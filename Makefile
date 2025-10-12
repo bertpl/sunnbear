@@ -11,6 +11,8 @@ help:
 	@echo '  format		                    Format source code using ruff.'
 	@echo '  format-single-file             Format single file using ruff. Useful in e.g. PyCharm to automatically trigger formatting on file save.'
 	@echo ''
+	@echo '  splash       			        Build splash screen using current version of package.'
+	@echo ''
 	@echo 'Options:'
 	@echo ''
 	@echo '  format-single-file             - accepts `file_path=<path>` to pass the relative path of the file to be formatted.'
@@ -25,9 +27,9 @@ test:
 coverage:
 	# run tests with Python 3.11; without optional dependencies & create new report
 	uv sync	# should remove optional dependencies
-	uv run --python 3.11 pytest ./tests --cov=./sunnbear/ --cov-report=html
+	uv run --python 3.11 pytest ./tests --cov --cov-report=html
 	# run tests with Python 3.13; with optional dependencies & append to report
-	uv run --all-extras --python 3.13 pytest ./tests --cov=./sunnbear/ --cov-append --cov-report=html
+	uv run --all-extras --python 3.13 pytest ./tests --cov --cov-append --cov-report=html
 
 format:
 	uvx ruff format .;
@@ -36,3 +38,6 @@ format:
 format-single-file:
 	uvx ruff format ${file_path};
 	uvx ruff check --fix ${file_path};
+
+splash:
+	./.github/scripts/create_splash.sh "$$(uv version --short)-dev";

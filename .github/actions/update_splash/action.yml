@@ -1,6 +1,6 @@
 name: Update Splash Image
 author: Bert Pluymers
-description: Generate updated Splash image with appropriate package version & upload to GH pages.
+description: Generate updated Splash image with appropriate package version.
 
 inputs:
     uv_version:
@@ -18,45 +18,35 @@ runs:
         uses: actions/checkout@v4
         with:
           token: '${{ inputs.github_token }}'
-          ref: develop  # this always acts upon the develop branch
+          ref: ${{ github.ref }} # check out the triggering ref
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
           version: ${{ inputs.uv_version }}
 
-      - name: Determine Package version
-        shell: bash
-        run: |
-            PACKAGE_VERSION=$(uv version --short)
-            echo "PACKAGE_EFFECTIVE_VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV            
+      - name: Determine Build Type
+        id: build_type
+        uses: ./.github/actions/build_type
 
       - name: Install ImageMagick 7
         uses: mfinelli/setup-imagemagick@v7
 
+      - name: Determine Package version
+        shell: bash
+        run: |
+            PACKAGE_VERSION=$(uv version --short)
+            if [[ "${{ steps.build_type.outputs.build_type }}" == "develop" ]]; then
+              DISPLAY_VERSION="v${PACKAGE_VERSION}-dev"
+            else
+              DISPLAY_VERSION="v${PACKAGE_VERSION}"
+            fi
+            echo "DISPLAY_VERSION=$DISPLAY_VERSION" >> $GITHUB_ENV  
+
       - name: Prepare splash screen
         shell: bash
         run: |
-            magick -pointsize 100 -background transparent \
-                   -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"S" \
-                   -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"........ " \
-                   -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"UN" \
-                   -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"...... ." \
-                   -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"N" \
-                   -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"........ ......... ... " \
-                   -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"B" \
-                   -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:".... " \
-                   -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"E" \
-                   -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"......... .. " \
-                   -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"A" \
-                   -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"......... ... " \
-                   -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"R" \
-                   -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"...-......." \
-                   +append "./images/header.png"
-            magick "./images/splash/splash.webp" "./images/header.png" -gravity North -geometry +0+5 -composite "./images/temp.png"
-            magick -pointsize 36 -font "./images/splash/google_fonts_montserrat_italic.ttf" "./images/temp.png" -gravity SouthWest -fill "#ffffff" -annotate +10+5 "DiffusionBee 2.5.3 (FLUX.1-dev + Real-ESRGAN)" "./images/temp.png"
-            magick -pointsize 128 -font "./images/splash/google_fonts_montserrat_bold.ttf" "./images/temp.png" -gravity East -fill "black" -annotate +1262+273 "v${PACKAGE_EFFECTIVE_VERSION}" "./images/temp.png"            
-            magick -pointsize 128 -font "./images/splash/google_fonts_montserrat_bold.ttf" "./images/temp.png" -gravity East -fill "white" -annotate +1265+270 "v${PACKAGE_EFFECTIVE_VERSION}" -quality 90 -define webp:lossless=false "./images/splash_with_version.webp"                                                
+            ./.github/scripts/create_splash.sh "${DISPLAY_VERSION}"
             mkdir -p "./splash"
             cp "./images/splash_with_version.webp" "./splash/splash.webp"           
 

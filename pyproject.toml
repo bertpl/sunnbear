@@ -11,14 +11,24 @@ dependencies = [
     "numpy>=1.20",
     "numba>=0.58.0",
     "matplotlib>=3.5.0",
-    "brtp>=0.0.1",
     "counted-float>=1.0.0",
     "snuffled>=0.0.1",
+    "max-div>=0.0.1",
+    "mpl-composite>=0.0.1",
+]
+
+[dependency-groups]
+dev = [
+    "genbadge[all]>=1.1.2",
+    "jupyterlab>=4.4.6",
+    "notebook>=7.4.5",
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
 ]
 
 [project.urls]
 Source = "https://github.com/bertpl/sunnbear"
-ChangeLog = "https://github.com/bertpl/sunnbear/blob/develop/CHANGELOG.md"
+ChangeLog = "https://github.com/bertpl/sunnbear/blob/main/CHANGELOG.md"
 Issues = "https://github.com/bertpl/sunnbear/issues"
 Roadmap = "https://github.com/bertpl/sunnbear/milestones"
 
@@ -39,11 +49,11 @@ target-version = "py313"
 [tool.ruff.lint]
 select = ["I"]
 
-[dependency-groups]
-dev = [
-    "genbadge[all]>=1.1.2",
-    "jupyterlab>=4.4.6",
-    "notebook>=7.4.5",
-    "pytest>=8.0",
-    "pytest-cov>=6.0",
+[tool.coverage.run]
+source = ["sunnbear"]
+
+[tool.coverage.report]
+exclude_also = [
+    "@abstractmethod",
+    "@abc.abstractmethod",
 ]
