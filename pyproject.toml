@@ -1,8 +1,10 @@
 [project]
 name = "sunnbear"
 version = "0.0.3"
-description = "/"
+description = "Benchmarking framework for univariate root-solvers — under construction."
 readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [
     { name = "Bert Pluymers", email = "bert.pluymers@gmail.com" }
 ]
@@ -24,6 +26,20 @@ dependencies = [
     "snuffled>=0.1.6",
     "max-div>=0.5.5",
     "mpl-composite>=0.1.2",
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    # Python versions kept in sync with .python-versions (release.py enforces this)
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Typing :: Typed",
 ]
 
 [dependency-groups]
