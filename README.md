@@ -5,6 +5,7 @@
 ![Python](https://img.shields.io/pypi/pyversions/sunnbear.svg)
 ![License](https://img.shields.io/badge/license-Apache--2.0-blue)
 ![code style: ruff](https://img.shields.io/badge/code%20style-ruff-261230)
+![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/bertpl/sunnbear/badge)
 
 # sunnbear
 
