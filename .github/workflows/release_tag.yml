@@ -16,10 +16,10 @@ jobs:
     name: Validate tag name matches package version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v8
+      - uses: astral-sh/setup-uv@f98e06938123ccabd21905ea5d0069192241f9f1 # v8.3.1
         with:
           version: ${{ vars.UV_VERSION }}
           enable-cache: false  # release path: never restore runtime artifacts from a poisonable cache
@@ -49,10 +49,10 @@ jobs:
       contents: read   # job-level perms replace the top-level block, so re-list read for checkout
       id-token: write  # mandatory for Trusted Publishing
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v8
+      - uses: astral-sh/setup-uv@f98e06938123ccabd21905ea5d0069192241f9f1 # v8.3.1
         with:
           version: ${{ vars.UV_VERSION }}
           enable-cache: false  # release path: never restore runtime artifacts from a poisonable cache
@@ -60,6 +60,6 @@ jobs:
         shell: bash
         run: uv build
       - name: Publish package distributions to PyPI   [---PROD---]
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
         with:
           repository-url: https://upload.pypi.org/legacy/
