@@ -8,19 +8,26 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "numpy>=1.20",
-    "numba>=0.58.0",
-    "matplotlib>=3.5.0",
-    "counted-float>=1.0.0",
-    "snuffled>=0.0.1",
-    "max-div>=0.0.1",
-    "mpl-composite>=0.0.1",
+    # Per-Python floors: each is the earliest version shipping a wheel for that
+    # CPython (and, for numpy, admitted by the numba floor on the same interpreter),
+    # so `lowest-direct` installs (not source-builds) across the whole matrix.
+    "numpy>=2.0.0; python_version < '3.13'",
+    "numpy>=2.1.0; python_version == '3.13'",
+    "numpy>=2.3.2; python_version >= '3.14'",
+    "numba>=0.60.0; python_version < '3.13'",
+    "numba>=0.61.0; python_version == '3.13'",
+    "numba>=0.66.0; python_version >= '3.14'",
+    "matplotlib>=3.8; python_version < '3.13'",
+    "matplotlib>=3.9.2; python_version == '3.13'",
+    "matplotlib>=3.10.7; python_version >= '3.14'",
+    "counted-float>=1.2.1",
+    "snuffled>=0.1.6",
+    "max-div>=0.5.5",
+    "mpl-composite>=0.1.2",
 ]
 
 [dependency-groups]
 dev = [
-    "jupyterlab>=4.4.6",
-    "notebook>=7.4.5",
     "pre-commit>=4.0",
     "pytest>=8.0",
     "pytest-cov>=6.0",
@@ -29,6 +36,15 @@ dev = [
     "ruff>=0.15.11",
     "ty==0.0.56",  # pre-1.0 type checker — pin exactly; its ruleset is still evolving
 ]
+# maintainer scratch tooling — installed by a plain `uv sync` (default-groups below)
+# but NOT by CI's `uv sync --group dev` / `uv run --group dev`, keeping matrix legs lean
+notebooks = [
+    "jupyterlab>=4.4.6",
+    "notebook>=7.4.5",
+]
+
+[tool.uv]
+default-groups = ["dev", "notebooks"]
 
 [project.urls]
 Source = "https://github.com/bertpl/sunnbear"
@@ -107,8 +123,11 @@ skip = "*.ipynb"
 
 [tool.coverage.run]
 source = ["src/sunnbear"]
+relative_files = true  # so per-combo matrix data files combine without a [paths] map
 
 [tool.coverage.report]
+precision = 2
+fail_under = 95        # cumulative gate, enforced on the combined matrix data
 exclude_also = [
     "@abstractmethod",
     "@abc.abstractmethod",
