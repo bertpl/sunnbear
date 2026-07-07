@@ -10,10 +10,10 @@ magick identify -version
 echo "----------------------------------------------------------------------------"
 
 # --- argument handling ---
-DISPLAY_VERSION="$1"  # e.g. "v0.1.10" or "v0.1.11-dev"
+DISPLAY_VERSION="$1"  # WITHOUT leading "v" (the annotation adds it), e.g. "0.1.10" or "0.1.11-dev"
 
 # --- create splash without version info ---
-if [ ! -f ./images/splash/_splash_without_version.png ]; then
+if [ ! -f ./images/_splash_without_version.png ]; then
     magick -pointsize 100 -background transparent \
            -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"S" \
            -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"........ " \

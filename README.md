@@ -1,7 +1,13 @@
-![shields.io-python-versions](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)
-![genbadge-test-count](https://bertpl.github.io/sunnbear/version_artifacts/develop/v0.0.3/badge-test-count.svg)
-![genbadge-test-coverage](https://bertpl.github.io/sunnbear/version_artifacts/develop/v0.0.3/badge-coverage.svg)
-![sunnbear logo](https://bertpl.github.io/sunnbear/version_artifacts/develop/v0.0.3/splash.webp)
+![CI](https://img.shields.io/github/actions/workflow/status/bertpl/sunnbear/push_to_main.yml?branch=main&label=CI)
+![Coverage](https://img.shields.io/badge/coverage-100.00%25-brightgreen)
+![Tests](https://img.shields.io/badge/tests-1-blue)
+![PyPI](https://img.shields.io/pypi/v/sunnbear.svg)
+![Python](https://img.shields.io/pypi/pyversions/sunnbear.svg)
+![License](https://img.shields.io/badge/license-Apache--2.0-blue)
+![code style: ruff](https://img.shields.io/badge/code%20style-ruff-261230)
 
-# SUNNBEAR
-/
+# sunnbear
+
+Benchmarking framework for univariate root-solvers — under construction.
+
+![sunnbear splash](images/splash_with_version.webp)
