@@ -2,6 +2,7 @@
 
 from ._bisection import Bisection
 from ._interval import Interval
+from ._regula_falsi import RegulaFalsi
 from ._result import SolveResult, SolveStatus
 from ._run import SolveRun
 from ._solver import BracketingSolver, Solver, StepOutcome
