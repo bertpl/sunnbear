@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `sunnbear.stats`: geometric pseudo-quantiles (`gpq`/`owg`) and exact mean pairwise L1 distance
 - Test-function framework: formulas with parameter recipes, stable function identities, and a file-drop formula catalog
+- Solver framework with flop counting, f-eval caps and guards, and a reference Bisection implementation
 
 ### Changed
 
