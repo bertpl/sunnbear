@@ -199,7 +199,7 @@ class BracketingSolver(Solver, Generic[S]):
     # --------------------------------------------------------------------------
     def _initial_state(self, run: SolveRun, interval: Interval) -> S:
         """Build the solver's carried state for a fresh run (default: none)."""
-        return cast(S, None)
+        return cast("S", None)
 
     @abstractmethod
     def _step(self, run: SolveRun, interval: Interval, state: S) -> StepOutcome[S]:
