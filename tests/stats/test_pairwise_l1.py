@@ -42,9 +42,7 @@ def test_mean_pairwise_l1_matches_brute_force():
     # --- arrange ----------------------
     rng = np.random.default_rng(13)
     vectors = rng.normal(size=(40, 5))
-    brute = np.mean(
-        [np.sum(np.abs(vectors[i] - vectors[j])) for i in range(40) for j in range(i + 1, 40)]
-    )
+    brute = np.mean([np.sum(np.abs(vectors[i] - vectors[j])) for i in range(40) for j in range(i + 1, 40)])
 
     # --- act / assert -----------------
     assert mean_pairwise_l1(vectors) == pytest.approx(float(brute))
