@@ -52,7 +52,7 @@ class ParamAxis:
     def values(self) -> tuple[float, ...]:
         """Materialize the axis's grid values, rounded to the grid resolution."""
         decimals = max(_decimals(self.start), _decimals(self.step))
-        n_points = int(round((self.stop - self.start) / self.step)) + 1
+        n_points = round((self.stop - self.start) / self.step) + 1
         grid = [round(self.start + i * self.step, decimals) for i in range(n_points)]
         grid = [g for g in grid if g <= self.stop + 10 ** -(decimals + 6)]
         if self.spacing == Spacing.LOG2:

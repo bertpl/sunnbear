@@ -26,7 +26,7 @@ def _make_cubic(p1: float) -> XCFun:
         return x * x * x - p1 * x - c
 
     # the numba dispatcher is call-compatible with the plain signature it wraps
-    return cast(XCFun, f)
+    return cast("XCFun", f)
 
 
 CUBIC = Formula(
