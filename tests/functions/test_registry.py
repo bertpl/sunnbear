@@ -52,7 +52,7 @@ def test_candidates_deduplicates_across_recipes():
     formula = Formula(
         number=999,
         name="dup_test",
-        make=lambda p1: (lambda x, c: x - c),
+        make=lambda p1: lambda x, c: x - c,
         bracket=lambda p1: (-1.0, 1.0),
         param_names=("p1",),
         recipes=(ParamRecipe.linear("p1", 0.0, 1.0, 0.5), ParamRecipe.linear("p1", 0.5, 1.5, 0.5)),
