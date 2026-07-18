@@ -1,12 +1,15 @@
 """Exact mean pairwise L1 distance in O(d * n log n), without a distance matrix.
 
-The mean absolute difference between all pairs of values of one coordinate (the
-Gini mean difference) is computable from a single sort: with values sorted
+The mean absolute difference between all pairs of values of one coordinate is
+the *Gini mean difference* (Gini, 1912; also "mean absolute difference" in the
+statistics literature — for positive data it equals twice the mean times the
+Gini coefficient). It is computable from a single sort: with values sorted
 ascending, element ``x_(j)`` (1-indexed) is the larger element of ``j - 1``
-pairs and the smaller of ``n - j``, so the pairwise sum collapses to
-``sum_j (2j - n - 1) * x_(j)``. The L1 metric adds over dimensions, so the mean
-pairwise L1 distance of a vector set is simply the sum of its per-dimension
-Gini mean differences — d sorts instead of n(n-1)/2 distance evaluations.
+pairs and the smaller of ``n - j``, so the pairwise sum collapses to the
+standard order-statistics identity ``sum_j (2j - n - 1) * x_(j)``. The L1
+metric adds over dimensions, so the mean pairwise L1 distance of a vector set
+is simply the sum of its per-dimension Gini mean differences — d sorts instead
+of n(n-1)/2 distance evaluations.
 """
 
 import numpy as np
