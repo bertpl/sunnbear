@@ -142,10 +142,22 @@ raises-require-match-for = ["Exception", "BaseException"]  # only the truly broa
 "tests/**" = ["SLF001", "S101", "S311", "D", "ANN"]  # AAA tests: asserts, private access, random data, no docstring/annotation duty
 "__init__.py" = ["F401"]                 # re-export modules: naked imports, no `as` alias
 "scripts/**" = ["INP001", "S"]           # maintainer tooling, not the shipped library
+# catalog naming convention F<number>_<Name>: the underscore beats CapWords readability-wise
+# for number-prefixed names (F102OddPower reads badly due to O-vs-0)
+"src/sunnbear/functions/catalog/**" = ["N801"]
 ".github/scripts/**" = ["INP001", "S", "D", "ANN"]   # maintainer tooling, not held to shipped-source style
 
 [tool.ty.src]
 include = ["src/sunnbear"]
+
+[[tool.ty.overrides]]
+# catalog formulas implement the Formula hooks with named parameters (p1, p2, ...)
+# instead of the base's *params — deliberately: readability of 100+ formula modules
+# outweighs strict override variance; the only caller is Formula.candidate(*params).
+include = ["src/sunnbear/functions/catalog/**"]
+
+[tool.ty.overrides.rules]
+invalid-method-override = "ignore"
 
 [tool.codespell]
 # "intoto": the in-toto attestation format (provenance.intoto.jsonl).

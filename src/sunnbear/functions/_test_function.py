@@ -6,14 +6,10 @@ rather than of a nullable field, so code that requires a benchmarkable
 function cannot silently receive an uncalibrated one.
 """
 
-from collections.abc import Callable
 from dataclasses import dataclass
 
-from ._formula import XCFun
 from ._identity import FunctionId
-
-# Single-argument view of a test function once c is bound: f(x) -> float.
-XFun = Callable[[float], float]
+from ._types import XCFun, XFun
 
 
 # ==================================================================================================

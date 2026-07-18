@@ -1,39 +1,53 @@
-"""Explicit formula registry: aggregation, candidate materialization, reconstruction.
+"""Formula registry: catalog discovery, candidate materialization, reconstruction.
 
-Formulas register by appearing in a module-level ``FORMULAS`` tuple that this
-module imports and aggregates explicitly — no reflection, no import side
-effects. `build` is the reconstruction seam: benchmark workers and users
-rebuild a `TestFunction` from its identity plus an externally supplied
-c-range (calibration results are explicit inputs; a missing one is an error,
-never a default).
+Discovery is a bounded convention: importing this module imports every module
+under the catalog package, and defining a `Formula` subclass registers it —
+adding a formula is adding a file, with no list to maintain anywhere. `build`
+is the reconstruction seam: benchmark workers and users rebuild a
+`TestFunction` from its identity plus an externally supplied c-range
+(calibration results are explicit inputs; a missing one is an error, never a
+default).
 """
 
+import importlib
+import inspect
+import pkgutil
 from collections.abc import Iterator
 
 from sunnbear.errors import InvalidParamsError, UnknownFormulaError
 
+from . import _formula as _formula_module
+from . import catalog
 from ._formula import Formula
 from ._identity import FunctionId
 from ._test_function import Candidate, TestFunction
-from .examples import FORMULAS as _EXAMPLE_FORMULAS
 
-# Explicit aggregation, one entry per formula module.
-_ALL_FORMULAS: tuple[Formula, ...] = (*_EXAMPLE_FORMULAS,)
+# Catalog discovery: importing the catalog's modules triggers Formula.__init_subclass__
+# registration. Bounded to the catalog package by construction.
+for _module_info in pkgutil.walk_packages(catalog.__path__, prefix=f"{catalog.__name__}."):
+    importlib.import_module(_module_info.name)
 
 
 # ==================================================================================================
 #  Registry API
 # ==================================================================================================
 def formulas() -> tuple[Formula, ...]:
-    """Return all registered formulas, sorted by formula number.
+    """Return one instance of every registered concrete formula, sorted by formula number.
 
     Raises:
-        ValueError: If two registered formulas share a number.
+        ValueError: If a registered formula has a non-positive number, or two
+            registered formulas share a number.
     """
-    numbers = [formula.number for formula in _ALL_FORMULAS]
+    # accessed via the module (not imported directly) so the registration list stays
+    # a single swap-able seam — e.g. for isolation in downstream test suites
+    instances = [cls() for cls in _formula_module.registered_formula_classes if not inspect.isabstract(cls)]
+    for formula in instances:
+        if formula.number <= 0:
+            raise ValueError(f"Formula number must be > 0 (got {formula.number} for {type(formula).__name__}).")
+    numbers = [formula.number for formula in instances]
     if len(set(numbers)) != len(numbers):
         raise ValueError("Duplicate formula numbers in registry.")
-    return tuple(sorted(_ALL_FORMULAS, key=lambda formula: formula.number))
+    return tuple(sorted(instances, key=lambda formula: formula.number))
 
 
 def candidates(formula: Formula) -> Iterator[Candidate]:
@@ -44,14 +58,14 @@ def candidates(formula: Formula) -> Iterator[Candidate]:
     are emitted once. A formula without recipes yields a single candidate with
     an empty parameter tuple.
     """
+    recipes = formula.recipes()
     seen: set[tuple[float, ...]] = set()
-    param_tuples = (p for recipe in formula.recipes for p in recipe.tuples()) if formula.recipes else iter([()])
+    param_tuples = (p for recipe in recipes for p in recipe.tuples()) if recipes else iter([()])
     for params in param_tuples:
         if params in seen or not formula.is_param_tuple_valid(*params):
             continue
         seen.add(params)
-        a, b = formula.bracket(*params)
-        yield Candidate(id=FunctionId(formula.number, params), fun=formula.make(*params), a=a, b=b)
+        yield formula.candidate(params)
 
 
 def build(function_id: FunctionId | str, c_range: tuple[float, float]) -> TestFunction:
@@ -72,6 +86,6 @@ def build(function_id: FunctionId | str, c_range: tuple[float, float]) -> TestFu
         raise UnknownFormulaError(f"No registered formula with number {fid.formula} (id: {fid}).")
     if not formula.is_param_tuple_valid(*fid.params):
         raise InvalidParamsError(f"Parameter tuple {fid.params} is invalid for formula {formula.name} (id: {fid}).")
-    a, b = formula.bracket(*fid.params)
+    candidate = formula.candidate(fid.params)
     c_min, c_max = c_range
-    return TestFunction(id=fid, fun=formula.make(*fid.params), a=a, b=b, c_min=c_min, c_max=c_max)
+    return TestFunction(id=candidate.id, fun=candidate.fun, a=candidate.a, b=candidate.b, c_min=c_min, c_max=c_max)
