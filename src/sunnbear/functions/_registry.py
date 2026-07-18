@@ -19,8 +19,8 @@ from sunnbear.errors import InvalidParamsError, UnknownFormulaError
 from . import _formula as _formula_module
 from . import catalog
 from ._formula import Formula
-from ._identity import FunctionId
-from ._test_function import Candidate, TestFunction
+from ._identity import FunctionId, ParamValue
+from ._test_function import CandidateTestFunction, TestFunction
 
 # Catalog discovery: importing the catalog's modules triggers Formula.__init_subclass__
 # registration. Bounded to the catalog package by construction.
@@ -50,7 +50,7 @@ def formulas() -> tuple[Formula, ...]:
     return tuple(sorted(instances, key=lambda formula: formula.number))
 
 
-def candidates(formula: Formula) -> Iterator[Candidate]:
+def candidates(formula: Formula) -> Iterator[CandidateTestFunction]:
     """Materialize a formula's candidates: recipe tuples, deduplicated, validity-filtered.
 
     Yields candidates in first-seen recipe order; duplicates across recipes
@@ -59,10 +59,10 @@ def candidates(formula: Formula) -> Iterator[Candidate]:
     an empty parameter tuple.
     """
     recipes = formula.recipes()
-    seen: set[tuple[float, ...]] = set()
+    seen: set[tuple[ParamValue, ...]] = set()
     param_tuples = (p for recipe in recipes for p in recipe.tuples()) if recipes else iter([()])
     for params in param_tuples:
-        if params in seen or not formula.is_param_tuple_valid(*params):
+        if params in seen or not formula.is_param_tuple_valid(*(p.value for p in params)):
             continue
         seen.add(params)
         yield formula.candidate(params)
@@ -84,7 +84,7 @@ def build(function_id: FunctionId | str, c_range: tuple[float, float]) -> TestFu
     formula = by_number.get(fid.formula)
     if formula is None:
         raise UnknownFormulaError(f"No registered formula with number {fid.formula} (id: {fid}).")
-    if not formula.is_param_tuple_valid(*fid.params):
+    if not formula.is_param_tuple_valid(*fid.param_values):
         raise InvalidParamsError(f"Parameter tuple {fid.params} is invalid for formula {formula.name} (id: {fid}).")
     candidate = formula.candidate(fid.params)
     c_min, c_max = c_range

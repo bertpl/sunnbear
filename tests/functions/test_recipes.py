@@ -1,6 +1,6 @@
 import pytest
 
-from sunnbear.functions import ParamAxis, ParamRecipe, Spacing
+from sunnbear.functions import ParamAxis, ParamRecipe, ParamSpacing
 
 
 # ==================================================================================================
@@ -16,7 +16,7 @@ def test_axis_linear_values_are_grid_rounded():
 
 def test_axis_log2_values():
     # --- arrange ----------------------
-    axis = ParamAxis("p1", 0.0, 2.0, step=1.0, spacing=Spacing.LOG2)
+    axis = ParamAxis("p1", 0.0, 2.0, step=1.0, spacing=ParamSpacing.LOG2)
 
     # --- act / assert -----------------
     assert axis.values() == (1.0, 2.0, 4.0)
@@ -24,7 +24,7 @@ def test_axis_log2_values():
 
 def test_axis_log10_values():
     # --- arrange ----------------------
-    axis = ParamAxis("p1", -1.0, 1.0, step=1.0, spacing=Spacing.LOG10)
+    axis = ParamAxis("p1", -1.0, 1.0, step=1.0, spacing=ParamSpacing.LOG10)
 
     # --- act / assert -----------------
     assert axis.values() == (0.1, 1.0, 10.0)

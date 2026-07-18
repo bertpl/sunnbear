@@ -1,4 +1,4 @@
-"""Materialized test functions: `Candidate` (pre-calibration) and `TestFunction`.
+"""Materialized test functions: `CandidateTestFunction` (pre-calibration) and `TestFunction`.
 
 The two types differ by exactly one fact: whether a valid c-range has been
 established. Keeping them separate makes "calibrated" a property of the type
@@ -13,10 +13,10 @@ from ._types import XCFun, XFun
 
 
 # ==================================================================================================
-#  Candidate
+#  CandidateTestFunction
 # ==================================================================================================
 @dataclass(frozen=True)
-class Candidate:
+class CandidateTestFunction:
     """A materialized formula instance whose c-range is not (yet) established.
 
     Attributes:

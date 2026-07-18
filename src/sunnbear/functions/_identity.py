@@ -1,55 +1,106 @@
 """Stable identity of a test function: formula number plus its bound parameter tuple.
 
-Identity is the parameter tuple itself (not a materialization-order counter),
-so it is stable under recipe edits, reordering, and deduplication. The
-canonical string form renders each parameter in its shortest exactly
-round-tripping notation — plain decimal, ``2^e``, or ``10^e`` — keeping
-storage keys human-readable even for log-spaced parameter grids.
+A `FunctionId` is the pair *(formula number, parameter tuple)* — nothing else.
+In particular there is no materialization-order counter: which recipe produced
+a parameter tuple, or in which order, never affects identity, so identities
+are stable under recipe edits, reordering, and deduplication.
+
+Parameter values are `ParamValue` objects that *carry* the notation they were
+authored in (plain decimal, or an exponent on base 2/10 for log-spaced grids),
+so canonical strings like ``f105-2^1.2_0.4`` are rendered and parsed directly —
+no reverse-engineering of notation from bare floats anywhere.
 """
 
-import math
 from dataclasses import dataclass
 
 
 # ==================================================================================================
-#  Parameter value formatting
+#  ParamValue
 # ==================================================================================================
-def format_param(value: float) -> str:
-    """Render a parameter value in its shortest exactly round-tripping notation.
+def _snap(x: float) -> float:
+    """Canonicalize a float to 10 significant digits (shortest-repr friendly)."""
+    return float(f"{x:.10g}")
 
-    Candidates are the plain decimal `repr`, ``2^e``, and ``10^e`` (with `e`
-    itself in decimal `repr`); only notations that reproduce the exact float
-    are considered, and ties prefer plain decimal.
+
+@dataclass(frozen=True, eq=False)
+class ParamValue:
+    """A parameter value carrying the notation it was authored in.
+
+    Identity (equality, hashing, ordering) is by `value` only — notation is
+    presentation. The construction classmethods canonicalize their input (the
+    decimal value, or the exponent for exponential notation) to **10
+    significant digits**, so ulp-level float noise can neither lengthen the
+    rendered notation nor split identities. Warning: this also means two
+    parameters differing only beyond the 10th significant digit are merged —
+    identity granularity is 10 significant digits by design.
+
+    Attributes:
+        value: The actual float handed to formula code; the identity datum.
+        base: None for decimal notation; 2 or 10 for ``base^exponent`` notation.
+        exponent: The (canonicalized) exponent for exponential notation.
     """
-    candidates = [repr(value)]
-    if value > 0.0:
-        for log_fn, base, prefix in ((math.log2, 2.0, "2^"), (math.log10, 10.0, "10^")):
-            exponent = _shortest_exact_exponent(value, base, log_fn(value))
-            if exponent is not None:
-                candidates.append(f"{prefix}{exponent!r}")
-    return min(candidates, key=lambda s: (len(s), s != candidates[0]))
 
+    value: float
+    base: int | None = None
+    exponent: float | None = None
 
-def _shortest_exact_exponent(value: float, base: float, exponent_raw: float) -> float | None:
-    """Find the fewest-decimals exponent with ``base ** exponent == value`` exactly, if any.
+    # --------------------------------------------------------------------------
+    #  Construction
+    # --------------------------------------------------------------------------
+    @classmethod
+    def decimal(cls, value: float) -> "ParamValue":
+        """Build a plain-decimal parameter value."""
+        return cls(value=_snap(value))
 
-    The raw logarithm can be off by an ulp from the short exponent that
-    generated the value (e.g. ``10 ** -3.4``), so nearby rounded exponents are
-    tried from coarse to fine before falling back to the raw one.
-    """
-    for decimals in range(13):
-        exponent = round(exponent_raw, decimals)
-        if base**exponent == value:
-            return exponent
-    return exponent_raw if base**exponent_raw == value else None
+    @classmethod
+    def exponential(cls, base: int, exponent: float) -> "ParamValue":
+        """Build a ``base^exponent`` parameter value (base 2 or 10)."""
+        if base not in (2, 10):
+            raise ValueError(f"ParamValue supports exponent notation on base 2 or 10 (got {base}).")
+        snapped = _snap(exponent)
+        return cls(value=float(base) ** snapped, base=base, exponent=snapped)
 
+    @classmethod
+    def coerce(cls, value: "ParamValue | float") -> "ParamValue":
+        """Return `value` unchanged if already a `ParamValue`, else wrap it as decimal."""
+        return value if isinstance(value, ParamValue) else cls.decimal(value)
 
-def parse_param(token: str) -> float:
-    """Parse a single `format_param` token back to its float value."""
-    for prefix, base in (("2^", 2.0), ("10^", 10.0)):
-        if token.startswith(prefix):
-            return base ** float(token.removeprefix(prefix))
-    return float(token)
+    @classmethod
+    def parse(cls, token: str) -> "ParamValue":
+        """Parse one canonical-string token (``0.4``, ``2^1.2``, ``10^-3.4``)."""
+        for prefix, base in (("2^", 2), ("10^", 10)):
+            if token.startswith(prefix):
+                return cls.exponential(base, float(token.removeprefix(prefix)))
+        return cls.decimal(float(token))
+
+    # --------------------------------------------------------------------------
+    #  Identity: by value only
+    # --------------------------------------------------------------------------
+    def __eq__(self, other: object) -> bool:
+        """Compare by float value; notation is presentation, and bare floats compare too."""
+        if isinstance(other, ParamValue):
+            return self.value == other.value
+        if isinstance(other, int | float):
+            return self.value == float(other)
+        return NotImplemented
+
+    def __hash__(self) -> int:
+        """Hash by float value, consistent with float-comparing equality."""
+        return hash(self.value)
+
+    def __lt__(self, other: "ParamValue | float") -> bool:
+        """Order by float value."""
+        other_value = other.value if isinstance(other, ParamValue) else float(other)
+        return self.value < other_value
+
+    # --------------------------------------------------------------------------
+    #  Rendering
+    # --------------------------------------------------------------------------
+    def __str__(self) -> str:
+        """Render the canonical token: shortest repr, or ``base^exponent``."""
+        if self.base is None:
+            return repr(self.value)
+        return f"{self.base}^{self.exponent!r}"
 
 
 # ==================================================================================================
@@ -57,10 +108,24 @@ def parse_param(token: str) -> float:
 # ==================================================================================================
 @dataclass(frozen=True, order=True)
 class FunctionId:
-    """Identity of one test function: formula number + the bound parameter tuple."""
+    """Identity of one test function: formula number + the bound parameter tuple.
+
+    `params` accepts bare floats for convenience; they are coerced to
+    decimal-notation `ParamValue`s on construction.
+    """
 
     formula: int
-    params: tuple[float, ...]
+    params: tuple[ParamValue | float, ...]  # normalized to all-ParamValue in __post_init__
+
+    def __post_init__(self) -> None:
+        """Coerce any bare-float parameters to `ParamValue`."""
+        object.__setattr__(self, "params", tuple(ParamValue.coerce(p) for p in self.params))
+
+    @property
+    def param_values(self) -> tuple[float, ...]:
+        """Return the plain float values, e.g. for handing to formula code."""
+        # coerce is an idempotent no-op at runtime (post-init normalized); it narrows for typing
+        return tuple(ParamValue.coerce(p).value for p in self.params)
 
     # --------------------------------------------------------------------------
     #  Canonical string form
@@ -69,7 +134,7 @@ class FunctionId:
         """Render the canonical string form, e.g. ``f101-0.2`` or ``f105-2^1.2_0.4``."""
         if not self.params:
             return f"f{self.formula:03d}"
-        return f"f{self.formula:03d}-" + "_".join(format_param(p) for p in self.params)
+        return f"f{self.formula:03d}-" + "_".join(str(p) for p in self.params)
 
     @classmethod
     def from_string(cls, text: str) -> "FunctionId":
@@ -83,7 +148,7 @@ class FunctionId:
         number_part, _, params_part = text[1:].partition("-")
         try:
             formula = int(number_part)
-            params = tuple(parse_param(token) for token in params_part.split("_")) if params_part else ()
+            params = tuple(ParamValue.parse(token) for token in params_part.split("_")) if params_part else ()
         except ValueError as exc:
             raise ValueError(f"Invalid FunctionId string: {text!r}") from exc
         return cls(formula=formula, params=params)

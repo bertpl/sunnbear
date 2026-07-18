@@ -3,7 +3,9 @@
 A recipe spans one or more axes, each sweeping one named parameter over a
 linear or logarithmic grid. Grid values are rounded to their grid resolution
 so printed parameter values stay short, human-screenable, and exactly
-reproducible. The grammar is deliberately small (range + spacing + step +
+reproducible. Axes emit `ParamValue`s that carry their notation (a LOG2 axis
+emits ``2^g`` values), which is what keeps canonical identity strings free of
+notation guessing. The grammar is deliberately small (range + spacing + step +
 product flag); anything fancier is expressed by adding another recipe —
 recipes are additive.
 """
@@ -13,11 +15,13 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from enum import StrEnum
 
+from ._identity import ParamValue
+
 
 # ==================================================================================================
-#  Spacing
+#  ParamSpacing
 # ==================================================================================================
-class Spacing(StrEnum):
+class ParamSpacing(StrEnum):
     """How an axis's grid positions map to parameter values."""
 
     LINEAR = "linear"  # value = grid position
@@ -40,7 +44,7 @@ class ParamAxis:
     start: float
     stop: float
     step: float
-    spacing: Spacing = Spacing.LINEAR
+    spacing: ParamSpacing = ParamSpacing.LINEAR
 
     def __post_init__(self) -> None:
         """Validate that the grid is well-formed (positive step, stop not before start)."""
@@ -49,17 +53,17 @@ class ParamAxis:
         if self.stop < self.start:
             raise ValueError(f"ParamAxis stop must be >= start (got {self.start}..{self.stop}).")
 
-    def values(self) -> tuple[float, ...]:
-        """Materialize the axis's grid values, rounded to the grid resolution."""
+    def values(self) -> tuple[ParamValue, ...]:
+        """Materialize the axis's grid as `ParamValue`s carrying this axis's notation."""
         decimals = max(_decimals(self.start), _decimals(self.step))
         n_points = round((self.stop - self.start) / self.step) + 1
         grid = [round(self.start + i * self.step, decimals) for i in range(n_points)]
         grid = [g for g in grid if g <= self.stop + 10 ** -(decimals + 6)]
-        if self.spacing == Spacing.LOG2:
-            return tuple(2.0**g for g in grid)
-        if self.spacing == Spacing.LOG10:
-            return tuple(10.0**g for g in grid)
-        return tuple(grid)
+        if self.spacing == ParamSpacing.LOG2:
+            return tuple(ParamValue.exponential(2, g) for g in grid)
+        if self.spacing == ParamSpacing.LOG10:
+            return tuple(ParamValue.exponential(10, g) for g in grid)
+        return tuple(ParamValue.decimal(g) for g in grid)
 
 
 def _decimals(value: float) -> int:
@@ -88,7 +92,7 @@ class ParamRecipe:
         """Return the axis names, in tuple position order."""
         return tuple(axis.name for axis in self.axes)
 
-    def tuples(self) -> Iterator[tuple[float, ...]]:
+    def tuples(self) -> Iterator[tuple[ParamValue, ...]]:
         """Materialize the recipe's parameter tuples.
 
         Raises:
@@ -109,14 +113,14 @@ class ParamRecipe:
     @classmethod
     def linear(cls, name: str, start: float, stop: float, step: float) -> "ParamRecipe":
         """Build a single-axis recipe with a linear grid."""
-        return cls(axes=(ParamAxis(name, start, stop, step, Spacing.LINEAR),))
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamSpacing.LINEAR),))
 
     @classmethod
     def log2(cls, name: str, start: float, stop: float, step: float) -> "ParamRecipe":
         """Build a single-axis recipe gridded in log2 exponent space."""
-        return cls(axes=(ParamAxis(name, start, stop, step, Spacing.LOG2),))
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamSpacing.LOG2),))
 
     @classmethod
     def log10(cls, name: str, start: float, stop: float, step: float) -> "ParamRecipe":
         """Build a single-axis recipe gridded in log10 exponent space."""
-        return cls(axes=(ParamAxis(name, start, stop, step, Spacing.LOG10),))
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamSpacing.LOG10),))

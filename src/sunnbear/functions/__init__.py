@@ -7,7 +7,7 @@ How the pieces tie together, from authored code to a solvable function::
       │
       │ candidate(p)   [framework: make_fun(p) + optional numba jit + bracket(p)]
       ▼
-    Candidate ─── id: FunctionId(number, p) · fun: f(x, c) · bracket [a, b]
+    CandidateTestFunction ─── id: FunctionId(number, p) · fun: f(x, c) · bracket [a, b]
       │
       │ + calibrated c-range (external artifact; supplied to build(), never derived)
       ▼
@@ -24,9 +24,9 @@ Ownership summary:
   `catalog/`; defining the class registers it.
 - the framework owns everything mechanical: numba compilation (`Formula.jit`),
   identity (`FunctionId` — the parameter tuple itself, stable and
-  human-readable), `Candidate`/`TestFunction` assembly, and discovery
+  human-readable), `CandidateTestFunction`/`TestFunction` assembly, and discovery
   (`formulas`, `candidates`, `build`).
-- `Candidate` vs `TestFunction` differ by exactly one fact — whether a
+- `CandidateTestFunction` vs `TestFunction` differ by exactly one fact — whether a
   calibrated c-range exists — kept as two types so calibrated-ness is a
   property of the type, not a nullable field.
 """
@@ -35,9 +35,9 @@ Ownership summary:
 # package, and the registry import (last) triggers the catalog auto-import — by which
 # point every framework name below is already bound on this module.
 from ._formula import Formula
-from ._identity import FunctionId, format_param, parse_param
-from ._recipes import ParamAxis, ParamRecipe, Spacing
-from ._test_function import Candidate, TestFunction
+from ._identity import FunctionId, ParamValue
+from ._recipes import ParamAxis, ParamRecipe, ParamSpacing
+from ._test_function import CandidateTestFunction, TestFunction
 from ._types import XCFun, XFun
 
 from ._registry import build, candidates, formulas  # isort: skip  (must come after the framework names)

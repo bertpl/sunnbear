@@ -7,7 +7,7 @@ never stored here — the tolerance ``xtol``.
 
 Concrete formulas subclass `Formula` and implement three small hooks
 (`make_fun`, `bracket`, `recipes`); everything mechanical — numba compilation,
-identity construction, `Candidate` assembly, registration — lives on the base
+identity construction, `CandidateTestFunction` assembly, registration — lives on the base
 class, so a formula module contains nothing but the mathematics. Subclasses
 register themselves on definition (``__init_subclass__``), which also lets
 downstream users contribute formulas without touching this package.
@@ -18,9 +18,9 @@ from typing import ClassVar, cast
 
 import numba
 
-from ._identity import FunctionId
+from ._identity import FunctionId, ParamValue
 from ._recipes import ParamRecipe
-from ._test_function import Candidate
+from ._test_function import CandidateTestFunction
 from ._types import XCFun
 
 # All defined Formula subclasses, in definition order; the registry filters and instantiates.
@@ -77,16 +77,18 @@ class Formula(ABC):
     # --------------------------------------------------------------------------
     #  Framework-owned assembly
     # --------------------------------------------------------------------------
-    def candidate(self, params: tuple[float, ...]) -> Candidate:
+    def candidate(self, params: "tuple[ParamValue | float, ...]") -> CandidateTestFunction:
         """Materialize one candidate test function for a bound parameter tuple.
 
         Applies numba compilation (per `jit`) and assembles identity, function,
-        and bracket — formula implementations never construct a `Candidate`
-        themselves.
+        and bracket — formula implementations never construct a
+        `CandidateTestFunction` themselves, and their hooks receive plain
+        floats (`ParamValue` unwrapping is handled here).
         """
-        fun = self.make_fun(*params)
+        fid = FunctionId(self.number, tuple(params))
+        fun = self.make_fun(*fid.param_values)
         if self.jit:
             # numba's dispatcher is call-compatible with the plain f(x, c) it wraps
             fun = cast("XCFun", numba.njit(fun))
-        a, b = self.bracket(*params)
-        return Candidate(id=FunctionId(self.number, params), fun=fun, a=a, b=b)
+        a, b = self.bracket(*fid.param_values)
+        return CandidateTestFunction(id=fid, fun=fun, a=a, b=b)
