@@ -7,8 +7,18 @@ are stable under recipe edits, reordering, and deduplication.
 
 Parameter values are `ParamValue` objects that *carry* the notation they were
 authored in (plain decimal, or an exponent on base 2/10 for log-spaced grids),
-so canonical strings like ``f105-2^1.2_0.4`` are rendered and parsed directly —
-no reverse-engineering of notation from bare floats anywhere.
+so a notation-carrying rendering needs no reverse-engineering of notation from
+bare floats — and `from_string` parses either rendering back.
+
+**Two renderings, and which is the default matters.** ``str()`` and ``repr()``
+both produce the *canonical* form: plain decimals, independent of notation, so
+that equal identities always produce equal strings. `display` produces the
+notation-carrying form (``f105-2^1.2_0.4``) for human-facing output — suite
+files, gallery labels, error messages. The safe form is the default because
+the unsafe one fails silently: keying storage on a notation-carrying string
+would give one candidate two keys the moment an author switched a linear axis
+to a log2 one — never a wrong answer, just unbounded recomputation that
+nothing reports.
 
 Identity semantics live on `FunctionId`, and are **by parameter value, not
 notation**: two recipes can legitimately generate the same value in different
@@ -16,45 +26,49 @@ notations (a linear axis hitting ``4.0``, a log2 axis hitting ``2^2.0``), and
 those must be *one* test function — so `FunctionId` compares, hashes, and
 orders on the float values, making "throw all candidates' ids in a set" the
 complete deduplication story. `ParamValue` itself is a plain value object
-(notation included in its own equality).
+(notation included in its own equality), modelled as one subclass per
+notation so that no value carries fields belonging to a notation it does not
+use.
 """
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 
 # ==================================================================================================
 #  ParamValue
 # ==================================================================================================
-def _snap(x: float) -> float:
-    """Canonicalize a float to 10 significant digits (shortest-repr friendly)."""
+def _canonical(x: float) -> float:
+    """Round a float to 10 significant digits — the framework's identity granularity."""
     return float(f"{x:.10g}")
 
 
 @dataclass(frozen=True)
-class ParamValue:
-    """A parameter value carrying the notation it was authored in.
+class ParamValue(ABC):
+    """A parameter value, in the notation it was authored in.
 
-    The construction classmethods canonicalize their input (the decimal value,
-    or the exponent for exponential notation) to **10 significant digits**, so
-    ulp-level float noise can neither lengthen the rendered notation nor split
-    identities. Warning: this also means two parameters differing only beyond
-    the 10th significant digit are merged — identity granularity is 10
-    significant digits by design.
+    One subclass per notation, so a value cannot carry fields belonging to a
+    notation it does not use. Construct through the factories on this class
+    (`decimal`, `exponential`, `parse`) rather than the subclasses directly.
 
-    Equality of `ParamValue` itself is plain field equality (notation
-    included); *identity* comparisons — where notation must be invisible —
-    happen at the `FunctionId` level on the float values (see the module
-    docstring).
+    **The canonical-value invariant lives here**, in `__post_init__`: `value`
+    is rounded to 10 significant digits on *every* construction path, whatever
+    the notation. That is what makes the canonical rendering re-parse to the
+    same value, and it is deliberately not left to the subclasses — a variant
+    that forgot the step would produce identities that silently fail to
+    round-trip through storage. Consequence, by design: two parameters
+    differing only beyond the 10th significant digit are one parameter.
 
-    Attributes:
-        value: The actual float handed to formula code; the identity datum.
-        base: None for decimal notation; 2 or 10 for ``base^exponent`` notation.
-        exponent: The (canonicalized) exponent for exponential notation.
+    Equality is plain field equality, so it *is* notation-sensitive; identity
+    comparisons, where notation must be invisible, happen at the `FunctionId`
+    level (see the module docstring).
     """
 
     value: float
-    base: int | None = None
-    exponent: float | None = None
+
+    def __post_init__(self) -> None:
+        """Enforce the canonical-value invariant for every notation."""
+        object.__setattr__(self, "value", _canonical(self.value))
 
     # --------------------------------------------------------------------------
     #  Construction
@@ -62,19 +76,23 @@ class ParamValue:
     @classmethod
     def decimal(cls, value: float) -> "ParamValue":
         """Build a plain-decimal parameter value."""
-        return cls(value=_snap(value))
+        return DecimalParamValue(value=value)
 
     @classmethod
     def exponential(cls, base: int, exponent: float) -> "ParamValue":
         """Build a ``base^exponent`` parameter value (base 2 or 10)."""
         if base not in (2, 10):
             raise ValueError(f"ParamValue supports exponent notation on base 2 or 10 (got {base}).")
-        snapped = _snap(exponent)
-        return cls(value=float(base) ** snapped, base=base, exponent=snapped)
+        canonical_exponent = _canonical(exponent)
+        return ExponentialParamValue(
+            value=float(base) ** canonical_exponent,
+            base=base,
+            exponent=canonical_exponent,
+        )
 
     @classmethod
     def parse(cls, token: str) -> "ParamValue":
-        """Parse one canonical-string token (``0.4``, ``2^1.2``, ``10^-3.4``).
+        """Parse one string token (``0.4``, ``2^1.2``, ``10^-3.4``).
 
         Raises:
             ValueError: On an unsupported exponent base or a malformed token,
@@ -97,9 +115,44 @@ class ParamValue:
     #  Rendering
     # --------------------------------------------------------------------------
     def __str__(self) -> str:
-        """Render the canonical token: shortest repr, or ``base^exponent``."""
-        if self.base is None:
-            return repr(self.value)
+        """Render the canonical token: a plain decimal, independent of notation."""
+        return repr(self.value)
+
+    def __repr__(self) -> str:
+        """Same as `__str__` — so equal values look equal wherever they are printed."""
+        return str(self)
+
+    @abstractmethod
+    def display(self) -> str:
+        """Render with the authored notation — for humans, never for keys."""
+
+
+@dataclass(frozen=True, repr=False)  # repr=False: inherit the canonical __repr__ from the base
+class DecimalParamValue(ParamValue):
+    """A parameter value authored as a plain decimal."""
+
+    def display(self) -> str:
+        """Render the value as a plain decimal — identical to the canonical form."""
+        return repr(self.value)
+
+
+@dataclass(frozen=True, repr=False)  # repr=False: inherit the canonical __repr__ from the base
+class ExponentialParamValue(ParamValue):
+    """A parameter value authored as ``base^exponent``, as log-spaced grids produce.
+
+    The exponent is canonicalized alongside the value (which the base class
+    handles), so both the authored and the canonical renderings are stable.
+
+    Attributes:
+        base: 2 or 10.
+        exponent: The canonicalized exponent.
+    """
+
+    base: int
+    exponent: float
+
+    def display(self) -> str:
+        """Render as ``base^exponent``, e.g. ``2^1.2``."""
         return f"{self.base}^{self.exponent!r}"
 
 
@@ -112,7 +165,9 @@ class FunctionId:
 
     Equality, hashing, and ordering are by ``(formula, parameter float
     values)`` — notation-blind, so a set of `FunctionId`s deduplicates test
-    functions regardless of how their parameters were spelled.
+    functions regardless of how their parameters were spelled. ``str()`` and
+    ``repr()` render the matching canonical form; `display` renders the
+    authored notation (see the module docstring).
     """
 
     formula: int
@@ -141,13 +196,27 @@ class FunctionId:
         return (self.formula, self.param_values) < (other.formula, other.param_values)
 
     # --------------------------------------------------------------------------
-    #  Canonical string form
+    #  Rendering
     # --------------------------------------------------------------------------
     def __str__(self) -> str:
-        """Render the canonical string form, e.g. ``f101-0.2`` or ``f105-2^1.2_0.4``."""
+        """Render the canonical form, e.g. ``f101-0.2`` — what storage and cache keys use."""
         if not self.params:
             return f"f{self.formula:03d}"
         return f"f{self.formula:03d}-" + "_".join(str(p) for p in self.params)
+
+    def __repr__(self) -> str:
+        """Same as `__str__` — identity-consistent, so equal ids look equal when printed."""
+        return str(self)
+
+    def display(self) -> str:
+        """Render with each parameter's authored notation, e.g. ``f105-2^1.2_0.4``.
+
+        For human-facing output only; `from_string` parses it back, but keying
+        storage on it would split one identity across two keys.
+        """
+        if not self.params:
+            return f"f{self.formula:03d}"
+        return f"f{self.formula:03d}-" + "_".join(p.display() for p in self.params)
 
     @classmethod
     def from_string(cls, text: str) -> "FunctionId":

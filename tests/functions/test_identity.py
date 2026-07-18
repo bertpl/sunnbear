@@ -1,6 +1,6 @@
 import pytest
 
-from sunnbear.functions import FunctionId, ParamValue
+from sunnbear.functions import DecimalParamValue, ExponentialParamValue, FunctionId, ParamValue
 
 
 # ==================================================================================================
@@ -18,13 +18,37 @@ from sunnbear.functions import FunctionId, ParamValue
         (ParamValue.exponential(2, 12.3), "2^12.3"),
     ],
 )
-def test_param_value_rendering(pv, expected):
+def test_param_value_display_carries_notation(pv, expected):
+    assert pv.display() == expected
+
+
+@pytest.mark.parametrize(
+    "pv, expected",
+    [
+        (ParamValue.decimal(0.2), "0.2"),
+        (ParamValue.exponential(2, 2.0), "4.0"),  # notation gone: canonical is plain decimal
+        (ParamValue.exponential(10, 1.0), "10.0"),
+    ],
+)
+def test_param_value_str_is_canonical(pv, expected):
     assert str(pv) == expected
+    assert repr(pv) == expected  # repr matches str: equal values print equally
+
+
+def test_param_value_str_is_notation_blind():
+    assert str(ParamValue.decimal(4.0)) == str(ParamValue.exponential(2, 2.0))
 
 
 @pytest.mark.parametrize("token", ["0.2", "1.0", "-0.4", "2^1.2", "10^-3.4", "6553.6", "0.0", "-17.25", "1e-12"])
-def test_param_value_parse_render_roundtrip(token):
-    assert str(ParamValue.parse(token)) == token
+def test_param_value_parse_display_roundtrip(token):
+    assert ParamValue.parse(token).display() == token
+
+
+@pytest.mark.parametrize("token", ["0.2", "2^1.2", "10^-3.4", "2^12.3", "1e-12", "-17.25"])
+def test_param_value_canonical_form_reparses_to_the_same_value(token):
+    """The canonical rendering is what storage keys on, so it must survive a round-trip exactly."""
+    original = ParamValue.parse(token)
+    assert ParamValue.parse(str(original)).value == original.value
 
 
 @pytest.mark.parametrize(
@@ -53,7 +77,7 @@ def test_param_value_snap_kills_ulp_noise():
 
 
 def test_param_value_snap_applies_to_exponent():
-    assert str(ParamValue.exponential(10, -3.4000000000000004)) == "10^-3.4"
+    assert ParamValue.exponential(10, -3.4000000000000004).display() == "10^-3.4"
 
 
 def test_param_value_snap_preserves_magnitude():
@@ -67,6 +91,40 @@ def test_param_value_equality_is_notation_sensitive():
     assert ParamValue.decimal(2.0).value == ParamValue.exponential(2, 1.0).value
 
 
+@pytest.mark.parametrize(
+    "pv, expected_type",
+    [
+        (ParamValue.decimal(0.2), DecimalParamValue),
+        (ParamValue.parse("0.2"), DecimalParamValue),
+        (ParamValue.exponential(2, 1.2), ExponentialParamValue),
+        (ParamValue.parse("2^1.2"), ExponentialParamValue),
+    ],
+)
+def test_factories_build_the_matching_variant(pv, expected_type):
+    assert isinstance(pv, expected_type)
+
+
+def test_decimal_variant_carries_no_notation_fields():
+    """Illegal states are unrepresentable: a decimal value has no base/exponent to be wrong."""
+    assert not hasattr(ParamValue.decimal(4.0), "base")
+    assert not hasattr(ParamValue.decimal(4.0), "exponent")
+
+
+@pytest.mark.parametrize(
+    "pv",
+    [
+        DecimalParamValue(value=0.1 + 0.2),  # constructed directly, bypassing the factory
+        ExponentialParamValue(value=2**0.5, base=2, exponent=0.5),
+        ParamValue.decimal(0.1 + 0.2),
+        ParamValue.exponential(2, 12.3),
+    ],
+)
+def test_value_is_canonical_on_every_construction_path(pv):
+    """The base class enforces the invariant, so no variant can forget to apply it."""
+    assert pv.value == float(f"{pv.value:.10g}")
+    assert ParamValue.parse(str(pv)).value == pv.value  # and therefore the canonical form round-trips
+
+
 def test_param_value_rejects_unsupported_base():
     with pytest.raises(ValueError):
         ParamValue.exponential(3, 1.0)
@@ -75,12 +133,24 @@ def test_param_value_rejects_unsupported_base():
 # ==================================================================================================
 #  FunctionId
 # ==================================================================================================
-def test_function_id_canonical_string():
+def test_function_id_display_carries_notation():
     # --- arrange ----------------------
     fid = FunctionId(formula=105, params=(ParamValue.exponential(2, 1.2), ParamValue.decimal(0.4)))
 
     # --- act / assert -----------------
-    assert str(fid) == "f105-2^1.2_0.4"
+    assert fid.display() == "f105-2^1.2_0.4"
+
+
+def test_function_id_str_is_canonical_and_notation_blind():
+    """Storage keys on str(), so two spellings of one identity must give one string."""
+    # --- arrange ----------------------
+    as_decimal = FunctionId(101, (ParamValue.decimal(4.0),))
+    as_pow2 = FunctionId(101, (ParamValue.exponential(2, 2.0),))
+
+    # --- act / assert -----------------
+    assert str(as_decimal) == str(as_pow2) == "f101-4.0"
+    assert repr(as_decimal) == str(as_decimal)  # repr matches str
+    assert as_pow2.display() == "f101-2^2.0"  # the authored notation survives, for humans
 
 
 def test_function_id_no_params():
@@ -103,8 +173,14 @@ def test_function_id_equality_with_unrelated_type():
 
 
 @pytest.mark.parametrize("text", ["f105-2^1.2_0.4", "f007", "f101-0.2", "f102-5.0"])
-def test_function_id_string_roundtrip(text):
-    assert str(FunctionId.from_string(text)) == text
+def test_function_id_display_roundtrip(text):
+    assert FunctionId.from_string(text).display() == text
+
+
+@pytest.mark.parametrize("text", ["f105-2^1.2_0.4", "f007", "f101-0.2", "f102-5.0"])
+def test_function_id_canonical_form_reparses_to_the_same_identity(text):
+    original = FunctionId.from_string(text)
+    assert FunctionId.from_string(str(original)) == original
 
 
 def test_function_id_ordering():

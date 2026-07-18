@@ -1,6 +1,8 @@
+import itertools
+
 import pytest
 
-from sunnbear.functions import ParamAxis, ParamRecipe, ParamSpacing
+from sunnbear.functions import DecimalParamValue, ExponentialParamValue, ParamAxis, ParamRecipe, ParamSpacing
 
 
 # ==================================================================================================
@@ -12,7 +14,7 @@ def test_axis_linear_values_are_grid_rounded():
 
     # --- act / assert -----------------
     assert tuple(v.value for v in axis.values()) == (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
-    assert all(v.base is None for v in axis.values())
+    assert all(isinstance(v, DecimalParamValue) for v in axis.values())
 
 
 def test_axis_log2_values():
@@ -21,7 +23,8 @@ def test_axis_log2_values():
 
     # --- act / assert -----------------
     assert tuple(v.value for v in axis.values()) == (1.0, 2.0, 4.0)
-    assert [str(v) for v in axis.values()] == ["2^0.0", "2^1.0", "2^2.0"]
+    assert all(isinstance(v, ExponentialParamValue) for v in axis.values())
+    assert [v.display() for v in axis.values()] == ["2^0.0", "2^1.0", "2^2.0"]
 
 
 def test_axis_log10_values():
@@ -30,11 +33,41 @@ def test_axis_log10_values():
 
     # --- act / assert -----------------
     assert tuple(v.value for v in axis.values()) == (0.1, 1.0, 10.0)
-    assert [str(v) for v in axis.values()] == ["10^-1.0", "10^0.0", "10^1.0"]
+    assert [v.display() for v in axis.values()] == ["10^-1.0", "10^0.0", "10^1.0"]
 
 
 def test_axis_single_point():
     assert tuple(v.value for v in ParamAxis("p1", 3.0, 3.0, step=1.0).values()) == (3.0,)
+
+
+@pytest.mark.parametrize("value", [1e-05, -1e-05, 1e16, -3.5, 0.0])
+def test_axis_single_point_preserves_value_exactly(value):
+    """Values whose repr uses exponent notation must survive materialization intact."""
+    assert tuple(v.value for v in ParamAxis("p1", value, value, step=1.0).values()) == (value,)
+
+
+@pytest.mark.parametrize(
+    "start, stop, step",
+    [(-1e-05, -1e-05, 1.0), (1e-09, 1e-09, 1.0), (0.0, 0.0, 1.0), (-1.0, -1.0, 0.25)],
+)
+def test_axis_never_yields_an_empty_grid(start, stop, step):
+    """An empty grid would make coupled sweeps index out of range."""
+    assert len(ParamAxis("p1", start, stop, step).values()) >= 1
+
+
+def test_coupled_sweep_with_tiny_magnitude_axis():
+    # --- arrange ----------------------
+    recipe = ParamRecipe(
+        axes=(ParamAxis("p1", 0.0, 2.0, 1.0), ParamAxis("p2", -1e-05, -1e-05, 1.0)),
+        product=False,
+    )
+
+    # --- act / assert -----------------
+    assert [tuple(v.value for v in p) for p in recipe.tuples()] == [
+        (0.0, -1e-05),
+        (1.0, -1e-05),
+        (2.0, -1e-05),
+    ]
 
 
 @pytest.mark.parametrize("start, stop, step", [(0.0, 1.0, 0.0), (0.0, 1.0, -0.1), (2.0, 1.0, 0.5)])
@@ -54,7 +87,7 @@ def test_recipe_product():
     assert [tuple(v.value for v in p) for p in recipe.tuples()] == [(0.0, 5.0), (0.0, 6.0), (1.0, 5.0), (1.0, 6.0)]
 
 
-def test_recipe_joint_sweep():
+def test_recipe_coupled_sweep_same_lengths():
     # --- arrange ----------------------
     recipe = ParamRecipe(
         axes=(ParamAxis("p1", 0.0, 1.0, 1.0), ParamAxis("p2", 5.0, 6.0, 1.0)),
@@ -65,22 +98,97 @@ def test_recipe_joint_sweep():
     assert [tuple(v.value for v in p) for p in recipe.tuples()] == [(0.0, 5.0), (1.0, 6.0)]
 
 
-def test_recipe_joint_sweep_rejects_unequal_lengths():
+def test_recipe_coupled_sweep_unequal_lengths():
+    """Axes advance one coordinate at a time along a shared axis; lengths need not match."""
     # --- arrange ----------------------
     recipe = ParamRecipe(
-        axes=(ParamAxis("p1", 0.0, 2.0, 1.0), ParamAxis("p2", 5.0, 6.0, 1.0)),
+        axes=(ParamAxis("p1", 0.0, 4.0, 1.0), ParamAxis("p2", 0.0, 2.0, 1.0)),  # 5 values, 3 values
+        product=False,
+    )
+
+    # --- act --------------------------
+    tuples = [tuple(v.value for v in p) for p in recipe.tuples()]
+
+    # --- assert -----------------------
+    assert tuples == [(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (2.0, 1.0), (3.0, 1.0), (3.0, 2.0), (4.0, 2.0)]
+
+
+@pytest.mark.parametrize("n_p1, n_p2", [(5, 3), (32, 50), (101, 11), (7, 7), (2, 9)])
+def test_recipe_coupled_sweep_covers_every_value(n_p1, n_p2):
+    """No axis ever loses a value, and consecutive tuples differ in exactly the stepping axes."""
+    # --- arrange ----------------------
+    recipe = ParamRecipe(
+        axes=(ParamAxis("p1", 0.0, float(n_p1 - 1), 1.0), ParamAxis("p2", 0.0, float(n_p2 - 1), 1.0)),
+        product=False,
+    )
+
+    # --- act --------------------------
+    tuples = [tuple(v.value for v in p) for p in recipe.tuples()]
+
+    # --- assert -----------------------
+    assert {t[0] for t in tuples} == {float(i) for i in range(n_p1)}  # every p1 value appears
+    assert {t[1] for t in tuples} == {float(i) for i in range(n_p2)}  # every p2 value appears
+    assert max(n_p1, n_p2) <= len(tuples) <= (n_p1 - 1) + (n_p2 - 1) + 1
+    assert all(a != b for a, b in itertools.pairwise(tuples))  # no repeats
+    assert all(a <= b for a, b in itertools.pairwise(tuples))  # monotone in both axes
+
+
+def test_recipe_coupled_sweep_equal_lengths_is_a_zip():
+    # --- arrange ----------------------
+    recipe = ParamRecipe(
+        axes=(ParamAxis("p1", 0.0, 3.0, 1.0), ParamAxis("p2", 10.0, 13.0, 1.0)),
         product=False,
     )
 
     # --- act / assert -----------------
-    with pytest.raises(ValueError):
-        list(recipe.tuples())
+    assert [tuple(v.value for v in p) for p in recipe.tuples()] == [
+        (0.0, 10.0),
+        (1.0, 11.0),
+        (2.0, 12.0),
+        (3.0, 13.0),
+    ]
+
+
+def test_recipe_coupled_sweep_all_single_value_axes():
+    # --- arrange ----------------------
+    recipe = ParamRecipe(
+        axes=(ParamAxis("p1", 3.0, 3.0, 1.0), ParamAxis("p2", 7.0, 7.0, 1.0)),
+        product=False,
+    )
+
+    # --- act / assert -----------------
+    assert [tuple(v.value for v in p) for p in recipe.tuples()] == [(3.0, 7.0)]
+
+
+def test_recipe_coupled_sweep_three_axes():
+    # --- arrange ----------------------
+    recipe = ParamRecipe(
+        axes=(
+            ParamAxis("p1", 0.0, 2.0, 1.0),
+            ParamAxis("p2", 0.0, 1.0, 1.0),
+            ParamAxis("p3", 0.0, 3.0, 1.0),
+        ),
+        product=False,
+    )
+
+    # --- act --------------------------
+    tuples = [tuple(v.value for v in p) for p in recipe.tuples()]
+
+    # --- assert -----------------------
+    assert {t[0] for t in tuples} == {0.0, 1.0, 2.0}
+    assert {t[1] for t in tuples} == {0.0, 1.0}
+    assert {t[2] for t in tuples} == {0.0, 1.0, 2.0, 3.0}
+    assert tuples[0] == (0.0, 0.0, 0.0)
+    assert tuples[-1] == (2.0, 1.0, 3.0)
 
 
 def test_recipe_single_axis_convenience():
     # --- arrange / act ----------------
     recipe = ParamRecipe.log2("p1", 0.0, 1.0, step=0.5)
+    tuples = list(recipe.tuples())
 
     # --- assert -----------------------
     assert recipe.param_names() == ("p1",)
-    assert [tuple(v.value for v in p) for p in recipe.tuples()] == [(1.0,), (2**0.5,), (2.0,)]
+    # values are canonicalized to 10 significant digits, so compare at that resolution
+    assert [p[0].value for p in tuples] == pytest.approx([1.0, 2**0.5, 2.0], rel=1e-9)
+    assert [p[0].display() for p in tuples] == ["2^0.0", "2^0.5", "2^1.0"]

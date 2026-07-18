@@ -13,6 +13,7 @@ class F102_OddPower(Formula):
 
     number = 102
     name = "odd_power"
+    param_names = ("p1",)
     jit = False
 
     @staticmethod

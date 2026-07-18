@@ -31,6 +31,15 @@ class CandidateTestFunction:
     a: float
     b: float
 
+    def calibrated(self, c_min: float, c_max: float) -> "TestFunction":
+        """Promote to a `TestFunction` by attaching a calibrated c-range.
+
+        The c-range is the one fact separating the two types, so this method
+        is the only way to cross that line — calibration results are always
+        supplied from outside, never derived here.
+        """
+        return TestFunction(id=self.id, fun=self.fun, a=self.a, b=self.b, c_min=c_min, c_max=c_max)
+
 
 # ==================================================================================================
 #  TestFunction
@@ -50,8 +59,15 @@ class TestFunction:
     c_min: float
     c_max: float
 
-    def bind(self, c: float) -> XFun:
-        """Return the single-argument ``f(x)`` with `c` bound, e.g. for handing to a solver."""
+    def univariate_fun(self, c: float) -> XFun:
+        """Return the univariate ``f(x)`` for a fixed `c` — what a solver consumes.
+
+        A closure rather than `functools.partial`: `c` is the *second*
+        argument, so partial could only bind it by keyword, which measures
+        noticeably slower than this closure (binding it positionally would
+        require an ``f(c, x)`` signature, against the framework's ``f(x, c)``
+        convention).
+        """
         fun = self.fun
 
         def f(x: float) -> float:

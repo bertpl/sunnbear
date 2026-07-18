@@ -1,19 +1,35 @@
-"""Declarative parameter-grid recipes that materialize candidate parameter tuples.
+"""Declarative parameter grids: how a formula's parameter sweeps are specified.
 
-A recipe spans one or more axes, each sweeping one named parameter over a
-linear or logarithmic grid. Grid values are rounded to their grid resolution
-so printed parameter values stay short, human-screenable, and exactly
-reproducible. Axes emit `ParamValue`s that carry their notation (a LOG2 axis
-emits ``2^g`` values), which is what keeps canonical identity strings free of
-notation guessing. The grammar is deliberately small (range + spacing + step +
-product flag); anything fancier is expressed by adding another recipe —
-recipes are additive.
+Three small pieces compose, innermost first::
+
+    ParamSpacing   how one axis maps grid positions to values
+                   (LINEAR, or LOG2/LOG10 where the grid lives in exponent space)
+        │
+    ParamAxis      one swept parameter: a named grid from `start` to `stop`
+        │          in steps of `step`, materialized by values() as ParamValues
+        │          that carry this axis's notation (a LOG2 axis emits 2^g)
+        │
+    ParamRecipe    one or more axes, combined into parameter tuples by tuples():
+                   - product=True  (default) -> the axes' Cartesian product
+                   - product=False           -> a coupled sweep, in which the
+                     axes advance together at their own resolutions and their
+                     lengths need not match (see ParamRecipe._coupled_param_sweep)
+
+A formula holds a *tuple* of recipes and its candidates are their concatenation,
+so recipes are additive: anything the small grammar above cannot express is
+written as one more recipe rather than as a richer axis. Every recipe's axis
+names must match the formula's declared `param_names`, which is what fixes the
+meaning of tuple position (`Formula._validate_recipes`).
+
+Grid values are canonicalized on `ParamValue` construction, so they print short,
+stay human-screenable, and reproduce exactly.
 """
 
 import itertools
 from collections.abc import Iterator
 from dataclasses import dataclass
 from enum import StrEnum
+from math import lcm
 
 from ._identity import ParamValue
 
@@ -54,11 +70,16 @@ class ParamAxis:
             raise ValueError(f"ParamAxis stop must be >= start (got {self.start}..{self.stop}).")
 
     def values(self) -> tuple[ParamValue, ...]:
-        """Materialize the axis's grid as `ParamValue`s carrying this axis's notation."""
-        decimals = max(_decimals(self.start), _decimals(self.step))
+        """Materialize the axis's grid as `ParamValue`s carrying this axis's notation.
+
+        The accumulated float error in ``start + i * step`` is absorbed by
+        `ParamValue` construction, which canonicalizes to 10 significant
+        digits — so no separate grid rounding is needed here, and the grid is
+        never empty (``stop >= start`` with ``step > 0`` gives at least one
+        point, which the coupled sweep relies on).
+        """
         n_points = round((self.stop - self.start) / self.step) + 1
-        grid = [round(self.start + i * self.step, decimals) for i in range(n_points)]
-        grid = [g for g in grid if g <= self.stop + 10 ** -(decimals + 6)]
+        grid = [self.start + i * self.step for i in range(n_points)]
         if self.spacing == ParamSpacing.LOG2:
             return tuple(ParamValue.exponential(2, g) for g in grid)
         if self.spacing == ParamSpacing.LOG10:
@@ -66,23 +87,16 @@ class ParamAxis:
         return tuple(ParamValue.decimal(g) for g in grid)
 
 
-def _decimals(value: float) -> int:
-    """Count decimal digits in a value's shortest repr (0 for integers and exponent notation)."""
-    text = repr(value)
-    if "e" in text or "E" in text or "." not in text:
-        return 0
-    return len(text.split(".")[1])
-
-
 # ==================================================================================================
 #  ParamRecipe
 # ==================================================================================================
 @dataclass(frozen=True)
 class ParamRecipe:
-    """A set of axes materializing parameter tuples, as a full product or swept jointly.
+    """A set of axes materializing parameter tuples, as a full product or coupled.
 
-    With ``product=True`` (default) the axes span their Cartesian product; with
-    ``product=False`` all axes advance together (and must have equal lengths).
+    ``product=True`` (default): the axes span their Cartesian product.
+    ``product=False``: the axes advance together along a shared axis, each at
+    its own resolution (see `_coupled_param_sweep`); their lengths need not match.
     """
 
     axes: tuple[ParamAxis, ...]
@@ -92,20 +106,76 @@ class ParamRecipe:
         """Return the axis names, in tuple position order."""
         return tuple(axis.param_name for axis in self.axes)
 
-    def tuples(self) -> Iterator[tuple[ParamValue, ...]]:
-        """Materialize the recipe's parameter tuples.
+    # --------------------------------------------------------------------------
+    #  Coupled sweep
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _coupled_param_sweep(per_axis: list[tuple[ParamValue, ...]]) -> Iterator[tuple[ParamValue, ...]]:
+        """Advance every axis together along one shared position, whatever their lengths.
 
-        Raises:
-            ValueError: If ``product=False`` and the axes have unequal lengths.
+        Think of each axis as occupying the interval ``[0, 1]``, divided into
+        one plateau per value: an axis with ``n`` values gives plateau ``k`` the
+        stretch around ``k / (n - 1)``, so consecutive plateaus meet at the
+        boundaries ``(2k + 1) / (2 * (n - 1))``. A short axis therefore has few,
+        widely spaced boundaries and a long axis has many closely spaced ones.
+
+        The sweep walks the *union* of all axes' boundaries from 0 to 1,
+        emitting the current value of every axis after each crossing. A 5-value
+        and a 3-value axis line up like this::
+
+            p1 (5 values):  0  |  1  |  2  |  3  |  4      boundaries: 1/8 3/8 5/8 7/8
+            p2 (3 values):  0     |     1     |     2      boundaries:   1/4     3/4
+
+            shared position:  0 --+--+--+--+--+--+-- 1
+                                 1/8 | 3/8 5/8 | 7/8
+                                    1/4       3/4
+
+            emitted:  (0,0) (1,0) (1,1) (2,1) (3,1) (3,2) (4,2)
+
+        Two properties follow, and they are the whole point: each axis steps at
+        its own resolution, and no axis ever loses a value — so axis lengths
+        need neither match nor be reconciled, where a fixed-count sample of the
+        shared position would silently skip plateaus of the finer axis. Usually
+        one coordinate steps at a time; axes whose boundaries coincide step
+        together (any two even-length axes share the boundary ``1/2``).
+        Equal-length axes reduce to a plain zip, and axes that each hold a
+        single value yield exactly one tuple.
+
+        The implementation is a merge walk: instead of sampling positions and
+        locating each axis within them, the boundaries become a sorted event
+        stream, and each event advances the axes it belongs to. Scaling every
+        boundary by the least common multiple of the ``2 * (n - 1)``
+        denominators turns them into plain integers, so ordering and
+        coincidence are exact integer comparisons — no tolerances, and no
+        rational arithmetic in the loop. (The predecessor framework, which
+        established these semantics, instead sampled floats either side of each
+        boundary with an absolute epsilon.) Assumes every axis holds at least
+        one value, which `ParamAxis.values` guarantees.
         """
+        denominators = [2 * (len(values) - 1) for values in per_axis if len(values) > 1]
+        scale = lcm(*denominators) if denominators else 1
+        events: list[tuple[int, int]] = []
+        for axis, values in enumerate(per_axis):
+            if len(values) < 2:
+                continue
+            per_step = scale // (2 * (len(values) - 1))
+            events += [((2 * k + 1) * per_step, axis) for k in range(len(values) - 1)]
+        events.sort()
+
+        indices = [0] * len(per_axis)
+        yield tuple(values[0] for values in per_axis)
+        for _, coinciding in itertools.groupby(events, key=lambda event: event[0]):
+            for _, axis in coinciding:
+                indices[axis] += 1
+            yield tuple(values[index] for values, index in zip(per_axis, indices, strict=True))
+
+    def tuples(self) -> Iterator[tuple[ParamValue, ...]]:
+        """Materialize the recipe's parameter tuples."""
         per_axis = [axis.values() for axis in self.axes]
         if self.product:
             yield from itertools.product(*per_axis)
         else:
-            lengths = {len(values) for values in per_axis}
-            if len(lengths) > 1:
-                raise ValueError("Jointly swept axes must have equal lengths.")
-            yield from zip(*per_axis, strict=True)
+            yield from self._coupled_param_sweep(per_axis)
 
     # --------------------------------------------------------------------------
     #  Single-axis conveniences

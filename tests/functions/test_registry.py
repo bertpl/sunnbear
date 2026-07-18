@@ -2,7 +2,15 @@ import pytest
 
 import sunnbear.functions._formula as formula_module
 from sunnbear.errors import InvalidParamsError, UnknownFormulaError
-from sunnbear.functions import Formula, FunctionId, ParamRecipe, ParamValue, build, candidates, formulas
+from sunnbear.functions import (
+    Formula,
+    FunctionId,
+    ParamAxis,
+    ParamRecipe,
+    ParamValue,
+    candidate_from_id,
+    formulas,
+)
 from sunnbear.functions.catalog.f1xx_polynomials.f101_cubic import F101_Cubic
 from sunnbear.functions.catalog.f1xx_polynomials.f102_odd_power import F102_OddPower
 
@@ -27,7 +35,7 @@ def test_formulas_contains_catalog_sorted():
 
 def test_candidates_materializes_recipe_grid():
     # --- act --------------------------
-    cubic_candidates = list(candidates(F101_Cubic()))
+    cubic_candidates = list(F101_Cubic().build_all_candidates())
 
     # --- assert -----------------------
     assert [c.id.param_values for c in cubic_candidates] == [(0.0,), (0.2,), (0.4,), (0.6,), (0.8,), (1.0,)]
@@ -37,7 +45,7 @@ def test_candidates_materializes_recipe_grid():
 
 def test_candidates_applies_validity_filter():
     # --- act --------------------------
-    odd_candidates = list(candidates(F102_OddPower()))
+    odd_candidates = list(F102_OddPower().build_all_candidates())
 
     # --- assert -----------------------
     assert [c.id.param_values for c in odd_candidates] == [(1.0,), (3.0,), (5.0,), (7.0,)]
@@ -47,7 +55,7 @@ def test_candidates_applies_validity_filter():
 def test_candidates_functions_evaluate(formula_cls):
     """Both compilation paths (jitted f101, plain f102) produce working f(x, c) callables."""
     # --- arrange ----------------------
-    candidate = next(iter(candidates(formula_cls())))  # p1 = 0.0 resp. 1.0
+    candidate = formula_cls().build_all_candidates()[0]  # p1 = 0.0 resp. 1.0
 
     # --- act / assert -----------------
     assert candidate.fun(2.0, 1.0) == pytest.approx(candidate.fun(2.0, 0.0) - 1.0)
@@ -59,6 +67,7 @@ def test_candidates_deduplicates_across_recipes():
     class DupTest(Formula):
         number = 999
         name = "dup_test"
+        param_names = ("p1",)
         jit = False
 
         @staticmethod
@@ -72,7 +81,7 @@ def test_candidates_deduplicates_across_recipes():
             return (ParamRecipe.linear("p1", 0.0, 1.0, 0.5), ParamRecipe.linear("p1", 0.5, 1.5, 0.5))
 
     # --- act --------------------------
-    params = [c.id.param_values for c in candidates(DupTest())]
+    params = [c.id.param_values for c in DupTest().build_all_candidates()]
 
     # --- assert -----------------------
     assert params == [(0.0,), (0.5,), (1.0,), (1.5,)]
@@ -88,10 +97,10 @@ def _minimal_formula_cls(formula_number: int) -> type[Formula]:
         jit = False
 
         @staticmethod
-        def parametrized_fun(x: float, c: float, *params: float) -> float:
+        def parametrized_fun(x: float, c: float) -> float:
             return x - c
 
-        def bracket(self, *params: float) -> tuple[float, float]:
+        def bracket(self) -> tuple[float, float]:
             return (-1.0, 1.0)
 
         def recipes(self) -> tuple[ParamRecipe, ...]:
@@ -146,6 +155,7 @@ def test_candidates_deduplicates_across_notations():
     class CrossNotation(Formula):
         number = 995
         name = "cross_notation"
+        param_names = ("p1",)
         jit = False
 
         @staticmethod
@@ -160,10 +170,139 @@ def test_candidates_deduplicates_across_notations():
             return (ParamRecipe.linear("p1", 4.0, 4.0, 1.0), ParamRecipe.log2("p1", 2.0, 2.0, 1.0))
 
     # --- act --------------------------
-    ids = [c.id for c in candidates(CrossNotation())]
+    ids = [c.id for c in CrossNotation().build_all_candidates()]
 
     # --- assert -----------------------
     assert [str(fid) for fid in ids] == ["f995-4.0"]  # first-seen notation wins
+
+
+# ==================================================================================================
+#  recipe validation
+# ==================================================================================================
+def _formula_cls(number: int, declared: tuple[str, ...], recipes: tuple, fun=None, bracket=None):
+    """Build a throwaway Formula whose declaration and recipes can be varied independently."""
+    namespace = {
+        "number": number,
+        "name": f"varying_{number}",
+        "param_names": declared,
+        "jit": False,
+        "parametrized_fun": staticmethod(fun or (lambda x, c, p1: x - c)),
+        "bracket": bracket or (lambda self, p1: (-1.0, 1.0)),
+        "recipes": lambda self: recipes,
+    }
+    return type(f"Varying{number}", (Formula,), namespace)
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_recipe_axis_order_must_match_declared_params():
+    """Transposed axes would silently swap parameter values, so they must be rejected."""
+    # --- arrange ----------------------
+    transposed = ParamRecipe(axes=(ParamAxis("p2", 7.0, 7.0, 1.0), ParamAxis("p1", 3.0, 3.0, 1.0)))
+    cls = _formula_cls(
+        990,
+        ("p1", "p2"),
+        (transposed,),
+        fun=lambda x, c, p1, p2: x - c,
+    )
+
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match="recipe axes must match the declared parameters"):
+        cls().build_all_candidates()
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_recipe_arity_must_match_declared_params():
+    # --- arrange ----------------------
+    cls = _formula_cls(989, ("p1", "p2"), (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, p1, p2: x - c)
+
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match="recipe axes must match the declared parameters"):
+        cls().build_all_candidates()
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_declared_params_must_match_parametrized_fun_signature():
+    # --- arrange ----------------------
+    cls = _formula_cls(988, ("p1",), (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, other: x - c)
+
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match="parametrized_fun takes"):
+        cls().build_all_candidates()
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_varargs_parametrized_fun_is_rejected():
+    """Hooks must name their parameters, so declaration/implementation/recipes stay cross-checkable."""
+    # --- arrange ----------------------
+    cls = _formula_cls(987, ("p1",), (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, *params: x - c)
+
+    # --- act / assert -----------------
+    with pytest.raises(TypeError, match="must name its parameters"):
+        cls().build_all_candidates()
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_varargs_bracket_is_rejected():
+    # --- arrange ----------------------
+    cls = _formula_cls(
+        984,
+        ("p1",),
+        (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),),
+        bracket=lambda self, *params: (-1.0, 1.0),
+    )
+
+    # --- act / assert -----------------
+    with pytest.raises(TypeError, match="bracket must name its parameters"):
+        cls().build_all_candidates()
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_varargs_overridden_validity_hook_is_rejected():
+    """The base default legitimately takes *params, so only overrides are checked."""
+    # --- arrange ----------------------
+    cls = _formula_cls(983, ("p1",), (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),))
+    cls.is_param_tuple_valid = lambda self, *params: True
+
+    # --- act / assert -----------------
+    with pytest.raises(TypeError, match="is_param_tuple_valid must name its parameters"):
+        cls().build_all_candidates()
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_unoverridden_validity_hook_is_not_checked():
+    """A formula that does not override is_param_tuple_valid inherits the *params default, and is fine."""
+    # --- arrange ----------------------
+    cls = _formula_cls(982, ("p1",), (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),))
+
+    # --- act / assert -----------------
+    assert [c.id.param_values for c in cls().build_all_candidates()] == [(0.0,), (1.0,)]
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_declared_params_without_recipes_is_rejected():
+    # --- arrange ----------------------
+    cls = _formula_cls(986, ("p1",), ())
+
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match="defines no recipes"):
+        cls().build_all_candidates()
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_formula_yielding_no_candidates_is_rejected():
+    # --- arrange ----------------------
+    cls = _formula_cls(985, ("p1",), (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),))
+    cls.is_param_tuple_valid = lambda self, p1: False
+
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match="produced no candidates"):
+        cls().build_all_candidates()
+
+
+def test_every_catalog_formula_validates():
+    """Guards the catalog itself: a malformed formula module fails here, not in a pipeline run."""
+    for formula in formulas():
+        assert formula.build_all_candidates(), formula.name
 
 
 # ==================================================================================================
@@ -197,16 +336,16 @@ def test_compiled_formula_rejects_plain_method():
 
     # --- act / assert -----------------
     with pytest.raises(TypeError, match="staticmethod"):
-        PlainMethod().candidate(())
+        PlainMethod().build_candidate(())
 
 
 # ==================================================================================================
-#  build
+#  candidate_from_id / calibrated
 # ==================================================================================================
-def test_build_from_id_and_string():
+def test_candidate_from_id_and_string():
     # --- act --------------------------
-    tf_from_id = build(FunctionId(101, (ParamValue.decimal(0.2),)), c_range=(-5.0, 5.0))
-    tf_from_str = build("f101-0.2", c_range=(-5.0, 5.0))
+    tf_from_id = candidate_from_id(FunctionId(101, (ParamValue.decimal(0.2),))).calibrated(-5.0, 5.0)
+    tf_from_str = candidate_from_id("f101-0.2").calibrated(-5.0, 5.0)
 
     # --- assert -----------------------
     for tf in (tf_from_id, tf_from_str):
@@ -215,30 +354,30 @@ def test_build_from_id_and_string():
         assert tf.fun(2.0, 0.0) == pytest.approx(8.0 - 0.4)
 
 
-def test_build_bind():
+def test_univariate_fun():
     # --- arrange ----------------------
-    tf = build("f101-0.0", c_range=(-5.0, 5.0))
+    tf = candidate_from_id("f101-0.0").calibrated(-5.0, 5.0)
 
     # --- act --------------------------
-    f = tf.bind(c=1.0)
+    f = tf.univariate_fun(c=1.0)
 
     # --- assert -----------------------
     assert f(2.0) == pytest.approx(7.0)
 
 
-def test_build_unknown_formula():
+def test_candidate_from_id_unknown_formula():
     with pytest.raises(UnknownFormulaError):
-        build("f900-0.2", c_range=(-1.0, 1.0))
+        candidate_from_id("f900-0.2")
 
 
-def test_build_invalid_params():
+def test_candidate_from_id_invalid_params():
     with pytest.raises(InvalidParamsError):
-        build(FunctionId(102, (ParamValue.decimal(2.0),)), c_range=(-1.0, 1.0))  # even power: invalid
+        candidate_from_id(FunctionId(102, (ParamValue.decimal(2.0),)))  # even power: invalid
 
 
 def test_catalog_brackets_change_sign_within_c_range():
     # --- arrange ----------------------
-    tf = build("f102-5.0", c_range=(-1.0, 1.0))
+    tf = candidate_from_id("f102-5.0").calibrated(-1.0, 1.0)
 
     # --- act / assert -----------------
     for c in (-1.0, 0.0, 1.0):

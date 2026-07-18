@@ -1,19 +1,18 @@
-"""Formula registry: catalog discovery, candidate materialization, reconstruction.
+"""Formula registry: catalog discovery and reconstruction from an identity.
 
-Discovery is a bounded convention: importing this module imports every module
-under the catalog package, and defining a `Formula` subclass registers it —
-adding a formula is adding a file, with no list to maintain anywhere. `build`
-is the reconstruction seam: benchmark workers and users rebuild a
-`TestFunction` from its identity plus an externally supplied c-range
-(calibration results are explicit inputs; a missing one is an error, never a
-default).
+Discovery is a bounded convention: the first registry call imports every
+module under the catalog package, and defining a `Formula` subclass registers
+it — adding a formula is adding a file, with no list to maintain anywhere.
+`candidate_from_id` is the reconstruction seam: benchmark workers and users
+rebuild a test function from its identity, then attach the calibrated c-range
+a suite artifact supplies (`CandidateTestFunction.calibrated`) — a missing
+c-range is an error, never a default.
 """
 
 import functools
 import importlib
 import inspect
 import pkgutil
-from collections.abc import Iterator
 
 from sunnbear.errors import InvalidParamsError, UnknownFormulaError
 
@@ -21,7 +20,7 @@ from . import _formula as _formula_module
 from . import catalog
 from ._formula import Formula
 from ._identity import FunctionId
-from ._test_function import CandidateTestFunction, TestFunction
+from ._test_function import CandidateTestFunction
 
 
 @functools.cache
@@ -61,33 +60,14 @@ def formulas() -> tuple[Formula, ...]:
     return tuple(sorted(instances, key=lambda formula: formula.number))
 
 
-def candidates(formula: Formula) -> Iterator[CandidateTestFunction]:
-    """Materialize a formula's candidates: recipe tuples, deduplicated, validity-filtered.
+def candidate_from_id(function_id: FunctionId | str) -> CandidateTestFunction:
+    """Reconstruct a candidate test function from its identity.
 
-    Yields candidates in first-seen recipe order; duplicates across recipes
-    (exact tuple equality — grid rounding makes equal points bit-identical)
-    are emitted once. A formula without recipes yields a single candidate with
-    an empty parameter tuple.
-    """
-    recipes = formula.recipes()
-    seen: set[FunctionId] = set()
-    param_tuples = (p for recipe in recipes for p in recipe.tuples()) if recipes else iter([()])
-    for params in param_tuples:
-        fid = FunctionId(formula.number, params)
-        # FunctionId equality is notation-blind, so this set is the entire dedup story —
-        # cross-recipe duplicates collapse even when spelled in different notations
-        if fid in seen or not formula.is_param_tuple_valid(*fid.param_values):
-            continue
-        seen.add(fid)
-        yield formula.candidate(params)
-
-
-def build(function_id: FunctionId | str, c_range: tuple[float, float]) -> TestFunction:
-    """Reconstruct a `TestFunction` from its identity and an externally supplied c-range.
+    Attach a calibrated c-range via `CandidateTestFunction.calibrated` to
+    obtain a benchmarkable `TestFunction`.
 
     Args:
         function_id: The identity, as object or canonical string.
-        c_range: The calibrated ``(c_min, c_max)`` for this function.
 
     Raises:
         UnknownFormulaError: If the formula number is not in the registry.
@@ -100,6 +80,4 @@ def build(function_id: FunctionId | str, c_range: tuple[float, float]) -> TestFu
         raise UnknownFormulaError(f"No registered formula with number {fid.formula} (id: {fid}).")
     if not formula.is_param_tuple_valid(*fid.param_values):
         raise InvalidParamsError(f"Parameter tuple {fid.params} is invalid for formula {formula.name} (id: {fid}).")
-    candidate = formula.candidate(fid.params)
-    c_min, c_max = c_range
-    return TestFunction(id=candidate.id, fun=candidate.fun, a=candidate.a, b=candidate.b, c_min=c_min, c_max=c_max)
+    return formula.build_candidate(fid.params)

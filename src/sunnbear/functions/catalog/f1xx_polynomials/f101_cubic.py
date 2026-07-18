@@ -8,6 +8,7 @@ class F101_Cubic(Formula):
 
     number = 101
     name = "cubic"
+    param_names = ("p1",)
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p1: float) -> float:
