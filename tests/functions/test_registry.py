@@ -2,7 +2,7 @@ import pytest
 
 import sunnbear.functions._formula as formula_module
 from sunnbear.errors import InvalidParamsError, UnknownFormulaError
-from sunnbear.functions import Formula, FunctionId, ParamRecipe, build, candidates, formulas
+from sunnbear.functions import Formula, FunctionId, ParamRecipe, ParamValue, build, candidates, formulas
 from sunnbear.functions.catalog.f1xx_polynomials.f101_cubic import F101_Cubic
 from sunnbear.functions.catalog.f1xx_polynomials.f102_odd_power import F102_OddPower
 
@@ -30,7 +30,7 @@ def test_candidates_materializes_recipe_grid():
     cubic_candidates = list(candidates(F101_Cubic()))
 
     # --- assert -----------------------
-    assert [c.id.params for c in cubic_candidates] == [(0.0,), (0.2,), (0.4,), (0.6,), (0.8,), (1.0,)]
+    assert [c.id.param_values for c in cubic_candidates] == [(0.0,), (0.2,), (0.4,), (0.6,), (0.8,), (1.0,)]
     assert all(c.id.formula == F101_Cubic.number for c in cubic_candidates)
     assert all((c.a, c.b) == (-2.0, 2.0) for c in cubic_candidates)
 
@@ -40,7 +40,7 @@ def test_candidates_applies_validity_filter():
     odd_candidates = list(candidates(F102_OddPower()))
 
     # --- assert -----------------------
-    assert [c.id.params for c in odd_candidates] == [(1.0,), (3.0,), (5.0,), (7.0,)]
+    assert [c.id.param_values for c in odd_candidates] == [(1.0,), (3.0,), (5.0,), (7.0,)]
 
 
 @pytest.mark.parametrize("formula_cls", [F101_Cubic, F102_OddPower])
@@ -72,7 +72,7 @@ def test_candidates_deduplicates_across_recipes():
             return (ParamRecipe.linear("p1", 0.0, 1.0, 0.5), ParamRecipe.linear("p1", 0.5, 1.5, 0.5))
 
     # --- act --------------------------
-    params = [c.id.params for c in candidates(DupTest())]
+    params = [c.id.param_values for c in candidates(DupTest())]
 
     # --- assert -----------------------
     assert params == [(0.0,), (0.5,), (1.0,), (1.5,)]
@@ -140,6 +140,32 @@ def test_abstract_intermediates_are_not_instantiated():
     assert all(type(f) is not PolynomialBase for f in formulas())
 
 
+@pytest.mark.usefixtures("isolated_registry")
+def test_candidates_deduplicates_across_notations():
+    # --- arrange ----------------------
+    class CrossNotation(Formula):
+        number = 995
+        name = "cross_notation"
+        jit = False
+
+        @staticmethod
+        def parametrized_fun(x: float, c: float, p1: float) -> float:
+            return x - c
+
+        def bracket(self, p1: float) -> tuple[float, float]:
+            return (-1.0, 1.0)
+
+        def recipes(self) -> tuple[ParamRecipe, ...]:
+            # linear hits 4.0 as "4.0"; log2 hits it as "2^2.0" — same value, different notation
+            return (ParamRecipe.linear("p1", 4.0, 4.0, 1.0), ParamRecipe.log2("p1", 2.0, 2.0, 1.0))
+
+    # --- act --------------------------
+    ids = [c.id for c in candidates(CrossNotation())]
+
+    # --- assert -----------------------
+    assert [str(fid) for fid in ids] == ["f995-4.0"]  # first-seen notation wins
+
+
 # ==================================================================================================
 #  compilation
 # ==================================================================================================
@@ -179,12 +205,12 @@ def test_compiled_formula_rejects_plain_method():
 # ==================================================================================================
 def test_build_from_id_and_string():
     # --- act --------------------------
-    tf_from_id = build(FunctionId(101, (0.2,)), c_range=(-5.0, 5.0))
+    tf_from_id = build(FunctionId(101, (ParamValue.decimal(0.2),)), c_range=(-5.0, 5.0))
     tf_from_str = build("f101-0.2", c_range=(-5.0, 5.0))
 
     # --- assert -----------------------
     for tf in (tf_from_id, tf_from_str):
-        assert tf.id == FunctionId(101, (0.2,))
+        assert tf.id == FunctionId(101, (ParamValue.decimal(0.2),))
         assert (tf.a, tf.b, tf.c_min, tf.c_max) == (-2.0, 2.0, -5.0, 5.0)
         assert tf.fun(2.0, 0.0) == pytest.approx(8.0 - 0.4)
 
@@ -207,7 +233,7 @@ def test_build_unknown_formula():
 
 def test_build_invalid_params():
     with pytest.raises(InvalidParamsError):
-        build(FunctionId(102, (2.0,)), c_range=(-1.0, 1.0))  # even power: invalid
+        build(FunctionId(102, (ParamValue.decimal(2.0),)), c_range=(-1.0, 1.0))  # even power: invalid
 
 
 def test_catalog_brackets_change_sign_within_c_range():

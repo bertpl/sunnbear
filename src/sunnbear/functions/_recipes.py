@@ -40,7 +40,7 @@ class ParamAxis:
     ``start=0, stop=2, step=1`` yields values ``1.0, 2.0, 4.0``).
     """
 
-    name: str
+    param_name: str  # name of the parameter this axis sweeps, e.g. "p1" (descriptive)
     start: float
     stop: float
     step: float
@@ -90,7 +90,7 @@ class ParamRecipe:
 
     def param_names(self) -> tuple[str, ...]:
         """Return the axis names, in tuple position order."""
-        return tuple(axis.name for axis in self.axes)
+        return tuple(axis.param_name for axis in self.axes)
 
     def tuples(self) -> Iterator[tuple[ParamValue, ...]]:
         """Materialize the recipe's parameter tuples.

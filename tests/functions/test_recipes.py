@@ -11,7 +11,8 @@ def test_axis_linear_values_are_grid_rounded():
     axis = ParamAxis("p1", 0.0, 1.0, step=0.2)
 
     # --- act / assert -----------------
-    assert axis.values() == (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+    assert tuple(v.value for v in axis.values()) == (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+    assert all(v.base is None for v in axis.values())
 
 
 def test_axis_log2_values():
@@ -19,7 +20,8 @@ def test_axis_log2_values():
     axis = ParamAxis("p1", 0.0, 2.0, step=1.0, spacing=ParamSpacing.LOG2)
 
     # --- act / assert -----------------
-    assert axis.values() == (1.0, 2.0, 4.0)
+    assert tuple(v.value for v in axis.values()) == (1.0, 2.0, 4.0)
+    assert [str(v) for v in axis.values()] == ["2^0.0", "2^1.0", "2^2.0"]
 
 
 def test_axis_log10_values():
@@ -27,11 +29,12 @@ def test_axis_log10_values():
     axis = ParamAxis("p1", -1.0, 1.0, step=1.0, spacing=ParamSpacing.LOG10)
 
     # --- act / assert -----------------
-    assert axis.values() == (0.1, 1.0, 10.0)
+    assert tuple(v.value for v in axis.values()) == (0.1, 1.0, 10.0)
+    assert [str(v) for v in axis.values()] == ["10^-1.0", "10^0.0", "10^1.0"]
 
 
 def test_axis_single_point():
-    assert ParamAxis("p1", 3.0, 3.0, step=1.0).values() == (3.0,)
+    assert tuple(v.value for v in ParamAxis("p1", 3.0, 3.0, step=1.0).values()) == (3.0,)
 
 
 @pytest.mark.parametrize("start, stop, step", [(0.0, 1.0, 0.0), (0.0, 1.0, -0.1), (2.0, 1.0, 0.5)])
@@ -48,7 +51,7 @@ def test_recipe_product():
     recipe = ParamRecipe(axes=(ParamAxis("p1", 0.0, 1.0, 1.0), ParamAxis("p2", 5.0, 6.0, 1.0)))
 
     # --- act / assert -----------------
-    assert list(recipe.tuples()) == [(0.0, 5.0), (0.0, 6.0), (1.0, 5.0), (1.0, 6.0)]
+    assert [tuple(v.value for v in p) for p in recipe.tuples()] == [(0.0, 5.0), (0.0, 6.0), (1.0, 5.0), (1.0, 6.0)]
 
 
 def test_recipe_joint_sweep():
@@ -59,7 +62,7 @@ def test_recipe_joint_sweep():
     )
 
     # --- act / assert -----------------
-    assert list(recipe.tuples()) == [(0.0, 5.0), (1.0, 6.0)]
+    assert [tuple(v.value for v in p) for p in recipe.tuples()] == [(0.0, 5.0), (1.0, 6.0)]
 
 
 def test_recipe_joint_sweep_rejects_unequal_lengths():
@@ -80,4 +83,4 @@ def test_recipe_single_axis_convenience():
 
     # --- assert -----------------------
     assert recipe.param_names() == ("p1",)
-    assert list(recipe.tuples()) == [(1.0,), (2**0.5,), (2.0,)]
+    assert [tuple(v.value for v in p) for p in recipe.tuples()] == [(1.0,), (2**0.5,), (2.0,)]

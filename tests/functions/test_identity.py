@@ -27,6 +27,19 @@ def test_param_value_parse_render_roundtrip(token):
     assert str(ParamValue.parse(token)) == token
 
 
+@pytest.mark.parametrize(
+    "token, match",
+    [
+        ("3^1.4", "Unsupported exponent base"),
+        ("2^abc", "Malformed exponent"),
+        ("zz", "Malformed parameter token"),
+    ],
+)
+def test_param_value_parse_rejects_bad_tokens(token, match):
+    with pytest.raises(ValueError, match=match):
+        ParamValue.parse(token)
+
+
 def test_param_value_snap_kills_ulp_noise():
     # --- arrange ----------------------
     noisy = 0.1 + 0.2  # 0.30000000000000004
@@ -48,20 +61,10 @@ def test_param_value_snap_preserves_magnitude():
     assert ParamValue.decimal(1e-12).value == 1e-12
 
 
-def test_param_value_identity_is_by_value_not_notation():
-    # --- arrange ----------------------
-    as_decimal = ParamValue.decimal(2.0)
-    as_pow2 = ParamValue.exponential(2, 1.0)
-
-    # --- act / assert -----------------
-    assert as_decimal == as_pow2
-    assert hash(as_decimal) == hash(as_pow2)
-    assert as_decimal == 2.0  # bare floats compare too
-
-
-def test_param_value_ordering():
-    values = [ParamValue.exponential(2, 2.0), ParamValue.decimal(1.5), ParamValue.decimal(3.0)]
-    assert sorted(values) == [ParamValue.decimal(1.5), ParamValue.decimal(3.0), ParamValue.exponential(2, 2.0)]
+def test_param_value_equality_is_notation_sensitive():
+    # plain value-object equality; notation-blind identity lives on FunctionId
+    assert ParamValue.decimal(2.0) != ParamValue.exponential(2, 1.0)
+    assert ParamValue.decimal(2.0).value == ParamValue.exponential(2, 1.0).value
 
 
 def test_param_value_rejects_unsupported_base():
@@ -80,18 +83,23 @@ def test_function_id_canonical_string():
     assert str(fid) == "f105-2^1.2_0.4"
 
 
-def test_function_id_coerces_bare_floats():
-    # --- arrange ----------------------
-    fid = FunctionId(formula=101, params=(0.2,))
-
-    # --- act / assert -----------------
-    assert fid.params == (ParamValue.decimal(0.2),)
-    assert fid.param_values == (0.2,)
-    assert str(fid) == "f101-0.2"
-
-
 def test_function_id_no_params():
     assert str(FunctionId(formula=7, params=())) == "f007"
+
+
+def test_function_id_equality_is_notation_blind():
+    # --- arrange ----------------------
+    as_decimal = FunctionId(101, (ParamValue.decimal(4.0),))
+    as_pow2 = FunctionId(101, (ParamValue.exponential(2, 2.0),))
+
+    # --- act / assert -----------------
+    assert as_decimal == as_pow2
+    assert hash(as_decimal) == hash(as_pow2)
+    assert len({as_decimal, as_pow2}) == 1  # a set of ids is the whole dedup story
+
+
+def test_function_id_equality_with_unrelated_type():
+    assert FunctionId(101, (ParamValue.decimal(1.0),)) != "f101-1.0"
 
 
 @pytest.mark.parametrize("text", ["f105-2^1.2_0.4", "f007", "f101-0.2", "f102-5.0"])
@@ -101,13 +109,17 @@ def test_function_id_string_roundtrip(text):
 
 def test_function_id_ordering():
     # --- arrange ----------------------
-    ids = [FunctionId(102, (1.0,)), FunctionId(101, (0.4,)), FunctionId(101, (0.2,))]
+    ids = [
+        FunctionId(102, (ParamValue.decimal(1.0),)),
+        FunctionId(101, (ParamValue.decimal(0.4),)),
+        FunctionId(101, (ParamValue.decimal(0.2),)),
+    ]
 
     # --- act --------------------------
     ordered = sorted(ids)
 
     # --- assert -----------------------
-    assert ordered == [FunctionId(101, (0.2,)), FunctionId(101, (0.4,)), FunctionId(102, (1.0,))]
+    assert [str(fid) for fid in ordered] == ["f101-0.2", "f101-0.4", "f102-1.0"]
 
 
 @pytest.mark.parametrize("text", ["x101-0.2", "f-abc", "f101-zz", ""])

@@ -38,14 +38,12 @@ class Formula(ABC):
     Class attributes:
         number: Registry-wide formula number (grouping by type, e.g. 1xx polynomials).
         name: Short human-readable slug.
-        param_names: Names of the ``p`` tuple's positions, for display purposes.
         jit: Whether `parametrized_fun` is numba-compiled (default) — set
             False for formulas numba cannot compile.
     """
 
     number: ClassVar[int]
     name: ClassVar[str]
-    param_names: ClassVar[tuple[str, ...]] = ()
     jit: ClassVar[bool] = True
     # populated lazily per concrete class by _compiled_formula (annotation only — no value,
     # so the `in cls.__dict__` cache check below is not satisfied by this declaration)
@@ -122,7 +120,7 @@ class Formula(ABC):
             cls._compiled_formula_cache = numba.njit(fn) if cls.jit else fn
         return cls._compiled_formula_cache
 
-    def candidate(self, params: "tuple[ParamValue | float, ...]") -> CandidateTestFunction:
+    def candidate(self, params: "tuple[ParamValue, ...]") -> CandidateTestFunction:
         """Materialize one candidate test function for a bound parameter tuple.
 
         Binds the parameter values over the once-per-class compiled formula

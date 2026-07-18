@@ -9,6 +9,7 @@ is the reconstruction seam: benchmark workers and users rebuild a
 default).
 """
 
+import functools
 import importlib
 import inspect
 import pkgutil
@@ -19,13 +20,22 @@ from sunnbear.errors import InvalidParamsError, UnknownFormulaError
 from . import _formula as _formula_module
 from . import catalog
 from ._formula import Formula
-from ._identity import FunctionId, ParamValue
+from ._identity import FunctionId
 from ._test_function import CandidateTestFunction, TestFunction
 
-# Catalog discovery: importing the catalog's modules triggers Formula.__init_subclass__
-# registration. Bounded to the catalog package by construction.
-for _module_info in pkgutil.walk_packages(catalog.__path__, prefix=f"{catalog.__name__}."):
-    importlib.import_module(_module_info.name)
+
+@functools.cache
+def _load_catalog() -> None:
+    """Import every module under the catalog package (once), registering its formulas.
+
+    Lazy — called from `formulas()` rather than at import time — so importing
+    the framework never triggers catalog imports; by the time discovery runs,
+    the package is fully initialized and catalog modules can import framework
+    names from it without any import-order subtlety. Bounded to the catalog
+    package by construction.
+    """
+    for module_info in pkgutil.walk_packages(catalog.__path__, prefix=f"{catalog.__name__}."):
+        importlib.import_module(module_info.name)
 
 
 # ==================================================================================================
@@ -38,6 +48,7 @@ def formulas() -> tuple[Formula, ...]:
         ValueError: If a registered formula has a non-positive number, or two
             registered formulas share a number.
     """
+    _load_catalog()
     # accessed via the module (not imported directly) so the registration list stays
     # a single swap-able seam — e.g. for isolation in downstream test suites
     instances = [cls() for cls in _formula_module.registered_formula_classes if not inspect.isabstract(cls)]
@@ -59,12 +70,15 @@ def candidates(formula: Formula) -> Iterator[CandidateTestFunction]:
     an empty parameter tuple.
     """
     recipes = formula.recipes()
-    seen: set[tuple[ParamValue, ...]] = set()
+    seen: set[FunctionId] = set()
     param_tuples = (p for recipe in recipes for p in recipe.tuples()) if recipes else iter([()])
     for params in param_tuples:
-        if params in seen or not formula.is_param_tuple_valid(*(p.value for p in params)):
+        fid = FunctionId(formula.number, params)
+        # FunctionId equality is notation-blind, so this set is the entire dedup story —
+        # cross-recipe duplicates collapse even when spelled in different notations
+        if fid in seen or not formula.is_param_tuple_valid(*fid.param_values):
             continue
-        seen.add(params)
+        seen.add(fid)
         yield formula.candidate(params)
 
 

@@ -32,13 +32,9 @@ Ownership summary:
   property of the type, not a nullable field.
 """
 
-# NOTE: import order is load-bearing. Catalog modules import framework names from this
-# package, and the registry import (last) triggers the catalog auto-import — by which
-# point every framework name below is already bound on this module.
 from ._formula import Formula
 from ._identity import FunctionId, ParamValue
 from ._recipes import ParamAxis, ParamRecipe, ParamSpacing
+from ._registry import build, candidates, formulas
 from ._test_function import CandidateTestFunction, TestFunction
 from ._types import XCFun, XFun
-
-from ._registry import build, candidates, formulas  # isort: skip  (must come after the framework names)
