@@ -61,8 +61,9 @@ def test_candidates_deduplicates_across_recipes():
         name = "dup_test"
         jit = False
 
-        def make_fun(self, p1: float):
-            return lambda x, c: x - c
+        @staticmethod
+        def parametrized_fun(x: float, c: float, p1: float) -> float:
+            return x - c
 
         def bracket(self, p1: float) -> tuple[float, float]:
             return (-1.0, 1.0)
@@ -86,8 +87,9 @@ def _minimal_formula_cls(formula_number: int) -> type[Formula]:
         name = f"minimal_{formula_number}"
         jit = False
 
-        def make_fun(self, *params: float):
-            return lambda x, c: x - c
+        @staticmethod
+        def parametrized_fun(x: float, c: float, *params: float) -> float:
+            return x - c
 
         def bracket(self, *params: float) -> tuple[float, float]:
             return (-1.0, 1.0)
@@ -136,6 +138,40 @@ def test_abstract_intermediates_are_not_instantiated():
 
     # --- act / assert -----------------
     assert all(type(f) is not PolynomialBase for f in formulas())
+
+
+# ==================================================================================================
+#  compilation
+# ==================================================================================================
+def test_compiled_formula_is_cached_per_class():
+    # --- arrange ----------------------
+    first_instance, second_instance = F101_Cubic(), F101_Cubic()
+
+    # --- act / assert -----------------
+    assert first_instance._compiled_formula() is second_instance._compiled_formula()
+    assert F101_Cubic()._compiled_formula() is not F102_OddPower()._compiled_formula()
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_compiled_formula_rejects_plain_method():
+    # --- arrange ----------------------
+    class PlainMethod(Formula):
+        number = 996
+        name = "plain_method"
+        jit = False
+
+        def parametrized_fun(self, x: float, c: float) -> float:  # not a staticmethod: rejected
+            return x - c
+
+        def bracket(self) -> tuple[float, float]:
+            return (-1.0, 1.0)
+
+        def recipes(self) -> tuple[ParamRecipe, ...]:
+            return ()
+
+    # --- act / assert -----------------
+    with pytest.raises(TypeError, match="staticmethod"):
+        PlainMethod().candidate(())
 
 
 # ==================================================================================================

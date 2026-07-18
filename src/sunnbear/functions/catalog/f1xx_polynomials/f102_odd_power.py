@@ -1,6 +1,6 @@
 """f102 — odd power ``x^p1 - c``: a difficulty knob."""
 
-from sunnbear.functions import Formula, ParamRecipe, XCFun
+from sunnbear.functions import Formula, ParamRecipe
 
 
 class F102_OddPower(Formula):
@@ -16,13 +16,10 @@ class F102_OddPower(Formula):
     param_names = ("p1",)
     jit = False
 
-    def make_fun(self, p1: float) -> XCFun:
-        """Build ``x^p1 - c``."""
-
-        def f(x: float, c: float) -> float:
-            return x**p1 - c
-
-        return f
+    @staticmethod
+    def parametrized_fun(x: float, c: float, p1: float) -> float:
+        """Evaluate ``x^p1 - c``."""
+        return x**p1 - c
 
     def bracket(self, p1: float) -> tuple[float, float]:
         """Fixed bracket, wide enough for the calibrated c-range."""

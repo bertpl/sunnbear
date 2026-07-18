@@ -1,6 +1,6 @@
 """f101 — cubic ``x^3 - p1*x - c``."""
 
-from sunnbear.functions import Formula, ParamRecipe, XCFun
+from sunnbear.functions import Formula, ParamRecipe
 
 
 class F101_Cubic(Formula):
@@ -10,13 +10,10 @@ class F101_Cubic(Formula):
     name = "cubic"
     param_names = ("p1",)
 
-    def make_fun(self, p1: float) -> XCFun:
-        """Build ``x^3 - p1*x - c``."""
-
-        def f(x: float, c: float) -> float:
-            return x * x * x - p1 * x - c
-
-        return f
+    @staticmethod
+    def parametrized_fun(x: float, c: float, p1: float) -> float:
+        """Evaluate ``x^3 - p1*x - c``."""
+        return x * x * x - p1 * x - c
 
     def bracket(self, p1: float) -> tuple[float, float]:
         """Fixed bracket, wide enough for the calibrated c-range."""

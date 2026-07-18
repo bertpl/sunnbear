@@ -5,8 +5,8 @@ How the pieces tie together, from authored code to a solvable function::
     Formula (subclass, auto-registered on definition)
       │ recipes() ── ParamRecipe grids ──▶ p-tuples ── is_param_tuple_valid() filter
       │
-      │ candidate(p)   [framework: make_fun(p) + optional numba jit + bracket(p)]
-      ▼
+      │ candidate(p)   [framework: once-per-formula-compiled parametrized_fun,
+      ▼                 bound to p in a thin closure, + bracket(p)]
     CandidateTestFunction ─── id: FunctionId(number, p) · fun: f(x, c) · bracket [a, b]
       │
       │ + calibrated c-range (external artifact; supplied to build(), never derived)
@@ -19,10 +19,11 @@ How the pieces tie together, from authored code to a solvable function::
 
 Ownership summary:
 
-- a concrete `Formula` contributes only mathematics: `make_fun`, `bracket`,
+- a concrete `Formula` contributes only mathematics: `parametrized_fun`, `bracket`,
   `recipes`, optionally `is_param_tuple_valid` — one class, one module, under
   `catalog/`; defining the class registers it.
-- the framework owns everything mechanical: numba compilation (`Formula.jit`),
+- the framework owns everything mechanical: numba compilation — once per
+  formula, not per candidate (`Formula.jit`, `Formula._compiled_formula`),
   identity (`FunctionId` — the parameter tuple itself, stable and
   human-readable), `CandidateTestFunction`/`TestFunction` assembly, and discovery
   (`formulas`, `candidates`, `build`).
