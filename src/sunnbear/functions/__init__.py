@@ -6,7 +6,7 @@ How the pieces tie together, from authored code to a solvable function::
       │ build_all_candidates() ── ParamRecipe grids ──▶ p-tuples,
       │                          validated against param_names,
       │                          filtered by is_param_tuple_valid(),
-      │                          deduplicated by FunctionId
+      │                          then near-duplicates dropped (deduplicate_ids)
       │ build_candidate(p) [framework: carries the formula + identity, so the
       ▼                  callable forms are derived on demand; + bracket(p)]
     CandidateTestFunction ─── id: FunctionId(number, p) · xc_fun: f(x, c) · bracket [a, b]
@@ -30,16 +30,23 @@ Ownership summary:
   class registers it.
 - the framework owns everything mechanical: numba compilation — once per
   formula, not per candidate (`Formula.jit`, `Formula._compiled_formula`),
-  identity (`FunctionId` — the parameter tuple itself, stable and
-  human-readable), candidate assembly and enumeration, and discovery
-  (`FormulaRegistry`).
+  identity (`FunctionId` — the parameter tuple itself, stable, faithful to the
+  authored notation, and human-readable), candidate assembly and enumeration,
+  and discovery (`FormulaRegistry`).
 - `CandidateTestFunction` vs `TestFunction` differ by exactly one fact — whether a
   calibrated c-range exists — kept as two types so calibrated-ness is a
   property of the type, not a nullable field.
 """
 
 from ._formula import Formula
-from ._identity import DecimalParamValue, ExponentialParamValue, FunctionId, ParamValue
+from ._identity import (
+    DEDUP_DIGITS,
+    DecimalParamValue,
+    ExponentialParamValue,
+    FunctionId,
+    ParamValue,
+    deduplicate_ids,
+)
 from ._recipes import ParamAxis, ParamRecipe, ParamSpacing
 from ._registry import FormulaRegistry
 from ._test_function import CandidateTestFunction, TestFunction

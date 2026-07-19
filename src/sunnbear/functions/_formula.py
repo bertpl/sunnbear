@@ -21,7 +21,7 @@ from typing import ClassVar
 
 import numba
 
-from ._identity import FunctionId, ParamValue
+from ._identity import DEDUP_DIGITS, FunctionId, ParamValue, deduplicate_ids
 from ._recipes import ParamRecipe
 from ._test_function import CandidateTestFunction
 from ._types import XCFun, XFun
@@ -169,17 +169,28 @@ class Formula(ABC):
 
         return x_fun
 
-    def build_all_candidates(self) -> "tuple[CandidateTestFunction, ...]":
+    def build_all_candidates(self, digits: int = DEDUP_DIGITS) -> "tuple[CandidateTestFunction, ...]":
         """Build every candidate this formula defines: recipe tuples, filtered and deduplicated.
 
-        Candidates come back in first-seen recipe order. Deduplication is by
-        `FunctionId`, whose equality is notation-blind, so duplicates across
-        recipes collapse even when the same value was spelled differently
-        (e.g. a linear axis hitting ``4.0`` and a log2 axis hitting ``2^2.0``).
+        Candidates come back in first-seen recipe order. Three passes, and the
+        order between them is load-bearing:
+
+        1. **Validity.** Tuples the formula rejects are dropped first, so a
+           rejected tuple can never displace a valid near-twin by arriving ahead
+           of it in the next pass.
+        2. **Near-duplicate removal** at `digits` significant digits
+           (`deduplicate_ids`), which is what collapses the same value reached
+           through different notations — a linear axis hitting ``4.0`` and a
+           log2 axis hitting ``2^2.0`` are distinct identities but one function.
+        3. **Construction**, so the per-candidate work is paid only for survivors.
 
         Eager rather than lazy, and validating: a malformed formula fails here,
         at corpus-build time, instead of somewhere downstream. See
         `_validate_recipes` for what is checked.
+
+        Args:
+            digits: Significant digits at which two parameter tuples count as
+                the same test function.
 
         Raises:
             ValueError: If a recipe disagrees with `param_names`, if
@@ -190,15 +201,10 @@ class Formula(ABC):
         self._validate_recipes(recipes)
         self._validate_param_name_consistency()
 
-        seen: set[FunctionId] = set()
-        candidates: list[CandidateTestFunction] = []
         param_tuples = (p for recipe in recipes for p in recipe.tuples()) if recipes else iter([()])
-        for params in param_tuples:
-            function_id = FunctionId(self.number, params)
-            if function_id in seen or not self.is_param_tuple_valid(*function_id.param_values):
-                continue
-            seen.add(function_id)
-            candidates.append(self.build_candidate(params))
+        ids = (FunctionId(self.number, params) for params in param_tuples)
+        valid_ids = (fid for fid in ids if self.is_param_tuple_valid(*fid.param_values))
+        candidates = [self.build_candidate(fid.params) for fid in deduplicate_ids(valid_ids, digits)]
 
         if not candidates:
             raise ValueError(

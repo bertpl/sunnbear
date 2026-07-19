@@ -21,8 +21,9 @@ written as one more recipe rather than as a richer axis. Every recipe's axis
 names must match the formula's declared `param_names`, which is what fixes the
 meaning of tuple position (`Formula._validate_recipes`).
 
-Grid values are canonicalized on `ParamValue` construction, so they print short,
-stay human-screenable, and reproduce exactly.
+Whatever the grid produces is canonicalized on `ParamValue` construction — the
+value for a linear axis, the exponent for a log-spaced one — so values print
+short, stay human-screenable, and reproduce exactly.
 """
 
 import itertools

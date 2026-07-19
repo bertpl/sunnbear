@@ -1,48 +1,58 @@
 """Stable identity of a test function: formula number plus its bound parameter tuple.
 
 A `FunctionId` is the pair *(formula number, parameter tuple)* — nothing else.
-In particular there is no materialization-order counter: which recipe produced
-a parameter tuple, or in which order, never affects identity, so identities
-are stable under recipe edits, reordering, and deduplication.
+In particular there is no materialization-order counter: which recipe produced a
+parameter tuple, or in which order, never affects identity, so identities are
+stable under recipe edits and reordering.
 
-Parameter values are `ParamValue` objects that *carry* the notation they were
-authored in (plain decimal, or an exponent on base 2/10 for log-spaced grids),
-so a notation-carrying rendering needs no reverse-engineering of notation from
-bare floats — and `from_string` parses either rendering back.
+**Identities are faithful.** A parameter authored as ``2^1.23`` is stored as that
+exponent and evaluated as ``2 ** 1.23``, not as a rounded stand-in — so the
+number sunnbear computes with is exactly the one its notation advertises, and a
+reader reproducing it from a paper or a suite file arrives at the same float.
+There is a single rendering, notation-carrying and parsed back losslessly by
+`from_string`.
 
-**Two renderings, and which is the default matters.** ``str()`` and ``repr()``
-both produce the *canonical* form: plain decimals, independent of notation, so
-that equal identities always produce equal strings. `display` produces the
-notation-carrying form (``f105-2^1.2_0.4``) for human-facing output — suite
-files, gallery labels, error messages. The safe form is the default because
-the unsafe one fails silently: keying storage on a notation-carrying string
-would give one candidate two keys the moment an author switched a linear axis
-to a log2 one — never a wrong answer, just unbounded recomputation that
-nothing reports.
+Canonicalization applies to whatever the grid arithmetic produced, since that is
+where float noise enters: the *value* of a linear axis (``start + i * step``),
+and the *exponent* of a log-spaced one. An exponential's value then follows from
+its canonical exponent by plain exponentiation, itself untouched.
 
-Identity semantics live on `FunctionId`, and are **by parameter value, not
-notation**: two recipes can legitimately generate the same value in different
-notations (a linear axis hitting ``4.0``, a log2 axis hitting ``2^2.0``), and
-those must be *one* test function — so `FunctionId` compares, hashes, and
-orders on the float values, making "throw all candidates' ids in a set" the
-complete deduplication story. `ParamValue` itself is a plain value object
-(notation included in its own equality), modelled as one subclass per
-notation so that no value carries fields belonging to a notation it does not
-use.
+Equality, hashing, and ordering are therefore **exact**: two ids match when they
+carry the same formula and the same parameter values in the same notation.
+Collapsing test functions that are merely *close* is a separate, deliberate
+pass — `deduplicate_ids` — because a tolerance folded into ``__eq__`` would force
+the rendering to be lossy to match it, which is precisely the faithfulness this
+module exists to keep.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from dataclasses import dataclass
+
+# Significant digits a grid quantity is snapped to, absorbing the float error accumulated
+# by `start + i * step`. Deliberately finer than DEDUP_DIGITS: this cleans up arithmetic
+# noise, it does not decide which test functions count as distinct.
+CANONICAL_DIGITS = 10
+
+# Significant digits at which two parameter tuples are treated as the same test function.
+# Coarser than CANONICAL_DIGITS on purpose, so near-duplicates collapse with margin — the
+# corpus wants diverse functions, not neighbours separated in the tenth digit.
+DEDUP_DIGITS = 8
+
+
+def _round_significant(x: float, digits: int) -> float:
+    """Round a float to `digits` significant digits."""
+    return float(f"{x:.{digits}g}")
+
+
+def _canonical(x: float) -> float:
+    """Snap a grid quantity to the framework's canonical precision."""
+    return _round_significant(x, CANONICAL_DIGITS)
 
 
 # ==================================================================================================
 #  ParamValue
 # ==================================================================================================
-def _canonical(x: float) -> float:
-    """Round a float to 10 significant digits — the framework's identity granularity."""
-    return float(f"{x:.10g}")
-
-
 @dataclass(frozen=True)
 class ParamValue(ABC):
     """A parameter value, in the notation it was authored in.
@@ -51,24 +61,18 @@ class ParamValue(ABC):
     notation it does not use. Construct through the factories on this class
     (`decimal`, `exponential`, `parse`) rather than the subclasses directly.
 
-    **The canonical-value invariant lives here**, in `__post_init__`: `value`
-    is rounded to 10 significant digits on *every* construction path, whatever
-    the notation. That is what makes the canonical rendering re-parse to the
-    same value, and it is deliberately not left to the subclasses — a variant
-    that forgot the step would produce identities that silently fail to
-    round-trip through storage. Consequence, by design: two parameters
-    differing only beyond the 10th significant digit are one parameter.
+    **Each notation canonicalizes its own grid quantity**, in its
+    `__post_init__` — the value for a plain decimal, the exponent for an
+    exponential. That is where the sweep's float error lands, and confining the
+    snap to it is what keeps the value a notation reports identical to the value
+    it evaluates to.
 
-    Equality is plain field equality, so it *is* notation-sensitive; identity
-    comparisons, where notation must be invisible, happen at the `FunctionId`
-    level (see the module docstring).
+    Equality is plain field equality, so it *is* notation-sensitive: `2^2.0` and
+    `4.0` are distinct values that happen to coincide numerically. Collapsing
+    them is `deduplicate_ids`'s job, not equality's.
     """
 
     value: float
-
-    def __post_init__(self) -> None:
-        """Enforce the canonical-value invariant for every notation."""
-        object.__setattr__(self, "value", _canonical(self.value))
 
     # --------------------------------------------------------------------------
     #  Construction
@@ -80,12 +84,7 @@ class ParamValue(ABC):
 
     @classmethod
     def exponential(cls, base: float, exponent: float) -> "ParamValue":
-        """Build a ``base^exponent`` parameter value (base 2 or 10; ``2.0``/``10.0`` also accepted).
-
-        Canonicalization of the exponent and value lives on
-        `ExponentialParamValue`, so this factory only checks the base and
-        translates the notation into a value.
-        """
+        """Build a ``base^exponent`` parameter value (base 2 or 10; ``2.0``/``10.0`` also accepted)."""
         if base not in (2, 10):
             raise ValueError(f"ParamValue supports exponent notation on base 2 or 10 (got {base!r}).")
         return ExponentialParamValue(value=float(base) ** exponent, base=int(base), exponent=exponent)
@@ -114,36 +113,41 @@ class ParamValue(ABC):
     # --------------------------------------------------------------------------
     #  Rendering
     # --------------------------------------------------------------------------
-    def __repr__(self) -> str:
-        """Render the canonical token: a plain decimal, independent of notation."""
-        return repr(self.value)
-
-    def __str__(self) -> str:
-        """Same as `__repr__` — so equal values look equal wherever they are printed."""
-        return repr(self)
-
     @abstractmethod
     def display(self) -> str:
-        """Render with the authored notation — for humans, never for keys."""
+        """Render this value in its authored notation — the one faithful form."""
+
+    def __repr__(self) -> str:
+        """Render the authored notation; `from_string` parses it back to this value."""
+        return self.display()
+
+    def __str__(self) -> str:
+        """Same as `__repr__` — there is one rendering, so both agree."""
+        return repr(self)
 
 
-@dataclass(frozen=True, repr=False)  # repr=False: inherit the canonical __repr__ from the base
+@dataclass(frozen=True, repr=False)  # repr=False: inherit the notation-carrying __repr__ from the base
 class DecimalParamValue(ParamValue):
     """A parameter value authored as a plain decimal."""
 
+    def __post_init__(self) -> None:
+        """Canonicalize the value — for this notation, the value *is* the grid quantity."""
+        object.__setattr__(self, "value", _canonical(self.value))
+
     def display(self) -> str:
-        """Render the value as a plain decimal — identical to the canonical form."""
+        """Render the value as a plain decimal."""
         return repr(self.value)
 
 
-@dataclass(frozen=True, repr=False)  # repr=False: inherit the canonical __repr__ from the base
+@dataclass(frozen=True, repr=False)  # repr=False: inherit the notation-carrying __repr__ from the base
 class ExponentialParamValue(ParamValue):
     """A parameter value authored as ``base^exponent``, as log-spaced grids produce.
 
     `__post_init__` enforces this notation's invariants on every construction
     path: the base is validated and normalized to `int` (``2.0``/``10.0`` are
-    accepted), and the exponent is canonicalized; the value is canonicalized by
-    the base class, so both the authored and canonical renderings are stable.
+    accepted), the exponent is canonicalized as the grid quantity, and the value
+    is *derived* from the two — so `value` never drifts from what the notation
+    says, and any `value` handed to the constructor is replaced.
 
     Attributes:
         base: 2 or 10 (stored as `int`).
@@ -154,12 +158,12 @@ class ExponentialParamValue(ParamValue):
     exponent: float
 
     def __post_init__(self) -> None:
-        """Validate and normalize the base, canonicalize the exponent, then the value."""
+        """Validate and normalize the base, canonicalize the exponent, then derive the value."""
         if self.base not in (2, 10):
             raise ValueError(f"ParamValue supports exponent notation on base 2 or 10 (got {self.base!r}).")
         object.__setattr__(self, "base", int(self.base))
         object.__setattr__(self, "exponent", _canonical(self.exponent))
-        super().__post_init__()  # canonicalize value — the identity invariant shared by every notation
+        object.__setattr__(self, "value", float(self.base) ** self.exponent)
 
     def display(self) -> str:
         """Render as ``base^exponent``, e.g. ``2^1.2``."""
@@ -169,15 +173,14 @@ class ExponentialParamValue(ParamValue):
 # ==================================================================================================
 #  FunctionId
 # ==================================================================================================
-@dataclass(frozen=True, eq=False)
+@dataclass(frozen=True)
 class FunctionId:
     """Identity of one test function: formula number + the bound parameter tuple.
 
-    Equality, hashing, and ordering are by ``(formula, parameter float
-    values)`` — notation-blind, so a set of `FunctionId`s deduplicates test
-    functions regardless of how their parameters were spelled. ``str()`` and
-    ``repr()` render the matching canonical form; `display` renders the
-    authored notation (see the module docstring).
+    Equality and hashing are the dataclass defaults — exact, and notation-aware,
+    since the parameter values carry their notation. Rendering is faithful and
+    re-parseable (see the module docstring); collapsing near-identical functions
+    belongs to `deduplicate_ids`.
     """
 
     formula: int
@@ -188,52 +191,33 @@ class FunctionId:
         """Return the plain float values, e.g. for handing to formula code."""
         return tuple(p.value for p in self.params)
 
-    # --------------------------------------------------------------------------
-    #  Identity: by (formula, float values), notation-blind
-    # --------------------------------------------------------------------------
-    def __eq__(self, other: object) -> bool:
-        """Compare by formula number and parameter float values."""
-        if isinstance(other, FunctionId):
-            return (self.formula, self.param_values) == (other.formula, other.param_values)
-        return NotImplemented
-
-    def __hash__(self) -> int:
-        """Hash consistently with the notation-blind equality."""
-        return hash((self.formula, self.param_values))
-
     def __lt__(self, other: "FunctionId") -> bool:
-        """Order by formula number, then parameter float values."""
+        """Order by formula number, then parameter values."""
         return (self.formula, self.param_values) < (other.formula, other.param_values)
 
     # --------------------------------------------------------------------------
     #  Rendering
     # --------------------------------------------------------------------------
-    def __repr__(self) -> str:
-        """Render the canonical form, e.g. ``f101-0.2`` — what storage and cache keys use."""
-        if not self.params:
-            return f"f{self.formula:03d}"
-        return f"f{self.formula:03d}-" + "_".join(repr(p) for p in self.params)
-
-    def __str__(self) -> str:
-        """Same as `__repr__` — identity-consistent, so equal ids look equal when printed."""
-        return repr(self)
-
     def display(self) -> str:
-        """Render with each parameter's authored notation, e.g. ``f105-2^1.2_0.4``.
-
-        For human-facing output only; `from_string` parses it back, but keying
-        storage on it would split one identity across two keys.
-        """
+        """Render with each parameter's authored notation, e.g. ``f105-2^1.2_0.4``."""
         if not self.params:
             return f"f{self.formula:03d}"
         return f"f{self.formula:03d}-" + "_".join(p.display() for p in self.params)
 
+    def __repr__(self) -> str:
+        """Render the faithful form; `from_string` parses it back to this identity."""
+        return self.display()
+
+    def __str__(self) -> str:
+        """Same as `__repr__` — there is one rendering, so both agree."""
+        return repr(self)
+
     @classmethod
     def from_string(cls, text: str) -> "FunctionId":
-        """Parse a canonical string form back into a `FunctionId`.
+        """Parse a rendered identity back into a `FunctionId`.
 
         Raises:
-            ValueError: If `text` does not follow the canonical form.
+            ValueError: If `text` does not follow the rendered form.
         """
         if not text.startswith("f"):
             raise ValueError(f"Invalid FunctionId string: {text!r}")
@@ -244,3 +228,38 @@ class FunctionId:
         except ValueError as exc:
             raise ValueError(f"Invalid FunctionId string: {text!r}") from exc
         return cls(formula=formula, params=params)
+
+
+# ==================================================================================================
+#  Near-duplicate removal
+# ==================================================================================================
+def deduplicate_ids(ids: Iterable[FunctionId], digits: int = DEDUP_DIGITS) -> tuple[FunctionId, ...]:
+    """Keep the first id of each group whose parameter values agree to `digits` significant digits.
+
+    A filter rather than an equality, and deliberately so: the granularity is a
+    parameter, and which member of a group survives follows the input order. It
+    is what collapses the same value reached through different notations (a
+    linear axis hitting ``4.0``, a log2 axis hitting ``2^2.0``), which exact
+    identity equality leaves as two.
+
+    Grouping is by rounded key, not pairwise distance, so the partition is
+    deterministic and the pass is linear. The cost is that a pair straddling a
+    rounding boundary survives as two ids — immaterial here, since the corpus's
+    diversity selection is free to drop one later.
+
+    Args:
+        ids: Candidate identities, in materialization order.
+        digits: Significant digits at which two parameter tuples count as one.
+
+    Returns:
+        The kept identities, in first-seen order.
+    """
+    seen: set[tuple[int, tuple[float, ...]]] = set()
+    kept: list[FunctionId] = []
+    for function_id in ids:
+        key = (function_id.formula, tuple(_round_significant(v, digits) for v in function_id.param_values))
+        if key in seen:
+            continue
+        seen.add(key)
+        kept.append(function_id)
+    return tuple(kept)
