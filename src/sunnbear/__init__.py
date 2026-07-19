@@ -9,7 +9,14 @@ from sunnbear.errors import (
     SunnbearError,
     UnknownFormulaError,
 )
-from sunnbear.functions import Candidate, Formula, FunctionId, ParamRecipe, TestFunction, build, candidates, formulas
+from sunnbear.functions import (
+    CandidateTestFunction,
+    Formula,
+    FormulaRegistry,
+    FunctionId,
+    ParamRecipe,
+    TestFunction,
+)
 from sunnbear.solvers import (
     Bisection,
     BracketingSolver,
