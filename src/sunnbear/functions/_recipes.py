@@ -28,10 +28,26 @@ stay human-screenable, and reproduce exactly.
 import itertools
 from collections.abc import Iterator
 from dataclasses import dataclass
+from decimal import Decimal
 from enum import StrEnum
 from math import lcm
 
 from ._identity import ParamValue
+
+# A grid endpoint or step may drift from an integer ratio by this much (relative) and still
+# count as aligned — the same float slack the round() in ParamAxis.values() already tolerates.
+_ALIGNMENT_TOL = 1e-9
+
+
+def _decimal_places(x: float) -> int:
+    """Count the decimal places in `x`'s shortest round-trip form (0 for an integer).
+
+    Uses the float's `repr` — the shortest string that round-trips — so it
+    matches exactly what a `ParamValue` displays, rather than the full binary
+    expansion (`0.1` reads as one place, not seventeen).
+    """
+    exponent = Decimal(repr(x)).normalize().as_tuple().exponent
+    return -exponent if isinstance(exponent, int) and exponent < 0 else 0
 
 
 # ==================================================================================================
@@ -67,11 +83,37 @@ class ParamAxis:
     spacing: ParamSpacing = ParamSpacing.LINEAR
 
     def __post_init__(self) -> None:
-        """Validate that the grid is well-formed (positive step, stop not before start)."""
+        """Validate that the grid is well-formed: positive step, ordered and aligned endpoints.
+
+        Alignment, both within `_ALIGNMENT_TOL` so float noise in the inputs is
+        forgiven:
+
+        - `start` and `stop` carry no more decimal places than `step`, so no grid
+          value ever displays more precision than the step implies (a `0.05`
+          endpoint on a `0.2` step would surface a stray second decimal). A
+          single-point axis (``start == stop``) is exempt — with no spacing there
+          is no step precision to honor.
+        - ``(stop - start)`` is an integer multiple of `step`, so the grid lands
+          exactly on `stop` rather than stopping short of the inclusive endpoint.
+        """
         if self.step <= 0.0:
             raise ValueError(f"ParamAxis step must be > 0 (got {self.step}).")
         if self.stop < self.start:
             raise ValueError(f"ParamAxis stop must be >= start (got {self.start}..{self.stop}).")
+        if self.start != self.stop:
+            step_places = _decimal_places(self.step)
+            for name, endpoint in (("start", self.start), ("stop", self.stop)):
+                if _decimal_places(endpoint) > step_places:
+                    raise ValueError(
+                        f"ParamAxis {name}={endpoint} has more decimal places than step={self.step}; "
+                        "grid values would display more precision than the step implies."
+                    )
+        ratio = (self.stop - self.start) / self.step
+        if abs(ratio - round(ratio)) > _ALIGNMENT_TOL * max(1.0, abs(ratio)):
+            raise ValueError(
+                f"ParamAxis (stop - start) must be an integer multiple of step "
+                f"(got start={self.start}, stop={self.stop}, step={self.step}); the grid would not land on stop."
+            )
 
     def values(self) -> tuple[ParamValue, ...]:
         """Materialize the axis's grid as `ParamValue`s carrying this axis's notation.

@@ -70,10 +70,28 @@ def test_coupled_sweep_with_tiny_magnitude_axis():
     ]
 
 
-@pytest.mark.parametrize("start, stop, step", [(0.0, 1.0, 0.0), (0.0, 1.0, -0.1), (2.0, 1.0, 0.5)])
+@pytest.mark.parametrize(
+    "start, stop, step",
+    [
+        (0.0, 1.0, 0.0),  # step not positive
+        (0.0, 1.0, -0.1),  # step not positive
+        (2.0, 1.0, 0.5),  # stop before start
+        (0.0, 0.9, 0.2),  # grid would not land on stop (0.9 / 0.2 = 4.5)
+        (0.05, 0.85, 0.2),  # start carries a finer decimal than the step
+    ],
+)
 def test_axis_rejects_bad_grid(start, stop, step):
     with pytest.raises(ValueError):
         ParamAxis("p1", start, stop, step)
+
+
+def test_axis_accepts_offset_but_clean_grid():
+    """An offset lattice (1,3,5,7 on step 2) is valid: the endpoints are no finer than the step."""
+    # --- act --------------------------
+    values = tuple(v.value for v in ParamAxis("p1", 1.0, 7.0, 2.0).values())
+
+    # --- assert -----------------------
+    assert values == (1.0, 3.0, 5.0, 7.0)
 
 
 # ==================================================================================================

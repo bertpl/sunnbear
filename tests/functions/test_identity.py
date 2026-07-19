@@ -180,6 +180,19 @@ def test_function_id_equality_is_notation_blind():
     assert len({as_decimal, as_pow2}) == 1  # a set of ids is the whole dedup story
 
 
+def test_function_id_dedup_survives_inexact_exponent():
+    """A log grid's exponent can carry float noise; canonicalization must still fold it onto the decimal value."""
+    # --- arrange ----------------------
+    noisy = FunctionId(101, (ParamValue.exponential(2, 2.0 + 1e-11),))  # 2^~2.0 -> ~4.0
+    exact = FunctionId(101, (ParamValue.decimal(4.0),))
+
+    # --- act / assert -----------------
+    assert noisy.param_values == (4.0,)  # canonicalized despite the noisy exponent
+    assert noisy == exact
+    assert hash(noisy) == hash(exact)
+    assert len({noisy, exact}) == 1
+
+
 def test_function_id_equality_with_unrelated_type():
     assert FunctionId(101, (ParamValue.decimal(1.0),)) != "f101-1.0"
 
