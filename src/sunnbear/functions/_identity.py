@@ -114,13 +114,13 @@ class ParamValue(ABC):
     # --------------------------------------------------------------------------
     #  Rendering
     # --------------------------------------------------------------------------
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         """Render the canonical token: a plain decimal, independent of notation."""
         return repr(self.value)
 
-    def __repr__(self) -> str:
-        """Same as `__str__` — so equal values look equal wherever they are printed."""
-        return str(self)
+    def __str__(self) -> str:
+        """Same as `__repr__` — so equal values look equal wherever they are printed."""
+        return repr(self)
 
     @abstractmethod
     def display(self) -> str:
@@ -198,15 +198,15 @@ class FunctionId:
     # --------------------------------------------------------------------------
     #  Rendering
     # --------------------------------------------------------------------------
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         """Render the canonical form, e.g. ``f101-0.2`` — what storage and cache keys use."""
         if not self.params:
             return f"f{self.formula:03d}"
-        return f"f{self.formula:03d}-" + "_".join(str(p) for p in self.params)
+        return f"f{self.formula:03d}-" + "_".join(repr(p) for p in self.params)
 
-    def __repr__(self) -> str:
-        """Same as `__str__` — identity-consistent, so equal ids look equal when printed."""
-        return str(self)
+    def __str__(self) -> str:
+        """Same as `__repr__` — identity-consistent, so equal ids look equal when printed."""
+        return repr(self)
 
     def display(self) -> str:
         """Render with each parameter's authored notation, e.g. ``f105-2^1.2_0.4``.

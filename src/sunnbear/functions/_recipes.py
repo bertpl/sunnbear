@@ -52,6 +52,10 @@ class ParamSpacing(StrEnum):
 class ParamAxis:
     """One swept parameter: a named grid from `start` to `stop` in steps of `step`.
 
+    The grid is **inclusive of both endpoints** — unlike Python's half-open
+    ``range``, ``stop`` is materialized, so ``start=0, stop=2, step=1`` yields
+    three points.
+
     For logarithmic spacings the grid lives in exponent space (e.g. LOG2 with
     ``start=0, stop=2, step=1`` yields values ``1.0, 2.0, 4.0``).
     """

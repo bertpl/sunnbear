@@ -73,7 +73,7 @@ class Formula(ABC):
 
         Overrides must **name** their parameters (``(x, c, p1, p2)``), matching
         `param_names`; the ``*params`` here is only this base declaration being
-        generic over arity. See `_declared_param_names`.
+        generic over arity. See `_declared_hook_param_names`.
         """
 
     @abstractmethod
@@ -125,7 +125,7 @@ class Formula(ABC):
         cls = type(self)
         if "_compiled_formula_cache" not in cls.__dict__:
             fn = cls.parametrized_fun
-            _declared_param_names(fn, cls.__name__, "parametrized_fun", n_leading=2)  # signature gate
+            _declared_hook_param_names(fn, cls.__name__, "parametrized_fun", n_leading=2)  # signature gate
             cls._compiled_formula_cache = numba.njit(fn) if cls.jit else fn
         return cls._compiled_formula_cache
 
@@ -168,6 +168,7 @@ class Formula(ABC):
         """
         recipes = self.recipes()
         self._validate_recipes(recipes)
+        self._validate_param_name_consistency()
 
         seen: set[FunctionId] = set()
         candidates: list[CandidateTestFunction] = []
@@ -190,27 +191,18 @@ class Formula(ABC):
     #  Validation
     # --------------------------------------------------------------------------
     def _validate_recipes(self, recipes: "tuple[ParamRecipe, ...]") -> None:
-        """Check that the recipes and the implementation agree with `param_names`.
+        """Check that every recipe's axes agree with `param_names`.
 
-        Two layers, because they catch different mistakes:
-
-        - **Every recipe's axis names must equal `param_names`, in order.** Axis
-          order determines tuple order, which lands positionally on
-          `parametrized_fun` — so axes declared in the wrong order silently
-          transpose parameter values rather than failing. This check is what
-          makes that impossible, and it needs no introspection, so it holds for
-          every formula.
-        - **`param_names` must match the signature of every hook that receives
-          the parameter tuple** — `parametrized_fun`, `bracket`, and
-          `is_param_tuple_valid` when overridden — catching drift between the
-          declaration and the implementations. Those hooks must name their
-          parameters rather than take ``*params``; see `_declared_param_names`
-          for why that is required rather than merely conventional.
+        Axis order determines tuple order, which lands positionally on
+        `parametrized_fun` — so axes declared in the wrong order silently
+        transpose parameter values rather than failing. This check makes that
+        impossible; it needs no introspection, so it holds for every formula. A
+        formula that declares parameters but defines no recipes is rejected here
+        too, since it can never materialize a tuple.
 
         Raises:
-            ValueError: On any disagreement, naming the offending formula.
-            TypeError: If a hook's signature is malformed (``*params``, or a
-                non-static `parametrized_fun`).
+            ValueError: If a recipe's axes disagree with `param_names`, or if
+                `param_names` is non-empty but no recipes are defined.
         """
         for recipe in recipes:
             if recipe.param_names() != self.param_names:
@@ -223,6 +215,20 @@ class Formula(ABC):
                 f"Formula {type(self).__name__} declares param_names={self.param_names} but defines no recipes."
             )
 
+    def _validate_param_name_consistency(self) -> None:
+        """Check that `param_names` matches the signature of every hook that receives the tuple.
+
+        Independent of the recipes: this catches drift between the declaration
+        (`param_names`) and the implementations — `parametrized_fun`, `bracket`,
+        and `is_param_tuple_valid` when overridden. Those hooks must name their
+        parameters rather than take ``*params``; see `_declared_hook_param_names`
+        for why that is required rather than merely conventional.
+
+        Raises:
+            ValueError: If a hook's parameter names disagree with `param_names`.
+            TypeError: If a hook's signature is malformed (``*params``, or a
+                non-static `parametrized_fun`).
+        """
         cls = type(self)
         hooks: list[tuple[str, Callable[..., object], int]] = [
             ("parametrized_fun", cls.parametrized_fun, 2),  # after (x, c)
@@ -231,7 +237,7 @@ class Formula(ABC):
         if cls.is_param_tuple_valid is not Formula.is_param_tuple_valid:
             hooks.append(("is_param_tuple_valid", cls.is_param_tuple_valid, 1))  # after self
         for hook, fun, n_leading in hooks:
-            signature_names = _declared_param_names(fun, cls.__name__, hook, n_leading)
+            signature_names = _declared_hook_param_names(fun, cls.__name__, hook, n_leading)
             if signature_names != self.param_names:
                 raise ValueError(
                     f"Formula {cls.__name__} declares param_names={self.param_names} but "
@@ -239,7 +245,7 @@ class Formula(ABC):
                 )
 
 
-def _declared_param_names(fun: "Callable[..., object]", owner: str, hook: str, n_leading: int) -> tuple[str, ...]:
+def _declared_hook_param_names(fun: "Callable[..., object]", owner: str, hook: str, n_leading: int) -> tuple[str, ...]:
     """Return a hook's parameter names after its `n_leading` fixed arguments.
 
     The concrete-signature gate for formula hooks: every hook that receives the
