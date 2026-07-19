@@ -79,16 +79,16 @@ class ParamValue(ABC):
         return DecimalParamValue(value=value)
 
     @classmethod
-    def exponential(cls, base: int, exponent: float) -> "ParamValue":
-        """Build a ``base^exponent`` parameter value (base 2 or 10)."""
+    def exponential(cls, base: float, exponent: float) -> "ParamValue":
+        """Build a ``base^exponent`` parameter value (base 2 or 10; ``2.0``/``10.0`` also accepted).
+
+        Canonicalization of the exponent and value lives on
+        `ExponentialParamValue`, so this factory only checks the base and
+        translates the notation into a value.
+        """
         if base not in (2, 10):
-            raise ValueError(f"ParamValue supports exponent notation on base 2 or 10 (got {base}).")
-        canonical_exponent = _canonical(exponent)
-        return ExponentialParamValue(
-            value=float(base) ** canonical_exponent,
-            base=base,
-            exponent=canonical_exponent,
-        )
+            raise ValueError(f"ParamValue supports exponent notation on base 2 or 10 (got {base!r}).")
+        return ExponentialParamValue(value=float(base) ** exponent, base=int(base), exponent=exponent)
 
     @classmethod
     def parse(cls, token: str) -> "ParamValue":
@@ -140,16 +140,26 @@ class DecimalParamValue(ParamValue):
 class ExponentialParamValue(ParamValue):
     """A parameter value authored as ``base^exponent``, as log-spaced grids produce.
 
-    The exponent is canonicalized alongside the value (which the base class
-    handles), so both the authored and the canonical renderings are stable.
+    `__post_init__` enforces this notation's invariants on every construction
+    path: the base is validated and normalized to `int` (``2.0``/``10.0`` are
+    accepted), and the exponent is canonicalized; the value is canonicalized by
+    the base class, so both the authored and canonical renderings are stable.
 
     Attributes:
-        base: 2 or 10.
+        base: 2 or 10 (stored as `int`).
         exponent: The canonicalized exponent.
     """
 
     base: int
     exponent: float
+
+    def __post_init__(self) -> None:
+        """Validate and normalize the base, canonicalize the exponent, then the value."""
+        if self.base not in (2, 10):
+            raise ValueError(f"ParamValue supports exponent notation on base 2 or 10 (got {self.base!r}).")
+        object.__setattr__(self, "base", int(self.base))
+        object.__setattr__(self, "exponent", _canonical(self.exponent))
+        super().__post_init__()  # canonicalize value — the identity invariant shared by every notation
 
     def display(self) -> str:
         """Render as ``base^exponent``, e.g. ``2^1.2``."""

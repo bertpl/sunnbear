@@ -125,9 +125,21 @@ def test_value_is_canonical_on_every_construction_path(pv):
     assert ParamValue.parse(str(pv)).value == pv.value  # and therefore the canonical form round-trips
 
 
-def test_param_value_rejects_unsupported_base():
+@pytest.mark.parametrize("base", [3, 2.5, 0, -2])
+def test_param_value_rejects_unsupported_base(base):
+    """2.5 matters: it guards against the int() normalization silently truncating a bad base to 2."""
     with pytest.raises(ValueError):
-        ParamValue.exponential(3, 1.0)
+        ParamValue.exponential(base, 1.0)
+
+
+@pytest.mark.parametrize("base", [2, 2.0, 10, 10.0])
+def test_exponential_accepts_int_or_float_base(base):
+    """A float 2.0/10.0 is a valid base, normalized to int so display and identity stay clean."""
+    # --- act --------------------------
+    pv = ParamValue.exponential(base, 1.0)
+
+    # --- assert -----------------------
+    assert pv.display() == f"{int(base)}^1.0"  # int base, no "2.0^..." leakage
 
 
 # ==================================================================================================
