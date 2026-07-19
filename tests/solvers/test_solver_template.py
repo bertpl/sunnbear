@@ -3,7 +3,7 @@ import math
 import pytest
 
 from sunnbear.errors import MaxFevalsExceeded
-from sunnbear.solvers import Bisection, Solver, SolveRun, SolveStatus
+from sunnbear.solvers import Bisection, BracketingSolver, Interval, Solver, SolveRun, SolveStatus, StepOutcome
 
 
 class _CrashingSolver(Solver):
@@ -63,6 +63,35 @@ def test_function_error_becomes_status():
 
     # --- assert -----------------------
     assert result.status == SolveStatus.FUNCTION_ERROR
+
+
+def test_function_error_during_initial_bracket_evaluation():
+    # --- act --------------------------
+    result = Bisection().solve(lambda x: math.nan, 0.0, 1.0, xtol=1e-9, max_fevals=100)
+
+    # --- assert -----------------------
+    assert result.status == SolveStatus.FUNCTION_ERROR
+    assert result.x == pytest.approx(0.5)  # fallback: bracket midpoint (no run state yet)
+    assert result.n_iters is None
+
+
+def test_base_loop_returns_endpoint_on_exact_zero_fb():
+    """A custom _step may hand back an interval whose upper endpoint is an exact zero."""
+
+    # --- arrange ----------------------
+    class ZeroFbSolver(BracketingSolver[None]):
+        name = "zero_fb"
+        version = 1
+
+        def _step(self, run, interval, state):
+            return StepOutcome(interval=Interval(interval.a, 0.7, interval.fa, 0.0), state=None)
+
+    # --- act --------------------------
+    result = ZeroFbSolver().solve(lambda x: x - 0.7, 0.0, 1.0, xtol=1e-9, max_fevals=100)
+
+    # --- assert -----------------------
+    assert result.status == SolveStatus.CONVERGED
+    assert result.x == 0.7
 
 
 def test_interrupt_exceptions_do_not_escape_solve():
