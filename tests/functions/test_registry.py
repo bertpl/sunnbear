@@ -4,12 +4,11 @@ import sunnbear.functions._formula as formula_module
 from sunnbear.errors import InvalidParamsError, UnknownFormulaError
 from sunnbear.functions import (
     Formula,
+    FormulaRegistry,
     FunctionId,
     ParamAxis,
     ParamRecipe,
     ParamValue,
-    candidate_from_id,
-    formulas,
 )
 from sunnbear.functions.catalog.f1xx_polynomials.f101_cubic import F101_Cubic
 from sunnbear.functions.catalog.f1xx_polynomials.f102_odd_power import F102_OddPower
@@ -26,7 +25,7 @@ def isolated_registry(monkeypatch):
 # ==================================================================================================
 def test_formulas_contains_catalog_sorted():
     # --- act --------------------------
-    registered = formulas()
+    registered = FormulaRegistry.formulas()
 
     # --- assert -----------------------
     assert [f.number for f in registered] == sorted(f.number for f in registered)
@@ -58,7 +57,7 @@ def test_candidates_functions_evaluate(formula_cls):
     candidate = formula_cls().build_all_candidates()[0]  # p1 = 0.0 resp. 1.0
 
     # --- act / assert -----------------
-    assert candidate.fun(2.0, 1.0) == pytest.approx(candidate.fun(2.0, 0.0) - 1.0)
+    assert candidate.xc_fun(2.0, 1.0) == pytest.approx(candidate.xc_fun(2.0, 0.0) - 1.0)
 
 
 @pytest.mark.usefixtures("isolated_registry")
@@ -115,7 +114,7 @@ def test_subclass_definition_registers():
     cls = _minimal_formula_cls(998)
 
     # --- assert -----------------------
-    assert any(type(f) is cls for f in formulas())
+    assert any(type(f) is cls for f in FormulaRegistry.formulas())
 
 
 @pytest.mark.usefixtures("isolated_registry")
@@ -126,7 +125,7 @@ def test_formulas_rejects_duplicate_numbers():
 
     # --- act / assert -----------------
     with pytest.raises(ValueError):
-        formulas()
+        FormulaRegistry.formulas()
 
 
 @pytest.mark.usefixtures("isolated_registry")
@@ -136,7 +135,7 @@ def test_formulas_rejects_non_positive_number():
 
     # --- act / assert -----------------
     with pytest.raises(ValueError):
-        formulas()
+        FormulaRegistry.formulas()
 
 
 @pytest.mark.usefixtures("isolated_registry")
@@ -146,7 +145,7 @@ def test_abstract_intermediates_are_not_instantiated():
         """Abstract intermediate: adds no hooks, implements none."""
 
     # --- act / assert -----------------
-    assert all(type(f) is not PolynomialBase for f in formulas())
+    assert all(type(f) is not PolynomialBase for f in FormulaRegistry.formulas())
 
 
 @pytest.mark.usefixtures("isolated_registry")
@@ -301,7 +300,7 @@ def test_formula_yielding_no_candidates_is_rejected():
 
 def test_every_catalog_formula_validates():
     """Guards the catalog itself: a malformed formula module fails here, not in a pipeline run."""
-    for formula in formulas():
+    for formula in FormulaRegistry.formulas():
         assert formula.build_all_candidates(), formula.name
 
 
@@ -336,7 +335,8 @@ def test_compiled_formula_rejects_plain_method():
 
     # --- act / assert -----------------
     with pytest.raises(TypeError, match="staticmethod"):
-        PlainMethod().build_candidate(())
+        # the candidate defers compilation, so the guard fires on first callable use
+        _ = PlainMethod().build_candidate(()).xc_fun
 
 
 # ==================================================================================================
@@ -344,22 +344,22 @@ def test_compiled_formula_rejects_plain_method():
 # ==================================================================================================
 def test_candidate_from_id_and_string():
     # --- act --------------------------
-    tf_from_id = candidate_from_id(FunctionId(101, (ParamValue.decimal(0.2),))).calibrated(-5.0, 5.0)
-    tf_from_str = candidate_from_id("f101-0.2").calibrated(-5.0, 5.0)
+    tf_from_id = FormulaRegistry.candidate_from_id(FunctionId(101, (ParamValue.decimal(0.2),))).calibrated(-5.0, 5.0)
+    tf_from_str = FormulaRegistry.candidate_from_id("f101-0.2").calibrated(-5.0, 5.0)
 
     # --- assert -----------------------
     for tf in (tf_from_id, tf_from_str):
         assert tf.id == FunctionId(101, (ParamValue.decimal(0.2),))
         assert (tf.a, tf.b, tf.c_min, tf.c_max) == (-2.0, 2.0, -5.0, 5.0)
-        assert tf.fun(2.0, 0.0) == pytest.approx(8.0 - 0.4)
+        assert tf.xc_fun(2.0, 0.0) == pytest.approx(8.0 - 0.4)
 
 
-def test_univariate_fun():
+def test_build_x_fun():
     # --- arrange ----------------------
-    tf = candidate_from_id("f101-0.0").calibrated(-5.0, 5.0)
+    tf = FormulaRegistry.candidate_from_id("f101-0.0").calibrated(-5.0, 5.0)
 
     # --- act --------------------------
-    f = tf.univariate_fun(c=1.0)
+    f = tf.build_x_fun(c=1.0)
 
     # --- assert -----------------------
     assert f(2.0) == pytest.approx(7.0)
@@ -367,18 +367,18 @@ def test_univariate_fun():
 
 def test_candidate_from_id_unknown_formula():
     with pytest.raises(UnknownFormulaError):
-        candidate_from_id("f900-0.2")
+        FormulaRegistry.candidate_from_id("f900-0.2")
 
 
 def test_candidate_from_id_invalid_params():
     with pytest.raises(InvalidParamsError):
-        candidate_from_id(FunctionId(102, (ParamValue.decimal(2.0),)))  # even power: invalid
+        FormulaRegistry.candidate_from_id(FunctionId(102, (ParamValue.decimal(2.0),)))  # even power: invalid
 
 
 def test_catalog_brackets_change_sign_within_c_range():
     # --- arrange ----------------------
-    tf = candidate_from_id("f102-5.0").calibrated(-1.0, 1.0)
+    tf = FormulaRegistry.candidate_from_id("f102-5.0").calibrated(-1.0, 1.0)
 
     # --- act / assert -----------------
     for c in (-1.0, 0.0, 1.0):
-        assert tf.fun(tf.a, c) * tf.fun(tf.b, c) < 0
+        assert tf.xc_fun(tf.a, c) * tf.xc_fun(tf.b, c) < 0

@@ -24,6 +24,7 @@ import numba
 from ._identity import FunctionId, ParamValue
 from ._recipes import ParamRecipe
 from ._test_function import CandidateTestFunction
+from ._types import XCFun, XFun
 
 # All defined Formula subclasses, in definition order; the registry filters and instantiates.
 registered_formula_classes: list[type["Formula"]] = []
@@ -132,22 +133,41 @@ class Formula(ABC):
     def build_candidate(self, params: "tuple[ParamValue, ...]") -> CandidateTestFunction:
         """Build one candidate test function for a bound parameter tuple.
 
-        Binds the parameter values over the once-per-class compiled formula
-        (see `_compiled_formula`) in a thin plain-Python closure — formula
+        The candidate carries this formula and its identity rather than a
+        pre-bound callable: both callable forms are derived on demand
+        (`bind_xc_fun` / `bind_x_fun`), so binding ``c`` costs one closure over
+        the compiled body instead of a wrapper around a wrapper. Formula
         implementations never construct a `CandidateTestFunction` themselves,
         never touch numba, and their non-static hooks receive plain floats
         (`ParamValue` unwrapping is handled here).
         """
         fid = FunctionId(self.number, tuple(params))
-        compiled = self._compiled_formula()
-        values = fid.param_values
+        a, b = self.bracket(*fid.param_values)
+        return CandidateTestFunction(id=fid, formula=self, a=a, b=b)
 
-        def fun(x: float, c: float) -> float:
+    def bind_xc_fun(self, values: "tuple[float, ...]") -> XCFun:
+        """Bind a parameter tuple over the once-per-class compiled body, yielding ``f(x, c)``."""
+        compiled = self._compiled_formula()
+
+        def xc_fun(x: float, c: float) -> float:
             """Evaluate the formula with its parameter tuple bound."""
             return compiled(x, c, *values)
 
-        a, b = self.bracket(*values)
-        return CandidateTestFunction(id=fid, fun=fun, a=a, b=b)
+        return xc_fun
+
+    def bind_x_fun(self, values: "tuple[float, ...]", c: float) -> XFun:
+        """Bind a parameter tuple *and* `c` in one closure over the compiled body, yielding ``f(x)``.
+
+        Deliberately not a wrapper around `bind_xc_fun`: this is the solver hot
+        path, so it costs one Python call per evaluation rather than two.
+        """
+        compiled = self._compiled_formula()
+
+        def x_fun(x: float) -> float:
+            """Evaluate the formula with its parameter tuple and c bound."""
+            return compiled(x, c, *values)
+
+        return x_fun
 
     def build_all_candidates(self) -> "tuple[CandidateTestFunction, ...]":
         """Build every candidate this formula defines: recipe tuples, filtered and deduplicated.
