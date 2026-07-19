@@ -200,6 +200,18 @@ def test_recipe_coupled_sweep_three_axes():
     assert tuples[-1] == (2.0, 1.0, 3.0)
 
 
+def test_axis_grid_with_large_magnitude_values():
+    assert tuple(v.value for v in ParamAxis("p1", 1e16, 3e16, step=1e16).values()) == (1e16, 2e16, 3e16)
+
+
+def test_recipe_log10_convenience():
+    # --- arrange / act ----------------
+    recipe = ParamRecipe.log10("p1", -1.0, 1.0, step=1.0)
+
+    # --- assert -----------------------
+    assert [tuple(v.value for v in p) for p in recipe.tuples()] == [(0.1,), (1.0,), (10.0,)]
+
+
 def test_recipe_single_axis_convenience():
     # --- arrange / act ----------------
     recipe = ParamRecipe.log2("p1", 0.0, 1.0, step=0.5)

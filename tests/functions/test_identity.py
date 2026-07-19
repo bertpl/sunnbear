@@ -156,6 +156,10 @@ def test_exponential_value_is_exactly_reproducible():
     assert ParamValue.exponential(2, 1.23).value == 2**1.23
 
 
+def test_param_value_equality_with_unrelated_type():
+    assert ParamValue.decimal(1.0) != "1.0"
+
+
 @pytest.mark.parametrize("base", [3, 2.5, 0, -2])
 def test_param_value_rejects_unsupported_base(base):
     """2.5 matters: it guards against the int() normalization silently truncating a bad base to 2."""
@@ -171,6 +175,12 @@ def test_exponential_accepts_int_or_float_base(base):
 
     # --- assert -----------------------
     assert pv.display() == f"{int(base)}^1.0"  # int base, no "2.0^..." leakage
+
+
+def test_exponential_variant_validates_base_on_direct_construction():
+    """The factory is not the only way in, so the base invariant lives on the variant itself."""
+    with pytest.raises(ValueError):
+        ExponentialParamValue(value=8.0, base=3, exponent=2.0)
 
 
 # ==================================================================================================
