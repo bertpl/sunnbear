@@ -14,6 +14,7 @@ def test_converges_on_gentle_function():
 
 def test_stalls_on_high_curvature_and_hits_budget():
     """The retained-endpoint pathology: the bracket never contracts to xtol, so the budget terminates the run."""
+
     # --- arrange ----------------------
     def septic(x: float) -> float:
         return x**7 - 0.5

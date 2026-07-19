@@ -10,7 +10,7 @@ falsi's endpoint-retention stall exercises the budget-capped path.
 
 import numpy as np
 
-from sunnbear import Bisection, RegulaFalsi, SolveStatus, build
+from sunnbear import Bisection, FormulaRegistry, RegulaFalsi, SolveStatus
 from sunnbear.stats import gpq
 
 MAX_FEVALS = 200
@@ -18,7 +18,7 @@ MAX_FEVALS = 200
 
 def test_solve_count_flops_summarize():
     # --- arrange ----------------------
-    test_function = build("f101-0.2", c_range=(-5.0, 5.0))
+    test_function = FormulaRegistry.candidate_from_id("f101-0.2").calibrated(-5.0, 5.0)
     c_values = np.linspace(test_function.c_min, test_function.c_max, 9)[1:-1]
     solvers = [Bisection(), RegulaFalsi()]
 
@@ -28,7 +28,7 @@ def test_solve_count_flops_summarize():
     for solver in solvers:
         for c in c_values:
             result = solver.solve(
-                test_function.bind(float(c)),
+                test_function.build_x_fun(float(c)),
                 test_function.a,
                 test_function.b,
                 xtol=1e-8,
@@ -43,7 +43,11 @@ def test_solve_count_flops_summarize():
     assert all(status == SolveStatus.CONVERGED for status in statuses["bisection"])
     # regula falsi: the endpoint-retention stall shows up on this curved cubic
     assert SolveStatus.MAX_FEVALS in statuses["regula_falsi"]
-    assert all(n == MAX_FEVALS for n, s in zip(n_fevals["regula_falsi"], statuses["regula_falsi"], strict=True) if s == SolveStatus.MAX_FEVALS)
+    assert all(
+        n == MAX_FEVALS
+        for n, s in zip(n_fevals["regula_falsi"], statuses["regula_falsi"], strict=True)
+        if s == SolveStatus.MAX_FEVALS
+    )
     # summary statistics over the evaluation counts
     counts = n_fevals["bisection"]
     assert 2 < gpq(counts, 0.5) <= gpq(counts, 0.9) <= max(counts)
