@@ -21,4 +21,4 @@ class F101_Cubic(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Sweep the slope knob linearly."""
-        return (ParamRecipe.linear("p1", 0.0, 1.0, step=0.2),)
+        return (ParamRecipe.decimal("p1", 0.0, 1.0, step=0.2),)

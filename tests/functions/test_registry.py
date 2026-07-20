@@ -84,7 +84,7 @@ def test_candidates_deduplicates_across_recipes():
             return (-1.0, 1.0)
 
         def recipes(self) -> tuple[ParamRecipe, ...]:
-            return (ParamRecipe.linear("p1", 0.0, 1.0, 0.5), ParamRecipe.linear("p1", 0.5, 1.5, 0.5))
+            return (ParamRecipe.decimal("p1", 0.0, 1.0, 0.5), ParamRecipe.decimal("p1", 0.5, 1.5, 0.5))
 
     # --- act --------------------------
     params = [c.id.param_values for c in DupTest().build_all_candidates()]
@@ -197,8 +197,8 @@ def test_candidates_deduplicates_across_notations():
             return (-1.0, 1.0)
 
         def recipes(self) -> tuple[ParamRecipe, ...]:
-            # linear hits 4.0 as "4.0"; log2 hits it as "2^2.0" — same value, different notation
-            return (ParamRecipe.linear("p1", 4.0, 4.0, 1.0), ParamRecipe.log2("p1", 2.0, 2.0, 1.0))
+            # a DECIMAL axis hits 4.0 as "4.0"; a POW2 axis hits it as "2^2.0" — same value, different notation
+            return (ParamRecipe.decimal("p1", 4.0, 4.0, 1.0), ParamRecipe.pow2("p1", 2.0, 2.0, 1.0))
 
     # --- act --------------------------
     ids = [c.id for c in CrossNotation().build_all_candidates()]
@@ -244,7 +244,7 @@ def test_recipe_axis_order_must_match_declared_params():
 @pytest.mark.usefixtures("isolated_registry")
 def test_recipe_arity_must_match_declared_params():
     # --- arrange ----------------------
-    cls = _formula_cls(989, ("p1", "p2"), (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, p1, p2: x - c)
+    cls = _formula_cls(989, ("p1", "p2"), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, p1, p2: x - c)
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="recipe axes must match the declared parameters"):
@@ -254,7 +254,7 @@ def test_recipe_arity_must_match_declared_params():
 @pytest.mark.usefixtures("isolated_registry")
 def test_declared_params_must_match_parametrized_fun_signature():
     # --- arrange ----------------------
-    cls = _formula_cls(988, ("p1",), (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, other: x - c)
+    cls = _formula_cls(988, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, other: x - c)
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="parametrized_fun takes"):
@@ -265,7 +265,7 @@ def test_declared_params_must_match_parametrized_fun_signature():
 def test_varargs_parametrized_fun_is_rejected():
     """Hooks must name their parameters, so declaration/implementation/recipes stay cross-checkable."""
     # --- arrange ----------------------
-    cls = _formula_cls(987, ("p1",), (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, *params: x - c)
+    cls = _formula_cls(987, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, *params: x - c)
 
     # --- act / assert -----------------
     with pytest.raises(TypeError, match="must name its parameters"):
@@ -278,7 +278,7 @@ def test_varargs_bracket_is_rejected():
     cls = _formula_cls(
         984,
         ("p1",),
-        (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),),
+        (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),),
         bracket=lambda self, *params: (-1.0, 1.0),
     )
 
@@ -291,7 +291,7 @@ def test_varargs_bracket_is_rejected():
 def test_varargs_overridden_validity_hook_is_rejected():
     """The base default legitimately takes *params, so only overrides are checked."""
     # --- arrange ----------------------
-    cls = _formula_cls(983, ("p1",), (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),))
+    cls = _formula_cls(983, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),))
     cls.is_param_tuple_valid = lambda self, *params: True
 
     # --- act / assert -----------------
@@ -303,7 +303,7 @@ def test_varargs_overridden_validity_hook_is_rejected():
 def test_unoverridden_validity_hook_is_not_checked():
     """A formula that does not override is_param_tuple_valid inherits the *params default, and is fine."""
     # --- arrange ----------------------
-    cls = _formula_cls(982, ("p1",), (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),))
+    cls = _formula_cls(982, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),))
 
     # --- act / assert -----------------
     assert [c.id.param_values for c in cls().build_all_candidates()] == [(0.0,), (1.0,)]
@@ -322,7 +322,7 @@ def test_declared_params_without_recipes_is_rejected():
 @pytest.mark.usefixtures("isolated_registry")
 def test_formula_yielding_no_candidates_is_rejected():
     # --- arrange ----------------------
-    cls = _formula_cls(985, ("p1",), (ParamRecipe.linear("p1", 0.0, 1.0, 1.0),))
+    cls = _formula_cls(985, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),))
     cls.is_param_tuple_valid = lambda self, p1: False
 
     # --- act / assert -----------------

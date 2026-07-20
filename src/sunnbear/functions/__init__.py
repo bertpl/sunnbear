@@ -6,7 +6,7 @@ How the pieces tie together, from authored code to a solvable function::
       │ build_all_candidates() ── ParamRecipe grids ──▶ p-tuples,
       │                          validated against param_names,
       │                          filtered by is_param_tuple_valid(),
-      │                          then near-duplicates dropped (deduplicate_ids)
+      │                          then near-duplicates dropped (deduplicate_param_tuples)
       │ build_candidate(p) [framework: carries the formula + identity, so the
       ▼                  callable forms are derived on demand; + bracket(p)]
     CandidateTestFunction ─── id: FunctionId(number, p) · xc_fun: f(x, c) · bracket [a, b]
@@ -39,15 +39,17 @@ Ownership summary:
 """
 
 from ._formula import Formula
-from ._identity import (
+from ._identity import FunctionId
+from ._param_values import (
+    CANONICAL_DIGITS,
     DEDUP_DIGITS,
     DecimalParamValue,
     ExponentialParamValue,
-    FunctionId,
+    ParamNotation,
     ParamValue,
-    deduplicate_ids,
+    deduplicate_param_tuples,
 )
-from ._recipes import ParamAxis, ParamRecipe, ParamSpacing
+from ._recipes import ParamAxis, ParamRecipe
 from ._registry import FormulaRegistry
 from ._test_function import CandidateTestFunction, TestFunction
 from ._types import XCFun, XFun

@@ -27,7 +27,7 @@ class F102_OddPower(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Sweep the power over the odd integers."""
-        return (ParamRecipe.linear("p1", 1.0, 7.0, step=2.0),)
+        return (ParamRecipe.decimal("p1", 1.0, 7.0, step=2.0),)
 
     def is_param_tuple_valid(self, p1: float) -> bool:
         """Require an odd integer power (even powers break the sign change across the bracket)."""

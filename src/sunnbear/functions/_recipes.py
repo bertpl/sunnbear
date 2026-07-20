@@ -2,12 +2,12 @@
 
 Three small pieces compose, innermost first::
 
-    ParamSpacing   how one axis maps grid positions to values
-                   (LINEAR, or LOG2/LOG10 where the grid lives in exponent space)
+    ParamNotation  how one axis maps grid arguments to values
+        │          (DECIMAL, or POW2/POW10 where the grid lives in exponent space)
         │
-    ParamAxis      one swept parameter: a named grid from `start` to `stop`
-        │          in steps of `step`, materialized by values() as ParamValues
-        │          that carry this axis's notation (a LOG2 axis emits 2^g)
+    ParamAxis      one swept parameter: a named argument grid from `start` to
+        │          `stop` in steps of `step`, materialized by values() through
+        │          the axis's notation (a POW2 axis emits 2^g)
         │
     ParamRecipe    one or more axes, combined into parameter tuples by tuples():
                    - product=True  (default) -> the axes' Cartesian product
@@ -22,18 +22,17 @@ names must match the formula's declared `param_names`, which is what fixes the
 meaning of tuple position (`Formula._validate_recipes`).
 
 Whatever the grid produces is canonicalized on `ParamValue` construction — the
-value for a linear axis, the exponent for a log-spaced one — so values print
-short, stay human-screenable, and reproduce exactly.
+argument of the axis's notation — so values print short, stay human-screenable,
+and reproduce exactly.
 """
 
 import itertools
 from collections.abc import Iterator
 from dataclasses import dataclass
 from decimal import Decimal
-from enum import StrEnum
 from math import lcm
 
-from ._identity import CANONICAL_DIGITS, ParamValue, _canonical
+from ._param_values import CANONICAL_DIGITS, ParamNotation, ParamValue, _canonical
 
 # A grid endpoint or step may drift from an integer ratio by this much (relative) and still
 # count as aligned — the same float slack the round() in ParamAxis.values() already tolerates.
@@ -55,36 +54,24 @@ def _decimal_places(x: float) -> int:
 
 
 # ==================================================================================================
-#  ParamSpacing
-# ==================================================================================================
-class ParamSpacing(StrEnum):
-    """How an axis's grid positions map to parameter values."""
-
-    LINEAR = "linear"  # value = grid position
-    LOG2 = "log2"  # value = 2 ** grid position
-    LOG10 = "log10"  # value = 10 ** grid position
-
-
-# ==================================================================================================
 #  ParamAxis
 # ==================================================================================================
 @dataclass(frozen=True)
 class ParamAxis:
-    """One swept parameter: a named grid from `start` to `stop` in steps of `step`.
+    """One swept parameter: a named argument grid from `start` to `stop` in steps of `step`.
 
-    The grid is **inclusive of both endpoints** — unlike Python's half-open
-    ``range``, ``stop`` is materialized, so ``start=0, stop=2, step=1`` yields
-    three points.
-
-    For logarithmic spacings the grid lives in exponent space (e.g. LOG2 with
-    ``start=0, stop=2, step=1`` yields values ``1.0, 2.0, 4.0``).
+    The grid lives in the notation's *argument* space — the value itself for
+    DECIMAL, the exponent for POW2/POW10 — and is **inclusive of both
+    endpoints**: unlike Python's half-open ``range``, ``stop`` is materialized,
+    so ``start=0, stop=2, step=1`` yields three points (a POW2 axis with that
+    grid yields values ``1.0, 2.0, 4.0``).
     """
 
     param_name: str  # name of the parameter this axis sweeps, e.g. "p1" (descriptive)
     start: float
     stop: float
     step: float
-    spacing: ParamSpacing = ParamSpacing.LINEAR
+    notation: ParamNotation = ParamNotation.DECIMAL
 
     def __post_init__(self) -> None:
         """Validate that the grid is well-formed: positive step, ordered and aligned endpoints.
@@ -122,21 +109,17 @@ class ParamAxis:
             )
 
     def values(self) -> tuple[ParamValue, ...]:
-        """Materialize the axis's grid as `ParamValue`s carrying this axis's notation.
+        """Materialize the axis's argument grid through this axis's notation.
 
         The accumulated float error in ``start + i * step`` is absorbed by
-        `ParamValue` construction, which canonicalizes to 10 significant
-        digits — so no separate grid rounding is needed here, and the grid is
-        never empty (``stop >= start`` with ``step > 0`` gives at least one
-        point, which the coupled sweep relies on).
+        `ParamValue` construction, which canonicalizes the argument to
+        `CANONICAL_DIGITS` significant digits — so no separate grid rounding is
+        needed here, and the grid is never empty (``stop >= start`` with
+        ``step > 0`` gives at least one point, which the coupled sweep relies
+        on).
         """
         n_points = round((self.stop - self.start) / self.step) + 1
-        grid = [self.start + i * self.step for i in range(n_points)]
-        if self.spacing == ParamSpacing.LOG2:
-            return tuple(ParamValue.exponential(2, g) for g in grid)
-        if self.spacing == ParamSpacing.LOG10:
-            return tuple(ParamValue.exponential(10, g) for g in grid)
-        return tuple(ParamValue.decimal(g) for g in grid)
+        return tuple(self.notation.make(self.start + i * self.step) for i in range(n_points))
 
 
 # ==================================================================================================
@@ -233,16 +216,16 @@ class ParamRecipe:
     #  Single-axis conveniences
     # --------------------------------------------------------------------------
     @classmethod
-    def linear(cls, name: str, start: float, stop: float, step: float) -> "ParamRecipe":
-        """Build a single-axis recipe with a linear grid."""
-        return cls(axes=(ParamAxis(name, start, stop, step, ParamSpacing.LINEAR),))
+    def decimal(cls, name: str, start: float, stop: float, step: float) -> "ParamRecipe":
+        """Build a single-axis recipe whose grid is the values themselves (DECIMAL notation)."""
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.DECIMAL),))
 
     @classmethod
-    def log2(cls, name: str, start: float, stop: float, step: float) -> "ParamRecipe":
-        """Build a single-axis recipe gridded in log2 exponent space."""
-        return cls(axes=(ParamAxis(name, start, stop, step, ParamSpacing.LOG2),))
+    def pow2(cls, name: str, start: float, stop: float, step: float) -> "ParamRecipe":
+        """Build a single-axis recipe gridded in base-2 exponent space (POW2 notation)."""
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW2),))
 
     @classmethod
-    def log10(cls, name: str, start: float, stop: float, step: float) -> "ParamRecipe":
-        """Build a single-axis recipe gridded in log10 exponent space."""
-        return cls(axes=(ParamAxis(name, start, stop, step, ParamSpacing.LOG10),))
+    def pow10(cls, name: str, start: float, stop: float, step: float) -> "ParamRecipe":
+        """Build a single-axis recipe gridded in base-10 exponent space (POW10 notation)."""
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW10),))

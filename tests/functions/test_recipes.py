@@ -2,13 +2,13 @@ import itertools
 
 import pytest
 
-from sunnbear.functions import DecimalParamValue, ExponentialParamValue, ParamAxis, ParamRecipe, ParamSpacing
+from sunnbear.functions import DecimalParamValue, ExponentialParamValue, ParamAxis, ParamNotation, ParamRecipe
 
 
 # ==================================================================================================
 #  ParamAxis
 # ==================================================================================================
-def test_axis_linear_values_are_grid_rounded():
+def test_axis_decimal_values_are_grid_rounded():
     # --- arrange ----------------------
     axis = ParamAxis("p1", 0.0, 1.0, step=0.2)
 
@@ -17,9 +17,9 @@ def test_axis_linear_values_are_grid_rounded():
     assert all(isinstance(v, DecimalParamValue) for v in axis.values())
 
 
-def test_axis_log2_values():
+def test_axis_pow2_values():
     # --- arrange ----------------------
-    axis = ParamAxis("p1", 0.0, 2.0, step=1.0, spacing=ParamSpacing.LOG2)
+    axis = ParamAxis("p1", 0.0, 2.0, step=1.0, notation=ParamNotation.POW2)
 
     # --- act / assert -----------------
     assert tuple(v.value for v in axis.values()) == (1.0, 2.0, 4.0)
@@ -27,9 +27,9 @@ def test_axis_log2_values():
     assert [v.display() for v in axis.values()] == ["2^0.0", "2^1.0", "2^2.0"]
 
 
-def test_axis_log10_values():
+def test_axis_pow10_values():
     # --- arrange ----------------------
-    axis = ParamAxis("p1", -1.0, 1.0, step=1.0, spacing=ParamSpacing.LOG10)
+    axis = ParamAxis("p1", -1.0, 1.0, step=1.0, notation=ParamNotation.POW10)
 
     # --- act / assert -----------------
     assert tuple(v.value for v in axis.values()) == (0.1, 1.0, 10.0)
@@ -216,9 +216,9 @@ def test_axis_grid_with_large_magnitude_values():
     assert tuple(v.value for v in ParamAxis("p1", 1e16, 3e16, step=1e16).values()) == (1e16, 2e16, 3e16)
 
 
-def test_recipe_log10_convenience():
+def test_recipe_pow10_convenience():
     # --- arrange / act ----------------
-    recipe = ParamRecipe.log10("p1", -1.0, 1.0, step=1.0)
+    recipe = ParamRecipe.pow10("p1", -1.0, 1.0, step=1.0)
 
     # --- assert -----------------------
     assert [tuple(v.value for v in p) for p in recipe.tuples()] == [(0.1,), (1.0,), (10.0,)]
@@ -226,11 +226,11 @@ def test_recipe_log10_convenience():
 
 def test_recipe_single_axis_convenience():
     # --- arrange / act ----------------
-    recipe = ParamRecipe.log2("p1", 0.0, 1.0, step=0.5)
+    recipe = ParamRecipe.pow2("p1", 0.0, 1.0, step=0.5)
     tuples = list(recipe.tuples())
 
     # --- assert -----------------------
     assert recipe.param_names() == ("p1",)
-    # values are canonicalized to 10 significant digits, so compare at that resolution
+    # values are canonicalized to 12 significant digits, so compare at that resolution
     assert [p[0].value for p in tuples] == pytest.approx([1.0, 2**0.5, 2.0], rel=1e-9)
     assert [p[0].display() for p in tuples] == ["2^0.0", "2^0.5", "2^1.0"]

@@ -21,7 +21,8 @@ from typing import ClassVar
 
 import numba
 
-from ._identity import DEDUP_DIGITS, FunctionId, ParamValue, deduplicate_ids
+from ._identity import FunctionId
+from ._param_values import DEDUP_DIGITS, ParamValue, deduplicate_param_tuples
 from ._recipes import ParamRecipe
 from ._test_function import CandidateTestFunction
 from ._types import XCFun, XFun
@@ -179,10 +180,14 @@ class Formula(ABC):
            rejected tuple can never displace a valid near-twin by arriving ahead
            of it in the next pass.
         2. **Near-duplicate removal** at `digits` significant digits
-           (`deduplicate_ids`), which is what collapses the same value reached
-           through different notations — a linear axis hitting ``4.0`` and a
-           log2 axis hitting ``2^2.0`` are distinct identities but one function.
-        3. **Construction**, so the per-candidate work is paid only for survivors.
+           (`deduplicate_param_tuples`), which is what collapses the same value
+           reached through different notations — a DECIMAL axis hitting ``4.0``
+           and a POW2 axis hitting ``2^2.0`` are distinct values but one
+           function. This happens on the parameter tuples, before identities
+           exist: the formula number is the same for every tuple here, so it
+           carries no information for the collapse.
+        3. **Construction** (identities included), so the per-candidate work is
+           paid only for survivors.
 
         Eager rather than lazy, and validating: a malformed formula fails here,
         at corpus-build time, instead of somewhere downstream. See
@@ -202,9 +207,8 @@ class Formula(ABC):
         self._validate_param_name_consistency()
 
         param_tuples = (p for recipe in recipes for p in recipe.tuples()) if recipes else iter([()])
-        ids = (FunctionId(self.number, params) for params in param_tuples)
-        valid_ids = (fid for fid in ids if self.is_param_tuple_valid(*fid.param_values))
-        candidates = [self.build_candidate(fid.params) for fid in deduplicate_ids(valid_ids, digits)]
+        valid_tuples = (params for params in param_tuples if self.is_param_tuple_valid(*(p.value for p in params)))
+        candidates = [self.build_candidate(params) for params in deduplicate_param_tuples(valid_tuples, digits)]
 
         if not candidates:
             raise ValueError(
