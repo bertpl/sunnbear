@@ -85,6 +85,22 @@ def test_axis_rejects_bad_grid(start, stop, step):
         ParamAxis("p1", start, stop, step)
 
 
+@pytest.mark.parametrize("noise", [1e-13, -1e-13, 2.5e-13])
+def test_axis_alignment_forgives_snap_erasable_noise(noise):
+    """The invariant behind the derived tolerance: noise the canonical snap erases cannot fail alignment."""
+    # --- act --------------------------
+    axis = ParamAxis("p1", 0.0, 1.0 + noise, step=0.25)
+
+    # --- assert -----------------------
+    assert tuple(v.value for v in axis.values()) == (0.0, 0.25, 0.5, 0.75, 1.0)
+
+
+def test_axis_alignment_rejects_misalignment_beyond_snap_noise():
+    """A genuinely off-grid stop (integer endpoints, so the places check cannot mask it) is rejected."""
+    with pytest.raises(ValueError, match="integer multiple"):
+        ParamAxis("p1", 0.0, 1000000001.0, step=4.0)  # ratio 250000000.25: off by 1e-9 relative
+
+
 def test_axis_forgives_float_noise_in_endpoints():
     """Decimal places are counted on the canonical form, so noise the snap erases can't fail the check."""
     # --- arrange ----------------------
@@ -188,6 +204,43 @@ def test_recipe_coupled_sweep_all_single_value_axes():
 
     # --- act / assert -----------------
     assert [tuple(v.value for v in p) for p in recipe.tuples()] == [(3.0, 7.0)]
+
+
+def test_recipe_coupled_sweep_coinciding_boundaries_step_together():
+    """Axes whose plateau boundaries coincide advance in the same step (2- and 4-value axes share 1/2)."""
+    # --- arrange ----------------------
+    recipe = ParamRecipe(
+        axes=(ParamAxis("p1", 0.0, 1.0, 1.0), ParamAxis("p2", 0.0, 3.0, 1.0)),  # 2 values, 4 values
+        product=False,
+    )
+
+    # --- act / assert -----------------
+    assert [tuple(v.value for v in p) for p in recipe.tuples()] == [
+        (0.0, 0.0),
+        (0.0, 1.0),
+        (1.0, 2.0),  # both axes crossed the shared boundary 1/2 in one step
+        (1.0, 3.0),
+    ]
+
+
+def test_recipe_mixed_notations_survive_tuple_assembly():
+    """Each axis's notation carries through recipe assembly — values and rendering both."""
+    # --- arrange ----------------------
+    recipe = ParamRecipe(
+        axes=(ParamAxis("p1", 0.0, 1.0, 1.0), ParamAxis("p2", 0.0, 1.0, 1.0, ParamNotation.POW2)),
+    )
+
+    # --- act --------------------------
+    tuples = list(recipe.tuples())
+
+    # --- assert -----------------------
+    assert [tuple(str(v) for v in p) for p in tuples] == [
+        ("0.0", "2^0.0"),
+        ("0.0", "2^1.0"),
+        ("1.0", "2^0.0"),
+        ("1.0", "2^1.0"),
+    ]
+    assert [tuple(v.value for v in p) for p in tuples] == [(0.0, 1.0), (0.0, 2.0), (1.0, 1.0), (1.0, 2.0)]
 
 
 def test_recipe_coupled_sweep_three_axes():

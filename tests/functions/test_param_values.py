@@ -54,12 +54,14 @@ def test_param_value_rendering_is_notation_sensitive():
     assert as_decimal.value == as_pow2.value  # same number, different notation
 
 
-@pytest.mark.parametrize("token", ["0.2", "1.0", "-0.4", "2^1.2", "10^-3.4", "6553.6", "0.0", "-17.25", "1e-12"])
+@pytest.mark.parametrize(
+    "token", ["0.2", "1.0", "-0.4", "2^1.2", "10^-3.4", "6553.6", "0.0", "-17.25", "1e-12", "1e+16", "-1e-12"]
+)
 def test_param_value_parse_display_roundtrip(token):
     assert ParamValue.parse(token).display() == token
 
 
-@pytest.mark.parametrize("token", ["0.2", "2^1.2", "10^-3.4", "2^12.3", "1e-12", "-17.25"])
+@pytest.mark.parametrize("token", ["0.2", "2^1.2", "10^-3.4", "2^12.3", "1e-12", "-17.25", "1e+16"])
 def test_param_value_rendering_reparses_to_the_same_value(token):
     """A published parameter must come back as the same float, or reproducing results is guesswork."""
     original = ParamValue.parse(token)

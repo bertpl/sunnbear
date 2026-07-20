@@ -145,6 +145,32 @@ def test_formulas_rejects_non_positive_number():
         FormulaRegistry.formulas()
 
 
+@pytest.mark.usefixtures("isolated_registry")
+def test_failed_population_is_not_cached():
+    """A validation failure leaves the registry unpopulated, so it re-raises on every call."""
+    # --- arrange ----------------------
+    _minimal_formula_cls(993)
+    _minimal_formula_cls(993)  # duplicate number: population must fail
+
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match="Duplicate formula numbers"):
+        FormulaRegistry.formulas()
+    with pytest.raises(ValueError, match="Duplicate formula numbers"):
+        FormulaRegistry.formulas()  # not silently cached as half-built state
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_zero_param_formula_yields_exactly_one_candidate():
+    """A formula without parameters materializes the single empty tuple, once."""
+    # --- act --------------------------
+    candidates = _minimal_formula_cls(992)().build_all_candidates()
+
+    # --- assert -----------------------
+    assert len(candidates) == 1
+    assert candidates[0].id.params == ()
+    assert str(candidates[0].id) == "f992"
+
+
 def test_registry_population_is_a_snapshot():
     """Accessors reuse one population: same tuple, and reconstruction hands out the same instances."""
     # --- act --------------------------
@@ -258,6 +284,33 @@ def test_declared_params_must_match_parametrized_fun_signature():
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="parametrized_fun takes"):
+        cls().build_all_candidates()
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_declared_params_must_match_bracket_signature():
+    """Right arity but wrong names in bracket is drift too — the cross-check covers every hook."""
+    # --- arrange ----------------------
+    cls = _formula_cls(
+        981,
+        ("p1",),
+        (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),),
+        bracket=lambda self, other: (-1.0, 1.0),
+    )
+
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match="bracket takes"):
+        cls().build_all_candidates()
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_declared_params_must_match_overridden_validity_hook_signature():
+    # --- arrange ----------------------
+    cls = _formula_cls(980, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),))
+    cls.is_param_tuple_valid = lambda self, other: True
+
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match="is_param_tuple_valid takes"):
         cls().build_all_candidates()
 
 

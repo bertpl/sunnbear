@@ -46,12 +46,34 @@ def test_function_id_equality_with_unrelated_type():
     assert FunctionId(101, (ParamValue.decimal(1.0),)) != "f101-1.0"
 
 
-@pytest.mark.parametrize("text", ["f105-2^1.2_0.4", "f007", "f101-0.2", "f102-5.0"])
+@pytest.mark.parametrize(
+    "text",
+    [
+        "f105-2^1.2_0.4",
+        "f007",
+        "f101-0.2",
+        "f102-5.0",
+        "f101--0.4",  # leading minus in a token vs the formula/params separator
+        "f105--0.4_-1e-12",  # negative + scientific notation across the param separator
+        "f101-1e+16",  # plus sign inside a token
+    ],
+)
 def test_function_id_display_roundtrip(text):
     assert FunctionId.from_string(text).display() == text
 
 
-@pytest.mark.parametrize("text", ["f105-2^1.2_0.4", "f007", "f101-0.2", "f102-5.0"])
+@pytest.mark.parametrize(
+    "text",
+    [
+        "f105-2^1.2_0.4",
+        "f007",
+        "f101-0.2",
+        "f102-5.0",
+        "f101--0.4",  # leading minus in a token vs the formula/params separator
+        "f105--0.4_-1e-12",  # negative + scientific notation across the param separator
+        "f101-1e+16",  # plus sign inside a token
+    ],
+)
 def test_function_id_canonical_form_reparses_to_the_same_identity(text):
     original = FunctionId.from_string(text)
     assert FunctionId.from_string(str(original)) == original
