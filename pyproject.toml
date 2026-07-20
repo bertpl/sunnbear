@@ -53,6 +53,11 @@ dev = [
     # `make lint`, and CI); these ranges just set the floor.
     "ruff>=0.15.11",
     "ty==0.0.56",  # pre-1.0 type checker — pin exactly; its ruleset is still evolving
+    # SciPy-agreement cross-checks in the test suite only — deliberately not a runtime dependency.
+    # Per-Python floors: earliest version shipping a wheel per CPython (same policy as runtime deps).
+    "scipy>=1.11.3; python_version < '3.13'",
+    "scipy>=1.14.1; python_version == '3.13'",
+    "scipy>=1.16.3; python_version >= '3.14'",
 ]
 # maintainer scratch tooling — installed by a plain `uv sync` (default-groups below)
 # but NOT by CI's `uv sync --group dev` / `uv run --group dev`, keeping matrix legs lean
