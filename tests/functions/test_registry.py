@@ -16,8 +16,15 @@ from sunnbear.functions.catalog.f1xx_polynomials.f102_odd_power import F102_OddP
 
 @pytest.fixture
 def isolated_registry(monkeypatch):
-    """Snapshot the auto-registration list so test-defined Formula subclasses don't leak."""
+    """Snapshot the auto-registration list and reset the registry's populated state.
+
+    Test-defined Formula subclasses don't leak past the test, and each test sees a
+    fresh population (so its own subclasses are discovered despite the snapshot
+    semantics of `FormulaRegistry._ensure_registry_populated`).
+    """
     monkeypatch.setattr(formula_module, "registered_formula_classes", list(formula_module.registered_formula_classes))
+    monkeypatch.setattr(FormulaRegistry, "_formulas", None)
+    monkeypatch.setattr(FormulaRegistry, "_formulas_by_number", None)
 
 
 # ==================================================================================================
@@ -136,6 +143,31 @@ def test_formulas_rejects_non_positive_number():
     # --- act / assert -----------------
     with pytest.raises(ValueError):
         FormulaRegistry.formulas()
+
+
+def test_registry_population_is_a_snapshot():
+    """Accessors reuse one population: same tuple, and reconstruction hands out the same instances."""
+    # --- act --------------------------
+    first, second = FormulaRegistry.formulas(), FormulaRegistry.formulas()
+    candidate_a = FormulaRegistry.candidate_from_id("f101-0.2")
+    candidate_b = FormulaRegistry.candidate_from_id("f101-0.4")
+
+    # --- assert -----------------------
+    assert first is second
+    assert candidate_a.formula is candidate_b.formula  # dict hit, not a fresh enumeration
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_formulas_defined_after_first_use_are_not_discovered():
+    """The snapshot is taken on first accessor call; late definitions are deliberately unsupported."""
+    # --- arrange ----------------------
+    FormulaRegistry.formulas()  # take the snapshot
+
+    # --- act --------------------------
+    cls = _minimal_formula_cls(994)
+
+    # --- assert -----------------------
+    assert all(type(f) is not cls for f in FormulaRegistry.formulas())
 
 
 @pytest.mark.usefixtures("isolated_registry")

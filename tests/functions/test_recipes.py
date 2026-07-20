@@ -85,6 +85,18 @@ def test_axis_rejects_bad_grid(start, stop, step):
         ParamAxis("p1", start, stop, step)
 
 
+def test_axis_forgives_float_noise_in_endpoints():
+    """Decimal places are counted on the canonical form, so noise the snap erases can't fail the check."""
+    # --- arrange ----------------------
+    noisy_stop = 0.1 + 0.2  # 0.30000000000000004: 17 raw decimal places, 1 canonical
+
+    # --- act --------------------------
+    axis = ParamAxis("p1", 0.0, noisy_stop, step=0.1)
+
+    # --- assert -----------------------
+    assert tuple(v.value for v in axis.values()) == (0.0, 0.1, 0.2, 0.3)
+
+
 def test_axis_accepts_offset_but_clean_grid():
     """An offset lattice (1,3,5,7 on step 2) is valid: the endpoints are no finer than the step."""
     # --- act --------------------------

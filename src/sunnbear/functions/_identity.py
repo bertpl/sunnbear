@@ -28,6 +28,7 @@ module exists to keep.
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from dataclasses import dataclass
+from math import isfinite
 
 # Significant digits a grid quantity is snapped to, absorbing the float error accumulated
 # by `start + i * step`. Deliberately finer than DEDUP_DIGITS: this cleans up arithmetic
@@ -87,7 +88,8 @@ class ParamValue(ABC):
         """Build a ``base^exponent`` parameter value (base 2 or 10; ``2.0``/``10.0`` also accepted)."""
         if base not in (2, 10):
             raise ValueError(f"ParamValue supports exponent notation on base 2 or 10 (got {base!r}).")
-        return ExponentialParamValue(value=float(base) ** exponent, base=int(base), exponent=exponent)
+        # value=0.0 is a placeholder: __post_init__ derives the real value from base and exponent
+        return ExponentialParamValue(value=0.0, base=int(base), exponent=exponent)
 
     @classmethod
     def parse(cls, token: str) -> "ParamValue":
@@ -131,7 +133,14 @@ class DecimalParamValue(ParamValue):
     """A parameter value authored as a plain decimal."""
 
     def __post_init__(self) -> None:
-        """Canonicalize the value — for this notation, the value *is* the grid quantity."""
+        """Reject non-finite values, then canonicalize — for this notation, the value *is* the grid quantity.
+
+        Finiteness is an identity invariant: a NaN would quietly break equality,
+        hashing and near-duplicate grouping, so it is rejected on every
+        construction path rather than allowed to propagate.
+        """
+        if not isfinite(self.value):
+            raise ValueError(f"ParamValue must be finite (got {self.value!r}).")
         object.__setattr__(self, "value", _canonical(self.value))
 
     def display(self) -> str:
@@ -158,12 +167,23 @@ class ExponentialParamValue(ParamValue):
     exponent: float
 
     def __post_init__(self) -> None:
-        """Validate and normalize the base, canonicalize the exponent, then derive the value."""
+        """Validate the base and exponent, canonicalize the exponent, then derive the value.
+
+        Both the exponent and the derived value must be finite (see
+        `DecimalParamValue.__post_init__` for why): a finite exponent can still
+        overflow the derivation (e.g. ``10^400``), so that is rejected too.
+        """
         if self.base not in (2, 10):
             raise ValueError(f"ParamValue supports exponent notation on base 2 or 10 (got {self.base!r}).")
+        if not isfinite(self.exponent):
+            raise ValueError(f"ParamValue exponent must be finite (got {self.exponent!r}).")
         object.__setattr__(self, "base", int(self.base))
         object.__setattr__(self, "exponent", _canonical(self.exponent))
-        object.__setattr__(self, "value", float(self.base) ** self.exponent)
+        try:
+            derived = float(self.base) ** self.exponent
+        except OverflowError as exc:
+            raise ValueError(f"ParamValue {self.base}^{self.exponent!r} overflows to a non-finite value.") from exc
+        object.__setattr__(self, "value", derived)
 
     def display(self) -> str:
         """Render as ``base^exponent``, e.g. ``2^1.2``."""
@@ -221,7 +241,9 @@ class FunctionId:
         """
         if not text.startswith("f"):
             raise ValueError(f"Invalid FunctionId string: {text!r}")
-        number_part, _, params_part = text[1:].partition("-")
+        number_part, dash, params_part = text[1:].partition("-")
+        if dash and not params_part:  # trailing dash: "f101-" is not the rendering of any identity
+            raise ValueError(f"Invalid FunctionId string: {text!r}")
         try:
             formula = int(number_part)
             params = tuple(ParamValue.parse(token) for token in params_part.split("_")) if params_part else ()

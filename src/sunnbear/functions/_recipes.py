@@ -33,11 +33,14 @@ from decimal import Decimal
 from enum import StrEnum
 from math import lcm
 
-from ._identity import ParamValue
+from ._identity import CANONICAL_DIGITS, ParamValue, _canonical
 
 # A grid endpoint or step may drift from an integer ratio by this much (relative) and still
 # count as aligned — the same float slack the round() in ParamAxis.values() already tolerates.
-_ALIGNMENT_TOL = 1e-9
+# Derived as one decade coarser than the canonical snap, so no input whose noise the snap
+# would erase anyway can fail alignment (the extra decade also covers the float error of the
+# ratio computation itself).
+_ALIGNMENT_TOL = 10.0 ** (1 - CANONICAL_DIGITS)
 
 
 def _decimal_places(x: float) -> int:
@@ -86,8 +89,10 @@ class ParamAxis:
     def __post_init__(self) -> None:
         """Validate that the grid is well-formed: positive step, ordered and aligned endpoints.
 
-        Alignment, both within `_ALIGNMENT_TOL` so float noise in the inputs is
-        forgiven:
+        Alignment, both forgiving float noise in the inputs — the multiple-of-step
+        check within `_ALIGNMENT_TOL`, the decimal-places check by judging the
+        canonicalized form of each quantity (what a `ParamValue` will display),
+        not the raw float:
 
         - `start` and `stop` carry no more decimal places than `step`, so no grid
           value ever displays more precision than the step implies (a `0.05`
@@ -102,9 +107,9 @@ class ParamAxis:
         if self.stop < self.start:
             raise ValueError(f"ParamAxis stop must be >= start (got {self.start}..{self.stop}).")
         if self.start != self.stop:
-            step_places = _decimal_places(self.step)
+            step_places = _decimal_places(_canonical(self.step))
             for name, endpoint in (("start", self.start), ("stop", self.stop)):
-                if _decimal_places(endpoint) > step_places:
+                if _decimal_places(_canonical(endpoint)) > step_places:
                     raise ValueError(
                         f"ParamAxis {name}={endpoint} has more decimal places than step={self.step}; "
                         "grid values would display more precision than the step implies."

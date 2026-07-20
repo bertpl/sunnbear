@@ -183,6 +183,31 @@ def test_exponential_variant_validates_base_on_direct_construction():
         ExponentialParamValue(value=8.0, base=3, exponent=2.0)
 
 
+@pytest.mark.parametrize("bad", [float("inf"), float("-inf"), float("nan")])
+def test_param_value_rejects_non_finite(bad):
+    """A NaN identity would quietly break equality, hashing and dedup, so every path rejects it."""
+    with pytest.raises(ValueError, match="finite"):
+        ParamValue.decimal(bad)
+    with pytest.raises(ValueError, match="finite"):
+        ParamValue.exponential(2, bad)
+    with pytest.raises(ValueError, match="finite"):
+        DecimalParamValue(value=bad)  # direct construction, bypassing the factory
+    with pytest.raises(ValueError, match="finite"):
+        ExponentialParamValue(value=1.0, base=2, exponent=bad)
+
+
+@pytest.mark.parametrize("token", ["inf", "-inf", "nan", "2^inf", "10^nan"])
+def test_param_value_parse_rejects_non_finite_tokens(token):
+    with pytest.raises(ValueError):
+        ParamValue.parse(token)
+
+
+def test_exponential_rejects_overflowing_derivation():
+    """A finite exponent can still overflow base**exponent; the derived value is checked too."""
+    with pytest.raises(ValueError, match="non-finite"):
+        ParamValue.exponential(10, 400.0)
+
+
 # ==================================================================================================
 #  FunctionId
 # ==================================================================================================
@@ -252,7 +277,7 @@ def test_function_id_ordering():
     assert [str(fid) for fid in ordered] == ["f101-0.2", "f101-0.4", "f102-1.0"]
 
 
-@pytest.mark.parametrize("text", ["x101-0.2", "f-abc", "f101-zz", ""])
+@pytest.mark.parametrize("text", ["x101-0.2", "f-abc", "f101-zz", "", "f101-"])
 def test_function_id_from_string_rejects_invalid(text):
     with pytest.raises(ValueError):
         FunctionId.from_string(text)
