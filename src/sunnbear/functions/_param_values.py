@@ -32,17 +32,36 @@ from math import isfinite
 # float error of grid arithmetic (`start + i * step`). Chosen as 3/4 of float64's ~16
 # significant digits — far enough above ulp noise to be robust with healthy margin, small
 # enough to still clearly be noise cleanup rather than value engineering. Every other
-# precision constant in the package derives from this one.
+# precision constant in this module derives from this one.
 CANONICAL_DIGITS = 12
 
 # Significant digits at which two parameter values count as the same exact-math number seen
-# through different notations. See `deduplicate_param_tuples` for the derivation of the
-# 2-decade margin below CANONICAL_DIGITS.
+# through different notations. Why 2 decades below CANONICAL_DIGITS suffices (first-order
+# error propagation): the canonical snap at C digits has relative resolution ~10^-(C-1). A
+# decimal stores its value directly, so that is its whole error. An exponential stores its
+# *exponent* snapped at C digits, and the derivation value = b^e amplifies a relative
+# exponent error eps to a relative value error ~ln(b)*|e|*eps. The worst cross-notation
+# discrepancy between two spellings of one exact value is therefore
+# delta ~ ln(10)*|e|*10^-(C-1). Deduplication collapses reliably when its key resolution
+# 10^-(D-1) comfortably exceeds delta; with D = C - 2 the margin is
+# 10^(C-D) / (ln(10)*|e|) ~ 43/|e| — a >=4x margin for exponents up to ~10 and still >=1 up
+# to |e| ~ 43, where a single decade would already fail around |e| ~ 4.
 DEDUP_DIGITS = CANONICAL_DIGITS - 2
 
 
 def _round_significant(x: float, digits: int) -> float:
-    """Round a float to `digits` significant digits."""
+    """Round a float to `digits` significant digits.
+
+    Rounds to *nearest* (``format`` half-even semantics), so when used as a
+    bucketing key the buckets are **centered on** round values, with boundaries
+    at the midpoints between representable `digits`-digit numbers — ``4.0``'s
+    bucket spans roughly ``4.0 ± 0.5`` units in the last kept digit. Round
+    numbers are therefore bucket centers, never boundaries: a canonical value
+    like ``2^2.0 == 4.0`` and anything within half a bucket of it share a key.
+    Two *noisy* values can still straddle a midpoint boundary and land in
+    different buckets — that is the residual straddle case documented at
+    `deduplicate_param_tuples`.
+    """
     return float(f"{x:.{digits}g}")
 
 
@@ -61,7 +80,7 @@ class ParamNotation(StrEnum):
     POW2 = "pow2"  # value = 2 ** argument
     POW10 = "pow10"  # value = 10 ** argument
 
-    def make(self, argument: float) -> "ParamValue":
+    def build_param_value(self, argument: float) -> "ParamValue":
         """Build the `ParamValue` whose (canonicalized) argument is `argument`."""
         if self is ParamNotation.DECIMAL:
             return ParamValue.decimal(argument)
@@ -77,7 +96,7 @@ class ParamValue(ABC):
 
     One subclass per notation shape, so a value cannot carry fields belonging
     to a notation it does not use. Construct through the factories on this
-    class (`decimal`, `exponential`, `parse`) or through `ParamNotation.make`
+    class (`decimal`, `exponential`, `parse`) or through `ParamNotation.build_param_value`
     rather than the subclasses directly.
 
     **Each notation canonicalizes its own argument**, in its `__post_init__` —
@@ -219,27 +238,17 @@ def deduplicate_param_tuples(
     they could plausibly be the same exact-math values seen through different
     notations, showing up as different floats only through float arithmetic —
     a DECIMAL axis hitting ``4.0`` and a POW2 axis hitting ``2^2.0``, which
-    exact notation-sensitive equality leaves as two.
-
-    **Why 2 decades below `CANONICAL_DIGITS` suffices** (first-order error
-    propagation): the canonical snap at ``C`` digits has relative resolution
-    ``~10^-(C-1)``. A decimal stores its value directly, so that is its whole
-    error. An exponential stores its *exponent* snapped at ``C`` digits, and
-    the derivation ``value = b^e`` amplifies a relative exponent error ``eps``
-    to a relative value error ``~ln(b) * |e| * eps``. The worst cross-notation
-    discrepancy between two spellings of one exact value is therefore
-    ``delta ~ ln(10) * |e| * 10^-(C-1)``. Deduplication collapses reliably when
-    its key resolution ``10^-(D-1)`` comfortably exceeds ``delta``; with
-    ``D = C - 2`` the margin is ``10^(C-D) / (ln(10) * |e|) ~ 43/|e|`` — a >=4x
-    margin for exponents up to ~10 and still >=1 up to ``|e| ~ 43``, where a
-    single decade would already fail around ``|e| ~ 4``.
+    exact notation-sensitive equality leaves as two. The default granularity's
+    2-decade margin below the canonical snap is derived at `DEDUP_DIGITS`.
 
     A filter rather than an equality, and deliberately so: the granularity is a
     parameter, and which member of a group survives follows the input order.
     Grouping is by rounded key, not pairwise distance, so the partition is
-    deterministic and the pass is linear. The cost is that a pair straddling a
-    rounding boundary survives as two tuples — immaterial here, since the
-    corpus's diversity selection is free to drop one later.
+    deterministic and the pass is linear. The cost is that a pair of *noisy*
+    values straddling a bucket boundary survives as two tuples — buckets are
+    centered on round values (see `_round_significant`), so this cannot hit a
+    canonical value — and it is immaterial here anyway, since the corpus's
+    diversity selection is free to drop one later.
 
     Args:
         tuples: Candidate parameter tuples, in materialization order.

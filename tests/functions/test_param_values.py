@@ -111,11 +111,11 @@ def test_param_value_equality_is_notation_sensitive():
     [
         (ParamValue.decimal(0.2), DecimalParamValue),
         (ParamValue.parse("0.2"), DecimalParamValue),
-        (ParamNotation.DECIMAL.make(0.2), DecimalParamValue),
+        (ParamNotation.DECIMAL.build_param_value(0.2), DecimalParamValue),
         (ParamValue.exponential(2, 1.2), ExponentialParamValue),
         (ParamValue.parse("2^1.2"), ExponentialParamValue),
-        (ParamNotation.POW2.make(1.2), ExponentialParamValue),
-        (ParamNotation.POW10.make(1.2), ExponentialParamValue),
+        (ParamNotation.POW2.build_param_value(1.2), ExponentialParamValue),
+        (ParamNotation.POW10.build_param_value(1.2), ExponentialParamValue),
     ],
 )
 def test_factories_build_the_matching_variant(pv, expected_type):
@@ -130,9 +130,9 @@ def test_factories_build_the_matching_variant(pv, expected_type):
         (ParamNotation.POW10, -3.4, "10^-3.4"),
     ],
 )
-def test_notation_make_maps_argument_to_value(notation, argument, expected):
+def test_notation_builds_param_value_from_argument(notation, argument, expected):
     """A notation maps a continuous argument to a value; the argument is what the display carries."""
-    assert notation.make(argument).display() == expected
+    assert notation.build_param_value(argument).display() == expected
 
 
 def test_decimal_variant_carries_no_notation_fields():
@@ -227,6 +227,18 @@ def test_exponential_rejects_overflowing_derivation():
 # ==================================================================================================
 #  deduplicate_param_tuples
 # ==================================================================================================
+def test_dedup_buckets_are_centered_on_round_values():
+    """Round numbers are bucket centers, never boundaries: noise on either side of 4.0 collapses onto it."""
+    # --- arrange ----------------------
+    just_below = (ParamValue.exponential(2, 1.99999999999),)  # value a hair under 4.0
+    exact = (ParamValue.decimal(4.0),)
+    just_above = (ParamValue.exponential(2, 2.00000000001),)  # value a hair over 4.0
+
+    # --- act / assert -----------------
+    assert just_below[0].value < 4.0 < just_above[0].value  # genuinely straddling the round number
+    assert len(deduplicate_param_tuples([just_below, exact, just_above])) == 1
+
+
 def test_deduplicate_collapses_notations_of_one_value():
     # --- arrange ----------------------
     tuples = [

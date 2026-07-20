@@ -119,7 +119,7 @@ class ParamAxis:
         on).
         """
         n_points = round((self.stop - self.start) / self.step) + 1
-        return tuple(self.notation.make(self.start + i * self.step) for i in range(n_points))
+        return tuple(self.notation.build_param_value(self.start + i * self.step) for i in range(n_points))
 
 
 # ==================================================================================================
