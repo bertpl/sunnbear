@@ -22,7 +22,7 @@ dependencies = [
     "numba>=0.61.0; python_version == '3.13'",
     "numba>=0.66.0; python_version >= '3.14'",
     "matplotlib>=3.8; python_version < '3.13'",
-    "matplotlib>=3.9.2; python_version == '3.13'",
+    "matplotlib>=3.10.7; python_version == '3.13'",
     "matplotlib>=3.10.7; python_version >= '3.14'",
     "counted-float>=1.2.1",
     "snuffled>=0.1.6",
