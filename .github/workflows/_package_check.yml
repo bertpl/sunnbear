@@ -23,7 +23,7 @@ jobs:
         uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
         with:
           version: ${{ vars.UV_VERSION }}
-          enable-cache: false  # release path: this build output is the published artifact — never restore from a poisonable cache
+          enable-cache: false  # never restore this build output from a poisonable cache; on release runs it becomes the published artifact
 
       - name: Build sdist + wheel
         run: uv build

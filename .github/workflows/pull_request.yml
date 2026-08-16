@@ -75,9 +75,7 @@ jobs:
     needs: [preflight]
     uses: ./.github/workflows/_unit_tests.yml
 
-  # Build the distribution and run the suite against a blind install of it — the
-  # packaging-layer gate (empty sdist/wheel, missing subpackages) that the
-  # editable-install test job can never see.
+  # Package-integrity gate: build + blind-install the wheel and test it (see _package_check.yml).
   package:
     needs: [preflight]
     uses: ./.github/workflows/_package_check.yml
