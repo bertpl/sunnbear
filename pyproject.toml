@@ -1,7 +1,7 @@
 [project]
 name = "sunnbear"
 version = "0.0.3"
-description = "Benchmarking framework for univariate root-solvers — under construction."
+description = "Under construction."
 # readme is dynamic: hatch-fancy-pypi-readme builds the PyPI long-description from README.md,
 # rewriting the relative splash link to a tag-pinned absolute URL (config below).
 dynamic = ["readme"]
