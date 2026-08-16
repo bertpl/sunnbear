@@ -33,7 +33,6 @@ classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     # Python versions kept in sync with .python-versions (release.py enforces this)
     "Programming Language :: Python :: 3.11",
@@ -59,6 +58,11 @@ dev = [
 notebooks = [
     "jupyterlab>=4.4.6",
     "notebook>=7.4.5",
+]
+# packaging-integrity tooling for the _package_check.yml CI gate; opt-in via
+# `--group package`, kept out of the default dev/notebooks sync.
+package = [
+    "check-wheel-contents>=0.6.2",
 ]
 
 [tool.uv]
@@ -87,7 +91,10 @@ pattern = '\]\((images/[^)]+)\)'
 replacement = '](https://raw.githubusercontent.com/bertpl/sunnbear/v$HFPR_VERSION/\1)'
 
 [tool.hatch.build.targets.sdist]
-packages = ["src/sunnbear"]
+# only-include, not packages: `packages` also strips the src/ prefix inside the
+# sdist, so the wheel build can't find src/sunnbear in the unpacked sdist and
+# ships an empty wheel. only-include keeps src/sunnbear/ verbatim.
+only-include = ["src/sunnbear"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/sunnbear"]
