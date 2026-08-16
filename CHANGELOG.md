@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Source distributions now contain the package; the 0.0.3 sdist shipped no importable code
+- Miscellaneous packaging fixes
 
 ### Security
 
