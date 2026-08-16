@@ -41,7 +41,7 @@ jobs:
     needs: validate-tag-version
     uses: ./.github/workflows/_unit_tests.yml
 
-  # Build + blind-install gate: the same package check PRs run behind ci-gate.
+  # Build + blind-install gate: the same package check that PRs run behind ci-gate.
   # publish-to-prod below reuses the exact artifact this job built and tested.
   package-check:
     needs: validate-tag-version
