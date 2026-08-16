@@ -9,6 +9,6 @@
 
 # sunnbear
 
-Benchmarking framework for univariate root-solvers — under construction.
+Under construction.
 
 ![sunnbear splash](images/splash_with_version.webp)
