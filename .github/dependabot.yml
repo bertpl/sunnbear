@@ -27,8 +27,9 @@ updates:
     # long enough for upstream compromises to surface before they can land.
     cooldown:
       default-days: 7  # zizmor's dependabot-cooldown floor; ~no-op at weekly cadence anyway
-      # No semver-major-days here (unlike the uv entry): a longer major soak guards
-      # PyPI's file-addition window, which has no counterpart for SHA-pinned actions.
+      # No semver-major-days here (unlike the uv entry): uv soaks majors longer
+      # because files can be added to a PyPI release after it is published;
+      # SHA-pinned actions have no equivalent window.
 
   - package-ecosystem: "uv"
     # lockfile-only: bump uv.lock to the latest that still satisfies pyproject,
