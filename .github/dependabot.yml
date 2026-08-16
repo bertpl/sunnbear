@@ -9,15 +9,26 @@ updates:
       - "/.github/actions/pre_commit"
     schedule:
       interval: "weekly"
+    # `chore` prefix makes the PR title (and thus the squash commit on main) follow
+    # the repo's `<type>: <summary>` convention, so the preflight title check needs
+    # no Dependabot exemption.
+    commit-message:
+      prefix: "chore"
+    # Split by update type: auto-merge is decided per PR from its update type, so a
+    # single major in a shared batch would park every minor/patch bump behind review.
     groups:
-      actions:  # one batched PR for all action bumps
+      actions:  # minor/patch batch: auto-merges once checks pass
         patterns: ["*"]
+        update-types: ["minor", "patch"]
+      actions-major:  # majors batch separately and wait for review
+        patterns: ["*"]
+        update-types: ["major"]
     # Let releases age before PRs open: auto-merged patch/minor bumps then sit
     # long enough for upstream compromises to surface before they can land.
     cooldown:
       default-days: 7  # zizmor's dependabot-cooldown floor; ~no-op at weekly cadence anyway
-      # semver-major-days is uv-only: action releases aren't semver-scoped, so
-      # github-actions only supports the flat default-days.
+      # No semver-major-days here (unlike the uv entry): a longer major soak guards
+      # PyPI's file-addition window, which has no counterpart for SHA-pinned actions.
 
   - package-ecosystem: "uv"
     # lockfile-only: bump uv.lock to the latest that still satisfies pyproject,
@@ -27,9 +38,15 @@ updates:
     versioning-strategy: "lockfile-only"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "chore"
     groups:
-      python:  # one batched PR for all Python-dependency bumps
+      python:  # minor/patch batch: auto-merges once checks pass
         patterns: ["*"]
+        update-types: ["minor", "patch"]
+      python-major:  # majors batch separately and wait for review
+        patterns: ["*"]
+        update-types: ["major"]
     cooldown:
       default-days: 7  # zizmor's dependabot-cooldown floor; ~no-op at weekly cadence anyway
       semver-major-days: 14
