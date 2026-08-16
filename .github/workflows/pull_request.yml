@@ -75,6 +75,13 @@ jobs:
     needs: [preflight]
     uses: ./.github/workflows/_unit_tests.yml
 
+  # Build the distribution and run the suite against a blind install of it — the
+  # packaging-layer gate (empty sdist/wheel, missing subpackages) that the
+  # editable-install test job can never see.
+  package:
+    needs: [preflight]
+    uses: ./.github/workflows/_package_check.yml
+
   # Synchronous dependency-CVE gate: audits the locked runtime dependencies
   # against the advisory DB at PR time — the blocking complement to the async,
   # repo-level Dependabot alerts. Hard-fails on any advisory; accepted ones go
@@ -109,7 +116,7 @@ jobs:
     # `always()` is load-bearing — without it the gate is skipped when an
     # upstream job fails, and GitHub treats a skipped required check as passing.
     if: always()
-    needs: [preflight, pre-commit, test, pip-audit]
+    needs: [preflight, pre-commit, test, package, pip-audit]
     runs-on: ubuntu-latest
     steps:
       - name: Fail if any required job did not succeed
