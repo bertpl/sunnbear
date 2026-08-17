@@ -18,6 +18,10 @@ inputs:
         required: false
         description: "'true' runs under coverage and uploads the per-combo data file for a cross-matrix combine; 'false' (default) runs plain pytest."
         default: "false"
+    jit:
+        required: false
+        description: "'on' (default) runs numba JIT; 'off' sets NUMBA_DISABLE_JIT=1 so coverage measures the njit formula bodies as plain Python."
+        default: "on"
 
 runs:
     using: composite
@@ -51,12 +55,16 @@ runs:
           PY: ${{ env.PYTHON_EFFECTIVE_VERSION }}
           RES: ${{ inputs.dependency_resolution }}
           COV: ${{ inputs.coverage }}
+          JIT: ${{ inputs.jit }}
           # distinct per-combo data file so the coverage job combines rather than overwrites
           COVERAGE_FILE: .coverage.${{ inputs.python_version }}-${{ inputs.dependency_resolution }}
         run: |
           COV_FLAG=""
           # --cov-fail-under=0: the gate is cumulative (coverage job), not per-combo
           [ "$COV" = "true" ] && COV_FLAG="--cov --cov-report= --cov-fail-under=0"
+          # jit-off legs: NUMBA_DISABLE_JIT makes njit a no-op, so the formula bodies run as plain
+          # Python and coverage.py sees their real lines and branches (not compiled-and-assumed).
+          [ "$JIT" = "off" ] && export NUMBA_DISABLE_JIT=1
           uv run --python "$PY" --resolution "$RES" --group dev pytest ./tests $COV_FLAG --durations=20
 
       - name: Dump collected node-ids (for the cross-combo test-count union)

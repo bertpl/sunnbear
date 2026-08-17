@@ -33,7 +33,7 @@ test:
 	uv run pytest ./tests
 
 coverage:
-	uv run pytest ./tests --cov --cov-report=html
+	NUMBA_DISABLE_JIT=1 uv run pytest ./tests --cov --cov-report=html
 
 lint:
 	uv run pre-commit run --all-files
