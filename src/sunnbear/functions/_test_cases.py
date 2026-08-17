@@ -3,14 +3,14 @@
 A concrete `Formula` lists `cases` — one `FormulaTestCase` per behavior worth pinning, built via
 `FormulaTestCase.value` / `.invalid` / `.bracket`. A single generic test drives every registered
 formula through its list, so between them the three kinds cover `parametrized_fun`, both sides of
-`is_param_tuple_valid`, and `bracket`; the jit-off branch-coverage gate then fails on any formula
-line no case reaches.
+`is_param_tuple_valid`, and `bracket`; the branch-coverage gate then fails on any formula line no
+case reaches.
 """
 
 from dataclasses import dataclass
 
-# loose enough for the ~1-ulp jit-vs-Python gap, tight enough to catch a real error. atol carries
-# the comparison near a root, where `expected` is 0 and a relative tolerance says nothing.
+# The defaults are loose enough for the ~1-ulp jit-vs-Python gap but tight enough to catch a real
+# error; atol matters near a root, where `expected` is 0 and a relative tolerance says nothing.
 DEFAULT_RTOL = 1e-12
 DEFAULT_ATOL = 1e-12
 
