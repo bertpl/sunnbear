@@ -9,6 +9,7 @@ help:
 	@echo ''
 	@echo '  dev-setup                      One-time: sync dev deps & install pre-commit hooks.'
 	@echo '  test		                    Run pytest unit tests.'
+	@echo '  coverage                       Run unit tests with coverage; HTML report in htmlcov/.'
 	@echo '  lint		                    Run all pre-commit hooks on all files.'
 	@echo '  format		                    Format source code using ruff.'
 	@echo '  format-single-file             Format single file using ruff. Useful in e.g. PyCharm to automatically trigger formatting on file save.'
@@ -29,10 +30,10 @@ dev-setup:
 	uv run pre-commit install
 
 test:
-	uv run --python 3.13 pytest ./tests
+	uv run pytest ./tests
 
 coverage:
-	uv run --python 3.13 pytest ./tests --cov --cov-report=html
+	uv run pytest ./tests --cov --cov-report=html
 
 lint:
 	uv run pre-commit run --all-files
