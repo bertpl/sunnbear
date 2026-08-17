@@ -18,7 +18,7 @@ PYTHON_VERSIONS_FILE = REPO_ROOT / ".python-versions"
 UNIT_TESTS_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "_unit_tests.yml"
 
 # Matrix legs quote their Python as `python: "3.11"`. The composite action's `python_version:` key
-# carries no `python:`-quoted literal, so this matches the matrix versions and nothing else.
+# carries no `python:`-quoted literal, so the pattern matches the matrix versions and nothing else.
 _MATRIX_PYTHON = re.compile(r'\bpython:\s*"([^"]+)"')
 
 
