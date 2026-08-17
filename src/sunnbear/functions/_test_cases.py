@@ -1,13 +1,10 @@
-"""FormulaTestCase: a formula's declared correctness and coverage vectors, colocated with it.
+"""FormulaTestCase: a formula's declared test cases, colocated with it.
 
 A concrete `Formula` lists `cases` — one `FormulaTestCase` per behavior worth pinning, built via
 `FormulaTestCase.value` / `.invalid` / `.bracket`. A single generic test drives every registered
 formula through its list, so between them the three kinds cover `parametrized_fun`, both sides of
 `is_param_tuple_valid`, and `bracket`; the jit-off branch-coverage gate then fails on any formula
 line no case reaches.
-
-Value comparisons use a small default tolerance: on the coverage legs numba is disabled, so a
-formula body runs as plain Python and can differ from the compiled result by ~1 ulp.
 """
 
 from abc import ABC

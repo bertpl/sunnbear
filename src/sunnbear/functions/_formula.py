@@ -46,15 +46,15 @@ class Formula(ABC):
             labels reporting uses. Empty for a formula without parameters.
         jit: Whether `parametrized_fun` is numba-compiled (default) — set
             False for formulas numba cannot compile.
-        cases: The formula's `FormulaTestCase` vectors, colocated with it and
-            driven by the generic formula test; empty by default.
+        cases: The formula's colocated `FormulaTestCase` list, driven by the
+            generic formula test; empty by default.
     """
 
     number: ClassVar[int]
     name: ClassVar[str]
     param_names: ClassVar[tuple[str, ...]] = ()
     jit: ClassVar[bool] = True
-    cases: ClassVar[tuple[FormulaTestCase, ...]] = ()  # correctness/coverage vectors — see _test_cases
+    cases: ClassVar[tuple[FormulaTestCase, ...]] = ()
     # populated lazily per concrete class by _compiled_formula (annotation only — no value,
     # so the `in cls.__dict__` cache check below is not satisfied by this declaration)
     _compiled_formula_cache: ClassVar["Callable[..., float]"]
