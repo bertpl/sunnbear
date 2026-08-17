@@ -23,13 +23,10 @@ updates:
       actions-major:  # majors batch separately and wait for review
         patterns: ["*"]
         update-types: ["major"]
-    # Let releases age before PRs open: auto-merged patch/minor bumps then sit
-    # long enough for upstream compromises to surface before they can land.
+    # Let releases age before PRs open, so an upstream compromise has time to
+    # surface before a bump can land.
     cooldown:
-      default-days: 7  # zizmor's dependabot-cooldown floor; ~no-op at weekly cadence anyway
-      # No semver-major-days here (unlike the uv entry): uv delays majors longer
-      # because files can be added to a PyPI release after it is published;
-      # SHA-pinned actions have no equivalent window.
+      default-days: 14  # covers every semver level; no per-level override needed
 
   - package-ecosystem: "uv"
     # lockfile-only: bump uv.lock to the latest that still satisfies pyproject,
@@ -48,6 +45,7 @@ updates:
       python-major:  # majors batch separately and wait for review
         patterns: ["*"]
         update-types: ["major"]
+    # 14 days matches PyPI's file-addition window: a release rejects new files once
+    # it is 14 days old, so waiting that long means the file set is settled.
     cooldown:
-      default-days: 7  # zizmor's dependabot-cooldown floor; ~no-op at weekly cadence anyway
-      semver-major-days: 14
+      default-days: 14  # covers every semver level; no per-level override needed
