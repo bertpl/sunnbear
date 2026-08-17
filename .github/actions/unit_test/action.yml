@@ -62,8 +62,7 @@ runs:
           COV_FLAG=""
           # --cov-fail-under=0: the gate is cumulative (coverage job), not per-combo
           [ "$COV" = "true" ] && COV_FLAG="--cov --cov-report= --cov-fail-under=0"
-          # jit-off legs: NUMBA_DISABLE_JIT makes njit a no-op, so the formula bodies run as plain
-          # Python and coverage.py sees their real lines and branches (not compiled-and-assumed).
+          # jit-off legs: export NUMBA_DISABLE_JIT, making njit a no-op (the `jit` input says why)
           [ "$JIT" = "off" ] && export NUMBA_DISABLE_JIT=1
           uv run --python "$PY" --resolution "$RES" --group dev pytest ./tests $COV_FLAG --durations=20
 

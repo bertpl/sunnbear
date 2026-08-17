@@ -13,12 +13,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # ubuntu-only: pure Python + numpy/matplotlib with no OS-specific code paths, so one OS
-        # exercises everything. The jit axis keeps coverage honest: the jit-off legs run under
-        # NUMBA_DISABLE_JIT so coverage measures the njit formula bodies as plain Python (branches
-        # and all); the jit-on legs prove those formulas actually numba-compile — one jit-on leg per
-        # Python. Coverage is collected on the jit-off legs only; the two span both the Python and
-        # the resolution ends, so the combined data still covers every version-/dependency path.
+        # ubuntu-only: pure Python + numpy/matplotlib, no OS-specific paths, so one OS covers all.
+        # The jit-off legs run under NUMBA_DISABLE_JIT, so coverage measures the njit formula bodies
+        # as plain Python; the jit-on legs prove those formulas numba-compile (one jit-on leg per
+        # Python). Coverage is collected on the jit-off legs only — the two span both the Python and
+        # resolution ends, so the combined data still covers every version-/dependency path.
         include:
           - { python: "3.11", resolution: lowest-direct, jit: "off" }
           - { python: "3.12", resolution: highest,       jit: "on"  }

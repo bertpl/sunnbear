@@ -179,9 +179,8 @@ relative_files = true  # so per-combo matrix data files combine without a [paths
 
 [tool.coverage.report]
 precision = 2
-fail_under = 100       # cumulative gate on the combined matrix data. Coverage is collected on the
-                       # jit-off legs (NUMBA_DISABLE_JIT), so njit formula bodies are measured as
-                       # plain Python — their real lines and branches, not compiled-and-assumed.
+fail_under = 100       # cumulative gate on the combined matrix data; coverage runs on the jit-off
+                       # legs (NUMBA_DISABLE_JIT), which measure the njit formula bodies as plain Python.
 exclude_also = [
     "@abstractmethod",
     "@abc.abstractmethod",
