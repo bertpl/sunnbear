@@ -1,19 +1,12 @@
 """Check that the CI test matrix covers every Python in `.python-versions`.
 
-`.python-versions` is the declared set of supported Python minors, and `scripts/release.py` ties it
-to the trove classifiers. Nothing ties `.python-versions` to what CI actually runs.
-
-The test matrix in `.github/workflows/_unit_tests.yml` is separate and hand-curated (each Python
-paired with a dependency-resolution end), so a version can sit in `.python-versions` and the
-classifiers, pass the release check, and reach PyPI with no test leg running on it.
-
-This check fails when a declared version has no matrix leg. It is one-directional: extra matrix legs
-are fine; only an uncovered declared version is an error. A leg pinned to an exact build (e.g. a
-pre-release like `3.15.0rc1`) covers its minor, so a declared version can be tested through such a pin.
+`.python-versions` is the declared support set, tied to the trove classifiers by `scripts/release.py`
+but to nothing in CI: the test matrix in `.github/workflows/_unit_tests.yml` is hand-curated, so a
+version can sit in `.python-versions`, pass the release check, and reach PyPI with no test leg on it.
 
 Usage:
 
-    python scripts/check_python_matrix.py    # exits non-zero if a declared version is untested
+    python scripts/check_python_matrix.py
 """
 
 import re
