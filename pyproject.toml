@@ -173,7 +173,7 @@ ignore-words-list = "intoto"
 skip = "*.ipynb"
 
 [tool.coverage.run]
-source = ["src/sunnbear"]
+source = ["sunnbear"]
 relative_files = true  # so per-combo matrix data files combine without a [paths] map
 
 [tool.coverage.report]

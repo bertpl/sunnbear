@@ -66,10 +66,9 @@ runs:
           PY: ${{ env.PYTHON_EFFECTIVE_VERSION }}
           RES: ${{ inputs.dependency_resolution }}
         run: |
-          # -o addopts="" clears `-n auto`, so collection runs single-process (xdist off);
-          # each combo records its own collected set so the coverage job can union them.
+          # each combo records its own collected set so the coverage job can union them
           uv run --python "$PY" --resolution "$RES" --group dev \
-            pytest ./tests --collect-only -q -o addopts="" \
+            pytest ./tests --collect-only -q \
             | grep '::' > "test-ids-${PY}-${RES}.txt"
 
       - name: Upload coverage + node-id data
