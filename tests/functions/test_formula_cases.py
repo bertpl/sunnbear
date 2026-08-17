@@ -5,7 +5,7 @@ import math
 import pytest
 
 from sunnbear.functions import FormulaRegistry
-from sunnbear.functions._test_cases import BracketTestCase, DEFAULT_ATOL, InvalidTestCase, ValueTestCase
+from sunnbear.functions._test_cases import DEFAULT_ATOL, BracketTestCase, InvalidTestCase, ValueTestCase
 
 # every (formula, case) pair across the catalog, so one parametrized test drives them all
 _CASES = [(formula, case) for formula in FormulaRegistry.formulas() for case in formula.cases]

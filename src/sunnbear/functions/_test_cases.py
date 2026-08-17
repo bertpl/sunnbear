@@ -7,7 +7,6 @@ formula through its list, so between them the three kinds cover `parametrized_fu
 line no case reaches.
 """
 
-from abc import ABC
 from dataclasses import dataclass
 
 # loose enough for the ~1-ulp jit-vs-Python gap, tight enough to catch a real error. atol carries
@@ -16,7 +15,7 @@ DEFAULT_RTOL = 1e-12
 DEFAULT_ATOL = 1e-12
 
 
-class FormulaTestCase(ABC):
+class FormulaTestCase:
     """One declared behavior of a formula. Build via the factory classmethods, never directly."""
 
     @classmethod
