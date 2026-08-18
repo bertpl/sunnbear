@@ -46,8 +46,8 @@ class Formula(ABC):
             labels reporting uses. Empty for a formula without parameters.
         jit: Whether `parametrized_fun` is numba-compiled (default) — set
             False for formulas numba cannot compile.
-        cases: The formula's colocated `FormulaTestCase` list, driven by the
-            generic formula test.
+        cases: The formula's self-declared behavioral traits (`FormulaTestCase`),
+            exercised by the generic formula test.
     """
 
     number: ClassVar[int]

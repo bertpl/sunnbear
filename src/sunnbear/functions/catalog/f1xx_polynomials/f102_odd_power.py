@@ -34,9 +34,9 @@ class F102_OddPower(Formula):
         return p1 == int(p1) and int(p1) % 2 == 1
 
     cases = (
-        FormulaTestCase.value(params=(3.0,), x=2.0, c=8.0, expected=0.0),  # 2^3 - 8, a root
-        FormulaTestCase.value(params=(3.0,), x=2.0, c=0.0, expected=8.0),  # 2^3, exercises c=0
-        FormulaTestCase.invalid(params=(2.0,)),  # even integer power — rejected
-        FormulaTestCase.invalid(params=(1.5,)),  # non-integer power — rejected
-        FormulaTestCase.bracket(params=(3.0,), expected=(-2.0, 2.0)),
+        FormulaTestCase.value(params={"p1": 3.0}, x=2.0, c=8.0, expected=0.0),  # 2^3 - 8, a root
+        FormulaTestCase.value(params={"p1": 3.0}, x=2.0, c=0.0, expected=8.0),  # 2^3, exercises c=0
+        FormulaTestCase.invalid(params={"p1": 2.0}),  # even integer power — rejected
+        FormulaTestCase.invalid(params={"p1": 1.5}),  # non-integer power — rejected
+        FormulaTestCase.bracket(params={"p1": 3.0}, expected=(-2.0, 2.0)),
     )
