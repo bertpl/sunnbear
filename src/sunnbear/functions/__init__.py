@@ -51,5 +51,6 @@ from ._param_values import (
 )
 from ._recipes import ParamAxis, ParamRecipe
 from ._registry import FormulaRegistry
+from ._test_cases import FormulaTestCase
 from ._test_function import CandidateTestFunction, TestFunction
 from ._types import XCFun, XFun

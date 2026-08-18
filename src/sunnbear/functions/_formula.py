@@ -24,6 +24,7 @@ import numba
 from ._identity import FunctionId
 from ._param_values import DEDUP_DIGITS, ParamValue, deduplicate_param_tuples
 from ._recipes import ParamRecipe
+from ._test_cases import FormulaTestCase
 from ._test_function import CandidateTestFunction
 from ._types import XCFun, XFun
 
@@ -45,12 +46,15 @@ class Formula(ABC):
             labels reporting uses. Empty for a formula without parameters.
         jit: Whether `parametrized_fun` is numba-compiled (default) — set
             False for formulas numba cannot compile.
+        cases: The formula's self-declared behavioral traits (`FormulaTestCase`),
+            exercised by the generic formula test.
     """
 
     number: ClassVar[int]
     name: ClassVar[str]
     param_names: ClassVar[tuple[str, ...]] = ()
     jit: ClassVar[bool] = True
+    cases: ClassVar[tuple[FormulaTestCase, ...]] = ()
     # populated lazily per concrete class by _compiled_formula (annotation only — no value,
     # so the `in cls.__dict__` cache check below is not satisfied by this declaration)
     _compiled_formula_cache: ClassVar["Callable[..., float]"]
@@ -100,6 +104,18 @@ class Formula(ABC):
     # --------------------------------------------------------------------------
     #  Framework-owned assembly
     # --------------------------------------------------------------------------
+    def param_dict_to_tuple(self, params: dict[str, float]) -> tuple[float, ...]:
+        """Resolve a name-keyed parameter dict to positional order (`param_names`).
+
+        Raises:
+            ValueError: If `params`'s keys are not exactly `param_names`.
+        """
+        if set(params) != set(self.param_names):
+            raise ValueError(
+                f"{type(self).__name__}: params {sorted(params)} do not match param_names {list(self.param_names)}."
+            )
+        return tuple(params[name] for name in self.param_names)
+
     def _compiled_formula(self) -> Callable[..., float]:
         """Return this formula's ``parametrized_fun``, numba-compiled at most once per class.
 
