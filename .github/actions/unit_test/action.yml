@@ -14,13 +14,9 @@ inputs:
         required: false
         description: "uv resolution strategy: 'highest' (default) or 'lowest-direct'."
         default: "highest"
-    coverage:
-        required: false
-        description: "'true' runs under coverage and uploads the per-combo data file for a cross-matrix combine; 'false' (default) runs plain pytest."
-        default: "false"
     jit:
         required: false
-        description: "'on' (default) runs numba JIT; 'off' sets NUMBA_DISABLE_JIT=1 so coverage measures the njit formula bodies as plain Python."
+        description: "'off' collects coverage under NUMBA_DISABLE_JIT (njit off, so formula bodies are measured as plain Python) and uploads the per-combo data for the cross-matrix combine; 'on' (default) runs plain pytest with JIT on."
         default: "on"
 
 runs:
@@ -54,20 +50,22 @@ runs:
         env:
           PY: ${{ env.PYTHON_EFFECTIVE_VERSION }}
           RES: ${{ inputs.dependency_resolution }}
-          COV: ${{ inputs.coverage }}
           JIT: ${{ inputs.jit }}
           # distinct per-combo data file so the coverage job combines rather than overwrites
           COVERAGE_FILE: .coverage.${{ inputs.python_version }}-${{ inputs.dependency_resolution }}
         run: |
           COV_FLAG=""
-          # --cov-fail-under=0: the gate is cumulative (coverage job), not per-combo
-          [ "$COV" = "true" ] && COV_FLAG="--cov --cov-report= --cov-fail-under=0"
-          # jit-off legs: export NUMBA_DISABLE_JIT, making njit a no-op (the `jit` input says why)
-          [ "$JIT" = "off" ] && export NUMBA_DISABLE_JIT=1
+          # jit-off legs collect coverage with numba disabled: njit becomes a no-op, so the formula
+          # bodies run as plain Python and coverage.py sees their real lines and branches.
+          # (--cov-fail-under=0: the gate is cumulative, in the coverage job, not per-combo.)
+          if [ "$JIT" = "off" ]; then
+            COV_FLAG="--cov --cov-report= --cov-fail-under=0"
+            export NUMBA_DISABLE_JIT=1
+          fi
           uv run --python "$PY" --resolution "$RES" --group dev pytest ./tests $COV_FLAG --durations=20
 
       - name: Dump collected node-ids (for the cross-combo test-count union)
-        if: inputs.coverage == 'true'
+        if: inputs.jit == 'off'
         shell: bash
         env:
           PY: ${{ env.PYTHON_EFFECTIVE_VERSION }}
@@ -79,7 +77,7 @@ runs:
             | grep '::' > "test-ids-${PY}-${RES}.txt"
 
       - name: Upload coverage + node-id data
-        if: inputs.coverage == 'true'
+        if: inputs.jit == 'off'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: coverage-data-${{ inputs.python_version }}-${{ inputs.dependency_resolution }}

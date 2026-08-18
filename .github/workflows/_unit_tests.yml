@@ -34,8 +34,7 @@ jobs:
           uv_version: ${{ vars.UV_VERSION }}
           python_version: ${{ matrix.python }}
           dependency_resolution: ${{ matrix.resolution }}
-          jit: ${{ matrix.jit }}
-          coverage: ${{ matrix.jit == 'off' && 'true' || 'false' }}  # collected on the jit-off legs; the coverage job unions + gates
+          jit: ${{ matrix.jit }}  # jit-off legs collect coverage; the coverage job unions + gates
 
   coverage:
     name: coverage
