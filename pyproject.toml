@@ -174,12 +174,13 @@ skip = "*.ipynb"
 
 [tool.coverage.run]
 source = ["sunnbear"]  # the import package name, not a src/ path — resolved via import, so cwd-independent
+branch = true          # both sides of every branch must be hit, not just each line once
 relative_files = true  # so per-combo matrix data files combine without a [paths] map
 
 [tool.coverage.report]
 precision = 2
-fail_under = 100       # cumulative gate, enforced on the combined matrix data; njit bodies
-                       # count via NUMBA_JIT_COVERAGE (see tests/conftest.py for the caveat)
+fail_under = 100       # cumulative gate on the combined matrix data; coverage runs on the jit-off
+                       # legs (NUMBA_DISABLE_JIT), which measure the njit formula bodies as plain Python.
 exclude_also = [
     "@abstractmethod",
     "@abc.abstractmethod",
