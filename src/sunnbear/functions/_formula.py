@@ -104,6 +104,18 @@ class Formula(ABC):
     # --------------------------------------------------------------------------
     #  Framework-owned assembly
     # --------------------------------------------------------------------------
+    def param_dict_to_tuple(self, params: dict[str, float]) -> tuple[float, ...]:
+        """Resolve a name-keyed parameter dict to positional order (`param_names`).
+
+        Raises:
+            ValueError: If `params`'s keys are not exactly `param_names`.
+        """
+        if set(params) != set(self.param_names):
+            raise ValueError(
+                f"{type(self).__name__}: params {sorted(params)} do not match param_names {list(self.param_names)}."
+            )
+        return tuple(params[name] for name in self.param_names)
+
     def _compiled_formula(self) -> Callable[..., float]:
         """Return this formula's ``parametrized_fun``, numba-compiled at most once per class.
 
