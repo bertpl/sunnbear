@@ -6,14 +6,13 @@ from ._solver import BracketingSolver
 
 
 class RegulaFalsi(BracketingSolver[None]):
-    """`RegulaFalsi` splits the bracket at the secant point of its endpoints every iteration.
+    """`RegulaFalsi` splits the bracket every iteration at the secant point.
 
-    The solver is included as the reference case for the ``MAX_FEVALS``
-    outcome, not as a competitive method. In this plain form one endpoint is
-    retained forever on a convex or concave function, so the bracket width
-    never falls below the distance from that endpoint to the root; the solve
-    then ends either through an exact zero at the moving endpoint or by
-    running into its evaluation budget.
+    The secant point is where the line through ``(a, fa)`` and ``(b, fb)``
+    crosses zero. In this plain form one endpoint is retained forever on a convex or concave
+    function, so the bracket width never falls below the distance from that
+    endpoint to the root; the solve then ends either through an exact zero at
+    the moving endpoint or by exhausting its evaluation budget.
     """
 
     name = "regula_falsi"

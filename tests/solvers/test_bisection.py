@@ -2,18 +2,15 @@ import math
 
 import pytest
 
-from sunnbear.functions import FormulaRegistry
 from sunnbear.solvers import Bisection, SolveStatus
 
-
-def _cube_minus_two(x: float) -> float:
-    return x**3 - 2.0
+from .example_functions import calibrated_cubic, cube_minus_two
 
 
 @pytest.mark.parametrize("xtol", [1e-2, 1e-6, 1e-10])
 def test_converges_within_xtol(xtol):
     # --- act --------------------------
-    result = Bisection().solve(_cube_minus_two, 0.0, 2.0, xtol=xtol, max_fevals=100)
+    result = Bisection().solve(cube_minus_two, 0.0, 2.0, xtol=xtol, max_fevals=100)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
@@ -50,7 +47,7 @@ def test_decreasing_function_is_handled_by_sign_normalization():
 
 def test_budget_exhaustion_reports_the_last_bracket_midpoint():
     # --- act --------------------------
-    result = Bisection().solve(_cube_minus_two, 0.0, 2.0, xtol=1e-12, max_fevals=6)
+    result = Bisection().solve(cube_minus_two, 0.0, 2.0, xtol=1e-12, max_fevals=6)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.MAX_FEVALS
@@ -60,7 +57,7 @@ def test_budget_exhaustion_reports_the_last_bracket_midpoint():
 
 def test_flops_and_history_are_recorded():
     # --- act --------------------------
-    result = Bisection().solve(_cube_minus_two, 0.0, 2.0, xtol=1e-6, max_fevals=100, record_history=True)
+    result = Bisection().solve(cube_minus_two, 0.0, 2.0, xtol=1e-6, max_fevals=100, record_history=True)
 
     # --- assert -----------------------
     assert result.flop_counts.total_count() > 0
@@ -71,7 +68,7 @@ def test_flops_and_history_are_recorded():
 def test_solves_a_catalog_test_function():
     """A compiled formula body behind a plain f(x) solves end to end through the functions layer."""
     # --- arrange ----------------------
-    test_function = FormulaRegistry.candidate_from_id("f101-0.2").calibrated(-5.0, 5.0)
+    test_function = calibrated_cubic()
     f = test_function.build_x_fun(1.0)
 
     # --- act --------------------------
