@@ -1,11 +1,12 @@
-"""Agreement of the reference solvers with their `scipy.optimize` counterparts, run under the same template method."""
+"""`Bisection` agrees with `scipy.optimize.bisect` when both run under the `Solver` template method."""
 
 import pytest
 from scipy import optimize
 
 from sunnbear.functions import FormulaRegistry
 from sunnbear.solvers import Bisection, SolveStatus
-from tests.solvers.scipy_twin import ScipySolver
+
+from .scipy_solver import ScipySolver
 
 
 def _cube_minus_two(x: float) -> float:
@@ -23,31 +24,31 @@ def _catalog_cubic(x: float) -> float:
 def test_bisection_agrees_with_scipy_bisect(f, a, b, xtol):
     # --- act --------------------------
     ours = Bisection().solve(f, a, b, xtol=xtol, max_fevals=200)
-    twin = ScipySolver(optimize.bisect).solve(f, a, b, xtol=xtol, max_fevals=200)
+    scipy_result = ScipySolver(optimize.bisect).solve(f, a, b, xtol=xtol, max_fevals=200)
 
     # --- assert -----------------------
-    assert ours.status is twin.status is SolveStatus.CONVERGED
-    assert ours.x == twin.x  # SciPy's last midpoint is the midpoint of our final bracket.
-    # SciPy re-evaluates the two endpoints the template method already evaluated, and it halves once more
-    # than we do: it stops at a bracket width below xtol, where our criterion stops at 2 * xtol.
-    assert twin.n_fevals == ours.n_fevals + 3
+    assert ours.status is scipy_result.status is SolveStatus.CONVERGED
+    assert ours.x == scipy_result.x  # SciPy's last midpoint is the midpoint of our final bracket.
+    # Two of the three are the endpoint re-evaluations (see ScipySolver); the third is SciPy halving once
+    # more, since it stops below xtol where Interval.is_converged stops at 2 * xtol.
+    assert scipy_result.n_fevals == ours.n_fevals + 3
 
 
-def test_twin_reports_no_iterations_and_no_flops():
-    """SciPy's loop runs on plain floats outside our arithmetic, so the twin measures evaluations only."""
+def test_scipy_solver_reports_no_iterations_and_no_flops():
+    """SciPy's loop runs on plain floats outside our arithmetic, so only evaluations are measured."""
     # --- act --------------------------
-    twin = ScipySolver(optimize.bisect).solve(_cube_minus_two, 0.0, 2.0, xtol=1e-6, max_fevals=200)
+    scipy_result = ScipySolver(optimize.bisect).solve(_cube_minus_two, 0.0, 2.0, xtol=1e-6, max_fevals=200)
 
     # --- assert -----------------------
-    assert twin.n_iters is None
-    assert twin.flop_counts.total_count() == 0
-    assert twin.n_fevals > 2
+    assert scipy_result.n_iters is None
+    assert scipy_result.flop_counts.total_count() == 0
+    assert scipy_result.n_fevals > 2
 
 
-def test_twin_is_subject_to_the_budget():
+def test_scipy_solver_is_subject_to_the_budget():
     """The wrapper's budget ends a SciPy solve the same way it ends ours."""
     # --- act --------------------------
-    twin = ScipySolver(optimize.bisect).solve(_cube_minus_two, 0.0, 2.0, xtol=1e-12, max_fevals=5)
+    scipy_result = ScipySolver(optimize.bisect).solve(_cube_minus_two, 0.0, 2.0, xtol=1e-12, max_fevals=5)
 
     # --- assert -----------------------
-    assert (twin.status, twin.n_fevals) == (SolveStatus.MAX_FEVALS, 5)
+    assert (scipy_result.status, scipy_result.n_fevals) == (SolveStatus.MAX_FEVALS, 5)

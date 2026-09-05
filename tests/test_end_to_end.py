@@ -1,4 +1,4 @@
-"""The foundation layers work end to end: registry, test function, both solvers, flop counts, summary statistic."""
+"""Registry, test function, reference solvers, flop counts and summary statistic work together end to end."""
 
 import numpy as np
 
@@ -19,17 +19,19 @@ def test_solve_count_flops_summarize():
     # --- act --------------------------
     n_fevals = {solver.name: [] for solver in solvers}
     statuses = {solver.name: [] for solver in solvers}
+    flop_totals = []
     for solver in solvers:
         for c in c_values:
             f = test_function.build_x_fun(float(c))
             result = solver.solve(f, test_function.a, test_function.b, xtol=1e-8, max_fevals=MAX_FEVALS)
-            assert result.flop_counts.total_count() > 0
+            flop_totals.append(result.flop_counts.total_count())
             n_fevals[solver.name].append(result.n_fevals)
             statuses[solver.name].append(result.status)
 
     # --- assert -----------------------
+    assert all(total > 0 for total in flop_totals)
     assert all(status is SolveStatus.CONVERGED for status in statuses["bisection"])
-    # Regula falsi's retained endpoint stalls on some c-values, which is the budget path the milestone covers.
+    # Regula falsi's retained endpoint stalls on some c-values, so a real batch contains MAX_FEVALS results.
     assert SolveStatus.MAX_FEVALS in statuses["regula_falsi"]
     stalled = [
         n

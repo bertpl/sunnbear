@@ -1,16 +1,9 @@
 """`sunnbear` is a benchmarking framework for univariate root-solvers.
 
-The top level re-exports what its two kinds of authors need:
-
-- a **solver author** subclasses `Solver` or `BracketingSolver`, works with a
-  `SolveRun` and `Interval`, and reads back a `SolveResult` with its
-  `SolveStatus`; `MaxFevalsExceeded` is the interrupt a solver may see fly past;
-- a **formula author** subclasses `Formula`, declares `ParamRecipe` grids, and
-  gets `TestFunction` instances identified by a `FunctionId` out of the
-  `FormulaRegistry`.
-
-The reference solvers live in `sunnbear.solvers`, summary statistics in
-`sunnbear.stats`.
+A solver author subclasses `Solver` or `BracketingSolver`; a formula author
+subclasses `Formula`. The other names exported here are what those classes
+hand you, documented there. The reference solvers live in `sunnbear.solvers`,
+summary statistics in `sunnbear.stats`.
 """
 
 from sunnbear.errors import MaxFevalsExceeded
