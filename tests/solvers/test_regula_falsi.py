@@ -38,7 +38,7 @@ def test_decreasing_function_is_handled_by_sign_normalization():
 
 
 def test_catalog_function_runs_into_the_budget():
-    """The failure path end to end: a compiled catalog function, a curved bracket, and a budget that runs out."""
+    """A compiled catalog function, curved on its bracket, runs the MAX_FEVALS outcome end to end."""
     # --- arrange ----------------------
     test_function = FormulaRegistry.candidate_from_id("f101-0.2").calibrated(-5.0, 5.0)
     f = test_function.build_x_fun(1.0)

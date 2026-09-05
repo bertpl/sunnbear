@@ -53,8 +53,8 @@ dev = [
     "ruff>=0.15.11",
     "ty==0.0.56",  # pre-1.0 type checker — pin exactly; its ruleset is still evolving
     # scipy backs the agreement tests against scipy.optimize only; it is deliberately not a runtime
-    # dependency. Per-Python floors follow the runtime-dependency policy: the earliest release with a
-    # wheel for that CPython that also accepts the numpy the lowest-direct leg installs.
+    # dependency. Per-Python minimum versions follow the rule of the runtime dependencies above; the extra
+    # constraint is that each scipy accepts the numpy the `lowest-direct` matrix job installs.
     "scipy>=1.13.0; python_version < '3.13'",
     "scipy>=1.14.1; python_version == '3.13'",
     "scipy>=1.16.1; python_version >= '3.14'",

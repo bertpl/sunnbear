@@ -1,4 +1,4 @@
-"""`RegulaFalsi` is the second reference bracketing solver, and the one that exercises the failure path."""
+"""`RegulaFalsi` is the reference solver for the ``MAX_FEVALS`` outcome: its plain form stalls on curved functions."""
 
 from ._interval import Interval
 from ._run import SolveRun
@@ -8,12 +8,12 @@ from ._solver import BracketingSolver
 class RegulaFalsi(BracketingSolver[None]):
     """`RegulaFalsi` splits the bracket at the secant point of its endpoints every iteration.
 
-    In this plain form one endpoint is retained forever on a convex or concave
-    function, so the bracket width never falls below the distance from that
-    endpoint to the root. The solve then ends either through an exact zero at
-    the moving endpoint or by running into its evaluation budget. That is
-    deliberate: the solver is included as the reference case for the
-    ``MAX_FEVALS`` path, not as a competitive method.
+    The solver is included as the reference case for the ``MAX_FEVALS``
+    outcome, not as a competitive method. In this plain form one endpoint is
+    retained forever on a convex or concave function, so the bracket width
+    never falls below the distance from that endpoint to the root; the solve
+    then ends either through an exact zero at the moving endpoint or by
+    running into its evaluation budget.
     """
 
     name = "regula_falsi"
