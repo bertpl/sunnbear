@@ -19,7 +19,7 @@ dependencies = [
     "numpy>=2.1.0; python_version == '3.13'",
     "numpy>=2.3.2; python_version >= '3.14'",
     "numba>=0.60.0; python_version < '3.13'",
-    "numba>=0.61.0; python_version == '3.13'",
+    "numba>=0.66.0; python_version == '3.13'",
     "numba>=0.66.0; python_version >= '3.14'",
     "matplotlib>=3.8; python_version < '3.13'",
     "matplotlib>=3.10.7; python_version == '3.13'",
