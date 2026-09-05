@@ -22,7 +22,7 @@ def test_converges_within_xtol(xtol):
 
 @pytest.mark.parametrize("a, b, xtol", [(0.0, 2.0, 1e-3), (-1.0, 1.5, 1e-7), (0.0, 1.0, 0.3)])
 def test_iteration_and_evaluation_counts_follow_the_bracket_arithmetic(a, b, xtol):
-    """Pins the relation the benchmark methodology derives its tolerance range and budget from."""
+    """Pins the iteration and evaluation counts of a bisection solve as functions of the bracket and xtol."""
     # --- act --------------------------
     result = Bisection().solve(lambda x: x - 0.7, a, b, xtol=xtol, max_fevals=100)
 
@@ -55,7 +55,7 @@ def test_budget_exhaustion_reports_the_last_bracket_midpoint():
     # --- assert -----------------------
     assert result.status is SolveStatus.MAX_FEVALS
     assert (result.n_fevals, result.n_iters) == (6, 4)
-    assert abs(result.x - 2.0 ** (1 / 3)) <= 2.0 / 2**4  # within the width of the bracket after 4 halvings
+    assert abs(result.x - 2.0 ** (1 / 3)) <= 2.0 / 2**4  # The estimate lies within the bracket left after 4 halvings.
 
 
 def test_flops_and_history_are_recorded():
@@ -65,7 +65,7 @@ def test_flops_and_history_are_recorded():
     # --- assert -----------------------
     assert result.flop_counts.total_count() > 0
     assert len(result.history) == result.n_fevals
-    assert (result.history[0][0], result.history[1][0]) == (0.0, 2.0)  # endpoints first, in order
+    assert (result.history[0][0], result.history[1][0]) == (0.0, 2.0)  # The endpoints come first, in order.
 
 
 def test_solves_a_catalog_test_function():

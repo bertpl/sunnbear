@@ -64,10 +64,10 @@ def test_replace_keeps_the_sign_change(fx, expected):
 @pytest.mark.parametrize(
     "interval, two_xtol, expected",
     [
-        (Interval(0.0, 1.0, -1.0, 1.0), 1.0, True),  # [A] width equal to 2*xtol counts as converged
-        (Interval(0.0, 1.0, -1.0, 1.0), 0.5, False),  # [A] not met, no zero endpoint
-        (Interval(0.0, 1.0, 0.0, 1.0), 0.5, True),  # [B] lower endpoint is a root
-        (Interval(0.0, 1.0, -1.0, 0.0), 0.5, True),  # [B] upper endpoint is a root
+        (Interval(0.0, 1.0, -1.0, 1.0), 1.0, True),  # width criterion: width equal to 2*xtol counts as converged
+        (Interval(0.0, 1.0, -1.0, 1.0), 0.5, False),  # width criterion not met, no zero endpoint
+        (Interval(0.0, 1.0, 0.0, 1.0), 0.5, True),  # zero-endpoint criterion: lower endpoint is a root
+        (Interval(0.0, 1.0, -1.0, 0.0), 0.5, True),  # zero-endpoint criterion: upper endpoint is a root
     ],
 )
 def test_is_converged(interval, two_xtol, expected):

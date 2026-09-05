@@ -40,7 +40,7 @@ def test_budget_refuses_the_call_that_would_exceed_it():
     # --- act / assert -----------------
     with pytest.raises(MaxFevalsExceeded):
         wf(0.5)
-    assert wf.n_fevals == 2  # the refused call is not an evaluation
+    assert wf.n_fevals == 2  # The refused call is not an evaluation.
 
 
 # ==================================================================================================
@@ -66,7 +66,7 @@ def test_outside_the_guard_interval_is_divergence(x):
     # --- act / assert -----------------
     with pytest.raises(DivergedError):
         wf(x)
-    assert wf.n_fevals == 0  # refused before evaluating
+    assert wf.n_fevals == 0  # The call was refused before evaluating.
 
 
 @pytest.mark.parametrize("value", [math.nan, math.inf, -math.inf])
@@ -77,7 +77,7 @@ def test_non_finite_value_is_a_domain_error_and_still_counts(value):
     # --- act / assert -----------------
     with pytest.raises(FunctionDomainError):
         wf(0.5)
-    assert wf.n_fevals == 1  # the function was evaluated
+    assert wf.n_fevals == 1  # The function was evaluated.
 
 
 # ==================================================================================================

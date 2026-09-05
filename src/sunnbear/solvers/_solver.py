@@ -1,10 +1,7 @@
-"""The solver base classes: `Solver` with its template method, and `BracketingSolver`.
+"""`Solver` with its template method, and `BracketingSolver`, are the base classes a solver subclasses.
 
-A third-party solver subclasses one of the two and implements a single hook.
-Everything that makes a solve measurable — evaluation counting, the budget,
-the guards, flop counting, sign normalization, stopping criteria, result
-packaging — lives here, so a solver author writes straight-line algorithm code
-and cannot get the measurement wrong.
+Everything that makes a solve measurable lives in `Solver.solve` and the
+`WrappedFunction` it installs; a subclass writes only the algorithm.
 """
 
 from abc import ABC, abstractmethod
@@ -25,16 +22,16 @@ from ._wrapped_function import WrappedFunction
 #  Solver
 # ==================================================================================================
 class Solver(ABC):
-    """Base class for every benchmarkable root solver.
+    """The base class every benchmarkable root solver subclasses.
 
-    Subclasses implement `_solve` and may add configuration through their
-    ``__init__``; `solve` itself has a fixed signature, so all solvers are
-    driven identically. Instances are immutable configuration and can be
-    shared freely across solves.
+    A subclass implements `_solve` and takes its configuration through
+    ``__init__``; `solve` has a fixed signature, so all solvers are driven
+    identically. Instances are immutable configuration, safe to share across
+    solves.
 
     Class attributes:
-        name: Canonical identifier fragment (e.g. ``"bisection"``); together
-            with `version` and the init arguments it identifies a solver in
+        name: Canonical identifier fragment, e.g. ``"bisection"``; with
+            `version` and the init arguments, the name identifies a solver in
             benchmark results.
         version: Bumped on any behavior change, so results from different
             versions of one solver are never pooled unknowingly.
@@ -58,19 +55,18 @@ class Solver(ABC):
     ) -> SolveResult:
         """Find a root of ``f`` in ``[a, b]`` and report what the solve did.
 
-        The two endpoint evaluations happen here and count toward `n_fevals`.
-        An endpoint that is exactly zero ends the solve as ``CONVERGED`` without
-        involving the algorithm. Afterwards the sign is normalized so the
-        algorithm sees ``f(a) <= 0 <= f(b)``, and every abnormal termination is
-        mapped to a `SolveStatus` instead of propagating: one broken solver
-        must not abort a batch of a million solves.
+        - The endpoints are evaluated first; an endpoint that is exactly zero
+          ends the solve as ``CONVERGED`` without running the algorithm.
+        - The sign is then normalized, so the algorithm sees ``f(a) <= 0 <= f(b)``.
+        - Every abnormal ending becomes a `SolveStatus`, not an exception: one
+          broken solver must not abort a batch of a million solves.
 
         Args:
             f: The function; must be finite on ``[a, b]`` and change sign across it.
             a: Lower end of the bracket.
             b: Upper end of the bracket.
-            xtol: Requested x-tolerance: ``|x_true - x| <= xtol``.
-            max_fevals: Function-evaluation budget, the endpoint evaluations included.
+            xtol: Requested x-tolerance, ``|x_true - x| <= xtol``.
+            max_fevals: Function-evaluation budget, the two endpoint evaluations included.
             record_history: Whether to keep every ``(x, f(x))`` pair in the result.
 
         Raises:
@@ -111,7 +107,7 @@ class Solver(ABC):
         )
 
     def _run_guarded(self, run: SolveRun) -> tuple[float, SolveStatus]:
-        """Run the algorithm and map how it ended to a root estimate and status."""
+        """Run the algorithm and map how it ended to a root estimate and a status."""
         try:
             return self._solve(run), SolveStatus.CONVERGED
         except MaxFevalsExceeded:
@@ -130,9 +126,9 @@ class Solver(ABC):
     def _solve(self, run: SolveRun) -> float:
         """Run the algorithm on `run` and return the root estimate.
 
-        Evaluate the function only through ``run.f``; let its interrupts
-        propagate. Keep ``run.x_best`` current so an interrupted solve still
-        reports a meaningful ``x``, and call ``run.mark_iteration()`` per
+        Evaluate the function only through ``run.f``, and let its interrupts
+        propagate. Keep ``run.x_best`` current, so an interrupted solve still
+        reports a meaningful ``x``, and call ``run.mark_iteration()`` once per
         iteration if the algorithm has iterations.
         """
 
@@ -144,24 +140,18 @@ S = TypeVar("S")
 
 
 class BracketingSolver(Solver, Generic[S]):
-    """Base class for interval-reducing solvers; subclasses implement one `_step`.
+    """The base class for interval-reducing solvers; a subclass implements one `_step`.
 
-    The base owns the loop, the stopping criteria, the root extraction, and the
-    iteration count, so a subclass cannot ship a subtly wrong stopping rule and
-    every bracketing solver counts iterations the same way: one `_step` is one
-    iteration. A solver that carries state between steps declares it as the
-    type parameter ``S`` and threads it through `_step`; memoryless solvers use
-    ``S = None``.
+    The base owns the loop, the stopping criteria (`Interval.is_converged`),
+    the root extraction (`Interval.root`), and the iteration count: one
+    `_step` is one iteration, and a subclass cannot define a wrong stopping rule.
 
-    Stopping criteria, checked before every step:
-
-    - **[A]** the bracket width is at most ``2 * xtol`` — the root estimate is
-      the midpoint, within ``xtol`` of the true root;
-    - **[B]** an endpoint value is exactly zero — that endpoint is the root.
+    A solver that carries state between steps declares its type as ``S`` and
+    threads it through `_step`; memoryless solvers use ``S = None``.
     """
 
     def _solve(self, run: SolveRun) -> float:
-        """Reduce the bracket with `_step` until a stopping criterion holds; return the root estimate."""
+        """Reduce the bracket with `_step` until `Interval.is_converged` holds; return `Interval.root`."""
         interval = Interval(run.a, run.b, run.fa, run.fb)
         state = self._initial_state(run, interval)
         two_xtol = 2.0 * run.xtol
@@ -169,15 +159,15 @@ class BracketingSolver(Solver, Generic[S]):
         while not interval.is_converged(two_xtol):
             interval, state = self._step(run, interval, state)
             run.mark_iteration()
-            run.x_best = 0.5 * (float(interval.a) + float(interval.b))  # plain floats: bookkeeping, not solver cost
+            # Plain floats, so this bookkeeping is not counted as solver cost.
+            run.x_best = 0.5 * (float(interval.a) + float(interval.b))
         return interval.root()
 
     def _initial_state(self, run: SolveRun, interval: Interval) -> S:
-        """Return the state carried into the first `_step`.
+        """Return the state carried into the first `_step`; ``None`` by default, for memoryless solvers.
 
-        Default: ``None``, for memoryless solvers (``S = None``). A stateful
-        solver overrides this; the cast is what lets one default serve every
-        ``S`` without forcing memoryless solvers to write it out.
+        A stateful solver overrides `_initial_state`; the cast lets one default
+        serve every ``S``.
         """
         return cast("S", None)
 
@@ -186,5 +176,5 @@ class BracketingSolver(Solver, Generic[S]):
         """Perform one iteration: return a strictly narrower bracket and the state for the next step.
 
         Evaluate the function only through ``run.f``, and derive the new bracket
-        with `Interval.replace` so the sign-change invariant is kept.
+        with `Interval.replace`, so the sign-change invariant is kept.
         """

@@ -13,7 +13,7 @@ class SunnbearError(Exception):
 # ==================================================================================================
 #  Solve interrupts — control flow inside Solver.solve(), never escaping it
 # ==================================================================================================
-class SolveInterrupt(SunnbearError):  # noqa: N818 — names a control-flow signal, not an error condition
+class SolveInterrupt(SunnbearError):  # noqa: N818 — the name marks a control-flow signal, not an error condition.
     """Base class for the exceptions that stop a solve early.
 
     The function wrapper raises one of the subclasses from inside an evaluation;

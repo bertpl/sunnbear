@@ -1,4 +1,4 @@
-"""Bisection: the reference bracketing solver."""
+"""`Bisection` is the reference bracketing solver."""
 
 from ._interval import Interval
 from ._run import SolveRun
@@ -8,10 +8,9 @@ from ._solver import BracketingSolver
 class Bisection(BracketingSolver[None]):
     """Halve the bracket at its midpoint every iteration.
 
-    The corpus's anchor solver: a solve from width ``w`` to tolerance ``xtol``
-    takes exactly ``ceil(log2(w / (2 * xtol)))`` iterations and two more
-    evaluations than iterations, and the benchmark methodology derives its
-    tolerance range and evaluation budget from that count.
+    A solve from width ``w`` to tolerance ``xtol`` takes exactly
+    ``ceil(log2(w / (2 * xtol)))`` iterations and two more evaluations than
+    iterations.
     """
 
     name = "bisection"

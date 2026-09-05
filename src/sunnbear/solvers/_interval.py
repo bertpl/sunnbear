@@ -1,24 +1,17 @@
-"""The bracketing state a `BracketingSolver` reduces step by step."""
+"""`Interval` is the bracketing state a `BracketingSolver` reduces step by step."""
 
 from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
 class Interval:
-    """A bracket ``[a, b]`` with its endpoint values, holding the sign change ``fa <= 0 <= fb``.
+    """A bracket ``[a, b]`` with its endpoint values ``fa`` and ``fb``, holding the sign change ``fa <= 0 <= fb``.
 
-    The template method normalizes the function's sign before the first step,
-    so the invariant is one-directional and every bracketing solver may rely on
-    it. Arithmetic on the endpoints is counted when they are `CountedFloat`
-    values, which is how a solver's interval bookkeeping ends up in its flop
-    counts; the invariant check itself runs on plain floats so that it costs
-    the solver nothing.
-
-    Attributes:
-        a: Lower endpoint.
-        b: Upper endpoint.
-        fa: Function value at ``a``, non-positive.
-        fb: Function value at ``b``, non-negative.
+    `Solver.solve` normalizes the function's sign before the first step, so
+    the invariant is one-directional and every bracketing solver may rely on
+    it. Arithmetic on `CountedFloat` endpoints is counted, which is how
+    interval bookkeeping lands in a solver's flop counts; the invariant check
+    runs on plain floats and costs the solver nothing.
     """
 
     a: float
@@ -54,7 +47,7 @@ class Interval:
         return Interval(self.a, x, self.fa, fx)
 
     def is_converged(self, two_xtol: float) -> bool:
-        """Return whether either stopping criterion holds: width within ``2 * xtol``, or a zero endpoint.
+        """Return whether a stopping criterion holds: the width is at most ``two_xtol``, or an endpoint value is zero.
 
         Takes the doubled tolerance so the caller computes it once per solve
         instead of once per iteration.
