@@ -6,7 +6,7 @@ from ._solver import BracketingSolver
 
 
 class Bisection(BracketingSolver[None]):
-    """Halve the bracket at its midpoint every iteration.
+    """`Bisection` halves the bracket at its midpoint every iteration.
 
     A solve from width ``w`` to tolerance ``xtol`` takes exactly
     ``ceil(log2(w / (2 * xtol)))`` iterations and two more evaluations than

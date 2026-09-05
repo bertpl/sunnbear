@@ -1,4 +1,7 @@
-"""`WrappedFunction` is the callable a solver evaluates ``f`` through; it owns every per-evaluation concern.
+"""`WrappedFunction` is the callable a solver evaluates ``f`` through.
+
+It applies the budget, the guards, the flop pause, sign normalization, and
+history to each evaluation.
 
 `Solver.solve` builds one per solve and hands it over inside the `SolveRun`;
 solver implementations never construct one.
@@ -13,12 +16,12 @@ from sunnbear.errors import DivergedError, FunctionDomainError, MaxFevalsExceede
 
 # The guard interval is [a - m*(b-a), b + m*(b-a)] with this margin m; an evaluation requested
 # outside it counts as divergence. The margin is generous enough for the overshoot of a
-# legitimate open-solver step and tight enough to catch a runaway iterate within an iteration or two.
+# legitimate step of a non-bracketing solver and tight enough to catch a runaway iterate within an iteration or two.
 DIVERGENCE_GUARD_MARGIN = 10.0
 
 
 class WrappedFunction:
-    """The callable a solver evaluates ``f`` through; each call applies the checks below, in order.
+    """A `WrappedFunction` is the callable a solver evaluates ``f`` through; each call runs the checks below, in order.
 
     A call:
 

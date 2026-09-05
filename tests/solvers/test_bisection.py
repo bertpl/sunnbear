@@ -22,7 +22,7 @@ def test_converges_within_xtol(xtol):
 
 @pytest.mark.parametrize("a, b, xtol", [(0.0, 2.0, 1e-3), (-1.0, 1.5, 1e-7), (0.0, 1.0, 0.3)])
 def test_iteration_and_evaluation_counts_follow_the_bracket_arithmetic(a, b, xtol):
-    """Pins the iteration and evaluation counts of a bisection solve as functions of the bracket and xtol."""
+    """The iteration and evaluation counts of a bisection solve follow from the bracket and xtol."""
     # --- act --------------------------
     result = Bisection().solve(lambda x: x - 0.7, a, b, xtol=xtol, max_fevals=100)
 
@@ -69,7 +69,7 @@ def test_flops_and_history_are_recorded():
 
 
 def test_solves_a_catalog_test_function():
-    """End-to-end through the functions layer: a compiled formula body behind a plain f(x)."""
+    """A compiled formula body behind a plain f(x) solves end to end through the functions layer."""
     # --- arrange ----------------------
     test_function = FormulaRegistry.candidate_from_id("f101-0.2").calibrated(-5.0, 5.0)
     f = test_function.build_x_fun(1.0)

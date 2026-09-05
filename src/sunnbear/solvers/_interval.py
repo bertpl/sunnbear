@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Interval:
-    """A bracket ``[a, b]`` with its endpoint values ``fa`` and ``fb``, holding the sign change ``fa <= 0 <= fb``.
+    """An `Interval` is a bracket ``[a, b]`` with endpoint values ``fa`` and ``fb`` such that ``fa <= 0 <= fb``.
 
     `Solver.solve` normalizes the function's sign before the first step, so
     the invariant is one-directional and every bracketing solver may rely on
@@ -49,8 +49,8 @@ class Interval:
     def is_converged(self, two_xtol: float) -> bool:
         """Return whether a stopping criterion holds: the width is at most ``two_xtol``, or an endpoint value is zero.
 
-        Takes the doubled tolerance so the caller computes it once per solve
-        instead of once per iteration.
+        The parameter is the doubled tolerance, so the caller computes it once
+        per solve, not once per iteration.
         """
         return self.width <= two_xtol or self.fa == 0.0 or self.fb == 0.0
 

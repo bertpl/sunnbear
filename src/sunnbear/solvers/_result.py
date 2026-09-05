@@ -19,7 +19,7 @@ class SolveStatus(Enum):
 
     CONVERGED = "converged"
     MAX_FEVALS = "max_fevals"  # the evaluation budget ran out
-    DIVERGED = "diverged"  # an evaluation was requested outside the guard interval
+    DIVERGED = "diverged"  # an evaluation was requested outside the interval WrappedFunction guards around [a, b]
     FUNCTION_ERROR = "function_error"  # the function returned a non-finite value
     SOLVER_ERROR = "solver_error"  # the solver raised — a bug in the solver, recorded, not propagated
 

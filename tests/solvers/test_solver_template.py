@@ -1,4 +1,4 @@
-"""Pins the `Solver.solve` template method with minimal test-local solvers, one per behavior."""
+"""Each test-local solver here pins one behavior of the `Solver.solve` template method."""
 
 import math
 
@@ -31,7 +31,7 @@ class _MidpointRepeatingSolver(Solver):
     version = 1
 
     def _solve(self, run: SolveRun) -> float:
-        x = 0.5 * (run.a + run.b)
+        x = run.bracket.midpoint
         while True:
             run.f(x)
             run.mark_iteration()
@@ -44,7 +44,7 @@ class _RunawaySolver(Solver):
     version = 1
 
     def _solve(self, run: SolveRun) -> float:
-        return run.f(run.b + 1e6 * (run.b - run.a))
+        return run.f(run.bracket.b + 1e6 * run.bracket.width)
 
 
 class _BuggySolver(Solver):
@@ -136,8 +136,8 @@ def test_run_is_sign_normalized(f):
 
     # --- assert -----------------------
     run = solver.runs[0]
-    assert run.fa < 0.0 < run.fb
-    assert (run.fa, run.fb) == (-0.25, 0.75)
+    assert run.bracket.fa < 0.0 < run.bracket.fb
+    assert (run.bracket.fa, run.bracket.fb) == (-0.25, 0.75)
     assert run.f.history == [(0.0, -0.25), (1.0, 0.75)]  # The history sees the normalized function too.
 
 

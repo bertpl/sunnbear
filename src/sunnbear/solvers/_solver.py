@@ -22,7 +22,7 @@ from ._wrapped_function import WrappedFunction
 #  Solver
 # ==================================================================================================
 class Solver(ABC):
-    """The base class every benchmarkable root solver subclasses.
+    """`Solver` is the base class every benchmarkable root solver subclasses.
 
     A subclass implements `_solve` and takes its configuration through
     ``__init__``; `solve` has a fixed signature, so all solvers are driven
@@ -63,7 +63,7 @@ class Solver(ABC):
 
         Args:
             f: The function; must be finite on ``[a, b]`` and change sign across it.
-            a: Lower end of the bracket.
+            a: Lower end of the bracket, which also sizes the divergence guard.
             b: Upper end of the bracket.
             xtol: Requested x-tolerance, ``|x_true - x| <= xtol``.
             max_fevals: Function-evaluation budget, the two endpoint evaluations included.
@@ -86,15 +86,8 @@ class Solver(ABC):
                 if fa_plain > 0.0:
                     wf.enable_sign_normalization()
                     fa_plain, fb_plain = -fa_plain, -fb_plain
-                run = SolveRun(
-                    f=wf,
-                    a=CountedFloat(a),
-                    b=CountedFloat(b),
-                    fa=CountedFloat(fa_plain),
-                    fb=CountedFloat(fb_plain),
-                    xtol=xtol,
-                    x_best=0.5 * (a + b),
-                )
+                bracket = Interval(CountedFloat(a), CountedFloat(b), CountedFloat(fa_plain), CountedFloat(fb_plain))
+                run = SolveRun(f=wf, bracket=bracket, xtol=xtol, x_best=0.5 * (a + b))
                 x, status = self._run_guarded(run)
                 n_iters = run.n_iters
         return SolveResult(
@@ -126,10 +119,9 @@ class Solver(ABC):
     def _solve(self, run: SolveRun) -> float:
         """Run the algorithm on `run` and return the root estimate.
 
-        Evaluate the function only through ``run.f``, and let its interrupts
-        propagate. Keep ``run.x_best`` current, so an interrupted solve still
-        reports a meaningful ``x``, and call ``run.mark_iteration()`` once per
-        iteration if the algorithm has iterations.
+        - Evaluate the function only through ``run.f``, and let its interrupts propagate.
+        - Keep ``run.x_best`` current, so an interrupted solve still reports a meaningful ``x``.
+        - Call ``run.mark_iteration()`` once per iteration, if the algorithm has iterations.
         """
 
 
@@ -140,19 +132,17 @@ S = TypeVar("S")
 
 
 class BracketingSolver(Solver, Generic[S]):
-    """The base class for interval-reducing solvers; a subclass implements one `_step`.
+    """`BracketingSolver` is the base class for interval-reducing solvers; a subclass implements one `_step`.
 
-    The base owns the loop, the stopping criteria (`Interval.is_converged`),
-    the root extraction (`Interval.root`), and the iteration count: one
-    `_step` is one iteration, and a subclass cannot define a wrong stopping rule.
-
-    A solver that carries state between steps declares its type as ``S`` and
+    The base owns the loop and the stopping rule (`Interval.is_converged`), so
+    a subclass cannot define a wrong one; one `_step` is one iteration. A
+    solver that carries state between steps declares its type as ``S`` and
     threads it through `_step`; memoryless solvers use ``S = None``.
     """
 
     def _solve(self, run: SolveRun) -> float:
         """Reduce the bracket with `_step` until `Interval.is_converged` holds; return `Interval.root`."""
-        interval = Interval(run.a, run.b, run.fa, run.fb)
+        interval = run.bracket
         state = self._initial_state(run, interval)
         two_xtol = 2.0 * run.xtol
         run.n_iters = 0
@@ -166,8 +156,7 @@ class BracketingSolver(Solver, Generic[S]):
     def _initial_state(self, run: SolveRun, interval: Interval) -> S:
         """Return the state carried into the first `_step`; ``None`` by default, for memoryless solvers.
 
-        A stateful solver overrides `_initial_state`; the cast lets one default
-        serve every ``S``.
+        The cast lets one default serve every ``S``.
         """
         return cast("S", None)
 

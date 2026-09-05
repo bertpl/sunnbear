@@ -1,11 +1,12 @@
 """`sunnbear.solvers` provides the base classes a benchmarkable solver subclasses, plus the reference solvers.
 
 A solver receives a plain ``f(x) -> float`` and a bracket ``[a, b]``; it knows
-nothing of test functions or the benchmark that drives it. How the pieces tie
-together in one call to ``solve``::
+nothing of test functions or the benchmark that drives it. One call to ``solve`` runs
+the pieces in this order::
 
     Solver.solve(f, a, b, xtol=..., max_fevals=...)       [template method]
-      │ wraps f in a WrappedFunction, which owns every per-evaluation concern
+      │ wraps f in a WrappedFunction, which applies the budget, the guards, the flop
+      │   pause, sign normalization, and history to each evaluation
       │ evaluates f(a), f(b); normalizes so that f(a) <= 0 <= f(b)
       │ opens the flop-counting context; a, b become CountedFloat
       ▼
@@ -13,7 +14,7 @@ together in one call to ``solve``::
       │   BracketingSolver implements it as a loop over _step(run, Interval, state)
       │   with the stopping criteria owned by the base
       ▼
-    SolveResult ── x · SolveStatus · n_fevals · n_iters · FlopCounts · history
+    SolveResult
 
 An abnormal ending is a `SolveInterrupt` exception (see `sunnbear.errors`),
 raised by the wrapper and mapped to a `SolveStatus` by `Solver.solve`; a
