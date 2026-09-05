@@ -1,10 +1,11 @@
-"""Registry, test function, reference solvers, flop counts and summary statistic work together end to end."""
+"""One solve pipeline runs end to end, from registry lookup to summary statistic."""
 
 import numpy as np
 
-from sunnbear import FormulaRegistry, SolveStatus
+from sunnbear import SolveStatus
 from sunnbear.solvers import Bisection, RegulaFalsi
 from sunnbear.stats import gpq
+from tests.solvers.example_functions import calibrated_cubic
 
 MAX_FEVALS = 200
 
@@ -12,7 +13,7 @@ MAX_FEVALS = 200
 def test_solve_count_flops_summarize():
     """A test function from the registry is solved over a batch of c-values; the counts feed a pseudo-quantile."""
     # --- arrange ----------------------
-    test_function = FormulaRegistry.candidate_from_id("f101-0.2").calibrated(-5.0, 5.0)
+    test_function = calibrated_cubic()
     c_values = np.linspace(test_function.c_min, test_function.c_max, 9)[1:-1]
     solvers = [Bisection(), RegulaFalsi()]
 
