@@ -52,6 +52,12 @@ dev = [
     # `make lint`, and CI); these ranges just set the floor.
     "ruff>=0.15.11",
     "ty==0.0.56",  # pre-1.0 type checker — pin exactly; its ruleset is still evolving
+    # scipy is used only by the agreement tests against scipy.optimize. Per-Python minimum versions follow
+    # the rule of the runtime dependencies above; the extra constraint is that each scipy accepts the numpy
+    # the `lowest-direct` matrix job installs.
+    "scipy>=1.13.0; python_version < '3.13'",
+    "scipy>=1.14.1; python_version == '3.13'",
+    "scipy>=1.16.1; python_version >= '3.14'",
 ]
 # maintainer scratch tooling — installed by a plain `uv sync` (default-groups below)
 # but NOT by CI's `uv sync --group dev` / `uv run --group dev`, keeping matrix legs lean

@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test-function framework: formulas with parameter recipes, stable function identities, and a file-drop formula catalog
 - `FormulaTestCase`: declare a formula's value / invalid-params / bracket test cases alongside its definition
 - Solver framework: `Solver`/`BracketingSolver` base classes with flop counting, evaluation budget and guards, plus a reference `Bisection`
+- `RegulaFalsi` reference solver
+- Top-level `sunnbear` re-exports the solver and formula base classes and the types their APIs use
 
 ### Changed
 
