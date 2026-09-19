@@ -87,6 +87,13 @@ class WrappedFunction:
         if not math.isfinite(fx):
             raise FunctionDomainError(f"f({x_plain!r}) = {fx!r} is not finite.")
         if self._negate:
+            # The sign flip runs on a plain float (fx is wrapped in CountedFloat only at the return
+            # below), so it is not counted, even though the f(a) < 0 < f(b) invariant it establishes can
+            # enable solver simplifications (e.g. simpler bracketing conditions). The stance: a user could
+            # implement the same flip inside a tested function, where it would go uncounted too, and
+            # leaving it uncounted here does not skew comparisons between solvers. Counting it would
+            # compensate those simplifications in only ~half the cases (f(a) > 0) and would make benchmark
+            # metrics inconsistent between functions f(.) and -f(.).
             fx = -fx
         if self.history is not None:
             self.history.append((x_plain, fx))
