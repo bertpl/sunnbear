@@ -1,4 +1,4 @@
-"""This package holds the base classes that make any root solver benchmarkable.
+"""This package implements the framework and fundamental building blocks used to implement solvers for benchmarking.
 
 A solver receives a plain ``f(x) -> float`` and a bracket ``[a, b]``; it knows
 nothing of test functions or the benchmark that drives it. One call to ``solve`` runs
