@@ -62,11 +62,7 @@ class WrappedFunction:
         self.history: list[tuple[float, float]] | None = [] if record_history else None
 
     def __call__(self, x: float) -> float:
-        """Evaluate ``f`` at ``x``: refuse it past the budget or the divergence bounds, and reject a non-finite value.
-
-        Returns:
-            The value as a `CountedFloat`, so the solver's arithmetic on it is counted.
-        """
+        """Evaluate ``f`` at ``x``: refuse it past the budget or the divergence bounds, reject a non-finite value."""
         if self.n_fevals >= self._max_fevals:
             raise MaxFevalsExceeded(f"Evaluation budget of {self._max_fevals} function evaluations exhausted.")
         x_plain = float(x)  # The checks and f itself run on plain floats: uncounted, and numba-compatible.
