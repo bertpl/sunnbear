@@ -17,11 +17,6 @@ from .run import SolveRun
 from .wrapped_function import WrappedFunction
 
 
-def _plain_midpoint(a: float, b: float) -> float:
-    """Return the midpoint of two plain floats; bookkeeping, so not counted as solver cost."""
-    return 0.5 * (a + b)
-
-
 # ==================================================================================================
 #  Solver
 # ==================================================================================================
@@ -38,7 +33,7 @@ class Solver(ABC):
             `version` and the init arguments, the name identifies a solver in
             benchmark results.
         version: Bumped on any behavior change, so results from different
-            versions of one solver are never pooled unknowingly.
+            versions of one solver are never combined unknowingly.
     """
 
     name: ClassVar[str]
@@ -61,14 +56,14 @@ class Solver(ABC):
 
         - The endpoints are evaluated first; an endpoint that is exactly zero
           ends the solve as ``CONVERGED`` without running the algorithm.
-        - The sign is then normalized, so the algorithm sees ``f(a) <= 0 <= f(b)``.
+        - The sign is then normalized, so the algorithm is given ``f(a) <= 0 <= f(b)``.
         - Every abnormal ending becomes a `SolveStatus`, not an exception: one
           broken solver must not abort a batch of a million solves.
 
         Args:
             f: The function; must be finite on ``[a, b]`` and change sign across it.
             a: Lower end of the bracket, which also sizes the divergence guard.
-            b: Upper end of the bracket.
+            b: Upper end of the bracket, which also sizes the divergence guard.
             xtol: Requested x-tolerance, ``|x_true - x| <= xtol``.
             max_fevals: Function-evaluation budget, the two endpoint evaluations included.
             record_history: Whether to keep every ``(x, f(x))`` pair in the result.
@@ -138,7 +133,7 @@ S = TypeVar("S")
 class BracketingSolver(Solver, Generic[S]):
     """`BracketingSolver` is the base class for interval-reducing solvers; a subclass implements one `_step`.
 
-    The base owns the loop and the stopping rule (`Interval.is_converged`), so
+    The base class implements the loop and the stopping rule (`Interval.is_converged`), so
     a subclass cannot define a wrong one; one `_step` is one iteration. A
     solver that carries state between steps declares its type as ``S`` and
     threads it through `_step`; memoryless solvers use ``S = None``.
@@ -148,9 +143,9 @@ class BracketingSolver(Solver, Generic[S]):
         """Reduce the bracket with `_step` until `Interval.is_converged` holds; return `Interval.root`."""
         interval = run.bracket
         state = self._initial_state(run, interval)
-        two_xtol = 2.0 * run.xtol
+        xtol_doubled = 2.0 * run.xtol
         run.n_iters = 0
-        while not interval.is_converged(two_xtol):
+        while not interval.is_converged(xtol_doubled):
             interval, state = self._step(run, interval, state)
             run.mark_iteration()
             run.x_best = _plain_midpoint(float(interval.a), float(interval.b))
@@ -170,3 +165,11 @@ class BracketingSolver(Solver, Generic[S]):
         Evaluate the function only through ``run.f``, and derive the new bracket
         with `Interval.narrow_at`, so the sign-change invariant is kept.
         """
+
+
+# ==================================================================================================
+#  Helpers
+# ==================================================================================================
+def _plain_midpoint(a: float, b: float) -> float:
+    """Return the midpoint of two plain floats; bookkeeping, so not counted as solver cost."""
+    return 0.5 * (a + b)

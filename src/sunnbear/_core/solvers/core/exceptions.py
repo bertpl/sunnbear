@@ -13,7 +13,7 @@ class SolveInterrupt(SunnbearError):  # noqa: N818 — the name marks a control-
     `WrappedFunction` raises one of the subclasses from inside an evaluation;
     the `Solver` template method catches every `SolveInterrupt` and maps it to a
     `SolveStatus`, so none of them ever reaches the caller of ``solve()``. Solver
-    implementations must let them propagate — swallowing one hides a failed run.
+    implementations must let them propagate — catching one hides a failed run.
     """
 
 

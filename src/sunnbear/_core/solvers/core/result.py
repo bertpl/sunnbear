@@ -31,7 +31,7 @@ class SolveStatus(Enum):
 class SolveResult:
     """A `SolveResult` records what one solve did, as measured by `Solver.solve`.
 
-    The record is closed: every field is shared by all solvers, so the
+    The record is closed: every field is common to all solvers, so the
     benchmark aggregation can read every result whole. A solver with
     diagnostics of its own logs them; it cannot attach them here.
 

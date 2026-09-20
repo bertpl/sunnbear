@@ -12,8 +12,8 @@ class SolveRun:
 
     Attributes:
         f: The wrapped function to evaluate, sign-normalized by `Solver.solve`.
-        bracket: The initial bracket with its endpoint values, as `CountedFloat`
-            values so arithmetic on them is counted.
+        bracket: The initial bracket, its endpoints already `CountedFloat` as documented on `Interval`.
+        xtol: Requested x-tolerance, ``|x_true - x| <= xtol``.
         n_iters: Iterations performed so far; ``None`` unless the solver counts
             iterations.
         x_best: Best root estimate so far; reported as the result's ``x`` when

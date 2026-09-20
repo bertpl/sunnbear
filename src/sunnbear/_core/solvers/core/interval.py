@@ -9,8 +9,8 @@ class Interval:
 
     `Solver.solve` normalizes the function's sign before the first step, so
     the invariant is one-directional and every bracketing solver may rely on
-    it. Arithmetic on `CountedFloat` endpoints is counted, which is how
-    interval bookkeeping is counted in a solver's flop counts; the invariant check
+    it. Arithmetic on `CountedFloat` endpoints is counted, so interval
+    bookkeeping contributes to a solver's flop counts; the invariant check
     runs on plain floats and costs the solver nothing.
     """
 
@@ -44,20 +44,22 @@ class Interval:
         """
         if fx <= 0.0:
             return Interval(x, self.b, fx, self.fb)
-        return Interval(self.a, x, self.fa, fx)
+        else:
+            return Interval(self.a, x, self.fa, fx)
 
-    def is_converged(self, two_xtol: float) -> bool:
-        """Return whether a stopping criterion holds: the width is at most ``two_xtol``, or an endpoint value is zero.
+    def is_converged(self, xtol_doubled: float) -> bool:
+        """Return whether a stopping criterion holds: the width is at most ``xtol_doubled`` or an endpoint is zero.
 
         The parameter is the doubled tolerance, so the caller computes it once
         per solve, not once per iteration.
         """
-        return self.width <= two_xtol or self.fa == 0.0 or self.fb == 0.0
+        return self.width <= xtol_doubled or self.fa == 0.0 or self.fb == 0.0
 
     def root(self) -> float:
         """Return the root estimate of a converged bracket: the zero endpoint if there is one, else the midpoint."""
         if self.fa == 0.0:
             return self.a
-        if self.fb == 0.0:
+        elif self.fb == 0.0:
             return self.b
-        return self.midpoint
+        else:
+            return self.midpoint

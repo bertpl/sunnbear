@@ -13,9 +13,10 @@ from counted_float import CountedFloat, PauseFlopCounting
 
 from .exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
 
-# The guard interval is [a - m*(b-a), b + m*(b-a)] with this margin m; an evaluation requested
-# outside it counts as divergence. The margin is generous enough for the overshoot of a
-# legitimate step of a non-bracketing solver and tight enough to catch a runaway iterate within an iteration or two.
+# The guard interval is the bracket widened on each side by this multiple of its width; an evaluation
+# requested outside it counts as divergence. The margin balances two needs:
+# - generous enough to tolerate the overshoot of a legitimate step of a non-bracketing solver
+# - tight enough to catch a runaway iterate within an iteration or two
 DIVERGENCE_GUARD_MARGIN = 10.0
 
 
@@ -60,7 +61,7 @@ class WrappedFunction:
         self.history: list[tuple[float, float]] | None = [] if record_history else None
 
     def enable_sign_normalization(self) -> None:
-        """Negate every value returned from here on, so callers see ``f(a) <= 0 <= f(b)``.
+        """Negate every value returned from here on, so callers are given ``f(a) <= 0 <= f(b)``.
 
         Values already in the history are negated too, so the history shows one
         consistent function: `Solver.solve` decides on normalization only after
@@ -71,7 +72,11 @@ class WrappedFunction:
             self.history = [(x, -fx) for x, fx in self.history]
 
     def __call__(self, x: float) -> float:
-        """Evaluate ``f`` at ``x`` under the wrapper's contract (see the class docstring)."""
+        """Evaluate ``f`` at ``x``: refuse past the budget or outside the guard, raise on a non-finite value, count it.
+
+        Returns:
+            The value as a `CountedFloat`, negated when sign normalization is enabled.
+        """
         if self.n_fevals >= self._max_fevals:
             raise MaxFevalsExceeded(f"Evaluation budget of {self._max_fevals} function evaluations exhausted.")
         x_plain = float(x)  # The guards and f itself run on plain floats: uncounted, and numba-compatible.

@@ -63,11 +63,11 @@ class _IterationCountingSolver(Solver):
     name = "iteration_counter"
     version = 1
 
-    def __init__(self, n: int) -> None:
-        self.n = n
+    def __init__(self, n_iters: int) -> None:
+        self.n_iters = n_iters
 
     def _solve(self, run: SolveRun) -> float:
-        for _ in range(self.n):
+        for _ in range(self.n_iters):
             run.mark_iteration()
         return run.x_best
 
