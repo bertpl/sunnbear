@@ -1,5 +1,3 @@
-"""Importing the test-function package registers every module of the formula catalog, none forgotten."""
-
 import importlib
 import pkgutil
 
@@ -17,5 +15,6 @@ def test_every_catalog_module_is_imported_by_its_package():
         importlib.import_module(module_info.name)
 
     # --- assert -----------------------
-    forgotten = [cls for cls in formula_module.registered_formula_classes if cls not in registered_before]
-    assert not forgotten, f"catalog modules not imported by their package: {[cls.__module__ for cls in forgotten]}"
+    not_imported_by_package = [cls for cls in formula_module.registered_formula_classes if cls not in registered_before]
+    modules = [cls.__module__ for cls in not_imported_by_package]
+    assert not not_imported_by_package, f"catalog modules not imported by their package: {modules}"
