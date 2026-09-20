@@ -356,6 +356,17 @@ def test_formula_yielding_no_candidates_is_rejected():
         cls().build_all_candidates()
 
 
+@pytest.mark.usefixtures("isolated_registry")
+def test_formula_oriented_the_wrong_way_round_is_rejected():
+    """`f(a, 0) < 0 < f(b, 0)` is required of every candidate, since the solver layer never normalizes the sign."""
+    # --- arrange ----------------------
+    cls = _formula_cls(984, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, p1: c - x)
+
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match=r"f\(a, 0\) < 0 < f\(b, 0\) is required"):
+        cls().build_all_candidates()
+
+
 def test_every_catalog_formula_validates():
     """Guards the catalog itself: a malformed formula module fails here, not in a pipeline run."""
     for formula in FormulaRegistry.formulas():

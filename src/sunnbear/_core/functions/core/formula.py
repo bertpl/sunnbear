@@ -209,7 +209,10 @@ class Formula(ABC):
            exist: the formula number is the same for every tuple here, so it
            carries no information for the collapse.
         3. **Construction** (identities included), so the per-candidate work is
-           paid only for survivors.
+           paid only for survivors, each checked for the orientation
+           ``f(a, 0) < 0 < f(b, 0)`` that `Solver.solve` requires of every
+           function it is given; the framework never normalizes the sign, so a
+           formula written the other way round is rejected here.
 
         Eager rather than lazy, and validating: a malformed formula fails here,
         at corpus-build time, instead of somewhere downstream. See
@@ -221,8 +224,9 @@ class Formula(ABC):
 
         Raises:
             ValueError: If a recipe disagrees with `param_names`, if
-                `param_names` disagrees with `parametrized_fun`'s signature, or
-                if no candidate survives `is_param_tuple_valid`.
+                `param_names` disagrees with `parametrized_fun`'s signature, if
+                no candidate survives `is_param_tuple_valid`, or if a candidate
+                does not satisfy ``f(a, 0) < 0 < f(b, 0)``.
         """
         recipes = self.recipes()
         self._validate_recipes(recipes)
@@ -237,11 +241,30 @@ class Formula(ABC):
                 f"Formula {type(self).__name__} produced no candidates: every parameter tuple was "
                 "rejected by is_param_tuple_valid. A formula that contributes nothing is a bug."
             )
+        for candidate in candidates:
+            self._validate_orientation(candidate)
         return tuple(candidates)
 
     # --------------------------------------------------------------------------
     #  Validation
     # --------------------------------------------------------------------------
+    def _validate_orientation(self, candidate: CandidateTestFunction) -> None:
+        """Check that ``f(a, 0) < 0 < f(b, 0)`` holds for the candidate.
+
+        The check is made at ``c = 0``, before any c-range exists; c-range calibration later requires
+        the same orientation on the whole range. A root cannot cross an endpoint inside a valid
+        c-range, so the orientation at ``c = 0`` is the orientation everywhere.
+
+        Raises:
+            ValueError: If the candidate is not oriented, naming the formula so its author negates it.
+        """
+        fa, fb = candidate.xc_fun(candidate.a, 0.0), candidate.xc_fun(candidate.b, 0.0)
+        if not fa < 0.0 < fb:
+            raise ValueError(
+                f"Formula {type(self).__name__} with params {candidate.id.params} has f(a, 0)={fa}, f(b, 0)={fb}; "
+                "f(a, 0) < 0 < f(b, 0) is required, so negate the formula if it is oriented the other way round."
+            )
+
     def _validate_recipes(self, recipes: "tuple[ParamRecipe, ...]") -> None:
         """Check that every recipe's axes agree with `param_names`.
 
