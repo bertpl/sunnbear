@@ -244,17 +244,19 @@ class Formula(ABC):
                 "rejected by is_param_tuple_valid. A formula that contributes nothing is a bug."
             )
         for candidate in candidates:
-            self._validate_endpoint_signs(candidate)
+            self._validate_orientation(candidate)
         return tuple(candidates)
 
     # --------------------------------------------------------------------------
     #  Validation
     # --------------------------------------------------------------------------
-    def _validate_endpoint_signs(self, candidate: CandidateTestFunction) -> None:
+    def _validate_orientation(self, candidate: CandidateTestFunction) -> None:
         """Check that ``f(a, 0) < 0 < f(b, 0)`` holds for the candidate.
 
         The check is made at ``c = 0``, before any c-range exists; c-range calibration later requires
-        the same orientation on the whole range. A root can never sit at the bracket endpoint ``a`` or
+        the same orientation on the whole range.
+
+        A root can never sit at the bracket endpoint ``a`` or
         ``b`` for any c inside a valid c-range, so the orientation at ``c = 0`` holds throughout the range.
 
         Raises:
