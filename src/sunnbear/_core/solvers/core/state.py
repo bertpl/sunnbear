@@ -18,7 +18,7 @@ class SolverState:
     class is named there, so the solver never constructs a state itself.
 
     Attributes:
-        f: The wrapped function to evaluate, sign-normalized by `Solver.solve`.
+        f: The wrapped function to evaluate; ``f(a) < 0 < f(b)`` holds, since `Solver.solve` requires it.
         bracket: The initial bracket, its endpoints already `CountedFloat` as documented on `Interval`.
         xtol: Requested x-tolerance, ``|x_true - x| <= xtol``.
         n_iters: Iterations performed so far; ``None`` unless the solver counts

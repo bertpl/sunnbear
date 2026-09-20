@@ -8,11 +8,10 @@ from functools import cached_property
 class Interval:
     """An `Interval` is a bracket ``[a, b]`` with endpoint values ``fa`` and ``fb`` such that ``fa <= 0 <= fb``.
 
-    The sign is normalized before a bracketing solver ever sees an `Interval`,
-    so the invariant is one-directional and every bracketing solver may rely on
-    it. Arithmetic on `CountedFloat` endpoints is counted, so interval
-    bookkeeping contributes to a solver's flop counts; the invariant check
-    runs on plain floats and costs the solver nothing.
+    `Solver.solve` requires ``f(a) < 0 < f(b)`` of its caller, so the invariant is one-directional
+    and every bracketing solver may rely on it. Arithmetic on `CountedFloat` endpoints is counted,
+    so interval bookkeeping contributes to a solver's flop counts; the invariant check runs on plain
+    floats and costs the solver nothing.
     """
 
     a: float
@@ -21,7 +20,7 @@ class Interval:
     fb: float
 
     def __post_init__(self) -> None:
-        """Reject a bracket that is reversed or does not hold the normalized sign change."""
+        """Reject a bracket that is reversed or does not hold the sign change in the required orientation."""
         if not float(self.a) < float(self.b):
             raise ValueError(f"Interval must satisfy a < b (got a={self.a}, b={self.b}).")
         if not float(self.fa) <= 0.0 <= float(self.fb):

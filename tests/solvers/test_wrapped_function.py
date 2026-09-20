@@ -83,21 +83,8 @@ def test_non_finite_value_is_a_domain_error_and_still_counts(value):
 
 
 # ==================================================================================================
-#  Sign normalization and history
+#  History
 # ==================================================================================================
-def test_sign_normalization_negates_values_from_then_on():
-    # --- arrange ----------------------
-    wf = _wrap()
-    before = wf(1.0)
-
-    # --- act --------------------------
-    wf.enable_sign_normalization()
-    after = wf(1.0)
-
-    # --- assert -----------------------
-    assert (before, after) == (1.0, -1.0)
-
-
 def test_history_is_off_by_default():
     # --- arrange ----------------------
     wf = _wrap()
@@ -109,17 +96,16 @@ def test_history_is_off_by_default():
     assert wf.history is None
 
 
-def test_history_records_normalized_plain_float_pairs():
+def test_history_records_the_evaluations_as_plain_float_pairs():
     # --- arrange ----------------------
     wf = _wrap(record_history=True)
-    wf.enable_sign_normalization()
 
     # --- act --------------------------
     wf(CountedFloat(0.0))
     wf(1.0)
 
     # --- assert -----------------------
-    assert wf.history == [(0.0, 1.0), (1.0, -1.0)]
+    assert wf.history == [(0.0, -1.0), (1.0, 1.0)]
     assert all(type(v) is float for pair in wf.history for v in pair)
 
 

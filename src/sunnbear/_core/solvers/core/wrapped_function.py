@@ -34,8 +34,8 @@ class WrappedFunction:
     - evaluates ``f`` with flop counting paused, so only the solver's own
       arithmetic is counted;
     - raises `FunctionDomainError` on a non-finite value;
-    - negates the value when sign normalization is enabled;
-    - records ``(x, f(x))`` when history is on;
+    - appends ``(x, f(x))`` to the history when history is on, so the history is the caller's ``f`` as
+      evaluated, in call order;
     - returns the value as a `CountedFloat`, so the solver's arithmetic on it
       is counted.
 
@@ -58,26 +58,14 @@ class WrappedFunction:
         self._divergence_lb = a - DIVERGENCE_GUARD_WIDTH_FACTOR * (b - a)
         self._divergence_ub = b + DIVERGENCE_GUARD_WIDTH_FACTOR * (b - a)
         self._max_fevals = max_fevals
-        self._is_sign_normalized = False
         self.n_fevals = 0
         self.history: list[tuple[float, float]] | None = [] if record_history else None
-
-    def enable_sign_normalization(self) -> None:
-        """Negate every value returned from here on, so callers are given ``f(a) <= 0 <= f(b)``.
-
-        Values already in the history are negated too, so the history shows one
-        consistent function: `Solver.solve` decides on normalization only after
-        the endpoint evaluations.
-        """
-        self._is_sign_normalized = True
-        if self.history is not None:
-            self.history = [(x, -fx) for x, fx in self.history]
 
     def __call__(self, x: float) -> float:
         """Evaluate ``f`` at ``x``: refuse it past the budget or the divergence bounds, and reject a non-finite value.
 
         Returns:
-            The value as a `CountedFloat`, negated when sign normalization is enabled.
+            The value as a `CountedFloat`, so the solver's arithmetic on it is counted.
         """
         if self.n_fevals >= self._max_fevals:
             raise MaxFevalsExceeded(f"Evaluation budget of {self._max_fevals} function evaluations exhausted.")
@@ -92,17 +80,6 @@ class WrappedFunction:
         self.n_fevals += 1
         if not math.isfinite(fx):
             raise FunctionDomainError(f"f({x_plain!r}) = {fx!r} is not finite.")
-        if self._is_sign_normalized:
-            # The sign flip runs on a plain float (fx is wrapped in CountedFloat only at the return below),
-            # so it is not counted, even though the f(a) < 0 < f(b) invariant that it establishes can enable
-            # solver simplifications (e.g. simpler bracketing conditions).
-            #
-            # The stance: a user could implement the same flip inside a tested function, where it would
-            # go uncounted too, and leaving it uncounted here does not skew comparisons between solvers.
-            #
-            # Counting the sign flip would compensate those simplifications in only ~half the cases
-            # (f(a) > 0) and would make benchmark metrics inconsistent between functions f(.) and -f(.).
-            fx = -fx
         if self.history is not None:
             self.history.append((x_plain, fx))
         return CountedFloat(fx)
