@@ -11,7 +11,7 @@ from sunnbear.solvers import Solver, SolveRun, SolveStatus
 #  Test-local solvers
 # ==================================================================================================
 class _RecordingSolver(Solver):
-    """`_RecordingSolver` keeps the run it was handed, so tests can inspect what `Solver.solve` prepared."""
+    """`_RecordingSolver` keeps the run that it was handed, so tests can inspect what `Solver.solve` prepared."""
 
     name = "recording"
     version = 1
@@ -37,10 +37,10 @@ class _MidpointRepeatingSolver(Solver):
             run.mark_iteration()
 
 
-class _RunawaySolver(Solver):
-    """`_RunawaySolver` asks for an evaluation far outside the bracket."""
+class _OutOfBracketSolver(Solver):
+    """`_OutOfBracketSolver` asks for an evaluation far outside the bracket."""
 
-    name = "runaway"
+    name = "out_of_bracket"
     version = 1
 
     def _solve(self, run: SolveRun) -> float:
@@ -148,7 +148,7 @@ def test_run_is_sign_normalized(f):
 # ==================================================================================================
 #  Status mapping
 # ==================================================================================================
-def test_budget_exhaustion_maps_to_max_fevals():
+def test_running_out_of_budget_maps_to_max_fevals():
     # --- act --------------------------
     result = _MidpointRepeatingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=7)
 
@@ -161,7 +161,7 @@ def test_budget_exhaustion_maps_to_max_fevals():
 
 def test_leaving_the_guard_interval_maps_to_diverged():
     # --- act --------------------------
-    result = _RunawaySolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
+    result = _OutOfBracketSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.DIVERGED

@@ -11,13 +11,12 @@ the pieces in this order::
       ▼
     Solver._solve(run: SolveRun)                           [subclass hook]
       │   BracketingSolver implements it as a loop over _step(run, Interval, state)
-      │   with the stopping criteria owned by the base
+      │   with the stopping criteria owned by BracketingSolver
       ▼
     SolveResult
 
-An abnormal ending is a `SolveInterrupt` exception, raised by the wrapper and
-mapped to a `SolveStatus` by `Solver.solve`; a solver that raises anything else
-is recorded as ``SOLVER_ERROR``.
+An abnormal ending is a `SolveInterrupt` exception (see that class); a solver
+that raises anything else is recorded as ``SOLVER_ERROR``.
 """
 
 from .interval import Interval

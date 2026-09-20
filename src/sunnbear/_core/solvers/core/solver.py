@@ -1,4 +1,4 @@
-"""`Solver` with its template method, and `BracketingSolver`, are the base classes a solver subclasses.
+"""`Solver` with its template method, and `BracketingSolver`, are the base classes that a solver subclasses.
 
 Everything that makes a solve measurable lives in `Solver.solve` and the
 `WrappedFunction` it installs; a subclass writes only the algorithm.
@@ -74,31 +74,31 @@ class Solver(ABC):
         """
         if not a < b:
             raise ValueError(f"Bracket must satisfy a < b (got a={a}, b={b}).")
-        wf = WrappedFunction(f, a, b, max_fevals=max_fevals, record_history=record_history)
-        with FlopCountingContext() as ctx:
-            fa_plain, fb_plain = float(wf(a)), float(wf(b))
+        wrapped_f = WrappedFunction(f, a, b, max_fevals=max_fevals, record_history=record_history)
+        with FlopCountingContext() as flop_ctx:
+            fa_plain, fb_plain = float(wrapped_f(a)), float(wrapped_f(b))
             if fa_plain == 0.0 or fb_plain == 0.0:
                 x, status, n_iters = (a if fa_plain == 0.0 else b), SolveStatus.CONVERGED, None
             else:
                 if fa_plain * fb_plain > 0.0:
                     raise ValueError(f"f(a) and f(b) must differ in sign (got f({a})={fa_plain}, f({b})={fb_plain}).")
                 if fa_plain > 0.0:
-                    wf.enable_sign_normalization()
+                    wrapped_f.enable_sign_normalization()
                     fa_plain, fb_plain = -fa_plain, -fb_plain
                 bracket = Interval(CountedFloat(a), CountedFloat(b), CountedFloat(fa_plain), CountedFloat(fb_plain))
-                run = SolveRun(f=wf, bracket=bracket, xtol=xtol, x_best=_plain_midpoint(a, b))
-                x, status = self._run_guarded(run)
+                run = SolveRun(f=wrapped_f, bracket=bracket, xtol=xtol, x_best=_plain_midpoint(a, b))
+                x, status = self._run_catching_exceptions(run)
                 n_iters = run.n_iters
         return SolveResult(
             x=float(x),
             status=status,
-            n_fevals=wf.n_fevals,
+            n_fevals=wrapped_f.n_fevals,
             n_iters=n_iters,
-            flop_counts=ctx.flop_counts(),
-            history=None if wf.history is None else tuple(wf.history),
+            flop_counts=flop_ctx.flop_counts(),
+            history=None if wrapped_f.history is None else tuple(wrapped_f.history),
         )
 
-    def _run_guarded(self, run: SolveRun) -> tuple[float, SolveStatus]:
+    def _run_catching_exceptions(self, run: SolveRun) -> tuple[float, SolveStatus]:
         """Run the algorithm and map how it ended to a root estimate and a status."""
         try:
             return self._solve(run), SolveStatus.CONVERGED
@@ -136,7 +136,7 @@ class BracketingSolver(Solver, Generic[S]):
     The base class implements the loop and the stopping rule (`Interval.is_converged`), so
     a subclass cannot define a wrong one; one `_step` is one iteration. A
     solver that carries state between steps declares its type as ``S`` and
-    threads it through `_step`; memoryless solvers use ``S = None``.
+    passes it to each `_step` call; memoryless solvers use ``S = None``.
     """
 
     def _solve(self, run: SolveRun) -> float:
@@ -152,7 +152,7 @@ class BracketingSolver(Solver, Generic[S]):
         return interval.root()
 
     def _initial_state(self, run: SolveRun, interval: Interval) -> S:
-        """Return the state carried into the first `_step`; ``None`` by default, for memoryless solvers.
+        """Return the state passed to the first `_step`; ``None`` by default, for memoryless solvers.
 
         The cast lets one default serve every ``S``.
         """

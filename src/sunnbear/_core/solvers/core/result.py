@@ -18,9 +18,9 @@ class SolveStatus(Enum):
     """
 
     CONVERGED = "converged"
-    MAX_FEVALS = "max_fevals"  # the evaluation budget ran out
-    DIVERGED = "diverged"  # an evaluation was requested outside the interval that WrappedFunction guards around [a, b]
-    FUNCTION_ERROR = "function_error"  # the function returned a non-finite value
+    MAX_FEVALS = "max_fevals"  # from MaxFevalsExceeded
+    DIVERGED = "diverged"  # from DivergedError
+    FUNCTION_ERROR = "function_error"  # from FunctionDomainError
     SOLVER_ERROR = "solver_error"  # the solver raised — a bug in the solver, recorded, not propagated
 
 
@@ -38,6 +38,7 @@ class SolveResult:
     Attributes:
         x: Root estimate. On an abnormal status, the best estimate so far (for
             a bracketing solver, the last bracket's midpoint).
+        status: How the solve ended; see `SolveStatus`.
         n_fevals: Function evaluations performed, the two endpoint evaluations
             included.
         n_iters: Iterations performed, or ``None`` for solvers to which the
