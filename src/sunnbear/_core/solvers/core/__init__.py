@@ -5,8 +5,7 @@ nothing of test functions or the benchmark that drives it. One call to ``solve``
 the pieces in this order::
 
     Solver.solve(f, a, b, xtol=..., max_fevals=...)       [template method]
-      │ wraps f in a WrappedFunction, which applies the budget, the guards, the flop
-      │   pause, sign normalization, and history to each evaluation
+      │ wraps f in a WrappedFunction, which runs the per-evaluation checks documented on that class
       │ evaluates f(a), f(b); normalizes so that f(a) <= 0 <= f(b)
       │ opens the flop-counting context; a, b become CountedFloat
       ▼

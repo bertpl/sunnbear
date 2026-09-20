@@ -1,4 +1,4 @@
-"""Each test-local solver here pins one behavior of the `Solver.solve` template method."""
+"""Each test-local solver here exercises one behavior of the `Solver.solve` template method."""
 
 import math
 
@@ -25,7 +25,7 @@ class _RecordingSolver(Solver):
 
 
 class _MidpointRepeatingSolver(Solver):
-    """`_MidpointRepeatingSolver` evaluates the midpoint over and over; the only way out is an interrupt."""
+    """`_MidpointRepeatingSolver` evaluates the midpoint over and over, which only an interrupt stops."""
 
     name = "midpoint_repeater"
     version = 1
@@ -89,7 +89,9 @@ def test_rejects_ill_ordered_bracket(a, b):
         _RecordingSolver().solve(_increasing, a, b, xtol=1e-3, max_fevals=10)
 
 
-@pytest.mark.parametrize("f", [lambda x: x + 1.0, lambda x: -x - 1.0])  # both positive, both negative
+@pytest.mark.parametrize(
+    "f", [lambda x: x + 1.0, lambda x: -x - 1.0]
+)  # the first is positive everywhere, the second negative everywhere
 def test_rejects_same_sign_endpoints(f):
     with pytest.raises(ValueError, match="differ in sign"):
         _RecordingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
@@ -113,7 +115,9 @@ def test_endpoints_are_evaluated_and_counted_before_the_algorithm_runs():
     assert solver.runs[0].f.n_fevals == 2
 
 
-@pytest.mark.parametrize("a, b, root", [(0.25, 1.0, 0.25), (-1.0, 0.25, 0.25)])  # root at the lower / upper end
+@pytest.mark.parametrize(
+    "a, b, root", [(0.25, 1.0, 0.25), (-1.0, 0.25, 0.25)]
+)  # the root sits at the lower end, then at the upper end
 def test_exact_zero_endpoint_converges_without_running_the_algorithm(a, b, root):
     # --- arrange ----------------------
     solver = _RecordingSolver()

@@ -7,7 +7,7 @@ from sunnbear.solvers import Interval
 # ==================================================================================================
 #  Invariants
 # ==================================================================================================
-@pytest.mark.parametrize("a, b", [(1.0, -1.0), (0.0, 0.0)])  # reversed and degenerate brackets
+@pytest.mark.parametrize("a, b", [(1.0, -1.0), (0.0, 0.0)])  # the first pair is reversed, the second is degenerate
 def test_rejects_ill_ordered_endpoints(a, b):
     with pytest.raises(ValueError, match="a < b"):
         Interval(a, b, -1.0, 1.0)
@@ -47,12 +47,12 @@ def test_width_and_midpoint():
         (0.5, (0.0, 1.0, -1.0, 0.5)),  # positive: x becomes the upper endpoint
     ],
 )
-def test_replace_keeps_the_sign_change(fx, expected):
+def test_narrow_at_keeps_the_sign_change(fx, expected):
     # --- arrange ----------------------
     interval = Interval(0.0, 4.0, -1.0, 2.0)
 
     # --- act --------------------------
-    narrowed = interval.replace(1.0, fx)
+    narrowed = interval.narrow_at(1.0, fx)
 
     # --- assert -----------------------
     assert (narrowed.a, narrowed.b, narrowed.fa, narrowed.fb) == expected
@@ -65,7 +65,7 @@ def test_replace_keeps_the_sign_change(fx, expected):
     "interval, two_xtol, expected",
     [
         (Interval(0.0, 1.0, -1.0, 1.0), 1.0, True),  # width criterion: width equal to 2*xtol counts as converged
-        (Interval(0.0, 1.0, -1.0, 1.0), 0.5, False),  # width criterion not met, no zero endpoint
+        (Interval(0.0, 1.0, -1.0, 1.0), 0.5, False),  # the width criterion is not met and no endpoint is zero
         (Interval(0.0, 1.0, 0.0, 1.0), 0.5, True),  # zero-endpoint criterion: lower endpoint is a root
         (Interval(0.0, 1.0, -1.0, 0.0), 0.5, True),  # zero-endpoint criterion: upper endpoint is a root
     ],
@@ -79,7 +79,7 @@ def test_is_converged(interval, two_xtol, expected):
     [
         (Interval(0.0, 1.0, 0.0, 1.0), 0.0),  # zero lower endpoint wins over the midpoint
         (Interval(0.0, 1.0, -1.0, 0.0), 1.0),  # zero upper endpoint wins over the midpoint
-        (Interval(0.0, 1.0, -1.0, 1.0), 0.5),  # otherwise the midpoint
+        (Interval(0.0, 1.0, -1.0, 1.0), 0.5),  # the midpoint is returned otherwise
     ],
 )
 def test_root(interval, expected):

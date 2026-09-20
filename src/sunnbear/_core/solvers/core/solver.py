@@ -17,6 +17,11 @@ from .run import SolveRun
 from .wrapped_function import WrappedFunction
 
 
+def _plain_midpoint(a: float, b: float) -> float:
+    """Return the midpoint of two plain floats; bookkeeping, so not counted as solver cost."""
+    return 0.5 * (a + b)
+
+
 # ==================================================================================================
 #  Solver
 # ==================================================================================================
@@ -86,7 +91,7 @@ class Solver(ABC):
                     wf.enable_sign_normalization()
                     fa_plain, fb_plain = -fa_plain, -fb_plain
                 bracket = Interval(CountedFloat(a), CountedFloat(b), CountedFloat(fa_plain), CountedFloat(fb_plain))
-                run = SolveRun(f=wf, bracket=bracket, xtol=xtol, x_best=0.5 * (a + b))
+                run = SolveRun(f=wf, bracket=bracket, xtol=xtol, x_best=_plain_midpoint(a, b))
                 x, status = self._run_guarded(run)
                 n_iters = run.n_iters
         return SolveResult(
@@ -148,8 +153,7 @@ class BracketingSolver(Solver, Generic[S]):
         while not interval.is_converged(two_xtol):
             interval, state = self._step(run, interval, state)
             run.mark_iteration()
-            # Plain floats, so this bookkeeping is not counted as solver cost.
-            run.x_best = 0.5 * (float(interval.a) + float(interval.b))
+            run.x_best = _plain_midpoint(float(interval.a), float(interval.b))
         return interval.root()
 
     def _initial_state(self, run: SolveRun, interval: Interval) -> S:
@@ -164,5 +168,5 @@ class BracketingSolver(Solver, Generic[S]):
         """Perform one iteration: return a strictly narrower bracket and the state for the next step.
 
         Evaluate the function only through ``run.f``, and derive the new bracket
-        with `Interval.replace`, so the sign-change invariant is kept.
+        with `Interval.narrow_at`, so the sign-change invariant is kept.
         """

@@ -10,7 +10,7 @@ class Interval:
     `Solver.solve` normalizes the function's sign before the first step, so
     the invariant is one-directional and every bracketing solver may rely on
     it. Arithmetic on `CountedFloat` endpoints is counted, which is how
-    interval bookkeeping lands in a solver's flop counts; the invariant check
+    interval bookkeeping is counted in a solver's flop counts; the invariant check
     runs on plain floats and costs the solver nothing.
     """
 
@@ -36,7 +36,7 @@ class Interval:
         """Return the midpoint of the bracket."""
         return 0.5 * (self.a + self.b)
 
-    def replace(self, x: float, fx: float) -> "Interval":
+    def narrow_at(self, x: float, fx: float) -> "Interval":
         """Return the half of the bracket that keeps the sign change once ``x`` splits it.
 
         ``x`` must lie strictly inside the bracket; a non-positive ``fx`` makes

@@ -1,4 +1,4 @@
-"""Two test-local bracketing solvers pin the loop, the stopping rule, and the state threading of `BracketingSolver`."""
+"""Two test-local bracketing solvers exercise the loop, stopping rule, and state threading of `BracketingSolver`."""
 
 import math
 
@@ -18,7 +18,7 @@ class _HalvingSolver(BracketingSolver[None]):
 
     def _step(self, run: SolveRun, interval: Interval, state: None) -> tuple[Interval, None]:
         x = interval.midpoint
-        return interval.replace(x, run.f(x)), None
+        return interval.narrow_at(x, run.f(x)), None
 
 
 class _StepCountingSolver(BracketingSolver[int]):
@@ -36,7 +36,7 @@ class _StepCountingSolver(BracketingSolver[int]):
     def _step(self, run: SolveRun, interval: Interval, state: int) -> tuple[Interval, int]:
         self.states_seen.append(state)
         x = interval.midpoint
-        return interval.replace(x, run.f(x)), state + 1
+        return interval.narrow_at(x, run.f(x)), state + 1
 
 
 def _linear(x: float) -> float:
@@ -77,7 +77,7 @@ def test_interrupted_loop_reports_the_last_bracket_midpoint():
 
     # --- assert -----------------------
     assert result.status is SolveStatus.MAX_FEVALS
-    assert result.n_iters == 2  # two completed steps: [0, 0.5], then [0.25, 0.5]
+    assert result.n_iters == 2  # two steps completed: the bracket became [0, 0.5], then [0.25, 0.5]
     assert result.x == 0.375
 
 
