@@ -1,8 +1,8 @@
-"""Formula registry: catalog discovery and reconstruction from an identity.
+"""Formula registry: the registered formulas, and reconstruction from an identity.
 
-Discovery is a bounded convention: the first registry call imports every
-module under the catalog package, and defining a `Formula` subclass registers
-it — adding a formula is adding a file, with no list to maintain anywhere.
+Defining a `Formula` subclass registers it; the registry reads that list and
+never imports anything, so the shipped formulas must be imported before the
+registry is first read, which the test-function package does on import.
 `FormulaRegistry.candidate_from_id` is the reconstruction seam: benchmark
 workers and users rebuild a test function from its identity, then attach the
 calibrated c-range a suite artifact supplies
@@ -10,12 +10,9 @@ calibrated c-range a suite artifact supplies
 default.
 """
 
-import importlib
 import inspect
-import pkgutil
 from typing import ClassVar
 
-from . import catalog
 from . import formula as formula_module
 from .exceptions import InvalidParamsError, UnknownFormulaError
 from .formula import Formula
@@ -27,13 +24,13 @@ from .test_function import CandidateTestFunction
 #  FormulaRegistry
 # ==================================================================================================
 class FormulaRegistry:
-    """The catalog's formulas: enumerate them, or rebuild one candidate from an identity.
+    """The registered formulas: enumerate them, or rebuild one candidate from an identity.
 
-    State is a lazily-populated class-level snapshot of the catalog, taken on
-    the first accessor call (`_ensure_registry_populated`). Defining formulas
-    after that snapshot is unsupported; a deliberate user-extension mechanism
-    (explicit registration, invalidation) can be added later without changing
-    this seam.
+    State is a lazily-populated class-level snapshot of the registered
+    formulas, taken on the first accessor call (`_ensure_registry_populated`).
+    Defining formulas after that snapshot is unsupported; a deliberate
+    user-extension mechanism (explicit registration, invalidation) can be added
+    later without changing this seam.
     """
 
     _formulas: ClassVar[tuple[Formula, ...] | None] = None
@@ -41,19 +38,13 @@ class FormulaRegistry:
 
     @classmethod
     def _ensure_registry_populated(cls) -> tuple[tuple[Formula, ...], dict[int, Formula]]:
-        """Populate the snapshot — catalog import, instantiation, validation, index — once.
+        """Populate the snapshot — instantiation, validation, index — once.
 
         Returns the snapshot (formulas, by-number index), so callers consume
-        the population result directly rather than re-reading the class fields.
+        the population result directly and never re-read the class fields.
         The fields are assigned only after every check has passed, so a
         validation failure leaves the registry unpopulated and re-raises on
-        every subsequent call rather than caching a half-built state.
-
-        Catalog import happens here, lazily, so importing the framework never
-        triggers catalog imports; by the time discovery runs, the package is
-        fully initialized and catalog modules can import framework names from
-        it without any import-order subtlety. Bounded to the catalog package
-        by construction.
+        every subsequent call instead of caching a half-built state.
 
         Raises:
             ValueError: If a registered formula has a non-positive number, or
@@ -61,8 +52,6 @@ class FormulaRegistry:
         """
         if cls._formulas is not None and cls._formulas_by_number is not None:
             return cls._formulas, cls._formulas_by_number
-        for module_info in pkgutil.walk_packages(catalog.__path__, prefix=f"{catalog.__name__}."):
-            importlib.import_module(module_info.name)
         # accessed via the module (not imported directly) so the registration list stays
         # a single swap-able seam — e.g. for isolation in downstream test suites
         instances = [
