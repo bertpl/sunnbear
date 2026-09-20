@@ -1,4 +1,4 @@
-"""`Solver` with its template method, and `BracketingSolver`, are the base classes that a solver subclasses.
+"""`Solver` with its template method, and `BracketingSolver`, are the solver base classes.
 
 Everything that makes a solve measurable lives in `Solver.solve` and the
 `WrappedFunction` it installs; a subclass writes only the algorithm.
