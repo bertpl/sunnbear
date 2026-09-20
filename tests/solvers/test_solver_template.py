@@ -4,24 +4,24 @@ import math
 
 import pytest
 
-from sunnbear.solvers import Solver, SolveRun, SolveStatus
+from sunnbear.solvers import Solver, SolverState, SolveStatus
 
 
 # ==================================================================================================
 #  Test-local solvers
 # ==================================================================================================
 class _RecordingSolver(Solver):
-    """`_RecordingSolver` keeps the run that it was handed, so tests can inspect what `Solver.solve` prepared."""
+    """`_RecordingSolver` keeps the state that it was handed, so tests can inspect what `Solver.solve` prepared."""
 
     name = "recording"
     version = 1
 
     def __init__(self) -> None:
-        self.runs: list[SolveRun] = []
+        self.states: list[SolverState] = []
 
-    def _solve(self, run: SolveRun) -> float:
-        self.runs.append(run)
-        return run.x_best
+    def _solve(self, state: SolverState) -> float:
+        self.states.append(state)
+        return state.x_best
 
 
 class _MidpointRepeatingSolver(Solver):
@@ -30,11 +30,11 @@ class _MidpointRepeatingSolver(Solver):
     name = "midpoint_repeater"
     version = 1
 
-    def _solve(self, run: SolveRun) -> float:
-        x = run.bracket.midpoint
+    def _solve(self, state: SolverState) -> float:
+        x = state.bracket.midpoint
         while True:
-            run.f(x)
-            run.mark_iteration()
+            state.f(x)
+            state.mark_iteration()
 
 
 class _OutOfBracketSolver(Solver):
@@ -43,8 +43,8 @@ class _OutOfBracketSolver(Solver):
     name = "out_of_bracket"
     version = 1
 
-    def _solve(self, run: SolveRun) -> float:
-        return run.f(run.bracket.b + 1e6 * run.bracket.width)
+    def _solve(self, state: SolverState) -> float:
+        return state.f(state.bracket.b + 1e6 * state.bracket.width)
 
 
 class _BuggySolver(Solver):
@@ -53,7 +53,7 @@ class _BuggySolver(Solver):
     name = "buggy"
     version = 1
 
-    def _solve(self, run: SolveRun) -> float:
+    def _solve(self, state: SolverState) -> float:
         raise RuntimeError("bug")
 
 
@@ -66,10 +66,10 @@ class _IterationCountingSolver(Solver):
     def __init__(self, n_iters: int) -> None:
         self.n_iters = n_iters
 
-    def _solve(self, run: SolveRun) -> float:
+    def _solve(self, state: SolverState) -> float:
         for _ in range(self.n_iters):
-            run.mark_iteration()
-        return run.x_best
+            state.mark_iteration()
+        return state.x_best
 
 
 def _increasing(x: float) -> float:
@@ -112,7 +112,7 @@ def test_endpoints_are_evaluated_and_counted_before_the_algorithm_runs():
     assert result.status is SolveStatus.CONVERGED
     assert result.n_iters is None  # The solver never marked an iteration.
     assert result.x == 0.5  # x_best starts at the bracket midpoint.
-    assert solver.runs[0].f.n_fevals == 2
+    assert solver.states[0].f.n_fevals == 2
 
 
 @pytest.mark.parametrize(
@@ -127,7 +127,7 @@ def test_exact_zero_endpoint_converges_without_running_the_algorithm(a, b, root)
 
     # --- assert -----------------------
     assert (result.x, result.status, result.n_fevals, result.n_iters) == (root, SolveStatus.CONVERGED, 2, None)
-    assert solver.runs == []
+    assert solver.states == []
 
 
 @pytest.mark.parametrize("f", [_increasing, _decreasing])
@@ -139,10 +139,10 @@ def test_run_is_sign_normalized(f):
     solver.solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10, record_history=True)
 
     # --- assert -----------------------
-    run = solver.runs[0]
-    assert run.bracket.fa < 0.0 < run.bracket.fb
-    assert (run.bracket.fa, run.bracket.fb) == (-0.25, 0.75)
-    assert run.f.history == [(0.0, -0.25), (1.0, 0.75)]  # The history sees the normalized function too.
+    state = solver.states[0]
+    assert state.bracket.fa < 0.0 < state.bracket.fb
+    assert (state.bracket.fa, state.bracket.fb) == (-0.25, 0.75)
+    assert state.f.history == [(0.0, -0.25), (1.0, 0.75)]  # The history sees the normalized function too.
 
 
 # ==================================================================================================

@@ -9,8 +9,8 @@ the pieces in this order::
       │ evaluates f(a), f(b); normalizes so that f(a) <= 0 <= f(b)
       │ opens the flop-counting context; a, b become CountedFloat
       ▼
-    Solver._solve(run: SolveRun)                           [subclass hook]
-      │   BracketingSolver implements it as a loop over _step(run, Interval, state)
+    Solver._solve(state: SolverState)                      [subclass hook]
+      │   BracketingSolver implements it as a loop over _step(state, Interval)
       │   with the stopping criterion owned by BracketingSolver
       ▼
     SolveResult
@@ -21,5 +21,5 @@ that raises anything else is recorded as ``SOLVER_ERROR``.
 
 from .interval import Interval
 from .result import SolveResult, SolveStatus
-from .run import SolveRun
 from .solver import BracketingSolver, Solver
+from .state import SolverState

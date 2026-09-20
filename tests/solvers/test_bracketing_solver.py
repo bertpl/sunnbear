@@ -1,42 +1,49 @@
-"""Two test-local bracketing solvers exercise the loop, stopping rule, and state threading of `BracketingSolver`."""
+"""Two test-local bracketing solvers exercise the loop, stopping rule, and state subclassing of `BracketingSolver`."""
 
 import math
+from dataclasses import dataclass
 
 import pytest
 
-from sunnbear.solvers import BracketingSolver, Interval, SolveRun, SolveStatus
+from sunnbear.solvers import BracketingSolver, Interval, SolverState, SolveStatus
 
 
 # ==================================================================================================
 #  Test-local solvers
 # ==================================================================================================
-class _HalvingSolver(BracketingSolver[None]):
-    """`_HalvingSolver` splits the bracket at its midpoint and carries no state."""
+class _HalvingSolver(BracketingSolver):
+    """`_HalvingSolver` splits the bracket at its midpoint and adds no state of its own."""
 
     name = "halving"
     version = 1
 
-    def _step(self, run: SolveRun, interval: Interval, state: None) -> tuple[Interval, None]:
+    def _step(self, state: SolverState, interval: Interval) -> Interval:
         x = interval.midpoint
-        return interval.split_at(x, run.f(x)), None
+        return interval.split_at(x, state.f(x))
 
 
-class _StepCountingSolver(BracketingSolver[int]):
-    """`_StepCountingSolver` halves like `_HalvingSolver` but counts its own steps in the threaded state."""
+@dataclass
+class _StepCountingState(SolverState):
+    """`_StepCountingState` adds the solver's own step count to the framework's state."""
+
+    n_steps: int = 0
+
+
+class _StepCountingSolver(BracketingSolver[_StepCountingState]):
+    """`_StepCountingSolver` halves like `_HalvingSolver` but counts its own steps in its state subclass."""
 
     name = "step_counting"
     version = 1
+    state_cls = _StepCountingState
 
     def __init__(self) -> None:
         self.states_seen: list[int] = []
 
-    def _initial_state(self, run: SolveRun, interval: Interval) -> int:
-        return 0
-
-    def _step(self, run: SolveRun, interval: Interval, state: int) -> tuple[Interval, int]:
-        self.states_seen.append(state)
+    def _step(self, state: _StepCountingState, interval: Interval) -> Interval:
+        self.states_seen.append(state.n_steps)
+        state.n_steps += 1
         x = interval.midpoint
-        return interval.split_at(x, run.f(x)), state + 1
+        return interval.split_at(x, state.f(x))
 
 
 def _linear(x: float) -> float:
@@ -82,14 +89,15 @@ def test_interrupted_loop_reports_the_last_bracket_midpoint():
 
 
 # ==================================================================================================
-#  State threading
+#  State subclassing
 # ==================================================================================================
-def test_state_is_threaded_from_the_initial_state_through_every_step():
+def test_a_solver_gets_a_fresh_instance_of_its_own_state_class_per_solve():
     # --- arrange ----------------------
     solver = _StepCountingSolver()
 
     # --- act --------------------------
-    result = solver.solve(_linear, 0.0, 1.0, xtol=1e-3, max_fevals=200)
+    first = solver.solve(_linear, 0.0, 1.0, xtol=1e-3, max_fevals=200)
+    second = solver.solve(_linear, 0.0, 1.0, xtol=1e-3, max_fevals=200)
 
     # --- assert -----------------------
-    assert solver.states_seen == list(range(result.n_iters))
+    assert solver.states_seen == list(range(first.n_iters)) + list(range(second.n_iters))
