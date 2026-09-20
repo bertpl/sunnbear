@@ -1,4 +1,4 @@
-"""Two test-local bracketing solvers exercise the loop, stopping rule, and state subclassing of `BracketingSolver`."""
+"""Two test-local bracketing solvers exercise the loop, stopping rule, and subclassing `SolverState` for `BracketingSolver`."""
 
 import math
 from dataclasses import dataclass
@@ -89,7 +89,7 @@ def test_interrupted_loop_reports_the_last_bracket_midpoint():
 
 
 # ==================================================================================================
-#  State subclassing
+#  Subclassing state
 # ==================================================================================================
 def test_a_solver_gets_a_fresh_instance_of_its_own_state_class_per_solve():
     # --- arrange ----------------------

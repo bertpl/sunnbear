@@ -9,6 +9,8 @@ from collections.abc import Callable
 from typing import ClassVar, Generic
 
 from counted_float import CountedFloat, FlopCountingContext
+
+# `typing.TypeVar` accepts `default=` only from Python 3.13; this project supports 3.11 and 3.12 too.
 from typing_extensions import TypeVar
 
 from .exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
@@ -17,7 +19,7 @@ from .result import SolveResult, SolveStatus
 from .state import SolverState
 from .wrapped_function import WrappedFunction
 
-# The state type a solver works with; a solver with fields of its own binds it to its `SolverState` subclass.
+# A solver with fields of its own binds StateT to its SolverState subclass; see `Solver.state_cls`.
 StateT = TypeVar("StateT", bound=SolverState, default=SolverState)
 
 
@@ -41,7 +43,7 @@ class Solver(ABC, Generic[StateT]):
             versions of one solver are never combined unknowingly.
         state_cls: The `SolverState` class that `solve` instantiates. A solver
             that carries values between iterations names its own subclass here
-            and binds ``StateT`` to it; a memoryless solver leaves both alone.
+            and binds ``StateT`` to it; a memoryless solver leaves ``state_cls`` and ``StateT`` at their defaults.
     """
 
     name: ClassVar[str]
@@ -111,7 +113,7 @@ class Solver(ABC, Generic[StateT]):
         """Run the algorithm and map how it ended to a root estimate and a status.
 
         The state is typed as the base class here because `state_cls` is declared as one; `_solve`
-        receives the subclass instance it was created as.
+        receives the instance of `state_cls` that `solve` created.
         """
         try:
             return self._solve(state), SolveStatus.CONVERGED  # type: ignore[arg-type]
