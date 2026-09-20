@@ -8,14 +8,14 @@ from .wrapped_function import WrappedFunction
 
 @dataclass
 class SolverState:
-    """A `SolverState` is the mutable state of one solve, created by `Solver.solve` and handed to the algorithm.
+    """A `SolverState` is the mutable state of one solve, created by `Solver.solve` and handed to `Solver._solve`.
 
-    The fields below are the framework's: `Solver.solve` fills them in and reads `n_iters` and
-    `x_best` back into the result. A solver that carries values between iterations subclasses
-    `SolverState`, adds its fields with defaults, and names the subclass in `Solver.state_cls`;
-    `Solver.solve` instantiates whichever class is named there, so the solver never constructs
-    a state itself. A solver instance holds no per-solve state of its own, which keeps it plain
-    configuration: reusable across solves and safe to share.
+    The fields below belong to `SolverState` itself, not to a solver's own subclass: `Solver.solve`
+    fills them in and reads `n_iters` and `x_best` back into the result.
+
+    A solver that carries values between iterations subclasses `SolverState`, adds its fields with
+    defaults, and names the subclass in `Solver.state_cls`; `Solver.solve` instantiates whichever
+    class is named there, so the solver never constructs a state itself.
 
     Attributes:
         f: The wrapped function to evaluate, sign-normalized by `Solver.solve`.
