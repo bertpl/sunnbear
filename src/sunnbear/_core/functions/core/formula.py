@@ -24,12 +24,10 @@ import numba
 from .identity import FunctionId
 from .param_values import DEDUP_DIGITS, ParamValue, deduplicate_param_tuples
 from .recipes import ParamRecipe
+from .registry import FormulaRegistry
 from .test_cases import FormulaTestCase
 from .test_function import CandidateTestFunction
 from .types import XCFun, XFun
-
-# All defined Formula subclasses, in definition order; the registry filters and instantiates.
-registered_formula_classes: list[type["Formula"]] = []
 
 
 # ==================================================================================================
@@ -60,9 +58,17 @@ class Formula(ABC):
     _compiled_formula_cache: ClassVar["Callable[..., float]"]
 
     def __init_subclass__(cls, **kwargs: object) -> None:
-        """Register every subclass; abstract intermediates are filtered out by the registry."""
+        """Register every concrete subclass with `FormulaRegistry`, so its checks run at class definition.
+
+        `inspect.isabstract` cannot decide concreteness here, because this hook runs before the ABC
+        machinery records the new class's abstract methods, so the hooks are checked one by one.
+        """
         super().__init_subclass__(**kwargs)
-        registered_formula_classes.append(cls)
+        is_concrete = not any(
+            getattr(getattr(cls, name), "__isabstractmethod__", False) for name in Formula.__abstractmethods__
+        )
+        if is_concrete:
+            FormulaRegistry.register(cls)
 
     # --------------------------------------------------------------------------
     #  Hooks implemented per formula
