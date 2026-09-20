@@ -91,7 +91,7 @@ def test_rejects_ill_ordered_bracket(a, b):
 
 @pytest.mark.parametrize(
     "f", [lambda x: x + 1.0, lambda x: -x - 1.0, _decreasing]
-)  # positive everywhere, negative everywhere, and the wrong way round
+)  # the first is positive everywhere, the second negative everywhere, the third has f(a) > 0 > f(b)
 def test_rejects_a_function_without_the_required_orientation(f):
     with pytest.raises(ValueError, match=r"f\(a\) < 0 < f\(b\) is required"):
         _RecordingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
@@ -130,7 +130,7 @@ def test_exact_zero_endpoint_converges_without_running_the_algorithm(a, b, root)
     assert solver.states == []
 
 
-def test_state_holds_the_evaluated_bracket_and_the_history_the_evaluations():
+def test_state_holds_the_evaluated_bracket_and_the_history_of_the_evaluations():
     # --- arrange ----------------------
     solver = _RecordingSolver()
 
