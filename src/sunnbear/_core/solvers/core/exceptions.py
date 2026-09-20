@@ -18,7 +18,7 @@ class MaxFevalsExceeded(SolveInterrupt):
 
 
 class DivergedError(SolveInterrupt):
-    """`WrappedFunction` raises this when a solver asks for an evaluation outside its guard interval."""
+    """`WrappedFunction` raises this when a solver asks for an evaluation outside its divergence bounds."""
 
 
 class FunctionDomainError(SolveInterrupt):

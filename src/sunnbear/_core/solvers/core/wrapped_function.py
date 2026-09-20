@@ -13,8 +13,8 @@ from counted_float import CountedFloat, PauseFlopCounting
 
 from .exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
 
-# The guard interval is the bracket widened on each side by this multiple of its width; an evaluation
-# requested outside the guard interval counts as divergence.
+# The divergence bounds are the bracket widened on each side by this multiple of its width; an evaluation
+# requested outside them counts as divergence.
 #
 # The factor balances two needs: generous enough to tolerate the overshoot of a legitimate step of a
 # non-bracketing solver, but finite enough to detect a divergent iterate within a few iterations. A
@@ -30,7 +30,7 @@ class WrappedFunction:
 
     - raises `MaxFevalsExceeded` when the call would exceed ``max_fevals``,
       before evaluating anything;
-    - raises `DivergedError` when ``x`` lies outside the guard interval;
+    - raises `DivergedError` when ``x`` lies outside the divergence bounds;
     - evaluates ``f`` with flop counting paused, so only the solver's own
       arithmetic is counted;
     - raises `FunctionDomainError` on a non-finite value;
@@ -41,7 +41,7 @@ class WrappedFunction:
 
     The evaluation count includes calls that ended in `FunctionDomainError`,
     since the function was evaluated; the count excludes calls refused by the
-    budget or the guard.
+    budget or the divergence bounds.
     """
 
     def __init__(
@@ -53,11 +53,10 @@ class WrappedFunction:
         max_fevals: int,
         record_history: bool,
     ) -> None:
-        """Wrap ``f`` for one solve; the guard interval is derived from ``[a, b]``."""
+        """Wrap ``f`` for one solve; the divergence bounds are derived from ``[a, b]``."""
         self._f = f
-        guard_width = DIVERGENCE_GUARD_WIDTH_FACTOR * (b - a)
-        self._guard_lo = a - guard_width
-        self._guard_hi = b + guard_width
+        self._divergence_lb = a - DIVERGENCE_GUARD_WIDTH_FACTOR * (b - a)
+        self._divergence_ub = b + DIVERGENCE_GUARD_WIDTH_FACTOR * (b - a)
         self._max_fevals = max_fevals
         self._is_sign_normalized = False
         self.n_fevals = 0
@@ -75,18 +74,18 @@ class WrappedFunction:
             self.history = [(x, -fx) for x, fx in self.history]
 
     def __call__(self, x: float) -> float:
-        """Evaluate ``f`` at ``x``: refuse it past the budget or outside the guard, reject a non-finite value, count it.
+        """Evaluate ``f`` at ``x``: refuse it past the budget or the divergence bounds, and reject a non-finite value.
 
         Returns:
             The value as a `CountedFloat`, negated when sign normalization is enabled.
         """
         if self.n_fevals >= self._max_fevals:
             raise MaxFevalsExceeded(f"Evaluation budget of {self._max_fevals} function evaluations exhausted.")
-        x_plain = float(x)  # The guards and f itself run on plain floats: uncounted, and numba-compatible.
-        if not self._guard_lo <= x_plain <= self._guard_hi:
+        x_plain = float(x)  # The checks and f itself run on plain floats: uncounted, and numba-compatible.
+        if not self._divergence_lb <= x_plain <= self._divergence_ub:
             raise DivergedError(
-                f"Evaluation requested at x={x_plain!r}, outside the guard interval "
-                f"[{self._guard_lo!r}, {self._guard_hi!r}]."
+                f"Evaluation requested at x={x_plain!r}, outside the divergence bounds "
+                f"[{self._divergence_lb!r}, {self._divergence_ub!r}]."
             )
         with PauseFlopCounting():
             fx = float(self._f(x_plain))

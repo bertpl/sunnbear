@@ -48,8 +48,8 @@ def test_budget_refuses_the_call_that_would_exceed_it():
 # ==================================================================================================
 @pytest.mark.parametrize(
     "x", [-DIVERGENCE_GUARD_WIDTH_FACTOR, 1.0 + DIVERGENCE_GUARD_WIDTH_FACTOR, 0.5]
-)  # the guard edges and a point inside
-def test_guard_interval_edges_are_inside(x):
+)  # both divergence bounds and a point inside
+def test_divergence_bounds_are_inside(x):
     # --- arrange ----------------------
     wf = _wrap(a=0.0, b=1.0)
 
@@ -61,7 +61,7 @@ def test_guard_interval_edges_are_inside(x):
 
 
 @pytest.mark.parametrize("x", [-DIVERGENCE_GUARD_WIDTH_FACTOR - 1e-9, 1.0 + DIVERGENCE_GUARD_WIDTH_FACTOR + 1e-9])
-def test_outside_the_guard_interval_is_divergence(x):
+def test_outside_the_divergence_bounds_is_divergence(x):
     # --- arrange ----------------------
     wf = _wrap(a=0.0, b=1.0)
 
