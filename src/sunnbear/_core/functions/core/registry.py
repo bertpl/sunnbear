@@ -1,8 +1,9 @@
-"""Formula registry: the registered formulas, and reconstruction from an identity.
+"""The formula registry holds the registered formulas and reconstructs one from an identity.
 
 Defining a `Formula` subclass registers it; the registry reads that list and
 never imports anything, so the shipped formulas must be imported before the
-registry is first read, which the test-function package does on import.
+registry is first read, and the test-function package imports them on import.
+
 `FormulaRegistry.candidate_from_id` is the reconstruction seam: benchmark
 workers and users rebuild a test function from its identity, then attach the
 calibrated c-range a suite artifact supplies
@@ -24,7 +25,7 @@ from .test_function import CandidateTestFunction
 #  FormulaRegistry
 # ==================================================================================================
 class FormulaRegistry:
-    """The registered formulas: enumerate them, or rebuild one candidate from an identity.
+    """`FormulaRegistry` enumerates the registered formulas, or rebuilds one candidate from an identity.
 
     State is a lazily-populated class-level snapshot of the registered
     formulas, taken on the first accessor call (`_ensure_registry_populated`).
