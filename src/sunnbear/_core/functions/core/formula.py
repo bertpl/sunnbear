@@ -211,7 +211,7 @@ class Formula(ABC):
         3. **Construction** (identities included), so the per-candidate work is
            paid only for survivors, each checked for the orientation
            ``f(a, 0) < 0 < f(b, 0)`` that `Solver.solve` requires of every
-           function it is given; the framework never normalizes the sign, so a
+           function it is given; `Solver.solve` never normalizes the sign, so a
            formula written the other way round is rejected here.
 
         Eager rather than lazy, and validating: a malformed formula fails here,
@@ -223,10 +223,12 @@ class Formula(ABC):
                 the same test function.
 
         Raises:
-            ValueError: If a recipe disagrees with `param_names`, if
-                `param_names` disagrees with `parametrized_fun`'s signature, if
-                no candidate survives `is_param_tuple_valid`, or if a candidate
-                does not satisfy ``f(a, 0) < 0 < f(b, 0)``.
+            ValueError: If any of the following holds:
+
+                - a recipe disagrees with `param_names`
+                - `param_names` disagrees with `parametrized_fun`'s signature
+                - no candidate survives `is_param_tuple_valid`
+                - a candidate does not satisfy ``f(a, 0) < 0 < f(b, 0)``
         """
         recipes = self.recipes()
         self._validate_recipes(recipes)
@@ -242,21 +244,21 @@ class Formula(ABC):
                 "rejected by is_param_tuple_valid. A formula that contributes nothing is a bug."
             )
         for candidate in candidates:
-            self._validate_orientation(candidate)
+            self._validate_endpoint_signs(candidate)
         return tuple(candidates)
 
     # --------------------------------------------------------------------------
     #  Validation
     # --------------------------------------------------------------------------
-    def _validate_orientation(self, candidate: CandidateTestFunction) -> None:
+    def _validate_endpoint_signs(self, candidate: CandidateTestFunction) -> None:
         """Check that ``f(a, 0) < 0 < f(b, 0)`` holds for the candidate.
 
         The check is made at ``c = 0``, before any c-range exists; c-range calibration later requires
-        the same orientation on the whole range. A root cannot cross an endpoint inside a valid
-        c-range, so the orientation at ``c = 0`` is the orientation everywhere.
+        the same orientation on the whole range. A root can never sit at the bracket endpoint ``a`` or
+        ``b`` for any c inside a valid c-range, so the orientation at ``c = 0`` holds throughout the range.
 
         Raises:
-            ValueError: If the candidate is not oriented, naming the formula so its author negates it.
+            ValueError: If the candidate is not oriented.
         """
         fa, fb = candidate.xc_fun(candidate.a, 0.0), candidate.xc_fun(candidate.b, 0.0)
         if not fa < 0.0 < fb:

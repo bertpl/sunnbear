@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `sunnbear.stats`: geometric pseudo-quantiles (`gpq`/`owg`) and exact mean pairwise L1 distance
 - Test-function framework: formulas with parameter recipes, stable function identities, and a file-drop formula catalog
 - `FormulaTestCase`: declare a formula's value / invalid-params / bracket test cases alongside its definition
-- Every formula candidate must satisfy `f(a, 0) < 0 < f(b, 0)`, the orientation the solver framework requires of every function it solves
+- Every formula candidate must satisfy `f(a, 0) < 0 < f(b, 0)`, the orientation that the solver framework requires of every function it solves
 
 ### Changed
 
