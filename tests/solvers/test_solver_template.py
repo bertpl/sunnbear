@@ -90,10 +90,10 @@ def test_rejects_ill_ordered_bracket(a, b):
 
 
 @pytest.mark.parametrize(
-    "f", [lambda x: x + 1.0, lambda x: -x - 1.0]
-)  # the first is positive everywhere, the second negative everywhere
-def test_rejects_same_sign_endpoints(f):
-    with pytest.raises(ValueError, match="differ in sign"):
+    "f", [lambda x: x + 1.0, lambda x: -x - 1.0, _decreasing]
+)  # positive everywhere, negative everywhere, and the wrong way round
+def test_rejects_a_function_without_the_required_orientation(f):
+    with pytest.raises(ValueError, match=r"f\(a\) < 0 < f\(b\) is required"):
         _RecordingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
 
 
@@ -130,19 +130,17 @@ def test_exact_zero_endpoint_converges_without_running_the_algorithm(a, b, root)
     assert solver.states == []
 
 
-@pytest.mark.parametrize("f", [_increasing, _decreasing])
-def test_run_is_sign_normalized(f):
+def test_state_holds_the_evaluated_bracket_and_the_history_the_evaluations():
     # --- arrange ----------------------
     solver = _RecordingSolver()
 
     # --- act --------------------------
-    solver.solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10, record_history=True)
+    solver.solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10, record_history=True)
 
     # --- assert -----------------------
     state = solver.states[0]
-    assert state.bracket.fa < 0.0 < state.bracket.fb
     assert (state.bracket.fa, state.bracket.fb) == (-0.25, 0.75)
-    assert state.f.history == [(0.0, -0.25), (1.0, 0.75)]  # The history sees the normalized function too.
+    assert state.f.history == [(0.0, -0.25), (1.0, 0.75)]
 
 
 # ==================================================================================================

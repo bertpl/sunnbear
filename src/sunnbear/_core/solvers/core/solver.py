@@ -67,12 +67,13 @@ class Solver(ABC, Generic[StateT]):
 
         - The endpoints are evaluated first; an endpoint that is exactly zero
           ends the solve as ``CONVERGED`` without running the algorithm.
-        - The sign is then normalized, so the algorithm is given ``f(a) <= 0 <= f(b)``.
+        - ``f(a) < 0 < f(b)`` is required of the caller, so every solver may rely on that orientation;
+          a function of the opposite orientation is passed as ``lambda x: -f(x)``.
         - Every abnormal ending becomes a `SolveStatus`, not an exception: one
           broken solver must not abort a batch of a million solves.
 
         Args:
-            f: The function; must be finite on ``[a, b]`` and change sign across it.
+            f: The function; must be finite on ``[a, b]`` with ``f(a) < 0 < f(b)``.
             a: Lower end of the bracket, which also sizes the divergence bounds.
             b: Upper end of the bracket, which also sizes the divergence bounds.
             xtol: Requested x-tolerance, ``|x_true - x| <= xtol``.
@@ -80,8 +81,8 @@ class Solver(ABC, Generic[StateT]):
             record_history: Whether to keep every ``(x, f(x))`` pair in the result.
 
         Raises:
-            ValueError: If ``a >= b`` or ``f(a)`` and ``f(b)`` have the same sign — a
-                caller error, not a solve outcome.
+            ValueError: If ``a >= b``, or ``f(a) < 0 < f(b)`` does not hold — a caller error, not a
+                solve outcome.
         """
         if not a < b:
             raise ValueError(f"Bracket must satisfy a < b (got a={a}, b={b}).")
@@ -91,12 +92,11 @@ class Solver(ABC, Generic[StateT]):
             if fa_plain == 0.0 or fb_plain == 0.0:
                 x, status, n_iters = (a if fa_plain == 0.0 else b), SolveStatus.CONVERGED, None
             else:
-                if fa_plain * fb_plain > 0.0:
-                    raise ValueError(f"f(a) and f(b) must differ in sign (got f({a})={fa_plain}, f({b})={fb_plain}).")
-                # f(a) > 0, so negate both endpoints to give the algorithm f(a) <= 0 <= f(b).
-                if fa_plain > 0.0:
-                    wrapped_f.enable_sign_normalization()
-                    fa_plain, fb_plain = -fa_plain, -fb_plain
+                if not fa_plain < 0.0 < fb_plain:
+                    raise ValueError(
+                        f"f(a) < 0 < f(b) is required (got f({a})={fa_plain}, f({b})={fb_plain}); "
+                        "pass lambda x: -f(x) for a function of the opposite orientation."
+                    )
                 bracket = Interval(CountedFloat(a), CountedFloat(b), CountedFloat(fa_plain), CountedFloat(fb_plain))
                 state = self.state_cls(f=wrapped_f, bracket=bracket, xtol=xtol, x_best=_plain_midpoint(a, b))
                 x, status = self._run_catching_exceptions(state)
