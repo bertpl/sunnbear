@@ -17,8 +17,10 @@ from .exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
 # requested outside the guard interval counts as divergence.
 #
 # The factor balances two needs: generous enough to tolerate the overshoot of a legitimate step of a
-# non-bracketing solver, but tight enough to detect a divergent iterate within an iteration or two.
-DIVERGENCE_GUARD_WIDTH_FACTOR = 10.0
+# non-bracketing solver, but finite enough to detect a divergent iterate within a few iterations. A
+# non-bracketing solver may legitimately step far outside the bracket and return, so the factor errs
+# toward tolerance.
+DIVERGENCE_GUARD_WIDTH_FACTOR = 1e3
 
 
 class WrappedFunction:
