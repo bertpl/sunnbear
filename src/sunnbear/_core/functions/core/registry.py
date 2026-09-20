@@ -1,8 +1,9 @@
 """The formula registry holds the registered formulas and reconstructs one from an identity.
 
-Defining a `Formula` subclass registers it; the registry reads that list and
-never imports anything, so the shipped formulas must be imported before the
-registry is first read, and the test-function package imports them on import.
+Defining a `Formula` subclass registers it; the registry reads the list of
+registered formula classes and never imports anything, so the shipped formulas
+must be imported before the registry is first read, and the test-function
+package imports those modules when it is imported.
 
 `FormulaRegistry.candidate_from_id` is the reconstruction seam: benchmark
 workers and users rebuild a test function from its identity, then attach the

@@ -24,7 +24,7 @@ rebuilding the `CandidateTestFunction` that a suite's c-range then calibrates.
 
 This package imports nothing from the packages beside it: the shipped formulas in
 `catalog` register themselves when their modules are imported, and the parent
-package imports them.
+package imports those modules.
 
 Ownership summary:
 

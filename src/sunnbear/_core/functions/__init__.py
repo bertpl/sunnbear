@@ -1,7 +1,7 @@
 """This package holds the test-function layer: the framework in `core`, the shipped formulas in `catalog`.
 
-Importing this package imports the catalog, so every shipped formula is registered before the
-registry is first read.
+Importing this package imports the catalog, so every shipped formula is registered before
+`FormulaRegistry` (in `core`) is first read.
 """
 
 from . import catalog
