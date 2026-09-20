@@ -163,7 +163,7 @@ class BracketingSolver(Solver, Generic[StateT]):
         """Perform one iteration: return a strictly narrower bracket and the state for the next step.
 
         Evaluate the function only through ``run.f``, and derive the new bracket
-        with `Interval.narrowed_at`, so the sign-change invariant is kept.
+        with `Interval.split_at`, so the sign-change invariant is kept.
         """
 
 
