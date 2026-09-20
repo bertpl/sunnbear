@@ -61,7 +61,7 @@ class Formula(ABC):
         """Register every concrete subclass with `FormulaRegistry`, so its checks run at class definition.
 
         `inspect.isabstract` cannot decide concreteness here, because this hook runs before the ABC
-        machinery records the new class's abstract methods, so the hooks are checked one by one.
+        machinery records the new class's abstract methods.
         """
         super().__init_subclass__(**kwargs)
         is_concrete = not any(

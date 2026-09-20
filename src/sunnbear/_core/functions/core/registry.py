@@ -2,7 +2,9 @@
 
 Defining a concrete `Formula` subclass registers one instance of it here, and every check runs at
 that moment, so a malformed formula fails when its module is imported, never inside a benchmark
-worker. The registry itself imports nothing: the shipped formulas are registered when the
+worker.
+
+The registry itself imports nothing: the shipped formulas are registered when the
 test-function package imports the formula catalog.
 
 `FormulaRegistry.candidate_from_id` is the reconstruction seam: benchmark
@@ -18,7 +20,7 @@ from .exceptions import InvalidParamsError, UnknownFormulaError
 from .identity import FunctionId
 from .test_function import CandidateTestFunction
 
-if TYPE_CHECKING:  # type-only: formula imports this module at runtime, so the edge cannot be mutual
+if TYPE_CHECKING:  # type-only: formula imports this module at runtime, so a runtime import here would be circular
     from .formula import Formula
 
 
@@ -49,8 +51,8 @@ class FormulaRegistry:
         if formula.number <= 0:
             raise ValueError(f"Formula number must be > 0 (got {formula.number} for {formula_cls.__name__}).")
         if formula.number in cls._formulas_by_number:
-            other = type(cls._formulas_by_number[formula.number]).__name__
-            raise ValueError(f"Duplicate formula number {formula.number}: {formula_cls.__name__} and {other}.")
+            existing_name = type(cls._formulas_by_number[formula.number]).__name__
+            raise ValueError(f"Duplicate formula number {formula.number}: {formula_cls.__name__} and {existing_name}.")
         cls._formulas_by_number[formula.number] = formula
 
     @classmethod

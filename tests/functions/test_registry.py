@@ -15,7 +15,7 @@ from sunnbear.functions import (
 
 @pytest.fixture
 def isolated_registry(monkeypatch):
-    """Give the test its own copy of the registry, so test-defined Formula subclasses don't leak past it."""
+    """Give the test its own copy of the registry, so test-defined Formula subclasses don't leak past the test."""
     monkeypatch.setattr(FormulaRegistry, "_formulas_by_number", dict(FormulaRegistry._formulas_by_number))
 
 
@@ -158,7 +158,7 @@ def test_registry_holds_one_instance_per_formula():
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_formulas_defined_after_first_use_are_registered():
-    """Registration happens at class definition, so a formula defined after a read is in the next read."""
+    """A formula defined after a call to `formulas()` appears in the next call: registration is at class definition."""
     # --- arrange ----------------------
     FormulaRegistry.formulas()
 
