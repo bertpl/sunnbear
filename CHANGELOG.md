@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test-function framework: formulas with parameter recipes, stable function identities, and a file-drop formula catalog
 - `FormulaTestCase`: declare a formula's value / invalid-params / interval test cases alongside its definition
 - Solver framework: every solver's function evaluations run through one wrapper that applies an evaluation budget, catches failed evaluations, and excludes the function's own cost from flop counting
-- Brackets of either orientation: `IncreasingInterval` (`f` negative at `a`, positive at `b`) and `DecreasingInterval` (the reverse), picked by `Interval.from_endpoints`
+- `Solver`/`BracketingSolver`: the base classes that a root solver subclasses to become benchmarkable
 
 ### Changed
 
