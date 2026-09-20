@@ -18,9 +18,9 @@ class SolveStatus(Enum):
     """
 
     CONVERGED = "converged"
-    MAX_FEVALS = "max_fevals"  # from MaxFevalsExceeded
-    DIVERGED = "diverged"  # from DivergedError
-    FUNCTION_ERROR = "function_error"  # from FunctionDomainError
+    MAX_FEVALS = "max_fevals"
+    DIVERGED = "diverged"
+    FUNCTION_ERROR = "function_error"
     SOLVER_ERROR = "solver_error"  # the solver raised — a bug in the solver, recorded, not propagated
 
 
@@ -31,8 +31,8 @@ class SolveStatus(Enum):
 class SolveResult:
     """A `SolveResult` records what one solve did, as measured by `Solver.solve`.
 
-    The record is closed: every field is common to all solvers, so the
-    benchmark aggregation can read every result whole. A solver with
+    The record's schema is fixed: every field is common to all solvers, so the
+    benchmark aggregation reads every result without solver-specific handling. A solver with
     diagnostics of its own logs them; it cannot attach them here.
 
     Attributes:

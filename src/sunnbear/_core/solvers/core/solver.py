@@ -62,8 +62,8 @@ class Solver(ABC):
 
         Args:
             f: The function; must be finite on ``[a, b]`` and change sign across it.
-            a: Lower end of the bracket, which also sizes the divergence guard.
-            b: Upper end of the bracket, which also sizes the divergence guard.
+            a: Lower end of the bracket, which also sizes the guard interval.
+            b: Upper end of the bracket, which also sizes the guard interval.
             xtol: Requested x-tolerance, ``|x_true - x| <= xtol``.
             max_fevals: Function-evaluation budget, the two endpoint evaluations included.
             record_history: Whether to keep every ``(x, f(x))`` pair in the result.
@@ -127,16 +127,16 @@ class Solver(ABC):
 # ==================================================================================================
 #  BracketingSolver
 # ==================================================================================================
-S = TypeVar("S")
+StateT = TypeVar("StateT")
 
 
-class BracketingSolver(Solver, Generic[S]):
+class BracketingSolver(Solver, Generic[StateT]):
     """`BracketingSolver` is the base class for interval-reducing solvers; a subclass implements one `_step`.
 
-    The base class implements the loop and the stopping rule (`Interval.is_converged`), so
+    The base class implements the loop and the stopping criterion (`Interval.is_converged`), so
     a subclass cannot define a wrong one; one `_step` is one iteration. A
-    solver that carries state between steps declares its type as ``S`` and
-    passes it to each `_step` call; memoryless solvers use ``S = None``.
+    solver that carries state between steps declares its type as ``StateT`` and
+    passes it to each `_step` call; memoryless solvers use ``StateT = None``.
     """
 
     def _solve(self, run: SolveRun) -> float:
@@ -151,15 +151,15 @@ class BracketingSolver(Solver, Generic[S]):
             run.x_best = _plain_midpoint(float(interval.a), float(interval.b))
         return interval.root()
 
-    def _initial_state(self, run: SolveRun, interval: Interval) -> S:
+    def _initial_state(self, run: SolveRun, interval: Interval) -> StateT:
         """Return the state passed to the first `_step`; ``None`` by default, for memoryless solvers.
 
-        The cast lets one default serve every ``S``.
+        The cast lets one default serve every ``StateT``.
         """
-        return cast("S", None)
+        return cast("StateT", None)
 
     @abstractmethod
-    def _step(self, run: SolveRun, interval: Interval, state: S) -> tuple[Interval, S]:
+    def _step(self, run: SolveRun, interval: Interval, state: StateT) -> tuple[Interval, StateT]:
         """Perform one iteration: return a strictly narrower bracket and the state for the next step.
 
         Evaluate the function only through ``run.f``, and derive the new bracket

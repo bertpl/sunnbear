@@ -11,7 +11,7 @@ the pieces in this order::
       ▼
     Solver._solve(run: SolveRun)                           [subclass hook]
       │   BracketingSolver implements it as a loop over _step(run, Interval, state)
-      │   with the stopping criteria owned by BracketingSolver
+      │   with the stopping criterion owned by BracketingSolver
       ▼
     SolveResult
 
