@@ -1,6 +1,6 @@
 import pytest
 
-import sunnbear._core.functions.formula as formula_module
+import sunnbear._core.functions.core.formula as formula_module
 from sunnbear._core.functions.catalog.f1xx_polynomials.f101_cubic import F101_Cubic
 from sunnbear._core.functions.catalog.f1xx_polynomials.f102_odd_power import F102_OddPower
 from sunnbear.exceptions import InvalidParamsError, UnknownFormulaError

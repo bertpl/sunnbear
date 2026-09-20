@@ -4,7 +4,7 @@ import math
 
 import pytest
 
-from sunnbear._core.functions.test_cases import BracketTestCase, InvalidTestCase, ValueTestCase
+from sunnbear._core.functions.core.test_cases import BracketTestCase, InvalidTestCase, ValueTestCase
 from sunnbear.functions import FormulaRegistry
 
 # every (formula, case) pair, with a stable unique id: formula number + case kind + within-formula index

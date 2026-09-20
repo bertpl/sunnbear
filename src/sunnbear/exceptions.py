@@ -4,7 +4,7 @@ All derive from `SunnbearError`; each is defined in the layer that raises it and
 """
 
 from sunnbear._core.exceptions import SunnbearError
-from sunnbear._core.functions.exceptions import InvalidParamsError, UnknownFormulaError
+from sunnbear._core.functions.core.exceptions import InvalidParamsError, UnknownFormulaError
 from sunnbear._core.solvers.core.exceptions import (
     DivergedError,
     FunctionDomainError,

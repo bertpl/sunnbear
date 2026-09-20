@@ -1,6 +1,6 @@
 """f102 — odd power ``x^p1 - c``: a difficulty knob."""
 
-from sunnbear.functions import Formula, FormulaTestCase, ParamRecipe
+from sunnbear._core.functions.core import Formula, FormulaTestCase, ParamRecipe
 
 
 class F102_OddPower(Formula):

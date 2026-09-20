@@ -1,6 +1,7 @@
 """This module re-exports the test-function framework: formulas, recipes, identities, and the registry.
 
-How the pieces tie together is described in the docstring of the implementation package, `sunnbear._core.functions`.
+How the pieces tie together is described in the docstring of the implementation package,
+`sunnbear._core.functions.core`.
 """
 
 from sunnbear._core.functions import (
