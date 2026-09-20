@@ -39,7 +39,7 @@ class SolveResult:
         x: Root estimate. On an abnormal status, the best estimate so far (for
             a bracketing solver, the last bracket's midpoint).
         status: How the solve ended; see `SolveStatus`.
-        n_fevals: Function evaluations performed, the two endpoint evaluations
+        n_fevals: Function evaluations performed, the 2 endpoint evaluations
             included.
         n_iters: Iterations performed, or ``None`` for solvers to which the
             notion does not apply.

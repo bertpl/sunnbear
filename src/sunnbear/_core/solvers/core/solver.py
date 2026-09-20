@@ -73,10 +73,10 @@ class Solver(ABC, Generic[StateT]):
 
         Args:
             f: The function; must be finite on ``[a, b]`` and change sign across it.
-            a: Lower end of the bracket, which also sizes the guard interval.
-            b: Upper end of the bracket, which also sizes the guard interval.
+            a: Lower end of the bracket, which also sizes the divergence bounds.
+            b: Upper end of the bracket, which also sizes the divergence bounds.
             xtol: Requested x-tolerance, ``|x_true - x| <= xtol``.
-            max_fevals: Function-evaluation budget, the two endpoint evaluations included.
+            max_fevals: Function-evaluation budget, the 2 endpoint evaluations included.
             record_history: Whether to keep every ``(x, f(x))`` pair in the result.
 
         Raises:
@@ -93,6 +93,7 @@ class Solver(ABC, Generic[StateT]):
             else:
                 if fa_plain * fb_plain > 0.0:
                     raise ValueError(f"f(a) and f(b) must differ in sign (got f({a})={fa_plain}, f({b})={fb_plain}).")
+                # f(a) > 0, so negate both endpoints to give the algorithm f(a) <= 0 <= f(b).
                 if fa_plain > 0.0:
                     wrapped_f.enable_sign_normalization()
                     fa_plain, fb_plain = -fa_plain, -fb_plain

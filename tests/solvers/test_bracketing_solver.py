@@ -1,4 +1,4 @@
-"""Two test-local bracketing solvers exercise the loop, stopping rule, and subclassing `SolverState` for `BracketingSolver`."""
+"""2 test-local bracketing solvers exercise the loop, the stopping rule, and subclassing `SolverState`."""
 
 import math
 from dataclasses import dataclass
@@ -37,10 +37,10 @@ class _StepCountingSolver(BracketingSolver[_StepCountingState]):
     state_cls = _StepCountingState
 
     def __init__(self) -> None:
-        self.states_seen: list[int] = []
+        self.n_steps_seen: list[int] = []
 
     def _step(self, state: _StepCountingState, interval: Interval) -> Interval:
-        self.states_seen.append(state.n_steps)
+        self.n_steps_seen.append(state.n_steps)
         state.n_steps += 1
         x = interval.midpoint
         return interval.split_at(x, state.f(x))
@@ -84,7 +84,7 @@ def test_interrupted_loop_reports_the_last_bracket_midpoint():
 
     # --- assert -----------------------
     assert result.status is SolveStatus.MAX_FEVALS
-    assert result.n_iters == 2  # two steps completed: the bracket became [0, 0.5], then [0.25, 0.5]
+    assert result.n_iters == 2  # 2 steps completed: the bracket became [0, 0.5], then [0.25, 0.5]
     assert result.x == 0.375
 
 
@@ -100,4 +100,4 @@ def test_a_solver_gets_a_fresh_instance_of_its_own_state_class_per_solve():
     second = solver.solve(_linear, 0.0, 1.0, xtol=1e-3, max_fevals=200)
 
     # --- assert -----------------------
-    assert solver.states_seen == list(range(first.n_iters)) + list(range(second.n_iters))
+    assert solver.n_steps_seen == list(range(first.n_iters)) + list(range(second.n_iters))

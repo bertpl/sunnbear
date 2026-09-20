@@ -1,4 +1,4 @@
-"""This module re-exports the solver base classes and the types in `Solver.solve`'s signature.
+"""This module re-exports the solver base classes and the types that a solver subclass works with.
 
 How a solve runs is described in the docstring of the implementation package, `sunnbear._core.solvers.core`.
 `WrappedFunction` is deliberately absent: a solver receives one inside its `SolverState` and never constructs one.
