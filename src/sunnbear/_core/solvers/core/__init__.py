@@ -1,32 +1,26 @@
-"""This package implements the framework and fundamental building blocks used to implement solvers for benchmarking.
+"""This package holds the base classes that make any root solver benchmarkable.
 
-A solver receives a plain ``f(x) -> float`` and a bracket ``[a, b]``; it knows nothing of test
-functions or the benchmark that drives the solver.
+A solver receives a plain ``f(x) -> float`` and a bracket ``[a, b]``; it knows
+nothing of test functions or the benchmark that drives it. One call to ``solve`` runs
+the pieces in this order::
 
-`WrappedFunction` is a solver's only way to evaluate ``f``. Each call:
+    Solver.solve(f, a, b, xtol=..., max_fevals=...)       [template method]
+      │ wraps f in a WrappedFunction, which runs the per-evaluation checks documented on that class
+      │ evaluates f(a), f(b); normalizes so that f(a) <= 0 <= f(b)
+      │ opens the flop-counting context; a, b become CountedFloat
+      ▼
+    Solver._solve(run: SolveRun)                           [subclass hook]
+      │   BracketingSolver implements it as a loop over _step(run, Interval, state)
+      │   with the stopping criteria owned by the base
+      ▼
+    SolveResult
 
-- performs checks and raises a `SolveException` subclass accordingly:
-  - `MaxFevalsExceeded` when the call would exceed the evaluation budget;
-  - `DivergedError` when ``x`` is not finite;
-  - `FunctionDomainError` when ``f`` raises or returns a non-finite value;
-- shields the evaluation of ``f`` from flop counting (the counted-float package), so only the
-  solver's own arithmetic is counted;
-- records the evaluation when history recording is on.
-
-`Interval` is a bracketing solver's bracket; its subclasses `IncreasingInterval` and
-`DecreasingInterval` are the 2 orientations. `SolverState` is the mutable state of one solve, which
-a solver extends with its own fields.
-
-Two facts hold throughout this package:
-
-- **Orientation.** The framework supports both orientations: the bracket's class says which one a
-  bracket has. The benchmark's own function portfolio is entirely increasing, ``f(a) < 0 < f(b)``,
-  so a solver may support only that case, and how it treats a decreasing bracket is its author's
-  choice.
-- **Flop counting.** `Solver.solve` converts ``a``, ``b``, ``f(a)`` and ``f(b)`` to `CountedFloat`
-  before handing them to the solver, so the solver's arithmetic on them is counted; `WrappedFunction`
-  pauses counting while ``f`` itself runs.
+An abnormal ending is a `SolveInterrupt` exception, raised by the wrapper and
+mapped to a `SolveStatus` by `Solver.solve`; a solver that raises anything else
+is recorded as ``SOLVER_ERROR``.
 """
 
-from .interval import DecreasingInterval, IncreasingInterval, Interval
-from .state import SolverState
+from .interval import Interval
+from .result import SolveResult, SolveStatus
+from .run import SolveRun
+from .solver import BracketingSolver, Solver
