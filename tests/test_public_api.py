@@ -3,8 +3,8 @@
 import pytest
 
 import sunnbear._core.exceptions
-import sunnbear._core.functions
-import sunnbear._core.functions.exceptions
+import sunnbear._core.functions.core
+import sunnbear._core.functions.core.exceptions
 import sunnbear._core.stats
 import sunnbear.exceptions
 import sunnbear.functions
@@ -29,8 +29,14 @@ def _is_submodule(module, name: str) -> bool:
     "public_module, implementation_modules",
     [
         (sunnbear.stats, (sunnbear._core.stats,)),
-        (sunnbear.functions, (sunnbear._core.functions,)),
-        (sunnbear.exceptions, (sunnbear._core.exceptions, sunnbear._core.functions.exceptions)),
+        (sunnbear.functions, (sunnbear._core.functions.core,)),
+        (
+            sunnbear.exceptions,
+            (
+                sunnbear._core.exceptions,
+                sunnbear._core.functions.core.exceptions,
+            ),
+        ),
     ],
 )
 def test_public_module_re_exports_every_public_name(public_module, implementation_modules):

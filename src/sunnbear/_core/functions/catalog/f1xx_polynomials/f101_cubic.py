@@ -1,6 +1,6 @@
 """f101 — cubic ``x^3 - p1*x - c``."""
 
-from sunnbear.functions import Formula, FormulaTestCase, ParamRecipe
+from sunnbear._core.functions.core import Formula, FormulaTestCase, ParamRecipe
 
 
 class F101_Cubic(Formula):

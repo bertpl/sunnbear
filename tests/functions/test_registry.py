@@ -1,6 +1,5 @@
 import pytest
 
-import sunnbear._core.functions.formula as formula_module
 from sunnbear._core.functions.catalog.f1xx_polynomials.f101_cubic import F101_Cubic
 from sunnbear._core.functions.catalog.f1xx_polynomials.f102_odd_power import F102_OddPower
 from sunnbear.exceptions import InvalidParamsError, UnknownFormulaError
@@ -16,15 +15,8 @@ from sunnbear.functions import (
 
 @pytest.fixture
 def isolated_registry(monkeypatch):
-    """Snapshot the auto-registration list and reset the registry's populated state.
-
-    Test-defined Formula subclasses don't leak past the test, and each test sees a
-    fresh population (so its own subclasses are discovered despite the snapshot
-    semantics of `FormulaRegistry._ensure_registry_populated`).
-    """
-    monkeypatch.setattr(formula_module, "registered_formula_classes", list(formula_module.registered_formula_classes))
-    monkeypatch.setattr(FormulaRegistry, "_formulas", None)
-    monkeypatch.setattr(FormulaRegistry, "_formulas_by_number", None)
+    """Give the test its own copy of the registry, so test-defined Formula subclasses don't leak past the test."""
+    monkeypatch.setattr(FormulaRegistry, "_formulas_by_number", dict(FormulaRegistry._formulas_by_number))
 
 
 # ==================================================================================================
@@ -125,38 +117,20 @@ def test_subclass_definition_registers():
 
 
 @pytest.mark.usefixtures("isolated_registry")
-def test_formulas_rejects_duplicate_numbers():
+def test_defining_a_duplicate_number_is_rejected_at_class_definition():
     # --- arrange ----------------------
-    _minimal_formula_cls(997)
     _minimal_formula_cls(997)
 
     # --- act / assert -----------------
-    with pytest.raises(ValueError):
-        FormulaRegistry.formulas()
+    with pytest.raises(ValueError, match="Duplicate formula number 997"):
+        _minimal_formula_cls(997)
 
 
 @pytest.mark.usefixtures("isolated_registry")
-def test_formulas_rejects_non_positive_number():
-    # --- arrange ----------------------
-    _minimal_formula_cls(0)
-
+def test_defining_a_non_positive_number_is_rejected_at_class_definition():
     # --- act / assert -----------------
-    with pytest.raises(ValueError):
-        FormulaRegistry.formulas()
-
-
-@pytest.mark.usefixtures("isolated_registry")
-def test_failed_population_is_not_cached():
-    """A validation failure leaves the registry unpopulated, so it re-raises on every call."""
-    # --- arrange ----------------------
-    _minimal_formula_cls(993)
-    _minimal_formula_cls(993)  # duplicate number: population must fail
-
-    # --- act / assert -----------------
-    with pytest.raises(ValueError, match="Duplicate formula numbers"):
-        FormulaRegistry.formulas()
-    with pytest.raises(ValueError, match="Duplicate formula numbers"):
-        FormulaRegistry.formulas()  # not silently cached as half-built state
+    with pytest.raises(ValueError, match="must be > 0"):
+        _minimal_formula_cls(0)
 
 
 @pytest.mark.usefixtures("isolated_registry")
@@ -171,33 +145,32 @@ def test_zero_param_formula_yields_exactly_one_candidate():
     assert str(candidates[0].id) == "f992"
 
 
-def test_registry_population_is_a_snapshot():
-    """Accessors reuse one population: same tuple, and reconstruction hands out the same instances."""
+def test_registry_holds_one_instance_per_formula():
+    """Enumeration and reconstruction hand out the same registered instance."""
     # --- act --------------------------
-    first, second = FormulaRegistry.formulas(), FormulaRegistry.formulas()
+    [enumerated] = [f for f in FormulaRegistry.formulas() if type(f) is F101_Cubic]
     candidate_a = FormulaRegistry.candidate_from_id("f101-0.2")
     candidate_b = FormulaRegistry.candidate_from_id("f101-0.4")
 
     # --- assert -----------------------
-    assert first is second
-    assert candidate_a.formula is candidate_b.formula  # dict hit, not a fresh enumeration
+    assert candidate_a.formula is candidate_b.formula is enumerated
 
 
 @pytest.mark.usefixtures("isolated_registry")
-def test_formulas_defined_after_first_use_are_not_discovered():
-    """The snapshot is taken on first accessor call; late definitions are deliberately unsupported."""
+def test_formulas_defined_after_first_use_are_registered():
+    """A formula defined after a call to `formulas()` appears in the next call: registration is at class definition."""
     # --- arrange ----------------------
-    FormulaRegistry.formulas()  # take the snapshot
+    FormulaRegistry.formulas()
 
     # --- act --------------------------
     cls = _minimal_formula_cls(994)
 
     # --- assert -----------------------
-    assert all(type(f) is not cls for f in FormulaRegistry.formulas())
+    assert any(type(f) is cls for f in FormulaRegistry.formulas())
 
 
 @pytest.mark.usefixtures("isolated_registry")
-def test_abstract_intermediates_are_not_instantiated():
+def test_abstract_intermediates_are_not_registered():
     # --- arrange ----------------------
     class PolynomialBase(Formula):
         """Abstract intermediate: adds no hooks, implements none."""
