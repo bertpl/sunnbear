@@ -1,4 +1,4 @@
-"""`Interval` is the bracketing state that a `BracketingSolver` reduces step by step."""
+"""`Interval` is a `BracketingSolver`'s bracket, reduced step by step."""
 
 from dataclasses import dataclass
 

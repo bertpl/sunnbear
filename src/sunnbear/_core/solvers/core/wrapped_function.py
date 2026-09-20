@@ -1,4 +1,4 @@
-"""`WrappedFunction` is the callable that a solver evaluates ``f`` through.
+"""`WrappedFunction` wraps ``f`` for one solve; every evaluation goes through it.
 
 Each call runs the checks documented on the class, in order.
 
@@ -22,7 +22,7 @@ DIVERGENCE_GUARD_WIDTH_FACTOR = 10.0
 
 
 class WrappedFunction:
-    """A `WrappedFunction` is the callable that a solver evaluates ``f`` through; each call runs the checks below.
+    """A `WrappedFunction` wraps ``f`` for one solve; each call runs the checks below.
 
     A call:
 
