@@ -45,8 +45,8 @@ class SolveResult:
             notion does not apply.
         flop_counts: Floating-point operations of the solver's own arithmetic,
             per flop type; function-body cost is excluded.
-        history: Every ``(x, f(x))`` evaluated, in order, after sign
-            normalization; ``None`` when history was not recorded.
+        history: Every ``(x, f(x))`` evaluated, in order; ``None`` when history
+            was not recorded.
     """
 
     x: float
