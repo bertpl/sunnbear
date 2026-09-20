@@ -2704,7 +2704,6 @@ dependencies = [
     { name = "numba" },
     { name = "numpy" },
     { name = "snuffled" },
-    { name = "typing-extensions" },
 ]
 
 [package.dev-dependencies]
@@ -2738,7 +2737,6 @@ requires-dist = [
     { name = "numpy", marker = "python_full_version == '3.13.*'", specifier = ">=2.1.0" },
     { name = "numpy", marker = "python_full_version >= '3.14'", specifier = ">=2.3.2" },
     { name = "snuffled", specifier = ">=0.1.6" },
-    { name = "typing-extensions", specifier = ">=4.4" },
 ]
 
 [package.metadata.requires-dev]
