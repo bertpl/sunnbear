@@ -5,9 +5,12 @@ import pytest
 import sunnbear._core.exceptions
 import sunnbear._core.functions
 import sunnbear._core.functions.exceptions
+import sunnbear._core.solvers.core
+import sunnbear._core.solvers.core.exceptions
 import sunnbear._core.stats
 import sunnbear.exceptions
 import sunnbear.functions
+import sunnbear.solvers
 import sunnbear.stats
 
 
@@ -30,7 +33,11 @@ def _is_submodule(module, name: str) -> bool:
     [
         (sunnbear.stats, (sunnbear._core.stats,)),
         (sunnbear.functions, (sunnbear._core.functions,)),
-        (sunnbear.exceptions, (sunnbear._core.exceptions, sunnbear._core.functions.exceptions)),
+        (sunnbear.solvers, (sunnbear._core.solvers.core,)),
+        (
+            sunnbear.exceptions,
+            (sunnbear._core.exceptions, sunnbear._core.functions.exceptions, sunnbear._core.solvers.core.exceptions),
+        ),
     ],
 )
 def test_public_module_re_exports_every_public_name(public_module, implementation_modules):
