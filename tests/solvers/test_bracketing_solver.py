@@ -18,7 +18,7 @@ class _HalvingSolver(BracketingSolver[None]):
 
     def _step(self, run: SolveRun, interval: Interval, state: None) -> tuple[Interval, None]:
         x = interval.midpoint
-        return interval.narrow_at(x, run.f(x)), None
+        return interval.narrowed_at(x, run.f(x)), None
 
 
 class _StepCountingSolver(BracketingSolver[int]):
@@ -36,7 +36,7 @@ class _StepCountingSolver(BracketingSolver[int]):
     def _step(self, run: SolveRun, interval: Interval, state: int) -> tuple[Interval, int]:
         self.states_seen.append(state)
         x = interval.midpoint
-        return interval.narrow_at(x, run.f(x)), state + 1
+        return interval.narrowed_at(x, run.f(x)), state + 1
 
 
 def _linear(x: float) -> float:
