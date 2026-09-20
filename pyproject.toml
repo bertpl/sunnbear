@@ -134,6 +134,8 @@ select = [
     "S",       # flake8-bandit: security lint
     "C901",    # mccabe complexity gate (threshold in [tool.ruff.lint.mccabe])
 ]
+# The final return of an if/elif chain goes inside `else:`, so every arm is a peer; RET505 flags that form.
+ignore = ["RET505"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
