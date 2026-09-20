@@ -1,4 +1,4 @@
-"""`Interval` is the bracketing state a `BracketingSolver` reduces step by step."""
+"""`Interval` is the bracketing state that a `BracketingSolver` reduces step by step."""
 
 from dataclasses import dataclass
 
@@ -7,8 +7,8 @@ from dataclasses import dataclass
 class Interval:
     """An `Interval` is a bracket ``[a, b]`` with endpoint values ``fa`` and ``fb`` such that ``fa <= 0 <= fb``.
 
-    `Solver.solve` normalizes the function's sign before the first step, so
-    the invariant is one-directional and every bracketing solver may rely on
+    The sign is normalized before a bracketing solver ever sees an `Interval`,
+    so the invariant is one-directional and every bracketing solver may rely on
     it. Arithmetic on `CountedFloat` endpoints is counted, so interval
     bookkeeping contributes to a solver's flop counts; the invariant check
     runs on plain floats and costs the solver nothing.
@@ -47,13 +47,13 @@ class Interval:
         else:
             return Interval(self.a, x, self.fa, fx)
 
-    def is_converged(self, xtol_doubled: float) -> bool:
-        """Return whether a stopping criterion holds: the width is at most ``xtol_doubled`` or an endpoint is zero.
+    def is_converged(self, doubled_xtol: float) -> bool:
+        """Return whether a stopping criterion holds: the width is at most ``doubled_xtol`` or an endpoint is zero.
 
         The parameter is the doubled tolerance, so the caller computes it once
         per solve, not once per iteration.
         """
-        return self.width <= xtol_doubled or self.fa == 0.0 or self.fb == 0.0
+        return self.width <= doubled_xtol or self.fa == 0.0 or self.fb == 0.0
 
     def root(self) -> float:
         """Return the root estimate of a converged bracket: the zero endpoint if there is one, else the midpoint."""

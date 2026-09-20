@@ -3,7 +3,7 @@ import math
 import pytest
 from counted_float import CountedFloat, FlopCountingContext
 
-from sunnbear._core.solvers.core.wrapped_function import DIVERGENCE_GUARD_MARGIN, WrappedFunction
+from sunnbear._core.solvers.core.wrapped_function import DIVERGENCE_GUARD_WIDTH_FACTOR, WrappedFunction
 from sunnbear.exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
 
 
@@ -47,7 +47,7 @@ def test_budget_refuses_the_call_that_would_exceed_it():
 #  Guards
 # ==================================================================================================
 @pytest.mark.parametrize(
-    "x", [-DIVERGENCE_GUARD_MARGIN, 1.0 + DIVERGENCE_GUARD_MARGIN, 0.5]
+    "x", [-DIVERGENCE_GUARD_WIDTH_FACTOR, 1.0 + DIVERGENCE_GUARD_WIDTH_FACTOR, 0.5]
 )  # the guard edges and a point inside
 def test_guard_interval_edges_are_inside(x):
     # --- arrange ----------------------
@@ -60,7 +60,7 @@ def test_guard_interval_edges_are_inside(x):
     assert wf.n_fevals == 1
 
 
-@pytest.mark.parametrize("x", [-DIVERGENCE_GUARD_MARGIN - 1e-9, 1.0 + DIVERGENCE_GUARD_MARGIN + 1e-9])
+@pytest.mark.parametrize("x", [-DIVERGENCE_GUARD_WIDTH_FACTOR - 1e-9, 1.0 + DIVERGENCE_GUARD_WIDTH_FACTOR + 1e-9])
 def test_outside_the_guard_interval_is_divergence(x):
     # --- arrange ----------------------
     wf = _wrap(a=0.0, b=1.0)

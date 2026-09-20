@@ -1,4 +1,4 @@
-"""`WrappedFunction` is the callable a solver evaluates ``f`` through.
+"""`WrappedFunction` is the callable that a solver evaluates ``f`` through.
 
 Each call runs the checks documented on the class, in order.
 
@@ -14,14 +14,14 @@ from counted_float import CountedFloat, PauseFlopCounting
 from .exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
 
 # The guard interval is the bracket widened on each side by this multiple of its width; an evaluation
-# requested outside it counts as divergence. The margin balances two needs:
-# - generous enough to tolerate the overshoot of a legitimate step of a non-bracketing solver
-# - tight enough to catch a runaway iterate within an iteration or two
-DIVERGENCE_GUARD_MARGIN = 10.0
+# requested outside it counts as divergence. The factor balances two needs: generous enough to tolerate
+# the overshoot of a legitimate step of a non-bracketing solver, but tight enough to catch a runaway
+# iterate within an iteration or two.
+DIVERGENCE_GUARD_WIDTH_FACTOR = 10.0
 
 
 class WrappedFunction:
-    """A `WrappedFunction` is the callable a solver evaluates ``f`` through; each call runs the checks below, in order.
+    """A `WrappedFunction` is the callable that a solver evaluates ``f`` through; each call runs the checks below.
 
     A call:
 
@@ -52,7 +52,7 @@ class WrappedFunction:
     ) -> None:
         """Wrap ``f`` for one solve; the guard interval is derived from ``[a, b]``."""
         self._f = f
-        guard_width = DIVERGENCE_GUARD_MARGIN * (b - a)
+        guard_width = DIVERGENCE_GUARD_WIDTH_FACTOR * (b - a)
         self._guard_lo = a - guard_width
         self._guard_hi = b + guard_width
         self._max_fevals = max_fevals
@@ -92,7 +92,7 @@ class WrappedFunction:
             raise FunctionDomainError(f"f({x_plain!r}) = {fx!r} is not finite.")
         if self._is_sign_normalized:
             # The sign flip runs on a plain float (fx is wrapped in CountedFloat only at the return below),
-            # so it is not counted, even though the f(a) < 0 < f(b) invariant it establishes can enable
+            # so it is not counted, even though the f(a) < 0 < f(b) invariant that it establishes can enable
             # solver simplifications (e.g. simpler bracketing conditions).
             #
             # The stance: a user could implement the same flip inside a tested function, where it would
