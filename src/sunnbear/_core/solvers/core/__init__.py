@@ -7,8 +7,9 @@ functions or the benchmark that drives the solver.
 guard against evaluations too far outside the bracket, and a check that each value is finite, and
 raises a `SolveInterrupt` when the solve must stop early.
 
-`Interval` is a bracketing solver's bracket, and `SolveRun` is the mutable state of one solve.
+`Interval` is a bracketing solver's bracket, and `SolverState` is the mutable state of one solve,
+which a solver extends with its own fields.
 """
 
 from .interval import Interval
-from .run import SolveRun
+from .state import SolverState

@@ -2,7 +2,7 @@
 
 Each call runs the checks documented on the class, in order.
 
-`Solver.solve` builds one per solve and hands it over inside the `SolveRun`;
+`Solver.solve` builds one per solve and hands it over inside the `SolverState`;
 solver implementations never construct one.
 """
 

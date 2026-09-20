@@ -25,6 +25,7 @@ dependencies = [
     "matplotlib>=3.10.7; python_version == '3.13'",
     "matplotlib>=3.10.7; python_version >= '3.14'",
     "counted-float>=1.2.1",
+    "typing-extensions>=4.4",  # TypeVar defaults (PEP 696) on Python < 3.13
     "snuffled>=0.1.6",
     "max-div>=0.5.5",
     "mpl-composite>=0.1.2",

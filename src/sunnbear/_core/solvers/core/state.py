@@ -1,4 +1,4 @@
-"""`SolveRun` is the per-solve context a solver implementation works with."""
+"""`SolverState` is the state of one solve, and the base class of a solver's own state."""
 
 from dataclasses import dataclass
 
@@ -7,8 +7,15 @@ from .wrapped_function import WrappedFunction
 
 
 @dataclass
-class SolveRun:
-    """A `SolveRun` is the mutable state of one solve, handed to `Solver._solve` and `BracketingSolver._step`.
+class SolverState:
+    """A `SolverState` is the mutable state of one solve, created by `Solver.solve` and handed to the algorithm.
+
+    The fields below are the framework's: `Solver.solve` fills them in and reads `n_iters` and
+    `x_best` back into the result. A solver that carries values between iterations subclasses
+    `SolverState`, adds its fields with defaults, and names the subclass in `Solver.state_cls`;
+    `Solver.solve` instantiates whichever class is named there, so the solver never constructs
+    a state itself. A solver instance holds no per-solve state of its own, which keeps it plain
+    configuration: reusable across solves and safe to share.
 
     Attributes:
         f: The wrapped function to evaluate, sign-normalized by `Solver.solve`.
