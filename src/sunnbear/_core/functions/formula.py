@@ -21,12 +21,12 @@ from typing import ClassVar
 
 import numba
 
-from ._identity import FunctionId
-from ._param_values import DEDUP_DIGITS, ParamValue, deduplicate_param_tuples
-from ._recipes import ParamRecipe
-from ._test_cases import FormulaTestCase
-from ._test_function import CandidateTestFunction
-from ._types import XCFun, XFun
+from .identity import FunctionId
+from .param_values import DEDUP_DIGITS, ParamValue, deduplicate_param_tuples
+from .recipes import ParamRecipe
+from .test_cases import FormulaTestCase
+from .test_function import CandidateTestFunction
+from .types import XCFun, XFun
 
 # All defined Formula subclasses, in definition order; the registry filters and instantiates.
 registered_formula_classes: list[type["Formula"]] = []

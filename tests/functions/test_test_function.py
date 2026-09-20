@@ -1,8 +1,8 @@
 import pytest
 
+from sunnbear._core.functions.catalog.f1xx_polynomials.f101_cubic import F101_Cubic
 from sunnbear.functions import CandidateTestFunction, FunctionId, ParamValue
 from sunnbear.functions import TestFunction as _TestFunction  # underscore alias: keep pytest from collecting it
-from sunnbear.functions.catalog.f1xx_polynomials.f101_cubic import F101_Cubic
 
 FID = FunctionId(101, (ParamValue.decimal(0.2),))
 

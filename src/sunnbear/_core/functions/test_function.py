@@ -15,11 +15,11 @@ never pays for a wrapper around a wrapper.
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from ._identity import FunctionId
-from ._types import XCFun, XFun
+from .identity import FunctionId
+from .types import XCFun, XFun
 
-if TYPE_CHECKING:  # type-only: _formula imports this module at runtime, so the edge cannot be mutual
-    from ._formula import Formula
+if TYPE_CHECKING:  # type-only: formula imports this module at runtime, so the edge cannot be mutual
+    from .formula import Formula
 
 
 # ==================================================================================================
