@@ -23,15 +23,15 @@ How the pieces tie together, from authored code to a solvable function::
 rebuilding the `CandidateTestFunction` that a suite's c-range then calibrates.
 
 This package imports nothing from the packages beside it: the shipped formulas in
-`catalog` register themselves when their modules are imported, which the parent
-package does.
+`catalog` register themselves when their modules are imported, and the parent
+package imports them.
 
 Ownership summary:
 
 - a concrete `Formula` contributes only mathematics plus its declared parameter
   interface: `param_names`, `parametrized_fun`, `bracket`, `recipes`, optionally
-  `is_param_tuple_valid` — one class, one module, in a package beside this one;
-  defining the class registers it.
+  `is_param_tuple_valid` — one class, one module, in `catalog`; defining the
+  class registers it.
 - the framework owns everything mechanical: numba compilation — once per
   formula, not per candidate (`Formula.jit`, `Formula._compiled_formula`),
   identity (`FunctionId` — the parameter tuple itself, stable, faithful to the

@@ -8,7 +8,7 @@ import sunnbear._core.functions.core.formula as formula_module
 
 
 def test_every_catalog_module_is_imported_by_its_package():
-    """Importing every module found by walking the catalog's directory registers nothing the package imports missed."""
+    """Importing every module found by walking the catalog registers nothing that the package's imports missed."""
     # --- arrange ----------------------
     registered_before = list(formula_module.registered_formula_classes)
 
