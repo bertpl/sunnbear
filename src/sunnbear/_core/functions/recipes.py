@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from math import lcm
 
-from ._param_values import CANONICAL_DIGITS, ParamNotation, ParamValue, _canonical
+from .param_values import CANONICAL_DIGITS, ParamNotation, ParamValue, _canonical
 
 # A grid endpoint or step may drift from an integer ratio by this much (relative) and still
 # count as aligned — the same float slack the round() in ParamAxis.values() already tolerates.

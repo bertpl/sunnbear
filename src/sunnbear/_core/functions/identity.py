@@ -6,7 +6,7 @@ parameter tuple, or in which order, never affects identity, so identities are
 stable under recipe edits and reordering.
 
 Identities inherit the faithfulness of their parameter values (see
-`_param_values`): there is a single rendering, notation-carrying and parsed
+`param_values`): there is a single rendering, notation-carrying and parsed
 back losslessly by `from_string`. Equality, hashing, and ordering are exact —
 two ids match when they carry the same formula and the same parameter values
 in the same notation; collapsing near-duplicate parameter tuples happens
@@ -15,7 +15,7 @@ in the same notation; collapsing near-duplicate parameter tuples happens
 
 from dataclasses import dataclass
 
-from ._param_values import ParamValue
+from .param_values import ParamValue
 
 
 # ==================================================================================================

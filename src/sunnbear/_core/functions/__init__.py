@@ -38,9 +38,10 @@ Ownership summary:
   property of the type, not a nullable field.
 """
 
-from ._formula import Formula
-from ._identity import FunctionId
-from ._param_values import (
+from .exceptions import InvalidParamsError, UnknownFormulaError
+from .formula import Formula
+from .identity import FunctionId
+from .param_values import (
     CANONICAL_DIGITS,
     DEDUP_DIGITS,
     DecimalParamValue,
@@ -49,8 +50,8 @@ from ._param_values import (
     ParamValue,
     deduplicate_param_tuples,
 )
-from ._recipes import ParamAxis, ParamRecipe
-from ._registry import FormulaRegistry
-from ._test_cases import FormulaTestCase
-from ._test_function import CandidateTestFunction, TestFunction
-from ._types import XCFun, XFun
+from .recipes import ParamAxis, ParamRecipe
+from .registry import FormulaRegistry
+from .test_cases import FormulaTestCase
+from .test_function import CandidateTestFunction, TestFunction
+from .types import XCFun, XFun

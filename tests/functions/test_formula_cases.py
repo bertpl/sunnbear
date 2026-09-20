@@ -4,8 +4,8 @@ import math
 
 import pytest
 
+from sunnbear._core.functions.test_cases import BracketTestCase, InvalidTestCase, ValueTestCase
 from sunnbear.functions import FormulaRegistry
-from sunnbear.functions._test_cases import BracketTestCase, InvalidTestCase, ValueTestCase
 
 # every (formula, case) pair, with a stable unique id: formula number + case kind + within-formula index
 _INDEXED = [(formula, i, case) for formula in FormulaRegistry.formulas() for i, case in enumerate(formula.cases)]

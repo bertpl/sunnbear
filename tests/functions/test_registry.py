@@ -1,7 +1,9 @@
 import pytest
 
-import sunnbear.functions._formula as formula_module
-from sunnbear.errors import InvalidParamsError, UnknownFormulaError
+import sunnbear._core.functions.formula as formula_module
+from sunnbear._core.functions.catalog.f1xx_polynomials.f101_cubic import F101_Cubic
+from sunnbear._core.functions.catalog.f1xx_polynomials.f102_odd_power import F102_OddPower
+from sunnbear.exceptions import InvalidParamsError, UnknownFormulaError
 from sunnbear.functions import (
     Formula,
     FormulaRegistry,
@@ -10,8 +12,6 @@ from sunnbear.functions import (
     ParamRecipe,
     ParamValue,
 )
-from sunnbear.functions.catalog.f1xx_polynomials.f101_cubic import F101_Cubic
-from sunnbear.functions.catalog.f1xx_polynomials.f102_odd_power import F102_OddPower
 
 
 @pytest.fixture

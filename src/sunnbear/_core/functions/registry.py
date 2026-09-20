@@ -15,13 +15,12 @@ import inspect
 import pkgutil
 from typing import ClassVar
 
-from sunnbear.errors import InvalidParamsError, UnknownFormulaError
-
-from . import _formula as _formula_module
 from . import catalog
-from ._formula import Formula
-from ._identity import FunctionId
-from ._test_function import CandidateTestFunction
+from . import formula as formula_module
+from .exceptions import InvalidParamsError, UnknownFormulaError
+from .formula import Formula
+from .identity import FunctionId
+from .test_function import CandidateTestFunction
 
 
 # ==================================================================================================
@@ -68,7 +67,7 @@ class FormulaRegistry:
         # a single swap-able seam — e.g. for isolation in downstream test suites
         instances = [
             formula_cls()
-            for formula_cls in _formula_module.registered_formula_classes
+            for formula_cls in formula_module.registered_formula_classes
             if not inspect.isabstract(formula_cls)
         ]
         for formula in instances:
