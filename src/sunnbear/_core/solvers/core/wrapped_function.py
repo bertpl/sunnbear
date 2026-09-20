@@ -14,9 +14,10 @@ from counted_float import CountedFloat, PauseFlopCounting
 from .exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
 
 # The guard interval is the bracket widened on each side by this multiple of its width; an evaluation
-# requested outside it counts as divergence. The factor balances two needs: generous enough to tolerate
-# the overshoot of a legitimate step of a non-bracketing solver, but tight enough to catch a runaway
-# iterate within an iteration or two.
+# requested outside the guard interval counts as divergence.
+#
+# The factor balances two needs: generous enough to tolerate the overshoot of a legitimate step of a
+# non-bracketing solver, but tight enough to detect a divergent iterate within an iteration or two.
 DIVERGENCE_GUARD_WIDTH_FACTOR = 10.0
 
 
@@ -72,7 +73,7 @@ class WrappedFunction:
             self.history = [(x, -fx) for x, fx in self.history]
 
     def __call__(self, x: float) -> float:
-        """Evaluate ``f`` at ``x``: refuse past the budget or outside the guard, raise on a non-finite value, count it.
+        """Evaluate ``f`` at ``x``: refuse it past the budget or outside the guard, reject a non-finite value, count it.
 
         Returns:
             The value as a `CountedFloat`, negated when sign normalization is enabled.

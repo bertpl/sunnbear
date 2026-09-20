@@ -36,7 +36,7 @@ class Interval:
         """Return the midpoint of the bracket."""
         return 0.5 * (self.a + self.b)
 
-    def narrow_at(self, x: float, fx: float) -> "Interval":
+    def narrowed_at(self, x: float, fx: float) -> "Interval":
         """Return the half of the bracket that keeps the sign change once ``x`` splits it.
 
         ``x`` must lie strictly inside the bracket; a non-positive ``fx`` makes

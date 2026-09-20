@@ -47,12 +47,12 @@ def test_width_and_midpoint():
         (0.5, (0.0, 1.0, -1.0, 0.5)),  # positive: x becomes the upper endpoint
     ],
 )
-def test_narrow_at_keeps_the_sign_change(fx, expected):
+def test_narrowed_at_keeps_the_sign_change(fx, expected):
     # --- arrange ----------------------
     interval = Interval(0.0, 4.0, -1.0, 2.0)
 
     # --- act --------------------------
-    narrowed = interval.narrow_at(1.0, fx)
+    narrowed = interval.narrowed_at(1.0, fx)
 
     # --- assert -----------------------
     assert (narrowed.a, narrowed.b, narrowed.fa, narrowed.fb) == expected
