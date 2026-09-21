@@ -37,14 +37,31 @@ class _MidpointRepeatingSolver(Solver):
             state.incr_iteration_count()
 
 
-class _OutOfBracketSolver(Solver):
-    """`_OutOfBracketSolver` asks for an evaluation far outside the bracket."""
+class _ExcursionSolver(Solver):
+    """`_ExcursionSolver` evaluates far outside the bracket, then returns an estimate of its choice."""
 
-    name = "out_of_bracket"
+    name = "excursion"
+    version = 1
+
+    def __init__(self, x_returned: float) -> None:
+        self._x_returned = x_returned
+
+    def _solve(self, state: SolverState) -> float:
+        state.x_best = float(state.bracket.b + 1e6 * state.bracket.width)
+        state.f(state.x_best)
+        return self._x_returned
+
+
+class _StrayingSolver(Solver):
+    """`_StrayingSolver` moves its best estimate outside the bracket and then runs out of budget."""
+
+    name = "straying"
     version = 1
 
     def _solve(self, state: SolverState) -> float:
-        return state.f(state.bracket.b + 1e6 * state.bracket.width)
+        state.x_best = float(state.bracket.b + 1.0)
+        while True:
+            state.f(state.x_best)
 
 
 class _BuggySolver(Solver):
@@ -157,25 +174,41 @@ def test_running_out_of_budget_maps_to_max_fevals():
     assert result.x == 0.5  # The best estimate so far is the untouched bracket's midpoint.
 
 
-def test_leaving_the_guard_interval_maps_to_diverged():
+@pytest.mark.parametrize(
+    "x_returned, status_expected",
+    [(0.5, SolveStatus.CONVERGED), (1.0, SolveStatus.CONVERGED), (1.0 + 1e-9, SolveStatus.DIVERGED)],
+)  # An excursion is not penalized; only the result decides, and an endpoint is inside.
+def test_only_a_result_outside_the_bracket_is_divergence(x_returned, status_expected):
     # --- act --------------------------
-    result = _OutOfBracketSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
+    result = _ExcursionSolver(x_returned).solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
 
     # --- assert -----------------------
-    assert result.status is SolveStatus.DIVERGED
-    assert result.n_fevals == 2
+    assert (result.status, result.x) == (status_expected, x_returned)
+    assert result.n_fevals == 3  # The far-away evaluation was performed, not refused.
 
 
-def test_non_finite_value_maps_to_function_error():
+def test_running_out_of_budget_outside_the_bracket_maps_to_diverged():
+    # --- act --------------------------
+    result = _StrayingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=5)
+
+    # --- assert -----------------------
+    assert (result.status, result.x, result.n_fevals) == (SolveStatus.DIVERGED, 2.0, 5)
+
+
+@pytest.mark.parametrize(
+    "solver, status_expected",
+    [(_MidpointRepeatingSolver(), SolveStatus.FUNCTION_ERROR), (_ExcursionSolver(0.5), SolveStatus.DIVERGED)],
+)  # The first fails inside the bracket, the second outside; where it failed decides the status.
+def test_a_function_error_is_classified_by_where_it_happened(solver, status_expected):
     # --- arrange ----------------------
     def f(x: float) -> float:
-        return math.nan if x == 0.5 else _increasing(x)
+        return _increasing(x) if x in (0.0, 1.0) else math.nan  # Fails anywhere but at the endpoints.
 
     # --- act --------------------------
-    result = _MidpointRepeatingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
+    result = solver.solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
 
     # --- assert -----------------------
-    assert result.status is SolveStatus.FUNCTION_ERROR
+    assert result.status is status_expected
     assert result.n_fevals == 3  # The failing evaluation counts.
 
 

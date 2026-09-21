@@ -15,6 +15,10 @@ class SolveStatus(Enum):
     ``CONVERGED`` means the solver's stopping criterion was met within budget —
     nothing more. Whether the returned ``x`` is correct is judged downstream by
     the benchmark harness, which knows the true root; the solver does not.
+
+    ``DIVERGED`` means the solve left the bracket: its result lies outside ``[a, b]``, or the
+    function failed at an ``x`` outside ``[a, b]``. A function failure inside the bracket is
+    ``FUNCTION_ERROR``.
     """
 
     CONVERGED = "converged"
