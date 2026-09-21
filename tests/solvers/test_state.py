@@ -15,8 +15,8 @@ def test_iterations_are_none_until_the_first_mark():
 
     # --- act --------------------------
     before = state.n_iters
-    state.mark_iteration()
-    state.mark_iteration()
+    state.incr_iteration_count()
+    state.incr_iteration_count()
 
     # --- assert -----------------------
     assert (before, state.n_iters) == (None, 2)

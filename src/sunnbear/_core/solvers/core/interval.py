@@ -67,7 +67,7 @@ class Interval:
         return self.width <= doubled_xtol or self.is_fa_zero or self.is_fb_zero
 
     def root(self) -> float:
-        """Return the root estimate of a converged bracket: the zero endpoint if there is one, else the midpoint."""
+        """Return the best root estimate without another step: a zero endpoint if there is one, else the midpoint."""
         if self.is_fa_zero:
             return self.a
         elif self.is_fb_zero:
