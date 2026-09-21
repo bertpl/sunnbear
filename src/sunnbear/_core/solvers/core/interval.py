@@ -16,27 +16,19 @@ class Interval(ABC):
     `DecreasingInterval` holds ``fa >= 0 >= fb``. Each subclass's name describes its sign change,
     not monotonicity.
 
-    `from_endpoints` picks the class from the values, so a bracketing solver written on `split_at`
-    and `root` works for either orientation without checking it; a solver that relies on one
-    orientation checks the bracket's class.
+    `from_endpoints` picks the class from the values and is the only place that validates them: the
+    constructors trust their caller, since every bracket is built by the framework, through the
+    factory or `split_at`. A bracketing solver written on `split_at` and `root` works for either
+    orientation without checking it; a solver that relies on one orientation checks the bracket's class.
 
-    Arithmetic on `CountedFloat` endpoints is counted, so interval bookkeeping contributes to a
-    solver's flop counts; the invariant checks run on plain floats and cost the solver nothing.
+    Arithmetic and comparisons on `CountedFloat` endpoints are counted, so interval bookkeeping
+    contributes to a solver's flop counts.
     """
 
     a: float
     b: float
     fa: float
     fb: float
-
-    def __post_init__(self) -> None:
-        """Reject a bracket that is reversed or whose endpoint values do not hold this orientation."""
-        if not float(self.a) < float(self.b):
-            raise ValueError(f"Interval must satisfy a < b (got a={self.a}, b={self.b}).")
-        if not self.is_oriented(float(self.fa), float(self.fb)):
-            raise ValueError(
-                f"{type(self).__name__} must satisfy {self.orientation_description()} (got fa={self.fa}, fb={self.fb})."
-            )
 
     # --------------------------------------------------------------------------
     #  Construction
@@ -46,14 +38,14 @@ class Interval(ABC):
         """Return the interval matching the endpoint values' orientation.
 
         When ``fa`` and ``fb`` are both zero, either orientation holds; this returns an `IncreasingInterval`.
+        ``a < b`` is the caller's responsibility.
 
         Raises:
-            ValueError: If ``a >= b``, or ``fa`` and ``fb`` have the same sign and neither is zero.
+            ValueError: If ``fa`` and ``fb`` have the same sign and neither is zero.
         """
-        fa_plain, fb_plain = float(fa), float(fb)
-        if IncreasingInterval.is_oriented(fa_plain, fb_plain):
+        if fa <= 0.0 <= fb:
             return IncreasingInterval(a, b, fa, fb)
-        elif DecreasingInterval.is_oriented(fa_plain, fb_plain):
+        elif fa >= 0.0 >= fb:
             return DecreasingInterval(a, b, fa, fb)
         else:
             raise ValueError(f"Endpoint values must differ in sign or one must be zero (got fa={fa}, fb={fb}).")
@@ -61,16 +53,6 @@ class Interval(ABC):
     # --------------------------------------------------------------------------
     #  Orientation
     # --------------------------------------------------------------------------
-    @staticmethod
-    @abstractmethod
-    def is_oriented(fa: float, fb: float) -> bool:
-        """Return whether plain-float endpoint values hold this class's orientation."""
-
-    @staticmethod
-    @abstractmethod
-    def orientation_description() -> str:
-        """Return the orientation as an inequality, for error messages."""
-
     @abstractmethod
     def _has_fa_sign(self, fx: float) -> bool:
         """Return whether ``fx`` has the sign of ``fa`` or is zero."""
@@ -138,16 +120,6 @@ class Interval(ABC):
 class IncreasingInterval(Interval):
     """An `IncreasingInterval` is a bracket with ``fa <= 0 <= fb``: not positive at ``a``, not negative at ``b``."""
 
-    @staticmethod
-    def is_oriented(fa: float, fb: float) -> bool:
-        """Return whether ``fa <= 0 <= fb``."""
-        return fa <= 0.0 <= fb
-
-    @staticmethod
-    def orientation_description() -> str:
-        """Return ``fa <= 0 <= fb``."""
-        return "fa <= 0 <= fb"
-
     def _has_fa_sign(self, fx: float) -> bool:
         """Return whether ``fx`` is non-positive."""
         return fx <= 0.0
@@ -156,16 +128,6 @@ class IncreasingInterval(Interval):
 @dataclass(frozen=True)
 class DecreasingInterval(Interval):
     """A `DecreasingInterval` is a bracket with ``fa >= 0 >= fb``: not negative at ``a``, not positive at ``b``."""
-
-    @staticmethod
-    def is_oriented(fa: float, fb: float) -> bool:
-        """Return whether ``fa >= 0 >= fb``."""
-        return fa >= 0.0 >= fb
-
-    @staticmethod
-    def orientation_description() -> str:
-        """Return ``fa >= 0 >= fb``."""
-        return "fa >= 0 >= fb"
 
     def _has_fa_sign(self, fx: float) -> bool:
         """Return whether ``fx`` is non-negative."""

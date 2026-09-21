@@ -1,5 +1,5 @@
 import pytest
-from counted_float import CountedFloat, FlopCountingContext
+from counted_float import CountedFloat, FlopCountingContext, FlopCounts
 
 from sunnbear.solvers import DecreasingInterval, IncreasingInterval, Interval
 
@@ -19,29 +19,6 @@ def _orient_endpoints(cls: type[Interval], fa: float, fb: float) -> tuple[float,
 # ==================================================================================================
 #  Invariants
 # ==================================================================================================
-@pytest.mark.parametrize("cls", ORIENTATIONS)
-@pytest.mark.parametrize("a, b", [(1.0, -1.0), (0.0, 0.0)])  # the first pair is reversed, the second is degenerate
-def test_rejects_ill_ordered_endpoints(cls, a, b):
-    with pytest.raises(ValueError, match="a < b"):
-        cls(a, b, *_orient_endpoints(cls, -1.0, 1.0))
-
-
-@pytest.mark.parametrize("cls", ORIENTATIONS)
-@pytest.mark.parametrize("fa, fb", [(1.0, 2.0), (-2.0, -1.0), (1.0, -1.0)])  # no sign change, or the wrong way round
-def test_rejects_endpoint_values_of_the_wrong_orientation(cls, fa, fb):
-    with pytest.raises(ValueError, match=cls.__name__):
-        cls(0.0, 1.0, *_orient_endpoints(cls, fa, fb))
-
-
-@pytest.mark.parametrize("cls", ORIENTATIONS)
-def test_zero_endpoint_values_are_accepted(cls):
-    # --- act --------------------------
-    interval = cls(0.0, 1.0, 0.0, 0.0)
-
-    # --- assert -----------------------
-    assert (interval.fa, interval.fb) == (0.0, 0.0)
-
-
 # ==================================================================================================
 #  Construction from endpoint values
 # ==================================================================================================
@@ -139,8 +116,7 @@ def test_root(cls, fa, fb, expected):
 # ==================================================================================================
 #  Flop accounting
 # ==================================================================================================
-def test_construction_costs_no_flops_but_geometry_is_counted():
-    """The invariant checks run on plain floats; midpoint and width arithmetic on CountedFloat endpoints is counted."""
+def test_the_sign_checks_and_the_geometry_are_counted_on_counted_endpoints():
     # --- arrange ----------------------
     a, b, fa, fb = CountedFloat(0.0), CountedFloat(1.0), CountedFloat(-1.0), CountedFloat(1.0)
 
@@ -152,5 +128,5 @@ def test_construction_costs_no_flops_but_geometry_is_counted():
         _ = interval.width
 
     # --- assert -----------------------
-    assert ctx_construct.flop_counts().total_count() == 0
-    assert ctx_geometry.flop_counts().total_count() > 0
+    assert ctx_construct.flop_counts() == FlopCounts(COMP=2)  # The increasing orientation's two comparisons.
+    assert ctx_geometry.flop_counts() == FlopCounts(ADD=1, MUL=1, SUB=1)
