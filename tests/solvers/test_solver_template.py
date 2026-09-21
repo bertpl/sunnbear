@@ -34,7 +34,7 @@ class _MidpointRepeatingSolver(Solver):
         x = state.bracket.midpoint
         while True:
             state.f(x)
-            state.mark_iteration()
+            state.incr_iteration_count()
 
 
 class _OutOfBracketSolver(Solver):
@@ -68,7 +68,7 @@ class _IterationCountingSolver(Solver):
 
     def _solve(self, state: SolverState) -> float:
         for _ in range(self.n_iters):
-            state.mark_iteration()
+            state.incr_iteration_count()
         return state.x_best
 
 

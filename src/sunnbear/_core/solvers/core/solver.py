@@ -136,7 +136,7 @@ class Solver(ABC, Generic[StateT]):
 
         - Evaluate the function only through ``state.f``, and let its interrupts propagate.
         - Keep ``state.x_best`` current, so an interrupted solve still reports a meaningful ``x``.
-        - Call ``state.mark_iteration()`` once per iteration, if the algorithm has iterations.
+        - Call ``state.incr_iteration_count()`` once per iteration, if the algorithm has iterations.
         """
 
 
@@ -158,7 +158,7 @@ class BracketingSolver(Solver[StateT]):
         state.n_iters = 0
         while not interval.is_converged(xtol_doubled):
             interval = self._step(state, interval)
-            state.mark_iteration()
+            state.incr_iteration_count()
             state.x_best = _plain_midpoint(float(interval.a), float(interval.b))
         return interval.root()
 
