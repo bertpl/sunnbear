@@ -5,7 +5,7 @@ from sunnbear.solvers import Interval, SolverState
 
 
 def _state() -> SolverState:
-    wf = WrappedFunction(lambda x: x - 0.5, 0.0, 1.0, max_fevals=10, record_history=False)
+    wf = WrappedFunction(lambda x: x - 0.5, max_fevals=10, record_history=False)
     return SolverState(f=wf, bracket=Interval(0.0, 1.0, -0.5, 0.5), xtol=1e-3)
 
 

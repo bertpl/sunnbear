@@ -3,7 +3,7 @@ import math
 import pytest
 from counted_float import CountedFloat, FlopCountingContext
 
-from sunnbear._core.solvers.core.wrapped_function import DIVERGENCE_GUARD_WIDTH_FACTOR, WrappedFunction
+from sunnbear._core.solvers.core.wrapped_function import WrappedFunction
 from sunnbear.exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
 
 
@@ -11,8 +11,8 @@ def _linear(x: float) -> float:
     return 2.0 * x - 1.0
 
 
-def _wrap(f=_linear, a: float = 0.0, b: float = 1.0, max_fevals: int = 10, record_history: bool = False):
-    return WrappedFunction(f, a, b, max_fevals=max_fevals, record_history=record_history)
+def _wrap(f=_linear, max_fevals: int = 10, record_history: bool = False):
+    return WrappedFunction(f, max_fevals=max_fevals, record_history=record_history)
 
 
 # ==================================================================================================
@@ -46,24 +46,21 @@ def test_budget_refuses_the_call_that_would_exceed_it():
 # ==================================================================================================
 #  Guards
 # ==================================================================================================
-@pytest.mark.parametrize(
-    "x", [-DIVERGENCE_GUARD_WIDTH_FACTOR, 1.0 + DIVERGENCE_GUARD_WIDTH_FACTOR, 0.5]
-)  # both divergence bounds and a point inside
-def test_divergence_bounds_are_inside(x):
+def test_far_from_the_origin_is_still_evaluated():
     # --- arrange ----------------------
-    wf = _wrap(a=0.0, b=1.0)
+    wf = _wrap()
 
     # --- act --------------------------
-    wf(x)
+    wf(1e300)
 
     # --- assert -----------------------
-    assert wf.n_fevals == 1
+    assert wf.n_fevals == 1  # No bound on x other than finiteness.
 
 
-@pytest.mark.parametrize("x", [-DIVERGENCE_GUARD_WIDTH_FACTOR - 1e-9, 1.0 + DIVERGENCE_GUARD_WIDTH_FACTOR + 1e-9])
-def test_outside_the_divergence_bounds_is_divergence(x):
+@pytest.mark.parametrize("x", [math.nan, math.inf, -math.inf])
+def test_non_finite_x_is_divergence(x):
     # --- arrange ----------------------
-    wf = _wrap(a=0.0, b=1.0)
+    wf = _wrap()
 
     # --- act / assert -----------------
     with pytest.raises(DivergedError):
@@ -77,9 +74,22 @@ def test_non_finite_value_is_a_domain_error_and_still_counts(value):
     wf = _wrap(f=lambda x: value)
 
     # --- act / assert -----------------
-    with pytest.raises(FunctionDomainError):
+    with pytest.raises(FunctionDomainError) as excinfo:
         wf(0.5)
     assert wf.n_fevals == 1  # The function was evaluated.
+    assert excinfo.value.x == 0.5
+
+
+def test_a_raising_function_is_a_domain_error_and_still_counts():
+    # --- arrange ----------------------
+    wf = _wrap(f=math.log)
+
+    # --- act / assert -----------------
+    with pytest.raises(FunctionDomainError) as excinfo:
+        wf(-1.0)
+    assert wf.n_fevals == 1  # The function was called.
+    assert excinfo.value.x == -1.0
+    assert isinstance(excinfo.value.__cause__, ValueError)
 
 
 # ==================================================================================================

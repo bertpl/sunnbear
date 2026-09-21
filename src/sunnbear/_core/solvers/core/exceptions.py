@@ -18,8 +18,18 @@ class MaxFevalsExceeded(SolveInterrupt):
 
 
 class DivergedError(SolveInterrupt):
-    """`WrappedFunction` raises this when a solver asks for an evaluation outside its divergence bounds."""
+    """`WrappedFunction` raises this when a solver asks for an evaluation at a non-finite ``x``."""
 
 
 class FunctionDomainError(SolveInterrupt):
-    """`WrappedFunction` raises this when a function evaluation returns a non-finite value."""
+    """`WrappedFunction` raises this when ``f`` raises or returns a non-finite value.
+
+    Attributes:
+        x: Where the evaluation failed; `Solver.solve` reads it to tell a function error inside
+            the bracket from a solver that diverged into a region where ``f`` fails.
+    """
+
+    def __init__(self, x: float, message: str) -> None:
+        """Record where the evaluation failed, then behave as a plain exception with ``message``."""
+        super().__init__(message)
+        self.x = x

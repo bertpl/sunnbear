@@ -5,8 +5,7 @@ functions or the benchmark that drives the solver.
 
 `WrappedFunction` is a solver's only way to evaluate ``f``. Each call:
 
-- applies an evaluation budget, a guard against evaluations too far outside the bracket, and a
-  check that each value is finite;
+- applies an evaluation budget and checks that ``x`` and ``f(x)`` are finite;
 - raises a `SolveInterrupt` when the solve must stop early;
 - records the evaluation when history recording is on.
 
