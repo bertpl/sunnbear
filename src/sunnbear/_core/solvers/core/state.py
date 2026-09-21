@@ -26,7 +26,7 @@ class SolverState:
         n_iters: Iterations performed so far; ``None`` unless the solver counts
             iterations.
         x_best: Best root estimate so far; reported as the solve's final ``x`` when
-            the solve is interrupted, so a solver keeps it current.
+            the solve ends early, so a solver keeps it current.
     """
 
     f: WrappedFunction

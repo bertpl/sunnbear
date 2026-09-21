@@ -9,7 +9,7 @@ from ._core.solvers.core.exceptions import (
     DivergedError,
     FunctionDomainError,
     MaxFevalsExceeded,
-    SolveInterrupt,
+    SolveException,
 )
 
 __all__ = [
@@ -17,7 +17,7 @@ __all__ = [
     "FunctionDomainError",
     "InvalidParamsError",
     "MaxFevalsExceeded",
-    "SolveInterrupt",
+    "SolveException",
     "SunnbearError",
     "UnknownFormulaError",
 ]
