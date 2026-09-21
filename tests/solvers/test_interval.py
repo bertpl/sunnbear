@@ -7,7 +7,7 @@ ORIENTATIONS = [IncreasingInterval, DecreasingInterval]
 
 
 def test_orientations_cover_every_interval_subclass():
-    """Assert ORIENTATIONS names every concrete subclass of Interval, so a new orientation is not missed here."""
+    """Assert ORIENTATIONS names every concrete subclass of Interval."""
     assert set(ORIENTATIONS) == set(Interval.__subclasses__())
 
 

@@ -18,7 +18,7 @@ class Interval(ABC):
 
     `from_endpoints` picks the class from the values, so a bracketing solver written on `split_at`
     and `root` works for either orientation without checking it; a solver that relies on one
-    orientation reads the class.
+    orientation checks the bracket's class.
 
     Arithmetic on `CountedFloat` endpoints is counted, so interval bookkeeping contributes to a
     solver's flop counts; the invariant checks run on plain floats and cost the solver nothing.
@@ -45,6 +45,8 @@ class Interval(ABC):
     def from_endpoints(a: float, b: float, fa: float, fb: float) -> "Interval":
         """Return the interval matching the endpoint values' orientation.
 
+        When ``fa`` and ``fb`` are both zero, either orientation holds; this returns an `IncreasingInterval`.
+
         Raises:
             ValueError: If ``a >= b``, or ``fa`` and ``fb`` have the same sign and neither is zero.
         """
@@ -62,7 +64,7 @@ class Interval(ABC):
     @staticmethod
     @abstractmethod
     def is_oriented(fa: float, fb: float) -> bool:
-        """Return whether plain-float endpoint values hold this class's orientation; a solver may ask this too."""
+        """Return whether plain-float endpoint values hold this class's orientation."""
 
     @staticmethod
     @abstractmethod
@@ -70,8 +72,8 @@ class Interval(ABC):
         """Return the orientation as an inequality, for error messages."""
 
     @abstractmethod
-    def _is_on_the_lower_side(self, fx: float) -> bool:
-        """Return whether ``fx`` has the sign of ``fa`` or is zero, so the point it came from can replace ``a``."""
+    def _has_fa_sign(self, fx: float) -> bool:
+        """Return whether ``fx`` has the sign of ``fa`` or is zero."""
 
     # --------------------------------------------------------------------------
     #  Geometry
@@ -103,10 +105,10 @@ class Interval(ABC):
     def split_at(self, x: float, fx: float) -> "Interval":
         """Split the bracket at ``x`` and return the part that still holds the sign change, of the same orientation.
 
-        ``x`` must lie strictly inside the bracket; an ``fx`` of the sign of ``fa``, or zero, makes
-        ``x`` the new lower endpoint, otherwise the new upper endpoint.
+        ``x`` must lie strictly inside the bracket; it replaces ``a`` when `_has_fa_sign` holds for
+        ``fx``, else ``b``.
         """
-        if self._is_on_the_lower_side(fx):
+        if self._has_fa_sign(fx):
             return type(self)(x, self.b, fx, self.fb)
         else:
             return type(self)(self.a, x, self.fa, fx)
@@ -130,11 +132,11 @@ class Interval(ABC):
 
 
 # ==================================================================================================
-#  The two orientations
+#  The 2 orientations
 # ==================================================================================================
 @dataclass(frozen=True)
 class IncreasingInterval(Interval):
-    """An `IncreasingInterval` is a bracket with ``fa <= 0 <= fb``: f rises through zero from ``a`` to ``b``."""
+    """An `IncreasingInterval` is a bracket with ``fa <= 0 <= fb``: not positive at ``a``, not negative at ``b``."""
 
     @staticmethod
     def is_oriented(fa: float, fb: float) -> bool:
@@ -146,14 +148,14 @@ class IncreasingInterval(Interval):
         """Return ``fa <= 0 <= fb``."""
         return "fa <= 0 <= fb"
 
-    def _is_on_the_lower_side(self, fx: float) -> bool:
+    def _has_fa_sign(self, fx: float) -> bool:
         """Return whether ``fx`` is non-positive."""
         return fx <= 0.0
 
 
 @dataclass(frozen=True)
 class DecreasingInterval(Interval):
-    """A `DecreasingInterval` is a bracket with ``fa >= 0 >= fb``: f falls through zero from ``a`` to ``b``."""
+    """A `DecreasingInterval` is a bracket with ``fa >= 0 >= fb``: not negative at ``a``, not positive at ``b``."""
 
     @staticmethod
     def is_oriented(fa: float, fb: float) -> bool:
@@ -165,6 +167,6 @@ class DecreasingInterval(Interval):
         """Return ``fa >= 0 >= fb``."""
         return "fa >= 0 >= fb"
 
-    def _is_on_the_lower_side(self, fx: float) -> bool:
+    def _has_fa_sign(self, fx: float) -> bool:
         """Return whether ``fx`` is non-negative."""
         return fx >= 0.0
