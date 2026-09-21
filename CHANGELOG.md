@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `sunnbear.stats`: geometric pseudo-quantiles (`gpq`/`owg`) and exact mean pairwise L1 distance
 - Test-function framework: formulas with parameter recipes, stable function identities, and a file-drop formula catalog
 - `FormulaTestCase`: declare a formula's value / invalid-params / bracket test cases alongside its definition
+- Solver framework: every solver's function evaluations run through one wrapper that applies an evaluation budget, catches failed evaluations, and excludes the function's own cost from flop counting
 
 ### Changed
 

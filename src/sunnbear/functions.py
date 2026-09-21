@@ -4,7 +4,7 @@ How the pieces tie together is described in the docstring of the implementation 
 `sunnbear._core.functions.core`.
 """
 
-from sunnbear._core.functions import (
+from ._core.functions import (
     CANONICAL_DIGITS,
     DEDUP_DIGITS,
     CandidateTestFunction,

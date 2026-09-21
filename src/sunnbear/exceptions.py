@@ -3,7 +3,21 @@
 All derive from `SunnbearError`; each is defined in the layer that raises it and re-exported here.
 """
 
-from sunnbear._core.exceptions import SunnbearError
-from sunnbear._core.functions.core.exceptions import InvalidParamsError, UnknownFormulaError
+from ._core.exceptions import SunnbearError
+from ._core.functions.core.exceptions import InvalidParamsError, UnknownFormulaError
+from ._core.solvers.core.exceptions import (
+    DivergedError,
+    FunctionDomainError,
+    MaxFevalsExceeded,
+    SolveException,
+)
 
-__all__ = ["InvalidParamsError", "SunnbearError", "UnknownFormulaError"]
+__all__ = [
+    "DivergedError",
+    "FunctionDomainError",
+    "InvalidParamsError",
+    "MaxFevalsExceeded",
+    "SolveException",
+    "SunnbearError",
+    "UnknownFormulaError",
+]
