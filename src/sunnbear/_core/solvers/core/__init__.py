@@ -15,7 +15,7 @@ the pieces in this order::
       ▼
     SolveResult
 
-An abnormal ending is a `SolveInterrupt` exception (see that class); a solver
+An abnormal ending is a `SolveException` (see that class); a solver
 that raises anything else is recorded as ``SOLVER_ERROR``. A solve whose result, or whose
 function error, lies outside ``[a, b]`` is recorded as ``DIVERGED``; no bound on how far an
 iterate may stray exists.
@@ -24,7 +24,8 @@ Two facts hold throughout this package:
 
 - **Orientation.** Every solver may assume ``f(a) < 0 < f(b)``; `Solver.solve` rejects any other
   bracket with a `ValueError`, and nothing normalizes the sign. The restriction is easy for a caller
-  to satisfy, and this is a research package in which a solver restricted to that case is acceptable.
+  to satisfy, and this package is targeted at research settings, to evaluate solver prototypes, where
+  this limitation is acceptable.
 - **Flop counting.** `Solver.solve` converts ``a``, ``b``, ``f(a)`` and ``f(b)`` to `CountedFloat`
   before handing them to the solver, so the solver's arithmetic on them is counted; `WrappedFunction`
   pauses counting while ``f`` itself runs.
