@@ -1,17 +1,23 @@
-"""`Interval` is a `BracketingSolver`'s bracket, reduced step by step."""
+"""`Interval` is a `BracketingSolver`'s bracket, reduced step by step; its two subclasses are the two orientations."""
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import cached_property
 
 
+# ==================================================================================================
+#  Interval
+# ==================================================================================================
 @dataclass(frozen=True)
-class Interval:
-    """An `Interval` is a bracket ``[a, b]`` with endpoint values ``fa`` and ``fb`` such that ``fa <= 0 <= fb``.
+class Interval(ABC):
+    """An `Interval` is a bracket ``[a, b]`` whose endpoint values ``fa`` and ``fb`` differ in sign, or one is zero.
 
-    `Solver.solve` enforces this orientation on the caller's function before an `Interval` is ever
-    built, so the invariant is one-directional and every bracketing solver may rely on it.
-    Arithmetic on `CountedFloat` endpoints is counted, so interval bookkeeping contributes to a
-    solver's flop counts; the invariant check runs on plain floats and costs the solver nothing.
+    The orientation is the class: an `IncreasingInterval` holds ``fa <= 0 <= fb`` and a
+    `DecreasingInterval` holds ``fa >= 0 >= fb``. `from_endpoints` picks the class from the values,
+    so a bracketing solver written on `split_at` and `root` works for either orientation without
+    checking it; a solver that relies on one orientation reads the class. Arithmetic on `CountedFloat`
+    endpoints is counted, so interval bookkeeping contributes to a solver's flop counts; the invariant
+    checks run on plain floats and cost the solver nothing.
     """
 
     a: float
@@ -20,12 +26,52 @@ class Interval:
     fb: float
 
     def __post_init__(self) -> None:
-        """Reject a bracket that is reversed or does not hold ``fa <= 0 <= fb``."""
+        """Reject a bracket that is reversed or whose endpoint values do not hold this orientation."""
         if not float(self.a) < float(self.b):
             raise ValueError(f"Interval must satisfy a < b (got a={self.a}, b={self.b}).")
-        if not float(self.fa) <= 0.0 <= float(self.fb):
-            raise ValueError(f"Interval must satisfy fa <= 0 <= fb (got fa={self.fa}, fb={self.fb}).")
+        if not self.holds_orientation(float(self.fa), float(self.fb)):
+            raise ValueError(
+                f"{type(self).__name__} must satisfy {self.orientation_description()} (got fa={self.fa}, fb={self.fb})."
+            )
 
+    # --------------------------------------------------------------------------
+    #  Construction
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def from_endpoints(a: float, b: float, fa: float, fb: float) -> "Interval":
+        """Return the interval of the orientation that the endpoint values hold.
+
+        Raises:
+            ValueError: If ``a >= b``, or ``fa`` and ``fb`` have the same sign and neither is zero.
+        """
+        fa_plain, fb_plain = float(fa), float(fb)
+        if IncreasingInterval.holds_orientation(fa_plain, fb_plain):
+            return IncreasingInterval(a, b, fa, fb)
+        elif DecreasingInterval.holds_orientation(fa_plain, fb_plain):
+            return DecreasingInterval(a, b, fa, fb)
+        else:
+            raise ValueError(f"Endpoint values must differ in sign or one must be zero (got fa={fa}, fb={fb}).")
+
+    # --------------------------------------------------------------------------
+    #  Orientation
+    # --------------------------------------------------------------------------
+    @staticmethod
+    @abstractmethod
+    def holds_orientation(fa: float, fb: float) -> bool:
+        """Return whether plain-float endpoint values hold this class's orientation; a solver may ask this too."""
+
+    @staticmethod
+    @abstractmethod
+    def orientation_description() -> str:
+        """Return the orientation as an inequality, for error messages."""
+
+    @abstractmethod
+    def _is_on_the_lower_side(self, fx: float) -> bool:
+        """Return whether ``fx`` has the sign of ``fa`` or is zero, so its ``x`` can replace ``a``."""
+
+    # --------------------------------------------------------------------------
+    #  Geometry
+    # --------------------------------------------------------------------------
     # The derived values are cached: each costs counted arithmetic, and a step reads some of them more than once.
     @cached_property
     def width(self) -> float:
@@ -47,16 +93,19 @@ class Interval:
         """Return whether the upper endpoint is an exact root."""
         return self.fb == 0.0
 
+    # --------------------------------------------------------------------------
+    #  Reduction
+    # --------------------------------------------------------------------------
     def split_at(self, x: float, fx: float) -> "Interval":
-        """Split the bracket at ``x`` and return the part that still holds the sign change.
+        """Split the bracket at ``x`` and return the part that still holds the sign change, of the same orientation.
 
-        ``x`` must lie strictly inside the bracket; a non-positive ``fx`` makes
-        ``x`` the new lower endpoint, a positive one the new upper endpoint.
+        ``x`` must lie strictly inside the bracket; an ``fx`` of the sign of ``fa``, or zero, makes
+        ``x`` the new lower endpoint, otherwise the new upper endpoint.
         """
-        if fx <= 0.0:
-            return Interval(x, self.b, fx, self.fb)
+        if self._is_on_the_lower_side(fx):
+            return type(self)(x, self.b, fx, self.fb)
         else:
-            return Interval(self.a, x, self.fa, fx)
+            return type(self)(self.a, x, self.fa, fx)
 
     def is_converged(self, doubled_xtol: float) -> bool:
         """Return whether a stopping criterion holds: the width is at most ``doubled_xtol`` or an endpoint is zero.
@@ -74,3 +123,51 @@ class Interval:
             return self.b
         else:
             return self.midpoint
+
+
+# ==================================================================================================
+#  The two orientations
+# ==================================================================================================
+@dataclass(frozen=True)
+class IncreasingInterval(Interval):
+    """An `IncreasingInterval` is a bracket with ``fa <= 0 <= fb``: the function rises through zero from ``a`` to ``b``.
+
+    The name describes the sign change, not monotonicity. The benchmark's own function portfolio
+    is entirely of this orientation.
+    """
+
+    @staticmethod
+    def holds_orientation(fa: float, fb: float) -> bool:
+        """Return whether ``fa <= 0 <= fb``."""
+        return fa <= 0.0 <= fb
+
+    @staticmethod
+    def orientation_description() -> str:
+        """Return ``fa <= 0 <= fb``."""
+        return "fa <= 0 <= fb"
+
+    def _is_on_the_lower_side(self, fx: float) -> bool:
+        """Return whether ``fx`` is non-positive."""
+        return fx <= 0.0
+
+
+@dataclass(frozen=True)
+class DecreasingInterval(Interval):
+    """A `DecreasingInterval` is a bracket with ``fa >= 0 >= fb``: the function falls through zero from ``a`` to ``b``.
+
+    The name describes the sign change, not monotonicity.
+    """
+
+    @staticmethod
+    def holds_orientation(fa: float, fb: float) -> bool:
+        """Return whether ``fa >= 0 >= fb``."""
+        return fa >= 0.0 >= fb
+
+    @staticmethod
+    def orientation_description() -> str:
+        """Return ``fa >= 0 >= fb``."""
+        return "fa >= 0 >= fb"
+
+    def _is_on_the_lower_side(self, fx: float) -> bool:
+        """Return whether ``fx`` is non-negative."""
+        return fx >= 0.0

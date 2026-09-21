@@ -13,19 +13,20 @@ functions or the benchmark that drives the solver.
   solver's own arithmetic is counted;
 - records the evaluation when history recording is on.
 
-`Interval` is a bracketing solver's bracket, and `SolverState` is the mutable state of one solve,
-which a solver extends with its own fields.
+`Interval` is a bracketing solver's bracket, of either orientation: an `IncreasingInterval` holds
+``f(a) <= 0 <= f(b)`` and a `DecreasingInterval` holds ``f(a) >= 0 >= f(b)``. `SolverState` is the
+mutable state of one solve, which a solver extends with its own fields.
 
 Two facts hold throughout this package:
 
-- **Orientation.** Every solver may assume ``f(a) < 0 < f(b)``; `Solver.solve` rejects any other
-  bracket with a `ValueError`, and nothing normalizes the sign. The restriction is easy for a caller
-  to satisfy, and this package is targeted at research settings, to evaluate solver prototypes, where
-  this limitation is acceptable.
+- **Orientation.** The framework supports both orientations and normalizes nothing: the bracket's
+  class says which one a solve has. The benchmark's own function portfolio is entirely increasing,
+  ``f(a) < 0 < f(b)``, so a solver may support only that case; how it treats a decreasing bracket
+  is its author's choice, and the framework never decides it for them.
 - **Flop counting.** `Solver.solve` converts ``a``, ``b``, ``f(a)`` and ``f(b)`` to `CountedFloat`
   before handing them to the solver, so the solver's arithmetic on them is counted; `WrappedFunction`
   pauses counting while ``f`` itself runs.
 """
 
-from .interval import Interval
+from .interval import DecreasingInterval, IncreasingInterval, Interval
 from .state import SolverState

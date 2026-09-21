@@ -4,6 +4,6 @@ What each one is for is described in the docstring of the implementation package
 `WrappedFunction` is deliberately absent: a solver receives one inside its `SolverState` and never constructs one.
 """
 
-from ._core.solvers.core import Interval, SolverState
+from ._core.solvers.core import DecreasingInterval, IncreasingInterval, Interval, SolverState
 
-__all__ = ["Interval", "SolverState"]
+__all__ = ["DecreasingInterval", "IncreasingInterval", "Interval", "SolverState"]
