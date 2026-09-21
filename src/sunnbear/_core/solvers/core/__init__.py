@@ -26,9 +26,10 @@ Two facts hold throughout this package:
   bracket with a `ValueError`, and nothing normalizes the sign. The restriction is easy for a caller
   to satisfy, and this package is targeted at research settings, to evaluate solver prototypes, where
   this limitation is acceptable.
-- **Flop counting.** `Solver.solve` converts ``a``, ``b``, ``f(a)`` and ``f(b)`` to `CountedFloat`
-  before handing them to the solver, so the solver's arithmetic on them is counted; `WrappedFunction`
-  pauses counting while ``f`` itself runs.
+- **Flop counting.** Only the bracket-order check in `Solver.solve` is uncounted. Everything after
+  it runs on `CountedFloat` and is counted: the endpoint checks, ``xtol``, the bookkeeping of the
+  best estimate, and the solver's own arithmetic. `WrappedFunction` pauses counting while ``f``
+  itself runs, so the function's cost is never included.
 """
 
 from .interval import Interval

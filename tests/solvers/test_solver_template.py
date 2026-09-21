@@ -3,6 +3,7 @@
 import math
 
 import pytest
+from counted_float import FlopCounts
 
 from sunnbear.solvers import Solver, SolverState, SolveStatus
 
@@ -261,10 +262,23 @@ def test_history_is_none_unless_requested():
     assert on.history == ((0.0, -0.25), (1.0, 0.75))
 
 
-def test_solver_arithmetic_is_counted_and_result_x_is_a_plain_float():
+def test_everything_after_validation_is_counted_and_result_x_is_a_plain_float():
     # --- act --------------------------
-    result = _MidpointRepeatingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=3)
+    result = _RecordingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=3)
 
     # --- assert -----------------------
-    assert result.flop_counts.total_count() > 0  # The midpoint arithmetic runs on CountedFloat endpoints.
+    # 2 endpoint zero checks + 2 sign checks + 2 divergence checks; the initial x_best midpoint.
+    assert result.flop_counts == FlopCounts(COMP=6, ADD=1, MUL=1)
     assert type(result.x) is float
+
+
+@pytest.mark.parametrize(
+    "f, n_comparisons", [(lambda x: x, 1), (lambda x: x - 1.0, 2)]
+)  # A zero at a needs 1 check, a zero at b needs 2.
+def test_an_early_exit_reports_the_comparisons_that_produced_it(f, n_comparisons):
+    # --- act --------------------------
+    result = _RecordingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=3)
+
+    # --- assert -----------------------
+    assert result.status is SolveStatus.CONVERGED
+    assert result.flop_counts == FlopCounts(COMP=n_comparisons)

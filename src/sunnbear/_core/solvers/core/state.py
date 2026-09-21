@@ -19,9 +19,10 @@ class SolverState:
     class is named there, so the solver never constructs a state itself.
 
     Attributes:
-        f: The wrapped function to evaluate.
-        bracket: The initial bracket ``[a, b]``; its class says whether it is increasing or decreasing, see `Interval`.
-        xtol: Requested x-tolerance, ``|x_true - x| <= xtol``.
+        f: The wrapped function to evaluate. The bracket's endpoints satisfy ``f(a) < 0 < f(b)``:
+            `Solver.solve` checks this and raises `ValueError` before any state is created.
+        bracket: The initial bracket ``[a, b]``.
+        xtol: Requested x-tolerance, ``|x_true - x| <= xtol``, as a `CountedFloat` so arithmetic on it is counted.
         n_iters: Iterations performed so far; ``None`` unless the solver counts
             iterations.
         x_best: Best root estimate so far; reported as the solve's final ``x`` when

@@ -75,6 +75,10 @@ class Solver(ABC, Generic[StateT]):
           whose result lies outside ``[a, b]``, or whose function error happened outside
           ``[a, b]``, is ``DIVERGED``. Excursions that return are not penalized, and there is no
           bound to justify.
+        - Only the bracket-order check is uncounted. Everything after it runs on `CountedFloat`
+          and is counted: the endpoint checks, ``xtol``, the bookkeeping of the best estimate, the
+          solver's arithmetic, and the divergence check. An early exit therefore reports the
+          comparisons that produced it.
 
         Args:
             f: The function; must be finite on ``[a, b]`` with ``f(a) < 0 < f(b)``.
@@ -88,22 +92,28 @@ class Solver(ABC, Generic[StateT]):
             ValueError: If ``a >= b``, or ``f(a) < 0 < f(b)`` does not hold — a caller error, not a
                 solve outcome.
         """
+        # --- uncounted validation -------------------
         if not a < b:
             raise ValueError(f"Bracket must satisfy a < b (got a={a}, b={b}).")
         wrapped_f = WrappedFunction(f, max_fevals=max_fevals, record_history=record_history)
         with FlopCountingContext() as flop_ctx:
-            fa_plain, fb_plain = float(wrapped_f(a)), float(wrapped_f(b))
-            if fa_plain == 0.0 or fb_plain == 0.0:
-                x, status, n_iters = (a if fa_plain == 0.0 else b), SolveStatus.CONVERGED, None
+            # --- counted: endpoints and early exits -----
+            a_counted, b_counted, xtol_counted = CountedFloat(a), CountedFloat(b), CountedFloat(xtol)
+            fa, fb = wrapped_f(a_counted), wrapped_f(b_counted)
+            if fa == 0.0:
+                x, status, n_iters = a_counted, SolveStatus.CONVERGED, None
+            elif fb == 0.0:
+                x, status, n_iters = b_counted, SolveStatus.CONVERGED, None
+            elif not fa < 0.0 < fb:
+                raise ValueError(
+                    f"f(a) < 0 < f(b) is required (got f({a})={float(fa)}, f({b})={float(fb)}); "
+                    "pass lambda x: -f(x) for a function of the opposite orientation."
+                )
             else:
-                if not fa_plain < 0.0 < fb_plain:
-                    raise ValueError(
-                        f"f(a) < 0 < f(b) is required (got f({a})={fa_plain}, f({b})={fb_plain}); "
-                        "pass lambda x: -f(x) for a function of the opposite orientation."
-                    )
-                bracket = Interval(CountedFloat(a), CountedFloat(b), CountedFloat(fa_plain), CountedFloat(fb_plain))
-                state = self.state_cls(f=wrapped_f, bracket=bracket, xtol=xtol, x_best=_plain_midpoint(a, b))
-                x, status = self._run_catching_exceptions(state, a, b)
+                # --- counted: the solver run ------------
+                bracket = Interval(a_counted, b_counted, fa, fb)
+                state = self.state_cls(f=wrapped_f, bracket=bracket, xtol=xtol_counted, x_best=bracket.midpoint)
+                x, status = self._run_catching_exceptions(state, a_counted, b_counted)
                 n_iters = state.n_iters
         return SolveResult(
             x=float(x),
@@ -118,7 +128,8 @@ class Solver(ABC, Generic[StateT]):
         """Run the algorithm and map how it ended to a root estimate and a status.
 
         The state is typed as the base class here because `state_cls` is declared as one; `_solve`
-        receives the instance of `state_cls` that `solve` created.
+        receives the instance of `state_cls` that `solve` created. ``a`` and ``b`` are `CountedFloat`,
+        so the divergence checks are counted.
         """
         try:
             x, status = self._solve(state), SolveStatus.CONVERGED  # type: ignore[arg-type]
@@ -132,7 +143,7 @@ class Solver(ABC, Generic[StateT]):
         except Exception:  # noqa: BLE001 — a solver bug becomes a recorded status, by design
             return state.x_best, SolveStatus.SOLVER_ERROR
         # A result outside the bracket is divergence whatever the solver reported, CONVERGED included.
-        if not a <= float(x) <= b:
+        if not a <= x <= b:
             status = SolveStatus.DIVERGED
         return x, status
 
@@ -168,7 +179,7 @@ class BracketingSolver(Solver[StateT]):
         while not interval.is_converged(xtol_doubled):
             interval = self._step(state, interval)
             state.incr_iteration_count()
-            state.x_best = _plain_midpoint(float(interval.a), float(interval.b))
+            state.x_best = interval.midpoint  # Cached on the interval: free when the step already used it.
         return interval.root()
 
     @abstractmethod
@@ -178,11 +189,3 @@ class BracketingSolver(Solver[StateT]):
         Evaluate the function only through ``state.f``, and derive the new bracket
         with `Interval.split_at`, so the sign-change invariant is kept.
         """
-
-
-# ==================================================================================================
-#  Helpers
-# ==================================================================================================
-def _plain_midpoint(a: float, b: float) -> float:
-    """Return the midpoint of two plain floats; bookkeeping, so not counted as solver cost."""
-    return 0.5 * (a + b)
