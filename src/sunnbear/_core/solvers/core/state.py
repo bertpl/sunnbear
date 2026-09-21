@@ -20,7 +20,7 @@ class SolverState:
 
     Attributes:
         f: The wrapped function to evaluate.
-        bracket: The initial bracket ``[a, b]``; its class is the orientation, see `Interval`.
+        bracket: The initial bracket ``[a, b]``; its class says whether it is increasing or decreasing, see `Interval`.
         xtol: Requested x-tolerance, ``|x_true - x| <= xtol``.
         n_iters: Iterations performed so far; ``None`` unless the solver counts
             iterations.

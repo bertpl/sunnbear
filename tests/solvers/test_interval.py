@@ -6,7 +6,12 @@ from sunnbear.solvers import DecreasingInterval, IncreasingInterval, Interval
 ORIENTATIONS = [IncreasingInterval, DecreasingInterval]
 
 
-def _oriented(cls: type[Interval], fa: float, fb: float) -> tuple[float, float]:
+def test_orientations_cover_every_interval_subclass():
+    """Assert ORIENTATIONS names every concrete subclass of Interval, so a new orientation is not missed here."""
+    assert set(ORIENTATIONS) == set(Interval.__subclasses__())
+
+
+def _orient_endpoints(cls: type[Interval], fa: float, fb: float) -> tuple[float, float]:
     """Return ``(fa, fb)`` as given for the increasing orientation and negated for the decreasing one."""
     return (fa, fb) if cls is IncreasingInterval else (-fa, -fb)
 
@@ -18,14 +23,14 @@ def _oriented(cls: type[Interval], fa: float, fb: float) -> tuple[float, float]:
 @pytest.mark.parametrize("a, b", [(1.0, -1.0), (0.0, 0.0)])  # the first pair is reversed, the second is degenerate
 def test_rejects_ill_ordered_endpoints(cls, a, b):
     with pytest.raises(ValueError, match="a < b"):
-        cls(a, b, *_oriented(cls, -1.0, 1.0))
+        cls(a, b, *_orient_endpoints(cls, -1.0, 1.0))
 
 
 @pytest.mark.parametrize("cls", ORIENTATIONS)
 @pytest.mark.parametrize("fa, fb", [(1.0, 2.0), (-2.0, -1.0), (1.0, -1.0)])  # no sign change, or the wrong way round
 def test_rejects_endpoint_values_of_the_wrong_orientation(cls, fa, fb):
     with pytest.raises(ValueError, match=cls.__name__):
-        cls(0.0, 1.0, *_oriented(cls, fa, fb))
+        cls(0.0, 1.0, *_orient_endpoints(cls, fa, fb))
 
 
 @pytest.mark.parametrize("cls", ORIENTATIONS)
@@ -45,8 +50,8 @@ def test_zero_endpoint_values_are_accepted(cls):
     [
         (-1.0, 1.0, IncreasingInterval),
         (1.0, -1.0, DecreasingInterval),
-        (0.0, 1.0, IncreasingInterval),  # a zero endpoint with the other positive rises
-        (1.0, 0.0, DecreasingInterval),  # a zero endpoint with the other positive at a falls
+        (0.0, 1.0, IncreasingInterval),  # a zero endpoint with the other positive at b: rises
+        (1.0, 0.0, DecreasingInterval),  # a zero endpoint with the other positive at a: falls
         (0.0, 0.0, IncreasingInterval),  # both zero holds either; the increasing class is the default
     ],
 )
@@ -71,7 +76,7 @@ def test_from_endpoints_rejects_a_missing_sign_change(fa, fb):
 @pytest.mark.parametrize("cls", ORIENTATIONS)
 def test_width_and_midpoint(cls):
     # --- arrange ----------------------
-    interval = cls(1.0, 4.0, *_oriented(cls, -1.0, 2.0))
+    interval = cls(1.0, 4.0, *_orient_endpoints(cls, -1.0, 2.0))
 
     # --- act / assert -----------------
     assert interval.width == 3.0
@@ -89,16 +94,16 @@ def test_width_and_midpoint(cls):
 )
 def test_split_at_keeps_the_sign_change_and_the_orientation(cls, fx, expected):
     # --- arrange ----------------------
-    interval = cls(0.0, 4.0, *_oriented(cls, -1.0, 2.0))
+    interval = cls(0.0, 4.0, *_orient_endpoints(cls, -1.0, 2.0))
     a_expected, b_expected, fa_expected, fb_expected = expected
 
     # --- act --------------------------
-    narrowed = interval.split_at(1.0, _oriented(cls, fx, 0.0)[0])
+    narrowed = interval.split_at(1.0, _orient_endpoints(cls, fx, 0.0)[0])
 
     # --- assert -----------------------
     assert type(narrowed) is cls
     assert (narrowed.a, narrowed.b) == (a_expected, b_expected)
-    assert (narrowed.fa, narrowed.fb) == _oriented(cls, fa_expected, fb_expected)
+    assert (narrowed.fa, narrowed.fb) == _orient_endpoints(cls, fa_expected, fb_expected)
 
 
 # ==================================================================================================
@@ -115,7 +120,7 @@ def test_split_at_keeps_the_sign_change_and_the_orientation(cls, fx, expected):
     ],
 )
 def test_is_converged(cls, fa, fb, two_xtol, expected):
-    assert cls(0.0, 1.0, *_oriented(cls, fa, fb)).is_converged(two_xtol) is expected
+    assert cls(0.0, 1.0, *_orient_endpoints(cls, fa, fb)).is_converged(two_xtol) is expected
 
 
 @pytest.mark.parametrize("cls", ORIENTATIONS)
@@ -128,7 +133,7 @@ def test_is_converged(cls, fa, fb, two_xtol, expected):
     ],
 )
 def test_root(cls, fa, fb, expected):
-    assert cls(0.0, 1.0, *_oriented(cls, fa, fb)).root() == expected
+    assert cls(0.0, 1.0, *_orient_endpoints(cls, fa, fb)).root() == expected
 
 
 # ==================================================================================================
