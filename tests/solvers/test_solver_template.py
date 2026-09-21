@@ -52,6 +52,16 @@ class _ExcursionSolver(Solver):
         return self._x_returned
 
 
+class _NanSolver(Solver):
+    """`_NanSolver` asks for an evaluation at NaN, as a runaway whose arithmetic broke down would."""
+
+    name = "nan"
+    version = 1
+
+    def _solve(self, state: SolverState) -> float:
+        return state.f(math.nan)
+
+
 class _StrayingSolver(Solver):
     """`_StrayingSolver` moves its best estimate outside the bracket and then runs out of budget."""
 
@@ -185,6 +195,14 @@ def test_only_a_result_outside_the_bracket_is_divergence(x_returned, status_expe
     # --- assert -----------------------
     assert (result.status, result.x) == (status_expected, x_returned)
     assert result.n_fevals == 3  # The far-away evaluation was performed, not refused.
+
+
+def test_a_non_finite_x_maps_to_diverged():
+    # --- act --------------------------
+    result = _NanSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
+
+    # --- assert -----------------------
+    assert (result.status, result.x, result.n_fevals) == (SolveStatus.DIVERGED, 0.5, 2)
 
 
 def test_running_out_of_budget_outside_the_bracket_maps_to_diverged():
