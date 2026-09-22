@@ -10,8 +10,8 @@ the pieces in this order::
       │ opens the flop-counting context; a, b become CountedFloat
       ▼
     Solver._solve(state: SolveState)                      [subclass hook]
-      │   BracketingSolver implements it as a loop over _step(state, Interval)
-      │   with the stopping criterion owned by BracketingSolver
+      │   BracketingSolver implements it as a loop of _next_x(state, Interval) calls; see that
+      │   class for what each iteration does
       ▼
     SolveResult
 

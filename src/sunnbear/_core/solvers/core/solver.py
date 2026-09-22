@@ -157,28 +157,37 @@ class Solver(ABC, Generic[StateT]):
 #  BracketingSolver
 # ==================================================================================================
 class BracketingSolver(Solver[StateT]):
-    """`BracketingSolver` is the base class for interval-reducing solvers; a subclass implements one `_step`.
+    """`BracketingSolver` is the base class for interval-reducing solvers; a subclass implements one `_next_x`.
 
-    The base class implements the loop and the stopping criterion (`Interval.is_converged`), so
-    a subclass cannot define a wrong one; one `_step` is one iteration. A solver that carries
-    values between steps keeps them on its `SolveState` subclass (see `Solver.state_cls`).
+    A bracketing solver is defined by what it does each iteration: pick a point inside the interval,
+    evaluate the function there, and keep the half that still holds the sign change.
+
+    The base class owns the evaluation and the split; only the choice of the point is left to the
+    subclass. It cannot evaluate the function itself, split the interval wrongly, or define a wrong
+    stopping criterion (`Interval.is_converged`); the base class does all three.
+
+    One `_next_x` is one iteration. A solver that carries values between iterations keeps them on its
+    `SolveState` subclass (see `Solver.state_cls`). A solver whose iteration evaluates the function
+    more than once, or updates the interval in its own way, overrides `_solve` on `Solver` directly,
+    instead of implementing `_next_x`.
     """
 
     def _solve(self, state: StateT) -> float:
-        """Reduce the interval with `_step` until `Interval.is_converged` holds; return `Interval.root`."""
+        """Split the interval at `_next_x` until `Interval.is_converged` holds; return `Interval.root`."""
         interval = state.interval
         xtol_doubled = 2.0 * state.xtol
         while not interval.is_converged(xtol_doubled):
-            interval = self._step(state, interval)
-            state.x_best = interval.midpoint  # Cached on the interval: free when the step already used it.
+            x = self._next_x(state, interval)
+            interval = interval.split_at(x, state.f(x))
+            state.x_best = interval.midpoint  # Cached on the interval: free when the next iteration reads it too.
         return interval.root()
 
     @abstractmethod
-    def _step(self, state: StateT, interval: Interval) -> Interval:
-        """Perform one iteration and return a strictly narrower interval.
+    def _next_x(self, state: StateT, interval: Interval) -> float:
+        """Return the interval's next evaluation point, strictly inside ``interval``.
 
-        Evaluate the function only through ``state.f``, and derive the new interval
-        with `Interval.split_at`, so the sign-change invariant is kept.
+        Read the function values at the interval bounds from ``interval``, and any value carried
+        between iterations from ``state``; do not evaluate the function here.
         """
 
 
