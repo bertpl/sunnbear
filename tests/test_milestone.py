@@ -11,7 +11,7 @@ so a mismatch between the layers' contracts is caught here.
 import numpy as np
 import pytest
 
-from sunnbear.functions import FormulaRegistry, TestFunction
+import sunnbear.functions as functions  # The module, so pytest does not try to collect the `TestFunction` class.
 from sunnbear.solvers import Bisection, RegulaFalsi, Solver, SolveResult, SolveStatus
 from sunnbear.stats import gpq
 
@@ -19,12 +19,12 @@ C_VALUES = np.linspace(-1.0, 1.0, 5)  # A batch of shifts, all of which fall ins
 
 
 @pytest.fixture(scope="module")
-def cubic() -> TestFunction:
+def cubic() -> functions.TestFunction:
     """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to ``c`` in ``[-1, 1]``."""
-    return FormulaRegistry.candidate_from_id("f101-0.2").calibrated(c_min=-1.0, c_max=1.0)
+    return functions.FormulaRegistry.candidate_from_id("f101-0.2").calibrated(c_min=-1.0, c_max=1.0)
 
 
-def _solve_batch(solver: Solver, cubic: TestFunction, xtol: float) -> list[SolveResult]:
+def _solve_batch(solver: Solver, cubic: functions.TestFunction, xtol: float) -> list[SolveResult]:
     """Solve the cubic for every shift in ``C_VALUES`` and return the results in that order."""
     return [solver.solve(cubic.build_x_fun(c), cubic.a, cubic.b, xtol=xtol, max_fevals=200) for c in C_VALUES]
 
