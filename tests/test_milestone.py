@@ -15,7 +15,8 @@ import sunnbear.functions as functions  # The module, so pytest does not try to 
 from sunnbear.solvers import Bisection, RegulaFalsi, Solver, SolveResult, SolveStatus
 from sunnbear.stats import gpq
 
-C_VALUES = np.linspace(-1.0, 1.0, 5)  # A batch of shift values for the cubic fixture below, inside the range it is calibrated for.
+# A batch of shift values for the cubic fixture below, inside the range it is calibrated for.
+C_VALUES = np.linspace(-1.0, 1.0, 5)
 
 
 @pytest.fixture(scope="module")
