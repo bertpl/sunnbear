@@ -75,14 +75,14 @@ def test_loop_stops_early_on_an_exact_zero():
     assert (result.x, result.status, result.n_fevals) == (0.5, SolveStatus.CONVERGED, 3)
 
 
-def test_interrupted_loop_reports_the_last_interval_midpoint():
+def test_interrupted_loop_reports_the_last_evaluated_point():
     # --- act --------------------------
     result = _HalvingSolver().solve(_linear, 0.0, 1.0, xtol=1e-9, max_fevals=4)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.MAX_FEVALS
-    assert result.n_fevals == 4  # 2 steps after the interval bounds: [0, 1] became [0, 0.5], then [0.25, 0.5].
-    assert result.x == 0.375
+    assert result.n_fevals == 4  # 2 steps after the interval bounds evaluated 0.5, then 0.25.
+    assert result.x == 0.25
 
 
 # ==================================================================================================

@@ -179,7 +179,7 @@ class BracketingSolver(Solver[StateT]):
         while not interval.is_converged(xtol_doubled):
             x = self._next_x(state, interval)
             interval = interval.split_at(x, state.f(x))
-            state.x_best = interval.midpoint  # Cached on the interval: free when the next iteration reads it too.
+            state.x_best = x  # The last evaluated point, so a stalled solver still reports its best iterate.
         return interval.root()
 
     @abstractmethod
