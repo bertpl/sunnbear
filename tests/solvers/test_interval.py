@@ -1,106 +1,132 @@
 import pytest
-from counted_float import CountedFloat, FlopCountingContext
+from counted_float import CountedFloat, FlopCountingContext, FlopCounts
 
-from sunnbear.solvers import Interval
+from sunnbear.solvers import DecreasingInterval, IncreasingInterval, Interval
+
+ORIENTATIONS = [IncreasingInterval, DecreasingInterval]
+
+
+def test_orientations_cover_every_interval_subclass():
+    """Assert ORIENTATIONS names every concrete subclass of Interval."""
+    assert set(ORIENTATIONS) == set(Interval.__subclasses__())
+
+
+def _orient_endpoints(cls: type[Interval], fa: float, fb: float) -> tuple[float, float]:
+    """Return ``(fa, fb)`` as given for the increasing orientation and negated for the decreasing one."""
+    return (fa, fb) if cls is IncreasingInterval else (-fa, -fb)
 
 
 # ==================================================================================================
 #  Invariants
 # ==================================================================================================
-@pytest.mark.parametrize("a, b", [(1.0, -1.0), (0.0, 0.0)])  # the first pair is reversed, the second is degenerate
-def test_rejects_ill_ordered_endpoints(a, b):
-    with pytest.raises(ValueError, match="a < b"):
-        Interval(a, b, -1.0, 1.0)
-
-
-@pytest.mark.parametrize("fa, fb", [(1.0, 2.0), (-2.0, -1.0), (1.0, -1.0)])  # no sign change, or the wrong way round
-def test_rejects_missing_normalized_sign_change(fa, fb):
-    with pytest.raises(ValueError, match="fa <= 0 <= fb"):
-        Interval(0.0, 1.0, fa, fb)
-
-
-def test_zero_endpoint_values_are_accepted():
+# ==================================================================================================
+#  Construction from endpoint values
+# ==================================================================================================
+@pytest.mark.parametrize(
+    "fa, fb, cls_expected",
+    [
+        (-1.0, 1.0, IncreasingInterval),
+        (1.0, -1.0, DecreasingInterval),
+        (0.0, 1.0, IncreasingInterval),  # a zero endpoint with the other positive at b: rises
+        (1.0, 0.0, DecreasingInterval),  # a zero endpoint with the other positive at a: falls
+        (0.0, 0.0, IncreasingInterval),  # both zero holds either; the increasing class is the default
+    ],
+)
+def test_from_endpoints_picks_the_orientation(fa, fb, cls_expected):
     # --- act --------------------------
-    interval = Interval(0.0, 1.0, 0.0, 0.0)
+    interval = Interval.from_endpoints(0.0, 1.0, fa, fb)
 
     # --- assert -----------------------
-    assert (interval.fa, interval.fb) == (0.0, 0.0)
+    assert type(interval) is cls_expected
+    assert (interval.a, interval.b, interval.fa, interval.fb) == (0.0, 1.0, fa, fb)
+
+
+@pytest.mark.parametrize("fa, fb", [(1.0, 2.0), (-2.0, -1.0)])
+def test_from_endpoints_rejects_a_missing_sign_change(fa, fb):
+    with pytest.raises(ValueError, match="differ in sign"):
+        Interval.from_endpoints(0.0, 1.0, fa, fb)
 
 
 # ==================================================================================================
 #  Geometry
 # ==================================================================================================
-def test_width_and_midpoint():
+@pytest.mark.parametrize("cls", ORIENTATIONS)
+def test_width_and_midpoint(cls):
     # --- arrange ----------------------
-    interval = Interval(1.0, 4.0, -1.0, 2.0)
+    interval = cls(1.0, 4.0, *_orient_endpoints(cls, -1.0, 2.0))
 
     # --- act / assert -----------------
     assert interval.width == 3.0
     assert interval.midpoint == 2.5
 
 
+@pytest.mark.parametrize("cls", ORIENTATIONS)
 @pytest.mark.parametrize(
     "fx, expected",
     [
-        (-0.5, (1.0, 4.0, -0.5, 2.0)),  # non-positive: x becomes the lower endpoint
+        (-0.5, (1.0, 4.0, -0.5, 2.0)),  # the sign of fa: x becomes the lower endpoint
         (0.0, (1.0, 4.0, 0.0, 2.0)),  # exact zero: also lower, so the zero endpoint is fa
-        (0.5, (0.0, 1.0, -1.0, 0.5)),  # positive: x becomes the upper endpoint
+        (0.5, (0.0, 1.0, -1.0, 0.5)),  # the sign of fb: x becomes the upper endpoint
     ],
 )
-def test_split_at_keeps_the_sign_change(fx, expected):
+def test_split_at_keeps_the_sign_change_and_the_orientation(cls, fx, expected):
     # --- arrange ----------------------
-    interval = Interval(0.0, 4.0, -1.0, 2.0)
+    interval = cls(0.0, 4.0, *_orient_endpoints(cls, -1.0, 2.0))
+    a_expected, b_expected, fa_expected, fb_expected = expected
 
     # --- act --------------------------
-    narrowed = interval.split_at(1.0, fx)
+    narrowed = interval.split_at(1.0, _orient_endpoints(cls, fx, 0.0)[0])
 
     # --- assert -----------------------
-    assert (narrowed.a, narrowed.b, narrowed.fa, narrowed.fb) == expected
+    assert type(narrowed) is cls
+    assert (narrowed.a, narrowed.b) == (a_expected, b_expected)
+    assert (narrowed.fa, narrowed.fb) == _orient_endpoints(cls, fa_expected, fb_expected)
 
 
 # ==================================================================================================
 #  Stopping criteria and root extraction
 # ==================================================================================================
+@pytest.mark.parametrize("cls", ORIENTATIONS)
 @pytest.mark.parametrize(
-    "interval, two_xtol, expected",
+    "fa, fb, two_xtol, expected",
     [
-        (Interval(0.0, 1.0, -1.0, 1.0), 1.0, True),  # width criterion: width equal to 2*xtol counts as converged
-        (Interval(0.0, 1.0, -1.0, 1.0), 0.5, False),  # the width criterion is not met and no endpoint is zero
-        (Interval(0.0, 1.0, 0.0, 1.0), 0.5, True),  # zero-endpoint criterion: lower endpoint is a root
-        (Interval(0.0, 1.0, -1.0, 0.0), 0.5, True),  # zero-endpoint criterion: upper endpoint is a root
+        (-1.0, 1.0, 1.0, True),  # width criterion: width equal to 2*xtol counts as converged
+        (-1.0, 1.0, 0.5, False),  # the width criterion is not met and no endpoint is zero
+        (0.0, 1.0, 0.5, True),  # zero-endpoint criterion: lower endpoint is a root
+        (-1.0, 0.0, 0.5, True),  # zero-endpoint criterion: upper endpoint is a root
     ],
 )
-def test_is_converged(interval, two_xtol, expected):
-    assert interval.is_converged(two_xtol) is expected
+def test_is_converged(cls, fa, fb, two_xtol, expected):
+    assert cls(0.0, 1.0, *_orient_endpoints(cls, fa, fb)).is_converged(two_xtol) is expected
 
 
+@pytest.mark.parametrize("cls", ORIENTATIONS)
 @pytest.mark.parametrize(
-    "interval, expected",
+    "fa, fb, expected",
     [
-        (Interval(0.0, 1.0, 0.0, 1.0), 0.0),  # zero lower endpoint wins over the midpoint
-        (Interval(0.0, 1.0, -1.0, 0.0), 1.0),  # zero upper endpoint wins over the midpoint
-        (Interval(0.0, 1.0, -1.0, 1.0), 0.5),  # the midpoint is returned otherwise
+        (0.0, 1.0, 0.0),  # zero lower endpoint wins over the midpoint
+        (-1.0, 0.0, 1.0),  # zero upper endpoint wins over the midpoint
+        (-1.0, 1.0, 0.5),  # the midpoint is returned otherwise
     ],
 )
-def test_root(interval, expected):
-    assert interval.root() == expected
+def test_root(cls, fa, fb, expected):
+    assert cls(0.0, 1.0, *_orient_endpoints(cls, fa, fb)).root() == expected
 
 
 # ==================================================================================================
 #  Flop accounting
 # ==================================================================================================
-def test_construction_costs_no_flops_but_geometry_is_counted():
-    """The invariant check runs on plain floats; midpoint and width arithmetic on CountedFloat endpoints is counted."""
+def test_the_sign_checks_and_the_geometry_are_counted_on_counted_endpoints():
     # --- arrange ----------------------
     a, b, fa, fb = CountedFloat(0.0), CountedFloat(1.0), CountedFloat(-1.0), CountedFloat(1.0)
 
     # --- act --------------------------
     with FlopCountingContext() as ctx_construct:
-        interval = Interval(a, b, fa, fb)
+        interval = Interval.from_endpoints(a, b, fa, fb)
     with FlopCountingContext() as ctx_geometry:
         _ = interval.midpoint
         _ = interval.width
 
     # --- assert -----------------------
-    assert ctx_construct.flop_counts().total_count() == 0
-    assert ctx_geometry.flop_counts().total_count() > 0
+    assert ctx_construct.flop_counts() == FlopCounts(COMP=2)  # The increasing orientation's two comparisons.
+    assert ctx_geometry.flop_counts() == FlopCounts(ADD=1, MUL=1, SUB=1)
