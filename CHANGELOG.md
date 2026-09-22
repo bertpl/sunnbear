@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Solver framework: every solver's function evaluations run through one wrapper that applies an evaluation budget, catches failed evaluations, and excludes the function's own cost from flop counting
 - Intervals of either orientation: `IncreasingInterval` (`f` negative at `a`, positive at `b`) and `DecreasingInterval` (the reverse), picked by `Interval.from_interval_bounds`
 - `Solver`/`BracketingSolver`: the base classes that a root solver subclasses to become benchmarkable; a solve that ends outside its interval is reported as diverged
-- `Bisection` reference solver
+- `Bisection` and `RegulaFalsi` reference solvers, with agreement tests against their SciPy counterparts
 
 ### Changed
 
