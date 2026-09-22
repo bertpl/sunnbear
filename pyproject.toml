@@ -52,6 +52,7 @@ dev = [
     # exact tool versions are pinned by the tracked uv.lock (used by pre-commit,
     # `make lint`, and CI); these ranges just set the floor.
     "ruff>=0.15.11",
+    "scipy>=1.16.2",  # its root finders are what the solver tests compare against; never a runtime dependency
     "ty==0.0.56",  # pre-1.0 type checker — pin exactly; its ruleset is still evolving
 ]
 # maintainer scratch tooling — installed by a plain `uv sync` (default-groups below)
