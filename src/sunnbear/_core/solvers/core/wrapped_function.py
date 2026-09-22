@@ -2,7 +2,7 @@
 
 Each call runs the checks documented on the class, in order.
 
-`Solver.solve` builds one per solve and hands it over inside the `SolverState`;
+`Solver.solve` builds one per solve and hands it over inside the `SolveState`;
 solver implementations never construct one.
 """
 
@@ -34,7 +34,7 @@ class WrappedFunction:
     since the function was evaluated; the count excludes calls refused by the
     budget or for a non-finite ``x``.
 
-    Whether an evaluation far from the bracket is divergence is not decided here: `Solver.solve`
+    Whether an evaluation far from the interval is divergence is not decided here: `Solver.solve`
     judges that from where the solve ended and where a function error happened.
     """
 
@@ -43,13 +43,13 @@ class WrappedFunction:
         f: Callable[[float], float],
         *,
         max_fevals: int,
-        record_history: bool,
+        history_enabled: bool,
     ) -> None:
         """Wrap ``f`` for one solve."""
         self._f = f
         self._max_fevals = max_fevals
         self.n_fevals = 0
-        self.history: list[tuple[float, float]] | None = [] if record_history else None
+        self.history: list[tuple[float, float]] | None = [] if history_enabled else None
 
     def __call__(self, x: float) -> float:
         """Evaluate ``f`` at ``x``: refuse it past the budget or for a non-finite ``x``, reject a failed evaluation."""

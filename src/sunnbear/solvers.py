@@ -1,9 +1,29 @@
-"""This module re-exports the classes that a solver implementation works with.
+"""This module re-exports the solver base classes and the classes that a solver subclass works with.
 
-What each one is for is described in the docstring of the implementation package, `sunnbear._core.solvers.core`.
-`WrappedFunction` is deliberately absent: a solver receives one inside its `SolverState` and never constructs one.
+How a solve runs is described in the docstring of the implementation package, `sunnbear._core.solvers.core`.
+`WrappedFunction` is deliberately absent: a solver receives one inside its `SolveState` and never constructs one.
 """
 
-from ._core.solvers.core import DecreasingInterval, IncreasingInterval, Interval, SolverState
+from ._core.solvers.core import (
+    BracketingSolver,
+    DecreasingInterval,
+    IncreasingInterval,
+    Interval,
+    IntervalBound,
+    Solver,
+    SolveResult,
+    SolveState,
+    SolveStatus,
+)
 
-__all__ = ["DecreasingInterval", "IncreasingInterval", "Interval", "SolverState"]
+__all__ = [
+    "BracketingSolver",
+    "DecreasingInterval",
+    "IncreasingInterval",
+    "Interval",
+    "IntervalBound",
+    "SolveResult",
+    "SolveState",
+    "SolveStatus",
+    "Solver",
+]
