@@ -9,7 +9,9 @@ from collections.abc import Callable
 
 from sunnbear.solvers import Solver, SolveState
 
-ScipyRootFinder = Callable[..., tuple[float, object]]  # e.g. scipy.optimize.bisect with full_output=True
+ScipyRootFinder = Callable[
+    ..., tuple[float, object]
+]  # For example, `scipy.optimize.bisect` called with `full_output=True`.
 
 
 class ScipySolver(Solver):
@@ -19,6 +21,7 @@ class ScipySolver(Solver):
     version = 1
 
     def __init__(self, root_finder: ScipyRootFinder) -> None:
+        """Wrap the given SciPy root finder as a `ScipySolver`."""
         self._root_finder = root_finder
 
     def _solve(self, state: SolveState) -> float:

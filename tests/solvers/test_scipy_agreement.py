@@ -38,8 +38,8 @@ def test_bisection_agrees_with_scipy_bisect(f, a, b, xtol):
     # --- assert -----------------------
     assert ours.status is twin.status is SolveStatus.CONVERGED
     assert abs(ours.x - twin.x) <= xtol
-    # SciPy stops on a slightly different width rule, so its own call count is ours within 1; it also re-evaluates
-    # both bounds; the twin's count includes both.
+    # SciPy stops on a slightly different width rule, so its own call count is ours within 1. It also re-evaluates
+    # both bounds, and the twin's count includes both.
     assert abs((twin.n_fevals - 2) - ours.n_fevals) <= 1
 
 

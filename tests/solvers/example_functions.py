@@ -7,7 +7,7 @@ def cubic(x: float) -> float:
 
 
 def decreasing_cubic(x: float) -> float:
-    """Return the negated `cubic`, so the same root with the decreasing interval orientation."""
+    """Return the negated `cubic`, giving the same root under the decreasing interval orientation."""
     return -cubic(x)
 
 
