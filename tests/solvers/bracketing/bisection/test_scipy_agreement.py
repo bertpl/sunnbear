@@ -1,15 +1,11 @@
-"""These tests check a shipped solver against its `scipy.optimize` counterpart through the `ScipySolver` twin.
-
-Only Bisection has one; SciPy ships no Regula Falsi.
-"""
+"""These tests check `Bisection` against `scipy.optimize.bisect` through `BisectionScipyTwin`."""
 
 import pytest
-import scipy.optimize
 from counted_float import FlopCounts
 
 from sunnbear.solvers import Bisection, SolveStatus
+from tests.solvers.bracketing.bisection.scipy_twin import BisectionScipyTwin
 from tests.solvers.example_functions import cubic, decreasing_cubic, quintic
-from tests.solvers.scipy_twin import ScipySolver
 
 PROBLEMS = [(cubic, 1.0, 2.0), (quintic, 0.0, 1.0), (decreasing_cubic, 1.0, 2.0)]
 
@@ -19,7 +15,7 @@ PROBLEMS = [(cubic, 1.0, 2.0), (quintic, 0.0, 1.0), (decreasing_cubic, 1.0, 2.0)
 # ==================================================================================================
 def test_the_twin_counts_evaluations_but_no_solver_arithmetic():
     # --- act --------------------------
-    result = ScipySolver(scipy.optimize.bisect).solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=200)
+    result = BisectionScipyTwin().solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=200)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
@@ -36,7 +32,7 @@ def test_the_twin_counts_evaluations_but_no_solver_arithmetic():
 def test_bisection_agrees_with_scipy_bisect(f, a, b, xtol):
     # --- act --------------------------
     ours = Bisection().solve(f, a, b, xtol=xtol, max_fevals=200)
-    twin = ScipySolver(scipy.optimize.bisect).solve(f, a, b, xtol=xtol, max_fevals=200)
+    twin = BisectionScipyTwin().solve(f, a, b, xtol=xtol, max_fevals=200)
 
     # --- assert -----------------------
     assert ours.status is twin.status is SolveStatus.CONVERGED

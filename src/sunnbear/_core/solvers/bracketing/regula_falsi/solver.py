@@ -1,4 +1,4 @@
-"""`RegulaFalsi` is a reference bracketing solver: the example of a solve that stalls."""
+"""`RegulaFalsi` implements regula falsi, the bracketing algorithm based on linear interpolation."""
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, SolveState
 
