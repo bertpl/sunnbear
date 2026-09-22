@@ -8,7 +8,7 @@ from sunnbear.solvers import Bisection, SolveStatus
 
 
 def _cubic(x: float) -> float:
-    return x**3 - x - 1.0  # One real root, near 1.3247
+    return x**3 - x - 1.0  # 1 real root, near 1.3247
 
 
 def _decreasing_cubic(x: float) -> float:
@@ -24,10 +24,8 @@ ROOT = 1.324717957244746
 @pytest.mark.parametrize("f", [_cubic, _decreasing_cubic])  # both orientations
 @pytest.mark.parametrize("a, b, xtol", [(1.0, 2.0, 1e-3), (0.0, 4.0, 1e-8), (1.3, 1.4, 1e-12)])
 def test_converges_within_xtol_with_the_exact_evaluation_count(f, a, b, xtol):
-    # --- act --------------------------
+    # --- act / assert -----------------
     result = Bisection().solve(f, a, b, xtol=xtol, max_fevals=200)
-
-    # --- assert -----------------------
     n_steps = math.ceil(math.log2((b - a) / (2.0 * xtol)))
     assert result.status is SolveStatus.CONVERGED
     assert abs(result.x - ROOT) <= xtol
