@@ -81,7 +81,7 @@ def test_interrupted_loop_reports_the_last_evaluated_point():
 
     # --- assert -----------------------
     assert result.status is SolveStatus.MAX_FEVALS
-    assert result.n_fevals == 4  # 2 steps after the interval bounds evaluated 0.5, then 0.25.
+    assert result.n_fevals == 4  # After the interval bounds, 2 steps evaluated 0.5, then 0.25.
     assert result.x == 0.25
 
 
