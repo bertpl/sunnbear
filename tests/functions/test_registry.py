@@ -72,7 +72,7 @@ def test_candidates_deduplicates_across_recipes():
         def parametrized_fun(x: float, c: float, p1: float) -> float:
             return x - c
 
-        def bracket(self, p1: float) -> tuple[float, float]:
+        def interval(self, p1: float) -> tuple[float, float]:
             return (-1.0, 1.0)
 
         def recipes(self) -> tuple[ParamRecipe, ...]:
@@ -98,7 +98,7 @@ def _minimal_formula_cls(formula_number: int) -> type[Formula]:
         def parametrized_fun(x: float, c: float) -> float:
             return x - c
 
-        def bracket(self) -> tuple[float, float]:
+        def interval(self) -> tuple[float, float]:
             return (-1.0, 1.0)
 
         def recipes(self) -> tuple[ParamRecipe, ...]:
@@ -192,7 +192,7 @@ def test_candidates_deduplicates_across_notations():
         def parametrized_fun(x: float, c: float, p1: float) -> float:
             return x - c
 
-        def bracket(self, p1: float) -> tuple[float, float]:
+        def interval(self, p1: float) -> tuple[float, float]:
             return (-1.0, 1.0)
 
         def recipes(self) -> tuple[ParamRecipe, ...]:
@@ -209,7 +209,7 @@ def test_candidates_deduplicates_across_notations():
 # ==================================================================================================
 #  recipe validation
 # ==================================================================================================
-def _formula_cls(number: int, declared: tuple[str, ...], recipes: tuple, fun=None, bracket=None):
+def _formula_cls(number: int, declared: tuple[str, ...], recipes: tuple, fun=None, interval=None):
     """Build a throwaway Formula whose declaration and recipes can be varied independently."""
     namespace = {
         "number": number,
@@ -217,7 +217,7 @@ def _formula_cls(number: int, declared: tuple[str, ...], recipes: tuple, fun=Non
         "param_names": declared,
         "jit": False,
         "parametrized_fun": staticmethod(fun or (lambda x, c, p1: x - c)),
-        "bracket": bracket or (lambda self, p1: (-1.0, 1.0)),
+        "interval": interval or (lambda self, p1: (-1.0, 1.0)),
         "recipes": lambda self: recipes,
     }
     return type(f"Varying{number}", (Formula,), namespace)
@@ -262,17 +262,17 @@ def test_declared_params_must_match_parametrized_fun_signature():
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_declared_params_must_match_bracket_signature():
-    """Right arity but wrong names in bracket is drift too — the cross-check covers every hook."""
+    """Right arity but wrong names in interval is drift too — the cross-check covers every hook."""
     # --- arrange ----------------------
     cls = _formula_cls(
         981,
         ("p1",),
         (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),),
-        bracket=lambda self, other: (-1.0, 1.0),
+        interval=lambda self, other: (-1.0, 1.0),
     )
 
     # --- act / assert -----------------
-    with pytest.raises(ValueError, match="bracket takes"):
+    with pytest.raises(ValueError, match="interval takes"):
         cls().build_all_candidates()
 
 
@@ -305,11 +305,11 @@ def test_varargs_bracket_is_rejected():
         984,
         ("p1",),
         (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),),
-        bracket=lambda self, *params: (-1.0, 1.0),
+        interval=lambda self, *params: (-1.0, 1.0),
     )
 
     # --- act / assert -----------------
-    with pytest.raises(TypeError, match="bracket must name its parameters"):
+    with pytest.raises(TypeError, match="interval must name its parameters"):
         cls().build_all_candidates()
 
 
@@ -385,7 +385,7 @@ def test_compiled_formula_rejects_plain_method():
         def parametrized_fun(self, x: float, c: float) -> float:  # not a staticmethod: rejected
             return x - c
 
-        def bracket(self) -> tuple[float, float]:
+        def interval(self) -> tuple[float, float]:
             return (-1.0, 1.0)
 
         def recipes(self) -> tuple[ParamRecipe, ...]:

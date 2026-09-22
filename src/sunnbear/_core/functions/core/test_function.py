@@ -42,9 +42,9 @@ class CandidateTestFunction:
     b: float
 
     def __post_init__(self) -> None:
-        """Reject an ill-defined bracket: a test function needs a genuine interval, so strictly a < b."""
+        """Reject an ill-defined interval: a test function needs a genuine x-interval, so strictly a < b."""
         if not self.a < self.b:
-            raise ValueError(f"Bracket must satisfy a < b (got a={self.a}, b={self.b}).")
+            raise ValueError(f"Interval must satisfy a < b (got a={self.a}, b={self.b}).")
 
     @property
     def xc_fun(self) -> XCFun:
@@ -66,7 +66,7 @@ class CandidateTestFunction:
 # ==================================================================================================
 @dataclass(frozen=True)
 class TestFunction:
-    """A benchmarkable test function: ``f(x, c)``, its bracket, and its calibrated c-range.
+    """A benchmarkable test function: ``f(x, c)``, its interval, and its calibrated c-range.
 
     For every ``c`` in ``[c_min, c_max]``, ``f(a, c) * f(b, c) < 0`` and the
     function returns finite values on ``[a, b]``.
@@ -88,9 +88,9 @@ class TestFunction:
     c_max: float
 
     def __post_init__(self) -> None:
-        """Reject ill-defined intervals: both the bracket and the c-range must be genuine, strictly ordered."""
+        """Reject ill-defined intervals: both the x-interval and the c-range must be genuine, strictly ordered."""
         if not self.a < self.b:
-            raise ValueError(f"Bracket must satisfy a < b (got a={self.a}, b={self.b}).")
+            raise ValueError(f"Interval must satisfy a < b (got a={self.a}, b={self.b}).")
         if not self.c_min < self.c_max:
             raise ValueError(f"Calibrated c-range must satisfy c_min < c_max (got {self.c_min}..{self.c_max}).")
 
