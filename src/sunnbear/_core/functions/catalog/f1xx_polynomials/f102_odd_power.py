@@ -21,8 +21,8 @@ class F102_OddPower(Formula):
         """Evaluate ``x^p1 - c``."""
         return x**p1 - c
 
-    def bracket(self, p1: float) -> tuple[float, float]:
-        """Fixed bracket, wide enough for the calibrated c-range."""
+    def interval(self, p1: float) -> tuple[float, float]:
+        """Return a fixed interval; `Formula.interval` says why it is wide."""
         return (-2.0, 2.0)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
@@ -30,7 +30,7 @@ class F102_OddPower(Formula):
         return (ParamRecipe.decimal("p1", 1.0, 7.0, step=2.0),)
 
     def is_param_tuple_valid(self, p1: float) -> bool:
-        """Require an odd integer power (even powers break the sign change across the bracket)."""
+        """Require an odd integer power (even powers break the sign change across the interval)."""
         return p1 == int(p1) and int(p1) % 2 == 1
 
     cases = (
@@ -38,5 +38,5 @@ class F102_OddPower(Formula):
         FormulaTestCase.value(params={"p1": 3.0}, x=2.0, c=0.0, expected=8.0),  # 2^3, exercises c=0
         FormulaTestCase.invalid(params={"p1": 2.0}),  # even integer power — rejected
         FormulaTestCase.invalid(params={"p1": 1.5}),  # non-integer power — rejected
-        FormulaTestCase.bracket(params={"p1": 3.0}, expected=(-2.0, 2.0)),
+        FormulaTestCase.interval(params={"p1": 3.0}, expected=(-2.0, 2.0)),
     )
