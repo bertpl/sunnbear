@@ -161,13 +161,14 @@ class BracketingSolver(Solver[StateT]):
 
     A bracketing solver is defined by what it does each iteration: pick a point inside the interval,
     evaluate the function there, and keep the half that still holds the sign change. The base class
-    owns all of that except the choice of the point, so a subclass cannot evaluate the function
-    itself, split the interval wrongly, or define a wrong stopping criterion (`Interval.is_converged`).
-    One `_next_x` is one iteration. A solver that carries values between iterations keeps them on its
-    `SolveState` subclass (see `Solver.state_cls`).
+    owns the evaluation and the split; only the choice of the point is left to the subclass, so a
+    subclass cannot evaluate the function itself, split the interval wrongly, or define a wrong
+    stopping criterion (`Interval.is_converged`).
 
-    A solver whose iteration evaluates the function more than once, or updates the interval in its own
-    way, overrides `_solve` on `Solver` instead.
+    One `_next_x` is one iteration. A solver that carries values between iterations keeps them on its
+    `SolveState` subclass (see `Solver.state_cls`). A solver whose iteration evaluates the function
+    more than once, or updates the interval in its own way, overrides `_solve` on `Solver` directly,
+    instead of implementing `_next_x`.
     """
 
     def _solve(self, state: StateT) -> float:
@@ -177,12 +178,12 @@ class BracketingSolver(Solver[StateT]):
         while not interval.is_converged(xtol_doubled):
             x = self._next_x(state, interval)
             interval = interval.split_at(x, state.f(x))
-            state.x_best = interval.midpoint  # Cached on the interval: free when the next step uses it.
+            state.x_best = interval.midpoint  # Cached on the interval: free when the next iteration uses it.
         return interval.root()
 
     @abstractmethod
     def _next_x(self, state: StateT, interval: Interval) -> float:
-        """Return the point strictly inside ``interval`` at which the base class evaluates the function next.
+        """Return the interval's next evaluation point, strictly inside ``interval``.
 
         Read the function values at the interval bounds from ``interval``; do not evaluate the
         function here.
