@@ -67,8 +67,9 @@ class Solver(ABC, Generic[StateT]):
 
         - The endpoints are evaluated first; an endpoint that is exactly zero
           ends the solve as ``CONVERGED`` without running the algorithm.
-        - ``f(a) < 0 < f(b)`` is required of the caller, so every solver may rely on that orientation;
-          a function of the opposite orientation is passed as ``lambda x: -f(x)``.
+        - The bracket handed to the solver is an `IncreasingInterval` or a `DecreasingInterval`,
+          whichever the endpoint values hold; a solver that supports one orientation only decides
+          for itself what to do with the other.
         - Every abnormal ending becomes a `SolveStatus`, not an exception: one
           broken solver must not abort a batch of a million solves.
         - Divergence is judged by where things ended, not by how far an iterate strayed: a solve
@@ -81,7 +82,7 @@ class Solver(ABC, Generic[StateT]):
           comparisons that produced it.
 
         Args:
-            f: The function; must be finite on ``[a, b]`` with ``f(a) < 0 < f(b)``.
+            f: The function; must be finite on ``[a, b]``, with ``f(a)`` and ``f(b)`` of opposite sign or zero.
             a: Lower end of the bracket.
             b: Upper end of the bracket.
             xtol: Requested x-tolerance, ``|x_true - x| <= xtol``.
@@ -89,8 +90,8 @@ class Solver(ABC, Generic[StateT]):
             record_history: Whether to keep every ``(x, f(x))`` pair in the result.
 
         Raises:
-            ValueError: If ``a >= b``, or ``f(a) < 0 < f(b)`` does not hold — a caller error, not a
-                solve outcome.
+            ValueError: If ``a >= b``, or ``f(a)`` and ``f(b)`` have the same sign and neither is
+                zero — a caller error, not a solve outcome.
         """
         # --- uncounted validation -------------------
         if not a < b:
@@ -104,14 +105,9 @@ class Solver(ABC, Generic[StateT]):
                 x, status, n_iters = a_counted, SolveStatus.CONVERGED, None
             elif fb == 0.0:
                 x, status, n_iters = b_counted, SolveStatus.CONVERGED, None
-            elif not fa < 0.0 < fb:
-                raise ValueError(
-                    f"f(a) < 0 < f(b) is required (got f({a})={float(fa)}, f({b})={float(fb)}); "
-                    "pass lambda x: -f(x) for a function of the opposite orientation."
-                )
             else:
                 # --- counted: the solver run ------------
-                bracket = Interval(a_counted, b_counted, fa, fb)
+                bracket = Interval.from_endpoints(a_counted, b_counted, fa, fb)
                 state = self.state_cls(f=wrapped_f, bracket=bracket, xtol=xtol_counted, x_best=bracket.midpoint)
                 x, status = self._run_catching_exceptions(state, a_counted, b_counted)
                 n_iters = state.n_iters

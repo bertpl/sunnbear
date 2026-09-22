@@ -4,6 +4,24 @@ How a solve runs is described in the docstring of the implementation package, `s
 `WrappedFunction` is deliberately absent: a solver receives one inside its `SolverState` and never constructs one.
 """
 
-from ._core.solvers.core import BracketingSolver, Interval, Solver, SolveResult, SolverState, SolveStatus
+from ._core.solvers.core import (
+    BracketingSolver,
+    DecreasingInterval,
+    IncreasingInterval,
+    Interval,
+    Solver,
+    SolveResult,
+    SolverState,
+    SolveStatus,
+)
 
-__all__ = ["BracketingSolver", "Interval", "SolveResult", "SolveStatus", "Solver", "SolverState"]
+__all__ = [
+    "BracketingSolver",
+    "DecreasingInterval",
+    "IncreasingInterval",
+    "Interval",
+    "SolveResult",
+    "SolveStatus",
+    "Solver",
+    "SolverState",
+]

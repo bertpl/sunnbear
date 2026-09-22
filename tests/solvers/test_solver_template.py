@@ -5,7 +5,7 @@ import math
 import pytest
 from counted_float import FlopCounts
 
-from sunnbear.solvers import Solver, SolverState, SolveStatus
+from sunnbear.solvers import DecreasingInterval, IncreasingInterval, Solver, SolverState, SolveStatus
 
 
 # ==================================================================================================
@@ -117,12 +117,25 @@ def test_rejects_ill_ordered_bracket(a, b):
         _RecordingSolver().solve(_increasing, a, b, xtol=1e-3, max_fevals=10)
 
 
-@pytest.mark.parametrize(
-    "f", [lambda x: x + 1.0, lambda x: -x - 1.0, _decreasing]
-)  # the first is positive everywhere, the second negative everywhere, the third has f(a) > 0 > f(b)
-def test_rejects_a_function_without_the_required_orientation(f):
-    with pytest.raises(ValueError, match=r"f\(a\) < 0 < f\(b\) is required"):
+@pytest.mark.parametrize("f", [lambda x: x + 1.0, lambda x: -x - 1.0])  # positive everywhere, negative everywhere
+def test_rejects_a_function_without_a_sign_change(f):
+    with pytest.raises(ValueError, match="differ in sign"):
         _RecordingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
+
+
+@pytest.mark.parametrize(
+    "f, cls_expected", [(_increasing, IncreasingInterval), (_decreasing, DecreasingInterval)]
+)  # Both orientations are solved; the bracket's class tells the solver which one it has.
+def test_the_bracket_class_is_the_orientation(f, cls_expected):
+    # --- arrange ----------------------
+    solver = _RecordingSolver()
+
+    # --- act --------------------------
+    result = solver.solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
+
+    # --- assert -----------------------
+    assert result.status is SolveStatus.CONVERGED
+    assert type(solver.states[0].bracket) is cls_expected
 
 
 # ==================================================================================================

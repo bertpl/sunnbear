@@ -6,7 +6,7 @@ the pieces in this order::
 
     Solver.solve(f, a, b, xtol=..., max_fevals=...)       [template method]
       │ wraps f in a WrappedFunction, which runs the per-evaluation checks documented on that class
-      │ evaluates f(a), f(b); requires f(a) < 0 < f(b)
+      │ evaluates f(a), f(b); Interval.from_endpoints picks the bracket's orientation from them
       │ opens the flop-counting context; a, b become CountedFloat
       ▼
     Solver._solve(state: SolverState)                      [subclass hook]
@@ -22,17 +22,17 @@ iterate may stray exists.
 
 Two facts hold throughout this package:
 
-- **Orientation.** Every solver may assume ``f(a) < 0 < f(b)``; `Solver.solve` rejects any other
-  bracket with a `ValueError`, and nothing normalizes the sign. The restriction is easy for a caller
-  to satisfy, and this package is targeted at research settings, to evaluate solver prototypes, where
-  this limitation is acceptable.
+- **Orientation.** The framework supports both orientations: the bracket's class, `IncreasingInterval`
+  or `DecreasingInterval`, says which one a bracket has. The benchmark's own function portfolio is
+  entirely increasing, ``f(a) < 0 < f(b)``, so a solver may support only that case, and how it
+  treats a decreasing bracket is its author's choice.
 - **Flop counting.** Only the bracket-order check in `Solver.solve` is uncounted. Everything after
   it runs on `CountedFloat` and is counted: the endpoint checks, ``xtol``, the bookkeeping of the
   best estimate, and the solver's own arithmetic. `WrappedFunction` pauses counting while ``f``
   itself runs, so the function's cost is never included.
 """
 
-from .interval import Interval
+from .interval import DecreasingInterval, IncreasingInterval, Interval
 from .result import SolveResult, SolveStatus
 from .solver import BracketingSolver, Solver
 from .state import SolverState
