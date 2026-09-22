@@ -5,18 +5,10 @@ import scipy.optimize
 from counted_float import FlopCounts
 
 from sunnbear.solvers import Bisection, RegulaFalsi, SolveStatus
+from tests.solvers.example_functions import cubic, decreasing_cubic, quintic
 from tests.solvers.scipy_twin import ScipySolver
 
-
-def _cubic(x: float) -> float:
-    return x**3 - x - 1.0
-
-
-def _sine_like(x: float) -> float:
-    return x**5 - 2.0 * x + 0.5
-
-
-PROBLEMS = [(_cubic, 1.0, 2.0), (_sine_like, 0.0, 1.0), (lambda x: -_cubic(x), 1.0, 2.0)]  # The last is decreasing.
+PROBLEMS = [(cubic, 1.0, 2.0), (quintic, 0.0, 1.0), (decreasing_cubic, 1.0, 2.0)]
 
 
 # ==================================================================================================
@@ -24,11 +16,11 @@ PROBLEMS = [(_cubic, 1.0, 2.0), (_sine_like, 0.0, 1.0), (lambda x: -_cubic(x), 1
 # ==================================================================================================
 def test_the_twin_counts_evaluations_but_no_solver_arithmetic():
     # --- act --------------------------
-    result = ScipySolver(scipy.optimize.bisect).solve(_cubic, 1.0, 2.0, xtol=1e-6, max_fevals=200)
+    result = ScipySolver(scipy.optimize.bisect).solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=200)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert result.n_fevals > 2  # The 2 bound evaluations, then SciPy's own.
+    assert result.n_fevals > 2  # The count includes the 2 bound evaluations plus SciPy's own.
     # SciPy runs on plain floats, so only the framework's own checks and bookkeeping are counted.
     assert result.flop_counts == FlopCounts(COMP=4, ADD=1, MUL=1)
 
@@ -47,7 +39,7 @@ def test_bisection_agrees_with_scipy_bisect(f, a, b, xtol):
     assert ours.status is twin.status is SolveStatus.CONVERGED
     assert abs(ours.x - twin.x) <= xtol
     # SciPy stops on a slightly different width rule, so its own call count is ours within 1; it also re-evaluates
-    # both bounds, which the twin's count includes.
+    # both bounds; the twin's count includes both.
     assert abs((twin.n_fevals - 2) - ours.n_fevals) <= 1
 
 

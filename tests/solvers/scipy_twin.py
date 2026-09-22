@@ -1,7 +1,7 @@
 """`ScipySolver` wraps a `scipy.optimize` root finder as a `Solver`, so a shipped solver can be checked against it.
 
 A twin exists for agreement tests only: it is never registered, never benchmarked, and SciPy runs on
-plain floats, so its flop counts hold only the framework's own checks. SciPy evaluates ``f`` at the
+plain floats, so the twin's flop counts hold only the framework's own checks. SciPy evaluates ``f`` at the
 interval bounds itself, so a twin's ``n_fevals`` is 2 more than SciPy's own function-call count.
 """
 
@@ -13,9 +13,9 @@ ScipyRootFinder = Callable[..., tuple[float, object]]  # e.g. scipy.optimize.bis
 
 
 class ScipySolver(Solver):
-    """`ScipySolver` runs one `scipy.optimize` root finder on the interval and returns its root."""
+    """`ScipySolver` runs 1 `scipy.optimize` root finder on the interval and returns its root."""
 
-    name = "scipy_twin"
+    name = "scipy_solver"
     version = 1
 
     def __init__(self, root_finder: ScipyRootFinder) -> None:
