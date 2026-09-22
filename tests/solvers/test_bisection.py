@@ -5,13 +5,13 @@ import math
 import pytest
 
 from sunnbear.solvers import Bisection, SolveStatus
-from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasingcubic
+from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 
 
 # ==================================================================================================
 #  Convergence and the exact evaluation count
 # ==================================================================================================
-@pytest.mark.parametrize("f", [cubic, decreasingcubic])  # Exercises both interval orientations.
+@pytest.mark.parametrize("f", [cubic, decreasing_cubic])  # Exercises both interval orientations.
 @pytest.mark.parametrize("a, b, xtol", [(1.0, 2.0, 1e-3), (0.0, 4.0, 1e-8), (1.3, 1.4, 1e-12)])
 def test_converges_within_xtol_with_the_exact_evaluation_count(f, a, b, xtol):
     # --- arrange ----------------------
