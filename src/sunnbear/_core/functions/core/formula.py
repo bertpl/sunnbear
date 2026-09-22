@@ -5,8 +5,8 @@ A formula owns three parameter layers with distinct roles: the recipe-swept
 the Monte-Carlo parameter ``c`` (varied per benchmark run), and — downstream,
 never stored here — the tolerance ``xtol``.
 
-Concrete formulas subclass `Formula` and implement three small hooks
-(`parametrized_fun`, `interval`, `recipes`); everything mechanical — numba
+Concrete formulas subclass `Formula` and implement 3 small hooks
+(`parametrized_fun`, `interval_bounds`, `recipes`); everything mechanical — numba
 compilation (once per formula, see `Formula._compiled_formula`), identity
 construction, candidate assembly and enumeration, registration — lives on the
 base class, so a formula module contains nothing but the mathematics. Subclasses
@@ -89,7 +89,7 @@ class Formula(ABC):
         """
 
     @abstractmethod
-    def interval(self, *params: float) -> tuple[float, float]:
+    def interval_bounds(self, *params: float) -> tuple[float, float]:
         """Return the bracketing x-interval ``(a, b)``: ``f`` changes sign between ``a`` and ``b``.
 
         Overrides must name their parameters, as for `parametrized_fun`. A formula whose interval
@@ -166,7 +166,7 @@ class Formula(ABC):
         (`ParamValue` unwrapping is handled here).
         """
         fid = FunctionId(self.number, tuple(params))
-        a, b = self.interval(*fid.param_values)
+        a, b = self.interval_bounds(*fid.param_values)
         return CandidateTestFunction(id=fid, formula=self, a=a, b=b)
 
     def bind_xc_fun(self, values: "tuple[float, ...]") -> XCFun:
@@ -272,7 +272,7 @@ class Formula(ABC):
         """Check that `param_names` matches the signature of every hook that receives the tuple.
 
         Independent of the recipes: this catches drift between the declaration
-        (`param_names`) and the implementations — `parametrized_fun`, `interval`,
+        (`param_names`) and the implementations — `parametrized_fun`, `interval_bounds`,
         and `is_param_tuple_valid` when overridden. Those hooks must name their
         parameters rather than take ``*params``; see `_declared_hook_param_names`
         for why that is required rather than merely conventional.
@@ -285,7 +285,7 @@ class Formula(ABC):
         cls = type(self)
         hooks: list[tuple[str, Callable[..., object], int]] = [
             ("parametrized_fun", cls.parametrized_fun, 2),  # after (x, c)
-            ("interval", cls.interval, 1),  # after self
+            ("interval_bounds", cls.interval_bounds, 1),  # after self
         ]
         if cls.is_param_tuple_valid is not Formula.is_param_tuple_valid:
             hooks.append(("is_param_tuple_valid", cls.is_param_tuple_valid, 1))  # after self

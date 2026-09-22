@@ -1,9 +1,9 @@
 """FormulaTestCase: a formula's self-declared test cases.
 
 A concrete `Formula` lists `cases` — one `FormulaTestCase` per behavior worth pinning, built via
-`FormulaTestCase.value` / `.invalid` / `.interval`. A single generic test drives every registered
+`FormulaTestCase.value` / `.invalid` / `.interval_bounds`. A single generic test drives every registered
 formula through its list, so between them the three kinds cover `parametrized_fun`, both sides of
-`is_param_tuple_valid`, and `interval`; the branch-coverage gate then fails on any formula line
+`is_param_tuple_valid`, and `interval_bounds`; the branch-coverage gate then fails on any formula line
 that no case reaches.
 
 Parameters are given by name (`{"p1": 0.0}`) and resolved to positional order against the formula's
@@ -41,7 +41,7 @@ class FormulaTestCase:
         return InvalidTestCase(params)
 
     @classmethod
-    def interval(
+    def interval_bounds(
         cls,
         params: dict[str, float],
         expected: tuple[float, float],
@@ -49,8 +49,8 @@ class FormulaTestCase:
         rtol: float = DEFAULT_RTOL,
         atol: float = DEFAULT_ATOL,
     ) -> "FormulaTestCase":
-        """`interval(*params)` must equal `expected` within `(rtol, atol)`."""
-        return IntervalTestCase(params, expected, rtol, atol)
+        """`interval_bounds(*params)` must equal `expected` within `(rtol, atol)`."""
+        return IntervalBoundsTestCase(params, expected, rtol, atol)
 
 
 @dataclass(frozen=True)
@@ -73,8 +73,8 @@ class InvalidTestCase(FormulaTestCase):
 
 
 @dataclass(frozen=True)
-class IntervalTestCase(FormulaTestCase):
-    """An interval check: `interval(*params)` equals `expected` within `(rtol, atol)`."""
+class IntervalBoundsTestCase(FormulaTestCase):
+    """An interval-bounds check: `interval_bounds(*params)` equals `expected` within `(rtol, atol)`."""
 
     params: dict[str, float]
     expected: tuple[float, float]
