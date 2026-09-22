@@ -261,7 +261,7 @@ def test_declared_params_must_match_parametrized_fun_signature():
 
 
 @pytest.mark.usefixtures("isolated_registry")
-def test_declared_params_must_match_bracket_signature():
+def test_declared_params_must_match_interval_signature():
     """Right arity but wrong names in interval is drift too — the cross-check covers every hook."""
     # --- arrange ----------------------
     cls = _formula_cls(
@@ -299,7 +299,7 @@ def test_varargs_parametrized_fun_is_rejected():
 
 
 @pytest.mark.usefixtures("isolated_registry")
-def test_varargs_bracket_is_rejected():
+def test_varargs_interval_is_rejected():
     # --- arrange ----------------------
     cls = _formula_cls(
         984,

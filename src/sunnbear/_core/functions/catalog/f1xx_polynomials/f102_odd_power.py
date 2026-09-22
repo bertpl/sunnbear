@@ -22,7 +22,7 @@ class F102_OddPower(Formula):
         return x**p1 - c
 
     def interval(self, p1: float) -> tuple[float, float]:
-        """Fixed interval, wide enough for the calibrated c-range."""
+        """Return a fixed interval; `Formula.interval` says why it is wide."""
         return (-2.0, 2.0)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:

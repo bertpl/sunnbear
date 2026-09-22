@@ -3,8 +3,8 @@
 A concrete `Formula` lists `cases` — one `FormulaTestCase` per behavior worth pinning, built via
 `FormulaTestCase.value` / `.invalid` / `.interval`. A single generic test drives every registered
 formula through its list, so between them the three kinds cover `parametrized_fun`, both sides of
-`is_param_tuple_valid`, and `interval`; the branch-coverage gate then fails on any formula line no
-case reaches.
+`is_param_tuple_valid`, and `interval`; the branch-coverage gate then fails on any formula line
+that no case reaches.
 
 Parameters are given by name (`{"p1": 0.0}`) and resolved to positional order against the formula's
 `param_names` when a case runs.
@@ -74,7 +74,7 @@ class InvalidTestCase(FormulaTestCase):
 
 @dataclass(frozen=True)
 class IntervalTestCase(FormulaTestCase):
-    """A interval check: `interval(*params)` equals `expected` within `(rtol, atol)`."""
+    """An interval check: `interval(*params)` equals `expected` within `(rtol, atol)`."""
 
     params: dict[str, float]
     expected: tuple[float, float]

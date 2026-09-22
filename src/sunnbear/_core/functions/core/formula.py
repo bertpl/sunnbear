@@ -92,7 +92,8 @@ class Formula(ABC):
     def interval(self, *params: float) -> tuple[float, float]:
         """Return the bracketing x-interval ``(a, b)``: ``f`` changes sign between ``a`` and ``b``.
 
-        Overrides must name their parameters, as for `parametrized_fun`.
+        Overrides must name their parameters, as for `parametrized_fun`. A formula whose interval
+        does not depend on its parameters returns a fixed one, wide enough for the calibrated c-range.
         """
 
     @abstractmethod

@@ -42,7 +42,7 @@ class CandidateTestFunction:
     b: float
 
     def __post_init__(self) -> None:
-        """Reject an ill-defined interval: a test function needs a genuine x-interval, so strictly a < b."""
+        """Reject an ill-defined x-interval: a test function needs a genuine one, so strictly a < b."""
         if not self.a < self.b:
             raise ValueError(f"Interval must satisfy a < b (got a={self.a}, b={self.b}).")
 
@@ -66,7 +66,7 @@ class CandidateTestFunction:
 # ==================================================================================================
 @dataclass(frozen=True)
 class TestFunction:
-    """A benchmarkable test function: ``f(x, c)``, its interval, and its calibrated c-range.
+    """A benchmarkable test function: ``f(x, c)``, its x-interval, and its calibrated c-range.
 
     For every ``c`` in ``[c_min, c_max]``, ``f(a, c) * f(b, c) < 0`` and the
     function returns finite values on ``[a, b]``.
