@@ -17,9 +17,8 @@ class _HalvingSolver(BracketingSolver):
     name = "halving"
     version = 1
 
-    def _step(self, state: SolveState, interval: Interval) -> Interval:
-        x = interval.midpoint
-        return interval.split_at(x, state.f(x))
+    def _next_x(self, state: SolveState, interval: Interval) -> float:
+        return interval.midpoint
 
 
 @dataclass
@@ -39,11 +38,10 @@ class _StepCountingSolver(BracketingSolver[_StepCountingState]):
     def __init__(self) -> None:
         self.n_steps_seen: list[int] = []
 
-    def _step(self, state: _StepCountingState, interval: Interval) -> Interval:
+    def _next_x(self, state: _StepCountingState, interval: Interval) -> float:
         self.n_steps_seen.append(state.n_steps)
         state.n_steps += 1
-        x = interval.midpoint
-        return interval.split_at(x, state.f(x))
+        return interval.midpoint
 
 
 def _linear(x: float) -> float:

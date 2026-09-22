@@ -18,7 +18,6 @@ class Bisection(BracketingSolver):
     name = "bisection"
     version = 1
 
-    def _step(self, state: SolveState, interval: Interval) -> Interval:
-        """Evaluate the midpoint and keep the half that holds the sign change."""
-        x = interval.midpoint
-        return interval.split_at(x, state.f(x))
+    def _next_x(self, state: SolveState, interval: Interval) -> float:
+        """Return the midpoint."""
+        return interval.midpoint
