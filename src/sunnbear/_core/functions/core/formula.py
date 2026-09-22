@@ -5,7 +5,7 @@ A formula owns three parameter layers with distinct roles: the recipe-swept
 the Monte-Carlo parameter ``c`` (varied per benchmark run), and — downstream,
 never stored here — the tolerance ``xtol``.
 
-Concrete formulas subclass `Formula` and implement three small hooks
+Concrete formulas subclass `Formula` and implement 3 small hooks
 (`parametrized_fun`, `interval_bounds`, `recipes`); everything mechanical — numba
 compilation (once per formula, see `Formula._compiled_formula`), identity
 construction, candidate assembly and enumeration, registration — lives on the
