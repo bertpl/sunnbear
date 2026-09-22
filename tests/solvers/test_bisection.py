@@ -1,4 +1,4 @@
-"""`Bisection` is pinned to its exact evaluation count, since the benchmark derives reference costs from it."""
+"""These tests assert `Bisection`'s exact evaluation count, which the benchmark takes as its reference cost."""
 
 import math
 
