@@ -160,10 +160,11 @@ class BracketingSolver(Solver[StateT]):
     """`BracketingSolver` is the base class for interval-reducing solvers; a subclass implements one `_next_x`.
 
     A bracketing solver is defined by what it does each iteration: pick a point inside the interval,
-    evaluate the function there, and keep the half that still holds the sign change. The base class
-    owns the evaluation and the split; only the choice of the point is left to the subclass, so a
-    subclass cannot evaluate the function itself, split the interval wrongly, or define a wrong
-    stopping criterion (`Interval.is_converged`).
+    evaluate the function there, and keep the half that still holds the sign change.
+
+    The base class owns the evaluation and the split; only the choice of the point is left to the
+    subclass. It cannot evaluate the function itself, split the interval wrongly, or define a wrong
+    stopping criterion (`Interval.is_converged`); the base class does all three.
 
     One `_next_x` is one iteration. A solver that carries values between iterations keeps them on its
     `SolveState` subclass (see `Solver.state_cls`). A solver whose iteration evaluates the function
@@ -178,15 +179,15 @@ class BracketingSolver(Solver[StateT]):
         while not interval.is_converged(xtol_doubled):
             x = self._next_x(state, interval)
             interval = interval.split_at(x, state.f(x))
-            state.x_best = interval.midpoint  # Cached on the interval: free when the next iteration uses it.
+            state.x_best = interval.midpoint  # Cached on the interval: free when the next iteration reads it too.
         return interval.root()
 
     @abstractmethod
     def _next_x(self, state: StateT, interval: Interval) -> float:
         """Return the interval's next evaluation point, strictly inside ``interval``.
 
-        Read the function values at the interval bounds from ``interval``; do not evaluate the
-        function here.
+        Read the function values at the interval bounds from ``interval``, and any value carried
+        between iterations from ``state``; do not evaluate the function here.
         """
 
 
