@@ -8,7 +8,7 @@ How the pieces tie together, from authored code to a solvable function::
       │                          filtered by is_param_tuple_valid(),
       │                          then near-duplicates dropped (deduplicate_param_tuples)
       │ build_candidate(p) [framework: carries the formula + identity, so the
-      ▼                  callable forms are derived on demand; + interval(p)]
+      ▼                  callable forms are derived on demand; + interval_bounds(p)]
     CandidateTestFunction ─── id: FunctionId(number, p) · xc_fun: f(x, c) · interval [a, b]
       │
       │ calibrated(c_min, c_max)   [c-range from an external artifact, never derived]
@@ -29,7 +29,7 @@ package imports those modules.
 Ownership summary:
 
 - a concrete `Formula` contributes only mathematics plus its declared parameter
-  interface: `param_names`, `parametrized_fun`, `interval`, `recipes`, optionally
+  interface: `param_names`, `parametrized_fun`, `interval_bounds`, `recipes`, optionally
   `is_param_tuple_valid` — one class, one module, in `catalog`; defining the
   class registers it.
 - the framework owns everything mechanical: numba compilation — once per

@@ -4,7 +4,7 @@ import math
 
 import pytest
 
-from sunnbear._core.functions.core.test_cases import IntervalTestCase, InvalidTestCase, ValueTestCase
+from sunnbear._core.functions.core.test_cases import IntervalBoundsTestCase, InvalidTestCase, ValueTestCase
 from sunnbear.functions import FormulaRegistry
 
 # every (formula, case) pair, with a stable unique id: formula number + case kind + within-formula index
@@ -23,8 +23,8 @@ def test_formula_test_case(formula, case):
             assert math.isclose(formula.bind_xc_fun(p)(x, c), expected, rel_tol=rtol, abs_tol=atol)
         case InvalidTestCase(params=params):
             assert not formula.is_param_tuple_valid(*formula.param_dict_to_tuple(params))
-        case IntervalTestCase(params=params, expected=(lo, hi), rtol=rtol, atol=atol):
-            got_lo, got_hi = formula.interval(*formula.param_dict_to_tuple(params))
+        case IntervalBoundsTestCase(params=params, expected=(lo, hi), rtol=rtol, atol=atol):
+            got_lo, got_hi = formula.interval_bounds(*formula.param_dict_to_tuple(params))
             assert math.isclose(got_lo, lo, rel_tol=rtol, abs_tol=atol)
             assert math.isclose(got_hi, hi, rel_tol=rtol, abs_tol=atol)
 

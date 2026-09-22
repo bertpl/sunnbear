@@ -21,8 +21,8 @@ class F102_OddPower(Formula):
         """Evaluate ``x^p1 - c``."""
         return x**p1 - c
 
-    def interval(self, p1: float) -> tuple[float, float]:
-        """Return a fixed interval; `Formula.interval` says why it is wide."""
+    def interval_bounds(self, p1: float) -> tuple[float, float]:
+        """Return a fixed interval; `Formula.interval_bounds` says why it is wide."""
         return (-2.0, 2.0)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
@@ -38,5 +38,5 @@ class F102_OddPower(Formula):
         FormulaTestCase.value(params={"p1": 3.0}, x=2.0, c=0.0, expected=8.0),  # 2^3, exercises c=0
         FormulaTestCase.invalid(params={"p1": 2.0}),  # even integer power — rejected
         FormulaTestCase.invalid(params={"p1": 1.5}),  # non-integer power — rejected
-        FormulaTestCase.interval(params={"p1": 3.0}, expected=(-2.0, 2.0)),
+        FormulaTestCase.interval_bounds(params={"p1": 3.0}, expected=(-2.0, 2.0)),
     )

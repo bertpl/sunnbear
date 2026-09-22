@@ -15,8 +15,8 @@ class F101_Cubic(Formula):
         """Evaluate ``x^3 - p1*x - c``."""
         return x * x * x - p1 * x - c
 
-    def interval(self, p1: float) -> tuple[float, float]:
-        """Return a fixed interval; `Formula.interval` says why it is wide."""
+    def interval_bounds(self, p1: float) -> tuple[float, float]:
+        """Return a fixed interval; `Formula.interval_bounds` says why it is wide."""
         return (-2.0, 2.0)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
@@ -26,5 +26,5 @@ class F101_Cubic(Formula):
     cases = (
         FormulaTestCase.value(params={"p1": 0.0}, x=0.0, c=0.0, expected=0.0),  # root at the origin
         FormulaTestCase.value(params={"p1": 1.0}, x=2.0, c=1.0, expected=5.0),  # 8 - 2 - 1, exercises c
-        FormulaTestCase.interval(params={"p1": 0.0}, expected=(-2.0, 2.0)),
+        FormulaTestCase.interval_bounds(params={"p1": 0.0}, expected=(-2.0, 2.0)),
     )
