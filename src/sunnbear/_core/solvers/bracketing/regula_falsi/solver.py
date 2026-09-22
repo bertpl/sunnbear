@@ -20,7 +20,6 @@ class RegulaFalsi(BracketingSolver):
     name = "regula_falsi"
     version = 1
 
-    def _step(self, state: SolveState, interval: Interval) -> Interval:
-        """Evaluate where the chord through the bound points crosses zero; keep the half with the sign change."""
-        x = (interval.a * interval.fb - interval.b * interval.fa) / (interval.fb - interval.fa)
-        return interval.split_at(x, state.f(x))
+    def _next_x(self, state: SolveState, interval: Interval) -> float:
+        """Return where the chord through the bound points crosses zero."""
+        return (interval.a * interval.fb - interval.b * interval.fa) / (interval.fb - interval.fa)
