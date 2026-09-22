@@ -31,9 +31,16 @@ Two facts hold throughout this package:
   best estimate, and the solver's own arithmetic. The validation before the context and the
   divergence checks after it are uncounted, and `WrappedFunction` pauses counting while ``f``
   itself runs, so the function's cost is never included.
+
+A solver class carries only its algorithm. Which init arguments the benchmark runs it with, and how the
+benchmark treats the result, is recorded by a `SolverConfig` with a `SolverRole`; `SolverConfigRegistry`
+holds every registered config.
 """
 
+from .config import SolverConfig
 from .interval import DecreasingInterval, IncreasingInterval, Interval, IntervalBound
+from .registry import SolverConfigRegistry
 from .result import SolveResult, SolveStatus
+from .role import SolverRole
 from .solver import BracketingSolver, Solver
 from .state import SolveState

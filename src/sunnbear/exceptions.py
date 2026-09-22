@@ -10,6 +10,7 @@ from ._core.solvers.core.exceptions import (
     FunctionDomainError,
     MaxFevalsExceeded,
     SolveException,
+    UnknownSolverConfigError,
 )
 
 __all__ = [
@@ -20,4 +21,5 @@ __all__ = [
     "SolveException",
     "SunnbearError",
     "UnknownFormulaError",
+    "UnknownSolverConfigError",
 ]
