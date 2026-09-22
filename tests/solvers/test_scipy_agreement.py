@@ -1,10 +1,13 @@
-"""These tests check the shipped solvers against their `scipy.optimize` counterparts through the `ScipySolver` twin."""
+"""These tests check a shipped solver against its `scipy.optimize` counterpart through the `ScipySolver` twin.
+
+Only Bisection has one; SciPy ships no Regula Falsi.
+"""
 
 import pytest
 import scipy.optimize
 from counted_float import FlopCounts
 
-from sunnbear.solvers import Bisection, RegulaFalsi, SolveStatus
+from sunnbear.solvers import Bisection, SolveStatus
 from tests.solvers.example_functions import cubic, decreasing_cubic, quintic
 from tests.solvers.scipy_twin import ScipySolver
 
@@ -41,16 +44,3 @@ def test_bisection_agrees_with_scipy_bisect(f, a, b, xtol):
     # SciPy stops on a slightly different width rule, so its own call count is ours within 1. It also re-evaluates
     # both bounds, and the twin's count includes both.
     assert abs((twin.n_fevals - 2) - ours.n_fevals) <= 1
-
-
-@pytest.mark.parametrize("f, a, b", PROBLEMS)
-def test_regula_falsi_iterates_reach_the_root_that_scipy_brentq_finds(f, a, b):
-    # --- act --------------------------
-    ours = RegulaFalsi().solve(f, a, b, xtol=1e-9, max_fevals=100, history_enabled=True)
-    twin = ScipySolver(scipy.optimize.brentq).solve(f, a, b, xtol=1e-9, max_fevals=200)
-
-    # --- assert -----------------------
-    # Regula Falsi's iterates converge even where its interval does not, so the last iterate is what agrees.
-    x_last, _ = ours.history[-1]
-    assert twin.status is SolveStatus.CONVERGED
-    assert abs(x_last - twin.x) <= 1e-8
