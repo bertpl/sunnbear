@@ -12,7 +12,7 @@ from sunnbear.solvers import BracketingSolver, Interval, SolveState, SolveStatus
 #  Test-local solvers
 # ==================================================================================================
 class _HalvingSolver(BracketingSolver):
-    """`_HalvingSolver` splits the bracket at its midpoint and adds no state of its own."""
+    """`_HalvingSolver` splits the interval at its midpoint and adds no state of its own."""
 
     name = "halving"
     version = 1
@@ -61,7 +61,7 @@ def test_loop_runs_until_the_width_criterion_holds(a, b, xtol):
     # --- assert -----------------------
     n_steps_expected = max(0, math.ceil(math.log2((b - a) / (2.0 * xtol))))
     assert result.status is SolveStatus.CONVERGED
-    assert result.n_fevals == n_steps_expected + 2  # One evaluation per step, plus the 2 bounds.
+    assert result.n_fevals == n_steps_expected + 2  # One evaluation per step, plus the 2 interval bounds.
     assert abs(result.x - 0.3) <= xtol
 
 
@@ -77,13 +77,13 @@ def test_loop_stops_early_on_an_exact_zero():
     assert (result.x, result.status, result.n_fevals) == (0.5, SolveStatus.CONVERGED, 3)
 
 
-def test_interrupted_loop_reports_the_last_bracket_midpoint():
+def test_interrupted_loop_reports_the_last_interval_midpoint():
     # --- act --------------------------
     result = _HalvingSolver().solve(_linear, 0.0, 1.0, xtol=1e-9, max_fevals=4)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.MAX_FEVALS
-    assert result.n_fevals == 4  # 2 steps completed after the bounds: the bracket became [0, 0.5], then [0.25, 0.5]
+    assert result.n_fevals == 4  # 2 steps after the interval bounds: [0, 1] became [0, 0.5], then [0.25, 0.5].
     assert result.x == 0.375
 
 

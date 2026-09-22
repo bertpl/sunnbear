@@ -16,8 +16,8 @@ class SolveStatus(Enum):
     nothing more. Whether the returned ``x`` is correct is judged downstream by
     the benchmark harness, which knows the true root; the solver does not.
 
-    ``DIVERGED`` means the solve left the bracket: its result lies outside ``[a, b]``, or the
-    function failed at an ``x`` outside ``[a, b]``. A function failure inside the bracket is
+    ``DIVERGED`` means the solve left the interval: its result lies outside ``[a, b]``, or the
+    function failed at an ``x`` outside ``[a, b]``. A function failure inside the interval is
     ``FUNCTION_ERROR``.
     """
 
@@ -41,10 +41,10 @@ class SolveResult:
 
     Attributes:
         x: Root estimate. On an abnormal status, the best estimate so far (for
-            a bracketing solver, the last bracket's midpoint).
+            a bracketing solver, the last interval's midpoint).
         status: How the solve ended; see `SolveStatus`.
-        n_fevals: Function evaluations performed, the 2 endpoint evaluations
-            included.
+        n_fevals: Function evaluations performed, the 2 evaluations at the
+            interval bounds included.
         flop_counts: Floating-point operations of the solver's own arithmetic,
             per flop type; function evaluation cost is excluded.
         history: Every ``(x, f(x))`` evaluated, in order; ``None`` when history

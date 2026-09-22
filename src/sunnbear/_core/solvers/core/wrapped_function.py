@@ -34,7 +34,7 @@ class WrappedFunction:
     since the function was evaluated; the count excludes calls refused by the
     budget or for a non-finite ``x``.
 
-    Whether an evaluation far from the bracket is divergence is not decided here: `Solver.solve`
+    Whether an evaluation far from the interval is divergence is not decided here: `Solver.solve`
     judges that from where the solve ended and where a function error happened.
     """
 

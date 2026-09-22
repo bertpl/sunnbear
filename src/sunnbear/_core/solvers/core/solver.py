@@ -65,12 +65,12 @@ class Solver(ABC, Generic[StateT]):
     ) -> SolveResult:
         """Find a root of ``f`` in ``[a, b]`` and report what the solve did.
 
-        - ``f(a)`` and ``f(b)`` are evaluated first; a bound whose value is exactly zero ends the
-          solve as ``CONVERGED`` without running the algorithm. A failure at a bound is recorded
-          like any other: nothing raised by ``f`` reaches the caller.
-        - The bracket handed to the solver is an `IncreasingInterval` or a `DecreasingInterval`,
-          whichever the endpoint values hold; a solver that supports one orientation only decides
-          for itself what to do with the other.
+        - ``f(a)`` and ``f(b)`` are evaluated first; an interval bound whose function value is exactly
+          zero ends the solve as ``CONVERGED`` without running the algorithm. A failure at an interval
+          bound is recorded like any other: nothing raised by ``f`` reaches the caller.
+        - The interval handed to the solver is an `IncreasingInterval` or a `DecreasingInterval`,
+          whichever the function values at the interval bounds hold; a solver that supports one
+          orientation only decides for itself what to do with the other.
         - Every abnormal ending becomes a `SolveStatus`, not an exception: ``solve()`` is invoked
           at scale during benchmarks and must not interrupt the pipeline.
         - Divergence is judged by where things ended: a solve whose result lies outside ``[a, b]``,
@@ -84,10 +84,10 @@ class Solver(ABC, Generic[StateT]):
 
         Args:
             f: The function; must be finite on ``[a, b]``, with ``f(a)`` and ``f(b)`` of opposite sign or zero.
-            a: Lower end of the bracket.
-            b: Upper end of the bracket.
+            a: Lower bound of the interval.
+            b: Upper bound of the interval.
             xtol: Requested x-tolerance, ``|x_true - x| <= xtol``.
-            max_fevals: Function-evaluation budget, the 2 endpoint evaluations included.
+            max_fevals: Function-evaluation budget, the 2 evaluations at the interval bounds included.
             history_enabled: Whether to keep every ``(x, f(x))`` pair in the result.
 
         Raises:
@@ -96,7 +96,7 @@ class Solver(ABC, Generic[StateT]):
         """
         # --- uncounted validation -------------------
         if not a < b:
-            raise ValueError(f"Bracket must satisfy a < b (got a={a}, b={b}).")
+            raise ValueError(f"Interval must satisfy a < b (got a={a}, b={b}).")
         wrapped_f = WrappedFunction(f, max_fevals=max_fevals, history_enabled=history_enabled)
 
         # --- counted: main algorithm ----------------
@@ -106,7 +106,7 @@ class Solver(ABC, Generic[StateT]):
             a_counted, b_counted, xtol_counted = CountedFloat(a), CountedFloat(b), CountedFloat(xtol)
             try:
                 fa, fb = wrapped_f(a_counted), wrapped_f(b_counted)
-            except Exception as exc:  # noqa: BLE001 — a failure at a bound is recorded like any other
+            except Exception as exc:  # noqa: BLE001 — a failure at an interval bound is recorded like any other
                 x, status, x_failed = _ending_of(exc, x_best=0.5 * (a_counted + b_counted))
             else:
                 if fa == 0.0:  # Early exit when a is a root.
@@ -115,8 +115,8 @@ class Solver(ABC, Generic[StateT]):
                     x, status = b_counted, SolveStatus.CONVERGED
                 else:
                     # --- actual solve -----------------------
-                    bracket = Interval.from_endpoints(a_counted, b_counted, fa, fb)
-                    state = self.state_cls(f=wrapped_f, bracket=bracket, xtol=xtol_counted, x_best=bracket.midpoint)
+                    interval = Interval.from_interval_bounds(a_counted, b_counted, fa, fb)
+                    state = self.state_cls(f=wrapped_f, interval=interval, xtol=xtol_counted, x_best=interval.midpoint)
                     try:
                         # state_cls is typed as type[SolveState]: the checker sees SolveState where StateT is expected.
                         x, status = self._solve(state), SolveStatus.CONVERGED  # type: ignore[arg-type]
@@ -165,8 +165,8 @@ class BracketingSolver(Solver[StateT]):
     """
 
     def _solve(self, state: StateT) -> float:
-        """Reduce the bracket with `_step` until `Interval.is_converged` holds; return `Interval.root`."""
-        interval = state.bracket
+        """Reduce the interval with `_step` until `Interval.is_converged` holds; return `Interval.root`."""
+        interval = state.interval
         xtol_doubled = 2.0 * state.xtol
         while not interval.is_converged(xtol_doubled):
             interval = self._step(state, interval)
@@ -175,9 +175,9 @@ class BracketingSolver(Solver[StateT]):
 
     @abstractmethod
     def _step(self, state: StateT, interval: Interval) -> Interval:
-        """Perform one iteration and return a strictly narrower bracket.
+        """Perform one iteration and return a strictly narrower interval.
 
-        Evaluate the function only through ``state.f``, and derive the new bracket
+        Evaluate the function only through ``state.f``, and derive the new interval
         with `Interval.split_at`, so the sign-change invariant is kept.
         """
 

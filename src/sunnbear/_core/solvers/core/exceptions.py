@@ -26,7 +26,7 @@ class FunctionDomainError(SolveException):
 
     Attributes:
         x: Where the evaluation failed; `Solver.solve` reads it to tell a function error inside
-            the bracket from a solver that diverged into a region where ``f`` fails.
+            the interval from a solver that diverged into a region where ``f`` fails.
     """
 
     def __init__(self, x: float, message: str) -> None:

@@ -32,13 +32,13 @@ class _MidpointRepeatingSolver(Solver):
     version = 1
 
     def _solve(self, state: SolveState) -> float:
-        x = state.bracket.midpoint
+        x = state.interval.midpoint
         while True:
             state.f(x)
 
 
 class _ExcursionSolver(Solver):
-    """`_ExcursionSolver` evaluates far outside the bracket, then returns an estimate of its choice."""
+    """`_ExcursionSolver` evaluates far outside the interval, then returns an estimate of its choice."""
 
     name = "excursion"
     version = 1
@@ -47,7 +47,7 @@ class _ExcursionSolver(Solver):
         self._x_returned = x_returned
 
     def _solve(self, state: SolveState) -> float:
-        state.x_best = float(state.bracket.b + 1e6 * state.bracket.width)
+        state.x_best = float(state.interval.b + 1e6 * state.interval.width)
         state.f(state.x_best)
         return self._x_returned
 
@@ -63,13 +63,13 @@ class _NanSolver(Solver):
 
 
 class _StrayingSolver(Solver):
-    """`_StrayingSolver` moves its best estimate outside the bracket and then runs out of budget."""
+    """`_StrayingSolver` moves its best estimate outside the interval and then runs out of budget."""
 
     name = "straying"
     version = 1
 
     def _solve(self, state: SolveState) -> float:
-        state.x_best = float(state.bracket.b + 1.0)
+        state.x_best = float(state.interval.b + 1.0)
         while True:
             state.f(state.x_best)
 
@@ -96,8 +96,8 @@ def _decreasing(x: float) -> float:
 #  Caller errors
 # ==================================================================================================
 @pytest.mark.parametrize("a, b", [(1.0, 0.0), (0.0, 0.0)])
-def test_rejects_ill_ordered_bracket(a, b):
-    with pytest.raises(ValueError, match="a < b"):
+def test_rejects_an_ill_ordered_interval(a, b):
+    with pytest.raises(ValueError, match="Interval must satisfy a < b"):
         _RecordingSolver().solve(_increasing, a, b, xtol=1e-3, max_fevals=10)
 
 
@@ -109,8 +109,8 @@ def test_rejects_a_function_without_a_sign_change(f):
 
 @pytest.mark.parametrize(
     "f, cls_expected", [(_increasing, IncreasingInterval), (_decreasing, DecreasingInterval)]
-)  # Both orientations are solved; the bracket's class tells the solver which one it has.
-def test_the_bracket_class_is_the_orientation(f, cls_expected):
+)  # Both orientations are solved; the interval's class tells the solver which one it has.
+def test_the_interval_class_is_the_orientation(f, cls_expected):
     # --- arrange ----------------------
     solver = _RecordingSolver()
 
@@ -119,13 +119,13 @@ def test_the_bracket_class_is_the_orientation(f, cls_expected):
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert type(solver.states[0].bracket) is cls_expected
+    assert type(solver.states[0].interval) is cls_expected
 
 
 # ==================================================================================================
-#  Endpoint evaluations
+#  Evaluations at the interval bounds
 # ==================================================================================================
-def test_the_bounds_are_evaluated_and_counted_before_the_algorithm_runs():
+def test_the_interval_bounds_are_evaluated_and_counted_before_the_algorithm_runs():
     # --- arrange ----------------------
     solver = _RecordingSolver()
 
@@ -135,14 +135,14 @@ def test_the_bounds_are_evaluated_and_counted_before_the_algorithm_runs():
     # --- assert -----------------------
     assert result.n_fevals == 2
     assert result.status is SolveStatus.CONVERGED
-    assert result.x == 0.5  # x_best starts at the bracket midpoint.
+    assert result.x == 0.5  # x_best starts at the interval midpoint.
     assert solver.states[0].f.n_fevals == 2
 
 
 @pytest.mark.parametrize(
     "a, b, root", [(0.25, 1.0, 0.25), (-1.0, 0.25, 0.25)]
 )  # the root sits at the lower end, then at the upper end
-def test_an_exact_zero_at_a_bound_converges_without_running_the_algorithm(a, b, root):
+def test_an_exact_zero_at_an_interval_bound_converges_without_running_the_algorithm(a, b, root):
     # --- arrange ----------------------
     solver = _RecordingSolver()
 
@@ -154,7 +154,7 @@ def test_an_exact_zero_at_a_bound_converges_without_running_the_algorithm(a, b, 
     assert solver.states == []
 
 
-def test_state_holds_the_evaluated_bracket_and_the_history_of_the_evaluations():
+def test_state_holds_the_evaluated_interval_and_the_history_of_the_evaluations():
     # --- arrange ----------------------
     solver = _RecordingSolver()
 
@@ -163,7 +163,7 @@ def test_state_holds_the_evaluated_bracket_and_the_history_of_the_evaluations():
 
     # --- assert -----------------------
     state = solver.states[0]
-    assert (state.bracket.fa, state.bracket.fb) == (-0.25, 0.75)
+    assert (state.interval.fa, state.interval.fb) == (-0.25, 0.75)
     assert state.f.history == [(0.0, -0.25), (1.0, 0.75)]
 
 
@@ -177,14 +177,14 @@ def test_running_out_of_budget_maps_to_max_fevals():
     # --- assert -----------------------
     assert result.status is SolveStatus.MAX_FEVALS
     assert result.n_fevals == 7
-    assert result.x == 0.5  # The best estimate so far is the untouched bracket's midpoint.
+    assert result.x == 0.5  # The best estimate so far is the untouched interval's midpoint.
 
 
 @pytest.mark.parametrize(
     "x_returned, status_expected",
     [(0.5, SolveStatus.CONVERGED), (1.0, SolveStatus.CONVERGED), (1.0 + 1e-9, SolveStatus.DIVERGED)],
-)  # An excursion is not penalized; only the result decides, and an endpoint is inside.
-def test_only_a_result_outside_the_bracket_is_divergence(x_returned, status_expected):
+)  # An excursion is not penalized; only the result decides, and an interval bound is inside.
+def test_only_a_result_outside_the_interval_is_divergence(x_returned, status_expected):
     # --- act --------------------------
     result = _ExcursionSolver(x_returned).solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
 
@@ -201,7 +201,7 @@ def test_a_non_finite_x_maps_to_diverged():
     assert (result.status, result.x, result.n_fevals) == (SolveStatus.DIVERGED, 0.5, 2)
 
 
-def test_running_out_of_budget_outside_the_bracket_maps_to_diverged():
+def test_running_out_of_budget_outside_the_interval_maps_to_diverged():
     # --- act --------------------------
     result = _StrayingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=5)
 
@@ -212,11 +212,11 @@ def test_running_out_of_budget_outside_the_bracket_maps_to_diverged():
 @pytest.mark.parametrize(
     "solver, status_expected",
     [(_MidpointRepeatingSolver(), SolveStatus.FUNCTION_ERROR), (_ExcursionSolver(0.5), SolveStatus.DIVERGED)],
-)  # The first fails inside the bracket, the second outside; where it failed decides the status.
+)  # The first fails inside the interval, the second outside; where it failed decides the status.
 def test_a_function_error_is_classified_by_where_it_happened(solver, status_expected):
     # --- arrange ----------------------
     def f(x: float) -> float:
-        return _increasing(x) if x in (0.0, 1.0) else math.nan  # Fails anywhere but at the endpoints.
+        return _increasing(x) if x in (0.0, 1.0) else math.nan  # Fails anywhere but at the interval bounds.
 
     # --- act --------------------------
     result = solver.solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
@@ -228,8 +228,8 @@ def test_a_function_error_is_classified_by_where_it_happened(solver, status_expe
 
 @pytest.mark.parametrize(
     "x_failing, status_expected", [(0.0, SolveStatus.FUNCTION_ERROR), (1.0, SolveStatus.FUNCTION_ERROR)]
-)  # A failure at either bound is recorded, not raised; the midpoint is the best estimate there is.
-def test_a_failure_at_a_bound_is_recorded(x_failing, status_expected):
+)  # A failure at either interval bound is recorded, not raised; the midpoint is the best estimate there is.
+def test_a_failure_at_an_interval_bound_is_recorded(x_failing, status_expected):
     # --- arrange ----------------------
     def f(x: float) -> float:
         return math.nan if x == x_failing else _increasing(x)
@@ -242,7 +242,7 @@ def test_a_failure_at_a_bound_is_recorded(x_failing, status_expected):
     assert result.n_fevals == (1 if x_failing == 0.0 else 2)
 
 
-def test_a_budget_below_the_two_bound_evaluations_maps_to_max_fevals():
+def test_a_budget_below_the_two_interval_bound_evaluations_maps_to_max_fevals():
     # --- act --------------------------
     result = _RecordingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=1)
 
