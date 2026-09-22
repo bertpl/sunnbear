@@ -7,7 +7,7 @@ from enum import Enum
 #  SolverRole
 # ==================================================================================================
 class SolverRole(Enum):
-    """`SolverRole` classifies a `SolverConfig`: whether it is reported, whether it characterizes, whether it is sealed.
+    """`SolverRole` classifies a `SolverConfig`: is it reported, does it characterize, is it built-in only.
 
     Code that treats configs differently reads the properties below, never the member itself: several
     roles share the same treatment, so the properties derive from the role and cannot define it.
@@ -35,15 +35,15 @@ class SolverRole(Enum):
         return self is not SolverRole.USER_OTHER
 
     @property
-    def contributes_to_characterization(self) -> bool:
+    def is_used_for_characterization(self) -> bool:
         """Return whether results of solvers with this role characterize the test functions."""
         return self is SolverRole.BUILTIN_CORE
 
     @property
-    def is_sealed(self) -> bool:
+    def is_builtin_only(self) -> bool:
         """Return whether only a config defined inside the sunnbear package may take this role.
 
-        Sealing keeps a user config out of the roles that decide the characterization, so every
-        installation characterizes the test functions identically.
+        This restriction keeps a user config out of the roles that decide the characterization, so
+        every installation characterizes the test functions identically.
         """
         return self in (SolverRole.BUILTIN_BASELINE, SolverRole.BUILTIN_CORE, SolverRole.BUILTIN_SECONDARY)

@@ -6,7 +6,7 @@ from sunnbear.solvers import SolverConfigRegistry
 
 
 def test_every_solver_module_is_imported_by_its_package():
-    """Importing every module found by walking the solver packages registers no config that the package imports missed."""
+    """Importing each module in the solver packages registers no config that was not already registered."""
     # --- arrange ----------------------
     registered_before = {type(config) for config in SolverConfigRegistry.configs()}
 

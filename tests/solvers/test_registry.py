@@ -1,4 +1,4 @@
-"""`SolverConfigRegistry` holds the built-in configs on import and rejects a config that conflicts with a registered one."""
+"""`SolverConfigRegistry` holds the built-in configs on import and rejects a config that conflicts with another."""
 
 import pytest
 
@@ -11,7 +11,8 @@ from sunnbear.solvers import (
     SolverConfigRegistry,
     SolverRole,
 )
-from tests.solvers.example_solvers import WeightedSplitSolver, define_config
+
+from .example_solvers import WeightedSplitSolver, define_config
 
 
 # ==================================================================================================

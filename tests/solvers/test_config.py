@@ -3,7 +3,8 @@
 import pytest
 
 from sunnbear.solvers import BracketingSolver, SolverConfigRegistry, SolverRole
-from tests.solvers.example_solvers import WeightedSplitSolver, define_config
+
+from .example_solvers import WeightedSplitSolver, define_config
 
 
 # ==================================================================================================
@@ -79,8 +80,8 @@ def test_malformed_config_is_rejected_at_class_definition(namespace, message):
 
 
 @pytest.mark.usefixtures("isolated_solver_config_registry")
-@pytest.mark.parametrize("role", [role for role in SolverRole if role.is_sealed])
-def test_sealed_role_outside_sunnbear_is_rejected(role):
+@pytest.mark.parametrize("role", [role for role in SolverRole if role.is_builtin_only])
+def test_builtin_only_role_outside_sunnbear_is_rejected(role):
     # --- arrange ----------------------
     namespace = {"solver_cls": WeightedSplitSolver, "kwargs": {"weight": 0.5}, "role": role}
 
@@ -90,7 +91,7 @@ def test_sealed_role_outside_sunnbear_is_rejected(role):
 
 
 @pytest.mark.usefixtures("isolated_solver_config_registry")
-def test_sealed_role_inside_sunnbear_is_accepted():
+def test_builtin_only_role_inside_sunnbear_is_accepted():
     # --- arrange ----------------------
     namespace = {
         "__module__": "sunnbear.hypothetical_solvers",

@@ -1,4 +1,7 @@
-"""The test-local solver that the solver config tests share, and a helper that declares configs of it."""
+"""This module defines the test-local solver that the solver config tests share.
+
+It also defines a helper that declares configs of that solver.
+"""
 
 from sunnbear.solvers import BracketingSolver, Interval, SolverConfig, SolveState
 

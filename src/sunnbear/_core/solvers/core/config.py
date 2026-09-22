@@ -1,9 +1,10 @@
 """`SolverConfig` is the base class of a registered solver configuration: a solver class, its init arguments, a role.
 
 A solver class carries only its algorithm; which settings the benchmark runs is a separate decision,
-recorded by one `SolverConfig` subclass per setting. Defining the subclass registers it with
-`SolverConfigRegistry`, and every check runs at that moment, so a malformed config fails when its
-module is imported, never inside a benchmark worker.
+recorded by one `SolverConfig` subclass per setting.
+
+Defining the subclass registers it with `SolverConfigRegistry`, and every check runs at that moment,
+so a malformed config fails when its module is imported, never inside a benchmark worker.
 """
 
 import inspect
@@ -33,8 +34,8 @@ class SolverConfig:
     Class attributes:
         solver_cls: The concrete `Solver` subclass to instantiate.
         kwargs: The init arguments passed to ``solver_cls``; each value is a bool, int, float, or str.
-        role: How the benchmark treats this config. A sealed role (`SolverRole.is_sealed`) is
-            reserved for configs defined inside the sunnbear package.
+        role: How the benchmark treats this config. A role for which `SolverRole.is_builtin_only`
+            holds is reserved for configs defined inside the sunnbear package.
     """
 
     solver_cls: ClassVar[type[Solver]]
@@ -48,8 +49,8 @@ class SolverConfig:
             TypeError: If ``solver_cls`` or ``role`` is missing, ``solver_cls`` is not a concrete
                 `Solver` subclass, ``kwargs`` do not fit its ``__init__``, or a ``kwargs`` value has
                 an unsupported type.
-            ValueError: If a sealed role is used outside the sunnbear package, or registration fails
-                (see `SolverConfigRegistry.register`).
+            ValueError: If a built-in-only role is used outside the sunnbear package, or registration
+                fails (see `SolverConfigRegistry.register`).
         """
         super().__init_subclass__(**kwargs)
         cls._validate()
@@ -96,7 +97,7 @@ class SolverConfig:
                 raise TypeError(
                     f"{cls.__name__}.kwargs[{key!r}] must be a bool, int, float, or str (got {type(value).__name__})."
                 )
-        if cls.role.is_sealed and not _is_defined_in_sunnbear(cls):
+        if cls.role.is_builtin_only and not _is_defined_in_sunnbear(cls):
             raise ValueError(
                 f"{cls.__name__} is defined in {cls.__module__}, but role {cls.role.name} is reserved for "
                 "configs inside the sunnbear package; use SolverRole.USER_ACTIVE or SolverRole.USER_OTHER."

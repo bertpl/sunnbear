@@ -1,11 +1,11 @@
 """The solver config registry holds the registered solver configs and looks one up by its identity.
 
-Defining a `SolverConfig` subclass registers one instance of it here. The built-in configs are
+Defining a `SolverConfig` subclass registers 1 instance of it here. The built-in configs are
 registered when the `sunnbear.solvers` module imports the shipped solvers, so the registry is complete
 on import.
 
-`SolverConfigRegistry.config_from_id` is the reconstruction seam: a benchmark worker receives a
-``solver_id`` and rebuilds the solver as ``config_from_id(solver_id).instantiate()``.
+A benchmark worker receives a ``solver_id`` and rebuilds the solver as
+``SolverConfigRegistry.config_from_id(solver_id).instantiate()``.
 """
 
 from typing import TYPE_CHECKING, ClassVar

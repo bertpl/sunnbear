@@ -6,7 +6,10 @@ from .solver import RegulaFalsi
 
 
 class RegulaFalsiConfig(SolverConfig):
-    """`RegulaFalsiConfig` is reported for information only: the classic method stalls too often to characterize."""
+    """`RegulaFalsiConfig` is reported for information only.
+
+    The classic method stalls too often to characterize the test functions reliably.
+    """
 
     solver_cls = RegulaFalsi
     role = SolverRole.BUILTIN_SECONDARY
