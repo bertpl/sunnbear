@@ -275,13 +275,13 @@ def test_history_is_none_unless_requested():
     assert on.history == ((0.0, -0.25), (1.0, 0.75))
 
 
-def test_everything_after_validation_is_counted_and_result_x_is_a_plain_float():
+def test_everything_inside_the_counting_context_is_counted_and_result_x_is_a_plain_float():
     # --- act --------------------------
     result = _RecordingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=3)
 
     # --- assert -----------------------
-    # 2 endpoint zero checks + 2 sign checks + 2 divergence checks; the initial x_best midpoint.
-    assert result.flop_counts == FlopCounts(COMP=6, ADD=1, MUL=1)
+    # 2 zero checks + 2 sign checks on f(a), f(b); the initial x_best midpoint. The divergence checks are uncounted.
+    assert result.flop_counts == FlopCounts(COMP=4, ADD=1, MUL=1)
     assert type(result.x) is float
 
 

@@ -70,16 +70,16 @@ class Solver(ABC, Generic[StateT]):
         - The bracket handed to the solver is an `IncreasingInterval` or a `DecreasingInterval`,
           whichever the endpoint values hold; a solver that supports one orientation only decides
           for itself what to do with the other.
-        - Every abnormal ending becomes a `SolveStatus`, not an exception: one
-          broken solver must not abort a batch of a million solves.
-        - Divergence is judged by where things ended, not by how far an iterate strayed: a solve
-          whose result lies outside ``[a, b]``, or whose function error happened outside
-          ``[a, b]``, is ``DIVERGED``. Excursions that return are not penalized, and there is no
-          bound to justify.
-        - Only the bracket-order check is uncounted. Everything after it runs on `CountedFloat`
-          and is counted: the endpoint checks, ``xtol``, the bookkeeping of the best estimate, the
-          solver's arithmetic, and the divergence check. An early exit therefore reports the
-          comparisons that produced it.
+        - Every abnormal ending becomes a `SolveStatus`, not an exception: ``solve()`` is invoked
+          at scale during benchmarks and must not interrupt the pipeline.
+        - Divergence is judged by where things ended: a solve whose result lies outside ``[a, b]``,
+          or whose function error happened outside ``[a, b]``, is ``DIVERGED``. Excursions that
+          return are not penalized.
+        - The validation before the flop-counting context and the divergence checks after it are
+          uncounted. Everything inside the context runs on `CountedFloat` and is counted: the
+          zero and sign checks on ``f(a)`` and ``f(b)``, ``xtol``, the bookkeeping of the best
+          estimate, and the solver's arithmetic. An early exit therefore reports the comparisons
+          that produced it.
 
         Args:
             f: The function; must be finite on ``[a, b]``, with ``f(a)`` and ``f(b)`` of opposite sign or zero.
@@ -97,51 +97,50 @@ class Solver(ABC, Generic[StateT]):
         if not a < b:
             raise ValueError(f"Bracket must satisfy a < b (got a={a}, b={b}).")
         wrapped_f = WrappedFunction(f, max_fevals=max_fevals, record_history=record_history)
+
+        # --- counted: main algorithm ----------------
+        x_failed: float | None = None  # Where f failed, if it did; decides FUNCTION_ERROR versus DIVERGED below.
         with FlopCountingContext() as flop_ctx:
-            # --- counted: endpoints and early exits -----
+            # --- prep and early exits ---------------
             a_counted, b_counted, xtol_counted = CountedFloat(a), CountedFloat(b), CountedFloat(xtol)
             fa, fb = wrapped_f(a_counted), wrapped_f(b_counted)
-            if fa == 0.0:
+            if fa == 0.0:  # Early exit when a is a root.
                 x, status, n_iters = a_counted, SolveStatus.CONVERGED, None
-            elif fb == 0.0:
+            elif fb == 0.0:  # Early exit when b is a root.
                 x, status, n_iters = b_counted, SolveStatus.CONVERGED, None
             else:
-                # --- counted: the solver run ------------
+                # --- actual solve -----------------------
                 bracket = Interval.from_endpoints(a_counted, b_counted, fa, fb)
                 state = self.state_cls(f=wrapped_f, bracket=bracket, xtol=xtol_counted, x_best=bracket.midpoint)
-                x, status = self._run_catching_exceptions(state, a_counted, b_counted)
+                try:
+                    # state_cls is typed as type[SolveState], so the checker sees a SolveState where StateT is expected.
+                    x, status = self._solve(state), SolveStatus.CONVERGED  # type: ignore[arg-type]
+                except MaxFevalsExceeded:
+                    x, status = state.x_best, SolveStatus.MAX_FEVALS
+                except DivergedError:
+                    x, status = state.x_best, SolveStatus.DIVERGED
+                except FunctionDomainError as exc:
+                    x, status, x_failed = state.x_best, SolveStatus.FUNCTION_ERROR, exc.x
+                except Exception:  # noqa: BLE001 — a solver bug becomes a recorded status, by design
+                    x, status = state.x_best, SolveStatus.SOLVER_ERROR
                 n_iters = state.n_iters
+
+        # --- return results -------------------------
+        # Divergence is the framework's judgment, not solver work, so these checks are uncounted. A result
+        # outside the bracket is divergence whatever the solver reported, CONVERGED included; a solver bug
+        # stays a solver bug.
+        x_plain = float(x)
+        x_judged = x_failed if x_failed is not None else x_plain
+        if status is not SolveStatus.SOLVER_ERROR and not a <= x_judged <= b:
+            status = SolveStatus.DIVERGED
         return SolveResult(
-            x=float(x),
+            x=x_plain,
             status=status,
             n_fevals=wrapped_f.n_fevals,
             n_iters=n_iters,
             flop_counts=flop_ctx.flop_counts(),
             history=None if wrapped_f.history is None else tuple(wrapped_f.history),
         )
-
-    def _run_catching_exceptions(self, state: SolveState, a: float, b: float) -> tuple[float, SolveStatus]:
-        """Run the algorithm and map how it ended to a root estimate and a status.
-
-        The state is typed as the base class here because `state_cls` is declared as one; `_solve`
-        receives the instance of `state_cls` that `solve` created. ``a`` and ``b`` are `CountedFloat`,
-        so the divergence checks are counted.
-        """
-        try:
-            x, status = self._solve(state), SolveStatus.CONVERGED  # type: ignore[arg-type]
-        except MaxFevalsExceeded:
-            x, status = state.x_best, SolveStatus.MAX_FEVALS
-        except DivergedError:
-            x, status = state.x_best, SolveStatus.DIVERGED
-        except FunctionDomainError as exc:
-            x = state.x_best
-            status = SolveStatus.FUNCTION_ERROR if a <= exc.x <= b else SolveStatus.DIVERGED
-        except Exception:  # noqa: BLE001 — a solver bug becomes a recorded status, by design
-            return state.x_best, SolveStatus.SOLVER_ERROR
-        # A result outside the bracket is divergence whatever the solver reported, CONVERGED included.
-        if not a <= x <= b:
-            status = SolveStatus.DIVERGED
-        return x, status
 
     # --------------------------------------------------------------------------
     #  Subclass hook

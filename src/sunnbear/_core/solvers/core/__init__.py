@@ -26,9 +26,10 @@ Two facts hold throughout this package:
   or `DecreasingInterval`, says which one a bracket has. The benchmark's own function portfolio is
   entirely increasing, ``f(a) < 0 < f(b)``, so a solver may support only that case, and how it
   treats a decreasing bracket is its author's choice.
-- **Flop counting.** Only the bracket-order check in `Solver.solve` is uncounted. Everything after
-  it runs on `CountedFloat` and is counted: the endpoint checks, ``xtol``, the bookkeeping of the
-  best estimate, and the solver's own arithmetic. `WrappedFunction` pauses counting while ``f``
+- **Flop counting.** Everything inside `Solver.solve`'s counting context runs on `CountedFloat` and
+  is counted: the zero and sign checks on ``f(a)`` and ``f(b)``, ``xtol``, the bookkeeping of the
+  best estimate, and the solver's own arithmetic. The validation before the context and the
+  divergence checks after it are uncounted, and `WrappedFunction` pauses counting while ``f``
   itself runs, so the function's cost is never included.
 """
 
