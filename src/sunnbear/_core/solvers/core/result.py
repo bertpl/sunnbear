@@ -41,7 +41,7 @@ class SolveResult:
 
     Attributes:
         x: Root estimate. On an abnormal status, the best estimate so far (for
-            a bracketing solver, the last interval's midpoint).
+            a bracketing solver, its last evaluated point).
         status: How the solve ended; see `SolveStatus`.
         n_fevals: Function evaluations performed, the 2 evaluations at the
             interval bounds included.

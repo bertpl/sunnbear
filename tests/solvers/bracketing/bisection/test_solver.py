@@ -35,14 +35,13 @@ def test_an_exact_midpoint_root_stops_early():
     assert (result.x, result.status, result.n_fevals) == (0.5, SolveStatus.CONVERGED, 3)
 
 
-def test_running_out_of_budget_reports_the_last_interval_midpoint():
+def test_running_out_of_budget_reports_the_last_evaluated_point():
     # --- act --------------------------
     result = Bisection().solve(cubic, 1.0, 2.0, xtol=1e-12, max_fevals=6)
 
     # --- assert -----------------------
-    # After the 2 bound evaluations, 4 steps ran; the interval sequence:
-    #   [1, 2], then [1, 1.5], then [1.25, 1.5], then [1.25, 1.375], then [1.3125, 1.375].
-    assert (result.status, result.n_fevals, result.x) == (SolveStatus.MAX_FEVALS, 6, 1.34375)
+    # After the 2 bound evaluations, 4 steps evaluated the midpoints 1.5, 1.25, 1.375, and 1.3125.
+    assert (result.status, result.n_fevals, result.x) == (SolveStatus.MAX_FEVALS, 6, 1.3125)
 
 
 # ==================================================================================================

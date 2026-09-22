@@ -11,10 +11,9 @@ class RegulaFalsi(BracketingSolver):
     retained forever and the width never shrinks below the distance from that bound to the root, so
     the stopping criterion never holds.
 
-    Such a solve runs until its evaluation budget is exhausted and ends as ``MAX_FEVALS``.
-
-    Its ``result.x`` is then the midpoint between the converging iterate and the retained bound, not
-    a good root estimate; the converging iterate is the last entry of ``result.history``.
+    The other bound is replaced every iteration and keeps approaching the root. Such a solve runs
+    until its evaluation budget is exhausted and ends as ``MAX_FEVALS``. Its ``result.x`` is then the
+    last evaluated point, which is close to the root.
     """
 
     name = "regula_falsi"
