@@ -1,9 +1,10 @@
-"""This module re-exports the solver base classes and the classes that a solver subclass works with.
+"""This module re-exports the solver base classes, what a solver subclass works with, and the shipped solvers.
 
 How a solve runs is described in the docstring of the implementation package, `sunnbear._core.solvers.core`.
 `WrappedFunction` is deliberately absent: a solver receives one inside its `SolveState` and never constructs one.
 """
 
+from ._core.solvers.bracketing import Bisection
 from ._core.solvers.core import (
     BracketingSolver,
     DecreasingInterval,
@@ -17,6 +18,7 @@ from ._core.solvers.core import (
 )
 
 __all__ = [
+    "Bisection",
     "BracketingSolver",
     "DecreasingInterval",
     "IncreasingInterval",

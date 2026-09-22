@@ -5,6 +5,7 @@ import pytest
 import sunnbear._core.exceptions
 import sunnbear._core.functions.core
 import sunnbear._core.functions.core.exceptions
+import sunnbear._core.solvers.bracketing
 import sunnbear._core.solvers.core
 import sunnbear._core.solvers.core.exceptions
 import sunnbear._core.stats
@@ -33,7 +34,7 @@ def _is_submodule(module, name: str) -> bool:
     [
         (sunnbear.stats, (sunnbear._core.stats,)),
         (sunnbear.functions, (sunnbear._core.functions.core,)),
-        (sunnbear.solvers, (sunnbear._core.solvers.core,)),
+        (sunnbear.solvers, (sunnbear._core.solvers.core, sunnbear._core.solvers.bracketing)),
         (
             sunnbear.exceptions,
             (
