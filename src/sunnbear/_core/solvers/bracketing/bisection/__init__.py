@@ -1,3 +1,3 @@
-"""This package holds `Bisection`; a solver package may grow helper modules beside its solver module."""
+"""This package holds `Bisection`."""
 
 from .solver import Bisection
