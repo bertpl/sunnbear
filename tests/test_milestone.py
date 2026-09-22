@@ -1,10 +1,10 @@
-"""These tests exercise the package's 3 layers, functions, solvers, and stats, together:
+"""These tests exercise the package's 3 layers (functions, solvers, and stats) together:
 
 - solve a shipped function
 - count flops
 - compute a geometric pseudo-quantile (gpq)
 
-That is the sequence a benchmark run repeats at scale; here it runs once, with the smallest inputs,
+That is the sequence that a benchmark run repeats at scale; here it runs once, with the smallest inputs,
 so a mismatch between the layers' contracts is caught here.
 """
 
@@ -15,7 +15,7 @@ import sunnbear.functions as functions  # The module, so pytest does not try to 
 from sunnbear.solvers import Bisection, RegulaFalsi, Solver, SolveResult, SolveStatus
 from sunnbear.stats import gpq
 
-C_VALUES = np.linspace(-1.0, 1.0, 5)  # A batch of shifts, all of which fall inside the calibrated c-range below.
+C_VALUES = np.linspace(-1.0, 1.0, 5)  # A batch of shift values for the cubic fixture below, inside the range it is calibrated for.
 
 
 @pytest.fixture(scope="module")
@@ -30,7 +30,7 @@ def _solve_batch(solver: Solver, cubic: functions.TestFunction, xtol: float) -> 
 
 
 def test_a_shipped_function_is_solved_by_both_solvers_with_counted_flops(cubic):
-    """Both solvers end inside the interval with a nonzero flop count, and Bisection converges on every shift."""
+    """Both solvers end inside the cubic's interval with counted flops; Bisection converges with a small residual."""
     # --- act --------------------------
     results = {solver.name: _solve_batch(solver, cubic, 1e-9) for solver in (Bisection(), RegulaFalsi())}
 
@@ -42,7 +42,7 @@ def test_a_shipped_function_is_solved_by_both_solvers_with_counted_flops(cubic):
             assert cubic.a <= result.x <= cubic.b, (name, c)
     for c, result in zip(C_VALUES, results["bisection"], strict=True):
         assert result.status is SolveStatus.CONVERGED
-        # The slope on the interval is at most 12, so the residual at a converged estimate is small.
+        # The slope on the cubic's interval is at most 12, so the residual at a converged estimate is small.
         assert abs(cubic.build_x_fun(c)(result.x)) < 1e-6
 
 
@@ -50,9 +50,9 @@ def test_a_gpq_over_a_batch_of_evaluation_counts(cubic):
     """The gpq at level 0.5 of a non-uniform batch of evaluation counts equals their geometric mean."""
     # --- act --------------------------
     n_fevals = [result.n_fevals for result in _solve_batch(Bisection(), cubic, 1e-6)]
-    cost = gpq(n_fevals, 0.5)
+    n_fevals_gpq = gpq(n_fevals, 0.5)
 
     # --- assert -----------------------
     # The evaluation counts are not uniform: at c = 0 the root sits at the first midpoint that Bisection evaluates.
     assert min(n_fevals) < max(n_fevals)
-    assert cost == pytest.approx(float(np.exp(np.mean(np.log(n_fevals)))))
+    assert n_fevals_gpq == pytest.approx(float(np.exp(np.mean(np.log(n_fevals)))))
