@@ -8,7 +8,7 @@ from sunnbear.solvers import Bisection, SolveStatus
 
 
 def _cubic(x: float) -> float:
-    return x**3 - x - 1.0  # 1 real root, near 1.3247
+    return x**3 - x - 1.0  # Has 1 real root, near 1.3247.
 
 
 def _decreasing_cubic(x: float) -> float:
@@ -21,7 +21,7 @@ ROOT = 1.324717957244746
 # ==================================================================================================
 #  Convergence and the exact evaluation count
 # ==================================================================================================
-@pytest.mark.parametrize("f", [_cubic, _decreasing_cubic])  # both orientations
+@pytest.mark.parametrize("f", [_cubic, _decreasing_cubic])  # Exercises both interval orientations.
 @pytest.mark.parametrize("a, b, xtol", [(1.0, 2.0, 1e-3), (0.0, 4.0, 1e-8), (1.3, 1.4, 1e-12)])
 def test_converges_within_xtol_with_the_exact_evaluation_count(f, a, b, xtol):
     # --- act / assert -----------------
@@ -45,7 +45,8 @@ def test_running_out_of_budget_reports_the_last_interval_midpoint():
     result = Bisection().solve(_cubic, 1.0, 2.0, xtol=1e-12, max_fevals=6)
 
     # --- assert -----------------------
-    # After the 2 bound evaluations, 4 steps ran: [1, 2] became [1, 1.5], [1.25, 1.5], [1.25, 1.375], [1.3125, 1.375].
+    # After the 2 bound evaluations, 4 steps ran; the interval sequence:
+    #   [1, 2], then [1, 1.5], then [1.25, 1.5], then [1.25, 1.375], then [1.3125, 1.375].
     assert (result.status, result.n_fevals, result.x) == (SolveStatus.MAX_FEVALS, 6, 1.34375)
 
 
