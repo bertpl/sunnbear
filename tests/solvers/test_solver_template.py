@@ -35,7 +35,6 @@ class _MidpointRepeatingSolver(Solver):
         x = state.bracket.midpoint
         while True:
             state.f(x)
-            state.incr_iteration_count()
 
 
 class _ExcursionSolver(Solver):
@@ -85,21 +84,6 @@ class _BuggySolver(Solver):
         raise RuntimeError("bug")
 
 
-class _IterationCountingSolver(Solver):
-    """`_IterationCountingSolver` marks a fixed number of iterations and returns."""
-
-    name = "iteration_counter"
-    version = 1
-
-    def __init__(self, n_iters: int) -> None:
-        self.n_iters = n_iters
-
-    def _solve(self, state: SolveState) -> float:
-        for _ in range(self.n_iters):
-            state.incr_iteration_count()
-        return state.x_best
-
-
 def _increasing(x: float) -> float:
     return x - 0.25
 
@@ -141,7 +125,7 @@ def test_the_bracket_class_is_the_orientation(f, cls_expected):
 # ==================================================================================================
 #  Endpoint evaluations
 # ==================================================================================================
-def test_endpoints_are_evaluated_and_counted_before_the_algorithm_runs():
+def test_the_bounds_are_evaluated_and_counted_before_the_algorithm_runs():
     # --- arrange ----------------------
     solver = _RecordingSolver()
 
@@ -151,7 +135,6 @@ def test_endpoints_are_evaluated_and_counted_before_the_algorithm_runs():
     # --- assert -----------------------
     assert result.n_fevals == 2
     assert result.status is SolveStatus.CONVERGED
-    assert result.n_iters is None  # The solver never marked an iteration.
     assert result.x == 0.5  # x_best starts at the bracket midpoint.
     assert solver.states[0].f.n_fevals == 2
 
@@ -159,7 +142,7 @@ def test_endpoints_are_evaluated_and_counted_before_the_algorithm_runs():
 @pytest.mark.parametrize(
     "a, b, root", [(0.25, 1.0, 0.25), (-1.0, 0.25, 0.25)]
 )  # the root sits at the lower end, then at the upper end
-def test_exact_zero_endpoint_converges_without_running_the_algorithm(a, b, root):
+def test_an_exact_zero_at_a_bound_converges_without_running_the_algorithm(a, b, root):
     # --- arrange ----------------------
     solver = _RecordingSolver()
 
@@ -167,7 +150,7 @@ def test_exact_zero_endpoint_converges_without_running_the_algorithm(a, b, root)
     result = solver.solve(_increasing, a, b, xtol=1e-3, max_fevals=10)
 
     # --- assert -----------------------
-    assert (result.x, result.status, result.n_fevals, result.n_iters) == (root, SolveStatus.CONVERGED, 2, None)
+    assert (result.x, result.status, result.n_fevals) == (root, SolveStatus.CONVERGED, 2)
     assert solver.states == []
 
 
@@ -176,7 +159,7 @@ def test_state_holds_the_evaluated_bracket_and_the_history_of_the_evaluations():
     solver = _RecordingSolver()
 
     # --- act --------------------------
-    solver.solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10, record_history=True)
+    solver.solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10, history_enabled=True)
 
     # --- assert -----------------------
     state = solver.states[0]
@@ -194,7 +177,6 @@ def test_running_out_of_budget_maps_to_max_fevals():
     # --- assert -----------------------
     assert result.status is SolveStatus.MAX_FEVALS
     assert result.n_fevals == 7
-    assert result.n_iters == 5  # Of 7 evaluations, 2 went to the endpoints and 5 to completed iterations.
     assert result.x == 0.5  # The best estimate so far is the untouched bracket's midpoint.
 
 
@@ -244,6 +226,30 @@ def test_a_function_error_is_classified_by_where_it_happened(solver, status_expe
     assert result.n_fevals == 3  # The failing evaluation counts.
 
 
+@pytest.mark.parametrize(
+    "x_failing, status_expected", [(0.0, SolveStatus.FUNCTION_ERROR), (1.0, SolveStatus.FUNCTION_ERROR)]
+)  # A failure at either bound is recorded, not raised; the midpoint is the best estimate there is.
+def test_a_failure_at_a_bound_is_recorded(x_failing, status_expected):
+    # --- arrange ----------------------
+    def f(x: float) -> float:
+        return math.nan if x == x_failing else _increasing(x)
+
+    # --- act --------------------------
+    result = _RecordingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
+
+    # --- assert -----------------------
+    assert (result.status, result.x) == (status_expected, 0.5)
+    assert result.n_fevals == (1 if x_failing == 0.0 else 2)
+
+
+def test_a_budget_below_the_two_bound_evaluations_maps_to_max_fevals():
+    # --- act --------------------------
+    result = _RecordingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=1)
+
+    # --- assert -----------------------
+    assert (result.status, result.x, result.n_fevals) == (SolveStatus.MAX_FEVALS, 0.5, 1)
+
+
 def test_solver_exception_maps_to_solver_error():
     # --- act --------------------------
     result = _BuggySolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
@@ -256,19 +262,10 @@ def test_solver_exception_maps_to_solver_error():
 # ==================================================================================================
 #  Result fields
 # ==================================================================================================
-@pytest.mark.parametrize("n", [1, 3])
-def test_marked_iterations_are_reported(n):
-    # --- act --------------------------
-    result = _IterationCountingSolver(n).solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
-
-    # --- assert -----------------------
-    assert result.n_iters == n
-
-
 def test_history_is_none_unless_requested():
     # --- act --------------------------
     off = _RecordingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
-    on = _RecordingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10, record_history=True)
+    on = _RecordingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10, history_enabled=True)
 
     # --- assert -----------------------
     assert off.history is None

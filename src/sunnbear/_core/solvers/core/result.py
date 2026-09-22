@@ -45,8 +45,6 @@ class SolveResult:
         status: How the solve ended; see `SolveStatus`.
         n_fevals: Function evaluations performed, the 2 endpoint evaluations
             included.
-        n_iters: Iterations performed, or ``None`` for solvers to which the
-            notion does not apply.
         flop_counts: Floating-point operations of the solver's own arithmetic,
             per flop type; function evaluation cost is excluded.
         history: Every ``(x, f(x))`` evaluated, in order; ``None`` when history
@@ -56,6 +54,5 @@ class SolveResult:
     x: float
     status: SolveStatus
     n_fevals: int
-    n_iters: int | None
     flop_counts: FlopCounts
     history: tuple[tuple[float, float], ...] | None

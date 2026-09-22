@@ -43,13 +43,13 @@ class WrappedFunction:
         f: Callable[[float], float],
         *,
         max_fevals: int,
-        record_history: bool,
+        history_enabled: bool,
     ) -> None:
         """Wrap ``f`` for one solve."""
         self._f = f
         self._max_fevals = max_fevals
         self.n_fevals = 0
-        self.history: list[tuple[float, float]] | None = [] if record_history else None
+        self.history: list[tuple[float, float]] | None = [] if history_enabled else None
 
     def __call__(self, x: float) -> float:
         """Evaluate ``f`` at ``x``: refuse it past the budget or for a non-finite ``x``, reject a failed evaluation."""

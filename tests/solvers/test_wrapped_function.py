@@ -11,8 +11,8 @@ def _linear(x: float) -> float:
     return 2.0 * x - 1.0
 
 
-def _wrap(f=_linear, max_fevals: int = 10, record_history: bool = False):
-    return WrappedFunction(f, max_fevals=max_fevals, record_history=record_history)
+def _wrap(f=_linear, max_fevals: int = 10, history_enabled: bool = False):
+    return WrappedFunction(f, max_fevals=max_fevals, history_enabled=history_enabled)
 
 
 # ==================================================================================================
@@ -108,7 +108,7 @@ def test_history_is_off_by_default():
 
 def test_history_records_the_evaluations_as_plain_float_pairs():
     # --- arrange ----------------------
-    wf = _wrap(record_history=True)
+    wf = _wrap(history_enabled=True)
 
     # --- act --------------------------
     wf(CountedFloat(0.0))

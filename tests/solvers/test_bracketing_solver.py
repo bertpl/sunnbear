@@ -59,10 +59,9 @@ def test_loop_runs_until_the_width_criterion_holds(a, b, xtol):
     result = _HalvingSolver().solve(_linear, a, b, xtol=xtol, max_fevals=200)
 
     # --- assert -----------------------
-    n_iters_expected = max(0, math.ceil(math.log2((b - a) / (2.0 * xtol))))
+    n_steps_expected = max(0, math.ceil(math.log2((b - a) / (2.0 * xtol))))
     assert result.status is SolveStatus.CONVERGED
-    assert result.n_iters == n_iters_expected
-    assert result.n_fevals == n_iters_expected + 2
+    assert result.n_fevals == n_steps_expected + 2  # One evaluation per step, plus the 2 bounds.
     assert abs(result.x - 0.3) <= xtol
 
 
@@ -75,7 +74,7 @@ def test_loop_stops_early_on_an_exact_zero():
     result = _HalvingSolver().solve(f, 0.0, 1.0, xtol=1e-9, max_fevals=200)
 
     # --- assert -----------------------
-    assert (result.x, result.status, result.n_iters, result.n_fevals) == (0.5, SolveStatus.CONVERGED, 1, 3)
+    assert (result.x, result.status, result.n_fevals) == (0.5, SolveStatus.CONVERGED, 3)
 
 
 def test_interrupted_loop_reports_the_last_bracket_midpoint():
@@ -84,7 +83,7 @@ def test_interrupted_loop_reports_the_last_bracket_midpoint():
 
     # --- assert -----------------------
     assert result.status is SolveStatus.MAX_FEVALS
-    assert result.n_iters == 2  # 2 steps completed: the bracket became [0, 0.5], then [0.25, 0.5]
+    assert result.n_fevals == 4  # 2 steps completed after the bounds: the bracket became [0, 0.5], then [0.25, 0.5]
     assert result.x == 0.375
 
 
@@ -100,4 +99,6 @@ def test_a_solver_gets_a_fresh_instance_of_its_own_state_class_per_solve():
     second = solver.solve(_linear, 0.0, 1.0, xtol=1e-3, max_fevals=200)
 
     # --- assert -----------------------
-    assert solver.n_steps_seen == list(range(first.n_iters)) + list(range(second.n_iters))
+    n_steps = first.n_fevals - 2  # One evaluation per step; both solves are identical.
+    assert second.n_fevals == first.n_fevals
+    assert solver.n_steps_seen == list(range(n_steps)) * 2
