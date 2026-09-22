@@ -1,35 +1,42 @@
-"""This test drives the package's 3 layers through each other: solve a shipped function, count flops, compute a gpq.
+"""These tests exercise the package's 3 layers, functions, solvers, and stats, together:
 
-The benchmark engine will run this loop at scale; here it runs once, with the smallest inputs, so
-a mismatch in the contracts between the layers surfaces before the engine exists.
+- solve a shipped function
+- count flops
+- compute a geometric pseudo-quantile (gpq)
+
+That is the sequence a benchmark run repeats at scale; here it runs once, with the smallest inputs,
+so a mismatch between the layers' contracts is caught here.
 """
 
 import numpy as np
 import pytest
 
-from sunnbear.functions import FormulaRegistry
-from sunnbear.solvers import Bisection, RegulaFalsi, SolveStatus
+from sunnbear.functions import FormulaRegistry, TestFunction
+from sunnbear.solvers import Bisection, RegulaFalsi, Solver, SolveResult, SolveStatus
 from sunnbear.stats import gpq
 
-C_VALUES = np.linspace(-1.0, 1.0, 5)  # A batch of shifts, all inside the calibrated c-range below.
+C_VALUES = np.linspace(-1.0, 1.0, 5)  # A batch of shifts, all of which fall inside the calibrated c-range below.
 
 
 @pytest.fixture(scope="module")
-def cubic():
+def cubic() -> TestFunction:
     """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to ``c`` in ``[-1, 1]``."""
     return FormulaRegistry.candidate_from_id("f101-0.2").calibrated(c_min=-1.0, c_max=1.0)
 
 
+def _solve_batch(solver: Solver, cubic: TestFunction, xtol: float) -> list[SolveResult]:
+    """Solve the cubic for every shift in ``C_VALUES`` and return the results in that order."""
+    return [solver.solve(cubic.build_x_fun(c), cubic.a, cubic.b, xtol=xtol, max_fevals=200) for c in C_VALUES]
+
+
 def test_a_shipped_function_is_solved_by_both_solvers_with_counted_flops(cubic):
+    """Both solvers end inside the interval with a nonzero flop count, and Bisection converges on every shift."""
     # --- act --------------------------
-    results = {
-        solver.name: [solver.solve(cubic.build_x_fun(c), cubic.a, cubic.b, xtol=1e-9, max_fevals=200) for c in C_VALUES]
-        for solver in (Bisection(), RegulaFalsi())
-    }
+    results = {solver.name: _solve_batch(solver, cubic, 1e-9) for solver in (Bisection(), RegulaFalsi())}
 
     # --- assert -----------------------
-    for name, batch in results.items():
-        for c, result in zip(C_VALUES, batch, strict=True):
+    for name, solve_results in results.items():
+        for c, result in zip(C_VALUES, solve_results, strict=True):
             assert result.status in (SolveStatus.CONVERGED, SolveStatus.MAX_FEVALS), (name, c, result.status)
             assert result.flop_counts.total_count() > 0, (name, c)
             assert cubic.a <= result.x <= cubic.b, (name, c)
@@ -40,13 +47,12 @@ def test_a_shipped_function_is_solved_by_both_solvers_with_counted_flops(cubic):
 
 
 def test_a_gpq_over_a_batch_of_evaluation_counts(cubic):
+    """The gpq at level 0.5 of a non-uniform batch of evaluation counts equals their geometric mean."""
     # --- act --------------------------
-    n_fevals = [
-        Bisection().solve(cubic.build_x_fun(c), cubic.a, cubic.b, xtol=1e-6, max_fevals=200).n_fevals for c in C_VALUES
-    ]
+    n_fevals = [result.n_fevals for result in _solve_batch(Bisection(), cubic, 1e-6)]
     cost = gpq(n_fevals, 0.5)
 
     # --- assert -----------------------
-    # At level 0.5 the gpq is the geometric mean. The batch is not uniform: c = 0 has its root at the first midpoint.
+    # The evaluation counts are not uniform: at c = 0 the root sits at the first midpoint that Bisection evaluates.
     assert min(n_fevals) < max(n_fevals)
     assert cost == pytest.approx(float(np.exp(np.mean(np.log(n_fevals)))))
