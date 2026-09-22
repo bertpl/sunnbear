@@ -1,12 +1,12 @@
-"""`SolverState` counts iterations only once a solver marks one."""
+"""`SolveState` counts iterations only once a solver marks one."""
 
 from sunnbear._core.solvers.core.wrapped_function import WrappedFunction
-from sunnbear.solvers import Interval, SolverState
+from sunnbear.solvers import Interval, SolveState
 
 
-def _state() -> SolverState:
+def _state() -> SolveState:
     wf = WrappedFunction(lambda x: x - 0.5, max_fevals=10, record_history=False)
-    return SolverState(f=wf, bracket=Interval.from_endpoints(0.0, 1.0, -0.5, 0.5), xtol=1e-3)
+    return SolveState(f=wf, bracket=Interval.from_endpoints(0.0, 1.0, -0.5, 0.5), xtol=1e-3)
 
 
 def test_iterations_are_none_until_the_first_mark():

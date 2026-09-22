@@ -9,7 +9,7 @@ the pieces in this order::
       │ evaluates f(a), f(b); Interval.from_endpoints picks the bracket's orientation from them
       │ opens the flop-counting context; a, b become CountedFloat
       ▼
-    Solver._solve(state: SolverState)                      [subclass hook]
+    Solver._solve(state: SolveState)                      [subclass hook]
       │   BracketingSolver implements it as a loop over _step(state, Interval)
       │   with the stopping criterion owned by BracketingSolver
       ▼
@@ -35,4 +35,4 @@ Two facts hold throughout this package:
 from .interval import DecreasingInterval, IncreasingInterval, Interval
 from .result import SolveResult, SolveStatus
 from .solver import BracketingSolver, Solver
-from .state import SolverState
+from .state import SolveState

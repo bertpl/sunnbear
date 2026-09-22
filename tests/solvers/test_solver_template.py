@@ -5,7 +5,7 @@ import math
 import pytest
 from counted_float import FlopCounts
 
-from sunnbear.solvers import DecreasingInterval, IncreasingInterval, Solver, SolverState, SolveStatus
+from sunnbear.solvers import DecreasingInterval, IncreasingInterval, Solver, SolveState, SolveStatus
 
 
 # ==================================================================================================
@@ -18,9 +18,9 @@ class _RecordingSolver(Solver):
     version = 1
 
     def __init__(self) -> None:
-        self.states: list[SolverState] = []
+        self.states: list[SolveState] = []
 
-    def _solve(self, state: SolverState) -> float:
+    def _solve(self, state: SolveState) -> float:
         self.states.append(state)
         return state.x_best
 
@@ -31,7 +31,7 @@ class _MidpointRepeatingSolver(Solver):
     name = "midpoint_repeater"
     version = 1
 
-    def _solve(self, state: SolverState) -> float:
+    def _solve(self, state: SolveState) -> float:
         x = state.bracket.midpoint
         while True:
             state.f(x)
@@ -47,7 +47,7 @@ class _ExcursionSolver(Solver):
     def __init__(self, x_returned: float) -> None:
         self._x_returned = x_returned
 
-    def _solve(self, state: SolverState) -> float:
+    def _solve(self, state: SolveState) -> float:
         state.x_best = float(state.bracket.b + 1e6 * state.bracket.width)
         state.f(state.x_best)
         return self._x_returned
@@ -59,7 +59,7 @@ class _NanSolver(Solver):
     name = "nan"
     version = 1
 
-    def _solve(self, state: SolverState) -> float:
+    def _solve(self, state: SolveState) -> float:
         return state.f(math.nan)
 
 
@@ -69,7 +69,7 @@ class _StrayingSolver(Solver):
     name = "straying"
     version = 1
 
-    def _solve(self, state: SolverState) -> float:
+    def _solve(self, state: SolveState) -> float:
         state.x_best = float(state.bracket.b + 1.0)
         while True:
             state.f(state.x_best)
@@ -81,7 +81,7 @@ class _BuggySolver(Solver):
     name = "buggy"
     version = 1
 
-    def _solve(self, state: SolverState) -> float:
+    def _solve(self, state: SolveState) -> float:
         raise RuntimeError("bug")
 
 
@@ -94,7 +94,7 @@ class _IterationCountingSolver(Solver):
     def __init__(self, n_iters: int) -> None:
         self.n_iters = n_iters
 
-    def _solve(self, state: SolverState) -> float:
+    def _solve(self, state: SolveState) -> float:
         for _ in range(self.n_iters):
             state.incr_iteration_count()
         return state.x_best

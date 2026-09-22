@@ -1,4 +1,4 @@
-"""`SolverState` is the state of one solve, and the base class of a solver's own state."""
+"""`SolveState` is the state of one solve, and the base class of a solver's own state."""
 
 from dataclasses import dataclass
 
@@ -7,14 +7,14 @@ from .wrapped_function import WrappedFunction
 
 
 @dataclass
-class SolverState:
-    """A `SolverState` is the mutable state of one solve, created by `Solver.solve` and handed to `Solver._solve`.
+class SolveState:
+    """A `SolveState` is the mutable state of one solve, created by `Solver.solve` and handed to `Solver._solve`.
 
-    The fields below belong to `SolverState` itself, not to a solver's own subclass. At the start of a
+    The fields below belong to `SolveState` itself, not to a solver's own subclass. At the start of a
     solve, `Solver.solve` initializes `f`, `bracket`, `xtol`, and `x_best` (the bracket's midpoint); at
     the end, it copies `n_iters` and `x_best` into the `SolveResult`.
 
-    A solver that needs additional fields in its state subclasses `SolverState`, adds its fields with
+    A solver that needs additional fields in its state subclasses `SolveState`, adds its fields with
     defaults, and names the subclass in `Solver.state_cls`; `Solver.solve` instantiates whichever
     class is named there, so the solver never constructs a state itself.
 

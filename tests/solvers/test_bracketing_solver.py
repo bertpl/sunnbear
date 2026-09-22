@@ -1,11 +1,11 @@
-"""2 test-local bracketing solvers exercise the loop, the stopping rule, and subclassing `SolverState`."""
+"""2 test-local bracketing solvers exercise the loop, the stopping rule, and subclassing `SolveState`."""
 
 import math
 from dataclasses import dataclass
 
 import pytest
 
-from sunnbear.solvers import BracketingSolver, Interval, SolverState, SolveStatus
+from sunnbear.solvers import BracketingSolver, Interval, SolveState, SolveStatus
 
 
 # ==================================================================================================
@@ -17,13 +17,13 @@ class _HalvingSolver(BracketingSolver):
     name = "halving"
     version = 1
 
-    def _step(self, state: SolverState, interval: Interval) -> Interval:
+    def _step(self, state: SolveState, interval: Interval) -> Interval:
         x = interval.midpoint
         return interval.split_at(x, state.f(x))
 
 
 @dataclass
-class _StepCountingState(SolverState):
+class _StepCountingState(SolveState):
     """`_StepCountingState` adds the solver's own step count to the framework's state."""
 
     n_steps: int = 0

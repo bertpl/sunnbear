@@ -16,11 +16,11 @@ from typing_extensions import TypeVar
 from .exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
 from .interval import Interval
 from .result import SolveResult, SolveStatus
-from .state import SolverState
+from .state import SolveState
 from .wrapped_function import WrappedFunction
 
-# A solver with fields of its own binds StateT to its SolverState subclass; see `Solver.state_cls`.
-StateT = TypeVar("StateT", bound=SolverState, default=SolverState)
+# A solver with fields of its own binds StateT to its SolveState subclass; see `Solver.state_cls`.
+StateT = TypeVar("StateT", bound=SolveState, default=SolveState)
 
 
 # ==================================================================================================
@@ -32,7 +32,7 @@ class Solver(ABC, Generic[StateT]):
     A subclass implements `_solve` and takes its configuration through
     ``__init__``; `solve` has a fixed signature, so all solvers are driven
     identically. Instances are immutable configuration, safe to share across
-    solves: everything that changes during a solve lives in the `SolverState`
+    solves: everything that changes during a solve lives in the `SolveState`
     that `solve` creates and hands to the algorithm.
 
     Class attributes:
@@ -41,14 +41,14 @@ class Solver(ABC, Generic[StateT]):
             benchmark results.
         version: Bumped on any behavior change, so results from different
             versions of one solver are never combined unknowingly.
-        state_cls: The `SolverState` class that `solve` instantiates. A solver
+        state_cls: The `SolveState` class that `solve` instantiates. A solver
             that carries values between iterations names its own subclass here
             and binds ``StateT`` to it; a memoryless solver leaves ``state_cls`` and ``StateT`` at their defaults.
     """
 
     name: ClassVar[str]
     version: ClassVar[int]
-    state_cls: ClassVar[type[SolverState]] = SolverState
+    state_cls: ClassVar[type[SolveState]] = SolveState
 
     # --------------------------------------------------------------------------
     #  Template method
@@ -120,7 +120,7 @@ class Solver(ABC, Generic[StateT]):
             history=None if wrapped_f.history is None else tuple(wrapped_f.history),
         )
 
-    def _run_catching_exceptions(self, state: SolverState, a: float, b: float) -> tuple[float, SolveStatus]:
+    def _run_catching_exceptions(self, state: SolveState, a: float, b: float) -> tuple[float, SolveStatus]:
         """Run the algorithm and map how it ended to a root estimate and a status.
 
         The state is typed as the base class here because `state_cls` is declared as one; `_solve`
@@ -164,7 +164,7 @@ class BracketingSolver(Solver[StateT]):
 
     The base class implements the loop and the stopping criterion (`Interval.is_converged`), so
     a subclass cannot define a wrong one; one `_step` is one iteration. A solver that carries
-    values between steps keeps them on its `SolverState` subclass (see `Solver.state_cls`).
+    values between steps keeps them on its `SolveState` subclass (see `Solver.state_cls`).
     """
 
     def _solve(self, state: StateT) -> float:
