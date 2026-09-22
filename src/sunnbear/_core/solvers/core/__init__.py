@@ -33,7 +33,7 @@ Two facts hold throughout this package:
   itself runs, so the function's cost is never included.
 """
 
-from .interval import DecreasingInterval, IncreasingInterval, Interval
+from .interval import DecreasingInterval, IncreasingInterval, Interval, IntervalBound
 from .result import SolveResult, SolveStatus
 from .solver import BracketingSolver, Solver
 from .state import SolveState

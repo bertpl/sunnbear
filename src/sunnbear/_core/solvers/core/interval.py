@@ -2,7 +2,18 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum
 from functools import cached_property
+
+
+# ==================================================================================================
+#  IntervalBound
+# ==================================================================================================
+class IntervalBound(Enum):
+    """`IntervalBound` names one of the 2 bounds of an `Interval`: the lower one, ``a``, or the upper one, ``b``."""
+
+    LOWER = "lower"
+    UPPER = "upper"
 
 
 # ==================================================================================================
@@ -23,12 +34,18 @@ class Interval(ABC):
 
     Arithmetic and comparisons on `CountedFloat` interval bounds are counted, so interval bookkeeping
     contributes to a solver's flop counts.
+
+    Attributes:
+        last_replaced_bound: Which bound the split that produced this interval replaced, or ``None`` for
+            the initial interval. A solver reads it to learn which side kept the sign change without
+            comparing bounds: the other bound of the interval it split is the one that was discarded.
     """
 
     a: float
     b: float
     fa: float
     fb: float
+    last_replaced_bound: IntervalBound | None = None
 
     # --------------------------------------------------------------------------
     #  Construction
@@ -94,9 +111,9 @@ class Interval(ABC):
         ``fx``, else ``b``.
         """
         if self._has_fa_sign(fx):
-            return type(self)(x, self.b, fx, self.fb)
+            return type(self)(x, self.b, fx, self.fb, IntervalBound.LOWER)
         else:
-            return type(self)(self.a, x, self.fa, fx)
+            return type(self)(self.a, x, self.fa, fx, IntervalBound.UPPER)
 
     def is_converged(self, doubled_xtol: float) -> bool:
         """Return whether a stopping criterion holds: the width is at most ``doubled_xtol`` or a bound value is zero.

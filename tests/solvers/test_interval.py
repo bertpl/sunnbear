@@ -1,7 +1,7 @@
 import pytest
 from counted_float import CountedFloat, FlopCountingContext, FlopCounts
 
-from sunnbear.solvers import DecreasingInterval, IncreasingInterval, Interval
+from sunnbear.solvers import DecreasingInterval, IncreasingInterval, Interval, IntervalBound
 
 ORIENTATIONS = [IncreasingInterval, DecreasingInterval]
 
@@ -39,6 +39,7 @@ def test_from_interval_bounds_picks_the_orientation(fa, fb, cls_expected):
     # --- assert -----------------------
     assert type(interval) is cls_expected
     assert (interval.a, interval.b, interval.fa, interval.fb) == (0.0, 1.0, fa, fb)
+    assert interval.last_replaced_bound is None  # The initial interval was not produced by a split.
 
 
 @pytest.mark.parametrize("fa, fb", [(1.0, 2.0), (-2.0, -1.0)])
@@ -62,14 +63,14 @@ def test_width_and_midpoint(cls):
 
 @pytest.mark.parametrize("cls", ORIENTATIONS)
 @pytest.mark.parametrize(
-    "fx, expected",
+    "fx, expected, replaced_expected",
     [
-        (-0.5, (1.0, 4.0, -0.5, 2.0)),  # the sign of fa: x becomes the lower interval bound
-        (0.0, (1.0, 4.0, 0.0, 2.0)),  # exact zero: also lower, so the zero interval bound is fa
-        (0.5, (0.0, 1.0, -1.0, 0.5)),  # the sign of fb: x becomes the upper interval bound
+        (-0.5, (1.0, 4.0, -0.5, 2.0), IntervalBound.LOWER),  # the sign of fa: x becomes the lower interval bound
+        (0.0, (1.0, 4.0, 0.0, 2.0), IntervalBound.LOWER),  # exact zero: also lower, so the zero interval bound is fa
+        (0.5, (0.0, 1.0, -1.0, 0.5), IntervalBound.UPPER),  # the sign of fb: x becomes the upper interval bound
     ],
 )
-def test_split_at_keeps_the_sign_change_and_the_orientation(cls, fx, expected):
+def test_split_at_keeps_the_sign_change_and_the_orientation(cls, fx, expected, replaced_expected):
     # --- arrange ----------------------
     interval = cls(0.0, 4.0, *_orient_values_at_interval_bounds(cls, -1.0, 2.0))
     a_expected, b_expected, fa_expected, fb_expected = expected
@@ -81,6 +82,7 @@ def test_split_at_keeps_the_sign_change_and_the_orientation(cls, fx, expected):
     assert type(narrowed) is cls
     assert (narrowed.a, narrowed.b) == (a_expected, b_expected)
     assert (narrowed.fa, narrowed.fb) == _orient_values_at_interval_bounds(cls, fa_expected, fb_expected)
+    assert narrowed.last_replaced_bound is replaced_expected
 
 
 # ==================================================================================================
