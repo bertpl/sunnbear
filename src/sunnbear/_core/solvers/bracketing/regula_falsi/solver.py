@@ -9,10 +9,11 @@ class RegulaFalsi(BracketingSolver):
     `RegulaFalsi` implements the classic method, without any of the modifications that repair its
     known weakness: when the function is convex or concave on the interval, 1 interval bound is
     retained forever and the width never shrinks below the distance from that bound to the root, so
-    the stopping criterion never holds.
+    the stopping criterion never holds. The other bound is replaced every iteration and keeps
+    approaching the root.
 
-    Such a solve runs until its evaluation budget is exhausted and ends as ``MAX_FEVALS``, with the
-    last iterate, which does converge to the root, as its ``result.x``.
+    Such a solve runs until its evaluation budget is exhausted and ends as ``MAX_FEVALS``. Its
+    ``result.x`` is then the last iterate, which is close to the root.
     """
 
     name = "regula_falsi"

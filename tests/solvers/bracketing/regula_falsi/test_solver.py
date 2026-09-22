@@ -31,7 +31,7 @@ def test_a_convex_function_stalls_on_the_retained_bound_and_exhausts_the_budget(
     assert result.status is SolveStatus.MAX_FEVALS
     assert result.n_fevals == 60
     assert abs(x_last - CUBIC_ROOT) <= 1e-9
-    assert result.x == x_last  # The reported estimate is the converging iterate, not the retained bound's side.
+    assert result.x == x_last  # The reported estimate is the converging iterate, not the retained bound.
 
 
 # ==================================================================================================
