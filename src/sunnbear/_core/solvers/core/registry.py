@@ -55,7 +55,7 @@ class SolverConfigRegistry:
 
     @classmethod
     def solver_classes(cls) -> "tuple[type[Solver], ...]":
-        """Return every solver class that a registered config names, once each, in the order of `configs`."""
+        """Return the solver class of every registered config, once each, in the order of `configs`."""
         return tuple(dict.fromkeys(config.solver_cls for config in cls.configs()))
 
     @classmethod

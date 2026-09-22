@@ -43,7 +43,7 @@ class SolverRole(Enum):
     def is_builtin_only(self) -> bool:
         """Return whether only a config defined inside the sunnbear package may take this role.
 
-        This restriction keeps a user config out of the roles that decide the characterization, so
-        every installation characterizes the test functions identically.
+        This restriction ensures that only sunnbear's own solvers set the baseline and characterize the
+        test functions, so every installation characterizes them identically.
         """
         return self in (SolverRole.BUILTIN_BASELINE, SolverRole.BUILTIN_CORE, SolverRole.BUILTIN_SECONDARY)

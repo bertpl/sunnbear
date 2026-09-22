@@ -1,4 +1,4 @@
-"""`SolverConfig` is the base class of a registered solver configuration: a solver class, its init arguments, a role.
+"""`SolverConfig` is the base class of a solver configuration: it names a solver class, its init arguments, and a role.
 
 A solver class carries only its algorithm; which settings the benchmark runs is a separate decision,
 recorded by one `SolverConfig` subclass per setting.
@@ -15,7 +15,8 @@ from .registry import SolverConfigRegistry
 from .role import SolverRole
 from .solver import Solver
 
-# A solver_id is rebuilt in other processes, so each init argument must print the same everywhere.
+# A config's identity (`SolverConfig.solver_id`) is rebuilt in other processes, so each init argument must
+# print the same everywhere.
 _KWARG_VALUE_TYPES = (bool, int, float, str)
 
 
@@ -42,17 +43,20 @@ class SolverConfig:
     kwargs: ClassVar[Mapping[str, object]] = {}
     role: ClassVar[SolverRole]
 
-    def __init_subclass__(cls, **kwargs: object) -> None:
+    def __init_subclass__(cls, **subclass_kwargs: object) -> None:
         """Validate the subclass and register it with `SolverConfigRegistry`.
 
         Raises:
-            TypeError: If ``solver_cls`` or ``role`` is missing, ``solver_cls`` is not a concrete
-                `Solver` subclass, ``kwargs`` do not fit its ``__init__``, or a ``kwargs`` value has
-                an unsupported type.
+            TypeError: If any of the following holds:
+
+                - ``solver_cls`` or ``role`` is missing
+                - ``solver_cls`` is not a concrete `Solver` subclass
+                - ``kwargs`` do not fit its ``__init__``
+                - a ``kwargs`` value has an unsupported type
             ValueError: If a built-in-only role is used outside the sunnbear package, or registration
                 fails (see `SolverConfigRegistry.register`).
         """
-        super().__init_subclass__(**kwargs)
+        super().__init_subclass__(**subclass_kwargs)
         cls._validate()
         SolverConfigRegistry.register(cls)
 
