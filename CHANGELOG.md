@@ -10,12 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `sunnbear.stats`: geometric pseudo-quantiles (`gpq`/`owg`) and exact mean pairwise L1 distance
-- Test-function framework: formulas with parameter recipes, stable function identities, and a file-drop formula catalog
-- `FormulaTestCase`: declare a formula's value / invalid-params / interval-bounds test cases alongside its definition
-- Solver framework: every solver's function evaluations run through one wrapper that applies an evaluation budget, catches failed evaluations, and excludes the function's own cost from flop counting
-- Intervals of either orientation: `IncreasingInterval` (`f` negative at `a`, positive at `b`) and `DecreasingInterval` (the reverse), picked by `Interval.from_interval_bounds`
-- `Solver`/`BracketingSolver`: the base classes that a root solver subclasses to become benchmarkable; a solve that ends outside its interval is reported as diverged, and one interrupted early reports its last evaluated point
-- `Bisection` and `RegulaFalsi` reference solvers; Bisection is checked against SciPy's
+- Test-function framework: formulas whose parameters are swept over grids, a stable id per test function, and a registry that rebuilds a test function from its id
+- `FormulaTestCase`: declare the unit tests that check a formula next to the formula's definition
+- `Solver`/`BracketingSolver`: base classes for benchmarkable root solvers; each solve has a limit on the number of function evaluations, and its flop count leaves out the flops spent inside the function being solved
+- Bracketing solvers accept an interval `[a, b]` where `f` goes from negative at `a` to positive at `b`, or the reverse
+- `Bisection` and `RegulaFalsi` reference solvers
 - `SolverConfig`: register a solver with fixed init arguments under a stable id, with a role that decides how the benchmark treats it
 
 ### Changed
