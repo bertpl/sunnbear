@@ -1,6 +1,6 @@
 """The solver config registry holds the registered solver configs and looks one up by its identity.
 
-Defining a `SolverConfig` subclass registers 1 instance of it here. The built-in configs are
+Defining a `SolverConfig` subclass registers one instance of it here. The built-in configs are
 registered when the `sunnbear.solvers` module imports the shipped solvers, so the registry is complete
 on import.
 

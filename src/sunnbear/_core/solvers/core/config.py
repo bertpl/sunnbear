@@ -17,7 +17,7 @@ from .solver import Solver
 
 # A config's identity (`SolverConfig.solver_id`) is rebuilt in other processes, so each init argument must
 # print the same everywhere.
-_KWARG_VALUE_TYPES = (bool, int, float, str)
+_SOLVER_KWARG_VALUE_TYPES = (bool, int, float, str)
 
 
 # ==================================================================================================
@@ -34,16 +34,16 @@ class SolverConfig:
 
     Class attributes:
         solver_cls: The concrete `Solver` subclass to instantiate.
-        kwargs: The init arguments passed to ``solver_cls``; each value is a bool, int, float, or str.
+        solver_kwargs: The init arguments passed to ``solver_cls``; each value is a bool, int, float, or str.
         role: How the benchmark treats this config. A role for which `SolverRole.is_builtin_only`
             holds is reserved for configs defined inside the sunnbear package.
     """
 
     solver_cls: ClassVar[type[Solver]]
-    kwargs: ClassVar[Mapping[str, object]] = {}
+    solver_kwargs: ClassVar[Mapping[str, object]] = {}
     role: ClassVar[SolverRole]
 
-    def __init_subclass__(cls, **subclass_kwargs: object) -> None:
+    def __init_subclass__(cls, **kwargs: object) -> None:
         """Validate the subclass and register it with `SolverConfigRegistry`.
 
         Raises:
@@ -51,12 +51,12 @@ class SolverConfig:
 
                 - ``solver_cls`` or ``role`` is missing
                 - ``solver_cls`` is not a concrete `Solver` subclass
-                - ``kwargs`` do not fit its ``__init__``
-                - a ``kwargs`` value has an unsupported type
+                - ``solver_kwargs`` do not fit its ``__init__``
+                - a ``solver_kwargs`` value has an unsupported type
             ValueError: If a built-in-only role is used outside the sunnbear package, or registration
                 fails (see `SolverConfigRegistry.register`).
         """
-        super().__init_subclass__(**subclass_kwargs)
+        super().__init_subclass__(**kwargs)
         cls._validate()
         SolverConfigRegistry.register(cls)
 
@@ -69,15 +69,15 @@ class SolverConfig:
 
         Arguments are sorted by name, so the identity does not depend on the order of declaration.
         """
-        if not self.kwargs:
+        if not self.solver_kwargs:
             return self.solver_cls.name
         else:
-            args = ",".join(f"{key}={value!r}" for key, value in sorted(self.kwargs.items()))
+            args = ",".join(f"{key}={value!r}" for key, value in sorted(self.solver_kwargs.items()))
             return f"{self.solver_cls.name}[{args}]"
 
     def instantiate(self) -> Solver:
         """Return a new solver built with this config's init arguments."""
-        return self.solver_cls(**self.kwargs)
+        return self.solver_cls(**self.solver_kwargs)
 
     # --------------------------------------------------------------------------
     #  Validation
@@ -93,13 +93,16 @@ class SolverConfig:
         if inspect.isabstract(cls.solver_cls):
             raise TypeError(f"{cls.__name__}.solver_cls must be concrete; {cls.solver_cls.__name__} is abstract.")
         try:
-            inspect.signature(cls.solver_cls).bind(**cls.kwargs)
+            inspect.signature(cls.solver_cls).bind(**cls.solver_kwargs)
         except TypeError as exc:
-            raise TypeError(f"{cls.__name__}.kwargs do not fit {cls.solver_cls.__name__}.__init__: {exc}.") from exc
-        for key, value in cls.kwargs.items():
-            if not isinstance(value, _KWARG_VALUE_TYPES):
+            raise TypeError(
+                f"{cls.__name__}.solver_kwargs do not fit {cls.solver_cls.__name__}.__init__: {exc}."
+            ) from exc
+        for key, value in cls.solver_kwargs.items():
+            if not isinstance(value, _SOLVER_KWARG_VALUE_TYPES):
                 raise TypeError(
-                    f"{cls.__name__}.kwargs[{key!r}] must be a bool, int, float, or str (got {type(value).__name__})."
+                    f"{cls.__name__}.solver_kwargs[{key!r}] must be a bool, int, float, or str "
+                    f"(got {type(value).__name__})."
                 )
         if cls.role.is_builtin_only and not _is_defined_in_sunnbear(cls):
             raise ValueError(

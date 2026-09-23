@@ -42,7 +42,9 @@ def test_built_in_config_is_registered_on_import(config_cls, solver_id, solver_c
 def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
     # --- arrange ----------------------
     for weight in (0.75, 0.25):
-        define_config({"solver_cls": WeightedSplitSolver, "kwargs": {"weight": weight}, "role": SolverRole.USER_ACTIVE})
+        define_config(
+            {"solver_cls": WeightedSplitSolver, "solver_kwargs": {"weight": weight}, "role": SolverRole.USER_ACTIVE}
+        )
 
     # --- act --------------------------
     solver_ids = [config.solver_id for config in SolverConfigRegistry.configs()]
@@ -77,7 +79,7 @@ def test_second_baseline_is_rejected():
     namespace = {
         "__module__": "sunnbear.hypothetical_solvers",
         "solver_cls": WeightedSplitSolver,
-        "kwargs": {"weight": 0.5},
+        "solver_kwargs": {"weight": 0.5},
         "role": SolverRole.BUILTIN_BASELINE,
     }
 
