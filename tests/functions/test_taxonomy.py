@@ -1,25 +1,25 @@
 import pytest
 
-from sunnbear._core.functions.core.taxonomy import format_number, parse_number, slugify
+from sunnbear._core.functions.core.taxonomy import format_taxonomy_number, parse_taxonomy_number, slugify
 from sunnbear.functions import FormulaCategory
 
-from .example_formulas import category_cls, minimal_formula_cls
+from .example_taxonomy_nodes import define_category_cls, define_formula_cls
 
 
 # ==================================================================================================
-#  format_number / parse_number
+#  format_taxonomy_number / parse_taxonomy_number
 # ==================================================================================================
 @pytest.mark.parametrize("number, text", [((2,), "2"), ((2, 1, 1), "2.1.1"), ((99, 10, 123), "99.10.123")])
 def test_number_renders_and_parses_back(number, text):
     # --- act / assert -----------------
-    assert format_number(number) == text
-    assert parse_number(text) == number
+    assert format_taxonomy_number(number) == text
+    assert parse_taxonomy_number(text) == number
 
 
 @pytest.mark.parametrize("text", ["", "2.", ".2", "2..1", "0", "2.01", "2.-1", "2.a", "2,1"])
-def test_parse_number_rejects_invalid(text):
+def test_parse_taxonomy_number_rejects_invalid(text):
     with pytest.raises(ValueError, match="Invalid taxonomy number"):
-        parse_number(text)
+        parse_taxonomy_number(text)
 
 
 # ==================================================================================================
@@ -54,14 +54,14 @@ def test_slugify(name, slug):
 )
 def test_category_number_is_validated_at_class_definition(number, error, match):
     with pytest.raises(error, match=match):
-        category_cls(number)
+        define_category_cls(number)
 
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_formula_number_needs_a_parent_category_element():
     """A formula is a leaf under a category, so its number has at least 2 elements."""
     with pytest.raises(ValueError, match="at least 2 element"):
-        minimal_formula_cls((99,))
+        define_formula_cls((99,))
 
 
 @pytest.mark.usefixtures("isolated_registry")

@@ -5,7 +5,7 @@ Layout convention, checked by the catalog tests:
 - a category is a package ``c<NN>_<slug>/`` whose ``__init__.py`` defines one `FormulaCategory`
   subclass and imports the package's modules and subpackages
 - a formula is a module ``f<NN>_<slug>.py`` defining one `Formula` subclass
-- ``<NN>`` is the last element of the node's number, zero-padded to 2 digits, and ``<slug>`` is its
+- ``<NN>`` is the last element of the category's or formula's number, zero-padded to 2 digits, and ``<slug>`` is its
   ``name_slug``; the folder path therefore reads as the full number, e.g.
   ``c02_documented_functions/c01_polynomials/f01_cubic.py`` is formula ``2.1.1``
 

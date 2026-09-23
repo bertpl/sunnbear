@@ -68,7 +68,7 @@ class Formula(TaxonomyNode, ABC):
             getattr(getattr(cls, name), "__isabstractmethod__", False) for name in Formula.__abstractmethods__
         )
         if is_concrete:
-            cls._validate_number(min_length=2)
+            cls._validate_number_and_name(min_length=2)
             FormulaRegistry.register_formula(cls)
 
     # --------------------------------------------------------------------------

@@ -1,14 +1,17 @@
 """The formula taxonomy is a tree whose inner nodes are categories and whose leaves are formulas.
 
-Every node has a number: a tuple of positive integers, e.g. ``(2, 1, 1)``, rendered ``2.1.1``. A
-node's parent is the node whose number is its own number minus the last element, so ``(2, 1)``
-is the parent of ``(2, 1, 1)``. The number of a formula therefore says which categories it sits
-in, and sorting by number sorts in category order.
+Every node has a number: a tuple of positive integers, e.g. ``(2, 1, 1)``, rendered ``2.1.1``.
+A node's parent is the node whose number is its own number minus the last element, so
+``(2, 1)`` is the parent of ``(2, 1, 1)``.
 
-`TaxonomyNode` is the base class of `Formula` and `FormulaCategory`: it holds what the 2 kinds
-of node share, the number, the display name, and the name's slug. How the nodes relate to one
-another (the parents exist, no category mixes subcategories and formulas) is checked by
-`FormulaRegistry`, after all nodes are registered.
+The number of a formula therefore says which categories it sits in, and sorting by number
+sorts in category order.
+
+`TaxonomyNode` is the base class of `Formula` and `FormulaCategory` and holds what the 2 kinds
+of node share.
+
+`FormulaRegistry` checks how the nodes relate to one another, the first time the registry is
+queried after a registration.
 """
 
 import re
@@ -36,8 +39,8 @@ class TaxonomyNode:
         return slugify(self.name)
 
     @classmethod
-    def _validate_number(cls, min_length: int) -> None:
-        """Check that `number` is declared, and is a tuple of at least `min_length` positive integers.
+    def _validate_number_and_name(cls, min_length: int) -> None:
+        """Check that `number` and `name` are declared, and that `number` has at least `min_length` positive integers.
 
         Raises:
             TypeError: If `number` or `name` is missing, or `number` is not a tuple of integers.
@@ -59,12 +62,12 @@ class TaxonomyNode:
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-def format_number(number: tuple[int, ...]) -> str:
+def format_taxonomy_number(number: tuple[int, ...]) -> str:
     """Render a taxonomy number with dots, e.g. ``(2, 1, 1)`` as ``2.1.1``."""
     return ".".join(str(n) for n in number)
 
 
-def parse_number(text: str) -> tuple[int, ...]:
+def parse_taxonomy_number(text: str) -> tuple[int, ...]:
     """Parse a rendered taxonomy number, e.g. ``2.1.1``, back into a tuple.
 
     Raises:
@@ -78,8 +81,10 @@ def parse_number(text: str) -> tuple[int, ...]:
 def slugify(name: str) -> str:
     """Return `name` as a lowercase identifier, e.g. "Documented functions" as ``documented_functions``.
 
-    Accented letters lose their accent; other characters outside a-z and 0-9 become underscores,
-    so the result is a valid Python module name as long as it does not start with a digit.
+    Accented letters lose their accent and other non-ASCII characters are dropped; each run of
+    remaining characters outside a-z and 0-9 becomes 1 underscore, and leading and trailing
+    underscores are removed, so the result is a valid Python module name as long as it does not
+    start with a digit.
     """
     ascii_name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
     return re.sub(r"[^a-z0-9]+", "_", ascii_name.lower()).strip("_")

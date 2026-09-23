@@ -1,31 +1,37 @@
 """The formula registry holds the registered formulas and categories, and rebuilds a candidate from an identity.
 
-Defining a concrete `Formula` or a `FormulaCategory` subclass registers one instance of it here.
-Checks run in 2 stages:
+Defining a concrete `Formula` or a `FormulaCategory` subclass registers one instance of it here,
+as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
 
-- **At class definition**, every check that concerns the node alone: a valid number, and no other
-  registered node with the same number. A malformed formula fails when its module is imported.
-- **On the first read** of the registry, and again after any later registration, the checks across
-  nodes: every node's parent category exists, no category holds both subcategories and formulas,
-  and no node outside sunnbear sits under a built-in-only top-level category. These cannot run
-  at class definition, because a category's package imports its formula modules at the top of
-  its ``__init__.py``, so its formulas register before the category itself.
+- **At class definition**, every check that concerns the formula or category alone: a valid
+  number, and no other registered node with the same number. A malformed formula fails when its
+  module is imported.
+- **The first time the registry is queried**, and again on the first query after any later
+  registration, the checks across nodes:
+
+  - every node's parent category exists
+  - no category holds both subcategories and formulas
+  - no node outside sunnbear sits under a built-in-only top-level category (see
+    `FormulaCategory.is_builtin_only`)
+
+  The checks across nodes cannot run at class definition: a category's package imports its
+  formula modules at the top of its ``__init__.py``, so its formulas register before the
+  category itself.
 
 The registry itself imports nothing: the shipped formulas are registered when the
 test-function package imports the formula catalog.
 
 `FormulaRegistry.candidate_from_id` rebuilds a candidate test function from its identity, for
-benchmark workers and users; the calibrated c-range that a suite artifact supplies is then
-attached with `CandidateTestFunction.calibrated`. A missing c-range is an error, never a default.
+benchmark workers and users.
 """
 
 from typing import TYPE_CHECKING, ClassVar
 
-from sunnbear._core.builtin import is_defined_in_sunnbear
+from sunnbear._core.class_origin import is_defined_in_sunnbear
 
 from .exceptions import FormulaTaxonomyError, InvalidParamsError, UnknownFormulaError
 from .identity import FunctionId
-from .taxonomy import TaxonomyNode, format_number
+from .taxonomy import TaxonomyNode, format_taxonomy_number
 from .test_function import CandidateTestFunction
 
 # type-only: formula and category import this module at runtime, so a runtime import would be circular
@@ -41,8 +47,9 @@ class FormulaRegistry:
     """`FormulaRegistry` enumerates the registered formulas and categories, or rebuilds one candidate from an identity.
 
     `Formula.__init_subclass__` and `FormulaCategory.__init_subclass__` call `register_formula` and
-    `register_category`, so the registry is complete as soon as the modules that define them are imported.
-    Every public read first checks the taxonomy tree, if a registration happened since the last check.
+    `register_category`, so the registry is complete as soon as the modules that define the formula and
+    category subclasses are imported. Every public query method first checks the taxonomy tree if a
+    formula or category was registered since the last check.
     """
 
     _formulas_by_number: ClassVar[dict[tuple[int, ...], "Formula"]] = {}
@@ -60,7 +67,7 @@ class FormulaRegistry:
             ValueError: If another registered formula or category has the same number.
         """
         formula = formula_cls()
-        cls._check_number_is_free(formula)
+        cls._validate_number_is_free(formula)
         cls._formulas_by_number[formula.number] = formula
         cls._is_taxonomy_validated = False
 
@@ -72,7 +79,7 @@ class FormulaRegistry:
             ValueError: If another registered formula or category has the same number.
         """
         category = category_cls()
-        cls._check_number_is_free(category)
+        cls._validate_number_is_free(category)
         cls._categories_by_number[category.number] = category
         cls._is_taxonomy_validated = False
 
@@ -119,7 +126,7 @@ class FormulaRegistry:
         formula = cls._formulas_by_number.get(fid.formula_number)
         if formula is None:
             raise UnknownFormulaError(
-                f"No registered formula with number {format_number(fid.formula_number)} (id: {fid})."
+                f"No registered formula with number {format_taxonomy_number(fid.formula_number)} (id: {fid})."
             )
         if not formula.is_param_tuple_valid(*fid.param_values):
             raise InvalidParamsError(f"Parameter tuple {fid.params} is invalid for formula {formula.name} (id: {fid}).")
@@ -129,16 +136,16 @@ class FormulaRegistry:
     #  Taxonomy checks
     # --------------------------------------------------------------------------
     @classmethod
-    def _check_number_is_free(cls, node: TaxonomyNode) -> None:
+    def _validate_number_is_free(cls, node: TaxonomyNode) -> None:
         """Check that no registered formula or category has the number of `node`.
 
         Raises:
-            ValueError: If one does.
+            ValueError: If a registered formula or category already has that number.
         """
         existing = cls._formulas_by_number.get(node.number) or cls._categories_by_number.get(node.number)
         if existing is not None:
             raise ValueError(
-                f"Duplicate taxonomy number {format_number(node.number)}: "
+                f"Duplicate taxonomy number {format_taxonomy_number(node.number)}: "
                 f"{type(node).__name__} and {type(existing).__name__}."
             )
 
@@ -161,34 +168,35 @@ class FormulaRegistry:
         categories = cls._categories_by_number
         nodes: list[TaxonomyNode] = [*categories.values(), *cls._formulas_by_number.values()]
 
-        # --- every parent exists ------------------------
+        # --- every parent exists ----------------
         # a formula's number has at least 2 elements, so only a top-level category has no parent
         for node in nodes:
             parent_number = node.number[:-1]
             if parent_number and parent_number not in categories:
                 raise FormulaTaxonomyError(
-                    f"{type(node).__name__} ({format_number(node.number)}) has no registered parent "
-                    f"category {format_number(parent_number)}."
+                    f"{type(node).__name__} ({format_taxonomy_number(node.number)}) has no registered parent "
+                    f"category {format_taxonomy_number(parent_number)}."
                 )
 
-        # --- no mixed categories ------------------------
+        # --- no mixed categories ----------------
         parents_of_formulas = {number[:-1] for number in cls._formulas_by_number}
         parents_of_categories = {number[:-1] for number in categories if len(number) > 1}
         mixed_numbers = sorted(parents_of_formulas & parents_of_categories)
         if mixed_numbers:
             number = mixed_numbers[0]
             raise FormulaTaxonomyError(
-                f"Category {type(categories[number]).__name__} ({format_number(number)}) holds both "
+                f"Category {type(categories[number]).__name__} ({format_taxonomy_number(number)}) holds both "
                 "subcategories and formulas; a category holds one kind only."
             )
 
-        # --- built-in-only top levels -------------------
-        # every ancestor exists after the first check, so every node's top-level category does
+        # --- built-in-only top levels -----------
+        # the parent check above guarantees that every ancestor exists, including each node's top-level category
         for node in nodes:
             top_level = categories[node.number[:1]]
             if top_level.is_builtin_only and not is_defined_in_sunnbear(type(node)):
+                node_label = f"{type(node).__name__} ({format_taxonomy_number(node.number)})"
+                top_level_label = f"{type(top_level).__name__} ({format_taxonomy_number(top_level.number)})"
                 raise FormulaTaxonomyError(
-                    f"{type(node).__name__} ({format_number(node.number)}) is defined in {type(node).__module__}, "
-                    f"but top-level category {type(top_level).__name__} ({format_number(top_level.number)}) is "
-                    "reserved for nodes inside the sunnbear package."
+                    f"{node_label} is defined in {type(node).__module__}, but top-level category "
+                    f"{top_level_label} is reserved for nodes inside the sunnbear package."
                 )

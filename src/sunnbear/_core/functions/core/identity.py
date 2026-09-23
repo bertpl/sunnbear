@@ -16,7 +16,7 @@ in the same notation; collapsing near-duplicate parameter tuples happens
 from dataclasses import dataclass
 
 from .param_values import ParamValue
-from .taxonomy import format_number, parse_number
+from .taxonomy import format_taxonomy_number, parse_taxonomy_number
 
 
 # ==================================================================================================
@@ -49,8 +49,9 @@ class FunctionId:
     def display(self) -> str:
         """Render with each parameter's authored notation, e.g. ``f2.1.5-2^1.2_0.4``."""
         if not self.params:
-            return f"f{format_number(self.formula_number)}"
-        return f"f{format_number(self.formula_number)}-" + "_".join(p.display() for p in self.params)
+            return f"f{format_taxonomy_number(self.formula_number)}"
+        else:
+            return f"f{format_taxonomy_number(self.formula_number)}-" + "_".join(p.display() for p in self.params)
 
     def __repr__(self) -> str:
         """Render the faithful form; `from_string` parses it back to this identity."""
@@ -73,7 +74,7 @@ class FunctionId:
         if dash and not params_part:  # trailing dash: "f2.1.1-" is not the rendering of any identity
             raise ValueError(f"Invalid FunctionId string: {text!r}")
         try:
-            formula_number = parse_number(number_part)
+            formula_number = parse_taxonomy_number(number_part)
             params = tuple(ParamValue.parse(token) for token in params_part.split("_")) if params_part else ()
         except ValueError as exc:
             raise ValueError(f"Invalid FunctionId string: {text!r}") from exc

@@ -12,7 +12,7 @@ from sunnbear.functions import (
     ParamValue,
 )
 
-from .example_formulas import minimal_formula_cls
+from .example_taxonomy_nodes import define_formula_cls
 
 
 # ==================================================================================================
@@ -60,7 +60,7 @@ def test_candidates_deduplicates_across_recipes():
     # --- arrange ----------------------
     class DupTest(Formula):
         number = (99, 999)
-        name = "dup_test"
+        name = "Dup test"
         param_names = ("p1",)
         jit = False
 
@@ -87,7 +87,7 @@ def test_candidates_deduplicates_across_recipes():
 @pytest.mark.usefixtures("isolated_registry")
 def test_subclass_definition_registers():
     # --- arrange / act ----------------
-    cls = minimal_formula_cls((99, 998))
+    cls = define_formula_cls((99, 998))
 
     # --- assert -----------------------
     assert any(type(f) is cls for f in FormulaRegistry.formulas())
@@ -96,25 +96,25 @@ def test_subclass_definition_registers():
 @pytest.mark.usefixtures("isolated_registry")
 def test_defining_a_duplicate_number_is_rejected_at_class_definition():
     # --- arrange ----------------------
-    minimal_formula_cls((99, 997))
+    define_formula_cls((99, 997))
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=r"Duplicate taxonomy number 99\.997"):
-        minimal_formula_cls((99, 997))
+        define_formula_cls((99, 997))
 
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_defining_a_non_positive_number_is_rejected_at_class_definition():
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="only positive integers"):
-        minimal_formula_cls((99, 0))
+        define_formula_cls((99, 0))
 
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_zero_param_formula_yields_exactly_one_candidate():
     """A formula without parameters materializes the single empty tuple, once."""
     # --- act --------------------------
-    candidates = minimal_formula_cls((99, 992))().build_all_candidates()
+    candidates = define_formula_cls((99, 992))().build_all_candidates()
 
     # --- assert -----------------------
     assert len(candidates) == 1
@@ -140,7 +140,7 @@ def test_formulas_defined_after_first_use_are_registered():
     FormulaRegistry.formulas()
 
     # --- act --------------------------
-    cls = minimal_formula_cls((99, 994))
+    cls = define_formula_cls((99, 994))
 
     # --- assert -----------------------
     assert any(type(f) is cls for f in FormulaRegistry.formulas())
@@ -161,7 +161,7 @@ def test_candidates_deduplicates_across_notations():
     # --- arrange ----------------------
     class CrossNotation(Formula):
         number = (99, 995)
-        name = "cross_notation"
+        name = "Cross notation"
         param_names = ("p1",)
         jit = False
 
@@ -186,18 +186,18 @@ def test_candidates_deduplicates_across_notations():
 # ==================================================================================================
 #  recipe validation
 # ==================================================================================================
-def _formula_cls(last_number: int, declared: tuple[str, ...], recipes: tuple, fun=None, interval_bounds=None):
-    """Build a throwaway Formula under ``(99, last_number)``; its declaration and recipes vary independently."""
+def _formula_cls(last_element: int, declared: tuple[str, ...], recipes: tuple, fun=None, interval_bounds=None):
+    """Build a throwaway Formula under ``(99, last_element)``; its declaration and recipes vary independently."""
     namespace = {
-        "number": (99, last_number),
-        "name": f"Varying {last_number}",
+        "number": (99, last_element),
+        "name": f"Varying {last_element}",
         "param_names": declared,
         "jit": False,
         "parametrized_fun": staticmethod(fun or (lambda x, c, p1: x - c)),
         "interval_bounds": interval_bounds or (lambda self, p1: (-1.0, 1.0)),
         "recipes": lambda self: recipes,
     }
-    return type(f"Varying{last_number}", (Formula,), namespace)
+    return type(f"Varying{last_element}", (Formula,), namespace)
 
 
 @pytest.mark.usefixtures("isolated_registry")
@@ -356,7 +356,7 @@ def test_compiled_formula_rejects_plain_method():
     # --- arrange ----------------------
     class PlainMethod(Formula):
         number = (99, 996)
-        name = "plain_method"
+        name = "Plain method"
         jit = False
 
         def parametrized_fun(self, x: float, c: float) -> float:  # not a staticmethod: rejected

@@ -19,8 +19,8 @@ How the pieces tie together, from authored code to a solvable function::
       ▼
     f(x) ───────── plain callable handed to a Solver
 
-Formulas are the leaves of a tree of `FormulaCategory` classes, the taxonomy: a formula's number,
-e.g. ``(2, 1, 1)``, lists the categories it sits in (see `taxonomy`).
+The formula taxonomy is a tree whose inner nodes are `FormulaCategory` classes and whose leaves are
+formulas: a formula's number, e.g. ``(2, 1, 1)``, lists the categories it sits in (see `taxonomy`).
 
 `FormulaRegistry.candidate_from_id` re-enters this chain from a stored identity,
 rebuilding the `CandidateTestFunction` that a suite's c-range then calibrates.

@@ -10,7 +10,7 @@ from sunnbear.functions import Formula, FormulaRegistry
 
 _CATALOG_PREFIX = f"{catalog.__name__}."
 
-# a catalog folder or file name: kind letter, 2-digit number, slug
+# A catalog folder or file name is a kind letter, a 2-digit number and a slug.
 _NAME_PATTERN = re.compile(r"(?P<kind>[cf])(?P<number>[0-9]{2})_(?P<slug>[a-z0-9_]+)")
 
 
@@ -40,7 +40,7 @@ def test_catalog_path_matches_number_and_names(node):
 
 
 def test_catalog_holds_categories_and_formulas():
-    """Guards the test above against passing vacuously: both kinds of node are found in the catalog."""
+    """Assert that the catalog contains both a category and a formula, so the test above cannot pass vacuously."""
     # --- act --------------------------
     nodes = _catalog_nodes()
 

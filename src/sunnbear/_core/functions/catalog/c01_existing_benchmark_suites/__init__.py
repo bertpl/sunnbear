@@ -1,10 +1,10 @@
-"""Formulas taken from existing benchmark suites (category 1), grouped by source, then by suite."""
+"""Category 1 holds formulas taken from existing benchmark suites, grouped by source, then by suite."""
 
 from sunnbear._core.functions.core import FormulaCategory
 
 
 class ExistingBenchmarkSuites(FormulaCategory):
-    """Top-level category of the formulas taken from existing benchmark suites."""
+    """`ExistingBenchmarkSuites` is the top-level category of formulas taken from existing benchmark suites."""
 
     number = (1,)
     name = "Existing benchmark suites"

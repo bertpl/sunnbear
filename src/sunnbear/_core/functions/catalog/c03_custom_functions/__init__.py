@@ -1,10 +1,10 @@
-"""Custom formulas built to provoke specific solver behavior (category 3)."""
+"""Category 3 holds custom formulas built to provoke specific solver behavior."""
 
 from sunnbear._core.functions.core import FormulaCategory
 
 
 class CustomFunctions(FormulaCategory):
-    """Top-level category of custom formulas built to provoke specific solver behavior."""
+    """`CustomFunctions` is the top-level category of custom formulas built to provoke specific solver behavior."""
 
     number = (3,)
     name = "Custom functions"
