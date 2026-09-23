@@ -32,8 +32,8 @@ Two facts hold throughout this package:
   divergence checks after it are uncounted, and `WrappedFunction` pauses counting while ``f``
   itself runs, so the function's cost is never included.
 
-A solver class carries only its algorithm. A `SolverConfig` records which init arguments the benchmark runs a
-solver with, and its `SolverRole` decides how the benchmark treats the result; `SolverConfigRegistry` holds
+A solver class carries only its algorithm. A `SolverConfig` records the init arguments that the benchmark passes
+to a solver, and its `SolverRole` decides how the benchmark treats the result; `SolverConfigRegistry` holds
 every registered config.
 """
 
