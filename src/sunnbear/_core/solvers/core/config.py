@@ -15,8 +15,8 @@ from .registry import SolverConfigRegistry
 from .role import SolverRole
 from .solver import Solver
 
-# A config's identity (`SolverConfig.solver_id`) is rebuilt in other processes, so each init argument must
-# print the same everywhere.
+# The types that a `solver_kwargs` value may have. `SolverConfig.solver_id` includes the `repr` of each
+# value, and a worker in another process must rebuild the same id, which holds for these types only.
 _SOLVER_KWARG_VALUE_TYPES = (bool, int, float, str)
 
 
