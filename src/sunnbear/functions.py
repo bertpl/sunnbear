@@ -7,6 +7,7 @@ How the pieces tie together is described in the docstring of the implementation 
 from ._core.functions import (
     CANONICAL_DIGITS,
     DEDUP_DIGITS,
+    USER_DEFINED_FORMULA_CATEGORY_NUMBER,
     CandidateTestFunction,
     DecimalParamValue,
     ExponentialParamValue,
@@ -28,6 +29,7 @@ from ._core.functions import (
 __all__ = [
     "CANONICAL_DIGITS",
     "DEDUP_DIGITS",
+    "USER_DEFINED_FORMULA_CATEGORY_NUMBER",
     "CandidateTestFunction",
     "DecimalParamValue",
     "ExponentialParamValue",

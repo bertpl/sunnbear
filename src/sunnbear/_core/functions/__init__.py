@@ -8,6 +8,7 @@ from . import catalog
 from .core import (
     CANONICAL_DIGITS,
     DEDUP_DIGITS,
+    USER_DEFINED_FORMULA_CATEGORY_NUMBER,
     CandidateTestFunction,
     DecimalParamValue,
     ExponentialParamValue,

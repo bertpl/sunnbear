@@ -46,7 +46,7 @@ Ownership summary:
   property of the type, not a nullable field.
 """
 
-from .category import FormulaCategory
+from .category import USER_DEFINED_FORMULA_CATEGORY_NUMBER, FormulaCategory
 from .formula import Formula
 from .identity import FunctionId
 from .param_values import (

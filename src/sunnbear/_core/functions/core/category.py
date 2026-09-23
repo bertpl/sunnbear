@@ -2,7 +2,8 @@
 
 A category is an inner node of the formula taxonomy (see `taxonomy`). It holds either
 subcategories or formulas, never both, and may be empty. The top-level categories are fixed: only
-sunnbear defines them, and a user's categories and formulas go under the user-defined top level.
+sunnbear defines them, and a user's categories and formulas go under the user-defined top level,
+`USER_DEFINED_FORMULA_CATEGORY_NUMBER`.
 """
 
 from typing import ClassVar
@@ -11,6 +12,9 @@ from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
 from .registry import FormulaRegistry
 from .taxonomy import FormulaTaxonomyNode
+
+# The number of the top-level category under which users register their own categories and formulas.
+USER_DEFINED_FORMULA_CATEGORY_NUMBER = 99
 
 
 # ==================================================================================================
@@ -50,7 +54,8 @@ class FormulaCategory(FormulaTaxonomyNode):
         if len(cls.number) == 1 and not is_defined_in_sunnbear(cls):
             raise ValueError(
                 f"{cls.__name__} is defined in {cls.__module__} as top-level category {cls.number[0]}; only "
-                "sunnbear defines top-level categories, so put user categories and formulas under 99."
+                "sunnbear defines top-level categories, so put user categories and formulas under "
+                f"{USER_DEFINED_FORMULA_CATEGORY_NUMBER}."
             )
         if "is_builtin_only" in cls.__dict__ and len(cls.number) > 1:
             raise ValueError(
