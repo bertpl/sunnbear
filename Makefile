@@ -51,5 +51,8 @@ splash:
 
 release:
 	@test -n "$(VERSION)" || (echo "Usage: make release VERSION=X.Y.Z" && exit 1)
+	# preconditions first (seconds, and step 9 waits out an in-flight main CI run), so a bad
+	# changelog or a stale coverage run aborts before the test suite spends its minutes
+	uv run python scripts/release.py $(VERSION) --dry-run
 	$(MAKE) test
 	uv run python scripts/release.py $(VERSION)
