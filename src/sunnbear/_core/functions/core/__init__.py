@@ -1,4 +1,4 @@
-"""This package holds the test-function framework: formulas, recipes, identities, and the registry.
+"""This package holds the test-function framework: formulas, categories, recipes, identities, and the registry.
 
 How the pieces tie together, from authored code to a solvable function::
 
@@ -18,6 +18,9 @@ How the pieces tie together, from authored code to a solvable function::
       │ build_x_fun(c)   [per Monte-Carlo run: one closure over the compiled body]
       ▼
     f(x) ───────── plain callable handed to a Solver
+
+Formulas are the leaves of a tree of `FormulaCategory` classes, the taxonomy: a formula's number,
+e.g. ``(2, 1, 1)``, lists the categories it sits in (see `taxonomy`).
 
 `FormulaRegistry.candidate_from_id` re-enters this chain from a stored identity,
 rebuilding the `CandidateTestFunction` that a suite's c-range then calibrates.
@@ -42,6 +45,7 @@ Ownership summary:
   property of the type, not a nullable field.
 """
 
+from .category import FormulaCategory
 from .formula import Formula
 from .identity import FunctionId
 from .param_values import (

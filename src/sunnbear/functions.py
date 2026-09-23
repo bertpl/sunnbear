@@ -1,4 +1,4 @@
-"""This module re-exports the test-function framework: formulas, recipes, identities, and the registry.
+"""This module re-exports the test-function framework: formulas, categories, recipes, identities, and the registry.
 
 How the pieces tie together is described in the docstring of the implementation package,
 `sunnbear._core.functions.core`.
@@ -11,6 +11,7 @@ from ._core.functions import (
     DecimalParamValue,
     ExponentialParamValue,
     Formula,
+    FormulaCategory,
     FormulaRegistry,
     FormulaTestCase,
     FunctionId,
@@ -31,6 +32,7 @@ __all__ = [
     "DecimalParamValue",
     "ExponentialParamValue",
     "Formula",
+    "FormulaCategory",
     "FormulaRegistry",
     "FormulaTestCase",
     "FunctionId",

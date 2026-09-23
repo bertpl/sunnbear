@@ -4,13 +4,14 @@ import math
 
 import pytest
 
+from sunnbear._core.functions.core.taxonomy import format_number
 from sunnbear._core.functions.core.test_cases import IntervalBoundsTestCase, InvalidTestCase, ValueTestCase
 from sunnbear.functions import FormulaRegistry
 
 # every (formula, case) pair, with a stable unique id: formula number + case kind + within-formula index
 _INDEXED = [(formula, i, case) for formula in FormulaRegistry.formulas() for i, case in enumerate(formula.cases)]
 _CASES = [(formula, case) for formula, _, case in _INDEXED]
-_IDS = [f"F{formula.number}:{type(case).__name__}:{i}" for formula, i, case in _INDEXED]
+_IDS = [f"f{format_number(formula.number)}:{type(case).__name__}:{i}" for formula, i, case in _INDEXED]
 
 
 @pytest.mark.parametrize("formula, case", _CASES, ids=_IDS)

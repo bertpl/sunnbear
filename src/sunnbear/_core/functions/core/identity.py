@@ -16,6 +16,7 @@ in the same notation; collapsing near-duplicate parameter tuples happens
 from dataclasses import dataclass
 
 from .param_values import ParamValue
+from .taxonomy import format_number, parse_number
 
 
 # ==================================================================================================
@@ -30,7 +31,7 @@ class FunctionId:
     re-parseable (see the module docstring).
     """
 
-    formula: int
+    formula_number: tuple[int, ...]
     params: tuple[ParamValue, ...]
 
     @property
@@ -40,16 +41,16 @@ class FunctionId:
 
     def __lt__(self, other: "FunctionId") -> bool:
         """Order by formula number, then parameter values."""
-        return (self.formula, self.param_values) < (other.formula, other.param_values)
+        return (self.formula_number, self.param_values) < (other.formula_number, other.param_values)
 
     # --------------------------------------------------------------------------
     #  Rendering
     # --------------------------------------------------------------------------
     def display(self) -> str:
-        """Render with each parameter's authored notation, e.g. ``f105-2^1.2_0.4``."""
+        """Render with each parameter's authored notation, e.g. ``f2.1.5-2^1.2_0.4``."""
         if not self.params:
-            return f"f{self.formula:03d}"
-        return f"f{self.formula:03d}-" + "_".join(p.display() for p in self.params)
+            return f"f{format_number(self.formula_number)}"
+        return f"f{format_number(self.formula_number)}-" + "_".join(p.display() for p in self.params)
 
     def __repr__(self) -> str:
         """Render the faithful form; `from_string` parses it back to this identity."""
@@ -69,11 +70,11 @@ class FunctionId:
         if not text.startswith("f"):
             raise ValueError(f"Invalid FunctionId string: {text!r}")
         number_part, dash, params_part = text[1:].partition("-")
-        if dash and not params_part:  # trailing dash: "f101-" is not the rendering of any identity
+        if dash and not params_part:  # trailing dash: "f2.1.1-" is not the rendering of any identity
             raise ValueError(f"Invalid FunctionId string: {text!r}")
         try:
-            formula = int(number_part)
+            formula_number = parse_number(number_part)
             params = tuple(ParamValue.parse(token) for token in params_part.split("_")) if params_part else ()
         except ValueError as exc:
             raise ValueError(f"Invalid FunctionId string: {text!r}") from exc
-        return cls(formula=formula, params=params)
+        return cls(formula_number=formula_number, params=params)

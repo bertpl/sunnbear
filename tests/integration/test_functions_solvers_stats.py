@@ -22,7 +22,7 @@ C_VALUES = np.linspace(-1.0, 1.0, 5)
 @pytest.fixture(scope="module")
 def cubic() -> functions.TestFunction:
     """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to ``c`` in ``[-1, 1]``."""
-    return functions.FormulaRegistry.candidate_from_id("f101-0.2").calibrated(c_min=-1.0, c_max=1.0)
+    return functions.FormulaRegistry.candidate_from_id("f2.1.1-0.2").calibrated(c_min=-1.0, c_max=1.0)
 
 
 def _solve_batch(solver: Solver, cubic: functions.TestFunction, xtol: float) -> list[SolveResult]:

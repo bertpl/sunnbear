@@ -1,7 +1,7 @@
 import pytest
 
-from sunnbear._core.functions.catalog.f1xx_polynomials.f101_cubic import F101_Cubic
-from sunnbear._core.functions.catalog.f1xx_polynomials.f102_odd_power import F102_OddPower
+from sunnbear._core.functions.catalog.c02_documented_functions.c01_polynomials.f01_cubic import Cubic
+from sunnbear._core.functions.catalog.c02_documented_functions.c01_polynomials.f02_odd_power import OddPower
 from sunnbear.exceptions import InvalidParamsError, UnknownFormulaError
 from sunnbear.functions import (
     Formula,
@@ -12,11 +12,7 @@ from sunnbear.functions import (
     ParamValue,
 )
 
-
-@pytest.fixture
-def isolated_registry(monkeypatch):
-    """Give the test its own copy of the registry, so test-defined Formula subclasses don't leak past the test."""
-    monkeypatch.setattr(FormulaRegistry, "_formulas_by_number", dict(FormulaRegistry._formulas_by_number))
+from .example_formulas import minimal_formula_cls
 
 
 # ==================================================================================================
@@ -28,30 +24,30 @@ def test_formulas_contains_catalog_sorted():
 
     # --- assert -----------------------
     assert [f.number for f in registered] == sorted(f.number for f in registered)
-    assert {type(f) for f in registered} >= {F101_Cubic, F102_OddPower}
+    assert {type(f) for f in registered} >= {Cubic, OddPower}
 
 
 def test_candidates_materializes_recipe_grid():
     # --- act --------------------------
-    cubic_candidates = list(F101_Cubic().build_all_candidates())
+    cubic_candidates = list(Cubic().build_all_candidates())
 
     # --- assert -----------------------
     assert [c.id.param_values for c in cubic_candidates] == [(0.0,), (0.2,), (0.4,), (0.6,), (0.8,), (1.0,)]
-    assert all(c.id.formula == F101_Cubic.number for c in cubic_candidates)
+    assert all(c.id.formula_number == Cubic.number for c in cubic_candidates)
     assert all((c.a, c.b) == (-2.0, 2.0) for c in cubic_candidates)
 
 
 def test_candidates_applies_validity_filter():
     # --- act --------------------------
-    odd_candidates = list(F102_OddPower().build_all_candidates())
+    odd_candidates = list(OddPower().build_all_candidates())
 
     # --- assert -----------------------
     assert [c.id.param_values for c in odd_candidates] == [(1.0,), (3.0,), (5.0,), (7.0,)]
 
 
-@pytest.mark.parametrize("formula_cls", [F101_Cubic, F102_OddPower])
+@pytest.mark.parametrize("formula_cls", [Cubic, OddPower])
 def test_candidates_functions_evaluate(formula_cls):
-    """Both compilation paths (jitted f101, plain f102) produce working f(x, c) callables."""
+    """Both compilation paths (jitted cubic, plain odd power) produce working f(x, c) callables."""
     # --- arrange ----------------------
     candidate = formula_cls().build_all_candidates()[0]  # p1 = 0.0 resp. 1.0
 
@@ -63,7 +59,7 @@ def test_candidates_functions_evaluate(formula_cls):
 def test_candidates_deduplicates_across_recipes():
     # --- arrange ----------------------
     class DupTest(Formula):
-        number = 999
+        number = (99, 999)
         name = "dup_test"
         param_names = ("p1",)
         jit = False
@@ -88,29 +84,10 @@ def test_candidates_deduplicates_across_recipes():
 # ==================================================================================================
 #  registration
 # ==================================================================================================
-def _minimal_formula_cls(formula_number: int) -> type[Formula]:
-    class Minimal(Formula):
-        number = formula_number
-        name = f"minimal_{formula_number}"
-        jit = False
-
-        @staticmethod
-        def parametrized_fun(x: float, c: float) -> float:
-            return x - c
-
-        def interval_bounds(self) -> tuple[float, float]:
-            return (-1.0, 1.0)
-
-        def recipes(self) -> tuple[ParamRecipe, ...]:
-            return ()
-
-    return Minimal
-
-
 @pytest.mark.usefixtures("isolated_registry")
 def test_subclass_definition_registers():
     # --- arrange / act ----------------
-    cls = _minimal_formula_cls(998)
+    cls = minimal_formula_cls((99, 998))
 
     # --- assert -----------------------
     assert any(type(f) is cls for f in FormulaRegistry.formulas())
@@ -119,38 +96,38 @@ def test_subclass_definition_registers():
 @pytest.mark.usefixtures("isolated_registry")
 def test_defining_a_duplicate_number_is_rejected_at_class_definition():
     # --- arrange ----------------------
-    _minimal_formula_cls(997)
+    minimal_formula_cls((99, 997))
 
     # --- act / assert -----------------
-    with pytest.raises(ValueError, match="Duplicate formula number 997"):
-        _minimal_formula_cls(997)
+    with pytest.raises(ValueError, match=r"Duplicate taxonomy number 99\.997"):
+        minimal_formula_cls((99, 997))
 
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_defining_a_non_positive_number_is_rejected_at_class_definition():
     # --- act / assert -----------------
-    with pytest.raises(ValueError, match="must be > 0"):
-        _minimal_formula_cls(0)
+    with pytest.raises(ValueError, match="only positive integers"):
+        minimal_formula_cls((99, 0))
 
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_zero_param_formula_yields_exactly_one_candidate():
     """A formula without parameters materializes the single empty tuple, once."""
     # --- act --------------------------
-    candidates = _minimal_formula_cls(992)().build_all_candidates()
+    candidates = minimal_formula_cls((99, 992))().build_all_candidates()
 
     # --- assert -----------------------
     assert len(candidates) == 1
     assert candidates[0].id.params == ()
-    assert str(candidates[0].id) == "f992"
+    assert str(candidates[0].id) == "f99.992"
 
 
 def test_registry_holds_one_instance_per_formula():
     """Enumeration and reconstruction hand out the same registered instance."""
     # --- act --------------------------
-    [enumerated] = [f for f in FormulaRegistry.formulas() if type(f) is F101_Cubic]
-    candidate_a = FormulaRegistry.candidate_from_id("f101-0.2")
-    candidate_b = FormulaRegistry.candidate_from_id("f101-0.4")
+    [enumerated] = [f for f in FormulaRegistry.formulas() if type(f) is Cubic]
+    candidate_a = FormulaRegistry.candidate_from_id("f2.1.1-0.2")
+    candidate_b = FormulaRegistry.candidate_from_id("f2.1.1-0.4")
 
     # --- assert -----------------------
     assert candidate_a.formula is candidate_b.formula is enumerated
@@ -163,7 +140,7 @@ def test_formulas_defined_after_first_use_are_registered():
     FormulaRegistry.formulas()
 
     # --- act --------------------------
-    cls = _minimal_formula_cls(994)
+    cls = minimal_formula_cls((99, 994))
 
     # --- assert -----------------------
     assert any(type(f) is cls for f in FormulaRegistry.formulas())
@@ -183,7 +160,7 @@ def test_abstract_intermediates_are_not_registered():
 def test_candidates_deduplicates_across_notations():
     # --- arrange ----------------------
     class CrossNotation(Formula):
-        number = 995
+        number = (99, 995)
         name = "cross_notation"
         param_names = ("p1",)
         jit = False
@@ -203,24 +180,24 @@ def test_candidates_deduplicates_across_notations():
     ids = [c.id for c in CrossNotation().build_all_candidates()]
 
     # --- assert -----------------------
-    assert [str(fid) for fid in ids] == ["f995-4.0"]  # first-seen notation wins
+    assert [str(fid) for fid in ids] == ["f99.995-4.0"]  # first-seen notation wins
 
 
 # ==================================================================================================
 #  recipe validation
 # ==================================================================================================
-def _formula_cls(number: int, declared: tuple[str, ...], recipes: tuple, fun=None, interval_bounds=None):
-    """Build a throwaway Formula whose declaration and recipes can be varied independently."""
+def _formula_cls(last_number: int, declared: tuple[str, ...], recipes: tuple, fun=None, interval_bounds=None):
+    """Build a throwaway Formula under ``(99, last_number)``; its declaration and recipes vary independently."""
     namespace = {
-        "number": number,
-        "name": f"varying_{number}",
+        "number": (99, last_number),
+        "name": f"Varying {last_number}",
         "param_names": declared,
         "jit": False,
         "parametrized_fun": staticmethod(fun or (lambda x, c, p1: x - c)),
         "interval_bounds": interval_bounds or (lambda self, p1: (-1.0, 1.0)),
         "recipes": lambda self: recipes,
     }
-    return type(f"Varying{number}", (Formula,), namespace)
+    return type(f"Varying{last_number}", (Formula,), namespace)
 
 
 @pytest.mark.usefixtures("isolated_registry")
@@ -367,18 +344,18 @@ def test_every_catalog_formula_validates():
 # ==================================================================================================
 def test_compiled_formula_is_cached_per_class():
     # --- arrange ----------------------
-    first_instance, second_instance = F101_Cubic(), F101_Cubic()
+    first_instance, second_instance = Cubic(), Cubic()
 
     # --- act / assert -----------------
     assert first_instance._compiled_formula() is second_instance._compiled_formula()
-    assert F101_Cubic()._compiled_formula() is not F102_OddPower()._compiled_formula()
+    assert Cubic()._compiled_formula() is not OddPower()._compiled_formula()
 
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_compiled_formula_rejects_plain_method():
     # --- arrange ----------------------
     class PlainMethod(Formula):
-        number = 996
+        number = (99, 996)
         name = "plain_method"
         jit = False
 
@@ -402,19 +379,21 @@ def test_compiled_formula_rejects_plain_method():
 # ==================================================================================================
 def test_candidate_from_id_and_string():
     # --- act --------------------------
-    tf_from_id = FormulaRegistry.candidate_from_id(FunctionId(101, (ParamValue.decimal(0.2),))).calibrated(-5.0, 5.0)
-    tf_from_str = FormulaRegistry.candidate_from_id("f101-0.2").calibrated(-5.0, 5.0)
+    tf_from_id = FormulaRegistry.candidate_from_id(FunctionId((2, 1, 1), (ParamValue.decimal(0.2),))).calibrated(
+        -5.0, 5.0
+    )
+    tf_from_str = FormulaRegistry.candidate_from_id("f2.1.1-0.2").calibrated(-5.0, 5.0)
 
     # --- assert -----------------------
     for tf in (tf_from_id, tf_from_str):
-        assert tf.id == FunctionId(101, (ParamValue.decimal(0.2),))
+        assert tf.id == FunctionId((2, 1, 1), (ParamValue.decimal(0.2),))
         assert (tf.a, tf.b, tf.c_min, tf.c_max) == (-2.0, 2.0, -5.0, 5.0)
         assert tf.xc_fun(2.0, 0.0) == pytest.approx(8.0 - 0.4)
 
 
 def test_build_x_fun():
     # --- arrange ----------------------
-    tf = FormulaRegistry.candidate_from_id("f101-0.0").calibrated(-5.0, 5.0)
+    tf = FormulaRegistry.candidate_from_id("f2.1.1-0.0").calibrated(-5.0, 5.0)
 
     # --- act --------------------------
     f = tf.build_x_fun(c=1.0)
@@ -425,17 +404,17 @@ def test_build_x_fun():
 
 def test_candidate_from_id_unknown_formula():
     with pytest.raises(UnknownFormulaError):
-        FormulaRegistry.candidate_from_id("f900-0.2")
+        FormulaRegistry.candidate_from_id("f9.9-0.2")
 
 
 def test_candidate_from_id_invalid_params():
     with pytest.raises(InvalidParamsError):
-        FormulaRegistry.candidate_from_id(FunctionId(102, (ParamValue.decimal(2.0),)))  # even power: invalid
+        FormulaRegistry.candidate_from_id(FunctionId((2, 1, 2), (ParamValue.decimal(2.0),)))  # even power: invalid
 
 
 def test_catalog_brackets_change_sign_within_c_range():
     # --- arrange ----------------------
-    tf = FormulaRegistry.candidate_from_id("f102-5.0").calibrated(-1.0, 1.0)
+    tf = FormulaRegistry.candidate_from_id("f2.1.2-5.0").calibrated(-1.0, 1.0)
 
     # --- act / assert -----------------
     for c in (-1.0, 0.0, 1.0):
