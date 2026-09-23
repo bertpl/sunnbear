@@ -1,10 +1,13 @@
 """`FormulaCategory` is the base class of a formula category.
 
 A category is an inner node of the formula taxonomy (see `taxonomy`). It holds either
-subcategories or formulas, never both, and may be empty.
+subcategories or formulas, never both, and may be empty. The top-level categories are fixed: only
+sunnbear defines them, and a user's categories and formulas go under the user-defined top level.
 """
 
 from typing import ClassVar
+
+from sunnbear._core.class_origin import is_defined_in_sunnbear
 
 from .registry import FormulaRegistry
 from .taxonomy import TaxonomyNode
@@ -38,11 +41,17 @@ class FormulaCategory(TaxonomyNode):
 
         Raises:
             TypeError: If `number` or `name` is missing, or `number` is not a tuple of integers.
-            ValueError: If `number` is empty or has an element below 1, `is_builtin_only` is declared
-                below the top level, or registration fails (see `FormulaRegistry.register_category`).
+            ValueError: If `number` is empty or has an element below 1, the category is a top level
+                defined outside sunnbear, `is_builtin_only` is declared below the top level, or
+                registration fails (see `FormulaRegistry.register_category`).
         """
         super().__init_subclass__(**kwargs)
         cls._validate_number_and_name(min_number_length=1)
+        if len(cls.number) == 1 and not is_defined_in_sunnbear(cls):
+            raise ValueError(
+                f"{cls.__name__} is defined in {cls.__module__} as top-level category {cls.number[0]}; only "
+                "sunnbear defines top-level categories, so put user categories and formulas under 99."
+            )
         if "is_builtin_only" in cls.__dict__ and len(cls.number) > 1:
             raise ValueError(
                 f"{cls.__name__} declares is_builtin_only below the top level; only a top-level category "

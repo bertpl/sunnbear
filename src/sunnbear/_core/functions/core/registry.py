@@ -3,10 +3,14 @@
 Defining a concrete `Formula` or a `FormulaCategory` subclass registers one instance of it here,
 as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
 
-- **At class definition**, every check that concerns the formula or category alone: a valid
-  number and name, no other registered node with the same number, and, for a category,
-  `is_builtin_only` declared only at the top level. A malformed formula or category fails when
-  its module is imported.
+- **At class definition**, the checks that concern the formula or category alone, so a malformed
+  one fails when its module is imported:
+
+  - a valid number and name
+  - no other registered node with the same number
+  - for a category: a top level only when defined inside sunnbear, and `is_builtin_only`
+    declared only at the top level
+
 - **The first time the registry is queried**, and again on the first query after any later
   registration, the checks across nodes:
 

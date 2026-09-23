@@ -64,6 +64,14 @@ def test_duplicate_number_across_formulas_and_categories_is_rejected(define_firs
 
 
 @pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.parametrize("number", [(4,), (98,), (100,)])
+def test_top_level_category_outside_sunnbear_is_rejected(number):
+    """Only sunnbear defines top-level categories; a user's go under 99."""
+    with pytest.raises(ValueError, match="only sunnbear defines top-level categories"):
+        define_category_cls(number)
+
+
+@pytest.mark.usefixtures("isolated_registry")
 def test_builtin_only_flag_below_the_top_level_is_rejected():
     """A category below the top level that declares ``is_builtin_only`` is rejected at class definition."""
     with pytest.raises(ValueError, match="only a top-level category declares it"):

@@ -12,4 +12,9 @@ The catalog tests check this layout convention:
 Importing this package registers every shipped formula and category.
 """
 
-from . import c01_existing_benchmark_suites, c02_documented_functions, c03_custom_functions, c99_user_defined_functions
+from . import (
+    c01_existing_benchmark_suites,
+    c02_documented_functions,
+    c03_purpose_built_functions,
+    c99_user_defined_functions,
+)
