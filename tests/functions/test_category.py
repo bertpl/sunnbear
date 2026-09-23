@@ -126,7 +126,7 @@ def test_candidate_from_id_checks_the_taxonomy_first():
 
     # --- act / assert -----------------
     with pytest.raises(FormulaTaxonomyError):
-        FormulaRegistry.candidate_from_id("f2.1.1-0.2")
+        FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]")
 
 
 @pytest.mark.usefixtures("isolated_registry")

@@ -32,7 +32,7 @@ def test_candidates_materializes_recipe_grid():
     cubic_candidates = list(Cubic().build_all_candidates())
 
     # --- assert -----------------------
-    assert [c.id.param_values for c in cubic_candidates] == [(0.0,), (0.2,), (0.4,), (0.6,), (0.8,), (1.0,)]
+    assert [c.id.param_float_values for c in cubic_candidates] == [(0.0,), (0.2,), (0.4,), (0.6,), (0.8,), (1.0,)]
     assert all(c.id.formula_number == Cubic.number for c in cubic_candidates)
     assert all((c.a, c.b) == (-2.0, 2.0) for c in cubic_candidates)
 
@@ -42,7 +42,7 @@ def test_candidates_applies_validity_filter():
     odd_candidates = list(OddPower().build_all_candidates())
 
     # --- assert -----------------------
-    assert [c.id.param_values for c in odd_candidates] == [(1.0,), (3.0,), (5.0,), (7.0,)]
+    assert [c.id.param_float_values for c in odd_candidates] == [(1.0,), (3.0,), (5.0,), (7.0,)]
 
 
 @pytest.mark.parametrize("formula_cls", [Cubic, OddPower])
@@ -75,7 +75,7 @@ def test_candidates_deduplicates_across_recipes():
             return (ParamRecipe.decimal("p1", 0.0, 1.0, 0.5), ParamRecipe.decimal("p1", 0.5, 1.5, 0.5))
 
     # --- act --------------------------
-    params = [c.id.param_values for c in DupTest().build_all_candidates()]
+    params = [c.id.param_float_values for c in DupTest().build_all_candidates()]
 
     # --- assert -----------------------
     assert params == [(0.0,), (0.5,), (1.0,), (1.5,)]
@@ -108,7 +108,7 @@ def test_zero_param_formula_yields_exactly_one_candidate():
 
     # --- assert -----------------------
     assert len(candidates) == 1
-    assert candidates[0].id.params == ()
+    assert candidates[0].id.param_values == ()
     assert str(candidates[0].id) == "f99.992"
 
 
@@ -116,8 +116,8 @@ def test_registry_holds_one_instance_per_formula():
     """Enumeration and reconstruction hand out the same registered instance."""
     # --- act --------------------------
     [enumerated] = [f for f in FormulaRegistry.formulas() if type(f) is Cubic]
-    candidate_a = FormulaRegistry.candidate_from_id("f2.1.1-0.2")
-    candidate_b = FormulaRegistry.candidate_from_id("f2.1.1-0.4")
+    candidate_a = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]")
+    candidate_b = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.4]")
 
     # --- assert -----------------------
     assert candidate_a.formula is candidate_b.formula is enumerated
@@ -170,7 +170,7 @@ def test_candidates_deduplicates_across_notations():
     ids = [c.id for c in CrossNotation().build_all_candidates()]
 
     # --- assert -----------------------
-    assert [str(fid) for fid in ids] == ["f99.995-4.0"]  # first-seen notation wins
+    assert [str(fid) for fid in ids] == ["f99.995[p1=4.0]"]  # first-seen notation wins
 
 
 # ==================================================================================================
@@ -299,7 +299,7 @@ def test_unoverridden_validity_hook_is_not_checked():
     cls = _formula_cls(982, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),))
 
     # --- act / assert -----------------
-    assert [c.id.param_values for c in cls().build_all_candidates()] == [(0.0,), (1.0,)]
+    assert [c.id.param_float_values for c in cls().build_all_candidates()] == [(0.0,), (1.0,)]
 
 
 @pytest.mark.usefixtures("isolated_registry")
@@ -368,22 +368,24 @@ def test_compiled_formula_rejects_plain_method():
 #  candidate_from_id / calibrated
 # ==================================================================================================
 def test_candidate_from_id_and_string():
+    """A `FunctionId` and its rendered string rebuild the same calibrated test function."""
     # --- act --------------------------
-    tf_from_id = FormulaRegistry.candidate_from_id(FunctionId((2, 1, 1), (ParamValue.decimal(0.2),))).calibrated(
-        -5.0, 5.0
-    )
-    tf_from_str = FormulaRegistry.candidate_from_id("f2.1.1-0.2").calibrated(-5.0, 5.0)
+    tf_from_id = FormulaRegistry.candidate_from_id(
+        FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.2),))
+    ).calibrated(-5.0, 5.0)
+    tf_from_str = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-5.0, 5.0)
 
     # --- assert -----------------------
     for tf in (tf_from_id, tf_from_str):
-        assert tf.id == FunctionId((2, 1, 1), (ParamValue.decimal(0.2),))
+        assert tf.id == FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.2),))
         assert (tf.a, tf.b, tf.c_min, tf.c_max) == (-2.0, 2.0, -5.0, 5.0)
         assert tf.xc_fun(2.0, 0.0) == pytest.approx(8.0 - 0.4)
 
 
 def test_build_x_fun():
+    """`build_x_fun` fixes `c` and returns the test function as a function of `x` alone."""
     # --- arrange ----------------------
-    tf = FormulaRegistry.candidate_from_id("f2.1.1-0.0").calibrated(-5.0, 5.0)
+    tf = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.0]").calibrated(-5.0, 5.0)
 
     # --- act --------------------------
     f = tf.build_x_fun(c=1.0)
@@ -393,18 +395,36 @@ def test_build_x_fun():
 
 
 def test_candidate_from_id_unknown_formula():
+    """An id whose formula number is not registered raises `UnknownFormulaError`."""
     with pytest.raises(UnknownFormulaError):
-        FormulaRegistry.candidate_from_id("f9.9-0.2")
+        FormulaRegistry.candidate_from_id("f9.9[p1=0.2]")
 
 
 def test_candidate_from_id_invalid_params():
+    """An id whose parameter values fail the formula's validity criteria raises `InvalidParamsError`."""
     with pytest.raises(InvalidParamsError):
-        FormulaRegistry.candidate_from_id(FunctionId((2, 1, 2), (ParamValue.decimal(2.0),)))  # even power: invalid
+        FormulaRegistry.candidate_from_id(
+            FunctionId((2, 1, 2), ("p1",), (ParamValue.decimal(2.0),))  # even power: invalid
+        )
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "f2.1.1[slope=0.2]",  # wrong name
+        "f2.1.1",  # parameter missing
+        "f2.1.1[p1=0.2,p2=0.4]",  # extra parameter
+    ],
+)
+def test_candidate_from_id_rejects_param_names_that_differ_from_the_formula(text):
+    """An id whose parameter names differ from the formula's `param_names` is rejected."""
+    with pytest.raises(InvalidParamsError, match="do not match"):
+        FormulaRegistry.candidate_from_id(text)
 
 
 def test_catalog_brackets_change_sign_within_c_range():
     # --- arrange ----------------------
-    tf = FormulaRegistry.candidate_from_id("f2.1.2-5.0").calibrated(-1.0, 1.0)
+    tf = FormulaRegistry.candidate_from_id("f2.1.2[p1=5.0]").calibrated(-1.0, 1.0)
 
     # --- act / assert -----------------
     for c in (-1.0, 0.0, 1.0):

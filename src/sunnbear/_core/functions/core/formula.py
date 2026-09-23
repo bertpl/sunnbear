@@ -156,7 +156,7 @@ class Formula(FormulaTaxonomyNode, ABC):
             cls._compiled_formula_cache = numba.njit(fn) if cls.jit else fn
         return cls._compiled_formula_cache
 
-    def build_candidate(self, params: "tuple[ParamValue, ...]") -> CandidateTestFunction:
+    def build_candidate(self, param_values: "tuple[ParamValue, ...]") -> CandidateTestFunction:
         """Build one candidate test function for a bound parameter tuple.
 
         The candidate carries this formula and its identity rather than a
@@ -167,8 +167,8 @@ class Formula(FormulaTaxonomyNode, ABC):
         never touch numba, and their non-static hooks receive plain floats
         (`ParamValue` unwrapping is handled here).
         """
-        fid = FunctionId(self.number, tuple(params))
-        a, b = self.interval_bounds(*fid.param_values)
+        fid = FunctionId(self.number, self.param_names, tuple(param_values))
+        a, b = self.interval_bounds(*fid.param_float_values)
         return CandidateTestFunction(id=fid, formula=self, a=a, b=b)
 
     def bind_xc_fun(self, values: "tuple[float, ...]") -> XCFun:
@@ -232,8 +232,12 @@ class Formula(FormulaTaxonomyNode, ABC):
         self._validate_param_name_consistency()
 
         param_tuples = (p for recipe in recipes for p in recipe.tuples()) if recipes else iter([()])
-        valid_tuples = (params for params in param_tuples if self.is_param_tuple_valid(*(p.value for p in params)))
-        candidates = [self.build_candidate(params) for params in deduplicate_param_tuples(valid_tuples, digits)]
+        valid_tuples = (
+            param_values for param_values in param_tuples if self.is_param_tuple_valid(*(p.value for p in param_values))
+        )
+        candidates = [
+            self.build_candidate(param_values) for param_values in deduplicate_param_tuples(valid_tuples, digits)
+        ]
 
         if not candidates:
             raise ValueError(

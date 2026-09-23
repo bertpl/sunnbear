@@ -120,7 +120,8 @@ class FormulaRegistry:
         Raises:
             FormulaTaxonomyError: If the registered nodes do not form a valid taxonomy tree.
             UnknownFormulaError: If the formula number is not in the registry.
-            InvalidParamsError: If the parameter tuple fails the formula's validity criteria.
+            InvalidParamsError: If the parameter names differ from the formula's `param_names`, or the
+                parameter tuple fails the formula's validity criteria.
         """
         cls._ensure_taxonomy_validated()
         fid = FunctionId.from_string(function_id) if isinstance(function_id, str) else function_id
@@ -130,9 +131,14 @@ class FormulaRegistry:
                 f"No registered formula with number {FormulaTaxonomyNode.format_number(fid.formula_number)} "
                 f"(id: {fid})."
             )
-        if not formula.is_param_tuple_valid(*fid.param_values):
-            raise InvalidParamsError(f"Parameter tuple {fid.params} is invalid for formula {formula.name} (id: {fid}).")
-        return formula.build_candidate(fid.params)
+        if fid.param_names != formula.param_names:
+            raise InvalidParamsError(
+                f"Parameter names {list(fid.param_names)} do not match the parameters {list(formula.param_names)} "
+                f"of formula {formula.name} (id: {fid})."
+            )
+        if not formula.is_param_tuple_valid(*fid.param_float_values):
+            raise InvalidParamsError(f"Parameter values are invalid for formula {formula.name} (id: {fid}).")
+        return formula.build_candidate(fid.param_values)
 
     # --------------------------------------------------------------------------
     #  Taxonomy checks
