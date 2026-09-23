@@ -32,7 +32,7 @@ def test_candidates_materializes_recipe_grid():
     cubic_candidates = list(Cubic().build_all_candidates())
 
     # --- assert -----------------------
-    assert [c.id.param_values for c in cubic_candidates] == [(0.0,), (0.2,), (0.4,), (0.6,), (0.8,), (1.0,)]
+    assert [c.id.param_float_values for c in cubic_candidates] == [(0.0,), (0.2,), (0.4,), (0.6,), (0.8,), (1.0,)]
     assert all(c.id.formula_number == Cubic.number for c in cubic_candidates)
     assert all((c.a, c.b) == (-2.0, 2.0) for c in cubic_candidates)
 
@@ -42,7 +42,7 @@ def test_candidates_applies_validity_filter():
     odd_candidates = list(OddPower().build_all_candidates())
 
     # --- assert -----------------------
-    assert [c.id.param_values for c in odd_candidates] == [(1.0,), (3.0,), (5.0,), (7.0,)]
+    assert [c.id.param_float_values for c in odd_candidates] == [(1.0,), (3.0,), (5.0,), (7.0,)]
 
 
 @pytest.mark.parametrize("formula_cls", [Cubic, OddPower])
@@ -75,7 +75,7 @@ def test_candidates_deduplicates_across_recipes():
             return (ParamRecipe.decimal("p1", 0.0, 1.0, 0.5), ParamRecipe.decimal("p1", 0.5, 1.5, 0.5))
 
     # --- act --------------------------
-    params = [c.id.param_values for c in DupTest().build_all_candidates()]
+    params = [c.id.param_float_values for c in DupTest().build_all_candidates()]
 
     # --- assert -----------------------
     assert params == [(0.0,), (0.5,), (1.0,), (1.5,)]
@@ -108,7 +108,7 @@ def test_zero_param_formula_yields_exactly_one_candidate():
 
     # --- assert -----------------------
     assert len(candidates) == 1
-    assert candidates[0].id.params == ()
+    assert candidates[0].id.param_values == ()
     assert str(candidates[0].id) == "f99.992"
 
 
@@ -299,7 +299,7 @@ def test_unoverridden_validity_hook_is_not_checked():
     cls = _formula_cls(982, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),))
 
     # --- act / assert -----------------
-    assert [c.id.param_values for c in cls().build_all_candidates()] == [(0.0,), (1.0,)]
+    assert [c.id.param_float_values for c in cls().build_all_candidates()] == [(0.0,), (1.0,)]
 
 
 @pytest.mark.usefixtures("isolated_registry")

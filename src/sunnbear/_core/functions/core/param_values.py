@@ -259,10 +259,10 @@ def deduplicate_param_tuples(
     """
     seen: set[tuple[float, ...]] = set()
     kept: list[tuple[ParamValue, ...]] = []
-    for params in tuples:
-        key = tuple(_round_significant(p.value, digits) for p in params)
+    for param_values in tuples:
+        key = tuple(_round_significant(p.value, digits) for p in param_values)
         if key in seen:
             continue
         seen.add(key)
-        kept.append(params)
+        kept.append(param_values)
     return tuple(kept)
