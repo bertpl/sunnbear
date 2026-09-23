@@ -1,4 +1,4 @@
-"""This package decides whether a class is built in, i.e. defined inside the sunnbear package."""
+"""This module decides whether a class is built in, i.e. defined inside the sunnbear package."""
 
 
 def is_defined_in_sunnbear(cls: type) -> bool:

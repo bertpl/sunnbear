@@ -7,7 +7,7 @@ sunnbear defines them, and a user's categories and formulas go under the user-de
 
 from typing import ClassVar
 
-from sunnbear._core.class_origin import is_defined_in_sunnbear
+from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
 from .registry import FormulaRegistry
 from .taxonomy import TaxonomyNode

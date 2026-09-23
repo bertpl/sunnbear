@@ -29,7 +29,7 @@ test-function package imports the formula catalog.
 
 from typing import TYPE_CHECKING, ClassVar
 
-from sunnbear._core.class_origin import is_defined_in_sunnbear
+from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
 from .exceptions import FormulaTaxonomyError, InvalidParamsError, UnknownFormulaError
 from .identity import FunctionId

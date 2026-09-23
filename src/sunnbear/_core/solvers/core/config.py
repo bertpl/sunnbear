@@ -11,7 +11,7 @@ import inspect
 from collections.abc import Mapping
 from typing import ClassVar
 
-from sunnbear._core.class_origin import is_defined_in_sunnbear
+from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
 from .registry import SolverConfigRegistry
 from .role import SolverRole
