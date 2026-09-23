@@ -167,7 +167,7 @@ class Formula(FormulaTaxonomyNode, ABC):
         never touch numba, and their non-static hooks receive plain floats
         (`ParamValue` unwrapping is handled here).
         """
-        fid = FunctionId(self.number, tuple(params))
+        fid = FunctionId(self.number, self.param_names, tuple(params))
         a, b = self.interval_bounds(*fid.param_values)
         return CandidateTestFunction(id=fid, formula=self, a=a, b=b)
 

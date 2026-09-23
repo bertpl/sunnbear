@@ -2,60 +2,81 @@ import pytest
 
 from sunnbear.functions import FunctionId, ParamValue
 
+# These rendered identities exercise the parser on names, signs, and exponent notation.
+_RENDERED_IDS = [
+    "f2.1.5[p1=2^1.2,p2=0.4]",
+    "f7.1",
+    "f2.1.1[p1=0.2]",
+    "f2.1.2[p1=5.0]",
+    "f2.1.1[p1=-0.4]",  # leading minus in a value
+    "f2.1.5[p1=-0.4,p2=-1e-12]",  # negative + scientific notation across the argument separator
+    "f2.1.1[p1=1e+16]",  # plus sign inside a value
+    "f2.1.1[slope_2=0.5]",  # a name with an underscore and a digit
+]
+
 
 # ==================================================================================================
 #  FunctionId
 # ==================================================================================================
-def test_function_id_display_carries_notation():
+def test_function_id_display_names_each_parameter():
+    """Each value renders with its name and authored notation, in the formula's declared order."""
     # --- arrange ----------------------
-    fid = FunctionId(formula_number=(2, 1, 5), params=(ParamValue.exponential(2, 1.2), ParamValue.decimal(0.4)))
+    fid = FunctionId(
+        formula_number=(2, 1, 5),
+        param_names=("p1", "p2"),
+        params=(ParamValue.exponential(2, 1.2), ParamValue.decimal(0.4)),
+    )
 
     # --- act / assert -----------------
-    assert fid.display() == "f2.1.5-2^1.2_0.4"
+    assert fid.display() == "f2.1.5[p1=2^1.2,p2=0.4]"
 
 
 def test_function_id_rendering_is_faithful():
     """One rendering, carrying the authored notation, so a published identity reproduces exactly."""
     # --- arrange ----------------------
-    as_decimal = FunctionId((2, 1, 1), (ParamValue.decimal(4.0),))
-    as_pow2 = FunctionId((2, 1, 1), (ParamValue.exponential(2, 2.0),))
+    as_decimal = FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(4.0),))
+    as_pow2 = FunctionId((2, 1, 1), ("p1",), (ParamValue.exponential(2, 2.0),))
 
     # --- act / assert -----------------
-    assert str(as_decimal) == "f2.1.1-4.0"
-    assert str(as_pow2) == "f2.1.1-2^2.0"  # not flattened to the decimal spelling
+    assert str(as_decimal) == "f2.1.1[p1=4.0]"
+    assert str(as_pow2) == "f2.1.1[p1=2^2.0]"  # not flattened to the decimal spelling
     assert repr(as_pow2) == str(as_pow2) == as_pow2.display()
 
 
 def test_function_id_no_params():
-    assert str(FunctionId(formula_number=(7, 1), params=())) == "f7.1"
+    """A formula without parameters renders as its number alone, without brackets."""
+    assert str(FunctionId(formula_number=(7, 1), param_names=(), params=())) == "f7.1"
+
+
+def test_function_id_needs_one_name_per_value():
+    with pytest.raises(ValueError, match="1 parameter name"):
+        FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.2), ParamValue.decimal(0.4)))
 
 
 def test_function_id_equality_is_exact():
     """Equality stays a real equivalence over exact values; collapsing near-matches happens earlier."""
     # --- arrange ----------------------
-    as_decimal = FunctionId((2, 1, 1), (ParamValue.decimal(4.0),))
-    as_pow2 = FunctionId((2, 1, 1), (ParamValue.exponential(2, 2.0),))
+    as_decimal = FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(4.0),))
+    as_pow2 = FunctionId((2, 1, 1), ("p1",), (ParamValue.exponential(2, 2.0),))
 
     # --- act / assert -----------------
     assert as_decimal != as_pow2  # same number, different notation: two identities
     assert len({as_decimal, as_pow2}) == 2
-    assert as_decimal == FunctionId((2, 1, 1), (ParamValue.decimal(4.0),))  # and reflexive on equal spellings
+    assert as_decimal == FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(4.0),))  # and reflexive on equal spellings
+
+
+def test_function_id_equality_includes_param_names():
+    """Renaming a parameter changes the identity, even when the values are equal."""
+    # --- arrange ----------------------
+    named_p1 = FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(4.0),))
+    named_slope = FunctionId((2, 1, 1), ("slope",), (ParamValue.decimal(4.0),))
+
+    # --- act / assert -----------------
+    assert named_p1 != named_slope
 
 
 def test_function_id_equality_with_unrelated_type():
-    assert FunctionId((2, 1, 1), (ParamValue.decimal(1.0),)) != "f2.1.1-1.0"
-
-
-# These rendered identities exercise the parser on separators, signs, and exponent notation.
-_RENDERED_IDS = [
-    "f2.1.5-2^1.2_0.4",
-    "f7.1",
-    "f2.1.1-0.2",
-    "f2.1.2-5.0",
-    "f2.1.1--0.4",  # leading minus in a token vs the formula/params separator
-    "f2.1.5--0.4_-1e-12",  # negative + scientific notation across the param separator
-    "f2.1.1-1e+16",  # plus sign inside a token
-]
+    assert FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(1.0),)) != "f2.1.1[p1=1.0]"
 
 
 @pytest.mark.parametrize("text", _RENDERED_IDS)
@@ -69,22 +90,49 @@ def test_function_id_canonical_form_reparses_to_the_same_identity(text):
     assert FunctionId.from_string(str(original)) == original
 
 
+def test_function_id_from_string_reads_the_names():
+    """The rendered form carries the names, so parsing needs no registry."""
+    # --- act --------------------------
+    fid = FunctionId.from_string("f2.1.5[p1=2^1.2,p2=0.4]")
+
+    # --- assert -----------------------
+    assert fid.param_names == ("p1", "p2")
+    assert fid.param_values == pytest.approx((2**1.2, 0.4))
+
+
 def test_function_id_ordering():
     # --- arrange ----------------------
     ids = [
-        FunctionId((2, 1, 2), (ParamValue.decimal(1.0),)),
-        FunctionId((2, 1, 1), (ParamValue.decimal(0.4),)),
-        FunctionId((2, 1, 1), (ParamValue.decimal(0.2),)),
+        FunctionId((2, 1, 2), ("p1",), (ParamValue.decimal(1.0),)),
+        FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.4),)),
+        FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.2),)),
     ]
 
     # --- act --------------------------
     ordered = sorted(ids)
 
     # --- assert -----------------------
-    assert [str(fid) for fid in ordered] == ["f2.1.1-0.2", "f2.1.1-0.4", "f2.1.2-1.0"]
+    assert [str(fid) for fid in ordered] == ["f2.1.1[p1=0.2]", "f2.1.1[p1=0.4]", "f2.1.2[p1=1.0]"]
 
 
-@pytest.mark.parametrize("text", ["x2.1.1-0.2", "f-abc", "f2.1.1-zz", "", "f2.1.1-"])
+@pytest.mark.parametrize(
+    "text",
+    [
+        "x2.1.1[p1=0.2]",  # wrong leading letter
+        "f[p1=0.2]",  # no number
+        "f2.1.1[]",  # empty brackets
+        "f2.1.1[p1=zz]",  # value that does not parse
+        "f2.1.1[p1=]",  # missing value
+        "f2.1.1[=0.2]",  # missing name
+        "f2.1.1[p1]",  # no equals sign
+        "f2.1.1[1p=0.2]",  # name that is not an identifier
+        "f2.1.1[p1=0.2,p1=0.4]",  # repeated name
+        "f2.1.1[p1=0.2",  # unclosed bracket
+        "f2.1.1[p1=0.2]x",  # trailing text
+        "f2.1.1-0.2",  # the positional form that named parameters replaced
+        "",
+    ],
+)
 def test_function_id_from_string_rejects_invalid(text):
     with pytest.raises(ValueError):
         FunctionId.from_string(text)
