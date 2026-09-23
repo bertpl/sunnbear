@@ -1,6 +1,6 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/bertpl/sunnbear/push_to_main.yml?branch=main&label=CI)](https://github.com/bertpl/sunnbear/actions/workflows/push_to_main.yml)
 [![Coverage](https://img.shields.io/badge/coverage-100.00%25-brightgreen)](https://github.com/bertpl/sunnbear/actions/workflows/push_to_main.yml)
-[![Tests](https://img.shields.io/badge/tests-1-blue)](https://github.com/bertpl/sunnbear/actions/workflows/push_to_main.yml)
+[![Tests](https://img.shields.io/badge/tests-361-blue)](https://github.com/bertpl/sunnbear/actions/workflows/push_to_main.yml)
 [![PyPI](https://img.shields.io/pypi/v/sunnbear.svg)](https://pypi.org/project/sunnbear/)
 [![Python](https://img.shields.io/pypi/pyversions/sunnbear.svg)](https://pypi.org/project/sunnbear/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/bertpl/sunnbear/blob/main/LICENSE)
