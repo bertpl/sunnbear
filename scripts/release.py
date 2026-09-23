@@ -32,10 +32,15 @@ README = REPO_ROOT / "README.md"
 PYTHON_VERSIONS_FILE = REPO_ROOT / ".python-versions"
 SPLASH_SCRIPT = REPO_ROOT / ".github" / "scripts" / "create_splash.sh"
 SPLASH_WEBP = REPO_ROOT / "images" / "splash_with_version.webp"
+SPLASH_BASE_PNG = REPO_ROOT / "images" / "_splash_without_version.png"
+SPLASH_FONT = REPO_ROOT / "images" / "splash" / "google_fonts_montserrat_bold.ttf"
 
 PACKAGE_NAME = "sunnbear"
 CATEGORIES = ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"]
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
+UNRELEASED_SECTION_RE = re.compile(r"^## Unreleased\s*$(.*?)(?=^## |\Z)", re.MULTILINE | re.DOTALL)
+COVERAGE_BADGE_RE = re.compile(r"badge/coverage-[\d.]+%25-[a-z]+")
+TESTS_BADGE_RE = re.compile(r"badge/tests-\d+-blue")
 
 
 # ==================================================================================================
@@ -82,6 +87,14 @@ def read_pyproject_version() -> str:
     if not m:
         fail_with_message("Could not find version in pyproject.toml")
     return m.group(1)
+
+
+def _find_unreleased_section(text: str) -> re.Match[str]:
+    """Return the match of the changelog's '## Unreleased' section, whose group 1 is the section body."""
+    m = UNRELEASED_SECTION_RE.search(text)
+    if not m:
+        fail_with_message("no '## Unreleased' section in CHANGELOG.md")
+    return m
 
 
 def read_python_versions() -> list[str]:
@@ -174,19 +187,28 @@ def step_6_check_classifiers_match() -> None:
 def step_7_check_changelog_has_entries() -> None:
     """Validate Unreleased section has at least one bullet entry."""
     print_step(7, "CHANGELOG.md '## Unreleased' has at least one entry")
-    text = CHANGELOG.read_text()
-    m = re.search(r"^## Unreleased\s*$(.*?)(?=^## |\Z)", text, re.MULTILINE | re.DOTALL)
-    if not m:
-        fail_with_message("no '## Unreleased' section in CHANGELOG.md")
+    m = _find_unreleased_section(CHANGELOG.read_text())
     if not re.search(r"^- ", m.group(1), re.MULTILINE):
         fail_with_message("'## Unreleased' has no bullet entries")
 
 
-def step_8_check_imagemagick() -> None:
-    """Validate that ImageMagick is installed, since the release commit stamps the splash with it."""
-    print_step(8, "ImageMagick ('magick') is available to stamp the splash")
+def step_8_check_stamping_inputs() -> None:
+    """Validate everything the release commit needs to stamp the README badges and the splash.
+
+    A badge that the README no longer carries would otherwise be skipped silently, leaving a stale
+    badge in the release.
+    """
+    print_step(8, "README badges and splash inputs are in place for stamping")
+    readme = README.read_text()
+    for name, badge_re in (("coverage", COVERAGE_BADGE_RE), ("test-count", TESTS_BADGE_RE)):
+        n_badges = len(badge_re.findall(readme))
+        if n_badges != 1:
+            fail_with_message(f"README.md must carry exactly 1 {name} badge to stamp (found {n_badges})")
     if shutil.which("magick") is None:
         fail_with_message("ImageMagick ('magick') is required to stamp the release splash but was not found")
+    for path in (SPLASH_SCRIPT, SPLASH_BASE_PNG, SPLASH_FONT):
+        if not path.is_file():
+            fail_with_message(f"the splash cannot be stamped: {path.relative_to(REPO_ROOT)} is missing")
 
 
 # warn if the number of distinct tests across all CI matrix combos exceeds this multiple of the
@@ -325,9 +347,7 @@ def step_12_finalize_changelog(version: str) -> None:
     """Move Unreleased entries to a dated version section."""
     print_step(12, f"finalize CHANGELOG.md '## Unreleased' -> '## {version} ({date.today().isoformat()})'")
     text = CHANGELOG.read_text()
-    m = re.search(r"^## Unreleased\s*$(.*?)(?=^## |\Z)", text, re.MULTILINE | re.DOTALL)
-    if not m:
-        fail_with_message("no '## Unreleased' section to finalize")
+    m = _find_unreleased_section(text)
     body = m.group(1)
     new_body_lines: list[str] = []
     lines = body.splitlines(keepends=True)
@@ -375,12 +395,11 @@ def _coverage_color(pct: float) -> str:
 def refresh_readme_badges(badge_metrics: BadgeMetrics) -> None:
     """Stamp the README coverage + test-count badges."""
     text = README.read_text()
-    text = re.sub(
-        r"badge/coverage-[\d.]+%25-[a-z]+",
+    text = COVERAGE_BADGE_RE.sub(
         f"badge/coverage-{badge_metrics.coverage_pct:.2f}%25-{_coverage_color(badge_metrics.coverage_pct)}",
         text,
     )
-    text = re.sub(r"badge/tests-\d+-blue", f"badge/tests-{badge_metrics.distinct_test_count}-blue", text)
+    text = TESTS_BADGE_RE.sub(f"badge/tests-{badge_metrics.distinct_test_count}-blue", text)
     README.write_text(text)
 
 
@@ -389,7 +408,7 @@ def stamp_splash(version: str) -> None:
 
     Run the second stage of ``create_splash.sh`` (the version overlay) on the
     committed, version-independent base image. It requires ImageMagick's ``magick`` on PATH,
-    which `step_8_check_imagemagick` verifies before the first write.
+    which `step_8_check_stamping_inputs` verifies before the first write.
     """
     # no leading "v": the script prepends it in the annotation
     run_command(["sh", str(SPLASH_SCRIPT), version], cwd=REPO_ROOT)
@@ -417,11 +436,10 @@ def step_15_add_unreleased_section() -> None:
     """Add a fresh Unreleased section to the changelog."""
     print_step(15, "add fresh '## Unreleased' section to CHANGELOG.md")
     text = CHANGELOG.read_text()
-    m = re.search(r"^## ", text, re.MULTILINE)
-    if not m:
-        fail_with_message("CHANGELOG.md has no version sections")
+    # step 12 has just written a '## <version>' heading, so a first '## ' heading always exists
+    first_heading = text.index("\n## ") + 1
     insertion = "## Unreleased\n\n" + "\n".join(f"### {c}\n" for c in CATEGORIES) + "\n"
-    text = text[: m.start()] + insertion + text[m.start() :]
+    text = text[:first_heading] + insertion + text[first_heading:]
     CHANGELOG.write_text(text)
 
 
@@ -484,7 +502,7 @@ def main() -> None:
     step_5_check_pypi_doesnt_have(version)
     step_6_check_classifiers_match()
     step_7_check_changelog_has_entries()
-    step_8_check_imagemagick()
+    step_8_check_stamping_inputs()
     badge_metrics = step_9_gather_badge_metrics()
 
     if args.is_dry_run:
