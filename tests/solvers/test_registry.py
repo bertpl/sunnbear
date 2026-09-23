@@ -2,15 +2,10 @@
 
 import pytest
 
+from sunnbear._core.solvers.bracketing.bisection.configs import BisectionConfig
+from sunnbear._core.solvers.bracketing.regula_falsi.configs import RegulaFalsiConfig
 from sunnbear.exceptions import UnknownSolverConfigError
-from sunnbear.solvers import (
-    Bisection,
-    BisectionConfig,
-    RegulaFalsi,
-    RegulaFalsiConfig,
-    SolverConfigRegistry,
-    SolverRole,
-)
+from sunnbear.solvers import Bisection, RegulaFalsi, SolverConfigRegistry, SolverRole
 
 from .example_solvers import WeightedSplitSolver, define_config
 

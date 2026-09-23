@@ -4,5 +4,5 @@ Each solver is a package of its own, holding its solver module, its built-in con
 modules. Importing this package registers the built-in configs.
 """
 
-from .bisection import Bisection, BisectionConfig
-from .regula_falsi import RegulaFalsi, RegulaFalsiConfig
+from .bisection import Bisection
+from .regula_falsi import RegulaFalsi

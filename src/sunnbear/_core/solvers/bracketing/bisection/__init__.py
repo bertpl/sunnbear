@@ -1,4 +1,4 @@
-"""This package holds `Bisection` and its built-in configs."""
+"""This package holds `Bisection` and its built-in configs; importing it registers the configs."""
 
-from .configs import BisectionConfig
+from . import configs
 from .solver import Bisection
