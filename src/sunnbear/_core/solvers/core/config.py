@@ -35,8 +35,8 @@ class SolverConfig:
     Class attributes:
         solver_cls: The concrete `Solver` subclass to instantiate.
         solver_kwargs: The init arguments passed to ``solver_cls``; each value is a bool, int, float, or str.
-        role: How the benchmark treats this config. A role for which `SolverRole.is_builtin_only`
-            holds is reserved for configs defined inside the sunnbear package.
+        role: How the benchmark treats this config. A role for which `SolverRole.is_builtin_only` is true
+            is reserved for configs defined inside the sunnbear package.
     """
 
     solver_cls: ClassVar[type[Solver]]
