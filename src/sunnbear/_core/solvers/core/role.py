@@ -35,7 +35,7 @@ class SolverRole(Enum):
         return self is not SolverRole.USER_OTHER
 
     @property
-    def is_used_for_characterization(self) -> bool:
+    def is_used_for_function_characterization(self) -> bool:
         """Return whether results of solvers with this role characterize the test functions."""
         return self is SolverRole.BUILTIN_CORE
 
