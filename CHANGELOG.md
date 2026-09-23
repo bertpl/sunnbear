@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- The source distribution contains the package again; the 0.0.3 source distribution installed no code
+- Miscellaneous packaging fixes
 
 ### Security
 
