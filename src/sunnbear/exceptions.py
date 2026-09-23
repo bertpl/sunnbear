@@ -4,7 +4,7 @@ All derive from `SunnbearError`; each is defined in the layer that raises it and
 """
 
 from ._core.exceptions import SunnbearError
-from ._core.functions.core.exceptions import InvalidParamsError, UnknownFormulaError
+from ._core.functions.core.exceptions import FormulaTaxonomyError, InvalidParamsError, UnknownFormulaError
 from ._core.solvers.core.exceptions import (
     DivergedError,
     FunctionDomainError,
@@ -15,6 +15,7 @@ from ._core.solvers.core.exceptions import (
 
 __all__ = [
     "DivergedError",
+    "FormulaTaxonomyError",
     "FunctionDomainError",
     "InvalidParamsError",
     "MaxFevalsExceeded",

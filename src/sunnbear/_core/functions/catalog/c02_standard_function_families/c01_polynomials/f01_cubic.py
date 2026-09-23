@@ -1,13 +1,13 @@
-"""f101 — cubic ``x^3 - p1*x - c``."""
+"""This formula is the cubic ``x^3 - p1*x - c``."""
 
 from sunnbear._core.functions.core import Formula, FormulaTestCase, ParamRecipe
 
 
-class F101_Cubic(Formula):
+class Cubic(Formula):
     """Benign cubic; ``p1`` tilts the central slope, ``c`` shifts the root."""
 
-    number = 101
-    name = "cubic"
+    number = (2, 1, 1)
+    name = "Cubic"
     param_names = ("p1",)
 
     @staticmethod

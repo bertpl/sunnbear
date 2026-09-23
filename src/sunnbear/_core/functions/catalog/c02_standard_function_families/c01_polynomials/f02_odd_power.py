@@ -1,9 +1,9 @@
-"""f102 — odd power ``x^p1 - c``: a difficulty knob."""
+"""This formula is the odd power ``x^p1 - c``."""
 
 from sunnbear._core.functions.core import Formula, FormulaTestCase, ParamRecipe
 
 
-class F102_OddPower(Formula):
+class OddPower(Formula):
     """Difficulty-knob polynomial: higher odd powers flatten the root at ``c = 0``.
 
     Higher powers turn a benign polynomial into a derivative-zero stress case.
@@ -11,8 +11,8 @@ class F102_OddPower(Formula):
     plain-Python path.
     """
 
-    number = 102
-    name = "odd_power"
+    number = (2, 1, 2)
+    name = "Odd power"
     param_names = ("p1",)
     jit = False
 

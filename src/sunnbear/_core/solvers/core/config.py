@@ -11,6 +11,8 @@ import inspect
 from collections.abc import Mapping
 from typing import ClassVar
 
+from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
+
 from .registry import SolverConfigRegistry
 from .role import SolverRole
 from .solver import Solver
@@ -104,16 +106,8 @@ class SolverConfig:
                     f"{cls.__name__}.solver_kwargs[{key!r}] must be a bool, int, float, or str "
                     f"(got {type(value).__name__})."
                 )
-        if cls.role.is_builtin_only and not cls._is_defined_in_sunnbear(cls):
+        if cls.role.is_builtin_only and not is_defined_in_sunnbear(cls):
             raise ValueError(
                 f"{cls.__name__} is defined in {cls.__module__}, but role {cls.role.name} is reserved for "
                 "configs inside the sunnbear package; use SolverRole.USER_ACTIVE or SolverRole.USER_OTHER."
             )
-
-    # --------------------------------------------------------------------------
-    #  Helpers
-    # --------------------------------------------------------------------------
-    @staticmethod
-    def _is_defined_in_sunnbear(config_cls: type) -> bool:
-        """Return whether ``config_cls`` is defined in a module of the sunnbear package."""
-        return config_cls.__module__ == "sunnbear" or config_cls.__module__.startswith("sunnbear.")

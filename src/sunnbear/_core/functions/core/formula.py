@@ -25,6 +25,7 @@ from .identity import FunctionId
 from .param_values import DEDUP_DIGITS, ParamValue, deduplicate_param_tuples
 from .recipes import ParamRecipe
 from .registry import FormulaRegistry
+from .taxonomy import FormulaTaxonomyNode
 from .test_cases import FormulaTestCase
 from .test_function import CandidateTestFunction
 from .types import XCFun, XFun
@@ -33,12 +34,14 @@ from .types import XCFun, XFun
 # ==================================================================================================
 #  Formula
 # ==================================================================================================
-class Formula(ABC):
+class Formula(FormulaTaxonomyNode, ABC):
     """One hand-written formula: the mathematics plus metadata to spawn candidate test functions.
 
     Class attributes:
-        number: Registry-wide formula number (grouping by type, e.g. 1xx polynomials).
-        name: Short human-readable slug.
+        number: The formula's place in the taxonomy, e.g. ``(2, 1, 1)``; its parent category is
+            ``number[:-1]``, and every formula belongs to a category, so the number has at least
+            2 elements.
+        name: Display name, e.g. "Odd power".
         param_names: The formula's declared parameter interface, in tuple-position
             order — the authority every recipe is validated against, and the
             labels reporting uses. Empty for a formula without parameters.
@@ -48,8 +51,6 @@ class Formula(ABC):
             exercised by the generic formula test.
     """
 
-    number: ClassVar[int]
-    name: ClassVar[str]
     param_names: ClassVar[tuple[str, ...]] = ()
     jit: ClassVar[bool] = True
     cases: ClassVar[tuple[FormulaTestCase, ...]] = ()
@@ -58,7 +59,7 @@ class Formula(ABC):
     _compiled_formula_cache: ClassVar["Callable[..., float]"]
 
     def __init_subclass__(cls, **kwargs: object) -> None:
-        """Register every concrete subclass with `FormulaRegistry`, so its checks run at class definition.
+        """Validate every concrete subclass and register it with `FormulaRegistry`, at class definition.
 
         `inspect.isabstract` cannot decide concreteness here, because this hook runs before the ABC
         machinery records the new class's abstract methods.
@@ -68,7 +69,8 @@ class Formula(ABC):
             getattr(getattr(cls, name), "__isabstractmethod__", False) for name in Formula.__abstractmethods__
         )
         if is_concrete:
-            FormulaRegistry.register(cls)
+            cls._validate_number_and_name(min_number_length=2)
+            FormulaRegistry.register_formula(cls)
 
     # --------------------------------------------------------------------------
     #  Hooks implemented per formula
