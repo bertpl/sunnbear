@@ -1,4 +1,4 @@
-"""Category 3 holds custom formulas built to provoke specific solver behavior."""
+"""This category holds custom formulas built to provoke specific solver behavior."""
 
 from sunnbear._core.functions.core import FormulaCategory
 

@@ -39,7 +39,8 @@ class Formula(TaxonomyNode, ABC):
 
     Class attributes:
         number: The formula's place in the taxonomy, e.g. ``(2, 1, 1)``; its parent category is
-            ``number[:-1]``, so the number has at least 2 elements.
+            ``number[:-1]``, and every formula belongs to a category, so the number has at least
+            2 elements.
         name: Display name, e.g. "Odd power".
         param_names: The formula's declared parameter interface, in tuple-position
             order — the authority every recipe is validated against, and the
@@ -68,7 +69,7 @@ class Formula(TaxonomyNode, ABC):
             getattr(getattr(cls, name), "__isabstractmethod__", False) for name in Formula.__abstractmethods__
         )
         if is_concrete:
-            cls._validate_number_and_name(min_length=2)
+            cls._validate_number_and_name(min_number_length=2)
             FormulaRegistry.register_formula(cls)
 
     # --------------------------------------------------------------------------

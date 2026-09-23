@@ -1,4 +1,4 @@
-"""Category 1 holds formulas taken from existing benchmark suites, grouped by source, then by suite."""
+"""This category holds formulas taken from existing benchmark suites, grouped by source, then by suite."""
 
 from sunnbear._core.functions.core import FormulaCategory
 

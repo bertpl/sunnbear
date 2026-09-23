@@ -1,11 +1,12 @@
-"""The formula registry holds the registered formulas and categories, and rebuilds a candidate from an identity.
+"""The formula registry holds formulas and categories, and rebuilds a candidate test function from an identity.
 
 Defining a concrete `Formula` or a `FormulaCategory` subclass registers one instance of it here,
 as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
 
 - **At class definition**, every check that concerns the formula or category alone: a valid
-  number, and no other registered node with the same number. A malformed formula fails when its
-  module is imported.
+  number and name, no other registered node with the same number, and, for a category,
+  `is_builtin_only` declared only at the top level. A malformed formula or category fails when
+  its module is imported.
 - **The first time the registry is queried**, and again on the first query after any later
   registration, the checks across nodes:
 
@@ -18,11 +19,8 @@ as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
   formula modules at the top of its ``__init__.py``, so its formulas register before the
   category itself.
 
-The registry itself imports nothing: the shipped formulas are registered when the
+The registry itself imports nothing: the shipped formulas and categories are registered when the
 test-function package imports the formula catalog.
-
-`FormulaRegistry.candidate_from_id` rebuilds a candidate test function from its identity, for
-benchmark workers and users.
 """
 
 from typing import TYPE_CHECKING, ClassVar
@@ -44,12 +42,11 @@ if TYPE_CHECKING:
 #  FormulaRegistry
 # ==================================================================================================
 class FormulaRegistry:
-    """`FormulaRegistry` enumerates the registered formulas and categories, or rebuilds one candidate from an identity.
+    """`FormulaRegistry` enumerates formulas and categories, or rebuilds a candidate test function from an identity.
 
     `Formula.__init_subclass__` and `FormulaCategory.__init_subclass__` call `register_formula` and
     `register_category`, so the registry is complete as soon as the modules that define the formula and
-    category subclasses are imported. Every public query method first checks the taxonomy tree if a
-    formula or category was registered since the last check.
+    category subclasses are imported.
     """
 
     _formulas_by_number: ClassVar[dict[tuple[int, ...], "Formula"]] = {}
@@ -84,7 +81,7 @@ class FormulaRegistry:
         cls._is_taxonomy_validated = False
 
     # --------------------------------------------------------------------------
-    #  Reads
+    #  Queries
     # --------------------------------------------------------------------------
     @classmethod
     def formulas(cls) -> "tuple[Formula, ...]":
@@ -142,11 +139,11 @@ class FormulaRegistry:
         Raises:
             ValueError: If a registered formula or category already has that number.
         """
-        existing = cls._formulas_by_number.get(node.number) or cls._categories_by_number.get(node.number)
-        if existing is not None:
+        existing_node = cls._formulas_by_number.get(node.number) or cls._categories_by_number.get(node.number)
+        if existing_node is not None:
             raise ValueError(
                 f"Duplicate taxonomy number {format_taxonomy_number(node.number)}: "
-                f"{type(node).__name__} and {type(existing).__name__}."
+                f"{type(node).__name__} and {type(existing_node).__name__}."
             )
 
     @classmethod
@@ -174,29 +171,25 @@ class FormulaRegistry:
             parent_number = node.number[:-1]
             if parent_number and parent_number not in categories:
                 raise FormulaTaxonomyError(
-                    f"{type(node).__name__} ({format_taxonomy_number(node.number)}) has no registered parent "
-                    f"category {format_taxonomy_number(parent_number)}."
+                    f"{node.label} has no registered parent category {format_taxonomy_number(parent_number)}."
                 )
 
         # --- no mixed categories ----------------
-        parents_of_formulas = {number[:-1] for number in cls._formulas_by_number}
-        parents_of_categories = {number[:-1] for number in categories if len(number) > 1}
-        mixed_numbers = sorted(parents_of_formulas & parents_of_categories)
-        if mixed_numbers:
-            number = mixed_numbers[0]
+        formula_parent_numbers = {number[:-1] for number in cls._formulas_by_number}
+        category_parent_numbers = {number[:-1] for number in categories if len(number) > 1}
+        mixed_category_numbers = sorted(formula_parent_numbers & category_parent_numbers)
+        if mixed_category_numbers:
             raise FormulaTaxonomyError(
-                f"Category {type(categories[number]).__name__} ({format_taxonomy_number(number)}) holds both "
-                "subcategories and formulas; a category holds one kind only."
+                f"Category {categories[mixed_category_numbers[0]].label} holds both subcategories and formulas; "
+                "a category holds one kind only."
             )
 
         # --- built-in-only top levels -----------
         # the parent check above guarantees that every ancestor exists, including each node's top-level category
         for node in nodes:
-            top_level = categories[node.number[:1]]
-            if top_level.is_builtin_only and not is_defined_in_sunnbear(type(node)):
-                node_label = f"{type(node).__name__} ({format_taxonomy_number(node.number)})"
-                top_level_label = f"{type(top_level).__name__} ({format_taxonomy_number(top_level.number)})"
+            top_level_category = categories[node.number[:1]]
+            if top_level_category.is_builtin_only and not is_defined_in_sunnbear(type(node)):
                 raise FormulaTaxonomyError(
-                    f"{node_label} is defined in {type(node).__module__}, but top-level category "
-                    f"{top_level_label} is reserved for nodes inside the sunnbear package."
+                    f"{node.label} is defined in {type(node).__module__}, but top-level category "
+                    f"{top_level_category.label} is reserved for nodes inside the sunnbear package."
                 )

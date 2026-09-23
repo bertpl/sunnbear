@@ -48,10 +48,11 @@ class FunctionId:
     # --------------------------------------------------------------------------
     def display(self) -> str:
         """Render with each parameter's authored notation, e.g. ``f2.1.5-2^1.2_0.4``."""
+        prefix = f"f{format_taxonomy_number(self.formula_number)}"
         if not self.params:
-            return f"f{format_taxonomy_number(self.formula_number)}"
+            return prefix
         else:
-            return f"f{format_taxonomy_number(self.formula_number)}-" + "_".join(p.display() for p in self.params)
+            return f"{prefix}-" + "_".join(p.display() for p in self.params)
 
     def __repr__(self) -> str:
         """Render the faithful form; `from_string` parses it back to this identity."""

@@ -1,4 +1,4 @@
-"""Category 2 holds documented function families."""
+"""This category holds documented function families."""
 
 from sunnbear._core.functions.core import FormulaCategory
 

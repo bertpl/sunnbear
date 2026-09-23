@@ -46,7 +46,7 @@ def test_function_id_equality_with_unrelated_type():
     assert FunctionId((2, 1, 1), (ParamValue.decimal(1.0),)) != "f2.1.1-1.0"
 
 
-# rendered identities that exercise the parser: separators, signs, and exponent notation
+# These rendered identities exercise the parser on separators, signs, and exponent notation.
 _RENDERED_IDS = [
     "f2.1.5-2^1.2_0.4",
     "f7.1",

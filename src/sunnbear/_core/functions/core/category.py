@@ -26,8 +26,9 @@ class FormulaCategory(TaxonomyNode):
         number: The category's place in the taxonomy; its parent category is ``number[:-1]``.
         name: Display name.
         is_builtin_only: Whether this category and every node below it are reserved for classes
-            defined inside the sunnbear package. Declared on top-level categories only; every
-            node below a top-level category inherits that category's flag.
+            defined inside the sunnbear package. Declared on top-level categories only; the
+            registry applies a top-level category's flag to every node below it, and a
+            subcategory's own `is_builtin_only` stays at its default `False`.
     """
 
     is_builtin_only: ClassVar[bool] = False
@@ -41,7 +42,7 @@ class FormulaCategory(TaxonomyNode):
                 below the top level, or registration fails (see `FormulaRegistry.register_category`).
         """
         super().__init_subclass__(**kwargs)
-        cls._validate_number_and_name(min_length=1)
+        cls._validate_number_and_name(min_number_length=1)
         if "is_builtin_only" in cls.__dict__ and len(cls.number) > 1:
             raise ValueError(
                 f"{cls.__name__} declares is_builtin_only below the top level; only a top-level category "

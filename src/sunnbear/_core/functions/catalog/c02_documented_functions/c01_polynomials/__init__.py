@@ -1,4 +1,4 @@
-"""Category 2.1 holds polynomial formulas."""
+"""This category holds polynomial formulas."""
 
 from sunnbear._core.functions.core import FormulaCategory
 

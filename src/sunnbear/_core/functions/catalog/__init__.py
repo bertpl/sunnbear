@@ -1,6 +1,6 @@
 """This package holds the shipped formulas and their categories, one folder per category.
 
-Layout convention, checked by the catalog tests:
+The catalog tests check this layout convention:
 
 - a category is a package ``c<NN>_<slug>/`` whose ``__init__.py`` defines one `FormulaCategory`
   subclass and imports the package's modules and subpackages
@@ -12,4 +12,4 @@ Layout convention, checked by the catalog tests:
 Importing this package registers every shipped formula and category.
 """
 
-from . import c01_existing_benchmark_suites, c02_documented_functions, c03_custom_functions, c99_user_defined
+from . import c01_existing_benchmark_suites, c02_documented_functions, c03_custom_functions, c99_user_defined_functions

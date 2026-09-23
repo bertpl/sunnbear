@@ -1,4 +1,4 @@
-"""Formula f2.1.1 is the cubic ``x^3 - p1*x - c``."""
+"""This formula is the cubic ``x^3 - p1*x - c``."""
 
 from sunnbear._core.functions.core import Formula, FormulaTestCase, ParamRecipe
 

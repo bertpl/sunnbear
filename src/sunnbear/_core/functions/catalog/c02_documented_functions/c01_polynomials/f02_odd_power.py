@@ -1,4 +1,4 @@
-"""Formula f2.1.2 is the odd power ``x^p1 - c``; higher odd powers flatten the root at ``c = 0``."""
+"""This formula is the odd power ``x^p1 - c``."""
 
 from sunnbear._core.functions.core import Formula, FormulaTestCase, ParamRecipe
 

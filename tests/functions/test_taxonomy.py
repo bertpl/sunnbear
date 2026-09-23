@@ -11,6 +11,7 @@ from .example_taxonomy_nodes import define_category_cls, define_formula_cls
 # ==================================================================================================
 @pytest.mark.parametrize("number, text", [((2,), "2"), ((2, 1, 1), "2.1.1"), ((99, 10, 123), "99.10.123")])
 def test_number_renders_and_parses_back(number, text):
+    """A taxonomy number renders with dots and parses back to the same tuple."""
     # --- act / assert -----------------
     assert format_taxonomy_number(number) == text
     assert parse_taxonomy_number(text) == number
@@ -18,6 +19,7 @@ def test_number_renders_and_parses_back(number, text):
 
 @pytest.mark.parametrize("text", ["", "2.", ".2", "2..1", "0", "2.01", "2.-1", "2.a", "2,1"])
 def test_parse_taxonomy_number_rejects_invalid(text):
+    """Parsing rejects text that is not a dot-separated list of positive integers without leading zeros."""
     with pytest.raises(ValueError, match="Invalid taxonomy number"):
         parse_taxonomy_number(text)
 
@@ -35,6 +37,7 @@ def test_parse_taxonomy_number_rejects_invalid(text):
     ],
 )
 def test_slugify(name, slug):
+    """Slugify lowercases, drops accents and other non-ASCII characters, and joins the words with underscores."""
     assert slugify(name) == slug
 
 
@@ -53,6 +56,7 @@ def test_slugify(name, slug):
     ],
 )
 def test_category_number_is_validated_at_class_definition(number, error, match):
+    """A category number that is empty, non-positive, not a tuple, or holds a non-int is rejected when defined."""
     with pytest.raises(error, match=match):
         define_category_cls(number)
 
@@ -67,5 +71,6 @@ def test_formula_number_needs_a_parent_category_element():
 @pytest.mark.usefixtures("isolated_registry")
 @pytest.mark.parametrize("attrs, missing", [({"name": "No number"}, "number"), ({"number": (99, 1)}, "name")])
 def test_number_and_name_are_required(attrs, missing):
+    """A category class without ``number`` or ``name`` is rejected at class definition."""
     with pytest.raises(TypeError, match=f"must define {missing}"):
         type("Incomplete", (FormulaCategory,), attrs)

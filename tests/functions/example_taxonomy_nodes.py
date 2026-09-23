@@ -1,4 +1,5 @@
-"""Helpers that define throwaway formula and category classes for the tests of the test-function layer.
+"""This module defines helpers that create throwaway formula and category classes for the tests of the
+test-function layer.
 
 Defining a formula or category class registers it, so a test that calls these helpers uses the
 ``isolated_registry`` fixture.
@@ -18,12 +19,15 @@ def define_formula_cls(formula_number: tuple[int, ...]) -> type[Formula]:
 
         @staticmethod
         def parametrized_fun(x: float, c: float) -> float:
+            """Return ``x - c``, so the root is at ``c``."""
             return x - c
 
         def interval_bounds(self) -> tuple[float, float]:
+            """Return the interval ``[-1, 1]``."""
             return (-1.0, 1.0)
 
         def recipes(self) -> tuple[ParamRecipe, ...]:
+            """Return no recipes; the formula has no parameters."""
             return ()
 
     return ExampleFormula

@@ -94,16 +94,6 @@ def test_subclass_definition_registers():
 
 
 @pytest.mark.usefixtures("isolated_registry")
-def test_defining_a_duplicate_number_is_rejected_at_class_definition():
-    # --- arrange ----------------------
-    define_formula_cls((99, 997))
-
-    # --- act / assert -----------------
-    with pytest.raises(ValueError, match=r"Duplicate taxonomy number 99\.997"):
-        define_formula_cls((99, 997))
-
-
-@pytest.mark.usefixtures("isolated_registry")
 def test_defining_a_non_positive_number_is_rejected_at_class_definition():
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="only positive integers"):
@@ -186,18 +176,18 @@ def test_candidates_deduplicates_across_notations():
 # ==================================================================================================
 #  recipe validation
 # ==================================================================================================
-def _formula_cls(last_element: int, declared: tuple[str, ...], recipes: tuple, fun=None, interval_bounds=None):
-    """Build a throwaway Formula under ``(99, last_element)``; its declaration and recipes vary independently."""
+def _formula_cls(number_last_element: int, declared: tuple[str, ...], recipes: tuple, fun=None, interval_bounds=None):
+    """Build a throwaway Formula numbered ``(99, number_last_element)``; declaration and recipes vary independently."""
     namespace = {
-        "number": (99, last_element),
-        "name": f"Varying {last_element}",
+        "number": (99, number_last_element),
+        "name": f"Varying {number_last_element}",
         "param_names": declared,
         "jit": False,
         "parametrized_fun": staticmethod(fun or (lambda x, c, p1: x - c)),
         "interval_bounds": interval_bounds or (lambda self, p1: (-1.0, 1.0)),
         "recipes": lambda self: recipes,
     }
-    return type(f"Varying{last_element}", (Formula,), namespace)
+    return type(f"Varying{number_last_element}", (Formula,), namespace)
 
 
 @pytest.mark.usefixtures("isolated_registry")
