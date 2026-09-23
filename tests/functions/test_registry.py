@@ -1,7 +1,7 @@
 import pytest
 
-from sunnbear._core.functions.catalog.c02_documented_functions.c01_polynomials.f01_cubic import Cubic
-from sunnbear._core.functions.catalog.c02_documented_functions.c01_polynomials.f02_odd_power import OddPower
+from sunnbear._core.functions.catalog.c02_standard_function_families.c01_polynomials.f01_cubic import Cubic
+from sunnbear._core.functions.catalog.c02_standard_function_families.c01_polynomials.f02_odd_power import OddPower
 from sunnbear.exceptions import InvalidParamsError, UnknownFormulaError
 from sunnbear.functions import (
     Formula,

@@ -85,7 +85,7 @@ def parse_taxonomy_number(text: str) -> tuple[int, ...]:
 
 
 def slugify(name: str) -> str:
-    """Return `name` as a lowercase identifier, e.g. "Documented functions" as ``documented_functions``.
+    """Return `name` as a lowercase identifier, e.g. "Standard function families" as ``standard_function_families``.
 
     The conversion runs in 3 steps:
 

@@ -1,6 +1,6 @@
 import pytest
 
-from sunnbear._core.functions.catalog.c02_documented_functions.c01_polynomials.f01_cubic import Cubic
+from sunnbear._core.functions.catalog.c02_standard_function_families.c01_polynomials.f01_cubic import Cubic
 from sunnbear.functions import CandidateTestFunction, FunctionId, ParamValue
 from sunnbear.functions import TestFunction as _TestFunction  # underscore alias: keep pytest from collecting it
 
