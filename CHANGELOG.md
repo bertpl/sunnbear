@@ -10,10 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `sunnbear.stats`: geometric pseudo-quantiles (`gpq`/`owg`) and exact mean pairwise L1 distance
-- Test-function framework: formulas with parameter recipes, stable function identities, and a registry of formulas
+- Test-function framework: formulas whose parameters are swept over grids, a stable id per test function, and a registry that rebuilds a test function from its id
 - `FormulaTestCase`: declare a formula's test cases alongside its definition
-- `Solver`/`BracketingSolver`: base classes for benchmarkable root solvers, with an evaluation budget and flop counting that excludes the function's own cost
-- Solvers accept intervals on which `f` either increases or decreases
+- `Solver`/`BracketingSolver`: base classes for benchmarkable root solvers, with an evaluation budget and flop counting that leaves out the cost of evaluating the function being solved
+- Solvers accept an interval where `f` goes from negative at `a` to positive at `b`, or the reverse
 - `Bisection` and `RegulaFalsi` reference solvers
 - `SolverConfig`: register a solver with fixed init arguments under a stable id, with a role that decides how the benchmark treats it
 
@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- The source distribution contains the package again; the 0.0.3 one installed no code
+- The source distribution contains the package again; the 0.0.3 source distribution installed no code
 
 ### Security
 
