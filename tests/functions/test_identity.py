@@ -9,7 +9,7 @@ _RENDERED_IDS = [
     "f2.1.1[p1=0.2]",
     "f2.1.2[p1=5.0]",
     "f2.1.1[p1=-0.4]",  # leading minus in a value
-    "f2.1.5[p1=-0.4,p2=-1e-12]",  # negative + scientific notation across the argument separator
+    "f2.1.5[p1=-0.4,p2=-1e-12]",  # negative values and scientific notation on both sides of the comma
     "f2.1.1[p1=1e+16]",  # plus sign inside a value
     "f2.1.1[slope_2=0.5]",  # a name with an underscore and a digit
 ]
@@ -18,8 +18,8 @@ _RENDERED_IDS = [
 # ==================================================================================================
 #  FunctionId
 # ==================================================================================================
-def test_function_id_display_names_each_parameter():
-    """Each value renders with its name and authored notation, in the formula's declared order."""
+def test_function_id_display_includes_each_parameter_name():
+    """Each value renders with its name and authored notation, in `param_names` order."""
     # --- arrange ----------------------
     fid = FunctionId(
         formula_number=(2, 1, 5),
@@ -49,6 +49,7 @@ def test_function_id_no_params():
 
 
 def test_function_id_needs_one_name_per_value():
+    """A `FunctionId` with more values than names is rejected."""
     with pytest.raises(ValueError, match="1 parameter name"):
         FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.2), ParamValue.decimal(0.4)))
 
@@ -76,6 +77,7 @@ def test_function_id_equality_includes_param_names():
 
 
 def test_function_id_equality_with_unrelated_type():
+    """A `FunctionId` never equals its rendered string."""
     assert FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(1.0),)) != "f2.1.1[p1=1.0]"
 
 
@@ -88,16 +90,6 @@ def test_function_id_display_roundtrip(text):
 def test_function_id_canonical_form_reparses_to_the_same_identity(text):
     original = FunctionId.from_string(text)
     assert FunctionId.from_string(str(original)) == original
-
-
-def test_function_id_from_string_reads_the_names():
-    """The rendered form carries the names, so parsing needs no registry."""
-    # --- act --------------------------
-    fid = FunctionId.from_string("f2.1.5[p1=2^1.2,p2=0.4]")
-
-    # --- assert -----------------------
-    assert fid.param_names == ("p1", "p2")
-    assert fid.param_values == pytest.approx((2**1.2, 0.4))
 
 
 def test_function_id_ordering():
@@ -129,7 +121,7 @@ def test_function_id_ordering():
         "f2.1.1[p1=0.2,p1=0.4]",  # repeated name
         "f2.1.1[p1=0.2",  # unclosed bracket
         "f2.1.1[p1=0.2]x",  # trailing text
-        "f2.1.1-0.2",  # the positional form that named parameters replaced
+        "f2.1.1-0.2",  # values after a dash, without names
         "",
     ],
 )

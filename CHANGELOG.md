@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Formulas are numbered by their place in a category tree, e.g. `f2.1.1`; user formulas go under category 99
-- Function ids name their parameters, e.g. `f2.1.1[p1=0.2,p2=2^1.2]`
+- Function ids name their parameters, e.g. `f2.1.1[p1=0.2]`
 
 ### Deprecated
 

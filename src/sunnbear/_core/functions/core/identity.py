@@ -1,21 +1,22 @@
-"""Stable identity of a test function: formula number plus its named, bound parameter tuple.
+"""The stable identity of a test function is its formula number plus its named, bound parameter tuple.
 
-A `FunctionId` holds the formula number, the formula's parameter names, and the
-parameter values — nothing else. In particular there is no materialization-order
-counter: which recipe produced a parameter tuple, or in which order, never affects
-identity, so identities are stable under recipe edits and reordering.
+A `FunctionId` carries nothing beyond the formula and its named parameters. In particular
+there is no materialization-order counter: which recipe produced a parameter tuple, or in
+which order, never affects identity, so identities are stable under recipe edits and
+reordering.
 
-The rendering names each parameter, e.g. ``f2.1.5[p1=2^1.2,p2=0.4]``, in the formula's
-declared parameter order, so a reader can tell the values apart without looking up the
-formula, and `from_string` parses it without consulting the registry. A formula without
-parameters renders as its number alone, e.g. ``f7.1``.
+`display()` writes each parameter as ``name=value``, in the formula's declared parameter
+order, e.g. ``f2.1.5[p1=2^1.2,p2=0.4]``. A reader can then tell the values apart without
+looking up the formula, and `from_string` can parse the text without consulting the
+registry. A formula without parameters renders as its number alone, e.g. ``f7.1``.
 
-Identities inherit the faithfulness of their parameter values (see
-`param_values`): there is a single rendering, notation-carrying and parsed
-back losslessly by `from_string`. Equality, hashing, and ordering are exact —
-two ids match when they carry the same formula, the same parameter names, and the
-same parameter values in the same notation; collapsing near-duplicate parameter
-tuples happens *before* identities are built (`deduplicate_param_tuples`).
+Identities inherit the faithfulness of their parameter values (see `param_values`): there
+is a single rendering, notation-carrying and parsed back losslessly by `from_string`.
+
+Equality and hashing are exact: two ids match when they carry the same formula, the same
+parameter names, and the same parameter values in the same notation. Ordering compares
+only the formula number and the parameter values, not the names. Collapsing near-duplicate
+parameter tuples happens *before* identities are built (`deduplicate_param_tuples`).
 """
 
 import re
@@ -33,7 +34,7 @@ _FUNCTION_ID_PATTERN = re.compile(r"f(?P<number>[0-9.]+)(?:\[(?P<params>[^\[\]]+
 # ==================================================================================================
 @dataclass(frozen=True)
 class FunctionId:
-    """Identity of one test function: formula number + the named, bound parameter tuple.
+    """A `FunctionId` identifies one test function by its formula number and its named, bound parameter tuple.
 
     Equality and hashing are the dataclass defaults — exact, and notation-aware,
     since the parameter values carry their notation. Rendering is faithful and
@@ -41,7 +42,7 @@ class FunctionId:
 
     Attributes:
         formula_number: The formula's taxonomy number, e.g. ``(2, 1, 1)``.
-        param_names: The formula's declared parameter names, in the order it binds them.
+        param_names: The formula's declared parameter names, in the order that the formula takes them.
         params: One value per name in `param_names`, in the same order.
     """
 
@@ -113,17 +114,17 @@ class FunctionId:
         """Parse ``name=value,name=value`` into the parameter names and their values, in order.
 
         Raises:
-            ValueError: If an argument is not ``name=value`` with a valid identifier as name, or a
-                name repeats.
+            ValueError: If a comma-separated entry is not ``name=value`` with a Python identifier as
+                name, a value does not parse, or a name appears twice.
         """
         names: list[str] = []
-        values: list[ParamValue] = []
+        params: list[ParamValue] = []
         for arg in text.split(","):
             name, equals, token = arg.partition("=")
             if not equals or not name.isidentifier():
                 raise ValueError(f"Invalid parameter argument: {arg!r}")
             names.append(name)
-            values.append(ParamValue.parse(token))
+            params.append(ParamValue.parse(token))
         if len(set(names)) != len(names):
             raise ValueError(f"Repeated parameter name in {text!r}")
-        return tuple(names), tuple(values)
+        return tuple(names), tuple(params)

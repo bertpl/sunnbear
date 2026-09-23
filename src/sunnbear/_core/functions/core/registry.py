@@ -133,7 +133,7 @@ class FormulaRegistry:
             )
         if fid.param_names != formula.param_names:
             raise InvalidParamsError(
-                f"Parameter names {list(fid.param_names)} do not match {list(formula.param_names)}, the parameters "
+                f"Parameter names {list(fid.param_names)} do not match the parameters {list(formula.param_names)} "
                 f"of formula {formula.name} (id: {fid})."
             )
         if not formula.is_param_tuple_valid(*fid.param_values):
