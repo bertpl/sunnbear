@@ -10,12 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `sunnbear.stats`: geometric pseudo-quantiles (`gpq`/`owg`) and exact mean pairwise L1 distance
-- Test-function framework: formulas with parameter recipes, stable function identities, and a file-drop formula catalog
-- `FormulaTestCase`: declare a formula's value / invalid-params / interval-bounds test cases alongside its definition
-- Solver framework: every solver's function evaluations run through one wrapper that applies an evaluation budget, catches failed evaluations, and excludes the function's own cost from flop counting
-- Intervals of either orientation: `IncreasingInterval` (`f` negative at `a`, positive at `b`) and `DecreasingInterval` (the reverse), picked by `Interval.from_interval_bounds`
-- `Solver`/`BracketingSolver`: the base classes that a root solver subclasses to become benchmarkable; a solve that ends outside its interval is reported as diverged, and one interrupted early reports its last evaluated point
-- `Bisection` and `RegulaFalsi` reference solvers; Bisection is checked against SciPy's
+- Test-function framework: formulas with parameter recipes, stable function identities, and a registry of formulas
+- `FormulaTestCase`: declare a formula's test cases alongside its definition
+- `Solver`/`BracketingSolver`: base classes for benchmarkable root solvers, with an evaluation budget and flop counting that excludes the function's own cost
+- Solvers accept intervals on which `f` either increases or decreases
+- `Bisection` and `RegulaFalsi` reference solvers
 - `SolverConfig`: register a solver with fixed init arguments under a stable id, with a role that decides how the benchmark treats it
 
 ### Changed
@@ -26,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Miscellaneous packaging fixes
+- The source distribution contains the package again; the 0.0.3 one installed no code
 
 ### Security
 
