@@ -14,8 +14,9 @@ of node share.
 """
 
 import re
-import unicodedata
 from typing import ClassVar
+
+from sunnbear._core.utils.slugify import slugify
 
 
 # ==================================================================================================
@@ -32,6 +33,28 @@ class FormulaTaxonomyNode:
     number: ClassVar[tuple[int, ...]]
     name: ClassVar[str]
 
+    # --------------------------------------------------------------------------
+    #  Taxonomy numbers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def format_number(number: tuple[int, ...]) -> str:
+        """Render a taxonomy number with dots, e.g. ``(2, 1, 1)`` as ``2.1.1``."""
+        return ".".join(str(n) for n in number)
+
+    @staticmethod
+    def parse_number(text: str) -> tuple[int, ...]:
+        """Parse a rendered taxonomy number, e.g. ``2.1.1``, back into a tuple.
+
+        Raises:
+            ValueError: If `text` is not a dot-separated list of positive integers.
+        """
+        if not re.fullmatch(r"[1-9][0-9]*(\.[1-9][0-9]*)*", text):
+            raise ValueError(f"Invalid taxonomy number: {text!r}")
+        return tuple(int(part) for part in text.split("."))
+
+    # --------------------------------------------------------------------------
+    #  Node properties and validation
+    # --------------------------------------------------------------------------
     @property
     def name_slug(self) -> str:
         """Return `name` as a lowercase identifier, e.g. ``odd_power``; catalog file names carry it."""
@@ -40,7 +63,7 @@ class FormulaTaxonomyNode:
     @property
     def label(self) -> str:
         """Return the class name and dotted number, e.g. ``Cubic (2.1.1)``, for error messages."""
-        return f"{type(self).__name__} ({format_taxonomy_number(self.number)})"
+        return f"{type(self).__name__} ({self.format_number(self.number)})"
 
     @classmethod
     def _validate_number_and_name(cls, min_number_length: int) -> None:
@@ -63,37 +86,3 @@ class FormulaTaxonomyNode:
             )
         if any(n < 1 for n in number):
             raise ValueError(f"{cls.__name__}.number must contain only positive integers (got {number!r}).")
-
-
-# ==================================================================================================
-#  Helpers
-# ==================================================================================================
-def format_taxonomy_number(number: tuple[int, ...]) -> str:
-    """Render a taxonomy number with dots, e.g. ``(2, 1, 1)`` as ``2.1.1``."""
-    return ".".join(str(n) for n in number)
-
-
-def parse_taxonomy_number(text: str) -> tuple[int, ...]:
-    """Parse a rendered taxonomy number, e.g. ``2.1.1``, back into a tuple.
-
-    Raises:
-        ValueError: If `text` is not a dot-separated list of positive integers.
-    """
-    if not re.fullmatch(r"[1-9][0-9]*(\.[1-9][0-9]*)*", text):
-        raise ValueError(f"Invalid taxonomy number: {text!r}")
-    return tuple(int(part) for part in text.split("."))
-
-
-def slugify(name: str) -> str:
-    """Return `name` as a lowercase identifier, e.g. "Standard function families" as ``standard_function_families``.
-
-    The conversion runs in 3 steps:
-
-    - accented letters lose their accent, and other non-ASCII characters are dropped
-    - each run of characters outside a-z and 0-9 becomes 1 underscore
-    - leading and trailing underscores are removed
-
-    The result is a valid Python module name as long as it does not start with a digit.
-    """
-    ascii_name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
-    return re.sub(r"[^a-z0-9]+", "_", ascii_name.lower()).strip("_")

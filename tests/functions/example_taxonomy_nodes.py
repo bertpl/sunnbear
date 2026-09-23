@@ -5,7 +5,7 @@ Defining a formula or category class registers it, so a test that calls these he
 ``isolated_registry`` fixture.
 """
 
-from sunnbear._core.functions.core.taxonomy import format_taxonomy_number
+from sunnbear._core.functions.core.taxonomy import FormulaTaxonomyNode
 from sunnbear.functions import Formula, FormulaCategory, ParamRecipe
 
 
@@ -14,7 +14,7 @@ def define_formula_cls(formula_number: tuple[int, ...]) -> type[Formula]:
 
     class ExampleFormula(Formula):
         number = formula_number
-        name = f"Example {format_taxonomy_number(formula_number)}"
+        name = f"Example {FormulaTaxonomyNode.format_number(formula_number)}"
         jit = False
 
         @staticmethod
@@ -35,5 +35,9 @@ def define_formula_cls(formula_number: tuple[int, ...]) -> type[Formula]:
 
 def define_category_cls(category_number: tuple[int, ...], **attrs: object) -> type[FormulaCategory]:
     """Define and return a category numbered `category_number`, with `attrs` as extra class attributes."""
-    namespace = {"number": category_number, "name": f"Example {format_taxonomy_number(category_number)}", **attrs}
+    namespace = {
+        "number": category_number,
+        "name": f"Example {FormulaTaxonomyNode.format_number(category_number)}",
+        **attrs,
+    }
     return type("ExampleCategory", (FormulaCategory,), namespace)

@@ -33,7 +33,7 @@ from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
 from .exceptions import FormulaTaxonomyError, InvalidParamsError, UnknownFormulaError
 from .identity import FunctionId
-from .taxonomy import FormulaTaxonomyNode, format_taxonomy_number
+from .taxonomy import FormulaTaxonomyNode
 from .test_function import CandidateTestFunction
 
 # type-only: formula and category import this module at runtime, so a runtime import would be circular
@@ -127,7 +127,8 @@ class FormulaRegistry:
         formula = cls._formulas_by_number.get(fid.formula_number)
         if formula is None:
             raise UnknownFormulaError(
-                f"No registered formula with number {format_taxonomy_number(fid.formula_number)} (id: {fid})."
+                f"No registered formula with number {FormulaTaxonomyNode.format_number(fid.formula_number)} "
+                f"(id: {fid})."
             )
         if not formula.is_param_tuple_valid(*fid.param_values):
             raise InvalidParamsError(f"Parameter tuple {fid.params} is invalid for formula {formula.name} (id: {fid}).")
@@ -146,7 +147,7 @@ class FormulaRegistry:
         existing_node = cls._formulas_by_number.get(node.number) or cls._categories_by_number.get(node.number)
         if existing_node is not None:
             raise ValueError(
-                f"Duplicate taxonomy number {format_taxonomy_number(node.number)}: "
+                f"Duplicate taxonomy number {FormulaTaxonomyNode.format_number(node.number)}: "
                 f"{type(node).__name__} and {type(existing_node).__name__}."
             )
 
@@ -175,7 +176,8 @@ class FormulaRegistry:
             parent_number = node.number[:-1]
             if parent_number and parent_number not in categories:
                 raise FormulaTaxonomyError(
-                    f"{node.label} has no registered parent category {format_taxonomy_number(parent_number)}."
+                    f"{node.label} has no registered parent category "
+                    f"{FormulaTaxonomyNode.format_number(parent_number)}."
                 )
 
         # --- no mixed categories ----------------
