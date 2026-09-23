@@ -5,7 +5,7 @@ import re
 import pytest
 
 import sunnbear._core.functions.catalog as catalog
-from sunnbear._core.functions.core.taxonomy import TaxonomyNode
+from sunnbear._core.functions.core.taxonomy import FormulaTaxonomyNode
 from sunnbear.functions import Formula, FormulaRegistry
 
 _CATALOG_PREFIX = f"{catalog.__name__}."
@@ -15,7 +15,7 @@ _CATALOG_PREFIX = f"{catalog.__name__}."
 _NAME_PATTERN = re.compile(r"(?P<kind>[cf])(?P<number>[0-9]{2})_(?P<slug>[a-z0-9_]+)")
 
 
-def _catalog_nodes() -> list[TaxonomyNode]:
+def _catalog_nodes() -> list[FormulaTaxonomyNode]:
     """Return every registered category and formula whose class is defined inside the catalog."""
     nodes = [*FormulaRegistry.categories(), *FormulaRegistry.formulas()]
     return [node for node in nodes if type(node).__module__.startswith(_CATALOG_PREFIX)]

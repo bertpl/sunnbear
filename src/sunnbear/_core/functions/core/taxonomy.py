@@ -7,7 +7,7 @@ parent of ``(2, 1, 1)``.
 The number of a formula therefore names the formula's categories from the top level down, and
 sorting by number sorts in category order.
 
-`TaxonomyNode` is the base class of `Formula` and `FormulaCategory` and holds what the 2 kinds
+`FormulaTaxonomyNode` is the base class of `Formula` and `FormulaCategory` and holds what the 2 kinds
 of node share.
 
 `FormulaRegistry` checks how the nodes relate to one another; its module docstring says when.
@@ -19,10 +19,10 @@ from typing import ClassVar
 
 
 # ==================================================================================================
-#  TaxonomyNode
+#  FormulaTaxonomyNode
 # ==================================================================================================
-class TaxonomyNode:
-    """`TaxonomyNode` is the base class of a node of the formula taxonomy: a category or a formula.
+class FormulaTaxonomyNode:
+    """`FormulaTaxonomyNode` is the base class of a node of the formula taxonomy: a category or a formula.
 
     Class attributes:
         number: The node's place in the taxonomy, a non-empty tuple of positive integers.

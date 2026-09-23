@@ -25,7 +25,7 @@ from .identity import FunctionId
 from .param_values import DEDUP_DIGITS, ParamValue, deduplicate_param_tuples
 from .recipes import ParamRecipe
 from .registry import FormulaRegistry
-from .taxonomy import TaxonomyNode
+from .taxonomy import FormulaTaxonomyNode
 from .test_cases import FormulaTestCase
 from .test_function import CandidateTestFunction
 from .types import XCFun, XFun
@@ -34,7 +34,7 @@ from .types import XCFun, XFun
 # ==================================================================================================
 #  Formula
 # ==================================================================================================
-class Formula(TaxonomyNode, ABC):
+class Formula(FormulaTaxonomyNode, ABC):
     """One hand-written formula: the mathematics plus metadata to spawn candidate test functions.
 
     Class attributes:

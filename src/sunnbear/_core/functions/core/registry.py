@@ -33,7 +33,7 @@ from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
 from .exceptions import FormulaTaxonomyError, InvalidParamsError, UnknownFormulaError
 from .identity import FunctionId
-from .taxonomy import TaxonomyNode, format_taxonomy_number
+from .taxonomy import FormulaTaxonomyNode, format_taxonomy_number
 from .test_function import CandidateTestFunction
 
 # type-only: formula and category import this module at runtime, so a runtime import would be circular
@@ -137,7 +137,7 @@ class FormulaRegistry:
     #  Taxonomy checks
     # --------------------------------------------------------------------------
     @classmethod
-    def _validate_number_is_free(cls, node: TaxonomyNode) -> None:
+    def _validate_number_is_free(cls, node: FormulaTaxonomyNode) -> None:
         """Check that no registered formula or category has the number of `node`.
 
         Raises:
@@ -167,7 +167,7 @@ class FormulaRegistry:
                 built-in-only top-level category.
         """
         categories = cls._categories_by_number
-        nodes: list[TaxonomyNode] = [*categories.values(), *cls._formulas_by_number.values()]
+        nodes: list[FormulaTaxonomyNode] = [*categories.values(), *cls._formulas_by_number.values()]
 
         # --- every parent exists ----------------
         # a formula's number has at least 2 elements, so only a top-level category has no parent

@@ -10,13 +10,13 @@ from typing import ClassVar
 from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
 from .registry import FormulaRegistry
-from .taxonomy import TaxonomyNode
+from .taxonomy import FormulaTaxonomyNode
 
 
 # ==================================================================================================
 #  FormulaCategory
 # ==================================================================================================
-class FormulaCategory(TaxonomyNode):
+class FormulaCategory(FormulaTaxonomyNode):
     """`FormulaCategory` describes one category of formulas; defining a subclass declares and registers it.
 
     Example::
