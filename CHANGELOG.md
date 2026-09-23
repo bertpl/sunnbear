@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Intervals of either orientation: `IncreasingInterval` (`f` negative at `a`, positive at `b`) and `DecreasingInterval` (the reverse), picked by `Interval.from_interval_bounds`
 - `Solver`/`BracketingSolver`: the base classes that a root solver subclasses to become benchmarkable; a solve that ends outside its interval is reported as diverged, and one interrupted early reports its last evaluated point
 - `Bisection` and `RegulaFalsi` reference solvers; Bisection is checked against SciPy's
+- `SolverConfig`: register a solver with fixed init arguments under a stable id, with a role that decides how the benchmark treats it
 
 ### Changed
 

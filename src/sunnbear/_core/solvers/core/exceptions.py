@@ -33,3 +33,7 @@ class FunctionDomainError(SolveException):
         """Record where the evaluation failed, then behave as a plain exception with ``message``."""
         super().__init__(message)
         self.x = x
+
+
+class UnknownSolverConfigError(SunnbearError):
+    """Raised when a ``solver_id`` names no registered solver config."""

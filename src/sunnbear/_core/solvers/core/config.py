@@ -1,0 +1,119 @@
+"""`SolverConfig` is the base class of a solver configuration: it names a solver class, its init arguments, and a role.
+
+A solver class carries only its algorithm; which settings the benchmark runs is a separate decision,
+recorded by one `SolverConfig` subclass per setting.
+
+Defining the subclass registers it with `SolverConfigRegistry`, and every check runs at that moment,
+so a malformed config fails when its module is imported, never inside a benchmark worker.
+"""
+
+import inspect
+from collections.abc import Mapping
+from typing import ClassVar
+
+from .registry import SolverConfigRegistry
+from .role import SolverRole
+from .solver import Solver
+
+# The types that a `solver_kwargs` value may have. `SolverConfig.solver_id` includes the `repr` of each
+# value, and a worker in another process must rebuild the same id, which holds for these types only.
+_SOLVER_KWARG_VALUE_TYPES = (bool, int, float, str)
+
+
+# ==================================================================================================
+#  SolverConfig
+# ==================================================================================================
+class SolverConfig:
+    """`SolverConfig` describes one configured solver; a subclass declares it, and defining the subclass registers it.
+
+    Example::
+
+        class RegulaFalsiConfig(SolverConfig):
+            solver_cls = RegulaFalsi
+            role = SolverRole.BUILTIN_SECONDARY
+
+    Class attributes:
+        solver_cls: The concrete `Solver` subclass to instantiate.
+        solver_kwargs: The init arguments passed to ``solver_cls``; each value is a bool, int, float, or str.
+        role: How the benchmark treats this config. A role for which `SolverRole.is_builtin_only` is true
+            is reserved for configs defined inside the sunnbear package.
+    """
+
+    solver_cls: ClassVar[type[Solver]]
+    solver_kwargs: ClassVar[Mapping[str, object]] = {}
+    role: ClassVar[SolverRole]
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        """Validate the subclass and register it with `SolverConfigRegistry`.
+
+        Raises:
+            TypeError: If any of the following holds:
+
+                - ``solver_cls`` or ``role`` is missing
+                - ``solver_cls`` is not a concrete `Solver` subclass
+                - ``solver_kwargs`` do not fit its ``__init__``
+                - a ``solver_kwargs`` value has an unsupported type
+            ValueError: If a built-in-only role is used outside the sunnbear package, or registration
+                fails (see `SolverConfigRegistry.register`).
+        """
+        super().__init_subclass__(**kwargs)
+        cls._validate()
+        SolverConfigRegistry.register(cls)
+
+    # --------------------------------------------------------------------------
+    #  Identity and construction
+    # --------------------------------------------------------------------------
+    @property
+    def solver_id(self) -> str:
+        """Return the config's identity, the solver's name plus its init arguments, e.g. ``itp[n_slack=4]``.
+
+        Arguments are sorted by name, so the identity does not depend on the order of declaration.
+        """
+        if not self.solver_kwargs:
+            return self.solver_cls.name
+        else:
+            args = ",".join(f"{key}={value!r}" for key, value in sorted(self.solver_kwargs.items()))
+            return f"{self.solver_cls.name}[{args}]"
+
+    def instantiate(self) -> Solver:
+        """Return a new solver built with this config's init arguments."""
+        return self.solver_cls(**self.solver_kwargs)
+
+    # --------------------------------------------------------------------------
+    #  Validation
+    # --------------------------------------------------------------------------
+    @classmethod
+    def _validate(cls) -> None:
+        """Run every check that concerns this config alone; checks across configs run in the registry."""
+        for attr in ("solver_cls", "role"):
+            if not hasattr(cls, attr):
+                raise TypeError(f"{cls.__name__} must define {attr}.")
+        if not (isinstance(cls.solver_cls, type) and issubclass(cls.solver_cls, Solver)):
+            raise TypeError(f"{cls.__name__}.solver_cls must be a Solver subclass (got {cls.solver_cls!r}).")
+        if inspect.isabstract(cls.solver_cls):
+            raise TypeError(f"{cls.__name__}.solver_cls must be concrete; {cls.solver_cls.__name__} is abstract.")
+        try:
+            inspect.signature(cls.solver_cls).bind(**cls.solver_kwargs)
+        except TypeError as exc:
+            raise TypeError(
+                f"{cls.__name__}.solver_kwargs do not fit {cls.solver_cls.__name__}.__init__: {exc}."
+            ) from exc
+        for key, value in cls.solver_kwargs.items():
+            if not isinstance(value, _SOLVER_KWARG_VALUE_TYPES):
+                raise TypeError(
+                    f"{cls.__name__}.solver_kwargs[{key!r}] must be a bool, int, float, or str "
+                    f"(got {type(value).__name__})."
+                )
+        if cls.role.is_builtin_only and not cls._is_defined_in_sunnbear(cls):
+            raise ValueError(
+                f"{cls.__name__} is defined in {cls.__module__}, but role {cls.role.name} is reserved for "
+                "configs inside the sunnbear package; use SolverRole.USER_ACTIVE or SolverRole.USER_OTHER."
+            )
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _is_defined_in_sunnbear(config_cls: type) -> bool:
+        """Return whether ``config_cls`` is defined in a module of the sunnbear package."""
+        return config_cls.__module__ == "sunnbear" or config_cls.__module__.startswith("sunnbear.")
