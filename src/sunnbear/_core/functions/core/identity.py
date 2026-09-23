@@ -1,17 +1,17 @@
-"""The stable identity of a test function is its formula number plus its named, bound parameter tuple.
+"""The stable identity of a test function is its formula number plus its named parameter values.
 
-A `FunctionId` carries nothing beyond the formula and its named parameters. In particular
-there is no materialization-order counter: which recipe produced a parameter tuple, or in
-which order, never affects identity, so identities are stable under recipe edits and
-reordering.
+In particular, a `FunctionId` holds no counter of the order in which candidates were
+generated: which `ParamRecipe` produced a parameter tuple, or in which order, never affects
+identity, so identities stay the same when recipes are edited or reordered.
 
 `display()` writes each parameter as ``name=value``, in the formula's declared parameter
 order, e.g. ``f2.1.5[p1=2^1.2,p2=0.4]``. A reader can then tell the values apart without
 looking up the formula, and `from_string` can parse the text without consulting the
 registry. A formula without parameters renders as its number alone, e.g. ``f7.1``.
 
-Identities inherit the faithfulness of their parameter values (see `param_values`): there
-is a single rendering, notation-carrying and parsed back losslessly by `from_string`.
+A parameter value keeps the notation it was authored in (see the `param_values` module), and
+so does an identity: `display()` is the only rendering, and `from_string` parses it back to an
+equal identity.
 
 Equality and hashing are exact: two ids match when they carry the same formula, the same
 parameter names, and the same parameter values in the same notation. Ordering compares
@@ -34,7 +34,7 @@ _FUNCTION_ID_PATTERN = re.compile(r"f(?P<number>[0-9.]+)(?:\[(?P<params>[^\[\]]+
 # ==================================================================================================
 @dataclass(frozen=True)
 class FunctionId:
-    """A `FunctionId` identifies one test function by its formula number and its named, bound parameter tuple.
+    """A `FunctionId` identifies one test function by its formula number and its named parameter values.
 
     Equality and hashing are the dataclass defaults — exact, and notation-aware,
     since the parameter values carry their notation. Rendering is faithful and
@@ -42,7 +42,7 @@ class FunctionId:
 
     Attributes:
         formula_number: The formula's taxonomy number, e.g. ``(2, 1, 1)``.
-        param_names: The formula's declared parameter names, in the order that the formula takes them.
+        param_names: The formula's declared parameter names, in declaration order.
         params: One value per name in `param_names`, in the same order.
     """
 
@@ -51,7 +51,7 @@ class FunctionId:
     params: tuple[ParamValue, ...]
 
     def __post_init__(self) -> None:
-        """Check that every parameter value has a name.
+        """Check that `param_names` and `params` pair up one to one.
 
         Raises:
             ValueError: If `param_names` and `params` differ in length.
@@ -114,8 +114,8 @@ class FunctionId:
         """Parse ``name=value,name=value`` into the parameter names and their values, in order.
 
         Raises:
-            ValueError: If a comma-separated entry is not ``name=value`` with a Python identifier as
-                name, a value does not parse, or a name appears twice.
+            ValueError: If an entry is not ``name=value``, a name is not a Python identifier, a value
+                does not parse, or a name appears twice.
         """
         names: list[str] = []
         params: list[ParamValue] = []

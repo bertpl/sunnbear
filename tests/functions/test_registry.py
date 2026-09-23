@@ -368,6 +368,7 @@ def test_compiled_formula_rejects_plain_method():
 #  candidate_from_id / calibrated
 # ==================================================================================================
 def test_candidate_from_id_and_string():
+    """A `FunctionId` and its rendered string rebuild the same calibrated test function."""
     # --- act --------------------------
     tf_from_id = FormulaRegistry.candidate_from_id(
         FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.2),))
@@ -382,6 +383,7 @@ def test_candidate_from_id_and_string():
 
 
 def test_build_x_fun():
+    """`build_x_fun` fixes `c` and returns the test function as a function of `x` alone."""
     # --- arrange ----------------------
     tf = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.0]").calibrated(-5.0, 5.0)
 
@@ -393,15 +395,17 @@ def test_build_x_fun():
 
 
 def test_candidate_from_id_unknown_formula():
+    """An id whose formula number is not registered raises `UnknownFormulaError`."""
     with pytest.raises(UnknownFormulaError):
         FormulaRegistry.candidate_from_id("f9.9[p1=0.2]")
 
 
 def test_candidate_from_id_invalid_params():
+    """An id whose parameter values fail the formula's validity criteria raises `InvalidParamsError`."""
     with pytest.raises(InvalidParamsError):
         FormulaRegistry.candidate_from_id(
-            FunctionId((2, 1, 2), ("p1",), (ParamValue.decimal(2.0),))
-        )  # even power: invalid
+            FunctionId((2, 1, 2), ("p1",), (ParamValue.decimal(2.0),))  # even power: invalid
+        )
 
 
 @pytest.mark.parametrize(

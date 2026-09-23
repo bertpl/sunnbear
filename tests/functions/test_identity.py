@@ -18,17 +18,19 @@ _RENDERED_IDS = [
 # ==================================================================================================
 #  FunctionId
 # ==================================================================================================
-def test_function_id_display_includes_each_parameter_name():
-    """Each value renders with its name and authored notation, in `param_names` order."""
-    # --- arrange ----------------------
-    fid = FunctionId(
-        formula_number=(2, 1, 5),
-        param_names=("p1", "p2"),
-        params=(ParamValue.exponential(2, 1.2), ParamValue.decimal(0.4)),
-    )
-
-    # --- act / assert -----------------
-    assert fid.display() == "f2.1.5[p1=2^1.2,p2=0.4]"
+@pytest.mark.parametrize(
+    "fid, expected",
+    [
+        (
+            FunctionId((2, 1, 5), ("p1", "p2"), (ParamValue.exponential(2, 1.2), ParamValue.decimal(0.4))),
+            "f2.1.5[p1=2^1.2,p2=0.4]",
+        ),
+        (FunctionId((7, 1), (), ()), "f7.1"),  # no parameters: the number alone, without brackets
+    ],
+)
+def test_function_id_display_includes_each_parameter_name(fid, expected):
+    """Each value renders as ``name=value`` in its authored notation, in `param_names` order."""
+    assert fid.display() == expected
 
 
 def test_function_id_rendering_is_faithful():
@@ -41,11 +43,6 @@ def test_function_id_rendering_is_faithful():
     assert str(as_decimal) == "f2.1.1[p1=4.0]"
     assert str(as_pow2) == "f2.1.1[p1=2^2.0]"  # not flattened to the decimal spelling
     assert repr(as_pow2) == str(as_pow2) == as_pow2.display()
-
-
-def test_function_id_no_params():
-    """A formula without parameters renders as its number alone, without brackets."""
-    assert str(FunctionId(formula_number=(7, 1), param_names=(), params=())) == "f7.1"
 
 
 def test_function_id_needs_one_name_per_value():
@@ -93,6 +90,7 @@ def test_function_id_canonical_form_reparses_to_the_same_identity(text):
 
 
 def test_function_id_ordering():
+    """Ids sort by formula number, then by parameter values."""
     # --- arrange ----------------------
     ids = [
         FunctionId((2, 1, 2), ("p1",), (ParamValue.decimal(1.0),)),
@@ -126,5 +124,6 @@ def test_function_id_ordering():
     ],
 )
 def test_function_id_from_string_rejects_invalid(text):
+    """Text that does not follow the rendered form raises `ValueError`."""
     with pytest.raises(ValueError):
         FunctionId.from_string(text)

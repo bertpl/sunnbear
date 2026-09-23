@@ -38,7 +38,7 @@ Ownership summary:
   class registers it.
 - the framework owns everything mechanical: numba compilation — once per
   formula, not per candidate (`Formula.jit`, `Formula._compiled_formula`),
-  identity (`FunctionId` — the parameter tuple itself, stable, faithful to the
+  identity (`FunctionId` — the formula number and its named parameter tuple, stable, faithful to the
   authored notation, and human-readable), candidate assembly and enumeration,
   and lookup (`FormulaRegistry`).
 - `CandidateTestFunction` vs `TestFunction` differ by exactly one fact — whether a
