@@ -32,6 +32,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
 from math import isfinite, log2, log10
+from typing import assert_never
 
 # The root precision constant: significant digits an argument is snapped to, absorbing the
 # float error of grid arithmetic (`start + i * step`). Chosen as 3/4 of float64's ~16
@@ -142,19 +143,28 @@ class ParamNotation(StrEnum):
 
     def spell_value(self, value: float) -> str | None:
         """Return this notation's spelling of `value`, or None if it cannot spell `value` under the validity rule."""
+        # --- validation ---------------------------
         value = value + 0.0  # adding 0.0 turns -0.0 into 0.0, so the two equal floats spell alike
-        if not isfinite(value):
-            return None
-        elif self is ParamNotation.DECIMAL:
-            argument = value
-        elif value <= 0.0:
-            return None  # a power of 2 or 10 is positive
-        else:
-            # recover the exponent of a valid value; the comparison below rejects the value if the
-            # recovered exponent, once rounded, does not reproduce the value
-            argument = (log2 if self is ParamNotation.POW2 else log10)(value)
+        if not isfinite(value) or (self is not ParamNotation.DECIMAL and value <= 0.0):
+            return None  # a power of 2 or 10 is finite and positive
+
+        # --- spell value --------------------------
+        # for a power, recover the exponent of a valid value; the comparison below rejects the value
+        # if the recovered exponent, once rounded, does not reproduce the value
+        match self:
+            case ParamNotation.DECIMAL:
+                argument = value
+            case ParamNotation.POW2:
+                argument = log2(value)
+            case ParamNotation.POW10:
+                argument = log10(value)
+            case _:
+                assert_never(self)
         candidate = self.build_param_value(argument)  # build_param_value rounds the argument, as for every value
-        return candidate.display() if candidate.value == value else None
+        if candidate.value == value:
+            return candidate.display()
+        else:
+            return None
 
 
 # ==================================================================================================
