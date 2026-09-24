@@ -228,7 +228,7 @@ def test_exponential_rejects_overflowing_derivation():
 
 
 # ==================================================================================================
-#  ParamNotation.render_canonical_value / is_valid_value
+#  ParamNotation.spell_value_canonically / is_valid_value
 # ==================================================================================================
 @pytest.mark.parametrize(
     "value, expected",
@@ -245,15 +245,15 @@ def test_exponential_rejects_overflowing_derivation():
         (-0.0, "0.0"),
     ],
 )
-def test_render_canonical_value_picks_the_shortest_valid_spelling(value, expected):
+def test_spell_value_canonically_picks_the_shortest_valid_spelling(value, expected):
     """A valid value renders in its shortest spelling, and a tie in length goes to the decimal."""
-    assert ParamNotation.render_canonical_value(value) == expected
+    assert ParamNotation.spell_value_canonically(value) == expected
 
 
 @pytest.mark.parametrize(
     "value",
     [
-        0.1 + 0.2,  # the sum 0.30000000000000004 needs 17 digits as a decimal and is no power of 2 or 10
+        0.1 + 0.2,  # 0.30000000000000004 needs 17 decimal digits, and no short exponent reproduces it
         2.0**1.2345678901234,  # its exponent needs 14 digits
         float("inf"),
         float("nan"),
@@ -264,7 +264,7 @@ def test_invalid_param_value_is_rejected(value):
     # --- act / assert -----------------
     assert not ParamNotation.is_valid_value(value)
     with pytest.raises(ValueError, match="not a valid parameter value"):
-        ParamNotation.render_canonical_value(value)
+        ParamNotation.spell_value_canonically(value)
 
 
 @pytest.mark.parametrize(
@@ -276,15 +276,15 @@ def test_invalid_param_value_is_rejected(value):
     ],
 )
 def test_every_built_value_renders_and_parses_back_to_itself(notation, start, stop, step):
-    """Every value that a recipe axis builds is valid, and parsing its canonical spelling gives the same float."""
+    """Every value that a `ParamAxis` builds is valid, and parsing its canonical spelling gives the same float."""
     # --- arrange ----------------------
     values = [param_value.value for param_value in ParamAxis("p1", start, stop, step, notation).values()]
 
     # --- act --------------------------
-    rendered = [ParamNotation.render_canonical_value(value) for value in values]
+    canonical_spellings = [ParamNotation.spell_value_canonically(value) for value in values]
 
     # --- assert -----------------------
-    assert [ParamValue.parse(token).value for token in rendered] == values
+    assert [ParamValue.parse(token).value for token in canonical_spellings] == values
 
 
 # ==================================================================================================
