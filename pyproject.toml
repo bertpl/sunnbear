@@ -185,4 +185,5 @@ fail_under = 100       # cumulative gate on the combined matrix data; coverage r
 exclude_also = [
     "@abstractmethod",
     "@abc.abstractmethod",
+    "case _:\\s*\\n\\s*assert_never\\(",  # an exhaustive match's fallback case, unreachable by construction
 ]

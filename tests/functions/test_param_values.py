@@ -3,6 +3,7 @@ import pytest
 from sunnbear.functions import (
     DecimalParamValue,
     ExponentialParamValue,
+    ParamAxis,
     ParamNotation,
     ParamValue,
     deduplicate_param_tuples,
@@ -224,6 +225,66 @@ def test_exponential_rejects_overflowing_derivation():
     """A finite exponent can still overflow base**exponent; the derived value is checked too."""
     with pytest.raises(ValueError, match="non-finite"):
         ParamValue.exponential(10, 400.0)
+
+
+# ==================================================================================================
+#  ParamNotation.spell_value_canonically / is_valid_value
+# ==================================================================================================
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        (2.0**2.0, "4.0"),  # authored as 2^2.0: the decimal is shorter
+        (2.0**1.23, "2^1.23"),
+        (10.0**-5.0, "1e-05"),
+        (2.0**10.0, "1024.0"),  # tie in length: the decimal wins
+        (1.0, "1.0"),
+        (2.0**-20.0, "2^-20.0"),
+        (10.0**0.5, "10^0.5"),
+        (0.3, "0.3"),
+        (-4.0, "-4.0"),  # negative: only the decimal can spell it
+        (-0.0, "0.0"),
+    ],
+)
+def test_spell_value_canonically_picks_the_shortest_valid_spelling(value, expected):
+    """A valid value renders in its shortest spelling, and a tie in length goes to the decimal."""
+    assert ParamNotation.spell_value_canonically(value) == expected
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        0.1 + 0.2,  # 0.30000000000000004 needs 17 decimal digits, and no short exponent reproduces it
+        2.0**1.2345678901234,  # its exponent needs 14 digits
+        float("inf"),
+        float("nan"),
+    ],
+)
+def test_invalid_param_value_is_rejected(value):
+    """A value that no notation spells within `CANONICAL_DIGITS` digits is invalid and does not render."""
+    # --- act / assert -----------------
+    assert not ParamNotation.is_valid_value(value)
+    with pytest.raises(ValueError, match="not a valid parameter value"):
+        ParamNotation.spell_value_canonically(value)
+
+
+@pytest.mark.parametrize(
+    "notation, start, stop, step",
+    [
+        (ParamNotation.DECIMAL, -5.0, 5.0, 0.1),
+        (ParamNotation.POW2, -20.0, 20.0, 0.1),
+        (ParamNotation.POW10, -5.0, 5.0, 0.01),
+    ],
+)
+def test_every_built_value_renders_and_parses_back_to_itself(notation, start, stop, step):
+    """Every value that a `ParamAxis` builds is valid, and parsing its canonical spelling gives the same float."""
+    # --- arrange ----------------------
+    values = [param_value.value for param_value in ParamAxis("p1", start, stop, step, notation).values()]
+
+    # --- act --------------------------
+    canonical_spellings = [ParamNotation.spell_value_canonically(value) for value in values]
+
+    # --- assert -----------------------
+    assert [ParamValue.parse(token).value for token in canonical_spellings] == values
 
 
 # ==================================================================================================
