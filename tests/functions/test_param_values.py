@@ -10,34 +10,24 @@ from sunnbear.functions import ParamAxis, ParamNotation, deduplicate_param_tuple
     "notation, argument, expected",
     [
         (ParamNotation.DECIMAL, 0.4, 0.4),
-        (ParamNotation.DECIMAL, 1e-12, 1e-12),  # rounding keeps significant digits, so tiny values survive
+        (ParamNotation.DECIMAL, 1e-12, 1e-12),  # rounding is to significant digits, not decimal places
+        (ParamNotation.DECIMAL, 0.1 + 0.2, 0.3),  # 0.30000000000000004 rounds to the float of 0.3
         (ParamNotation.POW2, 1.2, 2.0**1.2),  # the same float as computing 2 ** 1.2 yourself
         (ParamNotation.POW10, -3.4, 10.0**-3.4),
-    ],
-)
-def test_build_value_from_argument(notation, argument, expected):
-    """A notation maps a continuous argument to a value: the argument itself, or a power of the base."""
-    assert notation.build_value_from_argument(argument) == expected
-
-
-@pytest.mark.parametrize(
-    "notation, noisy_argument, expected",
-    [
-        (ParamNotation.DECIMAL, 0.1 + 0.2, 0.3),  # 0.30000000000000004 rounds to the float of 0.3
         (ParamNotation.POW10, -3.4000000000000004, 10.0**-3.4),  # the exponent is rounded, not the value
     ],
 )
-def test_build_value_rounds_the_argument(notation, noisy_argument, expected):
-    """Rounding the argument to `CANONICAL_DIGITS` significant digits removes float error from grid arithmetic."""
-    assert notation.build_value_from_argument(noisy_argument) == expected
+def test_build_value_from_argument(notation, argument, expected):
+    """A notation rounds the argument to `CANONICAL_DIGITS` digits, then maps it to the argument or a power."""
+    assert notation.build_value_from_argument(argument) == expected
 
 
 @pytest.mark.parametrize("notation", list(ParamNotation))
-@pytest.mark.parametrize("bad", [float("inf"), float("-inf"), float("nan")])
-def test_build_value_rejects_non_finite_argument(notation, bad):
+@pytest.mark.parametrize("non_finite_argument", [float("inf"), float("-inf"), float("nan")])
+def test_build_value_rejects_non_finite_argument(notation, non_finite_argument):
     """Every notation rejects a non-finite argument."""
     with pytest.raises(ValueError, match="finite"):
-        notation.build_value_from_argument(bad)
+        notation.build_value_from_argument(non_finite_argument)
 
 
 def test_build_value_rejects_overflowing_power():
@@ -80,6 +70,7 @@ def test_parse_value(token, expected):
     ],
 )
 def test_parse_value_rejects_bad_tokens(token, match):
+    """A token with an unsupported base, a malformed number or a non-finite argument raises `ValueError`."""
     with pytest.raises(ValueError, match=match):
         ParamNotation.parse_value(token)
 
@@ -159,24 +150,14 @@ def test_dedup_buckets_are_centered_on_round_values():
     assert len(deduplicate_param_tuples([just_below, exact, just_above])) == 1
 
 
-def test_deduplicate_collapses_a_near_match():
-    """Values that differ only beyond `DEDUP_DIGITS` significant digits collapse, though they are unequal floats."""
+def test_deduplicate_keeps_the_first_of_each_group():
+    """Unequal floats that agree to `DEDUP_DIGITS` digits collapse, and the first one in input order is kept."""
     # --- arrange ----------------------
     exact = (4.0,)
     nearly = (ParamNotation.POW2.build_value_from_argument(2.00000000001),)  # 2^~2 -> 4.0000000000277
 
     # --- act / assert -----------------
     assert nearly != exact  # genuinely different floats
-    assert len(deduplicate_param_tuples([exact, nearly])) == 1
-
-
-def test_deduplicate_keeps_the_first_of_each_group():
-    """Which near-duplicate survives follows the input order: the first one is kept."""
-    # --- arrange ----------------------
-    exact = (4.0,)
-    nearly = (ParamNotation.POW2.build_value_from_argument(2.00000000001),)
-
-    # --- act / assert -----------------
     assert deduplicate_param_tuples([nearly, exact]) == (nearly,)
     assert deduplicate_param_tuples([exact, nearly]) == (exact,)
 

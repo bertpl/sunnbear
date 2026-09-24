@@ -1,11 +1,10 @@
-"""This module builds parameter values from notations, spells them canonically, parses them and deduplicates them.
+"""This module defines parameter notations and the operations on parameter values.
 
-A parameter value is a plain float, so two values are equal exactly when their floats are equal,
-however each was authored.
+A parameter value is a plain float.
 
-**A notation maps a continuous argument to a value.** A grid sweeps the argument, and rounding to
-`CANONICAL_DIGITS` significant digits applies to the argument: the value itself for `DECIMAL`, the
-exponent for `POW2`/`POW10`.
+**A notation maps a continuous argument to a value.** The argument is the value itself for
+`DECIMAL` and the exponent for `POW2`/`POW10`. A grid sweeps the argument, and building a value
+rounds the argument to `CANONICAL_DIGITS` significant digits.
 
 A power notation's value then follows from its rounded exponent by plain exponentiation and is not
 rounded itself, so a value authored as ``2^1.23`` is exactly ``2 ** 1.23``, and a reader who
@@ -17,7 +16,8 @@ canonical spelling (see `ParamNotation`), which depends on the float alone: ``2^
 
 Collapsing values that agree to `DEDUP_DIGITS` significant digits but are different floats is
 a separate pass, `deduplicate_param_tuples`, not part of equality: a tolerance in equality would
-make values equal whose canonical spellings differ.
+make 2 values equal even though their canonical spellings differ, so equal ids could render as
+different strings.
 """
 
 from collections.abc import Iterable
@@ -46,27 +46,6 @@ CANONICAL_DIGITS = 12
 DEDUP_DIGITS = CANONICAL_DIGITS - 2
 
 
-def _round_significant(x: float, digits: int) -> float:
-    """Round a float to `digits` significant digits.
-
-    Rounds to *nearest* (``format`` half-even semantics), so when used as a
-    bucketing key the buckets are **centered on** round values, with boundaries
-    at the midpoints between representable `digits`-digit numbers — ``4.0``'s
-    bucket spans roughly ``4.0 ± 0.5`` units in the last kept digit. Round
-    numbers are therefore bucket centers, never boundaries: a canonical value
-    like ``2^2.0 == 4.0`` and anything within half a bucket of it share a key.
-    Two *noisy* values can still straddle a midpoint boundary and land in
-    different buckets — that is the residual straddle case documented at
-    `deduplicate_param_tuples`.
-    """
-    return float(f"{x:.{digits}g}")
-
-
-def _canonical(x: float) -> float:
-    """Snap an argument to the framework's canonical precision."""
-    return _round_significant(x, CANONICAL_DIGITS)
-
-
 # ==================================================================================================
 #  ParamNotation
 # ==================================================================================================
@@ -79,8 +58,10 @@ class ParamNotation(StrEnum):
 
     Every value that sunnbear builds meets the rule, because both of its ways to build a value —
     `build_value_from_argument` for a recipe grid and `parse_value` for a spelling — round the
-    argument to `CANONICAL_DIGITS` significant digits. A float written directly, such as
-    ``0.1 + 0.2``, is not checked until it is spelled; `is_valid_value` checks it up front.
+    argument to `CANONICAL_DIGITS` significant digits.
+
+    A float passed directly to `FunctionId`, such as ``0.1 + 0.2``, is not checked until the id is
+    rendered; `is_valid_value` checks it up front.
 
     **Canonical spelling.** `spell_value_canonically` spells a valid value in every notation that
     can spell it under the validity rule and returns the shortest spelling, so the spelling depends
@@ -88,10 +69,12 @@ class ParamNotation(StrEnum):
 
     A tie in length goes to the notation declared first below.
 
-    Exponent spellings depend on the platform's ``pow``, which is not guaranteed to be correctly
+    Power spellings depend on the platform's ``pow``, which is not guaranteed to be correctly
     rounded: ``2^1.23`` can parse to a float that differs in the last bit on another platform, so one
-    id string can stand for slightly different floats on 2 platforms. The test functions' own results
-    already differ in the last bit across platforms, so this adds no new source of difference.
+    id string can stand for slightly different floats on 2 platforms.
+
+    The test functions' own results already differ in the last bit across platforms, so the
+    platform's ``pow`` adds no new source of difference.
     """
 
     DECIMAL = "decimal"  # value = argument
@@ -104,15 +87,15 @@ class ParamNotation(StrEnum):
     def build_value_from_argument(self, argument: float) -> float:
         """Return the value of `argument` in this notation, after rounding `argument` to `CANONICAL_DIGITS` digits.
 
-        A non-finite argument is rejected, because a NaN would quietly break equality, hashing and
-        deduplication.
+        The rounding is to significant digits. A non-finite argument is rejected, because a NaN would
+        quietly break equality, hashing and deduplication.
 
         Raises:
             ValueError: If `argument` is not finite, or ``base ** argument`` overflows to a non-finite value.
         """
         if not isfinite(argument):
             raise ValueError(f"A parameter value's argument must be finite (got {argument!r}).")
-        return self._value_from_rounded_argument(_canonical(argument))
+        return self._build_value_from_rounded_argument(_round_argument(argument))
 
     @classmethod
     def parse_value(cls, token: str) -> float:
@@ -123,8 +106,9 @@ class ParamNotation(StrEnum):
         exactly that value.
 
         Raises:
-            ValueError: If the token uses an exponent base other than 2 or 10, is malformed, or
-                gives a non-finite value; the message names the token.
+            ValueError: If the token uses an exponent base other than 2 or 10, is malformed, or gives a
+                non-finite value; for an unsupported base or a malformed token, the message names the
+                token.
         """
         if "^" in token:
             base_text, _, argument_text = token.partition("^")
@@ -190,16 +174,16 @@ class ParamNotation(StrEnum):
                 argument = log10(value)
             case _:
                 assert_never(self)
-        argument = _canonical(argument)
-        if self._value_from_rounded_argument(argument) == value:
-            return self._spelling_from_rounded_argument(argument)
+        argument = _round_argument(argument)
+        if self._build_value_from_rounded_argument(argument) == value:
+            return self._spell_rounded_argument(argument)
         else:
             return None
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
-    def _value_from_rounded_argument(self, argument: float) -> float:
+    def _build_value_from_rounded_argument(self, argument: float) -> float:
         """Return the value of an already rounded `argument`: the argument itself, or a power of the base.
 
         Raises:
@@ -216,7 +200,7 @@ class ParamNotation(StrEnum):
             case _:
                 assert_never(self)
 
-    def _spelling_from_rounded_argument(self, argument: float) -> str:
+    def _spell_rounded_argument(self, argument: float) -> str:
         """Write an already rounded `argument` in this notation, e.g. ``0.4`` or ``2^1.2``."""
         match self:
             case ParamNotation.DECIMAL:
@@ -242,18 +226,18 @@ def deduplicate_param_tuples(
 
     The one collapse this level performs: two tuples count as duplicates iff
     they could plausibly be the same exact-math values seen through different
-    notations, showing up as different floats only through float arithmetic —
-    ``10^0.5`` from a POW10 axis and ``3.16227766017`` from a DECIMAL axis,
-    which exact float equality leaves as two.
+    notations, showing up as different floats only because of float rounding
+    error — ``10^0.5`` from a POW10 axis and ``3.16227766017`` from a DECIMAL
+    axis, which exact float equality leaves as two.
 
     Tuples whose floats are exactly equal, such as ``4.0`` and ``2^2.0``, are
-    already one value; they collapse here too. The default `digits` sits 2
-    digits below `CANONICAL_DIGITS`; the comment at `DEDUP_DIGITS` explains
-    why that margin suffices.
+    already one value; they collapse here too. The default `digits` is 2 less
+    than `CANONICAL_DIGITS`; the comment at `DEDUP_DIGITS` explains why that
+    margin suffices.
 
-    A filter, not an equality, and deliberately so: the granularity is a
-    parameter, and **the first tuple of each group survives**, so which one is
-    kept follows the input order.
+    Deduplication is a filter, not an equality, because the granularity is a
+    parameter; which tuple of a group is kept follows the input order.
+
     Grouping is by rounded key, not pairwise distance, so the partition is
     deterministic and the pass is linear. The cost is that a pair of *noisy*
     values straddling a bucket boundary survives as two tuples — buckets are
@@ -277,3 +261,27 @@ def deduplicate_param_tuples(
         seen.add(key)
         kept.append(param_values)
     return tuple(kept)
+
+
+# ==================================================================================================
+#  Helpers
+# ==================================================================================================
+def _round_significant(x: float, digits: int) -> float:
+    """Round a float to `digits` significant digits.
+
+    Rounds to *nearest* (``format`` half-even semantics), so when used as a
+    bucketing key the buckets are **centered on** round values, with boundaries
+    at the midpoints between representable `digits`-digit numbers — ``4.0``'s
+    bucket spans roughly ``4.0 ± 0.5`` units in the last kept digit. Round
+    numbers are therefore bucket centers, never boundaries: a canonical value
+    like ``2^2.0 == 4.0`` and anything within half a bucket of it share a key.
+    Two *noisy* values can still straddle a midpoint boundary and land in
+    different buckets — that is the residual straddle case documented at
+    `deduplicate_param_tuples`.
+    """
+    return float(f"{x:.{digits}g}")
+
+
+def _round_argument(x: float) -> float:
+    """Round an argument to `CANONICAL_DIGITS` significant digits."""
+    return _round_significant(x, CANONICAL_DIGITS)

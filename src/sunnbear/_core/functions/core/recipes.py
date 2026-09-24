@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from math import lcm
 
-from .param_values import CANONICAL_DIGITS, ParamNotation, _canonical
+from .param_values import CANONICAL_DIGITS, ParamNotation, _round_argument
 
 # A grid endpoint or step may drift from an integer ratio by this much (relative) and still
 # count as aligned — the same float slack the round() in ParamAxis.values() already tolerates.
@@ -94,9 +94,9 @@ class ParamAxis:
         if self.stop < self.start:
             raise ValueError(f"ParamAxis stop must be >= start (got {self.start}..{self.stop}).")
         if self.start != self.stop:
-            step_places = _decimal_places(_canonical(self.step))
+            step_places = _decimal_places(_round_argument(self.step))
             for name, endpoint in (("start", self.start), ("stop", self.stop)):
-                if _decimal_places(_canonical(endpoint)) > step_places:
+                if _decimal_places(_round_argument(endpoint)) > step_places:
                     raise ValueError(
                         f"ParamAxis {name}={endpoint} has more decimal places than step={self.step}; "
                         "grid values would display more precision than the step implies."
@@ -111,7 +111,7 @@ class ParamAxis:
     def values(self) -> tuple[float, ...]:
         """Materialize the axis's argument grid through this axis's notation.
 
-        The accumulated float error in ``start + i * step`` is absorbed by
+        The accumulated float error in ``start + i * step`` is removed by
         `ParamNotation.build_value_from_argument`, which rounds the argument to
         `CANONICAL_DIGITS` significant digits — so no separate grid rounding is
         needed here, and the grid is never empty (``stop >= start`` with

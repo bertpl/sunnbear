@@ -217,7 +217,7 @@ def test_recipe_coupled_sweep_coinciding_boundaries_step_together():
 
 
 def test_recipe_mixed_notations_survive_tuple_assembly():
-    """Each axis's notation still determines its values in the assembled tuples: the POW2 axis gives powers of 2."""
+    """Each axis's notation determines its values in the assembled tuples: the POW2 axis gives powers of 2."""
     # --- arrange ----------------------
     recipe = ParamRecipe(
         axes=(ParamAxis("p1", 0.0, 1.0, 1.0), ParamAxis("p2", 0.0, 1.0, 1.0, ParamNotation.POW2)),
@@ -271,6 +271,6 @@ def test_recipe_single_axis_convenience():
 
     # --- assert -----------------------
     assert recipe.param_names() == ("p1",)
-    # values are canonicalized to 12 significant digits, so compare at that resolution
+    # arguments are rounded to 12 significant digits, so compare at that resolution
     assert [p[0] for p in tuples] == pytest.approx([1.0, 2**0.5, 2.0], rel=1e-9)
     assert [ParamNotation.spell_value_canonically(p[0]) for p in tuples] == ["1.0", "2^0.5", "2.0"]

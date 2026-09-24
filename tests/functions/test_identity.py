@@ -59,7 +59,7 @@ def test_function_id_needs_one_name_per_value():
 
 
 def test_function_id_equality_is_exact():
-    """Floats that differ in the last bits are different ids; collapsing near-matches happens earlier."""
+    """Ids whose values differ only in the last bits are not equal; deduplication collapses them before ids exist."""
     # --- arrange ----------------------
     exact = FunctionId((2, 1, 1), ("p1",), (4.0,))
     nearly = FunctionId((2, 1, 1), ("p1",), (ParamNotation.POW2.build_value_from_argument(2.00000000001),))

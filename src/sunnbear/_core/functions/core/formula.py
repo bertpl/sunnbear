@@ -199,16 +199,16 @@ class Formula(FormulaTaxonomyNode, ABC):
     def build_all_candidates(self, digits: int = DEDUP_DIGITS) -> "tuple[CandidateTestFunction, ...]":
         """Build every candidate this formula defines: recipe tuples, filtered and deduplicated.
 
-        Candidates come back in first-seen recipe order, and **among near-duplicates
-        the first recipe in `recipes` order wins**. The tuples go through 3 passes, and each item
-        below states why it runs at that point in the order:
+        Candidates come back in the order the recipes generate their tuples, and **among
+        near-duplicates the tuple from the earliest recipe in `recipes` is kept**. The tuples go
+        through 3 passes, in this order:
 
         1. **Validity.** Tuples the formula rejects are dropped first, so a
            rejected tuple can never displace a valid near-twin by arriving ahead
            of it in the next pass.
         2. **Near-duplicate removal** at `digits` significant digits
            (`deduplicate_param_tuples`), which collapses values that differ
-           only by float arithmetic. This happens on the parameter tuples, before identities
+           only because of float rounding error. This happens on the parameter tuples, before identities
            exist: the formula number is the same for every tuple here, so it
            carries no information for the collapse.
         3. **Construction** (identities included), so the per-candidate work is
