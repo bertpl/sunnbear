@@ -10,8 +10,9 @@ untouched.
 exponent and evaluated as ``2 ** 1.23``, not as a rounded stand-in — so the
 number sunnbear computes with is exactly the one its notation advertises, and a
 reader reproducing it from a paper or a suite file arrives at the same float.
-There is a single rendering, notation-carrying and parsed back losslessly by
-`ParamValue.parse`.
+`ParamValue.display` renders a value in its authored notation, and `ParamValue.parse`
+reads that rendering back losslessly; `ParamNotation.render_canonical_value` gives the
+canonical spelling, which does not keep the notation.
 
 Equality and hashing are therefore **exact and notation-sensitive**: ``2^2.0``
 and ``4.0`` are distinct values that happen to coincide numerically. Collapsing
@@ -74,15 +75,18 @@ def _canonical(x: float) -> float:
 #  ParamNotation
 # ==================================================================================================
 class ParamNotation(StrEnum):
-    """The supported notations; each maps a continuous argument to a parameter value.
+    """Each supported notation maps a continuous argument to a parameter value.
 
-    **Validity rule.** A float is a valid parameter value only if at least one notation spells it
-    exactly with an argument of `CANONICAL_DIGITS` significant digits or fewer. Every value that
-    sunnbear builds meets the rule, because building a value rounds its argument to that precision.
+    **Validity rule.** A float is a valid parameter value only if at least one notation spells it —
+    writes it as text such as ``0.3`` or ``2^1.23`` that parses back to exactly that float — with an
+    argument of `CANONICAL_DIGITS` significant digits or fewer. Every value that sunnbear builds
+    meets the rule, because building a value rounds its argument to that precision.
 
-    **Canonical rendering.** `render_param_value` spells a valid value in the shortest notation
-    that meets the rule, so the rendering depends on the float alone, not on how it was authored:
-    ``2^2.0`` and ``4.0`` both render as ``4.0``. Ties go to the notation declared first below.
+    **Canonical rendering.** `render_canonical_value` spells a valid value in every notation that
+    meets the rule and returns the shortest spelling, so the rendering depends on the float alone,
+    not on how it was authored: ``2^2.0`` and ``4.0`` both render as ``4.0``. A tie in length goes
+    to the notation declared first below. `ParamValue.display` is different: it keeps the notation
+    that a value was authored in.
     """
 
     DECIMAL = "decimal"  # value = argument
@@ -102,42 +106,49 @@ class ParamNotation(StrEnum):
     #  Canonical rendering
     # --------------------------------------------------------------------------
     @classmethod
-    def render_param_value(cls, value: float) -> str:
-        """Return the canonical spelling of `value`: the shortest valid one, ties to the earliest notation.
+    def render_canonical_value(cls, value: float) -> str:
+        """Return the canonical spelling of `value`: its shortest valid spelling.
 
-        ``-0.0`` renders as ``0.0``, since the two are equal floats.
+        A tie in length goes to the notation declared first. ``-0.0`` renders as ``0.0``, since the two
+        are equal floats.
 
         Raises:
-            ValueError: If `value` is not a valid parameter value (see the class docstring).
+            ValueError: If no notation spells `value` exactly with an argument of `CANONICAL_DIGITS`
+                significant digits or fewer.
         """
-        spellings = [spelling for notation in cls if (spelling := notation.spell_param_value(value)) is not None]
+        spellings = [spelling for notation in cls if (spelling := notation.spell_value(value)) is not None]
         if not spellings:
             raise ValueError(
                 f"{value!r} is not a valid parameter value: no notation spells it exactly with an argument "
                 f"of {CANONICAL_DIGITS} significant digits or fewer."
             )
-        return min(spellings, key=len)  # min keeps the first of equal lengths: declaration order
+        # min returns the first of several equal-length spellings, and the list follows declaration order
+        return min(spellings, key=len)
 
     @classmethod
-    def is_valid_param_value(cls, value: float) -> bool:
-        """Return whether `value` meets the validity rule (see the class docstring)."""
-        return any(notation.spell_param_value(value) is not None for notation in cls)
+    def is_valid_value(cls, value: float) -> bool:
+        """Return whether `value` is a valid parameter value.
 
-    def spell_param_value(self, value: float) -> str | None:
+        A value is valid if some notation spells it exactly with an argument of `CANONICAL_DIGITS`
+        significant digits or fewer.
+        """
+        return any(notation.spell_value(value) is not None for notation in cls)
+
+    def spell_value(self, value: float) -> str | None:
         """Return this notation's spelling of `value`, or None if it cannot spell `value` under the validity rule."""
-        value = value + 0.0  # turns -0.0 into 0.0, so the two equal floats spell alike
+        value = value + 0.0  # adding 0.0 turns -0.0 into 0.0, so the two equal floats spell alike
         if not isfinite(value):
             return None
         elif self is ParamNotation.DECIMAL:
-            return repr(value) if _canonical(value) == value else None
+            argument = value
         elif value <= 0.0:
             return None  # a power of 2 or 10 is positive
         else:
-            base, log_base = (2, log2) if self is ParamNotation.POW2 else (10, log10)
-            # recover the exponent that a valid value was built from; the exact check rejects the
-            # value if the recovered exponent does not reproduce it
-            exponent = _canonical(log_base(value))
-            return f"{base}^{exponent!r}" if float(base) ** exponent == value else None
+            # recover the exponent of a valid value; the comparison below rejects the value if the
+            # recovered exponent, once rounded, does not reproduce it
+            argument = (log2 if self is ParamNotation.POW2 else log10)(value)
+        candidate = self.build_param_value(argument)  # rounds the argument, as building any value does
+        return candidate.display() if candidate.value == value else None
 
 
 # ==================================================================================================
