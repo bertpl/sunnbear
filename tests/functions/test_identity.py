@@ -1,6 +1,6 @@
 import pytest
 
-from sunnbear.functions import FunctionId, ParamValue
+from sunnbear.functions import FunctionId, ParamNotation
 
 # These rendered identities exercise the parser on names, signs, and exponent notation.
 _RENDERED_IDS = [
@@ -21,53 +21,65 @@ _RENDERED_IDS = [
 @pytest.mark.parametrize(
     "fid, expected",
     [
-        (
-            FunctionId((2, 1, 5), ("p1", "p2"), (ParamValue.exponential(2, 1.2), ParamValue.decimal(0.4))),
-            "f2.1.5[p1=2^1.2,p2=0.4]",
-        ),
+        (FunctionId((2, 1, 5), ("p1", "p2"), (2.0**1.2, 0.4)), "f2.1.5[p1=2^1.2,p2=0.4]"),
         (FunctionId((7, 1), (), ()), "f7.1"),  # no parameters: the number alone, without brackets
     ],
 )
 def test_function_id_display_includes_each_parameter_name(fid, expected):
-    """Each value renders as ``name=value`` in its authored notation, in `param_names` order."""
+    """Each value renders as ``name=value`` in its canonical spelling, in `param_names` order."""
     assert fid.display() == expected
 
 
-def test_function_id_rendering_is_faithful():
-    """One rendering, carrying the authored notation, so a published identity reproduces exactly."""
+def test_function_id_renders_one_number_alike_however_it_was_authored():
+    """``2^2.0`` and ``4.0`` are one float, so their ids are equal and render the same string."""
     # --- arrange ----------------------
-    as_decimal = FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(4.0),))
-    as_pow2 = FunctionId((2, 1, 1), ("p1",), (ParamValue.exponential(2, 2.0),))
+    from_decimal = FunctionId((2, 1, 1), ("p1",), (ParamNotation.DECIMAL.build_value_from_argument(4.0),))
+    from_pow2 = FunctionId((2, 1, 1), ("p1",), (ParamNotation.POW2.build_value_from_argument(2.0),))
 
     # --- act / assert -----------------
-    assert str(as_decimal) == "f2.1.1[p1=4.0]"
-    assert str(as_pow2) == "f2.1.1[p1=2^2.0]"  # not flattened to the decimal spelling
-    assert repr(as_pow2) == str(as_pow2) == as_pow2.display()
+    assert from_decimal == from_pow2
+    assert len({from_decimal, from_pow2}) == 1
+    assert str(from_decimal) == str(from_pow2) == repr(from_pow2) == from_pow2.display() == "f2.1.1[p1=4.0]"
+
+
+def test_function_id_parses_an_authored_spelling_to_the_canonical_id():
+    """A non-canonical spelling parses to an equal id, which renders canonically."""
+    # --- act --------------------------
+    parsed = FunctionId.from_string("f2.1.1[p1=2^2.0]")
+
+    # --- assert -----------------------
+    assert parsed == FunctionId.from_string("f2.1.1[p1=4.0]")
+    assert str(parsed) == "f2.1.1[p1=4.0]"
 
 
 def test_function_id_needs_one_name_per_value():
     """A `FunctionId` with more values than names is rejected."""
     with pytest.raises(ValueError, match="1 parameter name"):
-        FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.2), ParamValue.decimal(0.4)))
+        FunctionId((2, 1, 1), ("p1",), (0.2, 0.4))
 
 
 def test_function_id_equality_is_exact():
-    """Equality stays a real equivalence over exact values; collapsing near-matches happens earlier."""
+    """Ids whose values differ only in the last bits are not equal; deduplication collapses them before ids exist."""
     # --- arrange ----------------------
-    as_decimal = FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(4.0),))
-    as_pow2 = FunctionId((2, 1, 1), ("p1",), (ParamValue.exponential(2, 2.0),))
+    exact = FunctionId((2, 1, 1), ("p1",), (4.0,))
+    nearly = FunctionId((2, 1, 1), ("p1",), (ParamNotation.POW2.build_value_from_argument(2.00000000001),))
 
     # --- act / assert -----------------
-    assert as_decimal != as_pow2  # same number, different notation: two identities
-    assert len({as_decimal, as_pow2}) == 2
-    assert as_decimal == FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(4.0),))  # and reflexive on equal spellings
+    assert exact != nearly
+    assert len({exact, nearly}) == 2
+
+
+def test_function_id_with_an_invalid_value_does_not_render():
+    """A value that no notation spells with an argument of at most `CANONICAL_DIGITS` digits cannot be rendered."""
+    with pytest.raises(ValueError, match="not a valid parameter value"):
+        str(FunctionId((2, 1, 1), ("p1",), (0.1 + 0.2,)))
 
 
 def test_function_id_equality_includes_param_names():
     """Renaming a parameter changes the identity, even when the values are equal."""
     # --- arrange ----------------------
-    named_p1 = FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(4.0),))
-    named_slope = FunctionId((2, 1, 1), ("slope",), (ParamValue.decimal(4.0),))
+    named_p1 = FunctionId((2, 1, 1), ("p1",), (4.0,))
+    named_slope = FunctionId((2, 1, 1), ("slope",), (4.0,))
 
     # --- act / assert -----------------
     assert named_p1 != named_slope
@@ -75,7 +87,7 @@ def test_function_id_equality_includes_param_names():
 
 def test_function_id_equality_with_unrelated_type():
     """A `FunctionId` never equals its rendered string."""
-    assert FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(1.0),)) != "f2.1.1[p1=1.0]"
+    assert FunctionId((2, 1, 1), ("p1",), (1.0,)) != "f2.1.1[p1=1.0]"
 
 
 @pytest.mark.parametrize("text", _RENDERED_IDS)
@@ -93,9 +105,9 @@ def test_function_id_ordering():
     """Ids sort by formula number, then by parameter values."""
     # --- arrange ----------------------
     ids = [
-        FunctionId((2, 1, 2), ("p1",), (ParamValue.decimal(1.0),)),
-        FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.4),)),
-        FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.2),)),
+        FunctionId((2, 1, 2), ("p1",), (1.0,)),
+        FunctionId((2, 1, 1), ("p1",), (0.4,)),
+        FunctionId((2, 1, 1), ("p1",), (0.2,)),
     ]
 
     # --- act --------------------------

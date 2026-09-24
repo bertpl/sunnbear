@@ -21,9 +21,9 @@ written as one more recipe rather than as a richer axis. Every recipe's axis
 names must match the formula's declared `param_names`, which is what fixes the
 meaning of tuple position (`Formula._validate_recipes`).
 
-Whatever the grid produces is canonicalized on `ParamValue` construction — the
-argument of the axis's notation — so values print short, stay human-screenable,
-and reproduce exactly.
+When an axis's notation builds each grid value (`ParamNotation.build_value_from_argument`),
+it rounds the notation's argument to `CANONICAL_DIGITS` significant digits, so values print
+short, are easy for a person to scan, and reproduce exactly.
 """
 
 import itertools
@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from math import lcm
 
-from .param_values import CANONICAL_DIGITS, ParamNotation, ParamValue, _canonical
+from .param_values import CANONICAL_DIGITS, ParamNotation, _round_argument
 
 # A grid endpoint or step may drift from an integer ratio by this much (relative) and still
 # count as aligned — the same float slack the round() in ParamAxis.values() already tolerates.
@@ -46,7 +46,7 @@ def _decimal_places(x: float) -> int:
     """Count the decimal places in `x`'s shortest round-trip form (0 for an integer).
 
     Uses the float's `repr` — the shortest string that round-trips — so it
-    matches exactly what a `ParamValue` displays, rather than the full binary
+    matches exactly how a spelling writes the argument, not the full binary
     expansion (`0.1` reads as one place, not seventeen).
     """
     exponent = Decimal(repr(x)).normalize().as_tuple().exponent
@@ -78,7 +78,7 @@ class ParamAxis:
 
         Alignment, both forgiving float noise in the inputs — the multiple-of-step
         check within `_ALIGNMENT_TOL`, the decimal-places check by judging the
-        canonicalized form of each quantity (what a `ParamValue` will display),
+        rounded form of each quantity (the argument as a spelling writes it, e.g. the ``1.2`` of ``2^1.2``),
         not the raw float:
 
         - `start` and `stop` carry no more decimal places than `step`, so no grid
@@ -94,9 +94,9 @@ class ParamAxis:
         if self.stop < self.start:
             raise ValueError(f"ParamAxis stop must be >= start (got {self.start}..{self.stop}).")
         if self.start != self.stop:
-            step_places = _decimal_places(_canonical(self.step))
+            step_places = _decimal_places(_round_argument(self.step))
             for name, endpoint in (("start", self.start), ("stop", self.stop)):
-                if _decimal_places(_canonical(endpoint)) > step_places:
+                if _decimal_places(_round_argument(endpoint)) > step_places:
                     raise ValueError(
                         f"ParamAxis {name}={endpoint} has more decimal places than step={self.step}; "
                         "grid values would display more precision than the step implies."
@@ -108,18 +108,18 @@ class ParamAxis:
                 f"(got start={self.start}, stop={self.stop}, step={self.step}); the grid would not land on stop."
             )
 
-    def values(self) -> tuple[ParamValue, ...]:
+    def values(self) -> tuple[float, ...]:
         """Materialize the axis's argument grid through this axis's notation.
 
-        The accumulated float error in ``start + i * step`` is absorbed by
-        `ParamValue` construction, which canonicalizes the argument to
+        The accumulated float error in ``start + i * step`` is removed by
+        `ParamNotation.build_value_from_argument`, which rounds the argument to
         `CANONICAL_DIGITS` significant digits — so no separate grid rounding is
         needed here, and the grid is never empty (``stop >= start`` with
         ``step > 0`` gives at least one point, which the coupled sweep relies
         on).
         """
         n_points = round((self.stop - self.start) / self.step) + 1
-        return tuple(self.notation.build_param_value(self.start + i * self.step) for i in range(n_points))
+        return tuple(self.notation.build_value_from_argument(self.start + i * self.step) for i in range(n_points))
 
 
 # ==================================================================================================
@@ -145,7 +145,7 @@ class ParamRecipe:
     #  Coupled sweep
     # --------------------------------------------------------------------------
     @staticmethod
-    def _coupled_param_sweep(per_axis: list[tuple[ParamValue, ...]]) -> Iterator[tuple[ParamValue, ...]]:
+    def _coupled_param_sweep(per_axis: list[tuple[float, ...]]) -> Iterator[tuple[float, ...]]:
         """Advance every axis together along one shared position, whatever their lengths.
 
         Think of each axis as occupying the interval ``[0, 1]``, divided into
@@ -204,7 +204,7 @@ class ParamRecipe:
                 indices[axis] += 1
             yield tuple(values[index] for values, index in zip(per_axis, indices, strict=True))
 
-    def tuples(self) -> Iterator[tuple[ParamValue, ...]]:
+    def tuples(self) -> Iterator[tuple[float, ...]]:
         """Materialize the recipe's parameter tuples."""
         per_axis = [axis.values() for axis in self.axes]
         if self.product:

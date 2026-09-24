@@ -22,7 +22,7 @@ from typing import ClassVar
 import numba
 
 from .identity import FunctionId
-from .param_values import DEDUP_DIGITS, ParamValue, deduplicate_param_tuples
+from .param_values import DEDUP_DIGITS, deduplicate_param_tuples
 from .recipes import ParamRecipe
 from .registry import FormulaRegistry
 from .taxonomy import FormulaTaxonomyNode
@@ -100,7 +100,11 @@ class Formula(FormulaTaxonomyNode, ABC):
 
     @abstractmethod
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the grid recipes that materialize candidate parameter tuples."""
+        """Return the grid recipes that materialize candidate parameter tuples.
+
+        The order matters where recipes overlap: among near-duplicate tuples, the one from the
+        first recipe is kept (see `build_all_candidates`).
+        """
 
     def is_param_tuple_valid(self, *params: float) -> bool:
         """Accept or reject a parameter tuple up front (default: accept all).
@@ -156,19 +160,16 @@ class Formula(FormulaTaxonomyNode, ABC):
             cls._compiled_formula_cache = numba.njit(fn) if cls.jit else fn
         return cls._compiled_formula_cache
 
-    def build_candidate(self, param_values: "tuple[ParamValue, ...]") -> CandidateTestFunction:
+    def build_candidate(self, param_values: "tuple[float, ...]") -> CandidateTestFunction:
         """Build one candidate test function for a bound parameter tuple.
 
         The candidate carries this formula and its identity rather than a
         pre-bound callable: both callable forms are derived on demand
         (`bind_xc_fun` / `bind_x_fun`), so binding ``c`` costs one closure over
-        the compiled body instead of a wrapper around a wrapper. Formula
-        implementations never construct a `CandidateTestFunction` themselves,
-        never touch numba, and their non-static hooks receive plain floats
-        (`ParamValue` unwrapping is handled here).
+        the compiled body instead of a wrapper around a wrapper.
         """
         fid = FunctionId(self.number, self.param_names, tuple(param_values))
-        a, b = self.interval_bounds(*fid.param_float_values)
+        a, b = self.interval_bounds(*fid.param_values)
         return CandidateTestFunction(id=fid, formula=self, a=a, b=b)
 
     def bind_xc_fun(self, values: "tuple[float, ...]") -> XCFun:
@@ -198,17 +199,16 @@ class Formula(FormulaTaxonomyNode, ABC):
     def build_all_candidates(self, digits: int = DEDUP_DIGITS) -> "tuple[CandidateTestFunction, ...]":
         """Build every candidate this formula defines: recipe tuples, filtered and deduplicated.
 
-        Candidates come back in first-seen recipe order. Three passes, and the
-        order between them is load-bearing:
+        Candidates come back in the order the recipes generate their tuples, and **among
+        near-duplicates the tuple from the earliest recipe in `recipes` is kept**. The tuples go
+        through 3 passes, in this order:
 
         1. **Validity.** Tuples the formula rejects are dropped first, so a
            rejected tuple can never displace a valid near-twin by arriving ahead
            of it in the next pass.
         2. **Near-duplicate removal** at `digits` significant digits
-           (`deduplicate_param_tuples`), which is what collapses the same value
-           reached through different notations — a DECIMAL axis hitting ``4.0``
-           and a POW2 axis hitting ``2^2.0`` are distinct values but one
-           function. This happens on the parameter tuples, before identities
+           (`deduplicate_param_tuples`), which collapses values that differ
+           only because of float rounding error. This happens on the parameter tuples, before identities
            exist: the formula number is the same for every tuple here, so it
            carries no information for the collapse.
         3. **Construction** (identities included), so the per-candidate work is
@@ -232,9 +232,7 @@ class Formula(FormulaTaxonomyNode, ABC):
         self._validate_param_name_consistency()
 
         param_tuples = (p for recipe in recipes for p in recipe.tuples()) if recipes else iter([()])
-        valid_tuples = (
-            param_values for param_values in param_tuples if self.is_param_tuple_valid(*(p.value for p in param_values))
-        )
+        valid_tuples = (param_values for param_values in param_tuples if self.is_param_tuple_valid(*param_values))
         candidates = [
             self.build_candidate(param_values) for param_values in deduplicate_param_tuples(valid_tuples, digits)
         ]

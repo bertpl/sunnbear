@@ -136,7 +136,7 @@ class FormulaRegistry:
                 f"Parameter names {list(fid.param_names)} do not match the parameters {list(formula.param_names)} "
                 f"of formula {formula.name} (id: {fid})."
             )
-        if not formula.is_param_tuple_valid(*fid.param_float_values):
+        if not formula.is_param_tuple_valid(*fid.param_values):
             raise InvalidParamsError(f"Parameter values are invalid for formula {formula.name} (id: {fid}).")
         return formula.build_candidate(fid.param_values)
 
