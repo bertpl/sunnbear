@@ -21,9 +21,9 @@ written as one more recipe rather than as a richer axis. Every recipe's axis
 names must match the formula's declared `param_names`, which is what fixes the
 meaning of tuple position (`Formula._validate_recipes`).
 
-Whatever the grid produces is rounded to `CANONICAL_DIGITS` when the axis's notation
-builds each value (`ParamNotation.build_value`) — the argument of the notation — so
-values print short, stay human-screenable, and reproduce exactly.
+When an axis's notation builds each grid value (`ParamNotation.build_value_from_argument`),
+it rounds the notation's argument to `CANONICAL_DIGITS` significant digits, so values print
+short, are easy for a person to scan, and reproduce exactly.
 """
 
 import itertools
@@ -46,7 +46,7 @@ def _decimal_places(x: float) -> int:
     """Count the decimal places in `x`'s shortest round-trip form (0 for an integer).
 
     Uses the float's `repr` — the shortest string that round-trips — so it
-    matches exactly a value's decimal spelling, rather than the full binary
+    matches exactly how a spelling writes the argument, not the full binary
     expansion (`0.1` reads as one place, not seventeen).
     """
     exponent = Decimal(repr(x)).normalize().as_tuple().exponent
@@ -78,7 +78,7 @@ class ParamAxis:
 
         Alignment, both forgiving float noise in the inputs — the multiple-of-step
         check within `_ALIGNMENT_TOL`, the decimal-places check by judging the
-        rounded form of each quantity (what the value's decimal spelling will show),
+        rounded form of each quantity (the argument as a spelling writes it, e.g. the ``1.2`` of ``2^1.2``),
         not the raw float:
 
         - `start` and `stop` carry no more decimal places than `step`, so no grid
@@ -112,14 +112,14 @@ class ParamAxis:
         """Materialize the axis's argument grid through this axis's notation.
 
         The accumulated float error in ``start + i * step`` is absorbed by
-        `ParamNotation.build_value`, which rounds the argument to
+        `ParamNotation.build_value_from_argument`, which rounds the argument to
         `CANONICAL_DIGITS` significant digits — so no separate grid rounding is
         needed here, and the grid is never empty (``stop >= start`` with
         ``step > 0`` gives at least one point, which the coupled sweep relies
         on).
         """
         n_points = round((self.stop - self.start) / self.step) + 1
-        return tuple(self.notation.build_value(self.start + i * self.step) for i in range(n_points))
+        return tuple(self.notation.build_value_from_argument(self.start + i * self.step) for i in range(n_points))
 
 
 # ==================================================================================================

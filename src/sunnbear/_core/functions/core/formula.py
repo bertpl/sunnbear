@@ -166,9 +166,7 @@ class Formula(FormulaTaxonomyNode, ABC):
         The candidate carries this formula and its identity rather than a
         pre-bound callable: both callable forms are derived on demand
         (`bind_xc_fun` / `bind_x_fun`), so binding ``c`` costs one closure over
-        the compiled body instead of a wrapper around a wrapper. Formula
-        implementations never construct a `CandidateTestFunction` themselves
-        and never touch numba.
+        the compiled body instead of a wrapper around a wrapper.
         """
         fid = FunctionId(self.number, self.param_names, tuple(param_values))
         a, b = self.interval_bounds(*fid.param_values)
@@ -202,17 +200,15 @@ class Formula(FormulaTaxonomyNode, ABC):
         """Build every candidate this formula defines: recipe tuples, filtered and deduplicated.
 
         Candidates come back in first-seen recipe order, and **among near-duplicates
-        the first recipe in `recipes` order wins**. Three passes, and the order
-        between them is load-bearing:
+        the first recipe in `recipes` order wins**. The tuples go through 3 passes, and each item
+        below states why it runs at that point in the order:
 
         1. **Validity.** Tuples the formula rejects are dropped first, so a
            rejected tuple can never displace a valid near-twin by arriving ahead
            of it in the next pass.
         2. **Near-duplicate removal** at `digits` significant digits
            (`deduplicate_param_tuples`), which collapses values that differ
-           only by float arithmetic — ``10^0.5`` from a POW10 axis and
-           ``3.16227766017`` from a DECIMAL axis are different floats but one
-           function. This happens on the parameter tuples, before identities
+           only by float arithmetic. This happens on the parameter tuples, before identities
            exist: the formula number is the same for every tuple here, so it
            carries no information for the collapse.
         3. **Construction** (identities included), so the per-candidate work is

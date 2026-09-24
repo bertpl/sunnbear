@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Parameter values that are the same number are equal whatever their notation, and ids show each value in its shortest notation, e.g. `2^2.0` as `4.0`
+- Parameter values that are the same number are equal whatever their notation, and function ids show each value in its shortest notation, e.g. `2^2.0` as `4.0`
 
 ### Deprecated
 

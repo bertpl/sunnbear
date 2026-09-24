@@ -1,13 +1,15 @@
-"""Parameter values and their notations: building, canonical spelling, parsing, dedup.
+"""This module builds parameter values from notations, spells them canonically, parses them and deduplicates them.
 
-A parameter value is a plain float, and its identity is the exact float: two values are equal
-when their floats are, however each was authored.
+A parameter value is a plain float, so two values are equal exactly when their floats are equal,
+however each was authored.
 
-**A notation maps a continuous argument to a value.** The argument is the quantity a grid
-sweeps and the quantity that is rounded to `CANONICAL_DIGITS` — the value itself for `DECIMAL`,
-the exponent for `POW2`/`POW10`. An exponential's value then follows from its rounded exponent
-by plain exponentiation and is not rounded itself, so a value authored as ``2^1.23`` is exactly
-``2 ** 1.23``, the float a reader reproduces from a paper or a suite file.
+**A notation maps a continuous argument to a value.** A grid sweeps the argument, and rounding to
+`CANONICAL_DIGITS` significant digits applies to the argument: the value itself for `DECIMAL`, the
+exponent for `POW2`/`POW10`.
+
+A power notation's value then follows from its rounded exponent by plain exponentiation and is not
+rounded itself, so a value authored as ``2^1.23`` is exactly ``2 ** 1.23``, and a reader who
+computes ``2 ** 1.23`` from a paper or a suite file gets the same float.
 
 **The notation matters only while a value is built.** Afterwards a value is written in its
 canonical spelling (see `ParamNotation`), which depends on the float alone: ``2^2.0`` and
@@ -75,9 +77,10 @@ class ParamNotation(StrEnum):
     with an argument of `CANONICAL_DIGITS` significant digits or fewer. A notation spells a float
     when it writes it as text, such as ``0.3`` or ``2^1.23``, that parses back to exactly that float.
 
-    Every value that sunnbear builds meets the rule, because the only 2 ways to get a value —
-    `build_value` for a recipe grid and `parse_value` for a spelling — both round the argument to
-    that precision.
+    Every value that sunnbear builds meets the rule, because both of its ways to build a value —
+    `build_value_from_argument` for a recipe grid and `parse_value` for a spelling — round the
+    argument to `CANONICAL_DIGITS` significant digits. A float written directly, such as
+    ``0.1 + 0.2``, is not checked until it is spelled; `is_valid_value` checks it up front.
 
     **Canonical spelling.** `spell_value_canonically` spells a valid value in every notation that
     can spell it under the validity rule and returns the shortest spelling, so the spelling depends
@@ -86,8 +89,9 @@ class ParamNotation(StrEnum):
     A tie in length goes to the notation declared first below.
 
     Exponent spellings depend on the platform's ``pow``, which is not guaranteed to be correctly
-    rounded: ``2^1.23`` can parse to a float that differs in the last bit on another platform. The
-    test functions' own results are subject to the same last-bit differences.
+    rounded: ``2^1.23`` can parse to a float that differs in the last bit on another platform, so one
+    id string can stand for slightly different floats on 2 platforms. The test functions' own results
+    already differ in the last bit across platforms, so this adds no new source of difference.
     """
 
     DECIMAL = "decimal"  # value = argument
@@ -97,22 +101,26 @@ class ParamNotation(StrEnum):
     # --------------------------------------------------------------------------
     #  Building and parsing a value
     # --------------------------------------------------------------------------
-    def build_value(self, argument: float) -> float:
-        """Return the value of `argument` in this notation, after rounding `argument` to `CANONICAL_DIGITS`.
+    def build_value_from_argument(self, argument: float) -> float:
+        """Return the value of `argument` in this notation, after rounding `argument` to `CANONICAL_DIGITS` digits.
+
+        A non-finite argument is rejected, because a NaN would quietly break equality, hashing and
+        deduplication.
 
         Raises:
-            ValueError: If `argument` is not finite, or its power overflows to a non-finite value.
+            ValueError: If `argument` is not finite, or ``base ** argument`` overflows to a non-finite value.
         """
         if not isfinite(argument):
             raise ValueError(f"A parameter value's argument must be finite (got {argument!r}).")
-        return self._value_of(_canonical(argument))
+        return self._value_from_rounded_argument(_canonical(argument))
 
     @classmethod
     def parse_value(cls, token: str) -> float:
         """Parse one spelling (``0.4``, ``1e-05``, ``2^1.2``, ``10^-3.4``) back into its value.
 
-        The argument is rounded as `build_value` rounds it, so a spelling of a valid value parses
-        back to exactly that value.
+        The number after ``^``, or the whole token for a decimal, is rounded as
+        `build_value_from_argument` rounds its argument, so a spelling of a valid value parses back to
+        exactly that value.
 
         Raises:
             ValueError: If the token uses an exponent base other than 2 or 10, is malformed, or
@@ -129,7 +137,7 @@ class ParamNotation(StrEnum):
             argument = float(argument_text)
         except ValueError as exc:
             raise ValueError(f"Malformed parameter token {token!r}.") from exc
-        return notation.build_value(argument)
+        return notation.build_value_from_argument(argument)
 
     # --------------------------------------------------------------------------
     #  Canonical spelling
@@ -183,15 +191,15 @@ class ParamNotation(StrEnum):
             case _:
                 assert_never(self)
         argument = _canonical(argument)
-        if self._value_of(argument) == value:
-            return self._spell_argument(argument)
+        if self._value_from_rounded_argument(argument) == value:
+            return self._spelling_from_rounded_argument(argument)
         else:
             return None
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
-    def _value_of(self, argument: float) -> float:
+    def _value_from_rounded_argument(self, argument: float) -> float:
         """Return the value of an already rounded `argument`: the argument itself, or a power of the base.
 
         Raises:
@@ -202,24 +210,24 @@ class ParamNotation(StrEnum):
                 return argument
             case ParamNotation.POW2 | ParamNotation.POW10:
                 try:
-                    return float(self._base) ** argument
+                    return float(self._power_base) ** argument
                 except OverflowError as exc:
-                    raise ValueError(f"{self._base}^{argument!r} overflows to a non-finite value.") from exc
+                    raise ValueError(f"{self._power_base}^{argument!r} overflows to a non-finite value.") from exc
             case _:
                 assert_never(self)
 
-    def _spell_argument(self, argument: float) -> str:
+    def _spelling_from_rounded_argument(self, argument: float) -> str:
         """Write an already rounded `argument` in this notation, e.g. ``0.4`` or ``2^1.2``."""
         match self:
             case ParamNotation.DECIMAL:
                 return repr(argument)
             case ParamNotation.POW2 | ParamNotation.POW10:
-                return f"{self._base}^{argument!r}"
+                return f"{self._power_base}^{argument!r}"
             case _:
                 assert_never(self)
 
     @property
-    def _base(self) -> int:
+    def _power_base(self) -> int:
         """Return the base of a power notation: 2 or 10."""
         return 2 if self is ParamNotation.POW2 else 10
 
@@ -236,14 +244,16 @@ def deduplicate_param_tuples(
     they could plausibly be the same exact-math values seen through different
     notations, showing up as different floats only through float arithmetic —
     ``10^0.5`` from a POW10 axis and ``3.16227766017`` from a DECIMAL axis,
-    which exact float equality leaves as two. Tuples whose floats are exactly
-    equal, such as ``4.0`` and ``2^2.0``, are already one value; they collapse
-    here too. The default granularity's 2-decade margin below the canonical
-    snap is derived at `DEDUP_DIGITS`.
+    which exact float equality leaves as two.
 
-    A filter rather than an equality, and deliberately so: the granularity is a
+    Tuples whose floats are exactly equal, such as ``4.0`` and ``2^2.0``, are
+    already one value; they collapse here too. The default `digits` sits 2
+    digits below `CANONICAL_DIGITS`; the comment at `DEDUP_DIGITS` explains
+    why that margin suffices.
+
+    A filter, not an equality, and deliberately so: the granularity is a
     parameter, and **the first tuple of each group survives**, so which one is
-    kept follows the input order — for a formula, the order of its recipes.
+    kept follows the input order.
     Grouping is by rounded key, not pairwise distance, so the partition is
     deterministic and the pass is linear. The cost is that a pair of *noisy*
     values straddling a bucket boundary survives as two tuples — buckets are

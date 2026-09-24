@@ -33,8 +33,8 @@ def test_function_id_display_includes_each_parameter_name(fid, expected):
 def test_function_id_renders_one_number_alike_however_it_was_authored():
     """``2^2.0`` and ``4.0`` are one float, so their ids are equal and render the same string."""
     # --- arrange ----------------------
-    from_decimal = FunctionId((2, 1, 1), ("p1",), (ParamNotation.DECIMAL.build_value(4.0),))
-    from_pow2 = FunctionId((2, 1, 1), ("p1",), (ParamNotation.POW2.build_value(2.0),))
+    from_decimal = FunctionId((2, 1, 1), ("p1",), (ParamNotation.DECIMAL.build_value_from_argument(4.0),))
+    from_pow2 = FunctionId((2, 1, 1), ("p1",), (ParamNotation.POW2.build_value_from_argument(2.0),))
 
     # --- act / assert -----------------
     assert from_decimal == from_pow2
@@ -62,7 +62,7 @@ def test_function_id_equality_is_exact():
     """Floats that differ in the last bits are different ids; collapsing near-matches happens earlier."""
     # --- arrange ----------------------
     exact = FunctionId((2, 1, 1), ("p1",), (4.0,))
-    nearly = FunctionId((2, 1, 1), ("p1",), (ParamNotation.POW2.build_value(2.00000000001),))
+    nearly = FunctionId((2, 1, 1), ("p1",), (ParamNotation.POW2.build_value_from_argument(2.00000000001),))
 
     # --- act / assert -----------------
     assert exact != nearly
@@ -70,7 +70,7 @@ def test_function_id_equality_is_exact():
 
 
 def test_function_id_with_an_invalid_value_does_not_render():
-    """A value that no notation spells within `CANONICAL_DIGITS` digits cannot be written out as an id."""
+    """A value that no notation spells with an argument of at most `CANONICAL_DIGITS` digits cannot be rendered."""
     with pytest.raises(ValueError, match="not a valid parameter value"):
         str(FunctionId((2, 1, 1), ("p1",), (0.1 + 0.2,)))
 

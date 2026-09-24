@@ -11,10 +11,13 @@ registry. A formula without parameters renders as its number alone, e.g. ``f7.1`
 
 Each value is written in its canonical spelling (`ParamNotation.spell_value_canonically`),
 which depends on the float alone: an id built from ``2^2.0`` and one built from ``4.0`` are
-equal and render alike, as ``p1=4.0``. `display()` is the only rendering, so equal ids have
-equal strings and the string can serve as a key; `from_string` parses it back to an equal id.
-The values must be valid parameter values (see `ParamNotation`), which every value that
-sunnbear builds or parses is; rendering an id with an invalid value raises.
+equal and render alike, as ``p1=4.0``.
+
+`display()` is the only rendering, so equal ids have equal strings and the string can serve as a
+key; `from_string` parses it back to an equal id.
+
+The values must be valid parameter values (see `ParamNotation`). Every value that sunnbear builds
+or parses is valid, and rendering an id with an invalid value raises `ValueError`.
 
 Equality and hashing are exact: two ids match when they carry the same formula, the same
 parameter names, and parameter values that are equal floats. Ordering compares only the
@@ -46,7 +49,9 @@ class FunctionId:
         formula_number: The formula's taxonomy number, e.g. ``(2, 1, 1)``.
         param_names: The formula's declared parameter names, in declaration order.
         param_values: One value per name in `param_names`, in the same order; each must be a valid
-            parameter value (see `ParamNotation`).
+            parameter value, such as one from `ParamNotation.build_value_from_argument` or
+            `ParamNotation.parse_value`. Construction does not check this
+            (`ParamNotation.is_valid_value` does); rendering an invalid value raises.
     """
 
     formula_number: tuple[int, ...]

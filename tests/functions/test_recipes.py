@@ -16,29 +16,24 @@ def test_axis_decimal_values_are_grid_rounded():
     assert axis.values() == (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
 
 
-def test_axis_pow2_values():
+@pytest.mark.parametrize(
+    "notation, start, stop, values, spellings",
+    [
+        (ParamNotation.POW2, 0.0, 2.0, (1.0, 2.0, 4.0), ["1.0", "2.0", "4.0"]),
+        (ParamNotation.POW10, -1.0, 1.0, (0.1, 1.0, 10.0), ["0.1", "1.0", "10.0"]),
+    ],
+)
+def test_axis_power_values(notation, start, stop, values, spellings):
+    """A power axis sweeps the exponent; its values are powers of the base, spelled canonically."""
     # --- arrange ----------------------
-    axis = ParamAxis("p1", 0.0, 2.0, step=1.0, notation=ParamNotation.POW2)
+    axis = ParamAxis("p1", start, stop, step=1.0, notation=notation)
 
     # --- act / assert -----------------
-    assert axis.values() == (1.0, 2.0, 4.0)
-    assert [ParamNotation.spell_value_canonically(v) for v in axis.values()] == ["1.0", "2.0", "4.0"]
+    assert axis.values() == values
+    assert [ParamNotation.spell_value_canonically(v) for v in axis.values()] == spellings
 
 
-def test_axis_pow10_values():
-    # --- arrange ----------------------
-    axis = ParamAxis("p1", -1.0, 1.0, step=1.0, notation=ParamNotation.POW10)
-
-    # --- act / assert -----------------
-    assert axis.values() == (0.1, 1.0, 10.0)
-    assert [ParamNotation.spell_value_canonically(v) for v in axis.values()] == ["0.1", "1.0", "10.0"]
-
-
-def test_axis_single_point():
-    assert ParamAxis("p1", 3.0, 3.0, step=1.0).values() == (3.0,)
-
-
-@pytest.mark.parametrize("value", [1e-05, -1e-05, 1e16, -3.5, 0.0])
+@pytest.mark.parametrize("value", [3.0, 1e-05, -1e-05, 1e16, -3.5, 0.0])
 def test_axis_single_point_preserves_value_exactly(value):
     """Values whose repr uses exponent notation must survive materialization intact."""
     assert ParamAxis("p1", value, value, step=1.0).values() == (value,)
@@ -222,7 +217,7 @@ def test_recipe_coupled_sweep_coinciding_boundaries_step_together():
 
 
 def test_recipe_mixed_notations_survive_tuple_assembly():
-    """Each axis's notation decides its values through recipe assembly: the POW2 axis gives powers of 2."""
+    """Each axis's notation still determines its values in the assembled tuples: the POW2 axis gives powers of 2."""
     # --- arrange ----------------------
     recipe = ParamRecipe(
         axes=(ParamAxis("p1", 0.0, 1.0, 1.0), ParamAxis("p2", 0.0, 1.0, 1.0, ParamNotation.POW2)),
