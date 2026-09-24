@@ -9,7 +9,6 @@ from sunnbear.functions import (
     FunctionId,
     ParamAxis,
     ParamRecipe,
-    ParamValue,
 )
 
 from .example_taxonomy_nodes import define_formula_cls
@@ -32,7 +31,7 @@ def test_candidates_materializes_recipe_grid():
     cubic_candidates = list(Cubic().build_all_candidates())
 
     # --- assert -----------------------
-    assert [c.id.param_float_values for c in cubic_candidates] == [(0.0,), (0.2,), (0.4,), (0.6,), (0.8,), (1.0,)]
+    assert [c.id.param_values for c in cubic_candidates] == [(0.0,), (0.2,), (0.4,), (0.6,), (0.8,), (1.0,)]
     assert all(c.id.formula_number == Cubic.number for c in cubic_candidates)
     assert all((c.a, c.b) == (-2.0, 2.0) for c in cubic_candidates)
 
@@ -42,7 +41,7 @@ def test_candidates_applies_validity_filter():
     odd_candidates = list(OddPower().build_all_candidates())
 
     # --- assert -----------------------
-    assert [c.id.param_float_values for c in odd_candidates] == [(1.0,), (3.0,), (5.0,), (7.0,)]
+    assert [c.id.param_values for c in odd_candidates] == [(1.0,), (3.0,), (5.0,), (7.0,)]
 
 
 @pytest.mark.parametrize("formula_cls", [Cubic, OddPower])
@@ -75,7 +74,7 @@ def test_candidates_deduplicates_across_recipes():
             return (ParamRecipe.decimal("p1", 0.0, 1.0, 0.5), ParamRecipe.decimal("p1", 0.5, 1.5, 0.5))
 
     # --- act --------------------------
-    params = [c.id.param_float_values for c in DupTest().build_all_candidates()]
+    params = [c.id.param_values for c in DupTest().build_all_candidates()]
 
     # --- assert -----------------------
     assert params == [(0.0,), (0.5,), (1.0,), (1.5,)]
@@ -163,14 +162,14 @@ def test_candidates_deduplicates_across_notations():
             return (-1.0, 1.0)
 
         def recipes(self) -> tuple[ParamRecipe, ...]:
-            # a DECIMAL axis hits 4.0 as "4.0"; a POW2 axis hits it as "2^2.0" — same value, different notation
+            # a DECIMAL axis builds 4.0 and a POW2 axis builds 2^2.0: the same float, so one value
             return (ParamRecipe.decimal("p1", 4.0, 4.0, 1.0), ParamRecipe.pow2("p1", 2.0, 2.0, 1.0))
 
     # --- act --------------------------
     ids = [c.id for c in CrossNotation().build_all_candidates()]
 
     # --- assert -----------------------
-    assert [str(fid) for fid in ids] == ["f99.995[p1=4.0]"]  # first-seen notation wins
+    assert [str(fid) for fid in ids] == ["f99.995[p1=4.0]"]
 
 
 # ==================================================================================================
@@ -299,7 +298,7 @@ def test_unoverridden_validity_hook_is_not_checked():
     cls = _formula_cls(982, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),))
 
     # --- act / assert -----------------
-    assert [c.id.param_float_values for c in cls().build_all_candidates()] == [(0.0,), (1.0,)]
+    assert [c.id.param_values for c in cls().build_all_candidates()] == [(0.0,), (1.0,)]
 
 
 @pytest.mark.usefixtures("isolated_registry")
@@ -370,14 +369,12 @@ def test_compiled_formula_rejects_plain_method():
 def test_candidate_from_id_and_string():
     """A `FunctionId` and its rendered string rebuild the same calibrated test function."""
     # --- act --------------------------
-    tf_from_id = FormulaRegistry.candidate_from_id(
-        FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.2),))
-    ).calibrated(-5.0, 5.0)
+    tf_from_id = FormulaRegistry.candidate_from_id(FunctionId((2, 1, 1), ("p1",), (0.2,))).calibrated(-5.0, 5.0)
     tf_from_str = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-5.0, 5.0)
 
     # --- assert -----------------------
     for tf in (tf_from_id, tf_from_str):
-        assert tf.id == FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.2),))
+        assert tf.id == FunctionId((2, 1, 1), ("p1",), (0.2,))
         assert (tf.a, tf.b, tf.c_min, tf.c_max) == (-2.0, 2.0, -5.0, 5.0)
         assert tf.xc_fun(2.0, 0.0) == pytest.approx(8.0 - 0.4)
 
@@ -404,7 +401,7 @@ def test_candidate_from_id_invalid_params():
     """An id whose parameter values fail the formula's validity criteria raises `InvalidParamsError`."""
     with pytest.raises(InvalidParamsError):
         FormulaRegistry.candidate_from_id(
-            FunctionId((2, 1, 2), ("p1",), (ParamValue.decimal(2.0),))  # even power: invalid
+            FunctionId((2, 1, 2), ("p1",), (2.0,))  # even power: invalid
         )
 
 

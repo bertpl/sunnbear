@@ -30,7 +30,7 @@ class CandidateTestFunction:
     """A materialized formula instance whose c-range is not (yet) established.
 
     Attributes:
-        id: Stable identity (formula number + bound parameter tuple).
+        id: Stable identity (formula number + named parameter values).
         formula: The formula this was materialized from — supplies the compiled body.
         a: Lower end of the bracketing x-interval.
         b: Upper end of the bracketing x-interval.
@@ -49,7 +49,7 @@ class CandidateTestFunction:
     @property
     def xc_fun(self) -> XCFun:
         """The ``f(x, c)`` callable, with this candidate's parameter tuple bound."""
-        return self.formula.bind_xc_fun(self.id.param_float_values)
+        return self.formula.bind_xc_fun(self.id.param_values)
 
     def calibrated(self, c_min: float, c_max: float) -> "TestFunction":
         """Promote to a `TestFunction` by attaching a calibrated c-range.
@@ -72,7 +72,7 @@ class TestFunction:
     function returns finite values on ``[a, b]``.
 
     Attributes:
-        id: Stable identity (formula number + bound parameter tuple).
+        id: Stable identity (formula number + named parameter values).
         formula: The formula this was materialized from — supplies the compiled body.
         a: Lower end of the bracketing x-interval.
         b: Upper end of the bracketing x-interval.
@@ -97,7 +97,7 @@ class TestFunction:
     @property
     def xc_fun(self) -> XCFun:
         """The ``f(x, c)`` callable, with this function's parameter tuple bound."""
-        return self.formula.bind_xc_fun(self.id.param_float_values)
+        return self.formula.bind_xc_fun(self.id.param_values)
 
     def build_x_fun(self, c: float) -> XFun:
         """Return the univariate ``f(x)`` for a fixed `c` — what a solver consumes.
@@ -106,4 +106,4 @@ class TestFunction:
         body, rather than a wrapper around `xc_fun`: on the hot path that is a
         single Python call per evaluation instead of two.
         """
-        return self.formula.bind_x_fun(self.id.param_float_values, c)
+        return self.formula.bind_x_fun(self.id.param_values, c)

@@ -1,10 +1,10 @@
 import pytest
 
 from sunnbear._core.functions.catalog.c02_standard_function_families.c01_polynomials.f01_cubic import Cubic
-from sunnbear.functions import CandidateTestFunction, FunctionId, ParamValue
+from sunnbear.functions import CandidateTestFunction, FunctionId
 from sunnbear.functions import TestFunction as _TestFunction  # underscore alias: keep pytest from collecting it
 
-FID = FunctionId((2, 1, 1), ("p1",), (ParamValue.decimal(0.2),))
+FID = FunctionId((2, 1, 1), ("p1",), (0.2,))
 
 
 # ==================================================================================================

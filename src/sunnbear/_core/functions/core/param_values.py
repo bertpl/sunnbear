@@ -1,35 +1,24 @@
-"""Parameter values and their notations: faithful construction, canonicalization, dedup.
+"""Parameter values and their notations: building, canonical spelling, parsing, dedup.
 
-**A notation maps a continuous argument to a value.** The argument is the
-quantity a grid sweeps and the quantity that gets canonicalized — the value
-itself for `DECIMAL`, the exponent for `POW2`/`POW10`; an exponential's value
-then follows from its canonical argument by plain exponentiation, itself
-untouched.
+A parameter value is a plain float, and its identity is the exact float: two values are equal
+when their floats are, however each was authored.
 
-**Values are faithful.** A parameter authored as ``2^1.23`` is stored as that
-exponent and evaluated as ``2 ** 1.23``, not as a rounded stand-in — so the
-number sunnbear computes with is exactly the one its notation advertises, and a
-reader reproducing it from a paper or a suite file arrives at the same float.
+**A notation maps a continuous argument to a value.** The argument is the quantity a grid
+sweeps and the quantity that is rounded to `CANONICAL_DIGITS` — the value itself for `DECIMAL`,
+the exponent for `POW2`/`POW10`. An exponential's value then follows from its rounded exponent
+by plain exponentiation and is not rounded itself, so a value authored as ``2^1.23`` is exactly
+``2 ** 1.23``, the float a reader reproduces from a paper or a suite file.
 
-A value has 2 renderings:
+**The notation matters only while a value is built.** Afterwards a value is written in its
+canonical spelling (see `ParamNotation`), which depends on the float alone: ``2^2.0`` and
+``4.0`` are one value with one spelling.
 
-- `ParamValue.display` renders it in its authored notation, and `ParamValue.parse` reads that
-  rendering back losslessly.
-- `ParamNotation.spell_value_canonically` renders the float alone, in whichever notation writes
-  it shortest, so its output does not keep the authored notation.
-
-Equality and hashing are therefore **exact and notation-sensitive**: ``2^2.0``
-and ``4.0`` are distinct values that happen to coincide numerically. Collapsing
-two values that could plausibly be the same exact-math number seen through
-different notations is a separate, deliberate pass — `deduplicate_param_tuples`
-— because a tolerance folded into ``__eq__`` would force `ParamValue.display` to be
-lossy to match it, which is precisely the faithfulness this module exists to
-keep.
+Collapsing values that agree to `DEDUP_DIGITS` significant digits but are different floats is
+a separate pass, `deduplicate_param_tuples`, not part of equality: a tolerance in equality would
+make values equal whose canonical spellings differ.
 """
 
-from abc import ABC, abstractmethod
 from collections.abc import Iterable
-from dataclasses import dataclass
 from enum import StrEnum
 from math import isfinite, log2, log10
 from typing import assert_never
@@ -86,14 +75,19 @@ class ParamNotation(StrEnum):
     with an argument of `CANONICAL_DIGITS` significant digits or fewer. A notation spells a float
     when it writes it as text, such as ``0.3`` or ``2^1.23``, that parses back to exactly that float.
 
-    Every value that sunnbear builds meets the rule, because building a value rounds its argument to
+    Every value that sunnbear builds meets the rule, because the only 2 ways to get a value —
+    `build_value` for a recipe grid and `parse_value` for a spelling — both round the argument to
     that precision.
 
-    **Canonical rendering.** `spell_value_canonically` spells a valid value in every notation that
-    can spell it under the validity rule and returns the shortest spelling, so the rendering depends
-    on the float alone, not on how it was authored: ``2^2.0`` and ``4.0`` both render as ``4.0``.
+    **Canonical spelling.** `spell_value_canonically` spells a valid value in every notation that
+    can spell it under the validity rule and returns the shortest spelling, so the spelling depends
+    on the float alone, not on how it was authored: ``2^2.0`` and ``4.0`` both spell as ``4.0``.
 
     A tie in length goes to the notation declared first below.
+
+    Exponent spellings depend on the platform's ``pow``, which is not guaranteed to be correctly
+    rounded: ``2^1.23`` can parse to a float that differs in the last bit on another platform. The
+    test functions' own results are subject to the same last-bit differences.
     """
 
     DECIMAL = "decimal"  # value = argument
@@ -101,22 +95,50 @@ class ParamNotation(StrEnum):
     POW10 = "pow10"  # value = 10 ** argument
 
     # --------------------------------------------------------------------------
-    #  Building a value
+    #  Building and parsing a value
     # --------------------------------------------------------------------------
-    def build_param_value(self, argument: float) -> "ParamValue":
-        """Build the `ParamValue` whose (canonicalized) argument is `argument`."""
-        if self is ParamNotation.DECIMAL:
-            return ParamValue.decimal(argument)
-        return ParamValue.exponential(2 if self is ParamNotation.POW2 else 10, argument)
+    def build_value(self, argument: float) -> float:
+        """Return the value of `argument` in this notation, after rounding `argument` to `CANONICAL_DIGITS`.
+
+        Raises:
+            ValueError: If `argument` is not finite, or its power overflows to a non-finite value.
+        """
+        if not isfinite(argument):
+            raise ValueError(f"A parameter value's argument must be finite (got {argument!r}).")
+        return self._value_of(_canonical(argument))
+
+    @classmethod
+    def parse_value(cls, token: str) -> float:
+        """Parse one spelling (``0.4``, ``1e-05``, ``2^1.2``, ``10^-3.4``) back into its value.
+
+        The argument is rounded as `build_value` rounds it, so a spelling of a valid value parses
+        back to exactly that value.
+
+        Raises:
+            ValueError: If the token uses an exponent base other than 2 or 10, is malformed, or
+                gives a non-finite value; the message names the token.
+        """
+        if "^" in token:
+            base_text, _, argument_text = token.partition("^")
+            notation = {"2": cls.POW2, "10": cls.POW10}.get(base_text)
+            if notation is None:
+                raise ValueError(f"Unsupported exponent base {base_text!r} in token {token!r} (supported: 2, 10).")
+        else:
+            notation, argument_text = cls.DECIMAL, token
+        try:
+            argument = float(argument_text)
+        except ValueError as exc:
+            raise ValueError(f"Malformed parameter token {token!r}.") from exc
+        return notation.build_value(argument)
 
     # --------------------------------------------------------------------------
-    #  Canonical rendering
+    #  Canonical spelling
     # --------------------------------------------------------------------------
     @classmethod
     def spell_value_canonically(cls, value: float) -> str:
         """Return the canonical spelling of `value`: its shortest valid spelling.
 
-        A tie in length goes to the notation declared first. ``-0.0`` renders as ``0.0``, since the two
+        A tie in length goes to the notation declared first. ``-0.0`` spells as ``0.0``, since the two
         are equal floats.
 
         Raises:
@@ -160,169 +182,68 @@ class ParamNotation(StrEnum):
                 argument = log10(value)
             case _:
                 assert_never(self)
-        candidate = self.build_param_value(argument)  # build_param_value rounds the argument, as for every value
-        if candidate.value == value:
-            return candidate.display()
+        argument = _canonical(argument)
+        if self._value_of(argument) == value:
+            return self._spell_argument(argument)
         else:
             return None
 
-
-# ==================================================================================================
-#  ParamValue
-# ==================================================================================================
-@dataclass(frozen=True)
-class ParamValue(ABC):
-    """A parameter value, in the notation it was authored in.
-
-    One subclass per notation shape, so a value cannot carry fields belonging
-    to a notation it does not use. Construct through the factories on this
-    class (`decimal`, `exponential`, `parse`) or through `ParamNotation.build_param_value`
-    rather than the subclasses directly.
-
-    **Each notation canonicalizes its own argument**, in its `__post_init__` —
-    the value for a plain decimal, the exponent for an exponential. That is
-    where the sweep's float error lands, and confining the snap to it is what
-    keeps the value a notation reports identical to the value it evaluates to.
-
-    Equality is plain field equality, so it *is* notation-sensitive: `2^2.0`
-    and `4.0` are distinct values that happen to coincide numerically.
-    Collapsing them is `deduplicate_param_tuples`'s job, not equality's.
-    """
-
-    value: float
-
     # --------------------------------------------------------------------------
-    #  Construction
+    #  Helpers
     # --------------------------------------------------------------------------
-    @classmethod
-    def decimal(cls, value: float) -> "ParamValue":
-        """Build a plain-decimal parameter value."""
-        return DecimalParamValue(value=value)
-
-    @classmethod
-    def exponential(cls, base: float, exponent: float) -> "ParamValue":
-        """Build a ``base^exponent`` parameter value (base 2 or 10; ``2.0``/``10.0`` also accepted)."""
-        if base not in (2, 10):
-            raise ValueError(f"ParamValue supports exponent notation on base 2 or 10 (got {base!r}).")
-        # value=0.0 is a placeholder: __post_init__ derives the real value from base and exponent
-        return ExponentialParamValue(value=0.0, base=int(base), exponent=exponent)
-
-    @classmethod
-    def parse(cls, token: str) -> "ParamValue":
-        """Parse one string token (``0.4``, ``2^1.2``, ``10^-3.4``).
+    def _value_of(self, argument: float) -> float:
+        """Return the value of an already rounded `argument`: the argument itself, or a power of the base.
 
         Raises:
-            ValueError: On an unsupported exponent base or a malformed token,
-                with the offending token named.
+            ValueError: If the power overflows to a non-finite value.
         """
-        if "^" in token:
-            base_text, _, exponent_text = token.partition("^")
-            if base_text not in ("2", "10"):
-                raise ValueError(f"Unsupported exponent base {base_text!r} in token {token!r} (supported: 2, 10).")
-            try:
-                return cls.exponential(int(base_text), float(exponent_text))
-            except ValueError as exc:
-                raise ValueError(f"Malformed exponent in token {token!r}.") from exc
-        try:
-            return cls.decimal(float(token))
-        except ValueError as exc:
-            raise ValueError(f"Malformed parameter token {token!r}.") from exc
+        match self:
+            case ParamNotation.DECIMAL:
+                return argument
+            case ParamNotation.POW2 | ParamNotation.POW10:
+                try:
+                    return float(self._base) ** argument
+                except OverflowError as exc:
+                    raise ValueError(f"{self._base}^{argument!r} overflows to a non-finite value.") from exc
+            case _:
+                assert_never(self)
 
-    # --------------------------------------------------------------------------
-    #  Rendering
-    # --------------------------------------------------------------------------
-    @abstractmethod
-    def display(self) -> str:
-        """Render this value in its authored notation — the one faithful form."""
+    def _spell_argument(self, argument: float) -> str:
+        """Write an already rounded `argument` in this notation, e.g. ``0.4`` or ``2^1.2``."""
+        match self:
+            case ParamNotation.DECIMAL:
+                return repr(argument)
+            case ParamNotation.POW2 | ParamNotation.POW10:
+                return f"{self._base}^{argument!r}"
+            case _:
+                assert_never(self)
 
-    def __repr__(self) -> str:
-        """Render the authored notation; `parse` reads it back to this value."""
-        return self.display()
-
-    def __str__(self) -> str:
-        """Same as `__repr__`: both render the authored notation."""
-        return repr(self)
-
-
-@dataclass(frozen=True, repr=False)  # repr=False: inherit the notation-carrying __repr__ from the base
-class DecimalParamValue(ParamValue):
-    """A parameter value authored as a plain decimal."""
-
-    def __post_init__(self) -> None:
-        """Reject non-finite values, then canonicalize — for this notation, the value *is* the argument.
-
-        Finiteness is an identity invariant: a NaN would quietly break equality,
-        hashing and near-duplicate grouping, so it is rejected on every
-        construction path rather than allowed to propagate.
-        """
-        if not isfinite(self.value):
-            raise ValueError(f"ParamValue must be finite (got {self.value!r}).")
-        object.__setattr__(self, "value", _canonical(self.value))
-
-    def display(self) -> str:
-        """Render the value as a plain decimal."""
-        return repr(self.value)
-
-
-@dataclass(frozen=True, repr=False)  # repr=False: inherit the notation-carrying __repr__ from the base
-class ExponentialParamValue(ParamValue):
-    """A parameter value authored as ``base^exponent``, as POW2/POW10 grids produce.
-
-    `__post_init__` enforces this notation's invariants on every construction
-    path: the base is validated and normalized to `int` (``2.0``/``10.0`` are
-    accepted), the exponent — this notation's argument — is canonicalized, and
-    the value is *derived* from the two — so `value` never drifts from what the
-    notation says, and any `value` handed to the constructor is replaced.
-
-    Attributes:
-        base: 2 or 10 (stored as `int`).
-        exponent: The canonicalized exponent.
-    """
-
-    base: int
-    exponent: float
-
-    def __post_init__(self) -> None:
-        """Validate the base and exponent, canonicalize the exponent, then derive the value.
-
-        Both the exponent and the derived value must be finite (see
-        `DecimalParamValue.__post_init__` for why): a finite exponent can still
-        overflow the derivation (e.g. ``10^400``), so that is rejected too.
-        """
-        if self.base not in (2, 10):
-            raise ValueError(f"ParamValue supports exponent notation on base 2 or 10 (got {self.base!r}).")
-        if not isfinite(self.exponent):
-            raise ValueError(f"ParamValue exponent must be finite (got {self.exponent!r}).")
-        object.__setattr__(self, "base", int(self.base))
-        object.__setattr__(self, "exponent", _canonical(self.exponent))
-        try:
-            derived = float(self.base) ** self.exponent
-        except OverflowError as exc:
-            raise ValueError(f"ParamValue {self.base}^{self.exponent!r} overflows to a non-finite value.") from exc
-        object.__setattr__(self, "value", derived)
-
-    def display(self) -> str:
-        """Render as ``base^exponent``, e.g. ``2^1.2``."""
-        return f"{self.base}^{self.exponent!r}"
+    @property
+    def _base(self) -> int:
+        """Return the base of a power notation: 2 or 10."""
+        return 2 if self is ParamNotation.POW2 else 10
 
 
 # ==================================================================================================
 #  Near-duplicate removal
 # ==================================================================================================
 def deduplicate_param_tuples(
-    tuples: Iterable[tuple[ParamValue, ...]], digits: int = DEDUP_DIGITS
-) -> tuple[tuple[ParamValue, ...], ...]:
+    tuples: Iterable[tuple[float, ...]], digits: int = DEDUP_DIGITS
+) -> tuple[tuple[float, ...], ...]:
     """Keep the first tuple of each group whose values agree to `digits` significant digits.
 
     The one collapse this level performs: two tuples count as duplicates iff
     they could plausibly be the same exact-math values seen through different
     notations, showing up as different floats only through float arithmetic —
-    a DECIMAL axis hitting ``4.0`` and a POW2 axis hitting ``2^2.0``, which
-    exact notation-sensitive equality leaves as two. The default granularity's
-    2-decade margin below the canonical snap is derived at `DEDUP_DIGITS`.
+    ``10^0.5`` from a POW10 axis and ``3.16227766017`` from a DECIMAL axis,
+    which exact float equality leaves as two. Tuples whose floats are exactly
+    equal, such as ``4.0`` and ``2^2.0``, are already one value; they collapse
+    here too. The default granularity's 2-decade margin below the canonical
+    snap is derived at `DEDUP_DIGITS`.
 
     A filter rather than an equality, and deliberately so: the granularity is a
-    parameter, and which member of a group survives follows the input order.
+    parameter, and **the first tuple of each group survives**, so which one is
+    kept follows the input order — for a formula, the order of its recipes.
     Grouping is by rounded key, not pairwise distance, so the partition is
     deterministic and the pass is linear. The cost is that a pair of *noisy*
     values straddling a bucket boundary survives as two tuples — buckets are
@@ -338,9 +259,9 @@ def deduplicate_param_tuples(
         The kept tuples, in first-seen order.
     """
     seen: set[tuple[float, ...]] = set()
-    kept: list[tuple[ParamValue, ...]] = []
+    kept: list[tuple[float, ...]] = []
     for param_values in tuples:
-        key = tuple(_round_significant(p.value, digits) for p in param_values)
+        key = tuple(_round_significant(value, digits) for value in param_values)
         if key in seen:
             continue
         seen.add(key)
