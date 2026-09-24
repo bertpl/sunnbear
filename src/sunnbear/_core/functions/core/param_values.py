@@ -26,7 +26,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from math import isfinite
+from math import isfinite, log2, log10
 
 # The root precision constant: significant digits an argument is snapped to, absorbing the
 # float error of grid arithmetic (`start + i * step`). Chosen as 3/4 of float64's ~16
@@ -74,17 +74,70 @@ def _canonical(x: float) -> float:
 #  ParamNotation
 # ==================================================================================================
 class ParamNotation(StrEnum):
-    """The supported notations; each maps a continuous argument to a parameter value."""
+    """The supported notations; each maps a continuous argument to a parameter value.
+
+    **Validity rule.** A float is a valid parameter value only if at least one notation spells it
+    exactly with an argument of `CANONICAL_DIGITS` significant digits or fewer. Every value that
+    sunnbear builds meets the rule, because building a value rounds its argument to that precision.
+
+    **Canonical rendering.** `render_param_value` spells a valid value in the shortest notation
+    that meets the rule, so the rendering depends on the float alone, not on how it was authored:
+    ``2^2.0`` and ``4.0`` both render as ``4.0``. Ties go to the notation declared first below.
+    """
 
     DECIMAL = "decimal"  # value = argument
     POW2 = "pow2"  # value = 2 ** argument
     POW10 = "pow10"  # value = 10 ** argument
 
+    # --------------------------------------------------------------------------
+    #  Building a value
+    # --------------------------------------------------------------------------
     def build_param_value(self, argument: float) -> "ParamValue":
         """Build the `ParamValue` whose (canonicalized) argument is `argument`."""
         if self is ParamNotation.DECIMAL:
             return ParamValue.decimal(argument)
         return ParamValue.exponential(2 if self is ParamNotation.POW2 else 10, argument)
+
+    # --------------------------------------------------------------------------
+    #  Canonical rendering
+    # --------------------------------------------------------------------------
+    @classmethod
+    def render_param_value(cls, value: float) -> str:
+        """Return the canonical spelling of `value`: the shortest valid one, ties to the earliest notation.
+
+        ``-0.0`` renders as ``0.0``, since the two are equal floats.
+
+        Raises:
+            ValueError: If `value` is not a valid parameter value (see the class docstring).
+        """
+        spellings = [spelling for notation in cls if (spelling := notation.spell_param_value(value)) is not None]
+        if not spellings:
+            raise ValueError(
+                f"{value!r} is not a valid parameter value: no notation spells it exactly with an argument "
+                f"of {CANONICAL_DIGITS} significant digits or fewer."
+            )
+        return min(spellings, key=len)  # min keeps the first of equal lengths: declaration order
+
+    @classmethod
+    def is_valid_param_value(cls, value: float) -> bool:
+        """Return whether `value` meets the validity rule (see the class docstring)."""
+        return any(notation.spell_param_value(value) is not None for notation in cls)
+
+    def spell_param_value(self, value: float) -> str | None:
+        """Return this notation's spelling of `value`, or None if it cannot spell `value` under the validity rule."""
+        value = value + 0.0  # turns -0.0 into 0.0, so the two equal floats spell alike
+        if not isfinite(value):
+            return None
+        elif self is ParamNotation.DECIMAL:
+            return repr(value) if _canonical(value) == value else None
+        elif value <= 0.0:
+            return None  # a power of 2 or 10 is positive
+        else:
+            base, log_base = (2, log2) if self is ParamNotation.POW2 else (10, log10)
+            # recover the exponent that a valid value was built from; the exact check rejects the
+            # value if the recovered exponent does not reproduce it
+            exponent = _canonical(log_base(value))
+            return f"{base}^{exponent!r}" if float(base) ** exponent == value else None
 
 
 # ==================================================================================================
