@@ -2,6 +2,7 @@
 
 import pytest
 
+import sunnbear._core.data.exceptions
 import sunnbear._core.exceptions
 import sunnbear._core.functions.core
 import sunnbear._core.functions.core.exceptions
@@ -38,6 +39,7 @@ def _is_submodule(module, name: str) -> bool:
         (
             sunnbear.exceptions,
             (
+                sunnbear._core.data.exceptions,
                 sunnbear._core.exceptions,
                 sunnbear._core.functions.core.exceptions,
                 sunnbear._core.solvers.core.exceptions,
