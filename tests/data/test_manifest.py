@@ -1,25 +1,27 @@
 """An `ArtifactManifest` identifies an artifact by its content and round-trips through deterministic JSON."""
 
+import dataclasses
 import datetime
 import json
 
 import pytest
 
 from sunnbear._core.data import ArtifactError, ArtifactFileEntry, ArtifactManifest
+from sunnbear._core.data.manifest import _FILE_ENTRY_OPTIONAL_KEYS, _FILE_ENTRY_REQUIRED_KEYS, _MANIFEST_REQUIRED_KEYS
 
 
 def _make_manifest(**overrides) -> ArtifactManifest:
     """Return a manifest with 2 files, overriding any field by keyword."""
     fields = {
         "name": "sample",
-        "schema_version": 1,
+        "data_schema_version": 1,
         "files": (
             ArtifactFileEntry.from_content("values.csv", b"u,v\n0.25,0.75\n"),
             ArtifactFileEntry.from_content("notes/readme.txt", b"hello\n"),
         ),
-        "input_hashes": {"upstream": "ab" * 32},
+        "input_artifact_hashes": {"upstream": "ab" * 32},
         "built_with": {"sunnbear": "0.1.3"},
-        "built_on": datetime.date(2026, 9, 25),
+        "build_date": datetime.date(2026, 9, 25),
         "generated_by": {"function": "sample.generate", "arguments": {"seed": 42}},
     }
     return ArtifactManifest(**(fields | overrides))
@@ -31,13 +33,13 @@ def _make_manifest(**overrides) -> ArtifactManifest:
 def test_artifact_file_entry_from_content_records_hash_and_size():
     """`from_content` records the sha256 and the byte count, and `matches` accepts only that content."""
     # --- arrange / act ----------------
-    file = ArtifactFileEntry.from_content("values.csv", b"abc")
+    entry = ArtifactFileEntry.from_content("values.csv", b"abc")
 
     # --- assert -----------------------
-    assert file.sha256 == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
-    assert file.size_bytes == 3
-    assert file.matches(b"abc")
-    assert not file.matches(b"abx")
+    assert entry.sha256 == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    assert entry.size_bytes == 3
+    assert entry.matches(b"abc")
+    assert not entry.matches(b"abx")
 
 
 @pytest.mark.parametrize("path", ["", "/abs/values.csv", "../values.csv", "data/../../values.csv"])
@@ -63,10 +65,10 @@ def test_short_identity_is_the_name_and_the_shortened_content_hash():
     "overrides",
     [
         {"name": "other"},
-        {"schema_version": 2},
-        {"input_hashes": {}},
+        {"data_schema_version": 2},
+        {"input_artifact_hashes": {}},
         {"built_with": {"sunnbear": "9.9.9"}},
-        {"built_on": datetime.date(2030, 1, 1)},
+        {"build_date": datetime.date(2030, 1, 1)},
         {"generated_by": None},
     ],
 )
@@ -114,7 +116,7 @@ def test_manifest_rejects_missing_or_duplicate_files(files, message):
     "manifest",
     [
         _make_manifest(),
-        _make_manifest(generated_by=None, input_hashes={}),
+        _make_manifest(generated_by=None, input_artifact_hashes={}),
         _make_manifest(
             files=(ArtifactFileEntry.from_content("big.parquet", b"\x00\x01", url="https://example.org/big"),)
         ),
@@ -126,7 +128,7 @@ def test_manifest_round_trips_through_json(manifest):
 
 
 def test_to_json_is_deterministic_and_records_the_content_hash():
-    """`to_json` sorts keys, indents by 2, ends with a newline, records `content_hash`, and omits a `None` `url`."""
+    """`to_json` writes deterministic JSON that records `content_hash` and omits a `None` `url`."""
     # --- arrange ----------------------
     manifest = _make_manifest()
 
@@ -138,6 +140,17 @@ def test_to_json_is_deterministic_and_records_the_content_hash():
     assert text == json.dumps(data, sort_keys=True, indent=2) + "\n"
     assert data["content_hash"] == manifest.content_hash
     assert "url" not in data["files"][0]
+
+
+def test_json_key_sets_name_every_field():
+    """The JSON key sets name every dataclass field, plus the recorded `content_hash`."""
+    # --- arrange / act ----------------
+    manifest_fields = {f.name for f in dataclasses.fields(ArtifactManifest)}
+    entry_fields = {f.name for f in dataclasses.fields(ArtifactFileEntry)}
+
+    # --- assert -----------------------
+    assert manifest_fields | {"content_hash"} == _MANIFEST_REQUIRED_KEYS
+    assert entry_fields == _FILE_ENTRY_REQUIRED_KEYS | _FILE_ENTRY_OPTIONAL_KEYS
 
 
 def _make_edited_json(edit) -> str:
@@ -152,10 +165,10 @@ def _make_edited_json(edit) -> str:
     [
         ("not json", "Malformed"),
         ("[]", "Malformed"),
-        (_make_edited_json(lambda d: d.pop("built_on")), "Malformed"),  # missing key
+        (_make_edited_json(lambda d: d.pop("build_date")), "Malformed"),  # missing key
         (_make_edited_json(lambda d: d.update(extra=1)), "Malformed"),  # unknown key
-        (_make_edited_json(lambda d: d.update(schema_version="1")), "Malformed"),  # wrong type
-        (_make_edited_json(lambda d: d.update(schema_version=True)), "Malformed"),  # a bool is not an int
+        (_make_edited_json(lambda d: d.update(data_schema_version="1")), "Malformed"),  # wrong type
+        (_make_edited_json(lambda d: d.update(data_schema_version=True)), "Malformed"),  # a bool is not an int
         (_make_edited_json(lambda d: d.update(generated_by=[1])), "Malformed"),  # generated_by is an object or null
         (_make_edited_json(lambda d: d["files"][0].update(size_bytes=-1.5)), "Malformed"),  # wrong type in a file entry
         (
