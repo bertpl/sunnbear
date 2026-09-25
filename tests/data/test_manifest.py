@@ -12,7 +12,6 @@ def _make_manifest(**overrides) -> ArtifactManifest:
     """Return a manifest with 2 files, overriding any field by keyword."""
     fields = {
         "name": "sample",
-        "data_schema_version": 1,
         "files": (
             ArtifactFileEntry.from_content("values.csv", b"u,v\n0.25,0.75\n"),
             ArtifactFileEntry.from_content("notes/readme.txt", b"hello\n"),
@@ -63,7 +62,6 @@ def test_short_identity_is_the_name_and_the_shortened_content_hash():
     "overrides",
     [
         {"name": "other"},
-        {"data_schema_version": 2},
         {"input_artifact_hashes": {}},
         {"built_with": {"sunnbear": "9.9.9"}},
         {"build_date": datetime.date(2030, 1, 1)},
@@ -71,7 +69,7 @@ def test_short_identity_is_the_name_and_the_shortened_content_hash():
     ],
 )
 def test_content_hash_ignores_everything_but_the_files(overrides):
-    """Only the files decide the content hash; the name, schema version and build metadata do not."""
+    """Only the files decide the content hash; the name and the build metadata do not."""
     assert _make_manifest(**overrides).content_hash == _make_manifest().content_hash
 
 
@@ -155,8 +153,7 @@ def _make_edited_json(edit) -> str:
         (_make_edited_json(lambda d: d.pop("build_date")), "Malformed"),  # missing key
         (_make_edited_json(lambda d: d.pop("content_hash")), "Malformed"),  # no recorded content hash
         (_make_edited_json(lambda d: d.update(extra=1)), "Malformed"),  # unknown key
-        (_make_edited_json(lambda d: d.update(data_schema_version="1")), "Malformed"),  # wrong type
-        (_make_edited_json(lambda d: d.update(data_schema_version=True)), "Malformed"),  # a bool is not an int
+        (_make_edited_json(lambda d: d.update(name=1)), "Malformed"),  # wrong type
         (_make_edited_json(lambda d: d.update(generated_by=[1])), "Malformed"),  # generated_by is an object or null
         (_make_edited_json(lambda d: d["files"][0].update(size_bytes=-1.5)), "Malformed"),  # wrong type in a file entry
         (

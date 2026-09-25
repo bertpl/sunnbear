@@ -12,7 +12,6 @@ class SampleLinesDeclaration(ArtifactDeclaration[list[str]]):
     """`SampleLinesDeclaration` declares text lines, with their count in a subfolder file so tests cover such paths."""
 
     name = "sample_lines"
-    data_schema_version = 1
 
     @classmethod
     def to_files(cls, value: list[str]) -> dict[str, bytes]:
