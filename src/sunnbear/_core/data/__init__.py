@@ -4,5 +4,7 @@ The package depends only on `sunnbear._core.exceptions`, so every other subpacka
 `sunnbear._core` may import from this package.
 """
 
+from .artifact import Artifact, ArtifactResidency
 from .exceptions import ArtifactError
 from .manifest import ArtifactFileEntry, ArtifactManifest
+from .registry import ArtifactRegistry
