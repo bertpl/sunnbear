@@ -36,8 +36,9 @@ Branch names follow the pattern:
 
 - **Prefix** — one of `feat/`, `fix/`, `internal/`, `chore/`, `docs/`,
   `refactor/`, `test/`. CI rejects anything else. `internal/` is for new
-  functionality that users do not see, such as machinery a later
-  feature builds on; unlike `feat/`, it needs no changelog entry.
+  functionality that users do not see, such as supporting code for a
+  later feature; unlike `feat/`, it needs no changelog entry (see
+  [Changelog](#changelog)).
 - **Slug** — short kebab-case description, lowercase letters, digits,
   and hyphens only. When a GitHub issue exists, start the slug with its
   number (`feat/42-...`).
