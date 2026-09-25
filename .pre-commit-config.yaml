@@ -100,6 +100,6 @@ repos:
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
-        # `release` covers release-automation commits; the other six match
-        # the repo's branch/commit prefix convention.
-        args: [feat, fix, chore, docs, refactor, test, release]
+        # `release` covers release-automation commits; the others must match
+        # COMMIT_TYPES in .github/workflows/pull_request.yml.
+        args: [feat, fix, internal, chore, docs, refactor, test, release]
