@@ -20,8 +20,11 @@ jobs:
   preflight:
     runs-on: ubuntu-latest
     env:
-      # The allowed commit types, shared by the branch-name and PR-title checks
-      # (a regex alternation, so it stays unquoted inside [[ =~ ]]).
+      # COMMIT_TYPES lists the allowed commit types as a regex alternation; the
+      # branch-name and PR-title checks both use it. It stays unquoted inside
+      # [[ =~ ]], because bash matches a quoted right-hand side literally. Keep it
+      # in sync with the conventional-pre-commit args in .pre-commit-config.yaml,
+      # which add `release` for release-automation commits.
       COMMIT_TYPES: feat|fix|internal|chore|docs|refactor|test
     steps:
       # PR author, not github.actor — a human re-running checks on a Dependabot PR
