@@ -1,15 +1,15 @@
-"""`SampleLinesArtifact` is a test-only artifact declaration."""
+"""`SampleLinesDeclaration` is a test-only artifact declaration."""
 
 from collections.abc import Mapping
 
 from sunnbear._core.data import ArtifactDeclaration
 
-# The lines that the tests convert with `SampleLinesArtifact`.
+# The tests convert these lines with `SampleLinesDeclaration`.
 SAMPLE_LINES = ["alpha", "beta", "gamma"]
 
 
-class SampleLinesArtifact(ArtifactDeclaration[list[str]]):
-    """`SampleLinesArtifact` stores text lines, plus their count in a nested file so the tests cover a subfolder."""
+class SampleLinesDeclaration(ArtifactDeclaration[list[str]]):
+    """`SampleLinesDeclaration` declares text lines, with their count in a subfolder file so tests cover such paths."""
 
     name = "sample_lines"
     data_schema_version = 1

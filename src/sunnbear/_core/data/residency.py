@@ -1,4 +1,4 @@
-"""`ArtifactResidency` says where an artifact's data files live."""
+"""The artifact residency enum lists the places where an artifact's data files can live."""
 
 import enum
 

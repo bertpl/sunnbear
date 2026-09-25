@@ -3,8 +3,8 @@
 A declaration says how to turn a value of type ``T`` into the artifact's files and back, and which
 format version those files follow. It holds no data and touches no files.
 
-Defining a concrete subclass registers it with `ArtifactRegistry`, and its checks run at that
-moment, so a malformed declaration fails when its module is imported.
+Defining a concrete subclass validates its class attributes and registers it with
+`ArtifactRegistry`, so a malformed declaration fails when its module is imported.
 """
 
 import re
@@ -26,11 +26,11 @@ _ARTIFACT_NAME_PATTERN = re.compile(r"[a-z][a-z0-9_]*")
 #  ArtifactDeclaration
 # ==================================================================================================
 class ArtifactDeclaration(ABC, Generic[T]):
-    """`ArtifactDeclaration` is the base class of a data artifact declaration; each concrete subclass declares one.
+    """`ArtifactDeclaration` is the base class for artifact declarations; each concrete subclass declares one artifact.
 
-    Defining the concrete subclass registers it. Example::
+    Example::
 
-        class UvTuplesArtifact(ArtifactDeclaration[UvTuples]):
+        class UvTuplesDeclaration(ArtifactDeclaration[UvTuples]):
             name = "uv_tuples"
             data_schema_version = 1
 
@@ -43,7 +43,8 @@ class ArtifactDeclaration(ABC, Generic[T]):
     Class attributes:
         name: The artifact's name: lowercase letters, digits and underscores, starting with a letter.
         data_schema_version: The version of the data files' format; bump it whenever `to_files`
-            changes what it writes, so that loading refuses files written in another format.
+            changes what it writes, so that files written under a different version are refused when
+            the artifact is loaded.
         residency: Where the data files live.
     """
 
@@ -75,12 +76,16 @@ class ArtifactDeclaration(ABC, Generic[T]):
     @classmethod
     @abstractmethod
     def to_files(cls, value: T) -> dict[str, bytes]:
-        """Return the artifact's files for `value`, as file content by path relative to the artifact's folder."""
+        """Return the artifact's files for `value`, as a dict that maps each path to its content.
+
+        The dict holds at least 1 file; each path is relative to the artifact's folder, uses forward
+        slashes, may name a subfolder, and must not be absolute or contain a ``..`` part.
+        """
 
     @classmethod
     @abstractmethod
     def from_files(cls, files: Mapping[str, bytes]) -> T:
-        """Rebuild the value from the file contents that `to_files` wrote, keyed the same way."""
+        """Rebuild the value from the output of `to_files`."""
 
     # --------------------------------------------------------------------------
     #  Validation
