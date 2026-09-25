@@ -232,7 +232,7 @@ class ArtifactFileEntry:
 def _check_keys(
     json_value: object, required_keys: set[str], object_label: str, optional_keys: set[str] | None = None
 ) -> dict[str, Any]:
-    """Return `json_value` unchanged if it is a JSON object with every required key and no keys beyond the optional ones.
+    """Return `json_value` unchanged if it is a JSON object with every required key and no other keys but optional ones.
 
     Raises:
         TypeError: If `json_value` is not a JSON object.

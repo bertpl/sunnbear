@@ -1,4 +1,4 @@
-"""This package holds the code shared by all of sunnbear's data artifacts; no module in it refers to a specific artifact.
+"""This package holds the code shared by all of sunnbear's data artifacts; no module refers to a specific artifact.
 
 The package depends only on `sunnbear._core.exceptions`, so every other subpackage of
 `sunnbear._core` may import from this package.
