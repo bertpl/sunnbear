@@ -1,13 +1,11 @@
 """An `ArtifactManifest` identifies an artifact by its content and round-trips through deterministic JSON."""
 
-import dataclasses
 import datetime
 import json
 
 import pytest
 
 from sunnbear._core.data import ArtifactError, ArtifactFileEntry, ArtifactManifest
-from sunnbear._core.data.manifest import _FILE_ENTRY_OPTIONAL_KEYS, _FILE_ENTRY_REQUIRED_KEYS, _MANIFEST_REQUIRED_KEYS
 
 
 def _make_manifest(**overrides) -> ArtifactManifest:
@@ -96,10 +94,10 @@ def test_content_hash_changes_with_file_content_or_path(files):
 @pytest.mark.parametrize(
     "files, message",
     [
-        ((), "has no files"),
+        ((), "at least 1 file"),
         (
             (ArtifactFileEntry.from_content("a.csv", b"1"), ArtifactFileEntry.from_content("a.csv", b"2")),
-            "more than once",
+            "each file path once",
         ),
     ],
 )
@@ -142,17 +140,6 @@ def test_to_json_is_deterministic_and_records_the_content_hash():
     assert "url" not in data["files"][0]
 
 
-def test_json_key_sets_name_every_field():
-    """The JSON key sets name every dataclass field, plus the recorded `content_hash`."""
-    # --- arrange / act ----------------
-    manifest_fields = {f.name for f in dataclasses.fields(ArtifactManifest)}
-    entry_fields = {f.name for f in dataclasses.fields(ArtifactFileEntry)}
-
-    # --- assert -----------------------
-    assert manifest_fields | {"content_hash"} == _MANIFEST_REQUIRED_KEYS
-    assert entry_fields == _FILE_ENTRY_REQUIRED_KEYS | _FILE_ENTRY_OPTIONAL_KEYS
-
-
 def _make_edited_json(edit) -> str:
     """Return the JSON of the default manifest after `edit` changes its parsed form in place."""
     data = json.loads(_make_manifest().to_json())
@@ -166,6 +153,7 @@ def _make_edited_json(edit) -> str:
         ("not json", "Malformed"),
         ("[]", "Malformed"),
         (_make_edited_json(lambda d: d.pop("build_date")), "Malformed"),  # missing key
+        (_make_edited_json(lambda d: d.pop("content_hash")), "Malformed"),  # no recorded content hash
         (_make_edited_json(lambda d: d.update(extra=1)), "Malformed"),  # unknown key
         (_make_edited_json(lambda d: d.update(data_schema_version="1")), "Malformed"),  # wrong type
         (_make_edited_json(lambda d: d.update(data_schema_version=True)), "Malformed"),  # a bool is not an int

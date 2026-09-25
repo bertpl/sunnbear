@@ -2703,6 +2703,7 @@ dependencies = [
     { name = "mpl-composite" },
     { name = "numba" },
     { name = "numpy" },
+    { name = "pydantic" },
     { name = "snuffled" },
     { name = "typing-extensions" },
 ]
@@ -2739,6 +2740,9 @@ requires-dist = [
     { name = "numpy", marker = "python_full_version < '3.13'", specifier = ">=2.0.0" },
     { name = "numpy", marker = "python_full_version == '3.13.*'", specifier = ">=2.1.0" },
     { name = "numpy", marker = "python_full_version >= '3.14'", specifier = ">=2.3.2" },
+    { name = "pydantic", marker = "python_full_version < '3.13'", specifier = ">=2.7" },
+    { name = "pydantic", marker = "python_full_version == '3.13.*'", specifier = ">=2.9" },
+    { name = "pydantic", marker = "python_full_version >= '3.14'", specifier = ">=2.12" },
     { name = "snuffled", specifier = ">=0.1.6" },
     { name = "typing-extensions", specifier = ">=4.4" },
 ]

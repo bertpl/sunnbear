@@ -25,6 +25,11 @@ dependencies = [
     "matplotlib>=3.10.7; python_version == '3.13'",
     "matplotlib>=3.10.7; python_version >= '3.14'",
     "counted-float>=1.2.1",
+    # pydantic: counted-float's floors, which already hold in every install (counted-float
+    # depends on pydantic), with 3.11 on the 3.12 floor.
+    "pydantic>=2.7; python_version < '3.13'",
+    "pydantic>=2.9; python_version == '3.13'",
+    "pydantic>=2.12; python_version >= '3.14'",
     "typing-extensions>=4.4",  # TypeVar defaults (PEP 696) on Python < 3.13
     "snuffled>=0.1.6",
     "max-div>=0.5.5",
@@ -148,6 +153,11 @@ convention = "google"
 [tool.ruff.lint.flake8-pytest-style]
 parametrize-names-type = "csv"                     # names given as a single "a, b" string
 raises-require-match-for = ["Exception", "BaseException"]  # only the truly broad base exceptions need match=
+
+[tool.ruff.lint.flake8-type-checking]
+# Keep pydantic field types importable at runtime (pydantic evaluates annotations to build
+# validators); don't move them under TYPE_CHECKING.
+runtime-evaluated-base-classes = ["pydantic.BaseModel"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["SLF001", "S101", "S311", "D", "ANN"]  # AAA tests: asserts, private access, random data, no docstring/annotation duty
