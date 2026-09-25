@@ -1,7 +1,7 @@
-"""This package holds the machinery for sunnbear's data artifacts, with no knowledge of any specific artifact.
+"""This package holds the generic code for sunnbear's data artifacts, with no knowledge of any specific artifact.
 
-It depends only on `sunnbear._core.exceptions`, so every layer may use it.
+The package depends only on `sunnbear._core.exceptions`, so every layer may import from it.
 """
 
 from .exceptions import ArtifactError
-from .manifest import ArtifactFile, ArtifactManifest
+from .manifest import ArtifactFileEntry, ArtifactManifest
