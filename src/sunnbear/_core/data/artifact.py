@@ -1,4 +1,4 @@
-"""`Artifact` is the base class of a data artifact's declaration: its name, data format, and conversion to files.
+"""`ArtifactDeclaration` is the base class for declaring a data artifact: its name, format and conversion to files.
 
 A declaration says how to turn a value of type ``T`` into the artifact's files and back, and which
 format version those files follow. It holds no data and touches no files.
@@ -7,35 +7,30 @@ Defining a concrete subclass registers it with `ArtifactRegistry`, and its check
 moment, so a malformed declaration fails when its module is imported.
 """
 
-import enum
 import re
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from typing import ClassVar, Generic, TypeVar
 
 from .registry import ArtifactRegistry
+from .residency import ArtifactResidency
 
 T = TypeVar("T")
 
-# An artifact's name is also its folder name and part of its short identity, so it stays a plain slug.
+# An artifact's name is also its folder name and part of `ArtifactManifest.short_identity`
+# (e.g. ``uv_tuples@3f2a9c1e``), so it stays a plain slug.
 _ARTIFACT_NAME_PATTERN = re.compile(r"[a-z][a-z0-9_]*")
 
 
 # ==================================================================================================
-#  Artifact
+#  ArtifactDeclaration
 # ==================================================================================================
-class ArtifactResidency(enum.Enum):
-    """`ArtifactResidency` says where an artifact's data files live."""
+class ArtifactDeclaration(ABC, Generic[T]):
+    """`ArtifactDeclaration` is the base class of a data artifact declaration; each concrete subclass declares one.
 
-    EMBEDDED = "embedded"  # in the sunnbear package itself, next to the artifact's manifest
+    Defining the concrete subclass registers it. Example::
 
-
-class Artifact(ABC, Generic[T]):
-    """`Artifact` declares one data artifact; a concrete subclass declares it, and defining the subclass registers it.
-
-    Example::
-
-        class UvTuplesArtifact(Artifact[UvTuples]):
+        class UvTuplesArtifact(ArtifactDeclaration[UvTuples]):
             name = "uv_tuples"
             data_schema_version = 1
 
@@ -60,16 +55,18 @@ class Artifact(ABC, Generic[T]):
         """Validate a concrete subclass and register it with `ArtifactRegistry`; an abstract one is skipped.
 
         Raises:
-            TypeError: If ``name`` or ``data_schema_version`` is missing or of the wrong type.
-            ValueError: If ``name`` is not a valid artifact name, or registration fails (see
-                `ArtifactRegistry.register`).
+            TypeError: If ``name`` or ``data_schema_version`` is missing or of the wrong type; a bool
+                is refused as ``data_schema_version``.
+            ValueError: If ``name`` is not a valid artifact name, or another declaration already has
+                the same name.
         """
         super().__init_subclass__(**kwargs)
-        # ABCMeta sets `__abstractmethods__` only after `__init_subclass__` returns, so check the
-        # methods that `Artifact` leaves abstract directly.
-        if any(getattr(getattr(cls, method), "__isabstractmethod__", False) for method in Artifact.__abstractmethods__):
+        # ABCMeta sets `__abstractmethods__` only after `__init_subclass__` returns, so read the
+        # `__isabstractmethod__` flag of each method that `ArtifactDeclaration` leaves abstract.
+        abstract_methods = ArtifactDeclaration.__abstractmethods__
+        if any(getattr(getattr(cls, method), "__isabstractmethod__", False) for method in abstract_methods):
             return
-        cls._validate()
+        cls._check_class_attributes()
         ArtifactRegistry.register(cls)
 
     # --------------------------------------------------------------------------
@@ -89,8 +86,8 @@ class Artifact(ABC, Generic[T]):
     #  Validation
     # --------------------------------------------------------------------------
     @classmethod
-    def _validate(cls) -> None:
-        """Check the class attributes that a declaration must define."""
+    def _check_class_attributes(cls) -> None:
+        """Check the declaration's required class attributes."""
         for attr, attr_type in (("name", str), ("data_schema_version", int)):
             value = getattr(cls, attr, None)
             if not isinstance(value, attr_type) or isinstance(value, bool):

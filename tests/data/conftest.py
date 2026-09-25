@@ -5,5 +5,5 @@ from sunnbear._core.data import ArtifactRegistry
 
 @pytest.fixture
 def isolated_artifact_registry(monkeypatch):
-    """Give the test its own copy of the registry, so test-defined Artifact subclasses don't leak past the test."""
+    """Give the test its own copy of the artifact registry, so declarations that the test defines stay out of it."""
     monkeypatch.setattr(ArtifactRegistry, "_artifacts_by_name", dict(ArtifactRegistry._artifacts_by_name))

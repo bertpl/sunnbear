@@ -1,15 +1,15 @@
-"""`SampleLinesArtifact` is a test-only artifact, with its committed files in ``artifacts/sample_lines/`` beside it."""
+"""`SampleLinesArtifact` is a test-only artifact declaration."""
 
 from collections.abc import Mapping
 
-from sunnbear._core.data import Artifact
+from sunnbear._core.data import ArtifactDeclaration
 
-# The value that the committed files of `SampleLinesArtifact` hold.
+# The lines that the tests convert with `SampleLinesArtifact`.
 SAMPLE_LINES = ["alpha", "beta", "gamma"]
 
 
-class SampleLinesArtifact(Artifact[list[str]]):
-    """`SampleLinesArtifact` stores a list of text lines, plus their count in a nested file."""
+class SampleLinesArtifact(ArtifactDeclaration[list[str]]):
+    """`SampleLinesArtifact` stores text lines, plus their count in a nested file so the tests cover a subfolder."""
 
     name = "sample_lines"
     data_schema_version = 1

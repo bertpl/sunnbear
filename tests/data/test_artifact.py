@@ -1,18 +1,18 @@
-"""Defining a valid `Artifact` subclass registers it; `ArtifactRegistry` looks it up by name."""
+"""Defining a valid `ArtifactDeclaration` subclass registers it; `ArtifactRegistry` looks it up by name."""
 
 import pytest
 
-from sunnbear._core.data import Artifact, ArtifactError, ArtifactRegistry
+from sunnbear._core.data import ArtifactDeclaration, ArtifactError, ArtifactRegistry
 
 
-def _define_artifact(**attrs) -> type[Artifact]:
-    """Define a concrete `Artifact` subclass with the given class attributes."""
+def _define_artifact(**attrs) -> type[ArtifactDeclaration]:
+    """Define a concrete `ArtifactDeclaration` subclass with the given class attributes."""
     namespace = {
         "to_files": classmethod(lambda cls, value: {"value.txt": value}),
         "from_files": classmethod(lambda cls, files: files["value.txt"]),
         **attrs,
     }
-    return type("_DefinedArtifact", (Artifact,), namespace)
+    return type("_DefinedArtifact", (ArtifactDeclaration,), namespace)
 
 
 # ==================================================================================================
@@ -34,7 +34,7 @@ def test_an_abstract_artifact_is_not_registered():
     """A subclass that leaves the conversions abstract is a base for declarations, not one itself."""
 
     # --- arrange / act ----------------
-    class _AbstractArtifact(Artifact[str]):
+    class _AbstractArtifact(ArtifactDeclaration[str]):
         """`_AbstractArtifact` keeps `to_files` and `from_files` abstract."""
 
         name = "abstract_one"
@@ -58,6 +58,7 @@ def test_an_abstract_artifact_is_not_registered():
 )
 def test_a_malformed_declaration_fails_at_definition(attrs, error, message):
     """A missing or ill-typed attribute, or a name that is not a slug, fails when the class is defined."""
+    # --- act / assert -----------------
     with pytest.raises(error, match=message):
         _define_artifact(**attrs)
 
@@ -74,21 +75,21 @@ def test_two_declarations_cannot_share_a_name():
 
 
 @pytest.mark.usefixtures("isolated_artifact_registry")
-def test_artifacts_are_listed_by_name():
+def test_artifacts_are_sorted_by_name():
     """`artifacts` returns the declarations sorted by name, whatever the order of definition."""
     # --- arrange ----------------------
     later = _define_artifact(name="zz_later", data_schema_version=1)
     earlier = _define_artifact(name="aa_earlier", data_schema_version=1)
 
     # --- act --------------------------
-    names = [a.name for a in ArtifactRegistry.artifacts() if a in (later, earlier)]
+    names = [artifact_cls.name for artifact_cls in ArtifactRegistry.artifacts() if artifact_cls in (later, earlier)]
 
     # --- assert -----------------------
     assert names == ["aa_earlier", "zz_later"]
 
 
-def test_the_sample_fixture_declaration_converts_both_ways():
-    """The test fixture's own conversions are each other's inverse, which the store tests rely on."""
+def test_the_sample_declaration_converts_both_ways():
+    """`SampleLinesArtifact.from_files` reverses `SampleLinesArtifact.to_files`."""
     # --- arrange ----------------------
     from .sample_artifacts import SAMPLE_LINES, SampleLinesArtifact
 
