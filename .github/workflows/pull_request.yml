@@ -27,8 +27,8 @@ jobs:
         env:
           BRANCH: ${{ github.head_ref }}
         run: |
-          if [[ ! "$BRANCH" =~ ^(feat|fix|chore|docs|refactor|test)/[a-z0-9-]+$ ]]; then
-            echo "::error::Branch name '$BRANCH' does not match ^(feat|fix|chore|docs|refactor|test)/[a-z0-9-]+\$"
+          if [[ ! "$BRANCH" =~ ^(feat|fix|internal|chore|docs|refactor|test)/[a-z0-9-]+$ ]]; then
+            echo "::error::Branch name '$BRANCH' does not match ^(feat|fix|internal|chore|docs|refactor|test)/[a-z0-9-]+\$"
             exit 1
           fi
 
@@ -39,8 +39,8 @@ jobs:
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          if [[ ! "$PR_TITLE" =~ ^(feat|fix|chore|docs|refactor|test):[[:space:]].+ ]]; then
-            echo "::error::PR title '$PR_TITLE' does not match '<type>: <summary>' (type in feat|fix|chore|docs|refactor|test)"
+          if [[ ! "$PR_TITLE" =~ ^(feat|fix|internal|chore|docs|refactor|test):[[:space:]].+ ]]; then
+            echo "::error::PR title '$PR_TITLE' does not match '<type>: <summary>' (type in feat|fix|internal|chore|docs|refactor|test)"
             exit 1
           fi
 

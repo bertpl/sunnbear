@@ -34,8 +34,10 @@ Branch names follow the pattern:
 <prefix>/<short-slug>
 ```
 
-- **Prefix** — one of `feat/`, `fix/`, `chore/`, `docs/`, `refactor/`,
-  `test/`. CI rejects anything else.
+- **Prefix** — one of `feat/`, `fix/`, `internal/`, `chore/`, `docs/`,
+  `refactor/`, `test/`. CI rejects anything else. `internal/` is for new
+  functionality that users do not see, such as machinery a later
+  feature builds on; unlike `feat/`, it needs no changelog entry.
 - **Slug** — short kebab-case description, lowercase letters, digits,
   and hyphens only. When a GitHub issue exists, start the slug with its
   number (`feat/42-...`).
@@ -60,8 +62,9 @@ Subject line uses the same short-form prefixes as branches:
 <prefix>: <imperative summary>
 ```
 
-- **Prefix** — `feat`, `fix`, `chore`, `docs`, `refactor`, `test`
-  (matching the branch prefix is the common case but not required).
+- **Prefix** — `feat`, `fix`, `internal`, `chore`, `docs`, `refactor`,
+  `test` (matching the branch prefix is the common case but not
+  required).
 - **Summary** — imperative mood, lowercase, no trailing period,
   ideally under 72 characters.
 
