@@ -1,0 +1,21 @@
+{
+  "build_date": "2026-09-26",
+  "built_with": {
+    "sunnbear": "0.1.2"
+  },
+  "content_hash": "43b2eb354854d7ecd40c7efca13bac820208f88fdd1219f3e04d3aaee529edee",
+  "files": [
+    {
+      "path": "lines.txt",
+      "sha256": "4fdbc441ea7b546100e086ac1e4fc5ae6749b7314311c99db05be450eca12996",
+      "size_bytes": 17
+    },
+    {
+      "path": "meta/count.txt",
+      "sha256": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2",
+      "size_bytes": 2
+    }
+  ],
+  "input_artifact_hashes": {},
+  "name": "sample_lines"
+}
