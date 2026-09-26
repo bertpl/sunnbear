@@ -1,9 +1,10 @@
 """`ArtifactArchiver` packs the data files of a downloaded artifact into one archive, and unpacks them.
 
 The archive is a tar file compressed with zstd, so an artifact is downloaded and hash-checked as a
-single file, whatever the number of its data files and however deep their paths. The archiver works
-in memory, on bytes: it never reads or writes the file system, so unpacking a malicious archive
-cannot write any file.
+single file, whatever the number of its data files and however deep their paths.
+
+The archiver works in memory, on bytes: it never reads or writes the file system, so unpacking a
+malicious archive cannot write any file.
 """
 
 import io
@@ -12,7 +13,7 @@ from collections.abc import Collection, Mapping
 
 from .exceptions import ArtifactError
 
-# `tarfile` and `compression.zstd` read and write zstd from Python 3.14; `backports.zstd` provides the
+# `tarfile` and `compression.zstd` support zstd starting with Python 3.14; `backports.zstd` provides the
 # same API on older versions.
 if sys.version_info >= (3, 14):
     import tarfile
@@ -25,7 +26,8 @@ _ARCHIVE_SUFFIX = ".tar.zst"
 # Packing uses the highest standard zstd level: an archive is packed once, by the maintainer, and
 # downloaded by every user, so size matters more than packing time.
 _ZSTD_LEVEL = 19
-# A fixed mode, like the zeroed times and owners, keeps the packed bytes reproducible.
+# A fixed file permission mode keeps the packed bytes reproducible, like the zero modification times
+# and owners that `tarfile.TarInfo` sets by default.
 _FILE_MODE = 0o644
 
 
@@ -36,7 +38,7 @@ class ArtifactArchiver:
     """`ArtifactArchiver` converts between an artifact's data files and the bytes of their zstd-compressed tar file."""
 
     @staticmethod
-    def file_name(artifact_name: str) -> str:
+    def archive_file_name(artifact_name: str) -> str:
         """Return the file name of the archive of the artifact with this name, e.g. ``uv_tuples.tar.zst``."""
         return f"{artifact_name}{_ARCHIVE_SUFFIX}"
 

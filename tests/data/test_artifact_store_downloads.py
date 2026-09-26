@@ -12,10 +12,9 @@ from .sample_declarations import SAMPLE_LINES, SampleDownloadedLinesDeclaration,
 # The committed manifest of `SampleDownloadedLinesDeclaration` is read by path, so that a test that
 # moves artifact folders into `tmp_path` still finds it.
 _COMMITTED_MANIFEST_PATH = Path(__file__).parent / "artifacts" / SampleDownloadedLinesDeclaration.name / "manifest.json"
-# `_COMMITTED_ARCHIVE_PATH` holds the committed archive of `SampleDownloadedLinesDeclaration`; the tests'
-# stand-in for `ArtifactStore._download` serves it.
+# The tests' stand-in for `ArtifactStore._download` serves this committed archive.
 _COMMITTED_ARCHIVE_PATH = (
-    Path(__file__).parent / "downloads" / ArtifactArchiver.file_name(SampleDownloadedLinesDeclaration.name)
+    Path(__file__).parent / "downloads" / ArtifactArchiver.archive_file_name(SampleDownloadedLinesDeclaration.name)
 )
 
 
@@ -56,15 +55,15 @@ def lines_file_cache_path(cache_root_in_tmp):
 
 
 @pytest.fixture
-def archive_cache_path(lines_file_cache_path):
+def placed_archive_path(lines_file_cache_path):
     """Return the cache path where the archive of `SampleDownloadedLinesDeclaration` can be placed by hand."""
-    return lines_file_cache_path.parent / ArtifactArchiver.file_name(SampleDownloadedLinesDeclaration.name)
+    return lines_file_cache_path.parent / ArtifactArchiver.archive_file_name(SampleDownloadedLinesDeclaration.name)
 
 
 # ==================================================================================================
 #  Loading
 # ==================================================================================================
-def test_load_downloads_the_archive_once_and_then_reads_the_cache(stub_download_requested_urls, archive_cache_path):
+def test_load_downloads_the_archive_once_and_then_reads_the_cache(stub_download_requested_urls, placed_archive_path):
     """The first load downloads, unpacks and deletes the archive; the second load reads the unpacked files."""
     # --- act --------------------------
     first_value = ArtifactStore.load(SampleDownloadedLinesDeclaration)
@@ -73,7 +72,7 @@ def test_load_downloads_the_archive_once_and_then_reads_the_cache(stub_download_
     # --- assert -----------------------
     assert first_value == second_value == SAMPLE_LINES
     assert stub_download_requested_urls == ["https://example.invalid/sample_downloaded_lines.tar.zst"]
-    assert not archive_cache_path.exists()
+    assert not placed_archive_path.exists()
 
 
 def test_load_uses_files_placed_in_the_cache_by_hand(stub_download_requested_urls, lines_file_cache_path):
@@ -99,12 +98,12 @@ def test_load_uses_files_placed_in_the_cache_by_hand(stub_download_requested_url
     ],
 )
 def test_load_unpacks_an_archive_placed_in_the_cache_by_hand(
-    stub_download_requested_urls, lines_file_cache_path, archive_cache_path, placed_archive_bytes, expected_urls
+    stub_download_requested_urls, lines_file_cache_path, placed_archive_path, placed_archive_bytes, expected_urls
 ):
-    """A placed archive is used if it matches the archive entry, else a fresh one is downloaded; either is deleted."""
+    """A hand-placed archive is used if it matches the archive entry, else downloaded; either way it is deleted."""
     # --- arrange ----------------------
-    archive_cache_path.parent.mkdir(parents=True)
-    archive_cache_path.write_bytes(placed_archive_bytes)
+    placed_archive_path.parent.mkdir(parents=True)
+    placed_archive_path.write_bytes(placed_archive_bytes)
 
     # --- act --------------------------
     value = ArtifactStore.load(SampleDownloadedLinesDeclaration)
@@ -113,7 +112,7 @@ def test_load_unpacks_an_archive_placed_in_the_cache_by_hand(
     assert value == SAMPLE_LINES
     assert stub_download_requested_urls == expected_urls
     assert lines_file_cache_path.is_file()
-    assert not archive_cache_path.exists()
+    assert not placed_archive_path.exists()
 
 
 def test_load_downloads_again_when_a_cached_file_does_not_match_its_entry(
@@ -137,11 +136,11 @@ def test_load_downloads_again_when_a_cached_file_does_not_match_its_entry(
     "download, message",
     [
         (_raise_connection_error, r"Downloading https://example\.invalid/\S+ failed"),
-        (lambda url: b"unexpected\n", r"does not match the manifest's archive entry"),
+        (lambda url: b"unexpected\n", r"does not match the size and sha256 in the manifest"),
     ],
 )
 def test_load_reports_a_failed_or_wrong_download_and_caches_nothing(
-    monkeypatch, cache_root_in_tmp, archive_cache_path, download, message
+    monkeypatch, cache_root_in_tmp, placed_archive_path, download, message
 ):
     """A download that fails, or returns other bytes than the archive entry, is an error that names the archive path.
 
@@ -153,12 +152,12 @@ def test_load_reports_a_failed_or_wrong_download_and_caches_nothing(
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match=message) as error_info:
         ArtifactStore.load(SampleDownloadedLinesDeclaration)
-    assert str(archive_cache_path) in str(error_info.value)
+    assert str(placed_archive_path) in str(error_info.value)
     assert not any(path.is_file() for path in cache_root_in_tmp.rglob("*"))
 
 
 def test_load_refuses_an_archive_whose_files_differ_from_the_manifest(monkeypatch, artifacts_folder_in_tmp):
-    """An archive that matches its archive entry but holds other file contents than the manifest lists is refused."""
+    """An archive that matches its archive entry but holds a file that differs from its manifest entry is refused."""
     # --- arrange ----------------------
     archive_bytes = ArtifactArchiver.pack(SampleLinesDeclaration.to_files(["alpha", "beta", "delta"]))
     archive_entry = ArtifactArchiveEntry.from_content("https://example.invalid/other.tar.zst", archive_bytes)
@@ -179,10 +178,7 @@ def test_load_refuses_an_archive_whose_files_differ_from_the_manifest(monkeypatc
 def test_save_writes_the_data_files_to_the_cache_and_only_the_manifest_to_the_artifact_folder(
     monkeypatch, artifacts_folder_in_tmp, lines_file_cache_path
 ):
-    """Saving a downloaded artifact puts only the manifest in its folder and the data files in the cache.
-
-    The artifact then loads without a download.
-    """
+    """A saved downloaded artifact has only its manifest in its folder, and loads from the data files in the cache."""
     # --- arrange ----------------------
     monkeypatch.setattr(ArtifactStore, "_download", staticmethod(_raise_connection_error))
     folder = artifacts_folder_in_tmp / SampleDownloadedLinesDeclaration.name
@@ -201,7 +197,7 @@ def test_save_writes_the_data_files_to_the_cache_and_only_the_manifest_to_the_ar
 
 
 @pytest.mark.usefixtures("artifacts_folder_in_tmp")
-def test_load_without_download_entry_or_cached_copy_fails(lines_file_cache_path):
+def test_load_without_archive_entry_or_cached_copy_fails(lines_file_cache_path):
     """A saved downloaded artifact whose cached copy is gone cannot be loaded: its manifest has no archive entry."""
     # --- arrange ----------------------
     ArtifactStore.save(SampleDownloadedLinesDeclaration, SAMPLE_LINES)

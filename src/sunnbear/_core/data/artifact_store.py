@@ -14,12 +14,12 @@ Where the data files live depends on the declaration's `ArtifactSource`:
   package, and the test suite runs `ArtifactStore.verify_builtin_artifacts` on every change.
 - **download**: in the cache folder ``<cache root>/<artifact name>/<content hash>``, where the cache
   root is ``SUNNBEAR_CACHE_DIR`` when that environment variable is set, else the user's cache folder
-  for sunnbear. The data files are downloaded as one archive (`ArtifactArchiver`), described by the
-  manifest's ``archive`` entry. When the cache lacks a data file, or holds a copy whose hash
-  differs from the file's manifest entry, loading:
+  for sunnbear. The data files are downloaded as one archive, which `ArtifactArchiver` packs and
+  unpacks and the manifest's ``archive`` entry describes. When the cache lacks a data file, or
+  holds a copy whose hash differs from the file's manifest entry, loading:
 
   - downloads the archive and checks its hash;
-  - unpacks it into the cache folder;
+  - unpacks the archive into the cache folder;
   - checks every unpacked file against its manifest entry.
 """
 
@@ -81,10 +81,13 @@ class ArtifactStore:
 
                 - the manifest is missing, malformed or names another artifact;
                 - a file shipped in the package is missing;
-                - the archive is needed and either the manifest has no ``archive`` entry, the
-                  download fails, the archive does not match that entry, or the unpacked files do
-                  not match the manifest; for a failed or mismatched download, the message names
-                  the path where the archive can be placed by hand.
+                - the archive is needed and one of these holds:
+
+                    - the manifest has no ``archive`` entry;
+                    - the download fails, or the archive does not match that entry; the message
+                      names the path where the archive can be placed by hand;
+                    - the archive cannot be unpacked, or the unpacked files do not match the
+                      manifest.
         """
         manifest = cls.load_manifest(declaration_cls)
         match declaration_cls.source:
@@ -202,7 +205,8 @@ class ArtifactStore:
 
                 - the manifest is missing, malformed or names another artifact;
                 - for an artifact shipped in the package, a file is missing, differs from its
-                  manifest entry, or is not listed, or the manifest has an ``archive`` entry;
+                  manifest entry, or is not listed;
+                - for an artifact shipped in the package, the manifest has an ``archive`` entry;
                 - for a downloaded artifact, a data file lies next to the manifest, or the manifest
                   has no ``archive`` entry.
         """
@@ -283,7 +287,7 @@ class ArtifactStore:
         """Return a downloaded artifact's data files from the cache, unpacking its archive there first if needed.
 
         The archive is needed when a cached file is missing or differs from its manifest entry. It
-        is deleted from the cache folder once its files are unpacked.
+        The archive is deleted from the cache folder once its files are unpacked.
 
         Raises:
             ArtifactError: If the archive is needed but cannot be read or downloaded, or its files do
@@ -293,7 +297,7 @@ class ArtifactStore:
         cached_contents = cls._read_matching_cached_files(cache_folder, manifest)
         if cached_contents is not None:
             return cached_contents
-        archive_file = cache_folder / ArtifactArchiver.file_name(manifest.name)
+        archive_file = cache_folder / ArtifactArchiver.archive_file_name(manifest.name)
         contents = ArtifactArchiver.unpack(
             cls._read_or_download_archive(manifest, archive_file), [entry.path for entry in manifest.files]
         )
@@ -348,7 +352,7 @@ class ArtifactStore:
             ) from error
         if not archive_entry.matches(archive_bytes):
             raise ArtifactError(
-                f"The archive downloaded from {archive_entry.url} does not match the manifest's archive entry. "
+                f"The archive downloaded from {archive_entry.url} does not match the size and sha256 in the manifest. "
                 f"The correct archive can also be placed at {archive_file}."
             )
         return archive_bytes

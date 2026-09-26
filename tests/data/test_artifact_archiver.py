@@ -1,4 +1,4 @@
-"""`ArtifactArchiver` packs data files into a tar file reproducibly, and unpacks only the files asked for."""
+"""`ArtifactArchiver` packs data files into a tar file reproducibly, and unpacks only the requested files."""
 
 import io
 
@@ -50,9 +50,9 @@ def test_pack_gives_the_same_bytes_for_the_same_contents():
     }
 
 
-def test_file_name_is_the_artifact_name_with_the_archive_suffix():
+def test_archive_file_name_is_the_artifact_name_with_the_archive_suffix():
     """The archive of ``uv_tuples`` is named ``uv_tuples.tar.zst``."""
-    assert ArtifactArchiver.file_name("uv_tuples") == "uv_tuples.tar.zst"
+    assert ArtifactArchiver.archive_file_name("uv_tuples") == "uv_tuples.tar.zst"
 
 
 # ==================================================================================================

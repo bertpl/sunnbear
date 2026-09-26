@@ -53,9 +53,11 @@ class ArtifactManifest(BaseModel):
             arguments, as JSON-compatible data; ``None`` when no public function generated it.
         archive: Where to download the archive that holds all data files of a downloaded
             artifact, and the archive's hash; ``None`` for an artifact shipped in the package, and
-            for a downloaded artifact whose archive is not published yet. The content hash does not
-            cover this field, so recording it, or repacking the archive with another zstd version,
-            which may give other bytes, leaves the content hash unchanged.
+            for a downloaded artifact whose archive is not published yet.
+
+            The content hash does not cover this field: recording the archive entry leaves the
+            content hash unchanged, and so does repacking the archive with another zstd version,
+            which may give other bytes.
     """
 
     model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
@@ -132,10 +134,10 @@ class ArtifactManifest(BaseModel):
 
 
 # ==================================================================================================
-#  ArtifactContentEntry and its subclasses
+#  ArtifactHashEntry and its subclasses
 # ==================================================================================================
-class ArtifactContentEntry(BaseModel):
-    """An `ArtifactContentEntry` records what the bytes of one file hash to; subclasses say which file it is.
+class ArtifactHashEntry(BaseModel):
+    """An `ArtifactHashEntry` records what the bytes of one file hash to; subclasses say which file it is.
 
     Attributes:
         sha256: The sha256 of the file's bytes, as hex.
@@ -147,16 +149,16 @@ class ArtifactContentEntry(BaseModel):
     size_bytes: int
 
     @staticmethod
-    def _hash_fields_of(content: bytes) -> dict[str, Any]:
+    def _sha256_and_size_of(content: bytes) -> dict[str, Any]:
         """Return the ``sha256`` and ``size_bytes`` values that describe `content`."""
         return {"sha256": hashlib.sha256(content).hexdigest(), "size_bytes": len(content)}
 
     def matches(self, content: bytes) -> bool:
         """Return whether `content` has this entry's size and sha256."""
-        return len(content) == self.size_bytes and hashlib.sha256(content).hexdigest() == self.sha256
+        return self._sha256_and_size_of(content) == {"sha256": self.sha256, "size_bytes": self.size_bytes}
 
 
-class ArtifactFileEntry(ArtifactContentEntry):
+class ArtifactFileEntry(ArtifactHashEntry):
     """An `ArtifactFileEntry` describes one data file of an artifact: where it lives and what its bytes hash to.
 
     Attributes:
@@ -179,10 +181,10 @@ class ArtifactFileEntry(ArtifactContentEntry):
     @classmethod
     def from_content(cls, path: str, content: bytes) -> "ArtifactFileEntry":
         """Describe a file by hashing its content."""
-        return cls(path=path, **cls._hash_fields_of(content))
+        return cls(path=path, **cls._sha256_and_size_of(content))
 
 
-class ArtifactArchiveEntry(ArtifactContentEntry):
+class ArtifactArchiveEntry(ArtifactHashEntry):
     """An `ArtifactArchiveEntry` describes the archive of a downloaded artifact: where to download it, and its hash.
 
     Attributes:
@@ -194,4 +196,4 @@ class ArtifactArchiveEntry(ArtifactContentEntry):
     @classmethod
     def from_content(cls, url: str, content: bytes) -> "ArtifactArchiveEntry":
         """Describe an archive by hashing its content."""
-        return cls(url=url, **cls._hash_fields_of(content))
+        return cls(url=url, **cls._sha256_and_size_of(content))
