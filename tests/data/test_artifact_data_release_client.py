@@ -26,7 +26,7 @@ def _stub_gh(monkeypatch, respond) -> list[list[str]]:
 
 
 def _gh_failing_with(message: str):
-    """Return a stand-in for `_run_gh` that fails as if the GitHub CLI had written `message` to its error output."""
+    """Return a `respond` function for `_stub_gh` that fails as if the GitHub CLI had written `message` as error."""
 
     def respond(args: list[str]) -> str:
         raise ArtifactError(f"The GitHub CLI failed: {message}")

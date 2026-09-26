@@ -8,7 +8,7 @@ package releases:
 - its only file is the archive.
 
 Every call goes through the GitHub CLI (``gh``) with the maintainer's own authentication, so
-publishing is internal, maintainer-only functionality.
+creating a data release is internal, maintainer-only functionality.
 """
 
 import json
@@ -19,30 +19,14 @@ from pathlib import Path
 
 from .exceptions import ArtifactError
 
-# This repository hosts the data releases; it is named explicitly so that publishing does not depend
-# on the working directory of `gh`.
+# This repository hosts the data releases; it is named explicitly because `gh` otherwise takes the
+# repository from the git checkout it runs in.
 _GITHUB_REPOSITORY = "bertpl/sunnbear"
 _GH_EXECUTABLE = "gh"
 _MAINTAINER_ONLY_MESSAGE = (
     "Publishing a data release is internal, maintainer-only functionality: it needs the GitHub CLI "
     f"(gh), logged in with write access to {_GITHUB_REPOSITORY}."
 )
-
-
-# ==================================================================================================
-#  ArtifactDataRelease
-# ==================================================================================================
-@dataclass(frozen=True)
-class ArtifactDataRelease:
-    """An `ArtifactDataRelease` describes an existing data release, as `ArtifactDataReleaseClient.find` reports it.
-
-    Attributes:
-        is_draft: Whether the release is still a draft, e.g. left behind when publishing was interrupted.
-        file_urls: The download URL of each file attached to the release, keyed by file name.
-    """
-
-    is_draft: bool
-    file_urls: dict[str, str]
 
 
 # ==================================================================================================
@@ -74,12 +58,12 @@ class ArtifactDataReleaseClient:
             raise ArtifactError(_MAINTAINER_ONLY_MESSAGE)
 
     @classmethod
-    def find(cls, tag: str) -> ArtifactDataRelease | None:
+    def find(cls, tag: str) -> "ArtifactDataRelease | None":
         """Return the data release with this tag, or ``None`` if the repository has no release with it.
 
         Raises:
             ArtifactError: If the GitHub CLI is not installed, or fails for any reason other than a
-                missing release; the message holds its error output.
+                missing release; the message holds the GitHub CLI's error output.
         """
         try:
             output = cls._run_gh(["release", "view", tag, "--repo", _GITHUB_REPOSITORY, "--json", "isDraft,assets"])
@@ -87,10 +71,10 @@ class ArtifactDataReleaseClient:
             if "release not found" in str(error):
                 return None
             raise
-        release_json = json.loads(output)
+        release_fields = json.loads(output)
         return ArtifactDataRelease(
-            is_draft=release_json["isDraft"],
-            file_urls={asset["name"]: asset["url"] for asset in release_json["assets"]},
+            is_draft=release_fields["isDraft"],
+            file_urls={asset["name"]: asset["url"] for asset in release_fields["assets"]},
         )
 
     @classmethod
@@ -99,11 +83,12 @@ class ArtifactDataReleaseClient:
 
         The release's tag is created on the head of ``main``. The GitHub CLI uploads the file while
         the release is still a draft and only then publishes it, because the repository has GitHub's
-        immutable releases enabled, which forbid adding files to a release after it is published.
+        immutable releases enabled, which forbid adding files to a release after it is published. An
+        interrupted call can therefore leave a draft release behind.
 
         Raises:
             ArtifactError: If the GitHub CLI is not installed, or fails to create the release; the
-                message holds its error output.
+                message holds the GitHub CLI's error output.
         """
         with tempfile.TemporaryDirectory() as folder:
             file_path = Path(folder) / file_name
@@ -119,7 +104,7 @@ class ArtifactDataReleaseClient:
 
         Raises:
             ArtifactError: If the GitHub CLI is not installed, or exits with an error; the message
-                holds its error output.
+                holds the GitHub CLI's error output.
         """
         try:
             # The arguments are built by this class, never by user input, and no shell is involved.
@@ -129,3 +114,19 @@ class ArtifactDataReleaseClient:
         except subprocess.CalledProcessError as error:
             raise ArtifactError(f"The GitHub CLI failed: {error.stderr.strip()}") from error
         return completed.stdout
+
+
+# ==================================================================================================
+#  ArtifactDataRelease, the result of ArtifactDataReleaseClient.find
+# ==================================================================================================
+@dataclass(frozen=True)
+class ArtifactDataRelease:
+    """An `ArtifactDataRelease` describes an existing data release, as `ArtifactDataReleaseClient.find` reports it.
+
+    Attributes:
+        is_draft: Whether the release is still a draft, e.g. left behind when publishing was interrupted.
+        file_urls: The download URL of each file attached to the release, keyed by file name.
+    """
+
+    is_draft: bool
+    file_urls: dict[str, str]

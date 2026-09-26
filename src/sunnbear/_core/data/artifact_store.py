@@ -285,12 +285,14 @@ class ArtifactStore:
     # --------------------------------------------------------------------------
     @classmethod
     def publish(cls, declaration_cls: type[ArtifactDeclaration]) -> ArtifactManifest:
-        """Publish a downloaded artifact's archive as a data release, and record it as the manifest's ``archive`` entry.
+        """Publish a downloaded artifact's archive as a data release, and record the archive in the manifest.
 
-        Publishing is internal, maintainer-only functionality, called right after `save`. It:
+        Publishing, called right after `save`, is internal, maintainer-only functionality. A data
+        release is a GitHub release that holds only this archive (see `ArtifactDataReleaseClient`).
+        Publishing:
 
         - packs the data files from the cache;
-        - creates the data release (see `ArtifactDataReleaseClient`);
+        - creates the data release;
         - downloads the archive back from the release;
         - checks the unpacked files against the manifest, and only then records the archive.
 
@@ -303,7 +305,7 @@ class ArtifactStore:
         Raises:
             ArtifactError: If any of these holds:
 
-                - the artifact is not downloaded, or its manifest is missing or malformed;
+                - the artifact ships in the package, or its manifest is missing or malformed;
                 - the GitHub CLI is missing, has no write access to the repository, or fails;
                 - the data release does not exist and the cache lacks the data files, e.g. because
                   the artifact was not saved first;
@@ -332,11 +334,12 @@ class ArtifactStore:
                 title=f"Data: {manifest.short_identity}",
                 notes=f"Data files of the sunnbear artifact `{manifest.name}`, content hash `{manifest.content_hash}`.",
             )
+            # `create` returns nothing, so read the release back for the archive's download URL.
             release = ArtifactDataReleaseClient.find(tag)
         if release is None or release.is_draft or archive_file_name not in release.file_urls:
             raise ArtifactError(
                 f"The data release {tag} is a draft or lacks {archive_file_name}, e.g. because publishing "
-                f"was interrupted; delete it with `gh release delete {tag} --cleanup-tag` and publish again."
+                f"was interrupted; delete the release with `gh release delete {tag} --cleanup-tag` and publish again."
             )
         url = release.file_urls[archive_file_name]
         try:
@@ -473,7 +476,7 @@ class ArtifactStore:
 
     @classmethod
     def _folder_on_disk_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Path:
-        """Return the artifact's folder as a directory on disk, which `save` and `publish` write to.
+        """Return the artifact's folder, checked to be a directory on disk so that it can be written to.
 
         Raises:
             ArtifactError: If the folder is not a directory on disk, e.g. inside a zipped install.

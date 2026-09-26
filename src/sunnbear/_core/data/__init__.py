@@ -15,11 +15,11 @@ classes, by role:
     downloaded artifact;
 - reading and writing files:
   - `ArtifactStore` is the only code that touches artifact paths or URLs, apart from the release
-    URLs that `ArtifactDataReleaseClient` reads from GitHub: it loads, saves, verifies and
-    publishes an artifact through its declaration;
+    URLs that `ArtifactDataReleaseClient` reads from GitHub; `ArtifactStore` loads, saves,
+    verifies and publishes an artifact through its declaration;
   - `ArtifactArchiver` packs a downloaded artifact's data files into one archive, and unpacks it;
-  - `ArtifactDataReleaseClient` creates and reads the GitHub releases that host those archives,
-    which `ArtifactStore.publish` uses;
+  - `ArtifactDataReleaseClient`, which `ArtifactStore.publish` uses, creates and reads the GitHub
+    releases that host those archives;
 - `ArtifactError` is raised when an artifact cannot be read or trusted.
 
 The package depends only on `sunnbear._core.exceptions` and `sunnbear._core.utils`, so every other

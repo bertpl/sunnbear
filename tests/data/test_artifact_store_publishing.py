@@ -1,4 +1,4 @@
-"""`ArtifactStore.publish` hosts a downloaded artifact's archive as a data release, and records it in the manifest."""
+"""`ArtifactStore.publish` puts a downloaded artifact's archive in a data release, and records it in the manifest."""
 
 import shutil
 
@@ -67,13 +67,15 @@ def test_publish_creates_the_release_and_records_the_archive(fake_github, cache_
 
     # --- act --------------------------
     manifest = ArtifactStore.publish(SampleDownloadedLinesDeclaration)
+    verified_manifest = ArtifactStore.verify(SampleDownloadedLinesDeclaration)
+    shutil.rmtree(cache_root_in_tmp)
+    loaded_lines = ArtifactStore.load(SampleDownloadedLinesDeclaration)
 
     # --- assert -----------------------
     assert fake_github.created_tags == [_tag_of_sample()]
     assert manifest.archive.url == f"https://example.invalid/{_tag_of_sample()}/sample_downloaded_lines.tar.zst"
-    assert ArtifactStore.verify(SampleDownloadedLinesDeclaration) == manifest
-    shutil.rmtree(cache_root_in_tmp)
-    assert ArtifactStore.load(SampleDownloadedLinesDeclaration) == SAMPLE_LINES
+    assert verified_manifest == manifest
+    assert loaded_lines == SAMPLE_LINES
 
 
 def test_publish_records_an_existing_release_without_creating_another(fake_github):
@@ -91,7 +93,7 @@ def test_publish_records_an_existing_release_without_creating_another(fake_githu
 
 
 def test_publish_refuses_an_existing_release_whose_files_differ(fake_github):
-    """An existing data release whose archive holds other files than the manifest lists is not recorded."""
+    """An existing data release whose archive holds files that differ from the manifest is not recorded."""
     # --- arrange ----------------------
     ArtifactStore.save(SampleDownloadedLinesDeclaration, SAMPLE_LINES)
     other_archive = ArtifactArchiver.pack(SampleLinesDeclaration.to_files(["alpha", "beta", "delta"]))
@@ -143,7 +145,7 @@ def test_publish_refuses_an_artifact_shipped_in_the_package():
 
 
 def test_publish_checks_write_access_first(monkeypatch, fake_github):
-    """Without write access, the error of the access check stops publishing before any release is created."""
+    """Without write access, the error that `check_write_access` raises stops publishing before any release exists."""
     # --- arrange ----------------------
     ArtifactStore.save(SampleDownloadedLinesDeclaration, SAMPLE_LINES)
 
