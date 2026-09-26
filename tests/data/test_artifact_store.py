@@ -23,9 +23,9 @@ def _define_builtin_declaration(name: str, file_path: str = "value.txt") -> type
 
 
 @pytest.fixture
-def sample_lines_folder_in_tmp(artifact_folders_in_tmp):
-    """Return the folder of `SampleLinesDeclaration`, placed in `tmp_path` by `artifact_folders_in_tmp`."""
-    return artifact_folders_in_tmp / SampleLinesDeclaration.name
+def sample_lines_folder_in_tmp(artifacts_folder_in_tmp):
+    """Return the folder of `SampleLinesDeclaration`, placed in `tmp_path` by `artifacts_folder_in_tmp`."""
+    return artifacts_folder_in_tmp / SampleLinesDeclaration.name
 
 
 # ==================================================================================================

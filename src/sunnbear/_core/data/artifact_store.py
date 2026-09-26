@@ -14,8 +14,8 @@ Where the data files live depends on the declaration's `ArtifactSource`:
   package, and the test suite runs `ArtifactStore.verify_builtin_artifacts` on every change.
 - **download**: in the cache folder ``<cache root>/<artifact name>/<content hash>``, where the cache
   root is ``SUNNBEAR_DATA_DIR`` when that environment variable is set, else the user's cache folder
-  for sunnbear. When the cache lacks a data file, or holds it with other content, loading downloads
-  it from the URL in the file's manifest entry and checks its hash.
+  for sunnbear. When the cache lacks a data file, or holds a copy whose hash differs from the file's
+  manifest entry, loading downloads it from the URL in the file's manifest entry and checks its hash.
 """
 
 import datetime
@@ -70,7 +70,7 @@ class ArtifactStore:
 
                 - the manifest is missing, malformed or names another artifact;
                 - a file shipped in the package is missing;
-                - a downloaded file is not in the cache and has no URL, its download fails, or the
+                - a downloaded file has no matching copy in the cache and no URL, its download fails, or the
                   downloaded bytes do not match its manifest entry; the message names the cache path,
                   where the file can also be placed by hand.
         """
@@ -244,7 +244,7 @@ class ArtifactStore:
     def _compare_shipped_files_with_manifest(
         folder: Traversable, present_paths: set[str], manifest: ArtifactManifest
     ) -> list[str]:
-        """Return a problem for each data file that is missing from `folder`, differs from its entry, or is unlisted."""
+        """Return a problem message for each data file that is missing, differs from its entry, or is unlisted."""
         listed_paths = {entry.path for entry in manifest.files}
         problems = [f"{path} is not listed in the manifest" for path in sorted(present_paths - listed_paths)]
         for entry in manifest.files:
@@ -266,17 +266,17 @@ class ArtifactStore:
             case ArtifactSource.PACKAGE:
                 return cls._read_file(cls._folder_of(declaration_cls), entry.path, declaration_cls)
             case ArtifactSource.DOWNLOAD:
-                return cls._read_downloaded_file(manifest, entry)
+                return cls._read_or_download_file(manifest, entry)
             case _:
                 assert_never(declaration_cls.source)
 
     @classmethod
-    def _read_downloaded_file(cls, manifest: ArtifactManifest, entry: ArtifactFileEntry) -> bytes:
+    def _read_or_download_file(cls, manifest: ArtifactManifest, entry: ArtifactFileEntry) -> bytes:
         """Return a downloaded data file from the cache, downloading it first if the cache holds no matching copy.
 
         Raises:
-            ArtifactError: If the file is not in the cache and has no URL, its download fails, or the
-                downloaded bytes do not match the entry.
+            ArtifactError: If the cache holds no matching copy of the file and it has no URL, its
+                download fails, or the downloaded bytes do not match the entry.
         """
         cache_file = cls._cache_folder_of(manifest) / entry.path
         if cache_file.is_file():
@@ -316,10 +316,7 @@ class ArtifactStore:
 
     @staticmethod
     def _cache_folder_of(manifest: ArtifactManifest) -> Path:
-        """Return the cache folder of a downloaded artifact's data files.
-
-        The folder is ``<cache root>/<artifact name>/<content hash>``.
-        """
+        """Return a downloaded artifact's cache folder, under ``SUNNBEAR_DATA_DIR`` if set, else the user cache."""
         cache_root = os.environ.get(_DATA_DIR_ENV_VAR) or platformdirs.user_cache_dir("sunnbear")
         return Path(cache_root) / manifest.name / manifest.content_hash
 

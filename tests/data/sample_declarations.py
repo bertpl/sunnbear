@@ -1,8 +1,9 @@
-"""This module holds the test-only artifact declarations.
+"""This module holds the test-only artifact declarations:
 
-`SampleLinesDeclaration` has committed data files. `SampleDownloadedLinesDeclaration` has only a
-committed manifest, and its data files are downloaded. `define_declaration` defines a 1-file
-declaration on the fly.
+- `SampleLinesDeclaration` has committed data files;
+- `SampleDownloadedLinesDeclaration` has only a committed manifest, and its data files are
+  downloaded;
+- `define_declaration` defines a 1-file declaration on the fly.
 """
 
 from collections.abc import Mapping
