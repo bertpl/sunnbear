@@ -12,13 +12,13 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from typing import ClassVar, Generic, TypeVar
 
-from .registry import ArtifactRegistry
-from .residency import ArtifactResidency
+from .artifact_registry import ArtifactRegistry
+from .artifact_source import ArtifactSource
 
 T = TypeVar("T")
 
-# An artifact's name is also its folder name and part of `ArtifactManifest.short_identity`
-# (e.g. ``uv_tuples@3f2a9c1e``), so it stays a plain slug.
+# An artifact's name is a plain slug matching this pattern, because it also names the artifact's
+# folder and forms part of `ArtifactManifest.short_identity`.
 _ARTIFACT_NAME_PATTERN = re.compile(r"[a-z][a-z0-9_]*")
 
 
@@ -41,11 +41,11 @@ class ArtifactDeclaration(ABC, Generic[T]):
 
     Class attributes:
         name: The artifact's name: lowercase letters, digits and underscores, starting with a letter.
-        residency: Where the data files live.
+        source: Where the data files come from.
     """
 
     name: ClassVar[str]
-    residency: ClassVar[ArtifactResidency] = ArtifactResidency.EMBEDDED
+    source: ClassVar[ArtifactSource] = ArtifactSource.PACKAGE
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         """Validate a concrete subclass and register it with `ArtifactRegistry`; an abstract one is skipped.
@@ -56,10 +56,7 @@ class ArtifactDeclaration(ABC, Generic[T]):
                 the same name.
         """
         super().__init_subclass__(**kwargs)
-        # ABCMeta sets `__abstractmethods__` only after `__init_subclass__` returns, so read the
-        # `__isabstractmethod__` flag of each method that `ArtifactDeclaration` leaves abstract.
-        abstract_methods = ArtifactDeclaration.__abstractmethods__
-        if any(getattr(getattr(cls, method), "__isabstractmethod__", False) for method in abstract_methods):
+        if cls._is_abstract():
             return
         cls._check_name()
         ArtifactRegistry.register(cls)
@@ -84,6 +81,16 @@ class ArtifactDeclaration(ABC, Generic[T]):
     # --------------------------------------------------------------------------
     #  Validation
     # --------------------------------------------------------------------------
+    @classmethod
+    def _is_abstract(cls) -> bool:
+        """Return whether the subclass leaves a conversion abstract, which makes it a base for declarations."""
+        # ABCMeta sets `__abstractmethods__` only after `__init_subclass__` returns, so each method's
+        # own flag is read instead.
+        for method in ArtifactDeclaration.__abstractmethods__:
+            if getattr(getattr(cls, method), "__isabstractmethod__", False):
+                return True
+        return False
+
     @classmethod
     def _check_name(cls) -> None:
         """Check that the declaration defines a valid name."""

@@ -9,10 +9,10 @@ from typing import TYPE_CHECKING, ClassVar
 
 from .exceptions import ArtifactError
 
-# `ArtifactDeclaration` is imported for type checking only: `declaration.py` imports this module at
+# `ArtifactDeclaration` is imported for type checking only: `artifact_declaration.py` imports this module at
 # runtime, so a runtime import here would be circular.
 if TYPE_CHECKING:
-    from .declaration import ArtifactDeclaration
+    from .artifact_declaration import ArtifactDeclaration
 
 
 # ==================================================================================================
