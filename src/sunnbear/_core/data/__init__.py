@@ -4,8 +4,9 @@ The package depends only on `sunnbear._core.exceptions` and `sunnbear._core.util
 subpackage of `sunnbear._core` may import from this package.
 """
 
+from .artifact_archive import ArtifactArchive
 from .artifact_declaration import ArtifactDeclaration
-from .artifact_manifest import ArtifactFileEntry, ArtifactManifest
+from .artifact_manifest import ArtifactArchiveEntry, ArtifactFileEntry, ArtifactManifest
 from .artifact_registry import ArtifactRegistry
 from .artifact_source import ArtifactSource
 from .artifact_store import ArtifactStore
