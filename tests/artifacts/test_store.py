@@ -163,12 +163,12 @@ def test_a_builtin_artifact_lives_in_the_builtin_artifacts_folder_and_a_test_fix
     ``artifacts/<name>`` beside its own module.
     """
     # --- arrange ----------------------
-    builtin_cls = define_builtin_declaration("zz_builtin")
+    builtin_cls = define_builtin_declaration("sample_builtin")
 
     # --- act --------------------------
     builtin_folder = ArtifactStore._folder_of(builtin_cls)
     fixture_folder = ArtifactStore._folder_of(SampleLinesDeclaration)
 
     # --- assert -----------------------
-    assert str(builtin_folder).replace("\\", "/").endswith("sunnbear/_core/artifacts/builtin/zz_builtin")
+    assert str(builtin_folder).replace("\\", "/").endswith("sunnbear/_core/artifacts/builtin/sample_builtin")
     assert str(fixture_folder).replace("\\", "/").endswith("tests/artifacts/artifacts/sample_lines")
