@@ -3,8 +3,8 @@
 An artifact's data files and its ``manifest.json`` live in one folder, which the store derives from
 where the artifact's declaration is defined, so no caller passes a location:
 
-- a declaration inside the sunnbear package uses ``_core/data/artifacts/<name>/``, which ships with
-  sunnbear;
+- a built-in artifact, whose declaration is inside the sunnbear package, uses
+  ``_core/data/artifacts/<name>/``, which ships with sunnbear;
 - any other declaration, in practice a test fixture, uses ``artifacts/<name>/`` next to its own
   module, so its files never ship.
 
@@ -31,7 +31,6 @@ T = TypeVar("T")
 
 _MANIFEST_FILE_NAME = "manifest.json"
 _ARTIFACTS_FOLDER_NAME = "artifacts"
-# The package whose ``artifacts`` folder holds the built-in artifacts: this module's own package.
 _BUILTIN_ARTIFACTS_PACKAGE = "sunnbear._core.data"
 
 
@@ -46,7 +45,7 @@ class ArtifactStore:
     # --------------------------------------------------------------------------
     @classmethod
     def load(cls, declaration_cls: type[ArtifactDeclaration[T]]) -> T:
-        """Read the artifact's files and rebuild its value through the declaration.
+        """Read the artifact's files, without checking their hashes, and rebuild its value through the declaration.
 
         Raises:
             ArtifactError: If the manifest is missing, malformed or names another artifact, or lists
@@ -88,8 +87,8 @@ class ArtifactStore:
     ) -> ArtifactManifest:
         """Write the artifact's files for `value` and a new manifest, replacing what the folder held.
 
-        Files that the new value does not produce are deleted, so the folder holds exactly what the
-        manifest lists. The manifest lists the files in path order, so the content hash does not
+        Any other file in the folder is deleted, so the folder holds exactly what the manifest
+        lists. The manifest lists the files in path order, so the content hash does not
         depend on the order in which `ArtifactDeclaration.to_files` returns them.
 
         Args:
@@ -97,8 +96,8 @@ class ArtifactStore:
             value: The value to write.
             built_with: The versions of the libraries that affect the content, keyed by package
                 name; sunnbear's own version is always recorded.
-            input_artifact_hashes: The content hashes of the artifacts that `value` was generated
-                from, keyed by artifact name.
+            input_artifact_hashes: The content hashes of `value`'s input artifacts, keyed by
+                artifact name.
             generated_by: The public function call that generated `value`, as JSON-compatible data.
 
         Returns:
@@ -123,7 +122,7 @@ class ArtifactStore:
         if not isinstance(folder, Path):
             raise ArtifactError(f"The folder of {declaration_cls.__name__} is not a writable directory: {folder}.")
         folder.mkdir(parents=True, exist_ok=True)
-        for stale_path in cls._relative_file_paths(folder) - set(contents) - {_MANIFEST_FILE_NAME}:
+        for stale_path in cls._data_file_paths(folder) - set(contents):
             (folder / stale_path).unlink()
         for path, content in contents.items():
             (folder / path).parent.mkdir(parents=True, exist_ok=True)
@@ -147,7 +146,7 @@ class ArtifactStore:
         """
         manifest = cls.load_manifest(declaration_cls)
         folder = cls._folder_of(declaration_cls)
-        present_paths = cls._relative_file_paths(folder) - {_MANIFEST_FILE_NAME}
+        present_paths = cls._data_file_paths(folder)
         listed_paths = {entry.path for entry in manifest.files}
         problems = [f"{path} is not listed in the manifest" for path in sorted(present_paths - listed_paths)]
         for entry in manifest.files:
@@ -161,14 +160,15 @@ class ArtifactStore:
 
     @classmethod
     def verify_builtin_artifacts(cls) -> None:
-        """Verify every built-in declaration, and check that every folder of built-in artifacts has a declaration.
+        """Verify every built-in artifact, and check that each subfolder of the built-in artifacts folder is declared.
 
         Only the declarations whose modules have been imported are known, so import the sunnbear
-        modules that declare artifacts first.
+        modules that declare artifacts first; the store cannot import them itself, because this
+        package must not depend on the sunnbear modules above it.
 
         Raises:
-            ArtifactError: Listing every built-in artifact that fails `verify`, and every folder of
-                built-in artifacts that no declaration uses.
+            ArtifactError: If a built-in artifact fails `verify` or a subfolder of the built-in
+                artifacts folder has no declaration; the message lists each one.
         """
         builtin_declarations = [d for d in ArtifactRegistry.declarations() if is_defined_in_sunnbear(d)]
         problems = []
@@ -177,8 +177,12 @@ class ArtifactStore:
                 cls.verify(declaration_cls)
             except ArtifactError as error:
                 problems.append(str(error))
-        root = cls._builtin_artifacts_root()
-        folder_names = {child.name for child in root.iterdir() if child.is_dir()} if root.is_dir() else set()
+        builtin_artifacts_folder = cls._builtin_artifacts_folder()
+        folder_names = (
+            {child.name for child in builtin_artifacts_folder.iterdir() if child.is_dir()}
+            if builtin_artifacts_folder.is_dir()
+            else set()
+        )
         declared_names = {declaration_cls.name for declaration_cls in builtin_declarations}
         problems += [f"Folder {name!r} holds no declared artifact" for name in sorted(folder_names - declared_names)]
         if problems:
@@ -191,15 +195,17 @@ class ArtifactStore:
     def _folder_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Traversable:
         """Return the folder of an artifact's files and manifest, derived from where its declaration is defined."""
         if is_defined_in_sunnbear(declaration_cls):
-            return cls._builtin_artifacts_root().joinpath(declaration_cls.name)
+            return cls._builtin_artifacts_folder().joinpath(declaration_cls.name)
         else:
             module_file = sys.modules[declaration_cls.__module__].__file__
             return Path(str(module_file)).parent / _ARTIFACTS_FOLDER_NAME / declaration_cls.name
 
     @staticmethod
-    def _builtin_artifacts_root() -> Traversable:
-        """Return the folder that holds one subfolder per built-in artifact, read through `importlib.resources`."""
-        # The folder need not exist yet: it is created by saving the first built-in artifact.
+    def _builtin_artifacts_folder() -> Traversable:
+        """Return the folder that holds one subfolder per built-in artifact, located through `importlib.resources`.
+
+        The folder does not exist until the first built-in artifact is saved.
+        """
         return files(_BUILTIN_ARTIFACTS_PACKAGE).joinpath(_ARTIFACTS_FOLDER_NAME)
 
     @staticmethod
@@ -216,7 +222,7 @@ class ArtifactStore:
 
     @classmethod
     def _relative_file_paths(cls, folder: Traversable) -> set[str]:
-        """Return the path of every file below the existing `folder`, relative to it, with forward slashes."""
+        """Return the path of every file below `folder`, relative to it, with forward slashes; `folder` must exist."""
         paths = set()
         for child in folder.iterdir():
             if child.is_dir():
@@ -224,3 +230,8 @@ class ArtifactStore:
             else:
                 paths.add(child.name)
         return paths
+
+    @classmethod
+    def _data_file_paths(cls, folder: Traversable) -> set[str]:
+        """Return the path of every file in an artifact's existing `folder` except the manifest, relative to it."""
+        return cls._relative_file_paths(folder) - {_MANIFEST_FILE_NAME}

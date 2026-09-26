@@ -14,7 +14,10 @@ from .sample_declarations import SAMPLE_LINES, SampleLinesDeclaration
 
 
 def _define_builtin_declaration(name: str, file_path: str = "value.txt") -> type[ArtifactDeclaration]:
-    """Define a concrete declaration of bytes in 1 file, in a sunnbear module so the store treats it as built in."""
+    """Define a declaration whose value is the bytes of 1 file.
+
+    Its module name is inside sunnbear, so `ArtifactStore` treats it as built in.
+    """
     namespace = {
         "__module__": "sunnbear._declared_in_a_test",
         "name": name,
@@ -25,8 +28,11 @@ def _define_builtin_declaration(name: str, file_path: str = "value.txt") -> type
 
 
 @pytest.fixture
-def artifact_folder_in_tmp(monkeypatch, tmp_path):
-    """Point every artifact's folder into `tmp_path`, so a test can write without touching the repo."""
+def sample_lines_folder_in_tmp(monkeypatch, tmp_path):
+    """Point every artifact's folder into `tmp_path`, so a test can write without touching the repo.
+
+    The fixture returns the folder of `SampleLinesDeclaration`.
+    """
     folder_of = classmethod(lambda cls, declaration_cls: tmp_path / declaration_cls.name)
     monkeypatch.setattr(ArtifactStore, "_folder_of", folder_of)
     return tmp_path / SampleLinesDeclaration.name
@@ -48,7 +54,7 @@ def test_verify_accepts_the_committed_fixture():
 # ==================================================================================================
 #  Saving and loading
 # ==================================================================================================
-def test_save_writes_files_and_manifest_that_load_reads_back(artifact_folder_in_tmp):
+def test_save_writes_files_and_manifest_that_load_reads_back(sample_lines_folder_in_tmp):
     """A saved value loads back equal, and the manifest records sunnbear's version and the caller's metadata."""
     # --- act --------------------------
     manifest = ArtifactStore.save(
@@ -66,21 +72,21 @@ def test_save_writes_files_and_manifest_that_load_reads_back(artifact_folder_in_
     assert [entry.path for entry in manifest.files] == ["lines.txt", "meta/count.txt"]
 
 
-def test_save_deletes_files_that_the_new_value_does_not_produce(artifact_folder_in_tmp):
+def test_save_deletes_files_that_the_new_value_does_not_produce(sample_lines_folder_in_tmp):
     """After a save, the folder holds exactly the manifest's files, so `verify` passes."""
     # --- arrange ----------------------
-    artifact_folder_in_tmp.mkdir(parents=True)
-    (artifact_folder_in_tmp / "old.txt").write_text("left over")
+    sample_lines_folder_in_tmp.mkdir(parents=True)
+    (sample_lines_folder_in_tmp / "old.txt").write_text("left over")
 
     # --- act --------------------------
     ArtifactStore.save(SampleLinesDeclaration, SAMPLE_LINES)
 
     # --- assert -----------------------
-    assert not (artifact_folder_in_tmp / "old.txt").exists()
+    assert not (sample_lines_folder_in_tmp / "old.txt").exists()
     ArtifactStore.verify(SampleLinesDeclaration)
 
 
-@pytest.mark.usefixtures("artifact_folder_in_tmp", "isolated_artifact_registry")
+@pytest.mark.usefixtures("sample_lines_folder_in_tmp", "isolated_artifact_registry")
 def test_save_refuses_a_data_file_named_like_the_manifest():
     """A declaration that produces ``manifest.json`` as a data file cannot be saved."""
     # --- arrange ----------------------
@@ -105,18 +111,18 @@ def test_save_refuses_a_folder_that_is_not_a_directory_on_disk(monkeypatch, tmp_
         ArtifactStore.save(SampleLinesDeclaration, SAMPLE_LINES)
 
 
-@pytest.mark.usefixtures("artifact_folder_in_tmp")
+@pytest.mark.usefixtures("sample_lines_folder_in_tmp")
 def test_load_without_a_manifest_fails():
     """An artifact whose folder has no manifest cannot be loaded."""
     with pytest.raises(ArtifactError, match=r"no file 'manifest\.json'"):
         ArtifactStore.load(SampleLinesDeclaration)
 
 
-def test_load_manifest_refuses_a_manifest_for_another_artifact(artifact_folder_in_tmp):
+def test_load_manifest_refuses_a_manifest_for_another_artifact(sample_lines_folder_in_tmp):
     """A manifest whose name differs from the declaration's is refused."""
     # --- arrange ----------------------
     manifest = ArtifactStore.save(SampleLinesDeclaration, SAMPLE_LINES)
-    (artifact_folder_in_tmp / "manifest.json").write_text(manifest.model_copy(update={"name": "other"}).to_json())
+    (sample_lines_folder_in_tmp / "manifest.json").write_text(manifest.model_copy(update={"name": "other"}).to_json())
 
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match="is for 'other'"):
@@ -134,19 +140,19 @@ def test_load_manifest_refuses_a_manifest_for_another_artifact(artifact_folder_i
         (lambda folder: (folder / "extra.txt").write_text("x"), "extra.txt is not listed"),
     ],
 )
-def test_verify_reports_a_folder_that_differs_from_its_manifest(artifact_folder_in_tmp, tamper, message):
+def test_verify_reports_a_folder_that_differs_from_its_manifest(sample_lines_folder_in_tmp, tamper, message):
     """A missing, edited or unlisted file makes `verify` fail and name the file."""
     # --- arrange ----------------------
     ArtifactStore.save(SampleLinesDeclaration, SAMPLE_LINES)
-    tamper(artifact_folder_in_tmp)
+    tamper(sample_lines_folder_in_tmp)
 
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match=message):
         ArtifactStore.verify(SampleLinesDeclaration)
 
 
-def test_the_built_in_artifacts_are_consistent():
-    """Every built-in artifact matches its manifest, and every folder of built-in artifacts is declared."""
+def test_the_builtin_artifacts_are_consistent():
+    """Every built-in artifact matches its manifest, and each subfolder of the built-in artifacts folder is declared."""
     # --- arrange ----------------------
     # A declaration is known only once its module is imported, so import every sunnbear module.
     for module_info in pkgutil.walk_packages(sunnbear.__path__, prefix="sunnbear."):
@@ -160,7 +166,7 @@ def test_the_built_in_artifacts_are_consistent():
 def test_verify_builtin_artifacts_reports_unverifiable_and_undeclared(monkeypatch, tmp_path):
     """A built-in declaration without files, and a folder without a declaration, are both reported."""
     # --- arrange ----------------------
-    monkeypatch.setattr(ArtifactStore, "_builtin_artifacts_root", staticmethod(lambda: tmp_path))
+    monkeypatch.setattr(ArtifactStore, "_builtin_artifacts_folder", staticmethod(lambda: tmp_path))
     (tmp_path / "orphan").mkdir()
     _define_builtin_declaration("declared_without_files")
 
@@ -170,8 +176,10 @@ def test_verify_builtin_artifacts_reports_unverifiable_and_undeclared(monkeypatc
 
 
 @pytest.mark.usefixtures("isolated_artifact_registry")
-def test_a_built_in_artifact_lives_in_the_central_folder_and_a_test_fixture_beside_its_module():
-    """A declaration inside sunnbear uses ``_core/data/artifacts/<name>``, any other ``artifacts/<name>`` beside it."""
+def test_a_builtin_artifact_lives_in_the_package_artifacts_folder_and_a_test_fixture_beside_its_module():
+    """A built-in declaration uses ``_core/data/artifacts/<name>``; any other declaration uses
+    ``artifacts/<name>`` beside its own module.
+    """
     # --- arrange ----------------------
     builtin_cls = _define_builtin_declaration("central")
 
