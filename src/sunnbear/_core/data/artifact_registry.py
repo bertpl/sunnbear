@@ -7,6 +7,8 @@ it is imported.
 
 from typing import TYPE_CHECKING, ClassVar
 
+from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
+
 from .exceptions import ArtifactError
 
 # `ArtifactDeclaration` is imported for type checking only: `artifact_declaration.py` imports this module at
@@ -42,6 +44,13 @@ class ArtifactRegistry:
     def declarations(cls) -> "tuple[type[ArtifactDeclaration], ...]":
         """Return every declaration whose module has been imported, sorted by name."""
         return tuple(declaration_cls for _, declaration_cls in sorted(cls._declarations_by_name.items()))
+
+    @classmethod
+    def builtin_declarations(cls) -> "tuple[type[ArtifactDeclaration], ...]":
+        """Return every imported declaration that is defined inside sunnbear, sorted by name."""
+        return tuple(
+            declaration_cls for declaration_cls in cls.declarations() if is_defined_in_sunnbear(declaration_cls)
+        )
 
     @classmethod
     def declaration_from_name(cls, name: str) -> "type[ArtifactDeclaration]":

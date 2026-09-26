@@ -1,4 +1,4 @@
-"""`artifact_names` lists only the built-in data artifacts, and `artifact_manifest` reads one's manifest."""
+"""`artifact_names` lists only the built-in data artifacts, and `artifact_manifest` reads the manifest of one."""
 
 import pytest
 
@@ -10,7 +10,7 @@ from .sample_declarations import SampleLinesDeclaration, define_builtin_declarat
 
 @pytest.mark.usefixtures("isolated_artifact_registry")
 def test_artifact_names_lists_built_in_declarations_only():
-    """A declaration inside sunnbear is listed; a test fixture declared outside sunnbear is not."""
+    """A declaration inside sunnbear is listed, a test fixture outside sunnbear is not, and the names are sorted."""
     # --- arrange ----------------------
     define_builtin_declaration("zz_builtin")
 

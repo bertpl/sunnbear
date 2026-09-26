@@ -244,11 +244,7 @@ class ArtifactStore:
             ArtifactError: If a built-in artifact fails `verify` or a subfolder of the built-in
                 artifacts folder has no declaration; the message lists each one.
         """
-        builtin_declarations = [
-            declaration_cls
-            for declaration_cls in ArtifactRegistry.declarations()
-            if is_defined_in_sunnbear(declaration_cls)
-        ]
+        builtin_declarations = ArtifactRegistry.builtin_declarations()
         problems = []
         for declaration_cls in builtin_declarations:
             try:

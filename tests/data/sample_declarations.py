@@ -3,8 +3,8 @@
 - `SampleLinesDeclaration` has committed data files;
 - `SampleDownloadedLinesDeclaration` has only a committed manifest, and its data files are
   downloaded;
-- `define_declaration` defines a 1-file declaration on the fly, and `define_builtin_declaration` one
-  that counts as built in.
+- `define_declaration` defines a 1-file declaration on the fly;
+- `define_builtin_declaration` defines a 1-file declaration that counts as built in.
 """
 
 from collections.abc import Mapping

@@ -5,9 +5,8 @@ import importlib
 import pkgutil
 
 from sunnbear._core.data import ArtifactDeclaration, ArtifactError, ArtifactManifest, ArtifactRegistry, ArtifactStore
-from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
-# Every module below this package is imported, so every built-in declaration is registered.
+# `_import_core_modules` imports every module of this package, so that every built-in declaration is registered.
 _CORE_PACKAGE = "sunnbear._core"
 
 
@@ -18,9 +17,6 @@ def artifact_names() -> tuple[str, ...]:
 
 def artifact_manifest(name: str) -> ArtifactManifest:
     """Return the manifest of the built-in data artifact with this name, without reading or downloading its data files.
-
-    The manifest records the artifact's content hash, the versions of the libraries that built it,
-    and, where one exists, the public call that generated it.
 
     Raises:
         ArtifactError: If sunnbear has no data artifact with this name, or its manifest is missing
@@ -34,10 +30,10 @@ def artifact_manifest(name: str) -> ArtifactManifest:
     return ArtifactStore.load_manifest(declarations_by_name[name])
 
 
-def import_builtin_declarations() -> None:
+def register_builtin_declarations() -> None:
     """Import every module of `sunnbear._core`, so that every built-in declaration is registered.
 
-    The imports run once per process; later calls return at once.
+    The imports run once per process; later calls return immediately.
     """
     _import_core_modules()
 
@@ -45,14 +41,10 @@ def import_builtin_declarations() -> None:
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-def _builtin_declarations() -> list[type[ArtifactDeclaration]]:
-    """Return the registered declarations that are defined inside sunnbear, sorted by name."""
-    import_builtin_declarations()
-    return [
-        declaration_cls
-        for declaration_cls in ArtifactRegistry.declarations()
-        if is_defined_in_sunnbear(declaration_cls)
-    ]
+def _builtin_declarations() -> tuple[type[ArtifactDeclaration], ...]:
+    """Return the declarations that are defined inside sunnbear, sorted by name, after registering them all."""
+    register_builtin_declarations()
+    return ArtifactRegistry.builtin_declarations()
 
 
 @functools.cache

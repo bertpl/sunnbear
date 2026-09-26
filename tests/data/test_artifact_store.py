@@ -5,7 +5,7 @@ import zipfile
 
 import pytest
 
-from sunnbear._core.builtin_artifacts.listing import import_builtin_declarations
+from sunnbear._core.builtin_artifacts.listing import register_builtin_declarations
 from sunnbear._core.data import ArtifactError, ArtifactStore
 
 from .sample_declarations import SAMPLE_LINES, SampleLinesDeclaration, define_builtin_declaration
@@ -133,8 +133,8 @@ def test_verify_reports_a_folder_that_differs_from_its_manifest(sample_lines_fol
 def test_the_builtin_artifacts_are_consistent():
     """Every built-in artifact matches its manifest, and each subfolder of the built-in artifacts folder is declared."""
     # --- arrange ----------------------
-    # `ArtifactRegistry` knows a declaration only once its module is imported.
-    import_builtin_declarations()
+    # `ArtifactRegistry` holds a declaration only once its module is imported.
+    register_builtin_declarations()
 
     # --- act / assert -----------------
     ArtifactStore.verify_builtin_artifacts()

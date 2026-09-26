@@ -1,8 +1,9 @@
-"""This module re-exports the listing of sunnbear's built-in data artifacts, and the classes of their manifests.
+"""This module re-exports the functions and manifest classes for sunnbear's data artifacts.
 
 A data artifact is a named, frozen dataset that ships with sunnbear or is downloaded on first use.
-Its manifest identifies it by a content hash and records how it was built; see the docstring of the
-implementation package, `sunnbear._core.builtin_artifacts`.
+Its manifest identifies it by a content hash and records how it was built. `artifact_names` lists
+only the artifacts that sunnbear itself declares, and the first call to either function imports
+every sunnbear module.
 """
 
 from ._core.builtin_artifacts import (
