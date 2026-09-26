@@ -42,8 +42,6 @@ class ArtifactManifest(BaseModel):
     are refused.
 
     Attributes:
-        data_schema_version: The version of the data files' format. `from_json` does not check it;
-            the code that loads the artifact compares it with the expected version.
         files: The artifact's data files; at least 1, with unique paths. Their order is part of the
             content hash.
         input_artifact_hashes: The content hashes of the artifacts that this artifact was generated
@@ -58,7 +56,6 @@ class ArtifactManifest(BaseModel):
     model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
 
     name: str
-    data_schema_version: int
     files: tuple["ArtifactFileEntry", ...]
     input_artifact_hashes: dict[str, str] = Field(default_factory=dict)
     built_with: dict[str, str] = Field(default_factory=dict)
