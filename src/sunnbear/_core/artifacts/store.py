@@ -49,7 +49,8 @@ from .source import ArtifactSource
 T = TypeVar("T")
 
 _MANIFEST_FILE_NAME = "manifest.json"
-_ARTIFACTS_FOLDER_NAME = "artifacts"  # beside the module of a declaration defined outside sunnbear
+# A declaration defined outside sunnbear keeps its artifact folders in this folder, beside its own module.
+_NON_BUILTIN_ARTIFACTS_FOLDER_NAME = "artifacts"
 _BUILTIN_ARTIFACTS_FOLDER_NAME = "builtin"
 _BUILTIN_ARTIFACTS_PARENT_PACKAGE = "sunnbear._core.artifacts"
 _CACHE_DIR_ENV_VAR = "SUNNBEAR_CACHE_DIR"
@@ -488,7 +489,7 @@ class ArtifactStore:
             return cls._builtin_artifacts_folder().joinpath(declaration_cls.name)
         else:
             module_file = sys.modules[declaration_cls.__module__].__file__
-            return Path(str(module_file)).parent / _ARTIFACTS_FOLDER_NAME / declaration_cls.name
+            return Path(str(module_file)).parent / _NON_BUILTIN_ARTIFACTS_FOLDER_NAME / declaration_cls.name
 
     @classmethod
     def _folder_on_disk_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Path:
