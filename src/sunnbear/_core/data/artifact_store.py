@@ -13,7 +13,7 @@ Where the data files live depends on the declaration's `ArtifactSource`:
 - **package**: next to the manifest. Loading does not check their hashes: the files ship inside the
   package, and the test suite runs `ArtifactStore.verify_builtin_artifacts` on every change.
 - **download**: in the cache folder ``<cache root>/<artifact name>/<content hash>``, where the cache
-  root is ``SUNNBEAR_DATA_DIR`` when that environment variable is set, else the user's cache folder
+  root is ``SUNNBEAR_CACHE_DIR`` when that environment variable is set, else the user's cache folder
   for sunnbear. When the cache lacks a data file, or holds a copy whose hash differs from the file's
   manifest entry, loading downloads it from the URL in the file's manifest entry and checks its hash.
 """
@@ -44,7 +44,7 @@ T = TypeVar("T")
 _MANIFEST_FILE_NAME = "manifest.json"
 _ARTIFACTS_FOLDER_NAME = "artifacts"
 _BUILTIN_ARTIFACTS_PARENT_PACKAGE = "sunnbear._core.data"
-_DATA_DIR_ENV_VAR = "SUNNBEAR_DATA_DIR"
+_CACHE_DIR_ENV_VAR = "SUNNBEAR_CACHE_DIR"
 _DOWNLOAD_TIMEOUT_SEC = 60
 
 
@@ -316,8 +316,8 @@ class ArtifactStore:
 
     @staticmethod
     def _cache_folder_of(manifest: ArtifactManifest) -> Path:
-        """Return a downloaded artifact's cache folder, under ``SUNNBEAR_DATA_DIR`` if set, else the user cache."""
-        cache_root = os.environ.get(_DATA_DIR_ENV_VAR) or platformdirs.user_cache_dir("sunnbear")
+        """Return a downloaded artifact's cache folder, under ``SUNNBEAR_CACHE_DIR`` if set, else the user cache."""
+        cache_root = os.environ.get(_CACHE_DIR_ENV_VAR) or platformdirs.user_cache_dir("sunnbear")
         return Path(cache_root) / manifest.name / manifest.content_hash
 
     # --------------------------------------------------------------------------

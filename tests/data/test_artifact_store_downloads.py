@@ -181,9 +181,9 @@ def test_verify_reports_a_data_file_committed_next_to_a_downloaded_artifact(arti
 #  Cache folder and download
 # ==================================================================================================
 def test_the_cache_root_is_the_user_cache_folder_unless_the_environment_variable_is_set(monkeypatch):
-    """Without ``SUNNBEAR_DATA_DIR``, downloaded files are cached in the user's cache folder for sunnbear."""
+    """Without ``SUNNBEAR_CACHE_DIR``, downloaded files are cached in the user's cache folder for sunnbear."""
     # --- arrange ----------------------
-    monkeypatch.delenv("SUNNBEAR_DATA_DIR")
+    monkeypatch.delenv("SUNNBEAR_CACHE_DIR")
     manifest = _load_committed_manifest()
 
     # --- act --------------------------

@@ -11,11 +11,11 @@ def isolated_artifact_registry(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def cache_root_in_tmp(monkeypatch, tmp_path):
-    """Point the download cache into `tmp_path` through ``SUNNBEAR_DATA_DIR``, so no test touches the user's cache.
+    """Point the download cache into `tmp_path` through ``SUNNBEAR_CACHE_DIR``, so no test touches the user's cache.
 
     The fixture returns the cache root, which does not exist until a file is cached.
     """
-    monkeypatch.setenv("SUNNBEAR_DATA_DIR", str(tmp_path / "cache"))
+    monkeypatch.setenv("SUNNBEAR_CACHE_DIR", str(tmp_path / "cache"))
     return tmp_path / "cache"
 
 
