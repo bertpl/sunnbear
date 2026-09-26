@@ -1,30 +1,42 @@
 """`ArtifactStore` is the only code that reads or writes a data artifact's files and manifest.
 
-An artifact's data files and its ``manifest.json`` live in one folder, which the store derives from
-where the artifact's declaration is defined, so no caller passes a location:
+An artifact's ``manifest.json`` lives in the artifact's folder, which the store derives from where
+the artifact's declaration is defined, so no caller passes a location:
 
 - a built-in artifact, whose declaration is inside the sunnbear package, uses
   ``_core/data/artifacts/<name>/``, which ships with sunnbear;
 - any other declaration, in practice a test fixture, uses ``artifacts/<name>/`` next to its own
   module, so its files never ship.
 
-Loading does not check file hashes: the files ship inside the package, and the test suite runs
-`ArtifactStore.verify_builtin_artifacts` on every change.
+Where the data files live depends on the declaration's `ArtifactSource`:
+
+- **package**: next to the manifest. Loading does not check their hashes: the files ship inside the
+  package, and the test suite runs `ArtifactStore.verify_builtin_artifacts` on every change.
+- **download**: in the cache folder ``<cache root>/<artifact name>/<content hash>``, where the cache
+  root is ``SUNNBEAR_CACHE_DIR`` when that environment variable is set, else the user's cache folder
+  for sunnbear. When the cache lacks a data file, or holds a copy whose hash differs from the file's
+  manifest entry, loading downloads it from the URL in the file's manifest entry and checks its hash.
 """
 
 import datetime
+import http.client
 import importlib.metadata
+import os
 import sys
+import urllib.request
 from importlib.resources import files
 from importlib.resources.abc import Traversable
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any, TypeVar, assert_never
+
+import platformdirs
 
 from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
 from .artifact_declaration import ArtifactDeclaration
 from .artifact_manifest import ArtifactFileEntry, ArtifactManifest
 from .artifact_registry import ArtifactRegistry
+from .artifact_source import ArtifactSource
 from .exceptions import ArtifactError
 
 T = TypeVar("T")
@@ -32,6 +44,8 @@ T = TypeVar("T")
 _MANIFEST_FILE_NAME = "manifest.json"
 _ARTIFACTS_FOLDER_NAME = "artifacts"
 _BUILTIN_ARTIFACTS_PARENT_PACKAGE = "sunnbear._core.data"
+_CACHE_DIR_ENV_VAR = "SUNNBEAR_CACHE_DIR"
+_DOWNLOAD_TIMEOUT_SEC = 60
 
 
 # ==================================================================================================
@@ -45,17 +59,23 @@ class ArtifactStore:
     # --------------------------------------------------------------------------
     @classmethod
     def load(cls, declaration_cls: type[ArtifactDeclaration[T]]) -> T:
-        """Read the artifact's files, without checking their hashes, and rebuild its value with `from_files`.
+        """Read the artifact's data files and rebuild its value with `from_files`.
+
+        A file shipped in the package is read without checking its hash. A downloaded file is read
+        from the cache when the cache holds a copy that matches its manifest entry; otherwise it is
+        downloaded, checked against its entry, and stored in the cache.
 
         Raises:
             ArtifactError: If any of these holds:
 
                 - the manifest is missing, malformed or names another artifact;
-                - a file that the manifest lists is missing.
+                - a file shipped in the package is missing;
+                - a downloaded file has no matching copy in the cache and no URL, its download fails, or the
+                  downloaded bytes do not match its manifest entry; the message names the cache path,
+                  where the file can also be placed by hand.
         """
         manifest = cls.load_manifest(declaration_cls)
-        folder = cls._folder_of(declaration_cls)
-        contents = {entry.path: cls._read_file(folder, entry.path, declaration_cls) for entry in manifest.files}
+        contents = {entry.path: cls._read_data_file(declaration_cls, manifest, entry) for entry in manifest.files}
         return declaration_cls.from_files(contents)
 
     @classmethod
@@ -87,10 +107,16 @@ class ArtifactStore:
         input_artifact_hashes: dict[str, str] | None = None,
         generated_by: dict[str, Any] | None = None,
     ) -> ArtifactManifest:
-        """Write the artifact's files for `value` and a new manifest, replacing what the folder held.
+        """Write the artifact's data files for `value` and a new manifest, replacing what the artifact's folder held.
 
-        Any other file in the folder is deleted, so the folder holds exactly what the manifest
-        lists.
+        Where the data files go depends on the declaration's `ArtifactSource`:
+
+        - **package**: next to the manifest;
+        - **download**: into the cache folder; the manifest records no download URL, because `save`
+          does not upload the files, so no URL exists for them yet.
+
+        Any other file in the artifact's folder is deleted, so the folder holds exactly the manifest
+        and, for an artifact shipped in the package, the files that the manifest lists.
 
         Args:
             declaration_cls: The artifact's declaration.
@@ -125,12 +151,20 @@ class ArtifactStore:
         folder = cls._folder_of(declaration_cls)
         if not isinstance(folder, Path):
             raise ArtifactError(f"The folder of {declaration_cls.__name__} is not a writable directory: {folder}.")
+        match declaration_cls.source:
+            case ArtifactSource.PACKAGE:
+                data_folder, data_paths_next_to_manifest = folder, set(contents)
+            case ArtifactSource.DOWNLOAD:
+                data_folder, data_paths_next_to_manifest = cls._cache_folder_of(manifest), set()
+            case _:
+                assert_never(declaration_cls.source)
         folder.mkdir(parents=True, exist_ok=True)
-        for stale_path in cls._relative_data_file_paths(folder) - set(contents):
-            (folder / stale_path).unlink()
+        # A file left over from an earlier save, and not written by this one, would contradict the new manifest.
+        for leftover_path in cls._relative_data_file_paths(folder) - data_paths_next_to_manifest:
+            (folder / leftover_path).unlink()
         for path, content in contents.items():
-            (folder / path).parent.mkdir(parents=True, exist_ok=True)
-            (folder / path).write_bytes(content)
+            (data_folder / path).parent.mkdir(parents=True, exist_ok=True)
+            (data_folder / path).write_bytes(content)
         (folder / _MANIFEST_FILE_NAME).write_text(manifest.to_json())
         return manifest
 
@@ -139,7 +173,9 @@ class ArtifactStore:
     # --------------------------------------------------------------------------
     @classmethod
     def verify(cls, declaration_cls: type[ArtifactDeclaration]) -> ArtifactManifest:
-        """Check that the artifact's folder holds exactly the files listed in its manifest, with matching content.
+        """Check the artifact's folder against its manifest.
+
+        The download cache of a downloaded artifact is not checked.
 
         Returns:
             The artifact's manifest.
@@ -148,18 +184,25 @@ class ArtifactStore:
             ArtifactError: If any of these holds:
 
                 - the manifest is missing, malformed or names another artifact;
-                - a file is missing, differs from its manifest entry, or is not listed.
+                - for an artifact shipped in the package, a file is missing, differs from its
+                  manifest entry, or is not listed;
+                - for a downloaded artifact, a data file lies next to the manifest, or a file entry
+                  has no download URL.
         """
         manifest = cls.load_manifest(declaration_cls)
         folder = cls._folder_of(declaration_cls)
         present_paths = cls._relative_data_file_paths(folder)
-        listed_paths = {entry.path for entry in manifest.files}
-        problems = [f"{path} is not listed in the manifest" for path in sorted(present_paths - listed_paths)]
-        for entry in manifest.files:
-            if entry.path not in present_paths:
-                problems.append(f"{entry.path} is missing")
-            elif not entry.matches(folder.joinpath(entry.path).read_bytes()):
-                problems.append(f"{entry.path} differs from its manifest entry")
+        match declaration_cls.source:
+            case ArtifactSource.PACKAGE:
+                problems = cls._compare_shipped_files_with_manifest(folder, present_paths, manifest)
+            case ArtifactSource.DOWNLOAD:
+                problems = [
+                    f"{path} is next to the manifest, but the artifact's data files are downloaded"
+                    for path in sorted(present_paths)
+                ]
+                problems += [f"{entry.path} has no download URL" for entry in manifest.files if entry.url is None]
+            case _:
+                assert_never(declaration_cls.source)
         if problems:
             raise ArtifactError(f"Artifact {manifest.short_identity} fails verification: {'; '.join(problems)}.")
         return manifest
@@ -198,12 +241,95 @@ class ArtifactStore:
         if problems:
             raise ArtifactError("Built-in artifacts are inconsistent:\n- " + "\n- ".join(problems))
 
+    @staticmethod
+    def _compare_shipped_files_with_manifest(
+        folder: Traversable, present_paths: set[str], manifest: ArtifactManifest
+    ) -> list[str]:
+        """Return a problem message for each data file that is missing, differs from its entry, or is unlisted."""
+        listed_paths = {entry.path for entry in manifest.files}
+        problems = [f"{path} is not listed in the manifest" for path in sorted(present_paths - listed_paths)]
+        for entry in manifest.files:
+            if entry.path not in present_paths:
+                problems.append(f"{entry.path} is missing")
+            elif not entry.matches(folder.joinpath(entry.path).read_bytes()):
+                problems.append(f"{entry.path} differs from its manifest entry")
+        return problems
+
+    # --------------------------------------------------------------------------
+    #  Data files
+    # --------------------------------------------------------------------------
+    @classmethod
+    def _read_data_file(
+        cls, declaration_cls: type[ArtifactDeclaration], manifest: ArtifactManifest, entry: ArtifactFileEntry
+    ) -> bytes:
+        """Return the bytes of one data file, from the package or from the download cache."""
+        match declaration_cls.source:
+            case ArtifactSource.PACKAGE:
+                return cls._read_file(cls._folder_of(declaration_cls), entry.path, declaration_cls)
+            case ArtifactSource.DOWNLOAD:
+                return cls._read_or_download_file(manifest, entry)
+            case _:
+                assert_never(declaration_cls.source)
+
+    @classmethod
+    def _read_or_download_file(cls, manifest: ArtifactManifest, entry: ArtifactFileEntry) -> bytes:
+        """Return a downloaded data file from the cache, downloading it first if the cache holds no matching copy.
+
+        Raises:
+            ArtifactError: If the cache holds no matching copy of the file and it has no URL, its
+                download fails, or the downloaded bytes do not match the entry.
+        """
+        cache_file = cls._cache_folder_of(manifest) / entry.path
+        if cache_file.is_file():
+            content = cache_file.read_bytes()
+            if entry.matches(content):
+                return content
+        if entry.url is None:
+            raise ArtifactError(
+                f"Artifact {manifest.short_identity} has no download URL for {entry.path}, "
+                f"and {cache_file} holds no matching copy."
+            )
+        try:
+            content = cls._download(entry.url)
+        except (OSError, ValueError, http.client.HTTPException) as error:
+            raise ArtifactError(f"Downloading {entry.url} to {cache_file} failed: {error}") from error
+        if not entry.matches(content):
+            raise ArtifactError(
+                f"The file downloaded from {entry.url} does not match its manifest entry, "
+                f"so it was not stored at {cache_file}."
+            )
+        cache_file.parent.mkdir(parents=True, exist_ok=True)
+        cache_file.write_bytes(content)
+        return content
+
+    @staticmethod
+    def _download(url: str) -> bytes:
+        """Return the bytes at `url`; every download goes through this method, so tests can replace it.
+
+        Raises:
+            OSError: If the connection fails or the server returns an error status.
+            ValueError: If `url` is malformed or its scheme is unsupported.
+            http.client.HTTPException: If the server's response is malformed or cut short.
+        """
+        # The URLs come from committed manifests, so they are not user input.
+        with urllib.request.urlopen(url, timeout=_DOWNLOAD_TIMEOUT_SEC) as response:  # noqa: S310
+            return response.read()
+
+    @staticmethod
+    def _cache_folder_of(manifest: ArtifactManifest) -> Path:
+        """Return a downloaded artifact's cache folder, under ``SUNNBEAR_CACHE_DIR`` if set, else the user cache."""
+        cache_root = os.environ.get(_CACHE_DIR_ENV_VAR) or platformdirs.user_cache_dir("sunnbear")
+        return Path(cache_root) / manifest.name / manifest.content_hash
+
     # --------------------------------------------------------------------------
     #  Files and folders
     # --------------------------------------------------------------------------
     @classmethod
     def _folder_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Traversable:
-        """Return the folder of an artifact's files and manifest, derived from where its declaration is defined."""
+        """Return the artifact's folder, which holds the manifest.
+
+        The folder's location follows from the module that defines the declaration.
+        """
         if is_defined_in_sunnbear(declaration_cls):
             return cls._builtin_artifacts_folder().joinpath(declaration_cls.name)
         else:

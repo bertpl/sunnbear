@@ -23,15 +23,9 @@ def _define_builtin_declaration(name: str, file_path: str = "value.txt") -> type
 
 
 @pytest.fixture
-def sample_lines_folder_in_tmp(monkeypatch, tmp_path):
-    """Make `ArtifactStore` place every artifact's folder in `tmp_path`, so tests write no files in the repo.
-
-    The fixture returns the folder of `SampleLinesDeclaration`, which does not exist until a test
-    creates it or saves to it.
-    """
-    folder_of = classmethod(lambda cls, declaration_cls: tmp_path / declaration_cls.name)
-    monkeypatch.setattr(ArtifactStore, "_folder_of", folder_of)
-    return tmp_path / SampleLinesDeclaration.name
+def sample_lines_folder_in_tmp(artifacts_folder_in_tmp):
+    """Return the folder of `SampleLinesDeclaration`, placed in `tmp_path` by `artifacts_folder_in_tmp`."""
+    return artifacts_folder_in_tmp / SampleLinesDeclaration.name
 
 
 # ==================================================================================================

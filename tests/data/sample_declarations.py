@@ -1,12 +1,14 @@
-"""This module holds the test-only artifact declarations.
+"""This module holds the test-only artifact declarations:
 
-`SampleLinesDeclaration` has committed files; `define_declaration` defines a 1-file declaration
-on the fly.
+- `SampleLinesDeclaration` has committed data files;
+- `SampleDownloadedLinesDeclaration` has only a committed manifest, and its data files are
+  downloaded;
+- `define_declaration` defines a 1-file declaration on the fly.
 """
 
 from collections.abc import Mapping
 
-from sunnbear._core.data import ArtifactDeclaration
+from sunnbear._core.data import ArtifactDeclaration, ArtifactSource
 
 # The tests convert these lines with `SampleLinesDeclaration`.
 SAMPLE_LINES = ["alpha", "beta", "gamma"]
@@ -29,6 +31,17 @@ class SampleLinesDeclaration(ArtifactDeclaration[list[str]]):
     def from_files(cls, files: Mapping[str, bytes]) -> list[str]:
         """Read the lines back from ``lines.txt``."""
         return files["lines.txt"].decode().splitlines()
+
+
+class SampleDownloadedLinesDeclaration(SampleLinesDeclaration):
+    """`SampleDownloadedLinesDeclaration` declares the same files as `SampleLinesDeclaration`, but downloaded.
+
+    Its committed manifest lists URLs under ``example.invalid``, a domain that never resolves, so a
+    test must replace `ArtifactStore._download`.
+    """
+
+    name = "sample_downloaded_lines"
+    source = ArtifactSource.DOWNLOAD
 
 
 def define_declaration(file_path: str = "value.txt", **attrs) -> type[ArtifactDeclaration]:
