@@ -153,14 +153,15 @@ class ArtifactStore:
             raise ArtifactError(f"The folder of {declaration_cls.__name__} is not a writable directory: {folder}.")
         match declaration_cls.source:
             case ArtifactSource.PACKAGE:
-                data_folder, kept_paths = folder, set(contents)
+                data_folder, data_paths_next_to_manifest = folder, set(contents)
             case ArtifactSource.DOWNLOAD:
-                data_folder, kept_paths = cls._cache_folder_of(manifest), set()
+                data_folder, data_paths_next_to_manifest = cls._cache_folder_of(manifest), set()
             case _:
                 assert_never(declaration_cls.source)
         folder.mkdir(parents=True, exist_ok=True)
-        for stale_path in cls._relative_data_file_paths(folder) - kept_paths:
-            (folder / stale_path).unlink()
+        # A file left over from an earlier save, and not written by this one, would contradict the new manifest.
+        for leftover_path in cls._relative_data_file_paths(folder) - data_paths_next_to_manifest:
+            (folder / leftover_path).unlink()
         for path, content in contents.items():
             (data_folder / path).parent.mkdir(parents=True, exist_ok=True)
             (data_folder / path).write_bytes(content)
