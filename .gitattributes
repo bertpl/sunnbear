@@ -3,3 +3,4 @@
 # Data artifact files are hashed byte for byte, so git must never rewrite their line endings.
 src/sunnbear/_core/data/artifacts/** -text
 tests/**/artifacts/** -text
+tests/data/downloads/** -text

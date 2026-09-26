@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from sunnbear._core.data import ArtifactError, ArtifactFileEntry, ArtifactManifest
+from sunnbear._core.data import ArtifactArchiveEntry, ArtifactError, ArtifactFileEntry, ArtifactManifest
 
 
 def _make_manifest(**overrides) -> ArtifactManifest:
@@ -25,12 +25,19 @@ def _make_manifest(**overrides) -> ArtifactManifest:
 
 
 # ==================================================================================================
-#  ArtifactFileEntry
+#  ArtifactFileEntry and ArtifactArchiveEntry
 # ==================================================================================================
-def test_artifact_file_entry_from_content_records_hash_and_size():
+@pytest.mark.parametrize(
+    "make_entry",
+    [
+        lambda content: ArtifactFileEntry.from_content("values.csv", content),
+        lambda content: ArtifactArchiveEntry.from_content("https://example.org/sample.tar.zst", content),
+    ],
+)
+def test_entry_from_content_records_hash_and_size(make_entry):
     """`from_content` records the sha256 and the byte count, and `matches` accepts only that content."""
     # --- arrange / act ----------------
-    entry = ArtifactFileEntry.from_content("values.csv", b"abc")
+    entry = make_entry(b"abc")
 
     # --- assert -----------------------
     assert entry.sha256 == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
@@ -66,6 +73,7 @@ def test_short_identity_is_the_name_and_the_shortened_content_hash():
         {"built_with": {"sunnbear": "9.9.9"}},
         {"build_date": datetime.date(2030, 1, 1)},
         {"generated_by": None},
+        {"archive": ArtifactArchiveEntry.from_content("https://example.org/sample.tar.zst", b"\x28\xb5")},
     ],
 )
 def test_content_hash_ignores_everything_but_the_files(overrides):
@@ -113,9 +121,7 @@ def test_manifest_rejects_missing_or_duplicate_files(files, message):
     [
         _make_manifest(),
         _make_manifest(generated_by=None, input_artifact_hashes={}),
-        _make_manifest(
-            files=(ArtifactFileEntry.from_content("big.parquet", b"\x00\x01", url="https://example.org/big"),)
-        ),
+        _make_manifest(archive=ArtifactArchiveEntry.from_content("https://example.org/sample.tar.zst", b"\x28\xb5")),
     ],
 )
 def test_manifest_round_trips_through_json(manifest):
@@ -124,7 +130,7 @@ def test_manifest_round_trips_through_json(manifest):
 
 
 def test_to_json_is_deterministic_and_records_the_content_hash():
-    """`to_json` writes deterministic JSON that records `content_hash` and omits a `None` `url`."""
+    """`to_json` writes deterministic JSON that records `content_hash` and omits a `None` `archive`."""
     # --- arrange ----------------------
     manifest = _make_manifest()
 
@@ -135,7 +141,7 @@ def test_to_json_is_deterministic_and_records_the_content_hash():
     data = json.loads(text)
     assert text == json.dumps(data, sort_keys=True, indent=2) + "\n"
     assert data["content_hash"] == manifest.content_hash
-    assert "url" not in data["files"][0]
+    assert "archive" not in data
 
 
 def _make_edited_json(edit) -> str:
