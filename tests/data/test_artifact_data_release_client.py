@@ -1,4 +1,4 @@
-"""`ArtifactDataReleases` builds the GitHub CLI calls for data releases, and reads their output."""
+"""`ArtifactDataReleaseClient` builds the GitHub CLI calls for data releases, and reads their output."""
 
 import json
 import sys
@@ -6,24 +6,27 @@ from pathlib import Path
 
 import pytest
 
-import sunnbear._core.data.artifact_data_releases as data_releases_module
-from sunnbear._core.data import ArtifactDataReleases, ArtifactError, DataRelease
+import sunnbear._core.data.artifact_data_release_client as data_release_client_module
+from sunnbear._core.data import ArtifactDataRelease, ArtifactDataReleaseClient, ArtifactError
 
 
 def _stub_gh(monkeypatch, respond) -> list[list[str]]:
-    """Replace `ArtifactDataReleases._run_gh` with `respond`, which maps arguments to output; return the calls."""
+    """Replace `ArtifactDataReleaseClient._run_gh` with `respond`, which maps arguments to output.
+
+    Return the list that records the arguments of each call.
+    """
     calls = []
 
     def run_gh(args: list[str]) -> str:
         calls.append(args)
         return respond(args)
 
-    monkeypatch.setattr(ArtifactDataReleases, "_run_gh", staticmethod(run_gh))
+    monkeypatch.setattr(ArtifactDataReleaseClient, "_run_gh", staticmethod(run_gh))
     return calls
 
 
-def _raise(message: str):
-    """Return a stand-in for `_run_gh` that fails with `message`, as the GitHub CLI's error output."""
+def _gh_failing_with(message: str):
+    """Return a stand-in for `_run_gh` that fails as if the GitHub CLI had written `message` to its error output."""
 
     def respond(args: list[str]) -> str:
         raise ArtifactError(f"The GitHub CLI failed: {message}")
@@ -36,7 +39,7 @@ def _raise(message: str):
 # ==================================================================================================
 def test_tag_of_names_the_artifact_and_the_shortened_content_hash():
     """A data release's tag is ``data-<name>-<first 8 hex digits of the content hash>``."""
-    assert ArtifactDataReleases.tag_of("uv_tuples", "3f2a9c1e" + "0" * 56) == "data-uv_tuples-3f2a9c1e"
+    assert ArtifactDataReleaseClient.tag_of("uv_tuples", "3f2a9c1e" + "0" * 56) == "data-uv_tuples-3f2a9c1e"
 
 
 def test_check_write_access_accepts_a_maintainer(monkeypatch):
@@ -45,7 +48,7 @@ def test_check_write_access_accepts_a_maintainer(monkeypatch):
     calls = _stub_gh(monkeypatch, lambda args: "true\n")
 
     # --- act --------------------------
-    ArtifactDataReleases.check_write_access()
+    ArtifactDataReleaseClient.check_write_access()
 
     # --- assert -----------------------
     assert calls == [["api", "repos/bertpl/sunnbear", "--jq", ".permissions.push"]]
@@ -55,7 +58,7 @@ def test_check_write_access_accepts_a_maintainer(monkeypatch):
     "respond, message",
     [
         (lambda args: "false\n", r"maintainer-only functionality"),
-        (_raise("not logged in"), r"maintainer-only functionality.*not logged in"),
+        (_gh_failing_with("not logged in"), r"maintainer-only functionality.*not logged in"),
     ],
 )
 def test_check_write_access_refuses_anyone_else(monkeypatch, respond, message):
@@ -65,7 +68,7 @@ def test_check_write_access_refuses_anyone_else(monkeypatch, respond, message):
 
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match=message):
-        ArtifactDataReleases.check_write_access()
+        ArtifactDataReleaseClient.check_write_access()
 
 
 # ==================================================================================================
@@ -79,34 +82,34 @@ def test_find_reads_the_draft_state_and_the_file_urls(monkeypatch):
     calls = _stub_gh(monkeypatch, lambda args: output)
 
     # --- act --------------------------
-    release = ArtifactDataReleases.find("data-x-12345678")
+    release = ArtifactDataReleaseClient.find("data-x-12345678")
 
     # --- assert -----------------------
-    assert release == DataRelease(is_draft=False, asset_urls={"x.tar.zst": url})
+    assert release == ArtifactDataRelease(is_draft=False, file_urls={"x.tar.zst": url})
     assert calls == [["release", "view", "data-x-12345678", "--repo", "bertpl/sunnbear", "--json", "isDraft,assets"]]
 
 
 def test_find_returns_none_for_a_missing_release(monkeypatch):
     """A release that does not exist is ``None``, not an error."""
     # --- arrange ----------------------
-    _stub_gh(monkeypatch, _raise("release not found"))
+    _stub_gh(monkeypatch, _gh_failing_with("release not found"))
 
     # --- act / assert -----------------
-    assert ArtifactDataReleases.find("data-x-12345678") is None
+    assert ArtifactDataReleaseClient.find("data-x-12345678") is None
 
 
 def test_find_raises_for_any_other_failure(monkeypatch):
     """Any other failure of the GitHub CLI is an `ArtifactError` with its error output."""
     # --- arrange ----------------------
-    _stub_gh(monkeypatch, _raise("HTTP 502"))
+    _stub_gh(monkeypatch, _gh_failing_with("HTTP 502"))
 
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match="HTTP 502"):
-        ArtifactDataReleases.find("data-x-12345678")
+        ArtifactDataReleaseClient.find("data-x-12345678")
 
 
 def test_create_uploads_the_file_under_its_name_and_publishes_not_as_latest(monkeypatch):
-    """`create` passes a file with the given name and content, a tag on ``main``, and ``--latest=false``."""
+    """`create` gives the GitHub CLI a file of the given name and content, a tag on ``main`` and ``--latest=false``."""
     # --- arrange ----------------------
     uploaded = {}
 
@@ -117,7 +120,7 @@ def test_create_uploads_the_file_under_its_name_and_publishes_not_as_latest(monk
     calls = _stub_gh(monkeypatch, respond)
 
     # --- act --------------------------
-    ArtifactDataReleases.create("data-x-12345678", "x.tar.zst", b"archive", title="Data: x", notes="notes")
+    ArtifactDataReleaseClient.create("data-x-12345678", "x.tar.zst", b"archive", title="Data: x", notes="notes")
 
     # --- assert -----------------------
     assert uploaded == {"x.tar.zst": b"archive"}
@@ -134,10 +137,10 @@ def test_run_gh_returns_the_standard_output(monkeypatch):
     """`_run_gh` returns what the executable writes to standard output."""
     # --- arrange ----------------------
     # Python stands in for the GitHub CLI, so the test needs neither `gh` nor the network.
-    monkeypatch.setattr(data_releases_module, "_GH_EXECUTABLE", sys.executable)
+    monkeypatch.setattr(data_release_client_module, "_GH_EXECUTABLE", sys.executable)
 
     # --- act / assert -----------------
-    assert ArtifactDataReleases._run_gh(["-c", "print('ok')"]) == "ok\n"
+    assert ArtifactDataReleaseClient._run_gh(["-c", "print('ok')"]) == "ok\n"
 
 
 @pytest.mark.parametrize(
@@ -150,8 +153,8 @@ def test_run_gh_returns_the_standard_output(monkeypatch):
 def test_run_gh_reports_a_failed_or_missing_executable(monkeypatch, executable, args, message):
     """A failing or missing executable raises `ArtifactError`, with the error output when there is one."""
     # --- arrange ----------------------
-    monkeypatch.setattr(data_releases_module, "_GH_EXECUTABLE", executable)
+    monkeypatch.setattr(data_release_client_module, "_GH_EXECUTABLE", executable)
 
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match=message):
-        ArtifactDataReleases._run_gh(args)
+        ArtifactDataReleaseClient._run_gh(args)

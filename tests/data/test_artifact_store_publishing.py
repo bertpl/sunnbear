@@ -6,10 +6,10 @@ import pytest
 
 from sunnbear._core.data import (
     ArtifactArchiver,
-    ArtifactDataReleases,
+    ArtifactDataRelease,
+    ArtifactDataReleaseClient,
     ArtifactError,
     ArtifactStore,
-    DataRelease,
 )
 
 from .sample_declarations import SAMPLE_LINES, SampleDownloadedLinesDeclaration, SampleLinesDeclaration
@@ -20,19 +20,19 @@ class _FakeGitHub:
 
     def __init__(self) -> None:
         """Start without any release."""
-        self.releases: dict[str, DataRelease] = {}
+        self.releases: dict[str, ArtifactDataRelease] = {}
         self.files_by_url: dict[str, bytes] = {}
         self.created_tags: list[str] = []
 
-    def find(self, tag: str) -> DataRelease | None:
-        """Return the release with this tag, as `ArtifactDataReleases.find` does."""
+    def find(self, tag: str) -> ArtifactDataRelease | None:
+        """Return the release with this tag, as `ArtifactDataReleaseClient.find` does."""
         return self.releases.get(tag)
 
     def create(self, tag: str, file_name: str, content: bytes, title: str, notes: str) -> None:
-        """Publish a release with one file, as `ArtifactDataReleases.create` does."""
+        """Publish a release with one file, as `ArtifactDataReleaseClient.create` does."""
         url = f"https://example.invalid/{tag}/{file_name}"
         self.files_by_url[url] = content
-        self.releases[tag] = DataRelease(is_draft=False, asset_urls={file_name: url})
+        self.releases[tag] = ArtifactDataRelease(is_draft=False, file_urls={file_name: url})
         self.created_tags.append(tag)
 
     def download(self, url: str) -> bytes:
@@ -42,11 +42,11 @@ class _FakeGitHub:
 
 @pytest.fixture
 def fake_github(monkeypatch, artifacts_folder_in_tmp):
-    """Route every data release call and download of `ArtifactStore` to a `_FakeGitHub`, with write access."""
+    """Route the `ArtifactDataReleaseClient` calls and the downloads of `ArtifactStore` to a `_FakeGitHub`."""
     github = _FakeGitHub()
-    monkeypatch.setattr(ArtifactDataReleases, "check_write_access", staticmethod(lambda: None))
-    monkeypatch.setattr(ArtifactDataReleases, "find", staticmethod(github.find))
-    monkeypatch.setattr(ArtifactDataReleases, "create", staticmethod(github.create))
+    monkeypatch.setattr(ArtifactDataReleaseClient, "check_write_access", staticmethod(lambda: None))
+    monkeypatch.setattr(ArtifactDataReleaseClient, "find", staticmethod(github.find))
+    monkeypatch.setattr(ArtifactDataReleaseClient, "create", staticmethod(github.create))
     monkeypatch.setattr(ArtifactStore, "_download", staticmethod(github.download))
     return github
 
@@ -54,14 +54,14 @@ def fake_github(monkeypatch, artifacts_folder_in_tmp):
 def _tag_of_sample() -> str:
     """Return the data release tag of `SampleDownloadedLinesDeclaration` after it has been saved."""
     manifest = ArtifactStore.load_manifest(SampleDownloadedLinesDeclaration)
-    return ArtifactDataReleases.tag_of(manifest.name, manifest.content_hash)
+    return ArtifactDataReleaseClient.tag_of(manifest.name, manifest.content_hash)
 
 
 # ==================================================================================================
 #  Publishing
 # ==================================================================================================
 def test_publish_creates_the_release_and_records_the_archive(fake_github, cache_root_in_tmp):
-    """After `save` and `publish`, the artifact verifies, and loads from its data release with an empty cache."""
+    """After `publish`, `verify` accepts the artifact, and `load` reads it from its release when the cache is empty."""
     # --- arrange ----------------------
     ArtifactStore.save(SampleDownloadedLinesDeclaration, SAMPLE_LINES)
 
@@ -105,8 +105,8 @@ def test_publish_refuses_an_existing_release_whose_files_differ(fake_github):
 @pytest.mark.parametrize(
     "release",
     [
-        DataRelease(is_draft=True, asset_urls={"sample_downloaded_lines.tar.zst": "https://example.invalid/x"}),
-        DataRelease(is_draft=False, asset_urls={}),
+        ArtifactDataRelease(is_draft=True, file_urls={"sample_downloaded_lines.tar.zst": "https://example.invalid/x"}),
+        ArtifactDataRelease(is_draft=False, file_urls={}),
     ],
 )
 def test_publish_refuses_a_draft_or_incomplete_release(fake_github, release):
@@ -150,7 +150,7 @@ def test_publish_checks_write_access_first(monkeypatch, fake_github):
     def refuse() -> None:
         raise ArtifactError("maintainer-only")
 
-    monkeypatch.setattr(ArtifactDataReleases, "check_write_access", staticmethod(refuse))
+    monkeypatch.setattr(ArtifactDataReleaseClient, "check_write_access", staticmethod(refuse))
 
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match="maintainer-only"):
