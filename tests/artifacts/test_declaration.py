@@ -68,8 +68,8 @@ def test_two_declarations_cannot_share_a_name():
 def test_declarations_are_sorted_by_name():
     """`artifacts` returns the declarations sorted by name, whatever the order of definition."""
     # --- arrange ----------------------
-    later = define_declaration(name="zz_later")
-    earlier = define_declaration(name="aa_earlier")
+    later = define_declaration(name="later")
+    earlier = define_declaration(name="earlier")
 
     # --- act --------------------------
     names = [
@@ -79,7 +79,7 @@ def test_declarations_are_sorted_by_name():
     ]
 
     # --- assert -----------------------
-    assert names == ["aa_earlier", "zz_later"]
+    assert names == ["earlier", "later"]
 
 
 def test_the_sample_declaration_converts_both_ways():
