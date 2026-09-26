@@ -8,18 +8,9 @@ import zipfile
 import pytest
 
 import sunnbear
-from sunnbear._core.data import ArtifactDeclaration, ArtifactError, ArtifactStore
+from sunnbear._core.data import ArtifactError, ArtifactStore
 
-from .sample_declarations import SAMPLE_LINES, SampleLinesDeclaration, define_declaration
-
-
-def _define_builtin_declaration(name: str, file_path: str = "value.txt") -> type[ArtifactDeclaration]:
-    """Define a 1-file declaration whose module name is inside sunnbear, so `ArtifactStore` treats it as built in.
-
-    Defining the class registers it in `ArtifactRegistry`, so a test that calls this function must use
-    the `isolated_artifact_registry` fixture.
-    """
-    return define_declaration(file_path, __module__="sunnbear._declared_in_a_test", name=name)
+from .sample_declarations import SAMPLE_LINES, SampleLinesDeclaration, define_builtin_declaration
 
 
 @pytest.fixture
@@ -80,7 +71,7 @@ def test_save_deletes_files_that_the_new_value_does_not_produce(sample_lines_fol
 def test_save_refuses_a_data_file_named_like_the_manifest():
     """A declaration that produces ``manifest.json`` as a data file cannot be saved."""
     # --- arrange ----------------------
-    declaration_cls = _define_builtin_declaration("clashing", file_path="manifest.json")
+    declaration_cls = define_builtin_declaration("clashing", file_path="manifest.json")
 
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match=r"data file named 'manifest\.json'"):
@@ -144,7 +135,8 @@ def test_verify_reports_a_folder_that_differs_from_its_manifest(sample_lines_fol
 def test_the_builtin_artifacts_are_consistent():
     """Every built-in artifact matches its manifest, and each subfolder of the built-in artifacts folder is declared."""
     # --- arrange ----------------------
-    # `ArtifactRegistry` knows a declaration only once its module is imported, so import every sunnbear module.
+    # `verify_builtin_artifacts` checks only registered declarations, and a declaration is registered
+    # only once its module is imported, so import every sunnbear module.
     for module_info in pkgutil.walk_packages(sunnbear.__path__, prefix="sunnbear."):
         importlib.import_module(module_info.name)
 
@@ -158,7 +150,7 @@ def test_verify_builtin_artifacts_reports_unverifiable_and_undeclared(monkeypatc
     # --- arrange ----------------------
     monkeypatch.setattr(ArtifactStore, "_builtin_artifacts_folder", staticmethod(lambda: tmp_path))
     (tmp_path / "orphan").mkdir()
-    _define_builtin_declaration("declared_without_files")
+    define_builtin_declaration("declared_without_files")
 
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match=r"(?s)declared_without_files.*Folder 'orphan' holds no declared artifact"):
@@ -171,7 +163,7 @@ def test_a_builtin_artifact_lives_in_the_builtin_artifacts_folder_and_a_test_fix
     ``artifacts/<name>`` beside its own module.
     """
     # --- arrange ----------------------
-    builtin_cls = _define_builtin_declaration("builtin")
+    builtin_cls = define_builtin_declaration("builtin")
 
     # --- act --------------------------
     builtin_folder = ArtifactStore._folder_of(builtin_cls)

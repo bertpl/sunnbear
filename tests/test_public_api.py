@@ -2,6 +2,7 @@
 
 import pytest
 
+import sunnbear._core.data.artifact_listing
 import sunnbear._core.data.exceptions
 import sunnbear._core.exceptions
 import sunnbear._core.functions.core
@@ -10,6 +11,7 @@ import sunnbear._core.solvers.bracketing
 import sunnbear._core.solvers.core
 import sunnbear._core.solvers.core.exceptions
 import sunnbear._core.stats
+import sunnbear.data
 import sunnbear.exceptions
 import sunnbear.functions
 import sunnbear.solvers
@@ -17,10 +19,14 @@ import sunnbear.stats
 
 
 def _public_names(*modules) -> set[str]:
-    """Return the names that the modules expose without a leading underscore, submodules excluded."""
+    """Return the names that the modules expose: their `__all__` if they define one, else every name without a
+    leading underscore, submodules excluded."""
     names = set()
     for module in modules:
-        names |= {name for name in dir(module) if not name.startswith("_") and not _is_submodule(module, name)}
+        if hasattr(module, "__all__"):
+            names |= set(module.__all__)
+        else:
+            names |= {name for name in dir(module) if not name.startswith("_") and not _is_submodule(module, name)}
     return names
 
 
@@ -34,6 +40,7 @@ def _is_submodule(module, name: str) -> bool:
     "public_module, implementation_modules",
     [
         (sunnbear.stats, (sunnbear._core.stats,)),
+        (sunnbear.data, (sunnbear._core.data.artifact_listing,)),
         (sunnbear.functions, (sunnbear._core.functions.core,)),
         (sunnbear.solvers, (sunnbear._core.solvers.core, sunnbear._core.solvers.bracketing)),
         (

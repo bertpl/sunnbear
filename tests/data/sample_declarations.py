@@ -3,7 +3,8 @@
 - `SampleLinesDeclaration` has committed data files;
 - `SampleDownloadedLinesDeclaration` has only a committed manifest, and its data files are
   downloaded;
-- `define_declaration` defines a 1-file declaration on the fly.
+- `define_declaration` defines a 1-file declaration on the fly;
+- `define_builtin_declaration` defines a 1-file declaration that counts as built in.
 """
 
 from collections.abc import Mapping
@@ -55,3 +56,12 @@ def define_declaration(file_path: str = "value.txt", **attrs) -> type[ArtifactDe
         **attrs,
     }
     return type("_DefinedDeclaration", (ArtifactDeclaration,), namespace)
+
+
+def define_builtin_declaration(name: str, file_path: str = "value.txt") -> type[ArtifactDeclaration]:
+    """Define a 1-file declaration whose module name is inside sunnbear, so that it counts as built in.
+
+    Defining the class registers it in `ArtifactRegistry`, so a test that calls this function must use
+    the `isolated_artifact_registry` fixture.
+    """
+    return define_declaration(file_path, __module__="sunnbear._declared_in_a_test", name=name)
