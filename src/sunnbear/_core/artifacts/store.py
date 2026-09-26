@@ -49,7 +49,6 @@ from .source import ArtifactSource
 T = TypeVar("T")
 
 _MANIFEST_FILE_NAME = "manifest.json"
-# A declaration defined outside sunnbear keeps its artifact folders in this folder, beside its own module.
 _NON_BUILTIN_ARTIFACTS_FOLDER_NAME = "artifacts"
 _BUILTIN_ARTIFACTS_FOLDER_NAME = "builtin"
 _BUILTIN_ARTIFACTS_PARENT_PACKAGE = "sunnbear._core.artifacts"
