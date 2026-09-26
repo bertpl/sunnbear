@@ -51,9 +51,11 @@ class ArtifactManifest(BaseModel):
         build_date: The date the artifact was built.
         generated_by: The public sunnbear function call that generated the artifact, with its
             arguments, as JSON-compatible data; ``None`` when no public function generated it.
-        download: The archive that holds all data files of a downloaded artifact, once it is
-            published; ``None`` for an artifact shipped in the package. Not part of the content
-            hash, so recording it keeps the artifact's identity.
+        archive: Where to download the archive that holds all data files of a downloaded
+            artifact, and the archive's hash; ``None`` for an artifact shipped in the package, and
+            for a downloaded artifact whose archive is not published yet. The content hash does not
+            cover this field, so recording it, or repacking the archive with another zstd version,
+            which may give other bytes, leaves the content hash unchanged.
     """
 
     model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
@@ -64,7 +66,7 @@ class ArtifactManifest(BaseModel):
     built_with: dict[str, str] = Field(default_factory=dict)
     build_date: datetime.date
     generated_by: dict[str, Any] | None = None
-    download: "ArtifactArchiveEntry | None" = None
+    archive: "ArtifactArchiveEntry | None" = None
 
     @field_validator("files")
     @classmethod
@@ -137,13 +139,17 @@ class ArtifactContentEntry(BaseModel):
 
     Attributes:
         sha256: The sha256 of the file's bytes, as hex.
-        size_bytes: The number of bytes in the file.
     """
 
     model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
 
     sha256: str
     size_bytes: int
+
+    @staticmethod
+    def _hash_fields_of(content: bytes) -> dict[str, Any]:
+        """Return the ``sha256`` and ``size_bytes`` values that describe `content`."""
+        return {"sha256": hashlib.sha256(content).hexdigest(), "size_bytes": len(content)}
 
     def matches(self, content: bytes) -> bool:
         """Return whether `content` has this entry's size and sha256."""
@@ -170,10 +176,10 @@ class ArtifactFileEntry(ArtifactContentEntry):
             raise ValueError(f"Artifact file path '{path}' must be relative and stay inside the artifact's folder.")
         return path
 
-    @staticmethod
-    def from_content(path: str, content: bytes) -> "ArtifactFileEntry":
+    @classmethod
+    def from_content(cls, path: str, content: bytes) -> "ArtifactFileEntry":
         """Describe a file by hashing its content."""
-        return ArtifactFileEntry(path=path, sha256=hashlib.sha256(content).hexdigest(), size_bytes=len(content))
+        return cls(path=path, **cls._hash_fields_of(content))
 
 
 class ArtifactArchiveEntry(ArtifactContentEntry):
@@ -185,7 +191,7 @@ class ArtifactArchiveEntry(ArtifactContentEntry):
 
     url: str
 
-    @staticmethod
-    def from_content(url: str, content: bytes) -> "ArtifactArchiveEntry":
+    @classmethod
+    def from_content(cls, url: str, content: bytes) -> "ArtifactArchiveEntry":
         """Describe an archive by hashing its content."""
-        return ArtifactArchiveEntry(url=url, sha256=hashlib.sha256(content).hexdigest(), size_bytes=len(content))
+        return cls(url=url, **cls._hash_fields_of(content))

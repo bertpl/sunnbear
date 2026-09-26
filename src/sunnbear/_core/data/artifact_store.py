@@ -14,10 +14,13 @@ Where the data files live depends on the declaration's `ArtifactSource`:
   package, and the test suite runs `ArtifactStore.verify_builtin_artifacts` on every change.
 - **download**: in the cache folder ``<cache root>/<artifact name>/<content hash>``, where the cache
   root is ``SUNNBEAR_CACHE_DIR`` when that environment variable is set, else the user's cache folder
-  for sunnbear. The data files travel as one archive (`ArtifactArchive`), described by the
-  manifest's ``download`` entry. When the cache lacks a data file, or holds a copy whose hash
-  differs from the file's manifest entry, loading downloads the archive, checks its hash, unpacks
-  it into the cache folder, and checks every unpacked file against its manifest entry.
+  for sunnbear. The data files are downloaded as one archive (`ArtifactArchiver`), described by the
+  manifest's ``archive`` entry. When the cache lacks a data file, or holds a copy whose hash
+  differs from the file's manifest entry, loading:
+
+  - downloads the archive and checks its hash;
+  - unpacks it into the cache folder;
+  - checks every unpacked file against its manifest entry.
 """
 
 import datetime
@@ -35,7 +38,7 @@ import platformdirs
 
 from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
-from .artifact_archive import ArtifactArchive
+from .artifact_archiver import ArtifactArchiver
 from .artifact_declaration import ArtifactDeclaration
 from .artifact_manifest import ArtifactFileEntry, ArtifactManifest
 from .artifact_registry import ArtifactRegistry
@@ -66,18 +69,22 @@ class ArtifactStore:
 
         Files shipped in the package are read without checking their hashes. The files of a
         downloaded artifact are read from the cache when every cached copy matches its manifest
-        entry; otherwise the artifact's archive is unpacked into the cache first. The archive is
-        read from the cache folder when it is there and matches the manifest's ``download`` entry,
-        e.g. because a user without network access placed it there, and downloaded otherwise.
+        entry; otherwise the artifact's archive is unpacked into the cache first.
+
+        The archive is read from the cache folder when it is there and matches the manifest's
+        ``archive`` entry, e.g. because a user without network access placed it there, and
+        downloaded otherwise. The archive is deleted from the cache folder once its files are
+        unpacked.
 
         Raises:
             ArtifactError: If any of these holds:
 
                 - the manifest is missing, malformed or names another artifact;
                 - a file shipped in the package is missing;
-                - the archive is needed, and the manifest has no ``download`` entry, the download
-                  fails, the archive does not match the entry, or its files do not match the
-                  manifest; the message names the path where the archive can be placed by hand.
+                - the archive is needed and either the manifest has no ``archive`` entry, the
+                  download fails, the archive does not match that entry, or the unpacked files do
+                  not match the manifest; for a failed or mismatched download, the message names
+                  the path where the archive can be placed by hand.
         """
         manifest = cls.load_manifest(declaration_cls)
         match declaration_cls.source:
@@ -124,8 +131,8 @@ class ArtifactStore:
         Where the data files go depends on the declaration's `ArtifactSource`:
 
         - **package**: next to the manifest;
-        - **download**: into the cache folder; the manifest records no download URL, because `save`
-          does not upload the files, so no URL exists for them yet.
+        - **download**: into the cache folder; the manifest records no ``archive`` entry, because
+          `save` does not upload an archive, so no URL exists for it yet.
 
         Any other file in the artifact's folder is deleted, so the folder holds exactly the manifest
         and, for an artifact shipped in the package, the files that the manifest lists.
@@ -195,9 +202,9 @@ class ArtifactStore:
 
                 - the manifest is missing, malformed or names another artifact;
                 - for an artifact shipped in the package, a file is missing, differs from its
-                  manifest entry, or is not listed, or the manifest has a ``download`` entry;
+                  manifest entry, or is not listed, or the manifest has an ``archive`` entry;
                 - for a downloaded artifact, a data file lies next to the manifest, or the manifest
-                  has no ``download`` entry.
+                  has no ``archive`` entry.
         """
         manifest = cls.load_manifest(declaration_cls)
         folder = cls._folder_of(declaration_cls)
@@ -205,15 +212,15 @@ class ArtifactStore:
         match declaration_cls.source:
             case ArtifactSource.PACKAGE:
                 problems = cls._compare_shipped_files_with_manifest(folder, present_paths, manifest)
-                if manifest.download is not None:
-                    problems.append("the manifest has a download entry, but the artifact ships in the package")
+                if manifest.archive is not None:
+                    problems.append("the manifest has an archive entry, but the artifact ships in the package")
             case ArtifactSource.DOWNLOAD:
                 problems = [
                     f"{path} is next to the manifest, but the artifact's data files are downloaded"
                     for path in sorted(present_paths)
                 ]
-                if manifest.download is None:
-                    problems.append("the manifest has no download entry")
+                if manifest.archive is None:
+                    problems.append("the manifest has no archive entry")
             case _:
                 assert_never(declaration_cls.source)
         if problems:
@@ -286,8 +293,8 @@ class ArtifactStore:
         cached_contents = cls._read_matching_cached_files(cache_folder, manifest)
         if cached_contents is not None:
             return cached_contents
-        archive_file = cache_folder / ArtifactArchive.file_name(manifest.name)
-        contents = ArtifactArchive.unpack(
+        archive_file = cache_folder / ArtifactArchiver.file_name(manifest.name)
+        contents = ArtifactArchiver.unpack(
             cls._read_or_download_archive(manifest, archive_file), [entry.path for entry in manifest.files]
         )
         differing_paths = [entry.path for entry in manifest.files if not entry.matches(contents[entry.path])]
@@ -316,32 +323,32 @@ class ArtifactStore:
 
     @classmethod
     def _read_or_download_archive(cls, manifest: ArtifactManifest, archive_file: Path) -> bytes:
-        """Return the artifact's archive: from `archive_file` if it matches the ``download`` entry, else downloaded.
+        """Return the artifact's archive: from `archive_file` if it matches the ``archive`` entry, else downloaded.
 
         Raises:
-            ArtifactError: If the manifest has no ``download`` entry, the download fails, or the
-                downloaded bytes do not match the entry; the message names `archive_file`, where
-                the archive can be placed by hand.
+            ArtifactError: If the manifest has no ``archive`` entry, the download fails, or the
+                downloaded bytes do not match the entry; for a failed or mismatched download, the
+                message names `archive_file`, where the archive can be placed by hand.
         """
-        download = manifest.download
-        if download is None:
+        archive_entry = manifest.archive
+        if archive_entry is None:
             raise ArtifactError(
-                f"Artifact {manifest.short_identity} has no download entry, "
+                f"The manifest of artifact {manifest.short_identity} has no archive entry, "
                 f"and {archive_file.parent} holds no matching copy of its files."
             )
         if archive_file.is_file():
             archive_bytes = archive_file.read_bytes()
-            if download.matches(archive_bytes):
+            if archive_entry.matches(archive_bytes):
                 return archive_bytes
         try:
-            archive_bytes = cls._download(download.url)
+            archive_bytes = cls._download(archive_entry.url)
         except (OSError, ValueError, http.client.HTTPException) as error:
             raise ArtifactError(
-                f"Downloading {download.url} failed: {error}. The archive can also be placed at {archive_file}."
+                f"Downloading {archive_entry.url} failed: {error}. The archive can also be placed at {archive_file}."
             ) from error
-        if not download.matches(archive_bytes):
+        if not archive_entry.matches(archive_bytes):
             raise ArtifactError(
-                f"The archive downloaded from {download.url} does not match the manifest's download entry. "
+                f"The archive downloaded from {archive_entry.url} does not match the manifest's archive entry. "
                 f"The correct archive can also be placed at {archive_file}."
             )
         return archive_bytes

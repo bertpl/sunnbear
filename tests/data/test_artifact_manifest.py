@@ -73,7 +73,7 @@ def test_short_identity_is_the_name_and_the_shortened_content_hash():
         {"built_with": {"sunnbear": "9.9.9"}},
         {"build_date": datetime.date(2030, 1, 1)},
         {"generated_by": None},
-        {"download": ArtifactArchiveEntry.from_content("https://example.org/sample.tar.zst", b"\x28\xb5")},
+        {"archive": ArtifactArchiveEntry.from_content("https://example.org/sample.tar.zst", b"\x28\xb5")},
     ],
 )
 def test_content_hash_ignores_everything_but_the_files(overrides):
@@ -121,7 +121,7 @@ def test_manifest_rejects_missing_or_duplicate_files(files, message):
     [
         _make_manifest(),
         _make_manifest(generated_by=None, input_artifact_hashes={}),
-        _make_manifest(download=ArtifactArchiveEntry.from_content("https://example.org/sample.tar.zst", b"\x28\xb5")),
+        _make_manifest(archive=ArtifactArchiveEntry.from_content("https://example.org/sample.tar.zst", b"\x28\xb5")),
     ],
 )
 def test_manifest_round_trips_through_json(manifest):
@@ -130,7 +130,7 @@ def test_manifest_round_trips_through_json(manifest):
 
 
 def test_to_json_is_deterministic_and_records_the_content_hash():
-    """`to_json` writes deterministic JSON that records `content_hash` and omits a `None` `download`."""
+    """`to_json` writes deterministic JSON that records `content_hash` and omits a `None` `archive`."""
     # --- arrange ----------------------
     manifest = _make_manifest()
 
@@ -141,7 +141,7 @@ def test_to_json_is_deterministic_and_records_the_content_hash():
     data = json.loads(text)
     assert text == json.dumps(data, sort_keys=True, indent=2) + "\n"
     assert data["content_hash"] == manifest.content_hash
-    assert "download" not in data
+    assert "archive" not in data
 
 
 def _make_edited_json(edit) -> str:

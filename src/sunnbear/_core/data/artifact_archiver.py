@@ -1,9 +1,9 @@
-"""`ArtifactArchive` packs the data files of a downloaded artifact into one archive, and unpacks them.
+"""`ArtifactArchiver` packs the data files of a downloaded artifact into one archive, and unpacks them.
 
 The archive is a tar file compressed with zstd, so an artifact is downloaded and hash-checked as a
-single file, whatever the number of its data files and however deep their paths. The archive works
-in memory, on bytes: it never reads or writes the file system, so a crafted archive cannot write
-anywhere.
+single file, whatever the number of its data files and however deep their paths. The archiver works
+in memory, on bytes: it never reads or writes the file system, so unpacking a malicious archive
+cannot write any file.
 """
 
 import io
@@ -22,18 +22,18 @@ else:
     from backports.zstd import CompressionParameter, ZstdError, tarfile
 
 _ARCHIVE_SUFFIX = ".tar.zst"
-# The highest standard zstd level: an archive is packed once, by the maintainer, and downloaded by
-# every user, so size matters more than packing time.
+# Packing uses the highest standard zstd level: an archive is packed once, by the maintainer, and
+# downloaded by every user, so size matters more than packing time.
 _ZSTD_LEVEL = 19
-# Read and write permissions for the owner, read permission for everyone else.
+# A fixed mode, like the zeroed times and owners, keeps the packed bytes reproducible.
 _FILE_MODE = 0o644
 
 
 # ==================================================================================================
-#  ArtifactArchive
+#  ArtifactArchiver
 # ==================================================================================================
-class ArtifactArchive:
-    """`ArtifactArchive` converts between an artifact's data files and the bytes of their zstd-compressed tar file."""
+class ArtifactArchiver:
+    """`ArtifactArchiver` converts between an artifact's data files and the bytes of their zstd-compressed tar file."""
 
     @staticmethod
     def file_name(artifact_name: str) -> str:
@@ -46,8 +46,7 @@ class ArtifactArchive:
 
         For a given zstd version, the same contents always give the same bytes: the files are
         sorted by path, and their modification times and owners are zeroed. Another zstd version
-        may give other bytes, which is why an artifact's content hash covers the unpacked files, not
-        the archive.
+        may give other bytes.
         """
         buffer = io.BytesIO()
         zstd_options: dict[int, int] = {CompressionParameter.compression_level: _ZSTD_LEVEL}
@@ -70,7 +69,7 @@ class ArtifactArchive:
 
         Raises:
             ArtifactError: If the bytes are not a readable archive, or a path in `paths` is not a
-                regular file in it.
+                regular file in the archive.
         """
         contents = {}
         try:

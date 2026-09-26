@@ -1,11 +1,11 @@
-"""`ArtifactArchive` packs data files into a tar file reproducibly, and unpacks only the files asked for."""
+"""`ArtifactArchiver` packs data files into a tar file reproducibly, and unpacks only the files asked for."""
 
 import io
 
 import pytest
 
-from sunnbear._core.data import ArtifactArchive, ArtifactError
-from sunnbear._core.data.artifact_archive import tarfile
+from sunnbear._core.data import ArtifactArchiver, ArtifactError
+from sunnbear._core.data.artifact_archiver import tarfile
 
 _CONTENTS = {"lines.txt": b"alpha\nbeta\n", "meta/count.txt": b"2\n"}
 
@@ -31,14 +31,14 @@ def _regular_file(name: str, content: bytes) -> tuple[tarfile.TarInfo, bytes]:
 # ==================================================================================================
 def test_unpack_returns_what_pack_packed():
     """Unpacking a packed archive gives back every file, including one in a subfolder."""
-    assert ArtifactArchive.unpack(ArtifactArchive.pack(_CONTENTS), _CONTENTS.keys()) == _CONTENTS
+    assert ArtifactArchiver.unpack(ArtifactArchiver.pack(_CONTENTS), _CONTENTS.keys()) == _CONTENTS
 
 
 def test_pack_gives_the_same_bytes_for_the_same_contents():
     """Packing sorts the files and zeroes their times and owners, so repeated packing gives equal bytes."""
     # --- act --------------------------
-    first_bytes = ArtifactArchive.pack(_CONTENTS)
-    second_bytes = ArtifactArchive.pack(dict(reversed(_CONTENTS.items())))
+    first_bytes = ArtifactArchiver.pack(_CONTENTS)
+    second_bytes = ArtifactArchiver.pack(dict(reversed(_CONTENTS.items())))
 
     # --- assert -----------------------
     assert first_bytes == second_bytes
@@ -52,19 +52,19 @@ def test_pack_gives_the_same_bytes_for_the_same_contents():
 
 def test_file_name_is_the_artifact_name_with_the_archive_suffix():
     """The archive of ``uv_tuples`` is named ``uv_tuples.tar.zst``."""
-    assert ArtifactArchive.file_name("uv_tuples") == "uv_tuples.tar.zst"
+    assert ArtifactArchiver.file_name("uv_tuples") == "uv_tuples.tar.zst"
 
 
 # ==================================================================================================
 #  Unpacking
 # ==================================================================================================
 def test_unpack_ignores_members_that_are_not_asked_for():
-    """A member outside the requested paths, such as one that climbs out of the folder, is never returned."""
+    """A member outside the requested paths, such as one whose path starts with ``..``, is never returned."""
     # --- arrange ----------------------
     archive_bytes = _pack_members([_regular_file("lines.txt", b"alpha\n"), _regular_file("../escape.txt", b"x")])
 
     # --- act / assert -----------------
-    assert ArtifactArchive.unpack(archive_bytes, ["lines.txt"]) == {"lines.txt": b"alpha\n"}
+    assert ArtifactArchiver.unpack(archive_bytes, ["lines.txt"]) == {"lines.txt": b"alpha\n"}
 
 
 def test_unpack_refuses_a_link_in_place_of_a_requested_file():
@@ -77,17 +77,17 @@ def test_unpack_refuses_a_link_in_place_of_a_requested_file():
 
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match=r"lacks the files \['lines\.txt'\]"):
-        ArtifactArchive.unpack(archive_bytes, ["lines.txt"])
+        ArtifactArchiver.unpack(archive_bytes, ["lines.txt"])
 
 
 @pytest.mark.parametrize(
     "archive_bytes",
     [
         b"not an archive",
-        ArtifactArchive.pack({"big.txt": bytes(range(256)) * 400})[:-5],
+        ArtifactArchiver.pack({"big.txt": bytes(range(256)) * 400})[:-5],
     ],
 )
 def test_unpack_refuses_bytes_that_are_not_a_complete_archive(archive_bytes):
     """Bytes that are not a zstd-compressed tar file, or a truncated one, raise `ArtifactError`."""
     with pytest.raises(ArtifactError, match="Cannot read the artifact archive"):
-        ArtifactArchive.unpack(archive_bytes, ["big.txt"])
+        ArtifactArchiver.unpack(archive_bytes, ["big.txt"])

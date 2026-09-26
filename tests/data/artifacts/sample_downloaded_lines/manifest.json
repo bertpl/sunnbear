@@ -1,14 +1,14 @@
 {
+  "archive": {
+    "sha256": "4a0fe8485ee1b2b0a0c91843ebc37f457453451803a5d996de8688f0f9e58290",
+    "size_bytes": 117,
+    "url": "https://example.invalid/sample_downloaded_lines.tar.zst"
+  },
   "build_date": "2026-09-26",
   "built_with": {
     "sunnbear": "0.1.2"
   },
   "content_hash": "43b2eb354854d7ecd40c7efca13bac820208f88fdd1219f3e04d3aaee529edee",
-  "download": {
-    "sha256": "4a0fe8485ee1b2b0a0c91843ebc37f457453451803a5d996de8688f0f9e58290",
-    "size_bytes": 117,
-    "url": "https://example.invalid/sample_downloaded_lines.tar.zst"
-  },
   "files": [
     {
       "path": "lines.txt",
