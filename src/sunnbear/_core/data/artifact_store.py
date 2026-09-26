@@ -12,9 +12,10 @@ Where the data files live depends on the declaration's `ArtifactSource`:
 
 - **package**: next to the manifest. Loading does not check their hashes: the files ship inside the
   package, and the test suite runs `ArtifactStore.verify_builtin_artifacts` on every change.
-- **download**: in a cache folder per artifact name and content hash, under ``SUNNBEAR_DATA_DIR``
-  when that environment variable is set, else under the user's cache folder for sunnbear. Loading
-  downloads a file that the cache lacks from the URL in its manifest entry, and checks its hash.
+- **download**: in the cache folder ``<cache root>/<artifact name>/<content hash>``, where the cache
+  root is ``SUNNBEAR_DATA_DIR`` when that environment variable is set, else the user's cache folder
+  for sunnbear. When the cache lacks a data file, or holds it with other content, loading downloads
+  it from the URL in the file's manifest entry and checks its hash.
 """
 
 import datetime
@@ -108,10 +109,14 @@ class ArtifactStore:
     ) -> ArtifactManifest:
         """Write the artifact's data files for `value` and a new manifest, replacing what the artifact's folder held.
 
-        The data files go next to the manifest for an artifact shipped in the package, and into the
-        cache folder for a downloaded one; the manifest records no download URL, since the files are
-        not uploaded anywhere. Any other file in the artifact's folder is deleted, so the folder
-        holds exactly the manifest and, for an artifact shipped in the package, the files it lists.
+        Where the data files go depends on the declaration's `ArtifactSource`:
+
+        - **package**: next to the manifest;
+        - **download**: into the cache folder; the manifest records no download URL, because `save`
+          does not upload the files, so no URL exists for them yet.
+
+        Any other file in the artifact's folder is deleted, so the folder holds exactly the manifest
+        and, for an artifact shipped in the package, the files that the manifest lists.
 
         Args:
             declaration_cls: The artifact's declaration.
@@ -169,9 +174,7 @@ class ArtifactStore:
     def verify(cls, declaration_cls: type[ArtifactDeclaration]) -> ArtifactManifest:
         """Check the artifact's folder against its manifest.
 
-        For an artifact shipped in the package, the folder must hold exactly the files listed in the
-        manifest, with matching content. For a downloaded artifact, the folder must hold only the
-        manifest, and every file entry must have a download URL; the cache is not checked.
+        The download cache of a downloaded artifact is not checked.
 
         Returns:
             The artifact's manifest.
@@ -182,8 +185,8 @@ class ArtifactStore:
                 - the manifest is missing, malformed or names another artifact;
                 - for an artifact shipped in the package, a file is missing, differs from its
                   manifest entry, or is not listed;
-                - for a downloaded artifact, a data file is committed next to the manifest, or a
-                  file entry has no download URL.
+                - for a downloaded artifact, a data file lies next to the manifest, or a file entry
+                  has no download URL.
         """
         manifest = cls.load_manifest(declaration_cls)
         folder = cls._folder_of(declaration_cls)
@@ -192,7 +195,10 @@ class ArtifactStore:
             case ArtifactSource.PACKAGE:
                 problems = cls._compare_shipped_files_with_manifest(folder, present_paths, manifest)
             case ArtifactSource.DOWNLOAD:
-                problems = [f"{path} is committed, but the artifact is downloaded" for path in sorted(present_paths)]
+                problems = [
+                    f"{path} is next to the manifest, but the artifact's data files are downloaded"
+                    for path in sorted(present_paths)
+                ]
                 problems += [f"{entry.path} has no download URL" for entry in manifest.files if entry.url is None]
             case _:
                 assert_never(declaration_cls.source)
@@ -301,6 +307,8 @@ class ArtifactStore:
 
         Raises:
             OSError: If the connection fails or the server returns an error status.
+            ValueError: If `url` is malformed or its scheme is unsupported.
+            http.client.HTTPException: If the server's response is malformed or cut short.
         """
         # The URLs come from committed manifests, so they are not user input.
         with urllib.request.urlopen(url, timeout=_DOWNLOAD_TIMEOUT_SEC) as response:  # noqa: S310
@@ -308,10 +316,9 @@ class ArtifactStore:
 
     @staticmethod
     def _cache_folder_of(manifest: ArtifactManifest) -> Path:
-        """Return the cache folder of a downloaded artifact's data files, one per artifact name and content hash.
+        """Return the cache folder of a downloaded artifact's data files.
 
-        The cache root is ``SUNNBEAR_DATA_DIR`` when that environment variable is set, and the user's
-        cache folder for sunnbear otherwise.
+        The folder is ``<cache root>/<artifact name>/<content hash>``.
         """
         cache_root = os.environ.get(_DATA_DIR_ENV_VAR) or platformdirs.user_cache_dir("sunnbear")
         return Path(cache_root) / manifest.name / manifest.content_hash
@@ -321,7 +328,10 @@ class ArtifactStore:
     # --------------------------------------------------------------------------
     @classmethod
     def _folder_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Traversable:
-        """Return the artifact's folder, derived from where its declaration is defined; it holds the manifest."""
+        """Return the artifact's folder, which holds the manifest.
+
+        The folder's location follows from the module that defines the declaration.
+        """
         if is_defined_in_sunnbear(declaration_cls):
             return cls._builtin_artifacts_folder().joinpath(declaration_cls.name)
         else:

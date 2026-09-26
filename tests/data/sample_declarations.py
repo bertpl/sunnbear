@@ -1,7 +1,8 @@
 """This module holds the test-only artifact declarations.
 
-`SampleLinesDeclaration` has committed files, and `SampleDownloadedLinesDeclaration` a committed
-manifest whose files are downloaded; `define_declaration` defines a 1-file declaration on the fly.
+`SampleLinesDeclaration` has committed data files. `SampleDownloadedLinesDeclaration` has only a
+committed manifest, and its data files are downloaded. `define_declaration` defines a 1-file
+declaration on the fly.
 """
 
 from collections.abc import Mapping
@@ -32,10 +33,10 @@ class SampleLinesDeclaration(ArtifactDeclaration[list[str]]):
 
 
 class SampleDownloadedLinesDeclaration(SampleLinesDeclaration):
-    """`SampleDownloadedLinesDeclaration` declares the same files as `SampleLinesDeclaration`, downloaded.
+    """`SampleDownloadedLinesDeclaration` declares the same files as `SampleLinesDeclaration`, but downloaded.
 
     Its committed manifest lists URLs under ``example.invalid``, a domain that never resolves, so a
-    test must replace the download.
+    test must replace `ArtifactStore._download`.
     """
 
     name = "sample_downloaded_lines"

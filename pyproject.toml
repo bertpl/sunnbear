@@ -31,7 +31,7 @@ dependencies = [
     "pydantic>=2.9; python_version == '3.13'",
     "pydantic>=2.12; python_version >= '3.14'",
     "typing-extensions>=4.4",  # TypeVar defaults (PEP 696) on Python < 3.13
-    "platformdirs>=4.0",  # the user's cache folder for downloaded data artifacts
+    "platformdirs>=4.0",  # platformdirs finds the user's cache folder for downloaded data artifacts
     "snuffled>=0.1.6",
     "max-div>=0.5.5",
     "mpl-composite>=0.1.2",
