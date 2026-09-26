@@ -1,11 +1,43 @@
 """`ArtifactDataReleaseClient` creates and reads the GitHub releases that host downloaded artifacts' archives.
 
+A GitHub release is a title and notes plus attached files, which GitHub stores and serves outside
+git: the files never enter the repository's history or its clones. Every release hangs on one
+ordinary git tag, a name that points at one commit, and that tag name identifies the release: it
+appears in the download URL of each file,
+``https://github.com/bertpl/sunnbear/releases/download/<tag>/<file name>``.
+
 A data release is a GitHub release that holds the archive of one artifact and is separate from the
 package releases:
 
-- its tag is the one that `ArtifactDataReleaseClient.tag_of` returns, e.g. ``data-uv_tuples-3f2a9c1e``;
-- it is never marked as the latest release;
+- its tag is the one that `ArtifactDataReleaseClient.tag_of` returns, e.g.
+  ``data-uv_tuples-3f2a9c1e``; the content hash in it gives other data another tag and another
+  URL, and the ``data-`` prefix keeps it from matching the ``v*`` tags that trigger the package
+  release workflow;
+- it is never marked as the latest release, a label that GitHub gives one release per repository,
+  so the newest package release keeps that label;
 - its only file is the archive.
+
+A release goes through 2 states:
+
+- **draft**: only maintainers see it, it has no git tag yet, and files can still be added;
+- **published**: it is public, and publishing has created its git tag on the commit given as the
+  release's target. The repository has GitHub's immutable releases enabled, so from then on the
+  files and the tag cannot change, and the archive's URL and sha256 recorded in a manifest stay
+  valid.
+
+`ArtifactDataReleaseClient.create` does the whole sequence in one GitHub CLI call: it creates the
+release as a draft, uploads the archive, and publishes the release, which creates the git tag on the
+head of ``main``. `ArtifactStore.publish` then downloads the archive back, checks it, and records it
+in the manifest.
+
+Publishing usually runs on a feature branch, where the maintainer regenerates the artifact:
+
+- the git tag still lands on ``main``, whatever branch is checked out, because the branch's commits
+  disappear when its pull request is squash-merged;
+- the updated manifest is committed on the branch, and reaches ``main`` with the pull request;
+- the release therefore exists before the pull request merges; an abandoned pull request leaves a
+  release that no manifest refers to, which is harmless, and publishing the same data again checks
+  that release and records it.
 
 Every call goes through the GitHub CLI (``gh``) with the maintainer's own authentication, so
 creating a data release is internal, maintainer-only functionality.
@@ -37,7 +69,11 @@ class ArtifactDataReleaseClient:
 
     @staticmethod
     def tag_of(artifact_name: str, content_hash: str) -> str:
-        """Return the tag of the data release of an artifact, e.g. ``data-uv_tuples-3f2a9c1e``."""
+        """Return the git tag that names an artifact's data release and its download URL.
+
+        The tag is ``data-<artifact name>-<first 8 hex digits of the content hash>``, e.g.
+        ``data-uv_tuples-3f2a9c1e``.
+        """
         return f"data-{artifact_name}-{content_hash[:8]}"
 
     @classmethod
@@ -107,7 +143,8 @@ class ArtifactDataReleaseClient:
                 holds the GitHub CLI's error output.
         """
         try:
-            # The arguments are built by this class, never by user input, and no shell is involved.
+            # `noqa: S603` silences ruff's warning about running a subprocess with untrusted input: the
+            # arguments are built by this class, never taken from user input, and no shell is involved.
             completed = subprocess.run([_GH_EXECUTABLE, *args], capture_output=True, text=True, check=True)  # noqa: S603
         except FileNotFoundError as error:
             raise ArtifactError("The GitHub CLI (gh) is not installed.") from error
