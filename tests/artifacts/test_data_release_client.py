@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-import sunnbear._core.data.artifact_data_release_client as data_release_client_module
-from sunnbear._core.data import ArtifactDataRelease, ArtifactDataReleaseClient, ArtifactError
+import sunnbear._core.artifacts.data_release_client as data_release_client_module
+from sunnbear._core.artifacts import ArtifactDataRelease, ArtifactDataReleaseClient, ArtifactError
 
 
 def _stub_gh(monkeypatch, respond) -> list[list[str]]:

@@ -2,8 +2,8 @@
 
 import pytest
 
-from sunnbear._core.data import ArtifactError, ArtifactStore
-from sunnbear._core.data.artifact_listing import artifact_manifest, artifact_names
+from sunnbear._core.artifacts import ArtifactError, ArtifactStore
+from sunnbear._core.artifacts.listing import artifact_manifest, artifact_names
 
 from .sample_declarations import SampleLinesDeclaration, define_builtin_declaration
 

@@ -2,8 +2,8 @@
 
 import pytest
 
-import sunnbear._core.data.artifact_listing
-import sunnbear._core.data.exceptions
+import sunnbear._core.artifacts.exceptions
+import sunnbear._core.artifacts.listing
 import sunnbear._core.exceptions
 import sunnbear._core.functions.core
 import sunnbear._core.functions.core.exceptions
@@ -40,13 +40,13 @@ def _is_submodule(module, name: str) -> bool:
     "public_module, implementation_modules",
     [
         (sunnbear.stats, (sunnbear._core.stats,)),
-        (sunnbear.data, (sunnbear._core.data.artifact_listing,)),
+        (sunnbear.data, (sunnbear._core.artifacts.listing,)),
         (sunnbear.functions, (sunnbear._core.functions.core,)),
         (sunnbear.solvers, (sunnbear._core.solvers.core, sunnbear._core.solvers.bracketing)),
         (
             sunnbear.exceptions,
             (
-                sunnbear._core.data.exceptions,
+                sunnbear._core.artifacts.exceptions,
                 sunnbear._core.exceptions,
                 sunnbear._core.functions.core.exceptions,
                 sunnbear._core.solvers.core.exceptions,

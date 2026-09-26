@@ -2,7 +2,7 @@
 
 import pytest
 
-from sunnbear._core.data import ArtifactDeclaration, ArtifactError, ArtifactRegistry
+from sunnbear._core.artifacts import ArtifactDeclaration, ArtifactError, ArtifactRegistry
 
 from .sample_declarations import define_declaration
 

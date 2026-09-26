@@ -4,7 +4,7 @@ An artifact's ``manifest.json`` lives in the artifact's folder, which the store 
 the artifact's declaration is defined, so no caller passes a location:
 
 - a built-in artifact, whose declaration is inside the sunnbear package, uses
-  ``_core/data/artifacts/<name>/``, which ships with sunnbear;
+  ``_core/artifacts/builtin/<name>/``, which ships with sunnbear;
 - any other declaration, in practice a test fixture, uses ``artifacts/<name>/`` next to its own
   module, so its files never ship.
 
@@ -38,19 +38,20 @@ import platformdirs
 
 from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
-from .artifact_archiver import ArtifactArchiver
-from .artifact_data_release_client import ArtifactDataReleaseClient
-from .artifact_declaration import ArtifactDeclaration
-from .artifact_manifest import ArtifactArchiveEntry, ArtifactFileEntry, ArtifactManifest
-from .artifact_registry import ArtifactRegistry
-from .artifact_source import ArtifactSource
+from .archiver import ArtifactArchiver
+from .data_release_client import ArtifactDataReleaseClient
+from .declaration import ArtifactDeclaration
 from .exceptions import ArtifactError
+from .manifest import ArtifactArchiveEntry, ArtifactFileEntry, ArtifactManifest
+from .registry import ArtifactRegistry
+from .source import ArtifactSource
 
 T = TypeVar("T")
 
 _MANIFEST_FILE_NAME = "manifest.json"
-_ARTIFACTS_FOLDER_NAME = "artifacts"
-_BUILTIN_ARTIFACTS_PARENT_PACKAGE = "sunnbear._core.data"
+_ARTIFACTS_FOLDER_NAME = "artifacts"  # beside the module of a declaration defined outside sunnbear
+_BUILTIN_ARTIFACTS_FOLDER_NAME = "builtin"
+_BUILTIN_ARTIFACTS_PARENT_PACKAGE = "sunnbear._core.artifacts"
 _CACHE_DIR_ENV_VAR = "SUNNBEAR_CACHE_DIR"
 _DOWNLOAD_TIMEOUT_SEC = 60
 # `ArtifactStore._download` raises these exceptions for a failed download.
@@ -262,7 +263,7 @@ class ArtifactStore:
 
         `ArtifactRegistry` knows only the declarations whose modules have been imported, so import
         the sunnbear modules that declare artifacts first; the store cannot import them itself,
-        because `sunnbear._core.data` must not import the sunnbear modules that depend on it.
+        because `sunnbear._core.artifacts` must not import the sunnbear modules that depend on it.
 
         Raises:
             ArtifactError: If a built-in artifact fails `verify` or a subfolder of the built-in
@@ -514,7 +515,7 @@ class ArtifactStore:
 
         The folder does not exist until the first built-in artifact is saved.
         """
-        return files(_BUILTIN_ARTIFACTS_PARENT_PACKAGE).joinpath(_ARTIFACTS_FOLDER_NAME)
+        return files(_BUILTIN_ARTIFACTS_PARENT_PACKAGE).joinpath(_BUILTIN_ARTIFACTS_FOLDER_NAME)
 
     @classmethod
     def _read_manifest(cls, folder: Traversable, artifact_name: str) -> ArtifactManifest:

@@ -4,7 +4,7 @@ import shutil
 
 import pytest
 
-from sunnbear._core.data import (
+from sunnbear._core.artifacts import (
     ArtifactArchiver,
     ArtifactDataRelease,
     ArtifactDataReleaseClient,

@@ -5,7 +5,13 @@ from pathlib import Path
 import platformdirs
 import pytest
 
-from sunnbear._core.data import ArtifactArchiveEntry, ArtifactArchiver, ArtifactError, ArtifactManifest, ArtifactStore
+from sunnbear._core.artifacts import (
+    ArtifactArchiveEntry,
+    ArtifactArchiver,
+    ArtifactError,
+    ArtifactManifest,
+    ArtifactStore,
+)
 
 from .sample_declarations import SAMPLE_LINES, SampleDownloadedLinesDeclaration, SampleLinesDeclaration
 

@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from sunnbear._core.data import ArtifactArchiveEntry, ArtifactError, ArtifactFileEntry, ArtifactManifest
+from sunnbear._core.artifacts import ArtifactArchiveEntry, ArtifactError, ArtifactFileEntry, ArtifactManifest
 
 
 def _make_manifest(**overrides) -> ArtifactManifest:

@@ -4,8 +4,8 @@ import io
 
 import pytest
 
-from sunnbear._core.data import ArtifactArchiver, ArtifactError
-from sunnbear._core.data.artifact_archiver import tarfile
+from sunnbear._core.artifacts import ArtifactArchiver, ArtifactError
+from sunnbear._core.artifacts.archiver import tarfile
 
 _CONTENTS = {"lines.txt": b"alpha\nbeta\n", "meta/count.txt": b"2\n"}
 

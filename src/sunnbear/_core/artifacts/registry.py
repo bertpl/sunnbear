@@ -11,10 +11,10 @@ from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
 from .exceptions import ArtifactError
 
-# `ArtifactDeclaration` is imported for type checking only: `artifact_declaration.py` imports this module at
+# `ArtifactDeclaration` is imported for type checking only: `declaration.py` imports this module at
 # runtime, so a runtime import here would be circular.
 if TYPE_CHECKING:
-    from .artifact_declaration import ArtifactDeclaration
+    from .declaration import ArtifactDeclaration
 
 
 # ==================================================================================================
