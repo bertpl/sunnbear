@@ -1,6 +1,6 @@
 import pytest
 
-from sunnbear._core.data import ArtifactRegistry, ArtifactStore
+from sunnbear._core.artifacts import ArtifactRegistry, ArtifactStore
 
 
 @pytest.fixture

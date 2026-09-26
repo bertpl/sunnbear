@@ -3,7 +3,7 @@
 All derive from `SunnbearError`; each is defined in the layer that raises it and re-exported here.
 """
 
-from ._core.data.exceptions import ArtifactError
+from ._core.artifacts.exceptions import ArtifactError
 from ._core.exceptions import SunnbearError
 from ._core.functions.core.exceptions import FormulaTaxonomyError, InvalidParamsError, UnknownFormulaError
 from ._core.solvers.core.exceptions import (

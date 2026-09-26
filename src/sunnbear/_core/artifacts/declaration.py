@@ -12,8 +12,8 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from typing import ClassVar, Generic, TypeVar
 
-from .artifact_registry import ArtifactRegistry
-from .artifact_source import ArtifactSource
+from .registry import ArtifactRegistry
+from .source import ArtifactSource
 
 T = TypeVar("T")
 

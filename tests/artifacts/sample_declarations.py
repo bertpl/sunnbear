@@ -9,7 +9,7 @@
 
 from collections.abc import Mapping
 
-from sunnbear._core.data import ArtifactDeclaration, ArtifactSource
+from sunnbear._core.artifacts import ArtifactDeclaration, ArtifactSource
 
 # The tests convert these lines with `SampleLinesDeclaration`.
 SAMPLE_LINES = ["alpha", "beta", "gamma"]

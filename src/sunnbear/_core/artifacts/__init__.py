@@ -26,11 +26,11 @@ The package depends only on `sunnbear._core.exceptions` and `sunnbear._core.util
 subpackage of `sunnbear._core` may import from this package.
 """
 
-from .artifact_archiver import ArtifactArchiver
-from .artifact_data_release_client import ArtifactDataRelease, ArtifactDataReleaseClient
-from .artifact_declaration import ArtifactDeclaration
-from .artifact_manifest import ArtifactArchiveEntry, ArtifactFileEntry, ArtifactManifest
-from .artifact_registry import ArtifactRegistry
-from .artifact_source import ArtifactSource
-from .artifact_store import ArtifactStore
+from .archiver import ArtifactArchiver
+from .data_release_client import ArtifactDataRelease, ArtifactDataReleaseClient
+from .declaration import ArtifactDeclaration
 from .exceptions import ArtifactError
+from .manifest import ArtifactArchiveEntry, ArtifactFileEntry, ArtifactManifest
+from .registry import ArtifactRegistry
+from .source import ArtifactSource
+from .store import ArtifactStore

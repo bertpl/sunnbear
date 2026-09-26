@@ -8,7 +8,7 @@ import zipfile
 import pytest
 
 import sunnbear
-from sunnbear._core.data import ArtifactError, ArtifactStore
+from sunnbear._core.artifacts import ArtifactError, ArtifactStore
 
 from .sample_declarations import SAMPLE_LINES, SampleLinesDeclaration, define_builtin_declaration
 
@@ -159,16 +159,16 @@ def test_verify_builtin_artifacts_reports_unverifiable_and_undeclared(monkeypatc
 
 @pytest.mark.usefixtures("isolated_artifact_registry")
 def test_a_builtin_artifact_lives_in_the_builtin_artifacts_folder_and_a_test_fixture_beside_its_module():
-    """A built-in declaration uses ``_core/data/artifacts/<name>``; any other declaration uses
+    """A built-in declaration uses ``_core/artifacts/builtin/<name>``; any other declaration uses
     ``artifacts/<name>`` beside its own module.
     """
     # --- arrange ----------------------
-    builtin_cls = define_builtin_declaration("builtin")
+    builtin_cls = define_builtin_declaration("sample_builtin")
 
     # --- act --------------------------
     builtin_folder = ArtifactStore._folder_of(builtin_cls)
     fixture_folder = ArtifactStore._folder_of(SampleLinesDeclaration)
 
     # --- assert -----------------------
-    assert str(builtin_folder).replace("\\", "/").endswith("sunnbear/_core/data/artifacts/builtin")
-    assert str(fixture_folder).replace("\\", "/").endswith("tests/data/artifacts/sample_lines")
+    assert str(builtin_folder).replace("\\", "/").endswith("sunnbear/_core/artifacts/builtin/sample_builtin")
+    assert str(fixture_folder).replace("\\", "/").endswith("tests/artifacts/artifacts/sample_lines")

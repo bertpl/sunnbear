@@ -5,8 +5,8 @@ the module also re-exports the manifest classes, so that `sunnbear.data` offers 
 needs to read a manifest.
 """
 
-from .artifact_manifest import ArtifactArchiveEntry, ArtifactFileEntry, ArtifactManifest
-from .artifact_store import ArtifactStore
+from .manifest import ArtifactArchiveEntry, ArtifactFileEntry, ArtifactManifest
+from .store import ArtifactStore
 
 __all__ = ["ArtifactArchiveEntry", "ArtifactFileEntry", "ArtifactManifest", "artifact_manifest", "artifact_names"]
 
