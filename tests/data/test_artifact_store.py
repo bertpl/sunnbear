@@ -1,11 +1,13 @@
 """`ArtifactStore` reads, writes and verifies an artifact's folder, and checks the built-in artifacts as a whole."""
 
+import importlib
 import importlib.metadata
+import pkgutil
 import zipfile
 
 import pytest
 
-from sunnbear._core.builtin_artifact_listing.listing import register_builtin_declarations
+import sunnbear
 from sunnbear._core.data import ArtifactError, ArtifactStore
 
 from .sample_declarations import SAMPLE_LINES, SampleLinesDeclaration, define_builtin_declaration
@@ -134,8 +136,9 @@ def test_the_builtin_artifacts_are_consistent():
     """Every built-in artifact matches its manifest, and each subfolder of the built-in artifacts folder is declared."""
     # --- arrange ----------------------
     # `verify_builtin_artifacts` checks only registered declarations, and a declaration is registered
-    # only once its module is imported.
-    register_builtin_declarations()
+    # only once its module is imported, so import every sunnbear module.
+    for module_info in pkgutil.walk_packages(sunnbear.__path__, prefix="sunnbear."):
+        importlib.import_module(module_info.name)
 
     # --- act / assert -----------------
     ArtifactStore.verify_builtin_artifacts()

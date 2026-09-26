@@ -96,7 +96,9 @@ class ArtifactStore:
         match declaration_cls.source:
             case ArtifactSource.PACKAGE:
                 folder = cls._folder_of(declaration_cls)
-                contents = {entry.path: cls._read_file(folder, entry.path, declaration_cls) for entry in manifest.files}
+                contents = {
+                    entry.path: cls._read_file(folder, entry.path, declaration_cls.name) for entry in manifest.files
+                }
             case ArtifactSource.DOWNLOAD:
                 contents = cls._read_or_unpack_downloaded_files(manifest)
             case _:
@@ -110,14 +112,36 @@ class ArtifactStore:
         Raises:
             ArtifactError: If the manifest is missing or malformed, or names another artifact.
         """
-        manifest_bytes = cls._read_file(cls._folder_of(declaration_cls), _MANIFEST_FILE_NAME, declaration_cls)
-        manifest = ArtifactManifest.from_json(manifest_bytes.decode())
-        if manifest.name != declaration_cls.name:
-            raise ArtifactError(
-                f"The manifest of {declaration_cls.__name__} is for {manifest.name!r}, "
-                f"but the declaration is for {declaration_cls.name!r}."
-            )
-        return manifest
+        return cls._read_manifest(cls._folder_of(declaration_cls), declaration_cls.name)
+
+    # --------------------------------------------------------------------------
+    #  Listing built-in artifacts
+    # --------------------------------------------------------------------------
+    @classmethod
+    def builtin_artifact_names(cls) -> tuple[str, ...]:
+        """Return the names of the built-in artifacts, sorted: one per subfolder of the built-in artifacts folder.
+
+        The committed folders decide, not the declarations, so the result does not depend on which
+        modules have been imported; `verify_builtin_artifacts` checks that folders and declarations
+        agree.
+        """
+        builtin_artifacts_folder = cls._builtin_artifacts_folder()
+        if not builtin_artifacts_folder.is_dir():
+            return ()
+        return tuple(sorted(child.name for child in builtin_artifacts_folder.iterdir() if child.is_dir()))
+
+    @classmethod
+    def load_builtin_manifest(cls, name: str) -> ArtifactManifest:
+        """Read the manifest of the built-in artifact with this name, without reading or downloading its data files.
+
+        Raises:
+            ArtifactError: If no built-in artifact has this name, or its manifest is missing,
+                malformed, or names another artifact.
+        """
+        names = cls.builtin_artifact_names()
+        if name not in names:
+            raise ArtifactError(f"sunnbear has no data artifact named {name!r}; its data artifacts are {list(names)}.")
+        return cls._read_manifest(cls._builtin_artifacts_folder().joinpath(name), name)
 
     # --------------------------------------------------------------------------
     #  Saving
@@ -251,12 +275,7 @@ class ArtifactStore:
                 cls.verify(declaration_cls)
             except ArtifactError as error:
                 problems.append(str(error))
-        builtin_artifacts_folder = cls._builtin_artifacts_folder()
-        folder_names = (
-            {child.name for child in builtin_artifacts_folder.iterdir() if child.is_dir()}
-            if builtin_artifacts_folder.is_dir()
-            else set()
-        )
+        folder_names = set(cls.builtin_artifact_names())
         declared_names = {declaration_cls.name for declaration_cls in builtin_declarations}
         problems += [f"Folder {name!r} holds no declared artifact" for name in sorted(folder_names - declared_names)]
         if problems:
@@ -497,16 +516,30 @@ class ArtifactStore:
         """
         return files(_BUILTIN_ARTIFACTS_PARENT_PACKAGE).joinpath(_ARTIFACTS_FOLDER_NAME)
 
+    @classmethod
+    def _read_manifest(cls, folder: Traversable, artifact_name: str) -> ArtifactManifest:
+        """Read the manifest in `folder` and check that it names the artifact `artifact_name`.
+
+        Raises:
+            ArtifactError: If the manifest is missing or malformed, or names another artifact.
+        """
+        manifest = ArtifactManifest.from_json(cls._read_file(folder, _MANIFEST_FILE_NAME, artifact_name).decode())
+        if manifest.name != artifact_name:
+            raise ArtifactError(
+                f"The manifest in {folder} is for {manifest.name!r}, but the artifact is {artifact_name!r}."
+            )
+        return manifest
+
     @staticmethod
-    def _read_file(folder: Traversable, path: str, declaration_cls: type[ArtifactDeclaration]) -> bytes:
-        """Return the bytes of one file in an artifact's folder.
+    def _read_file(folder: Traversable, path: str, artifact_name: str) -> bytes:
+        """Return the bytes of one file in the folder of the artifact `artifact_name`.
 
         Raises:
             ArtifactError: If the file does not exist.
         """
         file = folder.joinpath(path)
         if not file.is_file():
-            raise ArtifactError(f"{declaration_cls.__name__} has no file {path!r} in {folder}.")
+            raise ArtifactError(f"Artifact {artifact_name!r} has no file {path!r} in {folder}.")
         return file.read_bytes()
 
     @staticmethod
