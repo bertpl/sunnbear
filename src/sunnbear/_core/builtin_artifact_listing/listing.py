@@ -6,21 +6,27 @@ import pkgutil
 
 from sunnbear._core.data import ArtifactDeclaration, ArtifactError, ArtifactManifest, ArtifactRegistry, ArtifactStore
 
-# `_import_core_modules` imports every module of this package, so that every built-in declaration is registered.
 _CORE_PACKAGE = "sunnbear._core"
 
 
 def artifact_names() -> tuple[str, ...]:
-    """Return the names of sunnbear's built-in data artifacts, sorted."""
+    """Return the names of sunnbear's built-in data artifacts, sorted.
+
+    The first call imports every module of `sunnbear._core`, so that every built-in declaration is
+    registered.
+    """
     return tuple(declaration_cls.name for declaration_cls in _builtin_declarations())
 
 
 def artifact_manifest(name: str) -> ArtifactManifest:
     """Return the manifest of the built-in data artifact with this name, without reading or downloading its data files.
 
+    The first call imports every module of `sunnbear._core`, so that every built-in declaration is
+    registered.
+
     Raises:
-        ArtifactError: If sunnbear has no data artifact with this name, or its manifest is missing
-            or malformed.
+        ArtifactError: If sunnbear has no data artifact with this name, or its manifest is missing,
+            malformed, or names another artifact.
     """
     declarations_by_name = {declaration_cls.name: declaration_cls for declaration_cls in _builtin_declarations()}
     if name not in declarations_by_name:

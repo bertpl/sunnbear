@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `sunnbear.data`: list the package's data artifacts and read their manifests (content hash, versions of the libraries that built them, and the public call that generated them)
+- `sunnbear.data`: list the package's data artifacts and read their manifests (content hash, versions of the libraries that built them, and the sunnbear function call that generated them)
 
 ### Changed
 

@@ -2,7 +2,7 @@
 
 import pytest
 
-import sunnbear._core.builtin_artifacts
+import sunnbear._core.builtin_artifact_listing
 import sunnbear._core.data.exceptions
 import sunnbear._core.exceptions
 import sunnbear._core.functions.core
@@ -36,7 +36,7 @@ def _is_submodule(module, name: str) -> bool:
     "public_module, implementation_modules",
     [
         (sunnbear.stats, (sunnbear._core.stats,)),
-        (sunnbear.data, (sunnbear._core.builtin_artifacts,)),
+        (sunnbear.data, (sunnbear._core.builtin_artifact_listing,)),
         (sunnbear.functions, (sunnbear._core.functions.core,)),
         (sunnbear.solvers, (sunnbear._core.solvers.core, sunnbear._core.solvers.bracketing)),
         (
