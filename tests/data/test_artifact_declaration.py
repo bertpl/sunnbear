@@ -4,15 +4,7 @@ import pytest
 
 from sunnbear._core.data import ArtifactDeclaration, ArtifactError, ArtifactRegistry
 
-
-def _define_declaration(**attrs) -> type[ArtifactDeclaration]:
-    """Define a concrete `ArtifactDeclaration` subclass with the given class attributes."""
-    namespace = {
-        "to_files": classmethod(lambda cls, value: {"value.txt": value}),
-        "from_files": classmethod(lambda cls, files: files["value.txt"]),
-        **attrs,
-    }
-    return type("_DefinedDeclaration", (ArtifactDeclaration,), namespace)
+from .sample_declarations import define_declaration
 
 
 # ==================================================================================================
@@ -22,7 +14,7 @@ def _define_declaration(**attrs) -> type[ArtifactDeclaration]:
 def test_defining_a_concrete_declaration_registers_it():
     """A valid concrete declaration can be looked up by its name right after its definition."""
     # --- arrange / act ----------------
-    declaration_cls = _define_declaration(name="defined")
+    declaration_cls = define_declaration(name="defined")
 
     # --- assert -----------------------
     assert ArtifactRegistry.declaration_from_name("defined") is declaration_cls
@@ -58,26 +50,26 @@ def test_a_malformed_declaration_fails_at_definition(attrs, error, message):
     """A missing or ill-typed name, or a name that is not a slug, fails when the class is defined."""
     # --- act / assert -----------------
     with pytest.raises(error, match=message):
-        _define_declaration(**attrs)
+        define_declaration(**attrs)
 
 
 @pytest.mark.usefixtures("isolated_artifact_registry")
 def test_two_declarations_cannot_share_a_name():
     """Registering a second declaration under an existing name fails."""
     # --- arrange ----------------------
-    _define_declaration(name="shared")
+    define_declaration(name="shared")
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="Duplicate artifact name 'shared'"):
-        _define_declaration(name="shared")
+        define_declaration(name="shared")
 
 
 @pytest.mark.usefixtures("isolated_artifact_registry")
 def test_declarations_are_sorted_by_name():
     """`artifacts` returns the declarations sorted by name, whatever the order of definition."""
     # --- arrange ----------------------
-    later = _define_declaration(name="zz_later")
-    earlier = _define_declaration(name="aa_earlier")
+    later = define_declaration(name="zz_later")
+    earlier = define_declaration(name="aa_earlier")
 
     # --- act --------------------------
     names = [

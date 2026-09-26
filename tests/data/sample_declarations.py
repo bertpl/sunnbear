@@ -1,4 +1,8 @@
-"""`SampleLinesDeclaration` is a test-only artifact declaration."""
+"""This module holds the test-only artifact declarations.
+
+`SampleLinesDeclaration` has committed files; `define_declaration` defines a 1-file declaration
+on the fly.
+"""
 
 from collections.abc import Mapping
 
@@ -25,3 +29,16 @@ class SampleLinesDeclaration(ArtifactDeclaration[list[str]]):
     def from_files(cls, files: Mapping[str, bytes]) -> list[str]:
         """Read the lines back from ``lines.txt``."""
         return files["lines.txt"].decode().splitlines()
+
+
+def define_declaration(file_path: str = "value.txt", **attrs) -> type[ArtifactDeclaration]:
+    """Define a concrete `ArtifactDeclaration` subclass with the given class attributes.
+
+    Its value is the bytes of the file at `file_path`.
+    """
+    namespace = {
+        "to_files": classmethod(lambda cls, value: {file_path: value}),
+        "from_files": classmethod(lambda cls, files: files[file_path]),
+        **attrs,
+    }
+    return type("_DefinedDeclaration", (ArtifactDeclaration,), namespace)

@@ -71,6 +71,9 @@ class ArtifactDeclaration(ABC, Generic[T]):
 
         The dict holds at least 1 file; each path is relative to the artifact's folder, uses forward
         slashes, may name a subfolder, and must not be absolute or contain a ``..`` part.
+
+        No file may be named ``manifest.json``, because `ArtifactStore` writes the artifact's manifest under
+        that name in the same folder.
         """
 
     @classmethod
