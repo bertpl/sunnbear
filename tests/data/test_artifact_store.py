@@ -10,28 +10,24 @@ import pytest
 import sunnbear
 from sunnbear._core.data import ArtifactDeclaration, ArtifactError, ArtifactStore
 
-from .sample_declarations import SAMPLE_LINES, SampleLinesDeclaration
+from .sample_declarations import SAMPLE_LINES, SampleLinesDeclaration, define_declaration
 
 
 def _define_builtin_declaration(name: str, file_path: str = "value.txt") -> type[ArtifactDeclaration]:
-    """Define a declaration whose value is the bytes of 1 file.
+    """Define a 1-file declaration whose module name is inside sunnbear, so `ArtifactStore` treats it as built in.
 
-    Its module name is inside sunnbear, so `ArtifactStore` treats it as built in.
+    Defining the class registers it in `ArtifactRegistry`, so a test that calls this function must use
+    the `isolated_artifact_registry` fixture.
     """
-    namespace = {
-        "__module__": "sunnbear._declared_in_a_test",
-        "name": name,
-        "to_files": classmethod(lambda cls, value: {file_path: value}),
-        "from_files": classmethod(lambda cls, files: files[file_path]),
-    }
-    return type("_BuiltinDeclaration", (ArtifactDeclaration,), namespace)
+    return define_declaration(file_path, __module__="sunnbear._declared_in_a_test", name=name)
 
 
 @pytest.fixture
 def sample_lines_folder_in_tmp(monkeypatch, tmp_path):
-    """Point every artifact's folder into `tmp_path`, so a test can write without touching the repo.
+    """Make `ArtifactStore` place every artifact's folder in `tmp_path`, so tests write no files in the repo.
 
-    The fixture returns the folder of `SampleLinesDeclaration`.
+    The fixture returns the folder of `SampleLinesDeclaration`, which does not exist until a test
+    creates it or saves to it.
     """
     folder_of = classmethod(lambda cls, declaration_cls: tmp_path / declaration_cls.name)
     monkeypatch.setattr(ArtifactStore, "_folder_of", folder_of)
@@ -39,15 +35,15 @@ def sample_lines_folder_in_tmp(monkeypatch, tmp_path):
 
 
 # ==================================================================================================
-#  The committed fixture
+#  The committed sample artifact
 # ==================================================================================================
-def test_load_reads_the_committed_fixture():
-    """`load` rebuilds the value from the committed files next to the fixture's declaration."""
+def test_load_reads_the_committed_sample_artifact():
+    """`load` rebuilds the value from the sample artifact's files, committed next to its declaration's module."""
     assert ArtifactStore.load(SampleLinesDeclaration) == SAMPLE_LINES
 
 
-def test_verify_accepts_the_committed_fixture():
-    """The committed fixture matches its manifest, so `verify` returns that manifest."""
+def test_verify_accepts_the_committed_sample_artifact():
+    """The committed sample artifact matches its manifest, so `verify` returns that manifest."""
     assert ArtifactStore.verify(SampleLinesDeclaration).name == SampleLinesDeclaration.name
 
 
@@ -154,7 +150,7 @@ def test_verify_reports_a_folder_that_differs_from_its_manifest(sample_lines_fol
 def test_the_builtin_artifacts_are_consistent():
     """Every built-in artifact matches its manifest, and each subfolder of the built-in artifacts folder is declared."""
     # --- arrange ----------------------
-    # A declaration is known only once its module is imported, so import every sunnbear module.
+    # `ArtifactRegistry` knows a declaration only once its module is imported, so import every sunnbear module.
     for module_info in pkgutil.walk_packages(sunnbear.__path__, prefix="sunnbear."):
         importlib.import_module(module_info.name)
 
@@ -176,17 +172,17 @@ def test_verify_builtin_artifacts_reports_unverifiable_and_undeclared(monkeypatc
 
 
 @pytest.mark.usefixtures("isolated_artifact_registry")
-def test_a_builtin_artifact_lives_in_the_package_artifacts_folder_and_a_test_fixture_beside_its_module():
+def test_a_builtin_artifact_lives_in_the_builtin_artifacts_folder_and_a_test_fixture_beside_its_module():
     """A built-in declaration uses ``_core/data/artifacts/<name>``; any other declaration uses
     ``artifacts/<name>`` beside its own module.
     """
     # --- arrange ----------------------
-    builtin_cls = _define_builtin_declaration("central")
+    builtin_cls = _define_builtin_declaration("builtin")
 
     # --- act --------------------------
     builtin_folder = ArtifactStore._folder_of(builtin_cls)
     fixture_folder = ArtifactStore._folder_of(SampleLinesDeclaration)
 
     # --- assert -----------------------
-    assert str(builtin_folder).replace("\\", "/").endswith("sunnbear/_core/data/artifacts/central")
+    assert str(builtin_folder).replace("\\", "/").endswith("sunnbear/_core/data/artifacts/builtin")
     assert str(fixture_folder).replace("\\", "/").endswith("tests/data/artifacts/sample_lines")
