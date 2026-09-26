@@ -17,6 +17,8 @@ classes, by role:
   - `ArtifactStore` is the only code that touches artifact paths or URLs: it loads, saves and
     verifies an artifact through its declaration;
   - `ArtifactArchiver` packs a downloaded artifact's data files into one archive, and unpacks it;
+  - `ArtifactDataReleases` creates and reads the GitHub releases that host those archives, for
+    `ArtifactStore.publish`;
 - `ArtifactError` is raised when an artifact cannot be read or trusted.
 
 The package depends only on `sunnbear._core.exceptions` and `sunnbear._core.utils`, so every other
@@ -24,6 +26,7 @@ subpackage of `sunnbear._core` may import from this package.
 """
 
 from .artifact_archiver import ArtifactArchiver
+from .artifact_data_releases import ArtifactDataReleases, DataRelease
 from .artifact_declaration import ArtifactDeclaration
 from .artifact_manifest import ArtifactArchiveEntry, ArtifactFileEntry, ArtifactManifest
 from .artifact_registry import ArtifactRegistry

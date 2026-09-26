@@ -39,8 +39,9 @@ import platformdirs
 from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 
 from .artifact_archiver import ArtifactArchiver
+from .artifact_data_releases import ArtifactDataReleases
 from .artifact_declaration import ArtifactDeclaration
-from .artifact_manifest import ArtifactFileEntry, ArtifactManifest
+from .artifact_manifest import ArtifactArchiveEntry, ArtifactFileEntry, ArtifactManifest
 from .artifact_registry import ArtifactRegistry
 from .artifact_source import ArtifactSource
 from .exceptions import ArtifactError
@@ -52,6 +53,8 @@ _ARTIFACTS_FOLDER_NAME = "artifacts"
 _BUILTIN_ARTIFACTS_PARENT_PACKAGE = "sunnbear._core.data"
 _CACHE_DIR_ENV_VAR = "SUNNBEAR_CACHE_DIR"
 _DOWNLOAD_TIMEOUT_SEC = 60
+# The exceptions that `ArtifactStore._download` raises for a failed download.
+_DOWNLOAD_ERRORS = (OSError, ValueError, http.client.HTTPException)
 
 
 # ==================================================================================================
@@ -170,9 +173,7 @@ class ArtifactStore:
             build_date=datetime.date.today(),
             generated_by=generated_by,
         )
-        folder = cls._folder_of(declaration_cls)
-        if not isinstance(folder, Path):
-            raise ArtifactError(f"The folder of {declaration_cls.__name__} is not a writable directory: {folder}.")
+        folder = cls._writable_folder_of(declaration_cls)
         match declaration_cls.source:
             case ArtifactSource.PACKAGE:
                 data_folder, data_paths_next_to_manifest = folder, set(contents)
@@ -185,7 +186,7 @@ class ArtifactStore:
         for leftover_path in cls._relative_data_file_paths(folder) - data_paths_next_to_manifest:
             (folder / leftover_path).unlink()
         cls._write_files(data_folder, contents)
-        (folder / _MANIFEST_FILE_NAME).write_text(manifest.to_json())
+        cls._write_manifest(declaration_cls, manifest)
         return manifest
 
     # --------------------------------------------------------------------------
@@ -280,14 +281,79 @@ class ArtifactStore:
         return problems
 
     # --------------------------------------------------------------------------
+    #  Publishing
+    # --------------------------------------------------------------------------
+    @classmethod
+    def publish(cls, declaration_cls: type[ArtifactDeclaration]) -> ArtifactManifest:
+        """Publish a downloaded artifact's archive as a data release, and record it as the manifest's ``archive`` entry.
+
+        Publishing is internal, maintainer-only functionality, run by the script that generates the
+        artifact right after `save`: it packs the data files from the cache, creates the data
+        release (see `ArtifactDataReleases`), downloads the archive back, and checks its unpacked
+        files against the manifest before it records the archive. An artifact whose data release
+        already exists is not published again: that release's archive is checked and recorded.
+
+        Returns:
+            The manifest that was written.
+
+        Raises:
+            ArtifactError: If any of these holds:
+
+                - the artifact is not downloaded, or its manifest is missing or malformed;
+                - the GitHub CLI is missing, or has no write access to the repository;
+                - the data release does not exist and the cache lacks the data files, e.g. because
+                  the artifact was not saved first;
+                - the data release is a draft, e.g. left behind by an interrupted publish;
+                - the archive downloaded back from the release does not match the manifest.
+        """
+        if declaration_cls.source is not ArtifactSource.DOWNLOAD:
+            raise ArtifactError(f"{declaration_cls.__name__} ships in the package, so it has no data release.")
+        manifest = cls.load_manifest(declaration_cls)
+        ArtifactDataReleases.check_write_access()
+        tag = ArtifactDataReleases.tag_of(manifest.name, manifest.content_hash)
+        archive_file_name = ArtifactArchiver.archive_file_name(manifest.name)
+        release = ArtifactDataReleases.find(tag)
+        if release is None:
+            contents = cls._read_matching_cached_files(cls._cache_folder_of(manifest), manifest)
+            if contents is None:
+                raise ArtifactError(
+                    f"The cache lacks the data files of {manifest.short_identity}; "
+                    "save the artifact before publishing it."
+                )
+            ArtifactDataReleases.create(
+                tag,
+                archive_file_name,
+                ArtifactArchiver.pack(contents),
+                title=f"Data: {manifest.short_identity}",
+                notes=f"Data files of the sunnbear artifact `{manifest.name}`, content hash `{manifest.content_hash}`.",
+            )
+            release = ArtifactDataReleases.find(tag)
+        if release is None or release.is_draft or archive_file_name not in release.asset_urls:
+            raise ArtifactError(
+                f"The data release {tag} is a draft or lacks {archive_file_name}, e.g. after an interrupted "
+                f"publish; delete it with `gh release delete {tag} --cleanup-tag` and publish again."
+            )
+        url = release.asset_urls[archive_file_name]
+        try:
+            archive_bytes = cls._download(url)
+        except _DOWNLOAD_ERRORS as error:
+            raise ArtifactError(f"Downloading {url} back failed: {error}") from error
+        cls._unpack_and_check(manifest, archive_bytes)
+        published_manifest = manifest.model_copy(
+            update={"archive": ArtifactArchiveEntry.from_content(url, archive_bytes)}
+        )
+        cls._write_manifest(declaration_cls, published_manifest)
+        return published_manifest
+
+    # --------------------------------------------------------------------------
     #  Downloaded files
     # --------------------------------------------------------------------------
     @classmethod
     def _read_or_unpack_downloaded_files(cls, manifest: ArtifactManifest) -> dict[str, bytes]:
         """Return a downloaded artifact's data files from the cache, unpacking its archive there first if needed.
 
-        The archive is needed when a cached file is missing or differs from its manifest entry. It
-        The archive is deleted from the cache folder once its files are unpacked.
+        The archive is needed when a cached file is missing or differs from its manifest entry. The
+        archive is deleted from the cache folder once its files are unpacked.
 
         Raises:
             ArtifactError: If the archive is needed but cannot be read or downloaded, or its files do
@@ -298,17 +364,26 @@ class ArtifactStore:
         if cached_contents is not None:
             return cached_contents
         archive_file = cache_folder / ArtifactArchiver.archive_file_name(manifest.name)
-        contents = ArtifactArchiver.unpack(
-            cls._read_or_download_archive(manifest, archive_file), [entry.path for entry in manifest.files]
-        )
+        contents = cls._unpack_and_check(manifest, cls._read_or_download_archive(manifest, archive_file))
+        cls._write_files(cache_folder, contents)
+        archive_file.unlink(missing_ok=True)
+        return contents
+
+    @staticmethod
+    def _unpack_and_check(manifest: ArtifactManifest, archive_bytes: bytes) -> dict[str, bytes]:
+        """Return the data files unpacked from the artifact's archive, each checked against its manifest entry.
+
+        Raises:
+            ArtifactError: If the archive cannot be unpacked, or holds files that differ from the
+                manifest.
+        """
+        contents = ArtifactArchiver.unpack(archive_bytes, [entry.path for entry in manifest.files])
         differing_paths = [entry.path for entry in manifest.files if not entry.matches(contents[entry.path])]
         if differing_paths:
             raise ArtifactError(
                 f"The archive of {manifest.short_identity} holds files that differ from the manifest: "
                 f"{differing_paths}."
             )
-        cls._write_files(cache_folder, contents)
-        archive_file.unlink(missing_ok=True)
         return contents
 
     @staticmethod
@@ -346,7 +421,7 @@ class ArtifactStore:
                 return archive_bytes
         try:
             archive_bytes = cls._download(archive_entry.url)
-        except (OSError, ValueError, http.client.HTTPException) as error:
+        except _DOWNLOAD_ERRORS as error:
             raise ArtifactError(
                 f"Downloading {archive_entry.url} failed: {error}. The archive can also be placed at {archive_file}."
             ) from error
@@ -390,6 +465,25 @@ class ArtifactStore:
         else:
             module_file = sys.modules[declaration_cls.__module__].__file__
             return Path(str(module_file)).parent / _ARTIFACTS_FOLDER_NAME / declaration_cls.name
+
+    @classmethod
+    def _writable_folder_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Path:
+        """Return the artifact's folder as a directory on disk, which `save` and `publish` write to.
+
+        Raises:
+            ArtifactError: If the folder is not a directory on disk, e.g. inside a zipped install.
+        """
+        folder = cls._folder_of(declaration_cls)
+        if not isinstance(folder, Path):
+            raise ArtifactError(f"The folder of {declaration_cls.__name__} is not a writable directory: {folder}.")
+        return folder
+
+    @classmethod
+    def _write_manifest(cls, declaration_cls: type[ArtifactDeclaration], manifest: ArtifactManifest) -> None:
+        """Write `manifest` to the artifact's folder, creating the folder if needed."""
+        folder = cls._writable_folder_of(declaration_cls)
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / _MANIFEST_FILE_NAME).write_text(manifest.to_json())
 
     @staticmethod
     def _builtin_artifacts_folder() -> Traversable:
