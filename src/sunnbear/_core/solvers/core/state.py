@@ -20,8 +20,9 @@ class SolveState:
 
     Attributes:
         f: The wrapped function to evaluate.
-        interval: The initial interval ``[a, b]``; its class says whether it is increasing or decreasing, see
-            `Interval`.
+        interval: The interval that holds the sign change, ``[a, b]`` at the start; its class says whether it
+            is increasing or decreasing, see `Interval`. A bracketing solver replaces it with each reduced
+            interval, so that an interrupted solve still reports the last one.
         xtol: Requested x-tolerance, ``|x_true - x| <= xtol``, as a `CountedFloat` so arithmetic on it is counted.
         x_best: Best root estimate so far; reported as the solve's final ``x`` when
             the solve ends early, so a solver keeps it current.

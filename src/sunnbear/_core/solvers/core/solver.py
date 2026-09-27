@@ -103,6 +103,7 @@ class Solver(ABC, Generic[StateT]):
 
         # --- counted: main algorithm ----------------
         x_failed: float | None = None  # Where f failed, if it did; decides FUNCTION_ERROR versus DIVERGED below.
+        final_interval: Interval | None = None  # Stays None when the solve ends at the interval bounds.
         with FlopCountingContext() as flop_ctx:
             # --- prep and early exits ---------------
             a_counted, b_counted, xtol_counted = CountedFloat(a), CountedFloat(b), CountedFloat(xtol)
@@ -124,6 +125,7 @@ class Solver(ABC, Generic[StateT]):
                         x, status = self._solve(state), SolveStatus.CONVERGED  # type: ignore[arg-type]
                     except Exception as exc:  # noqa: BLE001 — every ending becomes a recorded status, by design
                         x, status, x_failed = _ending_of(exc, x_best=state.x_best)
+                    final_interval = self._final_interval(state)  # type: ignore[arg-type]
 
         # --- return results -------------------------
         # Divergence is the framework's judgment, not solver work, so these checks are uncounted.
@@ -141,6 +143,7 @@ class Solver(ABC, Generic[StateT]):
             n_fevals=wrapped_f.n_fevals,
             flop_counts=flop_ctx.flop_counts(),
             history=None if wrapped_f.history is None else tuple(wrapped_f.history),
+            final_interval=None if final_interval is None else final_interval.with_plain_floats(),
         )
 
     # --------------------------------------------------------------------------
@@ -153,6 +156,14 @@ class Solver(ABC, Generic[StateT]):
         - Evaluate the function only through ``state.f``, and let its interrupts propagate.
         - Keep ``state.x_best`` current, so an interrupted solve still reports a meaningful ``x``.
         """
+
+    def _final_interval(self, state: StateT) -> Interval | None:
+        """Return the interval that the solve ended with, or ``None`` for a solver that keeps no interval.
+
+        Only a bracketing solver keeps ``state.interval`` current, so this base returns ``None``;
+        `BracketingSolver` returns ``state.interval``.
+        """
+        return None
 
 
 # ==================================================================================================
@@ -175,14 +186,17 @@ class BracketingSolver(Solver[StateT]):
     """
 
     def _solve(self, state: StateT) -> float:
-        """Split the interval at `_next_x` until `Interval.is_converged` holds; return `Interval.root`."""
-        interval = state.interval
+        """Split ``state.interval`` at `_next_x` until `Interval.is_converged` holds; return `Interval.root`."""
         xtol_doubled = 2.0 * state.xtol
-        while not interval.is_converged(xtol_doubled):
-            x = self._next_x(state, interval)
-            interval = interval.split_at(x, state.f(x))
+        while not state.interval.is_converged(xtol_doubled):
+            x = self._next_x(state, state.interval)
+            state.interval = state.interval.split_at(x, state.f(x))
             state.x_best = x  # This is the last evaluated point, so a stalled solver still reports its best estimate.
-        return interval.root()
+        return state.interval.root()
+
+    def _final_interval(self, state: StateT) -> Interval | None:
+        """Return ``state.interval``, the last interval of the solve."""
+        return state.interval
 
     @abstractmethod
     def _next_x(self, state: StateT, interval: Interval) -> float:

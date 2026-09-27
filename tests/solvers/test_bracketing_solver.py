@@ -1,11 +1,19 @@
-"""2 test-local bracketing solvers exercise the loop, the stopping rule, and subclassing `SolveState`."""
+"""2 test-local bracketing solvers exercise the loop, the stopping rule, the final interval, and state subclasses."""
 
 import math
 from dataclasses import dataclass
 
 import pytest
 
-from sunnbear.solvers import BracketingSolver, Interval, SolveState, SolveStatus
+from sunnbear.solvers import (
+    BracketingSolver,
+    DecreasingInterval,
+    IncreasingInterval,
+    Interval,
+    IntervalBound,
+    SolveState,
+    SolveStatus,
+)
 
 
 # ==================================================================================================
@@ -83,6 +91,47 @@ def test_interrupted_loop_reports_the_last_evaluated_point():
     assert result.status is SolveStatus.MAX_FEVALS
     assert result.n_fevals == 4  # After the interval bounds, 2 steps evaluated 0.5, then 0.25.
     assert result.x == 0.25
+
+
+# ==================================================================================================
+#  Final interval
+# ==================================================================================================
+@pytest.mark.parametrize(
+    "f, cls_expected", [(_linear, IncreasingInterval), (lambda x: -_linear(x), DecreasingInterval)]
+)  # Both orientations are reported with their own class.
+def test_the_final_interval_holds_the_root_within_2_xtol_as_plain_floats(f, cls_expected):
+    """A converged solve reports its last interval: no wider than `2·xtol`, around the root and the result."""
+    # --- act --------------------------
+    result = _HalvingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=200)
+
+    # --- assert -----------------------
+    interval = result.final_interval
+    assert type(interval) is cls_expected
+    assert interval.a <= 0.3 <= interval.b
+    assert interval.b - interval.a <= 2e-3
+    assert result.x == 0.5 * (interval.a + interval.b)
+    assert all(type(value) is float for value in (interval.a, interval.b, interval.fa, interval.fb))
+
+
+def test_an_interrupted_solve_reports_its_last_interval():
+    """A solve that runs out of budget still reports the interval that its last split produced."""
+    # --- act --------------------------
+    result = _HalvingSolver().solve(_linear, 0.0, 1.0, xtol=1e-9, max_fevals=4)
+
+    # --- assert -----------------------
+    # The splits at 0.5, then at 0.25, leave [0.25, 0.5]; the second split replaced the lower bound.
+    interval = result.final_interval
+    assert result.status is SolveStatus.MAX_FEVALS
+    assert (interval.a, interval.b, interval.last_replaced_bound) == (0.25, 0.5, IntervalBound.LOWER)
+
+
+def test_a_solve_that_ends_at_an_interval_bound_reports_no_final_interval():
+    """An exact zero at an interval bound ends the solve before the algorithm runs, so no interval is reported."""
+    # --- act --------------------------
+    result = _HalvingSolver().solve(_linear, 0.3, 1.0, xtol=1e-3, max_fevals=200)
+
+    # --- assert -----------------------
+    assert (result.status, result.final_interval) == (SolveStatus.CONVERGED, None)
 
 
 # ==================================================================================================

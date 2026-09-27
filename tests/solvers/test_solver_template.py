@@ -136,6 +136,7 @@ def test_the_interval_bounds_are_evaluated_and_counted_before_the_algorithm_runs
     assert result.n_fevals == 2
     assert result.status is SolveStatus.CONVERGED
     assert result.x == 0.5  # x_best starts at the interval midpoint.
+    assert result.final_interval is None  # Only a bracketing solver reports its final interval.
     assert solver.states[0].f.n_fevals == 2
 
 

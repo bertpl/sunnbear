@@ -5,6 +5,8 @@ from enum import Enum
 
 from counted_float import FlopCounts
 
+from .interval import Interval
+
 
 # ==================================================================================================
 #  SolveStatus
@@ -49,6 +51,10 @@ class SolveResult:
             per flop type; function evaluation cost is excluded.
         history: Every ``(x, f(x))`` evaluated, in order; ``None`` when history
             was not recorded.
+        final_interval: The last interval of a bracketing solve, whatever its status. Its bounds
+            differ in sign, so a root lies within it. ``None`` for a solver that is not a
+            bracketing solver, and for a solve that ended at the evaluations of the interval
+            bounds: an exact zero or a function failure there.
     """
 
     x: float
@@ -56,3 +62,4 @@ class SolveResult:
     n_fevals: int
     flop_counts: FlopCounts
     history: tuple[tuple[float, float], ...] | None
+    final_interval: Interval | None

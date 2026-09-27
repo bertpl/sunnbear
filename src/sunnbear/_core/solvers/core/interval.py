@@ -1,7 +1,7 @@
 """`Interval` is a `BracketingSolver`'s bracketing interval, reduced step by step; a subclass per orientation."""
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 from functools import cached_property
 
@@ -69,6 +69,14 @@ class Interval(ABC):
                 f"The function values at the interval bounds must differ in sign or one must be zero "
                 f"(got fa={fa}, fb={fb})."
             )
+
+    def with_plain_floats(self) -> "Interval":
+        """Return a copy of the same orientation whose bounds and function values are plain floats.
+
+        Inside a solve they are `CountedFloat`s; `Solver.solve` converts the final interval, so that the
+        `SolveResult` holds plain floats only.
+        """
+        return replace(self, a=float(self.a), b=float(self.b), fa=float(self.fa), fb=float(self.fb))
 
     # --------------------------------------------------------------------------
     #  Orientation

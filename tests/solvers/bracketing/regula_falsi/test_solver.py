@@ -32,6 +32,7 @@ def test_a_convex_function_stalls_on_the_retained_bound_and_exhausts_the_budget(
     assert result.n_fevals == 60
     assert abs(x_last - CUBIC_ROOT) <= 1e-9
     assert result.x == x_last  # The reported estimate is the last evaluated point, not the retained bound.
+    assert (result.final_interval.a, result.final_interval.b) == (x_last, 2.0)
 
 
 # ==================================================================================================

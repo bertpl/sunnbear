@@ -25,6 +25,7 @@ def test_converges_within_xtol_with_the_exact_evaluation_count(f, a, b, xtol):
     assert result.status is SolveStatus.CONVERGED
     assert abs(result.x - CUBIC_ROOT) <= xtol
     assert result.n_fevals == n_fevals_expected
+    assert result.final_interval.a <= CUBIC_ROOT <= result.final_interval.b
 
 
 def test_an_exact_midpoint_root_stops_early():
