@@ -1,4 +1,7 @@
-"""`xtol_band` and `max_fevals_for` follow from bisection's evaluation count, as real `Bisection` runs confirm."""
+"""Real `Bisection` runs spend exactly `n_bisection_fevals` inside the band that `xtol_band` returns.
+
+`max_fevals_for` returns the evaluation budget derived from that count.
+"""
 
 import pytest
 
@@ -13,7 +16,7 @@ from tests.solvers.example_functions import cubic
 @pytest.mark.parametrize("a, b", [(1.0, 2.0), (0.0, 4.0), (1.3, 1.4)])  # Each interval holds the cubic's root.
 @pytest.mark.parametrize("n_bisection_fevals", [3, 10, N_BISECTION_FEVALS])
 @pytest.mark.parametrize(
-    "edge, factor, n_fevals_offset",
+    "edge, xtol_factor, n_fevals_offset",
     [
         ("lower", 1.01, 0),  # just inside the band
         ("upper", 0.99, 0),
@@ -21,17 +24,17 @@ from tests.solvers.example_functions import cubic
         ("upper", 1.01, -1),
     ],
 )
-def test_bisection_takes_exactly_n_bisection_fevals_inside_the_band_only(
-    a, b, n_bisection_fevals, edge, factor, n_fevals_offset
+def test_bisection_takes_exactly_n_bisection_fevals_inside_the_xtol_band_only(
+    a, b, n_bisection_fevals, edge, xtol_factor, n_fevals_offset
 ):
-    """Bisection takes exactly `n_bisection_fevals` for an `xtol` just inside the band, and 1 more or 1 fewer just outside it.
+    """Bisection takes exactly `n_bisection_fevals` for an `xtol` just inside the band, 1 more or 1 fewer just outside.
 
     The 1 % margins keep `xtol` away from each edge, where the rounding of the midpoints can change the step
     count when the interval bounds are not exact binary fractions, as for [1.3, 1.4].
     """
     # --- arrange ----------------------
-    xtol_min, xtol_max = xtol_band(a, b, n_bisection_fevals)
-    xtol = factor * (xtol_min if edge == "lower" else xtol_max)
+    xtol_lower, xtol_upper = xtol_band(a, b, n_bisection_fevals)
+    xtol = xtol_factor * (xtol_lower if edge == "lower" else xtol_upper)
 
     # --- act --------------------------
     result = Bisection().solve(cubic, a, b, xtol=xtol, max_fevals=max_fevals_for(n_bisection_fevals))
@@ -42,7 +45,7 @@ def test_bisection_takes_exactly_n_bisection_fevals_inside_the_band_only(
 
 
 def test_xtol_band_matches_its_closed_form_on_a_known_interval():
-    """`xtol_band(-1, 3, 5)` returns `(0.25, 0.5)`: the interval width 4 times `2^(1 - 5)`, and twice that."""
+    """`xtol_band(-1, 3, 5)` returns `(0.25, 0.5)`: the interval width 4 multiplied by `2^(1 - 5)`, and twice that."""
     # --- act --------------------------
     band = xtol_band(-1.0, 3.0, 5)
 
@@ -68,7 +71,7 @@ def test_xtol_band_rejects_an_ill_ordered_interval_or_too_few_evaluations(a, b, 
 # ==================================================================================================
 #  max_fevals_for
 # ==================================================================================================
-def test_the_default_budget_is_160_evaluations():
+def test_the_default_evaluation_budget_is_160_evaluations():
     """The default `n_bisection_fevals` gives a budget of 160 evaluations."""
     # --- act / assert -----------------
     assert max_fevals_for(N_BISECTION_FEVALS) == 160

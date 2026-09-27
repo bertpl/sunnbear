@@ -1,4 +1,7 @@
-"""This package holds the benchmark layer: the (u, v) tuple set that drives every Monte Carlo benchmark run.
+"""This package holds the benchmark layer.
+
+It holds the (u, v) tuple set that drives every Monte Carlo benchmark run, and the tolerances and evaluation
+budget derived from bisection's evaluation count.
 
 Importing it registers the `mc_tuples` artifact declaration with `ArtifactRegistry`.
 """
