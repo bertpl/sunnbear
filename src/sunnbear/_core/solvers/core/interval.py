@@ -71,11 +71,7 @@ class Interval(ABC):
             )
 
     def with_plain_floats(self) -> "Interval":
-        """Return a copy of the same orientation whose bounds and function values are plain floats.
-
-        Inside a solve they are `CountedFloat`s; `Solver.solve` converts the final interval, so that the
-        `SolveResult` holds plain floats only.
-        """
+        """Return a copy of the same orientation whose bounds and function values are plain floats."""
         return replace(self, a=float(self.a), b=float(self.b), fa=float(self.fa), fb=float(self.fb))
 
     # --------------------------------------------------------------------------

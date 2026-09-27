@@ -1,4 +1,10 @@
-"""2 test-local bracketing solvers exercise the loop, the stopping rule, the final interval, and state subclasses."""
+"""2 test-local bracketing solvers exercise:
+
+- the loop
+- the stopping rule
+- the final interval
+- state subclasses
+"""
 
 import math
 from dataclasses import dataclass
@@ -98,9 +104,9 @@ def test_interrupted_loop_reports_the_last_evaluated_point():
 # ==================================================================================================
 @pytest.mark.parametrize(
     "f, cls_expected", [(_linear, IncreasingInterval), (lambda x: -_linear(x), DecreasingInterval)]
-)  # Both orientations are reported with their own class.
+)
 def test_the_final_interval_holds_the_root_within_2_xtol_as_plain_floats(f, cls_expected):
-    """A converged solve reports its last interval: no wider than `2·xtol`, around the root and the result."""
+    """A converged solve reports its last interval in plain floats, no wider than `2·xtol`, around the root and `x`."""
     # --- act --------------------------
     result = _HalvingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=200)
 
@@ -114,7 +120,7 @@ def test_the_final_interval_holds_the_root_within_2_xtol_as_plain_floats(f, cls_
 
 
 def test_an_interrupted_solve_reports_its_last_interval():
-    """A solve that runs out of budget still reports the interval that its last split produced."""
+    """A solve that runs out of budget still reports the interval from its last split."""
     # --- act --------------------------
     result = _HalvingSolver().solve(_linear, 0.0, 1.0, xtol=1e-9, max_fevals=4)
 
