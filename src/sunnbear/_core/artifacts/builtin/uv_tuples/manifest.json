@@ -1,0 +1,25 @@
+{
+  "build_date": "2026-09-27",
+  "built_with": {
+    "max-div": "0.18.4",
+    "sunnbear": "0.1.3"
+  },
+  "content_hash": "bbd77899f529e7167b7d17260985784cf5f5eaf26a4f152a7fcd43144415ce40",
+  "files": [
+    {
+      "path": "uv_tuples.csv",
+      "sha256": "3730b1d55997c5ba5f3030f6dc928d88c7c52832a63a62e2293c2b35f301c750",
+      "size_bytes": 39500
+    }
+  ],
+  "generated_by": {
+    "arguments": {
+      "n_workers": 32,
+      "seed": 42,
+      "t_total_sec": 900.0
+    },
+    "function": "sunnbear.benchmark.generate_uv_tuples"
+  },
+  "input_artifact_hashes": {},
+  "name": "uv_tuples"
+}
