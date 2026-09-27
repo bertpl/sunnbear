@@ -1,4 +1,4 @@
-"""`generate_uv_tuples` constructs a nested set of (u, v) tuples, spread as evenly as max-div can make it.
+"""`generate_mc_tuples` constructs a nested set of (u, v) tuples, spread as evenly as max-div can make it.
 
 The construction selects each size with max-div from a uniform random population of candidate tuples:
 
@@ -19,22 +19,22 @@ from max_div import Constraint, MaxDivProblem
 from max_div.metrics import DistanceMetric, DiversityMetric, HybridDiversityMetric
 from max_div.solver import ParallelMaxDivSolverBuilder, ParallelSolvingWarning, Verbosity, seconds
 
-from .construction_settings import FULL_POPULATION_SIZE, UvTuplesConstructionSettings
-from .exceptions import UvTuplesConstructionError
-from .tuples import N_SPANS, UV_TUPLES_SIZES, UvTuples, span_indices
+from .construction_settings import FULL_POPULATION_SIZE, MCTuplesConstructionSettings
+from .exceptions import MCTuplesConstructionError
+from .tuples import MC_TUPLES_SIZES, N_SPANS, MCTuples, span_indices
 
 # The inclusion constraint weighs more than the span constraints, so max-div meets it first.
 INCLUSION_CONSTRAINT_WEIGHT = 10.0
 
 
 # ==================================================================================================
-#  generate_uv_tuples
+#  generate_mc_tuples
 # ==================================================================================================
-def generate_uv_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) -> UvTuples:
+def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) -> MCTuples:
     """Construct a nested (u, v) tuple set in about `t_total_sec` s; its first `k` tuples form size `k`.
 
-    The construction runs 1 max-div solve per size in `UV_TUPLES_SIZES`, and splits `t_total_sec`
-    over them as `UvTuplesConstructionSettings.from_total_time` describes:
+    The construction runs 1 max-div solve per size in `MC_TUPLES_SIZES`, and splits `t_total_sec`
+    over them as `MCTuplesConstructionSettings.from_total_time` describes:
 
     - from 60 s up, the construction uses the full population of candidates and all `n_workers` workers;
     - below 60 s, the construction uses fewer of both, for short runs such as tests.
@@ -53,15 +53,15 @@ def generate_uv_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
 
     Raises:
         ValueError: If `t_total_sec` is below 1 s, or `n_workers` below 1.
-        UvTuplesConstructionError: If a size breaks its span or inclusion constraints, which can
+        MCTuplesConstructionError: If a size breaks its span or inclusion constraints, which can
             happen when `t_total_sec` is too short for max-div to meet them.
     """
-    settings = UvTuplesConstructionSettings.from_total_time(t_total_sec, n_workers)
+    settings = MCTuplesConstructionSettings.from_total_time(t_total_sec, n_workers)
     population = _draw_population(settings.population_size, seed)
     # `prefix_indices` holds population indices in prefix order: each size's new tuples follow those
     # of the size below it, so the first `k` indices form size `k`.
     prefix_indices = np.empty(0, dtype=np.int64)
-    for k in UV_TUPLES_SIZES:
+    for k in MC_TUPLES_SIZES:
         selection = _select_tuples(
             population, k, prefix_indices, settings.t_budget_per_size_sec[k], settings.n_workers, seed
         )
@@ -158,21 +158,21 @@ def _check_selection(population: np.ndarray, k: int, required_indices: np.ndarra
     them silently.
 
     Raises:
-        UvTuplesConstructionError: If any check fails.
+        MCTuplesConstructionError: If any check fails.
     """
     if np.unique(selection).size != k:
-        raise UvTuplesConstructionError(f"Size {k}: max-div selected {np.unique(selection).size} distinct tuples.")
+        raise MCTuplesConstructionError(f"Size {k}: max-div selected {np.unique(selection).size} distinct tuples.")
     n_missing = np.setdiff1d(required_indices, selection).size
     if n_missing > 0:
-        raise UvTuplesConstructionError(f"Size {k}: {n_missing} tuples of the size below it are not selected.")
+        raise MCTuplesConstructionError(f"Size {k}: {n_missing} tuples of the size below it are not selected.")
     stats = _tuples_at(population, selection).stats()
     if stats.max_span_count_deviation > 1:
-        raise UvTuplesConstructionError(
+        raise MCTuplesConstructionError(
             f"Size {k}: the span counts are {list(stats.span_counts_u)} along u and {list(stats.span_counts_v)} "
             f"along v, not all within 1 of {k // N_SPANS}."
         )
 
 
-def _tuples_at(population: np.ndarray, indices: np.ndarray) -> UvTuples:
+def _tuples_at(population: np.ndarray, indices: np.ndarray) -> MCTuples:
     """Return the tuples of `population` at `indices`, in that order."""
-    return UvTuples(population[indices, 0], population[indices, 1])
+    return MCTuples(population[indices, 0], population[indices, 1])

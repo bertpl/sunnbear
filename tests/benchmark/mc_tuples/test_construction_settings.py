@@ -1,8 +1,8 @@
-"""`UvTuplesConstructionSettings.from_total_time` derives the population size, worker count and time per size."""
+"""`MCTuplesConstructionSettings.from_total_time` derives the population size, worker count and time per size."""
 
 import pytest
 
-from sunnbear._core.benchmark.tuple_set import UV_TUPLES_SIZES, UvTuplesConstructionSettings
+from sunnbear._core.benchmark.mc_tuples import MC_TUPLES_SIZES, MCTuplesConstructionSettings
 
 
 @pytest.mark.parametrize(
@@ -19,14 +19,14 @@ def test_from_total_time_scales_below_60_s_and_saturates_above(
 ):
     """Below 60 s, the population, workers and minimum time per size scale down; the rest is split by size."""
     # --- act --------------------------
-    settings = UvTuplesConstructionSettings.from_total_time(t_total_sec, n_workers=32)
+    settings = MCTuplesConstructionSettings.from_total_time(t_total_sec, n_workers=32)
 
     # --- assert -----------------------
     t_rest_sec = t_total_sec - 6 * min_t_budget_per_size_sec
     assert settings.population_size == population_size
     assert settings.n_workers == n_workers
     assert settings.t_budget_per_size_sec == pytest.approx(
-        {k: min_t_budget_per_size_sec + t_rest_sec * k / sum(UV_TUPLES_SIZES) for k in UV_TUPLES_SIZES}
+        {k: min_t_budget_per_size_sec + t_rest_sec * k / sum(MC_TUPLES_SIZES) for k in MC_TUPLES_SIZES}
     )
     assert sum(settings.t_budget_per_size_sec.values()) == pytest.approx(t_total_sec)
 
@@ -41,4 +41,4 @@ def test_from_total_time_scales_below_60_s_and_saturates_above(
 def test_from_total_time_rejects_a_total_below_1_s_or_no_workers(t_total_sec, n_workers, message):
     """A total below 1 s, or fewer than 1 worker, raises a `ValueError`."""
     with pytest.raises(ValueError, match=message):
-        UvTuplesConstructionSettings.from_total_time(t_total_sec, n_workers)
+        MCTuplesConstructionSettings.from_total_time(t_total_sec, n_workers)

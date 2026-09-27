@@ -1,4 +1,4 @@
-"""`UvTuples` holds a set of (u, v) tuples, the dimensionless samples of every Monte Carlo benchmark run.
+"""`MCTuples` holds a set of (u, v) tuples, the dimensionless samples of every Monte Carlo benchmark run.
 
 A tuple `(u, v)` lies in the open unit square. When the set is mapped onto one test function, `u` sets
 the tolerance `xtol` log-uniformly between `xtol_min` and `2·xtol_min`, and `v` sets the parameter `c`
@@ -12,18 +12,18 @@ from numpy.typing import ArrayLike
 
 # The shipped set comes in these sizes; each is a prefix of the next, so a smaller size's tuples are a
 # subset of every larger size's.
-UV_TUPLES_SIZES = (32, 64, 128, 256, 512, 1024)
+MC_TUPLES_SIZES = (32, 64, 128, 256, 512, 1024)
 
-# Each axis is cut into this many equal spans; `UvTuplesStats` counts the tuples per span, and the
+# Each axis is cut into this many equal spans; `MCTuplesStats` counts the tuples per span, and the
 # construction keeps each count within 1 of `size / N_SPANS`.
 N_SPANS = 8
 
 
 # ==================================================================================================
-#  UvTuples
+#  MCTuples
 # ==================================================================================================
-class UvTuples:
-    """`UvTuples` is a set of (u, v) tuples in the open unit square, stored as 2 read-only arrays."""
+class MCTuples:
+    """`MCTuples` is a set of (u, v) tuples in the open unit square, stored as 2 read-only arrays."""
 
     def __init__(self, u: ArrayLike, v: ArrayLike) -> None:
         """Store copies of `u` and `v` as read-only float64 arrays.
@@ -65,7 +65,7 @@ class UvTuples:
         """Return the number of tuples."""
         return self._u.size
 
-    def first(self, size: int) -> "UvTuples":
+    def first(self, size: int) -> "MCTuples":
         """Return the first `size` tuples.
 
         Raises:
@@ -73,7 +73,7 @@ class UvTuples:
         """
         if not 2 <= size <= self.size:
             raise ValueError(f"size must lie in [2, {self.size}] (got {size}).")
-        return UvTuples(self._u[:size], self._v[:size])
+        return MCTuples(self._u[:size], self._v[:size])
 
     # --------------------------------------------------------------------------
     #  Mapping onto a test function
@@ -92,14 +92,14 @@ class UvTuples:
     # --------------------------------------------------------------------------
     #  Spread
     # --------------------------------------------------------------------------
-    def stats(self) -> "UvTuplesStats":
+    def stats(self) -> "MCTuplesStats":
         """Return the set's span counts and its 3 min separations.
 
         The L2 min separation is computed from the full pairwise distance matrix, so memory grows with
         the square of the size.
         """
         points = np.column_stack([self._u, self._v])
-        return UvTuplesStats(
+        return MCTuplesStats(
             size=self.size,
             span_counts_u=_span_counts(self._u),
             span_counts_v=_span_counts(self._v),
@@ -110,11 +110,11 @@ class UvTuples:
 
 
 # ==================================================================================================
-#  UvTuplesStats
+#  MCTuplesStats
 # ==================================================================================================
 @dataclass(frozen=True)
-class UvTuplesStats:
-    """`UvTuplesStats` describes how evenly a tuple set is spread.
+class MCTuplesStats:
+    """`MCTuplesStats` describes how evenly a tuple set is spread.
 
     Each min separation is the smallest distance between 2 tuples: in the square (L2), along u, or
     along v. Each `min_separation_*_fraction` property divides that min separation by the separation of

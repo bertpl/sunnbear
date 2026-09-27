@@ -10,7 +10,7 @@ A data release is a GitHub release that holds the archive of one artifact and is
 package releases:
 
 - its tag is the one that `ArtifactDataReleaseClient.tag_of` returns, e.g.
-  ``data-uv_tuples-3f2a9c1e``; the content hash in it gives other data another tag and another
+  ``data-mc_tuples-3f2a9c1e``; the content hash in it gives other data another tag and another
   URL, and the ``data-`` prefix keeps it from matching the ``v*`` tags that trigger the package
   release workflow;
 - it is never marked as the latest release, a label that GitHub gives one release per repository,
@@ -72,7 +72,7 @@ class ArtifactDataReleaseClient:
         """Return the git tag that names an artifact's data release and its download URL.
 
         The tag is ``data-<artifact name>-<first 8 hex digits of the content hash>``, e.g.
-        ``data-uv_tuples-3f2a9c1e``.
+        ``data-mc_tuples-3f2a9c1e``.
         """
         return f"data-{artifact_name}-{content_hash[:8]}"
 

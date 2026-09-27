@@ -28,14 +28,14 @@ class ArtifactDeclaration[T](ABC):
 
     Example::
 
-        class UvTuplesDeclaration(ArtifactDeclaration[UvTuples]):
-            name = "uv_tuples"
+        class MCTuplesDeclaration(ArtifactDeclaration[MCTuples]):
+            name = "mc_tuples"
 
             @classmethod
-            def to_files(cls, value: UvTuples) -> dict[str, bytes]: ...
+            def to_files(cls, value: MCTuples) -> dict[str, bytes]: ...
 
             @classmethod
-            def from_files(cls, files: Mapping[str, bytes]) -> UvTuples: ...
+            def from_files(cls, files: Mapping[str, bytes]) -> MCTuples: ...
 
     Class attributes:
         name: The artifact's name: lowercase letters, digits and underscores, starting with a letter.

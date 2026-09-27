@@ -35,7 +35,7 @@ dependencies = [
     # backports.zstd provides zstd for the archives of downloaded data artifacts; the standard library has it from 3.14.
     "backports.zstd>=1.0.0; python_version < '3.14'",
     "snuffled>=0.1.6",
-    "max-div>=0.18.1",  # 0.18.1 provides `HybridDiversityMetric` and `ParallelMaxDivSolverBuilder`, which `generate_uv_tuples` uses
+    "max-div>=0.18.1",  # 0.18.1 provides `HybridDiversityMetric` and `ParallelMaxDivSolverBuilder`, which `generate_mc_tuples` uses
     "mpl-composite>=0.1.2",
 ]
 classifiers = [

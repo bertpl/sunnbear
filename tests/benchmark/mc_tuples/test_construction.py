@@ -1,24 +1,24 @@
-"""`generate_uv_tuples` builds a nested, span-balanced tuple set, and refuses a selection breaking its constraints."""
+"""`generate_mc_tuples` builds a nested, span-balanced tuple set, and refuses a selection breaking its constraints."""
 
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.tuple_set import UV_TUPLES_SIZES, UvTuplesConstructionError, generate_uv_tuples
-from sunnbear._core.benchmark.tuple_set.construction import _check_selection, _draw_population
+from sunnbear._core.benchmark.mc_tuples import MC_TUPLES_SIZES, MCTuplesConstructionError, generate_mc_tuples
+from sunnbear._core.benchmark.mc_tuples.construction import _check_selection, _draw_population
 
 
-def test_generate_uv_tuples_builds_a_set_whose_every_size_meets_its_span_constraints():
+def test_generate_mc_tuples_builds_a_set_whose_every_size_meets_its_span_constraints():
     """A 1 s construction gives distinct tuples of the largest size, and every prefix size keeps each span within 1.
 
     Only the structure is asserted: max-div's spread depends on the wall-clock time.
     """
     # --- act --------------------------
-    tuples = generate_uv_tuples(t_total_sec=1.0)
+    tuples = generate_mc_tuples(t_total_sec=1.0)
 
     # --- assert -----------------------
-    assert tuples.size == max(UV_TUPLES_SIZES)
+    assert tuples.size == max(MC_TUPLES_SIZES)
     assert np.unique(np.column_stack([tuples.u, tuples.v]), axis=0).shape[0] == tuples.size
-    for size in UV_TUPLES_SIZES:
+    for size in MC_TUPLES_SIZES:
         assert tuples.first(size).stats().max_span_count_deviation <= 1
 
 
@@ -53,7 +53,7 @@ _ONE_PER_SPAN = np.arange(0, 24, 3)
 )
 def test_check_selection_refuses_duplicates_a_missing_tuple_or_unbalanced_spans(required_indices, selection, message):
     """A repeated tuple, a missing tuple of the size below, or a span off by more than 1 raises an error."""
-    with pytest.raises(UvTuplesConstructionError, match=message):
+    with pytest.raises(MCTuplesConstructionError, match=message):
         _check_selection(_POPULATION, 8, required_indices, selection)
 
 
