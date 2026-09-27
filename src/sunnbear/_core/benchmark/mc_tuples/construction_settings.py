@@ -18,7 +18,7 @@ from typing import Self
 from .tuples import MC_TUPLES_SIZES
 
 FULL_POPULATION_SIZE = 65_536
-# A population of 2 candidates per tuple at the largest size keeps the span constraints satisfiable.
+# A population of 2 candidates per tuple at the largest size keeps the bin constraints satisfiable.
 MIN_POPULATION_SIZE = 2 * max(MC_TUPLES_SIZES)
 MIN_T_TOTAL_SEC = 1.0
 MIN_T_TOTAL_AT_FULL_SCALE_SEC = 60.0

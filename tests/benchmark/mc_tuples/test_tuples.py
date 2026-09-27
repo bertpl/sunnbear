@@ -4,9 +4,9 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import MCTuples
-from sunnbear._core.benchmark.mc_tuples.tuples import span_indices
+from sunnbear._core.benchmark.mc_tuples.tuples import axis_bin_indices
 
-# The diagonal set has 8 tuples, one per span on each axis: u rises and v falls, so neighbors are diagonal at L2
+# The diagonal set has 8 tuples, one per bin on each axis: u rises and v falls, so neighbors are diagonal at L2
 # distance √2/8.
 _DIAGONAL_U = (np.arange(8) + 0.5) / 8
 _DIAGONAL_V = _DIAGONAL_U[::-1]
@@ -83,16 +83,16 @@ def test_to_xtol_and_c_maps_u_log_uniformly_and_v_linearly():
 # ==================================================================================================
 #  Stats
 # ==================================================================================================
-def test_stats_reports_span_counts_and_min_separations():
-    """One tuple per span gives counts of 1, separations 1/8 per axis and √2/8 in L2, and their fractions."""
+def test_stats_reports_bin_counts_and_min_separations():
+    """One tuple per bin gives counts of 1, separations 1/8 per axis and √2/8 in L2, and their fractions."""
     # --- act --------------------------
     stats = MCTuples(_DIAGONAL_U, _DIAGONAL_V).stats()
 
     # --- assert -----------------------
     assert stats.size == 8
-    assert stats.span_counts_u == (1,) * 8
-    assert stats.span_counts_v == (1,) * 8
-    assert stats.max_span_count_deviation == 0
+    assert stats.bin_counts_u == (1,) * 8
+    assert stats.bin_counts_v == (1,) * 8
+    assert stats.max_bin_count_deviation == 0
     assert stats.min_separation_u == pytest.approx(1 / 8)
     assert stats.min_separation_v == pytest.approx(1 / 8)
     assert stats.min_separation_l2 == pytest.approx(np.sqrt(2) / 8)
@@ -101,15 +101,15 @@ def test_stats_reports_span_counts_and_min_separations():
     assert stats.min_separation_l2_fraction == pytest.approx(np.sqrt(2) / 8 * (np.sqrt(8) - 1))
 
 
-def test_max_span_count_deviation_is_the_largest_over_both_axes():
-    """Putting 3 of 8 tuples in one span of v, where 1 is expected, gives a deviation of 2."""
+def test_max_bin_count_deviation_is_the_largest_over_both_axes():
+    """Putting 3 of 8 tuples in one bin of v, where 1 is expected, gives a deviation of 2."""
     # --- arrange ----------------------
     v = np.array([0.01, 0.02, 0.03, 0.4, 0.5, 0.6, 0.7, 0.8])
 
     # --- act / assert -----------------
-    assert MCTuples(_DIAGONAL_U, v).stats().max_span_count_deviation == 2
+    assert MCTuples(_DIAGONAL_U, v).stats().max_bin_count_deviation == 2
 
 
-def test_span_indices_puts_each_value_in_its_eighth_of_the_axis():
-    """A value in [s/8, (s+1)/8) is in span s, and a value just below 1 is in the last span."""
-    assert span_indices(np.array([0.01, 0.125, 0.5, 0.999999])).tolist() == [0, 1, 4, 7]
+def test_axis_bin_indices_puts_each_value_in_its_eighth_of_the_axis():
+    """A value in [s/8, (s+1)/8) is in bin s, and a value just below 1 is in the last bin."""
+    assert axis_bin_indices(np.array([0.01, 0.125, 0.5, 0.999999])).tolist() == [0, 1, 4, 7]

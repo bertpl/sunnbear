@@ -8,8 +8,8 @@ The construction selects each size with max-div from a uniform random population
   a test function;
 - **inclusion**: the sizes are built bottom-up, the smallest first, and each larger size is
   constrained to include the size below it, so every size is a prefix of the next;
-- **spans**: span constraints cut each axis into `N_SPANS` equal spans, and keep the number of a
-  size's tuples in each span within 1 of `size / N_SPANS`.
+- **bins**: bin constraints cut each axis into `N_BINS` equal bins, and keep the number of a
+  size's tuples in each bin within 1 of `size / N_BINS`.
 """
 
 import warnings
@@ -21,9 +21,9 @@ from max_div.solver import ParallelMaxDivSolverBuilder, ParallelSolvingWarning, 
 
 from .construction_settings import FULL_POPULATION_SIZE, MCTuplesConstructionSettings
 from .exceptions import MCTuplesConstructionError
-from .tuples import MC_TUPLES_SIZES, N_SPANS, MCTuples, span_indices
+from .tuples import MC_TUPLES_SIZES, N_BINS, MCTuples, axis_bin_indices
 
-# The inclusion constraint weighs more than the span constraints, so max-div meets it first.
+# The inclusion constraint weighs more than the bin constraints, so max-div meets it first.
 INCLUSION_CONSTRAINT_WEIGHT = 10.0
 
 
@@ -53,7 +53,7 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
 
     Raises:
         ValueError: If `t_total_sec` is below 1 s, or `n_workers` below 1.
-        MCTuplesConstructionError: If a size breaks its span or inclusion constraints, which can
+        MCTuplesConstructionError: If a size breaks its bin or inclusion constraints, which can
             happen when `t_total_sec` is too short for max-div to meet them.
     """
     settings = MCTuplesConstructionSettings.from_total_time(t_total_sec, n_workers)
@@ -94,7 +94,7 @@ def _select_tuples(
     seed: int,
 ) -> np.ndarray:
     """Return max-div's selection of `k` tuples, including `required_indices`, as sorted population indices."""
-    constraints = _span_constraints(population, k)
+    constraints = _bin_constraints(population, k)
     if required_indices.size > 0:
         constraints.append(
             Constraint(
@@ -131,27 +131,27 @@ def _select_tuples(
     return np.sort(np.asarray(solution.i_selected, dtype=np.int64))
 
 
-def _span_constraints(population: np.ndarray, k: int) -> list[Constraint]:
-    """Return 1 constraint per span of each axis, each allowing `k / N_SPANS ± 1` selected tuples."""
-    target_count_per_span = k // N_SPANS
+def _bin_constraints(population: np.ndarray, k: int) -> list[Constraint]:
+    """Return 1 constraint per bin of each axis, each allowing `k / N_BINS ± 1` selected tuples."""
+    target_count_per_bin = k // N_BINS
     constraints = []
     for axis in range(2):
-        indices = span_indices(population[:, axis])
-        for span in range(N_SPANS):
+        indices = axis_bin_indices(population[:, axis])
+        for bin_index in range(N_BINS):
             constraints.append(
                 Constraint(
-                    int_set=set(np.flatnonzero(indices == span).tolist()),
-                    min_count=target_count_per_span - 1,
-                    max_count=target_count_per_span + 1,
+                    int_set=set(np.flatnonzero(indices == bin_index).tolist()),
+                    min_count=target_count_per_bin - 1,
+                    max_count=target_count_per_bin + 1,
                 )
             )
     return constraints
 
 
 def _check_selection(population: np.ndarray, k: int, required_indices: np.ndarray, selection: np.ndarray) -> None:
-    """Check that `selection` has `k` distinct tuples, includes `required_indices`, and balances its spans.
+    """Check that `selection` has `k` distinct tuples, includes `required_indices`, and balances its bins.
 
-    Balanced spans hold `k / N_SPANS ± 1` tuples each, on both axes.
+    Balanced bins hold `k / N_BINS ± 1` tuples each, on both axes.
 
     max-div treats constraints as soft and returns its least-violating selection, so a total time
     too short for the solver to meet them raises here, because the returned set would otherwise break
@@ -166,10 +166,10 @@ def _check_selection(population: np.ndarray, k: int, required_indices: np.ndarra
     if n_missing > 0:
         raise MCTuplesConstructionError(f"Size {k}: {n_missing} tuples of the size below it are not selected.")
     stats = _tuples_at(population, selection).stats()
-    if stats.max_span_count_deviation > 1:
+    if stats.max_bin_count_deviation > 1:
         raise MCTuplesConstructionError(
-            f"Size {k}: the span counts are {list(stats.span_counts_u)} along u and {list(stats.span_counts_v)} "
-            f"along v, not all within 1 of {k // N_SPANS}."
+            f"Size {k}: the bin counts are {list(stats.bin_counts_u)} along u and {list(stats.bin_counts_v)} "
+            f"along v, not all within 1 of {k // N_BINS}."
         )
 
 

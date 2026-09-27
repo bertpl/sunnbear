@@ -5,7 +5,7 @@ the tolerance `xtol` log-uniformly between `xtol_min` and `2·xtol_min`, and `v`
 linearly between the function's `c_min` and `c_max`, so the same set works for every test function.
 """
 
-from dataclasses import dataclass
+from functools import cached_property
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -14,9 +14,9 @@ from numpy.typing import ArrayLike
 # subset of every larger size's.
 MC_TUPLES_SIZES = (32, 64, 128, 256, 512, 1024)
 
-# Each axis is cut into this many equal spans; `MCTuplesStats` counts the tuples per span, and the
-# construction keeps each count within 1 of `size / N_SPANS`.
-N_SPANS = 8
+# Each axis is cut into this many equal bins, as in a histogram; `MCTuplesStats` counts the tuples per
+# bin, and the construction keeps each count within 1 of `size / N_BINS`.
+N_BINS = 8
 
 
 # ==================================================================================================
@@ -93,41 +93,74 @@ class MCTuples:
     #  Spread
     # --------------------------------------------------------------------------
     def stats(self) -> "MCTuplesStats":
-        """Return the set's span counts and its 3 min separations.
-
-        The L2 min separation is computed from the full pairwise distance matrix, so memory grows with
-        the square of the size.
-        """
-        points = np.column_stack([self._u, self._v])
-        return MCTuplesStats(
-            size=self.size,
-            span_counts_u=_span_counts(self._u),
-            span_counts_v=_span_counts(self._v),
-            min_separation_l2=_min_separation_l2(points),
-            min_separation_u=_min_separation_along_axis(self._u),
-            min_separation_v=_min_separation_along_axis(self._v),
-        )
+        """Return the set's spread statistics, each computed when first read."""
+        return MCTuplesStats(self)
 
 
 # ==================================================================================================
 #  MCTuplesStats
 # ==================================================================================================
-@dataclass(frozen=True)
 class MCTuplesStats:
-    """`MCTuplesStats` describes how evenly a tuple set is spread.
+    """`MCTuplesStats` describes how evenly a tuple set is spread; each statistic is computed when first read.
 
     Each min separation is the smallest distance between 2 tuples: in the square (L2), along u, or
     along v. Each `min_separation_*_fraction` property divides that min separation by the separation of
-    `size` evenly spaced tuples:
-    `1/(size - 1)` along an axis, and the spacing `1/(√size - 1)` of a square grid in L2.
+    `size` evenly spaced tuples: `1/(size - 1)` along an axis, and the spacing `1/(√size - 1)` of a
+    square grid in L2.
     """
 
-    size: int
-    span_counts_u: tuple[int, ...]
-    span_counts_v: tuple[int, ...]
-    min_separation_l2: float
-    min_separation_u: float
-    min_separation_v: float
+    def __init__(self, tuples: MCTuples) -> None:
+        """Store the tuples whose spread this object describes."""
+        self._tuples = tuples
+
+    @property
+    def size(self) -> int:
+        """Return the number of tuples."""
+        return self._tuples.size
+
+    # --------------------------------------------------------------------------
+    #  Bin counts
+    # --------------------------------------------------------------------------
+    @cached_property
+    def bin_counts_u(self) -> tuple[int, ...]:
+        """Return the number of tuples in each of the `N_BINS` bins along u."""
+        return self._bin_counts(self._tuples.u)
+
+    @cached_property
+    def bin_counts_v(self) -> tuple[int, ...]:
+        """Return the number of tuples in each of the `N_BINS` bins along v."""
+        return self._bin_counts(self._tuples.v)
+
+    @property
+    def max_bin_count_deviation(self) -> float:
+        """Return the largest difference, over both axes, between a bin's count and `size / N_BINS`."""
+        counts = np.array(self.bin_counts_u + self.bin_counts_v)
+        return float(np.abs(counts - self.size / N_BINS).max())
+
+    # --------------------------------------------------------------------------
+    #  Min separations
+    # --------------------------------------------------------------------------
+    @cached_property
+    def min_separation_l2(self) -> float:
+        """Return the smallest L2 distance between 2 tuples.
+
+        It is computed from the full pairwise distance matrix, so memory grows with the square of the size.
+        """
+        points = np.column_stack([self._tuples.u, self._tuples.v])
+        diff = points[:, None, :] - points[None, :, :]
+        distances = np.sqrt((diff**2).sum(axis=-1))
+        np.fill_diagonal(distances, np.inf)
+        return float(distances.min())
+
+    @cached_property
+    def min_separation_u(self) -> float:
+        """Return the smallest difference between 2 u values."""
+        return self._min_separation_along_axis(self._tuples.u)
+
+    @cached_property
+    def min_separation_v(self) -> float:
+        """Return the smallest difference between 2 v values."""
+        return self._min_separation_along_axis(self._tuples.v)
 
     @property
     def min_separation_l2_fraction(self) -> float:
@@ -144,34 +177,23 @@ class MCTuplesStats:
         """Return the min separation along v as a fraction of `1/(size - 1)`."""
         return self.min_separation_v * (self.size - 1)
 
-    @property
-    def max_span_count_deviation(self) -> float:
-        """Return the largest difference, over both axes, between a span's count and `size / N_SPANS`."""
-        counts = np.array(self.span_counts_u + self.span_counts_v)
-        return float(np.abs(counts - self.size / N_SPANS).max())
+    # --------------------------------------------------------------------------
+    #  Internal helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _bin_counts(values: np.ndarray) -> tuple[int, ...]:
+        """Return the number of values in each of the `N_BINS` bins of (0, 1)."""
+        return tuple(int(n) for n in np.bincount(axis_bin_indices(values), minlength=N_BINS))
+
+    @staticmethod
+    def _min_separation_along_axis(values: np.ndarray) -> float:
+        """Return the smallest difference between 2 of the values."""
+        return float(np.diff(np.sort(values)).min())
 
 
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-def span_indices(values: np.ndarray) -> np.ndarray:
-    """Return the index of the span, among `N_SPANS` equal spans of (0, 1), that holds each value."""
-    return np.minimum((values * N_SPANS).astype(np.int64), N_SPANS - 1)
-
-
-def _span_counts(values: np.ndarray) -> tuple[int, ...]:
-    """Return the number of values in each of the `N_SPANS` spans of (0, 1)."""
-    return tuple(int(n) for n in np.bincount(span_indices(values), minlength=N_SPANS))
-
-
-def _min_separation_along_axis(values: np.ndarray) -> float:
-    """Return the smallest difference between 2 of the values."""
-    return float(np.diff(np.sort(values)).min())
-
-
-def _min_separation_l2(points: np.ndarray) -> float:
-    """Return the smallest L2 distance between 2 of the points, from the full distance matrix."""
-    diff = points[:, None, :] - points[None, :, :]
-    distances = np.sqrt((diff**2).sum(axis=-1))
-    np.fill_diagonal(distances, np.inf)
-    return float(distances.min())
+def axis_bin_indices(values: np.ndarray) -> np.ndarray:
+    """Return, for each value in (0, 1), the index of the bin that holds it, among `N_BINS` equal bins of the axis."""
+    return np.minimum((values * N_BINS).astype(np.int64), N_BINS - 1)
