@@ -5,23 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.1.4 (2026-09-27)
 
 ### Added
 
 - `sunnbear.benchmark.load_mc_tuples`: the shipped set of (u, v) tuples that Monte Carlo benchmarks sample from, nested across sizes 32–1024, with its spread statistics and `generate_mc_tuples` to regenerate an equivalent set within a given time
 
-### Changed
-
-### Deprecated
-
 ### Removed
 
 - Support for Python 3.11; sunnbear now requires Python 3.12 or later
-
-### Fixed
-
-### Security
 
 ## 0.1.3 (2026-09-26)
 
