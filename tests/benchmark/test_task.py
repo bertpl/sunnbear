@@ -7,7 +7,7 @@ from counted_float import FlopType
 import sunnbear.functions as functions  # Import the module, so pytest does not try to collect `TestFunction`.
 from sunnbear._core.benchmark import task
 from sunnbear._core.benchmark.mc_tuples import load_mc_tuples
-from sunnbear._core.benchmark.results_schema import RESULTS_SCHEMA, flops_column_name
+from sunnbear._core.benchmark.results_schema import RESULTS_SCHEMA, flop_count_column_name
 from sunnbear._core.benchmark.task import run_benchmark_task
 from sunnbear._core.benchmark.tolerances import compute_xtol_range
 from sunnbear.solvers import Solver, SolverConfig, SolverConfigRegistry, SolverRole, SolveState, SolveStatus
@@ -91,7 +91,7 @@ def test_a_task_gives_1_row_per_sample_and_solver_in_the_results_schema(cubic):
     assert results["solver_id"].to_list() == ["bisection", "regula_falsi"] * SIZE
     assert results["mc_sample_idx"].to_list() == [i for i in range(SIZE) for _ in configs]
     assert set(results["function_id"]) == {"f2.1.1[p1=0.2]"}
-    assert set(results["size"]) == {SIZE}
+    assert set(results["mc_size"]) == {SIZE}
     assert results["u"].to_list()[::2] == mc_tuples.u.tolist()
     assert results["xtol"].is_between(xtol_min, xtol_max, closed="left").all()
     assert results["c"].is_between(cubic.c_min, cubic.c_max).all()
@@ -107,7 +107,7 @@ def test_bisection_is_correct_in_exactly_n_bisection_fevals_with_counted_flops(c
     assert results["is_correct"].all()
     assert (results["n_fevals"] == N_BISECTION_FEVALS).all()
     assert (results["wall_time_ns"] > 0).all()
-    assert (results[flops_column_name(FlopType.COMP)] > 0).all()
+    assert (results[flop_count_column_name(FlopType.COMP)] > 0).all()
 
 
 # ==================================================================================================

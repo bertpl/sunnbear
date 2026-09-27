@@ -13,9 +13,9 @@ from counted_float import FlopType
 from sunnbear._core.solvers.core import SolveStatus
 
 
-def flops_column_name(flop_type: FlopType) -> str:
-    """Return the name of the column that counts `flop_type`, e.g. `flops_add` for `FlopType.ADD`."""
-    return f"flops_{flop_type.name.lower()}"
+def flop_count_column_name(flop_type: FlopType) -> str:
+    """Return the name of the column that counts `flop_type`, e.g. `flop_count_add` for `FlopType.ADD`."""
+    return f"flop_count_{flop_type.name.lower()}"
 
 
 RESULTS_SCHEMA: dict[str, pl.DataType] = {
@@ -23,7 +23,7 @@ RESULTS_SCHEMA: dict[str, pl.DataType] = {
     "solver_id": pl.String(),
     "solver_version": pl.Int32(),
     "function_id": pl.String(),
-    "size": pl.Int32(),
+    "mc_size": pl.Int32(),
     "mc_sample_idx": pl.Int32(),
     # These columns hold the Monte Carlo sample: its (u, v) tuple and that tuple's (xtol, c) values.
     "u": pl.Float64(),
@@ -38,5 +38,5 @@ RESULTS_SCHEMA: dict[str, pl.DataType] = {
     "wall_time_ns": pl.Int64(),
     # Each flop type gets 1 column that holds its raw count. The per-flop-type cost weights are applied at
     # analysis time, because counted-float can change them without any version number that records the change.
-    **{flops_column_name(flop_type): pl.Int32() for flop_type in FlopType},
+    **{flop_count_column_name(flop_type): pl.Int32() for flop_type in FlopType},
 }

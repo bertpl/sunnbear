@@ -13,7 +13,7 @@ from sunnbear._core.solvers.core import SolverConfig, SolveStatus
 
 from .correctness import is_solution_correct
 from .mc_tuples import MCTuples
-from .results_schema import RESULTS_SCHEMA, flops_column_name
+from .results_schema import RESULTS_SCHEMA, flop_count_column_name
 from .seeds import SeedPurpose, derive_seed
 from .tolerances import compute_xtol_range, max_fevals_for
 
@@ -46,7 +46,7 @@ def run_benchmark_task(
     Args:
         function: A calibrated test function.
         solver_configs: The solvers to run; each config is instantiated once and its solver reused for every sample.
-        mc_tuples: The Monte Carlo samples; their count is the `size` column.
+        mc_tuples: The Monte Carlo samples; their count is the `mc_size` column.
         n_bisection_fevals: Bisection's evaluation count, from which the `xtol` range and the evaluation
             budget follow.
         root_seed: The run's root seed, from which the seeds of the correctness checks are derived.
@@ -90,7 +90,7 @@ def run_benchmark_task(
                     "solver_id": config.solver_id,
                     "solver_version": config.solver_cls.version,
                     "function_id": function_id,
-                    "size": mc_tuples.size,
+                    "mc_size": mc_tuples.size,
                     "mc_sample_idx": mc_sample_idx,
                     "u": float(u),
                     "v": float(v),
@@ -101,7 +101,7 @@ def run_benchmark_task(
                     "n_fevals": result.n_fevals,
                     "is_correct": is_correct,
                     "wall_time_ns": wall_time_ns,
-                    **{flops_column_name(flop_type): n for flop_type, n in result.flop_counts.as_dict().items()},
+                    **{flop_count_column_name(flop_type): n for flop_type, n in result.flop_counts.as_dict().items()},
                 }
             )
     return pl.from_dicts(rows, schema=RESULTS_SCHEMA)
