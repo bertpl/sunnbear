@@ -44,7 +44,7 @@ def test_a_correct_answer_is_proven_by_the_first_3_points(x_found, n_fevals_expe
     f = _RecordingFunction(lambda x: x - 0.3)
 
     # --- act --------------------------
-    is_correct = is_solution_correct(f, x_found, xtol=1e-3, seed=1)
+    is_correct = is_solution_correct(f=f, x_found=x_found, xtol=1e-3, seed=1)
 
     # --- assert -----------------------
     assert is_correct
@@ -57,7 +57,7 @@ def test_a_candidate_point_within_xtol_proves_what_the_first_3_points_miss():
     f = _RecordingFunction(_narrow_dip)
 
     # --- act --------------------------
-    is_correct = is_solution_correct(f, 0.0, xtol=1.0, seed=1, candidate_points=[1.25, 0.25])
+    is_correct = is_solution_correct(f=f, x_found=0.0, xtol=1.0, seed=1, candidate_points=[1.25, 0.25])
 
     # --- assert -----------------------
     assert is_correct
@@ -70,7 +70,7 @@ def test_random_points_find_a_sign_change_that_the_fixed_points_miss():
     f = _RecordingFunction(_narrow_dip)
 
     # --- act --------------------------
-    is_correct = is_solution_correct(f, 0.0, xtol=1.0, seed=1)
+    is_correct = is_solution_correct(f=f, x_found=0.0, xtol=1.0, seed=1)
 
     # --- assert -----------------------
     assert is_correct
@@ -92,7 +92,7 @@ def test_a_failed_evaluation_proves_nothing_but_counts():
     f = _RecordingFunction(f_raw)
 
     # --- act --------------------------
-    is_correct = is_solution_correct(f, 0.3, xtol=1e-3, seed=1)
+    is_correct = is_solution_correct(f=f, x_found=0.3, xtol=1e-3, seed=1)
 
     # --- assert -----------------------
     assert is_correct
@@ -109,7 +109,7 @@ def test_a_wrong_answer_spends_the_whole_limit():
     f = _RecordingFunction(lambda x: x - 10.0)
 
     # --- act --------------------------
-    is_correct = is_solution_correct(f, 0.0, xtol=1.0, seed=1)
+    is_correct = is_solution_correct(f=f, x_found=0.0, xtol=1.0, seed=1)
 
     # --- assert -----------------------
     assert not is_correct
@@ -122,7 +122,7 @@ def test_the_random_points_stay_within_xtol_and_alternate_sides():
     f = _RecordingFunction(lambda x: x - 10.0)
 
     # --- act --------------------------
-    is_solution_correct(f, 2.0, xtol=0.5, seed=1)
+    is_solution_correct(f=f, x_found=2.0, xtol=0.5, seed=1)
 
     # --- assert -----------------------
     random_points = f.xs[3:]
@@ -138,8 +138,8 @@ def test_the_random_points_follow_the_seed(seed_other, is_equal_expected):
     f_second = _RecordingFunction(lambda x: x - 10.0)
 
     # --- act --------------------------
-    is_solution_correct(f_first, 0.0, xtol=1.0, seed=1)
-    is_solution_correct(f_second, 0.0, xtol=1.0, seed=seed_other)
+    is_solution_correct(f=f_first, x_found=0.0, xtol=1.0, seed=1)
+    is_solution_correct(f=f_second, x_found=0.0, xtol=1.0, seed=seed_other)
 
     # --- assert -----------------------
     assert (f_first.xs == f_second.xs) is is_equal_expected
@@ -150,4 +150,4 @@ def test_rejects_a_tolerance_that_is_not_positive_and_finite(xtol):
     """`is_solution_correct` raises `ValueError` for a zero, negative or non-finite `xtol`."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="positive and finite"):
-        is_solution_correct(lambda x: x, 0.0, xtol=xtol, seed=1)
+        is_solution_correct(f=lambda x: x, x_found=0.0, xtol=xtol, seed=1)

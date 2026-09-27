@@ -25,7 +25,7 @@ class SeedPurpose(StrEnum):
     CORRECTNESS_CHECK = "correctness_check"
 
 
-def derive_seed(root_seed: int, purpose: SeedPurpose, function_id: str, sample_idx: int) -> int:
+def derive_seed(*, root_seed: int, purpose: SeedPurpose, function_id: str, sample_idx: int) -> int:
     """Return the seed for a given purpose, test function and sample of a run: an integer in `[0, 2^64)`.
 
     The arguments are encoded as a JSON list before hashing, because JSON quotes and escapes the function id,

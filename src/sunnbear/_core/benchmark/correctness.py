@@ -16,6 +16,7 @@ CORRECTNESS_CHECK_MAX_FEVALS = 1000
 
 
 def is_solution_correct(
+    *,
     f: Callable[[float], float],
     x_found: float,
     xtol: float,

@@ -4,7 +4,12 @@ import pytest
 
 from sunnbear._core.benchmark.seeds import SeedPurpose, derive_seed
 
-_ARGS = (42, SeedPurpose.CORRECTNESS_CHECK, "f2.1.1[p1=0.2]", 7)
+_KWARGS = {
+    "root_seed": 42,
+    "purpose": SeedPurpose.CORRECTNESS_CHECK,
+    "function_id": "f2.1.1[p1=0.2]",
+    "sample_idx": 7,
+}
 
 
 def test_the_seed_of_known_values_is_fixed():
@@ -13,22 +18,22 @@ def test_the_seed_of_known_values_is_fixed():
     Such a change would make past runs irreproducible.
     """
     # --- act / assert -----------------
-    assert derive_seed(*_ARGS) == 7745312542909566469
+    assert derive_seed(**_KWARGS) == 7745312542909566469
 
 
 @pytest.mark.parametrize(
-    "args",
+    "changed_kwargs",
     [
-        (43, *_ARGS[1:]),
-        (*_ARGS[:2], "f2.1.1[p1=0.3]", _ARGS[3]),
-        (*_ARGS[:3], 8),
+        {"root_seed": 43},
+        {"function_id": "f2.1.1[p1=0.3]"},
+        {"sample_idx": 8},
     ],
 )
-def test_changing_any_value_changes_the_seed(args):
+def test_changing_any_value_changes_the_seed(changed_kwargs):
     """A different root seed, test function or sample gives a different seed within `[0, 2^64)`."""
     # --- act --------------------------
-    seed = derive_seed(*args)
+    seed = derive_seed(**(_KWARGS | changed_kwargs))
 
     # --- assert -----------------------
-    assert seed != derive_seed(*_ARGS)
+    assert seed != derive_seed(**_KWARGS)
     assert 0 <= seed < 2**64
