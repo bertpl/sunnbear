@@ -12,8 +12,8 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    # Per-Python floors: each is the earliest version shipping a wheel for that
-    # CPython (and, for numpy, admitted by the numba floor on the same interpreter),
+    # Per-Python minimal versions: each is the earliest version shipping a wheel for that
+    # CPython (and, for numpy, admitted by the numba minimal version on the same interpreter),
     # so `lowest-direct` installs (not source-builds) across the whole matrix.
     "numpy>=2.0.0; python_version == '3.12'",
     "numpy>=2.1.0; python_version == '3.13'",
@@ -25,8 +25,8 @@ dependencies = [
     "matplotlib>=3.10.7; python_version == '3.13'",
     "matplotlib>=3.10.7; python_version >= '3.14'",
     "counted-float>=1.2.1",
-    # The pydantic minimal versions are counted-float's own, so they already hold in every install
-    # (counted-float depends on pydantic).
+    # These pydantic minimal versions equal counted-float's own pydantic minimal versions; counted-float
+    # depends on pydantic, so every install already satisfies them.
     "pydantic>=2.7; python_version == '3.12'",
     "pydantic>=2.9; python_version == '3.13'",
     "pydantic>=2.12; python_version >= '3.14'",

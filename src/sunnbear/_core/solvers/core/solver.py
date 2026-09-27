@@ -10,8 +10,9 @@ from typing import ClassVar, Generic
 
 from counted_float import CountedFloat, FlopCountingContext
 
-# `typing.TypeVar` accepts `default=` only from Python 3.13; `typing_extensions` backports it to the older
-# Pythons that `requires-python` admits.
+# `typing.TypeVar` accepts `default=` only from Python 3.13, and so does the `class Solver[StateT = ...]` syntax;
+# `typing_extensions` backports `default=` to the older Python versions that `requires-python` admits, so
+# `Solver` keeps the `Generic[StateT]` form.
 from typing_extensions import TypeVar
 
 from .exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
