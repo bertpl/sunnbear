@@ -39,7 +39,7 @@ def _gh_failing_with(message: str):
 # ==================================================================================================
 def test_tag_of_names_the_artifact_and_the_shortened_content_hash():
     """A data release's tag is ``data-<name>-<first 8 hex digits of the content hash>``."""
-    assert ArtifactDataReleaseClient.tag_of("uv_tuples", "3f2a9c1e" + "0" * 56) == "data-uv_tuples-3f2a9c1e"
+    assert ArtifactDataReleaseClient.tag_of("mc_tuples", "3f2a9c1e" + "0" * 56) == "data-mc_tuples-3f2a9c1e"
 
 
 def test_check_write_access_accepts_a_maintainer(monkeypatch):

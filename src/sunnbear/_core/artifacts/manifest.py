@@ -10,7 +10,7 @@ file entries alone. The identity is never a hand-maintained version number, whic
 go unchanged when the data changes.
 
 `ArtifactManifest.short_identity` shows the content hash shortened, the way git shows commits, e.g.
-``uv_tuples@3f2a9c1e``; comparisons use the full `ArtifactManifest.content_hash`.
+``mc_tuples@3f2a9c1e``; comparisons use the full `ArtifactManifest.content_hash`.
 
 `ArtifactManifest.to_json` writes a given manifest as the same bytes every time (keys sorted, fixed
 indentation), so a changed manifest shows a readable diff. `ArtifactManifest.from_json` accepts
@@ -97,7 +97,7 @@ class ArtifactManifest(BaseModel):
 
     @property
     def short_identity(self) -> str:
-        """Return the name and the shortened content hash, e.g. ``uv_tuples@3f2a9c1e``, for display only."""
+        """Return the name and the shortened content hash, e.g. ``mc_tuples@3f2a9c1e``, for display only."""
         return f"{self.name}@{self.content_hash[:_SHORT_HASH_LENGTH]}"
 
     # --------------------------------------------------------------------------

@@ -39,7 +39,7 @@ class ArtifactArchiver:
 
     @staticmethod
     def archive_file_name(artifact_name: str) -> str:
-        """Return the file name of the archive of the artifact with this name, e.g. ``uv_tuples.tar.zst``."""
+        """Return the file name of the archive of the artifact with this name, e.g. ``mc_tuples.tar.zst``."""
         return f"{artifact_name}{_ARCHIVE_SUFFIX}"
 
     @staticmethod
