@@ -1,4 +1,6 @@
-"""`run_benchmark_task` gives 1 row per sample and solver, and checks the answer of every converged solve only."""
+"""`BenchmarkTask` gives 1 row per sample and solver, checks every converged answer only, and pickles as it is."""
+
+import pickle
 
 import polars as pl
 import pytest
@@ -8,7 +10,8 @@ import sunnbear.functions as functions  # Import the module, so pytest does not 
 from sunnbear._core.benchmark import task
 from sunnbear._core.benchmark.mc_tuples import load_mc_tuples
 from sunnbear._core.benchmark.results_schema import RESULTS_SCHEMA, flop_count_column_name
-from sunnbear._core.benchmark.task import run_benchmark_task
+from sunnbear._core.benchmark.run_settings import BenchmarkRunSettings
+from sunnbear._core.benchmark.task import BenchmarkTask
 from sunnbear._core.benchmark.tolerances import compute_xtol_range
 from sunnbear.solvers import Solver, SolverConfig, SolverConfigRegistry, SolverRole, SolveState, SolveStatus
 
@@ -61,15 +64,18 @@ def unevaluated_midpoint_and_stalling_configs(isolated_solver_config_registry) -
     return SolverConfigRegistry.config_from_id("unevaluated_midpoint"), SolverConfigRegistry.config_from_id("stalling")
 
 
-def _run_task_on_cubic(cubic: functions.TestFunction, solver_configs, root_seed: int = 1) -> pl.DataFrame:
-    """Run the benchmark task on the cubic with the first `SIZE` shipped Monte Carlo tuples."""
-    return run_benchmark_task(
+def _task_on_cubic(cubic: functions.TestFunction, solver_configs) -> BenchmarkTask:
+    """Return the benchmark task on the cubic with the first `SIZE` shipped Monte Carlo tuples."""
+    return BenchmarkTask.from_test_function(
         function=cubic,
         solver_configs=solver_configs,
-        mc_tuples=load_mc_tuples(SIZE),
-        n_bisection_fevals=N_BISECTION_FEVALS,
-        root_seed=root_seed,
+        run_settings=BenchmarkRunSettings(mc_size=SIZE, n_bisection_fevals=N_BISECTION_FEVALS, root_seed=1),
     )
+
+
+def _run_task_on_cubic(cubic: functions.TestFunction, solver_configs) -> pl.DataFrame:
+    """Run the benchmark task on the cubic with the first `SIZE` shipped Monte Carlo tuples."""
+    return _task_on_cubic(cubic, solver_configs).run()
 
 
 # ==================================================================================================
@@ -151,6 +157,21 @@ def test_only_converged_solves_are_checked_with_the_evaluated_x_values_as_candid
     assert len(calls) == SIZE  # The check runs once per bisection solve.
     assert all(call["x_candidates"][:2] == (cubic.a, cubic.b) for call in calls)  # A solve evaluates a and b first.
     assert all(len(call["x_candidates"]) == N_BISECTION_FEVALS for call in calls)
+
+
+def test_a_task_holds_only_ids_and_survives_pickling(cubic):
+    """A task holds the ids of its function and solvers, and a pickled copy, as a worker receives it, runs alike."""
+    # --- arrange ----------------------
+    configs = [SolverConfigRegistry.config_from_id("bisection")]
+    task_on_cubic = _task_on_cubic(cubic, configs)
+
+    # --- act --------------------------
+    task_copy = pickle.loads(pickle.dumps(task_on_cubic))  # noqa: S301 — the data is this test's own
+
+    # --- assert -----------------------
+    assert (task_copy.function_id, task_copy.solver_ids) == ("f2.1.1[p1=0.2]", ("bisection",))
+    assert task_copy == task_on_cubic
+    assert task_copy.run().drop("wall_time_ns").equals(task_on_cubic.run().drop("wall_time_ns"))
 
 
 def test_a_task_is_reproducible_apart_from_wall_time(cubic):
