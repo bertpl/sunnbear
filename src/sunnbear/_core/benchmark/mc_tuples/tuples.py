@@ -23,7 +23,7 @@ N_SPANS = 8
 #  MCTuples
 # ==================================================================================================
 class MCTuples:
-    """`MCTuples` is a set of (u, v) tuples in the open unit square, stored as 2 read-only arrays."""
+    """`MCTuples` is a set of Monte Carlo (u, v) tuples in the open unit square, stored as 2 read-only arrays."""
 
     def __init__(self, u: ArrayLike, v: ArrayLike) -> None:
         """Store copies of `u` and `v` as read-only float64 arrays.

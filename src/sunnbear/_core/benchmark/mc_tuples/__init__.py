@@ -1,4 +1,6 @@
-"""This package holds the (u, v) tuple set: the class, its construction, and the shipped artifact.
+"""This package holds the Monte Carlo (MC) tuple set: the class, its construction, and the shipped artifact.
+
+The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples from.
 
 - `MCTuples` holds a set of tuples, maps them onto a test function, and reports their spread as
   `MCTuplesStats`;

@@ -1,4 +1,6 @@
-"""This module re-exports the benchmark layer's public names: the shipped (u, v) tuple set and its construction.
+"""This module re-exports the benchmark layer's public names: the shipped Monte Carlo (MC) tuple set and its generation.
+
+The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples from.
 
 `load_mc_tuples(size)` returns one size of the shipped set, `generate_mc_tuples` constructs an equivalent
 set, and `MCTuples` holds either one.

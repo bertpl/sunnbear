@@ -31,7 +31,7 @@ INCLUSION_CONSTRAINT_WEIGHT = 10.0
 #  generate_mc_tuples
 # ==================================================================================================
 def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) -> MCTuples:
-    """Construct a nested (u, v) tuple set in about `t_total_sec` s; its first `k` tuples form size `k`.
+    """Construct a nested Monte Carlo tuple set in about `t_total_sec` s; its first `k` tuples form size `k`.
 
     The construction runs 1 max-div solve per size in `MC_TUPLES_SIZES`, and splits `t_total_sec`
     over them as `MCTuplesConstructionSettings.from_total_time` describes:
