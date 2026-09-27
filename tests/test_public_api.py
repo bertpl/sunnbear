@@ -4,6 +4,8 @@ import pytest
 
 import sunnbear._core.artifacts.exceptions
 import sunnbear._core.artifacts.listing
+import sunnbear._core.benchmark
+import sunnbear._core.benchmark.tuple_set.exceptions
 import sunnbear._core.exceptions
 import sunnbear._core.functions.core
 import sunnbear._core.functions.core.exceptions
@@ -11,6 +13,7 @@ import sunnbear._core.solvers.bracketing
 import sunnbear._core.solvers.core
 import sunnbear._core.solvers.core.exceptions
 import sunnbear._core.stats
+import sunnbear.benchmark
 import sunnbear.data
 import sunnbear.exceptions
 import sunnbear.functions
@@ -40,6 +43,7 @@ def _is_submodule(module, name: str) -> bool:
     "public_module, implementation_modules",
     [
         (sunnbear.stats, (sunnbear._core.stats,)),
+        (sunnbear.benchmark, (sunnbear._core.benchmark,)),
         (sunnbear.data, (sunnbear._core.artifacts.listing,)),
         (sunnbear.functions, (sunnbear._core.functions.core,)),
         (sunnbear.solvers, (sunnbear._core.solvers.core, sunnbear._core.solvers.bracketing)),
@@ -47,6 +51,7 @@ def _is_submodule(module, name: str) -> bool:
             sunnbear.exceptions,
             (
                 sunnbear._core.artifacts.exceptions,
+                sunnbear._core.benchmark.tuple_set.exceptions,
                 sunnbear._core.exceptions,
                 sunnbear._core.functions.core.exceptions,
                 sunnbear._core.solvers.core.exceptions,

@@ -4,6 +4,7 @@ All derive from `SunnbearError`; each is defined in the layer that raises it and
 """
 
 from ._core.artifacts.exceptions import ArtifactError
+from ._core.benchmark.tuple_set.exceptions import UvTuplesConstructionError
 from ._core.exceptions import SunnbearError
 from ._core.functions.core.exceptions import FormulaTaxonomyError, InvalidParamsError, UnknownFormulaError
 from ._core.solvers.core.exceptions import (
@@ -25,4 +26,5 @@ __all__ = [
     "SunnbearError",
     "UnknownFormulaError",
     "UnknownSolverConfigError",
+    "UvTuplesConstructionError",
 ]

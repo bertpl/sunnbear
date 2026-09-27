@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `sunnbear.benchmark.uv_tuples`: the shipped (u, v) sample set for Monte Carlo benchmarks, nested across sizes 32–1024, with its spread statistics and `generate_uv_tuples` to regenerate an equivalent set within a given time
+
 ### Changed
 
 ### Deprecated
