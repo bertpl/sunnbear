@@ -3,7 +3,7 @@
 - the loop
 - the stopping rule
 - the final interval
-- state subclasses
+- subclasses of `SolveState`
 """
 
 import math
@@ -106,7 +106,10 @@ def test_interrupted_loop_reports_the_last_evaluated_point():
     "f, cls_expected", [(_linear, IncreasingInterval), (lambda x: -_linear(x), DecreasingInterval)]
 )
 def test_the_final_interval_holds_the_root_within_2_xtol_as_plain_floats(f, cls_expected):
-    """A converged solve reports its last interval in plain floats, no wider than `2·xtol`, around the root and `x`."""
+    """A converged solve reports its last interval, of its orientation's class and in plain floats.
+
+    The interval contains the root, is no wider than `2·xtol`, and has `x` as its midpoint.
+    """
     # --- act --------------------------
     result = _HalvingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=200)
 

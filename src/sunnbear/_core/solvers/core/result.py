@@ -51,10 +51,10 @@ class SolveResult:
             per flop type; function evaluation cost is excluded.
         history: Every ``(x, f(x))`` evaluated, in order; ``None`` when history
             was not recorded.
-        final_interval: The last interval of a bracketing solve, whatever its status. The function
-            values at its bounds differ in sign, so a root lies within it. ``None`` for a
-            non-bracketing solver, and for a solve that ended while evaluating the function at the
-            interval bounds, because it was exactly zero or failed there.
+        final_interval: The last interval of a bracketing solve, whatever its status; the function
+            values at its bounds differ in sign, or one is zero, so a root lies within it. ``None``
+            for a non-bracketing solver, and when the solve ended at ``f(a)`` or ``f(b)``, because
+            either was zero or failed.
     """
 
     x: float
