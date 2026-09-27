@@ -29,8 +29,9 @@ def is_solution_correct(
     has opposite signs. The points are evaluated in this order, stopping at the first proof:
 
     1. `x_found`, `x_found - xtol` and `x_found + xtol`;
-    2. the `candidate_points` within `xtol` of `x_found`, for example the bounds of a bracketing solve's
-       final interval: `f` has opposite signs at these bounds, so they prove that solve's answer correct;
+    2. the `candidate_points` within `xtol` of `x_found`, for example the points at which the solver
+       evaluated `f`: for a bracketing solve, they include the bounds of its final interval, where `f` has
+       opposite signs, so they prove that solve's answer correct;
     3. random points drawn from `seed`, alternately below and above `x_found`.
 
     A correct answer of a bracketing solve is usually proven in 2 or 3 evaluations; a wrong answer
@@ -44,8 +45,9 @@ def is_solution_correct(
         xtol: The largest distance from `x_found` at which a root still makes the answer correct.
         seed: The seed of the random points, so that the verdict is reproducible; derive it with
             `derive_seed` and `SeedPurpose.CORRECTNESS_CHECK`.
-        candidate_points: Points to evaluate before the random points, such as the bounds of a bracketing
-            solve's final interval; points farther than `xtol` from `x_found` are skipped.
+        candidate_points: Points to evaluate before the random points, such as the points at which the
+            solver evaluated `f` (`SolveResult.history`); points farther than `xtol` from `x_found` are
+            skipped.
 
     Raises:
         ValueError: If `xtol` is not positive and finite.
