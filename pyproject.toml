@@ -10,24 +10,24 @@ license-files = ["LICENSE"]
 authors = [
     { name = "Bert Pluymers", email = "bert.pluymers@gmail.com" }
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
-    # Per-Python floors: each is the earliest version shipping a wheel for that
-    # CPython (and, for numpy, admitted by the numba floor on the same interpreter),
+    # Per-Python minimal versions: each is the earliest version shipping a wheel for that
+    # CPython (and, for numpy, admitted by the numba minimal version on the same interpreter),
     # so `lowest-direct` installs (not source-builds) across the whole matrix.
-    "numpy>=2.0.0; python_version < '3.13'",
+    "numpy>=2.0.0; python_version == '3.12'",
     "numpy>=2.1.0; python_version == '3.13'",
     "numpy>=2.3.2; python_version >= '3.14'",
-    "numba>=0.60.0; python_version < '3.13'",
+    "numba>=0.60.0; python_version == '3.12'",
     "numba>=0.66.0; python_version == '3.13'",
     "numba>=0.66.0; python_version >= '3.14'",
-    "matplotlib>=3.8; python_version < '3.13'",
+    "matplotlib>=3.8; python_version == '3.12'",
     "matplotlib>=3.10.7; python_version == '3.13'",
     "matplotlib>=3.10.7; python_version >= '3.14'",
     "counted-float>=1.2.1",
-    # pydantic: counted-float's floors, which already hold in every install (counted-float
-    # depends on pydantic), with 3.11 on the 3.12 floor.
-    "pydantic>=2.7; python_version < '3.13'",
+    # These pydantic minimal versions equal counted-float's own pydantic minimal versions; counted-float
+    # depends on pydantic, so every install already satisfies them.
+    "pydantic>=2.7; python_version == '3.12'",
     "pydantic>=2.9; python_version == '3.13'",
     "pydantic>=2.12; python_version >= '3.14'",
     "typing-extensions>=4.4",  # TypeVar defaults (PEP 696) on Python < 3.13
@@ -44,7 +44,6 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
     # Python versions kept in sync with .python-versions (release.py enforces this)
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
@@ -111,7 +110,7 @@ packages = ["src/sunnbear"]
 
 [tool.ruff]
 line-length = 120
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
 # Broad rule set; PLC/PLR (pylint conventions/refactors) are deliberately excluded

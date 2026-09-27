@@ -2,7 +2,7 @@
 
 `.python-versions` is the declared support set, tied to the trove classifiers by `scripts/release.py`
 but to nothing in CI: the test matrix in `.github/workflows/_unit_tests.yml` is hand-curated, so a
-version can sit in `.python-versions`, pass the release check, and reach PyPI with no test leg on it.
+version can sit in `.python-versions`, pass the release check, and reach PyPI with no matrix entry on it.
 
 Usage:
 
@@ -17,7 +17,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 PYTHON_VERSIONS_FILE = REPO_ROOT / ".python-versions"
 UNIT_TESTS_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "_unit_tests.yml"
 
-# Matrix legs quote their Python as `python: "3.11"`. The composite action's `python_version:` key
+# Matrix entries give their Python version as `python: "<version>"`. The composite action's `python_version:` key
 # carries no `python:`-quoted literal, so the pattern matches the matrix versions and nothing else.
 _MATRIX_PYTHON = re.compile(r'\bpython:\s*"([^"]+)"')
 
@@ -28,16 +28,16 @@ def read_declared_versions(path: Path = PYTHON_VERSIONS_FILE) -> set[str]:
 
 
 def read_tested_versions(path: Path = UNIT_TESTS_WORKFLOW) -> set[str]:
-    """Return the Python value of every leg in the workflow's test matrix."""
+    """Return the Python value of every entry in the workflow's test matrix."""
     return set(_MATRIX_PYTHON.findall(path.read_text(encoding="utf-8")))
 
 
 def uncovered_versions(declared: set[str], tested: set[str]) -> set[str]:
-    """Return declared versions with no matching matrix leg; extra tested legs are allowed.
+    """Return declared versions with no matching matrix entry; extra tested entries are allowed.
 
-    A declared minor is covered by an exact match or by a leg pinned to a fuller version of that
-    minor (`3.15` is covered by a `3.15.0rc1` leg); the dot in the prefix test keeps `3.1` from
-    counting as covered by a `3.15` leg.
+    A declared minor is covered by an exact match or by an entry pinned to a fuller version of that
+    minor (`3.15` is covered by a `3.15.0rc1` entry); the dot in the prefix test keeps `3.1` from
+    counting as covered by a `3.15` entry.
     """
     return {d for d in declared if not any(t == d or t.startswith(f"{d}.") for t in tested)}
 
@@ -49,7 +49,7 @@ def main() -> int:
     missing = uncovered_versions(declared, tested)
     if missing:
         print(
-            f".python-versions declares {sorted(missing)} with no matching leg in the "
+            f".python-versions declares {sorted(missing)} with no matching entry in the "
             f"{UNIT_TESTS_WORKFLOW.relative_to(REPO_ROOT)} test matrix (matrix tests {sorted(tested)}).",
             file=sys.stderr,
         )

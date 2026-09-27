@@ -10,12 +10,10 @@ Defining a concrete subclass validates its name and registers it with
 import re
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
-from typing import ClassVar, Generic, TypeVar
+from typing import ClassVar
 
 from .registry import ArtifactRegistry
 from .source import ArtifactSource
-
-T = TypeVar("T")
 
 # An artifact's name is a plain slug matching this pattern, because it also names the artifact's
 # folder and forms part of `ArtifactManifest.short_identity`.
@@ -25,7 +23,7 @@ _ARTIFACT_NAME_PATTERN = re.compile(r"[a-z][a-z0-9_]*")
 # ==================================================================================================
 #  ArtifactDeclaration
 # ==================================================================================================
-class ArtifactDeclaration(ABC, Generic[T]):
+class ArtifactDeclaration[T](ABC):
     """`ArtifactDeclaration` is the base class for artifact declarations; each concrete subclass declares one artifact.
 
     Example::
