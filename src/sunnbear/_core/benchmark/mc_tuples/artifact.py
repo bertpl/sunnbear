@@ -1,4 +1,4 @@
-"""The shipped (u, v) tuple set is the data artifact `mc_tuples`; `mc_tuples(size)` returns one size of it.
+"""The shipped (u, v) tuple set is the data artifact `mc_tuples`; `load_mc_tuples(size)` returns one size of it.
 
 The artifact is 1 CSV file with columns `u` and `v`, one row per tuple, in prefix order: the first
 `k` rows are the set of size `k`, for every supported size.
@@ -44,9 +44,9 @@ class MCTuplesDeclaration(ArtifactDeclaration[MCTuples]):
 
 
 # ==================================================================================================
-#  mc_tuples
+#  load_mc_tuples
 # ==================================================================================================
-def mc_tuples(size: int) -> MCTuples:
+def load_mc_tuples(size: int) -> MCTuples:
     """Return the shipped tuple set of `size` tuples: the first `size` rows of the `mc_tuples` artifact.
 
     The artifact is read once per process.

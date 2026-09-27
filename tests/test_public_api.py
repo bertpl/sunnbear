@@ -5,6 +5,7 @@ import pytest
 import sunnbear._core.artifacts.exceptions
 import sunnbear._core.artifacts.listing
 import sunnbear._core.benchmark
+import sunnbear._core.benchmark.mc_tuples.exceptions
 import sunnbear._core.exceptions
 import sunnbear._core.functions.core
 import sunnbear._core.functions.core.exceptions
@@ -18,10 +19,6 @@ import sunnbear.exceptions
 import sunnbear.functions
 import sunnbear.solvers
 import sunnbear.stats
-
-# `sunnbear._core.benchmark.mc_tuples` as an attribute is the re-exported function, not the subpackage, so the
-# subpackage's module is imported by name.
-from sunnbear._core.benchmark.mc_tuples import exceptions as mc_tuples_exceptions
 
 
 def _public_names(*modules) -> set[str]:
@@ -54,7 +51,7 @@ def _is_submodule(module, name: str) -> bool:
             sunnbear.exceptions,
             (
                 sunnbear._core.artifacts.exceptions,
-                mc_tuples_exceptions,
+                sunnbear._core.benchmark.mc_tuples.exceptions,
                 sunnbear._core.exceptions,
                 sunnbear._core.functions.core.exceptions,
                 sunnbear._core.solvers.core.exceptions,

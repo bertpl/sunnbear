@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `sunnbear.benchmark.mc_tuples`: the shipped set of (u, v) tuples that Monte Carlo benchmarks sample from, nested across sizes 32–1024, with its spread statistics and `generate_mc_tuples` to regenerate an equivalent set within a given time
+- `sunnbear.benchmark.load_mc_tuples`: the shipped set of (u, v) tuples that Monte Carlo benchmarks sample from, nested across sizes 32–1024, with its spread statistics and `generate_mc_tuples` to regenerate an equivalent set within a given time
 
 ### Changed
 
