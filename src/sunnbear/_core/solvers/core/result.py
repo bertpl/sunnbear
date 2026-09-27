@@ -56,3 +56,8 @@ class SolveResult:
     n_fevals: int
     flop_counts: FlopCounts
     history: tuple[tuple[float, float], ...] | None
+
+    @property
+    def evaluated_x_values(self) -> tuple[float, ...]:
+        """Return the x-value of every evaluation, in order; empty when history was not recorded."""
+        return tuple(x for x, _ in self.history or ())

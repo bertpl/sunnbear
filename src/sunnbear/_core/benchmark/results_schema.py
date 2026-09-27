@@ -1,8 +1,9 @@
-"""`RESULTS_SCHEMA` fixes the columns and types of the benchmark results table, 1 row per solve.
+"""`RESULTS_SCHEMA` defines the columns and types of the benchmark results table, 1 row per solve.
 
-Each row is 1 solver on 1 Monte Carlo sample of 1 test function. The identity columns come first, then the
-raw measurements. Nothing derived is stored, such as a censored evaluation count or a weighted flop cost,
-so a change to how those are derived never leaves stored results stale.
+Each row is 1 solver on 1 Monte Carlo sample of 1 test function.
+
+Nothing derived is stored, such as an evaluation count adjusted for failed solves or a flop cost weighted
+per flop type, so a change to how those are derived never leaves stored results stale.
 """
 
 import polars as pl
@@ -17,24 +18,24 @@ def flops_column_name(flop_type: FlopType) -> str:
 
 
 RESULTS_SCHEMA: dict[str, pl.DataType] = {
-    # The identity of the solve.
+    # These columns identify the solve.
     "solver_id": pl.String(),
     "solver_version": pl.Int32(),
     "function_id": pl.String(),
     "size": pl.Int32(),
     "mc_sample_idx": pl.Int32(),
-    # The Monte Carlo sample: its (u, v) tuple, and the (xtol, c) values that it maps to.
+    # These columns hold the Monte Carlo sample: its (u, v) tuple and that tuple's (xtol, c) values.
     "u": pl.Float64(),
     "v": pl.Float64(),
     "xtol": pl.Float64(),
     "c": pl.Float64(),
-    # The raw measurements.
+    # These columns hold the raw measurements.
     "x_found": pl.Float64(),
     "status": pl.Enum([status.value for status in SolveStatus]),
     "n_fevals": pl.Int32(),
-    "correct": pl.Boolean(),
+    "is_correct": pl.Boolean(),
     "wall_time_ns": pl.Int64(),
-    # 1 column per flop type, holding the raw count; the weights are applied at analysis time, because
-    # counted-float's weights change without a version of their own.
+    # Each flop type gets 1 column that holds its raw count. The weights are applied at analysis time,
+    # because counted-float can change its flop weights without any version number that records the change.
     **{flops_column_name(flop_type): pl.Int32() for flop_type in FlopType},
 }

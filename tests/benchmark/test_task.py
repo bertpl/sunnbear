@@ -4,7 +4,7 @@ import polars as pl
 import pytest
 from counted_float import FlopType
 
-import sunnbear.functions as functions  # The module, so pytest does not try to collect the `TestFunction` class.
+import sunnbear.functions as functions  # Import the module, so pytest does not try to collect `TestFunction`.
 from sunnbear._core.benchmark import task
 from sunnbear._core.benchmark.mc_tuples import load_mc_tuples
 from sunnbear._core.benchmark.results_schema import RESULTS_SCHEMA, flops_column_name
@@ -19,10 +19,10 @@ SIZE = 32
 # ==================================================================================================
 #  Test-local solvers and fixtures
 # ==================================================================================================
-class _MidpointSolver(Solver):
-    """`_MidpointSolver` reports the interval's midpoint as converged without evaluating it, a wrong answer."""
+class _UnevaluatedMidpointSolver(Solver):
+    """`_UnevaluatedMidpointSolver` reports the unevaluated midpoint as converged, so its answer is wrong."""
 
-    name = "midpoint"
+    name = "unevaluated_midpoint"
     version = 1
 
     def _solve(self, state: SolveState) -> float:
@@ -47,21 +47,21 @@ def cubic() -> functions.TestFunction:
 
 
 @pytest.fixture
-def test_local_configs(isolated_solver_config_registry) -> tuple[SolverConfig, SolverConfig]:
-    """Return configs of `_MidpointSolver` and `_StallingSolver`, registered only for the test."""
+def midpoint_and_stalling_configs(isolated_solver_config_registry) -> tuple[SolverConfig, SolverConfig]:
+    """Return configs of `_UnevaluatedMidpointSolver` and `_StallingSolver`, registered only for the test."""
 
-    class _MidpointConfig(SolverConfig):
-        solver_cls = _MidpointSolver
+    class _UnevaluatedMidpointConfig(SolverConfig):
+        solver_cls = _UnevaluatedMidpointSolver
         role = SolverRole.USER_OTHER
 
     class _StallingConfig(SolverConfig):
         solver_cls = _StallingSolver
         role = SolverRole.USER_OTHER
 
-    return SolverConfigRegistry.config_from_id("midpoint"), SolverConfigRegistry.config_from_id("stalling")
+    return SolverConfigRegistry.config_from_id("unevaluated_midpoint"), SolverConfigRegistry.config_from_id("stalling")
 
 
-def _run(cubic: functions.TestFunction, solver_configs, root_seed: int = 1) -> pl.DataFrame:
+def _run_task_on_cubic(cubic: functions.TestFunction, solver_configs, root_seed: int = 1) -> pl.DataFrame:
     """Run the task on the cubic with the first `SIZE` shipped tuples."""
     return run_benchmark_task(
         function=cubic,
@@ -80,30 +80,31 @@ def test_a_task_gives_1_row_per_sample_and_solver_in_the_results_schema(cubic):
     # --- arrange ----------------------
     configs = [SolverConfigRegistry.config_from_id("bisection"), SolverConfigRegistry.config_from_id("regula_falsi")]
     xtol_min, xtol_max = compute_xtol_range(a=cubic.a, b=cubic.b, n_bisection_fevals=N_BISECTION_FEVALS)
-    tuples = load_mc_tuples(SIZE)
+    mc_tuples = load_mc_tuples(SIZE)
 
     # --- act --------------------------
-    results = _run(cubic, configs)
+    results = _run_task_on_cubic(cubic, configs)
 
     # --- assert -----------------------
     assert dict(results.schema) == RESULTS_SCHEMA
+    assert results.null_count().sum_horizontal().item() == 0  # The row builder fills every schema column.
     assert results["solver_id"].to_list() == ["bisection", "regula_falsi"] * SIZE
     assert results["mc_sample_idx"].to_list() == [i for i in range(SIZE) for _ in configs]
     assert set(results["function_id"]) == {"f2.1.1[p1=0.2]"}
     assert set(results["size"]) == {SIZE}
-    assert results["u"].to_list()[::2] == tuples.u.tolist()
+    assert results["u"].to_list()[::2] == mc_tuples.u.tolist()
     assert results["xtol"].is_between(xtol_min, xtol_max, closed="left").all()
     assert results["c"].is_between(cubic.c_min, cubic.c_max).all()
 
 
 def test_bisection_is_correct_in_exactly_n_bisection_fevals_with_counted_flops(cubic):
-    """Every bisection solve converges to a correct answer in `N_BISECTION_FEVALS`, with its flops in their columns."""
+    """Every bisection solve is correct in exactly `N_BISECTION_FEVALS`, with its flop counts in the flop columns."""
     # --- act --------------------------
-    results = _run(cubic, [SolverConfigRegistry.config_from_id("bisection")])
+    results = _run_task_on_cubic(cubic, [SolverConfigRegistry.config_from_id("bisection")])
 
     # --- assert -----------------------
     assert (results["status"] == SolveStatus.CONVERGED.value).all()
-    assert results["correct"].all()
+    assert results["is_correct"].all()
     assert (results["n_fevals"] == N_BISECTION_FEVALS).all()
     assert (results["wall_time_ns"] > 0).all()
     assert (results[flops_column_name(FlopType.COMP)] > 0).all()
@@ -112,21 +113,21 @@ def test_bisection_is_correct_in_exactly_n_bisection_fevals_with_counted_flops(c
 # ==================================================================================================
 #  Correctness checks
 # ==================================================================================================
-def test_a_converged_but_wrong_answer_is_not_correct(cubic, test_local_configs):
+def test_a_converged_but_wrong_answer_is_not_correct(cubic, midpoint_and_stalling_configs):
     """The midpoint is reported as converged, but no root lies within `xtol` of it."""
     # --- arrange ----------------------
-    midpoint_config, _ = test_local_configs
+    unevaluated_midpoint_config, _ = midpoint_and_stalling_configs
 
     # --- act --------------------------
-    results = _run(cubic, [midpoint_config])
+    results = _run_task_on_cubic(cubic, [unevaluated_midpoint_config])
 
     # --- assert -----------------------
     assert (results["status"] == SolveStatus.CONVERGED.value).all()
-    assert not results["correct"].any()
+    assert not results["is_correct"].any()
 
 
 def test_only_converged_solves_are_checked_with_the_evaluated_x_values_as_candidates(
-    cubic, test_local_configs, monkeypatch
+    cubic, midpoint_and_stalling_configs, monkeypatch
 ):
     """The check runs once per converged solve, never for a solve out of budget, and receives the evaluated x-values."""
     # --- arrange ----------------------
@@ -137,18 +138,18 @@ def test_only_converged_solves_are_checked_with_the_evaluated_x_values_as_candid
         return True
 
     monkeypatch.setattr(task, "is_solution_correct", is_solution_correct_spy)
-    _, stalling_config = test_local_configs
+    _, stalling_config = midpoint_and_stalling_configs
     configs = [SolverConfigRegistry.config_from_id("bisection"), stalling_config]
 
     # --- act --------------------------
-    results = _run(cubic, configs)
+    results = _run_task_on_cubic(cubic, configs)
 
     # --- assert -----------------------
     stalled = results.filter(pl.col("solver_id") == "stalling")
     assert (stalled["status"] == SolveStatus.MAX_FEVALS.value).all()
-    assert not stalled["correct"].any()
-    assert len(calls) == SIZE  # 1 per bisection solve
-    assert all(call["x_candidates"][:2] == [cubic.a, cubic.b] for call in calls)  # a solve evaluates a and b first
+    assert not stalled["is_correct"].any()
+    assert len(calls) == SIZE  # The check runs once per bisection solve.
+    assert all(call["x_candidates"][:2] == (cubic.a, cubic.b) for call in calls)  # A solve evaluates a and b first.
     assert all(len(call["x_candidates"]) == N_BISECTION_FEVALS for call in calls)
 
 
@@ -158,7 +159,7 @@ def test_a_task_is_reproducible_apart_from_wall_time(cubic):
     configs = [SolverConfigRegistry.config_from_id("bisection"), SolverConfigRegistry.config_from_id("regula_falsi")]
 
     # --- act --------------------------
-    first, second = _run(cubic, configs), _run(cubic, configs)
+    first, second = _run_task_on_cubic(cubic, configs), _run_task_on_cubic(cubic, configs)
 
     # --- assert -----------------------
     assert first.drop("wall_time_ns").equals(second.drop("wall_time_ns"))
