@@ -1,4 +1,4 @@
-"""`is_solution_correct` finds a proof that a root lies within `xtol`, in a fixed order of points and within a limit."""
+"""`is_solution_correct` looks for a proof that a root lies within `xtol` of `x_found`, in a fixed order of points."""
 
 import math
 
@@ -52,7 +52,7 @@ def test_a_correct_answer_is_proven_by_the_first_3_points(x_found, n_fevals_expe
 
 
 def test_a_candidate_point_within_xtol_proves_what_the_first_3_points_miss():
-    """A candidate point in the dip gives the sign change on the 4th evaluation; the one beyond `xtol` is skipped."""
+    """A candidate point in the dip gives the sign change on the 4th evaluation; the candidate point 1.25 is skipped."""
     # --- arrange ----------------------
     f = _RecordingFunction(_narrow_dip)
 
@@ -65,7 +65,7 @@ def test_a_candidate_point_within_xtol_proves_what_the_first_3_points_miss():
 
 
 def test_random_points_find_a_sign_change_that_the_fixed_points_miss():
-    """Without candidate points, the random points reach the dip within the evaluation limit."""
+    """Without candidate points, the random points reach the dip within `CORRECTNESS_CHECK_MAX_FEVALS` evaluations."""
     # --- arrange ----------------------
     f = _RecordingFunction(_narrow_dip)
 
