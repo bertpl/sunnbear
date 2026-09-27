@@ -1,7 +1,6 @@
 """`run_benchmark_task` runs 1 benchmark task: every solver over every Monte Carlo sample of 1 test function.
 
-A task needs nothing beyond its own inputs, so tasks can run in separate worker processes. Its result rows
-follow `RESULTS_SCHEMA`.
+A task needs nothing beyond its own inputs, so tasks can run in separate worker processes.
 """
 
 import time
@@ -29,35 +28,34 @@ def run_benchmark_task(
 ) -> pl.DataFrame:
     """Solve `function` with every solver at every Monte Carlo sample, and return 1 row per solve.
 
-    Each sample maps its (u, v) tuple to a tolerance `xtol` within the range that `compute_xtol_range`
-    derives from `n_bisection_fevals`, and to a value of `c` within `[function.c_min, function.c_max]`.
+    Each sample maps its (u, v) tuple to a tolerance `xtol` within the `xtol` range derived from
+    `n_bisection_fevals` by `compute_xtol_range`, and to a value of the function's parameter `c` within
+    `[function.c_min, function.c_max]`.
 
-    Every solver solves `f(x, c)` on the function's interval with that tolerance, within an evaluation
-    budget of `MAX_FEVALS_FACTOR` times `n_bisection_fevals`, and the solve is timed on a monotonic clock.
-    The timed span includes recording every evaluated x-value, which the correctness check needs.
+    Every solver solves `f(x, c)` on the function's interval with that tolerance, within the evaluation
+    budget that `max_fevals_for` derives from `n_bisection_fevals`, and the solve is timed on a monotonic
+    clock. The timed span includes recording every evaluated x-value, which the correctness check probes
+    first, as `x_candidates`.
 
     A solve that reports convergence is checked with `is_solution_correct`; a solve with any other status
     is not checked, and its row's `is_correct` is `False`.
-
-    The check probes the x-values at which the solver evaluated the function before any random x-value, so
-    the bounds of a bracketing solve's final interval, where the function has opposite signs, prove a
-    correct answer.
 
     The random x-values of the check are seeded per test function and sample, so all solvers of a sample
     are checked against the same random x-values.
 
     Args:
         function: A calibrated test function.
-        solver_configs: The solvers to run, each rebuilt once for the task.
+        solver_configs: The solvers to run; each config is instantiated once and its solver reused for every sample.
         mc_tuples: The Monte Carlo samples; their count is the `size` column.
         n_bisection_fevals: Bisection's evaluation count, from which the `xtol` range and the evaluation
             budget follow.
         root_seed: The run's root seed, from which the seeds of the correctness checks are derived.
 
     Returns:
-        1 row per (sample, solver) pair, sample by sample, with the columns and types of `RESULTS_SCHEMA`.
+        One row per (sample, solver) pair, sample by sample, with the columns and types of `RESULTS_SCHEMA`.
     """
     # --- per-task values ------------------------
+    # `to_xtol_and_c` spans the range from its lower bound alone, so the upper bound is not needed.
     xtol_min, _ = compute_xtol_range(a=function.a, b=function.b, n_bisection_fevals=n_bisection_fevals)
     max_fevals = max_fevals_for(n_bisection_fevals=n_bisection_fevals)
     xtols, cs = mc_tuples.to_xtol_and_c(xtol_min, function.c_min, function.c_max)

@@ -2,8 +2,9 @@
 
 Each row is 1 solver on 1 Monte Carlo sample of 1 test function.
 
-Nothing derived is stored, such as an evaluation count adjusted for failed solves or a flop cost weighted
-per flop type, so a change to how those are derived never leaves stored results stale.
+The table stores only raw measurements, not values derived from them, such as an evaluation count adjusted
+for failed solves or a flop cost weighted per flop type, so a change to how such values are derived never
+leaves stored results stale.
 """
 
 import polars as pl
@@ -35,7 +36,7 @@ RESULTS_SCHEMA: dict[str, pl.DataType] = {
     "n_fevals": pl.Int32(),
     "is_correct": pl.Boolean(),
     "wall_time_ns": pl.Int64(),
-    # Each flop type gets 1 column that holds its raw count. The weights are applied at analysis time,
-    # because counted-float can change its flop weights without any version number that records the change.
+    # Each flop type gets 1 column that holds its raw count. The per-flop-type cost weights are applied at
+    # analysis time, because counted-float can change them without any version number that records the change.
     **{flops_column_name(flop_type): pl.Int32() for flop_type in FlopType},
 }
