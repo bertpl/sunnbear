@@ -8,7 +8,10 @@ _ARGS = (42, SeedPurpose.CORRECTNESS_CHECK, "f2.1.1[p1=0.2]", 7)
 
 
 def test_the_seed_of_known_values_is_fixed():
-    """The seed of known values is pinned, so a change to the scheme, which would change past runs, fails here."""
+    """The seed of known values is pinned, so a change to how `derive_seed` computes seeds fails this test.
+
+    Such a change would make past runs irreproducible.
+    """
     # --- act / assert -----------------
     assert derive_seed(*_ARGS) == 7745312542909566469
 

@@ -4,7 +4,7 @@ import math
 
 import pytest
 
-from sunnbear._core.benchmark.correctness import VERIFY_MAX_FEVALS, is_solution_correct
+from sunnbear._core.benchmark.correctness import CORRECTNESS_CHECK_MAX_FEVALS, is_solution_correct
 
 
 # ==================================================================================================
@@ -23,7 +23,7 @@ class _RecordingFunction:
 
 
 def _narrow_dip(x: float) -> float:
-    """Return a function that is positive at 0 and ±1, and negative only on the narrow interval (0.249, 0.251)."""
+    """Return `(x - 0.25)^2 - 1e-6`, which is positive at 0 and ±1 and negative only on the dip (0.249, 0.251)."""
     return (x - 0.25) ** 2 - 1e-6
 
 
@@ -51,13 +51,13 @@ def test_a_correct_answer_is_proven_by_the_first_3_points(x_found, n_fevals_expe
     assert len(f.xs) == n_fevals_expected
 
 
-def test_a_prior_within_xtol_proves_what_the_first_3_points_miss():
-    """A prior inside the dip gives the sign change on the 4th evaluation; the prior outside `xtol` is skipped."""
+def test_a_candidate_point_within_xtol_proves_what_the_first_3_points_miss():
+    """A candidate point in the dip gives the sign change on the 4th evaluation; the one beyond `xtol` is skipped."""
     # --- arrange ----------------------
     f = _RecordingFunction(_narrow_dip)
 
     # --- act --------------------------
-    is_correct = is_solution_correct(f, 0.0, xtol=1.0, seed=1, priors=[1.25, 0.25])
+    is_correct = is_solution_correct(f, 0.0, xtol=1.0, seed=1, candidate_points=[1.25, 0.25])
 
     # --- assert -----------------------
     assert is_correct
@@ -65,7 +65,7 @@ def test_a_prior_within_xtol_proves_what_the_first_3_points_miss():
 
 
 def test_random_points_find_a_sign_change_that_the_fixed_points_miss():
-    """Without priors, the random points reach the dip within the evaluation limit."""
+    """Without candidate points, the random points reach the dip within the evaluation limit."""
     # --- arrange ----------------------
     f = _RecordingFunction(_narrow_dip)
 
@@ -74,11 +74,11 @@ def test_random_points_find_a_sign_change_that_the_fixed_points_miss():
 
     # --- assert -----------------------
     assert is_correct
-    assert 3 < len(f.xs) < VERIFY_MAX_FEVALS
+    assert 3 < len(f.xs) < CORRECTNESS_CHECK_MAX_FEVALS
 
 
 def test_a_failed_evaluation_proves_nothing_but_counts():
-    """NaN at `x_found` and a raise at `x_found - xtol` are skipped; the sign change needs 2 more points."""
+    """NaN at `x_found` and an exception at `x_found - xtol` prove nothing, so the proof needs more than 3 points."""
 
     # --- arrange ----------------------
     def f_raw(x: float) -> float:
@@ -87,7 +87,7 @@ def test_a_failed_evaluation_proves_nothing_but_counts():
         elif x == 0.3 - 1e-3:
             raise ZeroDivisionError
         else:
-            return x - 0.3 + 0.5e-3  # root at 0.2995, within xtol of 0.3
+            return x - 0.3 + 0.5e-3  # The root lies at 0.2995, within xtol of 0.3.
 
     f = _RecordingFunction(f_raw)
 
@@ -104,7 +104,7 @@ def test_a_failed_evaluation_proves_nothing_but_counts():
 #  Wrong answers and the random points
 # ==================================================================================================
 def test_a_wrong_answer_spends_the_whole_limit():
-    """With the root far outside `xtol`, no proof exists, and every one of `VERIFY_MAX_FEVALS` evaluations is spent."""
+    """With the root far beyond `xtol`, no proof exists, so all `CORRECTNESS_CHECK_MAX_FEVALS` evaluations are spent."""
     # --- arrange ----------------------
     f = _RecordingFunction(lambda x: x - 10.0)
 
@@ -113,7 +113,7 @@ def test_a_wrong_answer_spends_the_whole_limit():
 
     # --- assert -----------------------
     assert not is_correct
-    assert len(f.xs) == VERIFY_MAX_FEVALS
+    assert len(f.xs) == CORRECTNESS_CHECK_MAX_FEVALS
 
 
 def test_the_random_points_stay_within_xtol_and_alternate_sides():
