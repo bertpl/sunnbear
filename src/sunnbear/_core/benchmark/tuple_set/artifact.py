@@ -59,6 +59,9 @@ def uv_tuples(size: int) -> UvTuples:
     return _load_full_set().first(size)
 
 
+# ==================================================================================================
+#  Helpers
+# ==================================================================================================
 @functools.cache
 def _load_full_set() -> UvTuples:
     """Return the full shipped tuple set, read from the `uv_tuples` artifact on the first call."""

@@ -1,8 +1,9 @@
 """Generate the shipped (u, v) tuple set and save it as the `uv_tuples` data artifact.
 
-The maintainer runs this by hand whenever the tuple set is regenerated, never at release time. It
-calls `sunnbear.benchmark.generate_uv_tuples`, prints the spread of every size, and saves the set
-through `ArtifactStore`, which records the call and max-div's version in the artifact's manifest.
+The maintainer runs this script by hand whenever the tuple set is regenerated, never at release
+time. The script calls `sunnbear.benchmark.generate_uv_tuples`, prints the spread of every size, and
+saves the set through `ArtifactStore`, which records the `generate_uv_tuples` call with its
+arguments, and max-div's version, in the artifact's manifest.
 
 Usage:
 

@@ -1,4 +1,4 @@
-"""This package holds the benchmark layer: so far, the (u, v) tuple set that drives every Monte Carlo benchmark run.
+"""This package holds the benchmark layer: the (u, v) tuple set that drives every Monte Carlo benchmark run.
 
 Importing it registers the `uv_tuples` artifact declaration with `ArtifactRegistry`.
 """

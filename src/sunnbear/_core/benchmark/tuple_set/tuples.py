@@ -25,7 +25,7 @@ N_SPANS = 8
 class UvTuples:
     """`UvTuples` is a set of (u, v) tuples in the open unit square, stored as 2 read-only arrays."""
 
-    def __init__(self, u: ArrayLike, v: ArrayLike):
+    def __init__(self, u: ArrayLike, v: ArrayLike) -> None:
         """Store copies of `u` and `v` as read-only float64 arrays.
 
         Raises:
@@ -35,7 +35,9 @@ class UvTuples:
         u_array = np.array(u, dtype=np.float64)
         v_array = np.array(v, dtype=np.float64)
         if u_array.ndim != 1 or u_array.shape != v_array.shape:
-            raise ValueError(f"u and v must be 1-D arrays of equal length (got shapes {u_array.shape}, {v_array.shape}).")
+            raise ValueError(
+                f"u and v must be 1-D arrays of equal length (got shapes {u_array.shape}, {v_array.shape})."
+            )
         if u_array.size < 2:
             raise ValueError(f"A tuple set holds at least 2 tuples (got {u_array.size}).")
         if not (np.all((u_array > 0) & (u_array < 1)) and np.all((v_array > 0) & (v_array < 1))):
@@ -64,7 +66,7 @@ class UvTuples:
         return self._u.size
 
     def first(self, size: int) -> "UvTuples":
-        """Return the first `size` tuples, which form the set of that size when this set is a shipped one.
+        """Return the first `size` tuples; for the full shipped set, they form the shipped set of that size.
 
         Raises:
             ValueError: If `size` is below 2 or above this set's size.
@@ -79,7 +81,7 @@ class UvTuples:
     def to_xtol_and_c(self, xtol_min: float, c_min: float, c_max: float) -> tuple[np.ndarray, np.ndarray]:
         """Return the `(xtol, c)` value of every tuple for one test function.
 
-        The mapping is `xtol = xtol_min · 2^u` and `c = c_min + v · (c_max − c_min)`, so `xtol` is
+        The mapping is `xtol = xtol_min · 2^u` and `c = c_min + v · (c_max - c_min)`, so `xtol` is
         log-uniform within `(xtol_min, 2·xtol_min)` and `c` is uniform within `(c_min, c_max)`.
 
         Returns:
@@ -91,12 +93,16 @@ class UvTuples:
     #  Spread
     # --------------------------------------------------------------------------
     def stats(self) -> "UvTuplesStats":
-        """Return the set's span counts and its 3 min separations."""
+        """Return the set's span counts and its 3 min separations.
+
+        The L2 min separation is computed from the full pairwise distance matrix, so memory grows with
+        the square of the size.
+        """
         points = np.column_stack([self._u, self._v])
         return UvTuplesStats(
             size=self.size,
-            span_counts_u=tuple(int(n) for n in np.bincount(span_indices(self._u), minlength=N_SPANS)),
-            span_counts_v=tuple(int(n) for n in np.bincount(span_indices(self._v), minlength=N_SPANS)),
+            span_counts_u=_span_counts(self._u),
+            span_counts_v=_span_counts(self._v),
             min_separation_l2=_min_l2_separation(points),
             min_separation_u=_min_axis_separation(self._u),
             min_separation_v=_min_axis_separation(self._v),
@@ -111,8 +117,9 @@ class UvTuplesStats:
     """`UvTuplesStats` describes how evenly a tuple set is spread.
 
     Each min separation is the smallest distance between 2 tuples: in the square (L2), along u, or
-    along v. Its fraction compares it with the separation of `size` tuples placed freely and evenly:
-    `1/(size − 1)` along an axis, and the spacing `1/(√size − 1)` of a square grid in L2.
+    along v. Each `min_separation_*_fraction` property divides that min separation by the separation of
+    `size` evenly spaced tuples:
+    `1/(size - 1)` along an axis, and the spacing `1/(√size - 1)` of a square grid in L2.
     """
 
     size: int
@@ -124,17 +131,17 @@ class UvTuplesStats:
 
     @property
     def min_separation_l2_fraction(self) -> float:
-        """Return the L2 min separation as a fraction of the grid spacing `1/(√size − 1)`."""
+        """Return the L2 min separation as a fraction of the grid spacing `1/(√size - 1)`."""
         return self.min_separation_l2 * (np.sqrt(self.size) - 1)
 
     @property
     def min_separation_u_fraction(self) -> float:
-        """Return the min separation along u as a fraction of `1/(size − 1)`."""
+        """Return the min separation along u as a fraction of `1/(size - 1)`."""
         return self.min_separation_u * (self.size - 1)
 
     @property
     def min_separation_v_fraction(self) -> float:
-        """Return the min separation along v as a fraction of `1/(size − 1)`."""
+        """Return the min separation along v as a fraction of `1/(size - 1)`."""
         return self.min_separation_v * (self.size - 1)
 
     @property
@@ -150,6 +157,11 @@ class UvTuplesStats:
 def span_indices(values: np.ndarray) -> np.ndarray:
     """Return the index of the span, among `N_SPANS` equal spans of (0, 1), that holds each value."""
     return np.minimum((values * N_SPANS).astype(np.int64), N_SPANS - 1)
+
+
+def _span_counts(values: np.ndarray) -> tuple[int, ...]:
+    """Return the number of values in each of the `N_SPANS` spans of (0, 1)."""
+    return tuple(int(n) for n in np.bincount(span_indices(values), minlength=N_SPANS))
 
 
 def _min_axis_separation(values: np.ndarray) -> float:

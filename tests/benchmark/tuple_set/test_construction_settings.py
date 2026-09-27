@@ -1,4 +1,4 @@
-"""`UvTuplesConstructionSettings.from_total_time` derives the population size, worker count and time per tier."""
+"""`UvTuplesConstructionSettings.from_total_time` derives the population size, worker count and time per size."""
 
 import pytest
 
@@ -6,29 +6,29 @@ from sunnbear._core.benchmark.tuple_set import UV_TUPLES_SIZES, UvTuplesConstruc
 
 
 @pytest.mark.parametrize(
-    "t_total_sec, population_size, n_workers, min_t_budget_per_tier_sec",
+    "t_total_sec, population_size, n_workers, min_t_budget_per_size_sec",
     [
-        (1.0, 2048, 1, 1 / 6),  # population and workers at their lower bounds; all time in the minimums
-        (30.0, 32_768, 16, 5.0),  # half scale; all time in the minimums
-        (60.0, 65_536, 32, 10.0),  # full scale reached; all time in the minimums
+        (1.0, 2048, 1, 1 / 6),  # population and workers at their lower bounds; all time goes to the per-size minimums
+        (30.0, 32_768, 16, 5.0),  # half scale; all time goes to the per-size minimums
+        (60.0, 65_536, 32, 10.0),  # full scale reached; all time goes to the per-size minimums
         (900.0, 65_536, 32, 10.0),  # full scale; the rest goes in proportion to the size
     ],
 )
 def test_from_total_time_scales_below_60_s_and_saturates_above(
-    t_total_sec, population_size, n_workers, min_t_budget_per_tier_sec
+    t_total_sec, population_size, n_workers, min_t_budget_per_size_sec
 ):
-    """Below 60 s the population, the workers and the minimum per tier scale down; the rest goes ∝ size."""
+    """Below 60 s the population, the workers and the minimum per size scale down; the rest goes by size."""
     # --- act --------------------------
     settings = UvTuplesConstructionSettings.from_total_time(t_total_sec, n_workers=32)
 
     # --- assert -----------------------
-    t_rest_sec = t_total_sec - 6 * min_t_budget_per_tier_sec
+    t_rest_sec = t_total_sec - 6 * min_t_budget_per_size_sec
     assert settings.population_size == population_size
     assert settings.n_workers == n_workers
-    assert settings.t_budget_per_tier_sec == pytest.approx(
-        {k: min_t_budget_per_tier_sec + t_rest_sec * k / sum(UV_TUPLES_SIZES) for k in UV_TUPLES_SIZES}
+    assert settings.t_budget_per_size_sec == pytest.approx(
+        {k: min_t_budget_per_size_sec + t_rest_sec * k / sum(UV_TUPLES_SIZES) for k in UV_TUPLES_SIZES}
     )
-    assert sum(settings.t_budget_per_tier_sec.values()) == pytest.approx(t_total_sec)
+    assert sum(settings.t_budget_per_size_sec.values()) == pytest.approx(t_total_sec)
 
 
 @pytest.mark.parametrize(

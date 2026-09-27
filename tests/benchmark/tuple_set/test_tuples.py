@@ -6,7 +6,8 @@ import pytest
 from sunnbear._core.benchmark.tuple_set import UvTuples
 from sunnbear._core.benchmark.tuple_set.tuples import span_indices
 
-# 8 tuples, one per span on each axis: u rises and v falls, so neighbors are diagonal at L2 distance √2/8.
+# The diagonal set has 8 tuples, one per span on each axis: u rises and v falls, so neighbors are diagonal at L2
+# distance √2/8.
 _DIAGONAL_U = (np.arange(8) + 0.5) / 8
 _DIAGONAL_V = _DIAGONAL_U[::-1]
 
@@ -24,13 +25,13 @@ _DIAGONAL_V = _DIAGONAL_U[::-1]
         ([0.1, 0.5], [0.1, 1.0], "open interval"),
     ],
 )
-def test_uv_tuples_rejects_invalid_values(u, v, message):
+def test_uv_tuples_class_rejects_invalid_values(u, v, message):
     """Arrays of different shapes, fewer than 2 tuples, or a value outside (0, 1) raise a `ValueError`."""
     with pytest.raises(ValueError, match=message):
         UvTuples(u, v)
 
 
-def test_uv_tuples_stores_read_only_copies():
+def test_uv_tuples_class_stores_read_only_copies():
     """Changing the input array later leaves the tuples unchanged, and the stored arrays cannot be written."""
     # --- arrange ----------------------
     u = np.array([0.1, 0.2])
@@ -83,7 +84,7 @@ def test_to_xtol_and_c_maps_u_log_uniformly_and_v_linearly():
 #  Stats
 # ==================================================================================================
 def test_stats_reports_span_counts_and_min_separations():
-    """1 tuple per span gives counts of 1, separations 1/8 per axis and √2/8 in L2, and their fractions."""
+    """One tuple per span gives counts of 1, separations 1/8 per axis and √2/8 in L2, and their fractions."""
     # --- act --------------------------
     stats = UvTuples(_DIAGONAL_U, _DIAGONAL_V).stats()
 
@@ -101,7 +102,7 @@ def test_stats_reports_span_counts_and_min_separations():
 
 
 def test_max_span_count_deviation_is_the_largest_over_both_axes():
-    """3 of 8 tuples in one span of v, where 1 is expected, gives a deviation of 2."""
+    """Putting 3 of 8 tuples in one span of v, where 1 is expected, gives a deviation of 2."""
     # --- arrange ----------------------
     v = np.array([0.01, 0.02, 0.03, 0.4, 0.5, 0.6, 0.7, 0.8])
 
