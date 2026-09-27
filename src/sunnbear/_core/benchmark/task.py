@@ -131,6 +131,7 @@ class BenchmarkTask:
                     )
                 else:
                     is_correct = False
+
                 rows.append(
                     {
                         "solver_id": config.solver_id,
