@@ -37,6 +37,8 @@ dependencies = [
     "snuffled>=0.1.6",
     "max-div>=0.18.1",  # 0.18.1 provides `HybridDiversityMetric` and `ParallelMaxDivSolverBuilder`, which `generate_mc_tuples` uses
     "mpl-composite>=0.1.2",
+    # polars holds the benchmark results; its wheels use the stable CPython ABI, so 1 minimal version serves every supported Python version.
+    "polars>=1.0.0",
 ]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",

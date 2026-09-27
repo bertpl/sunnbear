@@ -1,0 +1,42 @@
+"""`RESULTS_SCHEMA` defines the columns and types of the benchmark results table, 1 row per solve.
+
+Each row is 1 solver on 1 Monte Carlo sample of 1 test function.
+
+The table stores only raw measurements, not values derived from them, such as an evaluation count adjusted
+for failed solves or a flop cost weighted per flop type, so a change to how such values are derived never
+leaves stored results stale.
+"""
+
+import polars as pl
+from counted_float import FlopType
+
+from sunnbear._core.solvers.core import SolveStatus
+
+
+def flop_count_column_name(flop_type: FlopType) -> str:
+    """Return the name of the column that counts `flop_type`, e.g. `flop_count_add` for `FlopType.ADD`."""
+    return f"flop_count_{flop_type.name.lower()}"
+
+
+RESULTS_SCHEMA: dict[str, pl.DataType] = {
+    # These columns identify the solve.
+    "solver_id": pl.String(),
+    "solver_version": pl.Int32(),
+    "function_id": pl.String(),
+    "mc_size": pl.Int32(),
+    "mc_sample_idx": pl.Int32(),
+    # These columns hold the Monte Carlo sample: its (u, v) tuple and that tuple's (xtol, c) values.
+    "u": pl.Float64(),
+    "v": pl.Float64(),
+    "xtol": pl.Float64(),
+    "c": pl.Float64(),
+    # These columns hold the raw measurements.
+    "x_found": pl.Float64(),
+    "status": pl.Enum([status.value for status in SolveStatus]),
+    "n_fevals": pl.Int32(),
+    "is_correct": pl.Boolean(),
+    "wall_time_ns": pl.Int64(),
+    # Each flop type gets 1 column that holds its raw count. The per-flop-type cost weights are applied at
+    # analysis time, because counted-float can change them without any version number that records the change.
+    **{flop_count_column_name(flop_type): pl.Int32() for flop_type in FlopType},
+}

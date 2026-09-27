@@ -167,6 +167,16 @@ def test_state_holds_the_evaluated_interval_and_the_history_of_the_evaluations()
     assert state.f.history == [(0.0, -0.25), (1.0, 0.75)]
 
 
+@pytest.mark.parametrize("history_enabled, evaluated_x_values_expected", [(True, (0.0, 1.0)), (False, ())])
+def test_the_evaluated_x_values_come_from_the_history(history_enabled, evaluated_x_values_expected):
+    """`SolveResult.evaluated_x_values` lists the x-value of every evaluation, in order, when history is recorded."""
+    # --- act --------------------------
+    result = _RecordingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10, history_enabled=history_enabled)
+
+    # --- assert -----------------------
+    assert result.evaluated_x_values == evaluated_x_values_expected
+
+
 # ==================================================================================================
 #  Status mapping
 # ==================================================================================================
