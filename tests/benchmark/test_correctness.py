@@ -1,4 +1,4 @@
-"""`is_solution_correct` looks for a proof that a root lies within `xtol` of `x_found`, in a fixed order of points."""
+"""`is_solution_correct` looks for a proof that a root lies within `xtol` of `x_found`, in a fixed order of x-values."""
 
 import math
 
@@ -11,7 +11,7 @@ from sunnbear._core.benchmark.correctness import CORRECTNESS_CHECK_MAX_FEVALS, i
 #  Test-local function
 # ==================================================================================================
 class _RecordingFunction:
-    """`_RecordingFunction` wraps a function and records every point at which it is evaluated."""
+    """`_RecordingFunction` wraps a function and records every x-value at which it is evaluated."""
 
     def __init__(self, f) -> None:
         self._f = f
@@ -38,7 +38,7 @@ def _narrow_dip(x: float) -> float:
         (0.3 - 0.5e-3, 3),  # f(x_found) < 0 and f(x_found - xtol) < 0, then f(x_found + xtol) > 0.
     ],
 )
-def test_a_correct_answer_is_proven_by_the_first_3_points(x_found, n_fevals_expected):
+def test_a_correct_answer_is_proven_by_the_first_3_x_probes(x_found, n_fevals_expected):
     """An answer within `xtol` of the root of a monotone function is proven by `x_found` and `x_found ± xtol`."""
     # --- arrange ----------------------
     f = _RecordingFunction(lambda x: x - 0.3)
@@ -51,21 +51,21 @@ def test_a_correct_answer_is_proven_by_the_first_3_points(x_found, n_fevals_expe
     assert len(f.xs) == n_fevals_expected
 
 
-def test_a_candidate_point_within_xtol_proves_what_the_first_3_points_miss():
-    """A candidate point in the dip gives the sign change on the 4th evaluation; the candidate point 1.25 is skipped."""
+def test_an_x_candidate_within_xtol_proves_what_the_first_3_x_probes_miss():
+    """An x-candidate in the dip gives the sign change on the 4th evaluation; the x-candidate 1.25 is skipped."""
     # --- arrange ----------------------
     f = _RecordingFunction(_narrow_dip)
 
     # --- act --------------------------
-    is_correct = is_solution_correct(f=f, x_found=0.0, xtol=1.0, seed=1, candidate_points=[1.25, 0.25])
+    is_correct = is_solution_correct(f=f, x_found=0.0, xtol=1.0, seed=1, x_candidates=[1.25, 0.25])
 
     # --- assert -----------------------
     assert is_correct
     assert f.xs == [0.0, -1.0, 1.0, 0.25]
 
 
-def test_random_points_find_a_sign_change_that_the_fixed_points_miss():
-    """Without candidate points, the random points reach the dip within `CORRECTNESS_CHECK_MAX_FEVALS` evaluations."""
+def test_random_x_probes_find_a_sign_change_that_the_fixed_x_probes_miss():
+    """Without x-candidates, the random x-values reach the dip within `CORRECTNESS_CHECK_MAX_FEVALS` evaluations."""
     # --- arrange ----------------------
     f = _RecordingFunction(_narrow_dip)
 
@@ -78,7 +78,7 @@ def test_random_points_find_a_sign_change_that_the_fixed_points_miss():
 
 
 def test_a_failed_evaluation_proves_nothing_but_counts():
-    """NaN at `x_found` and an exception at `x_found - xtol` prove nothing, so the proof needs more than 3 points."""
+    """NaN at `x_found` and an exception at `x_found - xtol` prove nothing, so the proof needs more than 3 x-values."""
 
     # --- arrange ----------------------
     def f_raw(x: float) -> float:
@@ -101,7 +101,7 @@ def test_a_failed_evaluation_proves_nothing_but_counts():
 
 
 # ==================================================================================================
-#  Wrong answers and the random points
+#  Wrong answers and the random x-values
 # ==================================================================================================
 def test_a_wrong_answer_spends_the_whole_limit():
     """With the root far beyond `xtol`, no proof exists, so all `CORRECTNESS_CHECK_MAX_FEVALS` evaluations are spent."""
@@ -116,8 +116,8 @@ def test_a_wrong_answer_spends_the_whole_limit():
     assert len(f.xs) == CORRECTNESS_CHECK_MAX_FEVALS
 
 
-def test_the_random_points_stay_within_xtol_and_alternate_sides():
-    """Every random point lies within `xtol` of `x_found`, first below it, then above, and so on."""
+def test_the_random_x_probes_stay_within_xtol_and_alternate_sides():
+    """Every random x-value lies within `xtol` of `x_found`, first below it, then above, and so on."""
     # --- arrange ----------------------
     f = _RecordingFunction(lambda x: x - 10.0)
 
@@ -125,14 +125,14 @@ def test_the_random_points_stay_within_xtol_and_alternate_sides():
     is_solution_correct(f=f, x_found=2.0, xtol=0.5, seed=1)
 
     # --- assert -----------------------
-    random_points = f.xs[3:]
-    assert all(abs(x - 2.0) <= 0.5 for x in random_points)
-    assert all((x < 2.0) == (i % 2 == 0) for i, x in enumerate(random_points))
+    random_x_probes = f.xs[3:]
+    assert all(abs(x - 2.0) <= 0.5 for x in random_x_probes)
+    assert all((x < 2.0) == (i % 2 == 0) for i, x in enumerate(random_x_probes))
 
 
 @pytest.mark.parametrize("seed_other, is_equal_expected", [(1, True), (2, False)])
-def test_the_random_points_follow_the_seed(seed_other, is_equal_expected):
-    """The same seed gives the same points, so the verdict is reproducible; another seed gives other points."""
+def test_the_random_x_probes_follow_the_seed(seed_other, is_equal_expected):
+    """The same seed gives the same x-values, so the verdict is reproducible; another seed gives other x-values."""
     # --- arrange ----------------------
     f_first = _RecordingFunction(lambda x: x - 10.0)
     f_second = _RecordingFunction(lambda x: x - 10.0)

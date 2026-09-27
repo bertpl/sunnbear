@@ -1,4 +1,4 @@
-"""`derive_seed` gives a fixed 64-bit seed per root seed, purpose, test function and sample."""
+"""`derive_seed` gives a fixed 64-bit seed per root seed, purpose, test function and Monte Carlo sample."""
 
 import pytest
 
@@ -8,7 +8,7 @@ _KWARGS = {
     "root_seed": 42,
     "purpose": SeedPurpose.CORRECTNESS_CHECK,
     "function_id": "f2.1.1[p1=0.2]",
-    "sample_idx": 7,
+    "mc_sample_idx": 7,
 }
 
 
@@ -26,11 +26,11 @@ def test_the_seed_of_known_values_is_fixed():
     [
         {"root_seed": 43},
         {"function_id": "f2.1.1[p1=0.3]"},
-        {"sample_idx": 8},
+        {"mc_sample_idx": 8},
     ],
 )
 def test_changing_any_value_changes_the_seed(changed_kwargs):
-    """A different root seed, test function or sample gives a different seed within `[0, 2^64)`."""
+    """A different root seed, test function or Monte Carlo sample gives a different seed within `[0, 2^64)`."""
     # --- act --------------------------
     seed = derive_seed(**(_KWARGS | changed_kwargs))
 
