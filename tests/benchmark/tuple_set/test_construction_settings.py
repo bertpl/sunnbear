@@ -17,7 +17,7 @@ from sunnbear._core.benchmark.tuple_set import UV_TUPLES_SIZES, UvTuplesConstruc
 def test_from_total_time_scales_below_60_s_and_saturates_above(
     t_total_sec, population_size, n_workers, min_t_budget_per_size_sec
 ):
-    """Below 60 s the population, the workers and the minimum per size scale down; the rest goes by size."""
+    """Below 60 s, the population, workers and minimum time per size scale down; the rest is split by size."""
     # --- act --------------------------
     settings = UvTuplesConstructionSettings.from_total_time(t_total_sec, n_workers=32)
 

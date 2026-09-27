@@ -1,8 +1,8 @@
 """`UvTuples` holds a set of (u, v) tuples, the dimensionless samples of every Monte Carlo benchmark run.
 
-A tuple `(u, v)` lies in the open unit square. Mapped onto one test function, `u` places the
-tolerance `xtol` log-uniformly within its band `(xtol_min, 2·xtol_min)` and `v` places the
-parameter `c` linearly within the function's c-range, so one set serves every function.
+A tuple `(u, v)` lies in the open unit square. When the set is mapped onto one test function, `u` sets
+the tolerance `xtol` log-uniformly between `xtol_min` and `2·xtol_min`, and `v` sets the parameter `c`
+linearly between the function's `c_min` and `c_max`, so the same set works for every test function.
 """
 
 from dataclasses import dataclass
@@ -10,7 +10,7 @@ from dataclasses import dataclass
 import numpy as np
 from numpy.typing import ArrayLike
 
-# The sizes of the shipped set: each is a prefix of the next, so a smaller size's samples are a
+# The shipped set comes in these sizes; each is a prefix of the next, so a smaller size's tuples are a
 # subset of every larger size's.
 UV_TUPLES_SIZES = (32, 64, 128, 256, 512, 1024)
 
@@ -66,7 +66,7 @@ class UvTuples:
         return self._u.size
 
     def first(self, size: int) -> "UvTuples":
-        """Return the first `size` tuples; for the full shipped set, they form the shipped set of that size.
+        """Return the first `size` tuples.
 
         Raises:
             ValueError: If `size` is below 2 or above this set's size.
@@ -103,9 +103,9 @@ class UvTuples:
             size=self.size,
             span_counts_u=_span_counts(self._u),
             span_counts_v=_span_counts(self._v),
-            min_separation_l2=_min_l2_separation(points),
-            min_separation_u=_min_axis_separation(self._u),
-            min_separation_v=_min_axis_separation(self._v),
+            min_separation_l2=_min_separation_l2(points),
+            min_separation_u=_min_separation_along_axis(self._u),
+            min_separation_v=_min_separation_along_axis(self._v),
         )
 
 
@@ -164,12 +164,12 @@ def _span_counts(values: np.ndarray) -> tuple[int, ...]:
     return tuple(int(n) for n in np.bincount(span_indices(values), minlength=N_SPANS))
 
 
-def _min_axis_separation(values: np.ndarray) -> float:
+def _min_separation_along_axis(values: np.ndarray) -> float:
     """Return the smallest difference between 2 of the values."""
     return float(np.diff(np.sort(values)).min())
 
 
-def _min_l2_separation(points: np.ndarray) -> float:
+def _min_separation_l2(points: np.ndarray) -> float:
     """Return the smallest L2 distance between 2 of the points, from the full distance matrix."""
     diff = points[:, None, :] - points[None, :, :]
     distances = np.sqrt((diff**2).sum(axis=-1))

@@ -8,7 +8,7 @@ from sunnbear._core.benchmark.tuple_set import UV_TUPLES_SIZES, UvTuples, UvTupl
 
 
 def test_the_csv_file_reads_back_every_value_exactly():
-    """Each value is written as the shortest text that reads back to the same float64."""
+    """Every value written to the CSV file, behind the header `u,v`, reads back as the same float64."""
     # --- arrange ----------------------
     tuples = UvTuples(np.random.default_rng(7).random(5) * 0.9 + 0.05, [0.1, 0.2, 1 / 3, 0.5, 0.123456789012345678])
 
@@ -30,7 +30,7 @@ def test_a_csv_file_without_the_header_is_refused():
 
 @pytest.mark.parametrize("size", UV_TUPLES_SIZES)
 def test_uv_tuples_returns_a_prefix_of_the_shipped_set_that_meets_its_span_constraints(size):
-    """Each size is the start of the full shipped set, and keeps every span within 1 of `size / 8`."""
+    """Each size is the start of the full shipped set, and keeps every span within 1 of `size / N_SPANS`."""
     # --- act --------------------------
     tuples = uv_tuples(size)
 

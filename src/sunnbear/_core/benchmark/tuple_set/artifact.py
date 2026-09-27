@@ -39,8 +39,8 @@ class UvTuplesDeclaration(ArtifactDeclaration[UvTuples]):
         header, *rows = files[_CSV_FILE_NAME].decode().splitlines()
         if header != _CSV_HEADER:
             raise ArtifactError(f"{_CSV_FILE_NAME} starts with {header!r}, not {_CSV_HEADER!r}.")
-        values = [row.split(",") for row in rows]
-        return UvTuples([float(u) for u, _ in values], [float(v) for _, v in values])
+        row_fields = [row.split(",") for row in rows]
+        return UvTuples([float(u) for u, _ in row_fields], [float(v) for _, v in row_fields])
 
 
 # ==================================================================================================

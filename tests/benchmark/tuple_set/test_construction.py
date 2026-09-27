@@ -8,7 +8,7 @@ from sunnbear._core.benchmark.tuple_set.construction import _check_selection, _d
 
 
 def test_generate_uv_tuples_builds_a_set_whose_every_size_meets_its_span_constraints():
-    """A 1 s construction gives 1024 distinct tuples whose every prefix size keeps each span within 1.
+    """A 1 s construction gives distinct tuples of the largest size, and every prefix size keeps each span within 1.
 
     Only the structure is asserted: max-div's spread depends on the wall-clock time.
     """
@@ -37,8 +37,8 @@ def test_a_smaller_population_is_a_prefix_of_the_full_one():
 # ==================================================================================================
 #  Checks on a selection
 # ==================================================================================================
-# The population has 24 tuples, 3 per span on each axis: every third one gives 1 per span, and the first 8
-# overfill 2 spans.
+# The population has 24 tuples, 3 per span on each axis: selecting every third tuple puts 1 in each span,
+# and selecting the first 8 puts 3 in each of 2 spans.
 _POPULATION = np.column_stack([(np.arange(24) + 0.5) / 24, (np.arange(24)[::-1] + 0.5) / 24])
 _ONE_PER_SPAN = np.arange(0, 24, 3)
 

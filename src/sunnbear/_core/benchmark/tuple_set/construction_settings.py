@@ -7,9 +7,9 @@ From a total of `MIN_T_TOTAL_AT_FULL_SCALE_SEC` up, the construction uses:
 - at least `MIN_T_BUDGET_PER_SIZE_AT_FULL_SCALE_SEC` for each size's solve, about what a solve on
   the full population needs to start optimizing.
 
-Below that total, the population size, the worker count and the minimum per size scale down
-together, so that short runs such as tests still run a real construction; production runs are far
-longer and never scale.
+Below `MIN_T_TOTAL_AT_FULL_SCALE_SEC`, the population size, the worker count and the minimum time per
+size scale down together, so that short runs such as tests still run a real construction; production
+runs are far longer and never scale down.
 """
 
 from dataclasses import dataclass
@@ -46,11 +46,12 @@ class UvTuplesConstructionSettings:
     def from_total_time(cls, t_total_sec: float, n_workers: int) -> Self:
         """Return the settings for a construction of `t_total_sec` seconds with up to `n_workers` workers.
 
-        With `scale = min(1, t_total_sec / MIN_T_TOTAL_AT_FULL_SCALE_SEC)`, the population size is
-        `max(MIN_POPULATION_SIZE, scale · FULL_POPULATION_SIZE)` and the worker count
-        `max(1, round(scale · n_workers))`. Each size's solve gets
-        `scale · MIN_T_BUDGET_PER_SIZE_AT_FULL_SCALE_SEC`, and the rest of the total is split in
-        proportion to the size `k`.
+        With `scale = min(1, t_total_sec / MIN_T_TOTAL_AT_FULL_SCALE_SEC)`:
+
+        - the population size is `max(MIN_POPULATION_SIZE, scale · FULL_POPULATION_SIZE)`;
+        - the worker count is `max(1, round(scale · n_workers))`;
+        - each size's solve gets `scale · MIN_T_BUDGET_PER_SIZE_AT_FULL_SCALE_SEC`, and the rest of
+          the total is split in proportion to the size `k`.
 
         Raises:
             ValueError: If `t_total_sec` is below `MIN_T_TOTAL_SEC`, or `n_workers` below 1.

@@ -3,11 +3,13 @@
 The construction selects each size with max-div from a uniform random population of candidate tuples:
 
 - **objective**: maximize the geometric mean of 3 min separations, each the smallest distance
-  between 2 selected tuples: in the square (L2), along u and along v;
+  between 2 selected tuples: in the square (L2), along u and along v; the 2 separations along an
+  axis keep the tuples apart on each axis alone, because u and v each set a separate parameter of
+  a test function;
 - **inclusion**: the sizes are built bottom-up, the smallest first, and each larger size is
   constrained to include the size below it, so every size is a prefix of the next;
-- **spans**: span constraints cut each axis into `N_SPANS` equal spans, and keep each span's count
-  of a size's tuples within 1 of `size / N_SPANS`.
+- **spans**: span constraints cut each axis into `N_SPANS` equal spans, and keep the number of a
+  size's tuples in each span within 1 of `size / N_SPANS`.
 """
 
 import warnings
@@ -29,13 +31,13 @@ INCLUSION_CONSTRAINT_WEIGHT = 10.0
 #  generate_uv_tuples
 # ==================================================================================================
 def generate_uv_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) -> UvTuples:
-    """Construct a nested set of 1024 (u, v) tuples in about `t_total_sec` s; its first `k` rows form size `k`.
+    """Construct a nested (u, v) tuple set in about `t_total_sec` s; its first `k` tuples form size `k`.
 
     The construction runs 1 max-div solve per size in `UV_TUPLES_SIZES`, and splits `t_total_sec`
     over them as `UvTuplesConstructionSettings.from_total_time` describes:
 
-    - from 60 s up, it uses the full population of candidates and all `n_workers` workers;
-    - below 60 s, it uses fewer of both, for short runs such as tests.
+    - from 60 s up, the construction uses the full population of candidates and all `n_workers` workers;
+    - below 60 s, the construction uses fewer of both, for short runs such as tests.
 
     The total covers only the solves: drawing the population and checking each size take extra
     time.
@@ -45,7 +47,7 @@ def generate_uv_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
 
     Args:
         t_total_sec: The total wall-clock time of the solves, at least 1 s.
-        n_workers: The number of max-div workers per solve from 60 s up; more workers search from
+        n_workers: The number of max-div workers per solve when `t_total_sec` is 60 s or more; more workers search from
             more seeds, and may exceed the number of cores.
         seed: The seed of the population and of every solve.
 
@@ -78,7 +80,7 @@ def _draw_population(population_size: int, seed: int) -> np.ndarray:
     depend on the population size beyond how many are kept.
     """
     points = np.random.default_rng(seed).random((FULL_POPULATION_SIZE, 2))
-    # `random` draws from [0, 1): a row with an exact 0 is dropped, which leaves the open square.
+    # `random` draws from [0, 1): a row with an exact 0 is dropped, so every kept row lies in the open unit square.
     points = points[(points > 0).all(axis=1)]
     return points[:population_size]
 
@@ -103,7 +105,7 @@ def _select_tuples(
             )
         )
     problem = MaxDivProblem.new(
-        # max-div ranks float32 copies; the selected tuples are taken from the float64 population by index.
+        # max-div works on a float32 copy; the selected tuples are taken from the float64 population by index.
         population.astype(np.float32),
         k=k,
         distance_metric=DistanceMetric.l2_euclidean(),
@@ -131,7 +133,7 @@ def _select_tuples(
 
 def _span_constraints(population: np.ndarray, k: int) -> list[Constraint]:
     """Return 1 constraint per span of each axis, each allowing `k / N_SPANS ± 1` selected tuples."""
-    per_span = k // N_SPANS
+    target_count_per_span = k // N_SPANS
     constraints = []
     for axis in range(2):
         indices = span_indices(population[:, axis])
@@ -139,8 +141,8 @@ def _span_constraints(population: np.ndarray, k: int) -> list[Constraint]:
             constraints.append(
                 Constraint(
                     int_set=set(np.flatnonzero(indices == span).tolist()),
-                    min_count=per_span - 1,
-                    max_count=per_span + 1,
+                    min_count=target_count_per_span - 1,
+                    max_count=target_count_per_span + 1,
                 )
             )
     return constraints
@@ -152,7 +154,8 @@ def _check_selection(population: np.ndarray, k: int, required_indices: np.ndarra
     Balanced spans hold `k / N_SPANS ± 1` tuples each, on both axes.
 
     max-div treats constraints as soft and returns its least-violating selection, so a total time
-    too short for the solver to meet them raises here, not in a returned set.
+    too short for the solver to meet them raises here, because the returned set would otherwise break
+    them silently.
 
     Raises:
         UvTuplesConstructionError: If any check fails.
