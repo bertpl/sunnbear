@@ -10,7 +10,8 @@ from typing import ClassVar, Generic
 
 from counted_float import CountedFloat, FlopCountingContext
 
-# `typing.TypeVar` accepts `default=` only from Python 3.13; this project supports 3.12 too.
+# `typing.TypeVar` accepts `default=` only from Python 3.13; `typing_extensions` backports it to the older
+# Pythons that `requires-python` admits.
 from typing_extensions import TypeVar
 
 from .exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
