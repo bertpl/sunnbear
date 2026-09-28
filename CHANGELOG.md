@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The shipped Monte Carlo (u, v) tuple set is regenerated with an 8-hour time budget and spreads its tuples more evenly; benchmark results on the new set differ from those on the previous set
+- The shipped Monte Carlo (u, v) tuple set is regenerated with an 8-hour time budget, which increases the smallest distance between its tuples at every size; benchmark results on the new set differ from those on the previous set
 
 ### Deprecated
 
