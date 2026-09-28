@@ -4,7 +4,9 @@ It holds:
 
 - the (u, v) tuple set that drives every Monte Carlo benchmark run;
 - the tolerances and evaluation budget derived from bisection's evaluation count;
-- the seeds derived from a run's root seed, and the check of whether a solver's answer is correct.
+- the seeds derived from a run's root seed, and the check of whether a solver's answer is correct;
+- the benchmark task, which runs every solver on 1 test function, and `run_benchmark`, which runs the
+  tasks of a run into a run folder that `load_results` reads back.
 
 Importing it registers the `mc_tuples` artifact declaration with `ArtifactRegistry`.
 """

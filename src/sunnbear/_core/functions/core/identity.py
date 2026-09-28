@@ -76,21 +76,25 @@ class FunctionId:
     # --------------------------------------------------------------------------
     #  Rendering
     # --------------------------------------------------------------------------
+    @property
+    def formula_id(self) -> str:
+        """The id of the formula: its taxonomy number with an ``f`` prefix, e.g. ``f2.1.5``."""
+        return f"f{FormulaTaxonomyNode.format_number(self.formula_number)}"
+
     def display(self) -> str:
         """Render with each parameter's name and canonical spelling, e.g. ``f2.1.5[p1=2^1.2,p2=0.4]``.
 
         Raises:
             ValueError: If a parameter value is not a valid parameter value.
         """
-        prefix = f"f{FormulaTaxonomyNode.format_number(self.formula_number)}"
         if not self.param_values:
-            return prefix
+            return self.formula_id
         else:
             args = ",".join(
                 f"{name}={ParamNotation.spell_value_canonically(value)}"
                 for name, value in zip(self.param_names, self.param_values, strict=True)
             )
-            return f"{prefix}[{args}]"
+            return f"{self.formula_id}[{args}]"
 
     def __repr__(self) -> str:
         """Render the canonical form; `from_string` parses it back to an equal identity."""

@@ -2,6 +2,9 @@
 
 from dataclasses import dataclass
 
+from .mc_tuples import MC_TUPLES_SIZES
+from .tolerances import validate_n_bisection_fevals
+
 
 @dataclass(frozen=True, kw_only=True)
 class BenchmarkRunSettings:
@@ -21,3 +24,13 @@ class BenchmarkRunSettings:
     mc_size: int
     n_bisection_fevals: int
     root_seed: int
+
+    def __post_init__(self) -> None:
+        """Check the settings, so a run with invalid settings fails before its first task.
+
+        Raises:
+            ValueError: If `mc_size` is not 1 of `MC_TUPLES_SIZES`, or `n_bisection_fevals` is below 2.
+        """
+        if self.mc_size not in MC_TUPLES_SIZES:
+            raise ValueError(f"mc_size must be one of {list(MC_TUPLES_SIZES)} (got {self.mc_size}).")
+        validate_n_bisection_fevals(self.n_bisection_fevals)
