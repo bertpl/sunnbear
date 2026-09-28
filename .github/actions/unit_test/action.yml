@@ -34,13 +34,13 @@ runs:
         shell: bash
         env:
           REQUESTED: ${{ inputs.python_version }}
-          RESOLUTION: ${{ inputs.dependency_resolution }}
+          RES: ${{ inputs.dependency_resolution }}
         run: |  # zizmor: ignore[github-env] values are workflow-controlled, not user input
           PY="${REQUESTED:-$(cat .python-version)}"
-          echo "PYTHON_EFFECTIVE_VERSION=$PY" >> "$GITHUB_ENV"
-          # every later uv command reads these, so all of them resolve the same environment
+          # every later `uv sync` and `uv run` reads UV_PYTHON and UV_RESOLUTION, so all of them resolve
+          # the same environment
           echo "UV_PYTHON=$PY" >> "$GITHUB_ENV"
-          echo "UV_RESOLUTION=$RESOLUTION" >> "$GITHUB_ENV"
+          echo "UV_RESOLUTION=$RES" >> "$GITHUB_ENV"
           echo "Using Python $PY."
 
       - name: Drop the checked-out lock so each combo resolves fresh from pyproject
@@ -62,8 +62,10 @@ runs:
       #   - the CPU
       #   - the (mtime, size) of the function's source file
       # numba checks no file contents and no package versions. A fresh venv gives every installed file a
-      # new mtime, so no cached code would ever match. The jit-on jobs therefore set every third-party .py
-      # file to one fixed mtime, and key the cache on the exact installed package versions; that key
+      # new mtime, so no cached code would ever match.
+      #
+      # The jit-on jobs therefore set every third-party .py file to one fixed mtime, and key the cache on
+      # the exact installed package versions: the same versions install the same source files, which
       # makes up for numba not checking file contents.
       #
       # Tag pushes (releases) skip the cache, so release tests never load compiled code that another run
@@ -76,9 +78,8 @@ runs:
           # the later `uv run` steps resolve the same environment through UV_PYTHON and UV_RESOLUTION, so
           # they install nothing and the fixed mtimes stay
           uv sync --group dev
-          # sunnbear itself is an editable install from the checkout, not in site-packages, so its own
-          # source keeps its real mtimes: numba recompiles an edited file even when its size is unchanged.
-          # 946684800 is 2000-01-01, a fixed time.
+          # sunnbear itself is an editable install from the checkout, outside site-packages, so this leaves
+          # its source untouched. 946684800 is 2000-01-01.
           find .venv/lib/python*/site-packages -name '*.py' -exec touch -d @946684800 {} +
           INSTALLED_VERSIONS_HASH=$(uv pip freeze --python .venv/bin/python --exclude-editable | sha256sum | cut -d' ' -f1)
           echo "installed-versions-hash=$INSTALLED_VERSIONS_HASH" >> "$GITHUB_OUTPUT"
@@ -94,7 +95,7 @@ runs:
           path: ${{ runner.temp }}/numba-cache
           # the cache step sets no restore-keys, so a cache is only ever restored for the exact same
           # installed versions
-          key: numba-${{ runner.os }}-${{ runner.arch }}-py${{ env.PYTHON_EFFECTIVE_VERSION }}-${{ inputs.dependency_resolution }}-${{ steps.numba-cache-env.outputs.installed-versions-hash }}
+          key: numba-${{ runner.os }}-${{ runner.arch }}-py${{ env.UV_PYTHON }}-${{ inputs.dependency_resolution }}-${{ steps.numba-cache-env.outputs.installed-versions-hash }}
 
       - name: Run tests
         shell: bash
@@ -107,7 +108,7 @@ runs:
       - name: Dump collected node-ids (for the cross-combo test-count union)
         shell: bash
         env:
-          PY: ${{ env.PYTHON_EFFECTIVE_VERSION }}
+          PY: ${{ env.UV_PYTHON }}
           RES: ${{ inputs.dependency_resolution }}
           JIT: ${{ inputs.jit }}
         run: |
