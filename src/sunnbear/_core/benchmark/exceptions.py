@@ -4,4 +4,4 @@ from sunnbear._core.exceptions import SunnbearError
 
 
 class BenchmarkRunError(SunnbearError):
-    """`BenchmarkRunError` is raised when a run folder belongs to a different run, or holds no finished run."""
+    """`BenchmarkRunError` is raised when a benchmark run folder cannot be resumed, read or completed."""

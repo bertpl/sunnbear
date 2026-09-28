@@ -1,9 +1,9 @@
 """`run_benchmark` runs solvers on test functions over the Monte Carlo samples and writes the results to a run folder.
 
-A run is 1 `BenchmarkTask` per test function, run in this process, formula by formula. Each formula's
-results file is written once all of its test functions have run, so a crashed run resumes with the
-formulas that have no results file yet. The run info is written before the first task, so a resumed run
-is checked against the run that it resumes.
+A run is 1 `BenchmarkTask` per test function, run in this process, formula by formula.
+
+The run info is written before the first task, so a call that resumes the run can check its inputs and
+versions against the stored run info.
 
 `load_results` reads a finished run back. The run folder's layout is described by `BenchmarkRunFolder`.
 """
@@ -22,7 +22,7 @@ from .run_settings import BenchmarkRunSettings
 from .task import BenchmarkTask
 from .tolerances import N_BISECTION_FEVALS
 
-# A run's default Monte Carlo tuple set size is the number of samples per (solver, test function) pair.
+# The default size of a run's Monte Carlo tuple set, which is the number of samples per (solver, test function) pair.
 DEFAULT_MC_SIZE = 256
 
 
@@ -40,7 +40,7 @@ def run_benchmark(
 ) -> None:
     """Run every solver config on every calibrated test function over `mc_size` Monte Carlo samples, into `run_dir`.
 
-    When `run_dir` holds no run, the run starts there. When it holds a run, the call resumes it:
+    When `run_dir` holds no run, the run starts there. When `run_dir` holds a run, the call resumes that run:
 
     - a formula whose results file exists is skipped;
     - within the other formulas, a test function whose results are already stored in the run folder is
@@ -66,17 +66,20 @@ def run_benchmark(
             - `mc_size` is not 1 of `MC_TUPLES_SIZES`;
             - `n_bisection_fevals` is below 2.
 
-        BenchmarkRunError: If `run_dir` holds a run with other inputs or versions.
+        BenchmarkRunError: If `run_dir` holds a malformed run info, or a run with other inputs or versions.
     """
     run_settings = BenchmarkRunSettings(mc_size=mc_size, n_bisection_fevals=n_bisection_fevals, root_seed=root_seed)
     run_folder = BenchmarkRunFolder(run_dir)
-    run_info = run_folder.start_or_resume(
-        BenchmarkRunInfo.for_new_run(run_settings=run_settings, solver_configs=solver_configs, functions=functions)
+    run_info = run_folder.store_or_check_run_info(
+        BenchmarkRunInfo.for_current_inputs(
+            run_settings=run_settings, solver_configs=solver_configs, functions=functions
+        )
     )
 
-    for formula_id, formula_functions in _group_by_formula(functions).items():
+    for formula_id in run_info.formula_ids:
         if run_folder.has_formula_results(formula_id):
             continue
+        formula_functions = [function for function in functions if function.id.formula_id == formula_id]
         for function_idx, function in enumerate(formula_functions):
             if not run_folder.has_staged_function_results(formula_id, function_idx):
                 task = BenchmarkTask.from_test_function(
@@ -85,8 +88,7 @@ def run_benchmark(
                 run_folder.stage_function_results(formula_id, function_idx, task.run())
         run_folder.write_formula_results(formula_id, len(formula_functions))
 
-    if not run_info.is_finished:
-        run_folder.write_run_info(run_info.with_finished_at_now())
+    run_folder.mark_finished(run_info)
 
 
 # ==================================================================================================
@@ -99,17 +101,6 @@ def load_results(run_dir: Path) -> pl.LazyFrame:
     types are those of `RESULTS_SCHEMA`.
 
     Raises:
-        BenchmarkRunError: If `run_dir` holds no run, or a run that is not finished.
+        BenchmarkRunError: If `run_dir` holds no run, a malformed run info, or a run that is not finished.
     """
     return BenchmarkRunFolder(run_dir).scan_results()
-
-
-# ==================================================================================================
-#  Helpers
-# ==================================================================================================
-def _group_by_formula(functions: Sequence[TestFunction]) -> dict[str, list[TestFunction]]:
-    """Return the test functions grouped by formula id, formulas in order of first appearance, each group in order."""
-    functions_by_formula: dict[str, list[TestFunction]] = {}
-    for function in functions:
-        functions_by_formula.setdefault(function.id.formula_id, []).append(function)
-    return functions_by_formula

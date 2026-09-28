@@ -1,4 +1,4 @@
-"""`BenchmarkRunInfo` records a run's inputs and versions, reads back from JSON unchanged, and allows resumes."""
+"""`BenchmarkRunInfo` records a run's inputs and versions, reads back from JSON unchanged, and checks resumes."""
 
 import datetime
 
@@ -16,7 +16,7 @@ from sunnbear.solvers import SolverConfigRegistry
 @pytest.fixture(scope="module")
 def run_info() -> BenchmarkRunInfo:
     """Return the run info of a run of bisection on the shipped cubic."""
-    return BenchmarkRunInfo.for_new_run(
+    return BenchmarkRunInfo.for_current_inputs(
         run_settings=BenchmarkRunSettings(mc_size=32, n_bisection_fevals=40, root_seed=1),
         solver_configs=[SolverConfigRegistry.config_from_id("bisection")],
         functions=[functions.FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-1.0, 1.0)],
@@ -27,7 +27,7 @@ def test_a_new_run_info_records_the_inputs_the_artifacts_and_the_versions(run_in
     """A new run info records the solvers, functions, tuple set identity and package versions, and is not finished."""
     # --- assert -----------------------
     assert run_info.solver_versions == {"bisection": 1}
-    assert [function.function_id for function in run_info.functions] == ["f2.1.1[p1=0.2]"]
+    assert [function_info.function_id for function_info in run_info.function_infos] == ["f2.1.1[p1=0.2]"]
     assert run_info.artifact_hashes == {"mc_tuples": ArtifactStore.load_manifest(MCTuplesDeclaration).content_hash}
     assert {"python", "sunnbear", "numpy", "numba", "counted-float", "polars"} <= set(run_info.package_versions)
     assert not run_info.is_finished
@@ -52,7 +52,7 @@ def test_malformed_run_info_json_is_refused():
 
 
 def test_a_run_on_another_platform_or_at_another_time_may_resume(run_info):
-    """The platform and the timestamps are recorded for readers only, so they never stop a run from resuming."""
+    """`check_resumable_as` does not compare the platform and the timestamps, so they never stop a run from resuming."""
     # --- arrange ----------------------
     other = run_info.model_copy(
         update={"platform": "Other-arch", "started_at": datetime.datetime(2000, 1, 1, tzinfo=datetime.UTC)}
@@ -63,7 +63,7 @@ def test_a_run_on_another_platform_or_at_another_time_may_resume(run_info):
 
 
 def test_a_run_with_other_package_versions_may_not_resume(run_info):
-    """A run with another package version cannot resume, because results depend on them; the error names the field."""
+    """A run with another package version cannot resume, since results depend on it; the error names the field."""
     # --- arrange ----------------------
     other = run_info.model_copy(update={"package_versions": run_info.package_versions | {"numpy": "0.0.0"}})
 

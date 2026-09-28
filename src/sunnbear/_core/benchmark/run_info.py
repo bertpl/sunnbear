@@ -1,4 +1,4 @@
-"""This module defines `BenchmarkRunInfo` and the `BenchmarkRunFunctionInfo` records that it holds.
+"""`BenchmarkRunInfo` records what a run's results depend on, with 1 `BenchmarkRunFunctionInfo` per test function.
 
 A run's results depend on:
 
@@ -11,7 +11,7 @@ A run's results depend on:
 A resumed run must depend on exactly the same inputs and versions, so `check_resumable_as` compares the
 stored run info with the run info of the call that resumes the run.
 
-The platform and the timestamps are recorded for readers only.
+The platform and the timestamps are recorded for information only; `check_resumable_as` does not compare them.
 """
 
 import datetime
@@ -47,7 +47,7 @@ class BenchmarkRunInfo(BaseModel):
         run_settings: The settings that every task of the run shares.
         solver_versions: The version of each solver config's solver class, keyed by solver id, in the
             order of the result rows.
-        functions: The test functions, in the caller's order.
+        function_infos: The test functions, in the caller's order.
         artifact_hashes: The content hash of every data artifact that the run loads, keyed by artifact
             name.
         package_versions: The versions of Python, of sunnbear, and of every installed runtime dependency
@@ -62,7 +62,7 @@ class BenchmarkRunInfo(BaseModel):
 
     run_settings: BenchmarkRunSettings
     solver_versions: dict[str, int]
-    functions: tuple["BenchmarkRunFunctionInfo", ...]
+    function_infos: tuple["BenchmarkRunFunctionInfo", ...]
     artifact_hashes: dict[str, str]
     package_versions: dict[str, str]
     platform: str
@@ -73,24 +73,26 @@ class BenchmarkRunInfo(BaseModel):
     #  Construction
     # --------------------------------------------------------------------------
     @classmethod
-    def for_new_run(
+    def for_current_inputs(
         cls,
         *,
         run_settings: BenchmarkRunSettings,
         solver_configs: Sequence[SolverConfig],
         functions: Sequence[TestFunction],
     ) -> Self:
-        """Return the run info of a run that starts now, with the artifact hashes and package versions of this process.
+        """Return the run info of these inputs, started now, with this process's artifact hashes and package versions.
+
+        A call that resumes a run compares this run info with the stored one.
 
         Raises:
             ValueError: If `solver_configs` or `functions` is empty or holds an id twice.
         """
-        cls._check_ids_are_unique("solver_configs", [config.solver_id for config in solver_configs])
-        cls._check_ids_are_unique("functions", [str(function.id) for function in functions])
+        cls._validate_ids_are_nonempty_and_unique("solver_configs", [config.solver_id for config in solver_configs])
+        cls._validate_ids_are_nonempty_and_unique("functions", [str(function.id) for function in functions])
         return cls(
             run_settings=run_settings,
             solver_versions={config.solver_id: config.solver_cls.version for config in solver_configs},
-            functions=tuple(BenchmarkRunFunctionInfo.from_test_function(function) for function in functions),
+            function_infos=tuple(BenchmarkRunFunctionInfo.from_test_function(function) for function in functions),
             artifact_hashes={
                 MCTuplesDeclaration.name: ArtifactStore.load_manifest(MCTuplesDeclaration).content_hash,
             },
@@ -113,14 +115,17 @@ class BenchmarkRunInfo(BaseModel):
 
     @property
     def formula_ids(self) -> list[str]:
-        """The formula ids of the run's test functions, each once, in order of first appearance, e.g. ``["f2.1.1"]``."""
-        return list(dict.fromkeys(function.formula_id for function in self.functions))
+        """Return the formula ids of the run's test functions, each once, in order of first appearance.
+
+        The run runs its formulas in this order, and its results list them in this order.
+        """
+        return list(dict.fromkeys(function_info.formula_id for function_info in self.function_infos))
 
     # --------------------------------------------------------------------------
     #  Resuming
     # --------------------------------------------------------------------------
     def check_resumable_as(self, other: "BenchmarkRunInfo") -> None:
-        """Check that `other`, the run info of a run that wants to resume this run, has the same inputs and versions.
+        """Check that `other`, the run info of the call that resumes this run, has the same inputs and versions.
 
         Raises:
             BenchmarkRunError: If any field other than the platform and the timestamps differs, naming
@@ -161,10 +166,11 @@ class BenchmarkRunInfo(BaseModel):
     #  Helpers
     # --------------------------------------------------------------------------
     @staticmethod
-    def _check_ids_are_unique(argument_name: str, ids: Sequence[str]) -> None:
+    def _validate_ids_are_nonempty_and_unique(argument_name: str, ids: Sequence[str]) -> None:
         """Check that `ids`, the ids of the items of the argument `argument_name`, is not empty and holds no id twice.
 
-        The run info keys the solvers by id, so a repeated id would merge 2 solvers into 1 entry.
+        The run info keys the solvers by id, so a repeated solver id would merge 2 solvers into 1 entry; a
+        repeated function id would run that test function twice.
 
         Raises:
             ValueError: If `ids` is empty or holds an id twice.
@@ -211,5 +217,5 @@ class BenchmarkRunFunctionInfo(BaseModel):
 
     @property
     def formula_id(self) -> str:
-        """The formula id of the test function, e.g. ``f2.1.1``."""
+        """Return the formula id of the test function, e.g. ``f2.1.1``."""
         return FunctionId.from_string(self.function_id).formula_id

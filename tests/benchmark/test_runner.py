@@ -18,8 +18,8 @@ MC_SIZE = 32
 # ==================================================================================================
 #  Fixtures
 # ==================================================================================================
-# The test functions of the 2 formulas alternate in the list, so the run groups them by formula: both
-# test functions of f2.1.1 run first.
+# The test functions of the 2 formulas alternate in the list, so the tests check that the run groups them by
+# formula: both test functions of f2.1.1 run first.
 _FUNCTION_IDS = ("f2.1.1[p1=0.2]", "f2.1.2[p1=3.0]", "f2.1.1[p1=0.4]")
 _SOLVER_IDS = ("bisection", "regula_falsi")
 
@@ -129,12 +129,12 @@ def test_a_crashed_run_resumes_with_only_its_unfinished_tasks(finished_run_dir, 
         ({"solver_configs": [SolverConfigRegistry.config_from_id("bisection")]}, "solver_versions"),
         (
             {"functions": [functions.FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-0.5, 0.5)]},
-            "functions",
+            "function_infos",
         ),
     ],
 )
 def test_resuming_with_other_inputs_is_refused(finished_run_dir, changes, differing_field):
-    """A run folder only resumes with the inputs of the run it holds, and the error names what differs."""
+    """A run folder only resumes with the inputs of the run that it holds, and the error names what differs."""
     # --- act / assert -----------------
     with pytest.raises(BenchmarkRunError, match=differing_field):
         run_benchmark(**_run_inputs(finished_run_dir, **changes))

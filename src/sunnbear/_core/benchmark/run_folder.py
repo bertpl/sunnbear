@@ -5,9 +5,10 @@ The folder holds:
 - `run_info.json`, the run's `BenchmarkRunInfo`;
 - 1 results file per formula, e.g. `f2.1.1.parquet`, which holds the rows of every test function of the
   formula, written once all of them have run;
-- `staging/`, which holds 1 results file per test function of each formula that is still running, e.g.
-  `staging/f2.1.1/0.parquet` for the formula's first test function in run order; a formula's staging
-  folder is removed once its results file is written, and `staging/` once it is empty.
+- `staging/`, which holds 1 results file per finished test function of each formula whose results file is
+  not written yet, e.g. `staging/f2.1.1/0.parquet` for the formula's first test function in run order, the
+  order in which the formula's test functions run; a formula's staging folder is removed once its results
+  file is written, and `staging/` once it is empty.
 
 Every file is written under a temporary name and then renamed, so a crash never leaves a partly written
 file under its final name, and a file that exists is complete.
@@ -41,8 +42,8 @@ class BenchmarkRunFolder:
     # --------------------------------------------------------------------------
     #  Run info
     # --------------------------------------------------------------------------
-    def start_or_resume(self, run_info: BenchmarkRunInfo) -> BenchmarkRunInfo:
-        """Store `run_info` when the folder holds no run; else check that the stored run resumes as `run_info`.
+    def store_or_check_run_info(self, run_info: BenchmarkRunInfo) -> BenchmarkRunInfo:
+        """Store `run_info` when the folder holds no run; else check `run_info` against the stored run info.
 
         The folder is created when it does not exist.
 
@@ -77,6 +78,11 @@ class BenchmarkRunFolder:
         """Store `run_info`, creating the folder when needed and replacing any stored run info."""
         self.path.mkdir(parents=True, exist_ok=True)
         self._write_atomically(self.path / _RUN_INFO_FILE_NAME, lambda file: file.write_text(run_info.to_json()))
+
+    def mark_finished(self, run_info: BenchmarkRunInfo) -> None:
+        """Store `run_info` with `finished_at` set to now, unless the run is already finished."""
+        if not run_info.is_finished:
+            self.write_run_info(run_info.with_finished_at_now())
 
     # --------------------------------------------------------------------------
     #  Results
@@ -115,9 +121,9 @@ class BenchmarkRunFolder:
             BenchmarkRunError: If the results of a test function of the formula were not staged.
         """
         staged_files = [self._staged_function_results_file(formula_id, idx) for idx in range(n_functions)]
-        missing_files = [file.name for file in staged_files if not file.is_file()]
-        if missing_files:
-            raise BenchmarkRunError(f"Formula {formula_id} has no staged results in {missing_files}.")
+        missing_file_names = [file.name for file in staged_files if not file.is_file()]
+        if missing_file_names:
+            raise BenchmarkRunError(f"Formula {formula_id} is missing the staged results files {missing_file_names}.")
         results = pl.concat([pl.read_parquet(file) for file in staged_files])
         self._write_atomically(self._formula_results_file(formula_id), results.write_parquet)
         staging_folder = self.path / _STAGING_FOLDER_NAME
@@ -129,7 +135,7 @@ class BenchmarkRunFolder:
         """Return a lazy frame over every formula's results file of a finished run.
 
         Raises:
-            BenchmarkRunError: If the folder holds no run info, or a run that is not finished.
+            BenchmarkRunError: If the folder holds no run info, a malformed run info, or a run that is not finished.
         """
         run_info = self.read_run_info()
         if run_info is None:
@@ -150,8 +156,8 @@ class BenchmarkRunFolder:
         return self.path / _STAGING_FOLDER_NAME / formula_id / f"{function_idx}{_RESULTS_FILE_SUFFIX}"
 
     @staticmethod
-    def _write_atomically(file: Path, write: Callable[[Path], object]) -> None:
-        """Write `file` with `write` under a temporary name, then rename it, so `file` is never partly written."""
+    def _write_atomically(file: Path, write_file: Callable[[Path], object]) -> None:
+        """Write `file` with `write_file` under a temporary name, then rename it, so `file` is never partly written."""
         temporary_file = file.with_name(file.name + _TEMPORARY_FILE_SUFFIX)
-        write(temporary_file)
+        write_file(temporary_file)
         temporary_file.replace(file)

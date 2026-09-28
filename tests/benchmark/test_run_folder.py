@@ -13,7 +13,9 @@ def test_a_formula_results_file_needs_the_staged_results_of_every_test_function(
     run_folder = BenchmarkRunFolder(tmp_path)
 
     # --- act / assert -----------------
-    with pytest.raises(BenchmarkRunError, match=r"f2\.1\.1 has no staged results in \['0.parquet', '1.parquet'\]"):
+    with pytest.raises(
+        BenchmarkRunError, match=r"f2\.1\.1 is missing the staged results files \['0.parquet', '1.parquet'\]"
+    ):
         run_folder.write_formula_results("f2.1.1", 2)
 
 
