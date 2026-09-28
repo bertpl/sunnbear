@@ -31,7 +31,7 @@ from .exceptions import ArtifactError
 
 _SHORT_HASH_LENGTH = 8
 
-# The suffix of the sunnbear version recorded for an artifact built from unreleased code, after the last release.
+# An artifact built from unreleased code records the last release's sunnbear version with this suffix.
 _UNRELEASED_VERSION_SUFFIX = "+dev"
 
 
@@ -50,8 +50,8 @@ class ArtifactManifest(BaseModel):
         input_artifact_hashes: The content hashes of the artifacts that this artifact was generated
             from, keyed by artifact name.
         built_with: The versions of sunnbear and of the libraries that affect the content, keyed by
-            package name. sunnbear's version is `<last release>+dev` until the release that ships the
-            artifact replaces it with the release version; see `unreleased_sunnbear_version`.
+            package name. See `unreleased_sunnbear_version` for the sunnbear version recorded before
+            a release.
         build_date: The date the artifact was built.
         generated_by: The public sunnbear function call that generated the artifact, with its
             arguments, as JSON-compatible data; ``None`` when no public function generated it.
@@ -117,9 +117,14 @@ class ArtifactManifest(BaseModel):
         return f"{last_release_version}{_UNRELEASED_VERSION_SUFFIX}"
 
     @property
+    def sunnbear_version(self) -> str:
+        """Return the sunnbear version recorded in `built_with`, or `""` when none is recorded."""
+        return self.built_with.get("sunnbear", "")
+
+    @property
     def is_built_from_unreleased_code(self) -> bool:
         """Return whether the recorded sunnbear version marks unreleased code, e.g. `0.1.4+dev`."""
-        return self.built_with.get("sunnbear", "").endswith(_UNRELEASED_VERSION_SUFFIX)
+        return self.sunnbear_version.endswith(_UNRELEASED_VERSION_SUFFIX)
 
     def with_release_version(self, release_version: str) -> "ArtifactManifest":
         """Return a copy that records `release_version` as the sunnbear version; the content hash is unchanged."""

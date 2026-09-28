@@ -73,12 +73,12 @@ def test_with_release_version_replaces_only_the_sunnbear_version():
     manifest = _make_manifest(built_with={"numpy": "2.1.0", "sunnbear": "0.1.4+dev"})
 
     # --- act --------------------------
-    released = manifest.with_release_version("0.2.0")
+    released_manifest = manifest.with_release_version("0.2.0")
 
     # --- assert -----------------------
-    assert released.built_with == {"numpy": "2.1.0", "sunnbear": "0.2.0"}
-    assert not released.is_built_from_unreleased_code
-    assert released.content_hash == manifest.content_hash
+    assert released_manifest.built_with == {"numpy": "2.1.0", "sunnbear": "0.2.0"}
+    assert not released_manifest.is_built_from_unreleased_code
+    assert released_manifest.content_hash == manifest.content_hash
 
 
 # ==================================================================================================

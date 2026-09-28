@@ -149,21 +149,21 @@ class ArtifactStore:
     # --------------------------------------------------------------------------
     @classmethod
     def unreleased_builtin_artifact_names(cls, *, last_release_version: str) -> tuple[str, ...]:
-        """Return the names of the built-in artifacts built from code after `last_release_version`, sorted.
+        """Return the names of the built-in artifacts built since release `last_release_version`, sorted.
 
         Raises:
-            ArtifactError: If a built-in artifact records unreleased code after another release, e.g.
-                `0.1.3+dev` while the last release is `0.1.4`: that release should have stamped it.
+            ArtifactError: If a built-in artifact records an older release's version plus `+dev`, e.g.
+                `0.1.3+dev` while the last release is `0.1.4`: release `0.1.4` should have replaced it.
         """
         expected_version = ArtifactManifest.unreleased_sunnbear_version(last_release_version)
         names = []
         for name in cls.builtin_artifact_names():
             manifest = cls.load_builtin_manifest(name)
             if manifest.is_built_from_unreleased_code:
-                if manifest.built_with["sunnbear"] != expected_version:
+                if manifest.sunnbear_version != expected_version:
                     raise ArtifactError(
-                        f"{manifest.short_identity} records sunnbear {manifest.built_with['sunnbear']}, "
-                        f"but unreleased code after release {last_release_version} is {expected_version}."
+                        f"{manifest.short_identity} records sunnbear {manifest.sunnbear_version}, "
+                        f"but an artifact built since release {last_release_version} records {expected_version}."
                     )
                 names.append(name)
         return tuple(names)
@@ -172,24 +172,20 @@ class ArtifactStore:
     def stamp_release_version(cls, *, release_version: str, last_release_version: str) -> tuple[Path, ...]:
         """Record `release_version` in every built-in manifest built from unreleased code; return their paths.
 
-        The release script calls this before the release commit, which then includes the returned
-        manifests. Manifests of earlier releases keep their version, and no content hash changes.
+        Manifests of earlier releases keep their version, and no content hash changes.
 
         Raises:
-            ArtifactError: See `unreleased_builtin_artifact_names`; or the built-in artifacts folder is
-                not a writable directory, e.g. inside a zipped install.
+            ArtifactError: If a built-in artifact records an older release's `+dev` version (see
+                `unreleased_builtin_artifact_names`), or if the built-in artifacts folder is not a
+                writable directory, e.g. inside a zipped install.
         """
-        builtin_artifacts_folder = cls._builtin_artifacts_folder()
-        if not isinstance(builtin_artifacts_folder, Path):
-            raise ArtifactError(
-                f"The built-in artifacts folder is not a writable directory: {builtin_artifacts_folder}."
-            )
+        builtin_artifacts_folder = cls._writable_folder(
+            cls._builtin_artifacts_folder(), "The built-in artifacts folder"
+        )
         paths = []
         for name in cls.unreleased_builtin_artifact_names(last_release_version=last_release_version):
             manifest = cls.load_builtin_manifest(name).with_release_version(release_version)
-            path = builtin_artifacts_folder / name / _MANIFEST_FILE_NAME
-            path.write_text(manifest.to_json())
-            paths.append(path)
+            paths.append(cls._write_manifest_file(builtin_artifacts_folder / name, manifest))
         return tuple(paths)
 
     # --------------------------------------------------------------------------
@@ -220,8 +216,10 @@ class ArtifactStore:
             declaration_cls: The artifact's declaration.
             value: The value to write.
             built_with: The versions of the libraries that affect the content, keyed by package
-                name; sunnbear's own version is always recorded as `<installed version>+dev`,
-                replacing any ``sunnbear`` entry, because an artifact is built from unreleased code.
+                name; sunnbear's own version is always recorded as `<last release>+dev`, replacing any
+                ``sunnbear`` entry, because an artifact is built from unreleased code. Between
+                releases the installed version is the last release's, since only the release script
+                bumps it.
             input_artifact_hashes: The content hashes of `value`'s input artifacts, keyed by
                 artifact name.
             generated_by: The public function call that generated `value`, as JSON-compatible data.
@@ -547,9 +545,17 @@ class ArtifactStore:
         Raises:
             ArtifactError: If the folder is not a directory on disk, e.g. inside a zipped install.
         """
-        folder = cls._folder_of(declaration_cls)
+        return cls._writable_folder(cls._folder_of(declaration_cls), f"The folder of {declaration_cls.__name__}")
+
+    @staticmethod
+    def _writable_folder(folder: Traversable, description: str) -> Path:
+        """Return `folder`, checked to be a directory on disk so that it can be written to.
+
+        Raises:
+            ArtifactError: If the folder is not a directory on disk, e.g. inside a zipped install.
+        """
         if not isinstance(folder, Path):
-            raise ArtifactError(f"The folder of {declaration_cls.__name__} is not a writable directory: {folder}.")
+            raise ArtifactError(f"{description} is not a writable directory: {folder}.")
         return folder
 
     @classmethod
@@ -557,7 +563,14 @@ class ArtifactStore:
         """Write `manifest` to the artifact's folder, creating the folder if needed."""
         folder = cls._folder_on_disk_of(declaration_cls)
         folder.mkdir(parents=True, exist_ok=True)
-        (folder / _MANIFEST_FILE_NAME).write_text(manifest.to_json())
+        cls._write_manifest_file(folder, manifest)
+
+    @staticmethod
+    def _write_manifest_file(folder: Path, manifest: ArtifactManifest) -> Path:
+        """Write `manifest` to `folder`, which must exist, and return the manifest file's path."""
+        path = folder / _MANIFEST_FILE_NAME
+        path.write_text(manifest.to_json())
+        return path
 
     @staticmethod
     def _builtin_artifacts_folder() -> Traversable:

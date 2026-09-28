@@ -14,7 +14,7 @@ LAST_RELEASE_VERSION = importlib.metadata.version("sunnbear")
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-def _save_builtin(name: str, sunnbear_version: str | None = None) -> None:
+def _save_builtin_artifact(name: str, sunnbear_version: str | None = None) -> None:
     """Save a 1-file built-in artifact; with `sunnbear_version`, rewrite its manifest to record that version."""
     ArtifactStore.save(define_builtin_declaration(name), b"content\n")
     if sunnbear_version is not None:
@@ -30,8 +30,8 @@ def _save_builtin(name: str, sunnbear_version: str | None = None) -> None:
 def test_only_artifacts_built_after_the_last_release_are_unreleased():
     """A freshly saved artifact is unreleased; one that an earlier release stamped is not."""
     # --- arrange ----------------------
-    _save_builtin("fresh")
-    _save_builtin("released", sunnbear_version="0.0.1")
+    _save_builtin_artifact("fresh")
+    _save_builtin_artifact("released", sunnbear_version="0.0.1")
 
     # --- act --------------------------
     names = ArtifactStore.unreleased_builtin_artifact_names(last_release_version=LAST_RELEASE_VERSION)
@@ -42,9 +42,9 @@ def test_only_artifacts_built_after_the_last_release_are_unreleased():
 
 @pytest.mark.usefixtures("isolated_artifact_registry", "builtin_artifacts_folder_in_tmp")
 def test_an_unreleased_artifact_after_another_release_stops_the_release():
-    """An artifact that records `+dev` after a release other than the last one was never stamped, so it is refused."""
+    """An artifact that records an older release's version plus `+dev` was never stamped, so it is refused."""
     # --- arrange ----------------------
-    _save_builtin("stale", sunnbear_version="0.0.1+dev")
+    _save_builtin_artifact("stale", sunnbear_version="0.0.1+dev")
 
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match=r"records sunnbear 0\.0\.1\+dev"):
@@ -58,8 +58,8 @@ def test_an_unreleased_artifact_after_another_release_stops_the_release():
 def test_stamping_records_the_release_version_in_unreleased_manifests_only(builtin_artifacts_folder_in_tmp):
     """The unreleased manifest records the release version with its content hash unchanged; the other is untouched."""
     # --- arrange ----------------------
-    _save_builtin("fresh")
-    _save_builtin("released", sunnbear_version="0.0.1")
+    _save_builtin_artifact("fresh")
+    _save_builtin_artifact("released", sunnbear_version="0.0.1")
     fresh_before = ArtifactStore.load_builtin_manifest("fresh")
     released_json_before = (builtin_artifacts_folder_in_tmp / "released" / "manifest.json").read_text()
 
