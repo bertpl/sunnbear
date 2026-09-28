@@ -52,6 +52,37 @@ runs:
         # inside the numba-compiled functions; tests marked only_with_numba_jit skip (tests/conftest.py).
         run: echo "NUMBA_DISABLE_JIT=1" >> "$GITHUB_ENV"  # zizmor: ignore[github-env] constant value, not user input
 
+      # numba reuses a cached compile only when the numba version, the Python version, the CPU and the
+      # source file's (mtime, size) all match; it checks no file contents and no package versions. A
+      # fresh venv gives every installed file a new mtime, so the jit-on jobs pin the mtimes and key the
+      # cache on the exact installed versions, which covers the content check numba lacks. Tag pushes
+      # (releases) skip the cache, so release tests never load compiled code that another run saved.
+      - name: Install the environment and pin its third-party source mtimes
+        id: numba-cache-env
+        if: inputs.jit == 'on' && github.ref_type != 'tag'
+        shell: bash
+        env:
+          PY: ${{ env.PYTHON_EFFECTIVE_VERSION }}
+          RES: ${{ inputs.dependency_resolution }}
+        run: |  # zizmor: ignore[github-env] constant values, not user input
+          uv sync --python "$PY" --resolution "$RES" --group dev
+          # sunnbear itself is an editable install from the checkout, not in site-packages, so its own
+          # source keeps its real mtimes: a changed file of the same size must not load stale code.
+          find .venv/lib/python*/site-packages -name '*.py' -exec touch -d @946684800 {} +  # 2000-01-01, a fixed time
+          FREEZE_HASH=$(uv pip freeze --python .venv/bin/python --exclude-editable | sha256sum | cut -d' ' -f1)
+          echo "freeze-hash=$FREEZE_HASH" >> "$GITHUB_OUTPUT"
+          echo "NUMBA_CACHE_DIR=$RUNNER_TEMP/numba-cache" >> "$GITHUB_ENV"
+          # a generic CPU target makes the cached code independent of the runner's CPU model
+          echo "NUMBA_CPU_NAME=generic" >> "$GITHUB_ENV"
+
+      - name: Restore and save numba's compiled code
+        if: steps.numba-cache-env.outcome == 'success'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/numba-cache
+          # no restore-keys: a cache is only ever restored for the exact same installed versions
+          key: numba-${{ runner.os }}-${{ runner.arch }}-py${{ env.PYTHON_EFFECTIVE_VERSION }}-${{ inputs.dependency_resolution }}-${{ steps.numba-cache-env.outputs.freeze-hash }}
+
       - name: Run tests
         shell: bash
         env:
