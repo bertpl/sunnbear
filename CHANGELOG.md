@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The shipped Monte Carlo (u, v) tuple set comes from an 8 h construction and spreads its tuples more evenly; benchmark results on it differ from those on the previous set
+
 ### Deprecated
 
 ### Removed
