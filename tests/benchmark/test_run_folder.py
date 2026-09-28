@@ -18,7 +18,7 @@ def test_a_formula_results_file_needs_the_staged_results_of_every_test_function(
 
 
 def test_a_formula_results_file_holds_its_staged_results_in_run_order_and_keeps_other_staging(tmp_path):
-    """A formula's results file concatenates its staged results in run order; other formulas' staging stays."""
+    """A formula's results file joins its staged results in run order; other formulas' staged results are kept."""
     # --- arrange ----------------------
     run_folder = BenchmarkRunFolder(tmp_path)
     run_folder.stage_function_results("f2.1.1", 1, pl.DataFrame({"function_idx": [1, 1]}))

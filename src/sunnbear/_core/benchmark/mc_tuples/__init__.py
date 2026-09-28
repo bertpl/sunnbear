@@ -13,4 +13,4 @@ from .artifact import MCTuplesDeclaration, load_mc_tuples
 from .construction import generate_mc_tuples
 from .construction_settings import MCTuplesConstructionSettings
 from .exceptions import MCTuplesConstructionError
-from .tuples import MC_TUPLES_SIZES, MCTuples, MCTuplesStats
+from .tuples import MC_TUPLES_SIZES, MCTuples, MCTuplesStats, validate_mc_tuples_size

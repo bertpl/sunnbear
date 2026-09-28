@@ -1,4 +1,4 @@
-"""`BenchmarkRunInfo` records a run's inputs and versions, survives JSON, and tells which runs may resume it."""
+"""`BenchmarkRunInfo` records a run's inputs and versions, reads back from JSON unchanged, and allows resumes."""
 
 import datetime
 
@@ -31,14 +31,17 @@ def test_a_new_run_info_records_the_inputs_the_artifacts_and_the_versions(run_in
     assert run_info.artifact_hashes == {"mc_tuples": ArtifactStore.load_manifest(MCTuplesDeclaration).content_hash}
     assert {"python", "sunnbear", "numpy", "numba", "counted-float", "polars"} <= set(run_info.package_versions)
     assert not run_info.is_finished
-    assert run_info.finished_now().is_finished
+    assert run_info.with_finished_at_now().is_finished
 
 
-def test_a_run_info_reads_back_equal_from_its_json(run_info):
+@pytest.mark.parametrize("is_finished", [False, True])
+def test_a_run_info_reads_back_equal_from_its_json(run_info, is_finished):
     """`from_json` reads back exactly the run info that `to_json` wrote, finished or not."""
+    # --- arrange ----------------------
+    original = run_info.with_finished_at_now() if is_finished else run_info
+
     # --- act / assert -----------------
-    for original in (run_info, run_info.finished_now()):
-        assert BenchmarkRunInfo.from_json(original.to_json()) == original
+    assert BenchmarkRunInfo.from_json(original.to_json()) == original
 
 
 def test_malformed_run_info_json_is_refused():
@@ -53,14 +56,14 @@ def test_a_run_on_another_platform_or_at_another_time_may_resume(run_info):
     # --- arrange ----------------------
     other = run_info.model_copy(
         update={"platform": "Other-arch", "started_at": datetime.datetime(2000, 1, 1, tzinfo=datetime.UTC)}
-    ).finished_now()
+    ).with_finished_at_now()
 
     # --- act / assert -----------------
     run_info.check_resumable_as(other)
 
 
 def test_a_run_with_other_package_versions_may_not_resume(run_info):
-    """Results depend on the installed packages, so another version refuses the resume and names the field."""
+    """A run with another package version cannot resume, because results depend on them; the error names the field."""
     # --- arrange ----------------------
     other = run_info.model_copy(update={"package_versions": run_info.package_versions | {"numpy": "0.0.0"}})
 

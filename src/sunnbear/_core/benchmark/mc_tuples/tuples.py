@@ -14,6 +14,13 @@ from numpy.typing import ArrayLike
 # subset of every larger size's.
 MC_TUPLES_SIZES = (32, 64, 128, 256, 512, 1024)
 
+
+def validate_mc_tuples_size(argument_name: str, size: int) -> None:
+    """Raise `ValueError` if `size`, the value of the argument `argument_name`, is not 1 of `MC_TUPLES_SIZES`."""
+    if size not in MC_TUPLES_SIZES:
+        raise ValueError(f"{argument_name} must be one of {list(MC_TUPLES_SIZES)} (got {size}).")
+
+
 # Each axis is cut into this many equal bins, as in a histogram; `MCTuplesStats` counts the tuples per
 # bin, and the construction keeps each count within 1 of `size / N_BINS`.
 N_BINS = 8

@@ -18,21 +18,21 @@ MC_SIZE = 32
 # ==================================================================================================
 #  Fixtures
 # ==================================================================================================
-# The 2 formulas interleave, so the run groups the test functions by formula: f2.1.1 runs both of its
-# test functions first.
+# The test functions of the 2 formulas alternate in the list, so the run groups them by formula: both
+# test functions of f2.1.1 run first.
 _FUNCTION_IDS = ("f2.1.1[p1=0.2]", "f2.1.2[p1=3.0]", "f2.1.1[p1=0.4]")
 _SOLVER_IDS = ("bisection", "regula_falsi")
 
 
-def _run_inputs(out_dir: Path, **changes: object) -> dict[str, object]:
-    """Return the keyword arguments of a small run into `out_dir`, with `changes` applied."""
+def _run_inputs(run_dir: Path, **changes: object) -> dict[str, object]:
+    """Return the keyword arguments of a small run into `run_dir`, with `changes` applied."""
     return {
         "solver_configs": [SolverConfigRegistry.config_from_id(solver_id) for solver_id in _SOLVER_IDS],
         "functions": [
             functions.FormulaRegistry.candidate_from_id(function_id).calibrated(-1.0, 1.0)
             for function_id in _FUNCTION_IDS
         ],
-        "out_dir": out_dir,
+        "run_dir": run_dir,
         "root_seed": 1,
         "mc_size": MC_SIZE,
     } | changes
@@ -41,9 +41,9 @@ def _run_inputs(out_dir: Path, **changes: object) -> dict[str, object]:
 @pytest.fixture(scope="module")
 def finished_run_dir(tmp_path_factory) -> Path:
     """Return the folder of a finished small run."""
-    out_dir = tmp_path_factory.mktemp("finished_run")
-    run_benchmark(**_run_inputs(out_dir))
-    return out_dir
+    run_dir = tmp_path_factory.mktemp("finished_run")
+    run_benchmark(**_run_inputs(run_dir))
+    return run_dir
 
 
 def _results_without_wall_time(run_dir: Path) -> pl.DataFrame:
@@ -156,12 +156,12 @@ def test_resuming_with_other_inputs_is_refused(finished_run_dir, changes, differ
 def test_invalid_inputs_are_refused_before_the_run_folder_is_written(tmp_path, changes, message):
     """Invalid inputs raise `ValueError` and leave the run folder unwritten."""
     # --- arrange ----------------------
-    out_dir = tmp_path / "run"
+    run_dir = tmp_path / "run"
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=message):
-        run_benchmark(**_run_inputs(out_dir, **changes))
-    assert not out_dir.exists()
+        run_benchmark(**_run_inputs(run_dir, **changes))
+    assert not run_dir.exists()
 
 
 def test_loading_a_folder_without_a_run_is_refused(tmp_path):

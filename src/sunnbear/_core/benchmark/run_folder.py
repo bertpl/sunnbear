@@ -1,4 +1,4 @@
-"""`BenchmarkRunFolder` is the folder of 1 benchmark run, and the only code that reads or writes its files.
+"""`BenchmarkRunFolder` represents the folder of 1 benchmark run, and is the only code that reads or writes its files.
 
 The folder holds:
 
@@ -18,8 +18,6 @@ from collections.abc import Callable
 from pathlib import Path
 
 import polars as pl
-
-from sunnbear._core.functions.core import FunctionId
 
 from .exceptions import BenchmarkRunError
 from .run_info import BenchmarkRunInfo
@@ -43,6 +41,26 @@ class BenchmarkRunFolder:
     # --------------------------------------------------------------------------
     #  Run info
     # --------------------------------------------------------------------------
+    def start_or_resume(self, run_info: BenchmarkRunInfo) -> BenchmarkRunInfo:
+        """Store `run_info` when the folder holds no run; else check that the stored run resumes as `run_info`.
+
+        The folder is created when it does not exist.
+
+        Returns:
+            The run info of the folder's run: `run_info` for a new run, the stored run info for a resumed one.
+
+        Raises:
+            BenchmarkRunError: If the stored run info is malformed, or belongs to a run with other inputs or
+                versions.
+        """
+        stored_run_info = self.read_run_info()
+        if stored_run_info is None:
+            self.write_run_info(run_info)
+            return run_info
+        else:
+            stored_run_info.check_resumable_as(run_info)
+            return stored_run_info
+
     def read_run_info(self) -> BenchmarkRunInfo | None:
         """Return the stored run info, or ``None`` when the folder holds none.
 
@@ -64,11 +82,11 @@ class BenchmarkRunFolder:
     #  Results
     # --------------------------------------------------------------------------
     def has_formula_results(self, formula_id: str) -> bool:
-        """Whether the results file of the formula `formula_id`, e.g. ``f2.1.1``, was written."""
+        """Return whether the results file of the formula `formula_id`, e.g. ``f2.1.1``, was written."""
         return self._formula_results_file(formula_id).is_file()
 
     def has_staged_function_results(self, formula_id: str, function_idx: int) -> bool:
-        """Whether the results of a formula's test function were staged.
+        """Return whether the results of a formula's test function were staged.
 
         Args:
             formula_id: The formula's id, e.g. ``f2.1.1``.
@@ -91,7 +109,7 @@ class BenchmarkRunFolder:
         self._write_atomically(staged_file, results.write_parquet)
 
     def write_formula_results(self, formula_id: str, n_functions: int) -> None:
-        """Write the formula's results file from its `n_functions` staged results, in run order, and remove them.
+        """Write the formula's results file from its `n_functions` staged results, in run order, then remove them.
 
         Raises:
             BenchmarkRunError: If the results of a test function of the formula were not staged.
@@ -116,13 +134,9 @@ class BenchmarkRunFolder:
         run_info = self.read_run_info()
         if run_info is None:
             raise BenchmarkRunError(f"{self.path} holds no benchmark run.")
-        elif not run_info.is_finished:
+        if not run_info.is_finished:
             raise BenchmarkRunError(f"The benchmark run in {self.path} is not finished; resume it first.")
-        else:
-            formula_ids = dict.fromkeys(
-                FunctionId.from_string(function.function_id).formula_id for function in run_info.functions
-            )
-            return pl.scan_parquet([self._formula_results_file(formula_id) for formula_id in formula_ids])
+        return pl.scan_parquet([self._formula_results_file(formula_id) for formula_id in run_info.formula_ids])
 
     # --------------------------------------------------------------------------
     #  Helpers

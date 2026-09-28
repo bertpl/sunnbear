@@ -78,7 +78,7 @@ class FunctionId:
     # --------------------------------------------------------------------------
     @property
     def formula_id(self) -> str:
-        """The id of the formula: its taxonomy number with an ``f`` prefix, e.g. ``f2.1.5``."""
+        """A formula id is the formula's taxonomy number with an ``f`` prefix, e.g. ``f2.1.5``."""
         return f"f{FormulaTaxonomyNode.format_number(self.formula_number)}"
 
     def display(self) -> str:
