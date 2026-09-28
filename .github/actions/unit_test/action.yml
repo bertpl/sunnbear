@@ -1,6 +1,6 @@
 name: Unit Tests
 author: Bert Pluymers
-description: Run unit tests at a specific Python version and dependency resolution.
+description: Run unit tests with coverage at a specific Python version, dependency resolution, and numba JIT mode.
 
 inputs:
     uv_version:
@@ -16,7 +16,7 @@ inputs:
         default: "highest"
     jit:
         required: false
-        description: "'off' collects coverage under NUMBA_DISABLE_JIT (njit off, so formula bodies are measured as plain Python) and uploads the per-combo data for the cross-matrix combine; 'on' (default) runs plain pytest with JIT on."
+        description: "'off' runs under NUMBA_DISABLE_JIT (njit off, so coverage measures the formula bodies as plain Python); 'on' (default) runs with JIT on. Both collect coverage and upload the per-combo data for the cross-matrix combine."
         default: "on"
 
 runs:
@@ -50,37 +50,31 @@ runs:
         env:
           PY: ${{ env.PYTHON_EFFECTIVE_VERSION }}
           RES: ${{ inputs.dependency_resolution }}
-          JIT: ${{ inputs.jit }}
+          # jit-off: njit returns the plain Python function, so coverage.py sees the formula bodies'
+          # lines and branches; tests marked only_with_numba_jit skip (tests/conftest.py).
+          NUMBA_DISABLE_JIT: ${{ inputs.jit == 'off' && '1' || '0' }}
           # distinct per-combo data file so the coverage job combines rather than overwrites
-          COVERAGE_FILE: .coverage.${{ inputs.python_version }}-${{ inputs.dependency_resolution }}
-        run: |
-          COV_FLAG=""
-          # jit-off legs collect coverage with numba disabled: njit becomes a no-op, so the formula
-          # bodies run as plain Python and coverage.py sees their real lines and branches.
-          # (--cov-fail-under=0: the gate is cumulative, in the coverage job, not per-combo.)
-          if [ "$JIT" = "off" ]; then
-            COV_FLAG="--cov --cov-report= --cov-fail-under=0"
-            export NUMBA_DISABLE_JIT=1
-          fi
-          uv run --python "$PY" --resolution "$RES" --group dev pytest ./tests $COV_FLAG --durations=20
+          COVERAGE_FILE: .coverage.${{ inputs.python_version }}-${{ inputs.dependency_resolution }}-jit-${{ inputs.jit }}
+        # --cov-fail-under=0: the gate is cumulative, in the coverage job, not per-combo
+        run: uv run --python "$PY" --resolution "$RES" --group dev pytest ./tests --cov --cov-report= --cov-fail-under=0 --durations=20
 
       - name: Dump collected node-ids (for the cross-combo test-count union)
-        if: inputs.jit == 'off'
         shell: bash
         env:
           PY: ${{ env.PYTHON_EFFECTIVE_VERSION }}
           RES: ${{ inputs.dependency_resolution }}
+          JIT: ${{ inputs.jit }}
+          NUMBA_DISABLE_JIT: ${{ inputs.jit == 'off' && '1' || '0' }}
         run: |
           # each combo records its own collected set so the coverage job can union them
           uv run --python "$PY" --resolution "$RES" --group dev \
             pytest ./tests --collect-only -q \
-            | grep '::' > "test-ids-${PY}-${RES}.txt"
+            | grep '::' > "test-ids-${PY}-${RES}-jit-${JIT}.txt"
 
       - name: Upload coverage + node-id data
-        if: inputs.jit == 'off'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: coverage-data-${{ inputs.python_version }}-${{ inputs.dependency_resolution }}
+          name: coverage-data-${{ inputs.python_version }}-${{ inputs.dependency_resolution }}-jit-${{ inputs.jit }}
           path: |
             .coverage.*
             test-ids-*.txt

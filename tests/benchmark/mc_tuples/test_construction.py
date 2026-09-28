@@ -7,6 +7,7 @@ from sunnbear._core.benchmark.mc_tuples import MC_TUPLES_SIZES, MCTuplesConstruc
 from sunnbear._core.benchmark.mc_tuples.construction import _check_selection, _draw_population
 
 
+@pytest.mark.only_with_numba_jit
 def test_generate_mc_tuples_builds_a_set_whose_every_size_meets_its_bin_constraints():
     """A 1 s construction gives distinct tuples of the largest size, and every prefix size keeps each bin within 1.
 

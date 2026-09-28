@@ -187,6 +187,12 @@ ignore-words-list = "intoto"
 # Notebooks embed base64 image outputs that codespell misreads as typos.
 skip = "*.ipynb"
 
+[tool.pytest.ini_options]
+addopts = "--strict-markers"
+markers = [
+    "only_with_numba_jit: needs numba's compiled code; skipped when NUMBA_DISABLE_JIT is set (see tests/conftest.py)",
+]
+
 [tool.coverage.run]
 source = ["sunnbear"]  # the import package name, not a src/ path — resolved via import, so cwd-independent
 branch = true          # both sides of every branch must be hit, not just each line once
@@ -194,8 +200,8 @@ relative_files = true  # so per-combo matrix data files combine without a [paths
 
 [tool.coverage.report]
 precision = 2
-fail_under = 100       # cumulative gate on the combined matrix data; coverage runs on the jit-off
-                       # legs (NUMBA_DISABLE_JIT), which measure the njit formula bodies as plain Python.
+fail_under = 100       # cumulative gate on the combined matrix data; only the jit-off jobs
+                       # (NUMBA_DISABLE_JIT) measure the njit formula bodies, as plain Python.
 exclude_also = [
     "@abstractmethod",
     "@abc.abstractmethod",

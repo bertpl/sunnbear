@@ -33,7 +33,10 @@ test:
 	uv run pytest ./tests
 
 coverage:
-	NUMBA_DISABLE_JIT=1 uv run pytest ./tests --cov --cov-report=html
+	# Both modes, as in CI: with JIT off for the numba bodies, then with JIT on for the tests that
+	# skip without it; the report and the gate apply to the combined data.
+	NUMBA_DISABLE_JIT=1 uv run pytest ./tests --cov --cov-report= --cov-fail-under=0
+	uv run pytest ./tests --cov --cov-append --cov-report=html
 
 lint:
 	uv run pre-commit run --all-files

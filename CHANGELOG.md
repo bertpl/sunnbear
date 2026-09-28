@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Importing `sunnbear.benchmark` no longer compiles max-div's numba functions, which could take minutes on a fresh install
 - A data artifact's manifest names the sunnbear release that ships the artifact, not the release before it
 
 ### Security
