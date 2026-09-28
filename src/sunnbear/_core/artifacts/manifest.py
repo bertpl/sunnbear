@@ -47,7 +47,8 @@ class ArtifactManifest(BaseModel):
         input_artifact_hashes: The content hashes of the artifacts that this artifact was generated
             from, keyed by artifact name.
         built_with: The versions of sunnbear and of the libraries that affect the content, keyed by
-            package name.
+            package name. Before a release, the sunnbear version is the last release's version plus
+            `+dev`; the release replaces it with the release version.
         build_date: The date the artifact was built.
         generated_by: The public sunnbear function call that generated the artifact, with its
             arguments, as JSON-compatible data; ``None`` when no public function generated it.

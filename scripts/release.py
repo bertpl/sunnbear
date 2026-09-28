@@ -1,8 +1,14 @@
 """Release driver for sunnbear.
 
-Run via ``make release VERSION=X.Y.Z``.  Validates state, bumps version, stamps
-the versioned splash + README badges, finalizes the changelog, commits, tags,
-opens a fresh Unreleased section, and pushes main + tag atomically.
+Run via ``make release VERSION=X.Y.Z``.  In order, the release:
+
+- validates state
+- bumps the version
+- stamps the versioned splash, the README badges and the built-in artifact manifests
+- finalizes the changelog
+- commits and tags
+- opens a fresh Unreleased section
+- pushes main and the tag atomically
 
 Every precondition runs before the first write, so a failed precondition leaves
 the tree as it was.  ``--dry-run`` runs every precondition and stops before the
@@ -25,10 +31,14 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
+from sunnbear._core.artifacts import ArtifactManifest
+from sunnbear._core.artifacts.store import UNRELEASED_SUNNBEAR_VERSION_SUFFIX
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PYPROJECT = REPO_ROOT / "pyproject.toml"
 CHANGELOG = REPO_ROOT / "CHANGELOG.md"
 README = REPO_ROOT / "README.md"
+BUILTIN_ARTIFACTS_FOLDER = REPO_ROOT / "src" / "sunnbear" / "_core" / "artifacts" / "builtin"
 PYTHON_VERSIONS_FILE = REPO_ROOT / ".python-versions"
 SPLASH_SCRIPT = REPO_ROOT / ".github" / "scripts" / "create_splash.sh"
 SPLASH_WEBP = REPO_ROOT / "images" / "splash_with_version.webp"
@@ -192,13 +202,15 @@ def step_7_check_changelog_has_entries() -> None:
         fail_with_message("'## Unreleased' has no bullet entries")
 
 
-def step_8_check_stamping_inputs() -> None:
-    """Validate everything the release commit needs to stamp the README badges and the splash.
+def step_8_check_stamping_inputs(last_release_version: str) -> None:
+    """Validate everything the release commit needs to stamp the README badges, the splash and the artifact manifests.
 
     A badge that the README no longer carries would otherwise be skipped silently, leaving a stale
-    badge in the release.
+    badge in the release. An artifact built since the last release records that release's version
+    plus `+dev`; a built-in artifact manifest that still records an older release's version plus
+    `+dev` was missed by the release that followed that older one, so the release stops.
     """
-    print_step(8, "README badges and splash inputs are in place for stamping")
+    print_step(8, "README badges, splash and artifact manifests are in place for stamping")
     readme = README.read_text()
     for name, badge_re in (("coverage", COVERAGE_BADGE_RE), ("test-count", TESTS_BADGE_RE)):
         n_badges = len(badge_re.findall(readme))
@@ -209,6 +221,13 @@ def step_8_check_stamping_inputs() -> None:
     for path in (SPLASH_SCRIPT, SPLASH_BASE_PNG, SPLASH_FONT):
         if not path.is_file():
             fail_with_message(f"the splash cannot be stamped: {path.relative_to(REPO_ROOT)} is missing")
+    try:
+        manifest_paths = unreleased_artifact_manifest_paths(last_release_version)
+    except ValueError as error:
+        fail_with_message(f"the artifact manifests cannot be stamped: {error}")
+    else:
+        names = ", ".join(path.parent.name for path in manifest_paths) or "none"
+        print(f"    artifact manifests to stamp with the release version: {names}")
 
 
 # warn if the number of distinct tests across all CI matrix combos exceeds this multiple of the
@@ -329,6 +348,50 @@ def step_9_gather_badge_metrics() -> BadgeMetrics:
 
 
 # ==================================================================================================
+#  artifact manifests
+# ==================================================================================================
+# Saving a built-in data artifact records sunnbear's version as the last release's version plus
+# `UNRELEASED_SUNNBEAR_VERSION_SUFFIX`, because the next release's number is not known yet. The release
+# commit replaces such versions with the release version. The manifests are read and written through
+# `ArtifactManifest`, which owns their JSON format and checks their content hash.
+
+
+def unreleased_artifact_manifest_paths(last_release_version: str) -> list[Path]:
+    """Return the built-in artifact manifests that record sunnbear as `last_release_version` plus the suffix, sorted.
+
+    Raises:
+        ValueError: If a manifest records an older release's version plus the suffix: the release after
+            that older one should have replaced it.
+    """
+    expected_version = last_release_version + UNRELEASED_SUNNBEAR_VERSION_SUFFIX
+    paths = []
+    for path in sorted(BUILTIN_ARTIFACTS_FOLDER.glob("*/manifest.json")):
+        sunnbear_version = ArtifactManifest.from_json(path.read_text()).built_with.get("sunnbear", "")
+        if sunnbear_version.endswith(UNRELEASED_SUNNBEAR_VERSION_SUFFIX):
+            if sunnbear_version != expected_version:
+                raise ValueError(
+                    f"the manifest of {path.parent.name} records sunnbear {sunnbear_version}, "
+                    f"but an artifact built since release {last_release_version} records {expected_version}"
+                )
+            paths.append(path)
+    return paths
+
+
+def stamp_artifact_manifests(*, release_version: str, last_release_version: str) -> list[Path]:
+    """Record `release_version` as the sunnbear version of every unreleased built-in artifact; return their manifests.
+
+    Manifests of earlier releases keep their version, and no content hash changes: it covers the data
+    files only.
+    """
+    manifest_paths = unreleased_artifact_manifest_paths(last_release_version)
+    for path in manifest_paths:
+        manifest = ArtifactManifest.from_json(path.read_text())
+        stamped = manifest.model_copy(update={"built_with": manifest.built_with | {"sunnbear": release_version}})
+        path.write_text(stamped.to_json())
+    return manifest_paths
+
+
+# ==================================================================================================
 #  release commit steps
 # ==================================================================================================
 def step_10_bump_version(version: str) -> None:
@@ -414,12 +477,16 @@ def stamp_splash(version: str) -> None:
     run_command(["sh", str(SPLASH_SCRIPT), version], cwd=REPO_ROOT)
 
 
-def step_13_commit_release(version: str, badge_metrics: BadgeMetrics) -> None:
-    """Refresh README badges, stamp the splash, then create the release commit."""
-    print_step(13, f"refresh README badges + stamp splash + commit 'release: {version}'")
+def step_13_commit_release(version: str, last_release_version: str, badge_metrics: BadgeMetrics) -> None:
+    """Refresh README badges, stamp the splash and the artifact manifests, then create the release commit."""
+    print_step(13, f"refresh README badges + stamp splash and artifact manifests + commit 'release: {version}'")
     refresh_readme_badges(badge_metrics)
     stamp_splash(version)
-    run_command(["git", "add", "pyproject.toml", "uv.lock", "CHANGELOG.md", "README.md", str(SPLASH_WEBP)])
+    manifest_paths = stamp_artifact_manifests(release_version=version, last_release_version=last_release_version)
+    run_command(
+        ["git", "add", "pyproject.toml", "uv.lock", "CHANGELOG.md", "README.md", str(SPLASH_WEBP)]
+        + [str(path) for path in manifest_paths]
+    )
     run_command(["git", "commit", "-m", f"release: {version}"])
 
 
@@ -493,6 +560,9 @@ def main() -> None:
     parse_semver(version)
 
     print(f"Releasing {PACKAGE_NAME} v{version}\n")
+    # Read the last release's version before step 10 bumps it; steps 8 and 13 use that version to find the
+    # artifact manifests built since that release.
+    last_release_version = read_pyproject_version()
 
     print("Validation:")
     step_1_check_working_tree()
@@ -502,7 +572,7 @@ def main() -> None:
     step_5_check_pypi_doesnt_have(version)
     step_6_check_classifiers_match()
     step_7_check_changelog_has_entries()
-    step_8_check_stamping_inputs()
+    step_8_check_stamping_inputs(last_release_version)
     badge_metrics = step_9_gather_badge_metrics()
 
     if args.is_dry_run:
@@ -516,7 +586,7 @@ def main() -> None:
     step_10_bump_version(version)
     step_11_lock()
     step_12_finalize_changelog(version)
-    step_13_commit_release(version, badge_metrics)
+    step_13_commit_release(version, last_release_version, badge_metrics)
     step_14_tag(version)
 
     print("\nPost-release:")

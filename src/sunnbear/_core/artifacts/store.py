@@ -49,6 +49,9 @@ from .source import ArtifactSource
 T = TypeVar("T")
 
 _MANIFEST_FILE_NAME = "manifest.json"
+# Saving records sunnbear's version with this suffix: an artifact is built from unreleased code, and the
+# next release's number is not known yet. The release script replaces such a version with the release version.
+UNRELEASED_SUNNBEAR_VERSION_SUFFIX = "+dev"
 _NON_BUILTIN_ARTIFACTS_FOLDER_NAME = "artifacts"
 _BUILTIN_ARTIFACTS_FOLDER_NAME = "builtin"
 _BUILTIN_ARTIFACTS_PARENT_PACKAGE = "sunnbear._core.artifacts"
@@ -172,7 +175,8 @@ class ArtifactStore:
             declaration_cls: The artifact's declaration.
             value: The value to write.
             built_with: The versions of the libraries that affect the content, keyed by package
-                name; sunnbear's own version is always recorded, replacing any ``sunnbear`` entry.
+                name; sunnbear's own version is always recorded as the installed version plus
+                `UNRELEASED_SUNNBEAR_VERSION_SUFFIX`, replacing any ``sunnbear`` entry.
             input_artifact_hashes: The content hashes of `value`'s input artifacts, keyed by
                 artifact name.
             generated_by: The public function call that generated `value`, as JSON-compatible data.
@@ -194,7 +198,9 @@ class ArtifactStore:
             name=declaration_cls.name,
             files=tuple(ArtifactFileEntry.from_content(path, contents[path]) for path in sorted(contents)),
             input_artifact_hashes=input_artifact_hashes or {},
-            built_with=(built_with or {}) | {"sunnbear": importlib.metadata.version("sunnbear")},
+            # Between releases the installed version is the last release's, since only the release script bumps it.
+            built_with=(built_with or {})
+            | {"sunnbear": importlib.metadata.version("sunnbear") + UNRELEASED_SUNNBEAR_VERSION_SUFFIX},
             build_date=datetime.date.today(),
             generated_by=generated_by,
         )
