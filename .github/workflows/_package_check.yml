@@ -69,14 +69,8 @@ jobs:
           WHEEL=(dist/*.whl)
           uv pip install --python blind-venv/bin/python "sunnbear @ file://$PWD/${WHEEL[0]}"
 
-      - name: Assert the environment is blind
-        run: |
-          blind-venv/bin/python -c "
-          import sunnbear
-          path = sunnbear.__file__
-          assert 'site-packages' in path, f'sunnbear resolves outside site-packages: {path}'
-          print(f'OK: sunnbear imported from {path}')
-          "
-
       - name: Run the test suite against the installed wheel
+        env:
+          # Setting this variable makes tests/conftest.py fail the run when the tests import sunnbear from anywhere but site-packages
+          SUNNBEAR_TESTS_NEEDS_INSTALLED_WHEEL: "1"
         run: blind-venv/bin/python -m pytest tests/

@@ -13,9 +13,13 @@ max-div. Skipping it loses no coverage, because it runs no line inside sunnbear'
 functions.
 """
 
+import os
+from pathlib import Path
+
 import numba
 import pytest
 
+import sunnbear
 from sunnbear.solvers import SolverConfigRegistry
 
 
@@ -23,6 +27,19 @@ from sunnbear.solvers import SolverConfigRegistry
 def isolated_solver_config_registry(monkeypatch):
     """Give the test its own copy of the registry, so test-defined SolverConfig subclasses don't leak past the test."""
     monkeypatch.setattr(SolverConfigRegistry, "_configs_by_id", dict(SolverConfigRegistry._configs_by_id))
+
+
+def pytest_sessionstart(session: pytest.Session) -> None:
+    """Fail the run when `SUNNBEAR_TESTS_NEEDS_INSTALLED_WHEEL` is `1` and sunnbear is not imported from site-packages.
+
+    Without this check, a source checkout on `sys.path` would let every test import the checkout, so a
+    run meant to test the built wheel would pass without testing it.
+    """
+    if (
+        os.environ.get("SUNNBEAR_TESTS_NEEDS_INSTALLED_WHEEL") == "1"
+        and "site-packages" not in Path(sunnbear.__file__).parts
+    ):
+        pytest.exit(f"sunnbear is imported from {sunnbear.__file__}, not from the installed wheel.", returncode=1)
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
