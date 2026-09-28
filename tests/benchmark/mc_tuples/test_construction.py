@@ -4,9 +4,11 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import MC_TUPLES_SIZES, MCTuplesConstructionError, generate_mc_tuples
-from sunnbear._core.benchmark.mc_tuples.construction import _check_selection, _draw_population
+from sunnbear._core.benchmark.mc_tuples.construction import _draw_population
+from sunnbear._core.benchmark.mc_tuples.max_div_selection import _check_selection
 
 
+@pytest.mark.only_with_numba_jit
 def test_generate_mc_tuples_builds_a_set_whose_every_size_meets_its_bin_constraints():
     """A 1 s construction gives distinct tuples of the largest size, and every prefix size keeps each bin within 1.
 

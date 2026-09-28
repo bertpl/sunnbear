@@ -14,10 +14,14 @@ jobs:
       fail-fast: false
       matrix:
         # ubuntu-only: pure Python + numpy/matplotlib, no OS-specific paths, so one OS covers all.
-        # The jit-off legs run under NUMBA_DISABLE_JIT, so coverage measures the njit formula bodies
-        # as plain Python; the jit-on legs prove those formulas numba-compile (one jit-on leg per
-        # Python). Coverage is collected on the jit-off legs only — the two span both the Python and
-        # resolution ends, which suffices while no code path is gated to a middle-only Python.
+        #
+        # - jit-off jobs run under NUMBA_DISABLE_JIT, so coverage measures the bodies of sunnbear's
+        #   numba-compiled functions as plain Python.
+        # - jit-on jobs (one per Python) prove that those functions compile under numba, and run the
+        #   tests marked only_with_numba_jit.
+        #
+        # Every matrix job collects coverage, so the lines that only the only_with_numba_jit tests
+        # reach are measured too, and the coverage job combines their data.
         include:
           - { python: "3.12", resolution: lowest-direct, jit: "off" }
           - { python: "3.12", resolution: highest,       jit: "on"  }
@@ -33,7 +37,7 @@ jobs:
           uv_version: ${{ vars.UV_VERSION }}
           python_version: ${{ matrix.python }}
           dependency_resolution: ${{ matrix.resolution }}
-          jit: ${{ matrix.jit }}  # jit-off legs collect coverage; the coverage job unions + gates
+          jit: ${{ matrix.jit }}
 
   coverage:
     name: coverage
@@ -42,7 +46,7 @@ jobs:
     # read as uncovered.
     needs: [core]
     # always() so a cancelled/failed combo makes this job FAIL explicitly rather than
-    # skip — GitHub doesn't reliably propagate a cancelled leg through needs.
+    # skip — GitHub doesn't reliably propagate a cancelled job through needs.
     if: always()
     runs-on: ubuntu-latest
     steps:

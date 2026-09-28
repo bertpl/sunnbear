@@ -65,7 +65,7 @@ dev = [
     "ty==0.0.56",  # pre-1.0 type checker — pin exactly; its ruleset is still evolving
 ]
 # maintainer scratch tooling — installed by a plain `uv sync` (default-groups below)
-# but NOT by CI's `uv sync --group dev` / `uv run --group dev`, keeping matrix legs lean
+# but NOT by CI's `uv sync --group dev` / `uv run --group dev`, keeping matrix jobs lean
 notebooks = [
     "jupyterlab>=4.4.6",
     "notebook>=7.4.5",
@@ -187,6 +187,12 @@ ignore-words-list = "intoto"
 # Notebooks embed base64 image outputs that codespell misreads as typos.
 skip = "*.ipynb"
 
+[tool.pytest.ini_options]
+addopts = "--strict-markers"
+markers = [
+    "only_with_numba_jit: the test needs numba's JIT, so it skips when NUMBA_DISABLE_JIT is set (tests/conftest.py)",
+]
+
 [tool.coverage.run]
 source = ["sunnbear"]  # the import package name, not a src/ path — resolved via import, so cwd-independent
 branch = true          # both sides of every branch must be hit, not just each line once
@@ -194,8 +200,7 @@ relative_files = true  # so per-combo matrix data files combine without a [paths
 
 [tool.coverage.report]
 precision = 2
-fail_under = 100       # cumulative gate on the combined matrix data; coverage runs on the jit-off
-                       # legs (NUMBA_DISABLE_JIT), which measure the njit formula bodies as plain Python.
+fail_under = 100       # the gate applies to the combined data of both JIT modes (see tests/conftest.py)
 exclude_also = [
     "@abstractmethod",
     "@abc.abstractmethod",
