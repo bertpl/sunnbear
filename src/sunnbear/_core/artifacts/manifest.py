@@ -31,9 +31,6 @@ from .exceptions import ArtifactError
 
 _SHORT_HASH_LENGTH = 8
 
-# An artifact built from unreleased code records the last release's sunnbear version with this suffix.
-_UNRELEASED_VERSION_SUFFIX = "+dev"
-
 
 # ==================================================================================================
 #  ArtifactManifest
@@ -103,36 +100,6 @@ class ArtifactManifest(BaseModel):
     def short_identity(self) -> str:
         """Return the name and the shortened content hash, e.g. ``mc_tuples@3f2a9c1e``, for display only."""
         return f"{self.name}@{self.content_hash[:_SHORT_HASH_LENGTH]}"
-
-    # --------------------------------------------------------------------------
-    #  sunnbear version
-    # --------------------------------------------------------------------------
-    @staticmethod
-    def unreleased_sunnbear_version(last_release_version: str) -> str:
-        """Return the sunnbear version recorded for an artifact built from unreleased code, e.g. `0.1.4+dev`.
-
-        The next release's number is not known before the release, so an artifact records
-        `<last release>+dev`, and the next release replaces that version with its own.
-        """
-        return f"{last_release_version}{_UNRELEASED_VERSION_SUFFIX}"
-
-    @property
-    def sunnbear_version(self) -> str:
-        """Return the sunnbear version recorded in `built_with`, or `""` when none is recorded."""
-        return self.built_with.get("sunnbear", "")
-
-    @property
-    def is_built_from_unreleased_code(self) -> bool:
-        """Return whether the recorded sunnbear version marks unreleased code, e.g. `0.1.4+dev`."""
-        return self.sunnbear_version.endswith(_UNRELEASED_VERSION_SUFFIX)
-
-    def is_built_since_release(self, last_release_version: str) -> bool:
-        """Return whether the recorded sunnbear version is `last_release_version` plus `+dev`, e.g. `0.1.4+dev`."""
-        return self.sunnbear_version == self.unreleased_sunnbear_version(last_release_version)
-
-    def with_release_version(self, release_version: str) -> "ArtifactManifest":
-        """Return a copy that records `release_version` as the sunnbear version; the content hash is unchanged."""
-        return self.model_copy(update={"built_with": self.built_with | {"sunnbear": release_version}})
 
     # --------------------------------------------------------------------------
     #  JSON

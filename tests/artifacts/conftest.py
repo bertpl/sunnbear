@@ -30,10 +30,3 @@ def artifacts_folder_in_tmp(monkeypatch, tmp_path):
     folder_of = classmethod(lambda cls, declaration_cls: artifacts_folder / declaration_cls.name)
     monkeypatch.setattr(ArtifactStore, "_folder_of", folder_of)
     return artifacts_folder
-
-
-@pytest.fixture
-def builtin_artifacts_folder_in_tmp(monkeypatch, tmp_path):
-    """Make `ArtifactStore` keep the built-in artifacts in `tmp_path`, and return that folder."""
-    monkeypatch.setattr(ArtifactStore, "_builtin_artifacts_folder", staticmethod(lambda: tmp_path))
-    return tmp_path

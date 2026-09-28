@@ -54,34 +54,6 @@ def test_artifact_file_entry_rejects_a_path_outside_its_folder(path):
 
 
 # ==================================================================================================
-#  sunnbear version
-# ==================================================================================================
-@pytest.mark.parametrize("sunnbear_version, is_unreleased_expected", [("0.1.4+dev", True), ("0.1.4", False)])
-def test_a_manifest_knows_whether_it_was_built_from_unreleased_code(sunnbear_version, is_unreleased_expected):
-    """A sunnbear version ending in `+dev`, as `unreleased_sunnbear_version` writes it, marks unreleased code."""
-    # --- arrange ----------------------
-    manifest = _make_manifest(built_with={"sunnbear": sunnbear_version})
-
-    # --- act / assert -----------------
-    assert ArtifactManifest.unreleased_sunnbear_version("0.1.4") == "0.1.4+dev"
-    assert manifest.is_built_from_unreleased_code is is_unreleased_expected
-
-
-def test_with_release_version_replaces_only_the_sunnbear_version():
-    """The copy records the release version; the other build metadata and the content hash stay the same."""
-    # --- arrange ----------------------
-    manifest = _make_manifest(built_with={"numpy": "2.1.0", "sunnbear": "0.1.4+dev"})
-
-    # --- act --------------------------
-    released_manifest = manifest.with_release_version("0.2.0")
-
-    # --- assert -----------------------
-    assert released_manifest.built_with == {"numpy": "2.1.0", "sunnbear": "0.2.0"}
-    assert not released_manifest.is_built_from_unreleased_code
-    assert released_manifest.content_hash == manifest.content_hash
-
-
-# ==================================================================================================
 #  Identity
 # ==================================================================================================
 def test_short_identity_is_the_name_and_the_shortened_content_hash():

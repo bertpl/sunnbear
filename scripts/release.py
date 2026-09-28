@@ -31,12 +31,14 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
-from sunnbear._core.artifacts import ArtifactError, ArtifactStore
+from sunnbear._core.artifacts import ArtifactManifest
+from sunnbear._core.artifacts.store import UNRELEASED_SUNNBEAR_VERSION_SUFFIX
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PYPROJECT = REPO_ROOT / "pyproject.toml"
 CHANGELOG = REPO_ROOT / "CHANGELOG.md"
 README = REPO_ROOT / "README.md"
+BUILTIN_ARTIFACTS_FOLDER = REPO_ROOT / "src" / "sunnbear" / "_core" / "artifacts" / "builtin"
 PYTHON_VERSIONS_FILE = REPO_ROOT / ".python-versions"
 SPLASH_SCRIPT = REPO_ROOT / ".github" / "scripts" / "create_splash.sh"
 SPLASH_WEBP = REPO_ROOT / "images" / "splash_with_version.webp"
@@ -220,11 +222,12 @@ def step_8_check_stamping_inputs(last_release_version: str) -> None:
         if not path.is_file():
             fail_with_message(f"the splash cannot be stamped: {path.relative_to(REPO_ROOT)} is missing")
     try:
-        names = ArtifactStore.unreleased_builtin_artifact_names(last_release_version=last_release_version)
-    except ArtifactError as error:
+        manifest_paths = unreleased_artifact_manifest_paths(last_release_version)
+    except ValueError as error:
         fail_with_message(f"the artifact manifests cannot be stamped: {error}")
     else:
-        print(f"    artifact manifests to stamp with the release version: {', '.join(names) or 'none'}")
+        names = ", ".join(path.parent.name for path in manifest_paths) or "none"
+        print(f"    artifact manifests to stamp with the release version: {names}")
 
 
 # warn if the number of distinct tests across all CI matrix combos exceeds this multiple of the
@@ -345,6 +348,50 @@ def step_9_gather_badge_metrics() -> BadgeMetrics:
 
 
 # ==================================================================================================
+#  artifact manifests
+# ==================================================================================================
+# Saving a built-in data artifact records sunnbear's version as the last release's version plus
+# `UNRELEASED_SUNNBEAR_VERSION_SUFFIX`, because the next release's number is not known yet. The release
+# commit replaces such versions with the release version. The manifests are read and written through
+# `ArtifactManifest`, which owns their JSON format and checks their content hash.
+
+
+def unreleased_artifact_manifest_paths(last_release_version: str) -> list[Path]:
+    """Return the built-in artifact manifests that record sunnbear as `last_release_version` plus the suffix, sorted.
+
+    Raises:
+        ValueError: If a manifest records an older release's version plus the suffix: the release after
+            that older one should have replaced it.
+    """
+    expected_version = last_release_version + UNRELEASED_SUNNBEAR_VERSION_SUFFIX
+    paths = []
+    for path in sorted(BUILTIN_ARTIFACTS_FOLDER.glob("*/manifest.json")):
+        sunnbear_version = ArtifactManifest.from_json(path.read_text()).built_with.get("sunnbear", "")
+        if sunnbear_version.endswith(UNRELEASED_SUNNBEAR_VERSION_SUFFIX):
+            if sunnbear_version != expected_version:
+                raise ValueError(
+                    f"the manifest of {path.parent.name} records sunnbear {sunnbear_version}, "
+                    f"but an artifact built since release {last_release_version} records {expected_version}"
+                )
+            paths.append(path)
+    return paths
+
+
+def stamp_artifact_manifests(*, release_version: str, last_release_version: str) -> list[Path]:
+    """Record `release_version` as the sunnbear version of every unreleased built-in artifact; return their manifests.
+
+    Manifests of earlier releases keep their version, and no content hash changes: it covers the data
+    files only.
+    """
+    manifest_paths = unreleased_artifact_manifest_paths(last_release_version)
+    for path in manifest_paths:
+        manifest = ArtifactManifest.from_json(path.read_text())
+        stamped = manifest.model_copy(update={"built_with": manifest.built_with | {"sunnbear": release_version}})
+        path.write_text(stamped.to_json())
+    return manifest_paths
+
+
+# ==================================================================================================
 #  release commit steps
 # ==================================================================================================
 def step_10_bump_version(version: str) -> None:
@@ -435,9 +482,7 @@ def step_13_commit_release(version: str, last_release_version: str, badge_metric
     print_step(13, f"refresh README badges + stamp splash and artifact manifests + commit 'release: {version}'")
     refresh_readme_badges(badge_metrics)
     stamp_splash(version)
-    manifest_paths = ArtifactStore.stamp_release_version(
-        release_version=version, last_release_version=last_release_version
-    )
+    manifest_paths = stamp_artifact_manifests(release_version=version, last_release_version=last_release_version)
     run_command(
         ["git", "add", "pyproject.toml", "uv.lock", "CHANGELOG.md", "README.md", str(SPLASH_WEBP)]
         + [str(path) for path in manifest_paths]
