@@ -72,5 +72,5 @@ jobs:
       - name: Run the test suite against the installed wheel
         env:
           # tests/conftest.py fails the run when the tests import sunnbear from anywhere but site-packages
-          SUNNBEAR_TESTS_EXPECT_INSTALLED_WHEEL: "1"
+          SUNNBEAR_TESTS_NEEDS_INSTALLED_WHEEL: "1"
         run: blind-venv/bin/python -m pytest tests/

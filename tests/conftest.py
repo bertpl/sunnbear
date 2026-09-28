@@ -30,14 +30,14 @@ def isolated_solver_config_registry(monkeypatch):
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
-    """Fail the run when `SUNNBEAR_TESTS_EXPECT_INSTALLED_WHEEL` is set and sunnbear is not imported from site-packages.
+    """Fail the run when `SUNNBEAR_TESTS_NEEDS_INSTALLED_WHEEL` is `1` and sunnbear is not imported from site-packages.
 
-    CI's install-test job sets the variable, because it tests the built wheel: without this check, a
-    source checkout on `sys.path` would let every test import the checkout, and the job would pass
-    without testing the wheel.
+    The `install-test` job in `.github/workflows/_package_check.yml` sets the variable, because that job
+    tests the built wheel: without this check, a source checkout on `sys.path` would let every test
+    import the checkout, and the job would pass without testing the wheel.
     """
     if (
-        os.environ.get("SUNNBEAR_TESTS_EXPECT_INSTALLED_WHEEL") == "1"
+        os.environ.get("SUNNBEAR_TESTS_NEEDS_INSTALLED_WHEEL") == "1"
         and "site-packages" not in Path(sunnbear.__file__).parts
     ):
         pytest.exit(f"sunnbear is imported from {sunnbear.__file__}, not from the installed wheel.", returncode=1)
