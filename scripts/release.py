@@ -1,9 +1,14 @@
 """Release driver for sunnbear.
 
-Run via ``make release VERSION=X.Y.Z``.  Validates state, bumps version, stamps
-the versioned splash + README badges + built-in artifact manifests, finalizes
-the changelog, commits, tags, opens a fresh Unreleased section, and pushes
-main + tag atomically.
+Run via ``make release VERSION=X.Y.Z``.  In order, the release:
+
+- validates state
+- bumps the version
+- stamps the versioned splash, the README badges and the built-in artifact manifests
+- finalizes the changelog
+- commits and tags
+- opens a fresh Unreleased section
+- pushes main and the tag atomically
 
 Every precondition runs before the first write, so a failed precondition leaves
 the tree as it was.  ``--dry-run`` runs every precondition and stops before the
@@ -199,8 +204,9 @@ def step_8_check_stamping_inputs(last_release_version: str) -> None:
     """Validate everything the release commit needs to stamp the README badges, the splash and the artifact manifests.
 
     A badge that the README no longer carries would otherwise be skipped silently, leaving a stale
-    badge in the release. A built-in artifact manifest whose sunnbear version is an older release's
-    version plus `+dev` was never updated by that older release, so the release stops.
+    badge in the release. An artifact built since the last release records that release's version
+    plus `+dev`; a built-in artifact manifest that still records an older release's version plus
+    `+dev` was missed by the release that followed that older one, so the release stops.
     """
     print_step(8, "README badges, splash and artifact manifests are in place for stamping")
     readme = README.read_text()
@@ -425,10 +431,7 @@ def stamp_splash(version: str) -> None:
 
 
 def step_13_commit_release(version: str, last_release_version: str, badge_metrics: BadgeMetrics) -> None:
-    """Refresh README badges, stamp the splash and the artifact manifests, then create the release commit.
-
-    The release commit includes the manifests that the stamp returns.
-    """
+    """Refresh README badges, stamp the splash and the artifact manifests, then create the release commit."""
     print_step(13, f"refresh README badges + stamp splash and artifact manifests + commit 'release: {version}'")
     refresh_readme_badges(badge_metrics)
     stamp_splash(version)
@@ -512,8 +515,8 @@ def main() -> None:
     parse_semver(version)
 
     print(f"Releasing {PACKAGE_NAME} v{version}\n")
-    # Read the last release's version before step 10 bumps it; steps 8 and 13 use it to find the artifact manifests
-    # built since that release.
+    # Read the last release's version before step 10 bumps it; steps 8 and 13 use that version to find the
+    # artifact manifests built since that release.
     last_release_version = read_pyproject_version()
 
     print("Validation:")

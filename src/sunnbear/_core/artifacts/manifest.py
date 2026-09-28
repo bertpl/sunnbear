@@ -50,8 +50,8 @@ class ArtifactManifest(BaseModel):
         input_artifact_hashes: The content hashes of the artifacts that this artifact was generated
             from, keyed by artifact name.
         built_with: The versions of sunnbear and of the libraries that affect the content, keyed by
-            package name. See `unreleased_sunnbear_version` for the sunnbear version recorded before
-            a release.
+            package name. Before a release, the sunnbear version is the last release's version plus
+            `+dev`; the release replaces it with the release version.
         build_date: The date the artifact was built.
         generated_by: The public sunnbear function call that generated the artifact, with its
             arguments, as JSON-compatible data; ``None`` when no public function generated it.
@@ -111,8 +111,8 @@ class ArtifactManifest(BaseModel):
     def unreleased_sunnbear_version(last_release_version: str) -> str:
         """Return the sunnbear version recorded for an artifact built from unreleased code, e.g. `0.1.4+dev`.
 
-        The next release's number is not known before the release, so an artifact is built with
-        `<last release>+dev`, and the release replaces it with the release version.
+        The next release's number is not known before the release, so an artifact records
+        `<last release>+dev`, and the next release replaces that version with its own.
         """
         return f"{last_release_version}{_UNRELEASED_VERSION_SUFFIX}"
 
@@ -125,6 +125,10 @@ class ArtifactManifest(BaseModel):
     def is_built_from_unreleased_code(self) -> bool:
         """Return whether the recorded sunnbear version marks unreleased code, e.g. `0.1.4+dev`."""
         return self.sunnbear_version.endswith(_UNRELEASED_VERSION_SUFFIX)
+
+    def is_built_since_release(self, last_release_version: str) -> bool:
+        """Return whether the recorded sunnbear version is `last_release_version` plus `+dev`, e.g. `0.1.4+dev`."""
+        return self.sunnbear_version == self.unreleased_sunnbear_version(last_release_version)
 
     def with_release_version(self, release_version: str) -> "ArtifactManifest":
         """Return a copy that records `release_version` as the sunnbear version; the content hash is unchanged."""

@@ -18,9 +18,8 @@ def _save_builtin_artifact(name: str, sunnbear_version: str | None = None) -> No
     """Save a 1-file built-in artifact; with `sunnbear_version`, rewrite its manifest to record that version."""
     ArtifactStore.save(define_builtin_declaration(name), b"content\n")
     if sunnbear_version is not None:
-        folder = ArtifactStore._builtin_artifacts_folder() / name
         manifest = ArtifactStore.load_builtin_manifest(name).with_release_version(sunnbear_version)
-        (folder / "manifest.json").write_text(manifest.to_json())
+        ArtifactStore._write_manifest_to_folder(ArtifactStore._builtin_artifacts_folder() / name, manifest)
 
 
 # ==================================================================================================
@@ -75,7 +74,7 @@ def test_stamping_records_the_release_version_in_unreleased_manifests_only(built
 
 
 def test_stamping_refuses_a_builtin_artifacts_folder_that_is_not_on_disk(monkeypatch):
-    """Inside a zipped install the built-in artifacts folder is no directory on disk, so nothing can be stamped."""
+    """Inside a zipped install the built-in artifacts folder is not a directory on disk, so nothing can be stamped."""
     # --- arrange ----------------------
     monkeypatch.setattr(ArtifactStore, "_builtin_artifacts_folder", staticmethod(lambda: "not a path"))
 
