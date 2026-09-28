@@ -15,8 +15,7 @@ The construction selects each size with max-div from a uniform random population
 import numpy as np
 
 from .construction_settings import FULL_POPULATION_SIZE, MCTuplesConstructionSettings
-from .exceptions import MCTuplesConstructionError
-from .tuples import MC_TUPLES_SIZES, N_BINS, MCTuples
+from .tuples import MC_TUPLES_SIZES, MCTuples
 
 
 # ==================================================================================================
@@ -31,8 +30,9 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
     - from 60 s up, the construction uses the full population of candidates and all `n_workers` workers;
     - below 60 s, the construction uses fewer of both, for short runs such as tests.
 
-    The total covers only the solves: drawing the population and checking each size take extra
-    time.
+    The total covers only the solves: drawing the population, checking each size, and the first call's
+    import of max-div take extra time; that import compiles max-div's numba functions, which takes
+    minutes on a fresh install.
 
     A rerun gives a set of equivalent quality, not the same set, because max-div's parallel solver
     runs on a wall-clock budget.
@@ -49,7 +49,7 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
             happen when `t_total_sec` is too short for max-div to meet them.
     """
     # `select_tuples` is imported here, not at module level: importing max-div compiles its numba functions,
-    # which takes minutes on a fresh install, and only `generate_mc_tuples` needs them.
+    # which takes minutes on a fresh install, and only `generate_mc_tuples` uses max-div.
     from .max_div_selection import select_tuples
 
     settings = MCTuplesConstructionSettings.from_total_time(t_total_sec, n_workers)
@@ -61,9 +61,8 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
         selection = select_tuples(
             population, k, prefix_indices, settings.t_budget_per_size_sec[k], settings.n_workers, seed
         )
-        _check_selection(population, k, prefix_indices, selection)
         prefix_indices = np.concatenate([prefix_indices, np.setdiff1d(selection, prefix_indices)])
-    return _tuples_at(population, prefix_indices)
+    return MCTuples.from_population(population, prefix_indices)
 
 
 # ==================================================================================================
@@ -79,33 +78,3 @@ def _draw_population(population_size: int, seed: int) -> np.ndarray:
     # `random` draws from [0, 1): a row with an exact 0 is dropped, so every kept row lies in the open unit square.
     points = points[(points > 0).all(axis=1)]
     return points[:population_size]
-
-
-def _check_selection(population: np.ndarray, k: int, required_indices: np.ndarray, selection: np.ndarray) -> None:
-    """Check that `selection` has `k` distinct tuples, includes `required_indices`, and balances its bins.
-
-    Balanced bins hold `k / N_BINS ± 1` tuples each, on both axes.
-
-    max-div treats constraints as soft and returns its least-violating selection, so a total time
-    too short for the solver to meet them raises here, because the returned set would otherwise break
-    them silently.
-
-    Raises:
-        MCTuplesConstructionError: If any check fails.
-    """
-    if np.unique(selection).size != k:
-        raise MCTuplesConstructionError(f"Size {k}: max-div selected {np.unique(selection).size} distinct tuples.")
-    n_missing = np.setdiff1d(required_indices, selection).size
-    if n_missing > 0:
-        raise MCTuplesConstructionError(f"Size {k}: {n_missing} tuples of the size below it are not selected.")
-    stats = _tuples_at(population, selection).stats()
-    if stats.max_bin_count_deviation > 1:
-        raise MCTuplesConstructionError(
-            f"Size {k}: the bin counts are {list(stats.bin_counts_u)} along u and {list(stats.bin_counts_v)} "
-            f"along v, not all within 1 of {k // N_BINS}."
-        )
-
-
-def _tuples_at(population: np.ndarray, indices: np.ndarray) -> MCTuples:
-    """Return the tuples of `population` at `indices`, in that order."""
-    return MCTuples(population[indices, 0], population[indices, 1])

@@ -47,6 +47,11 @@ class MCTuples:
         self._u = u_array
         self._v = v_array
 
+    @classmethod
+    def from_population(cls, population: np.ndarray, indices: np.ndarray) -> "MCTuples":
+        """Return the tuples of `population`, an `(n, 2)` array, at `indices`, in that order."""
+        return cls(population[indices, 0], population[indices, 1])
+
     # --------------------------------------------------------------------------
     #  Values
     # --------------------------------------------------------------------------

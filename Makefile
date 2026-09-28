@@ -33,8 +33,9 @@ test:
 	uv run pytest ./tests
 
 coverage:
-	# Run the suite in both modes, as CI does: first with JIT off, so coverage measures the bodies of the numba-compiled functions,
-	# then with JIT on, for the tests that skip without JIT; the report and the gate apply to the combined data.
+	# Run the suite in both modes, as CI does: first with JIT off, so coverage measures the bodies of
+	# the numba-compiled functions, then with JIT on, for the tests that skip without JIT; the HTML
+	# report and the fail_under check in pyproject.toml apply to the combined data.
 	NUMBA_DISABLE_JIT=1 uv run pytest ./tests --cov --cov-report= --cov-fail-under=0
 	uv run pytest ./tests --cov --cov-append --cov-report=html
 

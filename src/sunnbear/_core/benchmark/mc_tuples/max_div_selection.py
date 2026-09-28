@@ -11,7 +11,8 @@ from max_div import Constraint, MaxDivProblem
 from max_div.metrics import DistanceMetric, DiversityMetric, HybridDiversityMetric
 from max_div.solver import ParallelMaxDivSolverBuilder, ParallelSolvingWarning, Verbosity, seconds
 
-from .tuples import N_BINS, axis_bin_indices
+from .exceptions import MCTuplesConstructionError
+from .tuples import N_BINS, MCTuples, axis_bin_indices
 
 # The inclusion constraint weighs more than the bin constraints, so max-div meets it first.
 INCLUSION_CONSTRAINT_WEIGHT = 10.0
@@ -31,7 +32,11 @@ def select_tuples(
     """Return max-div's selection of `k` tuples, including `required_indices`, as sorted population indices.
 
     max-div weighs the bin and inclusion constraints against the objective without enforcing them, so the
-    selection can break them when `t_budget_sec` is too short; check it before use.
+    selection is checked against them before it is returned.
+
+    Raises:
+        MCTuplesConstructionError: If the selection breaks its bin or inclusion constraints, which can
+            happen when `t_budget_sec` is too short for max-div to meet them.
     """
     constraints = _bin_constraints(population, k)
     if required_indices.size > 0:
@@ -67,7 +72,9 @@ def select_tuples(
             .build()
         )
     solution = solver.solve(verbosity=Verbosity.SILENT)
-    return np.sort(np.asarray(solution.i_selected, dtype=np.int64))
+    selection = np.sort(np.asarray(solution.i_selected, dtype=np.int64))
+    _check_selection(population, k, required_indices, selection)
+    return selection
 
 
 # ==================================================================================================
@@ -88,3 +95,24 @@ def _bin_constraints(population: np.ndarray, k: int) -> list[Constraint]:
                 )
             )
     return constraints
+
+
+def _check_selection(population: np.ndarray, k: int, required_indices: np.ndarray, selection: np.ndarray) -> None:
+    """Check that `selection` has `k` distinct tuples, includes `required_indices`, and balances its bins.
+
+    Balanced bins hold `k / N_BINS ± 1` tuples each, on both axes.
+
+    Raises:
+        MCTuplesConstructionError: If any check fails.
+    """
+    if np.unique(selection).size != k:
+        raise MCTuplesConstructionError(f"Size {k}: max-div selected {np.unique(selection).size} distinct tuples.")
+    n_missing = np.setdiff1d(required_indices, selection).size
+    if n_missing > 0:
+        raise MCTuplesConstructionError(f"Size {k}: {n_missing} tuples of the size below it are not selected.")
+    stats = MCTuples.from_population(population, selection).stats()
+    if stats.max_bin_count_deviation > 1:
+        raise MCTuplesConstructionError(
+            f"Size {k}: the bin counts are {list(stats.bin_counts_u)} along u and {list(stats.bin_counts_v)} "
+            f"along v, not all within 1 of {k // N_BINS}."
+        )

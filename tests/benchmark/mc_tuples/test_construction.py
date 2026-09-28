@@ -4,7 +4,8 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import MC_TUPLES_SIZES, MCTuplesConstructionError, generate_mc_tuples
-from sunnbear._core.benchmark.mc_tuples.construction import _check_selection, _draw_population
+from sunnbear._core.benchmark.mc_tuples.construction import _draw_population
+from sunnbear._core.benchmark.mc_tuples.max_div_selection import _check_selection
 
 
 @pytest.mark.only_with_numba_jit

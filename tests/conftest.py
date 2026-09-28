@@ -8,8 +8,9 @@ coverage.py cannot see inside a numba-compiled function, so CI runs the suite in
   numba-compiled functions.
 
 The coverage gate applies to both modes' data combined. A test marked `only_with_numba_jit` is
-skipped with JIT off: it runs no line inside sunnbear's own numba-compiled functions, and would run
-too slowly as plain Python, e.g. because it calls into max-div.
+skipped with JIT off, because as plain Python it would run too slowly, e.g. because it calls into
+max-div. Skipping it loses no coverage, because it runs no line inside sunnbear's own numba-compiled
+functions.
 """
 
 import numba
@@ -27,11 +28,11 @@ def isolated_solver_config_registry(monkeypatch):
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     """Skip `only_with_numba_jit` tests when numba runs with JIT disabled.
 
-    The check reads `numba.config.DISABLE_JIT`, the value numba itself parses from `NUMBA_DISABLE_JIT`,
-    so tests are skipped exactly when numba runs with JIT disabled.
+    The check reads `numba.config.DISABLE_JIT`, numba's own parsed value of `NUMBA_DISABLE_JIT`, so a
+    value such as `0` does not skip tests.
     """
     if numba.config.DISABLE_JIT:
-        skip = pytest.mark.skip(reason="requires numba JIT (running with NUMBA_DISABLE_JIT)")
+        skip_marker = pytest.mark.skip(reason="requires numba JIT (running with NUMBA_DISABLE_JIT)")
         for item in items:
             if "only_with_numba_jit" in item.keywords:
-                item.add_marker(skip)
+                item.add_marker(skip_marker)
