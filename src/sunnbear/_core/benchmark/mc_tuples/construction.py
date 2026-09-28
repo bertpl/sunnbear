@@ -48,8 +48,8 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
         MCTuplesConstructionError: If a size breaks its bin or inclusion constraints, which can
             happen when `t_total_sec` is too short for max-div to meet them.
     """
-    # Imported here, not at module level: importing max-div compiles its numba functions, which takes
-    # minutes on a fresh install, and only a construction needs them.
+    # `select_tuples` is imported here, not at module level: importing max-div compiles its numba functions,
+    # which takes minutes on a fresh install, and only `generate_mc_tuples` needs them.
     from .max_div_selection import select_tuples
 
     settings = MCTuplesConstructionSettings.from_total_time(t_total_sec, n_workers)

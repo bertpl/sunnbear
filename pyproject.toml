@@ -190,7 +190,7 @@ skip = "*.ipynb"
 [tool.pytest.ini_options]
 addopts = "--strict-markers"
 markers = [
-    "only_with_numba_jit: needs numba's compiled code; skipped when NUMBA_DISABLE_JIT is set (see tests/conftest.py)",
+    "only_with_numba_jit: the test needs numba's compiled code, so it is skipped when NUMBA_DISABLE_JIT is set (see tests/conftest.py)",
 ]
 
 [tool.coverage.run]
@@ -200,8 +200,8 @@ relative_files = true  # so per-combo matrix data files combine without a [paths
 
 [tool.coverage.report]
 precision = 2
-fail_under = 100       # cumulative gate on the combined matrix data; only the jit-off jobs
-                       # (NUMBA_DISABLE_JIT) measure the njit formula bodies, as plain Python.
+fail_under = 100       # the gate applies to the combined matrix data; only the jit-off jobs
+                       # (NUMBA_DISABLE_JIT) measure the bodies of the numba-compiled functions, run as plain Python.
 exclude_also = [
     "@abstractmethod",
     "@abc.abstractmethod",

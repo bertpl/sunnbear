@@ -1,7 +1,7 @@
-"""`select_tuples` runs 1 max-div solve, which selects 1 size of the tuple set from the population.
+"""`select_tuples` runs the max-div solver once, to select the tuples of 1 size of the tuple set from the population.
 
-`generate_mc_tuples` imports this module only when it runs, because importing max-div compiles its
-numba functions, which takes minutes on a fresh install.
+Import this module only inside the function that needs it: importing max-div compiles its numba
+functions, which takes minutes on a fresh install.
 """
 
 import warnings
@@ -28,7 +28,11 @@ def select_tuples(
     n_workers: int,
     seed: int,
 ) -> np.ndarray:
-    """Return max-div's selection of `k` tuples, including `required_indices`, as sorted population indices."""
+    """Return max-div's selection of `k` tuples, including `required_indices`, as sorted population indices.
+
+    max-div weighs the bin and inclusion constraints against the objective without enforcing them, so the
+    selection can break them when `t_budget_sec` is too short; check it before use.
+    """
     constraints = _bin_constraints(population, k)
     if required_indices.size > 0:
         constraints.append(

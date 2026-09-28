@@ -16,7 +16,7 @@ inputs:
         default: "highest"
     jit:
         required: false
-        description: "'off' runs under NUMBA_DISABLE_JIT (njit off, so coverage measures the formula bodies as plain Python); 'on' (default) runs with JIT on. Both collect coverage and upload the per-combo data for the cross-matrix combine."
+        description: "'off' runs under NUMBA_DISABLE_JIT, so coverage measures the bodies of the numba-compiled functions as plain Python; 'on' (default) runs with JIT on. Both collect coverage and upload their per-combo data, which the coverage job combines across the matrix."
         default: "on"
 
 runs:
@@ -45,14 +45,18 @@ runs:
         # but removing the committed lock guarantees the matrix leg is never pinned by it.
         run: rm -f uv.lock
 
+      - name: Disable numba JIT when jit is off
+        if: inputs.jit == 'off'
+        shell: bash
+        # With jit off, njit returns the plain Python function, so coverage.py sees the lines and branches
+        # inside the numba-compiled functions; tests marked only_with_numba_jit skip (tests/conftest.py).
+        run: echo "NUMBA_DISABLE_JIT=1" >> "$GITHUB_ENV"  # zizmor: ignore[github-env] constant value, not user input
+
       - name: Run tests
         shell: bash
         env:
           PY: ${{ env.PYTHON_EFFECTIVE_VERSION }}
           RES: ${{ inputs.dependency_resolution }}
-          # jit-off: njit returns the plain Python function, so coverage.py sees the formula bodies'
-          # lines and branches; tests marked only_with_numba_jit skip (tests/conftest.py).
-          NUMBA_DISABLE_JIT: ${{ inputs.jit == 'off' && '1' || '0' }}
           # distinct per-combo data file so the coverage job combines rather than overwrites
           COVERAGE_FILE: .coverage.${{ inputs.python_version }}-${{ inputs.dependency_resolution }}-jit-${{ inputs.jit }}
         # --cov-fail-under=0: the gate is cumulative, in the coverage job, not per-combo
@@ -64,7 +68,6 @@ runs:
           PY: ${{ env.PYTHON_EFFECTIVE_VERSION }}
           RES: ${{ inputs.dependency_resolution }}
           JIT: ${{ inputs.jit }}
-          NUMBA_DISABLE_JIT: ${{ inputs.jit == 'off' && '1' || '0' }}
         run: |
           # each combo records its own collected set so the coverage job can union them
           uv run --python "$PY" --resolution "$RES" --group dev \

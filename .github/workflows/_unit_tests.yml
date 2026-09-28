@@ -14,10 +14,11 @@ jobs:
       fail-fast: false
       matrix:
         # ubuntu-only: pure Python + numpy/matplotlib, no OS-specific paths, so one OS covers all.
-        # The jit-off legs run under NUMBA_DISABLE_JIT, so coverage measures the njit formula bodies
-        # as plain Python; the jit-on legs prove those formulas numba-compile (one jit-on leg per
-        # Python) and run the tests marked only_with_numba_jit. Every leg collects coverage, and the
-        # coverage job combines them.
+        #
+        # The jit-off jobs run under NUMBA_DISABLE_JIT, so coverage measures the njit formula bodies
+        # as plain Python; the jit-on jobs prove those formulas numba-compile (one jit-on job per
+        # Python) and also run the tests marked only_with_numba_jit. Every matrix job collects
+        # coverage, and the coverage job combines their data.
         include:
           - { python: "3.12", resolution: lowest-direct, jit: "off" }
           - { python: "3.12", resolution: highest,       jit: "on"  }
@@ -33,7 +34,7 @@ jobs:
           uv_version: ${{ vars.UV_VERSION }}
           python_version: ${{ matrix.python }}
           dependency_resolution: ${{ matrix.resolution }}
-          jit: ${{ matrix.jit }}  # every leg collects coverage; the coverage job unions + gates
+          jit: ${{ matrix.jit }}
 
   coverage:
     name: coverage
