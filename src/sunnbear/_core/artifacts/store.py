@@ -145,6 +145,54 @@ class ArtifactStore:
         return cls._read_manifest(cls._builtin_artifacts_folder().joinpath(name), name)
 
     # --------------------------------------------------------------------------
+    #  Releasing built-in artifacts
+    # --------------------------------------------------------------------------
+    @classmethod
+    def unreleased_builtin_artifact_names(cls, *, last_release_version: str) -> tuple[str, ...]:
+        """Return the names of the built-in artifacts built from code after `last_release_version`, sorted.
+
+        Raises:
+            ArtifactError: If a built-in artifact records unreleased code after another release, e.g.
+                `0.1.3+dev` while the last release is `0.1.4`: that release should have stamped it.
+        """
+        expected_version = ArtifactManifest.unreleased_sunnbear_version(last_release_version)
+        names = []
+        for name in cls.builtin_artifact_names():
+            manifest = cls.load_builtin_manifest(name)
+            if manifest.is_built_from_unreleased_code:
+                if manifest.built_with["sunnbear"] != expected_version:
+                    raise ArtifactError(
+                        f"{manifest.short_identity} records sunnbear {manifest.built_with['sunnbear']}, "
+                        f"but unreleased code after release {last_release_version} is {expected_version}."
+                    )
+                names.append(name)
+        return tuple(names)
+
+    @classmethod
+    def stamp_release_version(cls, *, release_version: str, last_release_version: str) -> tuple[Path, ...]:
+        """Record `release_version` in every built-in manifest built from unreleased code; return their paths.
+
+        The release script calls this before the release commit, which then includes the returned
+        manifests. Manifests of earlier releases keep their version, and no content hash changes.
+
+        Raises:
+            ArtifactError: See `unreleased_builtin_artifact_names`; or the built-in artifacts folder is
+                not a writable directory, e.g. inside a zipped install.
+        """
+        builtin_artifacts_folder = cls._builtin_artifacts_folder()
+        if not isinstance(builtin_artifacts_folder, Path):
+            raise ArtifactError(
+                f"The built-in artifacts folder is not a writable directory: {builtin_artifacts_folder}."
+            )
+        paths = []
+        for name in cls.unreleased_builtin_artifact_names(last_release_version=last_release_version):
+            manifest = cls.load_builtin_manifest(name).with_release_version(release_version)
+            path = builtin_artifacts_folder / name / _MANIFEST_FILE_NAME
+            path.write_text(manifest.to_json())
+            paths.append(path)
+        return tuple(paths)
+
+    # --------------------------------------------------------------------------
     #  Saving
     # --------------------------------------------------------------------------
     @classmethod
@@ -172,7 +220,8 @@ class ArtifactStore:
             declaration_cls: The artifact's declaration.
             value: The value to write.
             built_with: The versions of the libraries that affect the content, keyed by package
-                name; sunnbear's own version is always recorded, replacing any ``sunnbear`` entry.
+                name; sunnbear's own version is always recorded as `<installed version>+dev`,
+                replacing any ``sunnbear`` entry, because an artifact is built from unreleased code.
             input_artifact_hashes: The content hashes of `value`'s input artifacts, keyed by
                 artifact name.
             generated_by: The public function call that generated `value`, as JSON-compatible data.
@@ -194,7 +243,8 @@ class ArtifactStore:
             name=declaration_cls.name,
             files=tuple(ArtifactFileEntry.from_content(path, contents[path]) for path in sorted(contents)),
             input_artifact_hashes=input_artifact_hashes or {},
-            built_with=(built_with or {}) | {"sunnbear": importlib.metadata.version("sunnbear")},
+            built_with=(built_with or {})
+            | {"sunnbear": ArtifactManifest.unreleased_sunnbear_version(importlib.metadata.version("sunnbear"))},
             build_date=datetime.date.today(),
             generated_by=generated_by,
         )

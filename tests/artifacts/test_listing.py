@@ -8,13 +8,6 @@ from sunnbear._core.artifacts.listing import artifact_manifest, artifact_names
 from .sample_declarations import SampleLinesDeclaration, define_builtin_declaration
 
 
-@pytest.fixture
-def builtin_artifacts_folder_in_tmp(monkeypatch, tmp_path):
-    """Make `ArtifactStore` keep the built-in artifacts in `tmp_path`, and return that folder."""
-    monkeypatch.setattr(ArtifactStore, "_builtin_artifacts_folder", staticmethod(lambda: tmp_path))
-    return tmp_path
-
-
 @pytest.mark.usefixtures("isolated_artifact_registry")
 def test_artifact_names_lists_one_name_per_builtin_folder(builtin_artifacts_folder_in_tmp):
     """Each subfolder of the built-in artifacts folder is listed, sorted; a file there and a test fixture are not."""

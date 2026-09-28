@@ -36,7 +36,7 @@ def test_verify_accepts_the_committed_sample_artifact():
 #  Saving and loading
 # ==================================================================================================
 def test_save_writes_files_and_manifest_that_load_reads_back(sample_lines_folder_in_tmp):
-    """A saved value loads back equal, and the manifest records sunnbear's version and the caller's metadata."""
+    """A saved value loads back equal; the manifest records sunnbear's unreleased version and the caller's metadata."""
     # --- act --------------------------
     manifest = ArtifactStore.save(
         SampleLinesDeclaration,
@@ -49,7 +49,7 @@ def test_save_writes_files_and_manifest_that_load_reads_back(sample_lines_folder
     # --- assert -----------------------
     assert ArtifactStore.load(SampleLinesDeclaration) == SAMPLE_LINES
     assert ArtifactStore.load_manifest(SampleLinesDeclaration) == manifest
-    assert manifest.built_with == {"numpy": "2.1.0", "sunnbear": importlib.metadata.version("sunnbear")}
+    assert manifest.built_with == {"numpy": "2.1.0", "sunnbear": importlib.metadata.version("sunnbear") + "+dev"}
     assert [entry.path for entry in manifest.files] == ["lines.txt", "meta/count.txt"]
 
 

@@ -31,6 +31,9 @@ from .exceptions import ArtifactError
 
 _SHORT_HASH_LENGTH = 8
 
+# The suffix of the sunnbear version recorded for an artifact built from unreleased code, after the last release.
+_UNRELEASED_VERSION_SUFFIX = "+dev"
+
 
 # ==================================================================================================
 #  ArtifactManifest
@@ -47,7 +50,8 @@ class ArtifactManifest(BaseModel):
         input_artifact_hashes: The content hashes of the artifacts that this artifact was generated
             from, keyed by artifact name.
         built_with: The versions of sunnbear and of the libraries that affect the content, keyed by
-            package name.
+            package name. sunnbear's version is `<last release>+dev` until the release that ships the
+            artifact replaces it with the release version; see `unreleased_sunnbear_version`.
         build_date: The date the artifact was built.
         generated_by: The public sunnbear function call that generated the artifact, with its
             arguments, as JSON-compatible data; ``None`` when no public function generated it.
@@ -99,6 +103,27 @@ class ArtifactManifest(BaseModel):
     def short_identity(self) -> str:
         """Return the name and the shortened content hash, e.g. ``mc_tuples@3f2a9c1e``, for display only."""
         return f"{self.name}@{self.content_hash[:_SHORT_HASH_LENGTH]}"
+
+    # --------------------------------------------------------------------------
+    #  sunnbear version
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def unreleased_sunnbear_version(last_release_version: str) -> str:
+        """Return the sunnbear version recorded for an artifact built from unreleased code, e.g. `0.1.4+dev`.
+
+        The next release's number is not known before the release, so an artifact is built with
+        `<last release>+dev`, and the release replaces it with the release version.
+        """
+        return f"{last_release_version}{_UNRELEASED_VERSION_SUFFIX}"
+
+    @property
+    def is_built_from_unreleased_code(self) -> bool:
+        """Return whether the recorded sunnbear version marks unreleased code, e.g. `0.1.4+dev`."""
+        return self.built_with.get("sunnbear", "").endswith(_UNRELEASED_VERSION_SUFFIX)
+
+    def with_release_version(self, release_version: str) -> "ArtifactManifest":
+        """Return a copy that records `release_version` as the sunnbear version; the content hash is unchanged."""
+        return self.model_copy(update={"built_with": self.built_with | {"sunnbear": release_version}})
 
     # --------------------------------------------------------------------------
     #  JSON

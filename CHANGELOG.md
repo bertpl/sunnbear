@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A data artifact's manifest names the sunnbear release that ships the artifact, not the release before it
+
 ### Security
 
 ## 0.1.4 (2026-09-27)

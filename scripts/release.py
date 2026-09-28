@@ -1,7 +1,7 @@
 """Release driver for sunnbear.
 
 Run via ``make release VERSION=X.Y.Z``.  Validates state, bumps version, stamps
-the versioned splash + README badges, finalizes the changelog, commits, tags,
+the versioned splash + README badges + built-in artifact manifests, finalizes the changelog, commits, tags,
 opens a fresh Unreleased section, and pushes main + tag atomically.
 
 Every precondition runs before the first write, so a failed precondition leaves
@@ -24,6 +24,8 @@ import urllib.request
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+
+from sunnbear._core.artifacts import ArtifactError, ArtifactStore
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PYPROJECT = REPO_ROOT / "pyproject.toml"
@@ -192,13 +194,14 @@ def step_7_check_changelog_has_entries() -> None:
         fail_with_message("'## Unreleased' has no bullet entries")
 
 
-def step_8_check_stamping_inputs() -> None:
-    """Validate everything the release commit needs to stamp the README badges and the splash.
+def step_8_check_stamping_inputs(last_release_version: str) -> None:
+    """Validate everything the release commit needs to stamp the README badges, the splash and the artifact manifests.
 
     A badge that the README no longer carries would otherwise be skipped silently, leaving a stale
-    badge in the release.
+    badge in the release. A built-in artifact manifest that records unreleased code after another
+    release than the last one was never stamped by that release, so the release stops.
     """
-    print_step(8, "README badges and splash inputs are in place for stamping")
+    print_step(8, "README badges, splash and artifact manifests are in place for stamping")
     readme = README.read_text()
     for name, badge_re in (("coverage", COVERAGE_BADGE_RE), ("test-count", TESTS_BADGE_RE)):
         n_badges = len(badge_re.findall(readme))
@@ -209,6 +212,12 @@ def step_8_check_stamping_inputs() -> None:
     for path in (SPLASH_SCRIPT, SPLASH_BASE_PNG, SPLASH_FONT):
         if not path.is_file():
             fail_with_message(f"the splash cannot be stamped: {path.relative_to(REPO_ROOT)} is missing")
+    try:
+        names = ArtifactStore.unreleased_builtin_artifact_names(last_release_version=last_release_version)
+    except ArtifactError as error:
+        fail_with_message(f"the artifact manifests cannot be stamped: {error}")
+    else:
+        print(f"    artifact manifests to stamp with the release version: {', '.join(names) or 'none'}")
 
 
 # warn if the number of distinct tests across all CI matrix combos exceeds this multiple of the
@@ -414,12 +423,18 @@ def stamp_splash(version: str) -> None:
     run_command(["sh", str(SPLASH_SCRIPT), version], cwd=REPO_ROOT)
 
 
-def step_13_commit_release(version: str, badge_metrics: BadgeMetrics) -> None:
-    """Refresh README badges, stamp the splash, then create the release commit."""
-    print_step(13, f"refresh README badges + stamp splash + commit 'release: {version}'")
+def step_13_commit_release(version: str, last_release_version: str, badge_metrics: BadgeMetrics) -> None:
+    """Refresh README badges, stamp the splash and the artifact manifests, then create the release commit."""
+    print_step(13, f"refresh README badges + stamp splash and artifact manifests + commit 'release: {version}'")
     refresh_readme_badges(badge_metrics)
     stamp_splash(version)
-    run_command(["git", "add", "pyproject.toml", "uv.lock", "CHANGELOG.md", "README.md", str(SPLASH_WEBP)])
+    manifest_paths = ArtifactStore.stamp_release_version(
+        release_version=version, last_release_version=last_release_version
+    )
+    run_command(
+        ["git", "add", "pyproject.toml", "uv.lock", "CHANGELOG.md", "README.md", str(SPLASH_WEBP)]
+        + [str(path) for path in manifest_paths]
+    )
     run_command(["git", "commit", "-m", f"release: {version}"])
 
 
@@ -493,6 +508,8 @@ def main() -> None:
     parse_semver(version)
 
     print(f"Releasing {PACKAGE_NAME} v{version}\n")
+    # The last release's version, read before step 10 bumps it; unreleased artifacts record `<version>+dev`.
+    last_release_version = read_pyproject_version()
 
     print("Validation:")
     step_1_check_working_tree()
@@ -502,7 +519,7 @@ def main() -> None:
     step_5_check_pypi_doesnt_have(version)
     step_6_check_classifiers_match()
     step_7_check_changelog_has_entries()
-    step_8_check_stamping_inputs()
+    step_8_check_stamping_inputs(last_release_version)
     badge_metrics = step_9_gather_badge_metrics()
 
     if args.is_dry_run:
@@ -516,7 +533,7 @@ def main() -> None:
     step_10_bump_version(version)
     step_11_lock()
     step_12_finalize_changelog(version)
-    step_13_commit_release(version, badge_metrics)
+    step_13_commit_release(version, last_release_version, badge_metrics)
     step_14_tag(version)
 
     print("\nPost-release:")
