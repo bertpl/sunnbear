@@ -30,19 +30,23 @@ runs:
           # parallel jobs don't race to save one shared key or restore the wrong interpreter's wheels.
           cache-suffix: py${{ inputs.python_version }}-${{ inputs.dependency_resolution }}
 
-      - name: Determine Python version
+      - name: Determine Python version and dependency resolution
         shell: bash
         env:
           REQUESTED: ${{ inputs.python_version }}
-        run: |  # zizmor: ignore[github-env] value is a workflow-controlled Python version, not user input
+          RESOLUTION: ${{ inputs.dependency_resolution }}
+        run: |  # zizmor: ignore[github-env] values are workflow-controlled, not user input
           PY="${REQUESTED:-$(cat .python-version)}"
           echo "PYTHON_EFFECTIVE_VERSION=$PY" >> "$GITHUB_ENV"
+          # every later uv command reads these, so all of them resolve the same environment
+          echo "UV_PYTHON=$PY" >> "$GITHUB_ENV"
+          echo "UV_RESOLUTION=$RESOLUTION" >> "$GITHUB_ENV"
           echo "Using Python $PY."
 
       - name: Drop the checked-out lock so each combo resolves fresh from pyproject
         shell: bash
-        # `uv run --resolution` re-resolves per the requested strategy even with a lock present,
-        # but removing the committed lock guarantees the matrix job is never pinned by it.
+        # uv re-resolves per UV_RESOLUTION even with a lock present, but removing the committed lock
+        # guarantees the matrix job is never pinned by it.
         run: rm -f uv.lock
 
       - name: Disable numba JIT when jit is off
@@ -52,27 +56,35 @@ runs:
         # inside the numba-compiled functions; tests marked only_with_numba_jit skip (tests/conftest.py).
         run: echo "NUMBA_DISABLE_JIT=1" >> "$GITHUB_ENV"  # zizmor: ignore[github-env] constant value, not user input
 
-      # numba reuses a cached compile only when the numba version, the Python version, the CPU and the
-      # source file's (mtime, size) all match; it checks no file contents and no package versions. A
-      # fresh venv gives every installed file a new mtime, so the jit-on jobs pin the mtimes and key the
-      # cache on the exact installed versions, which covers the content check numba lacks. Tag pushes
-      # (releases) skip the cache, so release tests never load compiled code that another run saved.
-      - name: Install the environment and pin its third-party source mtimes
+      # numba reuses cached compiled code only when all of these match:
+      #   - the numba version
+      #   - the Python version
+      #   - the CPU
+      #   - the (mtime, size) of the function's source file
+      # numba checks no file contents and no package versions. A fresh venv gives every installed file a
+      # new mtime, so no cached code would ever match. The jit-on jobs therefore set every third-party .py
+      # file to one fixed mtime, and key the cache on the exact installed package versions; that key
+      # makes up for numba not checking file contents.
+      #
+      # Tag pushes (releases) skip the cache, so release tests never load compiled code that another run
+      # saved.
+      - name: Install the environment and set its third-party source mtimes to a fixed time
         id: numba-cache-env
         if: inputs.jit == 'on' && github.ref_type != 'tag'
         shell: bash
-        env:
-          PY: ${{ env.PYTHON_EFFECTIVE_VERSION }}
-          RES: ${{ inputs.dependency_resolution }}
         run: |  # zizmor: ignore[github-env] constant values, not user input
-          uv sync --python "$PY" --resolution "$RES" --group dev
+          # the later `uv run` steps resolve the same environment through UV_PYTHON and UV_RESOLUTION, so
+          # they install nothing and the fixed mtimes stay
+          uv sync --group dev
           # sunnbear itself is an editable install from the checkout, not in site-packages, so its own
-          # source keeps its real mtimes: a changed file of the same size must not load stale code.
-          find .venv/lib/python*/site-packages -name '*.py' -exec touch -d @946684800 {} +  # 2000-01-01, a fixed time
-          FREEZE_HASH=$(uv pip freeze --python .venv/bin/python --exclude-editable | sha256sum | cut -d' ' -f1)
-          echo "freeze-hash=$FREEZE_HASH" >> "$GITHUB_OUTPUT"
+          # source keeps its real mtimes: numba recompiles an edited file even when its size is unchanged.
+          # 946684800 is 2000-01-01, a fixed time.
+          find .venv/lib/python*/site-packages -name '*.py' -exec touch -d @946684800 {} +
+          INSTALLED_VERSIONS_HASH=$(uv pip freeze --python .venv/bin/python --exclude-editable | sha256sum | cut -d' ' -f1)
+          echo "installed-versions-hash=$INSTALLED_VERSIONS_HASH" >> "$GITHUB_OUTPUT"
           echo "NUMBA_CACHE_DIR=$RUNNER_TEMP/numba-cache" >> "$GITHUB_ENV"
-          # a generic CPU target makes the cached code independent of the runner's CPU model
+          # a generic CPU target makes the cached code independent of the runner's CPU model; the cost is
+          # that the jit-on tests run code built without the host CPU's specific instructions
           echo "NUMBA_CPU_NAME=generic" >> "$GITHUB_ENV"
 
       - name: Restore and save numba's compiled code
@@ -80,18 +92,17 @@ runs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/numba-cache
-          # no restore-keys: a cache is only ever restored for the exact same installed versions
-          key: numba-${{ runner.os }}-${{ runner.arch }}-py${{ env.PYTHON_EFFECTIVE_VERSION }}-${{ inputs.dependency_resolution }}-${{ steps.numba-cache-env.outputs.freeze-hash }}
+          # the cache step sets no restore-keys, so a cache is only ever restored for the exact same
+          # installed versions
+          key: numba-${{ runner.os }}-${{ runner.arch }}-py${{ env.PYTHON_EFFECTIVE_VERSION }}-${{ inputs.dependency_resolution }}-${{ steps.numba-cache-env.outputs.installed-versions-hash }}
 
       - name: Run tests
         shell: bash
         env:
-          PY: ${{ env.PYTHON_EFFECTIVE_VERSION }}
-          RES: ${{ inputs.dependency_resolution }}
           # distinct per-combo data file so the coverage job combines rather than overwrites
           COVERAGE_FILE: .coverage.${{ inputs.python_version }}-${{ inputs.dependency_resolution }}-jit-${{ inputs.jit }}
         # --cov-fail-under=0: the coverage job applies the fail_under check to the combined data of all matrix jobs, so no single job applies it
-        run: uv run --python "$PY" --resolution "$RES" --group dev pytest ./tests --cov --cov-report= --cov-fail-under=0 --durations=20
+        run: uv run --group dev pytest ./tests --cov --cov-report= --cov-fail-under=0 --durations=20
 
       - name: Dump collected node-ids (for the cross-combo test-count union)
         shell: bash
@@ -101,8 +112,7 @@ runs:
           JIT: ${{ inputs.jit }}
         run: |
           # each combo records its own collected set so the coverage job can union them
-          uv run --python "$PY" --resolution "$RES" --group dev \
-            pytest ./tests --collect-only -q \
+          uv run --group dev pytest ./tests --collect-only -q \
             | grep '::' > "test-ids-${PY}-${RES}-jit-${JIT}.txt"
 
       - name: Upload coverage + node-id data
