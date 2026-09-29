@@ -131,6 +131,11 @@ class BenchmarkRunDir:
         if not any(staging_dir.iterdir()):
             staging_dir.rmdir()
 
+    def write_formula_results_if_all_staged(self, formula_id: str, n_functions: int) -> None:
+        """Write the formula's results file if the results of all its `n_functions` test functions are staged."""
+        if all(self.has_staged_function_results(formula_id, idx) for idx in range(n_functions)):
+            self.write_formula_results(formula_id, n_functions)
+
     def scan_results(self) -> pl.LazyFrame:
         """Return a lazy frame over every formula's results file of a finished run.
 
