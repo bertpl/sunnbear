@@ -1,8 +1,4 @@
-"""`select_tuples` runs the max-div solver once, to select the tuples of 1 size of the tuple set from the population.
-
-Import this module only inside the function that needs it: importing max-div compiles its numba
-functions, which takes minutes on a fresh install.
-"""
+"""`select_tuples` runs the max-div solver once, to select the tuples of 1 size of the tuple set from the population."""
 
 import warnings
 
