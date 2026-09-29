@@ -1,8 +1,8 @@
 """`run_benchmark` runs solvers on test functions over the Monte Carlo samples, writing the results to a run directory.
 
 A run is 1 `BenchmarkTask` per test function, run by a `BenchmarkWorkerPool` in worker processes. Each task's
-results are staged as it finishes, and a formula's results file is written as soon as all of the formula's
-test functions have finished.
+results are written to a file of their own under the run directory's `staging/` as the task finishes, and a
+formula's results file is written as soon as all of the formula's test functions have finished.
 
 The run info is written before the first task, so a call that resumes the run can check its inputs and
 versions against the stored run info.
@@ -59,16 +59,19 @@ def run_benchmark(
 
     Args:
         solver_configs: The solver configs to run; their order is the order of each sample's result rows.
-        functions: The calibrated test functions to run, each with its c-range. They run grouped by formula,
-            formulas in order of first appearance, so the result rows follow that order, not the order passed.
+        functions: The calibrated test functions to run, each with its c-range. Their result rows are grouped by
+            formula, formulas in order of first appearance, not in the order passed.
         run_dir: The run directory, created when it does not exist.
         root_seed: The run's root seed, from which every seed of the run is derived.
         mc_size: The size of the Monte Carlo tuple set, 1 of `MCTuplesSize`.
         n_bisection_fevals: Bisection's evaluation count, from which the `xtol` range and the evaluation
             budget follow.
         n_workers: The number of worker processes; ``None`` for 1 per CPU, and 1 to run every task in this
-            process. Each worker imports the modules that define the formulas and solver configs, so with more
-            than 1 worker, no formula or solver config may be defined in an interactive session.
+            process. Each worker imports the modules that define the formulas and solver configs, and a class
+            defined in an interactive session has no module file to import, so with more than 1 worker, no
+            formula or solver config may be defined in an interactive session. Every worker also runs the main
+            script again, so a script that runs more than 1 worker must call `run_benchmark` under
+            `if __name__ == "__main__":`.
 
     Raises:
         ValueError: If an input is invalid, which leaves `run_dir` unwritten:
@@ -91,7 +94,6 @@ def run_benchmark(
     )
 
     # --- collect the unfinished tasks -----------
-    # A task's key is its formula id and the test function's position among the formula's test functions.
     tasks: dict[tuple[str, int], BenchmarkTask] = {}
     n_functions_by_formula_id: dict[str, int] = {}
     for formula_id in run_info.formula_ids:
@@ -105,7 +107,7 @@ def run_benchmark(
                     function=function, solver_configs=solver_configs, run_settings=run_settings
                 )
 
-    # --- run the tasks, writing formula files ---
+    # --- run the tasks, write results files -----
     # A run that stopped after staging the results of a formula's last test function has only the formula's
     # results file left to write.
     for formula_id, n_functions in n_functions_by_formula_id.items():

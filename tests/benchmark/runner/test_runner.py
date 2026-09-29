@@ -140,7 +140,7 @@ def test_a_crashed_run_resumes_with_only_its_unfinished_tasks(finished_run_dir, 
     assert _results_without_wall_time(tmp_path).equals(_results_without_wall_time(finished_run_dir))
 
 
-def test_a_run_that_stopped_before_writing_a_formula_file_writes_it_from_the_staged_results(
+def test_a_run_that_stopped_before_writing_a_results_file_writes_it_from_the_staged_results(
     finished_run_dir, tmp_path, monkeypatch
 ):
     """When a run staged all of a formula's results but crashed before writing the formula's results file, the

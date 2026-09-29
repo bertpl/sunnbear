@@ -1,6 +1,6 @@
 """`ExternalBisectionConfig` is a solver config, registered only when a test imports this module.
 
-A test file that imported this module at its top would register the config for every test that runs after it,
+A test file that imported this module at its top would register the config for every test that runs after the import,
 so a test imports this module by its module name at run time, inside the `isolated_solver_config_registry`
 fixture.
 """

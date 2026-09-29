@@ -1,11 +1,13 @@
 """`BenchmarkWorkerPool` runs benchmark tasks in worker processes, or in this process when it has 1 worker.
 
 A task looks up its formula and solver configs by id in registries, and each formula or solver config class
-adds itself to its registry when it is defined. A worker process has only imported sunnbear itself, so every
+adds itself to its registry when it is defined.
+
+A worker process has only imported sunnbear itself, so every
 worker first imports the modules that define the run's formulas and solver configs.
 
-Workers start with the "spawn" method on every platform: a worker then never inherits the threads of this
-process, e.g. those of numba or polars, and a run behaves the same on Linux, macOS and Windows.
+Workers start with the "spawn" method on every platform: a worker then never inherits the state of this
+process's threads, e.g. locks held by numba or polars, and a run behaves the same on Linux, macOS and Windows.
 """
 
 import importlib
@@ -53,13 +55,13 @@ class BenchmarkWorkerPool:
         solver_configs: Sequence[SolverConfig],
         functions: Sequence[TestFunction],
     ) -> Self:
-        """Return the pool for a run, whose workers import the modules that define its configs and formulas.
+        """Return a run's pool, whose workers import the modules that define the run's solver configs and formulas.
 
         An `n_workers` of ``None`` starts 1 worker per CPU.
 
         Raises:
             ValueError: If `n_workers` is below 1, or is above 1 while a formula or solver config is defined in
-                an interactive session, which a worker cannot import.
+                an interactive session, because a worker cannot import a definition from an interactive session.
         """
         n_workers = n_workers if n_workers is not None else (os.cpu_count() or 1)
         module_names = {type(config).__module__ for config in solver_configs}
@@ -70,10 +72,11 @@ class BenchmarkWorkerPool:
             and not hasattr(sys.modules[_MAIN_MODULE_NAME], "__file__")
         ):
             raise ValueError(
-                "A formula or solver config is defined in an interactive session, which a worker process cannot "
-                "import; define it in a module, or pass n_workers=1."
+                "A worker process cannot import a formula or solver config that is defined in an interactive session; "
+                "define the formula or solver config in a module, or pass n_workers=1."
             )
-        # A worker never imports the main module by name: "spawn" runs the main script in every worker itself.
+        # The main module is left out of the import list: with "spawn", every worker already runs the main script,
+        # which defines its formulas and solver configs.
         return cls(n_workers=n_workers, module_names=sorted(module_names - {_MAIN_MODULE_NAME}))
 
     # --------------------------------------------------------------------------
@@ -82,8 +85,8 @@ class BenchmarkWorkerPool:
     def run(self, tasks: Mapping[K, BenchmarkTask]) -> Iterator[tuple[K, pl.DataFrame]]:
         """Run every task and yield each task's key with its result rows, as the task finishes.
 
-        With 1 worker, the tasks run in this process, in the order of `tasks`. Otherwise they run in up to
-        `n_workers` worker processes and finish in any order.
+        The tasks run in up to `n_workers` worker processes and finish in any order. With 1 worker, they run in
+        this process, in the order of `tasks`.
 
         When a task fails:
 
