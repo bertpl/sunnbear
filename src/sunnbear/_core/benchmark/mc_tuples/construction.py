@@ -15,6 +15,7 @@ The construction selects each size with max-div from a uniform random population
 import numpy as np
 
 from .construction_settings import FULL_POPULATION_SIZE, MCTuplesConstructionSettings
+from .max_div_selection import select_tuples
 from .sizes import MCTuplesSize
 from .tuples import MCTuples
 
@@ -31,9 +32,8 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
     - from 60 s up, the construction uses the full population of candidates and all `n_workers` workers;
     - below 60 s, the construction uses fewer of both, for short runs such as tests.
 
-    The total covers only the solves: drawing the population, checking each size, and the first call's
-    import of max-div take extra time; that import compiles max-div's numba functions, which takes
-    minutes on a fresh install.
+    The total covers only the solves: drawing the population, checking each size, and compiling the
+    max-div functions that the solves use, on their first use in a process, take extra time.
 
     A rerun gives a set of equivalent quality, not the same set, because max-div's parallel solver
     runs on a wall-clock budget.
@@ -49,10 +49,6 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
         MCTuplesConstructionError: If a size breaks its bin or inclusion constraints, which can
             happen when `t_total_sec` is too short for max-div to meet them.
     """
-    # `select_tuples` is imported here, not at module level: importing max-div compiles its numba functions,
-    # which takes minutes on a fresh install, and only `generate_mc_tuples` uses max-div.
-    from .max_div_selection import select_tuples
-
     settings = MCTuplesConstructionSettings.from_total_time(t_total_sec, n_workers)
     population = _draw_population(settings.population_size, seed)
     # `prefix_indices` holds population indices in prefix order: each size's new tuples follow those
