@@ -139,8 +139,8 @@ class BenchmarkRunInfo(BaseModel):
         ]
         if differing_fields:
             raise BenchmarkRunError(
-                f"The run folder holds a run with different {', '.join(differing_fields)}; "
-                f"resume it with the same inputs and packages, or use another folder."
+                f"The run directory holds a run with different {', '.join(differing_fields)}; "
+                f"resume it with the same inputs and packages, or use another directory."
             )
 
     # --------------------------------------------------------------------------

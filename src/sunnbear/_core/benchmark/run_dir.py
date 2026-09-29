@@ -1,13 +1,13 @@
-"""`BenchmarkRunFolder` represents the folder of 1 benchmark run, and is the only code that reads or writes its files.
+"""`BenchmarkRunDir` represents the directory of 1 benchmark run, and is the only code that reads or writes its files.
 
-The folder holds:
+The directory holds:
 
 - `run_info.json`, the run's `BenchmarkRunInfo`;
 - 1 results file per formula, e.g. `f2.1.1.parquet`, which holds the rows of every test function of the
   formula, written once all of them have run;
 - `staging/`, which holds 1 results file per finished test function of each formula whose results file is
   not written yet, e.g. `staging/f2.1.1/0.parquet` for the formula's first test function in run order, the
-  order in which the formula's test functions run; a formula's staging folder is removed once its results
+  order in which the formula's test functions run; a formula's staging directory is removed once its results
   file is written, and `staging/` once it is empty.
 
 Every file is written under a temporary name and then renamed, so a crash never leaves a partly written
@@ -24,31 +24,31 @@ from .exceptions import BenchmarkRunError
 from .run_info import BenchmarkRunInfo
 
 _RUN_INFO_FILE_NAME = "run_info.json"
-_STAGING_FOLDER_NAME = "staging"
+_STAGING_DIR_NAME = "staging"
 _RESULTS_FILE_SUFFIX = ".parquet"
 _TEMPORARY_FILE_SUFFIX = ".tmp"
 
 
 # ==================================================================================================
-#  BenchmarkRunFolder
+#  BenchmarkRunDir
 # ==================================================================================================
-class BenchmarkRunFolder:
-    """`BenchmarkRunFolder` reads and writes the files of 1 benchmark run's folder."""
+class BenchmarkRunDir:
+    """`BenchmarkRunDir` reads and writes the files of 1 benchmark run's directory."""
 
     def __init__(self, path: Path) -> None:
-        """Refer to the run folder at `path`, which need not exist yet."""
+        """Refer to the run directory at `path`, which need not exist yet."""
         self.path = path
 
     # --------------------------------------------------------------------------
     #  Run info
     # --------------------------------------------------------------------------
     def store_or_check_run_info(self, run_info: BenchmarkRunInfo) -> BenchmarkRunInfo:
-        """Store `run_info` when the folder holds no run; else check `run_info` against the stored run info.
+        """Store `run_info` when the directory holds no run; else check `run_info` against the stored run info.
 
-        The folder is created when it does not exist.
+        The directory is created when it does not exist.
 
         Returns:
-            The run info of the folder's run: `run_info` for a new run, the stored run info for a resumed one.
+            The run info of the directory's run: `run_info` for a new run, the stored run info for a resumed one.
 
         Raises:
             BenchmarkRunError: If the stored run info is malformed, or belongs to a run with other inputs or
@@ -63,7 +63,7 @@ class BenchmarkRunFolder:
             return stored_run_info
 
     def read_run_info(self) -> BenchmarkRunInfo | None:
-        """Return the stored run info, or ``None`` when the folder holds none.
+        """Return the stored run info, or ``None`` when the directory holds none.
 
         Raises:
             BenchmarkRunError: If the stored run info is malformed.
@@ -75,7 +75,7 @@ class BenchmarkRunFolder:
             return None
 
     def write_run_info(self, run_info: BenchmarkRunInfo) -> None:
-        """Store `run_info`, creating the folder when needed and replacing any stored run info."""
+        """Store `run_info`, creating the directory when needed and replacing any stored run info."""
         self.path.mkdir(parents=True, exist_ok=True)
         self._write_atomically(self.path / _RUN_INFO_FILE_NAME, lambda file: file.write_text(run_info.to_json()))
 
@@ -126,16 +126,16 @@ class BenchmarkRunFolder:
             raise BenchmarkRunError(f"Formula {formula_id} is missing the staged results files {missing_file_names}.")
         results = pl.concat([pl.read_parquet(file) for file in staged_files])
         self._write_atomically(self._formula_results_file(formula_id), results.write_parquet)
-        staging_folder = self.path / _STAGING_FOLDER_NAME
-        shutil.rmtree(staging_folder / formula_id)
-        if not any(staging_folder.iterdir()):
-            staging_folder.rmdir()
+        staging_dir = self.path / _STAGING_DIR_NAME
+        shutil.rmtree(staging_dir / formula_id)
+        if not any(staging_dir.iterdir()):
+            staging_dir.rmdir()
 
     def scan_results(self) -> pl.LazyFrame:
         """Return a lazy frame over every formula's results file of a finished run.
 
         Raises:
-            BenchmarkRunError: If the folder holds no run info, a malformed run info, or a run that is not finished.
+            BenchmarkRunError: If the directory holds no run info, a malformed run info, or a run that is not finished.
         """
         run_info = self.read_run_info()
         if run_info is None:
@@ -153,7 +153,7 @@ class BenchmarkRunFolder:
 
     def _staged_function_results_file(self, formula_id: str, function_idx: int) -> Path:
         """Return the path of the staged results of a formula's test function."""
-        return self.path / _STAGING_FOLDER_NAME / formula_id / f"{function_idx}{_RESULTS_FILE_SUFFIX}"
+        return self.path / _STAGING_DIR_NAME / formula_id / f"{function_idx}{_RESULTS_FILE_SUFFIX}"
 
     @staticmethod
     def _write_atomically(file: Path, write_file: Callable[[Path], object]) -> None:

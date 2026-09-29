@@ -40,7 +40,7 @@ def _run_inputs(run_dir: Path, **changes: object) -> dict[str, object]:
 
 @pytest.fixture(scope="module")
 def finished_run_dir(tmp_path_factory) -> Path:
-    """Return the folder of a finished small run."""
+    """Return the run directory of a finished small run."""
     run_dir = tmp_path_factory.mktemp("finished_run")
     run_benchmark(**_run_inputs(run_dir))
     return run_dir
@@ -134,7 +134,7 @@ def test_a_crashed_run_resumes_with_only_its_unfinished_tasks(finished_run_dir, 
     ],
 )
 def test_resuming_with_other_inputs_is_refused(finished_run_dir, changes, differing_field):
-    """A run folder only resumes with the inputs of the run that it holds, and the error names what differs."""
+    """A run directory only resumes with the inputs of the run that it holds, and the error names what differs."""
     # --- act / assert -----------------
     with pytest.raises(BenchmarkRunError, match=differing_field):
         run_benchmark(**_run_inputs(finished_run_dir, **changes))
@@ -153,8 +153,8 @@ def test_resuming_with_other_inputs_is_refused(finished_run_dir, changes, differ
         ({"n_bisection_fevals": 1}, "n_bisection_fevals must be at least 2"),
     ],
 )
-def test_invalid_inputs_are_refused_before_the_run_folder_is_written(tmp_path, changes, message):
-    """Invalid inputs raise `ValueError` and leave the run folder unwritten."""
+def test_invalid_inputs_are_refused_before_the_run_dir_is_written(tmp_path, changes, message):
+    """Invalid inputs raise `ValueError` and leave the run directory unwritten."""
     # --- arrange ----------------------
     run_dir = tmp_path / "run"
 
@@ -164,8 +164,8 @@ def test_invalid_inputs_are_refused_before_the_run_folder_is_written(tmp_path, c
     assert not run_dir.exists()
 
 
-def test_loading_a_folder_without_a_run_is_refused(tmp_path):
-    """`load_results` on a folder that holds no run raises `BenchmarkRunError`."""
+def test_loading_a_run_dir_without_a_run_is_refused(tmp_path):
+    """`load_results` on a directory that holds no run raises `BenchmarkRunError`."""
     # --- act / assert -----------------
     with pytest.raises(BenchmarkRunError, match="holds no benchmark run"):
         load_results(tmp_path)
