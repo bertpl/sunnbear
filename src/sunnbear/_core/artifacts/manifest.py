@@ -163,20 +163,20 @@ class ArtifactFileEntry(ArtifactHashEntry):
     """An `ArtifactFileEntry` describes one data file of an artifact: where it lives and what its bytes hash to.
 
     Attributes:
-        path: Where the file sits once it is available, relative to the artifact's folder for a
-            file shipped in the sunnbear package, or to the artifact's cache folder for a
-            downloaded one; forward slashes, never leaving that folder.
+        path: Where the file sits once it is available, relative to the artifact's directory for a
+            file shipped in the sunnbear package, or to the artifact's cache directory for a
+            downloaded one; forward slashes, never leaving that directory.
     """
 
     path: str
 
     @field_validator("path")
     @classmethod
-    def _check_path_stays_inside_folder(cls, path: str) -> str:
+    def _check_path_stays_inside_artifact_dir(cls, path: str) -> str:
         """Refuse a path that is empty, absolute, or contains a ``..`` part."""
         parts = PurePosixPath(path).parts
         if not parts or path.startswith("/") or ".." in parts:
-            raise ValueError(f"Artifact file path '{path}' must be relative and stay inside the artifact's folder.")
+            raise ValueError(f"Artifact file path '{path}' must be relative and stay inside the artifact's directory.")
         return path
 
     @classmethod

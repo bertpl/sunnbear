@@ -1,4 +1,4 @@
-"""`ArtifactStore` lists the built-in artifacts from their committed folders, and reads the manifest of one."""
+"""`ArtifactStore` lists the built-in artifacts from their committed directories, and reads the manifest of one."""
 
 import pytest
 
@@ -9,19 +9,22 @@ from .sample_declarations import SampleLinesDeclaration, define_builtin_declarat
 
 
 @pytest.fixture
-def builtin_artifacts_folder_in_tmp(monkeypatch, tmp_path):
-    """Make `ArtifactStore` keep the built-in artifacts in `tmp_path`, and return that folder."""
-    monkeypatch.setattr(ArtifactStore, "_builtin_artifacts_folder", staticmethod(lambda: tmp_path))
+def builtin_artifacts_dir_in_tmp(monkeypatch, tmp_path):
+    """Make `ArtifactStore` keep the built-in artifacts in `tmp_path`, and return that directory."""
+    monkeypatch.setattr(ArtifactStore, "_builtin_artifacts_dir", staticmethod(lambda: tmp_path))
     return tmp_path
 
 
 @pytest.mark.usefixtures("isolated_artifact_registry")
-def test_artifact_names_lists_one_name_per_builtin_folder(builtin_artifacts_folder_in_tmp):
-    """Each subfolder of the built-in artifacts folder is listed, sorted; a file there and a test fixture are not."""
+def test_artifact_names_lists_one_name_per_builtin_dir(builtin_artifacts_dir_in_tmp):
+    """Each directory in the built-in artifacts directory is listed, sorted.
+
+    A plain file there, and an artifact declared in the tests, are not listed.
+    """
     # --- arrange ----------------------
     for name in ("later", "earlier"):
         ArtifactStore.save(define_builtin_declaration(name), b"content\n")
-    (builtin_artifacts_folder_in_tmp / "README.txt").write_text("not an artifact\n")
+    (builtin_artifacts_dir_in_tmp / "README.txt").write_text("not an artifact\n")
 
     # --- act --------------------------
     names = artifact_names()
@@ -31,17 +34,17 @@ def test_artifact_names_lists_one_name_per_builtin_folder(builtin_artifacts_fold
     assert SampleLinesDeclaration.name not in names
 
 
-def test_artifact_names_is_empty_without_a_builtin_artifacts_folder(builtin_artifacts_folder_in_tmp):
-    """Without the folder of built-in artifacts, no artifact is listed."""
+def test_artifact_names_is_empty_without_a_builtin_artifacts_dir(builtin_artifacts_dir_in_tmp):
+    """Without the built-in artifacts directory, no artifact is listed."""
     # --- arrange ----------------------
-    builtin_artifacts_folder_in_tmp.rmdir()
+    builtin_artifacts_dir_in_tmp.rmdir()
 
     # --- act / assert -----------------
     assert artifact_names() == ()
 
 
 @pytest.mark.usefixtures("isolated_artifact_registry")
-def test_artifact_manifest_reads_the_manifest_of_a_builtin_artifact(builtin_artifacts_folder_in_tmp):
+def test_artifact_manifest_reads_the_manifest_of_a_builtin_artifact(builtin_artifacts_dir_in_tmp):
     """`artifact_manifest` returns the manifest that `save` wrote for a built-in artifact."""
     # --- arrange ----------------------
     saved_manifest = ArtifactStore.save(define_builtin_declaration("sample_builtin"), b"content\n")
@@ -51,18 +54,18 @@ def test_artifact_manifest_reads_the_manifest_of_a_builtin_artifact(builtin_arti
 
 
 @pytest.mark.usefixtures("isolated_artifact_registry")
-def test_artifact_manifest_refuses_a_manifest_for_another_artifact(builtin_artifacts_folder_in_tmp):
-    """A built-in folder whose manifest names another artifact is refused."""
+def test_artifact_manifest_refuses_a_manifest_for_another_artifact(builtin_artifacts_dir_in_tmp):
+    """A built-in artifact's directory whose manifest names another artifact is refused."""
     # --- arrange ----------------------
     ArtifactStore.save(define_builtin_declaration("sample_builtin"), b"content\n")
-    (builtin_artifacts_folder_in_tmp / "sample_builtin").rename(builtin_artifacts_folder_in_tmp / "sample_renamed")
+    (builtin_artifacts_dir_in_tmp / "sample_builtin").rename(builtin_artifacts_dir_in_tmp / "sample_renamed")
 
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match="is for 'sample_builtin', but the artifact is 'sample_renamed'"):
         artifact_manifest("sample_renamed")
 
 
-@pytest.mark.usefixtures("builtin_artifacts_folder_in_tmp")
+@pytest.mark.usefixtures("builtin_artifacts_dir_in_tmp")
 @pytest.mark.parametrize("name", ["no_such_artifact", SampleLinesDeclaration.name])
 def test_artifact_manifest_refuses_a_name_that_is_not_builtin(name):
     """An unknown name, or the name of a test fixture, is not a sunnbear data artifact."""

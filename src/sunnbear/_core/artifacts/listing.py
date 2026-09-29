@@ -1,6 +1,6 @@
 """This module holds the public functions that list sunnbear's data artifacts and read their manifests.
 
-Both functions wrap `ArtifactStore`, which reads the committed folders of the built-in artifacts;
+Both functions wrap `ArtifactStore`, which reads the committed directories of the built-in artifacts;
 the module also re-exports the manifest classes, so that `sunnbear.data` offers everything a user
 needs to read a manifest.
 """

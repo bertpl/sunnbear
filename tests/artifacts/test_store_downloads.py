@@ -16,7 +16,7 @@ from sunnbear._core.artifacts import (
 from .sample_declarations import SAMPLE_LINES, SampleDownloadedLinesDeclaration, SampleLinesDeclaration
 
 # The committed manifest of `SampleDownloadedLinesDeclaration` is read by path, so that a test that
-# moves artifact folders into `tmp_path` still finds it.
+# moves artifact directories into `tmp_path` still finds it.
 _COMMITTED_MANIFEST_PATH = Path(__file__).parent / "artifacts" / SampleDownloadedLinesDeclaration.name / "manifest.json"
 # The tests' stand-in for `ArtifactStore._download` serves this committed archive.
 _COMMITTED_ARCHIVE_PATH = (
@@ -162,15 +162,15 @@ def test_load_reports_a_failed_or_wrong_download_and_caches_nothing(
     assert not any(path.is_file() for path in cache_root_in_tmp.rglob("*"))
 
 
-def test_load_refuses_an_archive_whose_files_differ_from_the_manifest(monkeypatch, artifacts_folder_in_tmp):
+def test_load_refuses_an_archive_whose_files_differ_from_the_manifest(monkeypatch, artifacts_dir_in_tmp):
     """An archive that matches its archive entry but holds a file that differs from its manifest entry is refused."""
     # --- arrange ----------------------
     archive_bytes = ArtifactArchiver.pack(SampleLinesDeclaration.to_files(["alpha", "beta", "delta"]))
     archive_entry = ArtifactArchiveEntry.from_content("https://example.invalid/other.tar.zst", archive_bytes)
     manifest = _load_committed_manifest().model_copy(update={"archive": archive_entry})
-    folder = artifacts_folder_in_tmp / SampleDownloadedLinesDeclaration.name
-    folder.mkdir(parents=True)
-    (folder / "manifest.json").write_text(manifest.to_json())
+    artifact_dir = artifacts_dir_in_tmp / SampleDownloadedLinesDeclaration.name
+    artifact_dir.mkdir(parents=True)
+    (artifact_dir / "manifest.json").write_text(manifest.to_json())
     _stub_download(monkeypatch, {archive_entry.url: archive_bytes})
 
     # --- act / assert -----------------
@@ -181,28 +181,28 @@ def test_load_refuses_an_archive_whose_files_differ_from_the_manifest(monkeypatc
 # ==================================================================================================
 #  Saving and verification
 # ==================================================================================================
-def test_save_writes_the_data_files_to_the_cache_and_only_the_manifest_to_the_artifact_folder(
-    monkeypatch, artifacts_folder_in_tmp, lines_file_cache_path
+def test_save_writes_the_data_files_to_the_cache_and_only_the_manifest_to_the_artifact_dir(
+    monkeypatch, artifacts_dir_in_tmp, lines_file_cache_path
 ):
-    """A saved downloaded artifact has only its manifest in its folder, and loads from the data files in the cache."""
+    """A saved downloaded artifact keeps only its manifest in its directory, and loads its data files from the cache."""
     # --- arrange ----------------------
     monkeypatch.setattr(ArtifactStore, "_download", staticmethod(_raise_connection_error))
-    folder = artifacts_folder_in_tmp / SampleDownloadedLinesDeclaration.name
-    folder.mkdir(parents=True)
-    (folder / "lines.txt").write_text("left over\n")
+    artifact_dir = artifacts_dir_in_tmp / SampleDownloadedLinesDeclaration.name
+    artifact_dir.mkdir(parents=True)
+    (artifact_dir / "lines.txt").write_text("left over\n")
 
     # --- act --------------------------
     ArtifactStore.save(SampleDownloadedLinesDeclaration, SAMPLE_LINES)
 
     # --- assert -----------------------
-    assert [path.name for path in folder.iterdir()] == ["manifest.json"]
+    assert [path.name for path in artifact_dir.iterdir()] == ["manifest.json"]
     assert (lines_file_cache_path.parent / "meta" / "count.txt").is_file()
     assert ArtifactStore.load(SampleDownloadedLinesDeclaration) == SAMPLE_LINES
     with pytest.raises(ArtifactError, match="the manifest has no archive entry"):
         ArtifactStore.verify(SampleDownloadedLinesDeclaration)
 
 
-@pytest.mark.usefixtures("artifacts_folder_in_tmp")
+@pytest.mark.usefixtures("artifacts_dir_in_tmp")
 def test_load_without_archive_entry_or_cached_copy_fails(lines_file_cache_path):
     """A saved downloaded artifact whose cached copy is gone cannot be loaded: its manifest has no archive entry."""
     # --- arrange ----------------------
@@ -215,17 +215,17 @@ def test_load_without_archive_entry_or_cached_copy_fails(lines_file_cache_path):
 
 
 def test_verify_accepts_the_committed_downloaded_artifact():
-    """The committed manifest is the only file in its folder and has an archive entry, so `verify` passes."""
+    """The committed manifest is the only file in its directory and has an archive entry, so `verify` passes."""
     assert ArtifactStore.verify(SampleDownloadedLinesDeclaration).name == SampleDownloadedLinesDeclaration.name
 
 
-def test_verify_reports_a_data_file_committed_next_to_a_downloaded_artifact(artifacts_folder_in_tmp):
-    """A downloaded artifact's folder holds only its manifest, so a data file beside it fails `verify`."""
+def test_verify_reports_a_data_file_committed_next_to_a_downloaded_artifact(artifacts_dir_in_tmp):
+    """A downloaded artifact's directory holds only its manifest, so a data file beside it fails `verify`."""
     # --- arrange ----------------------
-    folder = artifacts_folder_in_tmp / SampleDownloadedLinesDeclaration.name
-    folder.mkdir(parents=True)
-    (folder / "manifest.json").write_bytes(_COMMITTED_MANIFEST_PATH.read_bytes())
-    (folder / "lines.txt").write_text("alpha\n")
+    artifact_dir = artifacts_dir_in_tmp / SampleDownloadedLinesDeclaration.name
+    artifact_dir.mkdir(parents=True)
+    (artifact_dir / "manifest.json").write_bytes(_COMMITTED_MANIFEST_PATH.read_bytes())
+    (artifact_dir / "lines.txt").write_text("alpha\n")
 
     # --- act / assert -----------------
     with pytest.raises(
@@ -234,12 +234,12 @@ def test_verify_reports_a_data_file_committed_next_to_a_downloaded_artifact(arti
         ArtifactStore.verify(SampleDownloadedLinesDeclaration)
 
 
-def test_verify_reports_an_archive_entry_for_an_artifact_shipped_in_the_package(artifacts_folder_in_tmp):
+def test_verify_reports_an_archive_entry_for_an_artifact_shipped_in_the_package(artifacts_dir_in_tmp):
     """`verify` rejects an archive entry in the manifest of an artifact shipped in the package."""
     # --- arrange ----------------------
     manifest = ArtifactStore.save(SampleLinesDeclaration, SAMPLE_LINES)
     archive_entry = ArtifactArchiveEntry.from_content("https://example.invalid/sample_lines.tar.zst", b"")
-    manifest_file = artifacts_folder_in_tmp / SampleLinesDeclaration.name / "manifest.json"
+    manifest_file = artifacts_dir_in_tmp / SampleLinesDeclaration.name / "manifest.json"
     manifest_file.write_text(manifest.model_copy(update={"archive": archive_entry}).to_json())
 
     # --- act / assert -----------------
@@ -248,19 +248,19 @@ def test_verify_reports_an_archive_entry_for_an_artifact_shipped_in_the_package(
 
 
 # ==================================================================================================
-#  Cache folder and download
+#  Cache directory and download
 # ==================================================================================================
-def test_the_cache_root_is_the_user_cache_folder_unless_the_environment_variable_is_set(monkeypatch):
-    """Without ``SUNNBEAR_CACHE_DIR``, downloaded files are cached in the user's cache folder for sunnbear."""
+def test_the_cache_root_is_the_user_cache_dir_unless_the_environment_variable_is_set(monkeypatch):
+    """Without ``SUNNBEAR_CACHE_DIR``, downloaded files are cached in the user's cache directory for sunnbear."""
     # --- arrange ----------------------
     monkeypatch.delenv("SUNNBEAR_CACHE_DIR")
     manifest = _load_committed_manifest()
 
     # --- act --------------------------
-    cache_folder = ArtifactStore._cache_folder_of(manifest)
+    cache_dir = ArtifactStore._cache_dir_of(manifest)
 
     # --- assert -----------------------
-    assert cache_folder == Path(platformdirs.user_cache_dir("sunnbear")) / manifest.name / manifest.content_hash
+    assert cache_dir == Path(platformdirs.user_cache_dir("sunnbear")) / manifest.name / manifest.content_hash
 
 
 def test_download_returns_the_bytes_at_a_url(tmp_path):

@@ -16,7 +16,7 @@ from .registry import ArtifactRegistry
 from .source import ArtifactSource
 
 # An artifact's name is a plain slug matching this pattern, because it also names the artifact's
-# folder and forms part of `ArtifactManifest.short_identity`.
+# directory and forms part of `ArtifactManifest.short_identity`.
 _ARTIFACT_NAME_PATTERN = re.compile(r"[a-z][a-z0-9_]*")
 
 
@@ -67,11 +67,11 @@ class ArtifactDeclaration[T](ABC):
     def to_files(cls, value: T) -> dict[str, bytes]:
         """Return the artifact's files for `value`, as a dict that maps each path to its content.
 
-        The dict holds at least 1 file; each path is relative to the artifact's folder, uses forward
-        slashes, may name a subfolder, and must not be absolute or contain a ``..`` part.
+        The dict holds at least 1 file; each path is relative to the artifact's directory, uses forward
+        slashes, may name a subdirectory, and must not be absolute or contain a ``..`` part.
 
         No file may be named ``manifest.json``, because `ArtifactStore` writes the artifact's manifest under
-        that name in the same folder.
+        that name in the same directory.
         """
 
     @classmethod

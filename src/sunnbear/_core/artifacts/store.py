@@ -1,6 +1,6 @@
 """`ArtifactStore` is the only code that reads or writes a data artifact's files and manifest.
 
-An artifact's ``manifest.json`` lives in the artifact's folder, which the store derives from where
+An artifact's ``manifest.json`` lives in the artifact's directory, which the store derives from where
 the artifact's declaration is defined, so no caller passes a location:
 
 - a built-in artifact, whose declaration is inside the sunnbear package, uses
@@ -12,14 +12,14 @@ Where the data files live depends on the declaration's `ArtifactSource`:
 
 - **package**: next to the manifest. Loading does not check their hashes: the files ship inside the
   package, and the test suite runs `ArtifactStore.verify_builtin_artifacts` on every change.
-- **download**: in the cache folder ``<cache root>/<artifact name>/<content hash>``, where the cache
-  root is ``SUNNBEAR_CACHE_DIR`` when that environment variable is set, else the user's cache folder
+- **download**: in the cache directory ``<cache root>/<artifact name>/<content hash>``, where the cache
+  root is ``SUNNBEAR_CACHE_DIR`` when that environment variable is set, else the user's cache directory
   for sunnbear. The data files are downloaded as one archive, which `ArtifactArchiver` packs and
   unpacks and the manifest's ``archive`` entry describes. When the cache lacks a data file, or
   holds a copy whose hash differs from the file's manifest entry, loading:
 
   - downloads the archive and checks its hash;
-  - unpacks the archive into the cache folder;
+  - unpacks the archive into the cache directory;
   - checks every unpacked file against its manifest entry.
 """
 
@@ -52,8 +52,8 @@ _MANIFEST_FILE_NAME = "manifest.json"
 # Saving records sunnbear's version with this suffix: an artifact is built from unreleased code, and the
 # next release's number is not known yet. The release script replaces such a version with the release version.
 UNRELEASED_SUNNBEAR_VERSION_SUFFIX = "+dev"
-_NON_BUILTIN_ARTIFACTS_FOLDER_NAME = "artifacts"
-_BUILTIN_ARTIFACTS_FOLDER_NAME = "builtin"
+_NON_BUILTIN_ARTIFACTS_DIR_NAME = "artifacts"
+_BUILTIN_ARTIFACTS_DIR_NAME = "builtin"
 _BUILTIN_ARTIFACTS_PARENT_PACKAGE = "sunnbear._core.artifacts"
 _CACHE_DIR_ENV_VAR = "SUNNBEAR_CACHE_DIR"
 _DOWNLOAD_TIMEOUT_SEC = 60
@@ -78,9 +78,9 @@ class ArtifactStore:
         downloaded artifact are read from the cache when every cached copy matches its manifest
         entry; otherwise the artifact's archive is unpacked into the cache first.
 
-        The archive is read from the cache folder when it is there and matches the manifest's
+        The archive is read from the cache directory when it is there and matches the manifest's
         ``archive`` entry, e.g. because a user without network access placed it there, and
-        downloaded otherwise. The archive is deleted from the cache folder once its files are
+        downloaded otherwise. The archive is deleted from the cache directory once its files are
         unpacked.
 
         Raises:
@@ -99,9 +99,10 @@ class ArtifactStore:
         manifest = cls.load_manifest(declaration_cls)
         match declaration_cls.source:
             case ArtifactSource.PACKAGE:
-                folder = cls._folder_of(declaration_cls)
+                artifact_dir = cls._artifact_dir_of(declaration_cls)
                 contents = {
-                    entry.path: cls._read_file(folder, entry.path, declaration_cls.name) for entry in manifest.files
+                    entry.path: cls._read_file(artifact_dir, entry.path, declaration_cls.name)
+                    for entry in manifest.files
                 }
             case ArtifactSource.DOWNLOAD:
                 contents = cls._read_or_unpack_downloaded_files(manifest)
@@ -116,23 +117,23 @@ class ArtifactStore:
         Raises:
             ArtifactError: If the manifest is missing or malformed, or names another artifact.
         """
-        return cls._read_manifest(cls._folder_of(declaration_cls), declaration_cls.name)
+        return cls._read_manifest(cls._artifact_dir_of(declaration_cls), declaration_cls.name)
 
     # --------------------------------------------------------------------------
     #  Listing built-in artifacts
     # --------------------------------------------------------------------------
     @classmethod
     def builtin_artifact_names(cls) -> tuple[str, ...]:
-        """Return the names of the built-in artifacts, sorted: one per subfolder of the built-in artifacts folder.
+        """Return the names of the built-in artifacts, sorted: one per subdirectory of the built-in artifacts directory.
 
-        The committed folders decide, not the declarations, so the result does not depend on which
-        modules have been imported; `verify_builtin_artifacts` checks that folders and declarations
+        The committed directories determine the names, not the declarations, so the result does not depend on which
+        modules have been imported; `verify_builtin_artifacts` checks that directories and declarations
         agree.
         """
-        builtin_artifacts_folder = cls._builtin_artifacts_folder()
-        if not builtin_artifacts_folder.is_dir():
+        builtin_artifacts_dir = cls._builtin_artifacts_dir()
+        if not builtin_artifacts_dir.is_dir():
             return ()
-        return tuple(sorted(child.name for child in builtin_artifacts_folder.iterdir() if child.is_dir()))
+        return tuple(sorted(child.name for child in builtin_artifacts_dir.iterdir() if child.is_dir()))
 
     @classmethod
     def load_builtin_manifest(cls, name: str) -> ArtifactManifest:
@@ -145,7 +146,7 @@ class ArtifactStore:
         names = cls.builtin_artifact_names()
         if name not in names:
             raise ArtifactError(f"sunnbear has no data artifact named {name!r}; its data artifacts are {list(names)}.")
-        return cls._read_manifest(cls._builtin_artifacts_folder().joinpath(name), name)
+        return cls._read_manifest(cls._builtin_artifacts_dir().joinpath(name), name)
 
     # --------------------------------------------------------------------------
     #  Saving
@@ -160,15 +161,15 @@ class ArtifactStore:
         input_artifact_hashes: dict[str, str] | None = None,
         generated_by: dict[str, Any] | None = None,
     ) -> ArtifactManifest:
-        """Write the artifact's data files for `value` and a new manifest, replacing what the artifact's folder held.
+        """Write the artifact's data files for `value` and a new manifest, replacing what the artifact's directory held.
 
         Where the data files go depends on the declaration's `ArtifactSource`:
 
         - **package**: next to the manifest;
-        - **download**: into the cache folder; the manifest records no ``archive`` entry, because
+        - **download**: into the cache directory; the manifest records no ``archive`` entry, because
           `save` does not upload an archive, so no URL exists for it yet.
 
-        Any other file in the artifact's folder is deleted, so the folder holds exactly the manifest
+        Any other file in the artifact's directory is deleted, so the directory holds exactly the manifest
         and, for an artifact shipped in the package, the files that the manifest lists.
 
         Args:
@@ -186,7 +187,7 @@ class ArtifactStore:
 
         Raises:
             ArtifactError: If the declaration produces a file named like the manifest, or the
-                artifact's folder is not a writable directory, e.g. inside a zipped install.
+                artifact's directory is not a plain file-system directory, e.g. one inside a zipped install.
             ValueError: If the declaration produces no file, or a path that is absolute or contains
                 a ``..`` part.
         """
@@ -204,19 +205,19 @@ class ArtifactStore:
             build_date=datetime.date.today(),
             generated_by=generated_by,
         )
-        folder = cls._folder_on_disk_of(declaration_cls)
+        artifact_dir = cls._artifact_dir_on_disk_of(declaration_cls)
         match declaration_cls.source:
             case ArtifactSource.PACKAGE:
-                data_folder, data_paths_next_to_manifest = folder, set(contents)
+                data_dir, data_paths_next_to_manifest = artifact_dir, set(contents)
             case ArtifactSource.DOWNLOAD:
-                data_folder, data_paths_next_to_manifest = cls._cache_folder_of(manifest), set()
+                data_dir, data_paths_next_to_manifest = cls._cache_dir_of(manifest), set()
             case _:
                 assert_never(declaration_cls.source)
-        folder.mkdir(parents=True, exist_ok=True)
+        artifact_dir.mkdir(parents=True, exist_ok=True)
         # A file left over from an earlier save, and not written by this one, would contradict the new manifest.
-        for leftover_path in cls._relative_data_file_paths(folder) - data_paths_next_to_manifest:
-            (folder / leftover_path).unlink()
-        cls._write_files(data_folder, contents)
+        for leftover_path in cls._relative_data_file_paths(artifact_dir) - data_paths_next_to_manifest:
+            (artifact_dir / leftover_path).unlink()
+        cls._write_files(data_dir, contents)
         cls._write_manifest(declaration_cls, manifest)
         return manifest
 
@@ -225,7 +226,7 @@ class ArtifactStore:
     # --------------------------------------------------------------------------
     @classmethod
     def verify(cls, declaration_cls: type[ArtifactDeclaration]) -> ArtifactManifest:
-        """Check the artifact's folder against its manifest.
+        """Check the artifact's directory against its manifest.
 
         The download cache of a downloaded artifact is not checked.
 
@@ -243,11 +244,11 @@ class ArtifactStore:
                   has no ``archive`` entry.
         """
         manifest = cls.load_manifest(declaration_cls)
-        folder = cls._folder_of(declaration_cls)
-        present_paths = cls._relative_data_file_paths(folder)
+        artifact_dir = cls._artifact_dir_of(declaration_cls)
+        present_paths = cls._relative_data_file_paths(artifact_dir)
         match declaration_cls.source:
             case ArtifactSource.PACKAGE:
-                problems = cls._compare_shipped_files_with_manifest(folder, present_paths, manifest)
+                problems = cls._compare_shipped_files_with_manifest(artifact_dir, present_paths, manifest)
                 if manifest.archive is not None:
                     problems.append("the manifest has an archive entry, but the artifact ships in the package")
             case ArtifactSource.DOWNLOAD:
@@ -265,15 +266,15 @@ class ArtifactStore:
 
     @classmethod
     def verify_builtin_artifacts(cls) -> None:
-        """Verify every built-in artifact, and check that each subfolder of the built-in artifacts folder is declared.
+        """Verify each built-in artifact, and check that each directory in the built-in artifacts directory is declared.
 
         `ArtifactRegistry` knows only the declarations whose modules have been imported, so import
         the sunnbear modules that declare artifacts first; the store cannot import them itself,
         because `sunnbear._core.artifacts` must not import the sunnbear modules that depend on it.
 
         Raises:
-            ArtifactError: If a built-in artifact fails `verify` or a subfolder of the built-in
-                artifacts folder has no declaration; the message lists each one.
+            ArtifactError: If a built-in artifact fails `verify` or a subdirectory of the built-in
+                artifacts directory has no declaration; the message lists each one.
         """
         builtin_declarations = ArtifactRegistry.builtin_declarations()
         problems = []
@@ -282,15 +283,15 @@ class ArtifactStore:
                 cls.verify(declaration_cls)
             except ArtifactError as error:
                 problems.append(str(error))
-        folder_names = set(cls.builtin_artifact_names())
+        dir_names = set(cls.builtin_artifact_names())
         declared_names = {declaration_cls.name for declaration_cls in builtin_declarations}
-        problems += [f"Folder {name!r} holds no declared artifact" for name in sorted(folder_names - declared_names)]
+        problems += [f"Directory {name!r} holds no declared artifact" for name in sorted(dir_names - declared_names)]
         if problems:
             raise ArtifactError("Built-in artifacts are inconsistent:\n- " + "\n- ".join(problems))
 
     @staticmethod
     def _compare_shipped_files_with_manifest(
-        folder: Traversable, present_paths: set[str], manifest: ArtifactManifest
+        artifact_dir: Traversable, present_paths: set[str], manifest: ArtifactManifest
     ) -> list[str]:
         """Return a problem message for each data file that is missing, differs from its entry, or is unlisted."""
         listed_paths = {entry.path for entry in manifest.files}
@@ -298,7 +299,7 @@ class ArtifactStore:
         for entry in manifest.files:
             if entry.path not in present_paths:
                 problems.append(f"{entry.path} is missing")
-            elif not entry.matches(folder.joinpath(entry.path).read_bytes()):
+            elif not entry.matches(artifact_dir.joinpath(entry.path).read_bytes()):
                 problems.append(f"{entry.path} differs from its manifest entry")
         return problems
 
@@ -343,7 +344,7 @@ class ArtifactStore:
         archive_file_name = ArtifactArchiver.archive_file_name(manifest.name)
         release = ArtifactDataReleaseClient.find(tag)
         if release is None:
-            contents = cls._read_matching_cached_files(cls._cache_folder_of(manifest), manifest)
+            contents = cls._read_matching_cached_files(cls._cache_dir_of(manifest), manifest)
             if contents is None:
                 raise ArtifactError(
                     f"The cache lacks the data files of {manifest.short_identity}; "
@@ -383,19 +384,19 @@ class ArtifactStore:
         """Return a downloaded artifact's data files from the cache, unpacking its archive there first if needed.
 
         The archive is needed when a cached file is missing or differs from its manifest entry. The
-        archive is deleted from the cache folder once its files are unpacked.
+        archive is deleted from the cache directory once its files are unpacked.
 
         Raises:
             ArtifactError: If the archive is needed but cannot be read or downloaded, or its files do
                 not match the manifest.
         """
-        cache_folder = cls._cache_folder_of(manifest)
-        cached_contents = cls._read_matching_cached_files(cache_folder, manifest)
+        cache_dir = cls._cache_dir_of(manifest)
+        cached_contents = cls._read_matching_cached_files(cache_dir, manifest)
         if cached_contents is not None:
             return cached_contents
-        archive_file = cache_folder / ArtifactArchiver.archive_file_name(manifest.name)
+        archive_file = cache_dir / ArtifactArchiver.archive_file_name(manifest.name)
         contents = cls._unpack_and_check(manifest, cls._read_or_download_archive(manifest, archive_file))
-        cls._write_files(cache_folder, contents)
+        cls._write_files(cache_dir, contents)
         archive_file.unlink(missing_ok=True)
         return contents
 
@@ -417,11 +418,11 @@ class ArtifactStore:
         return contents
 
     @staticmethod
-    def _read_matching_cached_files(cache_folder: Path, manifest: ArtifactManifest) -> dict[str, bytes] | None:
+    def _read_matching_cached_files(cache_dir: Path, manifest: ArtifactManifest) -> dict[str, bytes] | None:
         """Return the cached data files, or ``None`` if any of them is missing or differs from its manifest entry."""
         contents = {}
         for entry in manifest.files:
-            cache_file = cache_folder / entry.path
+            cache_file = cache_dir / entry.path
             if not cache_file.is_file():
                 return None
             content = cache_file.read_bytes()
@@ -476,91 +477,97 @@ class ArtifactStore:
             return response.read()
 
     @staticmethod
-    def _cache_folder_of(manifest: ArtifactManifest) -> Path:
-        """Return a downloaded artifact's cache folder, under ``SUNNBEAR_CACHE_DIR`` if set, else the user cache."""
+    def _cache_dir_of(manifest: ArtifactManifest) -> Path:
+        """Return a downloaded artifact's cache directory, under ``SUNNBEAR_CACHE_DIR`` if set, else the user cache."""
         cache_root = os.environ.get(_CACHE_DIR_ENV_VAR) or platformdirs.user_cache_dir("sunnbear")
         return Path(cache_root) / manifest.name / manifest.content_hash
 
     # --------------------------------------------------------------------------
-    #  Files and folders
+    #  Files and directories
     # --------------------------------------------------------------------------
     @classmethod
-    def _folder_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Traversable:
-        """Return the artifact's folder, which holds the manifest.
+    def _artifact_dir_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Traversable:
+        """Return the artifact's directory, which holds the manifest.
 
-        The folder's location follows from the module that defines the declaration.
+        The directory's location follows from the module that defines the declaration.
         """
         if is_defined_in_sunnbear(declaration_cls):
-            return cls._builtin_artifacts_folder().joinpath(declaration_cls.name)
+            return cls._builtin_artifacts_dir().joinpath(declaration_cls.name)
         else:
             module_file = sys.modules[declaration_cls.__module__].__file__
-            return Path(str(module_file)).parent / _NON_BUILTIN_ARTIFACTS_FOLDER_NAME / declaration_cls.name
+            return Path(str(module_file)).parent / _NON_BUILTIN_ARTIFACTS_DIR_NAME / declaration_cls.name
 
     @classmethod
-    def _folder_on_disk_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Path:
-        """Return the artifact's folder, checked to be a directory on disk so that it can be written to.
+    def _artifact_dir_on_disk_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Path:
+        """Return the artifact's directory, checked to be a plain file-system directory that files can be written to.
 
         Raises:
-            ArtifactError: If the folder is not a directory on disk, e.g. inside a zipped install.
+            ArtifactError: If the directory is not a plain file-system directory, e.g. one inside a zipped install.
         """
-        folder = cls._folder_of(declaration_cls)
-        if not isinstance(folder, Path):
-            raise ArtifactError(f"The folder of {declaration_cls.__name__} is not a writable directory: {folder}.")
-        return folder
+        artifact_dir = cls._artifact_dir_of(declaration_cls)
+        if not isinstance(artifact_dir, Path):
+            raise ArtifactError(
+                f"The directory of {declaration_cls.__name__} is not a plain file-system directory, "
+                f"so it cannot be written: {artifact_dir}."
+            )
+        return artifact_dir
 
     @classmethod
     def _write_manifest(cls, declaration_cls: type[ArtifactDeclaration], manifest: ArtifactManifest) -> None:
-        """Write `manifest` to the artifact's folder, creating the folder if needed."""
-        folder = cls._folder_on_disk_of(declaration_cls)
-        folder.mkdir(parents=True, exist_ok=True)
-        (folder / _MANIFEST_FILE_NAME).write_text(manifest.to_json())
+        """Write `manifest` to the artifact's directory, creating the directory if needed."""
+        artifact_dir = cls._artifact_dir_on_disk_of(declaration_cls)
+        artifact_dir.mkdir(parents=True, exist_ok=True)
+        (artifact_dir / _MANIFEST_FILE_NAME).write_text(manifest.to_json())
 
     @staticmethod
-    def _builtin_artifacts_folder() -> Traversable:
-        """Return the folder that holds one subfolder per built-in artifact.
+    def _builtin_artifacts_dir() -> Traversable:
+        """Return the directory that holds one subdirectory per built-in artifact.
 
-        The folder does not exist until the first built-in artifact is saved.
+        The directory does not exist until the first built-in artifact is saved.
         """
-        return files(_BUILTIN_ARTIFACTS_PARENT_PACKAGE).joinpath(_BUILTIN_ARTIFACTS_FOLDER_NAME)
+        return files(_BUILTIN_ARTIFACTS_PARENT_PACKAGE).joinpath(_BUILTIN_ARTIFACTS_DIR_NAME)
 
     @classmethod
-    def _read_manifest(cls, folder: Traversable, artifact_name: str) -> ArtifactManifest:
-        """Read the manifest in `folder` and check that it names the artifact `artifact_name`.
+    def _read_manifest(cls, artifact_dir: Traversable, artifact_name: str) -> ArtifactManifest:
+        """Read the manifest in `artifact_dir` and check that it names the artifact `artifact_name`.
 
         Raises:
             ArtifactError: If the manifest is missing or malformed, or names another artifact.
         """
-        manifest = ArtifactManifest.from_json(cls._read_file(folder, _MANIFEST_FILE_NAME, artifact_name).decode())
+        manifest = ArtifactManifest.from_json(cls._read_file(artifact_dir, _MANIFEST_FILE_NAME, artifact_name).decode())
         if manifest.name != artifact_name:
             raise ArtifactError(
-                f"The manifest in {folder} is for {manifest.name!r}, but the artifact is {artifact_name!r}."
+                f"The manifest in {artifact_dir} is for {manifest.name!r}, but the artifact is {artifact_name!r}."
             )
         return manifest
 
     @staticmethod
-    def _read_file(folder: Traversable, path: str, artifact_name: str) -> bytes:
-        """Return the bytes of one file in the folder of the artifact `artifact_name`.
+    def _read_file(artifact_dir: Traversable, path: str, artifact_name: str) -> bytes:
+        """Return the bytes of one file in the directory of the artifact `artifact_name`.
 
         Raises:
             ArtifactError: If the file does not exist.
         """
-        file = folder.joinpath(path)
+        file = artifact_dir.joinpath(path)
         if not file.is_file():
-            raise ArtifactError(f"Artifact {artifact_name!r} has no file {path!r} in {folder}.")
+            raise ArtifactError(f"Artifact {artifact_name!r} has no file {path!r} in {artifact_dir}.")
         return file.read_bytes()
 
     @staticmethod
-    def _write_files(folder: Path, contents: dict[str, bytes]) -> None:
-        """Write each file in `contents`, a dict that maps each path below `folder` to its content."""
+    def _write_files(target_dir: Path, contents: dict[str, bytes]) -> None:
+        """Write each file in `contents`, a dict that maps each path below `target_dir` to its content."""
         for path, content in contents.items():
-            (folder / path).parent.mkdir(parents=True, exist_ok=True)
-            (folder / path).write_bytes(content)
+            (target_dir / path).parent.mkdir(parents=True, exist_ok=True)
+            (target_dir / path).write_bytes(content)
 
     @classmethod
-    def _relative_file_paths(cls, folder: Traversable) -> set[str]:
-        """Return the path of every file below `folder`, relative to it, with forward slashes; `folder` must exist."""
+    def _relative_file_paths(cls, base_dir: Traversable) -> set[str]:
+        """Return the path of every file below `base_dir`, relative to `base_dir`, with forward slashes.
+
+        `base_dir` must exist.
+        """
         paths = set()
-        for child in folder.iterdir():
+        for child in base_dir.iterdir():
             if child.is_dir():
                 paths |= {f"{child.name}/{path}" for path in cls._relative_file_paths(child)}
             else:
@@ -568,6 +575,9 @@ class ArtifactStore:
         return paths
 
     @classmethod
-    def _relative_data_file_paths(cls, folder: Traversable) -> set[str]:
-        """Return the path of every file in an artifact's existing `folder` except the manifest, relative to it."""
-        return cls._relative_file_paths(folder) - {_MANIFEST_FILE_NAME}
+    def _relative_data_file_paths(cls, artifact_dir: Traversable) -> set[str]:
+        """Return the path of every file below `artifact_dir` except the manifest, relative to `artifact_dir`.
+
+        `artifact_dir` must exist.
+        """
+        return cls._relative_file_paths(artifact_dir) - {_MANIFEST_FILE_NAME}

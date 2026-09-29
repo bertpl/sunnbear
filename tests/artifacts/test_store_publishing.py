@@ -41,7 +41,7 @@ class _FakeGitHub:
 
 
 @pytest.fixture
-def fake_github(monkeypatch, artifacts_folder_in_tmp):
+def fake_github(monkeypatch, artifacts_dir_in_tmp):
     """Route the `ArtifactDataReleaseClient` calls and the downloads of `ArtifactStore` to a `_FakeGitHub`."""
     github = _FakeGitHub()
     monkeypatch.setattr(ArtifactDataReleaseClient, "check_write_access", staticmethod(lambda: None))

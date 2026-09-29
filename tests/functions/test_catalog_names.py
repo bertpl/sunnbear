@@ -1,4 +1,4 @@
-"""The folder and file names of the formula catalog carry each node's number and name."""
+"""The directory and file names of the formula catalog carry each node's number and name."""
 
 import re
 
@@ -10,7 +10,7 @@ from sunnbear.functions import Formula, FormulaRegistry
 
 _CATALOG_PREFIX = f"{catalog.__name__}."
 
-# A catalog folder or file name is a letter (``c`` for a category, ``f`` for a formula), a 2-digit
+# A catalog directory or file name is a letter (``c`` for a category, ``f`` for a formula), a 2-digit
 # number and a slug.
 _NAME_PATTERN = re.compile(r"(?P<kind>[cf])(?P<number>[0-9]{2})_(?P<slug>[a-z0-9_]+)")
 

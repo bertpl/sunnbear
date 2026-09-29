@@ -16,7 +16,7 @@ SAMPLE_LINES = ["alpha", "beta", "gamma"]
 
 
 class SampleLinesDeclaration(ArtifactDeclaration[list[str]]):
-    """`SampleLinesDeclaration` declares text lines, with their count in a subfolder file so tests cover such paths."""
+    """`SampleLinesDeclaration` declares text lines and stores their count in a subdirectory, to test nested paths."""
 
     name = "sample_lines"
 
