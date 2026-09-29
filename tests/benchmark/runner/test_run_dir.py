@@ -3,8 +3,8 @@
 import polars as pl
 import pytest
 
-from sunnbear._core.benchmark.exceptions import BenchmarkRunError
-from sunnbear._core.benchmark.run_dir import BenchmarkRunDir
+from sunnbear._core.benchmark.runner.exceptions import BenchmarkRunError
+from sunnbear._core.benchmark.runner.run_dir import BenchmarkRunDir
 
 
 def test_a_formula_results_file_needs_the_staged_results_of_every_test_function(tmp_path):

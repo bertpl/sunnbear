@@ -5,7 +5,7 @@
 
 import pytest
 
-from sunnbear._core.benchmark.tolerances import N_BISECTION_FEVALS, compute_xtol_range, max_fevals_for
+from sunnbear._core.benchmark.protocol.tolerances import N_BISECTION_FEVALS, compute_xtol_range, max_fevals_for
 from sunnbear.solvers import Bisection, SolveStatus
 from tests.solvers.example_functions import cubic
 

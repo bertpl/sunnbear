@@ -6,10 +6,10 @@ import pytest
 
 import sunnbear.functions as functions  # Import the module, so pytest does not try to collect `TestFunction`.
 from sunnbear._core.artifacts import ArtifactStore
-from sunnbear._core.benchmark.exceptions import BenchmarkRunError
 from sunnbear._core.benchmark.mc_tuples.artifact import MCTuplesDeclaration
-from sunnbear._core.benchmark.run_info import BenchmarkRunInfo
-from sunnbear._core.benchmark.run_settings import BenchmarkRunSettings
+from sunnbear._core.benchmark.runner.exceptions import BenchmarkRunError
+from sunnbear._core.benchmark.runner.run_info import BenchmarkRunInfo
+from sunnbear._core.benchmark.runner.run_settings import BenchmarkRunSettings
 from sunnbear.solvers import SolverConfigRegistry
 
 

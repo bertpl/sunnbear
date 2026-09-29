@@ -6,10 +6,10 @@ import polars as pl
 import pytest
 
 import sunnbear.functions as functions  # Import the module, so pytest does not try to collect `TestFunction`.
-from sunnbear._core.benchmark.exceptions import BenchmarkRunError
-from sunnbear._core.benchmark.results_schema import RESULTS_SCHEMA
-from sunnbear._core.benchmark.runner import load_results, run_benchmark
-from sunnbear._core.benchmark.task import BenchmarkTask
+from sunnbear._core.benchmark.runner.exceptions import BenchmarkRunError
+from sunnbear._core.benchmark.runner.results_schema import RESULTS_SCHEMA
+from sunnbear._core.benchmark.runner.runner import load_results, run_benchmark
+from sunnbear._core.benchmark.runner.task import BenchmarkTask
 from sunnbear.solvers import SolverConfigRegistry
 
 MC_SIZE = 32

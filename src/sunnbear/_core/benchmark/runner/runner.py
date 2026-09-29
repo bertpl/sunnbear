@@ -13,6 +13,7 @@ from pathlib import Path
 
 import polars as pl
 
+from sunnbear._core.benchmark.protocol import N_BISECTION_FEVALS
 from sunnbear._core.functions.core import TestFunction
 from sunnbear._core.solvers.core import SolverConfig
 
@@ -20,7 +21,6 @@ from .run_dir import BenchmarkRunDir
 from .run_info import BenchmarkRunInfo
 from .run_settings import BenchmarkRunSettings
 from .task import BenchmarkTask
-from .tolerances import N_BISECTION_FEVALS
 
 # The default size of a run's Monte Carlo tuple set, which is the number of samples per (solver, test function) pair.
 DEFAULT_MC_SIZE = 256

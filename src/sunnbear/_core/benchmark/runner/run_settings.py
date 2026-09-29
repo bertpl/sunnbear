@@ -2,8 +2,8 @@
 
 from dataclasses import dataclass
 
-from .mc_tuples import MCTuplesSize
-from .tolerances import validate_n_bisection_fevals
+from sunnbear._core.benchmark.mc_tuples import MCTuplesSize
+from sunnbear._core.benchmark.protocol import validate_n_bisection_fevals
 
 
 @dataclass(frozen=True, kw_only=True)

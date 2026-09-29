@@ -25,11 +25,11 @@ from typing import Self
 from pydantic import BaseModel, ConfigDict
 
 from sunnbear._core.artifacts import ArtifactStore
+from sunnbear._core.benchmark.mc_tuples import MCTuplesDeclaration
 from sunnbear._core.functions.core import FunctionId, TestFunction
 from sunnbear._core.solvers.core import SolverConfig
 
 from .exceptions import BenchmarkRunError
-from .mc_tuples.artifact import MCTuplesDeclaration
 from .run_settings import BenchmarkRunSettings
 
 # A requirement string starts with the distribution name, which ends at the first character that a name
