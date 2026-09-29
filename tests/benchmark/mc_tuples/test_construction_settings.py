@@ -2,7 +2,7 @@
 
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import MC_TUPLES_SIZES, MCTuplesConstructionSettings
+from sunnbear._core.benchmark.mc_tuples import MCTuplesConstructionSettings, MCTuplesSize
 
 
 @pytest.mark.parametrize(
@@ -26,7 +26,7 @@ def test_from_total_time_scales_below_60_s_and_saturates_above(
     assert settings.population_size == population_size
     assert settings.n_workers == n_workers
     assert settings.t_budget_per_size_sec == pytest.approx(
-        {k: min_t_budget_per_size_sec + t_rest_sec * k / sum(MC_TUPLES_SIZES) for k in MC_TUPLES_SIZES}
+        {k: min_t_budget_per_size_sec + t_rest_sec * k / sum(MCTuplesSize) for k in MCTuplesSize}
     )
     assert sum(settings.t_budget_per_size_sec.values()) == pytest.approx(t_total_sec)
 

@@ -7,12 +7,12 @@ import pytest
 from counted_float import FlopType
 
 import sunnbear.functions as functions  # Import the module, so pytest does not try to collect `TestFunction`.
-from sunnbear._core.benchmark import task
 from sunnbear._core.benchmark.mc_tuples import load_mc_tuples
-from sunnbear._core.benchmark.results_schema import RESULTS_SCHEMA, flop_count_column_name
-from sunnbear._core.benchmark.run_settings import BenchmarkRunSettings
-from sunnbear._core.benchmark.task import BenchmarkTask
-from sunnbear._core.benchmark.tolerances import compute_xtol_range
+from sunnbear._core.benchmark.protocol.tolerances import compute_xtol_range
+from sunnbear._core.benchmark.runner import task
+from sunnbear._core.benchmark.runner.results_schema import RESULTS_SCHEMA, flop_count_column_name
+from sunnbear._core.benchmark.runner.run_settings import BenchmarkRunSettings
+from sunnbear._core.benchmark.runner.task import BenchmarkTask
 from sunnbear.solvers import Solver, SolverConfig, SolverConfigRegistry, SolverRole, SolveState, SolveStatus
 
 N_BISECTION_FEVALS = 40

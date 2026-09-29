@@ -15,7 +15,8 @@ The construction selects each size with max-div from a uniform random population
 import numpy as np
 
 from .construction_settings import FULL_POPULATION_SIZE, MCTuplesConstructionSettings
-from .tuples import MC_TUPLES_SIZES, MCTuples
+from .sizes import MCTuplesSize
+from .tuples import MCTuples
 
 
 # ==================================================================================================
@@ -24,7 +25,7 @@ from .tuples import MC_TUPLES_SIZES, MCTuples
 def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) -> MCTuples:
     """Construct a nested Monte Carlo tuple set in about `t_total_sec` s; its first `k` tuples form size `k`.
 
-    The construction runs 1 max-div solve per size in `MC_TUPLES_SIZES`, and splits `t_total_sec`
+    The construction runs 1 max-div solve per size in `MCTuplesSize`, and splits `t_total_sec`
     over them as `MCTuplesConstructionSettings.from_total_time` describes:
 
     - from 60 s up, the construction uses the full population of candidates and all `n_workers` workers;
@@ -57,7 +58,7 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
     # `prefix_indices` holds population indices in prefix order: each size's new tuples follow those
     # of the size below it, so the first `k` indices form size `k`.
     prefix_indices = np.empty(0, dtype=np.int64)
-    for k in MC_TUPLES_SIZES:
+    for k in MCTuplesSize:
         selection = select_tuples(
             population, k, prefix_indices, settings.t_budget_per_size_sec[k], settings.n_workers, seed
         )

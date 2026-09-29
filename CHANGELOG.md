@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `MC_TUPLES_SIZES` is replaced by the enum `MCTuplesSize`, whose members are the sizes of the shipped Monte Carlo tuple set
 - The shipped Monte Carlo (u, v) tuple set is regenerated with an 8-hour time budget, which increases the smallest distance between its tuples at every nested size from 32 to 1024; benchmark results on the new set differ from those on the previous set
 
 ### Deprecated

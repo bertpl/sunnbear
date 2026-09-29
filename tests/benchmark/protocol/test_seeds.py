@@ -2,7 +2,7 @@
 
 import pytest
 
-from sunnbear._core.benchmark.seeds import SeedPurpose, derive_seed
+from sunnbear._core.benchmark.protocol.seeds import SeedPurpose, derive_seed
 
 _KWARGS = {
     "root_seed": 42,

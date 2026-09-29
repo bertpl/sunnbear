@@ -10,10 +10,6 @@ from functools import cached_property
 import numpy as np
 from numpy.typing import ArrayLike
 
-# The shipped set comes in these sizes; each is a prefix of the next, so a smaller size's tuples are a
-# subset of every larger size's.
-MC_TUPLES_SIZES = (32, 64, 128, 256, 512, 1024)
-
 # Each axis is cut into this many equal bins, as in a histogram; `MCTuplesStats` counts the tuples per
 # bin, and the construction keeps each count within 1 of `size / N_BINS`.
 N_BINS = 8

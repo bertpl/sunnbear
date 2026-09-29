@@ -4,7 +4,7 @@ import math
 
 import pytest
 
-from sunnbear._core.benchmark.correctness import CORRECTNESS_CHECK_MAX_FEVALS, is_solution_correct
+from sunnbear._core.benchmark.protocol.correctness import CORRECTNESS_CHECK_MAX_FEVALS, is_solution_correct
 
 
 # ==================================================================================================

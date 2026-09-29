@@ -17,7 +17,7 @@ import argparse
 import importlib.metadata
 
 from sunnbear._core.artifacts import ArtifactStore
-from sunnbear._core.benchmark.mc_tuples import MC_TUPLES_SIZES, MCTuplesDeclaration, generate_mc_tuples
+from sunnbear._core.benchmark.mc_tuples import MCTuplesDeclaration, MCTuplesSize, generate_mc_tuples
 
 
 def main() -> None:
@@ -33,7 +33,7 @@ def main() -> None:
 
     print("| size | L2 | u | v | max bin deviation |")
     print("|---|---|---|---|---|")
-    for size in MC_TUPLES_SIZES:
+    for size in MCTuplesSize:
         stats = tuples.first(size).stats()
         print(
             f"| {size} | {stats.min_separation_l2_fraction:.1%} | {stats.min_separation_u_fraction:.1%} "

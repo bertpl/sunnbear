@@ -33,7 +33,7 @@ def compute_xtol_range(*, a: float, b: float, n_bisection_fevals: int) -> tuple[
     """
     if not a < b:
         raise ValueError(f"Interval must satisfy a < b (got a={a}, b={b}).")
-    _validate_n_bisection_fevals(n_bisection_fevals)
+    validate_n_bisection_fevals(n_bisection_fevals)
     xtol_min = math.ldexp(b - a, 1 - n_bisection_fevals)
     return xtol_min, 2.0 * xtol_min
 
@@ -44,14 +44,11 @@ def max_fevals_for(*, n_bisection_fevals: int) -> int:
     Raises:
         ValueError: If `n_bisection_fevals` is below 2 (bisection always evaluates both interval bounds).
     """
-    _validate_n_bisection_fevals(n_bisection_fevals)
+    validate_n_bisection_fevals(n_bisection_fevals)
     return MAX_FEVALS_FACTOR * n_bisection_fevals
 
 
-# ==================================================================================================
-#  Helpers
-# ==================================================================================================
-def _validate_n_bisection_fevals(n_bisection_fevals: int) -> None:
+def validate_n_bisection_fevals(n_bisection_fevals: int) -> None:
     """Raise `ValueError` if `n_bisection_fevals` is below 2: bisection always evaluates both interval bounds."""
     if n_bisection_fevals < 2:
         raise ValueError(f"n_bisection_fevals must be at least 2 (got {n_bisection_fevals}).")
