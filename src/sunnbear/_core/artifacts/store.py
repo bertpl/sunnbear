@@ -99,7 +99,7 @@ class ArtifactStore:
         manifest = cls.load_manifest(declaration_cls)
         match declaration_cls.source:
             case ArtifactSource.PACKAGE:
-                artifact_dir = cls._dir_of(declaration_cls)
+                artifact_dir = cls._artifact_dir_of(declaration_cls)
                 contents = {
                     entry.path: cls._read_file(artifact_dir, entry.path, declaration_cls.name)
                     for entry in manifest.files
@@ -117,7 +117,7 @@ class ArtifactStore:
         Raises:
             ArtifactError: If the manifest is missing or malformed, or names another artifact.
         """
-        return cls._read_manifest(cls._dir_of(declaration_cls), declaration_cls.name)
+        return cls._read_manifest(cls._artifact_dir_of(declaration_cls), declaration_cls.name)
 
     # --------------------------------------------------------------------------
     #  Listing built-in artifacts
@@ -205,7 +205,7 @@ class ArtifactStore:
             build_date=datetime.date.today(),
             generated_by=generated_by,
         )
-        artifact_dir = cls._dir_on_disk_of(declaration_cls)
+        artifact_dir = cls._artifact_dir_on_disk_of(declaration_cls)
         match declaration_cls.source:
             case ArtifactSource.PACKAGE:
                 data_dir, data_paths_next_to_manifest = artifact_dir, set(contents)
@@ -244,7 +244,7 @@ class ArtifactStore:
                   has no ``archive`` entry.
         """
         manifest = cls.load_manifest(declaration_cls)
-        artifact_dir = cls._dir_of(declaration_cls)
+        artifact_dir = cls._artifact_dir_of(declaration_cls)
         present_paths = cls._relative_data_file_paths(artifact_dir)
         match declaration_cls.source:
             case ArtifactSource.PACKAGE:
@@ -486,7 +486,7 @@ class ArtifactStore:
     #  Files and directories
     # --------------------------------------------------------------------------
     @classmethod
-    def _dir_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Traversable:
+    def _artifact_dir_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Traversable:
         """Return the artifact's directory, which holds the manifest.
 
         The directory's location follows from the module that defines the declaration.
@@ -498,13 +498,13 @@ class ArtifactStore:
             return Path(str(module_file)).parent / _NON_BUILTIN_ARTIFACTS_DIR_NAME / declaration_cls.name
 
     @classmethod
-    def _dir_on_disk_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Path:
-        """Return the artifact's directory, checked to be on disk so that it can be written to.
+    def _artifact_dir_on_disk_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Path:
+        """Return the artifact's directory, checked to be on disk so that the directory can be written to.
 
         Raises:
             ArtifactError: If the directory is not on disk, e.g. inside a zipped install.
         """
-        artifact_dir = cls._dir_of(declaration_cls)
+        artifact_dir = cls._artifact_dir_of(declaration_cls)
         if not isinstance(artifact_dir, Path):
             raise ArtifactError(
                 f"The directory of {declaration_cls.__name__} is not on disk, so it cannot be written: {artifact_dir}."
@@ -514,7 +514,7 @@ class ArtifactStore:
     @classmethod
     def _write_manifest(cls, declaration_cls: type[ArtifactDeclaration], manifest: ArtifactManifest) -> None:
         """Write `manifest` to the artifact's directory, creating the directory if needed."""
-        artifact_dir = cls._dir_on_disk_of(declaration_cls)
+        artifact_dir = cls._artifact_dir_on_disk_of(declaration_cls)
         artifact_dir.mkdir(parents=True, exist_ok=True)
         (artifact_dir / _MANIFEST_FILE_NAME).write_text(manifest.to_json())
 
@@ -561,7 +561,7 @@ class ArtifactStore:
 
     @classmethod
     def _relative_file_paths(cls, base_dir: Traversable) -> set[str]:
-        """Return the path of every file below `base_dir`, relative to it, with forward slashes; it must exist."""
+        """Return the path of every file below the existing `base_dir`, relative to it, with forward slashes."""
         paths = set()
         for child in base_dir.iterdir():
             if child.is_dir():
@@ -572,5 +572,5 @@ class ArtifactStore:
 
     @classmethod
     def _relative_data_file_paths(cls, artifact_dir: Traversable) -> set[str]:
-        """Return the path of every file in the existing `artifact_dir` except the manifest, relative to it."""
+        """Return every file path below the existing `artifact_dir`, relative to it, except the manifest."""
         return cls._relative_file_paths(artifact_dir) - {_MANIFEST_FILE_NAME}

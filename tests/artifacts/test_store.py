@@ -85,7 +85,7 @@ def test_save_refuses_an_artifact_dir_that_is_not_on_disk(monkeypatch, tmp_path)
     with zipfile.ZipFile(archive, "w") as zip_file:
         zip_file.writestr("artifacts/sample_lines/lines.txt", "")
     artifact_dir = zipfile.Path(archive, "artifacts/sample_lines/")
-    monkeypatch.setattr(ArtifactStore, "_dir_of", classmethod(lambda cls, declaration_cls: artifact_dir))
+    monkeypatch.setattr(ArtifactStore, "_artifact_dir_of", classmethod(lambda cls, declaration_cls: artifact_dir))
 
     # --- act / assert -----------------
     with pytest.raises(ArtifactError, match="is not on disk, so it cannot be written"):
@@ -121,7 +121,7 @@ def test_load_manifest_refuses_a_manifest_for_another_artifact(sample_lines_dir_
         (lambda artifact_dir: (artifact_dir / "extra.txt").write_text("x"), "extra.txt is not listed"),
     ],
 )
-def test_verify_reports_a_dir_that_differs_from_its_manifest(sample_lines_dir_in_tmp, tamper, message):
+def test_verify_reports_an_artifact_dir_that_differs_from_its_manifest(sample_lines_dir_in_tmp, tamper, message):
     """A missing, edited or unlisted file makes `verify` fail and name the file."""
     # --- arrange ----------------------
     ArtifactStore.save(SampleLinesDeclaration, SAMPLE_LINES)
@@ -168,8 +168,8 @@ def test_a_builtin_artifact_lives_in_the_builtin_artifacts_dir_and_a_test_fixtur
     builtin_cls = define_builtin_declaration("sample_builtin")
 
     # --- act --------------------------
-    builtin_dir = ArtifactStore._dir_of(builtin_cls)
-    fixture_dir = ArtifactStore._dir_of(SampleLinesDeclaration)
+    builtin_dir = ArtifactStore._artifact_dir_of(builtin_cls)
+    fixture_dir = ArtifactStore._artifact_dir_of(SampleLinesDeclaration)
 
     # --- assert -----------------------
     assert str(builtin_dir).replace("\\", "/").endswith("sunnbear/_core/artifacts/builtin/sample_builtin")

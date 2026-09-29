@@ -27,6 +27,6 @@ def artifacts_dir_in_tmp(monkeypatch, tmp_path):
     not exist until a test creates it or saves to it.
     """
     artifacts_dir = tmp_path / "artifacts"
-    dir_of = classmethod(lambda cls, declaration_cls: artifacts_dir / declaration_cls.name)
-    monkeypatch.setattr(ArtifactStore, "_dir_of", dir_of)
+    artifact_dir_of = classmethod(lambda cls, declaration_cls: artifacts_dir / declaration_cls.name)
+    monkeypatch.setattr(ArtifactStore, "_artifact_dir_of", artifact_dir_of)
     return artifacts_dir

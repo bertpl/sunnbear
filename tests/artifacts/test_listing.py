@@ -32,7 +32,7 @@ def test_artifact_names_lists_one_name_per_builtin_dir(builtin_artifacts_dir_in_
 
 
 def test_artifact_names_is_empty_without_a_builtin_artifacts_dir(builtin_artifacts_dir_in_tmp):
-    """Without the directory of built-in artifacts, no artifact is listed."""
+    """Without the built-in artifacts directory, no artifact is listed."""
     # --- arrange ----------------------
     builtin_artifacts_dir_in_tmp.rmdir()
 
@@ -52,7 +52,7 @@ def test_artifact_manifest_reads_the_manifest_of_a_builtin_artifact(builtin_arti
 
 @pytest.mark.usefixtures("isolated_artifact_registry")
 def test_artifact_manifest_refuses_a_manifest_for_another_artifact(builtin_artifacts_dir_in_tmp):
-    """A built-in directory whose manifest names another artifact is refused."""
+    """A built-in artifact's directory whose manifest names another artifact is refused."""
     # --- arrange ----------------------
     ArtifactStore.save(define_builtin_declaration("sample_builtin"), b"content\n")
     (builtin_artifacts_dir_in_tmp / "sample_builtin").rename(builtin_artifacts_dir_in_tmp / "sample_renamed")
