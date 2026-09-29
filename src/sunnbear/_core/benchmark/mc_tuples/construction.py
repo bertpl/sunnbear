@@ -36,8 +36,8 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
 
     - drawing the population;
     - checking each size;
-    - compiling the max-div functions that the solves use, the first time each one runs; numba caches the
-      compiled code, so this takes seconds, once after an install.
+    - compiling each max-div function that the solves use, on its first run after an install; compiling them
+      all takes seconds, and numba caches the compiled code for later runs.
 
     A rerun gives a set of equivalent quality, not the same set, because max-div's parallel solver
     runs on a wall-clock budget.
