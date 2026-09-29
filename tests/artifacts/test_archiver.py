@@ -30,7 +30,7 @@ def _regular_file(name: str, content: bytes) -> tuple[tarfile.TarInfo, bytes]:
 #  Packing
 # ==================================================================================================
 def test_unpack_returns_what_pack_packed():
-    """Unpacking a packed archive gives back every file, including one in a subfolder."""
+    """Unpacking a packed archive gives back every file, including one in a subdirectory."""
     assert ArtifactArchiver.unpack(ArtifactArchiver.pack(_CONTENTS), _CONTENTS.keys()) == _CONTENTS
 
 

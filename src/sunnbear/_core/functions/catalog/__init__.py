@@ -1,4 +1,4 @@
-"""This package holds the shipped formulas and their categories, one folder per category.
+"""This package holds the shipped formulas and their categories, one directory per category.
 
 The catalog tests check this layout convention:
 
@@ -6,7 +6,7 @@ The catalog tests check this layout convention:
   subclass and imports the package's modules and subpackages
 - a formula is a module ``f<NN>_<slug>.py`` defining one `Formula` subclass
 - ``<NN>`` is the last element of the category's or formula's number, zero-padded to 2 digits, and ``<slug>`` is its
-  ``name_slug``; the folder path therefore reads as the full number, e.g.
+  ``name_slug``; the directory path therefore reads as the full number, e.g.
   ``c02_standard_function_families/c01_polynomials/f01_cubic.py`` is formula ``2.1.1``
 
 Importing this package registers every shipped formula and category.

@@ -126,8 +126,8 @@ class ArtifactDataReleaseClient:
             ArtifactError: If the GitHub CLI is not installed, or fails to create the release; the
                 message holds the GitHub CLI's error output.
         """
-        with tempfile.TemporaryDirectory() as folder:
-            file_path = Path(folder) / file_name
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            file_path = Path(tmp_dir) / file_name
             file_path.write_bytes(content)
             release_options = ["--repo", _GITHUB_REPOSITORY, "--target", "main", "--latest=false"]
             cls._run_gh(

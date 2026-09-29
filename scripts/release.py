@@ -38,7 +38,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 PYPROJECT = REPO_ROOT / "pyproject.toml"
 CHANGELOG = REPO_ROOT / "CHANGELOG.md"
 README = REPO_ROOT / "README.md"
-BUILTIN_ARTIFACTS_FOLDER = REPO_ROOT / "src" / "sunnbear" / "_core" / "artifacts" / "builtin"
+BUILTIN_ARTIFACTS_DIR = REPO_ROOT / "src" / "sunnbear" / "_core" / "artifacts" / "builtin"
 PYTHON_VERSIONS_FILE = REPO_ROOT / ".python-versions"
 SPLASH_SCRIPT = REPO_ROOT / ".github" / "scripts" / "create_splash.sh"
 SPLASH_WEBP = REPO_ROOT / "images" / "splash_with_version.webp"
@@ -365,7 +365,7 @@ def unreleased_artifact_manifest_paths(last_release_version: str) -> list[Path]:
     """
     expected_version = last_release_version + UNRELEASED_SUNNBEAR_VERSION_SUFFIX
     paths = []
-    for path in sorted(BUILTIN_ARTIFACTS_FOLDER.glob("*/manifest.json")):
+    for path in sorted(BUILTIN_ARTIFACTS_DIR.glob("*/manifest.json")):
         sunnbear_version = ArtifactManifest.from_json(path.read_text()).built_with.get("sunnbear", "")
         if sunnbear_version.endswith(UNRELEASED_SUNNBEAR_VERSION_SUFFIX):
             if sunnbear_version != expected_version:

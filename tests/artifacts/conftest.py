@@ -20,13 +20,13 @@ def cache_root_in_tmp(monkeypatch, tmp_path):
 
 
 @pytest.fixture
-def artifacts_folder_in_tmp(monkeypatch, tmp_path):
-    """Make `ArtifactStore` place every artifact's folder in `tmp_path`, so tests write no files in the repo.
+def artifacts_dir_in_tmp(monkeypatch, tmp_path):
+    """Make `ArtifactStore` place every artifact's directory in `tmp_path`, so tests write no files in the repo.
 
-    The fixture returns the parent of those folders; each folder is named after its artifact and does
+    The fixture returns the parent of those directories; each directory is named after its artifact and does
     not exist until a test creates it or saves to it.
     """
-    artifacts_folder = tmp_path / "artifacts"
-    folder_of = classmethod(lambda cls, declaration_cls: artifacts_folder / declaration_cls.name)
-    monkeypatch.setattr(ArtifactStore, "_folder_of", folder_of)
-    return artifacts_folder
+    artifacts_dir = tmp_path / "artifacts"
+    dir_of = classmethod(lambda cls, declaration_cls: artifacts_dir / declaration_cls.name)
+    monkeypatch.setattr(ArtifactStore, "_dir_of", dir_of)
+    return artifacts_dir

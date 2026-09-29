@@ -27,13 +27,13 @@ def release():
 
 
 @pytest.fixture
-def builtin_artifacts_folder(release, monkeypatch, tmp_path):
-    """Make the release script look for the built-in artifacts in `tmp_path`, and return that folder."""
-    monkeypatch.setattr(release, "BUILTIN_ARTIFACTS_FOLDER", tmp_path)
+def builtin_artifacts_dir(release, monkeypatch, tmp_path):
+    """Make the release script look for the built-in artifacts in `tmp_path`, and return that directory."""
+    monkeypatch.setattr(release, "BUILTIN_ARTIFACTS_DIR", tmp_path)
     return tmp_path
 
 
-def _write_manifest(builtin_artifacts_folder: Path, name: str, sunnbear_version: str) -> Path:
+def _write_manifest(builtin_artifacts_dir: Path, name: str, sunnbear_version: str) -> Path:
     """Write the manifest of a 1-file artifact that records `sunnbear_version`, and return its path."""
     manifest = ArtifactManifest(
         name=name,
@@ -41,7 +41,7 @@ def _write_manifest(builtin_artifacts_folder: Path, name: str, sunnbear_version:
         built_with={"sunnbear": sunnbear_version},
         build_date=datetime.date(2026, 9, 28),
     )
-    path = builtin_artifacts_folder / name / "manifest.json"
+    path = builtin_artifacts_dir / name / "manifest.json"
     path.parent.mkdir(parents=True)
     path.write_text(manifest.to_json())
     return path
@@ -50,11 +50,11 @@ def _write_manifest(builtin_artifacts_folder: Path, name: str, sunnbear_version:
 # ==================================================================================================
 #  Finding unreleased manifests
 # ==================================================================================================
-def test_only_manifests_built_since_the_last_release_are_found(release, builtin_artifacts_folder):
+def test_only_manifests_built_since_the_last_release_are_found(release, builtin_artifacts_dir):
     """A manifest that records the last release plus `+dev` is found; one that an earlier release stamped is not."""
     # --- arrange ----------------------
-    fresh_path = _write_manifest(builtin_artifacts_folder, "fresh", "0.1.4+dev")
-    _write_manifest(builtin_artifacts_folder, "released", "0.1.3")
+    fresh_path = _write_manifest(builtin_artifacts_dir, "fresh", "0.1.4+dev")
+    _write_manifest(builtin_artifacts_dir, "released", "0.1.3")
 
     # --- act --------------------------
     paths = release.unreleased_artifact_manifest_paths("0.1.4")
@@ -63,10 +63,10 @@ def test_only_manifests_built_since_the_last_release_are_found(release, builtin_
     assert paths == [fresh_path]
 
 
-def test_an_older_release_plus_dev_stops_the_release(release, builtin_artifacts_folder):
+def test_an_older_release_plus_dev_stops_the_release(release, builtin_artifacts_dir):
     """A manifest that records an older release plus `+dev` was never stamped, so the release script refuses it."""
     # --- arrange ----------------------
-    _write_manifest(builtin_artifacts_folder, "stale", "0.1.3+dev")
+    _write_manifest(builtin_artifacts_dir, "stale", "0.1.3+dev")
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=r"stale records sunnbear 0\.1\.3\+dev"):
@@ -82,11 +82,11 @@ def test_the_committed_manifests_can_be_stamped_at_the_next_release(release):
 # ==================================================================================================
 #  Stamping
 # ==================================================================================================
-def test_stamping_records_the_release_version_in_unreleased_manifests_only(release, builtin_artifacts_folder):
+def test_stamping_records_the_release_version_in_unreleased_manifests_only(release, builtin_artifacts_dir):
     """The unreleased manifest records the release version with its content hash unchanged; the other is untouched."""
     # --- arrange ----------------------
-    fresh_path = _write_manifest(builtin_artifacts_folder, "fresh", "0.1.4+dev")
-    released_path = _write_manifest(builtin_artifacts_folder, "released", "0.1.3")
+    fresh_path = _write_manifest(builtin_artifacts_dir, "fresh", "0.1.4+dev")
+    released_path = _write_manifest(builtin_artifacts_dir, "released", "0.1.3")
     fresh_before = ArtifactManifest.from_json(fresh_path.read_text())
     released_json_before = released_path.read_text()
 
