@@ -58,7 +58,7 @@ def run_benchmark(
             formulas in order of first appearance, so the result rows follow that order, not the order passed.
         run_dir: The run directory, created when it does not exist.
         root_seed: The run's root seed, from which every seed of the run is derived.
-        mc_size: The size of the Monte Carlo tuple set, 1 of `MC_TUPLES_SIZES`.
+        mc_size: The size of the Monte Carlo tuple set, 1 of `MCTuplesSize`.
         n_bisection_fevals: Bisection's evaluation count, from which the `xtol` range and the evaluation
             budget follow.
 
@@ -66,7 +66,7 @@ def run_benchmark(
         ValueError: If an input is invalid, which leaves `run_dir` unwritten:
 
             - `solver_configs` or `functions` is empty or holds an id twice;
-            - `mc_size` is not 1 of `MC_TUPLES_SIZES`;
+            - `mc_size` is not 1 of `MCTuplesSize`;
             - `n_bisection_fevals` is below 2.
 
         BenchmarkRunError: If `run_dir` holds a malformed run info, or a run with other inputs or versions.

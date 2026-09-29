@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from .mc_tuples import validate_mc_tuples_size
+from .mc_tuples import MCTuplesSize
 from .tolerances import validate_n_bisection_fevals
 
 
@@ -14,7 +14,7 @@ class BenchmarkRunSettings:
     only be combined with results of the same settings.
 
     Attributes:
-        mc_size: The size of the Monte Carlo tuple set, 1 of `MC_TUPLES_SIZES`: the number of samples per
+        mc_size: The size of the Monte Carlo tuple set, 1 of `MCTuplesSize`: the number of samples per
             (solver, test function) pair.
         n_bisection_fevals: Bisection's evaluation count, from which the `xtol` range and the evaluation
             budget follow.
@@ -29,7 +29,7 @@ class BenchmarkRunSettings:
         """Check the settings, so an invalid `BenchmarkRunSettings` cannot be constructed.
 
         Raises:
-            ValueError: If `mc_size` is not 1 of `MC_TUPLES_SIZES`, or `n_bisection_fevals` is below 2.
+            ValueError: If `mc_size` is not 1 of `MCTuplesSize`, or `n_bisection_fevals` is below 2.
         """
-        validate_mc_tuples_size("mc_size", self.mc_size)
+        MCTuplesSize(self.mc_size)
         validate_n_bisection_fevals(self.n_bisection_fevals)

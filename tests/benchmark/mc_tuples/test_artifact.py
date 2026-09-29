@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from sunnbear._core.artifacts import ArtifactError
-from sunnbear._core.benchmark.mc_tuples import MC_TUPLES_SIZES, MCTuples, MCTuplesDeclaration, load_mc_tuples
+from sunnbear._core.benchmark.mc_tuples import MCTuples, MCTuplesDeclaration, MCTuplesSize, load_mc_tuples
 
 
 def test_the_csv_file_reads_back_every_value_exactly():
@@ -28,14 +28,14 @@ def test_a_csv_file_without_the_header_is_refused():
         MCTuplesDeclaration.from_files({"mc_tuples.csv": b"x,y\n0.1,0.2\n"})
 
 
-@pytest.mark.parametrize("size", MC_TUPLES_SIZES)
+@pytest.mark.parametrize("size", MCTuplesSize)
 def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set_that_meets_its_bin_constraints(size):
     """Each size is the start of the full shipped set, and keeps every bin within 1 of `size / N_BINS`."""
     # --- act --------------------------
     tuples = load_mc_tuples(size)
 
     # --- assert -----------------------
-    full = load_mc_tuples(max(MC_TUPLES_SIZES))
+    full = load_mc_tuples(max(MCTuplesSize))
     assert tuples.size == size
     assert tuples.u.tolist() == full.u[:size].tolist()
     assert tuples.v.tolist() == full.v[:size].tolist()

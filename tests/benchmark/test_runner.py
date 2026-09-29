@@ -149,7 +149,7 @@ def test_resuming_with_other_inputs_is_refused(finished_run_dir, changes, differ
             {"functions": [functions.FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-1.0, 1.0)] * 2},
             r"functions holds these ids more than once: \['f2.1.1\[p1=0.2\]'\]",
         ),
-        ({"mc_size": 33}, "mc_size must be one of"),
+        ({"mc_size": 33}, "size must be one of"),
         ({"n_bisection_fevals": 1}, "n_bisection_fevals must be at least 2"),
     ],
 )

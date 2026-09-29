@@ -15,11 +15,11 @@ runs are far longer and never scale down.
 from dataclasses import dataclass
 from typing import Self
 
-from .tuples import MC_TUPLES_SIZES
+from .sizes import MCTuplesSize
 
 FULL_POPULATION_SIZE = 65_536
 # A population of 2 candidates per tuple at the largest size keeps the bin constraints satisfiable.
-MIN_POPULATION_SIZE = 2 * max(MC_TUPLES_SIZES)
+MIN_POPULATION_SIZE = 2 * max(MCTuplesSize)
 MIN_T_TOTAL_SEC = 1.0
 MIN_T_TOTAL_AT_FULL_SCALE_SEC = 60.0
 MIN_T_BUDGET_PER_SIZE_AT_FULL_SCALE_SEC = 10.0
@@ -62,11 +62,11 @@ class MCTuplesConstructionSettings:
             raise ValueError(f"n_workers must be at least 1 (got {n_workers}).")
         scale = min(1.0, t_total_sec / MIN_T_TOTAL_AT_FULL_SCALE_SEC)
         min_t_budget_per_size_sec = scale * MIN_T_BUDGET_PER_SIZE_AT_FULL_SCALE_SEC
-        t_rest_sec = t_total_sec - len(MC_TUPLES_SIZES) * min_t_budget_per_size_sec
+        t_rest_sec = t_total_sec - len(MCTuplesSize) * min_t_budget_per_size_sec
         return cls(
             population_size=max(MIN_POPULATION_SIZE, round(scale * FULL_POPULATION_SIZE)),
             n_workers=max(1, round(scale * n_workers)),
             t_budget_per_size_sec={
-                k: min_t_budget_per_size_sec + t_rest_sec * k / sum(MC_TUPLES_SIZES) for k in MC_TUPLES_SIZES
+                k: min_t_budget_per_size_sec + t_rest_sec * k / sum(MCTuplesSize) for k in MCTuplesSize
             },
         )

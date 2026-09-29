@@ -9,7 +9,8 @@ from collections.abc import Mapping
 
 from sunnbear._core.artifacts import ArtifactDeclaration, ArtifactError, ArtifactStore
 
-from .tuples import MCTuples, validate_mc_tuples_size
+from .sizes import MCTuplesSize
+from .tuples import MCTuples
 
 _CSV_FILE_NAME = "mc_tuples.csv"
 _CSV_HEADER = "u,v"
@@ -52,10 +53,9 @@ def load_mc_tuples(size: int) -> MCTuples:
     The artifact is read once per process.
 
     Raises:
-        ValueError: If `size` is not one of `MC_TUPLES_SIZES`.
+        ValueError: If `size` is not 1 of `MCTuplesSize`.
     """
-    validate_mc_tuples_size("size", size)
-    return _load_full_set().first(size)
+    return _load_full_set().first(MCTuplesSize(size))
 
 
 # ==================================================================================================

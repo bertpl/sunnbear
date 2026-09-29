@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import MC_TUPLES_SIZES, MCTuplesConstructionError, generate_mc_tuples
+from sunnbear._core.benchmark.mc_tuples import MCTuplesConstructionError, MCTuplesSize, generate_mc_tuples
 from sunnbear._core.benchmark.mc_tuples.construction import _draw_population
 from sunnbear._core.benchmark.mc_tuples.max_div_selection import _check_selection
 
@@ -18,9 +18,9 @@ def test_generate_mc_tuples_builds_a_set_whose_every_size_meets_its_bin_constrai
     tuples = generate_mc_tuples(t_total_sec=1.0)
 
     # --- assert -----------------------
-    assert tuples.size == max(MC_TUPLES_SIZES)
+    assert tuples.size == max(MCTuplesSize)
     assert np.unique(np.column_stack([tuples.u, tuples.v]), axis=0).shape[0] == tuples.size
-    for size in MC_TUPLES_SIZES:
+    for size in MCTuplesSize:
         assert tuples.first(size).stats().max_bin_count_deviation <= 1
 
 
