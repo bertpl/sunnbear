@@ -1,8 +1,8 @@
-"""`BenchmarkTaskPool` runs benchmark tasks in worker processes, or in this process when it has 1 worker.
+"""`BenchmarkWorkerPool` runs benchmark tasks in worker processes, or in this process when it has 1 worker.
 
-A task finds its formula and solver configs by id, in registries that a class fills when it is defined.
-A worker process has only imported sunnbear itself, so every worker first imports the modules that define
-the run's formulas and solver configs.
+A task looks up its formula and solver configs by id in registries, and each formula or solver config class
+adds itself to its registry when it is defined. A worker process has only imported sunnbear itself, so every
+worker first imports the modules that define the run's formulas and solver configs.
 
 Workers start with the "spawn" method on every platform: a worker then never inherits the threads of this
 process, e.g. those of numba or polars, and a run behaves the same on Linux, macOS and Windows.
@@ -25,18 +25,17 @@ from .task import BenchmarkTask
 
 K = TypeVar("K", bound=Hashable)
 
-# A worker never imports the main module by name: "spawn" runs the main script in every worker itself.
 _MAIN_MODULE_NAME = "__main__"
 
 
 # ==================================================================================================
-#  BenchmarkTaskPool
+#  BenchmarkWorkerPool
 # ==================================================================================================
-class BenchmarkTaskPool:
-    """`BenchmarkTaskPool` runs benchmark tasks in `n_workers` worker processes, or in this process for 1 worker."""
+class BenchmarkWorkerPool:
+    """`BenchmarkWorkerPool` runs benchmark tasks in `n_workers` worker processes, or in this process for 1 worker."""
 
     def __init__(self, *, n_workers: int, module_names: Sequence[str]) -> None:
-        """Hold the worker count and the modules that every worker imports before its first task.
+        """Hold the worker count and the names of the modules to import in each worker before its first task.
 
         Raises:
             ValueError: If `n_workers` is below 1.
@@ -54,12 +53,9 @@ class BenchmarkTaskPool:
         solver_configs: Sequence[SolverConfig],
         functions: Sequence[TestFunction],
     ) -> Self:
-        """Return the pool for a run of these solver configs and test functions.
+        """Return the pool for a run, whose workers import the modules that define its configs and formulas.
 
-        Args:
-            n_workers: The number of worker processes; ``None`` for 1 per CPU.
-            solver_configs: The run's solver configs.
-            functions: The run's test functions.
+        An `n_workers` of ``None`` starts 1 worker per CPU.
 
         Raises:
             ValueError: If `n_workers` is below 1, or is above 1 while a formula or solver config is defined in
@@ -77,6 +73,7 @@ class BenchmarkTaskPool:
                 "A formula or solver config is defined in an interactive session, which a worker process cannot "
                 "import; define it in a module, or pass n_workers=1."
             )
+        # A worker never imports the main module by name: "spawn" runs the main script in every worker itself.
         return cls(n_workers=n_workers, module_names=sorted(module_names - {_MAIN_MODULE_NAME}))
 
     # --------------------------------------------------------------------------
@@ -86,8 +83,13 @@ class BenchmarkTaskPool:
         """Run every task and yield each task's key with its result rows, as the task finishes.
 
         With 1 worker, the tasks run in this process, in the order of `tasks`. Otherwise they run in up to
-        `n_workers` worker processes and finish in any order. When a task fails, the tasks that have not
-        started are cancelled, the running ones are awaited, and the task's exception is raised.
+        `n_workers` worker processes and finish in any order.
+
+        When a task fails:
+
+        - the tasks that have not started are canceled;
+        - the running tasks are awaited;
+        - the failed task's exception is raised.
         """
         if not tasks:
             return

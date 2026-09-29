@@ -1,5 +1,5 @@
-"""`run_benchmark` writes 1 results file per formula, in worker processes or not, resumes a crashed run, and refuses to
-resume another run.
+"""`run_benchmark` writes 1 results file per formula, whether its tasks run in worker processes or in this process,
+resumes a crashed run, and refuses to resume another run.
 """
 
 from pathlib import Path
@@ -82,7 +82,9 @@ def test_a_run_writes_1_results_file_per_formula_and_loads_every_solve(finished_
 
 
 def test_a_run_in_worker_processes_gives_the_results_of_a_run_in_this_process(finished_run_dir, tmp_path):
-    """With 2 workers, the tasks finish in any order, but the results files hold the same rows in the same order."""
+    """With 2 workers, the tasks finish in any order, but the results files hold the same rows, in the same order, as a
+    run in this process.
+    """
     # --- act --------------------------
     run_benchmark(**_run_inputs(tmp_path, n_workers=2))
 
@@ -141,14 +143,16 @@ def test_a_crashed_run_resumes_with_only_its_unfinished_tasks(finished_run_dir, 
 def test_a_run_that_stopped_before_writing_a_formula_file_writes_it_from_the_staged_results(
     finished_run_dir, tmp_path, monkeypatch
 ):
-    """A run that staged all of a formula's results but crashed before writing its file only writes the file."""
+    """When a run staged all of a formula's results but crashed before writing the formula's results file, the
+    resumed run writes that file without running the formula's tasks again.
+    """
     # --- arrange ----------------------
     write_formula_results = BenchmarkRunDir.write_formula_results
 
-    def crash(self: BenchmarkRunDir, formula_id: str, n_functions: int) -> None:
+    def crash_before_writing_formula_results(self: BenchmarkRunDir, formula_id: str, n_functions: int) -> None:
         raise RuntimeError("crash")
 
-    monkeypatch.setattr(BenchmarkRunDir, "write_formula_results", crash)
+    monkeypatch.setattr(BenchmarkRunDir, "write_formula_results", crash_before_writing_formula_results)
     with pytest.raises(RuntimeError, match="crash"):
         run_benchmark(**_run_inputs(tmp_path))
     monkeypatch.setattr(BenchmarkRunDir, "write_formula_results", write_formula_results)
@@ -165,7 +169,7 @@ def test_a_run_that_stopped_before_writing_a_formula_file_writes_it_from_the_sta
     run_benchmark(**_run_inputs(tmp_path))
 
     # --- assert -----------------------
-    # Both test functions of f2.1.1 were staged before the crash, so only f2.1.2's task runs.
+    # The results of both test functions of f2.1.1 were staged before the crash, so only f2.1.2's task runs.
     assert function_ids_run == ["f2.1.2[p1=3.0]"]
     assert _results_without_wall_time(tmp_path).equals(_results_without_wall_time(finished_run_dir))
 

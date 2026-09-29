@@ -1,7 +1,7 @@
 """This package holds the benchmark runner: it runs solvers on test functions and stores the results.
 
 - `run_benchmark` runs 1 `BenchmarkTask` per test function, with the `BenchmarkRunSettings` that every
-  task shares, in the worker processes of a `BenchmarkTaskPool`, and writes the results to a run directory;
+  task shares, in the worker processes of a `BenchmarkWorkerPool`, and writes the results to a run directory;
 - `BenchmarkRunDir` reads and writes the run directory's files, among them the `BenchmarkRunInfo` that
   records what the results depend on;
 - `load_results` reads a finished run back, as a table with the columns of `RESULTS_SCHEMA`.
@@ -14,4 +14,4 @@ from .run_info import BenchmarkRunInfo
 from .run_settings import BenchmarkRunSettings
 from .runner import load_results, run_benchmark
 from .task import BenchmarkTask
-from .task_pool import BenchmarkTaskPool
+from .worker_pool import BenchmarkWorkerPool

@@ -1,6 +1,6 @@
 """`run_benchmark` runs solvers on test functions over the Monte Carlo samples, writing the results to a run directory.
 
-A run is 1 `BenchmarkTask` per test function, run by a `BenchmarkTaskPool` in worker processes. Each task's
+A run is 1 `BenchmarkTask` per test function, run by a `BenchmarkWorkerPool` in worker processes. Each task's
 results are staged as it finishes, and a formula's results file is written as soon as all of the formula's
 test functions have finished.
 
@@ -10,7 +10,6 @@ versions against the stored run info.
 `load_results` reads a finished run back. The run directory's layout is described by `BenchmarkRunDir`.
 """
 
-from collections import Counter
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -24,7 +23,7 @@ from .run_dir import BenchmarkRunDir
 from .run_info import BenchmarkRunInfo
 from .run_settings import BenchmarkRunSettings
 from .task import BenchmarkTask
-from .task_pool import BenchmarkTaskPool
+from .worker_pool import BenchmarkWorkerPool
 
 # The default size of a run's Monte Carlo tuple set, which is the number of samples per (solver, test function) pair.
 DEFAULT_MC_SIZE = 256
@@ -68,8 +67,8 @@ def run_benchmark(
         n_bisection_fevals: Bisection's evaluation count, from which the `xtol` range and the evaluation
             budget follow.
         n_workers: The number of worker processes; ``None`` for 1 per CPU, and 1 to run every task in this
-            process. Each worker imports the modules that define the formulas and solver configs, so above 1
-            they must not be defined in an interactive session.
+            process. Each worker imports the modules that define the formulas and solver configs, so with more
+            than 1 worker, no formula or solver config may be defined in an interactive session.
 
     Raises:
         ValueError: If an input is invalid, which leaves `run_dir` unwritten:
@@ -83,7 +82,7 @@ def run_benchmark(
         BenchmarkRunError: If `run_dir` holds a malformed run info, or a run with other inputs or versions.
     """
     run_settings = BenchmarkRunSettings(mc_size=mc_size, n_bisection_fevals=n_bisection_fevals, root_seed=root_seed)
-    task_pool = BenchmarkTaskPool.for_run(n_workers=n_workers, solver_configs=solver_configs, functions=functions)
+    worker_pool = BenchmarkWorkerPool.for_run(n_workers=n_workers, solver_configs=solver_configs, functions=functions)
     benchmark_run_dir = BenchmarkRunDir(run_dir)
     run_info = benchmark_run_dir.store_or_check_run_info(
         BenchmarkRunInfo.for_current_inputs(
@@ -106,17 +105,14 @@ def run_benchmark(
                     function=function, solver_configs=solver_configs, run_settings=run_settings
                 )
 
-    # --- run them, writing each formula's file --
-    n_unfinished_by_formula_id = Counter(formula_id for formula_id, _ in tasks)
+    # --- run the tasks, writing formula files ---
+    # A run that stopped after staging the results of a formula's last test function has only the formula's
+    # results file left to write.
     for formula_id, n_functions in n_functions_by_formula_id.items():
-        # A run that stopped after staging a formula's last test function has only the file left to write.
-        if n_unfinished_by_formula_id[formula_id] == 0:
-            benchmark_run_dir.write_formula_results(formula_id, n_functions)
-    for (formula_id, function_idx), results in task_pool.run(tasks):
+        benchmark_run_dir.write_formula_results_if_all_staged(formula_id, n_functions)
+    for (formula_id, function_idx), results in worker_pool.run(tasks):
         benchmark_run_dir.stage_function_results(formula_id, function_idx, results)
-        n_unfinished_by_formula_id[formula_id] -= 1
-        if n_unfinished_by_formula_id[formula_id] == 0:
-            benchmark_run_dir.write_formula_results(formula_id, n_functions_by_formula_id[formula_id])
+        benchmark_run_dir.write_formula_results_if_all_staged(formula_id, n_functions_by_formula_id[formula_id])
 
     benchmark_run_dir.mark_finished(run_info)
 
