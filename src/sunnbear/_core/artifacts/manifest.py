@@ -172,7 +172,7 @@ class ArtifactFileEntry(ArtifactHashEntry):
 
     @field_validator("path")
     @classmethod
-    def _check_path_stays_inside_dir(cls, path: str) -> str:
+    def _check_path_stays_inside_artifact_dir(cls, path: str) -> str:
         """Refuse a path that is empty, absolute, or contains a ``..`` part."""
         parts = PurePosixPath(path).parts
         if not parts or path.startswith("/") or ".." in parts:

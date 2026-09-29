@@ -78,7 +78,7 @@ def test_save_refuses_a_data_file_named_like_the_manifest():
         ArtifactStore.save(declaration_cls, b"{}")
 
 
-def test_save_refuses_an_artifact_dir_that_is_not_on_disk(monkeypatch, tmp_path):
+def test_save_refuses_an_artifact_dir_inside_a_zip_archive(monkeypatch, tmp_path):
     """A directory inside a zip archive, as in a zipped install, cannot be written."""
     # --- arrange ----------------------
     archive = tmp_path / "package.zip"
@@ -88,7 +88,7 @@ def test_save_refuses_an_artifact_dir_that_is_not_on_disk(monkeypatch, tmp_path)
     monkeypatch.setattr(ArtifactStore, "_artifact_dir_of", classmethod(lambda cls, declaration_cls: artifact_dir))
 
     # --- act / assert -----------------
-    with pytest.raises(ArtifactError, match="is not on disk, so it cannot be written"):
+    with pytest.raises(ArtifactError, match="is not a plain file-system directory, so it cannot be written"):
         ArtifactStore.save(SampleLinesDeclaration, SAMPLE_LINES)
 
 

@@ -47,7 +47,7 @@ def test_entry_from_content_records_hash_and_size(make_entry):
 
 
 @pytest.mark.parametrize("path", ["", "/abs/values.csv", "../values.csv", "data/../../values.csv"])
-def test_artifact_file_entry_rejects_a_path_outside_its_dir(path):
+def test_artifact_file_entry_rejects_a_path_outside_the_artifact_dir(path):
     """A path that is empty, absolute, or points outside the artifact's directory is refused."""
     with pytest.raises(ValueError, match="must be relative"):
         ArtifactFileEntry.from_content(path, b"abc")

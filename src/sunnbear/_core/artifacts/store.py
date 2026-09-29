@@ -126,7 +126,7 @@ class ArtifactStore:
     def builtin_artifact_names(cls) -> tuple[str, ...]:
         """Return the names of the built-in artifacts, sorted: one per subdirectory of the built-in artifacts directory.
 
-        The committed directories decide, not the declarations, so the result does not depend on which
+        The committed directories determine the names, not the declarations, so the result does not depend on which
         modules have been imported; `verify_builtin_artifacts` checks that directories and declarations
         agree.
         """
@@ -187,7 +187,7 @@ class ArtifactStore:
 
         Raises:
             ArtifactError: If the declaration produces a file named like the manifest, or the
-                artifact's directory is not on disk, e.g. inside a zipped install.
+                artifact's directory is not a plain file-system directory, e.g. one inside a zipped install.
             ValueError: If the declaration produces no file, or a path that is absolute or contains
                 a ``..`` part.
         """
@@ -499,15 +499,16 @@ class ArtifactStore:
 
     @classmethod
     def _artifact_dir_on_disk_of(cls, declaration_cls: type[ArtifactDeclaration]) -> Path:
-        """Return the artifact's directory, checked to be on disk so that the directory can be written to.
+        """Return the artifact's directory, checked to be a plain file-system directory that files can be written to.
 
         Raises:
-            ArtifactError: If the directory is not on disk, e.g. inside a zipped install.
+            ArtifactError: If the directory is not a plain file-system directory, e.g. one inside a zipped install.
         """
         artifact_dir = cls._artifact_dir_of(declaration_cls)
         if not isinstance(artifact_dir, Path):
             raise ArtifactError(
-                f"The directory of {declaration_cls.__name__} is not on disk, so it cannot be written: {artifact_dir}."
+                f"The directory of {declaration_cls.__name__} is not a plain file-system directory, "
+                f"so it cannot be written: {artifact_dir}."
             )
         return artifact_dir
 
@@ -561,7 +562,10 @@ class ArtifactStore:
 
     @classmethod
     def _relative_file_paths(cls, base_dir: Traversable) -> set[str]:
-        """Return the path of every file below the existing `base_dir`, relative to it, with forward slashes."""
+        """Return the path of every file below `base_dir`, relative to `base_dir`, with forward slashes.
+
+        `base_dir` must exist.
+        """
         paths = set()
         for child in base_dir.iterdir():
             if child.is_dir():
@@ -572,5 +576,8 @@ class ArtifactStore:
 
     @classmethod
     def _relative_data_file_paths(cls, artifact_dir: Traversable) -> set[str]:
-        """Return every file path below the existing `artifact_dir`, relative to it, except the manifest."""
+        """Return the path of every file below `artifact_dir` except the manifest, relative to `artifact_dir`.
+
+        `artifact_dir` must exist.
+        """
         return cls._relative_file_paths(artifact_dir) - {_MANIFEST_FILE_NAME}

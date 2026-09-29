@@ -17,7 +17,10 @@ def builtin_artifacts_dir_in_tmp(monkeypatch, tmp_path):
 
 @pytest.mark.usefixtures("isolated_artifact_registry")
 def test_artifact_names_lists_one_name_per_builtin_dir(builtin_artifacts_dir_in_tmp):
-    """Each directory in the built-in artifacts directory is listed, sorted; a file there and a test fixture are not."""
+    """Each directory in the built-in artifacts directory is listed, sorted.
+
+    A plain file there, and an artifact declared in the tests, are not listed.
+    """
     # --- arrange ----------------------
     for name in ("later", "earlier"):
         ArtifactStore.save(define_builtin_declaration(name), b"content\n")
