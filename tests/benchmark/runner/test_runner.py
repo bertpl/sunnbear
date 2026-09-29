@@ -1,4 +1,6 @@
-"""`run_benchmark` writes 1 results file per formula, resumes a crashed run, and refuses to resume another run."""
+"""`run_benchmark` writes 1 results file per formula, in worker processes or not, resumes a crashed run, and refuses to
+resume another run.
+"""
 
 from pathlib import Path
 
@@ -8,6 +10,7 @@ import pytest
 import sunnbear.functions as functions  # Import the module, so pytest does not try to collect `TestFunction`.
 from sunnbear._core.benchmark.runner.exceptions import BenchmarkRunError
 from sunnbear._core.benchmark.runner.results_schema import RESULTS_SCHEMA
+from sunnbear._core.benchmark.runner.run_dir import BenchmarkRunDir
 from sunnbear._core.benchmark.runner.runner import load_results, run_benchmark
 from sunnbear._core.benchmark.runner.task import BenchmarkTask
 from sunnbear.solvers import SolverConfigRegistry
@@ -25,7 +28,10 @@ _SOLVER_IDS = ("bisection", "regula_falsi")
 
 
 def _run_inputs(run_dir: Path, **changes: object) -> dict[str, object]:
-    """Return the keyword arguments of a small run into `run_dir`, with `changes` applied."""
+    """Return the keyword arguments of a small run into `run_dir` in this process, with `changes` applied.
+
+    The run stays in this process, so a test can replace `BenchmarkTask.run` with `monkeypatch`.
+    """
     return {
         "solver_configs": [SolverConfigRegistry.config_from_id(solver_id) for solver_id in _SOLVER_IDS],
         "functions": [
@@ -35,6 +41,7 @@ def _run_inputs(run_dir: Path, **changes: object) -> dict[str, object]:
         "run_dir": run_dir,
         "root_seed": 1,
         "mc_size": MC_SIZE,
+        "n_workers": 1,
     } | changes
 
 
@@ -72,6 +79,16 @@ def test_a_run_writes_1_results_file_per_formula_and_loads_every_solve(finished_
         "f2.1.1[p1=0.4]",
         "f2.1.2[p1=3.0]",
     ]
+
+
+def test_a_run_in_worker_processes_gives_the_results_of_a_run_in_this_process(finished_run_dir, tmp_path):
+    """With 2 workers, the tasks finish in any order, but the results files hold the same rows in the same order."""
+    # --- act --------------------------
+    run_benchmark(**_run_inputs(tmp_path, n_workers=2))
+
+    # --- assert -----------------------
+    assert sorted(path.name for path in tmp_path.iterdir()) == sorted(path.name for path in finished_run_dir.iterdir())
+    assert _results_without_wall_time(tmp_path).equals(_results_without_wall_time(finished_run_dir))
 
 
 def test_resuming_a_finished_run_changes_nothing(finished_run_dir, monkeypatch):
@@ -121,6 +138,38 @@ def test_a_crashed_run_resumes_with_only_its_unfinished_tasks(finished_run_dir, 
     assert _results_without_wall_time(tmp_path).equals(_results_without_wall_time(finished_run_dir))
 
 
+def test_a_run_that_stopped_before_writing_a_formula_file_writes_it_from_the_staged_results(
+    finished_run_dir, tmp_path, monkeypatch
+):
+    """A run that staged all of a formula's results but crashed before writing its file only writes the file."""
+    # --- arrange ----------------------
+    write_formula_results = BenchmarkRunDir.write_formula_results
+
+    def crash(self: BenchmarkRunDir, formula_id: str, n_functions: int) -> None:
+        raise RuntimeError("crash")
+
+    monkeypatch.setattr(BenchmarkRunDir, "write_formula_results", crash)
+    with pytest.raises(RuntimeError, match="crash"):
+        run_benchmark(**_run_inputs(tmp_path))
+    monkeypatch.setattr(BenchmarkRunDir, "write_formula_results", write_formula_results)
+    run_task = BenchmarkTask.run
+    function_ids_run: list[str] = []
+
+    def record_and_run(self: BenchmarkTask) -> pl.DataFrame:
+        function_ids_run.append(self.function_id)
+        return run_task(self)
+
+    monkeypatch.setattr(BenchmarkTask, "run", record_and_run)
+
+    # --- act --------------------------
+    run_benchmark(**_run_inputs(tmp_path))
+
+    # --- assert -----------------------
+    # Both test functions of f2.1.1 were staged before the crash, so only f2.1.2's task runs.
+    assert function_ids_run == ["f2.1.2[p1=3.0]"]
+    assert _results_without_wall_time(tmp_path).equals(_results_without_wall_time(finished_run_dir))
+
+
 @pytest.mark.parametrize(
     "changes, differing_field",
     [
@@ -151,6 +200,7 @@ def test_resuming_with_other_inputs_is_refused(finished_run_dir, changes, differ
         ),
         ({"mc_size": 33}, "size must be one of"),
         ({"n_bisection_fevals": 1}, "n_bisection_fevals must be at least 2"),
+        ({"n_workers": 0}, "n_workers must be at least 1"),
     ],
 )
 def test_invalid_inputs_are_refused_before_the_run_dir_is_written(tmp_path, changes, message):
