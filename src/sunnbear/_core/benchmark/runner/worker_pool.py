@@ -39,6 +39,10 @@ class BenchmarkWorkerPool:
     def __init__(self, *, n_workers: int, module_names: Sequence[str]) -> None:
         """Hold the worker count and the names of the modules to import in each worker before its first task.
 
+        `module_names` exists because a task looks up its formula and solver configs by id, and a registry only
+        holds the classes of imported modules. A new worker has imported only sunnbear, so it imports
+        `module_names` to register the formulas and solver configs defined elsewhere.
+
         Raises:
             ValueError: If `n_workers` is below 1.
         """
