@@ -38,8 +38,8 @@ def main() -> None:
         bin_definitions = stats.bin_definitions
         print(
             f"| {size} | {stats.min_separation_l2_fraction:.1%} | {stats.min_separation_u_fraction:.1%} "
-            f"| {stats.min_separation_v_fraction:.1%} | {bin_definitions.n_bins} "
-            f"| {stats.min_bin_count} to {stats.max_bin_count} "
+            f"| {stats.min_separation_v_fraction:.1%} | {bin_definitions.n_bins_per_axis} "
+            f"| {stats.smallest_bin_count} to {stats.largest_bin_count} "
             f"| {bin_definitions.min_count_per_bin} to {bin_definitions.max_count_per_bin} |"
         )
 

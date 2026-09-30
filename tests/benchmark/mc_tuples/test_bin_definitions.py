@@ -5,28 +5,33 @@ import pytest
 
 from sunnbear._core.benchmark.mc_tuples import MCTuplesBinDefinitions, MCTuplesSize
 
+# The expected bins and count bounds of every shipped size.
+_SHIPPED_SIZE_BINS = [
+    (MCTuplesSize.SIZE_32, 5, 5, 7),
+    (MCTuplesSize.SIZE_64, 8, 7, 9),
+    (MCTuplesSize.SIZE_128, 11, 11, 13),
+    (MCTuplesSize.SIZE_256, 16, 15, 17),
+    (MCTuplesSize.SIZE_512, 22, 22, 24),
+    (MCTuplesSize.SIZE_1024, 32, 31, 33),
+]
 
-@pytest.mark.parametrize(
-    "size, n_bins, min_count_per_bin, max_count_per_bin",
-    [
-        (MCTuplesSize.SIZE_32, 5, 5, 7),
-        (MCTuplesSize.SIZE_64, 8, 7, 9),
-        (MCTuplesSize.SIZE_128, 11, 11, 13),
-        (MCTuplesSize.SIZE_256, 16, 15, 17),
-        (MCTuplesSize.SIZE_512, 22, 22, 24),
-        (MCTuplesSize.SIZE_1024, 32, 31, 33),
-    ],
-)
+
+def test_the_expected_bins_cover_every_shipped_size():
+    """`_SHIPPED_SIZE_BINS` names every member of `MCTuplesSize`, so a new size cannot go untested."""
+    assert {size for size, *_ in _SHIPPED_SIZE_BINS} == set(MCTuplesSize)
+
+
+@pytest.mark.parametrize("size, n_bins_per_axis, min_count_per_bin, max_count_per_bin", _SHIPPED_SIZE_BINS)
 def test_the_shipped_sizes_have_sqrt_size_bins_with_bounds_around_the_rounded_count(
-    size, n_bins, min_count_per_bin, max_count_per_bin
+    size, n_bins_per_axis, min_count_per_bin, max_count_per_bin
 ):
-    """Each shipped size has ⌊√size⌋ bins per axis, each allowing round(size / n_bins) ± 1 tuples."""
+    """Each shipped size has ⌊√size⌋ bins per axis, each allowing round(size / n_bins_per_axis) ± 1 tuples."""
     # --- act --------------------------
     bin_definitions = MCTuplesBinDefinitions(size=size)
 
     # --- assert -----------------------
-    assert (bin_definitions.n_bins, bin_definitions.min_count_per_bin, bin_definitions.max_count_per_bin) == (
-        n_bins,
+    assert (bin_definitions.n_bins_per_axis, bin_definitions.min_count_per_bin, bin_definitions.max_count_per_bin) == (
+        n_bins_per_axis,
         min_count_per_bin,
         max_count_per_bin,
     )
@@ -36,8 +41,12 @@ def test_the_bounds_can_be_met_by_every_size():
     """For every size, the bins' lower bounds sum to at most the size, and their upper bounds to at least it."""
     for size in range(2, 4097):
         bin_definitions = MCTuplesBinDefinitions(size=size)
-        n_bins = bin_definitions.n_bins
-        assert n_bins * bin_definitions.min_count_per_bin <= size <= n_bins * bin_definitions.max_count_per_bin
+        n_bins_per_axis = bin_definitions.n_bins_per_axis
+        assert (
+            n_bins_per_axis * bin_definitions.min_count_per_bin
+            <= size
+            <= n_bins_per_axis * bin_definitions.max_count_per_bin
+        )
 
 
 def test_bin_indices_and_counts_cut_the_axis_into_equal_bins():

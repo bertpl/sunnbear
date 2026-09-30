@@ -9,7 +9,7 @@ from max_div.solver import ParallelMaxDivSolverBuilder, ParallelSolvingWarning, 
 
 from .bin_definitions import MCTuplesBinDefinitions
 from .exceptions import MCTuplesConstructionError
-from .tuples import MCTuples
+from .tuples import MCTuples, MCTuplesStats
 
 # The inclusion constraint weighs more than the bin constraints, so max-div meets it first.
 INCLUSION_CONSTRAINT_WEIGHT = 10.0
@@ -28,10 +28,14 @@ def select_tuples(
 ) -> np.ndarray:
     """Return max-div's selection of `k` tuples, including `required_indices`, as sorted population indices.
 
-    The objective maximizes the smallest of 2 weighted min separations: under L-inf, which is the smaller
-    of the min separations along u and along v, weighted by `k - 1`, and under L2, weighted by `√k - 1`.
-    The weights are the inverse spacings of `k` evenly spaced tuples, so the 2 terms are the fractions
-    that `MCTuplesStats` reports, and the solve raises the weakest of the 3.
+    The objective maximizes the smaller of 2 weighted min separations:
+
+    - **along the axes**: the min separation under the L-minus-infinity distance `min(|Δu|, |Δv|)`, which
+      equals the smaller of the min separations along u and along v, weighted by `k - 1`;
+    - **in the square**: the min separation under L2, weighted by `√k - 1`.
+
+    Each weight is the inverse spacing of `k` evenly spaced tuples, so max-div raises the smallest of the 3
+    fractions that `MCTuplesStats` reports: along u, along v and in the square.
 
     max-div weighs the bin and inclusion constraints against the objective without enforcing them, so the
     selection is checked against them before it is returned.
@@ -58,7 +62,7 @@ def select_tuples(
         diversity_metric=HybridDiversityMetric.min_of(
             DiversityMetric.MIN_SEPARATION.over(DistanceMetric.l_minus_inf()),
             DiversityMetric.MIN_SEPARATION.over(DistanceMetric.l2_euclidean()),
-            weights=(k - 1.0, np.sqrt(k) - 1.0),
+            weights=(MCTuplesStats.inverse_axis_spacing(k), MCTuplesStats.inverse_grid_spacing(k)),
         ),
         constraints=constraints,
     )
@@ -83,12 +87,12 @@ def select_tuples(
 #  Helpers
 # ==================================================================================================
 def _bin_constraints(population: np.ndarray, k: int) -> list[Constraint]:
-    """Return 1 constraint per bin of each axis, keeping its number of selected tuples within the bounds for `k`."""
+    """Return 1 constraint per bin of each axis, keeping the number of selected tuples in that bin within its bounds."""
     bin_definitions = MCTuplesBinDefinitions(size=k)
     constraints = []
     for axis in range(2):
         indices = bin_definitions.bin_indices(population[:, axis])
-        for bin_index in range(bin_definitions.n_bins):
+        for bin_index in range(bin_definitions.n_bins_per_axis):
             constraints.append(
                 Constraint(
                     int_set=set(np.flatnonzero(indices == bin_index).tolist()),
@@ -102,7 +106,8 @@ def _bin_constraints(population: np.ndarray, k: int) -> list[Constraint]:
 def _check_selection(population: np.ndarray, k: int, required_indices: np.ndarray, selection: np.ndarray) -> None:
     """Check that `selection` has `k` distinct tuples, includes `required_indices`, and balances its bins.
 
-    Balanced bins hold between the bounds that `MCTuplesBinDefinitions` sets for `k` tuples, on both axes.
+    On both axes, each bin of a balanced selection holds a number of tuples within the bounds that
+    `MCTuplesBinDefinitions` sets for `k`.
 
     Raises:
         MCTuplesConstructionError: If any check fails.

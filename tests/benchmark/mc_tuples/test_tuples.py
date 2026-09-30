@@ -89,10 +89,10 @@ def test_stats_reports_bin_counts_and_min_separations():
 
     # --- assert -----------------------
     assert stats.size == 8
-    assert stats.bin_definitions.n_bins == 2
+    assert stats.bin_definitions.n_bins_per_axis == 2
     assert stats.bin_counts_u == (4, 4)
     assert stats.bin_counts_v == (4, 4)
-    assert (stats.min_bin_count, stats.max_bin_count) == (4, 4)
+    assert (stats.smallest_bin_count, stats.largest_bin_count) == (4, 4)
     assert stats.are_bin_counts_within_bounds
     assert stats.min_separation_u == pytest.approx(1 / 8)
     assert stats.min_separation_v == pytest.approx(1 / 8)
@@ -112,5 +112,5 @@ def test_bin_counts_outside_their_bounds_are_reported_over_both_axes():
 
     # --- assert -----------------------
     assert stats.bin_counts_v == (6, 2)
-    assert (stats.min_bin_count, stats.max_bin_count) == (2, 6)
+    assert (stats.smallest_bin_count, stats.largest_bin_count) == (2, 6)
     assert not stats.are_bin_counts_within_bounds

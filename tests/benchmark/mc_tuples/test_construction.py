@@ -42,14 +42,14 @@ def test_a_smaller_population_is_a_prefix_of_the_full_one():
 # The population has 24 tuples, evenly spaced on each axis. A selection of 8 has 2 bins per axis, each allowing
 # 3 to 5 tuples: every third tuple puts 4 in each bin, and the first 8 put all 8 in 1 bin.
 _POPULATION = np.column_stack([(np.arange(24) + 0.5) / 24, (np.arange(24)[::-1] + 0.5) / 24])
-_ONE_PER_BIN = np.arange(0, 24, 3)
+_EVERY_THIRD_TUPLE = np.arange(0, 24, 3)
 
 
 @pytest.mark.parametrize(
     "required_indices, selection, message",
     [
         (np.array([], dtype=np.int64), np.array([0, 0, 3, 6, 9, 12, 15, 18]), "7 distinct tuples"),
-        (np.array([1]), _ONE_PER_BIN, "1 tuples of the size below it are not selected"),
+        (np.array([1]), _EVERY_THIRD_TUPLE, "1 tuples of the size below it are not selected"),
         (np.array([], dtype=np.int64), np.arange(8), "bin counts"),
     ],
 )
@@ -63,4 +63,4 @@ def test_check_selection_refuses_duplicates_a_missing_tuple_or_bin_counts_out_of
 
 def test_check_selection_accepts_a_selection_that_meets_every_constraint():
     """A selection of 8 tuples, 4 per bin on each axis, that includes the required tuple passes the checks."""
-    _check_selection(_POPULATION, 8, np.array([3]), _ONE_PER_BIN)
+    _check_selection(_POPULATION, 8, np.array([3]), _EVERY_THIRD_TUPLE)

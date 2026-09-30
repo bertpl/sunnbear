@@ -102,9 +102,8 @@ class MCTuples:
 class MCTuplesStats:
     """`MCTuplesStats` describes how evenly a tuple set is spread; each statistic is computed when first read.
 
-    The bin counts count the tuples in each bin of each axis, as `MCTuplesBinDefinitions` defines the bins
-    for the set's size; a balanced set holds between its `min_count_per_bin` and `max_count_per_bin` in
-    every bin.
+    The bin counts are the numbers of tuples in each bin of each axis, with the bins that
+    `MCTuplesBinDefinitions` defines for the set's size.
 
     Each min separation is the smallest distance between 2 tuples: in the square (L2), along u, or
     along v. Each `min_separation_*_fraction` property divides that min separation by the separation of
@@ -126,7 +125,7 @@ class MCTuplesStats:
     # --------------------------------------------------------------------------
     @cached_property
     def bin_definitions(self) -> MCTuplesBinDefinitions:
-        """Return the bins of each axis and their bounds, for this set's size."""
+        """Return the bins of each axis and the bounds on their tuple counts, for this set's size."""
         return MCTuplesBinDefinitions(size=self.size)
 
     @cached_property
@@ -140,23 +139,19 @@ class MCTuplesStats:
         return self.bin_definitions.bin_counts(self._tuples.v)
 
     @property
-    def min_bin_count(self) -> int:
+    def smallest_bin_count(self) -> int:
         """Return the smallest number of tuples in a bin, over both axes."""
         return min(self.bin_counts_u + self.bin_counts_v)
 
     @property
-    def max_bin_count(self) -> int:
+    def largest_bin_count(self) -> int:
         """Return the largest number of tuples in a bin, over both axes."""
         return max(self.bin_counts_u + self.bin_counts_v)
 
     @property
     def are_bin_counts_within_bounds(self) -> bool:
         """Return whether every bin of both axes holds from `min_count_per_bin` to `max_count_per_bin` tuples."""
-        bin_definitions = self.bin_definitions
-        return (
-            bin_definitions.min_count_per_bin <= self.min_bin_count
-            and self.max_bin_count <= bin_definitions.max_count_per_bin
-        )
+        return self.bin_definitions.are_counts_within_bounds(self.bin_counts_u + self.bin_counts_v)
 
     # --------------------------------------------------------------------------
     #  Min separations
@@ -186,17 +181,27 @@ class MCTuplesStats:
     @property
     def min_separation_l2_fraction(self) -> float:
         """Return the L2 min separation as a fraction of the grid spacing `1/(√size - 1)`."""
-        return self.min_separation_l2 * (np.sqrt(self.size) - 1)
+        return self.min_separation_l2 * self.inverse_grid_spacing(self.size)
 
     @property
     def min_separation_u_fraction(self) -> float:
         """Return the min separation along u as a fraction of `1/(size - 1)`."""
-        return self.min_separation_u * (self.size - 1)
+        return self.min_separation_u * self.inverse_axis_spacing(self.size)
 
     @property
     def min_separation_v_fraction(self) -> float:
         """Return the min separation along v as a fraction of `1/(size - 1)`."""
-        return self.min_separation_v * (self.size - 1)
+        return self.min_separation_v * self.inverse_axis_spacing(self.size)
+
+    @staticmethod
+    def inverse_axis_spacing(size: int) -> float:
+        """Return `size - 1`, the inverse of the separation of `size` evenly spaced values along an axis."""
+        return size - 1.0
+
+    @staticmethod
+    def inverse_grid_spacing(size: int) -> float:
+        """Return `√size - 1`, the inverse of the spacing of `size` tuples on a square grid."""
+        return float(np.sqrt(size)) - 1.0
 
     # --------------------------------------------------------------------------
     #  Internal helpers
