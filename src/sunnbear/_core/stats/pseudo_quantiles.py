@@ -61,15 +61,15 @@ def owg(values: ArrayLike, p: float) -> float:
         # Return 0 directly: for a large |p| and many values, the weight on the
         # zero can round down to 0.0 in float64, and 0.0 * log(0) would give NaN.
         return 0.0
-    else:
-        # --- sort & weight ----------------------
-        v_sorted = np.sort(v) if p >= 0 else np.sort(v)[::-1]
-        n = v_sorted.size
-        rank_ramp = np.linspace(0.5 / n, 1.0 - 0.5 / n, n)
-        weights = rank_ramp ** abs(p)
 
-        # --- weighted geometric mean ------------
-        return float(np.exp(np.sum(weights * np.log(v_sorted)) / np.sum(weights)))
+    # --- sort & weight --------------------------
+    v_sorted = np.sort(v) if p >= 0 else np.sort(v)[::-1]
+    n = v_sorted.size
+    rank_ramp = np.linspace(0.5 / n, 1.0 - 0.5 / n, n)
+    weights = rank_ramp ** abs(p)
+
+    # --- weighted geometric mean ----------------
+    return float(np.exp(np.sum(weights * np.log(v_sorted)) / np.sum(weights)))
 
 
 # ==================================================================================================
