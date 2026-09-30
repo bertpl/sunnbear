@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `MC_TUPLES_SIZES` is replaced by the enum `MCTuplesSize`, whose members are the sizes of the shipped Monte Carlo tuple set
-- The shipped Monte Carlo (u, v) tuple set is rebuilt so that its tuples lie further apart at every size, in the square and along each axis, with about equal counts in each of ⌊√size⌋ bins per axis (`MCTuplesBinDefinitions`); `MCTuplesStats.are_bin_counts_within_bounds` replaces `max_bin_count_deviation`, and benchmark results on the new set differ from those on the previous set
+- The shipped Monte Carlo (u, v) tuple set is rebuilt so that its weakest separation, in the square or along an axis, is larger at every size, with about equal counts in each of ⌊√size⌋ bins per axis (`MCTuplesBinDefinitions`); `MCTuplesStats.are_bin_counts_within_bounds` replaces `max_bin_count_deviation`, and benchmark results on the new set differ from those on the previous set
 
 ### Deprecated
 
