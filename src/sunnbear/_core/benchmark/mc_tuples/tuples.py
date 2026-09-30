@@ -102,9 +102,6 @@ class MCTuples:
 class MCTuplesStats:
     """`MCTuplesStats` describes how evenly a tuple set is spread; each statistic is computed when first read.
 
-    The bin counts are the numbers of tuples in each bin of each axis, with the bins that
-    `MCTuplesBinDefinitions` defines for the set's size.
-
     Each min separation is the smallest distance between 2 tuples: in the square (L2), along u, or
     along v. Each `min_separation_*_fraction` property divides that min separation by the separation of
     `size` evenly spaced tuples: `1/(size - 1)` along an axis, and the spacing `1/(√size - 1)` of a
@@ -141,17 +138,17 @@ class MCTuplesStats:
     @property
     def smallest_bin_count(self) -> int:
         """Return the smallest number of tuples in a bin, over both axes."""
-        return min(self.bin_counts_u + self.bin_counts_v)
+        return min(self._bin_counts_both_axes)
 
     @property
     def largest_bin_count(self) -> int:
         """Return the largest number of tuples in a bin, over both axes."""
-        return max(self.bin_counts_u + self.bin_counts_v)
+        return max(self._bin_counts_both_axes)
 
     @property
     def are_bin_counts_within_bounds(self) -> bool:
-        """Return whether every bin of both axes holds from `min_count_per_bin` to `max_count_per_bin` tuples."""
-        return self.bin_definitions.are_counts_within_bounds(self.bin_counts_u + self.bin_counts_v)
+        """Return whether every bin of both axes holds a number of tuples within the bounds of `bin_definitions`."""
+        return self.bin_definitions.are_counts_within_bounds(self._bin_counts_both_axes)
 
     # --------------------------------------------------------------------------
     #  Min separations
@@ -195,17 +192,22 @@ class MCTuplesStats:
 
     @staticmethod
     def inverse_axis_spacing(size: int) -> float:
-        """Return `size - 1`, the inverse of the separation of `size` evenly spaced values along an axis."""
+        """Return `size - 1`, the inverse of the separation of `size` evenly spaced values from 0 to 1."""
         return size - 1.0
 
     @staticmethod
     def inverse_grid_spacing(size: int) -> float:
-        """Return `√size - 1`, the inverse of the spacing of `size` tuples on a square grid."""
+        """Return `√size - 1`, the inverse of the spacing of `size` tuples on a grid spanning the unit square."""
         return float(np.sqrt(size)) - 1.0
 
     # --------------------------------------------------------------------------
-    #  Internal helpers
+    #  Helpers
     # --------------------------------------------------------------------------
+    @property
+    def _bin_counts_both_axes(self) -> tuple[int, ...]:
+        """Return the bin counts along u followed by those along v."""
+        return self.bin_counts_u + self.bin_counts_v
+
     @staticmethod
     def _min_separation_along_axis(values: np.ndarray) -> float:
         """Return the smallest difference between 2 of the values."""

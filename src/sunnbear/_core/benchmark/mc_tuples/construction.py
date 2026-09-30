@@ -2,10 +2,10 @@
 
 The construction selects each size with max-div from a uniform random population of candidate tuples:
 
-- **objective**: maximize the smallest of 3 min separations, in the square (L2), along u and along v,
-  each the smallest distance between 2 selected tuples as a fraction of the spacing of evenly spaced
-  tuples; the 2 separations along an axis keep the tuples apart on each axis alone, because u and v
-  each set a separate parameter of a test function;
+- **objective**: maximize the smallest of 3 min separations: in the square (L2), along u and along v.
+  Each is the smallest distance between 2 selected tuples, as a fraction of the spacing of evenly
+  spaced tuples. The 2 separations along an axis keep the tuples apart on each axis alone, because u
+  and v each set a separate parameter of a test function;
 - **inclusion**: the sizes are built bottom-up, the smallest first, and each larger size is
   constrained to include the size below it, so every size is a prefix of the next;
 - **bins**: bin constraints cut each axis into the equal bins of `MCTuplesBinDefinitions` for the size,

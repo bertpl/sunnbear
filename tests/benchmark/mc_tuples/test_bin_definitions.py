@@ -5,7 +5,7 @@ import pytest
 
 from sunnbear._core.benchmark.mc_tuples import MCTuplesBinDefinitions, MCTuplesSize
 
-# The expected bins and count bounds of every shipped size.
+# Each entry holds a shipped size, its number of bins per axis, and its smallest and largest allowed count per bin.
 _SHIPPED_SIZE_BINS = [
     (MCTuplesSize.SIZE_32, 5, 5, 7),
     (MCTuplesSize.SIZE_64, 8, 7, 9),
@@ -38,7 +38,8 @@ def test_the_shipped_sizes_have_sqrt_size_bins_with_bounds_around_the_rounded_co
 
 
 def test_the_bounds_can_be_met_by_every_size():
-    """For every size, the bins' lower bounds sum to at most the size, and their upper bounds to at least it."""
+    """For sizes 2 to 4096, the bins' lower bounds sum to at most the size, and their upper bounds to at least it."""
+    # --- act / assert -----------------
     for size in range(2, 4097):
         bin_definitions = MCTuplesBinDefinitions(size=size)
         n_bins_per_axis = bin_definitions.n_bins_per_axis

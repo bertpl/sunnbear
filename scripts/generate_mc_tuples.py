@@ -31,7 +31,7 @@ def main() -> None:
     arguments = {"t_total_sec": args.t_total_sec, "n_workers": args.n_workers, "seed": args.seed}
     tuples = generate_mc_tuples(**arguments)
 
-    print("| size | L2 | u | v | bins per axis | bin counts | bin bounds |")
+    print("| size | L2 | u | v | bins per axis | bin counts | bin count bounds |")
     print("|---|---|---|---|---|---|---|")
     for size in MCTuplesSize:
         stats = tuples.first(size).stats()

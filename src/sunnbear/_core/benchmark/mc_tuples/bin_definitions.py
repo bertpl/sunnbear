@@ -1,4 +1,4 @@
-"""`MCTuplesBinDefinitions` defines, for a tuple set of a given size, the bins of each axis and their count bounds."""
+"""`MCTuplesBinDefinitions` defines, for a tuple set of a given size, the bins of each axis and their tuple counts."""
 
 import math
 from dataclasses import dataclass
@@ -16,10 +16,11 @@ class MCTuplesBinDefinitions:
     Each axis, u and v, is cut into `n_bins_per_axis = ⌊√size⌋` equal bins, as in a histogram, and a balanced
     set holds `round(size / n_bins_per_axis) ± 1` of its tuples in each bin.
 
-    Each bin is then about as wide as the spacing `1/(√size - 1)` of `size` tuples on a square grid, so the bins
-    balance the tuples along each axis over the same distance that separates neighboring tuples in the square.
+    Each bin is then about as wide as the spacing `1/(√size - 1)` of `size` tuples on a square grid, so along
+    each axis the tuple counts are kept even over intervals as wide as the distance between neighboring tuples
+    in the square.
 
-    The bounds can always be met, because the rounded count lies within 1/2 of `size / n_bins_per_axis`:
+    The bounds can always be met, because `round(size / n_bins_per_axis)` lies within 1/2 of `size / n_bins_per_axis`:
     `n_bins_per_axis · min_count_per_bin ≤ size ≤ n_bins_per_axis · max_count_per_bin`.
 
     Attributes:
@@ -32,7 +33,7 @@ class MCTuplesBinDefinitions:
         """Check the size.
 
         Raises:
-            ValueError: If `size` is below 2, the smallest tuple set.
+            ValueError: If `size` is below 2, the size of the smallest tuple set.
         """
         if self.size < 2:
             raise ValueError(f"A tuple set holds at least 2 tuples (got {self.size}).")

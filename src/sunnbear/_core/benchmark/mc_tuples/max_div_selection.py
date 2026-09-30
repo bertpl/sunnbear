@@ -30,12 +30,13 @@ def select_tuples(
 
     The objective maximizes the smaller of 2 weighted min separations:
 
-    - **along the axes**: the min separation under the L-minus-infinity distance `min(|Δu|, |Δv|)`, which
-      equals the smaller of the min separations along u and along v, weighted by `k - 1`;
-    - **in the square**: the min separation under L2, weighted by `√k - 1`.
+    - **along the axes**: `k - 1` times the min separation under the L-minus-infinity distance
+      `min(|Δu|, |Δv|)`, which equals the smaller of the min separations along u and along v;
+    - **in the square**: `√k - 1` times the min separation under L2.
 
-    Each weight is the inverse spacing of `k` evenly spaced tuples, so max-div raises the smallest of the 3
-    fractions that `MCTuplesStats` reports: along u, along v and in the square.
+    Each weight is the inverse of the spacing of `k` evenly spaced tuples, along an axis or on a square grid,
+    so max-div raises the smallest of the 3 separation fractions of `MCTuplesStats`: along u, along v and in
+    the square.
 
     max-div weighs the bin and inclusion constraints against the objective without enforcing them, so the
     selection is checked against them before it is returned.
@@ -106,8 +107,8 @@ def _bin_constraints(population: np.ndarray, k: int) -> list[Constraint]:
 def _check_selection(population: np.ndarray, k: int, required_indices: np.ndarray, selection: np.ndarray) -> None:
     """Check that `selection` has `k` distinct tuples, includes `required_indices`, and balances its bins.
 
-    On both axes, each bin of a balanced selection holds a number of tuples within the bounds that
-    `MCTuplesBinDefinitions` sets for `k`.
+    On both axes, each bin of a balanced selection holds a number of tuples within the bounds of
+    `MCTuplesBinDefinitions` for `k`.
 
     Raises:
         MCTuplesConstructionError: If any check fails.

@@ -103,7 +103,7 @@ def test_stats_reports_bin_counts_and_min_separations():
 
 
 def test_bin_counts_outside_their_bounds_are_reported_over_both_axes():
-    """Putting 6 of 8 v values in the lower bin, where 3 to 5 are allowed, gives counts of 2 and 6, out of bounds."""
+    """6 of 8 v values in the lower bin, where 3 to 5 are allowed, give counts of 6 and 2, both out of bounds."""
     # --- arrange ----------------------
     v = np.array([0.01, 0.02, 0.03, 0.1, 0.2, 0.3, 0.7, 0.8])
 
