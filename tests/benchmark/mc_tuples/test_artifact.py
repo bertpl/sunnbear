@@ -30,7 +30,7 @@ def test_a_csv_file_without_the_header_is_refused():
 
 @pytest.mark.parametrize("size", MCTuplesSize)
 def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set_that_meets_its_bin_constraints(size):
-    """Each size is the start of the full shipped set, and keeps every bin within 1 of `size / N_BINS`."""
+    """Each size is the start of the full shipped set, and keeps every bin within its bounds."""
     # --- act --------------------------
     tuples = load_mc_tuples(size)
 
@@ -39,7 +39,7 @@ def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set_that_meets_its_bin_c
     assert tuples.size == size
     assert tuples.u.tolist() == full.u[:size].tolist()
     assert tuples.v.tolist() == full.v[:size].tolist()
-    assert tuples.stats().max_bin_count_deviation <= 1
+    assert tuples.stats().are_bin_counts_within_bounds
 
 
 def test_load_mc_tuples_rejects_an_unsupported_size():

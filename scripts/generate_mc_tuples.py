@@ -31,13 +31,16 @@ def main() -> None:
     arguments = {"t_total_sec": args.t_total_sec, "n_workers": args.n_workers, "seed": args.seed}
     tuples = generate_mc_tuples(**arguments)
 
-    print("| size | L2 | u | v | max bin deviation |")
-    print("|---|---|---|---|---|")
+    print("| size | L2 | u | v | bins per axis | bin counts | bin bounds |")
+    print("|---|---|---|---|---|---|---|")
     for size in MCTuplesSize:
         stats = tuples.first(size).stats()
+        bin_definitions = stats.bin_definitions
         print(
             f"| {size} | {stats.min_separation_l2_fraction:.1%} | {stats.min_separation_u_fraction:.1%} "
-            f"| {stats.min_separation_v_fraction:.1%} | {stats.max_bin_count_deviation:g} |"
+            f"| {stats.min_separation_v_fraction:.1%} | {bin_definitions.n_bins} "
+            f"| {stats.min_bin_count} to {stats.max_bin_count} "
+            f"| {bin_definitions.min_count_per_bin} to {bin_definitions.max_count_per_bin} |"
         )
 
     manifest = ArtifactStore.save(

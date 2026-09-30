@@ -10,9 +10,7 @@ from functools import cached_property
 import numpy as np
 from numpy.typing import ArrayLike
 
-# Each axis is cut into this many equal bins, as in a histogram; `MCTuplesStats` counts the tuples per
-# bin, and the construction keeps each count within 1 of `size / N_BINS`.
-N_BINS = 8
+from .bin_definitions import MCTuplesBinDefinitions
 
 
 # ==================================================================================================
@@ -104,6 +102,10 @@ class MCTuples:
 class MCTuplesStats:
     """`MCTuplesStats` describes how evenly a tuple set is spread; each statistic is computed when first read.
 
+    The bin counts count the tuples in each bin of each axis, as `MCTuplesBinDefinitions` defines the bins
+    for the set's size; a balanced set holds between its `min_count_per_bin` and `max_count_per_bin` in
+    every bin.
+
     Each min separation is the smallest distance between 2 tuples: in the square (L2), along u, or
     along v. Each `min_separation_*_fraction` property divides that min separation by the separation of
     `size` evenly spaced tuples: `1/(size - 1)` along an axis, and the spacing `1/(√size - 1)` of a
@@ -123,20 +125,38 @@ class MCTuplesStats:
     #  Bin counts
     # --------------------------------------------------------------------------
     @cached_property
+    def bin_definitions(self) -> MCTuplesBinDefinitions:
+        """Return the bins of each axis and their bounds, for this set's size."""
+        return MCTuplesBinDefinitions(size=self.size)
+
+    @cached_property
     def bin_counts_u(self) -> tuple[int, ...]:
-        """Return the number of tuples in each of the `N_BINS` bins along u."""
-        return self._bin_counts(self._tuples.u)
+        """Return the number of tuples in each bin along u."""
+        return self.bin_definitions.bin_counts(self._tuples.u)
 
     @cached_property
     def bin_counts_v(self) -> tuple[int, ...]:
-        """Return the number of tuples in each of the `N_BINS` bins along v."""
-        return self._bin_counts(self._tuples.v)
+        """Return the number of tuples in each bin along v."""
+        return self.bin_definitions.bin_counts(self._tuples.v)
 
     @property
-    def max_bin_count_deviation(self) -> float:
-        """Return the largest difference, over both axes, between a bin's count and `size / N_BINS`."""
-        counts = np.array(self.bin_counts_u + self.bin_counts_v)
-        return float(np.abs(counts - self.size / N_BINS).max())
+    def min_bin_count(self) -> int:
+        """Return the smallest number of tuples in a bin, over both axes."""
+        return min(self.bin_counts_u + self.bin_counts_v)
+
+    @property
+    def max_bin_count(self) -> int:
+        """Return the largest number of tuples in a bin, over both axes."""
+        return max(self.bin_counts_u + self.bin_counts_v)
+
+    @property
+    def are_bin_counts_within_bounds(self) -> bool:
+        """Return whether every bin of both axes holds from `min_count_per_bin` to `max_count_per_bin` tuples."""
+        bin_definitions = self.bin_definitions
+        return (
+            bin_definitions.min_count_per_bin <= self.min_bin_count
+            and self.max_bin_count <= bin_definitions.max_count_per_bin
+        )
 
     # --------------------------------------------------------------------------
     #  Min separations
@@ -182,19 +202,6 @@ class MCTuplesStats:
     #  Internal helpers
     # --------------------------------------------------------------------------
     @staticmethod
-    def _bin_counts(values: np.ndarray) -> tuple[int, ...]:
-        """Return the number of values in each of the `N_BINS` bins of (0, 1)."""
-        return tuple(int(n) for n in np.bincount(axis_bin_indices(values), minlength=N_BINS))
-
-    @staticmethod
     def _min_separation_along_axis(values: np.ndarray) -> float:
         """Return the smallest difference between 2 of the values."""
         return float(np.diff(np.sort(values)).min())
-
-
-# ==================================================================================================
-#  Helpers
-# ==================================================================================================
-def axis_bin_indices(values: np.ndarray) -> np.ndarray:
-    """Return, for each value in (0, 1), the index of the bin that holds it, among `N_BINS` equal bins of the axis."""
-    return np.minimum((values * N_BINS).astype(np.int64), N_BINS - 1)

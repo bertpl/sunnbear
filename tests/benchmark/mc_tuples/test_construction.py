@@ -1,4 +1,4 @@
-"""`generate_mc_tuples` builds a nested, bin-balanced tuple set, and refuses a selection breaking its constraints."""
+"""`generate_mc_tuples` builds a nested tuple set within its bin bounds, and refuses a selection that breaks them."""
 
 import numpy as np
 import pytest
@@ -10,7 +10,7 @@ from sunnbear._core.benchmark.mc_tuples.max_div_selection import _check_selectio
 
 @pytest.mark.only_with_numba_jit
 def test_generate_mc_tuples_builds_a_set_whose_every_size_meets_its_bin_constraints():
-    """A 1 s construction gives distinct tuples of the largest size, and every prefix size keeps each bin within 1.
+    """A 1 s construction gives distinct tuples of the largest size, and every prefix size keeps its bins within bounds.
 
     Only the structure is asserted: max-div's spread depends on the wall-clock time.
     """
@@ -21,7 +21,7 @@ def test_generate_mc_tuples_builds_a_set_whose_every_size_meets_its_bin_constrai
     assert tuples.size == max(MCTuplesSize)
     assert np.unique(np.column_stack([tuples.u, tuples.v]), axis=0).shape[0] == tuples.size
     for size in MCTuplesSize:
-        assert tuples.first(size).stats().max_bin_count_deviation <= 1
+        assert tuples.first(size).stats().are_bin_counts_within_bounds
 
 
 def test_a_smaller_population_is_a_prefix_of_the_full_one():
@@ -39,8 +39,8 @@ def test_a_smaller_population_is_a_prefix_of_the_full_one():
 # ==================================================================================================
 #  Checks on a selection
 # ==================================================================================================
-# The population has 24 tuples, 3 per bin on each axis: selecting every third tuple puts 1 in each bin,
-# and selecting the first 8 puts 3 in each of 2 bins.
+# The population has 24 tuples, evenly spaced on each axis. A selection of 8 has 2 bins per axis, each allowing
+# 3 to 5 tuples: every third tuple puts 4 in each bin, and the first 8 put all 8 in 1 bin.
 _POPULATION = np.column_stack([(np.arange(24) + 0.5) / 24, (np.arange(24)[::-1] + 0.5) / 24])
 _ONE_PER_BIN = np.arange(0, 24, 3)
 
@@ -53,12 +53,14 @@ _ONE_PER_BIN = np.arange(0, 24, 3)
         (np.array([], dtype=np.int64), np.arange(8), "bin counts"),
     ],
 )
-def test_check_selection_refuses_duplicates_a_missing_tuple_or_unbalanced_bins(required_indices, selection, message):
-    """A repeated tuple, a missing tuple of the size below, or a bin off by more than 1 raises an error."""
+def test_check_selection_refuses_duplicates_a_missing_tuple_or_bin_counts_out_of_bounds(
+    required_indices, selection, message
+):
+    """A repeated tuple, a missing tuple of the size below, or a bin count out of bounds raises an error."""
     with pytest.raises(MCTuplesConstructionError, match=message):
         _check_selection(_POPULATION, 8, required_indices, selection)
 
 
 def test_check_selection_accepts_a_selection_that_meets_every_constraint():
-    """A selection of 8 tuples, 1 per bin on each axis, that includes the required tuple passes the checks."""
+    """A selection of 8 tuples, 4 per bin on each axis, that includes the required tuple passes the checks."""
     _check_selection(_POPULATION, 8, np.array([3]), _ONE_PER_BIN)
