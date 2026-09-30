@@ -74,6 +74,36 @@ class BenchmarkRunDir:
         else:
             return None
 
+    def read_finished_run_info(self) -> BenchmarkRunInfo:
+        """Return the stored run info of a finished run.
+
+        Raises:
+            BenchmarkRunError: If the directory holds no run info, a malformed run info, or a run that is not finished.
+        """
+        run_info = self.read_run_info()
+        if run_info is None:
+            raise BenchmarkRunError(f"{self.path} holds no benchmark run.")
+        if not run_info.is_finished:
+            raise BenchmarkRunError(f"The benchmark run in {self.path} is not finished; resume it first.")
+        return run_info
+
+    def check_combinable_with(self, other: "BenchmarkRunDir") -> None:
+        """Check that the finished runs in this directory and in `other` can be read as 1 table.
+
+        Raises:
+            BenchmarkRunError: If either directory holds no finished run, or if
+                `BenchmarkRunInfo.check_combinable_with` refuses the 2 run infos; the message then names both
+                directories.
+        """
+        run_info = self.read_finished_run_info()
+        other_run_info = other.read_finished_run_info()
+        try:
+            run_info.check_combinable_with(other_run_info)
+        except BenchmarkRunError as error:
+            raise BenchmarkRunError(
+                f"The runs in {self.path} and {other.path} cannot be read as 1 table: {error}"
+            ) from error
+
     def write_run_info(self, run_info: BenchmarkRunInfo) -> None:
         """Store `run_info`, creating the directory when needed and replacing any stored run info."""
         self.path.mkdir(parents=True, exist_ok=True)
@@ -135,19 +165,6 @@ class BenchmarkRunDir:
         """Write the formula's results file if the results of all its `n_functions` test functions are staged."""
         if all(self.has_staged_function_results(formula_id, idx) for idx in range(n_functions)):
             self.write_formula_results(formula_id, n_functions)
-
-    def read_finished_run_info(self) -> BenchmarkRunInfo:
-        """Return the stored run info of a finished run.
-
-        Raises:
-            BenchmarkRunError: If the directory holds no run info, a malformed run info, or a run that is not finished.
-        """
-        run_info = self.read_run_info()
-        if run_info is None:
-            raise BenchmarkRunError(f"{self.path} holds no benchmark run.")
-        if not run_info.is_finished:
-            raise BenchmarkRunError(f"The benchmark run in {self.path} is not finished; resume it first.")
-        return run_info
 
     def scan_results(self) -> pl.LazyFrame:
         """Return a lazy frame over every formula's results file of a finished run.

@@ -1,12 +1,12 @@
 """`add_derived_results` adds the columns of `DERIVED_RESULTS_SCHEMA`, computed from a results table's raw measurements.
 
-The results table stores only raw measurements (see `RESULTS_SCHEMA`); the benchmark's comparison values are
-derived from them when a table is analyzed:
+The results table stores only raw measurements (see `RESULTS_SCHEMA`); the values that solvers are compared on
+are derived from them when a table is analyzed:
 
 - `n_fevals_eff`: the evaluation count, or the row's `max_fevals` when the solve did not converge to a correct
   answer, so a failed solve counts as if it spent its whole evaluation budget;
 - `solver_flop_cost`: the flop counts of the solver's own arithmetic, each weighted by the cost of its flop
-  type; a failed solve keeps the cost that it spent;
+  type; a failed solve is charged only the flops it actually spent, not a budget;
 - `total_flop_cost_k<k>`: `solver_flop_cost + k · n_fevals_eff`, the cost of a solve in flops when 1 function
   evaluation costs `k` flops, for each `k` of `FEVAL_FLOP_COSTS`.
 """
@@ -18,10 +18,12 @@ from counted_float import FlopType
 from counted_float.config import get_active_flop_weights
 
 from sunnbear._core.benchmark.runner import solver_flop_count_column_name
+from sunnbear._core.utils.polars_frames import collect_if_eager
 
-from .helpers import collect_if_eager, is_converged_expression
+from .helpers import is_converged_expression
 
-# `add_derived_results` adds 1 `total_flop_cost_k<k>` column for each of these flop costs of 1 function evaluation.
+# Each value is an assumed cost of 1 function evaluation, in flops; `add_derived_results` adds 1
+# `total_flop_cost_k<k>` column per value.
 FEVAL_FLOP_COSTS = (10, 100, 1000)
 
 
@@ -44,9 +46,12 @@ def add_derived_results(frame: pl.LazyFrame) -> pl.LazyFrame: ...
 def add_derived_results(frame: pl.DataFrame | pl.LazyFrame) -> pl.DataFrame | pl.LazyFrame:
     """Return `frame` with the columns of `DERIVED_RESULTS_SCHEMA` added, computed from its raw measurements.
 
+    A solve that did not converge to a correct answer counts as if it spent its whole evaluation budget, the row's
+    `max_fevals`.
+
     The flop types are weighted with counted-float's active flop weights, read when this function is called:
-    `counted_float.config.set_active_flop_weights` changes them for later calls, not for a lazy frame that
-    this function already returned.
+    `counted_float.config.set_active_flop_weights` changes the active flop weights for later calls, not for a lazy
+    frame that this function already returned.
 
     Args:
         frame: A results table with the columns of `RESULTS_SCHEMA`, eager or lazy; the result is of the

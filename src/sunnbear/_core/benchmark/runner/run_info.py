@@ -11,9 +11,7 @@ A run's results depend on:
 A resumed run must depend on exactly the same inputs and versions, so `check_resumable_as` compares the
 stored run info with the run info of the call that resumes the run.
 
-The results of 2 runs can be read as 1 table when `check_combinable_with` accepts their run infos: the runs
-may cover different solvers and test functions, but everything else that their results depend on must be the
-same.
+The results of 2 runs can be read as 1 table when `check_combinable_with` accepts their run infos.
 
 The platform and the timestamps are recorded for information only; neither check compares them.
 """
@@ -41,7 +39,7 @@ from .run_settings import BenchmarkRunSettings
 _REQUIREMENT_NAME_END_PATTERN = re.compile(r"[^A-Za-z0-9._-]")
 
 # These run info fields are recorded for information only; no check compares them.
-_FIELDS_FOR_READERS_ONLY = frozenset({"platform", "started_at", "finished_at"})
+_FIELDS_FOR_INFORMATION_ONLY = frozenset({"platform", "started_at", "finished_at"})
 
 # These run info fields list a run's solvers and test functions; runs that are combined may list different ones.
 _FIELDS_OF_SOLVERS_AND_FUNCTIONS = frozenset({"solver_versions", "function_infos"})
@@ -146,7 +144,7 @@ class BenchmarkRunInfo(BaseModel):
             BenchmarkRunError: If any field other than the platform and the timestamps differs, naming
                 each such field.
         """
-        differing_fields = self._differing_fields(other, ignored_fields=_FIELDS_FOR_READERS_ONLY)
+        differing_fields = self._differing_fields(other, ignored_fields=_FIELDS_FOR_INFORMATION_ONLY)
         if differing_fields:
             raise BenchmarkRunError(
                 f"The run directory holds a run with different {', '.join(differing_fields)}; "
@@ -161,8 +159,8 @@ class BenchmarkRunInfo(BaseModel):
 
         The runs may cover different solvers and test functions, but:
 
-        - every field that the results depend on, apart from the lists of solvers and test functions, such
-          as the run settings, the artifact hashes and the package versions, must be the same;
+        - the run settings, the artifact hashes, the package versions and every other field that the results
+          depend on, apart from the lists of solvers and test functions, must be the same;
         - a solver in both runs must have the same version, and a test function in both runs the same
           c-range;
         - no solver may have run on the same test function in both runs, since the table would then hold
@@ -174,24 +172,27 @@ class BenchmarkRunInfo(BaseModel):
         """
         # --- fields that must be the same -------
         differing_fields = self._differing_fields(
-            other, ignored_fields=_FIELDS_FOR_READERS_ONLY | _FIELDS_OF_SOLVERS_AND_FUNCTIONS
+            other, ignored_fields=_FIELDS_FOR_INFORMATION_ONLY | _FIELDS_OF_SOLVERS_AND_FUNCTIONS
         )
 
         # --- solvers and functions in both runs -
-        shared_solver_ids = sorted(self.solver_versions.keys() & other.solver_versions.keys())
-        if any(self.solver_versions[solver_id] != other.solver_versions[solver_id] for solver_id in shared_solver_ids):
+        common_solver_ids = sorted(self.solver_versions.keys() & other.solver_versions.keys())
+        if any(self.solver_versions[solver_id] != other.solver_versions[solver_id] for solver_id in common_solver_ids):
             differing_fields.append("solver_versions")
-        function_infos = self.function_infos_by_id
-        other_function_infos = other.function_infos_by_id
-        shared_function_ids = sorted(function_infos.keys() & other_function_infos.keys())
-        if any(function_infos[function_id] != other_function_infos[function_id] for function_id in shared_function_ids):
+        function_infos_by_id = self.function_infos_by_id
+        other_function_infos_by_id = other.function_infos_by_id
+        common_function_ids = sorted(function_infos_by_id.keys() & other_function_infos_by_id.keys())
+        if any(
+            function_infos_by_id[function_id] != other_function_infos_by_id[function_id]
+            for function_id in common_function_ids
+        ):
             differing_fields.append("function_infos")
 
         if differing_fields:
             raise BenchmarkRunError(f"The runs have different {', '.join(differing_fields)}.")
-        if shared_solver_ids and shared_function_ids:
+        if common_solver_ids and common_function_ids:
             raise BenchmarkRunError(
-                f"Both runs ran the solvers {shared_solver_ids} on the test functions {shared_function_ids}."
+                f"Both runs ran the solvers {common_solver_ids} on the test functions {common_function_ids}."
             )
 
     # --------------------------------------------------------------------------

@@ -1,9 +1,10 @@
-"""`summarize_results` summarizes a results table per group: its success fractions, and `gpq` levels of chosen columns.
+"""`summarize_results` summarizes a results table per group: its success fractions, and statistics of chosen columns.
 
-`gpq` is the geometric pseudo-quantile of `sunnbear.stats`. Grouping is the caller's choice of columns, e.g.
-`solver_id` for 1 row per solver, or `solver_id` and `function_id` for 1 row per pair. Each `gpq` is computed
-over all rows of a group at once, so a test function with more rows in a group, such as more samples, weighs
-more in that group's `gpq`.
+The statistics are `gpq` levels, the geometric pseudo-quantiles of `sunnbear.stats`. Grouping is the caller's
+choice of columns, e.g. `solver_id` for 1 row per solver, or `solver_id` and `function_id` for 1 row per pair.
+
+Each `gpq` is computed over all rows of a group at once, so a test function that has more rows in a group, for
+example because it ran on more samples, weighs more in that group's `gpq`.
 """
 
 from collections.abc import Mapping, Sequence
@@ -12,9 +13,10 @@ from typing import overload
 import polars as pl
 
 from sunnbear._core.stats.pseudo_quantile_expressions import gpq_expression
+from sunnbear._core.utils.polars_frames import collect_if_eager
 
 from .derived_results import DERIVED_RESULTS_SCHEMA
-from .helpers import collect_if_eager, is_converged_expression
+from .helpers import is_converged_expression
 
 # These are the `gpq` levels of each summarized column when the caller names none: a best-case, a typical and a
 # worst-case value; `gpq` at level 0.5 is the geometric mean.
@@ -22,7 +24,7 @@ DEFAULT_GPQ_LEVELS = (0.25, 0.5, 0.75)
 
 
 def gpq_column_name(column: str, q: float) -> str:
-    """Return the name of the summary column of `column`'s `gpq` at level `q`, e.g. `n_fevals_eff_gpq_25`.
+    """Return the summary column name for the `gpq` of `column` at level `q`, e.g. `n_fevals_eff_gpq_25`.
 
     The level is written in percent, with at least 2 digits: `gpq_05`, `gpq_50`, `gpq_100`, `gpq_12.5`.
     """
@@ -59,11 +61,13 @@ def summarize_results(
     - for each summarized column and each of its levels `q`, the column's `gpq` at `q`, named by
       `gpq_column_name`.
 
+    Each `gpq` is computed over all rows of a group at once, so a test function with more rows in the group weighs
+    more in that group's `gpq`.
+
     Args:
-        frame: A results table with the columns of `RESULTS_SCHEMA` and, for the default `gpq_levels_by_column`,
-            those of
-            `DERIVED_RESULTS_SCHEMA` (see `add_derived_results`); eager or lazy, and the result is of the same
-            kind.
+        frame: A results table with the columns of `RESULTS_SCHEMA` and, for the default
+            `gpq_levels_by_column`, the columns of `DERIVED_RESULTS_SCHEMA` (see `add_derived_results`);
+            eager or lazy, and the result is of the same kind.
         by: The column or columns to group by.
         gpq_levels_by_column: The `gpq` levels to compute, per column. Each column must hold non-negative
             values, and each level must lie between 0 and 1 inclusive, where 0 gives the minimum and 1 the
@@ -86,8 +90,8 @@ def summarize_results(
         for column, levels in gpq_levels_by_column.items()
         for q in levels
     }
-    n_gpq_columns = sum(len(levels) for levels in gpq_levels_by_column.values())
-    if len(gpq_columns) < n_gpq_columns:
+    n_requested_gpq_levels = sum(len(levels) for levels in gpq_levels_by_column.values())
+    if len(gpq_columns) < n_requested_gpq_levels:
         raise ValueError(
             f"gpq_levels_by_column gives a summary column name more than once: {dict(gpq_levels_by_column)}."
         )

@@ -21,7 +21,6 @@ from sunnbear._core.benchmark.protocol import N_BISECTION_FEVALS
 from sunnbear._core.functions.core import TestFunction
 from sunnbear._core.solvers.core import SolverConfig
 
-from .exceptions import BenchmarkRunError
 from .run_dir import BenchmarkRunDir
 from .run_info import BenchmarkRunInfo
 from .run_settings import BenchmarkRunSettings
@@ -138,7 +137,7 @@ def load_results(run_dirs: Path | Sequence[Path]) -> pl.LazyFrame:
     Raises:
         ValueError: If `run_dirs` is an empty sequence.
         BenchmarkRunError: If a run directory holds no run, a malformed run info, or a run that is not
-            finished, or if 2 of the runs are not comparable.
+            finished, or if `BenchmarkRunInfo.check_combinable_with` refuses 2 of the runs.
     """
     if isinstance(run_dirs, Path):
         benchmark_run_dirs = [BenchmarkRunDir(run_dirs)]
@@ -147,15 +146,6 @@ def load_results(run_dirs: Path | Sequence[Path]) -> pl.LazyFrame:
     if not benchmark_run_dirs:
         raise ValueError("run_dirs must hold at least 1 run directory.")
 
-    run_infos = [benchmark_run_dir.read_finished_run_info() for benchmark_run_dir in benchmark_run_dirs]
-    for (benchmark_run_dir, run_info), (other_benchmark_run_dir, other_run_info) in itertools.combinations(
-        zip(benchmark_run_dirs, run_infos, strict=True), 2
-    ):
-        try:
-            run_info.check_combinable_with(other_run_info)
-        except BenchmarkRunError as error:
-            raise BenchmarkRunError(
-                f"The runs in {benchmark_run_dir.path} and {other_benchmark_run_dir.path} cannot be read as 1 table: "
-                f"{error}"
-            ) from error
+    for benchmark_run_dir, other_benchmark_run_dir in itertools.combinations(benchmark_run_dirs, 2):
+        benchmark_run_dir.check_combinable_with(other_benchmark_run_dir)
     return pl.concat([benchmark_run_dir.scan_results() for benchmark_run_dir in benchmark_run_dirs])

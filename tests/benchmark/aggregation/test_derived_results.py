@@ -16,8 +16,8 @@ from sunnbear._core.solvers.core import SolveStatus
 
 from .results_table import results_table
 
-_ADD_COUNT = solver_flop_count_column_name(FlopType.ADD)
-_MUL_COUNT = solver_flop_count_column_name(FlopType.MUL)
+_ADD_COUNT_COLUMN = solver_flop_count_column_name(FlopType.ADD)
+_MUL_COUNT_COLUMN = solver_flop_count_column_name(FlopType.MUL)
 
 
 @pytest.fixture
@@ -61,7 +61,7 @@ def test_only_a_correct_solve_keeps_its_evaluation_count(status, is_correct, exp
 def test_the_flop_costs_weight_the_counts_and_add_the_evaluations(is_correct):
     """`solver_flop_cost` weights each count, also for a failed solve; each total adds `k` flops per evaluation."""
     # --- arrange ----------------------
-    frame = results_table([{"is_correct": is_correct, _ADD_COUNT: 5, _MUL_COUNT: 2}])
+    frame = results_table([{"is_correct": is_correct, _ADD_COUNT_COLUMN: 5, _MUL_COUNT_COLUMN: 2}])
     n_fevals_eff = 10 if is_correct else 160
 
     # --- act --------------------------
@@ -77,7 +77,7 @@ def test_the_flop_costs_weight_the_counts_and_add_the_evaluations(is_correct):
 def test_the_weights_are_read_when_add_derived_results_is_called():
     """A lazy frame keeps the weights that were active when it was built, whatever is active when it is collected."""
     # --- arrange ----------------------
-    derived = add_derived_results(results_table([{_MUL_COUNT: 2}]).lazy())
+    derived = add_derived_results(results_table([{_MUL_COUNT_COLUMN: 2}]).lazy())
 
     # --- act --------------------------
     set_active_flop_weights(FlopWeights(weights=dict.fromkeys(FlopType, 100.0)))

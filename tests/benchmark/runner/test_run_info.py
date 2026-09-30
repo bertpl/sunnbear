@@ -120,7 +120,7 @@ def test_runs_with_other_settings_versions_or_solver_versions_are_not_combinable
         run_info.check_combinable_with(other)
 
 
-def test_runs_with_another_c_range_of_a_shared_function_are_not_combinable(run_info):
+def test_runs_with_another_c_range_of_a_common_function_are_not_combinable(run_info):
     """A test function in both runs must have the same c-range, even when the solvers differ."""
     # --- act / assert -----------------
     with pytest.raises(BenchmarkRunError, match="function_infos"):
@@ -128,7 +128,8 @@ def test_runs_with_another_c_range_of_a_shared_function_are_not_combinable(run_i
 
 
 def test_runs_of_a_solver_on_the_same_function_are_not_combinable(run_info):
-    """A solver that ran on the same test function in both runs would put those solves twice in the table."""
+    """`check_combinable_with` refuses runs in which a solver ran on the same test function, since the table would hold
+    those solves twice."""
     # --- act / assert -----------------
     with pytest.raises(BenchmarkRunError, match=r"ran the solvers \['bisection'\] on the test functions"):
         run_info.check_combinable_with(_run_info_of(["bisection", "regula_falsi"], ["f2.1.1[p1=0.2]"]))
