@@ -136,8 +136,8 @@ class BenchmarkRunDir:
         if all(self.has_staged_function_results(formula_id, idx) for idx in range(n_functions)):
             self.write_formula_results(formula_id, n_functions)
 
-    def scan_results(self) -> pl.LazyFrame:
-        """Return a lazy frame over every formula's results file of a finished run.
+    def read_finished_run_info(self) -> BenchmarkRunInfo:
+        """Return the stored run info of a finished run.
 
         Raises:
             BenchmarkRunError: If the directory holds no run info, a malformed run info, or a run that is not finished.
@@ -147,6 +147,15 @@ class BenchmarkRunDir:
             raise BenchmarkRunError(f"{self.path} holds no benchmark run.")
         if not run_info.is_finished:
             raise BenchmarkRunError(f"The benchmark run in {self.path} is not finished; resume it first.")
+        return run_info
+
+    def scan_results(self) -> pl.LazyFrame:
+        """Return a lazy frame over every formula's results file of a finished run.
+
+        Raises:
+            BenchmarkRunError: If the directory holds no run info, a malformed run info, or a run that is not finished.
+        """
+        run_info = self.read_finished_run_info()
         return pl.scan_parquet([self._formula_results_file(formula_id) for formula_id in run_info.formula_ids])
 
     # --------------------------------------------------------------------------

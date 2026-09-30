@@ -223,3 +223,36 @@ def test_loading_a_run_dir_without_a_run_is_refused(tmp_path):
     # --- act / assert -----------------
     with pytest.raises(BenchmarkRunError, match="holds no benchmark run"):
         load_results(tmp_path)
+
+
+# ==================================================================================================
+#  Loading several runs
+# ==================================================================================================
+def test_the_runs_of_each_solver_load_as_the_table_of_1_run_of_both(finished_run_dir, tmp_path):
+    """A run per solver, loaded together, holds the rows of 1 run of both solvers, run by run."""
+    # --- arrange ----------------------
+    run_dirs = [tmp_path / solver_id for solver_id in _SOLVER_IDS]
+    for solver_id, run_dir in zip(_SOLVER_IDS, run_dirs, strict=True):
+        run_benchmark(**_run_inputs(run_dir, solver_configs=[SolverConfigRegistry.config_from_id(solver_id)]))
+    sort_columns = ["function_id", "mc_sample_idx", "solver_id"]
+
+    # --- act --------------------------
+    results = load_results(run_dirs).drop("wall_time_ns").collect()
+
+    # --- assert -----------------------
+    assert results["solver_id"].unique(maintain_order=True).to_list() == list(_SOLVER_IDS)
+    assert results.sort(sort_columns).equals(_results_without_wall_time(finished_run_dir).sort(sort_columns))
+
+
+def test_loading_a_run_twice_is_refused(finished_run_dir):
+    """The same run loaded twice would hold every solve twice, so `load_results` refuses it."""
+    # --- act / assert -----------------
+    with pytest.raises(BenchmarkRunError, match="cannot be read as 1 table: Both runs ran the solvers"):
+        load_results([finished_run_dir, finished_run_dir])
+
+
+def test_loading_no_run_dir_is_refused():
+    """`load_results` on an empty sequence of run directories raises `ValueError`."""
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match="at least 1 run directory"):
+        load_results([])
