@@ -7,8 +7,9 @@ from max_div import Constraint, MaxDivProblem
 from max_div.metrics import DistanceMetric, DiversityMetric, HybridDiversityMetric
 from max_div.solver import ParallelMaxDivSolverBuilder, ParallelSolvingWarning, Verbosity, seconds
 
+from .bin_definitions import MCTuplesBinDefinitions
 from .exceptions import MCTuplesConstructionError
-from .tuples import N_BINS, MCTuples, axis_bin_indices
+from .tuples import MCTuples, MCTuplesStats
 
 # The inclusion constraint weighs more than the bin constraints, so max-div meets it first.
 INCLUSION_CONSTRAINT_WEIGHT = 10.0
@@ -26,6 +27,16 @@ def select_tuples(
     seed: int,
 ) -> np.ndarray:
     """Return max-div's selection of `k` tuples, including `required_indices`, as sorted population indices.
+
+    The objective maximizes the smaller of 2 weighted min separations:
+
+    - **along the axes**: `k - 1` times the min separation under the L-minus-infinity distance
+      `min(|Δu|, |Δv|)`, which equals the smaller of the min separations along u and along v;
+    - **in the square**: `√k - 1` times the min separation under L2.
+
+    Each weight is the inverse of the spacing of `k` evenly spaced tuples, along an axis or on a square grid,
+    so max-div raises the smallest of the 3 separation fractions of `MCTuplesStats`: along u, along v and in
+    the square.
 
     max-div weighs the bin and inclusion constraints against the objective without enforcing them, so the
     selection is checked against them before it is returned.
@@ -49,10 +60,10 @@ def select_tuples(
         population.astype(np.float32),
         k=k,
         distance_metric=DistanceMetric.l2_euclidean(),
-        diversity_metric=HybridDiversityMetric.geomean_of(
+        diversity_metric=HybridDiversityMetric.min_of(
+            DiversityMetric.MIN_SEPARATION.over(DistanceMetric.l_minus_inf()),
             DiversityMetric.MIN_SEPARATION.over(DistanceMetric.l2_euclidean()),
-            DiversityMetric.MIN_SEPARATION.over(DistanceMetric.along_axis(0)),
-            DiversityMetric.MIN_SEPARATION.over(DistanceMetric.along_axis(1)),
+            weights=(MCTuplesStats.inverse_axis_spacing(k), MCTuplesStats.inverse_grid_spacing(k)),
         ),
         constraints=constraints,
     )
@@ -77,17 +88,17 @@ def select_tuples(
 #  Helpers
 # ==================================================================================================
 def _bin_constraints(population: np.ndarray, k: int) -> list[Constraint]:
-    """Return 1 constraint per bin of each axis, each allowing `k / N_BINS ± 1` selected tuples."""
-    target_count_per_bin = k // N_BINS
+    """Return 1 constraint per bin of each axis, keeping the number of selected tuples in that bin within its bounds."""
+    bin_definitions = MCTuplesBinDefinitions(size=k)
     constraints = []
     for axis in range(2):
-        indices = axis_bin_indices(population[:, axis])
-        for bin_index in range(N_BINS):
+        indices = bin_definitions.bin_indices(population[:, axis])
+        for bin_index in range(bin_definitions.n_bins_per_axis):
             constraints.append(
                 Constraint(
                     int_set=set(np.flatnonzero(indices == bin_index).tolist()),
-                    min_count=target_count_per_bin - 1,
-                    max_count=target_count_per_bin + 1,
+                    min_count=bin_definitions.min_count_per_bin,
+                    max_count=bin_definitions.max_count_per_bin,
                 )
             )
     return constraints
@@ -96,7 +107,8 @@ def _bin_constraints(population: np.ndarray, k: int) -> list[Constraint]:
 def _check_selection(population: np.ndarray, k: int, required_indices: np.ndarray, selection: np.ndarray) -> None:
     """Check that `selection` has `k` distinct tuples, includes `required_indices`, and balances its bins.
 
-    Balanced bins hold `k / N_BINS ± 1` tuples each, on both axes.
+    On both axes, each bin of a balanced selection holds a number of tuples within the bounds of
+    `MCTuplesBinDefinitions` for `k`.
 
     Raises:
         MCTuplesConstructionError: If any check fails.
@@ -107,8 +119,9 @@ def _check_selection(population: np.ndarray, k: int, required_indices: np.ndarra
     if n_missing > 0:
         raise MCTuplesConstructionError(f"Size {k}: {n_missing} tuples of the size below it are not selected.")
     stats = MCTuples.from_population(population, selection).stats()
-    if stats.max_bin_count_deviation > 1:
+    if not stats.are_bin_counts_within_bounds:
+        bin_definitions = stats.bin_definitions
         raise MCTuplesConstructionError(
             f"Size {k}: the bin counts are {list(stats.bin_counts_u)} along u and {list(stats.bin_counts_v)} "
-            f"along v, not all within 1 of {k // N_BINS}."
+            f"along v, not all within [{bin_definitions.min_count_per_bin}, {bin_definitions.max_count_per_bin}]."
         )

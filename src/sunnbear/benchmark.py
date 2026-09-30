@@ -6,6 +6,20 @@ The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples
 set, and `MCTuples` holds either one.
 """
 
-from ._core.benchmark import MCTuples, MCTuplesSize, MCTuplesStats, generate_mc_tuples, load_mc_tuples
+from ._core.benchmark import (
+    MCTuples,
+    MCTuplesBinDefinitions,
+    MCTuplesSize,
+    MCTuplesStats,
+    generate_mc_tuples,
+    load_mc_tuples,
+)
 
-__all__ = ["MCTuples", "MCTuplesSize", "MCTuplesStats", "generate_mc_tuples", "load_mc_tuples"]
+__all__ = [
+    "MCTuples",
+    "MCTuplesBinDefinitions",
+    "MCTuplesSize",
+    "MCTuplesStats",
+    "generate_mc_tuples",
+    "load_mc_tuples",
+]
