@@ -3,6 +3,10 @@ import pytest
 
 from sunnbear.stats import gpq, owg
 
+# The smallest rank weight of these values, (0.5 / 1024) ** p, rounds to 0.0 in float64 for every p above
+# about 97.7, and gpq uses a p of about 98 at level 0.99.
+_VALUES_WITH_A_ZERO = np.linspace(0.0, 9.0, 1024)
+
 
 # ==================================================================================================
 #  owg
@@ -50,7 +54,25 @@ def test_owg_order_invariant():
     assert owg(values, 1.5) == pytest.approx(owg(shuffled, 1.5))
 
 
-@pytest.mark.parametrize("values", [[], [1.0, -2.0], [0.0, 1.0]])
+@pytest.mark.parametrize(
+    "values, p, expected",
+    [
+        ([4.0, 9.0, 1.0], np.inf, 9.0),
+        ([4.0, 9.0, 1.0], -np.inf, 1.0),
+        (_VALUES_WITH_A_ZERO, -3.0, 0.0),
+        (_VALUES_WITH_A_ZERO, 0.0, 0.0),
+        (_VALUES_WITH_A_ZERO, 98.0, 0.0),
+        (_VALUES_WITH_A_ZERO, np.inf, 9.0),
+        (_VALUES_WITH_A_ZERO, -np.inf, 0.0),
+    ],
+)
+def test_owg_exact_results(values, p, expected):
+    """Infinite powers give the exact extremes, and a zero makes the result 0 for every finite p."""
+    # --- act / assert -----------------
+    assert owg(values, p) == expected
+
+
+@pytest.mark.parametrize("values", [[], [1.0, -2.0], [0.0, -1e-300]])
 def test_owg_rejects_invalid_values(values):
     with pytest.raises(ValueError):
         owg(values, 1.0)
@@ -102,7 +124,25 @@ def test_gpq_antisymmetric_calibration():
     assert gpq(values, 0.75) == pytest.approx(owg(values, 2.0))
 
 
-@pytest.mark.parametrize("q", [0.0, 1.0, -0.5, 1.5])
+@pytest.mark.parametrize(
+    "values, q, expected",
+    [
+        ([4.0, 9.0, 1.0], 0.0, 1.0),
+        ([4.0, 9.0, 1.0], 1.0, 9.0),
+        (_VALUES_WITH_A_ZERO, 0.0, 0.0),
+        (_VALUES_WITH_A_ZERO, 0.25, 0.0),
+        (_VALUES_WITH_A_ZERO, 0.5, 0.0),
+        (_VALUES_WITH_A_ZERO, 0.99, 0.0),
+        (_VALUES_WITH_A_ZERO, 1.0, 9.0),
+    ],
+)
+def test_gpq_exact_results(values, q, expected):
+    """The levels 0 and 1 give the exact extremes, and a zero makes the result 0 at every level below 1."""
+    # --- act / assert -----------------
+    assert gpq(values, q) == expected
+
+
+@pytest.mark.parametrize("q", [-0.5, 1.5, -1e-12, 1.0 + 1e-12, float("nan")])
 def test_gpq_rejects_out_of_range_q(q):
     with pytest.raises(ValueError):
         gpq([1.0, 2.0], q)
