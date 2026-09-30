@@ -29,21 +29,23 @@ def owg_expression(column: str, p: float) -> pl.Expr:
     only nulls gives null.
     """
     values = pl.col(column).cast(pl.Float64)
+
+    # --- cases with an exact result -------------
     if p == float("inf"):
         return values.max()
     elif p == float("-inf"):
         return values.min()
-    else:
-        # --- sort & weight ----------------------
-        logs = values.sort(descending=p < 0).log()
-        rank_ramp = (pl.int_range(pl.len()).cast(pl.Float64) + 0.5) / pl.len()
-        weights = rank_ramp.pow(abs(p))
 
-        # --- weighted geometric mean ------------
-        # A zero gives 0 directly, as in `owg`: the weight on the zero can round down to 0.0 in float64, and
-        # 0.0 * log(0) would give NaN.
-        weighted_geometric_mean = ((weights * logs).sum() / weights.sum()).exp()
-        return pl.when(values.min() == 0.0).then(0.0).otherwise(weighted_geometric_mean)
+    # --- sort & weight --------------------------
+    logs = values.sort(descending=p < 0).log()
+    rank_ramp = (pl.int_range(pl.len()).cast(pl.Float64) + 0.5) / pl.len()
+    weights = rank_ramp.pow(abs(p))
+
+    # --- weighted geometric mean ----------------
+    # A zero gives 0 directly, as in `owg`: the weight on the zero can round down to 0.0 in float64, and
+    # 0.0 * log(0) would give NaN.
+    weighted_geometric_mean = ((weights * logs).sum() / weights.sum()).exp()
+    return pl.when(values.min() == 0.0).then(0.0).otherwise(weighted_geometric_mean)
 
 
 # ==================================================================================================
