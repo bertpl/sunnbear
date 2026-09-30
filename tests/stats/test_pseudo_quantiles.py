@@ -50,7 +50,26 @@ def test_owg_order_invariant():
     assert owg(values, 1.5) == pytest.approx(owg(shuffled, 1.5))
 
 
-@pytest.mark.parametrize("values", [[], [1.0, -2.0], [0.0, 1.0]])
+@pytest.mark.parametrize("p, expected", [(np.inf, 9.0), (-np.inf, 1.0)])
+def test_owg_infinite_p_is_exact_extreme(p, expected):
+    # --- arrange ----------------------
+    values = [4.0, 9.0, 1.0]
+
+    # --- act / assert -----------------
+    assert owg(values, p) == expected
+
+
+@pytest.mark.parametrize("p, expected", [(-3.0, 0.0), (0.0, 0.0), (98.0, 0.0), (np.inf, 9.0), (-np.inf, 0.0)])
+def test_owg_with_a_zero(p, expected):
+    """A zero makes every finite-power result 0, including powers large enough to round small weights to 0.0."""
+    # --- arrange ----------------------
+    values = np.linspace(0.0, 9.0, 1024)
+
+    # --- act / assert -----------------
+    assert owg(values, p) == expected
+
+
+@pytest.mark.parametrize("values", [[], [1.0, -2.0], [0.0, -1e-300]])
 def test_owg_rejects_invalid_values(values):
     with pytest.raises(ValueError):
         owg(values, 1.0)
@@ -102,7 +121,25 @@ def test_gpq_antisymmetric_calibration():
     assert gpq(values, 0.75) == pytest.approx(owg(values, 2.0))
 
 
-@pytest.mark.parametrize("q", [0.0, 1.0, -0.5, 1.5])
+@pytest.mark.parametrize("q, expected", [(0.0, 1.0), (1.0, 9.0)])
+def test_gpq_endpoints_are_exact_extremes(q, expected):
+    # --- arrange ----------------------
+    values = [4.0, 9.0, 1.0]
+
+    # --- act / assert -----------------
+    assert gpq(values, q) == expected
+
+
+@pytest.mark.parametrize("q, expected", [(0.0, 0.0), (0.25, 0.0), (0.5, 0.0), (0.99, 0.0), (1.0, 9.0)])
+def test_gpq_with_a_zero(q, expected):
+    # --- arrange ----------------------
+    values = np.linspace(0.0, 9.0, 1024)
+
+    # --- act / assert -----------------
+    assert gpq(values, q) == expected
+
+
+@pytest.mark.parametrize("q", [-0.5, 1.5, -1e-12, 1.0 + 1e-12, float("nan")])
 def test_gpq_rejects_out_of_range_q(q):
     with pytest.raises(ValueError):
         gpq([1.0, 2.0], q)
