@@ -3,6 +3,9 @@ import pytest
 
 from sunnbear.stats import gpq, owg
 
+# 1024 values from 0 to 9, so the smallest rank weight rounds to 0.0 in float64 at powers near 98 (level 0.99).
+_VALUES_WITH_A_ZERO = np.linspace(0.0, 9.0, 1024)
+
 
 # ==================================================================================================
 #  owg
@@ -50,21 +53,23 @@ def test_owg_order_invariant():
     assert owg(values, 1.5) == pytest.approx(owg(shuffled, 1.5))
 
 
-@pytest.mark.parametrize("p, expected", [(np.inf, 9.0), (-np.inf, 1.0)])
-def test_owg_infinite_p_is_exact_extreme(p, expected):
-    # --- arrange ----------------------
-    values = [4.0, 9.0, 1.0]
+@pytest.mark.parametrize(
+    "values, p, expected",
+    [
+        ([4.0, 9.0, 1.0], np.inf, 9.0),
+        ([4.0, 9.0, 1.0], -np.inf, 1.0),
+        (_VALUES_WITH_A_ZERO, -3.0, 0.0),
+        (_VALUES_WITH_A_ZERO, 0.0, 0.0),
+        (_VALUES_WITH_A_ZERO, 98.0, 0.0),
+        (_VALUES_WITH_A_ZERO, np.inf, 9.0),
+        (_VALUES_WITH_A_ZERO, -np.inf, 0.0),
+    ],
+)
+def test_owg_exact_results(values, p, expected):
+    """Infinite powers give the exact extremes, and a zero makes the result 0 for every finite p.
 
-    # --- act / assert -----------------
-    assert owg(values, p) == expected
-
-
-@pytest.mark.parametrize("p, expected", [(-3.0, 0.0), (0.0, 0.0), (98.0, 0.0), (np.inf, 9.0), (-np.inf, 0.0)])
-def test_owg_with_a_zero(p, expected):
-    """A zero makes every finite-power result 0, including powers large enough to round small weights to 0.0."""
-    # --- arrange ----------------------
-    values = np.linspace(0.0, 9.0, 1024)
-
+    The finite powers include a p large enough that the smallest weights round to 0.0.
+    """
     # --- act / assert -----------------
     assert owg(values, p) == expected
 
@@ -121,20 +126,20 @@ def test_gpq_antisymmetric_calibration():
     assert gpq(values, 0.75) == pytest.approx(owg(values, 2.0))
 
 
-@pytest.mark.parametrize("q, expected", [(0.0, 1.0), (1.0, 9.0)])
-def test_gpq_endpoints_are_exact_extremes(q, expected):
-    # --- arrange ----------------------
-    values = [4.0, 9.0, 1.0]
-
-    # --- act / assert -----------------
-    assert gpq(values, q) == expected
-
-
-@pytest.mark.parametrize("q, expected", [(0.0, 0.0), (0.25, 0.0), (0.5, 0.0), (0.99, 0.0), (1.0, 9.0)])
-def test_gpq_with_a_zero(q, expected):
-    # --- arrange ----------------------
-    values = np.linspace(0.0, 9.0, 1024)
-
+@pytest.mark.parametrize(
+    "values, q, expected",
+    [
+        ([4.0, 9.0, 1.0], 0.0, 1.0),
+        ([4.0, 9.0, 1.0], 1.0, 9.0),
+        (_VALUES_WITH_A_ZERO, 0.0, 0.0),
+        (_VALUES_WITH_A_ZERO, 0.25, 0.0),
+        (_VALUES_WITH_A_ZERO, 0.5, 0.0),
+        (_VALUES_WITH_A_ZERO, 0.99, 0.0),
+        (_VALUES_WITH_A_ZERO, 1.0, 9.0),
+    ],
+)
+def test_gpq_exact_results(values, q, expected):
+    """The levels 0 and 1 give the exact extremes, and a zero makes the result 0 at every level below 1."""
     # --- act / assert -----------------
     assert gpq(values, q) == expected
 

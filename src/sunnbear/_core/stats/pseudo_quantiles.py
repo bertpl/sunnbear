@@ -1,7 +1,7 @@
 """Geometric pseudo-quantiles: smooth, log-space stand-ins for hard quantiles.
 
 The ordered weighted geometric mean (OWG) weights sorted samples by a power law
-of their rank, yielding a statistic that slides continuously between ``min``,
+of their rank, yielding a statistic that ranges continuously between ``min``,
 geometric mean, and ``max`` as its power parameter varies. `gpq` calibrates that
 power so the weight distribution's center of mass sits at a requested quantile
 level, giving a smooth alternative to ``np.quantile`` for non-negative,
@@ -22,14 +22,15 @@ def owg(values: ArrayLike, p: float) -> float:
 
     Sorts the values (ascending for ``p >= 0``, descending for ``p < 0``) and
     weights each by ``rank_ramp ** |p|``, where the rank ramp runs over the
-    interval midpoints ``(i + 0.5) / n``. The result slides from ``min(values)``
+    interval midpoints ``(i + 0.5) / n``. The result ranges from ``min(values)``
     (``p = -inf``) through the plain geometric mean (``p = 0``) to
     ``max(values)`` (``p = +inf``).
 
-    Every weight is positive for a finite ``p``, so a single zero among the
-    values makes the result 0, as it does for any geometric mean. That case is
-    returned directly: for a large ``|p|`` and many values, the smallest
-    weights round down to 0.0 in float64, and ``0.0 * log(0)`` would give NaN.
+    A single zero among the values makes the result 0, as it does for any
+    geometric mean, because every weight is mathematically positive for a
+    finite ``p``. The function returns 0 directly in that case: for a large
+    ``|p|`` and many values, the weight on the zero can round down to 0.0 in
+    float64, and ``0.0 * log(0)`` would give NaN.
 
     Args:
         values: Non-negative samples; at least one required.
@@ -38,7 +39,9 @@ def owg(values: ArrayLike, p: float) -> float:
             maximum and minimum.
 
     Returns:
-        The weighted geometric mean ``exp(sum(w * ln(v)) / sum(w))``.
+        The weighted geometric mean ``exp(sum(w * ln(v)) / sum(w))``; 0 if any
+        value is 0 and ``p`` is finite, and ``max(values)`` or ``min(values)``
+        for ``p = +inf`` or ``p = -inf``.
 
     Raises:
         ValueError: If `values` is empty or contains negative entries.
@@ -75,10 +78,12 @@ def gpq(values: ArrayLike, q: float) -> float:
 
     An `owg` whose power is calibrated via ``p(q) = (2q - 1) / min(q, 1 - q)``
     so that the weight distribution's center of mass sits at quantile level `q`
-    (in the large-n limit). ``gpq(x, 0.5)`` is the plain geometric mean, and
-    ``gpq(x, 0)`` and ``gpq(x, 1)`` are exactly ``min(x)`` and ``max(x)``, the
-    limits of ``p(q)`` at those levels. Note the calibration targets the
-    *weight* center of mass, not the hard quantile value itself.
+    (in the large-n limit).
+
+    ``gpq(x, 0.5)`` is the plain geometric mean, and ``gpq(x, 0)`` and
+    ``gpq(x, 1)`` are exactly ``min(x)`` and ``max(x)``, because ``p(q)`` tends
+    to ``-inf`` and ``+inf`` at those levels. Note that the calibration targets
+    the *weight* center of mass, not the hard quantile value itself.
 
     Args:
         values: Non-negative samples; at least one required. A zero makes the
@@ -89,8 +94,8 @@ def gpq(values: ArrayLike, q: float) -> float:
         The calibrated ordered weighted geometric mean.
 
     Raises:
-        ValueError: If `q` is outside the interval [0, 1], or `values` fails
-            `owg` validation.
+        ValueError: If `q` is NaN or outside the interval [0, 1], or `values`
+            fails `owg` validation.
     """
     if not 0.0 <= q <= 1.0:
         raise ValueError(f"gpq requires 0 <= q <= 1 (got {q}).")
