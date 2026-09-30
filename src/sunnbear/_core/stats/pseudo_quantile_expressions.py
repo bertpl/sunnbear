@@ -1,7 +1,7 @@
-"""Polars expressions that compute `owg` and `gpq` per group of a group-by, with the same results as the numpy functions.
+"""Polars expressions that compute `owg` and `gpq` per group of a group-by, with the results of the numpy functions.
 
 Calling the numpy functions once per group would run Python code for every group, which is slow for the
-10⁴–10⁵ groups of a large results table; these expressions run inside polars. They follow `owg` and `gpq`
+10^4 to 10^5 groups of a large results table; these expressions run inside polars. They follow `owg` and `gpq`
 case by case: the exact extremes at infinite powers, 0 for a group that contains a zero, and the rank-weighted
 geometric mean otherwise.
 
