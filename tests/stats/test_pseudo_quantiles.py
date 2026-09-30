@@ -3,7 +3,8 @@ import pytest
 
 from sunnbear.stats import gpq, owg
 
-# 1024 values from 0 to 9, so the smallest rank weight rounds to 0.0 in float64 at powers near 98 (level 0.99).
+# The smallest rank weight of these values, (0.5 / 1024) ** p, rounds to 0.0 in float64 for every p above
+# about 97.7, and gpq uses a p of about 98 at level 0.99.
 _VALUES_WITH_A_ZERO = np.linspace(0.0, 9.0, 1024)
 
 
@@ -66,10 +67,7 @@ def test_owg_order_invariant():
     ],
 )
 def test_owg_exact_results(values, p, expected):
-    """Infinite powers give the exact extremes, and a zero makes the result 0 for every finite p.
-
-    The finite powers include a p large enough that the smallest weights round to 0.0.
-    """
+    """Infinite powers give the exact extremes, and a zero makes the result 0 for every finite p."""
     # --- act / assert -----------------
     assert owg(values, p) == expected
 
