@@ -9,7 +9,7 @@
 """
 
 from .exceptions import BenchmarkRunError
-from .results_schema import RESULTS_SCHEMA, flop_count_column_name
+from .results_schema import RESULTS_SCHEMA, solver_flop_count_column_name
 from .run_dir import BenchmarkRunDir
 from .run_info import BenchmarkRunInfo
 from .run_settings import BenchmarkRunSettings
