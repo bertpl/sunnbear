@@ -30,9 +30,9 @@ RESULTS_SCHEMA: dict[str, pl.DataType] = {
     "v": pl.Float64(),
     "xtol": pl.Float64(),
     "c": pl.Float64(),
-    # This column holds the solve's evaluation limit, the same on every row of a run. It is stored so that the
-    # evaluation count of a failed solve can be replaced by the limit without the run info, also after the rows
-    # of several runs are combined or filtered.
+    # This column holds the solve's evaluation limit, the same on every row of a run. It is stored on each row so
+    # that the evaluation count of a failed solve can be replaced by the limit without reading the run info, even
+    # after the rows of several runs are combined or filtered.
     "max_fevals": pl.Int32(),
     # These columns hold the raw measurements.
     "x_found": pl.Float64(),

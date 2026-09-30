@@ -1,4 +1,4 @@
-"""`add_derived_results` censors failed solves at their budget, weights flop counts, and adds the total flop costs."""
+"""`add_derived_results` counts failed solves at their budget, weights flop counts, and adds the total flop costs."""
 
 import polars as pl
 import pytest
@@ -12,6 +12,7 @@ from sunnbear._core.benchmark.aggregation import (
     total_flop_cost_column_name,
 )
 from sunnbear._core.benchmark.runner import RESULTS_SCHEMA, solver_flop_count_column_name
+from sunnbear._core.solvers.core import SolveStatus
 
 from .results_table import results_table
 
@@ -23,14 +24,14 @@ _MUL_COUNT = solver_flop_count_column_name(FlopType.MUL)
 def unit_weights_with_mul_at_3():
     """Set counted-float's active flop weights to 1 for every flop type but 3 for MUL, and restore them afterwards."""
     active_weights = get_active_flop_weights()
-    set_active_flop_weights(FlopWeights(weights={flop_type: 1.0 for flop_type in FlopType} | {FlopType.MUL: 3.0}))
+    set_active_flop_weights(FlopWeights(weights=dict.fromkeys(FlopType, 1.0) | {FlopType.MUL: 3.0}))
     yield
     set_active_flop_weights(active_weights)
 
 
 @pytest.mark.parametrize("is_lazy", [False, True])
 def test_the_derived_columns_are_added_to_a_frame_of_the_same_kind(is_lazy):
-    """An eager frame gives an eager frame and a lazy one a lazy one, with the columns of `DERIVED_RESULTS_SCHEMA` added."""
+    """An eager frame gives an eager one and a lazy frame a lazy one, with the derived columns added."""
     # --- arrange ----------------------
     frame = results_table([{}])
 
@@ -44,14 +45,7 @@ def test_the_derived_columns_are_added_to_a_frame_of_the_same_kind(is_lazy):
 
 @pytest.mark.parametrize(
     "status, is_correct, expected_n_fevals_eff",
-    [
-        ("converged", True, 10),
-        ("converged", False, 160),
-        ("max_fevals", False, 160),
-        ("diverged", False, 160),
-        ("function_error", False, 160),
-        ("solver_error", False, 160),
-    ],
+    [("converged", True, 10)] + [(status.value, False, 160) for status in SolveStatus],
 )
 def test_only_a_correct_solve_keeps_its_evaluation_count(status, is_correct, expected_n_fevals_eff):
     """`n_fevals_eff` is `n_fevals` for a converged, correct solve, and the row's `max_fevals` for any other."""
@@ -86,7 +80,7 @@ def test_the_weights_are_read_when_add_derived_results_is_called():
     derived = add_derived_results(results_table([{_MUL_COUNT: 2}]).lazy())
 
     # --- act --------------------------
-    set_active_flop_weights(FlopWeights(weights={flop_type: 100.0 for flop_type in FlopType}))
+    set_active_flop_weights(FlopWeights(weights=dict.fromkeys(FlopType, 100.0)))
 
     # --- assert -----------------------
     assert derived.collect()["solver_flop_cost"].item() == 2 * 3.0

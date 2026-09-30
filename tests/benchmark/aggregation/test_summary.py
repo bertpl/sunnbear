@@ -50,7 +50,7 @@ def test_by_default_every_derived_column_is_summarized_at_the_default_levels(is_
 
 
 def test_the_rows_hold_each_group_s_fractions_and_gpq_levels():
-    """Each group gets its converged and correct fractions and the `gpq` of its own rows, groups in order of appearance."""
+    """Each group gets its success fractions and the `gpq` of its own rows, groups in order of first appearance."""
     # --- act --------------------------
     summary = summarize_results(_results_of_2_solvers(), ["solver_id"])
 
@@ -64,12 +64,12 @@ def test_the_rows_hold_each_group_s_fractions_and_gpq_levels():
 
 
 def test_each_column_is_summarized_at_its_own_levels():
-    """`gpq_levels` names the columns and their levels; levels 0 and 1 give the minimum and maximum."""
+    """`gpq_levels_by_column` names the columns and their levels; levels 0 and 1 give the minimum and maximum."""
     # --- act --------------------------
     summary = summarize_results(
         _results_of_2_solvers(),
         "solver_id",
-        gpq_levels={"n_fevals_eff": (0.0, 1.0), "n_fevals": (0.125,)},
+        gpq_levels_by_column={"n_fevals_eff": (0.0, 1.0), "n_fevals": (0.125,)},
     )
 
     # --- assert -----------------------
@@ -79,7 +79,7 @@ def test_each_column_is_summarized_at_its_own_levels():
 
 
 @pytest.mark.parametrize(
-    "frame, gpq_levels, message",
+    "frame, gpq_levels_by_column, message",
     [
         (results_table([{}]), None, "lacks the columns .* add_derived_results first"),
         (results_table([{}]), {"no_such_column": (0.5,)}, r"lacks the columns \['no_such_column'\]\.$"),
@@ -87,11 +87,11 @@ def test_each_column_is_summarized_at_its_own_levels():
         (results_table([{}]), {"n_fevals": (1.5,)}, "0 <= q <= 1"),
     ],
 )
-def test_invalid_columns_or_levels_are_refused(frame, gpq_levels, message):
+def test_invalid_columns_or_levels_are_refused(frame, gpq_levels_by_column, message):
     """A missing column, a repeated level or an out-of-range level raises `ValueError` before any group is computed."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=message):
-        summarize_results(frame, "solver_id", gpq_levels=gpq_levels)
+        summarize_results(frame, "solver_id", gpq_levels_by_column=gpq_levels_by_column)
 
 
 @pytest.mark.parametrize(

@@ -1,11 +1,15 @@
-"""Polars expressions that compute `owg` and `gpq` per group of a group-by, with the results of the numpy functions.
+"""This module builds polars expressions that compute `owg` and `gpq` per group, as the numpy functions do.
 
-Calling the numpy functions once per group would run Python code for every group, which is slow for the
-10^4 to 10^5 groups of a large results table; these expressions run inside polars. They follow `owg` and `gpq`
-case by case: the exact extremes at infinite powers, 0 for a group that contains a zero, and the rank-weighted
-geometric mean otherwise.
+`owg` is the ordered weighted geometric mean and `gpq` the geometric pseudo-quantile. Calling the numpy
+functions once per group would run Python code for every group, which is slow for the 10^4 to 10^5 groups of
+a large results table; these expressions run inside polars. They follow `owg` and `gpq` case by case:
 
-They are kept apart from `pseudo_quantiles`, so that importing the numpy functions does not import polars.
+- the exact extremes at infinite powers;
+- 0 for a group that contains a zero;
+- the rank-weighted geometric mean otherwise.
+
+These expressions are kept apart from `pseudo_quantiles`, so that importing the numpy functions does not
+import polars.
 """
 
 import polars as pl

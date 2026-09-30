@@ -229,7 +229,7 @@ def test_loading_a_run_dir_without_a_run_is_refused(tmp_path):
 #  Loading several runs
 # ==================================================================================================
 def test_the_runs_of_each_solver_load_as_the_table_of_1_run_of_both(finished_run_dir, tmp_path):
-    """A run per solver, loaded together, holds the rows of 1 run of both solvers, run by run."""
+    """2 runs of 1 solver each, loaded together, give the rows of 1 run of both solvers, run by run."""
     # --- arrange ----------------------
     run_dirs = [tmp_path / solver_id for solver_id in _SOLVER_IDS]
     for solver_id, run_dir in zip(_SOLVER_IDS, run_dirs, strict=True):

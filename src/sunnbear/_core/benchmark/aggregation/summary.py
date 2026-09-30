@@ -1,8 +1,9 @@
 """`summarize_results` summarizes a results table per group: its success fractions, and `gpq` levels of chosen columns.
 
-Grouping is the caller's choice of columns, e.g. `solver_id` for 1 row per solver, or `solver_id` and
-`function_id` for 1 row per pair. Each `gpq` is computed over all rows of a group at once: a group that holds
-more rows of one member, such as more samples of one test function, weighs that member more.
+`gpq` is the geometric pseudo-quantile of `sunnbear.stats`. Grouping is the caller's choice of columns, e.g.
+`solver_id` for 1 row per solver, or `solver_id` and `function_id` for 1 row per pair. Each `gpq` is computed
+over all rows of a group at once, so a test function with more rows in a group, such as more samples, weighs
+more in that group's `gpq`.
 """
 
 from collections.abc import Mapping, Sequence
@@ -10,14 +11,13 @@ from typing import overload
 
 import polars as pl
 
-from sunnbear._core.solvers.core import SolveStatus
 from sunnbear._core.stats.pseudo_quantile_expressions import gpq_expression
 
 from .derived_results import DERIVED_RESULTS_SCHEMA
-from .helpers import collect_if_eager
+from .helpers import collect_if_eager, is_converged_expression
 
-# The `gpq` levels of each summarized column when the caller names none: a best-case, a typical and a worst-case
-# value; `gpq` at level 0.5 is the geometric mean.
+# These are the `gpq` levels of each summarized column when the caller names none: a best-case, a typical and a
+# worst-case value; `gpq` at level 0.5 is the geometric mean.
 DEFAULT_GPQ_LEVELS = (0.25, 0.5, 0.75)
 
 
@@ -31,17 +31,23 @@ def gpq_column_name(column: str, q: float) -> str:
 
 @overload
 def summarize_results(
-    frame: pl.DataFrame, by: str | Sequence[str], *, gpq_levels: Mapping[str, Sequence[float]] | None = None
+    frame: pl.DataFrame,
+    by: str | Sequence[str],
+    *,
+    gpq_levels_by_column: Mapping[str, Sequence[float]] | None = None,
 ) -> pl.DataFrame: ...
 @overload
 def summarize_results(
-    frame: pl.LazyFrame, by: str | Sequence[str], *, gpq_levels: Mapping[str, Sequence[float]] | None = None
+    frame: pl.LazyFrame,
+    by: str | Sequence[str],
+    *,
+    gpq_levels_by_column: Mapping[str, Sequence[float]] | None = None,
 ) -> pl.LazyFrame: ...
 def summarize_results(
     frame: pl.DataFrame | pl.LazyFrame,
     by: str | Sequence[str],
     *,
-    gpq_levels: Mapping[str, Sequence[float]] | None = None,
+    gpq_levels_by_column: Mapping[str, Sequence[float]] | None = None,
 ) -> pl.DataFrame | pl.LazyFrame:
     """Return 1 row per group of `frame`, grouped by the columns `by`, in order of first appearance.
 
@@ -54,38 +60,44 @@ def summarize_results(
       `gpq_column_name`.
 
     Args:
-        frame: A results table with the columns of `RESULTS_SCHEMA` and, for the default `gpq_levels`, those of
+        frame: A results table with the columns of `RESULTS_SCHEMA` and, for the default `gpq_levels_by_column`,
+            those of
             `DERIVED_RESULTS_SCHEMA` (see `add_derived_results`); eager or lazy, and the result is of the same
             kind.
         by: The column or columns to group by.
-        gpq_levels: The `gpq` levels to compute, per column; the columns hold non-negative values, and a
-            level between 0 and 1 inclusive, where 0 gives the minimum and 1 the maximum. ``None`` summarizes
-            every column of `DERIVED_RESULTS_SCHEMA` at `DEFAULT_GPQ_LEVELS`. The cost of the summary grows
-            with the number of columns times levels, so on a large table, ask only for the levels you need.
+        gpq_levels_by_column: The `gpq` levels to compute, per column. Each column must hold non-negative
+            values, and each level must lie between 0 and 1 inclusive, where 0 gives the minimum and 1 the
+            maximum. ``None`` summarizes every column of `DERIVED_RESULTS_SCHEMA` at `DEFAULT_GPQ_LEVELS`. The
+            cost of the summary grows with the number of columns times levels, so on a large table, ask only
+            for the levels you need.
 
     Raises:
-        ValueError: If a level is outside [0, 1] or gives a summary column name twice, or if `frame` lacks a
-            column to group by or to summarize.
+        ValueError: If a level is outside [0, 1], if 2 levels of a column give the same summary column name,
+            or if `frame` lacks a column to group by or to summarize.
     """
-    if gpq_levels is None:
-        gpq_levels = {column: DEFAULT_GPQ_LEVELS for column in DERIVED_RESULTS_SCHEMA}
+    if gpq_levels_by_column is None:
+        gpq_levels_by_column = dict.fromkeys(DERIVED_RESULTS_SCHEMA, DEFAULT_GPQ_LEVELS)
     group_columns = [by] if isinstance(by, str) else list(by)
-    _validate_has_columns(frame, [*group_columns, "status", "is_correct", *gpq_levels])
+    _validate_has_columns(frame, [*group_columns, "status", "is_correct", *gpq_levels_by_column])
 
     # --- gpq columns ----------------------------
     gpq_columns = {
-        gpq_column_name(column, q): gpq_expression(column, q) for column, levels in gpq_levels.items() for q in levels
+        gpq_column_name(column, q): gpq_expression(column, q)
+        for column, levels in gpq_levels_by_column.items()
+        for q in levels
     }
-    n_gpq_columns = sum(len(levels) for levels in gpq_levels.values())
+    n_gpq_columns = sum(len(levels) for levels in gpq_levels_by_column.values())
     if len(gpq_columns) < n_gpq_columns:
-        raise ValueError(f"gpq_levels gives a summary column name more than once: {dict(gpq_levels)}.")
+        raise ValueError(
+            f"gpq_levels_by_column gives a summary column name more than once: {dict(gpq_levels_by_column)}."
+        )
 
     # --- aggregate per group --------------------
     result = (
         frame.lazy()
         .group_by(group_columns, maintain_order=True)
         .agg(
-            (pl.col("status") == SolveStatus.CONVERGED.value).mean().alias("converged_fraction"),
+            is_converged_expression().mean().alias("converged_fraction"),
             pl.col("is_correct").mean().alias("correct_fraction"),
             *(expression.alias(name) for name, expression in gpq_columns.items()),
         )

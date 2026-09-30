@@ -8,8 +8,7 @@ from sunnbear._core.benchmark.runner import RESULTS_SCHEMA
 def results_table(rows: list[dict[str, object]]) -> pl.DataFrame:
     """Return a table with the columns of `RESULTS_SCHEMA`: each row's own values, and fixed values elsewhere.
 
-    The fixed values are those of a correct solve of bisection on 1 test function, with 10 of its 160 evaluations
-    and no counted flops.
+    The fixed values are those of a converged, correct solve with no counted flops.
     """
     defaults: dict[str, object] = {
         "solver_id": "bisection",

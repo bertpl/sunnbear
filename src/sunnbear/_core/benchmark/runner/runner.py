@@ -128,16 +128,12 @@ def run_benchmark(
 def load_results(run_dirs: Path | Sequence[Path]) -> pl.LazyFrame:
     """Return a lazy frame over the results of 1 or more finished runs, 1 row per solve.
 
-    The results of several runs are read as 1 table, run by run in the order given, only when they are
-    comparable: the runs may cover different solvers and test functions, but must share their run settings,
-    data artifacts and package versions, and no solver may have run on the same test function in 2 of them
-    (see `BenchmarkRunInfo.check_combinable_with`).
+    The results of several runs are read as 1 table, run by run in the order given, only when
+    `BenchmarkRunInfo.check_combinable_with` accepts every pair of them: the runs may cover different solvers
+    and test functions, but everything else that their results depend on must be the same.
 
     A query on the frame reads only the files, row groups and columns that it needs. The columns and their
     types are those of `RESULTS_SCHEMA`.
-
-    Args:
-        run_dirs: 1 run directory, or a sequence of them.
 
     Raises:
         ValueError: If `run_dirs` is an empty sequence.
@@ -152,13 +148,14 @@ def load_results(run_dirs: Path | Sequence[Path]) -> pl.LazyFrame:
         raise ValueError("run_dirs must hold at least 1 run directory.")
 
     run_infos = [benchmark_run_dir.read_finished_run_info() for benchmark_run_dir in benchmark_run_dirs]
-    for (run_dir, run_info), (other_run_dir, other_run_info) in itertools.combinations(
+    for (benchmark_run_dir, run_info), (other_benchmark_run_dir, other_run_info) in itertools.combinations(
         zip(benchmark_run_dirs, run_infos, strict=True), 2
     ):
         try:
             run_info.check_combinable_with(other_run_info)
         except BenchmarkRunError as error:
             raise BenchmarkRunError(
-                f"The runs in {run_dir.path} and {other_run_dir.path} cannot be read as 1 table: {error}"
+                f"The runs in {benchmark_run_dir.path} and {other_benchmark_run_dir.path} cannot be read as 1 table: "
+                f"{error}"
             ) from error
     return pl.concat([benchmark_run_dir.scan_results() for benchmark_run_dir in benchmark_run_dirs])

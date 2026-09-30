@@ -1,7 +1,7 @@
-"""`add_derived_results` adds the columns of `DERIVED_RESULTS_SCHEMA`, computed from the raw measurements of a results table.
+"""`add_derived_results` adds the columns of `DERIVED_RESULTS_SCHEMA`, computed from a results table's raw measurements.
 
-The results table stores only raw measurements (see `RESULTS_SCHEMA`); the values that the benchmark compares
-are derived from them when a table is analyzed:
+The results table stores only raw measurements (see `RESULTS_SCHEMA`); the benchmark's comparison values are
+derived from them when a table is analyzed:
 
 - `n_fevals_eff`: the evaluation count, or the row's `max_fevals` when the solve did not converge to a correct
   answer, so a failed solve counts as if it spent its whole evaluation budget;
@@ -18,11 +18,10 @@ from counted_float import FlopType
 from counted_float.config import get_active_flop_weights
 
 from sunnbear._core.benchmark.runner import solver_flop_count_column_name
-from sunnbear._core.solvers.core import SolveStatus
 
-from .helpers import collect_if_eager
+from .helpers import collect_if_eager, is_converged_expression
 
-# The flop costs of 1 function evaluation for which `total_flop_cost_k<k>` columns are added.
+# `add_derived_results` adds 1 `total_flop_cost_k<k>` column for each of these flop costs of 1 function evaluation.
 FEVAL_FLOP_COSTS = (10, 100, 1000)
 
 
@@ -60,16 +59,14 @@ def add_derived_results(frame: pl.DataFrame | pl.LazyFrame) -> pl.DataFrame | pl
     if flop_weights.has_missing_data():
         raise ValueError("counted-float's active flop weights hold an unknown (NaN) weight; set complete weights.")
 
-    # --- censored evaluations, solver cost ------
-    is_correct_solve = (pl.col("status") == SolveStatus.CONVERGED.value) & pl.col("is_correct")
+    # --- evaluation counts, solver cost ---------
+    is_correct_solve = is_converged_expression() & pl.col("is_correct")
     n_fevals_eff = pl.when(is_correct_solve).then(pl.col("n_fevals")).otherwise(pl.col("max_fevals"))
     solver_flop_cost = pl.sum_horizontal(
         pl.col(solver_flop_count_column_name(flop_type)) * float(flop_weights.weights[flop_type])
         for flop_type in FlopType
     )
-    result = frame.lazy().with_columns(
-        n_fevals_eff.alias("n_fevals_eff"), solver_flop_cost.alias("solver_flop_cost")
-    )
+    result = frame.lazy().with_columns(n_fevals_eff.alias("n_fevals_eff"), solver_flop_cost.alias("solver_flop_cost"))
 
     # --- total costs ----------------------------
     result = result.with_columns(
