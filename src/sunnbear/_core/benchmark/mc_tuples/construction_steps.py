@@ -27,7 +27,7 @@ from .tuples import MCTuples, MCTuplesStats
 # The number of random candidate tuples per selected cell in the refinement step.
 CANDIDATES_PER_CELL = 100
 
-# The constraint that keeps the tuples of the size below weighs more than the band constraints, so max-div meets it first.
+# The constraint that keeps the tuples of the size below outweighs the band constraints, so max-div meets it first.
 INCLUSION_CONSTRAINT_WEIGHT = 10.0
 
 

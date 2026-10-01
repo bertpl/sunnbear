@@ -1,4 +1,4 @@
-"""`LatinHypercubeGrid` finds a size's free bands, numbers its cells, samples inside them, and checks a Latin hypercube."""
+"""`LatinHypercubeGrid` finds the free bands, numbers the cells, samples inside them, and checks a Latin hypercube."""
 
 import numpy as np
 import pytest

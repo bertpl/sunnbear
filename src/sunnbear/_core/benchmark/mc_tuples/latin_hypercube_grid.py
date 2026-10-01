@@ -36,7 +36,7 @@ class LatinHypercubeGrid:
 
     @classmethod
     def for_size(cls, size: int, required: MCTuples | None) -> Self:
-        """Return the grid of `size`, whose tuples include `required`, the size below it (None for the smallest size)."""
+        """Return the grid of `size` above `required`, the tuples of the size below (None for the smallest size)."""
         if required is None:
             return cls(size, np.arange(size), np.arange(size))
         return cls(
@@ -62,7 +62,7 @@ class LatinHypercubeGrid:
         )
 
     def latin_hypercube_cells(self, permutation: np.ndarray) -> np.ndarray:
-        """Return the cells that pair free u band `i` with free v band `permutation[i]`, 1 per free band on each axis."""
+        """Return the cells that pair free u band `i` with free v band `permutation[i]`: 1 per free band per axis."""
         return np.arange(self.free_u_bands.size) * self.free_v_bands.size + permutation
 
     def sample_in_cells(self, cells: np.ndarray, n_per_cell: int, rng: np.random.Generator) -> np.ndarray:
