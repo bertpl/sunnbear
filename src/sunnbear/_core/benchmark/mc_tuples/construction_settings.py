@@ -7,9 +7,11 @@ Each size takes 2 max-div solves (`MCTuplesConstructionStep`). The total time is
   the solve's work.
 
 From `MIN_T_TOTAL_AT_FULL_SCALE_SEC` up, the construction builds every size of `MCTuplesSize` with every
-requested worker. Below it, the number of sizes and the worker count scale down together, so that short runs
-such as tests still run a real construction: the shortest runs build only the 2 smallest sizes, which still
-tests the nesting; production runs are far longer and never scale down.
+requested worker.
+
+Below `MIN_T_TOTAL_AT_FULL_SCALE_SEC`, the number of sizes and the worker count scale down together, so that
+short runs such as tests still run a real construction: the shortest runs build only the 2 smallest sizes,
+which still tests the nesting; production runs are far longer and never scale down.
 """
 
 from dataclasses import dataclass
@@ -50,7 +52,8 @@ class MCTuplesConstructionSettings:
         - the number of sizes is `MIN_N_SIZES + floor(scale · (len(MCTuplesSize) - MIN_N_SIZES))`;
         - the worker count is `max(1, round(scale · n_workers))`;
         - each solve gets `MIN_T_BUDGET_FRACTION_PER_SOLVE · t_total_sec`, and the rest of the total is
-          split in proportion to `n · k`.
+          split in proportion to `n · k`, the step's number of candidates (`MCTuplesConstructionStep.n_candidates`)
+          times the size.
 
         Raises:
             ValueError: If `t_total_sec` is below `MIN_T_TOTAL_SEC`, or `n_workers` below 1.
@@ -62,8 +65,8 @@ class MCTuplesConstructionSettings:
         scale = min(1.0, t_total_sec / MIN_T_TOTAL_AT_FULL_SCALE_SEC)
         sizes = tuple(MCTuplesSize)[: MIN_N_SIZES + int(scale * (len(MCTuplesSize) - MIN_N_SIZES))]
 
-        # --- time per solve -------------------------
-        work = {(k, step): step.pool_size(k) * k for k in sizes for step in MCTuplesConstructionStep}
+        # --- time per solve ---------------------
+        work = {(k, step): step.n_candidates(k) * k for k in sizes for step in MCTuplesConstructionStep}
         min_t_budget_per_solve_sec = MIN_T_BUDGET_FRACTION_PER_SOLVE * t_total_sec
         t_rest_sec = t_total_sec - len(work) * min_t_budget_per_solve_sec
         return cls(

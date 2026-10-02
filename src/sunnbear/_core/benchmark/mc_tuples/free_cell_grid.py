@@ -1,9 +1,11 @@
-"""`LatinHypercubeGrid` holds the grid cells in which 1 size of the tuple set places its new tuples.
+"""`FreeCellGrid` holds the grid cells for the new tuples of 1 size of the tuple set.
 
 A set of `size` tuples is a Latin hypercube when each of the `size` equal bands of [0, 1) along u, and
-each along v, holds exactly 1 tuple. The tuple set is nested: each size includes the size below it, whose
-tuples already occupy half of the bands. The new tuples of a size go in the cells where a free band along u
-crosses a free band along v, 1 per free band on each axis, so the size is again a Latin hypercube.
+each along v, holds exactly 1 tuple.
+
+The tuple set is nested: each size includes the size below it, whose tuples already occupy half of the
+bands. The new tuples of a size go in the cells where a free u band crosses a free v band, 1 per free band
+on each axis, so the size is again a Latin hypercube.
 """
 
 from dataclasses import dataclass
@@ -15,35 +17,39 @@ from .tuples import MCTuples
 
 
 # ==================================================================================================
-#  LatinHypercubeGrid
+#  FreeCellGrid
 # ==================================================================================================
 @dataclass(frozen=True)
-class LatinHypercubeGrid:
-    """`LatinHypercubeGrid` is the grid of 1 size: the bands along u and along v that hold no tuple of the size below.
+class FreeCellGrid:
+    """`FreeCellGrid` holds, for 1 size of the tuple set, the bands on each axis that hold no tuple of the size below.
 
     The cells are the crossings of a free u band and a free v band, numbered row by row: cell
     `i * len(free_v_bands) + j` crosses the free u band `free_u_bands[i]` and the free v band `free_v_bands[j]`.
 
     Attributes:
         size: The number of tuples of the size, which is also the number of bands per axis.
+        required_tuples: The tuples of the size below, which the size includes; None for the smallest size.
         free_u_bands: The indices of the u bands that hold no tuple of the size below, ascending.
         free_v_bands: The indices of the v bands that hold no tuple of the size below, ascending.
     """
 
     size: int
+    required_tuples: MCTuples | None
     free_u_bands: np.ndarray
     free_v_bands: np.ndarray
 
     @classmethod
-    def for_size(cls, size: int, required: MCTuples | None) -> Self:
-        """Return the grid of `size` above `required`, the tuples of the size below (None for the smallest size)."""
-        if required is None:
-            return cls(size, np.arange(size), np.arange(size))
-        return cls(
-            size,
-            np.setdiff1d(np.arange(size), cls.band_indices(required.u, size)),
-            np.setdiff1d(np.arange(size), cls.band_indices(required.v, size)),
-        )
+    def for_size(cls, size: int, required_tuples: MCTuples | None) -> Self:
+        """Return the grid for `size`, given `required_tuples`, the tuples of the size below (None at the smallest)."""
+        if required_tuples is None:
+            return cls(size, None, np.arange(size), np.arange(size))
+        else:
+            return cls(
+                size,
+                required_tuples,
+                np.setdiff1d(np.arange(size), cls.band_indices(required_tuples.u, size)),
+                np.setdiff1d(np.arange(size), cls.band_indices(required_tuples.v, size)),
+            )
 
     # --------------------------------------------------------------------------
     #  Cells
@@ -56,14 +62,21 @@ class LatinHypercubeGrid:
     @property
     def cell_centers(self) -> np.ndarray:
         """Return the center of every cell, as an `(n_cells, 2)` array of (u, v) values."""
-        return (
-            np.column_stack([self._cell_u_bands(), self._cell_v_bands()]).astype(np.float64) / self.size
-            + 0.5 / self.size
-        )
+        return (np.column_stack([self._cell_u_bands(), self._cell_v_bands()]) + 0.5) / self.size
+
+    def band_cells(self) -> list[np.ndarray]:
+        """Return the cells of each free u band, then the cells of each free v band."""
+        cells = np.arange(self.n_cells).reshape(self.free_u_bands.size, self.free_v_bands.size)
+        return [*cells, *cells.T]
 
     def latin_hypercube_cells(self, permutation: np.ndarray) -> np.ndarray:
-        """Return the cells that pair free u band `i` with free v band `permutation[i]`: 1 per free band per axis."""
+        """Return the cells that pair the i-th free u band with the `permutation[i]`-th free v band."""
         return np.arange(self.free_u_bands.size) * self.free_v_bands.size + permutation
+
+    def is_one_per_free_band(self, cells: np.ndarray) -> bool:
+        """Return whether `cells` holds exactly 1 cell per free u band and 1 per free v band."""
+        rows, columns = np.divmod(cells, self.free_v_bands.size)
+        return np.unique(rows).size == np.unique(columns).size == cells.size == self.free_u_bands.size
 
     def sample_in_cells(self, cells: np.ndarray, n_per_cell: int, rng: np.random.Generator) -> np.ndarray:
         """Return `n_per_cell` uniform random tuples inside each of `cells`, as an `(len(cells), n_per_cell, 2)` array.
@@ -71,13 +84,13 @@ class LatinHypercubeGrid:
         Every tuple lies strictly inside its cell's bands, as `band_indices` computes them: a draw that rounds
         onto a band edge, or onto 0, is drawn again.
         """
-        lower_bands = np.column_stack([self._cell_u_bands()[cells], self._cell_v_bands()[cells]])[:, None, :]
+        cell_bands = np.column_stack([self._cell_u_bands()[cells], self._cell_v_bands()[cells]])[:, None, :]
         samples = np.empty((cells.size, n_per_cell, 2))
-        is_redraw = np.ones(samples.shape, dtype=bool)
-        while is_redraw.any():
-            draws = (lower_bands + rng.random(samples.shape)) / self.size
-            samples[is_redraw] = draws[is_redraw]
-            is_redraw = (self.band_indices(samples, self.size) != lower_bands) | (samples <= 0.0)
+        needs_redraw = np.ones(samples.shape, dtype=bool)
+        while needs_redraw.any():
+            draws = (cell_bands + rng.random(samples.shape)) / self.size
+            samples[needs_redraw] = draws[needs_redraw]
+            needs_redraw = (self.band_indices(samples, self.size) != cell_bands) | (samples <= 0.0)
         return samples
 
     # --------------------------------------------------------------------------

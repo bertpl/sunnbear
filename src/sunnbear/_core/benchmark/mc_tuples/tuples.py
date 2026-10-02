@@ -39,11 +39,6 @@ class MCTuples:
         self._u = u_array
         self._v = v_array
 
-    @classmethod
-    def from_population(cls, population: np.ndarray, indices: np.ndarray) -> "MCTuples":
-        """Return the tuples of `population`, an `(n, 2)` array, at `indices`, in that order."""
-        return cls(population[indices, 0], population[indices, 1])
-
     # --------------------------------------------------------------------------
     #  Values
     # --------------------------------------------------------------------------
@@ -62,6 +57,11 @@ class MCTuples:
         """Return the number of tuples."""
         return self._u.size
 
+    @property
+    def points(self) -> np.ndarray:
+        """Return the tuples as a `(size, 2)` array of (u, v) values."""
+        return np.column_stack([self._u, self._v])
+
     def first(self, size: int) -> "MCTuples":
         """Return the first `size` tuples.
 
@@ -71,6 +71,10 @@ class MCTuples:
         if not 2 <= size <= self.size:
             raise ValueError(f"size must lie in [2, {self.size}] (got {size}).")
         return MCTuples(self._u[:size], self._v[:size])
+
+    def extended_by(self, other: "MCTuples") -> "MCTuples":
+        """Return this set followed by the tuples of `other`."""
+        return MCTuples(np.concatenate([self._u, other.u]), np.concatenate([self._v, other.v]))
 
     # --------------------------------------------------------------------------
     #  Mapping onto a test function
@@ -124,7 +128,7 @@ class MCTuplesStats:
 
         It is computed from the full pairwise distance matrix, so memory grows with the square of the size.
         """
-        points = np.column_stack([self._tuples.u, self._tuples.v])
+        points = self._tuples.points
         diff = points[:, None, :] - points[None, :, :]
         distances = np.sqrt((diff**2).sum(axis=-1))
         np.fill_diagonal(distances, np.inf)

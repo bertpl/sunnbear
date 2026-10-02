@@ -17,9 +17,8 @@ import argparse
 import importlib.metadata
 
 from sunnbear._core.artifacts import ArtifactStore
-from sunnbear._core.benchmark.mc_tuples import MCTuplesDeclaration, generate_mc_tuples
-from sunnbear._core.benchmark.mc_tuples.construction_settings import MCTuplesConstructionSettings
-from sunnbear._core.benchmark.mc_tuples.latin_hypercube_grid import LatinHypercubeGrid
+from sunnbear._core.benchmark.mc_tuples import MCTuplesDeclaration, MCTuplesSize, generate_mc_tuples
+from sunnbear._core.benchmark.mc_tuples.free_cell_grid import FreeCellGrid
 
 
 def main() -> None:
@@ -35,12 +34,12 @@ def main() -> None:
 
     print("| size | L2 | u | v | Latin hypercube |")
     print("|---|---|---|---|---|")
-    for size in MCTuplesConstructionSettings.from_total_time(args.t_total_sec, args.n_workers).sizes:
+    for size in (size for size in MCTuplesSize if size <= tuples.size):
         size_tuples = tuples.first(size)
         stats = size_tuples.stats()
         print(
             f"| {size} | {stats.min_separation_l2_fraction:.1%} | {stats.min_separation_u_fraction:.1%} "
-            f"| {stats.min_separation_v_fraction:.1%} | {LatinHypercubeGrid.is_latin_hypercube(size_tuples)} |"
+            f"| {stats.min_separation_v_fraction:.1%} | {FreeCellGrid.is_latin_hypercube(size_tuples)} |"
         )
 
     manifest = ArtifactStore.save(

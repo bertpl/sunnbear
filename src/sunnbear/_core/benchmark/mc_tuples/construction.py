@@ -1,15 +1,14 @@
 """`generate_mc_tuples` constructs a nested set of (u, v) tuples that is a Latin hypercube at every size.
 
 The construction builds the sizes bottom-up, the smallest first, and each larger size includes the size
-below it, so every size is a prefix of the next. Each size of `k` tuples is a Latin hypercube: each of
-the `k` equal bands along u, and each along v, holds exactly 1 tuple. The tuples of the size below already
-occupy half of the bands; the new tuples fill the other half, in 2 max-div steps (`construction_steps`):
+below it, so every size is a prefix of the next.
 
-- **cell selection**: 1 cell per free band on each axis, spread out in L2;
-- **refinement**: 1 random tuple inside each selected cell, raising the smallest separation fraction along u,
-  along v and in L2.
+Each size is a Latin hypercube, as `FreeCellGrid` defines it; the new tuples fill the free bands, the half of
+the bands that the size below leaves empty, in 2 max-div steps (`construction_steps`):
 
-The separations along an axis matter because u and v each set a separate parameter of a test function.
+- **cell selection** (`select_cells`): 1 cell per free band on each axis, where a cell is the crossing of a
+  free band along u and a free band along v;
+- **refinement** (`refine_within_cells`): 1 tuple inside each selected cell.
 """
 
 import numpy as np
@@ -17,7 +16,7 @@ import numpy as np
 from .construction_settings import MCTuplesConstructionSettings
 from .construction_steps import MCTuplesConstructionStep, refine_within_cells, select_cells
 from .exceptions import MCTuplesConstructionError
-from .latin_hypercube_grid import LatinHypercubeGrid
+from .free_cell_grid import FreeCellGrid
 from .tuples import MCTuples
 
 
@@ -59,30 +58,16 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
     rng = np.random.default_rng(seed)
     tuples = None
     for k in settings.sizes:
-        grid = LatinHypercubeGrid.for_size(k, tuples)
+        grid = FreeCellGrid.for_size(k, tuples)
+        t_budget_sec = settings.t_budget_per_solve_sec
         cells = select_cells(
-            grid,
-            tuples,
-            settings.t_budget_per_solve_sec[k, MCTuplesConstructionStep.CELL_SELECTION],
-            settings.n_workers,
-            seed,
-            rng,
+            grid, t_budget_sec[k, MCTuplesConstructionStep.CELL_SELECTION], settings.n_workers, seed, rng
         )
         new_tuples = refine_within_cells(
-            grid,
-            cells,
-            tuples,
-            settings.t_budget_per_solve_sec[k, MCTuplesConstructionStep.REFINEMENT],
-            settings.n_workers,
-            seed,
-            rng,
+            grid, cells, t_budget_sec[k, MCTuplesConstructionStep.REFINEMENT], settings.n_workers, seed, rng
         )
-        tuples = (
-            new_tuples
-            if tuples is None
-            else MCTuples(np.concatenate([tuples.u, new_tuples.u]), np.concatenate([tuples.v, new_tuples.v]))
-        )
-        if not LatinHypercubeGrid.is_latin_hypercube(tuples):
+        tuples = new_tuples if tuples is None else tuples.extended_by(new_tuples)
+        if not FreeCellGrid.is_latin_hypercube(tuples):
             raise MCTuplesConstructionError(f"Size {k}: the tuples are not a Latin hypercube.")
     assert tuples is not None  # noqa: S101 -- settings.sizes is never empty
     return tuples

@@ -1,10 +1,10 @@
-"""`LatinHypercubeGrid` finds the free bands, numbers the cells, samples inside them, and checks a Latin hypercube."""
+"""`FreeCellGrid` finds the free bands, numbers the cells, samples inside them, and checks a Latin hypercube."""
 
 import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import MCTuples
-from sunnbear._core.benchmark.mc_tuples.latin_hypercube_grid import LatinHypercubeGrid
+from sunnbear._core.benchmark.mc_tuples.free_cell_grid import FreeCellGrid
 
 # A Latin hypercube of 4 tuples, 1 per band of width 1/4 on each axis; at size 8 it occupies bands 1, 2, 5 and 6
 # along u, and bands 6, 0, 3 and 4 along v.
@@ -14,7 +14,7 @@ _SIZE_4 = MCTuples([0.15, 0.3, 0.7, 0.8], [0.8, 0.05, 0.45, 0.55])
 def test_the_smallest_size_has_every_band_free():
     """Without a size below, every band of each axis is free, and the grid has size x size cells."""
     # --- act --------------------------
-    grid = LatinHypercubeGrid.for_size(4, None)
+    grid = FreeCellGrid.for_size(4, None)
 
     # --- assert -----------------------
     assert grid.free_u_bands.tolist() == [0, 1, 2, 3]
@@ -25,7 +25,7 @@ def test_the_smallest_size_has_every_band_free():
 def test_a_nested_size_has_the_bands_free_that_the_size_below_leaves_empty():
     """At size 8, the 4 tuples of size 4 leave 4 bands free on each axis, crossing in 16 cells."""
     # --- act --------------------------
-    grid = LatinHypercubeGrid.for_size(8, _SIZE_4)
+    grid = FreeCellGrid.for_size(8, _SIZE_4)
 
     # --- assert -----------------------
     assert grid.free_u_bands.tolist() == [0, 3, 4, 7]
@@ -35,9 +35,9 @@ def test_a_nested_size_has_the_bands_free_that_the_size_below_leaves_empty():
 
 
 def test_latin_hypercube_cells_pair_each_free_u_band_with_1_free_v_band():
-    """The permutation [2, 0, 3, 1] pairs u band row i with v band column permutation[i], row by row."""
+    """The permutation [2, 0, 3, 1] pairs the i-th free u band with the permutation[i]-th free v band."""
     # --- act --------------------------
-    cells = LatinHypercubeGrid.for_size(8, _SIZE_4).latin_hypercube_cells(np.array([2, 0, 3, 1]))
+    cells = FreeCellGrid.for_size(8, _SIZE_4).latin_hypercube_cells(np.array([2, 0, 3, 1]))
 
     # --- assert -----------------------
     assert cells.tolist() == [2, 4, 11, 13]
@@ -46,16 +46,16 @@ def test_latin_hypercube_cells_pair_each_free_u_band_with_1_free_v_band():
 def test_samples_lie_strictly_inside_their_cells():
     """Every sample of a cell lies in that cell's bands on both axes, and above 0."""
     # --- arrange ----------------------
-    grid = LatinHypercubeGrid.for_size(8, _SIZE_4)
+    grid = FreeCellGrid.for_size(8, _SIZE_4)
     cells = np.array([0, 5, 15])
 
     # --- act --------------------------
     samples = grid.sample_in_cells(cells, 50, np.random.default_rng(3))
 
     # --- assert -----------------------
-    lower_bands = (grid.cell_centers[cells] * 8).astype(np.int64)
+    cell_bands = (grid.cell_centers[cells] * 8).astype(np.int64)
     assert samples.shape == (3, 50, 2)
-    assert (LatinHypercubeGrid.band_indices(samples, 8) == lower_bands[:, None, :]).all()
+    assert (FreeCellGrid.band_indices(samples, 8) == cell_bands[:, None, :]).all()
     assert (samples > 0).all()
 
 
@@ -70,4 +70,4 @@ def test_samples_lie_strictly_inside_their_cells():
 def test_is_latin_hypercube_requires_exactly_1_tuple_per_band_on_each_axis(tuples, is_latin_hypercube):
     """A set is a Latin hypercube only when every band along u and along v holds exactly 1 tuple."""
     # --- act / assert -----------------
-    assert LatinHypercubeGrid.is_latin_hypercube(tuples) == is_latin_hypercube
+    assert FreeCellGrid.is_latin_hypercube(tuples) == is_latin_hypercube

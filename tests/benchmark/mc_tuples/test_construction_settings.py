@@ -29,13 +29,13 @@ def test_from_total_time_builds_fewer_sizes_with_fewer_workers_below_60_s(t_tota
 
 @pytest.mark.parametrize("t_total_sec", [1.0, 30.0, 28_800.0])
 def test_from_total_time_gives_each_solve_1_percent_and_splits_the_rest_by_work(t_total_sec):
-    """Each solve gets 1 % of the total, the rest in proportion to its pool size times its size; all of it is used."""
+    """Each solve gets 1 % of the total, the rest in proportion to its number of candidates times its size."""
     # --- act --------------------------
     settings = MCTuplesConstructionSettings.from_total_time(t_total_sec, n_workers=32)
 
     # --- assert -----------------------
     budgets = settings.t_budget_per_solve_sec
-    work = {(k, step): step.pool_size(k) * k for k, step in budgets}
+    work = {(k, step): step.n_candidates(k) * k for k, step in budgets}
     t_rest_sec = t_total_sec * (1 - 0.01 * len(budgets))
     assert budgets == pytest.approx(
         {key: 0.01 * t_total_sec + t_rest_sec * solve_work / sum(work.values()) for key, solve_work in work.items()}
