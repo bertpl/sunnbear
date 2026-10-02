@@ -1,22 +1,22 @@
 {
-  "build_date": "2026-09-30",
+  "build_date": "2026-10-02",
   "built_with": {
     "max-div": "0.19.1",
     "sunnbear": "0.1.4+dev"
   },
-  "content_hash": "c12c37f4c5670d69186d8a938cbcf9e52055b1ed3fe620357a57eab7cf4dea33",
+  "content_hash": "ecaaaeb0b1b00bd481b755110ad2c886e3c8c45aff48c01fc20391f9900e8376",
   "files": [
     {
       "path": "mc_tuples.csv",
-      "sha256": "78c50afdc18eeba46700e7497379aa6a08cac4f5030b89498aaef11846b8add0",
-      "size_bytes": 39484
+      "sha256": "54331de12cfdb5420c8faf565ae52b6e9d54ed0536f3eee93cdb603bc8cd4c33",
+      "size_bytes": 39445
     }
   ],
   "generated_by": {
     "arguments": {
       "n_workers": 32,
       "seed": 42,
-      "t_total_sec": 7200.0
+      "t_total_sec": 28800.0
     },
     "function": "sunnbear.benchmark.generate_mc_tuples"
   },

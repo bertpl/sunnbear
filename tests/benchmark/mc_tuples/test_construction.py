@@ -1,16 +1,15 @@
-"""`generate_mc_tuples` builds a nested tuple set within its bin bounds, and refuses a selection that breaks them."""
+"""`generate_mc_tuples` builds a nested set that is a Latin hypercube at every size that it builds."""
 
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import MCTuplesConstructionError, MCTuplesSize, generate_mc_tuples
-from sunnbear._core.benchmark.mc_tuples.construction import _draw_population
-from sunnbear._core.benchmark.mc_tuples.max_div_selection import _check_selection
+from sunnbear._core.benchmark.mc_tuples import MCTuples, MCTuplesConstructionError, construction, generate_mc_tuples
+from sunnbear._core.benchmark.mc_tuples.free_cell_grid import FreeCellGrid
 
 
 @pytest.mark.only_with_numba_jit
-def test_generate_mc_tuples_builds_a_set_whose_every_size_meets_its_bin_constraints():
-    """A 1 s construction gives distinct tuples of the largest size, and every prefix size keeps its bins within bounds.
+def test_generate_mc_tuples_builds_nested_latin_hypercubes():
+    """A 1 s construction builds sizes 32 and 64; each is a Latin hypercube, and size 32 is the start of size 64.
 
     Only the structure is asserted: max-div's spread depends on the wall-clock time.
     """
@@ -18,49 +17,19 @@ def test_generate_mc_tuples_builds_a_set_whose_every_size_meets_its_bin_constrai
     tuples = generate_mc_tuples(t_total_sec=1.0)
 
     # --- assert -----------------------
-    assert tuples.size == max(MCTuplesSize)
-    assert np.unique(np.column_stack([tuples.u, tuples.v]), axis=0).shape[0] == tuples.size
-    for size in MCTuplesSize:
-        assert tuples.first(size).stats().are_bin_counts_within_bounds
+    assert tuples.size == 64
+    assert FreeCellGrid.is_latin_hypercube(tuples.first(32))
+    assert FreeCellGrid.is_latin_hypercube(tuples)
+    assert np.unique(tuples.u).size == np.unique(tuples.v).size == 64
 
 
-def test_a_smaller_population_is_a_prefix_of_the_full_one():
-    """The population for a short run is the start of the full population, all inside the open unit square."""
-    # --- act --------------------------
-    small = _draw_population(2048, seed=42)
-    full = _draw_population(65_536, seed=42)
+def test_generate_mc_tuples_refuses_a_size_that_is_not_a_latin_hypercube(monkeypatch):
+    """A size whose tuples share a band raises an error before the next size is built; the steps never produce one."""
+    # --- arrange ----------------------
+    monkeypatch.setattr(construction, "select_cells", lambda grid, *args: np.arange(grid.size))
+    same_u_band = MCTuples(np.full(32, 0.01), (np.arange(32) + 0.5) / 32)
+    monkeypatch.setattr(construction, "refine_within_cells", lambda *args: same_u_band)
 
-    # --- assert -----------------------
-    assert small.shape == (2048, 2)
-    assert (small == full[:2048]).all()
-    assert ((full > 0) & (full < 1)).all()
-
-
-# ==================================================================================================
-#  Checks on a selection
-# ==================================================================================================
-# The population has 24 tuples, evenly spaced on each axis. A selection of 8 has 2 bins per axis, each allowing
-# 3 to 5 tuples: selecting every third tuple puts 4 in each bin, and selecting the first 8 puts all 8 in 1 bin.
-_POPULATION = np.column_stack([(np.arange(24) + 0.5) / 24, (np.arange(24)[::-1] + 0.5) / 24])
-_EVERY_THIRD_TUPLE = np.arange(0, 24, 3)
-
-
-@pytest.mark.parametrize(
-    "required_indices, selection, message",
-    [
-        (np.array([], dtype=np.int64), np.array([0, 0, 3, 6, 9, 12, 15, 18]), "7 distinct tuples"),
-        (np.array([1]), _EVERY_THIRD_TUPLE, "1 tuples of the size below it are not selected"),
-        (np.array([], dtype=np.int64), np.arange(8), "bin counts"),
-    ],
-)
-def test_check_selection_refuses_duplicates_a_missing_tuple_or_bin_counts_out_of_bounds(
-    required_indices, selection, message
-):
-    """A repeated tuple, a missing tuple of the size below, or a bin count out of bounds raises an error."""
-    with pytest.raises(MCTuplesConstructionError, match=message):
-        _check_selection(_POPULATION, 8, required_indices, selection)
-
-
-def test_check_selection_accepts_a_selection_that_meets_every_constraint():
-    """A selection of 8 tuples, 4 per bin on each axis, that includes the required tuple passes the checks."""
-    _check_selection(_POPULATION, 8, np.array([3]), _EVERY_THIRD_TUPLE)
+    # --- act / assert -----------------
+    with pytest.raises(MCTuplesConstructionError, match="Size 32: the tuples are not a Latin hypercube"):
+        generate_mc_tuples(t_total_sec=1.0)

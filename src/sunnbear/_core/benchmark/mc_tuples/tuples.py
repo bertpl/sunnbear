@@ -10,8 +10,6 @@ from functools import cached_property
 import numpy as np
 from numpy.typing import ArrayLike
 
-from .bin_definitions import MCTuplesBinDefinitions
-
 
 # ==================================================================================================
 #  MCTuples
@@ -41,11 +39,6 @@ class MCTuples:
         self._u = u_array
         self._v = v_array
 
-    @classmethod
-    def from_population(cls, population: np.ndarray, indices: np.ndarray) -> "MCTuples":
-        """Return the tuples of `population`, an `(n, 2)` array, at `indices`, in that order."""
-        return cls(population[indices, 0], population[indices, 1])
-
     # --------------------------------------------------------------------------
     #  Values
     # --------------------------------------------------------------------------
@@ -64,6 +57,11 @@ class MCTuples:
         """Return the number of tuples."""
         return self._u.size
 
+    @property
+    def points(self) -> np.ndarray:
+        """Return the tuples as a `(size, 2)` array of (u, v) values."""
+        return np.column_stack([self._u, self._v])
+
     def first(self, size: int) -> "MCTuples":
         """Return the first `size` tuples.
 
@@ -73,6 +71,10 @@ class MCTuples:
         if not 2 <= size <= self.size:
             raise ValueError(f"size must lie in [2, {self.size}] (got {size}).")
         return MCTuples(self._u[:size], self._v[:size])
+
+    def extended_by(self, other: "MCTuples") -> "MCTuples":
+        """Return this set followed by the tuples of `other`."""
+        return MCTuples(np.concatenate([self._u, other.u]), np.concatenate([self._v, other.v]))
 
     # --------------------------------------------------------------------------
     #  Mapping onto a test function
@@ -118,39 +120,6 @@ class MCTuplesStats:
         return self._tuples.size
 
     # --------------------------------------------------------------------------
-    #  Bin counts
-    # --------------------------------------------------------------------------
-    @cached_property
-    def bin_definitions(self) -> MCTuplesBinDefinitions:
-        """Return the bins of each axis and the bounds on their tuple counts, for this set's size."""
-        return MCTuplesBinDefinitions(size=self.size)
-
-    @cached_property
-    def bin_counts_u(self) -> tuple[int, ...]:
-        """Return the number of tuples in each bin along u."""
-        return self.bin_definitions.bin_counts(self._tuples.u)
-
-    @cached_property
-    def bin_counts_v(self) -> tuple[int, ...]:
-        """Return the number of tuples in each bin along v."""
-        return self.bin_definitions.bin_counts(self._tuples.v)
-
-    @property
-    def smallest_bin_count(self) -> int:
-        """Return the smallest number of tuples in a bin, over both axes."""
-        return min(self._bin_counts_both_axes)
-
-    @property
-    def largest_bin_count(self) -> int:
-        """Return the largest number of tuples in a bin, over both axes."""
-        return max(self._bin_counts_both_axes)
-
-    @property
-    def are_bin_counts_within_bounds(self) -> bool:
-        """Return whether every bin of both axes holds a number of tuples within the bounds of `bin_definitions`."""
-        return self.bin_definitions.are_counts_within_bounds(self._bin_counts_both_axes)
-
-    # --------------------------------------------------------------------------
     #  Min separations
     # --------------------------------------------------------------------------
     @cached_property
@@ -159,7 +128,7 @@ class MCTuplesStats:
 
         It is computed from the full pairwise distance matrix, so memory grows with the square of the size.
         """
-        points = np.column_stack([self._tuples.u, self._tuples.v])
+        points = self._tuples.points
         diff = points[:, None, :] - points[None, :, :]
         distances = np.sqrt((diff**2).sum(axis=-1))
         np.fill_diagonal(distances, np.inf)
@@ -203,11 +172,6 @@ class MCTuplesStats:
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
-    @property
-    def _bin_counts_both_axes(self) -> tuple[int, ...]:
-        """Return the bin counts along u followed by those along v."""
-        return self.bin_counts_u + self.bin_counts_v
-
     @staticmethod
     def _min_separation_along_axis(values: np.ndarray) -> float:
         """Return the smallest difference between 2 of the values."""

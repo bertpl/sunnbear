@@ -3,14 +3,14 @@
 The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples from.
 
 - `MCTuples` holds a set of tuples, maps them onto a test function, and reports their spread as
-  `MCTuplesStats`, which counts the tuples in the bins that `MCTuplesBinDefinitions` defines;
-- `generate_mc_tuples` constructs a nested set, with settings from `MCTuplesConstructionSettings`;
+  `MCTuplesStats`;
+- `generate_mc_tuples` constructs a nested set that is a Latin hypercube at every size, with settings from
+  `MCTuplesConstructionSettings`;
 - `load_mc_tuples(size)` returns one size of the shipped set, 1 of `MCTuplesSize`; `MCTuplesDeclaration`
   declares the set as the data artifact `mc_tuples`.
 """
 
 from .artifact import MCTuplesDeclaration, load_mc_tuples
-from .bin_definitions import MCTuplesBinDefinitions
 from .construction import generate_mc_tuples
 from .construction_settings import MCTuplesConstructionSettings
 from .exceptions import MCTuplesConstructionError

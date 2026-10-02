@@ -4,13 +4,13 @@ The maintainer runs this script by hand whenever the tuple set is regenerated, n
 time. The script:
 
 - calls `sunnbear.benchmark.generate_mc_tuples`;
-- prints the spread of every size;
+- prints the spread of every size, and whether it is a Latin hypercube;
 - saves the set through `ArtifactStore`, which records in the artifact's manifest the
   `generate_mc_tuples` call, its arguments and max-div's version.
 
 Usage:
 
-    uv run python scripts/generate_mc_tuples.py --t-total-sec 900
+    uv run python scripts/generate_mc_tuples.py --t-total-sec 28800
 """
 
 import argparse
@@ -18,6 +18,7 @@ import importlib.metadata
 
 from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples import MCTuplesDeclaration, MCTuplesSize, generate_mc_tuples
+from sunnbear._core.benchmark.mc_tuples.free_cell_grid import FreeCellGrid
 
 
 def main() -> None:
@@ -31,16 +32,14 @@ def main() -> None:
     arguments = {"t_total_sec": args.t_total_sec, "n_workers": args.n_workers, "seed": args.seed}
     tuples = generate_mc_tuples(**arguments)
 
-    print("| size | L2 | u | v | bins per axis | bin counts | bin count bounds |")
-    print("|---|---|---|---|---|---|---|")
-    for size in MCTuplesSize:
-        stats = tuples.first(size).stats()
-        bin_definitions = stats.bin_definitions
+    print("| size | L2 | u | v | Latin hypercube |")
+    print("|---|---|---|---|---|")
+    for size in (size for size in MCTuplesSize if size <= tuples.size):
+        size_tuples = tuples.first(size)
+        stats = size_tuples.stats()
         print(
             f"| {size} | {stats.min_separation_l2_fraction:.1%} | {stats.min_separation_u_fraction:.1%} "
-            f"| {stats.min_separation_v_fraction:.1%} | {bin_definitions.n_bins_per_axis} "
-            f"| {stats.smallest_bin_count} to {stats.largest_bin_count} "
-            f"| {bin_definitions.min_count_per_bin} to {bin_definitions.max_count_per_bin} |"
+            f"| {stats.min_separation_v_fraction:.1%} | {FreeCellGrid.is_latin_hypercube(size_tuples)} |"
         )
 
     manifest = ArtifactStore.save(

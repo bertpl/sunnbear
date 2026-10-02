@@ -8,7 +8,6 @@ set, and `MCTuples` holds either one.
 
 from ._core.benchmark import (
     MCTuples,
-    MCTuplesBinDefinitions,
     MCTuplesSize,
     MCTuplesStats,
     generate_mc_tuples,
@@ -17,7 +16,6 @@ from ._core.benchmark import (
 
 __all__ = [
     "MCTuples",
-    "MCTuplesBinDefinitions",
     "MCTuplesSize",
     "MCTuplesStats",
     "generate_mc_tuples",
