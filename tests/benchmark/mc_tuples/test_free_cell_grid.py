@@ -34,13 +34,17 @@ def test_a_nested_size_has_the_bands_free_that_the_size_below_leaves_empty():
     assert grid.cell_centers[[0, 1, 4]].tolist() == [[0.5 / 8, 1.5 / 8], [0.5 / 8, 2.5 / 8], [3.5 / 8, 1.5 / 8]]
 
 
-def test_latin_hypercube_cells_pair_each_free_u_band_with_1_free_v_band():
-    """The permutation [2, 0, 3, 1] pairs the i-th free u band with the permutation[i]-th free v band."""
+def test_random_latin_hypercube_cells_pair_each_free_u_band_with_1_free_v_band():
+    """The random cells hold 1 cell per free u band and 1 per free v band."""
+    # --- arrange ----------------------
+    grid = FreeCellGrid.for_size(8, _SIZE_4)
+
     # --- act --------------------------
-    cells = FreeCellGrid.for_size(8, _SIZE_4).latin_hypercube_cells(np.array([2, 0, 3, 1]))
+    cells = grid.random_latin_hypercube_cells(np.random.default_rng(0))
 
     # --- assert -----------------------
-    assert cells.tolist() == [2, 4, 11, 13]
+    assert grid.is_one_per_free_band(cells)
+    assert not grid.is_one_per_free_band(np.array([0, 1, 2, 3]))  # 4 cells of the first free u band
 
 
 def test_samples_lie_strictly_inside_their_cells():

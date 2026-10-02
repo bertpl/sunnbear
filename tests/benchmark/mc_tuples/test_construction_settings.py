@@ -35,10 +35,13 @@ def test_from_total_time_gives_each_solve_1_percent_and_splits_the_rest_by_work(
 
     # --- assert -----------------------
     budgets = settings.t_budget_per_solve_sec
-    work = {(k, step): step.n_candidates(k) * k for k, step in budgets}
+    work_per_solve = {(k, step): step.n_candidates(k) * k for k, step in budgets}
     t_rest_sec = t_total_sec * (1 - 0.01 * len(budgets))
     assert budgets == pytest.approx(
-        {key: 0.01 * t_total_sec + t_rest_sec * solve_work / sum(work.values()) for key, solve_work in work.items()}
+        {
+            key: 0.01 * t_total_sec + t_rest_sec * solve_work / sum(work_per_solve.values())
+            for key, solve_work in work_per_solve.items()
+        }
     )
     assert sum(budgets.values()) == pytest.approx(t_total_sec)
 

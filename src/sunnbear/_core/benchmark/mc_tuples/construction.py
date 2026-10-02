@@ -3,8 +3,9 @@
 The construction builds the sizes bottom-up, the smallest first, and each larger size includes the size
 below it, so every size is a prefix of the next.
 
-Each size is a Latin hypercube, as `FreeCellGrid` defines it; the new tuples fill the free bands, the half of
-the bands that the size below leaves empty, in 2 max-div steps (`construction_steps`):
+Each size is a Latin hypercube, as `FreeCellGrid` defines it. Each size is twice the size below it, so the size
+below occupies half of the bands on each axis; the new tuples fill the free bands, the half of the bands with no
+tuple of the size below, in 2 max-div steps (`construction_steps`):
 
 - **cell selection** (`select_cells`): 1 cell per free band on each axis, where a cell is the crossing of a
   free band along u and a free band along v;
@@ -35,7 +36,7 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
 
     `t_total_sec` covers only the solves; other steps take extra time:
 
-    - drawing the candidates and building each solve's problem;
+    - drawing the random tuples that the solves choose from, and building each solve's problem;
     - checking each size;
     - compiling each max-div function that the solves use, on its first run after an install; compiling them
       all takes seconds, and numba caches the compiled code for later runs.
@@ -47,7 +48,7 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
         t_total_sec: The total wall-clock time of the solves, at least 1 s.
         n_workers: The number of max-div workers per solve when `t_total_sec` is 60 s or more; more workers search from
             more seeds, and may exceed the number of cores.
-        seed: The seed of the candidates and of every solve.
+        seed: The seed of every random draw and of every max-div solve.
 
     Raises:
         ValueError: If `t_total_sec` is below 1 s, or `n_workers` below 1.
@@ -59,12 +60,20 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
     tuples = None
     for k in settings.sizes:
         grid = FreeCellGrid.for_size(k, tuples)
-        t_budget_sec = settings.t_budget_per_solve_sec
         cells = select_cells(
-            grid, t_budget_sec[k, MCTuplesConstructionStep.CELL_SELECTION], settings.n_workers, seed, rng
+            grid,
+            settings.t_budget_per_solve_sec[k, MCTuplesConstructionStep.CELL_SELECTION],
+            settings.n_workers,
+            seed,
+            rng,
         )
         new_tuples = refine_within_cells(
-            grid, cells, t_budget_sec[k, MCTuplesConstructionStep.REFINEMENT], settings.n_workers, seed, rng
+            grid,
+            cells,
+            settings.t_budget_per_solve_sec[k, MCTuplesConstructionStep.REFINEMENT],
+            settings.n_workers,
+            seed,
+            rng,
         )
         tuples = new_tuples if tuples is None else tuples.extended_by(new_tuples)
         if not FreeCellGrid.is_latin_hypercube(tuples):

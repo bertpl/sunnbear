@@ -1,12 +1,16 @@
 """The construction adds the new tuples of 1 size in 2 max-div steps: `select_cells`, then `refine_within_cells`.
 
-- **Cell selection** picks 1 cell of the size's `FreeCellGrid` per free band on each axis, so the size is a
-  Latin hypercube; it maximizes the L2 min separation of the cell centers and of the tuples of the size
-  below. Every valid choice of cells fills all free bands, so the cell centers have the same coordinates
-  along each axis for every choice, and only the L2 separation varies.
+- **Cell selection** picks cells of the size's `FreeCellGrid`, where a cell is the crossing of a u band and a
+  v band that hold no tuple of the size below (free bands); it picks 1 cell per free band on each axis, so
+  the size is a Latin hypercube:
+  - it maximizes the L2 min separation of the cell centers and of the tuples of the size below;
+  - every valid choice of cells fills all free bands, so the set of center u values, and of center v values,
+    is the same for every choice; only the L2 separation differs between choices, so this step maximizes L2
+    alone.
 - **Refinement** places 1 tuple in each selected cell, chosen from `N_CANDIDATES_PER_CELL` uniform random
-  tuples inside the cell, so every value has full float64 precision. It maximizes the smallest of the
-  separation fractions along u, along v and in L2 (the objective of `refine_within_cells`).
+  float64 tuples inside the cell; max-div compares float32 copies, and the chosen tuple keeps its float64
+  values. It maximizes the smallest of the 3 separation fractions of `MCTuplesStats`: along u, along v and in
+  L2 (the objective of `refine_within_cells`).
 
 Both steps require every tuple of the size below to stay selected.
 """
@@ -58,10 +62,14 @@ def select_cells(
 ) -> np.ndarray:
     """Return the cells of `grid` for the new tuples of its size: 1 per free band along u and 1 per free band along v.
 
-    The selection maximizes the L2 min separation of the selected cell centers and the grid's required tuples.
-    Exact constraints keep 1 selected cell per free band. max-div starts from a random Latin hypercube over the
-    free bands, which `rng` draws, so the starting selection already meets the band constraints and max-div's
-    swaps of 2 cells can exchange their v bands.
+    The selection maximizes the L2 min separation of the selected cell centers and the tuples of the size below
+    (`grid.required_tuples`). A constraint per free band asks for exactly 1 selected cell in it; max-div weighs
+    the constraints against the objective without enforcing them, so the selection is checked before it is
+    returned.
+
+    max-div starts from a random Latin hypercube over the free bands, which `rng` draws, so the starting
+    selection already meets the band constraints; from there, max-div reaches other valid selections by
+    exchanging the v bands of 2 selected cells. `seed` seeds max-div's solve.
 
     Returns:
         The selected cell indices, ascending.
@@ -70,7 +78,7 @@ def select_cells(
         MCTuplesConstructionError: If the selection misses a required tuple, or does not hold exactly 1 cell per
             free band, which can happen when `t_budget_sec` is too short for max-div to meet the constraints.
     """
-    required_points = _points_of(grid.required_tuples)
+    required_points = grid.required_points
     n_required = required_points.shape[0]
     band_constraints = [
         Constraint(int_set=set((n_required + band_cells).tolist()), min_count=1, max_count=1)
@@ -84,10 +92,10 @@ def select_cells(
         diversity_metric=DiversityMetric.MIN_SEPARATION,
         constraints=band_constraints + _inclusion_constraints(n_required),
     )
-    initial_cells = grid.latin_hypercube_cells(rng.permutation(grid.free_v_bands.size))
+    initial_cells = grid.random_latin_hypercube_cells(rng)
     initial_selection = np.concatenate([np.arange(n_required), n_required + initial_cells])
-    selection = _solve(problem, initial_selection, t_budget_sec, n_workers, seed)
-    cells = _new_candidate_indices(selection, n_required, grid.size)
+    selection = _run_max_div(problem, initial_selection, t_budget_sec, n_workers, seed)
+    cells = _indices_among_new_candidates(selection, n_required, grid.size)
     if not grid.is_one_per_free_band(cells):
         raise MCTuplesConstructionError(f"Size {grid.size}: the selected cells do not hold exactly 1 per free band.")
     return cells
@@ -97,6 +105,8 @@ def refine_within_cells(
     grid: FreeCellGrid, cells: np.ndarray, t_budget_sec: float, n_workers: int, seed: int, rng: np.random.Generator
 ) -> MCTuples:
     """Return 1 new tuple in each of `cells`, chosen from `N_CANDIDATES_PER_CELL` random tuples inside the cell.
+
+    `rng` draws the candidates; `seed` seeds max-div's solve.
 
     The objective maximizes the smaller of 2 weighted min separations:
 
@@ -115,9 +125,10 @@ def refine_within_cells(
         The new tuples, in the order of `cells`.
 
     Raises:
-        MCTuplesConstructionError: If the selection misses a required tuple or does not hold 1 new tuple per cell.
+        MCTuplesConstructionError: If the selection misses a required tuple or does not hold 1 new tuple per cell,
+            which can happen when `t_budget_sec` is too short for max-div to meet them.
     """
-    required_points = _points_of(grid.required_tuples)
+    required_points = grid.required_points
     n_required = required_points.shape[0]
     candidates = grid.sample_in_cells(cells, N_CANDIDATES_PER_CELL, rng)
     problem = MaxDivProblem.new(
@@ -138,9 +149,9 @@ def refine_within_cells(
     initial_selection = np.concatenate(
         [np.arange(n_required), n_required + np.arange(cells.size) * N_CANDIDATES_PER_CELL + nearest_candidates]
     )
-    selection = _solve(problem, initial_selection, t_budget_sec, n_workers, seed)
+    selection = _run_max_div(problem, initial_selection, t_budget_sec, n_workers, seed)
     selected_cells, selected_candidates = np.divmod(
-        _new_candidate_indices(selection, n_required, grid.size), N_CANDIDATES_PER_CELL
+        _indices_among_new_candidates(selection, n_required, grid.size), N_CANDIDATES_PER_CELL
     )
     if np.unique(selected_cells).size != cells.size:
         raise MCTuplesConstructionError(f"Size {grid.size}: the refinement does not hold 1 new tuple per cell.")
@@ -151,11 +162,6 @@ def refine_within_cells(
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-def _points_of(tuples: MCTuples | None) -> np.ndarray:
-    """Return the points of `tuples`, or an empty `(0, 2)` array for None."""
-    return np.empty((0, 2)) if tuples is None else tuples.points
-
-
 def _inclusion_constraints(n_required: int) -> list[Constraint]:
     """Return the constraint that the first `n_required` candidates are all selected, or none if there are none."""
     if n_required == 0:
@@ -171,7 +177,7 @@ def _inclusion_constraints(n_required: int) -> list[Constraint]:
         ]
 
 
-def _solve(
+def _run_max_div(
     problem: MaxDivProblem, initial_selection: np.ndarray, t_budget_sec: float, n_workers: int, seed: int
 ) -> np.ndarray:
     """Return max-div's selection for `problem`, started from `initial_selection`, as sorted candidate indices."""
@@ -191,7 +197,7 @@ def _solve(
     return np.sort(np.asarray(solution.i_selected, dtype=np.int64))
 
 
-def _new_candidate_indices(selection: np.ndarray, n_required: int, size: int) -> np.ndarray:
+def _indices_among_new_candidates(selection: np.ndarray, n_required: int, size: int) -> np.ndarray:
     """Return the selected candidates that are not required, as indices relative to the first non-required candidate.
 
     Raises:

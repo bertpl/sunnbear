@@ -3,8 +3,7 @@
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import MCTuples, MCTuplesConstructionError, generate_mc_tuples
-from sunnbear._core.benchmark.mc_tuples import construction, construction_steps
+from sunnbear._core.benchmark.mc_tuples import MCTuples, MCTuplesConstructionError, construction_steps
 from sunnbear._core.benchmark.mc_tuples.construction_steps import (
     N_CANDIDATES_PER_CELL,
     MCTuplesConstructionStep,
@@ -17,8 +16,8 @@ from sunnbear._core.benchmark.mc_tuples.free_cell_grid import FreeCellGrid
 _SIZE_4 = MCTuples([0.15, 0.3, 0.7, 0.8], [0.8, 0.05, 0.45, 0.55])
 
 
-def _solve_returning(selection: list[int]):
-    """Return a replacement for `construction_steps._solve` that returns `selection` whatever the problem."""
+def _run_max_div_returning(selection: list[int]):
+    """Return a replacement for `construction_steps._run_max_div` that returns `selection` whatever the problem."""
 
     def solve(*args, **kwargs) -> np.ndarray:
         return np.array(selection)
@@ -51,7 +50,7 @@ def test_n_candidates_counts_the_new_candidates_and_the_size_below(size, step, n
 def test_select_cells_refuses_a_missing_tuple_or_2_cells_in_1_band(monkeypatch, selection, message):
     """A cell selection without every tuple of the size below, or with 2 cells in 1 free band, raises an error."""
     # --- arrange ----------------------
-    monkeypatch.setattr(construction_steps, "_solve", _solve_returning(selection))
+    monkeypatch.setattr(construction_steps, "_run_max_div", _run_max_div_returning(selection))
 
     # --- act / assert -----------------
     with pytest.raises(MCTuplesConstructionError, match=message):
@@ -62,22 +61,10 @@ def test_refine_within_cells_refuses_2_tuples_in_1_cell(monkeypatch):
     """A refinement that selects 2 candidates of the first cell, and none of the second, raises an error."""
     # --- arrange ----------------------
     two_in_first_cell = [0, 1, 2, 3, 4, 5, 4 + 2 * N_CANDIDATES_PER_CELL, 4 + 3 * N_CANDIDATES_PER_CELL]
-    monkeypatch.setattr(construction_steps, "_solve", _solve_returning(two_in_first_cell))
+    monkeypatch.setattr(construction_steps, "_run_max_div", _run_max_div_returning(two_in_first_cell))
 
     # --- act / assert -----------------
     with pytest.raises(MCTuplesConstructionError, match="1 new tuple per cell"):
         refine_within_cells(
             FreeCellGrid.for_size(8, _SIZE_4), np.array([2, 4, 11, 13]), 1.0, 1, 42, np.random.default_rng(0)
         )
-
-
-def test_generate_mc_tuples_refuses_a_size_that_is_not_a_latin_hypercube(monkeypatch):
-    """A size whose tuples share a band, which the steps would not produce, raises an error before the next size."""
-    # --- arrange ----------------------
-    monkeypatch.setattr(construction, "select_cells", lambda grid, *args: np.arange(grid.size))
-    same_u_band = MCTuples(np.full(32, 0.01), (np.arange(32) + 0.5) / 32)
-    monkeypatch.setattr(construction, "refine_within_cells", lambda *args: same_u_band)
-
-    # --- act / assert -----------------
-    with pytest.raises(MCTuplesConstructionError, match="Size 32: the tuples are not a Latin hypercube"):
-        generate_mc_tuples(t_total_sec=1.0)

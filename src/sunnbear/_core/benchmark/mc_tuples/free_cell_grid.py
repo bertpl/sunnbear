@@ -3,9 +3,9 @@
 A set of `size` tuples is a Latin hypercube when each of the `size` equal bands of [0, 1) along u, and
 each along v, holds exactly 1 tuple.
 
-The tuple set is nested: each size includes the size below it, whose tuples already occupy half of the
-bands. The new tuples of a size go in the cells where a free u band crosses a free v band, 1 per free band
-on each axis, so the size is again a Latin hypercube.
+The tuple set is nested: each size includes the size below it, which is half as large, so its tuples already
+occupy half of the bands. The new tuples of a size go in the cells where a free u band crosses a free v band,
+1 per free band on each axis, so the size is again a Latin hypercube.
 """
 
 from dataclasses import dataclass
@@ -52,6 +52,14 @@ class FreeCellGrid:
             )
 
     # --------------------------------------------------------------------------
+    #  Required tuples
+    # --------------------------------------------------------------------------
+    @property
+    def required_points(self) -> np.ndarray:
+        """Return the required tuples as an `(n, 2)` array of (u, v) values; empty for the smallest size."""
+        return np.empty((0, 2)) if self.required_tuples is None else self.required_tuples.points
+
+    # --------------------------------------------------------------------------
     #  Cells
     # --------------------------------------------------------------------------
     @property
@@ -69,9 +77,9 @@ class FreeCellGrid:
         cells = np.arange(self.n_cells).reshape(self.free_u_bands.size, self.free_v_bands.size)
         return [*cells, *cells.T]
 
-    def latin_hypercube_cells(self, permutation: np.ndarray) -> np.ndarray:
-        """Return the cells that pair the i-th free u band with the `permutation[i]`-th free v band."""
-        return np.arange(self.free_u_bands.size) * self.free_v_bands.size + permutation
+    def random_latin_hypercube_cells(self, rng: np.random.Generator) -> np.ndarray:
+        """Return random cells that pair each free u band with a different free v band, drawn with `rng`."""
+        return np.arange(self.free_u_bands.size) * self.free_v_bands.size + rng.permutation(self.free_v_bands.size)
 
     def is_one_per_free_band(self, cells: np.ndarray) -> bool:
         """Return whether `cells` holds exactly 1 cell per free u band and 1 per free v band."""
