@@ -82,8 +82,12 @@ def _run_task_on_cubic(cubic: functions.TestFunction, solver_configs) -> pl.Data
 #  Rows and schema
 # ==================================================================================================
 def test_a_task_gives_1_row_per_sample_and_solver_in_the_results_schema(cubic):
-    """The rows follow `RESULTS_SCHEMA`, sample by sample, with `xtol` in its range, `c` in `[c_min, c_max]` and the
-    run's `max_fevals`."""
+    """The rows follow `RESULTS_SCHEMA`, sample by sample, with:
+
+    - `xtol` in its range;
+    - `c` in `[c_min, c_max]`;
+    - `max_fevals` equal to the run's evaluation budget.
+    """
     # --- arrange ----------------------
     configs = [SolverConfigRegistry.config_from_id("bisection"), SolverConfigRegistry.config_from_id("regula_falsi")]
     xtol_min, xtol_max = compute_xtol_range(a=cubic.a, b=cubic.b, n_bisection_fevals=N_BISECTION_FEVALS)
