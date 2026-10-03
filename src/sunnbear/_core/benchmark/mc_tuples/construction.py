@@ -1,14 +1,14 @@
-"""`generate_mc_tuples` constructs a nested set of (u, v) tuples that is a Latin hypercube at every size.
+"""`generate_mc_tuples` constructs a nested set of (u, v) tuples that holds exactly 1 tuple per lane at every size.
 
 The construction builds the sizes bottom-up, the smallest first, and each larger size includes the size
 below it, so every size is a prefix of the next.
 
-Each size is a Latin hypercube, as `FreeCellGrid` defines it. Each size is twice the size below it, so the size
-below occupies half of the bands on each axis; the new tuples fill the free bands, the half of the bands with no
-tuple of the size below, in 2 max-div steps (`construction_steps`):
+Each size cuts each axis into lanes around its values, as `LaneGrid` defines them: the new values of the size
+are assigned to the gaps between the values of the size below, and the lanes meet at the midpoints between
+consecutive values. The new tuples go in the cells where a new u lane crosses a new v lane, in 2 max-div steps
+(`construction_steps`):
 
-- **cell selection** (`select_cells`): 1 cell per free band on each axis, where a cell is the crossing of a
-  free band along u and a free band along v;
+- **cell selection** (`select_cells`): 1 cell per new lane on each axis;
 - **refinement** (`refine_within_cells`): 1 tuple inside each selected cell.
 """
 
@@ -17,7 +17,7 @@ import numpy as np
 from .construction_settings import MCTuplesConstructionSettings
 from .construction_steps import MCTuplesConstructionStep, refine_within_cells, select_cells
 from .exceptions import MCTuplesConstructionError
-from .free_cell_grid import FreeCellGrid
+from .lane_grid import LaneGrid
 from .tuples import MCTuples
 
 
@@ -52,14 +52,14 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
 
     Raises:
         ValueError: If `t_total_sec` is below 1 s, or `n_workers` below 1.
-        MCTuplesConstructionError: If a size misses a tuple of the size below it or is not a Latin hypercube,
-            which can happen when `t_total_sec` is too short for max-div to meet its constraints.
+        MCTuplesConstructionError: If a size misses a tuple of the size below it or does not hold exactly 1 tuple
+            per lane, which can happen when `t_total_sec` is too short for max-div to meet its constraints.
     """
     settings = MCTuplesConstructionSettings.from_total_time(t_total_sec, n_workers)
     rng = np.random.default_rng(seed)
     tuples = None
     for k in settings.sizes:
-        grid = FreeCellGrid.for_size(k, tuples)
+        grid = LaneGrid.for_size(k, tuples)
         cells = select_cells(
             grid,
             settings.t_budget_per_solve_sec[k, MCTuplesConstructionStep.CELL_SELECTION],
@@ -76,7 +76,7 @@ def generate_mc_tuples(t_total_sec: float, n_workers: int = 32, seed: int = 42) 
             rng,
         )
         tuples = new_tuples if tuples is None else tuples.extended_by(new_tuples)
-        if not FreeCellGrid.is_latin_hypercube(tuples):
-            raise MCTuplesConstructionError(f"Size {k}: the tuples are not a Latin hypercube.")
+        if not grid.is_one_per_lane(tuples):
+            raise MCTuplesConstructionError(f"Size {k}: the tuples do not hold exactly 1 per lane.")
     assert tuples is not None  # noqa: S101 -- settings.sizes is never empty
     return tuples

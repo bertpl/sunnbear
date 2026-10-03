@@ -4,7 +4,7 @@ The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples
 
 - `MCTuples` holds a set of tuples, maps them onto a test function, and reports their spread as
   `MCTuplesStats`;
-- `generate_mc_tuples` constructs a nested set that is a Latin hypercube at every size, with settings from
+- `generate_mc_tuples` constructs a nested set that holds exactly 1 tuple per lane at every size, with settings from
   `MCTuplesConstructionSettings`;
 - `load_mc_tuples(size)` returns one size of the shipped set, 1 of `MCTuplesSize`; `MCTuplesDeclaration`
   declares the set as the data artifact `mc_tuples`.

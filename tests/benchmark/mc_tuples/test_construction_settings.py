@@ -3,6 +3,7 @@
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import MCTuplesConstructionSettings, MCTuplesSize
+from sunnbear._core.benchmark.mc_tuples.construction_settings import T_FRACTION_PER_STEP
 from sunnbear._core.benchmark.mc_tuples.construction_steps import MCTuplesConstructionStep
 
 
@@ -27,22 +28,32 @@ def test_from_total_time_builds_fewer_sizes_with_fewer_workers_below_60_s(t_tota
     assert set(settings.t_budget_per_solve_sec) == {(k, step) for k in sizes for step in MCTuplesConstructionStep}
 
 
+def test_every_step_has_a_fixed_share_and_the_shares_sum_to_1():
+    """`T_FRACTION_PER_STEP` names every step once, and the shares add up to the whole total."""
+    # --- act / assert -----------------
+    assert set(T_FRACTION_PER_STEP) == set(MCTuplesConstructionStep)
+    assert sum(T_FRACTION_PER_STEP.values()) == pytest.approx(1.0)
+
+
 @pytest.mark.parametrize("t_total_sec", [1.0, 30.0, 28_800.0])
-def test_from_total_time_gives_each_solve_1_percent_and_splits_the_rest_by_work(t_total_sec):
-    """Each solve gets 1 % of the total, the rest in proportion to its number of candidates times its size."""
+def test_from_total_time_splits_each_step_s_share_by_1_percent_per_solve_and_the_rest_by_work(t_total_sec):
+    """Within a step's share, each solve gets 1 % of the total, the rest in proportion to its candidates times size."""
     # --- act --------------------------
     settings = MCTuplesConstructionSettings.from_total_time(t_total_sec, n_workers=32)
 
     # --- assert -----------------------
     budgets = settings.t_budget_per_solve_sec
-    work_per_solve = {(k, step): step.n_candidates(k) * k for k, step in budgets}
-    t_rest_sec = t_total_sec * (1 - 0.01 * len(budgets))
-    assert budgets == pytest.approx(
-        {
-            key: 0.01 * t_total_sec + t_rest_sec * solve_work / sum(work_per_solve.values())
-            for key, solve_work in work_per_solve.items()
-        }
-    )
+    for step, t_fraction in T_FRACTION_PER_STEP.items():
+        step_budgets = {k: t for (k, s), t in budgets.items() if s == step}
+        work_per_size = {k: step.n_candidates(k) * k for k in step_budgets}
+        t_rest_sec = t_fraction * t_total_sec - 0.01 * t_total_sec * len(step_budgets)
+        assert step_budgets == pytest.approx(
+            {
+                k: 0.01 * t_total_sec + t_rest_sec * work / sum(work_per_size.values())
+                for k, work in work_per_size.items()
+            }
+        )
+        assert sum(step_budgets.values()) == pytest.approx(t_fraction * t_total_sec)
     assert sum(budgets.values()) == pytest.approx(t_total_sec)
 
 

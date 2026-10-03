@@ -5,7 +5,7 @@ import pytest
 
 from sunnbear._core.artifacts import ArtifactError
 from sunnbear._core.benchmark.mc_tuples import MCTuples, MCTuplesDeclaration, MCTuplesSize, load_mc_tuples
-from sunnbear._core.benchmark.mc_tuples.free_cell_grid import FreeCellGrid
+from sunnbear._core.benchmark.mc_tuples.lane_grid import LaneGrid
 
 
 def test_the_csv_file_reads_back_every_value_exactly():
@@ -30,17 +30,18 @@ def test_a_csv_file_without_the_header_is_refused():
 
 
 @pytest.mark.parametrize("size", MCTuplesSize)
-def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set_that_is_a_latin_hypercube(size):
-    """Each size is the start of the full shipped set, with exactly 1 tuple in each of its bands along u and along v."""
+def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set_with_1_tuple_per_lane(size):
+    """Each size is the start of the full shipped set, with exactly 1 tuple in each of its lanes along u and along v."""
     # --- act --------------------------
     tuples = load_mc_tuples(size)
 
     # --- assert -----------------------
     full = load_mc_tuples(max(MCTuplesSize))
+    size_below = None if size == min(MCTuplesSize) else load_mc_tuples(size // 2)
     assert tuples.size == size
     assert tuples.u.tolist() == full.u[:size].tolist()
     assert tuples.v.tolist() == full.v[:size].tolist()
-    assert FreeCellGrid.is_latin_hypercube(tuples)
+    assert LaneGrid.for_size(size, size_below).is_one_per_lane(tuples)
 
 
 def test_load_mc_tuples_rejects_an_unsupported_size():

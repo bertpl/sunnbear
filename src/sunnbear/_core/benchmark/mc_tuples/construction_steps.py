@@ -1,12 +1,10 @@
 """The construction adds the new tuples of 1 size in 2 max-div steps: `select_cells`, then `refine_within_cells`.
 
-- **Cell selection** picks cells of the size's `FreeCellGrid`, where a cell is the crossing of a u band and a
-  v band that hold no tuple of the size below (free bands); it picks 1 cell per free band on each axis, so
-  the size is a Latin hypercube:
-  - it maximizes the L2 min separation of the cell centers and of the tuples of the size below;
-  - every valid choice of cells fills all free bands, so the set of center u values, and of center v values,
-    is the same for every choice; only the L2 separation differs between choices, so this step maximizes L2
-    alone.
+- **Cell selection** picks cells of the size's `LaneGrid`, where a cell is the crossing of a new u lane and a
+  new v lane and is represented by its point (u value, v value); it picks 1 cell per new lane on each axis:
+  - it maximizes the L2 min separation of the cell points and of the tuples of the size below;
+  - every valid choice of cells uses every new lane, so the set of u values, and of v values, is the same for
+    every choice; only the L2 separation differs between choices, so this step maximizes L2 alone.
 - **Refinement** places 1 tuple in each selected cell, chosen from `N_CANDIDATES_PER_CELL` uniform random
   float64 tuples inside the cell; max-div compares float32 copies, and the chosen tuple keeps its float64
   values. It maximizes the smallest of the 3 separation fractions of `MCTuplesStats`: along u, along v and in
@@ -24,14 +22,15 @@ from max_div.metrics import DistanceMetric, DiversityMetric, HybridDiversityMetr
 from max_div.solver import ParallelMaxDivSolverBuilder, ParallelSolvingWarning, Verbosity, seconds
 
 from .exceptions import MCTuplesConstructionError
-from .free_cell_grid import FreeCellGrid
+from .lane_grid import LaneGrid
 from .sizes import MCTuplesSize
 from .tuples import MCTuples, MCTuplesStats
 
-# The number of random candidate tuples per selected cell in the refinement step.
-N_CANDIDATES_PER_CELL = 100
+# The number of random candidate tuples per selected cell in the refinement step. The axes no longer bind with
+# 256: the L2 separation does, and cell selection sets it, so a larger pool would only cost refinement iterations.
+N_CANDIDATES_PER_CELL = 256
 
-# The constraint that keeps the tuples of the size below outweighs the band constraints, so max-div meets it first.
+# The constraint that keeps the tuples of the size below outweighs the lane constraints, so max-div meets it first.
 INCLUSION_CONSTRAINT_WEIGHT = 10.0
 
 
@@ -58,51 +57,51 @@ class MCTuplesConstructionStep(StrEnum):
 #  Steps
 # ==================================================================================================
 def select_cells(
-    grid: FreeCellGrid, t_budget_sec: float, n_workers: int, seed: int, rng: np.random.Generator
+    grid: LaneGrid, t_budget_sec: float, n_workers: int, seed: int, rng: np.random.Generator
 ) -> np.ndarray:
-    """Return the cells of `grid` for the new tuples of its size: 1 per free band along u and 1 per free band along v.
+    """Return the cells of `grid` for the new tuples of its size: 1 per new lane along u and 1 per new lane along v.
 
-    The selection maximizes the L2 min separation of the selected cell centers and the tuples of the size below
-    (`grid.required_tuples`). A constraint per free band asks for exactly 1 selected cell in it; max-div weighs
+    The selection maximizes the L2 min separation of the selected cells' points and the tuples of the size below
+    (`grid.required_tuples`). A constraint per new lane asks for exactly 1 selected cell in it; max-div weighs
     the constraints against the objective without enforcing them, so the selection is checked before it is
     returned.
 
-    max-div starts from a random Latin hypercube over the free bands, which `rng` draws, so the starting
-    selection already meets the band constraints; from there, max-div reaches other valid selections by
-    exchanging the v bands of 2 selected cells. `seed` seeds max-div's solve.
+    max-div starts from random cells that pair each new u lane with a different new v lane, which `rng` draws,
+    so the starting selection already meets the lane constraints; from there, max-div reaches other valid
+    selections by exchanging the v lanes of 2 selected cells. `seed` seeds max-div's solve.
 
     Returns:
         The selected cell indices, ascending.
 
     Raises:
         MCTuplesConstructionError: If the selection misses a required tuple, or does not hold exactly 1 cell per
-            free band, which can happen when `t_budget_sec` is too short for max-div to meet the constraints.
+            new lane, which can happen when `t_budget_sec` is too short for max-div to meet the constraints.
     """
     required_points = grid.required_points
     n_required = required_points.shape[0]
-    band_constraints = [
-        Constraint(int_set=set((n_required + band_cells).tolist()), min_count=1, max_count=1)
-        for band_cells in grid.band_cells()
+    lane_constraints = [
+        Constraint(int_set=set((n_required + lane_cells).tolist()), min_count=1, max_count=1)
+        for lane_cells in grid.lane_cells()
     ]
     problem = MaxDivProblem.new(
         # max-div works on a float32 copy; the selected cells are taken by index.
-        np.vstack([required_points, grid.cell_centers]).astype(np.float32),
+        np.vstack([required_points, grid.cell_points]).astype(np.float32),
         k=grid.size,
         distance_metric=DistanceMetric.l2_euclidean(),
         diversity_metric=DiversityMetric.MIN_SEPARATION,
-        constraints=band_constraints + _inclusion_constraints(n_required),
+        constraints=lane_constraints + _inclusion_constraints(n_required),
     )
-    initial_cells = grid.random_latin_hypercube_cells(rng)
+    initial_cells = grid.random_one_per_lane_cells(rng)
     initial_selection = np.concatenate([np.arange(n_required), n_required + initial_cells])
     selection = _run_max_div(problem, initial_selection, t_budget_sec, n_workers, seed)
     cells = _indices_among_new_candidates(selection, n_required, grid.size)
-    if not grid.is_one_per_free_band(cells):
-        raise MCTuplesConstructionError(f"Size {grid.size}: the selected cells do not hold exactly 1 per free band.")
+    if not grid.is_one_per_new_lane(cells):
+        raise MCTuplesConstructionError(f"Size {grid.size}: the selected cells do not hold exactly 1 per new lane.")
     return cells
 
 
 def refine_within_cells(
-    grid: FreeCellGrid, cells: np.ndarray, t_budget_sec: float, n_workers: int, seed: int, rng: np.random.Generator
+    grid: LaneGrid, cells: np.ndarray, t_budget_sec: float, n_workers: int, seed: int, rng: np.random.Generator
 ) -> MCTuples:
     """Return 1 new tuple in each of `cells`, chosen from `N_CANDIDATES_PER_CELL` random tuples inside the cell.
 
@@ -118,8 +117,8 @@ def refine_within_cells(
     so max-div raises the smallest of the 3 separation fractions of `MCTuplesStats`. The separations along an
     axis matter because u and v each set a separate parameter of a test function.
 
-    No constraint keeps 1 tuple per cell; the objective does: 2 tuples in 1 cell would lie less than 1 band width
-    apart on each axis, which lowers the separation along the axes.
+    No constraint keeps 1 tuple per cell; the objective does: 2 tuples in 1 cell would lie less than a lane
+    width apart on each axis, which lowers the separation along the axes.
 
     Returns:
         The new tuples, in the order of `cells`.
@@ -143,9 +142,9 @@ def refine_within_cells(
         ),
         constraints=_inclusion_constraints(n_required),
     )
-    # max-div starts from the candidate nearest to each cell's center.
-    centers = grid.cell_centers[cells]
-    nearest_candidates = np.argmin(np.abs(candidates - centers[:, None, :]).sum(axis=-1), axis=1)
+    # max-div starts from the candidate nearest to each cell's point, the position that cell selection optimized.
+    cell_points = grid.cell_points[cells]
+    nearest_candidates = np.argmin(np.abs(candidates - cell_points[:, None, :]).sum(axis=-1), axis=1)
     initial_selection = np.concatenate(
         [np.arange(n_required), n_required + np.arange(cells.size) * N_CANDIDATES_PER_CELL + nearest_candidates]
     )

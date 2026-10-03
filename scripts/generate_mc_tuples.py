@@ -4,7 +4,7 @@ The maintainer runs this script by hand whenever the tuple set is regenerated, n
 time. The script:
 
 - calls `sunnbear.benchmark.generate_mc_tuples`;
-- prints the spread of every size, and whether it is a Latin hypercube;
+- prints the spread of every size, and whether it holds exactly 1 tuple per lane;
 - saves the set through `ArtifactStore`, which records in the artifact's manifest the
   `generate_mc_tuples` call, its arguments and max-div's version.
 
@@ -18,7 +18,7 @@ import importlib.metadata
 
 from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples import MCTuplesDeclaration, MCTuplesSize, generate_mc_tuples
-from sunnbear._core.benchmark.mc_tuples.free_cell_grid import FreeCellGrid
+from sunnbear._core.benchmark.mc_tuples.lane_grid import LaneGrid
 
 
 def main() -> None:
@@ -32,14 +32,16 @@ def main() -> None:
     arguments = {"t_total_sec": args.t_total_sec, "n_workers": args.n_workers, "seed": args.seed}
     tuples = generate_mc_tuples(**arguments)
 
-    print("| size | L2 | u | v | Latin hypercube |")
+    print("| size | L2 | u | v | 1 per lane |")
     print("|---|---|---|---|---|")
     for size in (size for size in MCTuplesSize if size <= tuples.size):
         size_tuples = tuples.first(size)
         stats = size_tuples.stats()
+        size_below = None if size == min(MCTuplesSize) else tuples.first(size // 2)
+        is_one_per_lane = LaneGrid.for_size(size, size_below).is_one_per_lane(size_tuples)
         print(
             f"| {size} | {stats.min_separation_l2_fraction:.1%} | {stats.min_separation_u_fraction:.1%} "
-            f"| {stats.min_separation_v_fraction:.1%} | {FreeCellGrid.is_latin_hypercube(size_tuples)} |"
+            f"| {stats.min_separation_v_fraction:.1%} | {is_one_per_lane} |"
         )
 
     manifest = ArtifactStore.save(
