@@ -1,10 +1,9 @@
-"""`summarize_results` summarizes a results table per group: its success fractions, and statistics of chosen columns.
+"""`summarize_results` gives, per group of a results table, its converged and correct fractions and `gpq` statistics.
 
-The statistics are `gpq` levels, the geometric pseudo-quantiles of `sunnbear.stats`. Grouping is the caller's
-choice of columns, e.g. `solver_id` for 1 row per solver, or `solver_id` and `function_id` for 1 row per pair.
-
-Each `gpq` is computed over all rows of a group at once, so a test function that has more rows in a group, for
-example because it ran on more samples, weighs more in that group's `gpq`.
+The fractions are the shares of the group's solves that converged, and that converged to a correct answer. The
+statistics are `gpq` values, the geometric pseudo-quantiles of `sunnbear.stats`, each at a level `q` between 0 and 1.
+Grouping is the caller's choice of columns, e.g. `solver_id` for 1 row per solver, or `solver_id` and `function_id`
+for 1 row per pair.
 """
 
 from collections.abc import Mapping, Sequence
@@ -26,7 +25,8 @@ DEFAULT_GPQ_LEVELS = (0.25, 0.5, 0.75)
 def gpq_column_name(column: str, q: float) -> str:
     """Return the summary column name for the `gpq` of `column` at level `q`, e.g. `n_fevals_eff_gpq_25`.
 
-    The level is written in percent, with at least 2 digits: `gpq_05`, `gpq_50`, `gpq_100`, `gpq_12.5`.
+    The level is written in percent, with at least 2 digits: `gpq_05`, `gpq_50`, `gpq_100`, `gpq_12.5`. The
+    percentage keeps 6 significant digits, so 2 levels that agree to that precision get the same name.
     """
     return f"{column}_gpq_{f'{round(q * 100, 6):g}'.zfill(2)}"
 
@@ -51,7 +51,7 @@ def summarize_results(
     *,
     gpq_levels_by_column: Mapping[str, Sequence[float]] | None = None,
 ) -> pl.DataFrame | pl.LazyFrame:
-    """Return 1 row per group of `frame`, grouped by the columns `by`, in order of first appearance.
+    """Return 1 row per group of `frame`, grouped by the columns `by`, in the order in which the groups first appear.
 
     Each row holds the group's values of `by`, and:
 
@@ -69,15 +69,20 @@ def summarize_results(
             `gpq_levels_by_column`, the columns of `DERIVED_RESULTS_SCHEMA` (see `add_derived_results`);
             eager or lazy, and the result is of the same kind.
         by: The column or columns to group by.
-        gpq_levels_by_column: The `gpq` levels to compute, per column. Each column must hold non-negative
-            values, and each level must lie between 0 and 1 inclusive, where 0 gives the minimum and 1 the
-            maximum. ``None`` summarizes every column of `DERIVED_RESULTS_SCHEMA` at `DEFAULT_GPQ_LEVELS`. The
-            cost of the summary grows with the number of columns times levels, so on a large table, ask only
-            for the levels you need.
+        gpq_levels_by_column: The `gpq` levels to compute, per column; ``None`` summarizes every column of
+            `DERIVED_RESULTS_SCHEMA` at `DEFAULT_GPQ_LEVELS`.
+
+            - Each column must hold non-negative values.
+            - Each level must lie between 0 and 1 inclusive, where 0 gives the minimum and 1 the maximum.
+            - The cost of the summary grows with the number of columns times levels, so on a large table,
+              ask only for the levels you need.
 
     Raises:
-        ValueError: If a level is outside [0, 1], if 2 levels of a column give the same summary column name,
-            or if `frame` lacks a column to group by or to summarize.
+        ValueError: If any of these holds:
+
+            - a level is outside [0, 1];
+            - 2 levels of a column give the same summary column name;
+            - `frame` lacks a column to group by or to summarize.
     """
     if gpq_levels_by_column is None:
         gpq_levels_by_column = dict.fromkeys(DERIVED_RESULTS_SCHEMA, DEFAULT_GPQ_LEVELS)
@@ -85,28 +90,28 @@ def summarize_results(
     _validate_has_columns(frame, [*group_columns, "status", "is_correct", *gpq_levels_by_column])
 
     # --- gpq columns ----------------------------
-    gpq_columns = {
+    gpq_expressions_by_column_name = {
         gpq_column_name(column, q): gpq_expression(column, q)
         for column, levels in gpq_levels_by_column.items()
         for q in levels
     }
-    n_requested_gpq_levels = sum(len(levels) for levels in gpq_levels_by_column.values())
-    if len(gpq_columns) < n_requested_gpq_levels:
+    n_requested_gpq_columns = sum(len(levels) for levels in gpq_levels_by_column.values())
+    if len(gpq_expressions_by_column_name) < n_requested_gpq_columns:
         raise ValueError(
             f"gpq_levels_by_column gives a summary column name more than once: {dict(gpq_levels_by_column)}."
         )
 
     # --- aggregate per group --------------------
-    result = (
+    summary = (
         frame.lazy()
         .group_by(group_columns, maintain_order=True)
         .agg(
             _converged_expression().mean().alias("converged_fraction"),
             pl.col("is_correct").mean().alias("correct_fraction"),
-            *(expression.alias(name) for name, expression in gpq_columns.items()),
+            *(expression.alias(name) for name, expression in gpq_expressions_by_column_name.items()),
         )
     )
-    return collect_if_eager(frame, result)
+    return collect_if_eager(frame, summary)
 
 
 # ==================================================================================================
@@ -121,10 +126,11 @@ def _validate_has_columns(frame: pl.DataFrame | pl.LazyFrame, columns: Sequence[
     """Check that `frame` has every one of `columns`.
 
     Raises:
-        ValueError: If a column is missing; the message points to `add_derived_results` for a derived column.
+        ValueError: If a column is missing; when a missing column is a derived column, the message says to call
+            `add_derived_results` first.
     """
-    column_names = set(frame.collect_schema().names())
-    missing_columns = [column for column in columns if column not in column_names]
+    frame_columns = set(frame.collect_schema().names())
+    missing_columns = [column for column in columns if column not in frame_columns]
     if missing_columns:
         raise ValueError(
             f"The results table lacks the columns {missing_columns}; "
