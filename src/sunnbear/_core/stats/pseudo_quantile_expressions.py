@@ -1,4 +1,4 @@
-"""`owg_expression` and `gpq_expression` compute 2 statistics per group inside polars, matching their numpy functions.
+"""`owg_expression` and `gpq_expression` compute `owg` and `gpq` per group inside polars, matching `pseudo_quantiles`.
 
 The statistics are `owg`, the ordered weighted geometric mean, and `gpq`, the geometric pseudo-quantile, whose
 numpy functions are in `pseudo_quantiles`. Calling the numpy functions once per group would run Python code for
@@ -25,9 +25,11 @@ def owg_expression(column: str, p: float) -> pl.Expr:
     - 0 for a group that contains a zero;
     - the rank-weighted geometric mean otherwise.
 
-    Unlike `owg`, the expression cannot refuse invalid values: a negative value gives NaN, a group of only nulls
-    gives null, and a null among other values gives a wrong result, because it still counts toward the rank
-    weights.
+    Unlike `owg`, the expression cannot refuse invalid values:
+
+    - a negative value gives NaN;
+    - a group of only nulls gives null;
+    - a null among other values gives a wrong result, because it still counts toward the rank weights.
     """
     values = pl.col(column).cast(pl.Float64)
 
@@ -54,6 +56,9 @@ def owg_expression(column: str, p: float) -> pl.Expr:
 # ==================================================================================================
 def gpq_expression(column: str, q: float) -> pl.Expr:
     """Return an aggregation expression that computes `gpq` of `column` at level `q`, per group.
+
+    Like `owg_expression`, the expression cannot refuse invalid values: a negative value gives NaN, a group of only
+    nulls gives null, and a null among other values gives a wrong result.
 
     Raises:
         ValueError: If `q` is NaN or outside the interval [0, 1].

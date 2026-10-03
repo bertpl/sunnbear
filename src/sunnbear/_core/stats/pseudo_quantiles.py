@@ -21,7 +21,7 @@ def owg(values: ArrayLike, p: float) -> float:
     """Compute the ordered weighted geometric mean of non-negative samples.
 
     Sorts the values (ascending for ``p >= 0``, descending for ``p < 0``) and
-    weights each by ``rank_fractions ** |p|``, where the rank ramp runs over the
+    weights each by ``rank_fractions ** |p|``, where the rank fractions are the
     interval midpoints ``(i + 0.5) / n``. The result ranges from ``min(values)``
     (``p = -inf``) through the plain geometric mean (``p = 0``) to
     ``max(values)`` (``p = +inf``).
