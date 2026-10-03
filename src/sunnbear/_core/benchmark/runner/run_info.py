@@ -31,7 +31,7 @@ from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples import MCTuplesDeclaration
 from sunnbear._core.functions.core import FunctionId, TestFunction
 from sunnbear._core.solvers.core import SolverConfig
-from sunnbear._core.utils.mapping_comparison import common_keys_and_whether_any_differ
+from sunnbear._core.utils.mapping_comparison import any_value_of_common_key_differs, common_dict_keys
 
 from .exceptions import BenchmarkRunError
 from .run_settings import BenchmarkRunSettings
@@ -178,15 +178,13 @@ class BenchmarkRunInfo(BaseModel):
         )
 
         # --- solvers and functions in both runs -
-        common_solver_ids, has_differing_solver_versions = common_keys_and_whether_any_differ(
-            self.solver_versions, other.solver_versions
-        )
-        if has_differing_solver_versions:
+        common_solver_ids = common_dict_keys(self.solver_versions, other.solver_versions)
+        if any_value_of_common_key_differs(self.solver_versions, other.solver_versions):
             differing_fields.append("solver_versions")
-        common_function_ids, has_differing_function_infos = common_keys_and_whether_any_differ(
-            self.function_infos_by_id, other.function_infos_by_id
-        )
-        if has_differing_function_infos:
+        function_infos_by_id = self.function_infos_by_id
+        other_function_infos_by_id = other.function_infos_by_id
+        common_function_ids = common_dict_keys(function_infos_by_id, other_function_infos_by_id)
+        if any_value_of_common_key_differs(function_infos_by_id, other_function_infos_by_id):
             differing_fields.append("function_infos")
 
         if differing_fields:
