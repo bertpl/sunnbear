@@ -34,7 +34,8 @@ def _results_of_2_solvers() -> pl.DataFrame:
 
 @pytest.mark.parametrize("is_lazy", [False, True])
 def test_by_default_every_derived_column_is_summarized_at_the_default_levels(is_lazy):
-    """The default summary has the group columns, the success fractions, and 1 column per derived column and level."""
+    """The default summary keeps the frame's kind and has the group columns, the converged and correct fractions, and 1
+    column per derived column and level."""
     # --- arrange ----------------------
     frame = _results_of_2_solvers()
 
@@ -51,9 +52,9 @@ def test_by_default_every_derived_column_is_summarized_at_the_default_levels(is_
     ]
 
 
-def test_the_rows_hold_each_group_s_fractions_and_gpq_levels():
-    """Each group gets its success fractions and the `gpq` of its own rows, and the groups keep their order of first
-    appearance."""
+def test_the_rows_hold_each_group_s_fractions_and_gpq_values():
+    """Each group gets its converged and correct fractions and the `gpq` of its own rows, and the groups keep their
+    order of first appearance."""
     # --- act --------------------------
     summary = summarize_results(_results_of_2_solvers(), ["solver_id"])
 

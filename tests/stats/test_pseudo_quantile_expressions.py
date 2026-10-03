@@ -7,8 +7,8 @@ import pytest
 from sunnbear._core.stats.pseudo_quantile_expressions import gpq_expression, owg_expression
 from sunnbear.stats import gpq, owg
 
-# The group with a zero is large enough that its smallest rank weight rounds to 0.0 in float64 at the `owg` power of
-# `gpq` at level 0.99; `owg_expression` handles a group with a zero as a separate case.
+# The group with a zero is large enough that, for `gpq` at level 0.99, its smallest rank weight rounds to 0.0 in
+# float64; the group checks that `owg_expression` returns 0, not NaN, for a group with a zero.
 _RNG = np.random.default_rng(3)
 _VALUES_BY_GROUP = {
     "lognormal": _RNG.lognormal(3.0, 1.0, 500),
@@ -18,7 +18,7 @@ _VALUES_BY_GROUP = {
 }
 
 
-def _frame() -> pl.DataFrame:
+def _frame_of_values_by_group() -> pl.DataFrame:
     """Return a frame with 1 row per value, and the group of each value in the column `group`."""
     return pl.DataFrame(
         {
@@ -32,7 +32,7 @@ def _frame() -> pl.DataFrame:
 def test_gpq_expression_equals_gpq_per_group(q):
     """Per group, the expression gives the value of `gpq`, at the endpoint levels and with a zero too."""
     # --- act --------------------------
-    results = _frame().group_by("group").agg(gpq_expression("value", q).alias("gpq"))
+    results = _frame_of_values_by_group().group_by("group").agg(gpq_expression("value", q).alias("gpq"))
 
     # --- assert -----------------------
     for group, result in results.iter_rows():
@@ -43,7 +43,7 @@ def test_gpq_expression_equals_gpq_per_group(q):
 def test_owg_expression_equals_owg_per_group(p):
     """Per group, the expression gives the value of `owg`, at infinite powers too."""
     # --- act --------------------------
-    results = _frame().group_by("group").agg(owg_expression("value", p).alias("owg"))
+    results = _frame_of_values_by_group().group_by("group").agg(owg_expression("value", p).alias("owg"))
 
     # --- assert -----------------------
     for group, result in results.iter_rows():
