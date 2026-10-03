@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import MCTuples
+from sunnbear._core.benchmark.mc_tuples import MCTuples, MCTuplesStats
 
 # The diagonal set has 8 tuples, evenly spaced on each axis: u rises and v falls, so neighbors are diagonal at L2
 # distance √2/8.
@@ -95,3 +95,15 @@ def test_stats_reports_min_separations_and_their_fractions():
     assert stats.min_separation_u_fraction == pytest.approx(7 / 8)
     assert stats.min_separation_v_fraction == pytest.approx(7 / 8)
     assert stats.min_separation_l2_fraction == pytest.approx(np.sqrt(2) / 8 * (np.sqrt(8) - 1))
+
+
+def test_stats_describe_points_on_the_edges_of_the_unit_square():
+    """`MCTuplesStats` takes a points array, so the construction's cell points at 0 or 1 get their fractions too."""
+    # --- act --------------------------
+    stats = MCTuplesStats(np.array([[0.0, 0.0], [0.5, 1.0], [1.0, 0.5]]))
+
+    # --- assert -----------------------
+    assert stats.size == 3
+    assert stats.min_separation_u == pytest.approx(0.5)
+    assert stats.min_separation_v == pytest.approx(0.5)
+    assert stats.min_separation_l2 == pytest.approx(np.sqrt(0.5))

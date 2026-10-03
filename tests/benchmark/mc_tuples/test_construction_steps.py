@@ -17,10 +17,10 @@ _SIZE_4 = MCTuples([0.15, 0.3, 0.7, 0.8], [0.8, 0.05, 0.45, 0.55])
 
 
 def _run_max_div_returning(selection: list[int]):
-    """Return a replacement for `construction_steps._run_max_div` that returns `selection` whatever the problem."""
+    """Return a replacement for `construction_steps._run_max_div` that returns `selection`, and no solution."""
 
-    def solve(*args, **kwargs) -> np.ndarray:
-        return np.array(selection)
+    def solve(*args, **kwargs) -> tuple[np.ndarray, None]:
+        return np.array(selection), None
 
     return solve
 

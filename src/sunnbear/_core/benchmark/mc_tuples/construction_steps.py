@@ -10,7 +10,8 @@
   values. It maximizes the smallest of the 3 separation fractions of `MCTuplesStats`: along u, along v and in
   L2 (the objective of `refine_within_cells`).
 
-Both steps require every tuple of the size below to stay selected.
+Both steps require every tuple of the size below to stay selected, and both return max-div's solution next to
+their result, so that a caller can keep its score checkpoints for inspection.
 """
 
 import warnings
@@ -19,7 +20,13 @@ from enum import StrEnum
 import numpy as np
 from max_div import Constraint, MaxDivProblem
 from max_div.metrics import DistanceMetric, DiversityMetric, HybridDiversityMetric
-from max_div.solver import ParallelMaxDivSolverBuilder, ParallelSolvingWarning, Verbosity, seconds
+from max_div.solver import (
+    ParallelMaxDivSolution,
+    ParallelMaxDivSolverBuilder,
+    ParallelSolvingWarning,
+    Verbosity,
+    seconds,
+)
 
 from .exceptions import MCTuplesConstructionError
 from .lane_grid import LaneGrid
@@ -58,7 +65,7 @@ class MCTuplesConstructionStep(StrEnum):
 # ==================================================================================================
 def select_cells(
     grid: LaneGrid, t_budget_sec: float, n_workers: int, seed: int, rng: np.random.Generator
-) -> np.ndarray:
+) -> tuple[np.ndarray, ParallelMaxDivSolution]:
     """Return the cells of `grid` for the new tuples of its size: 1 per new lane along u and 1 per new lane along v.
 
     The selection maximizes the L2 min separation of the selected cells' points and the tuples of the size below
@@ -71,7 +78,7 @@ def select_cells(
     selections by exchanging the v lanes of 2 selected cells. `seed` seeds max-div's solve.
 
     Returns:
-        The selected cell indices, ascending.
+        The selected cell indices, ascending, and max-div's solution of the solve.
 
     Raises:
         MCTuplesConstructionError: If the selection misses a required tuple, or does not hold exactly 1 cell per
@@ -93,16 +100,16 @@ def select_cells(
     )
     initial_cells = grid.random_one_per_lane_cells(rng)
     initial_selection = np.concatenate([np.arange(n_required), n_required + initial_cells])
-    selection = _run_max_div(problem, initial_selection, t_budget_sec, n_workers, seed)
+    selection, solution = _run_max_div(problem, initial_selection, t_budget_sec, n_workers, seed)
     cells = _indices_among_new_candidates(selection, n_required, grid.size)
     if not grid.is_one_per_new_lane(cells):
         raise MCTuplesConstructionError(f"Size {grid.size}: the selected cells do not hold exactly 1 per new lane.")
-    return cells
+    return cells, solution
 
 
 def refine_within_cells(
     grid: LaneGrid, cells: np.ndarray, t_budget_sec: float, n_workers: int, seed: int, rng: np.random.Generator
-) -> MCTuples:
+) -> tuple[MCTuples, ParallelMaxDivSolution]:
     """Return 1 new tuple in each of `cells`, chosen from `N_CANDIDATES_PER_CELL` random tuples inside the cell.
 
     `rng` draws the candidates; `seed` seeds max-div's solve.
@@ -121,7 +128,7 @@ def refine_within_cells(
     width apart on each axis, which lowers the separation along the axes.
 
     Returns:
-        The new tuples, in the order of `cells`.
+        The new tuples, in the order of `cells`, and max-div's solution of the solve.
 
     Raises:
         MCTuplesConstructionError: If the selection misses a required tuple or does not hold 1 new tuple per cell,
@@ -148,14 +155,14 @@ def refine_within_cells(
     initial_selection = np.concatenate(
         [np.arange(n_required), n_required + np.arange(cells.size) * N_CANDIDATES_PER_CELL + nearest_candidates]
     )
-    selection = _run_max_div(problem, initial_selection, t_budget_sec, n_workers, seed)
+    selection, solution = _run_max_div(problem, initial_selection, t_budget_sec, n_workers, seed)
     selected_cells, selected_candidates = np.divmod(
         _indices_among_new_candidates(selection, n_required, grid.size), N_CANDIDATES_PER_CELL
     )
     if np.unique(selected_cells).size != cells.size:
         raise MCTuplesConstructionError(f"Size {grid.size}: the refinement does not hold 1 new tuple per cell.")
     points = candidates[selected_cells, selected_candidates]
-    return MCTuples(points[:, 0], points[:, 1])
+    return MCTuples(points[:, 0], points[:, 1]), solution
 
 
 # ==================================================================================================
@@ -178,8 +185,8 @@ def _inclusion_constraints(n_required: int) -> list[Constraint]:
 
 def _run_max_div(
     problem: MaxDivProblem, initial_selection: np.ndarray, t_budget_sec: float, n_workers: int, seed: int
-) -> np.ndarray:
-    """Return max-div's selection for `problem`, started from `initial_selection`, as sorted candidate indices."""
+) -> tuple[np.ndarray, ParallelMaxDivSolution]:
+    """Return max-div's sorted selection for `problem`, started from `initial_selection`, and its solution."""
     with warnings.catch_warnings():
         # max-div warns when a short run scales down to 1 worker, and when the workers outnumber the
         # cores; both are deliberate here (the second searches from more seeds).
@@ -190,10 +197,12 @@ def _run_max_div(
             .with_workers(seconds(t_budget_sec), n_workers)
             .with_end_to_end_budget()
             .with_initial_selection(initial_selection)
+            # Every checkpoint also carries its selection, so a solution replays how the selection evolved.
+            .with_intermediate_selections()
             .build()
         )
     solution = solver.solve(verbosity=Verbosity.SILENT)
-    return np.sort(np.asarray(solution.i_selected, dtype=np.int64))
+    return np.sort(np.asarray(solution.i_selected, dtype=np.int64)), solution
 
 
 def _indices_among_new_candidates(selection: np.ndarray, n_required: int, size: int) -> np.ndarray:
