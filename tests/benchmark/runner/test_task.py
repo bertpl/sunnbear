@@ -8,7 +8,7 @@ from counted_float import FlopType
 
 import sunnbear.functions as functions  # Import the module, so pytest does not try to collect `TestFunction`.
 from sunnbear._core.benchmark.mc_tuples import load_mc_tuples
-from sunnbear._core.benchmark.protocol.tolerances import compute_xtol_range
+from sunnbear._core.benchmark.protocol.tolerances import compute_xtol_range, max_fevals_for
 from sunnbear._core.benchmark.runner import task
 from sunnbear._core.benchmark.runner.results_schema import RESULTS_SCHEMA, solver_flop_count_column_name
 from sunnbear._core.benchmark.runner.run_settings import BenchmarkRunSettings
@@ -82,7 +82,8 @@ def _run_task_on_cubic(cubic: functions.TestFunction, solver_configs) -> pl.Data
 #  Rows and schema
 # ==================================================================================================
 def test_a_task_gives_1_row_per_sample_and_solver_in_the_results_schema(cubic):
-    """The rows follow `RESULTS_SCHEMA`, sample by sample, with `xtol` in its range and `c` in `[c_min, c_max]`."""
+    """The rows follow `RESULTS_SCHEMA`, sample by sample, with `xtol` in its range, `c` in `[c_min, c_max]` and the
+    run's `max_fevals`."""
     # --- arrange ----------------------
     configs = [SolverConfigRegistry.config_from_id("bisection"), SolverConfigRegistry.config_from_id("regula_falsi")]
     xtol_min, xtol_max = compute_xtol_range(a=cubic.a, b=cubic.b, n_bisection_fevals=N_BISECTION_FEVALS)
@@ -101,6 +102,7 @@ def test_a_task_gives_1_row_per_sample_and_solver_in_the_results_schema(cubic):
     assert results["u"].to_list()[::2] == mc_tuples.u.tolist()
     assert results["xtol"].is_between(xtol_min, xtol_max, closed="left").all()
     assert results["c"].is_between(cubic.c_min, cubic.c_max).all()
+    assert set(results["max_fevals"]) == {max_fevals_for(n_bisection_fevals=N_BISECTION_FEVALS)}
 
 
 def test_bisection_is_correct_in_exactly_n_bisection_fevals_with_counted_flops(cubic):
