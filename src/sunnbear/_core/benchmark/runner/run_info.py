@@ -22,7 +22,7 @@ import importlib.metadata
 import json
 import platform
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from typing import Self
 
 from pydantic import BaseModel, ConfigDict
@@ -31,6 +31,7 @@ from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples import MCTuplesDeclaration
 from sunnbear._core.functions.core import FunctionId, TestFunction
 from sunnbear._core.solvers.core import SolverConfig
+from sunnbear._core.utils.mapping_comparison import common_keys_and_whether_any_differ
 
 from .exceptions import BenchmarkRunError
 from .run_settings import BenchmarkRunSettings
@@ -42,7 +43,8 @@ _REQUIREMENT_NAME_END_PATTERN = re.compile(r"[^A-Za-z0-9._-]")
 # These run info fields are recorded for information only; no check compares them.
 _FIELDS_FOR_INFORMATION_ONLY = frozenset({"platform", "started_at", "finished_at"})
 
-# These run info fields list a run's solvers and test functions; runs that are combined may list different ones.
+# These run info fields list a run's solvers and test functions; runs that are combined may list different ones,
+# so `check_combinable_with` compares only the entries that both runs list.
 _FIELDS_LISTING_SOLVERS_AND_FUNCTIONS = frozenset({"solver_versions", "function_infos"})
 
 
@@ -156,10 +158,10 @@ class BenchmarkRunInfo(BaseModel):
     #  Combining
     # --------------------------------------------------------------------------
     def check_combinable_with(self, other: "BenchmarkRunInfo") -> None:
-        """Check that the results of the runs that this run info and `other` describe can be read as 1 table.
+        """Check that the results of this run info's run and of `other`'s run can be read as 1 table.
 
-        Everything that the results depend on must be the same, except that the runs may cover different
-        solvers and test functions:
+        Both runs must depend on the same inputs and versions, except that the runs may cover different solvers
+        and test functions:
 
         - a solver in both runs must have the same version, and a test function in both runs must have the
           same c-range;
@@ -176,12 +178,12 @@ class BenchmarkRunInfo(BaseModel):
         )
 
         # --- solvers and functions in both runs -
-        common_solver_ids, has_differing_solver_versions = self._common_ids_with_any_difference(
+        common_solver_ids, has_differing_solver_versions = common_keys_and_whether_any_differ(
             self.solver_versions, other.solver_versions
         )
         if has_differing_solver_versions:
             differing_fields.append("solver_versions")
-        common_function_ids, has_differing_function_infos = self._common_ids_with_any_difference(
+        common_function_ids, has_differing_function_infos = common_keys_and_whether_any_differ(
             self.function_infos_by_id, other.function_infos_by_id
         )
         if has_differing_function_infos:
@@ -216,14 +218,6 @@ class BenchmarkRunInfo(BaseModel):
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
-    @staticmethod
-    def _common_ids_with_any_difference(
-        by_id: Mapping[str, object], other_by_id: Mapping[str, object]
-    ) -> tuple[list[str], bool]:
-        """Return the sorted ids in both mappings, and whether any of those ids maps to different values."""
-        common_ids = sorted(by_id.keys() & other_by_id.keys())
-        return common_ids, any(by_id[id_] != other_by_id[id_] for id_ in common_ids)
-
     def _differing_fields(self, other: "BenchmarkRunInfo", *, ignored_fields: frozenset[str]) -> list[str]:
         """Return the fields outside `ignored_fields` whose values differ between this run info and `other`."""
         return [

@@ -11,7 +11,6 @@ versions against the stored run info.
 `BenchmarkRunDir`.
 """
 
-import itertools
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -128,24 +127,17 @@ def load_results(run_dirs: Path | Sequence[Path]) -> pl.LazyFrame:
     """Return a lazy frame over the results of 1 or more finished runs, 1 row per solve.
 
     The rows of several runs follow each other in the order of `run_dirs`. Every pair of runs must pass
-    `BenchmarkRunInfo.check_combinable_with`: everything that their results depend on must be the same, except
-    that the runs may cover different solvers and test functions.
+    `BenchmarkRunInfo.check_combinable_with`: both runs must depend on the same inputs and versions, except that
+    the runs may cover different solvers and test functions, and no solver may have run on the same test function
+    in both runs.
 
     A query on the frame reads only the files, row groups and columns that it needs. The columns and their
     types are those of `RESULTS_SCHEMA`.
 
     Raises:
         ValueError: If `run_dirs` is an empty sequence.
-        BenchmarkRunError: If a run directory holds no run, a malformed run info, or a run that is not
-            finished, or if `BenchmarkRunInfo.check_combinable_with` refuses 2 of the runs.
+        BenchmarkRunError: If a run directory holds no finished run, or if `BenchmarkRunInfo.check_combinable_with`
+            refuses 2 of the runs.
     """
-    if isinstance(run_dirs, Path):
-        benchmark_run_dirs = [BenchmarkRunDir(run_dirs)]
-    else:
-        benchmark_run_dirs = [BenchmarkRunDir(run_dir) for run_dir in run_dirs]
-    if not benchmark_run_dirs:
-        raise ValueError("run_dirs must hold at least 1 run directory.")
-
-    for benchmark_run_dir, other_benchmark_run_dir in itertools.combinations(benchmark_run_dirs, 2):
-        benchmark_run_dir.check_combinable_with(other_benchmark_run_dir)
-    return pl.concat([benchmark_run_dir.scan_results() for benchmark_run_dir in benchmark_run_dirs])
+    paths = [run_dirs] if isinstance(run_dirs, Path) else list(run_dirs)
+    return BenchmarkRunDir.scan_combined_results([BenchmarkRunDir(path) for path in paths])

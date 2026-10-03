@@ -14,8 +14,9 @@ Every file is written under a temporary name and then renamed, so a crash never 
 file under its final name, and a file that exists is complete.
 """
 
+import itertools
 import shutil
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import polars as pl
@@ -174,6 +175,21 @@ class BenchmarkRunDir:
         """
         run_info = self.read_finished_run_info()
         return pl.scan_parquet([self._formula_results_file(formula_id) for formula_id in run_info.formula_ids])
+
+    @staticmethod
+    def scan_combined_results(run_dirs: Sequence["BenchmarkRunDir"]) -> pl.LazyFrame:
+        """Return a lazy frame over the results of the finished runs in `run_dirs`, in that order, 1 row per solve.
+
+        Raises:
+            ValueError: If `run_dirs` is empty.
+            BenchmarkRunError: If a directory holds no finished run, or if `check_combinable_with` refuses 2 of
+                the directories.
+        """
+        if not run_dirs:
+            raise ValueError("run_dirs must hold at least 1 run directory.")
+        for run_dir, other_run_dir in itertools.combinations(run_dirs, 2):
+            run_dir.check_combinable_with(other_run_dir)
+        return pl.concat([run_dir.scan_results() for run_dir in run_dirs])
 
     # --------------------------------------------------------------------------
     #  Helpers

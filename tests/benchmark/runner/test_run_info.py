@@ -13,14 +13,25 @@ from sunnbear._core.benchmark.runner.run_settings import BenchmarkRunSettings
 from sunnbear.solvers import SolverConfigRegistry
 
 
+# ==================================================================================================
+#  Fixtures
+# ==================================================================================================
+def _run_info_of(solver_ids: list[str], function_ids: list[str], c_max: float = 1.0) -> BenchmarkRunInfo:
+    """Return the run info of a run of `solver_ids` on `function_ids`, each calibrated to c in [-1, `c_max`]."""
+    return BenchmarkRunInfo.for_current_inputs(
+        run_settings=BenchmarkRunSettings(mc_size=32, n_bisection_fevals=40, root_seed=1),
+        solver_configs=[SolverConfigRegistry.config_from_id(solver_id) for solver_id in solver_ids],
+        functions=[
+            functions.FormulaRegistry.candidate_from_id(function_id).calibrated(-1.0, c_max)
+            for function_id in function_ids
+        ],
+    )
+
+
 @pytest.fixture(scope="module")
 def run_info() -> BenchmarkRunInfo:
     """Return the run info of a run of bisection on the shipped cubic."""
-    return BenchmarkRunInfo.for_current_inputs(
-        run_settings=BenchmarkRunSettings(mc_size=32, n_bisection_fevals=40, root_seed=1),
-        solver_configs=[SolverConfigRegistry.config_from_id("bisection")],
-        functions=[functions.FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-1.0, 1.0)],
-    )
+    return _run_info_of(["bisection"], ["f2.1.1[p1=0.2]"])
 
 
 # ==================================================================================================
@@ -81,18 +92,6 @@ def test_a_run_with_other_package_versions_may_not_resume(run_info):
 # ==================================================================================================
 #  Combining
 # ==================================================================================================
-def _run_info_of(solver_ids: list[str], function_ids: list[str], c_max: float = 1.0) -> BenchmarkRunInfo:
-    """Return the run info of a run of `solver_ids` on `function_ids`, each calibrated to c in [-1, `c_max`]."""
-    return BenchmarkRunInfo.for_current_inputs(
-        run_settings=BenchmarkRunSettings(mc_size=32, n_bisection_fevals=40, root_seed=1),
-        solver_configs=[SolverConfigRegistry.config_from_id(solver_id) for solver_id in solver_ids],
-        functions=[
-            functions.FormulaRegistry.candidate_from_id(function_id).calibrated(-1.0, c_max)
-            for function_id in function_ids
-        ],
-    )
-
-
 @pytest.mark.parametrize(
     "solver_ids, function_ids",
     [
@@ -109,22 +108,24 @@ def test_runs_of_other_solvers_or_on_other_functions_are_combinable(run_info, so
 
 
 @pytest.mark.parametrize(
-    "other_changes, message",
+    "other_changes, differing_field",
     [
         ({"run_settings": BenchmarkRunSettings(mc_size=64, n_bisection_fevals=40, root_seed=1)}, "run_settings"),
         ({"package_versions": {"numpy": "0.0.0"}}, "package_versions"),
         ({"solver_versions": {"bisection": 2}}, "solver_versions"),
     ],
 )
-def test_runs_with_other_settings_versions_or_solver_versions_are_not_combinable(run_info, other_changes, message):
-    """A run on other functions needs the same run settings, package versions and solver versions; the error names
-    the field that differs."""
+def test_runs_with_other_settings_versions_or_solver_versions_are_not_combinable(
+    run_info, other_changes, differing_field
+):
+    """Runs on different test functions are combinable only with the same run settings, package versions and solver
+    versions; the error names the field that differs."""
     # --- arrange ----------------------
     other = _run_info_of(["bisection"], ["f2.1.1[p1=0.4]"])
     other = other.model_copy(update=other_changes)
 
     # --- act / assert -----------------
-    with pytest.raises(BenchmarkRunError, match=message):
+    with pytest.raises(BenchmarkRunError, match=differing_field):
         run_info.check_combinable_with(other)
 
 
