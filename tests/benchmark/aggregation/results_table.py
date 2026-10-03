@@ -8,7 +8,7 @@ from sunnbear._core.benchmark.runner import RESULTS_SCHEMA
 def results_table(rows: list[dict[str, object]]) -> pl.DataFrame:
     """Return a table with the columns of `RESULTS_SCHEMA`, 1 row per dict of `rows`.
 
-    Each row holds the dict's values, and fixed values for the columns that the dict omits.
+    Each row holds the dict's values, and fixed values for the dict's missing columns.
 
     The fixed values are those of a converged, correct solve with no counted flops.
     """
