@@ -5,11 +5,11 @@
   `BenchmarkRunSettings`;
 - `BenchmarkRunDir` reads and writes the run directory's files, among them the `BenchmarkRunInfo` that
   records what the results depend on;
-- `load_results` reads a finished run back, as a table with the columns of `RESULTS_SCHEMA`.
+- `load_results` reads 1 or more finished runs back, as 1 table with the columns of `RESULTS_SCHEMA`.
 """
 
 from .exceptions import BenchmarkRunError
-from .results_schema import RESULTS_SCHEMA, flop_count_column_name
+from .results_schema import RESULTS_SCHEMA, solver_flop_count_column_name
 from .run_dir import BenchmarkRunDir
 from .run_info import BenchmarkRunInfo
 from .run_settings import BenchmarkRunSettings

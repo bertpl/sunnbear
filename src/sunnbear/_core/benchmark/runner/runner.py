@@ -7,9 +7,11 @@ formula's results file is written as soon as all of the formula's test functions
 The run info is written before the first task, so a call that resumes the run can check its inputs and
 versions against the stored run info.
 
-`load_results` reads a finished run back. The run directory's layout is described by `BenchmarkRunDir`.
+`load_results` reads 1 or more finished runs back as 1 table. The run directory's layout is described by
+`BenchmarkRunDir`.
 """
 
+import itertools
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -122,13 +124,28 @@ def run_benchmark(
 # ==================================================================================================
 #  load_results
 # ==================================================================================================
-def load_results(run_dir: Path) -> pl.LazyFrame:
-    """Return a lazy frame over the results of the finished run in `run_dir`, 1 row per solve.
+def load_results(run_dirs: Path | Sequence[Path]) -> pl.LazyFrame:
+    """Return a lazy frame over the results of 1 or more finished runs, 1 row per solve.
+
+    The results of several runs are read as 1 table, run by run in the order given, only when
+    `BenchmarkRunInfo.check_combinable_with` accepts every pair of them: the runs may cover different solvers
+    and test functions, but everything else that their results depend on must be the same.
 
     A query on the frame reads only the files, row groups and columns that it needs. The columns and their
     types are those of `RESULTS_SCHEMA`.
 
     Raises:
-        BenchmarkRunError: If `run_dir` holds no run, a malformed run info, or a run that is not finished.
+        ValueError: If `run_dirs` is an empty sequence.
+        BenchmarkRunError: If a run directory holds no run, a malformed run info, or a run that is not
+            finished, or if `BenchmarkRunInfo.check_combinable_with` refuses 2 of the runs.
     """
-    return BenchmarkRunDir(run_dir).scan_results()
+    if isinstance(run_dirs, Path):
+        benchmark_run_dirs = [BenchmarkRunDir(run_dirs)]
+    else:
+        benchmark_run_dirs = [BenchmarkRunDir(run_dir) for run_dir in run_dirs]
+    if not benchmark_run_dirs:
+        raise ValueError("run_dirs must hold at least 1 run directory.")
+
+    for benchmark_run_dir, other_benchmark_run_dir in itertools.combinations(benchmark_run_dirs, 2):
+        benchmark_run_dir.check_combinable_with(other_benchmark_run_dir)
+    return pl.concat([benchmark_run_dir.scan_results() for benchmark_run_dir in benchmark_run_dirs])
