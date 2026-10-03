@@ -99,13 +99,24 @@ def gpq(values: ArrayLike, q: float) -> float:
         ValueError: If `q` is NaN or outside the interval [0, 1], or `values`
             fails `owg` validation.
     """
+    return owg(values, gpq_power_for_level(q))
+
+
+def gpq_power_for_level(q: float) -> float:
+    """Return the `owg` power ``p(q) = (2q - 1) / min(q, 1 - q)`` that `gpq` uses at level `q`.
+
+    The power is ``-inf`` at ``q = 0`` and ``+inf`` at ``q = 1``, the limits of
+    the formula there.
+
+    Raises:
+        ValueError: If `q` is NaN or outside the interval [0, 1].
+    """
     if not 0.0 <= q <= 1.0:
         raise ValueError(f"gpq requires 0 <= q <= 1 (got {q}).")
 
     if q == 0.0:
-        p = -np.inf
+        return -np.inf
     elif q == 1.0:
-        p = np.inf
+        return np.inf
     else:
-        p = (2.0 * q - 1.0) / min(q, 1.0 - q)
-    return owg(values, p)
+        return (2.0 * q - 1.0) / min(q, 1.0 - q)
