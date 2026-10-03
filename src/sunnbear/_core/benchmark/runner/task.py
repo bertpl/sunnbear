@@ -147,6 +147,7 @@ class BenchmarkTask:
                         "v": float(v),
                         "xtol": float(xtol),
                         "c": float(c),
+                        "max_fevals": max_fevals,
                         "x_found": result.x,
                         "status": result.status.value,
                         "n_fevals": result.n_fevals,
