@@ -1,9 +1,4 @@
-"""`add_derived_results` adds the derived columns of a results table:
-
-- `n_fevals_eff` replaces a failed solve's evaluation count by its budget;
-- `solver_flop_cost` weights the solver's flop counts;
-- each `total_flop_cost_k<k>` adds `k` flops per evaluation to `solver_flop_cost`.
-"""
+"""`add_derived_results` adds the derived columns of a results table."""
 
 import polars as pl
 import pytest
@@ -64,7 +59,8 @@ def test_only_a_correct_solve_keeps_its_evaluation_count(status, is_correct, exp
 @pytest.mark.usefixtures("unit_weights_with_mul_at_3")
 @pytest.mark.parametrize("is_correct", [True, False])
 def test_the_flop_costs_weight_the_counts_and_add_the_evaluations(is_correct):
-    """`solver_flop_cost` weights each count, also for a failed solve; each total adds `k` flops per evaluation."""
+    """`solver_flop_cost` weights each count, also for a failed solve; each `total_flop_cost_k<k>` adds `k` flops per
+    evaluation."""
     # --- arrange ----------------------
     frame = results_table([{"is_correct": is_correct, _ADD_COUNT_COLUMN: 5, _MUL_COUNT_COLUMN: 2}])
     n_fevals_eff = 10 if is_correct else 160
@@ -91,7 +87,8 @@ def test_the_weights_are_read_when_add_derived_results_is_called():
     assert derived.collect()["solver_flop_cost"].item() == 2 * 3.0
 
 
-def test_unknown_flop_weights_are_refused(unit_weights_with_mul_at_3):
+@pytest.mark.usefixtures("unit_weights_with_mul_at_3")
+def test_unknown_flop_weights_are_refused():
     """An unknown (NaN) active flop weight raises `ValueError`, since every cost would become NaN."""
     # --- arrange ----------------------
     set_active_flop_weights(FlopWeights(weights={FlopType.ADD: 1.0}))
