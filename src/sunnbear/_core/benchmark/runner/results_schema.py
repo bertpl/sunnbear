@@ -13,9 +13,9 @@ from counted_float import FlopType
 from sunnbear._core.solvers.core import SolveStatus
 
 
-def flop_count_column_name(flop_type: FlopType) -> str:
-    """Return the name of the column that counts `flop_type`, e.g. `flop_count_add` for `FlopType.ADD`."""
-    return f"flop_count_{flop_type.name.lower()}"
+def solver_flop_count_column_name(flop_type: FlopType) -> str:
+    """Return the name of the column that counts the solver's `flop_type` flops, e.g. `solver_flop_count_add`."""
+    return f"solver_flop_count_{flop_type.name.lower()}"
 
 
 RESULTS_SCHEMA: dict[str, pl.DataType] = {
@@ -36,7 +36,8 @@ RESULTS_SCHEMA: dict[str, pl.DataType] = {
     "n_fevals": pl.Int32(),
     "is_correct": pl.Boolean(),
     "wall_time_ns": pl.Int64(),
-    # Each flop type gets 1 column that holds its raw count. The per-flop-type cost weights are applied at
-    # analysis time, because counted-float can change them without any version number that records the change.
-    **{flop_count_column_name(flop_type): pl.Int32() for flop_type in FlopType},
+    # Each flop type gets 1 column that holds the raw count of the solver's own arithmetic; the function's
+    # evaluations are not counted. The per-flop-type cost weights are applied at analysis time, because
+    # counted-float can change them without any version number that records the change.
+    **{solver_flop_count_column_name(flop_type): pl.Int32() for flop_type in FlopType},
 }
