@@ -7,7 +7,8 @@ It holds:
   the check of whether the solver's answer is correct;
 - `runner`: `run_benchmark`, which runs the benchmark tasks of a run and writes their results to a run
   directory, and `load_results`, which reads 1 or more runs back as 1 table;
-- `aggregation`: `add_derived_results`, which adds derived columns, such as flop costs, to a results table.
+- `aggregation`: `add_derived_results`, which adds derived columns, such as flop costs, to a results table, and
+  `summarize_results`, which summarizes a results table per group.
 
 Importing it registers the `mc_tuples` artifact declaration with `ArtifactRegistry`.
 """

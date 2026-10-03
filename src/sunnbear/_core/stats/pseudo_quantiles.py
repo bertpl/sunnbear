@@ -21,7 +21,7 @@ def owg(values: ArrayLike, p: float) -> float:
     """Compute the ordered weighted geometric mean of non-negative samples.
 
     Sorts the values (ascending for ``p >= 0``, descending for ``p < 0``) and
-    weights each by ``rank_ramp ** |p|``, where the rank ramp runs over the
+    weights each by ``rank_fractions ** |p|``, where the rank fractions are the
     interval midpoints ``(i + 0.5) / n``. The result ranges from ``min(values)``
     (``p = -inf``) through the plain geometric mean (``p = 0``) to
     ``max(values)`` (``p = +inf``).
@@ -65,8 +65,8 @@ def owg(values: ArrayLike, p: float) -> float:
     # --- sort & weight --------------------------
     v_sorted = np.sort(v) if p >= 0 else np.sort(v)[::-1]
     n = v_sorted.size
-    rank_ramp = np.linspace(0.5 / n, 1.0 - 0.5 / n, n)
-    weights = rank_ramp ** abs(p)
+    rank_fractions = np.linspace(0.5 / n, 1.0 - 0.5 / n, n)
+    weights = rank_fractions ** abs(p)
 
     # --- weighted geometric mean ----------------
     return float(np.exp(np.sum(weights * np.log(v_sorted)) / np.sum(weights)))
@@ -99,13 +99,24 @@ def gpq(values: ArrayLike, q: float) -> float:
         ValueError: If `q` is NaN or outside the interval [0, 1], or `values`
             fails `owg` validation.
     """
+    return owg(values, gpq_power_for_level(q))
+
+
+def gpq_power_for_level(q: float) -> float:
+    """Return the `owg` power ``p(q) = (2q - 1) / min(q, 1 - q)`` of `gpq` at level `q`.
+
+    The power is ``-inf`` at ``q = 0`` and ``+inf`` at ``q = 1``, the limits of
+    the formula there.
+
+    Raises:
+        ValueError: If `q` is NaN or outside the interval [0, 1].
+    """
     if not 0.0 <= q <= 1.0:
         raise ValueError(f"gpq requires 0 <= q <= 1 (got {q}).")
 
     if q == 0.0:
-        p = -np.inf
+        return -np.inf
     elif q == 1.0:
-        p = np.inf
+        return np.inf
     else:
-        p = (2.0 * q - 1.0) / min(q, 1.0 - q)
-    return owg(values, p)
+        return (2.0 * q - 1.0) / min(q, 1.0 - q)
