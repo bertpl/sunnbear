@@ -36,3 +36,5 @@ CLAUDE.md
 # Only working_docs/README.md is committed; everything else here stays out of git.
 working_docs/*
 !working_docs/README.md
+# Throwaway scratch directory beside working_docs/, never tracked
+local/
