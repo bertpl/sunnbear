@@ -1,4 +1,6 @@
-"""`summarize_results` gives 1 row per group, with its success fractions and `gpq` levels of the chosen columns."""
+"""`summarize_results` gives 1 row per group, with the group's fractions of converged and of correct solves and the
+`gpq` of each chosen column at each chosen level.
+"""
 
 import polars as pl
 import pytest
@@ -50,7 +52,8 @@ def test_by_default_every_derived_column_is_summarized_at_the_default_levels(is_
 
 
 def test_the_rows_hold_each_group_s_fractions_and_gpq_levels():
-    """Each group gets its success fractions and the `gpq` of its own rows, groups in order of first appearance."""
+    """Each group gets its success fractions and the `gpq` of its own rows, and the groups keep their order of first
+    appearance."""
     # --- act --------------------------
     summary = summarize_results(_results_of_2_solvers(), ["solver_id"])
 
@@ -88,7 +91,7 @@ def test_each_column_is_summarized_at_its_own_levels():
     ],
 )
 def test_invalid_columns_or_levels_are_refused(frame, gpq_levels_by_column, message):
-    """A missing column, a repeated level or an out-of-range level raises `ValueError` before any group is computed."""
+    """A missing column, a repeated level or an out-of-range level raises `ValueError`."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=message):
         summarize_results(frame, "solver_id", gpq_levels_by_column=gpq_levels_by_column)
@@ -99,6 +102,7 @@ def test_invalid_columns_or_levels_are_refused(frame, gpq_levels_by_column, mess
     [(0.0, "n_fevals_gpq_00"), (0.05, "n_fevals_gpq_05"), (0.29, "n_fevals_gpq_29"), (1.0, "n_fevals_gpq_100")],
 )
 def test_a_gpq_column_is_named_by_its_level_in_percent(q, expected):
-    """The level is written in percent with at least 2 digits, and without the rounding noise of `q * 100`."""
+    """The level is written in percent with at least 2 digits, and without the floating-point rounding error of
+    `q * 100`."""
     # --- act / assert -----------------
     assert gpq_column_name("n_fevals", q) == expected

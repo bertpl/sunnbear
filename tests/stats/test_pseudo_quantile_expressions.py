@@ -7,8 +7,8 @@ import pytest
 from sunnbear._core.stats.pseudo_quantile_expressions import gpq_expression, owg_expression
 from sunnbear.stats import gpq, owg
 
-# The group with a zero is large enough that its smallest rank weight rounds to 0.0 in float64 at the `owg` power
-# that `gpq` uses for level 0.99, which `owg_expression` handles as a separate case.
+# The group with a zero is large enough that its smallest rank weight rounds to 0.0 in float64 at the `owg` power of
+# `gpq` at level 0.99; `owg_expression` handles a group with a zero as a separate case.
 _RNG = np.random.default_rng(3)
 _VALUES_BY_GROUP = {
     "lognormal": _RNG.lognormal(3.0, 1.0, 500),
