@@ -10,7 +10,7 @@ import sunnbear.functions as functions  # Import the module, so pytest does not 
 from sunnbear._core.benchmark.mc_tuples import load_mc_tuples
 from sunnbear._core.benchmark.protocol.tolerances import compute_xtol_range
 from sunnbear._core.benchmark.runner import task
-from sunnbear._core.benchmark.runner.results_schema import RESULTS_SCHEMA, flop_count_column_name
+from sunnbear._core.benchmark.runner.results_schema import RESULTS_SCHEMA, solver_flop_count_column_name
 from sunnbear._core.benchmark.runner.run_settings import BenchmarkRunSettings
 from sunnbear._core.benchmark.runner.task import BenchmarkTask
 from sunnbear.solvers import Solver, SolverConfig, SolverConfigRegistry, SolverRole, SolveState, SolveStatus
@@ -113,7 +113,7 @@ def test_bisection_is_correct_in_exactly_n_bisection_fevals_with_counted_flops(c
     assert results["is_correct"].all()
     assert (results["n_fevals"] == N_BISECTION_FEVALS).all()
     assert (results["wall_time_ns"] > 0).all()
-    assert (results[flop_count_column_name(FlopType.COMP)] > 0).all()
+    assert (results[solver_flop_count_column_name(FlopType.COMP)] > 0).all()
 
 
 # ==================================================================================================

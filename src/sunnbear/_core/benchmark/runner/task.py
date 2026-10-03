@@ -21,7 +21,7 @@ from sunnbear._core.benchmark.protocol import (
 from sunnbear._core.functions.core import FormulaRegistry, TestFunction
 from sunnbear._core.solvers.core import SolverConfig, SolverConfigRegistry, SolveStatus
 
-from .results_schema import RESULTS_SCHEMA, flop_count_column_name
+from .results_schema import RESULTS_SCHEMA, solver_flop_count_column_name
 from .run_settings import BenchmarkRunSettings
 
 
@@ -153,7 +153,7 @@ class BenchmarkTask:
                         "is_correct": is_correct,
                         "wall_time_ns": wall_time_ns,
                         **{
-                            flop_count_column_name(flop_type): n
+                            solver_flop_count_column_name(flop_type): n
                             for flop_type, n in result.flop_counts.as_dict().items()
                         },
                     }
