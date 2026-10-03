@@ -1,4 +1,9 @@
-"""`add_derived_results` counts failed solves at their budget, weights flop counts, and adds the total flop costs."""
+"""`add_derived_results` adds the derived columns of a results table:
+
+- `n_fevals_eff` replaces a failed solve's evaluation count by its budget;
+- `solver_flop_cost` weights the solver's flop counts;
+- each `total_flop_cost_k<k>` adds `k` flops per evaluation to `solver_flop_cost`.
+"""
 
 import polars as pl
 import pytest
@@ -23,10 +28,10 @@ _MUL_COUNT_COLUMN = solver_flop_count_column_name(FlopType.MUL)
 @pytest.fixture
 def unit_weights_with_mul_at_3():
     """Set counted-float's active flop weights to 1 for every flop type but 3 for MUL, and restore them afterwards."""
-    active_weights = get_active_flop_weights()
+    original_weights = get_active_flop_weights()
     set_active_flop_weights(FlopWeights(weights=dict.fromkeys(FlopType, 1.0) | {FlopType.MUL: 3.0}))
     yield
-    set_active_flop_weights(active_weights)
+    set_active_flop_weights(original_weights)
 
 
 @pytest.mark.parametrize("is_lazy", [False, True])
