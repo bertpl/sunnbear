@@ -13,16 +13,30 @@ from sunnbear._core.benchmark.runner.run_settings import BenchmarkRunSettings
 from sunnbear.solvers import SolverConfigRegistry
 
 
-@pytest.fixture(scope="module")
-def run_info() -> BenchmarkRunInfo:
-    """Return the run info of a run of bisection on the shipped cubic."""
+# ==================================================================================================
+#  Fixtures
+# ==================================================================================================
+def _run_info_of(solver_ids: list[str], function_ids: list[str], c_max: float = 1.0) -> BenchmarkRunInfo:
+    """Return the run info of a run of `solver_ids` on `function_ids`, each calibrated to c in [-1, `c_max`]."""
     return BenchmarkRunInfo.for_current_inputs(
         run_settings=BenchmarkRunSettings(mc_size=32, n_bisection_fevals=40, root_seed=1),
-        solver_configs=[SolverConfigRegistry.config_from_id("bisection")],
-        functions=[functions.FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-1.0, 1.0)],
+        solver_configs=[SolverConfigRegistry.config_from_id(solver_id) for solver_id in solver_ids],
+        functions=[
+            functions.FormulaRegistry.candidate_from_id(function_id).calibrated(-1.0, c_max)
+            for function_id in function_ids
+        ],
     )
 
 
+@pytest.fixture(scope="module")
+def run_info() -> BenchmarkRunInfo:
+    """Return the run info of a run of bisection on the shipped cubic."""
+    return _run_info_of(["bisection"], ["f2.1.1[p1=0.2]"])
+
+
+# ==================================================================================================
+#  Construction and JSON
+# ==================================================================================================
 def test_a_new_run_info_records_the_inputs_the_artifacts_and_the_versions(run_info):
     """A new run info records the solvers, functions, tuple set identity and package versions, and is not finished."""
     # --- assert -----------------------
@@ -51,6 +65,9 @@ def test_malformed_run_info_json_is_refused():
         BenchmarkRunInfo.from_json('{"run_settings": {}}')
 
 
+# ==================================================================================================
+#  Resuming
+# ==================================================================================================
 def test_a_run_on_another_platform_or_at_another_time_may_resume(run_info):
     """`check_resumable_as` does not compare the platform and the timestamps, so they never stop a run from resuming."""
     # --- arrange ----------------------
@@ -70,3 +87,58 @@ def test_a_run_with_other_package_versions_may_not_resume(run_info):
     # --- act / assert -----------------
     with pytest.raises(BenchmarkRunError, match="package_versions"):
         run_info.check_resumable_as(other)
+
+
+# ==================================================================================================
+#  Combining
+# ==================================================================================================
+@pytest.mark.parametrize(
+    "solver_ids, function_ids",
+    [
+        (["regula_falsi"], ["f2.1.1[p1=0.2]"]),
+        (["bisection"], ["f2.1.1[p1=0.4]"]),
+        (["bisection", "regula_falsi"], ["f2.1.1[p1=0.4]", "f2.1.2[p1=3.0]"]),
+    ],
+)
+def test_runs_of_other_solvers_or_on_other_functions_are_combinable(run_info, solver_ids, function_ids):
+    """Runs with the same run settings and package versions can be read as 1 table when no solver ran on the same
+    test function in both."""
+    # --- act / assert -----------------
+    run_info.check_combinable_with(_run_info_of(solver_ids, function_ids))
+
+
+@pytest.mark.parametrize(
+    "other_changes, differing_field",
+    [
+        ({"run_settings": BenchmarkRunSettings(mc_size=64, n_bisection_fevals=40, root_seed=1)}, "run_settings"),
+        ({"package_versions": {"numpy": "0.0.0"}}, "package_versions"),
+        ({"solver_versions": {"bisection": 2}}, "solver_versions"),
+    ],
+)
+def test_runs_with_other_settings_versions_or_solver_versions_are_not_combinable(
+    run_info, other_changes, differing_field
+):
+    """Runs on different test functions are combinable only with the same run settings, package versions and solver
+    versions; the error names the field that differs."""
+    # --- arrange ----------------------
+    other = _run_info_of(["bisection"], ["f2.1.1[p1=0.4]"])
+    other = other.model_copy(update=other_changes)
+
+    # --- act / assert -----------------
+    with pytest.raises(BenchmarkRunError, match=differing_field):
+        run_info.check_combinable_with(other)
+
+
+def test_runs_with_another_c_range_of_a_common_function_are_not_combinable(run_info):
+    """A test function in both runs must have the same c-range, even when the solvers differ."""
+    # --- act / assert -----------------
+    with pytest.raises(BenchmarkRunError, match="function_infos"):
+        run_info.check_combinable_with(_run_info_of(["regula_falsi"], ["f2.1.1[p1=0.2]"], c_max=0.5))
+
+
+def test_runs_of_a_solver_on_the_same_function_are_not_combinable(run_info):
+    """`check_combinable_with` refuses 2 runs in which a solver ran on the same test function in both, since the table
+    would hold those solves twice."""
+    # --- act / assert -----------------
+    with pytest.raises(BenchmarkRunError, match=r"ran the solvers \['bisection'\] on the test functions"):
+        run_info.check_combinable_with(_run_info_of(["bisection", "regula_falsi"], ["f2.1.1[p1=0.2]"]))

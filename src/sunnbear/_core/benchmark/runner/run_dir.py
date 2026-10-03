@@ -14,8 +14,9 @@ Every file is written under a temporary name and then renamed, so a crash never 
 file under its final name, and a file that exists is complete.
 """
 
+import itertools
 import shutil
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import polars as pl
@@ -73,6 +74,36 @@ class BenchmarkRunDir:
             return BenchmarkRunInfo.from_json(run_info_file.read_text())
         else:
             return None
+
+    def read_finished_run_info(self) -> BenchmarkRunInfo:
+        """Return the stored run info of a finished run.
+
+        Raises:
+            BenchmarkRunError: If the directory holds no run info, a malformed run info, or a run that is not finished.
+        """
+        run_info = self.read_run_info()
+        if run_info is None:
+            raise BenchmarkRunError(f"{self.path} holds no benchmark run.")
+        if not run_info.is_finished:
+            raise BenchmarkRunError(f"The benchmark run in {self.path} is not finished; resume it first.")
+        return run_info
+
+    def check_combinable_with(self, other: "BenchmarkRunDir") -> None:
+        """Check that the finished runs in this directory and in `other` can be read as 1 table.
+
+        Raises:
+            BenchmarkRunError: If either directory holds no finished run, or if
+                `BenchmarkRunInfo.check_combinable_with` refuses the 2 run infos; the message then names both
+                directories.
+        """
+        run_info = self.read_finished_run_info()
+        other_run_info = other.read_finished_run_info()
+        try:
+            run_info.check_combinable_with(other_run_info)
+        except BenchmarkRunError as error:
+            raise BenchmarkRunError(
+                f"The runs in {self.path} and {other.path} cannot be read as 1 table: {error}"
+            ) from error
 
     def write_run_info(self, run_info: BenchmarkRunInfo) -> None:
         """Store `run_info`, creating the directory when needed and replacing any stored run info."""
@@ -142,12 +173,23 @@ class BenchmarkRunDir:
         Raises:
             BenchmarkRunError: If the directory holds no run info, a malformed run info, or a run that is not finished.
         """
-        run_info = self.read_run_info()
-        if run_info is None:
-            raise BenchmarkRunError(f"{self.path} holds no benchmark run.")
-        if not run_info.is_finished:
-            raise BenchmarkRunError(f"The benchmark run in {self.path} is not finished; resume it first.")
+        run_info = self.read_finished_run_info()
         return pl.scan_parquet([self._formula_results_file(formula_id) for formula_id in run_info.formula_ids])
+
+    @staticmethod
+    def scan_combined_results(run_dirs: Sequence["BenchmarkRunDir"]) -> pl.LazyFrame:
+        """Return a lazy frame over the results of the finished runs in `run_dirs`, in that order, 1 row per solve.
+
+        Raises:
+            ValueError: If `run_dirs` is empty.
+            BenchmarkRunError: If a directory holds no finished run, or if `check_combinable_with` refuses 2 of
+                the directories.
+        """
+        if not run_dirs:
+            raise ValueError("run_dirs must hold at least 1 run directory.")
+        for run_dir, other_run_dir in itertools.combinations(run_dirs, 2):
+            run_dir.check_combinable_with(other_run_dir)
+        return pl.concat([run_dir.scan_results() for run_dir in run_dirs])
 
     # --------------------------------------------------------------------------
     #  Helpers
