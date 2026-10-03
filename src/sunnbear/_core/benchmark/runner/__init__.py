@@ -5,7 +5,7 @@
   `BenchmarkRunSettings`;
 - `BenchmarkRunDir` reads and writes the run directory's files, among them the `BenchmarkRunInfo` that
   records what the results depend on;
-- `load_results` reads a finished run back, as a table with the columns of `RESULTS_SCHEMA`.
+- `load_results` reads 1 or more finished runs back, as 1 table with the columns of `RESULTS_SCHEMA`.
 """
 
 from .exceptions import BenchmarkRunError

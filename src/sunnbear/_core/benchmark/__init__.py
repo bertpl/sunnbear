@@ -6,7 +6,7 @@ It holds:
 - `protocol`: the rules that every solve follows: its tolerances and evaluation budget, its seeds, and
   the check of whether the solver's answer is correct;
 - `runner`: `run_benchmark`, which runs the benchmark tasks of a run and writes their results to a run
-  directory, and `load_results`, which reads them back.
+  directory, and `load_results`, which reads 1 or more runs back as 1 table.
 
 Importing it registers the `mc_tuples` artifact declaration with `ArtifactRegistry`.
 """
