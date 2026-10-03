@@ -127,9 +127,9 @@ def run_benchmark(
 def load_results(run_dirs: Path | Sequence[Path]) -> pl.LazyFrame:
     """Return a lazy frame over the results of 1 or more finished runs, 1 row per solve.
 
-    The results of several runs are read as 1 table, run by run in the order given, only when
-    `BenchmarkRunInfo.check_combinable_with` accepts every pair of them: the runs may cover different solvers
-    and test functions, but everything else that their results depend on must be the same.
+    The rows of several runs follow each other in the order of `run_dirs`. Every pair of runs must pass
+    `BenchmarkRunInfo.check_combinable_with`: everything that their results depend on must be the same, except
+    that the runs may cover different solvers and test functions.
 
     A query on the frame reads only the files, row groups and columns that it needs. The columns and their
     types are those of `RESULTS_SCHEMA`.

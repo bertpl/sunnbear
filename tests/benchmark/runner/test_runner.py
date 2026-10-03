@@ -229,7 +229,8 @@ def test_loading_a_run_dir_without_a_run_is_refused(tmp_path):
 #  Loading several runs
 # ==================================================================================================
 def test_the_runs_of_each_solver_load_as_the_table_of_1_run_of_both(finished_run_dir, tmp_path):
-    """Loading 2 runs of 1 solver each together gives the rows of 1 run of both solvers, run by run."""
+    """Loading 2 runs, each of 1 solver, gives the same rows as 1 run of both solvers, with the first run's rows
+    first."""
     # --- arrange ----------------------
     run_dirs = [tmp_path / solver_id for solver_id in _SOLVER_IDS]
     for solver_id, run_dir in zip(_SOLVER_IDS, run_dirs, strict=True):
@@ -245,7 +246,7 @@ def test_the_runs_of_each_solver_load_as_the_table_of_1_run_of_both(finished_run
 
 
 def test_loading_a_run_twice_is_refused(finished_run_dir):
-    """The same run loaded twice would hold every solve twice, so `load_results` refuses it."""
+    """`load_results` refuses to load the same run twice, since the table would then hold every solve twice."""
     # --- act / assert -----------------
     with pytest.raises(BenchmarkRunError, match="cannot be read as 1 table: Both runs ran the solvers"):
         load_results([finished_run_dir, finished_run_dir])

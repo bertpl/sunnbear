@@ -23,6 +23,9 @@ def run_info() -> BenchmarkRunInfo:
     )
 
 
+# ==================================================================================================
+#  Construction and JSON
+# ==================================================================================================
 def test_a_new_run_info_records_the_inputs_the_artifacts_and_the_versions(run_info):
     """A new run info records the solvers, functions, tuple set identity and package versions, and is not finished."""
     # --- assert -----------------------
@@ -51,6 +54,9 @@ def test_malformed_run_info_json_is_refused():
         BenchmarkRunInfo.from_json('{"run_settings": {}}')
 
 
+# ==================================================================================================
+#  Resuming
+# ==================================================================================================
 def test_a_run_on_another_platform_or_at_another_time_may_resume(run_info):
     """`check_resumable_as` does not compare the platform and the timestamps, so they never stop a run from resuming."""
     # --- arrange ----------------------
@@ -96,7 +102,8 @@ def _run_info_of(solver_ids: list[str], function_ids: list[str], c_max: float = 
     ],
 )
 def test_runs_of_other_solvers_or_on_other_functions_are_combinable(run_info, solver_ids, function_ids):
-    """Runs that share their settings and versions combine when no solver ran on the same function in both."""
+    """Runs with the same run settings and package versions can be read as 1 table when no solver ran on the same
+    test function in both."""
     # --- act / assert -----------------
     run_info.check_combinable_with(_run_info_of(solver_ids, function_ids))
 
@@ -110,7 +117,8 @@ def test_runs_of_other_solvers_or_on_other_functions_are_combinable(run_info, so
     ],
 )
 def test_runs_with_other_settings_versions_or_solver_versions_are_not_combinable(run_info, other_changes, message):
-    """A run on other functions needs the same settings, versions and solver versions; the error names the field."""
+    """A run on other functions needs the same run settings, package versions and solver versions; the error names
+    the field that differs."""
     # --- arrange ----------------------
     other = _run_info_of(["bisection"], ["f2.1.1[p1=0.4]"])
     other = other.model_copy(update=other_changes)
@@ -128,8 +136,8 @@ def test_runs_with_another_c_range_of_a_common_function_are_not_combinable(run_i
 
 
 def test_runs_of_a_solver_on_the_same_function_are_not_combinable(run_info):
-    """`check_combinable_with` refuses runs in which a solver ran on the same test function, since the table would hold
-    those solves twice."""
+    """`check_combinable_with` refuses 2 runs in which a solver ran on the same test function in both, since the table
+    would hold those solves twice."""
     # --- act / assert -----------------
     with pytest.raises(BenchmarkRunError, match=r"ran the solvers \['bisection'\] on the test functions"):
         run_info.check_combinable_with(_run_info_of(["bisection", "regula_falsi"], ["f2.1.1[p1=0.2]"]))
