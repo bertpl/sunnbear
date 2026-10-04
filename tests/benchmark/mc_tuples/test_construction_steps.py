@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+from max_div.metrics import DistanceMetric, DiversityMetric
 
 from sunnbear._core.benchmark.mc_tuples import MCTuples, MCTuplesConstructionError
 from sunnbear._core.benchmark.mc_tuples.construction_steps import (
@@ -87,3 +88,34 @@ def test_refinement_refuses_2_tuples_in_1_cell_or_in_1_lane(monkeypatch, cells, 
     # --- act / assert -----------------
     with pytest.raises(MCTuplesConstructionError, match=message):
         step.run(1.0)
+
+
+@pytest.mark.parametrize(
+    "build_step, distance_metric",
+    [
+        (lambda grid: MCTuplesCellSelectionStep(grid, _SETTINGS), DistanceMetric.l2_euclidean()),
+        (
+            lambda grid: MCTuplesRefinementStep(grid, np.array([2, 4, 11, 13]), _SETTINGS),
+            DistanceMetric.l2_and_projections(k=8),
+        ),
+    ],
+)
+def test_each_step_maximizes_min_separation_over_its_own_distance(monkeypatch, build_step, distance_metric):
+    """Cell selection maximizes min separation over L2, refinement over `l2_and_projections` for the size's items."""
+    # --- arrange ----------------------
+    objectives: list[tuple[DiversityMetric, DistanceMetric]] = []
+
+    def record_the_objective(self, new_candidate_array, diversity_metric, distance_metric, *args):
+        """Record the objective and return an empty selection, which the step then rejects."""
+        objectives.append((diversity_metric, distance_metric))
+        return np.array([], dtype=np.int64), None
+
+    monkeypatch.setattr(MCTuplesStep, "_solve", record_the_objective)
+    step = build_step(LaneGrid.for_size(8, _SIZE_4))
+
+    # --- act --------------------------
+    with pytest.raises(MCTuplesConstructionError):
+        step.run(1.0)
+
+    # --- assert -----------------------
+    assert objectives == [(DiversityMetric.MIN_SEPARATION, distance_metric)]

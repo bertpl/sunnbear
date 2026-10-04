@@ -7,8 +7,8 @@
   tuples and of the tuples of the size below.
 - **Refinement** places 1 tuple in each selected cell, chosen from `N_CANDIDATES_PER_CELL` uniform random
   float64 tuples inside the cell; max-div compares float32 copies, and the chosen tuple keeps its float64
-  values. It maximizes the smallest of the 3 separation fractions of `MCTuplesStats`: along u, along v and in
-  L2.
+  values. It maximizes the min separation under max-div's `l2_and_projections` distance for `size` items, which
+  raises the smallest of the 3 separation fractions of `MCTuplesStats`: along u, along v and in L2.
 """
 
 import time
@@ -18,7 +18,7 @@ from dataclasses import dataclass, replace
 
 import numpy as np
 from max_div import Constraint, MaxDivProblem
-from max_div.metrics import DistanceMetric, DiversityMetric, HybridDiversityMetric
+from max_div.metrics import DistanceMetric, DiversityMetric
 from max_div.solver import (
     ParallelMaxDivSolution,
     ParallelMaxDivSolverBuilder,
@@ -31,7 +31,7 @@ from .construction_step_results import MCTuplesCellSelectionResult, MCTuplesRefi
 from .exceptions import MCTuplesConstructionError
 from .lane_grid import LaneGrid
 from .sizes import MCTuplesSize
-from .tuples import MCTuples, MCTuplesStats
+from .tuples import MCTuples
 
 # The number of random candidate tuples per selected cell in the refinement step. At this pool size, the L2
 # fraction is already the smallest of the 3 fractions in the objective, and cell selection, not refinement, sets
@@ -114,7 +114,8 @@ class MCTuplesStep(ABC):
     def _solve(
         self,
         new_candidate_array: np.ndarray,
-        diversity_metric: DiversityMetric | HybridDiversityMetric,
+        diversity_metric: DiversityMetric,
+        distance_metric: DistanceMetric,
         constraints: list[Constraint],
         initial_new_selection: np.ndarray,
         t_budget_sec: float,
@@ -122,8 +123,9 @@ class MCTuplesStep(ABC):
         """Run max-div over the tuples of the size below and `new_candidate_array`; return the selected new candidates.
 
         The tuples of the size below come first among the candidates, and a weighted constraint asks max-div to
-        keep all of those tuples; `constraints` holds the step's own constraints, and the indices in `constraints`
-        and in `initial_new_selection` count rows of `new_candidate_array`.
+        keep all of those tuples; `diversity_metric` over `distance_metric` is the objective, `constraints` holds
+        the step's own constraints, and the indices in `constraints` and in `initial_new_selection` count rows of
+        `new_candidate_array`.
 
         Returns:
             The indices of the selected new candidates, ascending, relative to `new_candidate_array`, and max-div's
@@ -137,7 +139,7 @@ class MCTuplesStep(ABC):
             # max-div works on a float32 copy; the selected candidates are taken by index.
             np.vstack([self.grid.required_tuple_array, new_candidate_array]).astype(np.float32),
             k=self.grid.size,
-            distance_metric=DistanceMetric.l2_euclidean(),
+            distance_metric=distance_metric,
             diversity_metric=diversity_metric,
             constraints=[
                 *(
@@ -230,6 +232,7 @@ class MCTuplesCellSelectionStep(MCTuplesStep):
         cells, solution = self._solve(
             grid.cell_tuple_array,
             DiversityMetric.MIN_SEPARATION,
+            DistanceMetric.l2_euclidean(),
             lane_constraints,
             grid.random_one_per_new_lane_cells(self.settings.rng),
             t_budget_sec,
@@ -252,16 +255,13 @@ class MCTuplesCellSelectionStep(MCTuplesStep):
 class MCTuplesRefinementStep(MCTuplesStep):
     """`MCTuplesRefinementStep` places 1 new tuple in each selected cell, chosen from random tuples inside the cell.
 
-    The candidates are `N_CANDIDATES_PER_CELL` uniform random tuples per cell. The objective maximizes the smaller
-    of 2 weighted min separations:
-
-    - **along the axes**: `size - 1` times the min separation under the L-minus-infinity distance
-      `min(|Δu|, |Δv|)`, which equals the smaller of the min separations along u and along v;
-    - **in the square**: `√size - 1` times the min separation under L2.
-
-    Each weight is the inverse of the spacing of `size` evenly spaced tuples, along an axis or on a square grid,
-    so max-div raises the smallest of the 3 separation fractions of `MCTuplesStats`. The separations along an
-    axis matter because u and v each set a separate parameter of a test function.
+    The candidates are `N_CANDIDATES_PER_CELL` uniform random tuples per cell. The objective is the min separation
+    under max-div's `l2_and_projections` distance for `size` items: the smaller of the L-minus-infinity distance
+    `min(|Δu|, |Δv|)`, which equals the smaller of the gaps along u and along v, and the L2 distance scaled by
+    `(√size - 1) / (size - 1)`. That scale is the ratio of the spacings of `size` evenly spaced tuples along an
+    axis and on a square grid, so max-div raises the smallest of the 3 separation fractions of `MCTuplesStats` and
+    reads 1 distance per pair. The separations along an axis matter because u and v each set a separate parameter
+    of a test function.
 
     No constraint keeps 1 tuple per cell; the objective does: 2 tuples in 1 cell would lie less than a lane
     width apart on each axis, which lowers the separation along the axes. max-div starts from the candidate
@@ -296,11 +296,8 @@ class MCTuplesRefinementStep(MCTuplesStep):
         nearest_candidates = np.argmin(np.abs(candidates - selected_cell_tuple_array[:, None, :]).sum(axis=-1), axis=1)
         new_selection, solution = self._solve(
             candidates.reshape(-1, 2),
-            HybridDiversityMetric.min_of(
-                DiversityMetric.MIN_SEPARATION.over(DistanceMetric.l_minus_inf()),
-                DiversityMetric.MIN_SEPARATION.over(DistanceMetric.l2_euclidean()),
-                weights=(MCTuplesStats.inverse_axis_spacing(grid.size), MCTuplesStats.inverse_grid_spacing(grid.size)),
-            ),
+            DiversityMetric.MIN_SEPARATION,
+            DistanceMetric.l2_and_projections(k=grid.size),
             [],
             np.arange(cells.size) * N_CANDIDATES_PER_CELL + nearest_candidates,
             t_budget_sec,
