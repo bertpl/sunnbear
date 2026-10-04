@@ -9,13 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `sunnbear.benchmark.run_benchmark`: benchmark solvers on test functions over the Monte Carlo tuples, with resumable runs, a results table with 1 row per solve and a public schema, summaries by any column of that table, and public constants for the default number of evaluations that bisection spends per solve and the budget factor applied to it
+- Benchmark runs and result summaries: `sunnbear.benchmark.run_benchmark`, `load_results`, `add_derived_results` and `summarize_results`
 
 ### Changed
 
-- `MC_TUPLES_SIZES` is replaced by the enum `MCTuplesSize`, whose members are the sizes of the shipped Monte Carlo tuple set
-- The shipped Monte Carlo (u, v) tuple set is rebuilt: at every size, each axis is cut into 1 interval per tuple, with the boundaries midway between neighboring values of that size, and each interval holds exactly 1 tuple; `MCTuplesStats` no longer reports bin counts, and benchmark results on the new set differ from those on the previous set
-- `sunnbear.stats.gpq` accepts the quantile levels 0 and 1, and `sunnbear.stats.owg` accepts the powers -inf and +inf; each pair gives the exact minimum and maximum. Both functions accept values equal to 0
+- The enum `MCTuplesSize` replaces `MC_TUPLES_SIZES`
+- The shipped Monte Carlo tuple set is rebuilt with improved spread statistics; benchmark results on it differ from those on the previous set
+- `gpq` and `owg` are now more robust and accept a wider range of inputs
 
 ### Deprecated
 
@@ -23,8 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Importing `sunnbear.benchmark` no longer compiles the numba functions of its max-div dependency, which could take minutes on a fresh install
-- A data artifact's manifest names the sunnbear release that ships the artifact, not the release before it
+- A data artifact's manifest names the release that ships it
 
 ### Security
 
