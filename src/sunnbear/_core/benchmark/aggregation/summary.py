@@ -7,7 +7,6 @@ import polars as pl
 
 from sunnbear._core.solvers.core import SolveStatus
 from sunnbear._core.stats.pseudo_quantile_expressions import gpq_expression
-from sunnbear._core.utils.polars_frames import collect_if_eager
 
 from .derived_results import DERIVED_RESULTS_SCHEMA
 
@@ -61,7 +60,7 @@ def summarize_results(
     Args:
         frame: A results table with the columns of `RESULTS_SCHEMA` and, for the default
             `gpq_levels_by_column`, the columns of `DERIVED_RESULTS_SCHEMA` (see `add_derived_results`);
-            eager or lazy, and the result is of the same kind.
+            a `DataFrame` or a `LazyFrame`, and the result is of the same kind.
         by: The column or columns to group by, e.g. `solver_id` for 1 row per solver, or `["solver_id", "function_id"]`
             for 1 row per pair.
         gpq_levels_by_column: The `gpq` levels to compute, per column; ``None`` summarizes every column of
@@ -107,7 +106,8 @@ def summarize_results(
             *(expression.alias(name) for name, expression in gpq_expressions_by_gpq_column_name.items()),
         )
     )
-    return collect_if_eager(frame, summary)
+    # The caller gets back the kind it passed in: a `DataFrame` is collected, a `LazyFrame` stays a plan.
+    return summary.collect() if isinstance(frame, pl.DataFrame) else summary
 
 
 # ==================================================================================================
