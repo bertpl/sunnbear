@@ -1,10 +1,13 @@
 """`generate_mc_tuples` builds a nested set with exactly 1 tuple per lane at every size and reports each step, and its
 `MCTuplesGenerator` splits the total time over the solves and scales down the worker count of a short run."""
 
+from typing import TYPE_CHECKING, cast
+
 import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import (
+    MCTuples,
     MCTuplesCellSelectionResult,
     MCTuplesGenerator,
     MCTuplesRefinementResult,
@@ -14,8 +17,15 @@ from sunnbear._core.benchmark.mc_tuples import (
     MCTuplesStepResult,
     generate_mc_tuples,
 )
-from sunnbear._core.benchmark.mc_tuples.construction_steps import MCTuplesStep
+from sunnbear._core.benchmark.mc_tuples.construction_steps import (
+    MCTuplesCellSelectionStep,
+    MCTuplesRefinementStep,
+    MCTuplesStep,
+)
 from sunnbear._core.benchmark.mc_tuples.lane_grid import LaneGrid
+
+if TYPE_CHECKING:
+    from max_div.solver import ParallelMaxDivSolution
 
 
 # ==================================================================================================
@@ -53,6 +63,49 @@ def test_generate_mc_tuples_builds_nested_sizes_with_1_tuple_per_lane_and_report
     assert results[-1].tuple_array.tolist() == tuples.tuple_array.tolist()
     assert all(MCTuplesStats(result.tuple_array).size == int(result.size) for result in results)
     assert all(result.solution.score_checkpoints for result in results)
+
+
+def test_generate_mc_tuples_feeds_each_size_s_tuples_into_the_next_size(monkeypatch):
+    """Without a callback, the generator builds each size's grid on the size below and returns the last size's tuples,
+    here with the steps replaced by stubs that pick the diagonal cells and 1 random tuple inside each."""
+    # --- arrange ----------------------
+    no_solution = cast("ParallelMaxDivSolution", None)
+
+    def select_the_diagonal_cells(self: MCTuplesCellSelectionStep, t_budget_sec: float) -> MCTuplesCellSelectionResult:
+        """Return the cells on the grid's diagonal, 1 per new lane on each axis, without running max-div."""
+        cells = np.arange(self.grid.n_new) * (self.grid.n_new + 1)
+        return MCTuplesCellSelectionResult(
+            size=MCTuplesSize(self.grid.size),
+            t_budget_sec=t_budget_sec,
+            t_wall_sec=0.0,
+            tuple_array=self.grid.required_and_cell_tuple_array(cells),
+            solution=no_solution,
+            cells=cells,
+        )
+
+    def place_1_random_tuple_per_cell(self: MCTuplesRefinementStep, t_budget_sec: float) -> MCTuplesRefinementResult:
+        """Return the size's tuples with 1 random tuple inside each selected cell, without running max-div."""
+        new_tuple_array = self.grid.sample_in_cells(self.cells, 1, self.settings.rng)[:, 0, :]
+        tuple_array = np.vstack([self.grid.required_tuple_array, new_tuple_array])
+        return MCTuplesRefinementResult(
+            size=MCTuplesSize(self.grid.size),
+            t_budget_sec=t_budget_sec,
+            t_wall_sec=0.0,
+            tuple_array=tuple_array,
+            solution=no_solution,
+            tuples=MCTuples(tuple_array[:, 0], tuple_array[:, 1]),
+        )
+
+    monkeypatch.setattr(MCTuplesCellSelectionStep, "run", select_the_diagonal_cells)
+    monkeypatch.setattr(MCTuplesRefinementStep, "run", place_1_random_tuple_per_cell)
+
+    # --- act --------------------------
+    tuples = generate_mc_tuples(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_64)
+
+    # --- assert -----------------------
+    assert tuples.size == 64
+    assert LaneGrid.is_one_per_lane_on_rebuilt_grid(tuples.first(32))
+    assert LaneGrid.is_one_per_lane_on_rebuilt_grid(tuples)
 
 
 @pytest.mark.parametrize(
