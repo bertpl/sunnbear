@@ -35,8 +35,8 @@ dependencies = [
     # backports.zstd provides zstd for the archives of downloaded data artifacts; the standard library has it from 3.14.
     "backports.zstd>=1.0.0; python_version < '3.14'",
     "snuffled>=0.1.6",
-    # max-div 0.19.1 compiles its numba functions on first use, not at import, so importing sunnbear.benchmark stays fast.
-    "max-div>=0.19.1",
+    # max-div 0.21.0 adds the l2_and_projections distance; the refinement step of the MC tuple construction maximizes the min separation under it.
+    "max-div>=0.21.0",
     "mpl-composite>=0.1.2",
     # polars holds the benchmark results; its wheels use the stable CPython ABI, so 1 minimal version serves every supported Python version.
     "polars>=1.0.0",
