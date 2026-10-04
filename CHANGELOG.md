@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `sunnbear.benchmark.run_benchmark`: benchmark solvers on test functions over the Monte Carlo tuples, with resumable runs, a results table with 1 row per solve, and summaries grouped by any column of that table, such as per solver
+
 ### Changed
 
 - `MC_TUPLES_SIZES` is replaced by the enum `MCTuplesSize`, whose members are the sizes of the shipped Monte Carlo tuple set
