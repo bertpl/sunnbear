@@ -107,7 +107,10 @@ def summarize_results(
         )
     )
     # The caller gets back the kind it passed in: a `DataFrame` is collected, a `LazyFrame` stays a plan.
-    return summary.collect() if isinstance(frame, pl.DataFrame) else summary
+    if isinstance(frame, pl.DataFrame):
+        return summary.collect()
+    else:
+        return summary
 
 
 # ==================================================================================================
