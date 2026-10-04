@@ -7,9 +7,8 @@
   tuples and of the tuples of the size below.
 - **Refinement** places 1 tuple in each selected cell, chosen from `N_CANDIDATES_PER_CELL` uniform random
   float64 tuples inside the cell; max-div compares float32 copies, and the chosen tuple keeps its float64
-  values. It maximizes the min separation under max-div's `l2_and_projections` distance, configured for `size`
-  tuples; maximizing it raises the smallest of the 3 separation fractions of `MCTuplesStats`: along u, along v and
-  in L2.
+  values. It maximizes the min separation under max-div's `l2_and_projections` distance for `size` tuples;
+  maximizing that min separation raises the smallest separation fraction of `MCTuplesStats`.
 """
 
 import time
@@ -124,9 +123,9 @@ class MCTuplesStep(ABC):
         """Run max-div over the tuples of the size below and `new_candidate_array`; return the selected new candidates.
 
         The tuples of the size below come first among the candidates, and a weighted constraint asks max-div to
-        keep all of those tuples. The other arguments:
+        keep all of those tuples. The other arguments work as follows:
 
-        - the objective is `diversity_metric`, computed from `distance_metric` between pairs of tuples;
+        - the objective is `diversity_metric`, computed over the `distance_metric` distances between pairs of tuples;
         - `constraints` holds the step's own constraints;
         - the indices in `constraints` and in `initial_new_selection` count rows of `new_candidate_array`.
 
@@ -259,16 +258,18 @@ class MCTuplesRefinementStep(MCTuplesStep):
     """`MCTuplesRefinementStep` places 1 new tuple in each selected cell, chosen from random tuples inside the cell.
 
     The candidates are `N_CANDIDATES_PER_CELL` uniform random tuples per cell. The objective is the min separation
-    under max-div's `l2_and_projections` distance, configured for `size` tuples, which takes the smaller of 2
-    distances per pair:
+    under max-div's `l2_and_projections` distance, configured for `size` tuples. That distance takes the smaller
+    of 2 distances per pair:
 
     - **along the axes**: the L-minus-infinity distance `min(|Δu|, |Δv|)`, which equals the smaller of the gaps
       along u and along v;
-    - **in the square**: the L2 distance scaled by `(√size - 1) / (size - 1)`, the ratio of the spacings of `size`
-      evenly spaced tuples along an axis and on a square grid.
+    - **in the square**: the L2 distance scaled by `(√size - 1) / (size - 1)`, which is the spacing of `size`
+      evenly spaced values along an axis, `1/(size - 1)`, divided by the spacing of `size` tuples on a square
+      grid, `1/(√size - 1)`.
 
-    With that scale, max-div raises the smallest of the 3 separation fractions of `MCTuplesStats`. The separations
-    along an axis matter because u and v each set a separate parameter of a test function.
+    With that scale, each of the 2 distances equals its separation fraction divided by the same `size - 1`, so
+    max-div raises the smallest of the 3 separation fractions of `MCTuplesStats`. The separations along an axis
+    matter because u and v each set a separate parameter of a test function.
 
     No constraint keeps 1 tuple per cell; the objective does: 2 tuples in 1 cell would lie less than a lane
     width apart on each axis, which lowers the separation along the axes. max-div starts from the candidate
