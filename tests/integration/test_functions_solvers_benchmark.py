@@ -13,6 +13,9 @@ import pytest
 
 import sunnbear.functions as functions  # Import the module, so that pytest does not collect the `TestFunction` class.
 from sunnbear.benchmark import (
+    DEFAULT_N_BISECTION_FEVALS,
+    MAX_FEVALS_FACTOR,
+    RESULTS_SCHEMA,
     MCTuplesSize,
     add_derived_results,
     compute_xtol_range,
@@ -25,7 +28,6 @@ from sunnbear.solvers import SolverConfigRegistry, SolveStatus
 from sunnbear.stats import gpq
 
 SOLVER_IDS = ("bisection", "regula_falsi")
-N_BISECTION_FEVALS = 40
 
 
 @pytest.fixture(scope="module")
@@ -43,27 +45,36 @@ def run_dir(cubic: functions.TestFunction, tmp_path_factory: pytest.TempPathFact
         functions=[cubic],
         run_dir=run_dir,
         mc_size=MCTuplesSize.SIZE_32,
-        n_bisection_fevals=N_BISECTION_FEVALS,
         n_workers=1,
     )
     return run_dir
 
 
-def test_the_run_solves_every_sample_with_every_solver_within_the_xtol_range(run_dir, cubic):
-    """The results hold 1 row per solver and sample, every `xtol` within the range from `compute_xtol_range` for the
-    cubic's interval, and every `c` within the calibrated c-range."""
+def test_the_results_table_has_the_schema_and_1_row_per_solver_and_sample(run_dir, cubic):
+    """The results table has the columns of `RESULTS_SCHEMA` and 1 row per solver and sample, solvers in run order."""
+    # --- arrange / act ----------------
+    results = load_results(run_dir).collect()
+
+    # --- assert -----------------------
+    assert dict(results.schema) == RESULTS_SCHEMA
+    assert results.height == len(SOLVER_IDS) * MCTuplesSize.SIZE_32
+    assert results["solver_id"].unique(maintain_order=True).to_list() == list(SOLVER_IDS)
+    assert results["function_id"].unique().to_list() == [str(cubic.id)]
+
+
+def test_every_sample_s_xtol_c_and_budget_follow_the_protocol(run_dir, cubic):
+    """Every sample's `xtol` lies in the range from `compute_xtol_range` at `DEFAULT_N_BISECTION_FEVALS`, its `c`
+    lies in the calibrated c-range, and its `max_fevals` equals the default evaluation budget."""
     # --- arrange ----------------------
     results = load_results(run_dir).collect()
 
     # --- act --------------------------
-    xtol_min, xtol_max = compute_xtol_range(a=cubic.a, b=cubic.b, n_bisection_fevals=N_BISECTION_FEVALS)
+    xtol_min, xtol_max = compute_xtol_range(a=cubic.a, b=cubic.b, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
 
     # --- assert -----------------------
-    assert results.height == len(SOLVER_IDS) * MCTuplesSize.SIZE_32
-    assert results["solver_id"].unique(maintain_order=True).to_list() == list(SOLVER_IDS)
-    assert results["function_id"].unique().to_list() == [str(cubic.id)]
     assert ((results["xtol"] >= xtol_min) & (results["xtol"] < xtol_max)).all()
     assert ((results["c"] >= cubic.c_min) & (results["c"] <= cubic.c_max)).all()
+    assert results["max_fevals"].unique().to_list() == [MAX_FEVALS_FACTOR * DEFAULT_N_BISECTION_FEVALS]
 
 
 def test_bisection_spends_exactly_n_bisection_fevals_and_is_correct_on_every_sample(run_dir, cubic):
@@ -84,7 +95,7 @@ def test_bisection_spends_exactly_n_bisection_fevals_and_is_correct_on_every_sam
     # --- assert -----------------------
     assert bisection_rows["status"].unique().to_list() == [SolveStatus.CONVERGED.value]
     assert bisection_rows["is_correct"].all()
-    assert bisection_rows["n_fevals"].unique().to_list() == [N_BISECTION_FEVALS]
+    assert bisection_rows["n_fevals"].unique().to_list() == [DEFAULT_N_BISECTION_FEVALS]
     assert all(is_correct_again_by_row)
 
 

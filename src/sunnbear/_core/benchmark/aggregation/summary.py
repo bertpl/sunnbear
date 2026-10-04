@@ -51,8 +51,9 @@ def summarize_results(
     - `converged_fraction`: the fraction of the group's solves that converged;
     - `correct_fraction`: the fraction that converged to a correct answer, so never more than
       `converged_fraction`;
-    - for each summarized column and each of its levels `q`, the column's `gpq` at `q`, named by
-      `gpq_column_name`.
+    - for each summarized column and each of its levels `q`, the column's `gpq` at `q`, in a column named
+      `<column>_gpq_<q in percent, at least 2 digits>`, e.g. `n_fevals_eff_gpq_05`, `n_fevals_eff_gpq_50` or
+      `n_fevals_eff_gpq_12.5`.
 
     Each `gpq` is computed over all rows of a group at once, so a test function (`function_id`) with more rows in the
     group weighs more in that group's `gpq`.
@@ -64,7 +65,7 @@ def summarize_results(
         by: The column or columns to group by, e.g. `solver_id` for 1 row per solver, or `["solver_id", "function_id"]`
             for 1 row per pair.
         gpq_levels_by_column: The `gpq` levels to compute, per column; ``None`` summarizes every column of
-            `DERIVED_RESULTS_SCHEMA` at `DEFAULT_GPQ_LEVELS`.
+            `DERIVED_RESULTS_SCHEMA` at the levels 0.25, 0.5 and 0.75.
 
             - Each column must hold non-negative values and no nulls; neither is checked, and a violation gives a
               NaN, null or wrong `gpq`.

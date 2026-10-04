@@ -1,15 +1,8 @@
 """`add_derived_results` adds the columns of `DERIVED_RESULTS_SCHEMA`, computed from a results table's raw measurements.
 
 The results table stores only raw measurements (see `RESULTS_SCHEMA`); the metrics for comparing solvers
-are derived from them when a table is analyzed:
-
-- `n_fevals_eff`: the evaluation count, or the row's `max_fevals` when the solve did not converge to a correct
-  answer, so a failed solve counts as if it spent its whole evaluation budget;
-- `solver_flop_cost`: the sum of the flop counts of the solver's own arithmetic, each weighted by the cost of its
-  flop type; a failed solve keeps its actual flop counts, and only its evaluation count is replaced by the
-  evaluation budget, in `n_fevals_eff`;
-- `total_flop_cost_feval<k>`: `solver_flop_cost + k · n_fevals_eff`, the cost of a solve in flops when 1
-  function evaluation costs `k` flops, for each `k` of `FEVAL_FLOP_COSTS`.
+are derived from them when a table is analyzed. The docstring of `add_derived_results` describes each derived
+column.
 """
 
 from typing import overload
@@ -49,8 +42,16 @@ def add_derived_results(frame: pl.LazyFrame) -> pl.LazyFrame: ...
 def add_derived_results(frame: pl.DataFrame | pl.LazyFrame) -> pl.DataFrame | pl.LazyFrame:
     """Return `frame` with the columns of `DERIVED_RESULTS_SCHEMA` added, computed from its raw measurements.
 
-    `n_fevals_eff` is a solve's evaluation count, `n_fevals`, when its answer is correct, and the row's `max_fevals`,
-    its whole evaluation budget, for any other solve.
+    The added columns are:
+
+    - `n_fevals_eff`: the solve's evaluation count `n_fevals` when its answer is correct, and otherwise the row's
+      evaluation budget `max_fevals`, so a failed solve counts as if it spent its whole budget;
+    - `solver_flop_cost`: the sum of the flop counts of the solver's own arithmetic, each weighted by the cost of
+      its flop type; a failed solve keeps its actual flop counts, and only `n_fevals_eff` replaces its evaluation
+      count by the budget;
+    - `total_flop_cost_feval<k>`: `solver_flop_cost + k · n_fevals_eff`, the cost of a solve in flops when 1
+      function evaluation costs `k` flops, for each `k` of the `total_flop_cost_feval<k>` columns in
+      `DERIVED_RESULTS_SCHEMA`.
 
     The flop counts are weighted with counted-float's active flop weights, read when this function is called:
     `counted_float.config.set_active_flop_weights` changes the active flop weights for later calls, not for a lazy
