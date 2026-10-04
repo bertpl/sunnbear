@@ -98,7 +98,7 @@ def test_stats_reports_min_separations_and_their_fractions():
 
 
 def test_stats_describe_points_on_the_edges_of_the_unit_square():
-    """`MCTuplesStats` takes a points array, so the construction's cell points at 0 or 1 get their fractions too."""
+    """`MCTuplesStats` reports the size and the min separations of points on the edges of the unit square."""
     # --- act --------------------------
     stats = MCTuplesStats(np.array([[0.0, 0.0], [0.5, 1.0], [1.0, 0.5]]))
 

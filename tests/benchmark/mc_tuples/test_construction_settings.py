@@ -37,23 +37,26 @@ def test_every_step_has_a_fixed_share_and_the_shares_sum_to_1():
 
 @pytest.mark.parametrize("t_total_sec", [1.0, 30.0, 28_800.0])
 def test_from_total_time_splits_each_step_s_share_by_1_percent_per_solve_and_the_rest_by_work(t_total_sec):
-    """Within a step's share, each solve gets 1 % of the total, the rest in proportion to its candidates times size."""
+    """Within a step's share, each solve gets 1 % of the total, and the rest is split by work.
+
+    A solve's work is its number of candidates times its size.
+    """
     # --- act --------------------------
     settings = MCTuplesConstructionSettings.from_total_time(t_total_sec, n_workers=32)
 
     # --- assert -----------------------
     budgets = settings.t_budget_per_solve_sec
-    for step, t_fraction in T_BUDGET_FRACTION_PER_STEP.items():
+    for step, t_budget_fraction in T_BUDGET_FRACTION_PER_STEP.items():
         step_budgets = {k: t for (k, s), t in budgets.items() if s == step}
         work_per_size = {k: step.n_candidates(k) * k for k in step_budgets}
-        t_rest_sec = t_fraction * t_total_sec - 0.01 * t_total_sec * len(step_budgets)
+        t_rest_sec = t_budget_fraction * t_total_sec - 0.01 * t_total_sec * len(step_budgets)
         assert step_budgets == pytest.approx(
             {
                 k: 0.01 * t_total_sec + t_rest_sec * work / sum(work_per_size.values())
                 for k, work in work_per_size.items()
             }
         )
-        assert sum(step_budgets.values()) == pytest.approx(t_fraction * t_total_sec)
+        assert sum(step_budgets.values()) == pytest.approx(t_budget_fraction * t_total_sec)
     assert sum(budgets.values()) == pytest.approx(t_total_sec)
 
 

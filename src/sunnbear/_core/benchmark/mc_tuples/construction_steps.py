@@ -33,9 +33,9 @@ from .lane_grid import LaneGrid
 from .sizes import MCTuplesSize
 from .tuples import MCTuples, MCTuplesStats
 
-# The number of random candidate tuples per selected cell in the refinement step. At 256, the L2 separation
-# limits the objective, not the separations along the axes, and cell selection sets the L2 separation, so a
-# larger pool would only cost refinement iterations.
+# The number of random candidate tuples per selected cell in the refinement step. At this pool size, the L2
+# fraction is already the smallest of the 3 fractions in the objective, and cell selection, not refinement, sets
+# the L2 separation; a larger pool would only leave refinement fewer iterations within its budget.
 N_CANDIDATES_PER_CELL = 256
 
 # The constraint that keeps the tuples of the size below outweighs the lane constraints, so max-div meets it first.
@@ -53,8 +53,7 @@ class MCTuplesConstructionStep(StrEnum):
 
     def n_candidates(self, size: int) -> int:
         """Return the number of candidates of this step for `size`, the tuples of the size below included."""
-        size_below = MCTuplesSize(size).size_below
-        n_required = 0 if size_below is None else int(size_below)
+        n_required = MCTuplesSize(size).n_required
         n_new = size - n_required
         if self == MCTuplesConstructionStep.CELL_SELECTION:
             return n_new * n_new + n_required
@@ -151,7 +150,7 @@ def refine_within_cells(
         ),
         constraints=_inclusion_constraints(n_required),
     )
-    # max-div starts from the candidate nearest to each cell's point, cell selection's optimized position.
+    # max-div starts from the candidate nearest to each cell's point, the position that cell selection optimized.
     cell_points = grid.cell_points[cells]
     nearest_candidates = np.argmin(np.abs(candidates - cell_points[:, None, :]).sum(axis=-1), axis=1)
     initial_selection = np.concatenate(

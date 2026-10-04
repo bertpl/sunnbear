@@ -6,8 +6,9 @@ The tuple set is nested: each size includes the size below it, which is half as 
   (`LaneGrid.assign_new_values`);
 - **lanes** that meet at the midpoints between consecutive values, old and new (`LaneGrid.lane_boundaries`).
 
-Every value lies in its own lane. A cell is the crossing of a new u lane and a new v lane, and once each new tuple
-lies inside its own cell, the size holds exactly 1 tuple per lane along u and along v.
+Every value lies in its own lane. A new lane is the lane of a new value, and a cell is the crossing of a new u lane
+and a new v lane; once each new tuple lies inside its own cell, the size holds exactly 1 tuple per lane along u
+and along v.
 
 The lanes belong to 1 size only: the next size assigns its own new values to the gaps between all of this size's
 values and cuts its own lanes.
@@ -53,15 +54,15 @@ class LaneGrid:
     def for_size(cls, size: int, required_tuples: MCTuples | None) -> Self:
         """Return the grid for `size`, given `required_tuples`, the tuples of the size below (None at the smallest)."""
         required_points = cls._points_or_empty(required_tuples)
-        values, lanes = [], []
+        new_values_per_axis, new_lanes_per_axis = [], []
         for axis in range(2):
             new_values = cls.assign_new_values(required_points[:, axis], size)
             all_values = np.sort(np.concatenate([required_points[:, axis], new_values]))
             boundaries = cls.lane_boundaries(all_values)
             lane_indices = np.searchsorted(all_values, new_values)
-            values.append(new_values)
-            lanes.append(np.column_stack([boundaries[lane_indices], boundaries[lane_indices + 1]]))
-        return cls(size, required_tuples, values[0], values[1], lanes[0], lanes[1])
+            new_values_per_axis.append(new_values)
+            new_lanes_per_axis.append(np.column_stack([boundaries[lane_indices], boundaries[lane_indices + 1]]))
+        return cls(size, required_tuples, *new_values_per_axis, *new_lanes_per_axis)
 
     # --------------------------------------------------------------------------
     #  Values and lanes of 1 axis
@@ -71,8 +72,8 @@ class LaneGrid:
         """Return the new values of 1 axis, ascending, placed in the gaps between the sorted `old_values`.
 
         The sorted old values cut [0, 1] into gaps. Each of the `size - len(old_values)` new values goes, one at a
-        time, to the gap whose sub-gaps would be widest after adding it, which maximizes the smallest gap along the
-        axis.
+        time, to the gap that, once its values are evenly spaced, would leave the widest spacing after adding it,
+        which maximizes the smallest gap along the axis.
 
         Within a gap, the values are evenly spaced (`space_values_in_gaps`); with no old values, the new values
         are `i / (size - 1)`.
@@ -141,7 +142,7 @@ class LaneGrid:
         """Return the point that represents every cell, (u value, v value), as an `(n_cells, 2)` array, row by row."""
         return np.column_stack([np.repeat(self.new_u_values, self.n_new), np.tile(self.new_v_values, self.n_new)])
 
-    def points_with_cells(self, cells: np.ndarray) -> np.ndarray:
+    def required_and_cell_points(self, cells: np.ndarray) -> np.ndarray:
         """Return the required points, then the points of `cells`, as a `(size, 2)` array of (u, v) values."""
         return np.vstack([self.required_points, self.cell_points[cells]])
 
@@ -195,7 +196,7 @@ class LaneGrid:
         return True
 
     @classmethod
-    def is_size_one_per_lane(cls, tuples: MCTuples) -> bool:
+    def is_one_per_lane_on_rebuilt_grid(cls, tuples: MCTuples) -> bool:
         """Return whether `tuples`, 1 size of the nested set, holds exactly 1 tuple per lane along u and along v.
 
         The grid of the size is rebuilt from the tuples of the size below, the first half of `tuples`.

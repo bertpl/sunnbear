@@ -3,9 +3,9 @@
 The construction builds the sizes bottom-up, the smallest first, and each larger size includes the size
 below it, so every size is a prefix of the next.
 
-Each size first fixes the u and v values that its new tuples aim for, and cuts each axis into lanes around all
-of its values, as `LaneGrid` defines them. The new tuples go in the cells where a new u lane crosses a new v
-lane, in 2 max-div steps (`construction_steps`):
+Each size first fixes its new u and v values, 1 per new tuple on each axis, and cuts each axis into lanes around
+all values of the size, old and new, as `LaneGrid` defines them; a new lane is the lane around a new value. The
+new tuples go in the cells where a new u lane crosses a new v lane, in 2 max-div steps (`construction_steps`):
 
 - **cell selection** (`select_cells`): 1 cell per new lane on each axis;
 - **refinement** (`refine_within_cells`): 1 tuple inside each selected cell.
@@ -27,7 +27,7 @@ from .construction_steps import MCTuplesConstructionStep, refine_within_cells, s
 from .exceptions import MCTuplesConstructionError
 from .lane_grid import LaneGrid
 from .sizes import MCTuplesSize
-from .tuples import MCTuples
+from .tuples import MCTuples, MCTuplesStats
 
 
 # ==================================================================================================
@@ -38,11 +38,13 @@ class MCTuplesSolveReport:
     """`MCTuplesSolveReport` describes 1 finished max-div solve of a construction, for progress reports and inspection.
 
     Attributes:
-        size: The size whose new tuples the solve places.
+        size: The size of the tuple set under construction.
         step: The construction step of the solve.
         t_budget_sec: The solve's wall-clock budget.
-        t_wall_sec: The solve's wall-clock time: the budget, plus max-div's start and stop and the step's checks.
-        points: The size's points after the solve, the size below first, as a `(size, 2)` array of (u, v) values:
+        t_wall_sec: The solve's wall-clock time: the budget, plus the time that max-div takes to start up and shut
+            down and the time of the step's validation.
+        points: The size's points after the solve, the tuples of the size below first, as a `(size, 2)` array of
+            (u, v) values:
 
             - after cell selection, the points of the selected cells, which can lie on the edges of the unit square;
             - after refinement, the size's tuple set.
@@ -68,6 +70,10 @@ class MCTuplesSolveReport:
     ) -> Self:
         """Return the report of a solve that started at `t_start` (`time.perf_counter`) and ended now."""
         return cls(size, step, t_budget_sec, time.perf_counter() - t_start, points, solution)
+
+    def stats(self) -> MCTuplesStats:
+        """Return the spread statistics of the solve's points, each computed when first read."""
+        return MCTuplesStats(self.points)
 
 
 # ==================================================================================================
@@ -122,8 +128,8 @@ def generate_mc_tuples(
         t_budget_sec = settings.t_budget_per_solve_sec[k, step]
         t_start = time.perf_counter()
         cells, solution = select_cells(grid, t_budget_sec, settings.n_workers, seed, rng)
-        points_after_cell_selection = grid.points_with_cells(cells)
-        _report_solve(
+        points_after_cell_selection = grid.required_and_cell_points(cells)
+        _call_on_solve(
             on_solve,
             MCTuplesSolveReport.from_start_time(t_start, k, step, t_budget_sec, points_after_cell_selection, solution),
         )
@@ -136,7 +142,7 @@ def generate_mc_tuples(
         tuples = new_tuples if tuples is None else tuples.extended_by(new_tuples)
         if not grid.is_one_per_lane(tuples):
             raise MCTuplesConstructionError(f"Size {k}: the tuples do not hold exactly 1 per lane.")
-        _report_solve(
+        _call_on_solve(
             on_solve, MCTuplesSolveReport.from_start_time(t_start, k, step, t_budget_sec, tuples.points, solution)
         )
     assert tuples is not None  # noqa: S101 -- settings.sizes is never empty
@@ -146,7 +152,7 @@ def generate_mc_tuples(
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-def _report_solve(on_solve: Callable[[MCTuplesSolveReport], None] | None, report: MCTuplesSolveReport) -> None:
+def _call_on_solve(on_solve: Callable[[MCTuplesSolveReport], None] | None, report: MCTuplesSolveReport) -> None:
     """Pass `report` to `on_solve`, if there is one."""
     if on_solve is not None:
         on_solve(report)

@@ -5,13 +5,13 @@ time. The script:
 
 - calls `sunnbear.benchmark.generate_mc_tuples`;
 - prints 1 line per solve as the construction goes, with the solve's budget, wall time and min separation fractions
-  (as `MCTuplesStats` defines them), and, with `--inspection-dir`, stores each solve there: its points as the CSV
-  file `k<size>_<step>.csv`, and max-div's solution, with its score checkpoints, as the pickle file
-  `k<size>_<step>_solution.pkl`;
-- prints the spread of every size, and whether it holds exactly 1 tuple per lane, as `LaneGrid.is_size_one_per_lane`
-  checks it;
+  (as `MCTuplesStats` defines them);
+- with `--inspection-dir`, stores each solve in that directory: its points as the CSV file `k<size>_<step>.csv`,
+  and max-div's solution, with its score checkpoints, as the pickle file `k<size>_<step>_solution.pkl`;
+- prints the spread of every size, and whether it holds exactly 1 tuple per lane, as
+  `LaneGrid.is_one_per_lane_on_rebuilt_grid` checks it;
 - saves the set through `ArtifactStore`, which records in the artifact's manifest the
-  `generate_mc_tuples` call, its arguments and max-div's version; `--no-save` skips this, for a trial run.
+  `generate_mc_tuples` call, its arguments and max-div's version; `--no-save` skips saving the set, for a trial run.
 
 Usage:
 
@@ -30,7 +30,6 @@ from sunnbear._core.benchmark.mc_tuples import (
     MCTuplesDeclaration,
     MCTuplesSize,
     MCTuplesSolveReport,
-    MCTuplesStats,
     generate_mc_tuples,
 )
 from sunnbear._core.benchmark.mc_tuples.lane_grid import LaneGrid
@@ -58,7 +57,7 @@ def main() -> None:
         stats = size_tuples.stats()
         print(
             f"| {size} | {stats.min_separation_l2_fraction:.1%} | {stats.min_separation_u_fraction:.1%} "
-            f"| {stats.min_separation_v_fraction:.1%} | {LaneGrid.is_size_one_per_lane(size_tuples)} |"
+            f"| {stats.min_separation_v_fraction:.1%} | {LaneGrid.is_one_per_lane_on_rebuilt_grid(size_tuples)} |"
         )
 
     if args.is_trial_run:
@@ -75,7 +74,7 @@ def main() -> None:
 
 def report_solve(report: MCTuplesSolveReport, inspection_dir: Path | None) -> None:
     """Print the solve's budget, wall time and separation fractions, and store it in `inspection_dir` if given."""
-    stats = MCTuplesStats(report.points)
+    stats = report.stats()
     print(
         f"k={int(report.size)} {report.step.value}: budget {report.t_budget_sec:.0f} s, "
         f"wall {report.t_wall_sec:.0f} s, L2 {stats.min_separation_l2_fraction:.1%}, "

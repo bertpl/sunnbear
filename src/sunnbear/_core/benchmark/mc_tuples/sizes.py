@@ -29,5 +29,10 @@ class MCTuplesSize(IntEnum):
 
     @property
     def size_below(self) -> "MCTuplesSize | None":
-        """Return the size that this size includes, half as large; None for the smallest size."""
+        """Return the next smaller size, half as large, which this size includes; None for the smallest size."""
         return None if self == min(MCTuplesSize) else MCTuplesSize(self // 2)
+
+    @property
+    def n_required(self) -> int:
+        """Return the number of tuples that this size takes from the size below; 0 for the smallest size."""
+        return 0 if self.size_below is None else int(self.size_below)

@@ -2,10 +2,11 @@
 
 Each size takes 2 max-div solves (`MCTuplesConstructionStep`). The total time is split over the solves:
 
-- each step gets a fixed share of the total, `T_BUDGET_BUDGET_FRACTION_PER_STEP`, whatever its candidate count, because
-  cell selection decides the L2 min separation of the result and still improves it when a long budget ends, while
-  refinement improves it little at the large sizes; the size of refinement's candidate pool therefore does not
-  change the time of cell selection;
+- each step gets a fixed share of the total, `T_BUDGET_FRACTION_PER_STEP`, whatever its candidate count:
+  - cell selection decides the L2 min separation of the result, and is still improving that separation when
+    even a long budget runs out;
+  - refinement improves the L2 min separation little at the large sizes;
+  - so the size of refinement's candidate pool does not change the time of cell selection;
 - within a step, each solve gets at least `MIN_T_BUDGET_FRACTION_PER_SOLVE` of the total, so the solves of the
   smallest sizes, whose share of the work is tiny, still get time to run, and the rest of the step's share is
   split in proportion to `n · k`, the step's number of candidates times the size, a measure of the solve's work.
@@ -73,9 +74,9 @@ class MCTuplesConstructionSettings:
         # --- time per solve ---------------------
         min_t_budget_per_solve_sec = MIN_T_BUDGET_FRACTION_PER_SOLVE * t_total_sec
         t_budget_per_solve_sec: dict[tuple[MCTuplesSize, MCTuplesConstructionStep], float] = {}
-        for step, t_fraction in T_BUDGET_FRACTION_PER_STEP.items():
+        for step, t_budget_fraction in T_BUDGET_FRACTION_PER_STEP.items():
             work_per_size = {k: step.n_candidates(k) * k for k in sizes}
-            t_rest_sec = t_fraction * t_total_sec - len(sizes) * min_t_budget_per_solve_sec
+            t_rest_sec = t_budget_fraction * t_total_sec - len(sizes) * min_t_budget_per_solve_sec
             for k, solve_work in work_per_size.items():
                 t_budget_per_solve_sec[k, step] = min_t_budget_per_solve_sec + t_rest_sec * solve_work / sum(
                     work_per_size.values()

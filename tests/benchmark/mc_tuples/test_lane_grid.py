@@ -17,6 +17,12 @@ def _min_gap(old_values: list[float], new_values: np.ndarray) -> float:
     return float(np.diff(np.sort(np.concatenate([old_values, new_values]))).min())
 
 
+def _one_tuple_per_random_cell(grid: LaneGrid, rng: np.random.Generator) -> MCTuples:
+    """Return 1 random tuple inside each of random cells that pair each new u lane with a different new v lane."""
+    samples = grid.sample_in_cells(grid.random_one_per_new_lane_cells(rng), 1, rng)[:, 0, :]
+    return MCTuples(samples[:, 0], samples[:, 1])
+
+
 def _best_min_gap_by_brute_force(old_values: list[float], n_new: int) -> float:
     """Return the largest min gap over every assignment of `n_new` values to the gaps between `old_values`.
 
@@ -59,7 +65,7 @@ def test_assign_new_values_spaces_the_values_evenly_within_each_gap(old_values, 
     ],
 )
 def test_the_greedy_assignment_maximizes_the_smallest_gap(old_values, n_new):
-    """On small cases, the greedy's smallest gap equals the best over every assignment of counts to the gaps."""
+    """On small cases, `assign_new_values` maximizes the smallest gap over every assignment of counts to the gaps."""
     # --- act --------------------------
     new_values = LaneGrid.assign_new_values(np.array(old_values), len(old_values) + n_new)
 
@@ -101,7 +107,11 @@ def test_the_cells_are_numbered_row_by_row_and_represented_by_their_values():
     assert grid.n_cells == 16
     u, v = grid.new_u_values, grid.new_v_values
     assert grid.cell_points[[0, 1, 4]].tolist() == [[u[0], v[0]], [u[0], v[1]], [u[1], v[0]]]
-    assert grid.points_with_cells(np.array([1, 4])).tolist() == [*_SIZE_4.points.tolist(), [u[0], v[1]], [u[1], v[0]]]
+    assert grid.required_and_cell_points(np.array([1, 4])).tolist() == [
+        *_SIZE_4.points.tolist(),
+        [u[0], v[1]],
+        [u[1], v[0]],
+    ]
     assert [cells.tolist() for cells in grid.lane_cells()[:2]] == [[0, 1, 2, 3], [4, 5, 6, 7]]
     assert grid.lane_cells()[4].tolist() == [0, 4, 8, 12]
 
@@ -146,7 +156,7 @@ def test_samples_lie_strictly_inside_their_cells():
         (_SIZE_4, True),
         (MCTuples([0.1, 0.4, 0.6, 0.7], [0.9, 0.1, 0.6, 0.4]), False),  # 0.6 and 0.7 share the third u lane
         (MCTuples([0.1, 0.4, 0.6, 0.9], [0.9, 0.95, 0.6, 0.4]), False),  # 0.9 and 0.95 share the last v lane
-        (MCTuples([0.1, 0.4, 0.9], [0.9, 0.1, 0.4]), False),  # not the size
+        (MCTuples([0.1, 0.4, 0.9], [0.9, 0.1, 0.4]), False),  # 3 tuples, not the 4 of the size
     ],
 )
 def test_is_one_per_lane_requires_exactly_1_tuple_per_lane_on_each_axis(tuples, is_one_per_lane):
@@ -160,25 +170,23 @@ def test_a_nested_size_holds_1_per_lane_when_each_new_tuple_stays_inside_its_cel
     # --- arrange ----------------------
     rng = np.random.default_rng(5)
     grid = LaneGrid.for_size(8, _SIZE_4)
-    samples = grid.sample_in_cells(grid.random_one_per_new_lane_cells(rng), 1, rng)[:, 0, :]
+    new_tuples = _one_tuple_per_random_cell(grid, rng)
 
     # --- act --------------------------
-    tuples = _SIZE_4.extended_by(MCTuples(samples[:, 0], samples[:, 1]))
+    tuples = _SIZE_4.extended_by(new_tuples)
 
     # --- assert -----------------------
     assert grid.is_one_per_lane(tuples)
     assert not grid.is_one_per_lane(_SIZE_4.extended_by(_SIZE_4))
 
 
-def test_is_size_one_per_lane_rebuilds_the_grid_of_a_shipped_size_and_refuses_other_sizes():
+def test_is_one_per_lane_on_rebuilt_grid_checks_a_shipped_size_and_refuses_other_sizes():
     """A size-32 set with 1 sample per selected cell passes the check; a size outside `MCTuplesSize` is refused."""
     # --- arrange ----------------------
     rng = np.random.default_rng(6)
-    grid = LaneGrid.for_size(32, None)
-    samples = grid.sample_in_cells(grid.random_one_per_new_lane_cells(rng), 1, rng)[:, 0, :]
-    tuples = MCTuples(samples[:, 0], samples[:, 1])
+    tuples = _one_tuple_per_random_cell(LaneGrid.for_size(32, None), rng)
 
     # --- act / assert -----------------
-    assert LaneGrid.is_size_one_per_lane(tuples)
+    assert LaneGrid.is_one_per_lane_on_rebuilt_grid(tuples)
     with pytest.raises(ValueError, match="one of"):
-        LaneGrid.is_size_one_per_lane(_SIZE_4)
+        LaneGrid.is_one_per_lane_on_rebuilt_grid(_SIZE_4)
