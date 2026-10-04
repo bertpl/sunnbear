@@ -65,7 +65,7 @@ def summarize_results(
         by: The column or columns to group by, e.g. `solver_id` for 1 row per solver, or `["solver_id", "function_id"]`
             for 1 row per pair.
         gpq_levels_by_column: The `gpq` levels to compute, per column; ``None`` summarizes every column of
-            `DERIVED_RESULTS_SCHEMA` at the levels 0.25, 0.5 and 0.75, where `gpq` at 0.5 is the geometric mean.
+            `DERIVED_RESULTS_SCHEMA` at the levels 0.25, 0.5 and 0.75.
 
             - Each column must hold non-negative values and no nulls; neither is checked, and a violation gives a
               NaN, null or wrong `gpq`.

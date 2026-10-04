@@ -63,8 +63,8 @@ def test_the_results_table_has_the_schema_and_1_row_per_solver_and_sample(run_di
 
 
 def test_every_sample_s_xtol_c_and_budget_follow_the_protocol(run_dir, cubic):
-    """Every sample's `xtol` lies in the range from `compute_xtol_range` at the default evaluation count, its `c` in the
-    calibrated c-range, and its `max_fevals` is the default evaluation budget."""
+    """Every sample's `xtol` lies in the range from `compute_xtol_range` at `DEFAULT_N_BISECTION_FEVALS`, its `c`
+    lies in the calibrated c-range, and its `max_fevals` equals the default evaluation budget."""
     # --- arrange ----------------------
     results = load_results(run_dir).collect()
 

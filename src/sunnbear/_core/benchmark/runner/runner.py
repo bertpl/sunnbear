@@ -63,12 +63,12 @@ def run_benchmark(
         functions: The calibrated test functions to run, each with its c-range. Their result rows are grouped by
             formula, formulas in order of first appearance, not in the order passed.
         run_dir: The run directory, created when it does not exist.
-        root_seed: The run's root seed, from which every seed of the run is derived, such as the seed of each
-            correctness check, per test function and sample.
+        root_seed: The run's root seed, from which every seed of the run is derived, such as the seed of the
+            correctness check for each pair of test function and sample.
         mc_size: The size of the Monte Carlo tuple set, 1 of `MCTuplesSize`.
         n_bisection_fevals: The number of function evaluations that bisection spends on each solve; every solve's
-            `xtol` range follows from it (see `compute_xtol_range`), and every solve's evaluation budget is
-            `MAX_FEVALS_FACTOR` times that count.
+            `xtol` range follows from `n_bisection_fevals` (see `compute_xtol_range`), and every solve's evaluation
+            budget is `MAX_FEVALS_FACTOR` times `n_bisection_fevals`.
         n_workers: The number of worker processes; ``None`` for 1 per CPU, and 1 to run every task in this
             process. Each worker imports the modules that define the formulas and solver configs, and a class
             defined in an interactive session has no module file to import, so with more than 1 worker, no

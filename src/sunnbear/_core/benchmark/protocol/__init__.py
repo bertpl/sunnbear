@@ -1,8 +1,8 @@
 """This package holds the benchmark protocol: the rules that every solve of a benchmark run follows.
 
 - `compute_xtol_range` and `max_fevals_for` derive a solve's tolerance range and evaluation budget
-  from bisection's evaluation count, `n_bisection_fevals`, which defaults to `DEFAULT_N_BISECTION_FEVALS`; the budget
-  is `MAX_FEVALS_FACTOR` times that count;
+  from bisection's evaluation count, `n_bisection_fevals`, whose default in `run_benchmark` is
+  `DEFAULT_N_BISECTION_FEVALS`; the budget is `MAX_FEVALS_FACTOR` times `n_bisection_fevals`;
 - `derive_seed` derives every seed of a run from its root seed;
 - `is_solution_correct` judges whether a solver's answer lies within `xtol` of a root.
 """

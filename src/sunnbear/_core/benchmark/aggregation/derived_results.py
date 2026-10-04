@@ -2,7 +2,7 @@
 
 The results table stores only raw measurements (see `RESULTS_SCHEMA`); the metrics for comparing solvers
 are derived from them when a table is analyzed. The docstring of `add_derived_results` describes each derived
-column, because its callers read that docstring and not this one.
+column.
 """
 
 from typing import overload
@@ -50,7 +50,8 @@ def add_derived_results(frame: pl.DataFrame | pl.LazyFrame) -> pl.DataFrame | pl
       its flop type; a failed solve keeps its actual flop counts, and only `n_fevals_eff` replaces its evaluation
       count by the budget;
     - `total_flop_cost_feval<k>`: `solver_flop_cost + k · n_fevals_eff`, the cost of a solve in flops when 1
-      function evaluation costs `k` flops, for each `k` in 10, 100 and 1000.
+      function evaluation costs `k` flops, for each `k` of the `total_flop_cost_feval<k>` columns in
+      `DERIVED_RESULTS_SCHEMA`.
 
     The flop counts are weighted with counted-float's active flop weights, read when this function is called:
     `counted_float.config.set_active_flop_weights` changes the active flop weights for later calls, not for a lazy

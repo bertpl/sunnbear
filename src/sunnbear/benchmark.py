@@ -10,8 +10,8 @@ each tuple mapped to a tolerance `xtol` and a value of the function's parameter 
 - `compute_xtol_range` returns the range of `xtol` values on which bisection spends exactly a given number of
   function evaluations, and `is_solution_correct` checks whether a root lies within `xtol` of a solver's answer;
 - `DEFAULT_N_BISECTION_FEVALS` is the default of `run_benchmark`'s `n_bisection_fevals`, the number of function
-  evaluations that bisection spends to reach each solve's `xtol`, and every solve's evaluation budget is
-  `MAX_FEVALS_FACTOR` times `n_bisection_fevals`;
+  evaluations that bisection spends to reach each solve's `xtol`;
+- every solve's evaluation budget is `MAX_FEVALS_FACTOR` times `n_bisection_fevals`;
 - `add_derived_results` adds the columns of `DERIVED_RESULTS_SCHEMA` to a results table; these columns hold the metrics
   for comparing solvers, such as flop costs;
 - `summarize_results` summarizes a results table per group, e.g. per solver.
