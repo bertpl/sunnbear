@@ -15,7 +15,7 @@ The new tuples go in the cells where a new u lane crosses a new v lane, in 2 max
 
 - it splits the total time over the steps' max-div solves;
 - for each size, it builds the lane grid and runs the 2 steps;
-- it passes each step's result (`construction_step_results`) to the caller's `on_solve_finished`, so that a long
+- it passes each step's result (`construction_step_results`) to the caller's `on_step_finished`, so that a long
   construction can show its progress and store its tuples and max-div's solutions as it goes.
 """
 
@@ -60,7 +60,7 @@ class MCTuplesGenerator:
         n_workers: The number of max-div workers per solve when the total time is `MIN_T_TOTAL_AT_FULL_SCALE_SEC`
             or more; more workers search from more seeds, and may exceed the number of cores.
         seed: The seed of every random draw and of every max-div solve.
-        on_solve_finished: Called with each step's result as soon as the step, its validation included, ends; None
+        on_step_finished: Called with each step's result as soon as the step, its validation included, ends; None
             reports nothing.
     """
 
@@ -77,7 +77,7 @@ class MCTuplesGenerator:
         *,
         n_workers: int = 32,
         seed: int = 42,
-        on_solve_finished: Callable[[MCTuplesStepResult], None] | None = None,
+        on_step_finished: Callable[[MCTuplesStepResult], None] | None = None,
     ) -> None:
         """Set the settings of every construction of this generator.
 
@@ -88,7 +88,7 @@ class MCTuplesGenerator:
             raise ValueError(f"n_workers must be at least 1 (got {n_workers}).")
         self.n_workers = n_workers
         self.seed = seed
-        self.on_solve_finished = on_solve_finished
+        self.on_step_finished = on_step_finished
 
     # --------------------------------------------------------------------------
     #  Main API
@@ -117,13 +117,13 @@ class MCTuplesGenerator:
             cell_selection_result = MCTuplesCellSelectionStep(grid, settings).run(
                 t_budget_per_solve_sec[size, MCTuplesCellSelectionStep]
             )
-            if self.on_solve_finished is not None:
-                self.on_solve_finished(cell_selection_result)
+            if self.on_step_finished is not None:
+                self.on_step_finished(cell_selection_result)
             refinement_result = MCTuplesRefinementStep(grid, cell_selection_result.cells, settings).run(
                 t_budget_per_solve_sec[size, MCTuplesRefinementStep]
             )
-            if self.on_solve_finished is not None:
-                self.on_solve_finished(refinement_result)
+            if self.on_step_finished is not None:
+                self.on_step_finished(refinement_result)
             tuples = refinement_result.tuples
         assert tuples is not None  # noqa: S101 -- MCTuplesSize.up_to never returns an empty tuple
         return tuples
@@ -168,7 +168,7 @@ def generate_mc_tuples(
     n_workers: int = 32,
     seed: int = 42,
     max_size: MCTuplesSize = MCTuplesSize.SIZE_1024,
-    on_solve_finished: Callable[[MCTuplesStepResult], None] | None = None,
+    on_step_finished: Callable[[MCTuplesStepResult], None] | None = None,
 ) -> MCTuples:
     """Construct a nested Monte Carlo (u, v) tuple set up to `max_size` in about `t_total_sec` s.
 
@@ -199,7 +199,7 @@ def generate_mc_tuples(
         seed: The seed of every random draw and of every max-div solve.
         max_size: The largest size to build, 1 of `MCTuplesSize`; every size up to it is built, however short
             `t_total_sec` is, so a short run that wants fewer sizes passes a smaller `max_size`.
-        on_solve_finished: Called after each of the 2 solves of every size with the solve's result, e.g. to print
+        on_step_finished: Called after each of the 2 steps of every size with the step's result, e.g. to print
             the progress of a long construction or to store its tuples and solutions; None reports nothing. The
             result holds:
 
@@ -214,5 +214,5 @@ def generate_mc_tuples(
         MCTuplesConstructionError: If a size misses a tuple of the size below it or does not hold exactly 1 tuple
             per lane, which can happen when `t_total_sec` is too short for max-div to meet its constraints.
     """
-    generator = MCTuplesGenerator(n_workers=n_workers, seed=seed, on_solve_finished=on_solve_finished)
+    generator = MCTuplesGenerator(n_workers=n_workers, seed=seed, on_step_finished=on_step_finished)
     return generator.generate(t_total_sec, max_size)

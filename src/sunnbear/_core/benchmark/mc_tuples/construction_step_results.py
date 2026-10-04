@@ -74,7 +74,7 @@ class MCTuplesCellSelectionResult(MCTuplesStepResult):
 
 @dataclass(frozen=True, kw_only=True)
 class MCTuplesRefinementResult(MCTuplesStepResult):
-    """`MCTuplesRefinementResult` is the result of refinement: the size's tuples, with 1 new tuple inside each selected cell.
+    """`MCTuplesRefinementResult` is the result of refinement: the size's tuples, with 1 new one in each selected cell.
 
     Attributes:
         tuples: The size's tuples, the tuples of the size below first, as the `MCTuples` that the construction

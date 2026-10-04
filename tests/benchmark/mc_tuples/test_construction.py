@@ -32,7 +32,7 @@ def test_generate_mc_tuples_builds_nested_sizes_with_1_tuple_per_lane_and_report
     results: list[MCTuplesStepResult] = []
 
     # --- act --------------------------
-    tuples = generate_mc_tuples(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_64, on_solve_finished=results.append)
+    tuples = generate_mc_tuples(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_64, on_step_finished=results.append)
 
     # --- assert -----------------------
     assert tuples.size == 64

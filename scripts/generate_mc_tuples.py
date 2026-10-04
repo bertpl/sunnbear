@@ -61,7 +61,7 @@ def main() -> None:
         "seed": args.seed,
         "max_size": MCTuplesSize(args.max_size),
     }
-    tuples = generate_mc_tuples(**arguments, on_solve_finished=lambda result: report_step(result, args.inspection_dir))
+    tuples = generate_mc_tuples(**arguments, on_step_finished=lambda result: report_step(result, args.inspection_dir))
 
     print("| size | L2 | u | v | 1 per lane |")
     print("|---|---|---|---|---|")
