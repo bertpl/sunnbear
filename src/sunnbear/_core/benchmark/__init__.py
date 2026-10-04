@@ -13,12 +13,16 @@ It holds:
 Importing it registers the `mc_tuples` artifact declaration with `ArtifactRegistry`.
 """
 
-from .aggregation import add_derived_results, summarize_results
+from .aggregation import DERIVED_RESULTS_SCHEMA, add_derived_results, summarize_results
 from .mc_tuples import MCTuples, MCTuplesSize, MCTuplesStats, generate_mc_tuples, load_mc_tuples
-from .protocol import compute_xtol_range, is_solution_correct
-from .runner import load_results, run_benchmark
+from .protocol import MAX_FEVALS_FACTOR, N_BISECTION_FEVALS, compute_xtol_range, is_solution_correct
+from .runner import RESULTS_SCHEMA, load_results, run_benchmark
 
 __all__ = [
+    "DERIVED_RESULTS_SCHEMA",
+    "MAX_FEVALS_FACTOR",
+    "N_BISECTION_FEVALS",
+    "RESULTS_SCHEMA",
     "MCTuples",
     "MCTuplesSize",
     "MCTuplesStats",

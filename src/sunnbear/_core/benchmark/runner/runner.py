@@ -65,8 +65,8 @@ def run_benchmark(
         run_dir: The run directory, created when it does not exist.
         root_seed: The run's root seed, from which every seed of the run is derived.
         mc_size: The size of the Monte Carlo tuple set, 1 of `MCTuplesSize`.
-        n_bisection_fevals: Bisection's evaluation count, from which the `xtol` range and the evaluation
-            budget follow.
+        n_bisection_fevals: Bisection's evaluation count: every solve's `xtol` range follows from it (see
+            `compute_xtol_range`), and every solve's evaluation budget is `MAX_FEVALS_FACTOR` times it.
         n_workers: The number of worker processes; ``None`` for 1 per CPU, and 1 to run every task in this
             process. Each worker imports the modules that define the formulas and solver configs, and a class
             defined in an interactive session has no module file to import, so with more than 1 worker, no
@@ -126,18 +126,16 @@ def run_benchmark(
 def load_results(run_dirs: Path | Sequence[Path]) -> pl.LazyFrame:
     """Return a lazy frame over the results of 1 or more finished runs, 1 row per solve.
 
-    The rows of several runs follow each other in the order of `run_dirs`. Every pair of runs must pass
-    `BenchmarkRunInfo.check_combinable_with`: both runs must depend on the same inputs and versions, except that
-    the runs may cover different solvers and test functions, and no solver may have run on the same test function
-    in both runs.
+    The rows of several runs follow each other in the order of `run_dirs`. Every pair of runs must be combinable:
+    both runs must depend on the same inputs and versions, except that the runs may cover different solvers and
+    test functions, and no solver may have run on the same test function in both runs.
 
     A query on the frame reads only the files, row groups and columns that it needs. The columns and their
     types are those of `RESULTS_SCHEMA`.
 
     Raises:
         ValueError: If `run_dirs` is an empty sequence.
-        BenchmarkRunError: If a run directory holds no finished run, or if `BenchmarkRunInfo.check_combinable_with`
-            refuses 2 of the runs.
+        BenchmarkRunError: If a run directory holds no finished run, or if 2 of the runs are not combinable.
     """
     paths = [run_dirs] if isinstance(run_dirs, Path) else list(run_dirs)
     return BenchmarkRunDir.scan_combined_results([BenchmarkRunDir(path) for path in paths])

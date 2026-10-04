@@ -34,19 +34,19 @@ def is_solution_correct(
        opposite signs, so they prove that solve's answer correct;
     3. random x-values drawn from `seed`, alternately below and above `x_found`.
 
-    A correct answer of a bracketing solve is usually proven in 2 or 3 evaluations; a wrong answer
-    spends all `CORRECTNESS_CHECK_MAX_FEVALS`. An x-value where `f` raises or returns a non-finite value
-    proves nothing, but counts toward `CORRECTNESS_CHECK_MAX_FEVALS`.
+    A correct answer of a bracketing solve is usually proven in 2 or 3 evaluations; a wrong answer spends the
+    check's whole limit of 1000 evaluations. An x-value where `f` raises or returns a non-finite value proves
+    nothing, but counts toward that limit.
 
     Args:
         f: The plain function, not the wrapper that counts the solver's evaluations, so that the check's
             own evaluations are not counted as the solver's.
         x_found: The solver's answer.
         xtol: The largest distance from `x_found` at which a root still makes the answer correct.
-        seed: The seed of the random x-values, so that the verdict is reproducible; derive it with
-            `derive_seed` and `SeedPurpose.CORRECTNESS_CHECK`.
+        seed: The seed of the random x-values, so that the verdict is reproducible; any integer. A benchmark run
+            derives it from its root seed per test function and sample.
         x_candidates: X-values to probe before the random x-values, such as the x-values at which the
-            solver evaluated `f` (`SolveResult.history`); x-values farther than `xtol` from `x_found` are
+            solver evaluated `f` (`SolveResult.evaluated_x_values`); x-values farther than `xtol` from `x_found` are
             skipped.
 
     Raises:
