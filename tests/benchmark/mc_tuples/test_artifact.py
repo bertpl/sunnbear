@@ -37,11 +37,10 @@ def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set_with_1_tuple_per_lan
 
     # --- assert -----------------------
     full = load_mc_tuples(max(MCTuplesSize))
-    size_below = None if size == min(MCTuplesSize) else load_mc_tuples(size // 2)
     assert tuples.size == size
     assert tuples.u.tolist() == full.u[:size].tolist()
     assert tuples.v.tolist() == full.v[:size].tolist()
-    assert LaneGrid.for_size(size, size_below).is_one_per_lane(tuples)
+    assert LaneGrid.is_size_one_per_lane(tuples)
 
 
 def test_load_mc_tuples_rejects_an_unsupported_size():

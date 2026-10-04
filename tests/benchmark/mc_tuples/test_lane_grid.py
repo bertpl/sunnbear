@@ -8,7 +8,7 @@ import pytest
 from sunnbear._core.benchmark.mc_tuples import MCTuples
 from sunnbear._core.benchmark.mc_tuples.lane_grid import LaneGrid
 
-# A set of 4 tuples with 1 tuple per lane of size 4 on each axis, and the size below size 8.
+# A size-4 set with 1 tuple per lane on each axis; the tests use it as the size below size 8.
 _SIZE_4 = MCTuples([0.1, 0.4, 0.6, 0.9], [0.9, 0.1, 0.6, 0.4])
 
 
@@ -23,46 +23,30 @@ def _best_min_gap_by_brute_force(old_values: list[float], n_new: int) -> float:
     Within a gap, the values are spaced as `assign_new_values` spaces them, which is the best spacing for a
     given count; only the counts per gap are enumerated.
     """
-    bounds = [0.0, *sorted(old_values), 1.0]
-    n_gaps = len(bounds) - 1
+    bounds = np.array([0.0, *sorted(old_values), 1.0])
     best = 0.0
-    for counts in itertools.product(range(n_new + 1), repeat=n_gaps):
-        if sum(counts) != n_new:
-            continue
-        values = []
-        for gap, m in enumerate(counts):
-            lo, hi = bounds[gap], bounds[gap + 1]
-            if m == 0:
-                continue
-            if gap == 0:
-                values.extend(lo + np.arange(m) * (hi - lo) / m)
-            elif gap == n_gaps - 1:
-                values.extend(lo + np.arange(1, m + 1) * (hi - lo) / m)
-            else:
-                values.extend(lo + np.arange(1, m + 1) * (hi - lo) / (m + 1))
-        best = max(best, _min_gap(old_values, np.array(values)))
+    for counts in itertools.product(range(n_new + 1), repeat=bounds.size - 1):
+        if sum(counts) == n_new:
+            values = LaneGrid.space_values_in_gaps(bounds, np.array(counts))
+            best = max(best, _min_gap(old_values, values))
     return best
 
 
 # ==================================================================================================
 #  New values and lanes of 1 axis
 # ==================================================================================================
-def test_with_no_old_values_the_new_values_run_evenly_from_0_to_1():
-    """The smallest size has no old values, so its values are `i / (size - 1)`, from 0 to 1."""
+@pytest.mark.parametrize(
+    "old_values, size, new_values",
+    [
+        ([], 4, [0.0, 1 / 3, 2 / 3, 1.0]),  # no old values: `i / (size - 1)`, from 0 to 1
+        ([0.1, 0.9], 6, [0.26, 0.42, 0.58, 0.74]),  # an interior gap: 5 equal sub-gaps between 0.1 and 0.9
+        ([0.5], 5, [0.0, 0.25, 0.75, 1.0]),  # 2 edge gaps: the outermost values at 0 and 1
+    ],
+)
+def test_assign_new_values_spaces_the_values_evenly_within_each_gap(old_values, size, new_values):
+    """The new values are evenly spaced within each gap, and an edge gap puts its outermost value at 0 or 1."""
     # --- act / assert -----------------
-    assert LaneGrid.assign_new_values(np.array([]), 4).tolist() == pytest.approx([0.0, 1 / 3, 2 / 3, 1.0])
-
-
-def test_an_interior_gap_spaces_its_values_evenly_between_the_old_values():
-    """4 values between the old values 0.1 and 0.9 split that gap into 5 equal sub-gaps."""
-    # --- act / assert -----------------
-    assert LaneGrid.assign_new_values(np.array([0.1, 0.9]), 6).tolist() == pytest.approx([0.26, 0.42, 0.58, 0.74])
-
-
-def test_an_edge_gap_puts_its_outermost_value_at_the_edge():
-    """2 values per edge gap around the old value 0.5 put the outermost ones at 0 and 1, evenly spaced inward."""
-    # --- act / assert -----------------
-    assert LaneGrid.assign_new_values(np.array([0.5]), 5).tolist() == pytest.approx([0.0, 0.25, 0.75, 1.0])
+    assert LaneGrid.assign_new_values(np.array(old_values), size).tolist() == pytest.approx(new_values)
 
 
 @pytest.mark.parametrize(
@@ -101,7 +85,7 @@ def test_every_new_value_lies_in_its_own_lane_and_no_old_value_inside_a_new_lane
 
     # --- assert -----------------------
     assert grid.n_new == 4
-    axes = ((grid.u_values, grid.u_lanes, _SIZE_4.u), (grid.v_values, grid.v_lanes, _SIZE_4.v))
+    axes = ((grid.new_u_values, grid.new_u_lanes, _SIZE_4.u), (grid.new_v_values, grid.new_v_lanes, _SIZE_4.v))
     for values, lanes, old_values in axes:
         assert ((lanes[:, 0] <= values) & (values <= lanes[:, 1])).all()
         assert (lanes[:-1, 1] <= lanes[1:, 0]).all()
@@ -109,14 +93,15 @@ def test_every_new_value_lies_in_its_own_lane_and_no_old_value_inside_a_new_lane
 
 
 def test_the_cells_are_numbered_row_by_row_and_represented_by_their_values():
-    """Cell `i * n_new + j` is represented by the point `(u_values[i], v_values[j])`."""
+    """Cell `i * n_new + j` is represented by the point `(new_u_values[i], new_v_values[j])`."""
     # --- act --------------------------
     grid = LaneGrid.for_size(8, _SIZE_4)
 
     # --- assert -----------------------
     assert grid.n_cells == 16
-    u, v = grid.u_values, grid.v_values
+    u, v = grid.new_u_values, grid.new_v_values
     assert grid.cell_points[[0, 1, 4]].tolist() == [[u[0], v[0]], [u[0], v[1]], [u[1], v[0]]]
+    assert grid.points_with_cells(np.array([1, 4])).tolist() == [*_SIZE_4.points.tolist(), [u[0], v[1]], [u[1], v[0]]]
     assert [cells.tolist() for cells in grid.lane_cells()[:2]] == [[0, 1, 2, 3], [4, 5, 6, 7]]
     assert grid.lane_cells()[4].tolist() == [0, 4, 8, 12]
 
@@ -127,7 +112,7 @@ def test_random_cells_pair_each_new_u_lane_with_1_new_v_lane():
     grid = LaneGrid.for_size(8, _SIZE_4)
 
     # --- act --------------------------
-    cells = grid.random_one_per_lane_cells(np.random.default_rng(0))
+    cells = grid.random_one_per_new_lane_cells(np.random.default_rng(0))
 
     # --- assert -----------------------
     assert grid.is_one_per_new_lane(cells)
@@ -146,10 +131,10 @@ def test_samples_lie_strictly_inside_their_cells():
     # --- assert -----------------------
     rows, columns = np.divmod(cells, grid.n_new)
     assert samples.shape == (3, 50, 2)
-    assert (grid.u_lanes[rows, 0][:, None] < samples[:, :, 0]).all()
-    assert (samples[:, :, 0] < grid.u_lanes[rows, 1][:, None]).all()
-    assert (grid.v_lanes[columns, 0][:, None] < samples[:, :, 1]).all()
-    assert (samples[:, :, 1] < grid.v_lanes[columns, 1][:, None]).all()
+    assert (grid.new_u_lanes[rows, 0][:, None] < samples[:, :, 0]).all()
+    assert (samples[:, :, 0] < grid.new_u_lanes[rows, 1][:, None]).all()
+    assert (grid.new_v_lanes[columns, 0][:, None] < samples[:, :, 1]).all()
+    assert (samples[:, :, 1] < grid.new_v_lanes[columns, 1][:, None]).all()
 
 
 # ==================================================================================================
@@ -175,7 +160,7 @@ def test_a_nested_size_holds_1_per_lane_when_each_new_tuple_stays_inside_its_cel
     # --- arrange ----------------------
     rng = np.random.default_rng(5)
     grid = LaneGrid.for_size(8, _SIZE_4)
-    samples = grid.sample_in_cells(grid.random_one_per_lane_cells(rng), 1, rng)[:, 0, :]
+    samples = grid.sample_in_cells(grid.random_one_per_new_lane_cells(rng), 1, rng)[:, 0, :]
 
     # --- act --------------------------
     tuples = _SIZE_4.extended_by(MCTuples(samples[:, 0], samples[:, 1]))
@@ -183,3 +168,17 @@ def test_a_nested_size_holds_1_per_lane_when_each_new_tuple_stays_inside_its_cel
     # --- assert -----------------------
     assert grid.is_one_per_lane(tuples)
     assert not grid.is_one_per_lane(_SIZE_4.extended_by(_SIZE_4))
+
+
+def test_is_size_one_per_lane_rebuilds_the_grid_of_a_shipped_size_and_refuses_other_sizes():
+    """A size-32 set with 1 sample per selected cell passes the check; a size outside `MCTuplesSize` is refused."""
+    # --- arrange ----------------------
+    rng = np.random.default_rng(6)
+    grid = LaneGrid.for_size(32, None)
+    samples = grid.sample_in_cells(grid.random_one_per_new_lane_cells(rng), 1, rng)[:, 0, :]
+    tuples = MCTuples(samples[:, 0], samples[:, 1])
+
+    # --- act / assert -----------------
+    assert LaneGrid.is_size_one_per_lane(tuples)
+    with pytest.raises(ValueError, match="one of"):
+        LaneGrid.is_size_one_per_lane(_SIZE_4)

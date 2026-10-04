@@ -26,3 +26,8 @@ class MCTuplesSize(IntEnum):
     def _missing_(cls, value: object) -> NoReturn:
         """Raise `ValueError` listing the sizes, for a `value` that is not 1 of them."""
         raise ValueError(f"A Monte Carlo tuple set size must be one of {[int(size) for size in cls]} (got {value!r}).")
+
+    @property
+    def size_below(self) -> "MCTuplesSize | None":
+        """Return the size that this size includes, half as large; None for the smallest size."""
+        return None if self == min(MCTuplesSize) else MCTuplesSize(self // 2)

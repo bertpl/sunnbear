@@ -4,10 +4,12 @@ The maintainer runs this script by hand whenever the tuple set is regenerated, n
 time. The script:
 
 - calls `sunnbear.benchmark.generate_mc_tuples`;
-- prints 1 line per solve as the construction goes, with the solve's budget, wall time and separation fractions,
-  and, with `--inspection-dir`, stores each solve there: its points as the CSV file `k<size>_<step>.csv`, and
-  max-div's solution, with its score checkpoints, as the pickle file `k<size>_<step>_solution.pkl`;
-- prints the spread of every size, and whether it holds exactly 1 tuple per lane;
+- prints 1 line per solve as the construction goes, with the solve's budget, wall time and min separation fractions
+  (as `MCTuplesStats` defines them), and, with `--inspection-dir`, stores each solve there: its points as the CSV
+  file `k<size>_<step>.csv`, and max-div's solution, with its score checkpoints, as the pickle file
+  `k<size>_<step>_solution.pkl`;
+- prints the spread of every size, and whether it holds exactly 1 tuple per lane, as `LaneGrid.is_size_one_per_lane`
+  checks it;
 - saves the set through `ArtifactStore`, which records in the artifact's manifest the
   `generate_mc_tuples` call, its arguments and max-div's version; `--no-save` skips this, for a trial run.
 
@@ -41,7 +43,9 @@ def main() -> None:
     parser.add_argument("--n-workers", type=int, default=32)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--inspection-dir", type=Path, help="directory for the points and solution of each solve")
-    parser.add_argument("--no-save", action="store_true", help="do not save the artifact, for a trial run")
+    parser.add_argument(
+        "--no-save", action="store_true", dest="is_trial_run", help="do not save the artifact, for a trial run"
+    )
     args = parser.parse_args()
 
     arguments = {"t_total_sec": args.t_total_sec, "n_workers": args.n_workers, "seed": args.seed}
@@ -52,14 +56,12 @@ def main() -> None:
     for size in (size for size in MCTuplesSize if size <= tuples.size):
         size_tuples = tuples.first(size)
         stats = size_tuples.stats()
-        size_below = None if size == min(MCTuplesSize) else tuples.first(size // 2)
-        is_one_per_lane = LaneGrid.for_size(size, size_below).is_one_per_lane(size_tuples)
         print(
             f"| {size} | {stats.min_separation_l2_fraction:.1%} | {stats.min_separation_u_fraction:.1%} "
-            f"| {stats.min_separation_v_fraction:.1%} | {is_one_per_lane} |"
+            f"| {stats.min_separation_v_fraction:.1%} | {LaneGrid.is_size_one_per_lane(size_tuples)} |"
         )
 
-    if args.no_save:
+    if args.is_trial_run:
         print("Not saved (--no-save).")
     else:
         manifest = ArtifactStore.save(
@@ -75,9 +77,9 @@ def report_solve(report: MCTuplesSolveReport, inspection_dir: Path | None) -> No
     """Print the solve's budget, wall time and separation fractions, and store it in `inspection_dir` if given."""
     stats = MCTuplesStats(report.points)
     print(
-        f"k={int(report.size)} {report.step.value}: budget {report.t_budget_sec:.0f} s, wall {report.wall_sec:.0f} s, "
-        f"L2 {stats.min_separation_l2_fraction:.1%}, u {stats.min_separation_u_fraction:.1%}, "
-        f"v {stats.min_separation_v_fraction:.1%}",
+        f"k={int(report.size)} {report.step.value}: budget {report.t_budget_sec:.0f} s, "
+        f"wall {report.t_wall_sec:.0f} s, L2 {stats.min_separation_l2_fraction:.1%}, "
+        f"u {stats.min_separation_u_fraction:.1%}, v {stats.min_separation_v_fraction:.1%}",
         flush=True,
     )
     if inspection_dir is not None:

@@ -113,8 +113,8 @@ class MCTuplesStats:
     def __init__(self, points: ArrayLike) -> None:
         """Store `points`, an `(n, 2)` array of (u, v) values, which may lie on the edges of the unit square.
 
-        `MCTuples.stats()` describes a tuple set; the construction's cell points, which can lie on the edges that
-        `MCTuples` refuses, are described from their array.
+        It takes an array, not an `MCTuples`, so that it can also describe points on the edges of the unit square,
+        which `MCTuples` refuses.
         """
         self._points = np.asarray(points, dtype=np.float64)
 

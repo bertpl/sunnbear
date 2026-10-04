@@ -28,8 +28,8 @@ def test_generate_mc_tuples_builds_nested_sizes_with_1_tuple_per_lane_and_report
 
     # --- assert -----------------------
     assert tuples.size == 64
-    assert LaneGrid.for_size(32, None).is_one_per_lane(tuples.first(32))
-    assert LaneGrid.for_size(64, tuples.first(32)).is_one_per_lane(tuples)
+    assert LaneGrid.is_size_one_per_lane(tuples.first(32))
+    assert LaneGrid.is_size_one_per_lane(tuples)
     assert np.unique(tuples.u).size == np.unique(tuples.v).size == 64
     assert [(int(report.size), report.step) for report in reports] == [
         (32, MCTuplesConstructionStep.CELL_SELECTION),

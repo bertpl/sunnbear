@@ -2,9 +2,10 @@
 
 Each size takes 2 max-div solves (`MCTuplesConstructionStep`). The total time is split over the solves:
 
-- each step gets a fixed share of the total, `T_FRACTION_PER_STEP`, whatever the candidate counts: cell selection
-  sets the L2 separation and is still improving when a long budget ends, while refinement adds little at the
-  large sizes, so a larger candidate pool for refinement must not take time from cell selection;
+- each step gets a fixed share of the total, `T_BUDGET_BUDGET_FRACTION_PER_STEP`, whatever its candidate count, because
+  cell selection decides the L2 min separation of the result and still improves it when a long budget ends, while
+  refinement improves it little at the large sizes; the size of refinement's candidate pool therefore does not
+  change the time of cell selection;
 - within a step, each solve gets at least `MIN_T_BUDGET_FRACTION_PER_SOLVE` of the total, so the solves of the
   smallest sizes, whose share of the work is tiny, still get time to run, and the rest of the step's share is
   split in proportion to `n · k`, the step's number of candidates times the size, a measure of the solve's work.
@@ -27,7 +28,7 @@ MIN_T_TOTAL_SEC = 1.0
 MIN_T_TOTAL_AT_FULL_SCALE_SEC = 60.0
 MIN_T_BUDGET_FRACTION_PER_SOLVE = 0.01
 MIN_N_SIZES = 2
-T_FRACTION_PER_STEP = {MCTuplesConstructionStep.CELL_SELECTION: 0.8, MCTuplesConstructionStep.REFINEMENT: 0.2}
+T_BUDGET_FRACTION_PER_STEP = {MCTuplesConstructionStep.CELL_SELECTION: 0.8, MCTuplesConstructionStep.REFINEMENT: 0.2}
 
 
 # ==================================================================================================
@@ -55,7 +56,7 @@ class MCTuplesConstructionSettings:
 
         - the number of sizes is `MIN_N_SIZES + floor(scale · (len(MCTuplesSize) - MIN_N_SIZES))`;
         - the worker count is `max(1, round(scale · n_workers))`;
-        - each step gets `T_FRACTION_PER_STEP` of `t_total_sec`; within it, each solve gets
+        - each step gets `T_BUDGET_FRACTION_PER_STEP` of `t_total_sec`; within it, each solve gets
           `MIN_T_BUDGET_FRACTION_PER_SOLVE · t_total_sec`, and the rest of the step's share is split in proportion
           to `n · k`, the step's number of candidates (`MCTuplesConstructionStep.n_candidates`) times the size.
 
@@ -72,7 +73,7 @@ class MCTuplesConstructionSettings:
         # --- time per solve ---------------------
         min_t_budget_per_solve_sec = MIN_T_BUDGET_FRACTION_PER_SOLVE * t_total_sec
         t_budget_per_solve_sec: dict[tuple[MCTuplesSize, MCTuplesConstructionStep], float] = {}
-        for step, t_fraction in T_FRACTION_PER_STEP.items():
+        for step, t_fraction in T_BUDGET_FRACTION_PER_STEP.items():
             work_per_size = {k: step.n_candidates(k) * k for k in sizes}
             t_rest_sec = t_fraction * t_total_sec - len(sizes) * min_t_budget_per_solve_sec
             for k, solve_work in work_per_size.items():

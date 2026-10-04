@@ -1,17 +1,17 @@
 """The construction adds the new tuples of 1 size in 2 max-div steps: `select_cells`, then `refine_within_cells`.
 
 - **Cell selection** picks cells of the size's `LaneGrid`, where a cell is the crossing of a new u lane and a
-  new v lane and is represented by its point (u value, v value); it picks 1 cell per new lane on each axis:
-  - it maximizes the L2 min separation of the cell points and of the tuples of the size below;
-  - every valid choice of cells uses every new lane, so the set of u values, and of v values, is the same for
-    every choice; only the L2 separation differs between choices, so this step maximizes L2 alone.
+  new v lane and is represented by the point (new u value of its u lane, new v value of its v lane); it picks 1
+  cell per new lane on each axis. Every valid choice of cells uses every new lane, so the sets of u values and
+  v values are the same for every choice; the step therefore maximizes only the L2 min separation of the cell
+  points and of the tuples of the size below.
 - **Refinement** places 1 tuple in each selected cell, chosen from `N_CANDIDATES_PER_CELL` uniform random
   float64 tuples inside the cell; max-div compares float32 copies, and the chosen tuple keeps its float64
   values. It maximizes the smallest of the 3 separation fractions of `MCTuplesStats`: along u, along v and in
   L2 (the objective of `refine_within_cells`).
 
 Both steps require every tuple of the size below to stay selected, and both return max-div's solution next to
-their result, so that a caller can keep its score checkpoints for inspection.
+their result, so that a caller can keep the solution's score checkpoints for inspection.
 """
 
 import warnings
@@ -33,8 +33,9 @@ from .lane_grid import LaneGrid
 from .sizes import MCTuplesSize
 from .tuples import MCTuples, MCTuplesStats
 
-# The number of random candidate tuples per selected cell in the refinement step. The axes no longer bind with
-# 256: the L2 separation does, and cell selection sets it, so a larger pool would only cost refinement iterations.
+# The number of random candidate tuples per selected cell in the refinement step. At 256, the L2 separation
+# limits the objective, not the separations along the axes, and cell selection sets the L2 separation, so a
+# larger pool would only cost refinement iterations.
 N_CANDIDATES_PER_CELL = 256
 
 # The constraint that keeps the tuples of the size below outweighs the lane constraints, so max-div meets it first.
@@ -52,7 +53,8 @@ class MCTuplesConstructionStep(StrEnum):
 
     def n_candidates(self, size: int) -> int:
         """Return the number of candidates of this step for `size`, the tuples of the size below included."""
-        n_required = 0 if size == min(MCTuplesSize) else size // 2
+        size_below = MCTuplesSize(size).size_below
+        n_required = 0 if size_below is None else int(size_below)
         n_new = size - n_required
         if self == MCTuplesConstructionStep.CELL_SELECTION:
             return n_new * n_new + n_required
@@ -73,7 +75,7 @@ def select_cells(
     the constraints against the objective without enforcing them, so the selection is checked before it is
     returned.
 
-    max-div starts from random cells that pair each new u lane with a different new v lane, which `rng` draws,
+    max-div starts from random cells, drawn with `rng`, that pair each new u lane with a different new v lane,
     so the starting selection already meets the lane constraints; from there, max-div reaches other valid
     selections by exchanging the v lanes of 2 selected cells. `seed` seeds max-div's solve.
 
@@ -98,7 +100,7 @@ def select_cells(
         diversity_metric=DiversityMetric.MIN_SEPARATION,
         constraints=lane_constraints + _inclusion_constraints(n_required),
     )
-    initial_cells = grid.random_one_per_lane_cells(rng)
+    initial_cells = grid.random_one_per_new_lane_cells(rng)
     initial_selection = np.concatenate([np.arange(n_required), n_required + initial_cells])
     selection, solution = _run_max_div(problem, initial_selection, t_budget_sec, n_workers, seed)
     cells = _indices_among_new_candidates(selection, n_required, grid.size)
@@ -149,7 +151,7 @@ def refine_within_cells(
         ),
         constraints=_inclusion_constraints(n_required),
     )
-    # max-div starts from the candidate nearest to each cell's point, the position that cell selection optimized.
+    # max-div starts from the candidate nearest to each cell's point, cell selection's optimized position.
     cell_points = grid.cell_points[cells]
     nearest_candidates = np.argmin(np.abs(candidates - cell_points[:, None, :]).sum(axis=-1), axis=1)
     initial_selection = np.concatenate(
@@ -197,7 +199,7 @@ def _run_max_div(
             .with_workers(seconds(t_budget_sec), n_workers)
             .with_end_to_end_budget()
             .with_initial_selection(initial_selection)
-            # Every checkpoint also carries its selection, so a solution replays how the selection evolved.
+            # Every checkpoint also stores its selection, so the solution shows how the selection changed.
             .with_intermediate_selections()
             .build()
         )

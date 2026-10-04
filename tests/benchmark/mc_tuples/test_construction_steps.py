@@ -12,7 +12,7 @@ from sunnbear._core.benchmark.mc_tuples.construction_steps import (
 )
 from sunnbear._core.benchmark.mc_tuples.lane_grid import LaneGrid
 
-# A set of 4 tuples; at size 8 it gets 4 new lanes per axis, crossing in 16 cells.
+# A set of 4 tuples; size 8, built on it, has 4 new lanes per axis, crossing in 16 cells.
 _SIZE_4 = MCTuples([0.15, 0.3, 0.7, 0.8], [0.8, 0.05, 0.45, 0.55])
 
 
