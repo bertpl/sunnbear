@@ -59,7 +59,7 @@ def test_only_a_correct_solve_keeps_its_evaluation_count(status, is_correct, exp
 @pytest.mark.usefixtures("unit_weights_with_mul_at_3")
 @pytest.mark.parametrize("is_correct", [True, False])
 def test_the_flop_costs_weight_the_counts_and_add_the_evaluations(is_correct):
-    """`solver_flop_cost` weights each count, also for a failed solve; each `total_flop_cost_k<k>` adds `k` flops per
+    """`solver_flop_cost` weights each count, also for a failed solve; `total_flop_cost_feval<k>` adds `k` flops per
     evaluation."""
     # --- arrange ----------------------
     frame = results_table([{"is_correct": is_correct, _ADD_COUNT_COLUMN: 5, _MUL_COUNT_COLUMN: 2}])

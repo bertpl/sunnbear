@@ -8,8 +8,8 @@ are derived from them when a table is analyzed:
 - `solver_flop_cost`: the sum of the flop counts of the solver's own arithmetic, each weighted by the cost of its
   flop type; a failed solve keeps its actual flop counts, and only its evaluation count is replaced by the
   evaluation budget, in `n_fevals_eff`;
-- `total_flop_cost_k<k>`: `solver_flop_cost + k · n_fevals_eff`, the cost of a solve in flops when 1 function
-  evaluation costs `k` flops, for each `k` of `FEVAL_FLOP_COSTS`.
+- `total_flop_cost_feval<k>`: `solver_flop_cost + k · n_fevals_eff`, the cost of a solve in flops when 1
+  function evaluation costs `k` flops, for each `k` of `FEVAL_FLOP_COSTS`.
 """
 
 from typing import overload
@@ -21,13 +21,16 @@ from counted_float.config import get_active_flop_weights
 from sunnbear._core.benchmark.runner import solver_flop_count_column_name
 
 # Each value is an assumed cost of 1 function evaluation, in flops; `add_derived_results` adds 1
-# `total_flop_cost_k<k>` column per value.
+# `total_flop_cost_feval<k>` column per value.
 FEVAL_FLOP_COSTS = (10, 100, 1000)
 
 
 def total_flop_cost_column_name(feval_flop_cost: int) -> str:
-    """Return the name of the total flop cost column for a function evaluation cost, e.g. `total_flop_cost_k100`."""
-    return f"total_flop_cost_k{feval_flop_cost}"
+    """Return the name of the total flop cost column for `feval_flop_cost`, the assumed flops per function evaluation.
+
+    E.g. `total_flop_cost_feval100` for 100 flops per evaluation.
+    """
+    return f"total_flop_cost_feval{feval_flop_cost}"
 
 
 DERIVED_RESULTS_SCHEMA: dict[str, pl.DataType] = {
