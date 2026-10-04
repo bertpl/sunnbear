@@ -13,12 +13,21 @@ It holds:
 Importing it registers the `mc_tuples` artifact declaration with `ArtifactRegistry`.
 """
 
+from .aggregation import add_derived_results, summarize_results
 from .mc_tuples import MCTuples, MCTuplesSize, MCTuplesStats, generate_mc_tuples, load_mc_tuples
+from .protocol import compute_xtol_range, is_solution_correct
+from .runner import load_results, run_benchmark
 
 __all__ = [
     "MCTuples",
     "MCTuplesSize",
     "MCTuplesStats",
+    "add_derived_results",
+    "compute_xtol_range",
     "generate_mc_tuples",
+    "is_solution_correct",
     "load_mc_tuples",
+    "load_results",
+    "run_benchmark",
+    "summarize_results",
 ]
