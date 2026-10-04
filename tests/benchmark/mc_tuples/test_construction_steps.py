@@ -15,7 +15,7 @@ from sunnbear._core.benchmark.mc_tuples.lane_grid import LaneGrid
 
 # A set of 4 tuples; size 8, built on it, has 4 new lanes per axis, crossing in 16 cells.
 _SIZE_4 = MCTuples([0.15, 0.3, 0.7, 0.8], [0.8, 0.05, 0.45, 0.55])
-_SETTINGS = MCTuplesSolveSettings(n_workers=1, seed=42, rng=np.random.default_rng(0))
+_SETTINGS = MCTuplesSolveSettings.for_seed(n_workers=1, seed=42)
 
 
 def _run_max_div_returning(selection: list[int]):
@@ -61,13 +61,29 @@ def test_cell_selection_refuses_a_missing_tuple_or_2_cells_in_1_lane(monkeypatch
         step.run(1.0)
 
 
-def test_refinement_refuses_2_tuples_in_1_cell(monkeypatch):
-    """A refinement that selects 2 candidates of the first cell, and none of the second, raises an error."""
+@pytest.mark.parametrize(
+    "cells, selection, message",
+    [
+        # 1 cell per new lane, but 2 candidates of the first cell selected and none of the second.
+        (
+            [2, 4, 11, 13],
+            [0, 1, 2, 3, 4, 5, 4 + 2 * N_CANDIDATES_PER_CELL, 4 + 3 * N_CANDIDATES_PER_CELL],
+            "1 new tuple per cell",
+        ),
+        # 1 candidate per cell, but the 4 cells share the first new u lane, so 4 tuples end up in 1 lane.
+        (
+            [0, 1, 2, 3],
+            [0, 1, 2, 3, 4, 4 + N_CANDIDATES_PER_CELL, 4 + 2 * N_CANDIDATES_PER_CELL, 4 + 3 * N_CANDIDATES_PER_CELL],
+            "exactly 1 per lane",
+        ),
+    ],
+)
+def test_refinement_refuses_2_tuples_in_1_cell_or_in_1_lane(monkeypatch, cells, selection, message):
+    """A refinement with 2 tuples in 1 cell, or with the size's tuples not 1 per lane, raises an error."""
     # --- arrange ----------------------
-    two_in_first_cell = [0, 1, 2, 3, 4, 5, 4 + 2 * N_CANDIDATES_PER_CELL, 4 + 3 * N_CANDIDATES_PER_CELL]
-    monkeypatch.setattr(MCTuplesStep, "_run_max_div", _run_max_div_returning(two_in_first_cell))
-    step = MCTuplesRefinementStep(LaneGrid.for_size(8, _SIZE_4), np.array([2, 4, 11, 13]), _SETTINGS)
+    monkeypatch.setattr(MCTuplesStep, "_run_max_div", _run_max_div_returning(selection))
+    step = MCTuplesRefinementStep(LaneGrid.for_size(8, _SIZE_4), np.array(cells), _SETTINGS)
 
     # --- act / assert -----------------
-    with pytest.raises(MCTuplesConstructionError, match="1 new tuple per cell"):
+    with pytest.raises(MCTuplesConstructionError, match=message):
         step.run(1.0)

@@ -13,7 +13,7 @@ The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples
 
 from .artifact import MCTuplesDeclaration, load_mc_tuples
 from .construction import MCTuplesGenerator, generate_mc_tuples
-from .construction_results import (
+from .construction_step_results import (
     MCTuplesCellSelectionResult,
     MCTuplesRefinementResult,
     MCTuplesStepKind,

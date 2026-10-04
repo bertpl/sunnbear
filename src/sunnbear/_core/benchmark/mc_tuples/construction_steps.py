@@ -1,4 +1,4 @@
-"""The 2 max-div steps that add the new tuples of 1 size: `MCTuplesCellSelectionStep`, then `MCTuplesRefinementStep`.
+"""The new tuples of 1 size come from 2 max-div steps: `MCTuplesCellSelectionStep`, then `MCTuplesRefinementStep`.
 
 - **Cell selection** picks cells of the size's `LaneGrid`, where a cell is the crossing of a new u lane and a
   new v lane and is represented by the tuple (new u value of its u lane, new v value of its v lane); it picks 1
@@ -27,7 +27,7 @@ from max_div.solver import (
     seconds,
 )
 
-from .construction_results import MCTuplesCellSelectionResult, MCTuplesRefinementResult, MCTuplesStepResult
+from .construction_step_results import MCTuplesCellSelectionResult, MCTuplesRefinementResult, MCTuplesStepResult
 from .exceptions import MCTuplesConstructionError
 from .lane_grid import LaneGrid
 from .sizes import MCTuplesSize
@@ -47,7 +47,7 @@ INCLUSION_CONSTRAINT_WEIGHT = 10.0
 # ==================================================================================================
 @dataclass(frozen=True, kw_only=True)
 class MCTuplesSolveSettings:
-    """`MCTuplesSolveSettings` holds what every max-div solve of a construction shares: workers, seed and generator.
+    """`MCTuplesSolveSettings` holds what every max-div solve of a construction shares.
 
     Attributes:
         n_workers: The number of max-div workers of each solve.
@@ -59,6 +59,14 @@ class MCTuplesSolveSettings:
     seed: int
     rng: np.random.Generator
 
+    # --------------------------------------------------------------------------
+    #  Factory methods
+    # --------------------------------------------------------------------------
+    @classmethod
+    def for_seed(cls, n_workers: int, seed: int) -> "MCTuplesSolveSettings":
+        """Return the settings whose max-div solves and random draws all derive from `seed`."""
+        return cls(n_workers=n_workers, seed=seed, rng=np.random.default_rng(seed))
+
 
 # ==================================================================================================
 #  MCTuplesStep
@@ -68,12 +76,14 @@ class MCTuplesStep(ABC):
 
     A step is built for 1 size, from the size's lane grid. Its candidates are the tuples of the size below, which
     every valid selection keeps, followed by the step's own new candidates; max-div selects as many as the size
-    holds. The base class runs that solve in `_solve`. A subclass supplies its new candidates, objective,
-    constraints and starting selection, and validates what max-div selected among its own candidates.
+    holds. The base class runs the max-div solve in `_solve`. A subclass:
+
+    - supplies its new candidates, objective, constraints and starting selection;
+    - validates what max-div selected among its own candidates.
 
     Attributes:
         grid: The lane grid of the size, with the tuples of the size below.
-        settings: The workers, seed and random generator of the solve.
+        settings: The settings that every max-div solve of the construction shares.
     """
 
     def __init__(self, grid: LaneGrid, settings: MCTuplesSolveSettings) -> None:
@@ -112,8 +122,8 @@ class MCTuplesStep(ABC):
         """Run max-div over the tuples of the size below and `new_candidate_array`; return the selected new candidates.
 
         The tuples of the size below come first among the candidates, and a weighted constraint asks max-div to
-        keep all of those tuples; `constraints` are the step's own, and they and `initial_new_selection` index
-        `new_candidate_array`.
+        keep all of those tuples; `constraints` holds the step's own constraints, and the indices in `constraints`
+        and in `initial_new_selection` count rows of `new_candidate_array`.
 
         Returns:
             The indices of the selected new candidates, ascending, relative to `new_candidate_array`, and max-div's
@@ -273,17 +283,17 @@ class MCTuplesRefinementStep(MCTuplesStep):
         return N_CANDIDATES_PER_CELL * (size - n_required) + n_required
 
     def run(self, t_budget_sec: float) -> MCTuplesRefinementResult:
-        """Place the new tuples within `t_budget_sec` and return them, with the whole size's tuples.
+        """Place the new tuples within `t_budget_sec` and return the whole size's tuples.
 
         Raises:
-            MCTuplesConstructionError: If the selection misses a tuple of the size below, or does not hold 1 new
-                tuple per cell.
+            MCTuplesConstructionError: If the selection misses a tuple of the size below, does not hold 1 new
+                tuple per cell, or leaves a lane of the size without exactly 1 tuple.
         """
         t_start = time.perf_counter()
         grid, cells = self.grid, self.cells
         candidates = grid.sample_in_cells(cells, N_CANDIDATES_PER_CELL, self.settings.rng)
-        cell_tuple_array = grid.cell_tuple_array[cells]
-        nearest_candidates = np.argmin(np.abs(candidates - cell_tuple_array[:, None, :]).sum(axis=-1), axis=1)
+        selected_cell_tuple_array = grid.cell_tuple_array[cells]
+        nearest_candidates = np.argmin(np.abs(candidates - selected_cell_tuple_array[:, None, :]).sum(axis=-1), axis=1)
         new_selection, solution = self._solve(
             candidates.reshape(-1, 2),
             HybridDiversityMetric.min_of(
@@ -295,15 +305,18 @@ class MCTuplesRefinementStep(MCTuplesStep):
             np.arange(cells.size) * N_CANDIDATES_PER_CELL + nearest_candidates,
             t_budget_sec,
         )
-        selected_cells, selected_candidates = np.divmod(new_selection, N_CANDIDATES_PER_CELL)
-        if np.unique(selected_cells).size != cells.size:
+        i_selected_cells, i_selected_candidates = np.divmod(new_selection, N_CANDIDATES_PER_CELL)
+        if np.unique(i_selected_cells).size != cells.size:
             raise MCTuplesConstructionError(f"Size {grid.size}: the refinement does not hold 1 new tuple per cell.")
-        new_tuple_array = candidates[selected_cells, selected_candidates]
+        tuple_array = np.vstack([grid.required_tuple_array, candidates[i_selected_cells, i_selected_candidates]])
+        tuples = MCTuples(tuple_array[:, 0], tuple_array[:, 1])
+        if not grid.is_one_per_lane(tuples):
+            raise MCTuplesConstructionError(f"Size {grid.size}: the tuples do not hold exactly 1 per lane.")
         return MCTuplesRefinementResult(
             size=MCTuplesSize(grid.size),
             t_budget_sec=t_budget_sec,
             t_wall_sec=time.perf_counter() - t_start,
-            tuple_array=np.vstack([grid.required_tuple_array, new_tuple_array]),
+            tuple_array=tuple_array,
             solution=solution,
-            new_tuples=MCTuples(new_tuple_array[:, 0], new_tuple_array[:, 1]),
+            tuples=tuples,
         )

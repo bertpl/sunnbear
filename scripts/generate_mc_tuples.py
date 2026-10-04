@@ -29,6 +29,7 @@ from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples import (
     MCTuplesDeclaration,
     MCTuplesSize,
+    MCTuplesStats,
     MCTuplesStepResult,
     generate_mc_tuples,
 )
@@ -86,7 +87,7 @@ def main() -> None:
 
 def report_step(result: MCTuplesStepResult, inspection_dir: Path | None) -> None:
     """Print the step's budget, wall time and separation fractions, and store it in `inspection_dir` if given."""
-    stats = result.stats()
+    stats = MCTuplesStats(result.tuple_array)
     print(
         f"k={int(result.size)} {result.kind.value}: budget {result.t_budget_sec:.0f} s, "
         f"wall {result.t_wall_sec:.0f} s, L2 {stats.min_separation_l2_fraction:.1%}, "
