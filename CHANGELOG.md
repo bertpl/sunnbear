@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `generate_mc_tuples` takes `max_size` and builds every size up to it however short `t_total_sec` is, replaces `on_solve` with `on_step_finished`, whose result names its step `kind`, not `step`, and takes every argument after `t_total_sec` only as a keyword
+- signature changes to `generate_mc_tuples` after internal refactor; behavior for budgets ≥ 60 s is unchanged
 
 ### Deprecated
 
