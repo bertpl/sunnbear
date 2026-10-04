@@ -75,7 +75,10 @@ def add_derived_results(frame: pl.DataFrame | pl.LazyFrame) -> pl.DataFrame | pl
         pl.col(solver_flop_count_column_name(flop_type)) * float(flop_weights.weights[flop_type])
         for flop_type in FlopType
     )
-    derived = frame.lazy().with_columns(n_fevals_eff.alias("n_fevals_eff"), solver_flop_cost.alias("solver_flop_cost"))
+    derived = frame.lazy().with_columns(
+        n_fevals_eff.alias("n_fevals_eff"),
+        solver_flop_cost.alias("solver_flop_cost"),
+    )
 
     # --- total costs ----------------------------
     derived = derived.with_columns(
@@ -85,4 +88,7 @@ def add_derived_results(frame: pl.DataFrame | pl.LazyFrame) -> pl.DataFrame | pl
         for feval_flop_cost in FEVAL_FLOP_COSTS
     )
     # The caller gets back the kind it passed in: a `DataFrame` is collected, a `LazyFrame` stays a plan.
-    return derived.collect() if isinstance(frame, pl.DataFrame) else derived
+    if isinstance(frame, pl.DataFrame):
+        return derived.collect()
+    else:
+        return derived
