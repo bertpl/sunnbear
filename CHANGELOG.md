@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `sunnbear.benchmark.run_benchmark`: benchmark solvers on test functions over the Monte Carlo tuples, with resumable runs, a results table with 1 row per solve, and summaries per solver or per function
+- `sunnbear.benchmark.run_benchmark`: benchmark solvers on test functions over the Monte Carlo tuples, with resumable runs, a results table with 1 row per solve, and summaries by any of its columns, such as per solver
 
 ### Changed
 
