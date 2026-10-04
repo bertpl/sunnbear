@@ -2,8 +2,8 @@
 polynomial, then a summary per solver.
 
 These tests check that the runner, the correctness check and the aggregation work together, not how well the solvers
-perform, so the run uses the smallest Monte Carlo tuple size, solved in this process. Each of those 3 has its own
-tests under `tests/benchmark/`.
+perform, so the run uses the smallest Monte Carlo tuple set size and solves in the test process, with no worker
+processes. The runner, the correctness check and the aggregation each have their own unit tests.
 """
 
 from pathlib import Path
@@ -30,13 +30,13 @@ N_BISECTION_FEVALS = 40
 
 @pytest.fixture(scope="module")
 def cubic() -> functions.TestFunction:
-    """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to ``c`` in ``[-1, 1]``."""
+    """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to a range of ``c``."""
     return functions.FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
 
 
 @pytest.fixture(scope="module")
 def run_dir(cubic: functions.TestFunction, tmp_path_factory: pytest.TempPathFactory) -> Path:
-    """Return the directory of a run of both solvers on the cubic at the smallest tuple size, in this process."""
+    """Return the directory of a run of both solvers on the cubic."""
     run_dir = tmp_path_factory.mktemp("run")
     run_benchmark(
         solver_configs=[SolverConfigRegistry.config_from_id(solver_id) for solver_id in SOLVER_IDS],
@@ -49,15 +49,12 @@ def run_dir(cubic: functions.TestFunction, tmp_path_factory: pytest.TempPathFact
     return run_dir
 
 
-@pytest.fixture(scope="module")
-def results(run_dir: Path) -> pl.DataFrame:
-    """Return the run's results table."""
-    return load_results(run_dir).collect()
-
-
-def test_the_run_solves_every_sample_with_every_solver_within_the_xtol_range(results, cubic):
+def test_the_run_solves_every_sample_with_every_solver_within_the_xtol_range(run_dir, cubic):
     """The results hold 1 row per solver and sample, every `xtol` within the range from `compute_xtol_range` for the
     cubic's interval, and every `c` within the calibrated c-range."""
+    # --- arrange ----------------------
+    results = load_results(run_dir).collect()
+
     # --- act --------------------------
     xtol_min, xtol_max = compute_xtol_range(a=cubic.a, b=cubic.b, n_bisection_fevals=N_BISECTION_FEVALS)
 
@@ -69,15 +66,17 @@ def test_the_run_solves_every_sample_with_every_solver_within_the_xtol_range(res
     assert ((results["c"] >= cubic.c_min) & (results["c"] <= cubic.c_max)).all()
 
 
-def test_bisection_spends_exactly_n_bisection_fevals_and_is_correct_on_every_sample(results, cubic):
+def test_bisection_spends_exactly_n_bisection_fevals_and_is_correct_on_every_sample(run_dir, cubic):
     """Bisection converges on every sample in exactly `n_bisection_fevals` evaluations, since the `xtol` range is
-    derived from that count, and its answers pass `is_solution_correct` again when it is called without the solver's
-    evaluated x-values as `x_candidates`."""
+    derived from that count, and each of bisection's answers, already checked during the run, still passes
+    `is_solution_correct` when the check is repeated without `x_candidates`, the x-values at which the solver evaluated
+    the function."""
     # --- arrange ----------------------
+    results = load_results(run_dir).collect()
     bisection_rows = results.filter(pl.col("solver_id") == "bisection")
 
     # --- act --------------------------
-    is_correct_again = [
+    is_correct_again_by_row = [
         is_solution_correct(f=cubic.build_x_fun(row["c"]), x_found=row["x_found"], xtol=row["xtol"], seed=0)
         for row in bisection_rows.iter_rows(named=True)
     ]
@@ -86,7 +85,7 @@ def test_bisection_spends_exactly_n_bisection_fevals_and_is_correct_on_every_sam
     assert bisection_rows["status"].unique().to_list() == [SolveStatus.CONVERGED.value]
     assert bisection_rows["is_correct"].all()
     assert bisection_rows["n_fevals"].unique().to_list() == [N_BISECTION_FEVALS]
-    assert all(is_correct_again)
+    assert all(is_correct_again_by_row)
 
 
 def test_the_summary_per_solver_follows_from_the_derived_results(run_dir):
