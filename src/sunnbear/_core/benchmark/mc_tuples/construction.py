@@ -59,7 +59,7 @@ class MCTuplesSolveReport:
     solution: ParallelMaxDivSolution
 
     @classmethod
-    def from_start_time(
+    def ended_now(
         cls,
         t_start: float,
         size: MCTuplesSize,
@@ -138,9 +138,7 @@ def generate_mc_tuples(
         tuple_array_after_cell_selection = grid.required_and_cell_tuple_array(cells)
         _call_on_solve(
             on_solve,
-            MCTuplesSolveReport.from_start_time(
-                t_start, k, step, t_budget_sec, tuple_array_after_cell_selection, solution
-            ),
+            MCTuplesSolveReport.ended_now(t_start, k, step, t_budget_sec, tuple_array_after_cell_selection, solution),
         )
 
         # --- refinement -------------------------
@@ -152,7 +150,7 @@ def generate_mc_tuples(
         if not grid.is_one_per_lane(tuples):
             raise MCTuplesConstructionError(f"Size {k}: the tuples do not hold exactly 1 per lane.")
         _call_on_solve(
-            on_solve, MCTuplesSolveReport.from_start_time(t_start, k, step, t_budget_sec, tuples.tuple_array, solution)
+            on_solve, MCTuplesSolveReport.ended_now(t_start, k, step, t_budget_sec, tuples.tuple_array, solution)
         )
     assert tuples is not None  # noqa: S101 -- settings.sizes is never empty
     return tuples

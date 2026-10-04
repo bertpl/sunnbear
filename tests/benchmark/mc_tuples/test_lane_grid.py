@@ -75,8 +75,8 @@ def test_the_greedy_assignment_maximizes_the_smallest_gap(old_values, n_new):
     assert _min_gap(old_values, new_values) == pytest.approx(_best_min_gap_by_brute_force(old_values, n_new))
 
 
-def test_lane_boundaries_are_0_the_midpoints_and_1():
-    """The boundaries of 3 values are 0, the 2 midpoints between the sorted values, and 1."""
+def test_lane_boundaries_are_0_halfway_between_consecutive_values_and_1():
+    """The boundaries of 3 values are 0, one halfway between each 2 sorted neighbors, and 1."""
     # --- act / assert -----------------
     assert LaneGrid.lane_boundaries(np.array([0.8, 0.2, 0.4])).tolist() == pytest.approx([0.0, 0.3, 0.6, 1.0])
 

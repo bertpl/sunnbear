@@ -4,7 +4,7 @@ The tuple set is nested: each size includes the size below it, which is half as 
 
 - **new values**, 1 per new tuple, assigned to the gaps between the values of the size below
   (`LaneGrid.assign_new_values`);
-- **lanes** that meet at the midpoints between consecutive values, old and new (`LaneGrid.lane_boundaries`).
+- **lanes** whose boundaries lie halfway between consecutive values, old and new (`LaneGrid.lane_boundaries`).
 
 Every value lies in its own lane. A new lane is the lane of a new value, and a cell is the crossing of a new u lane
 and a new v lane; once each new tuple lies inside its own cell, the size holds exactly 1 tuple per lane along u
@@ -112,7 +112,7 @@ class LaneGrid:
 
     @staticmethod
     def lane_boundaries(values: np.ndarray) -> np.ndarray:
-        """Return the `len(values) + 1` lane boundaries: 0, the midpoints between consecutive sorted values, and 1."""
+        """Return `len(values) + 1` lane boundaries: 0, one halfway between each 2 sorted neighbors, and 1."""
         values = np.sort(values)
         return np.concatenate([[0.0], (values[:-1] + values[1:]) / 2, [1.0]])
 
@@ -183,8 +183,8 @@ class LaneGrid:
     def is_one_per_lane(self, tuples: MCTuples) -> bool:
         """Return whether each lane of the size, along u and along v, holds exactly 1 of `tuples`.
 
-        `tuples` is the whole size, the size below included; its lanes meet at the midpoints between the values
-        of the size below and the new values of this grid.
+        `tuples` is the whole size, the size below included; its lane boundaries lie halfway between consecutive
+        values, the values of the size below and the new values of this grid together.
         """
         if tuples.size != self.size:
             return False
