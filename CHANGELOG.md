@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `generate_mc_tuples` takes the largest size to build and reports each finished solve to `on_solve_finished`
+
 ### Deprecated
 
 ### Removed

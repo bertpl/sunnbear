@@ -29,7 +29,7 @@ from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples import (
     MCTuplesDeclaration,
     MCTuplesSize,
-    MCTuplesSolveReport,
+    MCTuplesStepResult,
     generate_mc_tuples,
 )
 from sunnbear._core.benchmark.mc_tuples.lane_grid import LaneGrid
@@ -41,14 +41,32 @@ def main() -> None:
     parser.add_argument("--t-total-sec", type=float, required=True, help="total wall-clock time of the solves")
     parser.add_argument("--n-workers", type=int, default=32)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--max-size",
+        type=int,
+        default=int(max(MCTuplesSize)),
+        choices=[int(size) for size in MCTuplesSize],
+        help="the largest size to build, for a trial run of the smaller sizes",
+    )
     parser.add_argument("--inspection-dir", type=Path, help="directory for the tuples and solution of each solve")
     parser.add_argument(
         "--no-save", action="store_true", dest="is_trial_run", help="do not save the artifact, for a trial run"
     )
     args = parser.parse_args()
 
-    arguments = {"t_total_sec": args.t_total_sec, "n_workers": args.n_workers, "seed": args.seed}
-    tuples = generate_mc_tuples(**arguments, on_solve=lambda report: report_solve(report, args.inspection_dir))
+    arguments = {
+        "t_total_sec": args.t_total_sec,
+        "n_workers": args.n_workers,
+        "seed": args.seed,
+        "max_size": args.max_size,
+    }
+    tuples = generate_mc_tuples(
+        args.t_total_sec,
+        n_workers=args.n_workers,
+        seed=args.seed,
+        max_size=MCTuplesSize(args.max_size),
+        on_solve_finished=lambda result: report_step(result, args.inspection_dir),
+    )
 
     print("| size | L2 | u | v | 1 per lane |")
     print("|---|---|---|---|---|")
@@ -72,23 +90,23 @@ def main() -> None:
         print(f"Saved {manifest.short_identity}.")
 
 
-def report_solve(report: MCTuplesSolveReport, inspection_dir: Path | None) -> None:
-    """Print the solve's budget, wall time and separation fractions, and store it in `inspection_dir` if given."""
-    stats = report.stats()
+def report_step(result: MCTuplesStepResult, inspection_dir: Path | None) -> None:
+    """Print the step's budget, wall time and separation fractions, and store it in `inspection_dir` if given."""
+    stats = result.stats()
     print(
-        f"k={int(report.size)} {report.step.value}: budget {report.t_budget_sec:.0f} s, "
-        f"wall {report.t_wall_sec:.0f} s, L2 {stats.min_separation_l2_fraction:.1%}, "
+        f"k={int(result.size)} {result.kind.value}: budget {result.t_budget_sec:.0f} s, "
+        f"wall {result.t_wall_sec:.0f} s, L2 {stats.min_separation_l2_fraction:.1%}, "
         f"u {stats.min_separation_u_fraction:.1%}, v {stats.min_separation_v_fraction:.1%}",
         flush=True,
     )
     if inspection_dir is not None:
         inspection_dir.mkdir(parents=True, exist_ok=True)
-        stem = f"k{int(report.size)}_{report.step.value}"
+        stem = f"k{int(result.size)}_{result.kind.value}"
         np.savetxt(
-            inspection_dir / f"{stem}.csv", report.tuple_array, fmt="%r", delimiter=",", header="u,v", comments=""
+            inspection_dir / f"{stem}.csv", result.tuple_array, fmt="%r", delimiter=",", header="u,v", comments=""
         )
         with (inspection_dir / f"{stem}_solution.pkl").open("wb") as file:
-            pickle.dump(report.solution, file)
+            pickle.dump(result.solution, file)
 
 
 if __name__ == "__main__":
