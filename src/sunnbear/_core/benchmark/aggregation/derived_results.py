@@ -44,14 +44,13 @@ def add_derived_results(frame: pl.DataFrame | pl.LazyFrame) -> pl.DataFrame | pl
 
     The added columns are:
 
-    - `n_fevals_eff`: the solve's evaluation count, `n_fevals`, when its answer is correct, and the row's
-      `max_fevals`, its whole evaluation budget, for any other solve, so a failed solve counts as if it spent its
-      whole budget;
+    - `n_fevals_eff`: the solve's evaluation count `n_fevals` when its answer is correct, and otherwise the row's
+      evaluation budget `max_fevals`, so a failed solve counts as if it spent its whole budget;
     - `solver_flop_cost`: the sum of the flop counts of the solver's own arithmetic, each weighted by the cost of
-      its flop type; a failed solve keeps its actual flop counts, and only its evaluation count is replaced by the
-      budget, in `n_fevals_eff`;
+      its flop type; a failed solve keeps its actual flop counts, and only `n_fevals_eff` replaces its evaluation
+      count by the budget;
     - `total_flop_cost_feval<k>`: `solver_flop_cost + k · n_fevals_eff`, the cost of a solve in flops when 1
-      function evaluation costs `k` flops, for `k` of 10, 100 and 1000.
+      function evaluation costs `k` flops, for each `k` in 10, 100 and 1000.
 
     The flop counts are weighted with counted-float's active flop weights, read when this function is called:
     `counted_float.config.set_active_flop_weights` changes the active flop weights for later calls, not for a lazy

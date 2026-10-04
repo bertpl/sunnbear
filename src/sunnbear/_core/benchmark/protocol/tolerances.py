@@ -11,7 +11,7 @@ which bisection spends exactly `n_bisection_fevals`.
 import math
 
 # The shipped default of `n_bisection_fevals`.
-N_BISECTION_FEVALS = 40
+DEFAULT_N_BISECTION_FEVALS = 40
 
 # A solve's evaluation budget is this many times bisection's evaluation count.
 MAX_FEVALS_FACTOR = 4

@@ -43,8 +43,7 @@ def is_solution_correct(
             own evaluations are not counted as the solver's.
         x_found: The solver's answer.
         xtol: The largest distance from `x_found` at which a root still makes the answer correct.
-        seed: The seed of the random x-values, so that the verdict is reproducible; any integer. A benchmark run
-            derives it from its root seed per test function and sample.
+        seed: The seed of the random x-values, so that the verdict is reproducible; any integer.
         x_candidates: X-values to probe before the random x-values, such as the x-values at which the
             solver evaluated `f` (`SolveResult.evaluated_x_values`); x-values farther than `xtol` from `x_found` are
             skipped.

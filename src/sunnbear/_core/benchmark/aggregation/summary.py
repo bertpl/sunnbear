@@ -52,7 +52,8 @@ def summarize_results(
     - `correct_fraction`: the fraction that converged to a correct answer, so never more than
       `converged_fraction`;
     - for each summarized column and each of its levels `q`, the column's `gpq` at `q`, in a column named
-      `<column>_gpq_<q in percent>`, e.g. `n_fevals_eff_gpq_50` or `n_fevals_eff_gpq_12.5`.
+      `<column>_gpq_<q in percent, at least 2 digits>`, e.g. `n_fevals_eff_gpq_05`, `n_fevals_eff_gpq_50` or
+      `n_fevals_eff_gpq_12.5`.
 
     Each `gpq` is computed over all rows of a group at once, so a test function (`function_id`) with more rows in the
     group weighs more in that group's `gpq`.

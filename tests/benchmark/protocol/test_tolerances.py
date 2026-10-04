@@ -5,7 +5,7 @@
 
 import pytest
 
-from sunnbear._core.benchmark.protocol.tolerances import N_BISECTION_FEVALS, compute_xtol_range, max_fevals_for
+from sunnbear._core.benchmark.protocol.tolerances import DEFAULT_N_BISECTION_FEVALS, compute_xtol_range, max_fevals_for
 from sunnbear.solvers import Bisection, SolveStatus
 from tests.solvers.example_functions import cubic
 
@@ -14,7 +14,7 @@ from tests.solvers.example_functions import cubic
 #  compute_xtol_range
 # ==================================================================================================
 @pytest.mark.parametrize("a, b", [(1.0, 2.0), (0.0, 4.0), (1.3, 1.4)])  # Each interval holds the cubic's root.
-@pytest.mark.parametrize("n_bisection_fevals", [3, 10, N_BISECTION_FEVALS])
+@pytest.mark.parametrize("n_bisection_fevals", [3, 10, DEFAULT_N_BISECTION_FEVALS])
 @pytest.mark.parametrize(
     "edge, xtol_factor, n_fevals_offset",
     [
@@ -74,7 +74,7 @@ def test_compute_xtol_range_rejects_an_ill_ordered_interval_or_too_few_evaluatio
 def test_the_default_evaluation_budget_is_160_evaluations():
     """The default `n_bisection_fevals` gives a budget of 160 evaluations."""
     # --- act / assert -----------------
-    assert max_fevals_for(n_bisection_fevals=N_BISECTION_FEVALS) == 160
+    assert max_fevals_for(n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS) == 160
 
 
 def test_max_fevals_for_rejects_too_few_evaluations():
