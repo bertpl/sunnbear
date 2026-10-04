@@ -36,3 +36,13 @@ class MCTuplesSize(IntEnum):
     def n_required(self) -> int:
         """Return the number of tuples that this size takes from the size below; 0 for the smallest size."""
         return 0 if self.size_below is None else int(self.size_below)
+
+    @classmethod
+    def up_to(cls, max_size: int) -> tuple["MCTuplesSize", ...]:
+        """Return every size up to `max_size`, the smallest first.
+
+        Raises:
+            ValueError: If `max_size` is not 1 of the sizes.
+        """
+        largest = cls(max_size)
+        return tuple(size for size in cls if size <= largest)

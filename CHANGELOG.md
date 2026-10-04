@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- signature changes to `generate_mc_tuples` after internal refactor; behavior for budgets ≥ 60 s is unchanged
+
 ### Deprecated
 
 ### Removed
