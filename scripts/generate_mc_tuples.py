@@ -58,15 +58,9 @@ def main() -> None:
         "t_total_sec": args.t_total_sec,
         "n_workers": args.n_workers,
         "seed": args.seed,
-        "max_size": args.max_size,
+        "max_size": MCTuplesSize(args.max_size),
     }
-    tuples = generate_mc_tuples(
-        args.t_total_sec,
-        n_workers=args.n_workers,
-        seed=args.seed,
-        max_size=MCTuplesSize(args.max_size),
-        on_solve_finished=lambda result: report_step(result, args.inspection_dir),
-    )
+    tuples = generate_mc_tuples(**arguments, on_solve_finished=lambda result: report_step(result, args.inspection_dir))
 
     print("| size | L2 | u | v | 1 per lane |")
     print("|---|---|---|---|---|")

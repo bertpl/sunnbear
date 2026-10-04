@@ -124,6 +124,11 @@ class LaneGrid:
         """Return the required tuples as an `(n, 2)` array of (u, v) values; empty for the smallest size."""
         return self._tuple_array_or_empty(self.required_tuples)
 
+    @property
+    def n_required(self) -> int:
+        """Return the number of required tuples, which every valid selection keeps; 0 for the smallest size."""
+        return self.required_tuple_array.shape[0]
+
     # --------------------------------------------------------------------------
     #  Cells
     # --------------------------------------------------------------------------

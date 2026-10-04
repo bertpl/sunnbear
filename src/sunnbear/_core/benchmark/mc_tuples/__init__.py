@@ -4,9 +4,9 @@ The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples
 
 - `MCTuples` holds a set of tuples, maps them onto a test function, and reports their spread as
   `MCTuplesStats`;
-- `generate_mc_tuples` constructs a nested set that holds exactly 1 tuple per lane at every size (`LaneGrid` defines
-  the lanes) through `MCTuplesGenerator`, which runs 2 max-div steps per size (`construction_steps`) and reports
-  each step's `MCTuplesStepResult`;
+- `generate_mc_tuples` constructs a nested set that holds exactly 1 tuple per lane at every size, with the lanes as
+  `LaneGrid` defines them. It delegates to `MCTuplesGenerator`, which runs 2 max-div steps per size
+  (`construction_steps`) and reports each step's `MCTuplesStepResult`;
 - `load_mc_tuples(size)` returns one size of the shipped set, 1 of `MCTuplesSize`; `MCTuplesDeclaration`
   declares the set as the data artifact `mc_tuples`.
 """
