@@ -150,31 +150,31 @@ class MCTuplesStats:
     @property
     def min_separation_l2_fraction(self) -> float:
         """Return the L2 min separation as a fraction of the grid spacing `1/(√size - 1)`."""
-        return self.min_separation_l2 * self.inverse_grid_spacing(self.size)
+        return self.min_separation_l2 * self._inverse_grid_spacing(self.size)
 
     @property
     def min_separation_u_fraction(self) -> float:
         """Return the min separation along u as a fraction of `1/(size - 1)`."""
-        return self.min_separation_u * self.inverse_axis_spacing(self.size)
+        return self.min_separation_u * self._inverse_axis_spacing(self.size)
 
     @property
     def min_separation_v_fraction(self) -> float:
         """Return the min separation along v as a fraction of `1/(size - 1)`."""
-        return self.min_separation_v * self.inverse_axis_spacing(self.size)
-
-    @staticmethod
-    def inverse_axis_spacing(size: int) -> float:
-        """Return `size - 1`, the inverse of the separation of `size` evenly spaced values from 0 to 1."""
-        return size - 1.0
-
-    @staticmethod
-    def inverse_grid_spacing(size: int) -> float:
-        """Return `√size - 1`, the inverse of the spacing of `size` tuples on a grid spanning the unit square."""
-        return float(np.sqrt(size)) - 1.0
+        return self.min_separation_v * self._inverse_axis_spacing(self.size)
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
+    @staticmethod
+    def _inverse_axis_spacing(size: int) -> float:
+        """Return `size - 1`, the inverse of the separation of `size` evenly spaced values from 0 to 1."""
+        return size - 1.0
+
+    @staticmethod
+    def _inverse_grid_spacing(size: int) -> float:
+        """Return `√size - 1`, the inverse of the spacing of `size` tuples on a grid spanning the unit square."""
+        return float(np.sqrt(size)) - 1.0
+
     @staticmethod
     def _min_separation_along_axis(values: np.ndarray) -> float:
         """Return the smallest difference between 2 of the values."""

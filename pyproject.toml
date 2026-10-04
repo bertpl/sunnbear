@@ -35,7 +35,7 @@ dependencies = [
     # backports.zstd provides zstd for the archives of downloaded data artifacts; the standard library has it from 3.14.
     "backports.zstd>=1.0.0; python_version < '3.14'",
     "snuffled>=0.1.6",
-    # max-div 0.21.0 has the k-aware l2_and_projections distance that refinement maximizes min-separation over.
+    # max-div 0.21.0 adds the l2_and_projections distance, the objective of the MC tuple construction's refinement step.
     "max-div>=0.21.0",
     "mpl-composite>=0.1.2",
     # polars holds the benchmark results; its wheels use the stable CPython ABI, so 1 minimal version serves every supported Python version.

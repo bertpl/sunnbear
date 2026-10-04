@@ -101,7 +101,7 @@ def test_refinement_refuses_2_tuples_in_1_cell_or_in_1_lane(monkeypatch, cells, 
     ],
 )
 def test_each_step_maximizes_min_separation_over_its_own_distance(monkeypatch, build_step, distance_metric):
-    """Cell selection maximizes min separation over L2, refinement over `l2_and_projections` for the size's items."""
+    """Cell selection maximizes min separation over L2, refinement over `l2_and_projections` for the grid's size."""
     # --- arrange ----------------------
     objectives: list[tuple[DiversityMetric, DistanceMetric]] = []
 
