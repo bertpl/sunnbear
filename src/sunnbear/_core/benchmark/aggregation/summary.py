@@ -6,7 +6,7 @@ from typing import overload
 import polars as pl
 
 from sunnbear._core.solvers.core import SolveStatus
-from sunnbear._core.stats.pseudo_quantile_expressions import gpq_expression
+from sunnbear._core.stats.pseudo_quantiles import gpq_expression
 
 from .derived_results import DERIVED_RESULTS_SCHEMA
 

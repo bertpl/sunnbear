@@ -1,21 +1,20 @@
-"""Geometric pseudo-quantiles: smooth, log-space stand-ins for hard quantiles.
+"""`owg`, the ordered weighted geometric mean, as a numpy function and as a polars expression.
 
-The ordered weighted geometric mean (OWG) weights sorted samples by a power law
-of their rank, yielding a statistic that ranges continuously between ``min``,
-geometric mean, and ``max`` as its power parameter varies. `gpq` calibrates that
-power so the weight distribution's center of mass sits at a requested quantile
-level, giving a smooth alternative to ``np.quantile`` for positive,
-log-scaled samples (such as function-evaluation counts), which ordinary
-quantiles summarize poorly because they snap to the few observed small-integer
-values.
+The ordered weighted geometric mean weights sorted samples by a power law of their rank, so that the statistic
+ranges continuously from the minimum through the geometric mean to the maximum as its power varies. `gpq`
+(`geometric_pseudo_quantile`) calibrates that power to a quantile level.
+
+`owg_expression` computes the statistic per group inside polars: calling `owg` once per group would run Python
+code for every group, which is slow on a results table with many groups.
 """
 
 import numpy as np
+import polars as pl
 from numpy.typing import ArrayLike
 
 
 # ==================================================================================================
-#  Ordered weighted geometric mean
+#  owg
 # ==================================================================================================
 def owg(values: ArrayLike, p: float) -> float:
     """Compute the ordered weighted geometric mean of non-negative samples.
@@ -73,50 +72,38 @@ def owg(values: ArrayLike, p: float) -> float:
 
 
 # ==================================================================================================
-#  Geometric pseudo-quantile
+#  Polars expression
 # ==================================================================================================
-def gpq(values: ArrayLike, q: float) -> float:
-    """Compute the geometric pseudo-quantile of non-negative samples.
+def owg_expression(column: str, p: float) -> pl.Expr:
+    """Return an aggregation expression that computes `owg` of `column` at power `p`, per group.
 
-    An `owg` whose power is calibrated via ``p(q) = (2q - 1) / min(q, 1 - q)``
-    so that the weight distribution's center of mass sits at quantile level `q`
-    (in the large-n limit).
+    In each case, the expression returns what `owg` returns:
 
-    ``gpq(x, 0.5)`` is the plain geometric mean, and ``gpq(x, 0)`` and
-    ``gpq(x, 1)`` are exactly ``min(x)`` and ``max(x)``, because ``p(q)`` tends
-    to ``-inf`` and ``+inf`` at those levels. The calibration aims at the
-    *weight* center of mass, not at the hard quantile value itself.
+    - the exact maximum at power `+inf` and the exact minimum at power `-inf`;
+    - 0 for a group that contains a zero;
+    - the rank-weighted geometric mean otherwise.
 
-    Args:
-        values: Non-negative samples; at least one required. A zero makes the
-            result 0 at every level below 1 (see `owg`).
-        q: Quantile level, between 0 and 1 inclusive.
+    Unlike `owg`, the expression cannot refuse invalid values:
 
-    Returns:
-        The calibrated ordered weighted geometric mean.
-
-    Raises:
-        ValueError: If `q` is NaN or outside the interval [0, 1], or `values`
-            fails `owg` validation.
+    - a negative value gives NaN;
+    - a group of only nulls gives null;
+    - a null among other values gives a wrong result, because it still counts toward the rank weights.
     """
-    return owg(values, gpq_power_for_level(q))
+    values = pl.col(column).cast(pl.Float64)
 
-
-def gpq_power_for_level(q: float) -> float:
-    """Return the `owg` power ``p(q) = (2q - 1) / min(q, 1 - q)`` of `gpq` at level `q`.
-
-    The power is ``-inf`` at ``q = 0`` and ``+inf`` at ``q = 1``, the limits of
-    the formula there.
-
-    Raises:
-        ValueError: If `q` is NaN or outside the interval [0, 1].
-    """
-    if not 0.0 <= q <= 1.0:
-        raise ValueError(f"gpq requires 0 <= q <= 1 (got {q}).")
-
-    if q == 0.0:
-        return -np.inf
-    elif q == 1.0:
-        return np.inf
+    # --- cases with an exact result -------------
+    if p == float("inf"):
+        return values.max()
+    elif p == float("-inf"):
+        return values.min()
     else:
-        return (2.0 * q - 1.0) / min(q, 1.0 - q)
+        # --- sort & weight ----------------------
+        log_values = values.sort(descending=p < 0).log()
+        rank_fractions = (pl.int_range(pl.len()).cast(pl.Float64) + 0.5) / pl.len()
+        weights = rank_fractions.pow(abs(p))
+
+        # --- weighted geometric mean ------------
+        # A zero gives 0 directly, as in `owg`: the weight on the zero can round down to 0.0 in float64, and
+        # 0.0 * log(0) would give NaN.
+        weighted_geometric_mean = ((weights * log_values).sum() / weights.sum()).exp()
+        return pl.when(values.min() == 0.0).then(0.0).otherwise(weighted_geometric_mean)
