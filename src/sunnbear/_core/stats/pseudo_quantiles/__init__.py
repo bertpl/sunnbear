@@ -9,5 +9,5 @@
 Each module holds the numpy function and a polars expression that computes the same statistic per group of a frame.
 """
 
-from .geometric_pseudo_quantile import gpq, gpq_expression, gpq_power_for_level
+from .geometric_pseudo_quantile import gpq, gpq_expression
 from .ordered_weighted_geomean import owg, owg_expression

@@ -43,10 +43,28 @@ def gpq(values: ArrayLike, q: float) -> float:
         ValueError: If `q` is NaN or outside the interval [0, 1], or `values`
             fails `owg` validation.
     """
-    return owg(values, gpq_power_for_level(q))
+    return owg(values, _gpq_power_for_level(q))
 
 
-def gpq_power_for_level(q: float) -> float:
+# ==================================================================================================
+#  Polars expression
+# ==================================================================================================
+def gpq_expression(column: str, q: float) -> pl.Expr:
+    """Return an aggregation expression that computes `gpq` of `column` at level `q`, per group.
+
+    Like `owg_expression`, the expression cannot refuse invalid values: a negative value gives NaN, a group of only
+    nulls gives null, and a null among other values gives a wrong result.
+
+    Raises:
+        ValueError: If `q` is NaN or outside the interval [0, 1].
+    """
+    return owg_expression(column, _gpq_power_for_level(q))
+
+
+# ==================================================================================================
+#  Helpers
+# ==================================================================================================
+def _gpq_power_for_level(q: float) -> float:
     """Return the `owg` power ``p(q) = (2q - 1) / min(q, 1 - q)`` of `gpq` at level `q`.
 
     The power is ``-inf`` at ``q = 0`` and ``+inf`` at ``q = 1``, the limits of
@@ -64,18 +82,3 @@ def gpq_power_for_level(q: float) -> float:
         return np.inf
     else:
         return (2.0 * q - 1.0) / min(q, 1.0 - q)
-
-
-# ==================================================================================================
-#  Polars expression
-# ==================================================================================================
-def gpq_expression(column: str, q: float) -> pl.Expr:
-    """Return an aggregation expression that computes `gpq` of `column` at level `q`, per group.
-
-    Like `owg_expression`, the expression cannot refuse invalid values: a negative value gives NaN, a group of only
-    nulls gives null, and a null among other values gives a wrong result.
-
-    Raises:
-        ValueError: If `q` is NaN or outside the interval [0, 1].
-    """
-    return owg_expression(column, gpq_power_for_level(q))
