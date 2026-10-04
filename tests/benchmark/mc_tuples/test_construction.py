@@ -37,8 +37,8 @@ def test_generate_mc_tuples_builds_nested_sizes_with_1_tuple_per_lane_and_report
         (64, MCTuplesConstructionStep.CELL_SELECTION),
         (64, MCTuplesConstructionStep.REFINEMENT),
     ]
-    assert reports[0].points.shape == (32, 2)
-    assert reports[-1].points.tolist() == tuples.points.tolist()
+    assert reports[0].tuple_array.shape == (32, 2)
+    assert reports[-1].tuple_array.tolist() == tuples.tuple_array.tolist()
     assert all(report.stats().size == int(report.size) for report in reports)
     assert all(report.solution.score_checkpoints for report in reports)
 

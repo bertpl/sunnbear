@@ -11,7 +11,7 @@ new tuples go in the cells where a new u lane crosses a new v lane, in 2 max-div
 - **refinement** (`refine_within_cells`): 1 tuple inside each selected cell.
 
 Each finished solve is reported as an `MCTuplesSolveReport` to the caller's `on_solve`, so that a long
-construction can show its progress and store its points and max-div's solutions as it goes.
+construction can show its progress and store its tuples and max-div's solutions as it goes.
 """
 
 import time
@@ -33,7 +33,7 @@ from .tuples import MCTuples, MCTuplesStats
 # ==================================================================================================
 #  MCTuplesSolveReport
 # ==================================================================================================
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class MCTuplesSolveReport:
     """`MCTuplesSolveReport` describes 1 finished max-div solve of a construction, for progress reports and inspection.
 
@@ -43,11 +43,11 @@ class MCTuplesSolveReport:
         t_budget_sec: The solve's wall-clock budget.
         t_wall_sec: The solve's wall-clock time: the budget, plus the time that max-div takes to start up and shut
             down and the time of the step's validation.
-        points: The size's points after the solve, the tuples of the size below first, as a `(size, 2)` array of
-            (u, v) values:
+        tuple_array: The size's tuples after the solve, the tuples of the size below first, as a `(size, 2)` array
+            of (u, v) values:
 
-            - after cell selection, the points of the selected cells, which can lie on the edges of the unit square;
-            - after refinement, the size's tuple set.
+            - after cell selection, the selected cells' tuples, which can lie on the edges of the unit square;
+            - after refinement, the size's final tuples.
         solution: max-div's solution of the solve, with its score checkpoints and timeline.
     """
 
@@ -55,7 +55,7 @@ class MCTuplesSolveReport:
     step: MCTuplesConstructionStep
     t_budget_sec: float
     t_wall_sec: float
-    points: np.ndarray
+    tuple_array: np.ndarray
     solution: ParallelMaxDivSolution
 
     @classmethod
@@ -65,15 +65,22 @@ class MCTuplesSolveReport:
         size: MCTuplesSize,
         step: MCTuplesConstructionStep,
         t_budget_sec: float,
-        points: np.ndarray,
+        tuple_array: np.ndarray,
         solution: ParallelMaxDivSolution,
     ) -> Self:
         """Return the report of a solve that started at `t_start` (`time.perf_counter`) and ended now."""
-        return cls(size, step, t_budget_sec, time.perf_counter() - t_start, points, solution)
+        return cls(
+            size=size,
+            step=step,
+            t_budget_sec=t_budget_sec,
+            t_wall_sec=time.perf_counter() - t_start,
+            tuple_array=tuple_array,
+            solution=solution,
+        )
 
     def stats(self) -> MCTuplesStats:
-        """Return the spread statistics of the solve's points, each computed when first read."""
-        return MCTuplesStats(self.points)
+        """Return the spread statistics of the solve's tuples, each computed when first read."""
+        return MCTuplesStats(self.tuple_array)
 
 
 # ==================================================================================================
@@ -110,7 +117,7 @@ def generate_mc_tuples(
             more seeds, and may exceed the number of cores.
         seed: The seed of every random draw and of every max-div solve.
         on_solve: Called with an `MCTuplesSolveReport` after each of the 2 solves of every size, e.g. to print the
-            progress of a long construction or to store its points and solutions; None reports nothing.
+            progress of a long construction or to store its tuples and solutions; None reports nothing.
 
     Raises:
         ValueError: If `t_total_sec` is below 1 s, or `n_workers` below 1.
@@ -128,10 +135,12 @@ def generate_mc_tuples(
         t_budget_sec = settings.t_budget_per_solve_sec[k, step]
         t_start = time.perf_counter()
         cells, solution = select_cells(grid, t_budget_sec, settings.n_workers, seed, rng)
-        points_after_cell_selection = grid.required_and_cell_points(cells)
+        tuple_array_after_cell_selection = grid.required_and_cell_tuple_array(cells)
         _call_on_solve(
             on_solve,
-            MCTuplesSolveReport.from_start_time(t_start, k, step, t_budget_sec, points_after_cell_selection, solution),
+            MCTuplesSolveReport.from_start_time(
+                t_start, k, step, t_budget_sec, tuple_array_after_cell_selection, solution
+            ),
         )
 
         # --- refinement -------------------------
@@ -143,7 +152,7 @@ def generate_mc_tuples(
         if not grid.is_one_per_lane(tuples):
             raise MCTuplesConstructionError(f"Size {k}: the tuples do not hold exactly 1 per lane.")
         _call_on_solve(
-            on_solve, MCTuplesSolveReport.from_start_time(t_start, k, step, t_budget_sec, tuples.points, solution)
+            on_solve, MCTuplesSolveReport.from_start_time(t_start, k, step, t_budget_sec, tuples.tuple_array, solution)
         )
     assert tuples is not None  # noqa: S101 -- settings.sizes is never empty
     return tuples

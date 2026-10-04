@@ -53,11 +53,11 @@ class LaneGrid:
     @classmethod
     def for_size(cls, size: int, required_tuples: MCTuples | None) -> Self:
         """Return the grid for `size`, given `required_tuples`, the tuples of the size below (None at the smallest)."""
-        required_points = cls._points_or_empty(required_tuples)
+        required_tuple_array = cls._tuple_array_or_empty(required_tuples)
         new_values_per_axis, new_lanes_per_axis = [], []
         for axis in range(2):
-            new_values = cls.assign_new_values(required_points[:, axis], size)
-            all_values = np.sort(np.concatenate([required_points[:, axis], new_values]))
+            new_values = cls.assign_new_values(required_tuple_array[:, axis], size)
+            all_values = np.sort(np.concatenate([required_tuple_array[:, axis], new_values]))
             boundaries = cls.lane_boundaries(all_values)
             lane_indices = np.searchsorted(all_values, new_values)
             new_values_per_axis.append(new_values)
@@ -120,9 +120,9 @@ class LaneGrid:
     #  Required tuples
     # --------------------------------------------------------------------------
     @property
-    def required_points(self) -> np.ndarray:
+    def required_tuple_array(self) -> np.ndarray:
         """Return the required tuples as an `(n, 2)` array of (u, v) values; empty for the smallest size."""
-        return self._points_or_empty(self.required_tuples)
+        return self._tuple_array_or_empty(self.required_tuples)
 
     # --------------------------------------------------------------------------
     #  Cells
@@ -138,13 +138,13 @@ class LaneGrid:
         return self.n_new * self.n_new
 
     @property
-    def cell_points(self) -> np.ndarray:
-        """Return the point that represents every cell, (u value, v value), as an `(n_cells, 2)` array, row by row."""
+    def cell_tuple_array(self) -> np.ndarray:
+        """Return the tuple (new u value, new v value) of every cell, as an `(n_cells, 2)` array, row by row."""
         return np.column_stack([np.repeat(self.new_u_values, self.n_new), np.tile(self.new_v_values, self.n_new)])
 
-    def required_and_cell_points(self, cells: np.ndarray) -> np.ndarray:
-        """Return the required points, then the points of `cells`, as a `(size, 2)` array of (u, v) values."""
-        return np.vstack([self.required_points, self.cell_points[cells]])
+    def required_and_cell_tuple_array(self, cells: np.ndarray) -> np.ndarray:
+        """Return the required tuples, then the tuples of `cells`, as a `(size, 2)` array of (u, v) values."""
+        return np.vstack([self.required_tuple_array, self.cell_tuple_array[cells]])
 
     def lane_cells(self) -> list[np.ndarray]:
         """Return the cells of each new u lane, then the cells of each new v lane."""
@@ -189,8 +189,8 @@ class LaneGrid:
         if tuples.size != self.size:
             return False
         for axis, new_values in ((0, self.new_u_values), (1, self.new_v_values)):
-            boundaries = self.lane_boundaries(np.concatenate([self.required_points[:, axis], new_values]))
-            lane_indices = np.searchsorted(boundaries[1:-1], tuples.points[:, axis], side="right")
+            boundaries = self.lane_boundaries(np.concatenate([self.required_tuple_array[:, axis], new_values]))
+            lane_indices = np.searchsorted(boundaries[1:-1], tuples.tuple_array[:, axis], side="right")
             if not (np.bincount(lane_indices, minlength=self.size) == 1).all():
                 return False
         return True
@@ -212,6 +212,6 @@ class LaneGrid:
     #  Helpers
     # --------------------------------------------------------------------------
     @staticmethod
-    def _points_or_empty(tuples: MCTuples | None) -> np.ndarray:
-        """Return the points of `tuples` as an `(n, 2)` array; empty when `tuples` is None."""
-        return np.empty((0, 2)) if tuples is None else tuples.points
+    def _tuple_array_or_empty(tuples: MCTuples | None) -> np.ndarray:
+        """Return `tuples` as an `(n, 2)` array of (u, v) values; empty when `tuples` is None."""
+        return np.empty((0, 2)) if tuples is None else tuples.tuple_array

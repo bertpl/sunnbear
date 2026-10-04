@@ -1,10 +1,10 @@
 """The construction adds the new tuples of 1 size in 2 max-div steps: `select_cells`, then `refine_within_cells`.
 
 - **Cell selection** picks cells of the size's `LaneGrid`, where a cell is the crossing of a new u lane and a
-  new v lane and is represented by the point (new u value of its u lane, new v value of its v lane); it picks 1
+  new v lane and is represented by the tuple (new u value of its u lane, new v value of its v lane); it picks 1
   cell per new lane on each axis. Every valid choice of cells uses every new lane, so the sets of u values and
-  v values are the same for every choice; the step therefore maximizes only the L2 min separation of the cell
-  points and of the tuples of the size below.
+  v values are the same for every choice; the step therefore maximizes only the L2 min separation of the cells'
+  tuples and of the tuples of the size below.
 - **Refinement** places 1 tuple in each selected cell, chosen from `N_CANDIDATES_PER_CELL` uniform random
   float64 tuples inside the cell; max-div compares float32 copies, and the chosen tuple keeps its float64
   values. It maximizes the smallest of the 3 separation fractions of `MCTuplesStats`: along u, along v and in
@@ -69,7 +69,7 @@ def select_cells(
 ) -> tuple[np.ndarray, ParallelMaxDivSolution]:
     """Return the cells of `grid` for the new tuples of its size: 1 per new lane along u and 1 per new lane along v.
 
-    The selection maximizes the L2 min separation of the selected cells' points and the tuples of the size below
+    The selection maximizes the L2 min separation of the selected cells' tuples and the tuples of the size below
     (`grid.required_tuples`). A constraint per new lane asks for exactly 1 selected cell in it; max-div weighs
     the constraints against the objective without enforcing them, so the selection is checked before it is
     returned.
@@ -85,15 +85,15 @@ def select_cells(
         MCTuplesConstructionError: If the selection misses a required tuple, or does not hold exactly 1 cell per
             new lane, which can happen when `t_budget_sec` is too short for max-div to meet the constraints.
     """
-    required_points = grid.required_points
-    n_required = required_points.shape[0]
+    required_tuple_array = grid.required_tuple_array
+    n_required = required_tuple_array.shape[0]
     lane_constraints = [
         Constraint(int_set=set((n_required + lane_cells).tolist()), min_count=1, max_count=1)
         for lane_cells in grid.lane_cells()
     ]
     problem = MaxDivProblem.new(
         # max-div works on a float32 copy; the selected cells are taken by index.
-        np.vstack([required_points, grid.cell_points]).astype(np.float32),
+        np.vstack([required_tuple_array, grid.cell_tuple_array]).astype(np.float32),
         k=grid.size,
         distance_metric=DistanceMetric.l2_euclidean(),
         diversity_metric=DiversityMetric.MIN_SEPARATION,
@@ -135,12 +135,12 @@ def refine_within_cells(
         MCTuplesConstructionError: If the selection misses a required tuple or does not hold 1 new tuple per cell,
             which can happen when `t_budget_sec` is too short for max-div to meet them.
     """
-    required_points = grid.required_points
-    n_required = required_points.shape[0]
+    required_tuple_array = grid.required_tuple_array
+    n_required = required_tuple_array.shape[0]
     candidates = grid.sample_in_cells(cells, N_CANDIDATES_PER_CELL, rng)
     problem = MaxDivProblem.new(
         # max-div works on a float32 copy; the selected tuples are taken from the float64 candidates by index.
-        np.vstack([required_points, candidates.reshape(-1, 2)]).astype(np.float32),
+        np.vstack([required_tuple_array, candidates.reshape(-1, 2)]).astype(np.float32),
         k=grid.size,
         distance_metric=DistanceMetric.l2_euclidean(),
         diversity_metric=HybridDiversityMetric.min_of(
@@ -150,9 +150,9 @@ def refine_within_cells(
         ),
         constraints=_inclusion_constraints(n_required),
     )
-    # max-div starts from the candidate nearest to each cell's point, the position that cell selection optimized.
-    cell_points = grid.cell_points[cells]
-    nearest_candidates = np.argmin(np.abs(candidates - cell_points[:, None, :]).sum(axis=-1), axis=1)
+    # max-div starts from the candidate nearest to each cell's tuple, the position that cell selection optimized.
+    cell_tuple_array = grid.cell_tuple_array[cells]
+    nearest_candidates = np.argmin(np.abs(candidates - cell_tuple_array[:, None, :]).sum(axis=-1), axis=1)
     initial_selection = np.concatenate(
         [np.arange(n_required), n_required + np.arange(cells.size) * N_CANDIDATES_PER_CELL + nearest_candidates]
     )
@@ -162,8 +162,8 @@ def refine_within_cells(
     )
     if np.unique(selected_cells).size != cells.size:
         raise MCTuplesConstructionError(f"Size {grid.size}: the refinement does not hold 1 new tuple per cell.")
-    points = candidates[selected_cells, selected_candidates]
-    return MCTuples(points[:, 0], points[:, 1]), solution
+    tuple_array = candidates[selected_cells, selected_candidates]
+    return MCTuples(tuple_array[:, 0], tuple_array[:, 1]), solution
 
 
 # ==================================================================================================

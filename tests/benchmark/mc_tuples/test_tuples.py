@@ -97,8 +97,8 @@ def test_stats_reports_min_separations_and_their_fractions():
     assert stats.min_separation_l2_fraction == pytest.approx(np.sqrt(2) / 8 * (np.sqrt(8) - 1))
 
 
-def test_stats_describe_points_on_the_edges_of_the_unit_square():
-    """`MCTuplesStats` reports the size and the min separations of points on the edges of the unit square."""
+def test_stats_describe_tuples_on_the_edges_of_the_unit_square():
+    """`MCTuplesStats` reports the size and the min separations of tuples on the edges of the unit square."""
     # --- act --------------------------
     stats = MCTuplesStats(np.array([[0.0, 0.0], [0.5, 1.0], [1.0, 0.5]]))
 

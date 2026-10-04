@@ -99,16 +99,16 @@ def test_every_new_value_lies_in_its_own_lane_and_no_old_value_inside_a_new_lane
 
 
 def test_the_cells_are_numbered_row_by_row_and_represented_by_their_values():
-    """Cell `i * n_new + j` is represented by the point `(new_u_values[i], new_v_values[j])`."""
+    """Cell `i * n_new + j` is represented by the tuple `(new_u_values[i], new_v_values[j])`."""
     # --- act --------------------------
     grid = LaneGrid.for_size(8, _SIZE_4)
 
     # --- assert -----------------------
     assert grid.n_cells == 16
     u, v = grid.new_u_values, grid.new_v_values
-    assert grid.cell_points[[0, 1, 4]].tolist() == [[u[0], v[0]], [u[0], v[1]], [u[1], v[0]]]
-    assert grid.required_and_cell_points(np.array([1, 4])).tolist() == [
-        *_SIZE_4.points.tolist(),
+    assert grid.cell_tuple_array[[0, 1, 4]].tolist() == [[u[0], v[0]], [u[0], v[1]], [u[1], v[0]]]
+    assert grid.required_and_cell_tuple_array(np.array([1, 4])).tolist() == [
+        *_SIZE_4.tuple_array.tolist(),
         [u[0], v[1]],
         [u[1], v[0]],
     ]

@@ -58,7 +58,7 @@ class MCTuples:
         return self._u.size
 
     @property
-    def points(self) -> np.ndarray:
+    def tuple_array(self) -> np.ndarray:
         """Return the tuples as a `(size, 2)` array of (u, v) values."""
         return np.column_stack([self._u, self._v])
 
@@ -95,44 +95,44 @@ class MCTuples:
     # --------------------------------------------------------------------------
     def stats(self) -> "MCTuplesStats":
         """Return the set's spread statistics, each computed when first read."""
-        return MCTuplesStats(self.points)
+        return MCTuplesStats(self.tuple_array)
 
 
 # ==================================================================================================
 #  MCTuplesStats
 # ==================================================================================================
 class MCTuplesStats:
-    """`MCTuplesStats` describes how evenly (u, v) points are spread; each statistic is computed when first read.
+    """`MCTuplesStats` describes how evenly (u, v) tuples are spread; each statistic is computed when first read.
 
-    Each min separation is the smallest distance between 2 points: in the square (L2), along u, or
+    Each min separation is the smallest distance between 2 tuples: in the square (L2), along u, or
     along v. Each `min_separation_*_fraction` property divides that min separation by the separation of
-    `size` evenly spaced points: `1/(size - 1)` along an axis, and the spacing `1/(√size - 1)` of a
+    `size` evenly spaced tuples: `1/(size - 1)` along an axis, and the spacing `1/(√size - 1)` of a
     square grid in L2.
 
-    `MCTuplesStats` takes a points array, not an `MCTuples`, so that it can also describe points on the edges of
-    the unit square, which `MCTuples` refuses.
+    `MCTuplesStats` takes an `(n, 2)` array, not an `MCTuples`, so that it can also describe the selected cells'
+    tuples of a construction, which can lie on the edges of the unit square that `MCTuples` refuses.
     """
 
-    def __init__(self, points: ArrayLike) -> None:
-        """Store `points`, an `(n, 2)` array of (u, v) values."""
-        self._points = np.asarray(points, dtype=np.float64)
+    def __init__(self, tuple_array: ArrayLike) -> None:
+        """Store `tuple_array`, an `(n, 2)` array of (u, v) values."""
+        self._tuple_array = np.asarray(tuple_array, dtype=np.float64)
 
     @property
     def size(self) -> int:
-        """Return the number of points."""
-        return self._points.shape[0]
+        """Return the number of tuples."""
+        return self._tuple_array.shape[0]
 
     # --------------------------------------------------------------------------
     #  Min separations
     # --------------------------------------------------------------------------
     @cached_property
     def min_separation_l2(self) -> float:
-        """Return the smallest L2 distance between 2 points.
+        """Return the smallest L2 distance between 2 tuples.
 
         It is computed from the full pairwise distance matrix, so memory grows with the square of the size.
         """
-        points = self._points
-        diff = points[:, None, :] - points[None, :, :]
+        tuple_array = self._tuple_array
+        diff = tuple_array[:, None, :] - tuple_array[None, :, :]
         distances = np.sqrt((diff**2).sum(axis=-1))
         np.fill_diagonal(distances, np.inf)
         return float(distances.min())
@@ -140,12 +140,12 @@ class MCTuplesStats:
     @cached_property
     def min_separation_u(self) -> float:
         """Return the smallest difference between 2 u values."""
-        return self._min_separation_along_axis(self._points[:, 0])
+        return self._min_separation_along_axis(self._tuple_array[:, 0])
 
     @cached_property
     def min_separation_v(self) -> float:
         """Return the smallest difference between 2 v values."""
-        return self._min_separation_along_axis(self._points[:, 1])
+        return self._min_separation_along_axis(self._tuple_array[:, 1])
 
     @property
     def min_separation_l2_fraction(self) -> float:
@@ -169,7 +169,7 @@ class MCTuplesStats:
 
     @staticmethod
     def inverse_grid_spacing(size: int) -> float:
-        """Return `√size - 1`, the inverse of the spacing of `size` points on a grid spanning the unit square."""
+        """Return `√size - 1`, the inverse of the spacing of `size` tuples on a grid spanning the unit square."""
         return float(np.sqrt(size)) - 1.0
 
     # --------------------------------------------------------------------------
