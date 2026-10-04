@@ -3,8 +3,8 @@
 `add_derived_results` adds the metrics for comparing solvers, such as flop costs and an evaluation count adjusted for
 failed solves.
 
-Every function takes an eager or a lazy frame and returns the same kind, so the functions can be mixed at any point
-with ordinary polars operations, such as a filter.
+Every function takes a `DataFrame` or a `LazyFrame` and returns the same kind, so the functions can be mixed at any
+point with ordinary polars operations, such as a filter.
 
 The functions read their inputs, such as a solve's evaluation budget, from columns of the results table, so
 their results stay correct after rows are filtered or runs are combined.

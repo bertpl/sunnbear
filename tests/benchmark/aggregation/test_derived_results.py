@@ -31,7 +31,7 @@ def unit_weights_with_mul_at_3():
 
 @pytest.mark.parametrize("is_lazy", [False, True])
 def test_the_derived_columns_are_added_to_a_frame_of_the_same_kind(is_lazy):
-    """An eager frame gives an eager one and a lazy frame a lazy one, with the derived columns added."""
+    """A `DataFrame` gives a `DataFrame` and a `LazyFrame` a `LazyFrame`, with the derived columns added."""
     # --- arrange ----------------------
     frame = results_table([{}])
 

@@ -19,7 +19,6 @@ from counted_float import FlopType
 from counted_float.config import get_active_flop_weights
 
 from sunnbear._core.benchmark.runner import solver_flop_count_column_name
-from sunnbear._core.utils.polars_frames import collect_if_eager
 
 # Each value is an assumed cost of 1 function evaluation, in flops; `add_derived_results` adds 1
 # `total_flop_cost_k<k>` column per value.
@@ -38,6 +37,8 @@ DERIVED_RESULTS_SCHEMA: dict[str, pl.DataType] = {
 }
 
 
+# The overloads promise the type checker that a `DataFrame` in gives a `DataFrame` out and a `LazyFrame` in a
+# `LazyFrame` out; without them the return type is the union, and every caller would have to narrow it.
 @overload
 def add_derived_results(frame: pl.DataFrame) -> pl.DataFrame: ...
 @overload
@@ -80,4 +81,5 @@ def add_derived_results(frame: pl.DataFrame | pl.LazyFrame) -> pl.DataFrame | pl
         )
         for feval_flop_cost in FEVAL_FLOP_COSTS
     )
-    return collect_if_eager(frame, derived)
+    # The caller gets back the kind it passed in: a `DataFrame` is collected, a `LazyFrame` stays a plan.
+    return derived.collect() if isinstance(frame, pl.DataFrame) else derived
