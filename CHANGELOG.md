@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - signature changes to `generate_mc_tuples` after internal refactor; behavior for `t_total_sec` ≥ 60 s is unchanged
 - requires max-div ≥ 0.21.0
+- the shipped Monte Carlo tuple set is rebuilt; benchmark results on it differ from those on the previous set
 
 ### Deprecated
 
