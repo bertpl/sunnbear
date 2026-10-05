@@ -1,0 +1,94 @@
+"""This module holds `TwinSolver`, the base class of every twin, and the function wrapper that stops a twin."""
+
+from abc import abstractmethod
+from typing import ClassVar
+
+from sunnbear.solvers import Interval, Solver, SolveResult, SolveState
+
+
+class TwinSolver(Solver):
+    """A `TwinSolver` is a test-only `Solver` that runs a reference implementation, and declares how it deviates
+    from exact agreement.
+
+    A subclass implements only `_run_reference`; `_solve` wraps the function in a `TwinFunction`, so that every twin
+    stops where sunnbear's solver would stop.
+
+    Attributes:
+        n_reevaluated_bounds: The number of evaluations that the reference implementation makes at the interval
+            bounds before its first iterate, after the framework already evaluated them. The agreement check leaves
+            them out of the twin's evaluations.
+    """
+
+    n_reevaluated_bounds: ClassVar[int] = 0
+
+    def _solve(self, state: SolveState) -> float:
+        """Run the reference implementation through a `TwinFunction`, which stops it where sunnbear's solver would."""
+        f = TwinFunction(state, self.n_reevaluated_bounds)
+        try:
+            self._run_reference(f, float(state.interval.a), float(state.interval.b), float(state.xtol))
+        except TwinConvergedSignal as converged:
+            return converged.x
+        raise AssertionError("The reference implementation stopped before sunnbear's stopping criterion held.")
+
+    @abstractmethod
+    def _run_reference(self, f: "TwinFunction", a: float, b: float, xtol: float) -> None:
+        """Run the reference implementation on ``f`` over ``[a, b]``."""
+
+    def history_without_reevaluations(self, result: SolveResult) -> list[tuple[float, float]]:
+        """Return ``result.history`` without the reference implementation's re-evaluations of the interval bounds.
+
+        The re-evaluations follow the framework's 2 evaluations at the interval bounds.
+        """
+        history = list(result.history)
+        del history[2 : 2 + self.n_reevaluated_bounds]
+        return history
+
+
+class TwinConvergedSignal(Exception):  # noqa: N818 — the name marks a control-flow signal, not an error condition.
+    """`TwinConvergedSignal` ends a reference implementation's loop once sunnbear's stopping criterion holds.
+
+    Attributes:
+        x: The root estimate that sunnbear's solver would report at that point, the interval's `Interval.root`.
+    """
+
+    def __init__(self, x: float) -> None:
+        """Hold the root estimate."""
+        super().__init__(x)
+        self.x = x
+
+
+class TwinFunction:
+    """`TwinFunction` wraps the solve's function for a twin's reference implementation.
+
+    Each call evaluates through the solve's ``state.f``, so the evaluation is counted, capped and recorded in the
+    history.
+
+    Each call also splits a plain-float copy of the interval at the evaluated point, and raises
+    `TwinConvergedSignal` once that interval meets `Interval.is_converged`. The copy holds plain floats, so the
+    twin's bookkeeping adds no counted flops.
+
+    The first ``n_reevaluated_bounds`` calls, the reference implementation's own evaluations of the interval
+    bounds, do not split the interval.
+    """
+
+    def __init__(self, state: SolveState, n_reevaluated_bounds: int) -> None:
+        """Start from the solve's initial interval."""
+        interval = state.interval
+        self._f = state.f
+        self._interval = Interval.from_interval_bounds(
+            float(interval.a), float(interval.b), float(interval.fa), float(interval.fb)
+        )
+        self._doubled_xtol = 2.0 * float(state.xtol)
+        self._n_reevaluated_bounds_left = n_reevaluated_bounds
+
+    def __call__(self, x: float) -> float:
+        """Return ``f(x)``, or raise `TwinConvergedSignal` if the interval, split at ``x``, meets the stopping
+        criterion."""
+        fx = float(self._f(x))
+        if self._n_reevaluated_bounds_left > 0:
+            self._n_reevaluated_bounds_left -= 1
+        else:
+            self._interval = self._interval.split_at(x, fx)
+            if self._interval.is_converged(self._doubled_xtol):
+                raise TwinConvergedSignal(self._interval.root())
+        return fx

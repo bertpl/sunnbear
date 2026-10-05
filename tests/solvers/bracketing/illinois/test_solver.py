@@ -23,7 +23,7 @@ def test_a_linear_function_is_solved_in_one_step(f):
     assert (result.x, result.status, result.n_fevals) == (0.3, SolveStatus.CONVERGED, 3)
 
 
-def test_the_first_step_is_regula_falsi_and_the_next_halves_the_kept_bound():
+def test_the_first_2_steps_are_regula_falsi_and_the_third_halves_the_retained_bound():
     """On the convex cubic, Illinois starts as regula falsi, then halves the value of the bound that it keeps again."""
     # --- arrange ----------------------
     a, b = 1.0, 2.0

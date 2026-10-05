@@ -2,8 +2,7 @@
 
 import scipy.optimize
 
-from sunnbear.solvers import SolveState
-from tests.solvers.twins import TwinConverged, TwinFunction, TwinSolver
+from tests.solvers.twins import TwinFunction, TwinSolver
 
 
 class BisectionScipyTwin(TwinSolver):
@@ -23,11 +22,6 @@ class BisectionScipyTwin(TwinSolver):
     version = 1
     n_reevaluated_bounds = 2
 
-    def _solve(self, state: SolveState) -> float:
-        """Run SciPy's bisect through a `TwinFunction`, which stops it where `Bisection` would stop."""
-        f = TwinFunction(state, self.n_reevaluated_bounds)
-        try:
-            # SciPy's own stopping test on xtol and rtol is met later than Bisection's, so TwinConverged ends the loop.
-            return scipy.optimize.bisect(f, float(state.interval.a), float(state.interval.b), xtol=float(state.xtol))
-        except TwinConverged as converged:
-            return converged.x
+    def _run_reference(self, f: TwinFunction, a: float, b: float, xtol: float) -> None:
+        """Run SciPy's bisect; its own stopping test on xtol and rtol is met later than Bisection's."""
+        scipy.optimize.bisect(f, a, b, xtol=xtol)
