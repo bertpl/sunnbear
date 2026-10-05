@@ -76,7 +76,7 @@ def test_gpq_exact_results(values, q, expected):
 @pytest.mark.parametrize("n", [1, 10, 1000])
 @pytest.mark.parametrize("q, extreme", [(1e-12, np.min), (1e-7, np.min), (1.0 - 1e-7, np.max), (1.0 - 1e-12, np.max)])
 def test_gpq_at_levels_close_to_0_or_1_gives_the_extreme(n, q, extreme):
-    """At levels very close to 0 or 1, `gpq` gives the min or the max, where its raw weights would all round to 0.0."""
+    """At levels very close to 0 or 1, `gpq` gives the min or the max of the values."""
     # --- arrange ----------------------
     values = np.random.default_rng(n).uniform(1.0, 100.0, n)
 
