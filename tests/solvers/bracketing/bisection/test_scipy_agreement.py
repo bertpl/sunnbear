@@ -4,7 +4,7 @@ import pytest
 from counted_float import FlopCounts
 
 from sunnbear.solvers import Bisection, SolveStatus
-from tests.solvers.bracketing.bisection.scipy_twin import DEVIATIONS, BisectionScipyTwin
+from tests.solvers.bracketing.bisection.scipy_twin import BisectionScipyTwin
 from tests.solvers.example_functions import cubic
 from tests.solvers.twins import TWIN_CASES, assert_agrees_with_twin
 
@@ -31,4 +31,4 @@ def test_the_twin_counts_evaluations_but_no_solver_arithmetic():
 def test_bisection_agrees_with_scipy_bisect(case):
     """`Bisection` evaluates the same points as SciPy's bisect, on every shared twin case."""
     # --- act / assert -----------------
-    assert_agrees_with_twin(Bisection(), BisectionScipyTwin(), DEVIATIONS, case)
+    assert_agrees_with_twin(Bisection(), BisectionScipyTwin(), case)

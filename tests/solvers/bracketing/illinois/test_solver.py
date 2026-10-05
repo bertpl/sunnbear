@@ -1,4 +1,5 @@
-"""These tests assert that `Illinois` halves the value of a bound it keeps again, which ends regula falsi's stall."""
+"""These tests assert that `Illinois` halves the value of a bound that the interval keeps twice in a row, which ends
+regula falsi's stall."""
 
 import pytest
 
@@ -9,9 +10,12 @@ from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 # ==================================================================================================
 #  The modified step
 # ==================================================================================================
-@pytest.mark.parametrize("f", [lambda x: x - 0.3, lambda x: 0.3 - x])  # Both interval orientations.
+@pytest.mark.parametrize(
+    "f", [lambda x: x - 0.3, lambda x: 0.3 - x]
+)  # The 2 functions cover both interval orientations.
 def test_a_linear_function_is_solved_in_one_step(f):
-    """On a straight line, the first chord is the function itself, so no value is ever halved."""
+    """On a straight line, the first chord lands on the root, so `Illinois` converges after 3 evaluations without
+    halving any value."""
     # --- act --------------------------
     result = Illinois().solve(f, 0.0, 1.0, xtol=1e-12, max_fevals=10)
 
@@ -39,9 +43,10 @@ def test_the_first_step_is_regula_falsi_and_the_next_halves_the_kept_bound():
     assert x3 == (x2 * (0.5 * fb) - b * f2) / (0.5 * fb - f2)
 
 
-@pytest.mark.parametrize("f", [cubic, decreasing_cubic])  # Both interval orientations.
+@pytest.mark.parametrize("f", [cubic, decreasing_cubic])  # The 2 functions cover both interval orientations.
 def test_a_convex_function_converges_where_regula_falsi_stalls(f):
-    """On the convex cubic, regula falsi exhausts its budget, while Illinois converges well within it."""
+    """On `cubic` in both interval orientations, regula falsi exhausts its budget, while Illinois converges well
+    within it."""
     # --- act --------------------------
     regula_falsi = RegulaFalsi().solve(f, 1.0, 2.0, xtol=1e-9, max_fevals=60)
     illinois = Illinois().solve(f, 1.0, 2.0, xtol=1e-9, max_fevals=60)

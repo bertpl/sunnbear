@@ -1,31 +1,32 @@
-"""The shared machinery of the twin tests: the cases, the twin's function wrapper, and the agreement check.
+"""This module holds the code that all twin tests share: the cases, the twin base class and its function wrapper, and
+the agreement check.
 
 A twin is a test-only `Solver` that runs a reference implementation of a solver's algorithm, such as SciPy's or
-mpmath's, so that the solver can be compared with it evaluation by evaluation. Every twin test follows the same
-rules, so that no twin takes an undocumented approach of its own:
+mpmath's, so that the solver can be compared with it evaluation by evaluation. A twin is never registered and never
+benchmarked. Every twin test follows the same rules, so that no twin takes an undocumented approach of its own:
 
 - it runs on `TWIN_CASES`, the cases that all twins share;
-- `assert_agrees_with_twin` compares the 2 solves: both converge, and they evaluate the same points, each within
-  `MAX_ULPS_APART` of the twin's, until rounding decides the sign of a function value (see that function);
-- each difference from exact agreement is declared once, as the `TwinDeviations` of the twin's module, with its
-  reason in that module's docstring.
+- `assert_agrees_with_twin` compares the 2 solves evaluation by evaluation;
+- each difference from exact agreement is declared once, on the twin class, with its reason in that class's
+  docstring.
 
 A twin stops where sunnbear's solver would stop, not where the reference implementation would: `TwinFunction`
 raises `TwinConverged` once the bracket of the evaluations so far meets `Interval.is_converged`. The 2 solves then
-evaluate the same number of points, and their stopping criteria are no declared deviation.
+evaluate the same number of points, and their different stopping criteria never need to be declared as a deviation.
 """
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import ClassVar
 
 import numpy as np
 
 from sunnbear.solvers import Interval, Solver, SolveState, SolveStatus
 from tests.solvers.example_functions import cubic, decreasing_cubic, quintic, steep_exponential
 
-# A twin computes the same iterates with its own arithmetic, e.g. a chord's zero anchored at the other bound, so
-# its iterates differ from the solver's by a few ulps; 8 leaves room for that while still catching any different
-# step, which moves an iterate by far more.
+# A twin computes the same iterates with its own arithmetic, e.g. a chord's zero computed as a step from one bound,
+# so its iterates differ from the solver's by a few ulps; the limit leaves room for that while still catching any
+# different step, which moves an iterate by far more.
 MAX_ULPS_APART = 8
 
 # A budget that no twin case reaches: a solve that hits it ends as MAX_FEVALS, which fails the agreement check.
@@ -63,9 +64,22 @@ TWIN_CASES = [
 
 
 # ==================================================================================================
-#  The twin's function
+#  Twins
 # ==================================================================================================
-class TwinConverged(Exception):
+class TwinSolver(Solver):
+    """A `TwinSolver` is a test-only `Solver` that runs a reference implementation, and declares how it deviates
+    from exact agreement.
+
+    Class attributes:
+        n_reevaluated_bounds: The number of evaluations that the reference implementation makes at the interval
+            bounds before its first iterate, after the framework already evaluated them. The agreement check leaves
+            them out of the twin's evaluations.
+    """
+
+    n_reevaluated_bounds: ClassVar[int] = 0
+
+
+class TwinConverged(Exception):  # noqa: N818 — the name marks a control-flow signal, not an error condition.
     """`TwinConverged` ends a reference implementation's loop once sunnbear's stopping criterion holds.
 
     Attributes:
@@ -79,15 +93,15 @@ class TwinConverged(Exception):
 
 
 class TwinFunction:
-    """`TwinFunction` is the function that a twin hands to its reference implementation.
+    """`TwinFunction` wraps the solve's function for a twin's reference implementation.
 
     Each call evaluates through the solve's ``state.f``, so the evaluation is counted, capped and recorded in the
-    history. It also splits a plain-float copy of the bracket at the evaluated point, and raises `TwinConverged`
-    once that bracket meets `Interval.is_converged`. The copy holds plain floats, so the twin's bookkeeping adds no
-    counted flops.
+    history.
 
-    A reference implementation that evaluates the interval bounds again, after the framework already did, makes
-    `n_reevaluated_bounds` such calls first; they do not split the bracket.
+    Each call also splits a plain-float copy of the bracket at the evaluated point, and raises `TwinConverged` once
+    that bracket meets `Interval.is_converged`. The copy holds plain floats, so the twin's bookkeeping adds no
+    counted flops. The first ``n_reevaluated_bounds`` calls, the reference implementation's own evaluations of the
+    interval bounds, do not split the bracket.
     """
 
     def __init__(self, state: SolveState, n_reevaluated_bounds: int) -> None:
@@ -98,13 +112,13 @@ class TwinFunction:
             float(interval.a), float(interval.b), float(interval.fa), float(interval.fb)
         )
         self._doubled_xtol = 2.0 * float(state.xtol)
-        self._n_reevaluations_left = n_reevaluated_bounds
+        self._n_reevaluated_bounds_left = n_reevaluated_bounds
 
     def __call__(self, x: float) -> float:
-        """Return ``f(x)``, or raise `TwinConverged` if the bracket that ``f(x)`` leaves meets the stopping criterion."""
+        """Return ``f(x)``, or raise `TwinConverged` if the bracket, split at ``x``, meets the stopping criterion."""
         fx = float(self._f(x))
-        if self._n_reevaluations_left > 0:
-            self._n_reevaluations_left -= 1
+        if self._n_reevaluated_bounds_left > 0:
+            self._n_reevaluated_bounds_left -= 1
         else:
             self._interval = self._interval.split_at(x, fx)
             if self._interval.is_converged(self._doubled_xtol):
@@ -115,40 +129,28 @@ class TwinFunction:
 # ==================================================================================================
 #  Agreement
 # ==================================================================================================
-@dataclass(frozen=True)
-class TwinDeviations:
-    """`TwinDeviations` declares how a twin differs from exact agreement; the defaults declare none.
-
-    Attributes:
-        n_reevaluated_bounds: The number of evaluations that the reference implementation makes at the interval
-            bounds before its first iterate, after the framework already evaluated them. The agreement check
-            leaves them out of the twin's evaluations.
-    """
-
-    n_reevaluated_bounds: int = 0
-
-
-def assert_agrees_with_twin(solver: Solver, twin: Solver, deviations: TwinDeviations, case: TwinCase) -> None:
+def assert_agrees_with_twin(solver: Solver, twin: TwinSolver, case: TwinCase) -> None:
     """Assert that `solver` and `twin` both converge on `case`, through the same evaluated points.
 
-    The check walks the 2 lists of evaluated points in step, with the twin's re-evaluations of the interval bounds,
-    which `deviations` declares, left out:
+    The check compares the 2 lists of evaluated points pair by pair, with the twin's re-evaluations of the interval
+    bounds, which `TwinSolver.n_reevaluated_bounds` declares, left out:
 
     - each pair of points must lie within `MAX_ULPS_APART`, measured by `ulps_apart` against the case's bounds;
-    - a pair whose function values differ in sign ends the walk: points that close together straddle the root, so
-      rounding decided that sign, and the 2 solves may continue differently. Both still converge, so their root
-      estimates lie within ``2 * xtol`` of each other;
+    - a pair whose function values differ in sign ends the comparison: the 2 points lie so close together that they
+      straddle the root, so rounding decided that sign, and the 2 solves may continue differently. Both still
+      converge, so their root estimates lie within ``2 * xtol`` of each other;
     - without such a pair, the 2 solves evaluate equally many points, and their root estimates lie within
       `MAX_ULPS_APART`.
     """
-    # --- arrange / act ----------------
+    # --- solve ----------------------------------
     ours = solver.solve(case.f, case.a, case.b, xtol=case.xtol, max_fevals=_MAX_FEVALS, history_enabled=True)
     theirs = twin.solve(case.f, case.a, case.b, xtol=case.xtol, max_fevals=_MAX_FEVALS, history_enabled=True)
 
-    # --- assert -----------------------
+    # --- compare --------------------------------
     assert ours.status is theirs.status is SolveStatus.CONVERGED
     their_history = list(theirs.history)
-    del their_history[2 : 2 + deviations.n_reevaluated_bounds]  # The re-evaluations follow the framework's 2.
+    # The re-evaluations follow the framework's 2 evaluations at the interval bounds.
+    del their_history[2 : 2 + twin.n_reevaluated_bounds]
     scale = max(abs(case.a), abs(case.b))
     for (our_x, our_fx), (their_x, their_fx) in zip(ours.history, their_history, strict=False):
         assert ulps_apart(our_x, their_x, scale) <= MAX_ULPS_APART, f"{our_x!r} and {their_x!r} differ by more"
