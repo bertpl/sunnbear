@@ -1,5 +1,7 @@
 """The example functions that the solver tests share, with their roots."""
 
+import math
+
 
 def cubic(x: float) -> float:
     """Return ``x^3 - x - 1``; it has 1 real root, near 1.3247, and is convex on ``[1, 2]``."""
@@ -17,3 +19,8 @@ def quintic(x: float) -> float:
 
 
 CUBIC_ROOT = 1.324717957244746
+
+
+def steep_exponential(x: float) -> float:
+    """Return ``exp(20x) - 10^4``; it rises steeply and is convex on ``[0, 1]``, with its root at ``ln(10^4) / 20``."""
+    return math.exp(20.0 * x) - 1.0e4

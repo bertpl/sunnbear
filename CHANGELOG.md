@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add the Illinois solver
+
 ### Changed
 
 - Require max-div ≥ 0.21.1

@@ -4,16 +4,16 @@ import pytest
 from counted_float import FlopCounts
 
 from sunnbear.solvers import Bisection, SolveStatus
-from tests.solvers.bracketing.bisection.scipy_twin import BisectionScipyTwin
-from tests.solvers.example_functions import cubic, decreasing_cubic, quintic
-
-PROBLEMS = [(cubic, 1.0, 2.0), (quintic, 0.0, 1.0), (decreasing_cubic, 1.0, 2.0)]
+from tests.solvers.bracketing.bisection.scipy_twin import DEVIATIONS, BisectionScipyTwin
+from tests.solvers.example_functions import cubic
+from tests.solvers.twins import TWIN_CASES, assert_agrees_with_twin
 
 
 # ==================================================================================================
 #  The twin itself
 # ==================================================================================================
 def test_the_twin_counts_evaluations_but_no_solver_arithmetic():
+    """The twin's evaluations are counted, but SciPy's arithmetic on plain floats is not."""
     # --- act --------------------------
     result = BisectionScipyTwin().solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=200)
 
@@ -27,16 +27,8 @@ def test_the_twin_counts_evaluations_but_no_solver_arithmetic():
 # ==================================================================================================
 #  Agreement
 # ==================================================================================================
-@pytest.mark.parametrize("f, a, b", PROBLEMS)
-@pytest.mark.parametrize("xtol", [1e-4, 1e-8])
-def test_bisection_agrees_with_scipy_bisect(f, a, b, xtol):
-    # --- act --------------------------
-    ours = Bisection().solve(f, a, b, xtol=xtol, max_fevals=200)
-    twin = BisectionScipyTwin().solve(f, a, b, xtol=xtol, max_fevals=200)
-
-    # --- assert -----------------------
-    assert ours.status is twin.status is SolveStatus.CONVERGED
-    assert abs(ours.x - twin.x) <= xtol
-    # SciPy stops on a slightly different width rule, so its own call count is ours within 1. It also re-evaluates
-    # both bounds, and the twin's count includes both.
-    assert abs((twin.n_fevals - 2) - ours.n_fevals) <= 1
+@pytest.mark.parametrize("case", TWIN_CASES, ids=str)
+def test_bisection_agrees_with_scipy_bisect(case):
+    """`Bisection` evaluates the same points as SciPy's bisect, on every shared twin case."""
+    # --- act / assert -----------------
+    assert_agrees_with_twin(Bisection(), BisectionScipyTwin(), DEVIATIONS, case)
