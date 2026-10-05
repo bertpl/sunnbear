@@ -65,8 +65,8 @@ class MCTuplesGenerator:
     """
 
     T_BUDGET_FRACTION_PER_STEP_KIND: ClassVar[dict[type[MCTuplesStep], float]] = {
-        MCTuplesCellSelectionStep: 0.8,
-        MCTuplesRefinementStep: 0.2,
+        MCTuplesCellSelectionStep: 0.9,
+        MCTuplesRefinementStep: 0.1,
     }
     MIN_T_BUDGET_FRACTION_PER_SOLVE: ClassVar[float] = 0.01
     MIN_T_TOTAL_SEC: ClassVar[float] = 1.0

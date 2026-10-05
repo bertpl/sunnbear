@@ -15,7 +15,7 @@ time. The script:
 
 Usage:
 
-    uv run python scripts/generate_mc_tuples.py --t-total-sec 28800 --inspection-dir local/regeneration
+    uv run python scripts/generate_mc_tuples.py --t-total-sec 43200 --inspection-dir local/regeneration
 """
 
 import argparse
