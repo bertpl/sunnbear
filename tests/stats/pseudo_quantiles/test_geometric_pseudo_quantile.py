@@ -73,6 +73,17 @@ def test_gpq_exact_results(values, q, expected):
     assert gpq(values, q) == expected
 
 
+@pytest.mark.parametrize("n", [1, 10, 1000])
+@pytest.mark.parametrize("q, extreme", [(1e-12, np.min), (1e-7, np.min), (1.0 - 1e-7, np.max), (1.0 - 1e-12, np.max)])
+def test_gpq_at_levels_close_to_0_or_1_gives_the_extreme(n, q, extreme):
+    """At levels very close to 0 or 1, `gpq` gives the min or the max, where its raw weights would all round to 0.0."""
+    # --- arrange ----------------------
+    values = np.random.default_rng(n).uniform(1.0, 100.0, n)
+
+    # --- act / assert -----------------
+    assert gpq(values, q) == pytest.approx(extreme(values), rel=1e-12)
+
+
 @pytest.mark.parametrize("q", [-0.5, 1.5, -1e-12, 1.0 + 1e-12, float("nan")])
 def test_gpq_rejects_out_of_range_q(q):
     with pytest.raises(ValueError):
@@ -82,7 +93,7 @@ def test_gpq_rejects_out_of_range_q(q):
 # ==================================================================================================
 #  Polars expression
 # ==================================================================================================
-@pytest.mark.parametrize("q", [0.0, 0.1, 0.25, 0.5, 0.75, 0.99, 1.0])
+@pytest.mark.parametrize("q", [0.0, 1e-12, 0.1, 0.25, 0.5, 0.75, 0.99, 1.0 - 1e-12, 1.0])
 def test_gpq_expression_equals_gpq_per_group(q):
     """Per group, the expression gives the value of `gpq`, at the endpoint levels and with a zero too."""
     # --- act --------------------------

@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `gpq` and `owg` no longer return NaN at levels very close to 0 or 1
+
 ### Security
 
 ## 0.2.1 (2026-10-05)

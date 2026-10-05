@@ -65,7 +65,9 @@ def owg(values: ArrayLike, p: float) -> float:
     v_sorted = np.sort(v) if p >= 0 else np.sort(v)[::-1]
     n = v_sorted.size
     rank_fractions = np.linspace(0.5 / n, 1.0 - 0.5 / n, n)
-    weights = rank_fractions ** abs(p)
+    # Dividing by the largest rank fraction makes the largest weight exactly 1: for a large |p|, the raw weights
+    # would all round down to 0.0 and give 0 / 0. A factor common to all weights leaves the result unchanged.
+    weights = (rank_fractions / rank_fractions[-1]) ** abs(p)
 
     # --- weighted geometric mean ----------------
     return float(np.exp(np.sum(weights * np.log(v_sorted)) / np.sum(weights)))
@@ -100,7 +102,8 @@ def owg_expression(column: str, p: float) -> pl.Expr:
         # --- sort & weight ----------------------
         log_values = values.sort(descending=p < 0).log()
         rank_fractions = (pl.int_range(pl.len()).cast(pl.Float64) + 0.5) / pl.len()
-        weights = rank_fractions.pow(abs(p))
+        # As in `owg`, dividing by the largest rank fraction keeps the largest weight at exactly 1.
+        weights = (rank_fractions / rank_fractions.max()).pow(abs(p))
 
         # --- weighted geometric mean ------------
         # A zero gives 0 directly, as in `owg`: the weight on the zero can round down to 0.0 in float64, and
