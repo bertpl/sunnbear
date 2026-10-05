@@ -21,8 +21,9 @@ def test_owg_p_zero_is_geomean(values):
     assert result == pytest.approx(float(np.exp(np.mean(np.log(values)))))
 
 
-@pytest.mark.parametrize("p, expected", [(200.0, 9.0), (-200.0, 1.0)])
+@pytest.mark.parametrize("p, expected", [(200.0, 9.0), (-200.0, 1.0), (1e6, 9.0), (-1e6, 1.0)])
 def test_owg_large_abs_p_approaches_extremes(p, expected):
+    """At a very large |p|, `owg` gives the max or the min of the values."""
     # --- arrange ----------------------
     values = [1.0, 4.0, 9.0]
 
@@ -82,9 +83,9 @@ def test_owg_rejects_invalid_values(values):
 # ==================================================================================================
 #  Polars expression
 # ==================================================================================================
-@pytest.mark.parametrize("p", [-np.inf, -3.0, 0.0, 1.5, np.inf])
+@pytest.mark.parametrize("p", [-np.inf, -1e6, -3.0, 0.0, 1.5, 1e6, np.inf])
 def test_owg_expression_equals_owg_per_group(p):
-    """Per group, the expression gives the value of `owg`, at infinite powers and with a zero too."""
+    """Per group, the expression gives the value of `owg` at infinite and very large powers, and with a zero too."""
     # --- act --------------------------
     results = frame_of_values_by_group().group_by("group").agg(owg_expression("value", p).alias("owg"))
 
