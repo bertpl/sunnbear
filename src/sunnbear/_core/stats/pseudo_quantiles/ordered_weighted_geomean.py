@@ -65,9 +65,9 @@ def owg(values: ArrayLike, p: float) -> float:
     v_sorted = np.sort(v) if p >= 0 else np.sort(v)[::-1]
     n = v_sorted.size
     rank_fractions = np.linspace(0.5 / n, 1.0 - 0.5 / n, n)
-    # Dividing by the largest rank fraction makes the largest weight exactly 1: for a large |p|, every weight in
-    # `rank_fractions ** abs(p)` would round down to 0.0 and give 0 / 0. A factor common to all weights leaves the
-    # result unchanged.
+    # Dividing by the largest rank fraction makes the largest weight exactly 1. Without that division, for a large |p|
+    # every weight in `rank_fractions ** abs(p)` rounds down to 0.0, and the weighted mean below becomes 0 / 0. A factor
+    # common to all weights cancels in the weighted mean, so the result is unchanged.
     weights = (rank_fractions / rank_fractions[-1]) ** abs(p)
 
     # --- weighted geometric mean ----------------
