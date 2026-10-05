@@ -233,7 +233,7 @@ class MCTuplesCellSelectionStep(MCTuplesStep):
         ]
         cells, solution = self._solve(
             grid.cell_tuple_array,
-            DiversityMetric.MIN_SEPARATION,
+            DiversityMetric.min_separation(),
             DistanceMetric.l2_euclidean(),
             lane_constraints,
             grid.random_one_per_new_lane_cells(self.settings.rng),
@@ -304,7 +304,7 @@ class MCTuplesRefinementStep(MCTuplesStep):
         nearest_candidates = np.argmin(np.abs(candidates - selected_cell_tuple_array[:, None, :]).sum(axis=-1), axis=1)
         new_selection, solution = self._solve(
             candidates.reshape(-1, 2),
-            DiversityMetric.MIN_SEPARATION,
+            DiversityMetric.min_separation(),
             DistanceMetric.l2_and_projections(k=grid.size),
             [],
             np.arange(cells.size) * N_CANDIDATES_PER_CELL + nearest_candidates,
