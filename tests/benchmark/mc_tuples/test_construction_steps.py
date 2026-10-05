@@ -118,4 +118,4 @@ def test_each_step_maximizes_min_separation_over_its_own_distance(monkeypatch, b
         step.run(1.0)
 
     # --- assert -----------------------
-    assert objectives == [(DiversityMetric.MIN_SEPARATION, distance_metric)]
+    assert objectives == [(DiversityMetric.min_separation(), distance_metric)]

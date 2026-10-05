@@ -1379,7 +1379,7 @@ wheels = [
 
 [[package]]
 name = "max-div"
-version = "0.21.0"
+version = "0.21.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -1390,9 +1390,9 @@ dependencies = [
     { name = "scipy" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/05/9c/16c3cbfba7ee5f19ff69c1948fe3e0922196bc26a6ef46b4dc7dd0dceb72/max_div-0.21.0.tar.gz", hash = "sha256:c54a7899dc9ec34d597a9e84cd7f5c15744c62e21c9f0f547b64b9b04625f3f3", size = 263367, upload-time = "2026-10-04T17:40:35.838Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/57/3f/e7ab3729c8fa73be02ea3bf12166d2f4758f849fd5cdb2b1dff519bd02cd/max_div-0.21.1.tar.gz", hash = "sha256:6881f3466bbad3d3eefee86750dbd42a8e4aed8f829372ce999af046d17ae2bb", size = 267224, upload-time = "2026-10-05T17:19:25.245Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/f8/5064fe5cc693f5827d903718843c1e50cbebe6e561c38fcc1c464c9bedfb/max_div-0.21.0-py3-none-any.whl", hash = "sha256:28397dc82b5967de761760a9d5ccfd09b7d6928831790aefacb63fda3b764b18", size = 387455, upload-time = "2026-10-04T17:40:34.171Z" },
+    { url = "https://files.pythonhosted.org/packages/65/7b/636110ede7c43c87e56b4c2df1118e7531da366765194a6a4c4c03cfa353/max_div-0.21.1-py3-none-any.whl", hash = "sha256:3d957a907072db754a0574e52bfd39e6e4ec80e0b69f3a794210f060104e97ca", size = 392455, upload-time = "2026-10-05T17:19:23.589Z" },
 ]
 
 [[package]]
@@ -2509,7 +2509,7 @@ requires-dist = [
     { name = "matplotlib", marker = "python_full_version == '3.12.*'", specifier = ">=3.10.7" },
     { name = "matplotlib", marker = "python_full_version == '3.13.*'", specifier = ">=3.10.7" },
     { name = "matplotlib", marker = "python_full_version >= '3.14'", specifier = ">=3.10.7" },
-    { name = "max-div", specifier = ">=0.21.0" },
+    { name = "max-div", specifier = ">=0.21.1" },
     { name = "mpl-composite", specifier = ">=0.1.2" },
     { name = "numba", marker = "python_full_version == '3.12.*'", specifier = ">=0.60.0" },
     { name = "numba", marker = "python_full_version == '3.13.*'", specifier = ">=0.66.0" },
