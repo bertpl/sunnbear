@@ -14,9 +14,9 @@ class BrentScipyTwin(TwinSolver):
     """`BrentScipyTwin` hands the interval to `scipy.optimize.brentq` and returns ``b`` at the point where `Brent`
     would stop.
 
-    SciPy's ``brentq`` follows netlib's ``zeroin.f``, the Fortran version of Brent's procedure. Its tolerance,
+    SciPy's ``brentq`` follows the Fortran version of Brent's procedure on netlib. Its tolerance,
     ``(xtol + rtol * |b|) / 2``, equals Brent's ``tol = 2 * macheps * |b| + t`` when the twin passes ``xtol = 2 * t``
-    and ``rtol = 4 * macheps``, so its steps match those of `Brent`.
+    and ``rtol = 4 * macheps``, so SciPy's steps match those of `Brent`.
 
     The twin deviates from exact agreement in these declared ways:
 
@@ -24,7 +24,7 @@ class BrentScipyTwin(TwinSolver):
     - SciPy computes the interpolation step from divided differences, where `Brent` computes it as ``p / q``, so the
       evaluated points can differ in their last bits;
     - SciPy tests a few of Brent's conditions with a strict inequality where Brent's procedure has a non-strict one,
-      and the reverse; the 2 differ only when the 2 sides are exactly equal.
+      and the reverse; the 2 tests give different results only when the 2 sides are exactly equal.
     """
 
     name = "brent_scipy_twin"
@@ -32,7 +32,7 @@ class BrentScipyTwin(TwinSolver):
     n_reevaluated_bounds = 2
 
     def _run_reference(self, f: TwinFunction, a: float, b: float, xtol: float) -> None:
-        """Run SciPy's brentq with the tolerances that make its tolerance equal Brent's ``tol``.
+        """Run SciPy's brentq with ``xtol`` and ``rtol`` set so that its tolerance equals Brent's ``tol``.
 
         The twin runs 1 solve at a time, so it keeps that solve's ``t`` on the instance for
         `_root_if_sunnbear_solver_stops`.
@@ -45,8 +45,8 @@ class BrentScipyTwin(TwinSolver):
     ) -> float | None:
         """Return ``b`` if `Brent` stops after the last of ``evaluations``, or ``None`` if it continues.
 
-        As in `Brent`, ``b`` is the interval bound with the smaller ``|f|``, the newest point when both are equal,
-        and `Brent` stops once half the interval is at most ``2 * macheps * |b| + t``, or ``f(b)`` is 0.
+        As in `Brent`, ``b`` is the interval bound with the smaller ``|f|``, and the newest point when both are
+        equal.
         """
         x_newest, f_newest = evaluations[-1]
         if x_newest == interval.a:

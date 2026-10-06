@@ -1,10 +1,10 @@
-"""`Brent` implements Brent's method: interpolation steps that bisection takes over when they converge too slowly."""
+"""`Brent` implements Brent's method: interpolation steps, with bisection when they converge too slowly."""
 
 import sys
 
 from sunnbear._core.solvers.core import Solver, SolveState
 
-# Brent's ``macheps``, the relative machine precision: 2^-52 for float64.
+# ``_MACHEPS`` is Brent's ``macheps``, the relative machine precision: 2^-52 for float64.
 _MACHEPS = sys.float_info.epsilon
 
 
@@ -15,30 +15,37 @@ class Brent(Solver):
 
     - inverse quadratic interpolation through the last 3 points;
     - linear interpolation, a secant step, when only 2 distinct points are known;
-    - bisection, forced when the step before the previous one was shorter than the tolerance, or when the last step
-      did not reduce ``|f|``; it also replaces an interpolation step that lands too close to the far bound or is
-      not shorter than half the step before the previous one.
+    - bisection, in 2 cases:
 
-    A step shorter than the tolerance is lengthened to the tolerance, toward the other bound. These rules guarantee
-    that the solve converges within a bounded number of evaluations, whatever the function.
+      - forced, when the step before the previous one was shorter than the tolerance ``tol`` (defined below), or
+        when the last step did not reduce ``|f|``;
+      - in place of an interpolation step that lands more than 3/4 of the way from the best point to the other
+        bound, or that is not shorter than half the step before the previous one.
 
-    The variables keep the names of the Algol procedure, so that the code can be compared with it line by line:
+    A step shorter than the tolerance is lengthened to the tolerance, toward the bound on the other side of the root.
+    These rules guarantee that the solve converges within a bounded number of evaluations, whatever the function.
+
+    The variables keep the names of the Algol procedure, and comments mark where its labels ``int`` and ``ext``
+    fall, so that the code can be compared with it line by line:
 
     - ``b`` and ``c`` are the interval bounds, ``b`` the one with the smaller ``|f|``, which is the best estimate;
     - ``a`` is the previous value of ``b``;
-    - ``d`` is the step from ``b`` in this iteration, and ``e`` the step of the iteration before;
+    - ``d`` is the step from ``b`` in this iteration, and ``e`` the step of the iteration before, so while the next
+      step is chosen, ``e`` holds the step before the previous one;
     - ``m`` is half the signed width of the interval, from ``b`` toward ``c``;
-    - ``p / q`` is the interpolation step, computed as a separate numerator and denominator so that the step is
-      only divided out once it is accepted;
-    - ``tol = 2 * macheps * |b| + t``, the tolerance; the solve ends once ``|m| <= tol`` or ``f(b) = 0``, and
+    - ``p / q`` is the interpolation step, computed as a separate numerator and denominator so that the division
+      ``p / q`` runs only once the step is accepted;
+    - ``tol = 2 * macheps * |b| + t`` is the tolerance, with ``macheps`` the relative machine precision and ``t`` an
+      absolute tolerance derived from ``xtol`` (below); the solve ends once ``|m| <= tol`` or ``f(b) = 0``, and
       returns ``b``.
 
-    Brent's procedure returns a ``b`` within ``6 * macheps * |x| + 2 * t`` of a root ``x``, where ``macheps`` is
-    the relative machine precision, and ``t`` is its absolute tolerance. The solver sets
-    ``t = (xtol - 6 * macheps * max(|a|, |b|)) / 2``, with ``a`` and ``b`` the bounds of the initial interval, so
-    that the returned ``b`` lies within ``xtol`` of a root. ``xtol`` must therefore exceed
-    ``6 * macheps * max(|a|, |b|)``; below that, the tolerance can never be met, and the solve runs until its
-    evaluation budget is exhausted.
+    Brent's procedure returns a ``b`` within ``6 * macheps * |x| + 2 * t`` of a root ``x``. The solver sets
+    ``t = (xtol - 6 * macheps * max(|a0|, |b0|)) / 2``, with ``a0`` and ``b0`` the bounds of the initial interval,
+    so that the returned ``b`` lies within ``xtol`` of a root.
+
+    ``xtol`` must therefore exceed ``6 * macheps * max(|a0|, |b0|)``; below that, ``t`` is negative and the accuracy
+    is no longer guaranteed. Where ``t`` also makes ``tol`` negative, ``|m| <= tol`` can never hold, and the solve
+    runs until its evaluation budget is exhausted.
 
     The bounds ``b`` and ``c`` swap roles as the iteration proceeds, and the stopping criterion is Brent's own, so
     `Brent` writes its own loop, not `BracketingSolver`'s.
@@ -57,11 +64,11 @@ class Brent(Solver):
         interval = state.interval
         a, fa, b, fb = interval.a, interval.fa, interval.b, interval.fb
         t = 0.5 * (state.xtol - 6.0 * _MACHEPS * max(abs(a), abs(b)))
-        # The Algol label "int": the previous value of b, which lies on the other side of the root, becomes c.
+        # The Algol label "int": c becomes a, the bound on the other side of the root from b.
         c, fc = a, fa
         d = e = b - a
         while True:
-            # --- the Algol label "ext" -------
+            # --- the Algol label "ext" ----------
             if abs(fc) < abs(fb):
                 a, b, c = b, c, b
                 fa, fb, fc = fb, fc, fb
@@ -70,33 +77,37 @@ class Brent(Solver):
             if abs(m) <= tol or fb == 0.0:
                 return b
 
-            # --- the step d ------------------
+            # --- the step d ---------------------
             if abs(e) < tol or abs(fa) <= abs(fb):
                 d = e = m  # A bisection is forced.
             else:
                 s = fb / fa
                 if a == c:
-                    # Linear interpolation, through b and c.
+                    # The step is a linear interpolation through b and c.
                     p = 2.0 * m * s
                     q = 1.0 - s
                 else:
-                    # Inverse quadratic interpolation, through a, b and c.
+                    # The step is an inverse quadratic interpolation through a, b and c.
                     q = fa / fc
                     r = fb / fc
                     p = s * (2.0 * m * q * (q - r) - (b - a) * (r - 1.0))
                     q = (q - 1.0) * (r - 1.0) * (s - 1.0)
+                # Make p non-negative, so that q carries the sign of the step p / q.
                 if p > 0.0:
                     q = -q
                 else:
                     p = -p
+                # s keeps the step before the previous one, and e the previous step.
                 s = e
                 e = d
+                # Accept the interpolation step only if it lands less than 3/4 of the way from b to c and is
+                # shorter than half the step before the previous one; otherwise bisect.
                 if 2.0 * p < 3.0 * m * q - abs(tol * q) and p < abs(0.5 * s * q):
                     d = p / q
                 else:
                     d = e = m
 
-            # --- the evaluation at b + d -----
+            # --- the evaluation at b + d --------
             a, fa = b, fb
             if abs(d) > tol:
                 b = b + d
