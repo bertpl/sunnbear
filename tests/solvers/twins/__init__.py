@@ -7,7 +7,7 @@ benchmarked.
 
 Every twin test follows the same rules, so that no twin takes an undocumented approach of its own:
 
-- it runs on `TWIN_CASES`, the cases that all twins share;
+- it runs on `TWIN_TEST_CASES`, the test cases that all twins share;
 - `assert_agrees_with_twin` compares the 2 solves evaluation by evaluation;
 - each difference from exact agreement is declared once, on the twin class, with its reason in that class's
   docstring.
@@ -19,5 +19,5 @@ criteria never need to be declared as a deviation.
 """
 
 from .agreement import MAX_ULPS_APART, assert_agrees_with_twin, ulps_apart
-from .cases import TWIN_CASES, TwinCase
+from .cases import TWIN_TEST_CASES, TwinTestCase
 from .solver import StoppingWrappedFunction, TwinConvergedSignal, TwinSolver
