@@ -17,9 +17,11 @@ from sunnbear._core.solvers.bracketing.ridders.configs import (
     RiddersCommonsMathConfig,
     RiddersScipyConfig,
 )
+from sunnbear._core.solvers.bracketing.toms748.configs import TOMS748K1Config, TOMS748K2Config
 from sunnbear.exceptions import UnknownSolverConfigError
 from sunnbear.solvers import (
     ITP,
+    TOMS748,
     Bisection,
     Brent,
     Chandrupatla,
@@ -65,6 +67,8 @@ from .example_solvers import WeightedSplitSolver, define_config
         (RiddersCommonsMathConfig, "ridders[variant='commons_math']", Ridders, SolverRole.BUILTIN_SECONDARY),
         (RiddersScipyConfig, "ridders[variant='scipy']", Ridders, SolverRole.BUILTIN_CORE),
         (ChandrupatlaConfig, "chandrupatla", Chandrupatla, SolverRole.BUILTIN_CORE),
+        (TOMS748K1Config, "toms748[k=1]", TOMS748, SolverRole.BUILTIN_CORE),
+        (TOMS748K2Config, "toms748[k=2]", TOMS748, SolverRole.BUILTIN_SECONDARY),
     ],
 )
 def test_built_in_config_is_registered_on_import(config_cls, solver_id, solver_cls, role):
@@ -105,10 +109,22 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         "ridders[variant='bracketing_solver']",
         "ridders[variant='commons_math']",
         "ridders[variant='scipy']",
+        "toms748[k=1]",
+        "toms748[k=2]",
         "weighted_split[weight=0.25]",
         "weighted_split[weight=0.75]",
     ]
-    assert solver_classes == (Bisection, Brent, Chandrupatla, Illinois, ITP, RegulaFalsi, Ridders, WeightedSplitSolver)
+    assert solver_classes == (
+        Bisection,
+        Brent,
+        Chandrupatla,
+        Illinois,
+        ITP,
+        RegulaFalsi,
+        Ridders,
+        TOMS748,
+        WeightedSplitSolver,
+    )
 
 
 def test_config_from_id_rejects_an_unknown_id():
