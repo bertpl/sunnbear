@@ -44,9 +44,9 @@ class ChandrupatlaScipyTwin(TwinSolver):
     ) -> float | None:
         """Return ``xm`` if `Chandrupatla` stops after the last of ``evaluations``, or ``None`` if it continues.
 
-        As in `Chandrupatla`, ``xm`` is the bound that `_bounds_by_smaller_abs_f` puts first.
+        As in `Chandrupatla`, ``xm`` is the bound that `_get_bounds_best_estimate_first` puts first.
         """
-        (xm, fm), (x_other, _) = self._bounds_by_smaller_abs_f(interval)
+        (xm, fm), (x_other, _) = self._get_bounds_best_estimate_first(interval)
         if 0.5 * xtol / abs(x_other - xm) > 0.5 or fm == 0.0:
             return xm
         else:

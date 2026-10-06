@@ -68,11 +68,12 @@ class TwinSolver(Solver):
     #  Helpers
     # --------------------------------------------------------------------------
     @staticmethod
-    def _bounds_by_smaller_abs_f(interval: Interval) -> tuple[tuple[float, float], tuple[float, float]]:
-        """Return the 2 bounds of ``interval`` as ``(x, f(x))`` pairs, the one with the smaller ``|f|`` first.
+    def _get_bounds_best_estimate_first(interval: Interval) -> tuple[tuple[float, float], tuple[float, float]]:
+        """Return the 2 bounds of ``interval`` as ``(x, f(x))`` pairs, the best root estimate first.
 
-        The bound that the last split replaced, which holds the newest point, comes first when both ``|f|`` are
-        equal.
+        The best root estimate is the bound with the smaller ``|f|``, which Brent's and Chandrupatla's methods both
+        return as their root estimate. When both ``|f|`` are equal, the bound that the last split replaced, which
+        holds the newest point, comes first.
         """
         if interval.last_replaced_bound is IntervalBound.LOWER:
             x_newest, f_newest, x_other, f_other = interval.a, interval.fa, interval.b, interval.fb
