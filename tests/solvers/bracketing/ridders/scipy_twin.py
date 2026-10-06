@@ -13,13 +13,14 @@ class RiddersScipyTwin(TwinSolver):
     """`RiddersScipyTwin` hands the interval to `scipy.optimize.ridder` and returns the root estimate at the point
     where `Ridders`, in the same variant, would stop.
 
-    SciPy stops once its interval is narrower than its tolerance ``xtol + rtol * x``, and limits each step so that the
-    iterate lies at least half that tolerance inside the interval. The twin passes SciPy:
+    SciPy stops once its interval is narrower than its tolerance ``xtol + rtol * x``, where ``x`` is SciPy's current
+    iterate, and limits each step so that the iterate lies at least half that tolerance inside the interval. The twin
+    passes SciPy:
 
-    - for the ``"scipy"`` variant, ``rtol = 4 * eps``, the smallest that SciPy accepts, and an ``xtol`` reduced by
+    - for the ``"scipy"`` variant, ``rtol = 4 * eps``, SciPy's smallest accepted value, and an ``xtol`` reduced by
       ``4 * eps * max(|a|, |b|)``, so that SciPy's tolerance never exceeds `Ridders`' ``xtol`` and SciPy does not
       stop first;
-    - for the other 2 variants, the smallest tolerance that SciPy accepts, so that its limit on the step moves an
+    - for the other 2 variants, SciPy's smallest accepted tolerance, so that SciPy's limit on the step moves an
       iterate by a few ulps at most.
 
     The twin stops SciPy with the criterion of `Ridders` through `_root_if_sunnbear_solver_stops`.
@@ -33,7 +34,9 @@ class RiddersScipyTwin(TwinSolver):
       - SciPy does not keep its 2 bounds in order, so the bound that serves as ``x0`` in its formula for the iterate
         can differ from the one that `Ridders` uses;
       - before SciPy 1.18, SciPy computed the iterate with an equivalent formula of its own;
-      - SciPy's limit on the step uses its own tolerance, which differs from that of `Ridders` by a few ulps.
+      - SciPy limits each step with its own tolerance; in the ``"scipy"`` variant, that limit differs from that of
+        `Ridders` by a few ulps, and in the other 2 variants, which have no such limit, it moves an iterate by a few
+        ulps at most.
     """
 
     name = "ridders_scipy_twin"
@@ -45,7 +48,7 @@ class RiddersScipyTwin(TwinSolver):
         self.variant = variant
 
     def _run_reference(self, f: TwinFunction, a: float, b: float, xtol: float) -> None:
-        """Run SciPy's ridder with the tolerances that the class docstring gives for the variant."""
+        """Run SciPy's ridder with the variant's tolerances, as the class docstring gives them."""
         eps = float(np.finfo(float).eps)
         if self.variant == "scipy":
             scipy_xtol = xtol - 4.0 * eps * max(abs(a), abs(b))

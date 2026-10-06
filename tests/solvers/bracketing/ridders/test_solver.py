@@ -7,7 +7,7 @@ import typing
 
 import pytest
 
-from sunnbear.solvers import Ridders, SolveStatus
+from sunnbear.solvers import Interval, Ridders, SolveStatus
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 
 # The parametrized tests run under every variant in the annotation of `Ridders.__init__`.
@@ -20,13 +20,6 @@ def _kinked_line(x: float) -> float:
         return x - 0.41
     else:
         return 1000.0 * (x - 0.41)
-
-
-def _final_interval_width(history: list[tuple[float, float]]) -> float:
-    """Return the width of the interval between the last evaluated point and the closest earlier point on the other
-    side of the root."""
-    x_last, f_last = history[-1]
-    return min(abs(x - x_last) for x, fx in history if (fx < 0.0) != (f_last < 0.0))
 
 
 # ==================================================================================================
@@ -107,7 +100,7 @@ def test_the_scipy_variant_stops_once_the_interval_is_narrower_than_xtol():
 
     # --- assert -----------------------
     assert result.x == result.history[-1][0]
-    assert _final_interval_width(result.history) < xtol
+    assert _final_interval(result.history).width < xtol
 
 
 def test_the_bracketing_solver_variant_stops_once_the_interval_is_at_most_2_xtol_wide():
@@ -120,15 +113,15 @@ def test_the_bracketing_solver_variant_stops_once_the_interval_is_at_most_2_xtol
     result = Ridders(variant="bracketing_solver").solve(cubic, 1.0, 2.0, xtol=xtol, max_fevals=60, history_enabled=True)
 
     # --- assert -----------------------
-    x_last, _ = result.history[-1]
-    width = _final_interval_width(result.history)
-    assert width <= 2.0 * xtol
-    assert result.x in (x_last + 0.5 * width, x_last - 0.5 * width)
+    interval = _final_interval(result.history)
+    assert interval.width <= 2.0 * xtol
+    assert result.x == interval.midpoint
 
 
 def test_the_limit_on_the_step_lets_the_scipy_variant_stop_where_the_interval_would_only_halve():
-    """On ``x^3 - x - 0.801``, SciPy's limit on the step collapses the interval near the root: the scipy variant needs
-    12 evaluations, as many as the commons_math variant, where the bracketing_solver variant needs 66."""
+    """On ``x^3 - x - 0.801``, SciPy's limit on the step lets the scipy variant stop after as few evaluations as the
+    commons_math variant, while the bracketing_solver variant, whose interval only halves near the root, needs far
+    more."""
 
     # --- arrange ----------------------
     def f(x: float) -> float:
@@ -163,7 +156,7 @@ def test_on_a_kinked_function_only_the_commons_math_variant_misses_the_root(vari
 
 
 def test_an_unknown_variant_is_rejected():
-    """A variant that is not 1 of the 3 raises a `ValueError` that names it."""
+    """A variant outside the annotation of `Ridders.__init__` raises a `ValueError` that names it."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="'original'"):
         Ridders(variant="original")  # ty: ignore[invalid-argument-type] — the test passes a wrong value
@@ -180,3 +173,15 @@ def test_identity_and_that_its_arithmetic_is_counted():
     # --- assert -----------------------
     assert (Ridders.name, Ridders.version) == ("ridders", 1)
     assert result.flop_counts.SQRT > 0
+
+
+# ==================================================================================================
+#  Helpers
+# ==================================================================================================
+def _final_interval(history: list[tuple[float, float]]) -> Interval:
+    """Return the interval that remains after splitting the initial interval at each later point of ``history``."""
+    (a, fa), (b, fb), *evaluations = history
+    interval = Interval.from_interval_bounds(a, b, fa, fb)
+    for x, fx in evaluations:
+        interval = interval.split_at(x, fx)
+    return interval

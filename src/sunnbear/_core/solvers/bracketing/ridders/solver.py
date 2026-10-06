@@ -28,19 +28,22 @@ class Ridders(Solver):
       returns the last one. On a function that is not smooth, that iterate often lies more than ``xtol`` from the
       true root.
     - ``"scipy"``, SciPy's ``ridder``: the step from ``x1`` is limited to ``d - xtol / 2``, so that ``x3`` lies at
-      least ``xtol / 2`` inside the interval, and the solve stops once the interval is narrower than ``xtol``, and
+      least ``xtol / 2`` inside the interval. The solve stops once the interval is narrower than ``xtol``, and
       returns the last iterate. SciPy adds a relative term to its tolerance; this variant leaves it out, so that its
       root always lies within ``xtol`` of the true root.
     - ``"bracketing_solver"``, the stopping criterion of `BracketingSolver`: the solve stops once the interval is at
       most ``2 * xtol`` wide, and returns its midpoint, which always lies within ``xtol`` of the true root.
 
-    SciPy's limit on the step matters near the root. Without it, ``x3`` lands on either side of the root, and when it
-    lands on the side away from ``x1``, the interval only halves. With it, a root within ``xtol / 2`` of a bound
-    makes ``x3`` land on the side of ``x1``, and the interval between ``x3`` and that bound is narrower than ``xtol``.
-    So the evaluation count of ``"bracketing_solver"`` varies far more between near-identical functions than that of
-    ``"scipy"``.
+    SciPy's limit on the step makes the evaluation count of ``"scipy"`` vary far less between near-identical functions
+    than that of ``"bracketing_solver"``. Near the root, the root lies in the half between ``x1`` and 1 bound, and
+    ``x3`` lies close to the root:
 
-    Under all 3 variants, the solve stops as soon as an evaluation returns exactly 0, and returns that x-value.
+    - without the limit, ``x3`` can lie between the root and that bound; the next interval then runs from ``x1`` to
+      ``x3``, so it only halves;
+    - with the limit, a root within ``xtol / 2`` of that bound makes ``x3`` lie between ``x1`` and the root; the next
+      interval then runs from ``x3`` to that bound, so it is narrower than ``xtol``.
+
+    Under every variant, the solve stops as soon as an evaluation returns exactly 0, and returns that x-value.
 
     An iteration evaluates the function twice, so `Ridders` writes its own loop, not `BracketingSolver`'s.
     """
@@ -49,16 +52,16 @@ class Ridders(Solver):
     version = 1
 
     def __init__(self, *, variant: Literal["commons_math", "scipy", "bracketing_solver"]) -> None:
-        """Configure the variant; the class docstring describes all 3.
+        """Configure the variant; the class docstring describes each.
 
         Raises:
-            ValueError: If ``variant`` is not 1 of ``"commons_math"``, ``"scipy"`` and ``"bracketing_solver"``.
+            ValueError: If ``variant`` is not 1 of the values in its annotation.
         """
         if variant not in ("commons_math", "scipy", "bracketing_solver"):
             raise ValueError(f"variant must be 'commons_math', 'scipy' or 'bracketing_solver' (got {variant!r}).")
         self.variant = variant
 
-    def _solve(self, state: SolveState) -> float:  # noqa: C901 — 1 loop holds the criteria of all 3 variants
+    def _solve(self, state: SolveState) -> float:  # noqa: C901 — one loop holds the criteria of all 3 variants
         """Run Ridders' iterations and return the root estimate.
 
         Each iteration evaluates the midpoint ``x1`` and then the iterate ``x3``, and splits the interval at both. The
@@ -66,7 +69,7 @@ class Ridders(Solver):
         """
         interval = state.interval
         if self.variant == "scipy":
-            half_xtol = 0.5 * state.xtol
+            xtol_halved = 0.5 * state.xtol
         elif self.variant == "bracketing_solver":
             xtol_doubled = 2.0 * state.xtol
         x3_previous: float | None = None  # The commons_math variant compares each new x3 with this previous one.
@@ -89,7 +92,7 @@ class Ridders(Solver):
             step = d * f1_over_f0 / math.sqrt(f1_over_f0 * f1_over_f0 - interval.fb / interval.fa)
             if self.variant == "scipy":
                 # SciPy keeps x3 at least xtol / 2 inside the interval; the class docstring says why that matters.
-                step = math.copysign(min(abs(step), d - half_xtol), step)
+                step = math.copysign(min(abs(step), d - xtol_halved), step)
             x3 = x1 + step
             f3 = state.f(x3)
             state.x_best = x3

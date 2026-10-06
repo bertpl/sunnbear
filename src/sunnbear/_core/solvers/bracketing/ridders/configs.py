@@ -8,8 +8,8 @@ from .solver import Ridders
 class RiddersScipyConfig(SolverConfig):
     """`RiddersScipyConfig` is `Ridders` in SciPy's variant, a core config.
 
-    Its evaluation count follows how fast the method converges on a function, and its root always lies within
-    ``xtol`` of the true root.
+    Its evaluation count follows how fast the method converges on a function, so its results characterize the test
+    functions, and its root always lies within ``xtol`` of the true root.
     """
 
     solver_cls = Ridders
@@ -32,8 +32,8 @@ class RiddersCommonsMathConfig(SolverConfig):
 class RiddersBracketingSolverConfig(SolverConfig):
     """`RiddersBracketingSolverConfig` is `Ridders` with `BracketingSolver`'s criterion, reported for information.
 
-    Without SciPy's limit on the step, the interval often only halves near the root, so its evaluation count varies
-    widely between near-identical functions.
+    This variant does not limit the step as the SciPy variant does, so near the root the interval often only halves,
+    and the evaluation count of this config varies widely between near-identical functions.
     """
 
     solver_cls = Ridders
