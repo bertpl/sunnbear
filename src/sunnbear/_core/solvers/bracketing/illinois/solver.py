@@ -12,8 +12,7 @@ class Illinois(BracketingSolver[IllinoisState]):
 
     Regula falsi stalls when the function is convex or concave on the interval: it keeps 1 bound forever, so the
     interval never shrinks below the distance from that bound to the root. The Illinois method (Dowell and
-    Jarratt, BIT 11, 1971) avoids the stall. Each new iterate replaces 1 bound, and the other bound is the retained
-    bound:
+    Jarratt, 1971) avoids the stall. Each new iterate replaces 1 bound, and the other bound is the retained bound:
 
     - when a new iterate lies on the same side of the root as the previous iterate, the retained bound's function
       value is halved before the next chord is drawn, which moves the next iterate toward the retained bound;
@@ -21,8 +20,16 @@ class Illinois(BracketingSolver[IllinoisState]):
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, at its own
       function value.
 
-    Ford (Scientia Iranica 4, 1997) states the Illinois step with regula falsi's chord formula, so the Illinois
-    method differs from `RegulaFalsi` only in its function value at the retained bound.
+    Ford (1997) states the Illinois step with regula falsi's chord formula, so the Illinois method differs from
+    `RegulaFalsi` only in its function value at the retained bound.
+
+    References:
+        - Dowell, M. and Jarratt, P. (1971). A modified regula falsi method for computing the root of an
+          equation. BIT 11(2), 168-174. https://doi.org/10.1007/BF01934364
+        - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
+          Iranica 4(1&2), 28-34. Its equation 5, with ``gamma = 0.5`` from its Table 1, is the Illinois step.
+        - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="illinois"``; the test suite checks
+          `Illinois` against it.
     """
 
     name = "illinois"
