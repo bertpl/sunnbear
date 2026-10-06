@@ -11,8 +11,8 @@ from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic,
 
 
 def _cubic_with_a_local_maximum(x: float) -> float:
-    """Return ``x^3 - 2x + 2``, whose root is near -1.77; between the root and 0, f rises from 2 at 0 to a local maximum
-    near -0.82, so the first iterates from ``[-3, 0]``, which land in that range, raise ``|f|``."""
+    """Return ``x^3 - 2x + 2``, whose root is near -1.77; between the root and 0, f has a local maximum of about 3.09
+    near -0.82, above f(0) = 2, so the first iterates from ``[-3, 0]``, which land in that range, raise ``|f|``."""
     return x**3 - 2.0 * x + 2.0
 
 
@@ -33,8 +33,12 @@ def test_a_linear_function_is_solved_in_one_step(f):
 
 
 def test_the_first_2_steps_are_regula_falsi_and_the_third_scales_the_retained_f():
-    """On the convex cubic, Anderson-Björck starts as regula falsi, scales the value of the bound that it keeps again
-    by ``1 - f_new / f_previous``, and drops the scaling once an iterate replaces that bound."""
+    """On the convex cubic, `AndersonBjorck`:
+
+    - starts as regula falsi;
+    - scales the value of the bound that it keeps again by ``1 - f_new / f_previous``;
+    - drops the scaling once an iterate replaces that bound.
+    """
     # --- arrange ----------------------
     a, b = 1.0, 2.0
     fa, fb = cubic(a), cubic(b)
@@ -74,7 +78,8 @@ def test_the_factor_falls_back_to_0_5_when_an_iterate_does_not_reduce_abs_f():
     # --- assert -----------------------
     (x1, f1), (x2, f2), (x3, _) = history[2:5]
     assert x1 == (a * fb - b * fa) / (fb - fa)
-    # f1 > fb > 0, so x1 replaced the upper bound, which counts as the previous iterate, and 1 - f1 / fb is negative.
+    # f1 > fb > 0, so x1 replaced the upper bound; before the first iterate, the upper bound counts as the previous
+    # iterate (the default of AndersonBjorckState.newest_bound), so the factor 1 - f1 / fb is negative.
     assert f1 > fb > 0.0
     assert x2 == (a * f1 - x1 * (0.5 * fa)) / (f1 - 0.5 * fa)
     # f2 > f1 > 0, so 1 - f2 / f1 is negative too, and the retained value is halved again.

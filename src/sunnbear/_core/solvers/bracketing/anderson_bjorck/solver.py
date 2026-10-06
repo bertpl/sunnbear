@@ -33,8 +33,9 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
     The factor is the ratio of 2 chord slopes: the slope from the previous to the new iterate, divided by the slope of
     the chord that produced the new iterate.
 
-    Ford (1997) writes the factor in that form; in exact arithmetic, the ratio equals ``1 - f_new / f_previous``;
-    `AndersonBjorck` computes the factor in this form, as mpmath's implementation does.
+    Ford (1997) writes the factor as this ratio of slopes. In exact arithmetic, the ratio equals
+    ``1 - f_new / f_previous``, and `AndersonBjorck` computes the factor as ``1 - f_new / f_previous``, as mpmath's
+    implementation does.
 
     Ford (1997) states the Anderson-Björck step with regula falsi's chord formula, so the Anderson-Björck method
     differs from `RegulaFalsi` only in its function value at the retained bound, and from `Illinois` and `Pegasus`
@@ -44,7 +45,8 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
     progress, and can need more than 200 iterations.
 
     When 2 iterates in a row land on the flat side with nearly equal function values, the factor is close to 0, and
-    the next iterate lies close to the retained bound, so replacing that bound moves it only slightly.
+    the next iterate lies close to the retained bound, on the same side of the root, so that iterate replaces the
+    retained bound but moves it only slightly.
 
     References:
         - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of an
@@ -54,11 +56,10 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
 
           - its equation 5, with ``gamma = f[x_(i+1), x_i] / f[x_i, x_(i-1)]`` from its Table 1, is the Anderson-Björck
             step;
-          - it falls back to ``gamma = 0.5``;
+          - the paper gives ``gamma = 0.5`` as the fallback factor;
           - its Table 4 shows the slow progress on large intervals.
-        - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="anderson"``, which `AndersonBjorck`
-          follows in the form of the factor and in its fallback to 0.5; the test suite checks `AndersonBjorck`
-          against mpmath's ``Illinois``.
+        - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="anderson"``; the test suite checks
+          `AndersonBjorck` against it.
     """
 
     name = "anderson_bjorck"

@@ -8,8 +8,9 @@ from tests.solvers.example_functions import steep_exponential
 from tests.solvers.twins import TWIN_TEST_CASES, assert_agrees_with_twin
 
 
-# On steep_exponential, both solvers need more evaluations than the shared budget, and the declared last-bit differences
-# of AndersonBjorckMpmathTwin grow to thousands of ulps, so the test leaves that function out.
+# On steep_exponential, both solvers need more evaluations than the evaluation limit of the twin test cases, and the
+# declared last-bit differences of AndersonBjorckMpmathTwin grow to thousands of ulps, so the test leaves that function
+# out.
 @pytest.mark.parametrize(
     "test_case", [test_case for test_case in TWIN_TEST_CASES if test_case.f is not steep_exponential], ids=str
 )
