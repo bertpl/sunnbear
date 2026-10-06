@@ -3,6 +3,7 @@
 import pytest
 
 from sunnbear._core.solvers.bracketing.bisection.configs import BisectionConfig
+from sunnbear._core.solvers.bracketing.brent.configs import BrentConfig
 from sunnbear._core.solvers.bracketing.illinois.configs import IllinoisConfig
 from sunnbear._core.solvers.bracketing.regula_falsi.configs import RegulaFalsiConfig
 from sunnbear._core.solvers.bracketing.ridders.configs import (
@@ -11,7 +12,7 @@ from sunnbear._core.solvers.bracketing.ridders.configs import (
     RiddersScipyConfig,
 )
 from sunnbear.exceptions import UnknownSolverConfigError
-from sunnbear.solvers import Bisection, Illinois, RegulaFalsi, Ridders, SolverConfigRegistry, SolverRole
+from sunnbear.solvers import Bisection, Brent, Illinois, RegulaFalsi, Ridders, SolverConfigRegistry, SolverRole
 
 from .example_solvers import WeightedSplitSolver, define_config
 
@@ -23,6 +24,7 @@ from .example_solvers import WeightedSplitSolver, define_config
     "config_cls, solver_id, solver_cls, role",
     [
         (BisectionConfig, "bisection", Bisection, SolverRole.BUILTIN_BASELINE),
+        (BrentConfig, "brent", Brent, SolverRole.BUILTIN_CORE),
         (IllinoisConfig, "illinois", Illinois, SolverRole.BUILTIN_CORE),
         (RegulaFalsiConfig, "regula_falsi", RegulaFalsi, SolverRole.BUILTIN_SECONDARY),
         (
@@ -63,6 +65,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
     # --- assert -----------------------
     assert solver_ids == [
         "bisection",
+        "brent",
         "illinois",
         "regula_falsi",
         "ridders[variant='bracketing_solver']",
@@ -71,7 +74,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         "weighted_split[weight=0.25]",
         "weighted_split[weight=0.75]",
     ]
-    assert solver_classes == (Bisection, Illinois, RegulaFalsi, Ridders, WeightedSplitSolver)
+    assert solver_classes == (Bisection, Brent, Illinois, RegulaFalsi, Ridders, WeightedSplitSolver)
 
 
 def test_config_from_id_rejects_an_unknown_id():

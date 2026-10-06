@@ -18,6 +18,7 @@ Variants of one algorithm, such as different values of one of its parameters, ar
 """
 
 from .bisection import Bisection
+from .brent import Brent
 from .illinois import Illinois
 from .regula_falsi import RegulaFalsi
 from .ridders import Ridders, RiddersVariant
