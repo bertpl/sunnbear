@@ -13,16 +13,17 @@ class RiddersScipyTwin(TwinSolver):
     """`RiddersScipyTwin` hands the interval to `scipy.optimize.ridder` and returns the root estimate at the point
     where `Ridders`, with the same stopping criterion, would stop.
 
-    SciPy's own stopping criterion, an interval narrower than its tolerance, is neither of `Ridders`' 2. The twin
-    passes SciPy the smallest tolerance that it accepts, so that SciPy does not stop first, and stops it with
-    `Ridders`' criterion through `_root_if_stopped`.
+    SciPy stops once its interval is narrower than its tolerance, which matches neither of the 2 stopping criteria of
+    `Ridders`. The twin passes SciPy its smallest accepted tolerance, so that SciPy does not stop first, and stops it
+    with the criterion of `Ridders` through `_root_if_sunnbear_solver_stops`.
 
     The twin deviates from exact agreement in these declared ways:
 
     - SciPy evaluates both interval bounds again before its first midpoint;
     - SciPy computes each midpoint as a bound plus a halved step, and does not keep its 2 bounds in order, so it
-      computes an iterate from either bound; before SciPy 1.18, it also computed the iterate with an equivalent
-      formula of its own. The iterates can differ in their last bits;
+      computes an iterate from whichever bound it holds as the first; before SciPy 1.18, it also computed the iterate
+      with an equivalent formula of its own. SciPy's midpoints and iterates can therefore differ from those of
+      `Ridders` in their last bits;
     - SciPy keeps each iterate at least half its tolerance away from the interval bounds; at the smallest tolerance,
       this moves an iterate by a few ulps at most.
     """
@@ -32,15 +33,17 @@ class RiddersScipyTwin(TwinSolver):
     n_reevaluated_bounds = 2
 
     def __init__(self, *, stopping_criterion: Literal["original", "corrected"]) -> None:
-        """Take the stopping criterion of the `Ridders` config that the twin is compared with."""
+        """Take the stopping criterion of the twin's `Ridders` config."""
         self.stopping_criterion = stopping_criterion
 
     def _run_reference(self, f: TwinFunction, a: float, b: float, xtol: float) -> None:
-        """Run SciPy's ridder with the smallest tolerance that it accepts: the smallest normal xtol, rtol of 4 eps."""
+        """Run SciPy's ridder with its smallest accepted tolerance."""
         finfo = np.finfo(float)
         scipy.optimize.ridder(f, a, b, xtol=float(finfo.smallest_normal), rtol=4.0 * float(finfo.eps))
 
-    def _root_if_stopped(self, interval: Interval, evaluations: list[tuple[float, float]], xtol: float) -> float | None:
+    def _root_if_sunnbear_solver_stops(
+        self, interval: Interval, evaluations: list[tuple[float, float]], xtol: float
+    ) -> float | None:
         """Return the root estimate if `Ridders` stops here: at a zero, or after an iteration that meets its criterion.
 
         The evaluations alternate between a midpoint and an iterate, so an odd count ends with a midpoint, after
@@ -57,7 +60,5 @@ class RiddersScipyTwin(TwinSolver):
                 return x
             else:
                 return None
-        elif interval.width <= 2.0 * xtol:
-            return interval.midpoint
         else:
-            return None
+            return super()._root_if_sunnbear_solver_stops(interval, evaluations, xtol)

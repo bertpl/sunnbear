@@ -12,7 +12,7 @@ class TwinSolver(Solver):
 
     A subclass implements `_run_reference`; `_solve` wraps the function in a `TwinFunction`, so that every twin
     stops where sunnbear's solver would stop. Where that solver has a stopping criterion of its own, not
-    `BracketingSolver`'s, the subclass also overrides `_root_if_stopped` with that criterion.
+    `BracketingSolver`'s, the subclass also overrides `_root_if_sunnbear_solver_stops` with that criterion.
 
     Attributes:
         n_reevaluated_bounds: The number of evaluations that the reference implementation makes at the interval
@@ -35,7 +35,9 @@ class TwinSolver(Solver):
     def _run_reference(self, f: "StoppingWrappedFunction", a: float, b: float, xtol: float) -> None:
         """Run the reference implementation on ``f`` over ``[a, b]``."""
 
-    def _root_if_stopped(self, interval: Interval, evaluations: list[tuple[float, float]], xtol: float) -> float | None:
+    def _root_if_sunnbear_solver_stops(
+        self, interval: Interval, evaluations: list[tuple[float, float]], xtol: float
+    ) -> float | None:
         """Return the root estimate if sunnbear's solver stops after ``evaluations``, or ``None`` if it continues.
 
         ``evaluations`` holds every ``(x, f(x))`` that the reference implementation evaluated, in order, without the
@@ -61,7 +63,8 @@ class TwinConvergedSignal(Exception):  # noqa: N818 — the name marks a control
     """`TwinConvergedSignal` ends a reference implementation's loop once sunnbear's stopping criterion holds.
 
     Attributes:
-        x: The root estimate that sunnbear's solver would report at that point, from `TwinSolver._root_if_stopped`.
+        x: The root estimate that sunnbear's solver would report at that point, from
+            `TwinSolver._root_if_sunnbear_solver_stops`.
     """
 
     def __init__(self, x: float) -> None:
@@ -77,8 +80,8 @@ class StoppingWrappedFunction:
     counted, capped and recorded in the history.
 
     Each call also splits a plain-float copy of the interval at the evaluated point, and raises
-    `TwinConvergedSignal` once the twin's `TwinSolver._root_if_stopped` returns a root estimate. The copy holds plain
-    floats, so the twin's bookkeeping adds no counted flops.
+    `TwinConvergedSignal` once the twin's `TwinSolver._root_if_sunnbear_solver_stops` returns a root estimate. The
+    copy holds plain floats, so the twin's bookkeeping adds no counted flops.
 
     The first ``n_reevaluated_bounds`` calls, the reference implementation's own evaluations of the interval
     bounds, do not split the interval.
@@ -104,7 +107,7 @@ class StoppingWrappedFunction:
         else:
             self._interval = self._interval.split_at(float(x), fx)
             self._evaluations.append((float(x), fx))
-            x_root = self._twin._root_if_stopped(self._interval, self._evaluations, self._xtol)
+            x_root = self._twin._root_if_sunnbear_solver_stops(self._interval, self._evaluations, self._xtol)
             if x_root is not None:
                 raise TwinConvergedSignal(x_root)
         return fx

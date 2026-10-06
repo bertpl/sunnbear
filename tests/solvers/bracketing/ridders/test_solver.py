@@ -1,19 +1,25 @@
 """These tests assert that `Ridders` takes the steps of Ridders' paper, and stops by the stopping criterion of its
 config."""
 
+import itertools
 import math
+import typing
 
 import pytest
 
 from sunnbear.solvers import Ridders, SolveStatus
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 
-_STOPPING_CRITERIA = ["original", "corrected"]
+# The parametrized tests run under every stopping criterion that the annotation of `Ridders.__init__` names.
+_STOPPING_CRITERIA = typing.get_args(typing.get_type_hints(Ridders.__init__)["stopping_criterion"])
 
 
 def _kinked_line(x: float) -> float:
     """Return a line through 0 at ``x = 0.41`` whose slope jumps from 1 to 1000 there; it is not smooth at its root."""
-    return x - 0.41 if x < 0.41 else 1000.0 * (x - 0.41)
+    if x < 0.41:
+        return x - 0.41
+    else:
+        return 1000.0 * (x - 0.41)
 
 
 # ==================================================================================================
@@ -54,7 +60,7 @@ def test_an_exact_zero_ends_the_solve_at_that_point(f, root, n_fevals, stopping_
 
 
 @pytest.mark.parametrize("stopping_criterion", _STOPPING_CRITERIA)
-@pytest.mark.parametrize("f", [cubic, decreasing_cubic])  # The 2 functions cover both interval orientations.
+@pytest.mark.parametrize("f", [cubic, decreasing_cubic])
 def test_a_smooth_function_converges_to_its_root(f, stopping_criterion):
     """On `cubic` in both interval orientations, `Ridders` converges within ``xtol`` of the root."""
     # --- act --------------------------
@@ -82,7 +88,7 @@ def test_the_original_criterion_stops_once_2_successive_iterates_lie_within_xtol
     iterates = [x for x, _ in result.history[3::2]]  # Every second evaluation after the bounds is an iterate.
     assert result.x == iterates[-1]
     assert abs(iterates[-1] - iterates[-2]) <= xtol
-    assert all(abs(x - x_previous) > xtol for x_previous, x in zip(iterates[:-2], iterates[1:-1], strict=True))
+    assert all(abs(x - x_previous) > xtol for x_previous, x in itertools.pairwise(iterates[:-1]))
 
 
 def test_the_corrected_criterion_stops_once_the_interval_is_at_most_2_xtol_wide():
@@ -104,8 +110,8 @@ def test_the_corrected_criterion_stops_once_the_interval_is_at_most_2_xtol_wide(
 
 
 def test_on_a_kinked_function_only_the_corrected_criterion_returns_a_root_within_xtol():
-    """On a function that is not smooth at its root, the original criterion stops more than ``xtol`` from the root,
-    while the corrected criterion stays within ``xtol``."""
+    """On a function that is not smooth at its root, the original criterion stops sooner but more than ``xtol`` from
+    the root, while the corrected criterion stays within ``xtol``."""
     # --- arrange ----------------------
     xtol = 1e-6
 
@@ -121,6 +127,8 @@ def test_on_a_kinked_function_only_the_corrected_criterion_returns_a_root_within
 
 
 def test_an_unknown_stopping_criterion_is_rejected():
+    """A stopping criterion other than ``"original"`` or ``"corrected"`` raises a `ValueError` that names it."""
+    # --- act / assert -----------------
     with pytest.raises(ValueError, match="'modified'"):
         Ridders(stopping_criterion="modified")  # ty: ignore[invalid-argument-type] — the test passes a wrong value
 

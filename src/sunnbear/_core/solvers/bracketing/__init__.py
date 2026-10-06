@@ -1,8 +1,8 @@
 """This package holds the bracketing solvers, each a subclass of `BracketingSolver` or `Solver` from the solver core.
 
 A solver whose iteration evaluates 1 point and splits the interval there subclasses `BracketingSolver`, which owns
-that loop and the stopping criterion. A solver whose iteration evaluates more than once, or whose stopping criterion
-is its own, subclasses `Solver` and writes its own loop.
+the iteration loop and the stopping criterion. A solver whose iteration evaluates more than once, or whose stopping
+criterion is its own, subclasses `Solver` and writes its own loop.
 
 Each solver is a package of its own, holding its solver module, its built-in configs, and any helper
 modules. Importing this package registers the built-in configs.

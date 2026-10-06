@@ -9,7 +9,7 @@ class RiddersOriginalCriterionConfig(SolverConfig):
     """`RiddersOriginalCriterionConfig` is `Ridders` with its original stopping criterion, a core config.
 
     Its evaluation count follows how fast the method converges on a function, so its results characterize the test
-    functions. A sample whose root lies more than ``xtol`` from the true root counts as ``max_fevals``.
+    functions. A sample whose root lies more than ``xtol`` from the true root counts as ``max_fevals`` evaluations.
     """
 
     solver_cls = Ridders
@@ -21,7 +21,7 @@ class RiddersCorrectedCriterionConfig(SolverConfig):
     """`RiddersCorrectedCriterionConfig` is `Ridders` with its corrected stopping criterion, reported for information.
 
     Its roots are always accurate, but its evaluation count varies unpredictably between near-identical functions, so
-    its results characterize the test functions less well than the original criterion's.
+    its results characterize the test functions less well than those of the original criterion.
     """
 
     solver_cls = Ridders
