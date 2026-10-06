@@ -42,7 +42,7 @@ def _circles(x: float) -> float:
 
 
 # Each entry holds a test function of the paper's Table 1, by its name there, and the iteration count of ITP in that
-# table. The table excludes the evaluations at the interval bounds.
+# table. The paper's iteration counts exclude the 2 evaluations at the interval bounds.
 _PAPER_TABLE_1 = {
     "lambert": (lambda x: x * math.exp(x) - 1.0, 8),
     "trigonometric_1": (lambda x: math.tan(x - 0.1), 8),
@@ -82,10 +82,10 @@ def test_the_iteration_counts_of_table_1_of_the_paper_are_reproduced(name):
     """On every function of the paper's Table 1 but the step function, the robust form with ``n_slack = 0`` takes as
     many iterations as the paper reports.
 
-    The paper's table comes from the authors' MATLAB code, which is the robust form.
+    The paper's table comes from the authors' MATLAB code, which applies the robust form.
 
-    On the step function, MATLAB's arithmetic gives the table 34 iterations where `ITP` takes 35, so the test leaves
-    that function out.
+    On the step function, the table reports 34 iterations, which MATLAB's arithmetic produced, and `ITP` takes 35, so
+    the test leaves that function out.
     """
     # --- arrange ----------------------
     f, n_iterations = _PAPER_TABLE_1[name]
@@ -103,7 +103,10 @@ def test_the_iteration_counts_of_table_1_of_the_paper_are_reproduced(name):
 @pytest.mark.parametrize("name", _PAPER_TABLE_1)
 def test_the_robust_form_with_slack_stays_within_n_max_on_the_functions_of_the_paper(name):
     """On every function of the paper's Table 1, the robust form with ``n_slack = 4`` takes at most
-    ``n_max = 34 + 4`` iterations."""
+    ``n_max = 34 + 4`` iterations.
+
+    This holds on these functions only: on harder ones, rounding errors can make this form go past ``n_max`` too.
+    """
     # --- arrange ----------------------
     f, _ = _PAPER_TABLE_1[name]
 
@@ -118,8 +121,8 @@ def test_the_robust_form_with_slack_stays_within_n_max_on_the_functions_of_the_p
 @pytest.mark.parametrize(
     "name, is_robust",
     [
-        ("polynomial_2", False),  # Rounding errors in the projection radius cause this overshoot.
-        ("step_function", True),  # The robust form reduces overshoots but does not prevent them all.
+        ("polynomial_2", False),
+        ("step_function", True),
     ],
 )
 def test_rounding_errors_can_push_either_form_past_n_max(name, is_robust):
@@ -140,7 +143,7 @@ def test_rounding_errors_can_push_either_form_past_n_max(name, is_robust):
 # ==================================================================================================
 @pytest.mark.parametrize("is_robust", [True, False])
 def test_a_root_at_the_midpoint_is_found_in_1_iteration(is_robust):
-    """On a line through 0 over ``[-1, 1]``, the interpolation lands on the midpoint, which is the root."""
+    """On a line through 0 over ``[-1, 1]``, the interpolation point is the midpoint, which is the root."""
     # --- act --------------------------
     result = ITP(n_slack=0, is_robust=is_robust).solve(lambda x: x, -1.0, 1.0, xtol=_XTOL, max_fevals=10)
 

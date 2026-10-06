@@ -8,7 +8,7 @@ from .state import ITPState
 
 
 class ITP(BracketingSolver[ITPState]):
-    """`ITP` implements the ITP method as the pseudocode in Appendix B of its paper states it.
+    """`ITP` implements the ITP method, as the pseudocode in Appendix B of its paper states it or in the robust form.
 
     The paper is Oliveira and Takahashi, ACM Transactions on Mathematical Software 47(1), article 5. Each iteration
     evaluates 1 point, ``x_itp``, which it computes from the interval ``[a, b]`` and its midpoint ``x_half`` in 3
@@ -16,25 +16,30 @@ class ITP(BracketingSolver[ITPState]):
 
     - interpolation: ``x_f`` is where the chord through ``(a, f(a))`` and ``(b, f(b))`` crosses zero, as in regula
       falsi;
-    - truncation: ``x_t`` is ``x_f`` moved toward ``x_half`` by ``delta = kappa_1 * (b - a)^kappa_2``, or
-      ``x_half`` itself when ``x_f`` lies closer to ``x_half`` than ``delta``;
+    - truncation: ``x_t`` is ``x_f`` moved toward ``x_half`` by ``delta = kappa_1 * (b - a)^kappa_2``, for 2
+      constants ``kappa_1`` and ``kappa_2``, or ``x_half`` itself when ``x_f`` lies closer to ``x_half`` than
+      ``delta``;
     - projection: ``x_itp`` is ``x_t``, or, when ``x_t`` lies farther than a radius ``r`` from ``x_half``, the point
-      at distance ``r`` from ``x_half`` toward ``x_t``; the next paragraph defines ``r``.
+      at distance ``r`` from ``x_half`` toward ``x_t``; the projection radius ``r`` is defined after this list.
+
+    ``n_bisection = ceil(log2((b0 - a0) / (2 * xtol)))``, the paper's ``n_1/2``, is the iteration count of bisection
+    on the initial interval ``[a0, b0]``.
 
     In iteration ``k``, counted from 0, the radius ``r = xtol * 2^(n_max - k) - (b - a) / 2`` keeps the solve within
     ``n_max = n_bisection + n_slack`` iterations.
 
-    Here ``n_bisection = ceil(log2((b0 - a0) / (2 * xtol)))``, the paper's ``n_1/2``, is the iteration count of
-    bisection on the initial interval ``[a0, b0]``. So, in exact arithmetic, the method needs at most ``n_slack``
-    iterations more than bisection, while it converges superlinearly on smooth functions. In floating point, rounding
-    errors can push a solve 1 or more iterations past ``n_max``.
+    So, in exact arithmetic, the method needs at most ``n_slack`` iterations more than bisection, while it converges
+    superlinearly on smooth functions. In floating point, once the interval nears the width that ``n_max`` allows,
+    rounding errors in the bounds can leave it slightly wider than ``2 * xtol`` after iteration ``n_max``, so 1 or
+    more iterations follow; this holds for every ``n_slack``.
 
     The constants follow the paper's experiments: ``kappa_2 = 2``, and ``kappa_1 = 0.2 / (b0 - a0)``, so that the
     first truncation moves ``x_f`` by at most 20 % of the initial width.
 
-    ``is_robust`` replaces ``r`` with ``max(0.99 * r - xtol / 2, 0)``, the correction for rounding errors that the
-    authors' MATLAB code applies and that the paper's Appendix B recommends in general terms. It reduces the solves
-    that go past ``n_max``, but does not prevent them all.
+    ``is_robust`` selects the robust form, which replaces ``r`` with ``max(0.99 * r - xtol / 2, 0)``, the correction
+    for rounding errors that the authors' MATLAB code applies and that the paper's Appendix B recommends in general
+    terms; the published form, without that correction, is the paper's pseudocode. The correction makes solves that
+    go past ``n_max`` rarer, but does not prevent them all.
 
     The interval, the stopping criterion and the root estimate are `BracketingSolver`'s: the solve ends once the
     interval is at most ``2 * xtol`` wide, as in the paper, and returns its midpoint.
@@ -76,7 +81,11 @@ class ITP(BracketingSolver[ITPState]):
         return super()._solve(state)
 
     def _next_x(self, state: ITPState, interval: Interval) -> float:
-        """Return ``x_itp``: the interpolation point ``x_f``, truncated and projected as the class docstring says."""
+        """Return ``x_itp``, the interpolation point ``x_f`` truncated and projected as the class docstring says.
+
+        Also halve ``state.max_next_width`` for the next iteration, so 2 calls on the same interval return different
+        points.
+        """
         # --- interpolation ----------------------
         x_f = (interval.fb * interval.a - interval.fa * interval.b) / (interval.fb - interval.fa)
 

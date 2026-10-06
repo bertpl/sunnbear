@@ -8,9 +8,9 @@ from .solver import ITP
 class ITPRobustSlack4Config(SolverConfig):
     """`ITPRobustSlack4Config` is a core config: `ITP` in its robust form, with ``n_slack = 4``.
 
-    With 4 iterations allowed beyond the iteration count of bisection, the method can take interpolation steps that
-    do not halve the interval before the projection restricts them, so the method's evaluation count follows how fast
-    interpolation converges on a function.
+    With ``n_slack = 4``, the projection accepts interpolation steps that shrink the interval by less than half, as
+    long as the solve can still end within 4 iterations more than bisection, so the evaluation count depends on how
+    fast interpolation converges on the function.
     """
 
     solver_cls = ITP
@@ -32,8 +32,8 @@ class ITPRobustSlack0Config(SolverConfig):
 class ITPPublishedSlack0Config(SolverConfig):
     """`ITPPublishedSlack0Config` is `ITP` as the paper's pseudocode states it, reported for information.
 
-    It differs from `ITPRobustSlack0Config` only in leaving out the robust form, so rounding errors in the projection
-    radius make it go past ``n_max`` more often.
+    It differs from `ITPRobustSlack0Config` only in leaving out the correction of the projection radius for rounding
+    errors, so its solves go past the iteration bound ``n_max`` of `ITP` more often.
     """
 
     solver_cls = ITP
