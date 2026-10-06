@@ -1,6 +1,8 @@
 """These tests assert that `Illinois` halves the value of a bound that the interval keeps twice in a row, which ends
 regula falsi's stall."""
 
+import math
+
 import pytest
 
 from sunnbear.solvers import Illinois, RegulaFalsi, SolveStatus
@@ -56,6 +58,28 @@ def test_a_convex_function_converges_where_regula_falsi_stalls(f):
     assert illinois.status is SolveStatus.CONVERGED
     assert abs(illinois.x - CUBIC_ROOT) <= 1e-9
     assert illinois.n_fevals <= 15
+
+
+# ==================================================================================================
+#  The paper's results
+# ==================================================================================================
+def test_the_errors_of_table_1_of_the_paper_are_reproduced():
+    """On ``sin(x) - 0.5`` from 0 and 1.5, the iterates of `Illinois` have the errors that the paper's Table 1 lists.
+
+    The table lists the error ``x_i - pi/6`` of the iterates ``i = 2`` to 10 to 3 digits, so each error must match
+    within 0.5 %. Its last row, an error below 0.5e-18, lies below the float64 spacing at ``pi/6``, so the test leaves
+    it out.
+    """
+    # --- arrange ----------------------
+    table_1_errors = [0.228, -0.895e-1, 0.666e-2, 0.160e-3, -0.152e-3, 0.702e-8, 0.308e-12, -0.308e-12]
+
+    # --- act --------------------------
+    result = Illinois().solve(lambda x: math.sin(x) - 0.5, 0.0, 1.5, xtol=1e-15, max_fevals=20, history_enabled=True)
+
+    # --- assert -----------------------
+    # The history starts with the 2 starting points, the paper's x_0 and x_1.
+    errors = [x - math.pi / 6.0 for x, _ in result.history[2:10]]
+    assert errors == pytest.approx(table_1_errors, rel=5e-3)
 
 
 # ==================================================================================================

@@ -25,7 +25,9 @@ class Illinois(BracketingSolver[IllinoisState]):
 
     References:
         - Dowell, M. and Jarratt, P. (1971). A modified regula falsi method for computing the root of an
-          equation. BIT 11(2), 168-174. https://doi.org/10.1007/BF01934364
+          equation. BIT 11(2), 168-174. The paper writes the step from the most recent iterate, which in exact
+          arithmetic equals regula falsi's chord formula; the test suite reproduces the errors of the paper's
+          Table 1. https://doi.org/10.1007/BF01934364
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. The paper's equation 5, with ``gamma = 0.5`` from the paper's Table 1, is the
           Illinois step.
