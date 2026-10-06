@@ -27,21 +27,21 @@ def assert_agrees_with_twin(solver: Solver, twin: TwinSolver, test_case: TwinTes
       differently. Both still converge, so their root estimates lie within ``2 * xtol`` of each other.
     """
     # --- solve ----------------------------------
-    ours = test_case.solve(solver)
-    theirs = test_case.solve(twin)
+    sunnbear_result = test_case.solve(solver)
+    twin_result = test_case.solve(twin)
 
     # --- compare --------------------------------
-    assert ours.status is theirs.status is SolveStatus.CONVERGED
-    their_history = twin.history_without_reevaluations(theirs)
-    for (our_x, our_fx), (their_x, their_fx) in zip(ours.history, their_history, strict=False):
-        assert ulps_apart(our_x, their_x, test_case.scale) <= MAX_ULPS_APART, (
-            f"{our_x!r} and {their_x!r} differ by more"
+    assert sunnbear_result.status is twin_result.status is SolveStatus.CONVERGED
+    twin_history = twin.history_without_reevaluations(twin_result)
+    for (sunnbear_x, sunnbear_fx), (twin_x, twin_fx) in zip(sunnbear_result.history, twin_history, strict=False):
+        assert ulps_apart(sunnbear_x, twin_x, test_case.scale) <= MAX_ULPS_APART, (
+            f"{sunnbear_x!r} and {twin_x!r} differ by more"
         )
-        if (our_fx < 0.0) != (their_fx < 0.0):
-            assert abs(ours.x - theirs.x) <= 2.0 * test_case.xtol
+        if (sunnbear_fx < 0.0) != (twin_fx < 0.0):
+            assert abs(sunnbear_result.x - twin_result.x) <= 2.0 * test_case.xtol
             return
-    assert len(ours.history) == len(their_history)
-    assert ulps_apart(ours.x, theirs.x, test_case.scale) <= MAX_ULPS_APART
+    assert len(sunnbear_result.history) == len(twin_history)
+    assert ulps_apart(sunnbear_result.x, twin_result.x, test_case.scale) <= MAX_ULPS_APART
 
 
 def ulps_apart(x: float, y: float, scale: float) -> float:
