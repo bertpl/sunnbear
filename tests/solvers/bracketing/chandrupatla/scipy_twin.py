@@ -5,7 +5,7 @@ import numpy as np
 import scipy.optimize.elementwise
 
 from sunnbear.solvers import Interval
-from tests.solvers.twins import TwinFunction, TwinSolver
+from tests.solvers.twins import StoppingWrappedFunction, TwinSolver
 
 
 class ChandrupatlaScipyTwin(TwinSolver):
@@ -19,7 +19,7 @@ class ChandrupatlaScipyTwin(TwinSolver):
     The twin passes ``xatol = xtol`` and 0 for ``xrtol``, ``fatol`` and ``frtol``, which makes SciPy stop where
     `Chandrupatla` stops and keep each new point as far inside the interval as `Chandrupatla` does.
 
-    SciPy calls the function with arrays; the twin evaluates each element through the `TwinFunction`.
+    SciPy calls the function with arrays; the twin evaluates each element through the `StoppingWrappedFunction`.
 
     The twin deviates from exact agreement in these declared ways:
 
@@ -32,7 +32,7 @@ class ChandrupatlaScipyTwin(TwinSolver):
     version = 1
     n_reevaluated_bounds = 2
 
-    def _run_reference(self, f: TwinFunction, a: float, b: float, xtol: float) -> None:
+    def _run_reference(self, f: StoppingWrappedFunction, a: float, b: float, xtol: float) -> None:
         """Run SciPy's find_root with ``xtol`` as its only nonzero tolerance."""
         tolerances = {"xatol": xtol, "xrtol": 0.0, "fatol": 0.0, "frtol": 0.0}
         # otypes stops np.vectorize from calling f once more to find the output type, an evaluation that
