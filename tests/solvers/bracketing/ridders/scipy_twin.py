@@ -20,10 +20,13 @@ class RiddersScipyTwin(TwinSolver):
     The twin deviates from exact agreement in these declared ways:
 
     - SciPy evaluates both interval bounds again before its first midpoint;
-    - SciPy computes each midpoint as a bound plus a halved step, and does not keep its 2 bounds in order, so it
-      computes an iterate from whichever bound it holds as the first; before SciPy 1.18, it also computed the iterate
-      with an equivalent formula of its own. SciPy's midpoints and iterates can therefore differ from those of
-      `Ridders` in their last bits;
+    - SciPy's midpoints and iterates can differ from those of `Ridders` in their last bits, for 3 reasons:
+
+      - SciPy computes each midpoint as a bound plus a halved step;
+      - SciPy does not keep its 2 bounds in order, so the bound that serves as ``x0`` in its formula for the iterate
+        can differ from the one that `Ridders` uses;
+      - before SciPy 1.18, SciPy computed the iterate with an equivalent formula of its own;
+
     - SciPy keeps each iterate at least half its tolerance away from the interval bounds; at the smallest tolerance,
       this moves an iterate by a few ulps at most.
     """
@@ -44,10 +47,11 @@ class RiddersScipyTwin(TwinSolver):
     def _root_if_sunnbear_solver_stops(
         self, interval: Interval, evaluations: list[tuple[float, float]], xtol: float
     ) -> float | None:
-        """Return the root estimate if `Ridders` stops here: at a zero, or after an iteration that meets its criterion.
+        """Return the root estimate if `Ridders` stops after the last of ``evaluations``, or ``None`` if it continues.
 
-        The evaluations alternate between a midpoint and an iterate, so an odd count ends with a midpoint, after
-        which `Ridders` stops only at a zero.
+        `Ridders` stops at a zero, or after an iteration that meets its stopping criterion. The evaluations alternate
+        between a midpoint and an iterate, so an odd count ends with a midpoint, after which `Ridders` stops only at
+        a zero.
         """
         x, fx = evaluations[-1]
         if fx == 0.0:

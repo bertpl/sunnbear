@@ -88,7 +88,8 @@ class StoppingWrappedFunction:
     """
 
     def __init__(self, state: SolveState, twin: TwinSolver) -> None:
-        """Start from the solve's initial interval."""
+        """Start from the solve's initial interval, and take the stopping criterion and ``n_reevaluated_bounds`` from
+        ``twin``."""
         interval = state.interval
         self._f = state.f
         self._twin = twin

@@ -10,7 +10,7 @@ import pytest
 from sunnbear.solvers import Ridders, SolveStatus
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 
-# The parametrized tests run under every stopping criterion that the annotation of `Ridders.__init__` names.
+# The parametrized tests run under every stopping criterion in the annotation of `Ridders.__init__`.
 _STOPPING_CRITERIA = typing.get_args(typing.get_type_hints(Ridders.__init__)["stopping_criterion"])
 
 

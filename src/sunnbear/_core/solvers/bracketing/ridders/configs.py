@@ -13,7 +13,7 @@ class RiddersOriginalCriterionConfig(SolverConfig):
     """
 
     solver_cls = Ridders
-    solver_kwargs = {"stopping_criterion": "original"}  # noqa: RUF012 — a class-level config record, never mutated
+    solver_kwargs = {"stopping_criterion": "original"}  # noqa: RUF012 — the dict is never mutated
     role = SolverRole.BUILTIN_CORE
 
 
@@ -25,5 +25,5 @@ class RiddersCorrectedCriterionConfig(SolverConfig):
     """
 
     solver_cls = Ridders
-    solver_kwargs = {"stopping_criterion": "corrected"}  # noqa: RUF012 — a class-level config record, never mutated
+    solver_kwargs = {"stopping_criterion": "corrected"}  # noqa: RUF012 — the dict is never mutated
     role = SolverRole.BUILTIN_SECONDARY
