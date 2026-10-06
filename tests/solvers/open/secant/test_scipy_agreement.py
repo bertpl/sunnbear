@@ -8,8 +8,8 @@ from tests.solvers.open.secant.scipy_twin import SecantScipyTwin
 from tests.solvers.twins import TWIN_TEST_CASES, assert_agrees_with_twin
 
 
-# The agreement check compares converged solves only. On steep_exponential, Secant leaves the interval at
-# xtol = 1e-10, so the test leaves that function out; test_solver.py covers it.
+# The agreement check compares converged solves only. With xtol = 1e-10, Secant leaves the interval on
+# steep_exponential, so the test leaves that function out; test_solver.py covers it.
 @pytest.mark.parametrize(
     "test_case", [test_case for test_case in TWIN_TEST_CASES if test_case.f is not steep_exponential], ids=str
 )

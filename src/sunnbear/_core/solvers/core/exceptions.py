@@ -20,8 +20,8 @@ class MaxFevalsExceeded(SolveException):
 class DivergedError(SolveException):
     """`WrappedFunction` raises this when a solver asks for an evaluation at a non-finite ``x``.
 
-    A solver raises `DivergedError` itself when its next point lies at infinity, such as a step to the zero of a
-    horizontal line.
+    A solver raises `DivergedError` itself when its next point lies at infinity, such as a secant step when the 2
+    latest points have equal function values, so the secant is horizontal and never crosses zero.
     """
 
 

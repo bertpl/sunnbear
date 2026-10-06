@@ -20,7 +20,7 @@ class SolveStatus(Enum):
 
     - its result lies outside ``[a, b]``;
     - the function failed at an ``x`` outside ``[a, b]``;
-    - the solver's next point lies at infinity.
+    - the solve ended with `DivergedError`: the solver's next point is not finite.
 
     A function failure inside the interval is ``FUNCTION_ERROR``.
     """
