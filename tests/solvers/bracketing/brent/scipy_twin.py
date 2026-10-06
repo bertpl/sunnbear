@@ -5,7 +5,7 @@ import sys
 import scipy.optimize
 
 from sunnbear.solvers import Interval
-from tests.solvers.twins import TwinFunction, TwinSolver
+from tests.solvers.twins import StoppingWrappedFunction, TwinSolver
 
 _MACHEPS = sys.float_info.epsilon
 
@@ -33,7 +33,7 @@ class BrentScipyTwin(TwinSolver):
     version = 1
     n_reevaluated_bounds = 2
 
-    def _run_reference(self, f: TwinFunction, a: float, b: float, xtol: float) -> None:
+    def _run_reference(self, f: StoppingWrappedFunction, a: float, b: float, xtol: float) -> None:
         """Run SciPy's brentq with ``xtol`` and ``rtol`` set so that its tolerance equals Brent's ``tol``.
 
         The twin runs 1 solve at a time, so it keeps that solve's ``t`` on the instance for
