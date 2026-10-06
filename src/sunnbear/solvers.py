@@ -5,7 +5,7 @@ How a solve runs is described in the docstring of the implementation package, `s
 Importing this module registers the built-in solver configs with `SolverConfigRegistry`.
 """
 
-from ._core.solvers.bracketing import Bisection, Brent, Chandrupatla, Illinois, RegulaFalsi, Ridders, RiddersVariant
+from ._core.solvers.bracketing import ITP, Bisection, Brent, Chandrupatla, Illinois, RegulaFalsi, Ridders, RiddersVariant
 from ._core.solvers.core import (
     BracketingSolver,
     DecreasingInterval,
@@ -22,6 +22,7 @@ from ._core.solvers.core import (
 )
 
 __all__ = [
+    "ITP",
     "Bisection",
     "BracketingSolver",
     "Brent",
