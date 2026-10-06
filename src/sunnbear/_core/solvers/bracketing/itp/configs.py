@@ -5,8 +5,8 @@ from sunnbear._core.solvers.core import SolverConfig, SolverRole
 from .solver import ITP
 
 
-class ITPRobustSlack4Config(SolverConfig):
-    """`ITPRobustSlack4Config` is a core config: `ITP` in its robust form, with ``n_slack = 4``.
+class ITPPaperExperimentsSlack4Config(SolverConfig):
+    """`ITPPaperExperimentsSlack4Config` is a core config: `ITP` in its paper's experiments variant, ``n_slack = 4``.
 
     With ``n_slack = 4``, the projection accepts interpolation steps that shrink the interval by less than half, as
     long as the solve can still end within 4 iterations more than bisection, so the evaluation count depends on how
@@ -14,28 +14,28 @@ class ITPRobustSlack4Config(SolverConfig):
     """
 
     solver_cls = ITP
-    solver_kwargs = {"n_slack": 4, "is_robust": True}  # noqa: RUF012 — the dict is never mutated
+    solver_kwargs = {"n_slack": 4, "variant": "paper_experiments"}  # noqa: RUF012 — the dict is never mutated
     role = SolverRole.BUILTIN_CORE
 
 
-class ITPRobustSlack0Config(SolverConfig):
-    """`ITPRobustSlack0Config` is `ITP` in its robust form, with ``n_slack = 0``, reported for information.
+class ITPPaperExperimentsSlack0Config(SolverConfig):
+    """`ITPPaperExperimentsSlack0Config` is `ITP` in its paper's experiments variant, ``n_slack = 0``, for information.
 
-    The paper's experiments used this setting, and ran it with the authors' MATLAB code.
+    It is the setting of the paper's experiments.
     """
 
     solver_cls = ITP
-    solver_kwargs = {"n_slack": 0, "is_robust": True}  # noqa: RUF012 — the dict is never mutated
+    solver_kwargs = {"n_slack": 0, "variant": "paper_experiments"}  # noqa: RUF012 — the dict is never mutated
     role = SolverRole.BUILTIN_SECONDARY
 
 
-class ITPPublishedSlack0Config(SolverConfig):
-    """`ITPPublishedSlack0Config` is `ITP` as the paper's pseudocode states it, reported for information.
+class ITPPaperPseudocodeSlack0Config(SolverConfig):
+    """`ITPPaperPseudocodeSlack0Config` is `ITP` as its paper's pseudocode states it, reported for information.
 
-    It differs from `ITPRobustSlack0Config` only in leaving out the correction of the projection radius for rounding
-    errors, so its solves go past the iteration bound ``n_max`` of `ITP` more often.
+    It differs from `ITPPaperExperimentsSlack0Config` only in its projection radius, which has no margin, so its solves
+    go past the iteration bound ``n_max`` of `ITP` more often, and end as pure bisection once their slack runs out.
     """
 
     solver_cls = ITP
-    solver_kwargs = {"n_slack": 0, "is_robust": False}  # noqa: RUF012 — the dict is never mutated
+    solver_kwargs = {"n_slack": 0, "variant": "paper_pseudocode"}  # noqa: RUF012 — the dict is never mutated
     role = SolverRole.BUILTIN_SECONDARY

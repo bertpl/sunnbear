@@ -2,6 +2,7 @@
 iteration count."""
 
 import math
+import typing
 
 import pytest
 
@@ -12,6 +13,9 @@ from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 # iterations.
 _XTOL = 1e-10
 _N_BISECTION = 34
+
+# The parametrized tests run under every variant in the annotation of `ITP.__init__`.
+_VARIANTS = typing.get_args(typing.get_type_hints(ITP.__init__)["variant"])
 
 
 def _sawtooth(x: float) -> float:
@@ -79,10 +83,10 @@ _PAPER_TABLE_1 = {
 # ==================================================================================================
 @pytest.mark.parametrize("name", [name for name in _PAPER_TABLE_1 if name != "step_function"])
 def test_the_iteration_counts_of_table_1_of_the_paper_are_reproduced(name):
-    """On every function of the paper's Table 1 but the step function, the robust form with ``n_slack = 0`` takes as
-    many iterations as the paper reports.
+    """On every function of the paper's Table 1 but the step function, the paper_experiments variant with
+    ``n_slack = 0`` takes as many iterations as the paper reports.
 
-    The paper's table comes from the authors' MATLAB code, which applies the robust form.
+    The paper's table comes from the authors' MATLAB code, which the paper_experiments variant follows.
 
     On the step function, the table reports 34 iterations, which MATLAB's arithmetic produced, and `ITP` takes 35, so
     the test leaves that function out.
@@ -91,7 +95,7 @@ def test_the_iteration_counts_of_table_1_of_the_paper_are_reproduced(name):
     f, n_iterations = _PAPER_TABLE_1[name]
 
     # --- act --------------------------
-    result = ITP(n_slack=0, is_robust=True).solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
+    result = ITP(n_slack=0, variant="paper_experiments").solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
 
     # --- assert -----------------------
     assert (result.status, result.n_fevals) == (SolveStatus.CONVERGED, n_iterations + 2)
@@ -101,17 +105,17 @@ def test_the_iteration_counts_of_table_1_of_the_paper_are_reproduced(name):
 #  The bound on the iteration count
 # ==================================================================================================
 @pytest.mark.parametrize("name", _PAPER_TABLE_1)
-def test_the_robust_form_with_slack_stays_within_n_max_on_the_functions_of_the_paper(name):
-    """On every function of the paper's Table 1, the robust form with ``n_slack = 4`` takes at most
+def test_the_paper_experiments_variant_with_slack_stays_within_n_max_on_the_functions_of_the_paper(name):
+    """On every function of the paper's Table 1, the paper_experiments variant with ``n_slack = 4`` takes at most
     ``n_max = 34 + 4`` iterations.
 
-    This holds on these functions only: on harder ones, rounding errors can make this form go past ``n_max`` too.
+    This holds on these functions only: on harder ones, rounding errors can make this variant go past ``n_max`` too.
     """
     # --- arrange ----------------------
     f, _ = _PAPER_TABLE_1[name]
 
     # --- act --------------------------
-    result = ITP(n_slack=4, is_robust=True).solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
+    result = ITP(n_slack=4, variant="paper_experiments").solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
@@ -119,20 +123,19 @@ def test_the_robust_form_with_slack_stays_within_n_max_on_the_functions_of_the_p
 
 
 @pytest.mark.parametrize(
-    "name, is_robust",
+    "name, variant",
     [
-        ("polynomial_2", False),
-        ("step_function", True),
+        ("polynomial_2", "paper_pseudocode"),
+        ("step_function", "paper_experiments"),
     ],
 )
-def test_rounding_errors_can_push_either_form_past_n_max(name, is_robust):
-    """Without slack, rounding errors can make `ITP` take 1 iteration more than ``n_max = 34``, in the published
-    form as well as in the robust form."""
+def test_rounding_errors_can_push_either_variant_past_n_max(name, variant):
+    """Without slack, rounding errors can make `ITP` take 1 iteration more than ``n_max = 34``, in either variant."""
     # --- arrange ----------------------
     f, _ = _PAPER_TABLE_1[name]
 
     # --- act --------------------------
-    result = ITP(n_slack=0, is_robust=is_robust).solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
+    result = ITP(n_slack=0, variant=variant).solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
 
     # --- assert -----------------------
     assert result.n_fevals - 2 == _N_BISECTION + 1
@@ -141,11 +144,11 @@ def test_rounding_errors_can_push_either_form_past_n_max(name, is_robust):
 # ==================================================================================================
 #  The steps
 # ==================================================================================================
-@pytest.mark.parametrize("is_robust", [True, False])
-def test_a_root_at_the_midpoint_is_found_in_1_iteration(is_robust):
+@pytest.mark.parametrize("variant", _VARIANTS)
+def test_a_root_at_the_midpoint_is_found_in_1_iteration(variant):
     """On a line through 0 over ``[-1, 1]``, the interpolation point is the midpoint, which is the root."""
     # --- act --------------------------
-    result = ITP(n_slack=0, is_robust=is_robust).solve(lambda x: x, -1.0, 1.0, xtol=_XTOL, max_fevals=10)
+    result = ITP(n_slack=0, variant=variant).solve(lambda x: x, -1.0, 1.0, xtol=_XTOL, max_fevals=10)
 
     # --- assert -----------------------
     assert (result.x, result.status, result.n_fevals) == (0.0, SolveStatus.CONVERGED, 3)
@@ -156,18 +159,42 @@ def test_a_smooth_function_converges_to_its_root(f):
     """On `cubic`, which increases, and `decreasing_cubic`, which decreases, `ITP` converges within ``xtol`` of the
     root."""
     # --- act --------------------------
-    result = ITP(n_slack=4, is_robust=True).solve(f, 1.0, 2.0, xtol=1e-10, max_fevals=60)
+    result = ITP(n_slack=4, variant="paper_experiments").solve(f, 1.0, 2.0, xtol=1e-10, max_fevals=60)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
     assert abs(result.x - CUBIC_ROOT) <= 1e-10
 
 
+def test_the_paper_pseudocode_variant_ends_as_bisection_once_its_slack_runs_out():
+    """On the paper's first polynomial, the projection radius of the paper_pseudocode variant reaches 0 and stays 0,
+    so it takes bisection's 34 iterations, where the margin of the paper_experiments variant keeps a reserve that
+    lets interpolation steps return."""
+    # --- arrange ----------------------
+    f, _ = _PAPER_TABLE_1["polynomial_1"]
+
+    # --- act --------------------------
+    n_iterations = {
+        variant: ITP(n_slack=0, variant=variant).solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100).n_fevals - 2
+        for variant in _VARIANTS
+    }
+
+    # --- assert -----------------------
+    assert n_iterations == {"paper_pseudocode": _N_BISECTION, "paper_experiments": 18}
+
+
+def test_an_unknown_variant_is_rejected():
+    """A variant outside the annotation of `ITP.__init__` raises a `ValueError` that names it."""
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match="'robust'"):
+        ITP(n_slack=0, variant="robust")  # ty: ignore[invalid-argument-type] — the test passes a wrong value
+
+
 def test_a_negative_n_slack_is_rejected():
     """A negative ``n_slack`` raises a `ValueError` that names it."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="-1"):
-        ITP(n_slack=-1, is_robust=True)
+        ITP(n_slack=-1, variant="paper_experiments")
 
 
 # ==================================================================================================
@@ -176,7 +203,7 @@ def test_a_negative_n_slack_is_rejected():
 def test_identity_and_that_its_arithmetic_is_counted():
     """`ITP` has name ``itp`` and version 1, and its flop count includes the logarithm that sets ``n_bisection``."""
     # --- act --------------------------
-    result = ITP(n_slack=4, is_robust=True).solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=40)
+    result = ITP(n_slack=4, variant="paper_experiments").solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=40)
 
     # --- assert -----------------------
     assert (ITP.name, ITP.version) == ("itp", 1)

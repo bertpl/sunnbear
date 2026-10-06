@@ -1,6 +1,7 @@
 """`ITP` implements the ITP method: interpolation, truncated toward the midpoint and projected around it."""
 
 import math
+from typing import Literal
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval
 
@@ -8,7 +9,7 @@ from .state import ITPState
 
 
 class ITP(BracketingSolver[ITPState]):
-    """`ITP` implements the ITP method, as the pseudocode in Appendix B of its paper states it or in the robust form.
+    """`ITP` implements the ITP method, in the variant of its paper's pseudocode or in that of its paper's experiments.
 
     The paper is Oliveira and Takahashi, ACM Transactions on Mathematical Software 47(1), article 5. Each iteration
     evaluates 1 point, ``x_itp``, which it computes from the interval ``[a, b]`` and its midpoint ``x_half`` in 3
@@ -36,10 +37,22 @@ class ITP(BracketingSolver[ITPState]):
     The constants follow the paper's experiments: ``kappa_2 = 2``, and ``kappa_1 = 0.2 / (b0 - a0)``, so that the
     first truncation moves ``x_f`` by at most 20 % of the initial width.
 
-    ``is_robust`` selects the robust form, which replaces ``r`` with ``max(0.99 * r - xtol / 2, 0)``, the correction
-    for rounding errors that the authors' MATLAB code applies and that the paper's Appendix B recommends in general
-    terms; the published form, without that correction, is the paper's pseudocode. The correction makes solves that
-    go past ``n_max`` rarer, but does not prevent them all.
+    ``variant`` picks the projection radius ``r``, from 1 of 2 sources in the paper:
+
+    - ``"paper_pseudocode"``: ``r`` as the pseudocode of the paper's Appendix B states it.
+    - ``"paper_experiments"``: ``r`` becomes ``max(0.99 * r - xtol / 2, 0)``, as in the authors' MATLAB code that
+      produced the paper's experiments; the authors shared that code on request, and it is not published. This
+      variant comes much closer to the iteration counts of the paper's Table 1 than the pseudocode: it matches 23 of
+      the 24 rows, and differs by 1 iteration on the step function, as a line-by-line port of that MATLAB code does
+      too.
+
+    The margin of ``"paper_experiments"`` has 2 effects:
+
+    - it guards against rounding errors in ``r``, as the paper's Appendix B recommends in general terms; this makes
+      solves that go past ``n_max`` rarer, but does not prevent them all;
+    - it never spends the last 1 % of ``r``. Under ``"paper_pseudocode"``, once a step lands at the edge of the
+      allowed range, ``r`` becomes 0 and stays 0, so the solve ends as pure bisection; the reserve that
+      ``"paper_experiments"`` keeps lets interpolation steps return once the interval has shrunk.
 
     The interval, the stopping criterion and the root estimate are `BracketingSolver`'s: the solve ends once the
     interval is at most ``2 * xtol`` wide, as in the paper, and returns its midpoint.
@@ -52,21 +65,24 @@ class ITP(BracketingSolver[ITPState]):
     # `_KAPPA_2` is the paper's kappa_2; kappa_1 depends on the initial interval, so `_solve` sets it per solve.
     _KAPPA_2 = 2
 
-    def __init__(self, *, n_slack: int, is_robust: bool) -> None:
+    def __init__(self, *, n_slack: int, variant: Literal["paper_pseudocode", "paper_experiments"]) -> None:
         """Configure the method.
 
         Args:
             n_slack: The paper's ``n_0``, the number of iterations that the solve may take beyond the iteration count
                 of bisection.
-            is_robust: Whether ``r`` gets the correction for rounding errors that the authors' MATLAB code applies.
+            variant: The source in the paper that the projection radius ``r`` follows; the class docstring describes
+                each.
 
         Raises:
-            ValueError: If ``n_slack`` is negative.
+            ValueError: If ``n_slack`` is negative, or ``variant`` is not 1 of the values in its annotation.
         """
         if n_slack < 0:
             raise ValueError(f"n_slack must be at least 0 (got {n_slack}).")
+        if variant not in ("paper_pseudocode", "paper_experiments"):
+            raise ValueError(f"variant must be 'paper_pseudocode' or 'paper_experiments' (got {variant!r}).")
         self.n_slack = n_slack
-        self.is_robust = is_robust
+        self.variant = variant
 
     def _solve(self, state: ITPState) -> float:
         """Set the solve's ``kappa_1`` and first ``max_next_width`` on ``state``, then run `BracketingSolver`'s loop.
@@ -107,7 +123,8 @@ class ITP(BracketingSolver[ITPState]):
         # --- projection -------------------------
         r = state.max_next_width - 0.5 * interval.width
         state.max_next_width = 0.5 * state.max_next_width
-        if self.is_robust:
+        if self.variant == "paper_experiments":
+            # The margin of the authors' MATLAB code; the class docstring describes its 2 effects.
             r = max(0.99 * r - 0.5 * state.xtol, 0.0)
         if abs(x_t - x_half) <= r:
             return x_t
