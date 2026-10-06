@@ -125,18 +125,23 @@ jobs:
     # `always()`, an upstream failure would skip the gate, and GitHub treats a
     # skipped required check as passing.
     #
-    # The gate passes only when every job in `needs` ended in `success`. A job
-    # skipped by its own `if:` reports the same result as one skipped because an
-    # upstream job failed or was cancelled, so no job in `needs` may skip itself:
-    # an optional check runs, decides inside the job whether it applies, and
-    # succeeds without doing the work when it does not, setting a job output if
-    # a later job needs to know which happened.
+    # The gate passes only when every job in `needs` ended in `success`.
+    #
+    # A job skipped by its own `if:` reports `skipped`, the same result as a job
+    # skipped because an upstream job failed or was cancelled. The gate cannot
+    # tell these cases apart, so no job in `needs` may skip itself.
+    #
+    # A job whose work applies only to some runs therefore always runs, and
+    # inside the job it:
+    #   - decides whether the work applies;
+    #   - succeeds without doing the work when it does not;
+    #   - sets a job output if a later job needs to know whether the work ran.
     if: always()
     needs: [preflight, pre-commit, test, package, pip-audit]
     runs-on: ubuntu-latest
     steps:
-      # The check runs in the script: a step-level `if:` can skip the step
-      # silently and leave the gate green.
+      # The script checks the job results itself: a step-level `if:` can skip
+      # the step silently and let the gate pass.
       - name: Fail unless every required job succeeded
         env:
           NEEDS: ${{ toJSON(needs) }}
