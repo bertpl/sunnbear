@@ -59,9 +59,9 @@ class ITP(BracketingSolver[ITPState]):
 
     References:
         - Oliveira, I. F. D. and Takahashi, R. H. C. (2020). An enhancement of the bisection method average
-          performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), article 5. Its
-          Appendix B holds the pseudocode that ``"paper_pseudocode"`` follows, and the test suite compares `ITP`
-          with the iteration counts of its Table 1. https://doi.org/10.1145/3423597
+          performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), article 5.
+          ``"paper_pseudocode"`` follows the pseudocode in the paper's Appendix B, and the test suite compares `ITP`
+          with the iteration counts in the paper's Table 1. https://doi.org/10.1145/3423597
         - The authors' MATLAB code that produced the paper's experiments, which ``"paper_experiments"`` follows. The
           authors shared it on request; it is not published.
     """
