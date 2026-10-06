@@ -19,7 +19,8 @@ class Bisection(BracketingSolver):
           edition, section 9.1.1. Cambridge University Press.
         - Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition, section 2.1.
           John Wiley & Sons.
-        - SciPy's ``scipy.optimize.bisect``; the test suite checks `Bisection` against it.
+        - SciPy's ``scipy.optimize.bisect``; the test suite checks `Bisection` against
+          ``scipy.optimize.bisect``.
     """
 
     name = "bisection"
