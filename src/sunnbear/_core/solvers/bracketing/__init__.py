@@ -17,6 +17,7 @@ Each solver class holds its whole algorithm, even where 2 solvers differ in a si
 Variants of one algorithm, such as different values of one of its parameters, are configs of a single class.
 """
 
+from .anderson_bjorck import AndersonBjorck
 from .bisection import Bisection
 from .brent import Brent
 from .chandrupatla import Chandrupatla
