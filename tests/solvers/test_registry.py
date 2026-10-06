@@ -6,6 +6,11 @@ from sunnbear._core.solvers.bracketing.bisection.configs import BisectionConfig
 from sunnbear._core.solvers.bracketing.brent.configs import BrentConfig
 from sunnbear._core.solvers.bracketing.chandrupatla.configs import ChandrupatlaConfig
 from sunnbear._core.solvers.bracketing.illinois.configs import IllinoisConfig
+from sunnbear._core.solvers.bracketing.itp.configs import (
+    ITPPaperExperimentsSlack0Config,
+    ITPPaperExperimentsSlack4Config,
+    ITPPaperPseudocodeSlack0Config,
+)
 from sunnbear._core.solvers.bracketing.regula_falsi.configs import RegulaFalsiConfig
 from sunnbear._core.solvers.bracketing.ridders.configs import (
     RiddersBracketingSolverConfig,
@@ -14,6 +19,7 @@ from sunnbear._core.solvers.bracketing.ridders.configs import (
 )
 from sunnbear.exceptions import UnknownSolverConfigError
 from sunnbear.solvers import (
+    ITP,
     Bisection,
     Brent,
     Chandrupatla,
@@ -36,6 +42,19 @@ from .example_solvers import WeightedSplitSolver, define_config
         (BisectionConfig, "bisection", Bisection, SolverRole.BUILTIN_BASELINE),
         (BrentConfig, "brent", Brent, SolverRole.BUILTIN_CORE),
         (IllinoisConfig, "illinois", Illinois, SolverRole.BUILTIN_CORE),
+        (
+            ITPPaperExperimentsSlack0Config,
+            "itp[n_slack=0,variant='paper_experiments']",
+            ITP,
+            SolverRole.BUILTIN_SECONDARY,
+        ),
+        (
+            ITPPaperPseudocodeSlack0Config,
+            "itp[n_slack=0,variant='paper_pseudocode']",
+            ITP,
+            SolverRole.BUILTIN_SECONDARY,
+        ),
+        (ITPPaperExperimentsSlack4Config, "itp[n_slack=4,variant='paper_experiments']", ITP, SolverRole.BUILTIN_CORE),
         (RegulaFalsiConfig, "regula_falsi", RegulaFalsi, SolverRole.BUILTIN_SECONDARY),
         (
             RiddersBracketingSolverConfig,
@@ -79,6 +98,9 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         "brent",
         "chandrupatla",
         "illinois",
+        "itp[n_slack=0,variant='paper_experiments']",
+        "itp[n_slack=0,variant='paper_pseudocode']",
+        "itp[n_slack=4,variant='paper_experiments']",
         "regula_falsi",
         "ridders[variant='bracketing_solver']",
         "ridders[variant='commons_math']",
@@ -86,7 +108,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         "weighted_split[weight=0.25]",
         "weighted_split[weight=0.75]",
     ]
-    assert solver_classes == (Bisection, Brent, Chandrupatla, Illinois, RegulaFalsi, Ridders, WeightedSplitSolver)
+    assert solver_classes == (Bisection, Brent, Chandrupatla, Illinois, ITP, RegulaFalsi, Ridders, WeightedSplitSolver)
 
 
 def test_config_from_id_rejects_an_unknown_id():

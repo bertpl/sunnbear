@@ -149,7 +149,8 @@ select = [
     "C901",    # mccabe complexity gate (threshold in [tool.ruff.lint.mccabe])
 ]
 # The final return of an if/elif chain goes inside `else:`, so every arm is a peer; RET505 flags that form.
-ignore = ["RET505"]
+# A decision whose branch computes a value is laid out as if/else statements; SIM108 flags that form.
+ignore = ["RET505", "SIM108"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
