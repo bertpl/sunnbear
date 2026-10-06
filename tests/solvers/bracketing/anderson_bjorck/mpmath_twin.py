@@ -18,10 +18,9 @@ class AndersonBjorckMpmathTwin(TwinSolver):
     - mpmath computes the chord's zero as ``a - fa / ((fb - fa) / (b - a))``, a step from ``a``, where
       `AndersonBjorck` uses regula falsi's ``(a * fb - b * fa) / (fb - fa)``, so the iterates can differ in their last
       bits;
-    - the twin test leaves out the shared test cases on `steep_exponential`. There, both solves enter the slow
-      progress that the `AndersonBjorck` class docstring describes and need more evaluations than the shared budget.
-      In that phase, ``1 - f_new / f_previous`` loses about 8 digits to cancellation, which magnifies the last-bit
-      differences of the chord to thousands of ulps.
+    - in the slow progress that the `AndersonBjorck` class docstring describes, ``1 - f_new / f_previous`` loses about
+      8 digits to cancellation, which magnifies the last-bit differences between the 2 chord formulas to differences of
+      thousands of ulps in the iterates.
     """
 
     name = "anderson_bjorck_mpmath_twin"

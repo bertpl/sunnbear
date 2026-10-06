@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add the ITP solver, `sunnbear.solvers.ITP`
 - Add the TOMS 748 solver, `sunnbear.solvers.TOMS748`
 - Add the Pegasus solver, `sunnbear.solvers.Pegasus`
-- Add the Anderson–Björck solver, `sunnbear.solvers.AndersonBjorck`
+- Add the Anderson-Björck solver, `sunnbear.solvers.AndersonBjorck`
 
 ### Changed
 

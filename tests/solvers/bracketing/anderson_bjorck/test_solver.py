@@ -1,5 +1,6 @@
-"""These tests assert that `AndersonBjorck` scales down the value of a bound that the interval keeps twice in a row, by
-the factor ``1 - f_new / f_previous`` or by 0.5 where that factor is not positive, which ends regula falsi's stall."""
+"""These tests assert that `AndersonBjorck` scales down the function value of a bound that the interval keeps twice in
+a row, by the factor ``1 - f_new / f_previous`` or by 0.5 where that factor is not positive, which ends regula falsi's
+stall."""
 
 import math
 
@@ -10,8 +11,8 @@ from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic,
 
 
 def _cubic_with_a_local_maximum(x: float) -> float:
-    """Return ``x^3 - 2x + 2``; on ``[-3, 0]`` it rises to a local maximum near -0.82 and falls to 2 at 0, so ``|f|``
-    grows along the first iterates from 0, on the same side of the root, near -1.77."""
+    """Return ``x^3 - 2x + 2``, whose root is near -1.77; between the root and 0, f rises from 2 at 0 to a local maximum
+    near -0.82, so the first iterates from ``[-3, 0]``, which land in that range, raise ``|f|``."""
     return x**3 - 2.0 * x + 2.0
 
 
@@ -73,7 +74,7 @@ def test_the_factor_falls_back_to_0_5_when_an_iterate_does_not_reduce_abs_f():
     # --- assert -----------------------
     (x1, f1), (x2, f2), (x3, _) = history[2:5]
     assert x1 == (a * fb - b * fa) / (fb - fa)
-    # f1 > fb > 0, so x1 replaced the upper bound, the previous iterate, and 1 - f1 / fb is negative.
+    # f1 > fb > 0, so x1 replaced the upper bound, which counts as the previous iterate, and 1 - f1 / fb is negative.
     assert f1 > fb > 0.0
     assert x2 == (a * f1 - x1 * (0.5 * fa)) / (f1 - 0.5 * fa)
     # f2 > f1 > 0, so 1 - f2 / f1 is negative too, and the retained value is halved again.
