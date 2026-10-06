@@ -1,5 +1,5 @@
 """These tests assert that `Pegasus` scales down the value of a bound that the interval keeps twice in a row, by the
-Pegasus factor, which ends regula falsi's stall."""
+factor ``f_previous / (f_previous + f_new)``, which ends regula falsi's stall."""
 
 import pytest
 
@@ -14,8 +14,8 @@ from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
     "f", [lambda x: x - 0.3, lambda x: 0.3 - x]
 )  # The 2 functions cover both interval orientations.
 def test_a_linear_function_is_solved_in_one_step(f):
-    """On a straight line, the first chord lands on the root, so `Pegasus` converges after 3 evaluations without
-    scaling any value."""
+    """On a straight line, the first chord lands on the root, so `Pegasus` converges after the 2 bound evaluations
+    and 1 iterate."""
     # --- act --------------------------
     result = Pegasus().solve(f, 0.0, 1.0, xtol=1e-12, max_fevals=10)
 
