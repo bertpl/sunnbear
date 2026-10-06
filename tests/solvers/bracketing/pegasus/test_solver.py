@@ -23,9 +23,9 @@ def test_a_linear_function_is_solved_in_one_step(f):
     assert (result.x, result.status, result.n_fevals) == (0.3, SolveStatus.CONVERGED, 3)
 
 
-def test_the_first_2_steps_are_regula_falsi_and_later_steps_scale_the_retained_bound():
+def test_the_first_2_steps_are_regula_falsi_and_later_steps_scale_the_retained_f():
     """On the convex cubic, Pegasus starts as regula falsi, then scales the value of the bound that it keeps again,
-    each time by the factor of the 2 most recent iterates."""
+    each time by the factor ``f_previous / (f_previous + f_new)`` of the 2 most recent iterates."""
     # --- arrange ----------------------
     a, b = 1.0, 2.0
     fa, fb = cubic(a), cubic(b)
@@ -54,14 +54,14 @@ def test_a_convex_function_converges_where_regula_falsi_stalls(f):
     """On `cubic` in both interval orientations, regula falsi exhausts its budget, while Pegasus converges well
     within it."""
     # --- act --------------------------
-    regula_falsi = RegulaFalsi().solve(f, 1.0, 2.0, xtol=1e-9, max_fevals=60)
-    pegasus = Pegasus().solve(f, 1.0, 2.0, xtol=1e-9, max_fevals=60)
+    regula_falsi_result = RegulaFalsi().solve(f, 1.0, 2.0, xtol=1e-9, max_fevals=60)
+    pegasus_result = Pegasus().solve(f, 1.0, 2.0, xtol=1e-9, max_fevals=60)
 
     # --- assert -----------------------
-    assert regula_falsi.status is SolveStatus.MAX_FEVALS
-    assert pegasus.status is SolveStatus.CONVERGED
-    assert abs(pegasus.x - CUBIC_ROOT) <= 1e-9
-    assert pegasus.n_fevals <= 15
+    assert regula_falsi_result.status is SolveStatus.MAX_FEVALS
+    assert pegasus_result.status is SolveStatus.CONVERGED
+    assert abs(pegasus_result.x - CUBIC_ROOT) <= 1e-9
+    assert pegasus_result.n_fevals <= 15
 
 
 # ==================================================================================================

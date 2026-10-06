@@ -8,7 +8,8 @@ from .solver import Pegasus
 class PegasusConfig(SolverConfig):
     """`PegasusConfig` is a secondary config.
 
-    `IllinoisConfig` already represents the modified regula falsi family among the core configs.
+    It is not core because `IllinoisConfig` already represents the modified regula falsi family among the core
+    configs.
     """
 
     solver_cls = Pegasus
