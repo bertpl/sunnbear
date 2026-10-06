@@ -7,7 +7,7 @@ from sunnbear._core.solvers.bracketing.brent.configs import BrentConfig
 from sunnbear._core.solvers.bracketing.chandrupatla.configs import ChandrupatlaConfig
 from sunnbear._core.solvers.bracketing.illinois.configs import IllinoisConfig
 from sunnbear._core.solvers.bracketing.itp.configs import (
-    ITPPublishedConfig,
+    ITPPublishedSlack0Config,
     ITPRobustSlack0Config,
     ITPRobustSlack4Config,
 )
@@ -42,7 +42,7 @@ from .example_solvers import WeightedSplitSolver, define_config
         (BisectionConfig, "bisection", Bisection, SolverRole.BUILTIN_BASELINE),
         (BrentConfig, "brent", Brent, SolverRole.BUILTIN_CORE),
         (IllinoisConfig, "illinois", Illinois, SolverRole.BUILTIN_CORE),
-        (ITPPublishedConfig, "itp[is_robust=False,n_slack=0]", ITP, SolverRole.BUILTIN_SECONDARY),
+        (ITPPublishedSlack0Config, "itp[is_robust=False,n_slack=0]", ITP, SolverRole.BUILTIN_SECONDARY),
         (ITPRobustSlack0Config, "itp[is_robust=True,n_slack=0]", ITP, SolverRole.BUILTIN_SECONDARY),
         (ITPRobustSlack4Config, "itp[is_robust=True,n_slack=4]", ITP, SolverRole.BUILTIN_CORE),
         (RegulaFalsiConfig, "regula_falsi", RegulaFalsi, SolverRole.BUILTIN_SECONDARY),

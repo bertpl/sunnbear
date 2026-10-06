@@ -8,9 +8,10 @@ import pytest
 from sunnbear.solvers import ITP, SolveStatus
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 
-# The paper's experiments solve every function on [-1, 1] with this xtol, where bisection needs 34 iterations.
+# The paper's experiments solve every function on [-1, 1] with this xtol, where bisection needs `_N_BISECTION`
+# iterations.
 _XTOL = 1e-10
-_N_HALF = 34
+_N_BISECTION = 34
 
 
 def _sawtooth(x: float) -> float:
@@ -35,7 +36,7 @@ def _warsaw(x: float) -> float:
 
 
 def _circles(x: float) -> float:
-    """Return the paper's circles function, with the sign of ``3x + 1``, which is 0 where ``3x + 1`` is 0."""
+    """Return the paper's circles function, which takes the sign of ``3x + 1`` and is 0 where ``3x + 1`` is 0."""
     sign = (3.0 * x + 1.0 > 0.0) - (3.0 * x + 1.0 < 0.0)
     return sign * (1.0 - math.sqrt(1.0 - (3.0 * x + 1.0) ** 2 / 81.0))
 
@@ -81,9 +82,10 @@ def test_the_iteration_counts_of_table_1_of_the_paper_are_reproduced(name):
     """On every function of the paper's Table 1 but the step function, the robust form with ``n_slack = 0`` takes as
     many iterations as the paper reports.
 
-    The paper's table comes from the authors' MATLAB code, which is the robust form. On the step function, `ITP`
-    takes 35 iterations where the table reports 34; a line-by-line Python port of that MATLAB code also takes 35,
-    through the same points, so the difference lies in MATLAB's arithmetic, not in `ITP`.
+    The paper's table comes from the authors' MATLAB code, which is the robust form.
+
+    On the step function, MATLAB's arithmetic gives the table 34 iterations where `ITP` takes 35, so the test leaves
+    that function out.
     """
     # --- arrange ----------------------
     f, n_iterations = _PAPER_TABLE_1[name]
@@ -99,7 +101,7 @@ def test_the_iteration_counts_of_table_1_of_the_paper_are_reproduced(name):
 #  The bound on the iteration count
 # ==================================================================================================
 @pytest.mark.parametrize("name", _PAPER_TABLE_1)
-def test_the_robust_form_with_slack_never_takes_more_than_n_max_iterations(name):
+def test_the_robust_form_with_slack_stays_within_n_max_on_the_functions_of_the_paper(name):
     """On every function of the paper's Table 1, the robust form with ``n_slack = 4`` takes at most
     ``n_max = 34 + 4`` iterations."""
     # --- arrange ----------------------
@@ -110,22 +112,27 @@ def test_the_robust_form_with_slack_never_takes_more_than_n_max_iterations(name)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert result.n_fevals - 2 <= _N_HALF + 4
+    assert result.n_fevals - 2 <= _N_BISECTION + 4
 
 
-def test_rounding_errors_can_push_the_published_form_past_n_max():
-    """On the paper's second polynomial, rounding errors in the projection radius make the published form take 1
-    iteration more than ``n_max = 34``, while the robust form takes 16."""
+@pytest.mark.parametrize(
+    "name, is_robust",
+    [
+        ("polynomial_2", False),  # Rounding errors in the projection radius cause this overshoot.
+        ("step_function", True),  # The robust form reduces overshoots but does not prevent them all.
+    ],
+)
+def test_rounding_errors_can_push_either_form_past_n_max(name, is_robust):
+    """Without slack, rounding errors can make `ITP` take 1 iteration more than ``n_max = 34``, in the published
+    form as well as in the robust form."""
     # --- arrange ----------------------
-    f, _ = _PAPER_TABLE_1["polynomial_2"]
+    f, _ = _PAPER_TABLE_1[name]
 
     # --- act --------------------------
-    published_result = ITP(n_slack=0, is_robust=False).solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
-    robust_result = ITP(n_slack=0, is_robust=True).solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
+    result = ITP(n_slack=0, is_robust=is_robust).solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
 
     # --- assert -----------------------
-    assert published_result.n_fevals - 2 == _N_HALF + 1
-    assert robust_result.n_fevals - 2 == 16
+    assert result.n_fevals - 2 == _N_BISECTION + 1
 
 
 # ==================================================================================================
@@ -164,7 +171,7 @@ def test_a_negative_n_slack_is_rejected():
 #  Identity and cost
 # ==================================================================================================
 def test_identity_and_that_its_arithmetic_is_counted():
-    """`ITP` has name ``itp`` and version 1, and its flop count includes the logarithm that sets ``n_half``."""
+    """`ITP` has name ``itp`` and version 1, and its flop count includes the logarithm that sets ``n_bisection``."""
     # --- act --------------------------
     result = ITP(n_slack=4, is_robust=True).solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=40)
 
