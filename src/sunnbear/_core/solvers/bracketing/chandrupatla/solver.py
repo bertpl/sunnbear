@@ -8,7 +8,7 @@ from sunnbear._core.solvers.core import Solver, SolveState
 class Chandrupatla(Solver):
     """`Chandrupatla` implements Chandrupatla's method, following the BASIC listing ``NEWZERO.BAS`` of its paper.
 
-    The paper is Chandrupatla, Advances in Engineering Software 28, 1997. The method keeps 3 points:
+    The method, from Chandrupatla (1997), keeps 3 points:
 
     - ``x1``, the newest point;
     - ``x2``, the other interval bound, where ``f`` has the other sign;
@@ -37,6 +37,13 @@ class Chandrupatla(Solver):
 
     `Chandrupatla` tracks a third point besides the 2 interval bounds, and stops by the paper's own criterion, so it
     writes its own loop, not `BracketingSolver`'s.
+
+    References:
+        - Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear
+          function without using derivatives. Advances in Engineering Software 28(3), 145-149. `Chandrupatla`
+          follows its BASIC listing ``NEWZERO.BAS``, and the test suite reproduces its Table 2.
+          https://doi.org/10.1016/S0965-9978(96)00051-8
+        - SciPy's ``scipy.optimize.elementwise.find_root``; the test suite checks `Chandrupatla` against it.
     """
 
     name = "chandrupatla"
