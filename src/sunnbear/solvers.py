@@ -33,6 +33,7 @@ from ._core.solvers.core import (
     SolveState,
     SolveStatus,
 )
+from ._core.solvers.open import Secant
 
 __all__ = [
     "ITP",
@@ -52,6 +53,7 @@ __all__ = [
     "RegulaFalsi",
     "Ridders",
     "RiddersVariant",
+    "Secant",
     "SolveResult",
     "SolveState",
     "SolveStatus",

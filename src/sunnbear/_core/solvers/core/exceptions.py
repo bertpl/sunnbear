@@ -6,10 +6,10 @@ from sunnbear._core.exceptions import SunnbearError
 class SolveException(SunnbearError):  # noqa: N818 — the name marks a control-flow signal, not an error condition.
     """`SolveException` is the base class for the exceptions that stop a solve early.
 
-    `WrappedFunction` raises one of the subclasses from inside an evaluation; `Solver.solve`
-    catches every `SolveException` and maps it to a `SolveStatus`, so none of them ever reaches
-    the caller of ``solve()``. Solver implementations must let them propagate — catching one hides
-    a failed run.
+    `WrappedFunction` raises one of the subclasses from inside an evaluation, and a solver may raise `DivergedError`
+    itself; `Solver.solve` catches every `SolveException` and maps it to a `SolveStatus`, so none of them ever
+    reaches the caller of ``solve()``. Solver implementations must let them propagate — catching one hides a failed
+    run.
     """
 
 
@@ -18,7 +18,10 @@ class MaxFevalsExceeded(SolveException):
 
 
 class DivergedError(SolveException):
-    """`WrappedFunction` raises this when a solver asks for an evaluation at a non-finite ``x``."""
+    """`WrappedFunction` raises this when a solver asks for an evaluation at a non-finite ``x``.
+
+    A solver raises it itself when its next point lies at infinity, such as a step to the zero of a horizontal line.
+    """
 
 
 class FunctionDomainError(SolveException):

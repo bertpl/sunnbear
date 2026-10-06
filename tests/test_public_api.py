@@ -13,6 +13,7 @@ import sunnbear._core.functions.core.exceptions
 import sunnbear._core.solvers.bracketing
 import sunnbear._core.solvers.core
 import sunnbear._core.solvers.core.exceptions
+import sunnbear._core.solvers.open
 import sunnbear._core.stats
 import sunnbear.benchmark
 import sunnbear.data
@@ -47,7 +48,10 @@ def _is_submodule(module, name: str) -> bool:
         (sunnbear.benchmark, (sunnbear._core.benchmark,)),
         (sunnbear.data, (sunnbear._core.artifacts.listing,)),
         (sunnbear.functions, (sunnbear._core.functions.core,)),
-        (sunnbear.solvers, (sunnbear._core.solvers.core, sunnbear._core.solvers.bracketing)),
+        (
+            sunnbear.solvers,
+            (sunnbear._core.solvers.core, sunnbear._core.solvers.bracketing, sunnbear._core.solvers.open),
+        ),
         (
             sunnbear.exceptions,
             (

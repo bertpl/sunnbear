@@ -76,8 +76,8 @@ class Solver(ABC, Generic[StateT]):
         - Every abnormal ending becomes a `SolveStatus`, not an exception: ``solve()`` is invoked
           at scale during benchmarks and must not interrupt the pipeline.
         - Divergence is judged by where things ended: a solve whose result lies outside ``[a, b]``,
-          or whose function error happened outside ``[a, b]``, is ``DIVERGED``. Excursions that
-          return are not penalized.
+          or whose function error happened outside ``[a, b]``, is ``DIVERGED``, and so is a solve whose
+          next point lies at infinity (`DivergedError`). Excursions that return are not penalized.
         - The validation before the flop-counting context and the divergence checks after it are
           uncounted. Everything inside the context runs on `CountedFloat` and is counted: the
           zero and sign checks on ``f(a)`` and ``f(b)``, ``xtol``, the bookkeeping of the best
