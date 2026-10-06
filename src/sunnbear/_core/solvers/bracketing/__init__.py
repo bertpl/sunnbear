@@ -1,4 +1,8 @@
-"""This package holds the bracketing solvers, each a subclass of `BracketingSolver` from the solver core.
+"""This package holds the bracketing solvers, each a subclass of `BracketingSolver` or `Solver` from the solver core.
+
+A solver whose iteration evaluates 1 point and splits the interval there subclasses `BracketingSolver`, which owns
+the iteration loop and the stopping criterion. A solver whose iteration evaluates more than once, or whose stopping
+criterion is its own, subclasses `Solver` and writes its own loop.
 
 Each solver is a package of its own, holding its solver module, its built-in configs, and any helper
 modules. Importing this package registers the built-in configs.
@@ -16,3 +20,4 @@ Variants of one algorithm, such as different values of one of its parameters, ar
 from .bisection import Bisection
 from .illinois import Illinois
 from .regula_falsi import RegulaFalsi
+from .ridders import Ridders, RiddersVariant

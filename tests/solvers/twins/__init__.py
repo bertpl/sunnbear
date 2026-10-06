@@ -13,9 +13,12 @@ Every twin test follows the same rules, so that no twin takes an undocumented ap
   docstring.
 
 A twin stops where sunnbear's solver would stop, not where the reference implementation would:
-`StoppingWrappedFunction` raises `TwinConvergedSignal` once the interval, split at every point evaluated so far, meets
-`Interval.is_converged`. The 2 solves then evaluate the same number of points, and their different stopping
-criteria never need to be declared as a deviation.
+`StoppingWrappedFunction` raises `TwinConvergedSignal` once `TwinSolver._root_if_sunnbear_solver_stops` says that
+sunnbear's solver stops. The 2 solves then evaluate the same number of points, and their different stopping criteria
+never need to be declared as a deviation.
+
+By default, `TwinSolver._root_if_sunnbear_solver_stops` applies the stopping criterion of `BracketingSolver`; the twin
+of a solver with a stopping criterion of its own overrides that method with that solver's criterion.
 """
 
 from .agreement import MAX_ULPS_APART, assert_agrees_with_twin, ulps_apart
