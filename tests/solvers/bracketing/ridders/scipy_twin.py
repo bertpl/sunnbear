@@ -6,7 +6,7 @@ import numpy as np
 import scipy.optimize
 
 from sunnbear.solvers import Interval
-from tests.solvers.twins import TwinFunction, TwinSolver
+from tests.solvers.twins import StoppingWrappedFunction, TwinSolver
 
 
 class RiddersScipyTwin(TwinSolver):
@@ -47,7 +47,7 @@ class RiddersScipyTwin(TwinSolver):
         """Take the variant of the twin's `Ridders` config."""
         self.variant = variant
 
-    def _run_reference(self, f: TwinFunction, a: float, b: float, xtol: float) -> None:
+    def _run_reference(self, f: StoppingWrappedFunction, a: float, b: float, xtol: float) -> None:
         """Run SciPy's ridder with the variant's tolerances, as the class docstring gives them."""
         eps = float(np.finfo(float).eps)
         if self.variant == "scipy":

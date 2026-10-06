@@ -10,9 +10,14 @@ class TwinSolver(Solver):
     """A `TwinSolver` is a test-only `Solver` that runs a reference implementation, and declares how it deviates
     from exact agreement.
 
-    A subclass implements `_run_reference`; `_solve` wraps the function in a `TwinFunction`, so that every twin
-    stops where sunnbear's solver would stop. Where that solver has a stopping criterion of its own, not
-    `BracketingSolver`'s, the subclass also overrides `_root_if_sunnbear_solver_stops` with that criterion.
+    A subclass implements `_run_reference`. `_solve` passes it the solve's function wrapped in a
+    `StoppingWrappedFunction`, which interrupts the reference implementation once sunnbear's stopping criterion holds.
+    The reference implementation computes every point that it evaluates; only the moment it stops is sunnbear's.
+    Reference implementations stop by criteria of their own, so without the interruption the 2 solves would evaluate
+    different numbers of points even where every point agrees.
+
+    Where sunnbear's solver has a stopping criterion of its own, not `BracketingSolver`'s, the subclass also overrides
+    `_root_if_sunnbear_solver_stops` with that criterion.
 
     Attributes:
         n_reevaluated_bounds: The number of evaluations that the reference implementation makes at the interval
@@ -23,8 +28,9 @@ class TwinSolver(Solver):
     n_reevaluated_bounds: ClassVar[int] = 0
 
     def _solve(self, state: SolveState) -> float:
-        """Run the reference implementation through a `TwinFunction`, which stops it where sunnbear's solver would."""
-        f = TwinFunction(state, self)
+        """Run the reference implementation through a `StoppingWrappedFunction`, which stops it where sunnbear's
+        solver would."""
+        f = StoppingWrappedFunction(state, self)
         try:
             self._run_reference(f, float(state.interval.a), float(state.interval.b), float(state.xtol))
         except TwinConvergedSignal as converged:
