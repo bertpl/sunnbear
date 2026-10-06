@@ -20,7 +20,8 @@ class RegulaFalsi(BracketingSolver):
           edition, section 9.2. Cambridge University Press. The section calls the method false
           position.
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations.
-          Scientia Iranica 4(1&2), 28-34. Its equation 3 is the formula that `RegulaFalsi` computes.
+          Scientia Iranica 4(1&2), 28-34. The paper's equation 3 is the iteration formula of
+          `RegulaFalsi`.
     """
 
     name = "regula_falsi"
