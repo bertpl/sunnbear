@@ -9,7 +9,7 @@ _MACHEPS = sys.float_info.epsilon
 
 
 class Brent(Solver):
-    """`Brent` implements Brent's method, as the Algol 60 procedure ``zero`` (Brent, The Computer Journal 14, 1971).
+    """`Brent` implements Brent's method, as the Algol 60 procedure ``zero`` (Brent, 1971).
 
     Each iteration evaluates 1 point, reached by 1 of 3 steps from the best point so far:
 
@@ -44,6 +44,12 @@ class Brent(Solver):
 
     The bounds ``b`` and ``c`` swap roles as the iteration proceeds, and the stopping criterion is Brent's own, so
     `Brent` writes its own loop, not `BracketingSolver`'s.
+
+    References:
+        - Brent, R. P. (1971). An algorithm with guaranteed convergence for finding a zero of a function. The
+          Computer Journal 14(4), 422-425. Its appendix holds the Algol 60 procedure ``zero``.
+          https://doi.org/10.1093/comjnl/14.4.422
+        - SciPy's ``scipy.optimize.brentq``; the test suite checks `Brent` against it.
     """
 
     name = "brent"
