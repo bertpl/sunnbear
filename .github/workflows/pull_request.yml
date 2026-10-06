@@ -120,16 +120,17 @@ jobs:
 
   ci-gate:
     name: CI gate
-    # The single stable required check on main: branch protection requires only
-    # this, so the job set can change without re-touching repo settings. Without
-    # `always()`, an upstream failure would skip the gate, and GitHub treats a
-    # skipped required check as passing.
+    # The gate is the single stable required check on main: branch protection
+    # requires only the gate, so the job set can change without re-touching repo
+    # settings. Without `always()`, an upstream failure would skip the gate, and
+    # GitHub treats a skipped required check as passing.
     #
     # The gate passes only when every job in `needs` ended in `success`.
     #
     # A job skipped by its own `if:` reports `skipped`, the same result as a job
     # skipped because an upstream job failed or was cancelled. The gate cannot
-    # tell these cases apart, so no job in `needs` may skip itself.
+    # tell these cases apart, so it fails on any `skipped` result, and no job in
+    # `needs` may skip itself.
     #
     # A job whose work applies only to some runs therefore always runs, and
     # inside the job it:
