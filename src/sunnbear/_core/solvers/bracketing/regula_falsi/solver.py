@@ -14,6 +14,14 @@ class RegulaFalsi(BracketingSolver):
     The other bound is replaced every iteration and keeps approaching the root. Such a solve runs
     until its evaluation budget is exhausted and ends as ``MAX_FEVALS``. Its ``result.x`` is then the
     last evaluated point, which is close to the root.
+
+    References:
+        - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd
+          edition, section 9.2. Cambridge University Press. The section calls the method false
+          position.
+        - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations.
+          Scientia Iranica 4(1&2), 28-34. The paper's equation 3 is the iteration formula of
+          `RegulaFalsi`.
     """
 
     name = "regula_falsi"
