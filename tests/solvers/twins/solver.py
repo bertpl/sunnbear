@@ -10,8 +10,11 @@ class TwinSolver(Solver):
     """A `TwinSolver` is a test-only `Solver` that runs a reference implementation, and declares how it deviates
     from exact agreement.
 
-    A subclass implements only `_run_reference`; `_solve` wraps the function in a `StoppingWrappedFunction`, so that
-    every twin stops where sunnbear's solver would stop.
+    A subclass implements only `_run_reference`. `_solve` passes it the solve's function wrapped in a
+    `StoppingWrappedFunction`, which interrupts the reference implementation once sunnbear's stopping criterion holds.
+    The reference implementation computes every point that it evaluates; only the moment it stops is sunnbear's.
+    Reference implementations stop by criteria of their own, so without the interruption the 2 solves would evaluate
+    different numbers of points even where every point agrees.
 
     Attributes:
         n_reevaluated_bounds: The number of evaluations that the reference implementation makes at the interval
