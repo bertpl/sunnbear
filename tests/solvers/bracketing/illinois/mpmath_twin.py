@@ -3,7 +3,7 @@
 import mpmath
 from mpmath.calculus.optimization import Illinois as MpmathIllinois
 
-from tests.solvers.twins import TwinFunction, TwinSolver
+from tests.solvers.twins import StoppingWrappedFunction, TwinSolver
 
 
 class IllinoisMpmathTwin(TwinSolver):
@@ -22,7 +22,7 @@ class IllinoisMpmathTwin(TwinSolver):
     version = 1
     n_reevaluated_bounds = 2
 
-    def _run_reference(self, f: TwinFunction, a: float, b: float, xtol: float) -> None:
+    def _run_reference(self, f: StoppingWrappedFunction, a: float, b: float, xtol: float) -> None:
         """Iterate mpmath's solver; a tolerance of 0 disables mpmath's own stopping test on |f|."""
         # mpmath's class also runs 2 related methods; `method` picks the Illinois scaling of the retained bound.
         for _ in MpmathIllinois(mpmath.fp, f, [a, b], tol=0.0, verbose=False, method="illinois"):

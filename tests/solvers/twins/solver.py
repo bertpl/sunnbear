@@ -10,8 +10,8 @@ class TwinSolver(Solver):
     """A `TwinSolver` is a test-only `Solver` that runs a reference implementation, and declares how it deviates
     from exact agreement.
 
-    A subclass implements only `_run_reference`; `_solve` wraps the function in a `TwinFunction`, so that every twin
-    stops where sunnbear's solver would stop.
+    A subclass implements only `_run_reference`; `_solve` wraps the function in a `StoppingWrappedFunction`, so that
+    every twin stops where sunnbear's solver would stop.
 
     Attributes:
         n_reevaluated_bounds: The number of evaluations that the reference implementation makes at the interval
@@ -22,8 +22,9 @@ class TwinSolver(Solver):
     n_reevaluated_bounds: ClassVar[int] = 0
 
     def _solve(self, state: SolveState) -> float:
-        """Run the reference implementation through a `TwinFunction`, which stops it where sunnbear's solver would."""
-        f = TwinFunction(state, self.n_reevaluated_bounds)
+        """Run the reference implementation through a `StoppingWrappedFunction`, which stops it where sunnbear's
+        solver would."""
+        f = StoppingWrappedFunction(state, self.n_reevaluated_bounds)
         try:
             self._run_reference(f, float(state.interval.a), float(state.interval.b), float(state.xtol))
         except TwinConvergedSignal as converged:
@@ -31,7 +32,7 @@ class TwinSolver(Solver):
         raise AssertionError("The reference implementation stopped before sunnbear's stopping criterion held.")
 
     @abstractmethod
-    def _run_reference(self, f: "TwinFunction", a: float, b: float, xtol: float) -> None:
+    def _run_reference(self, f: "StoppingWrappedFunction", a: float, b: float, xtol: float) -> None:
         """Run the reference implementation on ``f`` over ``[a, b]``."""
 
     def history_without_reevaluations(self, result: SolveResult) -> list[tuple[float, float]]:
@@ -57,11 +58,11 @@ class TwinConvergedSignal(Exception):  # noqa: N818 — the name marks a control
         self.x = x
 
 
-class TwinFunction:
-    """`TwinFunction` wraps the solve's function for a twin's reference implementation.
+class StoppingWrappedFunction:
+    """A `StoppingWrappedFunction` is the function being solved, wrapped for a twin's reference implementation.
 
-    Each call evaluates through the solve's ``state.f``, so the evaluation is counted, capped and recorded in the
-    history.
+    Each call evaluates through the solve's ``state.f``, the framework's own `WrappedFunction`, so the evaluation is
+    counted, capped and recorded in the history.
 
     Each call also splits a plain-float copy of the interval at the evaluated point, and raises
     `TwinConvergedSignal` once that interval meets `Interval.is_converged`. The copy holds plain floats, so the

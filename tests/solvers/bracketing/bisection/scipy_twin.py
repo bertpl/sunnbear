@@ -2,7 +2,7 @@
 
 import scipy.optimize
 
-from tests.solvers.twins import TwinFunction, TwinSolver
+from tests.solvers.twins import StoppingWrappedFunction, TwinSolver
 
 
 class BisectionScipyTwin(TwinSolver):
@@ -22,6 +22,6 @@ class BisectionScipyTwin(TwinSolver):
     version = 1
     n_reevaluated_bounds = 2
 
-    def _run_reference(self, f: TwinFunction, a: float, b: float, xtol: float) -> None:
+    def _run_reference(self, f: StoppingWrappedFunction, a: float, b: float, xtol: float) -> None:
         """Run SciPy's bisect; its own stopping test on xtol and rtol is met later than Bisection's."""
         scipy.optimize.bisect(f, a, b, xtol=xtol)
