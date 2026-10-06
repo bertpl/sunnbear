@@ -55,6 +55,24 @@ class TwinSolver(Solver):
         else:
             return None
 
+    @staticmethod
+    def _bounds_by_smaller_abs_f(
+        interval: Interval, evaluations: list[tuple[float, float]]
+    ) -> tuple[tuple[float, float], tuple[float, float]]:
+        """Return the 2 bounds of ``interval`` as ``(x, f(x))`` pairs, the one with the smaller ``|f|`` first.
+
+        One bound is the last of ``evaluations``; it comes first when both ``|f|`` are equal.
+        """
+        x_newest, f_newest = evaluations[-1]
+        if x_newest == interval.a:
+            x_other, f_other = interval.b, interval.fb
+        else:
+            x_other, f_other = interval.a, interval.fa
+        if abs(f_other) < abs(f_newest):
+            return (x_other, f_other), (x_newest, f_newest)
+        else:
+            return (x_newest, f_newest), (x_other, f_other)
+
     def history_without_reevaluations(self, result: SolveResult) -> list[tuple[float, float]]:
         """Return ``result.history`` without the reference implementation's re-evaluations of the interval bounds.
 

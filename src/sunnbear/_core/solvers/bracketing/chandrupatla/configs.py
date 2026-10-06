@@ -6,10 +6,10 @@ from .solver import Chandrupatla
 
 
 class ChandrupatlaConfig(SolverConfig):
-    """`ChandrupatlaConfig` is a core config.
+    """`ChandrupatlaConfig` is a core config, whose results differ from those of Brent's method at a multiple root.
 
-    Where interpolation converges slowly, as at a multiple root, Chandrupatla's method falls back to bisection where
-    Brent's method keeps interpolating, so its results differ from Brent's there.
+    There, interpolation converges slowly, and Chandrupatla's method switches to bisection while Brent's method keeps
+    interpolating.
     """
 
     solver_cls = Chandrupatla

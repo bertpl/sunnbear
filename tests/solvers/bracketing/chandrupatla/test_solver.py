@@ -1,5 +1,5 @@
-"""These tests assert that `Chandrupatla` reproduces the evaluation counts that Chandrupatla's paper reports, and
-stops within ``xtol`` of a root."""
+"""These tests assert that `Chandrupatla` reproduces the evaluation counts of Chandrupatla's paper, and stops within
+``xtol`` of a root."""
 
 import math
 
@@ -23,7 +23,7 @@ def _paper_function_8(x: float) -> float:
     return -3062.0 * (1.0 - xi) * math.exp(-x) / (xi + (1.0 - xi) * math.exp(-x)) - 1013.0 + 1628.0 / x
 
 
-# The 9 test functions of the paper's Table 1, numbered as there.
+# `_PAPER_FUNCTIONS` holds the 9 test functions of the paper's Table 1, keyed by their number in that table.
 _PAPER_FUNCTIONS = {
     1: lambda x: x**3 - 2.0 * x - 5.0,
     2: lambda x: 1.0 - 1.0 / x**2,
@@ -36,7 +36,8 @@ _PAPER_FUNCTIONS = {
     9: lambda x: math.exp(x) - 2.0 - 0.01 / x**2 + 0.000002 / x**3,
 }
 
-# The rows of the paper's Table 2: the function, the interval, and the evaluation count of the paper's method.
+# Each row of the paper's Table 2 holds the function number, the 2 interval bounds and the evaluation count of the
+# paper's method.
 _PAPER_TABLE_2 = [
     (1, 2, 3, 7),
     (1, 1, 10, 11),
@@ -141,8 +142,7 @@ def test_an_exact_zero_ends_the_solve_at_that_point():
 #  Identity and cost
 # ==================================================================================================
 def test_identity_and_that_its_arithmetic_is_counted():
-    """`Chandrupatla` is named ``chandrupatla``, at version 1, and its arithmetic, square roots included, is
-    flop-counted."""
+    """`Chandrupatla` has name ``chandrupatla`` and version 1, and its flop count includes its square roots."""
     # --- act --------------------------
     result = Chandrupatla().solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=40)
 
