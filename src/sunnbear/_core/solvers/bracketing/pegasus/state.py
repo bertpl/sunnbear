@@ -1,0 +1,29 @@
+"""This module declares `PegasusState`, the state that `Pegasus` carries between iterations."""
+
+from dataclasses import dataclass, field
+
+from sunnbear._core.solvers.core import IntervalBound, SolveState
+
+
+@dataclass
+class PegasusState(SolveState):
+    """`PegasusState` adds the Pegasus method's 3 values that carry over from one iteration to the next.
+
+    Attributes:
+        newest_bound: The bound that holds the most recent iterate. Before the first iterate, the upper bound is the
+            newest bound, as in `Illinois` and in mpmath's implementation of both methods.
+        newest_f: The function value at the newest bound. The scaling factor needs it once the next iterate has
+            replaced the newest bound, when the interval no longer holds it.
+        scaled_retained_f: The function value that the chord uses at the retained bound, which is the bound that does
+            not hold the most recent iterate. It equals that bound's own function value, multiplied by the scaling
+            factor of every iteration that kept the bound again.
+    """
+
+    newest_bound: IntervalBound = IntervalBound.UPPER
+    newest_f: float = field(init=False)
+    scaled_retained_f: float = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Start with the upper bound as the newest bound and the lower bound as the retained bound, at their values."""
+        self.newest_f = self.interval.fb
+        self.scaled_retained_f = self.interval.fa

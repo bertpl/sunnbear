@@ -11,6 +11,7 @@ from sunnbear._core.solvers.bracketing.itp.configs import (
     ITPPaperExperimentsSlack4Config,
     ITPPaperPseudocodeSlack0Config,
 )
+from sunnbear._core.solvers.bracketing.pegasus.configs import PegasusConfig
 from sunnbear._core.solvers.bracketing.regula_falsi.configs import RegulaFalsiConfig
 from sunnbear._core.solvers.bracketing.ridders.configs import (
     RiddersBracketingSolverConfig,
@@ -26,6 +27,7 @@ from sunnbear.solvers import (
     Brent,
     Chandrupatla,
     Illinois,
+    Pegasus,
     RegulaFalsi,
     Ridders,
     SolverConfigRegistry,
@@ -57,6 +59,7 @@ from .example_solvers import WeightedSplitSolver, define_config
             SolverRole.BUILTIN_SECONDARY,
         ),
         (ITPPaperExperimentsSlack4Config, "itp[n_slack=4,variant='paper_experiments']", ITP, SolverRole.BUILTIN_CORE),
+        (PegasusConfig, "pegasus", Pegasus, SolverRole.BUILTIN_SECONDARY),
         (RegulaFalsiConfig, "regula_falsi", RegulaFalsi, SolverRole.BUILTIN_SECONDARY),
         (
             RiddersBracketingSolverConfig,
@@ -105,6 +108,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         "itp[n_slack=0,variant='paper_experiments']",
         "itp[n_slack=0,variant='paper_pseudocode']",
         "itp[n_slack=4,variant='paper_experiments']",
+        "pegasus",
         "regula_falsi",
         "ridders[variant='bracketing_solver']",
         "ridders[variant='commons_math']",
@@ -120,6 +124,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         Chandrupatla,
         Illinois,
         ITP,
+        Pegasus,
         RegulaFalsi,
         Ridders,
         TOMS748,

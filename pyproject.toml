@@ -57,7 +57,7 @@ classifiers = [
 [dependency-groups]
 dev = [
     "pre-commit>=4.0",
-    # the solver tests compare Illinois with mpmath's Illinois solver, run in mpmath's float64 context; mpmath is never a runtime dependency
+    # the solver tests compare each solver that mpmath also implements with mpmath's version, run in mpmath's float64 context; mpmath is never a runtime dependency
     "mpmath>=1.3.0",
     "pytest>=8.0",
     "pytest-cov>=6.0",
