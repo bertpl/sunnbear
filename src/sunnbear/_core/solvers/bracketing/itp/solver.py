@@ -41,18 +41,19 @@ class ITP(BracketingSolver[ITPState]):
 
     - ``"paper_pseudocode"``: ``r`` as the pseudocode of the paper's Appendix B states it.
     - ``"paper_experiments"``: ``r`` becomes ``max(0.99 * r - xtol / 2, 0)``, as in the authors' MATLAB code that
-      produced the paper's experiments; the authors shared that code on request, and it is not published. This
-      variant comes much closer to the iteration counts of the paper's Table 1 than the pseudocode: it matches 23 of
-      the 24 rows, and differs by 1 iteration on the step function, as a line-by-line port of that MATLAB code does
-      too.
+      produced the paper's experiments; the authors shared that code on request, and it is not published.
 
-    The margin of ``"paper_experiments"`` has 2 effects:
+    ``"paper_experiments"`` comes much closer to the iteration counts of the paper's Table 1 than
+    ``"paper_pseudocode"``: it matches 23 of the 24 rows, and differs by 1 iteration on the step function, as a
+    line-by-line port of the authors' MATLAB code does too.
 
-    - it guards against rounding errors in ``r``, as the paper's Appendix B recommends in general terms; this makes
-      solves that go past ``n_max`` rarer, but does not prevent them all;
-    - it never spends the last 1 % of ``r``. Under ``"paper_pseudocode"``, once a step lands at the edge of the
-      allowed range, ``r`` becomes 0 and stays 0, so the solve ends as pure bisection; the reserve that
-      ``"paper_experiments"`` keeps lets interpolation steps return once the interval has shrunk.
+    The margin, the amount by which ``"paper_experiments"`` lowers ``r``, has 2 effects:
+
+    - it guards against rounding errors in ``r``, as the paper's Appendix B recommends in general terms; the margin
+      makes solves that go past ``n_max`` rarer, but does not prevent them all;
+    - it keeps each step at most ``0.99 * r - xtol / 2`` from ``x_half``, so ``r`` stays above 0, and interpolation
+      steps are accepted again once the interval has shrunk. Under ``"paper_pseudocode"``, once a step lands at
+      distance ``r`` from ``x_half``, ``r`` becomes 0 and stays 0, so every later step is the midpoint ``x_half``.
 
     The interval, the stopping criterion and the root estimate are `BracketingSolver`'s: the solve ends once the
     interval is at most ``2 * xtol`` wide, as in the paper, and returns its midpoint.
@@ -71,8 +72,9 @@ class ITP(BracketingSolver[ITPState]):
         Args:
             n_slack: The paper's ``n_0``, the number of iterations that the solve may take beyond the iteration count
                 of bisection.
-            variant: The source in the paper that the projection radius ``r`` follows; the class docstring describes
-                each.
+            variant: The paper's source for the projection radius ``r``: ``"paper_pseudocode"`` uses ``r`` as the
+                pseudocode states it, and ``"paper_experiments"`` lowers ``r`` by the margin of the authors' MATLAB
+                code.
 
         Raises:
             ValueError: If ``n_slack`` is negative, or ``variant`` is not 1 of the values in its annotation.
@@ -124,7 +126,7 @@ class ITP(BracketingSolver[ITPState]):
         r = state.max_next_width - 0.5 * interval.width
         state.max_next_width = 0.5 * state.max_next_width
         if self.variant == "paper_experiments":
-            # The margin of the authors' MATLAB code; the class docstring describes its 2 effects.
+            # Apply the margin of the authors' MATLAB code; the class docstring describes its 2 effects.
             r = max(0.99 * r - 0.5 * state.xtol, 0.0)
         if abs(x_t - x_half) <= r:
             return x_t

@@ -14,7 +14,7 @@ from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 _XTOL = 1e-10
 _N_BISECTION = 34
 
-# The parametrized tests run under every variant in the annotation of `ITP.__init__`.
+# Tests that cover every variant read them from the annotation of `ITP.__init__`, so a new variant joins them.
 _VARIANTS = typing.get_args(typing.get_type_hints(ITP.__init__)["variant"])
 
 
@@ -166,10 +166,10 @@ def test_a_smooth_function_converges_to_its_root(f):
     assert abs(result.x - CUBIC_ROOT) <= 1e-10
 
 
-def test_the_paper_pseudocode_variant_ends_as_bisection_once_its_slack_runs_out():
+def test_the_paper_pseudocode_variant_ends_as_bisection_once_its_projection_radius_reaches_0():
     """On the paper's first polynomial, the projection radius of the paper_pseudocode variant reaches 0 and stays 0,
-    so it takes bisection's 34 iterations, where the margin of the paper_experiments variant keeps a reserve that
-    lets interpolation steps return."""
+    so it takes bisection's 34 iterations; the paper_experiments variant keeps its projection radius above 0 and takes
+    18."""
     # --- arrange ----------------------
     f, _ = _PAPER_TABLE_1["polynomial_1"]
 
@@ -183,18 +183,19 @@ def test_the_paper_pseudocode_variant_ends_as_bisection_once_its_slack_runs_out(
     assert n_iterations == {"paper_pseudocode": _N_BISECTION, "paper_experiments": 18}
 
 
-def test_an_unknown_variant_is_rejected():
-    """A variant outside the annotation of `ITP.__init__` raises a `ValueError` that names it."""
+@pytest.mark.parametrize(
+    "kwargs, match",
+    [
+        ({"n_slack": -1, "variant": "paper_experiments"}, "-1"),
+        ({"n_slack": 0, "variant": "robust"}, "'robust'"),
+    ],
+)
+def test_an_invalid_argument_is_rejected(kwargs, match):
+    """A negative ``n_slack``, or a variant outside the annotation of `ITP.__init__`, raises a `ValueError` that
+    names the wrong value."""
     # --- act / assert -----------------
-    with pytest.raises(ValueError, match="'robust'"):
-        ITP(n_slack=0, variant="robust")  # ty: ignore[invalid-argument-type] — the test passes a wrong value
-
-
-def test_a_negative_n_slack_is_rejected():
-    """A negative ``n_slack`` raises a `ValueError` that names it."""
-    # --- act / assert -----------------
-    with pytest.raises(ValueError, match="-1"):
-        ITP(n_slack=-1, variant="paper_experiments")
+    with pytest.raises(ValueError, match=match):
+        ITP(**kwargs)
 
 
 # ==================================================================================================
