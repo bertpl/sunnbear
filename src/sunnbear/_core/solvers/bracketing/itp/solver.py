@@ -11,9 +11,8 @@ from .state import ITPState
 class ITP(BracketingSolver[ITPState]):
     """`ITP` implements the ITP method, in the variant of its paper's pseudocode or in that of its paper's experiments.
 
-    The paper is Oliveira and Takahashi, ACM Transactions on Mathematical Software 47(1), article 5. Each iteration
-    evaluates 1 point, ``x_itp``, which it computes from the interval ``[a, b]`` and its midpoint ``x_half`` in 3
-    steps:
+    The paper is Oliveira and Takahashi (2020). Each iteration evaluates 1 point, ``x_itp``, which it computes from
+    the interval ``[a, b]`` and its midpoint ``x_half`` in 3 steps:
 
     - interpolation: ``x_f`` is where the chord through ``(a, f(a))`` and ``(b, f(b))`` crosses zero, as in regula
       falsi;
@@ -41,7 +40,7 @@ class ITP(BracketingSolver[ITPState]):
 
     - ``"paper_pseudocode"``: ``r`` as the pseudocode of the paper's Appendix B states it.
     - ``"paper_experiments"``: ``r`` becomes ``max(0.99 * r - xtol / 2, 0)``, as in the authors' MATLAB code that
-      produced the paper's experiments; the authors shared that code on request, and it is not published.
+      produced the paper's experiments.
 
     ``"paper_experiments"`` comes much closer to the iteration counts of the paper's Table 1 than
     ``"paper_pseudocode"``: it matches 23 of the 24 rows, and differs by 1 iteration on the step function, as a
@@ -57,6 +56,14 @@ class ITP(BracketingSolver[ITPState]):
 
     The interval, the stopping criterion and the root estimate are `BracketingSolver`'s: the solve ends once the
     interval is at most ``2 * xtol`` wide, as in the paper, and returns its midpoint.
+
+    References:
+        - Oliveira, I. F. D. and Takahashi, R. H. C. (2020). An enhancement of the bisection method average
+          performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), article 5. Its
+          Appendix B holds the pseudocode that ``"paper_pseudocode"`` follows, and the test suite compares `ITP`
+          with the iteration counts of its Table 1. https://doi.org/10.1145/3423597
+        - The authors' MATLAB code that produced the paper's experiments, which ``"paper_experiments"`` follows. The
+          authors shared it on request; it is not published.
     """
 
     name = "itp"
