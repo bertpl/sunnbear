@@ -3,7 +3,7 @@
 from abc import abstractmethod
 from typing import ClassVar
 
-from sunnbear.solvers import Interval, Solver, SolveResult, SolveState
+from sunnbear.solvers import Interval, IntervalBound, Solver, SolveResult, SolveState
 
 
 class TwinSolver(Solver):
@@ -55,24 +55,6 @@ class TwinSolver(Solver):
         else:
             return None
 
-    @staticmethod
-    def _bounds_by_smaller_abs_f(
-        interval: Interval, evaluations: list[tuple[float, float]]
-    ) -> tuple[tuple[float, float], tuple[float, float]]:
-        """Return the 2 bounds of ``interval`` as ``(x, f(x))`` pairs, the one with the smaller ``|f|`` first.
-
-        One bound is the last of ``evaluations``; it comes first when both ``|f|`` are equal.
-        """
-        x_newest, f_newest = evaluations[-1]
-        if x_newest == interval.a:
-            x_other, f_other = interval.b, interval.fb
-        else:
-            x_other, f_other = interval.a, interval.fa
-        if abs(f_other) < abs(f_newest):
-            return (x_other, f_other), (x_newest, f_newest)
-        else:
-            return (x_newest, f_newest), (x_other, f_other)
-
     def history_without_reevaluations(self, result: SolveResult) -> list[tuple[float, float]]:
         """Return ``result.history`` without the reference implementation's re-evaluations of the interval bounds.
 
@@ -81,6 +63,25 @@ class TwinSolver(Solver):
         history = list(result.history)
         del history[2 : 2 + self.n_reevaluated_bounds]
         return history
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _bounds_by_smaller_abs_f(interval: Interval) -> tuple[tuple[float, float], tuple[float, float]]:
+        """Return the 2 bounds of ``interval`` as ``(x, f(x))`` pairs, the one with the smaller ``|f|`` first.
+
+        The bound that the last split replaced, which holds the newest point, comes first when both ``|f|`` are
+        equal.
+        """
+        if interval.last_replaced_bound is IntervalBound.LOWER:
+            x_newest, f_newest, x_other, f_other = interval.a, interval.fa, interval.b, interval.fb
+        else:
+            x_newest, f_newest, x_other, f_other = interval.b, interval.fb, interval.a, interval.fa
+        if abs(f_other) < abs(f_newest):
+            return (x_other, f_other), (x_newest, f_newest)
+        else:
+            return (x_newest, f_newest), (x_other, f_other)
 
 
 class TwinConvergedSignal(Exception):  # noqa: N818 — the name marks a control-flow signal, not an error condition.

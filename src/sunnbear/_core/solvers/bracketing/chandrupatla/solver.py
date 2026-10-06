@@ -32,8 +32,8 @@ class Chandrupatla(Solver):
     - ``xm`` is the interval bound with the smaller ``|f|``.
 
     The solver passes ``xtol`` as ``eps_a`` and 0 as ``eps_r``, so ``tol = 0.5 * xtol``. The solve ends once
-    ``tl > 0.5``, that is once the interval is narrower than ``xtol``, or once ``f(xm)`` is 0. It returns ``xm``,
-    which then lies within ``xtol`` of the root.
+    ``tl > 0.5``, that is once the interval is narrower than ``xtol``, or once ``f(xm)`` is 0. The solver returns
+    ``xm``, which then lies within ``xtol`` of the root.
 
     `Chandrupatla` tracks a third point besides the 2 interval bounds, and stops by the paper's own criterion, so it
     writes its own loop, not `BracketingSolver`'s.
@@ -45,12 +45,13 @@ class Chandrupatla(Solver):
     def _solve(self, state: SolveState) -> float:
         """Run the loop of the paper's BASIC listing and return ``xm``.
 
-        The variables keep the names of the BASIC listing where they do not clash with the names of this package,
-        so that the code can be compared with the listing line by line. Besides the variables of the class
-        docstring, these are:
+        The variables keep the names of the BASIC listing, so that the code can be compared with the listing line by
+        line, except where a listing name would read as an interval bound or its ``f`` value in this package, as
+        ``A`` and ``B`` would read as the bounds ``a`` and ``b``. Besides the variables of the class docstring, the
+        code uses these variables:
 
         - ``fm``, which is ``f(xm)``;
-        - ``ph``, which is ``phi``;
+        - ``phi``, which the listing calls ``PH``;
         - ``phi_low`` and ``phi_high``, the lower and upper limits on ``phi``, which the listing calls ``FL`` and
           ``FH``;
         - ``al``, which is ``(x3 - x1) / (x2 - x1)``;
@@ -60,7 +61,7 @@ class Chandrupatla(Solver):
         Each iteration:
 
         - evaluates ``x`` and makes it ``x1``;
-        - ends the solve if the stopping criterion holds;
+        - ends the solve and returns ``xm`` once the interval is narrower than ``xtol`` or ``f(xm)`` is 0;
         - chooses ``t`` for the next iteration.
         """
         interval = state.interval
@@ -72,9 +73,9 @@ class Chandrupatla(Solver):
             x = x1 + t * (x2 - x1)
             f = state.f(x)
             state.x_best = x
-            # Reorder the points, as the listing's step "Arrange 2-1-3" does: x2 and x1 bound the interval, x1 is the
-            # newest point, and x3 is the bound that this iteration drops. An exact zero f may take either branch,
-            # since the stopping criterion below then returns x.
+            # Reorder the points into the roles that the class docstring gives x1, x2 and x3, as the listing's step
+            # "Arrange 2-1-3" does. When f is exactly 0, which branch runs does not matter, because the stopping
+            # criterion below then returns x.
             if (f > 0.0) == (f1 > 0.0):
                 x3, f3 = x1, f1
             else:
@@ -93,11 +94,10 @@ class Chandrupatla(Solver):
 
             # --- t for the next point -----------
             xi = (x1 - x2) / (x3 - x2)
-            ph = (f1 - f2) / (f3 - f2)
+            phi = (f1 - f2) / (f3 - f2)
             phi_low = 1.0 - math.sqrt(1.0 - xi)
             phi_high = math.sqrt(xi)
-            if phi_low < ph and ph < phi_high:
-                # The inverse quadratic interpolation is well conditioned, so it gives t.
+            if phi_low < phi and phi < phi_high:
                 al = (x3 - x1) / (x2 - x1)
                 q1 = f1 / (f2 - f1)
                 q2 = f3 / (f2 - f3)

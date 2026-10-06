@@ -10,12 +10,14 @@ from tests.solvers.twins import TwinFunction, TwinSolver
 
 class ChandrupatlaScipyTwin(TwinSolver):
     """`ChandrupatlaScipyTwin` hands the interval to `scipy.optimize.elementwise.find_root`, which implements
-    Chandrupatla's method, and returns ``xm``, the interval bound with the smaller ``|f|``, after the evaluation at
-    which `Chandrupatla` would stop.
+    Chandrupatla's method. At the evaluation where `Chandrupatla` would stop, the twin returns ``xm``, the interval
+    bound with the smaller ``|f|``.
 
-    SciPy stops once the interval is narrower than ``xatol + xrtol * |xm|``, or once ``|f(xm)|`` is at most its
-    function tolerances. The twin passes ``xatol = xtol`` and 0 for the other 3 tolerances, which makes SciPy stop
-    where `Chandrupatla` stops and keep each new point as far inside the interval as `Chandrupatla` does.
+    SciPy stops once the interval is narrower than ``xatol + xrtol * |xm|``, or once ``|f(xm)|`` is at most the
+    tolerance that it computes from ``fatol`` and ``frtol``.
+
+    The twin passes ``xatol = xtol`` and 0 for ``xrtol``, ``fatol`` and ``frtol``, which makes SciPy stop where
+    `Chandrupatla` stops and keep each new point as far inside the interval as `Chandrupatla` does.
 
     SciPy calls the function with arrays; the twin evaluates each element through the `TwinFunction`.
 
@@ -32,8 +34,9 @@ class ChandrupatlaScipyTwin(TwinSolver):
 
     def _run_reference(self, f: TwinFunction, a: float, b: float, xtol: float) -> None:
         """Run SciPy's find_root with ``xtol`` as its only nonzero tolerance."""
-        # otypes spares np.vectorize the extra call that it would otherwise make to find the output type.
         tolerances = {"xatol": xtol, "xrtol": 0.0, "fatol": 0.0, "frtol": 0.0}
+        # otypes stops np.vectorize from calling f once more to find the output type, an evaluation that
+        # `Chandrupatla` does not make.
         scipy.optimize.elementwise.find_root(np.vectorize(f, otypes=[float]), (a, b), tolerances=tolerances)
 
     def _root_if_sunnbear_solver_stops(
@@ -41,10 +44,9 @@ class ChandrupatlaScipyTwin(TwinSolver):
     ) -> float | None:
         """Return ``xm`` if `Chandrupatla` stops after the last of ``evaluations``, or ``None`` if it continues.
 
-        As in `Chandrupatla`, ``xm`` is the interval bound with the smaller ``|f|``, and the newest point when both
-        are equal.
+        As in `Chandrupatla`, ``xm`` is the bound that `_bounds_by_smaller_abs_f` puts first.
         """
-        (xm, fm), (x_other, _) = self._bounds_by_smaller_abs_f(interval, evaluations)
+        (xm, fm), (x_other, _) = self._bounds_by_smaller_abs_f(interval)
         if 0.5 * xtol / abs(x_other - xm) > 0.5 or fm == 0.0:
             return xm
         else:

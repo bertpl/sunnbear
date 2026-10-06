@@ -18,12 +18,12 @@ def _paper_function_7(x: float) -> float:
 
 
 def _paper_function_8(x: float) -> float:
-    """Return the paper's function 8, with its constant ``xi = 0.61489``."""
+    """Return the paper's function 8."""
     xi = 0.61489
     return -3062.0 * (1.0 - xi) * math.exp(-x) / (xi + (1.0 - xi) * math.exp(-x)) - 1013.0 + 1628.0 / x
 
 
-# `_PAPER_FUNCTIONS` holds the 9 test functions of the paper's Table 1, keyed by their number in that table.
+# `_PAPER_FUNCTIONS` holds the test functions of the paper's Table 1, keyed by their number in that table.
 _PAPER_FUNCTIONS = {
     1: lambda x: x**3 - 2.0 * x - 5.0,
     2: lambda x: 1.0 - 1.0 / x**2,
@@ -36,8 +36,10 @@ _PAPER_FUNCTIONS = {
     9: lambda x: math.exp(x) - 2.0 - 0.01 / x**2 + 0.000002 / x**3,
 }
 
-# Each row of the paper's Table 2 holds the function number, the 2 interval bounds and the evaluation count of the
-# paper's method.
+# Each row of the paper's Table 2 holds:
+# - the function number;
+# - the 2 interval bounds;
+# - the evaluation count of the paper's method.
 _PAPER_TABLE_2 = [
     (1, 2, 3, 7),
     (1, 1, 10, 11),
