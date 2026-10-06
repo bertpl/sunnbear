@@ -5,8 +5,12 @@ import pytest
 from sunnbear._core.solvers.bracketing.bisection.configs import BisectionConfig
 from sunnbear._core.solvers.bracketing.illinois.configs import IllinoisConfig
 from sunnbear._core.solvers.bracketing.regula_falsi.configs import RegulaFalsiConfig
+from sunnbear._core.solvers.bracketing.ridders.configs import (
+    RiddersCorrectedCriterionConfig,
+    RiddersOriginalCriterionConfig,
+)
 from sunnbear.exceptions import UnknownSolverConfigError
-from sunnbear.solvers import Bisection, Illinois, RegulaFalsi, SolverConfigRegistry, SolverRole
+from sunnbear.solvers import Bisection, Illinois, RegulaFalsi, Ridders, SolverConfigRegistry, SolverRole
 
 from .example_solvers import WeightedSplitSolver, define_config
 
@@ -20,6 +24,13 @@ from .example_solvers import WeightedSplitSolver, define_config
         (BisectionConfig, "bisection", Bisection, SolverRole.BUILTIN_BASELINE),
         (IllinoisConfig, "illinois", Illinois, SolverRole.BUILTIN_CORE),
         (RegulaFalsiConfig, "regula_falsi", RegulaFalsi, SolverRole.BUILTIN_SECONDARY),
+        (
+            RiddersCorrectedCriterionConfig,
+            "ridders[stopping_criterion='corrected']",
+            Ridders,
+            SolverRole.BUILTIN_SECONDARY,
+        ),
+        (RiddersOriginalCriterionConfig, "ridders[stopping_criterion='original']", Ridders, SolverRole.BUILTIN_CORE),
     ],
 )
 def test_built_in_config_is_registered_on_import(config_cls, solver_id, solver_cls, role):
@@ -52,10 +63,12 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         "bisection",
         "illinois",
         "regula_falsi",
+        "ridders[stopping_criterion='corrected']",
+        "ridders[stopping_criterion='original']",
         "weighted_split[weight=0.25]",
         "weighted_split[weight=0.75]",
     ]
-    assert solver_classes == (Bisection, Illinois, RegulaFalsi, WeightedSplitSolver)
+    assert solver_classes == (Bisection, Illinois, RegulaFalsi, Ridders, WeightedSplitSolver)
 
 
 def test_config_from_id_rejects_an_unknown_id():
