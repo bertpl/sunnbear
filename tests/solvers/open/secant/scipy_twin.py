@@ -5,9 +5,6 @@ import scipy.optimize
 from sunnbear.solvers import Interval
 from tests.solvers.twins import StoppingWrappedFunction, TwinConvergedSignal, TwinSolver
 
-# SciPy's own limit on its iterations; the evaluation budget of the twin test cases ends a solve long before it.
-_SCIPY_MAXITER = 10_000
-
 
 class SecantScipyTwin(TwinSolver):
     """`SecantScipyTwin` runs `scipy.optimize.newton` without a derivative, SciPy's secant method, from the interval
@@ -27,9 +24,9 @@ class SecantScipyTwin(TwinSolver):
 
     def _run_reference(self, f: StoppingWrappedFunction, a: float, b: float, xtol: float) -> None:
         """Run SciPy's secant method from ``a`` and ``b``, and signal its root if it converged."""
-        root, info = scipy.optimize.newton(
-            f, a, x1=b, tol=xtol, rtol=0.0, maxiter=_SCIPY_MAXITER, full_output=True, disp=False
-        )
+        # maxiter caps SciPy's own iterations; the evaluation budget of the twin test cases ends a solve long before
+        # SciPy reaches that cap.
+        root, info = scipy.optimize.newton(f, a, x1=b, tol=xtol, rtol=0.0, maxiter=10_000, full_output=True, disp=False)
         if info.converged:
             raise TwinConvergedSignal(float(root))
 

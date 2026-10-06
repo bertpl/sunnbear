@@ -8,16 +8,18 @@ class Secant(Solver):
     """`Secant` implements the secant method, in the form of SciPy's ``scipy.optimize.newton`` without a derivative.
 
     Each step computes the zero of the line through the 2 latest points, the secant. Near a simple root, the method
-    converges faster than linearly, with order about 1.618. It is an open method: it keeps no interval around the
-    root, so its iterates may leave the initial interval, and its result is not guaranteed to lie within ``xtol`` of
-    a root.
+    converges faster than linearly, with order about 1.618.
+
+    It is an open method: it keeps no interval around the root, so its iterates may leave the initial interval, and
+    its result is not guaranteed to lie within ``xtol`` of a root.
 
     `Secant` follows SciPy in 4 respects:
 
-    - **Starting points:** the bounds of the initial interval. When the upper bound has the smaller ``|f|``, the 2
-      are swapped, so the newest point is the one with the larger ``|f|``.
-    - **Step formula:** the zero of the secant, with the smaller of the 2 function values divided by the larger, so
-      that the ratio's magnitude is at most 1.
+    - **Starting points:** the bounds of the initial interval. The method treats one bound as the older point and the
+      other as the newest point, and the newest point is the bound with the larger ``|f|``, or the upper bound when
+      both are equal.
+    - **Step formula:** the zero of the secant, computed from the ratio of the 2 function values, with the value of
+      smaller magnitude divided by the value of larger magnitude, so that the ratio's magnitude is at most 1.
     - **Stopping criterion:** the solve ends once the step from the newest point to the next point is at most
       ``xtol``, and returns that next point without evaluating it.
     - **Equal function values:** when the 2 latest points have equal function values, the secant is horizontal and
@@ -27,7 +29,8 @@ class Secant(Solver):
     A small step does not show that the next point is close to a root: on a function that is nearly flat between 2
     points, a step can be smaller than ``xtol`` far from the root.
 
-    The loop keeps no interval, so `Secant` subclasses `Solver` and writes its own loop, not `BracketingSolver`'s.
+    The loop keeps no interval, so `Secant` subclasses `Solver` directly and implements its own loop, not the
+    interval-reducing loop that `BracketingSolver` provides.
 
     References:
         - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section 9.2.
@@ -41,16 +44,21 @@ class Secant(Solver):
     def _solve(self, state: SolveState) -> float:
         """Run the secant method from the interval bounds and return the first point whose step is at most ``xtol``.
 
-        ``x0`` and ``x1`` are the 2 latest points, ``x1`` the newest, with function values ``f0`` and ``f1``.
+        Each pass computes the zero of the secant through the 2 latest points. It returns that zero if the step to it is
+        at most ``xtol``; otherwise it evaluates the zero and makes it the newest point.
+
+        Raises:
+            DivergedError: If the 2 latest points have equal function values, so the next point lies at infinity.
         """
-        # --- starting points ----------------------------
+        # --- starting points --------------------
+        # x0 and x1 are the 2 latest points, x1 the newest, with function values f0 and f1.
         interval = state.interval
         x0, x1, f0, f1 = interval.a, interval.b, interval.fa, interval.fb
         if abs(f1) < abs(f0):
             x0, x1, f0, f1 = x1, x0, f1, f0
         state.x_best = x1
 
-        # --- main loop ----------------------------------
+        # --- main loop --------------------------
         while True:
             if f1 == f0:
                 raise DivergedError("The 2 latest points have equal function values, so the next point is infinite.")

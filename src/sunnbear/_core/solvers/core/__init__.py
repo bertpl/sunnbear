@@ -16,9 +16,14 @@ the pieces in this order::
     SolveResult
 
 An abnormal ending is a `SolveException` (see that class); a solver
-that raises anything else is recorded as ``SOLVER_ERROR``. A solve whose result, or whose
-function error, lies outside ``[a, b]``, or whose next point lies at infinity, is recorded as
-``DIVERGED``; no bound on how far an iterate may stray exists.
+that raises anything else is recorded as ``SOLVER_ERROR``. A solve is recorded as ``DIVERGED``
+when:
+
+- its result lies outside ``[a, b]``;
+- its function error happened outside ``[a, b]``;
+- its next point lies at infinity.
+
+No bound on how far an iterate may stray exists.
 
 Two facts hold throughout this package:
 

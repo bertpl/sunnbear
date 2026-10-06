@@ -1,18 +1,13 @@
-"""These tests assert how `Secant` starts, steps and stops, and the 2 ways in which its solve can fail."""
-
-import math
+"""These tests assert how `Secant` starts, steps and stops, and the ways in which its solve can fail."""
 
 import pytest
 
 from sunnbear.solvers import Secant, SolveStatus
-from tests.solvers.example_functions import CUBIC_ROOT, cubic, steep_exponential
-
-# The root of `steep_exponential`.
-_STEEP_EXPONENTIAL_ROOT = math.log(1.0e4) / 20.0
+from tests.solvers.example_functions import CUBIC_ROOT, STEEP_EXPONENTIAL_ROOT, cubic, steep_exponential
 
 
-def _step_function(x: float) -> float:
-    """Return -1 left of 0.5 and 1 from 0.5 on; on ``[0, 1]``, the second iterate has the same value as ``b``."""
+def _unit_jump_at_half(x: float) -> float:
+    """Return -1 left of 0.5 and 1 from 0.5 on."""
     if x < 0.5:
         return -1.0
     else:
@@ -37,9 +32,9 @@ def test_a_linear_function_is_solved_in_one_step(f):
 
 
 @pytest.mark.parametrize(
-    "b, is_a_kept", [(1.5, True), (2.0, False)]
+    "b, is_bound_a_kept", [(1.5, True), (2.0, False)]
 )  # |f(1.5)| < |f(1)| < |f(2)|, so the 2 cases cover both orders of |f| at the starting points.
-def test_the_second_step_keeps_the_starting_point_with_the_larger_abs_f(b, is_a_kept):
+def test_the_second_step_keeps_the_starting_point_with_the_larger_abs_f(b, is_bound_a_kept):
     """On the cubic over ``[1, b]``, the second secant runs through the first iterate and the starting point with the
     larger ``|f|``, as in SciPy."""
     # --- arrange ----------------------
@@ -50,7 +45,7 @@ def test_the_second_step_keeps_the_starting_point_with_the_larger_abs_f(b, is_a_
 
     # --- assert -----------------------
     (_, fa), (_, fb), (x2, f2), (x3, _) = history[:4]
-    x_kept, f_kept = (a, fa) if is_a_kept else (b, fb)
+    x_kept, f_kept = (a, fa) if is_bound_a_kept else (b, fb)
     assert x3 == pytest.approx((x_kept * f2 - x2 * f_kept) / (f2 - f_kept), rel=1e-12, abs=0.0)
 
 
@@ -83,10 +78,10 @@ def test_a_smooth_function_converges_in_few_evaluations():
 #  Failures of an open method
 # ==================================================================================================
 def test_equal_function_values_at_the_2_latest_points_end_the_solve_as_diverged():
-    """On `_step_function` over ``[0, 1]``, the first iterate, 0.5, has the same value as ``b``, so the next secant is
-    horizontal and the solve ends as ``DIVERGED``."""
+    """On `_unit_jump_at_half` over ``[0, 1]``, the first iterate, 0.5, has the same value as ``b``, so the next secant
+    is horizontal and the solve ends as ``DIVERGED``."""
     # --- act --------------------------
-    result = Secant().solve(_step_function, 0.0, 1.0, xtol=1e-9, max_fevals=60)
+    result = Secant().solve(_unit_jump_at_half, 0.0, 1.0, xtol=1e-9, max_fevals=60)
 
     # --- assert -----------------------
     assert (result.status, result.n_fevals) == (SolveStatus.DIVERGED, 3)
@@ -111,7 +106,7 @@ def test_a_small_step_in_a_flat_region_stops_far_from_the_root():
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert abs(result.x - _STEEP_EXPONENTIAL_ROOT) > 0.4
+    assert abs(result.x - STEEP_EXPONENTIAL_ROOT) > 0.4
 
 
 # ==================================================================================================
