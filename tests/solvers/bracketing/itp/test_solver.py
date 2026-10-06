@@ -2,20 +2,16 @@
 iteration count."""
 
 import math
-import typing
 
 import pytest
 
-from sunnbear.solvers import ITP, SolveStatus
+from sunnbear.solvers import ITP, ITPVariant, SolveStatus
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 
 # The paper's experiments solve every function on [-1, 1] with this xtol, where bisection needs `_N_BISECTION`
 # iterations.
 _XTOL = 1e-10
 _N_BISECTION = 34
-
-# Tests that cover every variant read them from the annotation of `ITP.__init__`, so a new variant joins them.
-_VARIANTS = typing.get_args(typing.get_type_hints(ITP.__init__)["variant"])
 
 
 def _sawtooth(x: float) -> float:
@@ -95,7 +91,7 @@ def test_the_iteration_counts_of_table_1_of_the_paper_are_reproduced(name):
     f, n_iterations = _PAPER_TABLE_1[name]
 
     # --- act --------------------------
-    result = ITP(n_slack=0, variant="paper_experiments").solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
+    result = ITP(n_slack=0, variant=ITPVariant.PAPER_EXPERIMENTS).solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
 
     # --- assert -----------------------
     assert (result.status, result.n_fevals) == (SolveStatus.CONVERGED, n_iterations + 2)
@@ -115,7 +111,7 @@ def test_the_paper_experiments_variant_with_slack_stays_within_n_max_on_the_func
     f, _ = _PAPER_TABLE_1[name]
 
     # --- act --------------------------
-    result = ITP(n_slack=4, variant="paper_experiments").solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
+    result = ITP(n_slack=4, variant=ITPVariant.PAPER_EXPERIMENTS).solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
@@ -125,8 +121,8 @@ def test_the_paper_experiments_variant_with_slack_stays_within_n_max_on_the_func
 @pytest.mark.parametrize(
     "name, variant",
     [
-        ("polynomial_2", "paper_pseudocode"),
-        ("step_function", "paper_experiments"),
+        ("polynomial_2", ITPVariant.PAPER_PSEUDOCODE),
+        ("step_function", ITPVariant.PAPER_EXPERIMENTS),
     ],
 )
 def test_rounding_errors_can_push_either_variant_past_n_max(name, variant):
@@ -144,7 +140,7 @@ def test_rounding_errors_can_push_either_variant_past_n_max(name, variant):
 # ==================================================================================================
 #  The steps
 # ==================================================================================================
-@pytest.mark.parametrize("variant", _VARIANTS)
+@pytest.mark.parametrize("variant", ITPVariant)
 def test_a_root_at_the_midpoint_is_found_in_1_iteration(variant):
     """On a line through 0 over ``[-1, 1]``, the interpolation point is the midpoint, which is the root."""
     # --- act --------------------------
@@ -159,7 +155,7 @@ def test_a_smooth_function_converges_to_its_root(f):
     """On `cubic`, which increases, and `decreasing_cubic`, which decreases, `ITP` converges within ``xtol`` of the
     root."""
     # --- act --------------------------
-    result = ITP(n_slack=4, variant="paper_experiments").solve(f, 1.0, 2.0, xtol=1e-10, max_fevals=60)
+    result = ITP(n_slack=4, variant=ITPVariant.PAPER_EXPERIMENTS).solve(f, 1.0, 2.0, xtol=1e-10, max_fevals=60)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
@@ -176,23 +172,23 @@ def test_the_paper_pseudocode_variant_ends_as_bisection_once_its_projection_radi
     # --- act --------------------------
     n_iterations = {
         variant: ITP(n_slack=0, variant=variant).solve(f, -1.0, 1.0, xtol=_XTOL, max_fevals=100).n_fevals - 2
-        for variant in _VARIANTS
+        for variant in ITPVariant
     }
 
     # --- assert -----------------------
-    assert n_iterations == {"paper_pseudocode": _N_BISECTION, "paper_experiments": 18}
+    assert n_iterations == {ITPVariant.PAPER_PSEUDOCODE: _N_BISECTION, ITPVariant.PAPER_EXPERIMENTS: 18}
 
 
 @pytest.mark.parametrize(
     "kwargs, match",
     [
-        ({"n_slack": -1, "variant": "paper_experiments"}, "-1"),
+        ({"n_slack": -1, "variant": ITPVariant.PAPER_EXPERIMENTS}, "-1"),
         ({"n_slack": 0, "variant": "robust"}, "'robust'"),
     ],
 )
 def test_an_invalid_argument_is_rejected(kwargs, match):
-    """A negative ``n_slack``, or a variant outside the annotation of `ITP.__init__`, raises a `ValueError` that
-    names the wrong value."""
+    """A negative ``n_slack``, or a value that is not an `ITPVariant`, raises a `ValueError` that names the wrong
+    value."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=match):
         ITP(**kwargs)
@@ -204,7 +200,7 @@ def test_an_invalid_argument_is_rejected(kwargs, match):
 def test_identity_and_that_its_arithmetic_is_counted():
     """`ITP` has name ``itp`` and version 1, and its flop count includes the logarithm that sets ``n_bisection``."""
     # --- act --------------------------
-    result = ITP(n_slack=4, variant="paper_experiments").solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=40)
+    result = ITP(n_slack=4, variant=ITPVariant.PAPER_EXPERIMENTS).solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=40)
 
     # --- assert -----------------------
     assert (ITP.name, ITP.version) == ("itp", 1)

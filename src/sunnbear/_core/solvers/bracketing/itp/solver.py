@@ -1,11 +1,11 @@
 """`ITP` implements the ITP method: interpolation, truncated toward the midpoint and projected around it."""
 
 import math
-from typing import Literal
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval
 
 from .state import ITPState
+from .variant import ITPVariant
 
 
 class ITP(BracketingSolver[ITPState]):
@@ -36,7 +36,7 @@ class ITP(BracketingSolver[ITPState]):
     The constants follow the paper's experiments: ``kappa_2 = 2``, and ``kappa_1 = 0.2 / (b0 - a0)``, so that the
     first truncation moves ``x_f`` by at most 20 % of the initial width.
 
-    ``variant`` picks the projection radius ``r``, from 1 of 2 sources in the paper:
+    ``variant``, a value of `ITPVariant`, picks the projection radius ``r``, from 1 of 2 sources in the paper:
 
     - ``"paper_pseudocode"``: ``r`` as the pseudocode of the paper's Appendix B states it.
     - ``"paper_experiments"``: ``r`` becomes ``max(0.99 * r - xtol / 2, 0)``, as in the authors' MATLAB code that
@@ -73,7 +73,7 @@ class ITP(BracketingSolver[ITPState]):
     # `_KAPPA_2` is the paper's kappa_2; kappa_1 depends on the initial interval, so `_solve` sets it per solve.
     _KAPPA_2 = 2
 
-    def __init__(self, *, n_slack: int, variant: Literal["paper_pseudocode", "paper_experiments"]) -> None:
+    def __init__(self, *, n_slack: int, variant: ITPVariant) -> None:
         """Configure the method.
 
         Args:
@@ -81,17 +81,15 @@ class ITP(BracketingSolver[ITPState]):
                 of bisection.
             variant: The paper's source for the projection radius ``r``: ``"paper_pseudocode"`` uses ``r`` as the
                 pseudocode states it, and ``"paper_experiments"`` lowers ``r`` by the margin of the authors' MATLAB
-                code.
+                code. A plain string such as ``"paper_experiments"`` works too.
 
         Raises:
-            ValueError: If ``n_slack`` is negative, or ``variant`` is not 1 of the values in its annotation.
+            ValueError: If ``n_slack`` is negative, or ``variant`` is not a value of `ITPVariant`.
         """
         if n_slack < 0:
             raise ValueError(f"n_slack must be at least 0 (got {n_slack}).")
-        if variant not in ("paper_pseudocode", "paper_experiments"):
-            raise ValueError(f"variant must be 'paper_pseudocode' or 'paper_experiments' (got {variant!r}).")
         self.n_slack = n_slack
-        self.variant = variant
+        self.variant = ITPVariant(variant)
 
     def _solve(self, state: ITPState) -> float:
         """Set the solve's ``kappa_1`` and first ``max_next_width`` on ``state``, then run `BracketingSolver`'s loop.
@@ -132,7 +130,7 @@ class ITP(BracketingSolver[ITPState]):
         # --- projection -------------------------
         r = state.max_next_width - 0.5 * interval.width
         state.max_next_width = 0.5 * state.max_next_width
-        if self.variant == "paper_experiments":
+        if self.variant is ITPVariant.PAPER_EXPERIMENTS:
             # Apply the margin of the authors' MATLAB code; the class docstring describes its 2 effects.
             r = max(0.99 * r - 0.5 * state.xtol, 0.0)
         if abs(x_t - x_half) <= r:

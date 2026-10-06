@@ -3,6 +3,7 @@
 from sunnbear._core.solvers.core import SolverConfig, SolverRole
 
 from .solver import ITP
+from .variant import ITPVariant
 
 
 class ITPPaperExperimentsSlack4Config(SolverConfig):
@@ -14,7 +15,7 @@ class ITPPaperExperimentsSlack4Config(SolverConfig):
     """
 
     solver_cls = ITP
-    solver_kwargs = {"n_slack": 4, "variant": "paper_experiments"}  # noqa: RUF012 — the dict is never mutated
+    solver_kwargs = {"n_slack": 4, "variant": ITPVariant.PAPER_EXPERIMENTS}  # noqa: RUF012 — the dict is never mutated
     role = SolverRole.BUILTIN_CORE
 
 
@@ -25,7 +26,7 @@ class ITPPaperExperimentsSlack0Config(SolverConfig):
     """
 
     solver_cls = ITP
-    solver_kwargs = {"n_slack": 0, "variant": "paper_experiments"}  # noqa: RUF012 — the dict is never mutated
+    solver_kwargs = {"n_slack": 0, "variant": ITPVariant.PAPER_EXPERIMENTS}  # noqa: RUF012 — the dict is never mutated
     role = SolverRole.BUILTIN_SECONDARY
 
 
@@ -38,5 +39,5 @@ class ITPPaperPseudocodeSlack0Config(SolverConfig):
     """
 
     solver_cls = ITP
-    solver_kwargs = {"n_slack": 0, "variant": "paper_pseudocode"}  # noqa: RUF012 — the dict is never mutated
+    solver_kwargs = {"n_slack": 0, "variant": ITPVariant.PAPER_PSEUDOCODE}  # noqa: RUF012 — the dict is never mutated
     role = SolverRole.BUILTIN_SECONDARY
