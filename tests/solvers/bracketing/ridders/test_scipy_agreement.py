@@ -9,14 +9,9 @@ from tests.solvers.bracketing.ridders.scipy_twin import RiddersScipyTwin
 from tests.solvers.twins import TWIN_CASES, assert_agrees_with_twin
 
 
-@pytest.mark.parametrize(
-    "stopping_criterion", typing.get_args(typing.get_type_hints(Ridders.__init__)["stopping_criterion"])
-)
+@pytest.mark.parametrize("variant", typing.get_args(typing.get_type_hints(Ridders.__init__)["variant"]))
 @pytest.mark.parametrize("case", TWIN_CASES, ids=str)
-def test_ridders_agrees_with_scipy_ridder(case, stopping_criterion):
-    """`Ridders` evaluates the same points as SciPy's ridder, on every shared twin case, under both stopping
-    criteria."""
+def test_ridders_agrees_with_scipy_ridder(case, variant):
+    """`Ridders` evaluates the same points as SciPy's ridder, on every shared twin case, in every variant."""
     # --- act / assert -----------------
-    assert_agrees_with_twin(
-        Ridders(stopping_criterion=stopping_criterion), RiddersScipyTwin(stopping_criterion=stopping_criterion), case
-    )
+    assert_agrees_with_twin(Ridders(variant=variant), RiddersScipyTwin(variant=variant), case)

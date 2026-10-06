@@ -7,7 +7,7 @@ from sunnbear._core.solvers.core import Solver, SolveState
 
 
 class Ridders(Solver):
-    """`Ridders` implements Ridders' method (Ridders, IEEE Trans. Circuits and Systems 26, 1979).
+    """`Ridders` implements Ridders' method (Ridders, IEEE Trans. Circuits and Systems 26, 1979), in 3 variants.
 
     Each iteration evaluates the function twice, on the interval ``[x0, x2]``, with ``fi = f(xi)``:
 
@@ -20,14 +20,27 @@ class Ridders(Solver):
     ``x3`` always lies in the half of the interval that holds the sign change, so the next interval is the current
     interval, split first at ``x1`` and then at ``x3``.
 
-    The paper leaves the stopping criterion open, so ``stopping_criterion`` chooses 1 of 2:
+    The paper gives no formula for when to stop, only that the procedure can end once a given accuracy is reached.
+    ``variant`` therefore picks 1 of 3 variants, each from a reference implementation:
 
-    - ``"original"`` stops when 2 successive iterates lie at most ``xtol`` apart, and returns the last one. On a
-      function that is not smooth, the returned iterate can lie more than ``xtol`` from the true root.
-    - ``"corrected"`` stops when the interval is at most ``2 * xtol`` wide, and returns its midpoint, so its root
-      always lies within ``xtol`` of the true root.
+    - ``"commons_math"``, the stopping criterion of Apache Commons Math's ``RiddersSolver``, close to that of
+      Numerical Recipes' ``zriddr``: the solve stops once 2 successive iterates lie at most ``xtol`` apart, and
+      returns the last one. On a function that is not smooth, that iterate often lies more than ``xtol`` from the
+      true root.
+    - ``"scipy"``, SciPy's ``ridder``: the step from ``x1`` is limited to ``d - xtol / 2``, so that ``x3`` lies at
+      least ``xtol / 2`` inside the interval, and the solve stops once the interval is narrower than ``xtol``, and
+      returns the last iterate. SciPy adds a relative term to its tolerance; this variant leaves it out, so that its
+      root always lies within ``xtol`` of the true root.
+    - ``"bracketing_solver"``, the stopping criterion of `BracketingSolver`: the solve stops once the interval is at
+      most ``2 * xtol`` wide, and returns its midpoint, which always lies within ``xtol`` of the true root.
 
-    Under both, the solve stops as soon as an evaluation returns exactly 0, and returns that x-value.
+    SciPy's limit on the step matters near the root. Without it, ``x3`` lands on either side of the root, and when it
+    lands on the side away from ``x1``, the interval only halves. With it, a root within ``xtol / 2`` of a bound
+    makes ``x3`` land on the side of ``x1``, and the interval between ``x3`` and that bound is narrower than ``xtol``.
+    So the evaluation count of ``"bracketing_solver"`` varies far more between near-identical functions than that of
+    ``"scipy"``.
+
+    Under all 3 variants, the solve stops as soon as an evaluation returns exactly 0, and returns that x-value.
 
     An iteration evaluates the function twice, so `Ridders` writes its own loop, not `BracketingSolver`'s.
     """
@@ -35,33 +48,32 @@ class Ridders(Solver):
     name = "ridders"
     version = 1
 
-    def __init__(self, *, stopping_criterion: Literal["original", "corrected"]) -> None:
-        """Configure the stopping criterion.
-
-        ``"original"`` stops once 2 successive iterates lie at most ``xtol`` apart, ``"corrected"`` once the interval
-        is at most ``2 * xtol`` wide.
+    def __init__(self, *, variant: Literal["commons_math", "scipy", "bracketing_solver"]) -> None:
+        """Configure the variant; the class docstring describes all 3.
 
         Raises:
-            ValueError: If ``stopping_criterion`` is neither ``"original"`` nor ``"corrected"``.
+            ValueError: If ``variant`` is not 1 of ``"commons_math"``, ``"scipy"`` and ``"bracketing_solver"``.
         """
-        if stopping_criterion not in ("original", "corrected"):
-            raise ValueError(f"stopping_criterion must be 'original' or 'corrected' (got {stopping_criterion!r}).")
-        self.stopping_criterion = stopping_criterion
+        if variant not in ("commons_math", "scipy", "bracketing_solver"):
+            raise ValueError(f"variant must be 'commons_math', 'scipy' or 'bracketing_solver' (got {variant!r}).")
+        self.variant = variant
 
-    def _solve(self, state: SolveState) -> float:
+    def _solve(self, state: SolveState) -> float:  # noqa: C901 — 1 loop holds the criteria of all 3 variants
         """Run Ridders' iterations and return the root estimate.
 
         Each iteration evaluates the midpoint ``x1`` and then the iterate ``x3``, and splits the interval at both. The
-        solve ends at an evaluation that returns exactly 0, or once the configured stopping criterion holds.
+        solve ends at an evaluation that returns exactly 0, or once the stopping criterion of the variant holds.
         """
         interval = state.interval
-        if self.stopping_criterion == "corrected":
+        if self.variant == "scipy":
+            half_xtol = 0.5 * state.xtol
+        elif self.variant == "bracketing_solver":
             xtol_doubled = 2.0 * state.xtol
-        x3_previous: float | None = None  # The original criterion compares each new x3 with this previous one.
+        x3_previous: float | None = None  # The commons_math variant compares each new x3 with this previous one.
         while True:
-            # --- corrected stopping criterion ---
+            # --- bracketing_solver criterion ----
             # It is checked before each iteration, so that an interval that is narrow enough costs no evaluation.
-            if self.stopping_criterion == "corrected" and interval.width <= xtol_doubled:
+            if self.variant == "bracketing_solver" and interval.width <= xtol_doubled:
                 return interval.midpoint
 
             # --- x1, the midpoint ---------------
@@ -73,16 +85,24 @@ class Ridders(Solver):
 
             # --- x3, the paper's equation 6 -----
             f1_over_f0 = f1 / interval.fa
-            x3 = x1 + (x1 - interval.a) * f1_over_f0 / math.sqrt(f1_over_f0 * f1_over_f0 - interval.fb / interval.fa)
+            d = x1 - interval.a
+            step = d * f1_over_f0 / math.sqrt(f1_over_f0 * f1_over_f0 - interval.fb / interval.fa)
+            if self.variant == "scipy":
+                # SciPy keeps x3 at least xtol / 2 inside the interval; the class docstring says why that matters.
+                step = math.copysign(min(abs(step), d - half_xtol), step)
+            x3 = x1 + step
             f3 = state.f(x3)
             state.x_best = x3
             if f3 == 0.0:
                 return x3
             interval = interval.split_at(x1, f1).split_at(x3, f3)
 
-            # --- original stopping criterion ----
-            # It is checked after each iteration, because it compares 2 successive iterates.
-            if self.stopping_criterion == "original":
+            # --- criteria after an iteration ----
+            # The commons_math criterion compares 2 successive iterates, so it is checked after each iteration; SciPy
+            # checks its own criterion there too.
+            if self.variant == "commons_math":
                 if x3_previous is not None and abs(x3 - x3_previous) <= state.xtol:
                     return x3
                 x3_previous = x3
+            elif self.variant == "scipy" and interval.width < state.xtol:
+                return x3

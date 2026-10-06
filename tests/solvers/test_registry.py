@@ -6,8 +6,9 @@ from sunnbear._core.solvers.bracketing.bisection.configs import BisectionConfig
 from sunnbear._core.solvers.bracketing.illinois.configs import IllinoisConfig
 from sunnbear._core.solvers.bracketing.regula_falsi.configs import RegulaFalsiConfig
 from sunnbear._core.solvers.bracketing.ridders.configs import (
-    RiddersCorrectedCriterionConfig,
-    RiddersOriginalCriterionConfig,
+    RiddersBracketingSolverConfig,
+    RiddersCommonsMathConfig,
+    RiddersScipyConfig,
 )
 from sunnbear.exceptions import UnknownSolverConfigError
 from sunnbear.solvers import Bisection, Illinois, RegulaFalsi, Ridders, SolverConfigRegistry, SolverRole
@@ -25,12 +26,13 @@ from .example_solvers import WeightedSplitSolver, define_config
         (IllinoisConfig, "illinois", Illinois, SolverRole.BUILTIN_CORE),
         (RegulaFalsiConfig, "regula_falsi", RegulaFalsi, SolverRole.BUILTIN_SECONDARY),
         (
-            RiddersCorrectedCriterionConfig,
-            "ridders[stopping_criterion='corrected']",
+            RiddersBracketingSolverConfig,
+            "ridders[variant='bracketing_solver']",
             Ridders,
             SolverRole.BUILTIN_SECONDARY,
         ),
-        (RiddersOriginalCriterionConfig, "ridders[stopping_criterion='original']", Ridders, SolverRole.BUILTIN_CORE),
+        (RiddersCommonsMathConfig, "ridders[variant='commons_math']", Ridders, SolverRole.BUILTIN_SECONDARY),
+        (RiddersScipyConfig, "ridders[variant='scipy']", Ridders, SolverRole.BUILTIN_CORE),
     ],
 )
 def test_built_in_config_is_registered_on_import(config_cls, solver_id, solver_cls, role):
@@ -63,8 +65,9 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         "bisection",
         "illinois",
         "regula_falsi",
-        "ridders[stopping_criterion='corrected']",
-        "ridders[stopping_criterion='original']",
+        "ridders[variant='bracketing_solver']",
+        "ridders[variant='commons_math']",
+        "ridders[variant='scipy']",
         "weighted_split[weight=0.25]",
         "weighted_split[weight=0.75]",
     ]
