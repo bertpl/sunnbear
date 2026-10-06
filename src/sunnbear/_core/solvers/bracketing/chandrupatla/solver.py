@@ -41,9 +41,10 @@ class Chandrupatla(Solver):
     References:
         - Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear
           function without using derivatives. Advances in Engineering Software 28(3), 145-149. `Chandrupatla`
-          follows its BASIC listing ``NEWZERO.BAS``, and the test suite reproduces its Table 2.
+          follows the paper's BASIC listing ``NEWZERO.BAS``, and the test suite reproduces the paper's Table 2.
           https://doi.org/10.1016/S0965-9978(96)00051-8
-        - SciPy's ``scipy.optimize.elementwise.find_root``; the test suite checks `Chandrupatla` against it.
+        - SciPy's ``scipy.optimize.elementwise.find_root``; the test suite checks `Chandrupatla` against
+          ``scipy.optimize.elementwise.find_root``.
     """
 
     name = "chandrupatla"
