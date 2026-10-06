@@ -1,9 +1,10 @@
 """`Ridders` implements Ridders' method: each iteration evaluates the midpoint, then a point from an exponential fit."""
 
 import math
-from typing import Literal
 
 from sunnbear._core.solvers.core import Solver, SolveState
+
+from .variant import RiddersVariant
 
 
 class Ridders(Solver):
@@ -21,7 +22,7 @@ class Ridders(Solver):
     interval, split first at ``x1`` and then at ``x3``.
 
     The paper gives no formula for when to stop, only that the procedure can end once a given accuracy is reached.
-    ``variant`` therefore picks 1 of 3 variants, each from a reference implementation:
+    ``variant`` therefore picks 1 of the 3 values of `RiddersVariant`, each from a reference implementation:
 
     - ``"commons_math"``, the stopping criterion of Apache Commons Math's ``RiddersSolver``, close to that of
       Numerical Recipes' ``zriddr``: the solve stops once 2 successive iterates lie at most ``xtol`` apart, and
@@ -62,15 +63,13 @@ class Ridders(Solver):
     name = "ridders"
     version = 1
 
-    def __init__(self, *, variant: Literal["commons_math", "scipy", "bracketing_solver"]) -> None:
-        """Configure the variant; the class docstring describes each.
+    def __init__(self, *, variant: RiddersVariant) -> None:
+        """Configure the variant; the class docstring describes each. A plain string such as ``"scipy"`` works too.
 
         Raises:
-            ValueError: If ``variant`` is not 1 of the values in its annotation.
+            ValueError: If ``variant`` is not a value of `RiddersVariant`.
         """
-        if variant not in ("commons_math", "scipy", "bracketing_solver"):
-            raise ValueError(f"variant must be 'commons_math', 'scipy' or 'bracketing_solver' (got {variant!r}).")
-        self.variant = variant
+        self.variant = RiddersVariant(variant)
 
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — one loop holds the criteria of all 3 variants
         """Run Ridders' iterations and return the root estimate.
@@ -79,15 +78,15 @@ class Ridders(Solver):
         solve ends at an evaluation that returns exactly 0, or once the stopping criterion of the variant holds.
         """
         interval = state.interval
-        if self.variant == "scipy":
+        if self.variant is RiddersVariant.SCIPY:
             xtol_halved = 0.5 * state.xtol
-        elif self.variant == "bracketing_solver":
+        elif self.variant is RiddersVariant.BRACKETING_SOLVER:
             xtol_doubled = 2.0 * state.xtol
         x3_previous: float | None = None  # The commons_math variant compares each new x3 with this previous one.
         while True:
             # --- bracketing_solver criterion ----
             # It is checked before each iteration, so that an interval that is narrow enough costs no evaluation.
-            if self.variant == "bracketing_solver" and interval.width <= xtol_doubled:
+            if self.variant is RiddersVariant.BRACKETING_SOLVER and interval.width <= xtol_doubled:
                 return interval.midpoint
 
             # --- x1, the midpoint ---------------
@@ -101,7 +100,7 @@ class Ridders(Solver):
             f1_over_f0 = f1 / interval.fa
             d = x1 - interval.a
             step = d * f1_over_f0 / math.sqrt(f1_over_f0 * f1_over_f0 - interval.fb / interval.fa)
-            if self.variant == "scipy":
+            if self.variant is RiddersVariant.SCIPY:
                 # SciPy keeps x3 at least xtol / 2 inside the interval; the class docstring says why that matters.
                 step = math.copysign(min(abs(step), d - xtol_halved), step)
             x3 = x1 + step
@@ -114,9 +113,9 @@ class Ridders(Solver):
             # --- criteria after an iteration ----
             # The commons_math criterion compares 2 successive iterates, so it is checked after each iteration; SciPy
             # checks its own criterion there too.
-            if self.variant == "commons_math":
+            if self.variant is RiddersVariant.COMMONS_MATH:
                 if x3_previous is not None and abs(x3 - x3_previous) <= state.xtol:
                     return x3
                 x3_previous = x3
-            elif self.variant == "scipy" and interval.width < state.xtol:
+            elif self.variant is RiddersVariant.SCIPY and interval.width < state.xtol:
                 return x3

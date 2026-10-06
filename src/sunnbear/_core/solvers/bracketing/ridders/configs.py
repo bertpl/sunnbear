@@ -3,6 +3,7 @@
 from sunnbear._core.solvers.core import SolverConfig, SolverRole
 
 from .solver import Ridders
+from .variant import RiddersVariant
 
 
 class RiddersScipyConfig(SolverConfig):
@@ -13,7 +14,7 @@ class RiddersScipyConfig(SolverConfig):
     """
 
     solver_cls = Ridders
-    solver_kwargs = {"variant": "scipy"}  # noqa: RUF012 — the dict is never mutated
+    solver_kwargs = {"variant": RiddersVariant.SCIPY}  # noqa: RUF012 — the dict is never mutated
     role = SolverRole.BUILTIN_CORE
 
 
@@ -25,7 +26,7 @@ class RiddersCommonsMathConfig(SolverConfig):
     """
 
     solver_cls = Ridders
-    solver_kwargs = {"variant": "commons_math"}  # noqa: RUF012 — the dict is never mutated
+    solver_kwargs = {"variant": RiddersVariant.COMMONS_MATH}  # noqa: RUF012 — the dict is never mutated
     role = SolverRole.BUILTIN_SECONDARY
 
 
@@ -37,5 +38,5 @@ class RiddersBracketingSolverConfig(SolverConfig):
     """
 
     solver_cls = Ridders
-    solver_kwargs = {"variant": "bracketing_solver"}  # noqa: RUF012 — the dict is never mutated
+    solver_kwargs = {"variant": RiddersVariant.BRACKETING_SOLVER}  # noqa: RUF012 — the dict is never mutated
     role = SolverRole.BUILTIN_SECONDARY

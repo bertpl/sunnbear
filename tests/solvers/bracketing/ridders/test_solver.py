@@ -3,15 +3,11 @@ variant."""
 
 import itertools
 import math
-import typing
 
 import pytest
 
-from sunnbear.solvers import Interval, Ridders, SolveStatus
+from sunnbear.solvers import Interval, Ridders, RiddersVariant, SolveStatus
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
-
-# The parametrized tests run under every variant in the annotation of `Ridders.__init__`.
-_VARIANTS = typing.get_args(typing.get_type_hints(Ridders.__init__)["variant"])
 
 
 def _kinked_line(x: float) -> float:
@@ -25,7 +21,7 @@ def _kinked_line(x: float) -> float:
 # ==================================================================================================
 #  The steps
 # ==================================================================================================
-@pytest.mark.parametrize("variant", _VARIANTS)
+@pytest.mark.parametrize("variant", RiddersVariant)
 def test_the_first_iteration_reproduces_the_example_of_the_paper(variant):
     """On the paper's example, ``x^3 - x - 5`` on ``[-1, 3]``, the first iterate is 1.9128..., and the next interval
     is ``[1, 1.9128...]``, whose midpoint is the next point evaluated."""
@@ -42,7 +38,7 @@ def test_the_first_iteration_reproduces_the_example_of_the_paper(variant):
     assert x1_next == 0.5 * (1.0 + x3)
 
 
-@pytest.mark.parametrize("variant", _VARIANTS)
+@pytest.mark.parametrize("variant", RiddersVariant)
 @pytest.mark.parametrize(
     "f, root, n_fevals",
     [
@@ -59,7 +55,7 @@ def test_an_exact_zero_ends_the_solve_at_that_point(f, root, n_fevals, variant):
     assert (result.x, result.status, result.n_fevals) == (root, SolveStatus.CONVERGED, n_fevals)
 
 
-@pytest.mark.parametrize("variant", _VARIANTS)
+@pytest.mark.parametrize("variant", RiddersVariant)
 @pytest.mark.parametrize("f", [cubic, decreasing_cubic])
 def test_a_smooth_function_converges_to_its_root(f, variant):
     """On `cubic`, which increases, and `decreasing_cubic`, which decreases, every variant converges within ``xtol`` of
@@ -81,7 +77,9 @@ def test_the_commons_math_variant_stops_once_2_successive_iterates_lie_within_xt
     xtol = 1e-10
 
     # --- act --------------------------
-    result = Ridders(variant="commons_math").solve(cubic, 1.0, 2.0, xtol=xtol, max_fevals=60, history_enabled=True)
+    result = Ridders(variant=RiddersVariant.COMMONS_MATH).solve(
+        cubic, 1.0, 2.0, xtol=xtol, max_fevals=60, history_enabled=True
+    )
 
     # --- assert -----------------------
     iterates = [x for x, _ in result.history[3::2]]  # Every second evaluation after the bounds is an iterate.
@@ -96,7 +94,9 @@ def test_the_scipy_variant_stops_once_the_interval_is_narrower_than_xtol():
     xtol = 1e-4
 
     # --- act --------------------------
-    result = Ridders(variant="scipy").solve(cubic, 1.0, 2.0, xtol=xtol, max_fevals=60, history_enabled=True)
+    result = Ridders(variant=RiddersVariant.SCIPY).solve(
+        cubic, 1.0, 2.0, xtol=xtol, max_fevals=60, history_enabled=True
+    )
 
     # --- assert -----------------------
     assert result.x == result.history[-1][0]
@@ -110,7 +110,9 @@ def test_the_bracketing_solver_variant_stops_once_the_interval_is_at_most_2_xtol
     xtol = 1e-4
 
     # --- act --------------------------
-    result = Ridders(variant="bracketing_solver").solve(cubic, 1.0, 2.0, xtol=xtol, max_fevals=60, history_enabled=True)
+    result = Ridders(variant=RiddersVariant.BRACKETING_SOLVER).solve(
+        cubic, 1.0, 2.0, xtol=xtol, max_fevals=60, history_enabled=True
+    )
 
     # --- assert -----------------------
     interval = _final_interval(result.history)
@@ -130,14 +132,14 @@ def test_the_limit_on_the_step_lets_the_scipy_variant_stop_where_the_interval_wo
     # --- act --------------------------
     n_fevals = {
         variant: Ridders(variant=variant).solve(f, 1.0, 2.0, xtol=1e-10, max_fevals=100).n_fevals
-        for variant in _VARIANTS
+        for variant in RiddersVariant
     }
 
     # --- assert -----------------------
-    assert n_fevals == {"commons_math": 12, "scipy": 12, "bracketing_solver": 66}
+    assert n_fevals == {RiddersVariant.COMMONS_MATH: 12, RiddersVariant.SCIPY: 12, RiddersVariant.BRACKETING_SOLVER: 66}
 
 
-@pytest.mark.parametrize("variant", _VARIANTS)
+@pytest.mark.parametrize("variant", RiddersVariant)
 def test_on_a_kinked_function_only_the_commons_math_variant_misses_the_root(variant):
     """On a function that is not smooth at its root, the commons_math variant stops more than ``xtol`` from the root,
     while the other 2 variants stay within ``xtol``."""
@@ -149,14 +151,14 @@ def test_on_a_kinked_function_only_the_commons_math_variant_misses_the_root(vari
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    if variant == "commons_math":
+    if variant is RiddersVariant.COMMONS_MATH:
         assert abs(result.x - 0.41) > 100.0 * xtol
     else:
         assert abs(result.x - 0.41) <= xtol
 
 
 def test_an_unknown_variant_is_rejected():
-    """A variant outside the annotation of `Ridders.__init__` raises a `ValueError` that names it."""
+    """A value that is not a `RiddersVariant` raises a `ValueError` that names it."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="'original'"):
         Ridders(variant="original")  # ty: ignore[invalid-argument-type] — the test passes a wrong value
@@ -168,7 +170,7 @@ def test_an_unknown_variant_is_rejected():
 def test_identity_and_that_its_arithmetic_is_counted():
     """`Ridders` is named ``ridders``, at version 1, and its arithmetic, square roots included, is flop-counted."""
     # --- act --------------------------
-    result = Ridders(variant="scipy").solve(cubic, 1.0, 2.0, xtol=1e-3, max_fevals=20)
+    result = Ridders(variant=RiddersVariant.SCIPY).solve(cubic, 1.0, 2.0, xtol=1e-3, max_fevals=20)
 
     # --- assert -----------------------
     assert (Ridders.name, Ridders.version) == ("ridders", 1)

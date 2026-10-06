@@ -9,6 +9,7 @@ so a malformed config fails when its module is imported, never inside a benchmar
 
 import inspect
 from collections.abc import Mapping
+from enum import Enum
 from typing import ClassVar
 
 from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
@@ -18,7 +19,8 @@ from .role import SolverRole
 from .solver import Solver
 
 # The types that a `solver_kwargs` value may have. `SolverConfig.solver_id` includes the `repr` of each
-# value, and a worker in another process must rebuild the same id, which holds for these types only.
+# value, and a worker in another process must rebuild the same id, which holds for these types only. An enum
+# member of one of these types, such as a `StrEnum` member, counts as its type; the id shows its plain value.
 _SOLVER_KWARG_VALUE_TYPES = (bool, int, float, str)
 
 
@@ -36,7 +38,8 @@ class SolverConfig:
 
     Class attributes:
         solver_cls: The concrete `Solver` subclass to instantiate.
-        solver_kwargs: The init arguments passed to ``solver_cls``; each value is a bool, int, float, or str.
+        solver_kwargs: The init arguments passed to ``solver_cls``; each value is a bool, int, float, or str, or a
+            `StrEnum` member.
         role: How the benchmark treats this config. A role for which `SolverRole.is_builtin_only` is true
             is reserved for configs defined inside the sunnbear package.
     """
@@ -74,7 +77,11 @@ class SolverConfig:
         if not self.solver_kwargs:
             return self.solver_cls.name
         else:
-            args = ",".join(f"{key}={value!r}" for key, value in sorted(self.solver_kwargs.items()))
+            # An enum member shows as its plain value, e.g. 'scipy', not as <RiddersVariant.SCIPY: 'scipy'>.
+            values = {
+                key: value.value if isinstance(value, Enum) else value for key, value in self.solver_kwargs.items()
+            }
+            args = ",".join(f"{key}={value!r}" for key, value in sorted(values.items()))
             return f"{self.solver_cls.name}[{args}]"
 
     def instantiate(self) -> Solver:

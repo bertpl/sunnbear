@@ -1,11 +1,9 @@
 """`RiddersScipyTwin` runs `scipy.optimize.ridder` as a `Solver`, so `Ridders` can be tested against it."""
 
-from typing import Literal
-
 import numpy as np
 import scipy.optimize
 
-from sunnbear.solvers import Interval
+from sunnbear.solvers import Interval, RiddersVariant
 from tests.solvers.twins import StoppingWrappedFunction, TwinSolver
 
 
@@ -43,14 +41,14 @@ class RiddersScipyTwin(TwinSolver):
     version = 1
     n_reevaluated_bounds = 2
 
-    def __init__(self, *, variant: Literal["commons_math", "scipy", "bracketing_solver"]) -> None:
+    def __init__(self, *, variant: RiddersVariant) -> None:
         """Take the variant of the twin's `Ridders` config."""
         self.variant = variant
 
     def _run_reference(self, f: StoppingWrappedFunction, a: float, b: float, xtol: float) -> None:
         """Run SciPy's ridder with the variant's tolerances, as the class docstring gives them."""
         eps = float(np.finfo(float).eps)
-        if self.variant == "scipy":
+        if self.variant is RiddersVariant.SCIPY:
             scipy_xtol = xtol - 4.0 * eps * max(abs(a), abs(b))
         else:
             scipy_xtol = float(np.finfo(float).smallest_normal)
@@ -70,13 +68,13 @@ class RiddersScipyTwin(TwinSolver):
             return x
         elif len(evaluations) % 2 == 1:
             return None
-        elif self.variant == "commons_math":
+        elif self.variant is RiddersVariant.COMMONS_MATH:
             # The previous iterate lies 2 evaluations back, before the midpoint of this iteration.
             if len(evaluations) >= 4 and abs(x - evaluations[-3][0]) <= xtol:
                 return x
             else:
                 return None
-        elif self.variant == "scipy":
+        elif self.variant is RiddersVariant.SCIPY:
             if interval.width < xtol:
                 return x
             else:
