@@ -11,11 +11,13 @@ _MACHEPS = sys.float_info.epsilon
 # of the iteration ends with a bisection.
 _MU = 0.5
 
-# ``_LAMBDA`` is the paper's ``lambda``: `_bracket` keeps each new point ``_LAMBDA * stop_width`` inside the interval.
+# ``_LAMBDA`` is the paper's ``lambda``: `_evaluate_and_split_at` keeps each new point at least ``_LAMBDA * stop_width``
+# away from both bounds, with ``stop_width`` the interval width at which the solve stops.
 _LAMBDA = 0.7
 
-# The authors' code starts ``e`` and ``f(e)`` at this value, which no step uses: the only step that reads them before
-# they are set, the first interpolation step of the second iteration, always takes the Newton steps.
+# The authors' code starts ``e`` and ``f(e)`` at this value, which no step uses: the only step that could read them
+# before they are set, the first interpolation step of the second iteration, always takes Newton steps on the
+# quadratic through ``a``, ``b`` and ``d``, which do not read ``e``.
 _UNSET = 1.0e5
 
 
@@ -25,8 +27,8 @@ class TOMS748(Solver):
     The first iteration takes a secant step. Each later iteration evaluates the function at 1 point per step:
 
     - ``k`` interpolation steps. The j-th step, counted from 1, takes the zero of the inverse cubic interpolation
-      through the bounds ``a`` and ``b`` and the 2 points that the interval discarded last, ``d`` and ``e``. When the
-      4 function values are not distinct, or when that zero lies outside ``(a, b)``, it takes ``j + 1`` Newton steps
+      through the bounds ``a`` and ``b`` and the 2 most recently discarded bounds, ``d`` and ``e``. When the 4
+      function values are not distinct, or when that zero lies outside ``(a, b)``, it takes ``j + 1`` Newton steps
       on the quadratic through ``a``, ``b`` and ``d``. The first step of the second iteration always takes the
       Newton steps, because ``e`` is not known yet.
     - a double-size secant step: twice the secant step from ``u``, the bound with the smaller ``|f|``, or the midpoint
@@ -36,7 +38,7 @@ class TOMS748(Solver):
     ``k = 1`` is the paper's Algorithm 4.1 and ``k = 2`` its Algorithm 4.2.
 
     The paper states the 2 algorithms without a stopping criterion; its experiments, and the authors' code, add the
-    one of Brent's method:
+    stopping criterion of Brent's method:
 
     - ``stop_width = 2 * (2 * macheps * |u| + tol)``, with ``macheps`` the relative machine precision and ``tol`` an
       absolute tolerance derived from ``xtol`` (below);
@@ -48,19 +50,20 @@ class TOMS748(Solver):
 
     The returned ``a`` lies within ``stop_width`` of a root. The solver sets
     ``tol = xtol / 2 - 2 * macheps * max(|a0|, |b0|)``, with ``a0`` and ``b0`` the bounds of the initial interval, so
-    that ``stop_width`` never exceeds ``xtol``. Where ``xtol`` is below ``4 * macheps * max(|a0|, |b0|)``, ``tol``
-    would be negative and the margin of 0.7 times ``stop_width`` could move a point outside the interval; the solver
-    then sets ``tol = 0``, the setting of the authors' test runs, and the accuracy of ``xtol`` is no longer
-    guaranteed.
+    that ``stop_width`` never exceeds ``xtol``.
 
-    An iteration evaluates the function up to ``k + 2`` times, so `TOMS748` writes its own loop, not
-    `BracketingSolver`'s.
+    Where ``xtol`` is below ``4 * macheps * max(|a0|, |b0|)``, ``tol`` would be negative and the margin of 0.7 times
+    ``stop_width`` could move a point outside the interval; the solver then sets ``tol = 0``, the setting of the
+    authors' test runs, and the accuracy of ``xtol`` is no longer guaranteed.
+
+    `BracketingSolver`'s loop evaluates the function once per iteration, and an iteration of `TOMS748` evaluates it up
+    to ``k + 2`` times, so `TOMS748` writes its own loop.
 
     References:
         - Alefeld, G. E., Potra, F. A. and Shi, Y. (1995). Algorithm 748: Enclosing zeros of continuous functions.
-          ACM Transactions on Mathematical Software 21(3), 327-344. Its Algorithms 4.1 and 4.2 are ``k = 1`` and
-          ``k = 2``, its subroutine ``ipzero`` the inverse cubic interpolation, and its section 6 the stopping
-          criterion and the margin. https://doi.org/10.1145/210089.210111
+          ACM Transactions on Mathematical Software 21(3), 327-344. Its subroutine ``ipzero`` is the inverse cubic
+          interpolation, and its section 6 states the stopping criterion and the margin.
+          https://doi.org/10.1145/210089.210111
         - The authors' Fortran 77 code, published with the paper as algorithm 748 of the Collected Algorithms of the
           ACM (netlib, ``toms/748``). It implements Algorithm 4.2, which ``k = 2`` follows line by line, and the test
           suite reproduces the roots that the code lists for its 154 test problems.
@@ -86,29 +89,30 @@ class TOMS748(Solver):
         them step by step:
 
         - ``interval`` is the enclosing interval ``[a, b]``, with ``f(a)`` and ``f(b)`` of opposite signs;
-        - ``d`` is the bound that the last call of `_bracket` discarded, and ``e`` the value of ``d`` before it; both
-          lie outside the interval, and ``fd`` and ``fe`` are their function values;
+        - ``d`` is the bound that the last call of `_evaluate_and_split_at` discarded, and ``e`` the value of ``d``
+          before that call; both lie outside the interval, and ``fd`` and ``fe`` are their function values;
         - ``c`` is the point to evaluate next.
 
-        Each call of `_bracket` evaluates 1 point and returns the new interval; the solve ends after any call that
-        returns an interval with ``f(a) = 0``, or one at most ``stop_width`` wide.
+        Each call of `_evaluate_and_split_at` evaluates 1 point and returns the new interval; the solve ends after any
+        call that returns an interval with ``f(a) = 0``, or one at most ``stop_width`` wide. A midpoint is computed as
+        ``a + 0.5 * (b - a)``, as in the authors' code, not with `Interval.midpoint`, which rounds differently.
         """
         interval = state.interval
         tol = self._get_tol(state.xtol, interval.a, interval.b)
-        # The bracket of the first iteration sets d and f(d) before any step reads them.
+        # The first call of _evaluate_and_split_at sets d and fd before any step reads them.
         d = fd = e = fe = _UNSET
-        n_iteration = 0
+        n_iterations = 0
         while True:
-            start_width = interval.width
-            n_iteration += 1
+            iteration_start_width = interval.width
+            n_iterations += 1
             stop_width = self._get_stop_width(interval, tol)
             if interval.width <= stop_width:
                 return interval.a
 
             # --- iteration 1: the secant step ---
-            if n_iteration == 1:
+            if n_iterations == 1:
                 c = interval.a - (interval.fa / (interval.fb - interval.fa)) * interval.width
-                interval, d, fd, stop_width = self._bracket(state, interval, c, stop_width, tol)
+                interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
                 if interval.is_fa_zero or interval.width <= stop_width:
                     return interval.a
                 continue
@@ -117,17 +121,17 @@ class TOMS748(Solver):
             for j in range(1, self.k + 1):
                 a, b, fa, fb = interval.a, interval.b, interval.fa, interval.fb
                 # The product is 0 exactly when 2 of the 4 function values are equal.
-                product = (fa - fb) * (fa - fd) * (fa - fe) * (fb - fd) * (fb - fe) * (fd - fe)
-                if (j == 1 and n_iteration == 2) or product == 0.0:
-                    c = self._newton_quadratic(a, b, d, fa, fb, fd, j + 1)
+                product_of_f_differences = (fa - fb) * (fa - fd) * (fa - fe) * (fb - fd) * (fb - fe) * (fd - fe)
+                if (j == 1 and n_iterations == 2) or product_of_f_differences == 0.0:
+                    c = self._newton_quadratic_zero(a, b, d, fa, fb, fd, j + 1)
                 else:
                     c = self._inverse_cubic_zero(a, b, d, e, fa, fb, fd, fe)
                     if (c - a) * (c - b) >= 0.0:
-                        c = self._newton_quadratic(a, b, d, fa, fb, fd, j + 1)
+                        c = self._newton_quadratic_zero(a, b, d, fa, fb, fd, j + 1)
                 if j < self.k:
-                    # The next interpolation step interpolates through the d of this step as its e.
+                    # The next interpolation step uses, as its e, the d that this step interpolated through.
                     e, fe = d, fd
-                interval, d, fd, stop_width = self._bracket(state, interval, c, stop_width, tol)
+                interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
                 if interval.is_fa_zero or interval.width <= stop_width:
                     return interval.a
             e, fe = d, fd
@@ -140,16 +144,16 @@ class TOMS748(Solver):
             c = u - 2.0 * (fu / (interval.fb - interval.fa)) * interval.width
             if abs(c - u) > 0.5 * interval.width:
                 c = interval.a + 0.5 * interval.width
-            interval, d, fd, stop_width = self._bracket(state, interval, c, stop_width, tol)
+            interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
             if interval.is_fa_zero or interval.width <= stop_width:
                 return interval.a
 
             # --- the bisection, if needed -------
-            if interval.width < _MU * start_width:
+            if interval.width < _MU * iteration_start_width:
                 continue
             e, fe = d, fd
             c = interval.a + 0.5 * interval.width
-            interval, d, fd, stop_width = self._bracket(state, interval, c, stop_width, tol)
+            interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
             if interval.is_fa_zero or interval.width <= stop_width:
                 return interval.a
 
@@ -158,7 +162,7 @@ class TOMS748(Solver):
     # --------------------------------------------------------------------------
     @staticmethod
     def _get_tol(xtol: float, a0: float, b0: float) -> float:
-        """Return the paper's absolute tolerance ``tol`` for ``xtol``, as the class docstring derives it."""
+        """Return the ``tol`` that keeps ``stop_width`` at most ``xtol``, or 0 where that ``tol`` would be negative."""
         return max(0.5 * xtol - 2.0 * _MACHEPS * max(abs(a0), abs(b0)), 0.0)
 
     @staticmethod
@@ -173,13 +177,13 @@ class TOMS748(Solver):
             u = interval.a
         return 2.0 * (tol + 2.0 * abs(u) * _MACHEPS)
 
-    def _bracket(
+    def _evaluate_and_split_at(
         self, state: SolveState, interval: Interval, c: float, stop_width: float, tol: float
     ) -> tuple[Interval, float, float, float]:
         """Evaluate ``c`` and return the interval that still holds the sign change: the code's subroutine ``BRACKT``.
 
-        Before the evaluation, ``c`` is moved to at least ``0.7 * stop_width`` inside the interval, or to the
-        midpoint when the interval is at most ``1.4 * stop_width`` wide.
+        Before the evaluation, ``c`` is moved to at least ``_LAMBDA * stop_width`` inside the interval, or to the
+        midpoint when the interval is at most ``2 * _LAMBDA * stop_width`` wide.
 
         Returns:
             The new interval, the discarded bound ``d`` and ``f(d)``, and the ``stop_width`` of the new interval. If
@@ -193,9 +197,7 @@ class TOMS748(Solver):
         elif c >= interval.b - margin:
             c = interval.b - margin
         fc = state.f(c)
-        if fc == 0.0:
-            state.x_best = c
-            return type(interval)(c, interval.b, fc, interval.fb, IntervalBound.LOWER), 0.0, 0.0, margin
+        # A zero f(c) has the sign of f(a) for split_at, which therefore replaces a.
         new_interval = interval.split_at(c, fc)
         if new_interval.last_replaced_bound is IntervalBound.LOWER:
             d, fd = interval.a, interval.fa
@@ -205,7 +207,7 @@ class TOMS748(Solver):
         return new_interval, d, fd, self._get_stop_width(new_interval, tol)
 
     @staticmethod
-    def _newton_quadratic(a: float, b: float, d: float, fa: float, fb: float, fd: float, n_steps: int) -> float:
+    def _newton_quadratic_zero(a: float, b: float, d: float, fa: float, fb: float, fd: float, n_steps: int) -> float:
         """Return the zero in ``(a, b)`` of the quadratic through ``a``, ``b`` and ``d``, by ``n_steps`` Newton steps.
 
         This is the paper's subroutine Newton-Quadratic, as the code's subroutine ``NEWQUA`` implements it. The
@@ -218,17 +220,18 @@ class TOMS748(Solver):
         a2 = ((fd - fb) / (d - b) - a1) / (d - a)
         if a2 == 0.0:
             return a - fa / a1
-        if (a2 > 0.0) == (fa > 0.0):
-            c = a
         else:
-            c = b
-        for _ in range(n_steps):
-            pc = fa + (a1 + a2 * (c - b)) * (c - a)
-            pdc = a1 + a2 * ((2.0 * c) - (a + b))
-            if pdc == 0.0:
-                return a - fa / a1
-            c = c - pc / pdc
-        return c
+            if (a2 > 0.0) == (fa > 0.0):
+                c = a
+            else:
+                c = b
+            for _ in range(n_steps):
+                pc = fa + (a1 + a2 * (c - b)) * (c - a)
+                pdc = a1 + a2 * ((2.0 * c) - (a + b))
+                if pdc == 0.0:
+                    return a - fa / a1
+                c = c - pc / pdc
+            return c
 
     @staticmethod
     def _inverse_cubic_zero(

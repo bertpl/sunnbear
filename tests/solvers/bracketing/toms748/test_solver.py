@@ -18,7 +18,7 @@ _MACHEPS = sys.float_info.epsilon
 @pytest.mark.parametrize("problem", PAPER_PROBLEMS, ids=str)
 def test_k_2_reproduces_the_root_that_the_authors_code_computes(problem: PaperProblem):
     """With ``k = 2`` and ``tol = 0``, the setting of the authors' test runs, `TOMS748` returns the root that the
-    authors' code prints, to its 14 significant digits."""
+    authors' code prints, within a relative 1e-13, the precision of its 14 printed digits."""
     # --- arrange ----------------------
     a, b = problem.interval
 
@@ -79,8 +79,8 @@ def test_the_first_step_is_a_secant_step(k):
 
 @pytest.mark.parametrize("k", [1, 2])
 def test_an_exact_zero_ends_the_solve_at_that_point(k):
-    """On a line, the first secant step lands on the root, where the function is exactly 0, and the solve returns it
-    after 3 evaluations."""
+    """On a line, the first secant step lands on the root, where the function is exactly 0, and the solve returns the
+    root after 3 evaluations."""
     # --- act --------------------------
     result = TOMS748(k=k).solve(lambda x: x - 0.25, 0.0, 1.0, xtol=1e-10, max_fevals=10)
 
@@ -91,8 +91,8 @@ def test_an_exact_zero_ends_the_solve_at_that_point(k):
 @pytest.mark.parametrize("k", [1, 2])
 def test_a_point_close_to_a_bound_moves_to_the_margin_and_the_lower_bound_is_returned(k):
     """On ``x - 1e-9`` over ``[0, 1]`` with ``xtol = 1e-4``, the secant point 1e-9 lies within ``0.7 * stop_width``
-    of the lower bound, so it moves there. The interval ``[0, 0.7 * stop_width]`` that remains meets the stopping
-    criterion, and the solve returns its lower bound 0."""
+    of the lower bound, so the secant point moves to ``0.7 * stop_width``. The interval ``[0, 0.7 * stop_width]``
+    that remains meets the stopping criterion, and the solve returns its lower bound 0."""
     # --- arrange ----------------------
     xtol = 1e-4
     # The lower bound has the smaller |f|, and lies at 0, so stop_width is 2 * tol.
@@ -106,19 +106,20 @@ def test_a_point_close_to_a_bound_moves_to_the_margin_and_the_lower_bound_is_ret
     assert (result.x, result.status, result.n_fevals) == (0.0, SolveStatus.CONVERGED, 3)
 
 
-def test_newton_quadratic_returns_the_zero_of_the_line_when_the_3_points_lie_on_a_line():
+def test_newton_quadratic_zero_returns_the_zero_of_the_line_when_the_3_points_lie_on_a_line():
     """When ``f[a, b, d] = 0``, the quadratic is a line, and Newton-Quadratic returns its zero."""
     # --- act / assert -----------------
     # The points (0, -1), (1, 1) and (2, 3) lie on the line 2x - 1.
-    assert TOMS748._newton_quadratic(0.0, 1.0, 2.0, -1.0, 1.0, 3.0, 2) == 0.5
+    assert TOMS748._newton_quadratic_zero(0.0, 1.0, 2.0, -1.0, 1.0, 3.0, 2) == 0.5
 
 
-def test_newton_quadratic_returns_the_zero_of_the_line_when_a_newton_step_meets_a_zero_derivative():
+def test_newton_quadratic_zero_returns_the_zero_of_the_line_when_a_newton_step_meets_a_zero_derivative():
     """When a Newton step starts where the quadratic's derivative is 0, Newton-Quadratic returns the zero of the line
     through ``a`` and ``b``."""
     # --- act / assert -----------------
-    # p(x) = -1 - x - x(x - 1) through a = 0, b = 1 and d = 2; the steps start at a, where p'(0) = -1 + 1 = 0.
-    assert TOMS748._newton_quadratic(0.0, 1.0, 2.0, -1.0, -2.0, -5.0, 2) == -1.0
+    # The quadratic through a = 0, b = 1 and d = 2 is p(x) = -1 - x - x(x - 1); the steps start at a, where
+    # p'(0) = -1 + 1 = 0.
+    assert TOMS748._newton_quadratic_zero(0.0, 1.0, 2.0, -1.0, -2.0, -5.0, 2) == -1.0
 
 
 # ==================================================================================================
@@ -137,7 +138,7 @@ def test_a_smooth_function_converges_to_its_root(f, k):
     assert abs(result.x - CUBIC_ROOT) <= 1e-10
 
 
-def test_an_initial_interval_narrower_than_stop_width_returns_its_lower_bound_without_an_evaluation():
+def test_an_initial_interval_narrower_than_stop_width_returns_its_lower_bound_without_an_interior_evaluation():
     """An initial interval of width 1e-12, below ``xtol = 1e-10``, already meets the stopping criterion, so the solve
     returns its lower bound after the 2 evaluations at its bounds."""
     # --- act --------------------------
@@ -195,11 +196,12 @@ class _TOMS748WithTol(TOMS748):
 
 
 def _tol_as_the_driver_computes_it(n_digits: int | None) -> float:
-    """Return ``10^-n_digits`` by repeated division, as the driver's subroutine ``TOLE`` computes it, or 0 for
-    ``None``."""
+    """Return ``10^-n_digits`` by repeated division, as the subroutine ``TOLE`` of the authors' code computes it, or
+    0 for ``None``."""
     if n_digits is None:
         return 0.0
-    tol = 1.0
-    for _ in range(n_digits):
-        tol = tol / 10.0
-    return tol
+    else:
+        tol = 1.0
+        for _ in range(n_digits):
+            tol = tol / 10.0
+        return tol

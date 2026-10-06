@@ -18,7 +18,7 @@ class TOMS748K1Config(SolverConfig):
 
 
 class TOMS748K2Config(SolverConfig):
-    """`TOMS748K2Config` is `TOMS748` with ``k = 2``, the paper's Algorithm 4.2, for information."""
+    """`TOMS748K2Config` is a secondary config: `TOMS748` with ``k = 2``, the paper's Algorithm 4.2."""
 
     solver_cls = TOMS748
     solver_kwargs = {"k": 2}  # noqa: RUF012 — the dict is never mutated

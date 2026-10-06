@@ -10,7 +10,7 @@ import math
 from dataclasses import dataclass
 
 # The driver sets pi to this rounded value for the intervals of problems 1 and 27.
-_PI = 3.1416
+_PI_ROUNDED = 3.1416
 
 
 @dataclass(frozen=True)
@@ -30,9 +30,10 @@ class PaperProblem:
     def interval(self) -> tuple[float, float]:  # noqa: C901 — 1 branch per interval of the driver
         """Return the initial interval ``(a, b)`` of the problem."""
         if self.number == 1:
-            return _PI / 2.0, _PI
+            return _PI_ROUNDED / 2.0, _PI_ROUNDED
         elif 2 <= self.number <= 11:
-            # Problems 2 to 11 share 1 function with poles at the squares, 1 interval between 2 squares each.
+            # Problems 2 to 11 share 1 function, which has a pole at each square i^2; each problem takes the
+            # interval between 2 consecutive squares.
             i = float(self.number - 1)
             return i * i + 1e-9, (i + 1.0) * (i + 1.0) - 1e-9
         elif 12 <= self.number <= 14:
@@ -52,7 +53,7 @@ class PaperProblem:
         elif self.number == 26:
             return -1.0, 4.0
         elif self.number == 27:
-            return -10000.0, _PI / 2.0
+            return -10000.0, _PI_ROUNDED / 2.0
         else:
             return -10000.0, 1e-4
 
@@ -108,21 +109,23 @@ class PaperProblem:
 
 
 def _flat_near_0(x: float) -> float:
-    """Return ``x / exp(1 / x^2)``, problem 26, and 0 where the exponential overflows, as it does in Fortran.
+    """Return ``x / exp(1 / x^2)``, problem 26, and 0 where the exponential overflows, which is the value that the
+    Fortran code computes there.
 
     Python raises where Fortran returns infinity: ``exp`` overflows for ``|x|`` below about 0.0375, and ``1 / x^2``
     for ``|x|`` below about 1e-154. The function is 0 there in both cases.
     """
     if x == 0.0:
         return 0.0
-    try:
-        return x / math.exp(1.0 / (x * x))
-    except (OverflowError, ZeroDivisionError):
-        return 0.0
+    else:
+        try:
+            return x / math.exp(1.0 / (x * x))
+        except (OverflowError, ZeroDivisionError):
+            return 0.0
 
 
-# The authors' test output, in the order of their test data: problem number, n, and the root that their code prints
-# to 14 significant digits.
+# The authors' test output lists, in the order of their test data, the problem number, n, and the root that their
+# code prints to 14 significant digits.
 PAPER_PROBLEMS = [
     PaperProblem(number, n, root)
     for number, n, root in [
