@@ -23,18 +23,13 @@ class Brent(Solver):
         bound, or that is not shorter than half the step before the previous one.
 
     A step shorter than the tolerance is lengthened to the tolerance, toward the bound on the other side of the root.
-    These rules guarantee that the solve converges within a bounded number of evaluations, whatever the function.
+    As long as ``tol`` stays positive, these rules guarantee that the solve converges within a bounded number of
+    evaluations, at most about the square of bisection's count, whatever the function.
 
-    The variables keep the names of the Algol procedure, and comments mark where its labels ``int`` and ``ext``
-    fall, so that the code can be compared with it line by line:
+    The stopping criterion and the tolerance use these quantities of Brent's procedure:
 
     - ``b`` and ``c`` are the interval bounds, ``b`` the one with the smaller ``|f|``, which is the best estimate;
-    - ``a`` is the previous value of ``b``;
-    - ``d`` is the step from ``b`` in this iteration, and ``e`` the step of the iteration before, so while the next
-      step is chosen, ``e`` holds the step before the previous one;
     - ``m`` is half the signed width of the interval, from ``b`` toward ``c``;
-    - ``p / q`` is the interpolation step, computed as a separate numerator and denominator so that the division
-      ``p / q`` runs only once the step is accepted;
     - ``tol = 2 * macheps * |b| + t`` is the tolerance, with ``macheps`` the relative machine precision and ``t`` an
       absolute tolerance derived from ``xtol`` (below); the solve ends once ``|m| <= tol`` or ``f(b) = 0``, and
       returns ``b``.
@@ -44,8 +39,8 @@ class Brent(Solver):
     so that the returned ``b`` lies within ``xtol`` of a root.
 
     ``xtol`` must therefore exceed ``6 * macheps * max(|a0|, |b0|)``; below that, ``t`` is negative and the accuracy
-    is no longer guaranteed. Where ``t`` also makes ``tol`` negative, ``|m| <= tol`` can never hold, and the solve
-    runs until its evaluation budget is exhausted.
+    is no longer guaranteed. Where ``t`` is so negative that ``tol`` is negative too, ``|m| <= tol`` can never hold, and
+    the solve runs until its evaluation budget is exhausted.
 
     The bounds ``b`` and ``c`` swap roles as the iteration proceeds, and the stopping criterion is Brent's own, so
     `Brent` writes its own loop, not `BracketingSolver`'s.
@@ -54,12 +49,25 @@ class Brent(Solver):
     name = "brent"
     version = 1
 
-    def _solve(self, state: SolveState) -> float:  # noqa: C901 — 1 loop that follows Brent's procedure line by line
+    def _solve(self, state: SolveState) -> float:  # noqa: C901 — the loop follows Brent's procedure line by line
         """Run Brent's procedure and return ``b``.
 
-        Each iteration makes ``b`` the bound with the smaller ``|f|``, and ends the solve if the stopping criterion
-        holds. Otherwise it chooses the step ``d``, evaluates ``b + d``, and keeps the bound on the other side of
-        the root as ``c``.
+        The variables keep the names of the Algol procedure, and comments mark where its labels ``int`` and ``ext``
+        fall, so that the code can be compared with the procedure line by line. Besides ``b``, ``c``, ``m`` and
+        ``tol``, which the class docstring defines:
+
+        - ``a`` is the previous value of ``b``;
+        - ``d`` is the step taken from ``b``, and ``e`` the step taken in the iteration before it; while the next
+          step is chosen, ``d`` therefore holds the previous step and ``e`` the step before the previous one;
+        - ``p / q`` is the interpolation step, computed as a separate numerator and denominator so that the division
+          ``p / q`` runs only once the step is accepted.
+
+        Each iteration:
+
+        - makes ``b`` the bound with the smaller ``|f|``;
+        - ends the solve if the stopping criterion holds;
+        - chooses the step ``d`` and evaluates ``b + d``;
+        - keeps the bound on the other side of the root as ``c``.
         """
         interval = state.interval
         a, fa, b, fb = interval.a, interval.fa, interval.b, interval.fb

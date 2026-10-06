@@ -21,8 +21,8 @@ def test_the_first_step_is_a_secant_step_from_the_bound_with_the_smaller_abs_f()
 
 @pytest.mark.parametrize("f", [cubic, decreasing_cubic])
 def test_a_smooth_function_converges_to_its_root(f):
-    """On `cubic` and `decreasing_cubic`, which cover both interval orientations, `Brent` returns an evaluated point
-    within ``xtol`` of the root."""
+    """On `cubic`, which increases, and `decreasing_cubic`, which decreases, `Brent` returns an evaluated point within
+    ``xtol`` of the root."""
     # --- act --------------------------
     result = Brent().solve(f, 1.0, 2.0, xtol=1e-10, max_fevals=60, history_enabled=True)
 

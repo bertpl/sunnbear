@@ -11,12 +11,13 @@ _MACHEPS = sys.float_info.epsilon
 
 
 class BrentScipyTwin(TwinSolver):
-    """`BrentScipyTwin` hands the interval to `scipy.optimize.brentq` and returns ``b`` at the point where `Brent`
-    would stop.
+    """`BrentScipyTwin` hands the interval to `scipy.optimize.brentq` and returns ``b`` after the evaluation at which
+    `Brent` would stop.
 
     SciPy's ``brentq`` follows the Fortran version of Brent's procedure on netlib. Its tolerance,
-    ``(xtol + rtol * |b|) / 2``, equals Brent's ``tol = 2 * macheps * |b| + t`` when the twin passes ``xtol = 2 * t``
-    and ``rtol = 4 * macheps``, so SciPy's steps match those of `Brent`.
+    ``(xtol + rtol * |b|) / 2``, equals Brent's ``tol = 2 * macheps * |b| + t`` with ``t`` the absolute tolerance
+    that `Brent` derives from its ``xtol``, when the twin passes brentq ``xtol=2 * t`` and ``rtol=4 * macheps``, so
+    SciPy's steps match those of `Brent`.
 
     The twin deviates from exact agreement in these declared ways:
 
@@ -24,7 +25,8 @@ class BrentScipyTwin(TwinSolver):
     - SciPy computes the interpolation step from divided differences, where `Brent` computes it as ``p / q``, so the
       evaluated points can differ in their last bits;
     - SciPy tests a few of Brent's conditions with a strict inequality where Brent's procedure has a non-strict one,
-      and the reverse; the 2 tests give different results only when the 2 sides are exactly equal.
+      and the reverse; a strict and a non-strict comparison give different results only when
+      the 2 sides are exactly equal.
     """
 
     name = "brent_scipy_twin"
@@ -37,8 +39,8 @@ class BrentScipyTwin(TwinSolver):
         The twin runs 1 solve at a time, so it keeps that solve's ``t`` on the instance for
         `_root_if_sunnbear_solver_stops`.
         """
-        self._t = 0.5 * (xtol - 6.0 * _MACHEPS * max(abs(a), abs(b)))
-        scipy.optimize.brentq(f, a, b, xtol=2.0 * self._t, rtol=4.0 * _MACHEPS)
+        self._brent_t = 0.5 * (xtol - 6.0 * _MACHEPS * max(abs(a), abs(b)))
+        scipy.optimize.brentq(f, a, b, xtol=2.0 * self._brent_t, rtol=4.0 * _MACHEPS)
 
     def _root_if_sunnbear_solver_stops(
         self, interval: Interval, evaluations: list[tuple[float, float]], xtol: float
@@ -57,7 +59,7 @@ class BrentScipyTwin(TwinSolver):
             b, fb, c = x_other, f_other, x_newest
         else:
             b, fb, c = x_newest, f_newest, x_other
-        if abs(0.5 * (c - b)) <= 2.0 * _MACHEPS * abs(b) + self._t or fb == 0.0:
+        if abs(0.5 * (c - b)) <= 2.0 * _MACHEPS * abs(b) + self._brent_t or fb == 0.0:
             return b
         else:
             return None
