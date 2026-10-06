@@ -50,15 +50,7 @@ class BrentScipyTwin(TwinSolver):
         As in `Brent`, ``b`` is the interval bound with the smaller ``|f|``, and the newest point when both are
         equal.
         """
-        x_newest, f_newest = evaluations[-1]
-        if x_newest == interval.a:
-            x_other, f_other = interval.b, interval.fb
-        else:
-            x_other, f_other = interval.a, interval.fa
-        if abs(f_other) < abs(f_newest):
-            b, fb, c = x_other, f_other, x_newest
-        else:
-            b, fb, c = x_newest, f_newest, x_other
+        (b, fb), (c, _) = self._get_bounds_best_estimate_first(interval)
         if abs(0.5 * (c - b)) <= 2.0 * _MACHEPS * abs(b) + self._brent_t or fb == 0.0:
             return b
         else:
