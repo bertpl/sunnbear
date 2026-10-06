@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add the Illinois solver, `sunnbear.solvers.Illinois`
 - Add the Ridders solver, `sunnbear.solvers.Ridders`
 - Add the Brent solver, `sunnbear.solvers.Brent`
+- Add the Chandrupatla solver, `sunnbear.solvers.Chandrupatla`
 
 ### Changed
 

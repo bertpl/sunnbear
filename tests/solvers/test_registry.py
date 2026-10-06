@@ -4,6 +4,7 @@ import pytest
 
 from sunnbear._core.solvers.bracketing.bisection.configs import BisectionConfig
 from sunnbear._core.solvers.bracketing.brent.configs import BrentConfig
+from sunnbear._core.solvers.bracketing.chandrupatla.configs import ChandrupatlaConfig
 from sunnbear._core.solvers.bracketing.illinois.configs import IllinoisConfig
 from sunnbear._core.solvers.bracketing.regula_falsi.configs import RegulaFalsiConfig
 from sunnbear._core.solvers.bracketing.ridders.configs import (
@@ -12,7 +13,16 @@ from sunnbear._core.solvers.bracketing.ridders.configs import (
     RiddersScipyConfig,
 )
 from sunnbear.exceptions import UnknownSolverConfigError
-from sunnbear.solvers import Bisection, Brent, Illinois, RegulaFalsi, Ridders, SolverConfigRegistry, SolverRole
+from sunnbear.solvers import (
+    Bisection,
+    Brent,
+    Chandrupatla,
+    Illinois,
+    RegulaFalsi,
+    Ridders,
+    SolverConfigRegistry,
+    SolverRole,
+)
 
 from .example_solvers import WeightedSplitSolver, define_config
 
@@ -35,6 +45,7 @@ from .example_solvers import WeightedSplitSolver, define_config
         ),
         (RiddersCommonsMathConfig, "ridders[variant='commons_math']", Ridders, SolverRole.BUILTIN_SECONDARY),
         (RiddersScipyConfig, "ridders[variant='scipy']", Ridders, SolverRole.BUILTIN_CORE),
+        (ChandrupatlaConfig, "chandrupatla", Chandrupatla, SolverRole.BUILTIN_CORE),
     ],
 )
 def test_built_in_config_is_registered_on_import(config_cls, solver_id, solver_cls, role):
@@ -66,6 +77,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
     assert solver_ids == [
         "bisection",
         "brent",
+        "chandrupatla",
         "illinois",
         "regula_falsi",
         "ridders[variant='bracketing_solver']",
@@ -74,7 +86,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         "weighted_split[weight=0.25]",
         "weighted_split[weight=0.75]",
     ]
-    assert solver_classes == (Bisection, Brent, Illinois, RegulaFalsi, Ridders, WeightedSplitSolver)
+    assert solver_classes == (Bisection, Brent, Chandrupatla, Illinois, RegulaFalsi, Ridders, WeightedSplitSolver)
 
 
 def test_config_from_id_rejects_an_unknown_id():
