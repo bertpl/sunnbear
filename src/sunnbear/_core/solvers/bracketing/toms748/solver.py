@@ -11,13 +11,13 @@ _MACHEPS = sys.float_info.epsilon
 # of the iteration ends with a bisection.
 _MU = 0.5
 
-# ``_LAMBDA`` is the paper's ``lambda``: `_evaluate_and_split_at` keeps each new point at least ``_LAMBDA * stop_width``
-# away from both bounds, with ``stop_width`` the interval width at which the solve stops.
+# ``_LAMBDA`` is the paper's ``lambda``: `_evaluate_and_split_at` uses it to keep each new point away from the bounds of
+# the interval.
 _LAMBDA = 0.7
 
-# The authors' code starts ``e`` and ``f(e)`` at this value, which no step uses: the only step that could read them
-# before they are set, the first interpolation step of the second iteration, always takes Newton steps on the
-# quadratic through ``a``, ``b`` and ``d``, which do not read ``e``.
+# The authors' code starts ``e`` and ``f(e)`` at this value, which no step reads. ``e`` is the bound discarded before
+# the most recently discarded one; the only step that runs before ``e`` is set, the first interpolation step of the
+# second iteration, always takes Newton steps, which do not read ``e``.
 _UNSET = 1.0e5
 
 
@@ -31,8 +31,8 @@ class TOMS748(Solver):
       function values are not distinct, or when that zero lies outside ``(a, b)``, it takes ``j + 1`` Newton steps
       on the quadratic through ``a``, ``b`` and ``d``. The first step of the second iteration always takes the
       Newton steps, because ``e`` is not known yet.
-    - a double-size secant step: twice the secant step from ``u``, the bound with the smaller ``|f|``, or the midpoint
-      when that step is longer than half the interval.
+    - a double-size secant step: from ``u``, the bound with the smaller ``|f|``, a step twice as long as the secant
+      step; when that step would be longer than half the interval, the midpoint instead.
     - a bisection, unless the interval has shrunk below half its width at the start of the iteration.
 
     ``k = 1`` is the paper's Algorithm 4.1 and ``k = 2`` its Algorithm 4.2.
@@ -41,7 +41,7 @@ class TOMS748(Solver):
     stopping criterion of Brent's method:
 
     - ``stop_width = 2 * (2 * macheps * |u| + tol)``, with ``macheps`` the relative machine precision and ``tol`` an
-      absolute tolerance derived from ``xtol`` (below);
+      absolute tolerance that the solver derives from ``xtol``;
     - the solve ends once the interval is at most ``stop_width`` wide, or once an evaluation returns exactly 0, and
       returns the lower bound ``a``, or the point that returned 0.
 
@@ -66,14 +66,16 @@ class TOMS748(Solver):
           https://doi.org/10.1145/210089.210111
         - The authors' Fortran 77 code, published with the paper as algorithm 748 of the Collected Algorithms of the
           ACM (netlib, ``toms/748``). It implements Algorithm 4.2, which ``k = 2`` follows line by line, and the test
-          suite reproduces the roots that the code lists for its 154 test problems.
+          suite reproduces the roots that the code lists for its test problems.
     """
 
     name = "toms748"
     version = 1
 
     def __init__(self, *, k: int) -> None:
-        """Configure the number of interpolation steps per iteration; ``k = 1`` and ``k = 2`` are the paper's.
+        """Configure the number ``k`` of interpolation steps per iteration.
+
+        ``k = 1`` and ``k = 2`` are the paper's Algorithms 4.1 and 4.2.
 
         Raises:
             ValueError: If ``k`` is not 1 or 2.
@@ -85,8 +87,8 @@ class TOMS748(Solver):
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — the loop follows the authors' code step by step
         """Run Algorithm 4.1 or 4.2 and return the lower bound of the final interval.
 
-        The variables keep the names of the paper and the authors' code, so that the code can be compared with
-        them step by step:
+        The variables keep the names of the paper and the authors' code, so that this method can be compared with the
+        paper and the authors' code step by step:
 
         - ``interval`` is the enclosing interval ``[a, b]``, with ``f(a)`` and ``f(b)`` of opposite signs;
         - ``d`` is the bound that the last call of `_evaluate_and_split_at` discarded, and ``e`` the value of ``d``
@@ -129,7 +131,7 @@ class TOMS748(Solver):
                     if (c - a) * (c - b) >= 0.0:
                         c = self._newton_quadratic_zero(a, b, d, fa, fb, fd, j + 1)
                 if j < self.k:
-                    # The next interpolation step uses, as its e, the d that this step interpolated through.
+                    # The next interpolation step uses this step's d as its e.
                     e, fe = d, fd
                 interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
                 if interval.is_fa_zero or interval.width <= stop_width:
@@ -137,10 +139,7 @@ class TOMS748(Solver):
             e, fe = d, fd
 
             # --- the double-size secant step ----
-            if abs(interval.fa) < abs(interval.fb):
-                u, fu = interval.a, interval.fa
-            else:
-                u, fu = interval.b, interval.fb
+            u, fu = self._get_u(interval)
             c = u - 2.0 * (fu / (interval.fb - interval.fa)) * interval.width
             if abs(c - u) > 0.5 * interval.width:
                 c = interval.a + 0.5 * interval.width
@@ -166,28 +165,35 @@ class TOMS748(Solver):
         return max(0.5 * xtol - 2.0 * _MACHEPS * max(abs(a0), abs(b0)), 0.0)
 
     @staticmethod
-    def _get_stop_width(interval: Interval, tol: float) -> float:
-        """Return ``stop_width = 2 * (2 * macheps * |u| + tol)`` for ``interval``, the code's subroutine ``TOLE``.
-
-        ``u`` is the bound with the smaller ``|f|``, and ``b`` when both are equal.
-        """
+    def _get_u(interval: Interval) -> tuple[float, float]:
+        """Return ``u``, the bound with the smaller ``|f|``, and ``b`` when both are equal, with ``f(u)``."""
         if abs(interval.fb) <= abs(interval.fa):
-            u = interval.b
+            return interval.b, interval.fb
         else:
-            u = interval.a
+            return interval.a, interval.fa
+
+    @staticmethod
+    def _get_stop_width(interval: Interval, tol: float) -> float:
+        """Return ``stop_width = 2 * (2 * macheps * |u| + tol)`` for ``interval``, the authors' subroutine ``TOLE``."""
+        u, _ = TOMS748._get_u(interval)
         return 2.0 * (tol + 2.0 * abs(u) * _MACHEPS)
 
     def _evaluate_and_split_at(
         self, state: SolveState, interval: Interval, c: float, stop_width: float, tol: float
     ) -> tuple[Interval, float, float, float]:
-        """Evaluate ``c`` and return the interval that still holds the sign change: the code's subroutine ``BRACKT``.
+        """Evaluate ``c`` and return the interval that still holds the sign change: the authors' subroutine ``BRACKT``.
 
         Before the evaluation, ``c`` is moved to at least ``_LAMBDA * stop_width`` inside the interval, or to the
-        midpoint when the interval is at most ``2 * _LAMBDA * stop_width`` wide.
+        midpoint when the interval is at most ``2 * _LAMBDA * stop_width`` wide. The method also sets
+        ``state.x_best`` to the lower bound of the new interval.
 
         Returns:
-            The new interval, the discarded bound ``d`` and ``f(d)``, and the ``stop_width`` of the new interval. If
-            ``f(c)`` is exactly 0, the new interval is ``[c, b]`` with ``f(a) = 0``, which ends the solve.
+            A tuple of:
+
+            - the new interval; if ``f(c)`` is exactly 0, it is ``[c, b]`` with ``f(a) = 0``;
+            - the discarded bound ``d``;
+            - ``f(d)``;
+            - the ``stop_width`` of the new interval.
         """
         margin = _LAMBDA * stop_width
         if interval.width <= 2.0 * margin:
@@ -197,7 +203,7 @@ class TOMS748(Solver):
         elif c >= interval.b - margin:
             c = interval.b - margin
         fc = state.f(c)
-        # A zero f(c) has the sign of f(a) for split_at, which therefore replaces a.
+        # split_at treats a zero f(c) as having the sign of f(a), so it replaces a with c.
         new_interval = interval.split_at(c, fc)
         if new_interval.last_replaced_bound is IntervalBound.LOWER:
             d, fd = interval.a, interval.fa
@@ -210,11 +216,13 @@ class TOMS748(Solver):
     def _newton_quadratic_zero(a: float, b: float, d: float, fa: float, fb: float, fd: float, n_steps: int) -> float:
         """Return the zero in ``(a, b)`` of the quadratic through ``a``, ``b`` and ``d``, by ``n_steps`` Newton steps.
 
-        This is the paper's subroutine Newton-Quadratic, as the code's subroutine ``NEWQUA`` implements it. The
-        quadratic is ``p(x) = fa + a1 * (x - a) + a2 * (x - a) * (x - b)``, with the divided differences
-        ``a1 = f[a, b]`` and ``a2 = f[a, b, d]``. The Newton steps start from the bound where ``p`` has the sign of
-        ``p'' = 2 * a2``, from which they approach the zero from 1 side. When ``a2 = 0``, or when a step meets
-        ``p'(x) = 0``, the zero of the line ``fa + a1 * (x - a)`` is returned.
+        This is the paper's subroutine Newton-Quadratic, as the authors' subroutine ``NEWQUA`` implements it.
+
+        The quadratic is ``p(x) = fa + a1 * (x - a) + a2 * (x - a) * (x - b)``, with the divided differences
+        ``a1 = f[a, b]`` and ``a2 = f[a, b, d]``. The Newton steps start from the bound where ``p`` has the same sign
+        as ``p'' = 2 * a2``; from that bound, each step moves toward the zero without passing it.
+
+        When ``a2 = 0``, or when a step meets ``p'(x) = 0``, the zero of the line ``fa + a1 * (x - a)`` is returned.
         """
         a1 = (fb - fa) / (b - a)
         a2 = ((fd - fb) / (d - b) - a1) / (d - a)
@@ -239,8 +247,9 @@ class TOMS748(Solver):
     ) -> float:
         """Return the zero of the inverse cubic interpolation through ``a``, ``b``, ``d`` and ``e``.
 
-        This is the paper's subroutine ``ipzero``, the code's ``PZERO``: an Aitken-Neville scheme for the value at
-        ``y = 0`` of the cubic ``x(y)`` through the 4 points ``(f(x), x)``. The 4 function values must be distinct.
+        This is the paper's subroutine ``ipzero``, the authors' subroutine ``PZERO``: an Aitken-Neville scheme for the
+        value at ``y = 0`` of the cubic ``x(y)`` through the 4 points ``(f(x), x)``. The 4 function values must be
+        distinct.
         """
         q11 = (d - e) * fd / (fe - fd)
         q21 = (b - d) * fb / (fd - fb)

@@ -45,18 +45,15 @@ def test_k_2_reproduces_the_root_that_the_authors_code_computes(problem: PaperPr
     ],
 )
 def test_the_total_evaluation_count_lies_within_1_1_percent_of_the_papers_table_ii(k, n_digits, paper_total):
-    """Over the 154 problems, the total evaluation count lies within 1.1 % of the paper's Table II, for each ``k`` and
-    for each of the paper's tolerances ``tol = 10^-n_digits`` and ``tol = 0``.
+    """Over the problems in `PAPER_PROBLEMS`, the total evaluation count lies within 1.1 % of the paper's Table II,
+    for each ``k`` and for each of the paper's tolerances ``tol = 10^-n_digits`` and ``tol = 0``.
 
     The paper's counts include the 2 evaluations at the interval bounds, and come from a machine whose relative
     precision was 1.907e-16, not 2^-52.
     """
-    # --- arrange ----------------------
-    tol = _tol_as_the_driver_computes_it(n_digits)
-
-    # --- act --------------------------
+    # --- arrange / act ----------------
     total = sum(
-        _TOMS748WithTol(k=k, tol=tol).solve(problem.f, *problem.interval, xtol=0.0, max_fevals=100).n_fevals
+        _TOMS748WithTol(k=k, n_digits=n_digits).solve(problem.f, *problem.interval, xtol=0.0, max_fevals=100).n_fevals
         for problem in PAPER_PROBLEMS
     )
 
@@ -106,20 +103,24 @@ def test_a_point_close_to_a_bound_moves_to_the_margin_and_the_lower_bound_is_ret
     assert (result.x, result.status, result.n_fevals) == (0.0, SolveStatus.CONVERGED, 3)
 
 
-def test_newton_quadratic_zero_returns_the_zero_of_the_line_when_the_3_points_lie_on_a_line():
-    """When ``f[a, b, d] = 0``, the quadratic is a line, and Newton-Quadratic returns its zero."""
+@pytest.mark.parametrize(
+    "fa, fb, fd, expected",
+    [
+        # The points (0, -1), (1, 1) and (2, 3) lie on the line 2x - 1, so f[a, b, d] = 0.
+        (-1.0, 1.0, 3.0, 0.5),
+        # The quadratic through a = 0, b = 1 and d = 2 is p(x) = -1 - x - x(x - 1); the steps start at a, where
+        # p'(0) = -1 + 1 = 0.
+        (-1.0, -2.0, -5.0, -1.0),
+    ],
+    ids=["points_on_a_line", "zero_derivative"],
+)
+def test_newton_quadratic_zero_returns_the_zero_of_the_line_through_a_and_b_when_newton_steps_cannot_be_taken(
+    fa, fb, fd, expected
+):
+    """When ``f[a, b, d] = 0``, or when a Newton step meets a zero derivative of the quadratic, Newton-Quadratic
+    returns the zero of the line through ``a`` and ``b``."""
     # --- act / assert -----------------
-    # The points (0, -1), (1, 1) and (2, 3) lie on the line 2x - 1.
-    assert TOMS748._newton_quadratic_zero(0.0, 1.0, 2.0, -1.0, 1.0, 3.0, 2) == 0.5
-
-
-def test_newton_quadratic_zero_returns_the_zero_of_the_line_when_a_newton_step_meets_a_zero_derivative():
-    """When a Newton step starts where the quadratic's derivative is 0, Newton-Quadratic returns the zero of the line
-    through ``a`` and ``b``."""
-    # --- act / assert -----------------
-    # The quadratic through a = 0, b = 1 and d = 2 is p(x) = -1 - x - x(x - 1); the steps start at a, where
-    # p'(0) = -1 + 1 = 0.
-    assert TOMS748._newton_quadratic_zero(0.0, 1.0, 2.0, -1.0, -2.0, -5.0, 2) == -1.0
+    assert TOMS748._newton_quadratic_zero(0.0, 1.0, 2.0, fa, fb, fd, 2) == expected
 
 
 # ==================================================================================================
@@ -185,23 +186,26 @@ def test_identity_and_that_its_arithmetic_is_counted():
 class _TOMS748WithTol(TOMS748):
     """`_TOMS748WithTol` is `TOMS748` with the paper's ``tol`` given directly, as the authors' driver gives it."""
 
-    def __init__(self, *, k: int, tol: float) -> None:
-        """Configure ``k`` and the fixed ``tol``."""
+    def __init__(self, *, k: int, n_digits: int | None) -> None:
+        """Configure ``k`` and the fixed ``tol = 10^-n_digits``, or ``tol = 0`` for ``None``."""
         super().__init__(k=k)
-        self._tol = tol
+        self._tol = self._tol_as_the_driver_computes_it(n_digits)
 
     def _get_tol(self, xtol: float, a0: float, b0: float) -> float:
         """Return the fixed ``tol``."""
         return self._tol
 
-
-def _tol_as_the_driver_computes_it(n_digits: int | None) -> float:
-    """Return ``10^-n_digits`` by repeated division, as the subroutine ``TOLE`` of the authors' code computes it, or
-    0 for ``None``."""
-    if n_digits is None:
-        return 0.0
-    else:
-        tol = 1.0
-        for _ in range(n_digits):
-            tol = tol / 10.0
-        return tol
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _tol_as_the_driver_computes_it(n_digits: int | None) -> float:
+        """Return ``10^-n_digits`` by repeated division, as the subroutine ``TOLE`` of the authors' code computes it,
+        or 0 for ``None``."""
+        if n_digits is None:
+            return 0.0
+        else:
+            tol = 1.0
+            for _ in range(n_digits):
+                tol = tol / 10.0
+            return tol

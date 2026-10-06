@@ -1,4 +1,4 @@
-"""This module holds the 154 test problems of Algorithm 748, from the authors' test driver, and the roots that the
+"""This module holds the test problems of Algorithm 748, from the authors' test driver, and the roots that the
 authors' code computes for them.
 
 The driver numbers its problems 1 to 28, and runs most of them for several values of an integer parameter ``n``. The
@@ -15,8 +15,8 @@ _PI_ROUNDED = 3.1416
 
 @dataclass(frozen=True)
 class PaperProblem:
-    """A `PaperProblem` is 1 of the 154 test problems: the driver's problem number, its parameter ``n``, and the root
-    that the authors' code computes for it with the tolerance ``tol = 0``."""
+    """A `PaperProblem` is 1 of the test problems: the driver's problem number, its parameter ``n``, and the root that
+    the authors' code computes for it with the tolerance ``tol = 0``."""
 
     number: int
     n: int
@@ -94,7 +94,7 @@ class PaperProblem:
         elif self.number == 25:
             return x ** (1.0 / n) - n ** (1.0 / n)
         elif self.number == 26:
-            return _flat_near_0(x)
+            return self._flat_near_0(x)
         elif self.number == 27:
             if x >= 0.0:
                 return (x / 1.5 + math.sin(x) - 1.0) * n / 20.0
@@ -107,21 +107,24 @@ class PaperProblem:
         else:
             return -0.859
 
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _flat_near_0(x: float) -> float:
+        """Return ``x / exp(1 / x^2)``, problem 26, and 0 where the exponential overflows, which is the value that the
+        Fortran code computes there.
 
-def _flat_near_0(x: float) -> float:
-    """Return ``x / exp(1 / x^2)``, problem 26, and 0 where the exponential overflows, which is the value that the
-    Fortran code computes there.
-
-    Python raises where Fortran returns infinity: ``exp`` overflows for ``|x|`` below about 0.0375, and ``1 / x^2``
-    for ``|x|`` below about 1e-154. The function is 0 there in both cases.
-    """
-    if x == 0.0:
-        return 0.0
-    else:
-        try:
-            return x / math.exp(1.0 / (x * x))
-        except (OverflowError, ZeroDivisionError):
+        Python raises where Fortran returns infinity: ``exp`` overflows for ``|x|`` below about 0.0375, and ``1 / x^2``
+        for ``|x|`` below about 1e-154. The function is 0 there in both cases.
+        """
+        if x == 0.0:
             return 0.0
+        else:
+            try:
+                return x / math.exp(1.0 / (x * x))
+            except (OverflowError, ZeroDivisionError):
+                return 0.0
 
 
 # The authors' test output lists, in the order of their test data, the problem number, n, and the root that their
