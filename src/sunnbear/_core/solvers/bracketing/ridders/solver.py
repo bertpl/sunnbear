@@ -51,9 +51,10 @@ class Ridders(Solver):
         - Ridders, C. J. F. (1979). A new algorithm for computing a single root of a real continuous function. IEEE
           Transactions on Circuits and Systems 26(11), 979-980. https://doi.org/10.1109/TCS.1979.1084580
         - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section
-          9.2.1. Cambridge University Press. Its routine ``zriddr`` is close to the ``"commons_math"`` variant.
+          9.2.1. Cambridge University Press. The book's routine ``zriddr`` is close to the ``"commons_math"``
+          variant.
         - SciPy's ``scipy.optimize.ridder``, which the ``"scipy"`` variant follows; the test suite checks `Ridders`
-          against it.
+          against ``scipy.optimize.ridder``.
         - Apache Commons Math's ``org.apache.commons.math4.legacy.analysis.solvers.RiddersSolver``, whose stopping
           criterion the ``"commons_math"`` variant follows.
     """
