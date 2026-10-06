@@ -13,6 +13,13 @@ class Bisection(BracketingSolver):
     The solve performs fewer evaluations only when a midpoint is an exact root.
 
     The benchmark relies on that exact count as its reference cost, so it must not change.
+
+    References:
+        - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd
+          edition, section 9.1.1. Cambridge University Press.
+        - Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition, section 2.1.
+          John Wiley & Sons.
+        - SciPy's ``scipy.optimize.bisect``; the test suite checks `Bisection` against it.
     """
 
     name = "bisection"
