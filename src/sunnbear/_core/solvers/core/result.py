@@ -16,9 +16,13 @@ class SolveStatus(Enum):
     nothing more. Whether the returned ``x`` is correct is judged downstream by
     the benchmark harness, which knows the true root; the solver does not.
 
-    ``DIVERGED`` means the solve left the interval: its result lies outside ``[a, b]``, or the
-    function failed at an ``x`` outside ``[a, b]``. A function failure inside the interval is
-    ``FUNCTION_ERROR``.
+    ``DIVERGED`` means the solve left the interval:
+
+    - its result lies outside ``[a, b]``;
+    - the function failed at an ``x`` outside ``[a, b]``;
+    - the solve ended with `DivergedError`: the solver's next point is not finite.
+
+    A function failure inside the interval is ``FUNCTION_ERROR``.
     """
 
     CONVERGED = "converged"

@@ -2,12 +2,16 @@
 a row, by the factor ``1 - f_new / f_previous`` or by 0.5 where that factor is not positive, which ends regula falsi's
 stall."""
 
-import math
-
 import pytest
 
 from sunnbear.solvers import AndersonBjorck, RegulaFalsi, SolveStatus
-from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic, steep_exponential
+from tests.solvers.example_functions import (
+    CUBIC_ROOT,
+    STEEP_EXPONENTIAL_ROOT,
+    cubic,
+    decreasing_cubic,
+    steep_exponential,
+)
 
 
 def _cubic_with_a_local_maximum(x: float) -> float:
@@ -113,7 +117,7 @@ def test_a_function_that_is_nearly_flat_on_1_side_of_the_root_takes_over_200_eva
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert abs(result.x - math.log(1.0e4) / 20.0) <= 1e-10
+    assert abs(result.x - STEEP_EXPONENTIAL_ROOT) <= 1e-10
     assert result.n_fevals > 200
 
 
