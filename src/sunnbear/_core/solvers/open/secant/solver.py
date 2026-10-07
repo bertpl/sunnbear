@@ -32,7 +32,8 @@ class Secant(Solver):
 
     References:
         - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section 9.2.
-          Cambridge University Press.
+          Cambridge University Press. Its ``rtsec`` takes the bound with the smaller ``|f|`` as the newest point,
+          where SciPy and `Secant` take the bound with the larger ``|f|``.
         - SciPy's ``scipy.optimize.newton``, without a derivative; the test suite checks `Secant` against it.
     """
 
