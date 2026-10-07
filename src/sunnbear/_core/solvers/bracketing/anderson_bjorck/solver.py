@@ -14,18 +14,21 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
     so the interval never shrinks below the distance from that bound to the root.
 
     The Anderson-Björck method (Anderson and Björck, 1973) avoids the stall the way the Illinois method does: it scales
-    down the function value of the bound that it keeps, but by a different factor.
+    down the function value of the bound that it keeps, by a factor:
+
+        Illinois:          factor = 0.5
+        Pegasus:           factor = f_previous / (f_previous + f_new)
+        Anderson-Björck:   factor = 1 - f_new / f_previous, or 0.5 where that is not positive
+
+    ``f_previous`` and ``f_new`` are the function values at the previous and the new iterate. They have the same sign
+    whenever the factor applies, so ``1 - f_new / f_previous`` is below 1, and closer to 1 the more the new iterate
+    reduced ``|f|``; it is not positive when the new iterate did not reduce ``|f|``.
 
     Each new iterate replaces 1 bound, and the other bound is the retained bound:
 
     - when a new iterate lies on the same side of the root as the previous iterate, the retained bound's function
-      value is multiplied by ``1 - f_new / f_previous`` before the next chord is drawn, which moves the next iterate
-      toward the retained bound:
-
-      - ``f_previous`` and ``f_new`` are the function values at the previous and the new iterate; they have the same
-        sign, so the factor is below 1, and closer to 1 the more the new iterate reduced ``|f|``;
-      - when the new iterate did not reduce ``|f|``, the factor is not positive, and the Illinois method's factor,
-        0.5, replaces it;
+      value is multiplied by the factor before the next chord is drawn, which moves the next iterate toward the
+      retained bound;
     - each further iteration that keeps that bound multiplies its value again, by that iteration's factor;
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, with its
       unscaled function value.
