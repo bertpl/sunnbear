@@ -7,6 +7,7 @@ Importing this module registers the built-in solver configs with `SolverConfigRe
 
 from ._core.solvers.bracketing import (
     ITP,
+    TOMS748,
     Bisection,
     Brent,
     Chandrupatla,
@@ -33,6 +34,7 @@ from ._core.solvers.core import (
 
 __all__ = [
     "ITP",
+    "TOMS748",
     "Bisection",
     "BracketingSolver",
     "Brent",

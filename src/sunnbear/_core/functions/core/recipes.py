@@ -182,9 +182,7 @@ class ParamRecipe:
         boundary by the least common multiple of the ``2 * (n - 1)``
         denominators turns them into plain integers, so ordering and
         coincidence are exact integer comparisons — no tolerances, and no
-        rational arithmetic in the loop. (The predecessor framework, which
-        established these semantics, instead sampled floats either side of each
-        boundary with an absolute epsilon.) Assumes every axis holds at least
+        rational arithmetic in the loop. Assumes every axis holds at least
         one value, which `ParamAxis.values` guarantees.
         """
         denominators = [2 * (len(values) - 1) for values in per_axis if len(values) > 1]
