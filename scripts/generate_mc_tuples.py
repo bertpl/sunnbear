@@ -97,7 +97,7 @@ def report_step(result: MCTuplesStepResult, inspection_dir: Path | None) -> None
     if inspection_dir is not None:
         inspection_dir.mkdir(parents=True, exist_ok=True)
         stem = f"k{int(result.size)}_{result.kind.value}"
-        # 17 significant digits write every float64 so that `np.loadtxt` reads it back exactly.
+        # Writing 17 significant digits lets `np.loadtxt` read every float64 back exactly.
         np.savetxt(
             inspection_dir / f"{stem}.csv", result.tuple_array, fmt="%.17g", delimiter=",", header="u,v", comments=""
         )
