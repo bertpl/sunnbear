@@ -33,9 +33,19 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
     The factor is the ratio of 2 chord slopes: the slope from the previous to the new iterate, divided by the slope of
     the chord that produced the new iterate.
 
-    Ford (1997) writes the factor as this ratio of slopes. In exact arithmetic, the ratio equals
+    The paper and Ford (1997) write the factor as this ratio of slopes. In exact arithmetic, the ratio equals
     ``1 - f_new / f_previous``, and `AndersonBjorck` computes the factor as ``1 - f_new / f_previous``, as mpmath's
     implementation does.
+
+    The paper's algorithm adds 2 parts that `AndersonBjorck` leaves out, as mpmath does:
+
+    - **a step of delta:** when the next point lies within ``delta`` of the newest point, the paper moves it to
+      exactly ``delta`` from the newest point, toward the retained bound;
+    - **its stopping criterion:** the paper stops once the interval is narrower than ``delta``, and returns the bound
+      with the smaller ``|f|``.
+
+    `AndersonBjorck` stops by the criterion of `BracketingSolver`, as `Illinois` and `Pegasus` do, so that the 3
+    methods differ only in the factor.
 
     Ford (1997) states the Anderson-Björck step with regula falsi's chord formula, so the Anderson-Björck method
     differs from `RegulaFalsi` only in its function value at the retained bound, and from `Illinois` and `Pegasus`
@@ -50,7 +60,8 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
 
     References:
         - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of an
-          equation. BIT 13(3), 253-264. https://doi.org/10.1007/BF01951936
+          equation. BIT 13(3), 253-264. Its equation 7 is the factor, its section 3 the fallback to 0.5, and its
+          section 6 the ALGOL procedure with the step of delta. https://doi.org/10.1007/BF01951936
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. The paper covers the Anderson-Björck method in 3 places:
 
