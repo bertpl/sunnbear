@@ -28,13 +28,14 @@ class Pegasus(BracketingSolver[PegasusState]):
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, with its
       unscaled function value.
 
-    Ford (1997) states the Pegasus step with regula falsi's chord formula, so the Pegasus method differs from
-    `RegulaFalsi` only in its function value at the retained bound, and from `Illinois` only in the factor, which
-    `Illinois` fixes at 0.5.
+    Dowell and Jarratt (1972) state the Pegasus step with regula falsi's chord formula, as Ford (1997) does, so the
+    Pegasus method differs from `RegulaFalsi` only in its function value at the retained bound, and from `Illinois`
+    only in the factor, which `Illinois` fixes at 0.5.
 
     References:
         - Dowell, M. and Jarratt, P. (1972). The "Pegasus" method for computing the root of an equation. BIT 12(4),
-          503-508. https://doi.org/10.1007/BF01932959
+          503-508. Its section 2 states when the retained bound's value is scaled and by what factor, and its
+          section 3 the chord formula. https://doi.org/10.1007/BF01932959
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. The paper's equation 5, with ``gamma = f_i / (f_i + f_(i+1))`` from the paper's
           Table 1, is the Pegasus step.
