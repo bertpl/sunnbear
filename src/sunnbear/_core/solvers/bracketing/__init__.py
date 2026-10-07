@@ -22,6 +22,7 @@ from .brent import Brent
 from .chandrupatla import Chandrupatla
 from .illinois import Illinois
 from .itp import ITP, ITPVariant
+from .pegasus import Pegasus
 from .regula_falsi import RegulaFalsi
 from .ridders import Ridders, RiddersVariant
 from .toms748 import TOMS748
