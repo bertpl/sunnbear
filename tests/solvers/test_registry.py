@@ -2,6 +2,7 @@
 
 import pytest
 
+from sunnbear._core.solvers.bracketing.anderson_bjorck.configs import AndersonBjorckConfig
 from sunnbear._core.solvers.bracketing.bisection.configs import BisectionConfig
 from sunnbear._core.solvers.bracketing.brent.configs import BrentConfig
 from sunnbear._core.solvers.bracketing.chandrupatla.configs import ChandrupatlaConfig
@@ -23,6 +24,7 @@ from sunnbear.exceptions import UnknownSolverConfigError
 from sunnbear.solvers import (
     ITP,
     TOMS748,
+    AndersonBjorck,
     Bisection,
     Brent,
     Chandrupatla,
@@ -43,6 +45,7 @@ from .example_solvers import WeightedSplitSolver, define_config
 @pytest.mark.parametrize(
     "config_cls, solver_id, solver_cls, role",
     [
+        (AndersonBjorckConfig, "anderson_bjorck", AndersonBjorck, SolverRole.BUILTIN_SECONDARY),
         (BisectionConfig, "bisection", Bisection, SolverRole.BUILTIN_BASELINE),
         (BrentConfig, "brent", Brent, SolverRole.BUILTIN_CORE),
         (IllinoisConfig, "illinois", Illinois, SolverRole.BUILTIN_CORE),
@@ -101,6 +104,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
 
     # --- assert -----------------------
     assert solver_ids == [
+        "anderson_bjorck",
         "bisection",
         "brent",
         "chandrupatla",
@@ -119,6 +123,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         "weighted_split[weight=0.75]",
     ]
     assert solver_classes == (
+        AndersonBjorck,
         Bisection,
         Brent,
         Chandrupatla,
