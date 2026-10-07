@@ -97,8 +97,9 @@ def report_step(result: MCTuplesStepResult, inspection_dir: Path | None) -> None
     if inspection_dir is not None:
         inspection_dir.mkdir(parents=True, exist_ok=True)
         stem = f"k{int(result.size)}_{result.kind.value}"
+        # 17 significant digits write every float64 so that `np.loadtxt` reads it back exactly.
         np.savetxt(
-            inspection_dir / f"{stem}.csv", result.tuple_array, fmt="%r", delimiter=",", header="u,v", comments=""
+            inspection_dir / f"{stem}.csv", result.tuple_array, fmt="%.17g", delimiter=",", header="u,v", comments=""
         )
         with (inspection_dir / f"{stem}_solution.pkl").open("wb") as file:
             pickle.dump(result.solution, file)
