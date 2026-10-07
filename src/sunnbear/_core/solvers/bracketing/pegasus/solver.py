@@ -38,7 +38,8 @@ class Pegasus(BracketingSolver[PegasusState]):
     References:
         - Dowell, M. and Jarratt, P. (1972). The "Pegasus" method for computing the root of an equation. BIT 12(4),
           503-508. Its section 2 states when the retained bound's value is scaled and by what factor, and its
-          section 3 the chord formula. https://doi.org/10.1007/BF01932959
+          section 3 the chord formula. The test suite reproduces the errors in the paper's Table 1.
+          https://doi.org/10.1007/BF01932959
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. The paper's equation 5, with ``gamma = f_i / (f_i + f_(i+1))`` from the paper's
           Table 1, is the Pegasus step.
