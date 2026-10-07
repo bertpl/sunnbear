@@ -13,24 +13,27 @@ class Pegasus(BracketingSolver[PegasusState]):
     Regula falsi stalls when the function is convex or concave on the interval: regula falsi keeps 1 bound forever,
     so the interval never shrinks below the distance from that bound to the root. The Pegasus method (Dowell and
     Jarratt, 1972) avoids the stall the way the Illinois method does: it scales down the function value of the bound
-    that it keeps, but by a different factor.
+    that it keeps, by a factor:
+
+        Illinois:  factor = 0.5
+        Pegasus:   factor = f_previous / (f_previous + f_new)
+
+    ``f_previous`` and ``f_new`` are the function values at the previous and the new iterate. They have the same sign
+    whenever the factor applies, so the factor lies between 0 and 1: it is 0.5 when both have the same size, and
+    closer to 1 the more the new iterate reduced ``|f|``.
 
     Each new iterate replaces 1 bound, and the other bound is the retained bound:
 
     - when a new iterate lies on the same side of the root as the previous iterate, the retained bound's function
-      value is multiplied by ``f_previous / (f_previous + f_new)`` before the next chord is drawn, which moves the
-      next iterate toward the retained bound:
-
-      - ``f_previous`` and ``f_new`` are the function values at the previous and the new iterate; they have the same
-        sign, so the factor lies between 0 and 1;
-      - the factor is 0.5 when both have the same size, and closer to 1 the more the new iterate reduced ``|f|``;
+      value is multiplied by the factor before the next chord is drawn, which moves the next iterate toward the
+      retained bound;
     - each further iteration that keeps that bound multiplies its value again, by that iteration's factor;
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, with its
       unscaled function value.
 
     Dowell and Jarratt (1972) state the Pegasus step with regula falsi's chord formula, as Ford (1997) does, so the
     Pegasus method differs from `RegulaFalsi` only in its function value at the retained bound, and from `Illinois`
-    only in the factor, which `Illinois` fixes at 0.5.
+    only in the factor.
 
     References:
         - Dowell, M. and Jarratt, P. (1972). The "Pegasus" method for computing the root of an equation. BIT 12(4),
