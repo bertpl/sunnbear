@@ -1,128 +1,120 @@
-"""`generate_mc_tuples` builds a nested set with exactly 1 tuple per lane at every size and reports each step, and its
-`MCTuplesGenerator` splits the total time over the solves and scales down the worker count of a short run."""
-
-from typing import TYPE_CHECKING, cast
+"""`generate_mc_tuples` builds nested sizes with means of 0.5 and at most 1 tuple per fine lane, and reports each size;
+its `MCTuplesGenerator` splits the total time over the solves and scales down the worker count of a short run."""
 
 import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import (
+    N_FINE_LANES,
     MCTuples,
-    MCTuplesCellSelectionResult,
     MCTuplesGenerator,
-    MCTuplesRefinementResult,
     MCTuplesSize,
-    MCTuplesStats,
-    MCTuplesStepKind,
-    MCTuplesStepResult,
+    MCTuplesSizeResult,
     generate_mc_tuples,
 )
-from sunnbear._core.benchmark.mc_tuples.construction_steps import (
-    MCTuplesCellSelectionStep,
-    MCTuplesRefinementStep,
-    MCTuplesStep,
-)
-from sunnbear._core.benchmark.mc_tuples.lane_grid import LaneGrid
+from sunnbear._core.benchmark.mc_tuples.construction_solve import MCTuplesSizeSolve
 
-if TYPE_CHECKING:
-    from max_div.solver import ParallelMaxDivSolution
+
+def _spread_each_gap_s_new_tuples(self: MCTuplesSizeSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
+    """Replace `MCTuplesSizeSolve.run`: spread each gap's new tuples evenly over its fine lanes, pair u and v at random,
+    and return them without running max-div."""
+    new_values = []
+    for allocation in (self.u_allocation, self.v_allocation):
+        values = []
+        for gap, count in enumerate(allocation.counts):
+            lanes = np.flatnonzero(allocation.gap_of_fine_lane == gap)
+            picks = np.round(np.linspace(0, lanes.size - 1, count + 2)[1:-1]).astype(np.int64)
+            values.extend((lanes[picks] + 0.5) / N_FINE_LANES)
+        new_values.append(self.settings.rng.permutation(values))
+    return np.column_stack(new_values), None
+
+
+def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]) -> None:
+    """Assert that every reported size is a prefix of `tuples`, with means of 0.5 and at most 1 tuple per fine lane."""
+    for result in results:
+        size_tuples = tuples.first(result.size)
+        assert result.tuples.tuple_array.tolist() == size_tuples.tuple_array.tolist()
+        assert size_tuples.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
+        for values in (size_tuples.u, size_tuples.v):
+            assert np.bincount(np.floor(values * N_FINE_LANES).astype(np.int64)).max() == 1
 
 
 # ==================================================================================================
 #  generate_mc_tuples
 # ==================================================================================================
 @pytest.mark.only_with_numba_jit
-def test_generate_mc_tuples_builds_nested_sizes_with_1_tuple_per_lane_and_reports_each_step():
-    """A 1 s construction up to size 64 builds sizes 32 and 64, each with 1 tuple per lane, and reports its 4 steps in
-    order, each with its selected cells or the size's tuples.
+def test_generate_mc_tuples_builds_nested_sizes_with_means_of_0_5_and_reports_each_size():
+    """A 2 s construction up to size 64 builds sizes 32 and 64, each with means of 0.5 and at most 1 tuple per fine
+    lane, and reports both sizes in order.
 
     Only the structure is asserted: max-div's spread depends on the wall-clock time.
     """
     # --- arrange ----------------------
-    results: list[MCTuplesStepResult] = []
+    results: list[MCTuplesSizeResult] = []
 
     # --- act --------------------------
-    tuples = generate_mc_tuples(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_64, on_step_finished=results.append)
+    tuples = generate_mc_tuples(
+        t_total_sec=2.0, max_size=MCTuplesSize.SIZE_64, n_population=2**14, on_size_finished=results.append
+    )
 
     # --- assert -----------------------
     assert tuples.size == 64
-    assert LaneGrid.is_one_per_lane_on_rebuilt_grid(tuples.first(32))
-    assert LaneGrid.is_one_per_lane_on_rebuilt_grid(tuples)
-    assert np.unique(tuples.u).size == np.unique(tuples.v).size == 64
-    assert [(int(result.size), result.kind) for result in results] == [
-        (32, MCTuplesStepKind.CELL_SELECTION),
-        (32, MCTuplesStepKind.REFINEMENT),
-        (64, MCTuplesStepKind.CELL_SELECTION),
-        (64, MCTuplesStepKind.REFINEMENT),
-    ]
-    assert isinstance(results[0], MCTuplesCellSelectionResult)
-    assert results[0].tuple_array.shape == (32, 2)
-    assert results[0].cells.shape == (32,)
-    assert isinstance(results[-1], MCTuplesRefinementResult)
-    assert results[-1].tuples.tuple_array.tolist() == tuples.tuple_array.tolist()
-    assert results[-1].tuple_array.tolist() == tuples.tuple_array.tolist()
-    assert all(MCTuplesStats(result.tuple_array).size == int(result.size) for result in results)
+    assert [int(result.size) for result in results] == [32, 64]
+    _assert_valid_nested_set(tuples, results)
+    assert all(result.uncorrected_tuple_array.shape == (int(result.size), 2) for result in results)
     assert all(result.solution.score_checkpoints for result in results)
 
 
-def test_generate_mc_tuples_feeds_each_size_s_tuples_into_the_next_size(monkeypatch):
-    """Without a callback, the generator builds each size's grid on the size below and returns the last size's tuples,
-    here with the steps replaced by stubs that pick the diagonal cells and 1 random tuple inside each."""
+def test_generate_mc_tuples_corrects_each_size_and_builds_the_next_on_it(monkeypatch):
+    """With the solve replaced by a stub that spreads each gap's new tuples evenly over its fine lanes, the generator
+    corrects every size's means to 0.5 and builds each size on the corrected size below."""
     # --- arrange ----------------------
-    no_solution = cast("ParallelMaxDivSolution", None)
-
-    def select_the_diagonal_cells(self: MCTuplesCellSelectionStep, t_budget_sec: float) -> MCTuplesCellSelectionResult:
-        """Return the cells on the grid's diagonal, 1 per new lane on each axis, without running max-div."""
-        cells = np.arange(self.grid.n_new) * (self.grid.n_new + 1)
-        return MCTuplesCellSelectionResult(
-            size=MCTuplesSize(self.grid.size),
-            t_budget_sec=t_budget_sec,
-            t_wall_sec=0.0,
-            tuple_array=self.grid.required_and_cell_tuple_array(cells),
-            solution=no_solution,
-            cells=cells,
-        )
-
-    def place_1_random_tuple_per_cell(self: MCTuplesRefinementStep, t_budget_sec: float) -> MCTuplesRefinementResult:
-        """Return the size's tuples with 1 random tuple inside each selected cell, without running max-div."""
-        new_tuple_array = self.grid.sample_in_cells(self.cells, 1, self.settings.rng)[:, 0, :]
-        tuple_array = np.vstack([self.grid.required_tuple_array, new_tuple_array])
-        return MCTuplesRefinementResult(
-            size=MCTuplesSize(self.grid.size),
-            t_budget_sec=t_budget_sec,
-            t_wall_sec=0.0,
-            tuple_array=tuple_array,
-            solution=no_solution,
-            tuples=MCTuples(tuple_array[:, 0], tuple_array[:, 1]),
-        )
-
-    monkeypatch.setattr(MCTuplesCellSelectionStep, "run", select_the_diagonal_cells)
-    monkeypatch.setattr(MCTuplesRefinementStep, "run", place_1_random_tuple_per_cell)
+    monkeypatch.setattr(MCTuplesSizeSolve, "run", _spread_each_gap_s_new_tuples)
+    results: list[MCTuplesSizeResult] = []
 
     # --- act --------------------------
-    tuples = generate_mc_tuples(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_64)
+    tuples = generate_mc_tuples(
+        t_total_sec=1.0, max_size=MCTuplesSize.SIZE_128, n_population=2**12, on_size_finished=results.append
+    )
+
+    # --- assert -----------------------
+    assert tuples.size == 128
+    assert [int(result.size) for result in results] == [32, 64, 128]
+    _assert_valid_nested_set(tuples, results)
+    assert results[0].u_allocation.predicted_offset_fine_lanes is None
+    assert results[1].u_allocation.predicted_offset_fine_lanes is not None
+
+
+def test_generate_mc_tuples_without_a_callback_returns_the_largest_size(monkeypatch):
+    """Without `on_size_finished`, the generator reports nothing and returns the largest size, corrected to 0.5."""
+    # --- arrange ----------------------
+    monkeypatch.setattr(MCTuplesSizeSolve, "run", _spread_each_gap_s_new_tuples)
+
+    # --- act --------------------------
+    tuples = generate_mc_tuples(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_64, n_population=2**12)
 
     # --- assert -----------------------
     assert tuples.size == 64
-    assert LaneGrid.is_one_per_lane_on_rebuilt_grid(tuples.first(32))
-    assert LaneGrid.is_one_per_lane_on_rebuilt_grid(tuples)
+    assert tuples.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
 
 
 @pytest.mark.parametrize(
-    "t_total_sec, n_workers, max_size, message",
+    "arguments, message",
     [
-        (0.5, 32, MCTuplesSize.SIZE_1024, "at least 1.0 s"),
-        (60.0, 0, MCTuplesSize.SIZE_1024, "n_workers must be at least 1"),
-        (60.0, 32, 100, "must be one of"),
+        ({"t_total_sec": 0.5}, "at least 1.0 s"),
+        ({"t_total_sec": 60.0, "n_workers": 0}, "n_workers must be at least 1"),
+        ({"t_total_sec": 60.0, "max_size": 100}, "must be one of"),
+        ({"t_total_sec": 60.0, "n_population": 0}, "n_population must be at least 1"),
+        ({"t_total_sec": 60.0, "allocation_epsilon": 1.0}, r"allocation_epsilon must lie in \[0, 1\)"),
+        ({"t_total_sec": 60.0, "allocation_epsilon": -0.1}, r"allocation_epsilon must lie in \[0, 1\)"),
     ],
 )
-def test_generate_mc_tuples_rejects_a_total_below_1_s_no_workers_or_an_unknown_size(
-    t_total_sec, n_workers, max_size, message
-):
-    """A total below 1 s, fewer than 1 worker, or a `max_size` outside `MCTuplesSize` raises a `ValueError`."""
+def test_generate_mc_tuples_rejects_invalid_arguments(arguments, message):
+    """A total below 1 s, no workers, an unknown size, an empty population or an ε outside [0, 1) raise a
+    `ValueError`."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=message):
-        generate_mc_tuples(t_total_sec, n_workers=n_workers, max_size=max_size)
+        generate_mc_tuples(**arguments)
 
 
 # ==================================================================================================
@@ -144,41 +136,30 @@ def test_n_workers_for_scales_the_workers_down_below_60_s(t_total_sec, n_workers
     assert MCTuplesGenerator(n_workers=32).n_workers_for(t_total_sec) == n_workers
 
 
-def test_every_step_kind_has_a_fixed_share_and_the_shares_sum_to_1():
-    """`T_BUDGET_FRACTION_PER_STEP_KIND` names every step class once, and the shares add up to the whole total."""
-    # --- act / assert -----------------
-    assert set(MCTuplesGenerator.T_BUDGET_FRACTION_PER_STEP_KIND) == set(MCTuplesStep.__subclasses__())
-    assert sum(MCTuplesGenerator.T_BUDGET_FRACTION_PER_STEP_KIND.values()) == pytest.approx(1.0)
-
-
 @pytest.mark.parametrize(
-    "t_total_sec, max_size",
-    [(1.0, MCTuplesSize.SIZE_64), (30.0, MCTuplesSize.SIZE_256), (28_800.0, MCTuplesSize.SIZE_1024)],
+    "t_total_sec, max_size, n_population",
+    [
+        (1.0, MCTuplesSize.SIZE_64, 2**14),
+        (30.0, MCTuplesSize.SIZE_256, 2**18),
+        (28_800.0, MCTuplesSize.SIZE_1024, 2**20),
+    ],
 )
-def test_t_budget_per_solve_sec_splits_each_step_s_share_by_1_percent_per_solve_and_the_rest_by_work(
-    t_total_sec, max_size
+def test_t_budget_per_solve_sec_gives_each_solve_1_percent_and_splits_the_rest_by_work(
+    t_total_sec, max_size, n_population
 ):
-    """Within a step kind's share, each size's solve gets 1 % of the total; the rest goes by candidates times size."""
+    """Each size's solve gets 1 % of the total; the rest goes by candidates, the population and the size below, times
+    the size."""
     # --- act --------------------------
-    budgets = MCTuplesGenerator().t_budget_per_solve_sec(t_total_sec, max_size)
+    budgets = MCTuplesGenerator(n_population=n_population).t_budget_per_solve_sec(t_total_sec, max_size)
 
     # --- assert -----------------------
     sizes = MCTuplesSize.up_to(max_size)
-    shares = MCTuplesGenerator.T_BUDGET_FRACTION_PER_STEP_KIND
-    assert set(budgets) == {(size, step_cls) for size in sizes for step_cls in shares}
-    for step_cls, t_budget_fraction in shares.items():
-        step_budgets = {
-            size: t_budget_sec
-            for (size, budget_step_cls), t_budget_sec in budgets.items()
-            if budget_step_cls is step_cls
+    work_per_size = {size: (n_population + size.n_required) * size for size in sizes}
+    t_rest_sec = t_total_sec - 0.01 * t_total_sec * len(sizes)
+    assert budgets == pytest.approx(
+        {
+            size: 0.01 * t_total_sec + t_rest_sec * work / sum(work_per_size.values())
+            for size, work in work_per_size.items()
         }
-        work_per_size = {size: step_cls.n_candidates(size) * size for size in step_budgets}
-        t_rest_sec = t_budget_fraction * t_total_sec - 0.01 * t_total_sec * len(step_budgets)
-        assert step_budgets == pytest.approx(
-            {
-                size: 0.01 * t_total_sec + t_rest_sec * work / sum(work_per_size.values())
-                for size, work in work_per_size.items()
-            }
-        )
-        assert sum(step_budgets.values()) == pytest.approx(t_budget_fraction * t_total_sec)
+    )
     assert sum(budgets.values()) == pytest.approx(t_total_sec)

@@ -18,9 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add the Pegasus solver, `sunnbear.solvers.Pegasus`
 - Add the Anderson-Björck solver, `sunnbear.solvers.AndersonBjorck`
 - Add the Secant solver, `sunnbear.solvers.Secant`
+- Add gpq(0.1) spread statistics and a score to `MCTuplesStats`
 
 ### Changed
 
+- **Breaking:** Change how `generate_mc_tuples` builds tuple sets, and its signature: every size's mean u and mean v are now exactly 0.5
 - Require max-div ≥ 0.21.1
 
 ### Deprecated

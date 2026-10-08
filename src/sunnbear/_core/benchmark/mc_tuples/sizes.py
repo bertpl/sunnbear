@@ -1,4 +1,4 @@
-"""`MCTuplesSize` lists the sizes in which the shipped Monte Carlo tuple set comes."""
+"""`MCTuplesSize` lists the sizes in which the shipped Monte Carlo tuple set comes; `N_FINE_LANES` follows from them."""
 
 from enum import IntEnum
 from typing import NoReturn
@@ -46,3 +46,8 @@ class MCTuplesSize(IntEnum):
         """
         largest = cls(max_size)
         return tuple(size for size in cls if size <= largest)
+
+
+# The construction cuts each axis into as many equal fine lanes as the largest size holds tuples, and no 2 tuples of
+# the set share a fine lane, so the largest size holds exactly 1 tuple per fine lane on each axis.
+N_FINE_LANES = int(max(MCTuplesSize))
