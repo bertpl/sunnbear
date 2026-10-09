@@ -17,8 +17,8 @@ from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 )
 def test_a_function_converges_to_its_root(f, a, b, root):
     """On `cubic`, which increases, `decreasing_cubic`, which decreases, and ``x^9`` over ``[-1, 4]``, whose multiple
-    root keeps the function from looking close enough to a straight line for the switch, `ModAB` returns an x-value
-    within ``xtol`` of the root."""
+    root keeps the function from looking close enough to a straight line for `ModAB` to switch to Anderson-Björck mode,
+    `ModAB` returns an x-value within ``xtol`` of the root."""
     # --- act --------------------------
     result = ModAB().solve(f, a, b, xtol=1e-10, max_fevals=500)
 

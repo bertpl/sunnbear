@@ -1,4 +1,5 @@
-"""These tests assert the name and version of `CARF`, and that its arithmetic is counted."""
+"""These tests assert the name and version of `CARF`, and that the logarithms and powers of its power steps are
+counted."""
 
 from sunnbear.solvers import CARF
 

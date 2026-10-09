@@ -1,11 +1,12 @@
-"""These tests assert that `ITP` converges to a root of the test functions, and keeps within its bound on the
-iteration count."""
+"""These tests assert that `ITP` converges to a root of the test functions, and that its paper_experiments variant
+with slack keeps within its bound on the iteration count on the functions of the paper."""
 
 import pytest
 
 from sunnbear.solvers import ITP, ITPVariant, SolveStatus
-from tests.solvers.bracketing.itp.paper_problems import N_BISECTION, PAPER_TABLE_1, XTOL
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
+
+from .paper_problems import N_BISECTION, PAPER_TABLE_1, XTOL
 
 
 @pytest.mark.parametrize("name", PAPER_TABLE_1)

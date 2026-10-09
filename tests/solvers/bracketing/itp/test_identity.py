@@ -1,5 +1,9 @@
-"""These tests assert the name and version of `ITP`, that its arithmetic is counted, and that it rejects invalid
-arguments."""
+"""These tests assert 3 things about `ITP`:
+
+- its name and version;
+- that its arithmetic is counted;
+- that it rejects invalid arguments.
+"""
 
 import pytest
 

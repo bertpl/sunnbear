@@ -1,10 +1,11 @@
 """These tests assert that a root at the midpoint ends an `ITP` solve after 1 iteration, and that rounding errors can
-push `ITP` past its bound on the iteration count."""
+make `ITP` exceed its bound on the iteration count."""
 
 import pytest
 
 from sunnbear.solvers import ITP, ITPVariant, SolveStatus
-from tests.solvers.bracketing.itp.paper_problems import N_BISECTION, PAPER_TABLE_1, XTOL
+
+from .paper_problems import N_BISECTION, PAPER_TABLE_1, XTOL
 
 
 @pytest.mark.parametrize(

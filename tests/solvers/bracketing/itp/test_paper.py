@@ -3,7 +3,8 @@
 import pytest
 
 from sunnbear.solvers import ITP, ITPVariant, SolveStatus
-from tests.solvers.bracketing.itp.paper_problems import PAPER_TABLE_1, XTOL
+
+from .paper_problems import PAPER_TABLE_1, XTOL
 
 
 @pytest.mark.parametrize("name", [name for name in PAPER_TABLE_1 if name != "step_function"])

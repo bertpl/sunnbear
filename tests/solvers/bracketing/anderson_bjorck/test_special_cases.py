@@ -1,5 +1,5 @@
-"""These tests assert that `AndersonBjorck` needs many evaluations on a function that is nearly flat on 1 side of the
-root."""
+"""These tests assert that `AndersonBjorck` needs over 200 evaluations on a function that is nearly flat on 1 side of
+the root."""
 
 from sunnbear.solvers import AndersonBjorck, SolveStatus
 from tests.solvers.example_functions import STEEP_EXPONENTIAL_ROOT, steep_exponential

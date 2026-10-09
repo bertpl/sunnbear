@@ -1,7 +1,8 @@
 """These tests assert that the individual steps of `ITP` follow its algorithm."""
 
 from sunnbear.solvers import ITP, ITPVariant
-from tests.solvers.bracketing.itp.paper_problems import N_BISECTION, PAPER_TABLE_1, XTOL
+
+from .paper_problems import N_BISECTION, PAPER_TABLE_1, XTOL
 
 
 def test_the_paper_pseudocode_variant_ends_as_bisection_once_its_projection_radius_reaches_0():

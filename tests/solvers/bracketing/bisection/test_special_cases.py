@@ -1,5 +1,5 @@
-"""These tests assert that `Bisection` stops early on an exact root at a midpoint, and what it reports when its
-budget runs out."""
+"""These tests assert that `Bisection` stops early on an exact root at a midpoint, and that it reports the last
+evaluated x-value when its budget runs out."""
 
 from sunnbear.solvers import Bisection, SolveStatus
 from tests.solvers.example_functions import cubic
