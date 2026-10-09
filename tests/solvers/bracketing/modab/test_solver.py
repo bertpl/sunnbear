@@ -7,9 +7,9 @@ from sunnbear.solvers import ModAB, SolveStatus
 from tests.solvers.bracketing.modab.paper_problems import PAPER_PROBLEMS, PaperProblem
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 
-# On these problems, the evaluation count differs from Table 2's by up to 4, presumably because the authors' .NET
-# runtime rounds the last bit of cos, cbrt or exp differently from the correctly rounded values of `PAPER_PROBLEMS`,
-# which changes the path of the solve.
+# On these problems, the evaluation count differs from Table 2's, presumably because the authors' .NET runtime rounds
+# the last bit of cos, cbrt or exp differently from the correctly rounded values of `PAPER_PROBLEMS`, which changes
+# the x-values that the solve evaluates.
 _ROUNDING_SENSITIVE_PROBLEM_NAMES = {"f34", "f70", "f86"}
 
 
@@ -18,9 +18,9 @@ _ROUNDING_SENSITIVE_PROBLEM_NAMES = {"f34", "f70", "f86"}
 # ==================================================================================================
 @pytest.mark.parametrize("paper_problem", PAPER_PROBLEMS, ids=lambda p: p.name)
 def test_the_evaluation_counts_of_table_2_of_the_paper_are_reproduced(paper_problem: PaperProblem):
-    """With the paper's tolerances, `ModAB` evaluates as often as Table 2 reports, less the clamped iterations, or
-    within 4 of that count on the problems in `_ROUNDING_SENSITIVE_PROBLEM_NAMES`, and returns modAB's root in the
-    paper's supplementary results, within a relative 1e-13."""
+    """With the paper's tolerances, `ModAB` returns modAB's root in the paper's supplementary results within a
+    relative 1e-13, and evaluates as often as Table 2 reports less the clamped iterations: exactly, or within 4 on the
+    problems in `_ROUNDING_SENSITIVE_PROBLEM_NAMES`."""
     # --- arrange ----------------------
     if paper_problem.name in _ROUNDING_SENSITIVE_PROBLEM_NAMES:
         max_count_difference = 4
@@ -48,7 +48,7 @@ def test_the_switches_of_table_1_of_the_paper_are_reproduced():
     - iteration 24: the solve stops, before evaluating.
 
     Each switch takes effect from the next iteration, so iterations 1 and 8 to 15 bisect, and the solve evaluates in
-    iterations 1 to 23.
+    iterations 1 to 23, after its 2 evaluations of the interval's bounds.
     """
     # --- act --------------------------
     result = _ModABWithPaperTolerances().solve(
@@ -83,27 +83,25 @@ def test_a_straight_line_switches_to_anderson_bjorck_whose_first_step_lands_on_t
     assert (result.x, result.status) == (0.25, SolveStatus.CONVERGED)
 
 
-@pytest.mark.parametrize("f", [cubic, decreasing_cubic])
-def test_a_smooth_function_converges_to_its_root(f):
-    """On `cubic`, which increases, and `decreasing_cubic`, which decreases, `ModAB` returns an x-value within
-    ``xtol`` of the root."""
+@pytest.mark.parametrize(
+    "f, a, b, root",
+    [
+        (cubic, 1.0, 2.0, CUBIC_ROOT),
+        (decreasing_cubic, 1.0, 2.0, CUBIC_ROOT),
+        (lambda x: x**9, -1.0, 4.0, 0.0),
+    ],
+    ids=["cubic", "decreasing_cubic", "multiple_root"],
+)
+def test_a_function_converges_to_its_root(f, a, b, root):
+    """On `cubic`, which increases, `decreasing_cubic`, which decreases, and ``x^9`` over ``[-1, 4]``, whose multiple
+    root keeps the function from looking close enough to a straight line for the switch, `ModAB` returns an x-value
+    within ``xtol`` of the root."""
     # --- act --------------------------
-    result = ModAB().solve(f, 1.0, 2.0, xtol=1e-10, max_fevals=60)
+    result = ModAB().solve(f, a, b, xtol=1e-10, max_fevals=500)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert abs(result.x - CUBIC_ROOT) <= 1e-10
-
-
-def test_a_multiple_root_converges_to_its_root():
-    """On ``x^9`` over ``[-1, 4]``, the function never looks close enough to a straight line for the switch, so
-    `ModAB` bisects throughout, and returns a root within ``xtol``."""
-    # --- act --------------------------
-    result = ModAB().solve(lambda x: x**9, -1.0, 4.0, xtol=1e-10, max_fevals=500)
-
-    # --- assert -----------------------
-    assert result.status is SolveStatus.CONVERGED
-    assert abs(result.x) <= 1e-10
+    assert abs(result.x - root) <= 1e-10
 
 
 # ==================================================================================================
@@ -123,7 +121,7 @@ def test_identity_and_that_its_arithmetic_is_counted():
 #  Helpers
 # ==================================================================================================
 class _ModABWithPaperTolerances(ModAB):
-    """`_ModABWithPaperTolerances` is `ModAB` with the tolerances of the paper's benchmark, ``aTol = rTol = 1e-14``."""
+    """`_ModABWithPaperTolerances` is `ModAB` with the absolute and relative tolerances of the paper's benchmark."""
 
     @staticmethod
     def _get_stop_width(xtol: float, x3: float) -> float:
@@ -135,7 +133,8 @@ def _bisection_iterations(history: tuple[tuple[float, float], ...]) -> list[int]
     """Return the 1-based numbers of the iterations whose x-value is the midpoint of the interval.
 
     The interval is replayed from ``history``: each evaluated x-value replaces the bound whose function value has the
-    sign of its own. The replay holds only for a solve without clamped iterations, which evaluate nothing.
+    same sign as the function value at that x-value. The replay holds only for a solve without clamped iterations,
+    which evaluate nothing.
     """
     (x1, y1), (x2, _) = history[:2]
     iterations = []

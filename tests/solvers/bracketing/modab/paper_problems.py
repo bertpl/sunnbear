@@ -1,11 +1,17 @@
-"""This module holds the 92 test problems of Table 2 of the 2026 modAB paper: the functions with their intervals,
-modAB's evaluation counts in the table, and modAB's roots in the paper's supplementary results.
+"""This module holds the 92 test problems of Table 2 of the 2026 modAB paper. Each problem holds:
+
+- a function and its interval;
+- modAB's evaluation count in the table;
+- modAB's root in the paper's supplementary results.
 
 The functions follow the C# benchmark of the paper's supplementary code, which produced Table 2; where the table
 prints a function differently, the C# code holds.
 
-Each power and each library function, such as ``exp`` or ``sin``, is evaluated correctly rounded, through mpmath. The C
-library rounds the last bit of powers and library functions differently per platform, and on several of the 92
+Each power and each library function other than ``sqrt``, ``ceil`` and ``floor``, such as ``exp`` or ``sin``, is
+evaluated correctly rounded, through mpmath; IEEE 754 already rounds ``sqrt`` correctly, and ``ceil`` and ``floor`` are
+exact.
+
+The C library rounds the last bit of powers and library functions differently per platform, and on several of the 92
 functions that last bit changes the evaluation count; correctly rounded values make the counts the same on every
 platform.
 """
@@ -24,9 +30,6 @@ class PaperProblem:
 
     Attributes:
         name: The function's name in Table 2, ``f01`` to ``f92``.
-        f: The function.
-        a: The lower bound of the interval.
-        b: The upper bound of the interval.
         reported_root: modAB's root in the paper's supplementary results, which modAB returns without evaluating it.
         reported_n_fevals: modAB's evaluation count in Table 2.
         n_clamped: The number of iterations whose chord's zero is clamped onto a bound. The C# code counts every
@@ -49,8 +52,8 @@ class PaperProblem:
 def _correctly_rounded(mpmath_function: Callable[..., mpmath.mpf]) -> Callable[..., float]:
     """Return a float version of ``mpmath_function`` that rounds its exact result to the nearest float.
 
-    With 160 bits of working precision, the result is rounded correctly unless the exact value lies closer than 2^-107,
-    relative to the value, to the midpoint between 2 adjacent floats.
+    With 160 bits of working precision, the result is rounded correctly unless the exact value lies within a relative
+    distance of 2^-107 of the midpoint between 2 adjacent floats.
     """
 
     def evaluate(*args: float) -> float:
@@ -70,19 +73,10 @@ _sin = _correctly_rounded(mpmath.sin)
 _tan = _correctly_rounded(mpmath.tan)
 
 
-def _sign(x: float) -> float:
-    """Return -1, 0 or 1, the sign of ``x``, as C#'s ``Math.Sign`` does."""
-    if x > 0.0:
-        return 1.0
-    elif x < 0.0:
-        return -1.0
-    else:
-        return 0.0
-
-
-def _f27_shifted_x(x: float) -> float:
-    """Return ``x + 1.11111``, the shifted argument of ``f27``."""
-    return x + 1.11111
+def _f27(x: float) -> float:
+    """Return ``f27``, a quartic in ``s = x + 1.11111`` whose sign flips where ``s = 3``."""
+    s = x + 1.11111
+    return (81 - s * (108 - s * (54 - s * (12 - s)))) * float(mpmath.sign(s - 3))
 
 
 # ==================================================================================================
@@ -133,18 +127,7 @@ PAPER_PROBLEMS = [
     PaperProblem("f24", lambda x: (x + 2) * (x + 1) * _pow(x - 3, 3), 2.6, 4.6, 2.99999999999999, 48, 0),
     PaperProblem("f25", lambda x: _pow(x - 4, 5) * _log(x), 3.6, 5.6, 3.99999999999999, 48, 0),
     PaperProblem("f26", lambda x: _pow(_sin(x) - x / 4, 3), 2.0, 4.0, 2.47457678736982, 48, 0),
-    PaperProblem(
-        "f27",
-        lambda x: (
-            (81 - _f27_shifted_x(x) * (108 - _f27_shifted_x(x) * (54 - _f27_shifted_x(x) * (12 - _f27_shifted_x(x)))))
-            * _sign(_f27_shifted_x(x) - 3)
-        ),
-        1.0,
-        3.0,
-        1.88916015625,
-        14,
-        0,
-    ),
+    PaperProblem("f27", _f27, 1.0, 3.0, 1.88916015625, 14, 0),
     PaperProblem("f28", lambda x: _sin(_pow(x - 7.143, 3)), 7.0, 8.0, 7.143, 46, 0),
     PaperProblem("f29", lambda x: _exp(_pow(x - 3, 5)) - 1, 2.6, 4.6, 3.00039062499999, 12, 0),
     PaperProblem("f30", lambda x: _exp(_pow(x - 3, 5)) - _exp(x - 1), 4.0, 5.0, 4.26716830454212, 13, 0),
@@ -180,8 +163,8 @@ PAPER_PROBLEMS = [
     PaperProblem(
         "f48", lambda x: 1 / math.sqrt(x) - 2 * _log(5e7 * math.sqrt(x)) + 0.8, 0.0005, 0.5, 0.00127630494573556, 14, 0
     ),
-    # The C# expression Math.Pow(x, 1/3) divides 2 integers, so its exponent is 0; Table 2 counts the evaluations
-    # of this exponent-0 function, so the exponent here stays 0.
+    # The C# expression Math.Pow(x, 1/3) uses integer division, so its exponent is 0; Table 2 counts the evaluations
+    # of the function with that exponent, so the exponent here stays 0.
     PaperProblem(
         "f49", lambda x: -_pow(x, 3) - x - 1 if x <= 0 else _pow(x, 0) - x - 1, -1.0, 1.0, -0.682327803828019, 12, 1
     ),
@@ -205,14 +188,22 @@ PAPER_PROBLEMS = [
     PaperProblem("f67", lambda x: x + _pow(x, 10) - 1, -1.0, 1.0, 0.835079042723559, 12, 0),
     PaperProblem("f68", lambda x: _pow(math.pi, x) - math.e, -1.0, 1.0, 0.873568526830231, 9, 0),
     PaperProblem("f69", lambda x: _log(abs(x - 10 / 9)), -1.0, 1.0, 0.111111111111111, 10, 0),
-    PaperProblem("f70", lambda x: 1 / 3 + _sign(x) * _cbrt(abs(x)) + _pow(x, 3), -1.0, 1.0, -0.0370201277078609, 17, 1),
+    PaperProblem(
+        "f70",
+        lambda x: 1 / 3 + float(mpmath.sign(x)) * _cbrt(abs(x)) + _pow(x, 3),
+        -1.0,
+        1.0,
+        -0.0370201277078609,
+        17,
+        1,
+    ),
     PaperProblem("f71", lambda x: (x + 2 / 3) / (x + 101 / 100), -1.0, 1.0, -0.666666666666666, 8, 0),
     PaperProblem("f72", lambda x: _pow(x * 1e6 - 1, 3), -1.0, 1.0, 1.00000000102795e-06, 50, 0),
     PaperProblem("f73", lambda x: _exp(x) * _pow(x * 1e6 - 1, 3), -1.0, 1.0, 1.00000000102795e-06, 50, 0),
     PaperProblem("f74", lambda x: _pow(x - 1 / 3, 2) * _atan(x - 1 / 3), -1.0, 1.0, 0.333333333333332, 50, 0),
     PaperProblem(
         "f75",
-        lambda x: _sign(3 * x - 1) * (1 - math.sqrt(1 - _pow(3 * x - 1, 2) / 81)),
+        lambda x: float(mpmath.sign(3 * x - 1)) * (1 - math.sqrt(1 - _pow(3 * x - 1, 2) / 81)),
         -1.0,
         1.0,
         0.333333313465118,
