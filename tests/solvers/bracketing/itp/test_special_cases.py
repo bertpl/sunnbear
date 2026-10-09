@@ -5,7 +5,7 @@ import pytest
 
 from sunnbear.solvers import ITP, ITPVariant, SolveStatus
 
-from .paper_problems import N_BISECTION, PAPER_TABLE_1, XTOL
+from .paper_problems import N_BISECTION, TABLE_1, XTOL
 
 
 @pytest.mark.parametrize(
@@ -18,10 +18,10 @@ from .paper_problems import N_BISECTION, PAPER_TABLE_1, XTOL
 def test_rounding_errors_can_push_either_variant_past_n_max(name, variant):
     """Without slack, rounding errors can make `ITP` take 1 iteration more than ``n_max = 34``, in either variant."""
     # --- arrange ----------------------
-    f, _ = PAPER_TABLE_1[name]
+    problem = next(problem for problem in TABLE_1 if problem.name == name)
 
     # --- act --------------------------
-    result = ITP(n_slack=0, variant=variant).solve(f, -1.0, 1.0, xtol=XTOL, max_fevals=100)
+    result = ITP(n_slack=0, variant=variant).solve(problem.f, problem.a, problem.b, xtol=XTOL, max_fevals=100)
 
     # --- assert -----------------------
     assert result.n_fevals - 2 == N_BISECTION + 1

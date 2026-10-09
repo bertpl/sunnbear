@@ -3,24 +3,29 @@ totals come close to those of Table II of its paper."""
 
 import pytest
 
-from sunnbear.solvers import TOMS748, SolveStatus
-from tests.solvers.bracketing.toms748.paper_problems import PAPER_PROBLEMS, PaperProblem
+from sunnbear.solvers import TOMS748
+from tests.solvers.paper_problems import PaperProblem
+from tests.solvers.paper_problems.alefeld_potra_shi import ALEFELD_POTRA_SHI_PROBLEMS
+
+from .paper_problems import AUTHORS_TEST_OUTPUT, PRINTED_ROOTS
 
 
-@pytest.mark.parametrize("problem", PAPER_PROBLEMS, ids=str)
+def test_the_printed_roots_name_exactly_the_alefeld_potra_shi_problems():
+    """`PRINTED_ROOTS` holds a root for every Alefeld-Potra-Shi problem, and for no other name."""
+    # --- assert -----------------------
+    assert set(PRINTED_ROOTS) == {problem.name for problem in ALEFELD_POTRA_SHI_PROBLEMS}
+
+
+@pytest.mark.parametrize("problem", AUTHORS_TEST_OUTPUT, ids=str)
 def test_k_2_reproduces_the_root_that_the_authors_code_computes(problem: PaperProblem):
     """With ``k = 2`` and ``tol = 0``, the setting of the authors' test runs, `TOMS748` returns the root that the
     authors' code prints, within a relative 1e-13, the precision of its 14 printed digits."""
-    # --- arrange ----------------------
-    a, b = problem.interval
-
     # --- act --------------------------
     # An xtol of 0 makes tol 0.
-    result = TOMS748(k=2).solve(problem.f, a, b, xtol=0.0, max_fevals=100)
+    result = TOMS748(k=2).solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100)
 
     # --- assert -----------------------
-    assert result.status is SolveStatus.CONVERGED
-    assert result.x == pytest.approx(problem.root, rel=1e-13, abs=0.0)
+    problem.assert_reproduced_by(result)
 
 
 @pytest.mark.parametrize(
@@ -37,7 +42,7 @@ def test_k_2_reproduces_the_root_that_the_authors_code_computes(problem: PaperPr
     ],
 )
 def test_the_total_evaluation_count_lies_within_1_1_percent_of_the_papers_table_ii(k, n_digits, paper_total):
-    """Over the problems in `PAPER_PROBLEMS`, the total evaluation count lies within 1.1 % of the paper's Table II,
+    """Over the problems in `AUTHORS_TEST_OUTPUT`, the total evaluation count lies within 1.1 % of the paper's Table II,
     for each ``k`` and for each of the paper's tolerances ``tol = 10^-n_digits`` and ``tol = 0``.
 
     The paper's counts include the 2 evaluations at the interval bounds, and come from a machine whose relative
@@ -45,8 +50,10 @@ def test_the_total_evaluation_count_lies_within_1_1_percent_of_the_papers_table_
     """
     # --- arrange / act ----------------
     total = sum(
-        _TOMS748WithTol(k=k, n_digits=n_digits).solve(problem.f, *problem.interval, xtol=0.0, max_fevals=100).n_fevals
-        for problem in PAPER_PROBLEMS
+        _TOMS748WithTol(k=k, n_digits=n_digits)
+        .solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100)
+        .n_fevals
+        for problem in AUTHORS_TEST_OUTPUT
     )
 
     # --- assert -----------------------
