@@ -10,7 +10,7 @@ from tests.solvers.bracketing.chandrupatla.paper_functions import PAPER_FUNCTION
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 
 
-def _paper_function_7(x: float) -> float:
+def _listing_function_7(x: float) -> float:
     """Return the paper's function 7, ``x * exp(-1 / x^2)``, set to 0 where ``|x| < 3.8e-4``, as the paper's BASIC
     listing does."""
     if abs(x) < 3.8e-4:
@@ -19,9 +19,9 @@ def _paper_function_7(x: float) -> float:
         return x * math.exp(-(x**-2))
 
 
-# `_PAPER_FUNCTIONS` holds the test functions of the paper's Table 1, keyed by their number in that table, with the
-# listing's function 7.
-_PAPER_FUNCTIONS = {**PAPER_FUNCTIONS, 7: _paper_function_7}
+# `_LISTING_FUNCTIONS` holds the test functions of the paper's Table 1, keyed by their number in that table, with
+# function 7 replaced by `_listing_function_7`, the version in the paper's BASIC listing.
+_LISTING_FUNCTIONS = {**PAPER_FUNCTIONS, 7: _listing_function_7}
 
 # Each row of the paper's Table 2 holds:
 # - the function number;
@@ -87,7 +87,7 @@ def test_the_evaluation_counts_of_table_2_of_the_paper_are_reproduced(function_n
     so the solver's ``xtol`` of 1e-5 reproduces them.
     """
     # --- act --------------------------
-    result = Chandrupatla().solve(_PAPER_FUNCTIONS[function_number], float(a), float(b), xtol=1e-5, max_fevals=100)
+    result = Chandrupatla().solve(_LISTING_FUNCTIONS[function_number], float(a), float(b), xtol=1e-5, max_fevals=100)
 
     # --- assert -----------------------
     assert (result.status, result.n_fevals) == (SolveStatus.CONVERGED, n_fevals)

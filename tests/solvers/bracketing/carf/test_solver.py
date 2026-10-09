@@ -4,8 +4,8 @@ steps that its docstring describes, and stops within ``xtol`` of a root."""
 import pytest
 
 from sunnbear.solvers import CARF, SolveStatus
-from tests.solvers.bracketing.chandrupatla.paper_functions import PAPER_FUNCTIONS
-from tests.solvers.bracketing.toms748.paper_problems import PAPER_PROBLEMS
+from tests.solvers.bracketing.chandrupatla.paper_functions import PAPER_FUNCTIONS as CHANDRUPATLA_FUNCTIONS
+from tests.solvers.bracketing.toms748.paper_problems import PAPER_PROBLEMS as TOMS748_PROBLEMS
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic, steep_exponential
 
 # Each row of the paper's Table 4, on Chandrupatla's test functions, holds:
@@ -62,11 +62,11 @@ _PAPER_TABLE_4 = [
 
 # `_UNREPRODUCED_ROWS` holds the rows of `_PAPER_TABLE_4` whose count `CARF` does not reproduce, keyed by function
 # number and interval:
-# - the wide intervals of functions 1 to 4, where ``h`` often lies within rounding error of 0 or 1, the limits that
-#   choose the kind of step, so the count depends on how the paper's code computes the quadratic's root and the power
-#   step;
-# - rows (8, 2e-4, 2) and (9, 2e-4, 1), whose last step lands on the other side of the root, or exactly on it: moving
-#   that step's x-value by 1 ulp gives the paper's count of 7 for function 9.
+# - some of the wide intervals of functions 1 to 4, where ``h``, the scaled function value at ``t`` that `CARF`'s
+#   docstring defines, often lies within rounding error of 0 or 1, the limits that choose the kind of step, so the
+#   count depends on how the paper's code computes the quadratic's root and the power step;
+# - rows (8, 2e-4, 2) and (9, 2e-4, 1), whose last step lands on the other side of the root, or exactly on it, so a
+#   1-ulp difference in that step changes the count.
 _UNREPRODUCED_ROWS = {
     (1, -1e4, 1e4),
     (1, -1e10, 1e10),
@@ -94,7 +94,7 @@ def test_the_evaluation_counts_of_table_4_of_the_paper_are_reproduced(function_n
     reports, on every row outside `_UNREPRODUCED_ROWS`."""
     # --- act --------------------------
     result = _CARFWithPaperTolerances(eps1=1e-15, eps2=1e-12).solve(
-        PAPER_FUNCTIONS[function_number], float(a), float(b), xtol=0.0, max_fevals=300
+        CHANDRUPATLA_FUNCTIONS[function_number], float(a), float(b), xtol=0.0, max_fevals=300
     )
 
     # --- assert -----------------------
@@ -106,7 +106,7 @@ def test_the_unreproduced_rows_of_table_4_still_converge(function_number, a, b):
     """On the rows in `_UNREPRODUCED_ROWS`, `CARF` still converges with the paper's tolerances."""
     # --- act --------------------------
     result = _CARFWithPaperTolerances(eps1=1e-15, eps2=1e-12).solve(
-        PAPER_FUNCTIONS[function_number], float(a), float(b), xtol=0.0, max_fevals=300
+        CHANDRUPATLA_FUNCTIONS[function_number], float(a), float(b), xtol=0.0, max_fevals=300
     )
 
     # --- assert -----------------------
@@ -116,13 +116,13 @@ def test_the_unreproduced_rows_of_table_4_still_converge(function_number, a, b):
 @pytest.mark.parametrize("eps2, paper_total", [(1e-7, 2456), (1e-10, 2457), (1e-15, 2481)])
 def test_the_total_evaluation_count_lies_within_1_5_percent_of_the_papers_table_3(eps2, paper_total):
     """Over the test problems of Algorithm 748, the total evaluation count lies within 1.5 % of the paper's Table
-    3, at each of its tolerances ``eps2``, with ``eps1 = 1e-15`` as in its Table 4."""
+    3, at each of that table's tolerances ``eps2``, with ``eps1 = 1e-15`` as in the paper's Table 4."""
     # --- arrange / act ----------------
     total = sum(
         _CARFWithPaperTolerances(eps1=1e-15, eps2=eps2)
         .solve(problem.f, *problem.interval, xtol=0.0, max_fevals=300)
         .n_fevals
-        for problem in PAPER_PROBLEMS
+        for problem in TOMS748_PROBLEMS
     )
 
     # --- assert -----------------------
@@ -148,8 +148,8 @@ def test_the_first_x_value_is_the_chord_zero_clipped_into_the_middle_80_percent(
 
 
 def test_an_exact_zero_ends_the_solve_at_that_point():
-    """On a line, the first x-value, the chord's zero, is the root, where the function is exactly 0, and the solve
-    returns it after 3 evaluations."""
+    """On a straight line, the chord's zero is the root, so the first x-value has a function value of exactly 0, and
+    the solve returns it after 3 evaluations."""
     # --- act --------------------------
     result = CARF().solve(lambda x: x - 0.25, 0.0, 1.0, xtol=1e-10, max_fevals=10)
 
@@ -167,8 +167,8 @@ def test_an_exact_zero_ends_the_solve_at_that_point():
     ids=["cubic", "decreasing_cubic", "multiple_root"],
 )
 def test_a_function_converges_to_its_root(f, a, b, root):
-    """On `cubic`, which increases, `decreasing_cubic`, which decreases, and ``x^9`` over ``[-1, 4]``, whose multiple
-    root takes power steps, `CARF` returns an x-value within ``xtol`` of the root."""
+    """On `cubic`, which increases, `decreasing_cubic`, which decreases, and ``x^9`` over ``[-1, 4]``, where the
+    multiple root makes `CARF` take power steps, `CARF` returns an x-value within ``xtol`` of the root."""
     # --- act --------------------------
     result = CARF().solve(f, a, b, xtol=1e-10, max_fevals=200)
 
