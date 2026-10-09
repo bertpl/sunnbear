@@ -2,35 +2,21 @@
 
 import pytest
 
-from sunnbear.solvers import ModAB, SolveStatus
-from tests.solvers.bracketing.modab.paper_problems import PAPER_PROBLEMS, PaperProblem
-
-# On these problems, the evaluation count differs from Table 2's, presumably because the authors' .NET runtime rounds
-# the last bit of cos, cbrt or exp differently from the correctly rounded values of `PAPER_PROBLEMS`, which changes
-# the x-values that the solve evaluates.
-_ROUNDING_SENSITIVE_PROBLEM_NAMES = {"f34", "f70", "f86"}
+from sunnbear.solvers import ModAB
+from tests.solvers.bracketing.modab.paper_problems import TABLE_2
+from tests.solvers.paper_problems import PaperProblem
 
 
-@pytest.mark.parametrize("paper_problem", PAPER_PROBLEMS, ids=lambda p: p.name)
-def test_the_evaluation_counts_of_table_2_of_the_paper_are_reproduced(paper_problem: PaperProblem):
+@pytest.mark.parametrize("problem", TABLE_2, ids=str)
+def test_the_evaluation_counts_of_table_2_of_the_paper_are_reproduced(problem: PaperProblem):
     """With the paper's tolerances, `ModAB` returns modAB's root in the paper's supplementary results within a
-    relative 1e-13, and evaluates as often as Table 2 reports less the clamped iterations: exactly, or within 4 on the
-    problems in `_ROUNDING_SENSITIVE_PROBLEM_NAMES`."""
-    # --- arrange ----------------------
-    if paper_problem.name in _ROUNDING_SENSITIVE_PROBLEM_NAMES:
-        max_count_difference = 4
-    else:
-        max_count_difference = 0
-
+    relative 1e-13, and evaluates as often as Table 2 reports less the clamped iterations, within the tolerance of the
+    problems whose count is not reproduced exactly."""
     # --- act --------------------------
-    result = _ModABWithPaperTolerances().solve(
-        paper_problem.f, paper_problem.a, paper_problem.b, xtol=0.0, max_fevals=300
-    )
+    result = _ModABWithPaperTolerances().solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=300)
 
     # --- assert -----------------------
-    assert result.status is SolveStatus.CONVERGED
-    assert abs(result.n_fevals - (paper_problem.reported_n_fevals - paper_problem.n_clamped)) <= max_count_difference
-    assert result.x == pytest.approx(paper_problem.reported_root, rel=1e-13, abs=0.0)
+    problem.assert_reproduced_by(result)
 
 
 def test_the_switches_of_table_1_of_the_paper_are_reproduced():

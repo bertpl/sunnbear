@@ -5,22 +5,24 @@ import pytest
 
 from sunnbear.solvers import ITP, ITPVariant, SolveStatus
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
+from tests.solvers.paper_problems import PaperProblem
 
-from .paper_problems import N_BISECTION, PAPER_TABLE_1, XTOL
+from .paper_problems import N_BISECTION, TABLE_1, XTOL
 
 
-@pytest.mark.parametrize("name", PAPER_TABLE_1)
-def test_the_paper_experiments_variant_with_slack_stays_within_n_max_on_the_functions_of_the_paper(name):
+@pytest.mark.parametrize("problem", TABLE_1, ids=str)
+def test_the_paper_experiments_variant_with_slack_stays_within_n_max_on_the_functions_of_the_paper(
+    problem: PaperProblem,
+):
     """On every function of the paper's Table 1, the paper_experiments variant with ``n_slack = 4`` takes at most
     ``n_max = 34 + 4`` iterations.
 
     This holds on these functions only: on harder ones, rounding errors can make this variant go past ``n_max`` too.
     """
-    # --- arrange ----------------------
-    f, _ = PAPER_TABLE_1[name]
-
     # --- act --------------------------
-    result = ITP(n_slack=4, variant=ITPVariant.PAPER_EXPERIMENTS).solve(f, -1.0, 1.0, xtol=XTOL, max_fevals=100)
+    result = ITP(n_slack=4, variant=ITPVariant.PAPER_EXPERIMENTS).solve(
+        problem.f, problem.a, problem.b, xtol=XTOL, max_fevals=100
+    )
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED

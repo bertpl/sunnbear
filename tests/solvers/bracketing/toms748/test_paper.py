@@ -3,24 +3,21 @@ totals come close to those of Table II of its paper."""
 
 import pytest
 
-from sunnbear.solvers import TOMS748, SolveStatus
-from tests.solvers.bracketing.toms748.paper_problems import PAPER_PROBLEMS, PaperProblem
+from sunnbear.solvers import TOMS748
+from tests.solvers.bracketing.toms748.paper_problems import PAPER_PROBLEMS
+from tests.solvers.paper_problems import PaperProblem
 
 
 @pytest.mark.parametrize("problem", PAPER_PROBLEMS, ids=str)
 def test_k_2_reproduces_the_root_that_the_authors_code_computes(problem: PaperProblem):
     """With ``k = 2`` and ``tol = 0``, the setting of the authors' test runs, `TOMS748` returns the root that the
     authors' code prints, within a relative 1e-13, the precision of its 14 printed digits."""
-    # --- arrange ----------------------
-    a, b = problem.interval
-
     # --- act --------------------------
     # An xtol of 0 makes tol 0.
-    result = TOMS748(k=2).solve(problem.f, a, b, xtol=0.0, max_fevals=100)
+    result = TOMS748(k=2).solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100)
 
     # --- assert -----------------------
-    assert result.status is SolveStatus.CONVERGED
-    assert result.x == pytest.approx(problem.root, rel=1e-13, abs=0.0)
+    problem.assert_reproduced_by(result)
 
 
 @pytest.mark.parametrize(
@@ -45,7 +42,9 @@ def test_the_total_evaluation_count_lies_within_1_1_percent_of_the_papers_table_
     """
     # --- arrange / act ----------------
     total = sum(
-        _TOMS748WithTol(k=k, n_digits=n_digits).solve(problem.f, *problem.interval, xtol=0.0, max_fevals=100).n_fevals
+        _TOMS748WithTol(k=k, n_digits=n_digits)
+        .solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100)
+        .n_fevals
         for problem in PAPER_PROBLEMS
     )
 
