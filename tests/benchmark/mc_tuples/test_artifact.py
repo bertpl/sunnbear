@@ -4,8 +4,14 @@ import numpy as np
 import pytest
 
 from sunnbear._core.artifacts import ArtifactError
-from sunnbear._core.benchmark.mc_tuples import MCTuples, MCTuplesDeclaration, MCTuplesSize, load_mc_tuples
-from sunnbear._core.benchmark.mc_tuples.lane_grid import LaneGrid
+from sunnbear._core.benchmark.mc_tuples import (
+    N_FINE_LANES,
+    MCTuples,
+    MCTuplesDeclaration,
+    MCTuplesSize,
+    fine_lanes_of,
+    load_mc_tuples,
+)
 
 
 def test_the_csv_file_reads_back_every_value_exactly():
@@ -30,8 +36,8 @@ def test_a_csv_file_without_the_header_is_refused():
 
 
 @pytest.mark.parametrize("size", MCTuplesSize)
-def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set_with_1_tuple_per_lane(size):
-    """Each size is the start of the full shipped set, with exactly 1 tuple in each of its lanes along u and along v."""
+def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set(size):
+    """Each size is the start of the full shipped set."""
     # --- act --------------------------
     tuples = load_mc_tuples(size)
 
@@ -40,7 +46,28 @@ def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set_with_1_tuple_per_lan
     assert tuples.size == size
     assert tuples.u.tolist() == full.u[:size].tolist()
     assert tuples.v.tolist() == full.v[:size].tolist()
-    assert LaneGrid.is_one_per_lane_on_rebuilt_grid(tuples)
+
+
+@pytest.mark.parametrize("size", MCTuplesSize)
+def test_each_shipped_size_has_means_of_0_5_and_at_most_1_tuple_per_fine_lane(size):
+    """Each shipped size's mean u and mean v are 0.5, and no 2 of its tuples share a fine lane along u or along v."""
+    # --- act --------------------------
+    tuples = load_mc_tuples(size)
+
+    # --- assert -----------------------
+    assert tuples.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
+    for values in (tuples.u, tuples.v):
+        assert np.bincount(fine_lanes_of(values)).max() == 1
+
+
+def test_the_largest_shipped_size_holds_exactly_1_tuple_per_fine_lane():
+    """The largest size fills every fine lane along u and along v with exactly 1 tuple."""
+    # --- act --------------------------
+    tuples = load_mc_tuples(max(MCTuplesSize))
+
+    # --- assert -----------------------
+    for values in (tuples.u, tuples.v):
+        assert np.bincount(fine_lanes_of(values), minlength=N_FINE_LANES).tolist() == [1] * N_FINE_LANES
 
 
 def test_load_mc_tuples_rejects_an_unsupported_size():
