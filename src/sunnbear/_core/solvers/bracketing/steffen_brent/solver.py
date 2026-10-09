@@ -1,4 +1,4 @@
-"""`SteffenBrent` implements the modified Brent method of Steffen et al., which also tests the interval's midpoint."""
+"""`SteffenBrent` implements the modified Brent method of Steffen et al., which can move a bound onto the midpoint."""
 
 from sunnbear._core.solvers.core import Solver, SolveState
 
@@ -34,25 +34,27 @@ class SteffenBrent(Solver):
 
     - **The interval for an accepted step:** the paper's text accepts an interpolation step only between ``b`` and
       the midpoint ``(a + b) / 2``, while its Algorithm 2 keeps the bound of Brent's method, ``(3 * a + b) / 4``.
-      `SteffenBrent` follows Algorithm 2, as rateslib's ``modified_brent`` does.
+      `SteffenBrent` follows Algorithm 2.
     - **The choice of step:** Algorithm 2 chooses between interpolation and the secant by comparing the x-values
       ``a``, ``b`` and ``b_prev``, not the function values. Its secant step then divides 0 by 0 when ``b`` equals
-      ``b_prev``, which the final swap makes possible, and its interpolation divides by 0 when 2 distinct x-values
-      share a function value. `SteffenBrent` compares the function values, as rateslib does, but compares them
-      exactly, where rateslib bisects once ``|f(b) - f(b_prev)| < 1e-16``.
+      ``b_prev``, which happens when the old ``b`` became the new ``a`` and the final swap moves it back to ``b``, and
+      its interpolation divides by 0 when 2 distinct x-values share a function value. `SteffenBrent` compares the
+      function values, for exact equality.
     - **No step-size tests:** the paper's text describes the tests of Brent's method that force bisection once the
       interpolation steps stop shrinking, but Algorithm 2 leaves them out. `SteffenBrent` follows Algorithm 2, so on
       some functions the interval shrinks slowly.
     - **No needless evaluation of the midpoint:** when ``s`` is itself the midpoint, its function value serves as
       ``f(m)``, where Algorithm 2 evaluates the midpoint a second time; and an ``s`` with ``f(s) = 0`` ends the
-      solve without evaluating the midpoint. Neither changes an evaluated x-value, since in both cases the test of
-      ``f(m)`` against ``f(s)`` cannot hold.
+      solve without evaluating the midpoint. Neither shortcut changes the next interval or the returned x-value,
+      since in both cases ``f(m)`` and ``f(s)`` cannot differ in sign.
 
     The paper's title says that the modification halves the interval in every iteration, but Algorithm 2 does not
-    guarantee it. When the root lies between ``a`` and ``s``, and ``s`` lies on ``b``'s side of the midpoint, the
-    midpoint test fails and the new interval runs from ``a`` to ``s``, more than half the old interval; and when
-    ``f(a)`` and ``f(s)`` have the same sign, the new interval from ``b`` to ``s`` can keep up to 3/4 of it. On
-    ``1 - 11 * exp(-24 * x)`` over ``[0, 1]``, the first iteration keeps 91 % of the interval.
+    guarantee that the interval halves:
+
+    - when the root lies between ``a`` and ``s``, and ``s`` lies on ``b``'s side of the midpoint, the midpoint test
+      fails and the new interval runs from ``a`` to ``s``, more than half the old interval;
+    - when ``f(a)`` and ``f(s)`` have the same sign, the new interval from ``b`` to ``s`` can keep up to 3/4 of the
+      old interval.
 
     An iteration can evaluate the function twice, and the stopping criterion is the paper's own, so `SteffenBrent`
     writes its own loop, not `BracketingSolver`'s.
@@ -63,7 +65,7 @@ class SteffenBrent(Solver):
           Algorithm 2 is the method, and the test suite reproduces its 2 case studies.
           https://doi.org/10.1016/j.exco.2024.100173
         - Brent, R. P. (1971). An algorithm with guaranteed convergence for finding a zero of a function. The
-          Computer Journal 14(4), 422-425. The method that Steffen et al. modify. https://doi.org/10.1093/comjnl/14.4.422
+          Computer Journal 14(4), 422-425. Steffen et al. modify Brent's method. https://doi.org/10.1093/comjnl/14.4.422
     """
 
     name = "steffen_brent"
@@ -72,9 +74,6 @@ class SteffenBrent(Solver):
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — the loop follows the paper's Algorithm 2 step by step
         """Run Algorithm 2 of the paper and return ``b``.
 
-        Besides ``a``, ``b``, ``b_prev``, ``s`` and ``m``, which the class docstring defines, ``window_end`` is
-        ``(3 * a + b) / 4``, the end of the range that accepts an interpolation step.
-
         Each iteration:
 
         - chooses ``s`` and evaluates it;
@@ -82,8 +81,7 @@ class SteffenBrent(Solver):
         - chooses the new ``a``, evaluating the midpoint where the paper's modification needs it;
         - swaps ``a`` and ``b`` where ``|f(a)| < |f(b)|``.
 
-        The signs of 2 function values are compared directly, where the paper multiplies them: the product of 2
-        small function values can underflow to 0.
+        The loop ends once ``|b - a| <= xtol``.
         """
         interval = state.interval
         a, fa, b, fb = interval.a, interval.fa, interval.b, interval.fb
@@ -110,9 +108,10 @@ class SteffenBrent(Solver):
                 s = b - fb * (b_prev - b) / (fb_prev - fb)
             else:
                 s = m
-            # Accept s only strictly between b and window_end; a step that overflows to inf or nan fails this test too.
-            window_end = (3.0 * a + b) / 4.0
-            if not min(b, window_end) < s < max(b, window_end):
+            # accepted_range_end is the end of the range that accepts an interpolation step. A step that overflows to
+            # inf or nan falls outside the range too, so it becomes a bisection.
+            accepted_range_end = (3.0 * a + b) / 4.0
+            if not min(b, accepted_range_end) < s < max(b, accepted_range_end):
                 s = m
 
             # --- the evaluation at s ------------
@@ -123,6 +122,8 @@ class SteffenBrent(Solver):
 
             # --- the new interval ---------------
             b_prev, fb_prev = b, fb
+            # Signs are compared directly, where the paper multiplies them: the product of 2 small function values can
+            # underflow to 0.
             if (fa > 0.0) == (fs > 0.0):
                 a, fa = b, fb
             elif s != m:

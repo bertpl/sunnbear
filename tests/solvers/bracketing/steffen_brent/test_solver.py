@@ -14,20 +14,22 @@ def _case_study_1(x: float) -> float:
     return math.exp(-(x**2) / 4.0) - 2.0 * math.cos(x) + x / 2.0 - 2.5
 
 
-# The Peng-Robinson constants, at full precision (Peng and Robinson, 1976): the paper rounds them to Λ = 0.45724 and
-# Γ = 0.07780, which move the root of its second case study by 6.6e-4.
+# The Peng-Robinson constants, at full precision (Peng and Robinson, 1976): the paper prints them rounded to
+# Λ = 0.45724 and Γ = 0.07780, but its root fits the full-precision constants to within 6.5e-9; the rounded ones move
+# the root by 6.6e-4.
 _PENG_ROBINSON_ETA = 1.0 / (1.0 + (4.0 - math.sqrt(8.0)) ** (1.0 / 3.0) + (4.0 + math.sqrt(8.0)) ** (1.0 / 3.0))
-_PENG_ROBINSON_LAMBDA = (8.0 + 40.0 * _PENG_ROBINSON_ETA) / (49.0 - 37.0 * _PENG_ROBINSON_ETA)
-_PENG_ROBINSON_GAMMA = _PENG_ROBINSON_ETA / (3.0 + _PENG_ROBINSON_ETA)
+_PENG_ROBINSON_CAPITAL_LAMBDA = (8.0 + 40.0 * _PENG_ROBINSON_ETA) / (49.0 - 37.0 * _PENG_ROBINSON_ETA)
+_PENG_ROBINSON_CAPITAL_GAMMA = _PENG_ROBINSON_ETA / (3.0 + _PENG_ROBINSON_ETA)
 
 
 def _case_study_2(v: float) -> float:
     """Return the function of the paper's second case study: its equation 8 with the Peng-Robinson parameters of its
-    equation 9, at ``omega = 0.2``, ``Tr = 0.85`` and ``Pr = 0.45``, where ``v`` is ``V / b``."""
+    equation 9, at ``omega = 0.2``, ``Tr = 0.85`` and ``Pr = 0.45``, where ``v`` is the volume ``V`` divided by the
+    co-volume parameter ``b``."""
     lam, sigma, omega, tr, pr = 2.0, -1.0, 0.2, 0.85, 0.45
     alpha = (1.0 + (0.37464 + 1.54226 * omega - 0.26992 * omega**2) * (1.0 - math.sqrt(tr))) ** 2
-    t = tr / (_PENG_ROBINSON_GAMMA * pr)
-    u = _PENG_ROBINSON_LAMBDA * alpha / (_PENG_ROBINSON_GAMMA**2 * pr)
+    t = tr / (_PENG_ROBINSON_CAPITAL_GAMMA * pr)
+    u = _PENG_ROBINSON_CAPITAL_LAMBDA * alpha / (_PENG_ROBINSON_CAPITAL_GAMMA**2 * pr)
     return v**3 - (1.0 - lam + t) * v**2 + (sigma - lam - lam * t + u) * v - (sigma + sigma * t + u)
 
 
@@ -42,7 +44,8 @@ def _steep_exponential(x: float) -> float:
 def test_case_study_1_reaches_the_papers_root_in_its_6_iterations():
     """On the paper's first case study over ``[1, 3]``, `SteffenBrent` returns the paper's root 2.1584212093.
 
-    The 11 evaluations are the 2 at the interval bounds and the paper's 6 iterations, 3 of which evaluate the midpoint.
+    The 11 evaluations are the 2 at the interval bounds, 1 in each of the paper's 6 iterations, and 3 more at the
+    midpoint.
     """
     # --- act --------------------------
     result = SteffenBrent().solve(_case_study_1, 1.0, 3.0, xtol=1e-10, max_fevals=100)
@@ -109,9 +112,9 @@ def test_the_interval_does_not_always_halve():
 
 
 def test_equal_function_values_at_b_and_b_prev_force_a_bisection():
-    """On ``1 - 11 * exp(-24 * x)`` over ``[0, 1]``, the final swap makes ``b`` equal ``b_prev`` in several
-    iterations, where the secant of the paper's Algorithm 2 divides 0 by 0; `SteffenBrent` bisects there, and returns
-    a root within ``xtol``."""
+    """On ``1 - 11 * exp(-24 * x)`` over ``[0, 1]``, the swap at the end of an iteration, which keeps the smaller
+    ``|f|`` in ``b``, makes ``b`` equal ``b_prev`` in several iterations, where the secant of the paper's Algorithm 2
+    divides 0 by 0; `SteffenBrent` bisects there, and returns a root within ``xtol``."""
     # --- act --------------------------
     result = SteffenBrent().solve(_steep_exponential, 0.0, 1.0, xtol=1e-10, max_fevals=100)
 
