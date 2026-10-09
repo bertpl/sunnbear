@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add the Pegasus solver, `sunnbear.solvers.Pegasus`
 - Add the Anderson-Björck solver, `sunnbear.solvers.AndersonBjorck`
 - Add the Secant solver, `sunnbear.solvers.Secant`
+- Add the Steffen-Brent solver, `sunnbear.solvers.SteffenBrent`
 - Add gpq(0.1) spread statistics and a `score` property that combines them to `MCTuplesStats`
 
 ### Changed
