@@ -7,10 +7,11 @@ benchmarked.
 
 Every twin test follows the same rules, so that no twin takes an undocumented approach of its own:
 
-- it runs on `TWIN_TEST_CASES`, the test cases that all twins share;
+- it runs on `TwinSolver.comparable_test_cases`: `TWIN_TEST_CASES`, the test cases that all twins share, without
+  the ones that the twin declares in `TwinSolver.excluded_test_cases`;
 - `assert_agrees_with_twin` compares the 2 solves evaluation by evaluation;
-- each difference from exact agreement is declared once, on the twin class, with its reason in that class's
-  docstring.
+- each difference from exact agreement, and each excluded test case, is declared once, on the twin class, with its
+  reason in that class's docstring.
 
 A twin stops where sunnbear's solver would stop, not where the reference implementation would:
 `StoppingWrappedFunction` raises `TwinConvergedSignal` once `TwinSolver._root_if_sunnbear_solver_stops` says that
@@ -18,7 +19,10 @@ sunnbear's solver stops. The 2 solves then evaluate the same number of points, a
 never need to be declared as a deviation.
 
 By default, `TwinSolver._root_if_sunnbear_solver_stops` applies the stopping criterion of `BracketingSolver`; the twin
-of a solver with a stopping criterion of its own overrides that method with that solver's criterion.
+of a solver with a stopping criterion of its own overrides that method with that solver's criterion. Where the
+reference implementation stops by exactly the solver's own rule, the twin lets it stop: its
+`TwinSolver._root_if_sunnbear_solver_stops` returns ``None``, and its `TwinSolver._run_reference` raises
+`TwinConvergedSignal` with the reference implementation's root.
 """
 
 from .agreement import MAX_ULPS_APART, assert_agrees_with_twin, ulps_apart

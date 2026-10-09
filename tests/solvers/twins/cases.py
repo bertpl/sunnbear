@@ -6,7 +6,8 @@ from dataclasses import dataclass
 from sunnbear.solvers import Solver, SolveResult
 from tests.solvers.example_functions import cubic, decreasing_cubic, quintic, steep_exponential
 
-# A budget that no twin test case reaches: a solve that hits it ends as MAX_FEVALS, which fails the agreement check.
+# A budget that no test case reaches for a twin that does not exclude it: a solve that hits it ends as MAX_FEVALS,
+# which fails the agreement check.
 _MAX_FEVALS = 200
 
 
@@ -29,7 +30,8 @@ class TwinTestCase:
         return max(abs(self.a), abs(self.b))
 
     def solve(self, solver: Solver) -> SolveResult:
-        """Run ``solver`` on this test case, with its history recorded, under a budget that no test case reaches."""
+        """Run ``solver`` on this test case, with its history recorded, under a budget that no compared test case
+        reaches."""
         return solver.solve(self.f, self.a, self.b, xtol=self.xtol, max_fevals=_MAX_FEVALS, history_enabled=True)
 
 

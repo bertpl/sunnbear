@@ -4,10 +4,10 @@ import pytest
 
 from sunnbear.solvers import Pegasus
 from tests.solvers.bracketing.pegasus.mpmath_twin import PegasusMpmathTwin
-from tests.solvers.twins import TWIN_TEST_CASES, assert_agrees_with_twin
+from tests.solvers.twins import assert_agrees_with_twin
 
 
-@pytest.mark.parametrize("test_case", TWIN_TEST_CASES, ids=str)
+@pytest.mark.parametrize("test_case", PegasusMpmathTwin.comparable_test_cases(), ids=str)
 def test_pegasus_agrees_with_mpmath_pegasus(test_case):
     """`Pegasus` evaluates the same points as mpmath's Pegasus method, on every shared twin test case."""
     # --- act / assert -----------------

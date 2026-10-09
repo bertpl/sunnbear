@@ -9,8 +9,6 @@ class BisectionScipyTwin(TwinSolver):
     """`BisectionScipyTwin` hands the interval to `scipy.optimize.bisect` and returns the root estimate at the point
     where `Bisection` would stop.
 
-    SciPy runs on plain floats, so the twin's flop counts hold only the framework's own checks.
-
     The twin deviates from exact agreement in these declared ways:
 
     - SciPy evaluates both interval bounds again before its first midpoint;
