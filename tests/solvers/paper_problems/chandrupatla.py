@@ -1,6 +1,4 @@
-"""This module holds the test functions of Chandrupatla's paper, keyed by their number in its Table 1: the Chandrupatla
-tests reproduce the paper's Table 2 on them, and the CARF tests the CARF paper's Table 4, which reuses the same
-functions and intervals.
+"""This module holds the test functions of Chandrupatla's paper, keyed by their number in its Table 1.
 
 Function 7 comes in 2 versions: as the paper prints it, in `CHANDRUPATLA_FUNCTIONS`, and as the paper's BASIC listing
 computes it, in `CHANDRUPATLA_LISTING_FUNCTIONS`.

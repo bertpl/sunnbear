@@ -39,7 +39,7 @@ CASE_STUDIES = [
         root=2.1584212093,
         root_abs_tol=5e-11,
         # The paper reports 6 iterations. `SteffenBrent` evaluates at the 2 interval bounds, once in each of those 6
-        # iterations, and 3 more times at the midpoint.
+        # iterations, and, in 3 of them, also at the midpoint of the current interval.
         n_fevals=2 + 6 + 3,
     ),
     # The tolerance on the root covers the gap between the paper's root and the root at the full-precision

@@ -3,8 +3,9 @@
 import pytest
 
 from sunnbear.solvers import Chandrupatla
-from tests.solvers.bracketing.chandrupatla.paper_problems import TABLE_2
 from tests.solvers.paper_problems import PaperProblem
+
+from .paper_problems import TABLE_2
 
 
 @pytest.mark.parametrize("problem", TABLE_2, ids=str)

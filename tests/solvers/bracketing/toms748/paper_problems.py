@@ -1,5 +1,5 @@
-"""This module holds the roots that the authors' code of Algorithm 748 computes for the Alefeld-Potra-Shi test
-problems, with the tolerance ``tol = 0``."""
+"""This module holds `AUTHORS_TEST_OUTPUT`, the Alefeld-Potra-Shi test problems with the roots that the authors'
+code of Algorithm 748 computes for them with the tolerance ``tol = 0``, as its test output prints them."""
 
 from dataclasses import replace
 
@@ -7,7 +7,7 @@ from tests.solvers.paper_problems.alefeld_potra_shi import ALEFELD_POTRA_SHI_PRO
 
 # The authors' test output lists, in the order of their test data, the root that their code prints to 14 significant
 # digits for each problem.
-_ROOTS = {
+PRINTED_ROOTS = {
     "1[n=1]": 1.8954942670340,
     "2[n=1]": 3.0229153472731,
     "3[n=1]": 6.6837535608081,
@@ -165,6 +165,6 @@ _ROOTS = {
 }
 
 # A root matches the printed one within the precision of its 14 digits.
-PAPER_PROBLEMS = [
-    replace(problem, root=_ROOTS[problem.name], root_rel_tol=1e-13) for problem in ALEFELD_POTRA_SHI_PROBLEMS
+AUTHORS_TEST_OUTPUT = [
+    replace(problem, root=PRINTED_ROOTS[problem.name], root_rel_tol=1e-13) for problem in ALEFELD_POTRA_SHI_PROBLEMS
 ]

@@ -61,12 +61,15 @@ def _f27(x: float) -> float:
 # runtime rounds the last bit of cos, cbrt or exp differently from the correctly rounded values here, which changes the
 # x-values that the solve evaluates.
 _ROUNDING_SENSITIVE_PROBLEM_NAMES = {"f34", "f70", "f86"}
-_ROUNDING_DEVIATION = "the .NET runtime of the paper's benchmark presumably rounds a library function differently"
+_ROUNDING_DEVIATION_REASON = (
+    "the .NET runtime of the paper's benchmark presumably rounds a library function differently"
+)
 
 # Each row holds:
 # - the function's name in Table 2, f01 to f92;
 # - the function and its interval;
-# - modAB's root in the paper's supplementary results, which modAB returns without evaluating it;
+# - modAB's root in the paper's supplementary results; `ModAB` returns this x-value without evaluating the function
+#   there;
 # - modAB's evaluation count in Table 2;
 # - the number of iterations whose chord's zero is clamped onto a bound: the paper's C# code counts every iteration as
 #   an evaluation, but a clamped iteration evaluates nothing, so `ModAB` evaluates the table's count less these.
@@ -80,7 +83,7 @@ TABLE_2 = [
         root_rel_tol=1e-13,
         n_fevals=reported_n_fevals - n_clamped,
         n_fevals_tol=4 if name in _ROUNDING_SENSITIVE_PROBLEM_NAMES else 0,
-        deviation=_ROUNDING_DEVIATION if name in _ROUNDING_SENSITIVE_PROBLEM_NAMES else None,
+        deviation_reason=_ROUNDING_DEVIATION_REASON if name in _ROUNDING_SENSITIVE_PROBLEM_NAMES else None,
     )
     for name, f, a, b, root, reported_n_fevals, n_clamped in [
         ("f01", lambda x: _pow(x, 3) - 1, 0.5, 1.5, 1.0, 3, 0),

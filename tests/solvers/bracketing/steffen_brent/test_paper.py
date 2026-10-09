@@ -3,8 +3,9 @@
 import pytest
 
 from sunnbear.solvers import SteffenBrent
-from tests.solvers.bracketing.steffen_brent.paper_problems import CASE_STUDIES
 from tests.solvers.paper_problems import PaperProblem
+
+from .paper_problems import CASE_STUDIES
 
 
 @pytest.mark.parametrize("problem", CASE_STUDIES, ids=str)

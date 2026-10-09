@@ -3,15 +3,17 @@
 import pytest
 
 from sunnbear.solvers import ModAB
-from tests.solvers.bracketing.modab.paper_problems import TABLE_2
 from tests.solvers.paper_problems import PaperProblem
+
+from .paper_problems import TABLE_2
 
 
 @pytest.mark.parametrize("problem", TABLE_2, ids=str)
 def test_the_evaluation_counts_of_table_2_of_the_paper_are_reproduced(problem: PaperProblem):
-    """With the paper's tolerances, `ModAB` returns modAB's root in the paper's supplementary results within a
-    relative 1e-13, and evaluates as often as Table 2 reports less the clamped iterations, within the tolerance of the
-    problems whose count is not reproduced exactly."""
+    """With the paper's tolerances, `ModAB` returns the root that the paper's supplementary results give for modAB,
+    within a relative 1e-13, and evaluates as often as Table 2 reports less the iterations that the paper's C# code
+    counts but that evaluate nothing, except on the few problems whose count depends on how the platform rounds a
+    library function."""
     # --- act --------------------------
     result = _ModABWithPaperTolerances().solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=300)
 

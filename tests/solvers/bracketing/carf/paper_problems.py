@@ -1,34 +1,34 @@
-"""This module holds `TABLE_4`, the 45 cases of Table 4 of the CARF paper, which reuses the functions and intervals of
-Chandrupatla's paper, with CARF's evaluation counts in that table."""
+"""This module holds `TABLE_4`, the 45 cases of Table 4 of the CARF paper with CARF's evaluation count for each. The
+table reuses the functions and intervals of Chandrupatla's paper."""
 
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.chandrupatla import CHANDRUPATLA_FUNCTIONS
 
 # On some of the wide intervals of functions 1 to 4, ``h``, the scaled function value at ``t`` that `CARF`'s docstring
 # defines, often lies within rounding error of 0 or 1, the limits that choose the kind of step.
-_STEP_CHOICE_DEVIATION = (
+_STEP_CHOICE_DEVIATION_REASON = (
     "h lies within rounding error of a limit that chooses the kind of step, so the count depends on how the paper's "
-    "code computes the quadratic's root and the power step"
+    "code computes the root of the quadratic through the 3 points and the power step"
 )
-_LAST_STEP_DEVIATION = (
-    "the last step lands on the other side of the root, or exactly on it, so a 1-ulp difference in that step changes "
-    "the count"
+_LAST_STEP_DEVIATION_REASON = (
+    "the last step's x-value lies on the other side of the root, or exactly on it, so a 1-ulp difference in that step "
+    "changes the count"
 )
 
-# The rows whose count `CARF` does not reproduce, keyed by function number and interval.
-_DEVIATIONS = {
-    (1, -1e4, 1e4): _STEP_CHOICE_DEVIATION,
-    (1, -1e10, 1e10): _STEP_CHOICE_DEVIATION,
-    (2, 1e-4, 1e4): _STEP_CHOICE_DEVIATION,
-    (2, 1e-10, 1e10): _STEP_CHOICE_DEVIATION,
-    (2, 1e-12, 1e12): _STEP_CHOICE_DEVIATION,
-    (3, -1e6, 1e6): _STEP_CHOICE_DEVIATION,
-    (3, -1e10, 1e10): _STEP_CHOICE_DEVIATION,
-    (4, -1e4, 1e4): _STEP_CHOICE_DEVIATION,
-    (4, -1e6, 1e6): _STEP_CHOICE_DEVIATION,
-    (4, -1e10, 1e10): _STEP_CHOICE_DEVIATION,
-    (8, 2e-4, 2): _LAST_STEP_DEVIATION,
-    (9, 2e-4, 1): _LAST_STEP_DEVIATION,
+# `_DEVIATION_REASONS` holds the rows whose count `CARF` does not reproduce, keyed by function number and interval.
+_DEVIATION_REASONS = {
+    (1, -1e4, 1e4): _STEP_CHOICE_DEVIATION_REASON,
+    (1, -1e10, 1e10): _STEP_CHOICE_DEVIATION_REASON,
+    (2, 1e-4, 1e4): _STEP_CHOICE_DEVIATION_REASON,
+    (2, 1e-10, 1e10): _STEP_CHOICE_DEVIATION_REASON,
+    (2, 1e-12, 1e12): _STEP_CHOICE_DEVIATION_REASON,
+    (3, -1e6, 1e6): _STEP_CHOICE_DEVIATION_REASON,
+    (3, -1e10, 1e10): _STEP_CHOICE_DEVIATION_REASON,
+    (4, -1e4, 1e4): _STEP_CHOICE_DEVIATION_REASON,
+    (4, -1e6, 1e6): _STEP_CHOICE_DEVIATION_REASON,
+    (4, -1e10, 1e10): _STEP_CHOICE_DEVIATION_REASON,
+    (8, 2e-4, 2): _LAST_STEP_DEVIATION_REASON,
+    (9, 2e-4, 1): _LAST_STEP_DEVIATION_REASON,
 }
 
 # Each row of the paper's Table 4 holds:
@@ -42,8 +42,8 @@ TABLE_4 = [
         float(a),
         float(b),
         n_fevals=n_fevals,
-        n_fevals_tol=None if (number, a, b) in _DEVIATIONS else 0,
-        deviation=_DEVIATIONS.get((number, a, b)),
+        n_fevals_tol=None if (number, a, b) in _DEVIATION_REASONS else 0,
+        deviation_reason=_DEVIATION_REASONS.get((number, a, b)),
     )
     for number, a, b, n_fevals in [
         (1, 2, 3, 7),

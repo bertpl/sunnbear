@@ -38,7 +38,7 @@ def _circles(x: float) -> float:
     return sign * (1.0 - math.sqrt(1.0 - (3.0 * x + 1.0) ** 2 / 81.0))
 
 
-_STEP_FUNCTION_DEVIATION = "MATLAB's arithmetic produced the table's 34 iterations, and `ITP` takes 35"
+_STEP_FUNCTION_DEVIATION_REASON = "MATLAB's arithmetic produced the table's 34 iterations, and `ITP` takes 35"
 
 # Each row holds a test function of the paper's Table 1, by its name there, and the iteration count of ITP in that
 # table, which excludes the 2 evaluations at the interval bounds.
@@ -50,7 +50,7 @@ TABLE_1 = [
         1.0,
         n_fevals=n_iterations + 2,
         n_fevals_tol=1 if name == "step_function" else 0,
-        deviation=_STEP_FUNCTION_DEVIATION if name == "step_function" else None,
+        deviation_reason=_STEP_FUNCTION_DEVIATION_REASON if name == "step_function" else None,
     )
     for name, f, n_iterations in [
         ("lambert", lambda x: x * math.exp(x) - 1.0, 8),
