@@ -1,17 +1,9 @@
-"""These tests assert that `AndersonBjorck` scales down the function value of a bound that the interval keeps twice in
-a row, by the factor ``1 - f_new / f_previous`` or by 0.5 where that factor is not positive, which ends regula falsi's
-stall."""
+"""These tests assert that the individual steps of `AndersonBjorck` follow its algorithm."""
 
 import pytest
 
-from sunnbear.solvers import AndersonBjorck, RegulaFalsi, SolveStatus
-from tests.solvers.example_functions import (
-    CUBIC_ROOT,
-    STEEP_EXPONENTIAL_ROOT,
-    cubic,
-    decreasing_cubic,
-    steep_exponential,
-)
+from sunnbear.solvers import AndersonBjorck, SolveStatus
+from tests.solvers.example_functions import cubic
 
 
 def _cubic_with_a_local_maximum(x: float) -> float:
@@ -20,9 +12,6 @@ def _cubic_with_a_local_maximum(x: float) -> float:
     return x**3 - 2.0 * x + 2.0
 
 
-# ==================================================================================================
-#  The modified step
-# ==================================================================================================
 @pytest.mark.parametrize(
     "f", [lambda x: x - 0.3, lambda x: 0.3 - x]
 )  # The 2 functions cover both interval orientations.
@@ -89,46 +78,3 @@ def test_the_factor_falls_back_to_0_5_when_an_iterate_does_not_reduce_abs_f():
     # f2 > f1 > 0, so 1 - f2 / f1 is negative too, and the retained value is halved again.
     assert f2 > f1
     assert x3 == (a * f2 - x2 * (0.25 * fa)) / (f2 - 0.25 * fa)
-
-
-@pytest.mark.parametrize("f", [cubic, decreasing_cubic])  # The 2 functions cover both interval orientations.
-def test_a_convex_function_converges_where_regula_falsi_stalls(f):
-    """On `cubic` in both interval orientations, regula falsi exhausts its budget, while Anderson-Björck converges
-    well within it."""
-    # --- act --------------------------
-    regula_falsi_result = RegulaFalsi().solve(f, 1.0, 2.0, xtol=1e-9, max_fevals=60)
-    anderson_bjorck_result = AndersonBjorck().solve(f, 1.0, 2.0, xtol=1e-9, max_fevals=60)
-
-    # --- assert -----------------------
-    assert regula_falsi_result.status is SolveStatus.MAX_FEVALS
-    assert anderson_bjorck_result.status is SolveStatus.CONVERGED
-    assert abs(anderson_bjorck_result.x - CUBIC_ROOT) <= 1e-9
-    assert anderson_bjorck_result.n_fevals <= 15
-
-
-# ==================================================================================================
-#  Slow progress
-# ==================================================================================================
-def test_a_function_that_is_nearly_flat_on_1_side_of_the_root_takes_over_200_evaluations():
-    """On `steep_exponential` over ``[0, 1]``, which is nearly flat left of the root, `AndersonBjorck` converges only
-    after more than 200 evaluations, the slow progress that the class docstring describes."""
-    # --- act --------------------------
-    result = AndersonBjorck().solve(steep_exponential, 0.0, 1.0, xtol=1e-10, max_fevals=1000)
-
-    # --- assert -----------------------
-    assert result.status is SolveStatus.CONVERGED
-    assert abs(result.x - STEEP_EXPONENTIAL_ROOT) <= 1e-10
-    assert result.n_fevals > 200
-
-
-# ==================================================================================================
-#  Identity and cost
-# ==================================================================================================
-def test_identity_and_that_its_arithmetic_is_counted():
-    """`AndersonBjorck` is named ``anderson_bjorck``, at version 1, and its arithmetic is flop-counted."""
-    # --- act --------------------------
-    result = AndersonBjorck().solve(cubic, 1.0, 2.0, xtol=1e-3, max_fevals=20)
-
-    # --- assert -----------------------
-    assert (AndersonBjorck.name, AndersonBjorck.version) == ("anderson_bjorck", 1)
-    assert result.flop_counts.total_count() > 0
