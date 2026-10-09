@@ -26,7 +26,7 @@ class SecantScipyTwin(TwinSolver):
     name = "secant_scipy_twin"
     version = 1
     n_reevaluated_bounds = 2
-    excluded_test_cases = frozenset({TwinTestCase(steep_exponential, 0.0, 1.0, 1e-10)})
+    excluded_test_cases = frozenset({TwinTestCase(f=steep_exponential, a=0.0, b=1.0, xtol=1e-10)})
 
     def _run_reference(self, f: StoppingWrappedFunction, a: float, b: float, xtol: float) -> None:
         """Run SciPy's secant method from ``a`` and ``b``, and signal its root if it converged."""

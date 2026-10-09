@@ -36,13 +36,13 @@ class TwinTestCase:
 
 
 TWIN_TEST_CASES = [
-    TwinTestCase(f, a, b, xtol)
-    for f, a, b in [
-        (cubic, 1.0, 2.0),
-        (decreasing_cubic, 1.0, 2.0),  # This test case has a decreasing function.
-        (quintic, 0.0, 1.0),
-        (cubic, 1.3, 4.0),  # This test case has its root close to the lower bound.
-        (steep_exponential, 0.0, 1.0),
+    TwinTestCase(f=row["f"], a=row["a"], b=row["b"], xtol=xtol)
+    for row in [
+        {"f": cubic, "a": 1.0, "b": 2.0},
+        {"f": decreasing_cubic, "a": 1.0, "b": 2.0},  # This test case has a decreasing function.
+        {"f": quintic, "a": 0.0, "b": 1.0},
+        {"f": cubic, "a": 1.3, "b": 4.0},  # This test case has its root close to the lower bound.
+        {"f": steep_exponential, "a": 0.0, "b": 1.0},
     ]
     for xtol in (1e-4, 1e-10)
 ]
