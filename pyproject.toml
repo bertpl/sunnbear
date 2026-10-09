@@ -61,6 +61,7 @@ dev = [
     "mpmath>=1.3.0",
     "pytest>=8.0",
     "pytest-cov>=6.0",
+    "pytest-xdist>=3.8.0",  # runs the tests in parallel worker processes: `-n auto` in the Makefile and in CI
     # exact tool versions are pinned by the tracked uv.lock (used by pre-commit,
     # `make lint`, and CI); these ranges just set the floor.
     "ruff>=0.15.11",

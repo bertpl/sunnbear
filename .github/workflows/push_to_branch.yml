@@ -46,7 +46,8 @@ jobs:
   test:  # latest-only here; the full matrix runs on PR / push-to-main / release
     needs: [check-open-pr]
     if: needs.check-open-pr.outputs.has_pr == 'false'
-    runs-on: ubuntu-latest
+    # ARM, like the unit test matrix: the suite runs faster there.
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

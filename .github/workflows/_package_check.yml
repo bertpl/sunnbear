@@ -42,7 +42,8 @@ jobs:
 
   install-test:
     needs: [build]
-    runs-on: ubuntu-latest
+    # ARM, like the unit test matrix: the suite runs faster there.
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -73,4 +74,4 @@ jobs:
         env:
           # Setting this variable makes tests/conftest.py fail the run when the tests import sunnbear from anywhere but site-packages
           SUNNBEAR_TESTS_NEEDS_INSTALLED_WHEEL: "1"
-        run: blind-venv/bin/python -m pytest tests/
+        run: blind-venv/bin/python -m pytest tests/ -n auto
