@@ -13,10 +13,12 @@ class WeightedSplitSolver(BracketingSolver):
     version = 1
 
     def __init__(self, weight: float, n_warmup: int = 0) -> None:
+        """Store both init arguments; ``n_warmup`` is unused and gives the config tests a second argument."""
         self.weight = weight
         self.n_warmup = n_warmup
 
     def _next_x(self, state: SolveState, interval: Interval) -> float:
+        """Return the x-value at ``weight`` times the interval width above the lower interval bound."""
         return interval.a + self.weight * interval.width
 
 

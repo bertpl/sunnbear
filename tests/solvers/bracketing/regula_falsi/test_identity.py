@@ -5,6 +5,7 @@ from tests.solvers.example_functions import cubic
 
 
 def test_identity_and_that_its_arithmetic_is_counted():
+    """`RegulaFalsi` is named ``regula_falsi``, at version 1, and its arithmetic is flop-counted."""
     # --- act --------------------------
     result = RegulaFalsi().solve(cubic, 1.0, 2.0, xtol=1e-3, max_fevals=20)
 

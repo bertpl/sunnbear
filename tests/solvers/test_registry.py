@@ -57,6 +57,7 @@ from .example_solvers import WeightedSplitSolver, define_config
         (BisectionConfig, "bisection", Bisection, SolverRole.BUILTIN_BASELINE),
         (BrentConfig, "brent", Brent, SolverRole.BUILTIN_CORE),
         (CARFConfig, "carf", CARF, SolverRole.BUILTIN_SECONDARY),
+        (ChandrupatlaConfig, "chandrupatla", Chandrupatla, SolverRole.BUILTIN_CORE),
         (IllinoisConfig, "illinois", Illinois, SolverRole.BUILTIN_CORE),
         (
             ITPPaperExperimentsSlack0Config,
@@ -84,12 +85,12 @@ from .example_solvers import WeightedSplitSolver, define_config
         (RiddersScipyConfig, "ridders[variant='scipy']", Ridders, SolverRole.BUILTIN_CORE),
         (SecantConfig, "secant", Secant, SolverRole.BUILTIN_SECONDARY),
         (SteffenBrentConfig, "steffen_brent", SteffenBrent, SolverRole.BUILTIN_SECONDARY),
-        (ChandrupatlaConfig, "chandrupatla", Chandrupatla, SolverRole.BUILTIN_CORE),
         (TOMS748K1Config, "toms748[k=1]", TOMS748, SolverRole.BUILTIN_CORE),
         (TOMS748K2Config, "toms748[k=2]", TOMS748, SolverRole.BUILTIN_SECONDARY),
     ],
 )
 def test_built_in_config_is_registered_on_import(config_cls, solver_id, solver_cls, role):
+    """On import, each built-in config is registered under its ``solver_id``, with its solver class and its role."""
     # --- act --------------------------
     config = SolverConfigRegistry.config_from_id(solver_id)
 
@@ -104,6 +105,8 @@ def test_built_in_config_is_registered_on_import(config_cls, solver_id, solver_c
 # ==================================================================================================
 @pytest.mark.usefixtures("isolated_solver_config_registry")
 def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
+    """`SolverConfigRegistry.configs` lists every config sorted by ``solver_id``, and
+    `SolverConfigRegistry.solver_classes` lists each solver class once, in that order."""
     # --- arrange ----------------------
     for weight in (0.75, 0.25):
         define_config(
@@ -158,6 +161,8 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
 
 
 def test_config_from_id_rejects_an_unknown_id():
+    """For an unregistered id, `SolverConfigRegistry.config_from_id` raises `UnknownSolverConfigError` naming it."""
+    # --- act / assert -----------------
     with pytest.raises(UnknownSolverConfigError, match="'newton'"):
         SolverConfigRegistry.config_from_id("newton")
 
@@ -167,6 +172,7 @@ def test_config_from_id_rejects_an_unknown_id():
 # ==================================================================================================
 @pytest.mark.usefixtures("isolated_solver_config_registry")
 def test_duplicate_solver_id_is_rejected():
+    """Defining a config with the ``solver_id`` of a registered config raises ``ValueError``."""
     # --- arrange ----------------------
     namespace = {"solver_cls": Bisection, "role": SolverRole.USER_ACTIVE}
 
@@ -177,6 +183,7 @@ def test_duplicate_solver_id_is_rejected():
 
 @pytest.mark.usefixtures("isolated_solver_config_registry")
 def test_second_baseline_is_rejected():
+    """Defining a second config with role ``BUILTIN_BASELINE`` raises ``ValueError``."""
     # --- arrange ----------------------
     namespace = {
         "__module__": "sunnbear.hypothetical_solvers",
