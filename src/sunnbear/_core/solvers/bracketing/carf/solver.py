@@ -111,7 +111,7 @@ class CARF(Solver):
     name = "carf"
     version = 1
 
-    def _solve(self, state: SolveState) -> float:  # noqa: C901 — the loop follows the paper's steps in order
+    def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the paper's description
         """Run CARF's iterations and return the interior x-value ``t``.
 
         Each iteration, as the class docstring describes:
