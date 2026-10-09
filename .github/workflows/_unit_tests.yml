@@ -9,8 +9,9 @@ permissions:
 jobs:
   core:
     name: py${{ matrix.python }} / ${{ matrix.resolution }} / jit-${{ matrix.jit }}
-    # ARM, not x64: the suite runs faster on GitHub's ARM runners, and nothing in it depends on the
-    # architecture; every minimal dependency version ships an aarch64 wheel.
+    # The matrix runs on ARM, not x64, because the suite runs faster on GitHub's ARM runners and nothing in
+    # the suite depends on the architecture. Every dependency ships an aarch64 wheel even at the lowest
+    # version that pyproject.toml allows, so the lowest-direct matrix entries also install wheels.
     runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
