@@ -62,7 +62,7 @@ runs:
           # distinct per-combo data file so the coverage job combines rather than overwrites
           COVERAGE_FILE: .coverage.${{ inputs.python_version }}-${{ inputs.dependency_resolution }}-jit-${{ inputs.jit }}
         # --cov-fail-under=0: the coverage job applies the fail_under check to the combined data of all matrix jobs, so no single job applies it
-        run: uv run --group dev pytest ./tests --cov --cov-report= --cov-fail-under=0 --durations=20
+        run: uv run --group dev pytest ./tests -n auto --cov --cov-report= --cov-fail-under=0 --durations=20
 
       - name: Dump collected node-ids (for the cross-combo test-count union)
         shell: bash
