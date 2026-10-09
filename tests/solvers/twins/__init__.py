@@ -7,8 +7,8 @@ benchmarked.
 
 Every twin test follows the same rules, so that no twin takes an undocumented approach of its own:
 
-- it runs on `TwinSolver.comparable_test_cases`: `TWIN_TEST_CASES`, the test cases that all twins share, without
-  the ones that the twin declares in `TwinSolver.excluded_test_cases`;
+- it runs on `TwinSolver.compared_test_cases`: `TWIN_TEST_CASES`, the test cases that all twins share, without
+  the test cases in the twin's `TwinSolver.excluded_test_cases`;
 - `assert_agrees_with_twin` compares the 2 solves evaluation by evaluation;
 - each difference from exact agreement, and each excluded test case, is declared once, on the twin class, with its
   reason in that class's docstring.

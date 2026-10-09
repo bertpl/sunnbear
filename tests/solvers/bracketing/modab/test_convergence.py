@@ -8,8 +8,7 @@ from tests.solvers.example_functions import CONVERGENCE_TEST_CASES
 
 @pytest.mark.parametrize("f, a, b, root", CONVERGENCE_TEST_CASES)
 def test_a_function_converges_to_its_root(f, a, b, root):
-    """`ModAB` returns an x-value within ``xtol`` of the root on an increasing function (`cubic`), a decreasing
-    function (`decreasing_cubic`), and a function with a multiple root (`ninth_power` over ``[-1, 4]``); on
+    """`ModAB` returns an x-value within ``xtol`` of the root on each function of `CONVERGENCE_TEST_CASES`; on
     `ninth_power`, `ModAB` never switches to Anderson-Björck mode, because the function never comes close enough to a
     straight line."""
     # --- act --------------------------

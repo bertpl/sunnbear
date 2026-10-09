@@ -76,7 +76,10 @@ def test_loop_stops_early_on_an_exact_zero():
     # --- arrange ----------------------
     def f(x: float) -> float:
         """Return the value of `_linear`, except for an exact zero at 0.5."""
-        return 0.0 if x == 0.5 else _linear(x)  # the first midpoint is an exact root
+        if x == 0.5:
+            return 0.0  # the first midpoint is an exact root
+        else:
+            return _linear(x)
 
     # --- act --------------------------
     result = _HalvingSolver().solve(f, 0.0, 1.0, xtol=1e-9, max_fevals=200)
@@ -86,7 +89,7 @@ def test_loop_stops_early_on_an_exact_zero():
 
 
 def test_interrupted_loop_reports_the_last_evaluated_point():
-    """When its budget of 4 evaluations runs out, the solve reports ``MAX_FEVALS`` with the last evaluated x-value."""
+    """When its budget runs out, the solve reports ``MAX_FEVALS`` with the last evaluated x-value."""
     # --- act --------------------------
     result = _HalvingSolver().solve(_linear, 0.0, 1.0, xtol=1e-9, max_fevals=4)
 
@@ -100,7 +103,8 @@ def test_interrupted_loop_reports_the_last_evaluated_point():
 #  Subclassing state
 # ==================================================================================================
 def test_a_solver_gets_a_fresh_instance_of_its_own_state_class_per_solve():
-    """Each solve hands `_next_x` a new `_StepCountingState`, so the step count restarts at 0 for the second solve."""
+    """Each solve passes a new `_StepCountingState` to `_next_x`, so the step count restarts at 0 for the second
+    solve."""
     # --- arrange ----------------------
     solver = _StepCountingSolver()
 

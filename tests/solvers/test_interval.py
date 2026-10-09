@@ -1,5 +1,11 @@
-"""These tests assert how an `Interval` picks its orientation, splits, decides convergence and picks its root
-estimate, and that its arithmetic is counted."""
+"""These tests assert that an `Interval`:
+
+- picks its orientation;
+- splits at an x-value;
+- decides convergence;
+- picks its root estimate;
+- has its arithmetic counted.
+"""
 
 import pytest
 from counted_float import CountedFloat, FlopCountingContext, FlopCounts

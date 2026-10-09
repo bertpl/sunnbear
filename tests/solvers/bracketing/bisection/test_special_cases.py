@@ -15,8 +15,8 @@ def test_an_exact_midpoint_root_stops_early():
 
 
 def test_running_out_of_budget_reports_the_last_evaluated_point():
-    """When its budget of 6 evaluations runs out, `Bisection` reports ``MAX_FEVALS`` with the last evaluated midpoint
-    as ``result.x``."""
+    """When its budget runs out, `Bisection` reports ``MAX_FEVALS`` with the last evaluated midpoint as
+    ``result.x``."""
     # --- act --------------------------
     result = Bisection().solve(cubic, 1.0, 2.0, xtol=1e-12, max_fevals=6)
 

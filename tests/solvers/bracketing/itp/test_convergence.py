@@ -31,8 +31,7 @@ def test_the_paper_experiments_variant_with_slack_stays_within_n_max_on_the_func
 
 @pytest.mark.parametrize("f, a, b, root", CONVERGENCE_TEST_CASES)
 def test_a_function_converges_to_its_root(f, a, b, root):
-    """`ITP` returns an x-value within ``xtol`` of the root on an increasing function (`cubic`), a decreasing
-    function (`decreasing_cubic`), and a function with a multiple root (`ninth_power` over ``[-1, 4]``)."""
+    """`ITP` returns an x-value within ``xtol`` of the root on each function of `CONVERGENCE_TEST_CASES`."""
     # --- act --------------------------
     result = ITP(n_slack=4, variant=ITPVariant.PAPER_EXPERIMENTS).solve(f, a, b, xtol=1e-10, max_fevals=500)
 

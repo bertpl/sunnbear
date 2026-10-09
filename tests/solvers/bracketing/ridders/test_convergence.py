@@ -12,12 +12,12 @@ from tests.solvers.example_functions import CONVERGENCE_TEST_CASES, cubic, ninth
 @pytest.mark.parametrize("variant", RiddersVariant)
 @pytest.mark.parametrize("f, a, b, root", CONVERGENCE_TEST_CASES)
 def test_a_function_converges_to_its_root_except_commons_math_on_a_multiple_root(f, a, b, root, variant):
-    """Every variant of `Ridders` returns an x-value within ``xtol`` of the root on an increasing function (`cubic`),
-    a decreasing function (`decreasing_cubic`), and a function with a multiple root (`ninth_power` over ``[-1, 4]``),
-    except the commons_math variant on `ninth_power`.
+    """Every variant of `Ridders` returns an x-value within ``xtol`` of the root on each function of
+    `CONVERGENCE_TEST_CASES`, except the commons_math variant on `ninth_power`.
 
     Near the multiple root of `ninth_power`, 2 successive iterates of the commons_math variant lie within ``xtol``
-    of each other while both are still far from the root, as on the kinked function of `test_special_cases.py`.
+    of each other while both are still far from the root, so the variant stops there, as on the kinked function of
+    `test_special_cases.py`.
     """
     # --- arrange ----------------------
     xtol = 1e-10

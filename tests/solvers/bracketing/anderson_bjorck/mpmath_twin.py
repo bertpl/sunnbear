@@ -23,8 +23,8 @@ class AndersonBjorckMpmathTwin(TwinSolver):
       8 digits to cancellation, which magnifies the last-bit differences between the 2 chord formulas to differences of
       thousands of ulps in the iterates.
 
-    The twin is not compared on the test cases on `steep_exponential`: there, both solvers need more evaluations
-    than the budget of the twin test cases, and the last-bit differences grow to thousands of ulps.
+    The twin is not compared on the test cases of `steep_exponential`: on that function, both solvers need more
+    evaluations than the budget of the twin test cases, and the last-bit differences grow to thousands of ulps.
     """
 
     name = "anderson_bjorck_mpmath_twin"

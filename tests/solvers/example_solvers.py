@@ -7,13 +7,14 @@ from sunnbear.solvers import BracketingSolver, Interval, SolverConfig, SolveStat
 
 
 class WeightedSplitSolver(BracketingSolver):
-    """`WeightedSplitSolver` splits the interval at a fixed fraction of its width, set through ``__init__``."""
+    """`WeightedSplitSolver` splits the interval at a fixed fraction of its width, set through ``__init__``; its
+    ``n_warmup`` argument is unused and gives the config tests a second argument."""
 
     name = "weighted_split"
     version = 1
 
     def __init__(self, weight: float, n_warmup: int = 0) -> None:
-        """Store both init arguments; ``n_warmup`` is unused and gives the config tests a second argument."""
+        """Store both init arguments."""
         self.weight = weight
         self.n_warmup = n_warmup
 

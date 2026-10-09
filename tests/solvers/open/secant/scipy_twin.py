@@ -17,9 +17,10 @@ class SecantScipyTwin(TwinSolver):
     The twin deviates from exact agreement in 1 declared way: SciPy evaluates both interval bounds again before its
     first step.
 
-    The twin is not compared on `steep_exponential` at ``xtol = 1e-10``: `Secant` leaves the interval there, and the
-    agreement check compares converged solves only; `test_special_cases.py` covers that case. At ``xtol = 1e-4``,
-    both solvers stop at the same x-value, far from the root, and the test compares them.
+    The twin is not compared on `steep_exponential` at ``xtol = 1e-10``: `Secant` leaves the interval there, so its
+    solve ends as ``DIVERGED``, and the agreement check compares converged solves only; `test_special_cases.py`
+    covers that case. At ``xtol = 1e-4``, both solvers stop at the same x-value, far from the root, and the agreement
+    test compares them.
     """
 
     name = "secant_scipy_twin"

@@ -51,8 +51,8 @@ class _ExcursionSolver(Solver):
         self._x_returned = x_returned
 
     def _solve(self, state: SolveState) -> float:
-        """Move the best estimate to 1e6 interval widths above the upper interval bound, evaluate the function there,
-        and return the stored x-value."""
+        """Move the best estimate far above the upper interval bound, evaluate the function there, and return the
+        stored x-value."""
         state.x_best = float(state.interval.b + 1e6 * state.interval.width)
         state.f(state.x_best)
         return self._x_returned
@@ -261,7 +261,10 @@ def test_a_function_error_is_classified_by_where_it_happened(solver, status_expe
     # --- arrange ----------------------
     def f(x: float) -> float:
         """Return the value of `_increasing` at the interval bounds, and NaN everywhere else."""
-        return _increasing(x) if x in (0.0, 1.0) else math.nan  # Fails anywhere but at the interval bounds.
+        if x in (0.0, 1.0):
+            return _increasing(x)
+        else:
+            return math.nan  # Fails anywhere but at the interval bounds.
 
     # --- act --------------------------
     result = solver.solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
@@ -281,7 +284,10 @@ def test_a_failure_at_an_interval_bound_is_recorded(x_failing, status_expected):
     # --- arrange ----------------------
     def f(x: float) -> float:
         """Return NaN at ``x_failing``, and the value of `_increasing` everywhere else."""
-        return math.nan if x == x_failing else _increasing(x)
+        if x == x_failing:
+            return math.nan
+        else:
+            return _increasing(x)
 
     # --- act --------------------------
     result = _RecordingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
@@ -342,8 +348,8 @@ def test_everything_inside_the_counting_context_is_counted_and_result_x_is_a_pla
     "f, n_comparisons", [(lambda x: x, 1), (lambda x: x - 1.0, 2)]
 )  # A zero at a needs 1 check, a zero at b needs 2.
 def test_an_early_exit_reports_the_comparisons_that_produced_it(f, n_comparisons):
-    """When an interval bound is an exact zero, the flop counts hold only the zero checks up to that interval bound: 1
-    comparison for ``a`` and 2 for ``b``."""
+    """When an interval bound is an exact zero, the flop counts hold only the zero checks made before the solve stops:
+    1 comparison when ``a`` is the zero, and 2 when ``b`` is."""
     # --- act --------------------------
     result = _RecordingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=3)
 

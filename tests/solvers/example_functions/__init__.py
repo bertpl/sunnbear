@@ -37,7 +37,8 @@ def steep_exponential(x: float) -> float:
 STEEP_EXPONENTIAL_ROOT = math.log(1.0e4) / 20.0
 
 
-# Every bracketing solver's convergence test runs on these functions, each with its interval and its root.
+# These test cases cover an increasing function, a decreasing function and a multiple root, each with its interval
+# and its root.
 CONVERGENCE_TEST_CASES = [
     pytest.param(cubic, 1.0, 2.0, CUBIC_ROOT, id="cubic"),
     pytest.param(decreasing_cubic, 1.0, 2.0, CUBIC_ROOT, id="decreasing_cubic"),

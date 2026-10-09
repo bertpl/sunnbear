@@ -50,7 +50,7 @@ from .example_solvers import WeightedSplitSolver, define_config
 #  Built-in configs
 # ==================================================================================================
 # Each row holds a built-in config: its class, its solver_id, its solver class and its role.
-_BUILT_IN_CONFIGS = [
+_BUILT_IN_CONFIG_ROWS = [
     (AndersonBjorckConfig, "anderson_bjorck", AndersonBjorck, SolverRole.BUILTIN_SECONDARY),
     (BisectionConfig, "bisection", Bisection, SolverRole.BUILTIN_BASELINE),
     (BrentConfig, "brent", Brent, SolverRole.BUILTIN_CORE),
@@ -88,7 +88,7 @@ _BUILT_IN_CONFIGS = [
 ]
 
 
-@pytest.mark.parametrize("config_cls, solver_id, solver_cls, role", _BUILT_IN_CONFIGS)
+@pytest.mark.parametrize("config_cls, solver_id, solver_cls, role", _BUILT_IN_CONFIG_ROWS)
 def test_built_in_config_is_registered_on_import(config_cls, solver_id, solver_cls, role):
     """On import, each built-in config is registered under its ``solver_id``, with its solver class and its role."""
     # --- act --------------------------
@@ -100,10 +100,10 @@ def test_built_in_config_is_registered_on_import(config_cls, solver_id, solver_c
     assert config.role is role
 
 
-def test_the_built_in_config_list_names_every_built_in_config():
-    """`_BUILT_IN_CONFIGS` names every config that importing sunnbear registers, and no other."""
+def test_the_built_in_config_rows_name_every_built_in_config():
+    """`_BUILT_IN_CONFIG_ROWS` names every config that importing sunnbear registers, and no other."""
     # --- act / assert -----------------
-    assert {row[0] for row in _BUILT_IN_CONFIGS} == {
+    assert {row[0] for row in _BUILT_IN_CONFIG_ROWS} == {
         type(config) for config in SolverConfigRegistry.configs() if type(config).__module__.startswith("sunnbear.")
     }
 
