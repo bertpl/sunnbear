@@ -6,7 +6,8 @@ from dataclasses import dataclass
 from sunnbear.solvers import Solver, SolveResult
 from tests.solvers.example_functions import cubic, decreasing_cubic, quintic, steep_exponential
 
-# A budget that no twin test case reaches: a solve that hits it ends as MAX_FEVALS, which fails the agreement check.
+# No compared test case reaches this budget: a solve that hits the budget ends as MAX_FEVALS, which fails the
+# agreement check.
 _MAX_FEVALS = 200
 
 
@@ -29,18 +30,19 @@ class TwinTestCase:
         return max(abs(self.a), abs(self.b))
 
     def solve(self, solver: Solver) -> SolveResult:
-        """Run ``solver`` on this test case, with its history recorded, under a budget that no test case reaches."""
+        """Run ``solver`` on this test case, with its history recorded, under a budget that no compared test case
+        reaches."""
         return solver.solve(self.f, self.a, self.b, xtol=self.xtol, max_fevals=_MAX_FEVALS, history_enabled=True)
 
 
 TWIN_TEST_CASES = [
-    TwinTestCase(f, a, b, xtol)
-    for f, a, b in [
-        (cubic, 1.0, 2.0),
-        (decreasing_cubic, 1.0, 2.0),  # This test case has a decreasing function.
-        (quintic, 0.0, 1.0),
-        (cubic, 1.3, 4.0),  # This test case has its root close to the lower bound.
-        (steep_exponential, 0.0, 1.0),
+    TwinTestCase(f=row["f"], a=row["a"], b=row["b"], xtol=xtol)
+    for row in [
+        {"f": cubic, "a": 1.0, "b": 2.0},
+        {"f": decreasing_cubic, "a": 1.0, "b": 2.0},  # This test case has a decreasing function.
+        {"f": quintic, "a": 0.0, "b": 1.0},
+        {"f": cubic, "a": 1.3, "b": 4.0},  # This test case has its root close to the lower bound.
+        {"f": steep_exponential, "a": 0.0, "b": 1.0},
     ]
     for xtol in (1e-4, 1e-10)
 ]

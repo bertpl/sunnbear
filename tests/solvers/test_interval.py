@@ -1,3 +1,12 @@
+"""These tests assert that an `Interval`:
+
+- picks its orientation;
+- splits at an x-value;
+- decides convergence;
+- picks its root estimate;
+- has its arithmetic counted.
+"""
+
 import pytest
 from counted_float import CountedFloat, FlopCountingContext, FlopCounts
 
@@ -6,19 +15,15 @@ from sunnbear.solvers import DecreasingInterval, IncreasingInterval, Interval, I
 ORIENTATIONS = [IncreasingInterval, DecreasingInterval]
 
 
-def test_orientations_cover_every_interval_subclass():
-    """Assert ORIENTATIONS names every concrete subclass of Interval."""
-    assert set(ORIENTATIONS) == set(Interval.__subclasses__())
-
-
-def _orient_values_at_interval_bounds(cls: type[Interval], fa: float, fb: float) -> tuple[float, float]:
-    """Return the values at the interval bounds as given for the increasing orientation, negated for decreasing."""
-    return (fa, fb) if cls is IncreasingInterval else (-fa, -fb)
-
-
 # ==================================================================================================
 #  Invariants
 # ==================================================================================================
+def test_orientations_cover_every_interval_subclass():
+    """`ORIENTATIONS` names every concrete subclass of `Interval`."""
+    # --- act / assert -----------------
+    assert set(ORIENTATIONS) == set(Interval.__subclasses__())
+
+
 # ==================================================================================================
 #  Construction from the function values at the interval bounds
 # ==================================================================================================
@@ -33,6 +38,8 @@ def _orient_values_at_interval_bounds(cls: type[Interval], fa: float, fb: float)
     ],
 )
 def test_from_interval_bounds_picks_the_orientation(fa, fb, cls_expected):
+    """`Interval.from_interval_bounds` picks the orientation class from the signs of ``fa`` and ``fb``, keeps the given
+    interval bounds and values, and records no replaced interval bound."""
     # --- act --------------------------
     interval = Interval.from_interval_bounds(0.0, 1.0, fa, fb)
 
@@ -44,6 +51,8 @@ def test_from_interval_bounds_picks_the_orientation(fa, fb, cls_expected):
 
 @pytest.mark.parametrize("fa, fb", [(1.0, 2.0), (-2.0, -1.0)])
 def test_from_interval_bounds_rejects_a_missing_sign_change(fa, fb):
+    """`Interval.from_interval_bounds` raises ``ValueError`` when ``fa`` and ``fb`` have the same sign."""
+    # --- act / assert -----------------
     with pytest.raises(ValueError, match="differ in sign"):
         Interval.from_interval_bounds(0.0, 1.0, fa, fb)
 
@@ -53,6 +62,7 @@ def test_from_interval_bounds_rejects_a_missing_sign_change(fa, fb):
 # ==================================================================================================
 @pytest.mark.parametrize("cls", ORIENTATIONS)
 def test_width_and_midpoint(cls):
+    """In both orientations, the interval ``[1, 4]`` has width 3 and midpoint 2.5."""
     # --- arrange ----------------------
     interval = cls(1.0, 4.0, *_orient_values_at_interval_bounds(cls, -1.0, 2.0))
 
@@ -71,6 +81,8 @@ def test_width_and_midpoint(cls):
     ],
 )
 def test_split_at_keeps_the_sign_change_and_the_orientation(cls, fx, expected, replaced_expected):
+    """`Interval.split_at` replaces the interval bound whose value has the sign of ``fx``, or the lower one when ``fx``
+    is zero, keeps the orientation, and records which interval bound it replaced."""
     # --- arrange ----------------------
     interval = cls(0.0, 4.0, *_orient_values_at_interval_bounds(cls, -1.0, 2.0))
     a_expected, b_expected, fa_expected, fb_expected = expected
@@ -99,6 +111,8 @@ def test_split_at_keeps_the_sign_change_and_the_orientation(cls, fx, expected, r
     ],
 )
 def test_is_converged(cls, fa, fb, two_xtol, expected):
+    """`Interval.is_converged` holds when the width is at most ``two_xtol`` or an interval bound has a zero value."""
+    # --- act / assert -----------------
     assert cls(0.0, 1.0, *_orient_values_at_interval_bounds(cls, fa, fb)).is_converged(two_xtol) is expected
 
 
@@ -112,6 +126,8 @@ def test_is_converged(cls, fa, fb, two_xtol, expected):
     ],
 )
 def test_root(cls, fa, fb, expected):
+    """`Interval.root` returns the interval bound whose value is zero, and the midpoint when neither value is zero."""
+    # --- act / assert -----------------
     assert cls(0.0, 1.0, *_orient_values_at_interval_bounds(cls, fa, fb)).root() == expected
 
 
@@ -119,6 +135,8 @@ def test_root(cls, fa, fb, expected):
 #  Flop accounting
 # ==================================================================================================
 def test_the_sign_checks_and_the_geometry_are_counted_on_counted_interval_bounds():
+    """On `CountedFloat` interval bounds, building the interval counts its 2 sign comparisons, and computing the
+    midpoint and the width counts their addition, multiplication and subtraction."""
     # --- arrange ----------------------
     a, b, fa, fb = CountedFloat(0.0), CountedFloat(1.0), CountedFloat(-1.0), CountedFloat(1.0)
 
@@ -132,3 +150,14 @@ def test_the_sign_checks_and_the_geometry_are_counted_on_counted_interval_bounds
     # --- assert -----------------------
     assert ctx_construct.flop_counts() == FlopCounts(COMP=2)  # The increasing orientation's two comparisons.
     assert ctx_geometry.flop_counts() == FlopCounts(ADD=1, MUL=1, SUB=1)
+
+
+# ==================================================================================================
+#  Helpers
+# ==================================================================================================
+def _orient_values_at_interval_bounds(cls: type[Interval], fa: float, fb: float) -> tuple[float, float]:
+    """Return the values at the interval bounds as given for the increasing orientation, negated for decreasing."""
+    if cls is IncreasingInterval:
+        return (fa, fb)
+    else:
+        return (-fa, -fb)

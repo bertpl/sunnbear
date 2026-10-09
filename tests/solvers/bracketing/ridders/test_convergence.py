@@ -6,20 +6,31 @@ import itertools
 import pytest
 
 from sunnbear.solvers import Interval, Ridders, RiddersVariant, SolveStatus
-from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
+from tests.solvers.example_functions import CONVERGENCE_TEST_CASES, cubic, ninth_power
 
 
 @pytest.mark.parametrize("variant", RiddersVariant)
-@pytest.mark.parametrize("f", [cubic, decreasing_cubic])
-def test_a_smooth_function_converges_to_its_root(f, variant):
-    """On `cubic`, which increases, and `decreasing_cubic`, which decreases, every variant converges within ``xtol`` of
-    the root."""
+@pytest.mark.parametrize("f, a, b, root", CONVERGENCE_TEST_CASES)
+def test_a_function_converges_to_its_root_except_commons_math_on_a_multiple_root(f, a, b, root, variant):
+    """Every variant of `Ridders` returns an x-value within ``xtol`` of the root on each function of
+    `CONVERGENCE_TEST_CASES`, except the commons_math variant on `ninth_power`.
+
+    Near the multiple root of `ninth_power`, 2 successive iterates of the commons_math variant lie within ``xtol``
+    of each other while both are still far from the root, so the variant stops there, as on the kinked function of
+    `test_special_cases.py`.
+    """
+    # --- arrange ----------------------
+    xtol = 1e-10
+
     # --- act --------------------------
-    result = Ridders(variant=variant).solve(f, 1.0, 2.0, xtol=1e-10, max_fevals=60)
+    result = Ridders(variant=variant).solve(f, a, b, xtol=xtol, max_fevals=500)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert abs(result.x - CUBIC_ROOT) <= 1e-10
+    if variant is RiddersVariant.COMMONS_MATH and f is ninth_power:
+        assert abs(result.x - root) > 100.0 * xtol
+    else:
+        assert abs(result.x - root) <= xtol
 
 
 def test_the_commons_math_variant_stops_once_2_successive_iterates_lie_within_xtol():

@@ -1,3 +1,6 @@
+"""These tests assert that importing the solver packages imports every solver module, so that no config is left
+unregistered."""
+
 import importlib
 import pkgutil
 

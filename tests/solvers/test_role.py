@@ -15,11 +15,15 @@ _TREATMENT_BY_ROLE = {
 
 
 def test_treatment_table_covers_every_role():
+    """`_TREATMENT_BY_ROLE` has an entry for every member of `SolverRole`."""
+    # --- act / assert -----------------
     assert set(_TREATMENT_BY_ROLE) == set(SolverRole)
 
 
 @pytest.mark.parametrize("role, treatment", list(_TREATMENT_BY_ROLE.items()))
 def test_role_properties_match_treatment(role, treatment):
+    """Each role's ``is_reported``, ``is_used_for_function_characterization`` and ``is_builtin_only`` match its entry
+    in `_TREATMENT_BY_ROLE`."""
     # --- act --------------------------
     actual = (role.is_reported, role.is_used_for_function_characterization, role.is_builtin_only)
 

@@ -18,6 +18,7 @@ class _HalvingSolver(BracketingSolver):
     version = 1
 
     def _next_x(self, state: SolveState, interval: Interval) -> float:
+        """Return the interval midpoint."""
         return interval.midpoint
 
 
@@ -36,15 +37,19 @@ class _StepCountingSolver(BracketingSolver[_StepCountingState]):
     state_cls = _StepCountingState
 
     def __init__(self) -> None:
+        """Start an empty list that collects, across all solves, the step count that `_next_x` reads from the state."""
         self.n_steps_seen: list[int] = []
 
     def _next_x(self, state: _StepCountingState, interval: Interval) -> float:
+        """Append the state's step count to `n_steps_seen`, add 1 to the state's step count, and return the interval
+        midpoint."""
         self.n_steps_seen.append(state.n_steps)
         state.n_steps += 1
         return interval.midpoint
 
 
 def _linear(x: float) -> float:
+    """Return the value of a linear function with its root at 0.3."""
     return x - 0.3
 
 
@@ -53,6 +58,8 @@ def _linear(x: float) -> float:
 # ==================================================================================================
 @pytest.mark.parametrize("a, b, xtol", [(0.0, 1.0, 1e-3), (-2.0, 3.0, 1e-6), (0.25, 0.5, 0.1)])
 def test_loop_runs_until_the_width_criterion_holds(a, b, xtol):
+    """The loop halves the interval until its width is at most ``2 * xtol``, so the solve converges within ``xtol``
+    after 1 evaluation per halving plus the 2 at the interval bounds."""
     # --- act --------------------------
     result = _HalvingSolver().solve(_linear, a, b, xtol=xtol, max_fevals=200)
 
@@ -64,9 +71,15 @@ def test_loop_runs_until_the_width_criterion_holds(a, b, xtol):
 
 
 def test_loop_stops_early_on_an_exact_zero():
+    """When the function is exactly zero at the first midpoint, the loop converges there after 3 evaluations."""
+
     # --- arrange ----------------------
     def f(x: float) -> float:
-        return 0.0 if x == 0.5 else _linear(x)  # the first midpoint is an exact root
+        """Return the value of `_linear`, except for an exact zero at 0.5."""
+        if x == 0.5:
+            return 0.0  # the first midpoint is an exact root
+        else:
+            return _linear(x)
 
     # --- act --------------------------
     result = _HalvingSolver().solve(f, 0.0, 1.0, xtol=1e-9, max_fevals=200)
@@ -76,6 +89,7 @@ def test_loop_stops_early_on_an_exact_zero():
 
 
 def test_interrupted_loop_reports_the_last_evaluated_point():
+    """When its budget runs out, the solve reports ``MAX_FEVALS`` with the last evaluated x-value."""
     # --- act --------------------------
     result = _HalvingSolver().solve(_linear, 0.0, 1.0, xtol=1e-9, max_fevals=4)
 
@@ -89,6 +103,8 @@ def test_interrupted_loop_reports_the_last_evaluated_point():
 #  Subclassing state
 # ==================================================================================================
 def test_a_solver_gets_a_fresh_instance_of_its_own_state_class_per_solve():
+    """Each solve passes a new `_StepCountingState` to `_next_x`, so the step count restarts at 0 for the second
+    solve."""
     # --- arrange ----------------------
     solver = _StepCountingSolver()
 

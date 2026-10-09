@@ -4,7 +4,7 @@ with slack keeps within its bound on the iteration count on the functions of the
 import pytest
 
 from sunnbear.solvers import ITP, ITPVariant, SolveStatus
-from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
+from tests.solvers.example_functions import CONVERGENCE_TEST_CASES
 from tests.solvers.paper_problems import PaperProblem
 
 from .paper_problems import N_BISECTION, TABLE_1, XTOL
@@ -29,13 +29,12 @@ def test_the_paper_experiments_variant_with_slack_stays_within_n_max_on_the_func
     assert result.n_fevals - 2 <= N_BISECTION + 4
 
 
-@pytest.mark.parametrize("f", [cubic, decreasing_cubic])
-def test_a_smooth_function_converges_to_its_root(f):
-    """On `cubic`, which increases, and `decreasing_cubic`, which decreases, `ITP` converges within ``xtol`` of the
-    root."""
+@pytest.mark.parametrize("f, a, b, root", CONVERGENCE_TEST_CASES)
+def test_a_function_converges_to_its_root(f, a, b, root):
+    """`ITP` returns an x-value within ``xtol`` of the root on each function of `CONVERGENCE_TEST_CASES`."""
     # --- act --------------------------
-    result = ITP(n_slack=4, variant=ITPVariant.PAPER_EXPERIMENTS).solve(f, 1.0, 2.0, xtol=1e-10, max_fevals=60)
+    result = ITP(n_slack=4, variant=ITPVariant.PAPER_EXPERIMENTS).solve(f, a, b, xtol=1e-10, max_fevals=500)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert abs(result.x - CUBIC_ROOT) <= 1e-10
+    assert abs(result.x - root) <= 1e-10

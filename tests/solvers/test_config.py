@@ -30,6 +30,8 @@ class _AbstractSolver(BracketingSolver):
     ],
 )
 def test_solver_id_lists_init_arguments_sorted_by_name(solver_kwargs, solver_id_expected):
+    """A config's ``solver_id`` is the solver name followed by its init arguments, sorted by name whatever their order
+    in ``solver_kwargs``."""
     # --- arrange ----------------------
     config_cls = define_config(
         {"solver_cls": WeightedSplitSolver, "solver_kwargs": solver_kwargs, "role": SolverRole.USER_ACTIVE}
@@ -41,6 +43,7 @@ def test_solver_id_lists_init_arguments_sorted_by_name(solver_kwargs, solver_id_
 
 @pytest.mark.usefixtures("isolated_solver_config_registry")
 def test_instantiate_passes_the_init_arguments():
+    """`SolverConfig.instantiate` builds an instance of the config's solver class from its ``solver_kwargs``."""
     # --- arrange ----------------------
     config_cls = define_config(
         {
@@ -85,6 +88,9 @@ def test_instantiate_passes_the_init_arguments():
     ],
 )
 def test_malformed_config_is_rejected_at_class_definition(namespace, message):
+    """Defining a config raises ``TypeError`` when it lacks ``solver_cls`` or ``role``, when ``solver_cls`` is not a
+    concrete `Solver` subclass, or when ``solver_kwargs`` does not match ``__init__`` or holds an unsupported type."""
+    # --- act / assert -----------------
     with pytest.raises(TypeError, match=message):
         define_config(namespace)
 
@@ -92,6 +98,7 @@ def test_malformed_config_is_rejected_at_class_definition(namespace, message):
 @pytest.mark.usefixtures("isolated_solver_config_registry")
 @pytest.mark.parametrize("role", [role for role in SolverRole if role.is_builtin_only])
 def test_builtin_only_role_outside_sunnbear_is_rejected(role):
+    """Defining a config outside the sunnbear package with a built-in-only role raises ``ValueError``."""
     # --- arrange ----------------------
     namespace = {"solver_cls": WeightedSplitSolver, "solver_kwargs": {"weight": 0.5}, "role": role}
 
@@ -102,6 +109,7 @@ def test_builtin_only_role_outside_sunnbear_is_rejected(role):
 
 @pytest.mark.usefixtures("isolated_solver_config_registry")
 def test_builtin_only_role_inside_sunnbear_is_accepted():
+    """A config defined inside the sunnbear package can take a built-in-only role, and is registered with it."""
     # --- arrange ----------------------
     namespace = {
         "__module__": "sunnbear.hypothetical_solvers",

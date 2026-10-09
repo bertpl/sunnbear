@@ -18,7 +18,7 @@ def test_a_k_other_than_1_or_2_is_rejected():
         TOMS748(k=3)
 
 
-def test_identity_and_that_its_arithmetic_is_counted():
+def test_name_version_and_that_its_arithmetic_is_counted():
     """`TOMS748` is named ``toms748``, at version 1, and its arithmetic is flop-counted."""
     # --- act --------------------------
     result = TOMS748(k=1).solve(cubic, 1.0, 2.0, xtol=1e-3, max_fevals=20)

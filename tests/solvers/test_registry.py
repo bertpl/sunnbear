@@ -46,50 +46,51 @@ from sunnbear.solvers import (
 
 from .example_solvers import WeightedSplitSolver, define_config
 
-
 # ==================================================================================================
 #  Built-in configs
 # ==================================================================================================
-@pytest.mark.parametrize(
-    "config_cls, solver_id, solver_cls, role",
-    [
-        (AndersonBjorckConfig, "anderson_bjorck", AndersonBjorck, SolverRole.BUILTIN_SECONDARY),
-        (BisectionConfig, "bisection", Bisection, SolverRole.BUILTIN_BASELINE),
-        (BrentConfig, "brent", Brent, SolverRole.BUILTIN_CORE),
-        (CARFConfig, "carf", CARF, SolverRole.BUILTIN_SECONDARY),
-        (IllinoisConfig, "illinois", Illinois, SolverRole.BUILTIN_CORE),
-        (
-            ITPPaperExperimentsSlack0Config,
-            "itp[n_slack=0,variant='paper_experiments']",
-            ITP,
-            SolverRole.BUILTIN_SECONDARY,
-        ),
-        (
-            ITPPaperPseudocodeSlack0Config,
-            "itp[n_slack=0,variant='paper_pseudocode']",
-            ITP,
-            SolverRole.BUILTIN_SECONDARY,
-        ),
-        (ITPPaperExperimentsSlack4Config, "itp[n_slack=4,variant='paper_experiments']", ITP, SolverRole.BUILTIN_CORE),
-        (ModABConfig, "modab", ModAB, SolverRole.BUILTIN_SECONDARY),
-        (PegasusConfig, "pegasus", Pegasus, SolverRole.BUILTIN_SECONDARY),
-        (RegulaFalsiConfig, "regula_falsi", RegulaFalsi, SolverRole.BUILTIN_SECONDARY),
-        (
-            RiddersBracketingSolverConfig,
-            "ridders[variant='bracketing_solver']",
-            Ridders,
-            SolverRole.BUILTIN_SECONDARY,
-        ),
-        (RiddersCommonsMathConfig, "ridders[variant='commons_math']", Ridders, SolverRole.BUILTIN_SECONDARY),
-        (RiddersScipyConfig, "ridders[variant='scipy']", Ridders, SolverRole.BUILTIN_CORE),
-        (SecantConfig, "secant", Secant, SolverRole.BUILTIN_SECONDARY),
-        (SteffenBrentConfig, "steffen_brent", SteffenBrent, SolverRole.BUILTIN_SECONDARY),
-        (ChandrupatlaConfig, "chandrupatla", Chandrupatla, SolverRole.BUILTIN_CORE),
-        (TOMS748K1Config, "toms748[k=1]", TOMS748, SolverRole.BUILTIN_CORE),
-        (TOMS748K2Config, "toms748[k=2]", TOMS748, SolverRole.BUILTIN_SECONDARY),
-    ],
-)
+# Each row holds a built-in config: its class, its solver_id, its solver class and its role.
+_BUILT_IN_CONFIG_ROWS = [
+    (AndersonBjorckConfig, "anderson_bjorck", AndersonBjorck, SolverRole.BUILTIN_SECONDARY),
+    (BisectionConfig, "bisection", Bisection, SolverRole.BUILTIN_BASELINE),
+    (BrentConfig, "brent", Brent, SolverRole.BUILTIN_CORE),
+    (CARFConfig, "carf", CARF, SolverRole.BUILTIN_SECONDARY),
+    (ChandrupatlaConfig, "chandrupatla", Chandrupatla, SolverRole.BUILTIN_CORE),
+    (IllinoisConfig, "illinois", Illinois, SolverRole.BUILTIN_CORE),
+    (
+        ITPPaperExperimentsSlack0Config,
+        "itp[n_slack=0,variant='paper_experiments']",
+        ITP,
+        SolverRole.BUILTIN_SECONDARY,
+    ),
+    (
+        ITPPaperPseudocodeSlack0Config,
+        "itp[n_slack=0,variant='paper_pseudocode']",
+        ITP,
+        SolverRole.BUILTIN_SECONDARY,
+    ),
+    (ITPPaperExperimentsSlack4Config, "itp[n_slack=4,variant='paper_experiments']", ITP, SolverRole.BUILTIN_CORE),
+    (ModABConfig, "modab", ModAB, SolverRole.BUILTIN_SECONDARY),
+    (PegasusConfig, "pegasus", Pegasus, SolverRole.BUILTIN_SECONDARY),
+    (RegulaFalsiConfig, "regula_falsi", RegulaFalsi, SolverRole.BUILTIN_SECONDARY),
+    (
+        RiddersBracketingSolverConfig,
+        "ridders[variant='bracketing_solver']",
+        Ridders,
+        SolverRole.BUILTIN_SECONDARY,
+    ),
+    (RiddersCommonsMathConfig, "ridders[variant='commons_math']", Ridders, SolverRole.BUILTIN_SECONDARY),
+    (RiddersScipyConfig, "ridders[variant='scipy']", Ridders, SolverRole.BUILTIN_CORE),
+    (SecantConfig, "secant", Secant, SolverRole.BUILTIN_SECONDARY),
+    (SteffenBrentConfig, "steffen_brent", SteffenBrent, SolverRole.BUILTIN_SECONDARY),
+    (TOMS748K1Config, "toms748[k=1]", TOMS748, SolverRole.BUILTIN_CORE),
+    (TOMS748K2Config, "toms748[k=2]", TOMS748, SolverRole.BUILTIN_SECONDARY),
+]
+
+
+@pytest.mark.parametrize("config_cls, solver_id, solver_cls, role", _BUILT_IN_CONFIG_ROWS)
 def test_built_in_config_is_registered_on_import(config_cls, solver_id, solver_cls, role):
+    """On import, each built-in config is registered under its ``solver_id``, with its solver class and its role."""
     # --- act --------------------------
     config = SolverConfigRegistry.config_from_id(solver_id)
 
@@ -99,11 +100,21 @@ def test_built_in_config_is_registered_on_import(config_cls, solver_id, solver_c
     assert config.role is role
 
 
+def test_the_built_in_config_rows_name_every_built_in_config():
+    """`_BUILT_IN_CONFIG_ROWS` names every config that importing sunnbear registers, and no other."""
+    # --- act / assert -----------------
+    assert {row[0] for row in _BUILT_IN_CONFIG_ROWS} == {
+        type(config) for config in SolverConfigRegistry.configs() if type(config).__module__.startswith("sunnbear.")
+    }
+
+
 # ==================================================================================================
 #  Enumeration and lookup
 # ==================================================================================================
 @pytest.mark.usefixtures("isolated_solver_config_registry")
 def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
+    """`SolverConfigRegistry.configs` lists every config sorted by ``solver_id``, and
+    `SolverConfigRegistry.solver_classes` lists each solver class once, in that order."""
     # --- arrange ----------------------
     for weight in (0.75, 0.25):
         define_config(
@@ -158,6 +169,9 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
 
 
 def test_config_from_id_rejects_an_unknown_id():
+    """For an unregistered id, `SolverConfigRegistry.config_from_id` raises `UnknownSolverConfigError` naming that
+    id."""
+    # --- act / assert -----------------
     with pytest.raises(UnknownSolverConfigError, match="'newton'"):
         SolverConfigRegistry.config_from_id("newton")
 
@@ -167,6 +181,7 @@ def test_config_from_id_rejects_an_unknown_id():
 # ==================================================================================================
 @pytest.mark.usefixtures("isolated_solver_config_registry")
 def test_duplicate_solver_id_is_rejected():
+    """Defining a config with the ``solver_id`` of a registered config raises ``ValueError``."""
     # --- arrange ----------------------
     namespace = {"solver_cls": Bisection, "role": SolverRole.USER_ACTIVE}
 
@@ -177,6 +192,7 @@ def test_duplicate_solver_id_is_rejected():
 
 @pytest.mark.usefixtures("isolated_solver_config_registry")
 def test_second_baseline_is_rejected():
+    """Defining a second config with role ``BUILTIN_BASELINE`` raises ``ValueError``."""
     # --- arrange ----------------------
     namespace = {
         "__module__": "sunnbear.hypothetical_solvers",

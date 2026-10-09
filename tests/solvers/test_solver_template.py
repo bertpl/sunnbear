@@ -18,9 +18,11 @@ class _RecordingSolver(Solver):
     version = 1
 
     def __init__(self) -> None:
+        """Start an empty list that collects, across all solves, the states that `_solve` receives."""
         self.states: list[SolveState] = []
 
     def _solve(self, state: SolveState) -> float:
+        """Record ``state`` and return its best estimate without evaluating the function."""
         self.states.append(state)
         return state.x_best
 
@@ -32,6 +34,7 @@ class _MidpointRepeatingSolver(Solver):
     version = 1
 
     def _solve(self, state: SolveState) -> float:
+        """Evaluate the function at the interval midpoint until `Solver.solve` interrupts the loop."""
         x = state.interval.midpoint
         while True:
             state.f(x)
@@ -44,9 +47,12 @@ class _ExcursionSolver(Solver):
     version = 1
 
     def __init__(self, x_returned: float) -> None:
+        """Store the x-value that `_solve` returns."""
         self._x_returned = x_returned
 
     def _solve(self, state: SolveState) -> float:
+        """Move the best estimate far above the upper interval bound, evaluate the function there, and return the
+        stored x-value."""
         state.x_best = float(state.interval.b + 1e6 * state.interval.width)
         state.f(state.x_best)
         return self._x_returned
@@ -59,6 +65,7 @@ class _NanSolver(Solver):
     version = 1
 
     def _solve(self, state: SolveState) -> float:
+        """Evaluate the function at NaN."""
         return state.f(math.nan)
 
 
@@ -69,6 +76,7 @@ class _StrayingSolver(Solver):
     version = 1
 
     def _solve(self, state: SolveState) -> float:
+        """Move the best estimate past the upper interval bound and evaluate the function there until interrupted."""
         state.x_best = float(state.interval.b + 1.0)
         while True:
             state.f(state.x_best)
@@ -81,14 +89,17 @@ class _BuggySolver(Solver):
     version = 1
 
     def _solve(self, state: SolveState) -> float:
+        """Raise a ``RuntimeError``."""
         raise RuntimeError("bug")
 
 
 def _increasing(x: float) -> float:
+    """Return the value of an increasing linear function with its root at 0.25."""
     return x - 0.25
 
 
 def _decreasing(x: float) -> float:
+    """Return the value of a decreasing linear function with its root at 0.25."""
     return 0.25 - x
 
 
@@ -97,12 +108,16 @@ def _decreasing(x: float) -> float:
 # ==================================================================================================
 @pytest.mark.parametrize("a, b", [(1.0, 0.0), (0.0, 0.0)])
 def test_rejects_an_ill_ordered_interval(a, b):
+    """`Solver.solve` raises ``ValueError`` when ``a`` is not below ``b``."""
+    # --- act / assert -----------------
     with pytest.raises(ValueError, match="Interval must satisfy a < b"):
         _RecordingSolver().solve(_increasing, a, b, xtol=1e-3, max_fevals=10)
 
 
 @pytest.mark.parametrize("f", [lambda x: x + 1.0, lambda x: -x - 1.0])  # positive everywhere, negative everywhere
 def test_rejects_a_function_without_a_sign_change(f):
+    """`Solver.solve` raises ``ValueError`` when the function has the same sign at both interval bounds."""
+    # --- act / assert -----------------
     with pytest.raises(ValueError, match="differ in sign"):
         _RecordingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
 
@@ -111,6 +126,8 @@ def test_rejects_a_function_without_a_sign_change(f):
     "f, cls_expected", [(_increasing, IncreasingInterval), (_decreasing, DecreasingInterval)]
 )  # Both orientations are solved; the interval's class tells the solver which one it has.
 def test_the_interval_class_is_the_orientation(f, cls_expected):
+    """`_solve` receives an `IncreasingInterval` for an increasing function and a `DecreasingInterval` for a decreasing
+    one, and both solves converge."""
     # --- arrange ----------------------
     solver = _RecordingSolver()
 
@@ -126,6 +143,8 @@ def test_the_interval_class_is_the_orientation(f, cls_expected):
 #  Evaluations at the interval bounds
 # ==================================================================================================
 def test_the_interval_bounds_are_evaluated_and_counted_before_the_algorithm_runs():
+    """`Solver.solve` evaluates both interval bounds, counted as 2 evaluations, before `_solve` runs, and starts the
+    best estimate at the interval midpoint."""
     # --- arrange ----------------------
     solver = _RecordingSolver()
 
@@ -143,6 +162,8 @@ def test_the_interval_bounds_are_evaluated_and_counted_before_the_algorithm_runs
     "a, b, root", [(0.25, 1.0, 0.25), (-1.0, 0.25, 0.25)]
 )  # the root sits at the lower end, then at the upper end
 def test_an_exact_zero_at_an_interval_bound_converges_without_running_the_algorithm(a, b, root):
+    """When the function is exactly zero at an interval bound, the solve converges to that interval bound after 2
+    evaluations, without calling `_solve`."""
     # --- arrange ----------------------
     solver = _RecordingSolver()
 
@@ -155,6 +176,8 @@ def test_an_exact_zero_at_an_interval_bound_converges_without_running_the_algori
 
 
 def test_state_holds_the_evaluated_interval_and_the_history_of_the_evaluations():
+    """The state that `_solve` receives holds the values at both interval bounds, and its function's history lists
+    those 2 evaluations."""
     # --- arrange ----------------------
     solver = _RecordingSolver()
 
@@ -181,6 +204,8 @@ def test_the_evaluated_x_values_come_from_the_history(history_enabled, evaluated
 #  Status mapping
 # ==================================================================================================
 def test_running_out_of_budget_maps_to_max_fevals():
+    """A solve that uses up its budget maps to ``MAX_FEVALS``, with every evaluation counted and the best estimate,
+    still the interval midpoint, as ``result.x``."""
     # --- act --------------------------
     result = _MidpointRepeatingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=7)
 
@@ -195,6 +220,8 @@ def test_running_out_of_budget_maps_to_max_fevals():
     [(0.5, SolveStatus.CONVERGED), (1.0, SolveStatus.CONVERGED), (1.0 + 1e-9, SolveStatus.DIVERGED)],
 )  # An excursion is not penalized; only the result decides, and an interval bound is inside.
 def test_only_a_result_outside_the_interval_is_divergence(x_returned, status_expected):
+    """A far-away evaluation is performed and counted, and the solve maps to ``DIVERGED`` only when the returned
+    x-value lies outside the interval, whose bounds count as inside."""
     # --- act --------------------------
     result = _ExcursionSolver(x_returned).solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
 
@@ -204,6 +231,8 @@ def test_only_a_result_outside_the_interval_is_divergence(x_returned, status_exp
 
 
 def test_a_non_finite_x_maps_to_diverged():
+    """Asking for an evaluation at NaN maps to ``DIVERGED``, with the interval midpoint as ``result.x`` and the refused
+    call not counted."""
     # --- act --------------------------
     result = _NanSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
 
@@ -212,6 +241,8 @@ def test_a_non_finite_x_maps_to_diverged():
 
 
 def test_running_out_of_budget_outside_the_interval_maps_to_diverged():
+    """Running out of budget maps to ``DIVERGED`` when the best estimate lies outside the interval, with that estimate
+    as ``result.x``."""
     # --- act --------------------------
     result = _StrayingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=5)
 
@@ -224,9 +255,16 @@ def test_running_out_of_budget_outside_the_interval_maps_to_diverged():
     [(_MidpointRepeatingSolver(), SolveStatus.FUNCTION_ERROR), (_ExcursionSolver(0.5), SolveStatus.DIVERGED)],
 )  # The first fails inside the interval, the second outside; where it failed decides the status.
 def test_a_function_error_is_classified_by_where_it_happened(solver, status_expected):
+    """A non-finite function value maps to ``FUNCTION_ERROR`` inside the interval and to ``DIVERGED`` outside it, and
+    the failing evaluation counts."""
+
     # --- arrange ----------------------
     def f(x: float) -> float:
-        return _increasing(x) if x in (0.0, 1.0) else math.nan  # Fails anywhere but at the interval bounds.
+        """Return the value of `_increasing` at the interval bounds, and NaN everywhere else."""
+        if x in (0.0, 1.0):
+            return _increasing(x)
+        else:
+            return math.nan  # Fails anywhere but at the interval bounds.
 
     # --- act --------------------------
     result = solver.solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
@@ -240,9 +278,16 @@ def test_a_function_error_is_classified_by_where_it_happened(solver, status_expe
     "x_failing, status_expected", [(0.0, SolveStatus.FUNCTION_ERROR), (1.0, SolveStatus.FUNCTION_ERROR)]
 )  # A failure at either interval bound is recorded, not raised; the midpoint is the best estimate there is.
 def test_a_failure_at_an_interval_bound_is_recorded(x_failing, status_expected):
+    """A non-finite value at either interval bound maps to ``FUNCTION_ERROR`` with the interval midpoint as
+    ``result.x``, and no evaluation follows the failing one."""
+
     # --- arrange ----------------------
     def f(x: float) -> float:
-        return math.nan if x == x_failing else _increasing(x)
+        """Return NaN at ``x_failing``, and the value of `_increasing` everywhere else."""
+        if x == x_failing:
+            return math.nan
+        else:
+            return _increasing(x)
 
     # --- act --------------------------
     result = _RecordingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10)
@@ -253,6 +298,8 @@ def test_a_failure_at_an_interval_bound_is_recorded(x_failing, status_expected):
 
 
 def test_a_budget_below_the_two_interval_bound_evaluations_maps_to_max_fevals():
+    """A budget of 1 evaluation, too small for the 2 interval bounds, maps to ``MAX_FEVALS`` with the interval midpoint
+    as ``result.x``."""
     # --- act --------------------------
     result = _RecordingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=1)
 
@@ -261,6 +308,7 @@ def test_a_budget_below_the_two_interval_bound_evaluations_maps_to_max_fevals():
 
 
 def test_solver_exception_maps_to_solver_error():
+    """An exception raised inside `_solve` maps to ``SOLVER_ERROR``, with the interval midpoint as ``result.x``."""
     # --- act --------------------------
     result = _BuggySolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
 
@@ -273,6 +321,8 @@ def test_solver_exception_maps_to_solver_error():
 #  Result fields
 # ==================================================================================================
 def test_history_is_none_unless_requested():
+    """`SolveResult.history` is None by default, and holds every evaluation as an ``(x, f(x))`` pair when
+    ``history_enabled`` is set."""
     # --- act --------------------------
     off = _RecordingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10)
     on = _RecordingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=10, history_enabled=True)
@@ -283,6 +333,8 @@ def test_history_is_none_unless_requested():
 
 
 def test_everything_inside_the_counting_context_is_counted_and_result_x_is_a_plain_float():
+    """The flop counts hold the comparisons on the values at the interval bounds and the arithmetic of the initial
+    midpoint, and ``result.x`` is a plain ``float``."""
     # --- act --------------------------
     result = _RecordingSolver().solve(_increasing, 0.0, 1.0, xtol=1e-3, max_fevals=3)
 
@@ -296,6 +348,8 @@ def test_everything_inside_the_counting_context_is_counted_and_result_x_is_a_pla
     "f, n_comparisons", [(lambda x: x, 1), (lambda x: x - 1.0, 2)]
 )  # A zero at a needs 1 check, a zero at b needs 2.
 def test_an_early_exit_reports_the_comparisons_that_produced_it(f, n_comparisons):
+    """When an interval bound is an exact zero, the flop counts hold only the zero checks made before the solve stops:
+    1 comparison when ``a`` is the zero, and 2 when ``b`` is."""
     # --- act --------------------------
     result = _RecordingSolver().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=3)
 

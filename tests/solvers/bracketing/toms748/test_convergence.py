@@ -3,17 +3,16 @@
 import pytest
 
 from sunnbear.solvers import TOMS748, SolveStatus
-from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
+from tests.solvers.example_functions import CONVERGENCE_TEST_CASES
 
 
 @pytest.mark.parametrize("k", [1, 2])
-@pytest.mark.parametrize("f", [cubic, decreasing_cubic])
-def test_a_smooth_function_converges_to_its_root(f, k):
-    """On `cubic`, which increases, and `decreasing_cubic`, which decreases, `TOMS748` returns a point within
-    ``xtol`` of the root."""
+@pytest.mark.parametrize("f, a, b, root", CONVERGENCE_TEST_CASES)
+def test_a_function_converges_to_its_root(f, a, b, root, k):
+    """`TOMS748` returns an x-value within ``xtol`` of the root on each function of `CONVERGENCE_TEST_CASES`."""
     # --- act --------------------------
-    result = TOMS748(k=k).solve(f, 1.0, 2.0, xtol=1e-10, max_fevals=60)
+    result = TOMS748(k=k).solve(f, a, b, xtol=1e-10, max_fevals=500)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert abs(result.x - CUBIC_ROOT) <= 1e-10
+    assert abs(result.x - root) <= 1e-10

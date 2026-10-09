@@ -9,6 +9,8 @@ from sunnbear.solvers import RegulaFalsi, SolveStatus
     "f", [lambda x: x - 0.3, lambda x: 0.3 - x]
 )  # The parametrization exercises both interval orientations.
 def test_a_linear_function_is_solved_in_one_step(f):
+    """On an increasing and a decreasing linear function, the first iterate of `RegulaFalsi` is the exact root, so the
+    solve converges after 3 evaluations."""
     # --- act --------------------------
     result = RegulaFalsi().solve(f, 0.0, 1.0, xtol=1e-12, max_fevals=10)
 

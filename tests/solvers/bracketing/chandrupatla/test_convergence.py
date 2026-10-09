@@ -3,17 +3,17 @@
 import pytest
 
 from sunnbear.solvers import Chandrupatla, SolveStatus
-from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
+from tests.solvers.example_functions import CONVERGENCE_TEST_CASES
 
 
-@pytest.mark.parametrize("f", [cubic, decreasing_cubic])
-def test_a_smooth_function_converges_to_its_root(f):
-    """On `cubic`, which increases, and `decreasing_cubic`, which decreases, `Chandrupatla` returns an evaluated point
-    within ``xtol`` of the root."""
+@pytest.mark.parametrize("f, a, b, root", CONVERGENCE_TEST_CASES)
+def test_a_function_converges_to_its_root(f, a, b, root):
+    """`Chandrupatla` returns an evaluated x-value within ``xtol`` of the root on each function of
+    `CONVERGENCE_TEST_CASES`."""
     # --- act --------------------------
-    result = Chandrupatla().solve(f, 1.0, 2.0, xtol=1e-10, max_fevals=60, history_enabled=True)
+    result = Chandrupatla().solve(f, a, b, xtol=1e-10, max_fevals=500, history_enabled=True)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert abs(result.x - CUBIC_ROOT) <= 1e-10
+    assert abs(result.x - root) <= 1e-10
     assert result.x in result.evaluated_x_values
