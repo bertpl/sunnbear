@@ -35,7 +35,7 @@ dependencies = [
     # backports.zstd provides zstd for the archives of downloaded data artifacts; the standard library has it from 3.14.
     "backports.zstd>=1.0.0; python_version < '3.14'",
     "snuffled>=0.1.6",
-    # max-div 0.21.1 adds DiversityMetric.gpq_separation(q), the diversity metric that the construction of the Monte Carlo (MC) tuple set maximizes.
+    # max-div 0.21.1 adds DiversityMetric.gpq_separation(q), the diversity metric that sunnbear maximizes when it builds the Monte Carlo (MC) tuple set.
     "max-div>=0.21.1",
     "mpl-composite>=0.1.2",
     # polars holds the benchmark results; its wheels use the stable CPython ABI, so 1 minimal version serves every supported Python version.
