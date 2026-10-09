@@ -1,5 +1,9 @@
-"""These tests assert that `CARF` reproduces Tables 3 and 4 of its paper, and that the rows of Table 4 that it does
-not reproduce still converge."""
+"""These tests assert that `CARF`:
+
+- reproduces Table 4 of its paper;
+- still converges on the rows of Table 4 that it does not reproduce;
+- comes close to the total evaluation count of Table 3.
+"""
 
 import pytest
 

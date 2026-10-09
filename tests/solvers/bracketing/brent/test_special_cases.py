@@ -1,4 +1,5 @@
-"""These tests assert that `Brent` never meets its stopping rule when ``xtol`` makes its tolerance negative."""
+"""These tests assert that `Brent` never meets its stopping rule when ``xtol`` is so small that Brent's internal
+tolerance ``tol`` becomes negative."""
 
 from sunnbear.solvers import Brent, SolveStatus
 from tests.solvers.example_functions import cubic

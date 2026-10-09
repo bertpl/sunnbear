@@ -1,4 +1,4 @@
-"""These tests assert the identity of `Illinois`, and that its arithmetic is counted."""
+"""These tests assert the name and version of `Illinois`, and that its arithmetic is counted."""
 
 from sunnbear.solvers import Illinois
 from tests.solvers.example_functions import cubic

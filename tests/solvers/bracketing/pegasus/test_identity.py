@@ -1,4 +1,4 @@
-"""These tests assert the identity of `Pegasus`, and that its arithmetic is counted."""
+"""These tests assert the name and version of `Pegasus`, and that its arithmetic is counted."""
 
 from sunnbear.solvers import Pegasus
 from tests.solvers.example_functions import cubic

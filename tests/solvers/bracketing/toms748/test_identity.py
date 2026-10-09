@@ -1,5 +1,5 @@
-"""These tests assert the identity of `TOMS748`, that its arithmetic is counted, and that it rejects a ``k`` other
-than 1 or 2."""
+"""These tests assert the name and version of `TOMS748`, that its arithmetic is counted, and that it rejects a ``k``
+other than 1 or 2."""
 
 import pytest
 

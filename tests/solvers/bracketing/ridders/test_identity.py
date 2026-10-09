@@ -1,5 +1,5 @@
-"""These tests assert the identity of `Ridders`, that its arithmetic is counted, and that it rejects an unknown
-variant."""
+"""These tests assert the name and version of `Ridders`, that its arithmetic is counted, and that it rejects an
+unknown variant."""
 
 import pytest
 

@@ -2,10 +2,7 @@
 root."""
 
 from sunnbear.solvers import AndersonBjorck, SolveStatus
-from tests.solvers.example_functions import (
-    STEEP_EXPONENTIAL_ROOT,
-    steep_exponential,
-)
+from tests.solvers.example_functions import STEEP_EXPONENTIAL_ROOT, steep_exponential
 
 
 def test_a_function_that_is_nearly_flat_on_1_side_of_the_root_takes_over_200_evaluations():

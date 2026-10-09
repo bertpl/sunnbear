@@ -1,9 +1,7 @@
-"""These tests assert the identity of `AndersonBjorck`, and that its arithmetic is counted."""
+"""These tests assert the name and version of `AndersonBjorck`, and that its arithmetic is counted."""
 
 from sunnbear.solvers import AndersonBjorck
-from tests.solvers.example_functions import (
-    cubic,
-)
+from tests.solvers.example_functions import cubic
 
 
 def test_identity_and_that_its_arithmetic_is_counted():

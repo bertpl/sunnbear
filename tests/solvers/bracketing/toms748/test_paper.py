@@ -1,5 +1,5 @@
-"""These tests assert that `TOMS748` reproduces the roots that the authors' code computes, and the evaluation totals
-of Table II of its paper."""
+"""These tests assert that `TOMS748` reproduces the roots that the authors' code computes, and that its evaluation
+totals come close to those of Table II of its paper."""
 
 import pytest
 

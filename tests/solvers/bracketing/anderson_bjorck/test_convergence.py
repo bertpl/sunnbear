@@ -3,11 +3,7 @@
 import pytest
 
 from sunnbear.solvers import AndersonBjorck, RegulaFalsi, SolveStatus
-from tests.solvers.example_functions import (
-    CUBIC_ROOT,
-    cubic,
-    decreasing_cubic,
-)
+from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 
 
 @pytest.mark.parametrize("f", [cubic, decreasing_cubic])  # The 2 functions cover both interval orientations.

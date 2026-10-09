@@ -1,5 +1,9 @@
-"""These tests assert how `TOMS748` handles an exact zero, an initial interval narrower than its stopping width, and
-an ``xtol`` below the machine precision."""
+"""These tests assert how `TOMS748` handles 3 special cases:
+
+- an exact zero;
+- an initial interval narrower than ``xtol``;
+- an ``xtol`` below the machine precision.
+"""
 
 import sys
 

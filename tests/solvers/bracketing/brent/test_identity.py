@@ -1,4 +1,4 @@
-"""These tests assert the identity of `Brent`, and that its arithmetic is counted."""
+"""These tests assert the name and version of `Brent`, and that its arithmetic is counted."""
 
 from sunnbear.solvers import Brent
 from tests.solvers.example_functions import cubic

@@ -1,5 +1,4 @@
-"""This module holds the test functions of Table 1 of the ITP paper, with the iteration counts that the paper
-reports for `ITP`."""
+"""This module holds the test functions of Table 1 of the ITP paper, with the paper's iteration counts for `ITP`."""
 
 import math
 

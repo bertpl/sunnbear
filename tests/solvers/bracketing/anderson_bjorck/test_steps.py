@@ -3,9 +3,7 @@
 import pytest
 
 from sunnbear.solvers import AndersonBjorck, SolveStatus
-from tests.solvers.example_functions import (
-    cubic,
-)
+from tests.solvers.example_functions import cubic
 
 
 def _cubic_with_a_local_maximum(x: float) -> float:
