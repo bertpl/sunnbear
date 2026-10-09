@@ -1,4 +1,4 @@
-"""`MCTuplesSizeResult` records how 1 size of the tuple-set construction was built: its allocation, solve and correction."""
+"""`MCTuplesSizeResult` records how 1 size of the tuple-set construction was built: allocation, solve, correction."""
 
 from dataclasses import dataclass
 

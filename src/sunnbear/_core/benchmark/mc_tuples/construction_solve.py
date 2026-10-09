@@ -182,8 +182,11 @@ class MCTuplesSizeSolve:
             return np.split(order, np.flatnonzero(np.diff(lane_ids[order])) + 1)
 
     def _constraints(self) -> list[Constraint]:
-        """Return each gap's count of new tuples on each axis, at most 1 per fine lane in a gap of several, and the
-        inclusion of the size below's tuples; the indices count the problem's points, the size below's first."""
+        """Return the constraints of the problem, whose points are the size below's tuples and then the candidates.
+
+        On each axis, every gap holds its count of new tuples, and a gap of more than 1 holds at most 1 per fine lane;
+        a weighted constraint keeps the size below's tuples.
+        """
         n_required = self.n_required
         constraints = []
         for allocation, gap, fine in (
@@ -253,7 +256,9 @@ class MCTuplesSizeSolve:
         n_required = self.n_required
         n_missing = n_required - int((selection < n_required).sum())
         if n_missing > 0:
-            raise MCTuplesConstructionError(f"Size {self.size}: {n_missing} tuples of the size below it are not selected.")
+            raise MCTuplesConstructionError(
+                f"Size {self.size}: {n_missing} tuples of the size below it are not selected."
+            )
         new = selection[selection >= n_required] - n_required
         for axis, allocation, gap, fine in (
             ("u", self.u_allocation, self._gap_u, self._fine_u),

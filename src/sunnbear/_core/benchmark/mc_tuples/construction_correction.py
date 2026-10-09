@@ -4,13 +4,13 @@ The tuples of the size below stay where they are; per axis, only the new tuples 
 needs (`AxisMeanCorrection`). The rules are written for a mean above 0.5, where the new tuples move left, over the
 size's values u_0 < u_1 < … in ascending order, with w the width of a fine lane:
 
-- each new tuple i gets a reference r_i and a gap g_i = u_i − r_i, both fixed from the values before the correction:
-  r_i is 0 for the lowest value, the right edge of the fine lane of u_{i−1} if that is an old tuple, and u_{i−1} if
+- each new tuple i gets a reference r_i and a gap g_i = u_i - r_i, both fixed from the values before the correction:
+  r_i is 0 for the lowest value, the right edge of the fine lane of u_{i-1} if that is an old tuple, and u_{i-1} if
   it is a new one, in which case the reference moves along with it;
 - for a cap D, a new tuple behind the edge or an old tuple moves to u'_i = r_i + min(g_i, D); behind a new tuple
   with g_i ≤ w, it stays until its left neighbor has moved so far that it must follow at distance w,
-  u'_i = min(u_i, u'_{i−1} + w); behind a new tuple with g_i > w, it follows its neighbor and keeps its gap, capped at
-  w + D: u'_i = u'_{i−1} + min(g_i, w + D).
+  u'_i = min(u_i, u'_{i-1} + w); behind a new tuple with g_i > w, it follows its neighbor and keeps its gap, capped at
+  w + D: u'_i = u'_{i-1} + min(g_i, w + D).
 
 So the largest gaps shrink first and the smallest keep their value. Every u'_i rises with D without jumps, and a
 bisection over D finds the cap at which the mean is exactly 0.5. No fine lane ever holds 2 tuples, at any D: a new
@@ -85,7 +85,7 @@ class AxisMeanCorrection:
             for i, value in enumerate(sorted_values):
                 if not is_new[i]:
                     continue
-                elif i == 0:
+                if i == 0:
                     moved[i] = min(value, left_edge + cap)
                 elif not is_new[i - 1]:
                     # The reference is the right edge of the fine lane that holds the old left neighbor.

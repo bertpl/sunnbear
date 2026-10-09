@@ -106,7 +106,7 @@ class MCTuplesPopulation:
     def draw(
         cls, n_candidates: int, free_u_lanes: np.ndarray, free_v_lanes: np.ndarray, rng: np.random.Generator
     ) -> "MCTuplesPopulation":
-        """Draw `n_candidates` candidates over the fine cells of `free_u_lanes` × `free_v_lanes`.
+        """Draw `n_candidates` candidates over the fine cells of `free_u_lanes` x `free_v_lanes`.
 
         Raises:
             ValueError: If `n_candidates` is not positive.

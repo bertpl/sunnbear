@@ -11,7 +11,7 @@ from sunnbear._core.benchmark.mc_tuples.construction_gaps import AxisGaps, GapAl
 # and a right edge gap [12, 1024).
 _VALUES = np.array([3.5, 10.25, 11.5]) / N_FINE_LANES
 
-# 32 old tuples from the first fine lane to the last leave 31 interior gaps for 32 new tuples, so 1 gap gets 2.
+# 32 old tuples from the first fine lane to the last leave 31 gaps for 32 new tuples, so 1 gap gets 2.
 _SPREAD_VALUES = (np.round(np.linspace(0, N_FINE_LANES - 1, 32)) + 0.5) / N_FINE_LANES
 
 
@@ -19,8 +19,7 @@ _SPREAD_VALUES = (np.round(np.linspace(0, N_FINE_LANES - 1, 32)) + 0.5) / N_FINE
 #  AxisGaps
 # ==================================================================================================
 def test_of_finds_the_gaps_with_their_widths_edges_and_bounds():
-    """Each maximal run of free fine lanes is a gap, adjacent occupied fine lanes leave none, and the edge gaps reach the
-    edges of the axis."""
+    """Each maximal run of free fine lanes is a gap with its width, edge flags and bounds; adjacent lanes leave none."""
     # --- act --------------------------
     gaps = AxisGaps.of(_VALUES)
 
@@ -117,7 +116,7 @@ def test_balanced_counts_move_the_extra_tuple_to_the_middle_gap_without_lowering
 
 
 def test_balanced_counts_keep_every_spacing_within_the_floor():
-    """No gap's spacing falls below (1 − ε) times the greedy allocation's smallest spacing, and no gap takes more new
+    """No gap's spacing falls below (1 - ε) times the greedy allocation's smallest spacing, and no gap takes more new
     tuples than it has free fine lanes."""
     # --- arrange ----------------------
     values = np.random.default_rng(3).choice(N_FINE_LANES, size=128, replace=False) / N_FINE_LANES + 0.4 / N_FINE_LANES

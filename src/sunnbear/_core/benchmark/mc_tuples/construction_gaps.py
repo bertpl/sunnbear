@@ -9,7 +9,7 @@ The allocation comes in 2 stages:
 
 1. **greedy:** each new tuple goes, 1 at a time, to the gap that keeps the widest spacing after adding it;
 2. **mean-aware:** starting from the greedy allocation, a local search moves new tuples between gaps until the
-   predicted mean is closest to 0.5, while every gap's spacing stays at least (1 − ε) times the greedy allocation's
+   predicted mean is closest to 0.5, while every gap's spacing stays at least (1 - ε) times the greedy allocation's
    smallest spacing (`AxisGaps.balanced_counts`).
 """
 
@@ -76,9 +76,9 @@ class AxisGaps:
     def predicted_sums(self, counts: np.ndarray) -> np.ndarray:
         """Return each gap's predicted sum of new values, with its `counts` new tuples spread evenly over it.
 
-        In an interior gap the values lie at lows + j·(highs − lows)/(c + 1), j = 1…c, and sum to c times the gap's
+        In an interior gap the values lie at lows + j·(highs - lows)/(c + 1), j = 1…c, and sum to c times the gap's
         middle. In an edge gap the outermost value lies on the edge: the left edge gap's values lie at
-        highs − j·highs/c, and the right edge gap's at lows + j·(1 − lows)/c.
+        highs - j·highs/c, and the right edge gap's at lows + j·(1 - lows)/c.
         """
         interior = counts * (self.lows + self.highs) / 2
         left_edge = (counts - 1) * self.highs / 2
@@ -110,10 +110,10 @@ class AxisGaps:
     def balanced_counts(self, greedy_counts: np.ndarray, epsilon: float) -> np.ndarray:
         """Return the allocation that brings the predicted mean closest to 0.5, starting from `greedy_counts`.
 
-        The greedy allocation's smallest spacing σ* is the largest achievable. Each gap may hold as many new tuples as
-        keep its spacing at least (1 − `epsilon`)·σ*, and at most its number of free fine lanes. The search then
-        repeatedly moves 1 new tuple from 1 gap to another, taking the move that brings the predicted sum of new
-        values (`predicted_sums`) closest to its target, and stops once no move brings it closer.
+        The greedy allocation's smallest spacing is the largest achievable. Each gap may hold as many new tuples as
+        keep its spacing at least (1 - `epsilon`) times that spacing, and at most its number of free fine lanes. The
+        search then repeatedly moves 1 new tuple from 1 gap to another, taking the move that brings the predicted sum
+        of new values (`predicted_sums`) closest to its target, and stops once no move brings it closer.
         """
         spacing_floor = (1 - epsilon) * self.spacings(greedy_counts).min()
         max_counts = greedy_counts.copy()

@@ -6,7 +6,7 @@ import pytest
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES
 from sunnbear._core.benchmark.mc_tuples.construction_population import MCTuplesPopulation
 
-# Every 16th fine lane is free along u, and 128 consecutive fine lanes along v: 64 × 128 free fine cells.
+# Every 16th fine lane is free along u, and 128 consecutive fine lanes along v: 64 x 128 free fine cells.
 _FREE_U_LANES = np.arange(0, N_FINE_LANES, 16)
 _FREE_V_LANES = np.arange(512, 640)
 
