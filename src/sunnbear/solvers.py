@@ -6,6 +6,7 @@ Importing this module registers the built-in solver configs with `SolverConfigRe
 """
 
 from ._core.solvers.bracketing import (
+    CARF,
     ITP,
     TOMS748,
     AndersonBjorck,
@@ -38,6 +39,7 @@ from ._core.solvers.core import (
 from ._core.solvers.open import Secant
 
 __all__ = [
+    "CARF",
     "ITP",
     "TOMS748",
     "AndersonBjorck",

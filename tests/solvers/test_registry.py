@@ -5,6 +5,7 @@ import pytest
 from sunnbear._core.solvers.bracketing.anderson_bjorck.configs import AndersonBjorckConfig
 from sunnbear._core.solvers.bracketing.bisection.configs import BisectionConfig
 from sunnbear._core.solvers.bracketing.brent.configs import BrentConfig
+from sunnbear._core.solvers.bracketing.carf.configs import CARFConfig
 from sunnbear._core.solvers.bracketing.chandrupatla.configs import ChandrupatlaConfig
 from sunnbear._core.solvers.bracketing.illinois.configs import IllinoisConfig
 from sunnbear._core.solvers.bracketing.itp.configs import (
@@ -25,6 +26,7 @@ from sunnbear._core.solvers.bracketing.toms748.configs import TOMS748K1Config, T
 from sunnbear._core.solvers.open.secant.configs import SecantConfig
 from sunnbear.exceptions import UnknownSolverConfigError
 from sunnbear.solvers import (
+    CARF,
     ITP,
     TOMS748,
     AndersonBjorck,
@@ -54,6 +56,7 @@ from .example_solvers import WeightedSplitSolver, define_config
         (AndersonBjorckConfig, "anderson_bjorck", AndersonBjorck, SolverRole.BUILTIN_SECONDARY),
         (BisectionConfig, "bisection", Bisection, SolverRole.BUILTIN_BASELINE),
         (BrentConfig, "brent", Brent, SolverRole.BUILTIN_CORE),
+        (CARFConfig, "carf", CARF, SolverRole.BUILTIN_SECONDARY),
         (IllinoisConfig, "illinois", Illinois, SolverRole.BUILTIN_CORE),
         (
             ITPPaperExperimentsSlack0Config,
@@ -116,6 +119,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         "anderson_bjorck",
         "bisection",
         "brent",
+        "carf",
         "chandrupatla",
         "illinois",
         "itp[n_slack=0,variant='paper_experiments']",
@@ -138,6 +142,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         AndersonBjorck,
         Bisection,
         Brent,
+        CARF,
         Chandrupatla,
         Illinois,
         ITP,

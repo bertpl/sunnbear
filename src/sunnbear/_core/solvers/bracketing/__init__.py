@@ -20,6 +20,7 @@ Variants of one algorithm, such as different values of one of its parameters, ar
 from .anderson_bjorck import AndersonBjorck
 from .bisection import Bisection
 from .brent import Brent
+from .carf import CARF
 from .chandrupatla import Chandrupatla
 from .illinois import Illinois
 from .itp import ITP, ITPVariant
