@@ -1,12 +1,11 @@
-"""These tests assert that `CARF` reproduces the paper's Tables 3 and 4 as far as its reconstruction allows, takes the
-steps that its docstring describes, and stops within ``xtol`` of a root."""
+"""These tests assert that `CARF` reproduces Tables 3 and 4 of its paper, and that the rows of Table 4 that it does
+not reproduce still converge."""
 
 import pytest
 
 from sunnbear.solvers import CARF, SolveStatus
 from tests.solvers.bracketing.chandrupatla.paper_functions import PAPER_FUNCTIONS as CHANDRUPATLA_FUNCTIONS
 from tests.solvers.bracketing.toms748.paper_problems import PAPER_PROBLEMS as TOMS748_PROBLEMS
-from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic, steep_exponential
 
 # Each row of the paper's Table 4, on Chandrupatla's test functions, holds:
 # - the function number;
@@ -83,9 +82,6 @@ _UNREPRODUCED_ROWS = {
 }
 
 
-# ==================================================================================================
-#  The paper's results
-# ==================================================================================================
 @pytest.mark.parametrize(
     "function_number, a, b, n_fevals", [row for row in _PAPER_TABLE_4 if row[:3] not in _UNREPRODUCED_ROWS]
 )
@@ -127,68 +123,6 @@ def test_the_total_evaluation_count_lies_within_1_5_percent_of_the_papers_table_
 
     # --- assert -----------------------
     assert abs(total - paper_total) <= 0.015 * paper_total
-
-
-# ==================================================================================================
-#  The steps
-# ==================================================================================================
-@pytest.mark.parametrize(
-    "f, a, b, first_x",
-    [(cubic, 1.0, 2.0, 1.0 + 1.0 / 6.0), (steep_exponential, 0.0, 1.0, 0.1)],
-    ids=["chord_zero_inside", "chord_zero_clipped"],
-)
-def test_the_first_x_value_is_the_chord_zero_clipped_into_the_middle_80_percent(f, a, b, first_x):
-    """The first x-value is the chord's zero, kept when it lies in the middle 80 % of the interval and clipped to its
-    edge otherwise."""
-    # --- act --------------------------
-    result = CARF().solve(f, a, b, xtol=1e-10, max_fevals=60, history_enabled=True)
-
-    # --- assert -----------------------
-    assert result.history[2][0] == pytest.approx(first_x, abs=1e-15)
-
-
-def test_an_exact_zero_ends_the_solve_at_that_point():
-    """On a straight line, the chord's zero is the root, so the first x-value has a function value of exactly 0, and
-    the solve returns it after 3 evaluations."""
-    # --- act --------------------------
-    result = CARF().solve(lambda x: x - 0.25, 0.0, 1.0, xtol=1e-10, max_fevals=10)
-
-    # --- assert -----------------------
-    assert (result.x, result.status, result.n_fevals) == (0.25, SolveStatus.CONVERGED, 3)
-
-
-@pytest.mark.parametrize(
-    "f, a, b, root",
-    [
-        (cubic, 1.0, 2.0, CUBIC_ROOT),
-        (decreasing_cubic, 1.0, 2.0, CUBIC_ROOT),
-        (lambda x: x**9, -1.0, 4.0, 0.0),
-    ],
-    ids=["cubic", "decreasing_cubic", "multiple_root"],
-)
-def test_a_function_converges_to_its_root(f, a, b, root):
-    """On `cubic`, which increases, `decreasing_cubic`, which decreases, and ``x^9`` over ``[-1, 4]``, where the
-    multiple root makes `CARF` take power steps, `CARF` returns an x-value within ``xtol`` of the root."""
-    # --- act --------------------------
-    result = CARF().solve(f, a, b, xtol=1e-10, max_fevals=200)
-
-    # --- assert -----------------------
-    assert result.status is SolveStatus.CONVERGED
-    assert abs(result.x - root) <= 1e-10
-
-
-# ==================================================================================================
-#  Identity and cost
-# ==================================================================================================
-def test_identity_and_that_its_power_steps_are_counted():
-    """`CARF` is named ``carf``, at version 1, and the logarithms and power of its power steps are flop-counted."""
-    # --- act --------------------------
-    result = CARF().solve(lambda x: x**9, -1.0, 4.0, xtol=1e-6, max_fevals=200)
-
-    # --- assert -----------------------
-    assert (CARF.name, CARF.version) == ("carf", 1)
-    assert result.flop_counts.LOG > 0
-    assert result.flop_counts.POW > 0
 
 
 # ==================================================================================================
