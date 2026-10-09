@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add the Secant solver, `sunnbear.solvers.Secant`
 - Add the Steffen-Brent solver, `sunnbear.solvers.SteffenBrent`
 - Add the modified Anderson-Björck (modAB) solver, `sunnbear.solvers.ModAB`
+- Add the Curvature-Adaptive Root Finder (CARF) solver, `sunnbear.solvers.CARF`
 - Add gpq(0.1) spread statistics and a `score` property that combines them to `MCTuplesStats`
 
 ### Changed
