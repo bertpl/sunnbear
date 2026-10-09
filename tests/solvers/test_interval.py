@@ -102,7 +102,7 @@ def test_split_at_keeps_the_sign_change_and_the_orientation(cls, fx, expected, r
 # ==================================================================================================
 @pytest.mark.parametrize("cls", ORIENTATIONS)
 @pytest.mark.parametrize(
-    "fa, fb, two_xtol, expected",
+    "fa, fb, xtol_doubled, expected",
     [
         (-1.0, 1.0, 1.0, True),  # width criterion: width equal to 2*xtol counts as converged
         (-1.0, 1.0, 0.5, False),  # the width criterion is not met and no interval bound is zero
@@ -110,10 +110,11 @@ def test_split_at_keeps_the_sign_change_and_the_orientation(cls, fx, expected, r
         (-1.0, 0.0, 0.5, True),  # zero-bound criterion: the upper interval bound is a root
     ],
 )
-def test_is_converged(cls, fa, fb, two_xtol, expected):
-    """`Interval.is_converged` holds when the width is at most ``two_xtol`` or an interval bound has a zero value."""
+def test_is_converged(cls, fa, fb, xtol_doubled, expected):
+    """`Interval.is_converged` holds when the width is at most ``xtol_doubled`` or an interval bound has a zero
+    value."""
     # --- act / assert -----------------
-    assert cls(0.0, 1.0, *_orient_values_at_interval_bounds(cls, fa, fb)).is_converged(two_xtol) is expected
+    assert cls(0.0, 1.0, *_orient_values_at_interval_bounds(cls, fa, fb)).is_converged(xtol_doubled) is expected
 
 
 @pytest.mark.parametrize("cls", ORIENTATIONS)

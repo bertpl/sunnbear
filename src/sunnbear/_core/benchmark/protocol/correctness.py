@@ -11,6 +11,8 @@ from collections.abc import Callable, Iterator, Sequence
 
 import numpy as np
 
+from sunnbear._core.utils.floats import FLOAT64_EPS
+
 # The largest number of function evaluations that 1 check spends before it judges the answer incorrect.
 CORRECTNESS_CHECK_MAX_FEVALS = 1000
 
@@ -88,8 +90,8 @@ def _random_x_probes(x_found: float, xtol: float, seed: int) -> Iterator[float]:
     # Adding a distance below 1 ulp (unit in the last place) of `x_found` returns `x_found` unchanged. When
     # `x_found` is 0, 1 ulp is about 5e-324, so log-uniform distances would spread over hundreds of orders of
     # magnitude and almost all be negligible; the smallest log-uniform distance is therefore also held at or
-    # above `xtol · 2^-52`, the relative precision of a double.
-    log_distance_min = math.log(min(xtol, max(math.ulp(x_found), math.ldexp(xtol, -52))))
+    # above `xtol · FLOAT64_EPS`.
+    log_distance_min = math.log(min(xtol, max(math.ulp(x_found), xtol * FLOAT64_EPS)))
     log_distance_max = math.log(xtol)
     while True:
         for is_log_uniform in (True, False):

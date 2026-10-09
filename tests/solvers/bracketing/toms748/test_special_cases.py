@@ -5,14 +5,11 @@
 - an ``xtol`` below the machine precision.
 """
 
-import sys
-
 import pytest
 
+from sunnbear._core.utils.floats import FLOAT64_EPS
 from sunnbear.solvers import TOMS748, SolveStatus
 from tests.solvers.example_functions import CUBIC_ROOT, cubic
-
-_MACHEPS = sys.float_info.epsilon
 
 
 @pytest.mark.parametrize("k", [1, 2])
@@ -44,4 +41,4 @@ def test_an_xtol_below_the_machine_precision_sets_tol_to_0():
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert abs(result.x - CUBIC_ROOT) <= 4.0 * _MACHEPS * 2.0
+    assert abs(result.x - CUBIC_ROOT) <= 4.0 * FLOAT64_EPS * 2.0

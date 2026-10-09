@@ -3,6 +3,7 @@
 import numpy as np
 import scipy.optimize
 
+from sunnbear._core.utils.floats import FLOAT64_EPS
 from sunnbear.solvers import Interval, RiddersVariant
 from tests.solvers.twins import StoppingWrappedFunction, TwinSolver
 
@@ -15,9 +16,9 @@ class RiddersScipyTwin(TwinSolver):
     iterate, and limits each step so that the iterate lies at least half that tolerance inside the interval. The twin
     passes SciPy:
 
-    - for the ``"scipy"`` variant, ``rtol = 4 * eps``, SciPy's smallest accepted value, and an ``xtol`` reduced by
-      ``4 * eps * max(|a|, |b|)``, so that SciPy's tolerance never exceeds `Ridders`' ``xtol`` and SciPy does not
-      stop first;
+    - for the ``"scipy"`` variant, ``rtol = 4 * FLOAT64_EPS``, SciPy's smallest accepted value, and an ``xtol``
+      reduced by ``4 * FLOAT64_EPS * max(|a|, |b|)``, so that SciPy's tolerance never exceeds `Ridders`' ``xtol``
+      and SciPy does not stop first;
     - for the other 2 variants, SciPy's smallest accepted tolerance, so that SciPy's limit on the step moves an
       iterate by a few ulps at most.
 
@@ -47,12 +48,11 @@ class RiddersScipyTwin(TwinSolver):
 
     def _run_reference(self, f: StoppingWrappedFunction, a: float, b: float, xtol: float) -> None:
         """Run SciPy's ridder with the variant's tolerances, as the class docstring gives them."""
-        eps = float(np.finfo(float).eps)
         if self.variant is RiddersVariant.SCIPY:
-            scipy_xtol = xtol - 4.0 * eps * max(abs(a), abs(b))
+            scipy_xtol = xtol - 4.0 * FLOAT64_EPS * max(abs(a), abs(b))
         else:
             scipy_xtol = float(np.finfo(float).smallest_normal)
-        scipy.optimize.ridder(f, a, b, xtol=scipy_xtol, rtol=4.0 * eps)
+        scipy.optimize.ridder(f, a, b, xtol=scipy_xtol, rtol=4.0 * FLOAT64_EPS)
 
     def _root_if_sunnbear_solver_stops(
         self, interval: Interval, evaluations: list[tuple[float, float]], xtol: float

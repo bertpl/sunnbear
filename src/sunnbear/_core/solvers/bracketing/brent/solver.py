@@ -1,11 +1,7 @@
 """`Brent` implements Brent's method: interpolation steps, with bisection when they converge too slowly."""
 
-import sys
-
 from sunnbear._core.solvers.core import Solver, SolveState
-
-# ``_MACHEPS`` is Brent's ``macheps``, the relative machine precision: 2^-52 for float64.
-_MACHEPS = sys.float_info.epsilon
+from sunnbear._core.utils.floats import FLOAT64_EPS
 
 
 class Brent(Solver):
@@ -30,9 +26,9 @@ class Brent(Solver):
 
     - ``b`` and ``c`` are the interval bounds, ``b`` the one with the smaller ``|f|``, which is the best estimate;
     - ``m`` is half the signed width of the interval, from ``b`` toward ``c``;
-    - ``tol = 2 * macheps * |b| + t`` is the tolerance, with ``macheps`` the relative machine precision and ``t`` an
-      absolute tolerance derived from ``xtol`` (below); the solve ends once ``|m| <= tol`` or ``f(b) = 0``, and
-      returns ``b``.
+    - ``tol = 2 * macheps * |b| + t`` is the tolerance, with ``macheps`` the relative machine precision,
+      `FLOAT64_EPS`, and ``t`` an absolute tolerance derived from ``xtol`` (below); the solve ends once
+      ``|m| <= tol`` or ``f(b) = 0``, and returns ``b``.
 
     Brent's procedure returns a ``b`` within ``6 * macheps * |x| + 2 * t`` of a root ``x``. The solver sets
     ``t = (xtol - 6 * macheps * max(|a0|, |b0|)) / 2``, with ``a0`` and ``b0`` the bounds of the initial interval,
@@ -77,7 +73,7 @@ class Brent(Solver):
         """
         interval = state.interval
         a, fa, b, fb = interval.a, interval.fa, interval.b, interval.fb
-        t = 0.5 * (state.xtol - 6.0 * _MACHEPS * max(abs(a), abs(b)))
+        t = 0.5 * (state.xtol - 6.0 * FLOAT64_EPS * max(abs(a), abs(b)))
         # The Algol label "int": c becomes a, the bound on the other side of the root from b.
         c, fc = a, fa
         d = e = b - a
@@ -86,7 +82,7 @@ class Brent(Solver):
             if abs(fc) < abs(fb):
                 a, b, c = b, c, b
                 fa, fb, fc = fb, fc, fb
-            tol = 2.0 * _MACHEPS * abs(b) + t
+            tol = 2.0 * FLOAT64_EPS * abs(b) + t
             m = 0.5 * (c - b)
             if abs(m) <= tol or fb == 0.0:
                 return b

@@ -19,14 +19,12 @@ class PegasusState(SolveState):
             scaling factor of every iteration that kept the bound again.
     """
 
-    newest_bound: IntervalBound = IntervalBound.UPPER
+    newest_bound: IntervalBound = field(init=False)
     newest_f: float = field(init=False)
     scaled_retained_f: float = field(init=False)
 
     def __post_init__(self) -> None:
-        """Set the starting values from the interval: `newest_f` is ``fb`` and `scaled_retained_f` is ``fa``.
-
-        These values hold only for the default `newest_bound`.
-        """
+        """Start with the upper bound as the newest bound: `newest_f` is ``fb`` and `scaled_retained_f` is ``fa``."""
+        self.newest_bound = IntervalBound.UPPER
         self.newest_f = self.interval.fb
         self.scaled_retained_f = self.interval.fa

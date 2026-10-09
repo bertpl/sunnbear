@@ -1,11 +1,7 @@
 """`TOMS748` implements Algorithm 748: interpolation steps, a double-size secant step, and bisection if needed."""
 
-import sys
-
 from sunnbear._core.solvers.core import Interval, IntervalBound, Solver, SolveState
-
-# ``_MACHEPS`` is the paper's ``macheps``, the relative machine precision: 2^-52 for float64.
-_MACHEPS = sys.float_info.epsilon
+from sunnbear._core.utils.floats import FLOAT64_EPS
 
 # ``_MU`` is the paper's ``mu``: an iteration that leaves the interval wider than ``_MU`` times its width at the start
 # of the iteration ends with a bisection.
@@ -40,8 +36,8 @@ class TOMS748(Solver):
     The paper states the 2 algorithms without a stopping criterion; its experiments, and the authors' code, add the
     stopping criterion of Brent's method:
 
-    - ``stop_width = 2 * (2 * macheps * |u| + tol)``, with ``macheps`` the relative machine precision and ``tol`` an
-      absolute tolerance that the solver derives from ``xtol``;
+    - ``stop_width = 2 * (2 * macheps * |u| + tol)``, with ``macheps`` the relative machine precision,
+      `FLOAT64_EPS`, and ``tol`` an absolute tolerance that the solver derives from ``xtol``;
     - the solve ends once the interval is at most ``stop_width`` wide, or once an evaluation returns exactly 0, and
       returns the lower bound ``a``, or the point that returned 0.
 
@@ -162,7 +158,7 @@ class TOMS748(Solver):
     @staticmethod
     def _get_tol(xtol: float, a0: float, b0: float) -> float:
         """Return the ``tol`` that keeps ``stop_width`` at most ``xtol``, or 0 where that ``tol`` would be negative."""
-        return max(0.5 * xtol - 2.0 * _MACHEPS * max(abs(a0), abs(b0)), 0.0)
+        return max(0.5 * xtol - 2.0 * FLOAT64_EPS * max(abs(a0), abs(b0)), 0.0)
 
     @staticmethod
     def _get_u(interval: Interval) -> tuple[float, float]:
@@ -176,7 +172,7 @@ class TOMS748(Solver):
     def _get_stop_width(interval: Interval, tol: float) -> float:
         """Return ``stop_width = 2 * (2 * macheps * |u| + tol)`` for ``interval``, the authors' subroutine ``TOLE``."""
         u, _ = TOMS748._get_u(interval)
-        return 2.0 * (tol + 2.0 * abs(u) * _MACHEPS)
+        return 2.0 * (tol + 2.0 * abs(u) * FLOAT64_EPS)
 
     def _evaluate_and_split_at(
         self, state: SolveState, interval: Interval, c: float, stop_width: float, tol: float

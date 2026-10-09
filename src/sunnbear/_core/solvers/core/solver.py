@@ -95,15 +95,15 @@ class Solver(ABC, Generic[StateT]):
             ValueError: If ``a >= b``, or ``f(a)`` and ``f(b)`` have the same sign and neither is
                 zero — a caller error, not a solve outcome.
         """
-        # --- uncounted validation -------------------
+        # --- uncounted validation ---------------
         if not a < b:
             raise ValueError(f"Interval must satisfy a < b (got a={a}, b={b}).")
         wrapped_f = WrappedFunction(f, max_fevals=max_fevals, history_enabled=history_enabled)
 
-        # --- counted: main algorithm ----------------
+        # --- counted: main algorithm ------------
         x_failed: float | None = None  # Where f failed, if it did; decides FUNCTION_ERROR versus DIVERGED below.
         with FlopCountingContext() as flop_ctx:
-            # --- prep and early exits ---------------
+            # --- prep and early exits -----------
             a_counted, b_counted, xtol_counted = CountedFloat(a), CountedFloat(b), CountedFloat(xtol)
             try:
                 fa, fb = wrapped_f(a_counted), wrapped_f(b_counted)
@@ -115,7 +115,7 @@ class Solver(ABC, Generic[StateT]):
                 elif fb == 0.0:  # Early exit when b is a root.
                     x, status = b_counted, SolveStatus.CONVERGED
                 else:
-                    # --- actual solve -----------------------
+                    # --- actual solve -----------
                     interval = Interval.from_interval_bounds(a_counted, b_counted, fa, fb)
                     state = self.state_cls(f=wrapped_f, interval=interval, xtol=xtol_counted, x_best=interval.midpoint)
                     try:
@@ -124,7 +124,7 @@ class Solver(ABC, Generic[StateT]):
                     except Exception as exc:  # noqa: BLE001 — every ending becomes a recorded status, by design
                         x, status, x_failed = _ending_of(exc, x_best=state.x_best)
 
-        # --- return results -------------------------
+        # --- return results ---------------------
         # Divergence is the framework's judgment, not solver work, so these checks are uncounted.
         x_plain = float(x)
         if x_failed is not None and not a <= x_failed <= b:
