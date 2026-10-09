@@ -6,16 +6,17 @@ from sunnbear._core.solvers.core import Solver, SolveState
 class SteffenBrent(Solver):
     """`SteffenBrent` implements the modified Brent method of Steffen et al. (2025), as the paper's Algorithm 2.
 
-    The method keeps 2 interval bounds, ``a`` and ``b``, with ``b`` the one with the smaller ``|f|``, which is the
-    best estimate. Each iteration evaluates a new x-value ``s``, from 1 of 3 steps:
+    The method keeps 2 interval bounds, ``a`` and ``b``; ``b`` is the bound with the smaller ``|f|``, and is the best
+    estimate of the root. Each iteration evaluates a new x-value ``s``, from 1 of 3 steps:
 
-    - inverse quadratic interpolation through ``a``, ``b`` and ``b_prev``, the previous value of ``b``, when the 3
+    - inverse quadratic interpolation through ``a``, ``b`` and ``b_previous``, the previous value of ``b``, when the 3
       function values are distinct;
-    - linear interpolation, a secant step, through ``b`` and ``b_prev``, when only their function values differ;
+    - linear interpolation, a secant step, through ``b`` and ``b_previous``, when the 3 function values are not
+      distinct but ``f(b)`` and ``f(b_previous)`` differ;
     - bisection, in all other cases, and in place of an interpolation step that does not land strictly between ``b``
       and ``(3 * a + b) / 4``.
 
-    In the first iteration, ``b_prev`` is ``a``, so the first step is a secant step.
+    In the first iteration, ``b_previous`` is ``a``, so the first step is a secant step.
 
     ``s`` becomes the new ``b``, and the new ``a`` is chosen so that the interval keeps the root:
 
@@ -36,23 +37,31 @@ class SteffenBrent(Solver):
       the midpoint ``(a + b) / 2``, while its Algorithm 2 keeps the bound of Brent's method, ``(3 * a + b) / 4``.
       `SteffenBrent` follows Algorithm 2.
     - **The choice of step:** Algorithm 2 chooses between interpolation and the secant by comparing the x-values
-      ``a``, ``b`` and ``b_prev``, not the function values. Its secant step then divides 0 by 0 when ``b`` equals
-      ``b_prev``, which happens when the old ``b`` became the new ``a`` and the final swap moves it back to ``b``, and
-      its interpolation divides by 0 when 2 distinct x-values share a function value. `SteffenBrent` compares the
-      function values, for exact equality.
+      ``a``, ``b`` and ``b_previous``, not the function values. Comparing the x-values leads to 2 divisions by 0:
+
+      - the secant step divides 0 by 0 when ``b`` equals ``b_previous``, which happens when the old ``b`` became the
+        new ``a`` and the final swap moves the old ``b`` back to ``b``;
+      - the interpolation divides by 0 when 2 distinct x-values share a function value.
+
+      `SteffenBrent` chooses the step by testing the function values for exact equality.
     - **No step-size tests:** the paper's text describes the tests of Brent's method that force bisection once the
       interpolation steps stop shrinking, but Algorithm 2 leaves them out. `SteffenBrent` follows Algorithm 2, so on
       some functions the interval shrinks slowly.
-    - **No needless evaluation of the midpoint:** when ``s`` is itself the midpoint, its function value serves as
-      ``f(m)``, where Algorithm 2 evaluates the midpoint a second time; and an ``s`` with ``f(s) = 0`` ends the
-      solve without evaluating the midpoint. Neither shortcut changes the next interval or the returned x-value,
-      since in both cases ``f(m)`` and ``f(s)`` cannot differ in sign.
+    - **No needless evaluation of the midpoint:** Algorithm 2 evaluates the midpoint in 2 cases where `SteffenBrent`
+      does not:
+
+      - when ``s`` is itself the midpoint, `SteffenBrent` reuses ``f(s)`` as ``f(m)``;
+      - when ``f(s) = 0``, `SteffenBrent` ends the solve.
+
+      Neither shortcut changes the next interval or the returned x-value, since in both cases ``f(m)`` and ``f(s)``
+      cannot differ in sign.
 
     The paper's title says that the modification halves the interval in every iteration, but Algorithm 2 does not
     guarantee that the interval halves:
 
-    - when the root lies between ``a`` and ``s``, and ``s`` lies on ``b``'s side of the midpoint, the midpoint test
-      fails and the new interval runs from ``a`` to ``s``, more than half the old interval;
+    - when the root lies between ``a`` and the midpoint, and ``s`` lies on ``b``'s side of the midpoint, ``f(m)`` has
+      the sign of ``f(s)``, so ``m`` does not replace ``a``, and the new interval runs from ``a`` to ``s``, more than
+      half the old interval;
     - when ``f(a)`` and ``f(s)`` have the same sign, the new interval from ``b`` to ``s`` can keep up to 3/4 of the
       old interval.
 
@@ -87,29 +96,28 @@ class SteffenBrent(Solver):
         a, fa, b, fb = interval.a, interval.fa, interval.b, interval.fb
         if abs(fa) < abs(fb):
             a, b, fa, fb = b, a, fb, fa
-        b_prev, fb_prev = a, fa
+        b_previous, fb_previous = a, fa
         while abs(b - a) > state.xtol:
             m = (a + b) / 2.0
 
             # --- the step s ---------------------
-            if fa != fb and fa != fb_prev and fb != fb_prev:
-                # The step is an inverse quadratic interpolation through a, b and b_prev, the paper's equation 3.
+            if fa != fb and fa != fb_previous and fb != fb_previous:
+                # The step is an inverse quadratic interpolation through a, b and b_previous, the paper's equation 3.
                 fb_over_fa = fb / fa
-                fb_over_fb_prev = fb / fb_prev
-                fa_over_fb_prev = fa / fb_prev
+                fb_over_fb_previous = fb / fb_previous
+                fa_over_fb_previous = fa / fb_previous
                 numerator = fb_over_fa * (
-                    (1.0 - fb_over_fb_prev) * (a - b)
-                    + fa_over_fb_prev * (fb_over_fb_prev - fa_over_fb_prev) * (b_prev - b)
+                    (1.0 - fb_over_fb_previous) * (a - b)
+                    + fa_over_fb_previous * (fb_over_fb_previous - fa_over_fb_previous) * (b_previous - b)
                 )
-                denominator = (fb_over_fb_prev - 1.0) * (fb_over_fa - 1.0) * (fa_over_fb_prev - 1.0)
+                denominator = (fb_over_fb_previous - 1.0) * (fb_over_fa - 1.0) * (fa_over_fb_previous - 1.0)
                 s = b + numerator / denominator
-            elif fb != fb_prev:
-                # The step is a linear interpolation through b and b_prev, the paper's equation 4.
-                s = b - fb * (b_prev - b) / (fb_prev - fb)
+            elif fb != fb_previous:
+                # The step is a linear interpolation through b and b_previous, the paper's equation 4.
+                s = b - fb * (b_previous - b) / (fb_previous - fb)
             else:
                 s = m
-            # accepted_range_end is the end of the range that accepts an interpolation step. A step that overflows to
-            # inf or nan falls outside the range too, so it becomes a bisection.
+            # An interpolation step that overflows to inf or nan fails this comparison too, so it becomes a bisection.
             accepted_range_end = (3.0 * a + b) / 4.0
             if not min(b, accepted_range_end) < s < max(b, accepted_range_end):
                 s = m
@@ -121,7 +129,7 @@ class SteffenBrent(Solver):
                 return s
 
             # --- the new interval ---------------
-            b_prev, fb_prev = b, fb
+            b_previous, fb_previous = b, fb
             # Signs are compared directly, where the paper multiplies them: the product of 2 small function values can
             # underflow to 0.
             if (fa > 0.0) == (fs > 0.0):

@@ -15,8 +15,8 @@ def _case_study_1(x: float) -> float:
 
 
 # The Peng-Robinson constants, at full precision (Peng and Robinson, 1976): the paper prints them rounded to
-# Λ = 0.45724 and Γ = 0.07780, but its root fits the full-precision constants to within 6.5e-9; the rounded ones move
-# the root by 6.6e-4.
+# Λ = 0.45724 and Γ = 0.07780, but the paper's root lies within 6.5e-9 of the root at the full-precision constants, and
+# not near the root at the rounded ones.
 _PENG_ROBINSON_ETA = 1.0 / (1.0 + (4.0 - math.sqrt(8.0)) ** (1.0 / 3.0) + (4.0 + math.sqrt(8.0)) ** (1.0 / 3.0))
 _PENG_ROBINSON_CAPITAL_LAMBDA = (8.0 + 40.0 * _PENG_ROBINSON_ETA) / (49.0 - 37.0 * _PENG_ROBINSON_ETA)
 _PENG_ROBINSON_CAPITAL_GAMMA = _PENG_ROBINSON_ETA / (3.0 + _PENG_ROBINSON_ETA)
@@ -34,7 +34,8 @@ def _case_study_2(v: float) -> float:
 
 
 def _steep_exponential(x: float) -> float:
-    """Return ``1 - 11 * exp(-24 * x)``; it is flat near 1 on most of ``[0, 1]``, with its root at ``ln(11) / 24``."""
+    """Return ``1 - 11 * exp(-24 * x)``; its value stays close to 1 on most of ``[0, 1]``, and its root is
+    ``ln(11) / 24``."""
     return 1.0 - 11.0 * math.exp(-24.0 * x)
 
 
@@ -44,8 +45,11 @@ def _steep_exponential(x: float) -> float:
 def test_case_study_1_reaches_the_papers_root_in_its_6_iterations():
     """On the paper's first case study over ``[1, 3]``, `SteffenBrent` returns the paper's root 2.1584212093.
 
-    The 11 evaluations are the 2 at the interval bounds, 1 in each of the paper's 6 iterations, and 3 more at the
-    midpoint.
+    The 11 evaluations are:
+
+    - 2 at the interval bounds;
+    - 1 in each of the paper's 6 iterations;
+    - 3 more at the midpoint.
     """
     # --- act --------------------------
     result = SteffenBrent().solve(_case_study_1, 1.0, 3.0, xtol=1e-10, max_fevals=100)
@@ -60,7 +64,8 @@ def test_case_study_2_reaches_the_papers_root():
     """On the paper's second case study over ``[14, 17]``, at the paper's tolerance of 1e-10, `SteffenBrent` returns a
     root within 1e-8 of the paper's root 15.0676609061.
 
-    The paper's root and the root of the cubic at the full-precision constants differ by 6.5e-9.
+    The tolerance covers the gap between the paper's root and the root at the full-precision constants, which the
+    comment on those constants gives.
     """
     # --- act --------------------------
     result = SteffenBrent().solve(_case_study_2, 14.0, 17.0, xtol=1e-10, max_fevals=100)
@@ -111,10 +116,10 @@ def test_the_interval_does_not_always_halve():
     assert next_x < 0.5
 
 
-def test_equal_function_values_at_b_and_b_prev_force_a_bisection():
+def test_equal_function_values_at_b_and_b_previous_force_a_bisection():
     """On ``1 - 11 * exp(-24 * x)`` over ``[0, 1]``, the swap at the end of an iteration, which keeps the smaller
-    ``|f|`` in ``b``, makes ``b`` equal ``b_prev`` in several iterations, where the secant of the paper's Algorithm 2
-    divides 0 by 0; `SteffenBrent` bisects there, and returns a root within ``xtol``."""
+    ``|f|`` in ``b``, makes ``b`` equal ``b_previous`` in several iterations, where the secant of the paper's
+    Algorithm 2 divides 0 by 0; `SteffenBrent` bisects there, and returns a root within ``xtol``."""
     # --- act --------------------------
     result = SteffenBrent().solve(_steep_exponential, 0.0, 1.0, xtol=1e-10, max_fevals=100)
 
