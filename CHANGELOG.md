@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.2.2 (2026-10-09)
 
 ### Added
 
@@ -29,15 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rebuild the shipped Monte Carlo tuple set; benchmark results on it differ from those on the previous set
 - Require max-div ≥ 0.21.1
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Fix `gpq` returning NaN at levels very close to 0 or 1, and `owg` returning NaN at a very large |p|
-
-### Security
 
 ## 0.2.1 (2026-10-05)
 
