@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES
+from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, fine_lanes_of
 from sunnbear._core.benchmark.mc_tuples.construction_population import MCTuplesPopulation
 
 # Every 16th fine lane is free along u, and 128 consecutive fine lanes along v: 64 x 128 free fine cells.
@@ -37,12 +37,13 @@ def test_draw_spreads_the_candidates_evenly_over_the_free_fine_lanes_and_cells(n
     assert free_cells.max() - free_cells.min() <= 1
     assert free_cells.sum() == n_candidates
     for values, lanes in ((population.u, population.u_lane), (population.v, population.v_lane)):
-        assert np.array_equal(np.floor(values * N_FINE_LANES).astype(np.int64), lanes)
+        assert np.array_equal(fine_lanes_of(values), lanes)
         assert np.all((values > 0) & (values < 1))
 
 
 def test_draw_rejects_an_empty_population():
     """A population of fewer than 1 candidate raises a `ValueError`."""
+    # --- act / assert -----------------
     with pytest.raises(ValueError, match="must be positive"):
         MCTuplesPopulation.draw(0, _FREE_U_LANES, _FREE_V_LANES, np.random.default_rng(1))
 

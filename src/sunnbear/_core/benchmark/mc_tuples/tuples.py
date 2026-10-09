@@ -167,21 +167,21 @@ class MCTuplesStats:
         return self.min_separation_v * (self.size - 1.0)
 
     # --------------------------------------------------------------------------
-    #  gpq(0.1) of the separations
+    #  gpq of the separations
     # --------------------------------------------------------------------------
     @cached_property
     def gpq_l2_fraction(self) -> float:
-        """Return gpq(0.1) of the L2 separations as a fraction of the grid spacing `1/(√size - 1)`."""
+        """Return the gpq at `GPQ_LEVEL` of the L2 separations as a fraction of the grid spacing `1/(√size - 1)`."""
         return gpq(self._separations_l2, GPQ_LEVEL) * (float(np.sqrt(self.size)) - 1.0)
 
     @cached_property
     def gpq_u_fraction(self) -> float:
-        """Return gpq(0.1) of the separations along u as a fraction of `1/(size - 1)`."""
+        """Return the gpq at `GPQ_LEVEL` of the separations along u as a fraction of `1/(size - 1)`."""
         return gpq(self._separations_u, GPQ_LEVEL) * (self.size - 1.0)
 
     @cached_property
     def gpq_v_fraction(self) -> float:
-        """Return gpq(0.1) of the separations along v as a fraction of `1/(size - 1)`."""
+        """Return the gpq at `GPQ_LEVEL` of the separations along v as a fraction of `1/(size - 1)`."""
         return gpq(self._separations_v, GPQ_LEVEL) * (self.size - 1.0)
 
     @property

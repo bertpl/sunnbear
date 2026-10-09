@@ -4,12 +4,14 @@ The maintainer runs this script by hand whenever the tuple set is regenerated, n
 time. The script:
 
 - calls `sunnbear.benchmark.generate_mc_tuples`;
-- prints 2 lines per size as the construction goes: the solve's budget and wall time, the allocation's predicted
-  offsets of the mean, what the mean correction did, and the size's spread before and after the correction, as
-  `MCTuplesStats` defines it;
-- with `--inspection-dir`, stores each size in that directory: its tuples as the CSV files `k<size>.csv`, and
-  `k<size>_uncorrected.csv` before the mean correction, and max-div's solution, with its score checkpoints, as the
-  pickle file `k<size>_solution.pkl`;
+- prints 2 lines per size as the construction goes:
+  - the solve's budget and wall time;
+  - the allocation's predicted offsets of the mean;
+  - what the mean correction did;
+  - the size's spread before and after the correction, as `MCTuplesStats` defines it;
+- with `--inspection-dir`, stores each size in that directory: its tuples after the mean correction as the CSV file
+  `k<size>.csv`, its tuples before it as `k<size>_uncorrected.csv`, and max-div's solution, with its score
+  checkpoints, as the pickle file `k<size>_solution.pkl`;
 - prints the spread of every size, its means and its largest number of tuples in 1 fine lane, and the overall score;
 - saves the set through `ArtifactStore`, which records in the artifact's manifest the
   `generate_mc_tuples` call, its arguments and max-div's version; `--no-save` skips saving the set, for a trial run.
@@ -58,8 +60,8 @@ def main() -> None:
         type=float,
         default=0.1,
         help=(
-            "share of the smallest spacing that the allocation of new tuples to gaps may give up to bring the "
-            "predicted mean closer to 0.5"
+            "share by which the allocation of new tuples to the gaps between the size below's values may shrink the "
+            "smallest distance between neighboring values on an axis, to bring the predicted mean closer to 0.5"
         ),
     )
     parser.add_argument("--inspection-dir", type=Path, help="directory for the tuples and solution of each size")
@@ -112,10 +114,10 @@ def main() -> None:
 def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None:
     """Print the size's solve, allocation, correction and spread, and store it in `inspection_dir` if given."""
     before, after = MCTuplesStats(result.uncorrected_tuple_array), result.tuples.stats()
-    axes = []
+    axis_reports = []
     for label, allocation, correction in (
-        ("u", result.u_allocation, result.mean_correction.u),
-        ("v", result.v_allocation, result.mean_correction.v),
+        ("u", result.gap_allocation.u, result.mean_correction.u),
+        ("v", result.gap_allocation.v, result.mean_correction.v),
     ):
         if allocation.mean_aware_offset_fine_lanes is None:
             predicted = "1 gap"
@@ -123,14 +125,14 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
             predicted = (
                 f"predicted {allocation.greedy_offset_fine_lanes:+.2f} → {allocation.mean_aware_offset_fine_lanes:+.2f}"
             )
-        axes.append(
+        axis_reports.append(
             f"{label}: {predicted}, offset {correction.offset_before_fine_lanes:+.3f} → "
             f"{correction.offset_after_fine_lanes:+.1e}, D {correction.cap * N_FINE_LANES:.2f}, "
             f"largest move {correction.max_move_fine_lanes:.2f}"
         )
     print(
         f"k={int(result.size)}: budget {result.t_budget_sec:.0f} s, wall {result.t_wall_sec:.0f} s; "
-        f"in fine lanes, {'; '.join(axes)}",
+        f"in fine lanes, {'; '.join(axis_reports)}",
         flush=True,
     )
     print(

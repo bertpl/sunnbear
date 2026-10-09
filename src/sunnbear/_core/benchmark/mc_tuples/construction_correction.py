@@ -8,8 +8,8 @@ over the size's values u_0 < u_1 < … in ascending order, with w the width of a
   - r_i is 0 when u_i is the lowest value;
   - r_i is the right edge of u_{i-1}'s fine lane when u_{i-1} is an old tuple;
   - r_i is u_{i-1} when u_{i-1} is a new tuple, and then r_i moves when u_{i-1} moves;
-- a cap D bounds the gap that a new tuple keeps to its reference; u_{i-1}, or the edge for the lowest value, is the
-  tuple's left neighbor:
+- a cap D bounds the gap that a new tuple keeps to its reference, by a rule that depends on the tuple's left
+  neighbor (u_{i-1}, or the edge for the lowest value):
   - when the left neighbor is the edge or an old tuple, u'_i = r_i + min(g_i, D);
   - when the left neighbor is a new tuple and g_i ≤ w, u_i stays until u'_{i-1} + w falls below it:
     u'_i = min(u_i, u'_{i-1} + w);
@@ -19,8 +19,12 @@ over the size's values u_0 < u_1 < … in ascending order, with w the width of a
 So the largest gaps shrink first and the smallest keep their value. Every u'_i rises with D without jumps, and a
 bisection over D finds the cap at which the mean is exactly 0.5.
 
-No fine lane ever holds 2 tuples, at any D: a new tuple whose left neighbor is an old tuple stays above that tuple's
-fine lane, 2 new neighbors end at least w apart or keep their fine lanes, and the order of the values never changes.
+No fine lane ever holds 2 tuples, at any D:
+
+- a new tuple whose left neighbor is an old tuple stays above that tuple's fine lane;
+- 2 new neighbors end at least w apart or keep their fine lanes;
+- the order of the values never changes.
+
 A mean below 0.5 mirrors every rule.
 """
 
@@ -36,7 +40,7 @@ from .sizes import N_FINE_LANES, fine_lanes_of
 
 FINE_LANE_WIDTH = 1 / N_FINE_LANES
 
-# The range that the bisection searches for the cap D. The lower bound keeps every moved tuple at least 1e-6 fine
+# The bisection's search range for the cap D. The lower bound keeps every moved tuple at least 1e-6 fine
 # lanes from the edge of its fine lane, so that a right shift, computed on the negated axis, never puts a tuple on the
 # lower edge of its neighbor's fine lane, which belongs to that neighbor. At the upper bound no gap reaches the cap,
 # so nothing moves.
@@ -71,19 +75,19 @@ class MeanCorrection:
         """Return the size in `tuple_array` after the correction; its first `n_required` tuples are the size below.
 
         Raises:
-            MCTuplesConstructionError: If a fine lane holds 2 tuples after the correction, which the rules rule out
-                unless the size already had such a fine lane.
+            MCTuplesConstructionError: If a fine lane holds 2 tuples after the correction, which the correction's
+                rules prevent unless the size already had such a fine lane.
         """
         required, new = tuple_array[:n_required], tuple_array[n_required:]
         u = AxisMeanCorrection.of(required[:, 0], new[:, 0])
         v = AxisMeanCorrection.of(required[:, 1], new[:, 1])
-        corrected = np.vstack([required, np.column_stack([u.new_values, v.new_values])])
-        for axis, values in (("u", corrected[:, 0]), ("v", corrected[:, 1])):
+        corrected_tuple_array = np.vstack([required, np.column_stack([u.corrected_new_values, v.corrected_new_values])])
+        for axis, values in (("u", corrected_tuple_array[:, 0]), ("v", corrected_tuple_array[:, 1])):
             if np.bincount(fine_lanes_of(values)).max() > 1:
                 raise MCTuplesConstructionError(
                     f"Size {tuple_array.shape[0]}: after the mean correction, a fine {axis}-lane holds 2 tuples."
                 )
-        return cls(u=u, v=v, tuple_array=corrected)
+        return cls(u=u, v=v, tuple_array=corrected_tuple_array)
 
 
 # ==================================================================================================
@@ -95,7 +99,7 @@ class AxisMeanCorrection:
 
     Attributes:
         cap: The cap D, as a distance on the axis.
-        new_values: The new tuples' values after the correction, in their original order.
+        corrected_new_values: The new tuples' values after the correction, in their original order.
         offset_before_fine_lanes: The offset of the size's mean from 0.5 before the correction, in fine lanes.
         offset_after_fine_lanes: The same after the correction; apart from rounding, it is 0 unless the correction
             could not reach 0.5.
@@ -103,7 +107,7 @@ class AxisMeanCorrection:
     """
 
     cap: float
-    new_values: np.ndarray
+    corrected_new_values: np.ndarray
     offset_before_fine_lanes: float
     offset_after_fine_lanes: float
     max_move_fine_lanes: float
@@ -140,7 +144,8 @@ class AxisMeanCorrection:
                     lane_right_edge = (math.floor(sorted_values[i - 1] * N_FINE_LANES) + 1) * FINE_LANE_WIDTH
                     moved[i] = min(value, lane_right_edge + cap)
                 elif value - sorted_values[i - 1] <= FINE_LANE_WIDTH:
-                    # Stay, until the left neighbor has moved so far that the tuple has to follow it at 1 fine lane.
+                    # Stay, until the left neighbor has moved so far that the tuple has to follow it at a distance of
+                    # 1 fine lane.
                     moved[i] = min(value, moved[i - 1] + FINE_LANE_WIDTH)
                 else:
                     # Follow the left neighbor and keep the gap, capped at 1 fine lane plus D; the new value is
@@ -189,11 +194,11 @@ class AxisMeanCorrection:
         is_shift_left = bool(new_values.mean() > target_mean_of_new)
         moved_values_of_cap = cls._moved_values_of_cap(required_values, new_values, is_shift_left)
         cap = cls._solve_cap(moved_values_of_cap, target_mean_of_new)
-        corrected = moved_values_of_cap(cap)
+        corrected_new_values = moved_values_of_cap(cap)
         return cls(
             cap=cap,
-            new_values=corrected,
+            corrected_new_values=corrected_new_values,
             offset_before_fine_lanes=cls._offset_fine_lanes(new_values, target_mean_of_new, size),
-            offset_after_fine_lanes=cls._offset_fine_lanes(corrected, target_mean_of_new, size),
-            max_move_fine_lanes=float(np.abs(corrected - new_values).max() * N_FINE_LANES),
+            offset_after_fine_lanes=cls._offset_fine_lanes(corrected_new_values, target_mean_of_new, size),
+            max_move_fine_lanes=float(np.abs(corrected_new_values - new_values).max() * N_FINE_LANES),
         )

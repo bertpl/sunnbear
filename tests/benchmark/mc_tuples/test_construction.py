@@ -10,6 +10,7 @@ from sunnbear._core.benchmark.mc_tuples import (
     MCTuplesGenerator,
     MCTuplesSize,
     MCTuplesSizeResult,
+    fine_lanes_of,
     generate_mc_tuples,
 )
 from sunnbear._core.benchmark.mc_tuples.construction_solve import MCTuplesSizeSolve
@@ -19,7 +20,7 @@ def _spread_each_gap_s_new_tuples(self: MCTuplesSizeSolve, t_budget_sec: float) 
     """Replace `MCTuplesSizeSolve.run`: spread each gap's new tuples evenly over its fine lanes, pair u and v at random,
     and return them without running max-div."""
     new_values = []
-    for allocation in (self.u_allocation, self.v_allocation):
+    for allocation in (self.gap_allocation.u, self.gap_allocation.v):
         values = []
         for gap, count in enumerate(allocation.counts):
             lanes = np.flatnonzero(allocation.gap_of_fine_lane == gap)
@@ -36,7 +37,7 @@ def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]
         assert result.tuples.tuple_array.tolist() == size_tuples.tuple_array.tolist()
         assert size_tuples.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
         for values in (size_tuples.u, size_tuples.v):
-            assert np.bincount(np.floor(values * N_FINE_LANES).astype(np.int64)).max() == 1
+            assert np.bincount(fine_lanes_of(values)).max() == 1
 
 
 # ==================================================================================================
@@ -81,8 +82,8 @@ def test_generate_mc_tuples_corrects_each_size_and_builds_the_next_on_it(monkeyp
     assert tuples.size == 128
     assert [int(result.size) for result in results] == [32, 64, 128]
     _assert_valid_nested_set(tuples, results)
-    assert results[0].u_allocation.mean_aware_offset_fine_lanes is None
-    assert results[1].u_allocation.mean_aware_offset_fine_lanes is not None
+    assert results[0].gap_allocation.u.mean_aware_offset_fine_lanes is None
+    assert results[1].gap_allocation.u.mean_aware_offset_fine_lanes is not None
 
 
 def test_generate_mc_tuples_without_a_callback_returns_the_largest_size(monkeypatch):
@@ -147,8 +148,8 @@ def test_n_workers_for_scales_the_workers_down_below_60_s(t_total_sec, n_workers
 def test_t_budget_per_solve_sec_gives_each_solve_1_percent_and_splits_the_rest_by_work(
     t_total_sec, max_size, n_population
 ):
-    """Each size's solve gets 1 % of the total; the rest goes by candidates, the population and the size below, times
-    the size."""
+    """Each size's solve gets 1 % of the total, plus a part of the rest in proportion to its size times its number of
+    candidates, which is the population plus the tuples of the size below."""
     # --- act --------------------------
     budgets = MCTuplesGenerator(n_population=n_population).t_budget_per_solve_sec(t_total_sec, max_size)
 

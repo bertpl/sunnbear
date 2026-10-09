@@ -4,14 +4,15 @@ tuples to them so that the predicted mean lies close to 0.5."""
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES
+from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, fine_lanes_of
 from sunnbear._core.benchmark.mc_tuples.construction_allocation import AxisGapAllocation, AxisGaps
 
-# Old tuples in fine lanes 3, 10 and 11: a left edge gap [0, 3), an interior gap [4, 10), no gap between 10 and 11,
-# and a right edge gap [12, 1024).
+# The tuples of the size below lie in fine lanes 3, 10 and 11, which leaves a left edge gap [0, 3), an interior gap
+# [4, 10), no gap between 10 and 11, and a right edge gap [12, 1024).
 _VALUES = np.array([3.5, 10.25, 11.5]) / N_FINE_LANES
 
-# Spreading 32 old tuples from the first fine lane to the last leaves 31 gaps for 32 new tuples, so 1 gap gets 2.
+# Spreading the 32 tuples of the size below from the first fine lane to the last leaves 31 gaps for 32 new tuples,
+# so 1 gap gets 2.
 _SPREAD_VALUES = (np.round(np.linspace(0, N_FINE_LANES - 1, 32)) + 0.5) / N_FINE_LANES
 
 
@@ -25,7 +26,7 @@ def test_of_finds_the_gaps_with_their_widths_edges_and_bounds():
 
     # --- assert -----------------------
     assert gaps.first_lanes.tolist() == [0, 4, 12]
-    assert gaps.n_free.tolist() == [3, 6, 1012]
+    assert gaps.n_free_lanes.tolist() == [3, 6, 1012]
     assert gaps.widths.tolist() == [3.0, 7.0, 1012.0]
     assert gaps.is_left_edge.tolist() == [True, False, False]
     assert gaps.is_right_edge.tolist() == [False, False, True]
@@ -36,7 +37,7 @@ def test_of_finds_the_gaps_with_their_widths_edges_and_bounds():
 
 
 def test_of_leaves_out_an_edge_gap_when_an_old_tuple_lies_in_the_outermost_fine_lane():
-    """An old tuple in fine lane 0 leaves no left edge gap."""
+    """A tuple of the size below in fine lane 0 leaves no left edge gap."""
     # --- act --------------------------
     gaps = AxisGaps.of(np.array([0.5, 500.5]) / N_FINE_LANES)
 
@@ -93,10 +94,10 @@ def test_greedy_counts_give_a_gap_at_most_1_new_tuple_per_free_fine_lane():
     gaps = AxisGaps.of(np.array([3.5, 1020.5]) / N_FINE_LANES)
 
     # --- act --------------------------
-    counts = gaps.greedy_counts(int(gaps.n_free.sum()))
+    counts = gaps.greedy_counts(int(gaps.n_free_lanes.sum()))
 
     # --- assert -----------------------
-    assert counts.tolist() == gaps.n_free.tolist()
+    assert counts.tolist() == gaps.n_free_lanes.tolist()
 
 
 def test_mean_aware_counts_move_the_extra_tuple_to_the_middle_gap_without_lowering_the_smallest_spacing():
@@ -131,7 +132,7 @@ def test_mean_aware_counts_keep_every_spacing_at_or_above_the_min_allowed_spacin
 
     # --- assert -----------------------
     assert counts.sum() == 128
-    assert np.all(counts <= gaps.n_free)
+    assert np.all(counts <= gaps.n_free_lanes)
     assert gaps.spacings(counts).min() >= 0.9 * gaps.spacings(greedy_counts).min()
     assert abs(gaps.predicted_offset_fine_lanes(counts)) <= abs(gaps.predicted_offset_fine_lanes(greedy_counts))
 
@@ -140,7 +141,7 @@ def test_mean_aware_counts_keep_every_spacing_at_or_above_the_min_allowed_spacin
 #  AxisGapAllocation
 # ==================================================================================================
 def test_allocation_without_a_size_below_is_1_gap_of_all_fine_lanes():
-    """The smallest size has no old tuples, so every fine lane belongs to 1 gap that gets every new tuple."""
+    """The smallest size has no size below, so every fine lane belongs to 1 gap that gets every new tuple."""
     # --- act --------------------------
     allocation = AxisGapAllocation.of(np.zeros(0), 32, epsilon=0.1)
 
@@ -157,7 +158,7 @@ def test_allocation_numbers_the_gaps_with_new_tuples_and_leaves_the_others_out()
     allocation = AxisGapAllocation.of(_SPREAD_VALUES, 32, epsilon=0.1)
 
     # --- assert -----------------------
-    occupied = np.floor(_SPREAD_VALUES * N_FINE_LANES).astype(np.int64)
+    occupied = fine_lanes_of(_SPREAD_VALUES)
     assert np.all(allocation.gap_of_fine_lane[occupied] == -1)
     assert allocation.counts.sum() == 32
     assert allocation.greedy_offset_fine_lanes == pytest.approx(-7.734375)

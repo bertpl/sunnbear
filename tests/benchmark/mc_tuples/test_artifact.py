@@ -9,6 +9,7 @@ from sunnbear._core.benchmark.mc_tuples import (
     MCTuples,
     MCTuplesDeclaration,
     MCTuplesSize,
+    fine_lanes_of,
     load_mc_tuples,
 )
 
@@ -56,7 +57,7 @@ def test_each_shipped_size_has_means_of_0_5_and_at_most_1_tuple_per_fine_lane(si
     # --- assert -----------------------
     assert tuples.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
     for values in (tuples.u, tuples.v):
-        assert np.bincount(np.floor(values * N_FINE_LANES).astype(np.int64)).max() == 1
+        assert np.bincount(fine_lanes_of(values)).max() == 1
 
 
 def test_the_largest_shipped_size_holds_exactly_1_tuple_per_fine_lane():
@@ -66,10 +67,7 @@ def test_the_largest_shipped_size_holds_exactly_1_tuple_per_fine_lane():
 
     # --- assert -----------------------
     for values in (tuples.u, tuples.v):
-        assert (
-            np.bincount(np.floor(values * N_FINE_LANES).astype(np.int64), minlength=N_FINE_LANES).tolist()
-            == [1] * N_FINE_LANES
-        )
+        assert np.bincount(fine_lanes_of(values), minlength=N_FINE_LANES).tolist() == [1] * N_FINE_LANES
 
 
 def test_load_mc_tuples_rejects_an_unsupported_size():

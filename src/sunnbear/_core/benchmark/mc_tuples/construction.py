@@ -1,4 +1,4 @@
-"""`generate_mc_tuples` constructs a nested set of (u, v) tuples whose means are exactly 0.5 at every size.
+"""`generate_mc_tuples` constructs a nested set of (u, v) tuples and corrects every size's means to 0.5.
 
 The construction builds the sizes bottom-up, the smallest first, and each larger size includes the size below it, so
 every size is a prefix of the next. Each axis is cut into `N_FINE_LANES` fine lanes, and no 2 tuples of the set share
@@ -14,7 +14,7 @@ a fine lane, so the largest size holds exactly 1 tuple per fine lane on each axi
 4. the mean correction moves the new tuples so that the size's mean u and mean v are exactly 0.5
    (`construction_correction`).
 
-`MCTuplesGenerator` passes each size's result (`construction_results`) to the caller's `on_size_finished`, so that a
+`MCTuplesGenerator` passes each size's result (`construction_result`) to the caller's `on_size_finished`, so that a
 long construction can show its progress and store its tuples and max-div's solutions as it goes.
 """
 
@@ -24,10 +24,10 @@ from typing import ClassVar
 
 import numpy as np
 
-from .construction_allocation import AxisGapAllocation
+from .construction_allocation import GapAllocation
 from .construction_correction import MeanCorrection
 from .construction_population import MCTuplesPopulation
-from .construction_results import MCTuplesSizeResult
+from .construction_result import MCTuplesSizeResult
 from .construction_solve import MCTuplesSizeSolve, MCTuplesSolveSettings
 from .sizes import MCTuplesSize
 from .tuples import MCTuples
@@ -39,22 +39,14 @@ from .tuples import MCTuples
 class MCTuplesGenerator:
     """`MCTuplesGenerator` builds the nested tuple set size by size, 1 max-div solve per size, and reports every size.
 
-    The total time of a construction is split over its solves: the solve of each size gets
-    `MIN_T_BUDGET_FRACTION_PER_SOLVE` of the total, so the solves of the smallest sizes, whose share of the work is
-    tiny, still get time to run; the rest is split in proportion to `n · k`, the solve's number of candidates times
-    the size, a measure of the solve's work.
-
-    From `MIN_T_TOTAL_AT_FULL_SCALE_SEC` up, every solve uses all `n_workers` workers; below
-    `MIN_T_TOTAL_AT_FULL_SCALE_SEC`, the worker count scales down with the total time, so that a short run, such as a
-    test, does not spend its time starting workers.
-
     Attributes:
         n_workers: The number of max-div workers per solve when the total time is `MIN_T_TOTAL_AT_FULL_SCALE_SEC` or
             more; more workers search from more seeds, and may exceed the number of cores.
         seed: The seed of every random draw and of every max-div solve.
-        n_population: The number of candidate tuples that each size's population holds.
-        allocation_epsilon: The share of the greedy allocation's smallest spacing that the mean-aware allocation may
-            give up to bring the predicted mean closer to 0.5 (`AxisGaps.mean_aware_counts`).
+        n_population: The number of candidate tuples in each size's population.
+        allocation_epsilon: The share in [0, 1) by which the allocation of new tuples to the gaps may shrink the
+            smallest distance between neighboring values on an axis, to bring the predicted mean closer to 0.5
+            (`AxisGaps.mean_aware_counts`).
         on_size_finished: Called with each size's result as soon as the size, its mean correction included, ends;
             None reports nothing.
     """
@@ -95,9 +87,8 @@ class MCTuplesGenerator:
     def generate(self, t_total_sec: float, max_size: MCTuplesSize = MCTuplesSize.SIZE_1024) -> MCTuples:
         """Construct the nested set up to `max_size` in about `t_total_sec` s; size `k` is its first `k` tuples.
 
-        `t_total_sec` covers only the solves; drawing the populations, allocating the gaps, correcting the means and
-        the first numba compilation take extra time. A rerun gives a set of equivalent quality, not the same set,
-        because max-div's parallel solver runs on a wall-clock budget.
+        `generate_mc_tuples`, the public form of this method, documents the construction's extra time beyond
+        `t_total_sec` and why a rerun gives a different set.
 
         Args:
             t_total_sec: The total wall-clock time of the solves, at least `MIN_T_TOTAL_SEC`.
@@ -110,7 +101,9 @@ class MCTuplesGenerator:
                 `t_total_sec` is too short for max-div to meet them.
         """
         t_budget_per_solve_sec = self.t_budget_per_solve_sec(t_total_sec, max_size)
-        settings = MCTuplesSolveSettings.for_seed(self.n_workers_for(t_total_sec), self.seed)
+        settings = MCTuplesSolveSettings(
+            n_workers=self.n_workers_for(t_total_sec), seed=self.seed, rng=np.random.default_rng(self.seed)
+        )
         tuples: MCTuples | None = None
         for size in MCTuplesSize.up_to(max_size):
             result = self._build_size(size, tuples, t_budget_per_solve_sec[size], settings)
@@ -124,15 +117,21 @@ class MCTuplesGenerator:
     #  Workers and time per solve
     # --------------------------------------------------------------------------
     def n_workers_for(self, t_total_sec: float) -> int:
-        """Return the worker count of a run of `t_total_sec`."""
+        """Return the worker count of a run of `t_total_sec`.
+
+        From `MIN_T_TOTAL_AT_FULL_SCALE_SEC` up, the count is `n_workers`; below it, the count scales down in
+        proportion to `t_total_sec`, to at least 1, so that a short run, such as a test, does not spend its time
+        starting workers.
+        """
         scale = min(1.0, t_total_sec / self.MIN_T_TOTAL_AT_FULL_SCALE_SEC)
         return max(1, round(scale * self.n_workers))
 
     def t_budget_per_solve_sec(self, t_total_sec: float, max_size: MCTuplesSize) -> dict[MCTuplesSize, float]:
         """Return the wall-clock budget of every size's solve in a run of `t_total_sec` up to `max_size`.
 
-        Each solve gets `MIN_T_BUDGET_FRACTION_PER_SOLVE` of the total, and the rest is split in proportion to the
-        solve's number of candidates, its population plus the tuples of the size below, times the size.
+        Each solve gets `MIN_T_BUDGET_FRACTION_PER_SOLVE` of the total, so the solves of the smallest sizes, whose
+        share of the work is tiny, still get time to run; the rest is split in proportion to the size times the
+        solve's number of candidates, which is its population plus the tuples of the size below.
 
         Raises:
             ValueError: If `t_total_sec` is below `MIN_T_TOTAL_SEC`, or `max_size` is not 1 of `MCTuplesSize`.
@@ -152,24 +151,25 @@ class MCTuplesGenerator:
     #  Helpers
     # --------------------------------------------------------------------------
     def _build_size(
-        self, size: MCTuplesSize, tuples_below: MCTuples | None, t_budget_sec: float, settings: MCTuplesSolveSettings
+        self, size: MCTuplesSize, required_tuples: MCTuples | None, t_budget_sec: float, settings: MCTuplesSolveSettings
     ) -> MCTuplesSizeResult:
-        """Build `size` on `tuples_below`, the size below's tuples or None for the smallest size, and return it."""
+        """Build `size` on `required_tuples` and return it.
+
+        `required_tuples` holds the size below's tuples after their mean correction, or None for the smallest size.
+        """
         t_start = time.perf_counter()
-        required_tuple_array = tuples_below.tuple_array if tuples_below is not None else np.zeros((0, 2))
+        required_tuple_array = required_tuples.tuple_array if required_tuples is not None else np.zeros((0, 2))
         n_new = size - size.n_required
         population = MCTuplesPopulation.draw_in_free_lanes(self.n_population, required_tuple_array, settings.rng)
-        u_allocation = AxisGapAllocation.of(required_tuple_array[:, 0], n_new, self.allocation_epsilon)
-        v_allocation = AxisGapAllocation.of(required_tuple_array[:, 1], n_new, self.allocation_epsilon)
-        solve = MCTuplesSizeSolve(population, required_tuple_array, size, u_allocation, v_allocation, settings)
+        gap_allocation = GapAllocation.of(required_tuple_array, n_new, self.allocation_epsilon)
+        solve = MCTuplesSizeSolve(population, required_tuple_array, size, gap_allocation, settings)
         new_tuple_array, solution = solve.run(t_budget_sec)
         uncorrected_tuple_array = np.vstack([required_tuple_array, new_tuple_array])
         return MCTuplesSizeResult(
             size=size,
             t_budget_sec=t_budget_sec,
             t_wall_sec=time.perf_counter() - t_start,
-            u_allocation=u_allocation,
-            v_allocation=v_allocation,
+            gap_allocation=gap_allocation,
             uncorrected_tuple_array=uncorrected_tuple_array,
             mean_correction=MeanCorrection.of(uncorrected_tuple_array, size.n_required),
             solution=solution,
@@ -191,18 +191,21 @@ def generate_mc_tuples(
 ) -> MCTuples:
     """Construct a nested Monte Carlo (u, v) tuple set up to `max_size` in about `t_total_sec` s.
 
-    Size `k` of the set is its first `k` tuples, and every size's mean u and mean v are exactly 0.5. Each axis is cut
-    into as many equal fine lanes as the largest `MCTuplesSize` holds tuples, and no 2 tuples share a fine lane, so the
-    largest size holds exactly 1 tuple per fine lane on each axis.
+    Size `k` of the set is its first `k` tuples, and every size's mean u and mean v are 0.5 up to rounding, unless the
+    mean correction cannot reach 0.5. Each axis is cut into as many equal fine lanes as the largest `MCTuplesSize`
+    holds tuples, and no 2 tuples share a fine lane, so the largest size holds exactly 1 tuple per fine lane on each
+    axis.
 
     Each size's new tuples come from 1 max-div solve over a random population of `n_population` candidate tuples; the
-    solve maximizes the geomean of gpq(0.1), a soft minimum that `MCTuplesStats` reports, of each tuple's distance to
-    its nearest other tuple along u, along v and in squared L2. A correction then moves the new tuples to bring the
-    size's means to 0.5.
+    solve maximizes the geomean of 3 values of gpq(0.1), the geometric pseudo-quantile at level 0.1, a soft minimum
+    that `MCTuplesStats` reports: one over each tuple's distance to its nearest other tuple along u, one along v and
+    one in squared L2.
+
+    A correction then moves the new tuples to bring the size's means to 0.5.
 
     The construction splits `t_total_sec` over its solves: each size's solve gets 1 % of the total, plus a part of the
-    rest in proportion to its number of candidate tuples, the population plus the tuples of the size below, times its
-    size.
+    rest in proportion to its size times its number of candidate tuples, which is the population plus the tuples of
+    the size below.
 
     From 60 s up, every solve uses all `n_workers` workers; below 60 s, the worker count scales down with the time, so
     that a short run does not spend its time starting workers.

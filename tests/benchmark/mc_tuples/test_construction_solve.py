@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructionError, MCTuplesSize
-from sunnbear._core.benchmark.mc_tuples.construction_allocation import AxisGapAllocation
+from sunnbear._core.benchmark.mc_tuples.construction_allocation import GapAllocation
 from sunnbear._core.benchmark.mc_tuples.construction_population import MCTuplesPopulation
 from sunnbear._core.benchmark.mc_tuples.construction_solve import (
     INCLUSION_CONSTRAINT_WEIGHT,
@@ -12,7 +12,7 @@ from sunnbear._core.benchmark.mc_tuples.construction_solve import (
     MCTuplesSolveSettings,
 )
 
-# A size 32 spread from the first fine lane to the last: u rises, v falls.
+# The 32 tuples of the smallest size spread from the first fine lane to the last, with u rising and v falling.
 _LANES_32 = np.round(np.linspace(0, N_FINE_LANES - 1, 32)).astype(np.int64)
 _SIZE_32 = np.column_stack([_LANES_32 + 0.5, _LANES_32[::-1] + 0.25]) / N_FINE_LANES
 
@@ -26,8 +26,7 @@ def _solve(size: MCTuplesSize, required_tuple_array: np.ndarray, n_population: i
         population,
         required_tuple_array,
         size,
-        AxisGapAllocation.of(required_tuple_array[:, 0], n_new, epsilon=0.1),
-        AxisGapAllocation.of(required_tuple_array[:, 1], n_new, epsilon=0.1),
+        GapAllocation.of(required_tuple_array, n_new, epsilon=0.1),
         MCTuplesSolveSettings(n_workers=1, seed=42, rng=rng),
     )
 
@@ -59,9 +58,9 @@ def test_constraints_hold_each_gap_s_count_1_per_fine_lane_in_a_gap_of_several_a
     constraints = solve._constraints()
 
     # --- assert -----------------------
-    n_gaps = solve.u_allocation.counts.size + solve.v_allocation.counts.size
-    gap_constraints = constraints[: solve.u_allocation.counts.size]
-    assert sorted(c.min_count for c in gap_constraints) == sorted(solve.u_allocation.counts.tolist())
+    n_gaps = solve.gap_allocation.u.counts.size + solve.gap_allocation.v.counts.size
+    gap_constraints = constraints[: solve.gap_allocation.u.counts.size]
+    assert sorted(c.min_count for c in gap_constraints) == sorted(solve.gap_allocation.u.counts.tolist())
     assert all(c.min_count == c.max_count for c in gap_constraints)
     fine_lane_constraints = [c for c in constraints[:-1] if c.min_count == 0]
     assert len(fine_lane_constraints) == len(constraints) - 1 - n_gaps
@@ -73,8 +72,8 @@ def test_constraints_hold_each_gap_s_count_1_per_fine_lane_in_a_gap_of_several_a
 
 
 def test_constraints_leave_out_the_fine_lanes_when_every_gap_takes_at_most_1():
-    """Old tuples every 32 fine lanes from lane 16 leave 33 gaps for 32 new tuples, so no gap takes 2 and no fine lane
-    needs a constraint of its own."""
+    """Tuples of the size below every 32 fine lanes from lane 16 leave 33 gaps for 32 new tuples, so no gap takes 2
+    and no fine lane needs a constraint of its own."""
     # --- arrange ----------------------
     lanes = 16 + 32 * np.arange(32)
     solve = _solve(MCTuplesSize.SIZE_64, np.column_stack([lanes + 0.5, lanes + 0.5]) / N_FINE_LANES, n_population=8192)
@@ -83,12 +82,13 @@ def test_constraints_leave_out_the_fine_lanes_when_every_gap_takes_at_most_1():
     constraints = solve._constraints()
 
     # --- assert -----------------------
-    assert solve.u_allocation.counts.max() == solve.v_allocation.counts.max() == 1
-    assert len(constraints) == solve.u_allocation.counts.size + solve.v_allocation.counts.size + 1
+    assert solve.gap_allocation.u.counts.max() == solve.gap_allocation.v.counts.max() == 1
+    assert len(constraints) == solve.gap_allocation.u.counts.size + solve.gap_allocation.v.counts.size + 1
 
 
 def test_constraints_of_the_smallest_size_hold_its_1_gap_s_count_and_1_tuple_per_fine_lane():
-    """Size 32 is 1 gap of 32 new tuples per axis, so every fine lane gets an at-most-1 constraint; no inclusion."""
+    """Size 32 is 1 gap of 32 new tuples per axis, so every fine lane gets an at-most-1 constraint; with no size
+    below, there is no inclusion constraint."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=4096)
 
@@ -120,7 +120,7 @@ def test_the_random_starting_selection_holds_the_new_tuples_in_distinct_fine_lan
 
 
 def test_the_random_starting_selection_needs_as_many_pairable_fine_lanes_as_new_tuples():
-    """A population of 10 candidates cannot seat 32 new tuples in distinct fine lanes, which raises an error."""
+    """A population of 10 candidates cannot place 32 new tuples in distinct fine lanes, which raises an error."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=10)
 

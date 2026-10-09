@@ -8,9 +8,12 @@ v-lane. A size's population is drawn over the fine lanes that the size below lea
   `n_cells` the number of free fine cells.
 
 Every free fine cell first gets `n // n_cells` candidates. Which cells get 1 of the remaining `n % n_cells` is drawn at
-random under both guarantees: a round-robin pattern fills the free u-lanes one after the other, each continuing
-cyclically over the free v-lanes where the previous one stopped, and curveball trades then randomize that pattern;
-each trade picks 2 free u-lanes and reshuffles between them the v-lanes where exactly 1 of the 2 holds a candidate.
+random under both guarantees, in 2 steps:
+
+1. a round-robin pattern fills the free u-lanes one after the other, each continuing cyclically over the free v-lanes
+   where the previous one stopped;
+2. curveball trades randomize that pattern; each trade picks 2 free u-lanes and reshuffles between them the v-lanes
+   where exactly 1 of the 2 holds a candidate.
 
 Each candidate lies at its own uniform random position inside its fine cell.
 """
@@ -21,7 +24,8 @@ import numpy as np
 
 from .sizes import N_FINE_LANES, fine_lanes_of
 
-# Curveball trades per free fine u-lane: each trade involves 2 lanes, so every lane takes part in about twice this many.
+# The number of curveball trades per free fine u-lane; each trade involves 2 lanes, so every lane takes part in about
+# twice this many.
 N_CURVEBALL_TRADES_PER_LANE = 100
 
 
@@ -86,11 +90,11 @@ class MCTuplesPopulation:
             row_a, row_b = is_occupied[row_a_index], is_occupied[row_b_index]
             differing = np.flatnonzero(row_a ^ row_b)
             n_in_a = int(row_a[differing].sum())
-            dealt = rng.permutation(differing)
+            shuffled_columns = rng.permutation(differing)
             row_a[differing] = False
             row_b[differing] = False
-            row_a[dealt[:n_in_a]] = True
-            row_b[dealt[n_in_a:]] = True
+            row_a[shuffled_columns[:n_in_a]] = True
+            row_b[shuffled_columns[n_in_a:]] = True
 
     @staticmethod
     def _positions_in_lane(n: int, rng: np.random.Generator) -> np.ndarray:

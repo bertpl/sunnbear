@@ -4,7 +4,7 @@ in 1 fine lane."""
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructionError
+from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructionError, fine_lanes_of
 from sunnbear._core.benchmark.mc_tuples.construction_correction import CAP_RANGE, AxisMeanCorrection, MeanCorrection
 
 
@@ -30,10 +30,10 @@ def test_the_correction_keeps_the_fine_lanes_the_order_and_the_old_tuples_and_mo
     correction = AxisMeanCorrection.of(required, new)
 
     # --- assert -----------------------
-    all_after = np.concatenate([required, correction.new_values])
-    assert np.bincount(np.floor(all_after * N_FINE_LANES).astype(np.int64)).max() == 1
+    all_after = np.concatenate([required, correction.corrected_new_values])
+    assert np.bincount(fine_lanes_of(all_after)).max() == 1
     assert np.array_equal(np.argsort(np.concatenate([required, new])), np.argsort(all_after))
-    moves = correction.new_values - new
+    moves = correction.corrected_new_values - new
     assert np.all(moves <= 0) or np.all(moves >= 0)
     assert np.all((all_after > 0) & (all_after < 1))
     if correction.cap > CAP_RANGE[0] * 1.001:
@@ -42,8 +42,9 @@ def test_the_correction_keeps_the_fine_lanes_the_order_and_the_old_tuples_and_mo
 
 
 def test_the_correction_takes_the_shift_from_the_largest_gaps():
-    """With new tuples 0.3 and 0.4 behind an old tuple at 0.1, the mean 0.5 asks for a left shift that the cap takes
-    from the wider gap: the tuple at 0.4 keeps its distance to 0.3 unless that exceeds the cap."""
+    """With new tuples at 0.3 and 0.75 above an old tuple at 0.1, a mean of 0.5 needs a left shift, and the cap
+    shortens the wider gap first: the tuple at 0.75 moves to 0.7, and the tuple at 0.3, whose gap to 0.1 lies below
+    the cap, stays."""
     # --- arrange ----------------------
     required, new = np.array([0.1, 0.9]), np.array([0.3, 0.75])
 
@@ -51,22 +52,22 @@ def test_the_correction_takes_the_shift_from_the_largest_gaps():
     correction = AxisMeanCorrection.of(required, new)
 
     # --- assert -----------------------
-    assert np.concatenate([required, correction.new_values]).mean() == pytest.approx(0.5)
+    assert np.concatenate([required, correction.corrected_new_values]).mean() == pytest.approx(0.5)
     assert correction.offset_before_fine_lanes == pytest.approx((0.1 + 0.9 + 0.3 + 0.75) / 4 * N_FINE_LANES - 512)
-    assert correction.new_values[0] == pytest.approx(0.3)  # its gap to 0.1 lies below the cap
+    assert correction.corrected_new_values[0] == pytest.approx(0.3)  # its gap to 0.1 lies below the cap
     assert correction.max_move_fine_lanes == pytest.approx(0.05 * N_FINE_LANES)
 
 
 def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_the_rest():
-    """A new tuple at 0.95 above an old one at 0.9 cannot reach 0.1, the value that the mean 0.5 asks for: it stops just
-    above the old tuple's fine lane, and the remaining offset shows."""
+    """A new tuple at 0.95 above an old one at 0.9 cannot reach 0.1, the value that a mean of 0.5 needs: it stops just
+    above the old tuple's fine lane, and the correction reports the offset that remains."""
     # --- act --------------------------
     correction = AxisMeanCorrection.of(np.array([0.9]), np.array([0.95]))
 
     # --- assert -----------------------
     lane_above_old = (np.floor(0.9 * N_FINE_LANES) + 1) / N_FINE_LANES
     assert correction.cap == pytest.approx(CAP_RANGE[0])
-    assert correction.new_values[0] == pytest.approx(lane_above_old)
+    assert correction.corrected_new_values[0] == pytest.approx(lane_above_old)
     assert correction.offset_after_fine_lanes == pytest.approx((0.9 + lane_above_old) / 2 * N_FINE_LANES - 512)
 
 
@@ -81,8 +82,8 @@ def test_mean_correction_corrects_both_axes_of_a_size():
     # --- assert -----------------------
     assert correction.tuple_array[:2].tolist() == tuple_array[:2].tolist()
     assert correction.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5])
-    assert correction.u.new_values.tolist() == correction.tuple_array[2:, 0].tolist()
-    assert correction.v.new_values.tolist() == correction.tuple_array[2:, 1].tolist()
+    assert correction.u.corrected_new_values.tolist() == correction.tuple_array[2:, 0].tolist()
+    assert correction.v.corrected_new_values.tolist() == correction.tuple_array[2:, 1].tolist()
 
 
 def test_mean_correction_refuses_a_size_that_holds_2_tuples_in_1_fine_lane():

@@ -18,11 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add the Pegasus solver, `sunnbear.solvers.Pegasus`
 - Add the Anderson-Björck solver, `sunnbear.solvers.AndersonBjorck`
 - Add the Secant solver, `sunnbear.solvers.Secant`
-- Add to `MCTuplesStats` gpq(0.1) spread statistics and a `score` property that combines them
+- Add gpq(0.1) spread statistics and a `score` property that combines them to `MCTuplesStats`
 
 ### Changed
 
-- **Breaking:** Change the signature of `generate_mc_tuples`, and make every size's mean u and mean v of the tuple sets it builds exactly 0.5
+- **Breaking:** Change the signature of `generate_mc_tuples`, and give every size of the tuple sets that it builds a mean u and a mean v of exactly 0.5
 - Rebuild the shipped Monte Carlo tuple set; benchmark results on it differ from those on the previous set
 - Require max-div ≥ 0.21.1
 
