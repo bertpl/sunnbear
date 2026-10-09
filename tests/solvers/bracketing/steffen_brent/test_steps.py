@@ -8,7 +8,7 @@ from sunnbear.solvers import SolveStatus, SteffenBrent
 from tests.solvers.example_functions import cubic
 
 
-def _steep_exponential(x: float) -> float:
+def _saturating_exponential(x: float) -> float:
     """Return ``1 - 11 * exp(-24 * x)``; its value stays close to 1 on most of ``[0, 1]``, and its root is
     ``ln(11) / 24``."""
     return 1.0 - 11.0 * math.exp(-24.0 * x)
@@ -43,7 +43,7 @@ def test_the_interval_does_not_always_halve():
     ``f(0.5)`` has the sign of ``f(s)``, so the interval keeps ``[0, s]``, 91 % of its width, and the next x-value
     lies below 0.5."""
     # --- act --------------------------
-    result = SteffenBrent().solve(_steep_exponential, 0.0, 1.0, xtol=1e-10, max_fevals=100, history_enabled=True)
+    result = SteffenBrent().solve(_saturating_exponential, 0.0, 1.0, xtol=1e-10, max_fevals=100, history_enabled=True)
 
     # --- assert -----------------------
     s, m, next_x = result.evaluated_x_values[2:5]
@@ -57,7 +57,7 @@ def test_equal_function_values_at_b_and_b_previous_force_a_bisection():
     ``|f|`` in ``b``, makes ``b`` equal ``b_previous`` in several iterations, where the secant of the paper's
     Algorithm 2 divides 0 by 0; `SteffenBrent` bisects there, and returns a root within ``xtol``."""
     # --- act --------------------------
-    result = SteffenBrent().solve(_steep_exponential, 0.0, 1.0, xtol=1e-10, max_fevals=100)
+    result = SteffenBrent().solve(_saturating_exponential, 0.0, 1.0, xtol=1e-10, max_fevals=100)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED

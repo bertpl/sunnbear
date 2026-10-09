@@ -26,12 +26,9 @@ def test_a_linear_function_is_solved_in_one_step(f):
 
 
 def test_the_first_2_steps_are_regula_falsi_and_the_third_scales_the_retained_f():
-    """On the convex cubic, `AndersonBjorck`:
-
-    - starts as regula falsi;
-    - scales the value of the bound that it keeps again by ``1 - f_new / f_previous``;
-    - drops the scaling once an iterate replaces that bound.
-    """
+    """On the convex cubic, `AndersonBjorck` starts as regula falsi, scales the value of the bound that it keeps for a
+    second step in a row by ``1 - f_new / f_previous``, and drops that scaling once an iterate replaces the scaled
+    bound."""
     # --- arrange ----------------------
     a, b = 1.0, 2.0
     fa, fb = cubic(a), cubic(b)

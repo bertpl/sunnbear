@@ -50,7 +50,7 @@ def test_the_total_evaluation_count_lies_within_1_1_percent_of_the_papers_table_
     """
     # --- arrange / act ----------------
     total = sum(
-        _TOMS748WithTol(k=k, n_digits=n_digits)
+        _TOMS748WithPaperTolerance(k=k, n_digits=n_digits)
         .solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100)
         .n_fevals
         for problem in AUTHORS_TEST_OUTPUT
@@ -63,8 +63,9 @@ def test_the_total_evaluation_count_lies_within_1_1_percent_of_the_papers_table_
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-class _TOMS748WithTol(TOMS748):
-    """`_TOMS748WithTol` is `TOMS748` with the paper's ``tol`` given directly, as the authors' driver gives it."""
+class _TOMS748WithPaperTolerance(TOMS748):
+    """`_TOMS748WithPaperTolerance` is `TOMS748` with the paper's ``tol`` given directly, as the authors' driver gives
+    it."""
 
     def __init__(self, *, k: int, n_digits: int | None) -> None:
         """Configure ``k`` and the fixed ``tol = 10^-n_digits``, or ``tol = 0`` for ``None``."""
