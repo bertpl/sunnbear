@@ -38,3 +38,6 @@ working_docs/*
 !working_docs/README.md
 # Throwaway scratch directory beside working_docs/, never tracked
 local/
+# Output of the scripts in scripts/; only script_outputs/README.md is committed.
+script_outputs/*
+!script_outputs/README.md
