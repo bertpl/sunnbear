@@ -3,21 +3,14 @@
 import pytest
 
 from sunnbear.solvers import CARF, SolveStatus
-from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic, ninth_power
+from tests.solvers.example_functions import CONVERGENCE_TEST_CASES
 
 
-@pytest.mark.parametrize(
-    "f, a, b, root",
-    [
-        (cubic, 1.0, 2.0, CUBIC_ROOT),
-        (decreasing_cubic, 1.0, 2.0, CUBIC_ROOT),
-        (ninth_power, -1.0, 4.0, 0.0),
-    ],
-    ids=["cubic", "decreasing_cubic", "ninth_power"],
-)
+@pytest.mark.parametrize("f, a, b, root", CONVERGENCE_TEST_CASES)
 def test_a_function_converges_to_its_root(f, a, b, root):
-    """On `cubic`, which increases, `decreasing_cubic`, which decreases, and `ninth_power` over ``[-1, 4]``, where the
-    multiple root makes `CARF` take power steps, `CARF` returns an x-value within ``xtol`` of the root."""
+    """`CARF` returns an x-value within ``xtol`` of the root on an increasing function (`cubic`), a decreasing
+    function (`decreasing_cubic`), and a function with a multiple root (`ninth_power` over ``[-1, 4]``); on
+    `ninth_power`, the multiple root makes `CARF` take power steps."""
     # --- act --------------------------
     result = CARF().solve(f, a, b, xtol=1e-10, max_fevals=200)
 

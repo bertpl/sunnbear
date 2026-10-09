@@ -1,4 +1,5 @@
-"""These tests assert that a twin's bookkeeping adds no counted flops to the solve that it runs."""
+"""These tests assert that a twin counts its function evaluations but not the arithmetic of the reference
+implementation that it runs."""
 
 from counted_float import FlopCounts
 
@@ -14,6 +15,6 @@ def test_the_twin_counts_evaluations_but_no_solver_arithmetic():
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert result.n_fevals > 2  # The count includes the 2 bound evaluations plus SciPy's own.
+    assert result.n_fevals > 2  # The count includes the 2 evaluations at the interval bounds plus SciPy's own.
     # SciPy runs on plain floats, so only the framework's own checks and bookkeeping are counted.
     assert result.flop_counts == FlopCounts(COMP=4, ADD=1, MUL=1)

@@ -5,8 +5,9 @@ from tests.solvers.example_functions import CUBIC_ROOT, cubic
 
 
 def test_a_convex_function_stalls_on_the_retained_bound_and_exhausts_the_budget():
-    """On `cubic`, the iterates of `RegulaFalsi` reach the root while the upper interval bound never moves, so the solve
-    uses up its budget and reports the last evaluated x-value."""
+    """On `cubic`, the iterates of `RegulaFalsi` approach the root while the upper interval bound never moves, so the
+    interval width never drops to ``2 * xtol``, and the solve uses up its budget and reports the last evaluated
+    x-value."""
     # --- act --------------------------
     result = RegulaFalsi().solve(cubic, 1.0, 2.0, xtol=1e-9, max_fevals=60, history_enabled=True)
 

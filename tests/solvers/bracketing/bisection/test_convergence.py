@@ -11,8 +11,8 @@ from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 @pytest.mark.parametrize("f", [cubic, decreasing_cubic])  # Exercises both interval orientations.
 @pytest.mark.parametrize("a, b, xtol", [(1.0, 2.0, 1e-3), (0.0, 4.0, 1e-8), (1.3, 1.4, 1e-12)])
 def test_converges_within_xtol_with_the_exact_evaluation_count(f, a, b, xtol):
-    """In both interval orientations, `Bisection` converges within ``xtol`` after the number of halvings that brings the
-    width to at most ``2 * xtol``, plus the 2 evaluations at the interval bounds."""
+    """In both interval orientations, `Bisection` converges within ``xtol`` after 1 evaluation per halving needed to
+    bring the width to at most ``2 * xtol``, plus the 2 evaluations at the interval bounds."""
     # --- arrange ----------------------
     n_steps_expected = math.ceil(math.log2((b - a) / (2.0 * xtol)))
     n_fevals_expected = n_steps_expected + 2

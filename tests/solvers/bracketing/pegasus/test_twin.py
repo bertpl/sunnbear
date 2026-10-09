@@ -10,6 +10,6 @@ from .mpmath_twin import PegasusMpmathTwin
 
 @pytest.mark.parametrize("test_case", PegasusMpmathTwin.comparable_test_cases(), ids=str)
 def test_pegasus_agrees_with_mpmath_pegasus(test_case):
-    """`Pegasus` evaluates the same points as mpmath's Pegasus method, on every shared twin test case."""
+    """`Pegasus` evaluates the same x-values as mpmath's Pegasus method, on the twin's comparable test cases."""
     # --- act / assert -----------------
     assert_agrees_with_twin(Pegasus(), PegasusMpmathTwin(), test_case)

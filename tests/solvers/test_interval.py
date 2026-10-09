@@ -151,4 +151,7 @@ def test_the_sign_checks_and_the_geometry_are_counted_on_counted_interval_bounds
 # ==================================================================================================
 def _orient_values_at_interval_bounds(cls: type[Interval], fa: float, fb: float) -> tuple[float, float]:
     """Return the values at the interval bounds as given for the increasing orientation, negated for decreasing."""
-    return (fa, fb) if cls is IncreasingInterval else (-fa, -fb)
+    if cls is IncreasingInterval:
+        return (fa, fb)
+    else:
+        return (-fa, -fb)

@@ -6,24 +6,19 @@ import itertools
 import pytest
 
 from sunnbear.solvers import Interval, Ridders, RiddersVariant, SolveStatus
-from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic, ninth_power
+from tests.solvers.example_functions import CONVERGENCE_TEST_CASES, cubic, ninth_power
 
 
 @pytest.mark.parametrize("variant", RiddersVariant)
-@pytest.mark.parametrize(
-    "f, a, b, root",
-    [
-        (cubic, 1.0, 2.0, CUBIC_ROOT),
-        (decreasing_cubic, 1.0, 2.0, CUBIC_ROOT),
-        (ninth_power, -1.0, 4.0, 0.0),
-    ],
-    ids=["cubic", "decreasing_cubic", "ninth_power"],
-)
-def test_a_function_converges_to_its_root(f, a, b, root, variant):
-    """On `cubic`, which increases, `decreasing_cubic`, which decreases, and `ninth_power` over ``[-1, 4]``, whose root
-    is a multiple root, every variant returns an x-value within ``xtol`` of the root, except the commons_math variant
-    on `ninth_power`: near the multiple root, 2 successive iterates lie within ``xtol`` long before the root does, as
-    on the kinked function of `test_special_cases.py`."""
+@pytest.mark.parametrize("f, a, b, root", CONVERGENCE_TEST_CASES)
+def test_a_function_converges_to_its_root_except_commons_math_on_a_multiple_root(f, a, b, root, variant):
+    """Every variant of `Ridders` returns an x-value within ``xtol`` of the root on an increasing function (`cubic`),
+    a decreasing function (`decreasing_cubic`), and a function with a multiple root (`ninth_power` over ``[-1, 4]``),
+    except the commons_math variant on `ninth_power`.
+
+    Near the multiple root of `ninth_power`, 2 successive iterates of the commons_math variant lie within ``xtol``
+    of each other while both are still far from the root, as on the kinked function of `test_special_cases.py`.
+    """
     # --- arrange ----------------------
     xtol = 1e-10
 

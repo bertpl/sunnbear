@@ -20,14 +20,15 @@ class TwinSolver(Solver):
 
     Where sunnbear's solver has a stopping criterion of its own, not `BracketingSolver`'s, the subclass also overrides
     `_root_if_sunnbear_solver_stops` with that criterion. Where the reference implementation stops by exactly that
-    criterion, the subclass lets it stop: `_root_if_sunnbear_solver_stops` returns ``None``, and `_run_reference`
+    criterion, the subclass lets the reference implementation stop: `_root_if_sunnbear_solver_stops` returns
+    ``None``, and `_run_reference`
     raises `TwinConvergedSignal` with the reference implementation's root.
 
     Attributes:
         n_reevaluated_bounds: The number of evaluations that the reference implementation makes at the interval
             bounds before its first iterate, after the framework already evaluated them. The agreement check leaves
             them out of the twin's evaluations.
-        excluded_test_cases: The test cases of `TWIN_TEST_CASES` that the twin cannot be compared on; the subclass's
+        excluded_test_cases: The test cases of `TWIN_TEST_CASES` excluded from the twin's comparison; the subclass's
             docstring gives the reason.
     """
 
@@ -36,7 +37,7 @@ class TwinSolver(Solver):
 
     @classmethod
     def comparable_test_cases(cls) -> list[TwinTestCase]:
-        """Return the test cases that the twin is compared on: `TWIN_TEST_CASES` without `excluded_test_cases`."""
+        """Return the twin's comparable test cases: `TWIN_TEST_CASES` without `excluded_test_cases`."""
         return [test_case for test_case in TWIN_TEST_CASES if test_case not in cls.excluded_test_cases]
 
     def _solve(self, state: SolveState) -> float:

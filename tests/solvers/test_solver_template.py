@@ -18,7 +18,7 @@ class _RecordingSolver(Solver):
     version = 1
 
     def __init__(self) -> None:
-        """Start an empty list of the states that `_solve` receives, across all solves."""
+        """Start an empty list that collects, across all solves, the states that `_solve` receives."""
         self.states: list[SolveState] = []
 
     def _solve(self, state: SolveState) -> float:

@@ -64,8 +64,8 @@ def test_the_total_evaluation_count_lies_within_1_1_percent_of_the_papers_table_
 #  Helpers
 # ==================================================================================================
 class _TOMS748WithPaperTolerance(TOMS748):
-    """`_TOMS748WithPaperTolerance` is `TOMS748` with the paper's ``tol`` given directly, as the authors' driver gives
-    it."""
+    """`_TOMS748WithPaperTolerance` is `TOMS748` with a fixed ``tol = 10^-n_digits``, computed as the authors' driver
+    computes it, in place of the ``tol`` that `TOMS748._get_tol` derives from ``xtol``."""
 
     def __init__(self, *, k: int, n_digits: int | None) -> None:
         """Configure ``k`` and the fixed ``tol = 10^-n_digits``, or ``tol = 0`` for ``None``."""

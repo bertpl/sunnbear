@@ -19,10 +19,7 @@ sunnbear's solver stops. The 2 solves then evaluate the same number of points, a
 never need to be declared as a deviation.
 
 By default, `TwinSolver._root_if_sunnbear_solver_stops` applies the stopping criterion of `BracketingSolver`; the twin
-of a solver with a stopping criterion of its own overrides that method with that solver's criterion. Where the
-reference implementation stops by exactly the solver's own rule, the twin lets it stop: its
-`TwinSolver._root_if_sunnbear_solver_stops` returns ``None``, and its `TwinSolver._run_reference` raises
-`TwinConvergedSignal` with the reference implementation's root.
+of a solver with a stopping criterion of its own overrides that method, as the `TwinSolver` docstring describes.
 """
 
 from .agreement import MAX_ULPS_APART, assert_agrees_with_twin, ulps_apart

@@ -2,6 +2,8 @@
 
 import math
 
+import pytest
+
 
 def cubic(x: float) -> float:
     """Return ``x^3 - x - 1``; it has 1 real root, near 1.3247, and is convex on ``[1, 2]``."""
@@ -33,3 +35,11 @@ def steep_exponential(x: float) -> float:
 
 
 STEEP_EXPONENTIAL_ROOT = math.log(1.0e4) / 20.0
+
+
+# Every bracketing solver's convergence test runs on these functions, each with its interval and its root.
+CONVERGENCE_TEST_CASES = [
+    pytest.param(cubic, 1.0, 2.0, CUBIC_ROOT, id="cubic"),
+    pytest.param(decreasing_cubic, 1.0, 2.0, CUBIC_ROOT, id="decreasing_cubic"),
+    pytest.param(ninth_power, -1.0, 4.0, 0.0, id="ninth_power"),
+]

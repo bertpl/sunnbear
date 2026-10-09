@@ -1,6 +1,11 @@
-"""These tests assert that `WrappedFunction` counts evaluations against a budget, refuses non-finite x-values, turns
-a failing function into `FunctionDomainError`, records an optional history, and leaves the arithmetic of the
-function uncounted."""
+"""These tests assert that `WrappedFunction`:
+
+- counts evaluations against a budget;
+- refuses non-finite x-values;
+- turns a failing function into `FunctionDomainError`;
+- records an optional history;
+- leaves the arithmetic of the function uncounted.
+"""
 
 import math
 

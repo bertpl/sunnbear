@@ -10,6 +10,6 @@ from .scipy_twin import ChandrupatlaScipyTwin
 
 @pytest.mark.parametrize("test_case", ChandrupatlaScipyTwin.comparable_test_cases(), ids=str)
 def test_chandrupatla_agrees_with_scipy_find_root(test_case):
-    """`Chandrupatla` evaluates the same points as SciPy's find_root, on every shared twin test case."""
+    """`Chandrupatla` evaluates the same x-values as SciPy's find_root, on the twin's comparable test cases."""
     # --- act / assert -----------------
     assert_agrees_with_twin(Chandrupatla(), ChandrupatlaScipyTwin(), test_case)

@@ -37,11 +37,12 @@ class _StepCountingSolver(BracketingSolver[_StepCountingState]):
     state_cls = _StepCountingState
 
     def __init__(self) -> None:
-        """Start an empty list of the step counts that `_next_x` reads from the state, across all solves."""
+        """Start an empty list that collects, across all solves, the step count that `_next_x` reads from the state."""
         self.n_steps_seen: list[int] = []
 
     def _next_x(self, state: _StepCountingState, interval: Interval) -> float:
-        """Record the step count in the state, add 1 to it, and return the interval midpoint."""
+        """Append the state's step count to `n_steps_seen`, add 1 to the state's step count, and return the interval
+        midpoint."""
         self.n_steps_seen.append(state.n_steps)
         state.n_steps += 1
         return interval.midpoint
