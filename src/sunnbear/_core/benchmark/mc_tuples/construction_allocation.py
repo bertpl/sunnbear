@@ -59,7 +59,10 @@ class GapAllocation:
 # ==================================================================================================
 @dataclass(frozen=True)
 class AxisGapAllocation:
-    """`AxisGapAllocation` holds, for 1 axis of 1 size, the gaps that get new tuples and how many each gets.
+    """`AxisGapAllocation` holds the allocation chosen for 1 axis of 1 size, in the form that the solve uses.
+
+    `AxisGaps` describes every gap and computes the allocation; `AxisGapAllocation` keeps only the gaps that get new
+    tuples, how many each gets, and the predicted offsets for the progress report.
 
     Attributes:
         gap_of_fine_lane: For each fine lane, the gap that holds it, numbered from 0 in ascending order among the gaps
@@ -109,11 +112,18 @@ class AxisGapAllocation:
 # ==================================================================================================
 @dataclass(frozen=True)
 class AxisGaps:
-    """`AxisGaps` holds the gaps that the size below leaves on 1 axis, and predicts each gap's spacing and values.
+    """`AxisGaps` describes the gaps that the size below leaves on 1 axis, and computes their allocation of new tuples.
 
-    Widths are measured between fine-lane positions, fine lane `i` at position `i`: an interior gap is as wide as the
-    distance between its 2 occupied fine lanes; an edge gap reaches from its occupied fine lane to the outermost fine
-    lane, where the outermost new value lies.
+    It holds every gap, including those that end up without new tuples, and exists only inside `AxisGapAllocation.of`,
+    which keeps the result.
+
+    Every attribute except `n_required` and `required_sum` is an array with 1 entry per gap, in ascending order, so
+    that each step of an allocation scores every gap at once.
+
+    A gap's width counts fine lanes by their indices, not the distance between the tuples' values: an interior gap
+    between occupied fine lanes `a` and `b` is `b - a` wide; a left edge gap below occupied fine lane `b` is `b` wide,
+    and a right edge gap above `a` is `N_FINE_LANES - 1 - a` wide, because the outermost new tuple can lie in the
+    outermost fine lane.
 
     Attributes:
         first_lanes: The first free fine lane of each gap, ascending.
