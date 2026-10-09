@@ -8,8 +8,8 @@ from .solver import ModAB
 class ModABConfig(SolverConfig):
     """`ModABConfig` is a secondary config.
 
-    It is not core because the method is recent, and the evidence for it so far comes from its authors' own
-    benchmarks.
+    It is not core because the method is not established yet (published 2026), and the evidence for it so far comes
+    from its authors' own benchmarks.
     """
 
     solver_cls = ModAB

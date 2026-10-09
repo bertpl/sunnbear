@@ -73,7 +73,7 @@ class ModAB(Solver):
     name = "modab"
     version = 1
 
-    def _solve(self, state: SolveState) -> float:  # noqa: C901 — the loop follows the authors' C# code step by step
+    def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the authors' C# code
         """Run the loop of the paper's C# code and return the last ``x3``.
 
         The variables keep the names of the C# code, except for those listed below; the C# code also groups ``x1``
