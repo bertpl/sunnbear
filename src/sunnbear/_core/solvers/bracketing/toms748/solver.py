@@ -84,7 +84,7 @@ class TOMS748(Solver):
             raise ValueError(f"k must be 1 or 2 (got {k}).")
         self.k = k
 
-    def _solve(self, state: SolveState) -> float:  # noqa: C901 — the loop follows the authors' code step by step
+    def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the authors' code
         """Run Algorithm 4.1 or 4.2 and return the lower bound of the final interval.
 
         The variables keep the names of the paper and the authors' code, so that this method can be compared with the

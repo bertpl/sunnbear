@@ -80,7 +80,7 @@ class SteffenBrent(Solver):
     name = "steffen_brent"
     version = 1
 
-    def _solve(self, state: SolveState) -> float:  # noqa: C901 — the loop follows the paper's Algorithm 2 step by step
+    def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the paper's Algorithm 2
         """Run Algorithm 2 of the paper and return ``b``.
 
         Each iteration:
