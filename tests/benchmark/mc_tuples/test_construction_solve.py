@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructionError, MCTuplesSize
-from sunnbear._core.benchmark.mc_tuples.construction_gaps import GapAllocation
+from sunnbear._core.benchmark.mc_tuples.construction_allocation import AxisGapAllocation
 from sunnbear._core.benchmark.mc_tuples.construction_population import MCTuplesPopulation
 from sunnbear._core.benchmark.mc_tuples.construction_solve import (
     INCLUSION_CONSTRAINT_WEIGHT,
@@ -20,28 +20,22 @@ _SIZE_32 = np.column_stack([_LANES_32 + 0.5, _LANES_32[::-1] + 0.25]) / N_FINE_L
 def _solve(size: MCTuplesSize, required_tuple_array: np.ndarray, n_population: int) -> MCTuplesSizeSolve:
     """Return the solve of `size` on `required_tuple_array`, with a population of `n_population` over its free lanes."""
     rng = np.random.default_rng(5)
-    occupied = np.floor(required_tuple_array * N_FINE_LANES).astype(np.int64)
-    population = MCTuplesPopulation.draw(
-        n_population,
-        np.setdiff1d(np.arange(N_FINE_LANES), occupied[:, 0]),
-        np.setdiff1d(np.arange(N_FINE_LANES), occupied[:, 1]),
-        rng,
-    )
+    population = MCTuplesPopulation.draw_in_free_lanes(n_population, required_tuple_array, rng)
     n_new = size - size.n_required
     return MCTuplesSizeSolve(
         population,
         required_tuple_array,
         size,
-        GapAllocation.of(required_tuple_array[:, 0], n_new, epsilon=0.1),
-        GapAllocation.of(required_tuple_array[:, 1], n_new, epsilon=0.1),
+        AxisGapAllocation.of(required_tuple_array[:, 0], n_new, epsilon=0.1),
+        AxisGapAllocation.of(required_tuple_array[:, 1], n_new, epsilon=0.1),
         MCTuplesSolveSettings(n_workers=1, seed=42, rng=rng),
     )
 
 
 def _distinct_lane_selection(solve: MCTuplesSizeSolve, n: int) -> np.ndarray:
-    """Return `n` candidates, as indices into `candidates`, that share no fine lane on either axis."""
+    """Return `n` candidates, as indices into `candidate_indices`, that share no fine lane on either axis."""
     picked, used_u, used_v = [], set(), set()
-    for i, candidate in enumerate(solve.candidates):
+    for i, candidate in enumerate(solve.candidate_indices):
         u_lane, v_lane = solve.population.u_lane[candidate], solve.population.v_lane[candidate]
         if u_lane not in used_u and v_lane not in used_v:
             picked.append(i)
@@ -107,11 +101,11 @@ def test_constraints_of_the_smallest_size_hold_its_1_gap_s_count_and_1_tuple_per
 
 
 # ==================================================================================================
-#  Random start
+#  Random starting selection
 # ==================================================================================================
-def test_the_random_start_holds_the_new_tuples_in_distinct_fine_lanes():
-    """The start holds as many candidates as the size has new tuples, ascending, each in its own fine lane on each
-    axis."""
+def test_the_random_starting_selection_holds_the_new_tuples_in_distinct_fine_lanes():
+    """The starting selection holds as many candidates as the size has new tuples, ascending, each in its own fine
+    lane on each axis."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_64, _SIZE_32, n_population=8192)
 
@@ -122,10 +116,10 @@ def test_the_random_start_holds_the_new_tuples_in_distinct_fine_lanes():
     assert start.size == 32
     assert np.array_equal(start, np.sort(start))
     for lanes in (solve.population.u_lane, solve.population.v_lane):
-        assert np.unique(lanes[solve.candidates[start]]).size == 32
+        assert np.unique(lanes[solve.candidate_indices[start]]).size == 32
 
 
-def test_the_random_start_needs_as_many_pairable_fine_lanes_as_new_tuples():
+def test_the_random_starting_selection_needs_as_many_pairable_fine_lanes_as_new_tuples():
     """A population of 10 candidates cannot seat 32 new tuples in distinct fine lanes, which raises an error."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=10)
@@ -139,7 +133,8 @@ def test_the_random_start_needs_as_many_pairable_fine_lanes_as_new_tuples():
 #  Validation
 # ==================================================================================================
 def test_validation_returns_a_valid_selection_s_new_candidates():
-    """32 candidates in distinct fine lanes meet the smallest size's constraints, and come back as they are."""
+    """A selection of 32 candidates in distinct fine lanes meets the smallest size's constraints, and comes back as
+    it is."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=4096)
     selection = _distinct_lane_selection(solve, 32)
@@ -148,24 +143,22 @@ def test_validation_returns_a_valid_selection_s_new_candidates():
     assert solve._validated_new_selection(selection).tolist() == selection.tolist()
 
 
-def test_validation_refuses_a_selection_without_a_tuple_of_the_size_below():
-    """A selection that leaves out 1 of the 32 tuples of the size below raises an error."""
+@pytest.mark.parametrize(
+    "selection, message",
+    [
+        (np.arange(1, 65), "1 tuples of the size below it are not selected"),
+        (np.arange(64), "gaps along u do not hold their allocated number"),
+    ],
+)
+def test_validation_refuses_a_size_64_selection_that_breaks_a_constraint(selection, message):
+    """A selection that leaves out 1 of the 32 tuples of the size below, or whose first 32 candidates all lie in the
+    lowest gaps along u, raises an error."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_64, _SIZE_32, n_population=8192)
 
     # --- act / assert -----------------
-    with pytest.raises(MCTuplesConstructionError, match="1 tuples of the size below it are not selected"):
-        solve._validated_new_selection(np.arange(1, 65))
-
-
-def test_validation_refuses_a_selection_whose_gaps_miss_their_counts():
-    """The first 32 candidates, all in the lowest gaps along u, do not match the allocation, which raises an error."""
-    # --- arrange ----------------------
-    solve = _solve(MCTuplesSize.SIZE_64, _SIZE_32, n_population=8192)
-
-    # --- act / assert -----------------
-    with pytest.raises(MCTuplesConstructionError, match="gaps along u do not hold their allocated number"):
-        solve._validated_new_selection(np.arange(64))
+    with pytest.raises(MCTuplesConstructionError, match=message):
+        solve._validated_new_selection(selection)
 
 
 def test_validation_refuses_2_new_tuples_in_1_fine_lane():
@@ -173,9 +166,8 @@ def test_validation_refuses_2_new_tuples_in_1_fine_lane():
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=4096)
     selection = _distinct_lane_selection(solve, 31)
-    shares_u_lane = np.flatnonzero(
-        solve.population.u_lane[solve.candidates] == solve.population.u_lane[solve.candidates[selection[0]]]
-    )
+    u_lanes = solve.population.u_lane[solve.candidate_indices]
+    shares_u_lane = np.flatnonzero(u_lanes == u_lanes[selection[0]])
     selection = np.sort(np.append(selection, shares_u_lane[shares_u_lane != selection[0]][0]))
 
     # --- act / assert -----------------

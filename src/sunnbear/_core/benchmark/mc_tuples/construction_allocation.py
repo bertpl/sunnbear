@@ -1,26 +1,83 @@
-"""`GapAllocation` decides how many of a size's new tuples go into each gap that the size below leaves on an axis.
+"""`AxisGapAllocation` decides how many of a size's new tuples go into each gap that the size below leaves on an axis.
 
 On each axis, every tuple of the size below occupies 1 fine lane. A gap is a maximal run of free fine lanes: between 2
-occupied fine lanes, or between an occupied fine lane and an edge of the axis (`AxisGaps`). The size's max-div solve
-puts exactly the allocated number of new tuples into each gap, and spreads them about evenly inside it, so the
-allocation sets where the size's mean lies, and with it how far the mean correction has to move the new tuples.
+occupied fine lanes, or between an occupied fine lane and an edge of the axis (`AxisGaps`).
+
+The size's max-div solve puts exactly the allocated number of new tuples into each gap, and spreads them about evenly
+inside it. So the allocation sets where the size's mean lies, and with it how far the mean correction has to move the
+new tuples.
 
 The allocation comes in 2 stages:
 
-1. **greedy:** each new tuple goes, 1 at a time, to the gap that keeps the widest spacing after adding it;
+1. **greedy:** the new tuples go to the gaps 1 at a time, each to the gap that has the widest spacing after it takes
+   the tuple; a gap's spacing is the distance between its neighboring values once its new tuples are spread evenly
+   over it;
 2. **mean-aware:** starting from the greedy allocation, a local search moves new tuples between gaps until the
-   predicted mean is closest to 0.5, while every gap's spacing stays at least (1 - ε) times the greedy allocation's
-   smallest spacing (`AxisGaps.balanced_counts`).
+   predicted mean is closest to 0.5, while every gap's spacing stays at least (1 - `epsilon`) times the greedy
+   allocation's smallest spacing (`AxisGaps.mean_aware_counts`).
 """
 
 from dataclasses import dataclass
 
 import numpy as np
 
-from .sizes import N_FINE_LANES
+from .sizes import N_FINE_LANES, fine_lanes_of
 
 # The mean that every size's u values and v values have once the construction has corrected them.
 TARGET_MEAN = 0.5
+
+
+# ==================================================================================================
+#  AxisGapAllocation
+# ==================================================================================================
+@dataclass(frozen=True)
+class AxisGapAllocation:
+    """`AxisGapAllocation` holds, for 1 axis of 1 size, the gaps that get new tuples and how many each gets.
+
+    Attributes:
+        gap_of_fine_lane: For each fine lane, the gap that holds it, numbered from 0 in ascending order among the gaps
+            that get new tuples, or -1 for an occupied fine lane or one in a gap that gets none.
+        counts: The number of new tuples of each gap that gets any.
+        greedy_offset_fine_lanes: The predicted offset of the size's mean from 0.5 under the greedy allocation, in
+            fine lanes; `None` for the smallest size, whose axis is 1 gap of all fine lanes.
+        mean_aware_offset_fine_lanes: The same under the mean-aware allocation, which `counts` holds.
+    """
+
+    gap_of_fine_lane: np.ndarray
+    counts: np.ndarray
+    greedy_offset_fine_lanes: float | None
+    mean_aware_offset_fine_lanes: float | None
+
+    # --------------------------------------------------------------------------
+    #  Factory methods
+    # --------------------------------------------------------------------------
+    @classmethod
+    def of(cls, required_values: np.ndarray, n_new: int, epsilon: float) -> "AxisGapAllocation":
+        """Return the mean-aware allocation of `n_new` new tuples over the gaps that `required_values` leave free.
+
+        Without tuples of a size below, all fine lanes form 1 gap that gets every new tuple.
+        """
+        if required_values.size == 0:
+            return cls(
+                gap_of_fine_lane=np.zeros(N_FINE_LANES, dtype=np.int64),
+                counts=np.array([n_new]),
+                greedy_offset_fine_lanes=None,
+                mean_aware_offset_fine_lanes=None,
+            )
+        else:
+            gaps = AxisGaps.of(required_values)
+            greedy_counts = gaps.greedy_counts(n_new)
+            counts = gaps.mean_aware_counts(greedy_counts, epsilon)
+            is_used = counts > 0
+            gap_of_fine_lane = np.full(N_FINE_LANES, -1, dtype=np.int64)
+            for gap, (first, n_free) in enumerate(zip(gaps.first_lanes[is_used], gaps.n_free[is_used], strict=True)):
+                gap_of_fine_lane[first : first + n_free] = gap
+            return cls(
+                gap_of_fine_lane=gap_of_fine_lane,
+                counts=counts[is_used],
+                greedy_offset_fine_lanes=gaps.predicted_offset_fine_lanes(greedy_counts),
+                mean_aware_offset_fine_lanes=gaps.predicted_offset_fine_lanes(counts),
+            )
 
 
 # ==================================================================================================
@@ -56,11 +113,6 @@ class AxisGaps:
     n_required: int
     required_sum: float
 
-    @property
-    def is_edge(self) -> np.ndarray:
-        """Return whether each gap lies at an edge of the axis."""
-        return self.is_left_edge | self.is_right_edge
-
     # --------------------------------------------------------------------------
     #  Predictions
     # --------------------------------------------------------------------------
@@ -70,7 +122,7 @@ class AxisGaps:
         An interior gap's c new tuples split it into c + 1 equal parts, and an edge gap's into c, since its outermost
         tuple lies on the edge; an empty gap has no spacing of its own and gets inf.
         """
-        n_parts = np.where(self.is_edge, counts, counts + 1)
+        n_parts = np.where(self.is_left_edge | self.is_right_edge, counts, counts + 1)
         return np.divide(self.widths, n_parts, out=np.full(self.widths.shape, np.inf), where=counts > 0)
 
     def predicted_sums(self, counts: np.ndarray) -> np.ndarray:
@@ -102,23 +154,27 @@ class AxisGaps:
         """
         counts = np.zeros(self.n_free.size, dtype=np.int64)
         for _ in range(n_new):
-            spacing_after_addition = self.widths / np.where(self.is_edge, counts + 1, counts + 2)
+            n_parts_after_addition = np.where(self.is_left_edge | self.is_right_edge, counts + 1, counts + 2)
+            spacing_after_addition = self.widths / n_parts_after_addition
             spacing_after_addition[counts >= self.n_free] = -np.inf
             counts[np.argmax(spacing_after_addition)] += 1
         return counts
 
-    def balanced_counts(self, greedy_counts: np.ndarray, epsilon: float) -> np.ndarray:
+    def mean_aware_counts(self, greedy_counts: np.ndarray, epsilon: float) -> np.ndarray:
         """Return the allocation that brings the predicted mean closest to 0.5, starting from `greedy_counts`.
 
-        The greedy allocation's smallest spacing is the largest achievable. Each gap may hold as many new tuples as
-        keep its spacing at least (1 - `epsilon`) times that spacing, and at most its number of free fine lanes. The
-        search then repeatedly moves 1 new tuple from 1 gap to another, taking the move that brings the predicted sum
-        of new values (`predicted_sums`) closest to its target, and stops once no move brings it closer.
+        The greedy allocation's smallest spacing is the largest achievable. Each gap may hold new tuples up to the
+        largest count that keeps its spacing at least (1 - `epsilon`) times the greedy smallest spacing, and at most
+        its number of free fine lanes.
+
+        The search then repeatedly moves 1 new tuple from 1 gap to another, taking the move that brings the predicted
+        sum of new values (`predicted_sums`) closest to the sum that puts the size's mean at 0.5, and stops once no
+        move brings it closer.
         """
-        spacing_floor = (1 - epsilon) * self.spacings(greedy_counts).min()
+        min_allowed_spacing = (1 - epsilon) * self.spacings(greedy_counts).min()
         max_counts = greedy_counts.copy()
         while True:
-            can_grow = (max_counts < self.n_free) & (self.spacings(max_counts + 1) >= spacing_floor)
+            can_grow = (max_counts < self.n_free) & (self.spacings(max_counts + 1) >= min_allowed_spacing)
             if not can_grow.any():
                 break
             max_counts[can_grow] += 1
@@ -149,9 +205,9 @@ class AxisGaps:
     @classmethod
     def of(cls, required_values: np.ndarray) -> "AxisGaps":
         """Return the gaps that the size below's values on this axis leave free; `required_values` holds at least 1."""
-        occupied = np.unique(np.floor(required_values * N_FINE_LANES).astype(np.int64))
+        occupied = np.unique(fine_lanes_of(required_values))
         value_of_lane = np.zeros(N_FINE_LANES)
-        value_of_lane[np.floor(required_values * N_FINE_LANES).astype(np.int64)] = required_values
+        value_of_lane[fine_lanes_of(required_values)] = required_values
         lane_below = np.concatenate([[-1], occupied])
         lane_above = np.concatenate([occupied, [N_FINE_LANES]])
         n_free = lane_above - lane_below - 1
@@ -173,61 +229,3 @@ class AxisGaps:
             n_required=required_values.size,
             required_sum=float(required_values.sum()),
         )
-
-
-# ==================================================================================================
-#  GapAllocation
-# ==================================================================================================
-@dataclass(frozen=True)
-class GapAllocation:
-    """`GapAllocation` holds, for 1 axis of 1 size, the gaps that get new tuples and how many each gets.
-
-    Attributes:
-        gap_of_fine_lane: For each fine lane, the gap that holds it, numbered from 0 in ascending order among the gaps
-            that get new tuples, or -1 for an occupied fine lane or one in a gap that gets none.
-        counts: The number of new tuples of each gap that gets any.
-        greedy_offset_fine_lanes: The predicted offset of the size's mean from 0.5 under the greedy allocation, in
-            fine lanes; `None` for the smallest size, which is 1 gap of all fine lanes.
-        predicted_offset_fine_lanes: The same under the mean-aware allocation, which `counts` holds.
-    """
-
-    gap_of_fine_lane: np.ndarray
-    counts: np.ndarray
-    greedy_offset_fine_lanes: float | None
-    predicted_offset_fine_lanes: float | None
-
-    @property
-    def widths(self) -> np.ndarray:
-        """Return the number of fine lanes of each gap that gets new tuples."""
-        return np.bincount(self.gap_of_fine_lane[self.gap_of_fine_lane >= 0], minlength=self.counts.size)
-
-    # --------------------------------------------------------------------------
-    #  Factory methods
-    # --------------------------------------------------------------------------
-    @classmethod
-    def of(cls, required_values: np.ndarray, n_new: int, epsilon: float) -> "GapAllocation":
-        """Return the mean-aware allocation of `n_new` new tuples over the gaps that `required_values` leave free.
-
-        Without tuples of a size below, all fine lanes form 1 gap that gets every new tuple.
-        """
-        if required_values.size == 0:
-            return cls(
-                gap_of_fine_lane=np.zeros(N_FINE_LANES, dtype=np.int64),
-                counts=np.array([n_new]),
-                greedy_offset_fine_lanes=None,
-                predicted_offset_fine_lanes=None,
-            )
-        else:
-            gaps = AxisGaps.of(required_values)
-            greedy_counts = gaps.greedy_counts(n_new)
-            counts = gaps.balanced_counts(greedy_counts, epsilon)
-            is_used = counts > 0
-            gap_of_fine_lane = np.full(N_FINE_LANES, -1, dtype=np.int64)
-            for gap, (first, n_free) in enumerate(zip(gaps.first_lanes[is_used], gaps.n_free[is_used], strict=True)):
-                gap_of_fine_lane[first : first + n_free] = gap
-            return cls(
-                gap_of_fine_lane=gap_of_fine_lane,
-                counts=counts[is_used],
-                greedy_offset_fine_lanes=gaps.predicted_offset_fine_lanes(greedy_counts),
-                predicted_offset_fine_lanes=gaps.predicted_offset_fine_lanes(counts),
-            )

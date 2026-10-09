@@ -13,7 +13,7 @@ def _random_axis(seed: int) -> tuple[np.ndarray, np.ndarray]:
     rng = np.random.default_rng(seed)
     size = int(rng.choice([32, 64, 256, 1024]))
     lanes = rng.choice(N_FINE_LANES, size=size, replace=False)
-    # Positions pile up near the lanes' edges, where the lane rules matter most; 0.999999 keeps them inside.
+    # Positions concentrate near the lanes' edges, where the lane rules matter most; 0.999999 keeps them inside.
     values = (lanes + np.clip(rng.beta(0.2, 0.2, size=size), 1e-6, 0.999999)) / N_FINE_LANES
     n_required = int(rng.integers(0, size))
     return values[:n_required], values[n_required:]

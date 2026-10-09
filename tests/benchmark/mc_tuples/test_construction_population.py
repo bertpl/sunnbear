@@ -21,8 +21,8 @@ _FREE_V_LANES = np.arange(512, 640)
     ],
 )
 def test_draw_spreads_the_candidates_evenly_over_the_free_fine_lanes_and_cells(n_candidates):
-    """Every free fine lane, and every free fine cell, holds the same number of candidates up to 1; no other holds any;
-    and each candidate lies inside its fine cell, in the open unit square."""
+    """Every free fine lane, and every free fine cell, holds the same number of candidates, give or take 1; no other
+    holds any; and each candidate lies inside its fine cell, in the open unit square."""
     # --- act --------------------------
     population = MCTuplesPopulation.draw(n_candidates, _FREE_U_LANES, _FREE_V_LANES, np.random.default_rng(1))
 
@@ -63,19 +63,19 @@ def test_randomize_pattern_keeps_every_row_and_column_count():
     assert np.array_equal(is_occupied.sum(axis=1), before.sum(axis=1))
 
 
-def test_offsets_move_a_draw_of_exactly_0_to_the_middle_of_its_lane():
-    """An offset of exactly 0 would put a candidate on the edge of the unit square; it becomes 0.5."""
+def test_positions_in_lane_move_a_draw_of_exactly_0_to_the_middle_of_its_lane():
+    """A position of exactly 0 would put a candidate on the edge of the unit square; it becomes 0.5."""
 
     # --- arrange ----------------------
     class _ZerosFirst:
-        """Stands in for a random generator whose `random` draws 0 first."""
+        """`_ZerosFirst` stands in for a random generator whose `random` draws 0 first."""
 
         def random(self, n: int) -> np.ndarray:
             """Return 0 followed by 0.25's."""
             return np.concatenate([[0.0], np.full(n - 1, 0.25)])
 
     # --- act --------------------------
-    offsets = MCTuplesPopulation._offsets(3, _ZerosFirst())  # type: ignore[arg-type]
+    positions = MCTuplesPopulation._positions_in_lane(3, _ZerosFirst())  # type: ignore[arg-type]
 
     # --- assert -----------------------
-    assert offsets.tolist() == [0.5, 0.25, 0.25]
+    assert positions.tolist() == [0.5, 0.25, 0.25]

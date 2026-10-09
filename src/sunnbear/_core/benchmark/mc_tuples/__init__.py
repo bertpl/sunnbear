@@ -15,5 +15,5 @@ from .artifact import MCTuplesDeclaration, load_mc_tuples
 from .construction import MCTuplesGenerator, generate_mc_tuples
 from .construction_results import MCTuplesSizeResult
 from .exceptions import MCTuplesConstructionError
-from .sizes import N_FINE_LANES, MCTuplesSize
+from .sizes import N_FINE_LANES, MCTuplesSize, fine_lanes_of
 from .tuples import MCTuples, MCTuplesStats

@@ -1,17 +1,17 @@
-"""`AxisGaps` finds the gaps of free fine lanes and predicts their spacing and values; `GapAllocation` allocates new
-tuples to them with the mean in mind."""
+"""`AxisGaps` finds the gaps of free fine lanes and predicts their spacing and values; `AxisGapAllocation` allocates new
+tuples to them so that the predicted mean lies close to 0.5."""
 
 import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES
-from sunnbear._core.benchmark.mc_tuples.construction_gaps import AxisGaps, GapAllocation
+from sunnbear._core.benchmark.mc_tuples.construction_allocation import AxisGapAllocation, AxisGaps
 
 # Old tuples in fine lanes 3, 10 and 11: a left edge gap [0, 3), an interior gap [4, 10), no gap between 10 and 11,
 # and a right edge gap [12, 1024).
 _VALUES = np.array([3.5, 10.25, 11.5]) / N_FINE_LANES
 
-# 32 old tuples from the first fine lane to the last leave 31 gaps for 32 new tuples, so 1 gap gets 2.
+# Spreading 32 old tuples from the first fine lane to the last leaves 31 gaps for 32 new tuples, so 1 gap gets 2.
 _SPREAD_VALUES = (np.round(np.linspace(0, N_FINE_LANES - 1, 32)) + 0.5) / N_FINE_LANES
 
 
@@ -70,8 +70,10 @@ def test_predicted_sums_and_spacings_follow_an_even_spread_with_the_outermost_va
 
 def test_an_empty_gap_has_no_predicted_values_and_no_spacing():
     """A gap without new tuples adds nothing to the predicted sum and gets an infinite spacing."""
-    # --- act / assert -----------------
+    # --- arrange ----------------------
     gaps = AxisGaps.of(_VALUES)
+
+    # --- act / assert -----------------
     assert gaps.predicted_sums(np.zeros(3, dtype=np.int64)).tolist() == [0.0, 0.0, 0.0]
     assert np.isinf(gaps.spacings(np.zeros(3, dtype=np.int64))).all()
 
@@ -97,15 +99,16 @@ def test_greedy_counts_give_a_gap_at_most_1_new_tuple_per_free_fine_lane():
     assert counts.tolist() == gaps.n_free.tolist()
 
 
-def test_balanced_counts_move_the_extra_tuple_to_the_middle_gap_without_lowering_the_smallest_spacing():
-    """With 31 equal gaps for 32 new tuples, the greedy allocation doubles the first gap, 7.7 fine lanes off; the
-    mean-aware allocation doubles the middle gap instead, which brings the predicted mean to 0.5."""
+def test_mean_aware_counts_move_the_extra_tuple_to_the_middle_gap_without_lowering_the_smallest_spacing():
+    """With 31 equal gaps for 32 new tuples, the greedy allocation gives 2 new tuples to the first gap, which puts the
+    predicted mean 7.7 fine lanes from 0.5; the mean-aware allocation gives 2 to the middle gap instead, which brings
+    the predicted mean to 0.5."""
     # --- arrange ----------------------
     gaps = AxisGaps.of(_SPREAD_VALUES)
     greedy_counts = gaps.greedy_counts(32)
 
     # --- act --------------------------
-    counts = gaps.balanced_counts(greedy_counts, epsilon=0.1)
+    counts = gaps.mean_aware_counts(greedy_counts, epsilon=0.1)
 
     # --- assert -----------------------
     assert gaps.predicted_offset_fine_lanes(greedy_counts) == pytest.approx(-7.734375)
@@ -115,7 +118,7 @@ def test_balanced_counts_move_the_extra_tuple_to_the_middle_gap_without_lowering
     assert gaps.spacings(counts).min() == gaps.spacings(greedy_counts).min()
 
 
-def test_balanced_counts_keep_every_spacing_within_the_floor():
+def test_mean_aware_counts_keep_every_spacing_at_or_above_the_min_allowed_spacing():
     """No gap's spacing falls below (1 - ε) times the greedy allocation's smallest spacing, and no gap takes more new
     tuples than it has free fine lanes."""
     # --- arrange ----------------------
@@ -124,7 +127,7 @@ def test_balanced_counts_keep_every_spacing_within_the_floor():
     greedy_counts = gaps.greedy_counts(128)
 
     # --- act --------------------------
-    counts = gaps.balanced_counts(greedy_counts, epsilon=0.1)
+    counts = gaps.mean_aware_counts(greedy_counts, epsilon=0.1)
 
     # --- assert -----------------------
     assert counts.sum() == 128
@@ -134,29 +137,28 @@ def test_balanced_counts_keep_every_spacing_within_the_floor():
 
 
 # ==================================================================================================
-#  GapAllocation
+#  AxisGapAllocation
 # ==================================================================================================
 def test_allocation_without_a_size_below_is_1_gap_of_all_fine_lanes():
     """The smallest size has no old tuples, so every fine lane belongs to 1 gap that gets every new tuple."""
     # --- act --------------------------
-    allocation = GapAllocation.of(np.zeros(0), 32, epsilon=0.1)
+    allocation = AxisGapAllocation.of(np.zeros(0), 32, epsilon=0.1)
 
     # --- assert -----------------------
     assert allocation.counts.tolist() == [32]
-    assert allocation.widths.tolist() == [N_FINE_LANES]
+    assert allocation.gap_of_fine_lane.tolist() == [0] * N_FINE_LANES
     assert allocation.greedy_offset_fine_lanes is None
-    assert allocation.predicted_offset_fine_lanes is None
+    assert allocation.mean_aware_offset_fine_lanes is None
 
 
 def test_allocation_numbers_the_gaps_with_new_tuples_and_leaves_the_others_out():
     """Each fine lane of a gap with new tuples maps to that gap; occupied fine lanes and empty gaps map to -1."""
     # --- act --------------------------
-    allocation = GapAllocation.of(_SPREAD_VALUES, 32, epsilon=0.1)
+    allocation = AxisGapAllocation.of(_SPREAD_VALUES, 32, epsilon=0.1)
 
     # --- assert -----------------------
     occupied = np.floor(_SPREAD_VALUES * N_FINE_LANES).astype(np.int64)
     assert np.all(allocation.gap_of_fine_lane[occupied] == -1)
     assert allocation.counts.sum() == 32
-    assert allocation.widths.sum() == np.count_nonzero(allocation.gap_of_fine_lane >= 0)
     assert allocation.greedy_offset_fine_lanes == pytest.approx(-7.734375)
-    assert allocation.predicted_offset_fine_lanes == pytest.approx(0.0, abs=1e-9)
+    assert allocation.mean_aware_offset_fine_lanes == pytest.approx(0.0, abs=1e-9)

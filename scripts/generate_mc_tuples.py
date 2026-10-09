@@ -34,6 +34,7 @@ from sunnbear._core.benchmark.mc_tuples import (
     MCTuplesSize,
     MCTuplesSizeResult,
     MCTuplesStats,
+    fine_lanes_of,
     generate_mc_tuples,
 )
 
@@ -56,7 +57,10 @@ def main() -> None:
         "--allocation-epsilon",
         type=float,
         default=0.1,
-        help="share of the smallest spacing that the allocation of new tuples to gaps may give up for the mean",
+        help=(
+            "share of the smallest spacing that the allocation of new tuples to gaps may give up to bring the "
+            "predicted mean closer to 0.5"
+        ),
     )
     parser.add_argument("--inspection-dir", type=Path, help="directory for the tuples and solution of each size")
     parser.add_argument(
@@ -84,10 +88,7 @@ def main() -> None:
         stats = size_tuples.stats()
         scores.append(stats.score)
         offsets = [(values.mean() - 0.5) * N_FINE_LANES for values in (size_tuples.u, size_tuples.v)]
-        max_per_lane = max(
-            int(np.bincount(np.floor(values * N_FINE_LANES).astype(np.int64)).max())
-            for values in (size_tuples.u, size_tuples.v)
-        )
+        max_per_lane = max(int(np.bincount(fine_lanes_of(values)).max()) for values in (size_tuples.u, size_tuples.v))
         print(
             f"| {size} | {stats.min_separation_l2_fraction:.1%} / {stats.min_separation_u_fraction:.1%} / "
             f"{stats.min_separation_v_fraction:.1%} | {stats.gpq_u_fraction:.1%} / {stats.gpq_v_fraction:.1%} / "
@@ -113,14 +114,14 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
     before, after = MCTuplesStats(result.uncorrected_tuple_array), result.tuples.stats()
     axes = []
     for label, allocation, correction in (
-        ("u", result.u_allocation, result.correction.u),
-        ("v", result.v_allocation, result.correction.v),
+        ("u", result.u_allocation, result.mean_correction.u),
+        ("v", result.v_allocation, result.mean_correction.v),
     ):
-        if allocation.predicted_offset_fine_lanes is None:
+        if allocation.mean_aware_offset_fine_lanes is None:
             predicted = "1 gap"
         else:
             predicted = (
-                f"predicted {allocation.greedy_offset_fine_lanes:+.2f} → {allocation.predicted_offset_fine_lanes:+.2f}"
+                f"predicted {allocation.greedy_offset_fine_lanes:+.2f} → {allocation.mean_aware_offset_fine_lanes:+.2f}"
             )
         axes.append(
             f"{label}: {predicted}, offset {correction.offset_before_fine_lanes:+.3f} → "
@@ -133,7 +134,8 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
         flush=True,
     )
     print(
-        f"  gpq(0.1) u / v / L2 and score, before → after the correction: {spread(before)} → {spread(after)}",
+        f"  gpq(0.1) u / v / L2 and score, before → after the correction: "
+        f"{format_spread(before)} → {format_spread(after)}",
         flush=True,
     )
     if inspection_dir is not None:
@@ -153,7 +155,7 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
             pickle.dump(result.solution, file)
 
 
-def spread(stats: MCTuplesStats) -> str:
+def format_spread(stats: MCTuplesStats) -> str:
     """Return the 3 gpq(0.1) fractions and the score of a size."""
     return f"{stats.gpq_u_fraction:.1%} / {stats.gpq_v_fraction:.1%} / {stats.gpq_l2_fraction:.1%}, {stats.score:.1%}"
 

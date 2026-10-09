@@ -81,8 +81,8 @@ def test_generate_mc_tuples_corrects_each_size_and_builds_the_next_on_it(monkeyp
     assert tuples.size == 128
     assert [int(result.size) for result in results] == [32, 64, 128]
     _assert_valid_nested_set(tuples, results)
-    assert results[0].u_allocation.predicted_offset_fine_lanes is None
-    assert results[1].u_allocation.predicted_offset_fine_lanes is not None
+    assert results[0].u_allocation.mean_aware_offset_fine_lanes is None
+    assert results[1].u_allocation.mean_aware_offset_fine_lanes is not None
 
 
 def test_generate_mc_tuples_without_a_callback_returns_the_largest_size(monkeypatch):

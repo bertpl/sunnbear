@@ -13,7 +13,7 @@ from numpy.typing import ArrayLike
 from sunnbear._core.stats import gpq
 
 # The level of the geometric pseudo-quantile (`gpq`) that the construction maximizes and `MCTuplesStats` reports. At
-# 0.1 it is a soft minimum: the smallest separations dominate it, but not the single smallest alone.
+# 0.1 the gpq is a soft minimum: the smallest separations dominate it, but not the single smallest alone.
 GPQ_LEVEL = 0.1
 
 
@@ -111,7 +111,7 @@ class MCTuplesStats:
     """`MCTuplesStats` describes how evenly (u, v) tuples are spread; each statistic is computed when first read.
 
     Each tuple's separation is its distance to its nearest other tuple: in the square (L2), along u, or along v.
-    2 statistics summarize the separations of each kind:
+    The separations of each kind are summarized by 2 statistics:
 
     - the min separation, the smallest of them;
     - gpq(0.1), the geometric pseudo-quantile at `GPQ_LEVEL`, which the construction maximizes.
@@ -222,8 +222,8 @@ class MCTuplesStats:
     def _separations_along_axis(values: np.ndarray) -> np.ndarray:
         """Return each value's distance to its nearest other value, in the values' order."""
         order = np.argsort(values)
-        gaps = np.diff(values[order])
-        nearest_in_order = np.minimum(np.concatenate([[np.inf], gaps]), np.concatenate([gaps, [np.inf]]))
+        differences = np.diff(values[order])
+        nearest_in_order = np.minimum(np.concatenate([[np.inf], differences]), np.concatenate([differences, [np.inf]]))
         separations = np.empty_like(nearest_in_order)
         separations[order] = nearest_in_order
         return separations
