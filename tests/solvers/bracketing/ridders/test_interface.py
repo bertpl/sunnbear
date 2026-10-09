@@ -18,7 +18,7 @@ def test_an_unknown_variant_is_rejected():
         Ridders(variant="original")  # ty: ignore[invalid-argument-type] — the test passes a wrong value
 
 
-def test_identity_and_that_its_arithmetic_is_counted():
+def test_name_version_and_that_its_arithmetic_is_counted():
     """`Ridders` is named ``ridders``, at version 1, and its arithmetic, square roots included, is flop-counted."""
     # --- act --------------------------
     result = Ridders(variant=RiddersVariant.SCIPY).solve(cubic, 1.0, 2.0, xtol=1e-3, max_fevals=20)
