@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **Breaking:** Change how `generate_mc_tuples` builds tuple sets, and its signature: every size's mean u and mean v are now exactly 0.5
+- Rebuild the shipped Monte Carlo tuple set with the new construction; benchmark results on it differ from those on the previous set
 - Require max-div ≥ 0.21.1
 
 ### Deprecated
