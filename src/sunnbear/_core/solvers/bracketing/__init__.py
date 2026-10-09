@@ -26,4 +26,5 @@ from .itp import ITP, ITPVariant
 from .pegasus import Pegasus
 from .regula_falsi import RegulaFalsi
 from .ridders import Ridders, RiddersVariant
+from .steffen_brent import SteffenBrent
 from .toms748 import TOMS748

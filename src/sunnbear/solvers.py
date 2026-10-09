@@ -18,6 +18,7 @@ from ._core.solvers.bracketing import (
     RegulaFalsi,
     Ridders,
     RiddersVariant,
+    SteffenBrent,
 )
 from ._core.solvers.core import (
     BracketingSolver,
@@ -61,4 +62,5 @@ __all__ = [
     "SolverConfig",
     "SolverConfigRegistry",
     "SolverRole",
+    "SteffenBrent",
 ]

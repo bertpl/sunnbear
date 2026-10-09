@@ -55,7 +55,7 @@ class Brent(Solver):
     name = "brent"
     version = 1
 
-    def _solve(self, state: SolveState) -> float:  # noqa: C901 — the loop follows Brent's procedure line by line
+    def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the line-by-line match with Brent's procedure
         """Run Brent's procedure and return ``b``.
 
         The variables keep the names of the Algol procedure, and comments mark where its labels ``int`` and ``ext``

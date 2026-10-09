@@ -19,6 +19,7 @@ from sunnbear._core.solvers.bracketing.ridders.configs import (
     RiddersCommonsMathConfig,
     RiddersScipyConfig,
 )
+from sunnbear._core.solvers.bracketing.steffen_brent.configs import SteffenBrentConfig
 from sunnbear._core.solvers.bracketing.toms748.configs import TOMS748K1Config, TOMS748K2Config
 from sunnbear._core.solvers.open.secant.configs import SecantConfig
 from sunnbear.exceptions import UnknownSolverConfigError
@@ -36,6 +37,7 @@ from sunnbear.solvers import (
     Secant,
     SolverConfigRegistry,
     SolverRole,
+    SteffenBrent,
 )
 
 from .example_solvers import WeightedSplitSolver, define_config
@@ -75,6 +77,7 @@ from .example_solvers import WeightedSplitSolver, define_config
         (RiddersCommonsMathConfig, "ridders[variant='commons_math']", Ridders, SolverRole.BUILTIN_SECONDARY),
         (RiddersScipyConfig, "ridders[variant='scipy']", Ridders, SolverRole.BUILTIN_CORE),
         (SecantConfig, "secant", Secant, SolverRole.BUILTIN_SECONDARY),
+        (SteffenBrentConfig, "steffen_brent", SteffenBrent, SolverRole.BUILTIN_SECONDARY),
         (ChandrupatlaConfig, "chandrupatla", Chandrupatla, SolverRole.BUILTIN_CORE),
         (TOMS748K1Config, "toms748[k=1]", TOMS748, SolverRole.BUILTIN_CORE),
         (TOMS748K2Config, "toms748[k=2]", TOMS748, SolverRole.BUILTIN_SECONDARY),
@@ -121,6 +124,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         "ridders[variant='commons_math']",
         "ridders[variant='scipy']",
         "secant",
+        "steffen_brent",
         "toms748[k=1]",
         "toms748[k=2]",
         "weighted_split[weight=0.25]",
@@ -137,6 +141,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         RegulaFalsi,
         Ridders,
         Secant,
+        SteffenBrent,
         TOMS748,
         WeightedSplitSolver,
     )
