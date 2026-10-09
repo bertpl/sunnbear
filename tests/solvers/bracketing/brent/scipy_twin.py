@@ -1,13 +1,10 @@
 """`BrentScipyTwin` runs `scipy.optimize.brentq` as a `Solver`, so `Brent` can be tested against it."""
 
-import sys
-
 import scipy.optimize
 
+from sunnbear._core.utils.floats import FLOAT64_EPS
 from sunnbear.solvers import Interval
 from tests.solvers.twins import StoppingWrappedFunction, TwinSolver
-
-_MACHEPS = sys.float_info.epsilon
 
 
 class BrentScipyTwin(TwinSolver):
@@ -39,8 +36,8 @@ class BrentScipyTwin(TwinSolver):
         The twin runs 1 solve at a time, so it keeps that solve's ``t`` on the instance for
         `_root_if_sunnbear_solver_stops`.
         """
-        self._brent_t = 0.5 * (xtol - 6.0 * _MACHEPS * max(abs(a), abs(b)))
-        scipy.optimize.brentq(f, a, b, xtol=2.0 * self._brent_t, rtol=4.0 * _MACHEPS)
+        self._brent_t = 0.5 * (xtol - 6.0 * FLOAT64_EPS * max(abs(a), abs(b)))
+        scipy.optimize.brentq(f, a, b, xtol=2.0 * self._brent_t, rtol=4.0 * FLOAT64_EPS)
 
     def _root_if_sunnbear_solver_stops(
         self, interval: Interval, evaluations: list[tuple[float, float]], xtol: float
@@ -51,7 +48,7 @@ class BrentScipyTwin(TwinSolver):
         equal.
         """
         (b, fb), (c, _) = self._get_bounds_best_estimate_first(interval)
-        if abs(0.5 * (c - b)) <= 2.0 * _MACHEPS * abs(b) + self._brent_t or fb == 0.0:
+        if abs(0.5 * (c - b)) <= 2.0 * FLOAT64_EPS * abs(b) + self._brent_t or fb == 0.0:
             return b
         else:
             return None

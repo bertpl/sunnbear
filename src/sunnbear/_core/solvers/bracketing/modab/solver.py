@@ -22,7 +22,7 @@ class ModAB(Solver):
 
     ``x3`` replaces the bound whose function value has the sign of ``y3``.
 
-    In Anderson-Björck mode, when the same bound stays fixed in 2 iterations in a row, its stored function value is
+    In Anderson-Björck mode, when the same bound is retained in 2 iterations in a row, its stored function value is
     multiplied by the factor of `AndersonBjorck`, ``m = 1 - y3 / y_moved``, where ``y_moved`` is the function value at
     the replaced bound; where ``m`` is not positive, the factor is 0.5.
 
@@ -42,7 +42,7 @@ class ModAB(Solver):
     - **Clamping:** Algorithm 1 evaluates the chord's zero and then clamps it into the interval. The C# code clamps
       first: a chord's zero that rounding puts on or outside a bound is replaced by that bound and its stored function
       value, so nothing is evaluated. In Anderson-Björck mode, such an iteration only halves the stored function value
-      at the other bound, or marks the other bound as fixed.
+      at the other bound, or marks the other bound as retained.
     - **The first threshold:** only the C# code shows the threshold's starting value at the switch.
     - **Scaled function values:** Anderson-Björck mode's scaled function values stay stored after a fallback to
       bisection, and the next bisection steps read them when they test whether the function looks close to a straight
@@ -81,7 +81,7 @@ class ModAB(Solver):
 
         - ``x_new`` and ``y_new`` are the point that replaces a bound: ``x3`` and ``y3``, or, when ``x3`` is clamped
           onto a bound, that bound with its stored function value;
-        - ``fixed_bound`` is the bound that stayed fixed in the last Anderson-Björck step, ``None`` before the first;
+        - ``retained_bound`` is the bound that was retained in the last Anderson-Björck step, ``None`` before the first;
           the C# code stores it as the integer ``side``, although the comment on ``side`` calls it the side that moved
           last;
         - ``is_bisecting`` is the mode, ``bisection`` in the C# code.
@@ -91,13 +91,13 @@ class ModAB(Solver):
         - computes ``x3``, and ends the solve if the interval is narrow enough;
         - evaluates ``x3``, unless it is clamped, and in bisection mode tests whether to switch;
         - ends the solve if ``y_new = 0``;
-        - replaces a bound by ``(x_new, y_new)``, scaling the fixed bound's function value in Anderson-Björck mode;
+        - replaces a bound by ``(x_new, y_new)``, scaling the retained bound's function value in Anderson-Björck mode;
         - falls back to bisection if the interval is wider than the threshold.
         """
         interval = state.interval
         x1, y1, x2, y2 = interval.a, interval.fa, interval.b, interval.fb
         is_bisecting = True
-        fixed_bound: IntervalBound | None = None
+        retained_bound: IntervalBound | None = None
         threshold = x2 - x1
         while True:
             # --- the new x-value x3 -------------
@@ -137,23 +137,23 @@ class ModAB(Solver):
             # The C# code compares Math.Sign(y_new) with Math.Sign(y1); the test below gives the same result because
             # y_new is not 0 here.
             if (y_new > 0.0 and y1 > 0.0) or (y_new < 0.0 and y1 < 0.0):
-                if fixed_bound is IntervalBound.UPPER:
+                if retained_bound is IntervalBound.UPPER:
                     m = 1.0 - y_new / y1
                     y2 = y2 * (0.5 if m <= 0.0 else m)
                 elif not is_bisecting:
-                    fixed_bound = IntervalBound.UPPER
+                    retained_bound = IntervalBound.UPPER
                 x1, y1 = x_new, y_new
             else:
-                if fixed_bound is IntervalBound.LOWER:
+                if retained_bound is IntervalBound.LOWER:
                     m = 1.0 - y_new / y2
                     y1 = y1 * (0.5 if m <= 0.0 else m)
                 elif not is_bisecting:
-                    fixed_bound = IntervalBound.LOWER
+                    retained_bound = IntervalBound.LOWER
                 x2, y2 = x_new, y_new
             if x2 - x1 > threshold:
                 # The Anderson-Björck steps shrink the interval too slowly: fall back to bisection.
                 is_bisecting = True
-                fixed_bound = None
+                retained_bound = None
 
     # --------------------------------------------------------------------------
     #  Helpers

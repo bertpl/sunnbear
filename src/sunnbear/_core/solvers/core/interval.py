@@ -115,13 +115,13 @@ class Interval(ABC):
         else:
             return type(self)(self.a, x, self.fa, fx, IntervalBound.UPPER)
 
-    def is_converged(self, doubled_xtol: float) -> bool:
-        """Return whether a stopping criterion holds: the width is at most ``doubled_xtol`` or a bound value is zero.
+    def is_converged(self, xtol_doubled: float) -> bool:
+        """Return whether the width is at most ``xtol_doubled`` or the function value at a bound is zero.
 
         The parameter is the doubled tolerance, so the caller computes it once
         per solve, not once per iteration.
         """
-        return self.width <= doubled_xtol or self.is_fa_zero or self.is_fb_zero
+        return self.width <= xtol_doubled or self.is_fa_zero or self.is_fb_zero
 
     def root(self) -> float:
         """Return the best root estimate without another step: a bound with a zero value if any, else the midpoint."""

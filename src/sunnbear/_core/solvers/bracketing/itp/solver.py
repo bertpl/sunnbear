@@ -7,6 +7,11 @@ from sunnbear._core.solvers.core import BracketingSolver, Interval
 from .state import ITPState
 from .variant import ITPVariant
 
+# ``kappa_1`` and ``kappa_2`` are the truncation constants that the `ITP` docstring gives. ``kappa_1`` depends on
+# the initial interval, so `ITP._solve` sets it per solve from `_KAPPA_1_TIMES_INITIAL_WIDTH`.
+_KAPPA_1_TIMES_INITIAL_WIDTH = 0.2
+_KAPPA_2 = 2
+
 
 class ITP(BracketingSolver[ITPState]):
     """`ITP` implements the ITP method, in the variant of its paper's pseudocode or in that of its paper's experiments.
@@ -70,9 +75,6 @@ class ITP(BracketingSolver[ITPState]):
     version = 1
     state_cls = ITPState
 
-    # `_KAPPA_2` is the paper's kappa_2; kappa_1 depends on the initial interval, so `_solve` sets it per solve.
-    _KAPPA_2 = 2
-
     def __init__(self, *, n_slack: int, variant: ITPVariant) -> None:
         """Configure the method.
 
@@ -99,7 +101,7 @@ class ITP(BracketingSolver[ITPState]):
         """
         width = state.interval.width
         n_bisection = math.ceil(math.log2(width / (2.0 * state.xtol)))
-        state.kappa_1 = 0.2 / width
+        state.kappa_1 = _KAPPA_1_TIMES_INITIAL_WIDTH / width
         state.max_next_width = state.xtol * 2.0 ** (n_bisection + self.n_slack)
         return super()._solve(state)
 
@@ -121,7 +123,7 @@ class ITP(BracketingSolver[ITPState]):
             sigma = -1.0
         else:
             sigma = 0.0
-        delta = state.kappa_1 * interval.width**self._KAPPA_2
+        delta = state.kappa_1 * interval.width**_KAPPA_2
         if delta <= abs(x_half_minus_x_f):
             x_t = x_f + sigma * delta
         else:

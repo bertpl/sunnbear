@@ -1,13 +1,10 @@
 """These tests assert that the individual steps of `TOMS748` follow the authors' code."""
 
-import sys
-
 import pytest
 
+from sunnbear._core.utils.floats import FLOAT64_EPS
 from sunnbear.solvers import TOMS748, SolveStatus
 from tests.solvers.example_functions import cubic
-
-_MACHEPS = sys.float_info.epsilon
 
 
 @pytest.mark.parametrize("k", [1, 2])
@@ -28,7 +25,7 @@ def test_a_point_close_to_a_bound_moves_to_the_margin_and_the_lower_bound_is_ret
     # --- arrange ----------------------
     xtol = 1e-4
     # The lower bound has the smaller |f|, and lies at 0, so stop_width is 2 * tol.
-    stop_width = 2.0 * (0.5 * xtol - 2.0 * _MACHEPS * 1.0)
+    stop_width = 2.0 * (0.5 * xtol - 2.0 * FLOAT64_EPS * 1.0)
 
     # --- act --------------------------
     result = TOMS748(k=k).solve(lambda x: x - 1e-9, 0.0, 1.0, xtol=xtol, max_fevals=10, history_enabled=True)

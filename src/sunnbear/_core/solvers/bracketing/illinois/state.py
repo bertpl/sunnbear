@@ -17,9 +17,10 @@ class IllinoisState(SolveState):
             iteration that kept the bound again.
     """
 
-    newest_bound: IntervalBound = IntervalBound.UPPER
+    newest_bound: IntervalBound = field(init=False)
     scaled_retained_f: float = field(init=False)
 
     def __post_init__(self) -> None:
-        """Start with the lower bound as the retained bound, at its own function value."""
+        """Start with the upper bound as the newest bound: `scaled_retained_f` is ``fa``."""
+        self.newest_bound = IntervalBound.UPPER
         self.scaled_retained_f = self.interval.fa
