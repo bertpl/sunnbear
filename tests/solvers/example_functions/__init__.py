@@ -21,6 +21,11 @@ def quintic(x: float) -> float:
 CUBIC_ROOT = 1.324717957244746
 
 
+def ninth_power(x: float) -> float:
+    """Return ``x^9``; its root at 0 is a multiple root, around which the function is flat."""
+    return x**9
+
+
 def steep_exponential(x: float) -> float:
     """Return ``exp(20x) - 10^4``; it rises steeply and is convex on ``[0, 1]``, with its root at
     `STEEP_EXPONENTIAL_ROOT`."""
