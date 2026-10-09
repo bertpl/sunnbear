@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking:** Rename the parameter of `Interval.is_converged` to `xtol_doubled`
+
 ### Deprecated
 
 ### Removed
