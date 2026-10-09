@@ -1,8 +1,8 @@
-"""This module holds `TABLE_2`, the 45 cases of Table 2 of Chandrupatla's paper, with the paper's evaluation counts
+"""This module holds `TABLE_2`, the cases of Table 2 of Chandrupatla's paper, with the paper's evaluation counts
 for its method."""
 
 from tests.solvers.paper_problems import PaperProblem
-from tests.solvers.paper_problems.chandrupatla import CHANDRUPATLA_LISTING_FUNCTIONS
+from tests.solvers.paper_problems.chandrupatla import CHANDRUPATLA_BASIC_LISTING_FUNCTIONS
 
 # Each row of the paper's Table 2 holds:
 # - the function number;
@@ -11,7 +11,7 @@ from tests.solvers.paper_problems.chandrupatla import CHANDRUPATLA_LISTING_FUNCT
 # The functions are those of the paper's BASIC listing, which produced the table.
 TABLE_2 = [
     PaperProblem(
-        f"{number}[{a:g},{b:g}]", CHANDRUPATLA_LISTING_FUNCTIONS[number], float(a), float(b), n_fevals=n_fevals
+        f"{number}[{a:g},{b:g}]", CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[number], float(a), float(b), n_fevals=n_fevals
     )
     for number, a, b, n_fevals in [
         (1, 2, 3, 7),

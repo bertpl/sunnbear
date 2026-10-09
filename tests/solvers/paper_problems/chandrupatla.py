@@ -1,7 +1,7 @@
 """This module holds the test functions of Chandrupatla's paper, keyed by their number in its Table 1.
 
 Function 7 comes in 2 versions: as the paper prints it, in `CHANDRUPATLA_FUNCTIONS`, and as the paper's BASIC listing
-computes it, in `CHANDRUPATLA_LISTING_FUNCTIONS`.
+computes it, in `CHANDRUPATLA_BASIC_LISTING_FUNCTIONS`.
 """
 
 import math
@@ -42,4 +42,4 @@ CHANDRUPATLA_FUNCTIONS = {
     9: lambda x: math.exp(x) - 2.0 - 0.01 / x**2 + 0.000002 / x**3,
 }
 
-CHANDRUPATLA_LISTING_FUNCTIONS = {**CHANDRUPATLA_FUNCTIONS, 7: _listing_function_7}
+CHANDRUPATLA_BASIC_LISTING_FUNCTIONS = {**CHANDRUPATLA_FUNCTIONS, 7: _listing_function_7}

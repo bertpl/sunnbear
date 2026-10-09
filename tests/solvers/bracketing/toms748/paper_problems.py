@@ -164,7 +164,7 @@ PRINTED_ROOTS = {
     "28[n=1000]": 1.2388385788997e-06,
 }
 
-# A root matches the printed one within the precision of its 14 digits.
+# ``root_rel_tol = 1e-13`` is the precision of a root printed to 14 significant digits.
 AUTHORS_TEST_OUTPUT = [
     replace(problem, root=PRINTED_ROOTS[problem.name], root_rel_tol=1e-13) for problem in ALEFELD_POTRA_SHI_PROBLEMS
 ]

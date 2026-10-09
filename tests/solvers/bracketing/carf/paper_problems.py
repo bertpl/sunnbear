@@ -1,14 +1,16 @@
-"""This module holds `TABLE_4`, the 45 cases of Table 4 of the CARF paper with CARF's evaluation count for each. The
+"""This module holds `TABLE_4`, the cases of Table 4 of the CARF paper with CARF's evaluation count for each. The
 table reuses the functions and intervals of Chandrupatla's paper."""
 
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.chandrupatla import CHANDRUPATLA_FUNCTIONS
 
-# On some of the wide intervals of functions 1 to 4, ``h``, the scaled function value at ``t`` that `CARF`'s docstring
-# defines, often lies within rounding error of 0 or 1, the limits that choose the kind of step.
+# On some of the wide intervals of functions 1 to 4, `CARF`'s ``h`` (the scaled function value at ``t``, defined in
+# `CARF`'s docstring) often lies within rounding error of 0 or 1, the limits that `CARF` compares ``h`` with to choose
+# the kind of step.
 _STEP_CHOICE_DEVIATION_REASON = (
-    "h lies within rounding error of a limit that chooses the kind of step, so the count depends on how the paper's "
-    "code computes the root of the quadratic through the 3 points and the power step"
+    "h lies within rounding error of a limit that CARF compares h with to choose the kind of step, so the count "
+    "depends on how the paper's code computes 2 values: the root of the quadratic through the 3 points, and the power "
+    "step"
 )
 _LAST_STEP_DEVIATION_REASON = (
     "the last step's x-value lies on the other side of the root, or exactly on it, so a 1-ulp difference in that step "

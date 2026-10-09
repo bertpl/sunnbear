@@ -1,4 +1,4 @@
-"""This module holds `TABLE_2`, the 92 test problems of Table 2 of the 2026 modAB paper, with modAB's evaluation
+"""This module holds `TABLE_2`, the test problems of Table 2 of the 2026 modAB paper, with modAB's evaluation
 count in that table and its root in the paper's supplementary results.
 
 The functions follow the C# benchmark of the paper's supplementary code, which produced Table 2; where the table
@@ -57,7 +57,7 @@ def _f27(x: float) -> float:
 # ==================================================================================================
 #  The problems
 # ==================================================================================================
-# On these problems, the evaluation count differs from Table 2's by up to 4, presumably because the authors' .NET
+# On these problems, the evaluation count differs from Table 2's, presumably because the authors' .NET
 # runtime rounds the last bit of cos, cbrt or exp differently from the correctly rounded values here, which changes the
 # x-values that the solve evaluates.
 _ROUNDING_SENSITIVE_PROBLEM_NAMES = {"f34", "f70", "f86"}
@@ -72,7 +72,8 @@ _ROUNDING_DEVIATION_REASON = (
 #   there;
 # - modAB's evaluation count in Table 2;
 # - the number of iterations whose chord's zero is clamped onto a bound: the paper's C# code counts every iteration as
-#   an evaluation, but a clamped iteration evaluates nothing, so `ModAB` evaluates the table's count less these.
+#   an evaluation, but a clamped iteration evaluates nothing, so `ModAB`'s evaluation count is the table's count minus
+#   the clamped iterations.
 TABLE_2 = [
     PaperProblem(
         name,

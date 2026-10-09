@@ -17,7 +17,7 @@ from .paper_problems import TABLE_4
 @pytest.mark.parametrize("problem", TABLE_4, ids=str)
 def test_the_evaluation_counts_of_table_4_of_the_paper_are_reproduced(problem: PaperProblem):
     """With the paper's tolerances ``eps1 = 1e-15`` and ``eps2 = 1e-12``, `CARF` converges on every row of Table 4,
-    and evaluates exactly as often as the table reports on every row that carries no deviation reason."""
+    and evaluates exactly as often as the table reports on every row without a ``deviation_reason``."""
     # --- act --------------------------
     result = _CARFWithPaperTolerances(eps1=1e-15, eps2=1e-12).solve(
         problem.f, problem.a, problem.b, xtol=0.0, max_fevals=300

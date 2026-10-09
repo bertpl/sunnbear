@@ -91,7 +91,7 @@ def _function_25(x: float, *, n: float) -> float:
 
 def _function_26(x: float) -> float:
     """Return problem 26, ``x / exp(1 / x^2)``, and 0 where the exponential overflows, which is the value that the
-    Fortran code computes there.
+    authors' Fortran test driver computes there.
 
     Python raises where Fortran returns infinity: ``exp`` overflows for ``|x|`` below about 0.0375, and ``1 / x^2``
     for ``|x|`` below about 1e-154. The function is 0 there in both cases.
@@ -126,7 +126,7 @@ def _function_28(x: float, *, n: float) -> float:
 # ==================================================================================================
 #  The problems, in the order of the authors' test data
 # ==================================================================================================
-def _for_each_n(
+def _problems_for_each_n(
     problem_number: int, function: Callable[..., float], a: float, b: float, ns: Iterable[int]
 ) -> list[PaperProblem]:
     """Return 1 problem per value of ``n``, each with ``function`` bound to that ``n``."""
@@ -143,18 +143,18 @@ ALEFELD_POTRA_SHI_PROBLEMS = [
     PaperProblem("12[n=1]", functools.partial(_function_12_to_14, scale=40.0, rate=1.0), -9.0, 31.0),
     PaperProblem("13[n=1]", functools.partial(_function_12_to_14, scale=100.0, rate=2.0), -9.0, 31.0),
     PaperProblem("14[n=1]", functools.partial(_function_12_to_14, scale=200.0, rate=3.0), -9.0, 31.0),
-    *_for_each_n(15, _function_15, 0.0, 5.0, [4, 6, 8, 10, 12]),
-    *_for_each_n(16, _function_16_and_17, 0.0, 5.0, [4, 6, 8, 10, 12]),
-    *_for_each_n(17, _function_16_and_17, -0.95, 4.05, [8, 10, 12, 14]),
+    *_problems_for_each_n(15, _function_15, 0.0, 5.0, [4, 6, 8, 10, 12]),
+    *_problems_for_each_n(16, _function_16_and_17, 0.0, 5.0, [4, 6, 8, 10, 12]),
+    *_problems_for_each_n(17, _function_16_and_17, -0.95, 4.05, [8, 10, 12, 14]),
     PaperProblem("18[n=1]", _function_18, 0.0, 1.5),
-    *_for_each_n(19, _function_19, 0.0, 1.0, [1, 2, 3, 4, 5, 20, 40, 60, 80, 100]),
-    *_for_each_n(20, _function_20, 0.0, 1.0, [5, 10, 20]),
-    *_for_each_n(21, _function_21, 0.0, 1.0, [2, 5, 10, 15, 20]),
-    *_for_each_n(22, _function_22, 0.0, 1.0, [1, 2, 4, 5, 8, 15, 20]),
-    *_for_each_n(23, _function_23, 0.0, 1.0, [1, 5, 10, 15, 20]),
-    *_for_each_n(24, _function_24, 1e-2, 1.0, [2, 5, 15, 20]),
-    *_for_each_n(25, _function_25, 1.0, 100.0, [2, 3, 4, 5, 6, 7, *range(9, 34, 2)]),
+    *_problems_for_each_n(19, _function_19, 0.0, 1.0, [1, 2, 3, 4, 5, 20, 40, 60, 80, 100]),
+    *_problems_for_each_n(20, _function_20, 0.0, 1.0, [5, 10, 20]),
+    *_problems_for_each_n(21, _function_21, 0.0, 1.0, [2, 5, 10, 15, 20]),
+    *_problems_for_each_n(22, _function_22, 0.0, 1.0, [1, 2, 4, 5, 8, 15, 20]),
+    *_problems_for_each_n(23, _function_23, 0.0, 1.0, [1, 5, 10, 15, 20]),
+    *_problems_for_each_n(24, _function_24, 1e-2, 1.0, [2, 5, 15, 20]),
+    *_problems_for_each_n(25, _function_25, 1.0, 100.0, [2, 3, 4, 5, 6, 7, *range(9, 34, 2)]),
     PaperProblem("26[n=1]", _function_26, -1.0, 4.0),
-    *_for_each_n(27, _function_27, -10000.0, _PI_ROUNDED / 2.0, range(1, 41)),
-    *_for_each_n(28, _function_28, -10000.0, 1e-4, [*range(20, 41), *range(100, 1001, 100)]),
+    *_problems_for_each_n(27, _function_27, -10000.0, _PI_ROUNDED / 2.0, range(1, 41)),
+    *_problems_for_each_n(28, _function_28, -10000.0, 1e-4, [*range(20, 41), *range(100, 1001, 100)]),
 ]

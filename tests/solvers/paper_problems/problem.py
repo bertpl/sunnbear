@@ -12,21 +12,22 @@ from sunnbear.solvers import SolveResult, SolveStatus
 class PaperProblem:
     """`PaperProblem` is 1 published test problem: a function, its interval, and a solver's published results on it.
 
-    A count that the paper prints in another form, such as iterations without the 2 evaluations at the interval
-    bounds, is converted to an evaluation count where the problem is defined, written so that the printed number stays
-    visible, for example ``n_fevals=n_iterations + 2``.
+    Where a paper prints a count in another form, such as iterations that exclude the 2 evaluations at the interval
+    bounds, the code that defines the problem converts it to an evaluation count, and writes the conversion out so
+    that the printed number stays visible, for example ``n_fevals=n_iterations + 2``.
 
     Attributes:
         name: The paper's label for the problem; also its pytest id.
         root: The published root, or None where the paper gives none.
         root_rel_tol: The relative tolerance on ``root``, set from the digits that the paper prints.
-        root_abs_tol: The absolute tolerance on ``root``, set from the digits that the paper prints.
+        root_abs_tol: The absolute tolerance on ``root``, set from the digits that the paper prints; with both
+            tolerances at their default of 0, the root must match exactly.
         n_fevals: The published evaluation count in sunnbear's counting, which includes the 2 evaluations at the
             interval bounds, or None where the paper gives none.
-        n_fevals_tol: How far the solve's evaluation count may lie from ``n_fevals``; None when that count is not
-            checked.
+        n_fevals_tol: How far the solve's evaluation count may lie from ``n_fevals``; None when the solve's
+            evaluation count is not checked.
         deviation_reason: Why the solve's evaluation count does not reproduce ``n_fevals`` exactly; required whenever
-            ``n_fevals_tol`` is not 0.
+            ``n_fevals_tol`` is not 0, and None when it is 0.
     """
 
     name: str
@@ -41,7 +42,7 @@ class PaperProblem:
     deviation_reason: str | None = None
 
     def __post_init__(self) -> None:
-        """Check that a count that is not reproduced exactly comes with its reason."""
+        """Check that a deviation_reason is given exactly when the count is not reproduced exactly."""
         if (self.n_fevals_tol != 0) != (self.deviation_reason is not None):
             raise ValueError(f"{self.name}: give a deviation_reason exactly when n_fevals_tol is not 0.")
 

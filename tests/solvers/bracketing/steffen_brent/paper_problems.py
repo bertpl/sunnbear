@@ -1,4 +1,4 @@
-"""This module holds `CASE_STUDIES`, the 2 case studies of the Steffen-Brent paper, with the roots that the paper
+"""This module holds `CASE_STUDIES`, the case studies of the Steffen-Brent paper, with the roots that the paper
 reports for them."""
 
 import math
@@ -38,11 +38,13 @@ CASE_STUDIES = [
         3.0,
         root=2.1584212093,
         root_abs_tol=5e-11,
-        # The paper reports 6 iterations. `SteffenBrent` evaluates at the 2 interval bounds, once in each of those 6
-        # iterations, and, in 3 of them, also at the midpoint of the current interval.
+        # The paper reports 6 iterations. `SteffenBrent` evaluates:
+        # - at the 2 interval bounds;
+        # - once in each of those 6 iterations;
+        # - in 3 of those iterations, also at the midpoint of the current interval.
         n_fevals=2 + 6 + 3,
     ),
     # The tolerance on the root covers the gap between the paper's root and the root at the full-precision
-    # Peng-Robinson constants, which the comment on those constants gives.
+    # Peng-Robinson constants; the comment above `_PENG_ROBINSON_ETA` gives that gap.
     PaperProblem("case_study_2", _case_study_2, 14.0, 17.0, root=15.0676609061, root_abs_tol=1e-8),
 ]
