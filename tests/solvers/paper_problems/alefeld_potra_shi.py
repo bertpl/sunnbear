@@ -130,31 +130,44 @@ def _problems_for_each_n(
     problem_number: int, function: Callable[..., float], a: float, b: float, ns: Iterable[int]
 ) -> list[PaperProblem]:
     """Return 1 problem per value of ``n``, each with ``function`` bound to that ``n``."""
-    return [PaperProblem(f"{problem_number}[n={n}]", functools.partial(function, n=float(n)), a, b) for n in ns]
+    return [
+        PaperProblem(name=f"{problem_number}[n={n}]", f=functools.partial(function, n=float(n)), a=a, b=b) for n in ns
+    ]
 
 
 ALEFELD_POTRA_SHI_PROBLEMS = [
-    PaperProblem("1[n=1]", _function_1, _PI_ROUNDED / 2.0, _PI_ROUNDED),
+    PaperProblem(name="1[n=1]", f=_function_1, a=_PI_ROUNDED / 2.0, b=_PI_ROUNDED),
     # Each of problems 2 to 11 takes the interval between 2 consecutive poles, i^2 and (i + 1)^2.
     *[
-        PaperProblem(f"{i + 1}[n=1]", _function_2_to_11, float(i * i) + 1e-9, float((i + 1) * (i + 1)) - 1e-9)
+        PaperProblem(
+            name=f"{i + 1}[n=1]",
+            f=_function_2_to_11,
+            a=float(i * i) + 1e-9,
+            b=float((i + 1) * (i + 1)) - 1e-9,
+        )
         for i in range(1, 11)
     ],
-    PaperProblem("12[n=1]", functools.partial(_function_12_to_14, scale=40.0, rate=1.0), -9.0, 31.0),
-    PaperProblem("13[n=1]", functools.partial(_function_12_to_14, scale=100.0, rate=2.0), -9.0, 31.0),
-    PaperProblem("14[n=1]", functools.partial(_function_12_to_14, scale=200.0, rate=3.0), -9.0, 31.0),
-    *_problems_for_each_n(15, _function_15, 0.0, 5.0, [4, 6, 8, 10, 12]),
-    *_problems_for_each_n(16, _function_16_and_17, 0.0, 5.0, [4, 6, 8, 10, 12]),
-    *_problems_for_each_n(17, _function_16_and_17, -0.95, 4.05, [8, 10, 12, 14]),
-    PaperProblem("18[n=1]", _function_18, 0.0, 1.5),
-    *_problems_for_each_n(19, _function_19, 0.0, 1.0, [1, 2, 3, 4, 5, 20, 40, 60, 80, 100]),
-    *_problems_for_each_n(20, _function_20, 0.0, 1.0, [5, 10, 20]),
-    *_problems_for_each_n(21, _function_21, 0.0, 1.0, [2, 5, 10, 15, 20]),
-    *_problems_for_each_n(22, _function_22, 0.0, 1.0, [1, 2, 4, 5, 8, 15, 20]),
-    *_problems_for_each_n(23, _function_23, 0.0, 1.0, [1, 5, 10, 15, 20]),
-    *_problems_for_each_n(24, _function_24, 1e-2, 1.0, [2, 5, 15, 20]),
-    *_problems_for_each_n(25, _function_25, 1.0, 100.0, [2, 3, 4, 5, 6, 7, *range(9, 34, 2)]),
-    PaperProblem("26[n=1]", _function_26, -1.0, 4.0),
-    *_problems_for_each_n(27, _function_27, -10000.0, _PI_ROUNDED / 2.0, range(1, 41)),
-    *_problems_for_each_n(28, _function_28, -10000.0, 1e-4, [*range(20, 41), *range(100, 1001, 100)]),
+    PaperProblem(name="12[n=1]", f=functools.partial(_function_12_to_14, scale=40.0, rate=1.0), a=-9.0, b=31.0),
+    PaperProblem(name="13[n=1]", f=functools.partial(_function_12_to_14, scale=100.0, rate=2.0), a=-9.0, b=31.0),
+    PaperProblem(name="14[n=1]", f=functools.partial(_function_12_to_14, scale=200.0, rate=3.0), a=-9.0, b=31.0),
+    *_problems_for_each_n(problem_number=15, function=_function_15, a=0.0, b=5.0, ns=[4, 6, 8, 10, 12]),
+    *_problems_for_each_n(problem_number=16, function=_function_16_and_17, a=0.0, b=5.0, ns=[4, 6, 8, 10, 12]),
+    *_problems_for_each_n(problem_number=17, function=_function_16_and_17, a=-0.95, b=4.05, ns=[8, 10, 12, 14]),
+    PaperProblem(name="18[n=1]", f=_function_18, a=0.0, b=1.5),
+    *_problems_for_each_n(
+        problem_number=19, function=_function_19, a=0.0, b=1.0, ns=[1, 2, 3, 4, 5, 20, 40, 60, 80, 100]
+    ),
+    *_problems_for_each_n(problem_number=20, function=_function_20, a=0.0, b=1.0, ns=[5, 10, 20]),
+    *_problems_for_each_n(problem_number=21, function=_function_21, a=0.0, b=1.0, ns=[2, 5, 10, 15, 20]),
+    *_problems_for_each_n(problem_number=22, function=_function_22, a=0.0, b=1.0, ns=[1, 2, 4, 5, 8, 15, 20]),
+    *_problems_for_each_n(problem_number=23, function=_function_23, a=0.0, b=1.0, ns=[1, 5, 10, 15, 20]),
+    *_problems_for_each_n(problem_number=24, function=_function_24, a=1e-2, b=1.0, ns=[2, 5, 15, 20]),
+    *_problems_for_each_n(
+        problem_number=25, function=_function_25, a=1.0, b=100.0, ns=[2, 3, 4, 5, 6, 7, *range(9, 34, 2)]
+    ),
+    PaperProblem(name="26[n=1]", f=_function_26, a=-1.0, b=4.0),
+    *_problems_for_each_n(problem_number=27, function=_function_27, a=-10000.0, b=_PI_ROUNDED / 2.0, ns=range(1, 41)),
+    *_problems_for_each_n(
+        problem_number=28, function=_function_28, a=-10000.0, b=1e-4, ns=[*range(20, 41), *range(100, 1001, 100)]
+    ),
 ]

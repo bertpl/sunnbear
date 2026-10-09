@@ -32,10 +32,10 @@ def _case_study_2(v: float) -> float:
 
 CASE_STUDIES = [
     PaperProblem(
-        "case_study_1",
-        _case_study_1,
-        1.0,
-        3.0,
+        name="case_study_1",
+        f=_case_study_1,
+        a=1.0,
+        b=3.0,
         root=2.1584212093,
         root_abs_tol=5e-11,
         # The paper reports 6 iterations. `SteffenBrent` evaluates:
@@ -46,5 +46,5 @@ CASE_STUDIES = [
     ),
     # The tolerance on the root covers the gap between the paper's root and the root at the full-precision
     # Peng-Robinson constants; the comment above `_PENG_ROBINSON_ETA` gives that gap.
-    PaperProblem("case_study_2", _case_study_2, 14.0, 17.0, root=15.0676609061, root_abs_tol=1e-8),
+    PaperProblem(name="case_study_2", f=_case_study_2, a=14.0, b=17.0, root=15.0676609061, root_abs_tol=1e-8),
 ]
