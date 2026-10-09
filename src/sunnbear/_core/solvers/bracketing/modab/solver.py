@@ -8,11 +8,11 @@ _FALLBACK_SAFETY_FACTOR = 16.0
 
 
 class ModAB(Solver):
-    """`ModAB` implements the modified Anderson-Björck method of Ganchovski et al. (2026), as the paper's C# code.
+    """`ModAB` ports the modified Anderson-Björck method of Ganchovski et al. (2026) from the paper's C# code.
 
-    The method combines bisection with the Anderson-Björck method, the regula falsi method that `AndersonBjorck`
-    implements. It keeps the interval bounds ``x1 < x2`` with their function values ``y1`` and ``y2``, and runs in 1
-    of 2 modes, starting with bisection:
+    The method combines bisection with the Anderson-Björck method, the modified regula falsi method of `AndersonBjorck`.
+    `ModAB` keeps the interval bounds ``x1 < x2`` with their function values ``y1`` and ``y2``, and runs in 1 of 2
+    modes, starting with bisection:
 
     - **bisection:** the new x-value ``x3`` is the midpoint. After evaluating ``y3 = f(x3)``, the method switches to
       Anderson-Björck mode when the function looks close to a straight line on the interval:
@@ -20,36 +20,42 @@ class ModAB(Solver):
       ``k = r^2``, and ``r = 1 - |ym / (y2 - y1)|`` measures how symmetric ``y1`` and ``y2`` are;
     - **Anderson-Björck:** ``x3`` is the zero of the chord, ``(x1 * y2 - y1 * x2) / (y2 - y1)``.
 
-    ``x3`` replaces the bound whose function value has the sign of ``y3``. In Anderson-Björck mode, when the same bound
-    stays fixed in 2 iterations in a row, its stored function value is multiplied by the factor of `AndersonBjorck`:
-    ``1 - y3 / y_moved``, where ``y_moved`` is the function value at the bound that ``x3`` replaces, or 0.5 where that
-    factor is not positive.
+    ``x3`` replaces the bound whose function value has the sign of ``y3``.
 
-    The switch to Anderson-Björck mode sets a threshold of 16 times the interval width, which halves with every
-    Anderson-Björck step. Once the interval is wider than the threshold, the Anderson-Björck steps have shrunk it less
-    than bisection would have, by more than 4 steps, and the method falls back to bisection.
+    In Anderson-Björck mode, when the same bound stays fixed in 2 iterations in a row, its stored function value is
+    multiplied by the factor of `AndersonBjorck`, ``m = 1 - y3 / y_moved``, where ``y_moved`` is the function value at
+    the replaced bound; where ``m`` is not positive, the factor is 0.5.
 
-    The solve ends once the interval is at most ``aTol + rTol * |x3|`` wide, and returns ``x3`` without evaluating it;
-    or once ``y3 = 0``. The solver passes ``xtol`` as ``aTol`` and 0 as ``rTol``; ``x3`` lies inside the interval, so
-    it lies within ``xtol`` of a root.
+    The switch to Anderson-Björck mode sets a threshold of 16 times the interval width, and every Anderson-Björck step
+    halves the threshold. Once the interval is wider than the threshold, it is wider than bisection would have made it
+    in 4 fewer steps, and the method falls back to bisection.
+
+    The solve ends once ``y3 = 0``, or once the interval is at most ``aTol + rTol * |x3|`` wide, where ``aTol`` and
+    ``rTol`` are the C# code's absolute and relative tolerances; in the second case, it returns ``x3`` without
+    evaluating it. The solver passes ``xtol`` as ``aTol`` and 0 as ``rTol``; ``x3`` lies inside the interval, so it
+    lies within ``xtol`` of a root.
 
     `ModAB` follows the C# code where the paper's Algorithm 1 differs from it or leaves a detail out:
 
     - **Clamping:** Algorithm 1 evaluates the chord's zero and then clamps it into the interval. The C# code clamps
-      first: a chord's zero that rounding puts on or outside a bound takes over that bound and its stored function
-      value, without an evaluation. In Anderson-Björck mode, such an iteration only halves the stored function value
+      first: a chord's zero that rounding puts on or outside a bound is replaced by that bound and its stored function
+      value, so nothing is evaluated. In Anderson-Björck mode, such an iteration only halves the stored function value
       at the other bound, or marks the other bound as fixed.
     - **The first threshold:** only the C# code shows that the threshold starts at 16 times the interval width at the
       switch.
-    - **Scaled function values:** the scaled function values stay stored after a fallback to bisection, and the
-      linearity test of the next bisection steps reads them.
+    - **Scaled function values:** the function values that Anderson-Björck mode scaled stay stored after a fallback to
+      bisection, and the next bisection steps read them when they test whether the function looks close to a straight
+      line.
 
     The C# code also stops after 200 iterations; `ModAB` leaves that limit out, so the solve's evaluation budget ends
-    it instead.
+    the solve.
 
-    The method's first version (Ganchovski and Traykov, 2023), with a fixed ``k = 0.25``, a fallback to bisection after
-    a fixed number of iterations, and a stop once 2 successive x-values lie within the tolerance, is a different
-    algorithm, which the 2026 paper replaces; `ModAB` implements only the 2026 version.
+    The method's first version (Ganchovski and Traykov, 2023) is a different algorithm, which the 2026 paper replaces;
+    `ModAB` implements only the 2026 version. The first version differs in 3 ways:
+
+    - it fixes ``k = 0.25``;
+    - it falls back to bisection after a fixed number of iterations;
+    - it stops once 2 successive x-values lie within the tolerance.
 
     `ModAB` stops by its own criterion, and returns an x-value that it has not evaluated, so it writes its own loop,
     not `BracketingSolver`'s.
@@ -57,7 +63,7 @@ class ModAB(Solver):
     References:
         - Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L. and Traykov, A. (2026). Improvements to the modified
           Anderson-Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. Its Table A1 holds the C# code that
-          `ModAB` ports, and the test suite reproduces its Table 2. https://doi.org/10.3390/a19050332
+          `ModAB` ports, and the test suite reproduces its Tables 1 and 2. https://doi.org/10.3390/a19050332
         - Ganchovski, N. and Traykov, A. (2023). Modified Anderson-Björck's method for solving non-linear equations in
           structural mechanics. IOP Conference Series: Materials Science and Engineering 1276, 012010. The method's
           first version. https://doi.org/10.1088/1757-899X/1276/1/012010
@@ -69,13 +75,14 @@ class ModAB(Solver):
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — the loop follows the authors' C# code step by step
         """Run the loop of the paper's C# code and return the last ``x3``.
 
-        The variables keep the names of the C# code, where ``p1``, ``p2`` and ``p3`` are the points ``(x1, y1)``,
-        ``(x2, y2)`` and ``(x3, y3)``, except for these:
+        The variables keep the names of the C# code, except for those listed below; the C# code also groups ``x1``
+        and ``y1`` into the point ``p1``, and likewise ``p2`` and ``p3``.
 
-        - ``x_new`` and ``y_new`` are the point that replaces a bound: ``x3`` and ``y3``, or the bound that a clamped
-          ``x3`` takes over, with its stored function value;
+        - ``x_new`` and ``y_new`` are the point that replaces a bound: ``x3`` and ``y3``, or, when ``x3`` is clamped,
+          the bound that it is clamped onto, with its stored function value;
         - ``fixed_bound`` is the bound that stayed fixed in the last Anderson-Björck step, ``None`` before the first;
-          the C# code stores it as the integer ``side``, whose comment calls it the side that moved last;
+          the C# code stores it as the integer ``side``, although the comment on ``side`` calls it the side that moved
+          last;
         - ``is_bisecting`` is the mode, ``bisection`` in the C# code.
 
         Each iteration:
@@ -126,7 +133,7 @@ class ModAB(Solver):
                 return x3
 
             # --- the new interval ---------------
-            # The C# code compares Math.Sign of the 2 values; y_new is not 0 here.
+            # The C# code compares Math.Sign(y_new) with Math.Sign(y1); y_new is not 0 here.
             if (y_new > 0.0 and y1 > 0.0) or (y_new < 0.0 and y1 < 0.0):
                 if fixed_bound is IntervalBound.UPPER:
                     m = 1.0 - y_new / y1
@@ -146,10 +153,14 @@ class ModAB(Solver):
                 is_bisecting = True
                 fixed_bound = None
 
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
     @staticmethod
     def _get_stop_width(xtol: float, x3: float) -> float:
         """Return the interval width at or below which the solve stops.
 
-        The C# code stops at ``aTol + rTol * |x3|``; `ModAB` passes ``xtol`` as ``aTol`` and 0 as ``rTol``.
+        The C# code stops at ``aTol + rTol * |x3|``; `ModAB` passes ``xtol`` as ``aTol`` and 0 as ``rTol``, so it
+        ignores ``x3``, which a subclass that overrides this method can use for a relative tolerance.
         """
         return xtol
