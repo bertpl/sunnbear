@@ -6,35 +6,22 @@ import math
 import pytest
 
 from sunnbear.solvers import Chandrupatla, SolveStatus
+from tests.solvers.bracketing.chandrupatla.paper_functions import PAPER_FUNCTIONS
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic
 
 
 def _paper_function_7(x: float) -> float:
-    """Return the paper's function 7, ``x * exp(-1 / x^2)``, set to 0 where ``|x| < 3.8e-4``."""
+    """Return the paper's function 7, ``x * exp(-1 / x^2)``, set to 0 where ``|x| < 3.8e-4``, as the paper's BASIC
+    listing does."""
     if abs(x) < 3.8e-4:
         return 0.0
     else:
         return x * math.exp(-(x**-2))
 
 
-def _paper_function_8(x: float) -> float:
-    """Return the paper's function 8."""
-    xi = 0.61489
-    return -3062.0 * (1.0 - xi) * math.exp(-x) / (xi + (1.0 - xi) * math.exp(-x)) - 1013.0 + 1628.0 / x
-
-
-# `_PAPER_FUNCTIONS` holds the test functions of the paper's Table 1, keyed by their number in that table.
-_PAPER_FUNCTIONS = {
-    1: lambda x: x**3 - 2.0 * x - 5.0,
-    2: lambda x: 1.0 - 1.0 / x**2,
-    3: lambda x: (x - 3.0) ** 3,
-    4: lambda x: 6.0 * (x - 2.0) ** 5,
-    5: lambda x: x**9,
-    6: lambda x: x**19,
-    7: _paper_function_7,
-    8: _paper_function_8,
-    9: lambda x: math.exp(x) - 2.0 - 0.01 / x**2 + 0.000002 / x**3,
-}
+# `_PAPER_FUNCTIONS` holds the test functions of the paper's Table 1, keyed by their number in that table, with the
+# listing's function 7.
+_PAPER_FUNCTIONS = {**PAPER_FUNCTIONS, 7: _paper_function_7}
 
 # Each row of the paper's Table 2 holds:
 # - the function number;

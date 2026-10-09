@@ -1,44 +1,14 @@
 """These tests assert that `CARF` reproduces the paper's Tables 3 and 4 as far as its reconstruction allows, takes the
 steps that its docstring describes, and stops within ``xtol`` of a root."""
 
-import math
-
 import pytest
 
 from sunnbear.solvers import CARF, SolveStatus
+from tests.solvers.bracketing.chandrupatla.paper_functions import PAPER_FUNCTIONS
 from tests.solvers.bracketing.toms748.paper_problems import PAPER_PROBLEMS
 from tests.solvers.example_functions import CUBIC_ROOT, cubic, decreasing_cubic, steep_exponential
 
-
-def _paper_function_7(x: float) -> float:
-    """Return the paper's function 7, ``x * exp(-1 / x^2)``, and 0 at ``x = 0``."""
-    if x == 0.0:
-        return 0.0
-    else:
-        return x * math.exp(-1.0 / (x * x))
-
-
-def _paper_function_8(x: float) -> float:
-    """Return the paper's function 8."""
-    xi = 0.61489
-    return -3062.0 * (1.0 - xi) * math.exp(-x) / (xi + (1.0 - xi) * math.exp(-x)) - 1013.0 + 1628.0 / x
-
-
-# `_PAPER_FUNCTIONS` holds the test functions of the paper's Table 4, Chandrupatla's test functions, keyed by their
-# number in Chandrupatla's paper.
-_PAPER_FUNCTIONS = {
-    1: lambda x: x**3 - 2.0 * x - 5.0,
-    2: lambda x: 1.0 - 1.0 / x**2,
-    3: lambda x: (x - 3.0) ** 3,
-    4: lambda x: 6.0 * (x - 2.0) ** 5,
-    5: lambda x: x**9,
-    6: lambda x: x**19,
-    7: _paper_function_7,
-    8: _paper_function_8,
-    9: lambda x: math.exp(x) - 2.0 - 0.01 / x**2 + 0.000002 / x**3,
-}
-
-# Each row of the paper's Table 4 holds:
+# Each row of the paper's Table 4, on Chandrupatla's test functions, holds:
 # - the function number;
 # - the 2 interval bounds;
 # - CARF's evaluation count.
@@ -90,11 +60,13 @@ _PAPER_TABLE_4 = [
     (9, 2e-4, 81, 12),
 ]
 
-# The rows of `_PAPER_TABLE_4` whose count `CARF` does not reproduce, keyed by function number and interval:
-# - the wide intervals of functions 1 to 4, where many steps choose their kind of step on values within rounding of 0
-#   or 1, so the count depends on how the paper's code computes the quadratic's root and the power step;
-# - 2 rows whose last step lands on the other side of the root, or exactly on it: changing that step's root by 1 ulp
-#   gives the paper's 7 for function 9.
+# `_UNREPRODUCED_ROWS` holds the rows of `_PAPER_TABLE_4` whose count `CARF` does not reproduce, keyed by function
+# number and interval:
+# - the wide intervals of functions 1 to 4, where ``h`` often lies within rounding error of 0 or 1, the limits that
+#   choose the kind of step, so the count depends on how the paper's code computes the quadratic's root and the power
+#   step;
+# - rows (8, 2e-4, 2) and (9, 2e-4, 1), whose last step lands on the other side of the root, or exactly on it: moving
+#   that step's x-value by 1 ulp gives the paper's count of 7 for function 9.
 _UNREPRODUCED_ROWS = {
     (1, -1e4, 1e4),
     (1, -1e10, 1e10),
@@ -122,7 +94,7 @@ def test_the_evaluation_counts_of_table_4_of_the_paper_are_reproduced(function_n
     reports, on every row outside `_UNREPRODUCED_ROWS`."""
     # --- act --------------------------
     result = _CARFWithPaperTolerances(eps1=1e-15, eps2=1e-12).solve(
-        _PAPER_FUNCTIONS[function_number], float(a), float(b), xtol=0.0, max_fevals=300
+        PAPER_FUNCTIONS[function_number], float(a), float(b), xtol=0.0, max_fevals=300
     )
 
     # --- assert -----------------------
@@ -134,7 +106,7 @@ def test_the_unreproduced_rows_of_table_4_still_converge(function_number, a, b):
     """On the rows in `_UNREPRODUCED_ROWS`, `CARF` still converges with the paper's tolerances."""
     # --- act --------------------------
     result = _CARFWithPaperTolerances(eps1=1e-15, eps2=1e-12).solve(
-        _PAPER_FUNCTIONS[function_number], float(a), float(b), xtol=0.0, max_fevals=300
+        PAPER_FUNCTIONS[function_number], float(a), float(b), xtol=0.0, max_fevals=300
     )
 
     # --- assert -----------------------
@@ -143,7 +115,7 @@ def test_the_unreproduced_rows_of_table_4_still_converge(function_number, a, b):
 
 @pytest.mark.parametrize("eps2, paper_total", [(1e-7, 2456), (1e-10, 2457), (1e-15, 2481)])
 def test_the_total_evaluation_count_lies_within_1_5_percent_of_the_papers_table_3(eps2, paper_total):
-    """Over the 154 test problems of Algorithm 748, the total evaluation count lies within 1.5 % of the paper's Table
+    """Over the test problems of Algorithm 748, the total evaluation count lies within 1.5 % of the paper's Table
     3, at each of its tolerances ``eps2``, with ``eps1 = 1e-15`` as in its Table 4."""
     # --- arrange / act ----------------
     total = sum(
@@ -166,8 +138,8 @@ def test_the_total_evaluation_count_lies_within_1_5_percent_of_the_papers_table_
     ids=["chord_zero_inside", "chord_zero_clipped"],
 )
 def test_the_first_x_value_is_the_chord_zero_clipped_into_the_middle_80_percent(f, a, b, first_x):
-    """On `cubic` over ``[1, 2]``, the chord's zero 1 + 1/6 lies in ``[1.1, 1.9]``; on `steep_exponential` over
-    ``[0, 1]``, it lies near 0, and is clipped to 0.1."""
+    """The first x-value is the chord's zero, kept when it lies in the middle 80 % of the interval and clipped to its
+    edge otherwise."""
     # --- act --------------------------
     result = CARF().solve(f, a, b, xtol=1e-10, max_fevals=60, history_enabled=True)
 

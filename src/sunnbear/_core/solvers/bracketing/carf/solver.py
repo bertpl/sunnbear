@@ -8,19 +8,23 @@ from sunnbear._core.solvers.core import Solver, SolveState
 # width at each end is out of bounds. θ0 places the first x-value; θ1, θ2 and θ3 clip the later ones, by the kind of
 # step that produced them.
 _THETA_0 = 0.1
-_THETA_1 = 0.15  # a quadratic step on data whose quadratic is monotone
-_THETA_2 = 0.15  # a power step
-_THETA_3 = 0.5  # a quadratic step on data that is not monotone: the clip yields the midpoint
+# θ1 clips a quadratic step on data whose quadratic is monotone.
+_THETA_1 = 0.15
+# θ2 clips a power step.
+_THETA_2 = 0.15
+# θ3 clips a quadratic step on data that is not monotone, and the clip yields the midpoint.
+_THETA_3 = 0.5
 
 
 class CARF(Solver):
     """`CARF` implements the Curvature-Adaptive Root Finder of Gao (2026), reconstructed from the paper and its results.
 
-    The method keeps a bracket ``[a, b]`` and an x-value ``t`` strictly inside it, all 3 evaluated. The first ``t`` is
-    the zero of the chord through the bounds, clipped into the middle 80 % of the interval (``θ0 = 0.1``). Each
-    iteration:
+    The method keeps a bracket ``[a, b]`` and an x-value ``t`` strictly inside it, and knows the function value at all
+    3. The first ``t`` is the zero of the chord through the bounds, clipped into the middle 80 % of the interval
+    (``θ0 = 0.1``). Each iteration:
 
-    - **selects the active bracket:** ``[a, t]`` or ``[t, b]``, the part that holds the sign change;
+    - **selects the active bracket:** ``[a, t]`` or ``[t, b]``, the part that holds the sign change, with bounds ``a*``
+      and ``b*`` and width ``w* = b* - a*``;
     - **interpolates a candidate ``t*``,** with ``r = (t - a) / (b - a)`` and ``h = (f(t) - f(a)) / (f(b) - f(a))``:
 
       - when ``r^2 <= h <= 1 - (1 - r)^2``, the quadratic through the 3 points is monotone on ``[a, b]``, and ``t*`` is
@@ -30,62 +34,71 @@ class CARF(Solver):
         ``t* = a + (b - a) * r^xi``, with ``xi = log(1 - f(b) / f(a)) / (log(1 - f(b) / f(a)) - log(1 - f(t) / f(a)))``;
       - when ``h`` lies outside ``(0, 1)``, the 3 function values are not monotone, and ``t*`` is the quadratic's root;
 
-    - **accepts or clips ``t*``:** ``t*`` becomes the new x-value ``t_new`` when it lies inside the active bracket and
-      the step from ``t`` is shorter than half the step before last; otherwise ``t_new`` is ``t*`` clipped into the
-      middle part of the active bracket, ``[a* + θ * w*, b* - θ * w*]``, where ``w*`` is the active bracket's width and
-      ``θ`` is 0.15 for the first 2 kinds of step and 0.5, the midpoint, for the third;
+    - **accepts or clips ``t*``:** a step is the distance from 1 x-value to the next. ``t*`` becomes the new x-value
+      ``t_new`` when it lies inside the active bracket and the step from ``t`` is shorter than half the step before
+      last; otherwise ``t_new`` is ``t*`` clipped into ``[a* + θ * w*, b* - θ * w*]``, where ``θ`` is 0.15 for the
+      first 2 kinds of step, and 0.5 for the third, which clips ``t*`` to the midpoint;
     - **updates the bracket,** as the list of choices below describes.
 
     The solve ends once ``f(t) = 0``, or once the active bracket is narrower than ``xtol``, and returns ``t``, which
-    then lies within ``xtol`` of a root. The paper stops once ``|f(t)| < eps1`` or the active bracket is narrower than
-    ``eps2 + |t| * eps1``; the solver passes 0 as ``eps1``, read as ``f(t) = 0``, and ``xtol`` as ``eps2``.
+    then lies within ``xtol`` of a root.
+
+    The paper stops once ``|f(t)| < eps1`` or the active bracket is narrower than ``eps2 + |t| * eps1``; `CARF` uses
+    ``xtol`` as ``eps2`` and 0 as ``eps1``, and replaces the test ``|f(t)| < 0``, which never holds, with ``f(t) = 0``.
 
     The paper's code is not public, and the paper leaves parts of the method open or describes them ambiguously.
     `CARF` makes these choices, each chosen to reproduce the paper's Tables 3 and 4 as closely as possible:
 
     - **The acceptance test:** the paper compares the step ``|t* - t|`` with half "the width of the bracket two steps
       ago". Read this way, the test never clips while the x-values approach the root from 1 side: on ``(x - 3)^3``
-      over ``[0, 5]``, the solve then runs to the paper's limit of 200 iterations, where the paper reports 28
+      over ``[0, 5]``, the solve then runs to the paper's limit of 200 iterations, while the paper reports 28
       evaluations. `CARF` compares the step with half the step before last, the criterion of Brent's method, which the
-      paper says it borrows. Every step counts, accepted or clipped, and the 2 steps before the first iteration count
-      as the width of the initial interval.
+      paper says it borrows. Every step counts, accepted or clipped, and before the first iteration both the last step
+      and the step before last are set to the width of the initial interval.
     - **The bracket after a sign change:** when ``f(t_new)`` and ``f(t)`` differ in sign, the paper takes the shorter
       of "two sign-changing sub-intervals containing" ``t_new``. `CARF` takes the shorter of these 2 brackets:
 
       - the active bracket, with ``t_new`` as its interior x-value;
-      - the bracket from ``t_new`` to the far bound of ``[a, b]``, with the old ``t`` as its interior x-value.
+      - the bracket from ``t_new`` to the bound of ``[a, b]`` outside the active bracket, with the old ``t`` as its
+        interior x-value.
 
       When the signs agree, the new bracket is the active bracket, with ``t_new`` as its interior x-value.
     - **A function value of 0 counts as the same sign:** a sign change means ``f(t_new) * f(t) < 0``, so a ``t_new``
       with ``f(t_new) = 0`` becomes the interior x-value, and the solve ends at it.
-    - **The stop test reads the interior x-value only:** a ``t_new`` that becomes a bound of the bracket does not end
-      the solve, however small its ``|f|``. With the paper's ``eps1 > 0``, this choice changes the counts of Table 4.
+    - **The stop test checks only the interior x-value:** a ``t_new`` that becomes a bound of the bracket does not end
+      the solve, however small its ``|f|``. With the paper's ``eps1 > 0``, the evaluation counts of Table 4 depend on
+      this choice.
     - **The quadratic's root:** the paper does not say how it computes the root. `CARF` writes the quadratic around
       ``t`` and takes its root in ``[a, b]`` from the formula that avoids cancellation. On intervals as wide as
-      ``[-1e4, 1e4]``, many steps of a solve choose their kind of step on values within rounding of 0 or 1, so the
-      evaluation counts depend on this formula, and on those intervals `CARF` does not reproduce Table 4.
-    - **A power step that cannot be computed:** when both logarithms of ``xi`` round to the same value, ``xi``
-      divides by 0. `CARF` then takes the midpoint of the active bracket; the paper does not cover this case.
+      ``[-1e4, 1e4]``, ``h`` often lies within rounding error of 0 or 1, the limits that choose the kind of step, so
+      the evaluation counts depend on this formula, and on those intervals `CARF` does not reproduce Table 4.
+    - **A power step that cannot be computed:** when the 2 logarithms in the formula for ``xi`` round to the same
+      value, its denominator is 0. `CARF` then takes the midpoint of the active bracket; the paper does not cover
+      this case.
 
     Signs of function values are compared directly, where the paper multiplies them: the product of 2 small function
     values can underflow to 0. The paper's limit of 200 iterations is left out: the solve's evaluation budget ends a
     solve instead.
 
-    A known caveat: when a sign change near the root makes the bracket from ``t_new`` to the far bound the shorter one,
-    the old ``t`` stays the interior x-value, possibly far from the root. The next steps are then clipped, and each
-    shrinks the bracket by only 15 %, so the solve can take many more evaluations than usual, up to its budget. The
-    paper's test problems do not show this, but changing the last bit of 1 step's root on 1 of them does.
+    A known caveat: the old ``t`` can stay the interior x-value while it lies far from the root.
 
-    The paper's proof guarantees only that the bracket shrinks to 70 % per step, and a power step costs 3 logarithms
-    and a power, so `CARF`'s flop counts can exceed those of the other solvers.
+    - **Cause:** a sign change near the root makes the bracket from ``t_new`` to the bound outside the active bracket
+      the shorter one, and that bracket keeps the old ``t`` inside.
+    - **Effect:** the next steps are then clipped, and each shrinks the bracket by only 15 %, so the solve can take
+      many more evaluations than usual, up to its budget.
+    - **Occurrence:** none of the paper's test problems triggers this slowdown, but 1 of them does when the
+      quadratic's root at 1 step is changed by 1 ulp.
+
+    The paper's proof guarantees only that each step shrinks the bracket to 70 % of its width. A power step costs 3
+    logarithms and a power, so `CARF`'s flop counts can exceed those of the other solvers.
 
     `CARF` keeps an interior x-value besides the 2 bounds, and stops by its own criterion, so it writes its own loop,
     not `BracketingSolver`'s.
 
     References:
         - Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied Mathematics Letters
-          178, 109928. The method and its constants; the test suite reproduces 33 of the 45 evaluation counts of its
-          Table 4, and the totals of its Table 3 within 1.5 %. https://doi.org/10.1016/j.aml.2026.109928
+          178, 109928. The method and its constants, and Tables 3 and 4, which the test suite compares `CARF` with.
+          https://doi.org/10.1016/j.aml.2026.109928
         - Brent, R. P. (1971). An algorithm with guaranteed convergence for finding a zero of a function. The Computer
           Journal 14(4), 422-425. The acceptance test of the step before last, which `CARF` borrows.
           https://doi.org/10.1093/comjnl/14.4.422
@@ -97,14 +110,19 @@ class CARF(Solver):
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — the loop follows the paper's steps in order
         """Run CARF's iterations and return the interior x-value ``t``.
 
-        Each iteration selects the active bracket, ends the solve if the stop test holds, and then interpolates,
-        accepts or clips, evaluates, and updates the bracket, as the class docstring describes. The variables keep
-        the paper's names: ``a_active`` and ``b_active`` are its ``a*`` and ``b*``, and ``t_star`` is its ``t*``.
+        Each iteration, as the class docstring describes:
+
+        - selects the active bracket, and ends the solve if the stop test holds;
+        - interpolates ``t_star``, and accepts or clips it;
+        - evaluates the new x-value, and updates the bracket.
+
+        The variables keep the paper's names: ``a_active`` and ``b_active`` are its ``a*`` and ``b*``, and ``t_star``
+        is its ``t*``.
         """
         interval = state.interval
         a, fa, b, fb = interval.a, interval.fa, interval.b, interval.fb
 
-        # --- the first x-value --------------
+        # --- the first x-value ------------------
         width = b - a
         t = (a * fb - b * fa) / (fb - fa)
         t = max(min(t, b - _THETA_0 * width), a + _THETA_0 * width)
@@ -127,13 +145,14 @@ class CARF(Solver):
             if r * r <= h <= 1.0 - (1.0 - r) ** 2:
                 t_star, theta = self._quadratic_root(a, t, b, fa, ft, fb), _THETA_1
             elif 0.0 < h < 1.0:
-                log_b = math.log(1.0 - fb / fa)
-                log_t = math.log(1.0 - ft / fa)
-                if log_b == log_t:
-                    # xi would divide by 0: take the midpoint, which a clip with θ3 also yields.
+                log_one_minus_fb_over_fa = math.log(1.0 - fb / fa)
+                log_one_minus_ft_over_fa = math.log(1.0 - ft / fa)
+                if log_one_minus_fb_over_fa == log_one_minus_ft_over_fa:
+                    # The denominator of xi is 0: take the midpoint, which a clip with θ3 also yields.
                     t_star, theta = 0.5 * (a_active + b_active), _THETA_3
                 else:
-                    t_star, theta = a + (b - a) * r ** (log_b / (log_b - log_t)), _THETA_2
+                    xi = log_one_minus_fb_over_fa / (log_one_minus_fb_over_fa - log_one_minus_ft_over_fa)
+                    t_star, theta = a + (b - a) * r**xi, _THETA_2
             else:
                 t_star, theta = self._quadratic_root(a, t, b, fa, ft, fb), _THETA_3
 
@@ -149,8 +168,8 @@ class CARF(Solver):
 
             # --- the new bracket ----------------
             if (f_new < 0.0 < ft) or (ft < 0.0 < f_new):
-                # A sign change: the shorter of the active bracket, with t_new inside, and the bracket from t_new to the
-                # far bound, with t inside.
+                # On a sign change, the new bracket is the shorter of the active bracket, with t_new inside, and the
+                # bracket from t_new to the bound outside the active bracket, with t inside.
                 if is_sign_change_below_t:
                     if b - t_new < t - a:
                         a, fa = t_new, f_new
@@ -172,15 +191,16 @@ class CARF(Solver):
     def _quadratic_root(a: float, t: float, b: float, fa: float, ft: float, fb: float) -> float:
         """Return the root in ``[a, b]`` of the quadratic through ``(a, fa)``, ``(t, ft)`` and ``(b, fb)``.
 
-        The quadratic is written around ``t``, as ``q(t + u) = c2 * u^2 + c1 * u + ft``. Of its 2 roots, the one
-        nearer ``t`` comes from ``u = ft / root_term`` and the other from ``u = root_term / c2``, which avoids the
-        cancellation of the textbook formula. When rounding puts neither root in ``[a, b]``, the root farther from
+        The quadratic is written around ``t``, as ``q(t + u) = c2 * u^2 + c1 * u + ft``. With
+        ``root_term = -(c1 + sign(c1) * sqrt(c1^2 - 4 * c2 * ft)) / 2``, of its 2 roots, the one nearer ``t`` comes
+        from ``u = ft / root_term`` and the other from ``u = root_term / c2``, which avoids the cancellation of the
+        textbook formula. When rounding puts neither root in ``[a, b]``, the root farther from
         ``t`` is returned, and the caller's clip moves it into the bracket.
         """
-        slope_at = (ft - fa) / (t - a)
-        slope_tb = (fb - ft) / (b - t)
-        c2 = (slope_tb - slope_at) / (b - a)
-        c1 = slope_at + c2 * (t - a)
+        slope_a_t = (ft - fa) / (t - a)
+        slope_t_b = (fb - ft) / (b - t)
+        c2 = (slope_t_b - slope_a_t) / (b - a)
+        c1 = slope_a_t + c2 * (t - a)
         if c2 == 0.0:
             return t - ft / c1
         discriminant = max(c1 * c1 - 4.0 * c2 * ft, 0.0)
@@ -195,8 +215,8 @@ class CARF(Solver):
     def _is_converged(t: float, ft: float, active_width: float, xtol: float) -> bool:
         """Return whether the stop test holds at the interior x-value ``t``.
 
-        The paper stops once ``|f(t)| < eps1`` or the active bracket is narrower than ``eps2 + |t| * eps1``. `CARF`
-        passes 0 as ``eps1``, read as ``f(t) = 0``, and ``xtol`` as ``eps2``, so it ignores ``t``; a subclass that
-        overrides this method can use ``t`` for the paper's tolerances.
+        The test holds once ``f(t) = 0`` or the active bracket is narrower than ``xtol``, so `CARF` ignores ``t``; a
+        subclass that overrides this method can use ``t`` for the paper's relative tolerance, which the class docstring
+        describes.
         """
         return ft == 0.0 or active_width < xtol
