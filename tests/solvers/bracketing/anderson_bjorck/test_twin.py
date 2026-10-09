@@ -3,8 +3,9 @@
 import pytest
 
 from sunnbear.solvers import AndersonBjorck
-from tests.solvers.bracketing.anderson_bjorck.mpmath_twin import AndersonBjorckMpmathTwin
 from tests.solvers.twins import assert_agrees_with_twin
+
+from .mpmath_twin import AndersonBjorckMpmathTwin
 
 
 @pytest.mark.parametrize("test_case", AndersonBjorckMpmathTwin.comparable_test_cases(), ids=str)

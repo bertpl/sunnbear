@@ -3,8 +3,9 @@
 import pytest
 
 from sunnbear.solvers import Illinois
-from tests.solvers.bracketing.illinois.mpmath_twin import IllinoisMpmathTwin
 from tests.solvers.twins import assert_agrees_with_twin
+
+from .mpmath_twin import IllinoisMpmathTwin
 
 
 @pytest.mark.parametrize("test_case", IllinoisMpmathTwin.comparable_test_cases(), ids=str)

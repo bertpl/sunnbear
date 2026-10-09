@@ -3,8 +3,9 @@
 import pytest
 
 from sunnbear.solvers import Ridders, RiddersVariant
-from tests.solvers.bracketing.ridders.scipy_twin import RiddersScipyTwin
 from tests.solvers.twins import assert_agrees_with_twin
+
+from .scipy_twin import RiddersScipyTwin
 
 
 @pytest.mark.parametrize("variant", RiddersVariant)

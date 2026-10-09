@@ -3,8 +3,9 @@
 import pytest
 
 from sunnbear.solvers import Secant
-from tests.solvers.open.secant.scipy_twin import SecantScipyTwin
 from tests.solvers.twins import assert_agrees_with_twin
+
+from .scipy_twin import SecantScipyTwin
 
 
 @pytest.mark.parametrize("test_case", SecantScipyTwin.comparable_test_cases(), ids=str)

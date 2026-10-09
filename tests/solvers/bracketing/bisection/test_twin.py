@@ -3,8 +3,9 @@
 import pytest
 
 from sunnbear.solvers import Bisection
-from tests.solvers.bracketing.bisection.scipy_twin import BisectionScipyTwin
 from tests.solvers.twins import assert_agrees_with_twin
+
+from .scipy_twin import BisectionScipyTwin
 
 
 @pytest.mark.parametrize("test_case", BisectionScipyTwin.comparable_test_cases(), ids=str)

@@ -3,8 +3,9 @@
 import pytest
 
 from sunnbear.solvers import Chandrupatla
-from tests.solvers.bracketing.chandrupatla.scipy_twin import ChandrupatlaScipyTwin
 from tests.solvers.twins import assert_agrees_with_twin
+
+from .scipy_twin import ChandrupatlaScipyTwin
 
 
 @pytest.mark.parametrize("test_case", ChandrupatlaScipyTwin.comparable_test_cases(), ids=str)

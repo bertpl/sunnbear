@@ -3,8 +3,9 @@
 import pytest
 
 from sunnbear.solvers import Pegasus
-from tests.solvers.bracketing.pegasus.mpmath_twin import PegasusMpmathTwin
 from tests.solvers.twins import assert_agrees_with_twin
+
+from .mpmath_twin import PegasusMpmathTwin
 
 
 @pytest.mark.parametrize("test_case", PegasusMpmathTwin.comparable_test_cases(), ids=str)

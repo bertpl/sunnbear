@@ -3,8 +3,9 @@
 import pytest
 
 from sunnbear.solvers import Brent
-from tests.solvers.bracketing.brent.scipy_twin import BrentScipyTwin
 from tests.solvers.twins import assert_agrees_with_twin
+
+from .scipy_twin import BrentScipyTwin
 
 
 @pytest.mark.parametrize("test_case", BrentScipyTwin.comparable_test_cases(), ids=str)
