@@ -47,7 +47,8 @@ class CARF(Solver):
     ``xtol`` as ``eps2`` and 0 as ``eps1``, and replaces the test ``|f(t)| < 0``, which never holds, with ``f(t) = 0``.
 
     The paper's code is not public, and the paper leaves parts of the method open or describes them ambiguously.
-    `CARF` makes these choices, each chosen to reproduce the paper's Tables 3 and 4 as closely as possible:
+    The `CARF` solver implemented here settles them with these choices, each chosen to reproduce the paper's Tables 3
+    and 4 as closely as possible:
 
     - **The acceptance test:** the paper compares the step ``|t* - t|`` with half "the width of the bracket two steps
       ago". `CARF` compares the step with half the step before last, the criterion of Brent's method, which the paper
