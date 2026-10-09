@@ -36,8 +36,8 @@ class TOMS748(Solver):
     The paper states the 2 algorithms without a stopping criterion; its experiments, and the authors' code, add the
     stopping criterion of Brent's method:
 
-    - ``stop_width = 2 * (2 * macheps * |u| + tol)``, with ``macheps`` the relative machine precision,
-      `FLOAT64_EPS`, and ``tol`` an absolute tolerance that the solver derives from ``xtol``;
+    - ``stop_width = 2 * (2 * macheps * |u| + tol)``, with ``macheps`` the relative machine precision
+      (`FLOAT64_EPS`) and ``tol`` an absolute tolerance that the solver derives from ``xtol``;
     - the solve ends once the interval is at most ``stop_width`` wide, or once an evaluation returns exactly 0, and
       returns the lower bound ``a``, or the point that returned 0.
 

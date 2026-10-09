@@ -26,8 +26,8 @@ class Brent(Solver):
 
     - ``b`` and ``c`` are the interval bounds, ``b`` the one with the smaller ``|f|``, which is the best estimate;
     - ``m`` is half the signed width of the interval, from ``b`` toward ``c``;
-    - ``tol = 2 * macheps * |b| + t`` is the tolerance, with ``macheps`` the relative machine precision,
-      `FLOAT64_EPS`, and ``t`` an absolute tolerance derived from ``xtol`` (below); the solve ends once
+    - ``tol = 2 * macheps * |b| + t`` is the tolerance, with ``macheps`` the relative machine precision
+      (`FLOAT64_EPS`) and ``t`` an absolute tolerance derived from ``xtol`` (below); the solve ends once
       ``|m| <= tol`` or ``f(b) = 0``, and returns ``b``.
 
     Brent's procedure returns a ``b`` within ``6 * macheps * |x| + 2 * t`` of a root ``x``. The solver sets

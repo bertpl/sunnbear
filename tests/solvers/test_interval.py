@@ -111,8 +111,7 @@ def test_split_at_keeps_the_sign_change_and_the_orientation(cls, fx, expected, r
     ],
 )
 def test_is_converged(cls, fa, fb, xtol_doubled, expected):
-    """`Interval.is_converged` holds when the width is at most ``xtol_doubled`` or an interval bound has a zero
-    value."""
+    """`Interval.is_converged` holds when the width is at most ``xtol_doubled`` or a bound's function value is 0."""
     # --- act / assert -----------------
     assert cls(0.0, 1.0, *_orient_values_at_interval_bounds(cls, fa, fb)).is_converged(xtol_doubled) is expected
 

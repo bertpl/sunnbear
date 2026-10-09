@@ -42,7 +42,7 @@ class ModAB(Solver):
     - **Clamping:** Algorithm 1 evaluates the chord's zero and then clamps it into the interval. The C# code clamps
       first: a chord's zero that rounding puts on or outside a bound is replaced by that bound and its stored function
       value, so nothing is evaluated. In Anderson-Björck mode, such an iteration only halves the stored function value
-      at the other bound, or marks the other bound as fixed.
+      at the other bound, or marks the other bound as retained.
     - **The first threshold:** only the C# code shows the threshold's starting value at the switch.
     - **Scaled function values:** Anderson-Björck mode's scaled function values stay stored after a fallback to
       bisection, and the next bisection steps read them when they test whether the function looks close to a straight

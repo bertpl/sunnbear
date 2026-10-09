@@ -7,10 +7,10 @@ from sunnbear._core.solvers.core import BracketingSolver, Interval
 from .state import ITPState
 from .variant import ITPVariant
 
-# The paper's truncation constants, as in its experiments. ``kappa_1`` depends on the initial interval, so
-# `ITP._solve` sets it per solve, to `_KAPPA_1_TIMES_INITIAL_WIDTH` divided by the initial width.
+# ``kappa_1`` and ``kappa_2`` are the constants of the truncation step in the `ITP` docstring, with the values of the
+# experiments of Oliveira and Takahashi (2020). ``kappa_1`` depends on the initial interval, so `ITP._solve` sets it
+# per solve from `_KAPPA_1_TIMES_INITIAL_WIDTH`.
 _KAPPA_1_TIMES_INITIAL_WIDTH = 0.2
-# ``kappa_2`` is the exponent of the interval width in the truncation distance ``delta``.
 _KAPPA_2 = 2
 
 

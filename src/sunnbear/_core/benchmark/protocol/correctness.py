@@ -87,8 +87,9 @@ def _random_x_probes(x_found: float, xtol: float, seed: int) -> Iterator[float]:
     likely, and uniform.
     """
     rng = np.random.default_rng(seed)
-    # Adding a distance below 1 ulp (unit in the last place) of `x_found` returns `x_found` unchanged. When
-    # `x_found` is 0, 1 ulp is about 5e-324, so log-uniform distances would spread over hundreds of orders of
+    # Adding a distance below 1 ulp (unit in the last place) of `x_found` returns `x_found` unchanged.
+    #
+    # When `x_found` is 0, 1 ulp is about 5e-324, so log-uniform distances would spread over hundreds of orders of
     # magnitude and almost all be negligible; the smallest log-uniform distance is therefore also held at or
     # above `xtol · FLOAT64_EPS`.
     log_distance_min = math.log(min(xtol, max(math.ulp(x_found), xtol * FLOAT64_EPS)))

@@ -116,7 +116,7 @@ class Interval(ABC):
             return type(self)(self.a, x, self.fa, fx, IntervalBound.UPPER)
 
     def is_converged(self, xtol_doubled: float) -> bool:
-        """Return whether a stopping criterion holds: the width is at most ``xtol_doubled`` or a bound value is zero.
+        """Return whether the width is at most ``xtol_doubled`` or the function value at a bound is zero.
 
         The parameter is the doubled tolerance, so the caller computes it once
         per solve, not once per iteration.
