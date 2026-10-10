@@ -14,32 +14,44 @@ requires-python = ">=3.12"
 dependencies = [
     # Per-Python minimal versions: each is the earliest version shipping a wheel for that
     # CPython (and, for numpy, admitted by the numba minimal version on the same interpreter),
-    # so `lowest-direct` installs (not source-builds) across the whole matrix.
+    # so `lowest-direct` installs (not source-builds) across the whole matrix. The pure-Python
+    # packages counted-float, snuffled, max-div and mpl-composite get a separate minimal version on
+    # 3.15: the earliest release that declares 3.15 support.
     "numpy>=2.0.0; python_version == '3.12'",
     "numpy>=2.1.0; python_version == '3.13'",
-    "numpy>=2.3.2; python_version >= '3.14'",
+    "numpy>=2.3.2; python_version == '3.14'",
+    "numpy>=2.5.2; python_version >= '3.15'",
     "numba>=0.60.0; python_version == '3.12'",
     "numba>=0.66.0; python_version == '3.13'",
-    "numba>=0.66.0; python_version >= '3.14'",
+    "numba>=0.66.0; python_version == '3.14'",
+    "numba>=0.68.0; python_version >= '3.15'",
     "matplotlib>=3.10.7; python_version == '3.12'",
     "matplotlib>=3.10.7; python_version == '3.13'",
-    "matplotlib>=3.10.7; python_version >= '3.14'",
-    "counted-float>=1.2.1",
+    "matplotlib>=3.10.7; python_version == '3.14'",
+    "matplotlib>=3.11.2; python_version >= '3.15'",
+    "counted-float>=1.2.1; python_version < '3.15'",
+    "counted-float>=2.6.0; python_version >= '3.15'",
     # These pydantic minimal versions equal counted-float's own pydantic minimal versions; counted-float
     # depends on pydantic, so every install already satisfies them.
     "pydantic>=2.7; python_version == '3.12'",
     "pydantic>=2.9; python_version == '3.13'",
-    "pydantic>=2.12; python_version >= '3.14'",
+    "pydantic>=2.12; python_version == '3.14'",
+    "pydantic>=2.14; python_version >= '3.15'",
     "typing-extensions>=4.4",  # TypeVar defaults (PEP 696) on Python < 3.13
     "platformdirs>=4.0",  # platformdirs finds the user's cache directory for downloaded data artifacts
     # backports.zstd provides zstd for the archives of downloaded data artifacts; the standard library has it from 3.14.
     "backports.zstd>=1.0.0; python_version < '3.14'",
-    "snuffled>=0.1.6",
+    "snuffled>=0.1.6; python_version < '3.15'",
+    "snuffled>=0.1.9; python_version >= '3.15'",
     # max-div 0.21.1 adds DiversityMetric.gpq_separation(q), the diversity metric that sunnbear maximizes when it builds the Monte Carlo (MC) tuple set.
-    "max-div>=0.21.1",
-    "mpl-composite>=0.1.2",
-    # polars holds the benchmark results; its wheels use the stable CPython ABI, so 1 minimal version serves every supported Python version.
-    "polars>=1.0.0",
+    "max-div>=0.21.1; python_version < '3.15'",
+    "max-div>=0.21.3; python_version >= '3.15'",
+    "mpl-composite>=0.1.2; python_version < '3.15'",
+    "mpl-composite>=0.1.4; python_version >= '3.15'",
+    # polars holds the benchmark results. Its wheels use the stable CPython ABI, so they install on every Python
+    # version, but on 3.15 the benchmark runner fails with polars 1.x, so 3.15 requires polars 2.0.0.
+    "polars>=1.0.0; python_version < '3.15'",
+    "polars>=2.0.0; python_version >= '3.15'",
 ]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -50,6 +62,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Typing :: Typed",
 ]
@@ -65,7 +78,10 @@ dev = [
     # exact tool versions are pinned by the tracked uv.lock (used by pre-commit,
     # `make lint`, and CI); these ranges just set the floor.
     "ruff>=0.15.11",
-    "scipy>=1.16.2",  # its root finders are what the solver tests compare against; never a runtime dependency
+    # scipy's root finders are what the solver tests compare against; never a runtime dependency. 1.18.1 is
+    # the first scipy release with a 3.15 wheel.
+    "scipy>=1.16.2; python_version < '3.15'",
+    "scipy>=1.18.1; python_version >= '3.15'",
     "ty==0.0.56",  # pre-1.0 type checker — pin exactly; its ruleset is still evolving
 ]
 # maintainer scratch tooling — installed by a plain `uv sync` (default-groups below)
