@@ -14,9 +14,11 @@ requires-python = ">=3.12"
 dependencies = [
     # Per-Python minimal versions: each is the earliest version shipping a wheel for that
     # CPython (and, for numpy, admitted by the numba minimal version on the same interpreter),
-    # so `lowest-direct` installs (not source-builds) across the whole matrix. The pure-Python
-    # packages counted-float, snuffled, max-div and mpl-composite get a separate minimal version on
-    # 3.15: the earliest release that declares 3.15 support.
+    # so `lowest-direct` installs (not source-builds) across the whole matrix.
+    #
+    # A pure-Python package ships 1 wheel for every Python version, so the rule above does not apply
+    # to it: where its minimal version does not declare 3.15 support, a separate 3.15 line raises it to
+    # the earliest release that does.
     "numpy>=2.0.0; python_version == '3.12'",
     "numpy>=2.1.0; python_version == '3.13'",
     "numpy>=2.3.2; python_version == '3.14'",
@@ -49,7 +51,7 @@ dependencies = [
     "mpl-composite>=0.1.2; python_version < '3.15'",
     "mpl-composite>=0.1.4; python_version >= '3.15'",
     # polars holds the benchmark results. Its wheels use the stable CPython ABI, so they install on every Python
-    # version, but on 3.15 the benchmark runner fails with polars 1.x, so 3.15 requires polars 2.0.0.
+    # version, but on 3.15 the benchmark runner fails with polars 1.x.
     "polars>=1.0.0; python_version < '3.15'",
     "polars>=2.0.0; python_version >= '3.15'",
 ]
@@ -78,8 +80,8 @@ dev = [
     # exact tool versions are pinned by the tracked uv.lock (used by pre-commit,
     # `make lint`, and CI); these ranges just set the floor.
     "ruff>=0.15.11",
-    # scipy's root finders are what the solver tests compare against; never a runtime dependency. 1.18.1 is
-    # the first scipy release with a 3.15 wheel.
+    # The solver tests compare against scipy's root finders; scipy is never a runtime dependency. On 3.15,
+    # its minimal version is its first release with a 3.15 wheel.
     "scipy>=1.16.2; python_version < '3.15'",
     "scipy>=1.18.1; python_version >= '3.15'",
     "ty==0.0.56",  # pre-1.0 type checker — pin exactly; its ruleset is still evolving

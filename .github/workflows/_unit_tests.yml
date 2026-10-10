@@ -12,8 +12,10 @@ jobs:
     # The matrix runs on ARM, not x64, because the suite runs faster on GitHub's ARM runners and nothing in
     # the suite depends on the architecture. Every dependency ships an aarch64 wheel even at the lowest
     # version that pyproject.toml allows, so the matrix entries that install those lowest versions
-    # (resolution: lowest-direct) build nothing from source. The exception is PyYAML, which pre-commit
-    # pulls in: no PyYAML release ships a 3.15 wheel, so both 3.15 entries build it from source.
+    # (resolution: lowest-direct) build nothing from source.
+    #
+    # The exception is PyYAML, which pre-commit pulls in: no PyYAML release ships a 3.15 wheel, so both
+    # 3.15 entries build it from source.
     runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false

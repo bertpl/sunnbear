@@ -48,15 +48,15 @@ def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]
 # ==================================================================================================
 @pytest.mark.only_with_numba_jit
 def test_generate_mc_tuples_builds_nested_sizes_with_means_of_0_5_and_reports_each_size():
-    """A 5 s construction up to size 64 builds sizes 32 and 64, each with means of 0.5 and at most 1 tuple per fine
+    """A construction up to size 64 builds sizes 32 and 64, each with means of 0.5 and at most 1 tuple per fine
     lane, and reports both sizes in order.
 
     Only the structure is asserted: max-div's spread depends on the wall-clock time.
     """
     # --- arrange ----------------------
     results: list[MCTuplesSizeResult] = []
-    # On a fresh install, max-div compiles its functions inside each size's solve, which leaves it too little of the
-    # 5 s to meet the constraints. A first construction compiles them, so its outcome is ignored.
+    # On a fresh install, max-div compiles its functions inside each size's solve, which leaves it too little of
+    # `t_total_sec` to meet the constraints. A first construction compiles them, so its outcome is ignored.
     with contextlib.suppress(MCTuplesConstructionError):
         generate_mc_tuples(t_total_sec=5.0, max_size=MCTuplesSize.SIZE_64, n_population=2**14)
 
