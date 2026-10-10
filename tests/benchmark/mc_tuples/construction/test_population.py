@@ -1,5 +1,6 @@
-"""`MCTuplesPopulation` spreads its candidates evenly over the fine lanes and fine cells that it is given, and draws
-them in only the fine lanes of the gaps that get new tuples."""
+"""`MCTuplesPopulation.draw` spreads its candidates evenly over the fine lanes and fine cells that it is given, and
+`MCTuplesPopulation.draw_in_eligible_lanes` draws them only in the eligible fine lanes, those of the gaps that get new
+tuples."""
 
 import numpy as np
 import pytest
@@ -43,15 +44,15 @@ def test_draw_spreads_the_candidates_evenly_over_the_free_fine_lanes_and_cells(n
         assert np.all((values > 0) & (values < 1))
 
 
-def test_draw_in_allocated_lanes_skips_the_free_fine_lanes_of_gaps_without_new_tuples():
-    """With the size below in fine lanes 3, 10 and 11 and 2 new tuples, only the right edge gap gets new tuples, so no
-    candidate lies in the free fine lanes 0 to 2 and 4 to 9, and the population covers every allocated fine lane."""
+def test_draw_in_eligible_lanes_skips_the_free_fine_lanes_of_gaps_without_new_tuples():
+    """The size below holds tuples in fine lanes 3, 10 and 11 on both axes, and the allocation of 2 new tuples uses
+    only the gap above lane 11, so the population covers exactly the fine lanes from 12 up."""
     # --- arrange ----------------------
     values = np.array([3.5, 10.25, 11.5]) / N_FINE_LANES
     gap_allocation = MCTuplesGapAllocation.of(np.column_stack([values, values]), 2)
 
     # --- act --------------------------
-    population = MCTuplesPopulation.draw_in_allocated_lanes(3000, gap_allocation, np.random.default_rng(4))
+    population = MCTuplesPopulation.draw_in_eligible_lanes(3000, gap_allocation, np.random.default_rng(4))
 
     # --- assert -----------------------
     assert population.u.size == 3000

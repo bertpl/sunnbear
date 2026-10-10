@@ -77,6 +77,11 @@ class MCTuplesAxisGapAllocation:
     greedy_offset_fine_lanes: float | None
     mean_aware_offset_fine_lanes: float | None
 
+    @property
+    def eligible_fine_lanes(self) -> np.ndarray:
+        """Return the eligible fine lanes, those of the gaps that get new tuples, ascending."""
+        return np.flatnonzero(self.gap_of_fine_lane >= 0)
+
     # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------

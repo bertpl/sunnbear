@@ -1,7 +1,7 @@
 """`MCTuplesSizeSolve` picks a size's new tuples from its population in 1 max-div solve.
 
 The candidates are the tuples of the size below, which every valid selection keeps, followed by the population,
-whose candidates all lie in gaps that get new tuples on both axes (`MCTuplesPopulation.draw_in_allocated_lanes`).
+whose candidates all lie in gaps that get new tuples on both axes (`MCTuplesPopulation.draw_in_eligible_lanes`).
 The constraints are:
 
 - on each axis, each gap holds exactly its allocated number of new tuples;
@@ -54,8 +54,8 @@ class MCTuplesSizeSolve:
     """`MCTuplesSizeSolve` is the max-div solve that picks the new tuples of 1 size from its population.
 
     Attributes:
-        population: The size's population of candidate tuples, drawn over the fine lanes of the gaps that get new
-            tuples (`MCTuplesPopulation.draw_in_allocated_lanes`); max-div picks the new tuples among them.
+        population: The size's population of candidate tuples, which the solve draws over the eligible fine lanes of
+            `gap_allocation`; max-div picks the new tuples among these candidates.
         required_tuple_array: The tuples of the size below, as an `(n, 2)` array; empty for the smallest size.
         size: The size under construction.
         gap_allocation: The allocation of new tuples to the gaps along u and along v.
@@ -64,20 +64,20 @@ class MCTuplesSizeSolve:
 
     def __init__(
         self,
-        population: MCTuplesPopulation,
+        n_population: int,
         required_tuple_array: np.ndarray,
         size: MCTuplesSize,
         gap_allocation: MCTuplesGapAllocation,
         settings: "MCTuplesSolveSettings",
     ) -> None:
-        """Store the solve's inputs, and look up the gap of each candidate on each axis."""
-        self.population = population
+        """Draw the size's population of `n_population` candidates, and look up the gap of each on each axis."""
         self.required_tuple_array = required_tuple_array
         self.size = size
         self.gap_allocation = gap_allocation
         self.settings = settings
-        self._u_gap = gap_allocation.u.gap_of_fine_lane[population.u_lane]
-        self._v_gap = gap_allocation.v.gap_of_fine_lane[population.v_lane]
+        self.population = MCTuplesPopulation.draw_in_eligible_lanes(n_population, gap_allocation, settings.rng)
+        self._u_gap = gap_allocation.u.gap_of_fine_lane[self.population.u_lane]
+        self._v_gap = gap_allocation.v.gap_of_fine_lane[self.population.v_lane]
 
     # --------------------------------------------------------------------------
     #  Main API
