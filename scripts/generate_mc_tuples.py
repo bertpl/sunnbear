@@ -3,8 +3,8 @@
 The maintainer runs this script by hand whenever the tuple set is regenerated, never at release
 time. The script:
 
-- runs `MCTuplesGenerator`, as `sunnbear.benchmark.generate_mc_tuples` does, so that it can report each size as it
-  finishes;
+- runs `MCTuplesGenerator`, as `sunnbear.benchmark.generate_mc_tuples` does, so that the script can report each size
+  once that size is built;
 - prints 2 lines per size as the construction goes:
   - the solve's budget and wall time;
   - the allocation's predicted offsets of the mean;
@@ -14,8 +14,8 @@ time. The script:
   `k<size>.csv`, its tuples before it as `k<size>_uncorrected.csv`, and max-div's solution, with its score
   checkpoints, as the pickle file `k<size>_solution.pkl`;
 - prints the spread of every size, its means and its largest number of tuples in 1 fine lane, and the overall score;
-- saves the set through `ArtifactStore`, which records in the artifact's manifest the `generate_mc_tuples` call that
-  builds the same set, with its arguments, and max-div's version; `--no-save` skips saving the set, for a trial run.
+- saves the set through `ArtifactStore`, which records in the artifact's manifest the `generate_mc_tuples` call with
+  the same arguments, and max-div's version; `--no-save` skips saving the set, for a trial run.
 
 Usage:
 
@@ -74,12 +74,12 @@ def main() -> None:
         "n_population": args.n_population,
     }
     generator = MCTuplesGenerator(
-        n_workers=args.n_workers,
-        seed=args.seed,
-        n_population=args.n_population,
+        n_workers=arguments["n_workers"],
+        seed=arguments["seed"],
+        n_population=arguments["n_population"],
         on_size_finished=lambda result: report_size(result, args.inspection_dir),
     )
-    tuples = generator.generate(args.t_total_sec, MCTuplesSize(args.max_size))
+    tuples = generator.generate(arguments["t_total_sec"], arguments["max_size"])
 
     print(
         "| size | min separation L2 / u / v | gpq(0.1) u / v / L2 | score | mean offset u / v | tuples per fine lane |"

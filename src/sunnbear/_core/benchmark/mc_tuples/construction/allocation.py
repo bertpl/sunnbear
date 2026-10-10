@@ -13,10 +13,10 @@ The allocation comes in 2 stages:
    the tuple; a gap's spacing is the distance between its neighboring values once its new tuples are spread evenly
    over it;
 2. **mean-aware:** starting from the greedy allocation, a local search moves new tuples between gaps, 1 at a time, to
-   raise a score: the predicted smallest spacing minus the absolute predicted offset of the size's mean from 0.5,
-   both in fine lanes (`MCTuplesAxisGaps.predicted_score`). The score estimates the smallest spacing that remains
-   once the mean correction has removed the offset, so the search gives up spacing only where it buys a larger
-   reduction of the offset.
+   raise the predicted smallest spacing after the mean correction (`MCTuplesAxisGaps.predicted_corrected_min_spacing`):
+   - it is the predicted smallest spacing minus the absolute predicted offset of the size's mean from 0.5, both in
+     fine lanes;
+   - so the search lowers the smallest spacing only where that lowers the offset by more.
 """
 
 from dataclasses import dataclass
@@ -177,11 +177,10 @@ class MCTuplesAxisGaps:
         mean = (self.required_sum + self.predicted_sums(counts).sum()) / size
         return float((mean - TARGET_MEAN) * N_FINE_LANES)
 
-    def predicted_score(self, counts: np.ndarray) -> float:
-        """Return the score of the allocation `counts`: its smallest spacing minus its absolute offset, in fine lanes.
+    def predicted_corrected_min_spacing(self, counts: np.ndarray) -> float:
+        """Return the estimated smallest spacing after the mean correction of the allocation `counts`, in fine lanes.
 
-        Both come from the predicted spread of the new tuples (`spacings`, `predicted_offset_fine_lanes`), and the
-        score estimates the smallest spacing that remains once the mean correction has removed the offset.
+        The estimate is the allocation's smallest spacing minus the absolute offset of the size's mean from 0.5.
         """
         return float(self.spacings(counts).min() - abs(self.predicted_offset_fine_lanes(counts)))
 
@@ -201,18 +200,20 @@ class MCTuplesAxisGaps:
         return counts
 
     def mean_aware_counts(self, greedy_counts: np.ndarray) -> np.ndarray:
-        """Return the allocation with a locally best `predicted_score`, reached from `greedy_counts` by single moves.
+        """Return the allocation with a locally largest `predicted_corrected_min_spacing`, reached by moving tuples.
 
-        The search repeatedly moves 1 new tuple from 1 gap to another, taking the move that raises the score most, and
-        stops once no move raises it. A gap takes at most 1 new tuple per free fine lane. Every move raises the score
-        strictly, and there are finitely many allocations, so the search ends.
+        The search repeatedly moves 1 new tuple from 1 gap to another, taking the move that raises the estimate most,
+        and stops once no move raises it. Every move raises the estimate strictly, and there are finitely many
+        allocations, so the search ends.
+
+        A gap takes at most 1 new tuple per free fine lane.
         """
         size = self.n_required + int(greedy_counts.sum())
         target_sum = TARGET_MEAN * size - self.required_sum
         counts = greedy_counts.copy()
-        score = self.predicted_score(counts)
+        corrected_min_spacing = self.predicted_corrected_min_spacing(counts)
         while True:
-            # --- the score after each move ------
+            # --- the estimate after each move ---
             sums = self.predicted_sums(counts)
             excess = sums.sum() - target_sum
             removal = sums - self.predicted_sums(counts - 1)
@@ -220,21 +221,27 @@ class MCTuplesAxisGaps:
             offset_after = np.abs(excess - removal[:, None] + addition[None, :]) / size * N_FINE_LANES
             is_valid = (counts >= 1)[:, None] & (counts < self.n_free_lanes)[None, :]
             np.fill_diagonal(is_valid, False)
-            score_after = np.where(is_valid, self._min_spacing_after_moves(counts) - offset_after, -np.inf)
+            corrected_min_spacing_after = np.where(
+                is_valid, self._min_spacing_after_moves(counts) - offset_after, -np.inf
+            )
 
             # --- the best move ------------------
-            source, destination = np.unravel_index(np.argmax(score_after), score_after.shape)
+            source, destination = np.unravel_index(
+                np.argmax(corrected_min_spacing_after), corrected_min_spacing_after.shape
+            )
             moved_counts = counts.copy()
             moved_counts[source] -= 1
             moved_counts[destination] += 1
-            # The score of the move is recomputed from its allocation, so that rounding in the update above cannot
-            # make 2 allocations with the same score each look better than the other, and the search cannot cycle.
+            # The chosen move's estimate is recomputed from its allocation, because `corrected_min_spacing_after`
+            # builds each estimate from differences of predicted sums, whose rounding could make 2 allocations with the
+            # same estimate each look better than the other, so that the search would cycle. When no move is valid,
+            # every entry is -inf and argmax returns an invalid pair, which ends the search.
             if is_valid[source, destination]:
-                moved_score = self.predicted_score(moved_counts)
+                moved_corrected_min_spacing = self.predicted_corrected_min_spacing(moved_counts)
             else:
-                moved_score = -np.inf
-            if moved_score > score:
-                counts, score = moved_counts, moved_score
+                moved_corrected_min_spacing = -np.inf
+            if moved_corrected_min_spacing > corrected_min_spacing:
+                counts, corrected_min_spacing = moved_counts, moved_corrected_min_spacing
             else:
                 return counts
 
@@ -252,23 +259,29 @@ class MCTuplesAxisGaps:
     #  Helpers
     # --------------------------------------------------------------------------
     def _min_spacing_after_moves(self, counts: np.ndarray) -> np.ndarray:
-        """Return, for each move of 1 new tuple from gap `s` to gap `d`, the smallest spacing after it, at `[s, d]`.
+        """Return the matrix whose entry `[s, d]` is the smallest spacing after moving 1 tuple from gap `s` to gap `d`.
 
-        A move changes the spacings of `s` and `d` only, so the smallest spacing after it is the smallest of those 2
-        and of the smallest spacing among the other gaps, which is 1 of the 3 smallest spacings before the move.
+        A move changes the spacings of `s` and `d` only, so the smallest spacing after it is the smallest of 3 values:
+        the new spacings of `s` and `d`, and the smallest spacing among the other gaps, which is 1 of the 3 smallest
+        spacings before the move. Entries for a move out of a gap without new tuples, into a gap without free fine
+        lanes, or from a gap to itself hold meaningless values; the caller masks them.
         """
         spacings = self.spacings(counts)
         n_gaps = spacings.size
-        lowest = np.argsort(spacings)[:3]
-        gap = np.arange(n_gaps)
+        lowest_spacing_gaps = np.argsort(spacings)[:3]
+        gap_indices = np.arange(n_gaps)
         # Each entry starts at the 3rd smallest spacing, then takes the 2nd and the 1st where they belong to neither gap
         # of the move.
-        others_min = np.full((n_gaps, n_gaps), spacings[lowest[2]] if n_gaps >= 3 else np.inf)
+        if n_gaps >= 3:
+            min_spacing_of_others = np.full((n_gaps, n_gaps), spacings[lowest_spacing_gaps[2]])
+        else:
+            min_spacing_of_others = np.full((n_gaps, n_gaps), np.inf)
         for rank in reversed(range(min(2, n_gaps))):
-            is_other = (gap[:, None] != lowest[rank]) & (gap[None, :] != lowest[rank])
-            others_min = np.where(is_other, spacings[lowest[rank]], others_min)
+            gap = lowest_spacing_gaps[rank]
+            is_other = (gap_indices[:, None] != gap) & (gap_indices[None, :] != gap)
+            min_spacing_of_others = np.where(is_other, spacings[gap], min_spacing_of_others)
         return np.minimum(
-            others_min, np.minimum(self.spacings(counts - 1)[:, None], self.spacings(counts + 1)[None, :])
+            min_spacing_of_others, np.minimum(self.spacings(counts - 1)[:, None], self.spacings(counts + 1)[None, :])
         )
 
     # --------------------------------------------------------------------------

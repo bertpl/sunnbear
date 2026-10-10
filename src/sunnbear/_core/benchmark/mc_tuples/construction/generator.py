@@ -49,8 +49,8 @@ class MCTuplesGenerator:
     `generate_mc_tuples` documents.
 
     Attributes:
-        on_size_finished: Called with each size's `MCTuplesSizeResult` as soon as the size, its mean correction
-            included, ends, e.g. to print the progress of a long construction or to store its tuples and max-div's
+        on_size_finished: Called with each size's `MCTuplesSizeResult` as soon as the size is built and its means are
+            corrected, e.g. to print the progress of a long construction or to store its tuples and max-div's
             solutions; None reports nothing.
     """
 

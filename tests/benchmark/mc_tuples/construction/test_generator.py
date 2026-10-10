@@ -1,5 +1,10 @@
-"""`MCTuplesGenerator` builds nested sizes with means of 0.5 and at most 1 tuple per fine lane, reports each size,
-splits the total time over the solves and scales down the worker count of a short run; `generate_mc_tuples` runs it."""
+"""The tests check that `MCTuplesGenerator`, which `generate_mc_tuples` runs:
+
+- builds nested sizes with means of 0.5 and at most 1 tuple per fine lane;
+- reports each size;
+- splits the total time over the solves;
+- scales down the worker count of a short run.
+"""
 
 import contextlib
 
@@ -44,7 +49,7 @@ def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]
 
 
 # ==================================================================================================
-#  generate_mc_tuples
+#  MCTuplesGenerator and generate_mc_tuples
 # ==================================================================================================
 @pytest.mark.only_with_numba_jit
 def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size():

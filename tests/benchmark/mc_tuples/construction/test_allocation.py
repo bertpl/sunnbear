@@ -129,9 +129,10 @@ def test_mean_aware_counts_keep_an_allocation_that_fills_every_free_fine_lane():
     assert gaps.mean_aware_counts(greedy_counts).tolist() == greedy_counts.tolist()
 
 
-def test_mean_aware_counts_end_where_no_single_move_raises_the_score():
-    """On a random size below, the search ends at a score at least the greedy allocation's, where no move of 1 new tuple
-    to another gap raises it, and no gap takes more new tuples than it has free fine lanes."""
+def test_mean_aware_counts_end_where_no_single_move_raises_the_corrected_min_spacing():
+    """With random values for the size below, the search ends at an allocation whose predicted corrected smallest
+    spacing is at least the greedy allocation's, where no move of 1 new tuple to another gap raises it, and no gap
+    takes more new tuples than it has free fine lanes."""
     # --- arrange ----------------------
     values = np.random.default_rng(3).choice(N_FINE_LANES, size=128, replace=False) / N_FINE_LANES + 0.4 / N_FINE_LANES
     gaps = MCTuplesAxisGaps.of(values)
@@ -143,15 +144,15 @@ def test_mean_aware_counts_end_where_no_single_move_raises_the_score():
     # --- assert -----------------------
     assert counts.sum() == 128
     assert np.all(counts <= gaps.n_free_lanes)
-    score = gaps.predicted_score(counts)
-    assert score >= gaps.predicted_score(greedy_counts)
+    corrected_min_spacing = gaps.predicted_corrected_min_spacing(counts)
+    assert corrected_min_spacing >= gaps.predicted_corrected_min_spacing(greedy_counts)
     for source in np.flatnonzero(counts >= 1):
         for destination in np.flatnonzero(counts < gaps.n_free_lanes):
             if destination != source:
                 moved_counts = counts.copy()
                 moved_counts[source] -= 1
                 moved_counts[destination] += 1
-                assert gaps.predicted_score(moved_counts) <= score
+                assert gaps.predicted_corrected_min_spacing(moved_counts) <= corrected_min_spacing
 
 
 # ==================================================================================================
