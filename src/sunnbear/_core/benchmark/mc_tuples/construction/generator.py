@@ -14,7 +14,7 @@ a fine lane, so the largest size holds exactly 1 tuple per fine lane on each axi
 4. the mean correction moves the new tuples so that the size's mean u and mean v are exactly 0.5
    (`correction`).
 
-`MCTuplesGenerator` passes each size's result (`size_result`) to the caller's `on_size_finished`, so that a
+`MCTuplesGenerator` passes each size's result, an `MCTuplesSizeResult`, to the caller's `on_size_finished`, so that a
 long construction can show its progress and store its tuples and max-div's solutions as it goes.
 """
 
