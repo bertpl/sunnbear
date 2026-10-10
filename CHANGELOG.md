@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Change the tuple sets that `generate_mc_tuples` builds for the same arguments
+
 ### Deprecated
 
 ### Removed
