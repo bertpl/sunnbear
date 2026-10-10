@@ -37,7 +37,6 @@ from .solve import MCTuplesSizeSolve, MCTuplesSolveSettings
 DEFAULT_N_WORKERS = 32
 DEFAULT_SEED = 42
 DEFAULT_N_POPULATION = 2**20
-DEFAULT_ALLOCATION_EPSILON = 0.1
 
 
 # ==================================================================================================
@@ -46,7 +45,13 @@ DEFAULT_ALLOCATION_EPSILON = 0.1
 class MCTuplesGenerator:
     """`MCTuplesGenerator` builds the nested tuple set size by size, 1 max-div solve per size, and reports every size.
 
-    Each attribute holds the `generate_mc_tuples` argument of the same name, which `generate_mc_tuples` documents.
+    Each attribute except `on_size_finished` holds the `generate_mc_tuples` argument of the same name, which
+    `generate_mc_tuples` documents.
+
+    Attributes:
+        on_size_finished: Called with each size's `MCTuplesSizeResult` as soon as the size, its mean correction
+            included, ends, e.g. to print the progress of a long construction or to store its tuples and max-div's
+            solutions; None reports nothing.
     """
 
     MIN_T_BUDGET_FRACTION_PER_SOLVE: ClassVar[float] = 0.01
@@ -59,24 +64,20 @@ class MCTuplesGenerator:
         n_workers: int = DEFAULT_N_WORKERS,
         seed: int = DEFAULT_SEED,
         n_population: int = DEFAULT_N_POPULATION,
-        allocation_epsilon: float = DEFAULT_ALLOCATION_EPSILON,
         on_size_finished: Callable[[MCTuplesSizeResult], None] | None = None,
     ) -> None:
         """Set the settings of every construction of this generator.
 
         Raises:
-            ValueError: If `n_workers` or `n_population` is below 1, or `allocation_epsilon` lies outside [0, 1).
+            ValueError: If `n_workers` or `n_population` is below 1.
         """
         if n_workers < 1:
             raise ValueError(f"n_workers must be at least 1 (got {n_workers}).")
         if n_population < 1:
             raise ValueError(f"n_population must be at least 1 (got {n_population}).")
-        if not 0 <= allocation_epsilon < 1:
-            raise ValueError(f"allocation_epsilon must lie in [0, 1) (got {allocation_epsilon}).")
         self.n_workers = n_workers
         self.seed = seed
         self.n_population = n_population
-        self.allocation_epsilon = allocation_epsilon
         self.on_size_finished = on_size_finished
 
     # --------------------------------------------------------------------------
@@ -159,7 +160,7 @@ class MCTuplesGenerator:
         t_start = time.perf_counter()
         required_tuple_array = required_tuples.tuple_array if required_tuples is not None else np.zeros((0, 2))
         population = MCTuplesPopulation.draw_in_free_lanes(self.n_population, required_tuple_array, settings.rng)
-        gap_allocation = MCTuplesGapAllocation.of(required_tuple_array, size.n_new, self.allocation_epsilon)
+        gap_allocation = MCTuplesGapAllocation.of(required_tuple_array, size.n_new)
         solve = MCTuplesSizeSolve(population, required_tuple_array, size, gap_allocation, settings)
         new_tuple_array, solution = solve.run(t_budget_sec)
         uncorrected_tuple_array = np.vstack([required_tuple_array, new_tuple_array])
@@ -184,8 +185,6 @@ def generate_mc_tuples(
     seed: int = DEFAULT_SEED,
     max_size: MCTuplesSize = MCTuplesSize.SIZE_1024,
     n_population: int = DEFAULT_N_POPULATION,
-    allocation_epsilon: float = DEFAULT_ALLOCATION_EPSILON,
-    on_size_finished: Callable[[MCTuplesSizeResult], None] | None = None,
 ) -> MCTuples:
     """Construct a nested Monte Carlo (u, v) tuple set up to `max_size` in about `t_total_sec` s.
 
@@ -226,24 +225,13 @@ def generate_mc_tuples(
         max_size: The largest size to build, 1 of `MCTuplesSize`; every size up to it is built, however short
             `t_total_sec` is, so a short run that wants fewer sizes passes a smaller `max_size`.
         n_population: The number of candidate tuples of each size's population, at least 1.
-        allocation_epsilon: The share in [0, 1) by which the allocation of new tuples to the gaps between the size
-            below's tuples may shrink the smallest distance between neighboring values on an axis, to bring the
-            predicted mean closer to 0.5 before the correction.
-        on_size_finished: Called after every size with its `MCTuplesSizeResult`, e.g. to print the progress of a long
-            construction or to store its tuples and solutions; None reports nothing.
 
     Raises:
-        ValueError: If `t_total_sec` is below 1 s, `n_workers` or `n_population` is below 1, `allocation_epsilon`
-            lies outside [0, 1), or `max_size` is not 1 of `MCTuplesSize`.
+        ValueError: If `t_total_sec` is below 1 s, `n_workers` or `n_population` is below 1, or `max_size` is not 1
+            of `MCTuplesSize`.
         MCTuplesConstructionError: If a size cannot be built within its constraints, which can happen when
             `t_total_sec` is too short for max-div to meet them, or when `n_population` is too small to place the
             size's new tuples in distinct fine lanes.
     """
-    generator = MCTuplesGenerator(
-        n_workers=n_workers,
-        seed=seed,
-        n_population=n_population,
-        allocation_epsilon=allocation_epsilon,
-        on_size_finished=on_size_finished,
-    )
+    generator = MCTuplesGenerator(n_workers=n_workers, seed=seed, n_population=n_population)
     return generator.generate(t_total_sec, max_size)

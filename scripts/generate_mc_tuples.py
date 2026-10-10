@@ -3,7 +3,8 @@
 The maintainer runs this script by hand whenever the tuple set is regenerated, never at release
 time. The script:
 
-- calls `sunnbear.benchmark.generate_mc_tuples`;
+- runs `MCTuplesGenerator`, as `sunnbear.benchmark.generate_mc_tuples` does, so that it can report each size as it
+  finishes;
 - prints 2 lines per size as the construction goes:
   - the solve's budget and wall time;
   - the allocation's predicted offsets of the mean;
@@ -13,8 +14,8 @@ time. The script:
   `k<size>.csv`, its tuples before it as `k<size>_uncorrected.csv`, and max-div's solution, with its score
   checkpoints, as the pickle file `k<size>_solution.pkl`;
 - prints the spread of every size, its means and its largest number of tuples in 1 fine lane, and the overall score;
-- saves the set through `ArtifactStore`, which records in the artifact's manifest the
-  `generate_mc_tuples` call, its arguments and max-div's version; `--no-save` skips saving the set, for a trial run.
+- saves the set through `ArtifactStore`, which records in the artifact's manifest the `generate_mc_tuples` call that
+  builds the same set, with its arguments, and max-div's version; `--no-save` skips saving the set, for a trial run.
 
 Usage:
 
@@ -31,18 +32,17 @@ import numpy as np
 
 from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples import (
-    DEFAULT_ALLOCATION_EPSILON,
     DEFAULT_N_POPULATION,
     DEFAULT_N_WORKERS,
     DEFAULT_SEED,
     N_FINE_LANES,
     TARGET_MEAN,
     MCTuplesDeclaration,
+    MCTuplesGenerator,
     MCTuplesSize,
     MCTuplesSizeResult,
     MCTuplesStats,
     fine_lanes_of,
-    generate_mc_tuples,
 )
 
 
@@ -60,15 +60,6 @@ def main() -> None:
         help="the largest size to build, for a trial run of the smaller sizes",
     )
     parser.add_argument("--n-population", type=int, default=DEFAULT_N_POPULATION, help="candidate tuples per size")
-    parser.add_argument(
-        "--allocation-epsilon",
-        type=float,
-        default=DEFAULT_ALLOCATION_EPSILON,
-        help=(
-            "share by which the allocation of new tuples to the gaps between the size below's values may shrink the "
-            "smallest distance between neighboring values on an axis, to bring the predicted mean closer to 0.5"
-        ),
-    )
     parser.add_argument("--inspection-dir", type=Path, help="directory for the tuples and solution of each size")
     parser.add_argument(
         "--no-save", action="store_true", dest="is_trial_run", help="do not save the artifact, for a trial run"
@@ -81,9 +72,14 @@ def main() -> None:
         "seed": args.seed,
         "max_size": MCTuplesSize(args.max_size),
         "n_population": args.n_population,
-        "allocation_epsilon": args.allocation_epsilon,
     }
-    tuples = generate_mc_tuples(**arguments, on_size_finished=lambda result: report_size(result, args.inspection_dir))
+    generator = MCTuplesGenerator(
+        n_workers=args.n_workers,
+        seed=args.seed,
+        n_population=args.n_population,
+        on_size_finished=lambda result: report_size(result, args.inspection_dir),
+    )
+    tuples = generator.generate(args.t_total_sec, MCTuplesSize(args.max_size))
 
     print(
         "| size | min separation L2 / u / v | gpq(0.1) u / v / L2 | score | mean offset u / v | tuples per fine lane |"

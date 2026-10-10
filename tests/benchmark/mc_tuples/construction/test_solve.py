@@ -25,7 +25,7 @@ def _solve(size: MCTuplesSize, required_tuple_array: np.ndarray, n_population: i
         population,
         required_tuple_array,
         size,
-        MCTuplesGapAllocation.of(required_tuple_array, size.n_new, epsilon=0.1),
+        MCTuplesGapAllocation.of(required_tuple_array, size.n_new),
         MCTuplesSolveSettings(n_workers=1, seed=42, rng=rng),
     )
 
