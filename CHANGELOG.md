@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Remove the `allocation_epsilon` and `on_size_finished` arguments of `generate_mc_tuples`
+
 ### Fixed
 
 ### Security

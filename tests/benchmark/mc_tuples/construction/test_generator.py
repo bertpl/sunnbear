@@ -1,5 +1,10 @@
-"""`generate_mc_tuples` builds nested sizes with means of 0.5 and at most 1 tuple per fine lane, and reports each size;
-its `MCTuplesGenerator` splits the total time over the solves and scales down the worker count of a short run."""
+"""`MCTuplesGenerator`, which `generate_mc_tuples` runs:
+
+- builds nested sizes with means of 0.5 and at most 1 tuple per fine lane;
+- reports each size;
+- splits the total time over the solves;
+- scales down the worker count of a short run.
+"""
 
 import contextlib
 
@@ -44,10 +49,10 @@ def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]
 
 
 # ==================================================================================================
-#  generate_mc_tuples
+#  MCTuplesGenerator and generate_mc_tuples
 # ==================================================================================================
 @pytest.mark.only_with_numba_jit
-def test_generate_mc_tuples_builds_nested_sizes_with_means_of_0_5_and_reports_each_size():
+def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size():
     """A construction up to size 64 builds sizes 32 and 64, each with means of 0.5 and at most 1 tuple per fine
     lane, and reports both sizes in order.
 
@@ -63,9 +68,8 @@ def test_generate_mc_tuples_builds_nested_sizes_with_means_of_0_5_and_reports_ea
         generate_mc_tuples(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_64, n_population=2**14)
 
     # --- act --------------------------
-    tuples = generate_mc_tuples(
-        t_total_sec=5.0, max_size=MCTuplesSize.SIZE_64, n_population=2**14, on_size_finished=results.append
-    )
+    generator = MCTuplesGenerator(n_population=2**14, on_size_finished=results.append)
+    tuples = generator.generate(t_total_sec=5.0, max_size=MCTuplesSize.SIZE_64)
 
     # --- assert -----------------------
     assert tuples.size == 64
@@ -75,7 +79,7 @@ def test_generate_mc_tuples_builds_nested_sizes_with_means_of_0_5_and_reports_ea
     assert all(result.solution.score_checkpoints for result in results)
 
 
-def test_generate_mc_tuples_corrects_each_size_and_builds_the_next_on_it(monkeypatch):
+def test_generator_corrects_each_size_and_builds_the_next_on_it(monkeypatch):
     """With the solve replaced by a stub that spreads each gap's new tuples evenly over its fine lanes, the generator
     corrects every size's means to 0.5 and builds each size on the corrected size below."""
     # --- arrange ----------------------
@@ -83,9 +87,8 @@ def test_generate_mc_tuples_corrects_each_size_and_builds_the_next_on_it(monkeyp
     results: list[MCTuplesSizeResult] = []
 
     # --- act --------------------------
-    tuples = generate_mc_tuples(
-        t_total_sec=1.0, max_size=MCTuplesSize.SIZE_128, n_population=2**12, on_size_finished=results.append
-    )
+    generator = MCTuplesGenerator(n_population=2**12, on_size_finished=results.append)
+    tuples = generator.generate(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_128)
 
     # --- assert -----------------------
     assert tuples.size == 128
@@ -95,8 +98,8 @@ def test_generate_mc_tuples_corrects_each_size_and_builds_the_next_on_it(monkeyp
     assert results[1].gap_allocation.u.mean_aware_offset_fine_lanes is not None
 
 
-def test_generate_mc_tuples_without_a_callback_returns_the_largest_size(monkeypatch):
-    """Without `on_size_finished`, the generator reports nothing and returns the largest size, corrected to 0.5."""
+def test_generate_mc_tuples_returns_the_largest_size_corrected_to_0_5(monkeypatch):
+    """`generate_mc_tuples` returns the largest size, with means of 0.5."""
     # --- arrange ----------------------
     monkeypatch.setattr(MCTuplesSizeSolve, "run", _spread_each_gap_s_new_tuples)
 
@@ -115,13 +118,10 @@ def test_generate_mc_tuples_without_a_callback_returns_the_largest_size(monkeypa
         ({"t_total_sec": 60.0, "n_workers": 0}, "n_workers must be at least 1"),
         ({"t_total_sec": 60.0, "max_size": 100}, "must be one of"),
         ({"t_total_sec": 60.0, "n_population": 0}, "n_population must be at least 1"),
-        ({"t_total_sec": 60.0, "allocation_epsilon": 1.0}, r"allocation_epsilon must lie in \[0, 1\)"),
-        ({"t_total_sec": 60.0, "allocation_epsilon": -0.1}, r"allocation_epsilon must lie in \[0, 1\)"),
     ],
 )
 def test_generate_mc_tuples_rejects_invalid_arguments(arguments, message):
-    """A total below 1 s, no workers, an unknown size, an empty population or an ε outside [0, 1) raise a
-    `ValueError`."""
+    """A total below 1 s, no workers, an unknown size or an empty population raise a `ValueError`."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=message):
         generate_mc_tuples(**arguments)

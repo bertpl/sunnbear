@@ -109,7 +109,7 @@ def test_mean_aware_counts_move_the_extra_tuple_to_the_middle_gap_without_loweri
     greedy_counts = gaps.greedy_counts(32)
 
     # --- act --------------------------
-    counts = gaps.mean_aware_counts(greedy_counts, epsilon=0.1)
+    counts = gaps.mean_aware_counts(greedy_counts)
 
     # --- assert -----------------------
     assert gaps.predicted_offset_fine_lanes(greedy_counts) == pytest.approx(-7.734375)
@@ -119,22 +119,56 @@ def test_mean_aware_counts_move_the_extra_tuple_to_the_middle_gap_without_loweri
     assert gaps.spacings(counts).min() == gaps.spacings(greedy_counts).min()
 
 
-def test_mean_aware_counts_keep_every_spacing_at_or_above_the_min_allowed_spacing():
-    """No gap's spacing falls below (1 - ε) times the greedy allocation's smallest spacing, and no gap takes more new
-    tuples than it has free fine lanes."""
+def test_min_spacing_after_each_move_between_2_gaps_is_the_smaller_of_their_new_spacings():
+    """With only 2 gaps, no other gap bounds the smallest spacing: an interior gap 500 fine lanes wide and a right edge
+    gap 523 wide, holding 2 and 3 new tuples, end at 250 and 130.75 after a move to the right, and 125 and 261.5 after
+    a move to the left."""
+    # --- arrange ----------------------
+    gaps = MCTuplesAxisGaps.of(np.array([0.5, 500.5]) / N_FINE_LANES)
+
+    # --- act --------------------------
+    min_spacings = gaps._min_spacing_after_each_move(np.array([2, 3]))
+
+    # --- assert -----------------------
+    assert gaps.widths.tolist() == [500.0, 523.0]
+    assert min_spacings[0, 1] == pytest.approx(523 / 4)
+    assert min_spacings[1, 0] == pytest.approx(500 / 4)
+
+
+def test_mean_aware_counts_keep_an_allocation_that_fills_every_free_fine_lane():
+    """With as many new tuples as free fine lanes, no gap can take another, so the greedy allocation stays."""
+    # --- arrange ----------------------
+    gaps = MCTuplesAxisGaps.of(np.array([3.5, 1020.5]) / N_FINE_LANES)
+    greedy_counts = gaps.greedy_counts(int(gaps.n_free_lanes.sum()))
+
+    # --- act / assert -----------------
+    assert gaps.mean_aware_counts(greedy_counts).tolist() == greedy_counts.tolist()
+
+
+def test_mean_aware_counts_end_where_no_single_move_raises_the_corrected_min_spacing():
+    """With random values for the size below, the search ends at an allocation that fits every gap's free fine lanes,
+    whose `predicted_corrected_min_spacing` is at least the greedy allocation's, and whose
+    `predicted_corrected_min_spacing` no move of 1 new tuple to another gap raises."""
     # --- arrange ----------------------
     values = np.random.default_rng(3).choice(N_FINE_LANES, size=128, replace=False) / N_FINE_LANES + 0.4 / N_FINE_LANES
     gaps = MCTuplesAxisGaps.of(values)
     greedy_counts = gaps.greedy_counts(128)
 
     # --- act --------------------------
-    counts = gaps.mean_aware_counts(greedy_counts, epsilon=0.1)
+    counts = gaps.mean_aware_counts(greedy_counts)
 
     # --- assert -----------------------
     assert counts.sum() == 128
     assert np.all(counts <= gaps.n_free_lanes)
-    assert gaps.spacings(counts).min() >= 0.9 * gaps.spacings(greedy_counts).min()
-    assert abs(gaps.predicted_offset_fine_lanes(counts)) <= abs(gaps.predicted_offset_fine_lanes(greedy_counts))
+    corrected_min_spacing = gaps.predicted_corrected_min_spacing(counts)
+    assert corrected_min_spacing >= gaps.predicted_corrected_min_spacing(greedy_counts)
+    for source in np.flatnonzero(counts >= 1):
+        for destination in np.flatnonzero(counts < gaps.n_free_lanes):
+            if destination != source:
+                counts_after_move = counts.copy()
+                counts_after_move[source] -= 1
+                counts_after_move[destination] += 1
+                assert gaps.predicted_corrected_min_spacing(counts_after_move) <= corrected_min_spacing
 
 
 # ==================================================================================================
@@ -143,7 +177,7 @@ def test_mean_aware_counts_keep_every_spacing_at_or_above_the_min_allowed_spacin
 def test_allocation_without_a_size_below_is_1_gap_of_all_fine_lanes():
     """The smallest size has no size below, so every fine lane belongs to 1 gap that gets every new tuple."""
     # --- act --------------------------
-    allocation = MCTuplesAxisGapAllocation.of(np.zeros(0), 32, epsilon=0.1)
+    allocation = MCTuplesAxisGapAllocation.of(np.zeros(0), 32)
 
     # --- assert -----------------------
     assert allocation.counts.tolist() == [32]
@@ -155,7 +189,7 @@ def test_allocation_without_a_size_below_is_1_gap_of_all_fine_lanes():
 def test_allocation_numbers_the_gaps_with_new_tuples_and_leaves_the_others_out():
     """Each fine lane of a gap with new tuples maps to that gap; occupied fine lanes and empty gaps map to -1."""
     # --- act --------------------------
-    allocation = MCTuplesAxisGapAllocation.of(_SPREAD_VALUES, 32, epsilon=0.1)
+    allocation = MCTuplesAxisGapAllocation.of(_SPREAD_VALUES, 32)
 
     # --- assert -----------------------
     occupied = fine_lanes_of(_SPREAD_VALUES)

@@ -17,7 +17,6 @@ The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples
 
 from .artifact import MCTuplesDeclaration, load_mc_tuples
 from .construction import (
-    DEFAULT_ALLOCATION_EPSILON,
     DEFAULT_N_POPULATION,
     DEFAULT_N_WORKERS,
     DEFAULT_SEED,
