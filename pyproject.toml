@@ -86,20 +86,11 @@ dev = [
     "scipy>=1.18.1; python_version >= '3.15'",
     "ty==0.0.56",  # pre-1.0 type checker — pin exactly; its ruleset is still evolving
 ]
-# maintainer scratch tooling — installed by a plain `uv sync` (default-groups below)
-# but NOT by CI's `uv sync --group dev` / `uv run --group dev`, keeping matrix jobs lean
-notebooks = [
-    "jupyterlab>=4.4.6",
-    "notebook>=7.4.5",
-]
 # packaging-integrity tooling for the _package_check.yml CI gate; opt-in via
-# `--group package`, kept out of the default dev/notebooks sync.
+# `--group package`, kept out of the default `dev` sync.
 package = [
     "check-wheel-contents>=0.6.2",
 ]
-
-[tool.uv]
-default-groups = ["dev", "notebooks"]
 
 [project.urls]
 Source = "https://github.com/bertpl/sunnbear"
@@ -207,8 +198,6 @@ invalid-method-override = "ignore"
 [tool.codespell]
 # "intoto": the in-toto attestation format (provenance.intoto.jsonl).
 ignore-words-list = "intoto"
-# Notebooks embed base64 image outputs that codespell misreads as typos.
-skip = "*.ipynb"
 
 [tool.pytest.ini_options]
 addopts = "--strict-markers"
