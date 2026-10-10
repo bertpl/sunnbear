@@ -13,6 +13,9 @@ jobs:
     # the suite depends on the architecture. Every dependency ships an aarch64 wheel even at the lowest
     # version that pyproject.toml allows, so the matrix entries that install those lowest versions
     # (resolution: lowest-direct) build nothing from source.
+    #
+    # The exception is PyYAML, which pre-commit pulls in: no PyYAML release ships a 3.15 wheel, so both
+    # 3.15 entries build it from source.
     runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
@@ -32,6 +35,8 @@ jobs:
           - { python: "3.13", resolution: highest,       jit: "on"  }
           - { python: "3.14", resolution: highest,       jit: "off" }
           - { python: "3.14", resolution: lowest-direct, jit: "on"  }
+          - { python: "3.15", resolution: highest,       jit: "off" }
+          - { python: "3.15", resolution: lowest-direct, jit: "on"  }
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
