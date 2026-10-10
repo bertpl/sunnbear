@@ -4,7 +4,7 @@ The construction builds the sizes bottom-up, the smallest first, and each larger
 every size is a prefix of the next. Each axis is cut into `N_FINE_LANES` fine lanes, and no 2 tuples of the set share
 a fine lane, so the largest size holds exactly 1 tuple per fine lane on each axis.
 
-`MCTuplesGenerator` builds each size in 4 parts:
+`MCTuplesGenerator` builds each size in 4 parts, each implemented in the module of this package named in parentheses:
 
 1. it draws the size's population of candidate tuples over the fine lanes that the size below leaves free
    (`population`);

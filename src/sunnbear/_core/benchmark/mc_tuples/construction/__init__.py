@@ -1,7 +1,7 @@
-"""This package constructs the nested tuple set: `generate_mc_tuples` and the `MCTuplesGenerator` behind it.
+"""This package constructs the nested tuple set, in which each size includes the size below it.
 
-The `generator` module documents the construction and names the module of each of its parts. `MCTuplesSizeResult`
-records how 1 size was built, and `MCTuplesConstructionError` is raised when a size cannot meet its constraints.
+`generate_mc_tuples` runs the `MCTuplesGenerator` class. The `generator` module documents the construction and names
+the module that implements each of its steps.
 """
 
 from .exceptions import MCTuplesConstructionError
