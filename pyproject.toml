@@ -86,8 +86,8 @@ dev = [
     "scipy>=1.18.1; python_version >= '3.15'",
     "ty==0.0.56",  # pre-1.0 type checker — pin exactly; its ruleset is still evolving
 ]
-# The packaging-integrity tooling for the _package_check.yml CI gate is opt-in via `--group package`, so a plain
-# `uv sync`, which installs only the `dev` group, leaves it out.
+# This group holds the packaging-integrity tooling for the _package_check.yml CI gate, which installs it with
+# `--group package`.
 package = [
     "check-wheel-contents>=0.6.2",
 ]
