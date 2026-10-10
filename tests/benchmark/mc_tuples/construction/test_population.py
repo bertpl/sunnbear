@@ -41,22 +41,6 @@ def test_draw_spreads_the_candidates_evenly_over_the_free_fine_lanes_and_cells(n
         assert np.all((values > 0) & (values < 1))
 
 
-def test_randomize_pattern_keeps_every_row_and_column_count():
-    """Curveball trades change which cells are occupied, but no row's or column's count."""
-    # --- arrange ----------------------
-    rng = np.random.default_rng(2)
-    is_occupied = MCTuplesPopulation._round_robin_pattern(20, 30, 250, rng)
-    before = is_occupied.copy()
-
-    # --- act --------------------------
-    MCTuplesPopulation._randomize_pattern(is_occupied, 500, rng)
-
-    # --- assert -----------------------
-    assert not np.array_equal(is_occupied, before)
-    assert np.array_equal(is_occupied.sum(axis=0), before.sum(axis=0))
-    assert np.array_equal(is_occupied.sum(axis=1), before.sum(axis=1))
-
-
 def test_positions_in_lane_move_a_draw_of_exactly_0_to_the_middle_of_its_lane():
     """A position of exactly 0 would put a candidate on the edge of the unit square; it becomes 0.5."""
 

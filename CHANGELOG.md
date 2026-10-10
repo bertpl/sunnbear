@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Simplify how `generate_mc_tuples` draws each size's candidate tuples; the tuple sets that it builds differ
+
 ### Deprecated
 
 ### Removed
