@@ -119,6 +119,22 @@ def test_mean_aware_counts_move_the_extra_tuple_to_the_middle_gap_without_loweri
     assert gaps.spacings(counts).min() == gaps.spacings(greedy_counts).min()
 
 
+def test_min_spacing_after_each_move_between_2_gaps_is_the_smaller_of_their_new_spacings():
+    """With only 2 gaps, no other gap bounds the smallest spacing: an interior gap 500 fine lanes wide and a right edge
+    gap 523 wide, holding 2 and 3 new tuples, end at 250 and 130.75 after a move to the right, and 125 and 261.5 after
+    a move to the left."""
+    # --- arrange ----------------------
+    gaps = MCTuplesAxisGaps.of(np.array([0.5, 500.5]) / N_FINE_LANES)
+
+    # --- act --------------------------
+    min_spacings = gaps._min_spacing_after_each_move(np.array([2, 3]))
+
+    # --- assert -----------------------
+    assert gaps.widths.tolist() == [500.0, 523.0]
+    assert min_spacings[0, 1] == pytest.approx(523 / 4)
+    assert min_spacings[1, 0] == pytest.approx(500 / 4)
+
+
 def test_mean_aware_counts_keep_an_allocation_that_fills_every_free_fine_lane():
     """With as many new tuples as free fine lanes, no gap can take another, so the greedy allocation stays."""
     # --- arrange ----------------------
