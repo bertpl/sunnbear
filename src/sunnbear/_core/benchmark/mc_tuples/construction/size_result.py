@@ -21,8 +21,12 @@ class MCTuplesSizeResult:
     Attributes:
         size: The size built.
         t_budget_sec: The max-div solve's wall-clock budget.
-        t_wall_sec: The size's wall-clock time: the population, the gap allocation, the solve with max-div's start-up
-            and shut-down time, and the mean correction.
+        t_wall_sec: The size's wall-clock time, which covers:
+
+            - the gap allocation;
+            - the population;
+            - the solve, with max-div's start-up and shut-down time;
+            - the mean correction.
         gap_allocation: The allocation of the new tuples to the gaps along u and along v.
         uncorrected_tuple_array: The size's tuples before the mean correction, as a `(size, 2)` array of (u, v)
             values: the size below's tuples first, then the new tuples that max-div selected.

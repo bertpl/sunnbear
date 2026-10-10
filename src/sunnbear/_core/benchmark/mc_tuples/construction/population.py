@@ -1,16 +1,20 @@
 """`MCTuplesPopulation` holds a size's candidate tuples, among which max-div picks the size's new tuples.
 
 Each axis is cut into `N_FINE_LANES` equal fine lanes; a fine cell is the crossing of a fine u-lane and a fine
-v-lane. A size's population is drawn over the fine lanes that the size below leaves free, and guarantees:
+v-lane.
 
-- every free fine lane holds the same number of candidates, give or take 1, along u and along v;
-- every free fine cell holds `n // n_cells` or `n // n_cells + 1` candidates, with `n` the population size and
-  `n_cells` the number of free fine cells.
+A size's population is drawn over its eligible fine lanes: the fine lanes of the gaps that its gap allocation gives
+new tuples (`MCTuplesAxisGapAllocation.eligible_fine_lanes`). A candidate in any other fine lane could never be
+picked, so the whole population is usable. The population guarantees:
+
+- every eligible fine lane holds the same number of candidates, give or take 1, along u and along v;
+- every eligible fine cell, the crossing of an eligible u-lane and an eligible v-lane, holds `n // n_cells` or
+  `n // n_cells + 1` candidates, with `n` the population size and `n_cells` the number of eligible fine cells.
 
 The population is drawn in 2 steps:
 
-1. `spread_evenly_over_grid` picks each candidate's free fine cell, at random under both guarantees, on the grid of
-   free u-lanes and free v-lanes;
+1. `spread_evenly_over_grid` picks each candidate's eligible fine cell, at random under both guarantees, on the
+   grid of eligible u-lanes and eligible v-lanes;
 2. each candidate lies at its own uniform random position inside its fine cell.
 """
 
@@ -18,7 +22,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES
 from sunnbear._core.utils.spread_over_grid import spread_evenly_over_grid
 
 
@@ -65,32 +69,19 @@ class MCTuplesPopulation:
     # --------------------------------------------------------------------------
     @classmethod
     def draw(
-        cls, n_population: int, free_u_lanes: np.ndarray, free_v_lanes: np.ndarray, rng: np.random.Generator
+        cls, n_population: int, allowed_u_lanes: np.ndarray, allowed_v_lanes: np.ndarray, rng: np.random.Generator
     ) -> "MCTuplesPopulation":
-        """Draw `n_population` candidates over the fine cells of `free_u_lanes` x `free_v_lanes`."""
+        """Draw `n_population` candidates over the fine cells of `allowed_u_lanes` x `allowed_v_lanes`."""
         candidate_cells = np.fromiter(
-            spread_evenly_over_grid(n_population, free_u_lanes.size, free_v_lanes.size, rng),
+            spread_evenly_over_grid(n_population, allowed_u_lanes.size, allowed_v_lanes.size, rng),
             dtype=np.dtype((np.int64, 2)),
             count=n_population,
         )
-        u_lane = free_u_lanes[candidate_cells[:, 0]].astype(np.int64)
-        v_lane = free_v_lanes[candidate_cells[:, 1]].astype(np.int64)
+        u_lane = allowed_u_lanes[candidate_cells[:, 0]].astype(np.int64)
+        v_lane = allowed_v_lanes[candidate_cells[:, 1]].astype(np.int64)
         return cls(
             u=(u_lane + cls._positions_in_lane(u_lane.size, rng)) / N_FINE_LANES,
             v=(v_lane + cls._positions_in_lane(v_lane.size, rng)) / N_FINE_LANES,
             u_lane=u_lane,
             v_lane=v_lane,
-        )
-
-    @classmethod
-    def draw_in_free_lanes(
-        cls, n_population: int, required_tuple_array: np.ndarray, rng: np.random.Generator
-    ) -> "MCTuplesPopulation":
-        """Draw `n_population` candidates over the fine lanes left free by `required_tuple_array`, the size below."""
-        all_lanes = np.arange(N_FINE_LANES)
-        return cls.draw(
-            n_population,
-            np.setdiff1d(all_lanes, fine_lanes_of(required_tuple_array[:, 0])),
-            np.setdiff1d(all_lanes, fine_lanes_of(required_tuple_array[:, 1])),
-            rng,
         )
