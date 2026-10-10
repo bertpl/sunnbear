@@ -15,7 +15,8 @@ time. The script:
   checkpoints, as the pickle file `k<size>_solution.pkl`;
 - prints the spread of every size, its means and its largest number of tuples in 1 fine lane, and the overall score;
 - saves the set through `ArtifactStore`, which records in the artifact's manifest the `generate_mc_tuples` call with
-  the same arguments, and max-div's version; `--no-save` skips saving the set, for a trial run.
+  the arguments that the script passes to `MCTuplesGenerator`, and max-div's version; `--no-save` skips saving the
+  set, for a trial run.
 
 Usage:
 

@@ -130,9 +130,9 @@ def test_mean_aware_counts_keep_an_allocation_that_fills_every_free_fine_lane():
 
 
 def test_mean_aware_counts_end_where_no_single_move_raises_the_corrected_min_spacing():
-    """With random values for the size below, the search ends at an allocation whose predicted corrected smallest
-    spacing is at least the greedy allocation's, where no move of 1 new tuple to another gap raises it, and no gap
-    takes more new tuples than it has free fine lanes."""
+    """With random values for the size below, the search ends at an allocation that fits every gap's free fine lanes,
+    whose `predicted_corrected_min_spacing` is at least the greedy allocation's, and whose
+    `predicted_corrected_min_spacing` no move of 1 new tuple to another gap raises."""
     # --- arrange ----------------------
     values = np.random.default_rng(3).choice(N_FINE_LANES, size=128, replace=False) / N_FINE_LANES + 0.4 / N_FINE_LANES
     gaps = MCTuplesAxisGaps.of(values)
@@ -149,10 +149,10 @@ def test_mean_aware_counts_end_where_no_single_move_raises_the_corrected_min_spa
     for source in np.flatnonzero(counts >= 1):
         for destination in np.flatnonzero(counts < gaps.n_free_lanes):
             if destination != source:
-                moved_counts = counts.copy()
-                moved_counts[source] -= 1
-                moved_counts[destination] += 1
-                assert gaps.predicted_corrected_min_spacing(moved_counts) <= corrected_min_spacing
+                counts_after_move = counts.copy()
+                counts_after_move[source] -= 1
+                counts_after_move[destination] += 1
+                assert gaps.predicted_corrected_min_spacing(counts_after_move) <= corrected_min_spacing
 
 
 # ==================================================================================================

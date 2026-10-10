@@ -50,8 +50,7 @@ class MCTuplesGenerator:
 
     Attributes:
         on_size_finished: Called with each size's `MCTuplesSizeResult` as soon as the size is built and its means are
-            corrected, e.g. to print the progress of a long construction or to store its tuples and max-div's
-            solutions; None reports nothing.
+            corrected; None reports nothing.
     """
 
     MIN_T_BUDGET_FRACTION_PER_SOLVE: ClassVar[float] = 0.01

@@ -1,4 +1,4 @@
-"""The tests check that `MCTuplesGenerator`, which `generate_mc_tuples` runs:
+"""`MCTuplesGenerator`, which `generate_mc_tuples` runs:
 
 - builds nested sizes with means of 0.5 and at most 1 tuple per fine lane;
 - reports each size;
