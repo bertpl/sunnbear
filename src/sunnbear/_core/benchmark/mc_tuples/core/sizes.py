@@ -1,9 +1,15 @@
-"""`MCTuplesSize` lists the sizes in which the shipped Monte Carlo tuple set comes; the fine lanes follow from them."""
+"""`MCTuplesSize` lists the sizes in which the shipped Monte Carlo tuple set comes; the fine lanes follow from them.
+
+Every size also has the same target mean, `TARGET_MEAN`, on both axes.
+"""
 
 from enum import IntEnum
 from typing import NoReturn
 
 import numpy as np
+
+# The mean that every size's u values and v values have once the construction has corrected them.
+TARGET_MEAN = 0.5
 
 
 # ==================================================================================================
@@ -39,6 +45,11 @@ class MCTuplesSize(IntEnum):
         """Return the number of tuples that this size takes from the size below; 0 for the smallest size."""
         return 0 if self.size_below is None else int(self.size_below)
 
+    @property
+    def n_new(self) -> int:
+        """Return the number of tuples that this size adds to the size below; all of them for the smallest size."""
+        return int(self) - self.n_required
+
     @classmethod
     def up_to(cls, max_size: int) -> tuple["MCTuplesSize", ...]:
         """Return every size up to `max_size`, the smallest first.
@@ -50,6 +61,9 @@ class MCTuplesSize(IntEnum):
         return tuple(size for size in cls if size <= largest)
 
 
+# ==================================================================================================
+#  Fine lanes
+# ==================================================================================================
 # The construction cuts each axis into as many equal fine lanes as the largest size holds tuples, and no 2 tuples of
 # the set share a fine lane, so the largest size holds exactly 1 tuple per fine lane on each axis.
 N_FINE_LANES = int(max(MCTuplesSize))

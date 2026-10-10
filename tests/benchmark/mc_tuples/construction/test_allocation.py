@@ -1,5 +1,5 @@
-"""`MCTuplesAxisGaps` finds the gaps of free fine lanes and predicts their spacing and values; `MCTuplesAxisGapAllocation` allocates new
-tuples to them so that the predicted mean lies close to 0.5."""
+"""`MCTuplesAxisGaps` finds the gaps of free fine lanes and predicts their spacing and values;
+`MCTuplesAxisGapAllocation` allocates new tuples to them so that the predicted mean lies close to 0.5."""
 
 import numpy as np
 import pytest
@@ -36,7 +36,7 @@ def test_of_finds_the_gaps_with_their_widths_edges_and_bounds():
     assert gaps.required_sum == pytest.approx(_VALUES.sum())
 
 
-def test_of_leaves_out_an_edge_gap_when_an_old_tuple_lies_in_the_outermost_fine_lane():
+def test_of_leaves_out_an_edge_gap_when_a_tuple_of_the_size_below_lies_in_the_outermost_fine_lane():
     """A tuple of the size below in fine lane 0 leaves no left edge gap."""
     # --- act --------------------------
     gaps = MCTuplesAxisGaps.of(np.array([0.5, 500.5]) / N_FINE_LANES)

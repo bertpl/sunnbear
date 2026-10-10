@@ -183,7 +183,7 @@ class MCTuplesSizeSolve:
                 a candidate.
         """
         rng = self.settings.rng
-        n_new = int(self.size) - self.size.n_required
+        n_new = self.size.n_new
         fine_u_lanes, u_lane_index = np.unique(self._u_lane, return_inverse=True)
         fine_v_lanes, v_lane_index = np.unique(self._v_lane, return_inverse=True)
         n_u_lanes, n_v_lanes = fine_u_lanes.size, fine_v_lanes.size

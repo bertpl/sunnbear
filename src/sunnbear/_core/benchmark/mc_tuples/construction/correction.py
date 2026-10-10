@@ -1,27 +1,28 @@
-"""`MCTuplesMeanCorrection` moves a size's new tuples after its max-div solve, so that its mean u and mean v are exactly 0.5.
+"""`MCTuplesMeanCorrection` moves a size's new tuples after its solve, so that its mean u and mean v are exactly 0.5.
 
-The tuples of the size below, the old tuples, stay where they are; per axis, only the new tuples move, toward the side
-that the mean needs (`MCTuplesAxisMeanCorrection`). The rules are written for a mean above 0.5, where the new tuples move left,
-over the size's values u_0 < u_1 < … in ascending order, with w the width of a fine lane:
+The tuples of the size below stay where they are; per axis, only the new tuples move, toward the side that the mean
+needs (`MCTuplesAxisMeanCorrection`). The rules are written for a mean above 0.5, where the new tuples move left, over
+the size's values u_0 < u_1 < … in ascending order, with w the width of a fine lane:
 
-- each new tuple i gets a reference r_i and a gap g_i = u_i - r_i, both fixed from the values before the correction:
+- each new tuple i gets a reference r_i and its spacing s_i = u_i - r_i to it, both fixed from the values before the
+  correction:
   - r_i is 0 when u_i is the lowest value;
-  - r_i is the right edge of u_{i-1}'s fine lane when u_{i-1} is an old tuple;
+  - r_i is the right edge of u_{i-1}'s fine lane when u_{i-1} is a tuple of the size below;
   - r_i is u_{i-1} when u_{i-1} is a new tuple, and then r_i moves when u_{i-1} moves;
-- a cap D bounds the gap that a new tuple keeps to its reference, by a rule that depends on the tuple's left
+- a cap D bounds the spacing that a new tuple keeps to its reference, by a rule that depends on the tuple's left
   neighbor (u_{i-1}, or the edge for the lowest value):
-  - when the left neighbor is the edge or an old tuple, u'_i = r_i + min(g_i, D);
-  - when the left neighbor is a new tuple and g_i ≤ w, u_i stays until u'_{i-1} + w falls below it:
+  - when the left neighbor is the edge or a tuple of the size below, u'_i = r_i + min(s_i, D);
+  - when the left neighbor is a new tuple and s_i ≤ w, u_i stays until u'_{i-1} + w falls below it:
     u'_i = min(u_i, u'_{i-1} + w);
-  - when the left neighbor is a new tuple and g_i > w, u_i follows its left neighbor and keeps its gap, capped at
-    w + D: u'_i = u'_{i-1} + min(g_i, w + D).
+  - when the left neighbor is a new tuple and s_i > w, u_i follows its left neighbor and keeps its spacing, capped
+    at w + D: u'_i = u'_{i-1} + min(s_i, w + D).
 
-So the largest gaps shrink first and the smallest keep their value. Every u'_i rises with D without jumps, and a
+So the largest spacings shrink first and the smallest keep their value. Every u'_i rises with D without jumps, and a
 bisection over D finds the cap at which the mean is exactly 0.5.
 
 No fine lane ever holds 2 tuples, at any D:
 
-- a new tuple whose left neighbor is an old tuple stays above that tuple's fine lane;
+- a new tuple whose left neighbor is a tuple of the size below stays above that tuple's fine lane;
 - 2 new neighbors end at least w apart or keep their fine lanes;
 - the order of the values never changes.
 
@@ -34,16 +35,15 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, TARGET_MEAN, fine_lanes_of
 
-from .allocation import TARGET_MEAN
 from .exceptions import MCTuplesConstructionError
 
 FINE_LANE_WIDTH = 1 / N_FINE_LANES
 
 # The bisection's search range for the cap D. The lower bound keeps every moved tuple at least 1e-6 fine
 # lanes from the edge of its fine lane, so that a right shift, computed on the negated axis, never puts a tuple on the
-# lower edge of its neighbor's fine lane, which belongs to that neighbor. At the upper bound no gap reaches the cap,
+# lower edge of its neighbor's fine lane, which belongs to that neighbor. At the upper bound no spacing reaches the cap,
 # so nothing moves.
 CAP_RANGE = (1e-6 * FINE_LANE_WIDTH, 1.0)
 
@@ -141,7 +141,8 @@ class MCTuplesAxisMeanCorrection:
                 if i == 0:
                     moved[i] = min(value, left_edge + cap)
                 elif not is_new[i - 1]:
-                    # The reference is the right edge of the fine lane that holds the old left neighbor.
+                    # The reference is the right edge of the fine lane that holds the left neighbor, a tuple of the size
+                    # below.
                     lane_right_edge = (math.floor(sorted_values[i - 1] * N_FINE_LANES) + 1) * FINE_LANE_WIDTH
                     moved[i] = min(value, lane_right_edge + cap)
                 elif value - sorted_values[i - 1] <= FINE_LANE_WIDTH:
@@ -149,7 +150,7 @@ class MCTuplesAxisMeanCorrection:
                     # 1 fine lane.
                     moved[i] = min(value, moved[i - 1] + FINE_LANE_WIDTH)
                 else:
-                    # Follow the left neighbor and keep the gap, capped at 1 fine lane plus D; the new value is
+                    # Follow the left neighbor and keep the spacing, capped at 1 fine lane plus D; the new value is
                     # computed from the neighbor's move, so that a tuple whose neighbor stays keeps its value exactly.
                     moved[i] = min(value - (sorted_values[i - 1] - moved[i - 1]), moved[i - 1] + FINE_LANE_WIDTH + cap)
             unsorted = np.empty(len(moved))

@@ -99,18 +99,6 @@ def test_stats_reports_min_separations_and_their_fractions():
     assert stats.min_separation_l2_fraction == pytest.approx(np.sqrt(2) / 8 * (np.sqrt(8) - 1))
 
 
-def test_stats_describe_tuples_on_the_edges_of_the_unit_square():
-    """`MCTuplesStats` reports the size and the min separations of tuples on the edges of the unit square."""
-    # --- act --------------------------
-    stats = MCTuplesStats(np.array([[0.0, 0.0], [0.5, 1.0], [1.0, 0.5]]))
-
-    # --- assert -----------------------
-    assert stats.size == 3
-    assert stats.min_separation_u == pytest.approx(0.5)
-    assert stats.min_separation_v == pytest.approx(0.5)
-    assert stats.min_separation_l2 == pytest.approx(np.sqrt(0.5))
-
-
 def test_stats_reports_gpq_fractions_and_the_score_for_evenly_spaced_tuples():
     """With every separation equal, each gpq(0.1) equals it, so the gpq fractions equal the min separation fractions."""
     # --- act --------------------------

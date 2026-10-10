@@ -1,4 +1,4 @@
-"""`MCTuplesGapAllocation` decides how many of a size's new tuples go into each gap that the size below leaves on each axis.
+"""`MCTuplesGapAllocation` decides how many new tuples go into each gap that the size below leaves on each axis.
 
 On each axis, every tuple of the size below occupies 1 fine lane. A gap is a maximal run of free fine lanes: between 2
 occupied fine lanes, or between an occupied fine lane and an edge of the axis (`MCTuplesAxisGaps`).
@@ -21,10 +21,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, fine_lanes_of
-
-# The mean that every size's u values and v values have once the construction has corrected them.
-TARGET_MEAN = 0.5
+from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, TARGET_MEAN, fine_lanes_of
 
 
 # ==================================================================================================
@@ -61,8 +58,8 @@ class MCTuplesGapAllocation:
 class MCTuplesAxisGapAllocation:
     """`MCTuplesAxisGapAllocation` holds the allocation chosen for 1 axis of 1 size, in the form that the solve uses.
 
-    `MCTuplesAxisGaps` describes every gap and computes the allocation; `MCTuplesAxisGapAllocation` keeps only the gaps that get new
-    tuples, how many each gets, and the predicted offsets for the progress report.
+    `MCTuplesAxisGaps` describes every gap and computes the allocation; `MCTuplesAxisGapAllocation` keeps only the
+    gaps that get new tuples, how many each gets, and the predicted offsets for the progress report.
 
     Attributes:
         gap_of_fine_lane: For each fine lane, the gap that holds it, numbered from 0 in ascending order among the gaps
@@ -112,10 +109,10 @@ class MCTuplesAxisGapAllocation:
 # ==================================================================================================
 @dataclass(frozen=True)
 class MCTuplesAxisGaps:
-    """`MCTuplesAxisGaps` describes the gaps that the size below leaves on 1 axis, and computes their allocation of new tuples.
+    """`MCTuplesAxisGaps` describes the gaps that the size below leaves on 1 axis and allocates new tuples to them.
 
-    It holds every gap, including those that end up without new tuples, and exists only inside `MCTuplesAxisGapAllocation.of`,
-    which keeps the result.
+    It holds every gap, including those that end up without new tuples, and exists only inside
+    `MCTuplesAxisGapAllocation.of`, which keeps the result.
 
     Every attribute except `n_required` and `required_sum` is an array with 1 entry per gap, in ascending order, so
     that each step of an allocation scores every gap at once.

@@ -21,12 +21,11 @@ def _solve(size: MCTuplesSize, required_tuple_array: np.ndarray, n_population: i
     """Return the solve of `size` on `required_tuple_array`, with a population of `n_population` over its free lanes."""
     rng = np.random.default_rng(5)
     population = MCTuplesPopulation.draw_in_free_lanes(n_population, required_tuple_array, rng)
-    n_new = size - size.n_required
     return MCTuplesSizeSolve(
         population,
         required_tuple_array,
         size,
-        MCTuplesGapAllocation.of(required_tuple_array, n_new, epsilon=0.1),
+        MCTuplesGapAllocation.of(required_tuple_array, size.n_new, epsilon=0.1),
         MCTuplesSolveSettings(n_workers=1, seed=42, rng=rng),
     )
 
