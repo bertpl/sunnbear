@@ -16,9 +16,9 @@ dependencies = [
     # CPython (and, for numpy, admitted by the numba minimal version on the same interpreter),
     # so `lowest-direct` installs (not source-builds) across the whole matrix.
     #
-    # A pure-Python package ships 1 wheel for every Python version, so the rule above does not apply
-    # to it: where its minimal version does not declare 3.15 support, a separate 3.15 line raises it to
-    # the earliest release that does.
+    # A pure-Python package ships 1 wheel that installs on every Python version, so the rule above does
+    # not apply to it: where its minimal version does not declare 3.15 support, a separate dependency line
+    # for 3.15 raises its minimal version to the earliest release that does.
     "numpy>=2.0.0; python_version == '3.12'",
     "numpy>=2.1.0; python_version == '3.13'",
     "numpy>=2.3.2; python_version == '3.14'",

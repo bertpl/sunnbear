@@ -55,8 +55,10 @@ def test_generate_mc_tuples_builds_nested_sizes_with_means_of_0_5_and_reports_ea
     """
     # --- arrange ----------------------
     results: list[MCTuplesSizeResult] = []
-    # On a fresh install, max-div compiles its functions inside each size's solve, which leaves it too little of
-    # `t_total_sec` to meet the constraints. A first construction compiles them, so its outcome is ignored.
+    # On a fresh install, max-div compiles its functions inside each size's solve, which leaves max-div too little of
+    # the time budget `t_total_sec` to meet the constraints. A first construction compiles max-div's functions, so its
+    # outcome is ignored. On Python 3.15, each worker's import of max-div also uses part of `t_total_sec`, so 2 s is
+    # too little there.
     with contextlib.suppress(MCTuplesConstructionError):
         generate_mc_tuples(t_total_sec=5.0, max_size=MCTuplesSize.SIZE_64, n_population=2**14)
 
