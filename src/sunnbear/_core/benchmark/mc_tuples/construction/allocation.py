@@ -1,4 +1,4 @@
-"""`MCTuplesGapAllocation` decides how many new tuples go into each gap that the size below leaves on each axis.
+"""`MCTuplesGapAllocation` decides how many of a size's new tuples go into each gap left by the size below.
 
 On each axis, every tuple of the size below occupies 1 fine lane. A gap is a maximal run of free fine lanes: between 2
 occupied fine lanes, or between an occupied fine lane and an edge of the axis (`MCTuplesAxisGaps`).

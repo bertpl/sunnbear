@@ -70,10 +70,12 @@ def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_th
     correction = MCTuplesAxisMeanCorrection.of(np.array([0.9]), np.array([0.95]))
 
     # --- assert -----------------------
-    lane_above_old = (np.floor(0.9 * N_FINE_LANES) + 1) / N_FINE_LANES
+    required_lane_right_edge = (np.floor(0.9 * N_FINE_LANES) + 1) / N_FINE_LANES
     assert correction.cap == pytest.approx(CAP_RANGE[0])
-    assert correction.corrected_new_values[0] == pytest.approx(lane_above_old)
-    assert correction.offset_after_fine_lanes == pytest.approx((0.9 + lane_above_old) / 2 * N_FINE_LANES - 512)
+    assert correction.corrected_new_values[0] == pytest.approx(required_lane_right_edge)
+    assert correction.offset_after_fine_lanes == pytest.approx(
+        (0.9 + required_lane_right_edge) / 2 * N_FINE_LANES - 512
+    )
 
 
 def test_mean_correction_corrects_both_axes_of_a_size():

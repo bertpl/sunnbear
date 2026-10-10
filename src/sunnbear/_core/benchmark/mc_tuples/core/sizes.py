@@ -8,7 +8,7 @@ from typing import NoReturn
 
 import numpy as np
 
-# The mean that every size's u values and v values have once the construction has corrected them.
+# `TARGET_MEAN` is the mean of every size's u values and of its v values once the construction has corrected them.
 TARGET_MEAN = 0.5
 
 

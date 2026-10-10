@@ -120,8 +120,8 @@ class MCTuplesStats:
     along an axis, and the spacing `1/(√size - 1)` of a square grid in L2. `score` combines the 3 gpq fractions into
     1 number by which tuple sets are compared.
 
-    `MCTuplesStats` takes an `(n, 2)` array, not an `MCTuples`, so that it can also describe tuples held as an array,
-    such as a size's tuples before the mean correction.
+    `MCTuplesStats` takes an `(n, 2)` array, not an `MCTuples`, so that a caller that holds tuples only as an array,
+    such as a size's tuples before the mean correction, does not have to build an `MCTuples` first.
     """
 
     def __init__(self, tuple_array: ArrayLike) -> None:
