@@ -1,8 +1,8 @@
 """`generate_mc_tuples` constructs a nested set of (u, v) tuples and corrects every size's means to 0.5.
 
 The construction builds the sizes bottom-up, the smallest first, and each larger size includes the size below it, so
-every size is a prefix of the next. No 2 tuples of the set share a fine lane, 1 of the `N_FINE_LANES` equal parts of
-each axis.
+every size is a prefix of the next. Each axis is divided into `N_FINE_LANES` equal parts, the fine lanes, and no 2
+tuples of the set share a fine lane.
 
 `MCTuplesGenerator` builds each size in 4 parts, each implemented in the module of this package named in parentheses:
 
@@ -32,7 +32,8 @@ from .population import MCTuplesPopulation
 from .size_result import MCTuplesSizeResult
 from .solve import MCTuplesSizeSolve, MCTuplesSolveSettings
 
-# The constants below hold the defaults of the arguments of `generate_mc_tuples`, which documents each argument.
+# `generate_mc_tuples`, `MCTuplesGenerator` and `scripts/generate_mc_tuples.py` take their argument defaults from these
+# constants, so that the 3 cannot drift apart; `generate_mc_tuples` documents each argument.
 DEFAULT_N_WORKERS = 32
 DEFAULT_SEED = 42
 DEFAULT_N_POPULATION = 2**20

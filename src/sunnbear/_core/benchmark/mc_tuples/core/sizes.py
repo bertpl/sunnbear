@@ -1,6 +1,6 @@
 """`MCTuplesSize` lists the sizes in which the shipped Monte Carlo tuple set comes; the fine lanes follow from them.
 
-Every size also has the same target mean, `TARGET_MEAN`, on both axes.
+The construction corrects every size's u values and v values toward the same mean, `TARGET_MEAN`.
 """
 
 from enum import IntEnum
@@ -8,7 +8,7 @@ from typing import NoReturn
 
 import numpy as np
 
-# `TARGET_MEAN` is the mean of every size's u values and of its v values once the construction has corrected them.
+# `TARGET_MEAN` is the mean toward which the construction corrects every size's u values and v values.
 TARGET_MEAN = 0.5
 
 
@@ -47,7 +47,7 @@ class MCTuplesSize(IntEnum):
 
     @property
     def n_new(self) -> int:
-        """Return the number of tuples that this size adds to the size below; all of them for the smallest size."""
+        """Return the number of tuples that this size adds to the size below; the smallest size adds all its tuples."""
         return int(self) - self.n_required
 
     @classmethod

@@ -47,8 +47,8 @@ def test_the_correction_keeps_the_fine_lanes_the_order_and_the_size_below_and_mo
 
 
 def test_the_correction_takes_the_shift_from_the_largest_spacings():
-    """With new tuples at 0.3 and 0.75 above a tuple of the size below at 0.1, a mean of 0.5 needs a left shift, and
-    the cap shortens the wider spacing first: the tuple at 0.75 moves to 0.7, and the tuple at 0.3, whose spacing to
+    """With the size below at 0.1 and 0.9 and new tuples at 0.3 and 0.75, a mean of 0.5 needs a left shift, and the
+    cap shortens the wider spacing first: the tuple at 0.75 moves to 0.7, and the tuple at 0.3, whose spacing to
     0.1 lies below the cap, stays."""
     # --- arrange ----------------------
     required, new = np.array([0.1, 0.9]), np.array([0.3, 0.75])
@@ -64,17 +64,18 @@ def test_the_correction_takes_the_shift_from_the_largest_spacings():
 
 
 def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_the_rest():
-    """A new tuple at 0.95 above a tuple of the size below at 0.9 cannot reach 0.1, the value that a mean of 0.5
-    needs: it stops just above that tuple's fine lane, and the correction reports the offset that remains."""
+    """When the size below holds a tuple at 0.9, a new tuple at 0.95 cannot reach 0.1, the value that a mean of 0.5
+    needs: it stops just above the fine lane of the tuple at 0.9, and the correction reports the offset that
+    remains."""
     # --- act --------------------------
     correction = MCTuplesAxisMeanCorrection.of(np.array([0.9]), np.array([0.95]))
 
     # --- assert -----------------------
-    required_lane_right_edge = (np.floor(0.9 * N_FINE_LANES) + 1) / N_FINE_LANES
+    required_value_lane_right_edge = (np.floor(0.9 * N_FINE_LANES) + 1) / N_FINE_LANES
     assert correction.cap == pytest.approx(CAP_RANGE[0])
-    assert correction.corrected_new_values[0] == pytest.approx(required_lane_right_edge)
+    assert correction.corrected_new_values[0] == pytest.approx(required_value_lane_right_edge)
     assert correction.offset_after_fine_lanes == pytest.approx(
-        (0.9 + required_lane_right_edge) / 2 * N_FINE_LANES - 512
+        (0.9 + required_value_lane_right_edge) / 2 * N_FINE_LANES - 512
     )
 
 

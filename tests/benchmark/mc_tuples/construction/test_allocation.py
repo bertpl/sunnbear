@@ -1,5 +1,5 @@
 """`MCTuplesAxisGaps` finds the gaps of free fine lanes and predicts their spacing and values;
-`MCTuplesAxisGapAllocation` allocates new tuples to them so that the predicted mean lies close to 0.5."""
+`MCTuplesAxisGapAllocation` allocates new tuples to the gaps so that the predicted mean lies close to 0.5."""
 
 import numpy as np
 import pytest

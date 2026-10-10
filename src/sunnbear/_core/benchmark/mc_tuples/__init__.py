@@ -5,11 +5,12 @@ The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples
 - `MCTuples` holds a set of tuples, maps them onto a test function, and reports their spread as
   `MCTuplesStats`;
 - each axis is divided into `N_FINE_LANES` equal fine lanes, and `fine_lanes_of` returns the fine lane of each value;
-  `TARGET_MEAN` is the mean to which the mean correction brings every size's u values and v values;
-- `generate_mc_tuples` constructs a nested set and corrects every size's means to 0.5 on both axes, with no 2
-  tuples in 1 fine lane. It delegates to `MCTuplesGenerator`, which runs 1 max-div solve and 1 mean correction per size
-  (`construction`) and reports each size's `MCTuplesSizeResult`. The `DEFAULT_*` constants hold the defaults of the
-  arguments of `generate_mc_tuples`, which raises `MCTuplesConstructionError` when a size cannot meet its constraints;
+  `TARGET_MEAN` is the mean toward which `generate_mc_tuples` corrects every size's u values and v values;
+- `generate_mc_tuples` constructs a nested set and corrects every size's means to `TARGET_MEAN` on both axes, with no
+  2 tuples in 1 fine lane. It delegates to `MCTuplesGenerator`, which runs 1 max-div solve and 1 mean correction per
+  size (`construction`) and reports each size's `MCTuplesSizeResult`;
+- `generate_mc_tuples` raises `MCTuplesConstructionError` when a size cannot meet its constraints;
+- the `DEFAULT_*` constants hold the defaults of the arguments of `generate_mc_tuples`;
 - `load_mc_tuples(size)` returns one size of the shipped set, 1 of `MCTuplesSize`; `MCTuplesDeclaration`
   declares the set as the data artifact `mc_tuples`.
 """

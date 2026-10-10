@@ -1,4 +1,4 @@
-"""`MCTuplesMeanCorrection` moves a size's new tuples after its max-div solve, so that both its means are exactly 0.5.
+"""`MCTuplesMeanCorrection` moves a size's new tuples after its max-div solve, so its u and v means are exactly 0.5.
 
 The tuples of the size below stay where they are; per axis, only the new tuples move, toward the side that the mean
 needs (`MCTuplesAxisMeanCorrection`).
@@ -11,8 +11,8 @@ ascending order, with w the width of a fine lane:
   - r_i is 0 when u_i is the lowest value;
   - r_i is the right edge of u_{i-1}'s fine lane when u_{i-1} is a tuple of the size below;
   - r_i is u_{i-1} when u_{i-1} is a new tuple, and then r_i moves when u_{i-1} moves;
-- a cap D bounds the spacing that a new tuple keeps to its reference, by a rule that depends on the tuple's left
-  neighbor (u_{i-1}, or the edge for the lowest value):
+- a cap D bounds a new tuple's spacing to its reference, by a rule that depends on the tuple's left neighbor
+  (u_{i-1}, or the edge for the lowest value):
   - when the left neighbor is the edge or a tuple of the size below, u'_i = r_i + min(s_i, D);
   - when the left neighbor is a new tuple and s_i ≤ w, u_i stays until u'_{i-1} + w falls below it:
     u'_i = min(u_i, u'_{i-1} + w);
