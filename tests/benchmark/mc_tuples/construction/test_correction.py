@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructionError, fine_lanes_of
-from sunnbear._core.benchmark.mc_tuples.construction_correction import CAP_RANGE, AxisMeanCorrection, MeanCorrection
+from sunnbear._core.benchmark.mc_tuples.construction.correction import CAP_RANGE, AxisMeanCorrection, MeanCorrection
 
 
 def _random_axis(seed: int) -> tuple[np.ndarray, np.ndarray]:

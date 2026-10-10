@@ -4,9 +4,9 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructionError, MCTuplesSize
-from sunnbear._core.benchmark.mc_tuples.construction_allocation import GapAllocation
-from sunnbear._core.benchmark.mc_tuples.construction_population import MCTuplesPopulation
-from sunnbear._core.benchmark.mc_tuples.construction_solve import (
+from sunnbear._core.benchmark.mc_tuples.construction.allocation import GapAllocation
+from sunnbear._core.benchmark.mc_tuples.construction.population import MCTuplesPopulation
+from sunnbear._core.benchmark.mc_tuples.construction.solve import (
     INCLUSION_CONSTRAINT_WEIGHT,
     MCTuplesSizeSolve,
     MCTuplesSolveSettings,

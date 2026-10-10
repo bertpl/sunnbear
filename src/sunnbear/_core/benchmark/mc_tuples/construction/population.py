@@ -22,7 +22,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .sizes import N_FINE_LANES, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, fine_lanes_of
 
 # The number of curveball trades per free fine u-lane; each trade involves 2 lanes, so every lane takes part in about
 # twice this many.

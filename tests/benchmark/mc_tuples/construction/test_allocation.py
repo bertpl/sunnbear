@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, fine_lanes_of
-from sunnbear._core.benchmark.mc_tuples.construction_allocation import AxisGapAllocation, AxisGaps
+from sunnbear._core.benchmark.mc_tuples.construction.allocation import AxisGapAllocation, AxisGaps
 
 # The tuples of the size below lie in fine lanes 3, 10 and 11, which leaves a left edge gap [0, 3), an interior gap
 # [4, 10), no gap between 10 and 11, and a right edge gap [12, 1024).

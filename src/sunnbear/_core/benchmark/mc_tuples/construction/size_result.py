@@ -5,10 +5,10 @@ from dataclasses import dataclass
 import numpy as np
 from max_div.solver import ParallelMaxDivSolution
 
-from .construction_allocation import GapAllocation
-from .construction_correction import MeanCorrection
-from .sizes import MCTuplesSize
-from .tuples import MCTuples
+from sunnbear._core.benchmark.mc_tuples.core import MCTuples, MCTuplesSize
+
+from .allocation import GapAllocation
+from .correction import MeanCorrection
 
 
 # ==================================================================================================

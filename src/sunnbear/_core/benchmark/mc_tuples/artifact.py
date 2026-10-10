@@ -9,8 +9,7 @@ from collections.abc import Mapping
 
 from sunnbear._core.artifacts import ArtifactDeclaration, ArtifactError, ArtifactStore
 
-from .sizes import MCTuplesSize
-from .tuples import MCTuples
+from .core import MCTuples, MCTuplesSize
 
 _CSV_FILE_NAME = "mc_tuples.csv"
 _CSV_HEADER = "u,v"

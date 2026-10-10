@@ -21,7 +21,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .sizes import N_FINE_LANES, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, fine_lanes_of
 
 # The mean that every size's u values and v values have once the construction has corrected them.
 TARGET_MEAN = 0.5

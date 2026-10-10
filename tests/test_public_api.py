@@ -5,7 +5,7 @@ import pytest
 import sunnbear._core.artifacts.exceptions
 import sunnbear._core.artifacts.listing
 import sunnbear._core.benchmark
-import sunnbear._core.benchmark.mc_tuples.exceptions
+import sunnbear._core.benchmark.mc_tuples.construction.exceptions
 import sunnbear._core.benchmark.runner.exceptions
 import sunnbear._core.exceptions
 import sunnbear._core.functions.core
@@ -56,7 +56,7 @@ def _is_submodule(module, name: str) -> bool:
             sunnbear.exceptions,
             (
                 sunnbear._core.artifacts.exceptions,
-                sunnbear._core.benchmark.mc_tuples.exceptions,
+                sunnbear._core.benchmark.mc_tuples.construction.exceptions,
                 sunnbear._core.benchmark.runner.exceptions,
                 sunnbear._core.exceptions,
                 sunnbear._core.functions.core.exceptions,
