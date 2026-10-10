@@ -7,9 +7,9 @@ updates:
       - "/"
       - "/.github/actions/unit_test"
       - "/.github/actions/pre_commit"
-    # Each ecosystem runs on its own weekday: a bump's PR then opens on a main that
-    # already holds the previous day's bump, so its CI tests the two together before
-    # it merges.
+    # Dependabot checks each ecosystem on its own weekday. A bump PR then opens on a
+    # main that already holds the bumps that auto-merged on the earlier weekdays, so
+    # the CI run on that PR tests the new bump together with them before the PR merges.
     schedule:
       interval: "weekly"
       day: "monday"
@@ -40,7 +40,7 @@ updates:
     # deliberate minimums, not upgrade targets.
     directory: "/"
     versioning-strategy: "lockfile-only"
-    # Tuesday: see the weekday comment on the github-actions entry.
+    # See the weekday comment on the github-actions entry.
     schedule:
       interval: "weekly"
       day: "tuesday"
@@ -61,10 +61,12 @@ updates:
       default-days: 14  # covers every semver level; no per-level override needed
 
   - package-ecosystem: "pre-commit"
-    # Bumps the `rev` pin of each managed hook in .pre-commit-config.yaml. The local
-    # hooks (ruff, ty) run the versions in uv.lock, which the uv entry bumps.
+    # Dependabot bumps the `rev` pin of each hook that .pre-commit-config.yaml pulls
+    # from an external repository. Hooks under `repo: local` have no `rev` pin; those
+    # that run a tool through `uv run` use the version in uv.lock, which the uv entry
+    # bumps.
     directory: "/"
-    # Wednesday: see the weekday comment on the github-actions entry.
+    # See the weekday comment on the github-actions entry.
     schedule:
       interval: "weekly"
       day: "wednesday"
@@ -79,7 +81,7 @@ updates:
       pre-commit-major:  # majors batch separately and wait for review
         patterns: ["*"]
         update-types: ["major"]
-    # As on the github-actions entry: an upstream compromise has time to surface
-    # before a bump can land.
+    # As on the github-actions entry: a compromised upstream release has time to be
+    # discovered before a bump can merge.
     cooldown:
       default-days: 14  # covers every semver level; no per-level override needed

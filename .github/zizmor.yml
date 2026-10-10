@@ -1,8 +1,9 @@
-# zizmor configuration (https://docs.zizmor.sh/configuration/).
+# The options in this file are documented at https://docs.zizmor.sh/configuration/.
 
 rules:
-  # The self-repository audit asks for the `$/` form of in-repo references. actionlint rejects that form
-  # (rhysd/actionlint#711), so the workspace-relative `./` form stays until actionlint accepts `$/`.
+  # The self-repository audit asks for the `$/` form in each `uses:` key that points to an action or
+  # reusable workflow in this repository. actionlint rejects that form (rhysd/actionlint#711), so the
+  # workspace-relative `./` form stays until actionlint accepts `$/`.
   self-repository:
     ignore:
       - _unit_tests.yml
