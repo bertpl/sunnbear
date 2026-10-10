@@ -26,7 +26,6 @@ import numpy as np
 
 from sunnbear._core.benchmark.mc_tuples.core import MCTuples, MCTuplesSize
 
-from .allocation import MCTuplesGapAllocation
 from .correction import MCTuplesMeanCorrection
 from .size_result import MCTuplesSizeResult
 from .solve import MCTuplesSizeSolve, MCTuplesSolveSettings
@@ -157,15 +156,14 @@ class MCTuplesGenerator:
         """
         t_start = time.perf_counter()
         required_tuple_array = required_tuples.tuple_array if required_tuples is not None else np.zeros((0, 2))
-        gap_allocation = MCTuplesGapAllocation.of(required_tuple_array, size.n_new)
-        solve = MCTuplesSizeSolve(self.n_population, required_tuple_array, size, gap_allocation, settings)
+        solve = MCTuplesSizeSolve(self.n_population, required_tuple_array, size, settings)
         new_tuple_array, solution = solve.run(t_budget_sec)
         uncorrected_tuple_array = np.vstack([required_tuple_array, new_tuple_array])
         return MCTuplesSizeResult(
             size=size,
             t_budget_sec=t_budget_sec,
             t_wall_sec=time.perf_counter() - t_start,
-            gap_allocation=gap_allocation,
+            gap_allocation=solve.gap_allocation,
             uncorrected_tuple_array=uncorrected_tuple_array,
             mean_correction=MCTuplesMeanCorrection.of(uncorrected_tuple_array, size.n_required),
             solution=solution,

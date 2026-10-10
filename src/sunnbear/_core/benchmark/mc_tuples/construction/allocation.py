@@ -79,7 +79,7 @@ class MCTuplesAxisGapAllocation:
 
     @property
     def eligible_fine_lanes(self) -> np.ndarray:
-        """Return the eligible fine lanes, those of the gaps that get new tuples, ascending."""
+        """Return, in ascending order, the eligible fine lanes: the free fine lanes of the gaps that get new tuples."""
         return np.flatnonzero(self.gap_of_fine_lane >= 0)
 
     # --------------------------------------------------------------------------

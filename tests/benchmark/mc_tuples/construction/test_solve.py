@@ -4,7 +4,6 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructionError, MCTuplesSize
-from sunnbear._core.benchmark.mc_tuples.construction.allocation import MCTuplesGapAllocation
 from sunnbear._core.benchmark.mc_tuples.construction.solve import (
     INCLUSION_CONSTRAINT_WEIGHT,
     MCTuplesSizeSolve,
@@ -18,9 +17,8 @@ _SIZE_32 = np.column_stack([_LANES_32 + 0.5, _LANES_32[::-1] + 0.25]) / N_FINE_L
 
 def _solve(size: MCTuplesSize, required_tuple_array: np.ndarray, n_population: int) -> MCTuplesSizeSolve:
     """Return the solve of `size` on `required_tuple_array`, with `n_population` candidates in eligible fine lanes."""
-    gap_allocation = MCTuplesGapAllocation.of(required_tuple_array, size.n_new)
     settings = MCTuplesSolveSettings(n_workers=1, seed=42, rng=np.random.default_rng(5))
-    return MCTuplesSizeSolve(n_population, required_tuple_array, size, gap_allocation, settings)
+    return MCTuplesSizeSolve(n_population, required_tuple_array, size, settings)
 
 
 def _distinct_lane_selection(solve: MCTuplesSizeSolve, n: int) -> np.ndarray:

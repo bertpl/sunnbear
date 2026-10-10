@@ -1,6 +1,5 @@
-"""`MCTuplesPopulation.draw` spreads its candidates evenly over the fine lanes and fine cells that it is given, and
-`MCTuplesPopulation.draw_in_eligible_lanes` draws them only in the eligible fine lanes, those of the gaps that get new
-tuples."""
+"""`MCTuplesPopulation.draw` spreads its candidates evenly over the fine lanes and fine cells that it is allowed, and,
+given `MCTuplesAxisGapAllocation.eligible_fine_lanes`, draws its candidates only in the eligible fine lanes."""
 
 import numpy as np
 import pytest
@@ -9,50 +8,52 @@ from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, fine_lanes_of
 from sunnbear._core.benchmark.mc_tuples.construction.allocation import MCTuplesGapAllocation
 from sunnbear._core.benchmark.mc_tuples.construction.population import MCTuplesPopulation
 
-# Every 16th fine lane is free along u, and 128 consecutive fine lanes along v: 64 x 128 free fine cells.
-_FREE_U_LANES = np.arange(0, N_FINE_LANES, 16)
-_FREE_V_LANES = np.arange(512, 640)
+# The allowed fine lanes: every 16th fine lane along u, and 128 consecutive fine lanes along v: 64 x 128 fine cells.
+_ALLOWED_U_LANES = np.arange(0, N_FINE_LANES, 16)
+_ALLOWED_V_LANES = np.arange(512, 640)
 
 
 @pytest.mark.parametrize(
     "n_population",
     [
-        50,  # fewer than the free fine lanes
-        5000,  # fewer than the free fine cells: at most 1 per cell
-        64 * 128,  # exactly 1 per free fine cell
-        3 * 64 * 128 + 77,  # 3 or 4 per free fine cell
+        50,  # fewer than the allowed fine lanes
+        5000,  # fewer than the allowed fine cells: at most 1 per cell
+        64 * 128,  # exactly 1 per allowed fine cell
+        3 * 64 * 128 + 77,  # 3 or 4 per allowed fine cell
     ],
 )
-def test_draw_spreads_the_candidates_evenly_over_the_free_fine_lanes_and_cells(n_population):
-    """Every free fine lane, and every free fine cell, holds the same number of candidates, give or take 1; no other
-    holds any; and each candidate lies inside its fine cell, in the open unit square."""
+def test_draw_spreads_the_candidates_evenly_over_the_allowed_fine_lanes_and_cells(n_population):
+    """Every allowed fine lane, and every allowed fine cell, holds the same number of candidates, give or take 1; no
+    other holds any; and each candidate lies inside its fine cell, in the open unit square."""
     # --- act --------------------------
-    population = MCTuplesPopulation.draw(n_population, _FREE_U_LANES, _FREE_V_LANES, np.random.default_rng(1))
+    population = MCTuplesPopulation.draw(n_population, _ALLOWED_U_LANES, _ALLOWED_V_LANES, np.random.default_rng(1))
 
     # --- assert -----------------------
     assert population.u.size == population.tuple_array.shape[0] == n_population
-    for lanes, free in ((population.u_lane, _FREE_U_LANES), (population.v_lane, _FREE_V_LANES)):
+    for lanes, allowed in ((population.u_lane, _ALLOWED_U_LANES), (population.v_lane, _ALLOWED_V_LANES)):
         counts = np.bincount(lanes, minlength=N_FINE_LANES)
-        assert counts[free].max() - counts[free].min() <= 1
-        assert counts[free].sum() == n_population
+        assert counts[allowed].max() - counts[allowed].min() <= 1
+        assert counts[allowed].sum() == n_population
     cells = np.bincount(population.u_lane * N_FINE_LANES + population.v_lane, minlength=N_FINE_LANES**2)
-    free_cells = cells.reshape(N_FINE_LANES, N_FINE_LANES)[np.ix_(_FREE_U_LANES, _FREE_V_LANES)]
-    assert free_cells.max() - free_cells.min() <= 1
-    assert free_cells.sum() == n_population
+    allowed_cells = cells.reshape(N_FINE_LANES, N_FINE_LANES)[np.ix_(_ALLOWED_U_LANES, _ALLOWED_V_LANES)]
+    assert allowed_cells.max() - allowed_cells.min() <= 1
+    assert allowed_cells.sum() == n_population
     for values, lanes in ((population.u, population.u_lane), (population.v, population.v_lane)):
         assert np.array_equal(fine_lanes_of(values), lanes)
         assert np.all((values > 0) & (values < 1))
 
 
-def test_draw_in_eligible_lanes_skips_the_free_fine_lanes_of_gaps_without_new_tuples():
-    """The size below holds tuples in fine lanes 3, 10 and 11 on both axes, and the allocation of 2 new tuples uses
-    only the gap above lane 11, so the population covers exactly the fine lanes from 12 up."""
+def test_draw_over_eligible_fine_lanes_skips_the_free_fine_lanes_of_gaps_without_new_tuples():
+    """The size below holds tuples in fine lanes 3, 10 and 11 on both axes, and the allocation puts both of its 2 new
+    tuples in the widest gap, the one above lane 11, so the population covers exactly the fine lanes from 12 up."""
     # --- arrange ----------------------
     values = np.array([3.5, 10.25, 11.5]) / N_FINE_LANES
     gap_allocation = MCTuplesGapAllocation.of(np.column_stack([values, values]), 2)
 
     # --- act --------------------------
-    population = MCTuplesPopulation.draw_in_eligible_lanes(3000, gap_allocation, np.random.default_rng(4))
+    population = MCTuplesPopulation.draw(
+        3000, gap_allocation.u.eligible_fine_lanes, gap_allocation.v.eligible_fine_lanes, np.random.default_rng(4)
+    )
 
     # --- assert -----------------------
     assert population.u.size == 3000
