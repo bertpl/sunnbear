@@ -1,0 +1,13 @@
+# The options in this file are documented at https://docs.zizmor.sh/configuration/.
+
+rules:
+  # The self-repository audit asks each `uses:` key that points to an action or reusable workflow in
+  # this repository to use GitHub's self-repository syntax, `$/<path>`. actionlint rejects that syntax
+  # (rhysd/actionlint#711), so the workspace-relative `./` form stays until actionlint accepts `$/`.
+  self-repository:
+    ignore:
+      - _unit_tests.yml
+      - pull_request.yml
+      - push_to_branch.yml
+      - push_to_main.yml
+      - release_tag.yml

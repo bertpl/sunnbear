@@ -7,8 +7,14 @@ updates:
       - "/"
       - "/.github/actions/unit_test"
       - "/.github/actions/pre_commit"
+    # Dependabot checks each ecosystem on its own weekday. A bump PR then opens against
+    # `main` after the bumps of the earlier weekdays have auto-merged, so the CI run on
+    # that PR tests the new bump together with those earlier bumps before the PR merges.
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "01:00"
+      timezone: "Europe/Zurich"
     # `chore` prefix makes the PR title (and thus the squash commit on main) follow
     # the repo's `<type>: <summary>` convention, so the preflight title check needs
     # no Dependabot exemption.
@@ -17,7 +23,7 @@ updates:
     # Split by update type: auto-merge is decided per PR from its update type, so a
     # single major in a shared batch would park every minor/patch bump behind review.
     groups:
-      actions:  # minor/patch batch: auto-merges once checks pass
+      actions:  # the minor/patch batch auto-merges once checks pass
         patterns: ["*"]
         update-types: ["minor", "patch"]
       actions-major:  # majors batch separately and wait for review
@@ -26,7 +32,7 @@ updates:
     # Let releases age before PRs open, so an upstream compromise has time to
     # surface before a bump can land.
     cooldown:
-      default-days: 14  # covers every semver level; no per-level override needed
+      default-days: 14  # the default covers every semver level, so no per-level override is needed
 
   - package-ecosystem: "uv"
     # lockfile-only: bump uv.lock to the latest that still satisfies pyproject,
@@ -34,12 +40,16 @@ updates:
     # deliberate minimums, not upgrade targets.
     directory: "/"
     versioning-strategy: "lockfile-only"
+    # See the weekday comment on the github-actions entry.
     schedule:
       interval: "weekly"
+      day: "tuesday"
+      time: "01:00"
+      timezone: "Europe/Zurich"
     commit-message:
       prefix: "chore"
     groups:
-      python:  # minor/patch batch: auto-merges once checks pass
+      python:  # the minor/patch batch auto-merges once checks pass
         patterns: ["*"]
         update-types: ["minor", "patch"]
       python-major:  # majors batch separately and wait for review
@@ -48,4 +58,30 @@ updates:
     # 14 days matches PyPI's file-addition window: a release rejects new files once
     # it is 14 days old, so waiting that long means the file set is settled.
     cooldown:
-      default-days: 14  # covers every semver level; no per-level override needed
+      default-days: 14  # the default covers every semver level, so no per-level override is needed
+
+  - package-ecosystem: "pre-commit"
+    # Dependabot bumps the `rev` pin of each hook that .pre-commit-config.yaml pulls
+    # from an external repository. Hooks under `repo: local` have no `rev` pin; a local
+    # hook that runs its tool through `uv run` gets the tool version from uv.lock, which
+    # the `uv` entry in this file bumps.
+    directory: "/"
+    # See the weekday comment on the github-actions entry.
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "01:00"
+      timezone: "Europe/Zurich"
+    commit-message:
+      prefix: "chore"
+    groups:
+      pre-commit:  # the minor/patch batch auto-merges once checks pass
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      pre-commit-major:  # majors batch separately and wait for review
+        patterns: ["*"]
+        update-types: ["major"]
+    # As on the github-actions entry: a compromised upstream release has time to be
+    # discovered before a bump can merge.
+    cooldown:
+      default-days: 14  # the default covers every semver level, so no per-level override is needed
