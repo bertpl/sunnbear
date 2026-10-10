@@ -1,7 +1,7 @@
 """`MCTuplesSizeSolve` picks a size's new tuples from its population in 1 max-div solve.
 
 The candidates are the tuples of the size below, which every valid selection keeps, followed by the population's
-candidates that lie in a gap that gets new tuples on both axes (`GapAllocation`). The constraints are:
+candidates that lie in a gap that gets new tuples on both axes (`MCTuplesGapAllocation`). The constraints are:
 
 - on each axis, each gap holds exactly its allocated number of new tuples;
 - a gap that holds more than 1 new tuple holds at most 1 per fine lane, through 1 constraint per fine lane;
@@ -34,7 +34,7 @@ from scipy.optimize import linear_sum_assignment
 from sunnbear._core.benchmark.mc_tuples.core import GPQ_LEVEL, MCTuplesSize
 from sunnbear._core.utils.grouping import group_indices_by_id
 
-from .allocation import GapAllocation
+from .allocation import MCTuplesGapAllocation
 from .exceptions import MCTuplesConstructionError
 from .population import MCTuplesPopulation
 
@@ -67,7 +67,7 @@ class MCTuplesSizeSolve:
         population: MCTuplesPopulation,
         required_tuple_array: np.ndarray,
         size: MCTuplesSize,
-        gap_allocation: GapAllocation,
+        gap_allocation: MCTuplesGapAllocation,
         settings: "MCTuplesSolveSettings",
     ) -> None:
         """Collect the candidates of `size`: the population's candidates in a gap with new tuples on both axes."""

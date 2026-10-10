@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructionError, fine_lanes_of
-from sunnbear._core.benchmark.mc_tuples.construction.correction import CAP_RANGE, AxisMeanCorrection, MeanCorrection
+from sunnbear._core.benchmark.mc_tuples.construction.correction import CAP_RANGE, MCTuplesAxisMeanCorrection, MCTuplesMeanCorrection
 
 
 def _random_axis(seed: int) -> tuple[np.ndarray, np.ndarray]:
@@ -27,7 +27,7 @@ def test_the_correction_keeps_the_fine_lanes_the_order_and_the_old_tuples_and_mo
     required, new = _random_axis(seed)
 
     # --- act --------------------------
-    correction = AxisMeanCorrection.of(required, new)
+    correction = MCTuplesAxisMeanCorrection.of(required, new)
 
     # --- assert -----------------------
     all_after = np.concatenate([required, correction.corrected_new_values])
@@ -49,7 +49,7 @@ def test_the_correction_takes_the_shift_from_the_largest_gaps():
     required, new = np.array([0.1, 0.9]), np.array([0.3, 0.75])
 
     # --- act --------------------------
-    correction = AxisMeanCorrection.of(required, new)
+    correction = MCTuplesAxisMeanCorrection.of(required, new)
 
     # --- assert -----------------------
     assert np.concatenate([required, correction.corrected_new_values]).mean() == pytest.approx(0.5)
@@ -62,7 +62,7 @@ def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_th
     """A new tuple at 0.95 above an old one at 0.9 cannot reach 0.1, the value that a mean of 0.5 needs: it stops just
     above the old tuple's fine lane, and the correction reports the offset that remains."""
     # --- act --------------------------
-    correction = AxisMeanCorrection.of(np.array([0.9]), np.array([0.95]))
+    correction = MCTuplesAxisMeanCorrection.of(np.array([0.9]), np.array([0.95]))
 
     # --- assert -----------------------
     lane_above_old = (np.floor(0.9 * N_FINE_LANES) + 1) / N_FINE_LANES
@@ -77,7 +77,7 @@ def test_mean_correction_corrects_both_axes_of_a_size():
     tuple_array = np.array([[0.2, 0.8], [0.7, 0.3], [0.45, 0.65], [0.95, 0.15]])
 
     # --- act --------------------------
-    correction = MeanCorrection.of(tuple_array, n_required=2)
+    correction = MCTuplesMeanCorrection.of(tuple_array, n_required=2)
 
     # --- assert -----------------------
     assert correction.tuple_array[:2].tolist() == tuple_array[:2].tolist()
@@ -95,4 +95,4 @@ def test_mean_correction_refuses_a_size_that_holds_2_tuples_in_1_fine_lane():
 
     # --- act / assert -----------------
     with pytest.raises(MCTuplesConstructionError, match="a fine u-lane holds 2 tuples"):
-        MeanCorrection.of(tuple_array, n_required=2)
+        MCTuplesMeanCorrection.of(tuple_array, n_required=2)

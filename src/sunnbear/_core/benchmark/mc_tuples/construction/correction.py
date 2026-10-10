@@ -1,7 +1,7 @@
-"""`MeanCorrection` moves a size's new tuples after its max-div solve, so that its mean u and mean v are exactly 0.5.
+"""`MCTuplesMeanCorrection` moves a size's new tuples after its max-div solve, so that its mean u and mean v are exactly 0.5.
 
 The tuples of the size below, the old tuples, stay where they are; per axis, only the new tuples move, toward the side
-that the mean needs (`AxisMeanCorrection`). The rules are written for a mean above 0.5, where the new tuples move left,
+that the mean needs (`MCTuplesAxisMeanCorrection`). The rules are written for a mean above 0.5, where the new tuples move left,
 over the size's values u_0 < u_1 < … in ascending order, with w the width of a fine lane:
 
 - each new tuple i gets a reference r_i and a gap g_i = u_i - r_i, both fixed from the values before the correction:
@@ -51,11 +51,11 @@ N_BISECTION_STEPS = 200
 
 
 # ==================================================================================================
-#  MeanCorrection
+#  MCTuplesMeanCorrection
 # ==================================================================================================
 @dataclass(frozen=True)
-class MeanCorrection:
-    """`MeanCorrection` holds 1 size after the correction of both axes.
+class MCTuplesMeanCorrection:
+    """`MCTuplesMeanCorrection` holds 1 size after the correction of both axes.
 
     Attributes:
         u: The u axis after the correction.
@@ -64,15 +64,15 @@ class MeanCorrection:
             ones in their original order.
     """
 
-    u: "AxisMeanCorrection"
-    v: "AxisMeanCorrection"
+    u: "MCTuplesAxisMeanCorrection"
+    v: "MCTuplesAxisMeanCorrection"
     tuple_array: np.ndarray
 
     # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def of(cls, tuple_array: np.ndarray, n_required: int) -> "MeanCorrection":
+    def of(cls, tuple_array: np.ndarray, n_required: int) -> "MCTuplesMeanCorrection":
         """Return the size in `tuple_array` after the correction; its first `n_required` tuples are the size below.
 
         Raises:
@@ -80,8 +80,8 @@ class MeanCorrection:
                 rules prevent unless the size already had such a fine lane.
         """
         required, new = tuple_array[:n_required], tuple_array[n_required:]
-        u = AxisMeanCorrection.of(required[:, 0], new[:, 0])
-        v = AxisMeanCorrection.of(required[:, 1], new[:, 1])
+        u = MCTuplesAxisMeanCorrection.of(required[:, 0], new[:, 0])
+        v = MCTuplesAxisMeanCorrection.of(required[:, 1], new[:, 1])
         corrected_tuple_array = np.vstack([required, np.column_stack([u.corrected_new_values, v.corrected_new_values])])
         for axis, values in (("u", corrected_tuple_array[:, 0]), ("v", corrected_tuple_array[:, 1])):
             if np.bincount(fine_lanes_of(values)).max() > 1:
@@ -92,11 +92,11 @@ class MeanCorrection:
 
 
 # ==================================================================================================
-#  AxisMeanCorrection
+#  MCTuplesAxisMeanCorrection
 # ==================================================================================================
 @dataclass(frozen=True)
-class AxisMeanCorrection:
-    """`AxisMeanCorrection` holds 1 axis of 1 size after the correction, and what the correction did.
+class MCTuplesAxisMeanCorrection:
+    """`MCTuplesAxisMeanCorrection` holds 1 axis of 1 size after the correction, and what the correction did.
 
     Attributes:
         cap: The cap D, as a distance on the axis.
@@ -188,7 +188,7 @@ class AxisMeanCorrection:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def of(cls, required_values: np.ndarray, new_values: np.ndarray) -> "AxisMeanCorrection":
+    def of(cls, required_values: np.ndarray, new_values: np.ndarray) -> "MCTuplesAxisMeanCorrection":
         """Return 1 axis whose new values moved so that the mean of both arrays' values is 0.5, if possible."""
         size = required_values.size + new_values.size
         target_mean_of_new = (TARGET_MEAN * size - required_values.sum()) / new_values.size

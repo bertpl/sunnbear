@@ -1,7 +1,7 @@
-"""`GapAllocation` decides how many of a size's new tuples go into each gap that the size below leaves on each axis.
+"""`MCTuplesGapAllocation` decides how many of a size's new tuples go into each gap that the size below leaves on each axis.
 
 On each axis, every tuple of the size below occupies 1 fine lane. A gap is a maximal run of free fine lanes: between 2
-occupied fine lanes, or between an occupied fine lane and an edge of the axis (`AxisGaps`).
+occupied fine lanes, or between an occupied fine lane and an edge of the axis (`MCTuplesAxisGaps`).
 
 The size's max-div solve puts exactly the allocated number of new tuples into each gap, and spreads them about evenly
 inside it. So the allocation sets where the size's mean lies, and with it how far the mean correction has to move the
@@ -14,7 +14,7 @@ The allocation comes in 2 stages:
    over it;
 2. **mean-aware:** starting from the greedy allocation, a local search moves new tuples between gaps until the
    predicted mean is closest to 0.5, while every gap's spacing stays at least (1 - `epsilon`) times the greedy
-   allocation's smallest spacing (`AxisGaps.mean_aware_counts`).
+   allocation's smallest spacing (`MCTuplesAxisGaps.mean_aware_counts`).
 """
 
 from dataclasses import dataclass
@@ -28,40 +28,40 @@ TARGET_MEAN = 0.5
 
 
 # ==================================================================================================
-#  GapAllocation
+#  MCTuplesGapAllocation
 # ==================================================================================================
 @dataclass(frozen=True)
-class GapAllocation:
-    """`GapAllocation` holds, for 1 size, the allocation of its new tuples to the gaps along u and along v.
+class MCTuplesGapAllocation:
+    """`MCTuplesGapAllocation` holds, for 1 size, the allocation of its new tuples to the gaps along u and along v.
 
     Attributes:
         u: The allocation along u.
         v: The allocation along v.
     """
 
-    u: "AxisGapAllocation"
-    v: "AxisGapAllocation"
+    u: "MCTuplesAxisGapAllocation"
+    v: "MCTuplesAxisGapAllocation"
 
     # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def of(cls, required_tuple_array: np.ndarray, n_new: int, epsilon: float) -> "GapAllocation":
+    def of(cls, required_tuple_array: np.ndarray, n_new: int, epsilon: float) -> "MCTuplesGapAllocation":
         """Return the mean-aware allocation of `n_new` new tuples along u and along v of `required_tuple_array`."""
         return cls(
-            u=AxisGapAllocation.of(required_tuple_array[:, 0], n_new, epsilon),
-            v=AxisGapAllocation.of(required_tuple_array[:, 1], n_new, epsilon),
+            u=MCTuplesAxisGapAllocation.of(required_tuple_array[:, 0], n_new, epsilon),
+            v=MCTuplesAxisGapAllocation.of(required_tuple_array[:, 1], n_new, epsilon),
         )
 
 
 # ==================================================================================================
-#  AxisGapAllocation
+#  MCTuplesAxisGapAllocation
 # ==================================================================================================
 @dataclass(frozen=True)
-class AxisGapAllocation:
-    """`AxisGapAllocation` holds the allocation chosen for 1 axis of 1 size, in the form that the solve uses.
+class MCTuplesAxisGapAllocation:
+    """`MCTuplesAxisGapAllocation` holds the allocation chosen for 1 axis of 1 size, in the form that the solve uses.
 
-    `AxisGaps` describes every gap and computes the allocation; `AxisGapAllocation` keeps only the gaps that get new
+    `MCTuplesAxisGaps` describes every gap and computes the allocation; `MCTuplesAxisGapAllocation` keeps only the gaps that get new
     tuples, how many each gets, and the predicted offsets for the progress report.
 
     Attributes:
@@ -82,7 +82,7 @@ class AxisGapAllocation:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def of(cls, required_values: np.ndarray, n_new: int, epsilon: float) -> "AxisGapAllocation":
+    def of(cls, required_values: np.ndarray, n_new: int, epsilon: float) -> "MCTuplesAxisGapAllocation":
         """Return the mean-aware allocation of `n_new` new tuples over the gaps that `required_values` leave free.
 
         Without tuples of a size below, all fine lanes form 1 gap that gets every new tuple.
@@ -95,7 +95,7 @@ class AxisGapAllocation:
                 mean_aware_offset_fine_lanes=None,
             )
         else:
-            gaps = AxisGaps.of(required_values)
+            gaps = MCTuplesAxisGaps.of(required_values)
             greedy_counts = gaps.greedy_counts(n_new)
             counts = gaps.mean_aware_counts(greedy_counts, epsilon)
             is_used = counts > 0
@@ -108,13 +108,13 @@ class AxisGapAllocation:
 
 
 # ==================================================================================================
-#  AxisGaps
+#  MCTuplesAxisGaps
 # ==================================================================================================
 @dataclass(frozen=True)
-class AxisGaps:
-    """`AxisGaps` describes the gaps that the size below leaves on 1 axis, and computes their allocation of new tuples.
+class MCTuplesAxisGaps:
+    """`MCTuplesAxisGaps` describes the gaps that the size below leaves on 1 axis, and computes their allocation of new tuples.
 
-    It holds every gap, including those that end up without new tuples, and exists only inside `AxisGapAllocation.of`,
+    It holds every gap, including those that end up without new tuples, and exists only inside `MCTuplesAxisGapAllocation.of`,
     which keeps the result.
 
     Every attribute except `n_required` and `required_sum` is an array with 1 entry per gap, in ascending order, so
@@ -246,7 +246,7 @@ class AxisGaps:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def of(cls, required_values: np.ndarray) -> "AxisGaps":
+    def of(cls, required_values: np.ndarray) -> "MCTuplesAxisGaps":
         """Return the gaps that the size below's values on this axis leave free; `required_values` holds at least 1."""
         occupied = np.unique(fine_lanes_of(required_values))
         value_of_fine_lane = np.zeros(N_FINE_LANES)

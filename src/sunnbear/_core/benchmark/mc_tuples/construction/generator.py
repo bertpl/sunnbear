@@ -26,8 +26,8 @@ import numpy as np
 
 from sunnbear._core.benchmark.mc_tuples.core import MCTuples, MCTuplesSize
 
-from .allocation import GapAllocation
-from .correction import MeanCorrection
+from .allocation import MCTuplesGapAllocation
+from .correction import MCTuplesMeanCorrection
 from .population import MCTuplesPopulation
 from .size_result import MCTuplesSizeResult
 from .solve import MCTuplesSizeSolve, MCTuplesSolveSettings
@@ -46,7 +46,7 @@ class MCTuplesGenerator:
         n_population: The number of candidate tuples in each size's population.
         allocation_epsilon: The share in [0, 1) by which the allocation of new tuples to the gaps may shrink the
             smallest distance between neighboring values on an axis, to bring the predicted mean closer to 0.5
-            (`AxisGaps.mean_aware_counts`).
+            (`MCTuplesAxisGaps.mean_aware_counts`).
         on_size_finished: Called with each size's result as soon as the size, its mean correction included, ends;
             None reports nothing.
     """
@@ -161,7 +161,7 @@ class MCTuplesGenerator:
         required_tuple_array = required_tuples.tuple_array if required_tuples is not None else np.zeros((0, 2))
         n_new = size - size.n_required
         population = MCTuplesPopulation.draw_in_free_lanes(self.n_population, required_tuple_array, settings.rng)
-        gap_allocation = GapAllocation.of(required_tuple_array, n_new, self.allocation_epsilon)
+        gap_allocation = MCTuplesGapAllocation.of(required_tuple_array, n_new, self.allocation_epsilon)
         solve = MCTuplesSizeSolve(population, required_tuple_array, size, gap_allocation, settings)
         new_tuple_array, solution = solve.run(t_budget_sec)
         uncorrected_tuple_array = np.vstack([required_tuple_array, new_tuple_array])
@@ -171,7 +171,7 @@ class MCTuplesGenerator:
             t_wall_sec=time.perf_counter() - t_start,
             gap_allocation=gap_allocation,
             uncorrected_tuple_array=uncorrected_tuple_array,
-            mean_correction=MeanCorrection.of(uncorrected_tuple_array, size.n_required),
+            mean_correction=MCTuplesMeanCorrection.of(uncorrected_tuple_array, size.n_required),
             solution=solution,
         )
 
