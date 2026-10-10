@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Change the tuple sets that `generate_mc_tuples` builds for the same arguments
+- Draw each size's `n_population` candidate tuples in `generate_mc_tuples` only where its new tuples can go, so that none is dropped
 
 ### Deprecated
 

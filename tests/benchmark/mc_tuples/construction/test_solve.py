@@ -20,21 +20,18 @@ _SIZE_32 = np.column_stack([_LANES_32 + 0.5, _LANES_32[::-1] + 0.25]) / N_FINE_L
 def _solve(size: MCTuplesSize, required_tuple_array: np.ndarray, n_population: int) -> MCTuplesSizeSolve:
     """Return the solve of `size` on `required_tuple_array`, with a population of `n_population` over its free lanes."""
     rng = np.random.default_rng(5)
-    population = MCTuplesPopulation.draw_in_free_lanes(n_population, required_tuple_array, rng)
+    gap_allocation = MCTuplesGapAllocation.of(required_tuple_array, size.n_new)
+    population = MCTuplesPopulation.draw_in_allocated_lanes(n_population, gap_allocation, rng)
     return MCTuplesSizeSolve(
-        population,
-        required_tuple_array,
-        size,
-        MCTuplesGapAllocation.of(required_tuple_array, size.n_new),
-        MCTuplesSolveSettings(n_workers=1, seed=42, rng=rng),
+        population, required_tuple_array, size, gap_allocation, MCTuplesSolveSettings(n_workers=1, seed=42, rng=rng)
     )
 
 
 def _distinct_lane_selection(solve: MCTuplesSizeSolve, n: int) -> np.ndarray:
-    """Return `n` candidates, as indices into `candidate_indices`, that share no fine lane on either axis."""
+    """Return `n` candidates, as indices into the population, that share no fine lane on either axis."""
     picked, used_u, used_v = [], set(), set()
-    for i, candidate in enumerate(solve.candidate_indices):
-        u_lane, v_lane = solve.population.u_lane[candidate], solve.population.v_lane[candidate]
+    for i in range(solve.population.u.size):
+        u_lane, v_lane = solve.population.u_lane[i], solve.population.v_lane[i]
         if u_lane not in used_u and v_lane not in used_v:
             picked.append(i)
             used_u.add(u_lane)
@@ -115,7 +112,7 @@ def test_the_random_starting_selection_holds_the_new_tuples_in_distinct_fine_lan
     assert start.size == 32
     assert np.array_equal(start, np.sort(start))
     for lanes in (solve.population.u_lane, solve.population.v_lane):
-        assert np.unique(lanes[solve.candidate_indices[start]]).size == 32
+        assert np.unique(lanes[start]).size == 32
 
 
 def test_the_random_starting_selection_needs_as_many_pairable_fine_lanes_as_new_tuples():
@@ -165,7 +162,7 @@ def test_validation_refuses_2_new_tuples_in_1_fine_lane():
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=4096)
     selection = _distinct_lane_selection(solve, 31)
-    u_lanes = solve.population.u_lane[solve.candidate_indices]
+    u_lanes = solve.population.u_lane
     shares_u_lane = np.flatnonzero(u_lanes == u_lanes[selection[0]])
     selection = np.sort(np.append(selection, shares_u_lane[shares_u_lane != selection[0]][0]))
 

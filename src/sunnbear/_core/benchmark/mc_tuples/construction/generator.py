@@ -6,10 +6,10 @@ tuples of the set share a fine lane.
 
 `MCTuplesGenerator` builds each size in 4 parts, each implemented in the module of this package named in parentheses:
 
-1. it draws the size's population of candidate tuples over the fine lanes that the size below leaves free
-   (`population`);
-2. it allocates the new tuples to the gaps that the size below leaves on each axis, so that the size's predicted mean
+1. it allocates the new tuples to the gaps that the size below leaves on each axis, so that the size's predicted mean
    lies close to 0.5 (`allocation`);
+2. it draws the size's population of candidate tuples over the fine lanes of the gaps that get new tuples
+   (`population`);
 3. it picks the new tuples from the population in 1 max-div solve (`solve`);
 4. the mean correction moves the new tuples so that the size's mean u and mean v are exactly 0.5
    (`correction`).
@@ -158,8 +158,8 @@ class MCTuplesGenerator:
         """
         t_start = time.perf_counter()
         required_tuple_array = required_tuples.tuple_array if required_tuples is not None else np.zeros((0, 2))
-        population = MCTuplesPopulation.draw_in_free_lanes(self.n_population, required_tuple_array, settings.rng)
         gap_allocation = MCTuplesGapAllocation.of(required_tuple_array, size.n_new)
+        population = MCTuplesPopulation.draw_in_allocated_lanes(self.n_population, gap_allocation, settings.rng)
         solve = MCTuplesSizeSolve(population, required_tuple_array, size, gap_allocation, settings)
         new_tuple_array, solution = solve.run(t_budget_sec)
         uncorrected_tuple_array = np.vstack([required_tuple_array, new_tuple_array])
@@ -208,7 +208,7 @@ def generate_mc_tuples(
 
     `t_total_sec` covers only the solves; other work takes extra time:
 
-    - drawing each size's population, allocating its new tuples to gaps, and building its problem;
+    - allocating each size's new tuples to gaps, drawing its population, and building its problem;
     - checking and correcting each size;
     - compiling the solves' max-div functions, on their first run after an install; compiling them all takes
       seconds, and numba caches the compiled code for later runs.

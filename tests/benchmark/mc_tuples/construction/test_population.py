@@ -1,9 +1,11 @@
-"""`MCTuplesPopulation.draw` spreads its candidates evenly over the free fine lanes and the free fine cells."""
+"""`MCTuplesPopulation` spreads its candidates evenly over the fine lanes and fine cells that it is given, and draws
+them in only the fine lanes of the gaps that get new tuples."""
 
 import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples.construction.allocation import MCTuplesGapAllocation
 from sunnbear._core.benchmark.mc_tuples.construction.population import MCTuplesPopulation
 
 # Every 16th fine lane is free along u, and 128 consecutive fine lanes along v: 64 x 128 free fine cells.
@@ -39,6 +41,23 @@ def test_draw_spreads_the_candidates_evenly_over_the_free_fine_lanes_and_cells(n
     for values, lanes in ((population.u, population.u_lane), (population.v, population.v_lane)):
         assert np.array_equal(fine_lanes_of(values), lanes)
         assert np.all((values > 0) & (values < 1))
+
+
+def test_draw_in_allocated_lanes_skips_the_free_fine_lanes_of_gaps_without_new_tuples():
+    """With the size below in fine lanes 3, 10 and 11 and 2 new tuples, only the right edge gap gets new tuples, so no
+    candidate lies in the free fine lanes 0 to 2 and 4 to 9, and the population covers every allocated fine lane."""
+    # --- arrange ----------------------
+    values = np.array([3.5, 10.25, 11.5]) / N_FINE_LANES
+    gap_allocation = MCTuplesGapAllocation.of(np.column_stack([values, values]), 2)
+
+    # --- act --------------------------
+    population = MCTuplesPopulation.draw_in_allocated_lanes(3000, gap_allocation, np.random.default_rng(4))
+
+    # --- assert -----------------------
+    assert population.u.size == 3000
+    for lanes in (population.u_lane, population.v_lane):
+        assert lanes.min() == 12
+        assert np.unique(lanes).size == N_FINE_LANES - 12
 
 
 def test_positions_in_lane_move_a_draw_of_exactly_0_to_the_middle_of_its_lane():

@@ -1,7 +1,8 @@
 """`MCTuplesSizeSolve` picks a size's new tuples from its population in 1 max-div solve.
 
-The candidates are the tuples of the size below, which every valid selection keeps, followed by the population's
-candidates that lie in a gap that gets new tuples on both axes (`MCTuplesGapAllocation`). The constraints are:
+The candidates are the tuples of the size below, which every valid selection keeps, followed by the population,
+whose candidates all lie in gaps that get new tuples on both axes (`MCTuplesPopulation.draw_in_allocated_lanes`).
+The constraints are:
 
 - on each axis, each gap holds exactly its allocated number of new tuples;
 - a gap that holds more than 1 new tuple holds at most 1 per fine lane, through 1 constraint per fine lane;
@@ -53,13 +54,12 @@ class MCTuplesSizeSolve:
     """`MCTuplesSizeSolve` is the max-div solve that picks the new tuples of 1 size from its population.
 
     Attributes:
-        population: The size's population of candidate tuples.
+        population: The size's population of candidate tuples, drawn over the fine lanes of the gaps that get new
+            tuples (`MCTuplesPopulation.draw_in_allocated_lanes`); max-div picks the new tuples among them.
         required_tuple_array: The tuples of the size below, as an `(n, 2)` array; empty for the smallest size.
         size: The size under construction.
         gap_allocation: The allocation of new tuples to the gaps along u and along v.
         settings: The construction's settings, the same for every max-div solve.
-        candidate_indices: The population's candidates that lie in a gap with new tuples on both axes, as indices into
-            the population; max-div picks the new tuples among these.
     """
 
     def __init__(
@@ -70,19 +70,14 @@ class MCTuplesSizeSolve:
         gap_allocation: MCTuplesGapAllocation,
         settings: "MCTuplesSolveSettings",
     ) -> None:
-        """Collect the candidates of `size`: the population's candidates in a gap with new tuples on both axes."""
+        """Store the solve's inputs, and look up the gap of each candidate on each axis."""
         self.population = population
         self.required_tuple_array = required_tuple_array
         self.size = size
         self.gap_allocation = gap_allocation
         self.settings = settings
-        u_gap = gap_allocation.u.gap_of_fine_lane[population.u_lane]
-        v_gap = gap_allocation.v.gap_of_fine_lane[population.v_lane]
-        self.candidate_indices = np.flatnonzero((u_gap >= 0) & (v_gap >= 0))
-        self._u_gap = u_gap[self.candidate_indices]
-        self._v_gap = v_gap[self.candidate_indices]
-        self._u_lane = population.u_lane[self.candidate_indices]
-        self._v_lane = population.v_lane[self.candidate_indices]
+        self._u_gap = gap_allocation.u.gap_of_fine_lane[population.u_lane]
+        self._v_gap = gap_allocation.v.gap_of_fine_lane[population.v_lane]
 
     # --------------------------------------------------------------------------
     #  Main API
@@ -104,9 +99,7 @@ class MCTuplesSizeSolve:
         gpq = DiversityMetric.gpq_separation(GPQ_LEVEL)
         problem = MaxDivProblem.new(
             # max-div works on a float32 copy; the selected candidates are taken by index.
-            np.vstack([self.required_tuple_array, self.population.tuple_array[self.candidate_indices]]).astype(
-                np.float32
-            ),
+            np.vstack([self.required_tuple_array, self.population.tuple_array]).astype(np.float32),
             k=int(self.size),
             distance_metric=DistanceMetric.l2s_euclidean_squared(),
             # The geomean of gpq along u, along v, and over the problem's own distance, squared L2.
@@ -133,7 +126,7 @@ class MCTuplesSizeSolve:
             )
         solution = solver.solve(verbosity=Verbosity.SILENT)
         new = self._validated_new_selection(np.sort(np.asarray(solution.i_selected, dtype=np.int64)))
-        return self.population.tuple_array[self.candidate_indices[new]], solution
+        return self.population.tuple_array[new], solution
 
     # --------------------------------------------------------------------------
     #  Helpers
@@ -147,8 +140,8 @@ class MCTuplesSizeSolve:
         n_required = self.size.n_required
         constraints = []
         for allocation, gap, lane in (
-            (self.gap_allocation.u, self._u_gap, self._u_lane),
-            (self.gap_allocation.v, self._v_gap, self._v_lane),
+            (self.gap_allocation.u, self._u_gap, self.population.u_lane),
+            (self.gap_allocation.v, self._v_gap, self.population.v_lane),
         ):
             for group in group_indices_by_id(gap):
                 count = int(allocation.counts[gap[group[0]]])
@@ -172,7 +165,7 @@ class MCTuplesSizeSolve:
         return constraints
 
     def _initial_new_selection(self) -> np.ndarray:
-        """Return a random starting selection of new candidates, ascending, as indices into `candidate_indices`.
+        """Return a random starting selection of new candidates, ascending, as indices into the population.
 
         A min-cost matching over random costs pairs each fine u-lane with a distinct fine v-lane whose shared fine cell
         holds a candidate; `n_new` of these cells, picked at random, each contribute 1 random candidate. The starting
@@ -184,11 +177,11 @@ class MCTuplesSizeSolve:
         """
         rng = self.settings.rng
         n_new = self.size.n_new
-        fine_u_lanes, u_lane_index = np.unique(self._u_lane, return_inverse=True)
-        fine_v_lanes, v_lane_index = np.unique(self._v_lane, return_inverse=True)
+        fine_u_lanes, u_lane_index = np.unique(self.population.u_lane, return_inverse=True)
+        fine_v_lanes, v_lane_index = np.unique(self.population.v_lane, return_inverse=True)
         n_u_lanes, n_v_lanes = fine_u_lanes.size, fine_v_lanes.size
         cells = u_lane_index * n_v_lanes + v_lane_index
-        shuffled = rng.permutation(self.candidate_indices.size)
+        shuffled = rng.permutation(self.population.u.size)
         cells_with_a_candidate, first_in_shuffled = np.unique(cells[shuffled], return_index=True)
         candidate_of_cell = np.full(n_u_lanes * n_v_lanes, -1, dtype=np.int64)
         candidate_of_cell[cells_with_a_candidate] = shuffled[first_in_shuffled]
@@ -205,7 +198,7 @@ class MCTuplesSizeSolve:
         return np.sort(rng.choice(paired, size=n_new, replace=False))
 
     def _validated_new_selection(self, selection: np.ndarray) -> np.ndarray:
-        """Return the selected new candidates as indices into `candidate_indices`, after checking the constraints.
+        """Return the selected new candidates as indices into the population, after checking the constraints.
 
         Raises:
             MCTuplesConstructionError: If a tuple of the size below is missing, a gap holds a number of new tuples
@@ -219,8 +212,8 @@ class MCTuplesSizeSolve:
             )
         new = selection[selection >= n_required] - n_required
         for axis, allocation, gap, lane in (
-            ("u", self.gap_allocation.u, self._u_gap, self._u_lane),
-            ("v", self.gap_allocation.v, self._v_gap, self._v_lane),
+            ("u", self.gap_allocation.u, self._u_gap, self.population.u_lane),
+            ("v", self.gap_allocation.v, self._v_gap, self.population.v_lane),
         ):
             counts = np.bincount(gap[new], minlength=allocation.counts.size)
             n_off = int((counts != allocation.counts).sum())

@@ -1,16 +1,18 @@
 """`MCTuplesPopulation` holds a size's candidate tuples, among which max-div picks the size's new tuples.
 
 Each axis is cut into `N_FINE_LANES` equal fine lanes; a fine cell is the crossing of a fine u-lane and a fine
-v-lane. A size's population is drawn over the fine lanes that the size below leaves free, and guarantees:
+v-lane. A size's population is drawn over its allocated fine lanes: the fine lanes of the gaps that its gap
+allocation gives new tuples (`MCTuplesGapAllocation`). A candidate in any other fine lane could never be picked, so
+the whole population is usable. The population guarantees:
 
-- every free fine lane holds the same number of candidates, give or take 1, along u and along v;
-- every free fine cell holds `n // n_cells` or `n // n_cells + 1` candidates, with `n` the population size and
-  `n_cells` the number of free fine cells.
+- every allocated fine lane holds the same number of candidates, give or take 1, along u and along v;
+- every allocated fine cell holds `n // n_cells` or `n // n_cells + 1` candidates, with `n` the population size and
+  `n_cells` the number of allocated fine cells.
 
 The population is drawn in 2 steps:
 
-1. `spread_evenly_over_grid` picks each candidate's free fine cell, at random under both guarantees, on the grid of
-   free u-lanes and free v-lanes;
+1. `spread_evenly_over_grid` picks each candidate's allocated fine cell, at random under both guarantees, on the
+   grid of allocated u-lanes and allocated v-lanes;
 2. each candidate lies at its own uniform random position inside its fine cell.
 """
 
@@ -18,8 +20,10 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES
 from sunnbear._core.utils.spread_over_grid import spread_evenly_over_grid
+
+from .allocation import MCTuplesGapAllocation
 
 
 # ==================================================================================================
@@ -83,14 +87,13 @@ class MCTuplesPopulation:
         )
 
     @classmethod
-    def draw_in_free_lanes(
-        cls, n_population: int, required_tuple_array: np.ndarray, rng: np.random.Generator
+    def draw_in_allocated_lanes(
+        cls, n_population: int, gap_allocation: MCTuplesGapAllocation, rng: np.random.Generator
     ) -> "MCTuplesPopulation":
-        """Draw `n_population` candidates over the fine lanes left free by `required_tuple_array`, the size below."""
-        all_lanes = np.arange(N_FINE_LANES)
+        """Draw `n_population` candidates over the fine lanes of the gaps that `gap_allocation` gives new tuples."""
         return cls.draw(
             n_population,
-            np.setdiff1d(all_lanes, fine_lanes_of(required_tuple_array[:, 0])),
-            np.setdiff1d(all_lanes, fine_lanes_of(required_tuple_array[:, 1])),
+            np.flatnonzero(gap_allocation.u.gap_of_fine_lane >= 0),
+            np.flatnonzero(gap_allocation.v.gap_of_fine_lane >= 0),
             rng,
         )
