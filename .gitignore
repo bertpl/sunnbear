@@ -12,9 +12,6 @@ __pycache__
 .coverage.*
 htmlcov
 
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints
-
 # Virtual environment directories
 venv
 .env
