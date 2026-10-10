@@ -112,17 +112,11 @@ class MCTuplesPopulation:
     # --------------------------------------------------------------------------
     @classmethod
     def draw(
-        cls, n_candidates: int, free_u_lanes: np.ndarray, free_v_lanes: np.ndarray, rng: np.random.Generator
+        cls, n_population: int, free_u_lanes: np.ndarray, free_v_lanes: np.ndarray, rng: np.random.Generator
     ) -> "MCTuplesPopulation":
-        """Draw `n_candidates` candidates over the fine cells of `free_u_lanes` x `free_v_lanes`.
-
-        Raises:
-            ValueError: If `n_candidates` is not positive.
-        """
-        if n_candidates < 1:
-            raise ValueError(f"n_candidates must be positive (got {n_candidates}).")
+        """Draw `n_population` candidates over the fine cells of `free_u_lanes` x `free_v_lanes`."""
         n_rows, n_cols = free_u_lanes.size, free_v_lanes.size
-        n_per_cell, n_extra = divmod(n_candidates, n_rows * n_cols)
+        n_per_cell, n_extra = divmod(n_population, n_rows * n_cols)
         is_extra = cls._round_robin_pattern(n_rows, n_cols, n_extra, rng)
         # With no extra candidates every free fine cell holds the same number, so there is nothing to randomize.
         n_trades = N_CURVEBALL_TRADES_PER_LANE * n_rows if n_extra > 0 else 0
@@ -141,16 +135,12 @@ class MCTuplesPopulation:
 
     @classmethod
     def draw_in_free_lanes(
-        cls, n_candidates: int, required_tuple_array: np.ndarray, rng: np.random.Generator
+        cls, n_population: int, required_tuple_array: np.ndarray, rng: np.random.Generator
     ) -> "MCTuplesPopulation":
-        """Draw `n_candidates` candidates over the fine lanes that `required_tuple_array`, the size below, leaves free.
-
-        Raises:
-            ValueError: If `n_candidates` is not positive.
-        """
+        """Draw `n_population` candidates over the fine lanes left free by `required_tuple_array`, the size below."""
         all_lanes = np.arange(N_FINE_LANES)
         return cls.draw(
-            n_candidates,
+            n_population,
             np.setdiff1d(all_lanes, fine_lanes_of(required_tuple_array[:, 0])),
             np.setdiff1d(all_lanes, fine_lanes_of(required_tuple_array[:, 1])),
             rng,

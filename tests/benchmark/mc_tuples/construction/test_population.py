@@ -12,7 +12,7 @@ _FREE_V_LANES = np.arange(512, 640)
 
 
 @pytest.mark.parametrize(
-    "n_candidates",
+    "n_population",
     [
         50,  # fewer than the free fine lanes
         5000,  # fewer than the free fine cells: at most 1 per cell
@@ -20,32 +20,25 @@ _FREE_V_LANES = np.arange(512, 640)
         3 * 64 * 128 + 77,  # 3 or 4 per free fine cell
     ],
 )
-def test_draw_spreads_the_candidates_evenly_over_the_free_fine_lanes_and_cells(n_candidates):
+def test_draw_spreads_the_candidates_evenly_over_the_free_fine_lanes_and_cells(n_population):
     """Every free fine lane, and every free fine cell, holds the same number of candidates, give or take 1; no other
     holds any; and each candidate lies inside its fine cell, in the open unit square."""
     # --- act --------------------------
-    population = MCTuplesPopulation.draw(n_candidates, _FREE_U_LANES, _FREE_V_LANES, np.random.default_rng(1))
+    population = MCTuplesPopulation.draw(n_population, _FREE_U_LANES, _FREE_V_LANES, np.random.default_rng(1))
 
     # --- assert -----------------------
-    assert population.u.size == population.tuple_array.shape[0] == n_candidates
+    assert population.u.size == population.tuple_array.shape[0] == n_population
     for lanes, free in ((population.u_lane, _FREE_U_LANES), (population.v_lane, _FREE_V_LANES)):
         counts = np.bincount(lanes, minlength=N_FINE_LANES)
         assert counts[free].max() - counts[free].min() <= 1
-        assert counts[free].sum() == n_candidates
+        assert counts[free].sum() == n_population
     cells = np.bincount(population.u_lane * N_FINE_LANES + population.v_lane, minlength=N_FINE_LANES**2)
     free_cells = cells.reshape(N_FINE_LANES, N_FINE_LANES)[np.ix_(_FREE_U_LANES, _FREE_V_LANES)]
     assert free_cells.max() - free_cells.min() <= 1
-    assert free_cells.sum() == n_candidates
+    assert free_cells.sum() == n_population
     for values, lanes in ((population.u, population.u_lane), (population.v, population.v_lane)):
         assert np.array_equal(fine_lanes_of(values), lanes)
         assert np.all((values > 0) & (values < 1))
-
-
-def test_draw_rejects_an_empty_population():
-    """A population of fewer than 1 candidate raises a `ValueError`."""
-    # --- act / assert -----------------
-    with pytest.raises(ValueError, match="must be positive"):
-        MCTuplesPopulation.draw(0, _FREE_U_LANES, _FREE_V_LANES, np.random.default_rng(1))
 
 
 def test_randomize_pattern_keeps_every_row_and_column_count():

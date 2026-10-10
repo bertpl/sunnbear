@@ -7,8 +7,8 @@ from max_div.solver import ParallelMaxDivSolution
 
 from sunnbear._core.benchmark.mc_tuples.core import MCTuples, MCTuplesSize
 
-from .allocation import GapAllocation
-from .correction import MeanCorrection
+from .allocation import MCTuplesGapAllocation
+from .correction import MCTuplesMeanCorrection
 
 
 # ==================================================================================================
@@ -33,9 +33,9 @@ class MCTuplesSizeResult:
     size: MCTuplesSize
     t_budget_sec: float
     t_wall_sec: float
-    gap_allocation: GapAllocation
+    gap_allocation: MCTuplesGapAllocation
     uncorrected_tuple_array: np.ndarray
-    mean_correction: MeanCorrection
+    mean_correction: MCTuplesMeanCorrection
     solution: ParallelMaxDivSolution
 
     @property

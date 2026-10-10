@@ -1,8 +1,8 @@
 """`generate_mc_tuples` constructs a nested set of (u, v) tuples and corrects every size's means to 0.5.
 
 The construction builds the sizes bottom-up, the smallest first, and each larger size includes the size below it, so
-every size is a prefix of the next. Each axis is cut into `N_FINE_LANES` fine lanes, and no 2 tuples of the set share
-a fine lane, so the largest size holds exactly 1 tuple per fine lane on each axis.
+every size is a prefix of the next. Each axis is divided into `N_FINE_LANES` equal parts, the fine lanes, and no 2
+tuples of the set share a fine lane.
 
 `MCTuplesGenerator` builds each size in 4 parts, each implemented in the module of this package named in parentheses:
 
@@ -10,7 +10,7 @@ a fine lane, so the largest size holds exactly 1 tuple per fine lane on each axi
    (`population`);
 2. it allocates the new tuples to the gaps that the size below leaves on each axis, so that the size's predicted mean
    lies close to 0.5 (`allocation`);
-3. One max-div solve picks the new tuples from the population (`solve`);
+3. it picks the new tuples from the population in 1 max-div solve (`solve`);
 4. the mean correction moves the new tuples so that the size's mean u and mean v are exactly 0.5
    (`correction`).
 
@@ -26,11 +26,18 @@ import numpy as np
 
 from sunnbear._core.benchmark.mc_tuples.core import MCTuples, MCTuplesSize
 
-from .allocation import GapAllocation
-from .correction import MeanCorrection
+from .allocation import MCTuplesGapAllocation
+from .correction import MCTuplesMeanCorrection
 from .population import MCTuplesPopulation
 from .size_result import MCTuplesSizeResult
 from .solve import MCTuplesSizeSolve, MCTuplesSolveSettings
+
+# `generate_mc_tuples`, `MCTuplesGenerator` and `scripts/generate_mc_tuples.py` take their argument defaults from these
+# constants, so that the 3 cannot drift apart; `generate_mc_tuples` documents each argument.
+DEFAULT_N_WORKERS = 32
+DEFAULT_SEED = 42
+DEFAULT_N_POPULATION = 2**20
+DEFAULT_ALLOCATION_EPSILON = 0.1
 
 
 # ==================================================================================================
@@ -39,16 +46,7 @@ from .solve import MCTuplesSizeSolve, MCTuplesSolveSettings
 class MCTuplesGenerator:
     """`MCTuplesGenerator` builds the nested tuple set size by size, 1 max-div solve per size, and reports every size.
 
-    Attributes:
-        n_workers: The number of max-div workers per solve when the total time is `MIN_T_TOTAL_AT_FULL_SCALE_SEC` or
-            more; more workers search from more seeds, and may exceed the number of cores.
-        seed: The seed of every random draw and of every max-div solve.
-        n_population: The number of candidate tuples in each size's population.
-        allocation_epsilon: The share in [0, 1) by which the allocation of new tuples to the gaps may shrink the
-            smallest distance between neighboring values on an axis, to bring the predicted mean closer to 0.5
-            (`AxisGaps.mean_aware_counts`).
-        on_size_finished: Called with each size's result as soon as the size, its mean correction included, ends;
-            None reports nothing.
+    Each attribute holds the `generate_mc_tuples` argument of the same name, which `generate_mc_tuples` documents.
     """
 
     MIN_T_BUDGET_FRACTION_PER_SOLVE: ClassVar[float] = 0.01
@@ -58,10 +56,10 @@ class MCTuplesGenerator:
     def __init__(
         self,
         *,
-        n_workers: int = 32,
-        seed: int = 42,
-        n_population: int = 2**20,
-        allocation_epsilon: float = 0.1,
+        n_workers: int = DEFAULT_N_WORKERS,
+        seed: int = DEFAULT_SEED,
+        n_population: int = DEFAULT_N_POPULATION,
+        allocation_epsilon: float = DEFAULT_ALLOCATION_EPSILON,
         on_size_finished: Callable[[MCTuplesSizeResult], None] | None = None,
     ) -> None:
         """Set the settings of every construction of this generator.
@@ -98,7 +96,8 @@ class MCTuplesGenerator:
         Raises:
             ValueError: If `t_total_sec` is below `MIN_T_TOTAL_SEC`, or `max_size` is not 1 of `MCTuplesSize`.
             MCTuplesConstructionError: If a size cannot be built within its constraints, which can happen when
-                `t_total_sec` is too short for max-div to meet them.
+                `t_total_sec` is too short for max-div to meet them, or when `n_population` is too small to place
+                the size's new tuples in distinct fine lanes.
         """
         t_budget_per_solve_sec = self.t_budget_per_solve_sec(t_total_sec, max_size)
         settings = MCTuplesSolveSettings(
@@ -159,9 +158,8 @@ class MCTuplesGenerator:
         """
         t_start = time.perf_counter()
         required_tuple_array = required_tuples.tuple_array if required_tuples is not None else np.zeros((0, 2))
-        n_new = size - size.n_required
         population = MCTuplesPopulation.draw_in_free_lanes(self.n_population, required_tuple_array, settings.rng)
-        gap_allocation = GapAllocation.of(required_tuple_array, n_new, self.allocation_epsilon)
+        gap_allocation = MCTuplesGapAllocation.of(required_tuple_array, size.n_new, self.allocation_epsilon)
         solve = MCTuplesSizeSolve(population, required_tuple_array, size, gap_allocation, settings)
         new_tuple_array, solution = solve.run(t_budget_sec)
         uncorrected_tuple_array = np.vstack([required_tuple_array, new_tuple_array])
@@ -171,7 +169,7 @@ class MCTuplesGenerator:
             t_wall_sec=time.perf_counter() - t_start,
             gap_allocation=gap_allocation,
             uncorrected_tuple_array=uncorrected_tuple_array,
-            mean_correction=MeanCorrection.of(uncorrected_tuple_array, size.n_required),
+            mean_correction=MCTuplesMeanCorrection.of(uncorrected_tuple_array, size.n_required),
             solution=solution,
         )
 
@@ -182,11 +180,11 @@ class MCTuplesGenerator:
 def generate_mc_tuples(
     t_total_sec: float,
     *,
-    n_workers: int = 32,
-    seed: int = 42,
+    n_workers: int = DEFAULT_N_WORKERS,
+    seed: int = DEFAULT_SEED,
     max_size: MCTuplesSize = MCTuplesSize.SIZE_1024,
-    n_population: int = 2**20,
-    allocation_epsilon: float = 0.1,
+    n_population: int = DEFAULT_N_POPULATION,
+    allocation_epsilon: float = DEFAULT_ALLOCATION_EPSILON,
     on_size_finished: Callable[[MCTuplesSizeResult], None] | None = None,
 ) -> MCTuples:
     """Construct a nested Monte Carlo (u, v) tuple set up to `max_size` in about `t_total_sec` s.
@@ -238,7 +236,8 @@ def generate_mc_tuples(
         ValueError: If `t_total_sec` is below 1 s, `n_workers` or `n_population` is below 1, `allocation_epsilon`
             lies outside [0, 1), or `max_size` is not 1 of `MCTuplesSize`.
         MCTuplesConstructionError: If a size cannot be built within its constraints, which can happen when
-            `t_total_sec` is too short for max-div to meet them.
+            `t_total_sec` is too short for max-div to meet them, or when `n_population` is too small to place the
+            size's new tuples in distinct fine lanes.
     """
     generator = MCTuplesGenerator(
         n_workers=n_workers,

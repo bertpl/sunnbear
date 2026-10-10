@@ -31,7 +31,12 @@ import numpy as np
 
 from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples import (
+    DEFAULT_ALLOCATION_EPSILON,
+    DEFAULT_N_POPULATION,
+    DEFAULT_N_WORKERS,
+    DEFAULT_SEED,
     N_FINE_LANES,
+    TARGET_MEAN,
     MCTuplesDeclaration,
     MCTuplesSize,
     MCTuplesSizeResult,
@@ -45,8 +50,8 @@ def main() -> None:
     """Generate the tuple set, print each size and its spread, and save the set as the `mc_tuples` artifact."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--t-total-sec", type=float, required=True, help="total wall-clock time of the solves")
-    parser.add_argument("--n-workers", type=int, default=32)
-    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--n-workers", type=int, default=DEFAULT_N_WORKERS)
+    parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     parser.add_argument(
         "--max-size",
         type=int,
@@ -54,11 +59,11 @@ def main() -> None:
         choices=[int(size) for size in MCTuplesSize],
         help="the largest size to build, for a trial run of the smaller sizes",
     )
-    parser.add_argument("--n-population", type=int, default=2**20, help="candidate tuples per size")
+    parser.add_argument("--n-population", type=int, default=DEFAULT_N_POPULATION, help="candidate tuples per size")
     parser.add_argument(
         "--allocation-epsilon",
         type=float,
-        default=0.1,
+        default=DEFAULT_ALLOCATION_EPSILON,
         help=(
             "share by which the allocation of new tuples to the gaps between the size below's values may shrink the "
             "smallest distance between neighboring values on an axis, to bring the predicted mean closer to 0.5"
@@ -89,7 +94,7 @@ def main() -> None:
         size_tuples = tuples.first(size)
         stats = size_tuples.stats()
         scores.append(stats.score)
-        offsets = [(values.mean() - 0.5) * N_FINE_LANES for values in (size_tuples.u, size_tuples.v)]
+        offsets = [(values.mean() - TARGET_MEAN) * N_FINE_LANES for values in (size_tuples.u, size_tuples.v)]
         max_per_lane = max(int(np.bincount(fine_lanes_of(values)).max()) for values in (size_tuples.u, size_tuples.v))
         print(
             f"| {size} | {stats.min_separation_l2_fraction:.1%} / {stats.min_separation_u_fraction:.1%} / "
