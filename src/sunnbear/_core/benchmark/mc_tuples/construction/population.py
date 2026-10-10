@@ -19,7 +19,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, fine_lanes_of
-from sunnbear._core.utils.grid_spread import spread_evenly_over_grid
+from sunnbear._core.utils.spread_over_grid import spread_evenly_over_grid
 
 
 # ==================================================================================================
@@ -68,12 +68,13 @@ class MCTuplesPopulation:
         cls, n_population: int, free_u_lanes: np.ndarray, free_v_lanes: np.ndarray, rng: np.random.Generator
     ) -> "MCTuplesPopulation":
         """Draw `n_population` candidates over the fine cells of `free_u_lanes` x `free_v_lanes`."""
-        cells = np.fromiter(
+        candidate_cells = np.fromiter(
             spread_evenly_over_grid(n_population, free_u_lanes.size, free_v_lanes.size, rng),
             dtype=np.dtype((np.int64, 2)),
             count=n_population,
         )
-        u_lane, v_lane = free_u_lanes[cells[:, 0]].astype(np.int64), free_v_lanes[cells[:, 1]].astype(np.int64)
+        u_lane = free_u_lanes[candidate_cells[:, 0]].astype(np.int64)
+        v_lane = free_v_lanes[candidate_cells[:, 1]].astype(np.int64)
         return cls(
             u=(u_lane + cls._positions_in_lane(u_lane.size, rng)) / N_FINE_LANES,
             v=(v_lane + cls._positions_in_lane(v_lane.size, rng)) / N_FINE_LANES,

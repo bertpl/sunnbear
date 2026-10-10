@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Change how `generate_mc_tuples` draws each size's candidate tuples; for the same arguments, it builds different tuple sets
+- Change the tuple sets that `generate_mc_tuples` builds for the same arguments
 
 ### Deprecated
 
