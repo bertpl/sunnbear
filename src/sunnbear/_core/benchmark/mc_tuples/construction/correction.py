@@ -34,9 +34,10 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .construction_allocation import TARGET_MEAN
+from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, fine_lanes_of
+
+from .allocation import TARGET_MEAN
 from .exceptions import MCTuplesConstructionError
-from .sizes import N_FINE_LANES, fine_lanes_of
 
 FINE_LANE_WIDTH = 1 / N_FINE_LANES
 

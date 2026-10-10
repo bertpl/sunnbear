@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import MCTuples, MCTuplesStats
-from sunnbear._core.benchmark.mc_tuples.tuples import GPQ_LEVEL
+from sunnbear._core.benchmark.mc_tuples.core import GPQ_LEVEL
 from sunnbear._core.stats import gpq
 
 # The diagonal set has 8 tuples, evenly spaced on each axis: u rises and v falls, so neighbors are diagonal at L2

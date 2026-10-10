@@ -16,7 +16,7 @@ from sunnbear._core.benchmark.mc_tuples import (
     fine_lanes_of,
     generate_mc_tuples,
 )
-from sunnbear._core.benchmark.mc_tuples.construction_solve import MCTuplesSizeSolve
+from sunnbear._core.benchmark.mc_tuples.construction.solve import MCTuplesSizeSolve
 
 
 def _spread_each_gap_s_new_tuples(self: MCTuplesSizeSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:

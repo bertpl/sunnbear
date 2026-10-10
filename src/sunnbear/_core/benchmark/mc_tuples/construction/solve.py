@@ -31,13 +31,12 @@ from max_div.solver import (
 )
 from scipy.optimize import linear_sum_assignment
 
+from sunnbear._core.benchmark.mc_tuples.core import GPQ_LEVEL, MCTuplesSize
 from sunnbear._core.utils.grouping import group_indices_by_id
 
-from .construction_allocation import GapAllocation
-from .construction_population import MCTuplesPopulation
+from .allocation import GapAllocation
 from .exceptions import MCTuplesConstructionError
-from .sizes import MCTuplesSize
-from .tuples import GPQ_LEVEL
+from .population import MCTuplesPopulation
 
 # The constraint that keeps the tuples of the size below outweighs the other constraints, so max-div meets it first.
 INCLUSION_CONSTRAINT_WEIGHT = 10.0

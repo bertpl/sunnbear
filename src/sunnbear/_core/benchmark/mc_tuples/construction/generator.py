@@ -4,17 +4,17 @@ The construction builds the sizes bottom-up, the smallest first, and each larger
 every size is a prefix of the next. Each axis is cut into `N_FINE_LANES` fine lanes, and no 2 tuples of the set share
 a fine lane, so the largest size holds exactly 1 tuple per fine lane on each axis.
 
-`MCTuplesGenerator` builds each size in 4 parts:
+`MCTuplesGenerator` builds each size in 4 parts, each implemented in the module of this package named in parentheses:
 
 1. it draws the size's population of candidate tuples over the fine lanes that the size below leaves free
-   (`construction_population`);
+   (`population`);
 2. it allocates the new tuples to the gaps that the size below leaves on each axis, so that the size's predicted mean
-   lies close to 0.5 (`construction_allocation`);
-3. One max-div solve picks the new tuples from the population (`construction_solve`);
+   lies close to 0.5 (`allocation`);
+3. One max-div solve picks the new tuples from the population (`solve`);
 4. the mean correction moves the new tuples so that the size's mean u and mean v are exactly 0.5
-   (`construction_correction`).
+   (`correction`).
 
-`MCTuplesGenerator` passes each size's result (`construction_result`) to the caller's `on_size_finished`, so that a
+`MCTuplesGenerator` passes each size's result, an `MCTuplesSizeResult`, to the caller's `on_size_finished`, so that a
 long construction can show its progress and store its tuples and max-div's solutions as it goes.
 """
 
@@ -24,13 +24,13 @@ from typing import ClassVar
 
 import numpy as np
 
-from .construction_allocation import GapAllocation
-from .construction_correction import MeanCorrection
-from .construction_population import MCTuplesPopulation
-from .construction_result import MCTuplesSizeResult
-from .construction_solve import MCTuplesSizeSolve, MCTuplesSolveSettings
-from .sizes import MCTuplesSize
-from .tuples import MCTuples
+from sunnbear._core.benchmark.mc_tuples.core import MCTuples, MCTuplesSize
+
+from .allocation import GapAllocation
+from .correction import MeanCorrection
+from .population import MCTuplesPopulation
+from .size_result import MCTuplesSizeResult
+from .solve import MCTuplesSizeSolve, MCTuplesSolveSettings
 
 
 # ==================================================================================================
