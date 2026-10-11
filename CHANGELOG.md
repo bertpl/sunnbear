@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Breaking:** Stop `AndersonBjorck` by the stopping rule of its paper, which changes its root estimates and benchmark results, and makes it a subclass of `Solver`, not of `BracketingSolver`
+- **Breaking:** Stop `AndersonBjorck` by the stopping rule of its paper, which changes its root estimates and benchmark results, and make `AndersonBjorck` a subclass of `Solver`, not of `BracketingSolver`
 - Compute the steps of `Illinois`, `Pegasus` and `AndersonBjorck` as their papers state them, which changes their benchmark results
 
 ### Deprecated

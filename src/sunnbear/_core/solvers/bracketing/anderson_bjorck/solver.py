@@ -41,7 +41,9 @@ class AndersonBjorck(Solver):
       the slope of the chord that produced the new iterate. In exact arithmetic, the ratio equals
       ``1 - f_new / f_previous``.
 
-    `AndersonBjorck` stops as the ALGOL procedure does, with the procedure's tolerance ``delta`` set to ``xtol``:
+    As for the chord's zero and the factor, `AndersonBjorck` follows its paper in its stopping rule, so that the
+    benchmark measures the method as published. It stops as the ALGOL procedure does, with the procedure's tolerance
+    ``delta`` set to ``xtol``:
 
     - **when it stops:** once the interval is at most ``xtol`` wide, or the function value at the most recent iterate
       is 0;
@@ -49,8 +51,8 @@ class AndersonBjorck(Solver):
       with the retained bound's scaled ``|f0|``, as the procedure does. The returned bound lies within ``xtol`` of a
       root.
 
-    `Illinois` and `Pegasus` stop by the criterion of `BracketingSolver` instead, so the benchmark compares the 3
-    methods under different stopping rules.
+    `Illinois` and `Pegasus` stop by the criterion of `BracketingSolver` instead, so in the benchmark `AndersonBjorck`
+    uses a different stopping rule from the other 2 methods.
 
     Where the ALGOL procedure tests whether a new iterate ``x2`` lies on the other side of the root by
     ``f2 * f1 <= 0``, with ``f2`` the function value at ``x2``, `AndersonBjorck` compares the signs of ``f2`` and
@@ -60,9 +62,10 @@ class AndersonBjorck(Solver):
     ``delta`` of the most recent iterate, the procedure moves the chord's zero to exactly ``delta`` from that iterate,
     toward the retained bound.
 
-    In float64, that step can make the procedure alternate between 2 x-values forever: once the interval is ``delta``
-    wide in exact arithmetic, its computed width ``|x1 - x0|`` can round to just above ``delta``, so the procedure does
-    not stop, and each step of delta lands exactly on the retained bound.
+    `AndersonBjorck` leaves the step out because, in float64, it can make the procedure alternate forever between the
+    2 bounds: once the interval is ``delta`` wide in exact arithmetic, its computed width ``|x1 - x0|`` can round to
+    just above ``delta``, so the procedure does not stop; each step of delta then moves ``delta`` from the most recent
+    iterate toward the retained bound, and so lands exactly on the retained bound.
 
     Without the step of delta, the chord's zero can round onto the most recent iterate, once that iterate lies within
     rounding error of the root while the retained bound is still far from it.
@@ -124,8 +127,7 @@ class AndersonBjorck(Solver):
             state.x_best = x2
 
             # --- update the retained bound ------
-            # The ALGOL procedure tests f2 * f1 <= 0; comparing the signs gives the same result, without a product
-            # that can underflow to 0.
+            # The ALGOL procedure tests f2 * f1 <= 0; the class docstring says why the signs are compared instead.
             if f2 == 0.0 or (f2 < 0.0) != (f1 < 0.0):
                 # x2 lies on the other side of the root, so x1 becomes the retained bound, with its unscaled function
                 # value f1.
