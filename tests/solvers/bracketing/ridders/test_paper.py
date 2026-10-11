@@ -68,11 +68,11 @@ def test_the_first_iteration_reproduces_the_example_of_the_paper(variant):
     ],
 )
 def test_the_iterates_of_section_iii_of_the_paper_are_reproduced(variant, f, a, b, printed_iterates):
-    """On each run in Section III of the paper, the iterates ``x3`` match every iterate that the paper prints, to the
-    printed digits.
+    """On each run in Section III of the paper, the new points ``x3`` that each iteration computes from its interval
+    and that interval's midpoint match every iterate that the paper prints, to the printed digits.
 
-    The paper truncates an iterate that it prints with a trailing "...", and rounds an iterate that it prints without
-    one; the test truncates or rounds each computed iterate to match.
+    The paper truncates a printed iterate that ends in "...", and rounds a printed iterate that does not; the test
+    truncates or rounds each computed iterate to match.
 
     The paper states no stopping rule, so the test compares only the iterates that the paper prints. The tight
     ``xtol`` and large ``max_fevals`` keep every variant running past the last printed iterate.
@@ -87,8 +87,8 @@ def test_the_iterates_of_section_iii_of_the_paper_are_reproduced(variant, f, a, 
     # After the 2 interval bounds, each iteration evaluates its midpoint and then its iterate x3.
     iterates = result.evaluated_x_values[3::2][: len(printed_iterates)]
     assert len(iterates) == len(printed_iterates)
-    for x3, printed in zip(iterates, printed_iterates, strict=True):
-        is_truncated = printed.endswith("...")
-        printed_value = Decimal(printed.removesuffix("..."))
+    for x3, printed_iterate in zip(iterates, printed_iterates, strict=True):
+        is_truncated = printed_iterate.endswith("...")
+        printed_value = Decimal(printed_iterate.removesuffix("..."))
         rounding = ROUND_DOWN if is_truncated else ROUND_HALF_EVEN
-        assert Decimal(x3).quantize(printed_value, rounding=rounding) == printed_value, printed
+        assert Decimal(x3).quantize(printed_value, rounding=rounding) == printed_value, printed_iterate
