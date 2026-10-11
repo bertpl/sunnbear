@@ -10,9 +10,13 @@ Published results:
     compute ``f(x)`` that accurately, so only an iterate with ``f(x) == 0`` meets that test, and the iteration counts
     cannot be compared.
   - Problem 4 computes its function with a Gauss-Hermite rule whose number of points the paper does not state.
+
+Third-party published results:
+
 - Anderson and Björck (1973), Examples 1 to 7, the Pegasus columns: not reproduced; the test package of
   `AndersonBjorck` gives the reasons.
-- Ford (1997), Table 4: not compared.
+- Ford (1997), Table 4: reproduced, in ``test_third_party.py``: 12 of the 15 iteration counts exactly, and the
+  other 3 within 1; the test data states why each of the 3 deviates.
 
 Reference implementations:
 

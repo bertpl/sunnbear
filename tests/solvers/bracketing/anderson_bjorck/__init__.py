@@ -7,7 +7,11 @@ Published results:
   exactly ``delta`` from it. `AndersonBjorck` leaves these steps out, as its class docstring explains.
 - Anderson and Björck (1973), the double-precision totals on p. 263: not reproduced, because those runs take steps
   of delta too.
-- Ford (1997), Table 4: not compared.
+
+Third-party published results:
+
+- Ford (1997), Table 4: reproduced, in ``test_third_party.py``: all 15 iteration counts, including the 4 that
+  Ford prints as more than 200.
 
 Reference implementations:
 

@@ -6,6 +6,10 @@ Published results:
 - Ridders (1979), Section III: reproduced, in ``test_paper.py``: every printed iterate of the 5 runs, by every
   variant.
 
+Third-party published results:
+
+- None.
+
 Reference implementations:
 
 - SciPy's ``scipy.optimize.ridder``: compared in ``test_twin.py``, for every variant.

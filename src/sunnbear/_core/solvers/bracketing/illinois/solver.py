@@ -33,7 +33,7 @@ class Illinois(BracketingSolver[IllinoisState]):
           errors in the paper's Table 1. https://doi.org/10.1007/BF01934364
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. The paper's equation 5, with ``gamma = 0.5`` from the paper's Table 1, is the
-          Illinois step.
+          Illinois step, and the test suite reproduces the paper's Table 4.
         - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="illinois"``; the test suite checks
           `Illinois` against mpmath's ``Illinois``.
     """

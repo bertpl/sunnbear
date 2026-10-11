@@ -10,6 +10,10 @@ Published results:
 - Alefeld, Potra and Shi (1995), Tables IV to VI: reproduced, in ``test_paper.py``: 28 of the 34 evaluation counts
   exactly; the test data states why each of the other 6 deviates.
 
+Third-party published results:
+
+- None.
+
 Reference implementations:
 
 - None: SciPy's ``scipy.optimize.toms748`` keeps no margin from the interval bounds, and uses its own fallbacks and
