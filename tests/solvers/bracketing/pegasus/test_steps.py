@@ -21,7 +21,8 @@ def test_a_linear_function_is_solved_in_one_step(f):
 
 def test_the_first_2_steps_are_regula_falsi_and_later_steps_scale_the_retained_f():
     """On the convex cubic, Pegasus starts as regula falsi, then scales the value of the bound that it keeps again,
-    each time by the factor ``f_previous / (f_previous + f_new)`` of the 2 most recent iterates."""
+    each time by the factor ``f_previous / (f_previous + f_new)`` of the 2 most recent iterates, multiplying by
+    ``f_previous`` before dividing, as the paper does."""
     # --- arrange ----------------------
     a, b = 1.0, 2.0
     fa, fb = cubic(a), cubic(b)
@@ -37,9 +38,9 @@ def test_the_first_2_steps_are_regula_falsi_and_later_steps_scale_the_retained_f
     assert x2 == (x1 * fb - b * f1) / (fb - f1)
     # f2 < 0 too, so x2 replaced x1 and the upper bound is kept a second time: its value is scaled.
     assert f2 < 0.0
-    scaled_fb = (f1 / (f1 + f2)) * fb
+    scaled_fb = fb * f1 / (f1 + f2)
     assert x3 == (x2 * scaled_fb - b * f2) / (scaled_fb - f2)
     # f3 < 0 too: the scaled value is scaled again, by the factor of x2 and x3.
     assert f3 < 0.0
-    scaled_fb = (f2 / (f2 + f3)) * scaled_fb
+    scaled_fb = scaled_fb * f2 / (f2 + f3)
     assert x4 == (x3 * scaled_fb - b * f3) / (scaled_fb - f3)

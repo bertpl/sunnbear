@@ -22,6 +22,9 @@ class Pegasus(BracketingSolver[PegasusState]):
     whenever the factor applies, so the factor lies between 0 and 1: it is 0.5 when both have the same size, and
     closer to 1 the more the new iterate reduced ``|f|``.
 
+    `Pegasus` scales in the order of section 2 of Dowell and Jarratt (1972): it multiplies the retained bound's value
+    by ``f_previous`` first, then divides by ``f_previous + f_new``.
+
     Each new iterate replaces 1 bound, and the other bound is the retained bound:
 
     - when a new iterate lies on the same side of the root as the previous iterate, the retained bound's function
@@ -32,8 +35,10 @@ class Pegasus(BracketingSolver[PegasusState]):
       unscaled function value.
 
     Dowell and Jarratt (1972) state the Pegasus step with regula falsi's chord formula, as Ford (1997) does, so the
-    Pegasus method differs from `RegulaFalsi` only in its function value at the retained bound, and from `Illinois`
-    only in the factor.
+    Pegasus method differs from regula falsi only in its function value at the retained bound, and from the Illinois
+    method only in the factor.
+
+    `Illinois` computes the same zero of the chord, in the form of Dowell and Jarratt (1971).
 
     References:
         - Dowell, M. and Jarratt, P. (1972). The "Pegasus" method for computing the root of an equation. BIT 12(4),
@@ -48,7 +53,7 @@ class Pegasus(BracketingSolver[PegasusState]):
     """
 
     name = "pegasus"
-    version = 1
+    version = 2
     state_cls = PegasusState
 
     def _next_x(self, state: PegasusState, interval: Interval) -> float:
@@ -68,8 +73,9 @@ class Pegasus(BracketingSolver[PegasusState]):
             if replaced_bound is state.newest_bound:
                 # The new iterate replaced the previous iterate, so the retained bound was kept once more.
                 previous_iterate_f = state.newest_f
-                scaling_factor = previous_iterate_f / (previous_iterate_f + new_iterate_f)
-                state.scaled_retained_f = scaling_factor * state.scaled_retained_f
+                state.scaled_retained_f = (
+                    state.scaled_retained_f * previous_iterate_f / (previous_iterate_f + new_iterate_f)
+                )
             else:
                 # The new iterate replaced the retained bound, so the previous iterate is the retained bound now.
                 state.scaled_retained_f = state.newest_f

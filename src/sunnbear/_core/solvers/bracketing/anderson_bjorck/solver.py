@@ -33,12 +33,15 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, with its
       unscaled function value.
 
-    The factor is the ratio of 2 chord slopes: the slope from the previous to the new iterate, divided by the slope of
-    the chord that produced the new iterate.
+    `AndersonBjorck` computes the chord's zero and the factor as the paper's ALGOL procedure does:
 
-    The paper and Ford (1997) write the factor as this ratio of slopes. In exact arithmetic, the ratio equals
-    ``1 - f_new / f_previous``, and `AndersonBjorck` computes the factor as ``1 - f_new / f_previous``, as mpmath's
-    implementation does.
+    - **the chord's zero:** ``x1 - f1 / w1``, a step from the most recent iterate ``x1``, where ``w1 = (f1 - f0) /
+      (x1 - x0)`` is the slope of the chord through ``(x1, f1)`` and ``(x0, f0)``, with ``x0`` the retained bound and
+      ``f0`` its scaled value. In exact arithmetic, this is the x-value of the chord formula that `RegulaFalsi`
+      computes;
+    - **the factor:** the ratio of 2 chord slopes, the slope from the previous to the new iterate divided by ``w1``,
+      the slope of the chord that produced the new iterate. In exact arithmetic, the ratio equals
+      ``1 - f_new / f_previous``.
 
     The paper's algorithm adds 2 parts that `AndersonBjorck` leaves out, as mpmath does:
 
@@ -47,12 +50,15 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
     - **its stopping criterion:** the paper stops once the interval is narrower than ``delta``, and returns the bound
       with the smaller ``|f|``.
 
-    `AndersonBjorck` stops by the criterion of `BracketingSolver`, as `Illinois` and `Pegasus` do, so that the 3
-    methods differ only in the factor.
+    Without the step of delta, the chord's zero can round onto the most recent iterate, once that iterate lies within
+    rounding error of the root while the retained bound is still far from it.
 
-    Ford (1997) states the Anderson-Björck step with regula falsi's chord formula, so the Anderson-Björck method
-    differs from `RegulaFalsi` only in its function value at the retained bound, and from `Illinois` and `Pegasus`
-    only in the factor.
+    When the chord's zero rounds onto the most recent iterate, the new iterate equals the previous one in both x and f,
+    so the slope between them is ``0 / 0``. `AndersonBjorck` then takes the factor 0.5: in IEEE arithmetic, ``0 / 0``
+    is NaN, which fails the ALGOL procedure's test that the factor is positive, so the procedure takes 0.5 there too.
+
+    `AndersonBjorck` stops by the criterion of `BracketingSolver`, as `Illinois` and `Pegasus` do, so that the
+    benchmark compares the 3 methods under the same stopping criterion.
 
     On a function that is nearly flat on 1 side of the root, over a large interval, the method can make very slow
     progress, and can need more than 200 iterations.
@@ -64,7 +70,8 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
     References:
         - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of an
           equation. BIT 13(3), 253-264. Its equation 7 is the factor, its section 3 the fallback to 0.5, and its
-          section 6 the ALGOL procedure with the step of delta. https://doi.org/10.1007/BF01951936
+          section 6 gives the ALGOL procedure, which holds the step of delta and the forms of the chord's zero and of
+          the factor that `AndersonBjorck` computes. https://doi.org/10.1007/BF01951936
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. The paper covers the Anderson-Björck method in 3 places:
 
@@ -77,7 +84,7 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
     """
 
     name = "anderson_bjorck"
-    version = 1
+    version = 2
     state_cls = AndersonBjorckState
 
     def _next_x(self, state: AndersonBjorckState, interval: Interval) -> float:
@@ -88,29 +95,39 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
         exactly 1 new evaluation happened since the previous call.
         """
         # --- update the retained bound's value --
-        # Until the update below, state.newest_bound and state.newest_f still describe the previous iterate.
+        # Until the update below, the state's newest_* fields still describe the previous iterate.
         replaced_bound = interval.last_replaced_bound
         if replaced_bound is None:
             pass  # This is the first iteration: no bound has been kept again yet, so no value is scaled.
         else:
-            new_iterate_f = interval.fa if replaced_bound is IntervalBound.LOWER else interval.fb
+            if replaced_bound is IntervalBound.LOWER:
+                new_iterate_x, new_iterate_f = interval.a, interval.fa
+            else:
+                new_iterate_x, new_iterate_f = interval.b, interval.fb
             if replaced_bound is state.newest_bound:
-                # The new iterate replaced the previous iterate, so the retained bound was kept once more.
-                previous_iterate_f = state.newest_f
-                scaling_factor = 1.0 - new_iterate_f / previous_iterate_f
-                if scaling_factor <= 0.0:
-                    # The new iterate did not reduce |f|, so the Illinois method's factor replaces this one.
+                # The new iterate replaced the previous iterate, so the retained bound was kept once more. The ALGOL
+                # procedure's factor g1 is w2 / w1, where:
+                # - w2 is slope_between_iterates below, the slope from the previous to the new iterate;
+                # - w1 is state.chord_slope, the slope of the chord that produced the new iterate.
+                if new_iterate_x == state.newest_x:
+                    # The step rounded onto the previous iterate, so w2 is 0 / 0, as the class docstring says.
                     scaling_factor = 0.5
+                else:
+                    slope_between_iterates = (new_iterate_f - state.newest_f) / (new_iterate_x - state.newest_x)
+                    scaling_factor = slope_between_iterates / state.chord_slope
+                    if scaling_factor <= 0.0:
+                        # The new iterate did not reduce |f|, so the Illinois method's factor replaces this one.
+                        scaling_factor = 0.5
                 state.scaled_retained_f = scaling_factor * state.scaled_retained_f
             else:
                 # The new iterate replaced the retained bound, so the previous iterate is the retained bound now.
                 state.scaled_retained_f = state.newest_f
                 state.newest_bound = replaced_bound
-            state.newest_f = new_iterate_f
+            state.newest_x, state.newest_f = new_iterate_x, new_iterate_f
 
-        # --- regula falsi's chord ---------------
-        if state.newest_bound is IntervalBound.UPPER:
-            fa, fb = state.scaled_retained_f, interval.fb
-        else:
-            fa, fb = interval.fa, state.scaled_retained_f
-        return (interval.a * fb - interval.b * fa) / (fb - fa)
+        # --- the paper's step -------------------
+        # The ALGOL procedure's w1, stored as state.chord_slope, is the slope of the chord through the most recent
+        # iterate and the retained bound.
+        retained_x = interval.a if state.newest_bound is IntervalBound.UPPER else interval.b
+        state.chord_slope = (state.newest_f - state.scaled_retained_f) / (state.newest_x - retained_x)
+        return state.newest_x - state.newest_f / state.chord_slope
