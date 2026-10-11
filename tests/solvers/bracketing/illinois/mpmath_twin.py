@@ -14,10 +14,10 @@ class IllinoisMpmathTwin(TwinSolver):
     deviates from exact agreement in these declared ways:
 
     - mpmath evaluates both interval bounds again before its first iterate;
-    - mpmath computes the chord's zero as ``a - fa / ((fb - fa) / (b - a))``, a step from its ``a``, the bound that
-      does not hold the most recent iterate, where `Illinois` steps from the most recent iterate,
-      ``x1 - f1 * (x1 - x0) / (f1 - f0)``, with ``x0`` the retained bound at its halved value ``f0``, so the
-      iterates can differ in their last bits.
+    - mpmath computes the chord's zero as ``a - fa / ((fb - fa) / (b - a))``, a step from mpmath's ``a``, which is
+      the bound that does not hold the most recent iterate, where `Illinois` steps from the most recent iterate,
+      ``x1 - f1 * (x1 - x0) / (f1 - f0)``, with ``x0`` the retained bound and ``f0`` its function value after any
+      halving, so the iterates can differ in their last bits.
     """
 
     name = "illinois_mpmath_twin"

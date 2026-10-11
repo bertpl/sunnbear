@@ -19,8 +19,8 @@ def test_a_linear_function_is_solved_in_one_step(f):
     """On a straight line, the first chord lands on the root, so `AndersonBjorck` converges after the 2 bound
     evaluations and 1 iterate.
 
-    The root 0.25 is a power of 2, so the paper's step computes it without rounding; a root such as 0.3 comes out 1
-    ulp off.
+    The root 0.25 is a power of 2, so the paper's step computes it without rounding, and the test can compare the
+    result exactly.
     """
     # --- act --------------------------
     result = AndersonBjorck().solve(f, 0.0, 1.0, xtol=1e-12, max_fevals=10)
@@ -32,7 +32,10 @@ def test_a_linear_function_is_solved_in_one_step(f):
 def test_the_first_2_steps_are_regula_falsi_and_the_third_scales_the_retained_f():
     """On `cubic`, `AndersonBjorck` starts as regula falsi, scales the value of an interval bound by the ratio of 2
     chord slopes once it has kept that bound for 2 steps in a row, and drops that scaling once an iterate replaces
-    the scaled bound; each step and each factor take the form of the paper's ALGOL procedure."""
+    the scaled bound.
+
+    Each step and each factor take the form of the paper's ALGOL procedure.
+    """
     # --- arrange ----------------------
     a, b = 1.0, 2.0
     fa, fb = cubic(a), cubic(b)
@@ -83,6 +86,7 @@ def test_the_factor_falls_back_to_0_5_when_an_iterate_does_not_reduce_abs_f():
     # the chord's, so the factor is negative.
     assert f1 > fb > 0.0
     assert x2 == x1 - f1 / ((f1 - 0.5 * fa) / (x1 - a))
-    # f2 > f1 > 0, so the factor is negative too, and the retained value is halved again.
+    # f2 > f1 > 0, so the factor, which equals 1 - f2 / f1 in exact arithmetic, is negative too, and the retained
+    # value is halved again.
     assert f2 > f1
     assert x3 == x2 - f2 / ((f2 - 0.25 * fa) / (x2 - a))

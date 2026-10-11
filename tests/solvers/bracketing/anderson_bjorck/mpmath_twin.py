@@ -16,8 +16,8 @@ class AndersonBjorckMpmathTwin(TwinSolver):
     twin deviates from exact agreement in these declared ways:
 
     - mpmath evaluates both interval bounds again before its first iterate;
-    - mpmath computes the chord's zero as ``a - fa / ((fb - fa) / (b - a))``, a step from its ``a``, the bound that
-      does not hold the most recent iterate, where `AndersonBjorck` steps from the most recent iterate,
+    - mpmath computes the chord's zero as ``a - fa / ((fb - fa) / (b - a))``, a step from mpmath's ``a``, which is
+      the bound that does not hold the most recent iterate, where `AndersonBjorck` steps from the most recent iterate,
       ``x1 - f1 / w1``, with ``w1`` the slope of the chord through ``x1`` and the retained bound, so the iterates
       can differ in their last bits;
     - mpmath computes the factor as ``1 - f_new / f_previous``, where `AndersonBjorck` computes the ratio of 2 chord

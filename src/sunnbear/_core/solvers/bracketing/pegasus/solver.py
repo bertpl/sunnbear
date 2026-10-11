@@ -20,9 +20,10 @@ class Pegasus(BracketingSolver[PegasusState]):
 
     ``f_previous`` and ``f_new`` are the function values at the previous and the new iterate. They have the same sign
     whenever the factor applies, so the factor lies between 0 and 1: it is 0.5 when both have the same size, and
-    closer to 1 the more the new iterate reduced ``|f|``. `Pegasus` scales in the order of section 2 of Dowell and
-    Jarratt (1972): it multiplies the retained bound's value by ``f_previous`` first, then divides by
-    ``f_previous + f_new``.
+    closer to 1 the more the new iterate reduced ``|f|``.
+
+    `Pegasus` scales in the order of section 2 of Dowell and Jarratt (1972): it multiplies the retained bound's value
+    by ``f_previous`` first, then divides by ``f_previous + f_new``.
 
     Each new iterate replaces 1 bound, and the other bound is the retained bound:
 
@@ -35,8 +36,9 @@ class Pegasus(BracketingSolver[PegasusState]):
 
     Dowell and Jarratt (1972) state the Pegasus step with regula falsi's chord formula, as Ford (1997) does, so the
     Pegasus method differs from regula falsi only in its function value at the retained bound, and from the Illinois
-    method only in the factor. `Illinois` computes the same zero of the chord, in the form that Dowell and Jarratt
-    (1971) use.
+    method only in the factor.
+
+    `Illinois` computes the same zero of the chord, in the form of Dowell and Jarratt (1971).
 
     References:
         - Dowell, M. and Jarratt, P. (1972). The "Pegasus" method for computing the root of an equation. BIT 12(4),

@@ -35,10 +35,10 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
 
     `AndersonBjorck` computes the chord's zero and the factor as the paper's ALGOL procedure does:
 
-    - **the chord's zero:** a step from the most recent iterate ``x1``, ``x1 - f1 / w1``, where ``w1 = (f1 - f0) /
+    - **the chord's zero:** ``x1 - f1 / w1``, a step from the most recent iterate ``x1``, where ``w1 = (f1 - f0) /
       (x1 - x0)`` is the slope of the chord through ``(x1, f1)`` and ``(x0, f0)``, with ``x0`` the retained bound and
-      ``f0`` its scaled value. In exact arithmetic, this is the x-value of regula falsi's chord formula, which
-      `RegulaFalsi` computes as ``(a * fb - b * fa) / (fb - fa)``;
+      ``f0`` its scaled value. In exact arithmetic, this is the x-value of the chord formula that `RegulaFalsi`
+      computes;
     - **the factor:** the ratio of 2 chord slopes, the slope from the previous to the new iterate divided by ``w1``,
       the slope of the chord that produced the new iterate. In exact arithmetic, the ratio equals
       ``1 - f_new / f_previous``.
@@ -53,9 +53,9 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
     Without the step of delta, the chord's zero can round onto the most recent iterate, once that iterate lies within
     rounding error of the root while the retained bound is still far from it.
 
-    The slope from the previous to the new iterate is then ``0 / 0``, and `AndersonBjorck` takes the factor 0.5: in
-    IEEE arithmetic, ``0 / 0`` is NaN, which fails the ALGOL procedure's test that the factor is positive, so the
-    procedure takes 0.5 there too.
+    When the chord's zero rounds onto the most recent iterate, the new iterate equals the previous one in both x and f,
+    so the slope between them is ``0 / 0``. `AndersonBjorck` then takes the factor 0.5: in IEEE arithmetic, ``0 / 0``
+    is NaN, which fails the ALGOL procedure's test that the factor is positive, so the procedure takes 0.5 there too.
 
     `AndersonBjorck` stops by the criterion of `BracketingSolver`, as `Illinois` and `Pegasus` do, so that the
     benchmark compares the 3 methods under the same stopping criterion.
@@ -106,9 +106,9 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
                 new_iterate_x, new_iterate_f = interval.b, interval.fb
             if replaced_bound is state.newest_bound:
                 # The new iterate replaced the previous iterate, so the retained bound was kept once more. The ALGOL
-                # procedure's factor g1 is w2 / w1: its w2 is slope_between_iterates below, the slope from the previous
-                # to the new iterate, and its w1 is state.chord_slope, the slope of the chord that produced the new
-                # iterate.
+                # procedure's factor g1 is w2 / w1, where:
+                # - w2 is slope_between_iterates below, the slope from the previous to the new iterate;
+                # - w1 is state.chord_slope, the slope of the chord that produced the new iterate.
                 if new_iterate_x == state.newest_x:
                     # The step rounded onto the previous iterate, so w2 is 0 / 0, as the class docstring says.
                     scaling_factor = 0.5

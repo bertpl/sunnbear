@@ -20,15 +20,16 @@ class Illinois(BracketingSolver[IllinoisState]):
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, at its own
       function value.
 
-    `Illinois` computes the chord's zero as the paper does, as a correction to the most recent iterate:
-    ``x1 - f1 * (x1 - x0) / (f1 - f0)``, with ``x1`` the most recent iterate and ``x0`` the retained bound, at its
-    halved value ``f0``. In exact arithmetic, this is the x-value of regula falsi's chord formula, which `RegulaFalsi`
-    computes as ``(a * fb - b * fa) / (fb - fa)``.
+    `Illinois` computes the chord's zero as Dowell and Jarratt (1971) do, as a correction to the most recent iterate:
+    ``x1 - f1 * (x1 - x0) / (f1 - f0)``, with ``x1`` the most recent iterate, ``x0`` the retained bound, and ``f0``
+    the function value that `Illinois` uses at ``x0``, halved once for each iteration that kept ``x0`` again.
+
+    In exact arithmetic, this is the x-value of the chord formula that `RegulaFalsi` computes.
 
     References:
         - Dowell, M. and Jarratt, P. (1971). A modified regula falsi method for computing the root of an
-          equation. BIT 11(2), 168-174. The paper's equation 2 and its ALGOL procedure give the step formula in the
-          form that `Illinois` computes, and the ALGOL procedure also gives the halving. The test suite reproduces the
+          equation. BIT 11(2), 168-174. The paper's equation 2 and its ALGOL procedure give the step formula as
+          `Illinois` computes it, and the ALGOL procedure also gives the halving. The test suite reproduces the
           errors in the paper's Table 1. https://doi.org/10.1007/BF01934364
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. The paper's equation 5, with ``gamma = 0.5`` from the paper's Table 1, is the

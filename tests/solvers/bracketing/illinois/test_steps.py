@@ -13,8 +13,8 @@ def test_a_linear_function_is_solved_in_one_step(f):
     """On a straight line, the first chord lands on the root, so `Illinois` converges after 3 evaluations without
     halving any value.
 
-    The root 0.25 is a power of 2, so the paper's step computes it without rounding; a root such as 0.3 comes out 1
-    ulp off.
+    The root 0.25 is a power of 2, so the paper's step computes it without rounding, and the test can compare the
+    result exactly.
     """
     # --- act --------------------------
     result = Illinois().solve(f, 0.0, 1.0, xtol=1e-12, max_fevals=10)
