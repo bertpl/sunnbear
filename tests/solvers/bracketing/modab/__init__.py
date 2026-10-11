@@ -9,6 +9,10 @@ Published results:
 - Ganchovski and Traykov (2023), Table 2: not reproduced, because it describes an earlier version of the method,
   which `ModAB` does not implement.
 
+Third-party published results:
+
+- None.
+
 Reference implementations:
 
 - None: pymodab wraps the authors' compiled library, whose only Linux build is for x86-64, and the tests run on

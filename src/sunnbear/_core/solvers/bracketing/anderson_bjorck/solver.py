@@ -92,7 +92,7 @@ class AndersonBjorck(Solver):
           - its equation 5, with ``gamma = f[x_(i+1), x_i] / f[x_i, x_(i-1)]`` from its Table 1, is the Anderson-Björck
             step;
           - the paper gives ``gamma = 0.5`` as the fallback factor;
-          - its Table 4 shows the slow progress on large intervals.
+          - its Table 4 shows the slow progress on large intervals; the test suite reproduces that table.
         - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="anderson"``; the test suite checks
           `AndersonBjorck` against it.
     """

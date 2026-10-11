@@ -10,6 +10,10 @@ Published results:
   ``zero``.
 - Brent (1973), Table 4.2: not reproduced, because the book does not state its intervals.
 
+Third-party published results:
+
+- None.
+
 Reference implementations:
 
 - SciPy's ``scipy.optimize.brentq``: compared in ``test_twin.py``.

@@ -2,6 +2,10 @@
 
 Published results:
 
+- None: regula falsi is a classical method with no paper of its own.
+
+Third-party published results:
+
 - Ford (1997) and Numerical Recipes (2007), section 9.2: no numerical results for the unmodified method.
 - Dowell and Jarratt (1971), Tables 2 to 7, the Regula Falsi columns: not reproduced; the test package of
   `Illinois` gives the reason.

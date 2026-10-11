@@ -11,6 +11,10 @@ Published results:
   arithmetic.
 - ``n_slack = 4``: no published results.
 
+Third-party published results:
+
+- None.
+
 Reference implementations:
 
 - None: neither SciPy nor mpmath implements ITP.
