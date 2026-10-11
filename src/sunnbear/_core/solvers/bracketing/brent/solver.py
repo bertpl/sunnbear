@@ -48,6 +48,17 @@ class Brent(Solver):
         - Brent, R. P. (1973). Algorithms for Minimization without Derivatives, chapter 4. Prentice-Hall. The test
           suite reproduces the rows of its Table 4.1 whose functions do not underflow near the root.
         - SciPy's ``scipy.optimize.brentq``; the test suite checks `Brent` against ``scipy.optimize.brentq``.
+        - Third parties that publish evaluation counts of Brent's method, which the test suite reproduces:
+
+          - Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear
+            function without using derivatives. Advances in Engineering Software 28(3), 145-149. The column "Brent's"
+            of its Table 2. https://doi.org/10.1016/S0965-9978(96)00051-8
+          - Alefeld, G. E., Potra, F. A. and Shi, Y. (1995). Algorithm 748: Enclosing zeros of continuous functions.
+            ACM Transactions on Mathematical Software 21(3), 327-344. The column "BR" of its Tables II and IV to VI.
+            https://doi.org/10.1145/210089.210111
+          - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of
+            an equation. BIT 13(3), 253-264. The column "Brent" of its Examples 1 to 7.
+            https://doi.org/10.1007/BF01951936
     """
 
     name = "brent"
