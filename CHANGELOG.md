@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Compute the steps of `Illinois`, `Pegasus` and `AndersonBjorck` as their papers state them, which changes their benchmark results
+- Stop `AndersonBjorck` by the stopping rule of its paper, which returns the interval bound with the smaller `|f|`, not the interval's midpoint
 
 ### Deprecated
 

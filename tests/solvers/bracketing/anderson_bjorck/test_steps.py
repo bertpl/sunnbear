@@ -82,8 +82,7 @@ def test_the_factor_falls_back_to_0_5_when_an_iterate_does_not_reduce_abs_f():
     (x1, f1), (x2, f2), (x3, _) = history[2:5]
     assert x1 == b - fb / ((fb - fa) / (b - a))
     # f1 > fb > 0, so x1 replaced the upper bound; before the first iterate, the upper bound counts as the previous
-    # iterate (the default of AndersonBjorckState.newest_bound), and the slope from b to x1 has the sign opposite to
-    # the chord's, so the factor is negative.
+    # iterate, and the slope from b to x1 has the sign opposite to the chord's, so the factor is negative.
     assert f1 > fb > 0.0
     assert x2 == x1 - f1 / ((f1 - 0.5 * fa) / (x1 - a))
     # f2 > f1 > 0, so the factor, which equals 1 - f2 / f1 in exact arithmetic, is negative too, and the retained
