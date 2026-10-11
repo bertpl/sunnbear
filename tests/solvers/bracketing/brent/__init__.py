@@ -22,9 +22,10 @@ Third-party published results:
   problems behind its totals.
 - Anderson and Björck (1973), Examples 1 to 7, the column "Brent": reproduced, in ``test_third_party.py``: 22 of the
   26 iteration counts exactly, and the other 4 within 1; the test data states why.
-- Anderson and Björck (1973), the double-precision totals on p. 263, the column "Brent": not reproduced. The paper's
-  tolerance of 6e-16 is only a few float64 spacings at the roots, and the paper's double precision has a 60-bit
-  mantissa, so the last steps before the solve stops differ from those in float64.
+- Anderson and Björck (1973), the double-precision totals on p. 263, the column "Brent": not reproduced, cause
+  unknown. On Examples 1 to 5, `Brent` takes 15 to 18 iterations fewer in float64 and in emulated 60-bit arithmetic,
+  the double precision of the paper's UNIVAC 1108, and the paper gives no per-example counts in double precision that
+  could show where the difference arises.
 
 Reference implementations:
 

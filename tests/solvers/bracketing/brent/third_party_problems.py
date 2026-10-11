@@ -149,8 +149,8 @@ _ANDERSON_BJORCK_BRENT_N_ITERATIONS = {
 
 # `_ANDERSON_BJORCK_DEVIATION_REASON` explains each count that `Brent` does not reproduce exactly.
 _ANDERSON_BJORCK_DEVIATION_REASON = (
-    "the paper ran the examples in the 27-bit single precision of the UNIVAC 1108, which rounds the last iterates "
-    "before the solve stops differently from float64"
+    "a difference of 1 iteration can come from any small detail of the paper's runs that the paper does not state, "
+    "such as the rounding of its 27-bit arithmetic or of its library functions, or a choice in its implementation"
 )
 _ANDERSON_BJORCK_DEVIATING_NAMES = {"2[n=5]", "5[n=2]", "7[n=2]", "7[n=15]"}
 
