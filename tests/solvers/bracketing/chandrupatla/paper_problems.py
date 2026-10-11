@@ -2,10 +2,10 @@
 for its method, and `TABLE_2_WITH_N_BISECTION_SWITCHES`, which pairs each case with the number of times that the
 paper's method switches to bisection on it."""
 
-from tests.solvers.paper_problems.chandrupatla import chandrupatla_table_2_problems
+from tests.solvers.paper_problems.chandrupatla import chandrupatla_table_2_problems_with_n_bisection_switches
 
-# `_TABLE_2_ROWS` holds the rows of the paper's Table 2, with the evaluation count of the paper's method, followed in
-# the table by the number of times that the method switches to bisection, in parentheses.
+# `_TABLE_2_ROWS` holds the rows of the paper's Table 2, each with the evaluation count of the paper's method and, from
+# the parentheses after that count in the table, the number of times that the method switches to bisection.
 _TABLE_2_ROWS = [
     {"name": "1[2,3]", "n_fevals": 7, "n_bisection_switches": 0},
     {"name": "1[1,10]", "n_fevals": 11, "n_bisection_switches": 4},
@@ -55,6 +55,6 @@ _TABLE_2_ROWS = [
 ]
 
 # Each pair holds a problem of `TABLE_2` and the paper's number of bisection switches on it.
-TABLE_2_WITH_N_BISECTION_SWITCHES = chandrupatla_table_2_problems(_TABLE_2_ROWS)
+TABLE_2_WITH_N_BISECTION_SWITCHES = chandrupatla_table_2_problems_with_n_bisection_switches(_TABLE_2_ROWS)
 
 TABLE_2 = [problem for problem, _ in TABLE_2_WITH_N_BISECTION_SWITCHES]

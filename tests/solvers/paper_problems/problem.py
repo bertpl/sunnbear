@@ -2,7 +2,8 @@
 `PaperProblemEnum`, the base of the enums that hold a published table shared by several solvers, and
 `UNSTATED_RUN_DETAILS`, the reason for a deviation of 1 that has no cause of its own."""
 
-from collections.abc import Callable
+import functools
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, replace
 from enum import Enum
 
@@ -87,6 +88,17 @@ class PaperProblem:
             assert solve_n_fevals > self.n_fevals_strict_lower_bound
         elif self.n_fevals is not None and self.n_fevals_tol is not None:
             assert abs(solve_n_fevals - self.n_fevals) <= self.n_fevals_tol
+
+    # --------------------------------------------------------------------------
+    #  Factory methods
+    # --------------------------------------------------------------------------
+    @classmethod
+    def for_each_n(
+        cls, number: int, function: Callable[..., float], a: float, b: float, ns: Iterable[int]
+    ) -> list["PaperProblem"]:
+        """Return 1 problem per value of ``n``, named ``{number}[n={n}]``, each with ``function`` bound to that
+        ``n``."""
+        return [cls(name=f"{number}[n={n}]", f=functools.partial(function, n=float(n)), a=a, b=b) for n in ns]
 
 
 # ==================================================================================================

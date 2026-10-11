@@ -4,8 +4,8 @@
 - the evaluation counts of the column "BR" of Tables II and IV to VI of Alefeld, Potra and Shi (1995);
 - the iteration counts of the column "Brent" of Examples 1 to 7 of Anderson and Björck (1973), in single precision.
 
-Each paper ran Brent's procedure ``zero`` with its stopping rule, so `Brent` runs with only its tolerance ``t`` set to
-the paper's.
+Each paper ran Brent's procedure ``zero`` with the stopping rule of ``zero``, so the tests set only the tolerance
+``t`` of `Brent` to the paper's value.
 """
 
 import pytest
@@ -16,8 +16,7 @@ from tests.solvers.paper_problems.alefeld_potra_shi import ALEFELD_POTRA_SHI_PRO
 
 from .third_party_problems import (
     ALEFELD_POTRA_SHI_TABLES_IV_TO_VI,
-    ANDERSON_BJORCK_EXAMPLES_SINGLE_PRECISION,
-    CHANDRUPATLA_TABLE_2,
+    ANDERSON_BJORCK_EXAMPLES_WITH_SINGLE_PRECISION_COUNTS,
     CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES,
 )
 from .tolerance import xtol_for_t
@@ -27,13 +26,13 @@ from .tolerance import xtol_for_t
 _CHANDRUPATLA_T = 0.5e-5
 
 
-@pytest.mark.parametrize("problem", CHANDRUPATLA_TABLE_2, ids=str)
+@pytest.mark.parametrize("problem", [problem for problem, _ in CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES], ids=str)
 def test_the_evaluation_counts_of_chandrupatla_table_2_are_reproduced(problem: PaperProblem):
     """On every row of Table 2 of Chandrupatla (1997), `Brent` evaluates exactly as often as the column "Brent's"
     reports.
 
-    The paper also sets a relative tolerance of 1e-10 in place of Brent's machine precision; it makes no difference to
-    these counts.
+    The paper also sets a relative tolerance of 1e-10 in place of the machine precision in Brent's tolerance; that
+    substitution makes no difference to these counts.
     """
     # --- act --------------------------
     result = Brent().solve(
@@ -61,7 +60,7 @@ def test_the_bisection_switch_counts_of_chandrupatla_table_2_are_reproduced(
     )
 
     # --- assert -----------------------
-    assert _count_bisections(result.history) == n_bisection_switches
+    assert _count_bisection_switches(result.history) == n_bisection_switches
 
 
 @pytest.mark.parametrize("problem", ALEFELD_POTRA_SHI_TABLES_IV_TO_VI, ids=str)
@@ -79,11 +78,11 @@ def test_the_evaluation_counts_of_alefeld_potra_shi_tables_iv_to_vi_are_reproduc
 
 @pytest.mark.parametrize("t, paper_total", [(1e-7, 2804), (1e-10, 2905), (1e-15, 2975), (0.0, 3008)])
 def test_the_total_evaluation_count_lies_within_1_percent_of_alefeld_potra_shi_table_ii(t: float, paper_total: int):
-    """Over all 154 problems of Alefeld, Potra and Shi (1995), the total evaluation count of `Brent` lies within 1 % of
+    """Over all problems of `ALEFELD_POTRA_SHI_PROBLEMS`, the total evaluation count of `Brent` lies within 1 % of
     the column "BR" of the paper's Table II, for each of the paper's tolerances.
 
     The paper's counts include the 2 evaluations at the interval bounds, and come from a machine whose relative
-    precision was 1.907e-16, not 2^-52.
+    precision was 1.907e-16, not 2^-52, so the test compares the totals within 1 %, not exactly.
     """
     # --- arrange / act ----------------
     total = sum(
@@ -97,14 +96,14 @@ def test_the_total_evaluation_count_lies_within_1_percent_of_alefeld_potra_shi_t
     assert abs(total - paper_total) <= 0.01 * paper_total
 
 
-@pytest.mark.parametrize("problem", ANDERSON_BJORCK_EXAMPLES_SINGLE_PRECISION, ids=str)
+@pytest.mark.parametrize("problem", ANDERSON_BJORCK_EXAMPLES_WITH_SINGLE_PRECISION_COUNTS, ids=str)
 def test_the_iteration_counts_of_anderson_bjorck_examples_1_to_7_are_reproduced(problem: PaperProblem):
     """On every case of Examples 1 to 7 of Anderson and Björck (1973), `Brent` with ``t = 6e-8``, the paper's tolerance
     in single precision, takes as many iterations as the column "Brent" reports, except where the problem states an
     allowed deviation.
 
-    The paper sets the relative part of Brent's tolerance to 0; in float64, that part, ``2 * macheps * |b|`` with every
-    root in ``[0, 1]``, makes no difference to these counts.
+    The paper sets the relative part of Brent's tolerance, ``2 * macheps * |b|``, to 0. `Brent` keeps that part, but
+    with every root in ``[0, 1]`` it is at most 4.4e-16 in float64 and makes no difference to these counts.
     """
     # --- act --------------------------
     result = Brent().solve(problem.f, problem.a, problem.b, xtol=xtol_for_t(6e-8, problem.a, problem.b), max_fevals=300)
@@ -116,30 +115,33 @@ def test_the_iteration_counts_of_anderson_bjorck_examples_1_to_7_are_reproduced(
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-def _count_bisections(history: tuple[tuple[float, float], ...]) -> int:
+def _count_bisection_switches(history: tuple[tuple[float, float], ...]) -> int:
     """Return the number of iterations of a `Brent` solve that evaluate the midpoint of the interval.
 
     ``history`` holds every ``(x, f(x))`` of the solve, in order, starting with the evaluations at ``a`` and ``b``. The
     function follows Brent's bounds ``b`` and ``c`` through the history, as `Brent` keeps them: ``b`` is the bound with
     the smaller ``|f|``, and ``c`` the bound on the other side of the root.
 
-    A bisection is the only step that evaluates ``b + (c - b) / 2`` exactly: the tolerance step moves at most
-    ``tol`` from ``b``, less than half the interval while the solve runs, and an interpolation step to exactly the
-    midpoint does not occur on the rows of Table 2.
+    A bisection is the only step that evaluates ``b + (c - b) / 2`` exactly:
+
+    - the step that Brent's method takes when an interpolated step would be shorter than ``tol`` moves at most ``tol``
+      from ``b``, less than half the interval while the solve runs;
+    - an interpolation step to exactly the midpoint does not occur on the rows of Table 2.
     """
-    # The Algol label "int": c starts as a, the bound on the other side of the root from b.
+    # The label "int" of Brent's Algol procedure ``zero``: c starts as a, the bound on the other side of the root
+    # from b.
     (c, fc), (b, fb) = history[0], history[1]
-    n_bisections = 0
+    n_bisection_switches = 0
     for x, fx in history[2:]:
-        # The Algol label "ext": b becomes the bound with the smaller |f|.
+        # The label "ext" of ``zero``: b becomes the bound with the smaller |f|.
         if abs(fc) < abs(fb):
             b, c = c, b
             fb, fc = fc, fb
         if x == b + 0.5 * (c - b):
-            n_bisections += 1
+            n_bisection_switches += 1
         previous_b, previous_fb = b, fb
         b, fb = x, fx
         if (fb > 0.0) == (fc > 0.0):
             # b crossed the root, so its previous value becomes c.
             c, fc = previous_b, previous_fb
-    return n_bisections
+    return n_bisection_switches

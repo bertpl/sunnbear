@@ -8,11 +8,9 @@
 
 from dataclasses import replace
 
-from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.alefeld_potra_shi import (
     ALEFELD_POTRA_SHI_PROBLEMS,
-    ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME,
-    TABLES_IV_TO_VI_PAPER_LABELS,
+    alefeld_potra_shi_tables_iv_to_vi_problems,
 )
 
 # The authors' test output lists, in the order of their test data, the root that their code prints to 14 significant
@@ -181,7 +179,7 @@ AUTHORS_TEST_OUTPUT = [
 
 
 # The paper's Tables IV to VI list the evaluation counts of Algorithms 4.1 (k = 1) and 4.2 (k = 2) on the problems of
-# `TABLES_IV_TO_VI_PAPER_LABELS`, counting the 2 evaluations at the interval bounds.
+# `ALEFELD_POTRA_SHI_TABLES_IV_TO_VI_PAPER_LABELS_BY_NAME`, counting the 2 evaluations at the interval bounds.
 _TABLES_IV_TO_VI_ROWS = [
     {"name": "26[n=1]", "n_fevals_k1": 28, "n_fevals_k2": 29},
     {"name": "13[n=1]", "n_fevals_k1": 25, "n_fevals_k2": 24},
@@ -232,20 +230,12 @@ _TABLES_IV_TO_VI_DEVIATIONS = {
 }
 
 
-def _tables_iv_to_vi_problem(row: dict, k: int) -> PaperProblem:
-    """Return the test driver's problem that ``row`` names, with the paper's evaluation count for ``k`` and the allowed
-    deviation from that count, if any."""
-    n_fevals_tol, deviation_reason = _TABLES_IV_TO_VI_DEVIATIONS.get((row["name"], k), (0, None))
-    return replace(
-        ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME[row["name"]],
-        n_fevals=row[f"n_fevals_k{k}"],
-        n_fevals_tol=n_fevals_tol,
-        deviation_reason=deviation_reason,
-    )
-
-
 # `TABLES_IV_TO_VI_BY_K` maps ``k`` to the problems of the paper's Tables IV to VI, each with the paper's count for
 # that k.
-if [row["name"] for row in _TABLES_IV_TO_VI_ROWS] != list(TABLES_IV_TO_VI_PAPER_LABELS):
-    raise ValueError("Give 1 row per problem of the paper's Tables IV to VI, in the tables' order.")
-TABLES_IV_TO_VI_BY_K = {k: [_tables_iv_to_vi_problem(row, k) for row in _TABLES_IV_TO_VI_ROWS] for k in (1, 2)}
+TABLES_IV_TO_VI_BY_K = {
+    k: alefeld_potra_shi_tables_iv_to_vi_problems(
+        {row["name"]: row[f"n_fevals_k{k}"] for row in _TABLES_IV_TO_VI_ROWS},
+        {name: deviation for (name, k_), deviation in _TABLES_IV_TO_VI_DEVIATIONS.items() if k_ == k},
+    )
+    for k in (1, 2)
+}

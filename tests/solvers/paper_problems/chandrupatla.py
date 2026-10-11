@@ -113,9 +113,9 @@ CHANDRUPATLA_TABLE_2_PROBLEMS_BY_NAME = {
 }
 
 
-def chandrupatla_table_2_problems(rows: list[dict]) -> list[tuple[PaperProblem, int]]:
-    """Return the problems of the paper's Table 2, each with 1 method's evaluation count from the table, and paired
-    with that method's number of bisection switches on it.
+def chandrupatla_table_2_problems_with_n_bisection_switches(rows: list[dict]) -> list[tuple[PaperProblem, int]]:
+    """Return 1 pair per row of the paper's Table 2: the row's problem, with 1 method's evaluation count from the
+    table, and that method's number of bisection switches on the problem.
 
     Args:
         rows: 1 dict per row of the table, in the table's order, with the row's ``name``, the method's ``n_fevals``,

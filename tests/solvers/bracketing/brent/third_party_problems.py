@@ -1,26 +1,23 @@
 """This module holds the problems on which third parties publish evaluation counts for Brent's method, each with
 the published count for `Brent`:
 
-- `CHANDRUPATLA_TABLE_2` and `CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES`: the column "Brent's" of Table 2 of
-  Chandrupatla (1997);
+- `CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES`: the column "Brent's" of Table 2 of Chandrupatla (1997);
 - `ALEFELD_POTRA_SHI_TABLES_IV_TO_VI`: the column "BR" of Tables IV to VI of Alefeld, Potra and Shi (1995);
-- `ANDERSON_BJORCK_EXAMPLES_SINGLE_PRECISION`: the column "Brent" of Examples 1 to 7 of Anderson and Björck (1973).
+- `ANDERSON_BJORCK_EXAMPLES_WITH_SINGLE_PRECISION_COUNTS`: the column "Brent" of Examples 1 to 7 of Anderson and
+  Björck (1973).
 """
 
 from dataclasses import replace
 
-from tests.solvers.paper_problems.alefeld_potra_shi import (
-    ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME,
-    TABLES_IV_TO_VI_PAPER_LABELS,
-)
+from tests.solvers.paper_problems.alefeld_potra_shi import alefeld_potra_shi_tables_iv_to_vi_problems
 from tests.solvers.paper_problems.anderson_bjorck import ANDERSON_BJORCK_EXAMPLES
-from tests.solvers.paper_problems.chandrupatla import chandrupatla_table_2_problems
+from tests.solvers.paper_problems.chandrupatla import chandrupatla_table_2_problems_with_n_bisection_switches
 
 # ==================================================================================================
 #  Chandrupatla (1997), Table 2
 # ==================================================================================================
-# `_CHANDRUPATLA_TABLE_2_ROWS` holds the rows of the paper's Table 2, with the evaluation count of Brent's method,
-# followed in the table by the number of times that it switches to bisection, in parentheses.
+# `_CHANDRUPATLA_TABLE_2_ROWS` holds the rows of the paper's Table 2, each with the evaluation count of Brent's method
+# and, from the parentheses after that count in the table, the number of times that the method switches to bisection.
 _CHANDRUPATLA_TABLE_2_ROWS = [
     {"name": "1[2,3]", "n_fevals": 7, "n_bisection_switches": 0},
     {"name": "1[1,10]", "n_fevals": 13, "n_bisection_switches": 2},
@@ -69,18 +66,19 @@ _CHANDRUPATLA_TABLE_2_ROWS = [
     {"name": "9[0.0002,81]", "n_fevals": 19, "n_bisection_switches": 5},
 ]
 
-# Each pair holds a problem of Table 2, with the count of Brent's method, and the number of bisection switches on it.
-CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES = chandrupatla_table_2_problems(_CHANDRUPATLA_TABLE_2_ROWS)
-
-CHANDRUPATLA_TABLE_2 = [problem for problem, _ in CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES]
+# Each pair holds a problem of Table 2, with the count of Brent's method, and the number of bisection switches on
+# that problem.
+CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES = chandrupatla_table_2_problems_with_n_bisection_switches(
+    _CHANDRUPATLA_TABLE_2_ROWS
+)
 
 
 # ==================================================================================================
 #  Alefeld, Potra and Shi (1995), Tables IV to VI
 # ==================================================================================================
-# `_ALEFELD_POTRA_SHI_N_FEVALS` maps the name of each problem of `TABLES_IV_TO_VI_PAPER_LABELS` to the evaluation count
-# of the column "BR", which counts the 2 evaluations at the interval bounds.
-_ALEFELD_POTRA_SHI_N_FEVALS = {
+# `_ALEFELD_POTRA_SHI_BR_N_FEVALS` maps the name of each problem of the paper's Tables IV to VI to the evaluation
+# count of the column "BR", which counts the 2 evaluations at the interval bounds.
+_ALEFELD_POTRA_SHI_BR_N_FEVALS = {
     "26[n=1]": 23,
     "13[n=1]": 19,
     "27[n=10]": 21,
@@ -100,8 +98,8 @@ _ALEFELD_POTRA_SHI_N_FEVALS = {
     "25[n=3]": 10,
 }
 
-# `_ALEFELD_POTRA_SHI_DEVIATIONS` maps the name of each problem whose count `Brent` does not reproduce exactly to the
-# allowed deviation (None: the count is not checked) and its reason.
+# `_ALEFELD_POTRA_SHI_DEVIATIONS` maps a problem's name to its allowed deviation and the reason for it, for each
+# problem whose count `Brent` does not reproduce exactly; a deviation of None means that the count is not checked.
 _ALEFELD_POTRA_SHI_DEVIATIONS = {
     "26[n=1]": (
         None,
@@ -110,23 +108,18 @@ _ALEFELD_POTRA_SHI_DEVIATIONS = {
     ),
 }
 
-ALEFELD_POTRA_SHI_TABLES_IV_TO_VI = [
-    replace(
-        ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME[name],
-        n_fevals=_ALEFELD_POTRA_SHI_N_FEVALS[name],
-        n_fevals_tol=_ALEFELD_POTRA_SHI_DEVIATIONS.get(name, (0, None))[0],
-        deviation_reason=_ALEFELD_POTRA_SHI_DEVIATIONS.get(name, (0, None))[1],
-    )
-    for name in TABLES_IV_TO_VI_PAPER_LABELS
-]
+ALEFELD_POTRA_SHI_TABLES_IV_TO_VI = alefeld_potra_shi_tables_iv_to_vi_problems(
+    _ALEFELD_POTRA_SHI_BR_N_FEVALS, _ALEFELD_POTRA_SHI_DEVIATIONS
+)
 
 
 # ==================================================================================================
 #  Anderson and Björck (1973), Examples 1 to 7
 # ==================================================================================================
-# `_ANDERSON_BJORCK_N_ITERATIONS` maps the name of each example to the iteration count of the column "Brent", from the
-# paper's runs in single precision.
-_ANDERSON_BJORCK_N_ITERATIONS = {
+# `_ANDERSON_BJORCK_BRENT_N_ITERATIONS` maps the name of each example to the iteration count of the column "Brent",
+# from the paper's runs in single precision. Brent's method evaluates once per iteration, so the evaluation count adds
+# the 2 evaluations at the interval bounds.
+_ANDERSON_BJORCK_BRENT_N_ITERATIONS = {
     "1": 6,
     "2[n=1]": 5,
     "2[n=5]": 8,
@@ -157,15 +150,15 @@ _ANDERSON_BJORCK_N_ITERATIONS = {
 
 # `_ANDERSON_BJORCK_DEVIATION_REASON` explains each count that `Brent` does not reproduce exactly.
 _ANDERSON_BJORCK_DEVIATION_REASON = (
-    "the paper ran the examples in the 27-bit single precision of the UNIVAC 1108, which rounds the iterates near the "
-    "stop differently from float64"
+    "the paper ran the examples in the 27-bit single precision of the UNIVAC 1108, which rounds the last iterates "
+    "before the solve stops differently from float64"
 )
 _ANDERSON_BJORCK_DEVIATING_NAMES = {"2[n=5]", "5[n=2]", "7[n=2]", "7[n=15]"}
 
-ANDERSON_BJORCK_EXAMPLES_SINGLE_PRECISION = [
+ANDERSON_BJORCK_EXAMPLES_WITH_SINGLE_PRECISION_COUNTS = [
     replace(
         problem,
-        n_fevals=_ANDERSON_BJORCK_N_ITERATIONS[problem.name] + 2,
+        n_fevals=_ANDERSON_BJORCK_BRENT_N_ITERATIONS[problem.name] + 2,
         n_fevals_tol=1 if problem.name in _ANDERSON_BJORCK_DEVIATING_NAMES else 0,
         deviation_reason=(
             _ANDERSON_BJORCK_DEVIATION_REASON if problem.name in _ANDERSON_BJORCK_DEVIATING_NAMES else None

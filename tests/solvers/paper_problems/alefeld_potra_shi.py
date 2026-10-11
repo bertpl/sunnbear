@@ -10,7 +10,7 @@ paper's Table I, with the paper's problem 2 split into 10 problems, 1 per interv
 
 import functools
 import math
-from collections.abc import Callable, Iterable
+from dataclasses import replace
 
 from .problem import PaperProblem
 
@@ -126,15 +126,6 @@ def _function_28(x: float, *, n: float) -> float:
 # ==================================================================================================
 #  The problems, in the order of the authors' test data
 # ==================================================================================================
-def _problems_for_each_n(
-    problem_number: int, function: Callable[..., float], a: float, b: float, ns: Iterable[int]
-) -> list[PaperProblem]:
-    """Return 1 problem per value of ``n``, each with ``function`` bound to that ``n``."""
-    return [
-        PaperProblem(name=f"{problem_number}[n={n}]", f=functools.partial(function, n=float(n)), a=a, b=b) for n in ns
-    ]
-
-
 ALEFELD_POTRA_SHI_PROBLEMS = [
     PaperProblem(name="1[n=1]", f=_function_1, a=_PI_ROUNDED / 2.0, b=_PI_ROUNDED),
     # Each of problems 2 to 11 takes the interval between 2 consecutive poles, i^2 and (i + 1)^2.
@@ -150,34 +141,31 @@ ALEFELD_POTRA_SHI_PROBLEMS = [
     PaperProblem(name="12[n=1]", f=functools.partial(_function_12_to_14, scale=40.0, rate=1.0), a=-9.0, b=31.0),
     PaperProblem(name="13[n=1]", f=functools.partial(_function_12_to_14, scale=100.0, rate=2.0), a=-9.0, b=31.0),
     PaperProblem(name="14[n=1]", f=functools.partial(_function_12_to_14, scale=200.0, rate=3.0), a=-9.0, b=31.0),
-    *_problems_for_each_n(problem_number=15, function=_function_15, a=0.0, b=5.0, ns=[4, 6, 8, 10, 12]),
-    *_problems_for_each_n(problem_number=16, function=_function_16_and_17, a=0.0, b=5.0, ns=[4, 6, 8, 10, 12]),
-    *_problems_for_each_n(problem_number=17, function=_function_16_and_17, a=-0.95, b=4.05, ns=[8, 10, 12, 14]),
+    *PaperProblem.for_each_n(number=15, function=_function_15, a=0.0, b=5.0, ns=[4, 6, 8, 10, 12]),
+    *PaperProblem.for_each_n(number=16, function=_function_16_and_17, a=0.0, b=5.0, ns=[4, 6, 8, 10, 12]),
+    *PaperProblem.for_each_n(number=17, function=_function_16_and_17, a=-0.95, b=4.05, ns=[8, 10, 12, 14]),
     PaperProblem(name="18[n=1]", f=_function_18, a=0.0, b=1.5),
-    *_problems_for_each_n(
-        problem_number=19, function=_function_19, a=0.0, b=1.0, ns=[1, 2, 3, 4, 5, 20, 40, 60, 80, 100]
-    ),
-    *_problems_for_each_n(problem_number=20, function=_function_20, a=0.0, b=1.0, ns=[5, 10, 20]),
-    *_problems_for_each_n(problem_number=21, function=_function_21, a=0.0, b=1.0, ns=[2, 5, 10, 15, 20]),
-    *_problems_for_each_n(problem_number=22, function=_function_22, a=0.0, b=1.0, ns=[1, 2, 4, 5, 8, 15, 20]),
-    *_problems_for_each_n(problem_number=23, function=_function_23, a=0.0, b=1.0, ns=[1, 5, 10, 15, 20]),
-    *_problems_for_each_n(problem_number=24, function=_function_24, a=1e-2, b=1.0, ns=[2, 5, 15, 20]),
-    *_problems_for_each_n(
-        problem_number=25, function=_function_25, a=1.0, b=100.0, ns=[2, 3, 4, 5, 6, 7, *range(9, 34, 2)]
-    ),
+    *PaperProblem.for_each_n(number=19, function=_function_19, a=0.0, b=1.0, ns=[1, 2, 3, 4, 5, 20, 40, 60, 80, 100]),
+    *PaperProblem.for_each_n(number=20, function=_function_20, a=0.0, b=1.0, ns=[5, 10, 20]),
+    *PaperProblem.for_each_n(number=21, function=_function_21, a=0.0, b=1.0, ns=[2, 5, 10, 15, 20]),
+    *PaperProblem.for_each_n(number=22, function=_function_22, a=0.0, b=1.0, ns=[1, 2, 4, 5, 8, 15, 20]),
+    *PaperProblem.for_each_n(number=23, function=_function_23, a=0.0, b=1.0, ns=[1, 5, 10, 15, 20]),
+    *PaperProblem.for_each_n(number=24, function=_function_24, a=1e-2, b=1.0, ns=[2, 5, 15, 20]),
+    *PaperProblem.for_each_n(number=25, function=_function_25, a=1.0, b=100.0, ns=[2, 3, 4, 5, 6, 7, *range(9, 34, 2)]),
     PaperProblem(name="26[n=1]", f=_function_26, a=-1.0, b=4.0),
-    *_problems_for_each_n(problem_number=27, function=_function_27, a=-10000.0, b=_PI_ROUNDED / 2.0, ns=range(1, 41)),
-    *_problems_for_each_n(
-        problem_number=28, function=_function_28, a=-10000.0, b=1e-4, ns=[*range(20, 41), *range(100, 1001, 100)]
+    *PaperProblem.for_each_n(number=27, function=_function_27, a=-10000.0, b=_PI_ROUNDED / 2.0, ns=range(1, 41)),
+    *PaperProblem.for_each_n(
+        number=28, function=_function_28, a=-10000.0, b=1e-4, ns=[*range(20, 41), *range(100, 1001, 100)]
     ),
 ]
 
 ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME = {problem.name: problem for problem in ALEFELD_POTRA_SHI_PROBLEMS}
 
 # The paper's Tables IV to VI list evaluation counts on some of the problems, at ``tol = 10^-15``. The paper numbers
-# its problems as its Table I does, not as the authors' test driver does, so `TABLES_IV_TO_VI_PAPER_LABELS` maps the
-# driver's name of each problem in the tables to the paper's label for it, in the tables' order.
-TABLES_IV_TO_VI_PAPER_LABELS = {
+# its problems as its Table I does, not as the authors' test driver does, so
+# `ALEFELD_POTRA_SHI_TABLES_IV_TO_VI_PAPER_LABELS_BY_NAME` maps the driver's name of each problem in the tables to the
+# paper's label for it, in the tables' order.
+ALEFELD_POTRA_SHI_TABLES_IV_TO_VI_PAPER_LABELS_BY_NAME = {
     "26[n=1]": "Table IV: 13",
     "13[n=1]": "Table V: 3[a=-100,b=-2]",
     "27[n=10]": "Table V: 14[n=10]",
@@ -196,3 +184,35 @@ TABLES_IV_TO_VI_PAPER_LABELS = {
     "24[n=20]": "Table VI: 11[n=20]",
     "25[n=3]": "Table VI: 12[n=3]",
 }
+
+
+def alefeld_potra_shi_tables_iv_to_vi_problems(
+    n_fevals_by_name: dict[str, int], deviations_by_name: dict[str, tuple[int | None, str]]
+) -> list[PaperProblem]:
+    """Return the problems of the paper's Tables IV to VI, in the tables' order, each with 1 method's evaluation count
+    and the allowed deviation from that count, if any.
+
+    Args:
+        n_fevals_by_name: The method's evaluation count per problem of
+            `ALEFELD_POTRA_SHI_TABLES_IV_TO_VI_PAPER_LABELS_BY_NAME`, in the tables' order, counting the 2 evaluations
+            at the interval bounds.
+        deviations_by_name: The allowed deviation (None: the count is not checked) and its reason, for each problem
+            whose count is not reproduced exactly.
+
+    Raises:
+        ValueError: If ``n_fevals_by_name`` does not name every problem of the tables, in the tables' order.
+    """
+    if list(n_fevals_by_name) != list(ALEFELD_POTRA_SHI_TABLES_IV_TO_VI_PAPER_LABELS_BY_NAME):
+        raise ValueError("Give 1 count per problem of the paper's Tables IV to VI, in the tables' order.")
+    problems = []
+    for name, n_fevals in n_fevals_by_name.items():
+        n_fevals_tol, deviation_reason = deviations_by_name.get(name, (0, None))
+        problems.append(
+            replace(
+                ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME[name],
+                n_fevals=n_fevals,
+                n_fevals_tol=n_fevals_tol,
+                deviation_reason=deviation_reason,
+            )
+        )
+    return problems

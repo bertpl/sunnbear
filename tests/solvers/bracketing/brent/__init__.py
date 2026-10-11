@@ -23,9 +23,8 @@ Third-party published results:
 - Anderson and Björck (1973), Examples 1 to 7, the column "Brent": reproduced, in ``test_third_party.py``: 22 of the
   26 iteration counts exactly, and the other 4 within 1; the test data states why.
 - Anderson and Björck (1973), the double-precision totals on p. 263, the column "Brent": not reproduced. The paper's
-  tolerance of 6e-16 is a few float64 spacings near the roots, where the paper's double precision has a 60-bit
-  mantissa, so near the stop the float64 steps differ; `Brent` takes 125 and 78 iterations against the paper's 143
-  and 80.
+  tolerance of 6e-16 is only a few float64 spacings at the roots, and the paper's double precision has a 60-bit
+  mantissa, so the last steps before the solve stops differ from those in float64.
 
 Reference implementations:
 
