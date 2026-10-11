@@ -2,7 +2,8 @@
 
 Published results:
 
-- The authors' test output: reproduced for ``k = 2``, in ``test_paper.py``: the roots of all 154 problems.
+- The test output of the authors' Fortran 77 code (netlib, ``toms/748``): reproduced for ``k = 2``, in
+  ``test_paper.py``: the roots of all 154 problems.
 - Alefeld, Potra and Shi (1995), Table II: reproduced, in ``test_paper.py``: the totals within 1.1 %.
 - Alefeld, Potra and Shi (1995), Table III: not reproduced, because the paper does not list the 139 problems behind
   its totals.

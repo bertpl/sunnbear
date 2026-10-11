@@ -10,5 +10,5 @@ Reference implementations:
 
 - SciPy's ``scipy.optimize.ridder``: compared in ``test_twin.py``, for every variant.
 - Apache Commons Math's ``RiddersSolver``, whose stopping criterion the ``"commons_math"`` variant follows: not
-  compared, because it is a Java library.
+  compared, because Apache Commons Math is a Java library.
 """
