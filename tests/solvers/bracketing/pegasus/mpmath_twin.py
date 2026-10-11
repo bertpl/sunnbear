@@ -14,8 +14,12 @@ class PegasusMpmathTwin(TwinSolver):
     twin deviates from exact agreement in these declared ways:
 
     - mpmath evaluates both interval bounds again before its first iterate;
-    - mpmath computes the chord's zero as ``a - fa / ((fb - fa) / (b - a))``, a step from ``a``, where `Pegasus`
-      uses regula falsi's ``(a * fb - b * fa) / (fb - fa)``, so the iterates can differ in their last bits.
+    - mpmath computes the chord's zero as ``a - fa / ((fb - fa) / (b - a))``, a step from its ``a``, the bound that
+      does not hold the most recent iterate, where `Pegasus` uses regula falsi's ``(a * fb - b * fa) / (fb - fa)``,
+      so the iterates can differ in their last bits;
+    - mpmath computes the factor ``f_previous / (f_previous + f_new)`` and then multiplies the retained value by it,
+      where `Pegasus` multiplies by ``f_previous`` first, as its paper does, which can change the last bit of the
+      scaled value.
     """
 
     name = "pegasus_mpmath_twin"

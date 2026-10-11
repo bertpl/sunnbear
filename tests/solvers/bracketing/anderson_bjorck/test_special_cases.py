@@ -1,8 +1,8 @@
-"""These tests assert that `AndersonBjorck` needs over 200 evaluations on a function that is nearly flat on 1 side of
-the root."""
+"""These tests assert how `AndersonBjorck` handles a function that is nearly flat on 1 side of the root, and a step
+that rounds onto the most recent iterate."""
 
 from sunnbear.solvers import AndersonBjorck, SolveStatus
-from tests.solvers.example_functions import STEEP_EXPONENTIAL_ROOT, steep_exponential
+from tests.solvers.example_functions import CUBIC_ROOT, STEEP_EXPONENTIAL_ROOT, cubic, steep_exponential
 
 
 def test_a_function_that_is_nearly_flat_on_1_side_of_the_root_takes_over_200_evaluations():
@@ -15,3 +15,18 @@ def test_a_function_that_is_nearly_flat_on_1_side_of_the_root_takes_over_200_eva
     assert result.status is SolveStatus.CONVERGED
     assert abs(result.x - STEEP_EXPONENTIAL_ROOT) <= 1e-10
     assert result.n_fevals > 200
+
+
+def test_a_step_that_rounds_onto_the_most_recent_iterate_takes_the_factor_0_5():
+    """On `cubic` over ``[1, 2]``, the 7th iterate lies within rounding of the root while the retained bound is still
+    far from it, so the next 2 steps round onto that iterate, where the slope between the 2 is ``0 / 0``; the factor
+    0.5 then moves the next step away, and the solve converges."""
+    # --- act --------------------------
+    result = AndersonBjorck().solve(cubic, 1.0, 2.0, xtol=1e-9, max_fevals=60, history_enabled=True)
+
+    # --- assert -----------------------
+    # The history starts with the 2 interval bounds, so index 8 holds the 7th iterate.
+    x_values = [x for x, _ in result.history]
+    assert x_values[8] == x_values[9] == x_values[10] != x_values[11]
+    assert result.status is SolveStatus.CONVERGED
+    assert abs(result.x - CUBIC_ROOT) <= 1e-9

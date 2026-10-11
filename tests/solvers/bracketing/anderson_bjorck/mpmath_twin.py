@@ -16,12 +16,14 @@ class AndersonBjorckMpmathTwin(TwinSolver):
     twin deviates from exact agreement in these declared ways:
 
     - mpmath evaluates both interval bounds again before its first iterate;
-    - mpmath computes the chord's zero as ``a - fa / ((fb - fa) / (b - a))``, a step from ``a``, where
-      `AndersonBjorck` uses regula falsi's ``(a * fb - b * fa) / (fb - fa)``, so the iterates can differ in their last
-      bits;
-    - in the slow progress that the `AndersonBjorck` class docstring describes, ``1 - f_new / f_previous`` loses about
-      8 digits to cancellation, which magnifies the last-bit differences between the 2 chord formulas to differences of
-      thousands of ulps in the iterates.
+    - mpmath computes the chord's zero as ``a - fa / ((fb - fa) / (b - a))``, a step from its ``a``, the bound that
+      does not hold the most recent iterate, where `AndersonBjorck` steps from the most recent iterate,
+      ``x1 - f1 / w1``, so the iterates can differ in their last bits;
+    - mpmath computes the factor as ``1 - f_new / f_previous``, where `AndersonBjorck` computes the ratio of 2 chord
+      slopes, as its paper does; the 2 are equal in exact arithmetic;
+    - in the slow progress that the `AndersonBjorck` class docstring describes, the factor loses about 8 digits to
+      cancellation in either form, which magnifies the last-bit differences between the 2 implementations to
+      differences of thousands of ulps in the iterates.
 
     The twin is not compared on the test cases of `steep_exponential`: on that function, both solvers need more
     evaluations than the budget of the twin test cases, and the last-bit differences grow to thousands of ulps.

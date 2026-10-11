@@ -20,14 +20,16 @@ class Illinois(BracketingSolver[IllinoisState]):
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, at its own
       function value.
 
-    Ford (1997) states the Illinois step with regula falsi's chord formula, so the Illinois method differs from
-    `RegulaFalsi` only in its function value at the retained bound.
+    `Illinois` computes the chord's zero as the paper does, as a correction to the most recent iterate:
+    ``x1 - f1 * (x1 - x0) / (f1 - f0)``, with ``x1`` the most recent iterate and ``x0`` the retained bound, at its
+    halved value ``f0``. In exact arithmetic, this is the x-value of regula falsi's chord formula, which `RegulaFalsi`
+    computes as ``(a * fb - b * fa) / (fb - fa)``.
 
     References:
         - Dowell, M. and Jarratt, P. (1971). A modified regula falsi method for computing the root of an
-          equation. BIT 11(2), 168-174. The paper's step formula adds a correction to the most recent iterate; in
-          exact arithmetic, this formula gives the same iterate as regula falsi's chord formula. The test suite
-          reproduces the errors in the paper's Table 1. https://doi.org/10.1007/BF01934364
+          equation. BIT 11(2), 168-174. The paper's equation 2 and its ALGOL procedure give the step formula, in the
+          form that `Illinois` computes, and the ALGOL procedure the halving. The test suite reproduces the errors in
+          the paper's Table 1. https://doi.org/10.1007/BF01934364
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. The paper's equation 5, with ``gamma = 0.5`` from the paper's Table 1, is the
           Illinois step.
@@ -36,7 +38,7 @@ class Illinois(BracketingSolver[IllinoisState]):
     """
 
     name = "illinois"
-    version = 1
+    version = 2
     state_cls = IllinoisState
 
     def _next_x(self, state: IllinoisState, interval: Interval) -> float:
@@ -58,9 +60,11 @@ class Illinois(BracketingSolver[IllinoisState]):
             state.scaled_retained_f = interval.fb if replaced_bound is IntervalBound.LOWER else interval.fa
             state.newest_bound = replaced_bound
 
-        # --- regula falsi's chord ---------------
+        # --- the paper's step -------------------
+        # The names are the ALGOL procedure's: x1 holds the most recent iterate, x0 the retained bound.
         if state.newest_bound is IntervalBound.UPPER:
-            fa, fb = state.scaled_retained_f, interval.fb
+            x0, x1, f1 = interval.a, interval.b, interval.fb
         else:
-            fa, fb = interval.fa, state.scaled_retained_f
-        return (interval.a * fb - interval.b * fa) / (fb - fa)
+            x0, x1, f1 = interval.b, interval.a, interval.fa
+        f0 = state.scaled_retained_f
+        return x1 - f1 * (x1 - x0) / (f1 - f0)
