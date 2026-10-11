@@ -12,10 +12,11 @@ class AndersonBjorckState(SolveState):
     Attributes:
         newest_bound: The bound that holds the most recent iterate. Before the first iterate, the upper bound is the
             newest bound, as in `Illinois` and in mpmath's implementation of both methods.
-        newest_x: The most recent iterate. The factor's slope from the previous to the new iterate needs this value
-            after the next iterate has replaced the newest bound, because the interval then no longer holds the
-            previous iterate.
-        newest_f: The function value at the newest bound, which that slope needs for the same reason.
+        newest_x: The most recent iterate. The factor divides the slope from the previous to the new iterate by
+            `chord_slope`, and that slope needs this value after the next iterate has replaced the newest bound,
+            because the interval then no longer holds the previous iterate.
+        newest_f: The function value at the newest bound, which the slope from the previous to the new iterate needs
+            for the same reason as `newest_x`.
         scaled_retained_f: The chord's function value at the retained bound, which is the bound that does not hold
             the most recent iterate. The scaled value equals the retained bound's own function value, multiplied by the
             scaling factor of every iteration that kept the bound again.

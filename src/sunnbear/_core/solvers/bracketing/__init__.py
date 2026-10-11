@@ -14,6 +14,10 @@ Each solver class holds its whole algorithm, even where 2 solvers differ in few 
   possibly flops, that the published algorithms do not have;
 - a reader can compare a self-contained class with its published algorithm step by step.
 
+Each solver computes its steps in the arithmetic form of its published algorithm, even where another form gives the
+same value in exact arithmetic, because the 2 forms round differently and count different flops, and the benchmark
+measures the published algorithm.
+
 Variants of one algorithm, such as different values of one of its parameters, are configs of a single class.
 """
 

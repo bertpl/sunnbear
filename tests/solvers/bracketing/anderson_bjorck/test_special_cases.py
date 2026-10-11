@@ -19,8 +19,8 @@ def test_a_function_that_is_nearly_flat_on_1_side_of_the_root_takes_over_200_eva
 
 def test_a_step_that_rounds_onto_the_most_recent_iterate_takes_the_factor_0_5():
     """On `cubic` over ``[1, 2]``, the 7th iterate lies within rounding of the root while the retained bound is still
-    far from it, so the next 2 steps round onto that iterate, where the slope between the 2 is ``0 / 0``; the factor
-    0.5 then moves the next step away, and the solve converges."""
+    far from it, so the next 2 steps round onto that iterate, where the slope from the previous to the new iterate is
+    ``0 / 0``; the factor 0.5 then moves the next step away from that iterate, and the solve converges."""
     # --- act --------------------------
     result = AndersonBjorck().solve(cubic, 1.0, 2.0, xtol=1e-9, max_fevals=60, history_enabled=True)
 

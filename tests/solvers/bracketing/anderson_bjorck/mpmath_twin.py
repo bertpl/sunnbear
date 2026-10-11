@@ -18,7 +18,8 @@ class AndersonBjorckMpmathTwin(TwinSolver):
     - mpmath evaluates both interval bounds again before its first iterate;
     - mpmath computes the chord's zero as ``a - fa / ((fb - fa) / (b - a))``, a step from its ``a``, the bound that
       does not hold the most recent iterate, where `AndersonBjorck` steps from the most recent iterate,
-      ``x1 - f1 / w1``, so the iterates can differ in their last bits;
+      ``x1 - f1 / w1``, with ``w1`` the slope of the chord through ``x1`` and the retained bound, so the iterates
+      can differ in their last bits;
     - mpmath computes the factor as ``1 - f_new / f_previous``, where `AndersonBjorck` computes the ratio of 2 chord
       slopes, as its paper does; the 2 are equal in exact arithmetic;
     - in the slow progress that the `AndersonBjorck` class docstring describes, the factor loses about 8 digits to

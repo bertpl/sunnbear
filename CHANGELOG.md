@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Compute the steps of `Illinois`, `Pegasus` and `AndersonBjorck` in the arithmetic form of their papers
+- Compute the steps of `Illinois`, `Pegasus` and `AndersonBjorck` as their papers state them, which changes their benchmark results
 
 ### Deprecated
 
