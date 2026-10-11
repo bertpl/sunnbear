@@ -1,8 +1,14 @@
-"""This module holds `AUTHORS_TEST_OUTPUT`, the Alefeld-Potra-Shi test problems with the roots that the authors'
-code of Algorithm 748 computes for them with the tolerance ``tol = 0``, as its test output prints them."""
+"""This module holds the published results of Algorithm 748 on the Alefeld-Potra-Shi test problems:
+
+- `AUTHORS_TEST_OUTPUT`, the roots that the authors' code computes with the tolerance ``tol = 0``, as its test
+  output prints them;
+- `TABLES_IV_TO_VI_BY_K`, the evaluation counts of the paper's Tables IV to VI, keyed by the `TOMS748` parameter
+  ``k``, which selects Algorithm 4.1 (``k = 1``) or 4.2 (``k = 2``).
+"""
 
 from dataclasses import replace
 
+from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.alefeld_potra_shi import ALEFELD_POTRA_SHI_PROBLEMS
 
 # The authors' test output lists, in the order of their test data, the root that their code prints to 14 significant
@@ -168,3 +174,77 @@ PRINTED_ROOTS = {
 AUTHORS_TEST_OUTPUT = [
     replace(problem, root=PRINTED_ROOTS[problem.name], root_rel_tol=1e-13) for problem in ALEFELD_POTRA_SHI_PROBLEMS
 ]
+
+
+# The paper's Tables IV to VI list the evaluation counts of Algorithms 4.1 (k = 1) and 4.2 (k = 2) on some of the
+# authors' test problems at ``tol = 10^-15``, counting the 2 evaluations at the interval bounds.
+#
+# The paper numbers its problems as its Table I does, not as the authors' test driver does; each row names the
+# driver's problem that matches the paper's problem.
+_TABLES_IV_TO_VI_ROWS = [
+    {"name": "26[n=1]", "paper_label": "Table IV: 13", "n_fevals_k1": 28, "n_fevals_k2": 29},
+    {"name": "13[n=1]", "paper_label": "Table V: 3[a=-100,b=-2]", "n_fevals_k1": 25, "n_fevals_k2": 24},
+    {"name": "27[n=10]", "paper_label": "Table V: 14[n=10]", "n_fevals_k1": 20, "n_fevals_k2": 19},
+    {"name": "27[n=30]", "paper_label": "Table V: 14[n=30]", "n_fevals_k1": 20, "n_fevals_k2": 19},
+    {"name": "28[n=30]", "paper_label": "Table V: 15[n=30]", "n_fevals_k1": 29, "n_fevals_k2": 31},
+    {"name": "28[n=500]", "paper_label": "Table V: 15[n=500]", "n_fevals_k1": 35, "n_fevals_k2": 35},
+    {"name": "1[n=1]", "paper_label": "Table VI: 1", "n_fevals_k1": 10, "n_fevals_k2": 10},
+    {"name": "3[n=1]", "paper_label": "Table VI: 2[n=2]", "n_fevals_k1": 15, "n_fevals_k2": 11},
+    {"name": "16[n=4]", "paper_label": "Table VI: 4[a=1,n=4]", "n_fevals_k1": 12, "n_fevals_k2": 13},
+    {"name": "18[n=1]", "paper_label": "Table VI: 5", "n_fevals_k1": 11, "n_fevals_k2": 10},
+    {"name": "19[n=20]", "paper_label": "Table VI: 6[n=20]", "n_fevals_k1": 12, "n_fevals_k2": 11},
+    {"name": "20[n=10]", "paper_label": "Table VI: 7[n=10]", "n_fevals_k1": 7, "n_fevals_k2": 7},
+    {"name": "21[n=10]", "paper_label": "Table VI: 8[n=10]", "n_fevals_k1": 12, "n_fevals_k2": 11},
+    {"name": "22[n=1]", "paper_label": "Table VI: 9[n=1]", "n_fevals_k1": 11, "n_fevals_k2": 9},
+    {"name": "23[n=5]", "paper_label": "Table VI: 10[n=5]", "n_fevals_k1": 12, "n_fevals_k2": 9},
+    {"name": "24[n=20]", "paper_label": "Table VI: 11[n=20]", "n_fevals_k1": 17, "n_fevals_k2": 18},
+    {"name": "25[n=3]", "paper_label": "Table VI: 12[n=3]", "n_fevals_k1": 6, "n_fevals_k2": 5},
+]
+
+_UNDERFLOW_DEVIATION_REASON = (
+    "the function underflows to 0 on an interval around its root at 0, so the count depends on where the platform's "
+    "exp underflows; the paper's Section 6 states that how this function is coded changes the results"
+)
+_PLATFORM_DEVIATION_REASON = (
+    "the paper's platform presumably has library functions that round the function values differently from those of "
+    "the platform that runs this test"
+)
+_SIN_ROUNDING_DEVIATION_REASON = (
+    "the count depends on how the platform's sin rounds: `TOMS748` takes the paper's 11 evaluations on macOS and 10 on "
+    "Linux on ARM"
+)
+_REBUILT_ALGORITHM_4_1_DEVIATION_REASON = (
+    "the authors' code implements only Algorithm 4.2, so `TOMS748` builds Algorithm 4.1 from the authors' "
+    "subroutines, and the authors' own implementation of Algorithm 4.1 may differ in details that the paper does not "
+    "state"
+)
+# `_TABLES_IV_TO_VI_DEVIATIONS` lists the rows whose count `TOMS748` does not reproduce exactly. It maps the test
+# driver's problem name and ``k`` to the allowed deviation between the measured and the paper's count (None: the
+# count is not checked) and the reason for that deviation.
+_TABLES_IV_TO_VI_DEVIATIONS = {
+    ("26[n=1]", 1): (None, _UNDERFLOW_DEVIATION_REASON),
+    ("26[n=1]", 2): (None, _UNDERFLOW_DEVIATION_REASON),
+    ("13[n=1]", 1): (1, _REBUILT_ALGORITHM_4_1_DEVIATION_REASON),
+    ("3[n=1]", 1): (2, _REBUILT_ALGORITHM_4_1_DEVIATION_REASON),
+    ("18[n=1]", 1): (1, _SIN_ROUNDING_DEVIATION_REASON),
+    ("28[n=30]", 2): (1, _PLATFORM_DEVIATION_REASON),
+}
+
+_PROBLEMS_BY_NAME = {problem.name: problem for problem in ALEFELD_POTRA_SHI_PROBLEMS}
+
+
+def _tables_iv_to_vi_problem(row: dict, k: int) -> PaperProblem:
+    """Return the test driver's problem that ``row`` names, with the paper's evaluation count for ``k`` and the allowed
+    deviation from that count, if any."""
+    n_fevals_tol, deviation_reason = _TABLES_IV_TO_VI_DEVIATIONS.get((row["name"], k), (0, None))
+    return replace(
+        _PROBLEMS_BY_NAME[row["name"]],
+        n_fevals=row[f"n_fevals_k{k}"],
+        n_fevals_tol=n_fevals_tol,
+        deviation_reason=deviation_reason,
+    )
+
+
+# `TABLES_IV_TO_VI_BY_K` maps ``k`` to the problems of the paper's Tables IV to VI, each with the paper's count for
+# that k.
+TABLES_IV_TO_VI_BY_K = {k: [_tables_iv_to_vi_problem(row, k) for row in _TABLES_IV_TO_VI_ROWS] for k in (1, 2)}
