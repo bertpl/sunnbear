@@ -4,6 +4,7 @@ against it."""
 import mpmath
 from mpmath.calculus.optimization import Illinois as MpmathIllinois
 
+from sunnbear.solvers import Interval
 from tests.solvers.example_functions import steep_exponential
 from tests.solvers.twins import TWIN_TEST_CASES, StoppingWrappedFunction, TwinSolver
 
@@ -26,6 +27,13 @@ class AndersonBjorckMpmathTwin(TwinSolver):
       cancellation in either form, which magnifies the last-bit differences between the 2 implementations to
       differences of thousands of ulps in the iterates.
 
+    The twin stops where `AndersonBjorck` stops, and returns the interval bound with the smaller unscaled ``|f|``.
+    `AndersonBjorck` compares the most recent iterate's ``|f|`` with the retained bound's scaled ``|f|``, which the
+    twin cannot compute, because the twin sees only the function values at the bounds.
+
+    Wherever the agreement check compares the 2 root estimates to the last bits, the 2 comparisons pick the same
+    bound.
+
     The twin is not compared on the test cases of `steep_exponential`: on that function, both solvers need more
     evaluations than the budget of the twin test cases, and the last-bit differences grow to thousands of ulps.
     """
@@ -41,3 +49,15 @@ class AndersonBjorckMpmathTwin(TwinSolver):
         # Anderson-Björck scaling of the retained bound.
         for _ in MpmathIllinois(mpmath.fp, f, [a, b], tol=0.0, verbose=False, method="anderson"):
             pass
+
+    def _root_if_sunnbear_solver_stops(
+        self, interval: Interval, evaluations: list[tuple[float, float]], xtol: float
+    ) -> float | None:
+        """Return the bound with the smaller unscaled ``|f|`` if `AndersonBjorck`'s stopping rule (the interval at most
+        ``xtol`` wide, or ``f`` at the best bound 0) holds after the last of ``evaluations``, or ``None`` if it
+        continues."""
+        (x_best, f_best), (x_other, _) = self._get_bounds_best_estimate_first(interval)
+        if abs(x_other - x_best) <= xtol or f_best == 0.0:
+            return x_best
+        else:
+            return None
