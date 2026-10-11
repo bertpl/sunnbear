@@ -1,5 +1,6 @@
 """This module holds `TABLE_2`, the cases of Table 2 of Chandrupatla's paper, with the paper's evaluation counts
-for its method, and `TABLE_2_N_BISECTION_SWITCHES`, the paper's bisection-switch counts for the same cases."""
+for its method, and `TABLE_2_WITH_N_BISECTION_SWITCHES`, which pairs each case with the number of times that the
+paper's method switches to bisection on it."""
 
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.chandrupatla import CHANDRUPATLA_BASIC_LISTING_FUNCTIONS
@@ -7,7 +8,8 @@ from tests.solvers.paper_problems.chandrupatla import CHANDRUPATLA_BASIC_LISTING
 # Each row of the paper's Table 2 holds:
 # - the function number;
 # - the 2 interval bounds;
-# - the evaluation count of the paper's method, with its number of bisection switches in parentheses.
+# - the evaluation count of the paper's method, followed in parentheses by the number of times that the method
+#   switches to bisection.
 _TABLE_2_ROWS = [
     {"number": 1, "a": 2, "b": 3, "n_fevals": 7, "n_bisection_switches": 0},
     {"number": 1, "a": 1, "b": 10, "n_fevals": 11, "n_bisection_switches": 4},
@@ -68,6 +70,7 @@ TABLE_2 = [
     for row in _TABLE_2_ROWS
 ]
 
-TABLE_2_N_BISECTION_SWITCHES = {
-    problem.name: row["n_bisection_switches"] for problem, row in zip(TABLE_2, _TABLE_2_ROWS, strict=True)
-}
+# Each pair holds a problem of `TABLE_2` and the paper's number of bisection switches on it.
+TABLE_2_WITH_N_BISECTION_SWITCHES = [
+    (problem, row["n_bisection_switches"]) for problem, row in zip(TABLE_2, _TABLE_2_ROWS, strict=True)
+]
