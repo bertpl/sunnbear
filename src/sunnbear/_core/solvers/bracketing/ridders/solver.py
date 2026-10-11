@@ -50,7 +50,8 @@ class Ridders(Solver):
 
     References:
         - Ridders, C. J. F. (1979). A new algorithm for computing a single root of a real continuous function. IEEE
-          Transactions on Circuits and Systems 26(11), 979-980. https://doi.org/10.1109/TCS.1979.1084580
+          Transactions on Circuits and Systems 26(11), 979-980. The test suite reproduces the first iteration of the
+          paper's example, and the iterates of its Section III. https://doi.org/10.1109/TCS.1979.1084580
         - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section
           9.2.1. Cambridge University Press. The book's routine ``zriddr`` is close to the ``"commons_math"``
           variant.
