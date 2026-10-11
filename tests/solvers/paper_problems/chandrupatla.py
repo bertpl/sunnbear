@@ -4,8 +4,8 @@ of its Table 2, without results.
 Function 7 comes in 2 versions: as the paper prints it, in `CHANDRUPATLA_FUNCTIONS`, and as the paper's BASIC listing
 computes it, in `CHANDRUPATLA_BASIC_LISTING_FUNCTIONS`.
 
-Table 2 compares the evaluation counts of the paper's method, Brent's method and bisection on 9 functions, each on 5
-intervals. A problem's name holds the function's number and the interval, e.g. ``1[2,3]``.
+Table 2 compares the evaluation counts of 3 methods, Brent's method among them, on 9 functions, each on 5 intervals. A
+problem's name holds the function's number and the interval, e.g. ``1[2,3]``.
 """
 
 import math
@@ -114,7 +114,7 @@ CHANDRUPATLA_TABLE_2_PROBLEMS_BY_NAME = {
 
 
 def chandrupatla_table_2_problems_with_n_bisection_switches(rows: list[dict]) -> list[tuple[PaperProblem, int]]:
-    """Return 1 pair per row of the paper's Table 2: the row's problem, with 1 method's evaluation count from the
+    """Return 1 pair per row of the paper's Table 2: the row's problem, with one method's evaluation count from the
     table, and that method's number of bisection switches on the problem.
 
     Args:

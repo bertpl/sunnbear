@@ -235,7 +235,7 @@ _TABLES_IV_TO_VI_DEVIATIONS = {
 TABLES_IV_TO_VI_BY_K = {
     k: alefeld_potra_shi_tables_iv_to_vi_problems(
         {row["name"]: row[f"n_fevals_k{k}"] for row in _TABLES_IV_TO_VI_ROWS},
-        {name: deviation for (name, k_), deviation in _TABLES_IV_TO_VI_DEVIATIONS.items() if k_ == k},
+        {name: deviation for (name, deviation_k), deviation in _TABLES_IV_TO_VI_DEVIATIONS.items() if deviation_k == k},
     )
     for k in (1, 2)
 }

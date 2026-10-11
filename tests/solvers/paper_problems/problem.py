@@ -94,11 +94,14 @@ class PaperProblem:
     # --------------------------------------------------------------------------
     @classmethod
     def for_each_n(
-        cls, number: int, function: Callable[..., float], a: float, b: float, ns: Iterable[int]
+        cls, problem_number: int, function: Callable[..., float], a: float, b: float, ns: Iterable[int]
     ) -> list["PaperProblem"]:
-        """Return 1 problem per value of ``n``, named ``{number}[n={n}]``, each with ``function`` bound to that
-        ``n``."""
-        return [cls(name=f"{number}[n={n}]", f=functools.partial(function, n=float(n)), a=a, b=b) for n in ns]
+        """Return 1 problem per value of ``n``, named ``{problem_number}[n={n}]``, each with ``function`` bound to
+        that ``n``.
+
+        ``function`` must take ``n`` as a keyword argument, and receives it as a float.
+        """
+        return [cls(name=f"{problem_number}[n={n}]", f=functools.partial(function, n=float(n)), a=a, b=b) for n in ns]
 
 
 # ==================================================================================================

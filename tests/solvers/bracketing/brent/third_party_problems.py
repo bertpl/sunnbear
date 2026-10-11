@@ -1,16 +1,15 @@
-"""This module holds the problems on which third parties publish evaluation counts for Brent's method, each with
-the published count for `Brent`:
+"""This module holds third parties' test problems for Brent's method, each with the published count for `Brent`:
 
 - `CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES`: the column "Brent's" of Table 2 of Chandrupatla (1997);
 - `ALEFELD_POTRA_SHI_TABLES_IV_TO_VI`: the column "BR" of Tables IV to VI of Alefeld, Potra and Shi (1995);
-- `ANDERSON_BJORCK_EXAMPLES_WITH_SINGLE_PRECISION_COUNTS`: the column "Brent" of Examples 1 to 7 of Anderson and
-  Björck (1973).
+- `ANDERSON_BJORCK_EXAMPLES_1_TO_7`: the column "Brent" of Examples 1 to 7 of Anderson and Björck (1973), in single
+  precision.
 """
 
 from dataclasses import replace
 
 from tests.solvers.paper_problems.alefeld_potra_shi import alefeld_potra_shi_tables_iv_to_vi_problems
-from tests.solvers.paper_problems.anderson_bjorck import ANDERSON_BJORCK_EXAMPLES
+from tests.solvers.paper_problems.anderson_bjorck import ANDERSON_BJORCK_PROBLEMS
 from tests.solvers.paper_problems.chandrupatla import chandrupatla_table_2_problems_with_n_bisection_switches
 
 # ==================================================================================================
@@ -117,8 +116,8 @@ ALEFELD_POTRA_SHI_TABLES_IV_TO_VI = alefeld_potra_shi_tables_iv_to_vi_problems(
 #  Anderson and Björck (1973), Examples 1 to 7
 # ==================================================================================================
 # `_ANDERSON_BJORCK_BRENT_N_ITERATIONS` maps the name of each example to the iteration count of the column "Brent",
-# from the paper's runs in single precision. Brent's method evaluates once per iteration, so the evaluation count adds
-# the 2 evaluations at the interval bounds.
+# from the paper's runs in single precision. Brent's method evaluates once per iteration, so the evaluation count is the
+# iteration count plus the 2 evaluations at the interval bounds.
 _ANDERSON_BJORCK_BRENT_N_ITERATIONS = {
     "1": 6,
     "2[n=1]": 5,
@@ -155,7 +154,9 @@ _ANDERSON_BJORCK_DEVIATION_REASON = (
 )
 _ANDERSON_BJORCK_DEVIATING_NAMES = {"2[n=5]", "5[n=2]", "7[n=2]", "7[n=15]"}
 
-ANDERSON_BJORCK_EXAMPLES_WITH_SINGLE_PRECISION_COUNTS = [
+if list(_ANDERSON_BJORCK_BRENT_N_ITERATIONS) != [problem.name for problem in ANDERSON_BJORCK_PROBLEMS]:
+    raise ValueError("Give 1 iteration count per problem of Anderson and Björck (1973), in the paper's order.")
+ANDERSON_BJORCK_EXAMPLES_1_TO_7 = [
     replace(
         problem,
         n_fevals=_ANDERSON_BJORCK_BRENT_N_ITERATIONS[problem.name] + 2,
@@ -164,5 +165,5 @@ ANDERSON_BJORCK_EXAMPLES_WITH_SINGLE_PRECISION_COUNTS = [
             _ANDERSON_BJORCK_DEVIATION_REASON if problem.name in _ANDERSON_BJORCK_DEVIATING_NAMES else None
         ),
     )
-    for problem in ANDERSON_BJORCK_EXAMPLES
+    for problem in ANDERSON_BJORCK_PROBLEMS
 ]
