@@ -1,5 +1,9 @@
-"""These tests assert that `TOMS748` reproduces the roots that the authors' code computes and the evaluation counts of
-Tables IV to VI of its paper, and that its evaluation totals come close to those of the paper's Table II."""
+"""These tests check `TOMS748` against the published results of Algorithm 748:
+
+- it reproduces the roots that the authors' code computes;
+- it reproduces the evaluation counts of the paper's Tables IV to VI;
+- its evaluation totals come close to those of the paper's Table II.
+"""
 
 import pytest
 

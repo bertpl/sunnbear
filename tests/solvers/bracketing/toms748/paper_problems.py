@@ -2,7 +2,8 @@
 
 - `AUTHORS_TEST_OUTPUT`, the roots that the authors' code computes with the tolerance ``tol = 0``, as its test
   output prints them;
-- `TABLES_IV_TO_VI_BY_K`, the evaluation counts of the paper's Tables IV to VI, keyed by ``k``.
+- `TABLES_IV_TO_VI_BY_K`, the evaluation counts of the paper's Tables IV to VI, keyed by the `TOMS748` parameter
+  ``k``, which selects Algorithm 4.1 (``k = 1``) or 4.2 (``k = 2``).
 """
 
 from dataclasses import replace
@@ -175,8 +176,8 @@ AUTHORS_TEST_OUTPUT = [
 ]
 
 
-# Tables IV to VI of the paper list, for some of the authors' test problems, the evaluation counts of Algorithms 4.1
-# (k = 1) and 4.2 (k = 2) at ``tol = 10^-15``, the 2 evaluations at the interval bounds included.
+# The paper's Tables IV to VI list the evaluation counts of Algorithms 4.1 (k = 1) and 4.2 (k = 2) on some of the
+# authors' test problems at ``tol = 10^-15``, counting the 2 evaluations at the interval bounds.
 #
 # The paper numbers its problems as its Table I does, not as the authors' test driver does; each row names the
 # driver's problem that matches the paper's problem.
@@ -205,20 +206,22 @@ _UNDERFLOW_DEVIATION_REASON = (
     "exp underflows; the paper's Section 6 states that how this function is coded changes the results"
 )
 _PLATFORM_DEVIATION_REASON = (
-    "the paper's platform presumably has library functions that round the function values differently"
+    "the paper's platform presumably has library functions that round the function values differently from those of "
+    "the platform that runs this test"
 )
-_K1_DEVIATION_REASON = (
+_REBUILT_ALGORITHM_4_1_DEVIATION_REASON = (
     "the authors' code implements only Algorithm 4.2, so `TOMS748` builds Algorithm 4.1 from the authors' "
     "subroutines, and the authors' own implementation of Algorithm 4.1 may differ in details that the paper does not "
     "state"
 )
 # `_TABLES_IV_TO_VI_DEVIATIONS` lists the rows whose count `TOMS748` does not reproduce exactly. It maps the test
-# driver's problem name and ``k`` to the allowed difference (None: the count is not checked) and the reason.
+# driver's problem name and ``k`` to the allowed deviation between the measured and the paper's count (None: the
+# count is not checked) and the reason for that deviation.
 _TABLES_IV_TO_VI_DEVIATIONS = {
     ("26[n=1]", 1): (None, _UNDERFLOW_DEVIATION_REASON),
     ("26[n=1]", 2): (None, _UNDERFLOW_DEVIATION_REASON),
-    ("13[n=1]", 1): (1, _K1_DEVIATION_REASON),
-    ("3[n=1]", 1): (2, _K1_DEVIATION_REASON),
+    ("13[n=1]", 1): (1, _REBUILT_ALGORITHM_4_1_DEVIATION_REASON),
+    ("3[n=1]", 1): (2, _REBUILT_ALGORITHM_4_1_DEVIATION_REASON),
     ("28[n=30]", 2): (1, _PLATFORM_DEVIATION_REASON),
 }
 
