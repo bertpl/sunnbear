@@ -6,7 +6,7 @@ import pytest
 from sunnbear.solvers import Chandrupatla
 from tests.solvers.paper_problems import PaperProblem
 
-from .paper_problems import TABLE_2, TABLE_2_BISECTION_SWITCHES
+from .paper_problems import TABLE_2, TABLE_2_N_BISECTION_SWITCHES
 
 
 @pytest.mark.parametrize("problem", TABLE_2, ids=str)
@@ -27,27 +27,31 @@ def test_the_evaluation_counts_of_table_2_of_the_paper_are_reproduced(problem: P
 def test_the_bisection_switch_counts_of_table_2_of_the_paper_are_reproduced(problem: PaperProblem):
     """On every row of the paper's Table 2, `Chandrupatla` switches to bisection exactly as often as the paper reports.
 
-    The paper counts the iterations that bisect because inverse quadratic interpolation does not hold, and leaves out
-    the first iteration, which always bisects. A bisection is the only step that evaluates the exact midpoint of the
-    interval: the clamp that keeps ``t`` away from the interval bounds leaves ``t = 0.5`` unchanged, and an
-    interpolated ``t`` of exactly 0.5 does not occur on these rows.
+    The paper counts the iterations that bisect because the paper's condition for using inverse quadratic
+    interpolation fails, and leaves out the first iteration, which always bisects.
     """
     # --- act --------------------------
     result = Chandrupatla().solve(problem.f, problem.a, problem.b, xtol=1e-5, max_fevals=100, history_enabled=True)
 
     # --- assert -----------------------
-    assert _count_bisection_switches(result.history) == TABLE_2_BISECTION_SWITCHES[problem.name]
+    assert _count_bisection_switches(result.history) == TABLE_2_N_BISECTION_SWITCHES[problem.name]
 
 
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
 def _count_bisection_switches(history: list[tuple[float, float]]) -> int:
-    """Return how many iterations after the first evaluate the exact midpoint of the interval.
+    """Return the number of iterations, the first one excluded, that evaluate the exact midpoint of the interval.
+
+    ``history`` holds every ``(x, f(x))`` of a `Chandrupatla` solve, in order, starting with the evaluations at ``a``
+    and ``b``.
 
     The function tracks the interval as the paper's listing arranges it: ``x1`` is the newest x-value, and ``x2`` the
-    interval bound where ``f`` has the other sign. Each iteration evaluates ``x1 + t * (x2 - x1)``, so a bisection
-    evaluates ``x1 + 0.5 * (x2 - x1)``.
+    interval bound where ``f`` has the opposite sign of ``f`` at ``x1``. Each iteration evaluates
+    ``x1 + t * (x2 - x1)``, so a bisection evaluates ``x1 + 0.5 * (x2 - x1)``.
+
+    A bisection is the only step that evaluates this exact midpoint: the clamp that keeps ``t`` away from 0 and 1
+    leaves ``t = 0.5`` unchanged, and an interpolated ``t`` of exactly 0.5 does not occur on the rows of Table 2.
     """
     (x1, f1), (x2, _) = history[0], history[1]
     n_switches = 0
