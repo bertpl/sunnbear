@@ -45,6 +45,8 @@ class Brent(Solver):
         - Brent, R. P. (1971). An algorithm with guaranteed convergence for finding a zero of a function. The
           Computer Journal 14(4), 422-425. The paper's appendix holds the Algol 60 procedure ``zero``.
           https://doi.org/10.1093/comjnl/14.4.422
+        - Brent, R. P. (1973). Algorithms for Minimization without Derivatives, chapter 4. Prentice-Hall. The test
+          suite reproduces the rows of its Table 4.1 whose functions do not underflow near the root.
         - SciPy's ``scipy.optimize.brentq``; the test suite checks `Brent` against ``scipy.optimize.brentq``.
     """
 
