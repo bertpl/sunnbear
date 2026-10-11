@@ -1,5 +1,5 @@
-"""These tests assert that `TOMS748` reproduces the roots that the authors' code computes, and that its evaluation
-totals come close to those of Table II of its paper."""
+"""These tests assert that `TOMS748` reproduces the roots that the authors' code computes and the evaluation counts of
+Tables IV to VI of its paper, and that its evaluation totals come close to those of the paper's Table II."""
 
 import pytest
 
@@ -7,7 +7,7 @@ from sunnbear.solvers import TOMS748
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.alefeld_potra_shi import ALEFELD_POTRA_SHI_PROBLEMS
 
-from .paper_problems import AUTHORS_TEST_OUTPUT, PRINTED_ROOTS
+from .paper_problems import AUTHORS_TEST_OUTPUT, PRINTED_ROOTS, TABLES_IV_TO_VI
 
 
 def test_the_printed_roots_name_exactly_the_alefeld_potra_shi_problems():
@@ -58,6 +58,26 @@ def test_the_total_evaluation_count_lies_within_1_1_percent_of_the_papers_table_
 
     # --- assert -----------------------
     assert abs(total - paper_total) <= 0.011 * paper_total
+
+
+@pytest.mark.parametrize(
+    "k, problem",
+    [
+        pytest.param(k, problem, id=f"k={k}-{problem.name}")
+        for k, problems in TABLES_IV_TO_VI.items()
+        for problem in problems
+    ],
+)
+def test_the_evaluation_counts_of_tables_iv_to_vi_of_the_paper_are_reproduced(k: int, problem: PaperProblem):
+    """On every problem of the paper's Tables IV to VI, `TOMS748` with ``tol = 10^-15`` evaluates as often as the paper
+    reports for its ``k``, except on the rows whose deviation the problem states."""
+    # --- act --------------------------
+    result = _TOMS748WithPaperTolerance(k=k, n_digits=15).solve(
+        problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100
+    )
+
+    # --- assert -----------------------
+    problem.assert_reproduced_by(result)
 
 
 # ==================================================================================================

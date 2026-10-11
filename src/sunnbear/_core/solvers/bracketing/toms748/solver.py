@@ -58,8 +58,8 @@ class TOMS748(Solver):
     References:
         - Alefeld, G. E., Potra, F. A. and Shi, Y. (1995). Algorithm 748: Enclosing zeros of continuous functions.
           ACM Transactions on Mathematical Software 21(3), 327-344. Its subroutine ``ipzero`` is the inverse cubic
-          interpolation, and its section 6 states the stopping criterion and the margin.
-          https://doi.org/10.1145/210089.210111
+          interpolation, and its section 6 states the stopping criterion and the margin. The test suite compares the
+          evaluation counts of `TOMS748` with the paper's Tables II and IV to VI. https://doi.org/10.1145/210089.210111
         - The authors' Fortran 77 code, published with the paper as algorithm 748 of the Collected Algorithms of the
           ACM (netlib, ``toms/748``). It implements Algorithm 4.2, which ``k = 2`` follows line by line, and the test
           suite reproduces the roots that the code lists for its test problems.
