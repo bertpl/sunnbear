@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Change the tuple sets that `generate_mc_tuples` builds for the same arguments
 - Draw each size's `n_population` candidate tuples in `generate_mc_tuples` only in the fine lanes where that size's new tuples can go, so that every candidate can be picked
+- Rebuild the shipped Monte Carlo tuple set; benchmark results on it differ from those on the previous set
 
 ### Deprecated
 
