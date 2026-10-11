@@ -1,4 +1,4 @@
-"""Tests of `CARF`.
+"""This package tests `CARF`.
 
 Published results:
 

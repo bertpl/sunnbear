@@ -1,4 +1,4 @@
-"""Tests of `Secant`.
+"""This package tests `Secant`.
 
 Published results:
 

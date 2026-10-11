@@ -1,4 +1,4 @@
-"""Tests of `Ridders`.
+"""This package tests `Ridders`.
 
 Published results:
 

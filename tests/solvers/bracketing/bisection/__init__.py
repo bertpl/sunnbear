@@ -1,4 +1,4 @@
-"""Tests of `Bisection`.
+"""This package tests `Bisection`.
 
 Published results:
 
