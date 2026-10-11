@@ -24,6 +24,9 @@ class PaperProblem:
             tolerances at their default of 0, the root must match exactly.
         n_fevals: The published evaluation count in sunnbear's counting, which includes the 2 evaluations at the
             interval bounds, or None where the paper gives none.
+        n_fevals_lower_bound: A count that the solve's evaluation count must exceed, where the paper prints only
+            that its count exceeds a number, such as "200+"; None otherwise. At most 1 of ``n_fevals`` and
+            ``n_fevals_lower_bound`` is set.
         n_fevals_tol: How far the solve's evaluation count may lie from ``n_fevals``; None when the solve's
             evaluation count is not checked.
         deviation_reason: Why the solve's evaluation count does not reproduce ``n_fevals`` exactly; required whenever
@@ -38,13 +41,17 @@ class PaperProblem:
     root_rel_tol: float = 0.0
     root_abs_tol: float = 0.0
     n_fevals: int | None = None
+    n_fevals_lower_bound: int | None = None
     n_fevals_tol: int | None = 0
     deviation_reason: str | None = None
 
     def __post_init__(self) -> None:
-        """Check that a deviation_reason is given exactly when the count is not reproduced exactly."""
+        """Check that a deviation_reason is given exactly when the count is not reproduced exactly, and that at most 1
+        of the published count and its lower bound is set."""
         if (self.n_fevals_tol != 0) != (self.deviation_reason is not None):
             raise ValueError(f"{self.name}: give a deviation_reason exactly when n_fevals_tol is not 0.")
+        if self.n_fevals is not None and self.n_fevals_lower_bound is not None:
+            raise ValueError(f"{self.name}: set at most 1 of n_fevals and n_fevals_lower_bound.")
 
     def __str__(self) -> str:
         """Return the problem's name, so that ``ids=str`` labels each pytest case with it."""
@@ -55,10 +62,29 @@ class PaperProblem:
 
         - it converges;
         - it returns the published root within the root's tolerances, where the paper gives one;
-        - it evaluates as often as published, within ``n_fevals_tol``, where the count is checked.
+        - its evaluation count reproduces the published one, as `assert_n_fevals_reproduced` checks it.
         """
         assert result.status is SolveStatus.CONVERGED
         if self.root is not None:
             assert result.x == pytest.approx(self.root, rel=self.root_rel_tol, abs=self.root_abs_tol)
-        if self.n_fevals is not None and self.n_fevals_tol is not None:
-            assert abs(result.n_fevals - self.n_fevals) <= self.n_fevals_tol
+        self.assert_n_fevals_reproduced(result.n_fevals)
+
+    def assert_n_fevals_reproduced(self, n_fevals: int | None, *, max_fevals: int | None = None) -> None:
+        """Assert that a solve's evaluation count at its stop reproduces the published count:
+
+        - it exceeds ``n_fevals_lower_bound``, where the paper prints only a lower bound;
+        - else it lies within ``n_fevals_tol`` of ``n_fevals``, where the count is checked.
+
+        Args:
+            n_fevals: The solve's evaluation count at its stop, or None when the solve did not stop within its
+                ``max_fevals`` evaluations; its count at the stop then exceeds ``max_fevals``.
+            max_fevals: The solve's evaluation budget; required when ``n_fevals`` is None.
+        """
+        if n_fevals is None:
+            assert self.n_fevals_lower_bound is not None
+            assert max_fevals is not None
+            assert max_fevals > self.n_fevals_lower_bound
+        elif self.n_fevals_lower_bound is not None:
+            assert n_fevals > self.n_fevals_lower_bound
+        elif self.n_fevals is not None and self.n_fevals_tol is not None:
+            assert abs(n_fevals - self.n_fevals) <= self.n_fevals_tol
