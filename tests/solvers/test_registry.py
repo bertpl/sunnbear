@@ -61,7 +61,7 @@ _BUILT_IN_CONFIG_ROWS = [
         ITPPaperExperimentsSlack0Config,
         "itp[n_slack=0,variant='paper_experiments']",
         ITP,
-        SolverRole.BUILTIN_SECONDARY,
+        SolverRole.BUILTIN_CORE,
     ),
     (
         ITPPaperPseudocodeSlack0Config,
@@ -69,7 +69,12 @@ _BUILT_IN_CONFIG_ROWS = [
         ITP,
         SolverRole.BUILTIN_SECONDARY,
     ),
-    (ITPPaperExperimentsSlack4Config, "itp[n_slack=4,variant='paper_experiments']", ITP, SolverRole.BUILTIN_CORE),
+    (
+        ITPPaperExperimentsSlack4Config,
+        "itp[n_slack=4,variant='paper_experiments']",
+        ITP,
+        SolverRole.BUILTIN_SECONDARY,
+    ),
     (ModABConfig, "modab", ModAB, SolverRole.BUILTIN_SECONDARY),
     (PegasusConfig, "pegasus", Pegasus, SolverRole.BUILTIN_SECONDARY),
     (RegulaFalsiConfig, "regula_falsi", RegulaFalsi, SolverRole.BUILTIN_SECONDARY),
@@ -83,8 +88,8 @@ _BUILT_IN_CONFIG_ROWS = [
     (RiddersScipyConfig, "ridders[variant='scipy']", Ridders, SolverRole.BUILTIN_CORE),
     (SecantConfig, "secant", Secant, SolverRole.BUILTIN_SECONDARY),
     (SteffenBrentConfig, "steffen_brent", SteffenBrent, SolverRole.BUILTIN_SECONDARY),
-    (TOMS748K1Config, "toms748[k=1]", TOMS748, SolverRole.BUILTIN_CORE),
-    (TOMS748K2Config, "toms748[k=2]", TOMS748, SolverRole.BUILTIN_SECONDARY),
+    (TOMS748K1Config, "toms748[k=1]", TOMS748, SolverRole.BUILTIN_SECONDARY),
+    (TOMS748K2Config, "toms748[k=2]", TOMS748, SolverRole.BUILTIN_CORE),
 ]
 
 
