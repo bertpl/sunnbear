@@ -5,8 +5,15 @@ import pytest
 
 from sunnbear.solvers import Chandrupatla
 from tests.solvers.paper_problems import PaperProblem
+from tests.solvers.paper_problems.chandrupatla import ChandrupatlaTable2Problem
 
 from .paper_problems import TABLE_2, TABLE_2_WITH_N_BISECTION_SWITCHES
+
+
+def test_the_rows_of_table_2_name_every_problem_of_the_table_in_order():
+    """`TABLE_2` holds 1 problem per member of `ChandrupatlaTable2Problem`, in the table's order."""
+    # --- assert -----------------------
+    assert [problem.name for problem in TABLE_2] == [member.value.name for member in ChandrupatlaTable2Problem]
 
 
 @pytest.mark.parametrize("problem", TABLE_2, ids=str)

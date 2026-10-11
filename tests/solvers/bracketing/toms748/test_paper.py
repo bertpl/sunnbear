@@ -9,7 +9,10 @@ import pytest
 
 from sunnbear.solvers import TOMS748
 from tests.solvers.paper_problems import PaperProblem
-from tests.solvers.paper_problems.alefeld_potra_shi import ALEFELD_POTRA_SHI_PROBLEMS
+from tests.solvers.paper_problems.alefeld_potra_shi import (
+    ALEFELD_POTRA_SHI_PROBLEMS,
+    AlefeldPotraShiTablesIVToVIProblem,
+)
 
 from .paper_problems import AUTHORS_TEST_OUTPUT, PRINTED_ROOTS, TABLES_IV_TO_VI_BY_K
 
@@ -30,6 +33,16 @@ def test_k_2_reproduces_the_root_that_the_authors_code_computes(problem: PaperPr
 
     # --- assert -----------------------
     problem.assert_reproduced_by(result)
+
+
+@pytest.mark.parametrize("k", [1, 2])
+def test_the_rows_of_tables_iv_to_vi_name_every_problem_of_the_tables_in_order(k: int):
+    """`TABLES_IV_TO_VI_BY_K` holds, for each ``k``, 1 problem per member of `AlefeldPotraShiTablesIVToVIProblem`, in
+    the tables' order."""
+    # --- assert -----------------------
+    assert [problem.name for problem in TABLES_IV_TO_VI_BY_K[k]] == [
+        member.value.name for member in AlefeldPotraShiTablesIVToVIProblem
+    ]
 
 
 @pytest.mark.parametrize(

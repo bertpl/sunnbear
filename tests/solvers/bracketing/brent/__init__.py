@@ -12,7 +12,20 @@ Published results:
 
 Third-party published results:
 
-- None.
+- Chandrupatla (1997), Table 2, the column "Brent's": reproduced, in ``test_third_party.py``: all 45 evaluation
+  counts, and the number of bisections on each.
+- Alefeld, Potra and Shi (1995), Tables IV to VI, the column "BR": reproduced, in ``test_third_party.py``: 16 of the
+  17 evaluation counts exactly; the count of the 17th is not checked, and the test data states why.
+- Alefeld, Potra and Shi (1995), Table II, the column "BR": reproduced, in ``test_third_party.py``: the totals within
+  1 %.
+- Alefeld, Potra and Shi (1995), Table III, the column "BR": not reproduced, because the paper does not list the 139
+  problems behind its totals.
+- Anderson and Björck (1973), Examples 1 to 7, the column "Brent": reproduced, in ``test_third_party.py``: 22 of the
+  26 iteration counts exactly, and the other 4 within 1; the test data states why.
+- Anderson and Björck (1973), the double-precision totals on p. 263, the column "Brent": not reproduced, cause
+  unknown. On Examples 1 to 5, `Brent` takes 15 to 18 iterations fewer in float64 and in emulated 60-bit arithmetic,
+  the double precision of the paper's UNIVAC 1108, and the paper gives no per-example counts in double precision that
+  could show where the difference arises.
 
 Reference implementations:
 

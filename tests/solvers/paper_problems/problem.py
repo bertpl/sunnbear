@@ -2,7 +2,8 @@
 `PaperProblemEnum`, the base of the enums that hold a published table shared by several solvers, and
 `UNSTATED_RUN_DETAILS`, the reason for a deviation of 1 that has no cause of its own."""
 
-from collections.abc import Callable
+import functools
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, replace
 from enum import Enum
 
@@ -88,6 +89,20 @@ class PaperProblem:
         elif self.n_fevals is not None and self.n_fevals_tol is not None:
             assert abs(solve_n_fevals - self.n_fevals) <= self.n_fevals_tol
 
+    # --------------------------------------------------------------------------
+    #  Factory methods
+    # --------------------------------------------------------------------------
+    @classmethod
+    def for_each_n(
+        cls, problem_number: int, function: Callable[..., float], a: float, b: float, ns: Iterable[int]
+    ) -> list["PaperProblem"]:
+        """Return 1 problem per value of ``n``, named ``{problem_number}[n={n}]``, each with ``function`` bound to
+        that ``n``.
+
+        ``function`` must take ``n`` as a keyword argument, and receives it as a float.
+        """
+        return [cls(name=f"{problem_number}[n={n}]", f=functools.partial(function, n=float(n)), a=a, b=b) for n in ns]
+
 
 # ==================================================================================================
 #  PaperProblemEnum
@@ -100,6 +115,32 @@ class PaperProblemEnum(Enum):
     A solver's tests then list the table as 1 line per row, such as
     ``FordTable4Problem.F1_I1.with_n_iterations(10)``.
     """
+
+    def with_n_fevals(
+        self,
+        n_fevals: int,
+        *,
+        deviation: int | None = 0,
+        reason: str | None = None,
+        observation: str | None = None,
+    ) -> PaperProblem:
+        """Return the member's problem with a published evaluation count, which includes the 2 evaluations at the
+        interval bounds.
+
+        Args:
+            n_fevals: The published evaluation count.
+            deviation: How far the solve's count may lie from the published one; 0 when it must match exactly, and
+                None when the count is not checked.
+            reason: Why the count deviates; required when ``deviation`` is not 0.
+            observation: What the solve does differently from the published run; optional, beside a ``reason``.
+        """
+        return replace(
+            self.value,
+            n_fevals=n_fevals,
+            n_fevals_tol=deviation,
+            deviation_reason=reason,
+            deviation_observation=observation,
+        )
 
     def with_n_iterations(
         self, n_iterations: int, *, deviation: int = 0, reason: str | None = None, observation: str | None = None
