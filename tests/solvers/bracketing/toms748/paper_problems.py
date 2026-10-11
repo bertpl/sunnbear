@@ -9,7 +9,11 @@
 from dataclasses import replace
 
 from tests.solvers.paper_problems import PaperProblem
-from tests.solvers.paper_problems.alefeld_potra_shi import ALEFELD_POTRA_SHI_PROBLEMS
+from tests.solvers.paper_problems.alefeld_potra_shi import (
+    ALEFELD_POTRA_SHI_PROBLEMS,
+    ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME,
+    TABLES_IV_TO_VI_PAPER_LABELS,
+)
 
 # The authors' test output lists, in the order of their test data, the root that their code prints to 14 significant
 # digits for each problem.
@@ -176,29 +180,26 @@ AUTHORS_TEST_OUTPUT = [
 ]
 
 
-# The paper's Tables IV to VI list the evaluation counts of Algorithms 4.1 (k = 1) and 4.2 (k = 2) on some of the
-# authors' test problems at ``tol = 10^-15``, counting the 2 evaluations at the interval bounds.
-#
-# The paper numbers its problems as its Table I does, not as the authors' test driver does; each row names the
-# driver's problem that matches the paper's problem.
+# The paper's Tables IV to VI list the evaluation counts of Algorithms 4.1 (k = 1) and 4.2 (k = 2) on the problems of
+# `TABLES_IV_TO_VI_PAPER_LABELS`, counting the 2 evaluations at the interval bounds.
 _TABLES_IV_TO_VI_ROWS = [
-    {"name": "26[n=1]", "paper_label": "Table IV: 13", "n_fevals_k1": 28, "n_fevals_k2": 29},
-    {"name": "13[n=1]", "paper_label": "Table V: 3[a=-100,b=-2]", "n_fevals_k1": 25, "n_fevals_k2": 24},
-    {"name": "27[n=10]", "paper_label": "Table V: 14[n=10]", "n_fevals_k1": 20, "n_fevals_k2": 19},
-    {"name": "27[n=30]", "paper_label": "Table V: 14[n=30]", "n_fevals_k1": 20, "n_fevals_k2": 19},
-    {"name": "28[n=30]", "paper_label": "Table V: 15[n=30]", "n_fevals_k1": 29, "n_fevals_k2": 31},
-    {"name": "28[n=500]", "paper_label": "Table V: 15[n=500]", "n_fevals_k1": 35, "n_fevals_k2": 35},
-    {"name": "1[n=1]", "paper_label": "Table VI: 1", "n_fevals_k1": 10, "n_fevals_k2": 10},
-    {"name": "3[n=1]", "paper_label": "Table VI: 2[n=2]", "n_fevals_k1": 15, "n_fevals_k2": 11},
-    {"name": "16[n=4]", "paper_label": "Table VI: 4[a=1,n=4]", "n_fevals_k1": 12, "n_fevals_k2": 13},
-    {"name": "18[n=1]", "paper_label": "Table VI: 5", "n_fevals_k1": 11, "n_fevals_k2": 10},
-    {"name": "19[n=20]", "paper_label": "Table VI: 6[n=20]", "n_fevals_k1": 12, "n_fevals_k2": 11},
-    {"name": "20[n=10]", "paper_label": "Table VI: 7[n=10]", "n_fevals_k1": 7, "n_fevals_k2": 7},
-    {"name": "21[n=10]", "paper_label": "Table VI: 8[n=10]", "n_fevals_k1": 12, "n_fevals_k2": 11},
-    {"name": "22[n=1]", "paper_label": "Table VI: 9[n=1]", "n_fevals_k1": 11, "n_fevals_k2": 9},
-    {"name": "23[n=5]", "paper_label": "Table VI: 10[n=5]", "n_fevals_k1": 12, "n_fevals_k2": 9},
-    {"name": "24[n=20]", "paper_label": "Table VI: 11[n=20]", "n_fevals_k1": 17, "n_fevals_k2": 18},
-    {"name": "25[n=3]", "paper_label": "Table VI: 12[n=3]", "n_fevals_k1": 6, "n_fevals_k2": 5},
+    {"name": "26[n=1]", "n_fevals_k1": 28, "n_fevals_k2": 29},
+    {"name": "13[n=1]", "n_fevals_k1": 25, "n_fevals_k2": 24},
+    {"name": "27[n=10]", "n_fevals_k1": 20, "n_fevals_k2": 19},
+    {"name": "27[n=30]", "n_fevals_k1": 20, "n_fevals_k2": 19},
+    {"name": "28[n=30]", "n_fevals_k1": 29, "n_fevals_k2": 31},
+    {"name": "28[n=500]", "n_fevals_k1": 35, "n_fevals_k2": 35},
+    {"name": "1[n=1]", "n_fevals_k1": 10, "n_fevals_k2": 10},
+    {"name": "3[n=1]", "n_fevals_k1": 15, "n_fevals_k2": 11},
+    {"name": "16[n=4]", "n_fevals_k1": 12, "n_fevals_k2": 13},
+    {"name": "18[n=1]", "n_fevals_k1": 11, "n_fevals_k2": 10},
+    {"name": "19[n=20]", "n_fevals_k1": 12, "n_fevals_k2": 11},
+    {"name": "20[n=10]", "n_fevals_k1": 7, "n_fevals_k2": 7},
+    {"name": "21[n=10]", "n_fevals_k1": 12, "n_fevals_k2": 11},
+    {"name": "22[n=1]", "n_fevals_k1": 11, "n_fevals_k2": 9},
+    {"name": "23[n=5]", "n_fevals_k1": 12, "n_fevals_k2": 9},
+    {"name": "24[n=20]", "n_fevals_k1": 17, "n_fevals_k2": 18},
+    {"name": "25[n=3]", "n_fevals_k1": 6, "n_fevals_k2": 5},
 ]
 
 _UNDERFLOW_DEVIATION_REASON = (
@@ -230,15 +231,13 @@ _TABLES_IV_TO_VI_DEVIATIONS = {
     ("28[n=30]", 2): (1, _PLATFORM_DEVIATION_REASON),
 }
 
-_PROBLEMS_BY_NAME = {problem.name: problem for problem in ALEFELD_POTRA_SHI_PROBLEMS}
-
 
 def _tables_iv_to_vi_problem(row: dict, k: int) -> PaperProblem:
     """Return the test driver's problem that ``row`` names, with the paper's evaluation count for ``k`` and the allowed
     deviation from that count, if any."""
     n_fevals_tol, deviation_reason = _TABLES_IV_TO_VI_DEVIATIONS.get((row["name"], k), (0, None))
     return replace(
-        _PROBLEMS_BY_NAME[row["name"]],
+        ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME[row["name"]],
         n_fevals=row[f"n_fevals_k{k}"],
         n_fevals_tol=n_fevals_tol,
         deviation_reason=deviation_reason,
@@ -247,4 +246,6 @@ def _tables_iv_to_vi_problem(row: dict, k: int) -> PaperProblem:
 
 # `TABLES_IV_TO_VI_BY_K` maps ``k`` to the problems of the paper's Tables IV to VI, each with the paper's count for
 # that k.
+if [row["name"] for row in _TABLES_IV_TO_VI_ROWS] != list(TABLES_IV_TO_VI_PAPER_LABELS):
+    raise ValueError("Give 1 row per problem of the paper's Tables IV to VI, in the tables' order.")
 TABLES_IV_TO_VI_BY_K = {k: [_tables_iv_to_vi_problem(row, k) for row in _TABLES_IV_TO_VI_ROWS] for k in (1, 2)}

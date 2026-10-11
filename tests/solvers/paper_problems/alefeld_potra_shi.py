@@ -171,3 +171,28 @@ ALEFELD_POTRA_SHI_PROBLEMS = [
         problem_number=28, function=_function_28, a=-10000.0, b=1e-4, ns=[*range(20, 41), *range(100, 1001, 100)]
     ),
 ]
+
+ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME = {problem.name: problem for problem in ALEFELD_POTRA_SHI_PROBLEMS}
+
+# The paper's Tables IV to VI list evaluation counts on some of the problems, at ``tol = 10^-15``. The paper numbers
+# its problems as its Table I does, not as the authors' test driver does, so `TABLES_IV_TO_VI_PAPER_LABELS` maps the
+# driver's name of each problem in the tables to the paper's label for it, in the tables' order.
+TABLES_IV_TO_VI_PAPER_LABELS = {
+    "26[n=1]": "Table IV: 13",
+    "13[n=1]": "Table V: 3[a=-100,b=-2]",
+    "27[n=10]": "Table V: 14[n=10]",
+    "27[n=30]": "Table V: 14[n=30]",
+    "28[n=30]": "Table V: 15[n=30]",
+    "28[n=500]": "Table V: 15[n=500]",
+    "1[n=1]": "Table VI: 1",
+    "3[n=1]": "Table VI: 2[n=2]",
+    "16[n=4]": "Table VI: 4[a=1,n=4]",
+    "18[n=1]": "Table VI: 5",
+    "19[n=20]": "Table VI: 6[n=20]",
+    "20[n=10]": "Table VI: 7[n=10]",
+    "21[n=10]": "Table VI: 8[n=10]",
+    "22[n=1]": "Table VI: 9[n=1]",
+    "23[n=5]": "Table VI: 10[n=5]",
+    "24[n=20]": "Table VI: 11[n=20]",
+    "25[n=3]": "Table VI: 12[n=3]",
+}
