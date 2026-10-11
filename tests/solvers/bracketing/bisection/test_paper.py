@@ -9,8 +9,8 @@ def test_the_midpoints_of_table_2_1_of_atkinson_are_reproduced():
     """On ``x^6 - x - 1`` over ``[1, 2]``, with Atkinson's ``epsilon = 0.00005`` as ``xtol``, `Bisection` evaluates
     the midpoints ``c_1`` to ``c_14`` of Table 2.1 of Atkinson (1989), and returns ``c_15``.
 
-    The table prints each midpoint and its function value rounded to 5 decimals, and rounds a tie up: it prints
-    ``c_6 = 1.140625`` as 1.14063.
+    The table prints each midpoint and its function value rounded to at most 5 decimals, and rounds a tie up: it
+    prints ``c_6 = 1.140625`` as 1.14063.
 
     Atkinson's algorithm, like `Bisection`, stops once ``c_15`` lies within ``epsilon`` of both bounds of the current
     interval, and accepts ``c_15`` without evaluating it. The table's ``f(c_15) = 0.00016`` is ``f`` evaluated at the
