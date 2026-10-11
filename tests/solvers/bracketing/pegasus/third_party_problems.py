@@ -1,7 +1,7 @@
 """This module holds `FORD_TABLE_4`, the problems of Table 4 of Ford (1997), each with Ford's iteration count for
 `Pegasus`."""
 
-from tests.solvers.paper_problems.ford import ford_table_4_problems
+from tests.solvers.paper_problems.ford import F_EQUALS_ZERO_DEVIATION_REASON, ford_table_4_problems
 
 # `_FORD_TABLE_4_ROWS` holds the rows of Ford's Table 4, with Ford's iteration counts for `Pegasus`.
 _FORD_TABLE_4_ROWS = [
@@ -22,17 +22,12 @@ _FORD_TABLE_4_ROWS = [
     {"name": "5[0.025,0.5]", "n_iterations": 46},
 ]
 
-_F_EQUALS_ZERO_DEVIATION_REASON = (
-    "the solve reaches f(x) == 0 one iteration before the stop that Ford reports; near the root, the computed function "
-    "value is smaller than its rounding error, which differs between Ford's platform and the platform that runs this "
-    "test"
-)
 # `_FORD_TABLE_4_DEVIATIONS` maps the name of each row whose count `Pegasus` does not reproduce exactly to the
 # allowed deviation and its reason.
 _FORD_TABLE_4_DEVIATIONS = {
-    "4[0,1]": (1, _F_EQUALS_ZERO_DEVIATION_REASON),
-    "5[0.035,0.05]": (1, _F_EQUALS_ZERO_DEVIATION_REASON),
-    "5[0.03,0.09]": (1, _F_EQUALS_ZERO_DEVIATION_REASON),
+    "4[0,1]": (1, F_EQUALS_ZERO_DEVIATION_REASON),
+    "5[0.035,0.05]": (1, F_EQUALS_ZERO_DEVIATION_REASON),
+    "5[0.03,0.09]": (1, F_EQUALS_ZERO_DEVIATION_REASON),
 }
 
 FORD_TABLE_4 = ford_table_4_problems(_FORD_TABLE_4_ROWS, _FORD_TABLE_4_DEVIATIONS)

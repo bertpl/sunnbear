@@ -1,7 +1,7 @@
 """This module holds `FORD_TABLE_4`, the problems of Table 4 of Ford (1997), each with Ford's iteration count for
 `Illinois`."""
 
-from tests.solvers.paper_problems.ford import ford_table_4_problems
+from tests.solvers.paper_problems.ford import F_EQUALS_ZERO_DEVIATION_REASON, ford_table_4_problems
 
 # `_FORD_TABLE_4_ROWS` holds the rows of Ford's Table 4, with Ford's iteration counts for `Illinois`.
 _FORD_TABLE_4_ROWS = [
@@ -22,27 +22,22 @@ _FORD_TABLE_4_ROWS = [
     {"name": "5[0.025,0.5]", "n_iterations": 49},
 ]
 
-_F_EQUALS_ZERO_DEVIATION_REASON = (
-    "the solve reaches f(x) == 0 one iteration before the stop that Ford reports; near the root, the computed function "
-    "value is smaller than its rounding error, which differs between Ford's platform and the platform that runs this "
-    "test"
-)
-_NEAR_LIMIT_DEVIATION_REASON = (
-    "the solve stops on an iterate whose |f(x)| is 0.994 times Ford's limit on |f(x)|, one iteration before the stop "
-    "that Ford reports; on Ford's platform, a slightly different rounding of that function value keeps it above the "
-    "limit"
-)
-_WIDTH_DEVIATION_REASON = (
-    "the interval drops below Ford's width limit one iteration before the stop that Ford reports; the steps near the "
-    "root depend on the last bits of the function values, which differ between Ford's platform and the platform that "
-    "runs this test"
-)
 # `_FORD_TABLE_4_DEVIATIONS` maps the name of each row whose count `Illinois` does not reproduce exactly to the
 # allowed deviation and its reason.
 _FORD_TABLE_4_DEVIATIONS = {
-    "2[0.5,1.5]": (1, _NEAR_LIMIT_DEVIATION_REASON),
-    "5[0.03,0.09]": (1, _WIDTH_DEVIATION_REASON),
-    "5[0.025,0.5]": (1, _F_EQUALS_ZERO_DEVIATION_REASON),
+    "2[0.5,1.5]": (
+        1,
+        "the solve stops on an iterate whose |f(x)| is 0.994 times Ford's limit on |f(x)|, one iteration earlier than "
+        "Ford reports; on Ford's platform, a slightly different rounding of that function value keeps it above the "
+        "limit",
+    ),
+    "5[0.03,0.09]": (
+        1,
+        "the interval drops below Ford's width limit one iteration earlier than Ford reports; the steps near the root "
+        "depend on the last bits of the function values, which differ between Ford's platform and the platform that "
+        "runs this test",
+    ),
+    "5[0.025,0.5]": (1, F_EQUALS_ZERO_DEVIATION_REASON),
 }
 
 FORD_TABLE_4 = ford_table_4_problems(_FORD_TABLE_4_ROWS, _FORD_TABLE_4_DEVIATIONS)

@@ -4,8 +4,8 @@ Ford's Table 4 compares the iteration counts of several Illinois-type methods, a
 Anderson-Björck methods, on 5 functions, each on 3 intervals. A problem's name holds the function's number in the
 paper and the interval, e.g. ``1[0.5,2]``.
 
-The paper stops each solve by a stopping rule of its own, which no sunnbear solver uses; `assert_ford_count_reproduced`
-checks a solver's evaluation count at the point where that rule stops.
+The paper stops each solve by a stopping rule of its own, which no sunnbear solver uses;
+`assert_n_fevals_at_ford_stop_reproduced` checks a solver's evaluation count at the point where that rule stops.
 """
 
 import math
@@ -15,9 +15,15 @@ from sunnbear.solvers import Solver, SolveResult
 
 from .problem import PaperProblem
 
-# `_FORD_MAX_FEVALS` is the evaluation budget of a solve under Ford's stopping rule; it exceeds every count that Ford
-# prints, "200+" included.
-_FORD_MAX_FEVALS = 300
+# `_MAX_FEVALS_UNDER_FORD_STOPPING_RULE` is the evaluation budget of a solve under Ford's stopping rule; it exceeds
+# every count in Ford's Table 4, including the 200 of each row that Ford prints as "200+".
+_MAX_FEVALS_UNDER_FORD_STOPPING_RULE = 300
+
+# `F_EQUALS_ZERO_DEVIATION_REASON` explains a count 1 below Ford's on a row where the solve reaches f(x) == 0 early.
+F_EQUALS_ZERO_DEVIATION_REASON = (
+    "the solve reaches f(x) == 0 one iteration earlier than Ford reports; near the root, the computed function value "
+    "is smaller than its rounding error, which differs between Ford's platform and the platform that runs this test"
+)
 
 
 # ==================================================================================================
@@ -63,12 +69,12 @@ FORD_TABLE_4_PROBLEMS_BY_NAME = {
 
 
 def ford_table_4_problems(rows: list[dict], deviations: dict[str, tuple[int, str]]) -> list[PaperProblem]:
-    """Return the problems of Ford's Table 4 with 1 solver's counts, in sunnbear's counting, which adds the 2
-    evaluations at the interval bounds to Ford's iterations.
+    """Return the problems of Ford's Table 4, each with 1 solver's count from the table, converted to sunnbear's
+    evaluation count: Ford's iterations plus the 2 evaluations at the interval bounds.
 
     Args:
         rows: 1 dict per row of the table, in the table's order, with the row's ``name`` and either Ford's
-            ``n_iterations`` or, for a row that Ford prints as "200+", ``n_iterations_lower_bound``.
+            ``n_iterations`` or, for a row that Ford prints as "200+", ``n_iterations_strict_lower_bound``.
         deviations: The allowed deviation and its reason, by the name of each row whose count the solver does not
             reproduce exactly.
 
@@ -80,8 +86,8 @@ def ford_table_4_problems(rows: list[dict], deviations: dict[str, tuple[int, str
     problems = []
     for row in rows:
         problem = FORD_TABLE_4_PROBLEMS_BY_NAME[row["name"]]
-        if "n_iterations_lower_bound" in row:
-            problems.append(replace(problem, n_fevals_lower_bound=row["n_iterations_lower_bound"] + 2))
+        if "n_iterations_strict_lower_bound" in row:
+            problems.append(replace(problem, n_fevals_strict_lower_bound=row["n_iterations_strict_lower_bound"] + 2))
         else:
             n_fevals_tol, deviation_reason = deviations.get(row["name"], (0, None))
             problems.append(
@@ -98,19 +104,32 @@ def ford_table_4_problems(rows: list[dict], deviations: dict[str, tuple[int, str
 # ==================================================================================================
 #  Ford's stopping rule
 # ==================================================================================================
-def assert_ford_count_reproduced(solver: Solver, problem: PaperProblem) -> None:
+def assert_n_fevals_at_ford_stop_reproduced(solver: Solver, problem: PaperProblem) -> None:
     """Assert that ``solver`` takes the problem's published count of evaluations until Ford's stopping rule stops it.
 
-    The solve uses ``xtol = 0``, so that the solver's own stopping rule stops it only on ``f(x) == 0``, where Ford's
-    rule stops too; `n_fevals_at_ford_stop` then finds Ford's stop in the solve's history.
+    ``solver`` must be a bracketing solver, because `n_fevals_at_ford_stop` follows the bracketing interval through the
+    solve's history. The solve uses ``xtol = 0``, so that the solver runs past the point where Ford's rule stops, and
+    stops on its own only on ``f(x) == 0``, where Ford's rule stops too; `n_fevals_at_ford_stop` then finds, in the
+    solve's history, the evaluation at which Ford's rule stops.
     """
-    result = solver.solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=_FORD_MAX_FEVALS, history_enabled=True)
-    problem.assert_n_fevals_reproduced(n_fevals_at_ford_stop(result), max_fevals=_FORD_MAX_FEVALS)
+    result = solver.solve(
+        problem.f,
+        problem.a,
+        problem.b,
+        xtol=0.0,
+        max_fevals=_MAX_FEVALS_UNDER_FORD_STOPPING_RULE,
+        history_enabled=True,
+    )
+    n_fevals = n_fevals_at_ford_stop(result)
+    if n_fevals is None:
+        # Ford's rule did not stop the solve within its budget, so the count at which it stops exceeds the budget.
+        n_fevals = _MAX_FEVALS_UNDER_FORD_STOPPING_RULE + 1
+    problem.assert_n_fevals_reproduced(n_fevals)
 
 
 def n_fevals_at_ford_stop(result: SolveResult) -> int | None:
-    """Return the number of evaluations of a bracketing solve up to the first one at which Ford's stopping rule stops,
-    or None when the rule stops at none of them.
+    """Return the number of evaluations of a bracketing solve up to and including the first evaluation at which Ford's
+    stopping rule stops, or None when the rule stops at no evaluation.
 
     Ford stops once an evaluation gives ``|f(x)| < eps``, or leaves an interval narrower than ``0.95 * eps``, with
     ``eps = 1e-14 + 2^-53 * max(|a|, |b|, 1)`` for the initial interval ``[a, b]``.
