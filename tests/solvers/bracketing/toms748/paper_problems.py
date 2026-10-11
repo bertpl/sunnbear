@@ -209,6 +209,10 @@ _PLATFORM_DEVIATION_REASON = (
     "the paper's platform presumably has library functions that round the function values differently from those of "
     "the platform that runs this test"
 )
+_SIN_ROUNDING_DEVIATION_REASON = (
+    "the count depends on how the platform's sin rounds: `TOMS748` takes the paper's 11 evaluations on macOS and 10 on "
+    "Linux on ARM"
+)
 _REBUILT_ALGORITHM_4_1_DEVIATION_REASON = (
     "the authors' code implements only Algorithm 4.2, so `TOMS748` builds Algorithm 4.1 from the authors' "
     "subroutines, and the authors' own implementation of Algorithm 4.1 may differ in details that the paper does not "
@@ -222,6 +226,7 @@ _TABLES_IV_TO_VI_DEVIATIONS = {
     ("26[n=1]", 2): (None, _UNDERFLOW_DEVIATION_REASON),
     ("13[n=1]", 1): (1, _REBUILT_ALGORITHM_4_1_DEVIATION_REASON),
     ("3[n=1]", 1): (2, _REBUILT_ALGORITHM_4_1_DEVIATION_REASON),
+    ("18[n=1]", 1): (1, _SIN_ROUNDING_DEVIATION_REASON),
     ("28[n=30]", 2): (1, _PLATFORM_DEVIATION_REASON),
 }
 
