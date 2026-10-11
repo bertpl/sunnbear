@@ -1,4 +1,4 @@
-"""This module holds the test problems of Table 4 of Ford (1997), without results, and Ford's stopping rule.
+"""This module holds `FordTable4Problem`, the test problems of Table 4 of Ford (1997), and Ford's stopping rule.
 
 Ford's Table 4 compares the iteration counts of several Illinois-type methods, among them the Illinois, Pegasus and
 Anderson-Björck methods, on 5 functions, each on 3 intervals. A problem's name holds the function's number in the
@@ -9,21 +9,14 @@ The paper stops each solve by a stopping rule of its own, which no sunnbear solv
 """
 
 import math
-from dataclasses import replace
 
 from sunnbear.solvers import Solver, SolveResult
 
-from .problem import PaperProblem
+from .problem import PaperProblem, PaperProblemEnum
 
 # `_MAX_FEVALS_UNDER_FORD_STOPPING_RULE` is the evaluation budget of a solve under Ford's stopping rule; it exceeds
 # every count in Ford's Table 4, including the 200 of each row that Ford prints as "200+".
 _MAX_FEVALS_UNDER_FORD_STOPPING_RULE = 300
-
-# `F_EQUALS_ZERO_DEVIATION_REASON` explains a count 1 below Ford's on a row where the solve reaches f(x) == 0 early.
-F_EQUALS_ZERO_DEVIATION_REASON = (
-    "the solve reaches f(x) == 0 one iteration earlier than Ford reports; near the root, the computed function value "
-    "is smaller than its rounding error, which differs between Ford's platform and the platform that runs this test"
-)
 
 
 # ==================================================================================================
@@ -37,68 +30,26 @@ _FORD_FUNCTIONS = {
     5: lambda x: math.exp(1.0 / x - 25.0) - 1.0,
 }
 
-# `FORD_TABLE_4_PROBLEMS_BY_NAME` maps each problem's name to the problem, in the order of the rows of Ford's Table 4.
-FORD_TABLE_4_PROBLEMS_BY_NAME = {
-    problem.name: problem
-    for problem in [
-        PaperProblem(
-            name=f"{row['function']}[{row['a']:g},{row['b']:g}]",
-            f=_FORD_FUNCTIONS[row["function"]],
-            a=row["a"],
-            b=row["b"],
-        )
-        for row in [
-            {"function": 1, "a": 0.5, "b": 2.0},
-            {"function": 1, "a": 0.2, "b": 6.0},
-            {"function": 1, "a": 0.004, "b": 200.0},
-            {"function": 2, "a": 0.9, "b": 1.1},
-            {"function": 2, "a": 0.5, "b": 1.5},
-            {"function": 2, "a": -5.0, "b": 10.0},
-            {"function": 3, "a": 550.0, "b": 560.0},
-            {"function": 3, "a": 400.0, "b": 600.0},
-            {"function": 3, "a": 350.0, "b": 850.0},
-            {"function": 4, "a": 0.0, "b": 1.0},
-            {"function": 4, "a": -0.1, "b": 1.5},
-            {"function": 4, "a": -0.5, "b": 2.0},
-            {"function": 5, "a": 0.035, "b": 0.05},
-            {"function": 5, "a": 0.03, "b": 0.09},
-            {"function": 5, "a": 0.025, "b": 0.5},
-        ]
-    ]
-}
 
+class FordTable4Problem(PaperProblemEnum):
+    """`FordTable4Problem` holds the 15 problems of Ford's Table 4, in the table's order; a member's name holds the
+    function's number and the interval's place among that function's 3 intervals, e.g. ``F1_I1``."""
 
-def ford_table_4_problems(rows: list[dict], deviations: dict[str, tuple[int, str]]) -> list[PaperProblem]:
-    """Return the problems of Ford's Table 4, each with 1 solver's count from the table, converted to sunnbear's
-    evaluation count: Ford's iterations plus the 2 evaluations at the interval bounds.
-
-    Args:
-        rows: 1 dict per row of the table, in the table's order, with the row's ``name`` and either Ford's
-            ``n_iterations`` or, for a row that Ford prints as "200+", ``n_iterations_strict_lower_bound``.
-        deviations: The allowed deviation and its reason, by the name of each row whose count the solver does not
-            reproduce exactly.
-
-    Raises:
-        ValueError: If ``rows`` does not name every row of the table, in its order.
-    """
-    if [row["name"] for row in rows] != list(FORD_TABLE_4_PROBLEMS_BY_NAME):
-        raise ValueError("Give 1 row per row of Ford's Table 4, in the table's order.")
-    problems = []
-    for row in rows:
-        problem = FORD_TABLE_4_PROBLEMS_BY_NAME[row["name"]]
-        if "n_iterations_strict_lower_bound" in row:
-            problems.append(replace(problem, n_fevals_strict_lower_bound=row["n_iterations_strict_lower_bound"] + 2))
-        else:
-            n_fevals_tol, deviation_reason = deviations.get(row["name"], (0, None))
-            problems.append(
-                replace(
-                    problem,
-                    n_fevals=row["n_iterations"] + 2,
-                    n_fevals_tol=n_fevals_tol,
-                    deviation_reason=deviation_reason,
-                )
-            )
-    return problems
+    F1_I1 = PaperProblem(name="1[0.5,2]", f=_FORD_FUNCTIONS[1], a=0.5, b=2.0)
+    F1_I2 = PaperProblem(name="1[0.2,6]", f=_FORD_FUNCTIONS[1], a=0.2, b=6.0)
+    F1_I3 = PaperProblem(name="1[0.004,200]", f=_FORD_FUNCTIONS[1], a=0.004, b=200.0)
+    F2_I1 = PaperProblem(name="2[0.9,1.1]", f=_FORD_FUNCTIONS[2], a=0.9, b=1.1)
+    F2_I2 = PaperProblem(name="2[0.5,1.5]", f=_FORD_FUNCTIONS[2], a=0.5, b=1.5)
+    F2_I3 = PaperProblem(name="2[-5,10]", f=_FORD_FUNCTIONS[2], a=-5.0, b=10.0)
+    F3_I1 = PaperProblem(name="3[550,560]", f=_FORD_FUNCTIONS[3], a=550.0, b=560.0)
+    F3_I2 = PaperProblem(name="3[400,600]", f=_FORD_FUNCTIONS[3], a=400.0, b=600.0)
+    F3_I3 = PaperProblem(name="3[350,850]", f=_FORD_FUNCTIONS[3], a=350.0, b=850.0)
+    F4_I1 = PaperProblem(name="4[0,1]", f=_FORD_FUNCTIONS[4], a=0.0, b=1.0)
+    F4_I2 = PaperProblem(name="4[-0.1,1.5]", f=_FORD_FUNCTIONS[4], a=-0.1, b=1.5)
+    F4_I3 = PaperProblem(name="4[-0.5,2]", f=_FORD_FUNCTIONS[4], a=-0.5, b=2.0)
+    F5_I1 = PaperProblem(name="5[0.035,0.05]", f=_FORD_FUNCTIONS[5], a=0.035, b=0.05)
+    F5_I2 = PaperProblem(name="5[0.03,0.09]", f=_FORD_FUNCTIONS[5], a=0.03, b=0.09)
+    F5_I3 = PaperProblem(name="5[0.025,0.5]", f=_FORD_FUNCTIONS[5], a=0.025, b=0.5)
 
 
 # ==================================================================================================
