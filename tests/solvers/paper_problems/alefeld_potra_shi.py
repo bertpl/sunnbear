@@ -5,14 +5,14 @@ The driver numbers its problems 1 to 28, and runs most of them for several value
 problem's name holds both, e.g. ``15[n=4]``.
 
 The functions and intervals follow the driver's subroutines ``FUNC`` and ``INIT``; they are the test problems of the
-paper's Table I, with the paper's problem 2 split into 10 problems, 1 per interval.
+paper's Table I, with the paper's problem 2 split into 10 problems, 1 per interval. `AlefeldPotraShiTablesIVToVIProblem`
+holds the problems whose counts the paper's Tables IV to VI list.
 """
 
 import functools
 import math
-from dataclasses import replace
 
-from .problem import PaperProblem
+from .problem import PaperProblem, PaperProblemEnum
 
 # The driver sets pi to this rounded value for the intervals of problems 1 and 27.
 _PI_ROUNDED = 3.1416
@@ -167,59 +167,46 @@ ALEFELD_POTRA_SHI_PROBLEMS = [
 
 ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME = {problem.name: problem for problem in ALEFELD_POTRA_SHI_PROBLEMS}
 
-# The paper's Tables IV to VI list evaluation counts on some of the problems, at ``tol = 10^-15``.
-#
-# The paper numbers its problems as its Table I does, not as the authors' test driver does, so
-# `ALEFELD_POTRA_SHI_TABLES_IV_TO_VI_PAPER_LABELS_BY_NAME` maps the driver's name of each problem in the tables to the
-# paper's label for it, in the tables' order.
-ALEFELD_POTRA_SHI_TABLES_IV_TO_VI_PAPER_LABELS_BY_NAME = {
-    "26[n=1]": "Table IV: 13",
-    "13[n=1]": "Table V: 3[a=-100,b=-2]",
-    "27[n=10]": "Table V: 14[n=10]",
-    "27[n=30]": "Table V: 14[n=30]",
-    "28[n=30]": "Table V: 15[n=30]",
-    "28[n=500]": "Table V: 15[n=500]",
-    "1[n=1]": "Table VI: 1",
-    "3[n=1]": "Table VI: 2[n=2]",
-    "16[n=4]": "Table VI: 4[a=1,n=4]",
-    "18[n=1]": "Table VI: 5",
-    "19[n=20]": "Table VI: 6[n=20]",
-    "20[n=10]": "Table VI: 7[n=10]",
-    "21[n=10]": "Table VI: 8[n=10]",
-    "22[n=1]": "Table VI: 9[n=1]",
-    "23[n=5]": "Table VI: 10[n=5]",
-    "24[n=20]": "Table VI: 11[n=20]",
-    "25[n=3]": "Table VI: 12[n=3]",
-}
 
+class AlefeldPotraShiTablesIVToVIProblem(PaperProblemEnum):
+    """`AlefeldPotraShiTablesIVToVIProblem` holds the 17 problems of the paper's Tables IV to VI, in the tables' order,
+    whose counts the paper lists at ``tol = 10^-15``.
 
-def alefeld_potra_shi_tables_iv_to_vi_problems(
-    n_fevals_by_name: dict[str, int], deviations_by_name: dict[str, tuple[int | None, str]]
-) -> list[PaperProblem]:
-    """Return the problems of the paper's Tables IV to VI, in the tables' order, each with one method's evaluation count
-    and the allowed deviation from that count, if any.
-
-    Args:
-        n_fevals_by_name: The method's evaluation count per problem of
-            `ALEFELD_POTRA_SHI_TABLES_IV_TO_VI_PAPER_LABELS_BY_NAME`, in the tables' order, counting the 2 evaluations
-            at the interval bounds.
-        deviations_by_name: The allowed deviation and its reason, for each problem whose count is not reproduced
-            exactly; a deviation of None means that the count is not checked.
-
-    Raises:
-        ValueError: If ``n_fevals_by_name`` does not name every problem of the tables, in the tables' order.
+    The paper numbers its problems as its Table I does, not as the authors' test driver does: a member's name holds the
+    driver's problem number and ``n``, e.g. ``P26_N1``, and the comment above it gives the paper's label.
     """
-    if list(n_fevals_by_name) != list(ALEFELD_POTRA_SHI_TABLES_IV_TO_VI_PAPER_LABELS_BY_NAME):
-        raise ValueError("Give 1 count per problem of the paper's Tables IV to VI, in the tables' order.")
-    problems = []
-    for name, n_fevals in n_fevals_by_name.items():
-        n_fevals_tol, deviation_reason = deviations_by_name.get(name, (0, None))
-        problems.append(
-            replace(
-                ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME[name],
-                n_fevals=n_fevals,
-                n_fevals_tol=n_fevals_tol,
-                deviation_reason=deviation_reason,
-            )
-        )
-    return problems
+
+    # Table IV: 13
+    P26_N1 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["26[n=1]"]
+    # Table V: 3[a=-100,b=-2]
+    P13_N1 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["13[n=1]"]
+    # Table V: 14[n=10]
+    P27_N10 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["27[n=10]"]
+    # Table V: 14[n=30]
+    P27_N30 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["27[n=30]"]
+    # Table V: 15[n=30]
+    P28_N30 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["28[n=30]"]
+    # Table V: 15[n=500]
+    P28_N500 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["28[n=500]"]
+    # Table VI: 1
+    P1_N1 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["1[n=1]"]
+    # Table VI: 2[n=2]
+    P3_N1 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["3[n=1]"]
+    # Table VI: 4[a=1,n=4]
+    P16_N4 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["16[n=4]"]
+    # Table VI: 5
+    P18_N1 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["18[n=1]"]
+    # Table VI: 6[n=20]
+    P19_N20 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["19[n=20]"]
+    # Table VI: 7[n=10]
+    P20_N10 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["20[n=10]"]
+    # Table VI: 8[n=10]
+    P21_N10 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["21[n=10]"]
+    # Table VI: 9[n=1]
+    P22_N1 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["22[n=1]"]
+    # Table VI: 10[n=5]
+    P23_N5 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["23[n=5]"]
+    # Table VI: 11[n=20]
+    P24_N20 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["24[n=20]"]
+    # Table VI: 12[n=3]
+    P25_N3 = ALEFELD_POTRA_SHI_PROBLEMS_BY_NAME["25[n=3]"]

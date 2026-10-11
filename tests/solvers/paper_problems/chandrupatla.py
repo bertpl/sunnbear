@@ -1,5 +1,5 @@
-"""This module holds the test functions of Chandrupatla's paper, keyed by their number in its Table 1, and the problems
-of its Table 2, without results.
+"""This module holds the test functions of Chandrupatla's paper, keyed by their number in its Table 1, and
+`ChandrupatlaTable2Problem`, the problems of its Table 2, without results.
 
 Function 7 comes in 2 versions: as the paper prints it, in `CHANDRUPATLA_FUNCTIONS`, and as the paper's BASIC listing
 computes it, in `CHANDRUPATLA_BASIC_LISTING_FUNCTIONS`.
@@ -9,9 +9,8 @@ problem's name holds the function's number and the interval, e.g. ``1[2,3]``.
 """
 
 import math
-from dataclasses import replace
 
-from .problem import PaperProblem
+from .problem import PaperProblem, PaperProblemEnum
 
 
 def _function_7(x: float) -> float:
@@ -51,85 +50,54 @@ CHANDRUPATLA_FUNCTIONS = {
 
 CHANDRUPATLA_BASIC_LISTING_FUNCTIONS = {**CHANDRUPATLA_FUNCTIONS, 7: _listing_function_7}
 
-# `CHANDRUPATLA_TABLE_2_PROBLEMS_BY_NAME` maps each problem's name to the problem, in the order of the rows of the
-# paper's Table 2. The functions are those of the paper's BASIC listing, which produced the table.
-CHANDRUPATLA_TABLE_2_PROBLEMS_BY_NAME = {
-    problem.name: problem
-    for problem in [
-        PaperProblem(
-            name=f"{row['number']}[{row['a']:g},{row['b']:g}]",
-            f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[row["number"]],
-            a=float(row["a"]),
-            b=float(row["b"]),
-        )
-        for row in [
-            {"number": 1, "a": 2, "b": 3},
-            {"number": 1, "a": 1, "b": 10},
-            {"number": 1, "a": 1, "b": 100},
-            {"number": 1, "a": -10000.0, "b": 10000.0},
-            {"number": 1, "a": -10000000000.0, "b": 10000000000.0},
-            {"number": 2, "a": 0.5, "b": 1.51},
-            {"number": 2, "a": 0.0001, "b": 10000.0},
-            {"number": 2, "a": 1e-06, "b": 1000000.0},
-            {"number": 2, "a": 1e-10, "b": 10000000000.0},
-            {"number": 2, "a": 1e-12, "b": 1000000000000.0},
-            {"number": 3, "a": 0, "b": 5},
-            {"number": 3, "a": -10, "b": 10},
-            {"number": 3, "a": -10000.0, "b": 10000.0},
-            {"number": 3, "a": -1000000.0, "b": 1000000.0},
-            {"number": 3, "a": -10000000000.0, "b": 10000000000.0},
-            {"number": 4, "a": 0, "b": 5},
-            {"number": 4, "a": -10, "b": 10},
-            {"number": 4, "a": -10000.0, "b": 10000.0},
-            {"number": 4, "a": -1000000.0, "b": 1000000.0},
-            {"number": 4, "a": -10000000000.0, "b": 10000000000.0},
-            {"number": 5, "a": -1, "b": 4},
-            {"number": 5, "a": -2, "b": 5},
-            {"number": 5, "a": -1, "b": 10},
-            {"number": 5, "a": -5, "b": 50},
-            {"number": 5, "a": -10, "b": 100},
-            {"number": 6, "a": -1, "b": 4},
-            {"number": 6, "a": -2, "b": 5},
-            {"number": 6, "a": -1, "b": 10},
-            {"number": 6, "a": -5, "b": 50},
-            {"number": 6, "a": -10, "b": 100},
-            {"number": 7, "a": -1, "b": 4},
-            {"number": 7, "a": -2, "b": 5},
-            {"number": 7, "a": -1, "b": 10},
-            {"number": 7, "a": -5, "b": 50},
-            {"number": 7, "a": -10, "b": 100},
-            {"number": 8, "a": 0.0002, "b": 2},
-            {"number": 8, "a": 0.0002, "b": 3},
-            {"number": 8, "a": 0.0002, "b": 9},
-            {"number": 8, "a": 0.0002, "b": 27},
-            {"number": 8, "a": 0.0002, "b": 81},
-            {"number": 9, "a": 0.0002, "b": 1},
-            {"number": 9, "a": 0.0002, "b": 3},
-            {"number": 9, "a": 0.0002, "b": 9},
-            {"number": 9, "a": 0.0002, "b": 27},
-            {"number": 9, "a": 0.0002, "b": 81},
-        ]
-    ]
-}
 
+class ChandrupatlaTable2Problem(PaperProblemEnum):
+    """`ChandrupatlaTable2Problem` holds the 45 problems of the paper's Table 2, in the table's order, with the
+    functions of the paper's BASIC listing, which produced the table; a member's name holds the function's number and
+    the interval's place among that function's 5 intervals, e.g. ``F1_I1``."""
 
-def chandrupatla_table_2_problems_with_n_bisection_switches(rows: list[dict]) -> list[tuple[PaperProblem, int]]:
-    """Return 1 pair per row of the paper's Table 2: the row's problem, with one method's evaluation count from the
-    table, and that method's number of bisection switches on the problem.
-
-    Args:
-        rows: 1 dict per row of the table, in the table's order, with the row's ``name``, the method's ``n_fevals``,
-            and its ``n_bisection_switches``, which the table prints in parentheses.
-
-    Raises:
-        ValueError: If ``rows`` does not name every row of the table, in its order.
-    """
-    if [row["name"] for row in rows] != list(CHANDRUPATLA_TABLE_2_PROBLEMS_BY_NAME):
-        raise ValueError("Give 1 row per row of the paper's Table 2, in the table's order.")
-    return [
-        (
-            replace(CHANDRUPATLA_TABLE_2_PROBLEMS_BY_NAME[row["name"]], n_fevals=row["n_fevals"]),
-            row["n_bisection_switches"],
-        )
-        for row in rows
-    ]
+    F1_I1 = PaperProblem(name="1[2,3]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[1], a=2.0, b=3.0)
+    F1_I2 = PaperProblem(name="1[1,10]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[1], a=1.0, b=10.0)
+    F1_I3 = PaperProblem(name="1[1,100]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[1], a=1.0, b=100.0)
+    F1_I4 = PaperProblem(name="1[-10000,10000]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[1], a=-10000.0, b=10000.0)
+    F1_I5 = PaperProblem(name="1[-1e+10,1e+10]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[1], a=-1e10, b=1e10)
+    F2_I1 = PaperProblem(name="2[0.5,1.51]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[2], a=0.5, b=1.51)
+    F2_I2 = PaperProblem(name="2[0.0001,10000]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[2], a=0.0001, b=10000.0)
+    F2_I3 = PaperProblem(name="2[1e-06,1e+06]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[2], a=1e-6, b=1e6)
+    F2_I4 = PaperProblem(name="2[1e-10,1e+10]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[2], a=1e-10, b=1e10)
+    F2_I5 = PaperProblem(name="2[1e-12,1e+12]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[2], a=1e-12, b=1e12)
+    F3_I1 = PaperProblem(name="3[0,5]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[3], a=0.0, b=5.0)
+    F3_I2 = PaperProblem(name="3[-10,10]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[3], a=-10.0, b=10.0)
+    F3_I3 = PaperProblem(name="3[-10000,10000]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[3], a=-10000.0, b=10000.0)
+    F3_I4 = PaperProblem(name="3[-1e+06,1e+06]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[3], a=-1e6, b=1e6)
+    F3_I5 = PaperProblem(name="3[-1e+10,1e+10]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[3], a=-1e10, b=1e10)
+    F4_I1 = PaperProblem(name="4[0,5]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[4], a=0.0, b=5.0)
+    F4_I2 = PaperProblem(name="4[-10,10]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[4], a=-10.0, b=10.0)
+    F4_I3 = PaperProblem(name="4[-10000,10000]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[4], a=-10000.0, b=10000.0)
+    F4_I4 = PaperProblem(name="4[-1e+06,1e+06]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[4], a=-1e6, b=1e6)
+    F4_I5 = PaperProblem(name="4[-1e+10,1e+10]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[4], a=-1e10, b=1e10)
+    F5_I1 = PaperProblem(name="5[-1,4]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[5], a=-1.0, b=4.0)
+    F5_I2 = PaperProblem(name="5[-2,5]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[5], a=-2.0, b=5.0)
+    F5_I3 = PaperProblem(name="5[-1,10]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[5], a=-1.0, b=10.0)
+    F5_I4 = PaperProblem(name="5[-5,50]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[5], a=-5.0, b=50.0)
+    F5_I5 = PaperProblem(name="5[-10,100]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[5], a=-10.0, b=100.0)
+    F6_I1 = PaperProblem(name="6[-1,4]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[6], a=-1.0, b=4.0)
+    F6_I2 = PaperProblem(name="6[-2,5]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[6], a=-2.0, b=5.0)
+    F6_I3 = PaperProblem(name="6[-1,10]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[6], a=-1.0, b=10.0)
+    F6_I4 = PaperProblem(name="6[-5,50]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[6], a=-5.0, b=50.0)
+    F6_I5 = PaperProblem(name="6[-10,100]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[6], a=-10.0, b=100.0)
+    F7_I1 = PaperProblem(name="7[-1,4]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[7], a=-1.0, b=4.0)
+    F7_I2 = PaperProblem(name="7[-2,5]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[7], a=-2.0, b=5.0)
+    F7_I3 = PaperProblem(name="7[-1,10]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[7], a=-1.0, b=10.0)
+    F7_I4 = PaperProblem(name="7[-5,50]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[7], a=-5.0, b=50.0)
+    F7_I5 = PaperProblem(name="7[-10,100]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[7], a=-10.0, b=100.0)
+    F8_I1 = PaperProblem(name="8[0.0002,2]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[8], a=0.0002, b=2.0)
+    F8_I2 = PaperProblem(name="8[0.0002,3]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[8], a=0.0002, b=3.0)
+    F8_I3 = PaperProblem(name="8[0.0002,9]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[8], a=0.0002, b=9.0)
+    F8_I4 = PaperProblem(name="8[0.0002,27]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[8], a=0.0002, b=27.0)
+    F8_I5 = PaperProblem(name="8[0.0002,81]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[8], a=0.0002, b=81.0)
+    F9_I1 = PaperProblem(name="9[0.0002,1]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[9], a=0.0002, b=1.0)
+    F9_I2 = PaperProblem(name="9[0.0002,3]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[9], a=0.0002, b=3.0)
+    F9_I3 = PaperProblem(name="9[0.0002,9]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[9], a=0.0002, b=9.0)
+    F9_I4 = PaperProblem(name="9[0.0002,27]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[9], a=0.0002, b=27.0)
+    F9_I5 = PaperProblem(name="9[0.0002,81]", f=CHANDRUPATLA_BASIC_LISTING_FUNCTIONS[9], a=0.0002, b=81.0)

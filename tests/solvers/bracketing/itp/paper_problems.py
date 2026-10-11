@@ -3,7 +3,7 @@
 
 import math
 
-from tests.solvers.paper_problems import PaperProblem
+from tests.solvers.paper_problems import UNSTATED_RUN_DETAILS, PaperProblem
 
 # The paper's experiments solve every function on [-1, 1] with this xtol, where bisection needs `N_BISECTION`
 # iterations.
@@ -38,8 +38,6 @@ def _circles(x: float) -> float:
     return sign * (1.0 - math.sqrt(1.0 - (3.0 * x + 1.0) ** 2 / 81.0))
 
 
-_STEP_FUNCTION_DEVIATION_REASON = "MATLAB's arithmetic produced the table's 34 iterations, and `ITP` takes 35"
-
 # Each row holds a test function of the paper's Table 1, by its name there, and the iteration count of ITP in that
 # table, which excludes the 2 evaluations at the interval bounds; the row whose count `ITP` does not reproduce also
 # holds a count tolerance and the reason.
@@ -52,6 +50,7 @@ TABLE_1 = [
         n_fevals=row["n_iterations"] + 2,
         n_fevals_tol=row.get("n_fevals_tol", 0),
         deviation_reason=row.get("deviation_reason"),
+        deviation_observation=row.get("deviation_observation"),
     )
     for row in [
         {"name": "lambert", "f": lambda x: x * math.exp(x) - 1.0, "n_iterations": 8},
@@ -95,7 +94,8 @@ TABLE_1 = [
             "f": lambda x: float(x > (1.0 - 1e6) / 1e6) * (1.0 + 1e6) / 1e6 - 1.0,
             "n_iterations": 34,
             "n_fevals_tol": 1,
-            "deviation_reason": _STEP_FUNCTION_DEVIATION_REASON,
+            "deviation_reason": UNSTATED_RUN_DETAILS,
+            "deviation_observation": "the solve takes 1 iteration more",
         },
         {"name": "geometric", "f": _geometric, "n_iterations": 34},
         {"name": "truncated_polynomial", "f": lambda x: (x / 2.0) ** 2 + math.ceil(x / 2.0) - 0.5, "n_iterations": 34},

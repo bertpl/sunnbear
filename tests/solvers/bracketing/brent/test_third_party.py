@@ -12,7 +12,12 @@ import pytest
 
 from sunnbear.solvers import Brent
 from tests.solvers.paper_problems import PaperProblem
-from tests.solvers.paper_problems.alefeld_potra_shi import ALEFELD_POTRA_SHI_PROBLEMS
+from tests.solvers.paper_problems.alefeld_potra_shi import (
+    ALEFELD_POTRA_SHI_PROBLEMS,
+    AlefeldPotraShiTablesIVToVIProblem,
+)
+from tests.solvers.paper_problems.anderson_bjorck import AndersonBjorckExampleProblem
+from tests.solvers.paper_problems.chandrupatla import ChandrupatlaTable2Problem
 
 from .third_party_problems import (
     ALEFELD_POTRA_SHI_TABLES_IV_TO_VI,
@@ -24,6 +29,25 @@ from .tolerance import xtol_for_t
 # Chandrupatla's tolerance is ``2 * eps_R * |x| + 0.5 * eps_A``, with the absolute tolerance ``eps_A = 1e-5``, so
 # Brent's ``t`` is ``0.5 * eps_A``.
 _CHANDRUPATLA_T = 0.5e-5
+
+
+@pytest.mark.parametrize(
+    "problems, table",
+    [
+        pytest.param(
+            [problem for problem, _ in CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES],
+            ChandrupatlaTable2Problem,
+            id="chandrupatla_table_2",
+        ),
+        pytest.param(ALEFELD_POTRA_SHI_TABLES_IV_TO_VI, AlefeldPotraShiTablesIVToVIProblem, id="alefeld_potra_shi"),
+        pytest.param(ANDERSON_BJORCK_EXAMPLES_1_TO_7, AndersonBjorckExampleProblem, id="anderson_bjorck"),
+    ],
+)
+def test_each_published_column_names_every_problem_of_its_table_in_order(problems, table):
+    """Each column of `Brent`'s published counts holds 1 problem per member of its table's enum, in the table's
+    order."""
+    # --- assert -----------------------
+    assert [problem.name for problem in problems] == [member.value.name for member in table]
 
 
 @pytest.mark.parametrize("problem", [problem for problem, _ in CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES], ids=str)

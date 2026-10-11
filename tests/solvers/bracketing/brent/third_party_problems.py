@@ -6,164 +6,137 @@
   precision.
 """
 
-from dataclasses import replace
+from tests.solvers.paper_problems import UNSTATED_RUN_DETAILS
+from tests.solvers.paper_problems.alefeld_potra_shi import AlefeldPotraShiTablesIVToVIProblem
+from tests.solvers.paper_problems.anderson_bjorck import AndersonBjorckExampleProblem
+from tests.solvers.paper_problems.chandrupatla import ChandrupatlaTable2Problem
 
-from tests.solvers.paper_problems.alefeld_potra_shi import alefeld_potra_shi_tables_iv_to_vi_problems
-from tests.solvers.paper_problems.anderson_bjorck import ANDERSON_BJORCK_PROBLEMS
-from tests.solvers.paper_problems.chandrupatla import chandrupatla_table_2_problems_with_n_bisection_switches
-
-# ==================================================================================================
-#  Chandrupatla (1997), Table 2
-# ==================================================================================================
-# `_CHANDRUPATLA_TABLE_2_ROWS` holds the rows of the paper's Table 2, each with the evaluation count of Brent's method
-# and, from the parentheses after that count in the table, the number of times that the method switches to bisection.
-_CHANDRUPATLA_TABLE_2_ROWS = [
-    {"name": "1[2,3]", "n_fevals": 7, "n_bisection_switches": 0},
-    {"name": "1[1,10]", "n_fevals": 13, "n_bisection_switches": 2},
-    {"name": "1[1,100]", "n_fevals": 14, "n_bisection_switches": 2},
-    {"name": "1[-10000,10000]", "n_fevals": 34, "n_bisection_switches": 13},
-    {"name": "1[-1e+10,1e+10]", "n_fevals": 74, "n_bisection_switches": 34},
-    {"name": "2[0.5,1.51]", "n_fevals": 9, "n_bisection_switches": 1},
-    {"name": "2[0.0001,10000]", "n_fevals": 23, "n_bisection_switches": 14},
-    {"name": "2[1e-06,1e+06]", "n_fevals": 28, "n_bisection_switches": 20},
-    {"name": "2[1e-10,1e+10]", "n_fevals": 43, "n_bisection_switches": 33},
-    {"name": "2[1e-12,1e+12]", "n_fevals": 49, "n_bisection_switches": 40},
-    {"name": "3[0,5]", "n_fevals": 49, "n_bisection_switches": 13},
-    {"name": "3[-10,10]", "n_fevals": 63, "n_bisection_switches": 15},
-    {"name": "3[-10000,10000]", "n_fevals": 86, "n_bisection_switches": 26},
-    {"name": "3[-1e+06,1e+06]", "n_fevals": 101, "n_bisection_switches": 32},
-    {"name": "3[-1e+10,1e+10]", "n_fevals": 101, "n_bisection_switches": 32},
-    {"name": "4[0,5]", "n_fevals": 50, "n_bisection_switches": 13},
-    {"name": "4[-10,10]", "n_fevals": 50, "n_bisection_switches": 13},
-    {"name": "4[-10000,10000]", "n_fevals": 84, "n_bisection_switches": 24},
-    {"name": "4[-1e+06,1e+06]", "n_fevals": 105, "n_bisection_switches": 31},
-    {"name": "4[-1e+10,1e+10]", "n_fevals": 146, "n_bisection_switches": 46},
-    {"name": "5[-1,4]", "n_fevals": 53, "n_bisection_switches": 15},
-    {"name": "5[-2,5]", "n_fevals": 54, "n_bisection_switches": 15},
-    {"name": "5[-1,10]", "n_fevals": 58, "n_bisection_switches": 17},
-    {"name": "5[-5,50]", "n_fevals": 64, "n_bisection_switches": 19},
-    {"name": "5[-10,100]", "n_fevals": 66, "n_bisection_switches": 19},
-    {"name": "6[-1,4]", "n_fevals": 53, "n_bisection_switches": 16},
-    {"name": "6[-2,5]", "n_fevals": 56, "n_bisection_switches": 17},
-    {"name": "6[-1,10]", "n_fevals": 59, "n_bisection_switches": 18},
-    {"name": "6[-5,50]", "n_fevals": 66, "n_bisection_switches": 20},
-    {"name": "6[-10,100]", "n_fevals": 63, "n_bisection_switches": 19},
-    {"name": "7[-1,4]", "n_fevals": 18, "n_bisection_switches": 5},
-    {"name": "7[-2,5]", "n_fevals": 21, "n_bisection_switches": 6},
-    {"name": "7[-1,10]", "n_fevals": 24, "n_bisection_switches": 7},
-    {"name": "7[-5,50]", "n_fevals": 27, "n_bisection_switches": 8},
-    {"name": "7[-10,100]", "n_fevals": 33, "n_bisection_switches": 10},
-    {"name": "8[0.0002,2]", "n_fevals": 9, "n_bisection_switches": 1},
-    {"name": "8[0.0002,3]", "n_fevals": 11, "n_bisection_switches": 2},
-    {"name": "8[0.0002,9]", "n_fevals": 12, "n_bisection_switches": 3},
-    {"name": "8[0.0002,27]", "n_fevals": 14, "n_bisection_switches": 5},
-    {"name": "8[0.0002,81]", "n_fevals": 16, "n_bisection_switches": 7},
-    {"name": "9[0.0002,1]", "n_fevals": 7, "n_bisection_switches": 0},
-    {"name": "9[0.0002,3]", "n_fevals": 9, "n_bisection_switches": 1},
-    {"name": "9[0.0002,9]", "n_fevals": 14, "n_bisection_switches": 3},
-    {"name": "9[0.0002,27]", "n_fevals": 18, "n_bisection_switches": 4},
-    {"name": "9[0.0002,81]", "n_fevals": 19, "n_bisection_switches": 5},
+# Each pair holds a problem of Chandrupatla's Table 2 with the evaluation count of Brent's method, and the number of
+# times that the method switches to bisection, which the table prints in parentheses after that count.
+CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES = [
+    (ChandrupatlaTable2Problem.F1_I1.with_n_fevals(7), 0),
+    (ChandrupatlaTable2Problem.F1_I2.with_n_fevals(13), 2),
+    (ChandrupatlaTable2Problem.F1_I3.with_n_fevals(14), 2),
+    (ChandrupatlaTable2Problem.F1_I4.with_n_fevals(34), 13),
+    (ChandrupatlaTable2Problem.F1_I5.with_n_fevals(74), 34),
+    (ChandrupatlaTable2Problem.F2_I1.with_n_fevals(9), 1),
+    (ChandrupatlaTable2Problem.F2_I2.with_n_fevals(23), 14),
+    (ChandrupatlaTable2Problem.F2_I3.with_n_fevals(28), 20),
+    (ChandrupatlaTable2Problem.F2_I4.with_n_fevals(43), 33),
+    (ChandrupatlaTable2Problem.F2_I5.with_n_fevals(49), 40),
+    (ChandrupatlaTable2Problem.F3_I1.with_n_fevals(49), 13),
+    (ChandrupatlaTable2Problem.F3_I2.with_n_fevals(63), 15),
+    (ChandrupatlaTable2Problem.F3_I3.with_n_fevals(86), 26),
+    (ChandrupatlaTable2Problem.F3_I4.with_n_fevals(101), 32),
+    (ChandrupatlaTable2Problem.F3_I5.with_n_fevals(101), 32),
+    (ChandrupatlaTable2Problem.F4_I1.with_n_fevals(50), 13),
+    (ChandrupatlaTable2Problem.F4_I2.with_n_fevals(50), 13),
+    (ChandrupatlaTable2Problem.F4_I3.with_n_fevals(84), 24),
+    (ChandrupatlaTable2Problem.F4_I4.with_n_fevals(105), 31),
+    (ChandrupatlaTable2Problem.F4_I5.with_n_fevals(146), 46),
+    (ChandrupatlaTable2Problem.F5_I1.with_n_fevals(53), 15),
+    (ChandrupatlaTable2Problem.F5_I2.with_n_fevals(54), 15),
+    (ChandrupatlaTable2Problem.F5_I3.with_n_fevals(58), 17),
+    (ChandrupatlaTable2Problem.F5_I4.with_n_fevals(64), 19),
+    (ChandrupatlaTable2Problem.F5_I5.with_n_fevals(66), 19),
+    (ChandrupatlaTable2Problem.F6_I1.with_n_fevals(53), 16),
+    (ChandrupatlaTable2Problem.F6_I2.with_n_fevals(56), 17),
+    (ChandrupatlaTable2Problem.F6_I3.with_n_fevals(59), 18),
+    (ChandrupatlaTable2Problem.F6_I4.with_n_fevals(66), 20),
+    (ChandrupatlaTable2Problem.F6_I5.with_n_fevals(63), 19),
+    (ChandrupatlaTable2Problem.F7_I1.with_n_fevals(18), 5),
+    (ChandrupatlaTable2Problem.F7_I2.with_n_fevals(21), 6),
+    (ChandrupatlaTable2Problem.F7_I3.with_n_fevals(24), 7),
+    (ChandrupatlaTable2Problem.F7_I4.with_n_fevals(27), 8),
+    (ChandrupatlaTable2Problem.F7_I5.with_n_fevals(33), 10),
+    (ChandrupatlaTable2Problem.F8_I1.with_n_fevals(9), 1),
+    (ChandrupatlaTable2Problem.F8_I2.with_n_fevals(11), 2),
+    (ChandrupatlaTable2Problem.F8_I3.with_n_fevals(12), 3),
+    (ChandrupatlaTable2Problem.F8_I4.with_n_fevals(14), 5),
+    (ChandrupatlaTable2Problem.F8_I5.with_n_fevals(16), 7),
+    (ChandrupatlaTable2Problem.F9_I1.with_n_fevals(7), 0),
+    (ChandrupatlaTable2Problem.F9_I2.with_n_fevals(9), 1),
+    (ChandrupatlaTable2Problem.F9_I3.with_n_fevals(14), 3),
+    (ChandrupatlaTable2Problem.F9_I4.with_n_fevals(18), 4),
+    (ChandrupatlaTable2Problem.F9_I5.with_n_fevals(19), 5),
 ]
 
-# Each pair holds a problem of Table 2, with the count of Brent's method, and the number of bisection switches on
-# that problem.
-CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES = chandrupatla_table_2_problems_with_n_bisection_switches(
-    _CHANDRUPATLA_TABLE_2_ROWS
-)
-
-
-# ==================================================================================================
-#  Alefeld, Potra and Shi (1995), Tables IV to VI
-# ==================================================================================================
-# `_ALEFELD_POTRA_SHI_BR_N_FEVALS` maps the name of each problem of the paper's Tables IV to VI to the evaluation
-# count of the column "BR", which counts the 2 evaluations at the interval bounds.
-_ALEFELD_POTRA_SHI_BR_N_FEVALS = {
-    "26[n=1]": 23,
-    "13[n=1]": 19,
-    "27[n=10]": 21,
-    "27[n=30]": 21,
-    "28[n=30]": 36,
-    "28[n=500]": 39,
-    "1[n=1]": 9,
-    "3[n=1]": 10,
-    "16[n=4]": 15,
-    "18[n=1]": 10,
-    "19[n=20]": 13,
-    "20[n=10]": 9,
-    "21[n=10]": 11,
-    "22[n=1]": 10,
-    "23[n=5]": 9,
-    "24[n=20]": 14,
-    "25[n=3]": 10,
-}
-
-# `_ALEFELD_POTRA_SHI_DEVIATIONS` maps a problem's name to its allowed deviation and the reason for it, for each
-# problem whose count `Brent` does not reproduce exactly; a deviation of None means that the count is not checked.
-_ALEFELD_POTRA_SHI_DEVIATIONS = {
-    "26[n=1]": (
-        None,
-        "the function underflows to 0 on an interval around its root at 0, so the count depends on where the "
-        "platform's exp underflows; the paper's Section 6 states that how this function is coded changes the results",
-    ),
-}
-
-ALEFELD_POTRA_SHI_TABLES_IV_TO_VI = alefeld_potra_shi_tables_iv_to_vi_problems(
-    _ALEFELD_POTRA_SHI_BR_N_FEVALS, _ALEFELD_POTRA_SHI_DEVIATIONS
-)
-
-
-# ==================================================================================================
-#  Anderson and Björck (1973), Examples 1 to 7
-# ==================================================================================================
-# `_ANDERSON_BJORCK_BRENT_N_ITERATIONS` maps the name of each example to the iteration count of the column "Brent",
-# from the paper's runs in single precision. Brent's method evaluates once per iteration, so the evaluation count is the
-# iteration count plus the 2 evaluations at the interval bounds.
-_ANDERSON_BJORCK_BRENT_N_ITERATIONS = {
-    "1": 6,
-    "2[n=1]": 5,
-    "2[n=5]": 8,
-    "2[n=15]": 9,
-    "2[n=20]": 9,
-    "3[n=2]": 7,
-    "3[n=5]": 6,
-    "3[n=15]": 5,
-    "3[n=20]": 5,
-    "4[n=2]": 1,
-    "4[n=5]": 6,
-    "4[n=15]": 8,
-    "4[n=20]": 10,
-    "5[n=2]": 8,
-    "5[n=5]": 5,
-    "5[n=15]": 4,
-    "5[n=20]": 4,
-    "6[n=1]": 6,
-    "6[n=5]": 6,
-    "6[n=10]": 6,
-    "6[n=15]": 9,
-    "6[n=20]": 10,
-    "7[n=2]": 3,
-    "7[n=5]": 10,
-    "7[n=15]": 9,
-    "7[n=20]": 11,
-}
-
-# `_ANDERSON_BJORCK_DEVIATION_REASON` explains each count that `Brent` does not reproduce exactly.
-_ANDERSON_BJORCK_DEVIATION_REASON = (
-    "a difference of 1 iteration can come from any small detail of the paper's runs that the paper does not state, "
-    "such as the rounding of its 27-bit arithmetic or of its library functions, or a choice in its implementation"
-)
-_ANDERSON_BJORCK_DEVIATING_NAMES = {"2[n=5]", "5[n=2]", "7[n=2]", "7[n=15]"}
-
-if list(_ANDERSON_BJORCK_BRENT_N_ITERATIONS) != [problem.name for problem in ANDERSON_BJORCK_PROBLEMS]:
-    raise ValueError("Give 1 iteration count per problem of Anderson and Björck (1973), in the paper's order.")
-ANDERSON_BJORCK_EXAMPLES_1_TO_7 = [
-    replace(
-        problem,
-        n_fevals=_ANDERSON_BJORCK_BRENT_N_ITERATIONS[problem.name] + 2,
-        n_fevals_tol=1 if problem.name in _ANDERSON_BJORCK_DEVIATING_NAMES else 0,
-        deviation_reason=(
-            _ANDERSON_BJORCK_DEVIATION_REASON if problem.name in _ANDERSON_BJORCK_DEVIATING_NAMES else None
+# The column "BR" of Alefeld, Potra and Shi's Tables IV to VI counts the 2 evaluations at the interval bounds.
+ALEFELD_POTRA_SHI_TABLES_IV_TO_VI = [
+    AlefeldPotraShiTablesIVToVIProblem.P26_N1.with_n_fevals(
+        23,
+        deviation=None,
+        reason=(
+            "the function underflows to 0 on an interval around its root at 0, so the count depends on where the "
+            "platform's exp underflows; the paper's Section 6 states that how this function is coded changes the "
+            "results"
         ),
-    )
-    for problem in ANDERSON_BJORCK_PROBLEMS
+    ),
+    AlefeldPotraShiTablesIVToVIProblem.P13_N1.with_n_fevals(19),
+    AlefeldPotraShiTablesIVToVIProblem.P27_N10.with_n_fevals(21),
+    AlefeldPotraShiTablesIVToVIProblem.P27_N30.with_n_fevals(21),
+    AlefeldPotraShiTablesIVToVIProblem.P28_N30.with_n_fevals(36),
+    AlefeldPotraShiTablesIVToVIProblem.P28_N500.with_n_fevals(39),
+    AlefeldPotraShiTablesIVToVIProblem.P1_N1.with_n_fevals(9),
+    AlefeldPotraShiTablesIVToVIProblem.P3_N1.with_n_fevals(10),
+    AlefeldPotraShiTablesIVToVIProblem.P16_N4.with_n_fevals(15),
+    AlefeldPotraShiTablesIVToVIProblem.P18_N1.with_n_fevals(10),
+    AlefeldPotraShiTablesIVToVIProblem.P19_N20.with_n_fevals(13),
+    AlefeldPotraShiTablesIVToVIProblem.P20_N10.with_n_fevals(9),
+    AlefeldPotraShiTablesIVToVIProblem.P21_N10.with_n_fevals(11),
+    AlefeldPotraShiTablesIVToVIProblem.P22_N1.with_n_fevals(10),
+    AlefeldPotraShiTablesIVToVIProblem.P23_N5.with_n_fevals(9),
+    AlefeldPotraShiTablesIVToVIProblem.P24_N20.with_n_fevals(14),
+    AlefeldPotraShiTablesIVToVIProblem.P25_N3.with_n_fevals(10),
+]
+
+# The column "Brent" of Anderson and Björck's Examples 1 to 7 gives the iteration counts of the paper's runs in single
+# precision; Brent's method evaluates once per iteration.
+ANDERSON_BJORCK_EXAMPLES_1_TO_7 = [
+    AndersonBjorckExampleProblem.EX1.with_n_iterations(6),
+    AndersonBjorckExampleProblem.EX2_N1.with_n_iterations(5),
+    AndersonBjorckExampleProblem.EX2_N5.with_n_iterations(
+        8,
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation="the solve takes 1 iteration fewer",
+    ),
+    AndersonBjorckExampleProblem.EX2_N15.with_n_iterations(9),
+    AndersonBjorckExampleProblem.EX2_N20.with_n_iterations(9),
+    AndersonBjorckExampleProblem.EX3_N2.with_n_iterations(7),
+    AndersonBjorckExampleProblem.EX3_N5.with_n_iterations(6),
+    AndersonBjorckExampleProblem.EX3_N15.with_n_iterations(5),
+    AndersonBjorckExampleProblem.EX3_N20.with_n_iterations(5),
+    AndersonBjorckExampleProblem.EX4_N2.with_n_iterations(1),
+    AndersonBjorckExampleProblem.EX4_N5.with_n_iterations(6),
+    AndersonBjorckExampleProblem.EX4_N15.with_n_iterations(8),
+    AndersonBjorckExampleProblem.EX4_N20.with_n_iterations(10),
+    AndersonBjorckExampleProblem.EX5_N2.with_n_iterations(
+        8,
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation="the solve takes 1 iteration fewer",
+    ),
+    AndersonBjorckExampleProblem.EX5_N5.with_n_iterations(5),
+    AndersonBjorckExampleProblem.EX5_N15.with_n_iterations(4),
+    AndersonBjorckExampleProblem.EX5_N20.with_n_iterations(4),
+    AndersonBjorckExampleProblem.EX6_N1.with_n_iterations(6),
+    AndersonBjorckExampleProblem.EX6_N5.with_n_iterations(6),
+    AndersonBjorckExampleProblem.EX6_N10.with_n_iterations(6),
+    AndersonBjorckExampleProblem.EX6_N15.with_n_iterations(9),
+    AndersonBjorckExampleProblem.EX6_N20.with_n_iterations(10),
+    AndersonBjorckExampleProblem.EX7_N2.with_n_iterations(
+        3,
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation="the solve reaches f(x) == 0 one iteration early",
+    ),
+    AndersonBjorckExampleProblem.EX7_N5.with_n_iterations(10),
+    AndersonBjorckExampleProblem.EX7_N15.with_n_iterations(
+        9,
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation="the solve takes 1 iteration more",
+    ),
+    AndersonBjorckExampleProblem.EX7_N20.with_n_iterations(11),
 ]

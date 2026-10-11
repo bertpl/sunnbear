@@ -116,6 +116,32 @@ class PaperProblemEnum(Enum):
     ``FordTable4Problem.F1_I1.with_n_iterations(10)``.
     """
 
+    def with_n_fevals(
+        self,
+        n_fevals: int,
+        *,
+        deviation: int | None = 0,
+        reason: str | None = None,
+        observation: str | None = None,
+    ) -> PaperProblem:
+        """Return the member's problem with a published evaluation count, which includes the 2 evaluations at the
+        interval bounds.
+
+        Args:
+            n_fevals: The published evaluation count.
+            deviation: How far the solve's count may lie from the published one; 0 when it must match exactly, and
+                None when the count is not checked.
+            reason: Why the count deviates; required when ``deviation`` is not 0.
+            observation: What the solve does differently from the published run; optional, beside a ``reason``.
+        """
+        return replace(
+            self.value,
+            n_fevals=n_fevals,
+            n_fevals_tol=deviation,
+            deviation_reason=reason,
+            deviation_observation=observation,
+        )
+
     def with_n_iterations(
         self, n_iterations: int, *, deviation: int = 0, reason: str | None = None, observation: str | None = None
     ) -> PaperProblem:

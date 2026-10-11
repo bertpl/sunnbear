@@ -8,9 +8,10 @@ leading ``1 +`` makes ``f(0) = 0``. The paper takes its examples from Dowell and
 the function without the leading ``1 +``.
 """
 
+import functools
 import math
 
-from .problem import PaperProblem
+from .problem import PaperProblem, PaperProblemEnum
 
 
 # ==================================================================================================
@@ -49,12 +50,33 @@ def _function_7(x: float, *, n: float) -> float:
 # ==================================================================================================
 #  The problems, in the order of the paper's examples
 # ==================================================================================================
-ANDERSON_BJORCK_PROBLEMS = [
-    PaperProblem(name="1", f=lambda x: math.sin(x) - 0.5, a=0.0, b=1.5),
-    *PaperProblem.for_each_n(problem_number=2, function=_function_2, a=0.0, b=1.0, ns=[1, 5, 15, 20]),
-    *PaperProblem.for_each_n(problem_number=3, function=_function_3, a=0.0, b=1.0, ns=[2, 5, 15, 20]),
-    *PaperProblem.for_each_n(problem_number=4, function=_function_4, a=0.0, b=1.0, ns=[2, 5, 15, 20]),
-    *PaperProblem.for_each_n(problem_number=5, function=_function_5, a=0.0, b=1.0, ns=[2, 5, 15, 20]),
-    *PaperProblem.for_each_n(problem_number=6, function=_function_6, a=0.0, b=1.0, ns=[1, 5, 10, 15, 20]),
-    *PaperProblem.for_each_n(problem_number=7, function=_function_7, a=0.01, b=1.0, ns=[2, 5, 15, 20]),
-]
+class AndersonBjorckExampleProblem(PaperProblemEnum):
+    """`AndersonBjorckExampleProblem` holds the 26 problems of the paper's Examples 1 to 7, in the paper's order; a
+    member's name holds the example's number and ``n``, e.g. ``EX2_N5``."""
+
+    EX1 = PaperProblem(name="1", f=lambda x: math.sin(x) - 0.5, a=0.0, b=1.5)
+    EX2_N1 = PaperProblem(name="2[n=1]", f=functools.partial(_function_2, n=1.0), a=0.0, b=1.0)
+    EX2_N5 = PaperProblem(name="2[n=5]", f=functools.partial(_function_2, n=5.0), a=0.0, b=1.0)
+    EX2_N15 = PaperProblem(name="2[n=15]", f=functools.partial(_function_2, n=15.0), a=0.0, b=1.0)
+    EX2_N20 = PaperProblem(name="2[n=20]", f=functools.partial(_function_2, n=20.0), a=0.0, b=1.0)
+    EX3_N2 = PaperProblem(name="3[n=2]", f=functools.partial(_function_3, n=2.0), a=0.0, b=1.0)
+    EX3_N5 = PaperProblem(name="3[n=5]", f=functools.partial(_function_3, n=5.0), a=0.0, b=1.0)
+    EX3_N15 = PaperProblem(name="3[n=15]", f=functools.partial(_function_3, n=15.0), a=0.0, b=1.0)
+    EX3_N20 = PaperProblem(name="3[n=20]", f=functools.partial(_function_3, n=20.0), a=0.0, b=1.0)
+    EX4_N2 = PaperProblem(name="4[n=2]", f=functools.partial(_function_4, n=2.0), a=0.0, b=1.0)
+    EX4_N5 = PaperProblem(name="4[n=5]", f=functools.partial(_function_4, n=5.0), a=0.0, b=1.0)
+    EX4_N15 = PaperProblem(name="4[n=15]", f=functools.partial(_function_4, n=15.0), a=0.0, b=1.0)
+    EX4_N20 = PaperProblem(name="4[n=20]", f=functools.partial(_function_4, n=20.0), a=0.0, b=1.0)
+    EX5_N2 = PaperProblem(name="5[n=2]", f=functools.partial(_function_5, n=2.0), a=0.0, b=1.0)
+    EX5_N5 = PaperProblem(name="5[n=5]", f=functools.partial(_function_5, n=5.0), a=0.0, b=1.0)
+    EX5_N15 = PaperProblem(name="5[n=15]", f=functools.partial(_function_5, n=15.0), a=0.0, b=1.0)
+    EX5_N20 = PaperProblem(name="5[n=20]", f=functools.partial(_function_5, n=20.0), a=0.0, b=1.0)
+    EX6_N1 = PaperProblem(name="6[n=1]", f=functools.partial(_function_6, n=1.0), a=0.0, b=1.0)
+    EX6_N5 = PaperProblem(name="6[n=5]", f=functools.partial(_function_6, n=5.0), a=0.0, b=1.0)
+    EX6_N10 = PaperProblem(name="6[n=10]", f=functools.partial(_function_6, n=10.0), a=0.0, b=1.0)
+    EX6_N15 = PaperProblem(name="6[n=15]", f=functools.partial(_function_6, n=15.0), a=0.0, b=1.0)
+    EX6_N20 = PaperProblem(name="6[n=20]", f=functools.partial(_function_6, n=20.0), a=0.0, b=1.0)
+    EX7_N2 = PaperProblem(name="7[n=2]", f=functools.partial(_function_7, n=2.0), a=0.01, b=1.0)
+    EX7_N5 = PaperProblem(name="7[n=5]", f=functools.partial(_function_7, n=5.0), a=0.01, b=1.0)
+    EX7_N15 = PaperProblem(name="7[n=15]", f=functools.partial(_function_7, n=15.0), a=0.01, b=1.0)
+    EX7_N20 = PaperProblem(name="7[n=20]", f=functools.partial(_function_7, n=20.0), a=0.01, b=1.0)
