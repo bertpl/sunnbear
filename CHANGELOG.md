@@ -5,9 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
-### Added
+## 0.2.4 (2026-10-11)
 
 ### Changed
 
@@ -15,15 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Draw each size's `n_population` candidate tuples in `generate_mc_tuples` only in the fine lanes where that size's new tuples can go, so that every candidate can be picked
 - Rebuild the shipped Monte Carlo tuple set; benchmark results on it differ from those on the previous set
 
-### Deprecated
-
 ### Removed
 
 - Remove the `allocation_epsilon` and `on_size_finished` arguments of `generate_mc_tuples`
-
-### Fixed
-
-### Security
 
 ## 0.2.3 (2026-10-10)
 
