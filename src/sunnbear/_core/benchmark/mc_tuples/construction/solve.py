@@ -1,16 +1,18 @@
-"""`MCTuplesSolve` is the max-div solve that both solves of a size run: the selection and the refinement.
+"""`MCTuplesSolve` is the base class of a size's 2 max-div solves: the selection and the refinement.
 
 Each solve picks the size's new tuples from its own population of candidate tuples, and keeps the tuples of the size
-below. The candidates of the max-div problem are the tuples of the size below, followed by the population. The
-objective is the geomean of 3 gpq terms at `GPQ_LEVEL` over the nearest-neighbor separations: along u, along v and in
-squared L2. Since gpq(d²) = gpq(d)², the L2 term weighs as much as the 2 axis terms together.
+below. The candidates of the max-div problem are the tuples of the size below, followed by the population.
 
-A subclass sets the population and its constraints, the starting selection and the check of the selection:
+The objective is the geomean of 3 gpq terms at `GPQ_LEVEL` over the nearest-neighbor separations: along u, along v
+and in squared L2. Since gpq(d²) = gpq(d)², the L2 term weighs as much as the 2 axis terms together.
+
+A subclass sets the population, the constraints on the new tuples, the starting selection and the check of the
+selection through its hooks. The 2 subclasses are:
 
 - `MCTuplesSelectionSolve` (`selection`) picks the new tuples' fine cells and positions from a population over the
   eligible fine lanes;
 - `MCTuplesRefinementSolve` (`refinement`) then moves each new tuple within its fine cell, among a population drawn
-  only in those fine cells.
+  only in the fine cells of the new tuples.
 
 Besides the subclass's constraints, a weighted constraint keeps every tuple of the size below; it outweighs the
 others, so max-div meets it first. max-div weighs its constraints against the objective without enforcing them, so
@@ -72,11 +74,12 @@ class MCTuplesSolve(ABC):
     #  Main API
     # --------------------------------------------------------------------------
     def run(self, t_budget_sec: float) -> tuple[np.ndarray, ParallelMaxDivSolution]:
-        """Run the solve within `t_budget_sec` and return the new tuples and max-div's solution.
+        """Run the solve within `t_budget_sec` and return the size's tuples and max-div's solution.
 
         Returns:
-            The new tuples, as an `(n_new, 2)` array of (u, v) values in ascending candidate order, and max-div's
-            solution of the solve, with its score checkpoints and timeline.
+            The size's tuples, as a `(size, 2)` array of (u, v) values: the size below's tuples first, then the new
+            tuples in ascending candidate order; and max-div's solution of the solve, with its score checkpoints and
+            timeline.
 
         Raises:
             MCTuplesConstructionError: If the solve cannot form a starting selection, or its selection misses a tuple
@@ -114,7 +117,7 @@ class MCTuplesSolve(ABC):
             )
         solution = solver.solve(verbosity=Verbosity.SILENT)
         new = self._validated_new_selection(np.sort(np.asarray(solution.i_selected, dtype=np.int64)))
-        return self.population.tuple_array[new], solution
+        return np.vstack([self.required_tuple_array, self.population.tuple_array[new]]), solution
 
     # --------------------------------------------------------------------------
     #  Subclass hooks

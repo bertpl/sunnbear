@@ -2,7 +2,7 @@
 
 - `draw` spreads its candidates evenly over the fine lanes and fine cells that it is allowed, and, given
   `MCTuplesAxisGapAllocation.eligible_fine_lanes`, draws its candidates only in the eligible fine lanes;
-- `in_fine_cells_of` draws its candidates inside the fine cells of given tuples.
+- `draw_in_fine_cells_of` draws its candidates inside the fine cells of given tuples.
 """
 
 import numpy as np
@@ -84,13 +84,13 @@ def test_positions_in_lane_move_a_draw_of_exactly_0_to_the_middle_of_its_lane():
     assert positions.tolist() == [0.5, 0.25, 0.25]
 
 
-def test_in_fine_cells_of_puts_each_tuple_first_and_its_candidates_inside_its_fine_cell():
+def test_draw_in_fine_cells_of_puts_each_tuple_first_and_its_candidates_inside_its_fine_cell():
     """Each of the 3 tuples is followed by its 5 candidates, which all lie in its fine cell, at distinct positions."""
     # --- arrange ----------------------
     tuple_array = np.array([[3.5, 900.25], [10.75, 2.5], [1023.5, 511.9]]) / N_FINE_LANES
 
     # --- act --------------------------
-    population = MCTuplesPopulation.in_fine_cells_of(tuple_array, 5, np.random.default_rng(2))
+    population = MCTuplesPopulation.draw_in_fine_cells_of(tuple_array, 5, np.random.default_rng(2))
 
     # --- assert -----------------------
     assert population.u.size == 18

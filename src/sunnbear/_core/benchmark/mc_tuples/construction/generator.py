@@ -11,12 +11,12 @@ tuples of the set share a fine lane.
 2. it draws the size's population of candidate tuples over the fine lanes of the gaps that get new tuples
    (`population`);
 3. the selection solve, a max-div solve, picks the new tuples from the population (`selection`);
-4. the refinement solve, a second max-div solve, moves each new tuple within its fine cell, among candidates drawn
-   only in those fine cells (`refinement`);
+4. the refinement solve, a second max-div solve, moves each new tuple within its fine cell, the crossing of its fine
+   u-lane and fine v-lane, among candidates drawn only in the fine cells of the new tuples (`refinement`);
 5. the mean correction moves the new tuples so that the size's mean u and mean v are exactly 0.5
    (`correction`).
 
-Both solves share their max-div problem and its objective (`solve`).
+Both solves share the max-div objective and the constraint that keeps the size below (`solve`).
 
 `MCTuplesGenerator` passes each size's result, an `MCTuplesSizeResult`, to the caller's `on_size_finished`, so that a
 long construction can show its progress and store its tuples and max-div's solutions as it goes.
@@ -59,8 +59,8 @@ class MCTuplesGenerator:
     """
 
     MIN_T_BUDGET_FRACTION_PER_SIZE: ClassVar[float] = 0.01
-    # The refinement solve gets 1/9 of each size's budget and the selection solve the rest, a split of 8:1.
-    REFINEMENT_T_BUDGET_FRACTION: ClassVar[float] = 1 / 9
+    # The share of each size's budget for the refinement solve; the selection solve gets the rest.
+    REFINEMENT_FRACTION_OF_SIZE_T_BUDGET: ClassVar[float] = 1 / 9
     MIN_T_TOTAL_SEC: ClassVar[float] = 1.0
     MIN_T_TOTAL_AT_FULL_SCALE_SEC: ClassVar[float] = 60.0
 
@@ -143,8 +143,7 @@ class MCTuplesGenerator:
 
         Each size gets `MIN_T_BUDGET_FRACTION_PER_SIZE` of the total, so the solves of the smallest sizes, whose share
         of the work is tiny, still get time to run; the rest is split in proportion to the size times the selection
-        solve's number of candidates, which is its population plus the tuples of the size below. Each size then gives
-        `REFINEMENT_T_BUDGET_FRACTION` of its budget to the refinement solve, and the rest to the selection solve.
+        solve's number of candidates, which is its population plus the tuples of the size below.
 
         Raises:
             ValueError: If `t_total_sec` is below `MIN_T_TOTAL_SEC`, or `max_size` is not 1 of `MCTuplesSize`.
@@ -168,30 +167,31 @@ class MCTuplesGenerator:
     ) -> MCTuplesSizeResult:
         """Build `size` on `required_tuples` and return it.
 
-        `required_tuples` holds the size below's tuples after their mean correction, or None for the smallest size.
+        `required_tuples` holds the size below's tuples after their mean correction, or None for the smallest size. The
+        refinement solve gets `REFINEMENT_FRACTION_OF_SIZE_T_BUDGET` of `t_budget_sec`, and the selection solve the
+        rest.
         """
         t_start = time.perf_counter()
         required_tuple_array = required_tuples.tuple_array if required_tuples is not None else np.zeros((0, 2))
-        t_refinement_budget_sec = self.REFINEMENT_T_BUDGET_FRACTION * t_budget_sec
+        t_refinement_budget_sec = self.REFINEMENT_FRACTION_OF_SIZE_T_BUDGET * t_budget_sec
 
-        # --- selection ------------------------------
-        selection = MCTuplesSelectionSolve(self.n_population, required_tuple_array, size, settings)
-        selected_new_tuple_array, selection_solution = selection.run(t_budget_sec - t_refinement_budget_sec)
+        # --- selection --------------------------
+        selection_solve = MCTuplesSelectionSolve(self.n_population, required_tuple_array, size, settings)
+        unrefined_tuple_array, selection_solution = selection_solve.run(t_budget_sec - t_refinement_budget_sec)
 
-        # --- refinement -----------------------------
-        refinement = MCTuplesRefinementSolve(
-            self.n_refinement_candidates_per_cell, required_tuple_array, selected_new_tuple_array, size, settings
+        # --- refinement -------------------------
+        refinement_solve = MCTuplesRefinementSolve(
+            self.n_refinement_candidates_per_cell, unrefined_tuple_array, size, settings
         )
-        refined_new_tuple_array, refinement_solution = refinement.run(t_refinement_budget_sec)
+        uncorrected_tuple_array, refinement_solution = refinement_solve.run(t_refinement_budget_sec)
 
-        # --- mean correction ------------------------
-        uncorrected_tuple_array = np.vstack([required_tuple_array, refined_new_tuple_array])
+        # --- mean correction --------------------
         return MCTuplesSizeResult(
             size=size,
             t_budget_sec=t_budget_sec,
             t_wall_sec=time.perf_counter() - t_start,
-            gap_allocation=selection.gap_allocation,
-            unrefined_tuple_array=np.vstack([required_tuple_array, selected_new_tuple_array]),
+            gap_allocation=selection_solve.gap_allocation,
+            unrefined_tuple_array=unrefined_tuple_array,
             uncorrected_tuple_array=uncorrected_tuple_array,
             mean_correction=MCTuplesMeanCorrection.of(uncorrected_tuple_array, size.n_required),
             selection_solution=selection_solution,
@@ -222,7 +222,7 @@ def generate_mc_tuples(
     geometric pseudo-quantile at level 0.1, a soft minimum that `MCTuplesStats` reports: one over each tuple's
     distance to its nearest other tuple along u, one along v and one in squared L2. The 2 solves are:
 
-    - the selection solve picks the new tuples from a random population of `n_population` candidate tuples, which
+    - the selection solve picks the new tuples from a random population of `n_population` candidate tuples, and so
       fixes the fine lanes of each new tuple;
     - the refinement solve then moves each new tuple within its fine cell, the crossing of its fine u-lane and fine
       v-lane: it picks 1 tuple per fine cell among the tuple itself and `n_refinement_candidates_per_cell` random
@@ -232,7 +232,9 @@ def generate_mc_tuples(
 
     The construction splits `t_total_sec` over its sizes: each size gets 1 % of the total, plus a part of the rest in
     proportion to its size times the selection solve's number of candidate tuples, which is the population plus the
-    tuples of the size below. Each size's budget is split 8:1 between its selection solve and its refinement solve.
+    tuples of the size below.
+
+    Each size's budget is split 8:1 between its selection solve and its refinement solve.
 
     From 60 s up, every solve uses all `n_workers` workers; below 60 s, the worker count scales down with the time, so
     that a short run does not spend its time starting workers.

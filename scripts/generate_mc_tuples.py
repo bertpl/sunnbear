@@ -72,7 +72,7 @@ def main() -> None:
         default=DEFAULT_N_REFINEMENT_CANDIDATES_PER_CELL,
         help="candidate tuples per fine cell of a new tuple in the refinement solve",
     )
-    parser.add_argument("--inspection-dir", type=Path, help="directory for the tuples and solution of each size")
+    parser.add_argument("--inspection-dir", type=Path, help="directory for the tuples and solutions of each size")
     parser.add_argument(
         "--no-save", action="store_true", dest="is_trial_run", help="do not save the artifact, for a trial run"
     )
@@ -176,8 +176,11 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
                 header="u,v",
                 comments="",
             )
-        for solve, solution in (("selection", result.selection_solution), ("refinement", result.refinement_solution)):
-            with (inspection_dir / f"{stem}_{solve}_solution.pkl").open("wb") as file:
+        for solve_name, solution in (
+            ("selection", result.selection_solution),
+            ("refinement", result.refinement_solution),
+        ):
+            with (inspection_dir / f"{stem}_{solve_name}_solution.pkl").open("wb") as file:
                 pickle.dump(solution, file)
 
 

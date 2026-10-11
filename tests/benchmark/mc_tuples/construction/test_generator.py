@@ -36,13 +36,13 @@ def _spread_each_gap_s_new_tuples(self: MCTuplesSelectionSolve, t_budget_sec: fl
             picks = np.round(np.linspace(0, lanes.size - 1, count + 2)[1:-1]).astype(np.int64)
             values.extend((lanes[picks] + 0.5) / N_FINE_LANES)
         new_values.append(self.settings.rng.permutation(values))
-    return np.column_stack(new_values), None
+    return np.vstack([self.required_tuple_array, np.column_stack(new_values)]), None
 
 
 def _pick_each_cell_s_last_candidate(self: MCTuplesRefinementSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
     """Replace `MCTuplesRefinementSolve.run`: pick the last candidate of each fine cell, without running max-div."""
     n_per_cell = self.n_candidates_per_cell + 1
-    return self.population.tuple_array[n_per_cell - 1 :: n_per_cell], None
+    return np.vstack([self.required_tuple_array, self.population.tuple_array[n_per_cell - 1 :: n_per_cell]]), None
 
 
 def _replace_the_solves(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -94,9 +94,8 @@ def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size()
 
 
 def test_generator_refines_and_corrects_each_size_and_builds_the_next_on_it(monkeypatch):
-    """With the selection replaced by a stub that spreads each gap's new tuples evenly over its fine lanes, and the
-    refinement by a stub that picks another candidate in each fine cell, the generator refines and corrects every
-    size's means to 0.5, and builds each size on the corrected size below."""
+    """With both solves replaced by stubs that run no max-div, the generator moves every new tuple within its fine
+    cell, corrects every size's means to 0.5, and builds each size on the corrected size below."""
     # --- arrange ----------------------
     _replace_the_solves(monkeypatch)
     results: list[MCTuplesSizeResult] = []
@@ -136,18 +135,18 @@ def test_generator_splits_each_size_s_budget_8_to_1_between_selection_and_refine
     # --- arrange ----------------------
     budgets: list[tuple[str, float]] = []
 
-    def _selection(self: MCTuplesSelectionSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
+    def _record_selection_budget(self: MCTuplesSelectionSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
         """Record the selection's budget, then run the selection stub."""
         budgets.append(("selection", t_budget_sec))
         return _spread_each_gap_s_new_tuples(self, t_budget_sec)
 
-    def _refinement(self: MCTuplesRefinementSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
+    def _record_refinement_budget(self: MCTuplesRefinementSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
         """Record the refinement's budget, then run the refinement stub."""
         budgets.append(("refinement", t_budget_sec))
         return _pick_each_cell_s_last_candidate(self, t_budget_sec)
 
-    monkeypatch.setattr(MCTuplesSelectionSolve, "run", _selection)
-    monkeypatch.setattr(MCTuplesRefinementSolve, "run", _refinement)
+    monkeypatch.setattr(MCTuplesSelectionSolve, "run", _record_selection_budget)
+    monkeypatch.setattr(MCTuplesRefinementSolve, "run", _record_refinement_budget)
     results: list[MCTuplesSizeResult] = []
 
     # --- act --------------------------

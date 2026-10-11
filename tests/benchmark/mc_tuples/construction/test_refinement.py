@@ -1,5 +1,5 @@
-"""`MCTuplesRefinementSolve` holds 1 new tuple per fine cell of the selection, starts from the selection's tuples, and
-refuses a selection that breaks a fine cell's constraint."""
+"""`MCTuplesRefinementSolve` holds 1 new tuple per fine cell of the selection solve's new tuples, starts from those
+tuples, and refuses a selection that breaks a fine cell's constraint."""
 
 import numpy as np
 import pytest
@@ -17,10 +17,11 @@ _NEW_OF_SIZE_64 = _SIZE_32 + 1 / N_FINE_LANES
 _N_CANDIDATES_PER_CELL = 8
 
 
-def _refinement() -> MCTuplesRefinementSolve:
+def _solve() -> MCTuplesRefinementSolve:
     """Return the refinement of size 64 on `_SIZE_32`, with `_NEW_OF_SIZE_64` as the selection's new tuples."""
     settings = MCTuplesSolveSettings(n_workers=1, seed=42, rng=np.random.default_rng(5))
-    return MCTuplesRefinementSolve(_N_CANDIDATES_PER_CELL, _SIZE_32, _NEW_OF_SIZE_64, MCTuplesSize.SIZE_64, settings)
+    unrefined_tuple_array = np.vstack([_SIZE_32, _NEW_OF_SIZE_64])
+    return MCTuplesRefinementSolve(_N_CANDIDATES_PER_CELL, unrefined_tuple_array, MCTuplesSize.SIZE_64, settings)
 
 
 # ==================================================================================================
@@ -30,7 +31,7 @@ def test_constraints_hold_exactly_1_new_tuple_per_fine_cell_and_the_size_below()
     """Size 64 gets 1 constraint per fine cell of its 32 new tuples, each over that cell's 9 candidates, and the
     weighted inclusion of the 32 tuples of the size below."""
     # --- act --------------------------
-    constraints = _refinement()._constraints()
+    constraints = _solve()._constraints()
 
     # --- assert -----------------------
     assert len(constraints) == 32 + 1
@@ -45,14 +46,14 @@ def test_constraints_hold_exactly_1_new_tuple_per_fine_cell_and_the_size_below()
 def test_the_starting_selection_is_the_selection_s_new_tuples():
     """The starting selection holds the first candidate of each fine cell, which is the selection's tuple there."""
     # --- arrange ----------------------
-    refinement = _refinement()
+    solve = _solve()
 
     # --- act --------------------------
-    start = refinement._initial_new_selection()
+    start = solve._initial_new_selection()
 
     # --- assert -----------------------
     assert start.tolist() == (9 * np.arange(32)).tolist()
-    assert np.array_equal(refinement.population.tuple_array[start], _NEW_OF_SIZE_64)
+    assert np.array_equal(solve.population.tuple_array[start], _NEW_OF_SIZE_64)
 
 
 # ==================================================================================================
@@ -65,7 +66,7 @@ def test_validation_returns_a_selection_with_1_new_tuple_per_fine_cell():
     new = 9 * np.arange(32) + 8
 
     # --- act / assert -----------------
-    assert _refinement()._validated_new_selection(np.concatenate([np.arange(32), 32 + new])).tolist() == new.tolist()
+    assert _solve()._validated_new_selection(np.concatenate([np.arange(32), 32 + new])).tolist() == new.tolist()
 
 
 def test_validation_refuses_2_new_tuples_in_1_fine_cell():
@@ -76,4 +77,4 @@ def test_validation_refuses_2_new_tuples_in_1_fine_cell():
 
     # --- act / assert -----------------
     with pytest.raises(MCTuplesConstructionError, match="2 fine cells do not hold exactly 1 new tuple"):
-        _refinement()._validated_new_selection(np.concatenate([np.arange(32), 32 + np.sort(new)]))
+        _solve()._validated_new_selection(np.concatenate([np.arange(32), 32 + np.sort(new)]))
