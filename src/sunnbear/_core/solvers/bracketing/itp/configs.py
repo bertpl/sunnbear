@@ -7,27 +7,29 @@ from .variant import ITPVariant
 
 
 class ITPPaperExperimentsSlack4Config(SolverConfig):
-    """`ITPPaperExperimentsSlack4Config` is a core config: `ITP`, variant ``"paper_experiments"``, with ``n_slack = 4``.
+    """`ITPPaperExperimentsSlack4Config` is `ITP`, variant ``"paper_experiments"``, with ``n_slack = 4``.
 
-    With ``n_slack = 4``, the projection accepts interpolation steps that shrink the interval by less than half, as
-    long as the solve can still end within 4 iterations more than bisection, so the evaluation count depends on how
+    This config is reported for information, because `ITPPaperExperimentsSlack0Config` is the core config of `ITP`.
+    With ``n_slack = 4``, the projection accepts interpolation steps that shrink the interval by less than half, as long
+    as the solve can still end at most 4 iterations later than bisection would, so the evaluation count depends on how
     fast interpolation converges on the function.
     """
 
     solver_cls = ITP
     solver_kwargs = {"n_slack": 4, "variant": ITPVariant.PAPER_EXPERIMENTS}  # noqa: RUF012 — the dict is never mutated
-    role = SolverRole.BUILTIN_CORE
+    role = SolverRole.BUILTIN_SECONDARY
 
 
 class ITPPaperExperimentsSlack0Config(SolverConfig):
-    """`ITPPaperExperimentsSlack0Config` is `ITP`, variant ``"paper_experiments"``, with ``n_slack = 0``.
+    """`ITPPaperExperimentsSlack0Config` is a core config: `ITP`, variant ``"paper_experiments"``, with ``n_slack = 0``.
 
-    It is reported for information: the paper's experiments ran `ITP` with this variant and ``n_slack = 0``.
+    This config is the core config because the paper's experiments ran `ITP` with this variant and ``n_slack = 0``,
+    and the authors' code uses the same settings.
     """
 
     solver_cls = ITP
     solver_kwargs = {"n_slack": 0, "variant": ITPVariant.PAPER_EXPERIMENTS}  # noqa: RUF012 — the dict is never mutated
-    role = SolverRole.BUILTIN_SECONDARY
+    role = SolverRole.BUILTIN_CORE
 
 
 class ITPPaperPseudocodeSlack0Config(SolverConfig):
