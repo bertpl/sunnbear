@@ -8,7 +8,8 @@ from .solver import TOMS748
 class TOMS748K1Config(SolverConfig):
     """`TOMS748K1Config` is `TOMS748` with ``k = 1``, the paper's Algorithm 4.1.
 
-    It is reported for information: ``k = 1`` is the default of SciPy's ``toms748``.
+    This config is reported for information because `TOMS748K2Config` is the core config of `TOMS748`; it is included
+    because ``k = 1`` is the default of SciPy's ``toms748``.
     """
 
     solver_cls = TOMS748
@@ -20,7 +21,7 @@ class TOMS748K2Config(SolverConfig):
     """`TOMS748K2Config` is a core config: `TOMS748` with ``k = 2``, the paper's Algorithm 4.2.
 
     ``k = 2`` is the core config, not ``k = 1``: the authors' code implements only Algorithm 4.2, and the paper's
-    Table II gives Algorithm 4.2 fewer evaluations than Algorithm 4.1.
+    Table II reports fewer evaluations for Algorithm 4.2 than for Algorithm 4.1.
     """
 
     solver_cls = TOMS748
