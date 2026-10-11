@@ -6,6 +6,7 @@ The `generator` module documents the construction and names the module that impl
 from .exceptions import MCTuplesConstructionError
 from .generator import (
     DEFAULT_N_POPULATION,
+    DEFAULT_N_REFINEMENT_CANDIDATES_PER_CELL,
     DEFAULT_N_WORKERS,
     DEFAULT_SEED,
     MCTuplesGenerator,

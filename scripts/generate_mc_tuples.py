@@ -6,13 +6,17 @@ time. The script:
 - runs `MCTuplesGenerator`, as `sunnbear.benchmark.generate_mc_tuples` does, so that the script can report each size
   once that size is built;
 - prints 2 lines per size as the construction goes:
-  - the solve's budget and wall time;
+  - the size's budget and wall time;
   - the allocation's predicted offsets of the mean;
   - what the mean correction did;
-  - the size's spread before and after the correction, as `MCTuplesStats` defines it;
-- with `--inspection-dir`, stores each size in that directory: its tuples after the mean correction as the CSV file
-  `k<size>.csv`, its tuples before it as `k<size>_uncorrected.csv`, and max-div's solution, with its score
-  checkpoints, as the pickle file `k<size>_solution.pkl`;
+  - the size's spread after the selection solve, after the refinement solve and after the mean correction, as
+    `MCTuplesStats` defines it;
+- with `--inspection-dir`, stores each size in that directory as CSV files of its tuples and pickle files of max-div's
+  solutions, with their score checkpoints:
+  - `k<size>_unrefined.csv`, after the selection solve;
+  - `k<size>_uncorrected.csv`, after the refinement solve;
+  - `k<size>.csv`, after the mean correction;
+  - `k<size>_selection_solution.pkl` and `k<size>_refinement_solution.pkl`;
 - prints the spread of every size, its means and its largest number of tuples in 1 fine lane, and the overall score;
 - saves the set through `ArtifactStore`, which records in the artifact's manifest the `generate_mc_tuples` call with
   the arguments that the script passes to `MCTuplesGenerator`, and max-div's version; `--no-save` skips saving the
@@ -34,6 +38,7 @@ import numpy as np
 from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples import (
     DEFAULT_N_POPULATION,
+    DEFAULT_N_REFINEMENT_CANDIDATES_PER_CELL,
     DEFAULT_N_WORKERS,
     DEFAULT_SEED,
     N_FINE_LANES,
@@ -61,6 +66,12 @@ def main() -> None:
         help="the largest size to build, for a trial run of the smaller sizes",
     )
     parser.add_argument("--n-population", type=int, default=DEFAULT_N_POPULATION, help="candidate tuples per size")
+    parser.add_argument(
+        "--n-refinement-candidates-per-cell",
+        type=int,
+        default=DEFAULT_N_REFINEMENT_CANDIDATES_PER_CELL,
+        help="candidate tuples per fine cell of a new tuple in the refinement solve",
+    )
     parser.add_argument("--inspection-dir", type=Path, help="directory for the tuples and solution of each size")
     parser.add_argument(
         "--no-save", action="store_true", dest="is_trial_run", help="do not save the artifact, for a trial run"
@@ -73,11 +84,13 @@ def main() -> None:
         "seed": args.seed,
         "max_size": MCTuplesSize(args.max_size),
         "n_population": args.n_population,
+        "n_refinement_candidates_per_cell": args.n_refinement_candidates_per_cell,
     }
     generator = MCTuplesGenerator(
         n_workers=arguments["n_workers"],
         seed=arguments["seed"],
         n_population=arguments["n_population"],
+        n_refinement_candidates_per_cell=arguments["n_refinement_candidates_per_cell"],
         on_size_finished=lambda result: report_size(result, args.inspection_dir),
     )
     tuples = generator.generate(arguments["t_total_sec"], arguments["max_size"])
@@ -114,8 +127,12 @@ def main() -> None:
 
 
 def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None:
-    """Print the size's solve, allocation, correction and spread, and store it in `inspection_dir` if given."""
-    before, after = MCTuplesStats(result.uncorrected_tuple_array), result.tuples.stats()
+    """Print the size's solves, allocation, correction and spread, and store it in `inspection_dir` if given."""
+    spreads = [
+        MCTuplesStats(result.unrefined_tuple_array),
+        MCTuplesStats(result.uncorrected_tuple_array),
+        result.tuples.stats(),
+    ]
     axis_reports = []
     for label, allocation, correction in (
         ("u", result.gap_allocation.u, result.mean_correction.u),
@@ -138,14 +155,18 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
         flush=True,
     )
     print(
-        f"  gpq(0.1) u / v / L2 and score, before → after the correction: "
-        f"{format_spread(before)} → {format_spread(after)}",
+        f"  gpq(0.1) u / v / L2 and score, after the selection → refinement → correction: "
+        f"{' → '.join(format_spread(stats) for stats in spreads)}",
         flush=True,
     )
     if inspection_dir is not None:
         inspection_dir.mkdir(parents=True, exist_ok=True)
         stem = f"k{int(result.size)}"
-        for suffix, tuple_array in (("", result.tuples.tuple_array), ("_uncorrected", result.uncorrected_tuple_array)):
+        for suffix, tuple_array in (
+            ("_unrefined", result.unrefined_tuple_array),
+            ("_uncorrected", result.uncorrected_tuple_array),
+            ("", result.tuples.tuple_array),
+        ):
             # Writing 17 significant digits lets `np.loadtxt` read every float64 back exactly.
             np.savetxt(
                 inspection_dir / f"{stem}{suffix}.csv",
@@ -155,8 +176,9 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
                 header="u,v",
                 comments="",
             )
-        with (inspection_dir / f"{stem}_solution.pkl").open("wb") as file:
-            pickle.dump(result.solution, file)
+        for solve, solution in (("selection", result.selection_solution), ("refinement", result.refinement_solution)):
+            with (inspection_dir / f"{stem}_{solve}_solution.pkl").open("wb") as file:
+                pickle.dump(solution, file)
 
 
 def format_spread(stats: MCTuplesStats) -> str:
