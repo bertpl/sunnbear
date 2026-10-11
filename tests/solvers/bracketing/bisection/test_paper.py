@@ -10,14 +10,14 @@ def test_the_midpoints_of_table_2_1_of_atkinson_are_reproduced():
     the midpoints ``c_1`` to ``c_14`` of Table 2.1 of Atkinson (1989), and returns ``c_15``.
 
     The table prints each midpoint and its function value rounded to 5 decimals, and rounds a tie up: it prints
-    ``c_6 = 1.140625`` as 1.14063. The test rounds each computed value the same way.
+    ``c_6 = 1.140625`` as 1.14063.
 
-    Atkinson's algorithm stops once ``c_15`` lies within ``epsilon`` of the interval bound, and accepts ``c_15``
-    without evaluating it, as `Bisection` does. The table's ``f(c_15) = 0.00016`` is ``f`` at the rounded 1.13474,
-    so the test does not compare it.
+    Atkinson's algorithm stops once ``c_15`` lies within ``epsilon`` of both bounds of the current interval, and
+    accepts ``c_15`` without evaluating it, as `Bisection` does. The table's ``f(c_15) = 0.00016`` is ``f`` evaluated at
+    the rounded value 1.13474, not at ``c_15``, so the test does not compare that value.
     """
     # --- arrange ----------------------
-    atkinson_table_2_1 = [
+    printed_table_2_1 = [
         ("1.5", "8.89063"),
         ("1.25", "1.56470"),
         ("1.125", "-0.09771"),
@@ -40,8 +40,8 @@ def test_the_midpoints_of_table_2_1_of_atkinson_are_reproduced():
 
     # --- assert -----------------------
     # The history starts with the 2 interval bounds, so ``history[2:]`` holds c_1 to c_14 and their values.
-    assert len(result.history) == 2 + len(atkinson_table_2_1)
-    for (c, f), (printed_c, printed_f) in zip(result.history[2:], atkinson_table_2_1, strict=True):
+    assert len(result.history) == 2 + len(printed_table_2_1)
+    for (c, fc), (printed_c, printed_fc) in zip(result.history[2:], printed_table_2_1, strict=True):
         assert Decimal(c).quantize(Decimal(printed_c), rounding=ROUND_HALF_UP) == Decimal(printed_c)
-        assert Decimal(f).quantize(Decimal(printed_f), rounding=ROUND_HALF_UP) == Decimal(printed_f)
+        assert Decimal(fc).quantize(Decimal(printed_fc), rounding=ROUND_HALF_UP) == Decimal(printed_fc)
     assert Decimal(result.x).quantize(printed_c_15, rounding=ROUND_HALF_UP) == printed_c_15
