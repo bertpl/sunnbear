@@ -1,5 +1,5 @@
-"""These tests assert that `Brent` reproduces the evaluation counts of Table 4.1 of Brent's 1973 book, where its
-procedure ``zero`` applies."""
+"""These tests assert that `Brent` reproduces the evaluation counts of Table 4.1 of Brent's 1973 book, on the rows
+whose functions do not underflow near the root."""
 
 import pytest
 
@@ -13,10 +13,10 @@ from .paper_problems import TABLE_4_1_WITH_T
 @pytest.mark.parametrize("problem, t", TABLE_4_1_WITH_T, ids=str)
 def test_the_evaluation_counts_of_table_4_1_of_the_book_are_reproduced(problem: PaperProblem, t: float):
     """On the rows of Table 4.1 whose functions do not underflow near the root, the number of function evaluations of
-    `Brent` with the book's tolerance ``t`` is within a few of the book's count."""
+    `Brent` with the book's tolerance ``t`` is within the row's allowed deviation of the book's count."""
     # --- arrange ----------------------
-    # `Brent` derives ``t`` from ``xtol`` (see its class docstring); this inverts that formula, so the solve runs with
-    # the book's ``t``.
+    # `Brent` derives ``t`` from ``xtol`` (see its class docstring); the line below inverts that formula, so that
+    # `Brent` runs with the book's ``t``.
     xtol = 2.0 * t + 6.0 * FLOAT64_EPS * max(abs(problem.a), abs(problem.b))
 
     # --- act --------------------------
