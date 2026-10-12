@@ -61,13 +61,14 @@ Subject line uses the same short-form prefixes as branches:
 
 ```
 <prefix>: <imperative summary>
+<prefix>(<scope>): <imperative summary>
 ```
 
 - **Prefix** — `feat`, `fix`, `internal`, `chore`, `docs`, `refactor`,
   `test` (matching the branch prefix is the common case but not
   required).
-- **Scope** (optional) — a lowercase slug in parentheses after the
-  prefix that names the part of the package that changed, as in
+- **Scope** (optional) — a lowercase slug that names the part of the
+  package that changed, in parentheses after the prefix, as in
   `feat(mc-tuples): ...`.
 - **Summary** — imperative mood, lowercase, no trailing period,
   ideally under 72 characters.
