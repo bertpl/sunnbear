@@ -187,7 +187,7 @@ class MCTuplesAxisGaps:
             #
             # When no move is valid, every entry is -inf, and so is the chosen one, which ends the search.
             if corrected_min_spacing_after_each_move[source, destination] > -np.inf:
-                placement_after_move = placement.after_move(source, destination)
+                placement_after_move = placement.after_move(int(source), int(destination))
                 corrected_min_spacing_after_move = placement_after_move.corrected_min_spacing
             else:
                 corrected_min_spacing_after_move = -np.inf
