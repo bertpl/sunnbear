@@ -20,6 +20,7 @@ The allocation comes in 2 stages:
 """
 
 from dataclasses import dataclass
+from functools import cached_property
 
 import numpy as np
 
@@ -124,19 +125,6 @@ class MCTuplesAxisGaps:
     Every attribute except `n_required` and `required_sum` is an array with 1 entry per gap, in ascending order, so
     that each step of an allocation scores every gap at once.
 
-    A gap's width is the distance between its bounds, `lows` and `highs`, in fine lanes:
-
-    - for an interior gap, the distance between the values of the 2 tuples around it;
-    - for an edge gap, the distance between the edge of the axis and the value of the tuple next to it.
-
-    The width is measured between values, not counted in fine lanes, because `spacings` divides it to predict the
-    distance between neighboring values, and 2 gaps with the same number of free fine lanes can differ in that distance
-    by almost 2 fine lanes.
-
-    The edge gap's width assumes that its outermost new tuple lies exactly on the edge, as `predicted_sums` does; the
-    actual outermost new tuple lies inside the outermost fine lane, so the edge gap's width is at most 1 fine lane too
-    wide.
-
     Attributes:
         first_lanes: The first free fine lane of each gap, ascending.
         n_free_lanes: The number of free fine lanes of each gap, the most new tuples it can hold.
@@ -157,9 +145,18 @@ class MCTuplesAxisGaps:
     n_required: int
     required_sum: float
 
-    @property
+    @cached_property
     def widths(self) -> np.ndarray:
-        """Return the width of each gap, the distance between its bounds, in fine lanes."""
+        """Return the width of each gap, the distance between its bounds `lows` and `highs`, in fine lanes.
+
+        The width is measured between the gap's bounds on the axis, not counted from fine lane indices, because
+        `spacings` divides it to predict the distance between neighboring values, and 2 gaps with the same number of
+        free fine lanes can differ in width by almost 2 fine lanes.
+
+        An edge gap's width treats its outermost new tuple as lying exactly on the edge, as `predicted_sums` does; the
+        outermost new tuple actually lies inside the outermost fine lane, so an edge gap's width overstates the span of
+        its new tuples by at most 1 fine lane.
+        """
         return (self.highs - self.lows) * N_FINE_LANES
 
     # --------------------------------------------------------------------------

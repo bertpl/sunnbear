@@ -90,8 +90,8 @@ def test_greedy_counts_give_each_new_tuple_to_the_gap_that_keeps_the_widest_spac
 
 def test_greedy_counts_give_the_new_tuple_to_the_gap_whose_neighbors_values_are_farther_apart():
     """Of 2 interior gaps with 510 free fine lanes each, the second is 511.98 fine lanes wide against the first's
-    510.02, because the tuples around the second lie at the ends of their fine lanes away from it, so the second takes
-    the new tuple."""
+    510.02, because each tuple around the second gap lies at the end of its fine lane that faces away from that gap, so
+    the second takes the new tuple."""
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of(np.array([0.99, 511.01, 1022.99]) / N_FINE_LANES)
 
@@ -137,8 +137,11 @@ def test_mean_aware_counts_move_the_extra_tuple_to_the_middle_gap_without_loweri
 
 def test_min_spacing_after_each_move_between_2_gaps_is_the_smaller_of_their_new_spacings():
     """With only 2 gaps, no other gap bounds the smallest spacing: an interior gap 500 fine lanes wide and a right edge
-    gap 523.5 wide, holding 2 and 3 new tuples, end at 250 and 130.875 after a move to the right, and 125 and 261.75
-    after a move to the left."""
+    gap 523.5 wide hold 2 and 3 new tuples, and their spacings end at:
+
+    - 250 and 130.875 after a move to the right;
+    - 125 and 261.75 after a move to the left.
+    """
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of(np.array([0.5, 500.5]) / N_FINE_LANES)
 
