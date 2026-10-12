@@ -1,11 +1,12 @@
-"""`MCTuplesAxisGaps` finds the gaps of free fine lanes and predicts their spacing and values;
-`MCTuplesAxisGapAllocation` allocates new tuples to the gaps so that the predicted mean lies close to 0.5."""
+"""`MCTuplesAxisGaps` finds the gaps of free fine lanes and allocates new tuples to them; `MCTuplesAxisGapAllocation`
+keeps an allocation whose predicted mean lies close to 0.5."""
 
 import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, fine_lanes_of
 from sunnbear._core.benchmark.mc_tuples.construction.allocation import MCTuplesAxisGapAllocation, MCTuplesAxisGaps
+from sunnbear._core.benchmark.mc_tuples.construction.placement import MCTuplesGapPlacement
 
 # The tuples of the size below lie in fine lanes 3, 10 and 11, which leaves a left edge gap [0, 3), an interior gap
 # [4, 10), no gap between 10 and 11, and a right edge gap [12, 1024).
@@ -19,15 +20,14 @@ _SPREAD_VALUES = (np.round(np.linspace(0, N_FINE_LANES - 1, 32)) + 0.5) / N_FINE
 # ==================================================================================================
 #  MCTuplesAxisGaps
 # ==================================================================================================
-def test_of_finds_the_gaps_with_their_widths_edges_and_bounds():
-    """Each maximal run of free fine lanes is a gap with its width, edge flags and bounds; adjacent lanes leave none."""
+def test_of_finds_the_gaps_with_their_edges_and_bounds():
+    """Each maximal run of free fine lanes is a gap with its edge flags and bounds; adjacent lanes leave none."""
     # --- act --------------------------
     gaps = MCTuplesAxisGaps.of(_VALUES)
 
     # --- assert -----------------------
     assert gaps.first_lanes.tolist() == [0, 4, 12]
     assert gaps.n_free_lanes.tolist() == [3, 6, 1012]
-    assert gaps.widths == pytest.approx([3.5, 6.75, 1012.5])
     assert gaps.is_left_edge.tolist() == [True, False, False]
     assert gaps.is_right_edge.tolist() == [False, False, True]
     assert gaps.lows.tolist() == [0.0, _VALUES[0], _VALUES[2]]
@@ -44,39 +44,6 @@ def test_of_leaves_out_an_edge_gap_when_a_tuple_of_the_size_below_lies_in_the_ou
     # --- assert -----------------------
     assert gaps.first_lanes.tolist() == [1, 501]
     assert not gaps.is_left_edge.any()
-
-
-@pytest.mark.parametrize("count", [1, 2, 3])
-def test_predicted_sums_and_spacings_follow_an_even_spread_with_the_outermost_value_on_the_edge(count):
-    """An interior gap's values split it into count + 1 equal parts; an edge gap's into count, the outermost on the
-    edge."""
-    # --- arrange ----------------------
-    gaps = MCTuplesAxisGaps.of(_VALUES)
-    low, high = _VALUES[0], _VALUES[1]
-    j = np.arange(1, count + 1)
-    expected_values = [
-        _VALUES[0] - j * _VALUES[0] / count,  # left edge gap
-        low + j * (high - low) / (count + 1),  # interior gap
-        _VALUES[2] + j * (1 - _VALUES[2]) / count,  # right edge gap
-    ]
-
-    # --- act --------------------------
-    sums = gaps.predicted_sums(np.full(3, count))
-    spacings = gaps.spacings(np.full(3, count))
-
-    # --- assert -----------------------
-    assert sums == pytest.approx([values.sum() for values in expected_values])
-    assert spacings == pytest.approx([3.5 / count, 6.75 / (count + 1), 1012.5 / count])
-
-
-def test_an_empty_gap_has_no_predicted_values_and_no_spacing():
-    """A gap without new tuples adds nothing to the predicted sum and gets an infinite spacing."""
-    # --- arrange ----------------------
-    gaps = MCTuplesAxisGaps.of(_VALUES)
-
-    # --- act / assert -----------------
-    assert gaps.predicted_sums(np.zeros(3, dtype=np.int64)).tolist() == [0.0, 0.0, 0.0]
-    assert np.isinf(gaps.spacings(np.zeros(3, dtype=np.int64))).all()
 
 
 def test_greedy_counts_give_each_new_tuple_to_the_gap_that_keeps_the_widest_spacing():
@@ -100,7 +67,7 @@ def test_greedy_counts_give_the_new_tuple_to_the_gap_whose_neighbors_values_are_
 
     # --- assert -----------------------
     assert gaps.n_free_lanes.tolist() == [510, 510, 1]
-    assert gaps.widths[:2] == pytest.approx([510.02, 511.98])
+    assert (gaps.highs - gaps.lows)[:2] * N_FINE_LANES == pytest.approx([510.02, 511.98])
     assert counts.tolist() == [0, 1, 0]
 
 
@@ -128,11 +95,12 @@ def test_mean_aware_counts_move_the_extra_tuple_to_the_middle_gap_without_loweri
     counts = gaps.mean_aware_counts(greedy_counts)
 
     # --- assert -----------------------
-    assert gaps.predicted_offset_fine_lanes(greedy_counts) == pytest.approx(-7.734375)
-    assert gaps.predicted_offset_fine_lanes(counts) == pytest.approx(0.0, abs=1e-9)
+    greedy_placement, placement = MCTuplesGapPlacement(gaps, greedy_counts), MCTuplesGapPlacement(gaps, counts)
+    assert greedy_placement.offset_fine_lanes == pytest.approx(-7.734375)
+    assert placement.offset_fine_lanes == pytest.approx(0.0, abs=1e-9)
     assert np.flatnonzero(counts == 2).tolist() == [15]
     assert counts.sum() == 32
-    assert gaps.spacings(counts).min() == gaps.spacings(greedy_counts).min()
+    assert placement.spacings.min() == greedy_placement.spacings.min()
 
 
 def test_min_spacing_after_each_move_between_2_gaps_is_the_smaller_of_their_new_spacings():
@@ -146,10 +114,15 @@ def test_min_spacing_after_each_move_between_2_gaps_is_the_smaller_of_their_new_
     gaps = MCTuplesAxisGaps.of(np.array([0.5, 500.5]) / N_FINE_LANES)
 
     # --- act --------------------------
-    min_spacings = gaps._min_spacing_after_each_move(np.array([2, 3]))
+    counts = np.array([2, 3])
+    min_spacings = MCTuplesAxisGaps._min_spacing_after_each_move(
+        MCTuplesGapPlacement(gaps, counts),
+        MCTuplesGapPlacement(gaps, counts - 1),
+        MCTuplesGapPlacement(gaps, counts + 1),
+    )
 
     # --- assert -----------------------
-    assert gaps.widths == pytest.approx([500.0, 523.5])
+    assert (gaps.highs - gaps.lows) * N_FINE_LANES == pytest.approx([500.0, 523.5])
     assert min_spacings[0, 1] == pytest.approx(523.5 / 4)
     assert min_spacings[1, 0] == pytest.approx(500 / 4)
 
@@ -166,8 +139,8 @@ def test_mean_aware_counts_keep_an_allocation_that_fills_every_free_fine_lane():
 
 def test_mean_aware_counts_end_where_no_single_move_raises_the_corrected_min_spacing():
     """With random values for the size below, the search ends at an allocation that fits every gap's free fine lanes,
-    whose `predicted_corrected_min_spacing` is at least the greedy allocation's, and whose
-    `predicted_corrected_min_spacing` no move of 1 new tuple to another gap raises."""
+    whose `MCTuplesGapPlacement.corrected_min_spacing` is at least the greedy allocation's, and whose corrected
+    smallest spacing no move of 1 new tuple to another gap raises."""
     # --- arrange ----------------------
     values = np.random.default_rng(3).choice(N_FINE_LANES, size=128, replace=False) / N_FINE_LANES + 0.4 / N_FINE_LANES
     gaps = MCTuplesAxisGaps.of(values)
@@ -179,15 +152,15 @@ def test_mean_aware_counts_end_where_no_single_move_raises_the_corrected_min_spa
     # --- assert -----------------------
     assert counts.sum() == 128
     assert np.all(counts <= gaps.n_free_lanes)
-    corrected_min_spacing = gaps.predicted_corrected_min_spacing(counts)
-    assert corrected_min_spacing >= gaps.predicted_corrected_min_spacing(greedy_counts)
+    corrected_min_spacing = MCTuplesGapPlacement(gaps, counts).corrected_min_spacing
+    assert corrected_min_spacing >= MCTuplesGapPlacement(gaps, greedy_counts).corrected_min_spacing
     for source in np.flatnonzero(counts >= 1):
         for destination in np.flatnonzero(counts < gaps.n_free_lanes):
             if destination != source:
                 counts_after_move = counts.copy()
                 counts_after_move[source] -= 1
                 counts_after_move[destination] += 1
-                assert gaps.predicted_corrected_min_spacing(counts_after_move) <= corrected_min_spacing
+                assert MCTuplesGapPlacement(gaps, counts_after_move).corrected_min_spacing <= corrected_min_spacing
 
 
 # ==================================================================================================
