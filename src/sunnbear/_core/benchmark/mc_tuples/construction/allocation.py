@@ -124,11 +124,18 @@ class MCTuplesAxisGaps:
     Every attribute except `n_required` and `required_sum` is an array with 1 entry per gap, in ascending order, so
     that each step of an allocation scores every gap at once.
 
-    A gap's width is the distance between its bounds, `lows` and `highs`, in fine lanes: the distance between the
-    values of the 2 tuples around an interior gap, or between the edge of the axis and the value of the tuple next to
-    an edge gap. So of 2 gaps with the same free fine lanes, the gap whose neighbors sit on its far sides is wider. The
-    edge gap's width assumes that its outermost new tuple lies exactly on the edge, as `predicted_sums` does; a tuple
-    lies inside the outermost fine lane, so the width is at most 1 fine lane too wide.
+    A gap's width is the distance between its bounds, `lows` and `highs`, in fine lanes:
+
+    - for an interior gap, the distance between the values of the 2 tuples around it;
+    - for an edge gap, the distance between the edge of the axis and the value of the tuple next to it.
+
+    The width is measured between values, not counted in fine lanes, because `spacings` divides it to predict the
+    distance between neighboring values, and 2 gaps with the same number of free fine lanes can differ in that distance
+    by almost 2 fine lanes.
+
+    The edge gap's width assumes that its outermost new tuple lies exactly on the edge, as `predicted_sums` does; the
+    actual outermost new tuple lies inside the outermost fine lane, so the edge gap's width is at most 1 fine lane too
+    wide.
 
     Attributes:
         first_lanes: The first free fine lane of each gap, ascending.

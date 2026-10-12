@@ -88,9 +88,10 @@ def test_greedy_counts_give_each_new_tuple_to_the_gap_that_keeps_the_widest_spac
     assert gaps.greedy_counts(3).tolist() == [0, 1, 2]
 
 
-def test_greedy_counts_measure_a_gap_between_its_neighbors_values_not_their_fine_lanes():
-    """2 interior gaps span 511 fine lanes each, but the neighbors of the second sit on its far sides, which makes it
-    511.98 fine lanes wide against the first's 510.02, so it takes the new tuple."""
+def test_greedy_counts_give_the_new_tuple_to_the_gap_whose_neighbors_values_are_farther_apart():
+    """Of 2 interior gaps with 510 free fine lanes each, the second is 511.98 fine lanes wide against the first's
+    510.02, because the tuples around the second lie at the ends of their fine lanes away from it, so the second takes
+    the new tuple."""
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of(np.array([0.99, 511.01, 1022.99]) / N_FINE_LANES)
 
