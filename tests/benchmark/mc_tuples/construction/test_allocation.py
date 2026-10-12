@@ -134,10 +134,8 @@ def test_mean_aware_counts_end_where_no_single_move_raises_the_corrected_min_spa
     for source in np.flatnonzero(counts >= 1):
         for destination in np.flatnonzero(counts < gaps.n_free_lanes):
             if destination != source:
-                counts_after_move = counts.copy()
-                counts_after_move[source] -= 1
-                counts_after_move[destination] += 1
-                assert MCTuplesAxisGapPlacement(gaps, counts_after_move).corrected_min_spacing <= corrected_min_spacing
+                placement_after_move = MCTuplesAxisGapPlacement(gaps, counts).after_move(source, destination)
+                assert placement_after_move.corrected_min_spacing <= corrected_min_spacing
 
 
 # ==================================================================================================

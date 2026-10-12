@@ -167,43 +167,34 @@ class MCTuplesAxisGaps:
 
         The corrected smallest spacing is `MCTuplesAxisGapPlacement.corrected_min_spacing`. The search repeatedly moves
         1 new tuple from 1 gap to another, taking the move that raises the corrected smallest spacing most, and stops
-        once no move raises it. Every move raises the corrected smallest spacing strictly, and there are finitely many
-        allocations, so the search ends.
+        once no move raises it.
+
+        Every move raises the corrected smallest spacing strictly, and there are finitely many allocations, so the
+        search ends.
 
         A gap takes at most 1 new tuple per free fine lane.
         """
-        counts = greedy_counts.copy()
-        corrected_min_spacing = MCTuplesAxisGapPlacement(self, counts).corrected_min_spacing
+        placement = MCTuplesAxisGapPlacement(self, greedy_counts.copy())
+        corrected_min_spacing = placement.corrected_min_spacing
         while True:
-            # --- the estimate after each move ---
-            is_valid = (counts >= 1)[:, None] & (counts < self.n_free_lanes)[None, :]
-            np.fill_diagonal(is_valid, False)
-            corrected_min_spacing_after_each_move = np.where(
-                is_valid, MCTuplesAxisGapPlacement(self, counts).corrected_min_spacing_after_each_move(), -np.inf
-            )
-
-            # --- the best move ------------------
+            corrected_min_spacing_after_each_move = placement.corrected_min_spacing_after_each_move()
             source, destination = np.unravel_index(
                 np.argmax(corrected_min_spacing_after_each_move), corrected_min_spacing_after_each_move.shape
             )
-            counts_after_move = counts.copy()
-            counts_after_move[source] -= 1
-            counts_after_move[destination] += 1
             # The chosen move's estimate is recomputed from its allocation. `corrected_min_spacing_after_each_move`
             # builds each estimate from differences of predicted sums, and their rounding could make each of 2
             # allocations with the same estimate look better than the other, so the search would cycle between them.
             #
-            # When no move is valid, every entry is -inf and argmax returns an invalid pair, which ends the search.
-            if is_valid[source, destination]:
-                corrected_min_spacing_after_move = MCTuplesAxisGapPlacement(
-                    self, counts_after_move
-                ).corrected_min_spacing
+            # When no move is valid, every entry is -inf, and so is the chosen one, which ends the search.
+            if corrected_min_spacing_after_each_move[source, destination] > -np.inf:
+                placement_after_move = placement.after_move(source, destination)
+                corrected_min_spacing_after_move = placement_after_move.corrected_min_spacing
             else:
                 corrected_min_spacing_after_move = -np.inf
             if corrected_min_spacing_after_move > corrected_min_spacing:
-                counts, corrected_min_spacing = counts_after_move, corrected_min_spacing_after_move
+                placement, corrected_min_spacing = placement_after_move, corrected_min_spacing_after_move
             else:
-                return counts
+                return placement.counts
 
     # --------------------------------------------------------------------------
     #  Fine lanes
