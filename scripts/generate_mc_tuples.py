@@ -5,6 +5,8 @@ time. The script:
 
 - runs `MCTuplesGenerator`, as `sunnbear.benchmark.generate_mc_tuples` does, so that the script can report each size
   once that size is built;
+- prints the arguments of its `MCTuplesGenerator` calls before the construction starts, so that the log records the
+  arguments even when `--no-save` skips saving the set and its manifest;
 - prints 2 lines per size as the construction goes:
   - the size's budget and wall time;
   - the allocation's predicted offsets of the mean;
@@ -86,6 +88,9 @@ def main() -> None:
         "n_population": args.n_population,
         "n_refinement_random_candidates_per_cell": args.n_refinement_random_candidates_per_cell,
     }
+    print("Arguments of the construction:")
+    for name, value in arguments.items():
+        print(f"  {name} = {value}", flush=True)
     generator = MCTuplesGenerator(
         n_workers=arguments["n_workers"],
         seed=arguments["seed"],
