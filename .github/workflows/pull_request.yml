@@ -41,14 +41,15 @@ jobs:
 
       # The repo squash-merges, so the PR title becomes the commit subject on
       # main — the CI complement to the local commit-msg hook. Dependabot PRs pass
-      # too: dependabot.yml sets the `chore` commit-message prefix. The optional
-      # `(<scope>)` after the type follows the convention in CONTRIBUTING.md.
+      # too: dependabot.yml sets the `chore` commit-message prefix. The scope pattern
+      # `(<scope>)` must accept the same characters as the scope rule in
+      # CONTRIBUTING.md.
       - name: Check PR title
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           if [[ ! "$PR_TITLE" =~ ^(${COMMIT_TYPES})(\([a-z0-9._-]+\))?:[[:space:]].+ ]]; then
-            echo "::error::PR title '$PR_TITLE' does not match '<type>: <summary>' or '<type>(<scope>): <summary>' (type in ${COMMIT_TYPES}, scope a lowercase slug)"
+            echo "::error::PR title '$PR_TITLE' does not match '<prefix>: <summary>' or '<prefix>(<scope>): <summary>' (prefix in ${COMMIT_TYPES}, scope a lowercase slug)"
             exit 1
           fi
 

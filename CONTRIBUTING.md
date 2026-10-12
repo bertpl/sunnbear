@@ -67,9 +67,7 @@ Subject line uses the same short-form prefixes as branches:
 - **Prefix** — `feat`, `fix`, `internal`, `chore`, `docs`, `refactor`,
   `test` (matching the branch prefix is the common case but not
   required).
-- **Scope** (optional) — a lowercase slug that names the part of the
-  package that changed, in parentheses after the prefix, as in
-  `feat(mc-tuples): ...`.
+- **Scope** (optional) — a lowercase slug of letters, digits, `.`, `_` and `-` that names the area of the package that changed, such as `solvers` or `benchmark`, in parentheses after the prefix, as in `feat(solvers): ...`.
 - **Summary** — imperative mood, lowercase, no trailing period,
   ideally under 72 characters.
 
@@ -79,7 +77,7 @@ Examples:
 feat: add parametrized test-function family
 fix: handle degenerate bracketing interval
 chore: bump numba floor to 0.67
-feat(mc-tuples): refine each size's new tuples
+test(solvers): reproduce published evaluation counts
 docs: clarify solver benchmark protocol
 ```
 
