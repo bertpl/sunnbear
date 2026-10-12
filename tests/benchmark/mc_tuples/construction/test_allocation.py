@@ -6,7 +6,7 @@ import pytest
 
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, fine_lanes_of
 from sunnbear._core.benchmark.mc_tuples.construction.allocation import MCTuplesAxisGapAllocation, MCTuplesAxisGaps
-from sunnbear._core.benchmark.mc_tuples.construction.placement import MCTuplesGapPlacement
+from sunnbear._core.benchmark.mc_tuples.construction.placement import MCTuplesAxisGapPlacement
 
 # The tuples of the size below lie in fine lanes 3, 10 and 11, which leaves a left edge gap [0, 3), an interior gap
 # [4, 10), no gap between 10 and 11, and a right edge gap [12, 1024).
@@ -95,36 +95,13 @@ def test_mean_aware_counts_move_the_extra_tuple_to_the_middle_gap_without_loweri
     counts = gaps.mean_aware_counts(greedy_counts)
 
     # --- assert -----------------------
-    greedy_placement, placement = MCTuplesGapPlacement(gaps, greedy_counts), MCTuplesGapPlacement(gaps, counts)
+    greedy_placement = MCTuplesAxisGapPlacement(gaps, greedy_counts)
+    mean_aware_placement = MCTuplesAxisGapPlacement(gaps, counts)
     assert greedy_placement.offset_fine_lanes == pytest.approx(-7.734375)
-    assert placement.offset_fine_lanes == pytest.approx(0.0, abs=1e-9)
+    assert mean_aware_placement.offset_fine_lanes == pytest.approx(0.0, abs=1e-9)
     assert np.flatnonzero(counts == 2).tolist() == [15]
     assert counts.sum() == 32
-    assert placement.spacings.min() == greedy_placement.spacings.min()
-
-
-def test_min_spacing_after_each_move_between_2_gaps_is_the_smaller_of_their_new_spacings():
-    """With only 2 gaps, no other gap bounds the smallest spacing: an interior gap 500 fine lanes wide and a right edge
-    gap 523.5 wide hold 2 and 3 new tuples, and their spacings end at:
-
-    - 250 and 130.875 after a move to the right;
-    - 125 and 261.75 after a move to the left.
-    """
-    # --- arrange ----------------------
-    gaps = MCTuplesAxisGaps.of(np.array([0.5, 500.5]) / N_FINE_LANES)
-
-    # --- act --------------------------
-    counts = np.array([2, 3])
-    min_spacings = MCTuplesAxisGaps._min_spacing_after_each_move(
-        MCTuplesGapPlacement(gaps, counts),
-        MCTuplesGapPlacement(gaps, counts - 1),
-        MCTuplesGapPlacement(gaps, counts + 1),
-    )
-
-    # --- assert -----------------------
-    assert (gaps.highs - gaps.lows) * N_FINE_LANES == pytest.approx([500.0, 523.5])
-    assert min_spacings[0, 1] == pytest.approx(523.5 / 4)
-    assert min_spacings[1, 0] == pytest.approx(500 / 4)
+    assert mean_aware_placement.spacings.min() == greedy_placement.spacings.min()
 
 
 def test_mean_aware_counts_keep_an_allocation_that_fills_every_free_fine_lane():
@@ -139,8 +116,8 @@ def test_mean_aware_counts_keep_an_allocation_that_fills_every_free_fine_lane():
 
 def test_mean_aware_counts_end_where_no_single_move_raises_the_corrected_min_spacing():
     """With random values for the size below, the search ends at an allocation that fits every gap's free fine lanes,
-    whose `MCTuplesGapPlacement.corrected_min_spacing` is at least the greedy allocation's, and whose corrected
-    smallest spacing no move of 1 new tuple to another gap raises."""
+    whose `MCTuplesAxisGapPlacement.corrected_min_spacing` is at least the greedy allocation's, and from which no move
+    of 1 new tuple to another gap raises the corrected smallest spacing."""
     # --- arrange ----------------------
     values = np.random.default_rng(3).choice(N_FINE_LANES, size=128, replace=False) / N_FINE_LANES + 0.4 / N_FINE_LANES
     gaps = MCTuplesAxisGaps.of(values)
@@ -152,15 +129,15 @@ def test_mean_aware_counts_end_where_no_single_move_raises_the_corrected_min_spa
     # --- assert -----------------------
     assert counts.sum() == 128
     assert np.all(counts <= gaps.n_free_lanes)
-    corrected_min_spacing = MCTuplesGapPlacement(gaps, counts).corrected_min_spacing
-    assert corrected_min_spacing >= MCTuplesGapPlacement(gaps, greedy_counts).corrected_min_spacing
+    corrected_min_spacing = MCTuplesAxisGapPlacement(gaps, counts).corrected_min_spacing
+    assert corrected_min_spacing >= MCTuplesAxisGapPlacement(gaps, greedy_counts).corrected_min_spacing
     for source in np.flatnonzero(counts >= 1):
         for destination in np.flatnonzero(counts < gaps.n_free_lanes):
             if destination != source:
                 counts_after_move = counts.copy()
                 counts_after_move[source] -= 1
                 counts_after_move[destination] += 1
-                assert MCTuplesGapPlacement(gaps, counts_after_move).corrected_min_spacing <= corrected_min_spacing
+                assert MCTuplesAxisGapPlacement(gaps, counts_after_move).corrected_min_spacing <= corrected_min_spacing
 
 
 # ==================================================================================================

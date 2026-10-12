@@ -11,9 +11,9 @@ The allocation comes in 2 stages:
 
 1. **greedy:** the new tuples go to the gaps 1 at a time, each to the gap that has the widest spacing after it takes
    the tuple; a gap's spacing is the distance between its neighboring values once its new tuples are spread evenly
-   over it, as `MCTuplesGapPlacement` (`placement`) places them;
+   over it, as `MCTuplesAxisGapPlacement` in the `placement` module places them;
 2. **mean-aware:** starting from the greedy allocation, a local search moves new tuples between gaps, 1 at a time, to
-   raise the predicted smallest spacing after the mean correction (`MCTuplesGapPlacement.corrected_min_spacing`):
+   raise the predicted smallest spacing after the mean correction (`MCTuplesAxisGapPlacement.corrected_min_spacing`):
    - the estimate is the predicted smallest spacing minus the absolute predicted offset of the size's mean from 0.5,
      both in fine lanes;
    - so the search accepts a smaller smallest spacing only where the offset shrinks by more than the spacing does.
@@ -23,9 +23,9 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, TARGET_MEAN, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, fine_lanes_of
 
-from .placement import MCTuplesGapPlacement
+from .placement import MCTuplesAxisGapPlacement
 
 
 # ==================================================================================================
@@ -108,8 +108,8 @@ class MCTuplesAxisGapAllocation:
             return cls(
                 gap_of_fine_lane=gaps.gap_of_fine_lane(is_used),
                 counts=counts[is_used],
-                greedy_offset_fine_lanes=MCTuplesGapPlacement(gaps, greedy_counts).offset_fine_lanes,
-                mean_aware_offset_fine_lanes=MCTuplesGapPlacement(gaps, counts).offset_fine_lanes,
+                greedy_offset_fine_lanes=MCTuplesAxisGapPlacement(gaps, greedy_counts).offset_fine_lanes,
+                mean_aware_offset_fine_lanes=MCTuplesAxisGapPlacement(gaps, counts).offset_fine_lanes,
             )
 
 
@@ -157,7 +157,7 @@ class MCTuplesAxisGaps:
         counts = np.zeros(self.n_free_lanes.size, dtype=np.int64)
         for _ in range(n_new):
             spacing_after_addition = np.where(
-                counts >= self.n_free_lanes, -np.inf, MCTuplesGapPlacement(self, counts + 1).spacings
+                counts >= self.n_free_lanes, -np.inf, MCTuplesAxisGapPlacement(self, counts + 1).spacings
             )
             counts[np.argmax(spacing_after_addition)] += 1
         return counts
@@ -165,28 +165,21 @@ class MCTuplesAxisGaps:
     def mean_aware_counts(self, greedy_counts: np.ndarray) -> np.ndarray:
         """Return the allocation with a locally largest corrected smallest spacing, reached by moving tuples.
 
-        The corrected smallest spacing is `MCTuplesGapPlacement.corrected_min_spacing`. The search repeatedly moves 1
-        new tuple from 1 gap to another, taking the move that raises it most, and stops once no move raises it. Every
-        move raises it strictly, and there are finitely many allocations, so the search ends.
+        The corrected smallest spacing is `MCTuplesAxisGapPlacement.corrected_min_spacing`. The search repeatedly moves
+        1 new tuple from 1 gap to another, taking the move that raises the corrected smallest spacing most, and stops
+        once no move raises it. Every move raises the corrected smallest spacing strictly, and there are finitely many
+        allocations, so the search ends.
 
         A gap takes at most 1 new tuple per free fine lane.
         """
-        size = self.n_required + int(greedy_counts.sum())
-        target_sum = TARGET_MEAN * size - self.required_sum
         counts = greedy_counts.copy()
-        corrected_min_spacing = MCTuplesGapPlacement(self, counts).corrected_min_spacing
+        corrected_min_spacing = MCTuplesAxisGapPlacement(self, counts).corrected_min_spacing
         while True:
             # --- the estimate after each move ---
-            placement = MCTuplesGapPlacement(self, counts)
-            removed, added = MCTuplesGapPlacement(self, counts - 1), MCTuplesGapPlacement(self, counts + 1)
-            excess = placement.sums.sum() - target_sum
-            removal = placement.sums - removed.sums
-            addition = added.sums - placement.sums
-            offset_after = np.abs(excess - removal[:, None] + addition[None, :]) / size * N_FINE_LANES
             is_valid = (counts >= 1)[:, None] & (counts < self.n_free_lanes)[None, :]
             np.fill_diagonal(is_valid, False)
             corrected_min_spacing_after_each_move = np.where(
-                is_valid, self._min_spacing_after_each_move(placement, removed, added) - offset_after, -np.inf
+                is_valid, MCTuplesAxisGapPlacement(self, counts).corrected_min_spacing_after_each_move(), -np.inf
             )
 
             # --- the best move ------------------
@@ -202,7 +195,9 @@ class MCTuplesAxisGaps:
             #
             # When no move is valid, every entry is -inf and argmax returns an invalid pair, which ends the search.
             if is_valid[source, destination]:
-                corrected_min_spacing_after_move = MCTuplesGapPlacement(self, counts_after_move).corrected_min_spacing
+                corrected_min_spacing_after_move = MCTuplesAxisGapPlacement(
+                    self, counts_after_move
+                ).corrected_min_spacing
             else:
                 corrected_min_spacing_after_move = -np.inf
             if corrected_min_spacing_after_move > corrected_min_spacing:
@@ -219,42 +214,6 @@ class MCTuplesAxisGaps:
         for gap, (first, n_free) in enumerate(zip(self.first_lanes[is_used], self.n_free_lanes[is_used], strict=True)):
             gap_of_fine_lane[first : first + n_free] = gap
         return gap_of_fine_lane
-
-    # --------------------------------------------------------------------------
-    #  Helpers
-    # --------------------------------------------------------------------------
-    @staticmethod
-    def _min_spacing_after_each_move(
-        placement: MCTuplesGapPlacement, removed: MCTuplesGapPlacement, added: MCTuplesGapPlacement
-    ) -> np.ndarray:
-        """Return the matrix whose entry `[s, d]` is the smallest spacing after moving 1 tuple from gap `s` to gap `d`.
-
-        `removed` and `added` place every gap with 1 new tuple fewer and 1 more than `placement`. A move changes the
-        spacings of `s` and `d` only, so the smallest spacing after the move is the smallest of 3 values: the new
-        spacings of `s` and `d`, and the smallest spacing among the other gaps, which is 1 of the 3 smallest spacings
-        before the move.
-
-        Entries for these moves hold meaningless values, which the caller masks:
-
-        - a move out of a gap without new tuples;
-        - a move into a gap without free fine lanes;
-        - a move from a gap to itself.
-        """
-        spacings = placement.spacings
-        n_gaps = spacings.size
-        min_spacing_gaps = np.argsort(spacings)[:3]
-        gap_indices = np.arange(n_gaps)
-        # Each entry starts at the 3rd smallest spacing. The 2nd smallest spacing, then the smallest, replaces it in
-        # every entry whose move leaves the gap of that spacing untouched.
-        if n_gaps >= 3:
-            min_spacing_of_others = np.full((n_gaps, n_gaps), spacings[min_spacing_gaps[2]])
-        else:
-            min_spacing_of_others = np.full((n_gaps, n_gaps), np.inf)
-        for rank in reversed(range(min(2, n_gaps))):
-            gap = min_spacing_gaps[rank]
-            is_other = (gap_indices[:, None] != gap) & (gap_indices[None, :] != gap)
-            min_spacing_of_others = np.where(is_other, spacings[gap], min_spacing_of_others)
-        return np.minimum(min_spacing_of_others, np.minimum(removed.spacings[:, None], added.spacings[None, :]))
 
     # --------------------------------------------------------------------------
     #  Factory methods
