@@ -124,15 +124,15 @@ class MCTuplesAxisGaps:
     Every attribute except `n_required` and `required_sum` is an array with 1 entry per gap, in ascending order, so
     that each step of an allocation scores every gap at once.
 
-    A gap's width counts fine lanes by their indices, not the distance between the tuples' values: an interior gap
-    between occupied fine lanes `a` and `b` is `b - a` wide; a left edge gap below occupied fine lane `b` is `b` wide,
-    and a right edge gap above `a` is `N_FINE_LANES - 1 - a` wide, because the outermost new tuple can lie in the
-    outermost fine lane.
+    A gap's width is the distance between its bounds, `lows` and `highs`, in fine lanes: the distance between the
+    values of the 2 tuples around an interior gap, or between the edge of the axis and the value of the tuple next to
+    an edge gap. So of 2 gaps with the same free fine lanes, the gap whose neighbors sit on its far sides is wider. The
+    edge gap's width assumes that its outermost new tuple lies exactly on the edge, as `predicted_sums` does; a tuple
+    lies inside the outermost fine lane, so the width is at most 1 fine lane too wide.
 
     Attributes:
         first_lanes: The first free fine lane of each gap, ascending.
         n_free_lanes: The number of free fine lanes of each gap, the most new tuples it can hold.
-        widths: The width of each gap, in fine lanes.
         is_left_edge: Whether each gap starts at the left edge of the axis, at 0.
         is_right_edge: Whether each gap ends at the right edge of the axis, at 1.
         lows: The lower bound of each gap on the axis: the value of the tuple below it, or 0 for the left edge gap.
@@ -143,13 +143,17 @@ class MCTuplesAxisGaps:
 
     first_lanes: np.ndarray
     n_free_lanes: np.ndarray
-    widths: np.ndarray
     is_left_edge: np.ndarray
     is_right_edge: np.ndarray
     lows: np.ndarray
     highs: np.ndarray
     n_required: int
     required_sum: float
+
+    @property
+    def widths(self) -> np.ndarray:
+        """Return the width of each gap, the distance between its bounds, in fine lanes."""
+        return (self.highs - self.lows) * N_FINE_LANES
 
     # --------------------------------------------------------------------------
     #  Predictions
@@ -313,13 +317,9 @@ class MCTuplesAxisGaps:
         lane_below, lane_above, n_free = lane_below[is_gap], lane_above[is_gap], n_free[is_gap]
         is_left_edge = lane_below == -1
         is_right_edge = lane_above == N_FINE_LANES
-        widths = np.where(
-            is_left_edge, lane_above, np.where(is_right_edge, N_FINE_LANES - 1 - lane_below, lane_above - lane_below)
-        )
         return cls(
             first_lanes=lane_below + 1,
             n_free_lanes=n_free,
-            widths=widths.astype(np.float64),
             is_left_edge=is_left_edge,
             is_right_edge=is_right_edge,
             lows=np.where(is_left_edge, 0.0, value_of_fine_lane[np.maximum(lane_below, 0)]),
