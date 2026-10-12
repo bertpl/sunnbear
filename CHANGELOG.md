@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Compute the steps of `Illinois`, `Pegasus` and `AndersonBjorck` as their papers state them, which changes their benchmark results
 - Stop `AndersonBjorck` by the stopping rule of its paper, which changes its root estimates and benchmark results
 - Make `TOMS748` with `k = 2` and `ITP` with `n_slack = 0` and `variant="paper_experiments"` the core configs of their solvers, which changes how the benchmark characterizes the test functions
-- Refine each size's new tuples in `generate_mc_tuples` within their fine cells, which changes the tuple sets that `generate_mc_tuples` builds for the same arguments
+- Refine each size's new tuples in `generate_mc_tuples` within their fine cells, and spread them by the distances between the values of the size below, which changes the tuple sets that `generate_mc_tuples` builds for the same arguments
 
 ### Deprecated
 
