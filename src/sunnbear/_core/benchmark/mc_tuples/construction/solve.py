@@ -6,17 +6,17 @@ below. The candidates of the max-div problem are the tuples of the size below, f
 The objective is the geomean of 3 gpq terms at `GPQ_LEVEL` over the nearest-neighbor separations: along u, along v
 and in squared L2. Since gpq(d²) = gpq(d)², the L2 term weighs as much as the 2 axis terms together.
 
-A subclass sets the population, the constraints on the new tuples, the starting selection and the check of the
-selection through its hooks. The 2 subclasses are:
+A subclass passes its population to the constructor, and its hooks set:
 
-- `MCTuplesSelectionSolve` (`selection`) picks the new tuples' fine cells and positions from a population over the
-  eligible fine lanes;
-- `MCTuplesRefinementSolve` (`refinement`) then moves each new tuple within its fine cell, among a population drawn
-  only in the fine cells of the new tuples.
+- the constraints on the new tuples (`_new_tuple_constraints`);
+- the starting selection (`_initial_new_selection`);
+- the check of the selection (`_check_new_selection`).
 
-Besides the subclass's constraints, a weighted constraint keeps every tuple of the size below; it outweighs the
-others, so max-div meets it first. max-div weighs its constraints against the objective without enforcing them, so
-the selection is checked before it is returned.
+The `generator` module names the 2 subclasses and the order in which they run.
+
+Besides the subclass's constraints, a weighted constraint keeps every tuple of the size below; this weighted constraint
+outweighs the others, so max-div meets it first. max-div weighs its constraints against the objective without
+enforcing them, so `run` checks max-div's selected tuples before it returns them.
 """
 
 import warnings
@@ -131,14 +131,20 @@ class MCTuplesSolve(ABC):
         """Return the starting selection of new candidates, ascending, as indices into the population."""
 
     @abstractmethod
-    def _check_new_selection(self, new: np.ndarray) -> None:
-        """Raise `MCTuplesConstructionError` if `new`, indices into the population, breaks a new-tuple constraint."""
+    def _check_new_selection(self, new_selection: np.ndarray) -> None:
+        """Raise `MCTuplesConstructionError` if `new_selection` breaks a constraint on the new tuples.
+
+        `new_selection` holds the selected new candidates, as indices into the population.
+        """
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
     def _constraints(self) -> list[Constraint]:
-        """Return the subclass's constraints, and the weighted constraint that keeps the size below's tuples, if any."""
+        """Return the subclass's constraints and the weighted constraint that keeps the size below's tuples.
+
+        The smallest size has no size below, so it gets only the subclass's constraints.
+        """
         constraints = self._new_tuple_constraints()
         n_required = self.size.n_required
         if n_required > 0:

@@ -1,8 +1,8 @@
 """`MCTuplesSelectionSolve` picks a size's new tuples from its population in the size's first max-div solve.
 
 The population's candidates all lie in gaps that get new tuples on both axes
-(`MCTuplesAxisGapAllocation.eligible_fine_lanes`). Besides the constraint that keeps the size below (`solve`), the
-constraints are:
+(`MCTuplesAxisGapAllocation.eligible_fine_lanes`). Besides the constraint that keeps the tuples of the size
+below (`solve`), the constraints are:
 
 - on each axis, each gap holds exactly its allocated number of new tuples;
 - a gap that holds more than 1 new tuple holds at most 1 per fine lane, through 1 constraint per fine lane.
@@ -23,8 +23,8 @@ from .exceptions import MCTuplesConstructionError
 from .population import MCTuplesPopulation
 from .solve import MCTuplesSolve, MCTuplesSolveSettings
 
-# The cost of pairing a fine u-lane with a fine v-lane through a fine cell without a candidate, in the random starting
-# selection; it lies far above the random costs in [0, 1).
+# `EMPTY_CELL_COST` is the cost of pairing a fine u-lane with a fine v-lane through a fine cell without a candidate, in
+# the random starting selection; it lies far above the random costs in [0, 1).
 EMPTY_CELL_COST = 1e9
 
 
@@ -65,11 +65,7 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
     #  Subclass hooks
     # --------------------------------------------------------------------------
     def _new_tuple_constraints(self) -> list[Constraint]:
-        """Return the constraints on the new tuples.
-
-        On each axis, every gap holds its count of new tuples, and a gap that gets more than 1 new tuple holds at most
-        1 per fine lane.
-        """
+        """Return the constraints on the new tuples, as the module docstring lists them."""
         n_required = self.size.n_required
         constraints = []
         for allocation, gap, lane in (
@@ -121,17 +117,17 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
             )
         return np.sort(rng.choice(paired, size=n_new, replace=False))
 
-    def _check_new_selection(self, new: np.ndarray) -> None:
+    def _check_new_selection(self, new_selection: np.ndarray) -> None:
         """Raise `MCTuplesConstructionError` if a gap's count of new tuples is off, or a fine lane holds 2 or more."""
         for axis, allocation, gap, lane in (
             ("u", self.gap_allocation.u, self._u_gap, self.population.u_lane),
             ("v", self.gap_allocation.v, self._v_gap, self.population.v_lane),
         ):
-            counts = np.bincount(gap[new], minlength=allocation.counts.size)
+            counts = np.bincount(gap[new_selection], minlength=allocation.counts.size)
             n_off = int((counts != allocation.counts).sum())
             if n_off > 0:
                 raise MCTuplesConstructionError(
                     f"Size {self.size}: {n_off} gaps along {axis} do not hold their allocated number of new tuples."
                 )
-            if np.bincount(lane[new]).max() > 1:
+            if np.bincount(lane[new_selection]).max() > 1:
                 raise MCTuplesConstructionError(f"Size {self.size}: a fine {axis}-lane holds 2 or more new tuples.")

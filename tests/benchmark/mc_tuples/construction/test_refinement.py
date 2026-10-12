@@ -1,4 +1,4 @@
-"""`MCTuplesRefinementSolve` holds 1 new tuple per fine cell of the selection solve's new tuples, starts from those
+"""`MCTuplesRefinementSolve` requires 1 new tuple per fine cell of the selection solve's new tuples, starts from those
 tuples, and refuses a selection that breaks a fine cell's constraint."""
 
 import numpy as np
@@ -14,14 +14,14 @@ _LANES_32 = np.round(np.linspace(0, N_FINE_LANES - 2, 32)).astype(np.int64)
 _SIZE_32 = np.column_stack([_LANES_32 + 0.5, _LANES_32[::-1] + 0.25]) / N_FINE_LANES
 _NEW_OF_SIZE_64 = _SIZE_32 + 1 / N_FINE_LANES
 
-_N_CANDIDATES_PER_CELL = 8
+_N_RANDOM_CANDIDATES_PER_CELL = 8
 
 
 def _solve() -> MCTuplesRefinementSolve:
-    """Return the refinement of size 64 on `_SIZE_32`, with `_NEW_OF_SIZE_64` as the selection's new tuples."""
+    """Return the refinement of size 64 on `_SIZE_32`, with `_NEW_OF_SIZE_64` as the selection solve's new tuples."""
     settings = MCTuplesSolveSettings(n_workers=1, seed=42, rng=np.random.default_rng(5))
     unrefined_tuple_array = np.vstack([_SIZE_32, _NEW_OF_SIZE_64])
-    return MCTuplesRefinementSolve(_N_CANDIDATES_PER_CELL, unrefined_tuple_array, MCTuplesSize.SIZE_64, settings)
+    return MCTuplesRefinementSolve(_N_RANDOM_CANDIDATES_PER_CELL, unrefined_tuple_array, MCTuplesSize.SIZE_64, settings)
 
 
 # ==================================================================================================
@@ -29,7 +29,7 @@ def _solve() -> MCTuplesRefinementSolve:
 # ==================================================================================================
 def test_constraints_hold_exactly_1_new_tuple_per_fine_cell_and_the_size_below():
     """Size 64 gets 1 constraint per fine cell of its 32 new tuples, each over that cell's 9 candidates, and the
-    weighted inclusion of the 32 tuples of the size below."""
+    weighted constraint that keeps the 32 tuples of the size below."""
     # --- act --------------------------
     constraints = _solve()._constraints()
 
@@ -43,8 +43,9 @@ def test_constraints_hold_exactly_1_new_tuple_per_fine_cell_and_the_size_below()
     assert inclusion.weight == INCLUSION_CONSTRAINT_WEIGHT
 
 
-def test_the_starting_selection_is_the_selection_s_new_tuples():
-    """The starting selection holds the first candidate of each fine cell, which is the selection's tuple there."""
+def test_the_starting_selection_is_the_selection_solve_s_new_tuples():
+    """The starting selection holds the first candidate of each fine cell, which is the selection solve's tuple in that
+    cell."""
     # --- arrange ----------------------
     solve = _solve()
 
@@ -60,8 +61,8 @@ def test_the_starting_selection_is_the_selection_s_new_tuples():
 #  Validation
 # ==================================================================================================
 def test_validation_returns_a_selection_with_1_new_tuple_per_fine_cell():
-    """A selection of the last candidate of each fine cell, with the 32 tuples of the size below, comes back as its
-    new candidates."""
+    """Validating a selection of the 32 tuples of the size below and the last candidate of each fine cell returns those
+    last candidates."""
     # --- arrange ----------------------
     new = 9 * np.arange(32) + 8
 

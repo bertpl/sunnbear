@@ -4,9 +4,9 @@ Each axis is cut into `N_FINE_LANES` equal fine lanes; a fine cell is the crossi
 v-lane. Each size has 2 populations, 1 per max-div solve: the selection's (`draw`) and the refinement's
 (`draw_in_fine_cells_of`).
 
-The selection's population is drawn over the size's eligible fine lanes: the fine lanes of the gaps that its gap
-allocation gives new tuples (`MCTuplesAxisGapAllocation.eligible_fine_lanes`). A candidate in any other fine lane
-could never be picked, so the whole population is usable. The population guarantees:
+The selection's population is drawn over the size's eligible fine lanes: the fine lanes of the gaps with new tuples
+in its gap allocation (`MCTuplesAxisGapAllocation.eligible_fine_lanes`). A candidate in any other fine lane could
+never be picked, so the whole population is usable. The selection's population guarantees:
 
 - every eligible fine lane holds the same number of candidates, give or take 1, along u and along v;
 - every eligible fine cell, the crossing of an eligible u-lane and an eligible v-lane, holds `n // n_cells` or
@@ -19,7 +19,7 @@ The selection's population is drawn in 2 steps:
 2. each candidate lies at its own uniform random position inside its fine cell.
 
 The refinement's population lies only in the fine cells of given tuples: each tuple comes first, followed by
-`n_candidates_per_cell` candidates at uniform random positions inside its fine cell.
+`n_random_candidates_per_cell` candidates at uniform random positions inside its fine cell.
 """
 
 from dataclasses import dataclass
@@ -92,18 +92,19 @@ class MCTuplesPopulation:
 
     @classmethod
     def draw_in_fine_cells_of(
-        cls, tuple_array: np.ndarray, n_candidates_per_cell: int, rng: np.random.Generator
+        cls, tuple_array: np.ndarray, n_random_candidates_per_cell: int, rng: np.random.Generator
     ) -> "MCTuplesPopulation":
-        """Return each tuple of `tuple_array`, followed by `n_candidates_per_cell` candidates inside its fine cell.
+        """Return each tuple of `tuple_array`, followed by random candidates inside its fine cell.
 
-        Candidate `i * (n_candidates_per_cell + 1)` is the tuple `i` itself, and the candidates up to the next tuple
-        lie at uniform random positions inside the fine cell of tuple `i`.
+        Candidate `i * (n_random_candidates_per_cell + 1)` is the tuple `i` itself, and the
+        `n_random_candidates_per_cell` candidates up to the next tuple lie at uniform random positions inside the fine
+        cell of tuple `i`.
         """
         n_tuples = tuple_array.shape[0]
         values_per_axis, lanes_per_axis = [], []
         for values in (tuple_array[:, 0], tuple_array[:, 1]):
             lanes = fine_lanes_of(values)
-            positions = cls._positions_in_lane(n_tuples * n_candidates_per_cell, rng).reshape(n_tuples, -1)
+            positions = cls._positions_in_lane(n_tuples * n_random_candidates_per_cell, rng).reshape(n_tuples, -1)
             values_per_axis.append(np.column_stack([values, (lanes[:, None] + positions) / N_FINE_LANES]).ravel())
-            lanes_per_axis.append(np.repeat(lanes, n_candidates_per_cell + 1))
+            lanes_per_axis.append(np.repeat(lanes, n_random_candidates_per_cell + 1))
         return cls(u=values_per_axis[0], v=values_per_axis[1], u_lane=lanes_per_axis[0], v_lane=lanes_per_axis[1])

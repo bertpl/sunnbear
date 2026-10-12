@@ -38,7 +38,7 @@ def _distinct_lane_selection(solve: MCTuplesSelectionSolve, n: int) -> np.ndarra
 # ==================================================================================================
 def test_constraints_hold_each_gap_s_count_1_per_fine_lane_in_a_gap_of_several_and_the_size_below():
     """Size 64 gets 1 constraint per gap with new tuples on each axis, 1 per fine lane of each gap that takes 2, and
-    the weighted inclusion of the 32 tuples of the size below."""
+    the weighted constraint that keeps the 32 tuples of the size below."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_64, _SIZE_32, n_population=8192)
 

@@ -38,7 +38,7 @@ import numpy as np
 from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples import (
     DEFAULT_N_POPULATION,
-    DEFAULT_N_REFINEMENT_CANDIDATES_PER_CELL,
+    DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL,
     DEFAULT_N_WORKERS,
     DEFAULT_SEED,
     N_FINE_LANES,
@@ -67,9 +67,9 @@ def main() -> None:
     )
     parser.add_argument("--n-population", type=int, default=DEFAULT_N_POPULATION, help="candidate tuples per size")
     parser.add_argument(
-        "--n-refinement-candidates-per-cell",
+        "--n-refinement-random-candidates-per-cell",
         type=int,
-        default=DEFAULT_N_REFINEMENT_CANDIDATES_PER_CELL,
+        default=DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL,
         help="candidate tuples per fine cell of a new tuple in the refinement solve",
     )
     parser.add_argument("--inspection-dir", type=Path, help="directory for the tuples and solutions of each size")
@@ -84,13 +84,13 @@ def main() -> None:
         "seed": args.seed,
         "max_size": MCTuplesSize(args.max_size),
         "n_population": args.n_population,
-        "n_refinement_candidates_per_cell": args.n_refinement_candidates_per_cell,
+        "n_refinement_random_candidates_per_cell": args.n_refinement_random_candidates_per_cell,
     }
     generator = MCTuplesGenerator(
         n_workers=arguments["n_workers"],
         seed=arguments["seed"],
         n_population=arguments["n_population"],
-        n_refinement_candidates_per_cell=arguments["n_refinement_candidates_per_cell"],
+        n_refinement_random_candidates_per_cell=arguments["n_refinement_random_candidates_per_cell"],
         on_size_finished=lambda result: report_size(result, args.inspection_dir),
     )
     tuples = generator.generate(arguments["t_total_sec"], arguments["max_size"])

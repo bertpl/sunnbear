@@ -12,11 +12,11 @@ tuples of the set share a fine lane.
    (`population`);
 3. the selection solve, a max-div solve, picks the new tuples from the population (`selection`);
 4. the refinement solve, a second max-div solve, moves each new tuple within its fine cell, the crossing of its fine
-   u-lane and fine v-lane, among candidates drawn only in the fine cells of the new tuples (`refinement`);
+   u-lane and fine v-lane; its candidates lie only in the fine cells of the new tuples (`refinement`);
 5. the mean correction moves the new tuples so that the size's mean u and mean v are exactly 0.5
    (`correction`).
 
-Both solves share the max-div objective and the constraint that keeps the size below (`solve`).
+Both solves share the max-div objective and the constraint that keeps the tuples of the size below (`solve`).
 
 `MCTuplesGenerator` passes each size's result, an `MCTuplesSizeResult`, to the caller's `on_size_finished`, so that a
 long construction can show its progress and store its tuples and max-div's solutions as it goes.
@@ -41,7 +41,7 @@ from .solve import MCTuplesSolveSettings
 DEFAULT_N_WORKERS = 32
 DEFAULT_SEED = 42
 DEFAULT_N_POPULATION = 2**20
-DEFAULT_N_REFINEMENT_CANDIDATES_PER_CELL = 256
+DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL = 256
 
 
 # ==================================================================================================
@@ -59,7 +59,7 @@ class MCTuplesGenerator:
     """
 
     MIN_T_BUDGET_FRACTION_PER_SIZE: ClassVar[float] = 0.01
-    # The share of each size's budget for the refinement solve; the selection solve gets the rest.
+    # The refinement solve gets this share of each size's budget; the selection solve gets the rest.
     REFINEMENT_FRACTION_OF_SIZE_T_BUDGET: ClassVar[float] = 1 / 9
     MIN_T_TOTAL_SEC: ClassVar[float] = 1.0
     MIN_T_TOTAL_AT_FULL_SCALE_SEC: ClassVar[float] = 60.0
@@ -70,26 +70,27 @@ class MCTuplesGenerator:
         n_workers: int = DEFAULT_N_WORKERS,
         seed: int = DEFAULT_SEED,
         n_population: int = DEFAULT_N_POPULATION,
-        n_refinement_candidates_per_cell: int = DEFAULT_N_REFINEMENT_CANDIDATES_PER_CELL,
+        n_refinement_random_candidates_per_cell: int = DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL,
         on_size_finished: Callable[[MCTuplesSizeResult], None] | None = None,
     ) -> None:
         """Set the settings of every construction of this generator.
 
         Raises:
-            ValueError: If `n_workers`, `n_population` or `n_refinement_candidates_per_cell` is below 1.
+            ValueError: If `n_workers`, `n_population` or `n_refinement_random_candidates_per_cell` is below 1.
         """
         if n_workers < 1:
             raise ValueError(f"n_workers must be at least 1 (got {n_workers}).")
         if n_population < 1:
             raise ValueError(f"n_population must be at least 1 (got {n_population}).")
-        if n_refinement_candidates_per_cell < 1:
+        if n_refinement_random_candidates_per_cell < 1:
             raise ValueError(
-                f"n_refinement_candidates_per_cell must be at least 1 (got {n_refinement_candidates_per_cell})."
+                "n_refinement_random_candidates_per_cell must be at least 1 "
+                f"(got {n_refinement_random_candidates_per_cell})."
             )
         self.n_workers = n_workers
         self.seed = seed
         self.n_population = n_population
-        self.n_refinement_candidates_per_cell = n_refinement_candidates_per_cell
+        self.n_refinement_random_candidates_per_cell = n_refinement_random_candidates_per_cell
         self.on_size_finished = on_size_finished
 
     # --------------------------------------------------------------------------
@@ -167,9 +168,7 @@ class MCTuplesGenerator:
     ) -> MCTuplesSizeResult:
         """Build `size` on `required_tuples` and return it.
 
-        `required_tuples` holds the size below's tuples after their mean correction, or None for the smallest size. The
-        refinement solve gets `REFINEMENT_FRACTION_OF_SIZE_T_BUDGET` of `t_budget_sec`, and the selection solve the
-        rest.
+        `required_tuples` holds the size below's tuples after their mean correction, or None for the smallest size.
         """
         t_start = time.perf_counter()
         required_tuple_array = required_tuples.tuple_array if required_tuples is not None else np.zeros((0, 2))
@@ -181,7 +180,7 @@ class MCTuplesGenerator:
 
         # --- refinement -------------------------
         refinement_solve = MCTuplesRefinementSolve(
-            self.n_refinement_candidates_per_cell, unrefined_tuple_array, size, settings
+            self.n_refinement_random_candidates_per_cell, unrefined_tuple_array, size, settings
         )
         uncorrected_tuple_array, refinement_solution = refinement_solve.run(t_refinement_budget_sec)
 
@@ -209,7 +208,7 @@ def generate_mc_tuples(
     seed: int = DEFAULT_SEED,
     max_size: MCTuplesSize = MCTuplesSize.SIZE_1024,
     n_population: int = DEFAULT_N_POPULATION,
-    n_refinement_candidates_per_cell: int = DEFAULT_N_REFINEMENT_CANDIDATES_PER_CELL,
+    n_refinement_random_candidates_per_cell: int = DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL,
 ) -> MCTuples:
     """Construct a nested Monte Carlo (u, v) tuple set up to `max_size` in about `t_total_sec` s.
 
@@ -218,15 +217,17 @@ def generate_mc_tuples(
     holds tuples, and no 2 tuples share a fine lane, so the largest size holds exactly 1 tuple per fine lane on each
     axis.
 
-    Each size's new tuples come from 2 max-div solves, which both maximize the geomean of 3 values of gpq(0.1), the
-    geometric pseudo-quantile at level 0.1, a soft minimum that `MCTuplesStats` reports: one over each tuple's
-    distance to its nearest other tuple along u, one along v and one in squared L2. The 2 solves are:
+    Each size's new tuples come from 2 max-div solves:
 
     - the selection solve picks the new tuples from a random population of `n_population` candidate tuples, and so
       fixes the fine lanes of each new tuple;
     - the refinement solve then moves each new tuple within its fine cell, the crossing of its fine u-lane and fine
-      v-lane: it picks 1 tuple per fine cell among the tuple itself and `n_refinement_candidates_per_cell` random
-      candidates inside that fine cell.
+      v-lane: it picks 1 tuple per fine cell among the tuple itself and `n_refinement_random_candidates_per_cell`
+      random candidates inside that fine cell.
+
+    Both solves maximize the geomean of 3 values of gpq(0.1), the geometric pseudo-quantile at level 0.1, a soft
+    minimum that `MCTuplesStats` reports: one over each tuple's distance to its nearest other tuple along u, one along v
+    and one in squared L2.
 
     A correction then moves the new tuples to bring the size's means to 0.5.
 
@@ -257,12 +258,12 @@ def generate_mc_tuples(
         max_size: The largest size to build, 1 of `MCTuplesSize`; every size up to it is built, however short
             `t_total_sec` is, so a short run that wants fewer sizes passes a smaller `max_size`.
         n_population: The number of candidate tuples of each size's population for the selection solve, at least 1.
-        n_refinement_candidates_per_cell: The number of random candidate tuples that the refinement solve draws in
-            each fine cell of a new tuple, at least 1.
+        n_refinement_random_candidates_per_cell: The number of random candidate tuples that the refinement solve
+            draws in each fine cell of a new tuple, at least 1.
 
     Raises:
-        ValueError: If `t_total_sec` is below 1 s, `n_workers`, `n_population` or `n_refinement_candidates_per_cell`
-            is below 1, or `max_size` is not 1 of `MCTuplesSize`.
+        ValueError: If `t_total_sec` is below 1 s, `n_workers`, `n_population` or
+            `n_refinement_random_candidates_per_cell` is below 1, or `max_size` is not 1 of `MCTuplesSize`.
         MCTuplesConstructionError: If a size cannot be built within its constraints, which can happen when
             `t_total_sec` is too short for max-div to meet them, or when `n_population` is too small to place the
             size's new tuples in distinct fine lanes.
@@ -271,6 +272,6 @@ def generate_mc_tuples(
         n_workers=n_workers,
         seed=seed,
         n_population=n_population,
-        n_refinement_candidates_per_cell=n_refinement_candidates_per_cell,
+        n_refinement_random_candidates_per_cell=n_refinement_random_candidates_per_cell,
     )
     return generator.generate(t_total_sec, max_size)

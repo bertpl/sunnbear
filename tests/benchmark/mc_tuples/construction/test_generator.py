@@ -41,14 +41,8 @@ def _spread_each_gap_s_new_tuples(self: MCTuplesSelectionSolve, t_budget_sec: fl
 
 def _pick_each_cell_s_last_candidate(self: MCTuplesRefinementSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
     """Replace `MCTuplesRefinementSolve.run`: pick the last candidate of each fine cell, without running max-div."""
-    n_per_cell = self.n_candidates_per_cell + 1
+    n_per_cell = self.n_random_candidates_per_cell + 1
     return np.vstack([self.required_tuple_array, self.population.tuple_array[n_per_cell - 1 :: n_per_cell]]), None
-
-
-def _replace_the_solves(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Replace both solves of every size by stubs that run no max-div."""
-    monkeypatch.setattr(MCTuplesSelectionSolve, "run", _spread_each_gap_s_new_tuples)
-    monkeypatch.setattr(MCTuplesRefinementSolve, "run", _pick_each_cell_s_last_candidate)
 
 
 def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]) -> None:
@@ -97,7 +91,8 @@ def test_generator_refines_and_corrects_each_size_and_builds_the_next_on_it(monk
     """With both solves replaced by stubs that run no max-div, the generator moves every new tuple within its fine
     cell, corrects every size's means to 0.5, and builds each size on the corrected size below."""
     # --- arrange ----------------------
-    _replace_the_solves(monkeypatch)
+    monkeypatch.setattr(MCTuplesSelectionSolve, "run", _spread_each_gap_s_new_tuples)
+    monkeypatch.setattr(MCTuplesRefinementSolve, "run", _pick_each_cell_s_last_candidate)
     results: list[MCTuplesSizeResult] = []
 
     # --- act --------------------------
@@ -120,7 +115,8 @@ def test_generator_refines_and_corrects_each_size_and_builds_the_next_on_it(monk
 def test_generate_mc_tuples_returns_the_largest_size_corrected_to_0_5(monkeypatch):
     """`generate_mc_tuples` returns the largest size, with means of 0.5."""
     # --- arrange ----------------------
-    _replace_the_solves(monkeypatch)
+    monkeypatch.setattr(MCTuplesSelectionSolve, "run", _spread_each_gap_s_new_tuples)
+    monkeypatch.setattr(MCTuplesRefinementSolve, "run", _pick_each_cell_s_last_candidate)
 
     # --- act --------------------------
     tuples = generate_mc_tuples(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_64, n_population=2**12)
@@ -167,7 +163,10 @@ def test_generator_splits_each_size_s_budget_8_to_1_between_selection_and_refine
         ({"t_total_sec": 60.0, "n_workers": 0}, "n_workers must be at least 1"),
         ({"t_total_sec": 60.0, "max_size": 100}, "must be one of"),
         ({"t_total_sec": 60.0, "n_population": 0}, "n_population must be at least 1"),
-        ({"t_total_sec": 60.0, "n_refinement_candidates_per_cell": 0}, "n_refinement_candidates_per_cell must be"),
+        (
+            {"t_total_sec": 60.0, "n_refinement_random_candidates_per_cell": 0},
+            "n_refinement_random_candidates_per_cell must be",
+        ),
     ],
 )
 def test_generate_mc_tuples_rejects_invalid_arguments(arguments, message):

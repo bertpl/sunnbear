@@ -1,6 +1,6 @@
 """`MCTuplesPopulation` draws its 2 kinds of population:
 
-- `draw` spreads its candidates evenly over the fine lanes and fine cells that it is allowed, and, given
+- `draw` spreads its candidates evenly over its allowed fine lanes and fine cells, and, given
   `MCTuplesAxisGapAllocation.eligible_fine_lanes`, draws its candidates only in the eligible fine lanes;
 - `draw_in_fine_cells_of` draws its candidates inside the fine cells of given tuples.
 """
