@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.2.5 (2026-10-12)
 
 ### Added
 
@@ -17,14 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stop `AndersonBjorck` by the stopping rule of its paper, which changes its root estimates and benchmark results
 - Make `TOMS748` with `k = 2` and `ITP` with `n_slack = 0` and `variant="paper_experiments"` the core configs of their solvers, which changes how the benchmark characterizes the test functions
 - Change the tuple sets that `generate_mc_tuples` builds for the same arguments
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 0.2.4 (2026-10-11)
 
