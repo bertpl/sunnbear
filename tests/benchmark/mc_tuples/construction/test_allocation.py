@@ -27,7 +27,7 @@ def test_of_finds_the_gaps_with_their_widths_edges_and_bounds():
     # --- assert -----------------------
     assert gaps.first_lanes.tolist() == [0, 4, 12]
     assert gaps.n_free_lanes.tolist() == [3, 6, 1012]
-    assert gaps.widths.tolist() == [3.0, 7.0, 1012.0]
+    assert gaps.widths == pytest.approx([3.5, 6.75, 1012.5])
     assert gaps.is_left_edge.tolist() == [True, False, False]
     assert gaps.is_right_edge.tolist() == [False, False, True]
     assert gaps.lows.tolist() == [0.0, _VALUES[0], _VALUES[2]]
@@ -66,7 +66,7 @@ def test_predicted_sums_and_spacings_follow_an_even_spread_with_the_outermost_va
 
     # --- assert -----------------------
     assert sums == pytest.approx([values.sum() for values in expected_values])
-    assert spacings == pytest.approx([3 / count, 7 / (count + 1), 1012 / count])
+    assert spacings == pytest.approx([3.5 / count, 6.75 / (count + 1), 1012.5 / count])
 
 
 def test_an_empty_gap_has_no_predicted_values_and_no_spacing():
@@ -80,12 +80,28 @@ def test_an_empty_gap_has_no_predicted_values_and_no_spacing():
 
 
 def test_greedy_counts_give_each_new_tuple_to_the_gap_that_keeps_the_widest_spacing():
-    """Gaps of widths 100 (left edge), 500 and 423 (right edge) take 3 new tuples as: right, interior, right."""
+    """Gaps of widths 100.5 (left edge), 500 and 423.5 (right edge) take 3 new tuples as: right, interior, right."""
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of(np.array([100.5, 600.5]) / N_FINE_LANES)
 
     # --- act / assert -----------------
     assert gaps.greedy_counts(3).tolist() == [0, 1, 2]
+
+
+def test_greedy_counts_give_the_new_tuple_to_the_gap_whose_neighbors_values_are_farther_apart():
+    """Of 2 interior gaps with 510 free fine lanes each, the second is 511.98 fine lanes wide against the first's
+    510.02, because each tuple around the second gap lies at the end of its fine lane that faces away from that gap, so
+    the second takes the new tuple."""
+    # --- arrange ----------------------
+    gaps = MCTuplesAxisGaps.of(np.array([0.99, 511.01, 1022.99]) / N_FINE_LANES)
+
+    # --- act --------------------------
+    counts = gaps.greedy_counts(1)
+
+    # --- assert -----------------------
+    assert gaps.n_free_lanes.tolist() == [510, 510, 1]
+    assert gaps.widths[:2] == pytest.approx([510.02, 511.98])
+    assert counts.tolist() == [0, 1, 0]
 
 
 def test_greedy_counts_give_a_gap_at_most_1_new_tuple_per_free_fine_lane():
@@ -121,8 +137,11 @@ def test_mean_aware_counts_move_the_extra_tuple_to_the_middle_gap_without_loweri
 
 def test_min_spacing_after_each_move_between_2_gaps_is_the_smaller_of_their_new_spacings():
     """With only 2 gaps, no other gap bounds the smallest spacing: an interior gap 500 fine lanes wide and a right edge
-    gap 523 wide, holding 2 and 3 new tuples, end at 250 and 130.75 after a move to the right, and 125 and 261.5 after
-    a move to the left."""
+    gap 523.5 wide hold 2 and 3 new tuples, and their spacings end at:
+
+    - 250 and 130.875 after a move to the right;
+    - 125 and 261.75 after a move to the left.
+    """
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of(np.array([0.5, 500.5]) / N_FINE_LANES)
 
@@ -130,8 +149,8 @@ def test_min_spacing_after_each_move_between_2_gaps_is_the_smaller_of_their_new_
     min_spacings = gaps._min_spacing_after_each_move(np.array([2, 3]))
 
     # --- assert -----------------------
-    assert gaps.widths.tolist() == [500.0, 523.0]
-    assert min_spacings[0, 1] == pytest.approx(523 / 4)
+    assert gaps.widths == pytest.approx([500.0, 523.5])
+    assert min_spacings[0, 1] == pytest.approx(523.5 / 4)
     assert min_spacings[1, 0] == pytest.approx(500 / 4)
 
 
