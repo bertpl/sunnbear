@@ -61,11 +61,13 @@ Subject line uses the same short-form prefixes as branches:
 
 ```
 <prefix>: <imperative summary>
+<prefix>(<scope>): <imperative summary>
 ```
 
 - **Prefix** — `feat`, `fix`, `internal`, `chore`, `docs`, `refactor`,
   `test` (matching the branch prefix is the common case but not
   required).
+- **Scope** (optional) — 1 of the scopes below, in parentheses after the prefix, as in `feat(solvers): ...`. Leave it out when a change spans several areas or none fits.
 - **Summary** — imperative mood, lowercase, no trailing period,
   ideally under 72 characters.
 
@@ -75,8 +77,14 @@ Examples:
 feat: add parametrized test-function family
 fix: handle degenerate bracketing interval
 chore: bump numba floor to 0.67
+test(solvers): reproduce published evaluation counts
 docs: clarify solver benchmark protocol
 ```
+
+Scopes:
+
+- **package:** `solvers`, `functions`, `benchmark`, `mc-tuples`, `stats`, `data`, `suites`, `reporting`
+- **tooling:** `ci`, `release`, `deps`
 
 The body (optional) explains *why*, not *what*. Wrap at ~72 characters.
 
