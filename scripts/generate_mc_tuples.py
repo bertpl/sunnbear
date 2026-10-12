@@ -7,17 +7,18 @@ time. The script:
   once that size is built;
 - prints the arguments of its `MCTuplesGenerator` calls before the construction starts, so that the log records the
   arguments even when `--no-save` skips saving the set and its manifest;
-- prints 2 lines per size as the construction goes:
-  - the size's budget and wall time;
-  - the allocation's predicted offsets of the mean;
-  - what the mean correction did;
-  - the size's spread after the selection solve, after the refinement solve and after the mean correction, as
-    `MCTuplesStats` defines it;
+- prints 3 lines per size as the construction goes:
+  - the size's budget and wall time, the allocation's predicted offsets of the mean, and what the first mean
+    correction did;
+  - what the second mean correction did;
+  - the size's spread after the selection solve, the first mean correction, the refinement solve and the second
+    mean correction, as `MCTuplesStats` defines it;
 - with `--inspection-dir`, stores each size in that directory as CSV files of its tuples and pickle files of max-div's
   solutions, with their score checkpoints:
-  - `k<size>_unrefined.csv`, after the selection solve;
-  - `k<size>_uncorrected.csv`, after the refinement solve;
-  - `k<size>.csv`, after the mean correction;
+  - `k<size>_selected.csv`, after the selection solve;
+  - `k<size>_first_corrected.csv`, after the first mean correction;
+  - `k<size>_refined.csv`, after the refinement solve;
+  - `k<size>.csv`, after the second mean correction;
   - `k<size>_selection_solution.pkl` and `k<size>_refinement_solution.pkl`;
 - prints the spread of every size, its means and its largest number of tuples in 1 fine lane, and the overall score;
 - saves the set through `ArtifactStore`, which records in the artifact's manifest the `generate_mc_tuples` call with
@@ -52,6 +53,7 @@ from sunnbear._core.benchmark.mc_tuples import (
     MCTuplesStats,
     fine_lanes_of,
 )
+from sunnbear._core.benchmark.mc_tuples.construction.correction import MCTuplesAxisMeanCorrection
 
 
 def main() -> None:
@@ -132,16 +134,17 @@ def main() -> None:
 
 
 def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None:
-    """Print the size's solves, allocation, correction and spread, and store it in `inspection_dir` if given."""
+    """Print the size's solves, allocation, corrections and spread, and store it in `inspection_dir` if given."""
     spreads = [
-        MCTuplesStats(result.unrefined_tuple_array),
-        MCTuplesStats(result.uncorrected_tuple_array),
+        MCTuplesStats(result.selected_tuple_array),
+        MCTuplesStats(result.first_mean_correction.tuple_array),
+        MCTuplesStats(result.refined_tuple_array),
         result.tuples.stats(),
     ]
-    axis_reports = []
-    for label, allocation, correction in (
-        ("u", result.gap_allocation.u, result.mean_correction.u),
-        ("v", result.gap_allocation.v, result.mean_correction.v),
+    first_axis_reports, second_axis_reports = [], []
+    for label, allocation, first_correction, second_correction in (
+        ("u", result.gap_allocation.u, result.first_mean_correction.u, result.second_mean_correction.u),
+        ("v", result.gap_allocation.v, result.first_mean_correction.v, result.second_mean_correction.v),
     ):
         if allocation.mean_aware_offset_fine_lanes is None:
             predicted = "1 gap"
@@ -149,18 +152,16 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
             predicted = (
                 f"predicted {allocation.greedy_offset_fine_lanes:+.2f} → {allocation.mean_aware_offset_fine_lanes:+.2f}"
             )
-        axis_reports.append(
-            f"{label}: {predicted}, offset {correction.offset_before_fine_lanes:+.3f} → "
-            f"{correction.offset_after_fine_lanes:+.1e}, D {correction.cap * N_FINE_LANES:.2f}, "
-            f"largest move {correction.max_move_fine_lanes:.2f}"
-        )
+        first_axis_reports.append(f"{label}: {predicted}, {format_correction(first_correction)}")
+        second_axis_reports.append(f"{label}: {format_correction(second_correction)}")
     print(
         f"k={int(result.size)}: budget {result.t_budget_sec:.0f} s, wall {result.t_wall_sec:.0f} s; "
-        f"in fine lanes, {'; '.join(axis_reports)}",
+        f"in fine lanes, {'; '.join(first_axis_reports)}",
         flush=True,
     )
+    print(f"  after the refinement, in fine lanes, {'; '.join(second_axis_reports)}", flush=True)
     print(
-        f"  gpq(0.1) u / v / L2 and score, after the selection → refinement → correction: "
+        f"  gpq(0.1) u / v / L2 and score, after the selection → correction → refinement → correction: "
         f"{' → '.join(format_spread(stats) for stats in spreads)}",
         flush=True,
     )
@@ -168,8 +169,9 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
         inspection_dir.mkdir(parents=True, exist_ok=True)
         stem = f"k{int(result.size)}"
         for suffix, tuple_array in (
-            ("_unrefined", result.unrefined_tuple_array),
-            ("_uncorrected", result.uncorrected_tuple_array),
+            ("_selected", result.selected_tuple_array),
+            ("_first_corrected", result.first_mean_correction.tuple_array),
+            ("_refined", result.refined_tuple_array),
             ("", result.tuples.tuple_array),
         ):
             # Writing 17 significant digits lets `np.loadtxt` read every float64 back exactly.
@@ -187,6 +189,14 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
         ):
             with (inspection_dir / f"{stem}_{solve_name}_solution.pkl").open("wb") as file:
                 pickle.dump(solution, file)
+
+
+def format_correction(correction: MCTuplesAxisMeanCorrection) -> str:
+    """Return what 1 mean correction did on 1 axis: the offset before and after, the cap D and the largest move."""
+    return (
+        f"offset {correction.offset_before_fine_lanes:+.3f} → {correction.offset_after_fine_lanes:+.1e}, "
+        f"D {correction.cap * N_FINE_LANES:.2f}, largest move {correction.max_move_fine_lanes:.2f}"
+    )
 
 
 def format_spread(stats: MCTuplesStats) -> str:

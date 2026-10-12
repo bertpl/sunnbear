@@ -4,17 +4,22 @@ The construction builds the sizes bottom-up, the smallest first, and each larger
 every size is a prefix of the next. Each axis is divided into `N_FINE_LANES` equal parts, the fine lanes, and no 2
 tuples of the set share a fine lane.
 
-`MCTuplesGenerator` builds each size in 5 parts, each implemented in the module of this package named in parentheses:
+`MCTuplesGenerator` builds each size in 6 parts, each implemented in the module of this package named in parentheses:
 
 1. it allocates the new tuples to the gaps that the size below leaves on each axis, so that the size's predicted mean
    lies close to 0.5 (`allocation`);
 2. it draws the size's population of candidate tuples over the fine lanes of the gaps that get new tuples
    (`population`);
 3. the selection solve, a max-div solve, picks the new tuples from the population (`selection`);
-4. the refinement solve, a second max-div solve, moves each new tuple within its fine cell, the crossing of its fine
-   u-lane and fine v-lane; its candidates lie only in the fine cells of the new tuples (`refinement`);
-5. the mean correction moves the new tuples so that the size's mean u and mean v are exactly 0.5
-   (`correction`).
+4. the first mean correction moves the new tuples so that the size's mean u and mean v are exactly 0.5
+   (`correction`);
+5. the refinement solve, a second max-div solve, moves each new tuple within its fine cell, the crossing of its fine
+   u-lane and fine v-lane; its candidates lie only in the fine cells of the corrected new tuples (`refinement`);
+6. the second mean correction brings the means back to 0.5, after the refinement moved them.
+
+The first correction comes before the refinement because it can move a new tuple by several fine lanes, out of the
+fine cell that a refinement would have worked on; the refinement moves each tuple by less than 1 fine lane, so the
+second correction has little left to correct.
 
 Both solves share the max-div objective and the constraint that keeps the tuples of the size below (`solve`).
 
@@ -55,7 +60,7 @@ class MCTuplesGenerator:
 
     Attributes:
         on_size_finished: Called with each size's `MCTuplesSizeResult` as soon as the size is built and its means are
-            corrected; None reports nothing.
+            corrected for the second time; None reports nothing.
     """
 
     MIN_T_BUDGET_FRACTION_PER_SIZE: ClassVar[float] = 0.01
@@ -168,7 +173,8 @@ class MCTuplesGenerator:
     ) -> MCTuplesSizeResult:
         """Build `size` on `required_tuples` and return it.
 
-        `required_tuples` holds the size below's tuples after their mean correction, or None for the smallest size.
+        `required_tuples` holds the size below's tuples after their second mean correction, or None for the smallest
+        size.
         """
         t_start = time.perf_counter()
         required_tuple_array = required_tuples.tuple_array if required_tuples is not None else np.zeros((0, 2))
@@ -176,23 +182,27 @@ class MCTuplesGenerator:
 
         # --- selection --------------------------
         selection_solve = MCTuplesSelectionSolve(self.n_population, required_tuple_array, size, settings)
-        unrefined_tuple_array, selection_solution = selection_solve.run(t_budget_sec - t_refinement_budget_sec)
+        selected_tuple_array, selection_solution = selection_solve.run(t_budget_sec - t_refinement_budget_sec)
+
+        # --- first mean correction --------------
+        first_mean_correction = MCTuplesMeanCorrection.of(selected_tuple_array, size.n_required)
 
         # --- refinement -------------------------
         refinement_solve = MCTuplesRefinementSolve(
-            self.n_refinement_random_candidates_per_cell, unrefined_tuple_array, size, settings
+            self.n_refinement_random_candidates_per_cell, first_mean_correction.tuple_array, size, settings
         )
-        uncorrected_tuple_array, refinement_solution = refinement_solve.run(t_refinement_budget_sec)
+        refined_tuple_array, refinement_solution = refinement_solve.run(t_refinement_budget_sec)
 
-        # --- mean correction --------------------
+        # --- second mean correction -------------
         return MCTuplesSizeResult(
             size=size,
             t_budget_sec=t_budget_sec,
             t_wall_sec=time.perf_counter() - t_start,
             gap_allocation=selection_solve.gap_allocation,
-            unrefined_tuple_array=unrefined_tuple_array,
-            uncorrected_tuple_array=uncorrected_tuple_array,
-            mean_correction=MCTuplesMeanCorrection.of(uncorrected_tuple_array, size.n_required),
+            selected_tuple_array=selected_tuple_array,
+            first_mean_correction=first_mean_correction,
+            refined_tuple_array=refined_tuple_array,
+            second_mean_correction=MCTuplesMeanCorrection.of(refined_tuple_array, size.n_required),
             selection_solution=selection_solution,
             refinement_solution=refinement_solution,
         )
@@ -212,7 +222,7 @@ def generate_mc_tuples(
 ) -> MCTuples:
     """Construct a nested Monte Carlo (u, v) tuple set up to `max_size` in about `t_total_sec` s.
 
-    Size `k` of the set is its first `k` tuples, and every size's mean u and mean v are 0.5 up to rounding, unless the
+    Size `k` of the set is its first `k` tuples, and every size's mean u and mean v are 0.5 up to rounding, unless a
     mean correction cannot reach 0.5. Each axis is cut into as many equal fine lanes as the largest `MCTuplesSize`
     holds tuples, and no 2 tuples share a fine lane, so the largest size holds exactly 1 tuple per fine lane on each
     axis.
@@ -229,7 +239,8 @@ def generate_mc_tuples(
     minimum that `MCTuplesStats` reports: one over each tuple's distance to its nearest other tuple along u, one along v
     and one in squared L2.
 
-    A correction then moves the new tuples to bring the size's means to 0.5.
+    A correction moves the new tuples to bring the size's means to 0.5 before the refinement solve, and a second
+    correction after it.
 
     The construction splits `t_total_sec` over its sizes: each size gets 1 % of the total, plus a part of the rest in
     proportion to its size times the selection solve's number of candidate tuples, which is the population plus the

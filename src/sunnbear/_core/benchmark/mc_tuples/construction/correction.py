@@ -1,4 +1,4 @@
-"""`MCTuplesMeanCorrection` moves a size's new tuples after its max-div solve, so its u and v means are exactly 0.5.
+"""`MCTuplesMeanCorrection` moves a size's new tuples after a max-div solve, so its u and v means are exactly 0.5.
 
 The tuples of the size below stay where they are; per axis, only the new tuples move, toward the side that the mean
 needs (`MCTuplesAxisMeanCorrection`).
