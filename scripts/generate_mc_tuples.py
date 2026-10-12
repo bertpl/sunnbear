@@ -5,8 +5,8 @@ time. The script:
 
 - runs `MCTuplesGenerator`, as `sunnbear.benchmark.generate_mc_tuples` does, so that the script can report each size
   once that size is built;
-- prints the arguments that it passes to `MCTuplesGenerator` before the construction starts, so that the log of a
-  `--no-save` run records them too;
+- prints the arguments of its `MCTuplesGenerator` calls before the construction starts, so that the log records the
+  arguments even when `--no-save` skips saving the set and its manifest;
 - prints 2 lines per size as the construction goes:
   - the size's budget and wall time;
   - the allocation's predicted offsets of the mean;
