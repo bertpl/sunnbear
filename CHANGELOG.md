@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add the `n_refinement_candidates_per_cell` argument to `generate_mc_tuples`
+- Add the `n_refinement_random_candidates_per_cell` argument to `generate_mc_tuples`
 
 ### Changed
 
