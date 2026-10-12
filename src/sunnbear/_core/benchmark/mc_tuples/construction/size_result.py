@@ -1,4 +1,4 @@
-"""`MCTuplesSizeResult` records how 1 size of the tuple-set construction was built: allocation, solve, correction."""
+"""`MCTuplesSizeResult` records how 1 size of the tuple-set construction was built: allocation, solves, correction."""
 
 from dataclasses import dataclass
 
@@ -18,29 +18,34 @@ from .correction import MCTuplesMeanCorrection
 class MCTuplesSizeResult:
     """`MCTuplesSizeResult` describes 1 finished size of a construction, for progress reports and inspection.
 
+    The tuple arrays are `(size, 2)` arrays of (u, v) values: the size below's tuples first, then the new tuples.
+
     Attributes:
         size: The size built.
-        t_budget_sec: The max-div solve's wall-clock budget.
+        t_budget_sec: The wall-clock budget of the size's 2 max-div solves together.
         t_wall_sec: The size's wall-clock time, which covers:
 
             - the gap allocation;
-            - the population;
-            - the solve, with max-div's start-up and shut-down time;
+            - the 2 populations;
+            - the 2 solves, with max-div's start-up and shut-down time;
             - the mean correction.
         gap_allocation: The allocation of the new tuples to the gaps along u and along v.
-        uncorrected_tuple_array: The size's tuples before the mean correction, as a `(size, 2)` array of (u, v)
-            values: the size below's tuples first, then the new tuples that max-div selected.
+        unrefined_tuple_array: The size's tuples after the selection solve, before the refinement solve.
+        uncorrected_tuple_array: The size's tuples after the refinement solve, before the mean correction.
         mean_correction: The mean correction, with what it did on each axis and the size's tuples after it.
-        solution: max-div's solution of the solve, with its score checkpoints and timeline.
+        selection_solution: max-div's solution of the selection solve, with its score checkpoints and timeline.
+        refinement_solution: max-div's solution of the refinement solve, with its score checkpoints and timeline.
     """
 
     size: MCTuplesSize
     t_budget_sec: float
     t_wall_sec: float
     gap_allocation: MCTuplesGapAllocation
+    unrefined_tuple_array: np.ndarray
     uncorrected_tuple_array: np.ndarray
     mean_correction: MCTuplesMeanCorrection
-    solution: ParallelMaxDivSolution
+    selection_solution: ParallelMaxDivSolution
+    refinement_solution: ParallelMaxDivSolution
 
     @property
     def tuples(self) -> MCTuples:

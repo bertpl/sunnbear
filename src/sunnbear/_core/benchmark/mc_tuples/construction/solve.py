@@ -1,22 +1,26 @@
-"""`MCTuplesSizeSolve` picks a size's new tuples from its population in 1 max-div solve.
+"""`MCTuplesSolve` is the base class of a size's 2 max-div solves: the selection and the refinement.
 
-The candidates are the tuples of the size below, which every valid selection keeps, followed by the population,
-whose candidates all lie in gaps that get new tuples on both axes (`MCTuplesAxisGapAllocation.eligible_fine_lanes`).
-The constraints are:
-
-- on each axis, each gap holds exactly its allocated number of new tuples;
-- a gap that holds more than 1 new tuple holds at most 1 per fine lane, through 1 constraint per fine lane;
-- a weighted constraint keeps every tuple of the size below; it outweighs the others, so max-div meets it first.
+Each solve picks the size's new tuples from its own population of candidate tuples, and keeps the tuples of the size
+below. The candidates of the max-div problem are the tuples of the size below, followed by the population.
 
 The objective is the geomean of 3 gpq terms at `GPQ_LEVEL` over the nearest-neighbor separations: along u, along v
 and in squared L2. Since gpq(d²) = gpq(d)², the L2 term weighs as much as the 2 axis terms together.
 
-max-div starts from a random selection with at most 1 new tuple per fine lane on each axis, which ignores the counts
-per gap; max-div meets them within its first iterations. max-div weighs its constraints against the objective without
-enforcing them, so the selection is checked before it is returned.
+A subclass passes its population to the constructor, and its hooks set:
+
+- the constraints on the new tuples (`_new_tuple_constraints`);
+- the starting selection (`_initial_new_selection`);
+- the check of the selection (`_check_new_selection`).
+
+The `generator` module names the 2 subclasses and the order in which they run.
+
+Besides the subclass's constraints, a weighted constraint keeps every tuple of the size below; this weighted constraint
+outweighs the others, so max-div meets it first. max-div weighs its constraints against the objective without
+enforcing them, so `run` checks max-div's selected tuples before it returns them.
 """
 
 import warnings
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 import numpy as np
@@ -30,78 +34,57 @@ from max_div.solver import (
     Verbosity,
     seconds,
 )
-from scipy.optimize import linear_sum_assignment
 
 from sunnbear._core.benchmark.mc_tuples.core import GPQ_LEVEL, MCTuplesSize
-from sunnbear._core.utils.grouping import group_indices_by_id
 
-from .allocation import MCTuplesGapAllocation
 from .exceptions import MCTuplesConstructionError
 from .population import MCTuplesPopulation
 
 # The constraint that keeps the tuples of the size below outweighs the other constraints, so max-div meets it first.
 INCLUSION_CONSTRAINT_WEIGHT = 10.0
 
-# The cost of pairing a fine u-lane with a fine v-lane through a fine cell without a candidate, in the random starting
-# selection; it lies far above the random costs in [0, 1).
-EMPTY_CELL_COST = 1e9
-
 
 # ==================================================================================================
-#  MCTuplesSizeSolve
+#  MCTuplesSolve
 # ==================================================================================================
-class MCTuplesSizeSolve:
-    """`MCTuplesSizeSolve` is the max-div solve that picks the new tuples of 1 size from its population.
+class MCTuplesSolve(ABC):
+    """`MCTuplesSolve` is 1 max-div solve that picks the new tuples of 1 size from a population of candidates.
 
     Attributes:
-        population: The size's population of candidate tuples, which the solve draws over the eligible fine lanes of
-            `gap_allocation`.
+        population: The solve's candidate tuples for the size's new tuples.
         required_tuple_array: The tuples of the size below, as an `(n, 2)` array; empty for the smallest size.
         size: The size under construction.
-        gap_allocation: The allocation of new tuples to the gaps along u and along v, which the solve computes from
-            the size below.
         settings: The construction's settings, the same for every max-div solve.
     """
 
     def __init__(
         self,
-        n_population: int,
+        population: MCTuplesPopulation,
         required_tuple_array: np.ndarray,
         size: MCTuplesSize,
         settings: "MCTuplesSolveSettings",
     ) -> None:
-        """Allocate the size's new tuples to gaps, and draw its population of `n_population` candidates.
-
-        The population lies in the eligible fine lanes, and drawing it advances `settings.rng`.
-        """
+        """Set the solve's population, the size below, the size and the settings."""
+        self.population = population
         self.required_tuple_array = required_tuple_array
         self.size = size
         self.settings = settings
-        self.gap_allocation = MCTuplesGapAllocation.of(required_tuple_array, size.n_new)
-        self.population = MCTuplesPopulation.draw(
-            n_population,
-            self.gap_allocation.u.eligible_fine_lanes,
-            self.gap_allocation.v.eligible_fine_lanes,
-            settings.rng,
-        )
-        self._u_gap = self.gap_allocation.u.gap_of_fine_lane[self.population.u_lane]
-        self._v_gap = self.gap_allocation.v.gap_of_fine_lane[self.population.v_lane]
 
     # --------------------------------------------------------------------------
     #  Main API
     # --------------------------------------------------------------------------
     def run(self, t_budget_sec: float) -> tuple[np.ndarray, ParallelMaxDivSolution]:
-        """Run the solve within `t_budget_sec` and return the new tuples and max-div's solution.
+        """Run the solve within `t_budget_sec` and return the size's tuples and max-div's solution.
 
         Returns:
-            The new tuples, as an `(n_new, 2)` array of (u, v) values in ascending candidate order, and max-div's
-            solution of the solve, with its score checkpoints and timeline.
+            The size's tuples, as a `(size, 2)` array of (u, v) values: the size below's tuples first, then the new
+            tuples in ascending candidate order; and max-div's solution of the solve, with its score checkpoints and
+            timeline.
 
         Raises:
-            MCTuplesConstructionError: If no random starting selection exists, or the selection misses a tuple of the
-                size below, holds a number of new tuples in a gap that differs from its allocation, or holds 2 new
-                tuples in a fine lane, which can happen when `t_budget_sec` is too short for max-div to meet its
-                constraints.
+            MCTuplesConstructionError: If the solve cannot form a starting selection, or its selection misses a tuple
+                of the size below or breaks a constraint of the subclass, which can happen when `t_budget_sec` is too
+                short for max-div to meet the constraints.
         """
         n_required = self.size.n_required
         gpq = DiversityMetric.gpq_separation(GPQ_LEVEL)
@@ -134,33 +117,36 @@ class MCTuplesSizeSolve:
             )
         solution = solver.solve(verbosity=Verbosity.SILENT)
         new = self._validated_new_selection(np.sort(np.asarray(solution.i_selected, dtype=np.int64)))
-        return self.population.tuple_array[new], solution
+        return np.vstack([self.required_tuple_array, self.population.tuple_array[new]]), solution
+
+    # --------------------------------------------------------------------------
+    #  Subclass hooks
+    # --------------------------------------------------------------------------
+    @abstractmethod
+    def _new_tuple_constraints(self) -> list[Constraint]:
+        """Return the constraints on the new tuples, over the size below's tuples followed by the population."""
+
+    @abstractmethod
+    def _initial_new_selection(self) -> np.ndarray:
+        """Return the starting selection of new candidates, ascending, as indices into the population."""
+
+    @abstractmethod
+    def _check_new_selection(self, new_selection: np.ndarray) -> None:
+        """Raise `MCTuplesConstructionError` if `new_selection` breaks a constraint on the new tuples.
+
+        `new_selection` holds the selected new candidates, as indices into the population.
+        """
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
     def _constraints(self) -> list[Constraint]:
-        """Return the constraints of the problem, whose points are the size below's tuples and then the candidates.
+        """Return the subclass's constraints and the weighted constraint that keeps the size below's tuples.
 
-        On each axis, every gap holds its count of new tuples, and a gap that gets more than 1 new tuple holds at most
-        1 per fine lane; a weighted constraint keeps the size below's tuples.
+        The smallest size has no size below, so it gets only the subclass's constraints.
         """
+        constraints = self._new_tuple_constraints()
         n_required = self.size.n_required
-        constraints = []
-        for allocation, gap, lane in (
-            (self.gap_allocation.u, self._u_gap, self.population.u_lane),
-            (self.gap_allocation.v, self._v_gap, self.population.v_lane),
-        ):
-            for group in group_indices_by_id(gap):
-                count = int(allocation.counts[gap[group[0]]])
-                constraints.append(
-                    Constraint(int_set=set((n_required + group).tolist()), min_count=count, max_count=count)
-                )
-            in_gaps_of_several = np.flatnonzero(allocation.counts[gap] > 1)
-            constraints.extend(
-                Constraint(int_set=set((n_required + in_gaps_of_several[group]).tolist()), min_count=0, max_count=1)
-                for group in group_indices_by_id(lane[in_gaps_of_several])
-            )
         if n_required > 0:
             constraints.append(
                 Constraint(
@@ -172,45 +158,12 @@ class MCTuplesSizeSolve:
             )
         return constraints
 
-    def _initial_new_selection(self) -> np.ndarray:
-        """Return a random starting selection of new candidates, ascending, as indices into the population.
-
-        A min-cost matching over random costs pairs each fine u-lane with a distinct fine v-lane whose shared fine cell
-        holds a candidate; `n_new` of these cells, picked at random, each contribute 1 random candidate. The starting
-        selection holds at most 1 new tuple per fine lane, and ignores the counts per gap.
-
-        Raises:
-            MCTuplesConstructionError: If fewer fine-lane pairs than new tuples can be formed through cells that hold
-                a candidate.
-        """
-        rng = self.settings.rng
-        n_new = self.size.n_new
-        fine_u_lanes, u_lane_index = np.unique(self.population.u_lane, return_inverse=True)
-        fine_v_lanes, v_lane_index = np.unique(self.population.v_lane, return_inverse=True)
-        n_u_lanes, n_v_lanes = fine_u_lanes.size, fine_v_lanes.size
-        cells = u_lane_index * n_v_lanes + v_lane_index
-        shuffled = rng.permutation(self.population.u.size)
-        cells_with_a_candidate, first_in_shuffled = np.unique(cells[shuffled], return_index=True)
-        candidate_of_cell = np.full(n_u_lanes * n_v_lanes, -1, dtype=np.int64)
-        candidate_of_cell[cells_with_a_candidate] = shuffled[first_in_shuffled]
-        costs = rng.random((n_u_lanes, n_v_lanes))
-        costs[candidate_of_cell.reshape(n_u_lanes, n_v_lanes) < 0] = EMPTY_CELL_COST
-        rows, cols = linear_sum_assignment(costs)
-        paired = candidate_of_cell[rows * n_v_lanes + cols]
-        paired = paired[paired >= 0]
-        if paired.size < n_new:
-            raise MCTuplesConstructionError(
-                f"Size {self.size}: only {paired.size} fine lanes can be paired through cells with a candidate, for "
-                f"{n_new} new tuples."
-            )
-        return np.sort(rng.choice(paired, size=n_new, replace=False))
-
     def _validated_new_selection(self, selection: np.ndarray) -> np.ndarray:
         """Return the selected new candidates as indices into the population, after checking the constraints.
 
         Raises:
-            MCTuplesConstructionError: If a tuple of the size below is missing, a gap holds a number of new tuples
-                that differs from its allocation, or a fine lane holds 2 or more new tuples.
+            MCTuplesConstructionError: If a tuple of the size below is missing, or the new candidates break a
+                constraint of the subclass.
         """
         n_required = self.size.n_required
         n_missing = n_required - int((selection < n_required).sum())
@@ -219,18 +172,7 @@ class MCTuplesSizeSolve:
                 f"Size {self.size}: {n_missing} tuples of the size below it are not selected."
             )
         new = selection[selection >= n_required] - n_required
-        for axis, allocation, gap, lane in (
-            ("u", self.gap_allocation.u, self._u_gap, self.population.u_lane),
-            ("v", self.gap_allocation.v, self._v_gap, self.population.v_lane),
-        ):
-            counts = np.bincount(gap[new], minlength=allocation.counts.size)
-            n_off = int((counts != allocation.counts).sum())
-            if n_off > 0:
-                raise MCTuplesConstructionError(
-                    f"Size {self.size}: {n_off} gaps along {axis} do not hold their allocated number of new tuples."
-                )
-            if np.bincount(lane[new]).max() > 1:
-                raise MCTuplesConstructionError(f"Size {self.size}: a fine {axis}-lane holds 2 or more new tuples.")
+        self._check_new_selection(new)
         return new
 
 

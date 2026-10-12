@@ -2,7 +2,7 @@
 
 - builds nested sizes with means of 0.5 and at most 1 tuple per fine lane;
 - reports each size;
-- splits the total time over the solves;
+- splits the total time over the sizes, and each size's time over its 2 solves;
 - scales down the worker count of a short run.
 """
 
@@ -21,12 +21,13 @@ from sunnbear._core.benchmark.mc_tuples import (
     fine_lanes_of,
     generate_mc_tuples,
 )
-from sunnbear._core.benchmark.mc_tuples.construction.solve import MCTuplesSizeSolve
+from sunnbear._core.benchmark.mc_tuples.construction.refinement import MCTuplesRefinementSolve
+from sunnbear._core.benchmark.mc_tuples.construction.selection import MCTuplesSelectionSolve
 
 
-def _spread_each_gap_s_new_tuples(self: MCTuplesSizeSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
-    """Replace `MCTuplesSizeSolve.run`: spread each gap's new tuples evenly over its fine lanes, pair u and v at random,
-    and return them without running max-div."""
+def _spread_each_gap_s_new_tuples(self: MCTuplesSelectionSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
+    """Replace `MCTuplesSelectionSolve.run`: spread each gap's new tuples evenly over its fine lanes, pair u and v at
+    random, and return them without running max-div."""
     new_values = []
     for allocation in (self.gap_allocation.u, self.gap_allocation.v):
         values = []
@@ -35,7 +36,13 @@ def _spread_each_gap_s_new_tuples(self: MCTuplesSizeSolve, t_budget_sec: float) 
             picks = np.round(np.linspace(0, lanes.size - 1, count + 2)[1:-1]).astype(np.int64)
             values.extend((lanes[picks] + 0.5) / N_FINE_LANES)
         new_values.append(self.settings.rng.permutation(values))
-    return np.column_stack(new_values), None
+    return np.vstack([self.required_tuple_array, np.column_stack(new_values)]), None
+
+
+def _pick_each_cell_s_last_candidate(self: MCTuplesRefinementSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
+    """Replace `MCTuplesRefinementSolve.run`: pick the last candidate of each fine cell, without running max-div."""
+    n_per_cell = self.n_random_candidates_per_cell + 1
+    return np.vstack([self.required_tuple_array, self.population.tuple_array[n_per_cell - 1 :: n_per_cell]]), None
 
 
 def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]) -> None:
@@ -76,14 +83,16 @@ def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size()
     assert [int(result.size) for result in results] == [32, 64]
     _assert_valid_nested_set(tuples, results)
     assert all(result.uncorrected_tuple_array.shape == (int(result.size), 2) for result in results)
-    assert all(result.solution.score_checkpoints for result in results)
+    assert all(result.selection_solution.score_checkpoints for result in results)
+    assert all(result.refinement_solution.score_checkpoints for result in results)
 
 
-def test_generator_corrects_each_size_and_builds_the_next_on_it(monkeypatch):
-    """With the solve replaced by a stub that spreads each gap's new tuples evenly over its fine lanes, the generator
-    corrects every size's means to 0.5 and builds each size on the corrected size below."""
+def test_generator_refines_and_corrects_each_size_and_builds_the_next_on_it(monkeypatch):
+    """With both solves replaced by stubs that run no max-div, the generator moves every new tuple within its fine
+    cell, corrects every size's means to 0.5, and builds each size on the corrected size below."""
     # --- arrange ----------------------
-    monkeypatch.setattr(MCTuplesSizeSolve, "run", _spread_each_gap_s_new_tuples)
+    monkeypatch.setattr(MCTuplesSelectionSolve, "run", _spread_each_gap_s_new_tuples)
+    monkeypatch.setattr(MCTuplesRefinementSolve, "run", _pick_each_cell_s_last_candidate)
     results: list[MCTuplesSizeResult] = []
 
     # --- act --------------------------
@@ -96,12 +105,18 @@ def test_generator_corrects_each_size_and_builds_the_next_on_it(monkeypatch):
     _assert_valid_nested_set(tuples, results)
     assert results[0].gap_allocation.u.mean_aware_offset_fine_lanes is None
     assert results[1].gap_allocation.u.mean_aware_offset_fine_lanes is not None
+    for result in results:
+        unrefined, uncorrected = result.unrefined_tuple_array, result.uncorrected_tuple_array
+        assert np.array_equal(unrefined[: result.size.n_required], uncorrected[: result.size.n_required])
+        assert not np.any(unrefined[result.size.n_required :] == uncorrected[result.size.n_required :])
+        assert np.array_equal(fine_lanes_of(unrefined), fine_lanes_of(uncorrected))
 
 
 def test_generate_mc_tuples_returns_the_largest_size_corrected_to_0_5(monkeypatch):
     """`generate_mc_tuples` returns the largest size, with means of 0.5."""
     # --- arrange ----------------------
-    monkeypatch.setattr(MCTuplesSizeSolve, "run", _spread_each_gap_s_new_tuples)
+    monkeypatch.setattr(MCTuplesSelectionSolve, "run", _spread_each_gap_s_new_tuples)
+    monkeypatch.setattr(MCTuplesRefinementSolve, "run", _pick_each_cell_s_last_candidate)
 
     # --- act --------------------------
     tuples = generate_mc_tuples(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_64, n_population=2**12)
@@ -111,6 +126,36 @@ def test_generate_mc_tuples_returns_the_largest_size_corrected_to_0_5(monkeypatc
     assert tuples.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
 
 
+def test_generator_splits_each_size_s_budget_8_to_1_between_selection_and_refinement(monkeypatch):
+    """The selection solve of each size gets 8/9 of the size's budget, and the refinement solve the other 1/9."""
+    # --- arrange ----------------------
+    budgets: list[tuple[str, float]] = []
+
+    def _record_selection_budget(self: MCTuplesSelectionSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
+        """Record the selection's budget, then run the selection stub."""
+        budgets.append(("selection", t_budget_sec))
+        return _spread_each_gap_s_new_tuples(self, t_budget_sec)
+
+    def _record_refinement_budget(self: MCTuplesRefinementSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
+        """Record the refinement's budget, then run the refinement stub."""
+        budgets.append(("refinement", t_budget_sec))
+        return _pick_each_cell_s_last_candidate(self, t_budget_sec)
+
+    monkeypatch.setattr(MCTuplesSelectionSolve, "run", _record_selection_budget)
+    monkeypatch.setattr(MCTuplesRefinementSolve, "run", _record_refinement_budget)
+    results: list[MCTuplesSizeResult] = []
+
+    # --- act --------------------------
+    generator = MCTuplesGenerator(n_population=2**12, on_size_finished=results.append)
+    generator.generate(t_total_sec=9.0, max_size=MCTuplesSize.SIZE_64)
+
+    # --- assert -----------------------
+    assert [solve for solve, _ in budgets] == ["selection", "refinement"] * 2
+    for i, result in enumerate(results):
+        assert budgets[2 * i][1] == pytest.approx(8 / 9 * result.t_budget_sec)
+        assert budgets[2 * i + 1][1] == pytest.approx(1 / 9 * result.t_budget_sec)
+
+
 @pytest.mark.parametrize(
     "arguments, message",
     [
@@ -118,17 +163,22 @@ def test_generate_mc_tuples_returns_the_largest_size_corrected_to_0_5(monkeypatc
         ({"t_total_sec": 60.0, "n_workers": 0}, "n_workers must be at least 1"),
         ({"t_total_sec": 60.0, "max_size": 100}, "must be one of"),
         ({"t_total_sec": 60.0, "n_population": 0}, "n_population must be at least 1"),
+        (
+            {"t_total_sec": 60.0, "n_refinement_random_candidates_per_cell": 0},
+            "n_refinement_random_candidates_per_cell must be",
+        ),
     ],
 )
 def test_generate_mc_tuples_rejects_invalid_arguments(arguments, message):
-    """A total below 1 s, no workers, an unknown size or an empty population raise a `ValueError`."""
+    """A total below 1 s, no workers, an unknown size, an empty population or no refinement candidates raise a
+    `ValueError`."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=message):
         generate_mc_tuples(**arguments)
 
 
 # ==================================================================================================
-#  MCTuplesGenerator: workers and time per solve
+#  MCTuplesGenerator: workers and time per size
 # ==================================================================================================
 @pytest.mark.parametrize(
     "t_total_sec, n_workers",
@@ -154,13 +204,13 @@ def test_n_workers_for_scales_the_workers_down_below_60_s(t_total_sec, n_workers
         (28_800.0, MCTuplesSize.SIZE_1024, 2**20),
     ],
 )
-def test_t_budget_per_solve_sec_gives_each_solve_1_percent_and_splits_the_rest_by_work(
+def test_t_budget_per_size_sec_gives_each_size_1_percent_and_splits_the_rest_by_work(
     t_total_sec, max_size, n_population
 ):
-    """Each size's solve gets 1 % of the total, plus a part of the rest in proportion to its size times its number of
-    candidates, which is the population plus the tuples of the size below."""
+    """Each size gets 1 % of the total, plus a part of the rest in proportion to its size times the selection solve's
+    number of candidates, which is the population plus the tuples of the size below."""
     # --- act --------------------------
-    budgets = MCTuplesGenerator(n_population=n_population).t_budget_per_solve_sec(t_total_sec, max_size)
+    budgets = MCTuplesGenerator(n_population=n_population).t_budget_per_size_sec(t_total_sec, max_size)
 
     # --- assert -----------------------
     sizes = MCTuplesSize.up_to(max_size)

@@ -1,27 +1,25 @@
-"""`MCTuplesSizeSolve` builds its constraints and a valid random start, and refuses a selection that breaks them."""
+"""`MCTuplesSelectionSolve` builds its constraints and a valid random start, and refuses a selection that breaks
+them."""
 
 import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructionError, MCTuplesSize
-from sunnbear._core.benchmark.mc_tuples.construction.solve import (
-    INCLUSION_CONSTRAINT_WEIGHT,
-    MCTuplesSizeSolve,
-    MCTuplesSolveSettings,
-)
+from sunnbear._core.benchmark.mc_tuples.construction.selection import MCTuplesSelectionSolve
+from sunnbear._core.benchmark.mc_tuples.construction.solve import INCLUSION_CONSTRAINT_WEIGHT, MCTuplesSolveSettings
 
 # The 32 tuples of the smallest size spread from the first fine lane to the last, with u rising and v falling.
 _LANES_32 = np.round(np.linspace(0, N_FINE_LANES - 1, 32)).astype(np.int64)
 _SIZE_32 = np.column_stack([_LANES_32 + 0.5, _LANES_32[::-1] + 0.25]) / N_FINE_LANES
 
 
-def _solve(size: MCTuplesSize, required_tuple_array: np.ndarray, n_population: int) -> MCTuplesSizeSolve:
+def _solve(size: MCTuplesSize, required_tuple_array: np.ndarray, n_population: int) -> MCTuplesSelectionSolve:
     """Return the solve of `size` on `required_tuple_array`, with `n_population` candidates in eligible fine lanes."""
     settings = MCTuplesSolveSettings(n_workers=1, seed=42, rng=np.random.default_rng(5))
-    return MCTuplesSizeSolve(n_population, required_tuple_array, size, settings)
+    return MCTuplesSelectionSolve(n_population, required_tuple_array, size, settings)
 
 
-def _distinct_lane_selection(solve: MCTuplesSizeSolve, n: int) -> np.ndarray:
+def _distinct_lane_selection(solve: MCTuplesSelectionSolve, n: int) -> np.ndarray:
     """Return `n` candidates, as indices into the population, that share no fine lane on either axis."""
     picked, used_u, used_v = [], set(), set()
     for i in range(solve.population.u.size):
@@ -40,7 +38,7 @@ def _distinct_lane_selection(solve: MCTuplesSizeSolve, n: int) -> np.ndarray:
 # ==================================================================================================
 def test_constraints_hold_each_gap_s_count_1_per_fine_lane_in_a_gap_of_several_and_the_size_below():
     """Size 64 gets 1 constraint per gap with new tuples on each axis, 1 per fine lane of each gap that takes 2, and
-    the weighted inclusion of the 32 tuples of the size below."""
+    the weighted constraint that keeps the 32 tuples of the size below."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_64, _SIZE_32, n_population=8192)
 

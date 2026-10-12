@@ -1,28 +1,32 @@
 """`MCTuplesPopulation` holds a size's candidate tuples, among which max-div picks the size's new tuples.
 
 Each axis is cut into `N_FINE_LANES` equal fine lanes; a fine cell is the crossing of a fine u-lane and a fine
-v-lane.
+v-lane. Each size has 2 populations, 1 per max-div solve: the selection's (`draw`) and the refinement's
+(`draw_in_fine_cells_of`).
 
-A size's population is drawn over its eligible fine lanes: the fine lanes of the gaps that its gap allocation gives
-new tuples (`MCTuplesAxisGapAllocation.eligible_fine_lanes`). A candidate in any other fine lane could never be
-picked, so the whole population is usable. The population guarantees:
+The selection's population is drawn over the size's eligible fine lanes: the fine lanes of the gaps with new tuples
+in its gap allocation (`MCTuplesAxisGapAllocation.eligible_fine_lanes`). A candidate in any other fine lane could
+never be picked, so the whole population is usable. The selection's population guarantees:
 
 - every eligible fine lane holds the same number of candidates, give or take 1, along u and along v;
 - every eligible fine cell, the crossing of an eligible u-lane and an eligible v-lane, holds `n // n_cells` or
   `n // n_cells + 1` candidates, with `n` the population size and `n_cells` the number of eligible fine cells.
 
-The population is drawn in 2 steps:
+The selection's population is drawn in 2 steps:
 
 1. `spread_evenly_over_grid` picks each candidate's eligible fine cell, at random under both guarantees, on the
    grid of eligible u-lanes and eligible v-lanes;
 2. each candidate lies at its own uniform random position inside its fine cell.
+
+The refinement's population lies only in the fine cells of given tuples: each tuple comes first, followed by
+`n_random_candidates_per_cell` candidates at uniform random positions inside its fine cell.
 """
 
 from dataclasses import dataclass
 
 import numpy as np
 
-from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES
+from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, fine_lanes_of
 from sunnbear._core.utils.spread_over_grid import spread_evenly_over_grid
 
 
@@ -85,3 +89,22 @@ class MCTuplesPopulation:
             u_lane=u_lane,
             v_lane=v_lane,
         )
+
+    @classmethod
+    def draw_in_fine_cells_of(
+        cls, tuple_array: np.ndarray, n_random_candidates_per_cell: int, rng: np.random.Generator
+    ) -> "MCTuplesPopulation":
+        """Return each tuple of `tuple_array`, followed by random candidates inside its fine cell.
+
+        Candidate `i * (n_random_candidates_per_cell + 1)` is the tuple `i` itself, and the
+        `n_random_candidates_per_cell` candidates up to the next tuple lie at uniform random positions inside the fine
+        cell of tuple `i`.
+        """
+        n_tuples = tuple_array.shape[0]
+        values_per_axis, lanes_per_axis = [], []
+        for values in (tuple_array[:, 0], tuple_array[:, 1]):
+            lanes = fine_lanes_of(values)
+            positions = cls._positions_in_lane(n_tuples * n_random_candidates_per_cell, rng).reshape(n_tuples, -1)
+            values_per_axis.append(np.column_stack([values, (lanes[:, None] + positions) / N_FINE_LANES]).ravel())
+            lanes_per_axis.append(np.repeat(lanes, n_random_candidates_per_cell + 1))
+        return cls(u=values_per_axis[0], v=values_per_axis[1], u_lane=lanes_per_axis[0], v_lane=lanes_per_axis[1])
