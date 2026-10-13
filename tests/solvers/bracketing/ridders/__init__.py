@@ -8,13 +8,20 @@ Published results:
 
 Third-party published results:
 
-- Ganchovski et al. (2026), Table 2, the column "Rid", for the ``"commons_math"`` variant: reproduced, in
+- Ganchovski et al. (2026), Table 2, the column "Rid", for the ``"scipy"`` variant, the core variant: reproduced, in
   ``test_third_party.py``:
+
+  - 74 of the 92 evaluation counts exactly; the test data states why the other 18 deviate, 11 of them because the
+    paper's C# code stops by the rule of the ``"commons_math"`` variant;
+  - the roots of all 92 functions, to within twice the paper's tolerance, or a wider tolerance where the test data
+    states why.
+- Ganchovski et al. (2026), Table 2, the column "Rid", for the ``"commons_math"`` variant, whose stopping rule is that
+  of the paper's C# code: reproduced, in ``test_third_party.py``:
 
   - 85 of the 92 evaluation counts exactly; the test data states why the other 7 deviate;
   - the roots of all 92 functions, 4 of them within a wider tolerance; the test data states why each needs it.
-- Ganchovski et al. (2026), Table 2, for the ``"scipy"`` and ``"bracketing_solver"`` variants: not reproduced, because
-  their stopping rules differ from that of the paper's C# code, which is the rule of ``"commons_math"``.
+- Ganchovski et al. (2026), Table 2, for the ``"bracketing_solver"`` variant: not reproduced, because its stopping
+  rule differs from that of the paper's C# code.
 
 Reference implementations:
 
