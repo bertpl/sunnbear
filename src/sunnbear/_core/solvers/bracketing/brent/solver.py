@@ -62,7 +62,7 @@ class Brent(Solver):
     """
 
     name = "brent"
-    version = 2
+    version = 1
 
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the line-by-line match with Brent's procedure
         """Run Brent's procedure and return ``b``.
@@ -76,10 +76,6 @@ class Brent(Solver):
           step is chosen, ``d`` therefore holds the previous step and ``e`` the step before the previous one;
         - ``p / q`` is the interpolation step, computed as a separate numerator and denominator so that the division
           ``p / q`` runs only once the step is accepted.
-
-        Each test that combines 2 comparisons uses ``|`` or ``&``, which evaluate both operands, as Algol 60's Boolean
-        operators do. Python's ``or`` and ``and`` skip the second operand once the first one determines the result.
-        With ``|`` and ``&``, the flop count includes both comparisons, as in Brent's procedure.
 
         Each iteration:
 
@@ -101,11 +97,11 @@ class Brent(Solver):
                 fa, fb, fc = fb, fc, fb
             tol = 2.0 * FLOAT64_EPS * abs(b) + t
             m = 0.5 * (c - b)
-            if (abs(m) <= tol) | (fb == 0.0):
+            if abs(m) <= tol or fb == 0.0:
                 return b
 
             # --- the step d ---------------------
-            if (abs(e) < tol) | (abs(fa) <= abs(fb)):
+            if abs(e) < tol or abs(fa) <= abs(fb):
                 d = e = m  # A bisection is forced.
             else:
                 s = fb / fa
@@ -129,7 +125,7 @@ class Brent(Solver):
                 e = d
                 # Accept the interpolation step only if it lands less than 3/4 of the way from b to c and is
                 # shorter than half the step before the previous one; otherwise bisect.
-                if (2.0 * p < 3.0 * m * q - abs(tol * q)) & (p < abs(0.5 * s * q)):
+                if 2.0 * p < 3.0 * m * q - abs(tol * q) and p < abs(0.5 * s * q):
                     d = p / q
                 else:
                     d = e = m
