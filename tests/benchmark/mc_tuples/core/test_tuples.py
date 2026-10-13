@@ -1,11 +1,13 @@
-"""`MCTuples` validates and stores a tuple set, maps it onto a test function, and reports its spread."""
+"""`MCTuples` validates and stores a tuple set, maps it onto a test function, and reports its spread and the bits of
+information of its values."""
 
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import MCTuples, MCTuplesStats
+from sunnbear._core.benchmark.mc_tuples import MCTuples, MCTuplesBitStats, MCTuplesStats
 from sunnbear._core.benchmark.mc_tuples.core import GPQ_LEVEL
 from sunnbear._core.stats import gpq
+from sunnbear._core.utils.float_bits import n_bits
 
 # The diagonal set has 8 tuples, evenly spaced on each axis: u rises and v falls, so neighbors are diagonal at L2
 # distance √2/8.
@@ -119,6 +121,24 @@ def test_stats_takes_gpq_over_each_tuple_s_nearest_neighbor_separation():
     # --- act / assert -----------------
     assert stats.gpq_u_fraction == pytest.approx(gpq([0.3, 0.1, 0.4, 0.1], GPQ_LEVEL) * 3)
     assert stats.min_separation_u == pytest.approx(0.1)
+
+
+def test_bit_stats_report_the_fewest_and_the_mean_bits_per_axis():
+    """Per axis, `bit_stats` reports the fewest and the mean `n_bits` of the values."""
+    # --- arrange ----------------------
+    # The v values are e/10 and 1/√2 to 16 digits, so no short description reproduces them.
+    u, v = [0.5, 1 / 3], [0.2718281828459045, 0.7071067811865476]
+
+    # --- act --------------------------
+    bit_stats = MCTuples(u, v).bit_stats()
+
+    # --- assert -----------------------
+    assert isinstance(bit_stats, MCTuplesBitStats)
+    assert bit_stats.min_n_bits_u == pytest.approx(1.0)
+    assert bit_stats.mean_n_bits_u == pytest.approx((1.0 + np.log2(3)) / 2)
+    assert bit_stats.min_n_bits_v == pytest.approx(min(n_bits(x) for x in v))
+    assert bit_stats.mean_n_bits_v == pytest.approx(np.mean([n_bits(x) for x in v]))
+    assert bit_stats.min_n_bits_v > 45
 
 
 def test_extended_by_appends_the_other_set_s_tuples():

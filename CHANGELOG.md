@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add `MCTuples.bit_stats()`, which reports how many bits of information the u values and the v values of a tuple set hold
+
 ### Changed
 
 - Make each size of the tuple sets that `generate_mc_tuples` builds span the full range of u and of v, to within 1/1024 at each end

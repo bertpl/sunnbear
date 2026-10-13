@@ -11,6 +11,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from sunnbear._core.stats import gpq
+from sunnbear._core.utils.float_bits import n_bits
 
 # The level of the geometric pseudo-quantile (`gpq`) that the construction maximizes and `MCTuplesStats` reports. At
 # 0.1 the gpq is a soft minimum: the smallest separations dominate it, but not the single smallest alone.
@@ -102,6 +103,13 @@ class MCTuples:
     def stats(self) -> "MCTuplesStats":
         """Return the set's spread statistics, each computed when first read."""
         return MCTuplesStats(self.tuple_array)
+
+    # --------------------------------------------------------------------------
+    #  Bits of information
+    # --------------------------------------------------------------------------
+    def bit_stats(self) -> "MCTuplesBitStats":
+        """Return statistics of the bits of information of the set's u values and v values, computed when first read."""
+        return MCTuplesBitStats(self.tuple_array)
 
 
 # ==================================================================================================
@@ -227,3 +235,53 @@ class MCTuplesStats:
         separations = np.empty_like(nearest_in_order)
         separations[order] = nearest_in_order
         return separations
+
+
+# ==================================================================================================
+#  MCTuplesBitStats
+# ==================================================================================================
+class MCTuplesBitStats:
+    """`MCTuplesBitStats` reports how many bits of information the u values and the v values hold, per axis.
+
+    A value holds as many bits as `n_bits` measures. A value is trivial when a few binary or decimal digits or a small
+    fraction reproduce it exactly, so that it holds far fewer bits than a random float64 value.
+
+    A test function treated as a black box can have a root or another special point exactly at a trivial value: for
+    example, `sin(100·π·x)` has its roots at the multiples of 0.01, so a value such as `x = 0.25` sits exactly on a
+    root.
+
+    The fewest bits over an axis tell whether every value on it is non-trivial; the mean adds context, but 1 trivial
+    value among many barely moves the mean.
+    """
+
+    def __init__(self, tuple_array: ArrayLike) -> None:
+        """Store `tuple_array`, an `(n, 2)` array of (u, v) values."""
+        self._tuple_array = np.asarray(tuple_array, dtype=np.float64)
+
+    @property
+    def min_n_bits_u(self) -> float:
+        """Return the fewest bits of information of any u value."""
+        return float(self._n_bits_per_value[:, 0].min())
+
+    @property
+    def mean_n_bits_u(self) -> float:
+        """Return the mean bits of information of the u values."""
+        return float(self._n_bits_per_value[:, 0].mean())
+
+    @property
+    def min_n_bits_v(self) -> float:
+        """Return the fewest bits of information of any v value."""
+        return float(self._n_bits_per_value[:, 1].min())
+
+    @property
+    def mean_n_bits_v(self) -> float:
+        """Return the mean bits of information of the v values."""
+        return float(self._n_bits_per_value[:, 1].mean())
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @cached_property
+    def _n_bits_per_value(self) -> np.ndarray:
+        """Return the bits of information of each value, as an `(n, 2)` array with a u column and a v column."""
+        return np.array([[n_bits(float(value)) for value in row] for row in self._tuple_array])

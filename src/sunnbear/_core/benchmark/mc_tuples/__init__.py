@@ -2,8 +2,8 @@
 
 The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples from.
 
-- `MCTuples` holds a set of tuples, maps them onto a test function, and reports their spread as
-  `MCTuplesStats`;
+- `MCTuples` holds a set of tuples, maps them onto a test function, reports their spread as `MCTuplesStats`, and
+  reports how many bits of information their values hold as `MCTuplesBitStats`;
 - each axis is divided into `N_FINE_LANES` equal fine lanes, and `fine_lanes_of` returns the fine lane of each value;
   `TARGET_MEAN` is the mean toward which `generate_mc_tuples` corrects every size's u values and v values;
 - `generate_mc_tuples` constructs a nested set and corrects every size's means to `TARGET_MEAN` on both axes, with no
@@ -26,4 +26,4 @@ from .construction import (
     MCTuplesSizeResult,
     generate_mc_tuples,
 )
-from .core import N_FINE_LANES, TARGET_MEAN, MCTuples, MCTuplesSize, MCTuplesStats, fine_lanes_of
+from .core import N_FINE_LANES, TARGET_MEAN, MCTuples, MCTuplesBitStats, MCTuplesSize, MCTuplesStats, fine_lanes_of
