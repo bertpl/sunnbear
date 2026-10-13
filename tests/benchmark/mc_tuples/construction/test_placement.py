@@ -42,7 +42,8 @@ def test_spacings_sums_and_offset_follow_from_the_values(counts):
     - each gap's spacing is the distance between its consecutive values;
     - each gap's sum is the sum of those values;
     - the offset is the mean of the size below's values and all new values, minus 0.5, in fine lanes;
-    - the corrected smallest spacing is the smallest spacing minus `size / n_new` times the absolute offset.
+    - the corrected smallest spacing is the smallest spacing minus the absolute offset times the number of all values
+      divided by the number of new values.
     """
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of(_VALUES)
