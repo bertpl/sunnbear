@@ -147,13 +147,36 @@ def test_the_random_starting_selection_holds_the_new_tuples_in_distinct_fine_lan
         assert np.unique(lanes[start]).size == 32
 
 
-def test_the_random_starting_selection_needs_as_many_pairable_fine_lanes_as_new_tuples():
-    """A population of 10 candidates cannot place 32 new tuples in distinct fine lanes, which raises an error."""
+def test_the_random_starting_selection_of_the_smallest_size_holds_1_candidate_of_each_outer_lane_set():
+    """At the smallest size, the starting selection meets the 4 constraints of `outer_lane_candidate_sets`, so a solve
+    whose budget runs out before max-div improves the start still meets them."""
     # --- arrange ----------------------
-    solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=10)
+    solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=_N_POPULATION_32)
+
+    # --- act --------------------------
+    start = solve._initial_new_selection()
+
+    # --- assert -----------------------
+    assert start.size == 32
+    assert [int(np.isin(start, candidates).sum()) for candidates in solve.outer_lane_candidate_sets] == [1, 1, 1, 1]
+    assert solve._validated_new_selection(start).tolist() == start.tolist()
+
+
+@pytest.mark.parametrize(
+    "size, required_tuple_array, message",
+    [
+        (MCTuplesSize.SIZE_32, np.zeros((0, 2)), "a set of fine cells along the outer fine lanes holds no candidate"),
+        (MCTuplesSize.SIZE_64, _SIZE_32, "only 10 fine lanes can be paired"),
+    ],
+)
+def test_the_random_starting_selection_needs_enough_candidates(size, required_tuple_array, message):
+    """A population of 10 candidates leaves a set of `outer_lane_candidate_sets` empty at the smallest size, and
+    cannot place 32 new tuples in distinct fine lanes at size 64; both raise an error."""
+    # --- arrange ----------------------
+    solve = _solve(size, required_tuple_array, n_population=10)
 
     # --- act / assert -----------------
-    with pytest.raises(MCTuplesConstructionError, match="only 10 fine lanes can be paired"):
+    with pytest.raises(MCTuplesConstructionError, match=message):
         solve._initial_new_selection()
 
 

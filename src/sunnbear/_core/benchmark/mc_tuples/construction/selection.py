@@ -125,35 +125,47 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
     def _initial_new_selection(self) -> np.ndarray:
         """Return a random starting selection of new candidates, ascending, as indices into the population.
 
-        A min-cost matching over random costs pairs each fine u-lane with a distinct fine v-lane whose shared fine cell
-        holds a candidate; `n_new` of these cells, picked at random, each contribute 1 random candidate. The starting
-        selection holds at most 1 new tuple per fine lane, and ignores the counts per gap.
+        At the smallest size, 1 random candidate of each set of `outer_lane_candidate_sets` comes first, so the start
+        meets those constraints even when the solve's budget runs out before max-div improves it. A min-cost matching
+        over random costs then pairs each remaining fine u-lane with a distinct remaining fine v-lane whose shared fine
+        cell holds a candidate; the rest of the `n_new` new tuples come from these cells, picked at random, 1 random
+        candidate each. The starting selection holds at most 1 new tuple per fine lane, and ignores the counts per gap.
 
         Raises:
-            MCTuplesConstructionError: If fewer fine-lane pairs than new tuples can be formed through cells that hold
-                a candidate.
+            MCTuplesConstructionError: If a set of `outer_lane_candidate_sets` holds no candidate, or fewer fine-lane
+                pairs than new tuples can be formed through cells that hold a candidate.
         """
         rng = self.settings.rng
-        n_new = self.size.n_new
-        fine_u_lanes, u_lane_index = np.unique(self.population.u_lane, return_inverse=True)
-        fine_v_lanes, v_lane_index = np.unique(self.population.v_lane, return_inverse=True)
+        if any(candidates.size == 0 for candidates in self.outer_lane_candidate_sets):
+            raise MCTuplesConstructionError(
+                f"Size {self.size}: a set of fine cells along the outer fine lanes holds no candidate."
+            )
+        seeds = np.array([rng.choice(candidates) for candidates in self.outer_lane_candidate_sets], dtype=np.int64)
+        is_available = ~np.isin(self.population.u_lane, self.population.u_lane[seeds]) & ~np.isin(
+            self.population.v_lane, self.population.v_lane[seeds]
+        )
+        available = np.flatnonzero(is_available)
+        u_lane, v_lane = self.population.u_lane[available], self.population.v_lane[available]
+        fine_u_lanes, u_lane_index = np.unique(u_lane, return_inverse=True)
+        fine_v_lanes, v_lane_index = np.unique(v_lane, return_inverse=True)
         n_u_lanes, n_v_lanes = fine_u_lanes.size, fine_v_lanes.size
         cells = u_lane_index * n_v_lanes + v_lane_index
-        shuffled = rng.permutation(self.population.u.size)
+        shuffled = rng.permutation(available.size)
         cells_with_a_candidate, first_in_shuffled = np.unique(cells[shuffled], return_index=True)
         candidate_of_cell = np.full(n_u_lanes * n_v_lanes, -1, dtype=np.int64)
-        candidate_of_cell[cells_with_a_candidate] = shuffled[first_in_shuffled]
+        candidate_of_cell[cells_with_a_candidate] = available[shuffled[first_in_shuffled]]
         costs = rng.random((n_u_lanes, n_v_lanes))
         costs[candidate_of_cell.reshape(n_u_lanes, n_v_lanes) < 0] = EMPTY_CELL_COST
         rows, cols = linear_sum_assignment(costs)
         paired = candidate_of_cell[rows * n_v_lanes + cols]
         paired = paired[paired >= 0]
-        if paired.size < n_new:
+        n_paired_needed = self.size.n_new - seeds.size
+        if paired.size < n_paired_needed:
             raise MCTuplesConstructionError(
-                f"Size {self.size}: only {paired.size} fine lanes can be paired through cells with a candidate, for "
-                f"{n_new} new tuples."
+                f"Size {self.size}: only {paired.size + seeds.size} fine lanes can be paired through cells with a "
+                f"candidate, for {self.size.n_new} new tuples."
             )
-        return np.sort(rng.choice(paired, size=n_new, replace=False))
+        return np.sort(np.concatenate([seeds, rng.choice(paired, size=n_paired_needed, replace=False)]))
 
     def _check_new_selection(self, new_selection: np.ndarray) -> None:
         """Raise `MCTuplesConstructionError` if the new tuples break 1 of the constraints in the module docstring."""
