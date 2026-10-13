@@ -7,18 +7,9 @@ criterion is its own, subclasses `Solver` and writes its own loop.
 Each solver is a package of its own, holding its solver module, its built-in configs, and any helper
 modules. Importing this package registers the built-in configs.
 
-Each solver class holds its whole algorithm, even where 2 solvers differ in few details, as `RegulaFalsi` and
-`Illinois` do, for 2 reasons:
-
-- the benchmark counts every solver's flops, and a base class shared by such a family would add branches, and
-  possibly flops, that the published algorithms do not have;
-- a reader can compare a self-contained class with its published algorithm step by step.
-
-Each solver computes its steps in the arithmetic form of its published algorithm, even where another form gives the
-same value in exact arithmetic, because the 2 forms round differently and count different flops, and the benchmark
-measures the published algorithm.
-
-Variants of one algorithm, such as different values of one of its parameters, are configs of a single class.
+The implementation principles in ``IMPLEMENTATION_PRINCIPLES.md`` of the parent package say how each solver
+implements its published method, including why each solver class holds its whole algorithm and computes each formula
+in its source's form.
 """
 
 from .anderson_bjorck import AndersonBjorck
