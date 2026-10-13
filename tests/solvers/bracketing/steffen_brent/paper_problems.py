@@ -1,7 +1,8 @@
-"""This module holds `CASE_STUDIES`, the case studies of the Steffen-Brent paper, with the roots that the paper
-reports for them."""
+"""This module holds the published results of the Steffen-Brent paper: `CASE_STUDIES`, its 2 case studies with their
+roots and iteration counts, and `FIGURE_ITERATES`, the iterates of the modified method that its figures plot."""
 
 import math
+from dataclasses import dataclass
 
 from tests.solvers.paper_problems import PaperProblem
 
@@ -36,15 +37,55 @@ CASE_STUDIES = [
         f=_case_study_1,
         a=1.0,
         b=3.0,
-        root=2.1584212093,
-        root_abs_tol=5e-11,
-        # The paper reports 6 iterations. `SteffenBrent` evaluates:
-        # - at the 2 interval bounds;
-        # - once in each of those 6 iterations;
-        # - in 3 of those iterations, also at the midpoint of the current interval.
-        n_fevals=2 + 6 + 3,
+        # The paper prints the root to 4 decimals.
+        root=2.1584,
+        root_abs_tol=5e-5,
+        # The paper's figures show 6 iterations. In sunnbear's counting, the run evaluates at the 2 interval bounds,
+        # once in each iteration, and at the midpoint of the modification in 2 of them.
+        n_fevals=2 + 6 + 2,
+        n_fevals_tol=1,
+        deviation_reason=(
+            "The paper's run stops once |f(b)| is small enough, with |f(b)| about 1e-15 after 6 iterations; "
+            "`SteffenBrent` stops on the width of the interval, and takes a 7th iteration, which ends at an exact zero."
+        ),
     ),
-    # The tolerance on the root covers the gap between the paper's root and the root at the full-precision
-    # Peng-Robinson constants; the comment above `_PENG_ROBINSON_ETA` gives that gap.
-    PaperProblem(name="case_study_2", f=_case_study_2, a=14.0, b=17.0, root=15.0676609061, root_abs_tol=1e-8),
+    PaperProblem(
+        name="case_study_2",
+        f=_case_study_2,
+        a=14.0,
+        b=17.0,
+        # The tolerance on the root covers the gap between the paper's root and the root at the full-precision
+        # Peng-Robinson constants; the comment above `_PENG_ROBINSON_ETA` gives that gap.
+        root=15.0676609061,
+        root_abs_tol=1e-8,
+        # The paper's figures show 6 iterations; the evaluations are counted as in the first case study.
+        n_fevals=2 + 6 + 2,
+    ),
 ]
+
+
+@dataclass(frozen=True)
+class FigureIterates:
+    """The iterates of the modified method in 1 case study, as read from the paper's figures.
+
+    Attributes:
+        abs_fb: ``|f(b_k)|`` for ``k`` from 0 to 6, from Figure 3(b) or 6(b), on a log scale.
+        width_ratios: For each of the 6 iterations, the width of the new interval divided by that of the old one, from
+            Figure 4(b) or 7(b), on a linear scale. The paper calls it the relative interval reduction without
+            defining it; the width ratio is the measure that reproduces the Dekker panels of the same figures.
+    """
+
+    abs_fb: tuple[float, ...]
+    width_ratios: tuple[float, ...]
+
+
+FIGURE_ITERATES = {
+    "case_study_1": FigureIterates(
+        abs_fb=(1.1, 0.35, 0.065, 3.8e-3, 3.2e-5, 3.2e-10, 1.3e-15),
+        width_ratios=(0.34, 0.35, 0.16, 0.47, 0.0, 0.0),
+    ),
+    "case_study_2": FigureIterates(
+        abs_fb=(95.0, 37.0, 2.5, 0.17, 7.5e-4, 8e-10, 4e-13),
+        width_ratios=(0.38, 0.32, 0.065, 0.47, 0.0, 0.0),
+    ),
+}

@@ -21,8 +21,8 @@ class SteffenBrent(Solver):
     ``s`` becomes the new ``b``, and the new ``a`` is chosen so that the interval keeps the root:
 
     - when ``f(a)`` and ``f(s)`` have the same sign, the old ``b`` becomes the new ``a``, as in Brent's method;
-    - otherwise the root lies between ``a`` and ``s``, and the method evaluates the midpoint ``m = (a + b) / 2`` of
-      the old interval; when ``f(m)`` and ``f(s)`` differ in sign, ``m`` becomes the new ``a``.
+    - otherwise the root lies between ``a`` and ``s``, and the method evaluates their midpoint ``m = (a + s) / 2``;
+      when ``f(m)`` and ``f(s)`` differ in sign, ``m`` becomes the new ``a``.
 
     The second case is the paper's modification of Brent's method. Finally, ``a`` and ``b`` swap where needed, so that
     ``b`` keeps the smaller ``|f|``.
@@ -32,6 +32,11 @@ class SteffenBrent(Solver):
     0 as ``tol2``.
 
     Where the paper is ambiguous, `SteffenBrent` makes these choices:
+
+    - **The midpoint of the modification:** the paper's text and Algorithm 2 take ``m = (a + b) / 2``, the midpoint of
+      the interval before the step, but the paper's results follow ``m = (a + s) / 2``: only that midpoint reproduces
+      the iterates of the modified method in its Figures 3, 4, 6 and 7, and the iteration count of its second case
+      study. `SteffenBrent` follows the paper's results.
 
     - **The interval for an accepted step:** the paper's text accepts an interpolation step only between ``b`` and
       the midpoint ``(a + b) / 2``, while its Algorithm 2 keeps the bound of Brent's method, ``(3 * a + b) / 4``.
@@ -47,21 +52,16 @@ class SteffenBrent(Solver):
     - **No step-size tests:** the paper's text describes the tests of Brent's method that force bisection once the
       interpolation steps stop shrinking, but Algorithm 2 leaves them out. `SteffenBrent` follows Algorithm 2, so on
       some functions the interval shrinks slowly.
-    - **No needless evaluation of the midpoint:** Algorithm 2 evaluates the midpoint in 2 cases where `SteffenBrent`
-      does not:
-
-      - when ``s`` is itself the midpoint, `SteffenBrent` reuses ``f(s)`` as ``f(m)``;
-      - when ``f(s) = 0``, `SteffenBrent` ends the solve.
-
-      Neither shortcut changes the next interval or the returned x-value, since in both cases ``f(m)`` and ``f(s)``
-      cannot differ in sign.
+    - **No needless evaluation of the midpoint:** when ``f(s) = 0``, Algorithm 2 still evaluates the midpoint, while
+      `SteffenBrent` ends the solve. This changes neither the next interval nor the returned x-value, since ``f(m)``
+      and ``f(s) = 0`` cannot differ in sign.
 
     The paper's title says that the modification halves the interval in every iteration, but Algorithm 2 does not
     guarantee that the interval halves:
 
-    - when the root lies between ``a`` and the midpoint, and ``s`` lies on ``b``'s side of the midpoint, ``f(m)`` has
-      the sign of ``f(s)``, so ``m`` does not replace ``a``, and the new interval runs from ``a`` to ``s``, more than
-      half the old interval;
+    - when the root lies between ``a`` and ``m``, ``f(m)`` has the sign of ``f(s)``, so ``m`` does not replace ``a``,
+      and the new interval runs from ``a`` to ``s``, more than half the old interval when ``s`` lies on ``b``'s side
+      of the old interval's midpoint;
     - when ``f(a)`` and ``f(s)`` have the same sign, the new interval from ``b`` to ``s`` can keep up to 3/4 of the
       old interval.
 
@@ -71,23 +71,24 @@ class SteffenBrent(Solver):
     References:
         - Steffen, V., Della Pasqua, C. C., de Oliveira, M. S. and da Silva, E. A. (2025). Halving interval
           guaranteed for Dekker and Brent root finding methods. Examples and Counterexamples 7, 100173. Its
-          Algorithm 2 is the method, and the test suite reproduces its 2 case studies.
+          Algorithm 2 is the method. The test suite reproduces the roots of its 2 case studies, the iterates of the
+          modified method in its Figures 3, 4, 6 and 7, and the iteration count of its second case study.
           https://doi.org/10.1016/j.exco.2024.100173
         - Brent, R. P. (1971). An algorithm with guaranteed convergence for finding a zero of a function. The
           Computer Journal 14(4), 422-425. Steffen et al. modify Brent's method. https://doi.org/10.1093/comjnl/14.4.422
     """
 
     name = "steffen_brent"
-    version = 1
+    version = 2
 
-    def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the paper's Algorithm 2
+    def _solve(self, state: SolveState) -> float:
         """Run Algorithm 2 of the paper and return ``b``.
 
         Each iteration:
 
         - chooses ``s`` and evaluates it;
         - ends the solve if ``f(s) = 0``;
-        - chooses the new ``a``, evaluating the midpoint where the paper's modification needs it;
+        - chooses the new ``a``, evaluating the midpoint of ``a`` and ``s`` where the paper's modification needs it;
         - swaps ``a`` and ``b`` where ``|f(a)| < |f(b)|``.
 
         The loop ends once ``|b - a| <= xtol``.
@@ -98,8 +99,6 @@ class SteffenBrent(Solver):
             a, b, fa, fb = b, a, fb, fa
         b_previous, fb_previous = a, fa
         while abs(b - a) > state.xtol:
-            m = (a + b) / 2.0
-
             # --- the step s ---------------------
             if fa != fb and fa != fb_previous and fb != fb_previous:
                 # The step is an inverse quadratic interpolation through a, b and b_previous, the paper's equation 3.
@@ -116,11 +115,11 @@ class SteffenBrent(Solver):
                 # The step is a linear interpolation through b and b_previous, the paper's equation 4.
                 s = b - fb * (b_previous - b) / (fb_previous - fb)
             else:
-                s = m
+                s = (a + b) / 2.0
             # An interpolation step that overflows to inf or nan fails this comparison too, so it becomes a bisection.
             accepted_range_end = (3.0 * a + b) / 4.0
             if not min(b, accepted_range_end) < s < max(b, accepted_range_end):
-                s = m
+                s = (a + b) / 2.0
 
             # --- the evaluation at s ------------
             fs = state.f(s)
@@ -134,7 +133,8 @@ class SteffenBrent(Solver):
             # underflow to 0.
             if (fa > 0.0) == (fs > 0.0):
                 a, fa = b, fb
-            elif s != m:
+            else:
+                m = (a + s) / 2.0
                 fm = state.f(m)
                 if (fm > 0.0 > fs) or (fm < 0.0 < fs):
                     # The root lies between m and s, so m replaces a: the paper's modification.
