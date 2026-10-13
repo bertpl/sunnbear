@@ -48,8 +48,8 @@ def test_the_correction_keeps_the_fine_lanes_the_order_and_the_size_below_and_mo
 
 def test_the_correction_takes_the_shift_from_the_largest_spacings():
     """With the size below at 0.1 and 0.9 and new tuples at 0.3 and 0.75, a mean of 0.5 needs a left shift, and the
-    cap shortens the wider spacing first: the tuple at 0.75 moves to 0.7, and the tuple at 0.3, whose spacing to
-    0.1 lies below the cap, stays."""
+    cap shortens the wider spacing first: the tuple at 0.75 moves to 0.7, 1 fine lane plus the cap D above its new
+    neighbor at 0.3, and the tuple at 0.3, whose spacing to 0.1 lies below the cap, stays."""
     # --- arrange ----------------------
     required, new = np.array([0.1, 0.9]), np.array([0.3, 0.75])
 
@@ -61,6 +61,7 @@ def test_the_correction_takes_the_shift_from_the_largest_spacings():
     assert correction.offset_before_fine_lanes == pytest.approx((0.1 + 0.9 + 0.3 + 0.75) / 4 * N_FINE_LANES - 512)
     assert correction.corrected_new_values[0] == pytest.approx(0.3)  # its spacing to 0.1 lies below the cap
     assert correction.max_move_fine_lanes == pytest.approx(0.05 * N_FINE_LANES)
+    assert correction.cap_fine_lanes == pytest.approx((0.7 - 0.3) * N_FINE_LANES - 1)
 
 
 def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_the_rest():
