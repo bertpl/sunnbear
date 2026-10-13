@@ -8,12 +8,12 @@ time. The script:
 - prints the arguments of its `MCTuplesGenerator` calls before the construction starts, so that the log records the
   arguments even when `--no-save` skips saving the set and its manifest;
 - prints 3 lines per size as the construction goes:
-  - the first line holds:
+  - line 1 holds:
     - the size's budget and wall time;
     - the allocation's predicted offsets of the mean;
     - what the first mean correction did;
-  - the second line holds what the second mean correction did;
-  - the third line holds the size's spread, as `MCTuplesStats` defines it, after each of these steps:
+  - line 2 holds what the second mean correction did;
+  - line 3 holds the size's spread, as `MCTuplesStats` defines it, after each of these steps:
     - the selection solve;
     - the first mean correction;
     - the refinement solve;
