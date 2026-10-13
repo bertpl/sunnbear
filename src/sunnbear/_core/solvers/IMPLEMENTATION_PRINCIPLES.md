@@ -6,21 +6,21 @@ These principles decide how each of sunnbear's solvers implements its published 
 
 - which source it follows;
 - how it is validated;
-- how it computes;
-- when it stops.
+- how the iteration expressions are implemented;
+- what stopping criterion is used.
 
-A question about how a solver behaves is answered as a consequence of these principles, never for 1 solver at a time, so that the solvers stay consistent with each other.
+The principles are general decisions that every solver follows, so that no solver gets an ad-hoc decision of its own that is inconsistent with the other solvers.
 
 Each principle has an ID, such as P1 or P5a, so that a docstring or a test can cite it.
 
-## Why sunnbear has solvers
+## The sunnbear solver suite
 
 sunnbear has solvers for 2 reasons:
 
 - to characterize test functions objectively;
-- to show that the benchmark suite reveals the strengths and weaknesses of solvers.
+- to illustrate that sunnbear can reveal individual characteristics, strengths and weaknesses of solvers.
 
-The solvers give qualitative insight into the differences between methods; they do not set out to prove quantitatively which method is best. A detail of the comparison between solvers is worth investigating only as far as these 2 goals justify.
+The implementations of these solvers need to be faithful enough to give a representative quantification of their properties, with the ultimate goal of illustrating the benchmark suite's capabilities, not the solvers'. This justifies, but at the same time limits, the effort spent on aligning implementation details between solvers.
 
 ## Sources
 
@@ -36,7 +36,7 @@ The solvers give qualitative insight into the differences between methods; they 
 - **III** — other publicly available third-party implementations; a textbook's description and its tables count here, so a method without an original article starts at III;
 - **IV** — sunnbear's own interpretation or choice, for an aspect that no source states, or that every source states in a form that fails its validation (P4, P5).
 
-Where 2 sources of the same rank state an aspect differently and both pass validation, the choice is a judgment call that favors the most widely used implementation in the Python ecosystem, such as SciPy's, because of its install base.
+Where 2 sources of the same rank, such as 2 third-party implementations, state an aspect differently and both pass validation, the choice is a judgment call that favors the most widely used implementation in the Python ecosystem, such as SciPy's, because of its install base.
 
 A source can state some aspects completely and leave others out, or state them ambiguously. So the choice is made per aspect.
 
@@ -55,16 +55,14 @@ Without a good reason, a solver does not deviate from its article.
 **P4. A solver is validated by the strongest kind of evidence that exists**, highest first:
 
 - **A** — numerical results in the authors' own article;
-- **A′** — a third party's published numerical results for the method. They rank after A and never outweigh it, because a third party makes its own implementation decisions, which its paper does not always state;
-- **B** — behavioral parity with a reference implementation from source II or III, through a twin test, which runs the reference implementation as a `Solver` and checks that both evaluate the same x-values.
+- **B** — a third party's published numerical results for the method. They rank after A and never outweigh it, because a third party may make its own implementation decisions, which its paper does not always state;
+- **C** — behavioral parity with a reference implementation from source II or III, through a twin test, which runs the reference implementation as a `Solver` and checks that both evaluate the same x-values.
 
-For A′, only sources already cited by sunnbear count; when a method has no credible validation otherwise, sunnbear may cite 1 more source chosen for that method.
-
-Where a paper has a table of numerical results that no test reproduces, a test is added, or the solver's test package records why the solver does not reproduce the table.
+Where a solver's results cannot be reconciled with published results, its test package states so explicitly, with the observed deviations and an explanation where one is available.
 
 **P5. A reproduction of published numerical results is convincing** when it is exact, or when each deviation has a reasonable explanation: a stated cause, or a difference small enough to come from the authors' unstated implementation details or from a different platform, such as another language or CPU.
 
-A deviation without such an explanation is not convincing. Whether a reproduction is convincing is judged case by case, with no fixed numbers, for A and A′ alike.
+A deviation without such an explanation is not convincing. Whether a reproduction is convincing is judged case by case, with no fixed numbers, for A and B alike.
 
 **P5a (candidate, not adopted). A published iteration count that the solver misses by 1 counts as a reasonable deviation**, even when no cause is stated for that row of the table. Any detail of a published run that the paper does not state can shift a count by 1:
 
@@ -75,7 +73,14 @@ A deviation without such an explanation is not convincing. Whether a reproductio
 
 The tests mark such a row with `UNSTATED_RUN_DETAILS` and a short observation; an unverified cause is never stated as fact. A deviation larger than 1 needs a cause of its own, for example a test function or solver whose properties make the iteration count sensitive to small differences in the run.
 
-## Form
+## Detailed math implementation
+
+Even when the math of a solver is conceptually clear, there can be different ways to implement it in code. These details matter, because they can influence:
+
+- numerical robustness, and with it convergence and iteration counts;
+- computational efficiency, which sunnbear also measures, through the counted-float package.
+
+This section gives the principles behind these micro-decisions.
 
 **P6. A solver computes each formula as its source for that step writes it**, because sunnbear's flop counts should show the published algorithm. Forms that are equal in exact arithmetic can round differently and count different flops.
 
@@ -84,16 +89,13 @@ These kinds of change leave the published algorithm intact and are allowed witho
 - **an exactly equal cheaper operation**, such as `0.5 * x` for `x / 2`;
 - **computing a repeated value once:** when the source computes a value several times, in the same or nearly the same form, the solver computes it once, in 1 extra assignment or by moving the formula to an earlier or later step;
 - **short-circuit evaluation:** a condition that combines comparisons with Python's `and` or `or` skips the later comparisons once the earlier ones decide it, even where the source's language, such as Algol 60, evaluates them all. Skipping them changes no result, because the comparisons have no side effects.
+- **sign tests that compare signs:** a test whether 2 function values differ in sign compares their signs explicitly, even where the source writes a product such as `fa * fb < 0`, because in float64 the product of 2 small values can underflow to 0. This holds as long as the product is not needed for another step.
 
 A solver does not restructure a formula algebraically to save flops. Where it is unclear whether a change is allowed, the solver keeps the source's form. Any other change of form needs a good reason under P2, and the class docstring states that reason: the published results reproduce better with it, or the published form fails in float64.
 
-**P7. Sign tests compare signs.** A test whether 2 function values differ in sign compares their signs explicitly, in every solver, even where its source writes a product such as `fa * fb < 0`, because in float64 the product of 2 small values can underflow to 0.
-
-This deviation is stated here once, not per solver. The rule holds as long as the product is not needed for another step.
-
 ## Stopping
 
-**P8. The stopping rule aims at the same accuracy for every solver:** the returned x-value lies within `xtol` of a root. That goal is reached by 2 types of rule:
+**P7. The stopping rule aims at the same accuracy for every solver:** the returned x-value lies within `xtol` of a root. That goal is reached by 2 types of rule:
 
 - **type 1, the framework's rule, which `BracketingSolver` applies:** stop when the interval is at most `2 * xtol` wide, and return its midpoint;
 - **type 2, a source's own rule:** stop when the interval is at most `xtol` wide, and return an interval bound.
@@ -106,9 +108,10 @@ Following the source comes first: reaching `xtol` never justifies changing an al
 
 ## Variants
 
-**P9. A variant exists where alternative sources for an aspect behave sufficiently differently**, such as 2 third-party implementations with different stopping rules. Adding a variant is a judgment call, and the config's docstring states its reason. Variants of 1 algorithm are configs of 1 class.
+**P8. A solver can have variants where an implementation decision causes fundamentally different behavior**, for didactic reasons:
 
-Which variant is core is not a judgment call: the core config, with role `SolverRole.BUILTIN_CORE`, is selected by P1 to P8, and every other config is `SolverRole.BUILTIN_SECONDARY`.
+- at most 1 variant is core, with role `SolverRole.BUILTIN_CORE`; the other variants are secondary, with role `SolverRole.BUILTIN_SECONDARY`;
+- the principles apply strictly only to the core variant. A secondary variant is provided for information and may deviate from them, but it states every deviation.
 
 ## How the solver classes are built
 
