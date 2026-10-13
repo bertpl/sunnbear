@@ -1,10 +1,12 @@
 """These tests assert that `Ridders` reproduces third parties' published results for it: the evaluation counts and
-roots of the column "Rid" of Table 2 of Ganchovski et al. (2026), with the "scipy" variant, the core variant, and with
-the "commons_math" variant, whose stopping rule is that of the paper's C# code.
+roots of the column "Rid" of Table 2 of Ganchovski et al. (2026). They test 2 variants: the "scipy" variant, which is
+the core variant (role ``SolverRole.BUILTIN_CORE``), and the "commons_math" variant, whose stopping rule is that of the
+paper's C# code.
 
 The paper's C# code stops once 2 successive iterates lie within half of `ganchovski_et_al_stop_width` of each other,
-evaluated at the newer iterate ``x``, so the tests set the ``xtol`` of `Ridders` to that tolerance at the published
-root.
+evaluated at the newer iterate ``x``. The tests set the ``xtol`` of `Ridders` to half of `ganchovski_et_al_stop_width`,
+evaluated at the published root. The "scipy" variant stops once its interval is narrower than ``xtol``, so with the
+same ``xtol`` it too stops within that tolerance of the root.
 """
 
 import pytest
@@ -43,7 +45,7 @@ def test_the_evaluation_counts_and_roots_of_table_2_of_ganchovski_et_al_are_repr
 ):
     """On every row of Table 2 of Ganchovski et al. (2026), `Ridders` with the given variant and the paper's tolerance
     evaluates as often as the column "Rid" reports, and returns Ridders' root in the paper's supplementary results,
-    except where the problem states an allowed deviation or a wider tolerance on the root."""
+    except where the problem states an allowed deviation, a wider tolerance on the root, or another root."""
     # --- arrange ----------------------
     assert problem.root is not None
     # The solve stops with ``x`` at the root, so ``|x|`` is taken as the absolute value of the published root.

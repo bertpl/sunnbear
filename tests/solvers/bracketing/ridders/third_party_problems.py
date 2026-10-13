@@ -1,9 +1,10 @@
 """This module holds the test problems of Table 2 of Ganchovski et al. (2026), each with the count of the column "Rid"
-and Ridders' root in the paper's supplementary results, for 2 variants of `Ridders`:
+and Ridders' root in the paper's supplementary results, except where a row states another root, for 2 variants of
+`Ridders`:
 
 - `GANCHOVSKI_ET_AL_TABLE_2_COMMONS_MATH`, for the "commons_math" variant, whose stopping rule is that of the paper's
   C# code;
-- `GANCHOVSKI_ET_AL_TABLE_2_SCIPY`, for the "scipy" variant, the core variant.
+- `GANCHOVSKI_ET_AL_TABLE_2_SCIPY`, for the "scipy" variant, the core variant (role ``SolverRole.BUILTIN_CORE``).
 """
 
 from dataclasses import replace
@@ -11,9 +12,9 @@ from dataclasses import replace
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem, ganchovski_et_al_stop_width
 
-# Each reason below explains why the evaluation count of `Ridders` deviates from the column "Rid" of Ganchovski et al.'s
-# Table 2 on a row where the "commons_math" variant deviates too. That variant shares the stopping rule of the paper's
-# C# code, so each reason is a difference in what the 2 implementations compute.
+# Each reason below explains why the evaluation count of the "commons_math" variant of `Ridders` deviates from the
+# column "Rid" of Ganchovski et al.'s Table 2. That variant shares the stopping rule of the paper's C# code, so each
+# reason is a difference in what the 2 implementations compute.
 _ROOT_AT_MIDPOINT_DEVIATION_REASON = (
     "the function value at a midpoint is exactly 0: the solve stops there, while the paper's C# code takes a step of 0 "
     "from the midpoint and evaluates the same x-value again"
@@ -172,18 +173,17 @@ GANCHOVSKI_ET_AL_TABLE_2_COMMONS_MATH = [
     GanchovskiEtAlTable2Problem.F92.with_n_fevals_and_root(28, root=0.1),
 ]
 
-# The "scipy" variant deviates from the column "Rid" on every row where the "commons_math" variant does, by the same
-# count and for the same reason, because the 2 variants compute the same iterates there. On the rows below, it also
-# deviates where the "commons_math" variant does not.
-_SCIPY_STOPPING_RULE_DEVIATION_REASON = (
+# On the rows of `_SCIPY_OVERRIDES`, the "scipy" variant deviates from the column "Rid" where the "commons_math" variant
+# does not, for this reason.
+_SCIPY_STOPPING_AND_STEP_RULE_DEVIATION_REASON = (
     'the paper\'s C# code stops once 2 successive iterates lie within its tolerance, as the "commons_math" variant '
     'does, and does not limit the step; the "scipy" variant stops once the interval is narrower than xtol, and '
     "limits each step to keep the iterate at least xtol / 2 inside the interval"
 )
 
-# The rows on which the "scipy" variant takes another count than the column "Rid", and the root tolerances where twice
-# the paper's tolerance does not hold: where the function is nearly flat around its root (f25, f44, f45), or changes
-# sign at a pole (f39, f77).
+# `_SCIPY_OVERRIDES` gives the rows on which the "scipy" variant needs another number of evaluations than the column
+# "Rid", and the root tolerance on each row where twice the paper's tolerance does not hold: where the function is
+# nearly flat around its root (f25, f44, f45), or changes sign at a pole (f39, f77).
 _SCIPY_OVERRIDES = {
     "f25": {"n_fevals_scipy": 74, "root_rel_tol": 1e-12},
     "f28": {"n_fevals_scipy": 76},
@@ -201,12 +201,15 @@ _SCIPY_OVERRIDES = {
 }
 
 
-def _scipy_row(problem: PaperProblem) -> PaperProblem:
-    """Return ``problem`` for the "scipy" variant, with the count deviation and root tolerances of `_SCIPY_OVERRIDES`.
+def _with_scipy_overrides(problem: PaperProblem) -> PaperProblem:
+    """Return ``problem`` for the "scipy" variant, with the count, root and root tolerances of `_SCIPY_OVERRIDES`.
 
     Both the paper's C# code and the "scipy" variant stop within the paper's tolerance of a root, at different
-    iterates, so their roots agree to within twice that tolerance, an absolute one near a small root; every row checks
-    the root to within that.
+    iterates, so their roots agree to within twice that tolerance, which is `ganchovski_et_al_stop_width` at the
+    published root; every row checks the root to within at least that width, as an absolute tolerance.
+
+    Every other row keeps the count deviation and its reason from the "commons_math" variant, because the 2 variants
+    compute the same iterates there.
     """
     assert problem.root is not None
     overrides = {"root_abs_tol": max(problem.root_abs_tol, ganchovski_et_al_stop_width(problem.root))}
@@ -215,9 +218,9 @@ def _scipy_row(problem: PaperProblem) -> PaperProblem:
         n_fevals_scipy = overrides.pop("n_fevals_scipy")
         overrides |= {
             "n_fevals_tol": abs(n_fevals_scipy - problem.n_fevals),
-            "deviation_reason": _SCIPY_STOPPING_RULE_DEVIATION_REASON,
+            "deviation_reason": _SCIPY_STOPPING_AND_STEP_RULE_DEVIATION_REASON,
         }
     return replace(problem, **overrides)
 
 
-GANCHOVSKI_ET_AL_TABLE_2_SCIPY = [_scipy_row(problem) for problem in GANCHOVSKI_ET_AL_TABLE_2_COMMONS_MATH]
+GANCHOVSKI_ET_AL_TABLE_2_SCIPY = [_with_scipy_overrides(problem) for problem in GANCHOVSKI_ET_AL_TABLE_2_COMMONS_MATH]
