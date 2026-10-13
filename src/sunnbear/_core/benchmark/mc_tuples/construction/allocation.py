@@ -16,8 +16,9 @@ The allocation comes in 2 stages:
    raise the predicted smallest spacing after the first mean correction
    (`MCTuplesAxisGapPlacement.corrected_min_spacing`):
    - the estimate is the predicted smallest spacing minus the absolute predicted offset of the size's mean from 0.5,
-     both in fine lanes;
-   - so the search accepts a smaller smallest spacing only where the offset shrinks by more than the spacing does.
+     both in fine lanes, with the offset weighted by `size / n_new` (`MCTuplesAxisGapPlacement.offset_weight`);
+   - so the search accepts a smaller smallest spacing only where the weighted offset shrinks by more than the spacing
+     does.
 """
 
 from dataclasses import dataclass
