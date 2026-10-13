@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Change the flop counts of `ITP` and `Brent` to those of their published algorithms
+- Make the flop counts of `ITP` and `Brent` consistent with their published algorithms
 
 ### Deprecated
 
