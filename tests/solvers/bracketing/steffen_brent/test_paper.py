@@ -15,7 +15,7 @@ _XTOL = 1e-10
 @pytest.mark.parametrize("problem", CASE_STUDIES, ids=str)
 def test_the_case_studies_of_the_paper_are_reproduced(problem: PaperProblem):
     """`SteffenBrent` returns the paper's root on each of its case studies, and evaluates as often as the paper's runs
-    do, up to the problem's stated deviation."""
+    do, to within the problem's ``n_fevals_tol``."""
     # --- act --------------------------
     result = SteffenBrent().solve(problem.f, problem.a, problem.b, xtol=_XTOL, max_fevals=100)
 
@@ -25,8 +25,8 @@ def test_the_case_studies_of_the_paper_are_reproduced(problem: PaperProblem):
 
 @pytest.mark.parametrize("problem", CASE_STUDIES, ids=str)
 def test_the_values_in_the_papers_figures_are_reproduced(problem: PaperProblem):
-    """On each case study, the iterations that the figures plot reproduce the figures' ``|f(b_k)|`` and width ratios
-    to the precision of reading the plots."""
+    """On each case study, the solve's first iterations, as many as the figures plot, match the figures' ``|f(b_k)|``
+    and width ratios to the precision of reading the plots."""
     # --- act --------------------------
     result = SteffenBrent().solve(problem.f, problem.a, problem.b, xtol=_XTOL, max_fevals=100, history_enabled=True)
 

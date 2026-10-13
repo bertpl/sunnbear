@@ -35,8 +35,8 @@ class SteffenBrent(Solver):
 
     - **The midpoint of the modification:** the paper's text and Algorithm 2 take ``m = (a + b) / 2``, the midpoint of
       the interval before the step, but the paper's results follow ``m = (a + s) / 2``: only that midpoint reproduces
-      the iterates of the modified method in its Figures 3, 4, 6 and 7, and the iteration count of its second case
-      study. `SteffenBrent` follows the paper's results.
+      the values of the modified method in the paper's Figures 3, 4, 6 and 7, and the iteration count of the paper's
+      second case study. `SteffenBrent` follows the paper's results.
 
     - **The interval for an accepted step:** the paper's text accepts an interpolation step only between ``b`` and
       the midpoint ``(a + b) / 2``, while its Algorithm 2 keeps the bound of Brent's method, ``(3 * a + b) / 4``.
@@ -53,15 +53,15 @@ class SteffenBrent(Solver):
       interpolation steps stop shrinking, but Algorithm 2 leaves them out. `SteffenBrent` follows Algorithm 2, so on
       some functions the interval shrinks slowly.
     - **No needless evaluation of the midpoint:** when ``f(s) = 0``, Algorithm 2 still evaluates the midpoint, while
-      `SteffenBrent` ends the solve. Ending the solve changes neither the next interval nor the returned x-value,
-      since ``f(m)`` and ``f(s) = 0`` cannot differ in sign.
+      `SteffenBrent` ends the solve. Both return ``s``: in Algorithm 2, ``f(m)`` and ``f(s) = 0`` cannot differ in sign,
+      so ``m`` does not replace ``a`` and ``s`` becomes ``b``.
 
     The paper's title says that the modification halves the interval in every iteration, but Algorithm 2 does not
     guarantee that the interval halves:
 
     - when the root lies between ``a`` and ``m``, ``f(m)`` has the sign of ``f(s)``, so ``m`` does not replace ``a``,
       and the new interval runs from ``a`` to ``s``, more than half the old interval when ``s`` lies on ``b``'s side
-      of the old interval's midpoint;
+      of ``(a + b) / 2``;
     - when ``f(a)`` and ``f(s)`` have the same sign, the new interval from ``b`` to ``s`` can keep up to 3/4 of the
       old interval.
 
@@ -71,8 +71,7 @@ class SteffenBrent(Solver):
     References:
         - Steffen, V., Della Pasqua, C. C., de Oliveira, M. S. and da Silva, E. A. (2025). Halving interval
           guaranteed for Dekker and Brent root finding methods. Examples and Counterexamples 7, 100173. Its
-          Algorithm 2 is the method. The test suite reproduces the roots of its 2 case studies, the iterates of the
-          modified method in its Figures 3, 4, 6 and 7, and the iteration count of its second case study.
+          Algorithm 2 is the method, and the test suite reproduces its published results.
           https://doi.org/10.1016/j.exco.2024.100173
         - Brent, R. P. (1971). An algorithm with guaranteed convergence for finding a zero of a function. The
           Computer Journal 14(4), 422-425. Steffen et al. modify Brent's method. https://doi.org/10.1093/comjnl/14.4.422
