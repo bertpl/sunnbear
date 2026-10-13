@@ -89,6 +89,12 @@ class PaperProblem:
         elif self.n_fevals is not None and self.n_fevals_tol is not None:
             assert abs(solve_n_fevals - self.n_fevals) <= self.n_fevals_tol
 
+    def with_solve_n_fevals(self, solve_n_fevals: int, *, reason: str) -> "PaperProblem":
+        """Return the problem with the published count kept, and with ``n_fevals_tol`` set so that a solve stopping
+        after ``solve_n_fevals`` evaluations reproduces it, for the given ``reason``."""
+        assert self.n_fevals is not None
+        return replace(self, n_fevals_tol=abs(solve_n_fevals - self.n_fevals), deviation_reason=reason)
+
     # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------

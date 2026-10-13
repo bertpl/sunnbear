@@ -1,12 +1,13 @@
 """These tests assert that `Ridders` reproduces third parties' published results for it: the evaluation counts and
-roots of the column "Rid" of Table 2 of Ganchovski et al. (2026). They test 2 variants: the "scipy" variant, which is
-the core variant (role ``SolverRole.BUILTIN_CORE``), and the "commons_math" variant, whose stopping rule is that of the
-paper's C# code.
+roots of the column "Rid" of Table 2 of Ganchovski et al. (2026). They test 2 variants: the "scipy" variant and the
+"commons_math" variant, whose stopping rule is that of the paper's C# code.
 
 The paper's C# code stops once 2 successive iterates lie within half of `ganchovski_et_al_stop_width` of each other,
-evaluated at the newer iterate ``x``. The tests set the ``xtol`` of `Ridders` to half of `ganchovski_et_al_stop_width`,
-evaluated at the published root. The "scipy" variant stops once its interval is narrower than ``xtol``, so with the
-same ``xtol`` it too stops within that tolerance of the root.
+evaluated at the newer iterate ``x``.
+
+The tests set the ``xtol`` of `Ridders` to half of `ganchovski_et_al_stop_width`, evaluated at the published root. The
+"scipy" variant stops once its interval is narrower than ``xtol``, so with the same ``xtol`` it too stops within
+``xtol`` of the root.
 """
 
 import pytest
@@ -23,11 +24,11 @@ _ROWS_BY_VARIANT = {
 }
 
 
-@pytest.mark.parametrize("variant", list(_ROWS_BY_VARIANT), ids=str)
-def test_the_rows_of_table_2_of_ganchovski_et_al_name_every_problem_of_the_table_in_order(variant: RiddersVariant):
-    """Each variant's rows hold 1 problem per member of `GanchovskiEtAlTable2Problem`, in the table's order."""
+def test_the_rows_of_table_2_of_ganchovski_et_al_name_every_problem_of_the_table_in_order():
+    """`GANCHOVSKI_ET_AL_TABLE_2_COMMONS_MATH` holds 1 problem per member of `GanchovskiEtAlTable2Problem`, in the
+    table's order; `GANCHOVSKI_ET_AL_TABLE_2_SCIPY` is built from it row by row."""
     # --- assert -----------------------
-    assert [problem.name for problem in _ROWS_BY_VARIANT[variant]] == [
+    assert [problem.name for problem in GANCHOVSKI_ET_AL_TABLE_2_COMMONS_MATH] == [
         member.value.name for member in GanchovskiEtAlTable2Problem
     ]
 

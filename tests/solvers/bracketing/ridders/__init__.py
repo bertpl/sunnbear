@@ -12,9 +12,10 @@ Third-party published results:
   ``SolverRole.BUILTIN_CORE``): reproduced, in ``test_third_party.py``:
 
   - 74 of the 92 evaluation counts exactly; the test data states why the other 18 deviate, 11 of them because the
-    paper's C# code stops by the rule of the ``"commons_math"`` variant;
+    paper's C# code uses the stopping rule of the ``"commons_math"`` variant;
   - the roots of 90 of the 92 functions, to within twice the paper's tolerance, or a wider tolerance where the test
-    data states why; on f72 and f73, the true root, because the paper's root there is no root.
+    data states why; on f72 and f73, it returns the true root, because the paper's root there is not a
+    root of the function.
 - Ganchovski et al. (2026), Table 2, the column "Rid", for the ``"commons_math"`` variant, whose stopping rule is that
   of the paper's C# code: reproduced, in ``test_third_party.py``:
 
