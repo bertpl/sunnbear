@@ -14,7 +14,7 @@ Importing it registers the `mc_tuples` artifact declaration with `ArtifactRegist
 """
 
 from .aggregation import DERIVED_RESULTS_SCHEMA, add_derived_results, summarize_results
-from .mc_tuples import MCTuples, MCTuplesSize, MCTuplesStats, generate_mc_tuples, load_mc_tuples
+from .mc_tuples import MCTuples, MCTuplesBitStats, MCTuplesSize, MCTuplesStats, generate_mc_tuples, load_mc_tuples
 from .protocol import DEFAULT_N_BISECTION_FEVALS, MAX_FEVALS_FACTOR, compute_xtol_range, is_solution_correct
 from .runner import RESULTS_SCHEMA, load_results, run_benchmark
 
@@ -24,6 +24,7 @@ __all__ = [
     "MAX_FEVALS_FACTOR",
     "RESULTS_SCHEMA",
     "MCTuples",
+    "MCTuplesBitStats",
     "MCTuplesSize",
     "MCTuplesStats",
     "add_derived_results",

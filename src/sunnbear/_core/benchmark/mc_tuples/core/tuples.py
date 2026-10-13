@@ -11,6 +11,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from sunnbear._core.stats import gpq
+from sunnbear._core.utils.float_bits import n_bits
 
 # The level of the geometric pseudo-quantile (`gpq`) that the construction maximizes and `MCTuplesStats` reports. At
 # 0.1 the gpq is a soft minimum: the smallest separations dominate it, but not the single smallest alone.
@@ -102,6 +103,13 @@ class MCTuples:
     def stats(self) -> "MCTuplesStats":
         """Return the set's spread statistics, each computed when first read."""
         return MCTuplesStats(self.tuple_array)
+
+    # --------------------------------------------------------------------------
+    #  Bits of information
+    # --------------------------------------------------------------------------
+    def bit_stats(self) -> "MCTuplesBitStats":
+        """Return how many bits of information the set's u values and v values hold, each computed when first read."""
+        return MCTuplesBitStats(self.tuple_array)
 
 
 # ==================================================================================================
@@ -227,3 +235,52 @@ class MCTuplesStats:
         separations = np.empty_like(nearest_in_order)
         separations[order] = nearest_in_order
         return separations
+
+
+# ==================================================================================================
+#  MCTuplesBitStats
+# ==================================================================================================
+class MCTuplesBitStats:
+    """`MCTuplesBitStats` reports how many bits of information the u values and the v values hold, per axis.
+
+    A value holds as many bits as the shortest of its binary, decimal and rational descriptions (`n_bits`), and a random
+    float64 value holds about 51 to 53. The smallest over an axis tells whether every value is non-trivial; the mean
+    adds context, but 1 trivial value among many barely moves it.
+    """
+
+    def __init__(self, tuple_array: ArrayLike) -> None:
+        """Store `tuple_array`, an `(n, 2)` array of (u, v) values."""
+        self._tuple_array = np.asarray(tuple_array, dtype=np.float64)
+
+    @property
+    def min_n_bits_u(self) -> float:
+        """Return the fewest bits of information that a u value holds."""
+        return float(self._n_bits_u.min())
+
+    @property
+    def mean_n_bits_u(self) -> float:
+        """Return the mean bits of information of the u values."""
+        return float(self._n_bits_u.mean())
+
+    @property
+    def min_n_bits_v(self) -> float:
+        """Return the fewest bits of information that a v value holds."""
+        return float(self._n_bits_v.min())
+
+    @property
+    def mean_n_bits_v(self) -> float:
+        """Return the mean bits of information of the v values."""
+        return float(self._n_bits_v.mean())
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @cached_property
+    def _n_bits_u(self) -> np.ndarray:
+        """Return the bits of information of each u value."""
+        return np.array([n_bits(float(value)) for value in self._tuple_array[:, 0]])
+
+    @cached_property
+    def _n_bits_v(self) -> np.ndarray:
+        """Return the bits of information of each v value."""
+        return np.array([n_bits(float(value)) for value in self._tuple_array[:, 1]])
