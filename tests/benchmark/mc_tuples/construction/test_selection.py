@@ -8,6 +8,9 @@ from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructio
 from sunnbear._core.benchmark.mc_tuples.construction.selection import MCTuplesSelectionSolve
 from sunnbear._core.benchmark.mc_tuples.construction.solve import INCLUSION_CONSTRAINT_WEIGHT, MCTuplesSolveSettings
 
+# The smallest size's population is large enough that each set of `outer_lane_candidates` holds candidates.
+_N_POPULATION_32 = 2**15
+
 # The 32 tuples of the smallest size spread from the first fine lane to the last, with u rising and v falling.
 _LANES_32 = np.round(np.linspace(0, N_FINE_LANES - 1, 32)).astype(np.int64)
 _SIZE_32 = np.column_stack([_LANES_32 + 0.5, _LANES_32[::-1] + 0.25]) / N_FINE_LANES
@@ -20,8 +23,10 @@ def _solve(size: MCTuplesSize, required_tuple_array: np.ndarray, n_population: i
 
 
 def _distinct_lane_selection(solve: MCTuplesSelectionSolve, n: int) -> np.ndarray:
-    """Return `n` candidates, as indices into the population, that share no fine lane on either axis."""
-    picked, used_u, used_v = [], set(), set()
+    """Return `n` candidates, as indices into the population, that share no fine lane on either axis, starting with
+    the first candidate of each of the solve's `outer_lane_candidates`."""
+    picked = [int(candidates[0]) for candidates in solve.outer_lane_candidates]
+    used_u, used_v = set(solve.population.u_lane[picked].tolist()), set(solve.population.v_lane[picked].tolist())
     for i in range(solve.population.u.size):
         u_lane, v_lane = solve.population.u_lane[i], solve.population.v_lane[i]
         if u_lane not in used_u and v_lane not in used_v:
@@ -74,18 +79,51 @@ def test_constraints_leave_out_the_fine_lanes_when_every_gap_takes_at_most_1():
     assert len(constraints) == solve.gap_allocation.u.counts.size + solve.gap_allocation.v.counts.size + 1
 
 
-def test_constraints_of_the_smallest_size_hold_its_1_gap_s_count_and_1_tuple_per_fine_lane():
-    """Size 32 is 1 gap of 32 new tuples per axis, so every fine lane gets an at-most-1 constraint; with no size
-    below, there is no inclusion constraint."""
+def test_constraints_of_the_smallest_size_hold_its_1_gap_s_count_1_tuple_per_fine_lane_and_the_outer_lanes():
+    """Size 32 is 1 gap of 32 new tuples per axis, so every fine lane gets an at-most-1 constraint, and each of the 4
+    sets of `outer_lane_candidates` gets an exactly-1 constraint; with no size below, there is no inclusion
+    constraint."""
     # --- arrange ----------------------
-    solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=4096)
+    solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=_N_POPULATION_32)
 
     # --- act --------------------------
     constraints = solve._constraints()
 
     # --- assert -----------------------
-    assert len(constraints) == 2 * (1 + N_FINE_LANES)
-    assert [c.min_count for c in constraints if c.min_count > 0] == [32, 32]
+    assert len(constraints) == 2 * (1 + N_FINE_LANES) + 4
+    assert [c.min_count for c in constraints if c.min_count > 0] == [32, 32, 1, 1, 1, 1]
+    assert [c.int_set for c in constraints[-4:]] == [set(c.tolist()) for c in solve.outer_lane_candidates]
+
+
+@pytest.mark.parametrize(
+    "index, u_lanes, v_lanes",
+    [
+        (0, (0, 0), (1, 511)),
+        (1, (512, 1022), (0, 0)),
+        (2, (1023, 1023), (512, 1022)),
+        (3, (1, 511), (1023, 1023)),
+    ],
+)
+def test_outer_lane_candidates_are_the_population_in_4_rotated_sets_of_511_fine_cells(index, u_lanes, v_lanes):
+    """Each set holds exactly the candidates in its range of fine u-lanes and fine v-lanes: fine u-lane 0 along the
+    lower half of the v-lanes without the corner, and its 3 rotations by 90 degrees about (0.5, 0.5)."""
+    # --- arrange ----------------------
+    solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=_N_POPULATION_32)
+    u, v = solve.population.u_lane, solve.population.v_lane
+
+    # --- act --------------------------
+    candidates = solve.outer_lane_candidates[index]
+
+    # --- assert -----------------------
+    is_in_range = (u >= u_lanes[0]) & (u <= u_lanes[1]) & (v >= v_lanes[0]) & (v <= v_lanes[1])
+    assert candidates.size > 0
+    assert candidates.tolist() == np.flatnonzero(is_in_range).tolist()
+
+
+def test_a_larger_size_has_no_outer_lane_candidates():
+    """Every size above the smallest includes its tuples, so it has no sets of outer-lane candidates."""
+    # --- act / assert -----------------
+    assert _solve(MCTuplesSize.SIZE_64, _SIZE_32, n_population=8192).outer_lane_candidates == []
 
 
 # ==================================================================================================
@@ -124,11 +162,24 @@ def test_validation_returns_a_valid_selection_s_new_candidates():
     """A selection of 32 candidates in distinct fine lanes meets the smallest size's constraints, and comes back as
     it is."""
     # --- arrange ----------------------
-    solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=4096)
-    selection = _distinct_lane_selection(solve, 32)
+    solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=_N_POPULATION_32)
+    selection = np.sort(_distinct_lane_selection(solve, 32))
 
     # --- act / assert -----------------
     assert solve._validated_new_selection(selection).tolist() == selection.tolist()
+
+
+def test_validation_refuses_a_size_32_selection_without_a_tuple_in_1_outer_lane_set():
+    """A selection of 32 candidates in distinct fine lanes, none of them in the first set of `outer_lane_candidates`,
+    raises an error."""
+    # --- arrange ----------------------
+    solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=_N_POPULATION_32)
+    selection = _distinct_lane_selection(solve, 33)
+    selection = np.sort(selection[1:])
+
+    # --- act / assert -----------------
+    with pytest.raises(MCTuplesConstructionError, match="1 of the 4 sets of fine cells along the outer fine lanes"):
+        solve._validated_new_selection(selection)
 
 
 @pytest.mark.parametrize(
@@ -152,7 +203,7 @@ def test_validation_refuses_a_size_64_selection_that_breaks_a_constraint(selecti
 def test_validation_refuses_2_new_tuples_in_1_fine_lane():
     """At the smallest size any 32 candidates meet the count of its 1 gap, but 2 in 1 fine lane raise an error."""
     # --- arrange ----------------------
-    solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=4096)
+    solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=_N_POPULATION_32)
     selection = _distinct_lane_selection(solve, 31)
     u_lanes = solve.population.u_lane
     shares_u_lane = np.flatnonzero(u_lanes == u_lanes[selection[0]])

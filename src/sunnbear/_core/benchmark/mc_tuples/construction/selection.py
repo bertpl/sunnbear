@@ -5,17 +5,22 @@ The population's candidates all lie in gaps that get new tuples on both axes
 below (`solve`), the constraints are:
 
 - on each axis, each gap holds exactly its allocated number of new tuples;
-- a gap that holds more than 1 new tuple holds at most 1 per fine lane, through 1 constraint per fine lane.
+- a gap that holds more than 1 new tuple holds at most 1 per fine lane, through 1 constraint per fine lane;
+- at the smallest size, each of 4 sets of fine cells along the outer fine lanes holds exactly 1 new tuple
+  (`MCTuplesSelectionSolve.outer_lane_candidates`), so the smallest size, and with it every size, occupies both outer
+  fine lanes of each axis.
 
 max-div starts from a random selection with at most 1 new tuple per fine lane on each axis, which ignores the counts
 per gap; max-div meets them within its first iterations.
 """
 
+from functools import cached_property
+
 import numpy as np
 from max_div import Constraint
 from scipy.optimize import linear_sum_assignment
 
-from sunnbear._core.benchmark.mc_tuples.core import MCTuplesSize
+from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, MCTuplesSize
 from sunnbear._core.utils.grouping import group_indices_by_id
 
 from .allocation import MCTuplesGapAllocation
@@ -61,6 +66,31 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
         self._u_gap = self.gap_allocation.u.gap_of_fine_lane[self.population.u_lane]
         self._v_gap = self.gap_allocation.v.gap_of_fine_lane[self.population.v_lane]
 
+    @cached_property
+    def outer_lane_candidates(self) -> list[np.ndarray]:
+        """Return, for each of 4 sets of fine cells along the outer fine lanes, its candidates as population indices.
+
+        The first set is fine u-lane 0 with the fine v-lanes from 1 up to the middle of the axis, which leaves out the
+        corner cell; each next set is the previous one rotated by 90 degrees about (0.5, 0.5). The 4 sets share no fine
+        cell and contain no corner, so 1 new tuple in each puts 4 distinct tuples in the 4 outer fine lanes, no 2 of
+        them near the same corner.
+
+        Only the smallest size has these sets, because every larger size includes its tuples; a larger size gets an
+        empty list.
+        """
+        if self.size.size_below is not None:
+            return []
+        else:
+            u_lanes, v_lanes = self.population.u_lane, self.population.v_lane
+            candidates = []
+            for _ in range(4):
+                is_in_first_set = (u_lanes == 0) & (v_lanes >= 1) & (v_lanes < N_FINE_LANES // 2)
+                candidates.append(np.flatnonzero(is_in_first_set))
+                # A cell lies in the next set if rotating it back by 90 degrees puts it in this set; rotating the lanes
+                # back here, and testing the first set again, tests each next set in turn.
+                u_lanes, v_lanes = v_lanes, N_FINE_LANES - 1 - u_lanes
+            return candidates
+
     # --------------------------------------------------------------------------
     #  Subclass hooks
     # --------------------------------------------------------------------------
@@ -82,6 +112,10 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
                 Constraint(int_set=set((n_required + in_gaps_of_several[group]).tolist()), min_count=0, max_count=1)
                 for group in group_indices_by_id(lane[in_gaps_of_several])
             )
+        constraints.extend(
+            Constraint(int_set=set((n_required + candidates).tolist()), min_count=1, max_count=1)
+            for candidates in self.outer_lane_candidates
+        )
         return constraints
 
     def _initial_new_selection(self) -> np.ndarray:
@@ -118,7 +152,7 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
         return np.sort(rng.choice(paired, size=n_new, replace=False))
 
     def _check_new_selection(self, new_selection: np.ndarray) -> None:
-        """Raise `MCTuplesConstructionError` if a gap's count of new tuples is off, or a fine lane holds 2 or more."""
+        """Raise `MCTuplesConstructionError` if the new tuples break 1 of the constraints that the module lists."""
         for axis, allocation, gap, lane in (
             ("u", self.gap_allocation.u, self._u_gap, self.population.u_lane),
             ("v", self.gap_allocation.v, self._v_gap, self.population.v_lane),
@@ -131,3 +165,9 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
                 )
             if np.bincount(lane[new_selection]).max() > 1:
                 raise MCTuplesConstructionError(f"Size {self.size}: a fine {axis}-lane holds 2 or more new tuples.")
+        n_off = sum(int(np.isin(new_selection, candidates).sum() != 1) for candidates in self.outer_lane_candidates)
+        if n_off > 0:
+            raise MCTuplesConstructionError(
+                f"Size {self.size}: {n_off} of the 4 sets of fine cells along the outer fine lanes do not hold exactly "
+                "1 new tuple."
+            )

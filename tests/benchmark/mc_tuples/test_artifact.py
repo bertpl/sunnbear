@@ -1,9 +1,12 @@
 """The `mc_tuples` artifact round-trips through its CSV file, and `load_mc_tuples(size)` returns the shipped sets."""
 
+import datetime
+
 import numpy as np
 import pytest
 
 from sunnbear._core.artifacts import ArtifactError
+from sunnbear._core.artifacts.listing import artifact_manifest
 from sunnbear._core.benchmark.mc_tuples import (
     N_FINE_LANES,
     MCTuples,
@@ -68,6 +71,29 @@ def test_the_largest_shipped_size_holds_exactly_1_tuple_per_fine_lane():
     # --- assert -----------------------
     for values in (tuples.u, tuples.v):
         assert np.bincount(fine_lanes_of(values), minlength=N_FINE_LANES).tolist() == [1] * N_FINE_LANES
+
+
+# The construction fills both outer fine lanes of each axis from the smallest size up since this date; a shipped set
+# built on or before it predates that, and the test below skips it.
+_OUTER_LANES_FILLED_AFTER = datetime.date(2026, 10, 13)
+
+
+@pytest.mark.parametrize("size", MCTuplesSize)
+def test_each_shipped_size_holds_a_tuple_in_both_outer_fine_lanes_of_each_axis(size):
+    """Each shipped size has a tuple in fine lane 0 and in the last fine lane, along u and along v."""
+    # --- arrange ----------------------
+    if artifact_manifest("mc_tuples").build_date <= _OUTER_LANES_FILLED_AFTER:
+        pytest.skip(
+            "The shipped set was built before the construction filled the outer fine lanes; remove this condition "
+            "once the set is regenerated."
+        )
+
+    # --- act --------------------------
+    tuples = load_mc_tuples(size)
+
+    # --- assert -----------------------
+    for values in (tuples.u, tuples.v):
+        assert {0, N_FINE_LANES - 1} <= set(fine_lanes_of(values).tolist())
 
 
 def test_load_mc_tuples_rejects_an_unsupported_size():
