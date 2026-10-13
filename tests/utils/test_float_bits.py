@@ -16,6 +16,7 @@ LOG2_10 = math.log2(10)
     [
         (0.0, 0.0, 0.0, 0.0),
         (0.5, 1.0, LOG2_10, 1.0),
+        (4.0, 1.0, LOG2_10, 2.0),
         (-0.375, 2.0, 3 * LOG2_10, math.log2(3) + 3.0),
         (37 / 1024, 6.0, 9 * LOG2_10, math.log2(37) + 10.0),
         (0.1, 52.0, LOG2_10, math.log2(10)),
@@ -37,21 +38,26 @@ def test_each_measure_counts_the_bits_of_its_shortest_description(x, binary, dec
 
 @pytest.mark.parametrize("x", [0.25, 5 / 17, 1 / 1024, math.pi / 4, 2.0**-1074, 0.999999])
 def test_n_bits_rational_finds_the_fraction_with_the_smallest_denominator_that_rounds_to_x(x):
-    """No fraction with a smaller q than the fraction p/q behind `n_bits_rational` rounds to `x`; the test checks every
-    q below 2000."""
+    """`n_bits_rational` uses the fraction that rounds to `x` and has the smallest denominator; the test checks every
+    denominator below 2000."""
     # --- act --------------------------
     bits = n_bits_rational(x)
 
     # --- assert -----------------------
     q_limit = 2_000
-    best = next(
-        (Fraction(round(x * q), q) for q in range(1, q_limit) if float(Fraction(round(x * q), q)) == x),
-        None,
-    )
-    if best is None:
+    simplest_fraction = None
+    for q in range(1, q_limit):
+        candidate = Fraction(round(x * q), q)
+        if float(candidate) == x:
+            simplest_fraction = candidate
+            break
+    if simplest_fraction is None:
+        # Without a match below q_limit, q is at least q_limit, and for these x the bits then exceed this bound.
         assert bits > 2 * math.log2(q_limit) - 1
     else:
-        assert bits == pytest.approx(math.log2(max(best.numerator, 1)) + math.log2(best.denominator))
+        assert bits == pytest.approx(
+            math.log2(max(simplest_fraction.numerator, 1)) + math.log2(simplest_fraction.denominator)
+        )
 
 
 def test_random_values_hold_close_to_53_bits():

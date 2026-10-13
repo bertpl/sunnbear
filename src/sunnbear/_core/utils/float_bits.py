@@ -3,7 +3,7 @@
 A value is trivial when a short description reproduces it exactly: a few binary digits, a few decimal digits, or a
 fraction with a small numerator and denominator.
 
-Each function returns the length of the shortest such description in bits, as a float. A random float64 value scores
+Each function returns the length of the shortest such description in bits. A random float64 value scores
 about 51 to 54 bits in each representation, and a trivial value far less:
 
 - `n_bits_binary`: the binary description;
@@ -11,8 +11,8 @@ about 51 to 54 bits in each representation, and a trivial value far less:
 - `n_bits_rational`: the rational description;
 - `n_bits`: the smallest of the 3.
 
-Multiples of constants such as π or e are not measured: there are too many such constants. Each function takes a finite
-value, and returns 0 for 0.
+A multiple of a constant such as π or e does not count as trivial, because there are too many such constants to check.
+Each function takes a finite value, and returns 0 for 0.
 """
 
 import math
@@ -28,25 +28,29 @@ def n_bits_binary(x: float) -> float:
 
     `x` must be finite.
     """
-    return float(abs(x.as_integer_ratio()[0]).bit_length())
+    m = abs(x.as_integer_ratio()[0])
+    if m > 0:
+        # The numerator of an even integer still has trailing zero bits; shifting them out leaves the odd `m`.
+        m >>= (m & -m).bit_length() - 1
+    return float(m.bit_length())
 
 
 def n_bits_decimal(x: float) -> float:
-    """Return the significant digits of the shortest decimal that rounds back to `x`, times log2(10).
+    """Return the number of significant digits of the shortest decimal that rounds back to `x`, times log2(10).
 
     `x` must be finite.
     """
-    # Python's repr of a float is that shortest decimal; without the sign, the exponent, the point and the leading and
-    # trailing zeros, its digits are the significant digits.
+    # Python's repr of a float is the shortest decimal that rounds back to the float; without the sign, the exponent,
+    # the point and the leading and trailing zeros, its digits are the significant digits.
     digits = repr(abs(x)).split("e")[0].replace(".", "").strip("0")
     return len(digits) * LOG2_10
 
 
 def n_bits_rational(x: float) -> float:
-    """Return log2(p) + log2(q) for the fraction p/q with the smallest q that rounds to `|x|`.
+    """Return log2(p) + log2(q) for the fraction p/q that rounds to `|x|` and has the smallest q.
 
-    The fraction rounds to `|x|` when it lies between the midpoints to the 2 float64 neighbors of `|x|`; both midpoints
-    count as inside, whichever way a tie would round. `x` must be finite.
+    The fraction rounds to `|x|` when it lies between the midpoints between `|x|` and its 2 float64 neighbors; both
+    midpoints count as inside, whichever way a tie would round. `x` must be finite.
     """
     x = abs(x)
     if x == 0:
@@ -70,9 +74,9 @@ def n_bits(x: float) -> float:
 def _rounding_interval(x: float) -> tuple[int, int, int, int]:
     """Return the interval of reals that round to the positive `x`, as the fractions `a/b` and `c/d`.
 
-    The interval's bounds are the midpoints between `x` and its 2 float64 neighbors. All 3 values are dyadic fractions,
-    so the bounds are exact over a common power-of-2 denominator. The bounds are computed on integers, because
-    `fractions.Fraction` arithmetic makes `n_bits_rational` about 3 times slower.
+    The interval's bounds are the midpoints between `x` and its 2 float64 neighbors. `x` and its 2 float64 neighbors are
+    dyadic fractions, so the bounds are exact over a common power-of-2 denominator. The bounds are computed on
+    integers, because `fractions.Fraction` arithmetic makes `n_bits_rational` about 3 times slower.
     """
     ratios = [value.as_integer_ratio() for value in (math.nextafter(x, 0.0), x, math.nextafter(x, math.inf))]
     denominator = max(den for _, den in ratios)
@@ -83,9 +87,13 @@ def _rounding_interval(x: float) -> tuple[int, int, int, int]:
 def _simplest_fraction_between(a: int, b: int, c: int, d: int) -> tuple[int, int]:
     """Return the fraction p/q with the smallest q, then the smallest p, such that `a/b <= p/q <= c/d`.
 
-    The search follows the continued fraction of the 2 bounds: an integer in the interval is the answer; otherwise both
-    bounds share their integer part `n`, and the answer is `n + 1/y` for the simplest `y` between the reciprocals of
-    the bounds' fractional parts. `0 <= a/b < c/d` is required.
+    The search follows the continued fraction of the 2 bounds:
+
+    - if the interval holds an integer, the smallest such integer is the answer;
+    - otherwise both bounds share their integer part `n`, and the answer is `n + 1/y`, where `y` is the simplest
+      fraction between the reciprocals of the bounds' fractional parts.
+
+    `0 <= a/b < c/d` is required.
     """
     n = a // b
     if n * b == a:
