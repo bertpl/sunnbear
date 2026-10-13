@@ -103,8 +103,8 @@ class CARF(Solver):
 
     References:
         - Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied Mathematics Letters
-          178, 109928. It describes the method and its constants, and its Tables 3 and 4 hold the results that the test
-          suite compares `CARF` with.
+          178, 109928. It describes the method and its constants, and the test suite compares `CARF` with the results
+          of its Tables 3 and 4.
           https://doi.org/10.1016/j.aml.2026.109928
         - Brent, R. P. (1971). An algorithm with guaranteed convergence for finding a zero of a function. The Computer
           Journal 14(4), 422-425. It describes the test that compares a step with half the step before last, which
@@ -200,8 +200,8 @@ class CARF(Solver):
         """Return the zero in ``[a, b]`` of the quadratic through ``(a, fa)``, ``(t, ft)`` and ``(b, fb)``.
 
         The quadratic is written around ``t``, as ``q(t + u) = c2 * u^2 + c1 * u + ft``. Of the quadratic's 2 zeros,
-        the one nearer ``t`` is at ``u = ft / zero_term`` and the other at ``u = zero_term / c2``, with
-        ``zero_term = -(c1 + sign(c1) * sqrt(c1^2 - 4 * c2 * ft)) / 2``; these forms avoid the cancellation of the
+        the one nearer ``t`` is at ``u = ft / c2_u_far`` and the other at ``u = c2_u_far / c2``, with
+        ``c2_u_far = -(c1 + sign(c1) * sqrt(c1^2 - 4 * c2 * ft)) / 2``; these forms avoid the cancellation of the
         textbook formula.
 
         When rounding puts neither zero in ``[a, b]``, the zero farther from ``t`` is returned, and the caller's clip
@@ -215,12 +215,12 @@ class CARF(Solver):
             return t - ft / c1
         else:
             discriminant = max(c1 * c1 - 4.0 * c2 * ft, 0.0)
-            zero_term = -0.5 * (c1 + math.copysign(math.sqrt(discriminant), c1))
-            zero_near_t = t + ft / zero_term
+            c2_u_far = -0.5 * (c1 + math.copysign(math.sqrt(discriminant), c1))
+            zero_near_t = t + ft / c2_u_far
             if a <= zero_near_t <= b:
                 return zero_near_t
             else:
-                return t + zero_term / c2
+                return t + c2_u_far / c2
 
     @staticmethod
     def _is_converged(t: float, ft: float, active_width: float, xtol: float) -> bool:

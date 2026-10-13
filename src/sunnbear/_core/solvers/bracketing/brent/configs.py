@@ -6,7 +6,7 @@ from .solver import Brent
 
 
 class BrentConfig(SolverConfig):
-    """`BrentConfig` is a core config: `Brent`.
+    """`BrentConfig` is a core config of `Brent`.
 
     Brent's method is the de facto standard bracketing solver.
     """

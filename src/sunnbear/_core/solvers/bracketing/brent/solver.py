@@ -15,8 +15,9 @@ class Brent(Solver):
 
       - forced, when the step before the previous one was shorter than the tolerance ``tol`` (defined below), or
         when the last step did not reduce ``|f|``;
-      - in place of an interpolation step that does not land at least ``tol / 2`` short of 3/4 of the way from the
-        best estimate to the other bound, or that is not shorter than half the step before the previous one.
+      - in place of an interpolation step that lands less than ``tol / 2`` short of 3/4 of the way from the best
+        estimate to the other bound, or beyond that point, or that is not shorter than half the step before the
+        previous one.
 
     A step shorter than the tolerance is lengthened to the tolerance, toward the bound on the other side of the root.
     As long as ``tol`` stays positive, these rules guarantee that the solve converges within a bounded number of

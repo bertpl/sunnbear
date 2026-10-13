@@ -6,7 +6,7 @@ from .solver import RegulaFalsi
 
 
 class RegulaFalsiConfig(SolverConfig):
-    """`RegulaFalsiConfig` is a secondary config: `RegulaFalsi`.
+    """`RegulaFalsiConfig` is a secondary config of `RegulaFalsi`.
 
     It is not core because the classic method stalls too often to characterize the test functions reliably.
     """

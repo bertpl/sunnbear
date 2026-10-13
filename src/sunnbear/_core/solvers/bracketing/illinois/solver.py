@@ -47,8 +47,8 @@ class Illinois(BracketingSolver[IllinoisState]):
     def _next_x(self, state: IllinoisState, interval: Interval) -> float:
         """Return where the chord crosses zero, with the retained bound's value halved as the class docstring says.
 
-        Before computing the chord, update ``state.scaled_retained_f`` and ``state.newest_bound`` from the replaced
-        bound; the new iterate is the previous call's return value. This update is correct only when exactly 1 new
+        Before computing the chord, update ``state.scaled_retained_f`` and ``state.newest_bound`` from the bound
+        that the new iterate, the previous call's return value, replaced. This update is correct only when exactly 1 new
         evaluation happened since the previous call.
         """
         # --- update the retained bound's value --

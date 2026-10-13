@@ -16,15 +16,17 @@ class SolveState:
 
     A `BracketingSolver` subclass that needs additional fields in its state subclasses `SolveState` and names the
     subclass in `Solver.state_cls`; `Solver.solve` instantiates whichever class is named there, so the solver never
-    constructs a state itself. `Solver.solve` passes only the fields above, so each added field has a default, or is
-    declared with ``field(init=False)`` and set in the subclass's ``__post_init__`` or at the start of `_solve`.
+    constructs a state itself.
+
+    `Solver.solve` passes only the fields above, so each added field has a default, or is declared with
+    ``field(init=False)`` and set in the subclass's ``__post_init__`` or at the start of `_solve`.
 
     Attributes:
         f: The wrapped function to evaluate.
         interval: The initial interval ``[a, b]``; its class says whether it is increasing or decreasing, see
             `Interval`.
         xtol: Requested x-tolerance, ``|x_true - x| <= xtol``, as a `CountedFloat` so arithmetic on it is counted.
-        x_best: The solver's latest root estimate; reported as the solve's ``x`` when the solve ends with an
+        x_best: Best root estimate so far; reported as the solve's ``x`` when the solve ends with an
             exception, so a solver keeps it current.
     """
 

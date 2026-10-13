@@ -6,7 +6,7 @@ from .solver import AndersonBjorck
 
 
 class AndersonBjorckConfig(SolverConfig):
-    """`AndersonBjorckConfig` is a secondary config: `AndersonBjorck`.
+    """`AndersonBjorckConfig` is a secondary config of `AndersonBjorck`.
 
     It is not core because `IllinoisConfig` already represents the modified regula falsi family among the core
     configs.

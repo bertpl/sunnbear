@@ -11,11 +11,11 @@ class Bisection(BracketingSolver):
     the interval bounds. The solve performs fewer evaluations when a midpoint is an exact root. Rounding changes
     the count in 2 cases:
 
-    - at an ``xtol`` near the edge of the range of ``xtol`` values that give 1 count, the rounded midpoints can
-      shift the count by 1 when ``a`` and ``b`` are not exact binary fractions;
-    - when ``2 * xtol`` lies close to the float spacing near the root, the count can differ too; below that
-      spacing, the midpoint of 2 adjacent floats equals an interval bound, so the stopping criterion never holds
-      and the solve ends as ``MAX_FEVALS``.
+    - near an ``xtol`` at which the formula's count changes by 1, the rounded midpoints can shift the count by 1
+      when ``a`` and ``b`` are not exact binary fractions;
+    - when ``2 * xtol`` lies close to the float spacing near the root, the count can differ too; when
+      ``2 * xtol`` is below that spacing, the midpoint of 2 adjacent floats equals an interval bound, so the
+      stopping criterion never holds and the solve ends as ``MAX_FEVALS``.
 
     The benchmark relies on that count as its reference cost, so it must not change.
 

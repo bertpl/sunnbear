@@ -13,8 +13,8 @@ class RiddersScipyTwin(TwinSolver):
     where `Ridders`, in the same variant, would stop.
 
     SciPy stops once its interval is narrower than its tolerance ``xtol + rtol * x``, where ``x`` is SciPy's current
-    iterate, and limits each step so that the iterate lies at least ``xtol / 2`` inside the interval; its relative
-    term does not enter that limit. The twin passes SciPy:
+    iterate, and limits each step so that the iterate lies at least ``xtol / 2`` inside the interval; SciPy's
+    relative term ``rtol * x`` does not enter that limit. The twin passes SciPy:
 
     - for the ``"scipy"`` variant, ``rtol = 4 * FLOAT64_EPS``, SciPy's smallest accepted value, and an ``xtol``
       reduced by ``4 * FLOAT64_EPS * max(|a|, |b|)``, so that SciPy's tolerance never exceeds `Ridders`' ``xtol``

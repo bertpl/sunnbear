@@ -7,12 +7,14 @@ from .variant import ITPVariant
 
 
 class ITPPaperExperimentsSlack4Config(SolverConfig):
-    """`ITPPaperExperimentsSlack4Config` is a secondary config: `ITP`, variant ``"paper_experiments"``, ``n_slack = 4``.
+    """`ITPPaperExperimentsSlack4Config` is a secondary config of `ITP`.
 
-    It is not core because `ITPPaperExperimentsSlack0Config`, whose docstring gives the reason, is the core config
-    of `ITP`. With ``n_slack = 4``, the projection accepts interpolation steps that shrink the interval by less than
-    half, as long as the solve can still end at most 4 iterations later than bisection would, so the evaluation count
-    depends on how fast interpolation converges on the function.
+    It runs variant ``"paper_experiments"`` with ``n_slack = 4``. It is not core because
+    `ITPPaperExperimentsSlack0Config` is the core config of `ITP`; that config's docstring says why it was chosen.
+
+    With ``n_slack = 4``, the projection accepts interpolation steps that shrink the interval by less than half, as long
+    as the solve can still end at most 4 iterations later than bisection would, so the evaluation count depends on how
+    fast interpolation converges on the function.
     """
 
     solver_cls = ITP
@@ -21,10 +23,10 @@ class ITPPaperExperimentsSlack4Config(SolverConfig):
 
 
 class ITPPaperExperimentsSlack0Config(SolverConfig):
-    """`ITPPaperExperimentsSlack0Config` is a core config: `ITP`, variant ``"paper_experiments"``, with ``n_slack = 0``.
+    """`ITPPaperExperimentsSlack0Config` is a core config of `ITP`.
 
-    This config is the core config because the paper's experiments ran `ITP` with this variant and ``n_slack = 0``,
-    and the authors' code uses the same settings.
+    It runs variant ``"paper_experiments"`` with ``n_slack = 0``. It is the core config because the paper's experiments
+    ran `ITP` with this variant and ``n_slack = 0``, and the authors' code uses the same settings.
     """
 
     solver_cls = ITP
@@ -33,12 +35,14 @@ class ITPPaperExperimentsSlack0Config(SolverConfig):
 
 
 class ITPPaperPseudocodeSlack0Config(SolverConfig):
-    """`ITPPaperPseudocodeSlack0Config` is a secondary config: `ITP` as its paper's pseudocode states it.
+    """`ITPPaperPseudocodeSlack0Config` is a secondary config of `ITP`, as its paper's pseudocode states it.
 
-    It is not core because `ITPPaperExperimentsSlack0Config`, whose docstring gives the reason, is the core config
-    of `ITP`. This config differs from `ITPPaperExperimentsSlack0Config` only in its projection radius ``r``, which it
-    does not lower to ``max(0.99 * r - xtol / 2, 0)``, so its solves go past the iteration bound ``n_max`` of `ITP`
-    more often, and end as pure bisection once their projection radius reaches 0.
+    It is not core because `ITPPaperExperimentsSlack0Config` is the core config of `ITP`; that config's docstring
+    says why it was chosen.
+
+    This config differs from `ITPPaperExperimentsSlack0Config` only in its projection radius ``r``, which it does not
+    lower to ``max(0.99 * r - xtol / 2, 0)``, so its solves go past the iteration bound ``n_max`` of `ITP` more often,
+    and end as pure bisection once their projection radius reaches 0.
     """
 
     solver_cls = ITP

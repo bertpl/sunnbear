@@ -169,8 +169,12 @@ class BracketingSolver(Solver[StateT]):
     stopping criterion (`Interval.is_converged`); the base class does all 3.
 
     One `_next_x` is one iteration. A solver that carries values between iterations keeps them on its
-    `SolveState` subclass (see `Solver.state_cls`). A solver whose iteration does not fit this loop subclasses
-    `Solver` directly and writes its own `_solve`; the docstring of the `bracketing` package lists when.
+    `SolveState` subclass (see `Solver.state_cls`). A solver subclasses `Solver` directly and writes its own
+    `_solve` when any of these holds:
+
+    - its iteration evaluates the function more than once;
+    - it updates the interval in its own way, or keeps x-values besides the interval bounds;
+    - its stopping criterion is its own.
     """
 
     def _solve(self, state: StateT) -> float:

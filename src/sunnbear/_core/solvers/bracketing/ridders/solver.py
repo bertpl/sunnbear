@@ -53,8 +53,11 @@ class Ridders(Solver):
           paper's example, and the iterates of its Section III. https://doi.org/10.1109/TCS.1979.1084580
         - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section
           9.2.1. Cambridge University Press. The book's routine ``zriddr`` also stops once 2 successive iterates
-          lie within its tolerance, but it tests them before it evaluates the newer one and returns the older one,
-          and it also stops once the interval is at most its tolerance wide.
+          lie within its tolerance, with 2 differences:
+
+          - it compares the newest iterate with the previous one before evaluating the newest, and returns the
+            previous one;
+          - it also stops once the interval is at most its tolerance wide.
         - SciPy's ``scipy.optimize.ridder``, which the ``"scipy"`` variant follows; the test suite checks `Ridders`
           against ``scipy.optimize.ridder``.
         - Apache Commons Math's ``RiddersSolver``, whose stopping criterion the ``"commons_math"`` variant follows.

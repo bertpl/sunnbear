@@ -55,8 +55,8 @@ class ITP(BracketingSolver[ITPState]):
 
     - it guards against rounding errors in ``r``, as the paper's Appendix B recommends in general terms; the margin
       makes solves that go past ``n_max`` rarer, but does not prevent them all;
-    - it keeps each step at most ``0.99 * r - xtol / 2`` from ``x_half``. The radius used can still reach 0, and
-      then every later step is the midpoint ``x_half``. Under ``"paper_pseudocode"``, a step that lands at distance
+    - it keeps each step at most ``0.99 * r - xtol / 2`` from ``x_half``. That lowered radius can still reach 0,
+      and then every later step is the midpoint ``x_half``. Under ``"paper_pseudocode"``, a step that lands at distance
       ``r`` from ``x_half`` makes ``r`` 0 when the interval keeps its larger part, and in exact arithmetic ``r`` then
       stays 0.
 

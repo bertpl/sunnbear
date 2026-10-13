@@ -7,7 +7,7 @@ from .variant import RiddersVariant
 
 
 class RiddersScipyConfig(SolverConfig):
-    """`RiddersScipyConfig` is a core config: `Ridders` in SciPy's variant.
+    """`RiddersScipyConfig` is a core config of `Ridders`, in SciPy's variant.
 
     Its evaluation count follows how fast the method converges on a function, so its results characterize the test
     functions, and its returned x-value always lies within ``xtol`` of a root.
@@ -19,7 +19,7 @@ class RiddersScipyConfig(SolverConfig):
 
 
 class RiddersCommonsMathConfig(SolverConfig):
-    """`RiddersCommonsMathConfig` is a secondary config: `Ridders` in Apache Commons Math's variant.
+    """`RiddersCommonsMathConfig` is a secondary config of `Ridders`, in Apache Commons Math's variant.
 
     It is not core because its returned x-value can lie more than ``xtol`` from a root, as on a function with a kink
     or with a multiple root, and such a sample counts as ``max_fevals`` evaluations.
@@ -31,7 +31,7 @@ class RiddersCommonsMathConfig(SolverConfig):
 
 
 class RiddersBracketingSolverConfig(SolverConfig):
-    """`RiddersBracketingSolverConfig` is a secondary config: `Ridders` with `BracketingSolver`'s criterion.
+    """`RiddersBracketingSolverConfig` is a secondary config of `Ridders`, with `BracketingSolver`'s criterion.
 
     It is not core because this variant does not limit the step as the SciPy variant does, so near the root the
     interval often only halves, and the evaluation count of this config varies widely between near-identical functions.
