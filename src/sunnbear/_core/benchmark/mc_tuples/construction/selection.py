@@ -1,15 +1,17 @@
 """`MCTuplesSelectionSolve` picks a size's new tuples from its population in the size's first max-div solve.
 
+A fine cell is the crossing of a fine u-lane and a fine v-lane; the outer fine lanes of an axis are its first and its
+last fine lane.
+
 The population's candidates all lie in gaps that get new tuples on both axes
 (`MCTuplesAxisGapAllocation.eligible_fine_lanes`). Besides the constraint that keeps the tuples of the size
 below (`solve`), the constraints are:
 
 - on each axis, each gap holds exactly its allocated number of new tuples;
 - a gap that holds more than 1 new tuple holds at most 1 per fine lane, through 1 constraint per fine lane;
-- at the smallest size, each of 4 sets of fine cells (a fine cell is the crossing of a fine u-lane and a fine v-lane)
-  along the outer fine lanes holds exactly 1 new tuple (`MCTuplesSelectionSolve.outer_lane_candidates`), so the
-  smallest size occupies both outer fine lanes of each axis, and so does every larger size, because it includes the
-  smallest size's tuples.
+- at the smallest size, each of 4 sets of fine cells along the outer fine lanes holds exactly 1 new tuple
+  (`MCTuplesSelectionSolve.outer_lane_candidate_sets`), so every size fills both outer fine lanes of each axis, because
+  a larger size includes the smallest size's tuples.
 
 max-div starts from a random selection with at most 1 new tuple per fine lane on each axis, which ignores the counts
 per gap and the sets along the outer fine lanes; max-div meets both within its first iterations.
@@ -68,11 +70,11 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
         self._v_gap = self.gap_allocation.v.gap_of_fine_lane[self.population.v_lane]
 
     @cached_property
-    def outer_lane_candidates(self) -> list[np.ndarray]:
+    def outer_lane_candidate_sets(self) -> list[np.ndarray]:
         """Return, for each of 4 sets of fine cells along the outer fine lanes, its candidates as population indices.
 
-        The first set is fine u-lane 0 with the fine v-lanes from 1 up to the middle of the axis, which leaves out the
-        corner cell; each next set is the previous one rotated by 90 degrees about (0.5, 0.5).
+        The first set is fine u-lane 0 with the fine v-lanes from 1 up to, but not including, `N_FINE_LANES // 2`, which
+        leaves out the corner cell; each next set is the previous one rotated by 90 degrees about (0.5, 0.5).
 
         The 4 sets share no fine cell and contain no corner, so 1 new tuple in each puts 4 distinct tuples in the 4
         outer fine lanes, no 2 of them near the same corner.
@@ -116,7 +118,7 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
             )
         constraints.extend(
             Constraint(int_set=set((n_required + candidates).tolist()), min_count=1, max_count=1)
-            for candidates in self.outer_lane_candidates
+            for candidates in self.outer_lane_candidate_sets
         )
         return constraints
 
@@ -168,7 +170,7 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
             if np.bincount(lane[new_selection]).max() > 1:
                 raise MCTuplesConstructionError(f"Size {self.size}: a fine {axis}-lane holds 2 or more new tuples.")
         n_unmet_outer_lane_sets = sum(
-            int(np.isin(new_selection, candidates).sum() != 1) for candidates in self.outer_lane_candidates
+            int(np.isin(new_selection, candidates).sum() != 1) for candidates in self.outer_lane_candidate_sets
         )
         if n_unmet_outer_lane_sets > 0:
             raise MCTuplesConstructionError(

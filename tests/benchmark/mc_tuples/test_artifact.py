@@ -73,8 +73,7 @@ def test_the_largest_shipped_size_holds_exactly_1_tuple_per_fine_lane():
         assert np.bincount(fine_lanes_of(values), minlength=N_FINE_LANES).tolist() == [1] * N_FINE_LANES
 
 
-# A shipped set built on or before this date predates the selection's outer-lane constraint and the mean correction
-# that keeps outer-lane tuples in place, so the test below skips it.
+# A shipped set built on or before this date may leave an outer fine lane of an axis empty, so the test below skips it.
 _OUTER_LANES_FILLED_AFTER = datetime.date(2026, 10, 13)
 
 

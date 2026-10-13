@@ -4,9 +4,8 @@ The tuples of the size below stay where they are; per axis, only the new tuples 
 needs (`MCTuplesAxisMeanCorrection`).
 
 A new tuple in the first or the last fine lane of an axis stays where it is on that axis too, so that both outer fine
-lanes stay filled; at the smallest size, `MCTuplesSelectionSolve` fills them.
-
-On that axis, the rules below treat it as a tuple of the size below.
+lanes stay filled; on that axis, the rules below treat such a tuple as a tuple of the size below. At the smallest size,
+`MCTuplesSelectionSolve` fills both outer fine lanes.
 
 The rules are written for a mean above 0.5, where the new tuples move left, over the size's values u_0 < u_1 < … in
 ascending order, with w the width of a fine lane:
@@ -161,7 +160,7 @@ class MCTuplesAxisMeanCorrection:
                     # 1 fine lane.
                     moved[i] = min(value, moved[i - 1] + FINE_LANE_WIDTH)
                 else:
-                    # Follow the left neighbor and keep the spacing, capped at 1 fine lane plus D; the new value is
+                    # Follow the left neighbor and keep the spacing, capped at 1 fine lane plus D; the moved value is
                     # computed from the neighbor's move, so that a tuple whose neighbor stays keeps its value exactly.
                     moved[i] = min(value - (sorted_values[i - 1] - moved[i - 1]), moved[i - 1] + FINE_LANE_WIDTH + cap)
             unsorted = np.empty(len(moved))
