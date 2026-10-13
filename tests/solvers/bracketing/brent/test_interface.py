@@ -15,11 +15,11 @@ def test_name_version_and_that_its_arithmetic_is_counted():
     assert result.flop_counts.total_count() > 0
 
 
-def test_the_stopping_test_counts_both_of_its_comparisons():
-    """A solve that stops at its first stopping test counts both comparisons of that test, and 8 comparisons in the
-    whole solve.
+def test_the_flop_count_includes_both_comparisons_of_the_stopping_test():
+    """The flop count of a solve that stops at its first stopping test includes both comparisons of that test, and 8
+    comparisons in all.
 
-    Both comparisons of the stopping test count because Algol 60 evaluates both operands of a Boolean operator. The 8
+    Both comparisons of the stopping test are counted because Algol 60 evaluates both operands of a Boolean operator. The 8
     comparisons are:
 
     - 4 in `Solver.solve`;

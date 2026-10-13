@@ -27,7 +27,8 @@ def test_an_invalid_argument_is_rejected(kwargs, match):
 
 
 def test_name_version_and_that_its_arithmetic_is_counted():
-    """`ITP` has name ``itp`` and version 2, and counts 1 logarithm per solve and 1 power per iteration."""
+    """`ITP` has name ``itp`` and version 2, and the flop count of its solve includes 1 logarithm per solve and 1
+    power per iteration."""
     # --- act --------------------------
     result = ITP(n_slack=4, variant=ITPVariant.PAPER_EXPERIMENTS).solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=40)
 
