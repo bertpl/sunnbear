@@ -1,4 +1,4 @@
-"""`MCTuplesSizeResult` records how 1 size of the tuple-set construction was built: allocation, solves, correction."""
+"""`MCTuplesSizeResult` records how 1 size of the tuple-set construction was built: allocation, solves, corrections."""
 
 from dataclasses import dataclass
 
@@ -28,11 +28,13 @@ class MCTuplesSizeResult:
             - the gap allocation;
             - the 2 populations;
             - the 2 solves, with max-div's start-up and shut-down time;
-            - the mean correction.
+            - the 2 mean corrections.
         gap_allocation: The allocation of the new tuples to the gaps along u and along v.
-        unrefined_tuple_array: The size's tuples after the selection solve, before the refinement solve.
-        uncorrected_tuple_array: The size's tuples after the refinement solve, before the mean correction.
-        mean_correction: The mean correction, with what it did on each axis and the size's tuples after it.
+        selected_tuple_array: The size's tuples after the selection solve.
+        first_mean_correction: The mean correction after the selection solve, with what the correction did on each
+            axis and the size's tuples after the correction; the refinement solve starts from those tuples.
+        refined_tuple_array: The size's tuples after the refinement solve.
+        second_mean_correction: The mean correction after the refinement solve, with the size's final tuples.
         selection_solution: max-div's solution of the selection solve, with its score checkpoints and timeline.
         refinement_solution: max-div's solution of the refinement solve, with its score checkpoints and timeline.
     """
@@ -41,14 +43,15 @@ class MCTuplesSizeResult:
     t_budget_sec: float
     t_wall_sec: float
     gap_allocation: MCTuplesGapAllocation
-    unrefined_tuple_array: np.ndarray
-    uncorrected_tuple_array: np.ndarray
-    mean_correction: MCTuplesMeanCorrection
+    selected_tuple_array: np.ndarray
+    first_mean_correction: MCTuplesMeanCorrection
+    refined_tuple_array: np.ndarray
+    second_mean_correction: MCTuplesMeanCorrection
     selection_solution: ParallelMaxDivSolution
     refinement_solution: ParallelMaxDivSolution
 
     @property
     def tuples(self) -> MCTuples:
-        """Return the size's tuples after the mean correction, with the size below's tuples first."""
-        tuple_array = self.mean_correction.tuple_array
+        """Return the size's tuples after the second mean correction, with the size below's tuples first."""
+        tuple_array = self.second_mean_correction.tuple_array
         return MCTuples(tuple_array[:, 0], tuple_array[:, 1])

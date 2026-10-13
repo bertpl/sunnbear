@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Improve the spread statistics of the tuple sets that `generate_mc_tuples` builds
+- Rebuild the shipped Monte Carlo tuple set with improved spread statistics; benchmark results on it differ from those on the previous set
+
 ### Deprecated
 
 ### Removed
@@ -30,13 +33,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Compute the steps of `Illinois`, `Pegasus` and `AndersonBjorck` as their papers state them, which changes their benchmark results
 - Stop `AndersonBjorck` by the stopping rule of its paper, which changes its root estimates and benchmark results
 - Make `TOMS748` with `k = 2` and `ITP` with `n_slack = 0` and `variant="paper_experiments"` the core configs of their solvers, which changes how the benchmark characterizes the test functions
-- Change the tuple sets that `generate_mc_tuples` builds for the same arguments
+- Improve the spread statistics of the tuple sets that `generate_mc_tuples` builds
 
 ## 0.2.4 (2026-10-11)
 
 ### Changed
 
-- Change the tuple sets that `generate_mc_tuples` builds for the same arguments
+- Improve the spread statistics of the tuple sets that `generate_mc_tuples` builds
 - Draw each size's `n_population` candidate tuples in `generate_mc_tuples` only in the fine lanes where that size's new tuples can go, so that every candidate can be picked
 - Rebuild the shipped Monte Carlo tuple set; benchmark results on it differ from those on the previous set
 

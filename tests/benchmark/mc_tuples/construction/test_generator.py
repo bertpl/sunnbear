@@ -82,14 +82,15 @@ def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size()
     assert tuples.size == 64
     assert [int(result.size) for result in results] == [32, 64]
     _assert_valid_nested_set(tuples, results)
-    assert all(result.uncorrected_tuple_array.shape == (int(result.size), 2) for result in results)
+    assert all(result.refined_tuple_array.shape == (int(result.size), 2) for result in results)
     assert all(result.selection_solution.score_checkpoints for result in results)
     assert all(result.refinement_solution.score_checkpoints for result in results)
 
 
-def test_generator_refines_and_corrects_each_size_and_builds_the_next_on_it(monkeypatch):
-    """With both solves replaced by stubs that run no max-div, the generator moves every new tuple within its fine
-    cell, corrects every size's means to 0.5, and builds each size on the corrected size below."""
+def test_generator_corrects_refines_and_corrects_each_size_and_builds_the_next_on_it(monkeypatch):
+    """With both solves replaced by stubs that run no max-div, the generator corrects every size's means to 0.5, moves
+    every corrected new tuple within its fine cell, corrects the means to 0.5 again, and builds each size on the
+    corrected size below."""
     # --- arrange ----------------------
     monkeypatch.setattr(MCTuplesSelectionSolve, "run", _spread_each_gap_s_new_tuples)
     monkeypatch.setattr(MCTuplesRefinementSolve, "run", _pick_each_cell_s_last_candidate)
@@ -106,10 +107,11 @@ def test_generator_refines_and_corrects_each_size_and_builds_the_next_on_it(monk
     assert results[0].gap_allocation.u.mean_aware_offset_fine_lanes is None
     assert results[1].gap_allocation.u.mean_aware_offset_fine_lanes is not None
     for result in results:
-        unrefined, uncorrected = result.unrefined_tuple_array, result.uncorrected_tuple_array
-        assert np.array_equal(unrefined[: result.size.n_required], uncorrected[: result.size.n_required])
-        assert not np.any(unrefined[result.size.n_required :] == uncorrected[result.size.n_required :])
-        assert np.array_equal(fine_lanes_of(unrefined), fine_lanes_of(uncorrected))
+        first_corrected, refined = result.first_mean_correction.tuple_array, result.refined_tuple_array
+        assert first_corrected.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
+        assert np.array_equal(first_corrected[: result.size.n_required], refined[: result.size.n_required])
+        assert not np.any(first_corrected[result.size.n_required :] == refined[result.size.n_required :])
+        assert np.array_equal(fine_lanes_of(first_corrected), fine_lanes_of(refined))
 
 
 def test_generate_mc_tuples_returns_the_largest_size_corrected_to_0_5(monkeypatch):

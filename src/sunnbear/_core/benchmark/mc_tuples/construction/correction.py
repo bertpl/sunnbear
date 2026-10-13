@@ -1,4 +1,4 @@
-"""`MCTuplesMeanCorrection` moves a size's new tuples after its max-div solve, so its u and v means are exactly 0.5.
+"""`MCTuplesMeanCorrection` moves a size's new tuples after a max-div solve, so its u and v means are exactly 0.5.
 
 The tuples of the size below stay where they are; per axis, only the new tuples move, toward the side that the mean
 needs (`MCTuplesAxisMeanCorrection`).
@@ -114,6 +114,11 @@ class MCTuplesAxisMeanCorrection:
     offset_before_fine_lanes: float
     offset_after_fine_lanes: float
     max_move_fine_lanes: float
+
+    @property
+    def cap_fine_lanes(self) -> float:
+        """Return the cap D in fine lanes."""
+        return self.cap * N_FINE_LANES
 
     # --------------------------------------------------------------------------
     #  Helpers
