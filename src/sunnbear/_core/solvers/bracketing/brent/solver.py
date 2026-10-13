@@ -67,6 +67,9 @@ class Brent(Solver):
           - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of
             an equation. BIT 13(3), 253-264. Its Examples 1 to 7 hold the column "Brent".
             https://doi.org/10.1007/BF01951936
+          - Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L. and Traykov, A. (2026). Improvements to the modified
+            Anderson-Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. Its Table 2 holds the column "Bre".
+            https://doi.org/10.3390/a19050332
     """
 
     name = "brent"

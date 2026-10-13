@@ -16,6 +16,13 @@ Third-party published results:
   `AndersonBjorck` gives the reasons.
 - Ford (1997), Table 4: reproduced, in ``test_third_party.py``: 12 of the 15 iteration counts exactly, and the
   other 3 within 1; the test data states why each of the 3 deviates.
+- Ganchovski et al. (2026), Table 2, the column "ill": not reproduced, because the paper's C# code differs from
+  `Illinois` in 3 ways:
+
+  - the C# code stops when the next chord's zero lies within the code's tolerance of the previous chord's zero, without
+    evaluating the function at the new zero, while `Illinois` stops on the interval width;
+  - the C# code starts with no retained bound, so it never halves a function value before its 2nd iteration;
+  - the C# code computes the chord's zero in a different algebraic form from `Illinois`.
 
 Reference implementations:
 

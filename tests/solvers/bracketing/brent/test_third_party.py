@@ -2,14 +2,20 @@
 
 - the evaluation counts and bisection switches of the column "Brent's" of Table 2 of Chandrupatla (1997);
 - the evaluation counts of the column "BR" of Tables II and IV to VI of Alefeld, Potra and Shi (1995);
-- the iteration counts of the column "Brent" of Examples 1 to 7 of Anderson and Björck (1973), in single precision.
+- the iteration counts of the column "Brent" of Examples 1 to 7 of Anderson and Björck (1973), in single precision;
+- the evaluation counts and roots of the column "Bre" of Table 2 of Ganchovski et al. (2026).
 
-Each paper ran Brent's procedure ``zero``, stopping rule included, so the tests set only the tolerance ``t`` of
-`Brent` to the paper's value.
+Each paper ran Brent's procedure ``zero``, stopping rule included, with its own variant of the tolerance
+``tol = 2 * macheps * |b| + t``: Chandrupatla, and Anderson and Björck, changed the relative part ``2 * macheps * |b|``
+in ways that make no difference to their counts, and Ganchovski et al. used a larger relative part.
+
+The tests therefore set only the tolerance ``t`` of `Brent`, either to the paper's value or, for Ganchovski et al., to
+the value that makes ``tol`` equal to the paper's tolerance.
 """
 
 import pytest
 
+from sunnbear._core.utils.floats import FLOAT64_EPS
 from sunnbear.solvers import Brent
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.alefeld_potra_shi import (
@@ -18,11 +24,13 @@ from tests.solvers.paper_problems.alefeld_potra_shi import (
 )
 from tests.solvers.paper_problems.anderson_bjorck import AndersonBjorckExampleProblem
 from tests.solvers.paper_problems.chandrupatla import ChandrupatlaTable2Problem
+from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem, ganchovski_et_al_stop_width
 
 from .third_party_problems import (
     ALEFELD_POTRA_SHI_TABLES_IV_TO_VI,
     ANDERSON_BJORCK_EXAMPLES_1_TO_7,
     CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES,
+    GANCHOVSKI_ET_AL_TABLE_2,
 )
 from .tolerance import xtol_for_t
 
@@ -41,6 +49,7 @@ _CHANDRUPATLA_T = 0.5e-5
         ),
         pytest.param(ALEFELD_POTRA_SHI_TABLES_IV_TO_VI, AlefeldPotraShiTablesIVToVIProblem, id="alefeld_potra_shi"),
         pytest.param(ANDERSON_BJORCK_EXAMPLES_1_TO_7, AndersonBjorckExampleProblem, id="anderson_bjorck"),
+        pytest.param(GANCHOVSKI_ET_AL_TABLE_2, GanchovskiEtAlTable2Problem, id="ganchovski_et_al"),
     ],
 )
 def test_each_published_column_names_every_problem_of_its_table_in_order(problems, table):
@@ -136,9 +145,36 @@ def test_the_iteration_counts_of_anderson_bjorck_examples_1_to_7_are_reproduced(
     problem.assert_reproduced_by(result)
 
 
+@pytest.mark.parametrize("problem", GANCHOVSKI_ET_AL_TABLE_2, ids=str)
+def test_the_evaluation_counts_and_roots_of_ganchovski_et_al_table_2_are_reproduced(problem: PaperProblem):
+    """On every row of Table 2 of Ganchovski et al. (2026), `Brent` with the paper's tolerance evaluates as often as
+    the column "Bre" reports, except where the problem states an allowed deviation, and returns Brent's root in the
+    paper's supplementary results."""
+    # --- act --------------------------
+    result = Brent().solve(problem.f, problem.a, problem.b, xtol=_ganchovski_et_al_xtol(problem), max_fevals=300)
+
+    # --- assert -----------------------
+    problem.assert_reproduced_by(result)
+
+
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
+def _ganchovski_et_al_xtol(problem: PaperProblem) -> float:
+    """Return the ``xtol`` that makes `Brent` stop on ``problem`` where the C# code of Ganchovski et al. stops.
+
+    The C# code replaces the tolerance ``tol = 2 * macheps * |b| + t`` of Brent's procedure ``zero`` by half of
+    `ganchovski_et_al_stop_width` at ``b``. That equals ``tol`` for
+    ``t = ganchovski_et_al_stop_width(b) / 2 - 2 * macheps * |b|``.
+
+    The solve stops with ``b`` within ``tol`` of the root, so ``|b|`` is taken as the absolute value of the published
+    root.
+    """
+    assert problem.root is not None
+    t = ganchovski_et_al_stop_width(problem.root) / 2.0 - 2.0 * FLOAT64_EPS * abs(problem.root)
+    return xtol_for_t(t, problem.a, problem.b)
+
+
 def _count_bisection_switches(history: tuple[tuple[float, float], ...]) -> int:
     """Return the number of iterations of a `Brent` solve that evaluate the midpoint of the interval.
 

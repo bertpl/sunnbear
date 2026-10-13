@@ -4,8 +4,15 @@ import pytest
 
 from sunnbear.solvers import ModAB
 from tests.solvers.paper_problems import PaperProblem
+from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem, ganchovski_et_al_stop_width
 
 from .paper_problems import TABLE_2
+
+
+def test_the_rows_of_table_2_name_every_problem_of_the_table_in_order():
+    """`TABLE_2` holds 1 problem per member of `GanchovskiEtAlTable2Problem`, in the table's order."""
+    # --- assert -----------------------
+    assert [problem.name for problem in TABLE_2] == [member.value.name for member in GanchovskiEtAlTable2Problem]
 
 
 @pytest.mark.parametrize("problem", TABLE_2, ids=str)
@@ -54,7 +61,7 @@ class _ModABWithPaperTolerances(ModAB):
     @staticmethod
     def _get_stop_width(xtol: float, x3: float) -> float:
         """Return ``aTol + rTol * |x3|``, ignoring ``xtol``."""
-        return 1e-14 + 1e-14 * abs(x3)
+        return ganchovski_et_al_stop_width(x3)
 
 
 def _bisection_iterations(history: tuple[tuple[float, float], ...]) -> list[int]:
