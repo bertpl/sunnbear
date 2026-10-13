@@ -1,5 +1,5 @@
 """The 3 measures of `float_bits` count the bits of a value's shortest binary, decimal and rational descriptions, and
-its 2 other functions return values with at least a given number of those bits."""
+its other functions return values with at least a given number of those bits."""
 
 import math
 from fractions import Fraction

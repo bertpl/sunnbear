@@ -17,11 +17,14 @@ The selection's population is drawn in 2 steps:
 1. `spread_evenly_over_grid` picks each candidate's eligible fine cell, at random under both guarantees, on the
    grid of eligible u-lanes and eligible v-lanes;
 2. each candidate lies at its own uniform random position inside its fine cell, with at least `MIN_N_BITS` bits of
-   information in each value (`draw_floats_with_min_n_bits`); a fine lane's edges are multiples of 1 / `N_FINE_LANES`,
-   a power of 2, so they hold few bits, and no value lands on an edge, not even on the edge of the unit square.
+   information in each value (`draw_floats_with_min_n_bits`).
+
+   A fine lane's edges are multiples of 1 / `N_FINE_LANES`, and `N_FINE_LANES` is a power of 2, so each edge holds few
+   bits; no value lands on an edge, not even on the edge of the unit square.
 
 The refinement's population lies only in the fine cells of given tuples: each tuple comes first, followed by
-`n_random_candidates_per_cell` candidates at uniform random positions inside its fine cell, drawn in the same way.
+`n_random_candidates_per_cell` candidates at uniform random positions inside its fine cell, drawn like the
+selection's candidates.
 """
 
 from dataclasses import dataclass
@@ -58,6 +61,14 @@ class MCTuplesPopulation:
         return np.column_stack([self.u, self.v])
 
     # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _draw_values_in_fine_lanes(lanes: np.ndarray, rng: np.random.Generator) -> np.ndarray:
+        """Return 1 uniform random value strictly inside each fine lane in `lanes`, with at least `MIN_N_BITS` bits."""
+        return draw_floats_with_min_n_bits(*fine_lane_edges_of(lanes), MIN_N_BITS, rng)
+
+    # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
@@ -73,8 +84,8 @@ class MCTuplesPopulation:
         u_lane = allowed_u_lanes[candidate_cells[:, 0]].astype(np.int64)
         v_lane = allowed_v_lanes[candidate_cells[:, 1]].astype(np.int64)
         return cls(
-            u=draw_floats_with_min_n_bits(*fine_lane_edges_of(u_lane), MIN_N_BITS, rng),
-            v=draw_floats_with_min_n_bits(*fine_lane_edges_of(v_lane), MIN_N_BITS, rng),
+            u=cls._draw_values_in_fine_lanes(u_lane, rng),
+            v=cls._draw_values_in_fine_lanes(v_lane, rng),
             u_lane=u_lane,
             v_lane=v_lane,
         )
@@ -93,9 +104,7 @@ class MCTuplesPopulation:
         values_per_axis, lanes_per_axis = [], []
         for values in (tuple_array[:, 0], tuple_array[:, 1]):
             lanes = fine_lanes_of(values)
-            random_values = draw_floats_with_min_n_bits(
-                *fine_lane_edges_of(np.repeat(lanes, n_random_candidates_per_cell)), MIN_N_BITS, rng
-            )
+            random_values = cls._draw_values_in_fine_lanes(np.repeat(lanes, n_random_candidates_per_cell), rng)
             values_per_axis.append(np.column_stack([values, random_values.reshape(n_tuples, -1)]).ravel())
             lanes_per_axis.append(np.repeat(lanes, n_random_candidates_per_cell + 1))
         return cls(u=values_per_axis[0], v=values_per_axis[1], u_lane=lanes_per_axis[0], v_lane=lanes_per_axis[1])

@@ -75,8 +75,8 @@ def test_the_correction_takes_the_shift_from_the_largest_spacings():
     ],
 )
 def test_the_correction_leaves_a_new_tuple_in_an_outer_fine_lane_in_place(outer_value, other_new_values, required):
-    """A new tuple in fine lane 0 or in the last fine lane stays where it is, and the other new tuples bring the mean
-    to 0.5."""
+    """A new tuple in fine lane 0 or in the last fine lane stays where it is in the mean correction, and the other new
+    tuples bring the mean to 0.5."""
     # --- arrange ----------------------
     new = np.array([outer_value, *other_new_values])
 

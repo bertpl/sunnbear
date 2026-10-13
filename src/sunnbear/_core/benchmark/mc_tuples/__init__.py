@@ -6,7 +6,7 @@ The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples
   reports how many bits of information their values hold as `MCTuplesBitStats`;
 - each axis is divided into `N_FINE_LANES` equal fine lanes, and `fine_lanes_of` returns the fine lane of each value;
   `TARGET_MEAN` is the mean toward which `generate_mc_tuples` corrects every size's u values and v values, and
-  `MIN_N_BITS` is the fewest bits of information that it leaves in any value;
+  `MIN_N_BITS` is the fewest bits of information that `generate_mc_tuples` leaves in any value;
 - `generate_mc_tuples` constructs a nested set and corrects every size's means to `TARGET_MEAN` on both axes, with no
   2 tuples in 1 fine lane. It delegates to `MCTuplesGenerator`, which runs 2 max-div solves and 2 value corrections per
   size (`construction`) and reports each size's `MCTuplesSizeResult`;

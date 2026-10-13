@@ -81,5 +81,8 @@ def fine_lanes_of(values: np.ndarray) -> np.ndarray:
 
 
 def fine_lane_edges_of(lanes: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """Return the lower and the upper edge of each fine lane in `lanes`: the bounds of its values in `fine_lanes_of`."""
+    """Return the lower and the upper edges of the fine lanes in `lanes`.
+
+    `fine_lanes_of` puts a value in fine lane `i` when it lies in `[lower, upper)` of that lane.
+    """
     return lanes / N_FINE_LANES, (lanes + 1) / N_FINE_LANES

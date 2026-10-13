@@ -6,11 +6,11 @@
    (`nearest_float_with_min_n_bits`).
 
    A nudge moves a value by a few float64 steps, so each size's mean stays 0.5 up to rounding, and every tuple keeps
-   its fine lane. The populations' guarantee of `MIN_N_BITS` bits covers only the values that they draw; a value that
-   the mean correction moves can hold fewer.
+   its fine lane. The values that `MCTuplesPopulation` draws hold at least `MIN_N_BITS` bits, but a value that the mean
+   correction moves can hold fewer.
 
-The rest of this docstring describes the mean correction. The tuples of the size below stay where they are; per axis,
-only the new tuples move, toward the side that the mean needs (`MCTuplesAxisValueCorrection`).
+In the mean correction, the tuples of the size below stay where they are; per axis, only the new tuples move, toward
+the side that the mean needs (`MCTuplesAxisValueCorrection`).
 
 A new tuple in the first or the last fine lane of an axis stays where it is on that axis too, so that both outer fine
 lanes stay filled; on that axis, the rules below treat such a tuple as a tuple of the size below. At the smallest size,
@@ -255,9 +255,9 @@ class MCTuplesAxisValueCorrection:
         is_shift_left = bool(movable_values.mean() > target_mean_of_movable)
         moved_values_of_cap = cls._moved_values_of_cap(immovable_values, movable_values, is_shift_left)
         cap = cls._solve_cap(moved_values_of_cap, target_mean_of_movable)
-        mean_corrected_values = new_values.copy()
-        mean_corrected_values[~is_in_outer_lane] = moved_values_of_cap(cap)
-        corrected_new_values = cls._nudged_values(mean_corrected_values)
+        mean_corrected_new_values = new_values.copy()
+        mean_corrected_new_values[~is_in_outer_lane] = moved_values_of_cap(cap)
+        corrected_new_values = cls._nudged_values(mean_corrected_new_values)
         return cls(
             cap=cap,
             corrected_new_values=corrected_new_values,
@@ -266,5 +266,5 @@ class MCTuplesAxisValueCorrection:
                 corrected_new_values[~is_in_outer_lane], target_mean_of_movable, size
             ),
             max_move_fine_lanes=float(np.abs(corrected_new_values - new_values).max() * N_FINE_LANES),
-            n_nudged=int((corrected_new_values != mean_corrected_values).sum()),
+            n_nudged=int((corrected_new_values != mean_corrected_new_values).sum()),
         )

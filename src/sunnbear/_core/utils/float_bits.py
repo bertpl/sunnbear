@@ -3,7 +3,7 @@
 A value is trivial when a short description reproduces it exactly: a few binary digits, a few decimal digits, or a
 fraction with a small numerator and denominator.
 
-Each function returns the length of the shortest such description in bits. A random float64 value scores
+Each measure returns the length of the shortest such description in bits. A random float64 value scores
 about 51 to 54 bits in each representation, and a trivial value far less:
 
 - `n_bits_binary`: the binary description;
@@ -14,7 +14,7 @@ about 51 to 54 bits in each representation, and a trivial value far less:
 A multiple of a constant such as π or e does not count as trivial, because there are too many such constants to check.
 Each measure takes a finite value, and returns 0 for 0.
 
-The module also has 2 functions that produce values with a given minimum of `n_bits`:
+The module also has functions that produce values with a given minimum of `n_bits`:
 
 - `draw_floats_with_min_n_bits` draws them at random in given intervals;
 - `nearest_float_with_min_n_bits` moves a value by the fewest float64 steps that reach such a value.
@@ -83,8 +83,9 @@ def draw_floats_with_min_n_bits(
 ) -> np.ndarray:
     """Return 1 uniform random value in each open interval `(lows[i], highs[i])` with at least `min_n_bits` bits.
 
-    A value outside its open interval, or with fewer than `min_n_bits` bits, is drawn again until it fits, so the call
-    never returns if an interval holds no such value. At 50 bits, about 1 draw in 4 to 7 is drawn again.
+    A value on an edge of its open interval (from a random draw of exactly 0, or from rounding), or with fewer than
+    `min_n_bits` bits, is drawn again until it fits, so the call never returns if an interval holds no such value. At
+    50 bits, about 1 draw in 4 to 7 is drawn again.
     """
     values = np.empty(lows.size)
     needs_draw = np.ones(lows.size, dtype=bool)

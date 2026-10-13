@@ -11,12 +11,13 @@ tuples of the set share a fine lane.
 2. it draws the size's population of candidate tuples over the fine lanes of the gaps that get new tuples, each value
    with at least `MIN_N_BITS` bits of information (`population`);
 3. the selection solve, a max-div solve, picks the new tuples from the population (`selection`);
-4. the first value correction moves the new tuples so that the size's mean u and mean v are exactly 0.5, and nudges
-   each new value to at least `MIN_N_BITS` bits (`correction`);
+4. the first value correction moves the new tuples so that the size's mean u and mean v are exactly 0.5, then moves
+   each new value with fewer than `MIN_N_BITS` bits by a few float64 steps to a value with at least `MIN_N_BITS` bits
+   (`correction`);
 5. the refinement solve, a second max-div solve, moves each new tuple within its fine cell, the crossing of its fine
    u-lane and fine v-lane; its candidates lie only in the fine cells of the corrected new tuples (`refinement`);
-6. the second value correction brings the means back to 0.5, after the refinement moved them, and nudges the new
-   values again (`correction`).
+6. the second value correction brings the means back to 0.5, after the refinement moved them, and again moves each new
+   value with fewer than `MIN_N_BITS` bits (`correction`).
 
 The first correction comes before the refinement because the first correction can move a new tuple by several fine
 lanes, out of its fine cell, which would undo a refinement done before the first correction.
