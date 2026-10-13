@@ -2,7 +2,7 @@
   "build_date": "2026-10-13",
   "built_with": {
     "max-div": "0.21.1",
-    "sunnbear": "0.2.5+dev"
+    "sunnbear": "0.2.6"
   },
   "content_hash": "49e0ac693a1b31d02c49b864e3ea2421fb07e19d71681748917552a174b06601",
   "files": [

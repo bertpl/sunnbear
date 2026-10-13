@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.2.6 (2026-10-13)
 
 ### Added
 
@@ -17,14 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make each size of the tuple sets that `generate_mc_tuples` builds span the full range of u and of v, to within 1/1024 at each end
 - Improve the spread statistics of the tuple sets that `generate_mc_tuples` builds
 - Rebuild the shipped Monte Carlo tuple set with improved spread statistics; benchmark results on it differ from those on the previous set
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 0.2.5 (2026-10-12)
 
