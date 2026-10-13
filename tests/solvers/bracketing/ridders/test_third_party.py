@@ -1,11 +1,9 @@
 """These tests assert that `Ridders` reproduces third parties' published results for it: the evaluation counts and
 roots of the column "Rid" of Table 2 of Ganchovski et al. (2026), with the "commons_math" variant.
 
-The paper's C# code stops once 2 successive iterates lie within ``(aTol + rTol * |x|) / 2`` of each other, with
-``aTol = rTol = 1e-14`` and ``x`` the newer iterate. That is the stopping rule of the "commons_math" variant, so the
-test sets only the ``xtol`` of `Ridders` to that tolerance.
-
-The solve stops with ``x`` at the root, so ``|x|`` is taken as the absolute value of the published root.
+The paper's C# code stops once 2 successive iterates lie within half of `ganchovski_et_al_stop_width` of each other,
+evaluated at the newer iterate ``x``. That is the stopping rule of the "commons_math" variant, so the test sets only the
+``xtol`` of `Ridders` to that tolerance.
 """
 
 import pytest
@@ -32,6 +30,7 @@ def test_the_evaluation_counts_and_roots_of_table_2_of_ganchovski_et_al_are_repr
     results, except where the problem states an allowed deviation or a wider tolerance on the root."""
     # --- arrange ----------------------
     assert problem.root is not None
+    # The solve stops with ``x`` at the root, so ``|x|`` is taken as the absolute value of the published root.
     xtol = ganchovski_et_al_stop_width(problem.root) / 2.0
 
     # --- act --------------------------

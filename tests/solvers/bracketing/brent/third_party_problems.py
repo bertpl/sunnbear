@@ -144,8 +144,6 @@ ANDERSON_BJORCK_EXAMPLES_1_TO_7 = [
     AndersonBjorckExampleProblem.EX7_N20.with_n_iterations(11),
 ]
 
-# The roots that `Brent` returns on f44 and f45, x^5 and x^7, lie near 1e-15, close to their true root at 0, and differ
-# from the published roots by about 1e-27; they match only to a relative 1e-12, not to `GANCHOVSKI_ET_AL_ROOT_REL_TOL`.
 GANCHOVSKI_ET_AL_TABLE_2 = [
     GanchovskiEtAlTable2Problem.F01.with_n_fevals_and_root(10, root=1.0),
     GanchovskiEtAlTable2Problem.F02.with_n_fevals_and_root(13, root=0.399422291710968),
@@ -199,6 +197,8 @@ GANCHOVSKI_ET_AL_TABLE_2 = [
     GanchovskiEtAlTable2Problem.F41.with_n_fevals_and_root(13, root=0.138257155056824),
     GanchovskiEtAlTable2Problem.F42.with_n_fevals_and_root(10, root=3.0),
     GanchovskiEtAlTable2Problem.F43.with_n_fevals_and_root(124, root=-1.76712656679895e-15),
+    # `Brent`'s roots on f44 and f45, x^5 and x^7, lie near 1e-15, close to their true root at 0, and differ from the
+    # published roots by about 1e-27; they match only to a relative 1e-12, not to `GANCHOVSKI_ET_AL_ROOT_REL_TOL`.
     GanchovskiEtAlTable2Problem.F44.with_n_fevals_and_root(127, root=2.45000610953973e-15, root_rel_tol=1e-12),
     GanchovskiEtAlTable2Problem.F45.with_n_fevals_and_root(135, root=-1.15436487217852e-15, root_rel_tol=1e-12),
     GanchovskiEtAlTable2Problem.F46.with_n_fevals_and_root(15, root=0.101624392293549),

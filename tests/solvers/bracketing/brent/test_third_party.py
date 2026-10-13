@@ -5,10 +5,12 @@
 - the iteration counts of the column "Brent" of Examples 1 to 7 of Anderson and Björck (1973), in single precision;
 - the evaluation counts and roots of the column "Bre" of Table 2 of Ganchovski et al. (2026).
 
-Each paper ran Brent's procedure ``zero``, stopping rule included, with its own tolerance: Chandrupatla and Anderson
-and Björck changed the relative part of the tolerance in ways that make no difference to their counts, and Ganchovski
-et al. used a larger relative part. So the tests set only the tolerance ``t`` of `Brent`, either to the paper's value
-or, for Ganchovski et al., to the value that gives the same tolerance.
+Each paper ran Brent's procedure ``zero``, stopping rule included, with its own variant of the tolerance
+``tol = 2 * macheps * |b| + t``: Chandrupatla, and Anderson and Björck, changed the relative part ``2 * macheps * |b|``
+in ways that make no difference to their counts, and Ganchovski et al. used a larger relative part.
+
+The tests therefore set only the tolerance ``t`` of `Brent`, either to the paper's value or, for Ganchovski et al., to
+the value that makes ``tol`` equal to the paper's tolerance.
 """
 
 import pytest
@@ -149,9 +151,7 @@ def test_the_evaluation_counts_and_roots_of_ganchovski_et_al_table_2_are_reprodu
     the column "Bre" reports, except where the problem states an allowed deviation, and returns Brent's root in the
     paper's supplementary results."""
     # --- act --------------------------
-    result = Brent().solve(
-        problem.f, problem.a, problem.b, xtol=_xtol_for_ganchovski_et_al_tolerance(problem), max_fevals=300
-    )
+    result = Brent().solve(problem.f, problem.a, problem.b, xtol=_ganchovski_et_al_xtol(problem), max_fevals=300)
 
     # --- assert -----------------------
     problem.assert_reproduced_by(result)
@@ -160,12 +160,12 @@ def test_the_evaluation_counts_and_roots_of_ganchovski_et_al_table_2_are_reprodu
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-def _xtol_for_ganchovski_et_al_tolerance(problem: PaperProblem) -> float:
+def _ganchovski_et_al_xtol(problem: PaperProblem) -> float:
     """Return the ``xtol`` that makes `Brent` stop on ``problem`` where the C# code of Ganchovski et al. stops.
 
-    The C# code replaces the tolerance ``tol = 2 * macheps * |b| + t`` of Brent's procedure ``zero`` by
-    ``(aTol + rTol * |b|) / 2``, with ``aTol = rTol = 1e-14``. That equals ``tol`` for
-    ``t = (aTol + rTol * |b|) / 2 - 2 * macheps * |b|``.
+    The C# code replaces the tolerance ``tol = 2 * macheps * |b| + t`` of Brent's procedure ``zero`` by half of
+    `ganchovski_et_al_stop_width` at ``b``. That equals ``tol`` for
+    ``t = ganchovski_et_al_stop_width(b) / 2 - 2 * macheps * |b|``.
 
     The solve stops with ``b`` within ``tol`` of the root, so ``|b|`` is taken as the absolute value of the published
     root.

@@ -19,10 +19,10 @@ Third-party published results:
 - Ganchovski et al. (2026), Table 2, the column "ill": not reproduced, because the paper's C# code differs from
   `Illinois` in 3 ways:
 
-  - it stops when the next chord's zero lies within the code's tolerance of the previous chord's zero, without
+  - the C# code stops when the next chord's zero lies within the code's tolerance of the previous chord's zero, without
     evaluating the function at the new zero, while `Illinois` stops on the interval width;
-  - it starts without a bound that it keeps, so it never halves a function value before its 2nd iteration;
-  - it computes the chord's zero in another form.
+  - the C# code starts with no retained bound, so it never halves a function value before its 2nd iteration;
+  - the C# code computes the chord's zero in a different algebraic form from `Illinois`.
 
 Reference implementations:
 

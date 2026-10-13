@@ -1,8 +1,5 @@
-"""This module holds third parties' test problems for Ridders' method, each with the published count for `Ridders`:
-
-- `GANCHOVSKI_ET_AL_TABLE_2`: the column "Rid" of Table 2 of Ganchovski et al. (2026), with Ridders' root in the
-  paper's supplementary results.
-"""
+"""This module holds `GANCHOVSKI_ET_AL_TABLE_2`, the test problems of Table 2 of Ganchovski et al. (2026), each with
+the count of the column "Rid" and Ridders' root in the paper's supplementary results."""
 
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
 
@@ -15,20 +12,10 @@ _ROOT_AT_MIDPOINT_DEVIATION_REASON = (
 )
 _ITERATE_FORMULA_DEVIATION_REASON = (
     "the paper's C# code computes the iterate as x1 + (x1 - x0) * sign(f0) * f1 / sqrt(f1^2 - f0 * f2); in exact "
-    "arithmetic that equals the form of Ridders, but the 2 forms round differently in their last bits, which changes "
-    "the iterates at a tolerance near 1e-14"
-)
-_ITERATE_FORMULA_AND_ROOT_AT_MIDPOINT_DEVIATION_REASON = (
-    f"2 causes add up: {_ITERATE_FORMULA_DEVIATION_REASON}; and {_ROOT_AT_MIDPOINT_DEVIATION_REASON}"
+    "arithmetic that equals the formula that `Ridders` uses, but the 2 forms round differently in their last bits, "
+    "which changes the iterates at a tolerance near 1e-14"
 )
 
-# Some roots are checked within a wider tolerance than the default `GANCHOVSKI_ET_AL_ROOT_REL_TOL`, because the solve
-# and the paper's run stop at different x-values where the function is nearly flat or has a pole:
-# - f27 has a 4-fold root: up to 4e-4 from it, rounding makes its computed value 0 or of the wrong sign, and the 2
-#   roots lie 2.7e-4 apart;
-# - f40 changes sign at a pole, and the 2 roots agree to a relative 2.3e-12;
-# - f44 and f45, x^5 and x^7, are nearly flat around their root at 0, and the 2 roots, both within 1e-10 of 0, lie
-#   less than 1e-15 apart.
 GANCHOVSKI_ET_AL_TABLE_2 = [
     GanchovskiEtAlTable2Problem.F01.with_n_fevals_and_root(
         4,
@@ -66,12 +53,17 @@ GANCHOVSKI_ET_AL_TABLE_2 = [
     GanchovskiEtAlTable2Problem.F24.with_n_fevals_and_root(80, root=3.0),
     GanchovskiEtAlTable2Problem.F25.with_n_fevals_and_root(62, root=3.99999999999902),
     GanchovskiEtAlTable2Problem.F26.with_n_fevals_and_root(78, root=2.47457678736982),
+    # f27 has a 4-fold root: within 4e-4 of that root, rounding makes the computed value of f27 0 or of the wrong sign,
+    # and the returned and published roots lie 2.7e-4 apart.
     GanchovskiEtAlTable2Problem.F27.with_n_fevals_and_root(
         24,
         root=1.88905736094801,
         root_abs_tol=1e-3,
         deviation=5,
-        reason=_ITERATE_FORMULA_AND_ROOT_AT_MIDPOINT_DEVIATION_REASON,
+        reason=(
+            f"the count deviates for 2 causes that add up: {_ITERATE_FORMULA_DEVIATION_REASON}; and "
+            f"{_ROOT_AT_MIDPOINT_DEVIATION_REASON}"
+        ),
     ),
     GanchovskiEtAlTable2Problem.F28.with_n_fevals_and_root(70, root=7.14299999999989),
     GanchovskiEtAlTable2Problem.F29.with_n_fevals_and_root(
@@ -90,6 +82,7 @@ GANCHOVSKI_ET_AL_TABLE_2 = [
     GanchovskiEtAlTable2Problem.F37.with_n_fevals_and_root(24, root=0.777777777777777),
     GanchovskiEtAlTable2Problem.F38.with_n_fevals_and_root(56, root=0.333333333333334),
     GanchovskiEtAlTable2Problem.F39.with_n_fevals_and_root(84, root=0.333333333329918),
+    # f40 changes sign at a pole, and the returned and published roots agree only to a relative 2.3e-12.
     GanchovskiEtAlTable2Problem.F40.with_n_fevals_and_root(
         60,
         root=0.666666666665125,
@@ -100,6 +93,8 @@ GANCHOVSKI_ET_AL_TABLE_2 = [
     GanchovskiEtAlTable2Problem.F41.with_n_fevals_and_root(14, root=0.138257155056824),
     GanchovskiEtAlTable2Problem.F42.with_n_fevals_and_root(18, root=0.999999999999999),
     GanchovskiEtAlTable2Problem.F43.with_n_fevals_and_root(84, root=6.18534808760553e-16),
+    # f44 and f45, x^5 and x^7, are nearly flat around their root at 0, and the returned and published roots, both
+    # within 1e-10 of 0, lie less than 1e-15 apart.
     GanchovskiEtAlTable2Problem.F44.with_n_fevals_and_root(
         56,
         root=-6.36884555364388e-12,

@@ -1,9 +1,8 @@
 """This module holds `GanchovskiEtAlTable2Problem`, the 92 test problems of Table 2 of Ganchovski et al. (2026),
 without any method's evaluation counts or roots.
 
-Table 2 compares the evaluation counts of 9 methods, modAB, Brent's and Ridders' methods among them, on 92 functions,
-each on 1 interval; a problem's name is the function's name in the table, f01 to f92. The paper's supplementary results
-add each method's root.
+Table 2 gives several methods' evaluation counts on 92 functions, each on 1 interval; a problem's name is the
+function's name in the table, f01 to f92. The paper's supplementary results add each method's root.
 
 The functions follow the C# benchmark of the paper's supplementary code, which produced Table 2; where the table
 prints a function differently, the C# code holds.
@@ -36,7 +35,7 @@ GANCHOVSKI_ET_AL_ROOT_REL_TOL = 1e-13
 
 
 # ==================================================================================================
-#  Helpers
+#  The problems' functions
 # ==================================================================================================
 def _correctly_rounded(mpmath_function: Callable[..., mpmath.mpf]) -> Callable[..., float]:
     """Return a float version of ``mpmath_function`` that rounds its exact result to the nearest float.
@@ -221,15 +220,17 @@ class GanchovskiEtAlTable2Problem(PaperProblemEnum):
         *,
         root_rel_tol: float = GANCHOVSKI_ET_AL_ROOT_REL_TOL,
         root_abs_tol: float = 0.0,
-        deviation: int = 0,
+        deviation: int | None = 0,
         reason: str | None = None,
         observation: str | None = None,
     ) -> PaperProblem:
         """Return the member's problem with a method's evaluation count in Table 2 and the method's root in the paper's
         supplementary results; the count includes the 2 evaluations at the interval bounds.
 
-        ``root_rel_tol`` and ``root_abs_tol`` are those of `PaperProblem`; the other arguments are those of
-        `PaperProblemEnum.with_n_fevals`.
+        ``deviation`` is how far the solve's count may lie from ``n_fevals``: 0 when it must match exactly, and None
+        when the count is not checked; ``reason``, required when ``deviation`` is not 0, says why. ``observation`` is
+        that of `PaperProblemEnum.with_n_fevals`, and ``root_rel_tol`` and ``root_abs_tol`` are those of
+        `PaperProblem`.
         """
         return replace(
             self.with_n_fevals(n_fevals, deviation=deviation, reason=reason, observation=observation),
@@ -246,6 +247,7 @@ def ganchovski_et_al_stop_width(x: float) -> float:
     """Return ``aTol + rTol * |x|``, with ``aTol = rTol = 1e-14``, the tolerance that the paper's C# code applies at
     ``x``.
 
-    The C# modAB stops once the interval is at most this wide; the C# methods of Ridders and Brent use half of it.
+    The C# modAB stops once the interval is at most this wide; the C# methods of Ridders and Brent use half of this
+    width as their tolerance.
     """
     return 1e-14 + 1e-14 * abs(x)
