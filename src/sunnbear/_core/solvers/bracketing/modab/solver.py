@@ -37,8 +37,8 @@ class ModAB(Solver):
     The solver passes ``xtol`` as ``aTol`` and 0 as ``rTol``. When ``x3`` is a midpoint, it lies inside the interval,
     so it lies within ``xtol`` of a root.
 
-    When ``x3`` is a chord's zero, the solve returns it before any clamping, and rounding can put it on or just past
-    a bound, so it lies within ``xtol`` of a root only up to rounding.
+    When ``x3`` is a chord's zero, the solve returns it without clamping it into the interval, and rounding can put it
+    on or just past a bound, so it lies within ``xtol`` of a root only up to rounding.
 
     `ModAB` follows the C# code where the paper's Algorithm 1 differs from it or leaves a detail out:
 
@@ -47,8 +47,8 @@ class ModAB(Solver):
       value, so nothing is evaluated. In Anderson-Björck mode, such an iteration only halves the stored function value
       at the other bound, or marks the other bound as retained.
     - **The first threshold:** the paper's section 4.2 sets the threshold at the switch to
-      `_FALLBACK_THRESHOLD_FACTOR` times the interval width, and only the C# code shows that this is the width
-      before the ``x3`` whose evaluation triggers the switch replaces a bound.
+      `_FALLBACK_THRESHOLD_FACTOR` times the interval width. Only the C# code shows that this width is measured
+      before ``x3`` replaces a bound, where ``x3`` is the x-value whose evaluation triggers the switch.
     - **Scaled function values:** Anderson-Björck mode's scaled function values stay stored after a fallback to
       bisection, and the next bisection steps read them when they test whether the function looks close to a straight
       line.

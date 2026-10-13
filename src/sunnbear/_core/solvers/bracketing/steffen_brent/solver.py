@@ -131,7 +131,8 @@ class SteffenBrent(Solver):
 
             # --- the new interval ---------------
             b_previous, fb_previous = b, fb
-            # The class docstring says why the signs are compared directly.
+            # Signs are compared directly, where the paper multiplies them: the product of 2 small function values can
+            # underflow to 0.
             if (fa > 0.0) == (fs > 0.0):
                 a, fa = b, fb
             else:

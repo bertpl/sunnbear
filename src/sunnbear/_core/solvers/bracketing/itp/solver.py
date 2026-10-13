@@ -51,14 +51,13 @@ class ITP(BracketingSolver[ITPState]):
     ``"paper_pseudocode"``: it matches every row except that of the step function, on which a line-by-line port of
     the authors' MATLAB code differs from the table too.
 
-    The margin, the amount by which ``"paper_experiments"`` lowers ``r``, has 2 effects:
+    The margin, the amount by which ``"paper_experiments"`` lowers ``r``, guards against rounding errors in ``r``, as
+    the paper's Appendix B recommends in general terms; the margin makes solves that go past ``n_max`` rarer, but does
+    not prevent them all.
 
-    - it guards against rounding errors in ``r``, as the paper's Appendix B recommends in general terms; the margin
-      makes solves that go past ``n_max`` rarer, but does not prevent them all;
-    - it keeps each step at most ``0.99 * r - xtol / 2`` from ``x_half``. That lowered radius can still reach 0,
-      and then every later step is the midpoint ``x_half``. Under ``"paper_pseudocode"``, a step that lands at distance
-      ``r`` from ``x_half`` makes ``r`` 0 when the interval keeps its larger part, and in exact arithmetic ``r`` then
-      stays 0.
+    Under either variant, ``r`` can reach 0, and every later step is then the midpoint ``x_half``: under
+    ``"paper_experiments"`` once ``0.99 * r`` falls to ``xtol / 2``, and under ``"paper_pseudocode"`` once a step lands
+    at distance ``r`` from ``x_half`` and the interval keeps its larger part; in exact arithmetic ``r`` then stays 0.
 
     The interval, the stopping criterion and the root estimate are `BracketingSolver`'s: the solve ends once the
     interval is at most ``2 * xtol`` wide, as in the paper, and returns its midpoint, which then lies within ``xtol``

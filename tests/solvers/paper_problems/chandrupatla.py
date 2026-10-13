@@ -1,8 +1,10 @@
 """This module holds the test functions of Chandrupatla's paper, keyed by their number in its Table 1, and
 `ChandrupatlaTable2Problem`, the problems of its Table 2, without results.
 
-Function 7 comes in 2 versions: as the paper's Table 1 prints it, set to 0 where ``|x| < 3.8e-4``, in
-`CHANDRUPATLA_AS_PRINTED_FUNCTIONS`, and computed by the formula everywhere, in `CHANDRUPATLA_FUNCTIONS`.
+Function 7 comes in 2 versions:
+
+- `CHANDRUPATLA_AS_PRINTED_FUNCTIONS` holds it as the paper's Table 1 prints it, set to 0 where ``|x| < 3.8e-4``;
+- `CHANDRUPATLA_FUNCTIONS` holds it computed by the formula everywhere.
 
 Table 2 compares the evaluation counts of 3 methods, Brent's method among them, on 9 functions, each on 5 intervals. A
 problem's name holds the function's number and the interval, e.g. ``1[2,3]``.
@@ -14,8 +16,7 @@ from .problem import PaperProblem, PaperProblemEnum
 
 
 def _function_7(x: float) -> float:
-    """Return the paper's function 7, ``x * exp(-1 / x^2)``, and 0 at ``x = 0``; Table 1's version also returns 0
-    where ``|x| < 3.8e-4``."""
+    """Return the paper's function 7, ``x * exp(-1 / x^2)``, and 0 at ``x = 0``."""
     if x == 0.0:
         return 0.0
     else:

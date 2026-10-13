@@ -48,7 +48,7 @@ class Illinois(BracketingSolver[IllinoisState]):
         """Return where the chord crosses zero, with the retained bound's value halved as the class docstring says.
 
         Before computing the chord, update ``state.scaled_retained_f`` and ``state.newest_bound`` from the bound
-        that the new iterate, the previous call's return value, replaced. This update is correct only when exactly 1 new
+        that the previous call's returned x-value replaced. This update is correct only when exactly 1 new
         evaluation happened since the previous call.
         """
         # --- update the retained bound's value --

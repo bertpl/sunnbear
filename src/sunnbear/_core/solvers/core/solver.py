@@ -161,8 +161,11 @@ class Solver(ABC, Generic[StateT]):
 class BracketingSolver(Solver[StateT]):
     """`BracketingSolver` is the base class for interval-reducing solvers; a subclass implements one `_next_x`.
 
-    A bracketing solver is defined by what it does each iteration: pick an x-value inside the interval,
-    evaluate the function there, and keep the part that still holds the sign change.
+    A bracketing solver is defined by what it does each iteration:
+
+    - pick an x-value inside the interval;
+    - evaluate the function there;
+    - keep the part of the interval that still holds the sign change.
 
     The base class owns the evaluation and the split; only the choice of the x-value is left to the
     subclass. It cannot evaluate the function itself, split the interval wrongly, or define a wrong

@@ -11,10 +11,10 @@ class BrentScipyTwin(TwinSolver):
     """`BrentScipyTwin` hands the interval to `scipy.optimize.brentq` and returns ``b`` after the evaluation at which
     `Brent` would stop.
 
-    SciPy's ``brentq`` is SciPy's own C implementation of Brent's method; its documentation cites Brent (1973) and
-    Numerical Recipes. Its tolerance, ``(xtol + rtol * |b|) / 2``, equals Brent's ``tol = 2 * macheps * |b| + t`` with
-    ``t`` the absolute tolerance that `Brent` derives from its ``xtol``, when the twin passes brentq ``xtol=2 * t`` and
-    ``rtol=4 * macheps``, so SciPy's steps match those of `Brent`.
+    SciPy's ``brentq`` is SciPy's own C implementation of Brent's method. Its tolerance, ``(xtol + rtol * |b|) / 2``,
+    equals Brent's ``tol = 2 * macheps * |b| + t`` with ``t`` the absolute tolerance that `Brent` derives from its
+    ``xtol``, when the twin passes brentq ``xtol=2 * t`` and ``rtol=4 * macheps``, so SciPy's steps match those of
+    `Brent`.
 
     The twin deviates from exact agreement in these declared ways:
 

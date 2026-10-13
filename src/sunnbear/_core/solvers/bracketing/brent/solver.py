@@ -15,9 +15,11 @@ class Brent(Solver):
 
       - forced, when the step before the previous one was shorter than the tolerance ``tol`` (defined below), or
         when the last step did not reduce ``|f|``;
-      - in place of an interpolation step that lands less than ``tol / 2`` short of 3/4 of the way from the best
-        estimate to the other bound, or beyond that point, or that is not shorter than half the step before the
-        previous one.
+      - in place of an interpolation step that:
+
+        - does not stop at least ``tol / 2`` before the x-value 3/4 of the way from the best estimate to the other
+          bound;
+        - is not shorter than half the step before the previous one.
 
     A step shorter than the tolerance is lengthened to the tolerance, toward the bound on the other side of the root.
     As long as ``tol`` stays positive, these rules guarantee that the solve converges within a bounded number of
@@ -31,7 +33,8 @@ class Brent(Solver):
       tolerance derived from ``xtol`` (below); the solve ends once ``|m| <= tol`` or ``f(b) = 0``, and returns ``b``.
 
     `FLOAT64_EPS` is 2^-52, the value that SciPy and Numerical Recipes use. Brent (1971) defines ``macheps`` as the
-    relative machine precision, which is 2^-53 in rounded float64 arithmetic, and allows a larger value.
+    relative machine precision, which is 2^-53 in rounded float64 arithmetic, and also allows a larger
+    ``macheps``.
 
     Brent's procedure returns a ``b`` within ``6 * macheps * |x| + 2 * t`` of a root ``x``. The solver sets
     ``t = (xtol - 6 * macheps * max(|a0|, |b0|)) / 2``, with ``a0`` and ``b0`` the bounds of the initial interval,
@@ -128,8 +131,8 @@ class Brent(Solver):
                 # s keeps the step before the previous one, and e the previous step.
                 s = e
                 e = d
-                # Accept the interpolation step only if it lands at least tol / 2 short of 3/4 of the way from b to c
-                # and is shorter than half the step before the previous one; otherwise bisect.
+                # Accept the interpolation step only if it stops at least tol / 2 before the x-value 3/4 of the way
+                # from b to c, and is shorter than half the step before the previous one; otherwise bisect.
                 if 2.0 * p < 3.0 * m * q - abs(tol * q) and p < abs(0.5 * s * q):
                     d = p / q
                 else:

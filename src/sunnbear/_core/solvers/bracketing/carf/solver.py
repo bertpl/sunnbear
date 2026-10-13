@@ -92,8 +92,8 @@ class CARF(Solver):
       interval the shorter one, and that interval keeps the old ``t`` inside.
     - **Effect:** the next steps are then clipped, and each shrinks the interval by only 15 %, so the solve can take
       many more evaluations than usual, up to its budget.
-    - **Occurrence:** none of the paper's test problems triggers this slowdown, but one of them does when a
-      rounding difference moves the quadratic's zero at one of its steps.
+    - **Occurrence:** none of the paper's test problems triggers this slowdown, but one of them does when the
+      quadratic's zero at one of that problem's steps is rounded differently.
 
     The paper's proof guarantees only that each step shrinks the interval to at most 70 % of its width. A power step
     evaluates 2 logarithms and a power, so `CARF`'s flop counts can exceed those of the other solvers.
@@ -200,9 +200,9 @@ class CARF(Solver):
         """Return the zero in ``[a, b]`` of the quadratic through ``(a, fa)``, ``(t, ft)`` and ``(b, fb)``.
 
         The quadratic is written around ``t``, as ``q(t + u) = c2 * u^2 + c1 * u + ft``. Of the quadratic's 2 zeros,
-        the one nearer ``t`` is at ``u = ft / c2_u_far`` and the other at ``u = c2_u_far / c2``, with
-        ``c2_u_far = -(c1 + sign(c1) * sqrt(c1^2 - 4 * c2 * ft)) / 2``; these forms avoid the cancellation of the
-        textbook formula.
+        the one nearer ``t`` is at ``u = ft / c2_times_u_far`` and the other at ``u = c2_times_u_far / c2``, with
+        ``c2_times_u_far = -(c1 + sign(c1) * sqrt(c1^2 - 4 * c2 * ft)) / 2``, which is ``c2`` times the ``u`` of the
+        zero farther from ``t``; these forms avoid the cancellation of the textbook formula.
 
         When rounding puts neither zero in ``[a, b]``, the zero farther from ``t`` is returned, and the caller's clip
         moves it into the active interval.
@@ -215,12 +215,12 @@ class CARF(Solver):
             return t - ft / c1
         else:
             discriminant = max(c1 * c1 - 4.0 * c2 * ft, 0.0)
-            c2_u_far = -0.5 * (c1 + math.copysign(math.sqrt(discriminant), c1))
-            zero_near_t = t + ft / c2_u_far
+            c2_times_u_far = -0.5 * (c1 + math.copysign(math.sqrt(discriminant), c1))
+            zero_near_t = t + ft / c2_times_u_far
             if a <= zero_near_t <= b:
                 return zero_near_t
             else:
-                return t + c2_u_far / c2
+                return t + c2_times_u_far / c2
 
     @staticmethod
     def _is_converged(t: float, ft: float, active_width: float, xtol: float) -> bool:

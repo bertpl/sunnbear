@@ -1,12 +1,8 @@
 """This package holds the bracketing solvers, each a subclass of `BracketingSolver` or `Solver` from the solver core.
 
 A solver whose iteration evaluates 1 x-value and splits the interval there subclasses `BracketingSolver`, which owns
-the iteration loop and the stopping criterion. A solver subclasses `Solver` and writes its own loop when any of these
-holds:
-
-- its iteration evaluates the function more than once;
-- it updates the interval in its own way, or keeps x-values besides the interval bounds;
-- its stopping criterion is its own.
+the iteration loop and the stopping criterion. Any other solver subclasses `Solver` and writes its own loop; the
+docstring of `BracketingSolver` lists when that applies.
 
 Each solver is a package of its own, holding its solver module, its built-in configs, and any helper
 modules. Importing this package registers the built-in configs.

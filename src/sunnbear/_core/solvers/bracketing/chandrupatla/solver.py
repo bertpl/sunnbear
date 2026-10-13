@@ -82,7 +82,7 @@ class Chandrupatla(Solver):
             x = x1 + t * (x2 - x1)
             f = state.f(x)
             state.x_best = x
-            # Reorder the x-values into the roles that the class docstring gives x1, x2 and x3, as the listing's step
+            # Reorder the x-values into the class docstring's roles for x1, x2 and x3, as the listing's step
             # "Arrange 2-1-3" does. When f is exactly 0, which branch runs does not matter, because the stopping
             # criterion below then returns x.
             if (f > 0.0) == (f1 > 0.0):

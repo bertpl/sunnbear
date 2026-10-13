@@ -8,8 +8,9 @@ class Bisection(BracketingSolver):
 
     The evaluation count is known in advance: with the interval width ``b - a`` and the tolerance ``xtol``, a
     solve performs ``ceil(log2((b - a) / (2 * xtol)))`` iterations, 1 evaluation each, plus the 2 evaluations at
-    the interval bounds. The solve performs fewer evaluations when a midpoint is an exact root. Rounding changes
-    the count in 2 cases:
+    the interval bounds.
+
+    The solve performs fewer evaluations when a midpoint is an exact root. Rounding changes the count in 2 cases:
 
     - near an ``xtol`` at which the formula's count changes by 1, the rounded midpoints can shift the count by 1
       when ``a`` and ``b`` are not exact binary fractions;
@@ -17,7 +18,7 @@ class Bisection(BracketingSolver):
       ``2 * xtol`` is below that spacing, the midpoint of 2 adjacent floats equals an interval bound, so the
       stopping criterion never holds and the solve ends as ``MAX_FEVALS``.
 
-    The benchmark relies on that count as its reference cost, so it must not change.
+    The benchmark relies on the evaluation count of `Bisection` as its reference cost, so the count must not change.
 
     `Bisection` stops by `BracketingSolver`'s criterion, so the returned x-value lies within ``xtol`` of a root.
 
