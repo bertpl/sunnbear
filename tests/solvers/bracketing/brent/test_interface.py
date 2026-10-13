@@ -16,7 +16,8 @@ def test_name_version_and_that_its_arithmetic_is_counted():
 
 
 def test_the_stopping_test_counts_both_of_its_comparisons():
-    """A solve that stops at its first stopping test counts both comparisons of that test, 8 comparisons in all.
+    """A solve that stops at its first stopping test counts both comparisons of that test, and 8 comparisons in the
+    whole solve.
 
     Both comparisons of the stopping test count because Algol 60 evaluates both operands of a Boolean operator. The 8
     comparisons are:

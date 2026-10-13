@@ -32,6 +32,7 @@ def test_name_version_and_that_its_arithmetic_is_counted():
     result = ITP(n_slack=4, variant=ITPVariant.PAPER_EXPERIMENTS).solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=40)
 
     # --- assert -----------------------
+    # Each iteration evaluates 1 point; the other 2 evaluations are at the bounds of the initial interval.
     n_iterations = result.n_fevals - 2
     assert (ITP.name, ITP.version) == ("itp", 2)
     assert result.flop_counts.LOG2 == 1

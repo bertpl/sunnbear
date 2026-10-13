@@ -12,8 +12,8 @@ class ITPState(SolveState):
     Attributes:
         kappa_1: The paper's truncation constant ``kappa_1``, which `ITP._solve` sets from the width of the initial
             interval.
-        n_max: The iteration bound ``n_max``, defined in the `ITP` docstring; `ITP._solve` sets it from the initial
-            interval.
+        n_max: The iteration bound ``n_max`` that the `ITP` docstring defines; `ITP._solve` sets ``n_max`` from the
+            initial interval.
         k: The number of the current iteration, counted from 0; `ITP._next_x` increments it.
     """
 

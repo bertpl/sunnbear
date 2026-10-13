@@ -77,9 +77,9 @@ class Brent(Solver):
         - ``p / q`` is the interpolation step, computed as a separate numerator and denominator so that the division
           ``p / q`` runs only once the step is accepted.
 
-        Each test that combines 2 comparisons uses ``|`` or ``&``, not ``or`` or ``and``: Algol 60's Boolean operators
-        evaluate both operands, where Python's ``or`` and ``and`` skip the second operand once the first one determines
-        the result, so the flop count includes both comparisons, as in Brent's procedure.
+        Each test that combines 2 comparisons uses ``|`` or ``&``, which evaluate both operands, as Algol 60's Boolean
+        operators do. Python's ``or`` and ``and`` skip the second operand once the first one determines the result.
+        With ``|`` and ``&``, the flop count includes both comparisons, as in Brent's procedure.
 
         Each iteration:
 
