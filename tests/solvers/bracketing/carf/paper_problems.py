@@ -9,7 +9,7 @@ from tests.solvers.paper_problems.chandrupatla import CHANDRUPATLA_FUNCTIONS
 # the kind of step.
 _STEP_CHOICE_DEVIATION_REASON = (
     "h lies within rounding error of a limit that CARF compares h with to choose the kind of step, so the count "
-    "depends on how the paper's code computes 2 values: the root of the quadratic through the 3 points, and the power "
+    "depends on how the paper's code computes 2 values: the zero of the quadratic through the 3 points, and the power "
     "step"
 )
 _LAST_STEP_DEVIATION_REASON = (

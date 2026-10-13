@@ -6,9 +6,9 @@ from .solver import RegulaFalsi
 
 
 class RegulaFalsiConfig(SolverConfig):
-    """`RegulaFalsiConfig` is reported for information only.
+    """`RegulaFalsiConfig` is a secondary config of `RegulaFalsi`.
 
-    The classic method stalls too often to characterize the test functions reliably.
+    It is not core because the classic method stalls too often to characterize the test functions reliably.
     """
 
     solver_cls = RegulaFalsi

@@ -7,16 +7,19 @@ from sunnbear._core.utils.floats import FLOAT64_EPS
 class Brent(Solver):
     """`Brent` implements Brent's method, as the Algol 60 procedure ``zero`` (Brent, 1971).
 
-    Each iteration evaluates 1 point, reached by 1 of 3 steps from the best point so far:
+    Each iteration evaluates 1 x-value, reached by 1 of 3 steps from the best estimate so far:
 
-    - inverse quadratic interpolation through the last 3 points;
-    - linear interpolation, a secant step, when only 2 distinct points are known;
+    - inverse quadratic interpolation through the last 3 x-values;
+    - linear interpolation, a secant step, when only 2 distinct x-values are known;
     - bisection, in 2 cases:
 
       - forced, when the step before the previous one was shorter than the tolerance ``tol`` (defined below), or
         when the last step did not reduce ``|f|``;
-      - in place of an interpolation step that lands more than 3/4 of the way from the best point to the other
-        bound, or that is not shorter than half the step before the previous one.
+      - in place of an interpolation step that:
+
+        - does not stop at least ``tol / 2`` before the x-value 3/4 of the way from the best estimate to the other
+          bound;
+        - is not shorter than half the step before the previous one.
 
     A step shorter than the tolerance is lengthened to the tolerance, toward the bound on the other side of the root.
     As long as ``tol`` stays positive, these rules guarantee that the solve converges within a bounded number of
@@ -26,9 +29,12 @@ class Brent(Solver):
 
     - ``b`` and ``c`` are the interval bounds, ``b`` the one with the smaller ``|f|``, which is the best estimate;
     - ``m`` is half the signed width of the interval, from ``b`` toward ``c``;
-    - ``tol = 2 * macheps * |b| + t`` is the tolerance, with ``macheps`` the relative machine precision
-      (`FLOAT64_EPS`) and ``t`` an absolute tolerance derived from ``xtol`` (below); the solve ends once
-      ``|m| <= tol`` or ``f(b) = 0``, and returns ``b``.
+    - ``tol = 2 * macheps * |b| + t`` is the tolerance, with ``macheps`` set to `FLOAT64_EPS` and ``t`` an absolute
+      tolerance derived from ``xtol`` (below); the solve ends once ``|m| <= tol`` or ``f(b) = 0``, and returns ``b``.
+
+    `FLOAT64_EPS` is 2^-52, the value that SciPy and Numerical Recipes use. Brent (1971) defines ``macheps`` as the
+    relative machine precision, which is 2^-53 in rounded float64 arithmetic, and also allows a larger
+    ``macheps``.
 
     Brent's procedure returns a ``b`` within ``6 * macheps * |x| + 2 * t`` of a root ``x``. The solver sets
     ``t = (xtol - 6 * macheps * max(|a0|, |b0|)) / 2``, with ``a0`` and ``b0`` the bounds of the initial interval,
@@ -47,24 +53,26 @@ class Brent(Solver):
           https://doi.org/10.1093/comjnl/14.4.422
         - Brent, R. P. (1973). Algorithms for Minimization without Derivatives, chapter 4. Prentice-Hall. The test
           suite reproduces the rows of its Table 4.1 whose functions do not underflow near the root.
-        - SciPy's ``scipy.optimize.brentq``; the test suite checks `Brent` against ``scipy.optimize.brentq``.
+        - SciPy's ``scipy.optimize.brentq``, whose tolerance ``(xtol + rtol * |b|) / 2`` equals ``tol`` when SciPy's
+          ``xtol`` is ``2 * t`` and its ``rtol`` is ``4 * macheps``; the test suite checks `Brent` against
+          ``scipy.optimize.brentq``.
         - Third parties that publish evaluation counts of Brent's method, which the test suite reproduces:
 
           - Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear
-            function without using derivatives. Advances in Engineering Software 28(3), 145-149. The column "Brent's"
-            of its Table 2. https://doi.org/10.1016/S0965-9978(96)00051-8
+            function without using derivatives. Advances in Engineering Software 28(3), 145-149. Its Table 2
+            holds the column "Brent's". https://doi.org/10.1016/S0965-9978(96)00051-8
           - Alefeld, G. E., Potra, F. A. and Shi, Y. (1995). Algorithm 748: Enclosing zeros of continuous functions.
-            ACM Transactions on Mathematical Software 21(3), 327-344. The column "BR" of its Tables II and IV to VI.
+            ACM Transactions on Mathematical Software 21(3), 327-344. Its Tables II and IV to VI hold the column "BR".
             https://doi.org/10.1145/210089.210111
           - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of
-            an equation. BIT 13(3), 253-264. The column "Brent" of its Examples 1 to 7.
+            an equation. BIT 13(3), 253-264. Its Examples 1 to 7 hold the column "Brent".
             https://doi.org/10.1007/BF01951936
     """
 
     name = "brent"
     version = 1
 
-    def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the line-by-line match with Brent's procedure
+    def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with Brent's Algol procedure
         """Run Brent's procedure and return ``b``.
 
         The variables keep the names of the Algol procedure, and comments mark where its labels ``int`` and ``ext``
@@ -123,8 +131,8 @@ class Brent(Solver):
                 # s keeps the step before the previous one, and e the previous step.
                 s = e
                 e = d
-                # Accept the interpolation step only if it lands less than 3/4 of the way from b to c and is
-                # shorter than half the step before the previous one; otherwise bisect.
+                # Accept the interpolation step only if it stops at least tol / 2 before the x-value 3/4 of the way
+                # from b to c, and is shorter than half the step before the previous one; otherwise bisect.
                 if 2.0 * p < 3.0 * m * q - abs(tol * q) and p < abs(0.5 * s * q):
                     d = p / q
                 else:

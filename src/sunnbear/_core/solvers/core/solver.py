@@ -35,7 +35,7 @@ class Solver(ABC, Generic[StateT]):
     ``__init__``; `solve` has a fixed signature, so all solvers are driven
     identically. Instances are immutable configuration, safe to share across
     solves: everything that changes during a solve lives in the `SolveState`
-    that `solve` creates and hands to the algorithm.
+    that `solve` creates and hands to the algorithm, or in local variables of `_solve`.
 
     Class attributes:
         name: Canonical identifier fragment, e.g. ``"bisection"``; with
@@ -43,9 +43,10 @@ class Solver(ABC, Generic[StateT]):
             benchmark results.
         version: Bumped on any behavior change, so results from different
             versions of one solver are never combined unknowingly.
-        state_cls: The `SolveState` class that `solve` instantiates. A solver
-            that carries values between iterations names its own subclass here
-            and binds ``StateT`` to it; a memoryless solver leaves ``state_cls`` and ``StateT`` at their defaults.
+        state_cls: The `SolveState` class that `solve` instantiates. A `BracketingSolver` subclass that carries
+            values between iterations names its own subclass here and binds ``StateT`` to it. Every other solver
+            leaves ``state_cls`` and ``StateT`` at their defaults: a solver with its own loop keeps such values in
+            local variables of `_solve`.
     """
 
     name: ClassVar[str]
@@ -150,7 +151,7 @@ class Solver(ABC, Generic[StateT]):
         """Run the algorithm on `state` and return the root estimate.
 
         - Evaluate the function only through ``state.f``, and let its interrupts propagate.
-        - Keep ``state.x_best`` current, so an interrupted solve still reports a meaningful ``x``.
+        - Keep ``state.x_best`` current, so an interrupted solve still reports the solver's latest estimate as ``x``.
         """
 
 
@@ -160,17 +161,23 @@ class Solver(ABC, Generic[StateT]):
 class BracketingSolver(Solver[StateT]):
     """`BracketingSolver` is the base class for interval-reducing solvers; a subclass implements one `_next_x`.
 
-    A bracketing solver is defined by what it does each iteration: pick a point inside the interval,
-    evaluate the function there, and keep the half that still holds the sign change.
+    A bracketing solver is defined by what it does each iteration:
 
-    The base class owns the evaluation and the split; only the choice of the point is left to the
+    - pick an x-value inside the interval;
+    - evaluate the function there;
+    - keep the part of the interval that still holds the sign change.
+
+    The base class owns the evaluation and the split; only the choice of the x-value is left to the
     subclass. It cannot evaluate the function itself, split the interval wrongly, or define a wrong
-    stopping criterion (`Interval.is_converged`); the base class does all three.
+    stopping criterion (`Interval.is_converged`); the base class does all 3.
 
     One `_next_x` is one iteration. A solver that carries values between iterations keeps them on its
-    `SolveState` subclass (see `Solver.state_cls`). A solver whose iteration evaluates the function
-    more than once, or updates the interval in its own way, overrides `_solve` on `Solver` directly,
-    instead of implementing `_next_x`.
+    `SolveState` subclass (see `Solver.state_cls`). A solver subclasses `Solver` directly and writes its own
+    `_solve` when any of these holds:
+
+    - its iteration evaluates the function more than once;
+    - it updates the interval in its own way, or keeps x-values besides the interval bounds;
+    - its stopping criterion is its own.
     """
 
     def _solve(self, state: StateT) -> float:
@@ -180,12 +187,12 @@ class BracketingSolver(Solver[StateT]):
         while not interval.is_converged(xtol_doubled):
             x = self._next_x(state, interval)
             interval = interval.split_at(x, state.f(x))
-            state.x_best = x  # This is the last evaluated point, so a stalled solver still reports its best estimate.
+            state.x_best = x  # The last evaluated x-value is the solver's latest estimate.
         return interval.root()
 
     @abstractmethod
     def _next_x(self, state: StateT, interval: Interval) -> float:
-        """Return the interval's next evaluation point, strictly inside ``interval``.
+        """Return the next x-value to evaluate, strictly inside ``interval``.
 
         Read the function values at the interval bounds from ``interval``, and any value carried
         between iterations from ``state``; do not evaluate the function here.

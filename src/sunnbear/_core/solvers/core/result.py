@@ -20,7 +20,7 @@ class SolveStatus(Enum):
 
     - its result lies outside ``[a, b]``;
     - the function failed at an ``x`` outside ``[a, b]``;
-    - the solve ended with `DivergedError`: the solver's next point is not finite.
+    - the solve ended with `DivergedError`: the solver's next x-value is not finite.
 
     A function failure inside the interval is ``FUNCTION_ERROR``.
     """
@@ -44,8 +44,8 @@ class SolveResult:
     diagnostics of its own logs them; it cannot attach them here.
 
     Attributes:
-        x: Root estimate. On an abnormal status, the best estimate so far (for
-            a bracketing solver, its last evaluated point).
+        x: Root estimate. On an abnormal status, the solver's latest estimate, which
+            the benchmark does not use to judge the solve.
         status: How the solve ended; see `SolveStatus`.
         n_fevals: Function evaluations performed, the 2 evaluations at the
             interval bounds included.

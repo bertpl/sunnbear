@@ -6,8 +6,8 @@ from sunnbear._core.solvers.core import Solver, SolveState
 class SteffenBrent(Solver):
     """`SteffenBrent` implements the modified Brent method of Steffen et al. (2025), as the paper's Algorithm 2.
 
-    The method keeps 2 interval bounds, ``a`` and ``b``; ``b`` is the bound with the smaller ``|f|``, and is the best
-    estimate of the root. Each iteration evaluates a new x-value ``s``, from 1 of 3 steps:
+    `SteffenBrent` keeps 2 interval bounds, ``a`` and ``b``; ``b`` is the bound with the smaller ``|f|``, and is the
+    best estimate of the root. Each iteration evaluates a new x-value ``s``, from 1 of 3 steps:
 
     - inverse quadratic interpolation through ``a``, ``b`` and ``b_previous``, the previous value of ``b``, when the 3
       function values are distinct;
@@ -21,7 +21,7 @@ class SteffenBrent(Solver):
     ``s`` becomes the new ``b``, and the new ``a`` is chosen so that the interval keeps the root:
 
     - when ``f(a)`` and ``f(s)`` have the same sign, the old ``b`` becomes the new ``a``, as in Brent's method;
-    - otherwise the root lies between ``a`` and ``s``, and the method evaluates their midpoint ``m = (a + s) / 2``;
+    - otherwise the root lies between ``a`` and ``s``, and `SteffenBrent` evaluates their midpoint ``m = (a + s) / 2``;
       when ``f(m)`` and ``f(s)`` differ in sign, ``m`` becomes the new ``a``.
 
     The second case is the paper's modification of Brent's method. Finally, ``a`` and ``b`` swap where needed, so that
@@ -64,6 +64,9 @@ class SteffenBrent(Solver):
       of ``(a + b) / 2``;
     - when ``f(a)`` and ``f(s)`` have the same sign, the new interval from ``b`` to ``s`` can keep up to 3/4 of the
       old interval.
+
+    Signs of function values are compared directly, where the paper multiplies them: the product of 2 small function
+    values can underflow to 0.
 
     An iteration can evaluate the function twice, and the stopping criterion is the paper's own, so `SteffenBrent`
     writes its own loop, not `BracketingSolver`'s.

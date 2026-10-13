@@ -6,7 +6,10 @@ from .solver import Bisection
 
 
 class BisectionConfig(SolverConfig):
-    """`BisectionConfig` is the benchmark's baseline: its exact evaluation count is the reference cost."""
+    """`BisectionConfig` is the baseline config of `Bisection`.
+
+    Its evaluation count is the benchmark's reference cost.
+    """
 
     solver_cls = Bisection
     role = SolverRole.BUILTIN_BASELINE

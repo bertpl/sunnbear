@@ -8,7 +8,7 @@ from .state import IllinoisState
 class Illinois(BracketingSolver[IllinoisState]):
     """`Illinois` is regula falsi that halves the function value of a bound that the interval keeps twice in a row.
 
-    Like regula falsi, it evaluates where the chord through the bound points crosses zero.
+    Like regula falsi, it evaluates the zero of the chord through ``(a, f(a))`` and ``(b, f(b))``.
 
     Regula falsi stalls when the function is convex or concave on the interval: it keeps 1 bound forever, so the
     interval never shrinks below the distance from that bound to the root. The Illinois method (Dowell and
@@ -25,6 +25,8 @@ class Illinois(BracketingSolver[IllinoisState]):
     the function value that `Illinois` uses at ``x0``, halved once for each iteration that kept ``x0`` again.
 
     In exact arithmetic, this is the x-value of the chord formula that `RegulaFalsi` computes.
+
+    `Illinois` stops by `BracketingSolver`'s criterion, so the returned x-value lies within ``xtol`` of a root.
 
     References:
         - Dowell, M. and Jarratt, P. (1971). A modified regula falsi method for computing the root of an
@@ -46,8 +48,8 @@ class Illinois(BracketingSolver[IllinoisState]):
         """Return where the chord crosses zero, with the retained bound's value halved as the class docstring says.
 
         Before computing the chord, update ``state.scaled_retained_f`` and ``state.newest_bound`` from the bound
-        that the previous iterate replaced. This update is correct only when exactly 1 new evaluation happened
-        since the previous call.
+        that the previous call's returned x-value replaced. This update is correct only when exactly 1 new
+        evaluation happened since the previous call.
         """
         # --- update the retained bound's value --
         replaced_bound = interval.last_replaced_bound

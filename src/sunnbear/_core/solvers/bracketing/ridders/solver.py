@@ -1,4 +1,4 @@
-"""`Ridders` implements Ridders' method: each iteration evaluates the midpoint, then a point from an exponential fit."""
+"""`Ridders` implements Ridders' method: each iteration evaluates the midpoint, then the zero of an exponential fit."""
 
 import math
 
@@ -24,16 +24,15 @@ class Ridders(Solver):
     The paper gives no formula for when to stop, only that the procedure can end once a given accuracy is reached.
     ``variant`` therefore picks 1 of the 3 values of `RiddersVariant`, each from a reference implementation:
 
-    - ``"commons_math"``, the stopping criterion of Apache Commons Math's ``RiddersSolver``, close to that of
-      Numerical Recipes' ``zriddr``: the solve stops once 2 successive iterates lie at most ``xtol`` apart, and
-      returns the last one. On a function that is not smooth, that iterate often lies more than ``xtol`` from the
-      true root.
+    - ``"commons_math"``, the stopping criterion of Apache Commons Math's ``RiddersSolver``: the solve stops once
+      2 successive iterates lie at most ``xtol`` apart, and returns the last one. That iterate can lie more than
+      ``xtol`` from a root, as on a function with a kink or with a multiple root.
     - ``"scipy"``, SciPy's ``ridder``: the step from ``x1`` is limited to ``d - xtol / 2``, so that ``x3`` lies at
       least ``xtol / 2`` inside the interval. The solve stops once the interval is narrower than ``xtol``, and
       returns the last iterate. SciPy adds a relative term to its tolerance; this variant leaves it out, so that its
-      root always lies within ``xtol`` of the true root.
+      returned x-value always lies within ``xtol`` of a root.
     - ``"bracketing_solver"``, the stopping criterion of `BracketingSolver`: the solve stops once the interval is at
-      most ``2 * xtol`` wide, and returns its midpoint, which always lies within ``xtol`` of the true root.
+      most ``2 * xtol`` wide, and returns its midpoint, which always lies within ``xtol`` of a root.
 
     SciPy's limit on the step makes the evaluation count of ``"scipy"`` vary far less between near-identical functions
     than that of ``"bracketing_solver"``. Near the root, the root lies in the half between ``x1`` and 1 bound, and
@@ -53,12 +52,15 @@ class Ridders(Solver):
           Transactions on Circuits and Systems 26(11), 979-980. The test suite reproduces the first iteration of the
           paper's example, and the iterates of its Section III. https://doi.org/10.1109/TCS.1979.1084580
         - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section
-          9.2.1. Cambridge University Press. The book's routine ``zriddr`` is close to the ``"commons_math"``
-          variant.
+          9.2.1. Cambridge University Press. The book's routine ``zriddr`` also stops once 2 successive iterates
+          lie within its tolerance, with 2 differences:
+
+          - it compares the newest iterate with the previous one before evaluating the newest, and returns the
+            previous one;
+          - it also stops once the interval is at most its tolerance wide.
         - SciPy's ``scipy.optimize.ridder``, which the ``"scipy"`` variant follows; the test suite checks `Ridders`
           against ``scipy.optimize.ridder``.
-        - Apache Commons Math's ``org.apache.commons.math4.legacy.analysis.solvers.RiddersSolver``, whose stopping
-          criterion the ``"commons_math"`` variant follows.
+        - Apache Commons Math's ``RiddersSolver``, whose stopping criterion the ``"commons_math"`` variant follows.
     """
 
     name = "ridders"
