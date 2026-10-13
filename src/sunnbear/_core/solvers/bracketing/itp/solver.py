@@ -14,8 +14,9 @@ from .variant import ITPVariant
 _KAPPA_1_TIMES_INITIAL_WIDTH = 0.2
 _KAPPA_2 = 2
 
-# The base of the power ``2^(n_max - k)`` in the projection radius, as a `CountedFloat`, so that the power is counted.
-_TWO = CountedFloat(2.0)
+# `_COUNTED_TWO` is the base of the power ``2^(n_max - k)`` in the projection radius; it is a `CountedFloat` so that
+# the power is counted.
+_COUNTED_TWO = CountedFloat(2.0)
 
 
 class ITP(BracketingSolver[ITPState]):
@@ -130,7 +131,7 @@ class ITP(BracketingSolver[ITPState]):
             x_t = x_half
 
         # --- projection -------------------------
-        r = state.xtol * _TWO ** (state.n_max - state.k) - 0.5 * interval.width
+        r = state.xtol * _COUNTED_TWO ** (state.n_max - state.k) - 0.5 * interval.width
         state.k += 1
         if self.variant is ITPVariant.PAPER_EXPERIMENTS:
             # Apply the margin of the authors' MATLAB code; the class docstring describes its 2 effects.
