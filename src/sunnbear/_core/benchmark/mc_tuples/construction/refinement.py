@@ -1,7 +1,7 @@
 """`MCTuplesRefinementSolve` moves each new tuple of a size within its fine cell, in the size's second max-div solve.
 
 The selection solve (`selection`) draws only a few candidates per fine cell, and picks each new tuple among them; the
-first mean correction then moves the new tuples (`correction`).
+first value correction then moves the new tuples (`correction`).
 
 The refinement solve draws a population only in the fine cells of the corrected new tuples: each corrected tuple,
 followed by many candidates inside its fine cell (`MCTuplesPopulation.draw_in_fine_cells_of`).
@@ -45,7 +45,7 @@ class MCTuplesRefinementSolve(MCTuplesSolve):
     ) -> None:
         """Draw the population in the fine cells of the new tuples in `initial_tuple_array`.
 
-        `initial_tuple_array` holds the size's tuples after the first mean correction: the size below's tuples first,
+        `initial_tuple_array` holds the size's tuples after the first value correction: the size below's tuples first,
         then the new tuples. Drawing the population advances `settings.rng`.
         """
         self.n_random_candidates_per_cell = n_random_candidates_per_cell

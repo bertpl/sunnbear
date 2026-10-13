@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Make every u value and v value of the tuple sets that `generate_mc_tuples` builds hold at least 50 bits of information, as `MCTuples.bit_stats()` measures them
 - Make each size of the tuple sets that `generate_mc_tuples` builds span the full range of u and of v, to within 1/1024 at each end
 - Improve the spread of the tuple sets of size 64 and up that `generate_mc_tuples` builds
 - Improve the spread statistics of the tuple sets that `generate_mc_tuples` builds

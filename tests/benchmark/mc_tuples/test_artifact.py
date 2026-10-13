@@ -8,6 +8,7 @@ import pytest
 from sunnbear._core.artifacts import ArtifactError
 from sunnbear._core.artifacts.listing import artifact_manifest
 from sunnbear._core.benchmark.mc_tuples import (
+    MIN_N_BITS,
     N_FINE_LANES,
     MCTuples,
     MCTuplesDeclaration,
@@ -93,6 +94,27 @@ def test_each_shipped_size_holds_a_tuple_in_both_outer_fine_lanes_of_each_axis(s
     # --- assert -----------------------
     for values in (tuples.u, tuples.v):
         assert {0, N_FINE_LANES - 1} <= set(fine_lanes_of(values).tolist())
+
+
+# A shipped set built on or before this date may hold values with fewer than `MIN_N_BITS` bits of information, so the
+# test below skips it.
+_MIN_N_BITS_REACHED_AFTER = datetime.date(2026, 10, 13)
+
+
+def test_every_shipped_value_holds_at_least_min_n_bits():
+    """Every u value and v value of the shipped set holds at least `MIN_N_BITS` bits of information."""
+    # --- arrange ----------------------
+    if artifact_manifest("mc_tuples").build_date <= _MIN_N_BITS_REACHED_AFTER:
+        pytest.skip(
+            "The shipped set was built before the construction gave every value MIN_N_BITS bits; remove this "
+            "condition once the set is regenerated."
+        )
+
+    # --- act --------------------------
+    bit_stats = load_mc_tuples(max(MCTuplesSize)).bit_stats()
+
+    # --- assert -----------------------
+    assert min(bit_stats.min_n_bits_u, bit_stats.min_n_bits_v) >= MIN_N_BITS
 
 
 def test_load_mc_tuples_rejects_an_unsupported_size():

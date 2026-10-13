@@ -66,24 +66,6 @@ def test_draw_over_eligible_fine_lanes_skips_the_free_fine_lanes_of_gaps_without
         assert np.unique(lanes).size == N_FINE_LANES - 12
 
 
-def test_positions_in_lane_move_a_draw_of_exactly_0_to_the_middle_of_its_lane():
-    """A position of exactly 0 would put a candidate on the edge of the unit square; it becomes 0.5."""
-
-    # --- arrange ----------------------
-    class _ZerosFirst:
-        """`_ZerosFirst` stands in for a random generator whose `random` draws 0 first."""
-
-        def random(self, n: int) -> np.ndarray:
-            """Return 0 followed by 0.25's."""
-            return np.concatenate([[0.0], np.full(n - 1, 0.25)])
-
-    # --- act --------------------------
-    positions = MCTuplesPopulation._positions_in_lane(3, _ZerosFirst())  # type: ignore[arg-type]
-
-    # --- assert -----------------------
-    assert positions.tolist() == [0.5, 0.25, 0.25]
-
-
 def test_draw_in_fine_cells_of_puts_each_tuple_first_and_its_candidates_inside_its_fine_cell():
     """Each of the 3 tuples is followed by its 5 candidates, which all lie in its fine cell, at distinct positions."""
     # --- arrange ----------------------

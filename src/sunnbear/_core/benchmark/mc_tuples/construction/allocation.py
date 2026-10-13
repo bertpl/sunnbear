@@ -4,7 +4,7 @@ On each axis, every tuple of the size below occupies 1 fine lane. A gap is a max
 occupied fine lanes, or between an occupied fine lane and an edge of the axis (`MCTuplesAxisGaps`).
 
 The size's max-div solve puts exactly the allocated number of new tuples into each gap, and spreads them about evenly
-inside it. So the allocation sets where the size's mean lies, and with it how far the first mean correction, which runs
+inside it. So the allocation sets where the size's mean lies, and with it how far the first value correction, which runs
 right after the selection solve, has to move the new tuples.
 
 The allocation comes in 2 stages:
@@ -13,7 +13,7 @@ The allocation comes in 2 stages:
    the tuple; a gap's spacing is the distance between its neighboring values once its new tuples are spread evenly
    over it, as `MCTuplesAxisGapPlacement` in the `placement` module places them;
 2. **mean-aware:** starting from the greedy allocation, a local search moves new tuples between gaps, 1 at a time, to
-   raise the predicted smallest spacing after the first mean correction
+   raise the predicted smallest spacing after the first value correction
    (`MCTuplesAxisGapPlacement.corrected_min_spacing`):
    - the estimate is the predicted smallest spacing minus the absolute predicted offset of the size's mean from 0.5,
      both in fine lanes, with the offset weighted by `MCTuplesAxisGapPlacement.offset_weight`;

@@ -1,15 +1,17 @@
-"""The mean correction moves only the new tuples, brings the mean to exactly 0.5 when it can, and never puts 2 tuples
-in 1 fine lane."""
+"""The value correction moves only the new tuples, brings the mean to exactly 0.5 when it can, nudges each new value to
+at least `MIN_N_BITS` bits, and never puts 2 tuples in 1 fine lane."""
 
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructionError, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples import MIN_N_BITS, N_FINE_LANES, MCTuplesConstructionError, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples.construction import correction as correction_module
 from sunnbear._core.benchmark.mc_tuples.construction.correction import (
     CAP_RANGE,
-    MCTuplesAxisMeanCorrection,
-    MCTuplesMeanCorrection,
+    MCTuplesAxisValueCorrection,
+    MCTuplesValueCorrection,
 )
+from sunnbear._core.utils.float_bits import n_bits
 
 
 def _random_axis(seed: int) -> tuple[np.ndarray, np.ndarray]:
@@ -27,18 +29,20 @@ def _random_axis(seed: int) -> tuple[np.ndarray, np.ndarray]:
 @pytest.mark.parametrize("seed", range(40))
 def test_the_correction_keeps_the_fine_lanes_the_order_and_the_size_below_and_moves_the_new_ones_1_way(seed):
     """On random axes, no fine lane ends with 2 tuples, the values of the size below and the order stay, every new
-    tuple moves toward the same side, and the mean reaches 0.5 unless the cap ends at its lower bound."""
+    tuple moves toward the same side apart from a nudge of a few float64 steps, and the mean reaches 0.5 unless the cap
+    ends at its lower bound."""
     # --- arrange ----------------------
     required, new = _random_axis(seed)
 
     # --- act --------------------------
-    correction = MCTuplesAxisMeanCorrection.of(required, new)
+    correction = MCTuplesAxisValueCorrection.of(required, new)
 
     # --- assert -----------------------
     all_after = np.concatenate([required, correction.corrected_new_values])
     assert np.bincount(fine_lanes_of(all_after)).max() == 1
     assert np.array_equal(np.argsort(np.concatenate([required, new])), np.argsort(all_after))
     moves = correction.corrected_new_values - new
+    moves = moves[np.abs(moves) > 1e-12]
     assert np.all(moves <= 0) or np.all(moves >= 0)
     assert np.all((all_after > 0) & (all_after < 1))
     if correction.cap > CAP_RANGE[0] * 1.001:
@@ -54,7 +58,7 @@ def test_the_correction_takes_the_shift_from_the_largest_spacings():
     required, new = np.array([0.1, 0.9]), np.array([0.3, 0.75])
 
     # --- act --------------------------
-    correction = MCTuplesAxisMeanCorrection.of(required, new)
+    correction = MCTuplesAxisValueCorrection.of(required, new)
 
     # --- assert -----------------------
     assert np.concatenate([required, correction.corrected_new_values]).mean() == pytest.approx(0.5)
@@ -72,18 +76,50 @@ def test_the_correction_takes_the_shift_from_the_largest_spacings():
     ],
 )
 def test_the_correction_leaves_a_new_tuple_in_an_outer_fine_lane_in_place(outer_value, other_new_values, required):
-    """A new tuple in fine lane 0 or in the last fine lane stays where it is, and the other new tuples bring the mean
-    to 0.5."""
+    """A new tuple in fine lane 0 or in the last fine lane stays where it is in the mean correction, and the other new
+    tuples bring the mean to 0.5."""
     # --- arrange ----------------------
     new = np.array([outer_value, *other_new_values])
 
     # --- act --------------------------
-    correction = MCTuplesAxisMeanCorrection.of(np.array(required), new)
+    correction = MCTuplesAxisValueCorrection.of(np.array(required), new)
 
     # --- assert -----------------------
-    assert correction.corrected_new_values[0] == outer_value
+    # The mean correction leaves the outer value in place, and the nudge moves it by a few float64 steps at most.
+    assert correction.corrected_new_values[0] == pytest.approx(outer_value, abs=1e-15)
     assert np.all(correction.corrected_new_values[1:] != new[1:])
     assert np.concatenate([required, correction.corrected_new_values]).mean() == pytest.approx(0.5, abs=1e-12)
+
+
+def test_the_correction_nudges_each_new_value_below_min_n_bits_within_its_fine_lane():
+    """On an axis whose mean is already 0.5, a new value at a fine-lane center holds few bits; it moves by a few
+    float64 steps to a value with at least `MIN_N_BITS` bits, in its own fine lane, and the mean stays 0.5."""
+    # --- arrange ----------------------
+    required = np.array([0.7718281828459045])
+    new = np.array([200.5 / N_FINE_LANES, 0.0])
+    new[1] = 1.5 - required[0] - new[0]  # This value has many bits and puts the mean at 0.5.
+    new_lanes = fine_lanes_of(new)
+
+    # --- act --------------------------
+    correction = MCTuplesAxisValueCorrection.of(required, new)
+
+    # --- assert -----------------------
+    assert correction.n_nudged == 1
+    assert n_bits(float(correction.corrected_new_values[0])) >= MIN_N_BITS
+    assert correction.corrected_new_values[0] == pytest.approx(new[0], abs=1e-15)
+    assert np.array_equal(fine_lanes_of(correction.corrected_new_values), new_lanes)
+    assert np.concatenate([required, correction.corrected_new_values]).mean() == pytest.approx(0.5, abs=1e-12)
+
+
+def test_the_nudge_refuses_a_value_whose_fine_lane_holds_no_value_with_min_n_bits_near_it(monkeypatch):
+    """When the search for a value with `MIN_N_BITS` bits finds none in a value's fine lane, the correction raises an
+    error."""
+    # --- arrange ----------------------
+    monkeypatch.setattr(correction_module, "nearest_float_with_min_n_bits", lambda *args: None)
+
+    # --- act / assert -----------------
+    with pytest.raises(MCTuplesConstructionError, match="No value with at least"):
+        MCTuplesAxisValueCorrection.of(np.array([0.25]), np.array([0.75]))
 
 
 def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_the_rest():
@@ -91,7 +127,7 @@ def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_th
     needs: it stops just above the fine lane of the tuple at 0.9, and the correction reports the offset that
     remains."""
     # --- act --------------------------
-    correction = MCTuplesAxisMeanCorrection.of(np.array([0.9]), np.array([0.95]))
+    correction = MCTuplesAxisValueCorrection.of(np.array([0.9]), np.array([0.95]))
 
     # --- assert -----------------------
     required_value_lane_right_edge = (np.floor(0.9 * N_FINE_LANES) + 1) / N_FINE_LANES
@@ -102,13 +138,13 @@ def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_th
     )
 
 
-def test_mean_correction_corrects_both_axes_of_a_size():
+def test_value_correction_corrects_both_axes_of_a_size():
     """The tuples of the size below come first and stay; both axes' means end at 0.5."""
     # --- arrange ----------------------
     tuple_array = np.array([[0.2, 0.8], [0.7, 0.3], [0.45, 0.65], [0.95, 0.15]])
 
     # --- act --------------------------
-    correction = MCTuplesMeanCorrection.of(tuple_array, n_required=2)
+    correction = MCTuplesValueCorrection.of(tuple_array, n_required=2)
 
     # --- assert -----------------------
     assert correction.tuple_array[:2].tolist() == tuple_array[:2].tolist()
@@ -117,7 +153,7 @@ def test_mean_correction_corrects_both_axes_of_a_size():
     assert correction.v.corrected_new_values.tolist() == correction.tuple_array[2:, 1].tolist()
 
 
-def test_mean_correction_refuses_a_size_that_holds_2_tuples_in_1_fine_lane():
+def test_value_correction_refuses_a_size_that_holds_2_tuples_in_1_fine_lane():
     """A tuple of the size below and a new tuple that share a fine lane, on an axis whose mean is already 0.5, still
     share it after the correction, which raises an error."""
     # --- arrange ----------------------
@@ -126,4 +162,4 @@ def test_mean_correction_refuses_a_size_that_holds_2_tuples_in_1_fine_lane():
 
     # --- act / assert -----------------
     with pytest.raises(MCTuplesConstructionError, match="a fine u-lane holds 2 tuples"):
-        MCTuplesMeanCorrection.of(tuple_array, n_required=2)
+        MCTuplesValueCorrection.of(tuple_array, n_required=2)

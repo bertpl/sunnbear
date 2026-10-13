@@ -8,14 +8,16 @@ tuples of the set share a fine lane.
 
 1. it allocates the new tuples to the gaps that the size below leaves on each axis, so that the size's predicted mean
    lies close to 0.5 (`allocation`);
-2. it draws the size's population of candidate tuples over the fine lanes of the gaps that get new tuples
-   (`population`);
+2. it draws the size's population of candidate tuples over the fine lanes of the gaps that get new tuples, each value
+   with at least `MIN_N_BITS` bits of information (`population`);
 3. the selection solve, a max-div solve, picks the new tuples from the population (`selection`);
-4. the first mean correction moves the new tuples so that the size's mean u and mean v are exactly 0.5
+4. the first value correction moves the new tuples so that the size's mean u and mean v are exactly 0.5, then moves
+   each new value with fewer than `MIN_N_BITS` bits by a few float64 steps to a value with at least `MIN_N_BITS` bits
    (`correction`);
 5. the refinement solve, a second max-div solve, moves each new tuple within its fine cell, the crossing of its fine
    u-lane and fine v-lane; its candidates lie only in the fine cells of the corrected new tuples (`refinement`);
-6. the second mean correction brings the means back to 0.5, after the refinement moved them (`correction`).
+6. the second value correction brings the means back to 0.5, after the refinement moved them, and again moves each new
+   value with fewer than `MIN_N_BITS` bits (`correction`).
 
 The first correction comes before the refinement because the first correction can move a new tuple by several fine
 lanes, out of its fine cell, which would undo a refinement done before the first correction.
@@ -37,7 +39,7 @@ import numpy as np
 
 from sunnbear._core.benchmark.mc_tuples.core import MCTuples, MCTuplesSize
 
-from .correction import MCTuplesMeanCorrection
+from .correction import MCTuplesValueCorrection
 from .refinement import MCTuplesRefinementSolve
 from .selection import MCTuplesSelectionSolve
 from .size_result import MCTuplesSizeResult
@@ -175,7 +177,7 @@ class MCTuplesGenerator:
     ) -> MCTuplesSizeResult:
         """Build `size` on `required_tuples` and return it.
 
-        `required_tuples` holds the size below's tuples after their second mean correction, or None for the smallest
+        `required_tuples` holds the size below's tuples after their second value correction, or None for the smallest
         size.
         """
         t_start = time.perf_counter()
@@ -186,25 +188,25 @@ class MCTuplesGenerator:
         selection_solve = MCTuplesSelectionSolve(self.n_population, required_tuple_array, size, settings)
         selected_tuple_array, selection_solution = selection_solve.run(t_budget_sec - t_refinement_budget_sec)
 
-        # --- first mean correction --------------
-        first_mean_correction = MCTuplesMeanCorrection.of(selected_tuple_array, size.n_required)
+        # --- first value correction -------------
+        first_value_correction = MCTuplesValueCorrection.of(selected_tuple_array, size.n_required)
 
         # --- refinement -------------------------
         refinement_solve = MCTuplesRefinementSolve(
-            self.n_refinement_random_candidates_per_cell, first_mean_correction.tuple_array, size, settings
+            self.n_refinement_random_candidates_per_cell, first_value_correction.tuple_array, size, settings
         )
         refined_tuple_array, refinement_solution = refinement_solve.run(t_refinement_budget_sec)
 
-        # --- second mean correction -------------
+        # --- second value correction ------------
         return MCTuplesSizeResult(
             size=size,
             t_budget_sec=t_budget_sec,
             t_wall_sec=time.perf_counter() - t_start,
             gap_allocation=selection_solve.gap_allocation,
             selected_tuple_array=selected_tuple_array,
-            first_mean_correction=first_mean_correction,
+            first_value_correction=first_value_correction,
             refined_tuple_array=refined_tuple_array,
-            second_mean_correction=MCTuplesMeanCorrection.of(refined_tuple_array, size.n_required),
+            second_value_correction=MCTuplesValueCorrection.of(refined_tuple_array, size.n_required),
             selection_solution=selection_solution,
             refinement_solution=refinement_solution,
         )
