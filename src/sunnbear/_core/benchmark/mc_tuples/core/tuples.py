@@ -108,7 +108,7 @@ class MCTuples:
     #  Bits of information
     # --------------------------------------------------------------------------
     def bit_stats(self) -> "MCTuplesBitStats":
-        """Return how many bits of information the set's u values and v values hold, each computed when first read."""
+        """Return statistics of the bits of information of the set's u values and v values, computed when first read."""
         return MCTuplesBitStats(self.tuple_array)
 
 
@@ -243,9 +243,13 @@ class MCTuplesStats:
 class MCTuplesBitStats:
     """`MCTuplesBitStats` reports how many bits of information the u values and the v values hold, per axis.
 
-    A value holds as many bits as the shortest of its binary, decimal and rational descriptions (`n_bits`), and a random
-    float64 value holds about 51 to 53. The smallest over an axis tells whether every value is non-trivial; the mean
-    adds context, but 1 trivial value among many barely moves it.
+    A value holds as many bits as `n_bits` measures. A value is trivial when it holds far fewer than a random float64
+    value, because a few binary or decimal digits or a small fraction reproduce it exactly.
+
+    A test function treated as a black box can behave differently at a trivial value: for example, `sin(100·π·x)` has
+    its roots at the multiples of 0.01, so a value such as `x = 0.25` sits exactly on a root. The fewest bits over an
+    axis tell whether every value on it is non-trivial; the mean adds context, but 1 trivial value among many barely
+    moves it.
     """
 
     def __init__(self, tuple_array: ArrayLike) -> None:
@@ -254,33 +258,28 @@ class MCTuplesBitStats:
 
     @property
     def min_n_bits_u(self) -> float:
-        """Return the fewest bits of information that a u value holds."""
-        return float(self._n_bits_u.min())
+        """Return the fewest bits of information of any u value."""
+        return float(self._n_bits[:, 0].min())
 
     @property
     def mean_n_bits_u(self) -> float:
         """Return the mean bits of information of the u values."""
-        return float(self._n_bits_u.mean())
+        return float(self._n_bits[:, 0].mean())
 
     @property
     def min_n_bits_v(self) -> float:
-        """Return the fewest bits of information that a v value holds."""
-        return float(self._n_bits_v.min())
+        """Return the fewest bits of information of any v value."""
+        return float(self._n_bits[:, 1].min())
 
     @property
     def mean_n_bits_v(self) -> float:
         """Return the mean bits of information of the v values."""
-        return float(self._n_bits_v.mean())
+        return float(self._n_bits[:, 1].mean())
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
     @cached_property
-    def _n_bits_u(self) -> np.ndarray:
-        """Return the bits of information of each u value."""
-        return np.array([n_bits(float(value)) for value in self._tuple_array[:, 0]])
-
-    @cached_property
-    def _n_bits_v(self) -> np.ndarray:
-        """Return the bits of information of each v value."""
-        return np.array([n_bits(float(value)) for value in self._tuple_array[:, 1]])
+    def _n_bits(self) -> np.ndarray:
+        """Return the bits of information of each value, as an `(n, 2)` array with a u column and a v column."""
+        return np.array([[n_bits(float(value)) for value in row] for row in self._tuple_array])

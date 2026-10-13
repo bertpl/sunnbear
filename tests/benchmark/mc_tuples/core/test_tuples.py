@@ -124,7 +124,7 @@ def test_stats_takes_gpq_over_each_tuple_s_nearest_neighbor_separation():
 
 
 def test_bit_stats_report_the_fewest_and_the_mean_bits_per_axis():
-    """The u values 0.5 and 1/3 hold 1 and 1.6 bits; the v values hold those of 2 random float64 values."""
+    """Per axis, `bit_stats` reports the fewest and the mean of the bits that `n_bits` measures for the values."""
     # --- arrange ----------------------
     u, v = [0.5, 1 / 3], [0.2718281828459045, 0.7071067811865476]
 

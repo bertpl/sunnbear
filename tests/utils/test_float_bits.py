@@ -26,7 +26,8 @@ LOG2_10 = math.log2(10)
     ],
 )
 def test_each_measure_counts_the_bits_of_its_shortest_description(x, binary, decimal, rational):
-    """Each measure finds the shortest description that reproduces `x`: a dyadic fraction, a decimal or a fraction."""
+    """Each measure finds the shortest description that reproduces `x`: a dyadic fraction, a decimal or a fraction
+    p/q."""
     # --- act / assert -----------------
     assert n_bits_binary(x) == binary
     assert n_bits_decimal(x) == pytest.approx(decimal)
@@ -36,8 +37,8 @@ def test_each_measure_counts_the_bits_of_its_shortest_description(x, binary, dec
 
 @pytest.mark.parametrize("x", [0.25, 5 / 17, 1 / 1024, math.pi / 4, 2.0**-1074, 0.999999])
 def test_n_bits_rational_finds_the_fraction_with_the_smallest_denominator_that_rounds_to_x(x):
-    """The fraction p/q behind `n_bits_rational` rounds to `x`, and so does no fraction with a smaller q, for the q
-    values small enough to check by hand."""
+    """No fraction with a smaller q than the fraction p/q behind `n_bits_rational` rounds to `x`; the test checks every
+    q below 2000."""
     # --- act --------------------------
     bits = n_bits_rational(x)
 
@@ -53,7 +54,7 @@ def test_n_bits_rational_finds_the_fraction_with_the_smallest_denominator_that_r
         assert bits == pytest.approx(math.log2(max(best.numerator, 1)) + math.log2(best.denominator))
 
 
-def test_random_values_hold_about_51_to_53_bits():
+def test_random_values_hold_close_to_53_bits():
     """Random float64 values in [0.5, 1) score a median of 51 to 54 bits on every measure."""
     # --- arrange ----------------------
     values = 0.5 + 0.5 * np.random.default_rng(0).random(2000)

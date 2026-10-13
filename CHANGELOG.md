@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add `MCTuples.bit_stats`, which reports how many bits of information the u values and the v values hold
+- Add `MCTuples.bit_stats`, which reports how many bits of information the u values and the v values of a tuple set hold
 
 ### Changed
 
