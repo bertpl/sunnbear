@@ -1,7 +1,13 @@
-"""`MCTuplesMeanCorrection` moves a size's new tuples after a max-div solve, so its u and v means are exactly 0.5.
+"""`MCTuplesValueCorrection` moves a size's new tuples after a max-div solve, in 2 steps that always run together.
+
+1. **The mean correction** moves the new tuples so that the size's u and v means are exactly 0.5.
+2. **The nudge** moves each new value with fewer than `MIN_N_BITS` bits of information to the nearest float64 value, in
+   float64 steps, that has at least `MIN_N_BITS` and lies in the same fine lane (`nearest_float_with_min_n_bits`).
+   A nudge moves a value by a few float64 steps, so each size's mean stays 0.5 up to rounding, and every tuple keeps
+   its fine lane.
 
 The tuples of the size below stay where they are; per axis, only the new tuples move, toward the side that the mean
-needs (`MCTuplesAxisMeanCorrection`).
+needs (`MCTuplesAxisValueCorrection`). The rest of this docstring describes the mean correction.
 
 A new tuple in the first or the last fine lane of an axis stays where it is on that axis too, so that both outer fine
 lanes stay filled; on that axis, the rules below treat such a tuple as a tuple of the size below. At the smallest size,
@@ -41,7 +47,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from sunnbear._core.benchmark.mc_tuples.core import N_FINE_LANES, TARGET_MEAN, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples.core import MIN_N_BITS, N_FINE_LANES, TARGET_MEAN, fine_lanes_of
+from sunnbear._core.utils.float_bits import nearest_float_with_min_n_bits
 
 from .exceptions import MCTuplesConstructionError
 
@@ -57,11 +64,11 @@ N_BISECTION_STEPS = 200
 
 
 # ==================================================================================================
-#  MCTuplesMeanCorrection
+#  MCTuplesValueCorrection
 # ==================================================================================================
 @dataclass(frozen=True)
-class MCTuplesMeanCorrection:
-    """`MCTuplesMeanCorrection` holds 1 size after the correction of both axes.
+class MCTuplesValueCorrection:
+    """`MCTuplesValueCorrection` holds 1 size after the correction of both axes.
 
     Attributes:
         u: The u axis after the correction.
@@ -70,39 +77,40 @@ class MCTuplesMeanCorrection:
             ones in their original order.
     """
 
-    u: "MCTuplesAxisMeanCorrection"
-    v: "MCTuplesAxisMeanCorrection"
+    u: "MCTuplesAxisValueCorrection"
+    v: "MCTuplesAxisValueCorrection"
     tuple_array: np.ndarray
 
     # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def of(cls, tuple_array: np.ndarray, n_required: int) -> "MCTuplesMeanCorrection":
+    def of(cls, tuple_array: np.ndarray, n_required: int) -> "MCTuplesValueCorrection":
         """Return the size in `tuple_array` after the correction; its first `n_required` tuples are the size below.
 
         Raises:
             MCTuplesConstructionError: If a fine lane holds 2 tuples after the correction, which the correction's
-                rules prevent unless the size already had such a fine lane.
+                rules prevent unless the size already had such a fine lane, or if the nudge finds no value with
+                `MIN_N_BITS` bits inside a value's fine lane.
         """
         required, new = tuple_array[:n_required], tuple_array[n_required:]
-        u = MCTuplesAxisMeanCorrection.of(required[:, 0], new[:, 0])
-        v = MCTuplesAxisMeanCorrection.of(required[:, 1], new[:, 1])
+        u = MCTuplesAxisValueCorrection.of(required[:, 0], new[:, 0])
+        v = MCTuplesAxisValueCorrection.of(required[:, 1], new[:, 1])
         corrected_tuple_array = np.vstack([required, np.column_stack([u.corrected_new_values, v.corrected_new_values])])
         for axis, values in (("u", corrected_tuple_array[:, 0]), ("v", corrected_tuple_array[:, 1])):
             if np.bincount(fine_lanes_of(values)).max() > 1:
                 raise MCTuplesConstructionError(
-                    f"Size {tuple_array.shape[0]}: after the mean correction, a fine {axis}-lane holds 2 tuples."
+                    f"Size {tuple_array.shape[0]}: after the value correction, a fine {axis}-lane holds 2 tuples."
                 )
         return cls(u=u, v=v, tuple_array=corrected_tuple_array)
 
 
 # ==================================================================================================
-#  MCTuplesAxisMeanCorrection
+#  MCTuplesAxisValueCorrection
 # ==================================================================================================
 @dataclass(frozen=True)
-class MCTuplesAxisMeanCorrection:
-    """`MCTuplesAxisMeanCorrection` holds 1 axis of 1 size after the correction, and what the correction did.
+class MCTuplesAxisValueCorrection:
+    """`MCTuplesAxisValueCorrection` holds 1 axis of 1 size after the correction, and what the correction did.
 
     Attributes:
         cap: The cap D, as a distance on the axis.
@@ -111,6 +119,7 @@ class MCTuplesAxisMeanCorrection:
         offset_after_fine_lanes: The same after the correction; apart from rounding, it is 0 unless the correction
             could not reach 0.5.
         max_move_fine_lanes: The largest move of a new tuple, in fine lanes.
+        n_nudged: The number of new values that the nudge moved.
     """
 
     cap: float
@@ -118,6 +127,7 @@ class MCTuplesAxisMeanCorrection:
     offset_before_fine_lanes: float
     offset_after_fine_lanes: float
     max_move_fine_lanes: float
+    n_nudged: int
 
     @property
     def cap_fine_lanes(self) -> float:
@@ -179,6 +189,25 @@ class MCTuplesAxisMeanCorrection:
         return float((movable_values.mean() - target_mean_of_movable) * movable_values.size / size * N_FINE_LANES)
 
     @staticmethod
+    def _nudged_values(values: np.ndarray) -> np.ndarray:
+        """Return `values` with each value below `MIN_N_BITS` bits moved to the nearest one in its fine lane with them.
+
+        Raises:
+            MCTuplesConstructionError: If a value's fine lane holds no value with `MIN_N_BITS` bits near it.
+        """
+        nudged = values.copy()
+        for i, (value, lane) in enumerate(zip(values.tolist(), fine_lanes_of(values).tolist(), strict=True)):
+            nearest = nearest_float_with_min_n_bits(
+                value, MIN_N_BITS, lane * FINE_LANE_WIDTH, (lane + 1) * FINE_LANE_WIDTH
+            )
+            if nearest is None:
+                raise MCTuplesConstructionError(
+                    f"No value with {MIN_N_BITS} bits lies near {value!r} in its fine lane."
+                )
+            nudged[i] = nearest
+        return nudged
+
+    @staticmethod
     def _solve_cap(moved_values_of_cap: Callable[[float], np.ndarray], target_mean: float) -> float:
         """Return the cap in `CAP_RANGE` at which the moved values' mean is `target_mean`, or the nearest bound.
 
@@ -199,10 +228,14 @@ class MCTuplesAxisMeanCorrection:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def of(cls, required_values: np.ndarray, new_values: np.ndarray) -> "MCTuplesAxisMeanCorrection":
+    def of(cls, required_values: np.ndarray, new_values: np.ndarray) -> "MCTuplesAxisValueCorrection":
         """Return 1 axis whose new values moved so that the mean of both arrays' values is 0.5, if possible.
 
-        A new value in an outer fine lane does not move.
+        A new value in an outer fine lane does not move in the mean correction; the nudge then moves every new value
+        with fewer than `MIN_N_BITS` bits.
+
+        Raises:
+            MCTuplesConstructionError: If the nudge finds no value with `MIN_N_BITS` bits inside a value's fine lane.
         """
         size = required_values.size + new_values.size
         is_in_outer_lane = np.isin(fine_lanes_of(new_values), (0, N_FINE_LANES - 1))
@@ -212,8 +245,9 @@ class MCTuplesAxisMeanCorrection:
         is_shift_left = bool(movable_values.mean() > target_mean_of_movable)
         moved_values_of_cap = cls._moved_values_of_cap(immovable_values, movable_values, is_shift_left)
         cap = cls._solve_cap(moved_values_of_cap, target_mean_of_movable)
-        corrected_new_values = new_values.copy()
-        corrected_new_values[~is_in_outer_lane] = moved_values_of_cap(cap)
+        mean_corrected_values = new_values.copy()
+        mean_corrected_values[~is_in_outer_lane] = moved_values_of_cap(cap)
+        corrected_new_values = cls._nudged_values(mean_corrected_values)
         return cls(
             cap=cap,
             corrected_new_values=corrected_new_values,
@@ -222,4 +256,5 @@ class MCTuplesAxisMeanCorrection:
                 corrected_new_values[~is_in_outer_lane], target_mean_of_movable, size
             ),
             max_move_fine_lanes=float(np.abs(corrected_new_values - new_values).max() * N_FINE_LANES),
+            n_nudged=int((corrected_new_values != mean_corrected_values).sum()),
         )

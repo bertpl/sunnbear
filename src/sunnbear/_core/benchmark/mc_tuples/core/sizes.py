@@ -1,6 +1,7 @@
 """`MCTuplesSize` lists the sizes in which the shipped Monte Carlo tuple set comes; the fine lanes follow from them.
 
-The construction corrects every size's u values and v values toward the same mean, `TARGET_MEAN`.
+The construction corrects every size's u values and v values toward the same mean, `TARGET_MEAN`, and gives each value
+at least `MIN_N_BITS` bits of information.
 """
 
 from enum import IntEnum
@@ -10,6 +11,11 @@ import numpy as np
 
 # `TARGET_MEAN` is the mean toward which the construction corrects every size's u values and v values.
 TARGET_MEAN = 0.5
+
+# `MIN_N_BITS` is the fewest bits of information (`n_bits`) that the construction leaves in any u value or v value, so
+# that no short binary, decimal or rational description reproduces a value exactly; a random float64 value holds about
+# 51 to 54.
+MIN_N_BITS = 50
 
 
 # ==================================================================================================

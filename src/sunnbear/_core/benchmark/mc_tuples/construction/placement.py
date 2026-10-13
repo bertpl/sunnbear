@@ -104,7 +104,7 @@ class MCTuplesAxisGapPlacement:
     def offset_weight(self) -> float:
         """Return the drop in the smallest spacing, in fine lanes, per fine lane of the size's mean offset.
 
-        Only the new tuples move in the first mean correction, so to remove an offset of the size's mean they move on
+        Only the new tuples move in the first value correction, so to remove an offset of the size's mean they move on
         average by that offset times the size's total number of tuples divided by its number of new tuples.
 
         In an evenly spread size nearly all new tuples move, so the smallest spacing drops by about the average move of
@@ -115,10 +115,10 @@ class MCTuplesAxisGapPlacement:
 
     @property
     def corrected_min_spacing(self) -> float:
-        """Return the estimated smallest spacing, in fine lanes, once the first mean correction has run.
+        """Return the estimated smallest spacing, in fine lanes, once the first value correction has run.
 
         It is a heuristic: for every fine lane of offset of the size's mean from `TARGET_MEAN`, it subtracts
-        `offset_weight` fine lanes, without modeling how the first mean correction moves each new tuple.
+        `offset_weight` fine lanes, without modeling how the first value correction moves each new tuple.
         """
         return float(self.spacings.min() - self.offset_weight * abs(self.offset_fine_lanes))
 

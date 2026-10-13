@@ -13,6 +13,7 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import (
+    MIN_N_BITS,
     N_FINE_LANES,
     MCTuples,
     MCTuplesConstructionError,
@@ -58,7 +59,8 @@ def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]
 
     - the u and v means are 0.5;
     - each fine lane holds at most 1 tuple;
-    - both outer fine lanes of each axis hold a tuple.
+    - both outer fine lanes of each axis hold a tuple;
+    - every value holds at least `MIN_N_BITS` bits of information.
     """
     for result in results:
         size_tuples = tuples.first(result.size)
@@ -68,6 +70,8 @@ def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]
             lanes = fine_lanes_of(values)
             assert np.bincount(lanes).max() == 1
             assert {0, N_FINE_LANES - 1} <= set(lanes.tolist())
+        bit_stats = size_tuples.bit_stats()
+        assert min(bit_stats.min_n_bits_u, bit_stats.min_n_bits_v) >= MIN_N_BITS
 
 
 # ==================================================================================================
@@ -122,7 +126,7 @@ def test_generator_corrects_refines_and_corrects_each_size_and_builds_the_next_o
     assert results[0].gap_allocation.u.mean_aware_offset_fine_lanes is None
     assert results[1].gap_allocation.u.mean_aware_offset_fine_lanes is not None
     for result in results:
-        first_corrected, refined = result.first_mean_correction.tuple_array, result.refined_tuple_array
+        first_corrected, refined = result.first_value_correction.tuple_array, result.refined_tuple_array
         assert first_corrected.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
         assert np.array_equal(first_corrected[: result.size.n_required], refined[: result.size.n_required])
         assert not np.any(first_corrected[result.size.n_required :] == refined[result.size.n_required :])

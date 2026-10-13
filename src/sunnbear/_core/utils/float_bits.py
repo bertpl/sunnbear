@@ -11,11 +11,16 @@ about 51 to 54 bits in each representation, and a trivial value far less:
 - `n_bits_rational`: the rational description;
 - `n_bits`: the smallest of the 3.
 
+2 more functions produce values with a given minimum of `n_bits`: `draw_floats_with_min_n_bits` draws them at random
+in given intervals, and `nearest_float_with_min_n_bits` nudges a value by the fewest float64 steps.
+
 A multiple of a constant such as π or e does not count as trivial, because there are too many such constants to check.
 Each function takes a finite value, and returns 0 for 0.
 """
 
 import math
+
+import numpy as np
 
 LOG2_10 = math.log2(10)
 
@@ -66,6 +71,52 @@ def n_bits(x: float) -> float:
     `x` must be finite.
     """
     return min(n_bits_binary(x), n_bits_decimal(x), n_bits_rational(x))
+
+
+# ==================================================================================================
+#  Values with a minimum number of bits
+# ==================================================================================================
+def draw_floats_with_min_n_bits(
+    lows: np.ndarray, highs: np.ndarray, min_n_bits: float, rng: np.random.Generator
+) -> np.ndarray:
+    """Return 1 uniform random value in each open interval `(lows[i], highs[i])` with at least `min_n_bits` bits.
+
+    A value outside its open interval, or below `min_n_bits`, is drawn again until it fits. At 50 bits, about 1 draw in
+    4 to 7 is drawn again.
+    """
+    values = np.empty(lows.size)
+    is_drawn_again = np.ones(lows.size, dtype=bool)
+    while is_drawn_again.any():
+        indices = np.flatnonzero(is_drawn_again)
+        values[indices] = lows[indices] + (highs[indices] - lows[indices]) * rng.random(indices.size)
+        is_drawn_again[indices] = [
+            not (low < value < high and n_bits(value) >= min_n_bits)
+            for value, low, high in zip(
+                values[indices].tolist(), lows[indices].tolist(), highs[indices].tolist(), strict=True
+            )
+        ]
+    return values
+
+
+def nearest_float_with_min_n_bits(
+    x: float, min_n_bits: float, low: float, high: float, max_steps: int = 10_000
+) -> float | None:
+    """Return the float64 value nearest to `x` in the open interval `(low, high)` with at least `min_n_bits` bits.
+
+    Nearness counts float64 steps: the search takes 1 step up, then 1 step down, then 2 steps up, and so on, so of 2
+    values at the same number of steps the higher one wins. `x` itself is returned if it qualifies, and None if no value
+    within `max_steps` steps on either side does.
+    """
+    if low < x < high and n_bits(x) >= min_n_bits:
+        return x
+    else:
+        up, down = x, x
+        for _ in range(max_steps):
+            up, down = math.nextafter(up, math.inf), math.nextafter(down, -math.inf)
+            for candidate in (up, down):
+                if low < candidate < high and n_bits(candidate) >= min_n_bits:
+                    return candidate
+        return None
 
 
 # ==================================================================================================

@@ -8,7 +8,7 @@ from max_div.solver import ParallelMaxDivSolution
 from sunnbear._core.benchmark.mc_tuples.core import MCTuples, MCTuplesSize
 
 from .allocation import MCTuplesGapAllocation
-from .correction import MCTuplesMeanCorrection
+from .correction import MCTuplesValueCorrection
 
 
 # ==================================================================================================
@@ -28,13 +28,13 @@ class MCTuplesSizeResult:
             - the gap allocation;
             - the 2 populations;
             - the 2 solves, with max-div's start-up and shut-down time;
-            - the 2 mean corrections.
+            - the 2 value corrections.
         gap_allocation: The allocation of the new tuples to the gaps along u and along v.
         selected_tuple_array: The size's tuples after the selection solve.
-        first_mean_correction: The mean correction after the selection solve, with what the correction did on each
+        first_value_correction: The value correction after the selection solve, with what the correction did on each
             axis and the size's tuples after the correction; the refinement solve starts from those tuples.
         refined_tuple_array: The size's tuples after the refinement solve.
-        second_mean_correction: The mean correction after the refinement solve, with the size's final tuples.
+        second_value_correction: The value correction after the refinement solve, with the size's final tuples.
         selection_solution: max-div's solution of the selection solve, with its score checkpoints and timeline.
         refinement_solution: max-div's solution of the refinement solve, with its score checkpoints and timeline.
     """
@@ -44,14 +44,14 @@ class MCTuplesSizeResult:
     t_wall_sec: float
     gap_allocation: MCTuplesGapAllocation
     selected_tuple_array: np.ndarray
-    first_mean_correction: MCTuplesMeanCorrection
+    first_value_correction: MCTuplesValueCorrection
     refined_tuple_array: np.ndarray
-    second_mean_correction: MCTuplesMeanCorrection
+    second_value_correction: MCTuplesValueCorrection
     selection_solution: ParallelMaxDivSolution
     refinement_solution: ParallelMaxDivSolution
 
     @property
     def tuples(self) -> MCTuples:
-        """Return the size's tuples after the second mean correction, with the size below's tuples first."""
-        tuple_array = self.second_mean_correction.tuple_array
+        """Return the size's tuples after the second value correction, with the size below's tuples first."""
+        tuple_array = self.second_value_correction.tuple_array
         return MCTuples(tuple_array[:, 0], tuple_array[:, 1])
