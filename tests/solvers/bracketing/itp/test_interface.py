@@ -27,10 +27,13 @@ def test_an_invalid_argument_is_rejected(kwargs, match):
 
 
 def test_name_version_and_that_its_arithmetic_is_counted():
-    """`ITP` has name ``itp`` and version 1, and its flop count includes the logarithm that sets ``n_bisection``."""
+    """`ITP` has name ``itp`` and version 2, and its flop count includes the logarithm that sets ``n_bisection`` and,
+    in every iteration, the power ``2^(n_max - k)`` of the projection radius."""
     # --- act --------------------------
     result = ITP(n_slack=4, variant=ITPVariant.PAPER_EXPERIMENTS).solve(cubic, 1.0, 2.0, xtol=1e-6, max_fevals=40)
 
     # --- assert -----------------------
-    assert (ITP.name, ITP.version) == ("itp", 1)
+    n_iterations = result.n_fevals - 2
+    assert (ITP.name, ITP.version) == ("itp", 2)
     assert result.flop_counts.LOG2 == 1
+    assert n_iterations == result.flop_counts.POW

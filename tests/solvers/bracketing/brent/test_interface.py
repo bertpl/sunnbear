@@ -1,14 +1,26 @@
-"""These tests assert the name and version of `Brent`, and that its arithmetic is counted."""
+"""These tests assert the name and version of `Brent`, and that its arithmetic is counted as its Algol procedure's."""
 
 from sunnbear.solvers import Brent
 from tests.solvers.example_functions import cubic
 
 
 def test_name_version_and_that_its_arithmetic_is_counted():
-    """`Brent` is named ``brent``, at version 1, and its arithmetic is flop-counted."""
+    """`Brent` is named ``brent``, at version 2, and its arithmetic is flop-counted."""
     # --- act --------------------------
     result = Brent().solve(cubic, 1.0, 2.0, xtol=1e-3, max_fevals=20)
 
     # --- assert -----------------------
-    assert (Brent.name, Brent.version) == ("brent", 1)
+    assert (Brent.name, Brent.version) == ("brent", 2)
     assert result.flop_counts.total_count() > 0
+
+
+def test_the_stopping_test_counts_both_of_its_comparisons():
+    """A solve that stops at its first stopping test counts 8 comparisons: 4 in `Solver.solve`, 1 in the ``max`` of
+    the tolerance ``t``, 1 in the swap of ``b`` and ``c``, and both comparisons of the stopping test, as Algol 60
+    evaluates both operands of a Boolean operator."""
+    # --- act --------------------------
+    result = Brent().solve(cubic, 1.0, 2.0, xtol=10.0, max_fevals=20)
+
+    # --- assert -----------------------
+    assert result.n_fevals == 2
+    assert result.flop_counts.COMP == 8
