@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Make the flop counts of `ITP` consistent with its published algorithm
-- Compute `SteffenBrent`'s midpoint as the paper's published results do, which changes its benchmark results
+- Change the midpoint that `SteffenBrent` evaluates in its paper's modification of Brent's method to the one that the paper's results use, which changes its benchmark results
 
 ### Deprecated
 

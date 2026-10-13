@@ -53,8 +53,8 @@ class SteffenBrent(Solver):
       interpolation steps stop shrinking, but Algorithm 2 leaves them out. `SteffenBrent` follows Algorithm 2, so on
       some functions the interval shrinks slowly.
     - **No needless evaluation of the midpoint:** when ``f(s) = 0``, Algorithm 2 still evaluates the midpoint, while
-      `SteffenBrent` ends the solve. This changes neither the next interval nor the returned x-value, since ``f(m)``
-      and ``f(s) = 0`` cannot differ in sign.
+      `SteffenBrent` ends the solve. Ending the solve changes neither the next interval nor the returned x-value,
+      since ``f(m)`` and ``f(s) = 0`` cannot differ in sign.
 
     The paper's title says that the modification halves the interval in every iteration, but Algorithm 2 does not
     guarantee that the interval halves:
