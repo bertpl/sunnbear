@@ -139,3 +139,32 @@ def test_nearest_float_with_min_n_bits_returns_none_when_no_value_inside_the_int
     """When the open interval holds only the trivial value 0.5, no value qualifies."""
     # --- act / assert -----------------
     assert nearest_float_with_min_n_bits(0.5, 50, math.nextafter(0.5, 0.0), math.nextafter(0.5, 1.0)) is None
+
+
+def test_draw_floats_with_min_n_bits_draws_again_a_value_on_the_edge_of_its_interval():
+    """A random draw of exactly 0 puts a value on the lower edge of its open interval, so it is drawn again."""
+
+    # --- arrange ----------------------
+    class _ZeroFirst:
+        """`_ZeroFirst` stands in for a random generator whose first `random` call returns only zeros."""
+
+        def __init__(self) -> None:
+            """Start the stand-in before its first call."""
+            self._rng = np.random.default_rng(2)
+            self._is_first_call = True
+
+        def random(self, n: int) -> np.ndarray:
+            """Return zeros on the first call, then uniform random values."""
+            if self._is_first_call:
+                self._is_first_call = False
+                return np.zeros(n)
+            else:
+                return self._rng.random(n)
+
+    lows, highs = np.array([0.25, 0.5]), np.array([0.5, 0.75])
+
+    # --- act --------------------------
+    values = draw_floats_with_min_n_bits(lows, highs, 50, _ZeroFirst())  # type: ignore[arg-type]
+
+    # --- assert -----------------------
+    assert np.all((values > lows) & (values < highs))
