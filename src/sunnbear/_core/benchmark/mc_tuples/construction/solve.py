@@ -15,8 +15,11 @@ A subclass passes its population to the constructor, and its hooks set:
 The `generator` module names the 2 subclasses and the order in which they run.
 
 Besides the subclass's constraints, a weighted constraint keeps every tuple of the size below; this weighted constraint
-outweighs the others, so max-div meets it first. max-div weighs its constraints against the objective without
-enforcing them, so `run` checks max-div's selected tuples before it returns them.
+outweighs the others, so max-div meets it first.
+
+max-div satisfies its constraints before it raises the diversity score, so it finds a selection that meets every
+constraint within its first iterations. A time budget that runs out before then leaves a constraint unmet, so `run`
+checks max-div's selected tuples before it returns them.
 """
 
 import warnings

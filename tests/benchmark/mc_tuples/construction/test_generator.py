@@ -1,6 +1,7 @@
 """`MCTuplesGenerator`, which `generate_mc_tuples` runs:
 
-- builds nested sizes with means of 0.5 and at most 1 tuple per fine lane;
+- builds nested sizes with means of 0.5, at most 1 tuple per fine lane, and both outer fine lanes of each axis filled
+  from the smallest size up;
 - reports each size;
 - splits the total time over the sizes, and each size's time over its 2 solves;
 - scales down the worker count of a short run.
@@ -27,13 +28,20 @@ from sunnbear._core.benchmark.mc_tuples.construction.selection import MCTuplesSe
 
 def _spread_each_gap_s_new_tuples(self: MCTuplesSelectionSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
     """Replace `MCTuplesSelectionSolve.run`: spread each gap's new tuples evenly over its fine lanes, pair u and v at
-    random, and return them without running max-div."""
+    random, and return them without running max-div.
+
+    At the smallest size, the 1 gap spans the axis and the spread runs from the first fine lane to the last, so the new
+    tuples fill both outer fine lanes, as the selection's constraints require.
+    """
     new_values = []
     for allocation in (self.gap_allocation.u, self.gap_allocation.v):
         values = []
         for gap, count in enumerate(allocation.counts):
             lanes = np.flatnonzero(allocation.gap_of_fine_lane == gap)
-            picks = np.round(np.linspace(0, lanes.size - 1, count + 2)[1:-1]).astype(np.int64)
+            if self.size.size_below is None:
+                picks = np.round(np.linspace(0, lanes.size - 1, count)).astype(np.int64)
+            else:
+                picks = np.round(np.linspace(0, lanes.size - 1, count + 2)[1:-1]).astype(np.int64)
             values.extend((lanes[picks] + 0.5) / N_FINE_LANES)
         new_values.append(self.settings.rng.permutation(values))
     return np.vstack([self.required_tuple_array, np.column_stack(new_values)]), None
@@ -46,13 +54,20 @@ def _pick_each_cell_s_last_candidate(self: MCTuplesRefinementSolve, t_budget_sec
 
 
 def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]) -> None:
-    """Assert that every reported size is a prefix of `tuples`, with means of 0.5 and at most 1 tuple per fine lane."""
+    """Assert that every reported size is a prefix of `tuples`, and that in each size:
+
+    - the u and v means are 0.5;
+    - each fine lane holds at most 1 tuple;
+    - both outer fine lanes of each axis hold a tuple.
+    """
     for result in results:
         size_tuples = tuples.first(result.size)
         assert result.tuples.tuple_array.tolist() == size_tuples.tuple_array.tolist()
         assert size_tuples.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
         for values in (size_tuples.u, size_tuples.v):
-            assert np.bincount(fine_lanes_of(values)).max() == 1
+            lanes = fine_lanes_of(values)
+            assert np.bincount(lanes).max() == 1
+            assert {0, N_FINE_LANES - 1} <= set(lanes.tolist())
 
 
 # ==================================================================================================
@@ -60,8 +75,8 @@ def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]
 # ==================================================================================================
 @pytest.mark.only_with_numba_jit
 def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size():
-    """A construction up to size 64 builds sizes 32 and 64, each with means of 0.5 and at most 1 tuple per fine
-    lane, and reports both sizes in order.
+    """A construction up to size 64 builds sizes 32 and 64 as a valid nested set (`_assert_valid_nested_set`), and
+    reports both sizes in order.
 
     Only the structure is asserted: max-div's spread depends on the wall-clock time.
     """

@@ -64,6 +64,28 @@ def test_the_correction_takes_the_shift_from_the_largest_spacings():
     assert correction.cap_fine_lanes == pytest.approx((0.7 - 0.3) * N_FINE_LANES - 1)
 
 
+@pytest.mark.parametrize(
+    "outer_value, other_new_values, required",
+    [
+        (0.5 / N_FINE_LANES, [0.4, 0.45], [0.3]),  # a right shift would move outer_value out of fine lane 0
+        (1023.5 / N_FINE_LANES, [0.6, 0.55], [0.7]),  # a left shift would move outer_value out of the last fine lane
+    ],
+)
+def test_the_correction_leaves_a_new_tuple_in_an_outer_fine_lane_in_place(outer_value, other_new_values, required):
+    """A new tuple in fine lane 0 or in the last fine lane stays where it is, and the other new tuples bring the mean
+    to 0.5."""
+    # --- arrange ----------------------
+    new = np.array([outer_value, *other_new_values])
+
+    # --- act --------------------------
+    correction = MCTuplesAxisMeanCorrection.of(np.array(required), new)
+
+    # --- assert -----------------------
+    assert correction.corrected_new_values[0] == outer_value
+    assert np.all(correction.corrected_new_values[1:] != new[1:])
+    assert np.concatenate([required, correction.corrected_new_values]).mean() == pytest.approx(0.5, abs=1e-12)
+
+
 def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_the_rest():
     """When the size below holds a tuple at 0.9, a new tuple at 0.95 cannot reach 0.1, the value that a mean of 0.5
     needs: it stops just above the fine lane of the tuple at 0.9, and the correction reports the offset that
