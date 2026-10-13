@@ -18,10 +18,10 @@ DEFAULT_N_BISECTION_FEVALS = 40
 # A solve's evaluation budget is this many times bisection's evaluation count.
 MAX_FEVALS_FACTOR = 4
 
-# The smallest `xtol` must be at least this many times `FLOAT64_EPS · max(|a|, |b|)`. `Brent` and `TOMS748` subtract
-# 6 and 4 times that amount from `xtol` to allow for rounding, and guarantee `xtol` only where the result stays
-# positive.
-MIN_XTOL_IN_FLOAT64_EPS_OF_BOUND = 8
+# `xtol_min` from `compute_xtol_range` must be at least this many times `FLOAT64_EPS · max(|a|, |b|)`. `Brent` and
+# `TOMS748` each subtract a smaller multiple of that amount from `xtol` to allow for rounding, and guarantee `xtol` only
+# where the difference stays positive.
+MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_BOUND = 8
 
 
 def compute_xtol_range(*, a: float, b: float, n_bisection_fevals: int) -> tuple[float, float]:
@@ -34,23 +34,27 @@ def compute_xtol_range(*, a: float, b: float, n_bisection_fevals: int) -> tuple[
     edge, rounding of the midpoints can shift the count by 1 when `a` and `b` are not exact binary fractions,
     so pick `xtol` well inside the range.
 
-    `xtol_min` must be at least `MIN_XTOL_IN_FLOAT64_EPS_OF_BOUND · FLOAT64_EPS · max(|a|, |b|)`, so that every
-    solver can guarantee it. An interval far from 0 relative to its width fails this check: with the default
-    `n_bisection_fevals`, it needs `max(|a|, |b|) <= 1024 · (b - a)`, which every interval that contains 0 meets.
+    `xtol_min` must be at least `MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_BOUND · FLOAT64_EPS · max(|a|, |b|)`, so
+    that every solver can guarantee `xtol_min`. The check passes only when
+    `max(|a|, |b|) <= (b - a) · 2^(53 - n_bisection_fevals) / MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_BOUND`, so an
+    interval far from 0 relative to its width fails it; at the default `n_bisection_fevals`, every interval that
+    contains 0 passes.
 
     Raises:
-        ValueError: If `a >= b`, if `n_bisection_fevals` is below 2 (bisection always evaluates both interval
-            bounds), or if `xtol_min` is below the limit above.
+        ValueError: If any of these holds:
+            - `a >= b`;
+            - `n_bisection_fevals` is below 2 (bisection always evaluates both interval bounds);
+            - `xtol_min` is below the limit above.
     """
     if not a < b:
         raise ValueError(f"Interval must satisfy a < b (got a={a}, b={b}).")
     validate_n_bisection_fevals(n_bisection_fevals)
     xtol_min = math.ldexp(b - a, 1 - n_bisection_fevals)
-    xtol_limit = MIN_XTOL_IN_FLOAT64_EPS_OF_BOUND * FLOAT64_EPS * max(abs(a), abs(b))
-    if xtol_min < xtol_limit:
+    min_allowed_xtol = MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_BOUND * FLOAT64_EPS * max(abs(a), abs(b))
+    if xtol_min < min_allowed_xtol:
         raise ValueError(
             f"The interval [{a}, {b}] lies too far from 0 for its width: its smallest xtol, {xtol_min:g}, is below "
-            f"{MIN_XTOL_IN_FLOAT64_EPS_OF_BOUND} · FLOAT64_EPS · max(|a|, |b|) = {xtol_limit:g}."
+            f"{MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_BOUND} · FLOAT64_EPS · max(|a|, |b|) = {min_allowed_xtol:g}."
         )
     return xtol_min, 2.0 * xtol_min
 
