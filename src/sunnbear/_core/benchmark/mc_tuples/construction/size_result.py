@@ -31,8 +31,8 @@ class MCTuplesSizeResult:
             - the 2 mean corrections.
         gap_allocation: The allocation of the new tuples to the gaps along u and along v.
         selected_tuple_array: The size's tuples after the selection solve.
-        first_mean_correction: The mean correction after the selection solve, with what it did on each axis and the
-            size's tuples after it, which the refinement solve starts from.
+        first_mean_correction: The mean correction after the selection solve, with what the correction did on each
+            axis and the size's tuples after the correction; the refinement solve starts from those tuples.
         refined_tuple_array: The size's tuples after the refinement solve.
         second_mean_correction: The mean correction after the refinement solve, with the size's final tuples.
         selection_solution: max-div's solution of the selection solve, with its score checkpoints and timeline.

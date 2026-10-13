@@ -39,20 +39,20 @@ class MCTuplesRefinementSolve(MCTuplesSolve):
     def __init__(
         self,
         n_random_candidates_per_cell: int,
-        corrected_tuple_array: np.ndarray,
+        initial_tuple_array: np.ndarray,
         size: MCTuplesSize,
         settings: MCTuplesSolveSettings,
     ) -> None:
-        """Draw the population in the fine cells of the new tuples in `corrected_tuple_array`.
+        """Draw the population in the fine cells of the new tuples in `initial_tuple_array`.
 
-        `corrected_tuple_array` holds the size's tuples after the first mean correction: the size below's tuples first,
+        `initial_tuple_array` holds the size's tuples after the first mean correction: the size below's tuples first,
         then the new tuples. Drawing the population advances `settings.rng`.
         """
         self.n_random_candidates_per_cell = n_random_candidates_per_cell
         population = MCTuplesPopulation.draw_in_fine_cells_of(
-            corrected_tuple_array[size.n_required :], n_random_candidates_per_cell, settings.rng
+            initial_tuple_array[size.n_required :], n_random_candidates_per_cell, settings.rng
         )
-        super().__init__(population, corrected_tuple_array[: size.n_required], size, settings)
+        super().__init__(population, initial_tuple_array[: size.n_required], size, settings)
 
     # --------------------------------------------------------------------------
     #  Subclass hooks

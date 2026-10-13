@@ -115,6 +115,11 @@ class MCTuplesAxisMeanCorrection:
     offset_after_fine_lanes: float
     max_move_fine_lanes: float
 
+    @property
+    def cap_fine_lanes(self) -> float:
+        """Return the cap D in fine lanes."""
+        return self.cap * N_FINE_LANES
+
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------

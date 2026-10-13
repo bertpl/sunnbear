@@ -102,7 +102,7 @@ class MCTuplesAxisGapPlacement:
 
     @property
     def corrected_min_spacing(self) -> float:
-        """Return the estimated smallest spacing, in fine lanes, once the correction after the selection solve has run.
+        """Return the estimated smallest spacing, in fine lanes, once the first mean correction has run.
 
         It is a heuristic: it counts each fine lane of offset of the size's mean from `TARGET_MEAN` as 1 fine lane of
         lost spacing, without modeling how the first mean correction moves the new tuples.

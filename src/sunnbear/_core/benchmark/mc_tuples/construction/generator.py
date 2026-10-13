@@ -18,8 +18,10 @@ tuples of the set share a fine lane.
 6. the second mean correction brings the means back to 0.5, after the refinement moved them (`correction`).
 
 The first correction comes before the refinement because the first correction can move a new tuple by several fine
-lanes, out of its fine cell, which would undo a refinement done before it; the refinement moves each tuple by less
-than 1 fine lane, within its fine cell, so the second correction has little left to correct.
+lanes, out of its fine cell, which would undo a refinement done before the first correction.
+
+The refinement moves each tuple by less than 1 fine lane, within its fine cell, so the second correction has little
+left to correct.
 
 Both solves share the max-div objective and the constraint that keeps the tuples of the size below (`solve`).
 
@@ -223,17 +225,17 @@ def generate_mc_tuples(
     """Construct a nested Monte Carlo (u, v) tuple set up to `max_size` in about `t_total_sec` s.
 
     Size `k` of the set is its first `k` tuples, and every size's mean u and mean v are 0.5 up to rounding, unless the
-    mean correction after the refinement solve cannot reach 0.5. Each axis is cut into as many equal fine lanes as the
-    largest `MCTuplesSize` holds tuples, and no 2 tuples share a fine lane, so the largest size holds exactly 1 tuple
-    per fine lane on each axis.
+    last correction of the size's means cannot reach 0.5.
+
+    Each axis is cut into as many equal fine lanes as the largest `MCTuplesSize` holds tuples, and no 2 tuples share a
+    fine lane, so the largest size holds exactly 1 tuple per fine lane on each axis.
 
     Each size's new tuples come from 2 max-div solves:
 
-    - the selection solve picks the new tuples from a random population of `n_population` candidate tuples, and so
-      fixes the fine lanes of each new tuple;
-    - the refinement solve then moves each new tuple within its fine cell, the crossing of its fine u-lane and fine
-      v-lane: it picks 1 tuple per fine cell among the tuple itself and `n_refinement_random_candidates_per_cell`
-      random candidates inside that fine cell.
+    - the selection solve picks the new tuples from a random population of `n_population` candidate tuples;
+    - the refinement solve, after the first correction of the means, moves each new tuple within its fine cell, the
+      crossing of its fine u-lane and fine v-lane: it picks 1 tuple per fine cell among the tuple itself and
+      `n_refinement_random_candidates_per_cell` random candidates inside that fine cell.
 
     Both solves maximize the geomean of 3 values of gpq(0.1), the geometric pseudo-quantile at level 0.1, a soft
     minimum that `MCTuplesStats` reports: one over each tuple's distance to its nearest other tuple along u, one along v

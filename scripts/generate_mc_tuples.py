@@ -8,11 +8,16 @@ time. The script:
 - prints the arguments of its `MCTuplesGenerator` calls before the construction starts, so that the log records the
   arguments even when `--no-save` skips saving the set and its manifest;
 - prints 3 lines per size as the construction goes:
-  - the size's budget and wall time, the allocation's predicted offsets of the mean, and what the first mean
-    correction did;
-  - what the second mean correction did;
-  - the size's spread after the selection solve, the first mean correction, the refinement solve and the second
-    mean correction, as `MCTuplesStats` defines it;
+  - the first line holds:
+    - the size's budget and wall time;
+    - the allocation's predicted offsets of the mean;
+    - what the first mean correction did;
+  - the second line holds what the second mean correction did;
+  - the third line holds the size's spread, as `MCTuplesStats` defines it, after each of these steps:
+    - the selection solve;
+    - the first mean correction;
+    - the refinement solve;
+    - the second mean correction;
 - with `--inspection-dir`, stores each size in that directory as CSV files of its tuples and pickle files of max-div's
   solutions, with their score checkpoints:
   - `k<size>_selected.csv`, after the selection solve;
@@ -192,10 +197,10 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
 
 
 def format_correction(correction: MCTuplesAxisMeanCorrection) -> str:
-    """Return what 1 mean correction did on 1 axis: the offset before and after, the cap D and the largest move."""
+    """Return what 1 mean correction did on 1 axis, in fine lanes."""
     return (
         f"offset {correction.offset_before_fine_lanes:+.3f} → {correction.offset_after_fine_lanes:+.1e}, "
-        f"D {correction.cap * N_FINE_LANES:.2f}, largest move {correction.max_move_fine_lanes:.2f}"
+        f"D {correction.cap_fine_lanes:.2f}, largest move {correction.max_move_fine_lanes:.2f}"
     )
 
 
