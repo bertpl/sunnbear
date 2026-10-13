@@ -4,7 +4,7 @@ import pytest
 
 from sunnbear.solvers import ModAB
 from tests.solvers.paper_problems import PaperProblem
-from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
+from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem, ganchovski_et_al_stop_width
 
 from .paper_problems import TABLE_2
 
@@ -61,7 +61,7 @@ class _ModABWithPaperTolerances(ModAB):
     @staticmethod
     def _get_stop_width(xtol: float, x3: float) -> float:
         """Return ``aTol + rTol * |x3|``, ignoring ``xtol``."""
-        return 1e-14 + 1e-14 * abs(x3)
+        return ganchovski_et_al_stop_width(x3)
 
 
 def _bisection_iterations(history: tuple[tuple[float, float], ...]) -> list[int]:

@@ -6,23 +6,24 @@
 
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
 
-# The reasons why the evaluation count of `Ridders` deviates from the column "Rid" of Ganchovski et al.'s Table 2. The
-# paper's C# code and `Ridders` share the stopping rule of the "commons_math" variant, so each reason is a difference
-# in what the 2 implementations compute.
-_ZERO_MIDPOINT_REASON = (
+# Each reason below explains why the evaluation count of `Ridders` deviates from the column "Rid" of Ganchovski et al.'s
+# Table 2. The paper's C# code and `Ridders` share the stopping rule of the "commons_math" variant, so each reason is a
+# difference in what the 2 implementations compute.
+_ROOT_AT_MIDPOINT_DEVIATION_REASON = (
     "the function value at a midpoint is exactly 0: the solve stops there, while the paper's C# code takes a step of 0 "
     "from the midpoint and evaluates the same x-value again"
 )
-_STEP_FORM_REASON = (
+_ITERATE_FORMULA_DEVIATION_REASON = (
     "the paper's C# code computes the iterate as x1 + (x1 - x0) * sign(f0) * f1 / sqrt(f1^2 - f0 * f2); in exact "
-    "arithmetic that equals the form that Ridders computes, but its last bits round differently, which changes the "
-    "iterates at a tolerance near 1e-14"
+    "arithmetic that equals the form of Ridders, but the 2 forms round differently in their last bits, which changes "
+    "the iterates at a tolerance near 1e-14"
 )
-_STEP_FORM_AND_ZERO_MIDPOINT_REASON = f"2 causes add up: {_STEP_FORM_REASON}; and {_ZERO_MIDPOINT_REASON}"
+_ITERATE_FORMULA_AND_ROOT_AT_MIDPOINT_DEVIATION_REASON = (
+    f"2 causes add up: {_ITERATE_FORMULA_DEVIATION_REASON}; and {_ROOT_AT_MIDPOINT_DEVIATION_REASON}"
+)
 
-# The column "Rid" counts the 2 evaluations at the interval bounds; each root is Ridders' root in the paper's
-# supplementary results. 4 roots are checked within a wider tolerance, because the solve and the paper's run stop at
-# different x-values where the function is nearly flat or has a pole:
+# Some roots are checked within a wider tolerance than the default `GANCHOVSKI_ET_AL_ROOT_REL_TOL`, because the solve
+# and the paper's run stop at different x-values where the function is nearly flat or has a pole:
 # - f27 has a 4-fold root: up to 4e-4 from it, rounding makes its computed value 0 or of the wrong sign, and the 2
 #   roots lie 2.7e-4 apart;
 # - f40 changes sign at a pole, and the 2 roots agree to a relative 2.3e-12;
@@ -33,7 +34,7 @@ GANCHOVSKI_ET_AL_TABLE_2 = [
         4,
         root=1.0,
         deviation=1,
-        reason=_ZERO_MIDPOINT_REASON,
+        reason=_ROOT_AT_MIDPOINT_DEVIATION_REASON,
     ),
     GanchovskiEtAlTable2Problem.F02.with_n_fevals_and_root(16, root=0.399422291710968),
     GanchovskiEtAlTable2Problem.F03.with_n_fevals_and_root(14, root=0.804133097503664),
@@ -47,7 +48,7 @@ GANCHOVSKI_ET_AL_TABLE_2 = [
         16,
         root=0.0524786034368101,
         deviation=2,
-        reason=_STEP_FORM_REASON,
+        reason=_ITERATE_FORMULA_DEVIATION_REASON,
     ),
     GanchovskiEtAlTable2Problem.F11.with_n_fevals_and_root(16, root=0.0256237476199882),
     GanchovskiEtAlTable2Problem.F12.with_n_fevals_and_root(14, root=0.345954815848242),
@@ -70,14 +71,14 @@ GANCHOVSKI_ET_AL_TABLE_2 = [
         root=1.88905736094801,
         root_abs_tol=1e-3,
         deviation=5,
-        reason=_STEP_FORM_AND_ZERO_MIDPOINT_REASON,
+        reason=_ITERATE_FORMULA_AND_ROOT_AT_MIDPOINT_DEVIATION_REASON,
     ),
     GanchovskiEtAlTable2Problem.F28.with_n_fevals_and_root(70, root=7.14299999999989),
     GanchovskiEtAlTable2Problem.F29.with_n_fevals_and_root(
         18,
         root=3.00054459411,
         deviation=1,
-        reason=_ZERO_MIDPOINT_REASON,
+        reason=_ROOT_AT_MIDPOINT_DEVIATION_REASON,
     ),
     GanchovskiEtAlTable2Problem.F30.with_n_fevals_and_root(16, root=4.26716830454212),
     GanchovskiEtAlTable2Problem.F31.with_n_fevals_and_root(16, root=0.31830988618379),
@@ -94,7 +95,7 @@ GANCHOVSKI_ET_AL_TABLE_2 = [
         root=0.666666666665125,
         root_rel_tol=1e-11,
         deviation=10,
-        reason=_STEP_FORM_REASON,
+        reason=_ITERATE_FORMULA_DEVIATION_REASON,
     ),
     GanchovskiEtAlTable2Problem.F41.with_n_fevals_and_root(14, root=0.138257155056824),
     GanchovskiEtAlTable2Problem.F42.with_n_fevals_and_root(18, root=0.999999999999999),
@@ -127,7 +128,7 @@ GANCHOVSKI_ET_AL_TABLE_2 = [
         16,
         root=0.354463104375025,
         deviation=2,
-        reason=_STEP_FORM_REASON,
+        reason=_ITERATE_FORMULA_DEVIATION_REASON,
     ),
     GanchovskiEtAlTable2Problem.F61.with_n_fevals_and_root(18, root=1.40449164821534),
     GanchovskiEtAlTable2Problem.F62.with_n_fevals_and_root(14, root=1.89549426703398),
@@ -147,7 +148,7 @@ GANCHOVSKI_ET_AL_TABLE_2 = [
         38,
         root=0.333333353713476,
         deviation=1,
-        reason=_ZERO_MIDPOINT_REASON,
+        reason=_ROOT_AT_MIDPOINT_DEVIATION_REASON,
     ),
     GanchovskiEtAlTable2Problem.F76.with_n_fevals_and_root(52, root=-0.999999000000003),
     GanchovskiEtAlTable2Problem.F77.with_n_fevals_and_root(66, root=0.0476190476189878),

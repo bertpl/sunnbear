@@ -1,16 +1,15 @@
 """This module holds `GanchovskiEtAlTable2Problem`, the 92 test problems of Table 2 of Ganchovski et al. (2026),
-without results.
+without any method's evaluation counts or roots.
 
 Table 2 compares the evaluation counts of 9 methods, modAB, Brent's and Ridders' methods among them, on 92 functions,
 each on 1 interval; a problem's name is the function's name in the table, f01 to f92. The paper's supplementary results
-add the root that each method returns.
+add each method's root.
 
 The functions follow the C# benchmark of the paper's supplementary code, which produced Table 2; where the table
 prints a function differently, the C# code holds.
 
-Each power and each library function other than ``sqrt``, ``ceil`` and ``floor``, such as ``exp`` or ``sin``, is
-evaluated correctly rounded, through mpmath; IEEE 754 already rounds ``sqrt`` correctly, and ``ceil`` and ``floor`` are
-exact.
+Each power and each library function, such as ``exp`` or ``sin``, is evaluated correctly rounded, through mpmath. The
+exceptions are ``sqrt``, which IEEE 754 already rounds correctly, and ``ceil`` and ``floor``, which are exact.
 
 The C library rounds the last bit of powers and library functions differently per platform, and on several of the 92
 functions that last bit changes the evaluation count; correctly rounded values make the counts the same on every
@@ -69,6 +68,39 @@ def _f27(x: float) -> float:
     return (81 - s * (108 - s * (54 - s * (12 - s)))) * float(mpmath.sign(s - 3))
 
 
+def _f40(x: float) -> float:
+    """Return ``f40``, which is 0 at ``x = 0`` and has a pole at ``x = 2/3``."""
+    if x == 0:
+        return 0.0
+    else:
+        return 1 / (x - 2 / 3)
+
+
+def _f49(x: float) -> float:
+    """Return ``f49``: ``-x^3 - x - 1`` for ``x <= 0``, and ``x^0 - x - 1`` above, because the C# code writes the
+    exponent ``1/3`` as an integer division, which is 0."""
+    if x <= 0:
+        return -_pow(x, 3) - x - 1
+    else:
+        return _pow(x, 0) - x - 1
+
+
+def _f77(x: float) -> float:
+    """Return ``f77``, which has a pole at ``x = 1/21``, where it is set to 0."""
+    if x != 1 / 21:
+        return 1 / (21 * x - 1)
+    else:
+        return 0.0
+
+
+def _f81(x: float) -> float:
+    """Return ``f81``, which is -1 at ``x <= -1``."""
+    if x > -1:
+        return 1 + _sin(1 / (x + 1))
+    else:
+        return -1.0
+
+
 # ==================================================================================================
 #  The problems
 # ==================================================================================================
@@ -119,7 +151,7 @@ class GanchovskiEtAlTable2Problem(PaperProblemEnum):
     F37 = PaperProblem(name="f37", f=lambda x: _pow(x - 7 / 9, 3) + (x - 7 / 9) * 1e-3, a=-11.0, b=9.0)
     F38 = PaperProblem(name="f38", f=lambda x: -0.5 if x <= 1 / 3 else 0.5, a=-11.0, b=9.0)
     F39 = PaperProblem(name="f39", f=lambda x: -1e-3 if x <= 1 / 3 else 1 - 1e-3, a=-11.0, b=9.0)
-    F40 = PaperProblem(name="f40", f=lambda x: 0.0 if x == 0 else 1 / (x - 2 / 3), a=-11.0, b=9.0)
+    F40 = PaperProblem(name="f40", f=_f40, a=-11.0, b=9.0)
     F41 = PaperProblem(name="f41", f=lambda x: 2 * x * _exp(-5) - 2 * _exp(-5 * x) + 1, a=0.0, b=10.0)
     F42 = PaperProblem(name="f42", f=lambda x: (_pow(x, 2) - x - 6) * (_pow(x, 2) - 3 * x + 2), a=0.0, b=math.pi)
     F43 = PaperProblem(name="f43", f=lambda x: _pow(x, 3), a=-1.0, b=1.5)
@@ -128,7 +160,7 @@ class GanchovskiEtAlTable2Problem(PaperProblemEnum):
     F46 = PaperProblem(name="f46", f=lambda x: (_exp(-5 * x) - x - 0.5) / _pow(x, 5), a=0.09, b=0.7)
     F47 = PaperProblem(name="f47", f=lambda x: 1 / math.sqrt(x) - 2 * _log(5e3 * math.sqrt(x)) + 0.8, a=0.0005, b=0.5)
     F48 = PaperProblem(name="f48", f=lambda x: 1 / math.sqrt(x) - 2 * _log(5e7 * math.sqrt(x)) + 0.8, a=0.0005, b=0.5)
-    F49 = PaperProblem(name="f49", f=lambda x: -_pow(x, 3) - x - 1 if x <= 0 else _pow(x, 0) - x - 1, a=-1.0, b=1.0)
+    F49 = PaperProblem(name="f49", f=_f49, a=-1.0, b=1.0)
     F50 = PaperProblem(name="f50", f=lambda x: _pow(x, 3) - 2 * x - x + 3, a=-3.0, b=2.0)
     F51 = PaperProblem(name="f51", f=_log, a=0.5, b=5.0)
     F52 = PaperProblem(name="f52", f=lambda x: (10 - x) * _exp(-10 * x) - _pow(x, 10) + 1, a=0.5, b=8.0)
@@ -163,11 +195,11 @@ class GanchovskiEtAlTable2Problem(PaperProblemEnum):
         b=1.0,
     )
     F76 = PaperProblem(name="f76", f=lambda x: (1 + 1e6) / 1e6 if x > (1 - 1e6) / 1e6 else -1.0, a=-1.0, b=1.0)
-    F77 = PaperProblem(name="f77", f=lambda x: 1 / (21 * x - 1) if x != 1 / 21 else 0.0, a=-1.0, b=1.0)
+    F77 = PaperProblem(name="f77", f=_f77, a=-1.0, b=1.0)
     F78 = PaperProblem(name="f78", f=lambda x: x * x / 4 + math.ceil(x / 2) - 0.5, a=-1.0, b=1.0)
     F79 = PaperProblem(name="f79", f=lambda x: math.ceil(10 * x - 1) + 0.5, a=-1.0, b=1.0)
     F80 = PaperProblem(name="f80", f=lambda x: x + _sin(x * 1e6) / 10 + 1e-3, a=-1.0, b=1.0)
-    F81 = PaperProblem(name="f81", f=lambda x: 1 + _sin(1 / (x + 1)) if x > -1 else -1.0, a=-1.0, b=1.0)
+    F81 = PaperProblem(name="f81", f=_f81, a=-1.0, b=1.0)
     F82 = PaperProblem(name="f82", f=lambda x: 202 * x - 2 * math.floor((2 * x + 1e-2) / 2e-2) - 0.1, a=-1.0, b=1.0)
     F83 = PaperProblem(
         name="f83", f=lambda x: _pow(202 * x - 2 * math.floor((2 * x + 1e-2) / 2e-2) - 0.1, 3), a=-1.0, b=1.0
@@ -193,10 +225,10 @@ class GanchovskiEtAlTable2Problem(PaperProblemEnum):
         reason: str | None = None,
         observation: str | None = None,
     ) -> PaperProblem:
-        """Return the member's problem with a method's evaluation count in Table 2, which includes the 2 evaluations
-        at the interval bounds, and the method's root in the paper's supplementary results.
+        """Return the member's problem with a method's evaluation count in Table 2 and the method's root in the paper's
+        supplementary results; the count includes the 2 evaluations at the interval bounds.
 
-        ``root_rel_tol`` and ``root_abs_tol`` are the tolerances on ``root``; the other arguments are those of
+        ``root_rel_tol`` and ``root_abs_tol`` are those of `PaperProblem`; the other arguments are those of
         `PaperProblemEnum.with_n_fevals`.
         """
         return replace(
@@ -205,3 +237,15 @@ class GanchovskiEtAlTable2Problem(PaperProblemEnum):
             root_rel_tol=root_rel_tol,
             root_abs_tol=root_abs_tol,
         )
+
+
+# ==================================================================================================
+#  Stopping rule
+# ==================================================================================================
+def ganchovski_et_al_stop_width(x: float) -> float:
+    """Return ``aTol + rTol * |x|``, with ``aTol = rTol = 1e-14``, the tolerance that the paper's C# code applies at
+    ``x``.
+
+    The C# modAB stops once the interval is at most this wide; the C# methods of Ridders and Brent use half of it.
+    """
+    return 1e-14 + 1e-14 * abs(x)

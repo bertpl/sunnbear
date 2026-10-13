@@ -1,4 +1,4 @@
-"""This module holds `TABLE_2`, the problems of Table 2 of the 2026 modAB paper, with modAB's evaluation count in
+"""This module holds `TABLE_2`, the problems of Table 2 of Ganchovski et al. (2026), with modAB's evaluation count in
 that table and its root in the paper's supplementary results."""
 
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
@@ -11,9 +11,9 @@ _ROUNDING_DEVIATION_REASON = (
 )
 
 # Each row holds:
-# - modAB's evaluation count in Table 2, less the number of iterations whose chord's zero is clamped onto a bound,
-#   where there are any: the paper's C# code counts every iteration as an evaluation, but a clamped iteration
-#   evaluates nothing, so `ModAB`'s evaluation count is the table's count minus the clamped iterations;
+# - modAB's evaluation count in Table 2, written as the table's count minus the number of iterations whose chord's
+#   zero is clamped onto a bound, where there are any: the paper's C# code counts every iteration as an evaluation,
+#   but a clamped iteration evaluates nothing;
 # - modAB's root in the paper's supplementary results; `ModAB` returns this x-value without evaluating the function
 #   there.
 # A row whose count `ModAB` does not reproduce exactly also holds a count tolerance and the reason.

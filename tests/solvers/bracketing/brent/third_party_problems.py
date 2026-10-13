@@ -144,9 +144,8 @@ ANDERSON_BJORCK_EXAMPLES_1_TO_7 = [
     AndersonBjorckExampleProblem.EX7_N20.with_n_iterations(11),
 ]
 
-# The column "Bre" of Table 2 of Ganchovski et al. (2026) counts the 2 evaluations at the interval bounds; each root is
-# Brent's root in the paper's supplementary results. The roots of f44 and f45, x^5 and x^7, lie near 1e-15, close to
-# their true root at 0, and match the published ones to a relative 1e-12, not 1e-13.
+# The roots that `Brent` returns on f44 and f45, x^5 and x^7, lie near 1e-15, close to their true root at 0, and differ
+# from the published roots by about 1e-27; they match only to a relative 1e-12, not to `GANCHOVSKI_ET_AL_ROOT_REL_TOL`.
 GANCHOVSKI_ET_AL_TABLE_2 = [
     GanchovskiEtAlTable2Problem.F01.with_n_fevals_and_root(10, root=1.0),
     GanchovskiEtAlTable2Problem.F02.with_n_fevals_and_root(13, root=0.399422291710968),
