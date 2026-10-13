@@ -15,11 +15,11 @@ tuples of the set share a fine lane.
    (`correction`);
 5. the refinement solve, a second max-div solve, moves each new tuple within its fine cell, the crossing of its fine
    u-lane and fine v-lane; its candidates lie only in the fine cells of the corrected new tuples (`refinement`);
-6. the second mean correction brings the means back to 0.5, after the refinement moved them.
+6. the second mean correction brings the means back to 0.5, after the refinement moved them (`correction`).
 
-The first correction comes before the refinement because it can move a new tuple by several fine lanes, out of the
-fine cell that a refinement would have worked on; the refinement moves each tuple by less than 1 fine lane, so the
-second correction has little left to correct.
+The first correction comes before the refinement because the first correction can move a new tuple by several fine
+lanes, out of its fine cell, which would undo a refinement done before it; the refinement moves each tuple by less
+than 1 fine lane, within its fine cell, so the second correction has little left to correct.
 
 Both solves share the max-div objective and the constraint that keeps the tuples of the size below (`solve`).
 
@@ -222,10 +222,10 @@ def generate_mc_tuples(
 ) -> MCTuples:
     """Construct a nested Monte Carlo (u, v) tuple set up to `max_size` in about `t_total_sec` s.
 
-    Size `k` of the set is its first `k` tuples, and every size's mean u and mean v are 0.5 up to rounding, unless a
-    mean correction cannot reach 0.5. Each axis is cut into as many equal fine lanes as the largest `MCTuplesSize`
-    holds tuples, and no 2 tuples share a fine lane, so the largest size holds exactly 1 tuple per fine lane on each
-    axis.
+    Size `k` of the set is its first `k` tuples, and every size's mean u and mean v are 0.5 up to rounding, unless the
+    mean correction after the refinement solve cannot reach 0.5. Each axis is cut into as many equal fine lanes as the
+    largest `MCTuplesSize` holds tuples, and no 2 tuples share a fine lane, so the largest size holds exactly 1 tuple
+    per fine lane on each axis.
 
     Each size's new tuples come from 2 max-div solves:
 

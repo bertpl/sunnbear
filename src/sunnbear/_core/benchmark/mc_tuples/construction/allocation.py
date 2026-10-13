@@ -4,8 +4,8 @@ On each axis, every tuple of the size below occupies 1 fine lane. A gap is a max
 occupied fine lanes, or between an occupied fine lane and an edge of the axis (`MCTuplesAxisGaps`).
 
 The size's max-div solve puts exactly the allocated number of new tuples into each gap, and spreads them about evenly
-inside it. So the allocation sets where the size's mean lies, and with it how far the first mean correction has to
-move the new tuples.
+inside it. So the allocation sets where the size's mean lies, and with it how far the first mean correction, which runs
+right after the selection solve, has to move the new tuples.
 
 The allocation comes in 2 stages:
 

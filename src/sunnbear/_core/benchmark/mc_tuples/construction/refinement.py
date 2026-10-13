@@ -1,15 +1,16 @@
 """`MCTuplesRefinementSolve` moves each new tuple of a size within its fine cell, in the size's second max-div solve.
 
 The selection solve (`selection`) draws only a few candidates per fine cell, and picks each new tuple among them; the
-first mean correction then moves the new tuples (`correction`). The refinement solve draws a population only in the
-fine cells of the corrected new tuples: each corrected tuple, followed by many candidates inside its fine cell
-(`MCTuplesPopulation.draw_in_fine_cells_of`).
+first mean correction then moves the new tuples (`correction`).
+
+The refinement solve draws a population only in the fine cells of the corrected new tuples: each corrected tuple,
+followed by many candidates inside its fine cell (`MCTuplesPopulation.draw_in_fine_cells_of`).
 
 Besides the constraint that keeps the tuples of the size below (`solve`), 1 constraint per fine cell of a new tuple
 requires exactly 1 new tuple in that cell.
 
 A fine cell fixes a tuple's fine u-lane and fine v-lane, so every set of new tuples that meets these constraints keeps
-the number of new tuples per gap and the limit of 1 tuple per fine lane.
+each gap's allocated number of new tuples and the limit of 1 tuple per fine lane.
 
 max-div starts from the corrected tuples, so the refinement ends with a score at least as high as theirs.
 """
@@ -38,20 +39,20 @@ class MCTuplesRefinementSolve(MCTuplesSolve):
     def __init__(
         self,
         n_random_candidates_per_cell: int,
-        unrefined_tuple_array: np.ndarray,
+        corrected_tuple_array: np.ndarray,
         size: MCTuplesSize,
         settings: MCTuplesSolveSettings,
     ) -> None:
-        """Draw the population in the fine cells of the new tuples in `unrefined_tuple_array`.
+        """Draw the population in the fine cells of the new tuples in `corrected_tuple_array`.
 
-        `unrefined_tuple_array` holds the size's tuples after the first mean correction: the size below's tuples first,
+        `corrected_tuple_array` holds the size's tuples after the first mean correction: the size below's tuples first,
         then the new tuples. Drawing the population advances `settings.rng`.
         """
         self.n_random_candidates_per_cell = n_random_candidates_per_cell
         population = MCTuplesPopulation.draw_in_fine_cells_of(
-            unrefined_tuple_array[size.n_required :], n_random_candidates_per_cell, settings.rng
+            corrected_tuple_array[size.n_required :], n_random_candidates_per_cell, settings.rng
         )
-        super().__init__(population, unrefined_tuple_array[: size.n_required], size, settings)
+        super().__init__(population, corrected_tuple_array[: size.n_required], size, settings)
 
     # --------------------------------------------------------------------------
     #  Subclass hooks

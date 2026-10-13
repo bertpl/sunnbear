@@ -141,7 +141,7 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
         MCTuplesStats(result.refined_tuple_array),
         result.tuples.stats(),
     ]
-    first_axis_reports, second_axis_reports = [], []
+    first_correction_reports, second_correction_reports = [], []
     for label, allocation, first_correction, second_correction in (
         ("u", result.gap_allocation.u, result.first_mean_correction.u, result.second_mean_correction.u),
         ("v", result.gap_allocation.v, result.first_mean_correction.v, result.second_mean_correction.v),
@@ -152,14 +152,14 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
             predicted = (
                 f"predicted {allocation.greedy_offset_fine_lanes:+.2f} → {allocation.mean_aware_offset_fine_lanes:+.2f}"
             )
-        first_axis_reports.append(f"{label}: {predicted}, {format_correction(first_correction)}")
-        second_axis_reports.append(f"{label}: {format_correction(second_correction)}")
+        first_correction_reports.append(f"{label}: {predicted}, {format_correction(first_correction)}")
+        second_correction_reports.append(f"{label}: {format_correction(second_correction)}")
     print(
         f"k={int(result.size)}: budget {result.t_budget_sec:.0f} s, wall {result.t_wall_sec:.0f} s; "
-        f"in fine lanes, {'; '.join(first_axis_reports)}",
+        f"in fine lanes, {'; '.join(first_correction_reports)}",
         flush=True,
     )
-    print(f"  after the refinement, in fine lanes, {'; '.join(second_axis_reports)}", flush=True)
+    print(f"  after the refinement, in fine lanes, {'; '.join(second_correction_reports)}", flush=True)
     print(
         f"  gpq(0.1) u / v / L2 and score, after the selection → correction → refinement → correction: "
         f"{' → '.join(format_spread(stats) for stats in spreads)}",

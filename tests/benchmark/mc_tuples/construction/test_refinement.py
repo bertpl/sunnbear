@@ -20,8 +20,8 @@ _N_RANDOM_CANDIDATES_PER_CELL = 8
 def _solve() -> MCTuplesRefinementSolve:
     """Return the refinement of size 64 on `_SIZE_32`, with `_NEW_OF_SIZE_64` as the selection solve's new tuples."""
     settings = MCTuplesSolveSettings(n_workers=1, seed=42, rng=np.random.default_rng(5))
-    unrefined_tuple_array = np.vstack([_SIZE_32, _NEW_OF_SIZE_64])
-    return MCTuplesRefinementSolve(_N_RANDOM_CANDIDATES_PER_CELL, unrefined_tuple_array, MCTuplesSize.SIZE_64, settings)
+    corrected_tuple_array = np.vstack([_SIZE_32, _NEW_OF_SIZE_64])
+    return MCTuplesRefinementSolve(_N_RANDOM_CANDIDATES_PER_CELL, corrected_tuple_array, MCTuplesSize.SIZE_64, settings)
 
 
 # ==================================================================================================
