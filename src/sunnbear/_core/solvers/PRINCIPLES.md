@@ -1,4 +1,4 @@
-# Solver design principles
+# Solver implementation principles
 
 **These principles are a draft, a work in progress.** Not every solver follows them.
 

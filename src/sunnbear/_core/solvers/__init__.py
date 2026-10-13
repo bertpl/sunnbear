@@ -2,6 +2,6 @@
 
 Each family, such as `bracketing`, imports from `core` only.
 
-The design principles of the solvers, which decide how each solver implements its published method, are in
+The implementation principles of the solvers, which decide how each solver implements its published method, are in
 ``PRINCIPLES.md`` beside this file.
 """

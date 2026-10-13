@@ -7,8 +7,8 @@ criterion is its own, subclasses `Solver` and writes its own loop.
 Each solver is a package of its own, holding its solver module, its built-in configs, and any helper
 modules. Importing this package registers the built-in configs.
 
-The design principles in ``PRINCIPLES.md`` of the parent package say how each solver implements its published method,
-including why each solver class holds its whole algorithm and computes each formula in its source's form.
+The implementation principles in ``PRINCIPLES.md`` of the parent package say how each solver implements its published
+method, including why each solver class holds its whole algorithm and computes each formula in its source's form.
 """
 
 from .anderson_bjorck import AndersonBjorck
