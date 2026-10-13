@@ -72,13 +72,15 @@ def test_compute_xtol_range_rejects_an_ill_ordered_interval_or_too_few_evaluatio
     "a, b, is_accepted",
     [
         (1023.0, 1024.0, True),  # max(|a|, |b|) = 1024 · (b - a): exactly at the limit
-        (1024.0, 1025.0, False),  # just beyond it
+        (1024.0, 1025.0, False),  # max(|a|, |b|) = 1025 · (b - a): just beyond the limit
         (-1e6, 1e6, True),  # an interval that contains 0
     ],
 )
 def test_compute_xtol_range_rejects_an_interval_too_far_from_0_for_its_width(a, b, is_accepted):
     """With the default `n_bisection_fevals`, `compute_xtol_range` accepts an interval with
-    `max(|a|, |b|) <= 1024 · (b - a)`, and raises `ValueError` beyond that."""
+    `max(|a|, |b|) <= 1024 · (b - a)`, where 1024 =
+    `2^(53 - DEFAULT_N_BISECTION_FEVALS) / MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND`, and raises
+    `ValueError` beyond that."""
     # --- act / assert -----------------
     if is_accepted:
         compute_xtol_range(a=a, b=b, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
