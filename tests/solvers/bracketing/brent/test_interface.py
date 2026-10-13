@@ -19,8 +19,8 @@ def test_the_flop_count_includes_both_comparisons_of_the_stopping_test():
     """The flop count of a solve that stops at its first stopping test includes both comparisons of that test, and 8
     comparisons in all.
 
-    Both comparisons of the stopping test are counted because Algol 60 evaluates both operands of a Boolean operator. The 8
-    comparisons are:
+    Both comparisons of the stopping test are counted because Algol 60 evaluates both operands of a Boolean operator.
+    The 8 comparisons are:
 
     - 4 in `Solver.solve`;
     - 1 in the ``max`` of the tolerance ``t``;
