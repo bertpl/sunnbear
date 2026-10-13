@@ -8,7 +8,7 @@ from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructio
 from sunnbear._core.benchmark.mc_tuples.construction.selection import MCTuplesSelectionSolve
 from sunnbear._core.benchmark.mc_tuples.construction.solve import INCLUSION_CONSTRAINT_WEIGHT, MCTuplesSolveSettings
 
-# The smallest size's population is large enough that each set of `outer_lane_candidates` holds candidates.
+# A population of this many candidates puts candidates in each set of `outer_lane_candidates` at the smallest size.
 _N_POPULATION_32 = 2**15
 
 # The 32 tuples of the smallest size spread from the first fine lane to the last, with u rising and v falling.
@@ -96,7 +96,7 @@ def test_constraints_of_the_smallest_size_hold_its_1_gap_s_count_1_tuple_per_fin
 
 
 @pytest.mark.parametrize(
-    "index, u_lanes, v_lanes",
+    "index, u_lane_range, v_lane_range",
     [
         (0, (0, 0), (1, 511)),
         (1, (512, 1022), (0, 0)),
@@ -104,7 +104,9 @@ def test_constraints_of_the_smallest_size_hold_its_1_gap_s_count_1_tuple_per_fin
         (3, (1, 511), (1023, 1023)),
     ],
 )
-def test_outer_lane_candidates_are_the_population_in_4_rotated_sets_of_511_fine_cells(index, u_lanes, v_lanes):
+def test_outer_lane_candidates_are_the_population_in_4_rotated_sets_of_511_fine_cells(
+    index, u_lane_range, v_lane_range
+):
     """Each set holds exactly the candidates in its range of fine u-lanes and fine v-lanes: fine u-lane 0 along the
     lower half of the v-lanes without the corner, and its 3 rotations by 90 degrees about (0.5, 0.5)."""
     # --- arrange ----------------------
@@ -115,13 +117,13 @@ def test_outer_lane_candidates_are_the_population_in_4_rotated_sets_of_511_fine_
     candidates = solve.outer_lane_candidates[index]
 
     # --- assert -----------------------
-    is_in_range = (u >= u_lanes[0]) & (u <= u_lanes[1]) & (v >= v_lanes[0]) & (v <= v_lanes[1])
+    is_in_range = (u >= u_lane_range[0]) & (u <= u_lane_range[1]) & (v >= v_lane_range[0]) & (v <= v_lane_range[1])
     assert candidates.size > 0
     assert candidates.tolist() == np.flatnonzero(is_in_range).tolist()
 
 
 def test_a_larger_size_has_no_outer_lane_candidates():
-    """Every size above the smallest includes its tuples, so it has no sets of outer-lane candidates."""
+    """Every size above the smallest includes the smallest size's tuples, so it has no sets of outer-lane candidates."""
     # --- act / assert -----------------
     assert _solve(MCTuplesSize.SIZE_64, _SIZE_32, n_population=8192).outer_lane_candidates == []
 
@@ -159,8 +161,8 @@ def test_the_random_starting_selection_needs_as_many_pairable_fine_lanes_as_new_
 #  Validation
 # ==================================================================================================
 def test_validation_returns_a_valid_selection_s_new_candidates():
-    """A selection of 32 candidates in distinct fine lanes meets the smallest size's constraints, and comes back as
-    it is."""
+    """A selection of 32 candidates in distinct fine lanes, 1 in each set of `outer_lane_candidates`, meets the
+    smallest size's constraints, and comes back as it is."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=_N_POPULATION_32)
     selection = np.sort(_distinct_lane_selection(solve, 32))

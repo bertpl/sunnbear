@@ -30,8 +30,8 @@ def _spread_each_gap_s_new_tuples(self: MCTuplesSelectionSolve, t_budget_sec: fl
     """Replace `MCTuplesSelectionSolve.run`: spread each gap's new tuples evenly over its fine lanes, pair u and v at
     random, and return them without running max-div.
 
-    The smallest size's 1 gap spans the axis, and its new tuples include both outer fine lanes, as the selection's
-    constraints require.
+    At the smallest size, the 1 gap spans the axis and the spread runs from the first fine lane to the last, so the new
+    tuples fill both outer fine lanes, as the selection's constraints require.
     """
     new_values = []
     for allocation in (self.gap_allocation.u, self.gap_allocation.v):
@@ -54,8 +54,12 @@ def _pick_each_cell_s_last_candidate(self: MCTuplesRefinementSolve, t_budget_sec
 
 
 def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]) -> None:
-    """Assert that every reported size is a prefix of `tuples`, with means of 0.5, at most 1 tuple per fine lane, and
-    a tuple in both outer fine lanes of each axis."""
+    """Assert that every reported size is a prefix of `tuples`, and that in each size:
+
+    - the u and v means are 0.5;
+    - each fine lane holds at most 1 tuple;
+    - both outer fine lanes of each axis hold a tuple.
+    """
     for result in results:
         size_tuples = tuples.first(result.size)
         assert result.tuples.tuple_array.tolist() == size_tuples.tuple_array.tolist()
@@ -71,8 +75,8 @@ def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]
 # ==================================================================================================
 @pytest.mark.only_with_numba_jit
 def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size():
-    """A construction up to size 64 builds sizes 32 and 64, each with means of 0.5, at most 1 tuple per fine lane and
-    both outer fine lanes of each axis filled, and reports both sizes in order.
+    """A construction up to size 64 builds sizes 32 and 64 as a valid nested set (`_assert_valid_nested_set`), and
+    reports both sizes in order.
 
     Only the structure is asserted: max-div's spread depends on the wall-clock time.
     """

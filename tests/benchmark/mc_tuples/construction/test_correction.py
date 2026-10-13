@@ -67,8 +67,8 @@ def test_the_correction_takes_the_shift_from_the_largest_spacings():
 @pytest.mark.parametrize(
     "outer_value, other_new_values, required",
     [
-        (0.5 / N_FINE_LANES, [0.4, 0.45], [0.3]),  # a right shift would move it out of fine lane 0
-        (1023.5 / N_FINE_LANES, [0.6, 0.55], [0.7]),  # a left shift would move it out of the last fine lane
+        (0.5 / N_FINE_LANES, [0.4, 0.45], [0.3]),  # a right shift would move outer_value out of fine lane 0
+        (1023.5 / N_FINE_LANES, [0.6, 0.55], [0.7]),  # a left shift would move outer_value out of the last fine lane
     ],
 )
 def test_the_correction_leaves_a_new_tuple_in_an_outer_fine_lane_in_place(outer_value, other_new_values, required):
