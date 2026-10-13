@@ -38,10 +38,9 @@ def compute_xtol_range(*, a: float, b: float, n_bisection_fevals: int) -> tuple[
     `MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND · FLOAT64_EPS · max(|a|, |b|)`, so that every solver can
     guarantee a result within `xtol_min` of a root.
 
-    That minimum is met only when
-    `max(|a|, |b|) <= (b - a) · 2^(53 - n_bisection_fevals) / MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND`,
-    so an interval far from 0 relative to its width is rejected; at the default `n_bisection_fevals`, every interval
-    that contains 0 is accepted.
+    That minimum is met only when `max(|a|, |b|) <= (b - a) · 2^(53 - n_bisection_fevals) / k`, with `k` the constant
+    `MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND`, so an interval far from 0 relative to its width is
+    rejected; at the default `n_bisection_fevals`, every interval that contains 0 is accepted.
 
     Raises:
         ValueError: If any of these holds:
