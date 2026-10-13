@@ -12,10 +12,11 @@ class ITPState(SolveState):
     Attributes:
         kappa_1: The paper's truncation constant ``kappa_1``, which `ITP._solve` sets from the width of the initial
             interval.
-        max_next_width: The largest width that the interval may have after iteration ``k`` if the solve is to end
-            within ``n_max`` iterations, the bound that the `ITP` docstring defines. Before iteration ``k`` it holds
-            ``xtol * 2^(n_max - k)``, and `ITP` halves it every iteration.
+        n_max: The iteration bound ``n_max`` that the `ITP` docstring defines; `ITP._solve` sets ``n_max`` from the
+            initial interval.
+        k: The number of the current iteration, counted from 0; `ITP._next_x` increments it.
     """
 
     kappa_1: float = field(init=False)
-    max_next_width: float = field(init=False)
+    n_max: int = field(init=False)
+    k: int = 0

@@ -72,7 +72,7 @@ class ITP(BracketingSolver[ITPState]):
     """
 
     name = "itp"
-    version = 1
+    version = 2
     state_cls = ITPState
 
     def __init__(self, *, n_slack: int, variant: ITPVariant) -> None:
@@ -94,22 +94,17 @@ class ITP(BracketingSolver[ITPState]):
         self.variant = ITPVariant(variant)
 
     def _solve(self, state: ITPState) -> float:
-        """Set the solve's ``kappa_1`` and first ``max_next_width`` on ``state``, then run `BracketingSolver`'s loop.
-
-        The paper computes ``xtol * 2^(n_max - k)`` in every iteration; `ITP` computes it once and halves it every
-        iteration, which gives the same values exactly.
-        """
+        """Set the solve's ``kappa_1`` and ``n_max`` on ``state``, then run `BracketingSolver`'s loop."""
         width = state.interval.width
         n_bisection = math.ceil(math.log2(width / (2.0 * state.xtol)))
         state.kappa_1 = _KAPPA_1_TIMES_INITIAL_WIDTH / width
-        state.max_next_width = state.xtol * 2.0 ** (n_bisection + self.n_slack)
+        state.n_max = n_bisection + self.n_slack
         return super()._solve(state)
 
     def _next_x(self, state: ITPState, interval: Interval) -> float:
         """Return ``x_itp``, the interpolation point ``x_f`` truncated and projected as the class docstring says.
 
-        Also halve ``state.max_next_width`` for the next iteration, so 2 calls on the same interval return different
-        points.
+        Also advance the iteration counter ``state.k``, so 2 calls on the same interval return different points.
         """
         # --- interpolation ----------------------
         x_f = (interval.fb * interval.a - interval.fa * interval.b) / (interval.fb - interval.fa)
@@ -130,8 +125,9 @@ class ITP(BracketingSolver[ITPState]):
             x_t = x_half
 
         # --- projection -------------------------
-        r = state.max_next_width - 0.5 * interval.width
-        state.max_next_width = 0.5 * state.max_next_width
+        # 2^(n_max - k) is an integer power of 2, which is integer arithmetic, not a flop.
+        r = state.xtol * 2 ** (state.n_max - state.k) - 0.5 * interval.width
+        state.k += 1
         if self.variant is ITPVariant.PAPER_EXPERIMENTS:
             # Apply the margin of the authors' MATLAB code; the class docstring describes its 2 effects.
             r = max(0.99 * r - 0.5 * state.xtol, 0.0)
