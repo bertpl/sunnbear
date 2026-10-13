@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Improve the spread of the sizes from 64 up in the tuple sets that `generate_mc_tuples` builds
+- Improve the spread of the tuple sets of size 64 and up that `generate_mc_tuples` builds
 - Improve the spread statistics of the tuple sets that `generate_mc_tuples` builds
 - Rebuild the shipped Monte Carlo tuple set with improved spread statistics; benchmark results on it differ from those on the previous set
 

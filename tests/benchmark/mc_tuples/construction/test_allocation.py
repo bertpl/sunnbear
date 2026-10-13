@@ -105,8 +105,8 @@ def test_mean_aware_counts_move_the_extra_tuple_to_the_middle_gap_without_loweri
 
 
 def test_mean_aware_counts_trade_spacing_for_offset_at_twice_the_rate_when_the_size_doubles():
-    """With 4 tuples in the size below and 4 new ones, the offset weight is 2, so the search leaves a greedy allocation
-    whose `corrected_min_spacing` would be the higher with a weight of 1."""
+    """With 4 tuples in the size below and 4 new ones, the offset weight is 2, so the search moves away from a greedy
+    allocation whose `corrected_min_spacing` would be higher than the result's with a weight of 1."""
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of((np.array([151, 376, 528, 994]) + 0.5) / N_FINE_LANES)
     greedy_counts = gaps.greedy_counts(4)

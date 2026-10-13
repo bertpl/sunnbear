@@ -102,11 +102,13 @@ class MCTuplesAxisGapPlacement:
 
     @property
     def offset_weight(self) -> float:
-        """Return the fine lanes that the first mean correction takes off the smallest spacing, per lane of mean offset.
+        """Return the drop in the smallest spacing, in fine lanes, per fine lane of the size's mean offset.
 
-        Only the new tuples move in the correction, so to remove an offset of the size's mean they move on average by
-        that offset times the size's tuple count divided by its number of new tuples. In an evenly spread size nearly
-        all of them move, so the smallest spacing drops by about that average move.
+        Only the new tuples move in the first mean correction, so to remove an offset of the size's mean they move on
+        average by that offset times the size's total number of tuples divided by its number of new tuples.
+
+        In an evenly spread size nearly all new tuples move, so the smallest spacing drops by about the average move of
+        the new tuples.
         """
         n_new = int(self.counts.sum())
         return (self.gaps.n_required + n_new) / n_new
@@ -115,8 +117,8 @@ class MCTuplesAxisGapPlacement:
     def corrected_min_spacing(self) -> float:
         """Return the estimated smallest spacing, in fine lanes, once the first mean correction has run.
 
-        It is a heuristic: it charges every fine lane of offset of the size's mean from `TARGET_MEAN` at the average
-        move of the new tuples (`offset_weight`), without modeling how the first mean correction moves each new tuple.
+        It is a heuristic: for every fine lane of offset of the size's mean from `TARGET_MEAN`, it subtracts
+        `offset_weight` fine lanes, without modeling how the first mean correction moves each new tuple.
         """
         return float(self.spacings.min() - self.offset_weight * abs(self.offset_fine_lanes))
 
@@ -137,7 +139,7 @@ class MCTuplesAxisGapPlacement:
         offset_after = np.abs(excess - removal[:, None] + addition[None, :]) / size * N_FINE_LANES
         is_valid = (self.counts >= 1)[:, None] & (self.counts < self.gaps.n_free_lanes)[None, :]
         np.fill_diagonal(is_valid, False)
-        # A move keeps the number of new tuples, so the current `offset_weight` also holds for every moved allocation.
+        # Moving 1 tuple between gaps keeps the number of new tuples, so `offset_weight` is the same for every entry.
         return np.where(is_valid, self._min_spacing_after_each_move() - self.offset_weight * offset_after, -np.inf)
 
     # --------------------------------------------------------------------------
