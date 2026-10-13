@@ -6,7 +6,13 @@ from fractions import Fraction
 import numpy as np
 import pytest
 
-from sunnbear._core.utils.float_bits import n_bits, n_bits_binary, n_bits_decimal, n_bits_rational
+from sunnbear._core.utils.float_bits import (
+    _simplest_fraction_between,
+    n_bits,
+    n_bits_binary,
+    n_bits_decimal,
+    n_bits_rational,
+)
 
 LOG2_10 = math.log2(10)
 
@@ -58,6 +64,23 @@ def test_n_bits_rational_finds_the_fraction_with_the_smallest_denominator_that_r
         assert bits == pytest.approx(
             math.log2(max(simplest_fraction.numerator, 1)) + math.log2(simplest_fraction.denominator)
         )
+
+
+@pytest.mark.parametrize(
+    "a, b, c, d, fraction",
+    [
+        (2, 1, 5, 2, (2, 1)),  # the lower bound is an integer
+        (3, 2, 5, 2, (2, 1)),  # an integer lies strictly inside
+        (3, 10, 2, 5, (1, 3)),  # no integer inside: 1/3 lies between 0.3 and 0.4
+    ],
+)
+def test_simplest_fraction_between_takes_an_integer_bound_an_inner_integer_or_the_continued_fraction(
+    a, b, c, d, fraction
+):
+    """The simplest fraction in `[a/b, c/d]` is the lower bound when that is an integer, else an integer inside, else
+    the fraction that the continued fraction of the bounds gives."""
+    # --- act / assert -----------------
+    assert _simplest_fraction_between(a, b, c, d) == fraction
 
 
 def test_random_values_hold_close_to_53_bits():
