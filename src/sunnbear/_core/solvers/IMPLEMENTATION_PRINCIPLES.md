@@ -11,7 +11,7 @@ These principles decide how each of sunnbear's solvers implements its published 
 
 The principles are general decisions that every solver follows, so that no solver gets an ad-hoc decision of its own that is inconsistent with the other solvers.
 
-Each principle has an ID, such as P1 or P5a, so that a docstring or a test can cite it.
+Each principle has an ID, such as P1 or P6, so that a docstring or a test can cite it.
 
 ## The sunnbear solver suite
 
@@ -60,18 +60,17 @@ Without a good reason, a solver does not deviate from its article.
 
 Where a solver's results cannot be reconciled with published results, its test package states so explicitly, with the observed deviations and an explanation where one is available.
 
-**P5. A reproduction of published numerical results is convincing** when it is exact, or when each deviation has a reasonable explanation: a stated cause, or a difference small enough to come from the authors' unstated implementation details or from a different platform, such as another language or CPU.
+**P5. A reproduction of published numerical results is convincing** when it:
 
-A deviation without such an explanation is not convincing. Whether a reproduction is convincing is judged case by case, with no fixed numbers, for A and B alike.
+- is exact;
+- or deviates only where each deviation has a reasonable explanation:
+  - a stated cause, such as a known difference in computational precision or platform;
+  - an experimental difference, such as a relative tolerance in the published run, where sunnbear supports only an absolute tolerance;
+  - a deviation small enough, such as 1 iteration in a limited number of cases, to come from implementation details of the published run that the authors do not state, or from differences between math libraries.
 
-**P5a (candidate, not adopted). A published iteration count that the solver misses by 1 counts as a reasonable deviation**, even when no cause is stated for that row of the table. Any detail of a published run that the paper does not state can shift a count by 1:
+A deviation without such an explanation is not convincing. Whether a reproduction is convincing is judged case by case, for A and B alike.
 
-- the arithmetic and its rounding;
-- the math library;
-- the language and its compiler;
-- the many small decisions of any implementation.
-
-The tests mark such a row with `UNSTATED_RUN_DETAILS` and a short observation; an unverified cause is never stated as fact. A deviation larger than 1 needs a cause of its own, for example a test function or solver whose properties make the iteration count sensitive to small differences in the run.
+The tests mark a deviation of the last kind with `UNSTATED_RUN_DETAILS` and a short observation; an unverified cause is never stated as fact.
 
 ## Detailed math implementation
 
@@ -95,16 +94,7 @@ A solver does not restructure a formula algebraically to save flops. Where it is
 
 ## Stopping
 
-**P7. The stopping rule aims at the same accuracy for every solver:** the returned x-value lies within `xtol` of a root. That goal is reached by 2 types of rule:
-
-- **type 1, the framework's rule, which `BracketingSolver` applies:** stop when the interval is at most `2 * xtol` wide, and return its midpoint;
-- **type 2, a source's own rule:** stop when the interval is at most `xtol` wide, and return an interval bound.
-
-A solver uses the stopping rule of the highest-ranked source whose rule guarantees `xtol`, after translating `xtol` into that rule's own tolerance. When no source has such a rule, the solver uses the framework's rule, which counts as source IV.
-
-A type-2 rule can cost 1 evaluation more for the same guarantee; that difference is accepted, because comparing the solvers' evaluation or flop counts is not sunnbear's main goal.
-
-Following the source comes first: reaching `xtol` never justifies changing an algorithm fundamentally. An open method cannot guarantee `xtol`, and keeps its source's rule.
+**P7. Each solver translates sunnbear's absolute tolerance `xtol` into the formulation of its own stopping rule**, such as a relative tolerance or a tolerance on the function value, and its class docstring states how.
 
 ## Variants
 
