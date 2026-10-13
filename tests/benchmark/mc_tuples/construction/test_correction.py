@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import MIN_N_BITS, N_FINE_LANES, MCTuplesConstructionError, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples.construction import correction as correction_module
 from sunnbear._core.benchmark.mc_tuples.construction.correction import (
     CAP_RANGE,
     MCTuplesAxisValueCorrection,
@@ -108,6 +109,17 @@ def test_the_correction_nudges_each_new_value_below_min_n_bits_within_its_fine_l
     assert correction.corrected_new_values[0] == pytest.approx(new[0], abs=1e-15)
     assert np.array_equal(fine_lanes_of(correction.corrected_new_values), new_lanes)
     assert np.concatenate([required, correction.corrected_new_values]).mean() == pytest.approx(0.5, abs=1e-12)
+
+
+def test_the_nudge_refuses_a_value_whose_fine_lane_holds_no_value_with_min_n_bits_near_it(monkeypatch):
+    """When the search for a value with `MIN_N_BITS` bits finds none in a value's fine lane, the correction raises an
+    error."""
+    # --- arrange ----------------------
+    monkeypatch.setattr(correction_module, "nearest_float_with_min_n_bits", lambda *args: None)
+
+    # --- act / assert -----------------
+    with pytest.raises(MCTuplesConstructionError, match="No value with at least"):
+        MCTuplesAxisValueCorrection.of(np.array([0.25]), np.array([0.75]))
 
 
 def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_the_rest():
