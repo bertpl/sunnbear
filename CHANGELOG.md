@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Make the flop counts of `ITP` consistent with its published algorithm
 - Change the midpoint that `SteffenBrent` evaluates to the one that reproduces the iterates published by Steffen et al., which changes the benchmark results of `SteffenBrent`
+- Raise an error in `compute_xtol_range` when the interval lies too far from 0 for its smallest `xtol`
 
 ### Deprecated
 

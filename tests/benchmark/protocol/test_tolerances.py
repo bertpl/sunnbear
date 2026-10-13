@@ -68,6 +68,25 @@ def test_compute_xtol_range_rejects_an_ill_ordered_interval_or_too_few_evaluatio
         compute_xtol_range(a=a, b=b, n_bisection_fevals=n_bisection_fevals)
 
 
+@pytest.mark.parametrize(
+    "a, b, is_accepted",
+    [
+        (1023.0, 1024.0, True),  # max(|a|, |b|) = 1024 · (b - a): exactly at the limit
+        (1024.0, 1025.0, False),  # just beyond it
+        (-1e6, 1e6, True),  # an interval that contains 0
+    ],
+)
+def test_compute_xtol_range_rejects_an_interval_too_far_from_0_for_its_width(a, b, is_accepted):
+    """With the default `n_bisection_fevals`, `compute_xtol_range` accepts an interval with
+    `max(|a|, |b|) <= 1024 · (b - a)`, and raises `ValueError` beyond that."""
+    # --- act / assert -----------------
+    if is_accepted:
+        compute_xtol_range(a=a, b=b, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
+    else:
+        with pytest.raises(ValueError, match="too far from 0"):
+            compute_xtol_range(a=a, b=b, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
+
+
 # ==================================================================================================
 #  max_fevals_for
 # ==================================================================================================
