@@ -14,7 +14,7 @@ TARGET_MEAN = 0.5
 
 # `MIN_N_BITS` is the fewest bits of information (`n_bits`) that the construction leaves in any u value or v value, so
 # that no short binary, decimal or rational description reproduces a value exactly; a random float64 value holds about
-# 51 to 54.
+# 51 to 54 bits.
 MIN_N_BITS = 50
 
 
@@ -78,3 +78,8 @@ N_FINE_LANES = int(max(MCTuplesSize))
 def fine_lanes_of(values: np.ndarray) -> np.ndarray:
     """Return the fine lane of each value in [0, 1); fine lane `i` holds the values in `[i, i + 1) / N_FINE_LANES`."""
     return np.floor(values * N_FINE_LANES).astype(np.int64)
+
+
+def fine_lane_edges_of(lanes: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Return the lower and the upper edge of each fine lane in `lanes`: the bounds of its values in `fine_lanes_of`."""
+    return lanes / N_FINE_LANES, (lanes + 1) / N_FINE_LANES

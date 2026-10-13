@@ -187,7 +187,7 @@ class MCTuplesGenerator:
         selection_solve = MCTuplesSelectionSolve(self.n_population, required_tuple_array, size, settings)
         selected_tuple_array, selection_solution = selection_solve.run(t_budget_sec - t_refinement_budget_sec)
 
-        # --- first value correction --------------
+        # --- first value correction -------------
         first_value_correction = MCTuplesValueCorrection.of(selected_tuple_array, size.n_required)
 
         # --- refinement -------------------------
@@ -196,7 +196,7 @@ class MCTuplesGenerator:
         )
         refined_tuple_array, refinement_solution = refinement_solve.run(t_refinement_budget_sec)
 
-        # --- second value correction -------------
+        # --- second value correction ------------
         return MCTuplesSizeResult(
             size=size,
             t_budget_sec=t_budget_sec,

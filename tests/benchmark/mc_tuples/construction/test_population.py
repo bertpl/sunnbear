@@ -2,17 +2,15 @@
 
 - `draw` spreads its candidates evenly over its allowed fine lanes and fine cells, and, given
   `MCTuplesAxisGapAllocation.eligible_fine_lanes`, draws its candidates only in the eligible fine lanes;
-- `draw_in_fine_cells_of` draws its candidates inside the fine cells of given tuples;
-- every drawn value lies strictly inside its fine lane and holds at least `MIN_N_BITS` bits of information.
+- `draw_in_fine_cells_of` draws its candidates inside the fine cells of given tuples.
 """
 
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import MIN_N_BITS, N_FINE_LANES, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, fine_lanes_of
 from sunnbear._core.benchmark.mc_tuples.construction.allocation import MCTuplesGapAllocation
 from sunnbear._core.benchmark.mc_tuples.construction.population import MCTuplesPopulation
-from sunnbear._core.utils.float_bits import n_bits
 
 # The allowed fine lanes: every 16th fine lane along u, and 128 consecutive fine lanes along v: 64 x 128 fine cells.
 _ALLOWED_U_LANES = np.arange(0, N_FINE_LANES, 16)
@@ -66,20 +64,6 @@ def test_draw_over_eligible_fine_lanes_skips_the_free_fine_lanes_of_gaps_without
     for lanes in (population.u_lane, population.v_lane):
         assert lanes.min() == 12
         assert np.unique(lanes).size == N_FINE_LANES - 12
-
-
-def test_values_in_lanes_lie_strictly_inside_their_lanes_with_at_least_min_n_bits():
-    """Each value lies strictly inside its fine lane, even in the outer fine lanes, and holds at least `MIN_N_BITS`
-    bits of information."""
-    # --- arrange ----------------------
-    lanes = np.repeat([0, 500, N_FINE_LANES - 1], 400)
-
-    # --- act --------------------------
-    values = MCTuplesPopulation._values_in_lanes(lanes, np.random.default_rng(3))
-
-    # --- assert -----------------------
-    assert np.all((values > lanes / N_FINE_LANES) & (values < (lanes + 1) / N_FINE_LANES))
-    assert min(n_bits(float(value)) for value in values) >= MIN_N_BITS
 
 
 def test_draw_in_fine_cells_of_puts_each_tuple_first_and_its_candidates_inside_its_fine_cell():

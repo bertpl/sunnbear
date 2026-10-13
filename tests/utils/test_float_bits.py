@@ -1,5 +1,5 @@
 """The 3 measures of `float_bits` count the bits of a value's shortest binary, decimal and rational descriptions, and
-`float_bits` draws and nudges values to a minimum of those bits."""
+its 2 other functions return values with at least a given number of those bits."""
 
 import math
 from fractions import Fraction
@@ -100,7 +100,7 @@ def test_random_values_hold_close_to_53_bits():
 #  Values with a minimum number of bits
 # ==================================================================================================
 def test_draw_floats_with_min_n_bits_draws_inside_each_open_interval_with_at_least_min_n_bits():
-    """Every value lies strictly inside its own interval, also an interval that starts at 0, and holds at least
+    """Every value lies strictly inside its own interval, including the interval that starts at 0, and holds at least
     `min_n_bits` bits."""
     # --- arrange ----------------------
     lows = np.repeat([0.0, 0.25, 0.999], 500)

@@ -1,13 +1,16 @@
 """`MCTuplesValueCorrection` moves a size's new tuples after a max-div solve, in 2 steps that always run together.
 
 1. **The mean correction** moves the new tuples so that the size's u and v means are exactly 0.5.
-2. **The nudge** moves each new value with fewer than `MIN_N_BITS` bits of information to the nearest float64 value, in
-   float64 steps, that has at least `MIN_N_BITS` and lies in the same fine lane (`nearest_float_with_min_n_bits`).
-   A nudge moves a value by a few float64 steps, so each size's mean stays 0.5 up to rounding, and every tuple keeps
-   its fine lane.
+2. **The nudge** moves each new value with fewer than `MIN_N_BITS` bits of information to the nearest float64 value in
+   the same fine lane that has at least `MIN_N_BITS` bits; nearness counts float64 steps
+   (`nearest_float_with_min_n_bits`).
 
-The tuples of the size below stay where they are; per axis, only the new tuples move, toward the side that the mean
-needs (`MCTuplesAxisValueCorrection`). The rest of this docstring describes the mean correction.
+   A nudge moves a value by a few float64 steps, so each size's mean stays 0.5 up to rounding, and every tuple keeps
+   its fine lane. The populations' guarantee of `MIN_N_BITS` bits covers only the values that they draw; a value that
+   the mean correction moves can hold fewer.
+
+The rest of this docstring describes the mean correction. The tuples of the size below stay where they are; per axis,
+only the new tuples move, toward the side that the mean needs (`MCTuplesAxisValueCorrection`).
 
 A new tuple in the first or the last fine lane of an axis stays where it is on that axis too, so that both outer fine
 lanes stay filled; on that axis, the rules below treat such a tuple as a tuple of the size below. At the smallest size,
@@ -47,7 +50,13 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from sunnbear._core.benchmark.mc_tuples.core import MIN_N_BITS, N_FINE_LANES, TARGET_MEAN, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples.core import (
+    MIN_N_BITS,
+    N_FINE_LANES,
+    TARGET_MEAN,
+    fine_lane_edges_of,
+    fine_lanes_of,
+)
 from sunnbear._core.utils.float_bits import nearest_float_with_min_n_bits
 
 from .exceptions import MCTuplesConstructionError
@@ -89,8 +98,8 @@ class MCTuplesValueCorrection:
         """Return the size in `tuple_array` after the correction; its first `n_required` tuples are the size below.
 
         Raises:
-            MCTuplesConstructionError: If a fine lane holds 2 tuples after the correction, which the correction's
-                rules prevent unless the size already had such a fine lane, or if the nudge finds no value with
+            MCTuplesConstructionError: If a fine lane holds 2 tuples after the correction (the correction's rules
+                prevent that unless the size already had such a fine lane), or if the nudge finds no value with at least
                 `MIN_N_BITS` bits inside a value's fine lane.
         """
         required, new = tuple_array[:n_required], tuple_array[n_required:]
@@ -190,19 +199,20 @@ class MCTuplesAxisValueCorrection:
 
     @staticmethod
     def _nudged_values(values: np.ndarray) -> np.ndarray:
-        """Return `values` with each value below `MIN_N_BITS` bits moved to the nearest one in its fine lane with them.
+        """Return `values`, each moved to the nearest value in its fine lane with at least `MIN_N_BITS` bits.
 
         Raises:
-            MCTuplesConstructionError: If a value's fine lane holds no value with `MIN_N_BITS` bits near it.
+            MCTuplesConstructionError: If a value's fine lane holds no value with at least `MIN_N_BITS` bits within the
+                search range of `nearest_float_with_min_n_bits`.
         """
         nudged = values.copy()
-        for i, (value, lane) in enumerate(zip(values.tolist(), fine_lanes_of(values).tolist(), strict=True)):
-            nearest = nearest_float_with_min_n_bits(
-                value, MIN_N_BITS, lane * FINE_LANE_WIDTH, (lane + 1) * FINE_LANE_WIDTH
-            )
+        lows, highs = fine_lane_edges_of(fine_lanes_of(values))
+        for i, (value, low, high) in enumerate(zip(values.tolist(), lows.tolist(), highs.tolist(), strict=True)):
+            nearest = nearest_float_with_min_n_bits(value, MIN_N_BITS, low, high)
             if nearest is None:
                 raise MCTuplesConstructionError(
-                    f"No value with {MIN_N_BITS} bits lies near {value!r} in its fine lane."
+                    f"No value with at least {MIN_N_BITS} bits lies in the fine lane of {value!r}, within the search "
+                    "range of nearest_float_with_min_n_bits."
                 )
             nudged[i] = nearest
         return nudged

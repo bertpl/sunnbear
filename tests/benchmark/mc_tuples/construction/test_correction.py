@@ -1,5 +1,5 @@
-"""The value correction moves only the new tuples, brings the mean to exactly 0.5 when it can, and never puts 2 tuples
-in 1 fine lane."""
+"""The value correction moves only the new tuples, brings the mean to exactly 0.5 when it can, nudges each new value to
+at least `MIN_N_BITS` bits, and never puts 2 tuples in 1 fine lane."""
 
 import numpy as np
 import pytest
@@ -84,7 +84,7 @@ def test_the_correction_leaves_a_new_tuple_in_an_outer_fine_lane_in_place(outer_
     correction = MCTuplesAxisValueCorrection.of(np.array(required), new)
 
     # --- assert -----------------------
-    # The mean correction leaves it in place, and the nudge moves it by a few float64 steps at most.
+    # The mean correction leaves the outer value in place, and the nudge moves it by a few float64 steps at most.
     assert correction.corrected_new_values[0] == pytest.approx(outer_value, abs=1e-15)
     assert np.all(correction.corrected_new_values[1:] != new[1:])
     assert np.concatenate([required, correction.corrected_new_values]).mean() == pytest.approx(0.5, abs=1e-12)
@@ -96,7 +96,7 @@ def test_the_correction_nudges_each_new_value_below_min_n_bits_within_its_fine_l
     # --- arrange ----------------------
     required = np.array([0.7718281828459045])
     new = np.array([200.5 / N_FINE_LANES, 0.0])
-    new[1] = 1.5 - required[0] - new[0]  # a value with many bits, which puts the mean at 0.5
+    new[1] = 1.5 - required[0] - new[0]  # This value has many bits and puts the mean at 0.5.
     new_lanes = fine_lanes_of(new)
 
     # --- act --------------------------
@@ -126,7 +126,7 @@ def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_th
     )
 
 
-def test_mean_correction_corrects_both_axes_of_a_size():
+def test_value_correction_corrects_both_axes_of_a_size():
     """The tuples of the size below come first and stay; both axes' means end at 0.5."""
     # --- arrange ----------------------
     tuple_array = np.array([[0.2, 0.8], [0.7, 0.3], [0.45, 0.65], [0.95, 0.15]])
@@ -141,7 +141,7 @@ def test_mean_correction_corrects_both_axes_of_a_size():
     assert correction.v.corrected_new_values.tolist() == correction.tuple_array[2:, 1].tolist()
 
 
-def test_mean_correction_refuses_a_size_that_holds_2_tuples_in_1_fine_lane():
+def test_value_correction_refuses_a_size_that_holds_2_tuples_in_1_fine_lane():
     """A tuple of the size below and a new tuple that share a fine lane, on an axis whose mean is already 0.5, still
     share it after the correction, which raises an error."""
     # --- arrange ----------------------

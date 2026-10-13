@@ -9,5 +9,6 @@ class MCTuplesConstructionError(SunnbearError):
     - no random starting selection with at most 1 new tuple per fine lane on each axis can be formed;
     - the selection misses a tuple of the size below, or the number of new tuples in a gap between the size below's
       fine lanes differs from the gap's allocation;
-    - a fine lane holds 2 tuples, after the selection or after a value correction.
+    - a fine lane holds 2 tuples, after the selection or after a value correction;
+    - the nudge of a value correction finds no value with `MIN_N_BITS` bits inside a value's fine lane.
     """

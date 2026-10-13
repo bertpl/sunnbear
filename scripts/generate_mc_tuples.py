@@ -197,7 +197,7 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
 
 
 def format_correction(correction: MCTuplesAxisValueCorrection) -> str:
-    """Return what 1 value correction did on 1 axis: its offsets, cap and largest move in fine lanes, and its nudges."""
+    """Return what 1 value correction did on 1 axis, with its distances in fine lanes."""
     return (
         f"offset {correction.offset_before_fine_lanes:+.3f} → {correction.offset_after_fine_lanes:+.1e}, "
         f"D {correction.cap_fine_lanes:.2f}, largest move {correction.max_move_fine_lanes:.2f}, "
