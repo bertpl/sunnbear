@@ -2,8 +2,6 @@
 
 import math
 
-from counted_float import CountedFloat
-
 from sunnbear._core.solvers.core import BracketingSolver, Interval
 
 from .state import ITPState
@@ -127,8 +125,8 @@ class ITP(BracketingSolver[ITPState]):
             x_t = x_half
 
         # --- projection -------------------------
-        # A power with a plain float as its base is not counted, so the base 2 is a `CountedFloat`.
-        r = state.xtol * CountedFloat(2.0) ** (state.n_max - state.k) - 0.5 * interval.width
+        # 2^(n_max - k) is an integer power of 2, which is integer arithmetic, not a flop.
+        r = state.xtol * 2 ** (state.n_max - state.k) - 0.5 * interval.width
         state.k += 1
         if self.variant is ITPVariant.PAPER_EXPERIMENTS:
             # Apply the margin of the authors' MATLAB code; the class docstring describes its 2 effects.
