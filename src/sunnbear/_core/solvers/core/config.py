@@ -70,7 +70,7 @@ class SolverConfig:
     # --------------------------------------------------------------------------
     @property
     def solver_id(self) -> str:
-        """Return the config's identity, the solver's name plus its init arguments, e.g. ``itp[n_slack=4]``.
+        """Return the config's identity, the solver's name plus its init arguments, e.g. ``toms748[k=1]``.
 
         Arguments are sorted by name, so the identity does not depend on the order of declaration.
         """

@@ -7,12 +7,12 @@ from .variant import ITPVariant
 
 
 class ITPPaperExperimentsSlack4Config(SolverConfig):
-    """`ITPPaperExperimentsSlack4Config` is `ITP`, variant ``"paper_experiments"``, with ``n_slack = 4``.
+    """`ITPPaperExperimentsSlack4Config` is a secondary config: `ITP`, variant ``"paper_experiments"``, ``n_slack = 4``.
 
-    This config is reported for information, because `ITPPaperExperimentsSlack0Config` is the core config of `ITP`.
-    With ``n_slack = 4``, the projection accepts interpolation steps that shrink the interval by less than half, as long
-    as the solve can still end at most 4 iterations later than bisection would, so the evaluation count depends on how
-    fast interpolation converges on the function.
+    It is not core because `ITPPaperExperimentsSlack0Config`, whose docstring gives the reason, is the core config
+    of `ITP`. With ``n_slack = 4``, the projection accepts interpolation steps that shrink the interval by less than
+    half, as long as the solve can still end at most 4 iterations later than bisection would, so the evaluation count
+    depends on how fast interpolation converges on the function.
     """
 
     solver_cls = ITP
@@ -33,11 +33,12 @@ class ITPPaperExperimentsSlack0Config(SolverConfig):
 
 
 class ITPPaperPseudocodeSlack0Config(SolverConfig):
-    """`ITPPaperPseudocodeSlack0Config` is `ITP` as its paper's pseudocode states it, reported for information.
+    """`ITPPaperPseudocodeSlack0Config` is a secondary config: `ITP` as its paper's pseudocode states it.
 
-    This config differs from `ITPPaperExperimentsSlack0Config` only in its projection radius ``r``, which it does not
-    lower to ``max(0.99 * r - xtol / 2, 0)``, so its solves go past the iteration bound ``n_max`` of `ITP` more often,
-    and end as pure bisection once their projection radius reaches 0.
+    It is not core because `ITPPaperExperimentsSlack0Config`, whose docstring gives the reason, is the core config
+    of `ITP`. This config differs from `ITPPaperExperimentsSlack0Config` only in its projection radius ``r``, which it
+    does not lower to ``max(0.99 * r - xtol / 2, 0)``, so its solves go past the iteration bound ``n_max`` of `ITP`
+    more often, and end as pure bisection once their projection radius reaches 0.
     """
 
     solver_cls = ITP

@@ -6,7 +6,7 @@ from .solver import ModAB
 
 
 class ModABConfig(SolverConfig):
-    """`ModABConfig` is a secondary config.
+    """`ModABConfig` is a secondary config: `ModAB`.
 
     It is not core because the method is not established yet (published 2026), and the evidence for it so far comes
     from its authors' own benchmarks.

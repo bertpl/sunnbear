@@ -8,7 +8,7 @@ from .state import PegasusState
 class Pegasus(BracketingSolver[PegasusState]):
     """`Pegasus` is regula falsi that scales down the function value of a bound that the interval keeps twice in a row.
 
-    Like regula falsi, `Pegasus` evaluates where the chord through the points at both bounds crosses zero.
+    Like regula falsi, `Pegasus` evaluates the zero of the chord through ``(a, f(a))`` and ``(b, f(b))``.
 
     Regula falsi stalls when the function is convex or concave on the interval: regula falsi keeps 1 bound forever,
     so the interval never shrinks below the distance from that bound to the root. The Pegasus method (Dowell and
@@ -39,6 +39,8 @@ class Pegasus(BracketingSolver[PegasusState]):
     method only in the factor.
 
     `Illinois` computes the same zero of the chord, in the form of Dowell and Jarratt (1971).
+
+    `Pegasus` stops by `BracketingSolver`'s criterion, so the returned x-value lies within ``xtol`` of a root.
 
     References:
         - Dowell, M. and Jarratt, P. (1972). The "Pegasus" method for computing the root of an equation. BIT 12(4),

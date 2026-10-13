@@ -3,12 +3,12 @@
 from sunnbear._core.solvers.core import Interval, IntervalBound, Solver, SolveState
 from sunnbear._core.utils.floats import FLOAT64_EPS
 
-# ``_MU`` is the paper's ``mu``: an iteration that leaves the interval wider than ``_MU`` times its width at the start
-# of the iteration ends with a bisection.
+# ``_MU`` is the paper's ``mu``: an iteration that leaves the interval at least ``_MU`` times as wide as at the start of
+# the iteration ends with a bisection.
 _MU = 0.5
 
-# ``_LAMBDA`` is the paper's ``lambda``: `_evaluate_and_split_at` uses it to keep each new point away from the bounds of
-# the interval.
+# ``_LAMBDA`` is the paper's ``lambda``: `_evaluate_and_split_at` uses it to keep each new x-value away from the bounds
+# of the interval.
 _LAMBDA = 0.7
 
 # The authors' code starts ``e`` and ``f(e)`` at this value, which no step reads. ``e`` is the bound discarded before
@@ -20,7 +20,7 @@ _UNSET = 1.0e5
 class TOMS748(Solver):
     """`TOMS748` implements Algorithm 748 (Alefeld, Potra and Shi, 1995), with ``k`` interpolation steps per iteration.
 
-    The first iteration takes a secant step. Each later iteration evaluates the function at 1 point per step:
+    The first iteration takes a secant step. Each later iteration evaluates the function at 1 x-value per step:
 
     - ``k`` interpolation steps. The j-th step, counted from 1, takes the zero of the inverse cubic interpolation
       through the bounds ``a`` and ``b`` and the 2 most recently discarded bounds, ``d`` and ``e``. When the 4
@@ -39,9 +39,9 @@ class TOMS748(Solver):
     - ``stop_width = 2 * (2 * macheps * |u| + tol)``, with ``macheps`` the relative machine precision
       (`FLOAT64_EPS`) and ``tol`` an absolute tolerance that the solver derives from ``xtol``;
     - the solve ends once the interval is at most ``stop_width`` wide, or once an evaluation returns exactly 0, and
-      returns the lower bound ``a``, or the point that returned 0.
+      returns the lower bound ``a``, or the x-value that returned 0.
 
-    The experiments and the code also keep every new point at least ``0.7 * stop_width`` inside the interval, and
+    The experiments and the code also keep every new x-value at least ``0.7 * stop_width`` inside the interval, and
     take the midpoint when the interval is at most ``1.4 * stop_width`` wide.
 
     The returned ``a`` lies within ``stop_width`` of a root. The solver sets
@@ -49,11 +49,11 @@ class TOMS748(Solver):
     that ``stop_width`` never exceeds ``xtol``.
 
     Where ``xtol`` is below ``4 * macheps * max(|a0|, |b0|)``, ``tol`` would be negative and the margin of 0.7 times
-    ``stop_width`` could move a point outside the interval; the solver then sets ``tol = 0``, the setting of the
+    ``stop_width`` could move an x-value outside the interval; the solver then sets ``tol = 0``, the setting of the
     authors' test runs, and the accuracy of ``xtol`` is no longer guaranteed.
 
-    `BracketingSolver`'s loop evaluates the function once per iteration, and an iteration of `TOMS748` evaluates it up
-    to ``k + 2`` times, so `TOMS748` writes its own loop.
+    An iteration of `TOMS748` evaluates the function up to ``k + 2`` times, so `TOMS748` writes its own loop, not
+    `BracketingSolver`'s.
 
     References:
         - Alefeld, G. E., Potra, F. A. and Shi, Y. (1995). Algorithm 748: Enclosing zeros of continuous functions.
@@ -89,9 +89,9 @@ class TOMS748(Solver):
         - ``interval`` is the enclosing interval ``[a, b]``, with ``f(a)`` and ``f(b)`` of opposite signs;
         - ``d`` is the bound that the last call of `_evaluate_and_split_at` discarded, and ``e`` the value of ``d``
           before that call; both lie outside the interval, and ``fd`` and ``fe`` are their function values;
-        - ``c`` is the point to evaluate next.
+        - ``c`` is the x-value to evaluate next.
 
-        Each call of `_evaluate_and_split_at` evaluates 1 point and returns the new interval; the solve ends after any
+        Each call of `_evaluate_and_split_at` evaluates 1 x-value and returns the new interval; the solve ends after any
         call that returns an interval with ``f(a) = 0``, or one at most ``stop_width`` wide. A midpoint is computed as
         ``a + 0.5 * (b - a)``, as in the authors' code, not with `Interval.midpoint`, which rounds differently.
         """
@@ -157,7 +157,10 @@ class TOMS748(Solver):
     # --------------------------------------------------------------------------
     @staticmethod
     def _get_tol(xtol: float, a0: float, b0: float) -> float:
-        """Return the ``tol`` that keeps ``stop_width`` at most ``xtol``, or 0 where that ``tol`` would be negative."""
+        """Return the ``tol`` that keeps ``stop_width`` at most ``xtol``, or 0 where that ``tol`` would be negative.
+
+        The test suite overrides this method to apply the paper's tolerance when it reproduces the paper's tables.
+        """
         return max(0.5 * xtol - 2.0 * FLOAT64_EPS * max(abs(a0), abs(b0)), 0.0)
 
     @staticmethod

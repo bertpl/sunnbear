@@ -34,8 +34,9 @@ class ModAB(Solver):
     ``rTol`` are the C# code's absolute and relative tolerances; in the second case, the solve returns ``x3`` without
     evaluating it.
 
-    The solver passes ``xtol`` as ``aTol`` and 0 as ``rTol``; ``x3`` lies inside the interval, so it lies within
-    ``xtol`` of a root.
+    The solver passes ``xtol`` as ``aTol`` and 0 as ``rTol``. A midpoint ``x3`` lies inside the interval, so it then
+    lies within ``xtol`` of a root. A chord's zero ``x3`` is returned before any clamping, and rounding can put it on
+    or just past a bound, so it lies within ``xtol`` of a root only up to rounding.
 
     `ModAB` follows the C# code where the paper's Algorithm 1 differs from it or leaves a detail out:
 
@@ -43,7 +44,9 @@ class ModAB(Solver):
       first: a chord's zero that rounding puts on or outside a bound is replaced by that bound and its stored function
       value, so nothing is evaluated. In Anderson-Björck mode, such an iteration only halves the stored function value
       at the other bound, or marks the other bound as retained.
-    - **The first threshold:** only the C# code shows the threshold's starting value at the switch.
+    - **The first threshold:** the paper's section 4.2 sets the threshold at the switch to
+      `_FALLBACK_THRESHOLD_FACTOR` times a width, and only the C# code shows that this width is the one before the
+      switching evaluation replaces a bound.
     - **Scaled function values:** Anderson-Björck mode's scaled function values stay stored after a fallback to
       bisection, and the next bisection steps read them when they test whether the function looks close to a straight
       line.
@@ -66,8 +69,8 @@ class ModAB(Solver):
           Anderson-Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. Its Table A1 holds the C# code that
           `ModAB` ports, and the test suite reproduces its Tables 1 and 2. https://doi.org/10.3390/a19050332
         - Ganchovski, N. and Traykov, A. (2023). Modified Anderson-Björck's method for solving non-linear equations in
-          structural mechanics. IOP Conference Series: Materials Science and Engineering 1276, 012010. The method's
-          first version. https://doi.org/10.1088/1757-899X/1276/1/012010
+          structural mechanics. IOP Conference Series: Materials Science and Engineering 1276, 012010. It
+          describes the method's first version. https://doi.org/10.1088/1757-899X/1276/1/012010
     """
 
     name = "modab"
@@ -79,8 +82,8 @@ class ModAB(Solver):
         The variables keep the names of the C# code, except for those listed below; the C# code also groups ``x1``
         and ``y1`` into the point ``p1``, and likewise ``p2`` and ``p3``.
 
-        - ``x_new`` and ``y_new`` are the point that replaces a bound: ``x3`` and ``y3``, or, when ``x3`` is clamped
-          onto a bound, that bound with its stored function value;
+        - ``(x_new, y_new)`` is the point that replaces a bound: ``(x3, y3)``, or, when ``x3`` is clamped onto a
+          bound, that bound with its stored function value;
         - ``retained_bound`` is the bound that was retained in the last Anderson-Björck step, ``None`` before the first;
           the C# code stores it as the integer ``side``, although the comment on ``side`` calls it the side that moved
           last;
@@ -163,6 +166,7 @@ class ModAB(Solver):
         """Return the interval width at or below which the solve stops.
 
         The C# code stops at ``aTol + rTol * |x3|``; `ModAB` passes ``xtol`` as ``aTol`` and 0 as ``rTol``, so
-        `_get_stop_width` ignores ``x3``; a subclass that overrides this method can use ``x3`` for a relative tolerance.
+        `_get_stop_width` ignores ``x3``. The test suite overrides this method to apply the paper's tolerances, the
+        relative one included, when it reproduces the paper's tables.
         """
         return xtol

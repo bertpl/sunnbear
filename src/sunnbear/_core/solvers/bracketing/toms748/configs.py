@@ -6,10 +6,10 @@ from .solver import TOMS748
 
 
 class TOMS748K1Config(SolverConfig):
-    """`TOMS748K1Config` is `TOMS748` with ``k = 1``, the paper's Algorithm 4.1.
+    """`TOMS748K1Config` is a secondary config: `TOMS748` with ``k = 1``, the paper's Algorithm 4.1.
 
-    This config is reported for information because `TOMS748K2Config` is the core config of `TOMS748`; it is included
-    because ``k = 1`` is the default of SciPy's ``toms748``.
+    It is not core because `TOMS748K2Config`, whose docstring gives the reason, is the core config of `TOMS748`; it
+    is included because ``k = 1`` is the default of SciPy's ``toms748``.
     """
 
     solver_cls = TOMS748

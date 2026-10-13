@@ -1,4 +1,4 @@
-"""`Interval` is a `BracketingSolver`'s bracketing interval, reduced step by step; a subclass per orientation."""
+"""`Interval` is a solver's bracketing interval, which `BracketingSolver` reduces; it has a subclass per orientation."""
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass

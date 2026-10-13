@@ -1,4 +1,4 @@
-"""This module re-exports the solver base classes, the interval, state, config, and registry classes, and the solvers.
+"""This module re-exports every public name of the solver framework and of the shipped solvers, with their variants.
 
 How a solve runs is described in the docstring of the implementation package, `sunnbear._core.solvers.core`.
 `WrappedFunction` is deliberately absent: a solver receives one inside its `SolveState` and never constructs one.

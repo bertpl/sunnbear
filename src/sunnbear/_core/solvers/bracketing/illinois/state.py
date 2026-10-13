@@ -11,7 +11,8 @@ class IllinoisState(SolveState):
 
     Attributes:
         newest_bound: The bound that holds the most recent iterate. Before the first iterate, the upper bound is the
-            newest bound, as in the published method.
+            newest bound, as in every example of Dowell and Jarratt (1971); their ALGOL procedure leaves that choice to
+            its caller.
         scaled_retained_f: The function value that the chord uses at the retained bound, which is the bound that does
             not hold the most recent iterate. It equals that bound's own function value, halved once for every
             iteration that kept the bound again.

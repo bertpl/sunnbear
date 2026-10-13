@@ -17,15 +17,15 @@ class ChandrupatlaScipyTwin(TwinSolver):
     tolerance that it computes from ``fatol`` and ``frtol``.
 
     The twin passes ``xatol = xtol`` and 0 for ``xrtol``, ``fatol`` and ``frtol``, which makes SciPy stop where
-    `Chandrupatla` stops and keep each new point as far inside the interval as `Chandrupatla` does.
+    `Chandrupatla` stops and keep each new x-value as far inside the interval as `Chandrupatla` does.
 
     SciPy calls the function with arrays; the twin evaluates each element through the `StoppingWrappedFunction`.
 
     The twin deviates from exact agreement in these declared ways:
 
-    - SciPy evaluates both interval bounds again before its first point;
+    - SciPy evaluates both interval bounds again before its first x-value;
     - SciPy computes the interpolated ``t`` with the paper's equation 3, while `Chandrupatla` computes it from the 4
-      quotients of the BASIC listing, so the evaluated points can differ in their last bits.
+      quotients of the BASIC listing, so the evaluated x-values can differ in their last bits.
     """
 
     name = "chandrupatla_scipy_twin"

@@ -6,7 +6,7 @@ from sunnbear._core.solvers.core import Solver, SolveState
 class AndersonBjorck(Solver):
     """`AndersonBjorck` is regula falsi that scales down the function value of a bound kept twice in a row.
 
-    Like regula falsi, `AndersonBjorck` evaluates where the chord through the points at both bounds crosses zero.
+    Like regula falsi, `AndersonBjorck` evaluates the zero of the chord through ``(a, f(a))`` and ``(b, f(b))``.
 
     Regula falsi stalls when the function is convex or concave on the interval: regula falsi keeps 1 bound forever,
     so the interval never shrinks below the distance from that bound to the root.
@@ -81,6 +81,8 @@ class AndersonBjorck(Solver):
     the next iterate lies close to the retained bound, on the same side of the root, so that iterate replaces the
     retained bound but moves it only slightly.
 
+    `AndersonBjorck` stops by its paper's own criterion, so it writes its own loop, not `BracketingSolver`'s.
+
     References:
         - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of an
           equation. BIT 13(3), 253-264. Its equation 7 is the factor, its section 3 the fallback to 0.5, and its
@@ -94,7 +96,7 @@ class AndersonBjorck(Solver):
           - the paper gives ``gamma = 0.5`` as the fallback factor;
           - its Table 4 shows the slow progress on large intervals; the test suite reproduces that table.
         - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="anderson"``; the test suite checks
-          `AndersonBjorck` against it.
+          `AndersonBjorck` against mpmath's ``Illinois``.
     """
 
     name = "anderson_bjorck"

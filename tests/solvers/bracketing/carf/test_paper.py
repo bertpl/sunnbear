@@ -56,6 +56,6 @@ class _CARFWithPaperTolerances(CARF):
         self._eps2 = eps2
 
     def _is_converged(self, t: float, ft: float, active_width: float, xtol: float) -> bool:
-        """Return whether ``|f(t)| < eps1``, ``f(t) = 0``, or the active bracket is narrower than
+        """Return whether ``|f(t)| < eps1``, ``f(t) = 0``, or the active interval is narrower than
         ``eps2 + |t| * eps1``, ignoring ``xtol``."""
         return abs(ft) < self._eps1 or ft == 0.0 or active_width < self._eps2 + abs(t) * self._eps1

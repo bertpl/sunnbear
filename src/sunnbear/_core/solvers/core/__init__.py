@@ -19,7 +19,7 @@ An abnormal ending is a `SolveException` (see that class); a solver
 that raises anything else is recorded as ``SOLVER_ERROR``. `SolveStatus` lists when a solve is
 recorded as ``DIVERGED``; no bound on how far an iterate may stray exists.
 
-Two facts hold throughout this package:
+This package relies on 2 facts:
 
 - **Orientation.** The framework supports both orientations: the interval's class, `IncreasingInterval`
   or `DecreasingInterval`, says which one an interval has. The benchmark's own function portfolio is

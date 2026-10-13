@@ -11,19 +11,21 @@ class BrentScipyTwin(TwinSolver):
     """`BrentScipyTwin` hands the interval to `scipy.optimize.brentq` and returns ``b`` after the evaluation at which
     `Brent` would stop.
 
-    SciPy's ``brentq`` follows the Fortran version of Brent's procedure on netlib. Its tolerance,
-    ``(xtol + rtol * |b|) / 2``, equals Brent's ``tol = 2 * macheps * |b| + t`` with ``t`` the absolute tolerance
-    that `Brent` derives from its ``xtol``, when the twin passes brentq ``xtol=2 * t`` and ``rtol=4 * macheps``, so
-    SciPy's steps match those of `Brent`.
+    SciPy's ``brentq`` is SciPy's own C implementation of Brent's method; its documentation cites Brent (1973) and
+    Numerical Recipes. Its tolerance, ``(xtol + rtol * |b|) / 2``, equals Brent's ``tol = 2 * macheps * |b| + t`` with
+    ``t`` the absolute tolerance that `Brent` derives from its ``xtol``, when the twin passes brentq ``xtol=2 * t`` and
+    ``rtol=4 * macheps``, so SciPy's steps match those of `Brent`.
 
     The twin deviates from exact agreement in these declared ways:
 
     - SciPy evaluates both interval bounds again before its first step;
     - SciPy computes the interpolation step from divided differences, where `Brent` computes it as ``p / q``, so the
-      evaluated points can differ in their last bits;
+      evaluated x-values can differ in their last bits;
     - SciPy tests a few of Brent's conditions with a strict inequality where Brent's procedure has a non-strict one,
       and the reverse; a strict and a non-strict comparison give different results only when
-      the 2 sides are exactly equal.
+      the 2 sides are exactly equal;
+    - SciPy accepts an interpolation step by comparing step lengths only, without Brent's test of the step's
+      direction toward ``c``; no twin test case reaches a step on which the 2 tests differ.
     """
 
     name = "brent_scipy_twin"
@@ -44,7 +46,7 @@ class BrentScipyTwin(TwinSolver):
     ) -> float | None:
         """Return ``b`` if `Brent` stops after the last of ``evaluations``, or ``None`` if it continues.
 
-        As in `Brent`, ``b`` is the interval bound with the smaller ``|f|``, and the newest point when both are
+        As in `Brent`, ``b`` is the interval bound with the smaller ``|f|``, and the newest x-value when both are
         equal.
         """
         (b, fb), (c, _) = self._get_bounds_best_estimate_first(interval)
