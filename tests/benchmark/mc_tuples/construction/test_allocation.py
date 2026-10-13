@@ -104,6 +104,31 @@ def test_mean_aware_counts_move_the_extra_tuple_to_the_middle_gap_without_loweri
     assert mean_aware_placement.spacings.min() == greedy_placement.spacings.min()
 
 
+def test_mean_aware_counts_trade_spacing_for_offset_at_twice_the_rate_when_the_size_doubles():
+    """With 4 tuples in the size below and 4 new ones, the offset weight is 2, so the search moves away from a greedy
+    allocation whose `corrected_min_spacing` would be higher than the result's with a weight of 1."""
+    # --- arrange ----------------------
+    gaps = MCTuplesAxisGaps.of((np.array([151, 376, 528, 994]) + 0.5) / N_FINE_LANES)
+    greedy_counts = gaps.greedy_counts(4)
+
+    # --- act --------------------------
+    counts = gaps.mean_aware_counts(greedy_counts)
+
+    # --- assert -----------------------
+    greedy_placement = MCTuplesAxisGapPlacement(gaps, greedy_counts)
+    mean_aware_placement = MCTuplesAxisGapPlacement(gaps, counts)
+    assert greedy_counts.tolist() == [1, 0, 0, 3, 0]
+    assert counts.tolist() == [1, 0, 1, 2, 0]
+    assert greedy_placement.offset_weight == mean_aware_placement.offset_weight == 2.0
+    assert (greedy_placement.spacings.min(), greedy_placement.offset_fine_lanes) == pytest.approx((116.5, 29.9375))
+    assert (mean_aware_placement.spacings.min(), mean_aware_placement.offset_fine_lanes) == pytest.approx(
+        (76.0, -8.6875)
+    )
+    assert greedy_placement.spacings.min() - abs(greedy_placement.offset_fine_lanes) > (
+        mean_aware_placement.spacings.min() - abs(mean_aware_placement.offset_fine_lanes)
+    )
+
+
 def test_mean_aware_counts_keep_an_allocation_that_fills_every_free_fine_lane():
     """With as many new tuples as free fine lanes, no gap can take another, so the greedy allocation stays."""
     # --- arrange ----------------------

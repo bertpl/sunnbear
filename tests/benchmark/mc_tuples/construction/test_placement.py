@@ -42,7 +42,8 @@ def test_spacings_sums_and_offset_follow_from_the_values(counts):
     - each gap's spacing is the distance between its consecutive values;
     - each gap's sum is the sum of those values;
     - the offset is the mean of the size below's values and all new values, minus 0.5, in fine lanes;
-    - the corrected smallest spacing is the smallest spacing minus the absolute offset.
+    - the corrected smallest spacing is the smallest spacing minus the absolute offset times the number of all values
+      divided by the number of new values.
     """
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of(_VALUES)
@@ -58,7 +59,11 @@ def test_spacings_sums_and_offset_follow_from_the_values(counts):
             assert np.diff(values) * N_FINE_LANES == pytest.approx(placement.spacings[gap])
     mean = np.concatenate([_VALUES, *all_values]).mean()
     assert placement.offset_fine_lanes == pytest.approx((mean - 0.5) * N_FINE_LANES)
-    assert placement.corrected_min_spacing == pytest.approx(placement.spacings.min() - abs(placement.offset_fine_lanes))
+    weight = (_VALUES.size + sum(counts)) / sum(counts)
+    assert placement.offset_weight == pytest.approx(weight)
+    assert placement.corrected_min_spacing == pytest.approx(
+        placement.spacings.min() - weight * abs(placement.offset_fine_lanes)
+    )
 
 
 @pytest.mark.parametrize("count", [0, -1])
