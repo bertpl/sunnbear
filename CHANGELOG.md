@@ -5,23 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
-### Added
+## 0.2.7 (2026-10-13)
 
 ### Changed
 
 - **Breaking:** Raise a `ValueError` in `compute_xtol_range` when the interval lies too far from 0 for its width
 - Make the flop counts of `ITP` consistent with its published algorithm
 - Change the midpoint that `SteffenBrent` evaluates to the one that reproduces the iterates published by Steffen et al., which changes the benchmark results of `SteffenBrent`
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 0.2.6 (2026-10-13)
 
