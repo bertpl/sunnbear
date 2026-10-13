@@ -12,6 +12,10 @@ Third-party published results:
 
 - Ford (1997), Table 4: reproduced, in ``test_third_party.py``: all 15 iteration counts, including the 4 that
   Ford prints as more than 200.
+- Ganchovski et al. (2026), Table 2, the column "AB": not reproduced. The paper's C# code stops once the next
+  chord's zero lies within its tolerance of the previous one, before evaluating it, while `AndersonBjorck` stops on
+  the interval width. The C# code also starts without a retained bound, so it never scales a function value before its
+  2nd iteration, and it computes the chord's zero and the factor in another form.
 
 Reference implementations:
 

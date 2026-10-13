@@ -13,7 +13,9 @@ Published results:
 
 Third-party published results:
 
-- None.
+- Ganchovski et al. (2026), Table 2, the column "ITP": not reproduced. The paper's C# code runs ITP with
+  ``n_slack = 1`` and the projection radius of ``"paper_pseudocode"``, and it stops at an interval width of about
+  1e-14 while it derives ``n_max`` from a larger tolerance; one ``xtol`` of `ITP` sets both.
 
 Reference implementations:
 

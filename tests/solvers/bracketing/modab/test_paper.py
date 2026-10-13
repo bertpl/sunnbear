@@ -4,8 +4,15 @@ import pytest
 
 from sunnbear.solvers import ModAB
 from tests.solvers.paper_problems import PaperProblem
+from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
 
 from .paper_problems import TABLE_2
+
+
+def test_the_rows_of_table_2_name_every_problem_of_the_table_in_order():
+    """`TABLE_2` holds 1 problem per member of `GanchovskiEtAlTable2Problem`, in the table's order."""
+    # --- assert -----------------------
+    assert [problem.name for problem in TABLE_2] == [member.value.name for member in GanchovskiEtAlTable2Problem]
 
 
 @pytest.mark.parametrize("problem", TABLE_2, ids=str)

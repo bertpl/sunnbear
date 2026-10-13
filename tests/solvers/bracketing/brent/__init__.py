@@ -26,6 +26,9 @@ Third-party published results:
   unknown. On Examples 1 to 5, `Brent` takes 15 to 18 iterations fewer in float64 and in emulated 60-bit arithmetic,
   the double precision of the paper's UNIVAC 1108, and the paper gives no per-example counts in double precision that
   could show where the difference arises.
+- Ganchovski et al. (2026), Table 2, the column "Bre": reproduced, in ``test_third_party.py``: 90 of the 92
+  evaluation counts exactly, the other 2 within 1, and the roots of all 92 functions; the test data states why the
+  2 counts deviate.
 
 Reference implementations:
 

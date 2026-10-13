@@ -8,7 +8,11 @@ Published results:
 
 Third-party published results:
 
-- None.
+- Ganchovski et al. (2026), Table 2, the column "Rid", for the ``"commons_math"`` variant: reproduced, in
+  ``test_third_party.py``: 85 of the 92 evaluation counts exactly, and the roots of all 92 functions, 4 of them within
+  a wider tolerance; the test data states why the other 7 counts deviate and why the 4 roots need the wider tolerance.
+- Ganchovski et al. (2026), Table 2, for the ``"scipy"`` and ``"bracketing_solver"`` variants: not reproduced, because
+  their stopping rules differ from that of the paper's C# code, which is the rule of ``"commons_math"``.
 
 Reference implementations:
 

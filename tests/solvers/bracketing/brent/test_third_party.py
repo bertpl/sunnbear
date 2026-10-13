@@ -2,14 +2,17 @@
 
 - the evaluation counts and bisection switches of the column "Brent's" of Table 2 of Chandrupatla (1997);
 - the evaluation counts of the column "BR" of Tables II and IV to VI of Alefeld, Potra and Shi (1995);
-- the iteration counts of the column "Brent" of Examples 1 to 7 of Anderson and Björck (1973), in single precision.
+- the iteration counts of the column "Brent" of Examples 1 to 7 of Anderson and Björck (1973), in single precision;
+- the evaluation counts and roots of the column "Bre" of Table 2 of Ganchovski et al. (2026).
 
 Each paper ran Brent's procedure ``zero``, stopping rule included, so the tests set only the tolerance ``t`` of
-`Brent` to the paper's value.
+`Brent` to the paper's value. Ganchovski et al. ran a version whose tolerance has a larger relative part, which the
+test maps onto ``t``.
 """
 
 import pytest
 
+from sunnbear._core.utils.floats import FLOAT64_EPS
 from sunnbear.solvers import Brent
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.alefeld_potra_shi import (
@@ -18,11 +21,13 @@ from tests.solvers.paper_problems.alefeld_potra_shi import (
 )
 from tests.solvers.paper_problems.anderson_bjorck import AndersonBjorckExampleProblem
 from tests.solvers.paper_problems.chandrupatla import ChandrupatlaTable2Problem
+from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
 
 from .third_party_problems import (
     ALEFELD_POTRA_SHI_TABLES_IV_TO_VI,
     ANDERSON_BJORCK_EXAMPLES_1_TO_7,
     CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES,
+    GANCHOVSKI_ET_AL_TABLE_2,
 )
 from .tolerance import xtol_for_t
 
@@ -41,6 +46,7 @@ _CHANDRUPATLA_T = 0.5e-5
         ),
         pytest.param(ALEFELD_POTRA_SHI_TABLES_IV_TO_VI, AlefeldPotraShiTablesIVToVIProblem, id="alefeld_potra_shi"),
         pytest.param(ANDERSON_BJORCK_EXAMPLES_1_TO_7, AndersonBjorckExampleProblem, id="anderson_bjorck"),
+        pytest.param(GANCHOVSKI_ET_AL_TABLE_2, GanchovskiEtAlTable2Problem, id="ganchovski_et_al"),
     ],
 )
 def test_each_published_column_names_every_problem_of_its_table_in_order(problems, table):
@@ -136,9 +142,36 @@ def test_the_iteration_counts_of_anderson_bjorck_examples_1_to_7_are_reproduced(
     problem.assert_reproduced_by(result)
 
 
+@pytest.mark.parametrize("problem", GANCHOVSKI_ET_AL_TABLE_2, ids=str)
+def test_the_evaluation_counts_and_roots_of_ganchovski_et_al_table_2_are_reproduced(problem: PaperProblem):
+    """On every row of Table 2 of Ganchovski et al. (2026), `Brent` with the paper's tolerance evaluates as often as
+    the column "Bre" reports, except where the problem states an allowed deviation, and returns the root that the
+    paper's supplementary results give."""
+    # --- act --------------------------
+    result = Brent().solve(
+        problem.f, problem.a, problem.b, xtol=_xtol_for_ganchovski_et_al_tolerance(problem), max_fevals=300
+    )
+
+    # --- assert -----------------------
+    problem.assert_reproduced_by(result)
+
+
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
+def _xtol_for_ganchovski_et_al_tolerance(problem: PaperProblem) -> float:
+    """Return the ``xtol`` under which `Brent` stops by the tolerance of Ganchovski et al.'s C# code on ``problem``.
+
+    The C# code replaces the tolerance ``tol = 2 * macheps * |b| + t`` of Brent's procedure ``zero`` by
+    ``(aTol + rTol * |b|) / 2``, with ``aTol = rTol = 1e-14``. That equals ``tol`` for
+    ``t = 0.5e-14 + (0.5e-14 - 2 * macheps) * |b|``. The solve stops with ``b`` within ``tol`` of the root, so ``|b|``
+    is taken as the absolute value of the published root.
+    """
+    assert problem.root is not None
+    t = 0.5e-14 + (0.5e-14 - 2.0 * FLOAT64_EPS) * abs(problem.root)
+    return xtol_for_t(t, problem.a, problem.b)
+
+
 def _count_bisection_switches(history: tuple[tuple[float, float], ...]) -> int:
     """Return the number of iterations of a `Brent` solve that evaluate the midpoint of the interval.
 

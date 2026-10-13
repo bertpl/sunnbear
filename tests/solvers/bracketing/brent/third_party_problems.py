@@ -3,13 +3,16 @@
 - `CHANDRUPATLA_TABLE_2_WITH_N_BISECTION_SWITCHES`: the column "Brent's" of Table 2 of Chandrupatla (1997);
 - `ALEFELD_POTRA_SHI_TABLES_IV_TO_VI`: the column "BR" of Tables IV to VI of Alefeld, Potra and Shi (1995);
 - `ANDERSON_BJORCK_EXAMPLES_1_TO_7`: the column "Brent" of Examples 1 to 7 of Anderson and Björck (1973), in single
-  precision.
+  precision;
+- `GANCHOVSKI_ET_AL_TABLE_2`: the column "Bre" of Table 2 of Ganchovski et al. (2026), with Brent's root in the paper's
+  supplementary results.
 """
 
 from tests.solvers.paper_problems import UNSTATED_RUN_DETAILS
 from tests.solvers.paper_problems.alefeld_potra_shi import AlefeldPotraShiTablesIVToVIProblem
 from tests.solvers.paper_problems.anderson_bjorck import AndersonBjorckExampleProblem
 from tests.solvers.paper_problems.chandrupatla import ChandrupatlaTable2Problem
+from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
 
 # Each pair holds a problem of Chandrupatla's Table 2 with the evaluation count of Brent's method, and the number of
 # times that the method switches to bisection, which the table prints in parentheses after that count.
@@ -139,4 +142,117 @@ ANDERSON_BJORCK_EXAMPLES_1_TO_7 = [
         observation="the solve takes 1 iteration more",
     ),
     AndersonBjorckExampleProblem.EX7_N20.with_n_iterations(11),
+]
+
+# The column "Bre" of Table 2 of Ganchovski et al. (2026) counts the 2 evaluations at the interval bounds; each root is
+# Brent's root in the paper's supplementary results. The roots of f44 and f45, x^5 and x^7, lie near 1e-15, close to
+# their true root at 0, and match the published ones to a relative 1e-12, not 1e-13.
+GANCHOVSKI_ET_AL_TABLE_2 = [
+    GanchovskiEtAlTable2Problem.F01.with_n_fevals_and_root(10, root=1.0),
+    GanchovskiEtAlTable2Problem.F02.with_n_fevals_and_root(13, root=0.399422291710968),
+    GanchovskiEtAlTable2Problem.F03.with_n_fevals_and_root(12, root=0.804133097503664),
+    GanchovskiEtAlTable2Problem.F04.with_n_fevals_and_root(10, root=-1.0),
+    GanchovskiEtAlTable2Problem.F05.with_n_fevals_and_root(8, root=2.09455148154232),
+    GanchovskiEtAlTable2Problem.F06.with_n_fevals_and_root(10, root=0.138257155056824),
+    GanchovskiEtAlTable2Problem.F07.with_n_fevals_and_root(12, root=0.0693140886870234),
+    GanchovskiEtAlTable2Problem.F08.with_n_fevals_and_root(12, root=0.0346573590208538),
+    GanchovskiEtAlTable2Problem.F09.with_n_fevals_and_root(10, root=0.109611796797792),
+    GanchovskiEtAlTable2Problem.F10.with_n_fevals_and_root(10, root=0.0524786034368101),
+    GanchovskiEtAlTable2Problem.F11.with_n_fevals_and_root(9, root=0.0256237476199884),
+    GanchovskiEtAlTable2Problem.F12.with_n_fevals_and_root(9, root=0.345954815848242),
+    GanchovskiEtAlTable2Problem.F13.with_n_fevals_and_root(10, root=0.245122333753307),
+    GanchovskiEtAlTable2Problem.F14.with_n_fevals_and_root(13, root=0.16492095727644),
+    GanchovskiEtAlTable2Problem.F15.with_n_fevals_and_root(8, root=0.00361710817890406),
+    GanchovskiEtAlTable2Problem.F16.with_n_fevals_and_root(7, root=0.000151471334783891),
+    GanchovskiEtAlTable2Problem.F17.with_n_fevals_and_root(7, root=7.66859512218533e-06),
+    GanchovskiEtAlTable2Problem.F18.with_n_fevals_and_root(9, root=0.516153518757933),
+    GanchovskiEtAlTable2Problem.F19.with_n_fevals_and_root(9, root=0.539522226908413),
+    GanchovskiEtAlTable2Problem.F20.with_n_fevals_and_root(13, root=0.552704666678487),
+    GanchovskiEtAlTable2Problem.F21.with_n_fevals_and_root(11, root=0.409992017989137),
+    GanchovskiEtAlTable2Problem.F22.with_n_fevals_and_root(10, root=0.452509145577641),
+    GanchovskiEtAlTable2Problem.F23.with_n_fevals_and_root(10, root=0.475626848596062),
+    GanchovskiEtAlTable2Problem.F24.with_n_fevals_and_root(137, root=2.99999999999999),
+    GanchovskiEtAlTable2Problem.F25.with_n_fevals_and_root(118, root=4.0),
+    GanchovskiEtAlTable2Problem.F26.with_n_fevals_and_root(137, root=2.47457678736982),
+    GanchovskiEtAlTable2Problem.F27.with_n_fevals_and_root(31, root=1.88914310822898),
+    GanchovskiEtAlTable2Problem.F28.with_n_fevals_and_root(131, root=7.14299999999999),
+    GanchovskiEtAlTable2Problem.F29.with_n_fevals_and_root(30, root=2.99980076330914),
+    GanchovskiEtAlTable2Problem.F30.with_n_fevals_and_root(14, root=4.26716830454212),
+    GanchovskiEtAlTable2Problem.F31.with_n_fevals_and_root(12, root=0.31830988618379),
+    GanchovskiEtAlTable2Problem.F32.with_n_fevals_and_root(13, root=1.32581766366803),
+    GanchovskiEtAlTable2Problem.F33.with_n_fevals_and_root(15, root=0.865474033101614),
+    GanchovskiEtAlTable2Problem.F34.with_n_fevals_and_root(
+        10,
+        root=0.73908513321516,
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation=(
+            "the solve takes 1 evaluation fewer; with the cos of macOS's C library in place of a correctly rounded "
+            "cos, it takes the table's 10"
+        ),
+    ),
+    GanchovskiEtAlTable2Problem.F35.with_n_fevals_and_root(11, root=0.656666666666666),
+    GanchovskiEtAlTable2Problem.F36.with_n_fevals_and_root(44, root=0.666666666666665),
+    GanchovskiEtAlTable2Problem.F37.with_n_fevals_and_root(31, root=0.777777777777777),
+    GanchovskiEtAlTable2Problem.F38.with_n_fevals_and_root(53, root=0.333333333333337),
+    GanchovskiEtAlTable2Problem.F39.with_n_fevals_and_root(83, root=0.333333333333332),
+    GanchovskiEtAlTable2Problem.F40.with_n_fevals_and_root(55, root=0.666666666666657),
+    GanchovskiEtAlTable2Problem.F41.with_n_fevals_and_root(13, root=0.138257155056824),
+    GanchovskiEtAlTable2Problem.F42.with_n_fevals_and_root(10, root=3.0),
+    GanchovskiEtAlTable2Problem.F43.with_n_fevals_and_root(124, root=-1.76712656679895e-15),
+    GanchovskiEtAlTable2Problem.F44.with_n_fevals_and_root(127, root=2.45000610953973e-15, root_rel_tol=1e-12),
+    GanchovskiEtAlTable2Problem.F45.with_n_fevals_and_root(135, root=-1.15436487217852e-15, root_rel_tol=1e-12),
+    GanchovskiEtAlTable2Problem.F46.with_n_fevals_and_root(15, root=0.101624392293549),
+    GanchovskiEtAlTable2Problem.F47.with_n_fevals_and_root(16, root=0.00773252320061279),
+    GanchovskiEtAlTable2Problem.F48.with_n_fevals_and_root(16, root=0.00127630494573559),
+    GanchovskiEtAlTable2Problem.F49.with_n_fevals_and_root(11, root=-0.682327803828019),
+    GanchovskiEtAlTable2Problem.F50.with_n_fevals_and_root(12, root=-2.10380340273553),
+    GanchovskiEtAlTable2Problem.F51.with_n_fevals_and_root(10, root=1.0),
+    GanchovskiEtAlTable2Problem.F52.with_n_fevals_and_root(17, root=1.00004083556472),
+    GanchovskiEtAlTable2Problem.F53.with_n_fevals_and_root(14, root=1.69681238680975),
+    GanchovskiEtAlTable2Problem.F54.with_n_fevals_and_root(8, root=0.523598775598298),
+    GanchovskiEtAlTable2Problem.F55.with_n_fevals_and_root(11, root=0.999999999999996),
+    GanchovskiEtAlTable2Problem.F56.with_n_fevals_and_root(11, root=2.0),
+    GanchovskiEtAlTable2Problem.F57.with_n_fevals_and_root(12, root=3.0),
+    GanchovskiEtAlTable2Problem.F58.with_n_fevals_and_root(10, root=1.5574077246549),
+    GanchovskiEtAlTable2Problem.F59.with_n_fevals_and_root(13, root=1.25643120862616),
+    GanchovskiEtAlTable2Problem.F60.with_n_fevals_and_root(8, root=0.354463104375025),
+    GanchovskiEtAlTable2Problem.F61.with_n_fevals_and_root(11, root=1.40449164821534),
+    GanchovskiEtAlTable2Problem.F62.with_n_fevals_and_root(9, root=1.89549426703398),
+    GanchovskiEtAlTable2Problem.F63.with_n_fevals_and_root(10, root=0.567143290409783),
+    GanchovskiEtAlTable2Problem.F64.with_n_fevals_and_root(9, root=0.1),
+    GanchovskiEtAlTable2Problem.F65.with_n_fevals_and_root(
+        8,
+        root=-0.523598775598298,
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation="the solve takes 1 evaluation more",
+    ),
+    GanchovskiEtAlTable2Problem.F66.with_n_fevals_and_root(10, root=-0.843914568649263),
+    GanchovskiEtAlTable2Problem.F67.with_n_fevals_and_root(12, root=0.835079042723559),
+    GanchovskiEtAlTable2Problem.F68.with_n_fevals_and_root(8, root=0.873568526830231),
+    GanchovskiEtAlTable2Problem.F69.with_n_fevals_and_root(10, root=0.11111111111111),
+    GanchovskiEtAlTable2Problem.F70.with_n_fevals_and_root(11, root=-0.0370201277078609),
+    GanchovskiEtAlTable2Problem.F71.with_n_fevals_and_root(13, root=-0.666666666666663),
+    GanchovskiEtAlTable2Problem.F72.with_n_fevals_and_root(139, root=1.00000000199762e-06),
+    GanchovskiEtAlTable2Problem.F73.with_n_fevals_and_root(141, root=1.00000000060604e-06),
+    GanchovskiEtAlTable2Problem.F74.with_n_fevals_and_root(142, root=0.333333333333334),
+    GanchovskiEtAlTable2Problem.F75.with_n_fevals_and_root(66, root=0.333333349861514),
+    GanchovskiEtAlTable2Problem.F76.with_n_fevals_and_root(49, root=-0.999999000000004),
+    GanchovskiEtAlTable2Problem.F77.with_n_fevals_and_root(53, root=0.0476190476190529),
+    GanchovskiEtAlTable2Problem.F78.with_n_fevals_and_root(51, root=-9.83638457885193e-16),
+    GanchovskiEtAlTable2Problem.F79.with_n_fevals_and_root(47, root=1.50413845071253e-16),
+    GanchovskiEtAlTable2Problem.F80.with_n_fevals_and_root(21, root=-0.0282363589218286),
+    GanchovskiEtAlTable2Problem.F81.with_n_fevals_and_root(51, root=-0.99999999999999),
+    GanchovskiEtAlTable2Problem.F82.with_n_fevals_and_root(4, root=0.05),
+    GanchovskiEtAlTable2Problem.F83.with_n_fevals_and_root(125, root=0.257920792079211),
+    GanchovskiEtAlTable2Problem.F84.with_n_fevals_and_root(8, root=3.01250244276146),
+    GanchovskiEtAlTable2Problem.F85.with_n_fevals_and_root(12, root=-2.20778314488693),
+    GanchovskiEtAlTable2Problem.F86.with_n_fevals_and_root(16, root=0.302804157270694),
+    GanchovskiEtAlTable2Problem.F87.with_n_fevals_and_root(12, root=0.98780487804878),
+    GanchovskiEtAlTable2Problem.F88.with_n_fevals_and_root(13, root=0.168362173262536),
+    GanchovskiEtAlTable2Problem.F89.with_n_fevals_and_root(17, root=-3.63693954875174),
+    GanchovskiEtAlTable2Problem.F90.with_n_fevals_and_root(15, root=1.14759628853458),
+    GanchovskiEtAlTable2Problem.F91.with_n_fevals_and_root(13, root=0.353913733550918),
+    GanchovskiEtAlTable2Problem.F92.with_n_fevals_and_root(24, root=0.1),
 ]
