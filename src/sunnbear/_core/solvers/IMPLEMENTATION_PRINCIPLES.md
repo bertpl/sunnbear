@@ -122,10 +122,12 @@ These rules follow from P3 and P6: the flop counts must show the published algor
 
 The reasons why a solver follows each of its sources are stated nowhere else, so the record keeps them next to the code, and a change of principle is checked against each record.
 
+**A record names the source that the solver follows by default, then lists only the exceptions, each in a line or 2.** A reader skims it for what departs from that source; the code and the tests hold the details.
+
 The record has 4 sections, each a heading of the docstring:
 
-- **`Sources:`** names the sources under each rank of P1, by author and year where they have them, with what each states; a rank without a source lists "none".
-- **`Source per aspect:`** gives, for each of these aspects, the rank and the source that the solver follows:
+- **`Sources:`** lists each rank of P1 with its sources as bullets underneath, by author and year where they have them, and what each states. A rank without a source lists "none".
+- **`Source per aspect:`** opens with the source that every aspect follows by default, then gives 1 bullet per exception. An exception is an aspect that follows another source, a deviation (P3), or a case marked with 1 of the keywords below. The aspects are:
   - the step formula;
   - the safeguards;
   - the constants;
@@ -133,34 +135,24 @@ The record has 4 sections, each a heading of the docstring:
   - the arithmetic form (P6);
   - the translation of `xtol` (P7).
 
-  For each aspect:
-  - **For each rank above the followed rank, the entry gives the reason why that rank is not followed**, 1 of these, taken from P1 and P2:
-    - no source of that rank exists;
-    - the source does not state the aspect;
-    - the source states it incompletely or ambiguously;
-    - the solver's validation with the source is not convincing (P5);
-    - a good reason to deviate, which the entry states (P2).
-  - **Where 2 sources of the followed rank state the aspect differently**, the entry names the one that the solver follows, and why (P1).
+  An exception states the choice, its reason and its effect, such as "the evaluation count differs by 1 in about 1 in 7,000 solves". The reason is 1 of those that P1 and P2 give:
+  - the default source does not state the aspect, or states it incompletely or ambiguously;
+  - the solver's validation with the default source is not convincing (P5);
+  - a good reason to deviate, which the exception states (P2);
+  - P1's preference among sources of the same rank, or a judgment call between them.
 
-  An entry that does not follow the highest-ranked source that exists is a deviation that P3 requires the record to declare.
-- **`Validation:`** gives, for each kind of evidence in P4, 1 of these 3 answers:
-  - used, with its evidence, its outcome, and whether the outcome is convincing (P5);
-  - none exists;
-  - not used, with the reason.
-
-  The docstring of the solver's test package gives the details of each published table.
-- **`Variants:`** gives each variant of the solver with its config and role (P8), and for a secondary variant, its deviations from the principles.
+  A last bullet states how the solver translates `xtol` (P7).
+- **`Validation:`** gives 1 line per kind of evidence in P4: used, with the evidence and whether it is convincing (P5); none exists; or not used, with the reason. The docstring of the solver's test package gives the details of each published table.
+- **`Variants:`** gives 1 line per config, with its role (P8), and for a secondary variant, its deviations from the principles.
 
 **The class docstring describes what the algorithm does, and its `References:` gives the full citation of every source that the record names.** API documentation renders the docstring of the public class, not the docstring of its private module, so the full citations go in the class docstring.
 
 A test checks that every author and year that a record's `Sources:` names appears in the class's `References:`.
 
-**The record marks each disagreement between a solver and the principles, and each judgment call, with 1 of 3 keywords.** Each keyword starts a bullet next to the aspect that it concerns, so that `grep -rnE "PRINCIPLE-(CONFLICT|GAP)|JUDGMENT-CALL" src/` lists all of them:
+**The record marks each disagreement between a solver and the principles, and each judgment call, with 1 of 3 keywords.** Each keyword starts an exception bullet, so that `grep -rnE "PRINCIPLE-(CONFLICT|GAP)|JUDGMENT-CALL" src/` lists all of them:
 
 - **`PRINCIPLE-CONFLICT (Pn)`**: the solver breaks principle Pn. The bullet says how, and what would resolve the conflict.
 - **`PRINCIPLE-GAP (Pn)`**: Pn does not decide the case, because it is silent or ambiguous. The bullet says what is undecided, and which choice the code makes.
-- **`JUDGMENT-CALL`**: the principles leave a minor gap or a small judgment call, which the record makes for this solver. The bullet says which choice the code makes, why, and what the choice affects.
+- **`JUDGMENT-CALL`**: the principles leave a minor gap or a small judgment call, which the record makes for this solver. The bullet says which choice the code makes, why, and its effect.
 
 A record flags a conflict and does not resolve it; resolving it is a change of its own, made under these principles.
-
-**A record is longer than most module docstrings, and code reviews that ask to shorten a record are answered by this section.** A record still cites a fact that the code or the tests own, and does not repeat the fact.
