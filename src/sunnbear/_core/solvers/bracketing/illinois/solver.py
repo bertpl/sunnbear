@@ -52,6 +52,8 @@ Validation:
       - used: Ford (1997), Table 4, reproduced to within 1 iteration, which is convincing (P5);
       - not used: the Illinois columns of other articles; the docstring of the test package
         ``tests.solvers.bracketing.illinois`` lists them, with the reasons.
+      - TBD: Oliveira and Takahashi (2020), Table 1, the column "Illinois": 17 of its 24 counts match exactly and 23
+        within 1, and the choice of form in the PRINCIPLE-GAP (P6) entry changes these counts.
     - C - reference implementation:
       - used: a twin test checks that `Illinois` evaluates the same x-values as mpmath's ``Illinois`` with
         ``method="illinois"``; the twin test imposes the stopping rule of `Illinois` on mpmath.
