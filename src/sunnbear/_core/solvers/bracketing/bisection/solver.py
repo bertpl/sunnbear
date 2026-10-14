@@ -29,12 +29,13 @@ Source per aspect:
     - Translation of ``xtol`` (P7): ``xtol`` is Atkinson's ``epsilon``.
 
 Validation:
-    - A - authors' results: none exists.
-    - B - third-party results: used. Atkinson's Table 2.1 is reproduced exactly, which is convincing (P5).
-      Chandrupatla (1997) and Ganchovski et al. (2026) also publish evaluation counts of bisection, which the test
-      suite does not check.
-    - C - reference implementation: used. A twin test checks the midpoints against SciPy's ``scipy.optimize.bisect``,
-      not its stopping rule.
+    - A - authors' results:
+      - none exists.
+    - B - third-party results:
+      - used: Atkinson's Table 2.1, reproduced exactly, which is convincing (P5);
+      - not checked: the evaluation counts of bisection that Chandrupatla (1997) and Ganchovski et al. (2026) publish.
+    - C - reference implementation:
+      - used: a twin test checks the midpoints against SciPy's ``scipy.optimize.bisect``, not its stopping rule.
 
 Variants:
     - `BisectionConfig`, the only config, is the baseline, which follows the principles as strictly as a core variant
