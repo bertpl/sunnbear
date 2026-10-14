@@ -31,7 +31,7 @@ dependencies = [
     "matplotlib>=3.10.7; python_version == '3.13'",
     "matplotlib>=3.10.7; python_version == '3.14'",
     "matplotlib>=3.11.2; python_version >= '3.15'",
-    # counted-float 2.8.0 adds Verbosity.ERROR, which the tests use to fail on a solver operation that it cannot count.
+    # counted-float 2.8.0 adds Verbosity.ERROR, which the tests use to fail on a solver operation that counted-float cannot count.
     "counted-float>=2.8.0",
     # These pydantic minimal versions equal counted-float's own pydantic minimal versions; counted-float
     # depends on pydantic, so every install already satisfies them.

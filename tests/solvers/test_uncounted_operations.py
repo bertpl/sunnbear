@@ -1,9 +1,9 @@
-"""Every float operation of a built-in solver is counted, which 2 kinds of test check.
+"""The tests in this module check in 2 ways that every float operation of a built-in solver is counted.
 
-- At runtime, every built-in config solves the twin test cases with counted-float raising at each operation that it
-  cannot count.
-- Statically, the solver code imports no numpy and converts no value to a plain `float`: counted-float cannot see
-  either, so no runtime check reports them.
+- At runtime, every built-in config solves the test cases of the twin tests (which compare a solver with a reference
+  implementation), with counted-float raising at each operation that it cannot count.
+- Statically, the solver packages import no numpy, and the algorithm packages convert no value to a plain `float`:
+  counted-float cannot see either, so no runtime check reports them.
 """
 
 import ast
@@ -21,11 +21,12 @@ from tests.solvers.twins import TWIN_TEST_CASES
 
 _SOLVERS_DIR = Path(solvers_package.__file__).parent
 
-# The packages that hold the solvers' algorithms; the framework in `core/` converts to `float` on purpose, outside the
-# counted solve.
-_ALGORITHM_DIRS = [_SOLVERS_DIR / "bracketing", _SOLVERS_DIR / "open"]
+# The solvers' algorithms live in every subpackage except `core/`. The framework in `core/` converts results to
+# `float` on purpose, after the flop counting of the solve has ended.
+_ALGORITHM_DIRS = sorted(path.parent for path in _SOLVERS_DIR.glob("*/__init__.py") if path.parent.name != "core")
 
-# The built-in configs are the registered configs defined inside the sunnbear package.
+# Defining a SolverConfig subclass registers it, so the registry also holds the configs that test modules define;
+# the built-in configs are the ones defined inside the sunnbear package.
 _BUILT_IN_CONFIGS = [
     config for config in SolverConfigRegistry.configs() if type(config).__module__.startswith("sunnbear.")
 ]
@@ -34,8 +35,9 @@ _BUILT_IN_CONFIGS = [
 # ==================================================================================================
 #  Runtime check
 # ==================================================================================================
-class FrexpSolver(BracketingSolver):
-    """`FrexpSolver` bisects, after calling `math.frexp` on the interval width, which counted-float cannot count."""
+class FrexpBisectionSolver(BracketingSolver):
+    """`FrexpBisectionSolver` bisects, and in each step first calls `math.frexp` on the interval width; counted-float
+    cannot count a `math.frexp` call."""
 
     name = "frexp_bisection"
     version = 1
@@ -48,20 +50,22 @@ class FrexpSolver(BracketingSolver):
 
 @pytest.fixture
 def uncounted_operations_raise(monkeypatch):
-    """Make each solve count at `Verbosity.ERROR`, and let the `UncountedOperationError` that it raises fail the test.
+    """Make counted-float raise `UncountedOperationError` at each solver operation that it cannot count, and let that
+    error fail the test.
 
-    `Solver.solve` opens its own `FlopCountingContext`, whose level replaces that of a context around the call, so the
-    fixture patches the context class in the solver module. `Solver.solve` also records every exception inside a
-    solve as `SOLVER_ERROR`, so the fixture makes `_ending_of` re-raise this one.
+    `Solver.solve` opens its own `FlopCountingContext`, whose verbosity replaces the verbosity of any context that the
+    test opens around the call, so the fixture patches `FlopCountingContext` in the solver module. `Solver.solve` also
+    records any exception that is not a `SolveException` as `SOLVER_ERROR`, so the fixture makes `_ending_of`, the
+    function that maps the exception to a status, re-raise an `UncountedOperationError`.
     """
-    ending_of = solver_module._ending_of
+    original_ending_of = solver_module._ending_of
 
     def ending_of_that_reraises(exc, x_best):
         """Re-raise an `UncountedOperationError`, and hand any other exception to the original `_ending_of`."""
-        if isinstance(exc, UncountedOperationError):
-            raise exc
+        if not isinstance(exc, UncountedOperationError):
+            return original_ending_of(exc, x_best)
         else:
-            return ending_of(exc, x_best)
+            raise exc
 
     monkeypatch.setattr(
         solver_module, "FlopCountingContext", functools.partial(FlopCountingContext, verbosity=Verbosity.ERROR)
@@ -70,10 +74,11 @@ def uncounted_operations_raise(monkeypatch):
 
 
 @pytest.mark.usefixtures("uncounted_operations_raise")
-def test_a_solver_that_calls_an_uncountable_operation_fails_the_solve():
+def test_a_solver_that_calls_an_uncounted_operation_fails_the_solve():
     """With the fixture active, a solve that calls `math.frexp` raises `UncountedOperationError`."""
+    # --- act / assert -----------------
     with pytest.raises(UncountedOperationError, match="frexp"):
-        TWIN_TEST_CASES[0].solve(FrexpSolver())
+        TWIN_TEST_CASES[0].solve(FrexpBisectionSolver())
 
 
 @pytest.mark.usefixtures("uncounted_operations_raise")
@@ -89,7 +94,8 @@ def test_built_in_config_counts_every_operation(config, test_case):
 #  Static checks
 # ==================================================================================================
 def test_no_solver_module_imports_numpy():
-    """No module of the solver packages imports numpy, whose functions on plain floats counted-float cannot see."""
+    """No module of the solver packages imports numpy, because counted-float cannot see numpy functions applied to
+    plain floats."""
     # --- act --------------------------
     numpy_imports = []
     for path in sorted(_SOLVERS_DIR.rglob("*.py")):
@@ -109,7 +115,8 @@ def test_no_solver_module_imports_numpy():
 
 
 def test_no_algorithm_module_converts_to_a_plain_float():
-    """No module of the algorithm packages calls `float(...)`, which ends the counting of a value without a report."""
+    """No module of the algorithm packages calls `float(...)`, which silently stops counted-float from counting the
+    operations on its result."""
     # --- act --------------------------
     float_calls = []
     for algorithm_dir in _ALGORITHM_DIRS:
