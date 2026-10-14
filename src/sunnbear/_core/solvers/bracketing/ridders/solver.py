@@ -2,7 +2,8 @@
 
 The rest of this docstring is the record of `Ridders` under the solver implementation principles
 (``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package). ``Source per aspect:`` describes the core
-variant, ``"scipy"``, and ``Variants:`` gives the deviations of the other 2 variants.
+variant, ``"scipy"``, and ``Variants:`` gives the deviations of the other 2 variants. The names ``x0`` to ``x3``,
+``f0`` to ``f2`` and ``d`` are those of the class docstring of `Ridders`.
 
 Sources:
     - I - article:
@@ -32,46 +33,50 @@ Source per aspect:
     - JUDGMENT-CALL: SciPy's iteration limit ``maxiter`` is left out, so the evaluation budget ends a long solve, as
       for every solver. Where SciPy raises an error after ``maxiter`` iterations, the solve runs on to its budget.
     - PRINCIPLE-GAP (P1): SciPy limits the step, so that ``x3`` lies at least ``xtol / 2`` inside the interval;
-      equation 6 has no limit, and P1 does not say whether an article that mentions no safeguard leaves the
-      safeguards to the next-ranked source. The code keeps SciPy's limit; without it, the interval often only halves
-      near the root, and the solve takes 68 evaluations against 12 on ``x^3 - x - 0.801`` over ``[1, 2]`` at
+      equation 6 has no limit, and P1 does not say whether an article that mentions no limit on the step leaves that
+      limit to the next-ranked source. The code keeps SciPy's limit; without it, the interval often only halves near
+      the root, and the solve takes 68 evaluations against 12 on ``x^3 - x - 0.801`` over ``[1, 2]`` at
       ``xtol = 1e-10``.
     - PRINCIPLE-CONFLICT (P1): on an initial interval narrower than ``xtol``, the limit ``d - xtol / 2`` is negative;
-      the code then moves ``x3`` from the midpoint in the step's direction, and SciPy against it. On an interval
-      narrower than ``xtol / 2``, either form puts ``x3`` outside the interval, and the solve ends as ``DIVERGED``.
-      Computing the limit as SciPy does would resolve the conflict; the benchmark never meets the case, because it
-      picks every ``xtol`` below the width of the initial interval.
+      the code then moves ``x3`` from the midpoint in the step's direction, and SciPy moves it in the opposite
+      direction. On an interval narrower than ``xtol / 2``, both the code and SciPy put ``x3`` outside the interval,
+      and `Ridders` ends the solve as ``DIVERGED``. Computing the limit as SciPy does would resolve the conflict; the
+      benchmark never meets the case, because it picks every ``xtol`` below the width of the initial interval.
     - JUDGMENT-CALL: the midpoint is ``0.5 * (a + b)``, the framework's `Interval.midpoint`, as Commons Math,
       Press et al. and the C# code compute it; SciPy, which P1 prefers where the article gives no formula, computes
       ``a + 0.5 * (b - a)``. SciPy's form changes the evaluated x-values in their last bits in about 1 in 8 solves,
       and the evaluation count in about 1 in 100.
     - PRINCIPLE-CONFLICT (P6): the code computes the step as ``d * r / sqrt(r * r - f2 / f0)``, with ``r = f1 / f0``,
       so it multiplies ``d * r`` first, as SciPy does; equation 6 multiplies ``d`` by the fraction
-      ``r / sqrt(r^2 - f2 / f0)``. Computing equation 6 as printed would resolve the conflict: it changes the evaluated
-      x-values in their last bits in about 1 in 3 solves, and the evaluation count in about 1 in 100; all 30 iterates
-      of Section III still match, and 74 of the 92 counts of Table 2 of Ganchovski et al. (2026) match with either form.
+      ``r / sqrt(r^2 - f2 / f0)``. Computing equation 6 as printed would resolve the conflict, with these effects:
+      - the printed form changes the evaluated x-values in their last bits in about 1 in 3 solves, and the evaluation
+        count in about 1 in 100;
+      - all 30 iterates of Section III still match, and 74 of the 92 counts of Table 2 of Ganchovski et al. (2026)
+        match with either form.
     - Translation of ``xtol`` (P7): ``xtol`` is SciPy's ``xtol``, with SciPy's relative tolerance ``rtol`` at 0, a
       value that SciPy itself does not accept; ``xtol`` thus sets both the width at which the solve stops and the
       limit on the step.
 
 Validation:
     - A - authors' results:
-      - used: the first iteration of the example in section I, and all 30 iterates that Section III prints for 5 runs,
-        which every variant reproduces to the printed digits; this is convincing (P5);
+      - used: the first iteration of the example in section I, and all 30 iterates of the 5 runs in Section III,
+        which every variant reproduces to the printed digits; this reproduction is convincing (P5);
       - not used: the number of iterates in each run of Section III, because the article states no stopping rule.
     - B - third-party results:
       - used: Ganchovski et al. (2026), Table 2, the column "Rid", reproduced convincingly (P5): 74 of the 92
         evaluation counts exactly, and the test data states the cause of each other count. The C# code's stopping
-        rule, which the variant ``"commons_math"`` shares, causes 11 of them; that variant matches 85 counts.
+        rule, which the variant ``"commons_math"`` shares, causes 11 of the other 18 counts; that variant matches 85
+        counts.
       - not used: the Ridders results of 2 other articles; the docstring of the test package
         ``tests.solvers.bracketing.ridders`` gives the reasons.
       - TBD: Oliveira and Takahashi (2020), Table 1, the column "Ridders'", whose runs stop by `BracketingSolver`'s
         rule, as the variant ``"bracketing_solver"`` does: that variant matches 19 of the 24 counts exactly and 23
-        within 2, and 21 and 24 with equation 6 as printed (see the PRINCIPLE-CONFLICT (P6) entry).
+        within 2; with equation 6 computed as printed, it matches 21 exactly and all 24 within 2 (see the
+        PRINCIPLE-CONFLICT (P6) entry).
     - C - reference implementation:
       - used: a twin test checks that every variant evaluates the same x-values as SciPy's ``scipy.optimize.ridder``;
-        the twin test imposes each variant's stopping rule on SciPy, which for the core variant is SciPy's own rule
-        without its relative term.
+        the twin test imposes each variant's stopping rule on SciPy; for the core variant, that rule is SciPy's own
+        rule without its relative term.
 
 Variants:
     - `RiddersScipyConfig`, the variant ``"scipy"``, is core (P8): its stopping rule is SciPy's, which P1 prefers.
@@ -105,18 +110,18 @@ class Ridders(Solver):
     interval, split first at ``x1`` and then at ``x3``.
 
     The paper gives no formula for when to stop, only that the procedure can end once a given accuracy is reached.
-    ``variant`` therefore picks 1 of the 3 values of `RiddersVariant`, which differ in their stopping criterion; 2 of
-    them follow a reference implementation, and 1 follows `BracketingSolver`:
+    ``variant`` therefore picks a value of `RiddersVariant`; the values differ in their stopping rule, and each follows
+    either a reference implementation or `BracketingSolver`:
 
-    - ``"commons_math"``, the stopping criterion of Apache Commons Math's ``RiddersSolver``: the solve stops once
-      2 successive iterates lie at most ``xtol`` apart, and returns the last one. That iterate can lie more than
+    - ``"commons_math"``, the stopping rule of Apache Commons Math's ``RiddersSolver``: the solve stops once 2
+      successive iterates lie at most ``xtol`` apart, and returns the last one. That iterate can lie more than
       ``xtol`` from a root, as on a function with a kink or with a multiple root.
     - ``"scipy"``, SciPy's ``ridder``: the step from ``x1`` is limited to ``d - xtol / 2``, so that ``x3`` lies at
       least ``xtol / 2`` inside the interval. The solve stops once the interval is narrower than ``xtol``, and
       returns the last iterate. SciPy adds a relative term to its tolerance; this variant leaves it out, so that its
       returned x-value always lies within ``xtol`` of a root.
-    - ``"bracketing_solver"``, the stopping criterion of `BracketingSolver`: the solve stops once the interval is at
-      most ``2 * xtol`` wide, and returns its midpoint, which always lies within ``xtol`` of a root.
+    - ``"bracketing_solver"``, the stopping rule of `BracketingSolver`: the solve stops once the interval is at most
+      ``2 * xtol`` wide, and returns its midpoint, which always lies within ``xtol`` of a root.
 
     SciPy's limit on the step makes the evaluation count of ``"scipy"`` vary far less between near-identical functions
     than that of ``"bracketing_solver"``. Near the root, the root lies in the half between ``x1`` and 1 bound, and
@@ -145,7 +150,7 @@ class Ridders(Solver):
         - SciPy's ``scipy.optimize.ridder``, which the ``"scipy"`` variant follows; the test suite checks `Ridders`
           against ``scipy.optimize.ridder``.
         - Apache Commons Math's ``org.apache.commons.math4.legacy.analysis.solvers.RiddersSolver``,
-          https://github.com/apache/commons-math, whose stopping criterion the ``"commons_math"`` variant follows,
+          https://github.com/apache/commons-math, whose stopping rule the ``"commons_math"`` variant follows,
           with Commons Math's relative accuracy and function value accuracy at 0.
         - Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L. and Traykov, A. (2026). Improvements to the modified
           Anderson-Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. Its Table 2 holds the column "Rid",
