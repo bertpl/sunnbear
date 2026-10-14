@@ -6,8 +6,8 @@ The rest of this docstring is the record of `Chandrupatla` under the solver impl
 Sources:
     - I - article:
       - Ia - article code: Chandrupatla (1997), the BASIC listing ``NEWZERO.BAS`` in its appendix;
-      - Ib - article pseudocode: Chandrupatla (1997), the flowchart in its Fig. 1, which swaps the yes and no labels
-        of its sign test;
+      - Ib - article pseudocode: Chandrupatla (1997), the flowchart in its Fig. 1, whose sign test has its yes and
+        no labels swapped relative to the listing ``NEWZERO.BAS``;
       - Ic - article text: Chandrupatla (1997), its sections 2-4 and equations 1-4.
     - II - authors' code:
       - none.
@@ -20,14 +20,15 @@ Source per aspect:
     Every aspect follows Chandrupatla's listing ``NEWZERO.BAS``, except:
     - A function value of 0 at an initial interval bound follows SciPy: the solve ends at that bound. The article
       does not state this case, since the method starts from bounds where f has opposite signs.
-    - Translation of ``xtol`` (P7): ``xtol`` is the listing's absolute tolerance ``DLT``, and the listing's relative
-      tolerance ``EPS`` is 0, so the listing's tolerance ``TOL`` is the constant ``0.5 * xtol``. Setting ``EPS`` to
-      the article's value of 1e-10 changes none of the counts in its Table 2.
+    - Translation of ``xtol`` (P7): ``xtol`` is the listing's absolute tolerance ``DLT``, and the solver sets the
+      listing's relative tolerance ``EPS`` to 0, so the listing's tolerance ``TOL``, which is
+      ``2 * EPS * |xm| + 0.5 * DLT``, is the constant ``0.5 * xtol``. Setting ``EPS`` to the article's value of 1e-10
+      changes none of the counts in its Table 2.
 
 Validation:
     - A - authors' results:
-      - used: Table 2, the evaluation counts and the number of switches to bisection of all 45 problems, reproduced
-        exactly, which is convincing (P5);
+      - used: Table 2, its evaluation counts and its number of switches to bisection for all 45 problems; the
+        reproduction is exact, and so convincing (P5);
       - not used: Table 1, which lists 1 zero per function but does not say which of that function's 5 intervals in
         Table 2 produced it.
     - B - third-party results:
