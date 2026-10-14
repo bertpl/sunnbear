@@ -21,19 +21,22 @@ Source per aspect:
     - `Illinois` passes the upper bound as ``x1``, the second of the 2 starting x-values, as mpmath does, because the
       ALGOL procedure leaves the order of ``x0`` and ``x1`` to the caller.
     - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
-      solver. At the lower bound, the ALGOL procedure first evaluates the chord's zero, which lies at that bound up to
-      rounding.
-    - PRINCIPLE-GAP (P6): Dowell and Jarratt's Table 1 cannot tell the ALGOL procedure's form of the chord's zero,
-      ``x1 - f1 * (x1 - x0) / (f1 - f0)``, from Ford's form, ``(a * fb - b * fa) / (fb - fa)``, and P6 does not say
-      whether third-party tables may decide between them. The code keeps the ALGOL form:
+      solver. When the function value is 0 at the lower bound, the ALGOL procedure first evaluates the chord's zero,
+      which lies at that bound up to rounding.
+    - PRINCIPLE-GAP (P6): Dowell and Jarratt's Table 1 gives the same digits with the ALGOL procedure's form of the
+      chord's zero, ``x1 - f1 * (x1 - x0) / (f1 - f0)`` with ``x1`` the most recent iterate and ``x0`` the retained
+      bound, as with Ford's form, ``(a * fb - b * fa) / (fb - fa)`` with ``fa`` and ``fb`` the function values at the
+      interval bounds ``a`` and ``b``. P6 does not say whether third-party tables may decide between them. The code
+      keeps the ALGOL form, the form of the record's default source, because the 2 third-party tables disagree on
+      which form they match:
       - with the ALGOL form, all 15 counts of Ford's Table 4 match within 1, against 14 with Ford's form;
       - with Ford's form, 22 of the 24 counts in the column "Illinois" of Table 1 of Oliveira and Takahashi (2020)
         match exactly, against 17 with the ALGOL form.
     - PRINCIPLE-CONFLICT (P1): the code stops by `BracketingSolver`'s rule, once the interval is at most ``2 * xtol``
       wide, and returns the interval's midpoint. The ALGOL procedure stops once a step is at most ``delta``, and
-      returns the last chord's zero without evaluating it. Either rule would resolve the conflict:
-      - following the ALGOL procedure, with ``delta = xtol``, which on 132 solves of the test suite's problems returns
-        an x-value that is not within ``xtol`` of a root in 22;
+      returns the last chord's zero without evaluating it. Either of 2 changes would resolve the conflict:
+      - following the ALGOL procedure with ``delta = xtol``; on 132 solves of the test suite's problems, that stopping
+        rule returns an x-value that is not within ``xtol`` of a root in 22 of them;
       - a principle that lets a solver keep a stopping rule that guarantees ``xtol``.
     - Translation of ``xtol`` (P7): ``xtol`` is the tolerance of `BracketingSolver`'s rule; the ALGOL procedure would
       take it as ``delta``.
