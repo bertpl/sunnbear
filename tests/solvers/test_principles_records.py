@@ -12,7 +12,6 @@ from sunnbear.solvers import (
     CARF,
     ITP,
     TOMS748,
-    AndersonBjorck,
     Brent,
     RegulaFalsi,
     Ridders,
@@ -30,7 +29,6 @@ _BUILT_IN_SOLVER_CLASSES = list(
 # The tests of these solvers are expected to fail; a solver whose record is added must leave this list, or its
 # tests pass unexpectedly and fail the suite.
 _SOLVER_CLASSES_WITHOUT_RECORD = {
-    AndersonBjorck,
     Brent,
     CARF,
     ITP,

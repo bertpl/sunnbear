@@ -1,4 +1,70 @@
-"""`AndersonBjorck` implements the Anderson-Björck method: regula falsi that scales down a bound's function value."""
+"""`AndersonBjorck` implements the Anderson-Björck method: regula falsi that scales down a bound's function value.
+
+The rest of this docstring is the record of `AndersonBjorck` under the solver implementation principles
+(``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
+
+Sources:
+    - I - article:
+      - Ia - article code: Anderson and Björck (1973), the ALGOL procedure in its section 6;
+      - Ib - article pseudocode: none;
+      - Ic - article text: Anderson and Björck (1973), its equations 2 and 5 to 7, the rule of its section 3 for a
+        factor that is not positive, and its section 5, which states the starting x-values and the stopping rule of
+        its examples.
+    - II - authors' code:
+      - none.
+    - III - third party:
+      - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="anderson"``;
+      - Ford (1997), equation 5, with the factor of its Table 1;
+      - the C# code ``AndersonBjork.cs`` in the supplementary material of Ganchovski et al. (2026).
+    - IV - own judgment:
+      - none.
+
+Source per aspect:
+    Every aspect follows the ALGOL procedure of Anderson and Björck (1973), except:
+    - `AndersonBjorck` passes the upper bound as ``x1``, the second of the 2 starting x-values, as the article's
+      Examples 1 to 7 and mpmath do, because the ALGOL procedure leaves the order of ``x0`` and ``x1`` to the caller.
+      With the lower bound as ``x1``, 4 of the 15 counts of Ford's Table 4 change by 1.
+    - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
+      solver. When the function value is 0 at the lower bound, the ALGOL procedure first evaluates the zero of the chord
+      through the 2 bounds, which lies at that bound up to rounding, and returns that bound after 1 or 2 more
+      evaluations.
+    - The code leaves out the ALGOL procedure's step of delta, as mpmath and the C# code do. The step moves a chord's
+      zero that lies within ``delta`` of the most recent iterate to exactly ``delta`` from it, and in float64 it can
+      make the procedure alternate forever between the 2 interval bounds: a port with the step does not end on 11 of
+      the 26 runs of the article's Examples 1 to 7 at ``delta = 6e-8``. Without the step, a chord's zero can round onto
+      the most recent iterate.
+    - The code tests ``x2 == x1``, which the ALGOL procedure does not, and takes the factor 0.5 where it holds, because
+      a chord's zero that rounds onto the most recent iterate makes the slope ``w2`` from ``x1`` to ``x2`` divide 0 by
+      0, which raises an error in Python. In IEEE arithmetic, the procedure's factor ``g1`` is then NaN, which fails its
+      test ``g1 > 0.0``, so the procedure takes 0.5 there too; the test costs 1 counted comparison per iteration that
+      keeps the retained bound.
+    - Translation of ``xtol`` (P7): ``xtol`` is the ALGOL procedure's ``delta``, which, without the step of delta,
+      enters only the stopping test.
+
+Validation:
+    - A - authors' results:
+      - TBD: Examples 1 to 7, the 26 iteration counts of the column "Alg. A": at ``xtol = 6e-8``, the article's
+        ``delta``, 10 match, 11 differ by 1, and 5 differ by 2 or 3; the docstring of the test package
+        ``tests.solvers.bracketing.anderson_bjorck`` gives the details.
+      - PRINCIPLE-GAP (P5): P5 does not say whether a deviation that the solver declares counts as a stated cause of a
+        difference from published results. The article ran Examples 1 to 7 with the step of delta, which
+        `AndersonBjorck` leaves out, and in 27-bit arithmetic; a port of the ALGOL procedure that emulates both brings
+        the 5 counts that differ by 2 or 3 to within 1 of the article's, but does not end on 8 of the other 21
+        examples. No test checks the examples.
+      - not used: the double-precision totals on p. 263, which `AndersonBjorck` does not reproduce at
+        ``xtol = 6e-16``, for a cause that is not known: 133 iterations against 147 on Examples 1 to 5, and 60 against
+        50 on Examples 6 and 7.
+    - B - third-party results:
+      - used: Ford (1997), Table 4, reproduced exactly, which is convincing (P5);
+      - not used: the columns "AB" of Table 2 of Ganchovski et al. (2026) and of Ganchovski and Traykov (2023); the
+        docstring of the test package ``tests.solvers.bracketing.anderson_bjorck`` gives the reasons.
+    - C - reference implementation:
+      - used: a twin test checks that `AndersonBjorck` evaluates the same x-values as mpmath's ``Illinois`` with
+        ``method="anderson"``; the twin test imposes the stopping rule of `AndersonBjorck` on mpmath.
+
+Variants:
+    - `AndersonBjorckConfig`, the only config, is secondary (P8); this record marks no PRINCIPLE-CONFLICT.
+"""
 
 from sunnbear._core.solvers.core import Solver, SolveState
 
@@ -58,21 +124,9 @@ class AndersonBjorck(Solver):
     ``f2 * f1 <= 0``, with ``f2`` the function value at ``x2``, `AndersonBjorck` compares the signs of ``f2`` and
     ``f1``, because the product of 2 small function values can underflow to 0.
 
-    The ALGOL procedure also takes a step of delta, which `AndersonBjorck` leaves out: when the chord's zero lies within
-    ``delta`` of the most recent iterate, the procedure moves the chord's zero to exactly ``delta`` from that iterate,
-    toward the retained bound.
-
-    `AndersonBjorck` leaves the step out because, in float64, it can make the procedure alternate forever between the
-    2 bounds: once the interval is ``delta`` wide in exact arithmetic, its computed width ``|x1 - x0|`` can round to
-    just above ``delta``, so the procedure does not stop; each step of delta then moves ``delta`` from the most recent
-    iterate toward the retained bound, and so lands exactly on the retained bound.
-
-    Without the step of delta, the chord's zero can round onto the most recent iterate, once that iterate lies within
-    rounding error of the root while the retained bound is still far from it.
-
-    When the chord's zero rounds onto the most recent iterate, the new iterate equals the previous one in both x and f,
-    so the slope between them is ``0 / 0``. `AndersonBjorck` then takes the factor 0.5: in IEEE arithmetic, ``0 / 0``
-    is NaN, which fails the ALGOL procedure's test that the factor is positive, so the procedure takes 0.5 there too.
+    The chord's zero can round onto the most recent iterate, once that iterate lies within rounding error of the root
+    while the retained bound is still far from it. The new iterate then equals the previous one in both x and f, so
+    the slope between them is ``0 / 0``, and `AndersonBjorck` takes the factor 0.5.
 
     On a function that is nearly flat on 1 side of the root, over a large interval, the method can make very slow
     progress, and can need more than 200 iterations.
@@ -97,6 +151,16 @@ class AndersonBjorck(Solver):
           - its Table 4 shows the slow progress on large intervals; the test suite reproduces that table.
         - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="anderson"``; the test suite checks
           `AndersonBjorck` against mpmath's ``Illinois``.
+        - Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L. and Traykov, A. (2026). Improvements to the modified
+          Anderson-Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. Its supplementary material holds the
+          C# code ``AndersonBjork.cs``, an implementation of the Anderson-Björck method, and its Table 2 gives that
+          code's evaluation counts in the column "AB". https://doi.org/10.3390/a19050332
+        - The authors' repository of Ganchovski et al. (2026), https://github.com/Just-A-Random-Geek/ModAB-Root-Finding,
+          which holds the paper's supplementary material, ``AndersonBjork.cs`` among it.
+        - Ganchovski, N. and Traykov, A. (2023). Modified Anderson-Bjork's method for solving non-linear equations in
+          structural mechanics. IOP Conference Series: Materials Science and Engineering 1276, 012010. Its Table 2
+          holds the column "AB", for runs whose stopping rule the paper does not state.
+          https://doi.org/10.1088/1757-899X/1276/1/012010
     """
 
     name = "anderson_bjorck"
