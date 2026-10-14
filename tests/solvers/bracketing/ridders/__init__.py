@@ -4,7 +4,7 @@ Published results:
 
 - Ridders (1979), the example of section I: reproduced, in ``test_paper.py``: the first iteration.
 - Ridders (1979), Section III: reproduced, in ``test_paper.py``: every printed iterate of the 5 runs, by every
-  variant.
+  variant. The number of iterates in each run is not compared, because the paper states no stopping rule.
 
 Third-party published results:
 
@@ -23,6 +23,21 @@ Third-party published results:
   - the roots of all 92 functions, 4 of them within a wider tolerance; the test data states why each needs it.
 - Ganchovski et al. (2026), Table 2, for the ``"bracketing_solver"`` variant: not reproduced, because its stopping
   rule differs from that of the paper's C# code.
+- Oliveira and Takahashi (2020), Table 1, the column "Ridders'": not compared by a test yet. The table's runs stop by
+  the rule of `BracketingSolver`, the rule of the ``"bracketing_solver"`` variant, with ``xtol = 1e-10`` on
+  ``[-1, 1]``, and its counts leave out the 2 evaluations at the interval bounds. Counted that way, the
+  ``"bracketing_solver"`` variant matches 19 of the 24 counts, and differs on the other 5:
+
+  - "Trigonometric 1": 12, against the table's 10;
+  - "Polynomial 1": 26, against 14;
+  - "Normal CDF": 18, against 16;
+  - "Circles": 35, against 36;
+  - "Noisy Line": 22, against 24.
+- Ganchovski and Traykov (2023), Table 2, the column "Rid": not compared, because the paper does not state the stopping
+  rule of its Ridders runs.
+- Gorgey et al. (2025), Tables 2 to 7, the rows "Ridders'": not compared, because the paper states 2 different stopping
+  tests for its runs, a test on the interval width in its pseudocode and a test on ``|f|`` in its Table 1, and 2
+  different intervals for each of its Equations 1 and 3.
 
 Reference implementations:
 

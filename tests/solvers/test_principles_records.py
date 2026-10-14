@@ -12,7 +12,6 @@ from sunnbear.solvers import (
     ITP,
     TOMS748,
     Brent,
-    Ridders,
     SolverConfigRegistry,
 )
 
@@ -29,7 +28,6 @@ _BUILT_IN_SOLVER_CLASSES = list(
 _SOLVER_CLASSES_WITHOUT_RECORD = {
     Brent,
     ITP,
-    Ridders,
     TOMS748,
 }
 

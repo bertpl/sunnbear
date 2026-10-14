@@ -1,4 +1,87 @@
-"""`Ridders` implements Ridders' method: each iteration evaluates the midpoint, then the zero of an exponential fit."""
+"""`Ridders` implements Ridders' method: each iteration evaluates the midpoint, then the zero of an exponential fit.
+
+The rest of this docstring is the record of `Ridders` under the solver implementation principles
+(``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package). ``Source per aspect:`` describes the core
+variant, ``"scipy"``, and ``Variants:`` gives the deviations of the other 2 variants.
+
+Sources:
+    - I - article:
+      - Ia - article code: none;
+      - Ib - article pseudocode: none;
+      - Ic - article text: Ridders (1979), section I: its equation 6, and the interval update, which the article's
+        example in Fig. 2 applies by keeping the narrower of 2 intervals that hold the sign change. The article states
+        no stopping rule, only that the procedure can end once a given accuracy is obtained.
+    - II - authors' code:
+      - none.
+    - III - third party:
+      - SciPy's ``scipy.optimize.ridder``: a stopping rule on the interval width, and a limit on the step that keeps
+        ``x3`` inside the interval;
+      - Apache Commons Math's ``RiddersSolver``: a stopping rule on the distance between 2 successive iterates;
+      - Press et al. (2007), section 9.2.1: the routine ``zriddr``, which stops on that distance or on the interval
+        width;
+      - Ganchovski et al. (2026): the C# code behind its Table 2, which stops as Commons Math does;
+      - Oliveira and Takahashi (2020), section 3.1: runs of the method that stop by the rule of `BracketingSolver`.
+    - IV - own judgment:
+      - none.
+
+Source per aspect:
+    Every aspect follows Ridders (1979), except:
+    - Exact zeros and the stopping rule follow SciPy, which P1 prefers among the third-party sources, since the
+      article states neither: a function value of 0 ends the solve at its x-value; otherwise the solve ends once the
+      interval is narrower than ``xtol``, and returns ``x3``, which then lies within ``xtol`` of a root.
+    - JUDGMENT-CALL: SciPy's iteration limit ``maxiter`` is left out, so the evaluation budget ends a long solve, as
+      for every solver. Where SciPy raises an error after ``maxiter`` iterations, the solve runs on to its budget.
+    - PRINCIPLE-GAP (P1): SciPy limits the step, so that ``x3`` lies at least ``xtol / 2`` inside the interval;
+      equation 6 has no limit, and P1 does not say whether an article that mentions no safeguard leaves the
+      safeguards to the next-ranked source. The code keeps SciPy's limit; without it, the interval often only halves
+      near the root, and the solve takes 68 evaluations against 12 on ``x^3 - x - 0.801`` over ``[1, 2]`` at
+      ``xtol = 1e-10``.
+    - PRINCIPLE-CONFLICT (P1): on an initial interval narrower than ``xtol``, the limit ``d - xtol / 2`` is negative;
+      the code then moves ``x3`` from the midpoint in the step's direction, and SciPy against it. On an interval
+      narrower than ``xtol / 2``, either form puts ``x3`` outside the interval, and the solve ends as ``DIVERGED``.
+      Computing the limit as SciPy does would resolve the conflict; the benchmark never meets the case, because it
+      picks every ``xtol`` below the width of the initial interval.
+    - JUDGMENT-CALL: the midpoint is ``0.5 * (a + b)``, the framework's `Interval.midpoint`, as Commons Math,
+      Press et al. and the C# code compute it; SciPy, which P1 prefers where the article gives no formula, computes
+      ``a + 0.5 * (b - a)``. SciPy's form changes the evaluated x-values in their last bits in about 1 in 8 solves,
+      and the evaluation count in about 1 in 100.
+    - PRINCIPLE-CONFLICT (P6): the code computes the step as ``d * r / sqrt(r * r - f2 / f0)``, with ``r = f1 / f0``,
+      so it multiplies ``d * r`` first, as SciPy does; equation 6 multiplies ``d`` by the fraction
+      ``r / sqrt(r^2 - f2 / f0)``. Computing equation 6 as printed would resolve the conflict: it changes the evaluated
+      x-values in their last bits in about 1 in 3 solves, and the evaluation count in about 1 in 100; all 30 iterates
+      of Section III still match, and 74 of the 92 counts of Table 2 of Ganchovski et al. (2026) match with either form.
+    - Translation of ``xtol`` (P7): ``xtol`` is SciPy's ``xtol``, with SciPy's relative tolerance ``rtol`` at 0, a
+      value that SciPy itself does not accept; ``xtol`` thus sets both the width at which the solve stops and the
+      limit on the step.
+
+Validation:
+    - A - authors' results:
+      - used: the first iteration of the example in section I, and all 30 iterates that Section III prints for 5 runs,
+        which every variant reproduces to the printed digits; this is convincing (P5);
+      - not used: the number of iterates in each run of Section III, because the article states no stopping rule.
+    - B - third-party results:
+      - used: Ganchovski et al. (2026), Table 2, the column "Rid", reproduced convincingly (P5): 74 of the 92
+        evaluation counts exactly, and the test data states the cause of each other count. The C# code's stopping
+        rule, which the variant ``"commons_math"`` shares, causes 11 of them; that variant matches 85 counts.
+      - not used: the Ridders results of 2 other articles; the docstring of the test package
+        ``tests.solvers.bracketing.ridders`` gives the reasons.
+      - TBD: Oliveira and Takahashi (2020), Table 1, the column "Ridders'", whose runs stop by `BracketingSolver`'s
+        rule, as the variant ``"bracketing_solver"`` does: that variant matches 19 of the 24 counts exactly and 23
+        within 2, and 21 and 24 with equation 6 as printed (see the PRINCIPLE-CONFLICT (P6) entry).
+    - C - reference implementation:
+      - used: a twin test checks that every variant evaluates the same x-values as SciPy's ``scipy.optimize.ridder``;
+        the twin test imposes each variant's stopping rule on SciPy, which for the core variant is SciPy's own rule
+        without its relative term.
+
+Variants:
+    - `RiddersScipyConfig`, the variant ``"scipy"``, is core (P8): its stopping rule is SciPy's, which P1 prefers.
+    - `RiddersCommonsMathConfig`, the variant ``"commons_math"``, is secondary (P8). It deviates from P1 in its
+      stopping rule, that of Apache Commons Math's ``RiddersSolver``, with ``xtol`` as Commons Math's absolute
+      accuracy and its relative and function value accuracies at 0 (P7); like the article, it does not limit the step.
+    - `RiddersBracketingSolverConfig`, the variant ``"bracketing_solver"``, is secondary (P8). It deviates from P1 in
+      its stopping rule, that of `BracketingSolver` and of the runs of Oliveira and Takahashi (2020); like the
+      article, it does not limit the step.
+"""
 
 import math
 
@@ -22,7 +105,8 @@ class Ridders(Solver):
     interval, split first at ``x1`` and then at ``x3``.
 
     The paper gives no formula for when to stop, only that the procedure can end once a given accuracy is reached.
-    ``variant`` therefore picks 1 of the 3 values of `RiddersVariant`, each from a reference implementation:
+    ``variant`` therefore picks 1 of the 3 values of `RiddersVariant`, which differ in their stopping criterion; 2 of
+    them follow a reference implementation, and 1 follows `BracketingSolver`:
 
     - ``"commons_math"``, the stopping criterion of Apache Commons Math's ``RiddersSolver``: the solve stops once
       2 successive iterates lie at most ``xtol`` apart, and returns the last one. That iterate can lie more than
@@ -60,7 +144,18 @@ class Ridders(Solver):
           - it also stops once the interval is at most its tolerance wide.
         - SciPy's ``scipy.optimize.ridder``, which the ``"scipy"`` variant follows; the test suite checks `Ridders`
           against ``scipy.optimize.ridder``.
-        - Apache Commons Math's ``RiddersSolver``, whose stopping criterion the ``"commons_math"`` variant follows.
+        - Apache Commons Math's ``org.apache.commons.math4.legacy.analysis.solvers.RiddersSolver``,
+          https://github.com/apache/commons-math, whose stopping criterion the ``"commons_math"`` variant follows,
+          with Commons Math's relative accuracy and function value accuracy at 0.
+        - Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L. and Traykov, A. (2026). Improvements to the modified
+          Anderson-Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. Its Table 2 holds the column "Rid",
+          from the C# code of the paper's supplementary material, which stops as the ``"commons_math"`` variant does
+          and which the authors' repository, https://github.com/Just-A-Random-Geek/ModAB-Root-Finding, holds; the
+          test suite reproduces that column. https://doi.org/10.3390/a19050332
+        - Oliveira, I. F. D. and Takahashi, R. H. C. (2020). An enhancement of the bisection method average
+          performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), article 5. Its
+          Table 1 holds the column "Ridders'", for runs that stop by the rule of `BracketingSolver`.
+          https://doi.org/10.1145/3423597
     """
 
     name = "ridders"
