@@ -4,14 +4,14 @@ The rest of this docstring is the record of `ITP` under the solver implementatio
 (``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
 
 The names ``r``, ``n_max``, ``n_slack``, ``kappa_1``, ``kappa_2``, ``a0`` and ``b0`` are those of the class docstring
-of `ITP`.
+of `ITP`. The paper calls ``n_slack`` ``n0``.
 
 Sources:
     - I - article:
       - Ia - article code: none;
       - Ib - article pseudocode: Oliveira and Takahashi (2020), Algorithm 1 in its Appendix B, and Algorithm 0 in its
-        section 1, a bracketing algorithm that leaves the x-value of each iteration to the method, here ITP, and
-        returns the final interval's midpoint;
+        section 1, a bracketing algorithm in which a method, here ITP, chooses the x-value of each iteration, and
+        which returns the final interval's midpoint;
       - Ic - article text: Oliveira and Takahashi (2020):
         - equations 13 to 16 in its section 2.1;
         - the constants of its experiments in section 3;
@@ -24,38 +24,41 @@ Sources:
         ``kappa_1 = 0.2 / (b0 - a0)`` and ``kappa_2 = 2``, the projection radius clamped at 0, and a stopping rule
         with an absolute and a relative tolerance.
     - IV - own judgment:
-      - the value 4 of ``n_slack``, the paper's ``n0``, in the secondary config `ITPPaperExperimentsSlack4Config`.
+      - the value 4 of ``n_slack`` in the secondary config `ITPPaperExperimentsSlack4Config`.
 
 Source per aspect:
-    Every aspect of the core config follows Algorithm 1 of Oliveira and Takahashi (2020), except:
+    Every aspect of the core config, `ITPPaperExperimentsSlack0Config`, follows Algorithm 1 of Oliveira and Takahashi
+    (2020), except:
     - The projection radius follows the authors' code, which lowers Algorithm 1's radius ``r`` to
       ``max(0.99 * r - xtol / 2, 0)``, because the validation with Algorithm 1's radius is not convincing (P5): with
-      it, 17 of Table 1's 24 counts match, and with the authors' radius, 23 match. Appendix B suggests a margin and a
-      clamp at 0, without the margin's amount.
+      it, 17 of Table 1's 24 counts match, and with the authors' radius, 23 match.
+      - Appendix B suggests a margin and a clamp at 0, without the margin's amount.
     - The constants follow section 3, because Algorithm 1 takes them as inputs: ``kappa_2 = 2``, ``n0 = 0`` (the
       core config's ``n_slack``), and ``kappa_1 = 0.1`` on an x axis scaled to [-1, 1].
     - JUDGMENT-CALL: `ITP` keeps the problem's x axis and sets ``kappa_1 = 0.2 / (b0 - a0)`` for the initial interval
       ``[a0, b0]``, as the C# ITP does, so that ``f`` needs no change of variable; for ``kappa_2 = 2``, this choice of
-      ``kappa_1`` gives, in exact arithmetic, the same x-values as section 3's form on the scaled axis.
+      ``kappa_1`` gives, in exact arithmetic, the same x-values as ``kappa_1 = 0.1`` on the axis scaled to [-1, 1].
       - In float64, the x-values agree to about 1e-15 relative, yet in 26 of 126 solves of 8 functions the evaluation
-        counts differ, by up to 24, mostly where the scaled and the unscaled form put an x-value within 2 ulps (units
-        in the last place) of the root on opposite sides of it.
+        counts differ, by up to 24, mostly where the run on the scaled axis and the run on the problem's axis put an
+        x-value within 2 ulps (units in the last place) of the root on opposite sides of it.
     - The returned x-value is the final interval's midpoint, the output of Algorithm 0, because Algorithm 1 returns the
-      final interval. Algorithm 1 also requires ``f(a) < 0 < f(b)``; where ``f(a) > 0 > f(b)``, `ITP` keeps the sign
-      change as Algorithm 0 does, and evaluates the same x-values as on ``-f``.
+      final interval. Algorithm 1 also requires ``f(a) < 0 < f(b)``; where ``f(a) > 0 > f(b)``, `ITP` accepts the
+      interval, as Algorithm 0 does, and evaluates the same x-values as it would on ``-f``.
     - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
       solver. Algorithm 1 excludes this case; the authors' code does not check for it, and on 5 functions with such a
       bound, that code ends within ``xtol`` of that bound after 4 or 5 more evaluations.
-    - Translation of ``xtol`` (P7): ``xtol`` is Algorithm 1's ``epsilon``: it sets the projection radius, the stopping
-      width ``2 * xtol``, and ``n_1/2``, the number of bisection iterations needed to reach that width; the authors'
-      margin also subtracts ``xtol / 2``.
+    - Translation of ``xtol`` (P7): ``xtol`` is Algorithm 1's ``epsilon``, which sets:
+      - the projection radius, from which the authors' margin also subtracts ``xtol / 2``;
+      - the stopping width ``2 * xtol``;
+      - ``n_1/2``, the number of bisection iterations needed to reach that width.
 
 Validation:
     - A - authors' results:
       - used: Table 1, the column "ITP": the core config reproduces 23 of the 24 counts exactly, and that of the step
-        function within 1, which is convincing (P5). On the step function, rounding in the interval bounds leaves the
-        interval slightly wider than ``2 * xtol`` after the ``n_max = 34`` iterations, so the solve takes 35, as a port
-        of the authors' code does in float64; in exact arithmetic, it ends after 34, the table's count.
+        function within 1, which is convincing (P5).
+        - On the step function, rounding in the interval bounds leaves the interval slightly wider than ``2 * xtol``
+          after the ``n_max = 34`` iterations, so the solve takes 35, as a port of the authors' code does in float64;
+          in exact arithmetic, it ends after 34, the table's count.
       - not used: Figures 2 to 5, which are plots; Figures 4 and 5 use 1000-bit arithmetic.
       - TBD: Table 2, and the rows "Global Average" and "Global Worst Case" of Table 1, which summarize Table 1's
         counts and which no test checks: the core config's counts reproduce every value in these rows and in Table 2's
@@ -73,8 +76,7 @@ Validation:
 Variants:
     - `ITPPaperExperimentsSlack0Config`, variant ``"paper_experiments"`` with ``n_slack = 0``, is core (P8).
     - `ITPPaperPseudocodeSlack0Config` is secondary (P8): it keeps Algorithm 1's projection radius, which the core
-      config replaces (P2) because the validation with that radius is not convincing (P5): 17 of Table 1's 24 counts
-      match, and the other 7 take 1 to 19 iterations more.
+      config replaces (P2, P5); with that radius, the 7 counts of Table 1 that differ take 1 to 19 iterations more.
     - `ITPPaperExperimentsSlack4Config` is secondary (P8): its ``n_slack = 4`` comes from IV - own judgment, and goes
       against P1, since section 3 and the authors' code use ``n0 = 0``, and the C# ITP uses 1.
       - PRINCIPLE-GAP (P8): no docstring says why ``n_slack`` is 4; P8 asks that each variant have a didactic reason,
