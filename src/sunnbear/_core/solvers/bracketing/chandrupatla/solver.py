@@ -31,8 +31,9 @@ Validation:
         reproduction is exact, and so convincing (P5);
       - not used: Table 1, which lists 1 zero per function but does not say which of that function's 5 intervals in
         Table 2 produced it.
-      - TBD: Table 1's zeros, per function: rounded to the printed digits, 42 of the 45 solves of Table 2 return the
-        printed zero, and each function has at least 1 interval whose solve does.
+      - TBD: Table 1's zeros, checked per function, which needs no interval and which no test does yet: rounded to
+        the printed digits, 42 of the 45 solves of Table 2 return the printed zero, and each function has at least 1
+        interval whose solve does.
     - B - third-party results:
       - none found: no article that sunnbear cites publishes results of the method.
     - C - reference implementation:

@@ -33,8 +33,8 @@ Validation:
       - none exists.
     - B - third-party results:
       - used: Atkinson's Table 2.1, reproduced exactly, which is convincing (P5);
-      - TBD: Chandrupatla (1997), Table 2, the column "Bisection": `Bisection` with ``xtol = 0.5e-5`` reproduces all
-        45 counts;
+      - TBD: Chandrupatla (1997), Table 2, the column "Bisection", which no test checks yet: `Bisection` with
+        ``xtol = 0.5e-5`` reproduces all 45 counts;
       - TBD: Ganchovski et al. (2026), Table 2, the column "bs": not compared yet.
     - C - reference implementation:
       - used: a twin test checks the midpoints against SciPy's ``scipy.optimize.bisect``, not its stopping rule.
