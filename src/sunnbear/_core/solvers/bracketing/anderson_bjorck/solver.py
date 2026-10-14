@@ -25,32 +25,33 @@ Source per aspect:
       Examples 1 to 7 and mpmath do, because the ALGOL procedure leaves the order of ``x0`` and ``x1`` to the caller.
       With the lower bound as ``x1``, 4 of the 15 counts of Ford's Table 4 change by 1.
     - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
-      solver. When the function value is 0 at the lower bound, the ALGOL procedure first evaluates the zero of the chord
-      through the 2 bounds, which lies at that bound up to rounding, and returns that bound after 1 or 2 more
-      evaluations.
+      solver. When the function value is 0 at the lower bound, the ALGOL procedure first evaluates the function at the
+      zero of the chord through the 2 bounds, which lies at that bound up to rounding, and returns that bound after 1
+      or 2 more evaluations.
     - The code leaves out the ALGOL procedure's step of delta, as mpmath and the C# code do. The step moves a chord's
       zero that lies within ``delta`` of the most recent iterate to exactly ``delta`` from it, and in float64 it can
       make the procedure alternate forever between the 2 interval bounds: a port with the step does not end on 11 of
       the 26 runs of the article's Examples 1 to 7 at ``delta = 6e-8``. Without the step, a chord's zero can round onto
       the most recent iterate.
-    - The code tests ``x2 == x1``, which the ALGOL procedure does not, and takes the factor 0.5 where it holds, because
-      a chord's zero that rounds onto the most recent iterate makes the slope ``w2`` from ``x1`` to ``x2`` divide 0 by
-      0, which raises an error in Python. In IEEE arithmetic, the procedure's factor ``g1`` is then NaN, which fails its
-      test ``g1 > 0.0``, so the procedure takes 0.5 there too; the test costs 1 counted comparison per iteration that
-      keeps the retained bound.
+    - Unlike the ALGOL procedure, the code tests ``x2 == x1``, with ``x2`` the chord's zero and ``x1`` the most recent
+      iterate, and takes the factor 0.5 when ``x2 == x1``, because a chord's zero that rounds onto the most recent
+      iterate makes the computation of the slope ``w2`` from ``x1`` to ``x2`` divide 0 by 0, which raises an error in
+      Python. In IEEE arithmetic, the procedure's scaling factor ``g1`` is then NaN, which fails its test
+      ``g1 > 0.0``, so the procedure takes 0.5 there too; the test ``x2 == x1`` costs 1 counted comparison per
+      iteration that keeps the retained bound.
     - Translation of ``xtol`` (P7): ``xtol`` is the ALGOL procedure's ``delta``, which, without the step of delta,
       enters only the stopping test.
 
 Validation:
     - A - authors' results:
-      - TBD: Examples 1 to 7, the 26 iteration counts of the column "Alg. A": at ``xtol = 6e-8``, the article's
-        ``delta``, 10 match, 11 differ by 1, and 5 differ by 2 or 3; the docstring of the test package
+      - TBD: Examples 1 to 7, the 26 iteration counts of the column "Alg. A". At ``xtol = 6e-8``, the article's
+        ``delta``, 10 of the counts match, 11 differ by 1, and 5 differ by 2 or 3; the docstring of the test package
         ``tests.solvers.bracketing.anderson_bjorck`` gives the details.
       - PRINCIPLE-GAP (P5): P5 does not say whether a deviation that the solver declares counts as a stated cause of a
         difference from published results. The article ran Examples 1 to 7 with the step of delta, which
-        `AndersonBjorck` leaves out, and in 27-bit arithmetic; a port of the ALGOL procedure that emulates both brings
-        the 5 counts that differ by 2 or 3 to within 1 of the article's, but does not end on 8 of the other 21
-        examples. No test checks the examples.
+        `AndersonBjorck` leaves out, and in 27-bit arithmetic; a port of the ALGOL procedure that takes the step of
+        delta, in emulated 27-bit arithmetic, brings the 5 counts that differ by 2 or 3 to within 1 of the article's,
+        but does not end on 8 of the other 21 runs. No test checks the examples.
       - not used: the double-precision totals on p. 263, which `AndersonBjorck` does not reproduce at
         ``xtol = 6e-16``, for a cause that is not known: 133 iterations against 147 on Examples 1 to 5, and 60 against
         50 on Examples 6 and 7.
