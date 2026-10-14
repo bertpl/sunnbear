@@ -115,13 +115,21 @@ These rules follow from P3 and P6: the flop counts must show the published algor
 
 ## Each solver's record
 
-**The module docstring of each solver's `solver.py` is that solver's record: it states how these principles shape the solver.** The reasoning that ties a solver to its sources is otherwise stated nowhere, so the record keeps it next to the code, and a change of principle is checked against each record.
+**The module docstring of each solver's `solver.py` is that solver's record: it states how these principles apply to the solver.** The reasons why a solver follows each of its sources are stated nowhere else, so the record keeps them next to the code, and a change of principle is checked against each record.
 
 The record has 4 sections, each a heading of the docstring:
 
 - **`Sources:`** names the sources of each rank of P1, from Ia to IV, by author and year where they have them, with what each states; a rank without a source says "none".
-- **`Source per aspect:`** gives, for each of 6 aspects, the rank and the source that the solver follows. The aspects are the step formula, the safeguards, the constants, the stopping rule, the arithmetic form (P6) and the translation of `xtol` (P7).
-  - **For each higher rank, the entry gives the reason it is not followed**, 1 of these, taken from P1 and P2:
+- **`Source per aspect:`** gives, for each of these aspects, the rank and the source that the solver follows:
+  - the step formula;
+  - the safeguards;
+  - the constants;
+  - the stopping rule;
+  - the arithmetic form (P6);
+  - the translation of `xtol` (P7).
+
+  For each aspect:
+  - **For each rank above the followed rank, the entry gives the reason why that rank is not followed**, 1 of these, taken from P1 and P2:
     - no source of that rank exists;
     - the source does not state the aspect;
     - the source states it incompletely or ambiguously;
@@ -129,8 +137,8 @@ The record has 4 sections, each a heading of the docstring:
     - a good reason to deviate, which the entry states (P2).
   - **Where 2 sources of the followed rank state the aspect differently**, the entry names the one that the solver follows, and why (P1).
 
-  A deviation (P3) is such an entry.
-- **`Validation:`** gives, for each kind A, B and C of P4, 1 of 3 states:
+  An entry that does not follow the highest-ranked source that exists is a deviation that P3 requires the record to declare.
+- **`Validation:`** gives, for each kind A, B and C of P4, 1 of these 3 answers:
   - used, with its evidence, its outcome, and whether the outcome is convincing (P5);
   - none exists;
   - not used, with the reason.
@@ -138,13 +146,17 @@ The record has 4 sections, each a heading of the docstring:
   The docstring of the solver's test package gives the details of each published table.
 - **`Variants:`** gives each config of the solver with its role (P8), and for a secondary config, its deviations from the principles.
 
-**The class docstring describes what the algorithm does, and its `References:` gives the full citation of every source that the record names.** API documentation renders the docstring of the public class, not that of its private module, so the citations stay where it reads them. A test checks that every author and year that a record's `Sources:` names appears in the class's `References:`.
+**The class docstring describes what the algorithm does, and its `References:` gives the full citation of every source that the record names.** API documentation renders the docstring of the public class, not that of its private module, so the citations stay in the docstring that API documentation renders.
 
-**2 keywords mark where a solver and the principles disagree.** Each starts a bullet next to the aspect it concerns, so that `grep -rnE "PRINCIPLE-(CONFLICT|GAP)" src/` lists all of them:
+A test checks that every author and year that a record's `Sources:` names appears in the class's `References:`.
+
+**The record marks each disagreement between a solver and the principles with 1 of 2 keywords.** Each keyword starts a bullet next to the aspect that it concerns, so that `grep -rnE "PRINCIPLE-(CONFLICT|GAP)" src/` lists all of them:
 
 - **`PRINCIPLE-CONFLICT (Pn)`**: the solver breaks principle Pn. The bullet says how, and what would resolve the conflict.
 - **`PRINCIPLE-GAP (Pn)`**: Pn does not decide the case, because it is silent or ambiguous. The bullet says what is undecided, and which choice the code makes.
 
 A record flags a conflict and does not resolve it; resolving it is a change of its own, made under these principles.
 
-**A record is longer than most module docstrings**, because it is the only place that states, aspect by aspect, why a solver follows the source it does. Code reviews that ask to shorten a record are answered by this section; a record still cites a fact that the code or the tests own, and does not repeat it.
+**A record is longer than most module docstrings**, because it is the only place that states, aspect by aspect, why a solver follows the source it does.
+
+Code reviews that ask to shorten a record are answered by this section. Even so, a record cites a fact that the code or the tests own, and does not repeat the fact.

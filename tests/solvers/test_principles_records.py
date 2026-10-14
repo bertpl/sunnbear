@@ -1,5 +1,5 @@
-"""These tests assert that every built-in solver's module docstring holds the record that ``IMPLEMENTATION_PRINCIPLES.md``
-defines, and that the class docstring cites every source that the record names."""
+"""These tests assert that every built-in solver's module docstring holds the record that
+``IMPLEMENTATION_PRINCIPLES.md`` defines, and that the class docstring cites every source that the record names."""
 
 import inspect
 import re
@@ -28,12 +28,14 @@ from sunnbear.solvers import (
 # Defining a SolverConfig subclass registers it, so the registry also holds the configs that test modules define;
 # the built-in solvers are those of the configs defined inside the sunnbear package.
 _BUILT_IN_SOLVER_CLASSES = list(
-    dict.fromkeys(config.solver_cls for config in SolverConfigRegistry.configs() if is_defined_in_sunnbear(type(config)))
+    dict.fromkeys(
+        config.solver_cls for config in SolverConfigRegistry.configs() if is_defined_in_sunnbear(type(config))
+    )
 )
 
-# The solvers whose record is not written yet. Their tests are expected to fail; a solver whose record is added must
-# leave this list, or its tests pass unexpectedly and fail the suite.
-_SOLVERS_WITHOUT_RECORD = {
+# The tests of these solvers are expected to fail; a solver whose record is added must leave this list, or its
+# tests pass unexpectedly and fail the suite.
+_SOLVER_CLASSES_WITHOUT_RECORD = {
     AndersonBjorck,
     Brent,
     CARF,
@@ -51,15 +53,16 @@ _SOLVERS_WITHOUT_RECORD = {
 
 _RECORD_HEADINGS = ("Sources:", "Source per aspect:", "Validation:", "Variants:")
 
-# An author-year citation, such as "Atkinson (1989)" or "Ganchovski et al. (2026)": the group holds the surname.
-_AUTHOR_YEAR = re.compile(r"(\w[\w'-]*)(?: et al\.)? \((\d{4})\)")
+# This pattern matches an author-year citation, such as "Atkinson (1989)" or "Ganchovski et al. (2026)"; its first
+# group holds the surname, and its second the year.
+_AUTHOR_YEAR_PATTERN = re.compile(r"(\w[\w'-]*)(?: et al\.)? \((\d{4})\)")
 
 
-def _solver_params():
+def _built_in_solver_cls_params():
     """Return 1 parameter per built-in solver class, marked as an expected failure while it has no record."""
     params = []
     for solver_cls in _BUILT_IN_SOLVER_CLASSES:
-        if solver_cls in _SOLVERS_WITHOUT_RECORD:
+        if solver_cls in _SOLVER_CLASSES_WITHOUT_RECORD:
             marks = pytest.mark.xfail(strict=True, reason="the solver has no record yet")
         else:
             marks = ()
@@ -67,7 +70,7 @@ def _solver_params():
     return params
 
 
-def _record_sections(solver_cls) -> dict[str, str]:
+def _parse_record_sections(solver_cls) -> dict[str, str]:
     """Return the text under each record heading of the solver's module docstring, by heading."""
     lines = (sys.modules[solver_cls.__module__].__doc__ or "").splitlines()
     sections: dict[str, str] = {}
@@ -81,7 +84,7 @@ def _record_sections(solver_cls) -> dict[str, str]:
     return sections
 
 
-@pytest.mark.parametrize("solver_cls", _solver_params())
+@pytest.mark.parametrize("solver_cls", _built_in_solver_cls_params())
 def test_the_module_docstring_holds_the_record_headings_in_order(solver_cls):
     """The solver's module docstring holds each record heading once, in the order that the principles give."""
     # --- arrange ----------------------
@@ -94,20 +97,20 @@ def test_the_module_docstring_holds_the_record_headings_in_order(solver_cls):
     assert headings == list(_RECORD_HEADINGS)
 
 
-@pytest.mark.parametrize("solver_cls", _solver_params())
+@pytest.mark.parametrize("solver_cls", _built_in_solver_cls_params())
 def test_the_class_docstring_cites_every_source_of_the_record(solver_cls):
     """Every author and year that the record's ``Sources:`` names appears in 1 entry of the class's ``References:``."""
     # --- arrange ----------------------
-    sources = _record_sections(solver_cls)["Sources:"]
-    references = inspect.cleandoc(solver_cls.__doc__ or "").partition("References:")[2]
-    reference_entries = re.split(r"\n\s*- ", references)
+    sources_text = _parse_record_sections(solver_cls)["Sources:"]
+    references_text = inspect.cleandoc(solver_cls.__doc__ or "").partition("References:")[2]
+    reference_entries = re.split(r"\n\s*- ", references_text)
 
     # --- act --------------------------
-    uncited = [
-        f"{surname} ({year})"
-        for surname, year in _AUTHOR_YEAR.findall(sources)
-        if not any(surname in entry and f"({year})" in entry for entry in reference_entries)
-    ]
+    uncited = []
+    for surname, year in _AUTHOR_YEAR_PATTERN.findall(sources_text):
+        is_cited = any(surname in entry and f"({year})" in entry for entry in reference_entries)
+        if not is_cited:
+            uncited.append(f"{surname} ({year})")
 
     # --- assert -----------------------
     assert uncited == []

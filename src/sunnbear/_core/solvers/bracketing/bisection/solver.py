@@ -23,41 +23,43 @@ Source per aspect:
       interval whose bounds' function values differ in sign; a ``c`` with ``f(c) = 0`` replaces ``a``. Press et al.
       and SciPy state the same step.
     - Safeguards: none, as in Atkinson. Atkinson notes that ``Bisect`` ignores the limits of machine precision, and
-      that a practical program would adjust its tolerance to them, without giving a rule. The benchmark keeps
-      ``xtol`` well above the float spacing at the interval bounds (`compute_xtol_range`), so a solve in the benchmark
-      never ends as ``MAX_FEVALS`` for the reason that the class docstring gives. Press et al. and SciPy cap the
-      number of iterations, which the evaluation budget does for every solver.
+      that a practical program would adjust its tolerance to them, without giving a rule.
+
+      The benchmark keeps ``xtol`` well above the float spacing at the interval bounds (`compute_xtol_range`), so a
+      solve in the benchmark never ends as ``MAX_FEVALS`` because a midpoint equals an interval bound. Press et al.
+      and SciPy cap the number of iterations; in sunnbear, the evaluation budget caps it for every solver.
     - Constants: Atkinson's: the ``1/2`` of the midpoint, and the tolerance ``epsilon`` as the bound on the
       half-width ``b - c``.
     - Stopping rule: Atkinson's step 2, which ends the solve once the half-width ``b - c`` is at most ``epsilon`` and
-      returns ``c`` without evaluating it. `BracketingSolver` implements it in another float form, through
-      `Interval.is_converged` and `Interval.root` (see the PRINCIPLE-CONFLICT (P6) below). On an exact root, where
-      Atkinson states nothing or differs from SciPy, the solver follows SciPy, the source that P1's tie-break favors:
+      returns ``c`` without evaluating it. `BracketingSolver` implements it in a form that is equal in exact
+      arithmetic but rounds differently in float64, through `Interval.is_converged` and `Interval.root` (see the
+      PRINCIPLE-CONFLICT (P6) below). On an exact root, where Atkinson states nothing or differs from SciPy, the solver
+      follows SciPy, the source that P1 favors when 2 sources of the same rank differ:
 
       - a zero at a bound of the initial interval ends the solve before the first midpoint; Atkinson requires
         ``f(a) * f(b) < 0``;
       - a midpoint with ``f(c) = 0`` ends the solve and is returned; Atkinson's step 3 makes it the bound ``a`` and
-        bisects on. Table 2.1 has no such midpoint, so both versions pass its validation.
+        bisects on. Table 2.1 has no such midpoint, so Atkinson's handling and SciPy's both reproduce it.
     - Arithmetic form (P6): Atkinson's ``(a + b) / 2`` is computed as ``0.5 * (a + b)``, and Atkinson's sign test
-      ``sign(f(b)) * sign(f(c)) <= 0`` as a comparison of ``f(c)`` with 0 in the interval's orientation; P6 allows
-      both.
+      ``sign(f(b)) * sign(f(c)) <= 0`` as a comparison of ``f(c)`` with 0, in the direction that depends on whether
+      ``f`` is negative or positive at ``a``; P6 allows both.
     - PRINCIPLE-CONFLICT (P6): the stopping test is not Atkinson's ``b - c <= epsilon``, computed after ``c``, but
       ``b - a <= 2 * xtol``, computed before it (`Interval.is_converged`): an algebraic restructuring, which P6 does
       not allow. The 2 tests are equal in exact arithmetic. In float64 they end the solve 1 evaluation apart for some
-      ``xtol`` values, mostly next to an ``xtol`` where the evaluation count changes, which the benchmark's ``xtol``
-      range avoids. Testing Atkinson's form would need `Bisection` to write its own loop.
+      ``xtol`` values, mostly next to an ``xtol`` where the evaluation count changes; the benchmark's ``xtol`` range
+      avoids those values. Using Atkinson's stopping test would need `Bisection` to write its own loop.
     - Translation of ``xtol`` (P7): none needed. Atkinson's ``epsilon`` bounds the distance from ``c`` to a root, as
       ``xtol`` does, so ``xtol`` is passed as ``epsilon``.
-    - PRINCIPLE-GAP (P1): SciPy differs from Atkinson in 2 aspects, and both versions pass validation in each, so
-      P1's tie-break favors SciPy's. P1 does not say whether the reasons below outweigh the tie-break; the solver
-      follows Atkinson in both:
+    - PRINCIPLE-GAP (P1): SciPy differs from Atkinson in 2 aspects, and both versions pass validation in each, so P1
+      favors SciPy's, as the most widely used implementation. P1 does not say whether the reasons below outweigh that
+      preference; the solver follows Atkinson in both:
 
       - the arithmetic form of the midpoint: SciPy computes it as ``a + dm``, with the half-width ``dm`` halved each
         iteration, which can differ from ``0.5 * (a + b)`` in the last bit at the same flop count; the solver keeps
         the form of `Interval.midpoint`, which every bracketing solver shares;
       - the stopping rule: SciPy evaluates each midpoint first, then ends the solve once the halved interval is
-        narrower than ``xtol + rtol * |c|``, and returns that midpoint. It returns the x-value that Atkinson's rule
-        returns, after 1 evaluation more, and Table 2.1 does not tell the 2 rules apart.
+        narrower than ``xtol + rtol * |c|``, and returns that midpoint. SciPy's rule returns the x-value that
+        Atkinson's rule returns, after 1 evaluation more, and Table 2.1 does not tell the 2 rules apart.
 
 Validation:
     - A: none exists, because bisection has no article of its own.
@@ -65,8 +67,8 @@ Validation:
       x-value, to the printed digits. The reproduction is exact, so it is convincing (P5). Chandrupatla (1997) and
       Ganchovski et al. (2026) publish evaluation counts of bisection too, which the test suite does not check.
     - C: used. The test suite checks that `Bisection` evaluates the same x-values as SciPy's
-      ``scipy.optimize.bisect``, on every twin test case. The twin stops by the rule of `Bisection`, so C checks the
-      step and its arithmetic, not the stopping rule.
+      ``scipy.optimize.bisect``, on every twin test case. The twin test runs ``scipy.optimize.bisect`` with the
+      stopping rule of `Bisection`, so C checks the step and its arithmetic, not the stopping rule.
 
 Variants:
     - PRINCIPLE-GAP (P8): `BisectionConfig`, the only config, has role ``BUILTIN_BASELINE``. P8 says how strictly the
@@ -104,7 +106,7 @@ class Bisection(BracketingSolver):
           John Wiley & Sons. The test suite reproduces the book's Table 2.1.
         - SciPy's ``scipy.optimize.bisect``, which adds a relative term to its tolerance; the test suite checks
           `Bisection` against ``scipy.optimize.bisect``.
-        - Third parties that publish evaluation counts of bisection, which the test suite does not check:
+        - Third parties that publish evaluation counts of bisection:
 
           - Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear
             function without using derivatives. Advances in Engineering Software 28(3), 145-149. Its Table 2
