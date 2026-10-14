@@ -86,7 +86,8 @@ def _parse_record_sections(solver_cls) -> dict[str, str]:
 
 @pytest.mark.parametrize("solver_cls", _built_in_solver_cls_params())
 def test_the_module_docstring_holds_the_record_headings_in_order(solver_cls):
-    """The solver's module docstring holds each record heading once, in the order that the principles give."""
+    """The solver's module docstring holds each record heading once, in the order of
+    ``IMPLEMENTATION_PRINCIPLES.md``."""
     # --- arrange ----------------------
     lines = (sys.modules[solver_cls.__module__].__doc__ or "").splitlines()
 
@@ -108,7 +109,10 @@ def test_the_class_docstring_cites_every_source_of_the_record(solver_cls):
     # --- act --------------------------
     uncited = []
     for surname, year in _AUTHOR_YEAR_PATTERN.findall(sources_text):
-        is_cited = any(surname in entry and f"({year})" in entry for entry in reference_entries)
+        is_cited = False
+        for entry in reference_entries:
+            if surname in entry and f"({year})" in entry:
+                is_cited = True
         if not is_cited:
             uncited.append(f"{surname} ({year})")
 

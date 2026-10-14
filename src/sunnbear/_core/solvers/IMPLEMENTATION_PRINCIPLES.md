@@ -115,11 +115,13 @@ These rules follow from P3 and P6: the flop counts must show the published algor
 
 ## Each solver's record
 
-**The module docstring of each solver's `solver.py` is that solver's record: it states how these principles apply to the solver.** The reasons why a solver follows each of its sources are stated nowhere else, so the record keeps them next to the code, and a change of principle is checked against each record.
+**The module docstring of each solver's `solver.py` is that solver's record: it states how these principles apply to the solver.**
+
+The reasons why a solver follows each of its sources are stated nowhere else, so the record keeps them next to the code, and a change of principle is checked against each record.
 
 The record has 4 sections, each a heading of the docstring:
 
-- **`Sources:`** names the sources of each rank of P1, from Ia to IV, by author and year where they have them, with what each states; a rank without a source says "none".
+- **`Sources:`** names the sources of each rank of P1, by author and year where they have them, with what each states; a rank without a source says "none".
 - **`Source per aspect:`** gives, for each of these aspects, the rank and the source that the solver follows:
   - the step formula;
   - the safeguards;
@@ -138,15 +140,15 @@ The record has 4 sections, each a heading of the docstring:
   - **Where 2 sources of the followed rank state the aspect differently**, the entry names the one that the solver follows, and why (P1).
 
   An entry that does not follow the highest-ranked source that exists is a deviation that P3 requires the record to declare.
-- **`Validation:`** gives, for each kind A, B and C of P4, 1 of these 3 answers:
+- **`Validation:`** gives, for each kind of evidence in P4, 1 of these 3 answers:
   - used, with its evidence, its outcome, and whether the outcome is convincing (P5);
   - none exists;
   - not used, with the reason.
 
   The docstring of the solver's test package gives the details of each published table.
-- **`Variants:`** gives each config of the solver with its role (P8), and for a secondary config, its deviations from the principles.
+- **`Variants:`** gives each variant of the solver with its config and role (P8), and for a secondary variant, its deviations from the principles.
 
-**The class docstring describes what the algorithm does, and its `References:` gives the full citation of every source that the record names.** API documentation renders the docstring of the public class, not that of its private module, so the citations stay in the docstring that API documentation renders.
+**The class docstring describes what the algorithm does, and its `References:` gives the full citation of every source that the record names.** API documentation renders the docstring of the public class, not the docstring of its private module, so the full citations go in the class docstring.
 
 A test checks that every author and year that a record's `Sources:` names appears in the class's `References:`.
 
@@ -157,6 +159,4 @@ A test checks that every author and year that a record's `Sources:` names appear
 
 A record flags a conflict and does not resolve it; resolving it is a change of its own, made under these principles.
 
-**A record is longer than most module docstrings**, because it is the only place that states, aspect by aspect, why a solver follows the source it does.
-
-Code reviews that ask to shorten a record are answered by this section. Even so, a record cites a fact that the code or the tests own, and does not repeat the fact.
+**A record is longer than most module docstrings, and code reviews that ask to shorten a record are answered by this section.** A record still cites a fact that the code or the tests own, and does not repeat the fact.
