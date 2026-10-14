@@ -26,17 +26,17 @@ The implementations of these solvers need to be faithful enough to give a repres
 
 ## Sources
 
-**P1. Each aspect of a solver, such as its step formula, a safeguard or its stopping rule, follows the highest source that states it completely and unambiguously.** The sources rank as follows, highest preference first; a record and a docstring name each rank by its bold name:
+**P1. Each aspect of a solver, such as its step formula, a safeguard or its stopping rule, follows the highest source that states it completely and unambiguously.** The sources rank as follows, highest preference first; a record and a docstring name each rank by its numeral and its name, such as "III - third party":
 
-- **article** — the article that published the method. Its own content ranks above any other source. Within it:
-  - **article code** — a code listing printed in the article;
-  - **article pseudocode** — pseudocode printed in the article;
-  - **article text** — the article's prose and equations.
+- **I - article**: the article that published the method. Its own content ranks above any other source. Within it:
+  - **Ia - article code**: a code listing printed in the article;
+  - **Ib - article pseudocode**: pseudocode printed in the article;
+  - **Ic - article text**: the article's prose and equations.
 
   Code ranks above pseudocode, because it is likely closer to the authors' experimental code.
-- **authors' code** — the authors' own code outside the article: a repository, a supplement, or code sent on request;
-- **third party** — other publicly available third-party implementations; a textbook's description and its tables count here, so the sources of a method without an original article start at this rank;
-- **own judgment** — sunnbear's own interpretation or choice, for an aspect that no source states, or that every source states in a form that fails its validation (P4, P5).
+- **II - authors' code**: the authors' own code outside the article, such as a repository, a supplement, or code sent on request;
+- **III - third party**: other publicly available third-party implementations; a textbook's description and its tables count here, so the sources of a method without an original article start at this rank;
+- **IV - own judgment**: sunnbear's own interpretation or choice, for an aspect that no source states, or that every source states in a form that fails its validation (P4, P5).
 
 Where 2 sources of the same rank, such as 2 third-party implementations, state an aspect differently and both pass validation, the choice is a judgment call that favors the most widely used implementation in the Python ecosystem, such as SciPy's, because of its install base.
 
@@ -54,11 +54,11 @@ Without a good reason, a solver does not deviate from its article.
 
 ## Validation
 
-**P4. A solver is validated by the strongest kind of evidence that exists**, highest first:
+**P4. A solver is validated by the strongest kind of evidence that exists**, highest first; a record names each kind by its letter and its name, such as "B - third-party results":
 
-- **A** — numerical results in the authors' own article;
-- **B** — a third party's published numerical results for the method. They rank after A and never outweigh it, because a third party may make its own implementation decisions, which its paper does not always state;
-- **C** — behavioral parity with a reference implementation from the authors' code or a third party, through a twin test, which runs the reference implementation as a `Solver` and checks that both evaluate the same x-values.
+- **A - authors' results**: numerical results in the authors' own article;
+- **B - third-party results**: a third party's published numerical results for the method. They rank after A and never outweigh it, because a third party may make its own implementation decisions, which its paper does not always state;
+- **C - reference implementation**: behavioral parity with a reference implementation from II - authors' code or III - third party, through a twin test, which runs the reference implementation as a `Solver` and checks that both evaluate the same x-values.
 
 Where a solver's results cannot be reconciled with published results, its test package states so explicitly, with the observed deviations and an explanation where one is available.
 

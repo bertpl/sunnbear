@@ -4,15 +4,15 @@ The rest of this docstring is the record of `Bisection` under the solver impleme
 (``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
 
 Sources:
-    - article:
+    - I - article:
       - none: bisection is a classical method with no article of its own.
-    - authors' code:
+    - II - authors' code:
       - none.
-    - third party:
+    - III - third party:
       - Atkinson (1989), section 2.1: the pseudocode ``Bisect``, and Table 2.1, its results on 1 problem;
       - Press et al. (2007), section 9.1.1: prose and the routine ``rtbis``;
       - SciPy's ``scipy.optimize.bisect``.
-    - own judgment:
+    - IV - own judgment:
       - none.
 
 Source per aspect:
@@ -29,10 +29,12 @@ Source per aspect:
     - Translation of ``xtol`` (P7): ``xtol`` is Atkinson's ``epsilon``.
 
 Validation:
-    - A: none exists.
-    - B: used. Atkinson's Table 2.1 is reproduced exactly, which is convincing (P5). Chandrupatla (1997) and
-      Ganchovski et al. (2026) also publish evaluation counts of bisection, which the test suite does not check.
-    - C: used. A twin test checks the midpoints against SciPy's ``scipy.optimize.bisect``, not its stopping rule.
+    - A - authors' results: none exists.
+    - B - third-party results: used. Atkinson's Table 2.1 is reproduced exactly, which is convincing (P5).
+      Chandrupatla (1997) and Ganchovski et al. (2026) also publish evaluation counts of bisection, which the test
+      suite does not check.
+    - C - reference implementation: used. A twin test checks the midpoints against SciPy's ``scipy.optimize.bisect``,
+      not its stopping rule.
 
 Variants:
     - `BisectionConfig`, the only config, is the baseline, which follows the principles as strictly as a core variant
