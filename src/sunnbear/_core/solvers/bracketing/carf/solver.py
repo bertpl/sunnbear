@@ -27,46 +27,51 @@ Source per aspect:
     - JUDGMENT-CALL: the article's limit on the number of iterations, 200 in its Table 4, is left out, so the
       evaluation budget ends a long solve, as for every solver. The article counts a solve that reaches its limit as
       a failure.
-    - JUDGMENT-CALL: the article gives no formula for the chord's zero, the first x-value before its clip. The code
-      computes ``(a * f(b) - b * f(a)) / (f(b) - f(a))``, the form that `Pegasus` and `ModAB` take from their
-      sources; ``a - f(a) * (b - a) / (f(b) - f(a))`` matches 35, including all 33 that `CARF` matches.
-    - The quadratic's zero follows IV, since the article gives no formula: the code writes the quadratic around the
-      interior x-value ``t`` in forms that avoid cancellation, takes the zero nearer ``t`` when it lies in ``[a, b]``
-      and the other zero otherwise, and the zero of the line when the quadratic's leading coefficient is 0. Of 4 other
-      formulas tried, none matches more than 33.
+    - JUDGMENT-CALL: the article gives no formula for the chord's zero, the first x-value before it is clipped into
+      the middle 80 % of the interval. The code computes ``(a * f(b) - b * f(a)) / (f(b) - f(a))``, the form that
+      `Pegasus` and `ModAB` take from their sources; ``a - f(a) * (b - a) / (f(b) - f(a))`` matches 35, including all
+      33 that `CARF` matches.
+    - The quadratic's zero follows IV, since the article gives no formula; of 4 other formulas tried, none matches
+      more than 33. The code:
+      - writes the quadratic around the interior x-value ``t`` in forms that avoid cancellation;
+      - takes the zero nearer ``t`` when it lies in ``[a, b]``, and the other zero otherwise;
+      - takes the zero of the line when the quadratic's leading coefficient is 0.
     - A negative discriminant of the quadratic, which only rounding produces, is clamped to 0 (IV); no solve of
       Tables 3 and 4 needs the clamp. When the discriminant and the quadratic's slope at ``t`` are both 0, which
-      underflow can produce, the next division is by 0: at the benchmark's smallest allowed values of ``xtol``, the
-      solves of x^19 on 4 of its 5 intervals in Table 4 then end as ``SOLVER_ERROR``.
-    - When the 2 logarithms of the power step round to the same value, which the article does not cover, ``t*`` is
-      the midpoint of the active interval, clipped with ``θ = 0.5`` (IV); of Tables 3 and 4, only Table 4's function
-      3 over [-1e6, 1e6], written 3[-1e6, 1e6] below, meets this case.
+      underflow can produce, computing the zero nearer ``t`` divides by 0: at the benchmark's smallest allowed values
+      of ``xtol``, the solves of x^19 on 4 of its 5 intervals in Table 4 then end as ``SOLVER_ERROR``.
+    - When the 2 logarithms of the power step round to the same value, which the article does not cover, the next
+      x-value is the midpoint of the active interval, the part of ``[a, b]`` that holds the sign change (IV); of
+      Tables 3 and 4, only Table 4's function 3 over [-1e6, 1e6], written 3[-1e6, 1e6] below, meets this case.
     - PRINCIPLE-GAP (P6): the article writes the power step in 4 forms, equal in exact arithmetic, and P6 does not say
       which written form counts. The code keeps the form in which section 2 states the method; Appendix A's form
       ``a + (b - a) * r * r^sigma``, with ``sigma`` as Appendix A defines it, matches 35, including all 33 that `CARF`
       matches, and keeps Table 3's totals within 1.5 %.
     - The acceptance test follows Brent (1971): a step is accepted when it is shorter than half the step before last.
       The article's own test, against half the width of the interval 2 iterations back, is undefined in the first
-      iteration, and the validation with that test is not convincing (P2): the article's test matches 15, and with
-      ``eps1 = 0`` it almost never clips on (x - 3)^3 over [0, 5] and on Table 2's x^5 and x^7, which then do not
-      converge within 5,000 evaluations.
+      iteration, and the validation with that test is not convincing (P2):
+      - the article's test matches 15;
+      - with ``eps1 = 0``, it almost never clips on (x - 3)^3 over [0, 5] and on Table 2's x^5 and x^7, which then do
+        not converge within 5,000 evaluations.
     - The last step and the step before last, which the acceptance test needs, follow IV: they start at the initial
-      interval's width, as in Brent's procedure ``zero``, and every step, accepted or clipped, shifts them. Brent's
-      rule after a bisection, applied to a clip, sets both to half the active interval's width and matches 21; a start
-      at infinity matches 29.
+      interval's width, as in Brent's procedure ``zero``, and every step, accepted or clipped, shifts them. Applying
+      Brent's rule for a bisection to each clipped step, which sets both to half the active interval's width,
+      matches 21; starting both at infinity matches 29.
     - The interval after a sign change follows IV: the article takes the shorter of "two sign-changing sub-intervals
       containing" the new x-value, without saying which 2. The code takes the shorter of the active interval, with
       the new x-value inside, and the interval from the new x-value to the bound outside the active interval, with the
-      old ``t`` inside; on a tie, the active one. Always the active interval matches 19, always the other 24.
+      old ``t`` inside; on a tie, the active one. Always taking the active interval matches 19, and always taking the
+      other interval matches 24.
     - The stop test checks only the interior x-value (IV), where the article tests each new x-value: a new x-value
-      that becomes an interval bound does not end the solve, however small its ``|f|``. Testing it too matches 31.
+      that becomes an interval bound does not end the solve, however small its ``|f|``. Also testing a new x-value
+      that becomes an interval bound matches 31.
     - The returned x-value, which the article does not state, is the interior x-value ``t`` (IV); when the solve
       ends because the active interval is narrower than ``xtol``, ``t`` is a bound of the active interval, so it lies
       within ``xtol`` of a root.
     - Translation of ``xtol`` (P7): ``xtol`` is the article's ``eps2``, and its ``eps1`` is 0:
-      - the width test is ``b* - a* < xtol``, and the test ``|f(t)| < eps1``, which then never holds, becomes
-        ``f(t) = 0``; a new x-value with ``f = 0`` is not taken as a sign change, so it becomes the interior x-value,
-        which that test checks;
+      - the width test is that the active interval is narrower than ``xtol``, and the test ``|f(t)| < eps1``, which
+        then never holds, becomes ``f(t) = 0``; a new x-value with ``f = 0`` is not taken as a sign change, so it
+        becomes the interior x-value, which the test ``f(t) = 0`` checks;
       - the article's Tables 3 and 4 use ``eps1 = 1e-15``; with ``eps1 = 0``, Table 3's totals lie 3.7 to 8.6 % above
         the article's.
 
@@ -79,23 +84,24 @@ Validation:
         - Table 2 is not reproduced, and no explanation is known:
           - at ``xtol = 1e-10``, the tolerance at which SciPy's ``brentq`` reproduces the table's column "Brentq",
             `CARF` takes 53 and 61 evaluations on Table 2's x^5 and x^7, against 37 and 35;
-          - no other value of ``eps1`` or formula of a step that was tried closes the gap, and no reading of the
-            article's open details that was tried reproduces Table 2 together with Table 4: the closest to Table 2,
-            at 39 and 36, matches 8 of Table 4's counts;
+          - no other value of ``eps1`` or formula of a step that was tried reaches the article's 37 and 35, and no
+            reading of the article's open details that was tried reproduces Table 2 together with Table 4: the
+            closest to Table 2, at 39 and 36, matches 8 of Table 4's counts;
           - of the article's tables, only Table 2 shows solves that reach a tight tolerance at a multiple root, as
             those of `CARF` do with ``eps1 = 0``.
         - On the widest intervals of functions 1 to 4, 10 of Table 4's counts differ by 3 to 59. Each of the 10
-          changes with the formula of the chord's zero, the quadratic's zero or the power step, whose forms in the
-          author's program the article does not state, but only 3 reach the article's count with another formula.
+          counts changes with the formula of the chord's zero, the quadratic's zero or the power step; the article
+          does not state which forms the author's program uses. Another formula gives the article's count for only 3
+          of the 10.
         The author's program (II) would resolve the conflict.
       - PRINCIPLE-GAP (P2): P2 lets a solver whose validation is not convincing use the next-ranked source, here the
         author's program, which is not public; P2 does not say whether sunnbear must request it, and the code follows
         the article without it.
-      - PRINCIPLE-CONFLICT (P5): the tests check Table 4's other 12 counts for convergence only, and their test data
-        state causes that do not all hold, where P5 accepts a difference of 1 marked ``UNSTATED_RUN_DETAILS`` and asks
-        that an unverified cause never be stated as fact:
-        - 8[2e-4, 2] and 9[2e-4, 1] differ by 1; on 9[2e-4, 1], the stated cause, a 1-ulp difference in the last
-          step, gives 9, not the article's 7;
+      - PRINCIPLE-CONFLICT (P5): the tests check Table 4's other 12 counts for convergence only, and not every cause
+        that the test data state for them holds. P5, by contrast, accepts a difference of 1 marked
+        ``UNSTATED_RUN_DETAILS``, and asks that an unverified cause never be stated as fact:
+        - 8[2e-4, 2] and 9[2e-4, 1] differ by 1; on 9[2e-4, 1], applying the stated cause, a 1-ulp change in the last
+          step, gives a count of 9, not the article's 7;
         - the stated cause of the other 10, that ``h = (f(t) - f(a)) / (f(b) - f(a))`` lies within rounding error of
           a limit that picks the kind of step, does not hold on 1[-1e4, 1e4] and 1[-1e10, 1e10].
         Accepting the 2 counts that differ by 1, marked ``UNSTATED_RUN_DETAILS``, and stating for the 10 only that
@@ -147,8 +153,7 @@ class CARF(Solver):
         and ``t*`` is the zero of the power function ``alpha * (x - a)^beta + gamma`` through the 3 points, in the
         form of the paper's section 2: ``t* = a + (b - a) * r^xi``, with
         ``xi = log(1 - f(b) / f(a)) / (log(1 - f(b) / f(a)) - log(1 - f(t) / f(a)))``. When the 2 logarithms round to
-        the same value, the denominator of ``xi`` is 0, and ``t*`` is the midpoint of the active interval, clipped as
-        when the 3 function values are not monotone;
+        the same value, the denominator of ``xi`` is 0, and ``t*`` is the midpoint of the active interval;
       - when ``h`` lies outside ``(0, 1)``, the 3 function values are not monotone, and ``t*`` is the quadratic's zero;
 
     - **accepts or clips ``t*``:** a step is the distance from one x-value to the next. ``t*`` becomes the new x-value
@@ -180,9 +185,9 @@ class CARF(Solver):
       interval the shorter one, and that interval keeps the old ``t`` inside.
     - **Effect:** the next steps are then clipped, and each shrinks the interval by only 15 %, or halves it when the 3
       function values are not monotone, so the solve can take many more evaluations than usual, up to its budget.
-    - **Occurrence:** it occurs on some of the paper's test problems, including problems whose published counts
-      `CARF` reproduces, such as the 8th function of the paper's Table 4 over ``[2e-4, 81]``; on others, it occurs when
-      1 candidate ``t*`` is rounded differently by 1 ulp.
+    - **Occurrence:** the old ``t`` stays the interior x-value on some of the paper's test problems, including problems
+      whose published counts `CARF` reproduces, such as the 8th function of the paper's Table 4 over ``[2e-4, 81]``; on
+      others, it does so when 1 candidate ``t*`` is rounded differently by 1 ulp.
 
     The paper's proof guarantees only that each step shrinks the interval to at most 70 % of its width. A power step
     evaluates 2 logarithms and a power, so `CARF`'s flop counts can exceed those of the other solvers.
