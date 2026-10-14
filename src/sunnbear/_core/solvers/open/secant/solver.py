@@ -23,11 +23,13 @@ Source per aspect:
       has no status for.
     - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound after the 2
       evaluations at the bounds, as for every solver. SciPy evaluates that bound a 3rd time, for the same result.
-    - PRINCIPLE-GAP (P1): no rule for which interval bound starts as the newest x-value reproduces both Table 1 of
-      Oliveira and Takahashi (2020) and Table 2.3 of Atkinson (1989), and P1 prefers SciPy only among sources that
-      pass validation. The code keeps SciPy's rule, the bound with the larger ``|f|``. With that rule:
-      - 3 counts of Oliveira and Takahashi's Table 1 differ by 1 from those of `Secant`;
-      - Atkinson's Table 2.3 needs the rule of Press et al., the bound with the smaller ``|f|``.
+    - PRINCIPLE-GAP (P1): no single rule for choosing which interval bound starts as the newest x-value reproduces
+      both Table 1 of Oliveira and Takahashi (2020) and Table 2.3 of Atkinson (1989). P1 prefers SciPy only among
+      sources that pass validation, so P1 does not decide this rule. The code keeps SciPy's rule, the bound with the
+      larger ``|f|``. With that rule:
+      - Oliveira and Takahashi's Table 1 has 3 counts that differ by 1 from those of `Secant`;
+      - Atkinson's Table 2.3 is not reproduced, because it needs the rule of Press et al., the bound with the smaller
+        ``|f|``.
     - Translation of ``xtol`` (P7): ``xtol`` is SciPy's absolute tolerance ``tol``, with its relative tolerance
       ``rtol`` at 0, SciPy's default.
 
@@ -36,8 +38,8 @@ Validation:
       - none exists.
     - B - third-party results:
       - PRINCIPLE-CONFLICT (P4): not used: Oliveira and Takahashi (2020), Table 1, the column "Secant". No test checks
-        its counts: 20 of the 24 match those of `Secant`, 3 differ by 1 (see the PRINCIPLE-GAP (P1) entry) and 1
-        differs by 31. A test that checks these counts would resolve the conflict.
+        its counts, 4 of which differ from those of `Secant`; the docstring of the test package
+        ``tests.solvers.open.secant`` gives the details. A test that checks these counts would resolve the conflict.
       - not used: Atkinson (1989), Table 2.3, which needs the rule of Press et al. for which bound starts as the newest
         x-value (see the PRINCIPLE-GAP (P1) entry).
     - C - reference implementation:
