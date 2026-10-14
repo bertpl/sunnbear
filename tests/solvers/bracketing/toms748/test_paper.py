@@ -62,8 +62,11 @@ def test_the_total_evaluation_count_lies_within_1_1_percent_of_the_papers_table_
     """Over the problems in `AUTHORS_TEST_OUTPUT`, the total evaluation count lies within 1.1 % of the paper's Table II,
     for each ``k`` and for each of the paper's tolerances ``tol = 10^-n_digits`` and ``tol = 0``.
 
-    The paper's counts include the 2 evaluations at the interval bounds, and come from a machine whose relative
-    precision was 1.907e-16, not 2^-52.
+    The paper's counts include the 2 evaluations at the interval bounds. The bound of 1.1 % admits ``k = 1`` at
+    ``tol = 0``, which lies 1.02 % below the paper's total. In float64, problem 26's function is 0 for ``|x|`` below
+    about 0.0375; coded so that its solves reach its root 0, as the paper reports for its runs, 7 of the 8 totals lie
+    within 0.15 %, and ``k = 1`` at ``tol = 0`` within 0.71 %. The paper's relative machine precision,
+    1.9073486328e-16 in place of 2^-52, moves no total by more than 2.
     """
     # --- arrange / act ----------------
     total = sum(

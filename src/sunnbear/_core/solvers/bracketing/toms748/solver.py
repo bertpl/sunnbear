@@ -1,4 +1,94 @@
-"""`TOMS748` implements Algorithm 748: interpolation steps, a double-size secant step, and bisection if needed."""
+"""`TOMS748` implements Algorithm 748: interpolation steps, a double-size secant step, and bisection if needed.
+
+The rest of this docstring is the record of `TOMS748` under the solver implementation principles
+(``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
+
+Sources:
+    - I - article:
+      - Ia - article code: none: the authors' Fortran code is published with the article, not printed in it;
+      - Ib - article pseudocode: Alefeld, Potra and Shi (1995), Algorithms 4.1 and 4.2 in its section 4, the
+        subroutines ``bracket`` and Newton-Quadratic in its section 2 and ``ipzero`` in its section 3, and the modified
+        ``bracket`` in its section 6, which adds the margin from the interval bounds and the stopping test;
+      - Ic - article text: Alefeld, Potra and Shi (1995), its sections 2 and 6: the assumption ``f(a) * f(b) < 0``,
+        the stopping criterion (equation 25), ``mu = 0.5``, ``lambda = 0.7``, and the relative machine precision of the
+        article's runs.
+    - II - authors' code:
+      - the Fortran 77 code of Algorithm 748, which implements Algorithm 4.2 only, with a test driver that prints the
+        root of each of its 154 test problems.
+    - III - third party:
+      - SciPy's ``scipy.optimize.toms748``: Algorithms 4.1 and 4.2 and higher values of ``k``, with ``k = 1`` as its
+        default.
+    - IV - own judgment:
+      - the translation of ``xtol`` into the code's ``tol`` (P7).
+
+Source per aspect:
+    Every aspect follows Algorithms 4.1 and 4.2 of Alefeld, Potra and Shi (1995), with the modified ``bracket`` of
+    their section 6, which their runs used, except:
+    - The details that the article leaves open follow the authors' Fortran code:
+      - where a Newton step would divide by ``P'(r) = 0``, Newton-Quadratic returns the zero of the line through ``a``
+        and ``b``, as the article's Newton-Quadratic does for ``A = 0``;
+      - ``macheps`` is 2^-52, the relative machine precision of float64 as the code's subroutine ``RMP`` computes it;
+        the article gives only its own machine's, 1.9073486328e-16, with which ``k = 2`` misses 1 more count of Table
+        VI, 3[n=1];
+      - the stopping test also runs before the first step, ``u`` is ``b`` where ``|f(a)| = |f(b)|``, and the solve
+        returns the lower bound ``a``.
+    - PRINCIPLE-CONFLICT (P6): the code computes every formula in the form of the authors' Fortran code, where the
+      article's pseudocode writes 4 of them in other forms: the secant step and the double-size secant step, which it
+      computes with the divided difference ``f[a, b] = (f(b) - f(a)) / (b - a)``, Newton-Quadratic's quadratic and its
+      derivative, and the midpoint ``0.5 * (a + b)``. P1 ranks the article above the code, and for ``k = 2`` the
+      published results give no P2 reason for the code's forms. With the article's forms:
+      - ``k = 2`` still matches 15 of the 17 counts of Tables IV to VI, its Table II totals at ``tol = 10^-15`` and 0
+        come 3 and 6 evaluations closer to the article's, and it misses the root that the authors' code prints for
+        26[n=1];
+      - ``k = 1`` misses 1 more count of Table VI: 18 evaluations against 17 on 24[n=20].
+      Either of 2 changes would resolve the conflict: computing these 4 formulas in the article's forms, or a principle
+      that ranks code that a journal publishes with its article, as ACM does for Algorithm 748, as Ia.
+    - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
+      solver. The article assumes ``f(a) * f(b) < 0``. At a zero lower bound, the authors' code replaces that bound by
+      its first x-value and ends near the upper bound, away from the root; at a zero upper bound, it returns an x-value
+      within ``stop_width`` of that bound, after 1 more evaluation.
+    - Translation of ``xtol`` (P7): ``tol = xtol / 2 - 2 * macheps * max(|a0|, |b0|)``, with ``a0`` and ``b0`` the
+      initial interval bounds, so that ``stop_width = 2 * (2 * macheps * |u| + tol)`` stays at most ``xtol``. Where
+      ``xtol`` is below ``4 * macheps * max(|a0|, |b0|)``, that ``tol`` would be negative, so ``tol`` is 0, the smallest
+      value that the article admits, and the returned ``a`` lies within ``stop_width`` of a root, which can exceed
+      ``xtol``; the benchmark keeps ``xtol`` above that limit.
+
+Validation:
+    - A - authors' results:
+      - used: Tables IV to VI, the evaluation counts of 17 problems at ``tol = 10^-15``. ``k = 2`` matches 15 exactly
+        and 28[n=30] within 1, which is convincing (P5), and ``k = 1`` matches 13 exactly, and 18[n=1] too on macOS.
+        26[n=1] is not compared, because its results depend on how its function is coded, as the article's section 6
+        states.
+      - used: Table II, the total evaluation counts over the 154 problems at 4 values of ``tol``: within 0.4 % for
+        ``k = 2``, which is convincing (P5), and 1.1 % for ``k = 1``. With problem 26 coded so that its solves reach
+        its root 0, as section 6 reports for the article's runs, 7 of the 8 totals lie within 0.15 %, and ``k = 1`` at
+        ``tol = 0`` within 0.71 %.
+      - PRINCIPLE-CONFLICT (P5): for ``k = 1``, the test data explains 3[n=1] (13 evaluations against 15) and
+        13[n=1] (26 against 25) by the authors' own implementation of Algorithm 4.1, which may differ in details that
+        the article does not state; P5 asks for ``UNSTATED_RUN_DETAILS`` and an observation instead. Marking 13[n=1]
+        so, and giving 3[n=1] the reason that its count depends on the last bits of f, which a change of up to 2 ulps
+        moves between 12 and 15, would resolve the conflict.
+      - not used: Table III, whose 139 problems the article does not list.
+      - PRINCIPLE-GAP (P4): kind A covers results in the authors' article, and no kind covers the roots that the
+        authors' test driver prints, which are published with the code. The test suite checks them as authors'
+        results: ``k = 2`` returns all 154 at ``tol = 0``. They tell ``k = 2`` from ``k = 1`` only on 26[n=1].
+    - B - third-party results:
+      - none found: Gao (2026), Table 3, prints the totals of Algorithm 4.2 from Table II, and reports no run of its
+        own.
+    - C - reference implementation:
+      - not used: SciPy's ``scipy.optimize.toms748``, which keeps no margin from the interval bounds, computes its
+        steps in other forms, and has its own fallbacks and stopping rule;
+      - TBD: a twin test against the authors' Fortran code, which the tests would have to compile; not compared yet.
+
+Variants:
+    - `TOMS748K2Config`, with ``k = 2``, the article's Algorithm 4.2, is core (P8).
+    - `TOMS748K1Config`, with ``k = 1``, Algorithm 4.1, is secondary (P8); the PRINCIPLE-CONFLICT (P5) above concerns
+      its test data, and:
+      - PRINCIPLE-GAP (P8): P8 admits a variant whose implementation decision causes fundamentally different behavior,
+        and does not say how large that difference must be. The code keeps this config, whose docstring gives
+        SciPy's default as its reason; the article gives Algorithm 4.1 an asymptotic efficiency index of 1.6529
+        against 1.6686, and 1.7 to 2.3 % more evaluations than Algorithm 4.2 in Table II.
+"""
 
 from sunnbear._core.solvers.core import Interval, IntervalBound, Solver, SolveState
 from sunnbear._core.utils.floats import FLOAT64_EPS
@@ -61,8 +151,14 @@ class TOMS748(Solver):
           interpolation, and its section 6 states the stopping criterion and the margin. The test suite compares the
           evaluation counts of `TOMS748` with the paper's Tables II and IV to VI. https://doi.org/10.1145/210089.210111
         - The authors' Fortran 77 code, published with the paper as algorithm 748 of the Collected Algorithms of the
-          ACM (netlib, ``toms/748``). It implements Algorithm 4.2, which ``k = 2`` follows line by line, and the test
-          suite reproduces the roots that the code lists for its test problems.
+          ACM, https://www.netlib.org/toms/748. It implements Algorithm 4.2, which ``k = 2`` follows line by line, and
+          the test suite reproduces the roots that the code's test driver prints for its test problems.
+        - SciPy's ``scipy.optimize.toms748``, which implements Algorithms 4.1 and 4.2, with ``k = 1`` as its default.
+          It keeps no margin from the interval bounds, and stops once the interval is at most ``xtol + rtol * |b|``
+          wide, a test that it makes once per iteration, returning the interval's midpoint.
+        - Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied Mathematics Letters
+          178, 109928. Its Table 3 prints the totals of Algorithm 4.2 from the paper's Table II.
+          https://doi.org/10.1016/j.aml.2026.109928
     """
 
     name = "toms748"

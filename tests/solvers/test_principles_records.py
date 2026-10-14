@@ -8,10 +8,7 @@ import sys
 import pytest
 
 from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
-from sunnbear.solvers import (
-    TOMS748,
-    SolverConfigRegistry,
-)
+from sunnbear.solvers import SolverConfigRegistry
 
 # Defining a SolverConfig subclass registers it, so the registry also holds the configs that test modules define;
 # the built-in solvers are those of the configs defined inside the sunnbear package.
@@ -21,29 +18,11 @@ _BUILT_IN_SOLVER_CLASSES = list(
     )
 )
 
-# The tests of these solvers are expected to fail; a solver whose record is added must leave this list, or its
-# tests pass unexpectedly and fail the suite.
-_SOLVER_CLASSES_WITHOUT_RECORD = {
-    TOMS748,
-}
-
 _RECORD_HEADINGS = ("Sources:", "Source per aspect:", "Validation:", "Variants:")
 
 # This pattern matches an author-year citation, such as "Atkinson (1989)" or "Ganchovski et al. (2026)"; its first
 # group holds the surname, and its second the year.
 _AUTHOR_YEAR_PATTERN = re.compile(r"(\w[\w'-]*)(?: et al\.)? \((\d{4})\)")
-
-
-def _built_in_solver_cls_params():
-    """Return 1 parameter per built-in solver class, marked as an expected failure while it has no record."""
-    params = []
-    for solver_cls in _BUILT_IN_SOLVER_CLASSES:
-        if solver_cls in _SOLVER_CLASSES_WITHOUT_RECORD:
-            marks = pytest.mark.xfail(strict=True, reason="the solver has no record yet")
-        else:
-            marks = ()
-        params.append(pytest.param(solver_cls, marks=marks, id=solver_cls.__name__))
-    return params
 
 
 def _parse_record_sections(solver_cls) -> dict[str, str]:
@@ -60,7 +39,7 @@ def _parse_record_sections(solver_cls) -> dict[str, str]:
     return sections
 
 
-@pytest.mark.parametrize("solver_cls", _built_in_solver_cls_params())
+@pytest.mark.parametrize("solver_cls", _BUILT_IN_SOLVER_CLASSES, ids=lambda solver_cls: solver_cls.__name__)
 def test_the_module_docstring_holds_the_record_headings_in_order(solver_cls):
     """The solver's module docstring holds each record heading once, in the order of
     ``IMPLEMENTATION_PRINCIPLES.md``."""
@@ -74,7 +53,7 @@ def test_the_module_docstring_holds_the_record_headings_in_order(solver_cls):
     assert headings == list(_RECORD_HEADINGS)
 
 
-@pytest.mark.parametrize("solver_cls", _built_in_solver_cls_params())
+@pytest.mark.parametrize("solver_cls", _BUILT_IN_SOLVER_CLASSES, ids=lambda solver_cls: solver_cls.__name__)
 def test_the_class_docstring_cites_every_source_of_the_record(solver_cls):
     """Every author and year that the record's ``Sources:`` names appears in 1 entry of the class's ``References:``."""
     # --- arrange ----------------------
