@@ -9,7 +9,6 @@ import pytest
 
 from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 from sunnbear.solvers import (
-    CARF,
     ITP,
     TOMS748,
     Brent,
@@ -30,7 +29,6 @@ _BUILT_IN_SOLVER_CLASSES = list(
 # tests pass unexpectedly and fail the suite.
 _SOLVER_CLASSES_WITHOUT_RECORD = {
     Brent,
-    CARF,
     ITP,
     RegulaFalsi,
     Ridders,
