@@ -37,11 +37,12 @@ Validation:
     - A - authors' results:
       - none exists.
     - B - third-party results:
-      - PRINCIPLE-CONFLICT (P4): not used: Oliveira and Takahashi (2020), Table 1, the column "Secant". No test checks
-        its counts, 4 of which differ from those of `Secant`; the docstring of the test package
-        ``tests.solvers.open.secant`` gives the details. A test that checks these counts would resolve the conflict.
+      - PRINCIPLE-CONFLICT (P4): not used: Oliveira and Takahashi (2020), Table 1, the column "Secant", which no test
+        checks; the TBD entry below would resolve the conflict.
       - not used: Atkinson (1989), Table 2.3, which needs the rule of Press et al. for which bound starts as the newest
         x-value (see the PRINCIPLE-GAP (P1) entry).
+      - TBD: Oliveira and Takahashi (2020), Table 1, the column "Secant": 20 of its 24 counts match those of `Secant`,
+        and 4 differ; the docstring of the test package ``tests.solvers.open.secant`` gives the details.
     - C - reference implementation:
       - used: a twin test checks that `Secant` evaluates the same x-values as SciPy's ``scipy.optimize.newton``,
         and stops and returns where SciPy does.
