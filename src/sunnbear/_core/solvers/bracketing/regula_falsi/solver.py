@@ -27,20 +27,23 @@ Source per aspect:
     except:
     - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
       solver. Oliveira and Takahashi assume ``f(a) * f(b) < 0``, so Algorithm 0 never meets this case; ``rtflsp``
-      evaluates the chord's zero first, which lies, up to rounding, at the bound where f is 0, so ``rtflsp`` takes 1
+      still evaluates the chord's zero, which lies, up to rounding, at the bound where f is 0, so ``rtflsp`` takes 1
       evaluation more than `RegulaFalsi`.
     - JUDGMENT-CALL: the chord's zero is computed as the C# code of Ganchovski et al. writes it,
       ``(a * fb - b * fa) / (fb - fa)``, which negates the numerator and the denominator of equation 5. Both forms
       take the same operations and give the same x-values, so the choice has no effect.
-    - JUDGMENT-CALL: the width test runs before each iteration, as in `BracketingSolver`, while Algorithm 0 runs it
-      after each iteration; the 2 orders differ only on an initial interval at most ``2 * xtol`` wide, where
-      Algorithm 0 evaluates 1 chord's zero more.
-    - JUDGMENT-CALL: the stopping rule of Algorithm 0, which is `BracketingSolver`'s, not that of ``rtflsp`` or of the
-      C# code: P1 ranks all 3 as III - third party and favors the most widely used Python implementation among them,
-      but no Python implementation of the method exists; only Algorithm 0's rule guarantees an x-value within ``xtol``
-      of a root. On 408 solves of the test suite's problems, at 3 values of ``xtol``, `RegulaFalsi` runs out of budget
-      in 248; the rules of ``rtflsp`` and of the C# code would end 199 and 197 of these, but would return an x-value
-      farther than ``xtol`` from a root in 136 and 115 of the 408 solves.
+    - JUDGMENT-CALL: the test that the interval is at most ``2 * xtol`` wide runs before each iteration, as in
+      `BracketingSolver`, while Algorithm 0 runs it after each iteration; the 2 orders differ only on an initial
+      interval at most ``2 * xtol`` wide, where Algorithm 0 evaluates 1 more chord's zero.
+    - JUDGMENT-CALL: `RegulaFalsi` stops by the rule of Algorithm 0, which is `BracketingSolver`'s rule, not by the
+      rule of ``rtflsp`` or of the C# code.
+      - P1 ranks all 3 sources as III - third party and favors the most widely used Python implementation among
+        them, but no Python implementation of the method exists. Only the rule of Algorithm 0 guarantees an x-value
+        within ``xtol`` of a root.
+      - On 408 solves of the test suite's problems, at 3 values of ``xtol``, `RegulaFalsi` runs out of budget in
+        248. The rule of ``rtflsp`` would stop 199 of these 248 before the budget runs out, and the rule of the C#
+        code would stop 197. Across all 408 solves, however, the rule of ``rtflsp`` would return an x-value farther
+        than ``xtol`` from a root in 136 solves, and the rule of the C# code in 115.
     - JUDGMENT-CALL: no safeguard keeps the chord's zero strictly inside the interval, because no source has one,
       though `BracketingSolver._next_x` must return an x-value strictly inside. Once the interval bound that each
       iteration replaces lies at the root up to rounding, the chord's zero can round onto that bound or just past it,
@@ -53,10 +56,9 @@ Validation:
       - none exists.
     - B - third-party results:
       - PRINCIPLE-CONFLICT (P4): no test checks a published result, though the 2 tables of the TBD entries below
-        would validate `RegulaFalsi`; tests of them would resolve the conflict.
+        would validate `RegulaFalsi`; tests of these 2 tables would resolve the conflict.
       - TBD: Oliveira and Takahashi (2020), Table 1, the column "Reg.F.": 22 of its 24 counts match exactly, and 23
-        when the Weierstrass function adds its terms in another order; the 24th, Trigonometric 2, is off by 1. The
-        other forms of the chord's zero in the sources match at most 18 counts.
+        when the Weierstrass function adds its terms in another order; the 24th, Trigonometric 2, is off by 1.
       - TBD: Ganchovski et al. (2026), Table 2, the column "fp": `RegulaFalsi` evaluates the same x-values as the
         paper's C# code on all 92 problems, and the C# code's stopping rule, applied to these x-values, gives all 92
         counts and roots.
@@ -67,7 +69,7 @@ Validation:
 
 Variants:
     - `RegulaFalsiConfig`, the only config, is secondary (P8); its behavior deviates from no principle, and the
-      record's only PRINCIPLE-CONFLICT concerns its validation.
+      record's only PRINCIPLE-CONFLICT concerns the validation of `RegulaFalsi`.
 """
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, SolveState
@@ -94,7 +96,8 @@ class RegulaFalsi(BracketingSolver):
       it, and the solve evaluates that x-value again every iteration until its evaluation budget is exhausted;
     - the evaluation budget is exhausted while the moving bound still approaches the root.
 
-    A solve that exhausts its budget ends as ``MAX_FEVALS``, and its ``result.x`` is the last evaluated x-value.
+    A solve that exhausts its budget ends as ``MAX_FEVALS``, and its ``result.x`` is the last evaluated x-value, which
+    in the second case lies at the root up to rounding.
 
     `RegulaFalsi` stops by `BracketingSolver`'s criterion, so a converged solve returns an x-value within ``xtol`` of a
     root.

@@ -13,17 +13,16 @@ Third-party published results:
   - "∞" marks a run that reached the cap of 10^4 evaluations.
 
   With runs and counts set up the same way, the table's 24 counts compare with those of `RegulaFalsi` as follows:
-  - 22 match, 11 of the 12 "∞" rows among them;
-  - Weierstrass, printed as "∞", converges after 13 iterations, on an x-value where the test data's function is
-    exactly 0. The test data adds 0.001 to the sum of the function's 10 sine terms. When the function instead starts
-    from 0.001 and adds the terms one at a time, as the authors' MATLAB code for the table does, its last bits change:
-    the solve reaches an x-value where the function is about -1.9e-19, and the next chord's zero rounds onto that
-    x-value. The solve then evaluates that x-value until it runs out of budget, as printed;
+  - the counts of 22 rows match, among them 11 of the 12 rows printed as "∞";
+  - Weierstrass, printed as "∞", converges after 13 iterations, on an x-value where the test suite's definition of
+    the function is exactly 0.
+    - That definition adds 0.001 to the sum of the function's 10 sine terms. When the function instead starts from
+      0.001 and adds the terms one at a time, as the authors' MATLAB code for the table does, the last bits of the
+      function's values change: the solve reaches an x-value where the function is about -1.9e-19, and the next
+      chord's zero rounds onto that x-value.
+    - The solve then evaluates that x-value until it runs out of budget, which matches the table's "∞";
   - Trigonometric 2 takes 10 iterations, where the table prints 11: its 10th iterate is an x-value where ``math.sin``
     returns exactly -0.5, so the function value there is 0 and the solve ends.
-
-  The other forms of the chord's zero in the sources match fewer counts: the forms of equation 2 of Dowell and Jarratt
-  (1971) and of equation 2 of Ford (1997) match 18 each, and the form of ``rtflsp`` 17.
 - Ganchovski et al. (2026), Table 2, the column "fp": not checked by a test; the record of `RegulaFalsi` lists it as
   TBD. The paper's C# false-position code computes the chord's zero in the form of `RegulaFalsi`, but ends a solve in
   its own way:
@@ -34,18 +33,18 @@ Third-party published results:
 
   `RegulaFalsi` evaluates the same x-values as that code on all 92 problems, and the C# code's stopping rule, applied
   to these x-values, gives all 92 counts of the column, and the 92 roots of the paper's supplementary results.
-- Dowell and Jarratt (1971), Tables 2 to 7, the Regula Falsi columns: not reproduced. The tables stop once
+- Dowell and Jarratt (1971), Tables 2 to 7, the Regula Falsi columns: not reproduced. The runs in the tables stop once
   ``|f(x)| < 0.5e-19``. Near most of their roots, float64 cannot compute ``f(x)`` that accurately, so only an iterate
   with ``f(x) == 0`` meets that test, and the iteration counts cannot be compared.
-- Dowell and Jarratt (1972), Problems 1 to 4, the Regula Falsi column: not reproduced. Problems 1 to 3 stop once
-  ``|f(x)|`` drops below ``0.5e-17`` or ``0.5e-19``, a test that in float64 only an iterate with ``f(x) == 0``
-  passes, and Problem 4 states no starting values.
+- Dowell and Jarratt (1972), Problems 1 to 4, the Regula Falsi column: not reproduced. The runs of Problems 1 to 3
+  stop once ``|f(x)|`` drops below ``0.5e-17`` or ``0.5e-19``, a test that in float64 only an iterate with
+  ``f(x) == 0`` passes, and Problem 4 states no starting values.
 - Ganchovski and Traykov (2023), Table 2, the column "fp": not compared, because the paper does not state the stopping
   rule of its false-position runs.
 - Ford (1997) and Press et al. (2007), section 9.2: no numerical results for the method.
 
 Reference implementations:
 
-- None found: neither SciPy nor mpmath implements the unmodified method; mpmath's ``Illinois`` always scales the
-  function value of a retained bound.
+- None found: neither SciPy nor mpmath implements the unmodified method. mpmath's closest solver, ``Illinois``,
+  always scales the function value of a retained bound, so it cannot run the unmodified method.
 """
