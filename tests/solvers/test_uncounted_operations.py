@@ -17,7 +17,7 @@ from counted_float import FlopCountingContext, UncountedOperationError, Verbosit
 import sunnbear._core.solvers as solvers_package
 from sunnbear._core.solvers.core import solver as solver_module
 from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
-from sunnbear.solvers import BracketingSolver, Interval, SolverConfigRegistry, SolveState
+from sunnbear.solvers import BracketingSolver, Interval, Solver, SolverConfigRegistry, SolveState
 from tests.solvers.twins import TWIN_TEST_CASES
 
 _SOLVERS_DIR = Path(solvers_package.__file__).parent
@@ -53,26 +53,27 @@ def uncounted_operations_raise(monkeypatch):
     error fail the test.
 
     The verbosity of a `FlopCountingContext` decides whether counted-float raises at an operation that it cannot count.
-    The fixture patches 2 names in the solver module, because of how `Solver.solve` works:
+    The fixture patches 2 names, because of how `Solver.solve` works:
 
-    - `FlopCountingContext`: `Solver.solve` opens its own context, whose verbosity replaces the verbosity of any context
-      that the test opens around the call;
-    - `_ending_of`, the function that maps an exception to a status: `Solver.solve` records any exception that is not a
-      `SolveException` as `SOLVER_ERROR`, so the patched function re-raises an `UncountedOperationError`.
+    - `FlopCountingContext` in the solver module: `Solver.solve` opens its own context, whose verbosity replaces the
+      verbosity of any context that the test opens around the call;
+    - `Solver._outcome_from_exception`: `Solver.solve` records any exception that is not a `SolveException` as
+      `SOLVER_ERROR`, so the patched method re-raises an `UncountedOperationError`.
     """
-    original_ending_of = solver_module._ending_of
+    original_outcome_from_exception = Solver._outcome_from_exception
 
-    def ending_of_that_reraises(exc, x_best):
-        """Re-raise an `UncountedOperationError`, and hand any other exception to the original `_ending_of`."""
+    def outcome_from_exception_that_reraises(exc, x_best):
+        """Re-raise an `UncountedOperationError`, and hand any other exception to the original
+        `Solver._outcome_from_exception`."""
         if not isinstance(exc, UncountedOperationError):
-            return original_ending_of(exc, x_best)
+            return original_outcome_from_exception(exc, x_best)
         else:
             raise exc
 
     monkeypatch.setattr(
         solver_module, "FlopCountingContext", functools.partial(FlopCountingContext, verbosity=Verbosity.ERROR)
     )
-    monkeypatch.setattr(solver_module, "_ending_of", ending_of_that_reraises)
+    monkeypatch.setattr(Solver, "_outcome_from_exception", staticmethod(outcome_from_exception_that_reraises))
 
 
 @pytest.mark.usefixtures("uncounted_operations_raise")
