@@ -11,20 +11,23 @@ Sources:
     - III - third party:
       - SciPy's ``scipy.optimize.newton``, without a derivative;
       - Press et al. (2007), section 9.2: prose and the routine ``rtsec``;
-      - Atkinson (1989), section 2.3: equation 2.3.1, and Table 2.3, its results on 1 problem.
+      - Atkinson (1989), section 2.3: equation 2.3.1, and Table 2.3, which reports a run of the secant method on 1
+        problem.
     - IV - own judgment:
       - none.
 
 Source per aspect:
     Every aspect follows SciPy, which P1 prefers among third-party sources, except:
     - Equal function values at the 2 latest x-values end the solve as ``DIVERGED``, since the secant's zero lies at
-      infinity. SciPy returns their midpoint flagged as not converged, a result that the framework has no status for.
+      infinity. SciPy returns the midpoint of these 2 x-values, flagged as not converged, a result that the framework
+      has no status for.
     - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound after the 2
       evaluations at the bounds, as for every solver. SciPy evaluates that bound a 3rd time, for the same result.
-    - PRINCIPLE-GAP (P1): no rule for which interval bound starts as the newest x-value reproduces both published
-      tables, and P1 prefers SciPy only among sources that pass validation. The code keeps SciPy's rule, the bound
-      with the larger ``|f|``: 3 counts of Oliveira and Takahashi's Table 1 then differ by 1, and Atkinson's
-      Table 2.3 needs the rule of Press et al., the bound with the smaller ``|f|``.
+    - PRINCIPLE-GAP (P1): no rule for which interval bound starts as the newest x-value reproduces both Table 1 of
+      Oliveira and Takahashi (2020) and Table 2.3 of Atkinson (1989), and P1 prefers SciPy only among sources that
+      pass validation. The code keeps SciPy's rule, the bound with the larger ``|f|``. With that rule:
+      - 3 counts of Oliveira and Takahashi's Table 1 differ by 1 from those of `Secant`;
+      - Atkinson's Table 2.3 needs the rule of Press et al., the bound with the smaller ``|f|``.
     - Translation of ``xtol`` (P7): ``xtol`` is SciPy's absolute tolerance ``tol``, with its relative tolerance
       ``rtol`` at 0, SciPy's default.
 
@@ -32,9 +35,11 @@ Validation:
     - A - authors' results:
       - none exists.
     - B - third-party results:
-      - PRINCIPLE-CONFLICT (P4): not used: Oliveira and Takahashi (2020), Table 1, the column "Secant", which no test
-        checks; a test of its counts would resolve the conflict.
-      - not used: Atkinson (1989), Table 2.3, which needs another rule for the newest starting x-value (see above).
+      - PRINCIPLE-CONFLICT (P4): not used: Oliveira and Takahashi (2020), Table 1, the column "Secant". No test checks
+        its counts: 20 of the 24 match those of `Secant`, 3 differ by 1 (see the PRINCIPLE-GAP (P1) entry) and 1
+        differs by 31. A test that checks these counts would resolve the conflict.
+      - not used: Atkinson (1989), Table 2.3, which needs the rule of Press et al. for which bound starts as the newest
+        x-value (see the PRINCIPLE-GAP (P1) entry).
     - C - reference implementation:
       - used: a twin test checks that `Secant` evaluates the same x-values as SciPy's ``scipy.optimize.newton``,
         and stops and returns where SciPy does.
@@ -82,8 +87,7 @@ class Secant(Solver):
         - SciPy's ``scipy.optimize.newton``, without a derivative; the test suite checks `Secant` against
           ``scipy.optimize.newton``.
         - Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition, section 2.3.
-          John Wiley & Sons. Its Table 2.3 starts from ``x0 = 2`` and ``x1 = 1``, so on ``[1, 2]`` it takes the bound
-          with the smaller ``|f|`` as the newest x-value, as ``rtsec`` does.
+          John Wiley & Sons.
         - Oliveira, I. F. D. and Takahashi, R. H. C. (2020). An enhancement of the bisection method average
           performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), article 5. Its
           Table 1 holds the column "Secant", for a secant method that stops once the smaller ``|f|`` of its 2 latest
