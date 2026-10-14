@@ -17,7 +17,8 @@ Published results:
   - the totals lie 0.28 to 0.38 % below the paper's for ``k = 2``, and 0.24 to 1.02 % for ``k = 1``;
   - with problem 26 coded so that `TOMS748` reaches the problem's root 0, as the paper's section 6 reports for its own
     runs, 7 of the 8 totals lie within 0.15 %, and ``k = 1`` at ``tol = 0`` within 0.71 %;
-  - the paper's relative machine precision, 1.9073486328e-16 in place of 2^-52, moves no total by more than 2.
+  - using the paper's relative machine precision, 1.9073486328e-16, in place of 2^-52 moves no total by more than 2
+    evaluations.
 - Alefeld, Potra and Shi (1995), Table III: not reproduced, because the paper does not list the 139 problems behind
   its totals.
 - The roots that the test driver of the authors' Fortran 77 code (https://www.netlib.org/toms/748) prints, with

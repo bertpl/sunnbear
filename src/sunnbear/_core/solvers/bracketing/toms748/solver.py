@@ -3,7 +3,8 @@
 The rest of this docstring is the record of `TOMS748` under the solver implementation principles
 (``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
 
-The names ``a``, ``b``, ``u``, ``tol`` and ``stop_width`` are those of the class docstring of `TOMS748`.
+The names ``a``, ``b``, ``u``, ``k``, ``macheps``, ``tol`` and ``stop_width`` are those of the class docstring of
+`TOMS748`.
 
 Sources:
     - I - article:
@@ -30,34 +31,38 @@ Sources:
 Source per aspect:
     Every aspect follows Algorithms 4.1 and 4.2 of Alefeld, Potra and Shi (1995), with the modified ``bracket`` of
     their section 6, which their runs used, except:
-    - The details that the article leaves open follow the authors' Fortran code:
+    - Where the article leaves a detail open, the code follows the authors' Fortran code:
       - where a Newton step would divide by a zero derivative of the quadratic, Newton-Quadratic returns the zero of
         the line through ``a`` and ``b``, as the article's Newton-Quadratic does where the quadratic's leading
         coefficient is 0;
-      - ``macheps`` is 2^-52, the relative machine precision of float64 as the code's subroutine ``RMP`` computes it;
-        the article gives only its own machine's, 1.9073486328e-16, with which ``k = 2`` misses 1 more count of Table
-        VI: that of problem 3 with ``n = 1``, written 3[n=1] below;
-      - the stopping test also runs before the first step, ``u`` is ``b`` where ``|f(a)| = |f(b)|``, and the solve
-        returns the lower bound ``a``.
+      - ``macheps`` is 2^-52, the relative machine precision of float64 as the authors' code's subroutine ``RMP``
+        computes it; the article gives only the relative machine precision of its own machine, 1.9073486328e-16; with
+        that value, ``k = 2`` misses 1 more count of Table VI than with 2^-52: the count of problem 3 with ``n = 1``,
+        written 3[n=1] below;
+      - the stopping test also runs before the first step;
+      - ``u`` is ``b`` where ``|f(a)| = |f(b)|``;
+      - the solve returns the lower bound ``a``.
     - PRINCIPLE-CONFLICT (P6): the code computes every formula in the form of the authors' Fortran code, where the
       article's pseudocode writes 4 of them in other forms:
       - the secant step, which the article computes with the divided difference ``f[a, b] = (f(b) - f(a)) / (b - a)``;
       - the double-size secant step, which the article computes with ``f[a, b]`` too;
       - Newton-Quadratic's quadratic and its derivative;
       - the midpoint ``0.5 * (a + b)``.
-      P1 ranks the article above the code, and for ``k = 2`` the published results give no P2 reason for the code's
-      forms. With the article's forms:
+      P1 ranks the article above the authors' code, and for ``k = 2`` the article's results give no reason under P2
+      for the authors' forms: those results do not reproduce better with them. With the article's forms:
       - ``k = 2`` still matches 15 of the 17 counts of Tables IV to VI, its Table II totals at ``tol = 10^-15`` and at
         ``tol = 0`` come 3 and 6 evaluations closer to the article's, and it misses the root that the authors' code
         prints for 26[n=1];
-      - ``k = 1`` misses 1 more count of Table VI: 18 evaluations against 17 on 24[n=20].
+      - ``k = 1`` misses 1 more count of Table VI than with the authors' forms: 18 evaluations against the article's
+        17 on 24[n=20].
       Either of 2 changes would resolve the conflict: computing these 4 formulas in the article's forms, or a principle
-      that ranks code that a journal publishes with its article as Ia; ACM publishes the code of Algorithm 748 that
+      that ranks as Ia the code that a journal publishes with its article; ACM publishes the code of Algorithm 748 that
       way.
     - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
-      solver. The article assumes ``f(a) * f(b) < 0``. Where f is 0 at the lower bound, the authors' code replaces that
-      bound by its first x-value and ends near the upper bound, away from the root; where f is 0 at the upper bound, it
-      returns an x-value within ``stop_width`` of that bound, after 1 more evaluation.
+      solver. The article assumes ``f(a) * f(b) < 0``. Where f is 0 at such a bound, the authors' code:
+      - at the lower bound, replaces that bound by the first new x-value, and ends near the upper bound, away from the
+        root;
+      - at the upper bound, returns an x-value within ``stop_width`` of that bound, after 1 more evaluation.
     - Translation of ``xtol`` (P7): ``tol = xtol / 2 - 2 * macheps * max(|a0|, |b0|)``, with ``a0`` and ``b0`` the
       initial interval bounds, so that ``stop_width = 2 * (2 * macheps * |u| + tol)`` stays at most ``xtol``. Where
       ``xtol`` is below ``4 * macheps * max(|a0|, |b0|)``:
@@ -72,20 +77,23 @@ Validation:
         on macOS also the count of 18[n=1]. 26[n=1] is not compared, because its results depend on how its function is
         coded, as the article's section 6 states.
       - used: Table II, the total evaluation counts over the 154 problems at 4 values of ``tol``: within 0.4 % for
-        ``k = 2``, which is convincing (P5), and 1.1 % for ``k = 1``. In float64, problem 26's function is 0 for
-        ``|x|`` below about 0.0375; with that function coded so that `TOMS748` reaches the problem's root 0, as
-        section 6 reports for the article's runs, 7 of the 8 totals lie within 0.15 %, and ``k = 1`` at ``tol = 0``
-        within 0.71 %.
-      - PRINCIPLE-CONFLICT (P5): for ``k = 1``, the test data explains the deviations on 3[n=1] (13 evaluations
-        against 15) and 13[n=1] (26 against 25) by the authors' own implementation of Algorithm 4.1, which may differ
-        in details that the article does not state; P5 asks for ``UNSTATED_RUN_DETAILS`` and an observation instead.
-        Marking 13[n=1] with ``UNSTATED_RUN_DETAILS`` and an observation, and giving 3[n=1] the reason that its count
-        depends on the last bits of f, would resolve the conflict: a change of f by up to 2 ulps moves that count
-        between 12 and 15.
+        ``k = 2``, which is convincing (P5), and 1.1 % for ``k = 1``. In float64, problem 26's function
+        ``x / exp(1 / x^2)`` is 0 for ``|x|`` below about 0.0375, where ``exp`` overflows; with problem 26's function
+        coded so that `TOMS748` reaches the problem's root 0, as section 6 reports for the article's runs, 7 of the 8
+        totals lie within 0.15 %, and ``k = 1`` at ``tol = 0`` within 0.71 %.
+      - PRINCIPLE-CONFLICT (P5): for ``k = 1``, the test data explains 2 deviations by the authors' own implementation
+        of Algorithm 4.1, which may differ in details that the article does not state:
+        - 3[n=1]: 13 evaluations against 15;
+        - 13[n=1]: 26 against 25.
+        P5 asks that the tests mark a small deviation of unverified cause with ``UNSTATED_RUN_DETAILS`` and a short
+        observation instead. Marking 13[n=1] with ``UNSTATED_RUN_DETAILS`` and an observation, and giving 3[n=1] the
+        reason that its count depends on the last bits of f, would resolve the conflict: a change of f by up to 2 ulps
+        moves that count between 12 and 15.
       - not used: Table III, whose 139 problems the article does not list.
       - PRINCIPLE-GAP (P4): kind A covers results in the authors' article, and no kind covers the roots that the
-        authors' test driver prints, which are published with the code. The test suite checks them as authors'
-        results: ``k = 2`` returns all 154 at ``tol = 0``. The roots tell ``k = 2`` from ``k = 1`` only on 26[n=1].
+        authors' test driver prints, which are published with the authors' code. The test suite checks them as
+        authors' results: ``k = 2`` returns all 154 roots at ``tol = 0``. The roots tell ``k = 2`` from ``k = 1`` only
+        on 26[n=1].
     - B - third-party results:
       - none found: Gao (2026), Table 3, prints the totals of Algorithm 4.2 from Table II, and reports no run of its
         own.
@@ -99,9 +107,10 @@ Variants:
     - `TOMS748K1Config`, with ``k = 1``, Algorithm 4.1, is secondary (P8); the PRINCIPLE-CONFLICT (P5) above concerns
       its test data, and:
       - PRINCIPLE-GAP (P8): P8 admits a variant whose implementation decision causes fundamentally different behavior,
-        and does not say how large that difference must be. The code keeps this config, whose docstring gives as its
-        reason that ``k = 1`` is SciPy's default; the article gives Algorithm 4.1 an asymptotic efficiency index of
-        1.6529 against 1.6686, and 1.7 to 2.3 % more evaluations than Algorithm 4.2 in Table II.
+        and does not say how large that difference must be. For this config:
+        - the article gives Algorithm 4.1 an asymptotic efficiency index of 1.6529 against 1.6686 for Algorithm 4.2,
+          and 1.7 to 2.3 % more evaluations than Algorithm 4.2 in Table II;
+        - the code keeps the config; the config's docstring gives as the reason that ``k = 1`` is SciPy's default.
 """
 
 from sunnbear._core.solvers.core import Interval, IntervalBound, Solver, SolveState
@@ -168,8 +177,8 @@ class TOMS748(Solver):
           ACM, https://www.netlib.org/toms/748. It implements Algorithm 4.2, which ``k = 2`` follows line by line, and
           the test suite reproduces the roots that the code's test driver prints for its test problems.
         - SciPy's ``scipy.optimize.toms748``, which implements Algorithms 4.1 and 4.2, with ``k = 1`` as its default.
-          It keeps no margin from the interval bounds, and stops once the interval is at most ``xtol + rtol * |b|``
-          wide, a test that it makes once per iteration, and then returns the interval's midpoint.
+          It keeps no margin from the interval bounds. Once per iteration, it tests whether the interval is at most
+          ``xtol + rtol * |b|`` wide, and if so, it stops and returns the interval's midpoint.
         - Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied Mathematics Letters
           178, 109928. Its Table 3 prints the totals of Algorithm 4.2 from the paper's Table II.
           https://doi.org/10.1016/j.aml.2026.109928
