@@ -17,7 +17,6 @@ from sunnbear.solvers import (
     RegulaFalsi,
     Ridders,
     SolverConfigRegistry,
-    SteffenBrent,
 )
 
 # Defining a SolverConfig subclass registers it, so the registry also holds the configs that test modules define;
@@ -37,7 +36,6 @@ _SOLVER_CLASSES_WITHOUT_RECORD = {
     ITP,
     RegulaFalsi,
     Ridders,
-    SteffenBrent,
     TOMS748,
 }
 
