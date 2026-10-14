@@ -37,6 +37,8 @@ Validation:
       - used: Table 1, the errors of ``x_2`` to ``x_7``, reproduced to the printed digits, which is convincing (P5);
       - not used: Table 1's ``x_8`` and ``x_9``, and the iteration counts of Problems 1 to 4; the docstring of the
         test package ``tests.solvers.bracketing.pegasus`` gives the details.
+      - TBD: Problem 1, whose 3 iteration counts lie within 1 of the paper's, the tolerance that the test of Ford's
+        Table 4 accepts.
     - B - third-party results:
       - used: Ford (1997), Table 4, reproduced to within 1 iteration, which is convincing (P5);
       - not used: Anderson and Björck (1973), Examples 1 to 7, the Pegasus columns, which the paper ran in 27-bit
