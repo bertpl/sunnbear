@@ -16,7 +16,7 @@ def test_the_errors_of_table_1_of_the_dowell_jarratt_paper_are_reproduced():
     rounding changes a value by at most 0.5 %, so the test compares each error within 0.5 %.
 
     The test leaves out the table's last 2 rows, with errors below 1e-9: they differ from the float64 iterates by about
-    1 % for x_8 and in sign for x_9, and no precision of the arithmetic gives both printed values.
+    1 % for x_8 and in sign for x_9, and no single arithmetic precision reproduces both of the table's errors.
     """
     # --- arrange ----------------------
     dowell_jarratt_table_1_errors = [0.750, 0.534, 0.232, -0.682e-2, 0.184e-2, 0.125e-4]

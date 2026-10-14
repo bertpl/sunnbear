@@ -19,14 +19,15 @@ Sources:
 
 Source per aspect:
     Every aspect follows Dowell and Jarratt (1972), except:
-    - `Pegasus` takes the upper bound as the newer starting x-value, ``x_1``, as mpmath does, because the article
-      leaves the order of ``x_0`` and ``x_1`` to the caller.
-    - PRINCIPLE-GAP (P6): the article writes the retained bound's scaled value in 2 forms, and P6 does not say which
-      written form counts:
+    - `Pegasus` passes the upper bound as ``x_1``, the second of the 2 starting x-values, as mpmath does, because the
+      article leaves the order of ``x_0`` and ``x_1`` to the caller.
+    - PRINCIPLE-GAP (P6): the article writes the retained bound's scaled value in 2 forms, with ``f_i`` the function
+      value at the iterate ``x_i``, and P6 does not say which written form counts:
       - in its formula, as ``f_(i-1) * f_i / (f_i + f_(i+1))``;
       - in its prose, as ``f_(i-1)`` scaled by the factor ``f_i / (f_i + f_(i+1))``, the form of mpmath and Ford.
       The code multiplies first, as the formula is printed, so the product of 2 function values overflows or
-      underflows when f is scaled by about 1e154 or 1e-165; at those scales, the factor form still converges.
+      underflows when f is scaled by about 1e154 or 1e-165; at those scales, the form of mpmath and Ford still
+      converges.
     - PRINCIPLE-GAP (P7): the article stops its runs once ``|f(x)|`` falls below a threshold, and P7 does not say how
       ``xtol``, a tolerance on x, translates into one on f. The code stops by `BracketingSolver`'s rule instead: once
       the interval is at most ``2 * xtol`` wide, it returns the interval's midpoint.
@@ -35,11 +36,11 @@ Validation:
     - A - authors' results:
       - used: Table 1, the errors of ``x_2`` to ``x_7``, reproduced to the printed digits, which is convincing (P5);
       - not used: Table 1's ``x_8`` and ``x_9``, and the iteration counts of Problems 1 to 4; the docstring of the
-        test package ``tests.solvers.bracketing.pegasus`` gives the reasons.
+        test package ``tests.solvers.bracketing.pegasus`` gives the details.
     - B - third-party results:
       - used: Ford (1997), Table 4, reproduced to within 1 iteration, which is convincing (P5);
-      - not used: Anderson and Björck (1973), Examples 1 to 7, the Pegasus columns; the docstring of the test package
-        ``tests.solvers.bracketing.anderson_bjorck`` gives the reasons.
+      - not used: Anderson and Björck (1973), Examples 1 to 7, the Pegasus columns, which the paper ran in 27-bit
+        arithmetic and with an extra rule on the step size that `Pegasus` does not have.
     - C - reference implementation:
       - used: a twin test checks that `Pegasus` evaluates the same x-values as mpmath's ``Illinois`` with
         ``method="pegasus"``; the twin test imposes the stopping rule of `Pegasus` on mpmath.
