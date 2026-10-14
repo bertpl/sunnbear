@@ -7,8 +7,8 @@ Sources:
     - I - article:
       - Ia - article code: none;
       - Ib - article pseudocode: none;
-      - Ic - article text: Dowell and Jarratt (1972), sections 1 to 3: the rules that scale the retained bound's
-        function value, and the formula of the chord's zero.
+      - Ic - article text: Dowell and Jarratt (1972), sections 1 to 3: the rules that scale the function value of a
+        bound kept twice in a row, and the formula of the chord's zero.
     - II - authors' code:
       - none.
     - III - third party:
@@ -19,16 +19,17 @@ Sources:
 
 Source per aspect:
     Every aspect follows Dowell and Jarratt (1972), except:
-    - The upper bound is the newer of the 2 starting x-values, as in mpmath, because the article leaves their order
-      to the caller. The article's Table 1 starts from the lower bound, so its test solves the mirrored function.
-    - PRINCIPLE-GAP (P6): the article writes the retained bound's scaled value as ``f_(i-1) * f_i / (f_i + f_(i+1))``,
-      and in its prose as ``f_(i-1)`` scaled by the factor ``f_i / (f_i + f_(i+1))``; P6 does not say which written
-      form counts. The code multiplies first, as the formula is printed. The product of 2 function values then
-      overflows or underflows when f is scaled by about 1e154 or 1e-165, where the factor form of mpmath and Ford
-      converges.
+    - `Pegasus` takes the upper bound as the newer starting x-value, ``x_1``, as mpmath does, because the article
+      leaves the order of ``x_0`` and ``x_1`` to the caller.
+    - PRINCIPLE-GAP (P6): the article writes the retained bound's scaled value in 2 forms, and P6 does not say which
+      written form counts:
+      - in its formula, as ``f_(i-1) * f_i / (f_i + f_(i+1))``;
+      - in its prose, as ``f_(i-1)`` scaled by the factor ``f_i / (f_i + f_(i+1))``, the form of mpmath and Ford.
+      The code multiplies first, as the formula is printed, so the product of 2 function values overflows or
+      underflows when f is scaled by about 1e154 or 1e-165; at those scales, the factor form still converges.
     - PRINCIPLE-GAP (P7): the article stops its runs once ``|f(x)|`` falls below a threshold, and P7 does not say how
-      ``xtol``, a tolerance on x, translates into one on f. The code stops by the framework's rule instead: once the
-      interval is at most ``2 * xtol`` wide, it returns the interval's midpoint.
+      ``xtol``, a tolerance on x, translates into one on f. The code stops by `BracketingSolver`'s rule instead: once
+      the interval is at most ``2 * xtol`` wide, it returns the interval's midpoint.
 
 Validation:
     - A - authors' results:
@@ -44,7 +45,7 @@ Validation:
         ``method="pegasus"``; the twin test imposes the stopping rule of `Pegasus` on mpmath.
 
 Variants:
-    - `PegasusConfig`, the only config, is secondary (P8); its record marks no PRINCIPLE-CONFLICT.
+    - `PegasusConfig`, the only config, is secondary (P8); this record marks no PRINCIPLE-CONFLICT.
 """
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, IntervalBound
@@ -100,8 +101,8 @@ class Pegasus(BracketingSolver[PegasusState]):
         - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="pegasus"``; the test suite checks
           `Pegasus` against mpmath's ``Illinois``.
         - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of an
-          equation. BIT 13(3), 253-264. Its examples 1 to 7 hold columns for the Pegasus method, run in 27-bit
-          arithmetic with steps of delta. https://doi.org/10.1007/BF01951936
+          equation. BIT 13(3), 253-264. Its examples 1 to 7 hold columns for the Pegasus method, which the test suite
+          does not reproduce. https://doi.org/10.1007/BF01951936
     """
 
     name = "pegasus"
