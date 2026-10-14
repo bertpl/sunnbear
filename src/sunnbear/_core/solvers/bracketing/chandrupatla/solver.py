@@ -1,4 +1,45 @@
-"""`Chandrupatla` implements Chandrupatla's method, which interpolates only where interpolation is well conditioned."""
+"""`Chandrupatla` implements Chandrupatla's method, which interpolates only where interpolation is well conditioned.
+
+The rest of this docstring is the record of `Chandrupatla` under the solver implementation principles
+(``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
+
+Sources:
+    - I - article:
+      - Ia - article code: Chandrupatla (1997), the BASIC listing ``NEWZERO.BAS`` in its appendix;
+      - Ib - article pseudocode: Chandrupatla (1997), the flowchart in its Fig. 1, whose sign test has its yes and
+        no labels swapped relative to the listing ``NEWZERO.BAS``;
+      - Ic - article text: Chandrupatla (1997), its sections 2-4 and equations 1-4.
+    - II - authors' code:
+      - none.
+    - III - third party:
+      - SciPy's ``scipy.optimize.elementwise.find_root``.
+    - IV - own judgment:
+      - none.
+
+Source per aspect:
+    Every aspect follows Chandrupatla's listing ``NEWZERO.BAS``, except:
+    - A function value of 0 at an initial interval bound follows SciPy: the solve ends at that bound. The article
+      does not state this case, since the method starts from bounds where f has opposite signs.
+    - Translation of ``xtol`` (P7): ``xtol`` is the listing's absolute tolerance ``DLT``, and the solver sets the
+      listing's relative tolerance ``EPS`` to 0, so the listing's tolerance ``TOL``, which is
+      ``2 * EPS * |xm| + 0.5 * DLT``, is the constant ``0.5 * xtol``. Setting ``EPS`` to the article's value of 1e-10
+      changes none of the counts in its Table 2.
+
+Validation:
+    - A - authors' results:
+      - used: Table 2, its evaluation counts and its number of switches to bisection for all 45 problems; the
+        reproduction is exact, and so convincing (P5);
+      - not used: Table 1, which lists 1 zero per function but does not say which of that function's 5 intervals in
+        Table 2 produced it.
+    - B - third-party results:
+      - none found: no article that sunnbear cites publishes results of the method.
+    - C - reference implementation:
+      - used: a twin test checks that the solver evaluates the same x-values as SciPy's
+        ``scipy.optimize.elementwise.find_root``; the twin test does not compare their stopping rules.
+
+Variants:
+    - `ChandrupatlaConfig`, the only config, is core (P8).
+"""
 
 import math
 

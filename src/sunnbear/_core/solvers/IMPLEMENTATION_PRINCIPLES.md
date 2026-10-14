@@ -124,6 +124,16 @@ The reasons why a solver follows each of its sources are stated nowhere else, so
 
 **A record names the source that the solver follows by default, then lists only the exceptions, each in a line or 2.** A reader skims it for what departs from that source; the code and the tests hold the details.
 
+**A solver's record, the module docstring of its `solver.py`, uses the terms of this file without explaining them:**
+
+- the rank labels of P1 and the kind labels of P4;
+- the principle IDs;
+- the 3 keywords, defined below.
+
+Each record links back to this file in its opening lines, so a reader finds the definitions here.
+
+Code reviews that ask a record to define these terms, or to say more about an exception than its choice, reason and effect, are answered by this section.
+
 A record is read as plain text, since API documentation does not render the docstring of a private module, so its nested bullets follow their parent bullet without a blank line.
 
 The record has 4 sections, each a heading of the docstring:
