@@ -16,49 +16,50 @@ Sources:
       - rateslib's ``_brent``, which implements Algorithm 2, with Algorithm 2's midpoint ``(a + b) / 2``, and chooses
         the step on the function values.
     - IV - own judgment:
-      - the midpoint ``(a + s) / 2``, which only the article's figures support, and the other choices marked IV below.
+      - the midpoint ``(a + s) / 2`` of ``a`` and the new x-value ``s``, which only the article's figures support, and
+        the other choices marked IV below.
 
 Source per aspect:
     Every aspect follows Algorithm 2 of Steffen et al. (2025), except:
     - When the root lies between ``a`` and ``s``, the code evaluates the midpoint ``(a + s) / 2`` (IV), where
       Algorithm 2, the text and rateslib evaluate ``(a + b) / 2``, because the validation with ``(a + b) / 2`` is not
-      convincing (P5): only ``(a + s) / 2`` reproduces the values that the article's Figures 3, 4, 6 and 7 plot for
-      the modified Brent method, and ``(a + b) / 2`` departs from them in the first iteration.
+      convincing (P5): only ``(a + s) / 2`` reproduces the modified Brent method's values in the article's Figures 3,
+      4, 6 and 7, and ``(a + b) / 2`` departs from them in the first iteration.
     - The step is chosen by tests on the function values, as rateslib chooses it (III), not on the x-values, as
       Algorithm 2 chooses it, because Algorithm 2's choice divides by 0 (P2): in the secant step when ``b`` equals
       ``b_previous``, and in the interpolation when 2 distinct x-values share a function value. Wherever Algorithm 2's
-      step is defined, both choices give the same step; on 141 solves of the test suite's problems, Algorithm 2's
-      choice divides by 0 in 43 of them.
+      step is defined, both choices give the same step.
     - Where ``f(a)``, ``f(b)`` and ``f(b_previous)`` are not distinct, the code bisects only when ``f(b)`` equals
       ``f(b_previous)`` (IV); rateslib also bisects when they differ by less than 1e-16, an absolute threshold that
       makes the step depend on the scale of f. On the test suite's problems scaled by 4 factors from 1e-16 to 1e-300,
-      that threshold needs 21 % to 48 % more evaluations.
+      the solves need 21 % to 48 % more evaluations with rateslib's threshold.
     - The code also rejects an interpolation step that is NaN (IV), which Algorithm 2's acceptance test keeps, because
       an evaluation at NaN ends the solve as ``DIVERGED``. No step is NaN on the test suite's problems, scaled by 8
       factors from 1e-300 to 1e300.
     - PRINCIPLE-CONFLICT (P6): the secant step computes ``fb * (b_previous - b) / (fb_previous - fb)``, which
       multiplies before it divides, where equation 4 multiplies ``f(b)`` by the quotient
       ``(b_previous - b) / (f(b_previous) - f(b))``. Computing the quotient first would resolve the conflict; on 141
-      solves of the test suite's problems, it changes the evaluated x-values in 21, and no evaluation count.
+      solves of the test suite's problems, computing the quotient first changes the evaluated x-values in 21 of them,
+      and the evaluation count in none.
     - PRINCIPLE-GAP (P2): when ``f(s) = 0``, the code returns ``s`` at once, where Algorithm 2 first evaluates the
       midpoint, whose value can change neither the interval nor the returned x-value. P2 does not say whether saving
       such an evaluation is a good reason to deviate, and P6 allows skipping comparisons, not evaluations. On 141
       solves of the test suite's problems, 37 end at such a zero, each with 1 evaluation fewer than Algorithm 2 makes;
-      case study 1 is one of them.
+      the article's case study 1 is one of them.
     - PRINCIPLE-GAP (P7): ``xtol`` is Algorithm 2's ``tol1``, but Algorithm 2 also stops once ``|f(b)| <= tol2``, and
       P7 does not say how ``xtol``, a tolerance on x, translates into a tolerance on f. The code passes 0 as ``tol2``,
       so that only an exact zero ends a solve before the interval is at most ``xtol`` wide:
-      - with any ``tol2`` from 1.6e-15 to 3.2e-10, case study 1 takes the 6 iterations that the article's figures
-        plot, where the code takes 7;
+      - with any ``tol2`` from 1.6e-15 to 3.2e-10, case study 1 takes the 6 iterations in the article's figures,
+        where the code takes 7;
       - with ``tol2 = xtol``, on 141 solves of the test suite's problems, 103 need fewer evaluations, 1 fewer in the
-        median solve, and 24 return an x-value that is not within ``xtol`` of a root.
+        median of those 103, and 24 return an x-value that is not within ``xtol`` of a root.
 
 Validation:
     - A - authors' results:
       - used: the 2 case studies, which `SteffenBrent` reproduces convincingly (P5):
-        - the roots of both, and the values that Figures 3, 4, 6 and 7 plot for the modified Brent method, to the
-          precision of reading the plots;
-        - the 6 iterations that the figures plot, exactly in case study 2, and to within 1 in case study 1, which P5
+        - the roots of both, and the modified Brent method's values in Figures 3, 4, 6 and 7, to the precision of
+          reading the plots;
+        - the 6 iterations in the figures, exactly in case study 2, and to within 1 in case study 1, which P5
           accepts as an experimental difference: `SteffenBrent` does not stop on ``|f(b)|`` (see the
           PRINCIPLE-GAP (P7) entry);
       - not used: Table 1, which gives mean execution times.
@@ -66,7 +67,7 @@ Validation:
       - none found: no article by a third party that sunnbear cites publishes results of the method.
     - C - reference implementation:
       - not used: rateslib's ``_brent`` evaluates the midpoint ``(a + b) / 2``, so its x-values depart from those of
-        `SteffenBrent` at the first midpoint, and its licence allows only non-commercial use.
+        `SteffenBrent` at the first midpoint, and its license allows only non-commercial use.
 
 Variants:
     - `SteffenBrentConfig`, the only config, is secondary (P8); its deviation from the principles is the entry marked
@@ -104,8 +105,7 @@ class SteffenBrent(Solver):
     steps stop shrinking, so on some functions the interval shrinks slowly.
 
     The solve ends once ``|b - a| <= xtol``, and returns ``b``, which then lies within ``xtol`` of a root; it ends
-    earlier, and returns ``s``, once ``f(s) = 0``. The paper stops once ``|b - a| <= tol1`` or ``|f(b)| <= tol2``; the
-    solver passes ``xtol`` as ``tol1`` and 0 as ``tol2``.
+    earlier, and returns ``s``, once ``f(s) = 0``.
 
     The paper's title says that the modification halves the interval in every iteration, but Algorithm 2 does not
     guarantee that the interval halves:
@@ -122,12 +122,13 @@ class SteffenBrent(Solver):
     References:
         - Steffen, V., Della Pasqua, C. C., de Oliveira, M. S. and da Silva, E. A. (2025). Halving interval
           guaranteed for Dekker and Brent root finding methods. Examples and Counterexamples 7, 100173. Its
-          Algorithm 2 is the method, and the test suite reproduces its 2 case studies and the values that its
-          Figures 3, 4, 6 and 7 plot for the modified Brent method. https://doi.org/10.1016/j.exco.2024.100173
+          Algorithm 2 is the method, and the test suite reproduces its 2 case studies and the modified Brent
+          method's values in its Figures 3, 4, 6 and 7. https://doi.org/10.1016/j.exco.2024.100173
         - Brent, R. P. (1971). An algorithm with guaranteed convergence for finding a zero of a function. The
           Computer Journal 14(4), 422-425. Steffen et al. modify Brent's method. https://doi.org/10.1093/comjnl/14.4.422
-        - rateslib's ``_brent``, in ``rateslib.dual.ift``, which ``ift_1dim`` runs as its method ``modified_brent``;
-          https://github.com/attack68/rateslib. It implements Algorithm 2, under a licence for non-commercial use.
+        - rateslib's ``_brent``, in ``rateslib.dual.ift``, where the function ``ift_1dim`` runs ``_brent`` as its
+          method ``modified_brent``; https://github.com/attack68/rateslib. It implements Algorithm 2, under a license
+          for non-commercial use.
     """
 
     name = "steffen_brent"
