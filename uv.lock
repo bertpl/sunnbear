@@ -189,16 +189,16 @@ wheels = [
 
 [[package]]
 name = "counted-float"
-version = "2.6.0"
+version = "2.8.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic", version = "2.13.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.15'" },
     { name = "pydantic", version = "2.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.15'" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c2/be/110a6218f0b4eb6b4f762262ff8644c2bede6ffbeff68fbd339091423373/counted_float-2.6.0.tar.gz", hash = "sha256:c60dcca7fe730aaecb2c68d74eb5807d4f92d34b04d71620e180ce4c38fa8f4e", size = 187605, upload-time = "2026-08-15T09:57:09.354Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7c/44/7b5a68d081320eb9cd0a3bb6a856d7261471a3dee38a084e7b0be34b0760/counted_float-2.8.0.tar.gz", hash = "sha256:5d654d9b9b6fce32ef40edd384e543307d59868848037a2c451f7e7ff14dc5ad", size = 189103, upload-time = "2026-10-13T21:02:10.12Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6a/37/5fad583b286d2fd3a868d493a3d0cd85f35a0da6da30f1c28de4f5f6c9d9/counted_float-2.6.0-py3-none-any.whl", hash = "sha256:4492ea212d5796ccbfea07559f1ad931b443f1fa1ebb72e84dd586cf0d591d72", size = 246650, upload-time = "2026-08-15T09:57:07.756Z" },
+    { url = "https://files.pythonhosted.org/packages/66/bc/846207e71b36cdece35ea54ab9db138d7ede73ab1be51e74564f6c794dc4/counted_float-2.8.0-py3-none-any.whl", hash = "sha256:a64af393d5d3419bc5197ae46800dfa1dd95743dd979bee42b11236410281a31", size = 248032, upload-time = "2026-10-13T21:02:08.461Z" },
 ]
 
 [[package]]
@@ -1681,8 +1681,7 @@ package = [
 [package.metadata]
 requires-dist = [
     { name = "backports-zstd", marker = "python_full_version < '3.14'", specifier = ">=1.0.0" },
-    { name = "counted-float", marker = "python_full_version < '3.15'", specifier = ">=1.2.1" },
-    { name = "counted-float", marker = "python_full_version >= '3.15'", specifier = ">=2.6.0" },
+    { name = "counted-float", specifier = ">=2.8.0" },
     { name = "matplotlib", marker = "python_full_version == '3.12.*'", specifier = ">=3.10.7" },
     { name = "matplotlib", marker = "python_full_version == '3.13.*'", specifier = ">=3.10.7" },
     { name = "matplotlib", marker = "python_full_version == '3.14.*'", specifier = ">=3.10.7" },
