@@ -11,6 +11,8 @@ These principles decide how each of sunnbear's solvers implements its published 
 
 The principles are general decisions that every solver follows, so that no solver gets an ad-hoc decision of its own that is inconsistent with the other solvers.
 
+These principles cannot cover every detail and corner case. Where they leave a minor gap or a small judgment call, the solver's record makes the call case by case and marks it `JUDGMENT-CALL`, for transparency.
+
 Each principle has an ID, such as P1 or P6, so that a docstring or a test can cite it.
 
 ## The sunnbear solver suite
@@ -101,7 +103,8 @@ A solver does not restructure a formula algebraically to save flops. Where it is
 **P8. A solver can have variants where an implementation decision causes fundamentally different behavior**, for didactic reasons:
 
 - at most 1 variant is core, with role `SolverRole.BUILTIN_CORE`; the other variants are secondary, with role `SolverRole.BUILTIN_SECONDARY`;
-- the principles apply strictly only to the core variant. A secondary variant is provided for information and may deviate from them, but it states every deviation.
+- the principles apply strictly only to the core variant. A secondary variant is provided for information and may deviate from them, but it states every deviation;
+- the baseline, with role `SolverRole.BUILTIN_BASELINE`, follows the principles as strictly as a core variant.
 
 ## How the solver classes are built
 
@@ -152,10 +155,11 @@ The record has 4 sections, each a heading of the docstring:
 
 A test checks that every author and year that a record's `Sources:` names appears in the class's `References:`.
 
-**The record marks each disagreement between a solver and the principles with 1 of 2 keywords.** Each keyword starts a bullet next to the aspect that it concerns, so that `grep -rnE "PRINCIPLE-(CONFLICT|GAP)" src/` lists all of them:
+**The record marks each disagreement between a solver and the principles, and each judgment call, with 1 of 3 keywords.** Each keyword starts a bullet next to the aspect that it concerns, so that `grep -rnE "PRINCIPLE-(CONFLICT|GAP)|JUDGMENT-CALL" src/` lists all of them:
 
 - **`PRINCIPLE-CONFLICT (Pn)`**: the solver breaks principle Pn. The bullet says how, and what would resolve the conflict.
 - **`PRINCIPLE-GAP (Pn)`**: Pn does not decide the case, because it is silent or ambiguous. The bullet says what is undecided, and which choice the code makes.
+- **`JUDGMENT-CALL`**: the principles leave a minor gap or a small judgment call, which the record makes for this solver. The bullet says which choice the code makes, why, and what the choice affects.
 
 A record flags a conflict and does not resolve it; resolving it is a change of its own, made under these principles.
 
