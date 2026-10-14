@@ -1,4 +1,43 @@
-"""`Chandrupatla` implements Chandrupatla's method, which interpolates only where interpolation is well conditioned."""
+"""`Chandrupatla` implements Chandrupatla's method, which interpolates only where interpolation is well conditioned.
+
+The rest of this docstring is the record of `Chandrupatla` under the solver implementation principles
+(``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
+
+Sources:
+    - I - article:
+      - Ia - article code: Chandrupatla (1997), the BASIC listing ``NEWZERO.BAS`` in its appendix;
+      - Ib - article pseudocode: Chandrupatla (1997), the flowchart in its Fig. 1, which swaps the labels y and n of
+        its sign test;
+      - Ic - article text: Chandrupatla (1997), its sections 2-4 and equations 1-4.
+    - II - authors' code:
+      - none.
+    - III - third party:
+      - SciPy's ``scipy.optimize.elementwise.find_root``.
+    - IV - own judgment:
+      - none.
+
+Source per aspect:
+    Every aspect follows Chandrupatla's listing ``NEWZERO.BAS``, except:
+    - A function value of 0 at an initial interval bound follows SciPy: it ends the solve at that bound. The article
+      does not state this case, since it starts from bounds where f has opposite signs.
+    - Translation of ``xtol`` (P7): ``xtol`` is the listing's absolute tolerance ``DLT``, and its relative tolerance
+      ``EPS`` is 0, so ``TOL`` is the constant ``0.5 * xtol``, computed once per solve. The article's
+      ``EPS = 1e-10`` changes no count of its Table 2.
+
+Validation:
+    - A - authors' results:
+      - used: Table 2, the evaluation counts and bisection switches of all 45 problems, reproduced exactly, which is
+        convincing (P5);
+      - not used: Table 1, 1 zero per function, which the article does not tie to any of the function's 5 intervals.
+    - B - third-party results:
+      - none found: no article that sunnbear cites publishes results of the method.
+    - C - reference implementation:
+      - used: a twin test checks the x-values against SciPy's ``scipy.optimize.elementwise.find_root``, not its
+        stopping rule.
+
+Variants:
+    - `ChandrupatlaConfig`, the only config, is core (P8).
+"""
 
 import math
 
