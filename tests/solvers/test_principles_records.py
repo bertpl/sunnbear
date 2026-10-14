@@ -19,7 +19,6 @@ from sunnbear.solvers import (
     Pegasus,
     RegulaFalsi,
     Ridders,
-    Secant,
     SolverConfigRegistry,
     SteffenBrent,
 )
@@ -44,7 +43,6 @@ _SOLVER_CLASSES_WITHOUT_RECORD = {
     Pegasus,
     RegulaFalsi,
     Ridders,
-    Secant,
     SteffenBrent,
     TOMS748,
 }
