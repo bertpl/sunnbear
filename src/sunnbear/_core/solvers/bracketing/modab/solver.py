@@ -11,8 +11,8 @@ Sources:
     - II - authors' code:
       - the C# code of the article's supplementary material, which matches Table A1;
       - the authors' later code, which clamps the chord's zero into the interval before the stopping test, and uses
-        unscaled function values in the test for a switch after a fallback; the later code's header calls these 2
-        changes fixes;
+        unscaled function values when, after falling back from Anderson-Björck mode to bisection, it tests whether to
+        switch back; the later code's header calls these 2 changes fixes;
       - pymodab, a Python wrapper of the authors' compiled library.
     - III - third party:
       - none.
@@ -31,13 +31,15 @@ Source per aspect:
 
 Validation:
     - A - authors' results:
-      - used: Table 1 and Table 2, which `ModAB` reproduces exactly, and so convincingly (P5): in Table 1, the
-        iteration of each switch between bisection and Anderson-Björck mode, and the iteration of the stop; in Table 2,
-        all 92 roots and 89 of the 92 evaluation counts;
-      - PRINCIPLE-CONFLICT (P5): the other 3 evaluation counts of Table 2 differ by 1, 4 and 1, and their rows in the
-        test data state an unverified cause, that the count depends on how the platform rounds a library function,
-        while P5 asks for the marker ``UNSTATED_RUN_DETAILS`` and an observation. Marking these 3 rows with
-        ``UNSTATED_RUN_DETAILS``, after a re-check of the row that differs by 4, would resolve the conflict.
+      - used: Table 1 and Table 2, which `ModAB` reproduces convincingly (P5):
+        - Table 1, exactly: the iteration of each switch between bisection and Anderson-Björck mode, and the
+          iteration of the stop;
+        - Table 2: all 92 roots and 89 of the 92 evaluation counts, exactly;
+      - PRINCIPLE-CONFLICT (P5): the other 3 evaluation counts of Table 2 differ by up to 4:
+        - their rows in the test data state an unverified cause, that the count depends on how the platform rounds a
+          library function, where P5 asks for the marker ``UNSTATED_RUN_DETAILS`` and an observation;
+        - marking these 3 rows with ``UNSTATED_RUN_DETAILS``, after a re-check of the row with the largest
+          difference, would resolve the conflict.
       - not used: Table 3, which gives execution times of the authors' .NET code, and the rows of Tables 1 and 2 for
         the method's first version, which `ModAB` does not implement;
       - not used: Ganchovski and Traykov (2023), Table 2, which also describes the first version.
@@ -48,8 +50,8 @@ Validation:
         whose only Linux build is for x86-64, while the tests run on ARM.
 
 Variants:
-    - `ModABConfig`, the only config, is secondary (P8); its deviations from the principles are the entries marked
-      PRINCIPLE-CONFLICT above.
+    - `ModABConfig`, the only config, is secondary (P8); its behavior deviates from no principle, and the record's
+      only PRINCIPLE-CONFLICT concerns the test data.
 """
 
 from sunnbear._core.solvers.core import IntervalBound, Solver, SolveState
