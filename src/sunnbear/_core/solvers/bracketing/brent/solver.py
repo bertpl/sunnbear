@@ -28,11 +28,12 @@ Source per aspect:
     Every aspect follows the Algol 60 procedure ``zero``, except:
     - PRINCIPLE-GAP (P1): Brent's text defines ``macheps`` as the relative machine precision, which is 2^-53 in
       rounded float64 arithmetic, and lets ``2 * macheps`` be increased, never decreased. P1 does not say whether a
-      value that the source allows, but does not define, follows the source. The code takes `FLOAT64_EPS`, 2^-52, the
-      value that SciPy and Press et al. (2007) use (III); the book also passes 16^-13, which equals 2^-52, as
-      ``macheps`` for its Table 4.1. With 2^-53:
-      - 2 tested counts would change: x^9 on [-1, 4] of Table 4.1 would take 193 evaluations on macOS, 4 more than
-        the book's 189, and problem 3[n=1] of Alefeld, Potra and Shi (1995) would take 11, 1 more than the paper's 10;
+      value that the source allows, but does not name, counts as following the source. The code takes `FLOAT64_EPS`,
+      2^-52, the value that SciPy and Press et al. (2007) use (III); the book also passes 16^-13, which equals 2^-52,
+      as ``macheps`` for its Table 4.1. With 2^-53:
+      - the counts of 2 tested problems would change: x^9 on [-1, 4] of Table 4.1 would take 193 evaluations on
+        macOS, 4 more than the book's 189, and problem 3[n=1] of Alefeld, Potra and Shi (1995) would take 11, 1 more
+        than the paper's 10;
       - the test that checks `Brent` against SciPy's ``brentq`` could not pass ``brentq`` the same tolerance, because
         ``brentq`` refuses a relative tolerance below ``4 * 2^-52``.
     - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
@@ -41,7 +42,7 @@ Source per aspect:
     - JUDGMENT-CALL: an ``xtol`` below ``6 * macheps * max(|a0|, |b0|)`` gives a negative ``t``, which ``zero`` does
       not allow; the code keeps that ``t``, because no source covers this case. The bound of Brent (1971) on the
       error of the returned x-value then no longer applies, and once ``tol`` is negative too, only the evaluation
-      budget ends the solve, as ``MAX_FEVALS``. The benchmark keeps ``xtol`` above that limit.
+      budget ends the solve, with the status ``MAX_FEVALS``. The benchmark keeps ``xtol`` above that limit.
     - Translation of ``xtol`` (P7): ``t = (xtol - 6 * macheps * max(|a0|, |b0|)) / 2``, with ``a0`` and ``b0`` the
       initial interval bounds, so that the bound ``6 * macheps * |x| + 2 * t`` of Brent (1971) on the distance from
       the returned x-value to a root ``x`` is at most ``xtol`` for every root in the initial interval.
@@ -49,13 +50,15 @@ Source per aspect:
 Validation:
     - A - authors' results:
       - used: Brent (1973), Table 4.1, the 2 rows on x^9, whose evaluation counts the test reproduces within 3. On
-        [-1, 4] the reproduction is convincing (P5), because the count depends on how x^9 is computed: on macOS, 4
-        forms of x^9 give 187 to 192 evaluations in float64, against the book's 189.
+        [-1, 4] the reproduction is convincing (P5): the count depends on how x^9 is computed, and the book's 189 lies
+        within the 187 to 192 evaluations that 4 ways of computing x^9 give on macOS in float64.
       - PRINCIPLE-CONFLICT (P5): on [-1, 1.1], `Brent` takes 78 evaluations on macOS against the book's 81, with each
-        of the 4 forms of x^9, and also in an emulation of the book's truncating hexadecimal arithmetic. The row's test
-        data names that arithmetic and the platform's ``pow`` as the cause; P5 instead asks to mark a small deviation
-        of unverified cause with ``UNSTATED_RUN_DETAILS`` and a short observation. Marking the row's test data that way
-        would resolve the conflict, if P5 accepts a deviation of 3 evaluations as small.
+        of the 4 ways of computing x^9, and also in an emulation of the book's truncating hexadecimal arithmetic:
+        - the row's test data names that arithmetic and the platform's ``pow`` as the cause;
+        - P5 instead asks to mark a small deviation of unverified cause with ``UNSTATED_RUN_DETAILS`` and a short
+          observation;
+        - marking the row's test data that way would resolve the conflict, if P5 accepts a deviation of 3 evaluations
+          as small.
       - not used:
         - Table 4.1's column of errors, which `Brent` does not reproduce;
         - Table 4.1's other 3 rows, whose functions underflow near the root in float64;
@@ -72,16 +75,19 @@ Validation:
           other 4 within 1;
         - Ganchovski et al. (2026), Table 2, the column "Bre": 90 of the 92 counts exactly, 2 within 1, and all 92
           roots;
-      - not used: Alefeld, Potra and Shi (1995), Table III; the double-precision totals of Anderson and Björck (1973);
-        and Gao (2026), Tables 1 and 3 and its columns "Brenth". The docstring of the test package
-        ``tests.solvers.bracketing.brent`` gives the reasons.
+      - not used, for the reasons that the docstring of the test package ``tests.solvers.bracketing.brent`` gives:
+        - Alefeld, Potra and Shi (1995), Table III;
+        - Anderson and Björck (1973), the double-precision totals;
+        - Gao (2026), Tables 1 and 3 and its columns "Brenth".
       - TBD: Oliveira and Takahashi (2020), Table 1, the column "Matlab", whose counts are those of MATLAB's
-        ``fzero``, a descendant of ``zero``: with ``t = 2e-10``, twice the paper's tolerance, 23 of the 24 counts
-        match, and on the 24th, `Brent` takes 1 evaluation fewer.
+        ``fzero``, which is based on ``zero``. With ``t = 2e-10``, twice the paper's tolerance, because the stopping
+        rule of ``fzero`` uses twice the given tolerance on [-1, 1], 23 of the 24 counts match, and on the 24th,
+        `Brent` takes 1 evaluation fewer.
       - TBD: Gao (2026), Tables 2 and 4, the columns "Brentq", whose counts are those of SciPy's ``brentq``: with
-        SciPy's ``xtol = 1e-10``, `Brent` matches both counts of Table 2 and 35 of the 45 of Table 4. On x^19 `Brent`
-        takes 10 to 13 evaluations more, because ``brentq`` computes the inverse quadratic step from divided
-        differences, and the product in that step's denominator underflows to 0 there, so that ``brentq`` bisects.
+        ``xtol = 1e-10`` for ``brentq`` and the same tolerance, ``t = 5e-11``, for `Brent`, `Brent` matches both counts
+        of Table 2 and 35 of the 45 of Table 4. On x^19 `Brent` takes 10 to 13 evaluations more than ``brentq``,
+        because ``brentq`` computes the inverse quadratic step from divided differences, and the product in that
+        step's denominator underflows to 0 there, so that ``brentq`` bisects.
     - C - reference implementation:
       - used: a twin test checks that `Brent` evaluates the same x-values as SciPy's ``scipy.optimize.brentq``; the
         twin test imposes the stopping rule of `Brent` on SciPy.
