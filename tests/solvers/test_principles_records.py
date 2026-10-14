@@ -11,7 +11,6 @@ from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 from sunnbear.solvers import (
     ITP,
     TOMS748,
-    Brent,
     SolverConfigRegistry,
 )
 
@@ -26,7 +25,6 @@ _BUILT_IN_SOLVER_CLASSES = list(
 # The tests of these solvers are expected to fail; a solver whose record is added must leave this list, or its
 # tests pass unexpectedly and fail the suite.
 _SOLVER_CLASSES_WITHOUT_RECORD = {
-    Brent,
     ITP,
     TOMS748,
 }

@@ -114,8 +114,9 @@ def test_the_total_evaluation_count_lies_within_1_percent_of_alefeld_potra_shi_t
     """Over all problems of `ALEFELD_POTRA_SHI_PROBLEMS`, the total evaluation count of `Brent` lies within 1 % of
     the column "BR" of the paper's Table II, for each of the paper's tolerances.
 
-    The paper's counts include the 2 evaluations at the interval bounds. They come from a machine whose relative
-    precision was 1.907e-16, not 2^-52, so the test compares the totals within 1 %, not exactly.
+    The paper's counts include the 2 evaluations at the interval bounds. `Brent`'s totals lie below the paper's, for a
+    cause not fully known, so the test compares them within 1 %, not exactly; the docstring of this test package gives
+    the parts of the difference that the paper's machine precision and the coding of 1 problem explain.
     """
     # --- arrange / act ----------------
     total = sum(

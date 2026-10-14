@@ -1,11 +1,12 @@
 """This module holds `TABLE_4_1_WITH_T`, the rows of Table 4.1 of Brent's 1973 book that `Brent` can reproduce. Each
-row is a pair: a `PaperProblem` that holds the book's evaluation count, and the book's absolute tolerance ``t`` of the
-procedure ``zero``."""
+row is a pair: a `PaperProblem` that holds the book's evaluation count, and the book's absolute tolerance ``t`` of its
+procedure ``zero2``, which the procedure ``zero`` takes too."""
 
 from tests.solvers.paper_problems import PaperProblem
 
-# The book's other 3 rows of Table 4.1 are not reproduced: their functions underflow near the root, and the book
-# solves them with its procedure ``zero2``, which handles a wider floating-point exponent range than ``zero``.
+# The book runs all 5 rows of Table 4.1 with its procedure ``zero2``, which handles a wider floating-point exponent
+# range than ``zero``. The other 3 rows are not reproduced, because their functions underflow near the root in
+# float64; x^9 does not underflow before these 2 solves end.
 TABLE_4_1_WITH_T = [
     (
         PaperProblem(
