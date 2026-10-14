@@ -3,12 +3,14 @@
 The rest of this docstring is the record of `Brent` under the solver implementation principles
 (``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
 
+The names ``b``, ``t``, ``tol``, ``a0`` and ``b0`` are those of the class docstring of `Brent`.
+
 Sources:
     - I - article: Brent (1971), with Brent (1973), the author's book, which repeats the article in its chapter 4 and
       holds the numerical results and the Fortran translation that the article refers to:
       - Ia - article code: the Algol 60 procedure ``zero``, printed in the appendix of Brent (1971) and again in
-        section 6 of the book's chapter 4; and its Fortran translation ``ZERO``, in the book's appendix, which states
-        every aspect as ``zero`` does;
+        section 6 of the book's chapter 4; and its Fortran translation ``ZERO``, in the book's appendix, which
+        implements every aspect as ``zero`` does;
       - Ib - article pseudocode: none;
       - Ic - article text: Brent (1971), sections 3 to 7, which the book's chapter 4 repeats in its section 2: the
         rules of each step, the tolerance ``2 * macheps * |b| + t`` with the definition of ``macheps``, and the bound
@@ -27,10 +29,12 @@ Source per aspect:
     - PRINCIPLE-GAP (P1): Brent's text defines ``macheps`` as the relative machine precision, which is 2^-53 in
       rounded float64 arithmetic, and lets ``2 * macheps`` be increased, never decreased. P1 does not say whether a
       value that the source allows, but does not define, follows the source. The code takes `FLOAT64_EPS`, 2^-52, the
-      value of SciPy and Numerical Recipes (III), which the book also passes, as 16^-13, for its Table 4.1. With 2^-53:
-      - 2 tested counts would change: x^9 on [-1, 4] of Table 4.1 would take 193 evaluations, 4 more than the book's
-        189, and problem 3[n=1] of Alefeld, Potra and Shi (1995) 11, 1 more than the paper's 10;
-      - the twin test could not follow, because SciPy's ``brentq`` refuses a relative tolerance below ``4 * 2^-52``.
+      value that SciPy and Press et al. (2007) use (III); the book also passes 16^-13, which equals 2^-52, as
+      ``macheps`` for its Table 4.1. With 2^-53:
+      - 2 tested counts would change: x^9 on [-1, 4] of Table 4.1 would take 193 evaluations on macOS, 4 more than
+        the book's 189, and problem 3[n=1] of Alefeld, Potra and Shi (1995) would take 11, 1 more than the paper's 10;
+      - the test that checks `Brent` against SciPy's ``brentq`` could not pass ``brentq`` the same tolerance, because
+        ``brentq`` refuses a relative tolerance below ``4 * 2^-52``.
     - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
       solver. ``zero`` also ends there, after the same 2 evaluations, but returns the upper bound, not the lower one,
       when f is 0 at both bounds.
@@ -49,10 +53,13 @@ Validation:
         forms of x^9 give 187 to 192 evaluations in float64, against the book's 189.
       - PRINCIPLE-CONFLICT (P5): on [-1, 1.1], `Brent` takes 78 evaluations on macOS against the book's 81, with each
         of the 4 forms of x^9, and also in an emulation of the book's truncating hexadecimal arithmetic. The row's test
-        data names that arithmetic and the platform's ``pow`` as the cause, where P5 asks for ``UNSTATED_RUN_DETAILS``
-        and an observation. Marking the row so would resolve the conflict, if P5 accepts a deviation of 3 as small.
-      - not used: Table 4.1's column of errors, which `Brent` does not reproduce; its other 3 rows, whose functions
-        underflow near the root in float64; and Table 4.2, which states neither its intervals nor its tolerances.
+        data names that arithmetic and the platform's ``pow`` as the cause; P5 instead asks to mark a small deviation
+        of unverified cause with ``UNSTATED_RUN_DETAILS`` and a short observation. Marking the row's test data that way
+        would resolve the conflict, if P5 accepts a deviation of 3 evaluations as small.
+      - not used:
+        - Table 4.1's column of errors, which `Brent` does not reproduce;
+        - Table 4.1's other 3 rows, whose functions underflow near the root in float64;
+        - Table 4.2, which states neither its intervals nor its tolerances.
       - TBD: Brent (1973), Table 6.1, the evaluation counts of ``zero`` on 19 intervals: with ``macheps`` set to the
         book's 16^-7, a run of `Brent` matches all 19; with 2^-52, it matches 2 and takes 1 or 2 evaluations more on
         the other 17.
@@ -70,11 +77,11 @@ Validation:
         ``tests.solvers.bracketing.brent`` gives the reasons.
       - TBD: Oliveira and Takahashi (2020), Table 1, the column "Matlab", whose counts are those of MATLAB's
         ``fzero``, a descendant of ``zero``: with ``t = 2e-10``, twice the paper's tolerance, 23 of the 24 counts
-        match, and the 24th lies 1 lower.
+        match, and on the 24th, `Brent` takes 1 evaluation fewer.
       - TBD: Gao (2026), Tables 2 and 4, the columns "Brentq", whose counts are those of SciPy's ``brentq``: with
-        SciPy's ``xtol = 1e-10``, `Brent` matches both counts of Table 2 and 35 of the 45 of Table 4. On x^19 it takes
-        10 to 13 evaluations more, because ``brentq`` computes the inverse quadratic step from divided differences,
-        and the product in its denominator underflows to 0 there, so that ``brentq`` bisects.
+        SciPy's ``xtol = 1e-10``, `Brent` matches both counts of Table 2 and 35 of the 45 of Table 4. On x^19 `Brent`
+        takes 10 to 13 evaluations more, because ``brentq`` computes the inverse quadratic step from divided
+        differences, and the product in that step's denominator underflows to 0 there, so that ``brentq`` bisects.
     - C - reference implementation:
       - used: a twin test checks that `Brent` evaluates the same x-values as SciPy's ``scipy.optimize.brentq``; the
         twin test imposes the stopping rule of `Brent` on SciPy.
@@ -119,7 +126,7 @@ class Brent(Solver):
     Brent's procedure returns a ``b`` within ``6 * macheps * |x| + 2 * t`` of a root ``x``, up to the terms of order
     ``macheps * t`` and ``macheps^2 * |x|`` that Brent (1971) neglects. The solver sets
     ``t = (xtol - 6 * macheps * max(|a0|, |b0|)) / 2``, with ``a0`` and ``b0`` the bounds of the initial interval,
-    so that the returned ``b`` lies within ``xtol`` of a root.
+    so that the returned ``b`` lies within ``xtol`` of a root, up to those neglected terms.
 
     ``xtol`` must therefore exceed ``6 * macheps * max(|a0|, |b0|)``; below that, ``t`` is negative and the accuracy
     is no longer guaranteed. Where ``t`` is so negative that ``tol`` is negative too, ``|m| <= tol`` can never hold, and
@@ -157,7 +164,7 @@ class Brent(Solver):
             Anderson-Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. Its Table 2 holds the column "Bre".
             https://doi.org/10.3390/a19050332
         - Third parties that publish evaluation counts of other implementations of Brent's method, which the test
-          suite does not check yet:
+          suite does not check:
 
           - Oliveira, I. F. D. and Takahashi, R. H. C. (2020). An enhancement of the bisection method average
             performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), article 5. Its

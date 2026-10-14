@@ -4,9 +4,7 @@ procedure ``zero2``, which the procedure ``zero`` takes too."""
 
 from tests.solvers.paper_problems import PaperProblem
 
-# The book runs all 5 rows of Table 4.1 with its procedure ``zero2``, which handles a wider floating-point exponent
-# range than ``zero``. The other 3 rows are not reproduced, because their functions underflow near the root in
-# float64; x^9 does not underflow before these 2 solves end.
+# The docstring of this test package states why the other 3 rows of Table 4.1 are not reproduced.
 TABLE_4_1_WITH_T = [
     (
         PaperProblem(

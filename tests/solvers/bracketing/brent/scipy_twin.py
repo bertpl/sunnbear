@@ -21,8 +21,8 @@ class BrentScipyTwin(TwinSolver):
     - SciPy evaluates both interval bounds again before its first step;
     - SciPy computes the interpolation step from divided differences, where `Brent` computes it as ``p / q``, so the
       evaluated x-values can differ in their last bits; where the product in the denominator of SciPy's inverse
-      quadratic step underflows to 0, as on ``x^19`` near its root, SciPy bisects where `Brent` interpolates, a step
-      that no twin test case reaches;
+      quadratic step underflows to 0, as on ``x^19`` near its root, SciPy bisects where `Brent` interpolates; no twin
+      test case reaches such a bisection;
     - SciPy tests a few of Brent's conditions with a strict inequality where Brent's procedure has a non-strict one,
       and the reverse; a strict and a non-strict comparison give different results only when
       the 2 sides are exactly equal;

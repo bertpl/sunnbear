@@ -23,7 +23,7 @@ Published results:
 - Brent (1973), Table 4.2: not reproduced, because the book states neither its intervals nor its tolerances, which its
   eigenvalue program adjusted.
 - Brent (1973), Table 6.1, the column ``n_Z``, the evaluation counts of ``zero`` on 19 intervals with
-  ``macheps = 16^-7`` and ``t = 1e-10``: not checked by a test yet. A run of `Brent` with `FLOAT64_EPS` set to
+  ``macheps = 16^-7`` and ``t = 1e-10``: not checked by a test. A run of `Brent` with `FLOAT64_EPS` set to
   ``16^-7`` reproduces all 19 counts; `Brent` as it is, with ``2^-52``, matches 2 of them, and takes 1 or 2 evaluations
   more on the other 17.
 
@@ -34,14 +34,14 @@ Third-party published results:
 - Alefeld, Potra and Shi (1995), Tables IV to VI, the column "BR": reproduced, in ``test_third_party.py``: 16 of the
   17 evaluation counts exactly; the count of the 17th is not checked, and the test data states why.
 - Alefeld, Potra and Shi (1995), Table II, the column "BR": reproduced, in ``test_third_party.py``: the totals within
-  1 %. `Brent`'s totals, 2797, 2900, 2964 and 2980, lie 5 to 28 evaluations, at most 0.93 %, below the paper's, for a
-  cause not fully known:
+  1 %. `Brent`'s totals, 2797, 2900, 2964 and 2980, lie 5 to 28 evaluations below the paper's, at most 0.93 %; the
+  cause is not fully known:
 
   - with the paper's relative machine precision, 1.907e-16, in place of ``2^-52``, only the total at ``t = 0``
     changes, by 2;
   - with problem ``26[n=1]``, the paper's problem 13, coded so that it stays nonzero where ``exp(1 / x^2)``
     overflows, the totals lie 0 to 23 evaluations below the paper's. The paper's section 6 states that its runs found
-    the root 0 of this problem, which in float64 needs such a coding.
+    the root 0 of this problem, which in float64 needs the problem coded to stay nonzero there.
 
 - Alefeld, Potra and Shi (1995), Table III, the column "BR": not reproduced, because the paper does not list the 139
   problems behind its totals.
@@ -54,17 +54,21 @@ Third-party published results:
 - Ganchovski et al. (2026), Table 2, the column "Bre": reproduced, in ``test_third_party.py``: 90 of the 92
   evaluation counts exactly, the other 2 within 1, and the roots of all 92 functions; the test data states why the
   2 counts deviate.
-- Oliveira and Takahashi (2020), Table 1, the column "Matlab": not checked by a test yet. Its counts are those of
-  MATLAB's ``fzero``, which descends from ``zero`` through a Fortran version, run on ``[-1, 1]`` with an absolute
-  tolerance; like the table's other columns, they leave out the 2 evaluations at the interval bounds. With
-  ``t = 2e-10``, twice the paper's tolerance of 1e-10, 23 of the 24 counts match those of `Brent`, which takes 1
+- Oliveira and Takahashi (2020), Table 1, the column "Matlab": not checked by a test. Its counts are those of MATLAB's
+  ``fzero``, which descends from ``zero`` through a Fortran version; the paper runs ``fzero`` on ``[-1, 1]`` with an
+  absolute tolerance. Like the table's other columns, the counts leave out the 2 evaluations at the interval bounds.
+  With ``t = 2e-10``, twice the paper's tolerance of 1e-10, 23 of the 24 counts match those of `Brent`, which takes 1
   evaluation fewer on ``pi^x - e``.
-- Gao (2026), Tables 2 and 4, the columns "Brentq": not checked by a test yet. Their counts are those of SciPy's
-  ``brentq``, with a tolerance that the paper does not state; ``brentq`` with ``xtol = 1e-10`` reproduces both counts
-  of Table 2 and 42 of the 45 of Table 4. `Brent` with the same tolerance, ``t = 5e-11``, matches both counts of
-  Table 2 and 35 of Table 4. On ``x^19``, it takes 10 to 13 evaluations more than ``brentq``, which computes the
-  inverse quadratic step from divided differences: the product in that step's denominator underflows to 0 there, so
-  ``brentq`` bisects where `Brent` interpolates.
+- Gao (2026), Tables 2 and 4, the columns "Brentq": not checked by a test. Their counts are those of SciPy's
+  ``brentq``, with a tolerance that the paper does not state. With ``xtol = 1e-10`` for ``brentq`` and the same
+  tolerance, ``t = 5e-11``, for `Brent`:
+
+  - ``brentq`` reproduces both counts of Table 2 and 42 of the 45 of Table 4;
+  - `Brent` matches both counts of Table 2 and 35 of Table 4;
+  - on ``x^19``, `Brent` takes 10 to 13 evaluations more than ``brentq``, which computes the inverse quadratic step
+    from divided differences: the product in that step's denominator underflows to 0 there, so ``brentq`` bisects
+    where `Brent` interpolates.
+
 - Gao (2026), Table 1: not compared. Its third function has random parameters, and on the other 2, `Brent` and
   ``brentq`` with ``xtol = 1e-10`` both take 29 and 35 evaluations, against the paper's 25 and 29.
 - Gao (2026), Table 3: not compared, because its column "Brentq" repeats the totals of the column "BR" of Table II of
