@@ -1,4 +1,52 @@
-"""`ModAB` implements the modified Anderson-Björck method, which switches between bisection and Anderson-Björck."""
+"""`ModAB` implements the modified Anderson-Björck method, which switches between bisection and Anderson-Björck.
+
+The rest of this docstring is the record of `ModAB` under the solver implementation principles
+(``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
+
+Sources:
+    - I - article:
+      - Ia - article code: Ganchovski et al. (2026), the C# code in its Table A1;
+      - Ib - article pseudocode: Ganchovski et al. (2026), its Algorithm 1;
+      - Ic - article text: Ganchovski et al. (2026), its sections 4.1 to 4.3 and equations 2 to 7.
+    - II - authors' code:
+      - the C# code of the article's supplementary material, which matches Table A1;
+      - the authors' later code, which changes 2 details of Table A1 that its header calls fixes;
+      - pymodab, a Python wrapper of the authors' compiled library.
+    - III - third party:
+      - none.
+    - IV - own judgment:
+      - none.
+
+Source per aspect:
+    Every aspect follows the C# code of Table A1, except:
+    - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
+      solver and as the authors' later code does. The C# code of Table A1 runs its loop from such a bound, and
+      returns the same bound after more evaluations.
+    - JUDGMENT-CALL: the C# code's limit of 200 iterations is left out, so the evaluation budget ends a long solve, as
+      for every solver. At that limit, the C# code returns no x-value.
+    - Translation of ``xtol`` (P7): ``xtol`` is the C# code's absolute tolerance ``aTol``, and its relative tolerance
+      ``rTol`` is 0.
+
+Validation:
+    - A - authors' results:
+      - used: Table 1, the iterations of each switch and of the stop, and Table 2, all 92 roots and 89 of the 92
+        evaluation counts, each reproduced exactly, which is convincing (P5);
+      - PRINCIPLE-CONFLICT (P5): the other 3 counts of Table 2 differ by 1, 4 and 1, and their rows give a presumed
+        cause, where P5 asks for ``UNSTATED_RUN_DETAILS`` and an observation. Marking them so, after a re-check of the
+        row that differs by 4, would resolve the conflict.
+      - not used: Table 3, which times the authors' .NET code, and the rows of Tables 1 and 2 for the method's first
+        version, which `ModAB` does not implement;
+      - not used: Ganchovski and Traykov (2023), Table 2, which also describes the first version.
+    - B - third-party results:
+      - none found: no article by a third party that sunnbear cites publishes results of the method.
+    - C - reference implementation:
+      - not used: pymodab, the only implementation that a twin test could run, wraps the authors' compiled library,
+        whose only Linux build is for x86-64, while the tests run on ARM.
+
+Variants:
+    - `ModABConfig`, the only config, is secondary (P8); its deviations from the principles are the entries marked
+      PRINCIPLE-CONFLICT above.
+"""
 
 from sunnbear._core.solvers.core import IntervalBound, Solver, SolveState
 
@@ -53,9 +101,6 @@ class ModAB(Solver):
       bisection, and the next bisection steps read them when they test whether the function looks close to a straight
       line.
 
-    The C# code also stops after 200 iterations; `ModAB` leaves that limit out, so the solve's evaluation budget ends
-    the solve.
-
     The method's first version (Ganchovski and Traykov, 2023) is a different algorithm, which the 2026 paper replaces;
     `ModAB` implements only the 2026 version. The first version differs in 3 ways:
 
@@ -73,6 +118,9 @@ class ModAB(Solver):
         - Ganchovski, N. and Traykov, A. (2023). Modified Anderson-Björck's method for solving non-linear equations in
           structural mechanics. IOP Conference Series: Materials Science and Engineering 1276, 012010. It
           describes the method's first version. https://doi.org/10.1088/1757-899X/1276/1/012010
+        - The authors' repository, https://github.com/Just-A-Random-Geek/ModAB-Root-Finding, which holds the C# code
+          of the 2026 paper's supplementary material, and later versions of the method in several languages.
+        - pymodab, https://pypi.org/project/pymodab/, a Python wrapper of the authors' compiled C library.
     """
 
     name = "modab"
