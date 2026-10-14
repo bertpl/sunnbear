@@ -1,12 +1,9 @@
 """The `mc_tuples` artifact round-trips through its CSV file, and `load_mc_tuples(size)` returns the shipped sets."""
 
-import datetime
-
 import numpy as np
 import pytest
 
 from sunnbear._core.artifacts import ArtifactError
-from sunnbear._core.artifacts.listing import artifact_manifest
 from sunnbear._core.benchmark.mc_tuples import (
     MIN_N_BITS,
     N_FINE_LANES,
@@ -74,20 +71,9 @@ def test_the_largest_shipped_size_holds_exactly_1_tuple_per_fine_lane():
         assert np.bincount(fine_lanes_of(values), minlength=N_FINE_LANES).tolist() == [1] * N_FINE_LANES
 
 
-# A shipped set built on or before this date may leave an outer fine lane of an axis empty, so the test below skips it.
-_OUTER_LANES_FILLED_AFTER = datetime.date(2026, 10, 13)
-
-
 @pytest.mark.parametrize("size", MCTuplesSize)
 def test_each_shipped_size_holds_a_tuple_in_both_outer_fine_lanes_of_each_axis(size):
     """Each shipped size has a tuple in fine lane 0 and in the last fine lane, along u and along v."""
-    # --- arrange ----------------------
-    if artifact_manifest("mc_tuples").build_date <= _OUTER_LANES_FILLED_AFTER:
-        pytest.skip(
-            "The shipped set was built before the construction filled the outer fine lanes; remove this condition "
-            "once the set is regenerated."
-        )
-
     # --- act --------------------------
     tuples = load_mc_tuples(size)
 
@@ -96,20 +82,8 @@ def test_each_shipped_size_holds_a_tuple_in_both_outer_fine_lanes_of_each_axis(s
         assert {0, N_FINE_LANES - 1} <= set(fine_lanes_of(values).tolist())
 
 
-# A shipped set built on or before this date may hold values with fewer than `MIN_N_BITS` bits of information, so the
-# test below skips it.
-_MIN_N_BITS_REACHED_AFTER = datetime.date(2026, 10, 13)
-
-
 def test_every_shipped_value_holds_at_least_min_n_bits():
     """Every u value and v value of the shipped set holds at least `MIN_N_BITS` bits of information."""
-    # --- arrange ----------------------
-    if artifact_manifest("mc_tuples").build_date <= _MIN_N_BITS_REACHED_AFTER:
-        pytest.skip(
-            "The shipped set was built before the construction gave every value MIN_N_BITS bits; remove this "
-            "condition once the set is regenerated."
-        )
-
     # --- act --------------------------
     bit_stats = load_mc_tuples(max(MCTuplesSize)).bit_stats()
 
