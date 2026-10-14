@@ -10,7 +10,9 @@ Sources:
       - Ic - article text: Ganchovski et al. (2026), its sections 4.1 to 4.3 and equations 2 to 7.
     - II - authors' code:
       - the C# code of the article's supplementary material, which matches Table A1;
-      - the authors' later code, which changes 2 details of Table A1 that its header calls fixes;
+      - the authors' later code, which clamps the chord's zero into the interval before the stopping test, and uses
+        unscaled function values in the test for a switch after a fallback; the later code's header calls these 2
+        changes fixes;
       - pymodab, a Python wrapper of the authors' compiled library.
     - III - third party:
       - none.
@@ -29,13 +31,15 @@ Source per aspect:
 
 Validation:
     - A - authors' results:
-      - used: Table 1, the iterations of each switch and of the stop, and Table 2, all 92 roots and 89 of the 92
-        evaluation counts, each reproduced exactly, which is convincing (P5);
-      - PRINCIPLE-CONFLICT (P5): the other 3 counts of Table 2 differ by 1, 4 and 1, and their rows give a presumed
-        cause, where P5 asks for ``UNSTATED_RUN_DETAILS`` and an observation. Marking them so, after a re-check of the
-        row that differs by 4, would resolve the conflict.
-      - not used: Table 3, which times the authors' .NET code, and the rows of Tables 1 and 2 for the method's first
-        version, which `ModAB` does not implement;
+      - used: Table 1 and Table 2, which `ModAB` reproduces exactly, and so convincingly (P5): in Table 1, the
+        iteration of each switch between bisection and Anderson-Björck mode, and the iteration of the stop; in Table 2,
+        all 92 roots and 89 of the 92 evaluation counts;
+      - PRINCIPLE-CONFLICT (P5): the other 3 evaluation counts of Table 2 differ by 1, 4 and 1, and their rows in the
+        test data state an unverified cause, that the count depends on how the platform rounds a library function,
+        while P5 asks for the marker ``UNSTATED_RUN_DETAILS`` and an observation. Marking these 3 rows with
+        ``UNSTATED_RUN_DETAILS``, after a re-check of the row that differs by 4, would resolve the conflict.
+      - not used: Table 3, which gives execution times of the authors' .NET code, and the rows of Tables 1 and 2 for
+        the method's first version, which `ModAB` does not implement;
       - not used: Ganchovski and Traykov (2023), Table 2, which also describes the first version.
     - B - third-party results:
       - none found: no article by a third party that sunnbear cites publishes results of the method.
