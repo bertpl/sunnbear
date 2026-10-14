@@ -154,7 +154,13 @@ The record has 4 sections, each a heading of the docstring:
   - P1's preference among sources of the same rank, or a judgment call between them.
 
   A last bullet states how the solver translates `xtol` (P7).
-- **`Validation:`** lists each kind of evidence in P4 with its answer as a bullet underneath: used, with the evidence and whether it is convincing (P5); none exists; or not used, with the reason. The docstring of the solver's test package gives the details of each published table.
+- **`Validation:`** lists each kind of evidence in P4 with its answers as bullets underneath:
+  - used, with the evidence and whether it is convincing (P5);
+  - none exists;
+  - not used, with the reason;
+  - `TBD:`, for evidence that no test checks yet but that could validate the solver further, with what a comparison shows today, or that none was made yet.
+
+  The docstring of the solver's test package gives the details of each published table.
 - **`Variants:`** gives 1 line per config, with its role (P8), and for a secondary variant, its deviations from the principles.
 
 **The class docstring describes what the algorithm does, and its `References:` gives the full citation of every source that the record names.** API documentation renders the docstring of the public class, not the docstring of its private module, so the full citations go in the class docstring.
