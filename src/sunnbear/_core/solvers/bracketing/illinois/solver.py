@@ -1,4 +1,59 @@
-"""`Illinois` implements the Illinois method: regula falsi that halves the value of a bound kept twice in a row."""
+"""`Illinois` implements the Illinois method: regula falsi that halves the value of a bound kept twice in a row.
+
+The rest of this docstring is the record of `Illinois` under the solver implementation principles
+(``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
+
+Sources:
+    - I - article:
+      - Ia - article code: Dowell and Jarratt (1971), the ALGOL procedure in its section 4;
+      - Ib - article pseudocode: none;
+      - Ic - article text: Dowell and Jarratt (1971), its equation 2 and the rules of its section 2.
+    - II - authors' code:
+      - none.
+    - III - third party:
+      - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="illinois"``;
+      - Ford (1997), equation 5, with the factor 0.5 of its Table 1.
+    - IV - own judgment:
+      - none.
+
+Source per aspect:
+    Every aspect follows the ALGOL procedure of Dowell and Jarratt (1971), except:
+    - `Illinois` passes the upper bound as ``x1``, the second of the 2 starting x-values, as mpmath does, because the
+      ALGOL procedure leaves the order of ``x0`` and ``x1`` to the caller.
+    - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
+      solver. At the lower bound, the ALGOL procedure first evaluates the chord's zero, which lies at that bound up to
+      rounding.
+    - PRINCIPLE-GAP (P6): Dowell and Jarratt's Table 1 cannot tell the ALGOL procedure's form of the chord's zero,
+      ``x1 - f1 * (x1 - x0) / (f1 - f0)``, from Ford's form, ``(a * fb - b * fa) / (fb - fa)``, and P6 does not say
+      whether third-party tables may decide between them. The code keeps the ALGOL form:
+      - with the ALGOL form, all 15 counts of Ford's Table 4 match within 1, against 14 with Ford's form;
+      - with Ford's form, 22 of the 24 counts in the column "Illinois" of Table 1 of Oliveira and Takahashi (2020)
+        match exactly, against 17 with the ALGOL form.
+    - PRINCIPLE-CONFLICT (P1): the code stops by `BracketingSolver`'s rule, once the interval is at most ``2 * xtol``
+      wide, and returns the interval's midpoint. The ALGOL procedure stops once a step is at most ``delta``, and
+      returns the last chord's zero without evaluating it. Either rule would resolve the conflict:
+      - following the ALGOL procedure, with ``delta = xtol``, which on 132 solves of the test suite's problems returns
+        an x-value that is not within ``xtol`` of a root in 22;
+      - a principle that lets a solver keep a stopping rule that guarantees ``xtol``.
+    - Translation of ``xtol`` (P7): ``xtol`` is the tolerance of `BracketingSolver`'s rule; the ALGOL procedure would
+      take it as ``delta``.
+
+Validation:
+    - A - authors' results:
+      - used: Table 1, the errors of ``x_2`` to ``x_9``, reproduced to the printed digits, which is convincing (P5);
+      - not used: Table 1's ``x_10``, and Tables 2 to 7; the docstring of the test package
+        ``tests.solvers.bracketing.illinois`` gives the reasons.
+    - B - third-party results:
+      - used: Ford (1997), Table 4, reproduced to within 1 iteration, which is convincing (P5);
+      - not used: the Illinois columns of other articles; the docstring of the test package
+        ``tests.solvers.bracketing.illinois`` lists them, with the reasons.
+    - C - reference implementation:
+      - used: a twin test checks that `Illinois` evaluates the same x-values as mpmath's ``Illinois`` with
+        ``method="illinois"``; the twin test imposes the stopping rule of `Illinois` on mpmath.
+
+Variants:
+    - `IllinoisConfig`, the only config, is core (P8).
+"""
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, IntervalBound
 
@@ -38,6 +93,10 @@ class Illinois(BracketingSolver[IllinoisState]):
           Illinois step, and the test suite reproduces the paper's Table 4.
         - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="illinois"``; the test suite checks
           `Illinois` against mpmath's ``Illinois``.
+        - Oliveira, I. F. D. and Takahashi, R. H. C. (2020). An enhancement of the bisection method average
+          performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), article 5. Its
+          Table 1 holds the column "Illinois", for runs that stop by the rule of `BracketingSolver`.
+          https://doi.org/10.1145/3423597
     """
 
     name = "illinois"
