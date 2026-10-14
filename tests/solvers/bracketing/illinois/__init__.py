@@ -10,10 +10,18 @@ Published results:
 
 Third-party published results:
 
-- Dowell and Jarratt (1972), Problems 1 to 4, the Illinois columns: not reproduced; the test package of `Pegasus`
-  gives the reasons.
-- Anderson and Björck (1973), Examples 1 to 7, the Illinois columns: not reproduced; the test package of
-  `AndersonBjorck` gives the reasons.
+- Dowell and Jarratt (1972), Problems 1 to 4, the Illinois columns: not reproduced. Problems 1 to 3 stop once
+  ``|f(x)|`` drops below ``0.5e-17`` or ``0.5e-19``, which in float64 only ``f(x) == 0`` satisfies, and Problem 4
+  states no starting values.
+- Anderson and Björck (1973), Examples 1 to 7, the Illinois columns: not reproduced, because the paper ran Examples 1
+  to 7 in 27-bit arithmetic and with an extra rule on the step size that `Illinois` does not have.
+- Oliveira and Takahashi (2020), Table 1, the column "Illinois": not compared, because `Illinois` matches only 17 of
+  the 24 counts exactly, and 23 within 1; the record of `Illinois` gives the counts with the other form of the chord's
+  zero, and flags this choice of form as a gap in the principles. The table's runs stop by the rule of
+  `BracketingSolver`, with ``xtol = 1e-10`` on ``[-1, 1]``, and its counts leave out the 2 evaluations at the interval
+  bounds.
+- Ganchovski and Traykov (2023), Table 2, the column "ill": not compared, because the paper does not state the stopping
+  rule of its Illinois runs.
 - Ford (1997), Table 4: reproduced, in ``test_third_party.py``: 12 of the 15 iteration counts exactly, and the
   other 3 within 1; the test data states why each of the 3 deviates.
 - Ganchovski et al. (2026), Table 2, the column "ill": not reproduced, because the paper's C# code differs from
