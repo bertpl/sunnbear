@@ -109,7 +109,7 @@ class Solver(ABC, Generic[StateT]):
             try:
                 fa, fb = wrapped_f(a_counted), wrapped_f(b_counted)
             except Exception as exc:  # noqa: BLE001 — a failure at an interval bound is recorded like any other
-                x, status, x_failed = _ending_of(exc, x_best=0.5 * (a_counted + b_counted))
+                x, status, x_failed = self._outcome_from_exception(exc, x_best=0.5 * (a_counted + b_counted))
             else:
                 if fa == 0.0:  # Early exit when a is a root.
                     x, status = a_counted, SolveStatus.CONVERGED
@@ -123,7 +123,7 @@ class Solver(ABC, Generic[StateT]):
                         # state_cls is typed as type[SolveState]: the checker sees SolveState where StateT is expected.
                         x, status = self._solve(state), SolveStatus.CONVERGED  # type: ignore[arg-type]
                     except Exception as exc:  # noqa: BLE001 — every ending becomes a recorded status, by design
-                        x, status, x_failed = _ending_of(exc, x_best=state.x_best)
+                        x, status, x_failed = self._outcome_from_exception(exc, x_best=state.x_best)
 
         # --- return results ---------------------
         # Divergence is the framework's judgment, not solver work, so these checks are uncounted.
@@ -153,6 +153,24 @@ class Solver(ABC, Generic[StateT]):
         - Evaluate the function only through ``state.f``, and let its interrupts propagate.
         - Keep ``state.x_best`` current, so an interrupted solve still reports the solver's latest estimate as ``x``.
         """
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _outcome_from_exception(exc: Exception, x_best: float) -> tuple[float, SolveStatus, float | None]:
+        """Return the root estimate, the status, and where ``f`` failed (if it did) for a solve that ended in ``exc``.
+
+        Anything but a `SolveException` is a solver bug, recorded as ``SOLVER_ERROR``.
+        """
+        if isinstance(exc, MaxFevalsExceeded):
+            return x_best, SolveStatus.MAX_FEVALS, None
+        elif isinstance(exc, DivergedError):
+            return x_best, SolveStatus.DIVERGED, None
+        elif isinstance(exc, FunctionDomainError):
+            return x_best, SolveStatus.FUNCTION_ERROR, exc.x
+        else:
+            return x_best, SolveStatus.SOLVER_ERROR, None
 
 
 # ==================================================================================================
@@ -197,21 +215,3 @@ class BracketingSolver(Solver[StateT]):
         Read the function values at the interval bounds from ``interval``, and any value carried
         between iterations from ``state``; do not evaluate the function here.
         """
-
-
-# ==================================================================================================
-#  Helpers
-# ==================================================================================================
-def _ending_of(exc: Exception, x_best: float) -> tuple[float, SolveStatus, float | None]:
-    """Return the root estimate, the status, and where ``f`` failed (if it did) for a solve that ended in ``exc``.
-
-    Anything but a `SolveException` is a solver bug, recorded as ``SOLVER_ERROR``.
-    """
-    if isinstance(exc, MaxFevalsExceeded):
-        return x_best, SolveStatus.MAX_FEVALS, None
-    elif isinstance(exc, DivergedError):
-        return x_best, SolveStatus.DIVERGED, None
-    elif isinstance(exc, FunctionDomainError):
-        return x_best, SolveStatus.FUNCTION_ERROR, exc.x
-    else:
-        return x_best, SolveStatus.SOLVER_ERROR, None

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Require counted-float ≥ 2.8.0
 - Rebuild the shipped Monte Carlo tuple set with improved spread statistics; benchmark results on it differ from those on the previous set
 
 ### Deprecated
