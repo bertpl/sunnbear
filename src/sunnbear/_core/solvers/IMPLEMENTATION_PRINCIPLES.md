@@ -158,7 +158,7 @@ The record has 4 sections, each a heading of the docstring:
   - used, with the evidence and whether it is convincing (P5);
   - none exists;
   - not used, with the reason;
-  - `TBD:`, for evidence that no test checks yet but that could validate the solver further, with what a comparison shows today, or that none was made yet.
+  - `TBD:`, for evidence that no test checks yet but that could validate the solver further, with what a comparison of the solver's results against that evidence shows today, or that no such comparison was made yet.
 
   The docstring of the solver's test package gives the details of each published table.
 - **`Variants:`** gives 1 line per config, with its role (P8), and for a secondary variant, its deviations from the principles.
