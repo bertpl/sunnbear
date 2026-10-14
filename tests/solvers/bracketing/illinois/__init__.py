@@ -16,8 +16,8 @@ Third-party published results:
 - Anderson and Björck (1973), Examples 1 to 7, the Illinois columns: not reproduced, because the paper ran Examples 1
   to 7 in 27-bit arithmetic and with an extra rule on the step size that `Illinois` does not have.
 - Oliveira and Takahashi (2020), Table 1, the column "Illinois": not compared, because `Illinois` matches only 17 of
-  the 24 counts exactly, and 23 within 1, while Ford's form of the chord's zero matches 22 exactly; the record of
-  `Illinois` flags this choice of form as a gap in the principles. The table's runs stop by the rule of
+  the 24 counts exactly, and 23 within 1; the record of `Illinois` gives the counts with the other form of the chord's
+  zero, and flags this choice of form as a gap in the principles. The table's runs stop by the rule of
   `BracketingSolver`, with ``xtol = 1e-10`` on ``[-1, 1]``, and its counts leave out the 2 evaluations at the interval
   bounds.
 - Ganchovski and Traykov (2023), Table 2, the column "ill": not compared, because the paper does not state the stopping
