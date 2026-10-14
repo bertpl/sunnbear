@@ -5,19 +5,25 @@ The rest of this docstring is the record of `Bisection` under the solver impleme
 follows, and how the solver is validated.
 
 Sources:
-    - I: none. Bisection is a classical method with no article of its own, so its sources start at III (P1).
-    - II: none.
-    - III:
+    - article:
+
+      - none: bisection is a classical method with no article of its own, so its sources start at third party (P1).
+    - authors' code:
+
+      - none.
+    - third party:
 
       - Atkinson (1989), section 2.1: the pseudocode ``Bisect``, which states every aspect below, and Table 2.1, its
         results on 1 problem;
       - Press et al. (2007), section 9.1.1: prose and the routine ``rtbis``;
       - SciPy's ``scipy.optimize.bisect``.
-    - IV: none.
+    - own judgment:
+
+      - none.
 
 Source per aspect:
-    No source of rank I or II exists, so every aspect follows rank III: Atkinson's ``Bisect``, except where an entry
-    names another source.
+    No article or authors' code exists, so every aspect follows a third party: Atkinson's ``Bisect``, except where an
+    entry names another source.
 
     - Step formula: Atkinson's steps 1 and 3. Each iteration evaluates the midpoint ``c`` and keeps the half of the
       interval whose bounds' function values differ in sign; a ``c`` with ``f(c) = 0`` replaces ``a``. Press et al.
