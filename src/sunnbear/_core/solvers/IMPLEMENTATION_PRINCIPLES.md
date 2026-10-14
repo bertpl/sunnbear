@@ -48,7 +48,7 @@ A source can state some aspects completely and leave others out, or state them a
 
 Without a good reason, a solver does not deviate from its article.
 
-**P3. Each solver's class docstring declares every deviation** from the source that P1 ranks highest for that aspect.
+**P3. Each solver's module docstring declares every deviation** from the source that P1 ranks highest for that aspect.
 
 ## Validation
 
@@ -90,11 +90,11 @@ These kinds of change leave the published algorithm intact and are allowed witho
 - **short-circuit evaluation:** a condition that combines comparisons with Python's `and` or `or` skips the later comparisons once the earlier ones decide it, even where the source's language, such as Algol 60, evaluates them all. Skipping them changes no result, because the comparisons have no side effects.
 - **sign tests that compare signs:** a test whether 2 function values differ in sign compares their signs explicitly, even where the source writes a product such as `fa * fb < 0`, because in float64 the product of 2 small values can underflow to 0. This holds as long as the product is not needed for another step.
 
-A solver does not restructure a formula algebraically to save flops. Where it is unclear whether a change is allowed, the solver keeps the source's form. Any other change of form needs a good reason under P2, and the class docstring states that reason: the published results reproduce better with it, or the published form fails in float64.
+A solver does not restructure a formula algebraically to save flops. Where it is unclear whether a change is allowed, the solver keeps the source's form. Any other change of form needs a good reason under P2, and the module docstring states that reason: the published results reproduce better with it, or the published form fails in float64.
 
 ## Stopping
 
-**P7. Each solver translates sunnbear's absolute tolerance `xtol` into the formulation of its own stopping rule**, such as a relative tolerance or a tolerance on the function value, and its class docstring states how.
+**P7. Each solver translates sunnbear's absolute tolerance `xtol` into the formulation of its own stopping rule**, such as a relative tolerance or a tolerance on the function value, and its module docstring states how.
 
 ## Variants
 
@@ -112,3 +112,39 @@ These rules follow from P3 and P6: the flop counts must show the published algor
 - **Each solver keeps its source's variable names and symbols**, and writes 1 long method where helpers would break the step-by-step match with the source.
 - **Duplication across solvers is accepted**, for solver classes, state classes, tests and twin tests alike. Code reviews that ask to merge near-duplicate solver code are answered by this section.
 - **Only the framework in `core` is shared**, such as `Solver` and `SolveState`; no part of it belongs to a published algorithm.
+
+## Each solver's record
+
+**The module docstring of each solver's `solver.py` is that solver's record: it states how these principles shape the solver.** The reasoning that ties a solver to its sources is otherwise stated nowhere, so the record keeps it next to the code, and a change of principle is checked against each record.
+
+The record has 4 sections, each a heading of the docstring:
+
+- **`Sources:`** names the sources of each rank of P1, from Ia to IV, by author and year where they have them, with what each states; a rank without a source says "none".
+- **`Source per aspect:`** gives, for each of 6 aspects, the rank and the source that the solver follows. The aspects are the step formula, the safeguards, the constants, the stopping rule, the arithmetic form (P6) and the translation of `xtol` (P7).
+  - **For each higher rank, the entry gives the reason it is not followed**, 1 of these, taken from P1 and P2:
+    - no source of that rank exists;
+    - the source does not state the aspect;
+    - the source states it incompletely or ambiguously;
+    - the solver's validation with the source is not convincing (P5);
+    - a good reason to deviate, which the entry states (P2).
+  - **Where 2 sources of the followed rank state the aspect differently**, the entry names the one that the solver follows, and why (P1).
+
+  A deviation (P3) is such an entry.
+- **`Validation:`** gives, for each kind A, B and C of P4, 1 of 3 states:
+  - used, with its evidence, its outcome, and whether the outcome is convincing (P5);
+  - none exists;
+  - not used, with the reason.
+
+  The docstring of the solver's test package gives the details of each published table.
+- **`Variants:`** gives each config of the solver with its role (P8), and for a secondary config, its deviations from the principles.
+
+**The class docstring describes what the algorithm does, and its `References:` gives the full citation of every source that the record names.** API documentation renders the docstring of the public class, not that of its private module, so the citations stay where it reads them. A test checks that every author and year that a record's `Sources:` names appears in the class's `References:`.
+
+**2 keywords mark where a solver and the principles disagree.** Each starts a bullet next to the aspect it concerns, so that `grep -rnE "PRINCIPLE-(CONFLICT|GAP)" src/` lists all of them:
+
+- **`PRINCIPLE-CONFLICT (Pn)`**: the solver breaks principle Pn. The bullet says how, and what would resolve the conflict.
+- **`PRINCIPLE-GAP (Pn)`**: Pn does not decide the case, because it is silent or ambiguous. The bullet says what is undecided, and which choice the code makes.
+
+A record flags a conflict and does not resolve it; resolving it is a change of its own, made under these principles.
+
+**A record is longer than most module docstrings**, because it is the only place that states, aspect by aspect, why a solver follows the source it does. Code reviews that ask to shorten a record are answered by this section; a record still cites a fact that the code or the tests own, and does not repeat it.
