@@ -124,6 +124,8 @@ The reasons why a solver follows each of its sources are stated nowhere else, so
 
 **A record names the source that the solver follows by default, then lists only the exceptions, each in a line or 2.** A reader skims it for what departs from that source; the code and the tests hold the details.
 
+A record is read as plain text, since API documentation does not render the docstring of a private module, so its nested bullets follow their parent bullet without a blank line.
+
 The record has 4 sections, each a heading of the docstring:
 
 - **`Sources:`** lists each rank of P1 with its sources as bullets underneath, by author and year where they have them, and what each states. A rank without a source lists "none".

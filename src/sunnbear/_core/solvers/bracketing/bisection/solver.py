@@ -5,23 +5,18 @@ The rest of this docstring is the record of `Bisection` under the solver impleme
 
 Sources:
     - article:
-
       - none: bisection is a classical method with no article of its own.
     - authors' code:
-
       - none.
     - third party:
-
       - Atkinson (1989), section 2.1: the pseudocode ``Bisect``, and Table 2.1, its results on 1 problem;
       - Press et al. (2007), section 9.1.1: prose and the routine ``rtbis``;
       - SciPy's ``scipy.optimize.bisect``.
     - own judgment:
-
       - none.
 
 Source per aspect:
     Every aspect follows Atkinson's ``Bisect``, except:
-
     - Exact zeros follow SciPy, which P1 prefers: a function value of 0 at a bound or a midpoint ends the solve.
       Atkinson excludes a zero bound, and bisects on past a zero midpoint.
     - JUDGMENT-CALL: the stopping test is ``b - a <= 2 * xtol`` before the midpoint (`Interval.is_converged`), not
