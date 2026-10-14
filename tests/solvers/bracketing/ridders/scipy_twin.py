@@ -13,9 +13,9 @@ class RiddersScipyTwin(TwinSolver):
     in the same variant, would stop.
 
     SciPy stops once its interval is narrower than its tolerance ``xtol + rtol * x``, where ``x`` is SciPy's current
-    iterate, and limits each step so that the new iterate lies inside the interval by at least half of that
-    tolerance, with ``x`` the previous iterate; for the first step, ``x`` is the smaller of ``|a|`` and ``|b|``. The
-    twin passes SciPy:
+    iterate. It also limits each step so that the new iterate lies inside the interval by at least half of that
+    tolerance, but computed with ``x`` as the previous iterate, and for the first step as the smaller of ``|a|`` and
+    ``|b|``. The twin passes SciPy:
 
     - for the ``"scipy"`` variant, ``rtol = 4 * FLOAT64_EPS``, SciPy's smallest accepted value, and an ``xtol``
       reduced by ``4 * FLOAT64_EPS * max(|a|, |b|)``, so that SciPy's tolerance never exceeds `Ridders`' ``xtol``
@@ -23,7 +23,7 @@ class RiddersScipyTwin(TwinSolver):
     - for the other 2 variants, SciPy's smallest accepted tolerance, so that SciPy's limit on the step moves an
       iterate by a few ulps at most.
 
-    The twin stops SciPy with the criterion of `Ridders` through `_root_if_sunnbear_solver_stops`.
+    The twin stops SciPy with the stopping rule of `Ridders` through `_root_if_sunnbear_solver_stops`.
 
     The twin deviates from exact agreement in these declared ways:
 
@@ -60,7 +60,7 @@ class RiddersScipyTwin(TwinSolver):
     ) -> float | None:
         """Return the root estimate if `Ridders` stops after the last of ``evaluations``, or ``None`` if it continues.
 
-        `Ridders` stops at a zero, or after an iteration that meets the criterion of its variant. The evaluations
+        `Ridders` stops at a zero, or after an iteration that meets the stopping rule of its variant. The evaluations
         alternate between a midpoint and an iterate, so an odd count ends with a midpoint, after which `Ridders` stops
         only at a zero.
         """
