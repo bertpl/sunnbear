@@ -3,15 +3,19 @@
 The rest of this docstring is the record of `ITP` under the solver implementation principles
 (``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
 
+The names ``r``, ``n_max``, ``n_slack``, ``kappa_1``, ``kappa_2``, ``a0`` and ``b0`` are those of the class docstring
+of `ITP`.
+
 Sources:
     - I - article:
       - Ia - article code: none;
       - Ib - article pseudocode: Oliveira and Takahashi (2020), Algorithm 1 in its Appendix B, and Algorithm 0 in its
         section 1, a bracketing algorithm that leaves the x-value of each iteration to the method, here ITP, and
         returns the final interval's midpoint;
-      - Ic - article text: Oliveira and Takahashi (2020), equations 13 to 16 in its section 2.1, the constants of its
-        experiments in section 3, and the advice in its Appendix B to lower the projection radius by a small margin
-        and to clamp it at 0.
+      - Ic - article text: Oliveira and Takahashi (2020):
+        - equations 13 to 16 in its section 2.1;
+        - the constants of its experiments in section 3;
+        - the advice in its Appendix B to lower the projection radius by a small margin and to clamp it at 0.
     - II - authors' code:
       - the authors' MATLAB code that produced the paper's experiments, shared on request: the steps of Algorithm 1,
         with a margin and a clamp at 0 on the projection radius.
@@ -24,24 +28,27 @@ Sources:
 
 Source per aspect:
     Every aspect of the core config follows Algorithm 1 of Oliveira and Takahashi (2020), except:
-    - The projection radius follows the authors' code, which lowers it to ``max(0.99 * r - xtol / 2, 0)``, because
-      the validation with Algorithm 1's radius is not convincing (P5): with it, 17 of Table 1's 24 counts match, and
-      with the authors' radius 23. Appendix B suggests a margin and a clamp at 0, without the margin's amount.
+    - The projection radius follows the authors' code, which lowers Algorithm 1's radius ``r`` to
+      ``max(0.99 * r - xtol / 2, 0)``, because the validation with Algorithm 1's radius is not convincing (P5): with
+      it, 17 of Table 1's 24 counts match, and with the authors' radius, 23 match. Appendix B suggests a margin and a
+      clamp at 0, without the margin's amount.
     - The constants follow section 3, because Algorithm 1 takes them as inputs: ``kappa_2 = 2``, ``n0 = 0`` (the
       core config's ``n_slack``), and ``kappa_1 = 0.1`` on an x axis scaled to [-1, 1].
     - JUDGMENT-CALL: `ITP` keeps the problem's x axis and sets ``kappa_1 = 0.2 / (b0 - a0)`` for the initial interval
-      ``[a0, b0]``, as the C# ITP does, so that ``f`` needs no change of variable; for ``kappa_2 = 2``, this gives the
-      x-values of section 3's scaled axis in exact arithmetic. In float64, the x-values agree to about 1e-15 relative,
-      yet in 26 of 126 solves of 8 functions the evaluation counts differ, by up to 24, mostly where the 2 forms put
-      an x-value within 2 ulps (units in the last place) of the root on opposite sides of it.
+      ``[a0, b0]``, as the C# ITP does, so that ``f`` needs no change of variable; for ``kappa_2 = 2``, this choice of
+      ``kappa_1`` gives, in exact arithmetic, the same x-values as section 3's form on the scaled axis.
+      - In float64, the x-values agree to about 1e-15 relative, yet in 26 of 126 solves of 8 functions the evaluation
+        counts differ, by up to 24, mostly where the scaled and the unscaled form put an x-value within 2 ulps (units
+        in the last place) of the root on opposite sides of it.
     - The returned x-value is the final interval's midpoint, the output of Algorithm 0, because Algorithm 1 returns the
       final interval. Algorithm 1 also requires ``f(a) < 0 < f(b)``; where ``f(a) > 0 > f(b)``, `ITP` keeps the sign
       change as Algorithm 0 does, and evaluates the same x-values as on ``-f``.
     - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
       solver. Algorithm 1 excludes this case; the authors' code does not check for it, and on 5 functions with such a
-      bound, it ends within ``xtol`` of that bound after 4 or 5 more evaluations.
-    - Translation of ``xtol`` (P7): ``xtol`` is Algorithm 1's ``epsilon``: it sets ``n_1/2``, the projection radius
-      and the stopping width ``2 * xtol``, and the authors' margin subtracts ``xtol / 2``.
+      bound, that code ends within ``xtol`` of that bound after 4 or 5 more evaluations.
+    - Translation of ``xtol`` (P7): ``xtol`` is Algorithm 1's ``epsilon``: it sets the projection radius, the stopping
+      width ``2 * xtol``, and ``n_1/2``, the number of bisection iterations needed to reach that width; the authors'
+      margin also subtracts ``xtol / 2``.
 
 Validation:
     - A - authors' results:
@@ -51,12 +58,14 @@ Validation:
         of the authors' code does in float64; in exact arithmetic, it ends after 34, the table's count.
       - not used: Figures 2 to 5, which are plots; Figures 4 and 5 use 1000-bit arithmetic.
       - TBD: Table 2, and the rows "Global Average" and "Global Worst Case" of Table 1, which summarize Table 1's
-        counts and which no test checks yet: the core config gives each of their values for ITP, except the worst case,
-        35 against 34.
+        counts and which no test checks: the core config's counts reproduce every value in these rows and in Table 2's
+        column "ITP", except the worst case, 35 against 34.
     - B - third-party results:
-      - not used: the columns "ITP" of Ganchovski et al. (2026), Table 2, whose settings no config of `ITP` runs, and of
-        Ganchovski and Traykov (2023), Table 2, whose settings the paper does not state; the docstring of the test
-        package ``tests.solvers.bracketing.itp`` gives the details.
+      - not used: the column "ITP" of Ganchovski et al. (2026), Table 2, because no config of `ITP` runs the paper's
+        settings.
+      - not used: the column "ITP" of Ganchovski and Traykov (2023), Table 2, because the paper does not state the
+        settings of its ITP runs.
+      - The docstring of the test package ``tests.solvers.bracketing.itp`` gives the details.
     - C - reference implementation:
       - not used: no implementation of ITP that a twin test could run exists: SciPy and mpmath have none, and the C#
         ITP needs a .NET runtime, which the tests do not have.
@@ -64,14 +73,15 @@ Validation:
 Variants:
     - `ITPPaperExperimentsSlack0Config`, variant ``"paper_experiments"`` with ``n_slack = 0``, is core (P8).
     - `ITPPaperPseudocodeSlack0Config` is secondary (P8): it keeps Algorithm 1's projection radius, which the core
-      config replaces (P2) because its validation is not convincing (P5): 17 of Table 1's 24 counts match, and the other
-      7 take 1 to 19 iterations more.
-    - `ITPPaperExperimentsSlack4Config` is secondary (P8): its ``n_slack = 4`` is IV - own judgment, against P1, since
-      section 3 and the authors' code use ``n0 = 0``, and the C# ITP uses 1.
-      - PRINCIPLE-GAP (P8): no docstring says why ``n_slack`` is 4; P8 asks a variant for a didactic reason, but does
-        not say whether the value of its parameter needs one. The code keeps 4. The 4 extra iterations do not keep a
-        solve within its ``n_max`` either: on [-1, 1] with ``xtol = 1e-9``, Table 1's step function takes 35
-        iterations, against ``n_max = 34``.
+      config replaces (P2) because the validation with that radius is not convincing (P5): 17 of Table 1's 24 counts
+      match, and the other 7 take 1 to 19 iterations more.
+    - `ITPPaperExperimentsSlack4Config` is secondary (P8): its ``n_slack = 4`` comes from IV - own judgment, and goes
+      against P1, since section 3 and the authors' code use ``n0 = 0``, and the C# ITP uses 1.
+      - PRINCIPLE-GAP (P8): no docstring says why ``n_slack`` is 4; P8 asks that each variant have a didactic reason,
+        but does not say whether the value of a variant's parameter needs one. The code keeps 4.
+      - The 4 extra iterations do not stop a solve from going past its ``n_max``, because rounding in the interval
+        bounds can make a solve go past ``n_max`` for every ``n_slack``: on [-1, 1] with ``xtol = 1e-9``, Table 1's
+        step function takes 35 iterations, against ``n_max = 34``.
 """
 
 import math
