@@ -1,9 +1,9 @@
-"""The tests in this module check in 2 ways that every float operation of a built-in solver is counted.
+"""The tests in this module check, in 2 ways, that counted-float counts every float operation of a built-in solver.
 
 - At runtime, every built-in config solves the test cases of the twin tests (which compare a solver with a reference
   implementation), with counted-float raising at each operation that it cannot count.
-- Statically, the solver packages import no numpy, and the algorithm packages convert no value to a plain `float`:
-  counted-float cannot see either, so no runtime check reports them.
+- Statically, the solver packages import no numpy, and the algorithm packages (every solver subpackage except `core/`)
+  convert no value to a plain `float`: counted-float cannot detect either, so no runtime check reports them.
 """
 
 import ast
@@ -16,28 +16,27 @@ from counted_float import FlopCountingContext, UncountedOperationError, Verbosit
 
 import sunnbear._core.solvers as solvers_package
 from sunnbear._core.solvers.core import solver as solver_module
+from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 from sunnbear.solvers import BracketingSolver, Interval, SolverConfigRegistry, SolveState
 from tests.solvers.twins import TWIN_TEST_CASES
 
 _SOLVERS_DIR = Path(solvers_package.__file__).parent
 
-# The solvers' algorithms live in every subpackage except `core/`. The framework in `core/` converts results to
-# `float` on purpose, after the flop counting of the solve has ended.
+# The algorithm packages, which hold the solvers' algorithms, are every subpackage except `core/`. The framework in
+# `core/` converts to `float` on purpose, where values pass between the solver and the function or the caller.
 _ALGORITHM_DIRS = sorted(path.parent for path in _SOLVERS_DIR.glob("*/__init__.py") if path.parent.name != "core")
 
 # Defining a SolverConfig subclass registers it, so the registry also holds the configs that test modules define;
 # the built-in configs are the ones defined inside the sunnbear package.
-_BUILT_IN_CONFIGS = [
-    config for config in SolverConfigRegistry.configs() if type(config).__module__.startswith("sunnbear.")
-]
+_BUILT_IN_CONFIGS = [config for config in SolverConfigRegistry.configs() if is_defined_in_sunnbear(type(config))]
 
 
 # ==================================================================================================
 #  Runtime check
 # ==================================================================================================
 class FrexpBisectionSolver(BracketingSolver):
-    """`FrexpBisectionSolver` bisects, and in each step first calls `math.frexp` on the interval width; counted-float
-    cannot count a `math.frexp` call."""
+    """A bisection solver that calls `math.frexp` in each step, an operation that counted-float cannot count; with the
+    `uncounted_operations_raise` fixture active, its solve must fail."""
 
     name = "frexp_bisection"
     version = 1
@@ -53,10 +52,13 @@ def uncounted_operations_raise(monkeypatch):
     """Make counted-float raise `UncountedOperationError` at each solver operation that it cannot count, and let that
     error fail the test.
 
-    `Solver.solve` opens its own `FlopCountingContext`, whose verbosity replaces the verbosity of any context that the
-    test opens around the call, so the fixture patches `FlopCountingContext` in the solver module. `Solver.solve` also
-    records any exception that is not a `SolveException` as `SOLVER_ERROR`, so the fixture makes `_ending_of`, the
-    function that maps the exception to a status, re-raise an `UncountedOperationError`.
+    The verbosity of a `FlopCountingContext` decides whether counted-float raises at an operation that it cannot count.
+    The fixture patches 2 names in the solver module, because of how `Solver.solve` works:
+
+    - `FlopCountingContext`: `Solver.solve` opens its own context, whose verbosity replaces the verbosity of any context
+      that the test opens around the call;
+    - `_ending_of`, the function that maps an exception to a status: `Solver.solve` records any exception that is not a
+      `SolveException` as `SOLVER_ERROR`, so the patched function re-raises an `UncountedOperationError`.
     """
     original_ending_of = solver_module._ending_of
 
@@ -74,7 +76,7 @@ def uncounted_operations_raise(monkeypatch):
 
 
 @pytest.mark.usefixtures("uncounted_operations_raise")
-def test_a_solver_that_calls_an_uncounted_operation_fails_the_solve():
+def test_a_solver_that_calls_an_uncounted_operation_raises():
     """With the fixture active, a solve that calls `math.frexp` raises `UncountedOperationError`."""
     # --- act / assert -----------------
     with pytest.raises(UncountedOperationError, match="frexp"):
@@ -94,8 +96,8 @@ def test_built_in_config_counts_every_operation(config, test_case):
 #  Static checks
 # ==================================================================================================
 def test_no_solver_module_imports_numpy():
-    """No module of the solver packages imports numpy, because counted-float cannot see numpy functions applied to
-    plain floats."""
+    """No module of the solver packages imports numpy, because counted-float cannot detect numpy functions applied
+    to plain floats."""
     # --- act --------------------------
     numpy_imports = []
     for path in sorted(_SOLVERS_DIR.rglob("*.py")):
