@@ -2,6 +2,6 @@
 
 Each family, such as `bracketing`, imports from `core` only.
 
-``SOLVER_IMPLEMENTATIONS_APPROACH.md`` beside this file states what the shipped solvers are for, and the implementation
-choices that they share.
+``SOLVER_IMPLEMENTATIONS_APPROACH.md`` beside this file states what the shipped solvers are for, and their shared
+implementation choices.
 """
