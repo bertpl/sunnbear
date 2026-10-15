@@ -2,7 +2,6 @@
 
 Each family, such as `bracketing`, imports from `core` only.
 
-The implementation principles of the solvers, which decide how each solver implements its published method, are in
-``IMPLEMENTATION_PRINCIPLES.md`` beside this file. The module docstring of each solver's ``solver.py`` records how the
-principles apply to that solver.
+``SOLVER_IMPLEMENTATIONS_APPROACH.md`` beside this file states what the shipped solvers are for, and the implementation
+choices that they share.
 """
