@@ -622,46 +622,22 @@ wheels = [
 
 [[package]]
 name = "max-div"
-version = "0.21.1"
+version = "0.21.8"
 source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version == '3.14.*'",
-    "python_full_version == '3.13.*'",
-    "python_full_version < '3.13'",
-]
 dependencies = [
     { name = "click" },
     { name = "icc-rt", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "intel-cmplr-lib-rt", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "numba", version = "0.67.0", source = { registry = "https://pypi.org/simple" } },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numba", version = "0.67.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.15'" },
+    { name = "numba", version = "0.68.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.15'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.15'" },
+    { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.15'" },
     { name = "scipy" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/57/3f/e7ab3729c8fa73be02ea3bf12166d2f4758f849fd5cdb2b1dff519bd02cd/max_div-0.21.1.tar.gz", hash = "sha256:6881f3466bbad3d3eefee86750dbd42a8e4aed8f829372ce999af046d17ae2bb", size = 267224, upload-time = "2026-10-05T17:19:25.245Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/78/05/7ad48cfb796c4324bf76ecd87cce8c20d6dc65cb8d05a6e873dc19a3218e/max_div-0.21.8.tar.gz", hash = "sha256:c45135c82d4b5c8ca509708b9221debd8973e707c5ab3951ff84294889cadab1", size = 281169, upload-time = "2026-10-16T12:49:42.737Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/65/7b/636110ede7c43c87e56b4c2df1118e7531da366765194a6a4c4c03cfa353/max_div-0.21.1-py3-none-any.whl", hash = "sha256:3d957a907072db754a0574e52bfd39e6e4ec80e0b69f3a794210f060104e97ca", size = 392455, upload-time = "2026-10-05T17:19:23.589Z" },
-]
-
-[[package]]
-name = "max-div"
-version = "0.21.4"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.15'",
-]
-dependencies = [
-    { name = "click" },
-    { name = "icc-rt", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "intel-cmplr-lib-rt", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "numba", version = "0.68.0", source = { registry = "https://pypi.org/simple" } },
-    { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" } },
-    { name = "scipy" },
-    { name = "tqdm" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/98/45/c71b4142f013913f9cf7e0b1d3dd57f960c9189e201309dc7ea514c20898/max_div-0.21.4.tar.gz", hash = "sha256:4f76a0903a55c627ac2f3bb76debddae16ebbb44ebb11f1c8a011c80a048e661", size = 269001, upload-time = "2026-10-10T11:37:06.513Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ed/f8/3c9ccf46bb61c8c38dd8bd0d0c1849d6398679be6a57f7f8aead3414e807/max_div-0.21.4-py3-none-any.whl", hash = "sha256:4875eda49ac518bc3551a210b3740ed8612240d2034d3c1bbfdae5a00b58d02f", size = 394423, upload-time = "2026-10-10T11:37:04.8Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/b8/2194d8247582a9d03126e00e6f2b783bdd96d9d639c7b824ae0ac3d720c5/max_div-0.21.8-py3-none-any.whl", hash = "sha256:09ecb63f067b8aa4a3321479138acbf4bb5e8d5e8714431b30b3f9c0be2f96e3", size = 407941, upload-time = "2026-10-16T12:49:41.118Z" },
 ]
 
 [[package]]
@@ -1645,8 +1621,7 @@ dependencies = [
     { name = "backports-zstd", marker = "python_full_version < '3.14'" },
     { name = "counted-float" },
     { name = "matplotlib" },
-    { name = "max-div", version = "0.21.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.15'" },
-    { name = "max-div", version = "0.21.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.15'" },
+    { name = "max-div" },
     { name = "mpl-composite", version = "0.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.15'" },
     { name = "mpl-composite", version = "0.1.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.15'" },
     { name = "numba", version = "0.67.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.15'" },
@@ -1686,8 +1661,7 @@ requires-dist = [
     { name = "matplotlib", marker = "python_full_version == '3.13.*'", specifier = ">=3.10.7" },
     { name = "matplotlib", marker = "python_full_version == '3.14.*'", specifier = ">=3.10.7" },
     { name = "matplotlib", marker = "python_full_version >= '3.15'", specifier = ">=3.11.2" },
-    { name = "max-div", marker = "python_full_version < '3.15'", specifier = ">=0.21.1" },
-    { name = "max-div", marker = "python_full_version >= '3.15'", specifier = ">=0.21.3" },
+    { name = "max-div", specifier = ">=0.21.8" },
     { name = "mpl-composite", marker = "python_full_version < '3.15'", specifier = ">=0.1.2" },
     { name = "mpl-composite", marker = "python_full_version >= '3.15'", specifier = ">=0.1.4" },
     { name = "numba", marker = "python_full_version == '3.12.*'", specifier = ">=0.60.0" },

@@ -2,20 +2,26 @@
 
 The prediction is for 1 axis, and for 1 allocation of new tuples to the gaps that the `allocation` module defines.
 
-Each gap spreads its new tuples evenly, and where they lie depends on the kind of gap, with c the gap's number of new
-tuples:
+The solves measure distances cyclically (`distances`): each axis is a circle on which 0 and 1 meet. The stretch from
+the highest value of the size below, across 1 and 0, to its lowest value is then 1 gap, the wrap-around gap. Its 2
+parts, the left edge gap from 0 to the lowest value and the right edge gap from the highest value to 1, keep a count of
+new tuples each, because the side on which a new tuple lies decides whether it raises or lowers the size's mean.
+
+Each gap spreads its new tuples evenly, with c the gap's number of new tuples:
 
 - **interior gap:** the c values split the stretch between the values of the 2 neighboring tuples into c + 1 equal
   parts;
-- **edge gap:** the outermost value lies on the edge of the axis, at 0 or 1, and the c values split the stretch between
-  the edge and the neighboring tuple's value into c equal parts.
+- **edge gaps:** the c_left + c_right values of the 2 edge gaps split the wrap-around gap into c_left + c_right + 1
+  equal parts, when that puts exactly c_right of them below 1. Otherwise 1 side holds too many values for the even
+  split: that side spreads its values up to the point where 0 and 1 meet, with its outermost value on that point, and
+  the other side splits its own part evenly (`_edge_gap_placement`).
+
+Each edge gap that holds new tuples reports the spacing of the whole wrap-around gap, the smaller of the 2 sides'
+steps, so that adding a tuple to 1 side shows in the spacing of both.
 
 The stretch is measured between values, not counted from fine lane indices, because 2 gaps with the same number of free
 fine lanes can differ in the length of that stretch by almost 2 fine lanes, depending on where each neighboring tuple's
 value lies inside its fine lane.
-
-The size's max-div solve puts an edge gap's outermost new tuple inside the outermost fine lane, not on the edge, so the
-placement overstates the span of an edge gap's new tuples by at most 1 fine lane.
 
 Each gap's placement is a first value and a step, and `values`, `spacings` and `sums` all derive from these 2 numbers,
 so the spacings and sums always match the values that `values` returns.
@@ -55,18 +61,15 @@ class MCTuplesAxisGapPlacement:
     # --------------------------------------------------------------------------
     #  Placement
     # --------------------------------------------------------------------------
-    @cached_property
+    @property
     def steps(self) -> np.ndarray:
         """Return the distance between consecutive new values of each gap on the axis; 0 for a gap without any."""
-        is_edge = self.gaps.is_left_edge | self.gaps.is_right_edge
-        n_parts = np.where(is_edge, self.counts, self.counts + 1)
-        steps = (self.gaps.highs - self.gaps.lows) / np.maximum(n_parts, 1)
-        return np.where(self.counts > 0, steps, 0.0)
+        return self._first_values_and_steps[1]
 
-    @cached_property
+    @property
     def first_values(self) -> np.ndarray:
-        """Return the lowest new value of each gap: 0 for the left edge gap, 1 step above its lower bound otherwise."""
-        return np.where(self.gaps.is_left_edge, 0.0, self.gaps.lows + self.steps)
+        """Return the lowest new value of each gap."""
+        return self._first_values_and_steps[0]
 
     def values(self, gap: int) -> np.ndarray:
         """Return the new values of `gap`, ascending."""
@@ -84,8 +87,29 @@ class MCTuplesAxisGapPlacement:
     # --------------------------------------------------------------------------
     @cached_property
     def spacings(self) -> np.ndarray:
-        """Return each gap's spacing, the distance between neighboring values, in fine lanes; inf for an empty gap."""
-        return np.where(self.counts > 0, self.steps * N_FINE_LANES, np.inf)
+        """Return each gap's spacing, the distance between neighboring values, in fine lanes; inf for an empty gap.
+
+        Each edge gap with new tuples reports the spacing of the wrap-around gap, the smaller of the 2 edge gaps' steps.
+        """
+        has_values = self.counts > 0
+        spacings = np.where(has_values, self.steps * N_FINE_LANES, np.inf)
+        edge_gaps = self.gaps.edge_gaps
+        if edge_gaps.size > 0:
+            spacings[edge_gaps] = np.where(has_values[edge_gaps], spacings[edge_gaps].min(), np.inf)
+        return spacings
+
+    def spacings_after_adding_1(self) -> np.ndarray:
+        """Return each gap's spacing, in fine lanes, after that gap alone takes 1 more new tuple.
+
+        Adding a tuple to 1 edge gap changes the placement of both, so each edge gap's entry comes from its own
+        placement; every other entry comes from 1 placement with 1 more tuple in every gap.
+        """
+        spacings = self._with_1_more_per_gap.spacings.copy()
+        for gap in self.gaps.edge_gaps:
+            counts = self.counts.copy()
+            counts[gap] += 1
+            spacings[gap] = MCTuplesAxisGapPlacement(self.gaps, counts).spacings[gap]
+        return spacings
 
     @cached_property
     def sums(self) -> np.ndarray:
@@ -130,6 +154,10 @@ class MCTuplesAxisGapPlacement:
         - a move out of a gap without new tuples;
         - a move into a gap without free fine lanes;
         - a move from a gap to itself.
+
+        A move between interior gaps changes the spacings and sums of gaps `s` and `d` only, so those entries are
+        computed for all moves at once. A move into or out of an edge gap also changes the other edge gap's placement,
+        so each such entry is computed from the placement after that move.
         """
         # A move leaves the size unchanged, and changes the sums of gaps `s` and `d` only.
         size = self.gaps.n_required + int(self.counts.sum())
@@ -140,11 +168,66 @@ class MCTuplesAxisGapPlacement:
         is_valid = (self.counts >= 1)[:, None] & (self.counts < self.gaps.n_free_lanes)[None, :]
         np.fill_diagonal(is_valid, False)
         # Moving 1 tuple between gaps keeps the number of new tuples, so `offset_weight` is the same for every entry.
-        return np.where(is_valid, self._min_spacing_after_each_move() - self.offset_weight * offset_after, -np.inf)
+        corrected = np.where(is_valid, self._min_spacing_after_each_move() - self.offset_weight * offset_after, -np.inf)
+        for edge_gap in self.gaps.edge_gaps.tolist():
+            moves = [(edge_gap, destination) for destination in np.flatnonzero(is_valid[edge_gap]).tolist()]
+            moves += [(source, edge_gap) for source in np.flatnonzero(is_valid[:, edge_gap]).tolist()]
+            for source, destination in moves:
+                corrected[source, destination] = self.after_move(source, destination).corrected_min_spacing
+        return corrected
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
+    @cached_property
+    def _first_values_and_steps(self) -> tuple[np.ndarray, np.ndarray]:
+        """Return the first value and the step of each gap; the step is 0 for a gap without new tuples."""
+        counts = np.maximum(self.counts, 0)
+        steps = (self.gaps.highs - self.gaps.lows) / (counts + 1)
+        first_values = self.gaps.lows + steps
+        left_gap, right_gap = self.gaps.left_edge_gap, self.gaps.right_edge_gap
+        if left_gap is not None or right_gap is not None:
+            n_left = int(counts[left_gap]) if left_gap is not None else 0
+            n_right = int(counts[right_gap]) if right_gap is not None else 0
+            left_first, left_step, right_first, right_step = self._edge_gap_placement(
+                self.gaps.lowest_value, self.gaps.highest_value, n_left, n_right
+            )
+            if left_gap is not None:
+                first_values[left_gap], steps[left_gap] = left_first, left_step
+            if right_gap is not None:
+                first_values[right_gap], steps[right_gap] = right_first, right_step
+        return first_values, np.where(counts > 0, steps, 0.0)
+
+    @staticmethod
+    def _edge_gap_placement(
+        lowest_value: float, highest_value: float, n_left: int, n_right: int
+    ) -> tuple[float, float, float, float]:
+        """Return the first value and the step of the left edge gap, then those of the right edge gap.
+
+        The left edge gap holds `n_left` new values between 0 and `lowest_value`, the right edge gap `n_right` between
+        `highest_value` and 1; the module docstring describes the 3 cases. A side without values gets a step of inf,
+        which no caller reads, because a gap without new tuples has no values.
+        """
+        left_width, right_width = lowest_value, 1.0 - highest_value
+        even_step = (left_width + right_width) / (n_left + n_right + 1)
+        left_step_when_full = left_width / n_left if n_left > 0 else np.inf
+        right_step_when_full = right_width / n_right if n_right > 0 else np.inf
+        if even_step <= min(left_step_when_full, right_step_when_full):
+            # 1 even chain from the highest value, across 1 and 0, to the lowest value.
+            left_first, left_step = highest_value + (n_right + 1) * even_step - 1.0, even_step
+            right_first, right_step = highest_value + even_step, even_step
+        elif right_step_when_full < left_step_when_full:
+            # The right side holds too many values: its highest value lies on 1.
+            left_step = left_width / (n_left + 1)
+            left_first = left_step
+            right_first, right_step = highest_value + right_step_when_full, right_step_when_full
+        else:
+            # The left side holds too many values: its lowest value lies on 0.
+            left_first, left_step = 0.0, left_step_when_full
+            right_step = right_width / (n_right + 1)
+            right_first = highest_value + right_step
+        return left_first, left_step, right_first, right_step
+
     @cached_property
     def _with_1_fewer_per_gap(self) -> "MCTuplesAxisGapPlacement":
         """Return the placement with 1 new tuple fewer in every gap; an empty gap's count becomes -1."""
@@ -158,9 +241,10 @@ class MCTuplesAxisGapPlacement:
     def _min_spacing_after_each_move(self) -> np.ndarray:
         """Return the matrix whose entry `[s, d]` is the smallest spacing after moving 1 tuple from gap `s` to gap `d`.
 
-        A move changes the spacings of `s` and `d` only, so the smallest spacing after the move is the smallest of 3
-        values: the new spacings of `s` and `d`, and the smallest spacing among the other gaps, which is 1 of the 3
-        smallest spacings before the move.
+        A move between interior gaps changes the spacings of `s` and `d` only, so the smallest spacing after the move is
+        the smallest of 3 values: the new spacings of `s` and `d`, and the smallest spacing among the other gaps, which
+        is 1 of the 3 smallest spacings before the move. The entries of moves into or out of an edge gap are not valid
+        here; `corrected_min_spacing_after_each_move` replaces them.
         """
         spacings = self.spacings
         n_gaps = spacings.size

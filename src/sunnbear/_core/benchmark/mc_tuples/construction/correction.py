@@ -12,9 +12,9 @@
 In the mean correction, the tuples of the size below stay where they are; per axis, only the new tuples move, toward
 the side that the mean needs (`MCTuplesAxisValueCorrection`).
 
-A new tuple in the first or the last fine lane of an axis stays where it is on that axis too, so that both outer fine
-lanes stay filled; on that axis, the rules below treat such a tuple as a tuple of the size below. At the smallest size,
-`MCTuplesSelectionSolve` fills both outer fine lanes.
+The rules measure the lowest value's spacing from the edge of the axis, at 0. The solves measure distances
+cyclically, and the lowest value's spacing from 0 is never more than its cyclic spacing from the highest value, its
+neighbor across 0 and 1, so the cap never shrinks that cyclic spacing below the cap D.
 
 The rules are written for a mean above 0.5, where the new tuples move left, over the size's values u_0 < u_1 < … in
 ascending order, with w the width of a fine lane:
@@ -241,30 +241,24 @@ class MCTuplesAxisValueCorrection:
     def of(cls, required_values: np.ndarray, new_values: np.ndarray) -> "MCTuplesAxisValueCorrection":
         """Return 1 axis whose new values moved so that the mean of both arrays' values is 0.5, if possible.
 
-        A new value in an outer fine lane does not move in the mean correction; the nudge then moves every new value
-        with fewer than `MIN_N_BITS` bits.
+        The nudge then moves every new value with fewer than `MIN_N_BITS` bits.
 
         Raises:
             MCTuplesConstructionError: If the nudge finds no value with `MIN_N_BITS` bits inside a value's fine lane.
         """
         size = required_values.size + new_values.size
-        is_in_outer_lane = np.isin(fine_lanes_of(new_values), (0, N_FINE_LANES - 1))
-        immovable_values = np.concatenate([required_values, new_values[is_in_outer_lane]])
-        movable_values = new_values[~is_in_outer_lane]
+        immovable_values, movable_values = required_values, new_values
         target_mean_of_movable = (TARGET_MEAN * size - immovable_values.sum()) / movable_values.size
         is_shift_left = bool(movable_values.mean() > target_mean_of_movable)
         moved_values_of_cap = cls._moved_values_of_cap(immovable_values, movable_values, is_shift_left)
         cap = cls._solve_cap(moved_values_of_cap, target_mean_of_movable)
-        mean_corrected_new_values = new_values.copy()
-        mean_corrected_new_values[~is_in_outer_lane] = moved_values_of_cap(cap)
+        mean_corrected_new_values = moved_values_of_cap(cap)
         corrected_new_values = cls._nudged_values(mean_corrected_new_values)
         return cls(
             cap=cap,
             corrected_new_values=corrected_new_values,
             offset_before_fine_lanes=cls._offset_fine_lanes(movable_values, target_mean_of_movable, size),
-            offset_after_fine_lanes=cls._offset_fine_lanes(
-                corrected_new_values[~is_in_outer_lane], target_mean_of_movable, size
-            ),
+            offset_after_fine_lanes=cls._offset_fine_lanes(corrected_new_values, target_mean_of_movable, size),
             max_move_fine_lanes=float(np.abs(corrected_new_values - new_values).max() * N_FINE_LANES),
             n_nudged=int((corrected_new_values != mean_corrected_new_values).sum()),
         )
