@@ -1,56 +1,4 @@
-"""`Secant` implements the secant method, which evaluates the zero of the line through the 2 latest iterates.
-
-The rest of this docstring is the record of `Secant` under the solver implementation principles
-(``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
-
-Sources:
-    - I - article:
-      - none: the secant method is a classical method with no article of its own.
-    - II - authors' code:
-      - none.
-    - III - third party:
-      - SciPy's ``scipy.optimize.newton``, without a derivative;
-      - Press et al. (2007), section 9.2: prose and the routine ``rtsec``;
-      - Atkinson (1989), section 2.3: equation 2.3.1, and Table 2.3, which reports a run of the secant method on 1
-        problem.
-    - IV - own judgment:
-      - none.
-
-Source per aspect:
-    Every aspect follows SciPy, which P1 prefers among third-party sources, except:
-    - Equal function values at the 2 latest x-values end the solve as ``DIVERGED``, since the secant's zero lies at
-      infinity. SciPy returns the midpoint of these 2 x-values, flagged as not converged, a result that the framework
-      has no status for.
-    - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound after the 2
-      evaluations at the bounds, as for every solver. SciPy evaluates that bound a 3rd time, for the same result.
-    - PRINCIPLE-GAP (P1): no single rule for choosing which interval bound starts as the newest x-value reproduces
-      both Table 1 of Oliveira and Takahashi (2020) and Table 2.3 of Atkinson (1989). P1 prefers SciPy only among
-      sources that pass validation, so P1 does not decide this rule. The code keeps SciPy's rule, the bound with the
-      larger ``|f|``. With that rule:
-      - Oliveira and Takahashi's Table 1 has 3 counts that differ by 1 from those of `Secant`;
-      - Atkinson's Table 2.3 is not reproduced, because it needs the rule of Press et al., the bound with the smaller
-        ``|f|``.
-    - Translation of ``xtol`` (P7): ``xtol`` is SciPy's absolute tolerance ``tol``, with its relative tolerance
-      ``rtol`` at 0, SciPy's default.
-
-Validation:
-    - A - authors' results:
-      - none exists.
-    - B - third-party results:
-      - PRINCIPLE-CONFLICT (P4): not used: Oliveira and Takahashi (2020), Table 1, the column "Secant", which no test
-        checks; the TBD entry below would resolve the conflict.
-      - not used: Atkinson (1989), Table 2.3, which needs the rule of Press et al. for which bound starts as the newest
-        x-value (see the PRINCIPLE-GAP (P1) entry).
-      - TBD: Oliveira and Takahashi (2020), Table 1, the column "Secant": 20 of its 24 counts match those of `Secant`,
-        and 4 differ; the docstring of the test package ``tests.solvers.open.secant`` gives the details.
-    - C - reference implementation:
-      - used: a twin test checks that `Secant` evaluates the same x-values as SciPy's ``scipy.optimize.newton``,
-        and stops and returns where SciPy does.
-
-Variants:
-    - `SecantConfig`, the only config, is secondary (P8); its deviations from the principles are the entries marked
-      PRINCIPLE-CONFLICT above.
-"""
+"""`Secant` implements the secant method, which evaluates the zero of the line through the 2 latest iterates."""
 
 from sunnbear._core.solvers.core import Solver, SolveState
 from sunnbear._core.solvers.core.exceptions import DivergedError
@@ -77,6 +25,8 @@ class Secant(Solver):
       ``xtol``, and returns that next x-value without evaluating it.
     - **Equal function values:** when the 2 latest x-values have equal function values, the secant is horizontal and
       its zero lies at infinity. `Secant` then raises `DivergedError`, which `Solver.solve` records as ``DIVERGED``.
+      Raising `DivergedError` deviates from SciPy, which returns the midpoint of the 2 x-values and flags it as not
+      converged; the framework has no status for such a result.
 
     A small step does not show that the next x-value is close to a root: on a function that is nearly flat between 2
     x-values, a step taken far from the root can be smaller than ``xtol``.
@@ -90,7 +40,8 @@ class Secant(Solver):
         - SciPy's ``scipy.optimize.newton``, without a derivative; the test suite checks `Secant` against
           ``scipy.optimize.newton``.
         - Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition, section 2.3.
-          John Wiley & Sons.
+          John Wiley & Sons. Its error test for the secant method, which measures the error by the step between 2
+          successive iterates, is the stopping criterion of `Secant`.
         - Oliveira, I. F. D. and Takahashi, R. H. C. (2020). An enhancement of the bisection method average
           performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), article 5. Its
           Table 1 holds the column "Secant", for a secant method that stops once the smaller ``|f|`` of its 2 latest
