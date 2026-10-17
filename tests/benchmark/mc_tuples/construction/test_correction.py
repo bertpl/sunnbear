@@ -1,5 +1,5 @@
-"""The value correction moves only the new tuples, brings the mean to exactly 0.5 when it can, nudges each new value to
-at least `MIN_N_BITS` bits, and never puts 2 tuples in 1 fine lane."""
+"""The value correction moves only the new tuples, or rotates each axis of the smallest size, brings the mean to exactly
+0.5 when it can, nudges each new value to at least `MIN_N_BITS` bits, and never puts 2 tuples in 1 fine lane."""
 
 import numpy as np
 import pytest
@@ -45,6 +45,7 @@ def test_the_correction_keeps_the_fine_lanes_the_order_and_the_size_below_and_mo
     moves = moves[np.abs(moves) > 1e-12]
     assert np.all(moves <= 0) or np.all(moves >= 0)
     assert np.all((all_after > 0) & (all_after < 1))
+    assert correction.cap is not None
     if correction.cap > CAP_RANGE[0] * 1.001:
         assert correction.offset_after_fine_lanes == pytest.approx(0.0, abs=1e-9)
         assert all_after.mean() == pytest.approx(0.5, abs=1e-12)
@@ -65,30 +66,8 @@ def test_the_correction_takes_the_shift_from_the_largest_spacings():
     assert correction.offset_before_fine_lanes == pytest.approx((0.1 + 0.9 + 0.3 + 0.75) / 4 * N_FINE_LANES - 512)
     assert correction.corrected_new_values[0] == pytest.approx(0.3)  # its spacing to 0.1 lies below the cap
     assert correction.max_move_fine_lanes == pytest.approx(0.05 * N_FINE_LANES)
-    assert correction.cap_fine_lanes == pytest.approx((0.7 - 0.3) * N_FINE_LANES - 1)
-
-
-@pytest.mark.parametrize(
-    "outer_value, other_new_values, required",
-    [
-        (0.5 / N_FINE_LANES, [0.4, 0.45], [0.3]),  # a right shift would move outer_value out of fine lane 0
-        (1023.5 / N_FINE_LANES, [0.6, 0.55], [0.7]),  # a left shift would move outer_value out of the last fine lane
-    ],
-)
-def test_the_correction_leaves_a_new_tuple_in_an_outer_fine_lane_in_place(outer_value, other_new_values, required):
-    """A new tuple in fine lane 0 or in the last fine lane stays where it is in the mean correction, and the other new
-    tuples bring the mean to 0.5."""
-    # --- arrange ----------------------
-    new = np.array([outer_value, *other_new_values])
-
-    # --- act --------------------------
-    correction = MCTuplesAxisValueCorrection.of(np.array(required), new)
-
-    # --- assert -----------------------
-    # The mean correction leaves the outer value in place, and the nudge moves it by a few float64 steps at most.
-    assert correction.corrected_new_values[0] == pytest.approx(outer_value, abs=1e-15)
-    assert np.all(correction.corrected_new_values[1:] != new[1:])
-    assert np.concatenate([required, correction.corrected_new_values]).mean() == pytest.approx(0.5, abs=1e-12)
+    assert correction.cap == pytest.approx(0.7 - 0.3 - 1 / N_FINE_LANES)
+    assert correction.shift is None
 
 
 def test_the_correction_nudges_each_new_value_below_min_n_bits_within_its_fine_lane():
@@ -163,3 +142,87 @@ def test_value_correction_refuses_a_size_that_holds_2_tuples_in_1_fine_lane():
     # --- act / assert -----------------
     with pytest.raises(MCTuplesConstructionError, match="a fine u-lane holds 2 tuples"):
         MCTuplesValueCorrection.of(tuple_array, n_required=2)
+
+
+@pytest.mark.parametrize(
+    "values, expected_shift",
+    [
+        # Mean 0.475: the shifts 0.025, 0.275, -0.475 and -0.225 give a mean of 0.5.
+        ([0.1, 0.3, 0.6, 0.9], 0.025),
+        # Mean 0.59975: the shifts 0.15025, 0.40025, -0.34975 and -0.09975 give a mean of 0.5.
+        ([0.2, 0.4, 0.8, 0.999], -0.09975),
+    ],
+)
+def test_the_rotation_takes_the_shift_nearest_to_0_that_gives_a_mean_of_0_5(values, expected_shift):
+    """The rotation adds the same shift to every value, modulo 1, picks the shift nearest to 0 among those that give a
+    mean of 0.5, and moves each value by a few float64 steps at most beyond the shift."""
+    # --- arrange ----------------------
+    values = np.array(values)
+
+    # --- act --------------------------
+    correction = MCTuplesAxisValueCorrection.rotated(values)
+
+    # --- assert -----------------------
+    assert correction.cap is None
+    assert correction.shift == pytest.approx(expected_shift)
+    assert correction.corrected_new_values == pytest.approx((values + expected_shift) % 1.0, abs=1e-15)
+    assert correction.corrected_new_values.mean() == pytest.approx(0.5, abs=1e-12)
+    assert correction.offset_before_fine_lanes == pytest.approx((values.mean() - 0.5) * N_FINE_LANES)
+    assert correction.max_move_fine_lanes == pytest.approx(abs(expected_shift) * N_FINE_LANES)
+
+
+@pytest.mark.parametrize("seed", range(20))
+def test_the_rotation_keeps_every_cyclic_distance_and_1_tuple_per_fine_lane(seed):
+    """On random axes of the smallest size whose values lie more than 1 fine lane apart, the rotation keeps each value's
+    fine lane to itself, keeps every cyclic distance up to the nudge, and reaches a mean of 0.5."""
+    # --- arrange ----------------------
+    rng = np.random.default_rng(seed)
+    # Every other fine lane, so that 2 values lie more than 1 fine lane apart and no shift puts them into 1 fine lane.
+    lanes = 2 * rng.choice(N_FINE_LANES // 2, size=32, replace=False)
+    values = (lanes + rng.uniform(0.01, 0.99, size=32)) / N_FINE_LANES
+
+    # --- act --------------------------
+    correction = MCTuplesAxisValueCorrection.rotated(values)
+
+    # --- assert -----------------------
+    corrected = correction.corrected_new_values
+    assert correction.shift is not None
+    differences = np.abs(values[:, None] - values[None, :])
+    corrected_differences = np.abs(corrected[:, None] - corrected[None, :])
+    assert np.minimum(corrected_differences, 1 - corrected_differences) == pytest.approx(
+        np.minimum(differences, 1 - differences), abs=1e-12
+    )
+    assert np.bincount(fine_lanes_of(corrected)).max() == 1
+    assert corrected.mean() == pytest.approx(0.5, abs=1e-12)
+
+
+def test_the_rotation_falls_back_to_the_mean_correction_when_it_would_put_2_tuples_in_1_fine_lane():
+    """Values at 100.9 and 101.1 fine lanes, with a mean of 425.625 fine lanes, need a shift of 86.375 fine lanes plus
+    a multiple of 256, which puts both values into 1 fine lane, so the axis gets the mean correction instead."""
+    # --- arrange ----------------------
+    values = np.array([100.9, 101.1, 700.3, 800.2]) / N_FINE_LANES
+
+    # --- act --------------------------
+    correction = MCTuplesAxisValueCorrection.rotated(values)
+
+    # --- assert -----------------------
+    assert correction.shift is None
+    assert correction.cap is not None
+    assert np.bincount(fine_lanes_of(correction.corrected_new_values)).max() == 1
+    assert correction.corrected_new_values.mean() == pytest.approx(0.5, abs=1e-12)
+
+
+def test_value_correction_rotates_both_axes_of_the_smallest_size():
+    """Both axes of a size with no size below get a rotation, and both means end at 0.5."""
+    # --- arrange ----------------------
+    tuple_array = np.array([[0.1, 0.2], [0.3, 0.4], [0.6, 0.8], [0.9, 0.999]])
+
+    # --- act --------------------------
+    correction = MCTuplesValueCorrection.rotated(tuple_array)
+
+    # --- assert -----------------------
+    assert correction.u.shift == pytest.approx(0.025)
+    assert correction.v.shift == pytest.approx(-0.09975)
+    assert correction.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
+    assert correction.u.corrected_new_values.tolist() == correction.tuple_array[:, 0].tolist()
+    assert correction.v.corrected_new_values.tolist() == correction.tuple_array[:, 1].tolist()

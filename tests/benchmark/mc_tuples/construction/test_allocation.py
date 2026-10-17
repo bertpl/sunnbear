@@ -21,7 +21,8 @@ _SPREAD_VALUES = (np.round(np.linspace(0, N_FINE_LANES - 1, 32)) + 0.5) / N_FINE
 #  MCTuplesAxisGaps
 # ==================================================================================================
 def test_of_finds_the_gaps_with_their_edges_and_bounds():
-    """Each maximal run of free fine lanes is a gap with its edge flags and bounds; adjacent lanes leave none."""
+    """Each maximal run of free fine lanes is a gap with its edge flags and bounds, and adjacent lanes leave none; the
+    lowest and highest values of the size below bound the wrap-around gap."""
     # --- act --------------------------
     gaps = MCTuplesAxisGaps.of(_VALUES)
 
@@ -32,6 +33,8 @@ def test_of_finds_the_gaps_with_their_edges_and_bounds():
     assert gaps.is_right_edge.tolist() == [False, False, True]
     assert gaps.lows.tolist() == [0.0, _VALUES[0], _VALUES[2]]
     assert gaps.highs.tolist() == [_VALUES[0], _VALUES[1], 1.0]
+    assert gaps.edge_gaps.tolist() == [0, 2]
+    assert (gaps.lowest_value, gaps.highest_value) == (_VALUES[0], _VALUES[2])
     assert gaps.n_required == 3
     assert gaps.required_sum == pytest.approx(_VALUES.sum())
 
@@ -44,6 +47,8 @@ def test_of_leaves_out_an_edge_gap_when_a_tuple_of_the_size_below_lies_in_the_ou
     # --- assert -----------------------
     assert gaps.first_lanes.tolist() == [1, 501]
     assert not gaps.is_left_edge.any()
+    assert gaps.left_edge_gap is None
+    assert gaps.edge_gaps.tolist() == [1]
 
 
 def test_greedy_counts_give_each_new_tuple_to_the_gap_that_keeps_the_widest_spacing():
@@ -53,6 +58,22 @@ def test_greedy_counts_give_each_new_tuple_to_the_gap_that_keeps_the_widest_spac
 
     # --- act / assert -----------------
     assert gaps.greedy_counts(3).tolist() == [0, 1, 2]
+
+
+def test_greedy_counts_score_a_new_tuple_in_an_edge_gap_by_the_spacing_of_the_wrap_around_gap():
+    """Of 4 new tuples, the first 3 go to the interior gap 466 fine lanes wide and the 4th to the interior gap 225 wide,
+    at a spacing of 112.5; the left edge gap, 151.5 wide, would give it only 90.5, because with the right edge gap, 29.5
+    wide, a tuple there splits their wrap-around gap of 181 into 2 parts."""
+    # --- arrange ----------------------
+    gaps = MCTuplesAxisGaps.of((np.array([151, 376, 528, 994]) + 0.5) / N_FINE_LANES)
+
+    # --- act --------------------------
+    counts = gaps.greedy_counts(4)
+
+    # --- assert -----------------------
+    spacings_after_adding_1 = MCTuplesAxisGapPlacement(gaps, np.array([0, 0, 0, 3, 0])).spacings_after_adding_1()
+    assert spacings_after_adding_1[:2] == pytest.approx([90.5, 112.5])
+    assert counts.tolist() == [0, 1, 0, 3, 0]
 
 
 def test_greedy_counts_give_the_new_tuple_to_the_gap_whose_neighbors_values_are_farther_apart():
@@ -108,7 +129,7 @@ def test_mean_aware_counts_trade_spacing_for_offset_at_twice_the_rate_when_the_s
     """With 4 tuples in the size below and 4 new ones, the offset weight is 2, so the search moves away from a greedy
     allocation whose `corrected_min_spacing` would be higher than the result's with a weight of 1."""
     # --- arrange ----------------------
-    gaps = MCTuplesAxisGaps.of((np.array([151, 376, 528, 994]) + 0.5) / N_FINE_LANES)
+    gaps = MCTuplesAxisGaps.of((np.array([51, 200, 511, 974]) + 0.5) / N_FINE_LANES)
     greedy_counts = gaps.greedy_counts(4)
 
     # --- act --------------------------
@@ -117,12 +138,12 @@ def test_mean_aware_counts_trade_spacing_for_offset_at_twice_the_rate_when_the_s
     # --- assert -----------------------
     greedy_placement = MCTuplesAxisGapPlacement(gaps, greedy_counts)
     mean_aware_placement = MCTuplesAxisGapPlacement(gaps, counts)
-    assert greedy_counts.tolist() == [1, 0, 0, 3, 0]
-    assert counts.tolist() == [1, 0, 1, 2, 0]
+    assert greedy_counts.tolist() == [0, 0, 1, 3, 0]
+    assert counts.tolist() == [0, 1, 0, 3, 0]
     assert greedy_placement.offset_weight == mean_aware_placement.offset_weight == 2.0
-    assert (greedy_placement.spacings.min(), greedy_placement.offset_fine_lanes) == pytest.approx((116.5, 29.9375))
+    assert (greedy_placement.spacings.min(), greedy_placement.offset_fine_lanes) == pytest.approx((115.75, 28.375))
     assert (mean_aware_placement.spacings.min(), mean_aware_placement.offset_fine_lanes) == pytest.approx(
-        (76.0, -8.6875)
+        (74.5, -0.375)
     )
     assert greedy_placement.spacings.min() - abs(greedy_placement.offset_fine_lanes) > (
         mean_aware_placement.spacings.min() - abs(mean_aware_placement.offset_fine_lanes)

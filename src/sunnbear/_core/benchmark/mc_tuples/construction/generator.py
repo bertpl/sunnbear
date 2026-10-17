@@ -11,9 +11,9 @@ tuples of the set share a fine lane.
 2. it draws the size's population of candidate tuples over the fine lanes of the gaps that get new tuples, each value
    with at least `MIN_N_BITS` bits of information (`population`);
 3. the selection solve, a max-div solve, picks the new tuples from the population (`selection`);
-4. the first value correction moves the new tuples so that the size's mean u and mean v are exactly 0.5, then moves
-   each new value with fewer than `MIN_N_BITS` bits by a few float64 steps to a value with at least `MIN_N_BITS` bits
-   (`correction`);
+4. the first value correction moves the new tuples so that the size's mean u and mean v are exactly 0.5, and for the
+   smallest size it rotates each axis instead; it then moves each new value with fewer than `MIN_N_BITS` bits by a few
+   float64 steps to a value with at least `MIN_N_BITS` bits (`correction`);
 5. the refinement solve, a second max-div solve, moves each new tuple within its fine cell, the crossing of its fine
    u-lane and fine v-lane; its candidates lie only in the fine cells of the corrected new tuples (`refinement`);
 6. the second value correction brings the means back to 0.5, after the refinement moved them, and again moves each new
@@ -189,7 +189,10 @@ class MCTuplesGenerator:
         selected_tuple_array, selection_solution = selection_solve.run(t_budget_sec - t_refinement_budget_sec)
 
         # --- first value correction -------------
-        first_value_correction = MCTuplesValueCorrection.of(selected_tuple_array, size.n_required)
+        if size.n_required == 0:
+            first_value_correction = MCTuplesValueCorrection.rotated(selected_tuple_array)
+        else:
+            first_value_correction = MCTuplesValueCorrection.of(selected_tuple_array, size.n_required)
 
         # --- refinement -------------------------
         refinement_solve = MCTuplesRefinementSolve(
@@ -241,10 +244,12 @@ def generate_mc_tuples(
 
     Both solves maximize the geomean of 3 values of gpq(0.1), the geometric pseudo-quantile at level 0.1, a soft
     minimum that `MCTuplesStats` reports: one over each tuple's distance to its nearest other tuple along u, one along v
-    and one in squared L2.
+    and one in squared L2. Every distance is measured cyclically: each axis is a circle on which 0 and 1 meet, so a
+    size need not reach the ends of u and of v.
 
     A correction moves the new tuples to bring the size's means to 0.5 before the refinement solve, and a second
-    correction after it.
+    correction after it; the smallest size's first correction rotates each axis instead, which keeps every cyclic
+    distance.
 
     The construction splits `t_total_sec` over its sizes: each size gets 1 % of the total, plus a part of the rest in
     proportion to its size times the selection solve's number of candidate tuples, which is the population plus the
