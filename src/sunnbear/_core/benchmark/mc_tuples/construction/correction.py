@@ -12,6 +12,11 @@
 In the mean correction, the tuples of the size below stay where they are; per axis, only the new tuples move, toward
 the side that the mean needs (`MCTuplesAxisValueCorrection`).
 
+The first correction of the smallest size rotates each axis instead of the mean correction
+(`MCTuplesValueCorrection.rotated`): that size has no size below to keep in place, and a rotation keeps every cyclic
+distance, where the mean correction shrinks the largest spacings. An axis on which the rotation would put 2 tuples into
+1 fine lane gets the mean correction.
+
 The rules measure the lowest value's spacing from the edge of the axis, at 0. The solves measure distances
 cyclically, and the lowest value's spacing from 0 is never more than its cyclic spacing from the highest value, its
 neighbor across 0 and 1, so the cap never shrinks that cyclic spacing below the cap D.
@@ -113,6 +118,21 @@ class MCTuplesValueCorrection:
                 )
         return cls(u=u, v=v, tuple_array=corrected_tuple_array)
 
+    @classmethod
+    def rotated(cls, tuple_array: np.ndarray) -> "MCTuplesValueCorrection":
+        """Return the smallest size in `tuple_array` with each axis rotated to a mean of 0.5, then nudged.
+
+        An axis on which every rotation to a mean of 0.5 puts 2 tuples in 1 fine lane gets the mean correction
+        instead (`MCTuplesAxisValueCorrection.rotated`).
+
+        Raises:
+            MCTuplesConstructionError: If the nudge finds no value with at least `MIN_N_BITS` bits inside a value's fine
+                lane.
+        """
+        u = MCTuplesAxisValueCorrection.rotated(tuple_array[:, 0])
+        v = MCTuplesAxisValueCorrection.rotated(tuple_array[:, 1])
+        return cls(u=u, v=v, tuple_array=np.column_stack([u.corrected_new_values, v.corrected_new_values]))
+
 
 # ==================================================================================================
 #  MCTuplesAxisValueCorrection
@@ -122,26 +142,24 @@ class MCTuplesAxisValueCorrection:
     """`MCTuplesAxisValueCorrection` holds 1 axis of 1 size after the correction, and what the correction did.
 
     Attributes:
-        cap: The cap D, as a distance on the axis.
+        cap: The cap D of the mean correction, as a distance on the axis; None when the correction rotated the axis.
+        shift: The shift of the rotation, as a distance on the axis in (-0.5, 0.5]; None when the correction did not
+            rotate the axis.
         corrected_new_values: The new tuples' values after the correction, in their original order.
         offset_before_fine_lanes: The offset of the size's mean from 0.5 before the correction, in fine lanes.
         offset_after_fine_lanes: The same after the correction; apart from rounding, it is 0 unless the correction
             could not reach 0.5.
-        max_move_fine_lanes: The largest move of a new tuple, in fine lanes.
+        max_move_fine_lanes: The largest move of a new tuple, in fine lanes, measured cyclically.
         n_nudged: The number of new values that the nudge moved.
     """
 
-    cap: float
+    cap: float | None
+    shift: float | None
     corrected_new_values: np.ndarray
     offset_before_fine_lanes: float
     offset_after_fine_lanes: float
     max_move_fine_lanes: float
     n_nudged: int
-
-    @property
-    def cap_fine_lanes(self) -> float:
-        """Return the cap D in fine lanes."""
-        return self.cap * N_FINE_LANES
 
     # --------------------------------------------------------------------------
     #  Helpers
@@ -256,9 +274,49 @@ class MCTuplesAxisValueCorrection:
         corrected_new_values = cls._nudged_values(mean_corrected_new_values)
         return cls(
             cap=cap,
+            shift=None,
             corrected_new_values=corrected_new_values,
             offset_before_fine_lanes=cls._offset_fine_lanes(movable_values, target_mean_of_movable, size),
             offset_after_fine_lanes=cls._offset_fine_lanes(corrected_new_values, target_mean_of_movable, size),
             max_move_fine_lanes=float(np.abs(corrected_new_values - new_values).max() * N_FINE_LANES),
             n_nudged=int((corrected_new_values != mean_corrected_new_values).sum()),
         )
+
+    @classmethod
+    def rotated(cls, values: np.ndarray) -> "MCTuplesAxisValueCorrection":
+        """Return 1 axis of the smallest size, rotated by a shift modulo 1 to a mean of 0.5, then nudged.
+
+        As the shift grows from 0 to 1, the mean rises with slope 1 and drops by `1/k` each time a value wraps from 1
+        to 0, so 1 or more shifts give a mean of 0.5; the rotation takes the one nearest to 0, modulo 1.
+
+        A shift can put 2 values less than 1 fine lane apart into 1 fine lane. The shifts to a mean of 0.5 differ by
+        multiples of `1/k`, a whole number of fine lanes, so then every one of them does, and the axis gets the mean
+        correction instead, as `of` gives it to an axis with no size below.
+
+        Raises:
+            MCTuplesConstructionError: If the nudge finds no value with `MIN_N_BITS` bits inside a value's fine lane.
+        """
+        k = values.size
+        shifts = []
+        for n_wrapped in range(k + 1):
+            # Between 2 wraps the mean is `values.mean() + shift - n_wrapped / k`; this shift reaches 0.5 only if
+            # exactly `n_wrapped` values wrap at it, which the mean of the rotated values then shows.
+            shift = TARGET_MEAN - values.mean() + n_wrapped / k
+            if 0.0 <= shift < 1.0 and abs(((values + shift) % 1.0).mean() - TARGET_MEAN) < 0.5 / k:
+                shifts.append(shift if shift <= 0.5 else shift - 1.0)
+        for shift in sorted(shifts, key=abs):
+            rotated_values = (values + shift) % 1.0
+            # A value on 0 exactly has no value with `MIN_N_BITS` bits near it inside its fine lane.
+            if np.bincount(fine_lanes_of(rotated_values)).max() == 1 and rotated_values.min() > 0.0:
+                corrected_values = cls._nudged_values(rotated_values)
+                moves = np.abs(corrected_values - values)
+                return cls(
+                    cap=None,
+                    shift=shift,
+                    corrected_new_values=corrected_values,
+                    offset_before_fine_lanes=cls._offset_fine_lanes(values, TARGET_MEAN, k),
+                    offset_after_fine_lanes=cls._offset_fine_lanes(corrected_values, TARGET_MEAN, k),
+                    max_move_fine_lanes=float(np.minimum(moves, 1.0 - moves).max() * N_FINE_LANES),
+                    n_nudged=int((corrected_values != rotated_values).sum()),
+                )
+        return cls.of(np.zeros(0), values)
