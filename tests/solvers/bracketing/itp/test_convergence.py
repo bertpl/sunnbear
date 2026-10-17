@@ -6,7 +6,7 @@ import pytest
 from sunnbear.solvers import ITP, ITPVariant, SolveStatus
 from tests.solvers.example_functions import CONVERGENCE_TEST_CASES
 from tests.solvers.paper_problems import PaperProblem
-from tests.solvers.paper_problems.oliveira_takahashi import N_BISECTION, XTOL
+from tests.solvers.paper_problems.oliveira_takahashi import OLIVEIRA_TAKAHASHI_N_BISECTION, OLIVEIRA_TAKAHASHI_XTOL
 
 from .paper_problems import TABLE_1
 
@@ -22,12 +22,12 @@ def test_the_paper_experiments_variant_with_slack_stays_within_n_max_on_the_func
     """
     # --- act --------------------------
     result = ITP(n_slack=4, variant=ITPVariant.PAPER_EXPERIMENTS).solve(
-        problem.f, problem.a, problem.b, xtol=XTOL, max_fevals=100
+        problem.f, problem.a, problem.b, xtol=OLIVEIRA_TAKAHASHI_XTOL, max_fevals=100
     )
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert result.n_fevals - 2 <= N_BISECTION + 4
+    assert result.n_fevals - 2 <= OLIVEIRA_TAKAHASHI_N_BISECTION + 4
 
 
 @pytest.mark.parametrize("f, a, b, root", CONVERGENCE_TEST_CASES)

@@ -5,7 +5,7 @@ import pytest
 from sunnbear.solvers import Illinois
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.ford import FordTable4Problem, assert_n_fevals_at_ford_stop_reproduced
-from tests.solvers.paper_problems.oliveira_takahashi import XTOL, OliveiraTakahashiTable1Problem
+from tests.solvers.paper_problems.oliveira_takahashi import OLIVEIRA_TAKAHASHI_XTOL, OliveiraTakahashiTable1Problem
 
 from .third_party_problems import FORD_TABLE_4, OLIVEIRA_TAKAHASHI_TABLE_1
 
@@ -35,10 +35,10 @@ def test_the_rows_of_table_1_of_oliveira_takahashi_name_every_problem_of_the_tab
 
 @pytest.mark.parametrize("problem", OLIVEIRA_TAKAHASHI_TABLE_1, ids=str)
 def test_the_iteration_counts_of_table_1_of_oliveira_takahashi_are_reproduced(problem: PaperProblem):
-    """On every row of Table 1 of Oliveira and Takahashi (2020), `Illinois` takes the column "Illinois"'s count of
-    iterations, within the row's allowed deviation; the table's runs stop by the criterion of `Illinois`."""
+    """On every row of Table 1 of Oliveira and Takahashi (2020), `Illinois` takes the number of iterations in the
+    column "Illinois", within the row's allowed deviation; the table's runs stop by the criterion of `Illinois`."""
     # --- act --------------------------
-    result = Illinois().solve(problem.f, problem.a, problem.b, xtol=XTOL, max_fevals=200)
+    result = Illinois().solve(problem.f, problem.a, problem.b, xtol=OLIVEIRA_TAKAHASHI_XTOL, max_fevals=200)
 
     # --- assert -----------------------
     problem.assert_reproduced_by(result)

@@ -15,12 +15,11 @@ class ModAB(Solver):
     `ModAB` keeps the interval bounds ``x1 < x2`` with their function values ``y1`` and ``y2``, and runs in 1 of 2
     modes, starting with bisection:
 
-    - **bisection:** the new x-value ``x3`` is the midpoint, computed with `midpoint`. After evaluating
-      ``y3 = f(x3)``, the method switches to Anderson-Björck mode when the function looks close to a straight line on
-      the interval: ``|ym - y3| < k * (|y3| + |ym|)``, where ``ym = (y1 + y2) / 2`` is the value of the chord at the
-      midpoint, ``k = r^2``, and ``r = 1 - |ym / (y2 - y1)|`` measures how symmetric ``y1`` and ``y2`` are;
-    - **Anderson-Björck:** ``x3`` is the zero of the chord, ``(x1 * y2 - y1 * x2) / (y2 - y1)``, computed with
-      `chord_zero`.
+    - **bisection:** the new x-value ``x3`` is the midpoint. After evaluating ``y3 = f(x3)``, the method switches to
+      Anderson-Björck mode when the function looks close to a straight line on the interval:
+      ``|ym - y3| < k * (|y3| + |ym|)``, where ``ym = (y1 + y2) / 2`` is the value of the chord at the midpoint,
+      ``k = r^2``, and ``r = 1 - |ym / (y2 - y1)|`` measures how symmetric ``y1`` and ``y2`` are;
+    - **Anderson-Björck:** ``x3`` is the zero of the chord, ``(x1 * y2 - y1 * x2) / (y2 - y1)``.
 
     ``x3`` replaces the bound whose function value has the sign of ``y3``.
 

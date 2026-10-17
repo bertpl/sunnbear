@@ -1,10 +1,11 @@
-"""This module holds `OliveiraTakahashiTable1Problem`, the 24 test problems of Table 1 of Oliveira and Takahashi
-(2020), without any method's iteration counts.
+"""This module holds `OliveiraTakahashiTable1Problem`, the test problems of Table 1 of Oliveira and Takahashi (2020),
+without any method's iteration counts.
 
-Table 1 gives several methods' iteration counts on 24 functions, each on ``[-1, 1]``; a problem's name is the function's
-name in the table in snake case, e.g. ``polynomial_fraction`` for "Poly.Frac.". The table's runs stop once the interval
-is at most ``2 * XTOL`` wide, the stopping criterion of `BracketingSolver`, and its counts leave out the 2 evaluations
-at the interval bounds.
+Table 1 gives several methods' iteration counts on its functions, each on ``[-1, 1]``; a problem's name is the
+function's name in the table in snake case, e.g. ``polynomial_fraction`` for "Poly.Frac.".
+
+The table's runs stop once the interval is at most ``2 * OLIVEIRA_TAKAHASHI_XTOL`` wide, the stopping criterion of
+`BracketingSolver`, and its counts leave out the 2 evaluations at the interval bounds.
 
 References:
     - Oliveira, I. F. D. and Takahashi, R. H. C. (2020). An enhancement of the bisection method average performance
@@ -16,10 +17,10 @@ import math
 
 from .problem import PaperProblem, PaperProblemEnum
 
-# The paper's experiments solve every function on [-1, 1] with this xtol, where bisection needs `N_BISECTION`
-# iterations.
-XTOL = 1e-10
-N_BISECTION = 34
+# The paper's experiments solve every function on [-1, 1] with this xtol, where bisection needs
+# `OLIVEIRA_TAKAHASHI_N_BISECTION` iterations.
+OLIVEIRA_TAKAHASHI_XTOL = 1e-10
+OLIVEIRA_TAKAHASHI_N_BISECTION = 34
 
 
 # ==================================================================================================
@@ -56,8 +57,8 @@ def _circles(x: float) -> float:
 #  The problems
 # ==================================================================================================
 class OliveiraTakahashiTable1Problem(PaperProblemEnum):
-    """`OliveiraTakahashiTable1Problem` holds the 24 problems of Table 1 of Oliveira and Takahashi (2020), in the
-    table's order; a member's name is the problem's name in capitals, e.g. ``LAMBERT``."""
+    """`OliveiraTakahashiTable1Problem` holds the problems of Table 1 of Oliveira and Takahashi (2020), in the table's
+    order; a member's name is the problem's name in capitals, e.g. ``LAMBERT``."""
 
     LAMBERT = PaperProblem(name="lambert", f=lambda x: x * math.exp(x) - 1.0, a=-1.0, b=1.0)
     TRIGONOMETRIC_1 = PaperProblem(name="trigonometric_1", f=lambda x: math.tan(x - 0.1), a=-1.0, b=1.0)

@@ -4,9 +4,15 @@ import pytest
 
 from sunnbear.solvers import ITP, ITPVariant
 from tests.solvers.paper_problems import PaperProblem
-from tests.solvers.paper_problems.oliveira_takahashi import XTOL
+from tests.solvers.paper_problems.oliveira_takahashi import OLIVEIRA_TAKAHASHI_XTOL, OliveiraTakahashiTable1Problem
 
 from .paper_problems import TABLE_1
+
+
+def test_the_rows_of_table_1_name_every_problem_of_the_table_in_order():
+    """`TABLE_1` holds 1 problem per member of `OliveiraTakahashiTable1Problem`, in the table's order."""
+    # --- assert -----------------------
+    assert [problem.name for problem in TABLE_1] == [member.value.name for member in OliveiraTakahashiTable1Problem]
 
 
 @pytest.mark.parametrize("problem", TABLE_1, ids=str)
@@ -18,7 +24,7 @@ def test_the_iteration_counts_of_table_1_of_the_paper_are_reproduced(problem: Pa
     """
     # --- act --------------------------
     result = ITP(n_slack=0, variant=ITPVariant.PAPER_EXPERIMENTS).solve(
-        problem.f, problem.a, problem.b, xtol=XTOL, max_fevals=100
+        problem.f, problem.a, problem.b, xtol=OLIVEIRA_TAKAHASHI_XTOL, max_fevals=100
     )
 
     # --- assert -----------------------

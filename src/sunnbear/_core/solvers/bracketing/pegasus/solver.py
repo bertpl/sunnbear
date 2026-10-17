@@ -41,7 +41,7 @@ class Pegasus(BracketingSolver[PegasusState]):
 
     Dowell and Jarratt (1972) state the Pegasus step with regula falsi's chord formula, as Ford (1997) does, so the
     Pegasus method differs from regula falsi only in its function value at the retained bound, and from the Illinois
-    method only in the factor. `Pegasus` computes that formula with `chord_zero`.
+    method only in the factor.
 
     `Pegasus` departs from Dowell and Jarratt (1972), or settles an unspecified detail of the article, in these places:
 

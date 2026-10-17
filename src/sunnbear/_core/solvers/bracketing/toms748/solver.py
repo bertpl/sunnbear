@@ -1,7 +1,6 @@
 """`TOMS748` implements Algorithm 748: interpolation steps, a double-size secant step, and bisection if needed."""
 
 from sunnbear._core.solvers.core import Interval, IntervalBound, Solver, SolveState
-from sunnbear._core.solvers.core.formulas import chord_zero
 from sunnbear._core.utils.floats import FLOAT64_EPS
 
 # ``_MU`` is the paper's ``mu``: an iteration that leaves the interval at least ``_MU`` times as wide as at the start of
@@ -63,9 +62,9 @@ class TOMS748(Solver):
           interpolation, and its section 6 states the stopping criterion and the margin. The test suite compares the
           evaluation counts of `TOMS748` with the paper's Tables II and IV to VI. https://doi.org/10.1145/210089.210111
         - The authors' Fortran 77 code, published with the paper as algorithm 748 of the Collected Algorithms of the
-          ACM (netlib, ``toms/748``). It implements Algorithm 4.2, which ``k = 2`` follows line by line, except for
-          the forms of the first secant step and of the midpoint, and the test suite reproduces the roots that the
-          code lists for its test problems.
+          ACM (netlib, ``toms/748``). It implements Algorithm 4.2, which ``k = 2`` follows line by line except for the
+          forms of the first secant step and of the midpoint. The test suite reproduces the roots that the code lists
+          for its test problems.
     """
 
     name = "toms748"
@@ -95,9 +94,13 @@ class TOMS748(Solver):
         - ``c`` is the x-value to evaluate next.
 
         Each call of `_evaluate_and_split_at` evaluates 1 x-value and returns the new interval; the solve ends after any
-        call that returns an interval with ``f(a) = 0``, or one at most ``stop_width`` wide. A midpoint is
-        `Interval.midpoint`, where the authors' code computes ``a + 0.5 * (b - a)``, and the first secant step is
-        `chord_zero`, where the authors' code computes ``a - (fa / (fb - fa)) * (b - a)``.
+        call that returns an interval with ``f(a) = 0``, or one at most ``stop_width`` wide.
+
+        These steps take the shared form, not the form of the authors' code:
+
+        - a midpoint, `Interval.midpoint`, where the authors' code computes ``a + 0.5 * (b - a)``;
+        - the first secant step, `Interval.chord_zero`, where the authors' code computes
+          ``a - (fa / (fb - fa)) * (b - a)``.
         """
         interval = state.interval
         tol = self._get_tol(state.xtol, interval.a, interval.b)
@@ -113,7 +116,7 @@ class TOMS748(Solver):
 
             # --- iteration 1: the secant step ---
             if n_iterations == 1:
-                c = chord_zero(interval.a, interval.fa, interval.b, interval.fb)
+                c = interval.chord_zero
                 interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
                 if interval.is_fa_zero or interval.width <= stop_width:
                     return interval.a

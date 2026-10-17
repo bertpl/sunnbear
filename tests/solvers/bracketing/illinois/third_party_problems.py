@@ -9,13 +9,6 @@ from tests.solvers.paper_problems import UNSTATED_RUN_DETAILS
 from tests.solvers.paper_problems.ford import FordTable4Problem
 from tests.solvers.paper_problems.oliveira_takahashi import OliveiraTakahashiTable1Problem
 
-# `_ITERATES_NEAR_FORDS_LIMIT_DEVIATION_REASON` is the reason for the row whose count deviates by 2.
-_ITERATES_NEAR_FORDS_LIMIT_DEVIATION_REASON = (
-    "2 successive iterates have |f(x)| within 1 % of Ford's limit on |f(x)|, so a detail of the published run that the "
-    "paper does not state, such as its arithmetic or its math library, can decide at each of them whether Ford's rule "
-    "stops there, and each of the 2 can shift the count by 1"
-)
-
 FORD_TABLE_4 = [
     FordTable4Problem.F1_I1.with_n_iterations(10),
     FordTable4Problem.F1_I2.with_n_iterations(12),
@@ -24,7 +17,11 @@ FORD_TABLE_4 = [
     FordTable4Problem.F2_I2.with_n_iterations(
         15,
         deviation=2,
-        reason=_ITERATES_NEAR_FORDS_LIMIT_DEVIATION_REASON,
+        reason=(
+            "2 successive iterates have |f(x)| within 1 % of Ford's limit on |f(x)|; at each of them, a detail of the "
+            "run that the paper does not state, such as its arithmetic or its math library, can decide whether Ford's "
+            "rule stops there, so each of the 2 can shift the count by 1"
+        ),
         observation=(
             "the solve stops on iterate 13, whose |f(x)| is 0.994 times Ford's limit on |f(x)|; iterate 14 has the "
             "same |f(x)|, and iterate 15, Ford's count, has f(x) == 0"
@@ -59,8 +56,8 @@ OLIVEIRA_TAKAHASHI_TABLE_1 = [
         7,
         deviation=1,
         reason=UNSTATED_RUN_DETAILS,
-        observation="the solve takes 1 iteration more: iterate 7 has f(x) = 5.6e-17, 1 ulp of 0.5, and iterate 8 "
-        "has f(x) == 0",
+        observation="the solve takes 1 iteration more: iterate 7 has f(x) = 5.6e-17, the float spacing just below "
+        "0.5, the constant term of f, and iterate 8 has f(x) == 0",
     ),
     OliveiraTakahashiTable1Problem.POLYNOMIAL_1.with_n_iterations(12),
     OliveiraTakahashiTable1Problem.POLYNOMIAL_2.with_n_iterations(11),

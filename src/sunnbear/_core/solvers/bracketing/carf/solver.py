@@ -21,8 +21,8 @@ class CARF(Solver):
     """`CARF` implements the Curvature-Adaptive Root Finder of Gao (2026), reconstructed from the paper and its results.
 
     `CARF` keeps an interval ``[a, b]`` and an interior x-value ``t``, strictly inside it, and knows the function
-    value at all 3. The first ``t`` is the zero of the chord through the bounds, computed with `chord_zero`, clipped
-    into the middle 80 % of the interval (``θ0 = 0.1``). Each iteration:
+    value at all 3. The first ``t`` is the zero of the chord through the bounds, clipped into the middle 80 % of the
+    interval (``θ0 = 0.1``). Each iteration:
 
     - **selects the active interval:** ``[a, t]`` or ``[t, b]``, the part that holds the sign change, which the paper
       calls the "active bracket", with bounds ``a*`` and ``b*`` and width ``w* = b* - a*``;
@@ -38,7 +38,7 @@ class CARF(Solver):
     - **accepts or clips ``t*``:** a step is the distance from one x-value to the next. ``t*`` becomes the new x-value
       ``t_new`` when it lies inside the active interval and the step from ``t`` is shorter than half the step before
       last; otherwise ``t_new`` is ``t*`` clipped into ``[a* + θ * w*, b* - θ * w*]``, where ``θ`` is 0.15, or 0.5 when
-      the 3 function values are not monotone, which clips ``t*`` to the midpoint, computed with `midpoint`;
+      the 3 function values are not monotone, which clips ``t*`` to the midpoint;
     - **updates the interval,** as the bullet *The interval after a sign change* below describes.
 
     The solve ends once ``f(t) = 0``, or once the active interval is narrower than ``xtol``, and returns ``t``, which
@@ -85,9 +85,9 @@ class CARF(Solver):
       - **the rescaling** keeps the intermediate products of the formula from underflowing;
       - **the quadratic's slope at** ``t`` is a weighted average of the slopes from ``a`` to ``t`` and from ``t`` to
         ``b``, which cannot cancel to 0 while the 3 function values are monotone;
-      - **when rounding puts** ``t`` **onto a bound,** the quadratic is not defined, and when the 3 points lie on 1
-        line, the quadratic is that line; in both cases, `CARF` takes the zero of the chord through ``(a, f(a))`` and
-        ``(b, f(b))``, computed with `chord_zero`.
+      - **when rounding puts** ``t`` **onto a bound, or the 3 points lie on 1 line,** `CARF` takes the zero of the
+        chord through ``(a, f(a))`` and ``(b, f(b))``: in the first case the quadratic is not defined, and in the
+        second the quadratic is that line.
 
       On intervals as wide as ``[-1e4, 1e4]``, ``h`` often lies within rounding error of 0 or 1, the limits that
       choose the kind of step, so the evaluation counts depend on this formula, and on some of those intervals `CARF`
@@ -232,9 +232,9 @@ class CARF(Solver):
         tiny.
 
         When rounding puts neither zero in ``[a, b]``, the zero farther from ``t`` is returned, and the caller clips it
-        into the active interval. When rounding puts ``t`` onto ``a`` or ``b``, the quadratic is not defined, and when
-        the 3 points lie on 1 line, the quadratic is that line; in both cases, the zero of the chord through
-        ``(a, fa)`` and ``(b, fb)`` is returned.
+        into the active interval. When rounding puts ``t`` onto ``a`` or ``b``, the quadratic is not defined; when the
+        3 points lie on 1 line, the quadratic is that line. In both cases, the zero of the chord through ``(a, fa)``
+        and ``(b, fb)`` is returned.
         """
         if not a < t < b:
             return chord_zero(a, fa, b, fb)

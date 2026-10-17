@@ -1,8 +1,8 @@
-"""`chord_zero` and `midpoint` compute the chord's zero and the midpoint, the 2 formulas that most solvers share.
+"""`chord_zero` and `midpoint` compute the chord's zero and the midpoint, the formulas that most solvers share.
 
 Forms of these formulas that are equal in exact arithmetic round differently, which would show as tiny differences
-between solvers. So every plain chord step and every plain midpoint of the shipped solvers calls these functions;
-section IV.b of ``SOLVER_IMPLEMENTATIONS.md`` lists the steps that keep their source's form.
+between solvers. So every chord step and every midpoint of the shipped solvers calls these functions, except the steps
+that keep their source's form, which the section "Iteration Formula" of ``SOLVER_IMPLEMENTATIONS.md`` lists.
 """
 
 

@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Compute every plain chord step and every plain midpoint with 1 shared formula each, which changes the benchmark results of `Illinois`, `AndersonBjorck`, `SteffenBrent`, `TOMS748`, `ModAB`, `CARF` and `Secant` slightly
+- Make `Illinois`, `AndersonBjorck`, `SteffenBrent`, `TOMS748`, `ModAB`, `CARF` and `Secant` compute most chord steps and midpoints in the same form as the other solvers, which changes their benchmark results slightly
 
 ### Deprecated
 

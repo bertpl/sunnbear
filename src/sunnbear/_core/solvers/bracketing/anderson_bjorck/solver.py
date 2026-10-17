@@ -32,12 +32,13 @@ class AndersonBjorck(Solver):
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, with its
       unscaled function value.
 
-    `AndersonBjorck` computes the chord's zero with `chord_zero`, and the factor as the paper's ALGOL procedure does:
+    `AndersonBjorck` computes the factor as the paper's ALGOL procedure does, and the chord's zero with `chord_zero`,
+    in a form other than the procedure's:
 
     - **the chord's zero:** the procedure computes it as ``x1 - f1 / w1``, a step from the most recent iterate ``x1``,
       where ``w1 = (f1 - f0) / (x1 - x0)`` is the slope of the chord through ``(x1, f1)`` and ``(x0, f0)``, with ``x0``
-      the retained bound and ``f0`` its scaled value; in exact arithmetic, this is the x-value that `chord_zero`
-      computes, but it rounds differently;
+      the retained bound and ``f0`` its scaled value; in exact arithmetic, the procedure's form gives the x-value that
+      `chord_zero` computes, but rounds differently;
     - **the factor:** the ratio of 2 chord slopes, the slope from the previous to the new iterate divided by ``w1``,
       the slope of the chord that produced the new iterate. In exact arithmetic, the ratio equals
       ``1 - f_new / f_previous``.

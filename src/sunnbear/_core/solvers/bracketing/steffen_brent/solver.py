@@ -13,7 +13,9 @@ class SteffenBrent(Solver):
     - inverse quadratic interpolation through ``a``, ``b`` and ``b_previous``, the previous value of ``b``, when the 3
       function values are distinct;
     - linear interpolation, a secant step, through ``b`` and ``b_previous``, when the 3 function values are not
-      distinct but ``f(b)`` and ``f(b_previous)`` differ, computed with `chord_zero`;
+      distinct but ``f(b)`` and ``f(b_previous)`` differ, computed with `chord_zero`, where the paper's equation 4
+      steps from ``b``, ``b - f(b) * (b_previous - b) / (f(b_previous) - f(b))``, a form that is equal in exact
+      arithmetic but rounds differently;
     - bisection, in all other cases, and in place of an interpolation step that does not land strictly between ``b``
       and ``(3 * a + b) / 4``.
 

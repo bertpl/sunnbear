@@ -1,7 +1,6 @@
 """`RegulaFalsi` implements regula falsi, the bracketing algorithm based on linear interpolation."""
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, SolveState
-from sunnbear._core.solvers.core.formulas import chord_zero
 
 
 class RegulaFalsi(BracketingSolver):
@@ -16,11 +15,11 @@ class RegulaFalsi(BracketingSolver):
     until its evaluation budget is exhausted and ends as ``MAX_FEVALS``. Its ``result.x`` is then the
     last evaluated x-value, which is close to the root.
 
-    `RegulaFalsi` deviates from its sources in 1 place:
+    `RegulaFalsi` deviates from its sources only in its stopping criterion: it stops by `BracketingSolver`'s
+    criterion, so the returned x-value lies within ``xtol`` of a root, unless the solve stalls.
 
-    - **Stopping criterion:** `RegulaFalsi` stops by `BracketingSolver`'s criterion, so the returned x-value lies
-      within ``xtol`` of a root, unless the solve stalls; the routine ``rtflsp`` of Press et al. (2007) stops once an
-      evaluation moves an interval bound by less than its tolerance, and does not test the width of the interval.
+    The routine ``rtflsp`` of Press et al. (2007) stops once an evaluation moves an interval bound by less than its
+    tolerance, and does not test the width of the interval.
 
     References:
         - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section 9.2.
@@ -34,4 +33,4 @@ class RegulaFalsi(BracketingSolver):
 
     def _next_x(self, state: SolveState, interval: Interval) -> float:
         """Return the zero of the chord through ``(a, f(a))`` and ``(b, f(b))``."""
-        return chord_zero(interval.a, interval.fa, interval.b, interval.fb)
+        return interval.chord_zero

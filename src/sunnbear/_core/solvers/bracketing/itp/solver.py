@@ -3,7 +3,6 @@
 import math
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval
-from sunnbear._core.solvers.core.formulas import chord_zero
 
 from .state import ITPState
 from .variant import ITPVariant
@@ -21,7 +20,7 @@ class ITP(BracketingSolver[ITPState]):
     the interval ``[a, b]`` and its midpoint ``x_half`` in 3 steps:
 
     - interpolation: ``x_f`` is where the chord through ``(a, f(a))`` and ``(b, f(b))`` crosses zero, as in regula
-      falsi, computed with `chord_zero`;
+      falsi;
     - truncation: ``x_t`` is ``x_f`` moved toward ``x_half`` by ``delta = kappa_1 * (b - a)^kappa_2``, for 2
       constants ``kappa_1`` and ``kappa_2``, or ``x_half`` itself when ``x_f`` lies closer to ``x_half`` than
       ``delta``;
@@ -108,7 +107,7 @@ class ITP(BracketingSolver[ITPState]):
         Also advance the iteration counter ``state.k``, so 2 calls on the same interval return different x-values.
         """
         # --- interpolation ----------------------
-        x_f = chord_zero(interval.a, interval.fa, interval.b, interval.fb)
+        x_f = interval.chord_zero
 
         # --- truncation -------------------------
         x_half = interval.midpoint
