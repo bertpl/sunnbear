@@ -2,7 +2,6 @@
 
 import pytest
 
-from sunnbear._core.utils.floats import FLOAT64_EPS
 from sunnbear.solvers import TOMS748, SolveStatus
 from tests.solvers.example_functions import cubic
 
@@ -18,21 +17,21 @@ def test_the_first_step_is_a_secant_step(k):
 
 
 @pytest.mark.parametrize("k", [1, 2])
-def test_a_point_close_to_a_bound_moves_to_the_margin_and_the_lower_bound_is_returned(k):
-    """On ``x - 1e-9`` over ``[0, 1]`` with ``xtol = 1e-4``, the secant point 1e-9 lies within ``0.7 * stop_width``
-    of the lower bound, so the secant point moves to ``0.7 * stop_width``. The interval ``[0, 0.7 * stop_width]``
-    that remains meets the stopping criterion, and the solve returns its lower bound 0."""
+def test_a_point_close_to_a_bound_moves_to_the_margin_and_the_midpoint_is_returned(k):
+    """On ``x - 1e-9`` over ``[0, 1]`` with ``xtol = 1e-4``, the secant point 1e-9 lies within the margin
+    ``0.7*(2*tole)`` of the lower bound, so the secant point moves to that margin. The interval
+    ``[0, 0.7*(2*tole)]`` that remains is at most ``2*xtol`` wide, and the solve returns its midpoint."""
     # --- arrange ----------------------
     xtol = 1e-4
-    # The lower bound has the smaller |f|, and lies at 0, so stop_width is 2 * tol.
-    stop_width = 2.0 * (0.5 * xtol - 2.0 * FLOAT64_EPS * 1.0)
+    # The lower bound has the smaller |f|, and lies at 0, so tole is tol, which is xtol.
+    margin = 0.7 * (2.0 * xtol)
 
     # --- act --------------------------
     result = TOMS748(k=k).solve(lambda x: x - 1e-9, 0.0, 1.0, xtol=xtol, max_fevals=10, history_enabled=True)
 
     # --- assert -----------------------
-    assert result.history[2][0] == 0.7 * stop_width
-    assert (result.x, result.status, result.n_fevals) == (0.0, SolveStatus.CONVERGED, 3)
+    assert result.history[2][0] == margin
+    assert (result.x, result.status, result.n_fevals) == (0.5 * margin, SolveStatus.CONVERGED, 3)
 
 
 @pytest.mark.parametrize(

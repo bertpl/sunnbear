@@ -20,8 +20,7 @@ _UNSET = 1.0e5
 class TOMS748(Solver):
     """`TOMS748` implements Algorithm 748 (Alefeld, Potra and Shi, 1995), with ``k`` interpolation steps per iteration.
 
-    The first iteration takes a secant step, computed with `chord_zero`. Each later iteration evaluates the function
-    at 1 x-value per step:
+    The first iteration takes a secant step. Each later iteration evaluates the function at 1 x-value per step:
 
     - ``k`` interpolation steps. The j-th step, counted from 1, takes the zero of the inverse cubic interpolation
       through the bounds ``a`` and ``b`` and the 2 most recently discarded bounds, ``d`` and ``e``. When the 4
@@ -34,41 +33,51 @@ class TOMS748(Solver):
 
     ``k = 1`` is the paper's Algorithm 4.1 and ``k = 2`` its Algorithm 4.2.
 
-    The paper states the 2 algorithms without a stopping criterion; its experiments, and the authors' code, add the
-    stopping criterion of Brent's method:
+    As in the paper's experiments and the authors' code, every step keeps its new x-value at least ``0.7*(2*tole)``
+    inside the interval, and takes the midpoint instead when the interval is at most twice that margin wide:
 
-    - ``stop_width = 2 * (2 * macheps * |u| + tol)``, with ``macheps`` the relative machine precision
-      (`FLOAT64_EPS`) and ``tol`` an absolute tolerance that the solver derives from ``xtol``;
-    - the solve ends once the interval is at most ``stop_width`` wide, or once an evaluation returns exactly 0, and
-      returns the lower bound ``a``, or the x-value that returned 0.
-
-    The experiments and the code also keep every new x-value at least ``0.7 * stop_width`` inside the interval, and
-    take the midpoint when the interval is at most ``1.4 * stop_width`` wide.
-
-    The returned ``a`` lies within ``stop_width`` of a root. The solver sets
-    ``tol = xtol / 2 - 2 * macheps * max(|a0|, |b0|)``, with ``a0`` and ``b0`` the bounds of the initial interval, so
-    that ``stop_width`` never exceeds ``xtol``.
-
-    Where ``xtol`` is below ``4 * macheps * max(|a0|, |b0|)``, ``tol`` would be negative and the margin of 0.7 times
-    ``stop_width`` could move an x-value outside the interval; the solver then sets ``tol = 0``, the setting of the
-    authors' test runs, and the accuracy of ``xtol`` is no longer guaranteed.
+    - ``tole = 2*macheps*|u| + tol`` is the paper's tolerance, with ``macheps`` the relative machine precision,
+      `FLOAT64_EPS`;
+    - ``tol``, an absolute tolerance that the paper leaves to its caller, is ``xtol``, so that the margin is sized for
+      the shared stopping width ``2*xtol`` as the paper sizes it for its stopping width ``2*tole``.
 
     An iteration of `TOMS748` evaluates the function up to ``k + 2`` times, so `TOMS748` writes its own loop, not
     `BracketingSolver`'s.
 
+    `TOMS748` departs from the paper or the authors' code in these places:
+
+    - **Stopping criterion:** `TOMS748` checks the shared stopping criterion where the authors' code checks its own,
+      before each iteration and after each evaluation:
+
+      - the solve ends once the interval is at most ``2*xtol`` wide, or once the function value at an interval bound
+        is exactly 0, and returns that bound, or else the interval's midpoint, which then lies within ``xtol`` of a
+        root;
+      - the paper's experiments and the authors' code end the solve once the interval is at most ``2*tole`` wide, or
+        once an evaluation returns exactly 0, and the code returns the lower bound ``a``.
+    - **Chord's zero and midpoint:** the first secant step and every midpoint take the shared forms of `chord_zero`
+      and `midpoint`; the authors' code computes them as ``a - (fa/(fb - fa))*(b - a)`` and ``a + 0.5*(b - a)``.
+    - **Forms of the authors' code:** 2 formulas take the forms of the authors' code, which round differently from
+      the forms of the paper:
+
+      - the double-size secant step, ``u - 2*(fu/(fb - fa))*(b - a)``, which the paper writes as
+        ``u - 2*f(u)/f[a, b]``, with ``f[a, b] = (fb - fa)/(b - a)``;
+      - Newton-Quadratic's quadratic, ``fa + (a1 + a2*(x - b))*(x - a)``, which the paper writes as
+        ``fa + a1*(x - a) + a2*(x - a)*(x - b)``, with the divided differences ``a1 = f[a, b]`` and
+        ``a2 = f[a, b, d]``.
+
     References:
         - Alefeld, G. E., Potra, F. A. and Shi, Y. (1995). Algorithm 748: Enclosing zeros of continuous functions.
-          ACM Transactions on Mathematical Software 21(3), 327-344. Its subroutine ``ipzero`` is the inverse cubic
-          interpolation, and its section 6 states the stopping criterion and the margin. The test suite compares the
-          evaluation counts of `TOMS748` with the paper's Tables II and IV to VI. https://doi.org/10.1145/210089.210111
+          ACM Transactions on Mathematical Software 21(3), 327-344. It states Algorithms 4.1 and 4.2 and the inverse
+          cubic interpolation ``ipzero``; its section 6 states the margin, and the stopping criterion with which the
+          test suite reproduces its Tables II and IV to VI. https://doi.org/10.1145/210089.210111
         - The authors' Fortran 77 code, published with the paper as algorithm 748 of the Collected Algorithms of the
-          ACM (netlib, ``toms/748``). It implements Algorithm 4.2, which ``k = 2`` follows line by line except for the
-          forms of the first secant step and of the midpoint. The test suite reproduces the roots that the code lists
-          for its test problems.
+          ACM, https://www.netlib.org/toms/748. It implements only Algorithm 4.2, which ``k = 2`` follows line by line
+          apart from the deviations above, and the test suite reproduces the roots that its test driver prints for its
+          test problems.
     """
 
     name = "toms748"
-    version = 2
+    version = 3
 
     def __init__(self, *, k: int) -> None:
         """Configure the number ``k`` of interpolation steps per iteration.
@@ -83,7 +92,7 @@ class TOMS748(Solver):
         self.k = k
 
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the authors' code
-        """Run Algorithm 4.1 or 4.2 and return the lower bound of the final interval.
+        """Run Algorithm 4.1 or 4.2 until `_root_if_converged` returns a root estimate, and return that estimate.
 
         The variables keep the names of the paper and the authors' code, so that this method can be compared with the
         paper and the authors' code step by step:
@@ -91,36 +100,34 @@ class TOMS748(Solver):
         - ``interval`` is the enclosing interval ``[a, b]``, with ``f(a)`` and ``f(b)`` of opposite signs;
         - ``d`` is the bound that the last call of `_evaluate_and_split_at` discarded, and ``e`` the value of ``d``
           before that call; both lie outside the interval, and ``fd`` and ``fe`` are their function values;
-        - ``c`` is the x-value to evaluate next.
+        - ``c`` is the x-value to evaluate next;
+        - ``tol`` is the paper's absolute tolerance, and ``tole_doubled`` is ``2*tole``, which the authors' code keeps
+          in its variable ``TOL``.
 
-        Each call of `_evaluate_and_split_at` evaluates 1 x-value and returns the new interval; the solve ends after any
-        call that returns an interval with ``f(a) = 0``, or one at most ``stop_width`` wide.
-
-        These steps take the form of `chord_zero` and `midpoint`, which every solver shares, not the form of the
-        authors' code:
-
-        - a midpoint, `Interval.midpoint`, where the authors' code computes ``a + 0.5 * (b - a)``;
-        - the first secant step, `Interval.chord_zero`, where the authors' code computes
-          ``a - (fa / (fb - fa)) * (b - a)``.
+        The method calls `_root_if_converged` where the authors' code checks its stopping criterion: at the top of each
+        iteration, the authors' label 10, and after each call of `_evaluate_and_split_at`, which evaluates 1 x-value.
         """
         interval = state.interval
-        tol = self._get_tol(state.xtol, interval.a, interval.b)
+        tol = state.xtol
+        xtol_doubled = 2.0 * state.xtol
         # The first call of _evaluate_and_split_at sets d and fd before any step reads them.
         d = fd = e = fe = _UNSET
         n_iterations = 0
         while True:
             iteration_start_width = interval.width
             n_iterations += 1
-            stop_width = self._get_stop_width(interval, tol)
-            if interval.width <= stop_width:
-                return interval.a
+            tole_doubled = self._get_tole_doubled(interval, tol)
+            root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
+            if root is not None:
+                return root
 
             # --- iteration 1: the secant step ---
             if n_iterations == 1:
                 c = interval.chord_zero
-                interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
-                if interval.is_fa_zero or interval.width <= stop_width:
-                    return interval.a
+                interval, d, fd, tole_doubled = self._evaluate_and_split_at(state, interval, c, tole_doubled, tol)
+                root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
+                if root is not None:
+                    return root
                 continue
 
             # --- the k interpolation steps ------
@@ -137,9 +144,10 @@ class TOMS748(Solver):
                 if j < self.k:
                     # The next interpolation step uses this step's d as its e.
                     e, fe = d, fd
-                interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
-                if interval.is_fa_zero or interval.width <= stop_width:
-                    return interval.a
+                interval, d, fd, tole_doubled = self._evaluate_and_split_at(state, interval, c, tole_doubled, tol)
+                root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
+                if root is not None:
+                    return root
             e, fe = d, fd
 
             # --- the double-size secant step ----
@@ -147,29 +155,36 @@ class TOMS748(Solver):
             c = u - 2.0 * (fu / (interval.fb - interval.fa)) * interval.width
             if abs(c - u) > 0.5 * interval.width:
                 c = interval.midpoint
-            interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
-            if interval.is_fa_zero or interval.width <= stop_width:
-                return interval.a
+            interval, d, fd, tole_doubled = self._evaluate_and_split_at(state, interval, c, tole_doubled, tol)
+            root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
+            if root is not None:
+                return root
 
             # --- the bisection, if needed -------
             if interval.width < _MU * iteration_start_width:
                 continue
             e, fe = d, fd
             c = interval.midpoint
-            interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
-            if interval.is_fa_zero or interval.width <= stop_width:
-                return interval.a
+            interval, d, fd, tole_doubled = self._evaluate_and_split_at(state, interval, c, tole_doubled, tol)
+            root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
+            if root is not None:
+                return root
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
     @staticmethod
-    def _get_tol(xtol: float, a0: float, b0: float) -> float:
-        """Return the ``tol`` that keeps ``stop_width`` at most ``xtol``, or 0 where that ``tol`` would be negative.
+    def _root_if_converged(interval: Interval, xtol_doubled: float, tole_doubled: float) -> float | None:
+        """Return ``interval.root()`` if ``interval.is_converged(xtol_doubled)`` holds, else ``None``.
 
-        The test suite overrides this method to apply the paper's tolerance when it reproduces the paper's tables.
+        ``tole_doubled`` is unused here. The test suite overrides this method with the stopping criterion of the
+        authors' code, which reads ``tole_doubled``, to reproduce the paper's tables and the roots that the authors'
+        code prints.
         """
-        return max(0.5 * xtol - 2.0 * FLOAT64_EPS * max(abs(a0), abs(b0)), 0.0)
+        if interval.is_converged(xtol_doubled):
+            return interval.root()
+        else:
+            return None
 
     @staticmethod
     def _get_u(interval: Interval) -> tuple[float, float]:
@@ -180,19 +195,22 @@ class TOMS748(Solver):
             return interval.a, interval.fa
 
     @staticmethod
-    def _get_stop_width(interval: Interval, tol: float) -> float:
-        """Return ``stop_width = 2 * (2 * macheps * |u| + tol)`` for ``interval``, the authors' subroutine ``TOLE``."""
+    def _get_tole_doubled(interval: Interval, tol: float) -> float:
+        """Return ``2*tole`` for ``interval``, with ``tole = 2*macheps*|u| + tol``: the authors' subroutine ``TOLE``.
+
+        ``TOLE`` returns this value in its argument ``TOL``.
+        """
         u, _ = TOMS748._get_u(interval)
         return 2.0 * (tol + 2.0 * abs(u) * FLOAT64_EPS)
 
     def _evaluate_and_split_at(
-        self, state: SolveState, interval: Interval, c: float, stop_width: float, tol: float
+        self, state: SolveState, interval: Interval, c: float, tole_doubled: float, tol: float
     ) -> tuple[Interval, float, float, float]:
         """Evaluate ``c`` and return the interval that still holds the sign change: the authors' subroutine ``BRACKT``.
 
-        Before the evaluation, ``c`` is moved to at least ``_LAMBDA * stop_width`` inside the interval, or to the
-        midpoint when the interval is at most ``2 * _LAMBDA * stop_width`` wide. The method also sets
-        ``state.x_best`` to the lower bound of the new interval.
+        Before the evaluation, ``c`` is moved to at least ``_LAMBDA*tole_doubled`` inside the interval, or to the
+        midpoint when the interval is at most ``2*_LAMBDA*tole_doubled`` wide. After it, the method sets
+        ``state.x_best`` to ``c``, the latest evaluated x-value.
 
         Returns:
             A tuple of:
@@ -200,9 +218,9 @@ class TOMS748(Solver):
             - the new interval; if ``f(c)`` is exactly 0, it is ``[c, b]`` with ``f(a) = 0``;
             - the discarded bound ``d``;
             - ``f(d)``;
-            - the ``stop_width`` of the new interval.
+            - ``2*tole`` for the new interval.
         """
-        margin = _LAMBDA * stop_width
+        margin = _LAMBDA * tole_doubled
         if interval.width <= 2.0 * margin:
             c = interval.midpoint
         elif c <= interval.a + margin:
@@ -210,14 +228,14 @@ class TOMS748(Solver):
         elif c >= interval.b - margin:
             c = interval.b - margin
         fc = state.f(c)
+        state.x_best = c
         # split_at treats a zero f(c) as having the sign of f(a), so it replaces a with c.
         new_interval = interval.split_at(c, fc)
         if new_interval.last_replaced_bound is IntervalBound.LOWER:
             d, fd = interval.a, interval.fa
         else:
             d, fd = interval.b, interval.fb
-        state.x_best = new_interval.a
-        return new_interval, d, fd, self._get_stop_width(new_interval, tol)
+        return new_interval, d, fd, self._get_tole_doubled(new_interval, tol)
 
     @staticmethod
     def _newton_quadratic_zero(a: float, b: float, d: float, fa: float, fb: float, fd: float, n_steps: int) -> float:

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Make `Illinois`, `AndersonBjorck`, `SteffenBrent`, `TOMS748`, `ModAB`, `CARF` and `Secant` compute most chord steps and midpoints in the same form as the other solvers, which changes their benchmark results slightly
+- Stop `Brent`, `Chandrupatla` and `TOMS748` once the interval is at most `2*xtol` wide and return its midpoint, as `Bisection` does, and make `RiddersBracketingSolverConfig` the core config of `Ridders`, which changes their benchmark results
 
 ### Deprecated
 

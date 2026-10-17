@@ -3,6 +3,7 @@
 import math
 
 from sunnbear._core.solvers.core import Solver, SolveState
+from sunnbear._core.solvers.core.stopping import interval_root, is_interval_converged
 
 
 class Chandrupatla(Solver):
@@ -15,7 +16,7 @@ class Chandrupatla(Solver):
     - ``x3``, the bound that the last iteration dropped from the interval.
 
     ``f1``, ``f2`` and ``f3`` are the values of ``f`` at these x-values. Each iteration evaluates
-    ``x = x1 + t * (x2 - x1)``, where ``t`` comes from 1 of 2 rules:
+    ``x = x1 + t*(x2 - x1)``, where ``t`` comes from 1 of 2 rules:
 
     - inverse quadratic interpolation through the 3 x-values, where the paper shows it to be well conditioned:
       ``1 - sqrt(1 - xi) < phi < sqrt(xi)``, with ``xi = (x1 - x2) / (x3 - x2)`` and
@@ -25,21 +26,28 @@ class Chandrupatla(Solver):
     ``t`` is then kept at least ``tl = tol / |x2 - x1|`` away from 0 and 1, with ``tol`` the tolerance defined below,
     so that every new x-value lies at least ``tol`` inside the interval.
 
-    The paper's tolerance is ``tol = 2 * eps_r * |xm| + 0.5 * eps_a``, where:
+    The paper's tolerance is ``tol = 2*eps_r*|xm| + 0.5*eps_a``, where:
 
     - ``eps_r`` is a relative tolerance;
     - ``eps_a`` is an absolute tolerance;
     - ``xm`` is the interval bound with the smaller ``|f|``.
 
-    The solver passes ``xtol`` as ``eps_a`` and 0 as ``eps_r``, so ``tol = 0.5 * xtol``. The solve ends once
-    ``tl > 0.5``, that is once the interval is narrower than ``xtol``, or once ``f(xm)`` is 0. The solver returns
-    ``xm``, which then lies within ``xtol`` of a root.
+    After each evaluation, the solve ends once the interval is at most ``2*xtol`` wide, or once ``f`` is 0 at an
+    interval bound. It returns that bound, or else the interval's midpoint, which then lies within ``xtol`` of a root.
+
+    `Chandrupatla` sets ``eps_a = 2*xtol`` and ``eps_r = 0``, so ``tol = xtol``, half the width at which the solve
+    ends. While the solve continues, the interval is wider than ``2*tol``, so ``tl < 0.5``, and the limits ``tl`` and
+    ``1 - tl`` on ``t`` do not cross.
 
     The flowchart in the paper's Fig. 1 swaps the yes and no labels of its sign test, relative to the listing
     ``NEWZERO.BAS``; `Chandrupatla` follows the listing.
 
-    `Chandrupatla` tracks a third x-value besides the 2 interval bounds, and stops by the paper's own criterion, so it
-    writes its own loop, not `BracketingSolver`'s.
+    `Chandrupatla` deviates from the listing in its stopping criterion and its return value: the listing stops once
+    ``tl > 0.5``, that is once the interval is narrower than ``2*tol``, or once ``f(xm)`` is 0, and returns ``xm``,
+    which then lies within ``2*tol`` of a root.
+
+    `Chandrupatla` tracks a third x-value besides the 2 interval bounds, so it writes its own loop, not
+    `BracketingSolver`'s.
 
     References:
         - Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear
@@ -52,17 +60,16 @@ class Chandrupatla(Solver):
     """
 
     name = "chandrupatla"
-    version = 1
+    version = 2
 
     def _solve(self, state: SolveState) -> float:
-        """Run the loop of the paper's BASIC listing and return ``xm``.
+        """Run the loop of the paper's BASIC listing and return the root estimate of `_root_if_converged`.
 
         The variables keep the names of the BASIC listing, so that the code can be compared with the listing line by
         line, except where a listing name would read as an interval bound or its ``f`` value in this package, as
         ``A`` and ``B`` would read as the bounds ``a`` and ``b``. Besides the variables of the class docstring, the
         code uses these variables:
 
-        - ``fm``, which is ``f(xm)``;
         - ``phi``, which the listing calls ``PH``;
         - ``phi_low`` and ``phi_high``, the lower and upper limits on ``phi``, which the listing calls ``FL`` and
           ``FH``;
@@ -73,12 +80,15 @@ class Chandrupatla(Solver):
         Each iteration:
 
         - evaluates ``x`` and makes it ``x1``;
-        - ends the solve and returns ``xm`` once the interval is narrower than ``xtol`` or ``f(xm)`` is 0;
+        - ends the solve once `_root_if_converged` returns a root estimate, where the listing tests its own stopping
+          criterion;
         - chooses ``t`` for the next iteration.
         """
         interval = state.interval
         x1, f1, x2, f2 = interval.a, interval.fa, interval.b, interval.fb
-        tol = 0.5 * state.xtol
+        xtol_doubled = 2.0 * state.xtol
+        # tol is the listing's tolerance 2*eps_r*|xm| + 0.5*eps_a, with eps_a = 2*xtol and eps_r = 0.
+        tol = state.xtol
         t = 0.5
         while True:
             # --- the new x-value x --------------
@@ -96,13 +106,9 @@ class Chandrupatla(Solver):
             x1, f1 = x, f
 
             # --- the stopping criterion ---------
-            # xm is the interval bound with the smaller |f|, and the newest x-value when both are equal.
-            xm, fm = x1, f1
-            if abs(f2) < abs(f1):
-                xm, fm = x2, f2
-            tl = tol / abs(x2 - x1)
-            if tl > 0.5 or fm == 0.0:
-                return xm
+            x_root = self._root_if_converged(x1, f1, x2, f2, xtol_doubled)
+            if x_root is not None:
+                return x_root
 
             # --- t for the next x-value ---------
             xi = (x1 - x2) / (x3 - x2)
@@ -118,7 +124,24 @@ class Chandrupatla(Solver):
                 t = q1 * q2 + q3 * q4 * al
             else:
                 t = 0.5
+            tl = tol / abs(x2 - x1)
             if t < tl:
                 t = tl
             if t > 1.0 - tl:
                 t = 1.0 - tl
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _root_if_converged(x1: float, f1: float, x2: float, f2: float, xtol_doubled: float) -> float | None:
+        """Return the root estimate if the solve ends at these interval bounds, or ``None`` if it continues.
+
+        The solve ends by the shared stopping criterion, `is_interval_converged`, and returns `interval_root`. The
+        test suite overrides this method to apply the listing's own stopping criterion where it reproduces the
+        paper's published counts.
+        """
+        if is_interval_converged(x1, f1, x2, f2, xtol_doubled):
+            return interval_root(x1, f1, x2, f2)
+        else:
+            return None

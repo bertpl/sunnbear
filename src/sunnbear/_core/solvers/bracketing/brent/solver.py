@@ -1,6 +1,7 @@
 """`Brent` implements Brent's method: interpolation steps, with bisection when they converge too slowly."""
 
 from sunnbear._core.solvers.core import Solver, SolveState
+from sunnbear._core.solvers.core.stopping import interval_root, is_interval_converged
 from sunnbear._core.utils.floats import FLOAT64_EPS
 
 
@@ -22,40 +23,47 @@ class Brent(Solver):
         - is not shorter than half the step before the previous one.
 
     A step shorter than the tolerance is lengthened to the tolerance, toward the bound on the other side of the root.
-    As long as ``tol`` stays positive, these rules guarantee that the solve converges within a bounded number of
-    evaluations, at most about the square of bisection's count, whatever the function.
 
-    The stopping criterion and the tolerance use these quantities of Brent's procedure:
+    The steps use these quantities of Brent's procedure:
 
     - ``b`` and ``c`` are the interval bounds, ``b`` the one with the smaller ``|f|``, which is the best estimate;
-    - ``m`` is half the signed width of the interval, from ``b`` toward ``c``;
-    - ``tol = 2 * macheps * |b| + t`` is the tolerance, with ``macheps`` set to `FLOAT64_EPS` and ``t`` an absolute
-      tolerance derived from ``xtol`` (below); the solve ends once ``|m| <= tol`` or ``f(b) = 0``, and returns ``b``.
+    - ``m = 0.5*(c - b)`` is half the signed width of the interval, from ``b`` toward ``c``;
+    - ``tol = 2*macheps*|b| + t`` is the tolerance, with ``macheps`` set to `FLOAT64_EPS` and ``t`` set to ``xtol``.
 
-    `FLOAT64_EPS` is 2^-52, the value that SciPy and Numerical Recipes use. Brent (1971) defines ``macheps`` as the
-    relative machine precision, which is 2^-53 in rounded float64 arithmetic, and also allows a larger
-    ``macheps``.
+    The rules of the steps guarantee that the solve converges within a bounded number of evaluations, at most about the
+    square of bisection's count, whatever the function, as long as ``xtol`` exceeds ``2.5*macheps*|b|``.
 
-    Brent's procedure returns a ``b`` within ``6 * macheps * |x| + 2 * t`` of a root ``x``. The solver sets
-    ``t = (xtol - 6 * macheps * max(|a0|, |b0|)) / 2``, with ``a0`` and ``b0`` the bounds of the initial interval,
-    so that the returned ``b`` lies within ``xtol`` of a root.
+    For a smaller ``xtol``, a step lengthened to ``tol`` can round onto ``c`` while the interval is still wider than
+    ``2*xtol``, and the solve then evaluates ``c`` again and again until its evaluation budget is exhausted. The
+    benchmark keeps ``xtol`` at least ``8*macheps*max(|a0|, |b0|)``, with ``[a0, b0]`` the initial interval
+    (`compute_xtol_range`).
 
-    ``xtol`` must therefore exceed ``6 * macheps * max(|a0|, |b0|)``; below that, ``t`` is negative and the accuracy
-    is no longer guaranteed. Where ``t`` is so negative that ``tol`` is negative too, ``|m| <= tol`` can never hold, and
-    the solve runs until its evaluation budget is exhausted.
+    `Brent` departs from the procedure ``zero``, or settles a value that the procedure leaves to its caller, in these
+    places:
 
-    The bounds ``b`` and ``c`` swap roles as the iteration proceeds, and the stopping criterion is Brent's own, so
-    `Brent` writes its own loop, not `BracketingSolver`'s.
+    - **Stopping criterion:** `Brent` stops by the shared stopping criterion, once the interval between ``b`` and ``c``
+      is at most ``2*xtol`` wide or the function value at ``b`` or ``c`` is 0, and returns that bound, or else the
+      interval's midpoint, which lies within ``xtol`` of a root; the procedure stops once ``|m| <= tol`` or
+      ``f(b) = 0``, and returns ``b``. Both check at each pass through the procedure's label ``ext``.
+    - **Tolerance ``t``:** the procedure leaves ``t`` to its caller; `Brent` sets ``t = xtol``, so that ``tol``, the
+      length of the shortest step, is about ``xtol``, half the shared stopping width.
+    - **Machine precision:** `Brent` sets ``macheps`` to `FLOAT64_EPS`, 2^-52, the value that SciPy and Numerical
+      Recipes use; Brent (1971) defines ``macheps`` as the relative machine precision, which is 2^-53 in rounded
+      float64 arithmetic, and also allows a larger ``macheps``.
 
     References:
         - Brent, R. P. (1971). An algorithm with guaranteed convergence for finding a zero of a function. The
-          Computer Journal 14(4), 422-425. The paper's appendix holds the Algol 60 procedure ``zero``.
-          https://doi.org/10.1093/comjnl/14.4.422
-        - Brent, R. P. (1973). Algorithms for Minimization without Derivatives, chapter 4. Prentice-Hall. The test
-          suite reproduces the rows of its Table 4.1 whose functions do not underflow near the root.
-        - SciPy's ``scipy.optimize.brentq``, whose tolerance ``(xtol + rtol * |b|) / 2`` equals ``tol`` when SciPy's
-          ``xtol`` is ``2 * t`` and its ``rtol`` is ``4 * macheps``; the test suite checks `Brent` against
+          Computer Journal 14(4), 422-425. The paper's appendix holds the Algol 60 procedure ``zero``, which `Brent`
+          follows step by step. https://doi.org/10.1093/comjnl/14.4.422
+        - Brent, R. P. (1973). Algorithms for Minimization without Derivatives. Prentice-Hall. Its chapter 4 repeats
+          the 1971 paper with the procedure ``zero``, and the test suite reproduces the rows of its Table 4.1 whose
+          functions do not underflow near the root. A scan is available on the author's page:
+          https://maths-people.anu.edu.au/~brent/pub/pub011.html
+        - SciPy's ``scipy.optimize.brentq``, whose tolerance ``(xtol + rtol*|b|) / 2`` equals ``tol`` when SciPy's
+          ``xtol`` is ``2*t`` and its ``rtol`` is ``4*macheps``; the test suite checks `Brent` against
           ``scipy.optimize.brentq``.
+        - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section 9.3.
+          Cambridge University Press. Its routine ``zbrent`` takes ``macheps`` as 2^-52, as `Brent` does.
         - Third parties that publish evaluation counts of Brent's method, which the test suite reproduces:
 
           - Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear
@@ -73,14 +81,14 @@ class Brent(Solver):
     """
 
     name = "brent"
-    version = 1
+    version = 2
 
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with Brent's Algol procedure
-        """Run Brent's procedure and return ``b``.
+        """Run Brent's procedure until `_root_if_converged` returns a root estimate, and return that estimate.
 
         The variables keep the names of the Algol procedure, and comments mark where its labels ``int`` and ``ext``
-        fall, so that the code can be compared with the procedure line by line. Besides ``b``, ``c``, ``m`` and
-        ``tol``, which the class docstring defines:
+        fall, so that the code can be compared with the procedure line by line. Besides ``b``, ``c``, ``m``, ``tol``
+        and ``t``, which the class docstring defines:
 
         - ``a`` is the previous value of ``b``;
         - ``d`` is the step taken from ``b``, and ``e`` the step taken in the iteration before it; while the next
@@ -97,7 +105,8 @@ class Brent(Solver):
         """
         interval = state.interval
         a, fa, b, fb = interval.a, interval.fa, interval.b, interval.fb
-        t = 0.5 * (state.xtol - 6.0 * FLOAT64_EPS * max(abs(a), abs(b)))
+        t = state.xtol
+        xtol_doubled = 2.0 * state.xtol
         # The Algol label "int": c becomes a, the bound on the other side of the root from b.
         c, fc = a, fa
         d = e = b - a
@@ -108,8 +117,9 @@ class Brent(Solver):
                 fa, fb, fc = fb, fc, fb
             tol = 2.0 * FLOAT64_EPS * abs(b) + t
             m = 0.5 * (c - b)
-            if abs(m) <= tol or fb == 0.0:
-                return b
+            x_root = self._root_if_converged(b, fb, c, fc, m, tol, xtol_doubled)
+            if x_root is not None:
+                return x_root
 
             # --- the step d ---------------------
             if abs(e) < tol or abs(fa) <= abs(fb):
@@ -155,3 +165,21 @@ class Brent(Solver):
                 # The Algol label "int": b crossed the root, so its previous value a becomes c.
                 c, fc = a, fa
                 d = e = b - a
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _root_if_converged(
+        b: float, fb: float, c: float, fc: float, m: float, tol: float, xtol_doubled: float
+    ) -> float | None:
+        """Return the root estimate if the solve stops at the label ``ext``, or ``None`` if it continues.
+
+        The solve stops by the shared stopping criterion on the interval bounds ``b`` and ``c``, and returns the
+        shared root estimate; ``m`` and ``tol`` are not used. The test suite overrides this method to apply the
+        procedure's own stopping criterion, ``|m| <= tol`` or ``f(b) = 0``, where it reproduces published counts.
+        """
+        if is_interval_converged(b, fb, c, fc, xtol_doubled):
+            return interval_root(b, fb, c, fc)
+        else:
+            return None

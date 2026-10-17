@@ -82,6 +82,22 @@ def test_the_bracketing_solver_variant_stops_once_the_interval_is_at_most_2_xtol
     assert result.x == interval.midpoint
 
 
+def test_the_bracketing_solver_variant_evaluates_x1_and_x3_even_on_an_interval_that_is_narrow_enough():
+    """The bracketing_solver variant has no check before its first iteration, as SciPy's ridder has none, so on an
+    initial interval that is already at most ``2 * xtol`` wide, it evaluates ``x1`` and ``x3`` before it stops."""
+    # --- arrange ----------------------
+    xtol = 1e-3
+
+    # --- act --------------------------
+    result = Ridders(variant=RiddersVariant.BRACKETING_SOLVER).solve(
+        cubic, 1.3247, 1.3249, xtol=xtol, max_fevals=10, history_enabled=True
+    )
+
+    # --- assert -----------------------
+    assert result.n_fevals == 4
+    assert result.x == _final_interval(result.history).midpoint
+
+
 def test_the_limit_on_the_step_lets_the_scipy_variant_stop_where_the_interval_would_only_halve():
     """On ``x^3 - x - 0.801``, SciPy's limit on the step lets the scipy variant stop after as few evaluations as the
     commons_math variant, while the bracketing_solver variant, whose interval only halves near the root, needs far
