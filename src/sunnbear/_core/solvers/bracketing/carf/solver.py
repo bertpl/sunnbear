@@ -3,6 +3,7 @@
 import math
 
 from sunnbear._core.solvers.core import Solver, SolveState
+from sunnbear._core.solvers.core.formulas import chord_zero, midpoint
 
 # The paper's constants, which clip an x-value into the middle part of an interval: a fraction θ of the interval's
 # width at each end is out of bounds. θ0 places the first x-value; θ1, θ2 and θ3 clip the later x-values, and the kind
@@ -20,8 +21,8 @@ class CARF(Solver):
     """`CARF` implements the Curvature-Adaptive Root Finder of Gao (2026), reconstructed from the paper and its results.
 
     `CARF` keeps an interval ``[a, b]`` and an interior x-value ``t``, strictly inside it, and knows the function
-    value at all 3. The first ``t`` is the zero of the chord through the bounds, clipped into the middle 80 % of the
-    interval (``θ0 = 0.1``). Each iteration:
+    value at all 3. The first ``t`` is the zero of the chord through the bounds, computed with `chord_zero`, clipped
+    into the middle 80 % of the interval (``θ0 = 0.1``). Each iteration:
 
     - **selects the active interval:** ``[a, t]`` or ``[t, b]``, the part that holds the sign change, which the paper
       calls the "active bracket", with bounds ``a*`` and ``b*`` and width ``w* = b* - a*``;
@@ -37,7 +38,7 @@ class CARF(Solver):
     - **accepts or clips ``t*``:** a step is the distance from one x-value to the next. ``t*`` becomes the new x-value
       ``t_new`` when it lies inside the active interval and the step from ``t`` is shorter than half the step before
       last; otherwise ``t_new`` is ``t*`` clipped into ``[a* + θ * w*, b* - θ * w*]``, where ``θ`` is 0.15, or 0.5 when
-      the 3 function values are not monotone, which clips ``t*`` to the midpoint;
+      the 3 function values are not monotone, which clips ``t*`` to the midpoint, computed with `midpoint`;
     - **updates the interval,** as the bullet *The interval after a sign change* below describes.
 
     The solve ends once ``f(t) = 0``, or once the active interval is narrower than ``xtol``, and returns ``t``, which
@@ -84,8 +85,9 @@ class CARF(Solver):
       - **the rescaling** keeps the intermediate products of the formula from underflowing;
       - **the quadratic's slope at** ``t`` is a weighted average of the slopes from ``a`` to ``t`` and from ``t`` to
         ``b``, which cannot cancel to 0 while the 3 function values are monotone;
-      - **when rounding puts** ``t`` **onto a bound,** the quadratic is not defined, and `CARF` takes the zero of the
-        straight line through ``(a, f(a))`` and ``(b, f(b))``.
+      - **when rounding puts** ``t`` **onto a bound,** the quadratic is not defined, and when the 3 points lie on 1
+        line, the quadratic is that line; in both cases, `CARF` takes the zero of the chord through ``(a, f(a))`` and
+        ``(b, f(b))``, computed with `chord_zero`.
 
       On intervals as wide as ``[-1e4, 1e4]``, ``h`` often lies within rounding error of 0 or 1, the limits that
       choose the kind of step, so the evaluation counts depend on this formula, and on some of those intervals `CARF`
@@ -134,7 +136,7 @@ class CARF(Solver):
     """
 
     name = "carf"
-    version = 2
+    version = 3
 
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the paper's description
         """Run CARF's iterations and return the interior x-value ``t``.
@@ -153,7 +155,7 @@ class CARF(Solver):
 
         # --- the first x-value ------------------
         width = b - a
-        t = (a * fb - b * fa) / (fb - fa)
+        t = chord_zero(a, fa, b, fb)
         t = max(min(t, b - _THETA_0 * width), a + _THETA_0 * width)
         ft = state.f(t)
         state.x_best = t
@@ -178,7 +180,7 @@ class CARF(Solver):
                 log_one_minus_ft_over_fa = math.log(1.0 - ft / fa)
                 if log_one_minus_fb_over_fa == log_one_minus_ft_over_fa:
                     # The denominator of xi is 0: take the midpoint, which a clip with θ3 also yields.
-                    t_star, theta = 0.5 * (a_active + b_active), _THETA_3
+                    t_star, theta = midpoint(a_active, b_active), _THETA_3
                 else:
                     xi = log_one_minus_fb_over_fa / (log_one_minus_fb_over_fa - log_one_minus_ft_over_fa)
                     t_star, theta = a + (b - a) * r**xi, _THETA_2
@@ -188,6 +190,9 @@ class CARF(Solver):
             # --- the new x-value t_new ----------
             if a_active < t_star < b_active and abs(t_star - t) < 0.5 * abs(step_before_last):
                 t_new = t_star
+            elif theta == _THETA_3:
+                # A clip with θ3 = 0.5 leaves only the midpoint of the active interval.
+                t_new = midpoint(a_active, b_active)
             else:
                 active_width = b_active - a_active
                 t_new = max(min(t_star, b_active - theta * active_width), a_active + theta * active_width)
@@ -227,11 +232,12 @@ class CARF(Solver):
         tiny.
 
         When rounding puts neither zero in ``[a, b]``, the zero farther from ``t`` is returned, and the caller clips it
-        into the active interval. When rounding puts ``t`` onto ``a`` or ``b``, the quadratic is not defined, and the
-        zero of the chord through ``(a, fa)`` and ``(b, fb)`` is returned.
+        into the active interval. When rounding puts ``t`` onto ``a`` or ``b``, the quadratic is not defined, and when
+        the 3 points lie on 1 line, the quadratic is that line; in both cases, the zero of the chord through
+        ``(a, fa)`` and ``(b, fb)`` is returned.
         """
         if not a < t < b:
-            return (a * fb - b * fa) / (fb - fa)
+            return chord_zero(a, fa, b, fb)
         else:
             width = b - a
             # one_minus_r comes from b - t, not from 1.0 - r: the difference of 2 distinct floats is never 0, while
@@ -244,12 +250,14 @@ class CARF(Solver):
             slope_t_b = (gb - gt) / one_minus_r
             # c2 is the quadratic's second divided difference: the slopes' difference divided by the width, which is 1.
             c2 = slope_t_b - slope_a_t
-            # c1, the quadratic's slope at r, is the 2 slopes' average weighted by 1 - r and r. While the 3 function
-            # values are monotone, both terms are positive, so c1 cannot cancel to 0, as slope_a_t + c2 * r can.
-            c1 = slope_a_t * one_minus_r + slope_t_b * r
             if c2 == 0.0:
-                r_of_zero = r - gt / c1
+                # The 3 points lie on 1 line, the chord through (a, fa) and (b, fb).
+                return chord_zero(a, fa, b, fb)
             else:
+                # c1, the quadratic's slope at r, is the 2 slopes' average weighted by 1 - r and r. While the 3
+                # function values are monotone, both terms are positive, so c1 cannot cancel to 0, as
+                # slope_a_t + c2 * r can.
+                c1 = slope_a_t * one_minus_r + slope_t_b * r
                 # The quadratic is q(r + u) = c2 * u^2 + c1 * u + gt. c2_times_u_far is c2 times the u of the zero
                 # farther from r, so the nearer zero lies at u = gt / c2_times_u_far and the farther at
                 # u = c2_times_u_far / c2; these forms avoid the cancellation of the textbook formula.
@@ -260,7 +268,7 @@ class CARF(Solver):
                     r_of_zero = zero_near_r
                 else:
                     r_of_zero = r + c2_times_u_far / c2
-            return a + width * r_of_zero
+                return a + width * r_of_zero
 
     @staticmethod
     def _is_converged(t: float, ft: float, active_width: float, xtol: float) -> bool:

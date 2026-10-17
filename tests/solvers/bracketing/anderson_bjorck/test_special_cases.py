@@ -21,7 +21,7 @@ def test_a_step_that_rounds_onto_the_most_recent_iterate_takes_the_factor_0_5():
     """On `cubic` over ``[1, 2]``, the 7th iterate lies within rounding error of the root while the retained bound is
     still far from it.
 
-    The next 2 steps round onto the 7th iterate, so the slope from the previous to the new iterate is ``0 / 0``; the
+    The next step rounds onto the 7th iterate, so the slope from the previous to the new iterate is ``0 / 0``; the
     factor 0.5 then moves the following step away from the 7th iterate, and the solve converges.
     """
     # --- act --------------------------
@@ -30,6 +30,6 @@ def test_a_step_that_rounds_onto_the_most_recent_iterate_takes_the_factor_0_5():
     # --- assert -----------------------
     # The history starts with the 2 interval bounds, so index 8 holds the 7th iterate.
     x_values = [x for x, _ in result.history]
-    assert x_values[8] == x_values[9] == x_values[10] != x_values[11]
+    assert x_values[8] == x_values[9] != x_values[10]
     assert result.status is SolveStatus.CONVERGED
     assert abs(result.x - CUBIC_ROOT) <= 1e-9

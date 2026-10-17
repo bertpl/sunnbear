@@ -31,6 +31,8 @@ This package relies on 2 facts:
   divergence checks after it are uncounted, and `WrappedFunction` pauses counting while ``f``
   itself runs, so the function's cost is never included.
 
+The module `formulas` computes the 2 formulas that the shipped solvers share, each in 1 form.
+
 A solver class carries only its algorithm. A `SolverConfig` records the init arguments that the benchmark passes
 to a solver, and its `SolverRole` decides how the benchmark treats the result; `SolverConfigRegistry` holds
 every registered config.

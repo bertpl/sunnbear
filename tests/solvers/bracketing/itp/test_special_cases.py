@@ -4,8 +4,9 @@ make `ITP` exceed its bound on the iteration count."""
 import pytest
 
 from sunnbear.solvers import ITP, ITPVariant, SolveStatus
+from tests.solvers.paper_problems.oliveira_takahashi import N_BISECTION, XTOL
 
-from .paper_problems import N_BISECTION, TABLE_1, XTOL
+from .paper_problems import TABLE_1
 
 
 @pytest.mark.parametrize(

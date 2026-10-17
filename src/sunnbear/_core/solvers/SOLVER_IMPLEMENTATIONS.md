@@ -153,6 +153,8 @@ Many solvers compute the same 2 formulas, in forms that are equal in exact arith
 - **the chord's zero** through `(a, fa)` and `(b, fb)`: `(a*fb - b*fa) / (fb - fa)`
 - **the midpoint** of `[a, b]`: `0.5*(a + b)`
 
+The framework computes them in the functions `chord_zero` and `midpoint` of `core/formulas.py`.
+
 This applies to every plain chord step and every plain midpoint, in hybrid methods and in `Secant` too. A step whose form is part of its source's structure, or guards against rounding, keeps its source's form, and a guard that a source adds to a step, such as `ModAB`'s clamp of the chord's zero into the interval, stays.
 
 | Algorithm | Chord's zero | Midpoint |

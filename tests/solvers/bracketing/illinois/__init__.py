@@ -15,22 +15,19 @@ Third-party published results:
   states no starting values.
 - Anderson and Björck (1973), Examples 1 to 7, the Illinois columns: not reproduced, because the paper ran Examples 1
   to 7 in 27-bit arithmetic and with an extra rule on the step size that `Illinois` does not have.
-- Oliveira and Takahashi (2020), Table 1, the column "Illinois": not compared, because `Illinois` matches only 17 of
-  the 24 counts exactly, and 23 within 1; with the chord's zero computed as ``(a * fb - b * fa) / (fb - fa)``,
-  22 of the 24 match exactly. The table's runs stop by the rule of
-  `BracketingSolver`, with ``xtol = 1e-10`` on ``[-1, 1]``, and its counts leave out the 2 evaluations at the interval
-  bounds.
+- Oliveira and Takahashi (2020), Table 1, the column "Illinois": reproduced, in ``test_third_party.py``: 22 of the 24
+  iteration counts exactly, and the other 2 within 1. The table's runs stop by the criterion of `BracketingSolver`,
+  with ``xtol = 1e-10`` on ``[-1, 1]``, and its counts leave out the 2 evaluations at the interval bounds.
 - Ganchovski and Traykov (2023), Table 2, the column "ill": not compared, because the paper does not state the stopping
   rule of its Illinois runs.
-- Ford (1997), Table 4: reproduced, in ``test_third_party.py``: 12 of the 15 iteration counts exactly, and the
-  other 3 within 1; the test data states why each of the 3 deviates.
+- Ford (1997), Table 4: reproduced, in ``test_third_party.py``: 12 of the 15 iteration counts exactly, 2 within 1,
+  and 1 within 2; the test data states why each of the 3 deviates.
 - Ganchovski et al. (2026), Table 2, the column "ill": not reproduced, because the paper's C# code differs from
-  `Illinois` in 3 ways:
+  `Illinois` in 2 ways:
 
   - the C# code stops when the next chord's zero lies within the code's tolerance of the previous chord's zero, without
     evaluating the function at the new zero, while `Illinois` stops on the interval width;
-  - the C# code starts with no retained bound, so it never halves a function value before its 2nd iteration;
-  - the C# code computes the chord's zero in a different algebraic form from `Illinois`.
+  - the C# code starts with no retained bound, so it never halves a function value before its 2nd iteration.
 
 Reference implementations:
 

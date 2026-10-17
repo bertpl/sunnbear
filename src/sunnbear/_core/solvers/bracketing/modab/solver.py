@@ -1,6 +1,7 @@
 """`ModAB` implements the modified Anderson-Björck method, which switches between bisection and Anderson-Björck."""
 
 from sunnbear._core.solvers.core import IntervalBound, Solver, SolveState
+from sunnbear._core.solvers.core.formulas import chord_zero, midpoint
 
 # With this factor, the Anderson-Björck steps may fall 4 steps behind bisection before the solve falls back to
 # bisection: 16 = 2^4 (the paper's section 4.2).
@@ -14,11 +15,12 @@ class ModAB(Solver):
     `ModAB` keeps the interval bounds ``x1 < x2`` with their function values ``y1`` and ``y2``, and runs in 1 of 2
     modes, starting with bisection:
 
-    - **bisection:** the new x-value ``x3`` is the midpoint. After evaluating ``y3 = f(x3)``, the method switches to
-      Anderson-Björck mode when the function looks close to a straight line on the interval:
-      ``|ym - y3| < k * (|y3| + |ym|)``, where ``ym = (y1 + y2) / 2`` is the value of the chord at the midpoint,
-      ``k = r^2``, and ``r = 1 - |ym / (y2 - y1)|`` measures how symmetric ``y1`` and ``y2`` are;
-    - **Anderson-Björck:** ``x3`` is the zero of the chord, ``(x1 * y2 - y1 * x2) / (y2 - y1)``.
+    - **bisection:** the new x-value ``x3`` is the midpoint, computed with `midpoint`. After evaluating
+      ``y3 = f(x3)``, the method switches to Anderson-Björck mode when the function looks close to a straight line on
+      the interval: ``|ym - y3| < k * (|y3| + |ym|)``, where ``ym = (y1 + y2) / 2`` is the value of the chord at the
+      midpoint, ``k = r^2``, and ``r = 1 - |ym / (y2 - y1)|`` measures how symmetric ``y1`` and ``y2`` are;
+    - **Anderson-Björck:** ``x3`` is the zero of the chord, ``(x1 * y2 - y1 * x2) / (y2 - y1)``, computed with
+      `chord_zero`.
 
     ``x3`` replaces the bound whose function value has the sign of ``y3``.
 
@@ -79,7 +81,7 @@ class ModAB(Solver):
     """
 
     name = "modab"
-    version = 1
+    version = 2
 
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the authors' C# code
         """Run the loop of the paper's C# code and return the last ``x3``.
@@ -110,9 +112,9 @@ class ModAB(Solver):
         while True:
             # --- the new x-value x3 -------------
             if is_bisecting:
-                x3 = (x1 + x2) / 2.0
+                x3 = midpoint(x1, x2)
             else:
-                x3 = (x1 * y2 - y1 * x2) / (y2 - y1)
+                x3 = chord_zero(x1, y1, x2, y2)
             if x2 - x1 <= self._get_stop_width(state.xtol, x3):
                 return x3
 

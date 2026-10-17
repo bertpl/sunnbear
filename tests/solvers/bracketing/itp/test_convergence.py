@@ -6,8 +6,9 @@ import pytest
 from sunnbear.solvers import ITP, ITPVariant, SolveStatus
 from tests.solvers.example_functions import CONVERGENCE_TEST_CASES
 from tests.solvers.paper_problems import PaperProblem
+from tests.solvers.paper_problems.oliveira_takahashi import N_BISECTION, XTOL
 
-from .paper_problems import N_BISECTION, TABLE_1, XTOL
+from .paper_problems import TABLE_1
 
 
 @pytest.mark.parametrize("problem", TABLE_1, ids=str)

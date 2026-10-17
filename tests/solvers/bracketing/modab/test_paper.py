@@ -74,7 +74,7 @@ def _bisection_iterations(history: tuple[tuple[float, float], ...]) -> list[int]
     (x1, y1), (x2, _) = history[:2]
     iterations = []
     for iteration, (x, y) in enumerate(history[2:], start=1):
-        if x == (x1 + x2) / 2.0:
+        if x == 0.5 * (x1 + x2):
             iterations.append(iteration)
         if (y > 0.0) == (y1 > 0.0):
             x1, y1 = x, y

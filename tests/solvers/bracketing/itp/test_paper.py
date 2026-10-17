@@ -4,8 +4,9 @@ import pytest
 
 from sunnbear.solvers import ITP, ITPVariant
 from tests.solvers.paper_problems import PaperProblem
+from tests.solvers.paper_problems.oliveira_takahashi import XTOL
 
-from .paper_problems import TABLE_1, XTOL
+from .paper_problems import TABLE_1
 
 
 @pytest.mark.parametrize("problem", TABLE_1, ids=str)
