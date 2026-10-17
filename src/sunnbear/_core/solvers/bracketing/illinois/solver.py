@@ -1,66 +1,4 @@
-"""`Illinois` implements the Illinois method: regula falsi that halves the value of a bound kept twice in a row.
-
-The rest of this docstring is the record of `Illinois` under the solver implementation principles
-(``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
-
-Sources:
-    - I - article:
-      - Ia - article code: Dowell and Jarratt (1971), the ALGOL procedure in its section 4;
-      - Ib - article pseudocode: none;
-      - Ic - article text: Dowell and Jarratt (1971), its equation 2 and the rules of its section 2.
-    - II - authors' code:
-      - none.
-    - III - third party:
-      - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="illinois"``;
-      - Ford (1997), equation 5, with the factor 0.5 of its Table 1.
-    - IV - own judgment:
-      - none.
-
-Source per aspect:
-    Every aspect follows the ALGOL procedure of Dowell and Jarratt (1971), except:
-    - `Illinois` passes the upper bound as ``x1``, the second of the 2 starting x-values, as mpmath does, because the
-      ALGOL procedure leaves the order of ``x0`` and ``x1`` to the caller.
-    - JUDGMENT-CALL: a function value of 0 at an initial interval bound ends the solve at that bound, as for every
-      solver. When the function value is 0 at the lower bound, the ALGOL procedure first evaluates the zero of the chord
-      through the 2 bounds, which lies at that bound up to rounding.
-    - PRINCIPLE-GAP (P6): Dowell and Jarratt's Table 1 gives the same digits with either of 2 forms of the chord's zero:
-      - the ALGOL procedure's form, ``x1 - f1 * (x1 - x0) / (f1 - f0)``, with ``x1`` the most recent iterate and ``x0``
-        the retained bound;
-      - Ford's form, ``(a * fb - b * fa) / (fb - fa)``, with ``fa`` and ``fb`` the function values at the interval
-        bounds ``a`` and ``b``.
-      P6 does not say whether third-party tables may decide between the 2 forms. The code keeps the ALGOL form, the
-      form of the record's default source, because the 2 third-party tables disagree on which form they match:
-      - with the ALGOL form, all 15 counts of Ford's Table 4 match within 1, against 14 with Ford's form;
-      - with Ford's form, 22 of the 24 counts in the column "Illinois" of Table 1 of Oliveira and Takahashi (2020)
-        match exactly, against 17 with the ALGOL form.
-    - PRINCIPLE-CONFLICT (P1): the code stops by `BracketingSolver`'s rule, once the interval is at most ``2 * xtol``
-      wide, and returns the interval's midpoint. The ALGOL procedure stops once a step is at most ``delta``, and
-      returns the last chord's zero without evaluating it. Either of 2 changes would resolve the conflict:
-      - following the ALGOL procedure with ``delta = xtol``; on 132 solves of the test suite's problems, that stopping
-        rule returns an x-value that is not within ``xtol`` of a root in 22 of them;
-      - a principle that lets a solver use `BracketingSolver`'s rule in place of its source's rule when the source's
-        rule does not guarantee an x-value within ``xtol`` of a root.
-    - Translation of ``xtol`` (P7): ``xtol`` is the tolerance of `BracketingSolver`'s rule; the corresponding parameter
-      of the ALGOL procedure is ``delta``.
-
-Validation:
-    - A - authors' results:
-      - used: Table 1, the errors of ``x_2`` to ``x_9``, reproduced to the printed digits, which is convincing (P5);
-      - not used: Table 1's ``x_10``, and Tables 2 to 7; the docstring of the test package
-        ``tests.solvers.bracketing.illinois`` gives the reasons.
-    - B - third-party results:
-      - used: Ford (1997), Table 4, reproduced to within 1 iteration, which is convincing (P5);
-      - not used: the Illinois columns of other articles; the docstring of the test package
-        ``tests.solvers.bracketing.illinois`` lists them, with the reasons.
-      - TBD: Oliveira and Takahashi (2020), Table 1, the column "Illinois": 17 of its 24 counts match exactly and 23
-        within 1, and the choice of form in the PRINCIPLE-GAP (P6) entry changes these counts.
-    - C - reference implementation:
-      - used: a twin test checks that `Illinois` evaluates the same x-values as mpmath's ``Illinois`` with
-        ``method="illinois"``; the twin test imposes the stopping rule of `Illinois` on mpmath.
-
-Variants:
-    - `IllinoisConfig`, the only config, is core (P8).
-"""
+"""`Illinois` implements the Illinois method: regula falsi that halves the value of a bound kept twice in a row."""
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, IntervalBound
 
@@ -88,7 +26,14 @@ class Illinois(BracketingSolver[IllinoisState]):
 
     In exact arithmetic, this is the x-value of the chord formula that `RegulaFalsi` computes.
 
-    `Illinois` stops by `BracketingSolver`'s criterion, so the returned x-value lies within ``xtol`` of a root.
+    Where `Illinois` departs from the ALGOL procedure of Dowell and Jarratt (1971), or settles a detail that it leaves
+    open:
+
+    - it stops by `BracketingSolver`'s criterion, once the interval is at most ``2 * xtol`` wide, and returns the
+      interval's midpoint, which lies within ``xtol`` of a root; the procedure stops once a step is at most its
+      tolerance ``delta``, and returns the last chord's zero without evaluating it;
+    - the procedure leaves the order of its 2 starting x-values to the caller; `Illinois` passes the upper bound as
+      ``x1``, the second of them, as mpmath does.
 
     References:
         - Dowell, M. and Jarratt, P. (1971). A modified regula falsi method for computing the root of an

@@ -210,7 +210,10 @@ class BracketingSolver(Solver[StateT]):
 
     @abstractmethod
     def _next_x(self, state: StateT, interval: Interval) -> float:
-        """Return the next x-value to evaluate, strictly inside ``interval``.
+        """Return the next x-value to evaluate, inside ``interval`` up to rounding.
+
+        A formula such as the chord's zero can round onto an interval bound, or just past one; `Interval.split_at`
+        describes what such an x-value does to the interval.
 
         Read the function values at the interval bounds from ``interval``, and any value carried
         between iterations from ``state``; do not evaluate the function here.

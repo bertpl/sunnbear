@@ -1,55 +1,4 @@
-"""`Pegasus` implements the Pegasus method: regula falsi that scales down the value of a bound kept twice in a row.
-
-The rest of this docstring is the record of `Pegasus` under the solver implementation principles
-(``IMPLEMENTATION_PRINCIPLES.md`` in the ``sunnbear._core.solvers`` package).
-
-Sources:
-    - I - article:
-      - Ia - article code: none;
-      - Ib - article pseudocode: none;
-      - Ic - article text: Dowell and Jarratt (1972), sections 1 to 3: the rules that scale the function value of a
-        bound kept twice in a row, and the formula of the chord's zero.
-    - II - authors' code:
-      - none.
-    - III - third party:
-      - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="pegasus"``;
-      - Ford (1997), equation 5, with the factor of its Table 1.
-    - IV - own judgment:
-      - none.
-
-Source per aspect:
-    Every aspect follows Dowell and Jarratt (1972), except:
-    - `Pegasus` passes the upper bound as ``x_1``, the second of the 2 starting x-values, as mpmath does, because the
-      article leaves the order of ``x_0`` and ``x_1`` to the caller.
-    - PRINCIPLE-GAP (P6): the article writes the retained bound's scaled value in 2 forms, with ``f_i`` the function
-      value at the iterate ``x_i``, and P6 does not say which written form counts:
-      - in its formula, as ``f_(i-1) * f_i / (f_i + f_(i+1))``;
-      - in its prose, as ``f_(i-1)`` scaled by the factor ``f_i / (f_i + f_(i+1))``, the form of mpmath and Ford.
-      The code multiplies first, as the formula is printed, so the product of 2 function values overflows or
-      underflows when f is scaled by about 1e154 or 1e-165; at those scales, the form of mpmath and Ford still
-      converges.
-    - PRINCIPLE-GAP (P7): the article stops its runs once ``|f(x)|`` falls below a threshold, and P7 does not say how
-      ``xtol``, a tolerance on x, translates into one on f. The code stops by `BracketingSolver`'s rule instead: once
-      the interval is at most ``2 * xtol`` wide, it returns the interval's midpoint.
-
-Validation:
-    - A - authors' results:
-      - used: Table 1, the errors of ``x_2`` to ``x_7``, reproduced to the printed digits, which is convincing (P5);
-      - not used: Table 1's ``x_8`` and ``x_9``, and the iteration counts of Problems 1 to 4; the docstring of the
-        test package ``tests.solvers.bracketing.pegasus`` gives the details.
-      - TBD: Problem 1, whose 3 iteration counts lie within 1 of the paper's, the tolerance that the test of Ford's
-        Table 4 accepts.
-    - B - third-party results:
-      - used: Ford (1997), Table 4, reproduced to within 1 iteration, which is convincing (P5);
-      - not used: Anderson and Björck (1973), Examples 1 to 7, the Pegasus columns, which the paper ran in 27-bit
-        arithmetic and with an extra rule on the step size that `Pegasus` does not have.
-    - C - reference implementation:
-      - used: a twin test checks that `Pegasus` evaluates the same x-values as mpmath's ``Illinois`` with
-        ``method="pegasus"``; the twin test imposes the stopping rule of `Pegasus` on mpmath.
-
-Variants:
-    - `PegasusConfig`, the only config, is secondary (P8); this record marks no PRINCIPLE-CONFLICT.
-"""
+"""`Pegasus` implements the Pegasus method: regula falsi that scales down the value of a bound kept twice in a row."""
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, IntervalBound
 
@@ -74,7 +23,9 @@ class Pegasus(BracketingSolver[PegasusState]):
     closer to 1 the more the new iterate reduced ``|f|``.
 
     `Pegasus` scales in the order of section 2 of Dowell and Jarratt (1972): it multiplies the retained bound's value
-    by ``f_previous`` first, then divides by ``f_previous + f_new``.
+    by ``f_previous`` first, then divides by ``f_previous + f_new``. That product of 2 function values overflows or
+    underflows when ``f`` is scaled by about 1e154 or 1e-165, where the form of mpmath and Ford (1997), which divides
+    first, still converges.
 
     Each new iterate replaces 1 bound, and the other bound is the retained bound:
 
@@ -91,7 +42,13 @@ class Pegasus(BracketingSolver[PegasusState]):
 
     `Illinois` computes the same zero of the chord, in the form of Dowell and Jarratt (1971).
 
-    `Pegasus` stops by `BracketingSolver`'s criterion, so the returned x-value lies within ``xtol`` of a root.
+    Where `Pegasus` departs from Dowell and Jarratt (1972), or settles a detail that the article leaves open:
+
+    - it stops by `BracketingSolver`'s criterion, once the interval is at most ``2 * xtol`` wide, and returns the
+      interval's midpoint, which lies within ``xtol`` of a root; the article stops its runs once ``|f(x)|`` falls
+      below a threshold;
+    - the article leaves the order of its 2 starting x-values to the caller; `Pegasus` passes the upper bound as
+      ``x_1``, the second of them, as mpmath does.
 
     References:
         - Dowell, M. and Jarratt, P. (1972). The "Pegasus" method for computing the root of an equation. BIT 12(4),
