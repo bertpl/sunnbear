@@ -17,9 +17,9 @@ from sunnbear._core.solvers.bracketing.modab.configs import ModABConfig
 from sunnbear._core.solvers.bracketing.pegasus.configs import PegasusConfig
 from sunnbear._core.solvers.bracketing.regula_falsi.configs import RegulaFalsiConfig
 from sunnbear._core.solvers.bracketing.ridders.configs import (
-    RiddersBracketingSolverConfig,
     RiddersCommonsMathConfig,
     RiddersScipyConfig,
+    RiddersStandardStoppingCriterionConfig,
 )
 from sunnbear._core.solvers.bracketing.steffen_brent.configs import SteffenBrentConfig
 from sunnbear._core.solvers.bracketing.toms748.configs import TOMS748K1Config, TOMS748K2Config
@@ -78,14 +78,14 @@ _BUILT_IN_CONFIG_ROWS = [
     (ModABConfig, "modab", ModAB, SolverRole.BUILTIN_SECONDARY),
     (PegasusConfig, "pegasus", Pegasus, SolverRole.BUILTIN_SECONDARY),
     (RegulaFalsiConfig, "regula_falsi", RegulaFalsi, SolverRole.BUILTIN_SECONDARY),
+    (RiddersCommonsMathConfig, "ridders[variant='commons_math']", Ridders, SolverRole.BUILTIN_SECONDARY),
+    (RiddersScipyConfig, "ridders[variant='scipy']", Ridders, SolverRole.BUILTIN_SECONDARY),
     (
-        RiddersBracketingSolverConfig,
-        "ridders[variant='bracketing_solver']",
+        RiddersStandardStoppingCriterionConfig,
+        "ridders[variant='standard_stopping_criterion']",
         Ridders,
         SolverRole.BUILTIN_CORE,
     ),
-    (RiddersCommonsMathConfig, "ridders[variant='commons_math']", Ridders, SolverRole.BUILTIN_SECONDARY),
-    (RiddersScipyConfig, "ridders[variant='scipy']", Ridders, SolverRole.BUILTIN_SECONDARY),
     (SecantConfig, "secant", Secant, SolverRole.BUILTIN_SECONDARY),
     (SteffenBrentConfig, "steffen_brent", SteffenBrent, SolverRole.BUILTIN_SECONDARY),
     (TOMS748K1Config, "toms748[k=1]", TOMS748, SolverRole.BUILTIN_SECONDARY),
@@ -144,9 +144,9 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
         "modab",
         "pegasus",
         "regula_falsi",
-        "ridders[variant='bracketing_solver']",
         "ridders[variant='commons_math']",
         "ridders[variant='scipy']",
+        "ridders[variant='standard_stopping_criterion']",
         "secant",
         "steffen_brent",
         "toms748[k=1]",

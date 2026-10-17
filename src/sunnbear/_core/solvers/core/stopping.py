@@ -1,8 +1,10 @@
 """`is_interval_converged` and `interval_root` apply the shared stopping criterion to 2 interval bounds in either order.
 
 They hold the criterion of `Interval.is_converged` and the root estimate of `Interval.root`, for the solvers whose
-loop keeps the interval bounds in variables of its own, not in an `Interval`. `Interval` keeps its own methods, because
-they read its cached width and zero checks, which a `BracketingSolver` reuses within an iteration.
+loop keeps the interval bounds in variables of its own, not in an `Interval`.
+
+`Interval` keeps its own methods, because they read its cached width and its cached checks of whether ``fa`` and ``fb``
+are 0, which a `BracketingSolver` reuses within an iteration.
 """
 
 from .formulas import midpoint

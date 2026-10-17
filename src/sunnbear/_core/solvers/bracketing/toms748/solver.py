@@ -34,13 +34,20 @@ class TOMS748(Solver):
     ``k = 1`` is the paper's Algorithm 4.1 and ``k = 2`` its Algorithm 4.2.
 
     As in the paper's experiments and the authors' code, every step keeps its new x-value at least ``0.7*(2*tole)``
-    inside the interval, and takes the midpoint instead when the interval is at most twice that margin wide:
+    inside the interval, with the paper's tolerance ``tole``, defined below, and takes the midpoint instead when the
+    interval is at most twice that margin wide:
 
     - ``tole = 2*macheps*|u| + tol`` is the paper's tolerance, with ``macheps`` the relative machine precision,
       `FLOAT64_EPS`;
-    - ``tol``, an absolute tolerance that the paper leaves to its caller, is ``xtol``, so that the margin, about
-      ``0.7*(2*xtol)``, is the same fraction of the shared stopping width ``2*xtol`` as the paper's margin is of its
+    - ``tol`` is ``xtol``; the paper leaves this absolute tolerance to its caller. The margin is then about
+      ``0.7*(2*xtol)``, the same fraction of the shared stopping width ``2*xtol`` as the paper's margin is of its
       stopping width ``2*tole``.
+
+    For an ``xtol`` below the float spacing near the root, the interval never shrinks to ``2*xtol``, and the solve ends
+    as a solver error.
+
+    Once the interval is 1 float spacing wide, its midpoint rounds onto a bound, which then also becomes ``d``, and the
+    next Newton-Quadratic step divides by ``d - a = 0``.
 
     An iteration of `TOMS748` evaluates the function up to ``k + 2`` times, so `TOMS748` writes its own loop, not
     `BracketingSolver`'s.
@@ -176,7 +183,7 @@ class TOMS748(Solver):
     # --------------------------------------------------------------------------
     @staticmethod
     def _root_if_converged(interval: Interval, xtol_doubled: float, tole_doubled: float) -> float | None:
-        """Return ``interval.root()`` if ``interval.is_converged(xtol_doubled)`` holds, else ``None``.
+        """Return the root estimate if the shared stopping criterion holds for ``interval``, else ``None``.
 
         ``tole_doubled`` is unused here. The test suite overrides this method with the stopping criterion of the
         authors' code, which reads ``tole_doubled``, to reproduce the paper's tables and the roots that the authors'
@@ -197,9 +204,9 @@ class TOMS748(Solver):
 
     @staticmethod
     def _get_tole_doubled(interval: Interval, tol: float) -> float:
-        """Return ``2*tole`` for ``interval``, with ``tole = 2*macheps*|u| + tol``: the authors' subroutine ``TOLE``.
+        """Return ``2*tole`` for ``interval``, with ``tole = 2*macheps*|u| + tol``.
 
-        ``TOLE`` returns this value in its argument ``TOL``.
+        The authors' subroutine ``TOLE`` computes this value and returns it in its argument ``TOL``.
         """
         u, _ = TOMS748._get_u(interval)
         return 2.0 * (tol + 2.0 * abs(u) * FLOAT64_EPS)

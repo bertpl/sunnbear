@@ -9,9 +9,9 @@ Each paper ran Brent's procedure ``zero``, stopping criterion included, with its
 ``tol = 2*macheps*|b| + t``: Chandrupatla, and Anderson and Björck, changed the relative part ``2*macheps*|b|`` in ways
 that make no difference to their counts, and Ganchovski et al. used a larger relative part.
 
-The tests therefore run `BrentWithPaperStoppingCriterion`, `Brent` with the procedure's own stopping criterion, and
-set only its tolerance ``t``, passed as ``xtol``: either to the paper's value or, for Ganchovski et al., to the value
-that makes ``tol`` equal to the paper's tolerance.
+The tests therefore run `BrentWithPaperStoppingCriterion`, which is `Brent` with the procedure's own stopping criterion,
+and set only its tolerance ``t``, passed as ``xtol``: either to the paper's value or, for Ganchovski et al., to the
+value that makes ``tol`` equal to the paper's tolerance.
 """
 
 import pytest

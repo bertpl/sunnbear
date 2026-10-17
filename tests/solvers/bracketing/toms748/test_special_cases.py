@@ -51,8 +51,11 @@ def test_a_solve_that_exhausts_its_budget_reports_the_latest_evaluated_x_value(k
 @pytest.mark.parametrize("k", [1, 2])
 def test_an_xtol_below_the_float_spacing_near_the_root_ends_the_solve_as_a_solver_error(k):
     """An ``xtol`` of 1e-17 on ``[1, 2]`` lies below the float spacing near the root, so the interval never shrinks to
-    ``2*xtol``. Once the interval is 1 float spacing wide, its midpoint rounds onto a bound, which then becomes ``d``
-    as well, and the next call of Newton-Quadratic divides by ``d - a = 0``."""
+    ``2*xtol``.
+
+    Once the interval is 1 float spacing wide, its midpoint rounds onto a bound, which then also becomes ``d``, the
+    bound that `TOMS748` most recently discarded, and the next call of Newton-Quadratic divides by ``d - a = 0``.
+    """
     # --- act --------------------------
     result = TOMS748(k=k).solve(cubic, 1.0, 2.0, xtol=1e-17, max_fevals=60)
 

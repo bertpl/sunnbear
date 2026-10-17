@@ -21,12 +21,12 @@ Third-party published results:
 
   - 85 of the 92 evaluation counts exactly; the test data states why the other 7 deviate;
   - the roots of all 92 functions, 4 of them within a wider tolerance; the test data states why each needs it.
-- Ganchovski et al. (2026), Table 2, for the ``"bracketing_solver"`` variant, the core variant: not reproduced, because
-  its stopping criterion differs from that of the paper's C# code.
+- Ganchovski et al. (2026), Table 2, for the ``"standard_stopping_criterion"`` variant, the core variant: not
+  reproduced, because its stopping criterion differs from that of the paper's C# code.
 - Oliveira and Takahashi (2020), Table 1, the column "Ridders'": not compared. The table's runs stop by the criterion
-  of the ``"bracketing_solver"`` variant, with ``xtol = 1e-10`` on ``[-1, 1]``, and its counts leave out the 2
-  evaluations at the interval bounds. Counted that way, the variant matches 19 of the 24 counts; the other 5 deviate,
-  for causes that are not established.
+  of the ``"standard_stopping_criterion"`` variant, with ``xtol = 1e-10`` on ``[-1, 1]``, and its counts leave out
+  the 2 evaluations at the interval bounds. Counted that way, the variant matches 19 of the 24 counts; the other 5
+  deviate, for causes that are not established.
 - Ganchovski and Traykov (2023), Table 2, the column "Rid": not compared, because the paper does not state the stopping
   criterion of its Ridders runs.
 - Gorgey et al. (2025), Tables 2 to 7, the rows "Ridders'": not compared, because the paper does not fix how its runs

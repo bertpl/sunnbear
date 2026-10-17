@@ -1,8 +1,8 @@
 """This package tests `Brent`.
 
 Every published count below comes from runs that stop by the stopping criterion of Brent's procedure ``zero``, so the
-tests of published results run `BrentWithPaperStoppingCriterion`, `Brent` with that criterion, and pass the procedure's
-tolerance ``t`` as ``xtol``.
+tests of published results run `BrentWithPaperStoppingCriterion`, which is `Brent` with that criterion, and pass the
+procedure's tolerance ``t`` as ``xtol``.
 
 Published results:
 
@@ -12,7 +12,7 @@ Published results:
   ``zero2``, which handles a wider floating-point exponent range than ``zero``; in float64, ``x^9`` does not underflow
   before the solve stops on these 2 rows.
 - Brent (1973), Table 4.1, the column of errors of the returned x-values: not compared, because the errors of the
-  x-values that the solve returns differ from the book's; the cause is not known.
+  returned x-values differ from the book's; the cause is not known.
 - Brent (1973), Table 4.1, the other 3 rows: not reproduced, because their functions underflow near the root in
   float64, and `Brent` has no counterpart of ``zero2``.
 - Brent (1973), Table 4.2: not reproduced, because the book states neither its intervals nor its tolerances, which the
@@ -27,23 +27,22 @@ Third-party published results:
 - Alefeld, Potra and Shi (1995), Tables IV to VI, the column "BR": reproduced, in ``test_third_party.py``: 16 of the
   17 evaluation counts exactly; the count of the 17th is not checked, and the test data states why.
 - Alefeld, Potra and Shi (1995), Table II, the column "BR": reproduced, in ``test_third_party.py``: the totals within
-  1 %. The totals of the solve lie below the paper's; the cause is not fully known:
+  1 %. The totals of the solve lie below the paper's, for a cause not fully known. Known causes explain part of the
+  difference:
 
-  - with the paper's relative machine precision, 1.907e-16, in place of 2^-52, only the total at ``t = 0`` changes, by
-    2;
-  - with problem ``26[n=1]``, the paper's problem 13, coded so that it stays nonzero where ``exp(1 / x^2)`` overflows,
-    the totals lie 0 to 23 evaluations below the paper's. The paper's section 6 states that its runs found the root 0
-    of this problem; in float64, a solve reaches 0 only if the function stays nonzero where ``exp(1 / x^2)``
-    overflows, because a function value of 0 there ends the solve at that point.
+  - the paper's relative machine precision, 1.907e-16, not 2^-52;
+  - problem ``26[n=1]``, the paper's problem 13: in float64, its function is 0 where ``exp(1 / x^2)`` overflows,
+    which ends the solve there, while the paper's section 6 states that its runs found the root 0.
 
 - Alefeld, Potra and Shi (1995), Table III, the column "BR": not reproduced, because the paper does not list the 139
   problems behind its totals.
 - Anderson and Björck (1973), Examples 1 to 7, the column "Brent": reproduced, in ``test_third_party.py``: 22 of the
   26 iteration counts exactly, and the other 4 within 1; the test data states why.
 - Anderson and Björck (1973), the double-precision totals on p. 263, the column "Brent": not reproduced, cause
-  unknown. On Examples 1 to 5, the solve takes 15 to 18 iterations fewer in float64 and in emulated 60-bit arithmetic,
-  the double precision of the paper's UNIVAC 1108, and on Examples 6 and 7, 2 fewer in float64; the paper gives no
-  per-example counts in double precision that could show where the difference arises.
+  unknown; the paper gives no per-example counts in double precision that could show where the difference arises.
+
+  On Examples 1 to 5, the solve takes 15 to 18 iterations fewer in float64 and in emulated 60-bit arithmetic, the
+  double precision of the paper's UNIVAC 1108, and on Examples 6 and 7, 2 fewer in float64.
 - Ganchovski et al. (2026), Table 2, the column "Bre": reproduced, in ``test_third_party.py``: 90 of the 92
   evaluation counts exactly, the other 2 within 1, and the roots of all 92 functions; the test data states why the
   2 counts deviate.

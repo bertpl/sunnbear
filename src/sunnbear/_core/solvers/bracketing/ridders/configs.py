@@ -6,8 +6,8 @@ from .solver import Ridders
 from .variant import RiddersVariant
 
 
-class RiddersBracketingSolverConfig(SolverConfig):
-    """`RiddersBracketingSolverConfig` is the core config of `Ridders`, with Ridders' steps as the paper states them.
+class RiddersStandardStoppingCriterionConfig(SolverConfig):
+    """`RiddersStandardStoppingCriterionConfig` is the core config of `Ridders`, with the steps that the paper states.
 
     The paper states no stopping criterion, so this config uses the shared stopping criterion of the bracketing
     solvers, and checks it where SciPy's ``ridder`` checks its own.
@@ -17,7 +17,7 @@ class RiddersBracketingSolverConfig(SolverConfig):
     """
 
     solver_cls = Ridders
-    solver_kwargs = {"variant": RiddersVariant.BRACKETING_SOLVER}  # noqa: RUF012 — the dict is never mutated
+    solver_kwargs = {"variant": RiddersVariant.STANDARD_STOPPING_CRITERION}  # noqa: RUF012 — the dict is never mutated
     role = SolverRole.BUILTIN_CORE
 
 
@@ -27,9 +27,8 @@ class RiddersScipyConfig(SolverConfig):
     It shows the stopping criterion of SciPy's ``ridder``. That criterion is not the shared stopping criterion of the
     bracketing solvers, so this config is not core.
 
-    It also limits each step so that the new iterate lies at least ``xtol/2`` inside the interval, which the paper does
-    not state; near the root, that limit shrinks the interval below ``xtol``, its stopping width, in fewer evaluations
-    than an unlimited step does.
+    Its evaluation counts vary less between near-identical functions than those of
+    `RiddersStandardStoppingCriterionConfig`; the docstring of `Ridders` states why, under **Limit on the step**.
     """
 
     solver_cls = Ridders
@@ -44,7 +43,7 @@ class RiddersCommonsMathConfig(SolverConfig):
     stopping criterion of the bracketing solvers, so this config is not core.
 
     Its returned x-value can lie more than ``xtol`` from a root, as on a function with a kink or with a multiple root,
-    and such a sample counts as ``max_fevals`` evaluations.
+    and the benchmark counts such a solve as failed, at ``max_fevals`` evaluations.
     """
 
     solver_cls = Ridders

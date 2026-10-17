@@ -8,4 +8,4 @@ class RiddersVariant(StrEnum):
 
     COMMONS_MATH = "commons_math"
     SCIPY = "scipy"
-    BRACKETING_SOLVER = "bracketing_solver"
+    STANDARD_STOPPING_CRITERION = "standard_stopping_criterion"

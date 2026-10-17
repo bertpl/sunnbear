@@ -34,10 +34,7 @@ class Brent(Solver):
     square of bisection's count, whatever the function, as long as ``xtol`` exceeds ``2.5*macheps*|b|``.
 
     For a smaller ``xtol``, a step lengthened to ``tol`` can round onto ``c`` while the interval is still wider than
-    ``2*xtol``, and the solve then evaluates ``c`` again and again until its evaluation budget is exhausted. The
-    benchmark keeps ``xtol`` above ``2.5*macheps*|b|``: `compute_xtol_range` keeps ``xtol_min`` at least
-    `MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND` times ``macheps*max(|a0|, |b0|)``, with ``[a0, b0]``
-    the initial interval.
+    ``2*xtol``, and the solve then evaluates ``c`` again and again until its evaluation budget is exhausted.
 
     `Brent` departs from the procedure ``zero``, or settles a value that the procedure leaves to its caller, in these
     places:
@@ -54,6 +51,9 @@ class Brent(Solver):
     - **Machine precision:** `Brent` sets ``macheps`` to `FLOAT64_EPS`, 2^-52, the value that SciPy and Numerical
       Recipes use; Brent (1971) defines ``macheps`` as the relative machine precision, which is 2^-53 in rounded
       float64 arithmetic, and also allows a larger ``macheps``.
+
+    The bounds ``b`` and ``c`` swap roles as the iteration proceeds, so `Brent` writes its own loop, not
+    `BracketingSolver`'s.
 
     References:
         - Brent, R. P. (1971). An algorithm with guaranteed convergence for finding a zero of a function. The
