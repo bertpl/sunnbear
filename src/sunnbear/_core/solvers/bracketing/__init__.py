@@ -7,7 +7,7 @@ docstring of `BracketingSolver` lists when that applies.
 Each solver is a package of its own, holding its solver module, its built-in configs, and any helper
 modules. Importing this package registers the built-in configs.
 
-``SOLVER_IMPLEMENTATIONS_APPROACH.md`` in the parent package states the solvers' shared implementation choices, and why
+``SOLVER_IMPLEMENTATIONS.md`` in the parent package states the solvers' shared implementation choices, and why
 each solver class holds its whole algorithm.
 """
 
