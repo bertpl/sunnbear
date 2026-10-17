@@ -16,7 +16,7 @@ Third-party published results:
 - Anderson and Björck (1973), Examples 1 to 7, the Illinois columns: not reproduced, because the paper ran Examples 1
   to 7 in 27-bit arithmetic and with an extra rule on the step size that `Illinois` does not have.
 - Oliveira and Takahashi (2020), Table 1, the column "Illinois": not compared, because `Illinois` matches only 17 of
-  the 24 counts exactly, and 23 within 1; with the other form of the chord's zero, ``(a * fb - b * fa) / (fb - fa)``,
+  the 24 counts exactly, and 23 within 1; with the chord's zero computed as ``(a * fb - b * fa) / (fb - fa)``,
   22 of the 24 match exactly. The table's runs stop by the rule of
   `BracketingSolver`, with ``xtol = 1e-10`` on ``[-1, 1]``, and its counts leave out the 2 evaluations at the interval
   bounds.

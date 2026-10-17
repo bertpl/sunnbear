@@ -26,8 +26,8 @@ class Pegasus(BracketingSolver[PegasusState]):
     by ``f_previous`` first, then divides by ``f_previous + f_new``.
 
     Multiplying first makes the product of 2 function values overflow when ``f`` is scaled by about 1e154, and
-    underflow when ``f`` is scaled by about 1e-165; at those scales, the form of mpmath and Ford (1997), which divides
-    first, still converges.
+    underflow when ``f`` is scaled by about 1e-165; at those scales, the scaling of mpmath and Ford (1997), which
+    divides first, still converges.
 
     Each new iterate replaces 1 bound, and the other bound is the retained bound:
 
@@ -44,11 +44,12 @@ class Pegasus(BracketingSolver[PegasusState]):
 
     `Illinois` computes the same zero of the chord, in the form of Dowell and Jarratt (1971).
 
-    Where `Pegasus` departs from Dowell and Jarratt (1972), or settles a detail that the article leaves open:
+    `Pegasus` departs from Dowell and Jarratt (1972), or settles an unspecified detail of the article, in these places:
 
     - **Stopping criterion:** `Pegasus` stops by `BracketingSolver`'s criterion, once the interval is at most
       ``2 * xtol`` wide, and returns the interval's midpoint, which lies within ``xtol`` of a root; the article stops
-      its runs once ``|f(x)|`` falls below a threshold;
+      its runs once ``|f(x)|`` falls below a threshold, a tolerance on f that ``xtol``, a tolerance on x, does not
+      translate into;
     - **Starting order:** the article leaves the order of its 2 starting x-values to the caller; `Pegasus` passes the
       upper bound as ``x_1``, the second of them, as mpmath does.
 

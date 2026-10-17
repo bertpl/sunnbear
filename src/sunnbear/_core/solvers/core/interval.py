@@ -107,11 +107,10 @@ class Interval(ABC):
     def split_at(self, x: float, fx: float) -> "Interval":
         """Split the interval at ``x`` and return the part that still holds the sign change, of the same orientation.
 
-        ``x`` replaces ``a`` when `_has_fa_sign` holds for ``fx``, else ``b``. A solver's ``x`` lies inside the
-        interval up to rounding, and this method does not check the position of ``x``, because a check would add flops
-        to every solver:
+        A solver's ``x`` lies inside the interval up to rounding, and this method does not check the position of ``x``,
+        because a check would add flops to every solver:
 
-        - an ``x`` on a bound replaces that bound by itself, so the interval stays the same;
+        - an ``x`` on a bound replaces that bound with the same x-value, so the interval stays the same;
         - an ``x`` just outside, where rounding can put a chord's zero, usually replaces the nearer bound, which widens
           the interval and keeps the sign change;
         - only a sign change between that ``x`` and the nearer bound, as with a second root right outside the

@@ -35,8 +35,7 @@ class Bisection(BracketingSolver):
           edition, section 9.1.1. Cambridge University Press. The book's routine ``rtbis`` returns an evaluated
           interval bound, the one where ``f <= 0``, not the midpoint.
         - Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition, section 2.1.
-          John Wiley & Sons. `Bisection` follows its pseudocode ``Bisect``, and the test suite reproduces its
-          Table 2.1.
+          John Wiley & Sons. It provides the pseudocode ``Bisect``, and the test suite reproduces its Table 2.1.
         - SciPy's ``scipy.optimize.bisect``, which adds a relative term to its tolerance; the test suite checks
           `Bisection` against ``scipy.optimize.bisect``.
         - Third parties that publish evaluation counts of bisection:

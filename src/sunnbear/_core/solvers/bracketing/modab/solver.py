@@ -41,7 +41,7 @@ class ModAB(Solver):
     on or just past a bound, so it lies within ``xtol`` of a root only up to rounding.
 
     `ModAB` follows the C# code where the paper's Algorithm 1 differs from it or leaves a detail out, and departs from
-    the C# code in 1 place, the iteration limit in the last item:
+    the C# code in its iteration limit:
 
     - **Clamping:** Algorithm 1 evaluates the chord's zero and then clamps it into the interval. The C# code clamps
       first: a chord's zero that rounding puts on or outside a bound is replaced by that bound and its stored function
