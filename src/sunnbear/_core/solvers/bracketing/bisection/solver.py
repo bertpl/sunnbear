@@ -22,10 +22,11 @@ class Bisection(BracketingSolver):
 
     `Bisection` follows the pseudocode ``Bisect`` of Atkinson (1989), with 2 deviations:
 
-    - a function value of 0 at a midpoint ends the solve, as in SciPy, where ``Bisect`` bisects on past it;
-    - it stops by `BracketingSolver`'s criterion, ``b - a <= 2 * xtol`` before the next midpoint, where ``Bisect``
-      tests ``b - c <= epsilon`` after evaluating the midpoint ``c``; the evaluation count then differs by 1 in rare
-      cases.
+    - **Exact zeros:** a function value of 0 at a midpoint ends the solve, as in SciPy, while ``Bisect`` bisects on
+      past such a midpoint;
+    - **Stopping criterion:** `Bisection` stops by `BracketingSolver`'s criterion, ``b - a <= 2 * xtol`` before the
+      next midpoint, while ``Bisect`` tests ``b - c <= epsilon`` after evaluating the midpoint ``c``; in rare cases,
+      the evaluation counts of `Bisection` and ``Bisect`` then differ by 1.
 
     The returned x-value lies within ``xtol`` of a root.
 
@@ -34,8 +35,8 @@ class Bisection(BracketingSolver):
           edition, section 9.1.1. Cambridge University Press. The book's routine ``rtbis`` returns an evaluated
           interval bound, the one where ``f <= 0``, not the midpoint.
         - Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition, section 2.1.
-          John Wiley & Sons. Its pseudocode ``Bisect`` is the method that `Bisection` follows, and the test suite
-          reproduces its Table 2.1.
+          John Wiley & Sons. `Bisection` follows its pseudocode ``Bisect``, and the test suite reproduces its
+          Table 2.1.
         - SciPy's ``scipy.optimize.bisect``, which adds a relative term to its tolerance; the test suite checks
           `Bisection` against ``scipy.optimize.bisect``.
         - Third parties that publish evaluation counts of bisection:

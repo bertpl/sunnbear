@@ -23,8 +23,10 @@ class Pegasus(BracketingSolver[PegasusState]):
     closer to 1 the more the new iterate reduced ``|f|``.
 
     `Pegasus` scales in the order of section 2 of Dowell and Jarratt (1972): it multiplies the retained bound's value
-    by ``f_previous`` first, then divides by ``f_previous + f_new``. That product of 2 function values overflows or
-    underflows when ``f`` is scaled by about 1e154 or 1e-165, where the form of mpmath and Ford (1997), which divides
+    by ``f_previous`` first, then divides by ``f_previous + f_new``.
+
+    Multiplying first makes the product of 2 function values overflow when ``f`` is scaled by about 1e154, and
+    underflow when ``f`` is scaled by about 1e-165; at those scales, the form of mpmath and Ford (1997), which divides
     first, still converges.
 
     Each new iterate replaces 1 bound, and the other bound is the retained bound:
@@ -44,11 +46,11 @@ class Pegasus(BracketingSolver[PegasusState]):
 
     Where `Pegasus` departs from Dowell and Jarratt (1972), or settles a detail that the article leaves open:
 
-    - it stops by `BracketingSolver`'s criterion, once the interval is at most ``2 * xtol`` wide, and returns the
-      interval's midpoint, which lies within ``xtol`` of a root; the article stops its runs once ``|f(x)|`` falls
-      below a threshold;
-    - the article leaves the order of its 2 starting x-values to the caller; `Pegasus` passes the upper bound as
-      ``x_1``, the second of them, as mpmath does.
+    - **Stopping criterion:** `Pegasus` stops by `BracketingSolver`'s criterion, once the interval is at most
+      ``2 * xtol`` wide, and returns the interval's midpoint, which lies within ``xtol`` of a root; the article stops
+      its runs once ``|f(x)|`` falls below a threshold;
+    - **Starting order:** the article leaves the order of its 2 starting x-values to the caller; `Pegasus` passes the
+      upper bound as ``x_1``, the second of them, as mpmath does.
 
     References:
         - Dowell, M. and Jarratt, P. (1972). The "Pegasus" method for computing the root of an equation. BIT 12(4),

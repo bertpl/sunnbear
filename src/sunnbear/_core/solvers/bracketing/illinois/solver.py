@@ -26,14 +26,14 @@ class Illinois(BracketingSolver[IllinoisState]):
 
     In exact arithmetic, this is the x-value of the chord formula that `RegulaFalsi` computes.
 
-    Where `Illinois` departs from the ALGOL procedure of Dowell and Jarratt (1971), or settles a detail that it leaves
-    open:
+    Where `Illinois` departs from the ALGOL procedure of Dowell and Jarratt (1971), or settles a detail that the
+    procedure leaves open:
 
-    - it stops by `BracketingSolver`'s criterion, once the interval is at most ``2 * xtol`` wide, and returns the
-      interval's midpoint, which lies within ``xtol`` of a root; the procedure stops once a step is at most its
-      tolerance ``delta``, and returns the last chord's zero without evaluating it;
-    - the procedure leaves the order of its 2 starting x-values to the caller; `Illinois` passes the upper bound as
-      ``x1``, the second of them, as mpmath does.
+    - **Stopping criterion:** `Illinois` stops by `BracketingSolver`'s criterion, once the interval is at most
+      ``2 * xtol`` wide, and returns the interval's midpoint, which lies within ``xtol`` of a root; the procedure
+      stops once a step is at most its tolerance ``delta``, and returns the last chord's zero without evaluating it;
+    - **Starting order:** the procedure leaves the order of its 2 starting x-values to the caller; `Illinois` passes
+      the upper bound as ``x1``, the second of them, as mpmath does.
 
     References:
         - Dowell, M. and Jarratt, P. (1971). A modified regula falsi method for computing the root of an

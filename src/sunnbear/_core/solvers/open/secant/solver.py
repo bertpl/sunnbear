@@ -25,8 +25,8 @@ class Secant(Solver):
       ``xtol``, and returns that next x-value without evaluating it.
     - **Equal function values:** when the 2 latest x-values have equal function values, the secant is horizontal and
       its zero lies at infinity. `Secant` then raises `DivergedError`, which `Solver.solve` records as ``DIVERGED``.
-      This deviates from SciPy, which returns the midpoint of the 2 x-values, flagged as not converged, a result for
-      which the framework has no status.
+      Raising `DivergedError` deviates from SciPy, which returns the midpoint of the 2 x-values and flags it as not
+      converged; the framework has no status for such a result.
 
     A small step does not show that the next x-value is close to a root: on a function that is nearly flat between 2
     x-values, a step taken far from the root can be smaller than ``xtol``.
@@ -40,8 +40,8 @@ class Secant(Solver):
         - SciPy's ``scipy.optimize.newton``, without a derivative; the test suite checks `Secant` against
           ``scipy.optimize.newton``.
         - Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition, section 2.3.
-          John Wiley & Sons. Its error test for the secant method, the step between 2 successive iterates, is the
-          stopping criterion of `Secant`.
+          John Wiley & Sons. Its error test for the secant method, which measures the error by the step between 2
+          successive iterates, is the stopping criterion of `Secant`.
         - Oliveira, I. F. D. and Takahashi, R. H. C. (2020). An enhancement of the bisection method average
           performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), article 5. Its
           Table 1 holds the column "Secant", for a secant method that stops once the smaller ``|f|`` of its 2 latest
