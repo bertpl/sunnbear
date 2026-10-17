@@ -8,7 +8,7 @@
 
 The core mission of `sunnbear` is to provide a **fully transparent benchmarking system** for univariate root-finding algorithms based on an extensive, **curated suite of test problems**.  Actual solver implementations are not _directly_ part of the value proposition.
 
-Actual solver implementations in `sunnbear` still play a critical role in achieving the following two goals:
+Actual solver implementations in `sunnbear` still play a critical role in achieving the following 2 goals:
 1. Show that **`sunnbear` can surface differences** in fundamental characteristics, strengths and weaknesses of root-finding algorithms.
 2. Provide an objective, empirical path to **establish how difficult test problems are** for a representative set of known solvers.
 
@@ -32,10 +32,10 @@ These counts are a lower bound: an article counts only where the evidence ties a
 
 ### I.c. Implementation Approach
 
-Due to the aforementioned goals and challenges, we...
+Due to the goals of section I.a and the challenges of section I.b, we...
 - aim to implement root-finding algorithms on a best-effort basis to reproduce available results to the extent possible
 - let the effort be guided by the level of detail needed to achieve the aforementioned goals
-- standardize a few common elements (see below) to ensure results are comparable and reflect each solver's fundamental characteristics without being influenced by minor implementation differences
+- standardize a few common elements (section IV) to ensure results are comparable and reflect each solver's fundamental characteristics without being influenced by minor implementation differences
 
 ## II. Solvers Overview
 
@@ -60,7 +60,7 @@ The `sunnbear` package implements **14 solver algorithms**, several provided in 
 
 ## III. Overall Implementation Methodology
 
-As indicated earlier, reproducing results can be challenging and not all sources are sufficiently 'complete'.  This section clarifies which sources are used for implementation and validation of correctness of implementation.
+As section I.b shows, reproducing results can be challenging and not all sources are sufficiently 'complete'.  This section clarifies which sources are used for implementation and validation of correctness of implementation.
 
 **Sources for implementation**, roughly in descending order of precedence:
 1. the original article (code, pseudo-code, algorithm descriptions)
@@ -76,16 +76,16 @@ As indicated earlier, reproducing results can be challenging and not all sources
 **Notes:**
 - some cases might require a combination of sources where any single source might not suffice for reproducibility
 - the aforementioned order of precedence is indicative and can require judgment in cases where there are apparent problems (typos, inaccurate test problem description, etc.)
-- the docstring of each solver class will provide full transparency on which sources are used
-- for consistency and comparability of results, certain shared implementation elements will be implemented in a way that might deviate from the original formulation, as stated in the next section
+- the docstring of each solver class provides full transparency on which sources are used
+- for consistency and comparability of results, certain shared implementation elements are implemented in a way that can deviate from the original formulation, as stated in section IV
 
 ## IV. Shared Implementation Choices
 
-Inevitably, each author of a numerical algorithm makes a series of micro-decisions on how to turn its mathematical formulas into code (order of operations, numerical tolerances, ...). The page limits of scientific articles rarely leave room for these details, so authors often fall back on the formulations in exact arithmetic.
+Inevitably, each author of a numerical algorithm makes a series of micro-decisions on how to turn the algorithm's mathematical formulas into code (order of operations, numerical tolerances, ...). The page limits of scientific articles rarely leave room for these details, so authors often fall back on the formulations in exact arithmetic.
 
 Where an article _does_ state such details, they can still deviate from other authors' choices without constituting a fundamental difference in the algorithms' strategies.
 
-For these reasons, the `sunnbear` implementations of the solver algorithms standardize a few recurring elements, for consistency and comparability, in line with the goals and non-goals of section I.a; section V describes the configs that differ.
+For these reasons, the `sunnbear` implementations of the solver algorithms standardize a few recurring elements, for consistency and comparability, in line with the goals and non-goals of section I.a; section V describes the configs that deviate from these shared choices.
 
 ### IV.a. Stopping Criterion & Return Value
 
@@ -111,10 +111,10 @@ A test that also estimates the convergence rate from the last 3 iterates (Aitken
 
 #### IV.a.2. Bracketing algorithms
 
-All bracketing solvers follow 3 rules:
+All bracketing solvers follow 3 rules, apart from the secondary configs that section V lists as not following section IV:
 
 1. **A shared stopping test and return value.** After every iteration, a solve ends once the interval is at most `2*xtol` wide, or once the function value at an interval bound is exactly 0. It returns that bound, or else the interval's midpoint, which then lies within `xtol` of a root.
-   - This is the least strict test that still guarantees a result within `xtol` from the interval alone. A source's own test with the same guarantee stops at the same width or a narrower one: one that returns an interval bound needs the interval at most `xtol` wide. So the shared test never costs a solver an evaluation over its source's own test.
+   - This is the least strict test that still guarantees a result within `xtol` from the interval alone. A source's own test with the same guarantee stops at the same width or a narrower one: a test that returns an interval bound needs the interval at most `xtol` wide. So the shared test never costs a solver an evaluation over its source's own test.
    - Tests on `|f|`, or on the step between 2 iterates, can stop earlier, but they give no guarantee on the distance to a root. The benchmark scores a result farther than `xtol` from a root with a fixed high evaluation count, `max_fevals`.
 2. **Tolerances inside the steps are kept, with their value derived from `xtol`.** Several sources keep each new x-value at least some distance away from the interval bounds or from the previous iterate (a minimum step, or a margin), so that the interval closes once the method has converged. Each source sizes that distance for its own stopping test. The `sunnbear` solver implementations derive it from `xtol` such that it is about `xtol`, half the shared stopping width. A final step past the root then leaves an interval narrower than `2*xtol`, which ends the solve with room for rounding, and no step can land on the far bound, because the interval is wider than `2*xtol` while the solve continues.
 3. **Relative and machine-precision terms leave the stopping test, but stay inside the steps.** In a stopping test, such a term lets a solve end when `xtol` lies below the float spacing near the root; the benchmark excludes that case, because it keeps `xtol` above a multiple of the float spacing at the interval bounds (`compute_xtol_range`). Inside a step, such a term still guards against rounding, as its source intends.
@@ -182,7 +182,7 @@ Each config has a role: a **core** config characterizes the test functions, and 
 ### V.a. Ridders
 
 Ridders (1979) states no stopping rule, so the core config fills that gap with the shared rule of section IV.a. The 2 secondary configs show the stopping rules of 2 widely used implementations:
-- **`RiddersBracketingSolverConfig` (core):** Ridders' steps as the article states them, with the shared stopping rule. Near the root, a new iterate can land between the root and the far bound, and the interval then only halves, so its evaluation counts can vary between near-identical functions.
+- **`RiddersBracketingSolverConfig` (core):** Ridders' steps as the article states them, with the shared stopping rule. Near the root, a new iterate can land between the root and the far bound, and the interval then only halves, so this config's evaluation counts can vary between near-identical functions.
 - **`RiddersScipyConfig` (secondary):** SciPy's `ridder`. It limits each step so that the new iterate lies at least `xtol/2` inside the interval, which the article does not state; near the root, that limit closes the interval in fewer evaluations. It stops once the interval is narrower than `xtol`, and returns the last iterate.
 - **`RiddersCommonsMathConfig` (secondary):** the stopping rule of Apache Commons Math's `RiddersSolver`: it stops once 2 successive iterates lie at most `xtol` apart, and returns the last one. That iterate can lie more than `xtol` from a root, as on a function with a kink or with a multiple root.
 
