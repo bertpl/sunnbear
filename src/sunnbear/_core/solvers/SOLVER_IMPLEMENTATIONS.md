@@ -1,4 +1,4 @@
-> **DISCLAIMER:** the current doc represents the intent of the implementation approach, but in some cases still deviates from the actual implementations.  Once these deviations are resolved, this disclaimer will be removed.
+> **DISCLAIMER:** this document states the intended implementation approach; some solver implementations still deviate from it.
 
 # Solver implementations
 
@@ -28,7 +28,7 @@ However, reproducing results can be challenging.  **Out of the 11 solvers** in s
 - **1** publishes results that reproduce only with a detail that the article leaves out
 - **4** print a test problem that does not reproduce their own published results
 
-These counts are a lower bound: an article counts only where the evidence ties a problem to 1 of the causes above, and every discrepancy whose cause we could not establish is left out.
+These counts are a lower bound: an article counts only where the evidence ties a discrepancy to 1 of the causes above, and every discrepancy whose cause we could not establish is left out.
 
 ### I.c. Implementation Approach
 
@@ -41,8 +41,8 @@ Due to the goals of section I.a and the challenges of section I.b, we...
 
 The `sunnbear` package implements **14 solver algorithms**, several provided in different flavors and settings, totaling **19 solver configurations**.
 
-| Algorithm | Type | Configs | core? | Year | Reference |
-| --------- | ---- | ------- | ----- | ---- | --------- |
+| Algorithm | Type | Configs | core config? | Year | Reference |
+| --------- | ---- | ------- | ------------ | ---- | --------- |
 | `Bisection` | bracketing | 1 | | – | – |
 | `RegulaFalsi` | bracketing | 1 | | – | – |
 | `Secant` | open | 1 | | – | – |
@@ -58,9 +58,11 @@ The `sunnbear` package implements **14 solver algorithms**, several provided in 
 | `CARF` | bracketing | 1 | | 2026 | Gao (2026) |
 | `ModAB` | bracketing | 1 | | 2026 | Ganchovski et al. (2026) |
 
+The `core config?` column marks the algorithms that have a core config, which characterizes the test problems (section V).
+
 ## III. Overall Implementation Methodology
 
-As section I.b shows, reproducing results can be challenging and not all sources are sufficiently 'complete'.  This section clarifies which sources are used for implementation and validation of correctness of implementation.
+As section I.b shows, reproducing results can be challenging and not all sources are sufficiently 'complete'.
 
 **Sources for implementation**, roughly in descending order of precedence:
 1. the original article (code, pseudo-code, algorithm descriptions)
@@ -107,22 +109,27 @@ Moreover, `sunnbear` supports only an absolute tolerance on x (`xtol`), no relat
 - it then returns that next iterate, without evaluating it; near a simple root, the secant method converges superlinearly, so that iterate typically lies well within `xtol` of the root
 - the test gives no guarantee: an open method keeps no interval around the root, so a step can also be small far from a root, e.g. where `f` is nearly flat
 
-A test that also estimates the convergence rate from the last 3 iterates (Aitken's error formula, Atkinson (1989), section 2.6) would stop about 1 evaluation earlier, but it assumes linear convergence and can stop too early after an irregular secant step.
+A stopping criterion that also estimates the convergence rate from the last 3 iterates (Aitken's error formula, Atkinson (1989), section 2.6) would stop about 1 evaluation earlier, but it assumes linear convergence and can stop too early after an irregular secant step.
 
 #### IV.a.2. Bracketing algorithms
 
 All bracketing solvers follow 3 rules, apart from the secondary configs that section V lists as not following section IV:
 
-1. **A shared stopping test and return value.** After every iteration, a solve ends once the interval is at most `2*xtol` wide, or once the function value at an interval bound is exactly 0. It returns that bound, or else the interval's midpoint, which then lies within `xtol` of a root.
-   - This is the least strict test that still guarantees a result within `xtol` from the interval alone. A source's own test with the same guarantee stops at the same width or a narrower one: a test that returns an interval bound needs the interval at most `xtol` wide. So the shared test never costs a solver an evaluation over its source's own test.
-   - Tests on `|f|`, or on the step between 2 iterates, can stop earlier, but they give no guarantee on the distance to a root. The benchmark scores a result farther than `xtol` from a root with a fixed high evaluation count, `max_fevals`.
-2. **Tolerances inside the steps are kept, with their value derived from `xtol`.** Several sources keep each new x-value at least some distance away from the interval bounds or from the previous iterate (a minimum step, or a margin), so that the interval closes once the method has converged. Each source sizes that distance for its own stopping test. The `sunnbear` solver implementations derive it from `xtol` such that it is about `xtol`, half the shared stopping width. A final step past the root then leaves an interval narrower than `2*xtol`, which ends the solve with room for rounding, and no step can land on the far bound, because the interval is wider than `2*xtol` while the solve continues.
-3. **Relative and machine-precision terms leave the stopping test, but stay inside the steps.** In a stopping test, such a term lets a solve end when `xtol` lies below the float spacing near the root; the benchmark excludes that case, because it keeps `xtol` above a multiple of the float spacing at the interval bounds (`compute_xtol_range`). Inside a step, such a term still guards against rounding, as its source intends.
+1. **A shared stopping criterion and return value.** After every iteration, a solve ends once the interval is at most `2*xtol` wide, or once the function value at an interval bound is exactly 0. It returns that bound, or else the interval's midpoint, which then lies within `xtol` of a root.
+   - This is the least strict stopping criterion that still guarantees a result within `xtol` from the interval alone. A source's own stopping criterion with the same guarantee stops at the same width or a narrower one: a stopping criterion that returns an interval bound needs the interval at most `xtol` wide. So the shared stopping criterion never costs a solver an evaluation over its source's own.
+   - Stopping criteria on `|f|`, or on the step between 2 iterates, can stop earlier, but they give no guarantee on the distance to a root. The benchmark scores a result farther than `xtol` from a root with a fixed high evaluation count, `max_fevals`.
+2. **Tolerances inside the steps are kept, with their value derived from `xtol`.** Several sources keep each new x-value at least some distance away from the interval bounds or from the previous iterate (a minimum step, or a margin), so that the interval shrinks to the stopping width once the method has converged.
+   - Each source sizes that distance for its own stopping criterion. The `sunnbear` solver implementations derive it from `xtol` such that it is about `xtol`, half the shared stopping width.
+   - A final step past the root then leaves an interval narrower than `2*xtol`, which ends the solve with room for rounding.
+   - No step can land on the far bound, because the interval stays wider than `2*xtol` while the solve continues.
+3. **Relative and machine-precision terms are dropped from the stopping criterion, but kept inside the steps.**
+   - In a stopping criterion, such a term lets a solve end even when `xtol` lies below the float spacing near the root. The benchmark never sets such an `xtol`: it keeps `xtol` above a multiple of the float spacing at the interval bounds (`compute_xtol_range`).
+   - Inside a step, such a term still guards against rounding, as its source intends.
 
-The table lists what each source states, and what the `sunnbear` solver implementations keep besides the shared test and return value.
+The table lists what each source states, and what the `sunnbear` solver implementations keep besides the shared stopping criterion and return value.
 
-| Algorithm | Source's stopping test | Source's returned x-value | Kept inside the steps |
-| --------- | ---------------------- | ------------------------- | --------------------- |
+| Algorithm | Source's stopping criterion | Source's returned x-value | Kept inside the steps |
+| --------- | --------------------------- | ------------------------- | --------------------- |
 | `Brent` | half-width ≤ `tol`, or `f(b) = 0`, with `tol = 2*macheps*\|b\| + t` | `b`, the bound with the smaller `\|f\|` | minimum step `tol`, with `t = xtol` |
 | `Illinois` | ALGOL: step ≤ `delta`; tables: `\|f\| < 0.5e-19` | ALGOL: the next chord zero, not evaluated | – |
 | `Pegasus` | none; experiments: `\|f\|` below a threshold | not stated | – |
@@ -130,12 +137,12 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 | `Ridders` | none | not stated | – |
 | `TOMS748` | width ≤ `2*tole`, with `tole = 2*macheps*\|u\| + tol` | not stated | every new x-value kept `0.7*(2*tole)` inside the interval, with `tol = xtol` |
 | `Chandrupatla` | half-width < `TOL`, or `f = 0`, with `TOL = 2*ε_R*\|x\| + 0.5*ε_A` | the bound with the smaller `\|f\|` | distance `TOL` from the interval bounds, with `ε_A = 2*xtol` |
-| `ITP` | width ≤ `2ε` | the midpoint | projection radius, with `ε = xtol` |
+| `ITP` | width ≤ `2ε` | the midpoint | projection radius, which bounds how far each step may lie from the midpoint, with `ε = xtol` |
 | `SteffenBrent` | width ≤ `tol1`, or `\|f(b)\|` ≤ `tol2` | `b` | – |
 | `CARF` | `\|f\| < ε1`, or width < `ε2 + \|t\|*ε1` | not stated | – |
 | `ModAB` | width ≤ `aTol + rTol*\|x3\|`, or `f = 0` | the next iterate, not evaluated | – (it clamps each new iterate into the interval, without a tolerance) |
 
-`Bisection` and `RegulaFalsi` have no reference; they follow the shared test and return value as they are.
+`Bisection` and `RegulaFalsi` have no reference; they follow the shared stopping criterion and return value as they are.
 
 ### IV.b. Iteration Formula
 
@@ -150,12 +157,12 @@ This applies to every plain chord step and every plain midpoint, in hybrid metho
 | `Bisection` | – | shared |
 | `RegulaFalsi` | shared | – |
 | `Secant` | shared | – |
-| `Brent` | source's form: `p / q`, divided only after Brent's acceptance test | source's form: `b + m`, where `m = 0.5*(c - b)` also drives Brent's stopping and acceptance tests |
+| `Brent` | source's form: `p / q`, divided only after Brent's acceptance test | source's form: `b + m`, where `m = 0.5*(c - b)` also drives Brent's stopping criterion and acceptance test |
 | `Illinois` | shared | – |
 | `Pegasus` | shared | – |
 | `AndersonBjorck` | shared | – |
 | `Ridders` | – | shared |
-| `TOMS748` | shared in the first secant step; source's form in the double-size secant step, which is not a plain chord | shared |
+| `TOMS748` | shared in the first secant step; source's form in the double-size secant step, a step from the bound with the smaller `\|f\|` twice as long as the secant step, which is not a plain chord | shared |
 | `Chandrupatla` | – | source's form: `x1 + t*(x2 - x1)` with `t = 0.5`, where `t` is clamped before every step |
 | `ITP` | shared | shared |
 | `SteffenBrent` | shared | shared |
@@ -164,15 +171,15 @@ This applies to every plain chord step and every plain midpoint, in hybrid metho
 
 ## V. Solver Configurations
 
-Some solvers are provided in multiple configurations, which might differ in their parameters or in certain implementation details (such as the stopping criterion).  In the following subsections we will explicitly describe those configurations (when there's >1 for a single solver) and state the rationale.
+Some solvers are provided in multiple configurations, which might differ in their parameters or in certain implementation details (such as the stopping criterion).
 
-Each config has a role: a **core** config characterizes the test functions, and a **secondary** config is reported for information only. Only a secondary config may deviate from section IV.
+Each config has a role: a **core** config characterizes the test problems, and a **secondary** config is reported for information only. Only a secondary config may deviate from section IV.
 
 | Algorithm | Config | Role | Differs in | Follows section IV |
 | --------- | ------ | ---- | ---------- | ------------------ |
 | `Ridders` | `RiddersBracketingSolverConfig` | core | Ridders' steps, as the article states them | yes |
-| | `RiddersScipyConfig` | secondary | SciPy's step limit and stopping rule | no: SciPy's stopping rule |
-| | `RiddersCommonsMathConfig` | secondary | Apache Commons Math's stopping rule | no: Commons Math's stopping rule |
+| | `RiddersScipyConfig` | secondary | SciPy's step limit and stopping criterion | no: SciPy's stopping criterion |
+| | `RiddersCommonsMathConfig` | secondary | Apache Commons Math's stopping criterion | no: Commons Math's stopping criterion |
 | `TOMS748` | `TOMS748K2Config` | core | `k = 2`, the article's Algorithm 4.2 | yes |
 | | `TOMS748K1Config` | secondary | `k = 1`, the article's Algorithm 4.1 | yes |
 | `ITP` | `ITPPaperExperimentsSlack0Config` | core | the projection radius of the authors' code, `n_slack = 0` | yes |
@@ -181,10 +188,10 @@ Each config has a role: a **core** config characterizes the test functions, and 
 
 ### V.a. Ridders
 
-Ridders (1979) states no stopping rule, so the core config fills that gap with the shared rule of section IV.a. The 2 secondary configs show the stopping rules of 2 widely used implementations:
-- **`RiddersBracketingSolverConfig` (core):** Ridders' steps as the article states them, with the shared stopping rule. Near the root, a new iterate can land between the root and the far bound, and the interval then only halves, so this config's evaluation counts can vary between near-identical functions.
-- **`RiddersScipyConfig` (secondary):** SciPy's `ridder`. It limits each step so that the new iterate lies at least `xtol/2` inside the interval, which the article does not state; near the root, that limit closes the interval in fewer evaluations. It stops once the interval is narrower than `xtol`, and returns the last iterate.
-- **`RiddersCommonsMathConfig` (secondary):** the stopping rule of Apache Commons Math's `RiddersSolver`: it stops once 2 successive iterates lie at most `xtol` apart, and returns the last one. That iterate can lie more than `xtol` from a root, as on a function with a kink or with a multiple root.
+Ridders (1979) states no stopping criterion, so the core config fills that gap with the shared stopping criterion of section IV.a. The 2 secondary configs show the stopping criteria of 2 widely used implementations:
+- **`RiddersBracketingSolverConfig` (core):** Ridders' steps as the article states them, with the shared stopping criterion. Near the root, a new iterate can land between the root and the far bound, and the interval then only halves, so this config's evaluation counts can vary between near-identical functions.
+- **`RiddersScipyConfig` (secondary):** SciPy's `ridder`. It limits each step so that the new iterate lies at least `xtol/2` inside the interval, which the article does not state; near the root, that limit shrinks the interval to the stopping width in fewer evaluations. It stops once the interval is narrower than `xtol`, and returns the last iterate.
+- **`RiddersCommonsMathConfig` (secondary):** the stopping criterion of Apache Commons Math's `RiddersSolver`: it stops once 2 successive iterates lie at most `xtol` apart, and returns the last one. That iterate can lie more than `xtol` from a root, as on a function with a kink or with a multiple root.
 
 ### V.b. TOMS748
 
@@ -213,7 +220,7 @@ A reader must be able to compare each solver with its source step by step:
 ### VI.b. Validation & Provenance
 
 The tests compare each solver with the published results and reference implementations of section III, to check that it implements its method's steps correctly:
-- **a published table that depends on its article's own stopping rule** is checked against a subclass of the solver that replaces the shared stopping rule with the article's; that subclass lives in the solver's test package
+- **a published table that depends on its article's own stopping criterion** is checked against a subclass of the solver that replaces the shared stopping criterion with the article's; that subclass lives in the solver's test package
 - **the docstring of each solver's test package** lists, each with its reason: the published results and reference implementations used for comparison, the allowed deviations, and the published results not used
 - **the `References:` section of each solver's class docstring** cites every source used for the implementation or the validation, with 1 line on what each source provides; the class docstring states each deviation from its sources in 1 bullet
 
