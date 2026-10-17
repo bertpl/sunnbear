@@ -1,5 +1,5 @@
 """These tests assert that the individual steps of `CARF` follow its algorithm, and that its quadratic step finds the
-quadratic's zero at any scale of ``f`` and with ``t`` on or near an interval bound."""
+quadratic's zero at any scale of ``f`` and with its interior x-value ``t`` on or near an interval bound."""
 
 import math
 
@@ -9,10 +9,10 @@ import pytest
 from sunnbear.solvers import CARF
 from tests.solvers.example_functions import cubic, steep_exponential
 
-# The 3 points ``(a, f(a))``, ``(t, f(t))`` and ``(b, f(b))`` of a quadratic step of `CARF` on ``x^19`` over
-# ``[-1, 4]``, at the benchmark's smallest allowed ``xtol``: ``t`` lies within rounding error of ``b``, with
-# ``f(t) = f(b)``, and the function values are below 1e-180.
-_X19_STEP = (
+# The arguments ``(a, t, b, fa, ft, fb)`` of a quadratic step of `CARF` while solving ``x^19`` over ``[-1, 4]``, at
+# the benchmark's smallest allowed ``xtol``: ``t`` lies within rounding error of ``b``, ``f(t)`` and ``f(b)`` agree to
+# 13 significant digits, and the function values are below 1e-180.
+_X19_STEP_INPUTS = (
     -1.1602778377907523e-10,
     6.2640603329516776e-12,
     6.264060332951684e-12,
@@ -38,18 +38,19 @@ def test_the_first_x_value_is_the_chord_zero_clipped_into_the_middle_80_percent(
 
 
 def test_the_quadratic_zero_is_found_with_t_within_rounding_error_of_a_bound():
-    """At the quadratic step of `_X19_STEP`, the quadratic's zero agrees with its value in 50-digit arithmetic."""
+    """With the inputs of `_X19_STEP_INPUTS`, `_quadratic_zero` returns the zero that 50-digit arithmetic gives for the
+    same quadratic."""
     # --- act --------------------------
-    zero = CARF._quadratic_zero(*_X19_STEP)
+    zero = CARF._quadratic_zero(*_X19_STEP_INPUTS)
 
     # --- assert -----------------------
-    assert zero == pytest.approx(_exact_quadratic_zero(*_X19_STEP), rel=1e-14)
+    assert zero == pytest.approx(_exact_quadratic_zero(*_X19_STEP_INPUTS), rel=1e-14)
 
 
 @pytest.mark.parametrize("scale", [2.0**-1000, 1.0, 2.0**1000], ids=["2^-1000", "1", "2^1000"])
 def test_the_quadratic_zero_does_not_depend_on_the_scale_of_f(scale):
     """The quadratic through ``(0, -2)``, ``(0.75, 0.75^2 - 2)`` and ``(2, 2)`` is ``x^2 - 2``; with its function values
-    scaled by a power of 2 from 2^-1000 to 2^1000, its zero is ``sqrt(2)``, to within 1 ulp."""
+    scaled by a power of 2, its zero is ``sqrt(2)``, to within 1 ulp."""
     # --- act --------------------------
     zero = CARF._quadratic_zero(0.0, 0.75, 2.0, -2.0 * scale, (0.75**2 - 2.0) * scale, 2.0 * scale)
 
@@ -60,7 +61,7 @@ def test_the_quadratic_zero_does_not_depend_on_the_scale_of_f(scale):
 @pytest.mark.parametrize("t, ft", [(0.0, -2.0), (2.0, 2.0)], ids=["t_on_a", "t_on_b"])
 def test_the_quadratic_zero_with_t_on_a_bound_is_the_chord_zero(t, ft):
     """With ``t`` on an interval bound, the quadratic is not defined, and the step returns the zero of the chord
-    through ``(0, -2)`` and ``(2, 2)``, which is 1."""
+    through ``(0, -2)`` and ``(2, 2)``."""
     # --- act --------------------------
     zero = CARF._quadratic_zero(0.0, t, 2.0, -2.0, ft, 2.0)
 
@@ -73,15 +74,20 @@ def test_the_quadratic_zero_with_t_on_a_bound_is_the_chord_zero(t, ft):
 # ==================================================================================================
 def _exact_quadratic_zero(a: float, t: float, b: float, fa: float, ft: float, fb: float) -> float:
     """Return the zero in ``[a, b]`` of the quadratic through ``(a, fa)``, ``(t, ft)`` and ``(b, fb)``, computed in
-    50-digit arithmetic."""
+    50-digit arithmetic.
+
+    ``t`` must differ from ``a`` and ``b``, and the quadratic must have a nonzero ``x^2`` coefficient and a zero in
+    ``[a, b]``.
+    """
     with mpmath.workdps(50):
         a, t, b, fa, ft, fb = (mpmath.mpf(value) for value in (a, t, b, fa, ft, fb))
         slope_a_t = (ft - fa) / (t - a)
         slope_t_b = (fb - ft) / (b - t)
-        c2 = (slope_t_b - slope_a_t) / (b - a)
-        # The quadratic fa + slope_a_t * (x - a) + c2 * (x - a) * (x - t), as c2 * x^2 + c1 * x + c0.
-        c1 = slope_a_t - c2 * (a + t)
-        c0 = fa - slope_a_t * a + c2 * a * t
-        sqrt_discriminant = mpmath.sqrt(c1 * c1 - 4 * c2 * c0)
-        zeros = [(-c1 + sqrt_discriminant) / (2 * c2), (-c1 - sqrt_discriminant) / (2 * c2)]
+        x2_coef = (slope_t_b - slope_a_t) / (b - a)
+        # Expand the quadratic fa + slope_a_t * (x - a) + x2_coef * (x - a) * (x - t) into
+        # x2_coef * x^2 + x1_coef * x + x0_coef.
+        x1_coef = slope_a_t - x2_coef * (a + t)
+        x0_coef = fa - slope_a_t * a + x2_coef * a * t
+        sqrt_discriminant = mpmath.sqrt(x1_coef * x1_coef - 4 * x2_coef * x0_coef)
+        zeros = [(-x1_coef + sqrt_discriminant) / (2 * x2_coef), (-x1_coef - sqrt_discriminant) / (2 * x2_coef)]
         return float(next(zero for zero in zeros if a <= zero <= b))
