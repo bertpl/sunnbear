@@ -28,9 +28,10 @@ def test_the_modification_evaluates_the_midpoint_of_a_and_s_and_interpolation_is
     """On ``sqrt(x) - 1/2`` over ``[0, 1]``, the first step lands on 0.5, and the modification evaluates 0.25, the
     midpoint of ``a = 0`` and ``s = 0.5``.
 
-    The midpoint 0.25 is the root, but ``f(0.25) = 0`` does not differ in sign from ``f(s)``, so the solve goes on. The
-    second step, an inverse quadratic interpolation, lands on the root up to rounding, because the inverse function
-    ``(y + 1/2)^2`` is quadratic."""
+    The midpoint 0.25 is the root, but ``f(0.25) = 0`` does not differ in sign from ``f(s)``, so 0.25 does not replace
+    ``a``, and the solve goes on, because a 0 ends the solve only at an interval bound. The second step, an inverse
+    quadratic interpolation, lands on the root up to rounding, because the inverse function ``(y + 1/2)^2`` is
+    quadratic."""
     # --- act --------------------------
     result = SteffenBrent().solve(
         lambda x: math.sqrt(x) - 0.5, 0.0, 1.0, xtol=1e-10, max_fevals=60, history_enabled=True

@@ -54,8 +54,8 @@ class FigureValues:
         new interval divided by that of the old one.
 
         The interval after each iteration follows from the evaluations by the rule in the `SteffenBrent` class
-        docstring: each iteration evaluates ``s``, and also the midpoint of ``a`` and ``s`` when ``f(a)`` and ``f(s)``
-        differ in sign and ``f(s)`` is not 0.
+        docstring: each iteration evaluates ``s``, and also the midpoint of ``a`` and ``s`` unless ``f(a)`` and
+        ``f(s)`` have the same sign.
         """
         (a, fa), (b, fb), *evaluations = result.history
         if abs(fa) < abs(fb):
@@ -64,9 +64,9 @@ class FigureValues:
         while evaluations:
             old_width = abs(b - a)
             s, fs = evaluations.pop(0)
-            if (fa > 0.0) == (fs > 0.0):
+            if (fa > 0.0 and fs > 0.0) or (fa < 0.0 and fs < 0.0):
                 a, fa = b, fb
-            elif fs != 0.0:
+            else:
                 m, fm = evaluations.pop(0)
                 assert m == 0.5 * (a + s)
                 if (fm > 0.0 > fs) or (fm < 0.0 < fs):
@@ -103,12 +103,12 @@ def _case_study_2(v: float) -> float:
     return v**3 - (1.0 - lam + t) * v**2 + (sigma - lam - lam * t + u) * v - (sigma + sigma * t + u)
 
 
-# `_LAST_SECANT_STEP_DEVIATION_REASON` states why, in case study 2, the solve takes 1 more iteration than the paper's
-# run, which also changes the figures' last width ratio.
+# `_LAST_SECANT_STEP_DEVIATION_REASON` states why, in case study 2, the solve evaluates 1 more midpoint than the
+# paper's run, which also changes the figures' last width ratio.
 _LAST_SECANT_STEP_DEVIATION_REASON = (
     "`chord_zero` puts the last secant step 1 ulp from where the paper's equation 4 puts it; near the root, rounding "
     "in f gives neighboring floats opposite signs, so f(s) has the sign opposite to f at equation 4's x-value, and the "
-    "solve evaluates the midpoint of a and s and takes 1 more iteration"
+    "solve evaluates the midpoint of a and s in its 6th iteration"
 )
 
 CASE_STUDIES = [
@@ -125,11 +125,6 @@ CASE_STUDIES = [
         # - once in each of those 6 iterations;
         # - in 2 of those iterations, also at the midpoint of ``a`` and ``s``.
         n_fevals=2 + 6 + 2,
-        n_fevals_tol=1,
-        deviation_reason=(
-            "The paper's run stops once |f(b)| is small enough, with |f(b)| about 1e-15 after 6 iterations; "
-            "`SteffenBrent` stops on the width of the interval, and takes a 7th iteration, which ends at an exact zero."
-        ),
     ),
     PaperProblem(
         name="case_study_2",
@@ -142,7 +137,7 @@ CASE_STUDIES = [
         root_abs_tol=1e-8,
         # The paper's figures show 6 iterations; the evaluations are counted as in the first case study.
         n_fevals=2 + 6 + 2,
-        n_fevals_tol=2,
+        n_fevals_tol=1,
         deviation_reason=_LAST_SECANT_STEP_DEVIATION_REASON,
     ),
 ]

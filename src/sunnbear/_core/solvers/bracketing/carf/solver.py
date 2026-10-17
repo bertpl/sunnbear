@@ -4,6 +4,7 @@ import math
 
 from sunnbear._core.solvers.core import Solver, SolveState
 from sunnbear._core.solvers.core.formulas import chord_zero, midpoint
+from sunnbear._core.solvers.core.stopping import interval_root_if_converged
 
 # The paper's constants, which clip an x-value into the middle part of an interval: a fraction θ of the interval's
 # width at each end is out of bounds. θ0 places the first x-value; θ1, θ2 and θ3 clip the later x-values, and the kind
@@ -41,11 +42,23 @@ class CARF(Solver):
       the 3 function values are not monotone, which clips ``t*`` to the midpoint;
     - **updates the interval,** as the bullet *The interval after a sign change* below describes.
 
-    The solve ends once ``f(t) = 0``, or once the active interval is narrower than ``xtol``, and returns ``t``, which
-    then lies within ``xtol`` of a root.
+    The solve checks its stopping criterion once per iteration, after selecting the active interval:
 
-    The paper stops once ``|f(t)| < eps1`` or the active interval is narrower than ``eps2 + |t| * eps1``; `CARF` uses
-    ``xtol`` as ``eps2`` and 0 as ``eps1``, and replaces the test ``|f(t)| < 0``, which never holds, with ``f(t) = 0``.
+    - it ends once the active interval is at most ``2*xtol`` wide, or once ``f`` is 0 at one of its bounds;
+    - it returns that bound, or else the active interval's midpoint, which then lies within ``xtol`` of a root.
+
+    A function value of 0 is not a sign change, so a ``t_new`` with ``f(t_new) = 0`` becomes the interior x-value
+    ``t``, which is a bound of the next active interval, and the next check ends the solve at it.
+
+    `CARF` departs from the paper in these places:
+
+    - **Stopping criterion:** `CARF` stops by the shared stopping criterion above, checked where the paper checks its
+      own; the paper stops once ``|f(t)| < eps1`` or the active interval is narrower than ``eps2 + |t|*eps1``, and does
+      not state which x-value it returns.
+    - **Sign tests:** `CARF` compares the signs of 2 function values directly, where the paper tests whether their
+      product is negative, because the product of 2 small function values can underflow to 0.
+    - **Iteration limit:** the paper's limit of 200 iterations is left out; the solve's evaluation budget ends a solve
+      instead.
 
     The paper's code is not public, and the paper leaves parts of the method open or describes them ambiguously.
     The `CARF` solver implemented here settles them with these choices, each chosen to reproduce the paper's Tables 3
@@ -56,9 +69,9 @@ class CARF(Solver):
       says it borrows.
 
       Read the paper's way, the test never clips while the x-values approach the root from one side: on
-      ``(x - 3)^3`` over ``[0, 5]``, the solve then runs to the paper's limit of 200 iterations, while the paper reports
-      far fewer evaluations. Accepted and clipped steps both update the last step and the step before last, and before
-      the first iteration both are set to the width of the initial interval.
+      ``(x - 3)^3`` over ``[0, 5]``, the solve then takes far more evaluations than the paper reports, and with the
+      shared stopping criterion it does not converge. Accepted and clipped steps both update the last step and the
+      step before last, and before the first iteration both are set to the width of the initial interval.
     - **The interval after a sign change:** when ``f(t_new)`` and ``f(t)`` differ in sign, the paper takes the
       shorter of "two sign-changing sub-intervals containing" ``t_new``. `CARF` takes the shorter of these 2
       intervals:
@@ -68,11 +81,6 @@ class CARF(Solver):
         interior x-value.
 
       When the signs agree, the new interval is the active interval, with ``t_new`` as its interior x-value.
-    - **A function value of 0 is not a sign change:** a sign change means ``f(t_new) * f(t) < 0``, so a ``t_new``
-      with ``f(t_new) = 0`` becomes the interior x-value, and the solve ends at it.
-    - **The stop test checks only the interior x-value:** a ``t_new`` that becomes a bound of the interval does not end
-      the solve, however small its ``|f|``. With the paper's ``eps1 > 0``, the evaluation counts of Table 4 depend on
-      this choice.
     - **The quadratic's zero:** the paper does not say how it computes the zero. `CARF` computes it in 3 steps:
 
       - it rescales the 3 points so that ``[a, b]`` becomes ``[0, 1]`` and ``f(b) - f(a)`` becomes 1;
@@ -104,10 +112,6 @@ class CARF(Solver):
     - when ``f(b) / f(a)`` overflows, ``xi`` is NaN, and so is the next x-value, which `Solver.solve` records as
       ``DIVERGED``.
 
-    Signs of function values are compared directly, where the paper multiplies them: the product of 2 small function
-    values can underflow to 0. The paper's limit of 200 iterations is left out: the solve's evaluation budget ends a
-    solve instead.
-
     A known caveat: the old ``t`` can stay the interior x-value while it lies far from the root.
 
     - **Cause:** a sign change near the root makes the interval from ``t_new`` to the bound outside the active
@@ -121,8 +125,7 @@ class CARF(Solver):
     The paper's proof guarantees only that each step shrinks the interval to at most 70 % of its width. A power step
     evaluates 2 logarithms and a power, so `CARF`'s flop counts can exceed those of the other solvers.
 
-    `CARF` keeps an interior x-value besides the 2 bounds, and stops by its own criterion, so it writes its own loop,
-    not `BracketingSolver`'s.
+    `CARF` keeps an interior x-value besides the 2 bounds, so it writes its own loop, not `BracketingSolver`'s.
 
     References:
         - Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied Mathematics Letters
@@ -133,25 +136,35 @@ class CARF(Solver):
           Journal 14(4), 422-425. It describes the test that compares a step with half the step before last, which
           `CARF` borrows.
           https://doi.org/10.1093/comjnl/14.4.422
+        - Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear
+          function without using derivatives. Advances in Engineering Software 28(3), 145-149. Gao's Table 4 runs on the
+          45 test problems of Chandrupatla's Table 2, whose functions the test suite takes from that table.
+          https://doi.org/10.1016/S0965-9978(96)00051-8
+        - Alefeld, G. E., Potra, F. A. and Shi, Y. (1995). Algorithm 748: Enclosing zeros of continuous functions. ACM
+          Transactions on Mathematical Software 21(3), 327-344. Gao's Table 3 runs on the test problems of Algorithm
+          748, which the test suite takes from the authors' test driver.
+          https://doi.org/10.1145/210089.210111
     """
 
     name = "carf"
-    version = 3
+    version = 4
 
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the paper's description
-        """Run CARF's iterations and return the interior x-value ``t``.
+        """Run CARF's iterations until `_root_if_converged` returns a root estimate, and return that estimate.
 
         Each iteration, as the class docstring describes:
 
-        - selects the active interval, and ends the solve if the stop test holds;
+        - selects the active interval, and ends the solve once `_root_if_converged` returns a root estimate for it, at
+          the point where the paper tests its own stopping criterion;
         - interpolates ``t_star``, and accepts or clips it;
         - evaluates the new x-value, and updates the interval.
 
         The variables follow the paper's names, spelled as Python identifiers: ``a_active`` and ``b_active`` are its
-        ``a*`` and ``b*``, and ``t_star`` is its ``t*``.
+        ``a*`` and ``b*``, with function values ``fa_active`` and ``fb_active``, and ``t_star`` is its ``t*``.
         """
         interval = state.interval
         a, fa, b, fb = interval.a, interval.fa, interval.b, interval.fb
+        xtol_doubled = 2.0 * state.xtol
 
         # --- the first x-value ------------------
         width = b - a
@@ -164,11 +177,14 @@ class CARF(Solver):
             # --- the active interval ------------
             is_sign_change_below_t = (fa < 0.0 < ft) or (ft < 0.0 < fa)
             if is_sign_change_below_t:
-                a_active, b_active = a, t
+                a_active, fa_active, b_active, fb_active = a, fa, t, ft
             else:
-                a_active, b_active = t, b
-            if self._is_converged(t, ft, b_active - a_active, state.xtol):
-                return t
+                a_active, fa_active, b_active, fb_active = t, ft, b, fb
+
+            # --- the stopping criterion ---------
+            x_root = self._root_if_converged(a_active, fa_active, b_active, fb_active, t, ft, xtol_doubled)
+            if x_root is not None:
+                return x_root
 
             # --- the candidate t_star -----------
             r = (t - a) / (b - a)
@@ -273,11 +289,18 @@ class CARF(Solver):
                 return a + width * r_of_zero
 
     @staticmethod
-    def _is_converged(t: float, ft: float, active_width: float, xtol: float) -> bool:
-        """Return whether the stop test holds at the interior x-value ``t``.
+    def _root_if_converged(
+        a_active: float,
+        fa_active: float,
+        b_active: float,
+        fb_active: float,
+        t: float,
+        ft: float,
+        xtol_doubled: float,
+    ) -> float | None:
+        """Return the root estimate if the solve ends at the active interval, or ``None`` if it continues.
 
-        The test holds once ``f(t) = 0`` or the active interval is narrower than ``xtol``, and does not use ``t``.
-        The test suite overrides this method to apply the paper's stop test and tolerances, the relative tolerance
-        ``|t| * eps1`` included, when it reproduces the paper's tables.
+        ``t`` and ``ft`` are not used, since ``t`` is one of the 2 bounds. The test suite overrides this method to
+        apply the paper's own stopping criterion, which needs them, where it reproduces the paper's published counts.
         """
-        return ft == 0.0 or active_width < xtol
+        return interval_root_if_converged(a_active, fa_active, b_active, fb_active, xtol_doubled)

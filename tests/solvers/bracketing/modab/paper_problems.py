@@ -14,8 +14,7 @@ _ROUNDING_DEVIATION_REASON = (
 # - modAB's evaluation count in Table 2, written as the table's count minus the number of iterations whose chord's
 #   zero is clamped onto a bound, where there are any: the paper's C# code counts every iteration as an evaluation,
 #   but a clamped iteration evaluates nothing;
-# - modAB's root in the paper's supplementary results; `ModAB` returns this x-value without evaluating the function
-#   there.
+# - modAB's root in the paper's supplementary results, the return value of the paper's C# code.
 # A row whose count `ModAB` does not reproduce exactly also holds a count tolerance and the reason.
 TABLE_2 = [
     GanchovskiEtAlTable2Problem.F01.with_n_fevals_and_root(3, root=1.0),

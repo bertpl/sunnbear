@@ -1,5 +1,4 @@
-"""These tests assert that `AndersonBjorck` converges on a convex function, where `RegulaFalsi` stalls, and that
-`AndersonBjorck` returns an x-value where it evaluated the function, within ``xtol`` of the root."""
+"""These tests assert that `AndersonBjorck` converges on a convex function, where `RegulaFalsi` stalls."""
 
 import pytest
 
@@ -20,15 +19,3 @@ def test_a_convex_function_converges_where_regula_falsi_stalls(f):
     assert anderson_bjorck_result.status is SolveStatus.CONVERGED
     assert abs(anderson_bjorck_result.x - CUBIC_ROOT) <= 1e-9
     assert anderson_bjorck_result.n_fevals <= 15
-
-
-@pytest.mark.parametrize("f", [cubic, decreasing_cubic])  # The 2 functions cover both interval orientations.
-def test_the_solve_returns_an_x_value_where_it_evaluated_the_function(f):
-    """`AndersonBjorck` returns an x-value where it evaluated the function, within ``xtol`` of the root."""
-    # --- act --------------------------
-    result = AndersonBjorck().solve(f, 1.0, 2.0, xtol=1e-3, max_fevals=60, history_enabled=True)
-
-    # --- assert -----------------------
-    assert result.status is SolveStatus.CONVERGED
-    assert result.x in [x for x, _ in result.history]
-    assert abs(result.x - CUBIC_ROOT) <= 1e-3

@@ -1,10 +1,12 @@
 """`AndersonBjorck` implements the Anderson-Björck method: regula falsi that scales down a bound's function value."""
 
-from sunnbear._core.solvers.core import Solver, SolveState
+from sunnbear._core.solvers.core import BracketingSolver, Interval, IntervalBound
 from sunnbear._core.solvers.core.formulas import chord_zero
 
+from .state import AndersonBjorckState
 
-class AndersonBjorck(Solver):
+
+class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
     """`AndersonBjorck` is regula falsi that scales down the function value of a bound kept twice in a row.
 
     Like regula falsi, `AndersonBjorck` evaluates the zero of the chord through ``(a, f(a))`` and ``(b, f(b))``.
@@ -32,49 +34,16 @@ class AndersonBjorck(Solver):
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, with its
       unscaled function value.
 
-    `AndersonBjorck` computes the factor as the paper's ALGOL procedure does, and computes the chord's zero with
-    `chord_zero`, whose form differs from the procedure's:
+    `AndersonBjorck` computes the factor as the paper's ALGOL procedure does: as the ratio of 2 chord slopes, the slope
+    from the previous to the new iterate divided by the slope of the chord that produced the new iterate. For a new
+    iterate at that chord's zero, the ratio equals ``1 - f_new / f_previous`` in exact arithmetic.
 
-    - **the chord's zero:** the procedure computes it as ``x1 - f1 / w1``, a step from the most recent iterate ``x1``,
-      where ``w1 = (f1 - f0) / (x1 - x0)`` is the slope of the chord through ``(x1, f1)`` and ``(x0, f0)``, with ``x0``
-      the retained bound and ``f0`` its scaled value; in exact arithmetic, the procedure's form gives the same x-value
-      as `chord_zero`, but rounds differently;
-    - **the factor:** the ratio of 2 chord slopes, the slope from the previous to the new iterate divided by ``w1``,
-      the slope of the chord that produced the new iterate. In exact arithmetic, the ratio equals
-      ``1 - f_new / f_previous``.
+    `AndersonBjorck` also takes the procedure's step of delta, with ``delta = xtol``: when the chord's zero lies within
+    ``delta`` of the most recent iterate, it evaluates the x-value at exactly ``delta`` from that iterate, toward the
+    retained bound.
 
-    As for the chord's zero and the factor, `AndersonBjorck` follows its paper in its stopping rule, so that the
-    benchmark measures the method as published. It stops as the ALGOL procedure does, with the procedure's tolerance
-    ``delta`` set to ``xtol``:
-
-    - **when it stops:** once the interval is at most ``xtol`` wide, or the function value at the most recent iterate
-      is 0;
-    - **what it returns:** the interval bound with the smaller ``|f|``, comparing the most recent iterate's ``|f1|``
-      with the retained bound's scaled ``|f0|``, as the procedure does. The returned bound lies within ``xtol`` of a
-      root.
-
-    `Illinois` and `Pegasus` stop by the criterion of `BracketingSolver` instead, so in the benchmark `AndersonBjorck`
-    uses a different stopping rule from the other 2 methods.
-
-    Where the ALGOL procedure tests whether a new iterate ``x2`` lies on the other side of the root by
-    ``f2 * f1 <= 0``, with ``f2`` the function value at ``x2``, `AndersonBjorck` compares the signs of ``f2`` and
-    ``f1``, because the product of 2 small function values can underflow to 0.
-
-    The ALGOL procedure also takes a step of delta, which `AndersonBjorck` leaves out: when the chord's zero lies within
-    ``delta`` of the most recent iterate, the procedure moves the chord's zero to exactly ``delta`` from that iterate,
-    toward the retained bound.
-
-    `AndersonBjorck` leaves the step out because, in float64, it can make the procedure alternate forever between the
-    2 bounds: once the interval is ``delta`` wide in exact arithmetic, its computed width ``|x1 - x0|`` can round to
-    just above ``delta``, so the procedure does not stop; each step of delta then moves ``delta`` from the most recent
-    iterate toward the retained bound, and so lands exactly on the retained bound.
-
-    Without the step of delta, the chord's zero can round onto the most recent iterate, once that iterate lies within
-    rounding error of the root while the retained bound is still far from it.
-
-    When the chord's zero rounds onto the most recent iterate, the new iterate equals the previous one in both x and f,
-    so the slope between them is ``0 / 0``. `AndersonBjorck` then takes the factor 0.5: in IEEE arithmetic, ``0 / 0``
-    is NaN, which fails the ALGOL procedure's test that the factor is positive, so the procedure takes 0.5 there too.
+    When the most recent iterate lies within ``delta`` of the root, the step of delta crosses the root and leaves an
+    interval ``delta`` wide, which ends the solve.
 
     On a function that is nearly flat on 1 side of the root, over a large interval, the method can make very slow
     progress, and can need more than 200 iterations.
@@ -83,74 +52,113 @@ class AndersonBjorck(Solver):
     the next iterate lies close to the retained bound, on the same side of the root, so that iterate replaces the
     retained bound but moves it only slightly.
 
-    `AndersonBjorck` stops by its paper's own criterion, so it writes its own loop, not `BracketingSolver`'s.
+    `AndersonBjorck` departs from the ALGOL procedure, or settles a detail that the procedure leaves to its caller, in
+    these places:
+
+    - **Stopping criterion:** `AndersonBjorck` stops by `BracketingSolver`'s criterion, where the procedure stops by
+      its own:
+
+      - `AndersonBjorck` stops once the interval is at most ``2*xtol`` wide or the function value at a bound is 0, and
+        returns that bound, or else the interval's midpoint, which lies within ``xtol`` of a root;
+      - the procedure stops once the interval is at most ``delta`` wide or the function value at the most recent
+        iterate is 0, and returns whichever of the most recent iterate and the retained bound has the smaller ``|f|``,
+        with the retained bound's ``|f|`` scaled.
+    - **Tolerance ``delta``:** the procedure leaves ``delta`` to its caller, and uses it both as the length of a step
+      of delta and as its stopping width. `AndersonBjorck` sets ``delta = xtol``, half the shared stopping width, so
+      that a step of delta lands inside the interval while the solve continues.
+
+      With ``delta`` equal to the stopping width, as in the procedure, the solve can alternate between 2 x-values until
+      its evaluation budget runs out: once the interval is ``delta`` wide in exact arithmetic, its computed width can
+      round to just above ``delta``, so the solve continues, and a step of delta from 1 bound lands on the other.
+    - **Chord's zero:** `AndersonBjorck` computes it with `chord_zero`; the procedure computes it as ``x1 - f1 / w1``,
+      a step from the most recent iterate ``x1``, where ``w1 = (f1 - f0) / (x1 - x0)`` is the slope of the chord
+      through ``(x1, f1)`` and ``(x0, f0)``, with ``x0`` the retained bound and ``f0`` its scaled value; the 2 forms
+      are equal in exact arithmetic but round differently.
+    - **Side of the root:** the procedure tests whether a new iterate ``x2`` lies on the other side of the root by
+      ``f2 * f1 <= 0``, with ``f2`` the function value at ``x2``; the product of 2 small function values can underflow
+      to 0, so `AndersonBjorck` splits the interval by the sign of ``f2`` alone, with `Interval.split_at`.
+    - **A chord's zero on the most recent iterate:** where ``xtol`` lies below half the float spacing at the most
+      recent iterate, as at ``xtol = 0``, the step of delta does not move the chord's zero, which can then round onto
+      that iterate, so that the slope between the chord's zero and that iterate is ``0 / 0``.
+
+      `AndersonBjorck` then takes the factor 0.5, through a test ``x2 == x1`` that the procedure does not have; in IEEE
+      arithmetic, the procedure's ``0 / 0`` is NaN, which fails its test that the factor is positive, so the procedure
+      takes 0.5 too.
+    - **Starting order:** the procedure leaves the order of its 2 starting x-values to the caller; `AndersonBjorck`
+      passes the upper bound as ``x1``, the second of them, as the paper's examples and mpmath do.
 
     References:
         - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of an
           equation. BIT 13(3), 253-264. Its equation 7 is the factor, its section 3 the fallback to 0.5, and its
-          section 6 gives the ALGOL procedure, which holds the step of delta, the stopping rule, and the form of
-          `AndersonBjorck`'s factor. https://doi.org/10.1007/BF01951936
+          section 6 gives the ALGOL procedure, which holds the step of delta and the form of `AndersonBjorck`'s
+          factor; the test suite reproduces the iteration counts of its Examples 1 to 7.
+          https://doi.org/10.1007/BF01951936
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
-          Iranica 4(1&2), 28-34. The paper covers the Anderson-Björck method in 3 places:
+          Iranica 4(1&2), 28-34. The paper covers the Anderson-Björck method in 2 places:
 
-          - its equation 5, with ``gamma = f[x_(i+1), x_i] / f[x_i, x_(i-1)]`` from its Table 1, is the Anderson-Björck
-            step;
-          - the paper gives ``gamma = 0.5`` as the fallback factor;
+          - its equation 5, with ``gamma = f[x_(i+1), x_i] / f[x_i, x_(i-1)]`` from its Table 1, is the
+            Anderson-Björck step, with ``gamma = 0.5`` as its fallback;
           - its Table 4 shows the slow progress on large intervals; the test suite reproduces that table.
         - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="anderson"``; the test suite checks
           `AndersonBjorck` against mpmath's ``Illinois``.
     """
 
     name = "anderson_bjorck"
-    version = 4
+    version = 5
+    state_cls = AndersonBjorckState
 
-    def _solve(self, state: SolveState) -> float:
-        """Run the loop of the paper's ALGOL procedure, without its step of delta, and return its root estimate.
+    def _next_x(self, state: AndersonBjorckState, interval: Interval) -> float:
+        """Return the chord's zero, or the step of delta in its place, as the class docstring says.
 
-        The variables keep the names of the ALGOL procedure, so that the code can be compared with the procedure line
-        by line:
-
-        - ``x1`` is the most recent iterate and ``f1`` its function value; before the first iterate, the upper bound
-          counts as the most recent iterate;
-        - ``x0`` is the retained bound and ``f0`` its scaled function value;
-        - ``w1`` is the slope of the chord through ``(x0, f0)`` and ``(x1, f1)``, ``x2`` its zero and ``f2`` the
-          function value there;
-        - ``w2`` is the slope from ``x1`` to ``x2``, and ``g1 = w2 / w1`` the factor.
-
-        Each iteration evaluates the chord's zero ``x2``, makes it the most recent iterate, and updates the retained
-        bound as the class docstring says. The loop ends once the interval is at most ``xtol`` wide or ``f1`` is 0,
-        and returns ``x1`` if ``|f1| < |f0|``, else ``x0``.
+        Before computing the chord, update `AndersonBjorckState`'s own fields from the replaced bound; the new iterate
+        is the previous call's return value. This update is correct only when exactly 1 new evaluation happened since
+        the previous call.
         """
-        interval = state.interval
-        x0, f0, x1, f1 = interval.a, interval.fa, interval.b, interval.fb
-        while abs(x1 - x0) > state.xtol and f1 != 0.0:
-            # --- the paper's step ---------------
-            w1 = (f1 - f0) / (x1 - x0)
-            x2 = chord_zero(x0, f0, x1, f1)
-            f2 = state.f(x2)
-            state.x_best = x2
-
-            # --- update the retained bound ------
-            # The ALGOL procedure tests f2 * f1 <= 0; the class docstring says why the signs are compared instead.
-            if f2 == 0.0 or (f2 < 0.0) != (f1 < 0.0):
-                # x2 lies on the other side of the root, so x1 becomes the retained bound, with its unscaled function
-                # value f1.
-                x0, f0 = x1, f1
-            elif x2 == x1:
-                # The step rounded onto the most recent iterate, so w2 is 0 / 0, as the class docstring says.
-                f0 = 0.5 * f0
+        # --- update the retained bound's value --
+        # The names are the ALGOL procedure's: x2 is the new iterate, and x0 the retained bound; until the update
+        # below, x1 is the previous iterate, and f0 the retained bound's scaled value.
+        replaced_bound = interval.last_replaced_bound
+        if replaced_bound is None:
+            pass  # This is the first iteration: no bound has been kept again yet, so no value is scaled.
+        else:
+            if replaced_bound is IntervalBound.LOWER:
+                x2, f2, x0 = interval.a, interval.fa, interval.b
             else:
+                x2, f2, x0 = interval.b, interval.fb, interval.a
+            x1, f1, f0 = state.newest_x, state.newest_f, state.scaled_retained_f
+            if replaced_bound is not state.newest_bound:
+                # x2 replaced the retained bound, on the other side of the root from x1, so x1 becomes the retained
+                # bound, with its unscaled function value f1.
+                state.scaled_retained_f = f1
+                state.newest_bound = replaced_bound
+            elif x2 == x1:
+                # x2 equals x1, so the slope w2 = (f2 - f1) / (x2 - x1) would be 0 / 0, as the class docstring says.
+                state.scaled_retained_f = 0.5 * f0
+            else:
+                # x2 replaced x1, so the retained bound x0 was kept once more.
+                w1 = (f1 - f0) / (x1 - x0)
                 w2 = (f2 - f1) / (x2 - x1)
                 g1 = w2 / w1
                 if g1 > 0.0:
-                    f0 = g1 * f0
+                    state.scaled_retained_f = g1 * f0
                 else:
                     # x2 did not reduce |f|, so the Illinois method's factor replaces g1.
-                    f0 = 0.5 * f0
-            x1, f1 = x2, f2
+                    state.scaled_retained_f = 0.5 * f0
+            state.newest_x, state.newest_f = x2, f2
 
-        # --- the root estimate ------------------
-        if abs(f1) < abs(f0):
-            return x1
+        # --- the paper's step -------------------
+        if state.newest_bound is IntervalBound.UPPER:
+            x0, x1, f1 = interval.a, interval.b, interval.fb
         else:
-            return x0
+            x0, x1, f1 = interval.b, interval.a, interval.fa
+        x2 = chord_zero(x0, state.scaled_retained_f, x1, f1)
+
+        # --- the step of delta ------------------
+        delta = state.xtol
+        if abs(x2 - x1) < delta:
+            # This is the procedure's x1 - delta*sign(x1 - x0), which steps delta from x1 toward the retained bound x0.
+            if state.newest_bound is IntervalBound.UPPER:
+                x2 = x1 - delta
+            else:
+                x2 = x1 + delta
+        return x2
