@@ -1,10 +1,14 @@
 """This package tests `TOMS748`.
 
+The published results depend on the stopping criterion of the paper's experiments and of the authors' code, so
+``test_paper.py`` reproduces them with a subclass of `TOMS748` that stops by that criterion, and returns the lower
+bound ``a``, as the authors' code does.
+
 Published results:
 
-- The test output of the authors' Fortran 77 code (netlib, ``toms/748``): reproduced for ``k = 2``, in
-  ``test_paper.py``: the roots of 153 of the 154 problems; the test data states why the root of problem 26
-  is not compared.
+- The roots that the test driver of the authors' Fortran 77 code (https://www.netlib.org/toms/748) prints, with
+  ``tol = 0``: reproduced for ``k = 2``, in ``test_paper.py``: the roots of 153 of the 154 problems; the test data
+  states why the root of problem 26 is not compared.
 - Alefeld, Potra and Shi (1995), Table II: reproduced, in ``test_paper.py``: the totals within 1.2 %.
 - Alefeld, Potra and Shi (1995), Table III: not reproduced, because the paper does not list the 139 problems behind
   its totals.
@@ -13,7 +17,8 @@ Published results:
 
 Third-party published results:
 
-- None.
+- None: Gao (2026), Table 3, prints the totals of Algorithm 4.2 from the paper's Table II, not results of a run of
+  its own.
 
 Reference implementations:
 

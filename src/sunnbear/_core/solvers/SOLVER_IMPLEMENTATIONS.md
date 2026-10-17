@@ -187,7 +187,7 @@ Only a secondary config may deviate from section IV.
 
 | Algorithm | Config | Role | Differs in | Follows section IV |
 | --------- | ------ | ---- | ---------- | ------------------ |
-| `Ridders` | `RiddersBracketingSolverConfig` | core | Ridders' steps, as the article states them | yes |
+| `Ridders` | `RiddersStandardStoppingCriterionConfig` | core | Ridders' steps, as the article states them | yes |
 | | `RiddersScipyConfig` | secondary | SciPy's step limit and stopping criterion | no: SciPy's stopping criterion |
 | | `RiddersCommonsMathConfig` | secondary | Apache Commons Math's stopping criterion | no: Commons Math's stopping criterion |
 | `TOMS748` | `TOMS748K2Config` | core | `k = 2`, the article's Algorithm 4.2 | yes |
@@ -199,7 +199,7 @@ Only a secondary config may deviate from section IV.
 ### V.a. Ridders
 
 Ridders (1979) states no stopping criterion, so the core config fills that gap with the shared stopping criterion of section IV.a. The 2 secondary configs show the stopping criteria of 2 widely used implementations:
-- **`RiddersBracketingSolverConfig` (core):** Ridders' steps as the article states them, with the shared stopping criterion.
+- **`RiddersStandardStoppingCriterionConfig` (core):** Ridders' steps as the article states them, with the shared stopping criterion.
   - It checks that criterion where SciPy's `ridder` checks its own: right after evaluating the midpoint, it checks for a function value of 0, and after evaluating the new iterate, it checks the whole criterion.
   - Near the root, a new iterate can land between the root and the far bound, and the interval then only halves, so this config's evaluation counts can vary between near-identical functions.
 - **`RiddersScipyConfig` (secondary):** SciPy's `ridder`. It limits each step so that the new iterate lies at least `xtol/2` inside the interval, which the article does not state; near the root, that limit shrinks the interval to the stopping width in fewer evaluations. It stops once the interval is narrower than `xtol`, and returns the last iterate.

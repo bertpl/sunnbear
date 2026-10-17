@@ -1,4 +1,5 @@
-"""These tests check `TOMS748` against the published results of Algorithm 748:
+"""These tests check `TOMS748` against the published results of Algorithm 748, which depend on the stopping criterion
+of the authors' code, so they run a subclass of `TOMS748` with that criterion:
 
 - it reproduces the roots that the authors' code computes;
 - it reproduces the evaluation counts of the paper's Tables IV to VI;
@@ -7,7 +8,7 @@
 
 import pytest
 
-from sunnbear.solvers import TOMS748
+from sunnbear.solvers import TOMS748, Interval
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.alefeld_potra_shi import (
     ALEFELD_POTRA_SHI_PROBLEMS,
@@ -25,12 +26,11 @@ def test_the_printed_roots_name_exactly_the_alefeld_potra_shi_problems():
 
 @pytest.mark.parametrize("problem", AUTHORS_TEST_OUTPUT, ids=str)
 def test_k_2_reproduces_the_root_that_the_authors_code_computes(problem: PaperProblem):
-    """With ``k = 2`` and ``tol = 0``, the setting of the authors' test runs, `TOMS748` converges; wherever the test
-    data holds the root that the authors' code prints, `TOMS748` returns it within a relative 1e-13, the precision of
-    its 14 printed digits."""
+    """With ``k = 2`` and ``tol = 0``, the setting of the authors' test runs, `TOMS748` with the authors' stopping
+    criterion converges; wherever the test data holds the root that the authors' code prints, `TOMS748` returns that
+    root within a relative 1e-13, the precision of its 14 printed digits."""
     # --- act --------------------------
-    # An xtol of 0 makes tol 0.
-    result = TOMS748(k=2).solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100)
+    result = _TOMS748WithAuthorsStoppingCriterion(k=2).solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100)
 
     # --- assert -----------------------
     problem.assert_reproduced_by(result)
@@ -60,8 +60,9 @@ def test_the_rows_of_tables_iv_to_vi_name_every_problem_of_the_tables_in_order(k
     ],
 )
 def test_the_total_evaluation_count_lies_within_1_2_percent_of_the_papers_table_ii(k, n_digits, paper_total):
-    """Over the problems in `AUTHORS_TEST_OUTPUT`, the total evaluation count lies within 1.2 % of the paper's Table II,
-    for each ``k`` and for each of the paper's tolerances ``tol = 10^-n_digits`` and ``tol = 0``.
+    """Over the problems in `AUTHORS_TEST_OUTPUT`, the total evaluation count of `TOMS748` with the authors' stopping
+    criterion lies within 1.2 % of the paper's Table II, for each ``k`` and for each of the paper's tolerances
+    ``tol = 10^-n_digits`` and ``tol = 0``.
 
     The paper's counts include the 2 evaluations at the interval bounds, and come from a machine whose relative
     precision was 1.907e-16, not 2^-52. The totals that this test computes also differ by a few evaluations between
@@ -69,8 +70,8 @@ def test_the_total_evaluation_count_lies_within_1_2_percent_of_the_papers_table_
     """
     # --- arrange / act ----------------
     total = sum(
-        _TOMS748WithPaperTolerance(k=k, n_digits=n_digits)
-        .solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100)
+        _TOMS748WithAuthorsStoppingCriterion(k=k)
+        .solve(problem.f, problem.a, problem.b, xtol=_tol_as_the_driver_computes_it(n_digits), max_fevals=100)
         .n_fevals
         for problem in AUTHORS_TEST_OUTPUT
     )
@@ -88,11 +89,12 @@ def test_the_total_evaluation_count_lies_within_1_2_percent_of_the_papers_table_
     ],
 )
 def test_the_evaluation_counts_of_tables_iv_to_vi_of_the_paper_are_reproduced(k: int, problem: PaperProblem):
-    """On every problem of the paper's Tables IV to VI, `TOMS748` with ``tol = 10^-15`` evaluates as often as the paper
-    reports for that ``k``, except where the problem states an allowed deviation."""
+    """On every problem of the paper's Tables IV to VI, `TOMS748` with the authors' stopping criterion and
+    ``tol = 10^-15`` evaluates as often as the paper reports for that ``k``, except where the problem states an allowed
+    deviation."""
     # --- act --------------------------
-    result = _TOMS748WithPaperTolerance(k=k, n_digits=15).solve(
-        problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100
+    result = _TOMS748WithAuthorsStoppingCriterion(k=k).solve(
+        problem.f, problem.a, problem.b, xtol=_tol_as_the_driver_computes_it(15), max_fevals=100
     )
 
     # --- assert -----------------------
@@ -102,30 +104,34 @@ def test_the_evaluation_counts_of_tables_iv_to_vi_of_the_paper_are_reproduced(k:
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-class _TOMS748WithPaperTolerance(TOMS748):
-    """`_TOMS748WithPaperTolerance` is `TOMS748` with a fixed ``tol = 10^-n_digits``, computed as the authors' driver
-    computes it, not derived from ``xtol`` as `TOMS748._get_tol` does."""
+class _TOMS748WithAuthorsStoppingCriterion(TOMS748):
+    """`_TOMS748WithAuthorsStoppingCriterion` is `TOMS748` with the stopping criterion of the authors' code, and its
+    returned x-value, the lower bound ``a``.
 
-    def __init__(self, *, k: int, n_digits: int | None) -> None:
-        """Configure ``k`` and the fixed ``tol = 10^-n_digits``, or ``tol = 0`` for ``None``."""
-        super().__init__(k=k)
-        self._tol = self._tol_as_the_driver_computes_it(n_digits)
+    `TOMS748` takes ``tol = xtol``, so a test passes the paper's ``tol`` as ``xtol``.
+    """
 
-    def _get_tol(self, xtol: float, a0: float, b0: float) -> float:
-        """Return the fixed ``tol``."""
-        return self._tol
-
-    # --------------------------------------------------------------------------
-    #  Helpers
-    # --------------------------------------------------------------------------
     @staticmethod
-    def _tol_as_the_driver_computes_it(n_digits: int | None) -> float:
-        """Return ``10^-n_digits`` by repeated division, as the subroutine ``TOLE`` of the authors' code computes it,
-        or 0 for ``None``."""
-        if n_digits is None:
-            return 0.0
+    def _root_if_converged(interval: Interval, xtol_doubled: float, tole_doubled: float) -> float | None:
+        """Return ``a`` if ``f(a) = 0`` or the interval is at most ``2*tole`` wide, else ``None``, ignoring
+        ``xtol_doubled``.
+
+        At the top of an iteration, the authors' code checks only the width; ``f(a)`` is never 0 there, because the
+        check after the previous evaluation would have ended the solve.
+        """
+        if interval.is_fa_zero or interval.width <= tole_doubled:
+            return interval.a
         else:
-            tol = 1.0
-            for _ in range(n_digits):
-                tol = tol / 10.0
-            return tol
+            return None
+
+
+def _tol_as_the_driver_computes_it(n_digits: int | None) -> float:
+    """Return ``10^-n_digits`` by repeated division, as the subroutine ``TOLE`` of the authors' code computes it, or 0
+    for ``None``."""
+    if n_digits is None:
+        return 0.0
+    else:
+        tol = 1.0
+        for _ in range(n_digits):
+            tol = tol / 10.0
+        return tol

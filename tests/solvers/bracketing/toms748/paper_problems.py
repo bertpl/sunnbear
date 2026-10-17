@@ -182,9 +182,10 @@ AUTHORS_TEST_OUTPUT = [
 ]
 
 
-_UNDERFLOW_DEVIATION_REASON = (
-    "the function underflows to 0 on an interval around its root at 0, so the count depends on where the platform's "
-    "exp underflows; the paper's Section 6 states that how this function is coded changes the results"
+_OVERFLOW_DEVIATION_REASON = (
+    "the function is 0 on an interval around its root at 0, where exp(1 / x^2) overflows, so the count depends on "
+    "where the platform's exp overflows; the paper's Section 6 states that how this function is coded changes the "
+    "results"
 )
 _SIN_ROUNDING_DEVIATION_REASON = (
     "the count depends on how the platform's sin rounds: `TOMS748` takes the paper's 11 evaluations on macOS and 10 on "
@@ -202,7 +203,7 @@ TABLES_IV_TO_VI_BY_K = {
         AlefeldPotraShiTablesIVToVIProblem.P26_N1.with_n_fevals(
             28,
             deviation=None,
-            reason=_UNDERFLOW_DEVIATION_REASON,
+            reason=_OVERFLOW_DEVIATION_REASON,
         ),
         AlefeldPotraShiTablesIVToVIProblem.P13_N1.with_n_fevals(
             25,
@@ -233,7 +234,7 @@ TABLES_IV_TO_VI_BY_K = {
         AlefeldPotraShiTablesIVToVIProblem.P26_N1.with_n_fevals(
             29,
             deviation=None,
-            reason=_UNDERFLOW_DEVIATION_REASON,
+            reason=_OVERFLOW_DEVIATION_REASON,
         ),
         AlefeldPotraShiTablesIVToVIProblem.P13_N1.with_n_fevals(24),
         AlefeldPotraShiTablesIVToVIProblem.P27_N10.with_n_fevals(19),

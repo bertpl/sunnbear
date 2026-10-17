@@ -65,14 +65,14 @@ def test_the_scipy_variant_stops_once_the_interval_is_narrower_than_xtol():
     assert _final_interval(result.history).width < xtol
 
 
-def test_the_bracketing_solver_variant_stops_once_the_interval_is_at_most_2_xtol_wide():
-    """The bracketing_solver variant returns the midpoint of the final interval, which is at most ``2 * xtol``
+def test_the_standard_stopping_criterion_variant_stops_once_the_interval_is_at_most_2_xtol_wide():
+    """The standard_stopping_criterion variant returns the midpoint of the final interval, which is at most ``2 * xtol``
     wide."""
     # --- arrange ----------------------
     xtol = 1e-4
 
     # --- act --------------------------
-    result = Ridders(variant=RiddersVariant.BRACKETING_SOLVER).solve(
+    result = Ridders(variant=RiddersVariant.STANDARD_STOPPING_CRITERION).solve(
         cubic, 1.0, 2.0, xtol=xtol, max_fevals=60, history_enabled=True
     )
 
@@ -82,10 +82,26 @@ def test_the_bracketing_solver_variant_stops_once_the_interval_is_at_most_2_xtol
     assert result.x == interval.midpoint
 
 
+def test_the_standard_stopping_criterion_variant_evaluates_x1_and_x3_even_on_an_interval_that_is_narrow_enough():
+    """The standard_stopping_criterion variant has no check before its first iteration, as SciPy's ridder has none, so
+    on an initial interval that is already at most ``2 * xtol`` wide, it evaluates ``x1`` and ``x3`` before it stops."""
+    # --- arrange ----------------------
+    xtol = 1e-3
+
+    # --- act --------------------------
+    result = Ridders(variant=RiddersVariant.STANDARD_STOPPING_CRITERION).solve(
+        cubic, 1.3247, 1.3249, xtol=xtol, max_fevals=10, history_enabled=True
+    )
+
+    # --- assert -----------------------
+    assert result.n_fevals == 4
+    assert result.x == _final_interval(result.history).midpoint
+
+
 def test_the_limit_on_the_step_lets_the_scipy_variant_stop_where_the_interval_would_only_halve():
     """On ``x^3 - x - 0.801``, SciPy's limit on the step lets the scipy variant stop after as few evaluations as the
-    commons_math variant, while the bracketing_solver variant, whose interval only halves near the root, needs far
-    more."""
+    commons_math variant, while the standard_stopping_criterion variant, whose interval only halves near the root,
+    needs far more."""
 
     # --- arrange ----------------------
     def f(x: float) -> float:
@@ -98,7 +114,11 @@ def test_the_limit_on_the_step_lets_the_scipy_variant_stop_where_the_interval_wo
     }
 
     # --- assert -----------------------
-    assert n_fevals == {RiddersVariant.COMMONS_MATH: 12, RiddersVariant.SCIPY: 12, RiddersVariant.BRACKETING_SOLVER: 66}
+    assert n_fevals == {
+        RiddersVariant.COMMONS_MATH: 12,
+        RiddersVariant.SCIPY: 12,
+        RiddersVariant.STANDARD_STOPPING_CRITERION: 66,
+    }
 
 
 # ==================================================================================================
