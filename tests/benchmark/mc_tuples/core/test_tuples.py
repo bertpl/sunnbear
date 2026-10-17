@@ -71,7 +71,7 @@ def test_first_rejects_a_size_outside_the_set(size):
 
 
 def test_to_xtol_and_c_maps_u_log_uniformly_and_v_linearly():
-    """u = 0.5 lands at `xtol_min · √2`, and v places c linearly between `c_min` and `c_max`."""
+    """u = 0.5 lands at `xtol_min * sqrt(2)`, and v places c linearly between `c_min` and `c_max`."""
     # --- arrange ----------------------
     tuples = MCTuples([0.5, 0.25], [0.5, 0.25])
 
@@ -141,7 +141,7 @@ def test_stats_measures_the_l2_separation_along_the_shorter_arc_of_each_axis():
 def test_bit_stats_report_the_fewest_and_the_mean_bits_per_axis():
     """Per axis, `bit_stats` reports the fewest and the mean `n_bits` of the values."""
     # --- arrange ----------------------
-    # The v values are e/10 and 1/√2 to 16 digits, so no short description reproduces them.
+    # The v values are e/10 and 1/sqrt(2) to 16 digits, so no short description reproduces them.
     u, v = [0.5, 1 / 3], [0.2718281828459045, 0.7071067811865476]
 
     # --- act --------------------------

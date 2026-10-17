@@ -12,8 +12,9 @@ right after the selection solve, has to move the new tuples.
 The allocation comes in 2 stages:
 
 1. **greedy:** the new tuples go to the gaps 1 at a time, each to the gap that has the widest spacing after it takes
-   the tuple; a gap's spacing is the distance between its neighboring values once its new tuples are spread evenly
-   over it, as `MCTuplesAxisGapPlacement` in the `placement` module places them;
+   the tuple; a gap's spacing is the distance between neighboring values once its new tuples are spread evenly
+   over it, and an edge gap's spacing is that of the whole wrap-around gap, as `MCTuplesAxisGapPlacement` in the
+   `placement` module places them;
 2. **mean-aware:** starting from the greedy allocation, a local search moves new tuples between gaps, 1 at a time, to
    raise the predicted smallest spacing after the first value correction
    (`MCTuplesAxisGapPlacement.corrected_min_spacing`):
@@ -127,8 +128,8 @@ class MCTuplesAxisGaps:
     It holds every gap, including those that end up without new tuples, and exists only inside
     `MCTuplesAxisGapAllocation.of`, which keeps the result.
 
-    Every attribute except `n_required` and `required_sum` is an array with 1 entry per gap, in ascending order, so
-    that each step of an allocation scores every gap at once.
+    Every attribute except `lowest_value`, `highest_value`, `n_required` and `required_sum` is an array with 1 entry
+    per gap, in ascending order, so that each step of an allocation scores every gap at once.
 
     Attributes:
         first_lanes: The first free fine lane of each gap, ascending.

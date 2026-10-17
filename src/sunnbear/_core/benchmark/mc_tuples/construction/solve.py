@@ -4,8 +4,8 @@ Each solve picks the size's new tuples from its own population of candidate tupl
 below. The candidates of the max-div problem are the tuples of the size below, followed by the population.
 
 The objective is the geomean of 3 gpq terms at `GPQ_LEVEL` over the nearest-neighbor separations: along u, along v
-and in squared L2, each measured cyclically (`distances`). Since gpq(d²) = gpq(d)², the L2 term weighs as much as the 2
-axis terms together.
+and in squared L2, each measured cyclically (`distances`). Since gpq(d^2) = gpq(d)^2, the L2 term weighs as much as the
+2 axis terms together.
 
 A subclass passes its population to the constructor, and its hooks set:
 
