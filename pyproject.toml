@@ -45,8 +45,8 @@ dependencies = [
     "backports.zstd>=1.0.0; python_version < '3.14'",
     "snuffled>=0.1.6; python_version < '3.15'",
     "snuffled>=0.1.9; python_version >= '3.15'",
-    # max-div 0.21.8 adds the `params` of DistanceMetric.custom(), with which sunnbear computes the cyclic distances of
-    # the Monte Carlo (MC) tuple set.
+    # max-div 0.21.8 adds the `params` argument of DistanceMetric.custom(), which sunnbear uses to compute the cyclic
+    # distances along each axis of the Monte Carlo (MC) tuple set.
     "max-div>=0.21.8",
     "mpl-composite>=0.1.2; python_version < '3.15'",
     "mpl-composite>=0.1.4; python_version >= '3.15'",

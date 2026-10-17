@@ -37,8 +37,8 @@ def test_an_interior_gap_splits_the_stretch_between_its_neighbors_values_into_co
         # Edge gaps 250 and 150 wide: their 3 values split the wrap-around gap of 400 into 4 parts of 100.
         ([250.0, 874.0], [2, 0, 1], [50.0, 150.0], [974.0], 100.0),
         # An even split of the wrap-around gap of 390 into 5 parts of 78 puts only 1 of the right edge gap's 3 values
-        # below 1024. They split the right edge gap, 90 wide, into 3 parts of 30, the highest on 1024; the left edge
-        # gap's 1 value splits the left edge gap, 300 wide, into 2 parts of 150.
+        # below 1024. The right edge gap's 3 values instead split the right edge gap, 90 wide, into 3 parts of 30, the
+        # highest on 1024; the left edge gap's 1 value splits the left edge gap, 300 wide, into 2 parts of 150.
         ([300.0, 934.0], [1, 0, 3], [150.0], [964.0, 994.0, 1024.0], 30.0),
         # The same with the 2 edge gaps swapped: the left edge gap's 3 values start on 0.
         ([90.0, 724.0], [3, 0, 1], [0.0, 30.0, 60.0], [874.0], 30.0),

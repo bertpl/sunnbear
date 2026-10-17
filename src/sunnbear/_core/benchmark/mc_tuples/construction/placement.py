@@ -15,12 +15,16 @@ Each gap spreads its new tuples evenly, with c the gap's number of new tuples:
 
 - **interior gap:** the c values split the stretch between the values of the 2 neighboring tuples into c + 1 equal
   parts;
-- **edge gaps:** the c_left + c_right values of the 2 edge gaps split the wrap-around gap into c_left + c_right + 1
-  equal parts, when that puts exactly c_right of them below 1. Otherwise 1 side holds too many values for the even
-  split: that side spreads its values up to the point where 0 and 1 meet, with its outermost value on that point, and
-  the other side splits its own part evenly (`_edge_gap_first_values_and_steps`). The size's max-div solve puts that
-  outermost value inside the outermost fine lane, not on the point where 0 and 1 meet, so in that case the placement
-  overstates the span of that side's new values by at most 1 fine lane.
+- **edge gaps:** the c_left + c_right values of the 2 edge gaps share the wrap-around gap:
+  - when an even split into c_left + c_right + 1 equal parts puts exactly c_right of the values between the highest
+    value of the size below and 1, the values take that split;
+  - otherwise 1 side holds too many values for the even split, which would carry some of them across the point where 0
+    and 1 meet: that side spreads its values up to that point, with its outermost value on it, and the other side
+    splits its own part evenly (`_edge_gap_first_values_and_steps`).
+
+When 1 side holds too many values, the size's max-div solve puts that side's outermost value inside the outermost fine
+lane, not on the point where 0 and 1 meet, so the placement overstates the span of that side's new values by at most 1
+fine lane.
 
 Each edge gap that holds new tuples reports the spacing of the whole wrap-around gap, the smaller of the 2 sides'
 distances between neighboring values, so that adding a tuple to 1 side shows in the spacing of both.
@@ -67,19 +71,10 @@ class MCTuplesAxisGapPlacement:
     # --------------------------------------------------------------------------
     #  Placement
     # --------------------------------------------------------------------------
-    @property
-    def steps(self) -> np.ndarray:
-        """Return the distance between consecutive new values of each gap on the axis; 0 for a gap without any."""
-        return self._first_values_and_steps[1]
-
-    @property
-    def first_values(self) -> np.ndarray:
-        """Return the lowest new value of each gap."""
-        return self._first_values_and_steps[0]
-
     def values(self, gap: int) -> np.ndarray:
         """Return the new values of `gap`, ascending."""
-        return self.first_values[gap] + self.steps[gap] * np.arange(max(int(self.counts[gap]), 0))
+        first_values, steps = self._first_values_and_steps
+        return first_values[gap] + steps[gap] * np.arange(max(int(self.counts[gap]), 0))
 
     def after_move(self, source: int, destination: int) -> "MCTuplesAxisGapPlacement":
         """Return the placement after moving 1 new tuple from gap `source` to gap `destination`."""
@@ -98,7 +93,7 @@ class MCTuplesAxisGapPlacement:
         Each edge gap with new tuples reports the spacing of the wrap-around gap, the smaller of the 2 edge gaps' steps.
         """
         has_values = self.counts > 0
-        spacings = np.where(has_values, self.steps * N_FINE_LANES, np.inf)
+        spacings = np.where(has_values, self._first_values_and_steps[1] * N_FINE_LANES, np.inf)
         edge_gaps = np.flatnonzero(self.gaps.is_left_edge | self.gaps.is_right_edge)
         if edge_gaps.size > 0:
             spacings[edge_gaps] = np.where(has_values[edge_gaps], spacings[edge_gaps].min(), np.inf)
@@ -107,9 +102,9 @@ class MCTuplesAxisGapPlacement:
     def spacings_after_each_addition(self) -> np.ndarray:
         """Return each gap's spacing, in fine lanes, after that gap alone takes 1 more new tuple.
 
-        Adding a tuple to 1 edge gap changes the placement of both, so each edge gap's entry comes from its own
-        placement; an interior gap's spacing depends on its own count only, so every other entry comes from 1
-        placement with 1 more tuple in every gap.
+        Adding a tuple to 1 edge gap changes the placement of both, so each edge gap's entry comes from a placement with
+        1 more tuple in that edge gap only; an interior gap's spacing depends on its own count only, so every interior
+        gap's entry comes from 1 placement with 1 more tuple in every gap.
         """
         spacings = self._with_1_more_per_gap.spacings.copy()
         for gap in np.flatnonzero(self.gaps.is_left_edge | self.gaps.is_right_edge):
@@ -122,7 +117,8 @@ class MCTuplesAxisGapPlacement:
     def sums(self) -> np.ndarray:
         """Return the sum of each gap's new values."""
         counts = np.maximum(self.counts, 0)
-        return counts * self.first_values + self.steps * counts * (counts - 1) / 2
+        first_values, steps = self._first_values_and_steps
+        return counts * first_values + steps * counts * (counts - 1) / 2
 
     @property
     def offset_fine_lanes(self) -> float:
@@ -190,7 +186,10 @@ class MCTuplesAxisGapPlacement:
     # --------------------------------------------------------------------------
     @cached_property
     def _first_values_and_steps(self) -> tuple[np.ndarray, np.ndarray]:
-        """Return the first value and the step of each gap; the step is 0 for a gap without new tuples."""
+        """Return the first value and the step of each gap; the step is 0 for a gap without new tuples.
+
+        A count of -1, which `_with_1_fewer_per_gap` gives an empty gap, counts as 0.
+        """
         counts = np.maximum(self.counts, 0)
         steps = (self.gaps.highs - self.gaps.lows) / (counts + 1)
         first_values = self.gaps.lows + steps
@@ -215,13 +214,19 @@ class MCTuplesAxisGapPlacement:
         """Return the first value and the step of the left edge gap, then those of the right edge gap.
 
         The left edge gap holds `n_left` new values between 0 and `lowest_required_value`, the right edge gap `n_right`
-        between `highest_required_value` and 1; the module docstring describes the 3 cases. A side without values still
+        between `highest_required_value` and 1; the module docstring describes the cases. A side without values still
         gets a first value and a step, which no caller reads, because a gap without new tuples has no values.
         """
         left_width, right_width = lowest_required_value, 1.0 - highest_required_value
         even_step = (left_width + right_width) / (n_left + n_right + 1)
-        left_step_reaching_0 = left_width / n_left if n_left > 0 else np.inf
-        right_step_reaching_1 = right_width / n_right if n_right > 0 else np.inf
+        if n_left > 0:
+            left_step_reaching_0 = left_width / n_left
+        else:
+            left_step_reaching_0 = np.inf
+        if n_right > 0:
+            right_step_reaching_1 = right_width / n_right
+        else:
+            right_step_reaching_1 = np.inf
         if even_step <= min(left_step_reaching_0, right_step_reaching_1):
             # The values split the wrap-around gap evenly, from the highest value across 1 and 0 to the lowest value.
             left_first, left_step = highest_required_value + (n_right + 1) * even_step - 1.0, even_step
@@ -253,8 +258,8 @@ class MCTuplesAxisGapPlacement:
 
         A move between interior gaps changes the spacings of `s` and `d` only, so the smallest spacing after the move is
         the smallest of 3 values: the new spacings of `s` and `d`, and the smallest spacing among the other gaps, which
-        is 1 of the 3 smallest spacings before the move. The entries of moves into or out of an edge gap are not valid
-        here; `corrected_min_spacing_after_each_move` replaces them.
+        is 1 of the 3 smallest spacings before the move. The entries of moves into or out of an edge gap leave out the
+        change to the other edge gap, so they are wrong; `corrected_min_spacing_after_each_move` replaces them.
         """
         spacings = self.spacings
         n_gaps = spacings.size

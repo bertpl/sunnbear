@@ -1,9 +1,10 @@
 """`MCTuplesGapAllocation` decides how many of a size's new tuples go into each gap left by the size below.
 
 On each axis, every tuple of the size below occupies 1 fine lane. A gap is a maximal run of free fine lanes: between 2
-occupied fine lanes, or between an occupied fine lane and an edge of the axis (`MCTuplesAxisGaps`). The 2 edge gaps are
-the 2 parts of 1 gap, the wrap-around gap, on the circle on which max-div measures distances, so the `placement` module
-places their new tuples together, while each keeps its own count.
+occupied fine lanes, or between an occupied fine lane and an edge of the axis (`MCTuplesAxisGaps`). max-div measures
+each axis as a circle on which 0 and 1 meet (`distances`), so the 2 edge gaps are the 2 parts of 1 gap, the wrap-around
+gap, and the `placement` module places their new tuples together, while each edge gap keeps its own number of new
+tuples.
 
 The size's max-div solve puts exactly the allocated number of new tuples into each gap, and spreads them about evenly
 inside it. So the allocation sets where the size's mean lies, and with it how far the first value correction, which runs
@@ -12,9 +13,9 @@ right after the selection solve, has to move the new tuples.
 The allocation comes in 2 stages:
 
 1. **greedy:** the new tuples go to the gaps 1 at a time, each to the gap that has the widest spacing after it takes
-   the tuple; a gap's spacing is the distance between neighboring values once its new tuples are spread evenly
-   over it, and an edge gap's spacing is that of the whole wrap-around gap, as `MCTuplesAxisGapPlacement` in the
-   `placement` module places them;
+   the tuple; a gap's spacing is the distance between neighboring values once `MCTuplesAxisGapPlacement` in the
+   `placement` module spreads the gap's new tuples evenly over it, and an edge gap's spacing is that of the whole
+   wrap-around gap;
 2. **mean-aware:** starting from the greedy allocation, a local search moves new tuples between gaps, 1 at a time, to
    raise the predicted smallest spacing after the first value correction
    (`MCTuplesAxisGapPlacement.corrected_min_spacing`):
