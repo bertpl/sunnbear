@@ -2,8 +2,8 @@
 
 On each axis, every tuple of the size below occupies 1 fine lane. A gap is a maximal run of free fine lanes: between 2
 occupied fine lanes, or between an occupied fine lane and an edge of the axis (`MCTuplesAxisGaps`). The 2 edge gaps are
-the 2 parts of 1 gap on the circle on which the solves measure their distances, so the `placement` module places their
-new tuples together, while each keeps its own count.
+the 2 parts of 1 gap, the wrap-around gap, on the circle on which max-div measures distances, so the `placement` module
+places their new tuples together, while each keeps its own count.
 
 The size's max-div solve puts exactly the allocated number of new tuples into each gap, and spreads them about evenly
 inside it. So the allocation sets where the size's mean lies, and with it how far the first value correction, which runs
@@ -128,8 +128,8 @@ class MCTuplesAxisGaps:
     It holds every gap, including those that end up without new tuples, and exists only inside
     `MCTuplesAxisGapAllocation.of`, which keeps the result.
 
-    Every attribute except `lowest_value`, `highest_value`, `n_required` and `required_sum` is an array with 1 entry
-    per gap, in ascending order, so that each step of an allocation scores every gap at once.
+    Every attribute except `lowest_required_value`, `highest_required_value`, `n_required` and `required_sum` is an
+    array with 1 entry per gap, in ascending order, so that each step of an allocation scores every gap at once.
 
     Attributes:
         first_lanes: The first free fine lane of each gap, ascending.
@@ -138,8 +138,8 @@ class MCTuplesAxisGaps:
         is_right_edge: Whether each gap ends at the right edge of the axis, at 1.
         lows: The lower bound of each gap on the axis: the value of the tuple below it, or 0 for the left edge gap.
         highs: The upper bound of each gap on the axis: the value of the tuple above it, or 1 for the right edge gap.
-        lowest_value: The lowest value of the size below on this axis.
-        highest_value: The highest value of the size below on this axis.
+        lowest_required_value: The lowest value of the size below on this axis.
+        highest_required_value: The highest value of the size below on this axis.
         n_required: The number of tuples of the size below.
         required_sum: The sum of their values on this axis.
     """
@@ -150,25 +150,10 @@ class MCTuplesAxisGaps:
     is_right_edge: np.ndarray
     lows: np.ndarray
     highs: np.ndarray
-    lowest_value: float
-    highest_value: float
+    lowest_required_value: float
+    highest_required_value: float
     n_required: int
     required_sum: float
-
-    @property
-    def left_edge_gap(self) -> int | None:
-        """Return the index of the left edge gap, or None when the lowest fine lane is occupied."""
-        return 0 if self.is_left_edge[0] else None
-
-    @property
-    def right_edge_gap(self) -> int | None:
-        """Return the index of the right edge gap, or None when the highest fine lane is occupied."""
-        return self.is_right_edge.size - 1 if self.is_right_edge[-1] else None
-
-    @property
-    def edge_gaps(self) -> np.ndarray:
-        """Return the indices of the edge gaps, ascending: 0, 1 or 2 of them."""
-        return np.flatnonzero(self.is_left_edge | self.is_right_edge)
 
     # --------------------------------------------------------------------------
     #  Allocations
@@ -181,7 +166,9 @@ class MCTuplesAxisGaps:
         counts = np.zeros(self.n_free_lanes.size, dtype=np.int64)
         for _ in range(n_new):
             spacing_after_addition = np.where(
-                counts >= self.n_free_lanes, -np.inf, MCTuplesAxisGapPlacement(self, counts).spacings_after_adding_1()
+                counts >= self.n_free_lanes,
+                -np.inf,
+                MCTuplesAxisGapPlacement(self, counts).spacings_after_each_addition(),
             )
             counts[np.argmax(spacing_after_addition)] += 1
         return counts
@@ -253,8 +240,8 @@ class MCTuplesAxisGaps:
             is_right_edge=is_right_edge,
             lows=np.where(is_left_edge, 0.0, value_of_fine_lane[np.maximum(lane_below, 0)]),
             highs=np.where(is_right_edge, 1.0, value_of_fine_lane[np.minimum(lane_above, N_FINE_LANES - 1)]),
-            lowest_value=float(required_values.min()),
-            highest_value=float(required_values.max()),
+            lowest_required_value=float(required_values.min()),
+            highest_required_value=float(required_values.max()),
             n_required=required_values.size,
             required_sum=float(required_values.sum()),
         )

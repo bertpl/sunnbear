@@ -10,7 +10,7 @@ below (`solve`), the constraints are:
 - a gap that holds more than 1 new tuple holds at most 1 per fine lane, through 1 constraint per fine lane.
 
 max-div starts from a random selection with at most 1 new tuple per fine lane on each axis, which ignores the counts
-per gap; max-div meets them within its first iterations.
+per gap; max-div meets those counts within its first iterations.
 """
 
 import numpy as np

@@ -66,8 +66,8 @@ def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]
 
 
 def _assert_only_the_smallest_size_s_first_correction_rotates(results: list[MCTuplesSizeResult]) -> None:
-    """Assert that the first value correction of the smallest size rotates both axes, with a `shift` and no `cap`, and
-    that every other value correction applies the mean correction to both axes, with a `cap` and no `shift`."""
+    """Assert that the first value correction of the smallest size rotates both axes, each with a `rotation_shift`,
+    and that every other value correction applies the mean correction to both axes, each with a `cap`."""
     for result in results:
         is_smallest_size = result.size.size_below is None
         for correction, is_rotation in (
@@ -75,7 +75,7 @@ def _assert_only_the_smallest_size_s_first_correction_rotates(results: list[MCTu
             (result.second_value_correction, False),
         ):
             for axis_correction in (correction.u, correction.v):
-                assert (axis_correction.shift is not None) == is_rotation
+                assert (axis_correction.rotation_shift is not None) == is_rotation
                 assert (axis_correction.cap is None) == is_rotation
 
 

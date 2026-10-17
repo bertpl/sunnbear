@@ -118,9 +118,10 @@ class MCTuples:
 class MCTuplesStats:
     """`MCTuplesStats` describes how evenly (u, v) tuples are spread; each statistic is computed when first read.
 
-    Each tuple's separation is its distance to its nearest other tuple: in the square (L2), along u, or along v. Each
-    axis is measured cyclically, as a circle of circumference 1 on which 0 and 1 meet, so that the distance between 2
-    values is the shorter of the 2 arcs between them and the square becomes a torus; the construction's max-div solves
+    Each tuple's separation is its distance to its nearest other tuple: in the square (L2), along u, or along v.
+
+    Each axis is measured cyclically, as a circle of circumference 1 on which 0 and 1 meet, so that the distance between
+    2 values is the shorter of the 2 arcs between them and the square becomes a torus; the construction's max-div solves
     measure their distances the same way. The separations of each kind are summarized by 2 statistics:
 
     - the min separation, the smallest of them;
@@ -231,15 +232,12 @@ class MCTuplesStats:
 
     @staticmethod
     def _separations_along_axis(values: np.ndarray) -> np.ndarray:
-        """Return each value's cyclic distance to its nearest other value, in the values' order.
-
-        In ascending order, the highest value's upper neighbor is the lowest value, 1 further along the circle.
-        """
+        """Return each value's cyclic distance to its nearest other value, in the values' order."""
         order = np.argsort(values)
         sorted_values = values[order]
-        # Entry i is the gap from the i-th value to the next one, the last one wrapping around to the first.
-        gaps_above = np.diff(np.concatenate([sorted_values, [sorted_values[0] + 1.0]]))
-        nearest_in_order = np.minimum(gaps_above, np.roll(gaps_above, 1))
+        # Entry i is the difference from the i-th value to the next one, the last one wrapping around to the first.
+        differences_above = np.diff(np.concatenate([sorted_values, [sorted_values[0] + 1.0]]))
+        nearest_in_order = np.minimum(differences_above, np.roll(differences_above, 1))
         separations = np.empty_like(nearest_in_order)
         separations[order] = nearest_in_order
         return separations

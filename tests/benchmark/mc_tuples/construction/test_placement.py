@@ -82,7 +82,7 @@ def test_a_lone_edge_gap_spreads_its_values_over_the_whole_wrap_around_gap(
     placement = MCTuplesAxisGapPlacement(gaps, np.array(counts))
 
     # --- assert -----------------------
-    assert gaps.edge_gaps.tolist() == [edge_gap]
+    assert np.flatnonzero(gaps.is_left_edge | gaps.is_right_edge).tolist() == [edge_gap]
     assert placement.values(edge_gap) * N_FINE_LANES == pytest.approx(expected_values)
     assert placement.spacings[edge_gap] == pytest.approx(131.0)
 
@@ -138,23 +138,23 @@ def test_a_gap_without_new_tuples_has_no_values_no_sum_and_no_spacing(count):
     assert np.isinf(placement.spacings).all()
 
 
-def test_spacings_after_adding_1_match_the_placement_with_1_more_tuple_in_that_gap():
-    """Each entry of `spacings_after_adding_1` equals that gap's spacing in the placement with 1 more new tuple in that
-    gap alone."""
+def test_spacings_after_each_addition_match_the_placement_with_1_more_tuple_in_that_gap():
+    """Each entry of `spacings_after_each_addition` equals that gap's spacing in the placement with 1 more new tuple in
+    that gap alone."""
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of(_VALUES)
     counts = np.array([2, 3, 4])
     placement = MCTuplesAxisGapPlacement(gaps, counts)
 
     # --- act --------------------------
-    spacings_after_adding_1 = placement.spacings_after_adding_1()
+    spacings_after_each_addition = placement.spacings_after_each_addition()
 
     # --- assert -----------------------
     for gap in range(3):
-        counts_after_adding_1 = counts.copy()
-        counts_after_adding_1[gap] += 1
-        expected = MCTuplesAxisGapPlacement(gaps, counts_after_adding_1).spacings[gap]
-        assert spacings_after_adding_1[gap] == pytest.approx(expected)
+        counts_after_addition = counts.copy()
+        counts_after_addition[gap] += 1
+        expected = MCTuplesAxisGapPlacement(gaps, counts_after_addition).spacings[gap]
+        assert spacings_after_each_addition[gap] == pytest.approx(expected)
 
 
 def test_min_spacing_after_each_move_between_2_gaps_is_the_smaller_of_their_new_spacings():
