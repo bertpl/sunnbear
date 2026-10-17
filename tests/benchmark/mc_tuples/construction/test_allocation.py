@@ -33,8 +33,7 @@ def test_of_finds_the_gaps_with_their_edges_and_bounds():
     assert gaps.is_right_edge.tolist() == [False, False, True]
     assert gaps.lows.tolist() == [0.0, _VALUES[0], _VALUES[2]]
     assert gaps.highs.tolist() == [_VALUES[0], _VALUES[1], 1.0]
-    assert gaps.edge_gaps.tolist() == [0, 2]
-    assert (gaps.lowest_value, gaps.highest_value) == (_VALUES[0], _VALUES[2])
+    assert (gaps.lowest_required_value, gaps.highest_required_value) == (_VALUES[0], _VALUES[2])
     assert gaps.n_required == 3
     assert gaps.required_sum == pytest.approx(_VALUES.sum())
 
@@ -47,8 +46,7 @@ def test_of_leaves_out_an_edge_gap_when_a_tuple_of_the_size_below_lies_in_the_ou
     # --- assert -----------------------
     assert gaps.first_lanes.tolist() == [1, 501]
     assert not gaps.is_left_edge.any()
-    assert gaps.left_edge_gap is None
-    assert gaps.edge_gaps.tolist() == [1]
+    assert gaps.is_right_edge.tolist() == [False, True]
 
 
 def test_greedy_counts_give_each_new_tuple_to_the_gap_that_keeps_the_widest_spacing():
@@ -62,8 +60,8 @@ def test_greedy_counts_give_each_new_tuple_to_the_gap_that_keeps_the_widest_spac
 
 def test_greedy_counts_score_a_new_tuple_in_an_edge_gap_by_the_spacing_of_the_wrap_around_gap():
     """Of 4 new tuples, the first 3 go to the interior gap 466 fine lanes wide and the 4th to the interior gap 225 wide,
-    at a spacing of 112.5; the left edge gap, 151.5 wide, would give it only 90.5, because with the right edge gap, 29.5
-    wide, a tuple there splits their wrap-around gap of 181 into 2 parts."""
+    at a spacing of 112.5; the left edge gap, 151.5 wide, would give it only 90.5, because a tuple there splits the
+    wrap-around gap of 181, made of the left edge gap and the 29.5-wide right edge gap, into 2 parts."""
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of((np.array([151, 376, 528, 994]) + 0.5) / N_FINE_LANES)
 
@@ -71,8 +69,10 @@ def test_greedy_counts_score_a_new_tuple_in_an_edge_gap_by_the_spacing_of_the_wr
     counts = gaps.greedy_counts(4)
 
     # --- assert -----------------------
-    spacings_after_adding_1 = MCTuplesAxisGapPlacement(gaps, np.array([0, 0, 0, 3, 0])).spacings_after_adding_1()
-    assert spacings_after_adding_1[:2] == pytest.approx([90.5, 112.5])
+    spacings_after_each_addition = MCTuplesAxisGapPlacement(
+        gaps, np.array([0, 0, 0, 3, 0])
+    ).spacings_after_each_addition()
+    assert spacings_after_each_addition[:2] == pytest.approx([90.5, 112.5])
     assert counts.tolist() == [0, 1, 0, 3, 0]
 
 

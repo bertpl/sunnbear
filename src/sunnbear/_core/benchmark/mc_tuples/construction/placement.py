@@ -2,10 +2,14 @@
 
 The prediction is for 1 axis, and for 1 allocation of new tuples to the gaps that the `allocation` module defines.
 
-The solves measure distances cyclically (`distances`): each axis is a circle on which 0 and 1 meet. The stretch from
-the highest value of the size below, across 1 and 0, to its lowest value is then 1 gap, the wrap-around gap. Its 2
-parts, the left edge gap from 0 to the lowest value and the right edge gap from the highest value to 1, keep a count of
-new tuples each, because the side on which a new tuple lies decides whether it raises or lowers the size's mean.
+max-div measures distances cyclically (`distances`): each axis is a circle on which 0 and 1 meet. The stretch from the
+highest value of the size below, across 1 and 0, to its lowest value is then 1 gap, the wrap-around gap.
+
+Its 2 parts keep a count of new tuples each, because the side on which a new tuple lies decides whether it raises or
+lowers the size's mean:
+
+- the left edge gap runs from 0 to the lowest value;
+- the right edge gap runs from the highest value to 1.
 
 Each gap spreads its new tuples evenly, with c the gap's number of new tuples:
 
@@ -14,10 +18,12 @@ Each gap spreads its new tuples evenly, with c the gap's number of new tuples:
 - **edge gaps:** the c_left + c_right values of the 2 edge gaps split the wrap-around gap into c_left + c_right + 1
   equal parts, when that puts exactly c_right of them below 1. Otherwise 1 side holds too many values for the even
   split: that side spreads its values up to the point where 0 and 1 meet, with its outermost value on that point, and
-  the other side splits its own part evenly (`_edge_gap_placement`).
+  the other side splits its own part evenly (`_edge_gap_first_values_and_steps`). The size's max-div solve puts that
+  outermost value inside the outermost fine lane, not on the point where 0 and 1 meet, so in that case the placement
+  overstates the span of that side's new values by at most 1 fine lane.
 
 Each edge gap that holds new tuples reports the spacing of the whole wrap-around gap, the smaller of the 2 sides'
-steps, so that adding a tuple to 1 side shows in the spacing of both.
+distances between neighboring values, so that adding a tuple to 1 side shows in the spacing of both.
 
 The stretch is measured between values, not counted from fine lane indices, because 2 gaps with the same number of free
 fine lanes can differ in the length of that stretch by almost 2 fine lanes, depending on where each neighboring tuple's
@@ -93,19 +99,20 @@ class MCTuplesAxisGapPlacement:
         """
         has_values = self.counts > 0
         spacings = np.where(has_values, self.steps * N_FINE_LANES, np.inf)
-        edge_gaps = self.gaps.edge_gaps
+        edge_gaps = np.flatnonzero(self.gaps.is_left_edge | self.gaps.is_right_edge)
         if edge_gaps.size > 0:
             spacings[edge_gaps] = np.where(has_values[edge_gaps], spacings[edge_gaps].min(), np.inf)
         return spacings
 
-    def spacings_after_adding_1(self) -> np.ndarray:
+    def spacings_after_each_addition(self) -> np.ndarray:
         """Return each gap's spacing, in fine lanes, after that gap alone takes 1 more new tuple.
 
         Adding a tuple to 1 edge gap changes the placement of both, so each edge gap's entry comes from its own
-        placement; every other entry comes from 1 placement with 1 more tuple in every gap.
+        placement; an interior gap's spacing depends on its own count only, so every other entry comes from 1
+        placement with 1 more tuple in every gap.
         """
         spacings = self._with_1_more_per_gap.spacings.copy()
-        for gap in self.gaps.edge_gaps:
+        for gap in np.flatnonzero(self.gaps.is_left_edge | self.gaps.is_right_edge):
             counts = self.counts.copy()
             counts[gap] += 1
             spacings[gap] = MCTuplesAxisGapPlacement(self.gaps, counts).spacings[gap]
@@ -168,13 +175,15 @@ class MCTuplesAxisGapPlacement:
         is_valid = (self.counts >= 1)[:, None] & (self.counts < self.gaps.n_free_lanes)[None, :]
         np.fill_diagonal(is_valid, False)
         # Moving 1 tuple between gaps keeps the number of new tuples, so `offset_weight` is the same for every entry.
-        corrected = np.where(is_valid, self._min_spacing_after_each_move() - self.offset_weight * offset_after, -np.inf)
-        for edge_gap in self.gaps.edge_gaps.tolist():
+        corrected_min_spacings = np.where(
+            is_valid, self._min_spacing_after_each_move() - self.offset_weight * offset_after, -np.inf
+        )
+        for edge_gap in np.flatnonzero(self.gaps.is_left_edge | self.gaps.is_right_edge).tolist():
             moves = [(edge_gap, destination) for destination in np.flatnonzero(is_valid[edge_gap]).tolist()]
             moves += [(source, edge_gap) for source in np.flatnonzero(is_valid[:, edge_gap]).tolist()]
             for source, destination in moves:
-                corrected[source, destination] = self.after_move(source, destination).corrected_min_spacing
-        return corrected
+                corrected_min_spacings[source, destination] = self.after_move(source, destination).corrected_min_spacing
+        return corrected_min_spacings
 
     # --------------------------------------------------------------------------
     #  Helpers
@@ -185,47 +194,48 @@ class MCTuplesAxisGapPlacement:
         counts = np.maximum(self.counts, 0)
         steps = (self.gaps.highs - self.gaps.lows) / (counts + 1)
         first_values = self.gaps.lows + steps
-        left_gap, right_gap = self.gaps.left_edge_gap, self.gaps.right_edge_gap
-        if left_gap is not None or right_gap is not None:
-            n_left = int(counts[left_gap]) if left_gap is not None else 0
-            n_right = int(counts[right_gap]) if right_gap is not None else 0
-            left_first, left_step, right_first, right_step = self._edge_gap_placement(
-                self.gaps.lowest_value, self.gaps.highest_value, n_left, n_right
+        left_edge_gap = 0 if self.gaps.is_left_edge[0] else None
+        right_edge_gap = self.gaps.is_right_edge.size - 1 if self.gaps.is_right_edge[-1] else None
+        if left_edge_gap is not None or right_edge_gap is not None:
+            n_left = int(counts[left_edge_gap]) if left_edge_gap is not None else 0
+            n_right = int(counts[right_edge_gap]) if right_edge_gap is not None else 0
+            left_first, left_step, right_first, right_step = self._edge_gap_first_values_and_steps(
+                self.gaps.lowest_required_value, self.gaps.highest_required_value, n_left, n_right
             )
-            if left_gap is not None:
-                first_values[left_gap], steps[left_gap] = left_first, left_step
-            if right_gap is not None:
-                first_values[right_gap], steps[right_gap] = right_first, right_step
+            if left_edge_gap is not None:
+                first_values[left_edge_gap], steps[left_edge_gap] = left_first, left_step
+            if right_edge_gap is not None:
+                first_values[right_edge_gap], steps[right_edge_gap] = right_first, right_step
         return first_values, np.where(counts > 0, steps, 0.0)
 
     @staticmethod
-    def _edge_gap_placement(
-        lowest_value: float, highest_value: float, n_left: int, n_right: int
+    def _edge_gap_first_values_and_steps(
+        lowest_required_value: float, highest_required_value: float, n_left: int, n_right: int
     ) -> tuple[float, float, float, float]:
         """Return the first value and the step of the left edge gap, then those of the right edge gap.
 
-        The left edge gap holds `n_left` new values between 0 and `lowest_value`, the right edge gap `n_right` between
-        `highest_value` and 1; the module docstring describes the 3 cases. A side without values still gets a first
-        value and a step, which no caller reads, because a gap without new tuples has no values.
+        The left edge gap holds `n_left` new values between 0 and `lowest_required_value`, the right edge gap `n_right`
+        between `highest_required_value` and 1; the module docstring describes the 3 cases. A side without values still
+        gets a first value and a step, which no caller reads, because a gap without new tuples has no values.
         """
-        left_width, right_width = lowest_value, 1.0 - highest_value
+        left_width, right_width = lowest_required_value, 1.0 - highest_required_value
         even_step = (left_width + right_width) / (n_left + n_right + 1)
-        left_step_when_full = left_width / n_left if n_left > 0 else np.inf
-        right_step_when_full = right_width / n_right if n_right > 0 else np.inf
-        if even_step <= min(left_step_when_full, right_step_when_full):
-            # 1 even chain from the highest value, across 1 and 0, to the lowest value.
-            left_first, left_step = highest_value + (n_right + 1) * even_step - 1.0, even_step
-            right_first, right_step = highest_value + even_step, even_step
-        elif right_step_when_full < left_step_when_full:
+        left_step_reaching_0 = left_width / n_left if n_left > 0 else np.inf
+        right_step_reaching_1 = right_width / n_right if n_right > 0 else np.inf
+        if even_step <= min(left_step_reaching_0, right_step_reaching_1):
+            # The values split the wrap-around gap evenly, from the highest value across 1 and 0 to the lowest value.
+            left_first, left_step = highest_required_value + (n_right + 1) * even_step - 1.0, even_step
+            right_first, right_step = highest_required_value + even_step, even_step
+        elif right_step_reaching_1 < left_step_reaching_0:
             # The right side holds too many values: its highest value lies on 1.
             left_step = left_width / (n_left + 1)
             left_first = left_step
-            right_first, right_step = highest_value + right_step_when_full, right_step_when_full
+            right_first, right_step = highest_required_value + right_step_reaching_1, right_step_reaching_1
         else:
             # The left side holds too many values: its lowest value lies on 0.
-            left_first, left_step = 0.0, left_step_when_full
+            left_first, left_step = 0.0, left_step_reaching_0
             right_step = right_width / (n_right + 1)
-            right_first = highest_value + right_step
+            right_first = highest_required_value + right_step
         return left_first, left_step, right_first, right_step
 
     @cached_property

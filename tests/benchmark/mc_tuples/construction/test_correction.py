@@ -67,7 +67,7 @@ def test_the_correction_takes_the_shift_from_the_largest_spacings():
     assert correction.corrected_new_values[0] == pytest.approx(0.3)  # its spacing to 0.1 lies below the cap
     assert correction.max_move_fine_lanes == pytest.approx(0.05 * N_FINE_LANES)
     assert correction.cap == pytest.approx(0.7 - 0.3 - 1 / N_FINE_LANES)
-    assert correction.shift is None
+    assert correction.rotation_shift is None
 
 
 def test_the_correction_nudges_each_new_value_below_min_n_bits_within_its_fine_lane():
@@ -160,11 +160,11 @@ def test_the_rotation_takes_the_shift_nearest_to_0_that_gives_a_mean_of_0_5(valu
     values = np.array(values)
 
     # --- act --------------------------
-    correction = MCTuplesAxisValueCorrection.rotated(values)
+    correction = MCTuplesAxisValueCorrection.of_smallest_size(values)
 
     # --- assert -----------------------
     assert correction.cap is None
-    assert correction.shift == pytest.approx(expected_shift)
+    assert correction.rotation_shift == pytest.approx(expected_shift)
     assert correction.corrected_new_values == pytest.approx((values + expected_shift) % 1.0, abs=1e-15)
     assert correction.corrected_new_values.mean() == pytest.approx(0.5, abs=1e-12)
     assert correction.offset_before_fine_lanes == pytest.approx((values.mean() - 0.5) * N_FINE_LANES)
@@ -177,16 +177,17 @@ def test_the_rotation_keeps_every_cyclic_distance_and_1_tuple_per_fine_lane(seed
     fine lane to itself, keeps every cyclic distance up to the nudge, and reaches a mean of 0.5."""
     # --- arrange ----------------------
     rng = np.random.default_rng(seed)
-    # Every other fine lane, so that 2 values lie more than 1 fine lane apart and no shift puts them into 1 fine lane.
+    # The values take every other fine lane, so that 2 values lie more than 1 fine lane apart and no shift puts them
+    # into 1 fine lane.
     lanes = 2 * rng.choice(N_FINE_LANES // 2, size=32, replace=False)
     values = (lanes + rng.uniform(0.01, 0.99, size=32)) / N_FINE_LANES
 
     # --- act --------------------------
-    correction = MCTuplesAxisValueCorrection.rotated(values)
+    correction = MCTuplesAxisValueCorrection.of_smallest_size(values)
 
     # --- assert -----------------------
     corrected = correction.corrected_new_values
-    assert correction.shift is not None
+    assert correction.rotation_shift is not None
     differences = np.abs(values[:, None] - values[None, :])
     corrected_differences = np.abs(corrected[:, None] - corrected[None, :])
     assert np.minimum(corrected_differences, 1 - corrected_differences) == pytest.approx(
@@ -203,10 +204,10 @@ def test_the_rotation_falls_back_to_the_mean_correction_when_it_would_put_2_tupl
     values = np.array([100.9, 101.1, 700.3, 800.2]) / N_FINE_LANES
 
     # --- act --------------------------
-    correction = MCTuplesAxisValueCorrection.rotated(values)
+    correction = MCTuplesAxisValueCorrection.of_smallest_size(values)
 
     # --- assert -----------------------
-    assert correction.shift is None
+    assert correction.rotation_shift is None
     assert correction.cap is not None
     assert np.bincount(fine_lanes_of(correction.corrected_new_values)).max() == 1
     assert correction.corrected_new_values.mean() == pytest.approx(0.5, abs=1e-12)
@@ -218,11 +219,11 @@ def test_value_correction_rotates_both_axes_of_the_smallest_size():
     tuple_array = np.array([[0.1, 0.2], [0.3, 0.4], [0.6, 0.8], [0.9, 0.999]])
 
     # --- act --------------------------
-    correction = MCTuplesValueCorrection.rotated(tuple_array)
+    correction = MCTuplesValueCorrection.first_of(tuple_array, n_required=0)
 
     # --- assert -----------------------
-    assert correction.u.shift == pytest.approx(0.025)
-    assert correction.v.shift == pytest.approx(-0.09975)
+    assert correction.u.rotation_shift == pytest.approx(0.025)
+    assert correction.v.rotation_shift == pytest.approx(-0.09975)
     assert correction.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
     assert correction.u.corrected_new_values.tolist() == correction.tuple_array[:, 0].tolist()
     assert correction.v.corrected_new_values.tolist() == correction.tuple_array[:, 1].tolist()

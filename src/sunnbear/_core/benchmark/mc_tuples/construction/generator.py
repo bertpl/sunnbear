@@ -189,10 +189,7 @@ class MCTuplesGenerator:
         selected_tuple_array, selection_solution = selection_solve.run(t_budget_sec - t_refinement_budget_sec)
 
         # --- first value correction -------------
-        if size.n_required == 0:
-            first_value_correction = MCTuplesValueCorrection.rotated(selected_tuple_array)
-        else:
-            first_value_correction = MCTuplesValueCorrection.of(selected_tuple_array, size.n_required)
+        first_value_correction = MCTuplesValueCorrection.first_of(selected_tuple_array, size.n_required)
 
         # --- refinement -------------------------
         refinement_solve = MCTuplesRefinementSolve(
@@ -245,7 +242,7 @@ def generate_mc_tuples(
     Both solves maximize the geomean of 3 values of gpq(0.1), the geometric pseudo-quantile at level 0.1, a soft
     minimum that `MCTuplesStats` reports: one over each tuple's distance to its nearest other tuple along u, one along v
     and one in squared L2. Every distance is measured cyclically: each axis is a circle on which 0 and 1 meet, so a
-    size need not reach the ends of u and of v.
+    value near 0 and a value near 1 count as close.
 
     A correction moves the new tuples to bring the size's means to 0.5 before the refinement solve, and a second
     correction after it; the smallest size's first correction rotates each axis instead, which keeps every cyclic

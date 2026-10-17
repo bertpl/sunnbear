@@ -41,7 +41,7 @@ from max_div.solver import (
 
 from sunnbear._core.benchmark.mc_tuples.core import GPQ_LEVEL, MCTuplesSize
 
-from .distances import CYCLIC_SQUARED_L2_DISTANCE, CYCLIC_U_DISTANCE, CYCLIC_V_DISTANCE
+from .distances import CYCLIC_SQUARED_L2_DISTANCE_METRIC, CYCLIC_U_DISTANCE_METRIC, CYCLIC_V_DISTANCE_METRIC
 from .exceptions import MCTuplesConstructionError
 from .population import MCTuplesPopulation
 
@@ -97,10 +97,11 @@ class MCTuplesSolve(ABC):
             # max-div works on a float32 copy; the selected candidates are taken by index.
             np.vstack([self.required_tuple_array, self.population.tuple_array]).astype(np.float32),
             k=int(self.size),
-            distance_metric=CYCLIC_SQUARED_L2_DISTANCE,
-            # The geomean of gpq along u, along v, and over the problem's own distance, squared L2, all cyclic.
+            distance_metric=CYCLIC_SQUARED_L2_DISTANCE_METRIC,
+            # The objective is the geomean of gpq along u, along v, and over the problem's own distance, squared L2,
+            # each measured cyclically.
             diversity_metric=HybridDiversityMetric.geomean_of(
-                gpq.over(CYCLIC_U_DISTANCE), gpq.over(CYCLIC_V_DISTANCE), gpq
+                gpq.over(CYCLIC_U_DISTANCE_METRIC), gpq.over(CYCLIC_V_DISTANCE_METRIC), gpq
             ),
             constraints=self._constraints(),
         )

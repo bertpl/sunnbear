@@ -12,7 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Require max-div ≥ 0.21.8
-- Measure every distance of the tuple sets that `generate_mc_tuples` builds with each axis as a circle, which improves their spread statistics measured that way; each size no longer spans the full range of u and of v
+- Measure every statistic of `MCTuplesStats` cyclically, with each axis as a circle on which 0 and 1 meet, which changes every value it reports
+- Improve the cyclic spread statistics of the tuple sets that `generate_mc_tuples` builds; each size no longer spans the full range of u and of v
 
 ### Deprecated
 
