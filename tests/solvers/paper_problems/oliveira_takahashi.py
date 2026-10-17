@@ -18,9 +18,9 @@ import math
 from .problem import PaperProblem, PaperProblemEnum
 
 # The paper's experiments solve every function on [-1, 1] with this xtol, where bisection needs
-# `OLIVEIRA_TAKAHASHI_N_BISECTION` iterations.
+# `OLIVEIRA_TAKAHASHI_N_BISECTION_ITERATIONS` iterations.
 OLIVEIRA_TAKAHASHI_XTOL = 1e-10
-OLIVEIRA_TAKAHASHI_N_BISECTION = 34
+OLIVEIRA_TAKAHASHI_N_BISECTION_ITERATIONS = 34
 
 
 # ==================================================================================================
@@ -58,7 +58,7 @@ def _circles(x: float) -> float:
 # ==================================================================================================
 class OliveiraTakahashiTable1Problem(PaperProblemEnum):
     """`OliveiraTakahashiTable1Problem` holds the problems of Table 1 of Oliveira and Takahashi (2020), in the table's
-    order; a member's name is the problem's name in capitals, e.g. ``LAMBERT``."""
+    order."""
 
     LAMBERT = PaperProblem(name="lambert", f=lambda x: x * math.exp(x) - 1.0, a=-1.0, b=1.0)
     TRIGONOMETRIC_1 = PaperProblem(name="trigonometric_1", f=lambda x: math.tan(x - 0.1), a=-1.0, b=1.0)

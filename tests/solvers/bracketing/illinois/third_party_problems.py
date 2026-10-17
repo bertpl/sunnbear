@@ -56,8 +56,8 @@ OLIVEIRA_TAKAHASHI_TABLE_1 = [
         7,
         deviation=1,
         reason=UNSTATED_RUN_DETAILS,
-        observation="the solve takes 1 iteration more: iterate 7 has f(x) = 5.6e-17, the float spacing just below "
-        "0.5, the constant term of f, and iterate 8 has f(x) == 0",
+        observation="the solve takes 1 iteration more: iterate 7 has f(x) = 5.6e-17, the spacing between floats "
+        "just below 0.5, which is the constant term of f; iterate 8 has f(x) == 0",
     ),
     OliveiraTakahashiTable1Problem.POLYNOMIAL_1.with_n_iterations(12),
     OliveiraTakahashiTable1Problem.POLYNOMIAL_2.with_n_iterations(11),

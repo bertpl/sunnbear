@@ -32,13 +32,13 @@ class AndersonBjorck(Solver):
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, with its
       unscaled function value.
 
-    `AndersonBjorck` computes the factor as the paper's ALGOL procedure does, and the chord's zero with `chord_zero`,
-    in a form other than the procedure's:
+    `AndersonBjorck` computes the factor as the paper's ALGOL procedure does, and computes the chord's zero with
+    `chord_zero`, whose form differs from the procedure's:
 
     - **the chord's zero:** the procedure computes it as ``x1 - f1 / w1``, a step from the most recent iterate ``x1``,
       where ``w1 = (f1 - f0) / (x1 - x0)`` is the slope of the chord through ``(x1, f1)`` and ``(x0, f0)``, with ``x0``
-      the retained bound and ``f0`` its scaled value; in exact arithmetic, the procedure's form gives the x-value that
-      `chord_zero` computes, but rounds differently;
+      the retained bound and ``f0`` its scaled value; in exact arithmetic, the procedure's form gives the same x-value
+      as `chord_zero`, but rounds differently;
     - **the factor:** the ratio of 2 chord slopes, the slope from the previous to the new iterate divided by ``w1``,
       the slope of the chord that produced the new iterate. In exact arithmetic, the ratio equals
       ``1 - f_new / f_previous``.
@@ -88,8 +88,8 @@ class AndersonBjorck(Solver):
     References:
         - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of an
           equation. BIT 13(3), 253-264. Its equation 7 is the factor, its section 3 the fallback to 0.5, and its
-          section 6 gives the ALGOL procedure, which holds the step of delta, the stopping rule, and the form of the
-          factor that `AndersonBjorck` computes. https://doi.org/10.1007/BF01951936
+          section 6 gives the ALGOL procedure, which holds the step of delta, the stopping rule, and the form of
+          `AndersonBjorck`'s factor. https://doi.org/10.1007/BF01951936
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. The paper covers the Anderson-Björck method in 3 places:
 

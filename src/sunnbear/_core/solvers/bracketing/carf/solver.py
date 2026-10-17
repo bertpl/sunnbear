@@ -191,7 +191,8 @@ class CARF(Solver):
             if a_active < t_star < b_active and abs(t_star - t) < 0.5 * abs(step_before_last):
                 t_new = t_star
             elif theta == _THETA_3:
-                # A clip with θ3 = 0.5 leaves only the midpoint of the active interval.
+                # A clip with θ3 = 0.5 leaves only the midpoint of the active interval; `midpoint` computes it here,
+                # because the clip's bounds, a_active + θ3 * w* and b_active - θ3 * w*, round differently.
                 t_new = midpoint(a_active, b_active)
             else:
                 active_width = b_active - a_active
@@ -232,9 +233,10 @@ class CARF(Solver):
         tiny.
 
         When rounding puts neither zero in ``[a, b]``, the zero farther from ``t`` is returned, and the caller clips it
-        into the active interval. When rounding puts ``t`` onto ``a`` or ``b``, the quadratic is not defined; when the
-        3 points lie on 1 line, the quadratic is that line. In both cases, the zero of the chord through ``(a, fa)``
-        and ``(b, fb)`` is returned.
+        into the active interval.
+
+        When rounding puts ``t`` onto ``a`` or ``b``, the quadratic is not defined; when the 3 points lie on 1 line, the
+        quadratic is that line. In both cases, the zero of the chord through ``(a, fa)`` and ``(b, fb)`` is returned.
         """
         if not a < t < b:
             return chord_zero(a, fa, b, fb)

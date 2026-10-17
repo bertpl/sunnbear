@@ -26,8 +26,8 @@ class SecantScipyTwin(TwinSolver):
       and the agreement check compares converged solves only; `test_special_cases.py` covers that case. At
       ``xtol = 1e-4``, both solvers stop at the same x-value, far from the root, and the agreement test compares them.
     - `quintic`, at both tolerances: its 4th and 5th iterates have nearly equal function values, which makes the next
-      step so sensitive to rounding that a change of 1 ulp in either function value moves it far more than its last
-      bits, and the 2 forms of the secant's zero move it that far too.
+      iterate so sensitive to rounding that a change of 1 ulp in either function value changes it by far more than its
+      last bits, and SciPy's form of the secant's zero and `chord_zero` differ by that much too.
     """
 
     name = "secant_scipy_twin"

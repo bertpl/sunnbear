@@ -1,7 +1,10 @@
 """These tests assert that the individual steps of `ITP` follow its algorithm."""
 
 from sunnbear.solvers import ITP, ITPVariant
-from tests.solvers.paper_problems.oliveira_takahashi import OLIVEIRA_TAKAHASHI_N_BISECTION, OLIVEIRA_TAKAHASHI_XTOL
+from tests.solvers.paper_problems.oliveira_takahashi import (
+    OLIVEIRA_TAKAHASHI_N_BISECTION_ITERATIONS,
+    OLIVEIRA_TAKAHASHI_XTOL,
+)
 
 from .paper_problems import TABLE_1
 
@@ -24,6 +27,6 @@ def test_the_paper_pseudocode_variant_ends_as_bisection_once_its_projection_radi
 
     # --- assert -----------------------
     assert n_iterations == {
-        ITPVariant.PAPER_PSEUDOCODE: OLIVEIRA_TAKAHASHI_N_BISECTION,
+        ITPVariant.PAPER_PSEUDOCODE: OLIVEIRA_TAKAHASHI_N_BISECTION_ITERATIONS,
         ITPVariant.PAPER_EXPERIMENTS: 18,
     }

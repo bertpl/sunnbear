@@ -96,7 +96,8 @@ class TOMS748(Solver):
         Each call of `_evaluate_and_split_at` evaluates 1 x-value and returns the new interval; the solve ends after any
         call that returns an interval with ``f(a) = 0``, or one at most ``stop_width`` wide.
 
-        These steps take the shared form, not the form of the authors' code:
+        These steps take the form of `chord_zero` and `midpoint`, which every solver shares, not the form of the
+        authors' code:
 
         - a midpoint, `Interval.midpoint`, where the authors' code computes ``a + 0.5 * (b - a)``;
         - the first secant step, `Interval.chord_zero`, where the authors' code computes

@@ -3,9 +3,8 @@
 Published results:
 
 - The test output of the authors' Fortran 77 code (netlib, ``toms/748``): reproduced for ``k = 2``, in
-  ``test_paper.py``: the roots of 153 of the 154 problems. Problem 26 is exactly 0 for every ``|x|`` below about
-  0.0375, so which of those exact roots a solve evaluates first depends on the last bits of its steps, and its root is
-  the root of problem 26 is not compared.
+  ``test_paper.py``: the roots of 153 of the 154 problems; the test data states why the root of problem 26
+  is not compared.
 - Alefeld, Potra and Shi (1995), Table II: reproduced, in ``test_paper.py``: the totals within 1.1 %.
 - Alefeld, Potra and Shi (1995), Table III: not reproduced, because the paper does not list the 139 problems behind
   its totals.

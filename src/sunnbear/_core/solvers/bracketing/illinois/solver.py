@@ -26,7 +26,8 @@ class Illinois(BracketingSolver[IllinoisState]):
 
     - **Chord's zero:** `Illinois` computes it with `chord_zero`, in the form of Ford (1997); the procedure computes it
       as a correction to the most recent iterate ``x1``, ``x1 - f1 * (x1 - x0) / (f1 - f0)``, with ``x0`` the retained
-      bound and ``f0`` its halved function value; the 2 forms are equal in exact arithmetic but round differently;
+      bound and ``f0`` its function value, halved once for each iteration that kept ``x0`` again; the 2 forms are
+      equal in exact arithmetic but round differently;
     - **Stopping criterion:** `Illinois` stops by `BracketingSolver`'s criterion, once the interval is at most
       ``2 * xtol`` wide, and returns the interval's midpoint, which lies within ``xtol`` of a root; the procedure
       stops once a step is at most its tolerance ``delta``, and returns the last chord's zero without evaluating it,

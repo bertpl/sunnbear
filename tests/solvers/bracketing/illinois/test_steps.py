@@ -25,7 +25,7 @@ def test_a_linear_function_is_solved_in_one_step(f):
 
 def test_the_first_2_steps_are_regula_falsi_and_the_third_halves_the_retained_bound():
     """On the convex cubic, Illinois starts as regula falsi, then halves the value of the bound that it keeps again;
-    each step is the zero of the chord, in the form that `chord_zero` computes."""
+    each step is the zero of the chord, in the form of `chord_zero`."""
     # --- arrange ----------------------
     a, b = 1.0, 2.0
     fa, fb = cubic(a), cubic(b)

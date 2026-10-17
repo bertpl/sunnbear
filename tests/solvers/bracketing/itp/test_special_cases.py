@@ -4,7 +4,10 @@ make `ITP` exceed its bound on the iteration count."""
 import pytest
 
 from sunnbear.solvers import ITP, ITPVariant, SolveStatus
-from tests.solvers.paper_problems.oliveira_takahashi import OLIVEIRA_TAKAHASHI_N_BISECTION, OLIVEIRA_TAKAHASHI_XTOL
+from tests.solvers.paper_problems.oliveira_takahashi import (
+    OLIVEIRA_TAKAHASHI_N_BISECTION_ITERATIONS,
+    OLIVEIRA_TAKAHASHI_XTOL,
+)
 
 from .paper_problems import TABLE_1
 
@@ -27,7 +30,7 @@ def test_rounding_errors_can_push_either_variant_past_n_max(name, variant):
     )
 
     # --- assert -----------------------
-    assert result.n_fevals - 2 == OLIVEIRA_TAKAHASHI_N_BISECTION + 1
+    assert result.n_fevals - 2 == OLIVEIRA_TAKAHASHI_N_BISECTION_ITERATIONS + 1
 
 
 @pytest.mark.parametrize("variant", ITPVariant)

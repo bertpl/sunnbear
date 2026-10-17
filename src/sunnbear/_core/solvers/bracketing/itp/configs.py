@@ -12,8 +12,8 @@ class ITPPaperExperimentsSlack4Config(SolverConfig):
     It runs variant ``"paper_experiments"`` with ``n_slack = 4``. It is not core because
     `ITPPaperExperimentsSlack0Config` is the core config of `ITP`; that config's docstring says why it was chosen.
 
-    No source states a value of ``n_slack``; the value 4 is larger than 1, and small next to bisection's evaluation
-    count at the benchmark's default ``n_bisection_fevals``.
+    No source states a value of ``n_slack``. The value 4 allows more than 1 extra iteration, and stays small next to
+    bisection's evaluation count at the benchmark's default ``n_bisection_fevals``.
 
     The config shows how extra slack changes the evaluation counts, and that rounding can still take a solve 1
     iteration past its bound ``n_max``.

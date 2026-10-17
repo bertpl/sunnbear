@@ -3,17 +3,24 @@
 import pytest
 
 from sunnbear.solvers import Illinois
-from tests.solvers.paper_problems import PaperProblem
+from tests.solvers.paper_problems import PaperProblem, PaperProblemEnum
 from tests.solvers.paper_problems.ford import FordTable4Problem, assert_n_fevals_at_ford_stop_reproduced
 from tests.solvers.paper_problems.oliveira_takahashi import OLIVEIRA_TAKAHASHI_XTOL, OliveiraTakahashiTable1Problem
 
 from .third_party_problems import FORD_TABLE_4, OLIVEIRA_TAKAHASHI_TABLE_1
 
 
-def test_the_rows_of_table_4_of_ford_name_every_problem_of_the_table_in_order():
-    """`FORD_TABLE_4` holds 1 problem per member of `FordTable4Problem`, in the table's order."""
+@pytest.mark.parametrize(
+    "table, problem_enum",
+    [(FORD_TABLE_4, FordTable4Problem), (OLIVEIRA_TAKAHASHI_TABLE_1, OliveiraTakahashiTable1Problem)],
+    ids=["ford_table_4", "oliveira_takahashi_table_1"],
+)
+def test_the_rows_of_each_table_name_every_problem_of_the_table_in_order(
+    table: list[PaperProblem], problem_enum: type[PaperProblemEnum]
+):
+    """Each table holds 1 problem per member of its problem enum, in the table's order."""
     # --- assert -----------------------
-    assert [problem.name for problem in FORD_TABLE_4] == [member.value.name for member in FordTable4Problem]
+    assert [problem.name for problem in table] == [member.value.name for member in problem_enum]
 
 
 @pytest.mark.parametrize("problem", FORD_TABLE_4, ids=str)
@@ -22,15 +29,6 @@ def test_the_iteration_counts_of_table_4_of_ford_are_reproduced(problem: PaperPr
     stops it, within the row's allowed deviation."""
     # --- act / assert -----------------
     assert_n_fevals_at_ford_stop_reproduced(Illinois(), problem)
-
-
-def test_the_rows_of_table_1_of_oliveira_takahashi_name_every_problem_of_the_table_in_order():
-    """`OLIVEIRA_TAKAHASHI_TABLE_1` holds 1 problem per member of `OliveiraTakahashiTable1Problem`, in the table's
-    order."""
-    # --- assert -----------------------
-    assert [problem.name for problem in OLIVEIRA_TAKAHASHI_TABLE_1] == [
-        member.value.name for member in OliveiraTakahashiTable1Problem
-    ]
 
 
 @pytest.mark.parametrize("problem", OLIVEIRA_TAKAHASHI_TABLE_1, ids=str)
