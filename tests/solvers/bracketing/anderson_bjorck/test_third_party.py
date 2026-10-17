@@ -18,6 +18,9 @@ def test_the_rows_of_table_4_of_ford_name_every_problem_of_the_table_in_order():
 @pytest.mark.parametrize("problem", FORD_TABLE_4, ids=str)
 def test_the_iteration_counts_of_table_4_of_ford_are_reproduced(problem: PaperProblem):
     """On every row of Table 4 of Ford (1997), `AndersonBjorck` takes Ford's count of iterations until Ford's
-    stopping rule stops it."""
+    stopping rule stops it.
+
+    The solve runs at ``xtol = 0``, where `AndersonBjorck` takes no step of delta, as Ford's method takes none.
+    """
     # --- act / assert -----------------
     assert_n_fevals_at_ford_stop_reproduced(AndersonBjorck(), problem)

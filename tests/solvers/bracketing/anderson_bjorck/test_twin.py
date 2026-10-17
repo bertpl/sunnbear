@@ -10,7 +10,7 @@ from .mpmath_twin import AndersonBjorckMpmathTwin
 
 @pytest.mark.parametrize("test_case", AndersonBjorckMpmathTwin.compared_test_cases(), ids=str)
 def test_anderson_bjorck_agrees_with_mpmath_anderson_bjorck(test_case):
-    """`AndersonBjorck` evaluates the same x-values as mpmath's Anderson-Björck method, on every test case of
-    `TWIN_TEST_CASES` that the twin does not exclude."""
+    """`AndersonBjorck` evaluates the same x-values as mpmath's Anderson-Björck method, with the step of delta that
+    the twin takes in mpmath's place, on every test case of `TWIN_TEST_CASES` that the twin does not exclude."""
     # --- act / assert -----------------
     assert_agrees_with_twin(AndersonBjorck(), AndersonBjorckMpmathTwin(), test_case)
