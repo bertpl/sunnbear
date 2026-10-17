@@ -115,10 +115,11 @@ A stopping criterion that also estimates the convergence rate from the last 3 it
 
 All bracketing solvers follow 3 rules, apart from the secondary configs that section V lists as not following section IV:
 
-1. **A shared stopping criterion and return value.** Where its source checks its own stopping criterion, a solve ends once the interval is at most `2*xtol` wide, or once the function value at an interval bound is exactly 0. It returns that bound, or else the interval's midpoint, which then lies within `xtol` of a root.
+1. **A shared stopping criterion and return value.** Where a solver's source checks its stopping criterion, a solve ends once the interval is at most `2*xtol` wide, or once the function value at an interval bound is exactly 0. It returns that bound, or else the interval's midpoint, which then lies within `xtol` of a root.
    - This is the least strict stopping criterion that still guarantees a result within `xtol` from the interval alone. A source's own stopping criterion with the same guarantee stops at the same width or a narrower one: a stopping criterion that returns an interval bound needs the interval at most `xtol` wide. So the shared stopping criterion never costs a solver an evaluation over its source's own.
    - Stopping criteria on `|f|`, or on the step between 2 iterates, can stop earlier, but they give no guarantee on the distance to a root. The benchmark scores a result farther than `xtol` from a root with a fixed high evaluation count, `max_fevals`.
-   - The rule standardizes what a solve checks, not how often: each solver checks where its source checks its own stopping criterion, which most sources do once per iteration, and the code of Alefeld, Potra and Shi (1995) after every step. Ridders (1979) states no stopping criterion, so `Ridders` checks where SciPy's `ridder` does (section V.a).
+   - The rule standardizes what a solve checks, not how often: each solver checks where its source checks its own stopping criterion, which most sources do once per iteration and the code of Alefeld, Potra and Shi (1995), the source of `TOMS748`, does after every step.
+   - Ridders (1979) states no stopping criterion, so `Ridders` checks where SciPy's `ridder` does (section V.a). `Bisection` and `RegulaFalsi` have no reference, and check once per iteration.
 2. **Tolerances inside the steps are kept, with their value derived from `xtol`.** Several sources keep each new x-value at least some distance away from the interval bounds or from the previous iterate (a minimum step, or a margin), so that the interval shrinks to the stopping width once the method has converged.
    - Each source sizes that distance for its own stopping criterion. The `sunnbear` solver implementations derive it from `xtol` such that it is about `xtol`, half the shared stopping width.
    - A final step past the root then leaves an interval narrower than `2*xtol`, which ends the solve with room for rounding.
@@ -164,7 +165,7 @@ This applies to every plain chord step and every plain midpoint, in hybrid metho
 | `Pegasus` | shared | – |
 | `AndersonBjorck` | shared | – |
 | `Ridders` | – | shared |
-| `TOMS748` | shared in the first secant step; source's form in the double-size secant step, a step from the bound with the smaller `\|f\|` twice as long as the secant step, which is not a plain chord; source's form in Newton-Quadratic's fallback to the chord, `a - fa/a1`, which reuses the slope `a1 = (fb - fa)/(b - a)` of its quadratic | shared |
+| `TOMS748` | shared in the first secant step; source's form in the double-size secant step, a step from the bound with the smaller `\|f\|` twice as long as the secant step, which is not a plain chord; source's form in the chord step `a - fa/a1` that the article's Newton-Quadratic subroutine falls back to, which reuses the slope `a1 = (fb - fa)/(b - a)` of that subroutine's quadratic | shared |
 | `Chandrupatla` | – | source's form: `x1 + t*(x2 - x1)` with `t = 0.5`, where `t` is clamped before every step |
 | `ITP` | shared | shared |
 | `SteffenBrent` | shared | shared |
@@ -175,7 +176,7 @@ This applies to every plain chord step and every plain midpoint, in hybrid metho
 
 Some solvers are provided in multiple configurations, which might differ in their parameters or in certain implementation details (such as the stopping criterion).
 
-Each config has a role: a **core** config characterizes the test problems, and a **secondary** config is reported for information only. A third role, the **baseline**, belongs to `BisectionConfig` alone: its evaluation count is the benchmark's reference cost. Only a secondary config may deviate from section IV.
+Each config has a role: a **core** config characterizes the test problems, and a **secondary** config is reported for information only. A third role, the **baseline**, belongs to `BisectionConfig` alone: its evaluation count normalizes the other solvers' evaluation counts. Only a secondary config may deviate from section IV.
 
 | Algorithm | Config | Role | Differs in | Follows section IV |
 | --------- | ------ | ---- | ---------- | ------------------ |
@@ -191,7 +192,9 @@ Each config has a role: a **core** config characterizes the test problems, and a
 ### V.a. Ridders
 
 Ridders (1979) states no stopping criterion, so the core config fills that gap with the shared stopping criterion of section IV.a. The 2 secondary configs show the stopping criteria of 2 widely used implementations:
-- **`RiddersBracketingSolverConfig` (core):** Ridders' steps as the article states them, with the shared stopping criterion, checked where SciPy's `ridder` checks its own: for a function value of 0 right after the midpoint is evaluated, and for the whole criterion after the new iterate is evaluated. Near the root, a new iterate can land between the root and the far bound, and the interval then only halves, so this config's evaluation counts can vary between near-identical functions.
+- **`RiddersBracketingSolverConfig` (core):** Ridders' steps as the article states them, with the shared stopping criterion.
+  - It checks that criterion where SciPy's `ridder` checks its own: right after evaluating the midpoint, it checks for a function value of 0, and after evaluating the new iterate, it checks the whole criterion.
+  - Near the root, a new iterate can land between the root and the far bound, and the interval then only halves, so this config's evaluation counts can vary between near-identical functions.
 - **`RiddersScipyConfig` (secondary):** SciPy's `ridder`. It limits each step so that the new iterate lies at least `xtol/2` inside the interval, which the article does not state; near the root, that limit shrinks the interval to the stopping width in fewer evaluations. It stops once the interval is narrower than `xtol`, and returns the last iterate.
 - **`RiddersCommonsMathConfig` (secondary):** the stopping criterion of Apache Commons Math's `RiddersSolver`: it stops once 2 successive iterates lie at most `xtol` apart, and returns the last one. That iterate can lie more than `xtol` from a root, as on a function with a kink or with a multiple root.
 
