@@ -3,7 +3,7 @@
 import scipy.optimize
 
 from sunnbear.solvers import Interval
-from tests.solvers.example_functions import steep_exponential
+from tests.solvers.example_functions import quintic, steep_exponential
 from tests.solvers.twins import StoppingWrappedFunction, TwinConvergedSignal, TwinSolver, TwinTestCase
 
 
@@ -14,19 +14,32 @@ class SecantScipyTwin(TwinSolver):
     `Secant` stops by SciPy's own rule, so the twin passes SciPy ``tol=xtol`` and ``rtol=0``; SciPy then stops where
     `Secant` stops, and the twin never interrupts SciPy.
 
-    The twin deviates from exact agreement in 1 declared way: SciPy evaluates both interval bounds again before its
-    first step.
+    The twin deviates from exact agreement in these declared ways:
 
-    The twin is not compared on `steep_exponential` at ``xtol = 1e-10``: `Secant` leaves the interval there, so its
-    solve ends as ``DIVERGED``, and the agreement check compares converged solves only; `test_special_cases.py`
-    covers that case. At ``xtol = 1e-4``, both solvers stop at the same x-value, far from the root, and the agreement
-    test compares them.
+    - SciPy evaluates both interval bounds again before its first step;
+    - SciPy computes the secant's zero from the ratio of the 2 function values, where `Secant` computes it with
+      `chord_zero`, so the iterates can differ in their last bits.
+
+    The twin is not compared on these test cases:
+
+    - `steep_exponential` at ``xtol = 1e-10``: `Secant` leaves the interval there, so its solve ends as ``DIVERGED``,
+      and the agreement check compares converged solves only; `test_special_cases.py` covers that case. At
+      ``xtol = 1e-4``, both solvers stop at the same x-value, far from the root, and the agreement test compares them.
+    - `quintic`, at both tolerances: its 4th and 5th iterates have nearly equal function values, which makes the next
+      iterate so sensitive to rounding that a change of 1 ulp in either function value changes it by far more than its
+      last bits, and SciPy's form of the secant's zero and `chord_zero` differ by that much too.
     """
 
     name = "secant_scipy_twin"
     version = 1
     n_reevaluated_bounds = 2
-    excluded_test_cases = frozenset({TwinTestCase(f=steep_exponential, a=0.0, b=1.0, xtol=1e-10)})
+    excluded_test_cases = frozenset(
+        {
+            TwinTestCase(f=steep_exponential, a=0.0, b=1.0, xtol=1e-10),
+            TwinTestCase(f=quintic, a=0.0, b=1.0, xtol=1e-4),
+            TwinTestCase(f=quintic, a=0.0, b=1.0, xtol=1e-10),
+        }
+    )
 
     def _run_reference(self, f: StoppingWrappedFunction, a: float, b: float, xtol: float) -> None:
         """Run SciPy's secant method from ``a`` and ``b``, and signal its root if it converged."""

@@ -20,7 +20,8 @@ _UNSET = 1.0e5
 class TOMS748(Solver):
     """`TOMS748` implements Algorithm 748 (Alefeld, Potra and Shi, 1995), with ``k`` interpolation steps per iteration.
 
-    The first iteration takes a secant step. Each later iteration evaluates the function at 1 x-value per step:
+    The first iteration takes a secant step, computed with `chord_zero`. Each later iteration evaluates the function
+    at 1 x-value per step:
 
     - ``k`` interpolation steps. The j-th step, counted from 1, takes the zero of the inverse cubic interpolation
       through the bounds ``a`` and ``b`` and the 2 most recently discarded bounds, ``d`` and ``e``. When the 4
@@ -61,12 +62,13 @@ class TOMS748(Solver):
           interpolation, and its section 6 states the stopping criterion and the margin. The test suite compares the
           evaluation counts of `TOMS748` with the paper's Tables II and IV to VI. https://doi.org/10.1145/210089.210111
         - The authors' Fortran 77 code, published with the paper as algorithm 748 of the Collected Algorithms of the
-          ACM (netlib, ``toms/748``). It implements Algorithm 4.2, which ``k = 2`` follows line by line, and the test
-          suite reproduces the roots that the code lists for its test problems.
+          ACM (netlib, ``toms/748``). It implements Algorithm 4.2, which ``k = 2`` follows line by line except for the
+          forms of the first secant step and of the midpoint. The test suite reproduces the roots that the code lists
+          for its test problems.
     """
 
     name = "toms748"
-    version = 1
+    version = 2
 
     def __init__(self, *, k: int) -> None:
         """Configure the number ``k`` of interpolation steps per iteration.
@@ -92,8 +94,14 @@ class TOMS748(Solver):
         - ``c`` is the x-value to evaluate next.
 
         Each call of `_evaluate_and_split_at` evaluates 1 x-value and returns the new interval; the solve ends after any
-        call that returns an interval with ``f(a) = 0``, or one at most ``stop_width`` wide. A midpoint is computed as
-        ``a + 0.5 * (b - a)``, as in the authors' code, not with `Interval.midpoint`, which rounds differently.
+        call that returns an interval with ``f(a) = 0``, or one at most ``stop_width`` wide.
+
+        These steps take the form of `chord_zero` and `midpoint`, which every solver shares, not the form of the
+        authors' code:
+
+        - a midpoint, `Interval.midpoint`, where the authors' code computes ``a + 0.5 * (b - a)``;
+        - the first secant step, `Interval.chord_zero`, where the authors' code computes
+          ``a - (fa / (fb - fa)) * (b - a)``.
         """
         interval = state.interval
         tol = self._get_tol(state.xtol, interval.a, interval.b)
@@ -109,7 +117,7 @@ class TOMS748(Solver):
 
             # --- iteration 1: the secant step ---
             if n_iterations == 1:
-                c = interval.a - (interval.fa / (interval.fb - interval.fa)) * interval.width
+                c = interval.chord_zero
                 interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
                 if interval.is_fa_zero or interval.width <= stop_width:
                     return interval.a
@@ -138,7 +146,7 @@ class TOMS748(Solver):
             u, fu = self._get_u(interval)
             c = u - 2.0 * (fu / (interval.fb - interval.fa)) * interval.width
             if abs(c - u) > 0.5 * interval.width:
-                c = interval.a + 0.5 * interval.width
+                c = interval.midpoint
             interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
             if interval.is_fa_zero or interval.width <= stop_width:
                 return interval.a
@@ -147,7 +155,7 @@ class TOMS748(Solver):
             if interval.width < _MU * iteration_start_width:
                 continue
             e, fe = d, fd
-            c = interval.a + 0.5 * interval.width
+            c = interval.midpoint
             interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
             if interval.is_fa_zero or interval.width <= stop_width:
                 return interval.a
@@ -196,7 +204,7 @@ class TOMS748(Solver):
         """
         margin = _LAMBDA * stop_width
         if interval.width <= 2.0 * margin:
-            c = interval.a + 0.5 * interval.width
+            c = interval.midpoint
         elif c <= interval.a + margin:
             c = interval.a + margin
         elif c >= interval.b - margin:

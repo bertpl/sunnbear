@@ -173,9 +173,12 @@ PRINTED_ROOTS = {
     "28[n=1000]": 1.2388385788997e-06,
 }
 
-# ``root_rel_tol = 1e-13`` is the precision of a root printed to 14 significant digits.
+# ``root_rel_tol = 1e-13`` is the precision of a root printed to 14 significant digits. Problem 26 is exactly 0
+# wherever exp(1 / x^2) overflows, for |x| below about 0.0375, so every x-value there is an exact root, and which one
+# a solve evaluates first depends on the last bits of its steps; the printed root of problem 26 is not compared.
 AUTHORS_TEST_OUTPUT = [
-    replace(problem, root=PRINTED_ROOTS[problem.name], root_rel_tol=1e-13) for problem in ALEFELD_POTRA_SHI_PROBLEMS
+    problem if problem.name == "26[n=1]" else replace(problem, root=PRINTED_ROOTS[problem.name], root_rel_tol=1e-13)
+    for problem in ALEFELD_POTRA_SHI_PROBLEMS
 ]
 
 
@@ -211,11 +214,7 @@ TABLES_IV_TO_VI_BY_K = {
         AlefeldPotraShiTablesIVToVIProblem.P28_N30.with_n_fevals(29),
         AlefeldPotraShiTablesIVToVIProblem.P28_N500.with_n_fevals(35),
         AlefeldPotraShiTablesIVToVIProblem.P1_N1.with_n_fevals(10),
-        AlefeldPotraShiTablesIVToVIProblem.P3_N1.with_n_fevals(
-            15,
-            deviation=2,
-            reason=_REBUILT_ALGORITHM_4_1_DEVIATION_REASON,
-        ),
+        AlefeldPotraShiTablesIVToVIProblem.P3_N1.with_n_fevals(15),
         AlefeldPotraShiTablesIVToVIProblem.P16_N4.with_n_fevals(12),
         AlefeldPotraShiTablesIVToVIProblem.P18_N1.with_n_fevals(
             11,

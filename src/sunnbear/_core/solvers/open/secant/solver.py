@@ -2,10 +2,11 @@
 
 from sunnbear._core.solvers.core import Solver, SolveState
 from sunnbear._core.solvers.core.exceptions import DivergedError
+from sunnbear._core.solvers.core.formulas import chord_zero
 
 
 class Secant(Solver):
-    """`Secant` implements the secant method, in the form of SciPy's ``scipy.optimize.newton`` without a derivative.
+    """`Secant` implements the secant method, started and stopped as in SciPy's ``scipy.optimize.newton``.
 
     Each iteration computes the zero of the secant, the line through ``(x0, f0)`` and ``(x1, f1)``, where ``x0`` and
     ``x1`` are the 2 latest x-values, ``x1`` the newest. Near a simple root, the method converges faster than
@@ -19,8 +20,9 @@ class Secant(Solver):
     - **Starting x-values:** the bounds of the initial interval. The method treats one bound as the older x-value and
       the other as the newest x-value, and the newest x-value is the bound with the larger ``|f|``, or the upper bound
       when both are equal.
-    - **Step formula:** the zero of the secant, computed from the ratio of the 2 function values, with the value of
-      smaller magnitude divided by the value of larger magnitude, so that the ratio's magnitude is at most 1.
+    - **Step formula:** the zero of the secant, computed with `chord_zero`. SciPy computes it from the ratio of the 2
+      function values, the smaller magnitude divided by the larger: a form that is equal in exact arithmetic, but
+      rounds differently.
     - **Stopping criterion:** the solve ends once the step from the newest x-value to the next x-value is at most
       ``xtol``, and returns that next x-value without evaluating it.
     - **Equal function values:** when the 2 latest x-values have equal function values, the secant is horizontal and
@@ -37,8 +39,8 @@ class Secant(Solver):
         - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section 9.2.
           Cambridge University Press. Its ``rtsec`` takes the bound with the smaller ``|f|`` as the newest x-value,
           where SciPy and `Secant` take the bound with the larger ``|f|``.
-        - SciPy's ``scipy.optimize.newton``, without a derivative; the test suite checks `Secant` against
-          ``scipy.optimize.newton``.
+        - SciPy's ``scipy.optimize.newton``, without a derivative, whose starting x-values and stopping criterion
+          `Secant` takes; the test suite checks `Secant` against ``scipy.optimize.newton``.
         - Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition, section 2.3.
           John Wiley & Sons. Its error test for the secant method, which measures the error by the step between 2
           successive iterates, is the stopping criterion of `Secant`.
@@ -49,7 +51,7 @@ class Secant(Solver):
     """
 
     name = "secant"
-    version = 1
+    version = 2
 
     def _solve(self, state: SolveState) -> float:
         """Run the secant method from the interval bounds; return the first secant zero within ``xtol`` of its start.
@@ -76,11 +78,7 @@ class Secant(Solver):
                 raise DivergedError(
                     "The 2 latest x-values have equal function values, so the next x-value is infinite."
                 )
-            # Divide the smaller |f| by the larger, as SciPy does, so the ratio's magnitude is at most 1.
-            if abs(f1) > abs(f0):
-                x = (-f0 / f1 * x1 + x0) / (1.0 - f0 / f1)
-            else:
-                x = (-f1 / f0 * x0 + x1) / (1.0 - f1 / f0)
+            x = chord_zero(x0, f0, x1, f1)
             if abs(x - x1) <= state.xtol:
                 return x
             x0, f0 = x1, f1

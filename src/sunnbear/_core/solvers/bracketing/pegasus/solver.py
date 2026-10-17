@@ -1,6 +1,7 @@
 """`Pegasus` implements the Pegasus method: regula falsi that scales down the value of a bound kept twice in a row."""
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, IntervalBound
+from sunnbear._core.solvers.core.formulas import chord_zero
 
 from .state import PegasusState
 
@@ -41,8 +42,6 @@ class Pegasus(BracketingSolver[PegasusState]):
     Dowell and Jarratt (1972) state the Pegasus step with regula falsi's chord formula, as Ford (1997) does, so the
     Pegasus method differs from regula falsi only in its function value at the retained bound, and from the Illinois
     method only in the factor.
-
-    `Illinois` computes the same zero of the chord, in the form of Dowell and Jarratt (1971).
 
     `Pegasus` departs from Dowell and Jarratt (1972), or settles an unspecified detail of the article, in these places:
 
@@ -103,4 +102,4 @@ class Pegasus(BracketingSolver[PegasusState]):
             fa, fb = state.scaled_retained_f, interval.fb
         else:
             fa, fb = interval.fa, state.scaled_retained_f
-        return (interval.a * fb - interval.b * fa) / (fb - fa)
+        return chord_zero(interval.a, fa, interval.b, fb)

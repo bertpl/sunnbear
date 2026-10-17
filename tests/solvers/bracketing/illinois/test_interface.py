@@ -5,10 +5,10 @@ from tests.solvers.example_functions import cubic
 
 
 def test_name_version_and_that_its_arithmetic_is_counted():
-    """`Illinois` is named ``illinois``, at version 2, and its arithmetic is flop-counted."""
+    """`Illinois` is named ``illinois``, at version 3, and its arithmetic is flop-counted."""
     # --- act --------------------------
     result = Illinois().solve(cubic, 1.0, 2.0, xtol=1e-3, max_fevals=20)
 
     # --- assert -----------------------
-    assert (Illinois.name, Illinois.version) == ("illinois", 2)
+    assert (Illinois.name, Illinois.version) == ("illinois", 3)
     assert result.flop_counts.total_count() > 0

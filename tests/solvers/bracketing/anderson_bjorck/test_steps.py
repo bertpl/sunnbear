@@ -34,7 +34,7 @@ def test_the_first_2_steps_are_regula_falsi_and_the_third_scales_the_retained_f(
     chord slopes once it has kept that bound for 2 steps in a row, and drops that scaling once an iterate replaces
     the scaled bound.
 
-    Each step and each factor take the form of the paper's ALGOL procedure.
+    Each step takes the form of `chord_zero`, and each factor the form of the paper's ALGOL procedure.
     """
     # --- arrange ----------------------
     a, b = 1.0, 2.0
@@ -46,22 +46,18 @@ def test_the_first_2_steps_are_regula_falsi_and_the_third_scales_the_retained_f(
     # --- assert -----------------------
     (x1, f1), (x2, f2), (x3, f3), (x4, _) = history[2:6]
     # Before the first iterate, the upper bound counts as the most recent iterate.
-    slope = (fb - fa) / (b - a)
-    assert x1 == b - fb / slope
+    assert x1 == (a * fb - b * fa) / (fb - fa)
     # f1 < 0, so x1 replaced the lower bound; the upper bound is kept for the first time, at its own value.
     assert f1 < 0.0
-    slope = (f1 - fb) / (x1 - b)
-    assert x2 == x1 - f1 / slope
+    assert x2 == (b * f1 - x1 * fb) / (f1 - fb)
     # f2 < 0 too, so x2 replaced x1 and the upper bound is kept a second time: its value is scaled by the slope from
     # x1 to x2, divided by the slope of the chord that produced x2.
     assert f2 < 0.0
-    scaled_fb = (((f2 - f1) / (x2 - x1)) / slope) * fb
-    slope = (f2 - scaled_fb) / (x2 - b)
-    assert x3 == x2 - f2 / slope
+    scaled_fb = (((f2 - f1) / (x2 - x1)) / ((f1 - fb) / (x1 - b))) * fb
+    assert x3 == (b * f2 - x2 * scaled_fb) / (f2 - scaled_fb)
     # f3 > 0, so x3 replaced the upper bound, and x2 is the retained bound, at its own value.
     assert f3 > 0.0
-    slope = (f3 - f2) / (x3 - x2)
-    assert x4 == x3 - f3 / slope
+    assert x4 == (x2 * f3 - x3 * f2) / (f3 - f2)
 
 
 def test_the_factor_falls_back_to_0_5_when_an_iterate_does_not_reduce_abs_f():
@@ -80,12 +76,12 @@ def test_the_factor_falls_back_to_0_5_when_an_iterate_does_not_reduce_abs_f():
 
     # --- assert -----------------------
     (x1, f1), (x2, f2), (x3, _) = history[2:5]
-    assert x1 == b - fb / ((fb - fa) / (b - a))
+    assert x1 == (a * fb - b * fa) / (fb - fa)
     # f1 > fb > 0, so x1 replaced the upper bound; before the first iterate, the upper bound counts as the previous
     # iterate, and the slope from b to x1 has the sign opposite to the chord's, so the factor is negative.
     assert f1 > fb > 0.0
-    assert x2 == x1 - f1 / ((f1 - 0.5 * fa) / (x1 - a))
+    assert x2 == (a * f1 - x1 * (0.5 * fa)) / (f1 - 0.5 * fa)
     # f2 > f1 > 0, so the factor, which equals 1 - f2 / f1 in exact arithmetic, is negative too, and the retained
     # value is halved again.
     assert f2 > f1
-    assert x3 == x2 - f2 / ((f2 - 0.25 * fa) / (x2 - a))
+    assert x3 == (a * f2 - x2 * (0.25 * fa)) / (f2 - 0.25 * fa)

@@ -16,6 +16,7 @@ from counted_float import CountedFloat, FlopCountingContext
 from typing_extensions import TypeVar
 
 from .exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
+from .formulas import midpoint
 from .interval import Interval
 from .result import SolveResult, SolveStatus
 from .state import SolveState
@@ -109,7 +110,7 @@ class Solver(ABC, Generic[StateT]):
             try:
                 fa, fb = wrapped_f(a_counted), wrapped_f(b_counted)
             except Exception as exc:  # noqa: BLE001 — a failure at an interval bound is recorded like any other
-                x, status, x_failed = self._outcome_from_exception(exc, x_best=0.5 * (a_counted + b_counted))
+                x, status, x_failed = self._outcome_from_exception(exc, x_best=midpoint(a_counted, b_counted))
             else:
                 if fa == 0.0:  # Early exit when a is a root.
                     x, status = a_counted, SolveStatus.CONVERGED

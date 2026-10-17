@@ -3,7 +3,8 @@
 Published results:
 
 - Oliveira and Takahashi (2020), Table 1, for ``variant="paper_experiments"`` with ``n_slack = 0``: reproduced, in
-  ``test_paper.py``: 23 of the 24 iteration counts exactly, and the count for the step function within 1.
+  ``test_paper.py``: 23 of the 24 iteration counts exactly, and the count for the step function within 1; on the step
+  function, a line-by-line port of the authors' MATLAB code differs from the table too.
 - Oliveira and Takahashi (2020), Table 1, for ``variant="paper_pseudocode"``: not reproduced. The table comes from
   the authors' code, which ``"paper_experiments"`` follows; the class docstring of `ITP` explains how the 2 variants
   differ.
