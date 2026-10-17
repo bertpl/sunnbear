@@ -25,14 +25,8 @@ Third-party published results:
   its stopping criterion differs from that of the paper's C# code.
 - Oliveira and Takahashi (2020), Table 1, the column "Ridders'": not compared. The table's runs stop by the criterion
   of the ``"bracketing_solver"`` variant, with ``xtol = 1e-10`` on ``[-1, 1]``, and its counts leave out the 2
-  evaluations at the interval bounds. Counted that way, the variant matches 19 of the 24 counts, and the other 5
-  deviate by 1 to 12 evaluations, for causes that are not established:
-
-  - "Trigonometric 1": 12, against the table's 10;
-  - "Polynomial 1": 26, against 14;
-  - "Normal CDF": 18, against 16;
-  - "Circles": 35, against 36;
-  - "Noisy Line": 22, against 24.
+  evaluations at the interval bounds. Counted that way, the variant matches 19 of the 24 counts; the other 5 deviate,
+  for causes that are not established.
 - Ganchovski and Traykov (2023), Table 2, the column "Rid": not compared, because the paper does not state the stopping
   criterion of its Ridders runs.
 - Gorgey et al. (2025), Tables 2 to 7, the rows "Ridders'": not compared, because the paper does not fix how its runs

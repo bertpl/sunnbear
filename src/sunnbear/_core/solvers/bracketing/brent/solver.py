@@ -35,16 +35,20 @@ class Brent(Solver):
 
     For a smaller ``xtol``, a step lengthened to ``tol`` can round onto ``c`` while the interval is still wider than
     ``2*xtol``, and the solve then evaluates ``c`` again and again until its evaluation budget is exhausted. The
-    benchmark keeps ``xtol`` at least ``8*macheps*max(|a0|, |b0|)``, with ``[a0, b0]`` the initial interval
-    (`compute_xtol_range`).
+    benchmark keeps ``xtol`` above ``2.5*macheps*|b|``: `compute_xtol_range` keeps ``xtol_min`` at least
+    `MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND` times ``macheps*max(|a0|, |b0|)``, with ``[a0, b0]``
+    the initial interval.
 
     `Brent` departs from the procedure ``zero``, or settles a value that the procedure leaves to its caller, in these
     places:
 
-    - **Stopping criterion:** `Brent` stops by the shared stopping criterion, once the interval between ``b`` and ``c``
-      is at most ``2*xtol`` wide or the function value at ``b`` or ``c`` is 0, and returns that bound, or else the
-      interval's midpoint, which lies within ``xtol`` of a root; the procedure stops once ``|m| <= tol`` or
-      ``f(b) = 0``, and returns ``b``. Both check at each pass through the procedure's label ``ext``.
+    - **Stopping criterion:** `Brent` and the procedure check their criteria at each pass through the procedure's
+      label ``ext``:
+
+      - `Brent` stops by the shared stopping criterion, once the interval between ``b`` and ``c`` is at most
+        ``2*xtol`` wide or the function value at ``b`` or ``c`` is 0, and returns that bound, or else the interval's
+        midpoint, which lies within ``xtol`` of a root;
+      - the procedure stops once ``|m| <= tol`` or ``f(b) = 0``, and returns ``b``.
     - **Tolerance ``t``:** the procedure leaves ``t`` to its caller; `Brent` sets ``t = xtol``, so that ``tol``, the
       length of the shortest step, is about ``xtol``, half the shared stopping width.
     - **Machine precision:** `Brent` sets ``macheps`` to `FLOAT64_EPS`, 2^-52, the value that SciPy and Numerical
@@ -175,9 +179,8 @@ class Brent(Solver):
     ) -> float | None:
         """Return the root estimate if the solve stops at the label ``ext``, or ``None`` if it continues.
 
-        The solve stops by the shared stopping criterion on the interval bounds ``b`` and ``c``, and returns the
-        shared root estimate; ``m`` and ``tol`` are not used. The test suite overrides this method to apply the
-        procedure's own stopping criterion, ``|m| <= tol`` or ``f(b) = 0``, where it reproduces published counts.
+        ``m`` and ``tol`` are not used. The test suite overrides this method to apply the procedure's own stopping
+        criterion, ``|m| <= tol`` or ``f(b) = 0``, where it reproduces published counts.
         """
         if is_interval_converged(b, fb, c, fc, xtol_doubled):
             return interval_root(b, fb, c, fc)

@@ -11,15 +11,14 @@ from .formulas import midpoint
 def is_interval_converged(x1: float, f1: float, x2: float, f2: float, xtol_doubled: float) -> bool:
     """Return whether the interval between ``x1`` and ``x2`` is at most ``xtol_doubled`` wide, or ``f1`` or ``f2`` is 0.
 
-    ``x1`` and ``x2`` may come in either order. The parameter is the doubled tolerance, so the caller computes it once
-    per solve, not once per iteration.
+    ``x1`` and ``x2`` may come in either order. ``xtol_doubled`` is ``2*xtol``, which the caller computes once per
+    solve, not once per iteration.
     """
     return abs(x2 - x1) <= xtol_doubled or f1 == 0.0 or f2 == 0.0
 
 
 def interval_root(x1: float, f1: float, x2: float, f2: float) -> float:
-    """Return the root estimate of the interval between ``x1`` and ``x2``: a bound with a zero value if any, else the
-    midpoint."""
+    """Return the root estimate between ``x1`` and ``x2``: a bound with a zero value, else their midpoint."""
     if f1 == 0.0:
         return x1
     elif f2 == 0.0:

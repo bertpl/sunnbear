@@ -25,7 +25,7 @@ class Ridders(Solver):
     ``variant``, a value of `RiddersVariant`, picks 1 of 3 stopping criteria. Every variant checks for a 0 right after
     evaluating ``x1``, and checks its whole criterion after evaluating ``x3``, as SciPy's ``ridder`` does:
 
-    - ``"bracketing_solver"``, the stopping criterion that all bracketing solvers share: the solve ends once the
+    - ``"bracketing_solver"``, the shared stopping criterion of the bracketing solvers: the solve ends once the
       interval is at most ``2*xtol`` wide, or once the function value at an interval bound is exactly 0. It returns
       that bound, or else the interval's midpoint, which then lies within ``xtol`` of a root. The split at ``x1`` makes
       ``x1`` an interval bound, so a 0 at ``x1`` meets this criterion.
@@ -41,13 +41,13 @@ class Ridders(Solver):
     - **Limit on the step:** only ``"scipy"`` limits the step from ``x1`` to ``d - xtol/2``, as SciPy does, so that
       ``x3`` lies at least ``xtol/2`` inside the interval; the paper and Commons Math state no limit. Near the root,
       the limit shrinks the interval to the stopping width in fewer evaluations: without it, ``x3`` can land between
-      the root and the far bound, and the interval then only halves, so the evaluation counts of
-      ``"bracketing_solver"`` vary more between near-identical functions;
+      the root and the interval bound on the root's side of ``x1``, and the interval then only halves, so the
+      evaluation counts of ``"bracketing_solver"`` vary more between near-identical functions;
     - **SciPy's tolerance:** ``"scipy"`` leaves out the relative term that SciPy adds to ``xtol``, so that its returned
       x-value always lies within ``xtol`` of a root, and leaves out SciPy's iteration limit ``maxiter``, so that only
       the evaluation budget ends a long solve;
-    - **Commons Math's tolerances:** ``"commons_math"`` follows Commons Math with its relative accuracy and its function
-      value accuracy at 0, so that ``xtol``, its absolute accuracy, is its only tolerance;
+    - **Commons Math's tolerances:** ``"commons_math"`` sets Commons Math's relative accuracy and function value
+      accuracy to 0, so that ``xtol``, its absolute accuracy, is its only tolerance;
     - **Order of the step's operations:** `Ridders` computes ``(d * (f1 / f0)) / sqrt(...)``, as SciPy does, where
       equation 6 multiplies ``d`` by the quotient ``(f1 / f0) / sqrt(...)``; the 2 orders are equal in exact arithmetic
       but round differently;

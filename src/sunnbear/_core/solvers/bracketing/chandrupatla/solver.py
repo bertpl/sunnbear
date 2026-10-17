@@ -80,8 +80,8 @@ class Chandrupatla(Solver):
         Each iteration:
 
         - evaluates ``x`` and makes it ``x1``;
-        - ends the solve once `_root_if_converged` returns a root estimate, where the listing tests its own stopping
-          criterion;
+        - ends the solve once `_root_if_converged` returns a root estimate, at the point in the loop where the listing
+          tests its own stopping criterion;
         - chooses ``t`` for the next iteration.
         """
         interval = state.interval
@@ -137,8 +137,7 @@ class Chandrupatla(Solver):
     def _root_if_converged(x1: float, f1: float, x2: float, f2: float, xtol_doubled: float) -> float | None:
         """Return the root estimate if the solve ends at these interval bounds, or ``None`` if it continues.
 
-        The solve ends by the shared stopping criterion, `is_interval_converged`, and returns `interval_root`. The
-        test suite overrides this method to apply the listing's own stopping criterion where it reproduces the
+        The test suite overrides this method to apply the listing's own stopping criterion where it reproduces the
         paper's published counts.
         """
         if is_interval_converged(x1, f1, x2, f2, xtol_doubled):

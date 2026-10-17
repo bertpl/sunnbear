@@ -21,8 +21,8 @@ MAX_FEVALS_FACTOR = 4
 # `xtol_min` from `compute_xtol_range` must be at least this many times `FLOAT64_EPS * max(|a|, |b|)`, so that `xtol`
 # spans at least this many float64 spacings at the interval bounds:
 # - the interval can shrink to the shared stopping width of `2*xtol`;
-# - the minimum step of `Brent`, `xtol + 2*FLOAT64_EPS*|b|`, stays below `2*xtol`, so that no step lands on the far
-#   interval bound.
+# - the minimum step of `Brent`, `xtol + 2*FLOAT64_EPS*|b|`, stays below `2*xtol`, so that no step lands on the
+#   interval bound `c` on the other side of the root from `b`.
 MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND = 8
 
 

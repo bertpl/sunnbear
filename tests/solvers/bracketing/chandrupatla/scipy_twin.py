@@ -17,10 +17,12 @@ class ChandrupatlaScipyTwin(TwinSolver):
     than ``tol``, or once ``|f(xm)|`` is at most the tolerance that it computes from ``fatol`` and ``frtol``.
 
     The twin passes ``xatol = 2*xtol`` and 0 for ``xrtol``, ``fatol`` and ``frtol``, so that SciPy keeps each new
-    x-value as far inside the interval as `Chandrupatla` does, ``xtol``. SciPy then stops only where the shared
-    stopping criterion holds too: once the interval is narrower than ``2*xtol``, or once ``f(xm)`` is 0. The one
-    exception is SciPy's check before its first x-value, which `Chandrupatla` does not make: on an initial interval
-    narrower than ``2*xtol``, SciPy stops before it evaluates anything. No compared test case has such an interval.
+    x-value at least ``xtol`` inside the interval, as `Chandrupatla` does. SciPy then stops only where the shared
+    stopping criterion holds too: once the interval is narrower than ``2*xtol``, or once ``f(xm)`` is 0.
+
+    The one exception is SciPy's check before its first x-value, which `Chandrupatla` does not make: on an initial
+    interval narrower than ``2*xtol``, SciPy stops before it evaluates anything. No compared test case has such an
+    interval.
 
     SciPy calls the function with arrays; the twin evaluates each element through the `StoppingWrappedFunction`.
 

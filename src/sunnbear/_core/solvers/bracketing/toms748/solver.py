@@ -38,8 +38,9 @@ class TOMS748(Solver):
 
     - ``tole = 2*macheps*|u| + tol`` is the paper's tolerance, with ``macheps`` the relative machine precision,
       `FLOAT64_EPS`;
-    - ``tol``, an absolute tolerance that the paper leaves to its caller, is ``xtol``, so that the margin is sized for
-      the shared stopping width ``2*xtol`` as the paper sizes it for its stopping width ``2*tole``.
+    - ``tol``, an absolute tolerance that the paper leaves to its caller, is ``xtol``, so that the margin, about
+      ``0.7*(2*xtol)``, is the same fraction of the shared stopping width ``2*xtol`` as the paper's margin is of its
+      stopping width ``2*tole``.
 
     An iteration of `TOMS748` evaluates the function up to ``k + 2`` times, so `TOMS748` writes its own loop, not
     `BracketingSolver`'s.
@@ -117,17 +118,17 @@ class TOMS748(Solver):
             iteration_start_width = interval.width
             n_iterations += 1
             tole_doubled = self._get_tole_doubled(interval, tol)
-            root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
-            if root is not None:
-                return root
+            x_root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
+            if x_root is not None:
+                return x_root
 
             # --- iteration 1: the secant step ---
             if n_iterations == 1:
                 c = interval.chord_zero
                 interval, d, fd, tole_doubled = self._evaluate_and_split_at(state, interval, c, tole_doubled, tol)
-                root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
-                if root is not None:
-                    return root
+                x_root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
+                if x_root is not None:
+                    return x_root
                 continue
 
             # --- the k interpolation steps ------
@@ -145,9 +146,9 @@ class TOMS748(Solver):
                     # The next interpolation step uses this step's d as its e.
                     e, fe = d, fd
                 interval, d, fd, tole_doubled = self._evaluate_and_split_at(state, interval, c, tole_doubled, tol)
-                root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
-                if root is not None:
-                    return root
+                x_root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
+                if x_root is not None:
+                    return x_root
             e, fe = d, fd
 
             # --- the double-size secant step ----
@@ -156,9 +157,9 @@ class TOMS748(Solver):
             if abs(c - u) > 0.5 * interval.width:
                 c = interval.midpoint
             interval, d, fd, tole_doubled = self._evaluate_and_split_at(state, interval, c, tole_doubled, tol)
-            root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
-            if root is not None:
-                return root
+            x_root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
+            if x_root is not None:
+                return x_root
 
             # --- the bisection, if needed -------
             if interval.width < _MU * iteration_start_width:
@@ -166,9 +167,9 @@ class TOMS748(Solver):
             e, fe = d, fd
             c = interval.midpoint
             interval, d, fd, tole_doubled = self._evaluate_and_split_at(state, interval, c, tole_doubled, tol)
-            root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
-            if root is not None:
-                return root
+            x_root = self._root_if_converged(interval, xtol_doubled, tole_doubled)
+            if x_root is not None:
+                return x_root
 
     # --------------------------------------------------------------------------
     #  Helpers
@@ -209,7 +210,7 @@ class TOMS748(Solver):
         """Evaluate ``c`` and return the interval that still holds the sign change: the authors' subroutine ``BRACKT``.
 
         Before the evaluation, ``c`` is moved to at least ``_LAMBDA*tole_doubled`` inside the interval, or to the
-        midpoint when the interval is at most ``2*_LAMBDA*tole_doubled`` wide. After it, the method sets
+        midpoint when the interval is at most ``2*_LAMBDA*tole_doubled`` wide. After the evaluation, the method sets
         ``state.x_best`` to ``c``, the latest evaluated x-value.
 
         Returns:

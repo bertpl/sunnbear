@@ -27,8 +27,8 @@ def test_the_printed_roots_name_exactly_the_alefeld_potra_shi_problems():
 @pytest.mark.parametrize("problem", AUTHORS_TEST_OUTPUT, ids=str)
 def test_k_2_reproduces_the_root_that_the_authors_code_computes(problem: PaperProblem):
     """With ``k = 2`` and ``tol = 0``, the setting of the authors' test runs, `TOMS748` with the authors' stopping
-    criterion converges; wherever the test data holds the root that the authors' code prints, it returns that root
-    within a relative 1e-13, the precision of its 14 printed digits."""
+    criterion converges; wherever the test data holds the root that the authors' code prints, `TOMS748` returns that
+    root within a relative 1e-13, the precision of its 14 printed digits."""
     # --- act --------------------------
     result = _TOMS748WithAuthorsStoppingCriterion(k=2).solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100)
 
