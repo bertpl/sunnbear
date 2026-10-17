@@ -64,7 +64,8 @@ def test_the_total_evaluation_count_lies_within_1_2_percent_of_the_papers_table_
     for each ``k`` and for each of the paper's tolerances ``tol = 10^-n_digits`` and ``tol = 0``.
 
     The paper's counts include the 2 evaluations at the interval bounds, and come from a machine whose relative
-    precision was 1.907e-16, not 2^-52. The totals also differ by a few evaluations between macOS and Linux.
+    precision was 1.907e-16, not 2^-52. The totals that this test computes also differ by a few evaluations between
+    macOS and Linux, so the tolerance has to cover that difference too.
     """
     # --- arrange / act ----------------
     total = sum(
