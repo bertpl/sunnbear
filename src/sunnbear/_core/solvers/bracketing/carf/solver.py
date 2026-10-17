@@ -72,8 +72,20 @@ class CARF(Solver):
     - **The stop test checks only the interior x-value:** a ``t_new`` that becomes a bound of the interval does not end
       the solve, however small its ``|f|``. With the paper's ``eps1 > 0``, the evaluation counts of Table 4 depend on
       this choice.
-    - **The quadratic's zero:** the paper does not say how it computes the zero. `CARF` writes the quadratic around
-      ``t`` and takes its zero in ``[a, b]`` from the formula that avoids cancellation.
+    - **The quadratic's zero:** the paper does not say how it computes the zero. `CARF` computes it in 3 steps:
+
+      - it rescales the 3 points so that ``[a, b]`` becomes ``[0, 1]`` and ``f(b) - f(a)`` becomes 1;
+      - it writes the quadratic around ``t``;
+      - it takes the quadratic's zero in ``[a, b]`` from the formula that avoids cancellation.
+
+      Near some roots, as that of ``x^19``, the function values are tiny, and ``t`` can lie within rounding error of a
+      bound:
+
+      - **the rescaling** keeps the intermediate products of the formula from underflowing;
+      - **the quadratic's slope at** ``t`` is a weighted average of the slopes from ``a`` to ``t`` and from ``t`` to
+        ``b``, which cannot cancel to 0 while the 3 function values are monotone;
+      - **when rounding puts** ``t`` **onto a bound,** the quadratic is not defined, and `CARF` takes the zero of the
+        straight line through ``(a, f(a))`` and ``(b, f(b))``.
 
       On intervals as wide as ``[-1e4, 1e4]``, ``h`` often lies within rounding error of 0 or 1, the limits that
       choose the kind of step, so the evaluation counts depend on this formula, and on some of those intervals `CARF`
@@ -81,6 +93,14 @@ class CARF(Solver):
     - **A power step that cannot be computed:** when the 2 logarithms in the formula for ``xi`` round to the same
       value, the denominator of ``xi`` is 0. `CARF` then takes the midpoint of the active interval; the paper does not
       cover this case.
+
+    The power step computes ``xi`` as the paper prints it, and `CARF` does not guard against the 2 cases in which that
+    formula fails in float64:
+
+    - when rounding makes ``log(1 - f(t) / f(a))`` exceed ``log(1 - f(b) / f(a))``, ``xi`` is large and negative, and
+      ``r**xi`` can raise `OverflowError`, which `Solver.solve` records as ``SOLVER_ERROR``;
+    - when ``f(b) / f(a)`` overflows, ``xi`` is NaN, and so is the next x-value, which `Solver.solve` records as
+      ``DIVERGED``.
 
     Signs of function values are compared directly, where the paper multiplies them: the product of 2 small function
     values can underflow to 0. The paper's limit of 200 iterations is left out: the solve's evaluation budget ends a
@@ -90,10 +110,11 @@ class CARF(Solver):
 
     - **Cause:** a sign change near the root makes the interval from ``t_new`` to the bound outside the active
       interval the shorter one, and that interval keeps the old ``t`` inside.
-    - **Effect:** the next steps are then clipped, and each shrinks the interval by only 15 %, so the solve can take
-      many more evaluations than usual, up to its budget.
-    - **Occurrence:** none of the paper's test problems triggers this slowdown, but one of them does when the
-      quadratic's zero at one of that problem's steps is rounded differently.
+    - **Effect:** the next steps are then clipped, and each shrinks the interval by only 15 %, or halves it when the 3
+      function values are not monotone, so the solve can take many more evaluations than usual, up to its budget.
+    - **Occurrence:** on some of the paper's test problems, including problems whose published counts `CARF`
+      reproduces, the old ``t`` stays the interior x-value; on others, the old ``t`` stays the interior x-value when 1
+      of the solve's candidates ``t*`` is rounded differently by 1 ulp.
 
     The paper's proof guarantees only that each step shrinks the interval to at most 70 % of its width. A power step
     evaluates 2 logarithms and a power, so `CARF`'s flop counts can exceed those of the other solvers.
@@ -113,7 +134,7 @@ class CARF(Solver):
     """
 
     name = "carf"
-    version = 1
+    version = 2
 
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the paper's description
         """Run CARF's iterations and return the interior x-value ``t``.
@@ -199,28 +220,47 @@ class CARF(Solver):
     def _quadratic_zero(a: float, t: float, b: float, fa: float, ft: float, fb: float) -> float:
         """Return the zero in ``[a, b]`` of the quadratic through ``(a, fa)``, ``(t, ft)`` and ``(b, fb)``.
 
-        The quadratic is written around ``t``, as ``q(t + u) = c2 * u^2 + c1 * u + ft``. Of the quadratic's 2 zeros,
-        the one nearer ``t`` is at ``u = ft / c2_times_u_far`` and the other at ``u = c2_times_u_far / c2``, with
-        ``c2_times_u_far = -(c1 + sign(c1) * sqrt(c1^2 - 4 * c2 * ft)) / 2``, which is ``c2`` times the ``u`` of the
-        zero farther from ``t``; these forms avoid the cancellation of the textbook formula.
+        ``fa`` and ``fb`` must have opposite signs, as they do at the bounds of a bracket.
 
-        When rounding puts neither zero in ``[a, b]``, the zero farther from ``t`` is returned, and the caller's clip
-        moves it into the active interval.
+        The function computes in units in which ``[a, b]`` is ``[0, 1]`` and ``fb - fa`` is 1, so that its slopes and
+        coefficients do not depend on the scale of ``x`` and ``f``, and their products do not underflow when ``f`` is
+        tiny.
+
+        When rounding puts neither zero in ``[a, b]``, the zero farther from ``t`` is returned, and the caller clips it
+        into the active interval. When rounding puts ``t`` onto ``a`` or ``b``, the quadratic is not defined, and the
+        zero of the chord through ``(a, fa)`` and ``(b, fb)`` is returned.
         """
-        slope_a_t = (ft - fa) / (t - a)
-        slope_t_b = (fb - ft) / (b - t)
-        c2 = (slope_t_b - slope_a_t) / (b - a)
-        c1 = slope_a_t + c2 * (t - a)
-        if c2 == 0.0:
-            return t - ft / c1
+        if not a < t < b:
+            return (a * fb - b * fa) / (fb - fa)
         else:
-            discriminant = max(c1 * c1 - 4.0 * c2 * ft, 0.0)
-            c2_times_u_far = -0.5 * (c1 + math.copysign(math.sqrt(discriminant), c1))
-            zero_near_t = t + ft / c2_times_u_far
-            if a <= zero_near_t <= b:
-                return zero_near_t
+            width = b - a
+            # one_minus_r comes from b - t, not from 1.0 - r: the difference of 2 distinct floats is never 0, while
+            # 1.0 - r rounds to 0 when b - t is below about 1e-16 times the width.
+            r = (t - a) / width
+            one_minus_r = (b - t) / width
+            f_scale = fb - fa
+            ga, gt, gb = fa / f_scale, ft / f_scale, fb / f_scale
+            slope_a_t = (gt - ga) / r
+            slope_t_b = (gb - gt) / one_minus_r
+            # c2 is the quadratic's second divided difference: the slopes' difference divided by the width, which is 1.
+            c2 = slope_t_b - slope_a_t
+            # c1, the quadratic's slope at r, is the 2 slopes' average weighted by 1 - r and r. While the 3 function
+            # values are monotone, both terms are positive, so c1 cannot cancel to 0, as slope_a_t + c2 * r can.
+            c1 = slope_a_t * one_minus_r + slope_t_b * r
+            if c2 == 0.0:
+                r_of_zero = r - gt / c1
             else:
-                return t + c2_times_u_far / c2
+                # The quadratic is q(r + u) = c2 * u^2 + c1 * u + gt. c2_times_u_far is c2 times the u of the zero
+                # farther from r, so the nearer zero lies at u = gt / c2_times_u_far and the farther at
+                # u = c2_times_u_far / c2; these forms avoid the cancellation of the textbook formula.
+                discriminant = max(c1 * c1 - 4.0 * c2 * gt, 0.0)
+                c2_times_u_far = -0.5 * (c1 + math.copysign(math.sqrt(discriminant), c1))
+                zero_near_r = r + gt / c2_times_u_far
+                if 0.0 <= zero_near_r <= 1.0:
+                    r_of_zero = zero_near_r
+                else:
+                    r_of_zero = r + c2_times_u_far / c2
+            return a + width * r_of_zero
 
     @staticmethod
     def _is_converged(t: float, ft: float, active_width: float, xtol: float) -> bool:

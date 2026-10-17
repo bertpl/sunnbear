@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix `CARF` ending a solve as `SOLVER_ERROR` on functions with tiny values near the root, such as `x^19`, which also changes some benchmark results of `CARF`
+
 ### Security
 
 ## 0.2.8 (2026-10-14)
