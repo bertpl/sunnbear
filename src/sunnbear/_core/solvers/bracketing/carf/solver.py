@@ -222,9 +222,9 @@ class CARF(Solver):
 
         ``fa`` and ``fb`` must have opposite signs, as they do at the bounds of a bracket.
 
-        The function computes in units in which ``[a, b]`` is ``[0, 1]`` and ``fb - fa`` is 1, so that all its
-        intermediate values are of order 1, whatever the scale of ``x`` and ``f``, and the products in its formulas do
-        not underflow when ``f`` is tiny.
+        The function computes in units in which ``[a, b]`` is ``[0, 1]`` and ``fb - fa`` is 1, so that its slopes and
+        coefficients do not depend on the scale of ``x`` and ``f``, and their products do not underflow when ``f`` is
+        tiny.
 
         When rounding puts neither zero in ``[a, b]``, the zero farther from ``t`` is returned, and the caller clips it
         into the active interval. When rounding puts ``t`` onto ``a`` or ``b``, the quadratic is not defined, and the
