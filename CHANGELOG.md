@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix `CARF` ending with a solver error when the function values near the root underflow, which also changes some of its benchmark results
+
 ### Security
 
 ## 0.2.8 (2026-10-14)
