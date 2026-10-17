@@ -107,7 +107,7 @@ def test_a_chord_zero_within_xtol_of_the_upper_bound_is_replaced_by_a_step_of_de
 
 def test_a_chord_zero_within_xtol_of_the_lower_bound_is_replaced_by_a_step_of_delta_above_it():
     """On `cubic` over ``[1, 2]`` at ``xtol = 1e-3``, the 3rd and 4th iterates lie on opposite sides of the root, and
-    the chord through them has its zero within ``xtol`` of the 4th, which holds the lower bound.
+    the chord through them has its zero within ``xtol`` of the 4th, which is the lower bound.
 
     `AndersonBjorck` therefore evaluates ``xtol`` above the 4th iterate, toward the retained upper bound, the 3rd
     iterate. That step crosses the root and ends the solve.

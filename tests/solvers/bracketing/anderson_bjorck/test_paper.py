@@ -25,12 +25,12 @@ def test_the_iteration_counts_of_examples_1_to_7_of_the_paper_are_reproduced(pro
     """On every run of Examples 1 to 7 of Anderson and Björck (1973), `AndersonBjorck` takes the paper's count of
     iterations, within the row's allowed deviation, with its steps of delta at the paper's ``delta``.
 
-    The paper's runs stop once the interval is narrower than ``delta``; `AndersonBjorck` stops by the shared stopping
-    criterion, once the interval is at most ``2*delta`` wide.
+    The paper's runs stop by the ALGOL procedure's criterion, which the "Stopping criterion" bullet of the
+    `AndersonBjorck` class docstring states; `AndersonBjorck` stops by the shared stopping criterion, once the interval
+    is at most ``2*delta`` wide.
 
-    The test does not apply the paper's stopping criterion: in float64, 10 of the 26 runs then alternate between 2
-    x-values whose computed distance exceeds ``delta`` by a rounding error, and never end, while the other 16 take the
-    same counts as under the shared stopping criterion.
+    The test does not apply the paper's stopping criterion, because in float64 some runs then alternate between 2
+    x-values whose computed distance exceeds ``delta`` by a rounding error, and never end.
     """
     # --- act --------------------------
     result = AndersonBjorck().solve(problem.f, problem.a, problem.b, xtol=_PAPER_DELTA, max_fevals=50)

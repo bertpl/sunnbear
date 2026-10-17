@@ -42,8 +42,8 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
     ``delta`` of the most recent iterate, it evaluates the x-value at exactly ``delta`` from that iterate, toward the
     retained bound.
 
-    From a most recent iterate within ``delta`` of the root, that step crosses the root and leaves an interval
-    ``delta`` wide, which ends the solve.
+    When the most recent iterate lies within ``delta`` of the root, the step of delta crosses the root and leaves an
+    interval ``delta`` wide, which ends the solve.
 
     On a function that is nearly flat on 1 side of the root, over a large interval, the method can make very slow
     progress, and can need more than 200 iterations.
@@ -65,10 +65,11 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
         with the retained bound's ``|f|`` scaled.
     - **Tolerance ``delta``:** the procedure leaves ``delta`` to its caller, and uses it both as the length of a step
       of delta and as its stopping width. `AndersonBjorck` sets ``delta = xtol``, half the shared stopping width, so
-      that a step of delta lands inside the interval while the solve continues. With ``delta`` equal to the stopping
-      width, as in the procedure, the solve can alternate between 2 x-values until its evaluation budget runs out:
-      once the interval is ``delta`` wide in exact arithmetic, its computed width can round to just above ``delta``,
-      so the solve continues, and a step of delta from 1 bound lands on the other.
+      that a step of delta lands inside the interval while the solve continues.
+
+      With ``delta`` equal to the stopping width, as in the procedure, the solve can alternate between 2 x-values until
+      its evaluation budget runs out: once the interval is ``delta`` wide in exact arithmetic, its computed width can
+      round to just above ``delta``, so the solve continues, and a step of delta from 1 bound lands on the other.
     - **Chord's zero:** `AndersonBjorck` computes it with `chord_zero`; the procedure computes it as ``x1 - f1 / w1``,
       a step from the most recent iterate ``x1``, where ``w1 = (f1 - f0) / (x1 - x0)`` is the slope of the chord
       through ``(x1, f1)`` and ``(x0, f0)``, with ``x0`` the retained bound and ``f0`` its scaled value; the 2 forms
@@ -78,9 +79,11 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
       to 0, so `AndersonBjorck` splits the interval by the sign of ``f2`` alone, with `Interval.split_at`.
     - **A chord's zero on the most recent iterate:** where ``xtol`` lies below half the float spacing at the most
       recent iterate, as at ``xtol = 0``, the step of delta does not move the chord's zero, which can then round onto
-      that iterate, so that the slope between the chord's zero and that iterate is ``0 / 0``. `AndersonBjorck` then
-      takes the factor 0.5, through a test ``x2 == x1`` that the procedure does not have; in IEEE arithmetic, the
-      procedure's ``0 / 0`` is NaN, which fails its test that the factor is positive, so the procedure takes 0.5 too.
+      that iterate, so that the slope between the chord's zero and that iterate is ``0 / 0``.
+
+      `AndersonBjorck` then takes the factor 0.5, through a test ``x2 == x1`` that the procedure does not have; in IEEE
+      arithmetic, the procedure's ``0 / 0`` is NaN, which fails its test that the factor is positive, so the procedure
+      takes 0.5 too.
     - **Starting order:** the procedure leaves the order of its 2 starting x-values to the caller; `AndersonBjorck`
       passes the upper bound as ``x1``, the second of them, as the paper's examples and mpmath do.
 
@@ -91,9 +94,11 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
           factor; the test suite reproduces the iteration counts of its Examples 1 to 7.
           https://doi.org/10.1007/BF01951936
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
-          Iranica 4(1&2), 28-34. Its equation 5, with ``gamma = f[x_(i+1), x_i] / f[x_i, x_(i-1)]`` from its Table 1,
-          is the Anderson-Björck step, with ``gamma = 0.5`` as its fallback; its Table 4 shows the slow progress on
-          large intervals, and the test suite reproduces that table.
+          Iranica 4(1&2), 28-34. The paper covers the Anderson-Björck method in 2 places:
+
+          - its equation 5, with ``gamma = f[x_(i+1), x_i] / f[x_i, x_(i-1)]`` from its Table 1, is the
+            Anderson-Björck step, with ``gamma = 0.5`` as its fallback;
+          - its Table 4 shows the slow progress on large intervals; the test suite reproduces that table.
         - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="anderson"``; the test suite checks
           `AndersonBjorck` against mpmath's ``Illinois``.
     """

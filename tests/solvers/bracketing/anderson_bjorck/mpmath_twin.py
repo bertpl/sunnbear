@@ -55,8 +55,8 @@ class AndersonBjorckMpmathTwin(TwinSolver):
 # ==================================================================================================
 class _MpmathFunctionWithStepOfDelta:
     """`_MpmathFunctionWithStepOfDelta` is `AndersonBjorckMpmathTwin`'s function argument to mpmath: where mpmath asks
-    for a chord's zero that lies within ``xtol`` of its most recent iterate, it evaluates `AndersonBjorck`'s step of
-    delta instead, ``xtol`` from that iterate toward the retained bound.
+    for ``f`` at a chord's zero that lies within ``xtol`` of its most recent iterate, it evaluates `AndersonBjorck`'s
+    step of delta instead, ``xtol`` from that iterate toward the retained bound.
 
     It follows mpmath's 2 points as mpmath updates them: ``b``, the most recent iterate, and ``a``, the retained bound,
     which mpmath replaces by the previous ``b`` when ``f`` at the new iterate and at ``b`` differ in sign.
@@ -75,7 +75,7 @@ class _MpmathFunctionWithStepOfDelta:
         self._f = f
         self._xtol = xtol
         self._a, self._b = a, b
-        self._fb = 0.0  # mpmath evaluates a, then b, so its re-evaluations leave f(b) here.
+        self._fb = 0.0  # mpmath evaluates a, then b, so after its evaluations of the bounds this field holds f(b).
         self._n_reevaluated_bounds_left = n_reevaluated_bounds
 
     def __call__(self, x: float) -> float:

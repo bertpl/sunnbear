@@ -23,8 +23,8 @@ class SteffenBrent(Solver):
     ``s`` becomes the new ``b``, and the new ``a`` is chosen so that the interval keeps the root:
 
     - when ``f(a)`` and ``f(s)`` have the same sign, the old ``b`` becomes the new ``a``, as in Brent's method;
-    - otherwise, ``f(s) = 0`` included, the root lies between ``a`` and ``s``, and `SteffenBrent` evaluates their
-      midpoint ``m = (a + s) / 2``; when ``f(m)`` and ``f(s)`` differ in sign, ``m`` becomes the new ``a``.
+    - otherwise, including when ``f(s) = 0``, the root lies between ``a`` and ``s``, and `SteffenBrent` evaluates
+      their midpoint ``m = (a + s) / 2``; when ``f(m)`` and ``f(s)`` differ in sign, ``m`` becomes the new ``a``.
 
     The second case is the paper's modification of Brent's method. Finally, ``a`` and ``b`` swap where needed, so that
     ``b`` keeps the smaller ``|f|``.
@@ -138,8 +138,8 @@ class SteffenBrent(Solver):
             # --- the new interval ---------------
             b_previous, fb_previous = b, fb
             # Signs are compared directly, where Algorithm 2 multiplies them, because the product of 2 small function
-            # values can underflow to 0. Each test holds exactly where Algorithm 2's product is positive or negative,
-            # so f(s) = 0 takes the else branch, as in Algorithm 2.
+            # values can underflow to 0. Each sign test below holds exactly where Algorithm 2's product is positive or
+            # negative, so f(s) = 0 takes the else branch, as in Algorithm 2.
             if (fa > 0.0 and fs > 0.0) or (fa < 0.0 and fs < 0.0):
                 a, fa = b, fb
             else:

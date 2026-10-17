@@ -1,4 +1,4 @@
-"""This module declares `AndersonBjorckState`, the state that `AndersonBjorck` carries between iterations."""
+"""This module declares `AndersonBjorckState`, `AndersonBjorck`'s state between iterations."""
 
 from dataclasses import dataclass, field
 

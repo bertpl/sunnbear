@@ -3,9 +3,10 @@
 Published results:
 
 - Anderson and Björck (1973), Examples 1 to 7, the column "Alg. A": reproduced, in ``test_paper.py``: 17 of the 26
-  iteration counts exactly, 8 within 1, and 1 within 2; the test data states why each of the 9 deviates. The test
-  passes the paper's ``delta``, 6e-8, as ``xtol``, so that the steps of delta are the paper's, and stops by the shared
-  stopping criterion, not by the paper's, for the reason that the test's docstring gives.
+  iteration counts exactly, 8 within 1, and 1 within 2; the test data states why each of the 9 deviates.
+
+  The test passes the paper's ``delta``, 6e-8, as ``xtol``, so that the steps of delta are the paper's, and stops by the
+  shared stopping criterion, not by the paper's, for the reason that the test's docstring gives.
 - Anderson and Björck (1973), the double-precision totals on p. 263: not reproduced, cause unknown:
 
   - at ``xtol = 6e-16``, the paper's ``delta``, `AndersonBjorck` takes 129 iterations on Examples 1 to 5, against the
