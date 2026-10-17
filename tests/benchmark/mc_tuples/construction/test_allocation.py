@@ -59,8 +59,10 @@ def test_greedy_counts_give_each_new_tuple_to_the_gap_that_keeps_the_widest_spac
 
 
 def test_greedy_counts_score_a_new_tuple_in_an_edge_gap_by_the_spacing_of_the_wrap_around_gap():
-    """Of 4 new tuples, the first 3 go to the interior gap 466 fine lanes wide and the 4th to the interior gap 225 wide,
-    at a spacing of 112.5; the left edge gap, 151.5 wide, would give it only 90.5, because a tuple there splits the
+    """Of 4 new tuples, the first 3 go to the interior gap 466 fine lanes wide, and the 4th goes to the interior gap 225
+    wide, at a spacing of 112.5.
+
+    The left edge gap, 151.5 wide, would give the 4th tuple a spacing of only 90.5, because a tuple there splits the
     wrap-around gap of 181, made of the left edge gap and the 29.5-wide right edge gap, into 2 parts."""
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of((np.array([151, 376, 528, 994]) + 0.5) / N_FINE_LANES)

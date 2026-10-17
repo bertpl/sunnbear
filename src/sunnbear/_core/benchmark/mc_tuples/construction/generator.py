@@ -12,8 +12,8 @@ tuples of the set share a fine lane.
    with at least `MIN_N_BITS` bits of information (`population`);
 3. the selection solve, a max-div solve, picks the new tuples from the population (`selection`);
 4. the first value correction moves the new tuples so that the size's mean u and mean v are exactly 0.5, and for the
-   smallest size it rotates each axis instead; it then moves each new value with fewer than `MIN_N_BITS` bits by a few
-   float64 steps to a value with at least `MIN_N_BITS` bits (`correction`);
+   smallest size it instead rotates each axis, adding 1 shift modulo 1 to every value; it then moves each new value with
+   fewer than `MIN_N_BITS` bits by a few float64 steps to a value with at least `MIN_N_BITS` bits (`correction`);
 5. the refinement solve, a second max-div solve, moves each new tuple within its fine cell, the crossing of its fine
    u-lane and fine v-lane; its candidates lie only in the fine cells of the corrected new tuples (`refinement`);
 6. the second value correction brings the means back to 0.5, after the refinement moved them, and again moves each new
@@ -245,8 +245,8 @@ def generate_mc_tuples(
     value near 0 and a value near 1 count as close.
 
     A correction moves the new tuples to bring the size's means to 0.5 before the refinement solve, and a second
-    correction after it; the smallest size's first correction rotates each axis instead, which keeps every cyclic
-    distance.
+    correction after it; the smallest size's first correction instead adds 1 shift to every value of each axis, modulo
+    1, which keeps every cyclic distance.
 
     The construction splits `t_total_sec` over its sizes: each size gets 1 % of the total, plus a part of the rest in
     proportion to its size times the selection solve's number of candidate tuples, which is the population plus the

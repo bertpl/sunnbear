@@ -6,8 +6,7 @@ The distance between 2 values on an axis is the shorter of the 2 arcs between th
 - on a circle, the `k` values of a size leave `k` gaps, so the next size's `k` new values fit 1 per gap;
 - on a line whose 2 ends are occupied, `k` values leave `k - 1` gaps, and 1 gap has to take 2 new values.
 
-max-div calls each distance function through `DistanceMetric.custom`. numba compiles the functions, so they are
-module-level.
+numba compiles the distance functions that max-div calls through `DistanceMetric.custom`, so they are module-level.
 """
 
 import numba
