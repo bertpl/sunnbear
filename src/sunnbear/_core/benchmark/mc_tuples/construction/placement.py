@@ -205,8 +205,8 @@ class MCTuplesAxisGapPlacement:
         """Return the first value and the step of the left edge gap, then those of the right edge gap.
 
         The left edge gap holds `n_left` new values between 0 and `lowest_value`, the right edge gap `n_right` between
-        `highest_value` and 1; the module docstring describes the 3 cases. A side without values gets a step of inf,
-        which no caller reads, because a gap without new tuples has no values.
+        `highest_value` and 1; the module docstring describes the 3 cases. A side without values still gets a first
+        value and a step, which no caller reads, because a gap without new tuples has no values.
         """
         left_width, right_width = lowest_value, 1.0 - highest_value
         even_step = (left_width + right_width) / (n_left + n_right + 1)

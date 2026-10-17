@@ -1,7 +1,7 @@
 """`MCTuples` holds a set of (u, v) tuples, the dimensionless samples of every Monte Carlo benchmark run.
 
 A tuple `(u, v)` lies in the open unit square. When the set is mapped onto one test function, `u` sets
-the tolerance `xtol` log-uniformly between `xtol_min` and `2·xtol_min`, and `v` sets the parameter `c`
+the tolerance `xtol` log-uniformly between `xtol_min` and `2*xtol_min`, and `v` sets the parameter `c`
 linearly between the function's `c_min` and `c_max`, so the same set works for every test function.
 """
 
@@ -89,8 +89,8 @@ class MCTuples:
     def to_xtol_and_c(self, xtol_min: float, c_min: float, c_max: float) -> tuple[np.ndarray, np.ndarray]:
         """Return the `(xtol, c)` value of every tuple for one test function.
 
-        The mapping is `xtol = xtol_min · 2^u` and `c = c_min + v · (c_max - c_min)`, so `xtol` is
-        log-uniform within `(xtol_min, 2·xtol_min)` and `c` is uniform within `(c_min, c_max)`.
+        The mapping is `xtol = xtol_min * 2^u` and `c = c_min + v * (c_max - c_min)`, so `xtol` is
+        log-uniform within `(xtol_min, 2*xtol_min)` and `c` is uniform within `(c_min, c_max)`.
 
         Returns:
             The `xtol` array and the `c` array, in tuple order.
@@ -127,7 +127,7 @@ class MCTuplesStats:
     - gpq(0.1), the geometric pseudo-quantile at `GPQ_LEVEL`, which the construction maximizes.
 
     Each `*_fraction` property divides its statistic by the separation of `size` evenly spaced tuples on the circle or
-    the torus: `1/size` along an axis, and the spacing `1/√size` of a square grid in L2. `score` combines the 3 gpq
+    the torus: `1/size` along an axis, and the spacing `1/sqrt(size)` of a square grid in L2. `score` combines the 3 gpq
     fractions into 1 number by which tuple sets are compared.
 
     `MCTuplesStats` takes an `(n, 2)` array, not an `MCTuples`, so that a caller that holds tuples only as an array,
@@ -163,7 +163,7 @@ class MCTuplesStats:
 
     @property
     def min_separation_l2_fraction(self) -> float:
-        """Return the L2 min separation as a fraction of the grid spacing `1/√size`."""
+        """Return the L2 min separation as a fraction of the grid spacing `1/sqrt(size)`."""
         return self.min_separation_l2 * float(np.sqrt(self.size))
 
     @property
@@ -181,7 +181,7 @@ class MCTuplesStats:
     # --------------------------------------------------------------------------
     @cached_property
     def gpq_l2_fraction(self) -> float:
-        """Return the gpq at `GPQ_LEVEL` of the L2 separations as a fraction of the grid spacing `1/√size`."""
+        """Return the gpq at `GPQ_LEVEL` of the L2 separations as a fraction of the grid spacing `1/sqrt(size)`."""
         return gpq(self._separations_l2, GPQ_LEVEL) * float(np.sqrt(self.size))
 
     @cached_property
@@ -196,10 +196,10 @@ class MCTuplesStats:
 
     @property
     def score(self) -> float:
-        """Return `(u · v · L2²)^(1/4)` of the 3 gpq fractions: their geomean with weights 1, 1 and 2.
+        """Return `(u * v * L2^2)^(1/4)` of the 3 gpq fractions: their geomean with weights 1, 1 and 2.
 
         The weight 2 on L2 matches the construction's objective, which takes gpq over squared L2 distances, and
-        gpq(d²) = gpq(d)².
+        gpq(d^2) = gpq(d)^2.
         """
         return (self.gpq_u_fraction * self.gpq_v_fraction * self.gpq_l2_fraction**2) ** 0.25
 
@@ -255,7 +255,7 @@ class MCTuplesBitStats:
     fraction reproduce it exactly, so that it holds far fewer bits than a random float64 value.
 
     A test function treated as a black box can have a root or another special point exactly at a trivial value: for
-    example, `sin(100·π·x)` has its roots at the multiples of 0.01, so a value such as `x = 0.25` sits exactly on a
+    example, `sin(100*pi*x)` has its roots at the multiples of 0.01, so a value such as `x = 0.25` sits exactly on a
     root.
 
     The fewest bits over an axis tell whether every value on it is non-trivial; the mean adds context, but 1 trivial
