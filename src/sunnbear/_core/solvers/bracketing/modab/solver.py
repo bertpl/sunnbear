@@ -2,7 +2,7 @@
 
 from sunnbear._core.solvers.core import IntervalBound, Solver, SolveState
 from sunnbear._core.solvers.core.formulas import chord_zero, midpoint
-from sunnbear._core.solvers.core.stopping import interval_root, is_interval_converged
+from sunnbear._core.solvers.core.stopping import interval_root_if_converged
 
 # With this factor, the Anderson-Björck steps may fall 4 steps behind bisection before the solve falls back to
 # bisection: 16 = 2^4 (the paper's section 4.2).
@@ -116,7 +116,7 @@ class ModAB(Solver):
             else:
                 x3 = chord_zero(x1, y1, x2, y2)
             # The criterion reads the stored values y1 and y2, not f(x1) and f(x2). A stored value is 0 only where
-            # scaling underflows, which takes a subnormal function value; the solve then ends at that bound.
+            # scaling a subnormal function value underflows to 0; the solve then ends at that bound.
             x_root = self._root_if_converged(x1, y1, x2, y2, x3, xtol_doubled)
             if x_root is not None:
                 return x_root
@@ -180,7 +180,4 @@ class ModAB(Solver):
         ``x3`` is not used. The test suite overrides this method to apply the C# code's own stopping criterion, the
         interval at most ``aTol + rTol*|x3|`` wide, where it reproduces the paper's published counts.
         """
-        if is_interval_converged(x1, y1, x2, y2, xtol_doubled):
-            return interval_root(x1, y1, x2, y2)
-        else:
-            return None
+        return interval_root_if_converged(x1, y1, x2, y2, xtol_doubled)

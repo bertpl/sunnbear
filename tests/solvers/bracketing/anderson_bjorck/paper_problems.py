@@ -4,8 +4,9 @@ paper's iteration count for `AndersonBjorck`, from the column "Alg. A"."""
 from tests.solvers.paper_problems import UNSTATED_RUN_DETAILS
 from tests.solvers.paper_problems.anderson_bjorck import AndersonBjorckExampleProblem
 
-# The paper prints an iteration pattern for Example 1 and for the largest n of Examples 2 to 7; where a solve takes 1
-# iteration more, its steps follow that pattern, and a step of delta follows them.
+# For Example 1 and for the largest n of Examples 2 to 7, the paper prints the type of each step of its solve: a
+# regula falsi step, a step whose chord uses a scaled function value, or a step of delta. Where a solve here takes 1
+# iteration more, its steps have the paper's types in the paper's order, and a step of delta follows them.
 _ONE_MORE_STEP_OF_DELTA = "the solve takes 1 iteration more: a step of delta after the paper's last step"
 
 # On Example 7, the solve takes 3 iterations for every n.

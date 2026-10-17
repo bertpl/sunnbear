@@ -13,15 +13,14 @@ class AndersonBjorckState(SolveState):
     the retained bound ``x0``, and the retained bound's scaled function value ``f0``.
 
     Attributes:
-        newest_bound: The bound that holds the most recent iterate ``x1``. Before the first iterate, the upper bound is
-            the newest bound, as in the paper's examples and in mpmath; the ALGOL procedure leaves that choice to its
-            caller.
+        newest_bound: The bound that holds the most recent iterate ``x1``. Before the first iterate, it is the upper
+            bound, for the reason that the "Starting order" bullet of the `AndersonBjorck` class docstring gives.
         newest_x: The most recent iterate ``x1``. The factor needs it after the next iterate has replaced the newest
             bound, because the interval then no longer holds ``x1``.
         newest_f: The function value ``f1`` at the most recent iterate, kept for the same reason.
-        scaled_retained_f: The chord's function value ``f0`` at the retained bound ``x0``, which is the bound that does
-            not hold the most recent iterate. It equals that bound's own function value, multiplied by the factor of
-            every iteration that kept the bound again.
+        scaled_retained_f: The function value ``f0`` that the chord uses at the retained bound ``x0``, which is the
+            bound that does not hold the most recent iterate. It equals that bound's own function value, multiplied by
+            the factor of every iteration that kept the bound again.
     """
 
     newest_bound: IntervalBound = field(init=False)

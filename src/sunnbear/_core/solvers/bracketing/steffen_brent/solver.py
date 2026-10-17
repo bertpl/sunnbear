@@ -2,7 +2,7 @@
 
 from sunnbear._core.solvers.core import Solver, SolveState
 from sunnbear._core.solvers.core.formulas import chord_zero, midpoint
-from sunnbear._core.solvers.core.stopping import interval_root, is_interval_converged
+from sunnbear._core.solvers.core.stopping import interval_root_if_converged
 
 
 class SteffenBrent(Solver):
@@ -162,7 +162,4 @@ class SteffenBrent(Solver):
         The test suite overrides this method to apply Algorithm 2's own stopping criterion where it reproduces the
         paper's published results.
         """
-        if is_interval_converged(a, fa, b, fb, xtol_doubled):
-            return interval_root(a, fa, b, fb)
-        else:
-            return None
+        return interval_root_if_converged(a, fa, b, fb, xtol_doubled)

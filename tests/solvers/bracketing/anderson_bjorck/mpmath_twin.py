@@ -54,20 +54,24 @@ class AndersonBjorckMpmathTwin(TwinSolver):
 #  _MpmathFunctionWithStepOfDelta
 # ==================================================================================================
 class _MpmathFunctionWithStepOfDelta:
-    """`_MpmathFunctionWithStepOfDelta` is the function that `AndersonBjorckMpmathTwin` hands to mpmath: where mpmath
-    asks for a chord's zero that lies within ``xtol`` of its most recent iterate, it evaluates `AndersonBjorck`'s step
-    of delta instead, ``xtol`` from that iterate toward the retained bound.
+    """`_MpmathFunctionWithStepOfDelta` is `AndersonBjorckMpmathTwin`'s function argument to mpmath: where mpmath asks
+    for a chord's zero that lies within ``xtol`` of its most recent iterate, it evaluates `AndersonBjorck`'s step of
+    delta instead, ``xtol`` from that iterate toward the retained bound.
 
     It follows mpmath's 2 points as mpmath updates them: ``b``, the most recent iterate, and ``a``, the retained bound,
     which mpmath replaces by the previous ``b`` when ``f`` at the new iterate and at ``b`` differ in sign.
 
-    mpmath takes the function value that it gets back for the value at its own chord's zero, so it cannot continue
-    after a step of delta. The step therefore has to end the solve, by `TwinConvergedSignal`; a step that does not end
-    it raises an error.
+    mpmath takes the returned function value as the value at its own chord's zero, so it cannot continue after a step
+    of delta. The step therefore has to end the solve, by `TwinConvergedSignal`; a step that does not end it raises an
+    error.
     """
 
     def __init__(self, f: StoppingWrappedFunction, a: float, b: float, xtol: float, n_reevaluated_bounds: int) -> None:
-        """Start from mpmath's initial points, with ``b`` as the most recent iterate."""
+        """Start from mpmath's initial points, with ``b`` as the most recent iterate.
+
+        The first ``n_reevaluated_bounds`` calls are mpmath's own evaluations of ``a`` and ``b``, which pass through
+        without a step of delta.
+        """
         self._f = f
         self._xtol = xtol
         self._a, self._b = a, b
@@ -81,15 +85,15 @@ class _MpmathFunctionWithStepOfDelta:
             self._n_reevaluated_bounds_left -= 1
             self._fb = self._f(x)
             return self._fb
-
-        # --- an iterate -------------------------
-        is_step_of_delta = abs(x - self._b) < self._xtol
-        if is_step_of_delta:
-            x = self._b - self._xtol * math.copysign(1.0, self._b - self._a)
-        fx = self._f(x)  # This raises TwinConvergedSignal once `AndersonBjorck` stops.
-        if is_step_of_delta:
-            raise AssertionError("A step of delta did not end the solve, so mpmath cannot continue from it.")
-        if fx * self._fb < 0.0:  # mpmath's own test for a new iterate on the other side of the root
-            self._a = self._b
-        self._b, self._fb = x, fx
-        return fx
+        else:
+            # --- an iterate ---------------------
+            is_step_of_delta = abs(x - self._b) < self._xtol
+            if is_step_of_delta:
+                x = self._b - self._xtol * math.copysign(1.0, self._b - self._a)
+            fx = self._f(x)  # This raises TwinConvergedSignal once `AndersonBjorck` stops.
+            if is_step_of_delta:
+                raise AssertionError("A step of delta did not end the solve, so mpmath cannot continue from it.")
+            if fx * self._fb < 0.0:  # This is mpmath's own test for a new iterate on the other side of the root.
+                self._a = self._b
+            self._b, self._fb = x, fx
+            return fx

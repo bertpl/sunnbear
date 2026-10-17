@@ -4,7 +4,7 @@ import math
 
 from sunnbear._core.solvers.core import Solver, SolveState
 from sunnbear._core.solvers.core.formulas import chord_zero, midpoint
-from sunnbear._core.solvers.core.stopping import interval_root, is_interval_converged
+from sunnbear._core.solvers.core.stopping import interval_root_if_converged
 
 # The paper's constants, which clip an x-value into the middle part of an interval: a fraction θ of the interval's
 # width at each end is out of bounds. θ0 places the first x-value; θ1, θ2 and θ3 clip the later x-values, and the kind
@@ -42,11 +42,13 @@ class CARF(Solver):
       the 3 function values are not monotone, which clips ``t*`` to the midpoint;
     - **updates the interval,** as the bullet *The interval after a sign change* below describes.
 
-    The solve checks its stopping criterion once per iteration, after selecting the active interval: it ends once the
-    active interval is at most ``2*xtol`` wide, or once ``f`` is 0 at one of its bounds. It returns that bound, or else
-    the active interval's midpoint, which then lies within ``xtol`` of a root. A function value of 0 is not a sign
-    change, so a ``t_new`` with ``f(t_new) = 0`` becomes the interior x-value ``t``, which is a bound of the next
-    active interval, and the next check ends the solve at it.
+    The solve checks its stopping criterion once per iteration, after selecting the active interval:
+
+    - it ends once the active interval is at most ``2*xtol`` wide, or once ``f`` is 0 at one of its bounds;
+    - it returns that bound, or else the active interval's midpoint, which then lies within ``xtol`` of a root.
+
+    A function value of 0 is not a sign change, so a ``t_new`` with ``f(t_new) = 0`` becomes the interior x-value
+    ``t``, which is a bound of the next active interval, and the next check ends the solve at it.
 
     `CARF` departs from the paper in these places:
 
@@ -67,10 +69,9 @@ class CARF(Solver):
       says it borrows.
 
       Read the paper's way, the test never clips while the x-values approach the root from one side: on
-      ``(x - 3)^3`` over ``[0, 5]``, the solve then takes 51 evaluations with the paper's stopping criterion and the
-      tolerances of its Table 4, against the paper's 28, and does not converge within 5,000 evaluations with the
-      shared stopping criterion. Accepted and clipped steps both update the last step and the step before last, and
-      before the first iteration both are set to the width of the initial interval.
+      ``(x - 3)^3`` over ``[0, 5]``, the solve then takes far more evaluations than the paper reports, and with the
+      shared stopping criterion it does not converge. Accepted and clipped steps both update the last step and the
+      step before last, and before the first iteration both are set to the width of the initial interval.
     - **The interval after a sign change:** when ``f(t_new)`` and ``f(t)`` differ in sign, the paper takes the
       shorter of "two sign-changing sub-intervals containing" ``t_new``. `CARF` takes the shorter of these 2
       intervals:
@@ -137,11 +138,11 @@ class CARF(Solver):
           https://doi.org/10.1093/comjnl/14.4.422
         - Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear
           function without using derivatives. Advances in Engineering Software 28(3), 145-149. Gao's Table 4 runs on the
-          45 test problems of its Table 2, whose functions the test suite takes from it.
+          45 test problems of Chandrupatla's Table 2, whose functions the test suite takes from that table.
           https://doi.org/10.1016/S0965-9978(96)00051-8
         - Alefeld, G. E., Potra, F. A. and Shi, Y. (1995). Algorithm 748: Enclosing zeros of continuous functions. ACM
-          Transactions on Mathematical Software 21(3), 327-344. Gao's Table 3 runs on its test problems, which the test
-          suite takes from the authors' test driver.
+          Transactions on Mathematical Software 21(3), 327-344. Gao's Table 3 runs on the test problems of Algorithm
+          748, which the test suite takes from the authors' test driver.
           https://doi.org/10.1145/210089.210111
     """
 
@@ -302,7 +303,4 @@ class CARF(Solver):
         ``t`` and ``ft`` are not used, since ``t`` is one of the 2 bounds. The test suite overrides this method to
         apply the paper's own stopping criterion, which needs them, where it reproduces the paper's published counts.
         """
-        if is_interval_converged(a_active, fa_active, b_active, fb_active, xtol_doubled):
-            return interval_root(a_active, fa_active, b_active, fb_active)
-        else:
-            return None
+        return interval_root_if_converged(a_active, fa_active, b_active, fb_active, xtol_doubled)

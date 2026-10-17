@@ -26,9 +26,11 @@ def test_the_iteration_counts_of_examples_1_to_7_of_the_paper_are_reproduced(pro
     iterations, within the row's allowed deviation, with its steps of delta at the paper's ``delta``.
 
     The paper's runs stop once the interval is narrower than ``delta``; `AndersonBjorck` stops by the shared stopping
-    criterion, once the interval is at most ``2*delta`` wide. The test does not apply the paper's stopping criterion:
-    in float64, 10 of the 26 runs then alternate between 2 x-values whose computed distance exceeds ``delta`` by a
-    rounding error, and never end, while the other 16 take the same counts as under the shared stopping criterion.
+    criterion, once the interval is at most ``2*delta`` wide.
+
+    The test does not apply the paper's stopping criterion: in float64, 10 of the 26 runs then alternate between 2
+    x-values whose computed distance exceeds ``delta`` by a rounding error, and never end, while the other 16 take the
+    same counts as under the shared stopping criterion.
     """
     # --- act --------------------------
     result = AndersonBjorck().solve(problem.f, problem.a, problem.b, xtol=_PAPER_DELTA, max_fevals=50)
