@@ -36,7 +36,7 @@ from typing import Any, TypeVar, assert_never
 
 import platformdirs
 
-from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
+from sunnbear._core.utils.class_origin import is_sunnbear_module
 
 from .archiver import ArtifactArchiver
 from .data_release_client import ArtifactDataReleaseClient
@@ -491,7 +491,7 @@ class ArtifactStore:
 
         The directory's location follows from the module that defines the declaration.
         """
-        if is_defined_in_sunnbear(declaration_cls):
+        if is_sunnbear_module(declaration_cls.__module__):
             return cls._builtin_artifacts_dir().joinpath(declaration_cls.name)
         else:
             module_file = sys.modules[declaration_cls.__module__].__file__

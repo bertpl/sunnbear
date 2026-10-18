@@ -52,7 +52,7 @@ class Ridders(Solver):
     - **Order of the step's operations:** `Ridders` computes ``(d * (f1 / f0)) / sqrt(...)``, as SciPy does, where
       equation 6 multiplies ``d`` by the quotient ``(f1 / f0) / sqrt(...)``; the 2 orders are equal in exact arithmetic
       but round differently;
-    - **Midpoint:** `Ridders` computes it with `midpoint`, the form that most solvers share; SciPy computes it as
+    - **Midpoint:** `Ridders` computes it as ``0.5*(a + b)``, with `Interval.midpoint`; SciPy computes it as
       ``xa + 0.5*(xb - xa)``.
 
     An iteration evaluates the function twice, so `Ridders` writes its own loop, not `BracketingSolver`'s.

@@ -43,7 +43,7 @@ def test_a_run_with_workers_refuses_a_solver_config_defined_in_an_interactive_se
     """A config defined in `__main__` without a file cannot be imported by a worker, so only 1 worker is allowed."""
     # --- arrange ----------------------
     monkeypatch.setitem(sys.modules, "__main__", types.ModuleType("__main__"))
-    interactive_config = type("InteractiveConfig", (), {"__module__": "__main__"})()
+    interactive_config = types.SimpleNamespace(declaring_module_name="__main__")
 
     # --- act / assert -----------------
     BenchmarkWorkerPool.for_run(n_workers=1, solver_configs=[interactive_config], functions=[])

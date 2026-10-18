@@ -3,7 +3,7 @@
 It also defines a helper that declares configs of that solver.
 """
 
-from sunnbear.solvers import BracketingSolver, Interval, SolverConfig, SolveState
+from sunnbear.solvers import BracketingSolver, Interval, SolverConfigsDeclaration, SolveState
 
 
 class WeightedSplitSolver(BracketingSolver):
@@ -23,10 +23,10 @@ class WeightedSplitSolver(BracketingSolver):
         return interval.a + self.weight * interval.width
 
 
-def define_config(namespace: dict[str, object]) -> type[SolverConfig]:
-    """Define, and so register, a config class with the attributes in ``namespace``.
+def define_configs_declaration(namespace: dict[str, object]) -> type[SolverConfigsDeclaration]:
+    """Define, and so register, a `SolverConfigsDeclaration` subclass with the attributes in ``namespace``.
 
     The class counts as defined in the test suite, outside the sunnbear package, unless ``namespace``
     names another ``__module__``.
     """
-    return type("Config", (SolverConfig,), {"__module__": "tests.solvers", **namespace})
+    return type("ConfigsDeclaration", (SolverConfigsDeclaration,), {"__module__": "tests.solvers", **namespace})

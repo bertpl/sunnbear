@@ -1,16 +1,16 @@
-"""This module declares the built-in configs of `CARF`."""
+"""This module declares the built-in config of `CARF`."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import CARF
 
 
-class CARFConfig(SolverConfig):
-    """`CARFConfig` is a secondary config of `CARF`, with the paper's constants.
+class CARFConfigsDeclaration(SolverConfigsDeclaration):
+    """`CARFConfigsDeclaration` declares `CARF`'s only config, named ``carf``.
 
-    It is not core because the method is not established yet (published 2026), and `CARF` reconstructs it from the
-    paper's description, without the author's code.
+    It is a secondary config, with the paper's constants. It is not core because the method is not established yet
+    (published 2026), and `CARF` reconstructs it from the paper's description, without the author's code.
     """
 
     solver_cls = CARF
-    role = SolverRole.BUILTIN_SECONDARY
+    configs = (SolverConfig(role=SolverRole.BUILTIN_SECONDARY),)

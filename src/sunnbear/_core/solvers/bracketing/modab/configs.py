@@ -1,16 +1,16 @@
-"""This module declares the built-in configs of `ModAB`."""
+"""This module declares the built-in config of `ModAB`."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import ModAB
 
 
-class ModABConfig(SolverConfig):
-    """`ModABConfig` is a secondary config of `ModAB`.
+class ModABConfigsDeclaration(SolverConfigsDeclaration):
+    """`ModABConfigsDeclaration` declares `ModAB`'s only config, named ``modab``.
 
-    It is not core because the method is not established yet (published 2026), and the evidence for it so far comes
-    from its authors' own benchmarks.
+    It is a secondary config. It is not core because the method is not established yet (published 2026), and the
+    evidence for it so far comes from its authors' own benchmarks.
     """
 
     solver_cls = ModAB
-    role = SolverRole.BUILTIN_SECONDARY
+    configs = (SolverConfig(role=SolverRole.BUILTIN_SECONDARY),)

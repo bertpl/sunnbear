@@ -1,56 +1,33 @@
 """This module declares the built-in configs of `ITP`."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import ITP
 from .variant import ITPVariant
 
 
-class ITPPaperExperimentsSlack4Config(SolverConfig):
-    """`ITPPaperExperimentsSlack4Config` is a secondary config of `ITP`.
+class ITPConfigsDeclaration(SolverConfigsDeclaration):
+    """`ITPConfigsDeclaration` declares the configs of `ITP`, which differ in projection radius and in ``n_slack``.
 
-    It runs variant ``"paper_experiments"`` with ``n_slack = 4``. It is not core because
-    `ITPPaperExperimentsSlack0Config` is the core config of `ITP`; that config's docstring says why it was chosen.
+    - ``itp[n_slack=0,variant='paper_experiments']``, the core config: the settings of the paper's experiments and of
+      the authors' code;
+    - ``itp[n_slack=0,variant='paper_pseudocode']``, a secondary config: the projection radius of the paper's
+      pseudocode;
+    - ``itp[n_slack=4,variant='paper_experiments']``, a secondary config: the core config with 4 iterations of slack.
 
-    No source states a value of ``n_slack``. The value 4 allows more than 1 extra iteration, and stays small next to
-    bisection's evaluation count at the benchmark's default ``n_bisection_fevals``.
-
-    The config shows how extra slack changes the evaluation counts, and that rounding can still take a solve 1
-    iteration past its bound ``n_max``.
-
-    With ``n_slack = 4``, the projection accepts interpolation steps that shrink the interval by less than half, as long
-    as the solve can still end at most 4 iterations later than bisection would, so the evaluation count depends on how
-    fast interpolation converges on the function.
+    Section V.c of ``SOLVER_IMPLEMENTATIONS.md``, in the package `sunnbear._core.solvers`, gives the reasons for the
+    configs' roles, and for ``n_slack = 4``.
     """
 
     solver_cls = ITP
-    solver_kwargs = {"n_slack": 4, "variant": ITPVariant.PAPER_EXPERIMENTS}  # noqa: RUF012 — the dict is never mutated
-    role = SolverRole.BUILTIN_SECONDARY
-
-
-class ITPPaperExperimentsSlack0Config(SolverConfig):
-    """`ITPPaperExperimentsSlack0Config` is a core config of `ITP`.
-
-    It runs variant ``"paper_experiments"`` with ``n_slack = 0``. It is the core config because the paper's experiments
-    ran `ITP` with this variant and ``n_slack = 0``, and the authors' code uses the same settings.
-    """
-
-    solver_cls = ITP
-    solver_kwargs = {"n_slack": 0, "variant": ITPVariant.PAPER_EXPERIMENTS}  # noqa: RUF012 — the dict is never mutated
-    role = SolverRole.BUILTIN_CORE
-
-
-class ITPPaperPseudocodeSlack0Config(SolverConfig):
-    """`ITPPaperPseudocodeSlack0Config` is a secondary config of `ITP`, as its paper's pseudocode states it.
-
-    It is not core because `ITPPaperExperimentsSlack0Config` is the core config of `ITP`; that config's docstring
-    says why it was chosen.
-
-    This config differs from `ITPPaperExperimentsSlack0Config` only in its projection radius ``r``, which it does not
-    lower to ``max(0.99 * r - xtol / 2, 0)``, so its solves go past the iteration bound ``n_max`` of `ITP` more often,
-    and end as pure bisection once their projection radius reaches 0.
-    """
-
-    solver_cls = ITP
-    solver_kwargs = {"n_slack": 0, "variant": ITPVariant.PAPER_PSEUDOCODE}  # noqa: RUF012 — the dict is never mutated
-    role = SolverRole.BUILTIN_SECONDARY
+    configs = (
+        SolverConfig(
+            role=SolverRole.BUILTIN_CORE, solver_kwargs={"n_slack": 0, "variant": ITPVariant.PAPER_EXPERIMENTS}
+        ),
+        SolverConfig(
+            role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"n_slack": 0, "variant": ITPVariant.PAPER_PSEUDOCODE}
+        ),
+        SolverConfig(
+            role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"n_slack": 4, "variant": ITPVariant.PAPER_EXPERIMENTS}
+        ),
+    )

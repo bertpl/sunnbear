@@ -1,6 +1,6 @@
 """The solver config registry holds the registered solver configs and looks one up by its identity.
 
-Defining a `SolverConfig` subclass registers one instance of it here. The built-in configs are
+Defining a `SolverConfigsDeclaration` subclass registers each of its configs here. The built-in configs are
 registered when the `sunnbear.solvers` module imports the shipped solvers, so the registry is complete
 on import.
 
@@ -24,27 +24,30 @@ if TYPE_CHECKING:  # type-only: config imports this module at runtime, so a runt
 class SolverConfigRegistry:
     """`SolverConfigRegistry` enumerates the registered solver configs, or looks one up by ``solver_id``.
 
-    `SolverConfig.__init_subclass__` calls `register` for every subclass; nothing is discovered lazily.
+    `SolverConfigsDeclaration.__init_subclass__` calls `register` for every config of every subclass; nothing is
+    discovered lazily.
     """
 
     _configs_by_id: ClassVar[dict[str, "SolverConfig"]] = {}
 
     @classmethod
-    def register(cls, config_cls: "type[SolverConfig]") -> None:
-        """Instantiate a config class and register it under its ``solver_id``.
+    def register(cls, config: "SolverConfig") -> None:
+        """Register a config under its ``solver_id``.
 
         Raises:
             ValueError: If another registered config has the same ``solver_id``, or the config is a
                 second one with role ``BUILTIN_BASELINE``.
         """
-        config = config_cls()
         if config.solver_id in cls._configs_by_id:
-            existing_name = type(cls._configs_by_id[config.solver_id]).__name__
-            raise ValueError(f"Duplicate solver_id {config.solver_id!r}: {config_cls.__name__} and {existing_name}.")
+            existing_declaring_module_name = cls._configs_by_id[config.solver_id].declaring_module_name
+            raise ValueError(
+                f"Duplicate solver_id {config.solver_id!r}: declared in {config.declaring_module_name} and in "
+                f"{existing_declaring_module_name}."
+            )
         baseline = next((c for c in cls._configs_by_id.values() if c.role is SolverRole.BUILTIN_BASELINE), None)
         if config.role is SolverRole.BUILTIN_BASELINE and baseline is not None:
             raise ValueError(
-                f"Only one config may have role BUILTIN_BASELINE: {config_cls.__name__} and {type(baseline).__name__}."
+                f"Only one config may have role BUILTIN_BASELINE: {config.solver_id} and {baseline.solver_id}."
             )
         cls._configs_by_id[config.solver_id] = config
 

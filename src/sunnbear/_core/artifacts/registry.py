@@ -7,7 +7,7 @@ it is imported.
 
 from typing import TYPE_CHECKING, ClassVar
 
-from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
+from sunnbear._core.utils.class_origin import is_sunnbear_module
 
 from .exceptions import ArtifactError
 
@@ -49,7 +49,7 @@ class ArtifactRegistry:
     def builtin_declarations(cls) -> "tuple[type[ArtifactDeclaration], ...]":
         """Return every imported declaration that is defined inside sunnbear, sorted by name."""
         return tuple(
-            declaration_cls for declaration_cls in cls.declarations() if is_defined_in_sunnbear(declaration_cls)
+            declaration_cls for declaration_cls in cls.declarations() if is_sunnbear_module(declaration_cls.__module__)
         )
 
     @classmethod

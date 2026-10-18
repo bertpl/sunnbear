@@ -29,7 +29,7 @@ test-function package imports the formula catalog.
 
 from typing import TYPE_CHECKING, ClassVar
 
-from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
+from sunnbear._core.utils.class_origin import is_sunnbear_module
 
 from .exceptions import FormulaTaxonomyError, InvalidParamsError, UnknownFormulaError
 from .identity import FunctionId
@@ -200,7 +200,7 @@ class FormulaRegistry:
         # the parent check above guarantees that every ancestor exists, including each node's top-level category
         for node in nodes:
             top_level_category = categories[node.number[:1]]
-            if top_level_category.is_builtin_only and not is_defined_in_sunnbear(type(node)):
+            if top_level_category.is_builtin_only and not is_sunnbear_module(type(node).__module__):
                 raise FormulaTaxonomyError(
                     f"{node.label} is defined in {type(node).__module__}, but top-level category "
                     f"{top_level_category.label} is reserved for nodes inside the sunnbear package."

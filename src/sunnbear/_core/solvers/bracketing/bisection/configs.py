@@ -1,15 +1,15 @@
-"""This module declares the built-in configs of `Bisection`."""
+"""This module declares the built-in config of `Bisection`."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import Bisection
 
 
-class BisectionConfig(SolverConfig):
-    """`BisectionConfig` is the baseline config of `Bisection`.
+class BisectionConfigsDeclaration(SolverConfigsDeclaration):
+    """`BisectionConfigsDeclaration` declares `Bisection`'s only config, named ``bisection``.
 
-    Its evaluation count is the benchmark's reference cost.
+    It is the baseline config. Its evaluation count is the benchmark's reference cost.
     """
 
     solver_cls = Bisection
-    role = SolverRole.BUILTIN_BASELINE
+    configs = (SolverConfig(role=SolverRole.BUILTIN_BASELINE),)

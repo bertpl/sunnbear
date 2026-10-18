@@ -1,15 +1,15 @@
-"""This module declares the built-in configs of `Brent`."""
+"""This module declares the built-in config of `Brent`."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import Brent
 
 
-class BrentConfig(SolverConfig):
-    """`BrentConfig` is a core config of `Brent`.
+class BrentConfigsDeclaration(SolverConfigsDeclaration):
+    """`BrentConfigsDeclaration` declares `Brent`'s only config, named ``brent``.
 
-    Brent's method is the de facto standard bracketing solver.
+    It is a core config. Brent's method is the de facto standard bracketing solver.
     """
 
     solver_cls = Brent
-    role = SolverRole.BUILTIN_CORE
+    configs = (SolverConfig(role=SolverRole.BUILTIN_CORE),)

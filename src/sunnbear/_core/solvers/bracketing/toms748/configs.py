@@ -1,29 +1,22 @@
 """This module declares the built-in configs of `TOMS748`, 1 per value of ``k``."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import TOMS748
 
 
-class TOMS748K1Config(SolverConfig):
-    """`TOMS748K1Config` is a secondary config of `TOMS748`, with ``k = 1``, the paper's Algorithm 4.1.
+class TOMS748ConfigsDeclaration(SolverConfigsDeclaration):
+    """`TOMS748ConfigsDeclaration` declares the configs of `TOMS748`, 1 per value of ``k``.
 
-    It is not core because `TOMS748K2Config` is the core config of `TOMS748`; that config's docstring says why it was
-    chosen. `TOMS748K1Config` is included because ``k = 1`` is the default of SciPy's ``toms748``.
+    - ``toms748[k=2]``, the core config: the paper's Algorithm 4.2;
+    - ``toms748[k=1]``, a secondary config: the paper's Algorithm 4.1.
+
+    Section V.b of ``SOLVER_IMPLEMENTATIONS.md``, in the package `sunnbear._core.solvers`, gives the reasons for the
+    configs' roles.
     """
 
     solver_cls = TOMS748
-    solver_kwargs = {"k": 1}  # noqa: RUF012 — the dict is never mutated
-    role = SolverRole.BUILTIN_SECONDARY
-
-
-class TOMS748K2Config(SolverConfig):
-    """`TOMS748K2Config` is a core config of `TOMS748`, with ``k = 2``, the paper's Algorithm 4.2.
-
-    ``k = 2`` is the core config, not ``k = 1``: the authors' code implements only Algorithm 4.2, and the paper's
-    Table II reports fewer evaluations for Algorithm 4.2 than for Algorithm 4.1.
-    """
-
-    solver_cls = TOMS748
-    solver_kwargs = {"k": 2}  # noqa: RUF012 — the dict is never mutated
-    role = SolverRole.BUILTIN_CORE
+    configs = (
+        SolverConfig(role=SolverRole.BUILTIN_CORE, solver_kwargs={"k": 2}),
+        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"k": 1}),
+    )

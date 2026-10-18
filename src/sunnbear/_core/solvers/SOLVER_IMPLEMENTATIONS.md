@@ -157,45 +157,47 @@ The midpoint that the shared stopping criterion returns (section IV.a.2) is `0.5
 
 Some solvers are provided in multiple configurations, which might differ in their parameters or in certain implementation details (such as the stopping criterion).
 
+Each config's name in the benchmark's results is its `solver_id`: the solver's name followed by its init arguments, as in `toms748[k=2]`.
+
 Each config has 1 of 3 roles:
 - **core:** the config characterizes the test problems.
 - **secondary:** the config is reported for information only.
-- **baseline:** only `BisectionConfig` has this role; its evaluation count normalizes the other solvers' evaluation counts.
+- **baseline:** only `bisection` has this role; its evaluation count normalizes the other solvers' evaluation counts.
 
 Only a secondary config may deviate from section IV.
 
 | Algorithm | Config | Role | Differs in | Follows section IV |
 | --------- | ------ | ---- | ---------- | ------------------ |
-| `Ridders` | `RiddersStandardStoppingCriterionConfig` | core | Ridders' steps, as the article states them | yes |
-| | `RiddersScipyConfig` | secondary | SciPy's step limit and stopping criterion | no: SciPy's stopping criterion |
-| | `RiddersCommonsMathConfig` | secondary | Apache Commons Math's stopping criterion | no: Commons Math's stopping criterion |
-| `TOMS748` | `TOMS748K2Config` | core | `k = 2`, the article's Algorithm 4.2 | yes |
-| | `TOMS748K1Config` | secondary | `k = 1`, the article's Algorithm 4.1 | yes |
-| `ITP` | `ITPPaperExperimentsSlack0Config` | core | the projection radius of the authors' code, `n_slack = 0` | yes |
-| | `ITPPaperPseudocodeSlack0Config` | secondary | the projection radius of the article's pseudocode, `n_slack = 0` | yes |
-| | `ITPPaperExperimentsSlack4Config` | secondary | the projection radius of the authors' code, `n_slack = 4` | yes |
+| `Ridders` | `ridders[variant='standard_stopping_criterion']` | core | Ridders' steps, as the article states them | yes |
+| | `ridders[variant='scipy']` | secondary | SciPy's step limit and stopping criterion | no: SciPy's stopping criterion |
+| | `ridders[variant='commons_math']` | secondary | Apache Commons Math's stopping criterion | no: Commons Math's stopping criterion |
+| `TOMS748` | `toms748[k=2]` | core | `k = 2`, the article's Algorithm 4.2 | yes |
+| | `toms748[k=1]` | secondary | `k = 1`, the article's Algorithm 4.1 | yes |
+| `ITP` | `itp[n_slack=0,variant='paper_experiments']` | core | the projection radius of the authors' code, `n_slack = 0` | yes |
+| | `itp[n_slack=0,variant='paper_pseudocode']` | secondary | the projection radius of the article's pseudocode, `n_slack = 0` | yes |
+| | `itp[n_slack=4,variant='paper_experiments']` | secondary | the projection radius of the authors' code, `n_slack = 4` | yes |
 
 ### V.a. Ridders
 
 Ridders (1979) states no stopping criterion, so the core config fills that gap with the shared stopping criterion of section IV.a. The 2 secondary configs show the stopping criteria of 2 widely used implementations:
-- **`RiddersStandardStoppingCriterionConfig` (core):** Ridders' steps as the article states them, with the shared stopping criterion.
+- **`ridders[variant='standard_stopping_criterion']` (core):** Ridders' steps as the article states them, with the shared stopping criterion.
   - It checks that criterion where SciPy's `ridder` checks its own: right after evaluating the midpoint, it checks for a function value of 0, and after evaluating the new iterate, it checks the whole criterion.
   - Near the root, a new iterate can land between the root and the far bound, and the interval then only halves, so this config's evaluation counts can vary between near-identical functions.
-- **`RiddersScipyConfig` (secondary):** SciPy's `ridder`. It limits each step so that the new iterate lies at least `xtol/2` inside the interval, which the article does not state; near the root, that limit shrinks the interval to the stopping width in fewer evaluations. It stops once the interval is narrower than `xtol`, and returns the last iterate.
-- **`RiddersCommonsMathConfig` (secondary):** the stopping criterion of Apache Commons Math's `RiddersSolver`: it stops once 2 successive iterates lie at most `xtol` apart, and returns the last one. That iterate can lie more than `xtol` from a root, as on a function with a kink or with a multiple root.
+- **`ridders[variant='scipy']` (secondary):** SciPy's `ridder`. It limits each step so that the new iterate lies at least `xtol/2` inside the interval, which the article does not state; near the root, that limit shrinks the interval to the stopping width in fewer evaluations. It stops once the interval is narrower than `xtol`, and returns the last iterate.
+- **`ridders[variant='commons_math']` (secondary):** the stopping criterion of Apache Commons Math's `RiddersSolver`: it stops once 2 successive iterates lie at most `xtol` apart, and returns the last one. That iterate can lie more than `xtol` from a root, as on a function with a kink or with a multiple root.
 
 ### V.b. TOMS748
 
 Alefeld, Potra and Shi (1995) publish 2 algorithms, which differ only in `k`, the number of interpolation steps in each iteration. Both configs follow section IV, so `k` is their only difference:
-- **`TOMS748K2Config` (core):** `k = 2`, Algorithm 4.2. The authors' published code implements only this algorithm, and the article's Table II reports fewer evaluations for it than for Algorithm 4.1.
-- **`TOMS748K1Config` (secondary):** `k = 1`, Algorithm 4.1, the default of SciPy's `toms748`.
+- **`toms748[k=2]` (core):** `k = 2`, Algorithm 4.2. The authors' published code implements only this algorithm, and the article's Table II reports fewer evaluations for it than for Algorithm 4.1.
+- **`toms748[k=1]` (secondary):** `k = 1`, Algorithm 4.1, the default of SciPy's `toms748`.
 
 ### V.c. ITP
 
 The 3 configs follow section IV, and differ in 2 settings: the projection radius `r`, and `n_slack`, the number of iterations that `ITP` may take beyond bisection's:
-- **`ITPPaperExperimentsSlack0Config` (core):** the settings of the article's experiments and of the authors' code, with `n_slack = 0`. The authors' code lowers the article's projection radius to `max(0.99*r - xtol/2, 0)`, a margin against rounding; with it, the config reproduces 23 of the 24 evaluation counts of the article's Table 1.
-- **`ITPPaperPseudocodeSlack0Config` (secondary):** the article's pseudocode as printed, without that margin, which reproduces 17 of the 24 counts. It shows what the margin buys: without it, rounding takes solves past the iteration bound of `ITP` more often.
-- **`ITPPaperExperimentsSlack4Config` (secondary):** the core config with `n_slack = 4`: about 10 % slack on the 40 evaluations of bisection at `n_bisection_fevals = 40`, the largest value that the benchmark uses. No source states a value; 4 is meant as a neutral value larger than 1, to show what extra slack buys, and that rounding can still take a solve 1 iteration past its bound.
+- **`itp[n_slack=0,variant='paper_experiments']` (core):** the settings of the article's experiments and of the authors' code, with `n_slack = 0`. The authors' code lowers the article's projection radius to `max(0.99*r - xtol/2, 0)`, a margin against rounding; with it, the config reproduces 23 of the 24 evaluation counts of the article's Table 1.
+- **`itp[n_slack=0,variant='paper_pseudocode']` (secondary):** the article's pseudocode as printed, without that margin, which reproduces 17 of the 24 counts. It shows what the margin buys: without it, rounding takes solves past the iteration bound of `ITP` more often.
+- **`itp[n_slack=4,variant='paper_experiments']` (secondary):** the core config with `n_slack = 4`: about 10 % slack on the 40 evaluations of bisection at `n_bisection_fevals = 40`, the largest value that the benchmark uses. No source states a value; 4 is meant as a neutral value larger than 1, to show what extra slack buys, and that rounding can still take a solve 1 iteration past its bound.
 
 ## VI. Code Organization & Validation
 
