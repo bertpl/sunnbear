@@ -196,8 +196,8 @@ Alefeld, Potra and Shi (1995) publish 2 algorithms, which differ only in `k`, th
 
 The 3 configs follow section IV, and differ in 2 settings: the projection radius `r`, and `n_slack`, the number of iterations that `ITP` may take beyond bisection's:
 - **`itp[n_slack=0,variant='paper_experiments']` (core):** the settings of the article's experiments and of the authors' code, with `n_slack = 0`. The authors' code lowers the article's projection radius to `max(0.99*r - xtol/2, 0)`, a margin against rounding; with it, the config reproduces 23 of the 24 evaluation counts of the article's Table 1.
-- **`itp[n_slack=0,variant='paper_pseudocode']` (secondary):** the article's pseudocode as printed, without that margin, which reproduces 17 of the 24 counts. It shows what the margin buys: without it, rounding takes solves past the iteration bound of `ITP` more often.
-- **`itp[n_slack=4,variant='paper_experiments']` (secondary):** the core config with `n_slack = 4`: about 10 % slack on the 40 evaluations of bisection at `n_bisection_fevals = 40`, the largest value that the benchmark uses. No source states a value; 4 is meant as a neutral value larger than 1, to show what extra slack buys, and that rounding can still take a solve 1 iteration past its bound.
+- **`itp[n_slack=0,variant='paper_pseudocode']` (secondary):** the article's pseudocode as printed, without that margin, which reproduces 17 of the 24 counts. It shows the effect of the margin: without it, rounding takes solves past the iteration bound of `ITP` more often.
+- **`itp[n_slack=4,variant='paper_experiments']` (secondary):** the core config with `n_slack = 4`: about 10 % slack on the 40 evaluations of bisection at `n_bisection_fevals = 40`, the largest value that the benchmark uses. No source states a value; 4 is meant as a neutral value larger than 1, to show how extra slack changes the evaluation counts, and that rounding can still take a solve 1 iteration past its bound.
 
 ## VI. Code Organization & Validation
 
