@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Make the solvers compute most secant steps in SciPy's form, which stays finite for huge and tiny function values, and every midpoint in 1 shared form, which changes the benchmark results of most solvers slightly
+- Make the solvers compute most secant steps in SciPy's form, which stays accurate for huge and tiny function values, and every midpoint in 1 shared form, which changes the benchmark results of most solvers slightly
 
 ### Deprecated
 
