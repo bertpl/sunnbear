@@ -76,7 +76,10 @@ N_FINE_LANES = int(max(MCTuplesSize))
 
 
 def fine_lanes_of(values: np.ndarray) -> np.ndarray:
-    """Return the fine lane of each value in [0, 1); fine lane `i` holds the values in `[i, i + 1) / N_FINE_LANES`."""
+    """Return the fine lane of each value; fine lane `i` holds the values in `[i, i + 1) / N_FINE_LANES`.
+
+    A value below 0, such as a value on a negated axis, gets a negative `i`.
+    """
     return np.floor(values * N_FINE_LANES).astype(np.int64)
 
 
