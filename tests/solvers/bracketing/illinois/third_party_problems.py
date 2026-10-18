@@ -65,7 +65,12 @@ OLIVEIRA_TAKAHASHI_TABLE_1 = [
     ),
     OliveiraTakahashiTable1Problem.WEIERSTRASS.with_n_iterations(11),
     OliveiraTakahashiTable1Problem.POLYNOMIAL_FRACTION.with_n_iterations(13),
-    OliveiraTakahashiTable1Problem.NORMAL_CDF.with_n_iterations(8),
+    OliveiraTakahashiTable1Problem.NORMAL_CDF.with_n_iterations(
+        8,
+        deviation=1,
+        reason="the count depends on how the platform's erf rounds: `Illinois` takes the table's 8 iterations on macOS "
+        "and 9 on Linux on ARM",
+    ),
     OliveiraTakahashiTable1Problem.NORMAL_PDF.with_n_iterations(
         10,
         deviation=1,

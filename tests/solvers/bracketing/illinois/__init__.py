@@ -15,10 +15,10 @@ Third-party published results:
   states no starting values.
 - Anderson and Björck (1973), Examples 1 to 7, the Illinois columns: not reproduced, because the paper ran Examples 1
   to 7 in 27-bit arithmetic and with an extra rule on the step size that `Illinois` does not have.
-- Oliveira and Takahashi (2020), Table 1, the column "Illinois": reproduced, in ``test_third_party.py``: 17 of the 24
-  iteration counts exactly, 6 within 1, and the count for ``noisy_line`` within 4; the test data states why each of
-  the 7 deviates. The table's runs stop by the criterion of `BracketingSolver`, with ``xtol = 1e-10`` on ``[-1, 1]``,
-  and its counts leave out the 2 evaluations at the interval bounds.
+- Oliveira and Takahashi (2020), Table 1, the column "Illinois": reproduced, in ``test_third_party.py``: 16 of the 24
+  iteration counts exactly, 7 within 1, 1 of them only on Linux, and the count for ``noisy_line`` within 4; the test
+  data states why each of the 8 deviates. The table's runs stop by the criterion of `BracketingSolver`, with
+  ``xtol = 1e-10`` on ``[-1, 1]``, and its counts leave out the 2 evaluations at the interval bounds.
 - Ganchovski and Traykov (2023), Table 2, the column "ill": not compared, because the paper does not state the stopping
   rule of its Illinois runs.
 - Ford (1997), Table 4: reproduced, in ``test_third_party.py``: 12 of the 15 iteration counts exactly, and the
