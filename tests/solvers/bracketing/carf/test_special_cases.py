@@ -37,11 +37,11 @@ def test_tiny_function_values_near_the_root_of_x_to_the_19th_still_converge():
 
 
 def test_an_x_value_on_an_interval_bound_ends_the_solve_by_the_evaluation_budget():
-    """At ``xtol = 1e-15``, about 2 ulps at the root of ``(x - 3)^3`` over ``[0, 5]``, the solve ends as ``MAX_FEVALS``
-    within 1 ulp of the root: the clipped x-values round onto the interval bounds, where the quadratic is not defined,
-    and `CARF` takes the zero of the secant through the 2 bounds."""
+    """At ``xtol = 5e-16``, so that the stopping width ``2*xtol`` is about 2 ulps at the root of ``(x - 3)^3`` over
+    ``[0, 5]``, the solve ends as ``MAX_FEVALS`` within 1 ulp of the root: the clipped x-values round onto the interval
+    bounds, where the quadratic is not defined, and `CARF` takes the zero of the secant through the 2 bounds."""
     # --- act --------------------------
-    result = CARF().solve(lambda x: (x - 3.0) ** 3, 0.0, 5.0, xtol=1e-15, max_fevals=100)
+    result = CARF().solve(lambda x: (x - 3.0) ** 3, 0.0, 5.0, xtol=5e-16, max_fevals=100)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.MAX_FEVALS

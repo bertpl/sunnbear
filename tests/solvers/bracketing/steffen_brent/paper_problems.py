@@ -54,8 +54,8 @@ class FigureValues:
         new interval divided by that of the old one.
 
         The interval after each iteration follows from the evaluations by the rule in the `SteffenBrent` class
-        docstring: each iteration evaluates ``s``, and also the midpoint of ``a`` and ``s`` when ``f(a)`` and ``f(s)``
-        differ in sign and ``f(s)`` is not 0.
+        docstring: each iteration evaluates ``s``, and also the midpoint of ``a`` and ``s`` unless ``f(a)`` and
+        ``f(s)`` have the same sign.
         """
         (a, fa), (b, fb), *evaluations = result.history
         if abs(fa) < abs(fb):
@@ -64,9 +64,9 @@ class FigureValues:
         while evaluations:
             old_width = abs(b - a)
             s, fs = evaluations.pop(0)
-            if (fa > 0.0) == (fs > 0.0):
+            if (fa > 0.0 and fs > 0.0) or (fa < 0.0 and fs < 0.0):
                 a, fa = b, fb
-            elif fs != 0.0:
+            else:
                 m, fm = evaluations.pop(0)
                 assert m == (a + s) / 2.0
                 if (fm > 0.0 > fs) or (fm < 0.0 < fs):
@@ -117,11 +117,6 @@ CASE_STUDIES = [
         # - once in each of those 6 iterations;
         # - in 2 of those iterations, also at the midpoint of ``a`` and ``s``.
         n_fevals=2 + 6 + 2,
-        n_fevals_tol=1,
-        deviation_reason=(
-            "The paper's run stops once |f(b)| is small enough, with |f(b)| about 1e-15 after 6 iterations; "
-            "`SteffenBrent` stops on the width of the interval, and takes a 7th iteration, which ends at an exact zero."
-        ),
     ),
     PaperProblem(
         name="case_study_2",

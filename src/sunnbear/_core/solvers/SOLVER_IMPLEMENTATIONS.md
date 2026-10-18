@@ -1,5 +1,3 @@
-> **DISCLAIMER:** this document states the intended implementation approach; some solver implementations still deviate from it.
-
 # Solver implementations
 
 ## I. Introduction

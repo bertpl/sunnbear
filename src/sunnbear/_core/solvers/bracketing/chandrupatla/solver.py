@@ -3,7 +3,7 @@
 import math
 
 from sunnbear._core.solvers.core import Solver, SolveState
-from sunnbear._core.solvers.core.stopping import interval_root, is_interval_converged
+from sunnbear._core.solvers.core.stopping import interval_root_if_converged
 
 
 class Chandrupatla(Solver):
@@ -140,7 +140,4 @@ class Chandrupatla(Solver):
         The test suite overrides this method to apply the listing's own stopping criterion where it reproduces the
         paper's published counts.
         """
-        if is_interval_converged(x1, f1, x2, f2, xtol_doubled):
-            return interval_root(x1, f1, x2, f2)
-        else:
-            return None
+        return interval_root_if_converged(x1, f1, x2, f2, xtol_doubled)
