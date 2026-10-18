@@ -5,9 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
-### Added
+## 0.2.9 (2026-10-18)
 
 ### Changed
 
@@ -16,16 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stop `Brent`, `Chandrupatla`, `TOMS748`, `AndersonBjorck`, `SteffenBrent`, `ModAB` and `CARF` once the interval is at most `2*xtol` wide and return its midpoint, as `Bisection` does, which changes their benchmark results
 - Make the `"standard_stopping_criterion"` variant the core config of `Ridders`, which changes the benchmark results of `Ridders`
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Fix `CARF` ending a solve as `SOLVER_ERROR` on functions with tiny values near the root, such as `x^19`, which also changes some benchmark results of `CARF`
 - Fix trivially inefficient floating-point operations in `Secant`, `SteffenBrent` and `ModAB`, with results staying bit-identical
-
-### Security
 
 ## 0.2.8 (2026-10-14)
 
