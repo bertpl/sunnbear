@@ -5,8 +5,8 @@ from tests.solvers.paper_problems import UNSTATED_RUN_DETAILS
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
 
 # On the problems whose row carries this reason, the evaluation count differs from Table 2's, presumably because the
-# authors' .NET runtime rounds the last bit of a library function differently from the correctly rounded values here,
-# which changes the x-values that the solve evaluates.
+# authors' .NET runtime rounds the last bit of a library function's result differently from the correctly rounded
+# values here, which changes the x-values that the solve evaluates.
 _ROUNDING_DEVIATION_REASON = (
     "the .NET runtime of the paper's benchmark presumably rounds a library function differently"
 )
