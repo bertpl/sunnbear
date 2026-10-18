@@ -149,30 +149,11 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 
 ### IV.b. Iteration Formula
 
-Many solvers compute the same 2 formulas, in forms that are equal in exact arithmetic but round differently. The `sunnbear` solver implementations compute both in 1 shared form:
-- **the secant's zero** through `(a, fa)` and `(b, fb)`, in the form of SciPy's secant method: `(a - q*b) / (1 - q)` with `q = fa/fb` when `|fb| > |fa|`, else `(b - q*a) / (1 - q)` with `q = fb/fa`. The ratio `q` of the smaller `|f|` to the larger never exceeds 1 in magnitude, so the result does not depend on the scale of `f`: it stays finite where `a*fb` or `b*fa` would overflow.
-- **the midpoint** of `[a, b]`: `0.5*(a + b)`
+Each solver computes its steps in the form of its source, the secant's zero and its own midpoints included. Forms that are equal in exact arithmetic round differently, but that rounding moves an evaluation count by about 1 near a stop, favors no solver, and is part of each source's method as published; a source's form also keeps its failures in float64, such as an overflow of `a*fb`.
 
-The framework computes them in the functions `secant_zero` and `midpoint` of `core/formulas.py`.
+A step may be rewritten only where the rewrite gives the same x-value in float64, bit for bit, and only to drop operations that an expert would not write, such as `0.5*(a + b)` for `(a + b) / 2`, or a ratio computed once that a source computes twice. `SteffenBrent` and `ModAB` multiply their midpoints by 0.5, and `Secant` computes SciPy's ratio of the 2 function values once.
 
-This applies to every plain secant step and every plain midpoint, in hybrid methods and in `Secant` too. A step whose form is part of its source's structure, or guards against rounding, keeps its source's form, and a guard that a source adds to a step, such as `ModAB`'s clamp of the secant's zero into the interval, stays.
-
-| Algorithm | Secant's zero | Midpoint |
-| --------- | ------------ | -------- |
-| `Bisection` | – | shared |
-| `RegulaFalsi` | shared | – |
-| `Secant` | shared | – |
-| `Brent` | source's form: `p / q`, divided only after Brent's acceptance test | source's form: `b + m`, where `m = 0.5*(c - b)` also drives Brent's stopping criterion and acceptance test |
-| `Illinois` | shared | – |
-| `Pegasus` | shared | – |
-| `AndersonBjorck` | shared | – |
-| `Ridders` | – | shared |
-| `TOMS748` | shared in the first secant step<br>source's form in the double-size secant step: a step from the bound with the smaller `\|f\|` twice as long as the secant step, which is not a plain secant<br>source's form in the Newton-Quadratic subroutine's fallback secant step `a - fa/a1`, which reuses the slope `a1 = (fb - fa)/(b - a)` of the subroutine's quadratic | shared |
-| `Chandrupatla` | – | source's form: `x1 + t*(x2 - x1)` with `t = 0.5`, where `t` is clamped before every step |
-| `ITP` | shared | shared |
-| `SteffenBrent` | shared | shared |
-| `CARF` | shared | shared |
-| `ModAB` | shared, then clamped into the interval, as its source does | shared |
+The midpoint that the shared stopping criterion returns (section IV.a.2) is `0.5*(a + b)` for every solver: it belongs to the stopping criterion, not to a solver's steps.
 
 ## V. Solver Configurations
 
@@ -233,7 +214,6 @@ A reader must be able to compare each solver with its source step by step:
 
 The tests compare each solver with the published results and reference implementations of section III, to check that it implements its method's steps correctly:
 - **a published table that depends on its article's own stopping criterion** is checked against a subclass of the solver that replaces the shared stopping criterion with the article's; that subclass lives in the solver's test package
-- **a published table that depends on the rounding of its article's form of the secant's zero** is checked against a subclass of the solver that replaces the shared form with the article's, through the method `_secant_zero` that every solver's secant steps call; that subclass lives in the solver's test package too
 - **the docstring of each solver's test package** lists, each with its reason: the published results and reference implementations used for comparison, the allowed deviations, and the published results not used
 - **the `References:` section of each solver's class docstring** cites every source used for the implementation or the validation, with 1 line on what each source provides; the class docstring states each deviation from its sources in 1 bullet
 

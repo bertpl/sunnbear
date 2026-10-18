@@ -18,8 +18,7 @@ Third-party published results:
   - the C# code stops when the next secant's zero lies within the code's tolerance of the previous secant's zero,
     without evaluating the function at the new zero, while `AndersonBjorck` stops on the interval width;
   - the C# code starts with no retained bound, so it never scales a function value before its 2nd iteration;
-  - the C# code computes the scaling factor as ``1 - f_new / f_previous``, where `AndersonBjorck` computes the ratio of
-    2 secant slopes, as its paper does.
+  - the C# code computes the secant's zero and the scaling factor in a different algebraic form from `AndersonBjorck`.
 
 Reference implementations:
 

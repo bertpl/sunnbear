@@ -1,7 +1,6 @@
 """`ModAB` implements the modified Anderson-Björck method, which switches between bisection and Anderson-Björck."""
 
 from sunnbear._core.solvers.core import IntervalBound, Solver, SolveState
-from sunnbear._core.solvers.core.formulas import midpoint
 
 # With this factor, the Anderson-Björck steps may fall 4 steps behind bisection before the solve falls back to
 # bisection: 16 = 2^4 (the paper's section 4.2).
@@ -111,9 +110,9 @@ class ModAB(Solver):
         while True:
             # --- the new x-value x3 -------------
             if is_bisecting:
-                x3 = midpoint(x1, x2)
+                x3 = 0.5 * (x1 + x2)
             else:
-                x3 = self._secant_zero(x1, y1, x2, y2)
+                x3 = (x1 * y2 - y1 * x2) / (y2 - y1)
             if x2 - x1 <= self._get_stop_width(state.xtol, x3):
                 return x3
 

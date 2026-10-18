@@ -68,7 +68,7 @@ class FigureValues:
                 a, fa = b, fb
             elif fs != 0.0:
                 m, fm = evaluations.pop(0)
-                assert m == 0.5 * (a + s)
+                assert m == (a + s) / 2.0
                 if (fm > 0.0 > fs) or (fm < 0.0 < fs):
                     a, fa = m, fm
             b, fb = s, fs

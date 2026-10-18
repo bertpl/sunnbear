@@ -16,7 +16,6 @@ from counted_float import CountedFloat, FlopCountingContext
 from typing_extensions import TypeVar
 
 from .exceptions import DivergedError, FunctionDomainError, MaxFevalsExceeded
-from .formulas import midpoint, secant_zero
 from .interval import Interval
 from .result import SolveResult, SolveStatus
 from .state import SolveState
@@ -110,7 +109,7 @@ class Solver(ABC, Generic[StateT]):
             try:
                 fa, fb = wrapped_f(a_counted), wrapped_f(b_counted)
             except Exception as exc:  # noqa: BLE001 — a failure at an interval bound is recorded like any other
-                x, status, x_failed = self._outcome_from_exception(exc, x_best=midpoint(a_counted, b_counted))
+                x, status, x_failed = self._outcome_from_exception(exc, x_best=0.5 * (a_counted + b_counted))
             else:
                 if fa == 0.0:  # Early exit when a is a root.
                     x, status = a_counted, SolveStatus.CONVERGED
@@ -145,7 +144,7 @@ class Solver(ABC, Generic[StateT]):
         )
 
     # --------------------------------------------------------------------------
-    #  Subclass hooks
+    #  Subclass hook
     # --------------------------------------------------------------------------
     @abstractmethod
     def _solve(self, state: StateT) -> float:
@@ -154,15 +153,6 @@ class Solver(ABC, Generic[StateT]):
         - Evaluate the function only through ``state.f``, and let its interrupts propagate.
         - Keep ``state.x_best`` current, so an interrupted solve still reports the solver's latest estimate as ``x``.
         """
-
-    @staticmethod
-    def _secant_zero(a: float, fa: float, b: float, fb: float) -> float:
-        """Return the zero of the secant through ``(a, fa)`` and ``(b, fb)``, computed by `secant_zero`.
-
-        Every plain secant step of a solver calls this method, so that a test-only subclass can compute the step in a
-        paper's own form where a published table depends on that form's rounding.
-        """
-        return secant_zero(a, fa, b, fb)
 
     # --------------------------------------------------------------------------
     #  Helpers

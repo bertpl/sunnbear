@@ -1,7 +1,6 @@
 """`SteffenBrent` implements the modified Brent method of Steffen et al., which can move a bound onto the midpoint."""
 
 from sunnbear._core.solvers.core import Solver, SolveState
-from sunnbear._core.solvers.core.formulas import midpoint
 
 
 class SteffenBrent(Solver):
@@ -13,9 +12,7 @@ class SteffenBrent(Solver):
     - inverse quadratic interpolation through ``a``, ``b`` and ``b_previous``, the previous value of ``b``, when the 3
       function values are distinct;
     - linear interpolation, a secant step, through ``b`` and ``b_previous``, when the 3 function values are not
-      distinct but ``f(b)`` and ``f(b_previous)`` differ. The step is computed with `secant_zero`; the paper's
-      equation 4 steps from ``b`` instead, as ``b - f(b) * (b_previous - b) / (f(b_previous) - f(b))``, which is equal
-      in exact arithmetic but rounds differently;
+      distinct but ``f(b)`` and ``f(b_previous)`` differ;
     - bisection, in all other cases, and in place of an interpolation step that does not land strictly between ``b``
       and ``(3 * a + b) / 4``.
 
@@ -117,14 +114,14 @@ class SteffenBrent(Solver):
                 denominator = (fb_over_fb_previous - 1.0) * (fb_over_fa - 1.0) * (fa_over_fb_previous - 1.0)
                 s = b + numerator / denominator
             elif fb != fb_previous:
-                # The step is the paper's equation 4: the zero of the secant through b and b_previous.
-                s = self._secant_zero(b, fb, b_previous, fb_previous)
+                # The step is a linear interpolation through b and b_previous, the paper's equation 4.
+                s = b - fb * (b_previous - b) / (fb_previous - fb)
             else:
-                s = midpoint(a, b)
+                s = 0.5 * (a + b)
             # An interpolation step that overflows to inf or nan fails this comparison too, so it becomes a bisection.
             accepted_range_end = (3.0 * a + b) / 4.0
             if not min(b, accepted_range_end) < s < max(b, accepted_range_end):
-                s = midpoint(a, b)
+                s = 0.5 * (a + b)
 
             # --- the evaluation at s ------------
             fs = state.f(s)
@@ -139,7 +136,7 @@ class SteffenBrent(Solver):
             if (fa > 0.0) == (fs > 0.0):
                 a, fa = b, fb
             else:
-                m = midpoint(a, s)
+                m = 0.5 * (a + s)
                 fm = state.f(m)
                 if (fm > 0.0 > fs) or (fm < 0.0 < fs):
                     # The root lies between m and s, so m replaces a: the paper's modification.

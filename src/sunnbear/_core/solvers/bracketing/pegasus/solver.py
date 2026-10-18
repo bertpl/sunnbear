@@ -42,6 +42,8 @@ class Pegasus(BracketingSolver[PegasusState]):
     Pegasus method differs from regula falsi only in its function value at the retained bound, and from the Illinois
     method only in the factor.
 
+    `Illinois` computes the same zero of the secant, in the form of Dowell and Jarratt (1971).
+
     `Pegasus` departs from Dowell and Jarratt (1972), or settles an unspecified detail of the article, in these places:
 
     - **Stopping criterion:** `Pegasus` stops by `BracketingSolver`'s criterion, once the interval is at most
@@ -67,7 +69,7 @@ class Pegasus(BracketingSolver[PegasusState]):
     """
 
     name = "pegasus"
-    version = 3
+    version = 2
     state_cls = PegasusState
 
     def _next_x(self, state: PegasusState, interval: Interval) -> float:
@@ -96,9 +98,9 @@ class Pegasus(BracketingSolver[PegasusState]):
                 state.newest_bound = replaced_bound
             state.newest_f = new_iterate_f
 
-        # --- regula falsi's secant ---------------
+        # --- regula falsi's secant --------------
         if state.newest_bound is IntervalBound.UPPER:
             fa, fb = state.scaled_retained_f, interval.fb
         else:
             fa, fb = interval.fa, state.scaled_retained_f
-        return self._secant_zero(interval.a, fa, interval.b, fb)
+        return (interval.a * fb - interval.b * fa) / (fb - fa)

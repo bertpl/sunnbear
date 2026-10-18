@@ -3,13 +3,10 @@
 import pytest
 
 from sunnbear.solvers import Pegasus
-from tests.solvers.paper_problems.secant_forms import with_textbook_secant_zero
 
 
 def test_the_errors_of_table_1_of_the_dowell_jarratt_paper_are_reproduced():
     """The iterates of `Pegasus` on ``x^3 + 1``, mirrored, have the errors in Table 1 of Dowell and Jarratt (1972).
-
-    The solve takes the secant's zero in the textbook form, as the paper states the step.
 
     The paper starts from x_0 = 0 and x_1 = -2, so its newest starting point is the lower one, while `Pegasus` takes
     the upper bound as its newest starting point. The test therefore solves the mirrored function ``1 - x^3`` over
@@ -25,9 +22,7 @@ def test_the_errors_of_table_1_of_the_dowell_jarratt_paper_are_reproduced():
     dowell_jarratt_table_1_errors = [0.750, 0.534, 0.232, -0.682e-2, 0.184e-2, 0.125e-4]
 
     # --- act --------------------------
-    result = with_textbook_secant_zero(Pegasus)().solve(
-        lambda x: 1.0 - x**3, 0.0, 2.0, xtol=1e-15, max_fevals=20, history_enabled=True
-    )
+    result = Pegasus().solve(lambda x: 1.0 - x**3, 0.0, 2.0, xtol=1e-15, max_fevals=20, history_enabled=True)
 
     # --- assert -----------------------
     # The history starts with the 2 starting points, the mirrored x_0 and x_1, so ``evaluated_x_values[2:8]`` holds

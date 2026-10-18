@@ -5,15 +5,14 @@ import math
 import pytest
 
 from sunnbear.solvers import Illinois
-from tests.solvers.paper_problems.secant_forms import with_textbook_secant_zero
 
 
 def test_the_errors_of_table_1_of_the_dowell_jarratt_paper_are_reproduced():
     """The iterates of `Illinois` on ``sin(x) - 0.5`` have the errors in Table 1 of Dowell and Jarratt (1971).
 
-    The test starts `Illinois` from 0 and 1.5, the paper's x_0 and x_1, with the secant's zero in the textbook form, as
-    the paper states the step. The table lists the error ``x_i - pi/6`` of the iterates ``i = 2`` to 10, each rounded to
-    3 significant digits. That rounding changes a value by at most 0.5 %, so the test compares each error within 0.5 %.
+    The test starts `Illinois` from 0 and 1.5, the paper's x_0 and x_1. The table lists the error ``x_i - pi/6`` of
+    the iterates ``i = 2`` to 10, each rounded to 3 significant digits. That rounding changes a value by at most
+    0.5 %, so the test compares each error within 0.5 %.
 
     The table's error for x_10, below 0.5e-18, is smaller than the gap between adjacent float64 values near ``pi/6``,
     so the test leaves that error out.
@@ -22,9 +21,7 @@ def test_the_errors_of_table_1_of_the_dowell_jarratt_paper_are_reproduced():
     dowell_jarratt_table_1_errors = [0.228, -0.895e-1, 0.666e-2, 0.160e-3, -0.152e-3, 0.702e-8, 0.308e-12, -0.308e-12]
 
     # --- act --------------------------
-    result = with_textbook_secant_zero(Illinois)().solve(
-        lambda x: math.sin(x) - 0.5, 0.0, 1.5, xtol=1e-15, max_fevals=20, history_enabled=True
-    )
+    result = Illinois().solve(lambda x: math.sin(x) - 0.5, 0.0, 1.5, xtol=1e-15, max_fevals=20, history_enabled=True)
 
     # --- assert -----------------------
     # The history starts with the 2 starting points, the paper's x_0 and x_1, so ``evaluated_x_values[2:10]`` holds

@@ -5,7 +5,6 @@ import pytest
 from sunnbear.solvers import ModAB
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem, ganchovski_et_al_stop_width
-from tests.solvers.paper_problems.secant_forms import textbook_secant_zero
 
 from .paper_problems import TABLE_2
 
@@ -57,10 +56,7 @@ def test_the_switches_of_table_1_of_the_paper_are_reproduced():
 #  Helpers
 # ==================================================================================================
 class _ModABWithPaperTolerances(ModAB):
-    """`_ModABWithPaperTolerances` is `ModAB` with the absolute and relative tolerances of the paper's benchmark, and
-    the textbook form of the secant's zero, which the paper's C# code uses."""
-
-    _secant_zero = staticmethod(textbook_secant_zero)
+    """`_ModABWithPaperTolerances` is `ModAB` with the absolute and relative tolerances of the paper's benchmark."""
 
     @staticmethod
     def _get_stop_width(xtol: float, x3: float) -> float:
@@ -78,7 +74,7 @@ def _bisection_iterations(history: tuple[tuple[float, float], ...]) -> list[int]
     (x1, y1), (x2, _) = history[:2]
     iterations = []
     for iteration, (x, y) in enumerate(history[2:], start=1):
-        if x == 0.5 * (x1 + x2):
+        if x == (x1 + x2) / 2.0:
             iterations.append(iteration)
         if (y > 0.0) == (y1 > 0.0):
             x1, y1 = x, y

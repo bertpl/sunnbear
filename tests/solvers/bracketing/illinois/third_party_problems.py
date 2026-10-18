@@ -16,16 +16,9 @@ FORD_TABLE_4 = [
     FordTable4Problem.F2_I1.with_n_iterations(8),
     FordTable4Problem.F2_I2.with_n_iterations(
         15,
-        deviation=2,
-        reason=(
-            "2 successive iterates have |f(x)| within 1 % of Ford's limit on |f(x)|; at each of them, a detail of the "
-            "run that the paper does not state, such as its arithmetic or its math library, can decide whether Ford's "
-            "rule stops there, so each of the 2 can shift the count by 1"
-        ),
-        observation=(
-            "the solve stops on iterate 13, whose |f(x)| is 0.994 times Ford's limit on |f(x)|; iterate 14 has the "
-            "same |f(x)|, and iterate 15, Ford's count, has f(x) == 0"
-        ),
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation="the solve stops on an iterate whose |f(x)| is 0.994 times Ford's limit on |f(x)|",
     ),
     FordTable4Problem.F2_I3.with_n_iterations(70),
     FordTable4Problem.F3_I1.with_n_iterations(7),
@@ -45,7 +38,7 @@ FORD_TABLE_4 = [
         49,
         deviation=1,
         reason=UNSTATED_RUN_DETAILS,
-        observation="the solve stops one iteration early, on an iterate whose |f(x)| is 0.35 times Ford's limit",
+        observation="the solve reaches f(x) == 0 one iteration early",
     ),
 ]
 
@@ -63,7 +56,13 @@ OLIVEIRA_TAKAHASHI_TABLE_1 = [
     OliveiraTakahashiTable1Problem.POLYNOMIAL_2.with_n_iterations(11),
     OliveiraTakahashiTable1Problem.EXPONENTIAL.with_n_iterations(8),
     OliveiraTakahashiTable1Problem.LOGARITHMIC.with_n_iterations(10),
-    OliveiraTakahashiTable1Problem.POSYNOMIAL.with_n_iterations(15),
+    OliveiraTakahashiTable1Problem.POSYNOMIAL.with_n_iterations(
+        15,
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation="the solve takes 1 iteration more, and the table's count with the secant's zero computed as "
+        "(a*fb - b*fa) / (fb - fa)",
+    ),
     OliveiraTakahashiTable1Problem.WEIERSTRASS.with_n_iterations(11),
     OliveiraTakahashiTable1Problem.POLYNOMIAL_FRACTION.with_n_iterations(13),
     OliveiraTakahashiTable1Problem.NORMAL_CDF.with_n_iterations(8),
@@ -74,14 +73,44 @@ OLIVEIRA_TAKAHASHI_TABLE_1 = [
         observation="the solve takes 1 iteration less: iterate 9 has f(x) == 0",
     ),
     OliveiraTakahashiTable1Problem.POLYNOMIAL_3.with_n_iterations(144),
-    OliveiraTakahashiTable1Problem.EXPONENTIAL_POLYNOMIAL.with_n_iterations(146),
-    OliveiraTakahashiTable1Problem.TANGENT_POLYNOMIAL.with_n_iterations(110),
+    OliveiraTakahashiTable1Problem.EXPONENTIAL_POLYNOMIAL.with_n_iterations(
+        146,
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation="the solve takes 1 iteration more, and the table's count with the secant's zero computed as "
+        "(a*fb - b*fa) / (fb - fa)",
+    ),
+    OliveiraTakahashiTable1Problem.TANGENT_POLYNOMIAL.with_n_iterations(
+        110,
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation="the solve takes 1 iteration less, and the table's count with the secant's zero computed as "
+        "(a*fb - b*fa) / (fb - fa)",
+    ),
     OliveiraTakahashiTable1Problem.CIRCLES.with_n_iterations(26),
     OliveiraTakahashiTable1Problem.STEP_FUNCTION.with_n_iterations(155),
-    OliveiraTakahashiTable1Problem.GEOMETRIC.with_n_iterations(69),
+    OliveiraTakahashiTable1Problem.GEOMETRIC.with_n_iterations(
+        69,
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation="the solve takes 1 iteration less, and the table's count with the secant's zero computed as "
+        "(a*fb - b*fa) / (fb - fa)",
+    ),
     OliveiraTakahashiTable1Problem.TRUNCATED_POLYNOMIAL.with_n_iterations(38),
     OliveiraTakahashiTable1Problem.STAIRCASE.with_n_iterations(34),
-    OliveiraTakahashiTable1Problem.NOISY_LINE.with_n_iterations(20),
+    OliveiraTakahashiTable1Problem.NOISY_LINE.with_n_iterations(
+        20,
+        deviation=4,
+        reason=(
+            "the paper does not state in which form its runs compute the secant's zero, and f has roots about 3e-6 "
+            "apart between -0.1 and 0.1, so the rounding of the first iterates decides which root the solve reaches"
+        ),
+        observation=(
+            "the solve takes 4 iterations less and reaches the root near -0.0534; with the secant's zero computed as "
+            "(a*fb - b*fa) / (fb - fa), iterate 1 differs by 505 ulps, and the solve reaches the root near -0.0356 "
+            "after the table's count"
+        ),
+    ),
     OliveiraTakahashiTable1Problem.WARSAW.with_n_iterations(12),
     OliveiraTakahashiTable1Problem.SAWTOOTH.with_n_iterations(2),
     OliveiraTakahashiTable1Problem.SAWTOOTH_CUBE.with_n_iterations(96),

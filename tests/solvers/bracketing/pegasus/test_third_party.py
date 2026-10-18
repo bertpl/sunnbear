@@ -5,7 +5,6 @@ import pytest
 from sunnbear.solvers import Pegasus
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.ford import FordTable4Problem, assert_n_fevals_at_ford_stop_reproduced
-from tests.solvers.paper_problems.secant_forms import with_textbook_secant_zero
 
 from .third_party_problems import FORD_TABLE_4
 
@@ -19,7 +18,6 @@ def test_the_rows_of_table_4_of_ford_name_every_problem_of_the_table_in_order():
 @pytest.mark.parametrize("problem", FORD_TABLE_4, ids=str)
 def test_the_iteration_counts_of_table_4_of_ford_are_reproduced(problem: PaperProblem):
     """On every row of Table 4 of Ford (1997), `Pegasus` takes Ford's count of iterations until Ford's stopping rule
-    stops it, within the row's allowed deviation, with the secant's zero in the textbook form, in which Ford writes
-    the Pegasus step."""
+    stops it, within the row's allowed deviation."""
     # --- act / assert -----------------
-    assert_n_fevals_at_ford_stop_reproduced(with_textbook_secant_zero(Pegasus)(), problem)
+    assert_n_fevals_at_ford_stop_reproduced(Pegasus(), problem)

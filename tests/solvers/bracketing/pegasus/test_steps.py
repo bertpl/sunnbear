@@ -2,7 +2,6 @@
 
 import pytest
 
-from sunnbear._core.solvers.core.formulas import secant_zero
 from sunnbear.solvers import Pegasus, SolveStatus
 from tests.solvers.example_functions import cubic
 
@@ -33,15 +32,15 @@ def test_the_first_2_steps_are_regula_falsi_and_later_steps_scale_the_retained_f
 
     # --- assert -----------------------
     (x1, f1), (x2, f2), (x3, f3), (x4, _) = history[2:6]
-    assert x1 == secant_zero(a, fa, b, fb)
+    assert x1 == (a * fb - b * fa) / (fb - fa)
     # f1 < 0, so x1 replaced the lower bound; the upper bound is kept for the first time, at its own value.
     assert f1 < 0.0
-    assert x2 == secant_zero(x1, f1, b, fb)
+    assert x2 == (x1 * fb - b * f1) / (fb - f1)
     # f2 < 0 too, so x2 replaced x1 and the upper bound is kept a second time: its value is scaled.
     assert f2 < 0.0
     scaled_fb = fb * f1 / (f1 + f2)
-    assert x3 == secant_zero(x2, f2, b, scaled_fb)
+    assert x3 == (x2 * scaled_fb - b * f2) / (scaled_fb - f2)
     # f3 < 0 too: the scaled value is scaled again, by the factor of x2 and x3.
     assert f3 < 0.0
     scaled_fb = scaled_fb * f2 / (f2 + f3)
-    assert x4 == secant_zero(x3, f3, b, scaled_fb)
+    assert x4 == (x3 * scaled_fb - b * f3) / (scaled_fb - f3)

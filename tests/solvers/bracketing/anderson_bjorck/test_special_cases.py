@@ -21,9 +21,8 @@ def test_a_step_that_rounds_onto_the_most_recent_iterate_takes_the_factor_0_5():
     """On `cubic` over ``[1, 2]``, the 7th iterate lies within rounding error of the root while the retained bound is
     still far from it.
 
-    The next 2 steps round onto the 7th iterate, so the slope from the previous to the new iterate is ``0 / 0`` each
-    time; the factor 0.5, taken at each of them, then moves the following step away from the 7th iterate, and the
-    solve converges.
+    The next 2 steps round onto the 7th iterate, so the slope from the previous to the new iterate is ``0 / 0``; the
+    factor 0.5 then moves the following step away from the 7th iterate, and the solve converges.
     """
     # --- act --------------------------
     result = AndersonBjorck().solve(cubic, 1.0, 2.0, xtol=1e-9, max_fevals=60, history_enabled=True)

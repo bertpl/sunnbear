@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Make the solvers compute most secant steps in SciPy's form, which stays accurate for huge and tiny function values, and every midpoint in 1 shared form, which changes the benchmark results of most solvers slightly
-
 ### Deprecated
 
 ### Removed
@@ -20,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix `CARF` ending a solve as `SOLVER_ERROR` on functions with tiny values near the root, such as `x^19`, which also changes some benchmark results of `CARF`
+- Fix trivially inefficient floating-point operations in `Secant`, `SteffenBrent` and `ModAB`, with results staying bit-identical
 
 ### Security
 

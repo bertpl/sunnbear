@@ -5,8 +5,6 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import cached_property
 
-from .formulas import midpoint
-
 
 # ==================================================================================================
 #  IntervalBound
@@ -91,7 +89,7 @@ class Interval(ABC):
     @cached_property
     def midpoint(self) -> float:
         """Return the midpoint of the interval."""
-        return midpoint(self.a, self.b)
+        return 0.5 * (self.a + self.b)
 
     @cached_property
     def is_fa_zero(self) -> bool:

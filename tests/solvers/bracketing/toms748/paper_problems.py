@@ -173,12 +173,9 @@ PRINTED_ROOTS = {
     "28[n=1000]": 1.2388385788997e-06,
 }
 
-# ``root_rel_tol = 1e-13`` is the precision of a root printed to 14 significant digits. Problem 26 is exactly 0
-# wherever exp(1 / x^2) overflows, for |x| below about 0.0375, so every x-value there is an exact root, and which one
-# a solve evaluates first depends on the last bits of its steps; the printed root of problem 26 is not compared.
+# ``root_rel_tol = 1e-13`` is the precision of a root printed to 14 significant digits.
 AUTHORS_TEST_OUTPUT = [
-    problem if problem.name == "26[n=1]" else replace(problem, root=PRINTED_ROOTS[problem.name], root_rel_tol=1e-13)
-    for problem in ALEFELD_POTRA_SHI_PROBLEMS
+    replace(problem, root=PRINTED_ROOTS[problem.name], root_rel_tol=1e-13) for problem in ALEFELD_POTRA_SHI_PROBLEMS
 ]
 
 

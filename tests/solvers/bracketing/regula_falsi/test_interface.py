@@ -5,10 +5,10 @@ from tests.solvers.example_functions import cubic
 
 
 def test_name_version_and_that_its_arithmetic_is_counted():
-    """`RegulaFalsi` is named ``regula_falsi``, at version 2, and its arithmetic is flop-counted."""
+    """`RegulaFalsi` is named ``regula_falsi``, at version 1, and its arithmetic is flop-counted."""
     # --- act --------------------------
     result = RegulaFalsi().solve(cubic, 1.0, 2.0, xtol=1e-3, max_fevals=20)
 
     # --- assert -----------------------
-    assert (RegulaFalsi.name, RegulaFalsi.version) == ("regula_falsi", 2)
+    assert (RegulaFalsi.name, RegulaFalsi.version) == ("regula_falsi", 1)
     assert result.flop_counts.total_count() > 0

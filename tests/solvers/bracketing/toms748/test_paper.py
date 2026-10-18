@@ -25,9 +25,8 @@ def test_the_printed_roots_name_exactly_the_alefeld_potra_shi_problems():
 
 @pytest.mark.parametrize("problem", AUTHORS_TEST_OUTPUT, ids=str)
 def test_k_2_reproduces_the_root_that_the_authors_code_computes(problem: PaperProblem):
-    """With ``k = 2`` and ``tol = 0``, the setting of the authors' test runs, `TOMS748` converges; wherever the test
-    data holds the root that the authors' code prints, `TOMS748` returns it within a relative 1e-13, the precision of
-    its 14 printed digits."""
+    """With ``k = 2`` and ``tol = 0``, the setting of the authors' test runs, `TOMS748` returns the root that the
+    authors' code prints, within a relative 1e-13, the precision of its 14 printed digits."""
     # --- act --------------------------
     # An xtol of 0 makes tol 0.
     result = TOMS748(k=2).solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100)
@@ -59,13 +58,12 @@ def test_the_rows_of_tables_iv_to_vi_name_every_problem_of_the_tables_in_order(k
         (2, None, 2884),
     ],
 )
-def test_the_total_evaluation_count_lies_within_1_2_percent_of_the_papers_table_ii(k, n_digits, paper_total):
-    """Over the problems in `AUTHORS_TEST_OUTPUT`, the total evaluation count lies within 1.2 % of the paper's Table II,
+def test_the_total_evaluation_count_lies_within_1_1_percent_of_the_papers_table_ii(k, n_digits, paper_total):
+    """Over the problems in `AUTHORS_TEST_OUTPUT`, the total evaluation count lies within 1.1 % of the paper's Table II,
     for each ``k`` and for each of the paper's tolerances ``tol = 10^-n_digits`` and ``tol = 0``.
 
     The paper's counts include the 2 evaluations at the interval bounds, and come from a machine whose relative
-    precision was 1.907e-16, not 2^-52. The totals that this test computes also differ by a few evaluations between
-    macOS and Linux, so the tolerance has to cover that difference too.
+    precision was 1.907e-16, not 2^-52.
     """
     # --- arrange / act ----------------
     total = sum(
@@ -76,7 +74,7 @@ def test_the_total_evaluation_count_lies_within_1_2_percent_of_the_papers_table_
     )
 
     # --- assert -----------------------
-    assert abs(total - paper_total) <= 0.012 * paper_total
+    assert abs(total - paper_total) <= 0.011 * paper_total
 
 
 @pytest.mark.parametrize(

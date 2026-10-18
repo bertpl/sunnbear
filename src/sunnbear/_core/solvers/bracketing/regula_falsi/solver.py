@@ -29,8 +29,8 @@ class RegulaFalsi(BracketingSolver):
     """
 
     name = "regula_falsi"
-    version = 2
+    version = 1
 
     def _next_x(self, state: SolveState, interval: Interval) -> float:
         """Return the zero of the secant through ``(a, f(a))`` and ``(b, f(b))``."""
-        return self._secant_zero(interval.a, interval.fa, interval.b, interval.fb)
+        return (interval.a * interval.fb - interval.b * interval.fa) / (interval.fb - interval.fa)
