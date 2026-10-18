@@ -19,10 +19,10 @@ def test_a_k_other_than_1_or_2_is_rejected():
 
 
 def test_name_version_and_that_its_arithmetic_is_counted():
-    """`TOMS748` is named ``toms748``, at version 1, and its arithmetic is flop-counted."""
+    """`TOMS748` is named ``toms748``, at version 2, and its arithmetic is flop-counted."""
     # --- act --------------------------
     result = TOMS748(k=1).solve(cubic, 1.0, 2.0, xtol=1e-3, max_fevals=20)
 
     # --- assert -----------------------
-    assert (TOMS748.name, TOMS748.version) == ("toms748", 1)
+    assert (TOMS748.name, TOMS748.version) == ("toms748", 2)
     assert result.flop_counts.total_count() > 0

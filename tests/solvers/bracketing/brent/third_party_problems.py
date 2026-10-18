@@ -70,9 +70,9 @@ ALEFELD_POTRA_SHI_TABLES_IV_TO_VI = [
         23,
         deviation=None,
         reason=(
-            "the function underflows to 0 on an interval around its root at 0, so the count depends on where the "
-            "platform's exp underflows; the paper's Section 6 states that how this function is coded changes the "
-            "results"
+            "the function is 0 on an interval around its root at 0, where exp(1 / x^2) overflows, so the count "
+            "depends on where the platform's exp overflows; the paper's Section 6 states that how this function is "
+            "coded changes the results"
         ),
     ),
     AlefeldPotraShiTablesIVToVIProblem.P13_N1.with_n_fevals(19),

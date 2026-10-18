@@ -18,9 +18,11 @@ DEFAULT_N_BISECTION_FEVALS = 40
 # A solve's evaluation budget is this many times bisection's evaluation count.
 MAX_FEVALS_FACTOR = 4
 
-# `xtol_min` from `compute_xtol_range` must be at least this many times `FLOAT64_EPS · max(|a|, |b|)`. `Brent` and
-# `TOMS748` each subtract a smaller multiple of that amount from `xtol` to allow for rounding, and guarantee a result
-# within `xtol` of a root only while `xtol` minus that multiple stays positive.
+# `xtol_min` from `compute_xtol_range` must be at least this many times `FLOAT64_EPS * max(|a|, |b|)`, so that `xtol`
+# spans at least this many float64 spacings at the interval bounds:
+# - the interval can shrink to the shared stopping width of `2*xtol`;
+# - the minimum step of `Brent`, `xtol + 2*FLOAT64_EPS*|b|`, stays below `2*xtol`, so that no step lands on the
+#   interval bound `c` on the other side of the root from `b`.
 MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND = 8
 
 

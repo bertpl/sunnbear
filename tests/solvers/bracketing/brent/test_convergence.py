@@ -8,14 +8,13 @@ from tests.solvers.example_functions import CONVERGENCE_TEST_CASES, ninth_power
 
 @pytest.mark.parametrize("f, a, b, root", CONVERGENCE_TEST_CASES)
 def test_a_function_converges_to_its_root(f, a, b, root):
-    """`Brent` returns an evaluated x-value within ``xtol`` of the root on each function of `CONVERGENCE_TEST_CASES`."""
+    """`Brent` returns an x-value within ``xtol`` of the root on each function of `CONVERGENCE_TEST_CASES`."""
     # --- act --------------------------
-    result = Brent().solve(f, a, b, xtol=1e-10, max_fevals=500, history_enabled=True)
+    result = Brent().solve(f, a, b, xtol=1e-10, max_fevals=500)
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
     assert abs(result.x - root) <= 1e-10
-    assert result.x in result.evaluated_x_values
 
 
 def test_a_multiple_root_converges_within_3_times_the_evaluations_of_bisection():

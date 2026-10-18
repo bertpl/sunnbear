@@ -4,7 +4,7 @@ against it."""
 import mpmath
 from mpmath.calculus.optimization import Illinois as MpmathIllinois
 
-from sunnbear.solvers import Interval
+from sunnbear.solvers import Interval, IntervalBound
 from tests.solvers.example_functions import steep_exponential
 from tests.solvers.twins import TWIN_TEST_CASES, StoppingWrappedFunction, TwinSolver
 
@@ -61,3 +61,22 @@ class AndersonBjorckMpmathTwin(TwinSolver):
             return x_best
         else:
             return None
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _get_bounds_best_estimate_first(interval: Interval) -> tuple[tuple[float, float], tuple[float, float]]:
+        """Return the 2 bounds of ``interval`` as ``(x, f(x))`` pairs, the best root estimate first.
+
+        The best root estimate is the bound with the smaller ``|f|``. When both ``|f|`` are equal, the bound that the
+        last split replaced, which holds the newest point, comes first.
+        """
+        if interval.last_replaced_bound is IntervalBound.LOWER:
+            x_newest, f_newest, x_other, f_other = interval.a, interval.fa, interval.b, interval.fb
+        else:
+            x_newest, f_newest, x_other, f_other = interval.b, interval.fb, interval.a, interval.fa
+        if abs(f_other) < abs(f_newest):
+            return (x_other, f_other), (x_newest, f_newest)
+        else:
+            return (x_newest, f_newest), (x_other, f_other)
