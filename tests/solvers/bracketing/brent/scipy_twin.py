@@ -3,54 +3,37 @@
 import scipy.optimize
 
 from sunnbear._core.utils.floats import FLOAT64_EPS
-from sunnbear.solvers import Interval
 from tests.solvers.twins import StoppingWrappedFunction, TwinSolver
 
 
 class BrentScipyTwin(TwinSolver):
-    """`BrentScipyTwin` hands the interval to `scipy.optimize.brentq` and returns ``b`` after the evaluation at which
-    `Brent` would stop.
+    """`BrentScipyTwin` hands the interval to `scipy.optimize.brentq`, and stops it where `Brent` stops, by the shared
+    stopping criterion of `TwinSolver`.
 
-    SciPy's ``brentq`` is SciPy's own C implementation of Brent's method. Its tolerance, ``(xtol + rtol * |b|) / 2``,
-    equals Brent's ``tol = 2 * macheps * |b| + t`` with ``t`` the absolute tolerance that `Brent` derives from its
-    ``xtol``, when the twin passes brentq ``xtol=2 * t`` and ``rtol=4 * macheps``, so SciPy's steps match those of
-    `Brent`.
+    SciPy's ``brentq`` is SciPy's own C implementation of Brent's method. Its tolerance, ``(xtol + rtol*|b|) / 2``,
+    equals Brent's ``tol = 2*macheps*|b| + t`` with ``t = xtol``, as `Brent` sets it, when the twin passes brentq
+    ``xtol=2*xtol`` and ``rtol=4*macheps``, so SciPy's steps match those of `Brent`.
 
     The twin deviates from exact agreement in these declared ways:
 
     - SciPy evaluates both interval bounds again before its first step;
     - SciPy computes the interpolation step from divided differences, where `Brent` computes it as ``p / q``, so the
-      evaluated x-values can differ in their last bits;
+      evaluated x-values can differ in their last bits; where the product in the denominator of SciPy's inverse
+      quadratic step underflows to 0, as on ``x^19`` near its root, SciPy bisects where `Brent` interpolates; no twin
+      test case reaches such a bisection;
     - SciPy tests a few of Brent's conditions with a strict inequality where Brent's procedure has a non-strict one,
       and the reverse; a strict and a non-strict comparison give different results only when
       the 2 sides are exactly equal;
     - SciPy accepts an interpolation step by comparing step lengths only, without Brent's test of the step's
-      direction toward ``c``; no twin test case reaches a step on which the 2 tests differ.
+      direction toward ``c``; no twin test case reaches a step on which the 2 tests differ;
+    - SciPy stops by its own criterion once the interval is narrower than ``2*tol``, which can happen before it is
+      ``2*xtol`` wide; `TwinSolver` then fails the comparison, and no twin test case reaches such a stop.
     """
 
     name = "brent_scipy_twin"
-    version = 1
+    version = 2
     n_reevaluated_bounds = 2
 
     def _run_reference(self, f: StoppingWrappedFunction, a: float, b: float, xtol: float) -> None:
-        """Run SciPy's brentq with ``xtol`` and ``rtol`` set so that its tolerance equals Brent's ``tol``.
-
-        The twin runs 1 solve at a time, so it keeps that solve's ``t`` on the instance for
-        `_root_if_sunnbear_solver_stops`.
-        """
-        self._brent_t = 0.5 * (xtol - 6.0 * FLOAT64_EPS * max(abs(a), abs(b)))
-        scipy.optimize.brentq(f, a, b, xtol=2.0 * self._brent_t, rtol=4.0 * FLOAT64_EPS)
-
-    def _root_if_sunnbear_solver_stops(
-        self, interval: Interval, evaluations: list[tuple[float, float]], xtol: float
-    ) -> float | None:
-        """Return ``b`` if `Brent` stops after the last of ``evaluations``, or ``None`` if it continues.
-
-        As in `Brent`, ``b`` is the interval bound with the smaller ``|f|``, and the newest x-value when both are
-        equal.
-        """
-        (b, fb), (c, _) = self._get_bounds_best_estimate_first(interval)
-        if abs(0.5 * (c - b)) <= 2.0 * FLOAT64_EPS * abs(b) + self._brent_t or fb == 0.0:
-            return b
-        else:
-            return None
+        """Run SciPy's brentq with ``xtol`` and ``rtol`` set so that its tolerance equals Brent's ``tol``."""
+        scipy.optimize.brentq(f, a, b, xtol=2.0 * xtol, rtol=4.0 * FLOAT64_EPS)
