@@ -32,9 +32,12 @@ def _random_axis(seed: int) -> tuple[np.ndarray, np.ndarray]:
 
 
 def _limit_of(value: float, all_values: np.ndarray, is_shift_left: bool) -> float:
-    """Return the limit of a new value that moves left or right: the edge of the neighbor's fine lane that faces the
-    value, on the side the value moves to. The lowest value's left neighbor and the highest value's right neighbor lie
-    across 0 and 1, and the limit never lies beyond 0 or 1."""
+    """Return the limit of a new value: the edge of its neighbor's fine lane that faces the value, on the side that the
+    value moves to.
+
+    The lowest value's left neighbor and the highest value's right neighbor lie across 0 and 1, and the limit never lies
+    beyond 0 or 1.
+    """
     if is_shift_left:
         below = all_values[all_values < value]
         if below.size:
@@ -53,9 +56,14 @@ def _limit_of(value: float, all_values: np.ndarray, is_shift_left: bool) -> floa
 
 @pytest.mark.parametrize("seed", range(40))
 def test_the_correction_keeps_the_fine_lanes_the_order_and_the_size_below_and_moves_the_new_ones_1_way(seed):
-    """On random axes, no fine lane ends with 2 tuples, the values of the size below and the order stay, every new
-    tuple moves toward the same side apart from a nudge of a few float64 steps, no tuple moves more than halfway to its
-    limit, and the mean reaches 0.5 unless the cap ends at its lower bound."""
+    """On random axes, the correction keeps these properties:
+
+    - no fine lane ends with 2 tuples;
+    - the values of the size below and the order of all values stay;
+    - every new tuple moves toward the same side, apart from a nudge of a few float64 steps;
+    - no tuple moves more than halfway to its limit;
+    - the mean reaches 0.5 unless the cap ends at its lower bound.
+    """
     # --- arrange ----------------------
     required, new = _random_axis(seed)
     all_before = np.concatenate([required, new])
@@ -131,9 +139,9 @@ def test_the_nudge_refuses_a_value_whose_fine_lane_holds_no_value_with_min_n_bit
 
 
 def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_the_rest():
-    """When the size below holds a tuple at 0.9, a new tuple at 0.95 cannot reach 0.1, the value that a mean of 0.5
-    needs: it stops at its halfway point, between 0.95 and its limit at the right edge of the fine lane of the tuple at
-    0.9, and the correction reports the offset that remains."""
+    """When the size below holds a tuple at 0.9, a mean of 0.5 needs the new tuple at 0.95 to reach 0.1. It cannot: it
+    stops halfway to the right edge of the fine lane of the tuple at 0.9, and the correction reports the offset that
+    remains."""
     # --- act --------------------------
     correction = MCTuplesAxisValueCorrection.of(np.array([0.9]), np.array([0.95]))
 

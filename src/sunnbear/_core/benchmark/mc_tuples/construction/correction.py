@@ -21,23 +21,27 @@ value is the lowest value's neighbor across 0 and 1.
 
 From the values before the correction, each new tuple i gets:
 
-- a limit l_i: the right edge of its left neighbor's fine lane, but never below 0, because a value that crossed 0 would
-  raise the mean instead of lowering it;
+- a limit l_i, the lowest value that the tuple could take while it stays out of its left neighbor's fine lane: the
+  right edge of that fine lane, but never below 0, because a value that crossed 0 would raise the mean, not lower it;
 - a halfway point h_i = (u_i + l_i) / 2 between its value and its limit.
 
 A cap D then bounds each new tuple's spacing to its left neighbor's moved value, but no tuple moves past its halfway
-point: u'_i = max(h_i, min(u_i, u'_{i-1} + D)).
+point: u'_i = max(h_i, min(u_i, u'_{i-1} + D)). For the lowest value, u'_{i-1} is the highest value minus 1, taken
+before the correction moves the highest value, so after the correction the spacing between the 2 can exceed D.
 
 So the largest spacings shrink first and the smallest keep their value. Every u'_i rises with D without jumps, and a
-bisection over D finds the cap at which the mean is exactly 0.5; when the halfway points leave too little room, the cap
-ends at its lower bound and `offset_after_fine_lanes` reports the offset that remains.
+bisection over D finds the cap at which the mean is exactly 0.5.
 
-The halfway point keeps every moved value off its limit, an edge of a fine lane: a value clipped onto its limit would
-hold few bits of information, and after a right shift it would sit on the lower edge of its right neighbor's fine
-lane, which belongs to that neighbor.
+When the new tuples cannot bring the mean to 0.5 without passing their halfway points, the cap ends at its lower bound,
+and `offset_after_fine_lanes` reports the offset that remains.
+
+The halfway point keeps every moved value off its limit, an edge of a fine lane: a value clipped onto its limit would be
+a multiple of 1 / N_FINE_LANES and hold fewer than `MIN_N_BITS` bits of information. For a mean below 0.5, where the
+new tuples move right, it would also sit on the lower edge of its right neighbor's fine lane, which belongs to that
+neighbor.
 
 No fine lane ever holds 2 tuples, at any D: every new tuple stays above its left neighbor's fine lane, and all new
-tuples move the same way, so the order of the values never changes.
+tuples move in the same direction, so the order of the values never changes.
 
 A mean below 0.5 mirrors the rule.
 
@@ -183,31 +187,29 @@ class MCTuplesAxisValueCorrection:
         order = np.argsort(values)
         sorted_values = values[order].tolist()
         is_new = (order >= required_values.size).tolist()
-        # The left edge of the axis, which the values move toward; no value crosses it, because a value that crossed it
-        # would move the mean the other way.
+        # axis_left_edge is the left edge of the axis: 0, or -1 on the negated axis of a right shift.
         axis_left_edge = 0.0 if is_shift_left else -1.0
 
-        # Each new value's halfway point lies halfway between the value and its limit, both fixed from the values before
-        # the correction. The limit is the right edge of the left neighbor's fine lane, but never below the axis's left
-        # edge. The lowest value's left neighbor is the highest value minus 1, its neighbor across that edge on the
-        # circle.
+        # Each new value's halfway point is fixed from the values before the correction; the module docstring defines
+        # the limit and the lowest value's left neighbor.
         left_neighbors = np.array([sorted_values[-1] - 1.0, *sorted_values[:-1]])
-        _, lane_right_edges = fine_lane_edges_of(fine_lanes_of(left_neighbors))
+        _, left_neighbor_fine_lane_right_edges = fine_lane_edges_of(fine_lanes_of(left_neighbors))
         halfway_points = [-math.inf] * len(sorted_values)
         for i, value in enumerate(sorted_values):
             if is_new[i]:
-                limit = max(float(lane_right_edges[i]), axis_left_edge)
+                limit = max(float(left_neighbor_fine_lane_right_edges[i]), axis_left_edge)
                 halfway_points[i] = 0.5 * (value + limit)
 
         def moved_values(cap: float) -> np.ndarray:
             moved = list(sorted_values)
             for i, value in enumerate(sorted_values):
                 if is_new[i]:
-                    # The lowest value reads the highest value before that value moves, so its cap is measured from the
-                    # highest value's original value minus 1; the highest value only moves away from it, so after the
-                    # correction their spacing can exceed D.
-                    left_neighbor = moved[i - 1] if i > 0 else moved[-1] - 1.0
-                    moved[i] = max(halfway_points[i], min(value, left_neighbor + cap))
+                    # For the lowest value, moved[-1] still holds the highest value from before the correction, because
+                    # the loop has not reached it yet, so the cap is measured from that highest value minus 1. The
+                    # highest value can only move left, away from the lowest value across 0, so after the correction
+                    # the spacing between the 2 can exceed D.
+                    moved_left_neighbor = moved[i - 1] if i > 0 else moved[-1] - 1.0
+                    moved[i] = max(halfway_points[i], min(value, moved_left_neighbor + cap))
             unsorted = np.empty(len(moved))
             unsorted[order] = moved
             return sign * unsorted[required_values.size :]
