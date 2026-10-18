@@ -68,7 +68,7 @@ class BenchmarkWorkerPool:
                 an interactive session, because a worker cannot import a definition from an interactive session.
         """
         n_workers = n_workers if n_workers is not None else (os.cpu_count() or 1)
-        module_names = {type(config).__module__ for config in solver_configs}
+        module_names = {config.module_name for config in solver_configs}
         module_names |= {type(function.formula).__module__ for function in functions}
         if (
             n_workers > 1

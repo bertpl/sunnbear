@@ -13,7 +13,15 @@ from sunnbear._core.benchmark.runner import task
 from sunnbear._core.benchmark.runner.results_schema import RESULTS_SCHEMA, solver_flop_count_column_name
 from sunnbear._core.benchmark.runner.run_settings import BenchmarkRunSettings
 from sunnbear._core.benchmark.runner.task import BenchmarkTask
-from sunnbear.solvers import Solver, SolverConfig, SolverConfigRegistry, SolverRole, SolveState, SolveStatus
+from sunnbear.solvers import (
+    Solver,
+    SolverConfig,
+    SolverConfigRegistry,
+    SolverConfigs,
+    SolverRole,
+    SolveState,
+    SolveStatus,
+)
 
 N_BISECTION_FEVALS = 40
 SIZE = 32
@@ -53,13 +61,13 @@ def cubic() -> functions.TestFunction:
 def unevaluated_midpoint_and_stalling_configs(isolated_solver_config_registry) -> tuple[SolverConfig, SolverConfig]:
     """Return configs of `_UnevaluatedMidpointSolver` and `_StallingSolver`, registered only for the test."""
 
-    class _UnevaluatedMidpointConfig(SolverConfig):
+    class _UnevaluatedMidpointConfigs(SolverConfigs):
         solver_cls = _UnevaluatedMidpointSolver
-        role = SolverRole.USER_OTHER
+        configs = (SolverConfig(role=SolverRole.USER_OTHER),)
 
-    class _StallingConfig(SolverConfig):
+    class _StallingConfigs(SolverConfigs):
         solver_cls = _StallingSolver
-        role = SolverRole.USER_OTHER
+        configs = (SolverConfig(role=SolverRole.USER_OTHER),)
 
     return SolverConfigRegistry.config_from_id("unevaluated_midpoint"), SolverConfigRegistry.config_from_id("stalling")
 

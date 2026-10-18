@@ -16,7 +16,6 @@ from counted_float import FlopCountingContext, UncountedOperationError, Verbosit
 
 import sunnbear._core.solvers as solvers_package
 from sunnbear._core.solvers.core import solver as solver_module
-from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
 from sunnbear.solvers import BracketingSolver, Interval, Solver, SolverConfigRegistry, SolveState
 from tests.solvers.twins import TWIN_TEST_CASES
 
@@ -26,9 +25,9 @@ _SOLVERS_DIR = Path(solvers_package.__file__).parent
 # `core/` converts to `float` on purpose, where values pass between the solver and the function or the caller.
 _ALGORITHM_DIRS = sorted(path.parent for path in _SOLVERS_DIR.glob("*/__init__.py") if path.parent.name != "core")
 
-# Defining a SolverConfig subclass registers it, so the registry also holds the configs that test modules define;
-# the built-in configs are the ones defined inside the sunnbear package.
-_BUILT_IN_CONFIGS = [config for config in SolverConfigRegistry.configs() if is_defined_in_sunnbear(type(config))]
+# Defining a SolverConfigs subclass registers its configs, so the registry also holds the configs that test modules
+# declare; the built-in configs are the ones declared inside the sunnbear package.
+_BUILT_IN_CONFIGS = [config for config in SolverConfigRegistry.configs() if config.module_name.startswith("sunnbear.")]
 
 
 # ==================================================================================================

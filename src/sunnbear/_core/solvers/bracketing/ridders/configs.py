@@ -1,51 +1,29 @@
 """This module declares the built-in configs of `Ridders`, 1 per variant."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigs, SolverRole
 
 from .solver import Ridders
 from .variant import RiddersVariant
 
 
-class RiddersStandardStoppingCriterionConfig(SolverConfig):
-    """`RiddersStandardStoppingCriterionConfig` is the core config of `Ridders`, with the steps that the paper states.
+class RiddersConfigs(SolverConfigs):
+    """`RiddersConfigs` declares the configs of `Ridders`, 1 per variant.
 
-    The paper states no stopping criterion, so this config uses the shared stopping criterion of the bracketing
-    solvers, and checks it where SciPy's ``ridder`` checks its own.
+    - ``ridders[variant='standard_stopping_criterion']``, the core config: the paper's steps, with the shared stopping
+      criterion;
+    - ``ridders[variant='scipy']``, a secondary config: SciPy's step limit and stopping criterion;
+    - ``ridders[variant='commons_math']``, a secondary config: Apache Commons Math's stopping criterion.
 
-    This config's evaluation counts can vary between near-identical functions; the docstring of `Ridders` states why,
-    under **Limit on the step**.
+    Section V.a of ``SOLVER_IMPLEMENTATIONS.md``, in the package `sunnbear._core.solvers`, gives the reasons for their
+    roles. Under **Limit on the step**, the docstring of `Ridders` states why the evaluation counts of the core config
+    vary more between near-identical functions than those of ``ridders[variant='scipy']``.
     """
 
     solver_cls = Ridders
-    solver_kwargs = {"variant": RiddersVariant.STANDARD_STOPPING_CRITERION}  # noqa: RUF012 — the dict is never mutated
-    role = SolverRole.BUILTIN_CORE
-
-
-class RiddersScipyConfig(SolverConfig):
-    """`RiddersScipyConfig` is a secondary config of `Ridders`, in SciPy's variant.
-
-    It shows the stopping criterion of SciPy's ``ridder``. That criterion is not the shared stopping criterion of the
-    bracketing solvers, so this config is not core.
-
-    Its evaluation counts vary less between near-identical functions than those of
-    `RiddersStandardStoppingCriterionConfig`; the docstring of `Ridders` states why, under **Limit on the step**.
-    """
-
-    solver_cls = Ridders
-    solver_kwargs = {"variant": RiddersVariant.SCIPY}  # noqa: RUF012 — the dict is never mutated
-    role = SolverRole.BUILTIN_SECONDARY
-
-
-class RiddersCommonsMathConfig(SolverConfig):
-    """`RiddersCommonsMathConfig` is a secondary config of `Ridders`, in Apache Commons Math's variant.
-
-    It shows the stopping criterion of Apache Commons Math's ``RiddersSolver``. That criterion is not the shared
-    stopping criterion of the bracketing solvers, so this config is not core.
-
-    Its returned x-value can lie more than ``xtol`` from a root, as on a function with a kink or with a multiple root,
-    and the benchmark counts such a solve as failed, at ``max_fevals`` evaluations.
-    """
-
-    solver_cls = Ridders
-    solver_kwargs = {"variant": RiddersVariant.COMMONS_MATH}  # noqa: RUF012 — the dict is never mutated
-    role = SolverRole.BUILTIN_SECONDARY
+    configs = (
+        SolverConfig(
+            role=SolverRole.BUILTIN_CORE, solver_kwargs={"variant": RiddersVariant.STANDARD_STOPPING_CRITERION}
+        ),
+        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": RiddersVariant.SCIPY}),
+        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": RiddersVariant.COMMONS_MATH}),
+    )

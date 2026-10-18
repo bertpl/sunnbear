@@ -11,9 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Breaking:** Rename the `"bracketing_solver"` variant of `Ridders` to `"standard_stopping_criterion"`, and its config `RiddersBracketingSolverConfig` to `RiddersStandardStoppingCriterionConfig`
+- **Breaking:** Declare solver configs in 1 `SolverConfigs` subclass per solver class, which lists the configs as `SolverConfig` values
+- **Breaking:** Rename the `"bracketing_solver"` variant of `Ridders` to `"standard_stopping_criterion"`
 - Stop `Brent`, `Chandrupatla`, `TOMS748`, `AndersonBjorck`, `SteffenBrent`, `ModAB` and `CARF` once the interval is at most `2*xtol` wide and return its midpoint, as `Bisection` does, which changes their benchmark results
-- Make `RiddersStandardStoppingCriterionConfig` the core config of `Ridders`, which changes the benchmark results of `Ridders`
+- Make the `"standard_stopping_criterion"` variant the core config of `Ridders`, which changes the benchmark results of `Ridders`
 
 ### Deprecated
 
