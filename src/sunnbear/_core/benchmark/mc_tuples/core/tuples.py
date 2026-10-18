@@ -1,7 +1,7 @@
 """`MCTuples` holds a set of (u, v) tuples, the dimensionless samples of every Monte Carlo benchmark run.
 
 A tuple `(u, v)` lies in the open unit square. When the set is mapped onto one test function, `u` sets
-the tolerance `xtol` log-uniformly between `xtol_min` and `2·xtol_min`, and `v` sets the parameter `c`
+the tolerance `xtol` log-uniformly between `xtol_min` and `2*xtol_min`, and `v` sets the parameter `c`
 linearly between the function's `c_min` and `c_max`, so the same set works for every test function.
 """
 
@@ -89,8 +89,8 @@ class MCTuples:
     def to_xtol_and_c(self, xtol_min: float, c_min: float, c_max: float) -> tuple[np.ndarray, np.ndarray]:
         """Return the `(xtol, c)` value of every tuple for one test function.
 
-        The mapping is `xtol = xtol_min · 2^u` and `c = c_min + v · (c_max - c_min)`, so `xtol` is
-        log-uniform within `(xtol_min, 2·xtol_min)` and `c` is uniform within `(c_min, c_max)`.
+        The mapping is `xtol = xtol_min * 2^u` and `c = c_min + v * (c_max - c_min)`, so `xtol` is
+        log-uniform within `(xtol_min, 2*xtol_min)` and `c` is uniform within `(c_min, c_max)`.
 
         Returns:
             The `xtol` array and the `c` array, in tuple order.
@@ -119,14 +119,19 @@ class MCTuplesStats:
     """`MCTuplesStats` describes how evenly (u, v) tuples are spread; each statistic is computed when first read.
 
     Each tuple's separation is its distance to its nearest other tuple: in the square (L2), along u, or along v.
+
+    Each axis is measured cyclically, as a circle of circumference 1 on which 0 and 1 meet, so that the distance between
+    2 values is the shorter of the 2 arcs between them and the square becomes a torus; the construction's max-div solves
+    measure their distances the same way.
+
     The separations of each kind are summarized by 2 statistics:
 
     - the min separation, the smallest of them;
     - gpq(0.1), the geometric pseudo-quantile at `GPQ_LEVEL`, which the construction maximizes.
 
-    Each `*_fraction` property divides its statistic by the separation of `size` evenly spaced tuples: `1/(size - 1)`
-    along an axis, and the spacing `1/(√size - 1)` of a square grid in L2. `score` combines the 3 gpq fractions into
-    1 number by which tuple sets are compared.
+    Each `*_fraction` property divides its statistic by the separation of `size` evenly spaced tuples on the circle or
+    the torus: `1/size` along an axis, and the spacing `1/sqrt(size)` of a square grid in L2. `score` combines the 3 gpq
+    fractions into 1 number by which tuple sets are compared.
 
     `MCTuplesStats` takes an `(n, 2)` array, not an `MCTuples`, so that a caller that holds tuples only as an array,
     such as a size's tuples before the value correction, does not have to build an `MCTuples` first.
@@ -146,58 +151,58 @@ class MCTuplesStats:
     # --------------------------------------------------------------------------
     @property
     def min_separation_l2(self) -> float:
-        """Return the smallest L2 distance between 2 tuples."""
+        """Return the smallest cyclic L2 distance between 2 tuples."""
         return float(self._separations_l2.min())
 
     @property
     def min_separation_u(self) -> float:
-        """Return the smallest difference between 2 u values."""
+        """Return the smallest cyclic difference between 2 u values."""
         return float(self._separations_u.min())
 
     @property
     def min_separation_v(self) -> float:
-        """Return the smallest difference between 2 v values."""
+        """Return the smallest cyclic difference between 2 v values."""
         return float(self._separations_v.min())
 
     @property
     def min_separation_l2_fraction(self) -> float:
-        """Return the L2 min separation as a fraction of the grid spacing `1/(√size - 1)`."""
-        return self.min_separation_l2 * (float(np.sqrt(self.size)) - 1.0)
+        """Return the L2 min separation as a fraction of the grid spacing `1/sqrt(size)`."""
+        return self.min_separation_l2 * float(np.sqrt(self.size))
 
     @property
     def min_separation_u_fraction(self) -> float:
-        """Return the min separation along u as a fraction of `1/(size - 1)`."""
-        return self.min_separation_u * (self.size - 1.0)
+        """Return the min separation along u as a fraction of `1/size`."""
+        return self.min_separation_u * self.size
 
     @property
     def min_separation_v_fraction(self) -> float:
-        """Return the min separation along v as a fraction of `1/(size - 1)`."""
-        return self.min_separation_v * (self.size - 1.0)
+        """Return the min separation along v as a fraction of `1/size`."""
+        return self.min_separation_v * self.size
 
     # --------------------------------------------------------------------------
     #  gpq of the separations
     # --------------------------------------------------------------------------
     @cached_property
     def gpq_l2_fraction(self) -> float:
-        """Return the gpq at `GPQ_LEVEL` of the L2 separations as a fraction of the grid spacing `1/(√size - 1)`."""
-        return gpq(self._separations_l2, GPQ_LEVEL) * (float(np.sqrt(self.size)) - 1.0)
+        """Return the gpq at `GPQ_LEVEL` of the L2 separations as a fraction of the grid spacing `1/sqrt(size)`."""
+        return gpq(self._separations_l2, GPQ_LEVEL) * float(np.sqrt(self.size))
 
     @cached_property
     def gpq_u_fraction(self) -> float:
-        """Return the gpq at `GPQ_LEVEL` of the separations along u as a fraction of `1/(size - 1)`."""
-        return gpq(self._separations_u, GPQ_LEVEL) * (self.size - 1.0)
+        """Return the gpq at `GPQ_LEVEL` of the separations along u as a fraction of `1/size`."""
+        return gpq(self._separations_u, GPQ_LEVEL) * self.size
 
     @cached_property
     def gpq_v_fraction(self) -> float:
-        """Return the gpq at `GPQ_LEVEL` of the separations along v as a fraction of `1/(size - 1)`."""
-        return gpq(self._separations_v, GPQ_LEVEL) * (self.size - 1.0)
+        """Return the gpq at `GPQ_LEVEL` of the separations along v as a fraction of `1/size`."""
+        return gpq(self._separations_v, GPQ_LEVEL) * self.size
 
     @property
     def score(self) -> float:
-        """Return `(u · v · L2²)^(1/4)` of the 3 gpq fractions: their geomean with weights 1, 1 and 2.
+        """Return `(u * v * L2^2)^(1/4)` of the 3 gpq fractions: their geomean with weights 1, 1 and 2.
 
         The weight 2 on L2 matches the construction's objective, which takes gpq over squared L2 distances, and
-        gpq(d²) = gpq(d)².
+        gpq(d^2) = gpq(d)^2.
         """
         return (self.gpq_u_fraction * self.gpq_v_fraction * self.gpq_l2_fraction**2) ** 0.25
 
@@ -206,13 +211,14 @@ class MCTuplesStats:
     # --------------------------------------------------------------------------
     @cached_property
     def _separations_l2(self) -> np.ndarray:
-        """Return each tuple's L2 distance to its nearest other tuple.
+        """Return each tuple's cyclic L2 distance to its nearest other tuple.
 
         It is computed from the full pairwise distance matrix, so memory grows with the square of the size.
         """
         tuple_array = self._tuple_array
-        diff = tuple_array[:, None, :] - tuple_array[None, :, :]
-        distances = np.sqrt((diff**2).sum(axis=-1))
+        difference = np.abs(tuple_array[:, None, :] - tuple_array[None, :, :])
+        cyclic_difference = np.minimum(difference, 1.0 - difference)
+        distances = np.sqrt((cyclic_difference**2).sum(axis=-1))
         np.fill_diagonal(distances, np.inf)
         return distances.min(axis=1)
 
@@ -228,10 +234,12 @@ class MCTuplesStats:
 
     @staticmethod
     def _separations_along_axis(values: np.ndarray) -> np.ndarray:
-        """Return each value's distance to its nearest other value, in the values' order."""
+        """Return each value's cyclic distance to its nearest other value, in the values' order."""
         order = np.argsort(values)
-        differences = np.diff(values[order])
-        nearest_in_order = np.minimum(np.concatenate([[np.inf], differences]), np.concatenate([differences, [np.inf]]))
+        sorted_values = values[order]
+        # Entry i is the difference from the i-th value to the next one, the last one wrapping around to the first.
+        differences_above = np.diff(np.concatenate([sorted_values, [sorted_values[0] + 1.0]]))
+        nearest_in_order = np.minimum(differences_above, np.roll(differences_above, 1))
         separations = np.empty_like(nearest_in_order)
         separations[order] = nearest_in_order
         return separations
@@ -247,7 +255,7 @@ class MCTuplesBitStats:
     fraction reproduce it exactly, so that it holds far fewer bits than a random float64 value.
 
     A test function treated as a black box can have a root or another special point exactly at a trivial value: for
-    example, `sin(100·π·x)` has its roots at the multiples of 0.01, so a value such as `x = 0.25` sits exactly on a
+    example, `sin(100*pi*x)` has its roots at the multiples of 0.01, so a value such as `x = 0.25` sits exactly on a
     root.
 
     The fewest bits over an axis tell whether every value on it is non-trivial; the mean adds context, but 1 trivial

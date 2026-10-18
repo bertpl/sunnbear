@@ -4,7 +4,8 @@ Each solve picks the size's new tuples from its own population of candidate tupl
 below. The candidates of the max-div problem are the tuples of the size below, followed by the population.
 
 The objective is the geomean of 3 gpq terms at `GPQ_LEVEL` over the nearest-neighbor separations: along u, along v
-and in squared L2. Since gpq(d²) = gpq(d)², the L2 term weighs as much as the 2 axis terms together.
+and in squared L2, each measured cyclically (`distances`). Since gpq(d^2) = gpq(d)^2, the L2 term weighs as much as the
+2 axis terms together.
 
 A subclass passes its population to the constructor, and its hooks set:
 
@@ -28,7 +29,7 @@ from dataclasses import dataclass
 
 import numpy as np
 from max_div import Constraint, MaxDivProblem
-from max_div.metrics import DistanceMetric, DiversityMetric, HybridDiversityMetric
+from max_div.metrics import DiversityMetric, HybridDiversityMetric
 from max_div.solver import (
     DistanceStorageType,
     ParallelMaxDivSolution,
@@ -40,6 +41,7 @@ from max_div.solver import (
 
 from sunnbear._core.benchmark.mc_tuples.core import GPQ_LEVEL, MCTuplesSize
 
+from .distances import CYCLIC_SQUARED_L2_DISTANCE_METRIC, CYCLIC_U_DISTANCE_METRIC, CYCLIC_V_DISTANCE_METRIC
 from .exceptions import MCTuplesConstructionError
 from .population import MCTuplesPopulation
 
@@ -95,10 +97,10 @@ class MCTuplesSolve(ABC):
             # max-div works on a float32 copy; the selected candidates are taken by index.
             np.vstack([self.required_tuple_array, self.population.tuple_array]).astype(np.float32),
             k=int(self.size),
-            distance_metric=DistanceMetric.l2s_euclidean_squared(),
-            # The geomean of gpq along u, along v, and over the problem's own distance, squared L2.
+            distance_metric=CYCLIC_SQUARED_L2_DISTANCE_METRIC,
+            # The objective is the geomean of gpq along u, along v, and over the problem's own distance, squared L2.
             diversity_metric=HybridDiversityMetric.geomean_of(
-                gpq.over(DistanceMetric.along_axis(0)), gpq.over(DistanceMetric.along_axis(1)), gpq
+                gpq.over(CYCLIC_U_DISTANCE_METRIC), gpq.over(CYCLIC_V_DISTANCE_METRIC), gpq
             ),
             constraints=self._constraints(),
         )

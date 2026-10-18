@@ -3,6 +3,10 @@
 On each axis, every tuple of the size below occupies 1 fine lane. A gap is a maximal run of free fine lanes: between 2
 occupied fine lanes, or between an occupied fine lane and an edge of the axis (`MCTuplesAxisGaps`).
 
+max-div measures each axis as a circle on which 0 and 1 meet (`distances`), so the 2 edge gaps are the 2 parts of 1 gap,
+the wrap-around gap. The `placement` module places the new tuples of both edge gaps together, and each edge gap keeps
+its own number of new tuples.
+
 The size's max-div solve puts exactly the allocated number of new tuples into each gap, and spreads them about evenly
 inside it. So the allocation sets where the size's mean lies, and with it how far the first value correction, which runs
 right after the selection solve, has to move the new tuples.
@@ -10,8 +14,9 @@ right after the selection solve, has to move the new tuples.
 The allocation comes in 2 stages:
 
 1. **greedy:** the new tuples go to the gaps 1 at a time, each to the gap that has the widest spacing after it takes
-   the tuple; a gap's spacing is the distance between its neighboring values once its new tuples are spread evenly
-   over it, as `MCTuplesAxisGapPlacement` in the `placement` module places them;
+   the tuple; a gap's spacing is the distance between neighboring values once `MCTuplesAxisGapPlacement` in the
+   `placement` module spreads the gap's new tuples evenly over it, and an edge gap's spacing is that of the whole
+   wrap-around gap;
 2. **mean-aware:** starting from the greedy allocation, a local search moves new tuples between gaps, 1 at a time, to
    raise the predicted smallest spacing after the first value correction
    (`MCTuplesAxisGapPlacement.corrected_min_spacing`):
@@ -125,8 +130,8 @@ class MCTuplesAxisGaps:
     It holds every gap, including those that end up without new tuples, and exists only inside
     `MCTuplesAxisGapAllocation.of`, which keeps the result.
 
-    Every attribute except `n_required` and `required_sum` is an array with 1 entry per gap, in ascending order, so
-    that each step of an allocation scores every gap at once.
+    Every array attribute has 1 entry per gap, in ascending order, so that each step of an allocation scores every gap
+    at once.
 
     Attributes:
         first_lanes: The first free fine lane of each gap, ascending.
@@ -135,6 +140,8 @@ class MCTuplesAxisGaps:
         is_right_edge: Whether each gap ends at the right edge of the axis, at 1.
         lows: The lower bound of each gap on the axis: the value of the tuple below it, or 0 for the left edge gap.
         highs: The upper bound of each gap on the axis: the value of the tuple above it, or 1 for the right edge gap.
+        lowest_required_value: The lowest value of the size below on this axis.
+        highest_required_value: The highest value of the size below on this axis.
         n_required: The number of tuples of the size below.
         required_sum: The sum of their values on this axis.
     """
@@ -145,8 +152,18 @@ class MCTuplesAxisGaps:
     is_right_edge: np.ndarray
     lows: np.ndarray
     highs: np.ndarray
+    lowest_required_value: float
+    highest_required_value: float
     n_required: int
     required_sum: float
+
+    # --------------------------------------------------------------------------
+    #  Edge gaps
+    # --------------------------------------------------------------------------
+    @property
+    def edge_gaps(self) -> np.ndarray:
+        """Return the indices of the edge gaps, ascending."""
+        return np.flatnonzero(self.is_left_edge | self.is_right_edge)
 
     # --------------------------------------------------------------------------
     #  Allocations
@@ -159,7 +176,9 @@ class MCTuplesAxisGaps:
         counts = np.zeros(self.n_free_lanes.size, dtype=np.int64)
         for _ in range(n_new):
             spacing_after_addition = np.where(
-                counts >= self.n_free_lanes, -np.inf, MCTuplesAxisGapPlacement(self, counts + 1).spacings
+                counts >= self.n_free_lanes,
+                -np.inf,
+                MCTuplesAxisGapPlacement(self, counts).spacings_after_each_addition(),
             )
             counts[np.argmax(spacing_after_addition)] += 1
         return counts
@@ -231,6 +250,8 @@ class MCTuplesAxisGaps:
             is_right_edge=is_right_edge,
             lows=np.where(is_left_edge, 0.0, value_of_fine_lane[np.maximum(lane_below, 0)]),
             highs=np.where(is_right_edge, 1.0, value_of_fine_lane[np.minimum(lane_above, N_FINE_LANES - 1)]),
+            lowest_required_value=float(required_values.min()),
+            highest_required_value=float(required_values.max()),
             n_required=required_values.size,
             required_sum=float(required_values.sum()),
         )
