@@ -1,11 +1,12 @@
 """This module holds `TABLE_2`, the problems of Table 2 of Ganchovski et al. (2026), with modAB's evaluation count in
 that table and its root in the paper's supplementary results."""
 
+from tests.solvers.paper_problems import UNSTATED_RUN_DETAILS
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
 
 # On the problems whose row carries this reason, the evaluation count differs from Table 2's, presumably because the
-# authors' .NET runtime rounds the last bit of cos, cbrt or exp differently from the correctly rounded values here,
-# which changes the x-values that the solve evaluates.
+# authors' .NET runtime rounds the last bit of a library function's result differently from the correctly rounded
+# values here, which changes the x-values that the solve evaluates.
 _ROUNDING_DEVIATION_REASON = (
     "the .NET runtime of the paper's benchmark presumably rounds a library function differently"
 )
@@ -51,7 +52,11 @@ TABLE_2 = [
     GanchovskiEtAlTable2Problem.F32.with_n_fevals_and_root(14 - 1, root=1.32581766366803),
     GanchovskiEtAlTable2Problem.F33.with_n_fevals_and_root(12, root=0.865474033101614),
     GanchovskiEtAlTable2Problem.F34.with_n_fevals_and_root(
-        11, root=0.73908513321516, deviation=4, reason=_ROUNDING_DEVIATION_REASON
+        11,
+        root=0.73908513321516,
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation="the solve takes 1 evaluation more",
     ),
     GanchovskiEtAlTable2Problem.F35.with_n_fevals_and_root(17 - 1, root=0.656666666666666),
     GanchovskiEtAlTable2Problem.F36.with_n_fevals_and_root(55, root=0.666666666666665),
@@ -107,7 +112,11 @@ TABLE_2 = [
     GanchovskiEtAlTable2Problem.F84.with_n_fevals_and_root(8, root=3.01250244276146),
     GanchovskiEtAlTable2Problem.F85.with_n_fevals_and_root(11, root=-2.20778314488693),
     GanchovskiEtAlTable2Problem.F86.with_n_fevals_and_root(
-        15, root=0.302804157270697, deviation=4, reason=_ROUNDING_DEVIATION_REASON
+        15,
+        root=0.302804157270697,
+        deviation=1,
+        reason=UNSTATED_RUN_DETAILS,
+        observation="the solve takes 1 evaluation fewer",
     ),
     GanchovskiEtAlTable2Problem.F87.with_n_fevals_and_root(9 - 1, root=0.98780487804878),
     GanchovskiEtAlTable2Problem.F88.with_n_fevals_and_root(14 - 1, root=0.168362173262536),
