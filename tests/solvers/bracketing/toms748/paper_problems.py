@@ -214,7 +214,11 @@ TABLES_IV_TO_VI_BY_K = {
         AlefeldPotraShiTablesIVToVIProblem.P28_N30.with_n_fevals(29),
         AlefeldPotraShiTablesIVToVIProblem.P28_N500.with_n_fevals(35),
         AlefeldPotraShiTablesIVToVIProblem.P1_N1.with_n_fevals(10),
-        AlefeldPotraShiTablesIVToVIProblem.P3_N1.with_n_fevals(15),
+        AlefeldPotraShiTablesIVToVIProblem.P3_N1.with_n_fevals(
+            15,
+            deviation=2,
+            reason=_REBUILT_ALGORITHM_4_1_DEVIATION_REASON,
+        ),
         AlefeldPotraShiTablesIVToVIProblem.P16_N4.with_n_fevals(12),
         AlefeldPotraShiTablesIVToVIProblem.P18_N1.with_n_fevals(
             11,

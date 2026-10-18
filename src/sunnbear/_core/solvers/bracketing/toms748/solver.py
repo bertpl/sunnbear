@@ -100,7 +100,7 @@ class TOMS748(Solver):
         authors' code:
 
         - a midpoint, `Interval.midpoint`, where the authors' code computes ``a + 0.5 * (b - a)``;
-        - the first secant step, `Interval.secant_zero`, where the authors' code computes
+        - the first secant step, computed with `secant_zero`, where the authors' code computes
           ``a - (fa / (fb - fa)) * (b - a)``.
         """
         interval = state.interval
@@ -117,7 +117,7 @@ class TOMS748(Solver):
 
             # --- iteration 1: the secant step ---
             if n_iterations == 1:
-                c = interval.secant_zero
+                c = self._secant_zero(interval.a, interval.fa, interval.b, interval.fb)
                 interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
                 if interval.is_fa_zero or interval.width <= stop_width:
                     return interval.a

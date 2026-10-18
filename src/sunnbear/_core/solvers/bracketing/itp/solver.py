@@ -72,7 +72,7 @@ class ITP(BracketingSolver[ITPState]):
     """
 
     name = "itp"
-    version = 2
+    version = 3
     state_cls = ITPState
 
     def __init__(self, *, n_slack: int, variant: ITPVariant) -> None:
@@ -107,7 +107,7 @@ class ITP(BracketingSolver[ITPState]):
         Also advance the iteration counter ``state.k``, so 2 calls on the same interval return different x-values.
         """
         # --- interpolation ----------------------
-        x_f = interval.secant_zero
+        x_f = self._secant_zero(interval.a, interval.fa, interval.b, interval.fb)
 
         # --- truncation -------------------------
         x_half = interval.midpoint

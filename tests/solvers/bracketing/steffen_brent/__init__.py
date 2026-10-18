@@ -2,15 +2,12 @@
 
 Published results:
 
-- Steffen et al. (2025), case studies 1 and 2: reproduced, in ``test_paper.py``: the roots of both, and the iteration
-  counts of both to within 1 iteration:
-
-  - in case 1, the paper's run stops once ``|f(b)|`` is small enough, while `SteffenBrent` stops on the width of the
-    interval;
-  - in case 2, the solve evaluates 1 more midpoint; the test data states why.
+- Steffen et al. (2025), case studies 1 and 2: reproduced, in ``test_paper.py``, with the secant step in the form of
+  the paper's equation 4: the roots of both, the iteration count of case 2, and the iteration count of case 1 to within
+  1 iteration, because the paper's run stops once ``|f(b)|`` is small enough, while `SteffenBrent` stops on the width
+  of the interval.
 - Steffen et al. (2025), the modified Brent method's panels of Figures 3, 4, 6 and 7: reproduced to the precision of
-  reading the plots, in ``test_paper.py``, except the 6th width ratio of case 2, which changes with the extra
-  iteration.
+  reading the plots, in ``test_paper.py``, with the same form of the secant step.
 
 Third-party published results:
 

@@ -2,7 +2,6 @@
 
 from sunnbear._core.solvers.core import Solver, SolveState
 from sunnbear._core.solvers.core.exceptions import DivergedError
-from sunnbear._core.solvers.core.formulas import secant_zero
 
 
 class Secant(Solver):
@@ -20,9 +19,8 @@ class Secant(Solver):
     - **Starting x-values:** the bounds of the initial interval. The method treats one bound as the older x-value and
       the other as the newest x-value, and the newest x-value is the bound with the larger ``|f|``, or the upper bound
       when both are equal.
-    - **Step formula:** the zero of the secant, computed with `secant_zero`. SciPy computes it from the ratio of the 2
-      function values, the smaller magnitude divided by the larger: a form that is equal in exact arithmetic, but
-      rounds differently.
+    - **Step formula:** the zero of the secant, computed with `secant_zero`, which takes SciPy's form; SciPy computes
+      its ratio of the 2 function values twice, where `secant_zero` computes it once, which gives the same x-values.
     - **Stopping criterion:** the solve ends once the step from the newest x-value to the next x-value is at most
       ``xtol``, and returns that next x-value without evaluating it.
     - **Equal function values:** when the 2 latest x-values have equal function values, the secant is horizontal and
@@ -78,7 +76,7 @@ class Secant(Solver):
                 raise DivergedError(
                     "The 2 latest x-values have equal function values, so the next x-value is infinite."
                 )
-            x = secant_zero(x0, f0, x1, f1)
+            x = self._secant_zero(x0, f0, x1, f1)
             if abs(x - x1) <= state.xtol:
                 return x
             x0, f0 = x1, f1

@@ -1,7 +1,7 @@
 """`SteffenBrent` implements the modified Brent method of Steffen et al., which can move a bound onto the midpoint."""
 
 from sunnbear._core.solvers.core import Solver, SolveState
-from sunnbear._core.solvers.core.formulas import midpoint, secant_zero
+from sunnbear._core.solvers.core.formulas import midpoint
 
 
 class SteffenBrent(Solver):
@@ -118,7 +118,7 @@ class SteffenBrent(Solver):
                 s = b + numerator / denominator
             elif fb != fb_previous:
                 # The step is the paper's equation 4: the zero of the secant through b and b_previous.
-                s = secant_zero(b, fb, b_previous, fb_previous)
+                s = self._secant_zero(b, fb, b_previous, fb_previous)
             else:
                 s = midpoint(a, b)
             # An interpolation step that overflows to inf or nan fails this comparison too, so it becomes a bisection.

@@ -6,6 +6,7 @@ from sunnbear.solvers import Illinois
 from tests.solvers.paper_problems import PaperProblem, PaperProblemEnum
 from tests.solvers.paper_problems.ford import FordTable4Problem, assert_n_fevals_at_ford_stop_reproduced
 from tests.solvers.paper_problems.oliveira_takahashi import OLIVEIRA_TAKAHASHI_XTOL, OliveiraTakahashiTable1Problem
+from tests.solvers.paper_problems.secant_forms import textbook_secant_zero
 
 from .third_party_problems import FORD_TABLE_4, OLIVEIRA_TAKAHASHI_TABLE_1
 
@@ -36,7 +37,19 @@ def test_the_iteration_counts_of_table_1_of_oliveira_takahashi_are_reproduced(pr
     """On every row of Table 1 of Oliveira and Takahashi (2020), `Illinois` takes the number of iterations in the
     column "Illinois", within the row's allowed deviation; the table's runs stop by the criterion of `Illinois`."""
     # --- act --------------------------
-    result = Illinois().solve(problem.f, problem.a, problem.b, xtol=OLIVEIRA_TAKAHASHI_XTOL, max_fevals=200)
+    result = _IllinoisWithTextbookSecantZero().solve(
+        problem.f, problem.a, problem.b, xtol=OLIVEIRA_TAKAHASHI_XTOL, max_fevals=200
+    )
 
     # --- assert -----------------------
     problem.assert_reproduced_by(result)
+
+
+# ==================================================================================================
+#  Helpers
+# ==================================================================================================
+class _IllinoisWithTextbookSecantZero(Illinois):
+    """`_IllinoisWithTextbookSecantZero` is `Illinois` with the textbook form of the secant's zero, the form in which
+    Ford (1997) writes the Illinois step, and with which Table 1 of Oliveira and Takahashi (2020) reproduces."""
+
+    _secant_zero = staticmethod(textbook_secant_zero)

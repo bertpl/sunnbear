@@ -155,7 +155,7 @@ class CARF(Solver):
 
         # --- the first x-value ------------------
         width = b - a
-        t = secant_zero(a, fa, b, fb)
+        t = self._secant_zero(a, fa, b, fb)
         t = max(min(t, b - _THETA_0 * width), a + _THETA_0 * width)
         ft = state.f(t)
         state.x_best = t

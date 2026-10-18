@@ -150,7 +150,7 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 ### IV.b. Iteration Formula
 
 Many solvers compute the same 2 formulas, in forms that are equal in exact arithmetic but round differently. The `sunnbear` solver implementations compute both in 1 shared form:
-- **the secant's zero** through `(a, fa)` and `(b, fb)`: `(a*fb - b*fa) / (fb - fa)`
+- **the secant's zero** through `(a, fa)` and `(b, fb)`, in the form of SciPy's secant method: `(a - q*b) / (1 - q)` with `q = fa/fb` when `|fb| > |fa|`, else `(b - q*a) / (1 - q)` with `q = fb/fa`. The ratio `q` of the smaller `|f|` to the larger never exceeds 1 in magnitude, so the result does not depend on the scale of `f`: it stays finite where `a*fb` or `b*fa` would overflow.
 - **the midpoint** of `[a, b]`: `0.5*(a + b)`
 
 The framework computes them in the functions `secant_zero` and `midpoint` of `core/formulas.py`.
@@ -233,6 +233,7 @@ A reader must be able to compare each solver with its source step by step:
 
 The tests compare each solver with the published results and reference implementations of section III, to check that it implements its method's steps correctly:
 - **a published table that depends on its article's own stopping criterion** is checked against a subclass of the solver that replaces the shared stopping criterion with the article's; that subclass lives in the solver's test package
+- **a published table that depends on the rounding of its article's form of the secant's zero** is checked against a subclass of the solver that replaces the shared form with the article's, through the method `_secant_zero` that every solver's secant steps call; that subclass lives in the solver's test package too
 - **the docstring of each solver's test package** lists, each with its reason: the published results and reference implementations used for comparison, the allowed deviations, and the published results not used
 - **the `References:` section of each solver's class docstring** cites every source used for the implementation or the validation, with 1 line on what each source provides; the class docstring states each deviation from its sources in 1 bullet
 

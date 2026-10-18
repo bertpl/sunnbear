@@ -1,7 +1,6 @@
 """`Pegasus` implements the Pegasus method: regula falsi that scales down the value of a bound kept twice in a row."""
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, IntervalBound
-from sunnbear._core.solvers.core.formulas import secant_zero
 
 from .state import PegasusState
 
@@ -68,7 +67,7 @@ class Pegasus(BracketingSolver[PegasusState]):
     """
 
     name = "pegasus"
-    version = 2
+    version = 3
     state_cls = PegasusState
 
     def _next_x(self, state: PegasusState, interval: Interval) -> float:
@@ -102,4 +101,4 @@ class Pegasus(BracketingSolver[PegasusState]):
             fa, fb = state.scaled_retained_f, interval.fb
         else:
             fa, fb = interval.fa, state.scaled_retained_f
-        return secant_zero(interval.a, fa, interval.b, fb)
+        return self._secant_zero(interval.a, fa, interval.b, fb)

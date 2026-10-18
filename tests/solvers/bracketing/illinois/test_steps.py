@@ -2,6 +2,7 @@
 
 import pytest
 
+from sunnbear._core.solvers.core.formulas import secant_zero
 from sunnbear.solvers import Illinois, SolveStatus
 from tests.solvers.example_functions import cubic
 
@@ -36,10 +37,10 @@ def test_the_first_2_steps_are_regula_falsi_and_the_third_halves_the_retained_bo
     # --- assert -----------------------
     (x1, f1), (x2, f2), (x3, _) = history[2:5]
     # Before the first iterate, the upper bound counts as the most recent iterate.
-    assert x1 == (a * fb - b * fa) / (fb - fa)
+    assert x1 == secant_zero(a, fa, b, fb)
     # f1 < 0, so x1 replaced the lower bound; the upper bound is kept for the first time, at its own value.
     assert f1 < 0.0
-    assert x2 == (x1 * fb - b * f1) / (fb - f1)
+    assert x2 == secant_zero(x1, f1, b, fb)
     # f2 < 0 too, so x2 replaced x1 and the upper bound is kept a second time: its value is halved.
     assert f2 < 0.0
-    assert x3 == (x2 * (0.5 * fb) - b * f2) / (0.5 * fb - f2)
+    assert x3 == secant_zero(x2, f2, b, 0.5 * fb)

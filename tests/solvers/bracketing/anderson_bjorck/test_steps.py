@@ -2,6 +2,7 @@
 
 import pytest
 
+from sunnbear._core.solvers.core.formulas import secant_zero
 from sunnbear.solvers import AndersonBjorck, SolveStatus
 from tests.solvers.example_functions import cubic
 
@@ -46,18 +47,18 @@ def test_the_first_2_steps_are_regula_falsi_and_the_third_scales_the_retained_f(
     # --- assert -----------------------
     (x1, f1), (x2, f2), (x3, f3), (x4, _) = history[2:6]
     # Before the first iterate, the upper bound counts as the most recent iterate.
-    assert x1 == (a * fb - b * fa) / (fb - fa)
+    assert x1 == secant_zero(a, fa, b, fb)
     # f1 < 0, so x1 replaced the lower bound; the upper bound is kept for the first time, at its own value.
     assert f1 < 0.0
-    assert x2 == (b * f1 - x1 * fb) / (f1 - fb)
+    assert x2 == secant_zero(b, fb, x1, f1)
     # f2 < 0 too, so x2 replaced x1 and the upper bound is kept a second time: its value is scaled by the slope from
     # x1 to x2, divided by the slope of the secant that produced x2.
     assert f2 < 0.0
     scaled_fb = (((f2 - f1) / (x2 - x1)) / ((f1 - fb) / (x1 - b))) * fb
-    assert x3 == (b * f2 - x2 * scaled_fb) / (f2 - scaled_fb)
+    assert x3 == secant_zero(b, scaled_fb, x2, f2)
     # f3 > 0, so x3 replaced the upper bound, and x2 is the retained bound, at its own value.
     assert f3 > 0.0
-    assert x4 == (x2 * f3 - x3 * f2) / (f3 - f2)
+    assert x4 == secant_zero(x2, f2, x3, f3)
 
 
 def test_the_factor_falls_back_to_0_5_when_an_iterate_does_not_reduce_abs_f():
@@ -76,12 +77,12 @@ def test_the_factor_falls_back_to_0_5_when_an_iterate_does_not_reduce_abs_f():
 
     # --- assert -----------------------
     (x1, f1), (x2, f2), (x3, _) = history[2:5]
-    assert x1 == (a * fb - b * fa) / (fb - fa)
+    assert x1 == secant_zero(a, fa, b, fb)
     # f1 > fb > 0, so x1 replaced the upper bound; before the first iterate, the upper bound counts as the previous
     # iterate, and the slope from b to x1 has the sign opposite to the secant's, so the factor is negative.
     assert f1 > fb > 0.0
-    assert x2 == (a * f1 - x1 * (0.5 * fa)) / (f1 - 0.5 * fa)
+    assert x2 == secant_zero(a, 0.5 * fa, x1, f1)
     # f2 > f1 > 0, so the factor, which equals 1 - f2 / f1 in exact arithmetic, is negative too, and the retained
     # value is halved again.
     assert f2 > f1
-    assert x3 == (a * f2 - x2 * (0.25 * fa)) / (f2 - 0.25 * fa)
+    assert x3 == secant_zero(a, 0.25 * fa, x2, f2)

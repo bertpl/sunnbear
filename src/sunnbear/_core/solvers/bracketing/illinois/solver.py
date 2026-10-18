@@ -1,7 +1,6 @@
 """`Illinois` implements the Illinois method: regula falsi that halves the value of a bound kept twice in a row."""
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, IntervalBound
-from sunnbear._core.solvers.core.formulas import secant_zero
 
 from .state import IllinoisState
 
@@ -24,10 +23,10 @@ class Illinois(BracketingSolver[IllinoisState]):
     `Illinois` departs from the ALGOL procedure of Dowell and Jarratt (1971), or settles an unspecified detail of that
     procedure, in these places:
 
-    - **Secant's zero:** `Illinois` computes it with `secant_zero`, in the form of Ford (1997); the procedure computes
-      it as a correction to the most recent iterate ``x1``, ``x1 - f1 * (x1 - x0) / (f1 - f0)``, with ``x0`` the
-      retained bound and ``f0`` its function value, halved once for each iteration that kept ``x0`` again; the 2 forms
-      are equal in exact arithmetic but round differently;
+    - **Secant's zero:** `Illinois` computes it with `secant_zero`; the procedure computes it as a correction to the
+      most recent iterate ``x1``, ``x1 - f1 * (x1 - x0) / (f1 - f0)``, with ``x0`` the retained bound and ``f0`` its
+      function value, halved once for each iteration that kept ``x0`` again; the 2 forms are equal in exact
+      arithmetic but round differently;
     - **Stopping criterion:** `Illinois` stops by `BracketingSolver`'s criterion, once the interval is at most
       ``2 * xtol`` wide, and returns the interval's midpoint, which lies within ``xtol`` of a root; the procedure
       stops once a step is at most its tolerance ``delta``, and returns the last secant's zero without evaluating it,
@@ -40,8 +39,8 @@ class Illinois(BracketingSolver[IllinoisState]):
           equation. BIT 11(2), 168-174. Its ALGOL procedure gives the step and the halving, and the test suite
           reproduces the errors in its Table 1. https://doi.org/10.1007/BF01934364
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
-          Iranica 4(1&2), 28-34. Its equation 5, with ``gamma = 0.5`` from its Table 1, is the Illinois step in the
-          form of `secant_zero`, and the test suite reproduces its Table 4.
+          Iranica 4(1&2), 28-34. Its equation 5, with ``gamma = 0.5`` from its Table 1, is the Illinois step, and the
+          test suite reproduces its Table 4.
         - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="illinois"``; the test suite checks
           `Illinois` against mpmath's ``Illinois``.
         - Oliveira, I. F. D. and Takahashi, R. H. C. (2020). An enhancement of the bisection method average
@@ -80,4 +79,4 @@ class Illinois(BracketingSolver[IllinoisState]):
         else:
             x0, x1, f1 = interval.b, interval.a, interval.fa
         f0 = state.scaled_retained_f
-        return secant_zero(x0, f0, x1, f1)
+        return self._secant_zero(x0, f0, x1, f1)

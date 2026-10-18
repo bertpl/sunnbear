@@ -103,14 +103,6 @@ def _case_study_2(v: float) -> float:
     return v**3 - (1.0 - lam + t) * v**2 + (sigma - lam - lam * t + u) * v - (sigma + sigma * t + u)
 
 
-# `_LAST_SECANT_STEP_DEVIATION_REASON` states why, in case study 2, the solve takes 1 more iteration than the paper's
-# run, which also changes the figures' last width ratio.
-_LAST_SECANT_STEP_DEVIATION_REASON = (
-    "`secant_zero` puts the last secant step 1 ulp from where the paper's equation 4 puts it; near the root, rounding "
-    "in f gives neighboring floats opposite signs, so f(s) has the sign opposite to f at equation 4's x-value, and the "
-    "solve evaluates the midpoint of a and s and takes 1 more iteration"
-)
-
 CASE_STUDIES = [
     PaperProblem(
         name="case_study_1",
@@ -142,8 +134,6 @@ CASE_STUDIES = [
         root_abs_tol=1e-8,
         # The paper's figures show 6 iterations; the evaluations are counted as in the first case study.
         n_fevals=2 + 6 + 2,
-        n_fevals_tol=2,
-        deviation_reason=_LAST_SECANT_STEP_DEVIATION_REASON,
     ),
 ]
 
@@ -155,8 +145,6 @@ FIGURE_VALUES = {
     ),
     "case_study_2": FigureValues(
         abs_fb=(95.0, 37.0, 2.5, 0.17, 7.5e-4, 8e-10, 4e-13),
-        # The figure's 6th width ratio, 0.0, is left out: in the solve's 6th iteration, the midpoint replaces a and
-        # halves the interval, for the reason in `_LAST_SECANT_STEP_DEVIATION_REASON`.
-        width_ratios=(0.38, 0.32, 0.065, 0.47, 0.0),
+        width_ratios=(0.38, 0.32, 0.065, 0.47, 0.0, 0.0),
     ),
 }

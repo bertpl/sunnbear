@@ -1,7 +1,6 @@
 """`AndersonBjorck` implements the Anderson-Björck method: regula falsi that scales down a bound's function value."""
 
 from sunnbear._core.solvers.core import Solver, SolveState
-from sunnbear._core.solvers.core.formulas import secant_zero
 
 
 class AndersonBjorck(Solver):
@@ -126,7 +125,7 @@ class AndersonBjorck(Solver):
         while abs(x1 - x0) > state.xtol and f1 != 0.0:
             # --- the paper's step ---------------
             w1 = (f1 - f0) / (x1 - x0)
-            x2 = secant_zero(x0, f0, x1, f1)
+            x2 = self._secant_zero(x0, f0, x1, f1)
             f2 = state.f(x2)
             state.x_best = x2
 

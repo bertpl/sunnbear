@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import cached_property
 
-from .formulas import midpoint, secant_zero
+from .formulas import midpoint
 
 
 # ==================================================================================================
@@ -92,11 +92,6 @@ class Interval(ABC):
     def midpoint(self) -> float:
         """Return the midpoint of the interval."""
         return midpoint(self.a, self.b)
-
-    @cached_property
-    def secant_zero(self) -> float:
-        """Return the zero of the secant through ``(a, fa)`` and ``(b, fb)``."""
-        return secant_zero(self.a, self.fa, self.b, self.fb)
 
     @cached_property
     def is_fa_zero(self) -> bool:

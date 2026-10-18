@@ -25,12 +25,12 @@ class RegulaFalsi(BracketingSolver):
         - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section 9.2.
           Cambridge University Press. It describes the method, which it calls false position.
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
-          Iranica 4(1&2), 28-34. Its equation 3 is the iteration formula, in the form of `secant_zero`.
+          Iranica 4(1&2), 28-34. Its equation 3 is the iteration formula.
     """
 
     name = "regula_falsi"
-    version = 1
+    version = 2
 
     def _next_x(self, state: SolveState, interval: Interval) -> float:
         """Return the zero of the secant through ``(a, f(a))`` and ``(b, f(b))``."""
-        return interval.secant_zero
+        return self._secant_zero(interval.a, interval.fa, interval.b, interval.fb)

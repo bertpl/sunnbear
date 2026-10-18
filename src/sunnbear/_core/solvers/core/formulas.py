@@ -7,15 +7,24 @@ that keep their source's form, which the section "Iteration Formula" of ``SOLVER
 
 
 def secant_zero(a: float, fa: float, b: float, fb: float) -> float:
-    """Return the zero of the secant through ``(a, fa)`` and ``(b, fb)``, as ``(a*fb - b*fa) / (fb - fa)``.
+    """Return the zero of the secant through ``(a, fa)`` and ``(b, fb)``, in the form of SciPy's secant method.
 
-    The 2 points may come in either order: swapping them negates the numerator and the denominator, which is exact,
-    so the result is the same. ``fa`` and ``fb`` must differ.
+    With ``q`` the function value of smaller magnitude divided by the one of larger magnitude, the zero is
+    ``(a - q*b) / (1 - q)`` when ``|fb| > |fa|``, else ``(b - q*a) / (1 - q)``. Since ``|q|`` is at most 1, the result
+    does not depend on the scale of the function values: it stays finite where the products of the form
+    ``(a*fb - b*fa) / (fb - fa)`` would overflow, and keeps its precision where they would underflow.
+
+    The 2 points may come in either order, with the same result. ``fa`` and ``fb`` must differ.
 
     The result is not clamped: where ``(a, fa)`` and ``(b, fb)`` are the interval bounds, rounding can put it on a
     bound or just outside the interval, and a solver clamps it only where its source does.
     """
-    return (a * fb - b * fa) / (fb - fa)
+    if abs(fb) > abs(fa):
+        q = fa / fb
+        return (a - q * b) / (1.0 - q)
+    else:
+        q = fb / fa
+        return (b - q * a) / (1.0 - q)
 
 
 def midpoint(a: float, b: float) -> float:
