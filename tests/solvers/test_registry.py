@@ -2,6 +2,7 @@
 
 import pytest
 
+from sunnbear._core.utils.class_origin import is_sunnbear_module
 from sunnbear.exceptions import UnknownSolverConfigError
 from sunnbear.solvers import (
     CARF,
@@ -23,7 +24,7 @@ from sunnbear.solvers import (
     SteffenBrent,
 )
 
-from .example_solvers import WeightedSplitSolver, define_configs
+from .example_solvers import WeightedSplitSolver, define_configs_subclass
 
 # ==================================================================================================
 #  Built-in configs
@@ -63,14 +64,16 @@ def test_built_in_config_is_registered_on_import(solver_id, solver_cls, role):
     assert config.solver_cls is solver_cls
     assert type(config.instantiate()) is solver_cls
     assert config.role is role
-    assert config.module_name.startswith("sunnbear.")
+    assert is_sunnbear_module(config.declaring_module_name)
 
 
 def test_the_built_in_config_rows_name_every_built_in_config():
     """`_BUILT_IN_CONFIG_ROWS` names every config that importing sunnbear registers, and no other."""
     # --- act / assert -----------------
     assert {row[0] for row in _BUILT_IN_CONFIG_ROWS} == {
-        config.solver_id for config in SolverConfigRegistry.configs() if config.module_name.startswith("sunnbear.")
+        config.solver_id
+        for config in SolverConfigRegistry.configs()
+        if is_sunnbear_module(config.declaring_module_name)
     }
 
 
@@ -85,7 +88,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
     configs = tuple(
         SolverConfig(role=SolverRole.USER_ACTIVE, solver_kwargs={"weight": weight}) for weight in (0.75, 0.25)
     )
-    define_configs({"solver_cls": WeightedSplitSolver, "configs": configs})
+    define_configs_subclass({"solver_cls": WeightedSplitSolver, "configs": configs})
 
     # --- act --------------------------
     solver_ids = [config.solver_id for config in SolverConfigRegistry.configs()]
@@ -153,7 +156,7 @@ def test_duplicate_solver_id_is_rejected():
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="Duplicate solver_id 'bisection'"):
-        define_configs(namespace)
+        define_configs_subclass(namespace)
 
 
 @pytest.mark.usefixtures("isolated_solver_config_registry")
@@ -168,4 +171,4 @@ def test_second_baseline_is_rejected():
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="Only one config may have role BUILTIN_BASELINE"):
-        define_configs(namespace)
+        define_configs_subclass(namespace)

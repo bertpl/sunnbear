@@ -1,7 +1,8 @@
 """`BenchmarkWorkerPool` runs benchmark tasks in worker processes, or in this process when it has 1 worker.
 
-A task looks up its formula and solver configs by id in registries, and each formula or solver config class
-adds itself to its registry when it is defined.
+A task looks up its formula and solver configs by id in registries: each formula class adds itself to its registry
+when it is defined, and each `SolverConfigs` subclass adds its configs to the solver config registry when it is
+defined.
 
 A worker process has only imported sunnbear itself, so every
 worker first imports the modules that define the run's formulas and solver configs.
@@ -68,7 +69,7 @@ class BenchmarkWorkerPool:
                 an interactive session, because a worker cannot import a definition from an interactive session.
         """
         n_workers = n_workers if n_workers is not None else (os.cpu_count() or 1)
-        module_names = {config.module_name for config in solver_configs}
+        module_names = {config.declaring_module_name for config in solver_configs}
         module_names |= {type(function.formula).__module__ for function in functions}
         if (
             n_workers > 1

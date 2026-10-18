@@ -6,7 +6,7 @@ from .solver import SteffenBrent
 
 
 class SteffenBrentConfigs(SolverConfigs):
-    """`SteffenBrentConfigs` declares the only config of `SteffenBrent`, ``steffen_brent``, a secondary config.
+    """`SteffenBrentConfigs` declares `SteffenBrent`'s only config, a secondary config named ``steffen_brent``.
 
     It is not core because the method is not established yet (published 2025), and its paper tests it on 2 functions
     only.

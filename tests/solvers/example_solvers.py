@@ -23,7 +23,7 @@ class WeightedSplitSolver(BracketingSolver):
         return interval.a + self.weight * interval.width
 
 
-def define_configs(namespace: dict[str, object]) -> type[SolverConfigs]:
+def define_configs_subclass(namespace: dict[str, object]) -> type[SolverConfigs]:
     """Define, and so register, a `SolverConfigs` subclass with the attributes in ``namespace``.
 
     The class counts as defined in the test suite, outside the sunnbear package, unless ``namespace``

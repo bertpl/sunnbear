@@ -6,7 +6,7 @@ from .solver import Illinois
 
 
 class IllinoisConfigs(SolverConfigs):
-    """`IllinoisConfigs` declares the only config of `Illinois`, ``illinois``, a core config.
+    """`IllinoisConfigs` declares `Illinois`'s only config, a core config named ``illinois``.
 
     Unlike `RegulaFalsi`, `Illinois` does not stall on a convex or concave function, so its results characterize the
     test functions.

@@ -11,8 +11,8 @@ class TOMS748Configs(SolverConfigs):
     - ``toms748[k=2]``, the core config: the paper's Algorithm 4.2;
     - ``toms748[k=1]``, a secondary config: the paper's Algorithm 4.1.
 
-    Section V.b of ``SOLVER_IMPLEMENTATIONS.md``, in the package `sunnbear._core.solvers`, gives the reasons for their
-    roles.
+    Section V.b of ``SOLVER_IMPLEMENTATIONS.md``, in the package `sunnbear._core.solvers`, gives the reasons for the
+    configs' roles.
     """
 
     solver_cls = TOMS748

@@ -39,10 +39,10 @@ class SolverConfigRegistry:
                 second one with role ``BUILTIN_BASELINE``.
         """
         if config.solver_id in cls._configs_by_id:
-            existing_module_name = cls._configs_by_id[config.solver_id].module_name
+            existing_declaring_module_name = cls._configs_by_id[config.solver_id].declaring_module_name
             raise ValueError(
-                f"Duplicate solver_id {config.solver_id!r}: declared in {config.module_name} and in "
-                f"{existing_module_name}."
+                f"Duplicate solver_id {config.solver_id!r}: declared in {config.declaring_module_name} and in "
+                f"{existing_declaring_module_name}."
             )
         baseline = next((c for c in cls._configs_by_id.values() if c.role is SolverRole.BUILTIN_BASELINE), None)
         if config.role is SolverRole.BUILTIN_BASELINE and baseline is not None:

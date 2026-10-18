@@ -15,8 +15,8 @@ class ITPConfigs(SolverConfigs):
       pseudocode;
     - ``itp[n_slack=4,variant='paper_experiments']``, a secondary config: the core config with 4 iterations of slack.
 
-    Section V.c of ``SOLVER_IMPLEMENTATIONS.md``, in the package `sunnbear._core.solvers`, gives the reasons for their
-    roles, and for the value 4.
+    Section V.c of ``SOLVER_IMPLEMENTATIONS.md``, in the package `sunnbear._core.solvers`, gives the reasons for the
+    configs' roles, and for the value 4.
     """
 
     solver_cls = ITP

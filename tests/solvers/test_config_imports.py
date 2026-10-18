@@ -11,7 +11,7 @@ from sunnbear.solvers import SolverConfigRegistry
 def test_every_solver_module_is_imported_by_its_package():
     """Importing every solver module registers nothing beyond what importing the solver packages already registers."""
     # --- arrange ----------------------
-    registered_before = {type(config) for config in SolverConfigRegistry.configs()}
+    registered_before = {config.solver_id for config in SolverConfigRegistry.configs()}
 
     # --- act --------------------------
     for module_info in pkgutil.walk_packages(solvers_package.__path__, prefix=f"{solvers_package.__name__}."):
@@ -19,7 +19,7 @@ def test_every_solver_module_is_imported_by_its_package():
 
     # --- assert -----------------------
     not_imported_by_package = [
-        type(config) for config in SolverConfigRegistry.configs() if type(config) not in registered_before
+        config for config in SolverConfigRegistry.configs() if config.solver_id not in registered_before
     ]
-    modules = [cls.__module__ for cls in not_imported_by_package]
+    modules = [config.declaring_module_name for config in not_imported_by_package]
     assert not not_imported_by_package, f"solver modules not imported by their package: {modules}"

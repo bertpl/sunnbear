@@ -14,9 +14,9 @@ class RiddersConfigs(SolverConfigs):
     - ``ridders[variant='scipy']``, a secondary config: SciPy's step limit and stopping criterion;
     - ``ridders[variant='commons_math']``, a secondary config: Apache Commons Math's stopping criterion.
 
-    Section V.a of ``SOLVER_IMPLEMENTATIONS.md``, in the package `sunnbear._core.solvers`, gives the reasons for their
-    roles. Under **Limit on the step**, the docstring of `Ridders` states why the evaluation counts of the core config
-    vary more between near-identical functions than those of ``ridders[variant='scipy']``.
+    Section V.a of ``SOLVER_IMPLEMENTATIONS.md``, in the package `sunnbear._core.solvers`, gives the reasons for the
+    configs' roles. Under **Limit on the step**, the docstring of `Ridders` states why the evaluation counts of the core
+    config vary more between near-identical functions than those of ``ridders[variant='scipy']``.
     """
 
     solver_cls = Ridders

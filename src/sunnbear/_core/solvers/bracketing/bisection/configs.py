@@ -6,7 +6,7 @@ from .solver import Bisection
 
 
 class BisectionConfigs(SolverConfigs):
-    """`BisectionConfigs` declares the only config of `Bisection`, ``bisection``, the baseline config.
+    """`BisectionConfigs` declares `Bisection`'s only config, the baseline config named ``bisection``.
 
     Its evaluation count is the benchmark's reference cost.
     """

@@ -3,4 +3,9 @@
 
 def is_defined_in_sunnbear(cls: type) -> bool:
     """Return whether ``cls`` is defined in a module of the sunnbear package."""
-    return cls.__module__ == "sunnbear" or cls.__module__.startswith("sunnbear.")
+    return is_sunnbear_module(cls.__module__)
+
+
+def is_sunnbear_module(module_name: str) -> bool:
+    """Return whether ``module_name`` names the sunnbear package or one of its modules."""
+    return module_name == "sunnbear" or module_name.startswith("sunnbear.")

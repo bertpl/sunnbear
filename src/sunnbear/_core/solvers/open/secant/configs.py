@@ -6,7 +6,7 @@ from .solver import Secant
 
 
 class SecantConfigs(SolverConfigs):
-    """`SecantConfigs` declares the only config of `Secant`, ``secant``, a secondary config.
+    """`SecantConfigs` declares `Secant`'s only config, a secondary config named ``secant``.
 
     It is not core because the secant method can stop at an incorrect x-value or leave the interval, so its results do
     not reliably characterize the test functions.

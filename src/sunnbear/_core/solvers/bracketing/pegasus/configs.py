@@ -6,7 +6,7 @@ from .solver import Pegasus
 
 
 class PegasusConfigs(SolverConfigs):
-    """`PegasusConfigs` declares the only config of `Pegasus`, ``pegasus``, a secondary config.
+    """`PegasusConfigs` declares `Pegasus`'s only config, a secondary config named ``pegasus``.
 
     It is not core because the config of `Illinois` already represents the modified regula falsi family among the core
     configs.

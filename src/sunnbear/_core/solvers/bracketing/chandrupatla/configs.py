@@ -6,7 +6,7 @@ from .solver import Chandrupatla
 
 
 class ChandrupatlaConfigs(SolverConfigs):
-    """`ChandrupatlaConfigs` declares the only config of `Chandrupatla`, ``chandrupatla``, a core config.
+    """`ChandrupatlaConfigs` declares `Chandrupatla`'s only config, a core config named ``chandrupatla``.
 
     Its results differ from those of Brent's method at a multiple root. There, interpolation converges slowly, and
     Chandrupatla's method switches to bisection while Brent's method keeps interpolating.

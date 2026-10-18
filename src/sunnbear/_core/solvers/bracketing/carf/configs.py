@@ -6,7 +6,7 @@ from .solver import CARF
 
 
 class CARFConfigs(SolverConfigs):
-    """`CARFConfigs` declares the only config of `CARF`, ``carf``, a secondary config, with the paper's constants.
+    """`CARFConfigs` declares `CARF`'s only config, a secondary config named ``carf``, with the paper's constants.
 
     It is not core because the method is not established yet (published 2026), and `CARF` reconstructs it from the
     paper's description, without the author's code.

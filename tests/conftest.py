@@ -25,7 +25,7 @@ from sunnbear.solvers import SolverConfigRegistry
 
 @pytest.fixture
 def isolated_solver_config_registry(monkeypatch):
-    """Give the test its own copy of the registry, so the configs that a test declares don't leak past the test."""
+    """Give the test its own copy of the registry, so a test's own configs don't leak past the test."""
     monkeypatch.setattr(SolverConfigRegistry, "_configs_by_id", dict(SolverConfigRegistry._configs_by_id))
 
 
