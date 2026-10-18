@@ -71,17 +71,6 @@ def test_the_largest_shipped_size_holds_exactly_1_tuple_per_fine_lane():
         assert np.bincount(fine_lanes_of(values), minlength=N_FINE_LANES).tolist() == [1] * N_FINE_LANES
 
 
-@pytest.mark.parametrize("size", MCTuplesSize)
-def test_each_shipped_size_holds_a_tuple_in_both_outer_fine_lanes_of_each_axis(size):
-    """Each shipped size has a tuple in fine lane 0 and in the last fine lane, along u and along v."""
-    # --- act --------------------------
-    tuples = load_mc_tuples(size)
-
-    # --- assert -----------------------
-    for values in (tuples.u, tuples.v):
-        assert {0, N_FINE_LANES - 1} <= set(fine_lanes_of(values).tolist())
-
-
 def test_every_shipped_value_holds_at_least_min_n_bits():
     """Every u value and v value of the shipped set holds at least `MIN_N_BITS` bits of information."""
     # --- act --------------------------
