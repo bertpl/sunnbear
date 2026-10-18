@@ -14,8 +14,8 @@ def test_the_first_step_is_a_bisection():
 
 
 def test_a_straight_line_switches_to_anderson_bjorck_whose_first_step_lands_on_the_root():
-    """On a line, the midpoint lies exactly on the chord, so the method switches to Anderson-Björck mode, and the
-    chord's zero is the root, where the function is exactly 0: 4 evaluations in total."""
+    """On a line, the midpoint lies exactly on the secant, so the method switches to Anderson-Björck mode, and the
+    secant's zero is the root, where the function is exactly 0: 4 evaluations in total."""
     # --- act --------------------------
     result = ModAB().solve(lambda x: x - 0.25, 0.0, 1.0, xtol=1e-10, max_fevals=10, history_enabled=True)
 

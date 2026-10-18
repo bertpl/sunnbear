@@ -25,8 +25,8 @@ Third-party published results:
 - Ganchovski et al. (2026), Table 2, the column "ill": not reproduced, because the paper's C# code differs from
   `Illinois` in 2 ways:
 
-  - the C# code stops when the next chord's zero lies within the code's tolerance of the previous chord's zero, without
-    evaluating the function at the new zero, while `Illinois` stops on the interval width;
+  - the C# code stops when the next secant's zero lies within the code's tolerance of the previous secant's zero,
+    without evaluating the function at the new zero, while `Illinois` stops on the interval width;
   - the C# code starts with no retained bound, so it never halves a function value before its 2nd iteration.
 
 Reference implementations:

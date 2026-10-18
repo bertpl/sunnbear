@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import cached_property
 
-from .formulas import chord_zero, midpoint
+from .formulas import midpoint, secant_zero
 
 
 # ==================================================================================================
@@ -94,9 +94,9 @@ class Interval(ABC):
         return midpoint(self.a, self.b)
 
     @cached_property
-    def chord_zero(self) -> float:
-        """Return the zero of the chord through ``(a, fa)`` and ``(b, fb)``."""
-        return chord_zero(self.a, self.fa, self.b, self.fb)
+    def secant_zero(self) -> float:
+        """Return the zero of the secant through ``(a, fa)`` and ``(b, fb)``."""
+        return secant_zero(self.a, self.fa, self.b, self.fb)
 
     @cached_property
     def is_fa_zero(self) -> bool:
@@ -118,7 +118,7 @@ class Interval(ABC):
         because a check would add flops to every solver:
 
         - an ``x`` on a bound replaces that bound with the same x-value, so the interval stays the same;
-        - an ``x`` just outside, where rounding can put a chord's zero, usually replaces the nearer bound, which widens
+        - an ``x`` just outside, where rounding can put a secant's zero, usually replaces the nearer bound, which widens
           the interval and keeps the sign change;
         - only a sign change between that ``x`` and the nearer bound, as with a second root right outside the
           interval, makes ``x`` replace the far bound; the interval is then inverted, with ``b < a``, and its negative

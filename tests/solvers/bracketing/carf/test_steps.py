@@ -1,6 +1,6 @@
 """These tests assert that the individual steps of `CARF` follow its algorithm, that its quadratic step finds the
 quadratic's zero at any scale of ``f`` and with its middle x-value ``t`` within rounding error of an interval bound,
-and that the step returns the chord's zero with ``t`` on a bound."""
+and that the step returns the secant's zero with ``t`` on a bound."""
 
 import math
 
@@ -29,10 +29,10 @@ _X_POW_19_STEP_INPUTS = (
 @pytest.mark.parametrize(
     "f, a, b, first_x",
     [(cubic, 1.0, 2.0, 1.0 + 1.0 / 6.0), (steep_exponential, 0.0, 1.0, 0.1)],
-    ids=["chord_zero_inside", "chord_zero_clipped"],
+    ids=["secant_zero_inside", "secant_zero_clipped"],
 )
-def test_the_first_x_value_is_the_chord_zero_clipped_into_the_middle_80_percent(f, a, b, first_x):
-    """The first x-value is the chord's zero, kept when it lies in the middle 80 % of the interval and clipped to its
+def test_the_first_x_value_is_the_secant_zero_clipped_into_the_middle_80_percent(f, a, b, first_x):
+    """The first x-value is the secant's zero, kept when it lies in the middle 80 % of the interval and clipped to its
     edge otherwise."""
     # --- act --------------------------
     result = CARF().solve(f, a, b, xtol=1e-10, max_fevals=60, history_enabled=True)
@@ -63,8 +63,8 @@ def test_the_quadratic_zero_does_not_depend_on_the_scale_of_f(scale):
 
 
 @pytest.mark.parametrize("t, ft", [(0.0, -2.0), (2.0, 2.0)], ids=["t_on_a", "t_on_b"])
-def test_the_quadratic_zero_with_t_on_a_bound_is_the_chord_zero(t, ft):
-    """With ``t`` on an interval bound, the quadratic is not defined, and the step returns the zero of the chord
+def test_the_quadratic_zero_with_t_on_a_bound_is_the_secant_zero(t, ft):
+    """With ``t`` on an interval bound, the quadratic is not defined, and the step returns the zero of the secant
     through ``(0, -2)`` and ``(2, 2)``."""
     # --- act --------------------------
     zero = CARF._quadratic_zero(0.0, t, 2.0, -2.0, ft, 2.0)

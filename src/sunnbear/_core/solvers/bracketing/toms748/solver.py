@@ -20,7 +20,7 @@ _UNSET = 1.0e5
 class TOMS748(Solver):
     """`TOMS748` implements Algorithm 748 (Alefeld, Potra and Shi, 1995), with ``k`` interpolation steps per iteration.
 
-    The first iteration takes a secant step, computed with `chord_zero`. Each later iteration evaluates the function
+    The first iteration takes a secant step, computed with `secant_zero`. Each later iteration evaluates the function
     at 1 x-value per step:
 
     - ``k`` interpolation steps. The j-th step, counted from 1, takes the zero of the inverse cubic interpolation
@@ -96,11 +96,11 @@ class TOMS748(Solver):
         Each call of `_evaluate_and_split_at` evaluates 1 x-value and returns the new interval; the solve ends after any
         call that returns an interval with ``f(a) = 0``, or one at most ``stop_width`` wide.
 
-        These steps take the form of `chord_zero` and `midpoint`, which every solver shares, not the form of the
+        These steps take the form of `secant_zero` and `midpoint`, which every solver shares, not the form of the
         authors' code:
 
         - a midpoint, `Interval.midpoint`, where the authors' code computes ``a + 0.5 * (b - a)``;
-        - the first secant step, `Interval.chord_zero`, where the authors' code computes
+        - the first secant step, `Interval.secant_zero`, where the authors' code computes
           ``a - (fa / (fb - fa)) * (b - a)``.
         """
         interval = state.interval
@@ -117,7 +117,7 @@ class TOMS748(Solver):
 
             # --- iteration 1: the secant step ---
             if n_iterations == 1:
-                c = interval.chord_zero
+                c = interval.secant_zero
                 interval, d, fd, stop_width = self._evaluate_and_split_at(state, interval, c, stop_width, tol)
                 if interval.is_fa_zero or interval.width <= stop_width:
                     return interval.a

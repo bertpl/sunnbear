@@ -1,7 +1,7 @@
 """`Illinois` implements the Illinois method: regula falsi that halves the value of a bound kept twice in a row."""
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, IntervalBound
-from sunnbear._core.solvers.core.formulas import chord_zero
+from sunnbear._core.solvers.core.formulas import secant_zero
 
 from .state import IllinoisState
 
@@ -9,14 +9,14 @@ from .state import IllinoisState
 class Illinois(BracketingSolver[IllinoisState]):
     """`Illinois` is regula falsi that halves the function value of a bound that the interval keeps twice in a row.
 
-    Like regula falsi, it evaluates the zero of the chord through ``(a, f(a))`` and ``(b, f(b))``.
+    Like regula falsi, it evaluates the zero of the secant through ``(a, f(a))`` and ``(b, f(b))``.
 
     Regula falsi stalls when the function is convex or concave on the interval: it keeps 1 bound forever, so the
     interval never shrinks below the distance from that bound to the root. The Illinois method (Dowell and
     Jarratt, 1971) avoids the stall. Each new iterate replaces 1 bound, and the other bound is the retained bound:
 
     - when a new iterate lies on the same side of the root as the previous iterate, the retained bound's function
-      value is halved before the next chord is drawn, which moves the next iterate toward the retained bound;
+      value is halved before the next secant is drawn, which moves the next iterate toward the retained bound;
     - each further iteration that keeps that bound halves its value again;
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, at its own
       function value.
@@ -24,13 +24,13 @@ class Illinois(BracketingSolver[IllinoisState]):
     `Illinois` departs from the ALGOL procedure of Dowell and Jarratt (1971), or settles an unspecified detail of that
     procedure, in these places:
 
-    - **Chord's zero:** `Illinois` computes it with `chord_zero`, in the form of Ford (1997); the procedure computes it
-      as a correction to the most recent iterate ``x1``, ``x1 - f1 * (x1 - x0) / (f1 - f0)``, with ``x0`` the retained
-      bound and ``f0`` its function value, halved once for each iteration that kept ``x0`` again; the 2 forms are
-      equal in exact arithmetic but round differently;
+    - **Secant's zero:** `Illinois` computes it with `secant_zero`, in the form of Ford (1997); the procedure computes
+      it as a correction to the most recent iterate ``x1``, ``x1 - f1 * (x1 - x0) / (f1 - f0)``, with ``x0`` the
+      retained bound and ``f0`` its function value, halved once for each iteration that kept ``x0`` again; the 2 forms
+      are equal in exact arithmetic but round differently;
     - **Stopping criterion:** `Illinois` stops by `BracketingSolver`'s criterion, once the interval is at most
       ``2 * xtol`` wide, and returns the interval's midpoint, which lies within ``xtol`` of a root; the procedure
-      stops once a step is at most its tolerance ``delta``, and returns the last chord's zero without evaluating it,
+      stops once a step is at most its tolerance ``delta``, and returns the last secant's zero without evaluating it,
       which need not lie within ``xtol`` of a root;
     - **Starting order:** the procedure leaves the order of its 2 starting x-values to the caller; `Illinois` passes
       the upper bound as ``x1``, the second of them, as mpmath does.
@@ -41,7 +41,7 @@ class Illinois(BracketingSolver[IllinoisState]):
           reproduces the errors in its Table 1. https://doi.org/10.1007/BF01934364
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. Its equation 5, with ``gamma = 0.5`` from its Table 1, is the Illinois step in the
-          form of `chord_zero`, and the test suite reproduces its Table 4.
+          form of `secant_zero`, and the test suite reproduces its Table 4.
         - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="illinois"``; the test suite checks
           `Illinois` against mpmath's ``Illinois``.
         - Oliveira, I. F. D. and Takahashi, R. H. C. (2020). An enhancement of the bisection method average
@@ -55,9 +55,9 @@ class Illinois(BracketingSolver[IllinoisState]):
     state_cls = IllinoisState
 
     def _next_x(self, state: IllinoisState, interval: Interval) -> float:
-        """Return where the chord crosses zero, with the retained bound's value halved as the class docstring says.
+        """Return where the secant crosses zero, with the retained bound's value halved as the class docstring says.
 
-        Before computing the chord, update ``state.scaled_retained_f`` and ``state.newest_bound`` from the bound
+        Before computing the secant, update ``state.scaled_retained_f`` and ``state.newest_bound`` from the bound
         that the previous call's returned x-value replaced. This update is correct only when exactly 1 new
         evaluation happened since the previous call.
         """
@@ -80,4 +80,4 @@ class Illinois(BracketingSolver[IllinoisState]):
         else:
             x0, x1, f1 = interval.b, interval.a, interval.fa
         f0 = state.scaled_retained_f
-        return chord_zero(x0, f0, x1, f1)
+        return secant_zero(x0, f0, x1, f1)

@@ -106,7 +106,7 @@ def _case_study_2(v: float) -> float:
 # `_LAST_SECANT_STEP_DEVIATION_REASON` states why, in case study 2, the solve takes 1 more iteration than the paper's
 # run, which also changes the figures' last width ratio.
 _LAST_SECANT_STEP_DEVIATION_REASON = (
-    "`chord_zero` puts the last secant step 1 ulp from where the paper's equation 4 puts it; near the root, rounding "
+    "`secant_zero` puts the last secant step 1 ulp from where the paper's equation 4 puts it; near the root, rounding "
     "in f gives neighboring floats opposite signs, so f(s) has the sign opposite to f at equation 4's x-value, and the "
     "solve evaluates the midpoint of a and s and takes 1 more iteration"
 )

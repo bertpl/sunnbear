@@ -3,7 +3,7 @@
 import math
 
 from sunnbear._core.solvers.core import Solver, SolveState
-from sunnbear._core.solvers.core.formulas import chord_zero, midpoint
+from sunnbear._core.solvers.core.formulas import midpoint, secant_zero
 
 # The paper's constants, which clip an x-value into the middle part of an interval: a fraction θ of the interval's
 # width at each end is out of bounds. θ0 places the first x-value; θ1, θ2 and θ3 clip the later x-values, and the kind
@@ -21,7 +21,7 @@ class CARF(Solver):
     """`CARF` implements the Curvature-Adaptive Root Finder of Gao (2026), reconstructed from the paper and its results.
 
     `CARF` keeps an interval ``[a, b]`` and an interior x-value ``t``, strictly inside it, and knows the function
-    value at all 3. The first ``t`` is the zero of the chord through the bounds, clipped into the middle 80 % of the
+    value at all 3. The first ``t`` is the zero of the secant through the bounds, clipped into the middle 80 % of the
     interval (``θ0 = 0.1``). Each iteration:
 
     - **selects the active interval:** ``[a, t]`` or ``[t, b]``, the part that holds the sign change, which the paper
@@ -86,7 +86,7 @@ class CARF(Solver):
       - **the quadratic's slope at** ``t`` is a weighted average of the slopes from ``a`` to ``t`` and from ``t`` to
         ``b``, which cannot cancel to 0 while the 3 function values are monotone;
       - **when rounding puts** ``t`` **onto a bound, or the 3 points lie on 1 line,** `CARF` takes the zero of the
-        chord through ``(a, f(a))`` and ``(b, f(b))``: in the first case the quadratic is not defined, and in the
+        secant through ``(a, f(a))`` and ``(b, f(b))``: in the first case the quadratic is not defined, and in the
         second the quadratic is that line.
 
       On intervals as wide as ``[-1e4, 1e4]``, ``h`` often lies within rounding error of 0 or 1, the limits that
@@ -155,7 +155,7 @@ class CARF(Solver):
 
         # --- the first x-value ------------------
         width = b - a
-        t = chord_zero(a, fa, b, fb)
+        t = secant_zero(a, fa, b, fb)
         t = max(min(t, b - _THETA_0 * width), a + _THETA_0 * width)
         ft = state.f(t)
         state.x_best = t
@@ -236,10 +236,10 @@ class CARF(Solver):
         into the active interval.
 
         When rounding puts ``t`` onto ``a`` or ``b``, the quadratic is not defined; when the 3 points lie on 1 line, the
-        quadratic is that line. In both cases, the zero of the chord through ``(a, fa)`` and ``(b, fb)`` is returned.
+        quadratic is that line. In both cases, the zero of the secant through ``(a, fa)`` and ``(b, fb)`` is returned.
         """
         if not a < t < b:
-            return chord_zero(a, fa, b, fb)
+            return secant_zero(a, fa, b, fb)
         else:
             width = b - a
             # one_minus_r comes from b - t, not from 1.0 - r: the difference of 2 distinct floats is never 0, while
@@ -253,8 +253,8 @@ class CARF(Solver):
             # c2 is the quadratic's second divided difference: the slopes' difference divided by the width, which is 1.
             c2 = slope_t_b - slope_a_t
             if c2 == 0.0:
-                # The 3 points lie on 1 line, the chord through (a, fa) and (b, fb).
-                return chord_zero(a, fa, b, fb)
+                # The 3 points lie on 1 line, the secant through (a, fa) and (b, fb).
+                return secant_zero(a, fa, b, fb)
             else:
                 # c1, the quadratic's slope at r, is the 2 slopes' average weighted by 1 - r and r. While the 3
                 # function values are monotone, both terms are positive, so c1 cannot cancel to 0, as

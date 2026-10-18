@@ -1,7 +1,7 @@
 """`Pegasus` implements the Pegasus method: regula falsi that scales down the value of a bound kept twice in a row."""
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, IntervalBound
-from sunnbear._core.solvers.core.formulas import chord_zero
+from sunnbear._core.solvers.core.formulas import secant_zero
 
 from .state import PegasusState
 
@@ -9,7 +9,7 @@ from .state import PegasusState
 class Pegasus(BracketingSolver[PegasusState]):
     """`Pegasus` is regula falsi that scales down the function value of a bound that the interval keeps twice in a row.
 
-    Like regula falsi, `Pegasus` evaluates the zero of the chord through ``(a, f(a))`` and ``(b, f(b))``.
+    Like regula falsi, `Pegasus` evaluates the zero of the secant through ``(a, f(a))`` and ``(b, f(b))``.
 
     Regula falsi stalls when the function is convex or concave on the interval: regula falsi keeps 1 bound forever,
     so the interval never shrinks below the distance from that bound to the root. The Pegasus method (Dowell and
@@ -33,13 +33,13 @@ class Pegasus(BracketingSolver[PegasusState]):
     Each new iterate replaces 1 bound, and the other bound is the retained bound:
 
     - when a new iterate lies on the same side of the root as the previous iterate, the retained bound's function
-      value is multiplied by the factor before the next chord is drawn, which moves the next iterate toward the
+      value is multiplied by the factor before the next secant is drawn, which moves the next iterate toward the
       retained bound;
     - each further iteration that keeps that bound multiplies its value again, by that iteration's factor;
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, with its
       unscaled function value.
 
-    Dowell and Jarratt (1972) state the Pegasus step with regula falsi's chord formula, as Ford (1997) does, so the
+    Dowell and Jarratt (1972) state the Pegasus step with regula falsi's secant formula, as Ford (1997) does, so the
     Pegasus method differs from regula falsi only in its function value at the retained bound, and from the Illinois
     method only in the factor.
 
@@ -55,7 +55,7 @@ class Pegasus(BracketingSolver[PegasusState]):
     References:
         - Dowell, M. and Jarratt, P. (1972). The "Pegasus" method for computing the root of an equation. BIT 12(4),
           503-508. Its section 2 states when the retained bound's value is scaled and by what factor, and its
-          section 3 the chord formula. The test suite reproduces the errors in the paper's Table 1.
+          section 3 the secant formula. The test suite reproduces the errors in the paper's Table 1.
           https://doi.org/10.1007/BF01932959
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. The paper's equation 5, with ``gamma = f_i / (f_i + f_(i+1))`` from the paper's
@@ -72,9 +72,9 @@ class Pegasus(BracketingSolver[PegasusState]):
     state_cls = PegasusState
 
     def _next_x(self, state: PegasusState, interval: Interval) -> float:
-        """Return where the chord crosses zero, with the retained bound's value scaled as the class docstring says.
+        """Return where the secant crosses zero, with the retained bound's value scaled as the class docstring says.
 
-        Before computing the chord, update `PegasusState`'s own fields from the replaced bound; the new iterate is the
+        Before computing the secant, update `PegasusState`'s own fields from the replaced bound; the new iterate is the
         previous call's return value. This update is correct only when exactly 1 new evaluation happened since the
         previous call.
         """
@@ -97,9 +97,9 @@ class Pegasus(BracketingSolver[PegasusState]):
                 state.newest_bound = replaced_bound
             state.newest_f = new_iterate_f
 
-        # --- regula falsi's chord ---------------
+        # --- regula falsi's secant ---------------
         if state.newest_bound is IntervalBound.UPPER:
             fa, fb = state.scaled_retained_f, interval.fb
         else:
             fa, fb = interval.fa, state.scaled_retained_f
-        return chord_zero(interval.a, fa, interval.b, fb)
+        return secant_zero(interval.a, fa, interval.b, fb)

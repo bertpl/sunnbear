@@ -10,7 +10,7 @@ from tests.solvers.example_functions import cubic
     "f", [lambda x: x - 0.3, lambda x: 0.3 - x]
 )  # The 2 functions cover both interval orientations.
 def test_a_linear_function_is_solved_in_one_step(f):
-    """On a straight line, the first chord lands on the root, so `Pegasus` converges after the 2 bound evaluations
+    """On a straight line, the first secant lands on the root, so `Pegasus` converges after the 2 bound evaluations
     and 1 iterate."""
     # --- act --------------------------
     result = Pegasus().solve(f, 0.0, 1.0, xtol=1e-12, max_fevals=10)

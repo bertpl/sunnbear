@@ -134,7 +134,7 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 | Algorithm | Source's stopping criterion | Source's returned x-value | Kept inside the steps |
 | --------- | --------------------------- | ------------------------- | --------------------- |
 | `Brent` | half-width ≤ `tol`, or `f(b) = 0`, with `tol = 2*macheps*\|b\| + t` | `b`, the bound with the smaller `\|f\|` | minimum step `tol`, with `t = xtol` |
-| `Illinois` | ALGOL: step ≤ `delta`; tables: `\|f\| < 0.5e-19` | ALGOL: the next chord zero, not evaluated | – |
+| `Illinois` | ALGOL: step ≤ `delta`; tables: `\|f\| < 0.5e-19` | ALGOL: the next secant's zero, not evaluated | – |
 | `Pegasus` | none; experiments: `\|f\|` below a threshold | not stated | – |
 | `AndersonBjorck` | `\|x1 - x0\| < δ`, or `f = 0` | the bound with the smaller `\|f\|` | step of `δ`, with `δ = xtol` |
 | `Ridders` | none | not stated | – |
@@ -150,14 +150,14 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 ### IV.b. Iteration Formula
 
 Many solvers compute the same 2 formulas, in forms that are equal in exact arithmetic but round differently. The `sunnbear` solver implementations compute both in 1 shared form:
-- **the chord's zero** through `(a, fa)` and `(b, fb)`: `(a*fb - b*fa) / (fb - fa)`
+- **the secant's zero** through `(a, fa)` and `(b, fb)`: `(a*fb - b*fa) / (fb - fa)`
 - **the midpoint** of `[a, b]`: `0.5*(a + b)`
 
-The framework computes them in the functions `chord_zero` and `midpoint` of `core/formulas.py`.
+The framework computes them in the functions `secant_zero` and `midpoint` of `core/formulas.py`.
 
-This applies to every plain chord step and every plain midpoint, in hybrid methods and in `Secant` too. A step whose form is part of its source's structure, or guards against rounding, keeps its source's form, and a guard that a source adds to a step, such as `ModAB`'s clamp of the chord's zero into the interval, stays.
+This applies to every plain secant step and every plain midpoint, in hybrid methods and in `Secant` too. A step whose form is part of its source's structure, or guards against rounding, keeps its source's form, and a guard that a source adds to a step, such as `ModAB`'s clamp of the secant's zero into the interval, stays.
 
-| Algorithm | Chord's zero | Midpoint |
+| Algorithm | Secant's zero | Midpoint |
 | --------- | ------------ | -------- |
 | `Bisection` | – | shared |
 | `RegulaFalsi` | shared | – |
@@ -167,7 +167,7 @@ This applies to every plain chord step and every plain midpoint, in hybrid metho
 | `Pegasus` | shared | – |
 | `AndersonBjorck` | shared | – |
 | `Ridders` | – | shared |
-| `TOMS748` | shared in the first secant step<br>source's form in the double-size secant step: a step from the bound with the smaller `\|f\|` twice as long as the secant step, which is not a plain chord<br>source's form in the Newton-Quadratic subroutine's fallback chord step `a - fa/a1`, which reuses the slope `a1 = (fb - fa)/(b - a)` of the subroutine's quadratic | shared |
+| `TOMS748` | shared in the first secant step<br>source's form in the double-size secant step: a step from the bound with the smaller `\|f\|` twice as long as the secant step, which is not a plain secant<br>source's form in the Newton-Quadratic subroutine's fallback secant step `a - fa/a1`, which reuses the slope `a1 = (fb - fa)/(b - a)` of the subroutine's quadratic | shared |
 | `Chandrupatla` | – | source's form: `x1 + t*(x2 - x1)` with `t = 0.5`, where `t` is clamped before every step |
 | `ITP` | shared | shared |
 | `SteffenBrent` | shared | shared |

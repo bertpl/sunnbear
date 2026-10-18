@@ -10,10 +10,10 @@ from tests.solvers.example_functions import cubic
     "f", [lambda x: x - 0.25, lambda x: 0.25 - x]
 )  # The 2 functions cover both interval orientations.
 def test_a_linear_function_is_solved_in_one_step(f):
-    """On a straight line, the first chord lands on the root, so `Illinois` converges after 3 evaluations without
+    """On a straight line, the first secant lands on the root, so `Illinois` converges after 3 evaluations without
     halving any value.
 
-    The root 0.25 is a power of 2, so the chord's zero is computed without rounding, and the test can compare the
+    The root 0.25 is a power of 2, so the secant's zero is computed without rounding, and the test can compare the
     result exactly.
     """
     # --- act --------------------------
@@ -25,7 +25,7 @@ def test_a_linear_function_is_solved_in_one_step(f):
 
 def test_the_first_2_steps_are_regula_falsi_and_the_third_halves_the_retained_bound():
     """On the convex cubic, Illinois starts as regula falsi, then halves the value of the bound that it keeps again;
-    each step is the zero of the chord, in the form of `chord_zero`."""
+    each step is the zero of the secant, in the form of `secant_zero`."""
     # --- arrange ----------------------
     a, b = 1.0, 2.0
     fa, fb = cubic(a), cubic(b)

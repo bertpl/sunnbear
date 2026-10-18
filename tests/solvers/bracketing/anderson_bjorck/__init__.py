@@ -15,11 +15,11 @@ Third-party published results:
 - Ganchovski et al. (2026), Table 2, the column "AB": not reproduced, because the paper's C# code differs from
   `AndersonBjorck` in 3 ways:
 
-  - the C# code stops when the next chord's zero lies within the code's tolerance of the previous chord's zero, without
-    evaluating the function at the new zero, while `AndersonBjorck` stops on the interval width;
+  - the C# code stops when the next secant's zero lies within the code's tolerance of the previous secant's zero,
+    without evaluating the function at the new zero, while `AndersonBjorck` stops on the interval width;
   - the C# code starts with no retained bound, so it never scales a function value before its 2nd iteration;
   - the C# code computes the scaling factor as ``1 - f_new / f_previous``, where `AndersonBjorck` computes the ratio of
-    2 chord slopes, as its paper does.
+    2 secant slopes, as its paper does.
 
 Reference implementations:
 

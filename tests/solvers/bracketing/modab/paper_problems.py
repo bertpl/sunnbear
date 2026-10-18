@@ -11,7 +11,7 @@ _ROUNDING_DEVIATION_REASON = (
 )
 
 # Each row holds:
-# - modAB's evaluation count in Table 2, written as the table's count minus the number of iterations whose chord's
+# - modAB's evaluation count in Table 2, written as the table's count minus the number of iterations whose secant's
 #   zero is clamped onto a bound, where there are any: the paper's C# code counts every iteration as an evaluation,
 #   but a clamped iteration evaluates nothing;
 # - modAB's root in the paper's supplementary results; `ModAB` returns this x-value without evaluating the function

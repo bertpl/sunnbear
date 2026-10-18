@@ -18,7 +18,7 @@ class SecantScipyTwin(TwinSolver):
 
     - SciPy evaluates both interval bounds again before its first step;
     - SciPy computes the secant's zero from the ratio of the 2 function values, where `Secant` computes it with
-      `chord_zero`, so the iterates can differ in their last bits.
+      `secant_zero`, so the iterates can differ in their last bits.
 
     The twin is not compared on these test cases:
 
@@ -27,7 +27,7 @@ class SecantScipyTwin(TwinSolver):
       ``xtol = 1e-4``, both solvers stop at the same x-value, far from the root, and the agreement test compares them.
     - `quintic`, at both tolerances: its 4th and 5th iterates have nearly equal function values, which makes the next
       iterate so sensitive to rounding that a change of 1 ulp in either function value changes it by far more than its
-      last bits, and SciPy's form of the secant's zero and `chord_zero` differ by that much too.
+      last bits, and SciPy's form of the secant's zero and `secant_zero` differ by that much too.
     """
 
     name = "secant_scipy_twin"

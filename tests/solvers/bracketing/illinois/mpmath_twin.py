@@ -14,8 +14,8 @@ class IllinoisMpmathTwin(TwinSolver):
     deviates from exact agreement in these declared ways:
 
     - mpmath evaluates both interval bounds again before its first iterate;
-    - mpmath computes the chord's zero as ``a - fa / ((fb - fa) / (b - a))``, a step from mpmath's ``a``, which is
-      the bound that does not hold the most recent iterate, where `Illinois` computes it with `chord_zero`, so the
+    - mpmath computes the secant's zero as ``a - fa / ((fb - fa) / (b - a))``, a step from mpmath's ``a``, which is
+      the bound that does not hold the most recent iterate, where `Illinois` computes it with `secant_zero`, so the
       iterates can differ in their last bits.
     """
 
