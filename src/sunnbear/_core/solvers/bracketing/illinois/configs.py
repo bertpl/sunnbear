@@ -1,15 +1,15 @@
 """This module declares the built-in config of `Illinois`."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverConfigs, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import Illinois
 
 
-class IllinoisConfigs(SolverConfigs):
-    """`IllinoisConfigs` declares `Illinois`'s only config, a core config named ``illinois``.
+class IllinoisConfigsDeclaration(SolverConfigsDeclaration):
+    """`IllinoisConfigsDeclaration` declares `Illinois`'s only config, named ``illinois``.
 
-    Unlike `RegulaFalsi`, `Illinois` does not stall on a convex or concave function, so its results characterize the
-    test functions.
+    It is a core config. Unlike `RegulaFalsi`, `Illinois` does not stall on a convex or concave function, so its results
+    characterize the test functions.
     """
 
     solver_cls = Illinois

@@ -17,7 +17,7 @@ from sunnbear.solvers import (
     Solver,
     SolverConfig,
     SolverConfigRegistry,
-    SolverConfigs,
+    SolverConfigsDeclaration,
     SolverRole,
     SolveState,
     SolveStatus,
@@ -61,11 +61,11 @@ def cubic() -> functions.TestFunction:
 def unevaluated_midpoint_and_stalling_configs(isolated_solver_config_registry) -> tuple[SolverConfig, SolverConfig]:
     """Return configs of `_UnevaluatedMidpointSolver` and `_StallingSolver`, registered only for the test."""
 
-    class _UnevaluatedMidpointConfigs(SolverConfigs):
+    class _UnevaluatedMidpointConfigsDeclaration(SolverConfigsDeclaration):
         solver_cls = _UnevaluatedMidpointSolver
         configs = (SolverConfig(role=SolverRole.USER_OTHER),)
 
-    class _StallingConfigs(SolverConfigs):
+    class _StallingConfigsDeclaration(SolverConfigsDeclaration):
         solver_cls = _StallingSolver
         configs = (SolverConfig(role=SolverRole.USER_OTHER),)
 

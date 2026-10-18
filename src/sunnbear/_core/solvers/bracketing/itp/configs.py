@@ -1,13 +1,13 @@
 """This module declares the built-in configs of `ITP`."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverConfigs, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import ITP
 from .variant import ITPVariant
 
 
-class ITPConfigs(SolverConfigs):
-    """`ITPConfigs` declares the configs of `ITP`, which differ in their projection radius and in ``n_slack``.
+class ITPConfigsDeclaration(SolverConfigsDeclaration):
+    """`ITPConfigsDeclaration` declares the configs of `ITP`, which differ in projection radius and in ``n_slack``.
 
     - ``itp[n_slack=0,variant='paper_experiments']``, the core config: the settings of the paper's experiments and of
       the authors' code;

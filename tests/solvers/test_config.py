@@ -1,11 +1,11 @@
-"""A `SolverConfig` gets its `solver_id` and its solver from its declaration in a `SolverConfigs` subclass, and a
-malformed declaration fails when the subclass is defined."""
+"""A `SolverConfig` gets its `solver_id` and its solver from its declaration in a `SolverConfigsDeclaration` subclass,
+and a malformed declaration fails when the subclass is defined."""
 
 import pytest
 
 from sunnbear.solvers import BracketingSolver, SolverConfig, SolverConfigRegistry, SolverRole
 
-from .example_solvers import WeightedSplitSolver, define_configs_subclass
+from .example_solvers import WeightedSplitSolver, define_configs_declaration
 
 
 # ==================================================================================================
@@ -37,7 +37,7 @@ def test_solver_id_lists_init_arguments_sorted_by_name(solver_kwargs, solver_id_
     configs = (SolverConfig(role=SolverRole.USER_ACTIVE, solver_kwargs=solver_kwargs),)
 
     # --- act --------------------------
-    define_configs_subclass({"solver_cls": WeightedSplitSolver, "configs": configs})
+    define_configs_declaration({"solver_cls": WeightedSplitSolver, "configs": configs})
 
     # --- assert -----------------------
     assert SolverConfigRegistry.config_from_id(solver_id_expected).solver_id == solver_id_expected
@@ -48,7 +48,7 @@ def test_instantiate_passes_the_init_arguments():
     """`SolverConfig.instantiate` builds an instance of the config's solver class from its ``solver_kwargs``."""
     # --- arrange ----------------------
     configs = (SolverConfig(role=SolverRole.USER_ACTIVE, solver_kwargs={"weight": 0.25, "n_warmup": 3}),)
-    define_configs_subclass({"solver_cls": WeightedSplitSolver, "configs": configs})
+    define_configs_declaration({"solver_cls": WeightedSplitSolver, "configs": configs})
 
     # --- act --------------------------
     solver = SolverConfigRegistry.config_from_id("weighted_split[n_warmup=3,weight=0.25]").instantiate()
@@ -60,8 +60,8 @@ def test_instantiate_passes_the_init_arguments():
 
 @pytest.mark.usefixtures("isolated_solver_config_registry")
 def test_every_config_of_a_declaration_is_registered_with_its_solver_class_and_module():
-    """Each config of a `SolverConfigs` subclass is registered with the subclass's ``solver_cls``, and with the
-    subclass's module, which a benchmark worker imports."""
+    """Each config of a `SolverConfigsDeclaration` subclass is registered with the subclass's ``solver_cls``, and with
+    the subclass's module, which a benchmark worker imports."""
     # --- arrange ----------------------
     configs = (
         SolverConfig(role=SolverRole.USER_ACTIVE, solver_kwargs={"weight": 0.25}),
@@ -69,7 +69,7 @@ def test_every_config_of_a_declaration_is_registered_with_its_solver_class_and_m
     )
 
     # --- act --------------------------
-    define_configs_subclass({"solver_cls": WeightedSplitSolver, "configs": configs})
+    define_configs_declaration({"solver_cls": WeightedSplitSolver, "configs": configs})
 
     # --- assert -----------------------
     registered_configs = [SolverConfigRegistry.config_from_id(f"weighted_split[weight={w}]") for w in (0.25, 0.75)]
@@ -113,10 +113,10 @@ def test_every_config_of_a_declaration_is_registered_with_its_solver_class_and_m
     ],
 )
 def test_malformed_declaration_is_rejected_at_class_definition(namespace, message):
-    """Defining a malformed `SolverConfigs` subclass raises ``TypeError``, with a message that names the defect."""
+    """Defining a malformed `SolverConfigsDeclaration` subclass raises ``TypeError`` that names the defect."""
     # --- act / assert -----------------
     with pytest.raises(TypeError, match=message):
-        define_configs_subclass(namespace)
+        define_configs_declaration(namespace)
 
 
 def test_a_solver_kwargs_value_of_an_unsupported_type_is_rejected():
@@ -129,7 +129,7 @@ def test_a_solver_kwargs_value_of_an_unsupported_type_is_rejected():
 
 @pytest.mark.usefixtures("isolated_solver_config_registry")
 def test_a_malformed_declaration_registers_none_of_its_configs():
-    """When 1 config of a `SolverConfigs` subclass is malformed, the configs before it are not registered either."""
+    """When 1 config of a `SolverConfigsDeclaration` subclass is malformed, no config of that subclass is registered."""
     # --- arrange ----------------------
     configs = (
         SolverConfig(role=SolverRole.USER_ACTIVE, solver_kwargs={"weight": 0.5}),
@@ -138,7 +138,7 @@ def test_a_malformed_declaration_registers_none_of_its_configs():
 
     # --- act --------------------------
     with pytest.raises(TypeError):
-        define_configs_subclass({"solver_cls": WeightedSplitSolver, "configs": configs})
+        define_configs_declaration({"solver_cls": WeightedSplitSolver, "configs": configs})
 
     # --- assert -----------------------
     assert "weighted_split[weight=0.5]" not in {config.solver_id for config in SolverConfigRegistry.configs()}
@@ -156,7 +156,7 @@ def test_builtin_only_role_outside_sunnbear_is_rejected(role):
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="reserved for configs inside the sunnbear package"):
-        define_configs_subclass(namespace)
+        define_configs_declaration(namespace)
 
 
 @pytest.mark.usefixtures("isolated_solver_config_registry")
@@ -170,7 +170,7 @@ def test_builtin_only_role_inside_sunnbear_is_accepted():
     }
 
     # --- act --------------------------
-    define_configs_subclass(namespace)
+    define_configs_declaration(namespace)
 
     # --- assert -----------------------
     assert SolverConfigRegistry.config_from_id("weighted_split[weight=0.5]").role is SolverRole.BUILTIN_CORE

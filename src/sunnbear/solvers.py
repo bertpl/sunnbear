@@ -31,7 +31,7 @@ from ._core.solvers.core import (
     Solver,
     SolverConfig,
     SolverConfigRegistry,
-    SolverConfigs,
+    SolverConfigsDeclaration,
     SolveResult,
     SolverRole,
     SolveState,
@@ -66,7 +66,7 @@ __all__ = [
     "Solver",
     "SolverConfig",
     "SolverConfigRegistry",
-    "SolverConfigs",
+    "SolverConfigsDeclaration",
     "SolverRole",
     "SteffenBrent",
 ]

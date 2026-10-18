@@ -36,11 +36,11 @@ The module `stopping` holds `interval_root_if_converged`, which applies the stop
 their interval bounds in variables of their own.
 
 A solver class carries only its algorithm. A `SolverConfig` records the init arguments that the benchmark passes
-to a solver, and its `SolverRole` decides how the benchmark treats the result; 1 `SolverConfigs` subclass per
+to a solver, and its `SolverRole` decides how the benchmark treats the result; 1 `SolverConfigsDeclaration` subclass per
 solver class declares that solver's configs, and `SolverConfigRegistry` holds every registered config.
 """
 
-from .config import SolverConfig, SolverConfigs
+from .config import SolverConfig, SolverConfigsDeclaration
 from .interval import DecreasingInterval, IncreasingInterval, Interval, IntervalBound
 from .registry import SolverConfigRegistry
 from .result import SolveResult, SolveStatus

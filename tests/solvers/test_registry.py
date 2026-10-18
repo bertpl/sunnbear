@@ -24,7 +24,7 @@ from sunnbear.solvers import (
     SteffenBrent,
 )
 
-from .example_solvers import WeightedSplitSolver, define_configs_subclass
+from .example_solvers import WeightedSplitSolver, define_configs_declaration
 
 # ==================================================================================================
 #  Built-in configs
@@ -88,7 +88,7 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
     configs = tuple(
         SolverConfig(role=SolverRole.USER_ACTIVE, solver_kwargs={"weight": weight}) for weight in (0.75, 0.25)
     )
-    define_configs_subclass({"solver_cls": WeightedSplitSolver, "configs": configs})
+    define_configs_declaration({"solver_cls": WeightedSplitSolver, "configs": configs})
 
     # --- act --------------------------
     solver_ids = [config.solver_id for config in SolverConfigRegistry.configs()]
@@ -156,7 +156,7 @@ def test_duplicate_solver_id_is_rejected():
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="Duplicate solver_id 'bisection'"):
-        define_configs_subclass(namespace)
+        define_configs_declaration(namespace)
 
 
 @pytest.mark.usefixtures("isolated_solver_config_registry")
@@ -171,4 +171,4 @@ def test_second_baseline_is_rejected():
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="Only one config may have role BUILTIN_BASELINE"):
-        define_configs_subclass(namespace)
+        define_configs_declaration(namespace)

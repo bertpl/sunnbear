@@ -1,12 +1,12 @@
 """This module declares the built-in configs of `TOMS748`, 1 per value of ``k``."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverConfigs, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import TOMS748
 
 
-class TOMS748Configs(SolverConfigs):
-    """`TOMS748Configs` declares the configs of `TOMS748`, 1 per value of ``k``.
+class TOMS748ConfigsDeclaration(SolverConfigsDeclaration):
+    """`TOMS748ConfigsDeclaration` declares the configs of `TOMS748`, 1 per value of ``k``.
 
     - ``toms748[k=2]``, the core config: the paper's Algorithm 4.2;
     - ``toms748[k=1]``, a secondary config: the paper's Algorithm 4.1.

@@ -1,14 +1,15 @@
 """This module declares the built-in config of `RegulaFalsi`."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverConfigs, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import RegulaFalsi
 
 
-class RegulaFalsiConfigs(SolverConfigs):
-    """`RegulaFalsiConfigs` declares `RegulaFalsi`'s only config, a secondary config named ``regula_falsi``.
+class RegulaFalsiConfigsDeclaration(SolverConfigsDeclaration):
+    """`RegulaFalsiConfigsDeclaration` declares `RegulaFalsi`'s only config, named ``regula_falsi``.
 
-    It is not core because the classic method stalls too often to characterize the test functions reliably.
+    It is a secondary config. It is not core because the classic method stalls too often to characterize the test
+    functions reliably.
     """
 
     solver_cls = RegulaFalsi

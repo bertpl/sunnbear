@@ -1,13 +1,13 @@
 """This module declares the built-in configs of `Ridders`, 1 per variant."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverConfigs, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import Ridders
 from .variant import RiddersVariant
 
 
-class RiddersConfigs(SolverConfigs):
-    """`RiddersConfigs` declares the configs of `Ridders`, 1 per variant.
+class RiddersConfigsDeclaration(SolverConfigsDeclaration):
+    """`RiddersConfigsDeclaration` declares the configs of `Ridders`, 1 per variant.
 
     - ``ridders[variant='standard_stopping_criterion']``, the core config: the paper's steps, with the shared stopping
       criterion;

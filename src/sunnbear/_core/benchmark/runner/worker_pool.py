@@ -1,8 +1,8 @@
 """`BenchmarkWorkerPool` runs benchmark tasks in worker processes, or in this process when it has 1 worker.
 
 A task looks up its formula and solver configs by id in registries: each formula class adds itself to its registry
-when it is defined, and each `SolverConfigs` subclass adds its configs to the solver config registry when it is
-defined.
+when it is defined, and each `SolverConfigsDeclaration` subclass adds its configs to the solver config registry when
+it is defined.
 
 A worker process has only imported sunnbear itself, so every
 worker first imports the modules that define the run's formulas and solver configs.

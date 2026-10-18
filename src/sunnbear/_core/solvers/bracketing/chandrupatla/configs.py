@@ -1,15 +1,15 @@
 """This module declares the built-in config of `Chandrupatla`."""
 
-from sunnbear._core.solvers.core import SolverConfig, SolverConfigs, SolverRole
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import Chandrupatla
 
 
-class ChandrupatlaConfigs(SolverConfigs):
-    """`ChandrupatlaConfigs` declares `Chandrupatla`'s only config, a core config named ``chandrupatla``.
+class ChandrupatlaConfigsDeclaration(SolverConfigsDeclaration):
+    """`ChandrupatlaConfigsDeclaration` declares `Chandrupatla`'s only config, named ``chandrupatla``.
 
-    Its results differ from those of Brent's method at a multiple root. There, interpolation converges slowly, and
-    Chandrupatla's method switches to bisection while Brent's method keeps interpolating.
+    It is a core config. Its results differ from those of Brent's method at a multiple root. There, interpolation
+    converges slowly, and Chandrupatla's method switches to bisection while Brent's method keeps interpolating.
     """
 
     solver_cls = Chandrupatla

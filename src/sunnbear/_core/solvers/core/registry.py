@@ -1,6 +1,6 @@
 """The solver config registry holds the registered solver configs and looks one up by its identity.
 
-Defining a `SolverConfigs` subclass registers each of its configs here. The built-in configs are
+Defining a `SolverConfigsDeclaration` subclass registers each of its configs here. The built-in configs are
 registered when the `sunnbear.solvers` module imports the shipped solvers, so the registry is complete
 on import.
 
@@ -24,8 +24,8 @@ if TYPE_CHECKING:  # type-only: config imports this module at runtime, so a runt
 class SolverConfigRegistry:
     """`SolverConfigRegistry` enumerates the registered solver configs, or looks one up by ``solver_id``.
 
-    `SolverConfigs.__init_subclass__` calls `register` for every config of every subclass; nothing is discovered
-    lazily.
+    `SolverConfigsDeclaration.__init_subclass__` calls `register` for every config of every subclass; nothing is
+    discovered lazily.
     """
 
     _configs_by_id: ClassVar[dict[str, "SolverConfig"]] = {}

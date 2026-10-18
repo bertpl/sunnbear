@@ -1,7 +1,9 @@
-"""`SolverConfig` and `SolverConfigs` declare the configured solvers: a solver class, its init arguments, and a role.
+"""`SolverConfig` and `SolverConfigsDeclaration` declare the configured solvers.
+
+A config names a solver class, its init arguments, and a role.
 
 A solver class carries only its algorithm; which settings the benchmark runs is a separate decision, recorded by
-1 `SolverConfigs` subclass per solver class, which lists that solver's configs as `SolverConfig` values.
+1 `SolverConfigsDeclaration` subclass per solver class, which lists that solver's configs as `SolverConfig` values.
 
 Defining the subclass registers each of its configs with `SolverConfigRegistry`, and every check has run by that
 moment, so a malformed config fails when its module is imported, never inside a benchmark worker.
@@ -33,9 +35,9 @@ _SOLVER_KWARG_VALUE_TYPES = (bool, int, float, str)
 class SolverConfig:
     """`SolverConfig` describes one configured solver: its role, and the init arguments of its solver class.
 
-    A config is declared in the ``configs`` of a `SolverConfigs` subclass. Defining that subclass registers a copy of
-    each config, with ``solver_cls`` and ``declaring_module_name`` set. The config as written in ``configs`` holds only
-    ``role`` and ``solver_kwargs``, so reading its ``solver_id`` raises ``AttributeError``.
+    A config is declared in the ``configs`` of a `SolverConfigsDeclaration` subclass. Defining that subclass registers a
+    copy of each config, with ``solver_cls`` and ``declaring_module_name`` set. The config as written in ``configs``
+    holds only ``role`` and ``solver_kwargs``, so reading its ``solver_id`` raises ``AttributeError``.
 
     Attributes:
         role: How the benchmark treats this config. A role for which `SolverRole.is_builtin_only` is true
@@ -43,8 +45,8 @@ class SolverConfig:
         solver_kwargs: The init arguments passed to ``solver_cls``; each value is a bool, int, float, or str, or a
             `StrEnum` member.
         solver_cls: The concrete `Solver` subclass to instantiate, the ``solver_cls`` of the declaring
-            `SolverConfigs` subclass.
-        declaring_module_name: The module of the declaring `SolverConfigs` subclass, which a benchmark worker
+            `SolverConfigsDeclaration` subclass.
+        declaring_module_name: The module of the declaring `SolverConfigsDeclaration` subclass, which a benchmark worker
             imports to register the config in its own process.
     """
 
@@ -91,16 +93,16 @@ class SolverConfig:
 
 
 # ==================================================================================================
-#  SolverConfigs
+#  SolverConfigsDeclaration
 # ==================================================================================================
-class SolverConfigs:
-    """`SolverConfigs` is the base class that declares the configs of 1 solver class.
+class SolverConfigsDeclaration:
+    """`SolverConfigsDeclaration` is the base class that declares the configs of 1 solver class.
 
     A subclass lists the configs, and defining the subclass registers them.
 
     Example::
 
-        class TOMS748Configs(SolverConfigs):
+        class TOMS748ConfigsDeclaration(SolverConfigsDeclaration):
             solver_cls = TOMS748
             configs = (
                 SolverConfig(role=SolverRole.BUILTIN_CORE, solver_kwargs={"k": 2}),

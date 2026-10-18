@@ -26,8 +26,8 @@ _SOLVERS_DIR = Path(solvers_package.__file__).parent
 # `core/` converts to `float` on purpose, where values pass between the solver and the function or the caller.
 _ALGORITHM_DIRS = sorted(path.parent for path in _SOLVERS_DIR.glob("*/__init__.py") if path.parent.name != "core")
 
-# Defining a SolverConfigs subclass registers its configs, so the registry also holds the test modules' configs; the
-# built-in configs are the ones declared inside the sunnbear package.
+# Defining a SolverConfigsDeclaration subclass registers its configs, so the registry also holds the test modules'
+# configs; the built-in configs are the ones declared inside the sunnbear package.
 _BUILT_IN_CONFIGS = [
     config for config in SolverConfigRegistry.configs() if is_sunnbear_module(config.declaring_module_name)
 ]
