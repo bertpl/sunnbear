@@ -1,5 +1,10 @@
-"""The value correction moves only the new tuples, or rotates each axis of the smallest size, brings the mean to exactly
-0.5 when it can, nudges each new value to at least `MIN_N_BITS` bits, and never puts 2 tuples in 1 fine lane."""
+"""The value correction:
+
+- moves only the new tuples, or, for the smallest size, rotates each axis;
+- brings the mean to exactly 0.5 when it can;
+- nudges each new value to at least `MIN_N_BITS` bits;
+- never puts 2 tuples in 1 fine lane.
+"""
 
 import numpy as np
 import pytest
@@ -155,7 +160,7 @@ def test_value_correction_refuses_a_size_that_holds_2_tuples_in_1_fine_lane():
 )
 def test_the_rotation_takes_the_shift_nearest_to_0_that_gives_a_mean_of_0_5(values, expected_shift):
     """The rotation adds the same shift to every value, modulo 1, picks the shift nearest to 0 among those that give a
-    mean of 0.5, and moves each value by a few float64 steps at most beyond the shift."""
+    mean of 0.5, and the nudge then moves each value by at most a few float64 steps."""
     # --- arrange ----------------------
     values = np.array(values)
 
@@ -173,8 +178,8 @@ def test_the_rotation_takes_the_shift_nearest_to_0_that_gives_a_mean_of_0_5(valu
 
 @pytest.mark.parametrize("seed", range(20))
 def test_the_rotation_keeps_every_cyclic_distance_and_1_tuple_per_fine_lane(seed):
-    """On random axes of the smallest size whose values lie more than 1 fine lane apart, the rotation keeps each value's
-    fine lane to itself, keeps every cyclic distance up to the nudge, and reaches a mean of 0.5."""
+    """On random axes of the smallest size whose values lie more than 1 fine lane apart, the rotation keeps every value
+    in a fine lane of its own, keeps every cyclic distance up to the nudge, and reaches a mean of 0.5."""
     # --- arrange ----------------------
     rng = np.random.default_rng(seed)
     # The values take every other fine lane, so that 2 values lie more than 1 fine lane apart and no shift puts them

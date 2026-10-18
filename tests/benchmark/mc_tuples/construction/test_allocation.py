@@ -21,8 +21,8 @@ _SPREAD_VALUES = (np.round(np.linspace(0, N_FINE_LANES - 1, 32)) + 0.5) / N_FINE
 #  MCTuplesAxisGaps
 # ==================================================================================================
 def test_of_finds_the_gaps_with_their_edges_and_bounds():
-    """Each maximal run of free fine lanes is a gap with its edge flags and bounds, and adjacent lanes leave none; the
-    lowest and highest values of the size below bound the wrap-around gap."""
+    """Each maximal run of free fine lanes is a gap with its edge flags and bounds, and 2 occupied fine lanes side by
+    side leave no gap between them; the lowest and highest values of the size below bound the wrap-around gap."""
     # --- act --------------------------
     gaps = MCTuplesAxisGaps.of(_VALUES)
 

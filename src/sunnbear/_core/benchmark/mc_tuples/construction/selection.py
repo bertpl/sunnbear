@@ -89,9 +89,9 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
     def _initial_new_selection(self) -> np.ndarray:
         """Return a random starting selection of new candidates, ascending, as indices into the population.
 
-        A min-cost matching over random costs pairs each fine u-lane with a distinct fine v-lane whose shared fine cell
-        holds a candidate; the `n_new` new tuples come from these cells, picked at random, 1 random candidate each. The
-        starting selection holds at most 1 new tuple per fine lane, and ignores the counts per gap.
+        A min-cost matching with random costs assigns each fine u-lane a distinct fine v-lane, such that the fine cell
+        of the 2 lanes holds a candidate; the `n_new` new tuples come from these cells, picked at random, 1 random
+        candidate each. The starting selection holds at most 1 new tuple per fine lane, and ignores the counts per gap.
 
         Raises:
             MCTuplesConstructionError: If fewer fine-lane pairs than new tuples can be formed through cells that hold a

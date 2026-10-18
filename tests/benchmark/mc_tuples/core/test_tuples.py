@@ -87,8 +87,8 @@ def test_to_xtol_and_c_maps_u_log_uniformly_and_v_linearly():
 #  Stats
 # ==================================================================================================
 def test_stats_reports_min_separations_and_their_fractions():
-    """Evenly spaced tuples give separations 1/8 per axis and sqrt(2)/8 in L2, so the fractions are 1 per axis, against
-    1/8, and 1/2 in L2, against the grid spacing 1/sqrt(8)."""
+    """Evenly spaced tuples give separations 1/8 per axis and sqrt(2)/8 in L2, so the fractions are 1 per axis, relative
+    to 1/8, and 1/2 in L2, relative to the grid spacing 1/sqrt(8)."""
     # --- act --------------------------
     stats = MCTuples(_DIAGONAL_U, _DIAGONAL_V).stats()
 

@@ -21,7 +21,7 @@ def _solve(size: MCTuplesSize, required_tuple_array: np.ndarray, n_population: i
 
 def _distinct_lane_selection(solve: MCTuplesSelectionSolve, n: int) -> np.ndarray:
     """Return `n` candidates, as indices into the population, that share no fine lane on either axis, each the first
-    candidate in population order whose fine lanes no earlier pick holds."""
+    candidate in population order that shares no fine lane with an earlier one."""
     picked, used_u, used_v = [], set(), set()
     for i in range(solve.population.u.size):
         u_lane, v_lane = solve.population.u_lane[i], solve.population.v_lane[i]

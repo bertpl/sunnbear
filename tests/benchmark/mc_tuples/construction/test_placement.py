@@ -73,8 +73,8 @@ def test_edge_gaps_split_the_wrap_around_gap_evenly_unless_1_edge_gap_holds_too_
 def test_a_lone_edge_gap_spreads_its_values_over_the_whole_wrap_around_gap(
     required_values, counts, edge_gap, expected_values
 ):
-    """With a value of the size below in 1 outer fine lane, only the other edge gap forms; its 3 values split the whole
-    wrap-around gap, 524 fine lanes up to that value, into 4 parts of 131."""
+    """With a value of the size below in the first or the last fine lane, only the other edge gap forms; its 3 values
+    split the whole wrap-around gap, 524 fine lanes up to that value, into 4 parts of 131."""
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of(np.array(required_values) / N_FINE_LANES)
 
@@ -157,22 +157,23 @@ def test_spacings_after_each_addition_match_the_placement_with_1_more_tuple_in_t
         assert spacings_after_each_addition[gap] == pytest.approx(expected)
 
 
-def test_min_spacing_after_each_move_between_2_gaps_is_the_smaller_of_their_new_spacings():
+def test_min_spacing_after_each_interior_move_between_2_gaps_is_the_smaller_of_their_new_spacings():
     """With only 2 gaps, no other gap bounds the smallest spacing: 2 interior gaps 500 and 523 fine lanes wide hold 2
     and 3 new tuples, and their spacings end at:
 
     - 250 and 104.6 after a move to the right;
     - 125 and 174.33 after a move to the left.
 
-    The size below fills both outer fine lanes, so that no edge gap forms: `_min_spacing_after_each_move` leaves the
-    entries of moves into or out of an edge gap to `corrected_min_spacing_after_each_move`.
+    The size below fills the first and the last fine lane, so that no edge gap forms:
+    `_min_spacing_after_each_interior_move` leaves the entries of moves into or out of an edge gap to
+    `corrected_min_spacing_after_each_move`.
     """
     # --- arrange ----------------------
     gaps = MCTuplesAxisGaps.of(np.array([0.5, 500.5, 1023.5]) / N_FINE_LANES)
     placement = MCTuplesAxisGapPlacement(gaps, np.array([2, 3]))
 
     # --- act --------------------------
-    min_spacings = placement._min_spacing_after_each_move()
+    min_spacings = placement._min_spacing_after_each_interior_move()
 
     # --- assert -----------------------
     assert placement.spacings == pytest.approx([500.0 / 3, 523.0 / 4])
