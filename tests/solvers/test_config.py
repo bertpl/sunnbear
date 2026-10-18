@@ -72,8 +72,8 @@ def test_every_config_of_a_declaration_is_registered_with_its_solver_class_and_m
     define_configs_subclass({"solver_cls": WeightedSplitSolver, "configs": configs})
 
     # --- assert -----------------------
-    registered = [SolverConfigRegistry.config_from_id(f"weighted_split[weight={w}]") for w in (0.25, 0.75)]
-    assert [(c.solver_cls, c.declaring_module_name, c.role) for c in registered] == [
+    registered_configs = [SolverConfigRegistry.config_from_id(f"weighted_split[weight={w}]") for w in (0.25, 0.75)]
+    assert [(c.solver_cls, c.declaring_module_name, c.role) for c in registered_configs] == [
         (WeightedSplitSolver, "tests.solvers", SolverRole.USER_ACTIVE),
         (WeightedSplitSolver, "tests.solvers", SolverRole.USER_OTHER),
     ]
@@ -120,7 +120,7 @@ def test_malformed_declaration_is_rejected_at_class_definition(namespace, messag
 
 
 def test_a_solver_kwargs_value_of_an_unsupported_type_is_rejected():
-    """Building a `SolverConfig` whose ``solver_kwargs`` hold a value that `solver_id` cannot show raises
+    """Building a `SolverConfig` whose ``solver_kwargs`` hold a value that `solver_id` cannot write as text raises
     ``TypeError``."""
     # --- act / assert -----------------
     with pytest.raises(TypeError, match=r"solver_kwargs\['weight'\] must be a bool, int, float, or str"):

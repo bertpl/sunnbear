@@ -157,7 +157,7 @@ The midpoint that the shared stopping criterion returns (section IV.a.2) is `0.5
 
 Some solvers are provided in multiple configurations, which might differ in their parameters or in certain implementation details (such as the stopping criterion).
 
-Each config is named by its `solver_id`, the name that the benchmark's results use for it: the solver's name followed by its init arguments, as in `toms748[k=2]`.
+Each config's name in the benchmark's results is its `solver_id`: the solver's name followed by its init arguments, as in `toms748[k=2]`.
 
 Each config has 1 of 3 roles:
 - **core:** the config characterizes the test problems.

@@ -3,17 +3,18 @@
 A solver class carries only its algorithm; which settings the benchmark runs is a separate decision, recorded by
 1 `SolverConfigs` subclass per solver class, which lists that solver's configs as `SolverConfig` values.
 
-Defining the subclass registers each of its configs with `SolverConfigRegistry`, and every check runs at that moment,
-so a malformed config fails when its module is imported, never inside a benchmark worker.
+Defining the subclass registers each of its configs with `SolverConfigRegistry`, and every check has run by that
+moment, so a malformed config fails when its module is imported, never inside a benchmark worker.
 """
 
+import dataclasses
 import inspect
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import ClassVar
 
-from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
+from sunnbear._core.utils.class_origin import is_sunnbear_module
 
 from .registry import SolverConfigRegistry
 from .role import SolverRole
@@ -32,9 +33,9 @@ _SOLVER_KWARG_VALUE_TYPES = (bool, int, float, str)
 class SolverConfig:
     """`SolverConfig` describes one configured solver: its role, and the init arguments of its solver class.
 
-    A config is declared in the ``configs`` of a `SolverConfigs` subclass, which registers a copy of it with
-    ``solver_cls`` and ``declaring_module_name`` set; the declared value holds only ``role`` and ``solver_kwargs``, so
-    reading its ``solver_id`` raises ``AttributeError``.
+    A config is declared in the ``configs`` of a `SolverConfigs` subclass. Defining that subclass registers a copy of
+    each config, with ``solver_cls`` and ``declaring_module_name`` set. The config as written in ``configs`` holds only
+    ``role`` and ``solver_kwargs``, so reading its ``solver_id`` raises ``AttributeError``.
 
     Attributes:
         role: How the benchmark treats this config. A role for which `SolverRole.is_builtin_only` is true
@@ -53,7 +54,7 @@ class SolverConfig:
     declaring_module_name: str = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
-        """Check that each ``solver_kwargs`` value has a type that `solver_id` can show.
+        """Check that each ``solver_kwargs`` value has a type that `solver_id` can write as text.
 
         Raises:
             TypeError: If a ``solver_kwargs`` value is not a bool, int, float, or str.
@@ -93,7 +94,9 @@ class SolverConfig:
 #  SolverConfigs
 # ==================================================================================================
 class SolverConfigs:
-    """`SolverConfigs` declares the configs of 1 solver class; a subclass lists them, and defining it registers them.
+    """`SolverConfigs` is the base class that declares the configs of 1 solver class.
+
+    A subclass lists the configs, and defining the subclass registers them.
 
     Example::
 
@@ -105,7 +108,7 @@ class SolverConfigs:
             )
 
     Class attributes:
-        solver_cls: The concrete `Solver` subclass that every config of ``configs`` instantiates.
+        solver_cls: The concrete `Solver` subclass to instantiate for every config of ``configs``.
         configs: The solver's configs, at least 1.
     """
 
@@ -126,25 +129,28 @@ class SolverConfigs:
                 fails (see `SolverConfigRegistry.register`).
         """
         super().__init_subclass__(**kwargs)
-        cls._validate()
+        cls._validate_class_attributes()
         # Every config is checked before any is registered, so a subclass with 1 malformed config registers none of its
         # configs.
         for config in cls.configs:
             cls._validate_config(config)
-        # solver_cls and declaring_module_name are not init arguments, so each registered copy sets them with
-        # object.__setattr__, the call that sets a field of a frozen dataclass outside __init__.
+        # solver_cls and declaring_module_name are not init arguments, so the loop sets them on each registered copy
+        # with object.__setattr__, which can set a field of a frozen dataclass outside __init__.
         for config in cls.configs:
-            registered = SolverConfig(role=config.role, solver_kwargs=config.solver_kwargs)
-            object.__setattr__(registered, "solver_cls", cls.solver_cls)
-            object.__setattr__(registered, "declaring_module_name", cls.__module__)
-            SolverConfigRegistry.register(registered)
+            config_copy = dataclasses.replace(config)
+            object.__setattr__(config_copy, "solver_cls", cls.solver_cls)
+            object.__setattr__(config_copy, "declaring_module_name", cls.__module__)
+            SolverConfigRegistry.register(config_copy)
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
     @classmethod
-    def _validate(cls) -> None:
-        """Run every check that concerns this subclass alone; checks across configs run in the registry."""
+    def _validate_class_attributes(cls) -> None:
+        """Check the subclass's own attributes, ``solver_cls`` and ``configs``.
+
+        `_validate_config` checks each config, and the registry checks across configs.
+        """
         for attr in ("solver_cls", "configs"):
             if not hasattr(cls, attr):
                 raise TypeError(f"{cls.__name__} must define {attr}.")
@@ -157,10 +163,14 @@ class SolverConfigs:
 
     @classmethod
     def _validate_config(cls, config: object) -> None:
-        """Check that 1 entry of ``configs`` is a `SolverConfig` value that fits this subclass."""
+        """Check that 1 entry of ``configs`` is a `SolverConfig` that this subclass may declare.
+
+        Its ``solver_kwargs`` must bind to ``solver_cls.__init__``, and a built-in-only role needs a subclass inside the
+        sunnbear package.
+        """
         if not isinstance(config, SolverConfig):
             raise TypeError(f"{cls.__name__}.configs must hold only SolverConfig values (got {config!r}).")
-        if config.role.is_builtin_only and not is_defined_in_sunnbear(cls):
+        if config.role.is_builtin_only and not is_sunnbear_module(cls.__module__):
             raise ValueError(
                 f"{cls.__name__} is defined in {cls.__module__}, but role {config.role.name} is reserved for "
                 "configs inside the sunnbear package; use SolverRole.USER_ACTIVE or SolverRole.USER_OTHER."

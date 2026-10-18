@@ -8,7 +8,7 @@ sunnbear defines them, and a user's categories and formulas go under the user-de
 
 from typing import ClassVar
 
-from sunnbear._core.utils.class_origin import is_defined_in_sunnbear
+from sunnbear._core.utils.class_origin import is_sunnbear_module
 
 from .registry import FormulaRegistry
 from .taxonomy import FormulaTaxonomyNode
@@ -51,7 +51,7 @@ class FormulaCategory(FormulaTaxonomyNode):
         """
         super().__init_subclass__(**kwargs)
         cls._validate_number_and_name(min_number_length=1)
-        if len(cls.number) == 1 and not is_defined_in_sunnbear(cls):
+        if len(cls.number) == 1 and not is_sunnbear_module(cls.__module__):
             raise ValueError(
                 f"{cls.__name__} is defined in {cls.__module__} as top-level category {cls.number[0]}; only "
                 "sunnbear defines top-level categories, so put user categories and formulas under "
