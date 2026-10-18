@@ -64,10 +64,12 @@ def test_constraints_leave_out_the_fine_lanes_when_every_gap_takes_at_most_1():
     """Tuples of the size below every 32 fine lanes from lane 8 give each of 32 gaps per axis 1 new tuple, so no fine
     lane needs a constraint of its own."""
     # --- arrange ----------------------
-    # On the circle, the 32 tuples leave 32 gaps of 32 fine lanes each, the wrap-around gap counted once. With 1 new
-    # tuple in the middle of each gap, the 64 values lie 16 fine lanes apart and the size's mean lies 0.5 fine lanes
-    # above the value 0.5, so the mean-aware allocation keeps 1 new tuple per gap. The wrap-around gap's new tuple lies
-    # at fine lane 1016.5, in the right edge gap, so the left edge gap takes none.
+    # On the circle, the 32 tuples leave 32 gaps of 32 fine lanes each, the wrap-around gap counted once.
+    #
+    # With 1 new tuple in the middle of each gap, the 64 values lie 16 fine lanes apart and the size's mean lies 0.5
+    # fine lanes above the value 0.5, so the mean-aware allocation keeps 1 new tuple per gap.
+    #
+    # The wrap-around gap's new tuple lies at fine lane 1016.5, in the right edge gap, so the left edge gap takes none.
     lanes = 8 + 32 * np.arange(32)
     solve = _solve(MCTuplesSize.SIZE_64, np.column_stack([lanes + 0.5, lanes + 0.5]) / N_FINE_LANES, n_population=8192)
 

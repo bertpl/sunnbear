@@ -122,7 +122,9 @@ class MCTuplesStats:
 
     Each axis is measured cyclically, as a circle of circumference 1 on which 0 and 1 meet, so that the distance between
     2 values is the shorter of the 2 arcs between them and the square becomes a torus; the construction's max-div solves
-    measure their distances the same way. The separations of each kind are summarized by 2 statistics:
+    measure their distances the same way.
+
+    The separations of each kind are summarized by 2 statistics:
 
     - the min separation, the smallest of them;
     - gpq(0.1), the geometric pseudo-quantile at `GPQ_LEVEL`, which the construction maximizes.
@@ -214,9 +216,9 @@ class MCTuplesStats:
         It is computed from the full pairwise distance matrix, so memory grows with the square of the size.
         """
         tuple_array = self._tuple_array
-        diff = np.abs(tuple_array[:, None, :] - tuple_array[None, :, :])
-        cyclic_diff = np.minimum(diff, 1.0 - diff)
-        distances = np.sqrt((cyclic_diff**2).sum(axis=-1))
+        difference = np.abs(tuple_array[:, None, :] - tuple_array[None, :, :])
+        cyclic_difference = np.minimum(difference, 1.0 - difference)
+        distances = np.sqrt((cyclic_difference**2).sum(axis=-1))
         np.fill_diagonal(distances, np.inf)
         return distances.min(axis=1)
 

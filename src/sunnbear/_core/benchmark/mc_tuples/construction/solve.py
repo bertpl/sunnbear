@@ -98,8 +98,7 @@ class MCTuplesSolve(ABC):
             np.vstack([self.required_tuple_array, self.population.tuple_array]).astype(np.float32),
             k=int(self.size),
             distance_metric=CYCLIC_SQUARED_L2_DISTANCE_METRIC,
-            # The objective is the geomean of gpq along u, along v, and over the problem's own distance, squared L2,
-            # each measured cyclically.
+            # The objective is the geomean of gpq along u, along v, and over the problem's own distance, squared L2.
             diversity_metric=HybridDiversityMetric.geomean_of(
                 gpq.over(CYCLIC_U_DISTANCE_METRIC), gpq.over(CYCLIC_V_DISTANCE_METRIC), gpq
             ),

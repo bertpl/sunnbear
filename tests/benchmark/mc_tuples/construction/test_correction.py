@@ -165,7 +165,7 @@ def test_the_rotation_takes_the_shift_nearest_to_0_that_gives_a_mean_of_0_5(valu
     values = np.array(values)
 
     # --- act --------------------------
-    correction = MCTuplesAxisValueCorrection.of_smallest_size(values)
+    correction = MCTuplesAxisValueCorrection.of_rotation_or_mean_correction(values)
 
     # --- assert -----------------------
     assert correction.cap is None
@@ -188,7 +188,7 @@ def test_the_rotation_keeps_every_cyclic_distance_and_1_tuple_per_fine_lane(seed
     values = (lanes + rng.uniform(0.01, 0.99, size=32)) / N_FINE_LANES
 
     # --- act --------------------------
-    correction = MCTuplesAxisValueCorrection.of_smallest_size(values)
+    correction = MCTuplesAxisValueCorrection.of_rotation_or_mean_correction(values)
 
     # --- assert -----------------------
     corrected = correction.corrected_new_values
@@ -203,13 +203,14 @@ def test_the_rotation_keeps_every_cyclic_distance_and_1_tuple_per_fine_lane(seed
 
 
 def test_the_rotation_falls_back_to_the_mean_correction_when_it_would_put_2_tuples_in_1_fine_lane():
-    """Values at 100.9 and 101.1 fine lanes, with a mean of 425.625 fine lanes, need a shift of 86.375 fine lanes plus
-    a multiple of 256, which puts both values into 1 fine lane, so the axis gets the mean correction instead."""
+    """Values at 100.9 and 101.1 fine lanes, with a mean of 425.625 fine lanes, need a shift of 86.375 fine lanes plus a
+    multiple of 256 fine lanes, the axis length over the 4 values; every such shift puts both values into 1 fine lane,
+    so the axis gets the mean correction instead."""
     # --- arrange ----------------------
     values = np.array([100.9, 101.1, 700.3, 800.2]) / N_FINE_LANES
 
     # --- act --------------------------
-    correction = MCTuplesAxisValueCorrection.of_smallest_size(values)
+    correction = MCTuplesAxisValueCorrection.of_rotation_or_mean_correction(values)
 
     # --- assert -----------------------
     assert correction.rotation_shift is None

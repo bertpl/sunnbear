@@ -5,11 +5,9 @@ The prediction is for 1 axis, and for 1 allocation of new tuples to the gaps tha
 max-div measures distances cyclically (`distances`): each axis is a circle on which 0 and 1 meet. The stretch from the
 highest value of the size below, across 1 and 0, to its lowest value is then 1 gap, the wrap-around gap.
 
-Its 2 parts keep a count of new tuples each, because the edge gap in which a new tuple lies decides whether it raises or
-lowers the size's mean:
-
-- the left edge gap runs from 0 to the lowest value;
-- the right edge gap runs from the highest value to 1.
+The wrap-around gap consists of the 2 edge gaps, which keep separate counts of new tuples, because the edge gap in which
+a new tuple lies decides whether it raises or lowers the size's mean: the left edge gap runs from 0 to the lowest value,
+and the right edge gap from the highest value to 1.
 
 Each gap spreads its new tuples evenly, with c the gap's number of new tuples, and c_left and c_right those of the
 left and right edge gaps:
@@ -23,12 +21,12 @@ left and right edge gaps:
     gap spreads its values up to that point, with its outermost value on it, and the other edge gap splits its own
     width evenly (`_edge_gap_first_values_and_steps`).
 
-When the even split would carry values of 1 edge gap across that point, the size's max-div solve puts that edge gap's
-outermost value inside the outermost fine lane, not on the point where 0 and 1 meet, so the placement overstates the
-span of that edge gap's new values by at most 1 fine lane.
+When the even split would carry values of 1 edge gap across the point where 0 and 1 meet, the size's max-div solve puts
+that edge gap's outermost value inside the outermost fine lane, so the placement overstates the span of that edge gap's
+new values by at most 1 fine lane.
 
-Each edge gap that holds new tuples reports the spacing of the whole wrap-around gap, the smaller of the 2 edge gaps'
-distances between neighboring values, so that adding a tuple to 1 edge gap shows in the spacing of both.
+The spacing of each edge gap that holds new tuples is the spacing of the whole wrap-around gap, the smaller of the 2
+edge gaps' distances between neighboring values, so that adding a tuple to 1 edge gap shows in the spacing of both.
 
 The stretch is measured between values, not counted from fine lane indices, because 2 gaps with the same number of free
 fine lanes can differ in the length of that stretch by almost 2 fine lanes, depending on where each neighboring tuple's
@@ -91,7 +89,8 @@ class MCTuplesAxisGapPlacement:
     def spacings(self) -> np.ndarray:
         """Return each gap's spacing, the distance between neighboring values, in fine lanes; inf for an empty gap.
 
-        Each edge gap with new tuples reports the spacing of the wrap-around gap, the smaller of the 2 edge gaps' steps.
+        The spacing of each edge gap with new tuples is the spacing of the wrap-around gap, the smaller of the 2 edge
+        gaps' steps.
         """
         has_values = self.counts > 0
         spacings = np.where(has_values, self._first_values_and_steps[1] * N_FINE_LANES, np.inf)
@@ -161,8 +160,10 @@ class MCTuplesAxisGapPlacement:
         - a move from a gap to itself.
 
         A move between interior gaps changes the spacings and sums of gaps `s` and `d` only, so those entries are
-        computed for all moves at once. A move into or out of an edge gap also changes the other edge gap's placement,
-        so each such entry is computed from the placement after that move.
+        computed for all moves at once.
+
+        A move into or out of an edge gap also changes the other edge gap's placement, so each such entry is computed
+        from the placement after that move.
         """
         # A move leaves the size unchanged, and changes the sums of gaps `s` and `d` only.
         size = self.gaps.n_required + int(self.counts.sum())
@@ -195,7 +196,9 @@ class MCTuplesAxisGapPlacement:
         counts = np.maximum(self.counts, 0)
         steps = (self.gaps.highs - self.gaps.lows) / (counts + 1)
         first_values = self.gaps.lows + steps
-        left_edge_gap, right_edge_gap = self.gaps.left_edge_gap, self.gaps.right_edge_gap
+        # The gaps are ascending, so an edge gap can only be the first or the last gap.
+        left_edge_gap = 0 if self.gaps.is_left_edge[0] else None
+        right_edge_gap = self.gaps.is_right_edge.size - 1 if self.gaps.is_right_edge[-1] else None
         if left_edge_gap is not None or right_edge_gap is not None:
             n_left = int(counts[left_edge_gap]) if left_edge_gap is not None else 0
             n_right = int(counts[right_edge_gap]) if right_edge_gap is not None else 0
@@ -215,8 +218,10 @@ class MCTuplesAxisGapPlacement:
         """Return the first value and the step of the left edge gap, then those of the right edge gap.
 
         The left edge gap holds `n_left` new values between 0 and `lowest_required_value`, the right edge gap `n_right`
-        between `highest_required_value` and 1; the module docstring describes the cases. An edge gap without values
-        still gets a first value and a step, which no caller reads, because a gap without new tuples has no values.
+        between `highest_required_value` and 1; the module docstring describes the cases.
+
+        An edge gap without values still gets a first value and a step, which no caller reads, because a gap without
+        new tuples has no values.
         """
         left_width, right_width = lowest_required_value, 1.0 - highest_required_value
         even_step = (left_width + right_width) / (n_left + n_right + 1)

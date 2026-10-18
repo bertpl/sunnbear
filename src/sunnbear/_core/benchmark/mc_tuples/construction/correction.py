@@ -12,15 +12,6 @@
 In the mean correction, the tuples of the size below stay where they are; per axis, only the new tuples move, toward
 the side that the mean needs (`MCTuplesAxisValueCorrection`).
 
-In place of the mean correction, the first correction of the smallest size rotates each axis: it adds the same shift to
-every value, modulo 1 (`MCTuplesValueCorrection.first_of`). The smallest size gets a rotation because:
-
-- that size has no size below to keep in place;
-- a rotation keeps every distance on the circle on which max-div measures each axis (`distances`), while the mean
-  correction shrinks the largest spacings.
-
-An axis on which no rotation qualifies gets the mean correction (`MCTuplesAxisValueCorrection.of_smallest_size`).
-
 The rules are written for a mean above 0.5, where the new tuples move left, over the size's values u_0 < u_1 < … in
 ascending order, with w the width of a fine lane:
 
@@ -53,6 +44,16 @@ No fine lane ever holds 2 tuples, at any D:
 - the order of the values never changes.
 
 A mean below 0.5 mirrors every rule.
+
+In place of the mean correction, the first correction of the smallest size rotates each axis: it adds the same shift to
+every value, modulo 1 (`MCTuplesValueCorrection.first_of`). The smallest size gets a rotation because:
+
+- that size has no size below to keep in place;
+- a rotation keeps every distance on the circle on which max-div measures each axis (`distances`), while the mean
+  correction shrinks the largest spacings.
+
+An axis on which every rotation to a mean of 0.5 puts 2 values into 1 fine lane or a value on 0 gets the mean correction
+(`MCTuplesAxisValueCorrection.of_rotation_or_mean_correction`).
 """
 
 import math
@@ -128,18 +129,18 @@ class MCTuplesValueCorrection:
     def first_of(cls, tuple_array: np.ndarray, n_required: int) -> "MCTuplesValueCorrection":
         """Return the first value correction of the size whose tuples are `tuple_array`.
 
-        The first `n_required` tuples are the size below. The smallest size, with `n_required` 0, gets each axis
-        rotated to a mean of 0.5, then nudged, or the mean correction on an axis where no rotation qualifies
-        (`MCTuplesAxisValueCorrection.of_smallest_size`). Every other size gets the correction of `of`.
+        The first `n_required` tuples are the size below. The smallest size, with `n_required` 0, gets each axis rotated
+        to a mean of 0.5 and then nudged; an axis on which every such rotation puts 2 values into 1 fine lane or a value
+        on 0 gets the mean correction instead (`MCTuplesAxisValueCorrection.of_rotation_or_mean_correction`). Every
+        other size gets the correction of `of`.
 
         Raises:
             MCTuplesConstructionError: If the nudge finds no value with at least `MIN_N_BITS` bits inside a value's fine
-                lane, or if `of`, which corrects every size but the smallest, finds a fine lane that holds 2 tuples
-                after the correction.
+                lane, or if `of` finds a fine lane that holds 2 tuples after the correction.
         """
         if n_required == 0:
-            u = MCTuplesAxisValueCorrection.of_smallest_size(tuple_array[:, 0])
-            v = MCTuplesAxisValueCorrection.of_smallest_size(tuple_array[:, 1])
+            u = MCTuplesAxisValueCorrection.of_rotation_or_mean_correction(tuple_array[:, 0])
+            v = MCTuplesAxisValueCorrection.of_rotation_or_mean_correction(tuple_array[:, 1])
             return cls(u=u, v=v, tuple_array=np.column_stack([u.corrected_new_values, v.corrected_new_values]))
         else:
             return cls.of(tuple_array, n_required)
@@ -293,18 +294,21 @@ class MCTuplesAxisValueCorrection:
         )
 
     @classmethod
-    def of_smallest_size(cls, values: np.ndarray) -> "MCTuplesAxisValueCorrection":
+    def of_rotation_or_mean_correction(cls, values: np.ndarray) -> "MCTuplesAxisValueCorrection":
         """Return 1 axis of the smallest size, rotated by a shift modulo 1 to a mean of 0.5, then nudged.
 
-        The rotation takes the shift nearest to 0, modulo 1, that puts no 2 values into 1 fine lane and no value
-        exactly on 0, where the nudge finds no value with `MIN_N_BITS` bits.
+        The rotation takes, among the shifts that bring the mean to 0.5, the one nearest to 0, modulo 1, that puts no 2
+        values into 1 fine lane and no value exactly on 0, because the nudge cannot move a value of 0 to a value with
+        `MIN_N_BITS` bits.
 
         When no shift passes both checks, the axis gets the mean correction instead, computed by `of` as for an axis
         with no size below.
 
-        A shift can put 2 values that lie less than 1 fine lane apart into 1 fine lane. The shifts to a mean of 0.5
-        differ by multiples of `1/k`, which is a whole number of fine lanes, so if 1 of these shifts puts 2 values into
-        1 fine lane, every one of them does, and the axis gets the mean correction.
+        A shift can put 2 values that lie less than 1 fine lane apart into 1 fine lane.
+
+        With `k` the number of values, the shifts to a mean of 0.5 differ by multiples of `1/k`, which is a whole number
+        of fine lanes, so if 1 of these shifts puts 2 values into 1 fine lane, every one of them does, and the axis gets
+        the mean correction.
 
         Raises:
             MCTuplesConstructionError: If the nudge finds no value with `MIN_N_BITS` bits inside a value's fine lane.
@@ -313,9 +317,10 @@ class MCTuplesAxisValueCorrection:
         shifts = []
         for n_wrapped in range(k + 1):
             # As the shift grows from 0 to 1, the mean rises with slope 1 and drops by `1/k` each time a value wraps
-            # from 1 to 0, so between 2 wraps it is `values.mean() + shift - n_wrapped / k`; this shift brings the
-            # mean to 0.5 only if adding it carries exactly `n_wrapped` values past 1, which the check on the mean of
-            # the rotated values confirms.
+            # from 1 to 0, so between 2 wraps it is `values.mean() + shift - n_wrapped / k`.
+            #
+            # This shift brings the mean to 0.5 only if adding it carries exactly `n_wrapped` values past 1, which the
+            # check on the mean of the rotated values confirms.
             shift = TARGET_MEAN - values.mean() + n_wrapped / k
             if 0.0 <= shift < 1.0 and abs(((values + shift) % 1.0).mean() - TARGET_MEAN) < 0.5 / k:
                 shifts.append(shift if shift <= 0.5 else shift - 1.0)

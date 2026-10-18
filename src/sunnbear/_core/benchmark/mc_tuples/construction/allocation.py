@@ -3,9 +3,9 @@
 On each axis, every tuple of the size below occupies 1 fine lane. A gap is a maximal run of free fine lanes: between 2
 occupied fine lanes, or between an occupied fine lane and an edge of the axis (`MCTuplesAxisGaps`).
 
-max-div measures each axis as a circle on which 0 and 1 meet (`distances`), so the 2 edge gaps are the 2 parts of 1
-gap, the wrap-around gap, and the `placement` module places their new tuples together, while each edge gap keeps its own
-number of new tuples.
+max-div measures each axis as a circle on which 0 and 1 meet (`distances`), so the 2 edge gaps are the 2 parts of 1 gap,
+the wrap-around gap. The `placement` module places the new tuples of both edge gaps together, and each edge gap keeps
+its own number of new tuples.
 
 The size's max-div solve puts exactly the allocated number of new tuples into each gap, and spreads them about evenly
 inside it. So the allocation sets where the size's mean lies, and with it how far the first value correction, which runs
@@ -160,22 +160,6 @@ class MCTuplesAxisGaps:
     # --------------------------------------------------------------------------
     #  Edge gaps
     # --------------------------------------------------------------------------
-    @property
-    def left_edge_gap(self) -> int | None:
-        """Return the index of the left edge gap, first because the gaps are ascending, or None if there is none."""
-        if self.is_left_edge[0]:
-            return 0
-        else:
-            return None
-
-    @property
-    def right_edge_gap(self) -> int | None:
-        """Return the index of the right edge gap, last because the gaps are ascending, or None if there is none."""
-        if self.is_right_edge[-1]:
-            return self.is_right_edge.size - 1
-        else:
-            return None
-
     @property
     def edge_gaps(self) -> np.ndarray:
         """Return the indices of the edge gaps, ascending."""

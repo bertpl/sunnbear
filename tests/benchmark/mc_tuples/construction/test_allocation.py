@@ -69,11 +69,11 @@ def test_greedy_counts_score_a_new_tuple_in_an_edge_gap_by_the_spacing_of_the_wr
 
     # --- act --------------------------
     counts = gaps.greedy_counts(4)
-
-    # --- assert -----------------------
     spacings_after_each_addition = MCTuplesAxisGapPlacement(
         gaps, np.array([0, 0, 0, 3, 0])
     ).spacings_after_each_addition()
+
+    # --- assert -----------------------
     assert spacings_after_each_addition[:2] == pytest.approx([90.5, 112.5])
     assert counts.tolist() == [0, 1, 0, 3, 0]
 

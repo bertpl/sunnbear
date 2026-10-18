@@ -113,9 +113,13 @@ def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size()
 
 
 def test_generator_corrects_refines_and_corrects_each_size_and_builds_the_next_on_it(monkeypatch):
-    """With both solves replaced by stubs that run no max-div, the generator corrects every size's means to 0.5,
-    rotating each axis in the smallest size's first correction only, moves every corrected new tuple within its fine
-    cell, corrects the means to 0.5 again, and builds each size on the corrected size below."""
+    """With both solves replaced by stubs that run no max-div, the generator, for each size:
+
+    - corrects the size's means to 0.5, rotating each axis in the smallest size's first correction only;
+    - moves every corrected new tuple within its fine cell;
+    - corrects the means to 0.5 again;
+    - builds the next size on this corrected size.
+    """
     # --- arrange ----------------------
     monkeypatch.setattr(MCTuplesSelectionSolve, "run", _spread_each_gap_s_new_tuples)
     monkeypatch.setattr(MCTuplesRefinementSolve, "run", _pick_each_cell_s_last_candidate)
