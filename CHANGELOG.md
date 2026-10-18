@@ -23,8 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Breaking:** Declare solver configs in 1 `SolverConfigsDeclaration` subclass per solver class, which lists the configs as `SolverConfig` values
-- **Breaking:** Rename the `"bracketing_solver"` variant of `Ridders` to `"standard_stopping_criterion"`
+- Declare solver configs in 1 `SolverConfigsDeclaration` subclass per solver class, which lists the configs as `SolverConfig` values
+- Rename the `"bracketing_solver"` variant of `Ridders` to `"standard_stopping_criterion"`
 - Stop `Brent`, `Chandrupatla`, `TOMS748`, `AndersonBjorck`, `SteffenBrent`, `ModAB` and `CARF` once the interval is at most `2*xtol` wide and return its midpoint, as `Bisection` does, which changes their benchmark results
 - Make the `"standard_stopping_criterion"` variant the core config of `Ridders`, which changes the benchmark results of `Ridders`
 
@@ -44,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Breaking:** Raise a `ValueError` in `compute_xtol_range` when the interval lies too far from 0 for its width
+- Raise a `ValueError` in `compute_xtol_range` when the interval lies too far from 0 for its width
 - Make the flop counts of `ITP` consistent with its published algorithm
 - Change the midpoint that `SteffenBrent` evaluates to the one that reproduces the iterates published by Steffen et al., which changes the benchmark results of `SteffenBrent`
 
@@ -94,7 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Breaking:** Rename the parameter of `Interval.is_converged` to `xtol_doubled`
+- Rename the parameter of `Interval.is_converged` to `xtol_doubled`
 
 ## 0.2.2 (2026-10-09)
 
@@ -116,7 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Breaking:** Change the signature of `generate_mc_tuples`, and give every size of the tuple sets that it builds a mean u and a mean v of exactly 0.5
+- Change the signature of `generate_mc_tuples`, and give every size of the tuple sets that it builds a mean u and a mean v of exactly 0.5
 - Rebuild the shipped Monte Carlo tuple set; benchmark results on it differ from those on the previous set
 - Require max-div ≥ 0.21.1
 
