@@ -89,3 +89,44 @@ def test_the_factor_falls_back_to_0_5_when_an_iterate_does_not_reduce_abs_f():
     # value is halved again.
     assert f2 > f1
     assert x3 == x2 - f2 / ((f2 - 0.25 * fa) / (x2 - a))
+
+
+@pytest.mark.parametrize(
+    "f", [lambda x: x - 0.999999, lambda x: 0.999999 - x]
+)  # The 2 functions cover both interval orientations.
+def test_a_secant_zero_within_xtol_of_the_upper_bound_is_replaced_by_a_step_of_delta_below_it(f):
+    """On a straight line whose root lies 1e-6 below the upper bound, the first secant's zero lies within
+    ``xtol = 1e-3`` of the upper bound, which counts as the most recent iterate before the first iterate.
+
+    `AndersonBjorck` therefore evaluates ``xtol`` below the upper bound, toward the retained lower bound. That step
+    crosses the root, so the interval is ``xtol`` wide and the solve returns its midpoint.
+    """
+    # --- act --------------------------
+    result = AndersonBjorck().solve(f, 0.0, 1.0, xtol=1e-3, max_fevals=10, history_enabled=True)
+
+    # --- assert -----------------------
+    assert result.evaluated_x_values == (0.0, 1.0, 1.0 - 1e-3)
+    assert (result.x, result.status) == (0.5 * ((1.0 - 1e-3) + 1.0), SolveStatus.CONVERGED)
+
+
+def test_a_secant_zero_within_xtol_of_the_lower_bound_is_replaced_by_a_step_of_delta_above_it():
+    """On `cubic` over ``[1, 2]`` at ``xtol = 1e-3``, the 3rd and 4th iterates lie on opposite sides of the root, and
+    the secant through them has its zero within ``xtol`` of the 4th, which is the lower bound.
+
+    `AndersonBjorck` therefore evaluates ``xtol`` above the 4th iterate, toward the retained upper bound, the 3rd
+    iterate. That step crosses the root and ends the solve.
+    """
+    # --- arrange ----------------------
+    xtol = 1e-3
+
+    # --- act --------------------------
+    result = AndersonBjorck().solve(cubic, 1.0, 2.0, xtol=xtol, max_fevals=60, history_enabled=True)
+
+    # --- assert -----------------------
+    (x3, f3), (x4, f4), (x5, f5) = result.history[4:7]
+    # x4 replaced the retained bound, so x3 is the retained bound, at its own value.
+    assert f3 > 0.0 > f4
+    assert abs((x4 - f4 / ((f4 - f3) / (x4 - x3))) - x4) < xtol
+    assert x5 == x4 + xtol
+    assert f5 > 0.0
+    assert result.n_fevals == 7

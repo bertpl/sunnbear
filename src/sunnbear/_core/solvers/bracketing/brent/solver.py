@@ -1,7 +1,7 @@
 """`Brent` implements Brent's method: interpolation steps, with bisection when they converge too slowly."""
 
 from sunnbear._core.solvers.core import Solver, SolveState
-from sunnbear._core.solvers.core.stopping import interval_root, is_interval_converged
+from sunnbear._core.solvers.core.stopping import interval_root_if_converged
 from sunnbear._core.utils.floats import FLOAT64_EPS
 
 
@@ -182,7 +182,4 @@ class Brent(Solver):
         ``m`` and ``tol`` are not used. The test suite overrides this method to apply the procedure's own stopping
         criterion, ``|m| <= tol`` or ``f(b) = 0``, where it reproduces published counts.
         """
-        if is_interval_converged(b, fb, c, fc, xtol_doubled):
-            return interval_root(b, fb, c, fc)
-        else:
-            return None
+        return interval_root_if_converged(b, fb, c, fc, xtol_doubled)

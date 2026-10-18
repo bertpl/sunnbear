@@ -2,7 +2,7 @@
 that rounds onto the most recent iterate."""
 
 from sunnbear.solvers import AndersonBjorck, SolveStatus
-from tests.solvers.example_functions import CUBIC_ROOT, STEEP_EXPONENTIAL_ROOT, cubic, steep_exponential
+from tests.solvers.example_functions import STEEP_EXPONENTIAL_ROOT, cubic, steep_exponential
 
 
 def test_a_function_that_is_nearly_flat_on_1_side_of_the_root_takes_over_200_evaluations():
@@ -18,18 +18,18 @@ def test_a_function_that_is_nearly_flat_on_1_side_of_the_root_takes_over_200_eva
 
 
 def test_a_step_that_rounds_onto_the_most_recent_iterate_takes_the_factor_0_5():
-    """On `cubic` over ``[1, 2]``, the 7th iterate lies within rounding error of the root while the retained bound is
-    still far from it.
+    """On `cubic` over ``[1, 2]`` at ``xtol = 0``, where the step of delta never applies, the 7th iterate lies within
+    rounding error of the root while the retained bound is still far from it.
 
-    The next 2 steps round onto the 7th iterate, so the slope from the previous to the new iterate is ``0 / 0``; the
-    factor 0.5 then moves the following step away from the 7th iterate, and the solve converges.
+    The next 2 steps round onto the 7th iterate, so the slope from the previous to the new iterate is ``0 / 0`` each
+    time; the factor 0.5, taken at each of them, then moves the following step away from the 7th iterate.
     """
     # --- act --------------------------
-    result = AndersonBjorck().solve(cubic, 1.0, 2.0, xtol=1e-9, max_fevals=60, history_enabled=True)
+    result = AndersonBjorck().solve(cubic, 1.0, 2.0, xtol=0.0, max_fevals=12, history_enabled=True)
 
     # --- assert -----------------------
     # The history starts with the 2 interval bounds, so index 8 holds the 7th iterate.
-    x_values = [x for x, _ in result.history]
+    x_values = result.evaluated_x_values
     assert x_values[8] == x_values[9] == x_values[10] != x_values[11]
-    assert result.status is SolveStatus.CONVERGED
-    assert abs(result.x - CUBIC_ROOT) <= 1e-9
+    # At xtol = 0, the solve runs until its budget is spent; a division of 0 by 0 would have ended it as SOLVER_ERROR.
+    assert result.status is SolveStatus.MAX_FEVALS

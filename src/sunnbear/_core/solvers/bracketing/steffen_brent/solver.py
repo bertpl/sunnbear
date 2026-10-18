@@ -1,60 +1,32 @@
 """`SteffenBrent` implements the modified Brent method of Steffen et al., which can move a bound onto the midpoint."""
 
 from sunnbear._core.solvers.core import Solver, SolveState
+from sunnbear._core.solvers.core.stopping import interval_root_if_converged
 
 
 class SteffenBrent(Solver):
     """`SteffenBrent` implements the modified Brent method of Steffen et al. (2025), as the paper's Algorithm 2.
 
-    `SteffenBrent` keeps 2 interval bounds, ``a`` and ``b``; ``b`` is the bound with the smaller ``|f|``, and is the
-    best estimate of the root. Each iteration evaluates a new x-value ``s``, from 1 of 3 steps:
+    `SteffenBrent` keeps 2 interval bounds, ``a`` and ``b``; ``b`` is the bound with the smaller ``|f|``. Each
+    iteration evaluates a new x-value ``s``, from 1 of 3 steps:
 
     - inverse quadratic interpolation through ``a``, ``b`` and ``b_previous``, the previous value of ``b``, when the 3
       function values are distinct;
     - linear interpolation, a secant step, through ``b`` and ``b_previous``, when the 3 function values are not
       distinct but ``f(b)`` and ``f(b_previous)`` differ;
     - bisection, in all other cases, and in place of an interpolation step that does not land strictly between ``b``
-      and ``(3 * a + b) / 4``.
+      and ``(3*a + b) / 4``.
 
     In the first iteration, ``b_previous`` is ``a``, so the first step is a secant step.
 
     ``s`` becomes the new ``b``, and the new ``a`` is chosen so that the interval keeps the root:
 
     - when ``f(a)`` and ``f(s)`` have the same sign, the old ``b`` becomes the new ``a``, as in Brent's method;
-    - otherwise the root lies between ``a`` and ``s``, and `SteffenBrent` evaluates their midpoint ``m = (a + s) / 2``;
-      when ``f(m)`` and ``f(s)`` differ in sign, ``m`` becomes the new ``a``.
+    - otherwise, including when ``f(s) = 0``, the root lies between ``a`` and ``s``, and `SteffenBrent` evaluates
+      their midpoint ``m = (a + s) / 2``; when ``f(m)`` and ``f(s)`` differ in sign, ``m`` becomes the new ``a``.
 
     The second case is the paper's modification of Brent's method. Finally, ``a`` and ``b`` swap where needed, so that
     ``b`` keeps the smaller ``|f|``.
-
-    The solve ends once ``|b - a| <= xtol`` or ``f(b) = 0``, and returns ``b``, which then lies within ``xtol`` of a
-    root. The paper stops once ``|b - a| <= tol1`` or ``|f(b)| <= tol2``; the solver passes ``xtol`` as ``tol1`` and
-    0 as ``tol2``.
-
-    Where the paper is ambiguous, `SteffenBrent` makes these choices:
-
-    - **The midpoint of the modification:** the paper's text and Algorithm 2 take ``m = (a + b) / 2``, the midpoint of
-      the interval before the step, but the paper's results follow ``m = (a + s) / 2``: only that midpoint reproduces
-      the values of the modified method in the paper's Figures 3, 4, 6 and 7, and the iteration count of the paper's
-      second case study. `SteffenBrent` follows the paper's results.
-
-    - **The interval for an accepted step:** the paper's text accepts an interpolation step only between ``b`` and
-      the midpoint ``(a + b) / 2``, while its Algorithm 2 keeps the bound of Brent's method, ``(3 * a + b) / 4``.
-      `SteffenBrent` follows Algorithm 2.
-    - **The choice of step:** Algorithm 2 chooses between interpolation and the secant by comparing the x-values
-      ``a``, ``b`` and ``b_previous``, not the function values. Comparing the x-values leads to 2 divisions by 0:
-
-      - the secant step divides 0 by 0 when ``b`` equals ``b_previous``, which happens when the old ``b`` became the
-        new ``a`` and the final swap moves the old ``b`` back to ``b``;
-      - the interpolation divides by 0 when 2 distinct x-values share a function value.
-
-      `SteffenBrent` chooses the step by testing the function values for exact equality.
-    - **No step-size tests:** the paper's text describes the tests of Brent's method that force bisection once the
-      interpolation steps stop shrinking, but Algorithm 2 leaves them out. `SteffenBrent` follows Algorithm 2, so on
-      some functions the interval shrinks slowly.
-    - **No needless evaluation of the midpoint:** when ``f(s) = 0``, Algorithm 2 still evaluates the midpoint, while
-      `SteffenBrent` ends the solve. Both return ``s``: in Algorithm 2, ``f(m)`` and ``f(s) = 0`` cannot differ in sign,
-      so ``m`` does not replace ``a`` and ``s`` becomes ``b``.
 
     The paper's title says that the modification halves the interval in every iteration, but Algorithm 2 does not
     guarantee that the interval halves:
@@ -65,42 +37,74 @@ class SteffenBrent(Solver):
     - when ``f(a)`` and ``f(s)`` have the same sign, the new interval from ``b`` to ``s`` can keep up to 3/4 of the
       old interval.
 
-    Signs of function values are compared directly, where the paper multiplies them: the product of 2 small function
-    values can underflow to 0.
+    `SteffenBrent` departs from Algorithm 2, or settles a detail where the paper is ambiguous, in these places:
 
-    An iteration can evaluate the function twice, and the stopping criterion is the paper's own, so `SteffenBrent`
-    writes its own loop, not `BracketingSolver`'s.
+    - **Stopping criterion:** `SteffenBrent` checks the shared stopping criterion where Algorithm 2 checks its own, at
+      the top of each iteration:
+
+      - the solve ends once the interval is at most ``2*xtol`` wide, or once the function value at an interval bound
+        is exactly 0, and returns that bound, or else the interval's midpoint, which then lies within ``xtol`` of a
+        root;
+      - Algorithm 2 ends the solve once ``|b - a| <= tol1`` or ``|f(b)| <= tol2``, and returns ``b``.
+    - **Midpoint of the modification:** the paper's text and Algorithm 2 take ``m = (a + b) / 2``, the midpoint of the
+      interval before the step, but the paper's results follow ``m = (a + s) / 2``: only that midpoint reproduces the
+      values of the modified method in the paper's Figures 3, 4, 6 and 7. `SteffenBrent` follows the paper's results.
+    - **Interval for an accepted step:** the paper's text accepts an interpolation step only between ``b`` and the
+      midpoint ``(a + b) / 2``, while Algorithm 2 keeps the bound of Brent's method, ``(3*a + b) / 4``. `SteffenBrent`
+      follows Algorithm 2.
+    - **No step-size tests:** the paper's text describes the tests of Brent's method that force bisection once the
+      interpolation steps stop shrinking, but Algorithm 2 leaves them out. `SteffenBrent` follows Algorithm 2, so on
+      some functions the interval shrinks slowly.
+    - **Choice of step:** `SteffenBrent` chooses the step by testing the function values for exact equality, where
+      Algorithm 2 compares the x-values ``a``, ``b`` and ``b_previous``. Comparing the x-values leads to 2 divisions
+      by 0:
+
+      - the secant step divides 0 by 0 when ``b`` equals ``b_previous``, which happens when the old ``b`` became the
+        new ``a`` and the final swap moves the old ``b`` back to ``b``;
+      - the interpolation divides by 0 when 2 distinct x-values share a function value.
+    - **Sign tests:** `SteffenBrent` compares the signs of 2 function values directly, where Algorithm 2 multiplies
+      them: the product of 2 small function values can underflow to 0.
+
+    An iteration can evaluate the function twice, and its steps read ``b_previous`` besides the 2 interval bounds, so
+    `SteffenBrent` writes its own loop, not `BracketingSolver`'s.
 
     References:
         - Steffen, V., Della Pasqua, C. C., de Oliveira, M. S. and da Silva, E. A. (2025). Halving interval
           guaranteed for Dekker and Brent root finding methods. Examples and Counterexamples 7, 100173. Its
-          Algorithm 2 is the method, and the test suite reproduces its published results.
-          https://doi.org/10.1016/j.exco.2024.100173
+          Algorithm 2 is the method, and the test suite reproduces its 2 case studies and the modified Brent method's
+          values in its Figures 3, 4, 6 and 7. https://doi.org/10.1016/j.exco.2024.100173
         - Brent, R. P. (1971). An algorithm with guaranteed convergence for finding a zero of a function. The
           Computer Journal 14(4), 422-425. Steffen et al. modify Brent's method. https://doi.org/10.1093/comjnl/14.4.422
+        - rateslib's ``_brent``, which rateslib's function ``ift_1dim`` runs for the method ``modified_brent``, is an
+          implementation of Algorithm 2 that also chooses the step by testing the function values.
+          https://github.com/attack68/rateslib
     """
 
     name = "steffen_brent"
-    version = 3
+    version = 4
 
     def _solve(self, state: SolveState) -> float:
-        """Run Algorithm 2 of the paper and return ``b``.
+        """Run Algorithm 2 of the paper until `_root_if_converged` returns a root estimate, and return that estimate.
 
         Each iteration:
 
+        - ends the solve if the stopping criterion holds;
         - chooses ``s`` and evaluates it;
-        - ends the solve if ``f(s) = 0``;
         - chooses the new ``a``, evaluating the midpoint of ``a`` and ``s`` where the paper's modification needs it;
         - swaps ``a`` and ``b`` where ``|f(a)| < |f(b)|``.
-
-        The loop ends once ``|b - a| <= xtol``.
         """
         interval = state.interval
         a, fa, b, fb = interval.a, interval.fa, interval.b, interval.fb
+        xtol_doubled = 2.0 * state.xtol
         if abs(fa) < abs(fb):
             a, b, fa, fb = b, a, fb, fa
         b_previous, fb_previous = a, fa
-        while abs(b - a) > state.xtol:
+        while True:
+            # --- the stopping criterion ---------
+            x_root = self._root_if_converged(a, fa, b, fb, xtol_doubled)
+            if x_root is not None:
+                return x_root
+
             # --- the step s ---------------------
             if fa != fb and fa != fb_previous and fb != fb_previous:
                 # The step is an inverse quadratic interpolation through a, b and b_previous, the paper's equation 3.
@@ -126,14 +130,13 @@ class SteffenBrent(Solver):
             # --- the evaluation at s ------------
             fs = state.f(s)
             state.x_best = s
-            if fs == 0.0:
-                return s
 
             # --- the new interval ---------------
             b_previous, fb_previous = b, fb
-            # Signs are compared directly, where the paper multiplies them: the product of 2 small function values can
-            # underflow to 0.
-            if (fa > 0.0) == (fs > 0.0):
+            # Signs are compared directly, where Algorithm 2 multiplies them, because the product of 2 small function
+            # values can underflow to 0. Each sign test below holds exactly where Algorithm 2's product is positive or
+            # negative, so f(s) = 0 takes the else branch, as in Algorithm 2.
+            if (fa > 0.0 and fs > 0.0) or (fa < 0.0 and fs < 0.0):
                 a, fa = b, fb
             else:
                 m = 0.5 * (a + s)
@@ -144,4 +147,15 @@ class SteffenBrent(Solver):
             b, fb = s, fs
             if abs(fa) < abs(fb):
                 a, b, fa, fb = b, a, fb, fa
-        return b
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _root_if_converged(a: float, fa: float, b: float, fb: float, xtol_doubled: float) -> float | None:
+        """Return the root estimate if the solve ends at these interval bounds, or ``None`` if it continues.
+
+        The test suite overrides this method to apply Algorithm 2's own stopping criterion where it reproduces the
+        paper's published results.
+        """
+        return interval_root_if_converged(a, fa, b, fb, xtol_doubled)
