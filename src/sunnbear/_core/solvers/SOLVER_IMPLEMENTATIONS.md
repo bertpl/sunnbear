@@ -151,7 +151,7 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 
 Each solver computes its steps in the form of its source, the secant's zero and its own midpoints included. Forms that are equal in exact arithmetic round differently, but that rounding moves an evaluation count by about 1 near a stop, favors no solver, and is part of each source's method as published; a source's form also keeps its failures in float64, such as an overflow of `a*fb`.
 
-A step may be rewritten only where the rewrite gives the same x-value in float64, bit for bit, and only to drop operations that an expert would not write, such as `0.5*(a + b)` for `(a + b) / 2`, or a ratio computed once that a source computes twice. `SteffenBrent` and `ModAB` multiply their midpoints by 0.5, and `Secant` computes SciPy's ratio of the 2 function values once.
+A step may be rewritten only where the rewrite gives the same x-value in float64, bit for bit, and only to drop operations that an expert would not write, such as `0.5*(a + b)` for `(a + b) / 2`, or a ratio computed once that a source computes twice. For example, `SteffenBrent` and `ModAB` multiply their midpoints by 0.5, and `Secant` computes SciPy's ratio of the 2 function values once.
 
 The midpoint that the shared stopping criterion returns (section IV.a.2) is `0.5*(a + b)` for every solver: it belongs to the stopping criterion, not to a solver's steps.
 

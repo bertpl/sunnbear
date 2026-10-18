@@ -119,7 +119,7 @@ class SteffenBrent(Solver):
             else:
                 s = 0.5 * (a + b)
             # An interpolation step that overflows to inf or nan fails this comparison too, so it becomes a bisection.
-            accepted_range_end = (3.0 * a + b) / 4.0
+            accepted_range_end = 0.25 * (3.0 * a + b)
             if not min(b, accepted_range_end) < s < max(b, accepted_range_end):
                 s = 0.5 * (a + b)
 
