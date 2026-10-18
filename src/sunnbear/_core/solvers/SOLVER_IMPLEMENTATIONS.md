@@ -134,7 +134,7 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 | Algorithm | Source's stopping criterion | Source's returned x-value | Kept inside the steps |
 | --------- | --------------------------- | ------------------------- | --------------------- |
 | `Brent` | half-width ≤ `tol`, or `f(b) = 0`, with `tol = 2*macheps*\|b\| + t` | `b`, the bound with the smaller `\|f\|` | minimum step `tol`, with `t = xtol` |
-| `Illinois` | ALGOL: step ≤ `delta`; tables: `\|f\| < 0.5e-19` | ALGOL: the next chord zero, not evaluated | – |
+| `Illinois` | ALGOL: step ≤ `delta`; tables: `\|f\| < 0.5e-19` | ALGOL: the next secant's zero, not evaluated | – |
 | `Pegasus` | none; experiments: `\|f\|` below a threshold | not stated | – |
 | `AndersonBjorck` | `\|x1 - x0\| < δ`, or `f = 0` | the bound with the smaller `\|f\|` | step of `δ`, with `δ = xtol` |
 | `Ridders` | none | not stated | – |
@@ -149,28 +149,11 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 
 ### IV.b. Iteration Formula
 
-Many solvers compute the same 2 formulas, in forms that are equal in exact arithmetic but round differently. The `sunnbear` solver implementations compute both in 1 shared form:
-- **the chord's zero** through `(a, fa)` and `(b, fb)`: `(a*fb - b*fa) / (fb - fa)`
-- **the midpoint** of `[a, b]`: `0.5*(a + b)`
+Each solver computes its steps in the form of its source, the secant's zero and its own midpoints included. Forms that are equal in exact arithmetic round differently, but that rounding moves an evaluation count by about 1 near a stop, favors no solver, and is part of each source's method as published; a source's form also keeps its failures in float64, such as an overflow of `a*fb`.
 
-This applies to every plain chord step and every plain midpoint, in hybrid methods and in `Secant` too. A step whose form is part of its source's structure, or guards against rounding, keeps its source's form, and a guard that a source adds to a step, such as `ModAB`'s clamp of the chord's zero into the interval, stays.
+A step may be rewritten only where the rewrite gives the same x-value in float64, bit for bit, and only to drop operations that an expert would not write, such as `0.5*(a + b)` for `(a + b) / 2`, or a ratio computed once that a source computes twice. For example, `SteffenBrent` and `ModAB` multiply their midpoints by 0.5, and `Secant` computes SciPy's ratio of the 2 function values once.
 
-| Algorithm | Chord's zero | Midpoint |
-| --------- | ------------ | -------- |
-| `Bisection` | – | shared |
-| `RegulaFalsi` | shared | – |
-| `Secant` | shared | – |
-| `Brent` | source's form: `p / q`, divided only after Brent's acceptance test | source's form: `b + m`, where `m = 0.5*(c - b)` also drives Brent's stopping criterion and acceptance test |
-| `Illinois` | shared | – |
-| `Pegasus` | shared | – |
-| `AndersonBjorck` | shared | – |
-| `Ridders` | – | shared |
-| `TOMS748` | shared in the first secant step<br>source's form in the double-size secant step: a step from the bound with the smaller `\|f\|` twice as long as the secant step, which is not a plain chord<br>source's form in the Newton-Quadratic subroutine's fallback chord step `a - fa/a1`, which reuses the slope `a1 = (fb - fa)/(b - a)` of the subroutine's quadratic | shared |
-| `Chandrupatla` | – | source's form: `x1 + t*(x2 - x1)` with `t = 0.5`, where `t` is clamped before every step |
-| `ITP` | shared | shared |
-| `SteffenBrent` | shared | shared |
-| `CARF` | shared | shared |
-| `ModAB` | shared, then clamped into the interval, as its source does | shared |
+The midpoint that the shared stopping criterion returns (section IV.a.2) is `0.5*(a + b)` for every solver: it belongs to the stopping criterion, not to a solver's steps.
 
 ## V. Solver Configurations
 

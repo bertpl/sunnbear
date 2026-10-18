@@ -81,7 +81,7 @@ class SteffenBrent(Solver):
     """
 
     name = "steffen_brent"
-    version = 2
+    version = 3
 
     def _solve(self, state: SolveState) -> float:
         """Run Algorithm 2 of the paper and return ``b``.
@@ -117,11 +117,11 @@ class SteffenBrent(Solver):
                 # The step is a linear interpolation through b and b_previous, the paper's equation 4.
                 s = b - fb * (b_previous - b) / (fb_previous - fb)
             else:
-                s = (a + b) / 2.0
+                s = 0.5 * (a + b)
             # An interpolation step that overflows to inf or nan fails this comparison too, so it becomes a bisection.
-            accepted_range_end = (3.0 * a + b) / 4.0
+            accepted_range_end = 0.25 * (3.0 * a + b)
             if not min(b, accepted_range_end) < s < max(b, accepted_range_end):
-                s = (a + b) / 2.0
+                s = 0.5 * (a + b)
 
             # --- the evaluation at s ------------
             fs = state.f(s)
@@ -136,7 +136,7 @@ class SteffenBrent(Solver):
             if (fa > 0.0) == (fs > 0.0):
                 a, fa = b, fb
             else:
-                m = (a + s) / 2.0
+                m = 0.5 * (a + s)
                 fm = state.f(m)
                 if (fm > 0.0 > fs) or (fm < 0.0 < fs):
                     # The root lies between m and s, so m replaces a: the paper's modification.

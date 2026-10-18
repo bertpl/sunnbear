@@ -20,7 +20,8 @@ class Secant(Solver):
       the other as the newest x-value, and the newest x-value is the bound with the larger ``|f|``, or the upper bound
       when both are equal.
     - **Step formula:** the zero of the secant, computed from the ratio of the 2 function values, with the value of
-      smaller magnitude divided by the value of larger magnitude, so that the ratio's magnitude is at most 1.
+      smaller magnitude divided by the value of larger magnitude, so that the ratio's magnitude is at most 1. SciPy
+      computes that ratio twice; `Secant` computes it once, which gives the same x-values.
     - **Stopping criterion:** the solve ends once the step from the newest x-value to the next x-value is at most
       ``xtol``, and returns that next x-value without evaluating it.
     - **Equal function values:** when the 2 latest x-values have equal function values, the secant is horizontal and
@@ -49,7 +50,7 @@ class Secant(Solver):
     """
 
     name = "secant"
-    version = 1
+    version = 2
 
     def _solve(self, state: SolveState) -> float:
         """Run the secant method from the interval bounds; return the first secant zero within ``xtol`` of its start.
@@ -76,11 +77,15 @@ class Secant(Solver):
                 raise DivergedError(
                     "The 2 latest x-values have equal function values, so the next x-value is infinite."
                 )
-            # Divide the smaller |f| by the larger, as SciPy does, so the ratio's magnitude is at most 1.
+            # Divide the smaller |f| by the larger, as SciPy does, so the ratio's magnitude is at most 1. SciPy
+            # computes the ratio q twice, in -q * x1 + x0 and in 1 - q; computing it once gives the same x-value,
+            # because -q * x1 + x0 equals x0 - q * x1 exactly in float64.
             if abs(f1) > abs(f0):
-                x = (-f0 / f1 * x1 + x0) / (1.0 - f0 / f1)
+                q = f0 / f1
+                x = (x0 - q * x1) / (1.0 - q)
             else:
-                x = (-f1 / f0 * x0 + x1) / (1.0 - f1 / f0)
+                q = f1 / f0
+                x = (x1 - q * x0) / (1.0 - q)
             if abs(x - x1) <= state.xtol:
                 return x
             x0, f0 = x1, f1

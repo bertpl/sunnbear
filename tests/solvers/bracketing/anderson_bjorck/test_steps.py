@@ -16,7 +16,7 @@ def _cubic_with_a_local_maximum(x: float) -> float:
     "f", [lambda x: x - 0.25, lambda x: 0.25 - x]
 )  # The 2 functions cover both interval orientations.
 def test_a_linear_function_is_solved_in_one_step(f):
-    """On a straight line, the first chord lands on the root, so `AndersonBjorck` converges after the 2 bound
+    """On a straight line, the first secant lands on the root, so `AndersonBjorck` converges after the 2 bound
     evaluations and 1 iterate.
 
     The root 0.25 is a power of 2, so the paper's step computes it without rounding, and the test can compare the
@@ -31,7 +31,7 @@ def test_a_linear_function_is_solved_in_one_step(f):
 
 def test_the_first_2_steps_are_regula_falsi_and_the_third_scales_the_retained_f():
     """On `cubic`, `AndersonBjorck` starts as regula falsi, scales the value of an interval bound by the ratio of 2
-    chord slopes once it has kept that bound for 2 steps in a row, and drops that scaling once an iterate replaces
+    secant slopes once it has kept that bound for 2 steps in a row, and drops that scaling once an iterate replaces
     the scaled bound.
 
     Each step and each factor take the form of the paper's ALGOL procedure.
@@ -53,7 +53,7 @@ def test_the_first_2_steps_are_regula_falsi_and_the_third_scales_the_retained_f(
     slope = (f1 - fb) / (x1 - b)
     assert x2 == x1 - f1 / slope
     # f2 < 0 too, so x2 replaced x1 and the upper bound is kept a second time: its value is scaled by the slope from
-    # x1 to x2, divided by the slope of the chord that produced x2.
+    # x1 to x2, divided by the slope of the secant that produced x2.
     assert f2 < 0.0
     scaled_fb = (((f2 - f1) / (x2 - x1)) / slope) * fb
     slope = (f2 - scaled_fb) / (x2 - b)
@@ -82,7 +82,7 @@ def test_the_factor_falls_back_to_0_5_when_an_iterate_does_not_reduce_abs_f():
     (x1, f1), (x2, f2), (x3, _) = history[2:5]
     assert x1 == b - fb / ((fb - fa) / (b - a))
     # f1 > fb > 0, so x1 replaced the upper bound; before the first iterate, the upper bound counts as the previous
-    # iterate, and the slope from b to x1 has the sign opposite to the chord's, so the factor is negative.
+    # iterate, and the slope from b to x1 has the sign opposite to the secant's, so the factor is negative.
     assert f1 > fb > 0.0
     assert x2 == x1 - f1 / ((f1 - 0.5 * fa) / (x1 - a))
     # f2 > f1 > 0, so the factor, which equals 1 - f2 / f1 in exact arithmetic, is negative too, and the retained

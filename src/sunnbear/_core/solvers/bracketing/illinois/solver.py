@@ -8,30 +8,30 @@ from .state import IllinoisState
 class Illinois(BracketingSolver[IllinoisState]):
     """`Illinois` is regula falsi that halves the function value of a bound that the interval keeps twice in a row.
 
-    Like regula falsi, it evaluates the zero of the chord through ``(a, f(a))`` and ``(b, f(b))``.
+    Like regula falsi, it evaluates the zero of the secant through ``(a, f(a))`` and ``(b, f(b))``.
 
     Regula falsi stalls when the function is convex or concave on the interval: it keeps 1 bound forever, so the
     interval never shrinks below the distance from that bound to the root. The Illinois method (Dowell and
     Jarratt, 1971) avoids the stall. Each new iterate replaces 1 bound, and the other bound is the retained bound:
 
     - when a new iterate lies on the same side of the root as the previous iterate, the retained bound's function
-      value is halved before the next chord is drawn, which moves the next iterate toward the retained bound;
+      value is halved before the next secant is drawn, which moves the next iterate toward the retained bound;
     - each further iteration that keeps that bound halves its value again;
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, at its own
       function value.
 
-    `Illinois` computes the chord's zero as Dowell and Jarratt (1971) do, as a correction to the most recent iterate:
+    `Illinois` computes the secant's zero as Dowell and Jarratt (1971) do, as a correction to the most recent iterate:
     ``x1 - f1 * (x1 - x0) / (f1 - f0)``, with ``x1`` the most recent iterate, ``x0`` the retained bound, and ``f0``
     the function value that `Illinois` uses at ``x0``, halved once for each iteration that kept ``x0`` again.
 
-    In exact arithmetic, this is the x-value of the chord formula that `RegulaFalsi` computes.
+    In exact arithmetic, this is the x-value of the secant formula that `RegulaFalsi` computes.
 
     `Illinois` departs from the ALGOL procedure of Dowell and Jarratt (1971), or settles an unspecified detail of that
     procedure, in these places:
 
     - **Stopping criterion:** `Illinois` stops by `BracketingSolver`'s criterion, once the interval is at most
       ``2 * xtol`` wide, and returns the interval's midpoint, which lies within ``xtol`` of a root; the procedure
-      stops once a step is at most its tolerance ``delta``, and returns the last chord's zero without evaluating it,
+      stops once a step is at most its tolerance ``delta``, and returns the last secant's zero without evaluating it,
       which need not lie within ``xtol`` of a root;
     - **Starting order:** the procedure leaves the order of its 2 starting x-values to the caller; `Illinois` passes
       the upper bound as ``x1``, the second of them, as mpmath does.
@@ -48,8 +48,8 @@ class Illinois(BracketingSolver[IllinoisState]):
           `Illinois` against mpmath's ``Illinois``.
         - Oliveira, I. F. D. and Takahashi, R. H. C. (2020). An enhancement of the bisection method average
           performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), article 5. Its
-          Table 1 holds the column "Illinois", for runs that stop by the rule of `BracketingSolver`.
-          https://doi.org/10.1145/3423597
+          Table 1 holds the column "Illinois", for runs that stop by the criterion of `BracketingSolver`, and the
+          test suite reproduces that column. https://doi.org/10.1145/3423597
     """
 
     name = "illinois"
@@ -57,9 +57,9 @@ class Illinois(BracketingSolver[IllinoisState]):
     state_cls = IllinoisState
 
     def _next_x(self, state: IllinoisState, interval: Interval) -> float:
-        """Return where the chord crosses zero, with the retained bound's value halved as the class docstring says.
+        """Return where the secant crosses zero, with the retained bound's value halved as the class docstring says.
 
-        Before computing the chord, update ``state.scaled_retained_f`` and ``state.newest_bound`` from the bound
+        Before computing the secant, update ``state.scaled_retained_f`` and ``state.newest_bound`` from the bound
         that the previous call's returned x-value replaced. This update is correct only when exactly 1 new
         evaluation happened since the previous call.
         """

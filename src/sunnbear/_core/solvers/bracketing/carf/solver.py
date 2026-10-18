@@ -20,7 +20,7 @@ class CARF(Solver):
     """`CARF` implements the Curvature-Adaptive Root Finder of Gao (2026), reconstructed from the paper and its results.
 
     `CARF` keeps an interval ``[a, b]`` and an interior x-value ``t``, strictly inside it, and knows the function
-    value at all 3. The first ``t`` is the zero of the chord through the bounds, clipped into the middle 80 % of the
+    value at all 3. The first ``t`` is the zero of the secant through the bounds, clipped into the middle 80 % of the
     interval (``θ0 = 0.1``). Each iteration:
 
     - **selects the active interval:** ``[a, t]`` or ``[t, b]``, the part that holds the sign change, which the paper
@@ -228,7 +228,7 @@ class CARF(Solver):
 
         When rounding puts neither zero in ``[a, b]``, the zero farther from ``t`` is returned, and the caller clips it
         into the active interval. When rounding puts ``t`` onto ``a`` or ``b``, the quadratic is not defined, and the
-        zero of the chord through ``(a, fa)`` and ``(b, fb)`` is returned.
+        zero of the secant through ``(a, fa)`` and ``(b, fb)`` is returned.
         """
         if not a < t < b:
             return (a * fb - b * fa) / (fb - fa)

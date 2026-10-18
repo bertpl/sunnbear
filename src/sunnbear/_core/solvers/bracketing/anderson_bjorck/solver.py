@@ -6,7 +6,7 @@ from sunnbear._core.solvers.core import Solver, SolveState
 class AndersonBjorck(Solver):
     """`AndersonBjorck` is regula falsi that scales down the function value of a bound kept twice in a row.
 
-    Like regula falsi, `AndersonBjorck` evaluates the zero of the chord through ``(a, f(a))`` and ``(b, f(b))``.
+    Like regula falsi, `AndersonBjorck` evaluates the zero of the secant through ``(a, f(a))`` and ``(b, f(b))``.
 
     Regula falsi stalls when the function is convex or concave on the interval: regula falsi keeps 1 bound forever,
     so the interval never shrinks below the distance from that bound to the root.
@@ -25,23 +25,23 @@ class AndersonBjorck(Solver):
     Each new iterate replaces 1 bound, and the other bound is the retained bound:
 
     - when a new iterate lies on the same side of the root as the previous iterate, the retained bound's function
-      value is multiplied by the factor before the next chord is drawn, which moves the next iterate toward the
+      value is multiplied by the factor before the next secant is drawn, which moves the next iterate toward the
       retained bound;
     - each further iteration that keeps that bound multiplies its value again, by that iteration's factor;
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, with its
       unscaled function value.
 
-    `AndersonBjorck` computes the chord's zero and the factor as the paper's ALGOL procedure does:
+    `AndersonBjorck` computes the secant's zero and the factor as the paper's ALGOL procedure does:
 
-    - **the chord's zero:** ``x1 - f1 / w1``, a step from the most recent iterate ``x1``, where ``w1 = (f1 - f0) /
-      (x1 - x0)`` is the slope of the chord through ``(x1, f1)`` and ``(x0, f0)``, with ``x0`` the retained bound and
-      ``f0`` its scaled value. In exact arithmetic, this is the x-value of the chord formula that `RegulaFalsi`
+    - **the secant's zero:** ``x1 - f1 / w1``, a step from the most recent iterate ``x1``, where ``w1 = (f1 - f0) /
+      (x1 - x0)`` is the slope of the secant through ``(x1, f1)`` and ``(x0, f0)``, with ``x0`` the retained bound and
+      ``f0`` its scaled value. In exact arithmetic, this is the x-value of the secant formula that `RegulaFalsi`
       computes;
-    - **the factor:** the ratio of 2 chord slopes, the slope from the previous to the new iterate divided by ``w1``,
-      the slope of the chord that produced the new iterate. In exact arithmetic, the ratio equals
+    - **the factor:** the ratio of 2 secant slopes, the slope from the previous to the new iterate divided by ``w1``,
+      the slope of the secant that produced the new iterate. In exact arithmetic, the ratio equals
       ``1 - f_new / f_previous``.
 
-    As for the chord's zero and the factor, `AndersonBjorck` follows its paper in its stopping rule, so that the
+    As for the secant's zero and the factor, `AndersonBjorck` follows its paper in its stopping rule, so that the
     benchmark measures the method as published. It stops as the ALGOL procedure does, with the procedure's tolerance
     ``delta`` set to ``xtol``:
 
@@ -58,19 +58,19 @@ class AndersonBjorck(Solver):
     ``f2 * f1 <= 0``, with ``f2`` the function value at ``x2``, `AndersonBjorck` compares the signs of ``f2`` and
     ``f1``, because the product of 2 small function values can underflow to 0.
 
-    The ALGOL procedure also takes a step of delta, which `AndersonBjorck` leaves out: when the chord's zero lies within
-    ``delta`` of the most recent iterate, the procedure moves the chord's zero to exactly ``delta`` from that iterate,
-    toward the retained bound.
+    The ALGOL procedure also takes a step of delta, which `AndersonBjorck` leaves out: when the secant's zero lies
+    within ``delta`` of the most recent iterate, the procedure moves the secant's zero to exactly ``delta`` from that
+    iterate, toward the retained bound.
 
     `AndersonBjorck` leaves the step out because, in float64, it can make the procedure alternate forever between the
     2 bounds: once the interval is ``delta`` wide in exact arithmetic, its computed width ``|x1 - x0|`` can round to
     just above ``delta``, so the procedure does not stop; each step of delta then moves ``delta`` from the most recent
     iterate toward the retained bound, and so lands exactly on the retained bound.
 
-    Without the step of delta, the chord's zero can round onto the most recent iterate, once that iterate lies within
+    Without the step of delta, the secant's zero can round onto the most recent iterate, once that iterate lies within
     rounding error of the root while the retained bound is still far from it.
 
-    When the chord's zero rounds onto the most recent iterate, the new iterate equals the previous one in both x and f,
+    When the secant's zero rounds onto the most recent iterate, the new iterate equals the previous one in both x and f,
     so the slope between them is ``0 / 0``. `AndersonBjorck` then takes the factor 0.5: in IEEE arithmetic, ``0 / 0``
     is NaN, which fails the ALGOL procedure's test that the factor is positive, so the procedure takes 0.5 there too.
 
@@ -87,7 +87,7 @@ class AndersonBjorck(Solver):
         - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of an
           equation. BIT 13(3), 253-264. Its equation 7 is the factor, its section 3 the fallback to 0.5, and its
           section 6 gives the ALGOL procedure, which holds the step of delta, the stopping rule, and the forms of the
-          chord's zero and of the factor that `AndersonBjorck` computes. https://doi.org/10.1007/BF01951936
+          secant's zero and of the factor that `AndersonBjorck` computes. https://doi.org/10.1007/BF01951936
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. The paper covers the Anderson-Björck method in 3 places:
 
@@ -111,11 +111,11 @@ class AndersonBjorck(Solver):
         - ``x1`` is the most recent iterate and ``f1`` its function value; before the first iterate, the upper bound
           counts as the most recent iterate;
         - ``x0`` is the retained bound and ``f0`` its scaled function value;
-        - ``w1`` is the slope of the chord through ``(x0, f0)`` and ``(x1, f1)``, ``x2`` its zero and ``f2`` the
+        - ``w1`` is the slope of the secant through ``(x0, f0)`` and ``(x1, f1)``, ``x2`` its zero and ``f2`` the
           function value there;
         - ``w2`` is the slope from ``x1`` to ``x2``, and ``g1 = w2 / w1`` the factor.
 
-        Each iteration evaluates the chord's zero ``x2``, makes it the most recent iterate, and updates the retained
+        Each iteration evaluates the secant's zero ``x2``, makes it the most recent iterate, and updates the retained
         bound as the class docstring says. The loop ends once the interval is at most ``xtol`` wide or ``f1`` is 0,
         and returns ``x1`` if ``|f1| < |f0|``, else ``x0``.
         """

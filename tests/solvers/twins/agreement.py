@@ -7,7 +7,7 @@ from sunnbear.solvers import Solver, SolveStatus
 from .cases import TwinTestCase
 from .solver import TwinSolver
 
-# A twin computes the same iterates with its own arithmetic, e.g. a chord's zero computed as a step from one bound,
+# A twin computes the same iterates with its own arithmetic, e.g. a secant's zero computed as a step from one bound,
 # so its iterates differ from the solver's by a few ulps; the limit leaves room for that while still catching an
 # iterate computed by a different formula, which lies far more ulps away.
 MAX_ULPS_APART = 8

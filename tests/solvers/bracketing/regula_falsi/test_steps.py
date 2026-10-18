@@ -15,5 +15,5 @@ def test_a_linear_function_is_solved_in_one_step(f):
     result = RegulaFalsi().solve(f, 0.0, 1.0, xtol=1e-12, max_fevals=10)
 
     # --- assert -----------------------
-    # The chord is the function, so the first iterate is the exact root and the stopping criterion holds immediately.
+    # The secant is the function, so the first iterate is the exact root and the stopping criterion holds immediately.
     assert (result.x, result.status, result.n_fevals) == (0.3, SolveStatus.CONVERGED, 3)

@@ -19,7 +19,7 @@ class ITP(BracketingSolver[ITPState]):
     The paper is Oliveira and Takahashi (2020). Each iteration evaluates 1 x-value, ``x_itp``, which it computes from
     the interval ``[a, b]`` and its midpoint ``x_half`` in 3 steps:
 
-    - interpolation: ``x_f`` is where the chord through ``(a, f(a))`` and ``(b, f(b))`` crosses zero, as in regula
+    - interpolation: ``x_f`` is where the secant through ``(a, f(a))`` and ``(b, f(b))`` crosses zero, as in regula
       falsi;
     - truncation: ``x_t`` is ``x_f`` moved toward ``x_half`` by ``delta = kappa_1 * (b - a)^kappa_2``, for 2
       constants ``kappa_1`` and ``kappa_2``, or ``x_half`` itself when ``x_f`` lies closer to ``x_half`` than
@@ -48,8 +48,7 @@ class ITP(BracketingSolver[ITPState]):
       produced the paper's experiments.
 
     ``"paper_experiments"`` comes much closer to the iteration counts of the paper's Table 1 than
-    ``"paper_pseudocode"``: it matches every row except that of the step function, on which a line-by-line port of
-    the authors' MATLAB code differs from the table too.
+    ``"paper_pseudocode"``.
 
     The margin, the amount by which ``"paper_experiments"`` lowers ``r``, guards against rounding errors in ``r``, as
     the paper's Appendix B recommends in general terms; the margin makes solves that go past ``n_max`` rarer, but does
@@ -68,8 +67,8 @@ class ITP(BracketingSolver[ITPState]):
           performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), article 5.
           ``"paper_pseudocode"`` follows the pseudocode in the paper's Appendix B, and the test suite compares `ITP`
           with the iteration counts in the paper's Table 1. https://doi.org/10.1145/3423597
-        - The authors' MATLAB code that produced the paper's experiments, which ``"paper_experiments"`` follows. The
-          authors shared it on request; it is not published.
+        - The authors' MATLAB code that produced the paper's experiments, which ``"paper_experiments"`` follows; the
+          authors shared it on request, and it is not published.
     """
 
     name = "itp"
@@ -103,7 +102,7 @@ class ITP(BracketingSolver[ITPState]):
         return super()._solve(state)
 
     def _next_x(self, state: ITPState, interval: Interval) -> float:
-        """Return ``x_itp``, the chord's zero ``x_f`` truncated and projected as the class docstring says.
+        """Return ``x_itp``, the secant's zero ``x_f`` truncated and projected as the class docstring says.
 
         Also advance the iteration counter ``state.k``, so 2 calls on the same interval return different x-values.
         """

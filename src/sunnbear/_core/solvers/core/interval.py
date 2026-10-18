@@ -111,7 +111,7 @@ class Interval(ABC):
         because a check would add flops to every solver:
 
         - an ``x`` on a bound replaces that bound with the same x-value, so the interval stays the same;
-        - an ``x`` just outside, where rounding can put a chord's zero, usually replaces the nearer bound, which widens
+        - an ``x`` just outside, where rounding can put a secant's zero, usually replaces the nearer bound, which widens
           the interval and keeps the sign change;
         - only a sign change between that ``x`` and the nearer bound, as with a second root right outside the
           interval, makes ``x`` replace the far bound; the interval is then inverted, with ``b < a``, and its negative

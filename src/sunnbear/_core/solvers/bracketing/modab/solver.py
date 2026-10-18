@@ -16,9 +16,9 @@ class ModAB(Solver):
 
     - **bisection:** the new x-value ``x3`` is the midpoint. After evaluating ``y3 = f(x3)``, the method switches to
       Anderson-Björck mode when the function looks close to a straight line on the interval:
-      ``|ym - y3| < k * (|y3| + |ym|)``, where ``ym = (y1 + y2) / 2`` is the value of the chord at the midpoint,
+      ``|ym - y3| < k * (|y3| + |ym|)``, where ``ym = (y1 + y2) / 2`` is the value of the secant at the midpoint,
       ``k = r^2``, and ``r = 1 - |ym / (y2 - y1)|`` measures how symmetric ``y1`` and ``y2`` are;
-    - **Anderson-Björck:** ``x3`` is the zero of the chord, ``(x1 * y2 - y1 * x2) / (y2 - y1)``.
+    - **Anderson-Björck:** ``x3`` is the zero of the secant, ``(x1 * y2 - y1 * x2) / (y2 - y1)``.
 
     ``x3`` replaces the bound whose function value has the sign of ``y3``.
 
@@ -37,14 +37,14 @@ class ModAB(Solver):
     The solver passes ``xtol`` as ``aTol`` and 0 as ``rTol``. When ``x3`` is a midpoint, it lies inside the interval,
     so it lies within ``xtol`` of a root.
 
-    When ``x3`` is a chord's zero, the solve returns it without clamping it into the interval, and rounding can put it
+    When ``x3`` is a secant's zero, the solve returns it without clamping it into the interval, and rounding can put it
     on or just past a bound, so it lies within ``xtol`` of a root only up to rounding.
 
     `ModAB` follows the C# code where the paper's Algorithm 1 differs from it or leaves a detail out, and departs from
     the C# code in its iteration limit:
 
-    - **Clamping:** Algorithm 1 evaluates the chord's zero and then clamps it into the interval. The C# code clamps
-      first: a chord's zero that rounding puts on or outside a bound is replaced by that bound and its stored function
+    - **Clamping:** Algorithm 1 evaluates the secant's zero and then clamps it into the interval. The C# code clamps
+      first: a secant's zero that rounding puts on or outside a bound is replaced by that bound and its stored function
       value, so nothing is evaluated. In Anderson-Björck mode, such an iteration only halves the stored function value
       at the other bound, or marks the other bound as retained.
     - **The first threshold:** the paper's section 4.2 sets the threshold at the switch to
@@ -79,7 +79,7 @@ class ModAB(Solver):
     """
 
     name = "modab"
-    version = 1
+    version = 2
 
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the authors' C# code
         """Run the loop of the paper's C# code and return the last ``x3``.
@@ -110,7 +110,7 @@ class ModAB(Solver):
         while True:
             # --- the new x-value x3 -------------
             if is_bisecting:
-                x3 = (x1 + x2) / 2.0
+                x3 = 0.5 * (x1 + x2)
             else:
                 x3 = (x1 * y2 - y1 * x2) / (y2 - y1)
             if x2 - x1 <= self._get_stop_width(state.xtol, x3):

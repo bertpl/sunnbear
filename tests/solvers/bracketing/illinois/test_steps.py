@@ -10,7 +10,7 @@ from tests.solvers.example_functions import cubic
     "f", [lambda x: x - 0.25, lambda x: 0.25 - x]
 )  # The 2 functions cover both interval orientations.
 def test_a_linear_function_is_solved_in_one_step(f):
-    """On a straight line, the first chord lands on the root, so `Illinois` converges after 3 evaluations without
+    """On a straight line, the first secant lands on the root, so `Illinois` converges after 3 evaluations without
     halving any value.
 
     The root 0.25 is a power of 2, so the paper's step computes it without rounding, and the test can compare the
