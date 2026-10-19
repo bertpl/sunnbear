@@ -8,19 +8,8 @@ from tests.solvers.example_functions import cubic
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
 
+from .history_replay import bisection_iterations
 from .paper_problems import EQUATION_27
-
-
-def _function_with_huge_values(x: float) -> float:
-    """Return the value at ``x`` of a function that reaches 1.5e308 on ``[-1, 1]``, computed without overflow.
-
-    Left of 0, the function is the line ``2.3e308*(x + 1) - 8e307``, computed in an order that does not overflow; it
-    is 1.5e308 at 0 and has its root at ``-1 + 8/23``. Right of 0, it falls linearly to 8.0001e307 at 1.
-    """
-    if x <= 0.0:
-        return (1.15e308 * (x + 1.0) - 8e307) + 1.15e308 * (x + 1.0)
-    else:
-        return 1.5e308 - 6.9999e307 * x
 
 
 @pytest.mark.parametrize("variant", ModABVariant)
@@ -88,23 +77,24 @@ def test_only_the_safeguarded_variant_scales_no_stored_value_in_its_first_anders
 
 
 @pytest.mark.parametrize(
-    "problem, bisection_iterations",
+    "problem, expected_bisection_iterations",
     [(GanchovskiEtAlTable2Problem.F92.value, [1, 5]), (EQUATION_27, [1, 8])],
     ids=str,
 )
 def test_the_safeguarded_variant_falls_back_once_a_step_leaves_the_interval_too_wide_without_an_exception(
-    problem: PaperProblem, bisection_iterations: list[int]
+    problem: PaperProblem, expected_bisection_iterations: list[int]
 ):
     """The safeguarded variant switches to Anderson-Björck mode in iteration 1, and falls back to bisection after the
-    first Anderson-Björck step that leaves the interval wider than the threshold without earning a residual exception:
+    first Anderson-Björck step that leaves the interval wider than the threshold without being granted a residual
+    exception:
 
     - on f92, ``x^3 - 0.001`` over ``[-10, 10]``, Anderson-Björck step 3 is the first to leave the interval too wide,
       and ``|y3|`` is far above half the smaller ``|y|`` at the bounds, so the solve falls back at once, and iteration
       5 bisects;
     - on the preprint's equation 27 over ``[-3, 1]``, the interval stays about 1 wide, too wide from Anderson-Björck
-      step 3 on, while ``|y3|`` stays below half the smaller ``|y|`` at the bounds. Steps 3 to 5 each earn an
-      exception, step 6 earns none because 3 is the most in a row, and iteration 8 bisects, as the preprint's Section
-      7.4 reports.
+      step 3 on, while ``|y3|`` stays below half the smaller ``|y|`` at the bounds. Steps 3 to 5 are each granted an
+      exception, step 6 is granted none because at most 3 steps in a row may be granted one, and iteration 8
+      bisects, as the preprint's Section 7.4 reports.
     """
     # --- act --------------------------
     result = ModAB(variant=ModABVariant.SAFEGUARDED_2026).solve(
@@ -112,7 +102,7 @@ def test_the_safeguarded_variant_falls_back_once_a_step_leaves_the_interval_too_
     )
 
     # --- assert -----------------------
-    assert _bisection_iterations(result.history)[:2] == bisection_iterations
+    assert bisection_iterations(result.history, ModABVariant.SAFEGUARDED_2026)[:2] == expected_bisection_iterations
 
 
 @pytest.mark.parametrize(
@@ -186,28 +176,21 @@ def test_the_safeguarded_variant_projects_x3_into_the_interval_and_evaluates_not
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-def _bisection_iterations(history: tuple[tuple[float, float], ...]) -> list[int]:
-    """Return the 1-based numbers of the iterations whose x-value is the midpoint of the interval, in the form
-    ``0.5*x1 + 0.5*x2`` of the safeguarded variant.
+def _function_with_huge_values(x: float) -> float:
+    """Return the value at ``x`` of a function that reaches 1.5e308 on ``[-1, 1]``, computed without overflow.
 
-    The interval is replayed from ``history``: each evaluated x-value replaces the bound whose function value has the
-    same sign as the function value at that x-value. The replay holds only for a solve whose iterations all evaluate.
+    Left of 0, the function is the line ``2.3e308*(x + 1) - 8e307``, computed in an order that does not overflow; it
+    is 1.5e308 at 0 and has its root at ``-1 + 8/23``. Right of 0, it falls linearly to 8.0001e307 at 1.
     """
-    (x1, y1), (x2, _) = history[:2]
-    iterations = []
-    for iteration, (x, y) in enumerate(history[2:], start=1):
-        if x == 0.5 * x1 + 0.5 * x2:
-            iterations.append(iteration)
-        if (y > 0.0) == (y1 > 0.0):
-            x1, y1 = x, y
-        else:
-            x2 = x
-    return iterations
+    if x <= 0.0:
+        return (1.15e308 * (x + 1.0) - 8e307) + 1.15e308 * (x + 1.0)
+    else:
+        return 1.5e308 - 6.9999e307 * x
 
 
 class _ModABRecordingIterations(ModAB):
     """`_ModABRecordingIterations` is `ModAB` that records ``(x1, x3, x2)`` in ``iterations`` at each check of the
-    stopping criterion, where each iteration computes ``x3``."""
+    stopping criterion, which follows the computation of ``x3`` in each iteration."""
 
     def __init__(self, *, variant: ModABVariant) -> None:
         """Configure the variant, and start with no recorded iterations."""

@@ -39,7 +39,7 @@ class ModAB(Solver):
     - ``"algorithms_2026"``, the method of Ganchovski et al. (2026), ported from the C# code of the paper's Table A1.
       The switch sets the threshold to `_FALLBACK_THRESHOLD_FACTOR` times the interval width.
     - ``"safeguarded_2026"``, the safeguarded method of Tomov and Ganchovski (2026), ported from the authors' C# code
-      ``SgModAB.cs``. It differs from ``"algorithms_2026"`` in 4 ways:
+      ``SgModAB.cs``. It differs from ``"algorithms_2026"`` in these ways:
 
       - **No scaling in the first Anderson-Björck step:** in ``"algorithms_2026"``, the bisection step that switches
         already records the bound that it retains, so a first Anderson-Björck step that retains the same bound scales
@@ -49,10 +49,11 @@ class ModAB(Solver):
         ordinates that only the secant reads, and resets the ordinates to ``y1`` and ``y2`` at each switch. In
         ``"algorithms_2026"``, as its C# code shows, a scaled value replaces the stored function value, and stays
         stored after a fallback to bisection, where the switching test reads it.
-      - **Fallback rule:** the switch sets the threshold to `_SAFEGUARDED_THRESHOLD_FACTOR` times the interval width
-        after ``x3`` replaces a bound. An Anderson-Björck step that leaves the interval wider than the threshold still
-        continues the phase, as a residual exception, if ``|y3|`` is below half the smaller ``|y1|`` and ``|y2|``
-        before the step; at most `_SAFEGUARDED_MAX_RESIDUAL_STEPS` steps in a row may be residual exceptions.
+      - **Fallback rule:** the switch sets the threshold to `_SAFEGUARDED_FALLBACK_THRESHOLD_FACTOR` times the
+        interval width after ``x3`` replaces a bound. An Anderson-Björck step that leaves the interval wider than the
+        threshold still continues the phase, as a residual exception, if ``|y3|`` is below half the smaller of
+        ``|y1|`` and ``|y2|`` before the step; at most `_SAFEGUARDED_MAX_RESIDUAL_STEPS` steps in a row may be
+        residual exceptions.
       - **Forms of the steps:** the secant's zero is ``(b/den)*x1 + (a/den)*x2``, projected into the interval, where
         ``a`` and ``b`` are the magnitudes of the ordinates at ``x1`` and ``x2``, and ``den = a + b``; where ``den``
         overflows, ``a`` and ``b`` are halved first. The midpoint is ``0.5*x1 + 0.5*x2``. The switching test is
@@ -66,7 +67,7 @@ class ModAB(Solver):
     - after evaluating ``x3``, the solve ends once ``y3 = 0``, and returns ``x3``.
 
     `ModAB` follows each variant's C# code where its paper differs from it or leaves a detail out, and departs from
-    that code in its stopping criterion, its iteration limit, and paths that it cannot reach:
+    that code in its stopping criterion, its iteration limit, and code paths that can never run in `ModAB`:
 
     - **Stopping criterion:** before evaluating ``x3``, the C# code ends the solve once the interval is at most
       ``aTol + rTol*|x3|`` wide, for an absolute tolerance ``aTol`` and a relative tolerance ``rTol``, and returns
@@ -75,9 +76,11 @@ class ModAB(Solver):
       limit out, so the evaluation budget ends a long solve, as for every solver.
     - **Unreachable paths, ``"safeguarded_2026"``:** the C# code returns no x-value after a function value that is
       NaN, and its secant returns the midpoint where an ordinate is infinite or both ordinates are 0. `ModAB` leaves
-      these paths out, because none of them can occur: `WrappedFunction` raises at a function value that is not
-      finite, scaling only shrinks an ordinate, and the ordinate at the bound that moved last is that bound's function
-      value, which is never 0.
+      these paths out, because none of them can occur:
+
+      - `WrappedFunction` raises at a function value that is not finite;
+      - scaling only shrinks an ordinate;
+      - the ordinate at the bound that moved last is that bound's function value, which is never 0.
     - **Clamping, ``"algorithms_2026"``:** Algorithm 1 evaluates the secant's zero and then clamps it into the
       interval. The C# code clamps first: a secant's zero that rounding puts on or outside a bound is replaced by that
       bound and its stored function value, so nothing is evaluated. In Anderson-Björck mode, such an iteration only
@@ -126,11 +129,11 @@ class ModAB(Solver):
 
     # The 2 constants of "safeguarded_2026", the preprint's B and M, are class attributes, so that the test suite can
     # override them in a subclass to run the other 2 settings of the preprint's Table 3.
-    _SAFEGUARDED_THRESHOLD_FACTOR = 2.0
+    _SAFEGUARDED_FALLBACK_THRESHOLD_FACTOR = 2.0
     _SAFEGUARDED_MAX_RESIDUAL_STEPS = 3
 
     def __init__(self, *, variant: ModABVariant) -> None:
-        """Configure the variant, which may also be given as a plain string; the class docstring describes each.
+        """Configure the variant, which may also be given as a plain string; the class docstring describes each variant.
 
         Raises:
             ValueError: If ``variant`` is not a value of `ModABVariant`.
@@ -162,8 +165,8 @@ class ModAB(Solver):
 
         Each iteration:
 
-        - computes ``x3``, and ends the solve once `_root_if_converged` returns a root estimate, where the C# code
-          tests the interval's width;
+        - computes ``x3``, and ends the solve once `_root_if_converged` returns a root estimate, at the point where the
+          C# code tests the interval's width;
         - evaluates ``x3``, unless it is clamped, and in bisection mode tests whether to switch;
         - ends the solve if ``y_new = 0``, and returns ``x3``;
         - replaces a bound by ``(x_new, y_new)``, scaling the retained bound's function value in Anderson-Björck mode;
@@ -246,15 +249,16 @@ class ModAB(Solver):
         - ``moved_bound`` is the bound that the last Anderson-Björck step replaced, ``None`` at the start of each
           Anderson-Björck phase; the C# code stores it as the integer ``sideMoved``;
         - ``is_switching_to_ab`` is ``switchToAB`` in the C# code;
-        - `_SAFEGUARDED_THRESHOLD_FACTOR` and `_SAFEGUARDED_MAX_RESIDUAL_STEPS` are ``C`` and ``MaxResidualSteps``.
+        - `_SAFEGUARDED_FALLBACK_THRESHOLD_FACTOR` and `_SAFEGUARDED_MAX_RESIDUAL_STEPS` are ``C`` and
+          ``MaxResidualSteps``.
 
         Each iteration:
 
         - computes ``x3``, projected into the interval in Anderson-Björck mode, and ends the solve once
-          `_root_if_converged` returns a root estimate, where the C# code tests the interval's width;
+          `_root_if_converged` returns a root estimate, at the point where the C# code tests the interval's width;
         - evaluates ``x3``, unless it lies on a bound, whose function value it then reuses;
         - ends the solve if ``y3 = 0``, and returns ``x3``;
-        - in Anderson-Björck mode, records the smaller ``|y1|`` and ``|y2|``, replaces a bound by ``(x3, y3)``,
+        - in Anderson-Björck mode, records the smaller of ``|y1|`` and ``|y2|``, replaces a bound by ``(x3, y3)``,
           scales the retained bound's ordinate ``f1`` or ``f2``, and falls back to bisection if the interval is wider
           than the threshold, unless it grants a residual exception;
         - in bisection mode, tests whether to switch, replaces a bound by ``(x3, y3)``, and then switches, setting the
@@ -272,7 +276,7 @@ class ModAB(Solver):
         while True:
             # --- the new x-value x3 -------------
             if is_ab:
-                x3 = self._safe_secant(x1, f1, x2, f2)
+                x3 = self._safe_secant_zero(x1, f1, x2, f2)
             else:
                 x3 = 0.5 * x1 + 0.5 * x2
             # The criterion reads the function values y1 and y2, which are never 0 here.
@@ -298,7 +302,8 @@ class ModAB(Solver):
                 # The fallback rule compares |y3| with half the smaller |y| at the bounds before the update.
                 y_min = min(abs(y1), abs(y2))
             else:
-                # The C# code computes y2 - y1 twice. Where it overflows, the test is skipped.
+                # The C# code computes y2 - y1 twice; computing it once gives the same value. The C# code skips the
+                # test where it overflows.
                 y2_minus_y1 = y2 - y1
                 if math.isfinite(y2_minus_y1):
                     ym = 0.5 * (y1 + y2)
@@ -344,17 +349,17 @@ class ModAB(Solver):
                     # The function is close enough to a straight line: switch to Anderson-Björck mode.
                     is_ab = True
                     residual_steps = 0
-                    fallback_threshold = self._SAFEGUARDED_THRESHOLD_FACTOR * (x2 - x1)
+                    fallback_threshold = self._SAFEGUARDED_FALLBACK_THRESHOLD_FACTOR * (x2 - x1)
                     f1, f2 = y1, y2
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
     @staticmethod
-    def _safe_secant(x1: float, y1: float, x2: float, y2: float) -> float:
+    def _safe_secant_zero(x1: float, y1: float, x2: float, y2: float) -> float:
         """Return the zero of the secant through ``(x1, y1)`` and ``(x2, y2)``, projected into ``[x1, x2]``.
 
-        The method computes the zero as ``SafeSecant`` in the C# code of ``"safeguarded_2026"`` does, in a weighted
+        The method computes the zero as the C# code of ``"safeguarded_2026"`` does in ``SafeSecant``, in a weighted
         form whose 2 weights lie in ``[0, 1]``. ``y1`` and ``y2`` are finite, with opposite signs, or 1 of them is 0.
         Where ``|y1| + |y2|`` overflows, halving both magnitudes makes the sum finite and keeps the weights.
         """
@@ -367,13 +372,7 @@ class ModAB(Solver):
             den = a + b
         w1 = b / den
         w2 = a / den
-        x = w1 * x1 + w2 * x2
-        if x < x1:
-            return x1
-        elif x > x2:
-            return x2
-        else:
-            return x
+        return min(max(w1 * x1 + w2 * x2, x1), x2)
 
     @staticmethod
     def _root_if_converged(x1: float, y1: float, x2: float, y2: float, x3: float, xtol_doubled: float) -> float | None:

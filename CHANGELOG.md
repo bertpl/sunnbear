@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Rename the config `modab` to `modab[variant='algorithms_2026']`, and require the `variant` argument of `ModAB`
+- Rename the config `modab` to `modab[variant='algorithms_2026']`, and add a required `variant` argument to `ModAB`
 
 ### Deprecated
 

@@ -256,7 +256,7 @@ class GanchovskiEtAlTable2Problem(PaperProblemEnum):
 # The benchmark in the authors' repository adds f93 to f101 after the 92 problems of Table 2. f93 to f99 extend f92 to
 # the odd powers from 5 to 17. f100 and f101 are left out. f100 is infinite at its lower bound, which sunnbear rejects.
 # f101 is the counterexample of Tomov and Ganchovski (2026), whose published values need another evaluation order than
-# the benchmark's; the tests of `ModAB` define it.
+# the benchmark's; the tests of `ModAB` define f101 themselves.
 GANCHOVSKI_ET_AL_ADDED_PROBLEMS = [
     PaperProblem(name="f93", f=lambda x: _pow(x, 5) - 0.001, a=-10.0, b=10.0),
     PaperProblem(name="f94", f=lambda x: _pow(x, 7) - 0.001, a=-10.0, b=10.0),

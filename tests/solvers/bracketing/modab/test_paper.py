@@ -8,6 +8,7 @@ from sunnbear.solvers import Interval, ModAB, ModABVariant
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem, ganchovski_et_al_stop_width
 
+from .history_replay import bisection_iterations
 from .paper_problems import (
     TABLE_2,
     TABLE_3_BY_SETTING,
@@ -65,7 +66,7 @@ def test_the_switches_of_table_1_of_the_paper_are_reproduced():
     )
 
     # --- assert -----------------------
-    assert _bisection_iterations(result.history) == [1, 8, 9, 10, 11, 12, 13, 14, 15]
+    assert bisection_iterations(result.history, ModABVariant.ALGORITHMS_2026) == [1, 8, 9, 10, 11, 12, 13, 14, 15]
     assert result.n_fevals == 2 + 23
 
 
@@ -92,7 +93,7 @@ def test_the_evaluation_counts_of_table_3_of_the_safeguarded_paper_are_reproduce
 @pytest.mark.parametrize("setting, published_sum", TABLE_3_NON_STRESS_SUMS_BY_SETTING.items())
 def test_the_sums_of_table_3_over_its_86_non_stress_cases_are_reproduced(setting: str, published_sum: int):
     """Under each setting of Table 3, the evaluation counts of the safeguarded variant with the C# code's stopping
-    criterion sum, over the table's 86 validated non-stress cases, to the table's sum."""
+    criterion add up, over the table's 86 validated non-stress cases, to the table's sum."""
     # --- arrange ----------------------
     solver = _SOLVER_CLS_BY_TABLE_3_SETTING[setting](variant=ModABVariant.SAFEGUARDED_2026)
 
@@ -166,7 +167,7 @@ class _ModABWithFixedDelay(_ModABWithPaperStoppingCriterion):
     and Ganchovski (2026), ``(B, M) = (16, 0)``: in the safeguarded variant, the switch sets the threshold to 16 times
     the interval width, and no residual exception is granted."""
 
-    _SAFEGUARDED_THRESHOLD_FACTOR = 16.0
+    _SAFEGUARDED_FALLBACK_THRESHOLD_FACTOR = 16.0
     _SAFEGUARDED_MAX_RESIDUAL_STEPS = 0
 
 
@@ -178,33 +179,13 @@ class _ModABWithEarlyFallback(_ModABWithPaperStoppingCriterion):
     _SAFEGUARDED_MAX_RESIDUAL_STEPS = 0
 
 
-# The solver class for each setting of Table 3 of Tomov and Ganchovski (2026). The setting "adaptive",
+# This dict gives the solver class for each setting of Table 3 of Tomov and Ganchovski (2026). The setting "adaptive",
 # (B, M) = (2, 3), is that of `ModAB` itself.
 _SOLVER_CLS_BY_TABLE_3_SETTING = {
     "fixed_delay": _ModABWithFixedDelay,
     "early_fallback": _ModABWithEarlyFallback,
     "adaptive": _ModABWithPaperStoppingCriterion,
 }
-
-
-def _bisection_iterations(history: tuple[tuple[float, float], ...]) -> list[int]:
-    """Return the 1-based numbers of the iterations whose x-value is the midpoint of the interval, in the form
-    ``(x1 + x2) / 2`` of ``"algorithms_2026"``.
-
-    The interval is replayed from ``history``: each evaluated x-value replaces the bound whose function value has the
-    same sign as the function value at that x-value. The replay holds only for a solve without clamped iterations,
-    which evaluate nothing.
-    """
-    (x1, y1), (x2, _) = history[:2]
-    iterations = []
-    for iteration, (x, y) in enumerate(history[2:], start=1):
-        if x == (x1 + x2) / 2.0:
-            iterations.append(iteration)
-        if (y > 0.0) == (y1 > 0.0):
-            x1, y1 = x, y
-        else:
-            x2 = x
-    return iterations
 
 
 def _final_interval(history: tuple[tuple[float, float], ...]) -> Interval:

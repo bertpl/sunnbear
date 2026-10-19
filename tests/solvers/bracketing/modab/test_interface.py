@@ -1,4 +1,4 @@
-"""These tests assert 3 things about `ModAB`:
+"""These tests assert the following about `ModAB`:
 
 - its name and version;
 - that the arithmetic of both variants is counted;
