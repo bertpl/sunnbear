@@ -15,7 +15,8 @@ Published results:
 - Ganchovski and Traykov (2023), Table 2: not reproduced, because it describes an earlier version of the method,
   which `ModAB` does not implement.
 - Tomov and Ganchovski (2026), Table 3: reproduced with ``"safeguarded_2026"``, in ``test_paper.py``, where test-only
-  subclasses set the 2 constants for the 2 settings of the table that differ from `ModAB`'s own:
+  subclasses set B, the factor of the fallback threshold, and M, the largest number of residual exceptions in a row, to
+  the 2 settings of the table that differ from `ModAB`'s own:
 
   - all 24 evaluation counts of its 8 cases under its 3 settings, exactly;
   - its sums over the 86 non-stress cases whose returned x-value the authors validated, exactly. Its other 3 sums
@@ -24,7 +25,8 @@ Published results:
 - Tomov and Ganchovski (2026), Table 4: the row "Cap M = 3" reproduced with ``"safeguarded_2026"``, in
   ``test_paper.py``: the evaluation count, and the returned x-value and final width that the preprint's Section 7.4
   prints. The row "Unlimited exceptions" is not compared, because it runs a version of the C# code without the bound
-  on residual exceptions, and ends at the iteration limit that `ModAB` leaves out.
+  M on residual exceptions, Anderson-Björck steps that continue although the interval shrank too slowly, and ends at
+  the iteration limit that `ModAB` leaves out.
 - Tomov and Ganchovski (2026), Table 5: reproduced with ``"safeguarded_2026"``, in ``test_paper.py``: the returned
   x-values of its 3 cases under each setting of Table 3, and their total evaluation count, which the preprint's
   Section 7.3 gives.
@@ -33,8 +35,8 @@ Published results:
   Anderson-Björck step.
 - Tomov and Ganchovski (2026), the residuals and widths that Section 7.3 prints for the first Anderson-Björck phases
   of f64 and f84: not compared, because Table 3 already checks the evaluation counts of both solves.
-- Tomov and Ganchovski (2026), Proposition 3.5: not compared, because its Anderson-Björck phase continues without a
-  fallback to bisection, and both variants fall back.
+- Tomov and Ganchovski (2026), Proposition 3.5: not compared, because in Proposition 3.5 the Anderson-Björck phase
+  continues without a fallback to bisection, while both variants fall back.
 
 Third-party published results:
 

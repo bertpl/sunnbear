@@ -4,11 +4,11 @@ Ganchovski (2026) with ``"safeguarded_2026"``."""
 
 import pytest
 
-from sunnbear.solvers import Interval, ModAB, ModABVariant
+from sunnbear.solvers import ModAB, ModABVariant
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem, ganchovski_et_al_stop_width
 
-from .history_replay import bisection_iterations
+from .history_replay import bisection_iterations, final_interval
 from .paper_problems import (
     TABLE_2,
     TABLE_3_BY_SETTING,
@@ -79,7 +79,7 @@ def test_the_switches_of_table_1_of_the_paper_are_reproduced():
     ids=str,
 )
 def test_the_evaluation_counts_of_table_3_of_the_safeguarded_paper_are_reproduced(setting: str, problem: PaperProblem):
-    """With the stopping criterion of the C# code and the tolerances of the preprint's runs, the safeguarded variant
+    """With the stopping criterion of the C# code and the tolerances that the preprint uses, the safeguarded variant
     evaluates as often as Table 3 reports on each of its 8 cases, under each of its 3 settings."""
     # --- act --------------------------
     result = _SOLVER_CLS_BY_TABLE_3_SETTING[setting](variant=ModABVariant.SAFEGUARDED_2026).solve(
@@ -109,8 +109,8 @@ def test_the_sums_of_table_3_over_its_86_non_stress_cases_are_reproduced(setting
 
 
 def test_the_row_cap_m_3_of_table_4_of_the_safeguarded_paper_is_reproduced():
-    """On the preprint's equation 27 over ``[-3, 1]``, with the stopping criterion of the C# code and the tolerances of
-    the preprint's runs, the safeguarded variant reproduces the row "Cap M = 3" of Table 4: it converges after 77
+    """On the preprint's equation 27 over ``[-3, 1]``, with the stopping criterion of the C# code and the tolerances
+    that the preprint uses, the safeguarded variant reproduces the row "Cap M = 3" of Table 4: it converges after 77
     evaluations, returns the x-value that the preprint's Section 7.4 prints, and leaves a final interval as wide as
     that section reports."""
     # --- act --------------------------
@@ -120,7 +120,7 @@ def test_the_row_cap_m_3_of_table_4_of_the_safeguarded_paper_is_reproduced():
 
     # --- assert -----------------------
     TABLE_4_CAP_M_3.assert_reproduced_by(result)
-    assert _final_interval(result.history).width == TABLE_4_CAP_M_3_FINAL_WIDTH
+    assert final_interval(result.history).width == TABLE_4_CAP_M_3_FINAL_WIDTH
 
 
 @pytest.mark.parametrize("setting", TABLE_3_BY_SETTING)
@@ -145,7 +145,7 @@ def test_the_x_values_of_table_5_of_the_safeguarded_paper_are_reproduced(setting
 # ==================================================================================================
 class _ModABWithPaperStoppingCriterion(ModAB):
     """`_ModABWithPaperStoppingCriterion` is `ModAB` with the stopping criterion and the return value of the C# code of
-    both variants, at the absolute and relative tolerances ``aTol`` and ``rTol`` of both papers' runs.
+    both variants, at the absolute and relative tolerances ``aTol`` and ``rTol`` that both papers use.
 
     The tolerances are those of `ganchovski_et_al_stop_width`, so a test passes ``xtol = 0``, which this class ignores.
     """
@@ -173,29 +173,15 @@ class _ModABWithFixedDelay(_ModABWithPaperStoppingCriterion):
 
 class _ModABWithEarlyFallback(_ModABWithPaperStoppingCriterion):
     """`_ModABWithEarlyFallback` is `_ModABWithPaperStoppingCriterion` with the setting "early fallback" of Table 3 of
-    Tomov and Ganchovski (2026), ``(B, M) = (2, 0)``: in the safeguarded variant, the switch still sets the threshold
-    to 2 times the interval width, but no residual exception is granted."""
+    Tomov and Ganchovski (2026), ``(B, M) = (2, 0)``: in the safeguarded variant, the switch sets the threshold to 2
+    times the interval width, as `ModAB` does, but no residual exception is granted."""
 
     _SAFEGUARDED_MAX_RESIDUAL_STEPS = 0
 
 
-# This dict gives the solver class for each setting of Table 3 of Tomov and Ganchovski (2026). The setting "adaptive",
-# (B, M) = (2, 3), is that of `ModAB` itself.
+# The setting "adaptive" of Table 3 of Tomov and Ganchovski (2026), (B, M) = (2, 3), is that of `ModAB` itself.
 _SOLVER_CLS_BY_TABLE_3_SETTING = {
     "fixed_delay": _ModABWithFixedDelay,
     "early_fallback": _ModABWithEarlyFallback,
     "adaptive": _ModABWithPaperStoppingCriterion,
 }
-
-
-def _final_interval(history: tuple[tuple[float, float], ...]) -> Interval:
-    """Return the interval that remains after splitting the initial interval at each later x-value of ``history``.
-
-    An iteration that evaluates nothing reuses the function value at a bound, and leaves the interval as it is, so the
-    replay holds for every solve.
-    """
-    (a, fa), (b, fb), *evaluations = history
-    interval = Interval.from_interval_bounds(a, b, fa, fb)
-    for x, fx in evaluations:
-        interval = interval.split_at(x, fx)
-    return interval

@@ -7,10 +7,6 @@ from sunnbear._core.solvers.core.stopping import interval_root_if_converged
 
 from .variant import ModABVariant
 
-# With this factor, the Anderson-Björck steps of the "algorithms_2026" variant may fall 4 steps behind bisection before
-# the solve falls back to bisection: 16 = 2^4 (the paper's section 4.2).
-_FALLBACK_THRESHOLD_FACTOR = 16.0
-
 
 class ModAB(Solver):
     """`ModAB` implements the modified Anderson-Björck method, in the 2 versions that its authors published in 2026.
@@ -42,8 +38,9 @@ class ModAB(Solver):
       ``SgModAB.cs``. It differs from ``"algorithms_2026"`` in these ways:
 
       - **No scaling in the first Anderson-Björck step:** in ``"algorithms_2026"``, the bisection step that switches
-        already records the bound that it retains, so a first Anderson-Björck step that retains the same bound scales
-        that bound's stored function value. ``"safeguarded_2026"`` starts each Anderson-Björck phase with no bound
+        already counts as the first of 2 iterations in a row that retain a bound, so a first Anderson-Björck step that
+        retains the same bound scales that bound's stored function value. ``"safeguarded_2026"`` starts each
+        Anderson-Björck phase, the sequence of Anderson-Björck steps from a switch to the next fallback, with no bound
         recorded.
       - **True function values kept apart:** ``"safeguarded_2026"`` scales copies of ``y1`` and ``y2``, the
         ordinates that only the secant reads, and resets the ordinates to ``y1`` and ``y2`` at each switch. In
@@ -127,6 +124,10 @@ class ModAB(Solver):
     name = "modab"
     version = 3
 
+    # With this factor, the Anderson-Björck steps of "algorithms_2026" may fall 4 steps behind bisection before the
+    # solve falls back to bisection: 16 = 2^4 (the paper's section 4.2).
+    _FALLBACK_THRESHOLD_FACTOR = 16.0
+
     # The 2 constants of "safeguarded_2026", the preprint's B and M, are class attributes, so that the test suite can
     # override them in a subclass to run the other 2 settings of the preprint's Table 3.
     _SAFEGUARDED_FALLBACK_THRESHOLD_FACTOR = 2.0
@@ -201,7 +202,7 @@ class ModAB(Solver):
                 if abs(ym - y3) < k * (abs(y3) + abs(ym)):
                     # The function is close enough to a straight line: switch to Anderson-Björck mode.
                     is_bisecting = False
-                    threshold = (x2 - x1) * _FALLBACK_THRESHOLD_FACTOR
+                    threshold = (x2 - x1) * self._FALLBACK_THRESHOLD_FACTOR
             else:
                 if x3 <= x1:
                     x_new, y_new = x1, y1
@@ -285,7 +286,6 @@ class ModAB(Solver):
                 return x_root
 
             # --- the evaluation at x3 -----------
-            # An x3 on a bound reuses the function value there, so nothing is evaluated.
             if x3 == x1:
                 y3 = y1
             elif x3 == x2:
@@ -303,7 +303,7 @@ class ModAB(Solver):
                 y_min = min(abs(y1), abs(y2))
             else:
                 # The C# code computes y2 - y1 twice; computing it once gives the same value. The C# code skips the
-                # test where it overflows.
+                # test where y2 - y1 overflows.
                 y2_minus_y1 = y2 - y1
                 if math.isfinite(y2_minus_y1):
                     ym = 0.5 * (y1 + y2)
@@ -312,7 +312,8 @@ class ModAB(Solver):
                     is_switching_to_ab = abs(ym - y3) < k * abs(ym) + k * abs(y3)
 
             # --- the new interval ---------------
-            # The C# code tests SameSign(y1, y3), as the tests below do: y1 and y3 are not 0 here.
+            # The C# code tests SameSign(y1, y3); the sign comparisons below are equivalent, because y1 and y3 are
+            # not 0 here.
             if is_ab:
                 if (y3 > 0.0 and y1 > 0.0) or (y3 < 0.0 and y1 < 0.0):
                     if moved_bound is IntervalBound.LOWER:
@@ -329,9 +330,8 @@ class ModAB(Solver):
                         moved_bound = IntervalBound.UPPER
                     x2, y2, f2 = x3, y3, y3
                 if x2 - x1 > fallback_threshold:
-                    # The interval shrinks too slowly. A residual exception continues the phase if |y3| is below
-                    # half of y_min, at most _SAFEGUARDED_MAX_RESIDUAL_STEPS times in a row; otherwise, the solve
-                    # falls back to bisection.
+                    # The interval shrinks too slowly: fall back to bisection, unless the step is granted a residual
+                    # exception.
                     if residual_steps >= self._SAFEGUARDED_MAX_RESIDUAL_STEPS or abs(y3) >= 0.5 * y_min:
                         is_ab = False
                         moved_bound = None
@@ -359,9 +359,9 @@ class ModAB(Solver):
     def _safe_secant_zero(x1: float, y1: float, x2: float, y2: float) -> float:
         """Return the zero of the secant through ``(x1, y1)`` and ``(x2, y2)``, projected into ``[x1, x2]``.
 
-        The method computes the zero as the C# code of ``"safeguarded_2026"`` does in ``SafeSecant``, in a weighted
-        form whose 2 weights lie in ``[0, 1]``. ``y1`` and ``y2`` are finite, with opposite signs, or 1 of them is 0.
-        Where ``|y1| + |y2|`` overflows, halving both magnitudes makes the sum finite and keeps the weights.
+        `_safe_secant_zero` computes the zero as the C# code of ``"safeguarded_2026"`` does in ``SafeSecant``, in a
+        weighted form whose 2 weights lie in ``[0, 1]``. ``y1`` and ``y2`` are finite, with opposite signs, or 1 of
+        them is 0. Where ``|y1| + |y2|`` overflows, halving both magnitudes makes the sum finite and keeps the weights.
         """
         a = abs(y1)
         b = abs(y2)

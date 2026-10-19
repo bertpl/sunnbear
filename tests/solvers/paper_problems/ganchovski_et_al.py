@@ -253,10 +253,12 @@ class GanchovskiEtAlTable2Problem(PaperProblemEnum):
 # ==================================================================================================
 #  The problems that the authors' repository adds
 # ==================================================================================================
-# The benchmark in the authors' repository adds f93 to f101 after the 92 problems of Table 2. f93 to f99 extend f92 to
-# the odd powers from 5 to 17. f100 and f101 are left out. f100 is infinite at its lower bound, which sunnbear rejects.
-# f101 is the counterexample of Tomov and Ganchovski (2026), whose published values need another evaluation order than
-# the benchmark's; the tests of `ModAB` define f101 themselves.
+# The benchmark in the authors' repository adds f93 to f101 after the 92 problems of Table 2:
+# - f93 to f99 extend f92 to the odd powers from 5 to 17;
+# - f100 is left out: it is infinite at its lower bound, which sunnbear rejects;
+# - f101 is left out: it is the counterexample of Tomov and Ganchovski (2026), whose published values need the
+#   product 7*(x*x), where the benchmark computes 7*x*x, which rounds differently; the tests of `ModAB` define f101
+#   themselves.
 GANCHOVSKI_ET_AL_ADDED_PROBLEMS = [
     PaperProblem(name="f93", f=lambda x: _pow(x, 5) - 0.001, a=-10.0, b=10.0),
     PaperProblem(name="f94", f=lambda x: _pow(x, 7) - 0.001, a=-10.0, b=10.0),
@@ -276,7 +278,7 @@ def ganchovski_et_al_stop_width(x: float) -> float:
     ``x``.
 
     The C# modAB stops once the interval is at most this wide, and so does the C# code of the safeguarded method of
-    Tomov and Ganchovski (2026), whose runs use the same tolerances; the C# methods of Ridders and Brent use half of
-    this width as their tolerance.
+    Tomov and Ganchovski (2026), whose benchmark uses the same tolerances; the C# methods of Ridders and Brent use half
+    of this width as their tolerance.
     """
     return 1e-14 + 1e-14 * abs(x)

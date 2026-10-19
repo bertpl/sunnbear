@@ -5,8 +5,9 @@ of Tomov and Ganchovski (2026):
   root in the paper's supplementary results;
 - `TABLE_3_BY_SETTING`, the 8 cases of Table 3 of Tomov and Ganchovski (2026), with the safeguarded method's
   evaluation count under each of the table's 3 settings;
-- `TABLE_3_NON_STRESS_CASES`, the 86 cases that 1 of Table 3's sums covers, and `TABLE_3_NON_STRESS_SUMS_BY_SETTING`,
-  the value of that sum under each setting;
+- `TABLE_3_NON_STRESS_CASES`, the 86 cases that 1 sum of Table 3 covers: the benchmark's f01 to f100 without its 3
+  stress cases and without the 11 cases whose returned x-value the authors could not validate, and
+  `TABLE_3_NON_STRESS_SUMS_BY_SETTING`, the value of that sum under each setting;
 - `TABLE_4_CAP_M_3`, the row "Cap M = 3" of Table 4 of Tomov and Ganchovski (2026), on `EQUATION_27`, the preprint's
   equation 27;
 - `TABLE_5` and `TABLE_5_TOTAL_N_FEVALS`, the x-values that the safeguarded method returns on the 3 cases of Table 5 of
@@ -148,17 +149,19 @@ TABLE_2 = [
 #  Tomov and Ganchovski (2026)
 # ==================================================================================================
 # This dict maps each name to its problem, for the problems of the authors' benchmark that sunnbear accepts, f01 to
-# f99. In that benchmark, f49 computes x^(1/3) for x > 0, not x^0 as in Table 2 of Ganchovski et al. (2026); the
-# safeguarded method takes as many evaluations on both forms, under each setting of Table 3, so the tests use
-# `GanchovskiEtAlTable2Problem.F49`.
+# f99.
+#
+# In that benchmark, f49 computes x^(1/3) for x > 0, not x^0 as in Table 2 of Ganchovski et al. (2026); the
+# safeguarded method takes the same number of evaluations on both forms, under each setting of Table 3, so the tests
+# use `GanchovskiEtAlTable2Problem.F49`.
 _BENCHMARK_PROBLEMS_BY_NAME = {
     problem.name: problem
     for problem in [member.value for member in GanchovskiEtAlTable2Problem] + GANCHOVSKI_ET_AL_ADDED_PROBLEMS
 }
 
 # Table 3 runs the safeguarded method under 3 settings of its 2 constants, which the tests name fixed_delay,
-# early_fallback and adaptive. Each row holds a case and its evaluation counts under the 3 settings, which include the 2
-# evaluations at the interval bounds.
+# early_fallback and adaptive. Each row holds a case and its evaluation counts under the 3 settings; each count
+# includes the 2 evaluations at the interval bounds.
 _TABLE_3_ROWS = [
     {"name": "f64", "fixed_delay": 9, "early_fallback": 14, "adaptive": 9},
     {"name": "f84", "fixed_delay": 9, "early_fallback": 16, "adaptive": 9},

@@ -207,10 +207,11 @@ Tomov and Ganchovski (2026) correct 2 defects in the code of Ganchovski et al. (
 
 Both configs follow section IV, and both are secondary: neither method is established yet (published 2026), and the evidence for each so far comes from its authors' own benchmarks.
 - **`modab[variant='algorithms_2026']` (secondary):** the method as Ganchovski et al. (2026) publish it, ported from the C# code in their article.
-- **`modab[variant='safeguarded_2026']` (secondary):** the corrected method of Tomov and Ganchovski (2026), ported from the authors' C# code. It differs from the method of Ganchovski et al. (2026) in 3 ways, of which the first 2 correct the 2 defects:
+- **`modab[variant='safeguarded_2026']` (secondary):** the corrected method of Tomov and Ganchovski (2026), ported from the authors' C# code. It differs from the method of Ganchovski et al. (2026) in 4 ways, of which the first 2 correct the 2 defects:
   - it keeps the true function values apart from the scaled values of its Anderson–Björck steps, so a scaled value never replaces a true one;
   - it starts each phase of Anderson–Björck steps from the true function values, without scaling a value in its first step;
-  - it allows up to 3 Anderson–Björck steps in a row that shrink the interval too slowly, as long as each one brings the function value, in magnitude, below half the smaller function value at the interval bounds before the step.
+  - it sets the fallback threshold at a switch to 2 times the interval width after the new x-value replaces a bound, not 16 times the width before;
+  - it allows up to 3 Anderson–Björck steps in a row that shrink the interval too slowly, as long as each one brings the magnitude of the function value at its new x-value below half the smaller magnitude of the function values at the interval bounds before the step.
 
 ## VI. Code Organization & Validation
 

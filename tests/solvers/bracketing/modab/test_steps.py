@@ -59,13 +59,13 @@ def test_only_the_safeguarded_variant_scales_no_stored_value_in_its_first_anders
     variant, x_second_secant
 ):
     """On ``-x^2`` below 0 and ``7*x^2`` from 0, over ``[-3, 1]``, the preprint's equation 27, both variants switch at
-    the first midpoint, -1, and their first secant's zero is -0.75; both midpoint and secant then replace the lower
-    bound. Their second secant's zero shows whether the first Anderson-Björck step scaled ``y2 = 7``:
+    the first midpoint, -1, and their first secant's zero is -0.75; the midpoint and the secant's zero each replace
+    the lower bound. Their second secant's zero shows whether the first Anderson-Björck step scaled ``y2 = 7``:
 
     - ``"safeguarded_2026"`` starts the phase with no bound recorded, so it does not scale ``y2``, and its second
       secant's zero is ``-75/121``, which the preprint's Proposition 3.6 gives;
-    - ``"algorithms_2026"`` recorded the upper bound as retained in the switching bisection, so it multiplies ``y2`` by
-      ``m = 1 - 0.5625``, which puts its second secant's zero at ``-111/232``.
+    - ``"algorithms_2026"`` recorded the upper bound as retained in the bisection step that switched, so it multiplies
+      ``y2`` by ``m = 1 - 0.5625``, which puts its second secant's zero at ``-111/232``.
     """
     # --- act --------------------------
     result = ModAB(variant=variant).solve(
@@ -179,8 +179,8 @@ def test_the_safeguarded_variant_projects_x3_into_the_interval_and_evaluates_not
 def _function_with_huge_values(x: float) -> float:
     """Return the value at ``x`` of a function that reaches 1.5e308 on ``[-1, 1]``, computed without overflow.
 
-    Left of 0, the function is the line ``2.3e308*(x + 1) - 8e307``, computed in an order that does not overflow; it
-    is 1.5e308 at 0 and has its root at ``-1 + 8/23``. Right of 0, it falls linearly to 8.0001e307 at 1.
+    Left of 0, the function is the line ``2.3e308*(x + 1) - 8e307``; it is 1.5e308 at 0 and has its root at
+    ``-1 + 8/23``. Right of 0, it falls linearly to 8.0001e307 at 1.
     """
     if x <= 0.0:
         return (1.15e308 * (x + 1.0) - 8e307) + 1.15e308 * (x + 1.0)
