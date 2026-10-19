@@ -18,10 +18,10 @@ A **core principle of the scientific approach is reproducibility** of results.  
 
 Some domains have inherent challenges in this area (e.g., non-exact sciences or studies that involve exceptionally expensive equipment), but numerical algorithms and especially **root-finding algorithms seem well-suited**: digitally shareable, self-contained algorithms that can run on essentially any off-the-shelf computer.
 
-However, reproducing results can be challenging.  **Out of the 12 references** in section II...
-- **5** publish no code of the method, neither in the article nor as a separate download
+However, reproducing results can be challenging.  **Out of the 13 references** in section II...
+- **6** publish no code of the method, neither in the article nor as a separate download
 - **3** give evaluation counts for fewer than 10 runs of the method
-- **5** contain apparent typos in the algorithm description
+- **6** contain apparent typos in the algorithm description
 - **2** state that their experiments ran on a machine without IEEE 754 (64-bit) floating point
 - **1** publishes results that reproduce only with a detail that the article leaves out
 - **4** print a test problem that does not reproduce their own published results
@@ -37,7 +37,7 @@ Due to the goals of section I.a and the challenges of section I.b, we...
 
 ## II. Solvers Overview
 
-The `sunnbear` package implements **15 solver algorithms**, several provided in different flavors and settings, totaling **20 solver configurations**.
+The `sunnbear` package implements **16 solver algorithms**, several provided in different flavors and settings, totaling **23 solver configurations**.
 
 | Algorithm | Type | Configs | core config? | Year | Reference |
 | --------- | ---- | ------- | ------------ | ---- | --------- |
@@ -51,6 +51,7 @@ The `sunnbear` package implements **15 solver algorithms**, several provided in 
 | `Ridders` | bracketing | 3 | ✓ | 1979 | Ridders (1979) |
 | `TOMS748` | bracketing | 2 | ✓ | 1995 | Alefeld, Potra and Shi (1995) |
 | `Chandrupatla` | bracketing | 1 | ✓ | 1997 | Chandrupatla (1997) |
+| `Ford` | bracketing | 3 | | 1997 | Ford (1997) |
 | `ITP` | bracketing | 3 | ✓ | 2020 | Oliveira and Takahashi (2020) |
 | `SteffenBrent` | bracketing | 1 | | 2025 | Steffen et al. (2025) |
 | `CARF` | bracketing | 1 | | 2026 | Gao (2026) |
@@ -94,7 +95,7 @@ Some articles do not state an explicit stopping criterion (Ridders (1979): "The 
 - distance between mid-point and bracket endpoint < xtol
 - bracket width < 2*xtol, or < an absolute plus a relative tolerance (Brent, TOMS748, Chandrupatla, ModAB)
 - step between 2 successive iterates < a tolerance (Dowell and Jarratt's ALGOL procedure for Illinois)
-- |f| below a threshold (Dowell and Jarratt's tables; combined with a width test by Steffen et al. and Gao)
+- |f| below a threshold (Dowell and Jarratt's tables; combined with a width test by Steffen et al., Gao and Ford)
 - variants with some numerical rounding tolerance
 
 The returned x-value differs as well: the midpoint, the bound with the smaller |f|, or an iterate that is never evaluated.
@@ -139,6 +140,7 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 | `Ridders` | none | not stated | – |
 | `TOMS748` | width ≤ `2*tole`, with `tole = 2*macheps*\|u\| + tol` | not stated | every new x-value kept `0.7*(2*tole)` inside the interval, with `tol = xtol` |
 | `Chandrupatla` | half-width < `TOL`, or `f = 0`, with `TOL = 2*ε_R*\|x\| + 0.5*ε_A` | the bound with the smaller `\|f\|` | distance `TOL` from the interval bounds, with `ε_A = 2*xtol` and `ε_R = 0` |
+| `Ford` | `\|f\| < ε`, or width < `0.95*ε`, with `ε = τ + 2^-53*max(\|a\|, \|b\|, 1)` | not stated | – |
 | `ITP` | width ≤ `2ε` | the midpoint | projection radius, which bounds how far each step may lie from the midpoint, with `ε = xtol` |
 | `SteffenBrent` | width ≤ `tol1`, or `\|f(b)\|` ≤ `tol2` | `b` | – |
 | `CARF` | `\|f\| < ε1`, or width < `ε2 + \|t\|*ε1` | not stated | – |
@@ -180,6 +182,9 @@ Only a secondary config may deviate from section IV.
 | | `itp[n_slack=4,variant='paper_experiments']` | secondary | the projection radius of the authors' code, `n_slack = 4` | yes |
 | `ModAB` | `modab` | secondary | the method of Ganchovski et al. (2026) | yes |
 | `ModABSafeguarded` | `modab_safeguarded` | secondary | the corrected method of Tomov and Ganchovski (2026) | yes |
+| `Ford` | `ford[variant='method_1']` | secondary | Method 1 of the article | yes |
+| | `ford[variant='method_3']` | secondary | Method 3 of the article | yes |
+| | `ford[variant='method_4']` | secondary | Method 4 of the article | yes |
 
 ### V.a. Ridders
 
@@ -217,6 +222,17 @@ Both configs follow section IV, and both are secondary: neither method is establ
   - when it switches to Anderson–Björck steps, it sets the fallback threshold to 2 times the interval width after the new x-value replaces a bound, not 16 times the width before;
   - it allows up to 3 Anderson–Björck steps in a row that leave the interval wider than the fallback threshold, as long as each one brings the magnitude of the function value at its new x-value below half the smaller magnitude of the function values at the interval bounds before the step.
 
+### V.e. Ford
+
+Ford (1997) treats the methods of `Illinois`, `Pegasus` and `AndersonBjorck` as 1 family: regula falsi in which a step that keeps an interval bound scales the function value stored at that bound by a factor `γ`. His Methods 1 to 4 estimate `γ` from divided differences of the last 3 x-values, and differ only in the denominator of that estimate.
+
+The 3 configs follow section IV, and are secondary: the config of `Illinois` already represents this family among the core configs. They could become core if results show that they behave differently from it.
+- **`ford[variant='method_1']` (secondary):** Method 1, with the denominator `f[x_(i-1), x_(i+1)] + f[x_(i-1), x_i] - f[x_(i+1), x_i]`.
+- **`ford[variant='method_3']` (secondary):** Method 3, with the denominator `f[x_(i-1), x_(i+1)]`.
+- **`ford[variant='method_4']` (secondary):** Method 4, with the denominator `f[x_(i-1), x_i]`.
+
+Method 2 is left out: the article reports that it behaves very much like the method of `AndersonBjorck`, and drops it from its discussion.
+
 ## VI. Code Organization & Validation
 
 ### VI.a. Solver Classes
@@ -245,6 +261,7 @@ The tests compare each solver with the published results and reference implement
 - **Chandrupatla, T. R. (1997)**. A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear function without using derivatives. Advances in Engineering Software 28(3), 145–149. https://doi.org/10.1016/S0965-9978(96)00051-8
 - **Dowell, M. and Jarratt, P. (1971)**. A modified regula falsi method for computing the root of an equation. BIT 11(2), 168–174. https://doi.org/10.1007/BF01934364
 - **Dowell, M. and Jarratt, P. (1972)**. The "Pegasus" method for computing the root of an equation. BIT 12(4), 503–508. https://doi.org/10.1007/BF01932959
+- **Ford, J. A. (1997)**. Improved Illinois-type methods for the solution of nonlinear equations. Scientia Iranica 4(1&2), 28–34. https://scientiairanica.sharif.edu/article_21758.html
 - **Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L. and Traykov, A. (2026)**. Improvements to the modified Anderson-Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. https://doi.org/10.3390/a19050332
 - **Gao, F. (2026)**. Fast and stable root-finding using clipped power interpolations. Applied Mathematics Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928
 - **Oliveira, I. F. D. and Takahashi, R. H. C. (2020)**. An enhancement of the bisection method average performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), Article 5. https://doi.org/10.1145/3423597

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add the safeguarded modified Anderson-Björck method of Tomov and Ganchovski (2026), `sunnbear.solvers.ModABSafeguarded`
+- Add Ford's Illinois-type Methods 1, 3 and 4, `sunnbear.solvers.Ford`
 
 ### Changed
 
