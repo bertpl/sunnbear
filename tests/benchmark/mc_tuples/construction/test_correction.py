@@ -31,13 +31,42 @@ def _random_axis(seed: int) -> tuple[np.ndarray, np.ndarray]:
     return values[:n_required], values[n_required:]
 
 
+def _limit_of(value: float, all_values: np.ndarray, is_shift_left: bool) -> float:
+    """Return the limit of a new value: the edge of its neighbor's fine lane that faces the value, on the side that the
+    value moves to.
+
+    The lowest value's left neighbor and the highest value's right neighbor lie across 0 and 1, and the limit never lies
+    beyond 0 or 1.
+    """
+    if is_shift_left:
+        below = all_values[all_values < value]
+        if below.size:
+            neighbor = below.max()
+        else:
+            neighbor = all_values.max() - 1.0
+        return max((np.floor(neighbor * N_FINE_LANES) + 1) / N_FINE_LANES, 0.0)
+    else:
+        above = all_values[all_values > value]
+        if above.size:
+            neighbor = above.min()
+        else:
+            neighbor = all_values.min() + 1.0
+        return min(np.floor(neighbor * N_FINE_LANES) / N_FINE_LANES, 1.0)
+
+
 @pytest.mark.parametrize("seed", range(40))
 def test_the_correction_keeps_the_fine_lanes_the_order_and_the_size_below_and_moves_the_new_ones_1_way(seed):
-    """On random axes, no fine lane ends with 2 tuples, the values of the size below and the order stay, every new
-    tuple moves toward the same side apart from a nudge of a few float64 steps, and the mean reaches 0.5 unless the cap
-    ends at its lower bound."""
+    """On random axes, the correction keeps these properties:
+
+    - no fine lane ends with 2 tuples;
+    - the values of the size below and the order of all values stay;
+    - every new tuple moves toward the same side, apart from a nudge of a few float64 steps;
+    - no tuple moves more than halfway to its limit;
+    - the mean reaches 0.5 unless the cap ends at its lower bound.
+    """
     # --- arrange ----------------------
     required, new = _random_axis(seed)
+    all_before = np.concatenate([required, new])
 
     # --- act --------------------------
     correction = MCTuplesAxisValueCorrection.of(required, new)
@@ -45,21 +74,24 @@ def test_the_correction_keeps_the_fine_lanes_the_order_and_the_size_below_and_mo
     # --- assert -----------------------
     all_after = np.concatenate([required, correction.corrected_new_values])
     assert np.bincount(fine_lanes_of(all_after)).max() == 1
-    assert np.array_equal(np.argsort(np.concatenate([required, new])), np.argsort(all_after))
+    assert np.array_equal(np.argsort(all_before), np.argsort(all_after))
     moves = correction.corrected_new_values - new
-    moves = moves[np.abs(moves) > 1e-12]
-    assert np.all(moves <= 0) or np.all(moves >= 0)
+    is_moved = np.abs(moves) > 1e-12
+    assert np.all(moves[is_moved] <= 0) or np.all(moves[is_moved] >= 0)
+    for value, move in zip(new[is_moved].tolist(), moves[is_moved].tolist(), strict=True):
+        limit = _limit_of(value, all_before, is_shift_left=move < 0)
+        assert abs(move) <= 0.5 * abs(value - limit) + 1e-15
     assert np.all((all_after > 0) & (all_after < 1))
     assert correction.cap is not None
-    if correction.cap > CAP_RANGE[0] * 1.001:
+    if correction.cap > CAP_RANGE[0] + 1e-12:
         assert correction.offset_after_fine_lanes == pytest.approx(0.0, abs=1e-9)
         assert all_after.mean() == pytest.approx(0.5, abs=1e-12)
 
 
 def test_the_correction_takes_the_shift_from_the_largest_spacings():
     """With the size below at 0.1 and 0.9 and new tuples at 0.3 and 0.75, a mean of 0.5 needs a left shift, and the
-    cap shortens the wider spacing first: the tuple at 0.75 moves to 0.7, 1 fine lane plus the cap D above its new
-    neighbor at 0.3, and the tuple at 0.3, whose spacing to 0.1 lies below the cap, stays."""
+    cap shortens the wider spacing first: the tuple at 0.75 moves to 0.7, the cap D above its left neighbor at 0.3, and
+    the tuple at 0.3, whose spacing to 0.1 lies below the cap, stays."""
     # --- arrange ----------------------
     required, new = np.array([0.1, 0.9]), np.array([0.3, 0.75])
 
@@ -71,7 +103,7 @@ def test_the_correction_takes_the_shift_from_the_largest_spacings():
     assert correction.offset_before_fine_lanes == pytest.approx((0.1 + 0.9 + 0.3 + 0.75) / 4 * N_FINE_LANES - 512)
     assert correction.corrected_new_values[0] == pytest.approx(0.3)  # its spacing to 0.1 lies below the cap
     assert correction.max_move_fine_lanes == pytest.approx(0.05 * N_FINE_LANES)
-    assert correction.cap == pytest.approx(0.7 - 0.3 - 1 / N_FINE_LANES)
+    assert correction.cap == pytest.approx(0.7 - 0.3)
     assert correction.rotation_shift is None
 
 
@@ -107,25 +139,24 @@ def test_the_nudge_refuses_a_value_whose_fine_lane_holds_no_value_with_min_n_bit
 
 
 def test_a_correction_that_cannot_reach_0_5_ends_at_the_lower_cap_and_reports_the_rest():
-    """When the size below holds a tuple at 0.9, a new tuple at 0.95 cannot reach 0.1, the value that a mean of 0.5
-    needs: it stops just above the fine lane of the tuple at 0.9, and the correction reports the offset that
+    """When the size below holds a tuple at 0.9, a mean of 0.5 needs the new tuple at 0.95 to reach 0.1. It cannot: it
+    stops halfway to the right edge of the fine lane of the tuple at 0.9, and the correction reports the offset that
     remains."""
     # --- act --------------------------
     correction = MCTuplesAxisValueCorrection.of(np.array([0.9]), np.array([0.95]))
 
     # --- assert -----------------------
-    required_value_lane_right_edge = (np.floor(0.9 * N_FINE_LANES) + 1) / N_FINE_LANES
-    assert correction.cap == pytest.approx(CAP_RANGE[0])
-    assert correction.corrected_new_values[0] == pytest.approx(required_value_lane_right_edge)
-    assert correction.offset_after_fine_lanes == pytest.approx(
-        (0.9 + required_value_lane_right_edge) / 2 * N_FINE_LANES - 512
-    )
+    limit = (np.floor(0.9 * N_FINE_LANES) + 1) / N_FINE_LANES
+    halfway_point = (0.95 + limit) / 2
+    assert correction.cap == pytest.approx(CAP_RANGE[0], abs=1e-12)
+    assert correction.corrected_new_values[0] == pytest.approx(halfway_point, abs=1e-15)
+    assert correction.offset_after_fine_lanes == pytest.approx((0.9 + halfway_point) / 2 * N_FINE_LANES - 512)
 
 
 def test_value_correction_corrects_both_axes_of_a_size():
     """The tuples of the size below come first and stay; both axes' means end at 0.5."""
     # --- arrange ----------------------
-    tuple_array = np.array([[0.2, 0.8], [0.7, 0.3], [0.45, 0.65], [0.95, 0.15]])
+    tuple_array = np.array([[0.2, 0.8], [0.7, 0.3], [0.4, 0.65], [0.85, 0.15]])
 
     # --- act --------------------------
     correction = MCTuplesValueCorrection.of(tuple_array, n_required=2)

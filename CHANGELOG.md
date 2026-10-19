@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Require max-div ≥ 0.21.8
 - Measure every statistic of `MCTuplesStats` cyclically, with each axis as a circle on which 0 and 1 meet, which changes their values
 - Improve the cyclic spread statistics of the tuple sets that `generate_mc_tuples` builds; each size no longer spans the full range of u and of v
+- Change how `generate_mc_tuples` corrects the means of its tuple sets, which improves their cyclic spread statistics, most at size 1024
 
 ### Deprecated
 

@@ -12,38 +12,38 @@
 In the mean correction, the tuples of the size below stay where they are; per axis, only the new tuples move, toward
 the side that the mean needs (`MCTuplesAxisValueCorrection`).
 
-The rules are written for a mean above 0.5, where the new tuples move left, over the size's values u_0 < u_1 < … in
-ascending order, with w the width of a fine lane:
+The rule is written for a mean above 0.5, where the new tuples move left, over the size's values u_0 < u_1 < … in
+ascending order.
 
-- each new tuple i gets a reference r_i and a spacing s_i = u_i - r_i to that reference, both fixed from the values
-  before the correction:
-  - r_i is 0 when u_i is the lowest value;
-  - r_i is the right edge of u_{i-1}'s fine lane when u_{i-1} is a tuple of the size below;
-  - r_i is u_{i-1} when u_{i-1} is a new tuple, and then r_i moves when u_{i-1} moves;
-- a cap D bounds a new tuple's spacing to its reference, by a rule that depends on the tuple's left neighbor
-  (u_{i-1}, or the edge for the lowest value):
-  - when the left neighbor is the edge or a tuple of the size below, u'_i = r_i + min(s_i, D);
-  - when the left neighbor is a new tuple and s_i ≤ w, u_i stays until u'_{i-1} + w falls below it:
-    u'_i = min(u_i, u'_{i-1} + w);
-  - when the left neighbor is a new tuple and s_i > w, u_i follows its left neighbor and keeps its spacing, capped
-    at w + D: u'_i = u'_{i-1} + min(s_i, w + D).
+Each new tuple i has a left neighbor u_{i-1}, a tuple of the size below or a new one. The lowest value's left neighbor
+is the highest value minus 1, because on the circle on which max-div measures distances (`distances`), the highest
+value is the lowest value's neighbor across 0 and 1.
+
+From the values before the correction, each new tuple i gets:
+
+- a limit l_i, the lowest value that the tuple could take while it stays out of its left neighbor's fine lane: the
+  right edge of that fine lane, but never below 0, because a value that crossed 0 would raise the mean, not lower it;
+- a halfway point h_i = (u_i + l_i) / 2 between its value and its limit.
+
+A cap D then bounds each new tuple's spacing to its left neighbor's moved value, but no tuple moves past its halfway
+point: u'_i = max(h_i, min(u_i, u'_{i-1} + D)). For the lowest value, u'_{i-1} is the highest value minus 1, taken
+before the correction moves the highest value, so after the correction the spacing between the 2 can exceed D.
 
 So the largest spacings shrink first and the smallest keep their value. Every u'_i rises with D without jumps, and a
 bisection over D finds the cap at which the mean is exactly 0.5.
 
-The rules measure the lowest value's spacing from the edge of the axis, at 0. max-div measures distances cyclically, so
-the lowest value's neighbor across 0 and 1 is the highest value.
+When the new tuples cannot bring the mean to 0.5 without passing their halfway points, the cap ends at its lower bound,
+and `offset_after_fine_lanes` reports the offset that remains.
 
-The cyclic spacing between the 2 is u_0 plus the highest value's distance to 1, so it is never less than u_0, and the
-mean correction never shrinks it below the cap D.
+The halfway point keeps every moved value off its limit, an edge of a fine lane: a value clipped onto its limit would be
+a multiple of 1 / N_FINE_LANES and hold fewer than `MIN_N_BITS` bits of information. For a mean below 0.5, where the
+new tuples move right, it would also sit on the lower edge of its right neighbor's fine lane, which belongs to that
+neighbor.
 
-No fine lane ever holds 2 tuples, at any D:
+No fine lane ever holds 2 tuples, at any D: every new tuple stays above its left neighbor's fine lane, and all new
+tuples move in the same direction, so the order of the values never changes.
 
-- a new tuple whose left neighbor is a tuple of the size below stays above that tuple's fine lane;
-- 2 new neighbors end at least w apart or keep their fine lanes;
-- the order of the values never changes.
-
-A mean below 0.5 mirrors every rule.
+A mean below 0.5 mirrors the rule.
 
 In place of the mean correction, the first correction of the smallest size rotates each axis: it adds the same shift to
 every value, modulo 1 (`MCTuplesValueCorrection.first_of`). The smallest size gets a rotation because:
@@ -73,13 +73,9 @@ from sunnbear._core.utils.float_bits import nearest_float_with_min_n_bits
 
 from .exceptions import MCTuplesConstructionError
 
-FINE_LANE_WIDTH = 1 / N_FINE_LANES
-
-# The bisection's search range for the cap D. The lower bound keeps every moved tuple at least 1e-6 fine
-# lanes from the edge of its fine lane, so that a right shift, computed on the negated axis, never puts a tuple on the
-# lower edge of its neighbor's fine lane, which belongs to that neighbor. At the upper bound no spacing reaches the cap,
-# so nothing moves.
-CAP_RANGE = (1e-6 * FINE_LANE_WIDTH, 1.0)
+# CAP_RANGE is the bisection's search range for the cap D. At the lower bound every new tuple moves as far as its
+# halfway point or its left neighbor allows; at the upper bound no spacing reaches the cap, so nothing moves.
+CAP_RANGE = (0.0, 1.0)
 
 N_BISECTION_STEPS = 200
 
@@ -110,9 +106,9 @@ class MCTuplesValueCorrection:
         """Return the size in `tuple_array` after the correction; its first `n_required` tuples are the size below.
 
         Raises:
-            MCTuplesConstructionError: If a fine lane holds 2 tuples after the correction (the correction's rules
-                prevent that unless the size already had such a fine lane), or if the nudge finds no value with at least
-                `MIN_N_BITS` bits inside a value's fine lane.
+            MCTuplesConstructionError: If a fine lane holds 2 tuples after the correction (the correction's rule
+                prevents that unless the size already had such a fine lane), or if the nudge finds no value with at
+                least `MIN_N_BITS` bits inside a value's fine lane.
         """
         required, new = tuple_array[:n_required], tuple_array[n_required:]
         u = MCTuplesAxisValueCorrection.of(required[:, 0], new[:, 0])
@@ -182,36 +178,38 @@ class MCTuplesAxisValueCorrection:
     ) -> Callable[[float], np.ndarray]:
         """Return the map from the cap D to the moved values of `new_values`; `required_values` stay in place.
 
-        The rules are written for a left shift. A right shift negates the axis, which is exact in floating point, so
+        The rule is written for a left shift. A right shift negates the axis, which is exact in floating point, so
         that the left neighbor, the left edge and the right edge of a fine lane become the right neighbor, the right
-        edge and the left edge; the right shift then applies the left-shift rules and negates the result back.
+        edge and the left edge; the right shift then applies the left-shift rule and negates the result back.
         """
         sign = 1.0 if is_shift_left else -1.0
         values = sign * np.concatenate([required_values, new_values])
         order = np.argsort(values)
         sorted_values = values[order].tolist()
         is_new = (order >= required_values.size).tolist()
-        left_edge = 0.0 if is_shift_left else -1.0
+        # axis_left_edge is the left edge of the axis: 0, or -1 on the negated axis of a right shift.
+        axis_left_edge = 0.0 if is_shift_left else -1.0
+
+        # Each new value's halfway point is fixed from the values before the correction; the module docstring defines
+        # the limit and the lowest value's left neighbor.
+        left_neighbors = np.array([sorted_values[-1] - 1.0, *sorted_values[:-1]])
+        _, left_neighbor_fine_lane_right_edges = fine_lane_edges_of(fine_lanes_of(left_neighbors))
+        halfway_points = [-math.inf] * len(sorted_values)
+        for i, value in enumerate(sorted_values):
+            if is_new[i]:
+                limit = max(float(left_neighbor_fine_lane_right_edges[i]), axis_left_edge)
+                halfway_points[i] = 0.5 * (value + limit)
 
         def moved_values(cap: float) -> np.ndarray:
             moved = list(sorted_values)
             for i, value in enumerate(sorted_values):
-                if not is_new[i]:
-                    continue
-                if i == 0:
-                    moved[i] = min(value, left_edge + cap)
-                elif not is_new[i - 1]:
-                    # The reference is the right edge of the fine lane of the left neighbor, a tuple of the size below.
-                    lane_right_edge = (math.floor(sorted_values[i - 1] * N_FINE_LANES) + 1) * FINE_LANE_WIDTH
-                    moved[i] = min(value, lane_right_edge + cap)
-                elif value - sorted_values[i - 1] <= FINE_LANE_WIDTH:
-                    # Stay, until the left neighbor has moved so far that the tuple has to follow it at a distance of
-                    # 1 fine lane.
-                    moved[i] = min(value, moved[i - 1] + FINE_LANE_WIDTH)
-                else:
-                    # Follow the left neighbor and keep the spacing, capped at 1 fine lane plus D; the moved value is
-                    # computed from the neighbor's move, so that a tuple whose neighbor stays keeps its value exactly.
-                    moved[i] = min(value - (sorted_values[i - 1] - moved[i - 1]), moved[i - 1] + FINE_LANE_WIDTH + cap)
+                if is_new[i]:
+                    # For the lowest value, moved[-1] still holds the highest value from before the correction, because
+                    # the loop has not reached it yet, so the cap is measured from that highest value minus 1. The
+                    # highest value can only move left, away from the lowest value across 0, so after the correction
+                    # the spacing between the 2 can exceed D.
+                    moved_left_neighbor = moved[i - 1] if i > 0 else moved[-1] - 1.0
+                    moved[i] = max(halfway_points[i], min(value, moved_left_neighbor + cap))
             unsorted = np.empty(len(moved))
             unsorted[order] = moved
             return sign * unsorted[required_values.size :]
