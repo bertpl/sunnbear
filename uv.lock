@@ -1615,7 +1615,7 @@ wheels = [
 
 [[package]]
 name = "sunnbear"
-version = "0.2.9"
+version = "0.2.10"
 source = { editable = "." }
 dependencies = [
     { name = "backports-zstd", marker = "python_full_version < '3.14'" },

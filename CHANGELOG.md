@@ -5,9 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
-### Added
+## 0.2.10 (2026-10-19)
 
 ### Changed
 
@@ -16,14 +14,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve the cyclic spread statistics of the tuple sets that `generate_mc_tuples` builds; each size no longer spans the full range of u and of v
 - Change how `generate_mc_tuples` corrects the means of its tuple sets, which improves their cyclic spread statistics, most at size 1024
 - Rebuild the shipped Monte Carlo tuple set, which improves its cyclic spread statistics at every size; benchmark results on it differ from those on the previous set
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 0.2.9 (2026-10-18)
 
