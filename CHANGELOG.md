@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add the safeguarded variant of `ModAB`, from Tomov and Ganchovski (2026)
+
 ### Changed
+
+- Rename the config `modab` to `modab[variant='algorithms_2026']`, and require the `variant` argument of `ModAB`
 
 ### Deprecated
 

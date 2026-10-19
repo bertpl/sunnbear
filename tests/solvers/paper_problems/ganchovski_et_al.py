@@ -1,11 +1,15 @@
-"""This module holds `GanchovskiEtAlTable2Problem`, the 92 test problems of Table 2 of Ganchovski et al. (2026),
-without any method's evaluation counts or roots.
+"""This module holds the test problems of the C# benchmark of Ganchovski et al. (2026), without any method's
+evaluation counts or roots:
+
+- `GanchovskiEtAlTable2Problem`, the 92 test problems of the paper's Table 2;
+- `GANCHOVSKI_ET_AL_ADDED_PROBLEMS`, the problems f93 to f99, which the benchmark in the authors' repository adds
+  later, and which Tomov and Ganchovski (2026) use.
 
 Table 2 gives several methods' evaluation counts on 92 functions, each on 1 interval; a problem's name is the
 function's name in the table, f01 to f92. The paper's supplementary results add each method's root.
 
 The functions follow the C# benchmark of the paper's supplementary code, which produced Table 2; where the table
-prints a function differently, the C# code holds.
+prints a function differently, the C# code holds. f93 to f99 follow the benchmark in the authors' repository.
 
 Each power and each library function, such as ``exp`` or ``sin``, is evaluated correctly rounded, through mpmath. The
 exceptions are ``sqrt``, which IEEE 754 already rounds correctly, and ``ceil`` and ``floor``, which are exact.
@@ -19,6 +23,12 @@ References:
       Anderson-Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. https://doi.org/10.3390/a19050332
     - The paper's supplementary materials, which hold the C# benchmark and the results per function and method:
       https://www.mdpi.com/article/10.3390/a19050332/s1
+    - The authors' repository at commit ``0d6efd5``, whose folder ``MDPI-Algorithms-Data-2`` holds the benchmark with
+      f93 to f99:
+      https://github.com/Proektsoft-EOOD/ModAB-Root-Finding/tree/0d6efd59e5dcb34b7bccf90e1d4a9eee6d486e70
+    - Tomov, L. and Ganchovski, N. (2026). Global convergence and reliable stopping in a safeguarded modified
+      Anderson-Björck method. arXiv preprint arXiv:2610.14193 [math.NA], version 1.
+      https://doi.org/10.48550/arXiv.2610.14193
 """
 
 import math
@@ -241,13 +251,32 @@ class GanchovskiEtAlTable2Problem(PaperProblemEnum):
 
 
 # ==================================================================================================
+#  The problems that the authors' repository adds
+# ==================================================================================================
+# The benchmark in the authors' repository adds f93 to f101 after the 92 problems of Table 2. f93 to f99 extend f92 to
+# the odd powers from 5 to 17. f100 and f101 are left out. f100 is infinite at its lower bound, which sunnbear rejects.
+# f101 is the counterexample of Tomov and Ganchovski (2026), whose published values need another evaluation order than
+# the benchmark's; the tests of `ModAB` define it.
+GANCHOVSKI_ET_AL_ADDED_PROBLEMS = [
+    PaperProblem(name="f93", f=lambda x: _pow(x, 5) - 0.001, a=-10.0, b=10.0),
+    PaperProblem(name="f94", f=lambda x: _pow(x, 7) - 0.001, a=-10.0, b=10.0),
+    PaperProblem(name="f95", f=lambda x: _pow(x, 9) - 0.001, a=-10.0, b=10.0),
+    PaperProblem(name="f96", f=lambda x: _pow(x, 11) - 0.001, a=-10.0, b=10.0),
+    PaperProblem(name="f97", f=lambda x: _pow(x, 13) - 0.001, a=-10.0, b=10.0),
+    PaperProblem(name="f98", f=lambda x: _pow(x, 15) - 0.001, a=-10.0, b=10.0),
+    PaperProblem(name="f99", f=lambda x: _pow(x, 17) - 0.001, a=-10.0, b=10.0),
+]
+
+
+# ==================================================================================================
 #  Stopping rule
 # ==================================================================================================
 def ganchovski_et_al_stop_width(x: float) -> float:
     """Return ``aTol + rTol * |x|``, with ``aTol = rTol = 1e-14``, the tolerance that the paper's C# code applies at
     ``x``.
 
-    The C# modAB stops once the interval is at most this wide; the C# methods of Ridders and Brent use half of this
-    width as their tolerance.
+    The C# modAB stops once the interval is at most this wide, and so does the C# code of the safeguarded method of
+    Tomov and Ganchovski (2026), whose runs use the same tolerances; the C# methods of Ridders and Brent use half of
+    this width as their tolerance.
     """
     return 1e-14 + 1e-14 * abs(x)

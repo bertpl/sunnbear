@@ -1,16 +1,24 @@
-"""This module declares the built-in config of `ModAB`."""
+"""This module declares the built-in configs of `ModAB`, 1 per variant."""
 
 from sunnbear._core.solvers.core import SolverConfig, SolverConfigsDeclaration, SolverRole
 
 from .solver import ModAB
+from .variant import ModABVariant
 
 
 class ModABConfigsDeclaration(SolverConfigsDeclaration):
-    """`ModABConfigsDeclaration` declares `ModAB`'s only config, named ``modab``.
+    """`ModABConfigsDeclaration` declares the configs of `ModAB`, 1 per variant.
 
-    It is a secondary config. It is not core because the method is not established yet (published 2026), and the
-    evidence for it so far comes from its authors' own benchmarks.
+    - ``modab[variant='algorithms_2026']``, a secondary config: the method of Ganchovski et al. (2026);
+    - ``modab[variant='safeguarded_2026']``, a secondary config: the safeguarded method of Tomov and Ganchovski
+      (2026).
+
+    Section V.d of ``SOLVER_IMPLEMENTATIONS.md``, in the package `sunnbear._core.solvers`, gives the reasons for the
+    configs' roles.
     """
 
     solver_cls = ModAB
-    configs = (SolverConfig(role=SolverRole.BUILTIN_SECONDARY),)
+    configs = (
+        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": ModABVariant.ALGORITHMS_2026}),
+        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": ModABVariant.SAFEGUARDED_2026}),
+    )
