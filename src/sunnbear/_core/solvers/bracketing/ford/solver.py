@@ -1,4 +1,4 @@
-"""`Ford` implements 3 methods of Ford (1997): regula falsi that scales down the value of a bound kept twice in a row."""
+"""`Ford` implements 3 methods of Ford (1997): regula falsi that shrinks the value of a bound kept twice in a row."""
 
 from sunnbear._core.solvers.core import BracketingSolver, Interval, IntervalBound
 
@@ -26,17 +26,19 @@ class Ford(BracketingSolver[FordState]):
     - when a new iterate replaces the retained bound, the previous iterate becomes the retained bound, with its
       unscaled function value.
 
-    The article calls a step whose secant uses a scaled function value modified, and any other step unmodified.
+    The article calls a step modified when its secant uses a scaled function value, and unmodified otherwise.
 
     The factor that makes the next secant pass through the root ``x*`` is the ratio of 2 slopes,
-    ``f[x_(i+1), x*] / f[x_(i-1), x*]``, where ``f[u, v] = (f(u) - f(v)) / (u - v)`` is the divided difference. Each
-    method approximates both slopes with divided differences between ``x_(i-1)``, ``x_i`` and ``x_(i+1)``, and takes
-    their ratio as ``gamma``. All 3 methods approximate the numerator by the slope at ``x_(i+1)`` of the quadratic
+    ``f[x_(i+1), x*] / f[x_(i-1), x*]``, where ``f[u, v] = (f(u) - f(v)) / (u - v)`` is the divided difference.
+
+    Each method approximates both slopes with divided differences between ``x_(i-1)``, ``x_i`` and ``x_(i+1)``, and
+    takes their ratio as ``gamma``. All 3 methods approximate the numerator by the slope at ``x_(i+1)`` of the quadratic
     through the function values at the 3 x-values,
 
         f[x_(i+1), x_i] + f[x_(i+1), x_(i-1)] - f[x_i, x_(i-1)],
 
-    and differ only in the denominator, which ``variant``, a value of `FordVariant`, picks from the article's Table 3:
+    and differ only in the denominator. ``variant``, a value of `FordVariant`, picks the denominator from the article's
+    Table 3:
 
         "method_1":  f[x_(i-1), x_(i+1)] + f[x_(i-1), x_i] - f[x_(i+1), x_i], the quadratic's slope at x_(i-1)
         "method_3":  f[x_(i-1), x_(i+1)]
@@ -44,14 +46,16 @@ class Ford(BracketingSolver[FordState]):
 
     Where ``gamma`` is not positive, all 3 methods take ``gamma = 0.5``, the Illinois method's factor.
 
-    The article's description of the steps leaves out 2 details, which its analysis of a second modified step in a
-    row, in its equations 23 to 25, shows: the divided differences use the scaled function value at ``x_(i-1)``, and
-    each further iteration that keeps the retained bound scales that scaled value again.
+    The article's description of the steps leaves out 2 details. Its equations 23 to 25, which analyze a second
+    modified step in a row, show both: the divided differences use the scaled function value at ``x_(i-1)``, and each
+    further iteration that keeps the retained bound scales that scaled value again.
 
     `Ford` computes every step in the form of the article's equation 5, ``(s*fr - r*fs) / (fr - fs)``, with
-    ``fs = f(s)``, and ``fr`` the scaled or unscaled function value at ``r``. The article gives the unmodified step in
-    2 forms, its equations 2 and 3, and calls a step with equation 3 unmodified; equation 5 is equation 3 with the
-    scaled value.
+    ``fs = f(s)``, and ``fr`` the scaled or unscaled function value at ``r``.
+
+    The article gives the unmodified step in 2 forms, its equations 2 and 3, which are equal in exact arithmetic but
+    round differently; equation 5 is equation 3 with the scaled value, so `Ford` uses the form of equation 3 for every
+    step.
 
     Ford's Method 2 is left out: Ford finds that it behaves very much like the Anderson-Björck method, which
     `AndersonBjorck` implements, and drops it from the article's discussion.
@@ -60,10 +64,15 @@ class Ford(BracketingSolver[FordState]):
 
     - **Stopping criterion:** `Ford` stops by `BracketingSolver`'s criterion, once the interval is at most ``2*xtol``
       wide or the function value at a bound is 0, and returns that bound, or else the interval's midpoint, which lies
-      within ``xtol`` of a root. The article's experiments stop once ``|f(x)| < eps``, or once the interval is narrower
-      than ``0.95*eps``, with ``eps = tau + 2^-53*max(|a|, |b|, 1)`` for a tolerance ``tau`` and the initial interval
-      ``[a, b]``, or after 200 iterations. The test on ``|f(x)|`` is a tolerance on f that ``xtol``, a tolerance on x,
-      does not translate into; `Ford` has no iteration limit, so the evaluation budget ends a long solve.
+      within ``xtol`` of a root. The article's experiments stop at the first of 3 conditions, with
+      ``eps = tau + 2^-53*max(|a|, |b|, 1)`` for a tolerance ``tau`` and the initial interval ``[a, b]``:
+
+      - ``|f(x)| < eps``;
+      - the interval is narrower than ``0.95*eps``;
+      - 200 iterations have run.
+
+      ``xtol`` is a tolerance on x and cannot express the article's tolerance on ``|f(x)|``; `Ford` has no iteration
+      limit, so the evaluation budget ends a long solve.
     - **Fallback condition:** the article takes ``gamma = 0.5`` where ``gamma`` is "non-negative" (pp. 29 and 30), a
       typo for "non-positive": only with that reading do the counts of the article's Table 4 reproduce. `Ford` takes
       0.5 where ``gamma`` is not positive.
@@ -81,11 +90,11 @@ class Ford(BracketingSolver[FordState]):
     References:
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. Its equations 3 and 5 are the steps, its Table 3 the approximations of the 2 slopes
-          of ``gamma``, and its equations 23 to 25 the repeated scaling; the test suite reproduces the iteration
-          counts of Methods 1, 3 and 4 in its Table 4. https://scientiairanica.sharif.edu/article_21758.html
+          whose ratio is ``gamma``, and its equations 23 to 25 the repeated scaling; the test suite reproduces the
+          iteration counts of Methods 1, 3 and 4 in its Table 4. https://scientiairanica.sharif.edu/article_21758.html
         - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of an
-          equation. BIT 13(3), 253-264. Its section 3 takes 0.5 in place of a factor that is not positive, the
-          reading of Ford's fallback that `Ford` follows. https://doi.org/10.1007/BF01951936
+          equation. BIT 13(3), 253-264. Its section 3 takes 0.5 in place of a factor that is not positive; `Ford`
+          reads Ford's fallback the same way. https://doi.org/10.1007/BF01951936
     """
 
     name = "ford"
@@ -108,9 +117,12 @@ class Ford(BracketingSolver[FordState]):
         previous call.
         """
         # --- update the retained bound's value --
-        # The names are the article's: x_ip1, x_i and x_im1 stand for x_(i+1), the new iterate, x_i, the previous
-        # iterate, and x_(i-1), the retained bound; f_ip1, f_i and f_im1 are the function values there, with f_im1
-        # the retained bound's scaled value.
+        # The names follow the article's:
+        # - x_ip1 is x_(i+1), the new iterate;
+        # - x_i is the previous iterate;
+        # - x_im1 is x_(i-1), the retained bound;
+        # - f_ip1 and f_i are the function values at x_ip1 and x_i;
+        # - scaled_f_im1 is the retained bound's scaled value.
         replaced_bound = interval.last_replaced_bound
         if replaced_bound is None:
             pass  # This is the first iteration: no bound has been kept again yet, so no value is scaled.
@@ -119,7 +131,7 @@ class Ford(BracketingSolver[FordState]):
                 x_ip1, f_ip1, x_im1 = interval.a, interval.fa, interval.b
             else:
                 x_ip1, f_ip1, x_im1 = interval.b, interval.fb, interval.a
-            x_i, f_i, f_im1 = state.newest_x, state.newest_f, state.scaled_retained_f
+            x_i, f_i, scaled_f_im1 = state.newest_x, state.newest_f, state.scaled_retained_f
             if replaced_bound is not state.newest_bound:
                 # x_(i+1) replaced the retained bound, on the other side of the root from x_i, so x_i becomes the
                 # retained bound, with its unscaled function value f_i, and the next step is unmodified.
@@ -128,16 +140,16 @@ class Ford(BracketingSolver[FordState]):
             elif x_ip1 == x_i:
                 # f[x_(i+1), x_i] would be 0/0. Taking 0.5 only avoids Python's ZeroDivisionError, as the class
                 # docstring says; in IEEE arithmetic, 0/0 is NaN, which is not positive either.
-                state.scaled_retained_f = 0.5 * f_im1
+                state.scaled_retained_f = 0.5 * scaled_f_im1
             else:
                 # x_(i+1) replaced x_i, so the retained bound was kept once more, and its value is scaled by gamma.
                 # slope_ip1_i is the divided difference f[x_(i+1), x_i], and likewise for the other 2.
                 slope_ip1_i = (f_ip1 - f_i) / (x_ip1 - x_i)
-                slope_ip1_im1 = (f_ip1 - f_im1) / (x_ip1 - x_im1)
-                slope_i_im1 = (f_i - f_im1) / (x_i - x_im1)
+                slope_ip1_im1 = (f_ip1 - scaled_f_im1) / (x_ip1 - x_im1)
+                slope_i_im1 = (f_i - scaled_f_im1) / (x_i - x_im1)
                 numerator = slope_ip1_i + slope_ip1_im1 - slope_i_im1
-                # f[u, v] and f[v, u] are equal bit for bit, because they differ only by negations, which are exact,
-                # so Method 1's denominator reuses the 3 divided differences of the numerator.
+                # Method 1's denominator reuses the 3 divided differences of the numerator: f[u, v] and f[v, u] are
+                # equal bit for bit, because they differ only by negations, which are exact.
                 if self.variant is FordVariant.METHOD_1:
                     denominator = slope_ip1_im1 + slope_i_im1 - slope_ip1_i
                 elif self.variant is FordVariant.METHOD_3:
@@ -150,10 +162,10 @@ class Ford(BracketingSolver[FordState]):
                 else:
                     gamma = numerator / denominator
                 if gamma > 0.0:
-                    state.scaled_retained_f = gamma * f_im1
+                    state.scaled_retained_f = gamma * scaled_f_im1
                 else:
-                    # The article's fallback, for a gamma that is not positive, as the class docstring says.
-                    state.scaled_retained_f = 0.5 * f_im1
+                    # This is the article's fallback for a gamma that is not positive, as the class docstring says.
+                    state.scaled_retained_f = 0.5 * scaled_f_im1
             state.newest_x, state.newest_f = x_ip1, f_ip1
 
         # --- the article's equation 5 -----------

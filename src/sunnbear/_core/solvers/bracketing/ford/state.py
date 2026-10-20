@@ -14,13 +14,13 @@ class FordState(SolveState):
 
     Attributes:
         newest_bound: The bound that holds the most recent iterate ``x_i``. Before the first iterate, it is the upper
-            bound, for the reason that the "Starting order" bullet of the `Ford` class docstring gives.
+            bound; the "Starting order" bullet of the `Ford` class docstring gives the reason.
         newest_x: The most recent iterate ``x_i``. The factor ``gamma`` needs it after the next iterate has replaced
             the newest bound, because the interval then no longer holds ``x_i``.
         newest_f: The function value ``f_i`` at the most recent iterate, kept for the same reason.
-        scaled_retained_f: The function value that the secant uses at the retained bound ``x_(i-1)``, which is the
-            bound that does not hold the most recent iterate. It equals that bound's own function value, multiplied by
-            the ``gamma`` of every iteration that kept the bound again.
+        scaled_retained_f: The secant's function value at the retained bound ``x_(i-1)``, which is the bound that
+            does not hold the most recent iterate. It equals that bound's own function value, multiplied by the
+            ``gamma`` of every iteration that kept the bound again.
     """
 
     newest_bound: IntervalBound = field(init=False)

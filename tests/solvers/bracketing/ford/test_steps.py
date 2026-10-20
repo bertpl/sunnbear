@@ -13,8 +13,9 @@ def _quadratic(x: float) -> float:
 
 
 def _cubic_with_a_local_maximum(x: float) -> float:
-    """Return ``x^3 - 2x + 2``, whose root is near -1.77; between the root and 0, f has a local maximum of about 3.09
-    near -0.82, above f(0) = 2, so the first iterate from ``[-3, 0]``, which lands in that range, raises ``|f|``."""
+    """Return ``x^3 - 2x + 2``, whose root is near -1.77. Between the root and 0, f has a local maximum of about 3.09
+    near -0.82, and the first iterate from ``[-3, 0]`` lands where f is above f(0) = 2, so that iterate raises ``|f|``.
+    """
     return x**3 - 2.0 * x + 2.0
 
 
@@ -23,8 +24,8 @@ def test_the_first_2_steps_are_unmodified_regula_falsi_steps(variant):
     """On `_quadratic` over ``[0, 2]``, every variant starts with 2 unmodified steps of the article's equation 3:
 
     - the first from ``s = 2``, the upper bound, and ``r = 0``, which gives 1;
-    - ``f(1) = -1``, so 1 replaced the retained bound 0, and the second step is from ``s = 1`` and ``r = 2``, at its
-      own function value, which gives 4/3.
+    - ``f(1) = -1``, so 1 replaced the retained bound 0, and the second step is from ``s = 1`` and ``r = 2``, with the
+      unscaled ``f(2) = 2``, which gives 4/3.
     """
     # --- act --------------------------
     history = Ford(variant=variant).solve(_quadratic, 0.0, 2.0, xtol=1e-9, max_fevals=60, history_enabled=True).history
@@ -62,8 +63,8 @@ def test_each_method_scales_the_retained_f_by_its_own_gamma(variant, x3):
 
 @pytest.mark.parametrize("variant", FordVariant)
 def test_a_gamma_that_is_not_positive_falls_back_to_0_5(variant):
-    """On `_cubic_with_a_local_maximum` over ``[-3, 0]``, the first iterate raises ``|f|`` above ``f(0)``, so it
-    replaces the upper bound, on the same side of the root, and the second step is modified.
+    """On `_cubic_with_a_local_maximum` over ``[-3, 0]``, the first iterate has a function value above ``f(0) > 0``, so
+    it replaces the upper bound, on the same side of the root, and the second step is modified.
 
     The numerator of ``gamma``, the slope at the first iterate of the quadratic through the 3 x-values, is negative, as
     f's own slope is there, while every method's denominator is positive; so every variant halves ``f(-3)``.
@@ -110,7 +111,7 @@ def test_a_denominator_of_method_1_that_rounds_to_0_takes_the_factor_0_5():
     1.5. The test gives ``x_(i+1)`` a positive function value, so the second step is modified, and chooses that value
     so that Method 1's denominator rounds to exactly 0.
 
-    `Ford` then takes ``gamma = 0.5`` and continues, until the budget of 3 evaluations ends the solve.
+    `Ford` then takes ``gamma = 0.5`` and continues, until the evaluation budget ends the solve.
     """
     # --- arrange ----------------------
     a, b, fa, fb = 0.0, 1.5, -1.0, 3e-16

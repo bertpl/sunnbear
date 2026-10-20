@@ -5,8 +5,7 @@ from sunnbear.solvers import FordVariant
 from tests.solvers.paper_problems import UNSTATED_RUN_DETAILS
 from tests.solvers.paper_problems.ford import FordTable4Problem
 
-# On 6 rows of function 5, over the 3 methods, `Ford` stops 1 iteration before Ford's count; on 5 of them, it reaches
-# f(x) == 0.
+# On most rows of function 5 where `Ford` stops 1 iteration before Ford's count, it reaches f(x) == 0.
 _REACHES_ZERO_ONE_ITERATION_EARLY = "the solve reaches f(x) == 0 one iteration early"
 
 # `TABLE_4_BY_VARIANT` maps each variant to the table's problems, in the table's order, each with the table's iteration
@@ -81,14 +80,14 @@ TABLE_4_BY_VARIANT = {
         FordTable4Problem.F2_I3.with_n_iterations(59),
         FordTable4Problem.F3_I1.with_n_iterations(6),
         FordTable4Problem.F3_I2.with_n_iterations(12),
-        # `with_n_iterations` checks every count, so this row, whose count is not checked, writes Ford's 19 iterations
-        # as an evaluation count itself.
+        # `with_n_iterations` cannot leave a count unchecked, so this row gives Ford's 19 iterations as an evaluation
+        # count, adding the 2 evaluations at the interval bounds.
         FordTable4Problem.F3_I3.with_n_fevals(
             19 + 2,
             deviation=None,
             reason="the cause is unknown",
-            observation="the solve takes 13 iterations, in float64 and in arithmetic of up to 113 bits; Methods 1 and 3 "
-            "reproduce their counts on this problem",
+            observation="the solve takes 13 iterations, in float64 and in arithmetic of up to 113 bits; Methods 1 "
+            "and 3 reproduce their counts on this problem",
         ),
         FordTable4Problem.F4_I1.with_n_iterations(10),
         FordTable4Problem.F4_I2.with_n_iterations(12),

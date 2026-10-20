@@ -1,4 +1,5 @@
-"""These tests assert that every variant of `Ford` converges to a root of the test functions, except at a multiple root."""
+"""These tests assert that every variant of `Ford` converges to a root of the test functions, except at a multiple
+root."""
 
 import pytest
 
