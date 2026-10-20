@@ -1,0 +1,188 @@
+"""`ModAB` implements the modified Anderson-Björck method, which switches between bisection and Anderson-Björck."""
+
+# `ModAB` is ported from C# code under the MIT license, © 2026 Ned Ganchovski; THIRD_PARTY_NOTICES.md holds that code's
+# copyright and license notice.
+
+from sunnbear._core.solvers.core import IntervalBound, Solver, SolveState
+from sunnbear._core.solvers.core.stopping import interval_root_if_converged
+
+# With this factor, the Anderson-Björck steps may fall 4 steps behind bisection before the solve falls back to
+# bisection: 16 = 2^4 (the paper's section 4.2).
+_FALLBACK_THRESHOLD_FACTOR = 16.0
+
+
+class ModAB(Solver):
+    """`ModAB` ports the modified Anderson-Björck method of Ganchovski et al. (2026) from the paper's C# code.
+
+    The method combines bisection with the Anderson-Björck method, the modified regula falsi method of `AndersonBjorck`.
+    `ModAB` keeps the interval bounds ``x1 < x2`` with their function values ``y1`` and ``y2``, and runs in 1 of 2
+    modes, starting with bisection:
+
+    - **bisection:** the new x-value ``x3`` is the midpoint. After evaluating ``y3 = f(x3)``, the method switches to
+      Anderson-Björck mode when the function looks close to a straight line on the interval:
+      ``|ym - y3| < k*(|y3| + |ym|)``, where ``ym = (y1 + y2) / 2`` is the value of the secant at the midpoint,
+      ``k = r^2``, and ``r = 1 - |ym / (y2 - y1)|`` measures how symmetric ``y1`` and ``y2`` are;
+    - **Anderson-Björck:** ``x3`` is the zero of the secant, ``(x1*y2 - y1*x2) / (y2 - y1)``.
+
+    ``x3`` replaces the bound whose function value has the sign of ``y3``.
+
+    In Anderson-Björck mode, when the same bound is retained in 2 iterations in a row, its stored function value is
+    multiplied by the factor of `AndersonBjorck`, ``m = 1 - y3 / y_moved``, where ``y_moved`` is the function value at
+    the replaced bound; where ``m`` is not positive, the factor is 0.5.
+
+    The switch to Anderson-Björck mode sets the threshold to `_FALLBACK_THRESHOLD_FACTOR` times the interval width,
+    and every Anderson-Björck step halves the threshold; once the interval is wider than the threshold, the method falls
+    back to bisection.
+
+    The solve checks the shared stopping criterion at the 2 points of each iteration where the C# code checks its own:
+
+    - after computing ``x3`` and before evaluating it, the solve ends once the interval is at most ``2*xtol`` wide, and
+      returns the interval's midpoint, which then lies within ``xtol`` of a root;
+    - after evaluating ``x3``, the solve ends once ``y3 = 0``, and returns ``x3``.
+
+    `ModAB` follows the C# code where the paper's Algorithm 1 differs from it or leaves a detail out, and departs from
+    the C# code in its stopping criterion and its iteration limit:
+
+    - **Stopping criterion:** before evaluating ``x3``, the C# code ends the solve once the interval is at most
+      ``aTol + rTol*|x3|`` wide, for an absolute tolerance ``aTol`` and a relative tolerance ``rTol``, and returns
+      ``x3``, not the interval's midpoint.
+    - **Clamping:** Algorithm 1 evaluates the secant's zero and then clamps it into the interval. The C# code clamps
+      first: a secant's zero that rounding puts on or outside a bound is replaced by that bound and its stored function
+      value, so nothing is evaluated. In Anderson-Björck mode, such an iteration only halves the stored function value
+      at the other bound, or marks the other bound as retained.
+    - **The first threshold:** the paper's section 4.2 sets the threshold at the switch to
+      `_FALLBACK_THRESHOLD_FACTOR` times the interval width. Only the C# code shows that this width is measured
+      before ``x3`` replaces a bound, where ``x3`` is the x-value whose evaluation triggers the switch.
+    - **Scaled function values:** Anderson-Björck mode's scaled function values stay stored after a fallback to
+      bisection, and the next bisection steps read them when they test whether the function looks close to a straight
+      line.
+    - **No iteration limit:** the C# code stops after 200 iterations and then returns no x-value; `ModAB` leaves the
+      limit out, so the evaluation budget ends a long solve, as for every solver.
+
+    The method's first version (Ganchovski and Traykov, 2023) is a different algorithm, which the 2026 paper replaces;
+    `ModAB` implements only the 2026 version. The first version differs in 3 ways:
+
+    - it fixes ``k = 0.25``;
+    - it falls back to bisection after a fixed number of iterations;
+    - it stops once 2 successive x-values lie within the tolerance.
+
+    Tomov and Ganchovski (2026) correct 2 defects of the C# code and replace its fallback rule; `ModABSafeguarded`
+    implements their method.
+
+    In a clamped iteration, `ModAB` evaluates nothing, so it writes its own loop, not `BracketingSolver`'s.
+
+    References:
+        - Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L. and Traykov, A. (2026). Improvements to the modified
+          Anderson-Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. Its Table A1 holds the C# code that
+          `ModAB` ports, and the test suite reproduces its Tables 1 and 2. https://doi.org/10.3390/a19050332
+        - Ganchovski, N. and Traykov, A. (2023). Modified Anderson-Björck's method for solving non-linear equations in
+          structural mechanics. IOP Conference Series: Materials Science and Engineering 1276, 012010. It
+          describes the method's first version. https://doi.org/10.1088/1757-899X/1276/1/012010
+        - The authors' repository, https://github.com/Proektsoft-EOOD/ModAB-Root-Finding, which holds the C# code of
+          the 2026 paper's supplementary material, and later versions of the method in several languages.
+        - pymodab, https://pypi.org/project/pymodab/, a Python wrapper of the authors' compiled C library.
+    """
+
+    name = "modab"
+    version = 3
+
+    def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the authors' C# code
+        """Run the loop of the paper's C# code, and return the root estimate of `_root_if_converged` or ``x3``.
+
+        The variables keep the names of the C# code, except for those listed below; the C# code also groups ``x1``
+        and ``y1`` into the point ``p1``, and likewise ``p2`` and ``p3``.
+
+        - ``(x_new, y_new)`` is the point that replaces a bound: ``(x3, y3)``, or, when ``x3`` is clamped onto a
+          bound, that bound with its stored function value;
+        - ``retained_bound`` is the bound that was retained in the last Anderson-Björck step, ``None`` before the first;
+          the C# code stores it as the integer ``side``, although the comment on ``side`` calls it the side that moved
+          last;
+        - ``is_bisecting`` is the mode, ``bisection`` in the C# code.
+
+        Each iteration:
+
+        - computes ``x3``, and ends the solve once `_root_if_converged` returns a root estimate, where the C# code
+          tests the interval's width;
+        - evaluates ``x3``, unless it is clamped, and in bisection mode tests whether to switch;
+        - ends the solve if ``y_new = 0``, and returns ``x3``;
+        - replaces a bound by ``(x_new, y_new)``, scaling the retained bound's function value in Anderson-Björck mode;
+        - falls back to bisection if the interval is wider than the threshold.
+        """
+        interval = state.interval
+        x1, y1, x2, y2 = interval.a, interval.fa, interval.b, interval.fb
+        xtol_doubled = 2.0 * state.xtol
+        is_bisecting = True
+        retained_bound: IntervalBound | None = None
+        threshold = x2 - x1
+        while True:
+            # --- the new x-value x3 -------------
+            if is_bisecting:
+                x3 = 0.5 * (x1 + x2)
+            else:
+                x3 = (x1 * y2 - y1 * x2) / (y2 - y1)
+            # The criterion reads the stored values y1 and y2, not f(x1) and f(x2). A stored value is 0 only where
+            # scaling a subnormal function value underflows to 0; the solve then ends at that bound.
+            x_root = self._root_if_converged(x1, y1, x2, y2, x3, xtol_doubled)
+            if x_root is not None:
+                return x_root
+
+            # --- the evaluation at x3 -----------
+            if is_bisecting:
+                y3 = state.f(x3)
+                state.x_best = x3
+                x_new, y_new = x3, y3
+                ym = 0.5 * (y1 + y2)
+                r = 1.0 - abs(ym / (y2 - y1))
+                k = r * r
+                if abs(ym - y3) < k * (abs(y3) + abs(ym)):
+                    # The function is close enough to a straight line: switch to Anderson-Björck mode.
+                    is_bisecting = False
+                    threshold = (x2 - x1) * _FALLBACK_THRESHOLD_FACTOR
+            else:
+                if x3 <= x1:
+                    x_new, y_new = x1, y1
+                elif x3 >= x2:
+                    x_new, y_new = x2, y2
+                else:
+                    y3 = state.f(x3)
+                    state.x_best = x3
+                    x_new, y_new = x3, y3
+                threshold = threshold * 0.5
+            # A 0 at x3 meets the shared stopping criterion, because x3 then replaces a bound. In a clamped iteration,
+            # y_new is a stored value, which the check above found not to be 0.
+            if y_new == 0.0:
+                return x3
+
+            # --- the new interval ---------------
+            # The C# code compares Math.Sign(y_new) with Math.Sign(y1); the test below gives the same result because
+            # y_new is not 0 here.
+            if (y_new > 0.0 and y1 > 0.0) or (y_new < 0.0 and y1 < 0.0):
+                if retained_bound is IntervalBound.UPPER:
+                    m = 1.0 - y_new / y1
+                    y2 = y2 * (0.5 if m <= 0.0 else m)
+                elif not is_bisecting:
+                    retained_bound = IntervalBound.UPPER
+                x1, y1 = x_new, y_new
+            else:
+                if retained_bound is IntervalBound.LOWER:
+                    m = 1.0 - y_new / y2
+                    y1 = y1 * (0.5 if m <= 0.0 else m)
+                elif not is_bisecting:
+                    retained_bound = IntervalBound.LOWER
+                x2, y2 = x_new, y_new
+            if x2 - x1 > threshold:
+                # The Anderson-Björck steps shrink the interval too slowly: fall back to bisection.
+                is_bisecting = True
+                retained_bound = None
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _root_if_converged(x1: float, y1: float, x2: float, y2: float, x3: float, xtol_doubled: float) -> float | None:
+        """Return the root estimate if the solve ends before evaluating ``x3``, or ``None`` if it continues.
+
+        ``x3`` is not used. The test suite overrides this method to apply the C# code's own stopping criterion, the
+        interval at most ``aTol + rTol*|x3|`` wide, where it reproduces the paper's published counts.
+        """
+        return interval_root_if_converged(x1, y1, x2, y2, xtol_doubled)

@@ -37,7 +37,7 @@ Due to the goals of section I.a and the challenges of section I.b, we...
 
 ## II. Solvers Overview
 
-The `sunnbear` package implements **14 solver algorithms**, several provided in different flavors and settings, totaling **20 solver configurations**.
+The `sunnbear` package implements **15 solver algorithms**, several provided in different flavors and settings, totaling **20 solver configurations**.
 
 | Algorithm | Type | Configs | core config? | Year | Reference |
 | --------- | ---- | ------- | ------------ | ---- | --------- |
@@ -54,7 +54,8 @@ The `sunnbear` package implements **14 solver algorithms**, several provided in 
 | `ITP` | bracketing | 3 | ✓ | 2020 | Oliveira and Takahashi (2020) |
 | `SteffenBrent` | bracketing | 1 | | 2025 | Steffen et al. (2025) |
 | `CARF` | bracketing | 1 | | 2026 | Gao (2026) |
-| `ModAB` | bracketing | 2 | | 2026 | Ganchovski et al. (2026); Tomov and Ganchovski (2026) |
+| `ModAB` | bracketing | 1 | | 2026 | Ganchovski et al. (2026) |
+| `ModABSafeguarded` | bracketing | 1 | | 2026 | Tomov and Ganchovski (2026) |
 
 The `core config?` column marks the algorithms that have a core config, which characterizes the test problems (section V).
 
@@ -176,8 +177,8 @@ Only a secondary config may deviate from section IV.
 | `ITP` | `itp[n_slack=0,variant='paper_experiments']` | core | the projection radius of the authors' code, `n_slack = 0` | yes |
 | | `itp[n_slack=0,variant='paper_pseudocode']` | secondary | the projection radius of the article's pseudocode, `n_slack = 0` | yes |
 | | `itp[n_slack=4,variant='paper_experiments']` | secondary | the projection radius of the authors' code, `n_slack = 4` | yes |
-| `ModAB` | `modab[variant='algorithms_2026']` | secondary | the method of Ganchovski et al. (2026) | yes |
-| | `modab[variant='safeguarded_2026']` | secondary | the corrected method of Tomov and Ganchovski (2026) | yes |
+| `ModAB` | `modab` | secondary | the method of Ganchovski et al. (2026) | yes |
+| `ModABSafeguarded` | `modab_safeguarded` | secondary | the corrected method of Tomov and Ganchovski (2026) | yes |
 
 ### V.a. Ridders
 
@@ -201,13 +202,13 @@ The 3 configs follow section IV, and differ in 2 settings: the projection radius
 - **`itp[n_slack=0,variant='paper_pseudocode']` (secondary):** the article's pseudocode as printed, without that margin; this config reproduces 17 of the 24 counts. This config shows the effect of the margin: without it, rounding makes more solves exceed the iteration bound of `ITP`.
 - **`itp[n_slack=4,variant='paper_experiments']` (secondary):** the core config with `n_slack = 4`: about 10 % slack on the 40 evaluations of bisection at `n_bisection_fevals = 40`, the largest value that the benchmark uses. No source states a value; 4 is meant as a neutral value larger than 1, to show how extra slack changes the evaluation counts, and that rounding can still make a solve exceed the iteration bound of `ITP` by 1 iteration.
 
-### V.d. ModAB
+### V.d. ModAB and ModABSafeguarded
 
 Tomov and Ganchovski (2026) correct 2 defects in the code of Ganchovski et al. (2026), and replace its fallback to bisection by an adaptive rule.
 
 Both configs follow section IV, and both are secondary: neither method is established yet (published 2026), and the evidence for each so far comes from its authors' own benchmarks.
-- **`modab[variant='algorithms_2026']` (secondary):** the method as Ganchovski et al. (2026) publish it, ported from the C# code in their article.
-- **`modab[variant='safeguarded_2026']` (secondary):** the corrected method of Tomov and Ganchovski (2026), ported from the authors' C# code. It differs from the method of Ganchovski et al. (2026) in 4 ways, of which the first 2 correct the 2 defects:
+- **`modab` (secondary):** the method as Ganchovski et al. (2026) publish it, ported from the C# code in their article.
+- **`modab_safeguarded` (secondary):** the corrected method of Tomov and Ganchovski (2026), ported from the authors' C# code. It differs from the method of Ganchovski et al. (2026) in 4 ways, of which the first 2 correct the 2 defects:
   - it keeps the true function values apart from the scaled values of its Anderson–Björck steps, so a scaled value never replaces a true one;
   - it starts each phase of Anderson–Björck steps from the true function values, without scaling a value in its first step;
   - it sets the fallback threshold at a switch to 2 times the interval width after the new x-value replaces a bound, not 16 times the width before;

@@ -1,5 +1,5 @@
-"""This module holds the published results of `ModAB` on the problems of its authors' C# benchmark, and on 1 problem
-of Tomov and Ganchovski (2026):
+"""This module holds the published results of `ModAB` and `ModABSafeguarded` on the problems of their authors' C#
+benchmark, and on 1 problem of Tomov and Ganchovski (2026):
 
 - `TABLE_2`, the problems of Table 2 of Ganchovski et al. (2026), with modAB's evaluation count in that table and its
   root in the paper's supplementary results;

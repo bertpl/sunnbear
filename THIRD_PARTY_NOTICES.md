@@ -4,10 +4,10 @@ sunnbear is licensed under the Apache License 2.0 (see `LICENSE`). Parts of it d
 
 ## ModAB-Root-Finding
 
-- **Used in:** `src/sunnbear/_core/solvers/bracketing/modab/solver.py`. Both variants of `ModAB` are ported from this C# code.
+- **Used in:** the package `src/sunnbear/_core/solvers/bracketing/modab/`. Its classes `ModAB` and `ModABSafeguarded` are ported from this C# code.
 - **Source:** https://github.com/Proektsoft-EOOD/ModAB-Root-Finding, at commit `0d6efd59e5dcb34b7bccf90e1d4a9eee6d486e70`:
-  - `"algorithms_2026"` from `MDPI-Algorithms-Data/CSharp code/Numerical/Solvers/ModAB.cs`, the code of Table A1 of Ganchovski et al. (2026), https://doi.org/10.3390/a19050332;
-  - `"safeguarded_2026"` from `MDPI-Algorithms-Data-2/Root/Solvers/SgModAB.cs`, with the secant `SafeSecant` of `MDPI-Algorithms-Data-2/Root/Node.cs`.
+  - `ModAB` from `MDPI-Algorithms-Data/CSharp code/Numerical/Solvers/ModAB.cs`, the code of Table A1 of Ganchovski et al. (2026), https://doi.org/10.3390/a19050332;
+  - `ModABSafeguarded` from `MDPI-Algorithms-Data-2/Root/Solvers/SgModAB.cs`, with the secant `SafeSecant` of `MDPI-Algorithms-Data-2/Root/Node.cs`.
 - **License:** MIT, the same text in both folders:
 
 ```text

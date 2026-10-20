@@ -9,12 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add the safeguarded variant of `ModAB`, from Tomov and Ganchovski (2026)
+- Add the safeguarded modAB method of Tomov and Ganchovski (2026), `sunnbear.solvers.ModABSafeguarded`
 
 ### Changed
 
 - Move `solver_cls` from `SolverConfigsDeclaration` to each `SolverConfig`, so that 1 declaration can declare the configs of several solver classes
-- Rename the config `modab` to `modab[variant='algorithms_2026']`, and add a required `variant` argument to `ModAB`
 
 ### Deprecated
 
