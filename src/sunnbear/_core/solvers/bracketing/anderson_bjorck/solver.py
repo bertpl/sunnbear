@@ -101,6 +101,8 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
           - its equation 5, with ``gamma = f[x_(i+1), x_i] / f[x_i, x_(i-1)]`` from its Table 1, is the
             Anderson-Björck step, with ``gamma = 0.5`` as its fallback;
           - its Table 4 shows the slow progress on large intervals; the test suite reproduces that table.
+
+          https://scientiairanica.sharif.edu/article_21758.html
         - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="anderson"``; the test suite checks
           `AndersonBjorck` against mpmath's ``Illinois``.
     """

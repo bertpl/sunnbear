@@ -61,6 +61,7 @@ class Pegasus(BracketingSolver[PegasusState]):
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
           Iranica 4(1&2), 28-34. The paper's equation 5, with ``gamma = f_i / (f_i + f_(i+1))`` from the paper's
           Table 1, is the Pegasus step, and the test suite reproduces the paper's Table 4.
+          https://scientiairanica.sharif.edu/article_21758.html
         - mpmath's ``mpmath.calculus.optimization.Illinois``, with ``method="pegasus"``; the test suite checks
           `Pegasus` against mpmath's ``Illinois``.
         - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of an

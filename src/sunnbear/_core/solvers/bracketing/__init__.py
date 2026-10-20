@@ -16,6 +16,7 @@ from .bisection import Bisection
 from .brent import Brent
 from .carf import CARF
 from .chandrupatla import Chandrupatla
+from .ford import Ford, FordVariant
 from .illinois import Illinois
 from .itp import ITP, ITPVariant
 from .modab import ModAB, ModABSafeguarded
