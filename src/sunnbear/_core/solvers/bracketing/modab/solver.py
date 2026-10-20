@@ -1,5 +1,8 @@
 """`ModAB` implements the modified Anderson-Björck method, which switches between bisection and Anderson-Björck."""
 
+# Both variants are ported from C# code under the MIT license, © 2026 Ned Ganchovski; THIRD_PARTY_NOTICES.md holds
+# that code's copyright and license notice.
+
 import math
 
 from sunnbear._core.solvers.core import IntervalBound, Solver, SolveState
