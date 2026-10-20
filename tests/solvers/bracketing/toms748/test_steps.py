@@ -125,7 +125,9 @@ def test_ipzero_is_exact_where_the_inverse_function_is_a_cubic():
         pytest.param(0.0, 2.5e-6, 0.5e-6, 2e-6, 1.25e-6, (0.0, 1.25e-6, 2.5e-6), id="narrow_interval"),
     ],
 )
-def test_the_margin_of_bracket_keeps_c_2_delta_inside_the_interval(a, b, root, c, expected_x, expected_a_bar_b_bar_d):
+def test_the_margin_of_bracket_keeps_c_at_least_2_delta_inside_the_interval(
+    a, b, root, c, expected_x, expected_a_bar_b_bar_d
+):
     """On ``f(x) = x - root``, ``bracket`` evaluates ``c`` where it lies at least ``2*delta`` inside ``[a, b]``, moves
     it to ``2*delta`` from a bound that it lies closer to, and takes the midpoint on an interval at most ``4*delta``
     wide, with ``delta = lambda*tole(a, b)``; ``bracket`` returns the part of ``[a, b]`` that holds the sign change,

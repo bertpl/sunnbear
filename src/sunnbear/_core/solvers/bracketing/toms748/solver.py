@@ -17,7 +17,8 @@ class TOMS748(Solver):
     x-values outside it.
 
     The subroutine ``bracket`` keeps the part of the interval that holds the sign change and drops the other bound:
-    ``d_n`` is the bound that its last call dropped, and ``e_n`` the bound that the call before that dropped.
+    ``d_n`` is the bound that the last call of ``bracket`` dropped, and ``e_n`` the bound that the call before that
+    dropped.
 
     The iteration takes these steps, numbered as in Algorithm 4.1:
 
@@ -35,14 +36,14 @@ class TOMS748(Solver):
 
     Algorithm 4.2 repeats the interpolation step once, in its steps 4.2.5 and 4.2.6, on the interval that the first
     interpolation step leaves; where the repeated step falls back to ``Newton-Quadratic``, it takes 3 Newton steps in
-    place of 2. Before the first iteration, at ``n = 2``, step 4.1.1 takes a secant step from ``a_1``.
+    place of 2. Before the first iteration, which is ``n = 2``, step 4.1.1 takes a secant step from ``a_1``.
 
     Each step passes its x-value ``c`` to ``bracket``, which evaluates ``f`` there. `TOMS748` implements
     ``bracket`` as the paper's section 6 modifies it for the paper's experiments, with a margin and a termination test:
 
-    - **the margin:** ``bracket`` first sets ``delta = lambda*tole(a, b)``, with ``lambda = 0.7`` and
-      ``tole(a, b) = 2*|u|*macheps + tol``, with the paper's absolute tolerance ``tol`` and relative machine precision
-      ``macheps``, where ``u`` is the bound with the smaller ``|f|``. Where the interval is at most ``4*delta`` wide,
+    - **the margin:** ``bracket`` first sets ``delta = lambda*tole(a, b)``, with ``lambda = 0.7``. Here
+      ``tole(a, b) = 2*|u|*macheps + tol``, where ``tol`` is the paper's absolute tolerance, ``macheps`` its relative
+      machine precision, and ``u`` the bound with the smaller ``|f|``. Where the interval is at most ``4*delta`` wide,
       ``c`` becomes the midpoint; elsewhere, ``c`` is moved to at least ``2*delta`` inside the interval;
     - **the termination test:** ``bracket`` ends the solve once ``f(c) = 0``, or once the new interval
       ``[a_bar, b_bar]`` is at most ``2*tole(a_bar, b_bar)`` wide.
@@ -55,16 +56,19 @@ class TOMS748(Solver):
 
     The paper's tolerances take these values in `TOMS748`:
 
-    - ``tol``, the paper's absolute tolerance, is ``xtol``. The paper's termination test then holds once the interval
-      is at most ``2*xtol + 4*|u|*macheps`` wide; the shared stopping criterion drops the term ``4*|u|*macheps`` and
-      holds at ``2*xtol``. The margin ``2*delta`` is then about ``1.4*xtol``, which is ``lambda`` times ``2*xtol``, as
-      the paper's margin is ``lambda`` times the width ``2*tole`` of its termination test. A step that keeps this
-      margin from the bound next to the root therefore leaves an interval narrower than ``2*xtol``, and no step lands
-      on a bound;
+    - ``tol``, the paper's absolute tolerance, is ``xtol``:
+
+      - the paper's termination test then holds once the interval is at most ``2*xtol + 4*|u|*macheps`` wide; the
+        shared stopping criterion drops the term ``4*|u|*macheps`` and holds at ``2*xtol``;
+      - the margin ``2*delta`` is then about ``1.4*xtol``, which is ``lambda`` times ``2*xtol``, as the paper's margin
+        is ``lambda`` times the width ``2*tole`` of its termination test;
+      - where a step lands ``2*delta`` from the bound next to the root, with the root between them, the new interval
+        is ``2*delta`` wide, narrower than ``2*xtol``, so the solve ends; and because the margin is larger than 0, no
+        step lands on a bound;
     - ``macheps``, the paper's relative machine precision, is `FLOAT64_EPS`, 2^-52, the distance from 1.0 to the next
-      larger float64. The paper states the value of its own machine, 1.9073486328e-16, and takes its termination test
-      from Brent's method, for which `Brent` takes ``macheps`` as 2^-52 too. ``macheps`` enters only the margin of
-      ``bracket``, not the stopping criterion.
+      larger float64. The paper states the machine precision of its own computer, 1.9073486328e-16, and takes its
+      termination test from Brent's method, for which `Brent` takes ``macheps`` as 2^-52 too. ``macheps`` enters only
+      the margin of ``bracket``, not the stopping criterion.
 
     `TOMS748` departs from the paper in these places:
 
@@ -103,11 +107,14 @@ class TOMS748(Solver):
 
     - The divided difference ``f[a, b]`` underflows to 0 where ``|f(b) - f(a)|`` is tiny next to ``b - a``; a step that
       divides by it then raises a ``ZeroDivisionError``, which `Solver.solve` records as ``SOLVER_ERROR``.
-    - Where ``xtol`` lies below half the float spacing near the root, the shared stopping criterion never holds. Once
-      the interval is 1 float spacing wide, the midpoint that ``bracket`` takes rounds onto a bound, which ``bracket``
-      returns both as an interval bound and as ``d``. ``Newton-Quadratic`` then divides by ``d - a = 0`` or
-      ``d - b = 0``, and the solve ends as ``SOLVER_ERROR``. With the machine-precision term, the paper's termination
-      test ends the solve before the division by 0; the benchmark never sets such an ``xtol``.
+    - Where ``xtol`` lies below half the float spacing near the root, the shared stopping criterion never holds.
+
+      Once the interval is 1 float spacing wide, the midpoint that ``bracket`` takes rounds onto a bound, which
+      ``bracket`` returns both as an interval bound and as ``d``. ``Newton-Quadratic`` then divides by ``d - a = 0``
+      or ``d - b = 0``, and the solve ends as ``SOLVER_ERROR``.
+
+      With the machine-precision term, the paper's termination test ends the solve before the division by 0; the
+      benchmark never sets such an ``xtol``.
 
     `TOMS748` keeps x-values besides the interval bounds, so it writes its own loop, not `BracketingSolver`'s.
 
@@ -178,20 +185,15 @@ class TOMS748(Solver):
                 if c <= a or c >= b:
                     c = self.newton_quadratic(a, fa, b, fb, d, fd, 2)
 
-            if self.k == 1:
-                # --- 4.1.4 ----------------------
-                a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar = self.bracket(state, a, fa, b, fb, c)
-                x_root = self._root_if_converged(state, a_bar, fa_bar, b_bar, fb_bar, xtol_doubled)
-                if x_root is not None:
-                    return x_root
-            else:
-                # --- 4.2.4 ----------------------
-                e_bar, fe_bar = d, fd
-                a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar = self.bracket(state, a, fa, b, fb, c)
-                x_root = self._root_if_converged(state, a_bar, fa_bar, b_bar, fb_bar, xtol_doubled)
-                if x_root is not None:
-                    return x_root
+            # --- 4.1.4 / 4.2.4 ------------------
+            # e_bar is read only by step 4.2.5.
+            e_bar, fe_bar = d, fd
+            a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar = self.bracket(state, a, fa, b, fb, c)
+            x_root = self._root_if_converged(state, a_bar, fa_bar, b_bar, fb_bar, xtol_doubled)
+            if x_root is not None:
+                return x_root
 
+            if self.k == 2:
                 # --- 4.2.5 ----------------------
                 if self._has_equal_values(fa_bar, fb_bar, fd_bar, fe_bar):
                     c_bar = self.newton_quadratic(a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar, 3)

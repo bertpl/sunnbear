@@ -139,7 +139,7 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 | `Pegasus` | none; experiments: `\|f\|` below a threshold | not stated | – |
 | `AndersonBjorck` | `\|x1 - x0\| < δ`, or `f = 0` | the bound with the smaller `\|f\|` | step of `δ`, with `δ = xtol` |
 | `Ridders` | none | not stated | – |
-| `TOMS748` | width ≤ `2*tole`, or `f(c) = 0`, with `tole = 2*\|u\|*macheps + tol` | not stated | every new x-value kept `2*delta` inside the interval, with `delta = 0.7*tole` and `tol = xtol` |
+| `TOMS748` | width ≤ `2*tole`, or `f(c) = 0` at the new x-value `c`, with `tole = 2*\|u\|*macheps + tol` and `u` the bound with the smaller `\|f\|` | not stated | every new x-value kept `2*delta` inside the interval, with `delta = 0.7*tole` and `tol = xtol` |
 | `Chandrupatla` | half-width < `TOL`, or `f = 0`, with `TOL = 2*ε_R*\|x\| + 0.5*ε_A` | the bound with the smaller `\|f\|` | distance `TOL` from the interval bounds, with `ε_A = 2*xtol` and `ε_R = 0` |
 | `Ford` | `\|f\| < ε`, or width < `0.95*ε`, with `ε = τ + 2^-53*max(\|a\|, \|b\|, 1)` | not stated | – |
 | `ITP` | width ≤ `2ε` | the midpoint | projection radius, which bounds how far each step may lie from the midpoint, with `ε = xtol` |

@@ -26,8 +26,8 @@ _TABLE_II_TOTALS = {
     2: {1e-7: 2650, 1e-10: 2786, 1e-15: 2859, 0.0: 2884},
 }
 
-# Each k has its own relative tolerance on the totals of Table II: the next tenth of a percent above the largest
-# deviation of the totals on macOS, plus 0.1 % for the problems whose count a platform's math library can shift by 1.
+# Each k has its own relative tolerance on the totals of Table II: the largest deviation of its totals on macOS,
+# rounded up to the next 0.1 %, plus 0.1 % for the problems whose count can differ by 1 between math libraries.
 _TABLE_II_REL_TOL = {1: 0.012, 2: 0.004}
 
 
@@ -71,7 +71,7 @@ def test_the_solve_of_problem_26_ends_where_its_function_is_0(k: int):
 )
 def test_the_totals_of_table_ii_are_reproduced_within_the_tolerance_of_k(k: int, tol: float, paper_total: int):
     """Over all 154 problems, the total evaluation count of each algorithm, at each of the paper's tolerances, lies
-    within the relative tolerance of its ``k`` of the paper's Table II.
+    within the relative tolerance for its ``k`` of the total in the paper's Table II.
 
     The totals include the 2 evaluations at the interval bounds of each problem, as the counts of Tables IV to VI do.
     They lie below the paper's for a cause not known; the docstring of this test package discusses the difference.

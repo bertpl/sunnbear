@@ -17,8 +17,9 @@ Published results:
 Allowed deviations:
 
 - Problem ``26[n=1]``, the paper's problem 13: its function is 0 on the interval around its root 0 where
-  ``exp(1 / x^2)`` overflows, and the solve ends at the first x-value of that interval that it evaluates. That x-value
-  differs from the root of the authors' test output, so the test checks that the function is 0 there;
+  ``exp(1 / x^2)`` overflows, and the solve ends at the first x-value of that interval that it evaluates.
+
+  That x-value differs from the root of the authors' test output, so the test checks that the function is 0 there;
   ``paper_problems.py`` states why its counts in Tables IV to VI are not checked.
 - The totals of Table II all lie below the paper's, for a cause not known; the paper's machine precision, in place
   of 2^-52, does not explain the difference.
@@ -33,11 +34,12 @@ Published results not used:
 
 Third-party published results:
 
-- None compared.
+- None: Gao (2026), Table 3, prints the totals of Algorithm 4.2 from the paper's Table II, not results of a run of
+  its own.
 
 Reference implementations:
 
-- None: `TOMS748` implements the paper's text, and the tests validate it against the paper's published results and the
-  authors' published test output. SciPy's ``scipy.optimize.toms748`` keeps no margin from the interval bounds, and uses
-  its own fallbacks and stopping rule.
+- None. The authors' Fortran 77 code (https://www.netlib.org/toms/748) implements only Algorithm 4.2, and the tests
+  use its published test output instead of running it. SciPy's ``scipy.optimize.toms748`` keeps no margin from the
+  interval bounds, and uses its own fallbacks and stopping rule.
 """
