@@ -143,6 +143,7 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 | `SteffenBrent` | width ≤ `tol1`, or `\|f(b)\|` ≤ `tol2` | `b` | – |
 | `CARF` | `\|f\| < ε1`, or width < `ε2 + \|t\|*ε1` | not stated | – |
 | `ModAB` | width ≤ `aTol + rTol*\|x3\|`, or `f = 0` | the next iterate, not evaluated | – (it clamps each new iterate into the interval, without a tolerance) |
+| `ModABSafeguarded` | width ≤ `aTol + rTol*\|x3\|`, or `f = 0` | the next iterate, not evaluated | – (it projects each new iterate into the interval, without a tolerance) |
 
 `Bisection` and `RegulaFalsi` have no reference; they follow the shared stopping criterion and return value as they are.
 
@@ -204,15 +205,17 @@ The 3 configs follow section IV, and differ in 2 settings: the projection radius
 
 ### V.d. ModAB and ModABSafeguarded
 
+Both methods start with bisection steps, switch to Anderson–Björck steps once the function is close to a straight line, and fall back to bisection when an Anderson–Björck step leaves the interval wider than a fallback threshold, which the switch sets and each Anderson–Björck step halves. A phase is the sequence of Anderson–Björck steps from a switch to the next fallback.
+
 Tomov and Ganchovski (2026) correct 2 defects in the code of Ganchovski et al. (2026), and replace its fallback to bisection by an adaptive rule.
 
 Both configs follow section IV, and both are secondary: neither method is established yet (published 2026), and the evidence for each so far comes from its authors' own benchmarks.
 - **`modab` (secondary):** the method as Ganchovski et al. (2026) publish it, ported from the C# code in their article.
-- **`modab_safeguarded` (secondary):** the corrected method of Tomov and Ganchovski (2026), ported from the authors' C# code. It differs from the method of Ganchovski et al. (2026) in 4 ways, of which the first 2 correct the 2 defects:
+- **`modab_safeguarded` (secondary):** the corrected method of Tomov and Ganchovski (2026), ported from the authors' C# code. The corrected method differs from the method of Ganchovski et al. (2026) in 4 ways; the 2 ways that concern the true function values correct the 2 defects:
   - it keeps the true function values apart from the scaled values of its Anderson–Björck steps, so a scaled value never replaces a true one;
   - it starts each phase of Anderson–Björck steps from the true function values, without scaling a value in its first step;
-  - it sets the fallback threshold at a switch to 2 times the interval width after the new x-value replaces a bound, not 16 times the width before;
-  - it allows up to 3 Anderson–Björck steps in a row that shrink the interval too slowly, as long as each one brings the magnitude of the function value at its new x-value below half the smaller magnitude of the function values at the interval bounds before the step.
+  - when it switches to Anderson–Björck steps, it sets the fallback threshold to 2 times the interval width after the new x-value replaces a bound, not 16 times the width before;
+  - it allows up to 3 Anderson–Björck steps in a row that leave the interval wider than the fallback threshold, as long as each one brings the magnitude of the function value at its new x-value below half the smaller magnitude of the function values at the interval bounds before the step.
 
 ## VI. Code Organization & Validation
 
