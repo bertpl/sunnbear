@@ -18,7 +18,9 @@ class PaperProblem:
 
     Where a paper prints a count in another form, such as iterations that exclude the 2 evaluations at the interval
     bounds, the code that defines the problem converts it to an evaluation count, and writes the conversion out so
-    that the printed number stays visible, for example ``n_fevals=n_iterations + 2``.
+    that the printed number stays visible, for example ``n_fevals=n_iterations + 2``. Where the solver's iterations
+    evaluate the function a varying number of times, an iteration count does not convert, and the problem holds it in
+    ``n_iterations``; the solver's tests then count the solve's iterations themselves.
 
     Attributes:
         name: The paper's label for the problem; also its pytest id.
@@ -31,6 +33,8 @@ class PaperProblem:
         n_fevals_strict_lower_bound: A strict lower bound on the solve's evaluation count, in sunnbear's counting,
             where the paper prints only a lower bound, such as "200+"; None otherwise. At most 1 of ``n_fevals`` and
             ``n_fevals_strict_lower_bound`` is set.
+        n_iterations: The published iteration count, where it does not convert to an evaluation count, as above;
+            None otherwise.
         n_fevals_tol: How far the solve's evaluation count may lie from ``n_fevals``; None when the solve's
             evaluation count is not checked.
         deviation_reason: Why the solve's evaluation count does not reproduce ``n_fevals`` exactly; required whenever
@@ -48,6 +52,7 @@ class PaperProblem:
     root_abs_tol: float = 0.0
     n_fevals: int | None = None
     n_fevals_strict_lower_bound: int | None = None
+    n_iterations: int | None = None
     n_fevals_tol: int | None = 0
     deviation_reason: str | None = None
     deviation_observation: str | None = None

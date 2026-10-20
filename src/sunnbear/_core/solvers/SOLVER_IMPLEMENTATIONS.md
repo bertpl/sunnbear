@@ -18,12 +18,12 @@ A **core principle of the scientific approach is reproducibility** of results.  
 
 Some domains have inherent challenges in this area (e.g., non-exact sciences or studies that involve exceptionally expensive equipment), but numerical algorithms and especially **root-finding algorithms seem well-suited**: digitally shareable, self-contained algorithms that can run on essentially any off-the-shelf computer.
 
-However, reproducing results can be challenging.  **Out of the 13 references** in section II...
+However, reproducing results can be challenging.  **Out of the 14 references** in section II...
 - **6** publish no code of the method, neither in the article nor as a separate download
-- **3** give evaluation counts for fewer than 10 runs of the method
-- **6** contain apparent typos in the algorithm description
+- **4** give evaluation counts for fewer than 10 runs of the method
+- **7** contain apparent typos in the algorithm description
 - **2** state that their experiments ran on a machine without IEEE 754 (64-bit) floating point
-- **1** publishes results that reproduce only with a detail that the article leaves out
+- **2** publish results that reproduce only with a detail that the article leaves out
 - **4** print a test problem that does not reproduce their own published results
 
 These counts are a lower bound: an article counts only where the evidence ties a discrepancy to 1 of the causes above, and every discrepancy whose cause we could not establish is left out.
@@ -37,7 +37,7 @@ Due to the goals of section I.a and the challenges of section I.b, we...
 
 ## II. Solvers Overview
 
-The `sunnbear` package implements **16 solver algorithms**, several provided in different flavors and settings, totaling **23 solver configurations**.
+The `sunnbear` package implements **17 solver algorithms**, several provided in different flavors and settings, totaling **27 solver configurations**.
 
 | Algorithm | Type | Configs | core config? | Year | Reference |
 | --------- | ---- | ------- | ------------ | ---- | --------- |
@@ -55,6 +55,7 @@ The `sunnbear` package implements **16 solver algorithms**, several provided in 
 | `ITP` | bracketing | 3 | ✓ | 2020 | Oliveira and Takahashi (2020) |
 | `SteffenBrent` | bracketing | 1 | | 2025 | Steffen et al. (2025) |
 | `CARF` | bracketing | 1 | | 2026 | Gao (2026) |
+| `Ellithy` | bracketing | 4 | | 2026 | Ellithy (2026) |
 | `ModAB` | bracketing | 1 | | 2026 | Ganchovski et al. (2026) |
 | `ModABSafeguarded` | bracketing | 1 | | 2026 | Tomov and Ganchovski (2026) |
 
@@ -95,7 +96,7 @@ Some articles do not state an explicit stopping criterion (Ridders (1979): "The 
 - distance between mid-point and bracket endpoint < xtol
 - bracket width < 2*xtol, or < an absolute plus a relative tolerance (Brent, TOMS748, Chandrupatla, ModAB)
 - step between 2 successive iterates < a tolerance (Dowell and Jarratt's ALGOL procedure for Illinois)
-- |f| below a threshold (Dowell and Jarratt's tables; combined with a width test by Steffen et al., Gao and Ford)
+- |f| below a threshold (Dowell and Jarratt's tables, Ellithy's pseudocode; combined with a width test by Steffen et al., Gao and Ford)
 - variants with some numerical rounding tolerance
 
 The returned x-value differs as well: the midpoint, the bound with the smaller |f|, or an iterate that is never evaluated.
@@ -144,6 +145,7 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 | `ITP` | width ≤ `2ε` | the midpoint | projection radius, which bounds how far each step may lie from the midpoint, with `ε = xtol` |
 | `SteffenBrent` | width ≤ `tol1`, or `\|f(b)\|` ≤ `tol2` | `b` | – |
 | `CARF` | `\|f\| < ε1`, or width < `ε2 + \|t\|*ε1` | not stated | – |
+| `Ellithy` | pseudocode: `\|f\| <= tol` at each new x-value; section 5.2: width and `\|f\|` both below `1e-14` | the x-value that meets the test | the step `δ` of the modified secant, and the guard `ε` against a 0 denominator, at their printed values |
 | `ModAB` | width ≤ `aTol + rTol*\|x3\|`, or `f = 0` | the next iterate, not evaluated | – (it clamps each new iterate into the interval, without a tolerance) |
 | `ModABSafeguarded` | width ≤ `aTol + rTol*\|x3\|`, or `f = 0` | the next iterate, not evaluated | – (it projects each new iterate into the interval, without a tolerance) |
 
@@ -185,6 +187,10 @@ Only a secondary config may deviate from section IV.
 | `Ford` | `ford[variant='method_1']` | secondary | Method 1 of the article | yes |
 | | `ford[variant='method_3']` | secondary | Method 3 of the article | yes |
 | | `ford[variant='method_4']` | secondary | Method 4 of the article | yes |
+| `Ellithy` | `ellithy[variant='bf']` | secondary | Opt.BF: bisection, then false position | yes |
+| | `ellithy[variant='bfms']` | secondary | Opt.BFMS: Opt.BF with a modified secant step | yes |
+| | `ellithy[variant='tf']` | secondary | Opt.TF: trisection, then false position | yes |
+| | `ellithy[variant='tfms']` | secondary | Opt.TFMS: Opt.TF with a modified secant step | yes |
 
 ### V.a. Ridders
 
@@ -235,6 +241,14 @@ The 3 configs follow section IV, and are secondary: the config of `Illinois` alr
 
 Method 2 is left out: the article reports that it behaves very much like the method of `AndersonBjorck`, and drops it from its discussion.
 
+### V.f. Ellithy
+
+Ellithy (2026) builds 4 algorithms from 1 architecture: each iteration takes a bisection or a trisection step, then a false position step, and in 2 of the algorithms a modified secant step, whose derivative estimate is a finite difference with a fixed step `δ`. All 4 configs follow section IV, and all 4 are secondary: the method is not established yet (published 2026), and the evidence for it so far comes from its author's own benchmarks.
+- **`ellithy[variant='bf']` (secondary):** Opt.BF, bisection and false position.
+- **`ellithy[variant='bfms']` (secondary):** Opt.BFMS, Opt.BF with the modified secant step.
+- **`ellithy[variant='tf']` (secondary):** Opt.TF, trisection and false position.
+- **`ellithy[variant='tfms']` (secondary):** Opt.TFMS, Opt.TF with the modified secant step.
+
 ## VI. Code Organization & Validation
 
 ### VI.a. Solver Classes
@@ -263,6 +277,7 @@ The tests compare each solver with the published results and reference implement
 - **Chandrupatla, T. R. (1997)**. A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear function without using derivatives. Advances in Engineering Software 28(3), 145–149. https://doi.org/10.1016/S0965-9978(96)00051-8
 - **Dowell, M. and Jarratt, P. (1971)**. A modified regula falsi method for computing the root of an equation. BIT 11(2), 168–174. https://doi.org/10.1007/BF01934364
 - **Dowell, M. and Jarratt, P. (1972)**. The "Pegasus" method for computing the root of an equation. BIT 12(4), 503–508. https://doi.org/10.1007/BF01932959
+- **Ellithy, A. (2026)**. Four new multi-phase hybrid bracketing algorithms for numerical root finding. Journal of the Egyptian Mathematical Society 34(1), 91–115. https://doi.org/10.21608/joems.2026.440115.1078
 - **Ford, J. A. (1997)**. Improved Illinois-type methods for the solution of nonlinear equations. Scientia Iranica 4(1&2), 28–34. https://scientiairanica.sharif.edu/article_21758.html
 - **Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L. and Traykov, A. (2026)**. Improvements to the modified Anderson-Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. https://doi.org/10.3390/a19050332
 - **Gao, F. (2026)**. Fast and stable root-finding using clipped power interpolations. Applied Mathematics Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928

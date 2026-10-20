@@ -72,6 +72,10 @@ classifiers = [
 [dependency-groups]
 dev = [
     "pre-commit>=4.0",
+    # The tests of `Ellithy` compare it with hybridroots, its authors' package; hybridroots is never a runtime dependency.
+    # It is pure Python, with no dependencies of its own, and its only 2 releases declare support up to 3.12, so 1 line
+    # covers every Python version; 1.0.1 is the version against which the twin declares its deviations.
+    "hybridroots>=1.0.1",
     # some solver tests compare a solver with mpmath's version of that solver, which they run in mpmath's float64 context; mpmath is never a runtime dependency
     "mpmath>=1.3.0",
     "pytest>=8.0",
