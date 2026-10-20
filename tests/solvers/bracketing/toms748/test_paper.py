@@ -16,7 +16,7 @@ from tests.solvers.paper_problems.alefeld_potra_shi import AlefeldPotraShiTables
 
 from .paper_problems import AUTHORS_TEST_OUTPUT, TABLES_IV_TO_VI_BY_K
 
-# Problem 26[n=1], the paper's problem 13, is 0 on the interval around its root 0 where exp(1 / x^2) overflows, so
+# Problem 26[n=1], the paper's problem 13, is 0 on the interval around its root 0 on which exp(1 / x^2) overflows, so
 # any x-value of that interval is a root of the function as computed.
 _ZERO_ON_AN_INTERVAL_PROBLEM_NAME = "26[n=1]"
 
@@ -51,8 +51,8 @@ def test_the_roots_of_the_authors_test_output_are_reproduced(problem: PaperProbl
 def test_the_solve_of_problem_26_ends_where_its_function_is_0(k: int):
     """On problem 26[n=1], both algorithms with ``tol = 0`` end at an x-value where the function is exactly 0.
 
-    The function is 0 on the interval around its root 0 where ``exp(1 / x^2)`` overflows, and the solve ends at the
-    first x-value of that interval that it evaluates, which differs from the x-value of the authors' test output.
+    The solve ends at the first x-value that it evaluates where the function is 0, which differs from the x-value of
+    the authors' test output.
     """
     # --- arrange ----------------------
     (problem,) = [problem for problem in AUTHORS_TEST_OUTPUT if problem.name == _ZERO_ON_AN_INTERVAL_PROBLEM_NAME]
@@ -74,7 +74,6 @@ def test_the_totals_of_table_ii_are_reproduced_within_the_tolerance_of_k(k: int,
     within the relative tolerance for its ``k`` of the total in the paper's Table II.
 
     The totals include the 2 evaluations at the interval bounds of each problem, as the counts of Tables IV to VI do.
-    They lie below the paper's for a cause not known; the docstring of this test package discusses the difference.
     """
     # --- arrange ----------------------
     solver = _TOMS748WithPaperStoppingCriterion(k=k)
@@ -122,20 +121,20 @@ class _TOMS748WithPaperStoppingCriterion(TOMS748):
     ``bracket`` of the paper's section 6."""
 
     def _root_if_converged(
-        self, state: SolveState, a_bar: float, fa_bar: float, b_bar: float, fb_bar: float, xtol_doubled: float
+        self, state: SolveState, a: float, fa: float, b: float, fb: float, xtol_doubled: float
     ) -> float | None:
-        """Return the x-value where ``f`` is 0, or else the midpoint once ``b_bar - a_bar <= 2*tole(a_bar, b_bar)``, or
-        ``None`` if the solve continues.
+        """Return the x-value where ``f`` is 0, or else the midpoint once ``b - a <= 2*tole(a, b)``, or ``None`` if the
+        solve continues.
 
-        The paper terminates at ``c`` where ``f(c) = 0``, and ``bracket`` returns that ``c`` as ``a_bar``. The paper
-        does not state which x-value its termination test returns once the interval is narrow enough; the midpoint is
-        the x-value that the shared stopping criterion returns.
+        The paper terminates at ``c`` where ``f(c) = 0``, and ``bracket`` returns that ``c`` as ``a``. The paper
+        does not state which x-value its termination test returns once the interval is narrow enough; this method
+        returns the midpoint, as the shared stopping criterion does.
         """
-        if fa_bar == 0.0:
-            return a_bar
-        elif fb_bar == 0.0:
-            return b_bar
-        elif b_bar - a_bar <= 2.0 * self.tole(a_bar, fa_bar, b_bar, fb_bar, state.xtol):
-            return 0.5 * (a_bar + b_bar)
+        if fa == 0.0:
+            return a
+        elif fb == 0.0:
+            return b
+        elif b - a <= 2.0 * self.tole(a, fa, b, fb, state.xtol):
+            return 0.5 * (a + b)
         else:
             return None

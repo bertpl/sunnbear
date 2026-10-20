@@ -1,8 +1,8 @@
 """These tests assert that the individual steps of `TOMS748` follow the paper's algorithms and subroutines.
 
 The expected x-values of the first steps on `cubic` are computed in exact rational arithmetic from the x-values and
-function values that the solve evaluated, so each solve's x-value equals its expected one up to the rounding of its
-own arithmetic.
+function values that the solve evaluated, so each x-value that a solve evaluates equals its expected value up to the
+rounding in the solve's own arithmetic.
 """
 
 from fractions import Fraction
@@ -128,10 +128,13 @@ def test_ipzero_is_exact_where_the_inverse_function_is_a_cubic():
 def test_the_margin_of_bracket_keeps_c_at_least_2_delta_inside_the_interval(
     a, b, root, c, expected_x, expected_a_bar_b_bar_d
 ):
-    """On ``f(x) = x - root``, ``bracket`` evaluates ``c`` where it lies at least ``2*delta`` inside ``[a, b]``, moves
-    it to ``2*delta`` from a bound that it lies closer to, and takes the midpoint on an interval at most ``4*delta``
-    wide, with ``delta = lambda*tole(a, b)``; ``bracket`` returns the part of ``[a, b]`` that holds the sign change,
-    and ``d``, the dropped bound."""
+    """On ``f(x) = x - root``, with ``delta = lambda*tole(a, b)``, ``bracket``:
+
+    - evaluates ``c`` where it lies at least ``2*delta`` inside ``[a, b]``;
+    - moves ``c`` to ``2*delta`` from a bound that it lies less than ``2*delta`` from, or beyond;
+    - takes the midpoint on an interval at most ``4*delta`` wide;
+    - returns the part of ``[a, b]`` that holds the sign change, and ``d``, the dropped bound.
+    """
     # --- arrange ----------------------
     f = WrappedFunction(lambda x: x - root, max_fevals=10, history_enabled=True)
     fa, fb = f(a), f(b)
@@ -193,11 +196,11 @@ def test_tole_takes_u_at_the_bound_with_the_smaller_abs_f_and_at_b_on_a_tie(fa, 
         ],
     ],
 )
-def test_has_equal_values_compares_the_4_values_pair_by_pair(values, expected):
+def test_has_2_equal_values_compares_the_4_values_pair_by_pair(values, expected):
     """The test ``prod_(i != j) (f_i - f_j) = 0`` of steps 4.1.3, 4.2.3 and 4.2.5 holds exactly where 2 of the 4 values
     are equal, also where the product of their differences would underflow to 0."""
     # --- act / assert -----------------
-    assert TOMS748._has_equal_values(*values) is expected
+    assert TOMS748._has_2_equal_values(*values) is expected
 
 
 # ==================================================================================================

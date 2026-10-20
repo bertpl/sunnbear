@@ -13,11 +13,11 @@ class TOMS748(Solver):
     ``k`` selects the algorithm: ``k = 1`` is Algorithm 4.1, and ``k = 2`` is Algorithm 4.2. The paper's section 5
     names this ``k`` in its Algorithm 5.7, of which Algorithms 4.1 and 4.2 are the cases ``k = 1`` and ``k = 2``.
 
-    Each iteration ``n`` starts from the interval ``[a_n, b_n]``, where ``f`` changes sign, and from up to 2 earlier
-    x-values outside it.
+    Each iteration ``n``, counted from ``n = 2``, starts from the interval ``[a_n, b_n]``, where ``f`` changes sign,
+    and from up to 2 earlier x-values outside it.
 
     The subroutine ``bracket`` keeps the part of the interval that holds the sign change and drops the other bound:
-    ``d_n`` is the bound that the last call of ``bracket`` dropped, and ``e_n`` the bound that the call before that
+    ``d_n`` is the bound that the last call of ``bracket`` dropped, and ``e_n`` the bound that the second-to-last call
     dropped.
 
     The iteration takes these steps, numbered as in Algorithm 4.1:
@@ -27,16 +27,16 @@ class TOMS748(Solver):
       interpolation through ``a_n``, ``b_n`` and ``d_n`` instead, from the subroutine ``Newton-Quadratic``: at
       ``n = 2``, where 2 of the 4 function values are equal, and where the zero of ``ipzero`` lies outside
       ``(a_n, b_n)``;
-    - **4.1.5 to 4.1.7, a double-length secant step:** on the interval ``[a_bar, b_bar]`` that the interpolation step
-      leaves, ``c_bar = u - 2*f(u) / f[a_bar, b_bar]``, from the bound ``u`` of that interval with the smaller ``|f|``,
+    - **4.1.5 to 4.1.7, a double-length secant step:** on the interval ``[a_bar, b_bar]`` after the interpolation
+      step, ``c_bar = u - 2*f(u) / f[a_bar, b_bar]``, from the bound ``u`` of that interval with the smaller ``|f|``,
       with ``f[a, b] = (f(b) - f(a)) / (b - a)``. Where ``c_bar`` lies more than half the width of ``[a_bar, b_bar]``
       from ``u``, the midpoint of ``[a_bar, b_bar]`` replaces ``c_bar``;
     - **4.1.9, a bisection:** only where the 2 steps above have not reduced the interval to less than ``mu = 0.5``
       times the width of ``[a_n, b_n]``.
 
-    Algorithm 4.2 repeats the interpolation step once, in its steps 4.2.5 and 4.2.6, on the interval that the first
-    interpolation step leaves; where the repeated step falls back to ``Newton-Quadratic``, it takes 3 Newton steps in
-    place of 2. Before the first iteration, which is ``n = 2``, step 4.1.1 takes a secant step from ``a_1``.
+    Algorithm 4.2 repeats the interpolation step once, in its steps 4.2.5 and 4.2.6, on the interval after the first
+    interpolation step; where the repeated step falls back to ``Newton-Quadratic``, it takes 3 Newton steps in place
+    of 2. Before the first iteration, which is ``n = 2``, step 4.1.1 takes a secant step from ``a_1``.
 
     Each step passes its x-value ``c`` to ``bracket``, which evaluates ``f`` there. `TOMS748` implements
     ``bracket`` as the paper's section 6 modifies it for the paper's experiments, with a margin and a termination test:
@@ -44,12 +44,13 @@ class TOMS748(Solver):
     - **the margin:** ``bracket`` first sets ``delta = lambda*tole(a, b)``, with ``lambda = 0.7``. Here
       ``tole(a, b) = 2*|u|*macheps + tol``, where ``tol`` is the paper's absolute tolerance, ``macheps`` its relative
       machine precision, and ``u`` the bound with the smaller ``|f|``. Where the interval is at most ``4*delta`` wide,
-      ``c`` becomes the midpoint; elsewhere, ``c`` is moved to at least ``2*delta`` inside the interval;
+      ``c`` becomes the midpoint; elsewhere, a ``c`` that lies less than ``2*delta`` inside the interval, or outside
+      it, moves to ``2*delta`` from the nearer bound;
     - **the termination test:** ``bracket`` ends the solve once ``f(c) = 0``, or once the new interval
       ``[a_bar, b_bar]`` is at most ``2*tole(a_bar, b_bar)`` wide.
 
     In place of that test, the shared stopping criterion of the bracketing solvers ends the solve once the new interval
-    is at most ``2*xtol`` wide, or once ``f`` is exactly 0 at one of its bounds, which then is ``c``. `TOMS748`
+    is at most ``2*xtol`` wide, or once ``f`` is exactly 0 at one of its bounds; that bound is then ``c``. `TOMS748`
     returns that bound, or else the interval's midpoint, which then lies within ``xtol`` of a root.
 
     Each iteration calls ``bracket`` 2 or 3 times with ``k = 1``, and 3 or 4 times with ``k = 2``.
@@ -66,9 +67,9 @@ class TOMS748(Solver):
         is ``2*delta`` wide, narrower than ``2*xtol``, so the solve ends; and because the margin is larger than 0, no
         step lands on a bound;
     - ``macheps``, the paper's relative machine precision, is `FLOAT64_EPS`, 2^-52, the distance from 1.0 to the next
-      larger float64. The paper states the machine precision of its own computer, 1.9073486328e-16, and takes its
-      termination test from Brent's method, for which `Brent` takes ``macheps`` as 2^-52 too. ``macheps`` enters only
-      the margin of ``bracket``, not the stopping criterion.
+      larger float64. The paper states the machine precision of its own computer, 1.9073486328e-16, but takes its
+      termination test from Brent's method; `TOMS748` therefore takes ``macheps`` as 2^-52, the value that the
+      `Brent` solver takes. ``macheps`` enters only the margin of ``bracket``, not the stopping criterion.
 
     `TOMS748` departs from the paper in these places:
 
@@ -91,14 +92,14 @@ class TOMS748(Solver):
 
     - **The Newton step, the paper's equation (4):** its second line divides ``B(r_(i-1))`` by the derivative of ``P``;
       ``B(r_(i-1))`` is a typo for ``P(r_(i-1))``, the numerator of its first line.
-    - **The case** ``A = 0`` **of** ``Newton-Quadratic``: the statement ``r = a - B^-1 f(a)`` ends the subroutine.
-      The Newton steps that the paper lists after that statement would replace that ``r``, so the statement would
-      otherwise have no effect.
+    - **The case** ``A = 0`` **of** ``Newton-Quadratic``: `TOMS748` reads the statement ``r = a - B^-1 f(a)`` as the
+      end of the subroutine, because the Newton steps that the paper lists after it would replace that ``r``, and
+      the statement would then have no effect.
     - **The inverse notation:** the paper writes a division by a divided difference as a product with its inverse, as
       in ``f[a, b]^-1 f(a)``; `TOMS748` computes it as 1 division, ``f(a) / f[a, b]``.
-    - **The products in** ``ipzero``: each of its quantities ``Q`` and ``D`` is a difference of x-values times a
-      fraction of function values, such as ``Q11 = (c - d)*(f(c) / (f(d) - f(c)))``, computed with the fraction first,
-      as the paper typesets it.
+    - **The products in** ``ipzero``: each of its quantities ``Q11`` to ``Q33`` and ``D21`` to ``D32`` is a
+      difference of x-values times a fraction of function values, such as ``Q11 = (c - d)*(f(c) / (f(d) - f(c)))``,
+      computed with the fraction first, as the paper typesets it.
 
     `TOMS748` settles 1 case that the paper leaves open, a tie in ``tole``: where ``|f(a)| = |f(b)|``, ``u`` is
     ``b``, by the rule of step 4.1.5, which picks ``u`` from the same 2 bounds.
@@ -177,7 +178,7 @@ class TOMS748(Solver):
         n = 2
         while True:
             # --- 4.1.3 / 4.2.3 ------------------
-            if n == 2 or self._has_equal_values(fa, fb, fd, fe):
+            if n == 2 or self._has_2_equal_values(fa, fb, fd, fe):
                 c = self.newton_quadratic(a, fa, b, fb, d, fd, 2)
             else:
                 c = self.ipzero(a, fa, b, fb, d, fd, e, fe)
@@ -195,7 +196,7 @@ class TOMS748(Solver):
 
             if self.k == 2:
                 # --- 4.2.5 ----------------------
-                if self._has_equal_values(fa_bar, fb_bar, fd_bar, fe_bar):
+                if self._has_2_equal_values(fa_bar, fb_bar, fd_bar, fe_bar):
                     c_bar = self.newton_quadratic(a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar, 3)
                 else:
                     c_bar = self.ipzero(a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar, e_bar, fe_bar)
@@ -257,9 +258,9 @@ class TOMS748(Solver):
         - the margin: where ``[a, b]`` is at most ``4*delta`` wide, ``c`` becomes the midpoint; elsewhere, a ``c`` that
           lies less than ``2*delta`` inside ``[a, b]``, or outside it, moves to ``2*delta`` from the nearer bound. Here
           ``delta = lambda*tole(a, b)``, with the paper's absolute tolerance ``tol`` taken as ``state.xtol``;
-        - ``f`` is evaluated at ``c``;
-        - ``[a_bar, b_bar]`` is the part of ``[a, b]`` on either side of ``c`` that holds the sign change, and ``d`` is
-          the bound of ``[a, b]`` that ``c`` replaces.
+        - ``f`` is evaluated at ``c``, and ``state.x_best`` is set to ``c``;
+        - ``[a_bar, b_bar]`` is whichever of ``[a, c]`` and ``[c, b]`` holds the sign change, and ``d`` is the bound of
+          ``[a, b]`` that ``c`` replaces.
 
         Section 6 ends the subroutine with its termination test; `_solve` instead calls `_root_if_converged` after each
         call of ``bracket``. Where ``f(c) = 0``, the paper terminates at ``c``; here ``c`` becomes ``a_bar``, and the
@@ -303,6 +304,7 @@ class TOMS748(Solver):
 
         ``r`` approximates the zero in ``[a, b]`` of ``P``, the quadratic interpolation through ``a``, ``b`` and ``d``:
         ``P(x) = f(a) + f[a, b]*(x - a) + f[a, b, d]*(x - a)*(x - b)``, with ``A = f[a, b, d]`` and ``B = f[a, b]``.
+
         Where ``A = 0``, ``P`` is a line, and ``r`` is its zero ``a - f(a) / B``. Elsewhere, ``r`` is the result of
         ``k`` Newton steps on ``P``, the paper's equation (4), starting from ``a`` where ``A*f(a) > 0``, and from ``b``
         otherwise.
@@ -312,7 +314,10 @@ class TOMS748(Solver):
 
         In exact arithmetic, the derivative of ``P`` never vanishes on the Newton steps: they start from the bound where
         ``P`` and its second derivative have the same sign, so they approach the zero of ``P`` from that side. The
-        subroutine adds no guard there, so a derivative that rounding makes 0 raises a ``ZeroDivisionError``.
+        subroutine adds no guard there.
+
+        Raises:
+            ZeroDivisionError: If ``d`` equals ``a`` or ``b``, or if rounding makes ``B`` or the derivative of ``P`` 0.
         """
         # A = f[a, b, d] = (f[b, d] - f[a, b]) / (d - a) and B = f[a, b].
         B = (fb - fa) / (b - a)  # noqa: N806 — the paper's name
@@ -355,17 +360,17 @@ class TOMS748(Solver):
     #  Helpers
     # --------------------------------------------------------------------------
     @staticmethod
-    def _has_equal_values(f1: float, f2: float, f3: float, f4: float) -> bool:
+    def _has_2_equal_values(f1: float, f2: float, f3: float, f4: float) -> bool:
         """Return whether 2 of the 4 values are equal, which the paper tests as ``prod_(i != j) (f_i - f_j) = 0``."""
         return f1 in (f2, f3, f4) or f2 in (f3, f4) or f3 == f4
 
     def _root_if_converged(
-        self, state: SolveState, a_bar: float, fa_bar: float, b_bar: float, fb_bar: float, xtol_doubled: float
+        self, state: SolveState, a: float, fa: float, b: float, fb: float, xtol_doubled: float
     ) -> float | None:
         """Return the root estimate if the solve ends at the interval that ``bracket`` returned, or ``None``.
 
-        ``[a_bar, b_bar]`` is that interval, and ``state`` is not used. The test suite overrides this method with the
-        paper's termination test, which reads ``tol`` as ``state.xtol`` through ``tole(a_bar, b_bar)``, to reproduce
-        the paper's published counts.
+        ``[a, b]`` is that interval. ``state`` is not used here: the test suite overrides this method with the paper's
+        termination test, to reproduce the paper's published counts, and that test computes ``tole(a, b)`` with
+        ``tol = state.xtol``.
         """
-        return interval_root_if_converged(a_bar, fa_bar, b_bar, fb_bar, xtol_doubled)
+        return interval_root_if_converged(a, fa, b, fb, xtol_doubled)

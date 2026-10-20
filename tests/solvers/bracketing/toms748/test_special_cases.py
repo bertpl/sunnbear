@@ -59,8 +59,11 @@ def test_an_exhausted_budget_reports_the_last_evaluated_x_value(k: int):
 
 @pytest.mark.parametrize("k", [1, 2])
 def test_an_xtol_below_the_float_spacing_near_the_root_ends_in_a_division_by_0(k: int):
-    """An ``xtol`` of 1e-17 on ``[1, 2]`` lies below half the float spacing near the root of `cubic`; that spacing
-    is about 2.2e-16, so the interval never gets as narrow as ``2*xtol``.
+    """An ``xtol`` of 1e-17 on ``[1, 2]`` ends the solve of `cubic` as ``SOLVER_ERROR``, with its last 3 evaluated
+    x-values equal.
+
+    That ``xtol`` lies below half the float spacing near the root of `cubic`, which is about 2.2e-16, so the interval
+    never gets as narrow as ``2*xtol``.
 
     Once the interval is 1 float spacing wide, the midpoint that ``bracket`` takes rounds onto the lower bound, which
     ``bracket`` evaluates again, and returns both as the lower bound and as ``d``. ``Newton-Quadratic`` then divides by

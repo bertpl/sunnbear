@@ -16,7 +16,7 @@ Published results:
 
 Allowed deviations:
 
-- Problem ``26[n=1]``, the paper's problem 13: its function is 0 on the interval around its root 0 where
+- Problem ``26[n=1]``, the paper's problem 13: its function is 0 on the interval around its root 0 on which
   ``exp(1 / x^2)`` overflows, and the solve ends at the first x-value of that interval that it evaluates.
 
   That x-value differs from the root of the authors' test output, so the test checks that the function is 0 there;
