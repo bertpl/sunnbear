@@ -1,4 +1,4 @@
-"""These tests assert how a solve of either algorithm of `TOMS748Paper` ends in 4 special cases:
+"""These tests assert how a solve of either algorithm of `TOMS748Paper` ends in these special cases:
 
 - at an x-value where the function is exactly 0;
 - on an initial interval at most ``2*xtol`` wide;
@@ -25,13 +25,13 @@ def test_an_exact_zero_ends_the_solve_at_that_point(k: int):
 
 
 @pytest.mark.parametrize("k", [1, 2])
-def test_an_initial_interval_at_most_2_xtol_wide_ends_the_solve_after_1_bisection(k: int):
+def test_an_initial_interval_at_most_2_xtol_wide_ends_the_solve_after_bracket_takes_the_midpoint(k: int):
     """On an initial interval at most ``2*xtol`` wide, the first call of ``bracket`` replaces the secant step by the
     midpoint, because the interval is at most ``4*delta`` wide; the solve then ends after 3 evaluations, and returns the
     midpoint of the half of the interval that holds the root.
 
-    No stopping criterion is checked before the first x-value, because the paper checks its termination test only in
-    ``bracket``.
+    No stopping criterion is checked before the first call of ``bracket``, because the paper checks its termination
+    test only in ``bracket``.
     """
     # --- arrange ----------------------
     a, b = 1.32471795, 1.32471796
@@ -60,8 +60,8 @@ def test_an_exhausted_budget_reports_the_last_evaluated_x_value(k: int):
 
 @pytest.mark.parametrize("k", [1, 2])
 def test_an_xtol_below_the_float_spacing_near_the_root_ends_in_a_division_by_0(k: int):
-    """An ``xtol`` of 1e-17 on ``[1, 2]`` lies below half the float spacing near the root of `cubic`, about 2.2e-16,
-    so the interval never gets as narrow as ``2*xtol``.
+    """An ``xtol`` of 1e-17 on ``[1, 2]`` lies below half the float spacing near the root of `cubic`; that spacing
+    is about 2.2e-16, so the interval never gets as narrow as ``2*xtol``.
 
     Once the interval is 1 float spacing wide, the midpoint that ``bracket`` takes rounds onto the lower bound, which
     ``bracket`` evaluates again, and returns both as the lower bound and as ``d``. ``Newton-Quadratic`` then divides by

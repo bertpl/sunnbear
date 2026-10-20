@@ -90,7 +90,8 @@ def test_newton_quadratic_takes_k_newton_steps_on_the_quadratic_through_a_b_and_
     on ``f``, from ``a`` where ``A*f(a) > 0`` and from ``b`` otherwise; where ``A = 0``, it returns the zero of the
     line ``P``.
 
-    The iterates of ``x^2 - 2`` confirm that the Newton step (4) divides ``P(r)``, not ``B(r)``, by the derivative.
+    The iterates of ``x^2 - 2`` confirm that the Newton step of the paper's equation (4) divides ``P(r)``, not
+    ``B(r)``, by the derivative.
     """
     # --- act --------------------------
     r = TOMS748Paper.newton_quadratic(a, fa, b, fb, d, fd, k)
@@ -114,7 +115,7 @@ def test_ipzero_is_exact_where_the_inverse_function_is_a_cubic():
 
 
 @pytest.mark.parametrize(
-    "a, b, root, c, expected_x, expected_bracket",
+    "a, b, root, c, expected_x, expected_a_bar_b_bar_d",
     [
         # f(a) has the smaller |f| in each case, so u = a = 0, tole(a, b) = tol = 1e-6 and 2*delta = 1.4e-6.
         pytest.param(0.0, 1.0, 0.25, 0.5, 0.5, (0.0, 0.5, 1.0), id="inside"),
@@ -124,11 +125,11 @@ def test_ipzero_is_exact_where_the_inverse_function_is_a_cubic():
         pytest.param(0.0, 2.5e-6, 0.5e-6, 2e-6, 1.25e-6, (0.0, 1.25e-6, 2.5e-6), id="narrow_interval"),
     ],
 )
-def test_the_margin_of_bracket_keeps_c_2_delta_inside_the_interval(a, b, root, c, expected_x, expected_bracket):
+def test_the_margin_of_bracket_keeps_c_2_delta_inside_the_interval(a, b, root, c, expected_x, expected_a_bar_b_bar_d):
     """On ``f(x) = x - root``, ``bracket`` evaluates ``c`` where it lies at least ``2*delta`` inside ``[a, b]``, moves
     it to ``2*delta`` from a bound that it lies closer to, and takes the midpoint on an interval at most ``4*delta``
-    wide, with ``delta = lambda*tole(a, b)``; it returns the part of ``[a, b]`` that holds the sign change, and ``d``,
-    the bound that it drops."""
+    wide, with ``delta = lambda*tole(a, b)``; ``bracket`` returns the part of ``[a, b]`` that holds the sign change,
+    and ``d``, the dropped bound."""
     # --- arrange ----------------------
     f = WrappedFunction(lambda x: x - root, max_fevals=10, history_enabled=True)
     fa, fb = f(a), f(b)
@@ -140,7 +141,7 @@ def test_the_margin_of_bracket_keeps_c_2_delta_inside_the_interval(a, b, root, c
     # --- assert -----------------------
     assert f.history[-1][0] == pytest.approx(expected_x, abs=1e-20)
     assert state.x_best == f.history[-1][0]
-    assert (a_bar, b_bar, d) == pytest.approx(expected_bracket, abs=1e-20)
+    assert (a_bar, b_bar, d) == pytest.approx(expected_a_bar_b_bar_d, abs=1e-20)
 
 
 def test_bracket_keeps_the_sign_change_where_the_product_of_the_paper_underflows():

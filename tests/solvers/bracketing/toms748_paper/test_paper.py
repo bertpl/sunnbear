@@ -11,15 +11,17 @@ The tests pass the paper's tolerance ``tol`` as ``xtol``, which `TOMS748Paper` t
 import pytest
 
 from sunnbear._core.solvers.bracketing.toms748_paper import TOMS748Paper
+from sunnbear._core.solvers.core import SolveState
 from sunnbear.solvers import SolveStatus
+from tests.solvers.bracketing.toms748.paper_problems import AUTHORS_TEST_OUTPUT
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.alefeld_potra_shi import AlefeldPotraShiTablesIVToVIProblem
 
-from .paper_problems import AUTHORS_TEST_OUTPUT, TABLES_IV_TO_VI_BY_K
+from .paper_problems import TABLES_IV_TO_VI_BY_K
 
 # Problem 26[n=1], the paper's problem 13, is 0 on the interval around its root 0 where exp(1 / x^2) overflows, so
 # any x-value of that interval is a root of the function as computed.
-_ZERO_INTERVAL_PROBLEM_NAME = "26[n=1]"
+_ZERO_ON_AN_INTERVAL_PROBLEM_NAME = "26[n=1]"
 
 # The paper's Table II gives the total evaluation count over all 154 problems, per k and per tol.
 _TABLE_II_TOTALS = {
@@ -27,15 +29,16 @@ _TABLE_II_TOTALS = {
     2: {1e-7: 2650, 1e-10: 2786, 1e-15: 2859, 0.0: 2884},
 }
 
-# Each k has its own relative tolerance on the totals of Table II. On macOS, the totals lie 0.24 % to 1.08 % below the
-# paper's for k = 1, and 0.10 % to 0.25 % below for k = 2; each tolerance is the next tenth of a percent above the
-# largest of these, plus 0.1 % for the problems whose count a platform's math library can shift by 1.
+# Each k has its own relative tolerance on the totals of Table II: the next tenth of a percent above the largest
+# deviation of the totals on macOS, plus 0.1 % for the problems whose count a platform's math library can shift by 1.
 _TABLE_II_REL_TOL = {1: 0.012, 2: 0.004}
 
 
 @pytest.mark.parametrize("k", [1, 2])
 @pytest.mark.parametrize(
-    "problem", [problem for problem in AUTHORS_TEST_OUTPUT if problem.name != _ZERO_INTERVAL_PROBLEM_NAME], ids=str
+    "problem",
+    [problem for problem in AUTHORS_TEST_OUTPUT if problem.name != _ZERO_ON_AN_INTERVAL_PROBLEM_NAME],
+    ids=str,
 )
 def test_the_roots_of_the_authors_test_output_are_reproduced(problem: PaperProblem, k: int):
     """On each problem of the authors' test output except 26[n=1], both algorithms with ``tol = 0`` return the root
@@ -57,7 +60,7 @@ def test_the_solve_of_problem_26_ends_where_its_function_is_0(k: int):
     first x-value of that interval that it evaluates, which differs from the x-value of the authors' test output.
     """
     # --- arrange ----------------------
-    (problem,) = [problem for problem in AUTHORS_TEST_OUTPUT if problem.name == _ZERO_INTERVAL_PROBLEM_NAME]
+    (problem,) = [problem for problem in AUTHORS_TEST_OUTPUT if problem.name == _ZERO_ON_AN_INTERVAL_PROBLEM_NAME]
 
     # --- act --------------------------
     result = _TOMS748PaperWithPaperStoppingCriterion(k=k).solve(
@@ -78,8 +81,7 @@ def test_the_totals_of_table_ii_are_reproduced_within_the_tolerance_of_k(k: int,
     within the relative tolerance of its ``k`` of the paper's Table II.
 
     The totals include the 2 evaluations at the interval bounds of each problem, as the counts of Tables IV to VI do.
-    They lie below the paper's, for a cause not known, which the docstring of this test
-    package discusses.
+    They lie below the paper's for a cause not known; the docstring of this test package discusses the difference.
     """
     # --- arrange ----------------------
     solver = _TOMS748PaperWithPaperStoppingCriterion(k=k)
@@ -129,19 +131,20 @@ class _TOMS748PaperWithPaperStoppingCriterion(TOMS748Paper):
     ``bracket`` of the paper's section 6."""
 
     def _root_if_converged(
-        self, a_bar: float, fa_bar: float, b_bar: float, fb_bar: float, tol: float, xtol_doubled: float
+        self, state: SolveState, a_bar: float, fa_bar: float, b_bar: float, fb_bar: float, xtol_doubled: float
     ) -> float | None:
         """Return the x-value where ``f`` is 0, or else the midpoint once ``b_bar - a_bar <= 2*tole(a_bar, b_bar)``, or
         ``None`` if the solve continues.
 
         The paper terminates at ``c`` where ``f(c) = 0``, and ``bracket`` returns that ``c`` as ``a_bar``. The paper
-        does not state which x-value its width test returns; the midpoint is the one of the shared stopping criterion.
+        does not state which x-value its termination test returns once the interval is narrow enough; the midpoint is
+        the x-value that the shared stopping criterion returns.
         """
         if fa_bar == 0.0:
             return a_bar
         elif fb_bar == 0.0:
             return b_bar
-        elif b_bar - a_bar <= 2.0 * self.tole(a_bar, fa_bar, b_bar, fb_bar, tol):
+        elif b_bar - a_bar <= 2.0 * self.tole(a_bar, fa_bar, b_bar, fb_bar, state.xtol):
             return 0.5 * (a_bar + b_bar)
         else:
             return None

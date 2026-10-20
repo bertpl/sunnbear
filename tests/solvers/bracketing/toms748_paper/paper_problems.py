@@ -1,26 +1,10 @@
 """This module holds the published results of Algorithm 748 on the Alefeld-Potra-Shi test problems, for the tests of
-`TOMS748Paper`:
-
-- `AUTHORS_TEST_OUTPUT`, the roots that the authors' code computes with the tolerance ``tol = 0``, as its test
-  output prints them;
-- `TABLES_IV_TO_VI_BY_K`, the evaluation counts of the paper's Tables IV to VI, keyed by ``k``, which selects
-  Algorithm 4.1 (``k = 1``) or 4.2 (``k = 2``).
+`TOMS748Paper`: `TABLES_IV_TO_VI_BY_K`, the evaluation counts of the paper's Tables IV to VI, keyed by ``k``, which
+selects Algorithm 4.1 (``k = 1``) or 4.2 (``k = 2``).
 """
 
-from dataclasses import replace
-
-from tests.solvers.bracketing.toms748.paper_problems import PRINTED_ROOTS
 from tests.solvers.paper_problems import UNSTATED_RUN_DETAILS
-from tests.solvers.paper_problems.alefeld_potra_shi import (
-    ALEFELD_POTRA_SHI_PROBLEMS,
-    AlefeldPotraShiTablesIVToVIProblem,
-)
-
-# ``root_rel_tol = 1e-13`` is the precision of a root printed to 14 significant digits.
-AUTHORS_TEST_OUTPUT = [
-    replace(problem, root=PRINTED_ROOTS[problem.name], root_rel_tol=1e-13) for problem in ALEFELD_POTRA_SHI_PROBLEMS
-]
-
+from tests.solvers.paper_problems.alefeld_potra_shi import AlefeldPotraShiTablesIVToVIProblem
 
 _OVERFLOW_DEVIATION_REASON = (
     "the function is 0 on an interval around its root at 0, where exp(1 / x^2) overflows, so the count depends on "
@@ -69,8 +53,8 @@ TABLES_IV_TO_VI_BY_K = {
             deviation=1,
             reason=UNSTATED_RUN_DETAILS,
             observation=(
-                "the solve's last x-value is a step that the margin of section 6 moves 2*delta inside the interval, "
-                "which then is 0.7 times 2*tole(a, b) wide"
+                "the solve's last x-value is a step that the margin of section 6 moves to 2*delta inside the interval, "
+                "which leaves a new interval 2*delta wide: 0.7 times the width 2*tole(a, b) of the termination test"
             ),
         ),
         AlefeldPotraShiTablesIVToVIProblem.P28_N500.with_n_fevals(35),

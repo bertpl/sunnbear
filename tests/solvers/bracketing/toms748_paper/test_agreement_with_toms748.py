@@ -9,9 +9,9 @@ In float64, the 2 implementations differ in these places:
 
 - **Formula forms that round differently:**
 
-  - the secant step 4.1.1 starts from ``a``, and the double-length secant step 4.1.6 from ``u``; for each, `TOMS748`
-    computes the step from its x-value ``x`` as ``(f(x) / (f(b) - f(a)))*(b - a)``, where `TOMS748Paper` computes
-    ``f(x) / f[a, b]``;
+  - the secant step 4.1.1 starts from ``a``, and the double-length secant step 4.1.6 from ``u``; with ``x`` the
+    x-value that each step starts from, `TOMS748` computes the step as ``(f(x) / (f(b) - f(a)))*(b - a)``, where
+    `TOMS748Paper` computes ``f(x) / f[a, b]``;
   - `TOMS748` computes each midpoint as ``a + 0.5*(b - a)``, where `TOMS748Paper` computes ``0.5*(a + b)``;
   - in ``Newton-Quadratic``, `TOMS748` computes ``P(x)`` as ``f(a) + (B + A*(x - b))*(x - a)``, and its derivative
     with ``(2*x) - (a + b)``, where `TOMS748Paper` computes ``f(a) + B*(x - a) + A*(x - a)*(x - b)``, and
@@ -40,17 +40,16 @@ from tests.solvers.example_functions import CONVERGENCE_TEST_CASES, cubic
 from tests.solvers.paper_problems.alefeld_potra_shi import ALEFELD_POTRA_SHI_PROBLEMS
 from tests.solvers.twins import TWIN_TEST_CASES
 
-# 60 digits leave about 200 bits for each x-value, so that 2 forms of 1 formula round to the same float64 x-value,
-# except where the formula's exact value lies within about 10^-44 times the float spacing of a value halfway between
-# 2 float64 values.
+# At 60 digits, each x-value has about 200 bits, so that 2 forms of 1 formula round to the same float64 x-value,
+# except where the formula's exact value lies less than about 10^-44 float spacings from a value halfway between 2
+# float64 values.
 _N_DIGITS = 60
 
 # No compared solve reaches this budget.
 _MAX_FEVALS = 400
 
-# Each compared solve is a tuple (label, f, a, b, xtol). For each problem of the authors' test output and each n of
-# 10, 20, 30 and 40, xtol is 1.5 times the smallest xtol at which bisection spends n evaluations. The compared
-# solves also cover `CONVERGENCE_TEST_CASES` and `TWIN_TEST_CASES`.
+# Each compared solve is a tuple (label, f, a, b, xtol). On the problems of the authors' test output, xtol is 1.5
+# times the smallest xtol at which bisection spends n evaluations.
 _COMPARED_SOLVES = [
     *[
         (f"{problem.name}@{n}", problem.f, problem.a, problem.b, 1.5 * xtol_min)
@@ -115,7 +114,8 @@ def _solve_in_60_digit_arithmetic(solver: Solver, f, a: float, b: float, xtol: f
 
     with mpmath.workdps(_N_DIGITS):
         interval = Interval.from_interval_bounds(mpmath.mpf(a), mpmath.mpf(b), mpmath.mpf(f(a)), mpmath.mpf(f(b)))
-        # `SolveState` holds a `WrappedFunction`, which rounds each value to float64; the recorder keeps 60 digits.
+        # `SolveState` normally holds a `WrappedFunction`, which rounds each value to float64; `f_recorded` takes its
+        # place here, so that the solver's values stay at 60 digits.
         state = SolveState(f=f_recorded, interval=interval, xtol=mpmath.mpf(xtol))  # type: ignore[arg-type]
         x_root = float(solver._solve(state))
     return x_values, x_root
