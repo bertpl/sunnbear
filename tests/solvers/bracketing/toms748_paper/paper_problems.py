@@ -16,6 +16,10 @@ _POLE_ROUNDING_DEVIATION_REASON = (
     "poles: on macOS, the solve takes 13 evaluations with the 20 terms of f summed from i = 1 up, as the problem "
     "defines f, and 15, the paper's count, with them summed from i = 20 down"
 )
+_SIN_ROUNDING_DEVIATION_REASON = (
+    "the count depends on how the platform's sin rounds: the solve takes the paper's 11 evaluations on macOS and 10 on "
+    "Linux on ARM"
+)
 # `TABLES_IV_TO_VI_BY_K` maps ``k`` to the problems of the paper's Tables IV to VI, each with the paper's evaluation
 # count for that ``k``, which counts the 2 evaluations at the interval bounds.
 TABLES_IV_TO_VI_BY_K = {
@@ -34,7 +38,7 @@ TABLES_IV_TO_VI_BY_K = {
         AlefeldPotraShiTablesIVToVIProblem.P1_N1.with_n_fevals(10),
         AlefeldPotraShiTablesIVToVIProblem.P3_N1.with_n_fevals(15, deviation=2, reason=_POLE_ROUNDING_DEVIATION_REASON),
         AlefeldPotraShiTablesIVToVIProblem.P16_N4.with_n_fevals(12),
-        AlefeldPotraShiTablesIVToVIProblem.P18_N1.with_n_fevals(11),
+        AlefeldPotraShiTablesIVToVIProblem.P18_N1.with_n_fevals(11, deviation=1, reason=_SIN_ROUNDING_DEVIATION_REASON),
         AlefeldPotraShiTablesIVToVIProblem.P19_N20.with_n_fevals(12),
         AlefeldPotraShiTablesIVToVIProblem.P20_N10.with_n_fevals(7),
         AlefeldPotraShiTablesIVToVIProblem.P21_N10.with_n_fevals(12),
