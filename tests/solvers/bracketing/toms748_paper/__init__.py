@@ -39,6 +39,6 @@ Third-party published results:
 
 Reference implementations:
 
-- None: `TOMS748Paper` implements the paper's text, and the tests validate it against the paper's published results
-  and the authors' published test output.
+- `TOMS748`, which follows the authors' Fortran code: compared in ``test_agreement_with_toms748.py``, which shows
+  that both implementations take the same steps, and lists where they differ in float64.
 """

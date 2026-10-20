@@ -4,8 +4,7 @@
 - `AUTHORS_TEST_OUTPUT`, the roots that the authors' code computes with the tolerance ``tol = 0``, as its test
   output prints them;
 - `TABLES_IV_TO_VI_BY_K`, the evaluation counts of the paper's Tables IV to VI, keyed by ``k``, which selects
-  Algorithm 4.1 (``k = 1``) or 4.2 (``k = 2``);
-- `tol_as_the_driver_computes_it`, the paper's tolerances ``tol = 10^-n``, as the published runs compute them.
+  Algorithm 4.1 (``k = 1``) or 4.2 (``k = 2``).
 """
 
 from dataclasses import replace
@@ -88,15 +87,3 @@ TABLES_IV_TO_VI_BY_K = {
         AlefeldPotraShiTablesIVToVIProblem.P25_N3.with_n_fevals(5),
     ],
 }
-
-
-def tol_as_the_driver_computes_it(n_digits: int | None) -> float:
-    """Return ``10^-n_digits`` by repeated division by 10, as the authors' test driver computes the paper's tolerances,
-    or 0 for ``None``."""
-    if n_digits is None:
-        return 0.0
-    else:
-        tol = 1.0
-        for _ in range(n_digits):
-            tol = tol / 10.0
-        return tol

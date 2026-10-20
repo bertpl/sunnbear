@@ -15,17 +15,16 @@ from sunnbear.solvers import SolveStatus
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.alefeld_potra_shi import AlefeldPotraShiTablesIVToVIProblem
 
-from .paper_problems import AUTHORS_TEST_OUTPUT, TABLES_IV_TO_VI_BY_K, tol_as_the_driver_computes_it
+from .paper_problems import AUTHORS_TEST_OUTPUT, TABLES_IV_TO_VI_BY_K
 
 # Problem 26[n=1], the paper's problem 13, is 0 on the interval around its root 0 where exp(1 / x^2) overflows, so
 # any x-value of that interval is a root of the function as computed.
 _ZERO_INTERVAL_PROBLEM_NAME = "26[n=1]"
 
-# The paper's Table II gives the total evaluation count over all 154 problems, per k and per tol = 10^-n_digits;
-# n_digits = None stands for tol = 0.
+# The paper's Table II gives the total evaluation count over all 154 problems, per k and per tol.
 _TABLE_II_TOTALS = {
-    1: {7: 2696, 10: 2835, 15: 2908, None: 2950},
-    2: {7: 2650, 10: 2786, 15: 2859, None: 2884},
+    1: {1e-7: 2696, 1e-10: 2835, 1e-15: 2908, 0.0: 2950},
+    2: {1e-7: 2650, 1e-10: 2786, 1e-15: 2859, 0.0: 2884},
 }
 
 # Each k has its own relative tolerance on the totals of Table II. On macOS, the totals lie 0.24 % to 1.08 % below the
@@ -71,12 +70,10 @@ def test_the_solve_of_problem_26_ends_where_its_function_is_0(k: int):
 
 
 @pytest.mark.parametrize(
-    "k, n_digits, paper_total",
-    [(k, n_digits, total) for k, totals in _TABLE_II_TOTALS.items() for n_digits, total in totals.items()],
+    "k, tol, paper_total",
+    [(k, tol, total) for k, totals in _TABLE_II_TOTALS.items() for tol, total in totals.items()],
 )
-def test_the_totals_of_table_ii_are_reproduced_within_the_tolerance_of_k(
-    k: int, n_digits: int | None, paper_total: int
-):
+def test_the_totals_of_table_ii_are_reproduced_within_the_tolerance_of_k(k: int, tol: float, paper_total: int):
     """Over all 154 problems, the total evaluation count of each algorithm, at each of the paper's tolerances, lies
     within the relative tolerance of its ``k`` of the paper's Table II.
 
@@ -86,7 +83,6 @@ def test_the_totals_of_table_ii_are_reproduced_within_the_tolerance_of_k(
     """
     # --- arrange ----------------------
     solver = _TOMS748PaperWithPaperStoppingCriterion(k=k)
-    tol = tol_as_the_driver_computes_it(n_digits)
 
     # --- act --------------------------
     total = sum(
@@ -118,7 +114,7 @@ def test_the_evaluation_counts_of_tables_iv_to_vi_are_reproduced(k: int, problem
     paper reports for its ``k``, except where the problem states an allowed deviation."""
     # --- act --------------------------
     result = _TOMS748PaperWithPaperStoppingCriterion(k=k).solve(
-        problem.f, problem.a, problem.b, xtol=tol_as_the_driver_computes_it(15), max_fevals=1000
+        problem.f, problem.a, problem.b, xtol=1e-15, max_fevals=1000
     )
 
     # --- assert -----------------------

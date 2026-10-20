@@ -30,8 +30,8 @@ class TOMS748Paper(Solver):
       times the width of ``[a_n, b_n]``.
 
     Algorithm 4.2 repeats the interpolation step once, on the interval that the first interpolation step leaves, with 3
-    Newton steps in place of 2 where the repeated step falls back to ``Newton-Quadratic``: its steps 4.2.4 to 4.2.6. The
-    first iteration, at ``n = 2``, follows a secant step from ``a_1``, the paper's step 4.1.1.
+    Newton steps in place of 2 where the repeated step falls back to ``Newton-Quadratic``: its steps 4.2.5 and
+    4.2.6. The first iteration, at ``n = 2``, follows a secant step from ``a_1``, the paper's step 4.1.1.
 
     Each step passes its x-value ``c`` to ``bracket``, which evaluates ``f`` there and keeps the part of the interval
     that still holds the sign change. `TOMS748Paper` implements ``bracket`` as the paper's section 6 modifies it for
@@ -70,9 +70,9 @@ class TOMS748Paper(Solver):
     - **Stopping criterion and return value:** the shared stopping criterion above replaces the paper's termination
       test; the paper does not state which x-value its runs return when its termination test holds because the
       interval is narrow enough.
-    - **Tests written as products:** the paper states 4 tests as the sign of a product, or as a product equal to 0.
-      `TOMS748Paper` tests the factors instead, because a product of small numbers can underflow to 0, which changes
-      the outcome of the test:
+    - **Tests written as products:** the paper states these tests as the sign of a product, or as a product equal
+      to 0. `TOMS748Paper` tests the factors instead, because a product of small numbers can underflow to 0, which
+      changes the outcome of the test:
 
       - ``f(a)f(c) < 0`` and ``f(b)f(c) < 0`` in ``bracket``: the signs of ``f(a)`` and ``f(c)`` are compared;
       - ``A*f(a) > 0`` in ``Newton-Quadratic``: the signs of ``A`` and ``f(a)`` are compared;
@@ -115,9 +115,11 @@ class TOMS748Paper(Solver):
     References:
         - Alefeld, G. E., Potra, F. A. and Shi, Y. (1995). Algorithm 748: Enclosing zeros of continuous functions. ACM
           Transactions on Mathematical Software 21(3), 327-344. Its sections 2 to 4 and 6 state the method, which
-          `TOMS748Paper` follows step by step. The test suite reproduces the roots of the authors' published test
-          output, the totals of the paper's Table II and the counts of its Tables IV to VI.
-          https://doi.org/10.1145/210089.210111
+          `TOMS748Paper` follows step by step, and the test suite reproduces the totals of its Table II and the
+          counts of its Tables IV to VI. https://doi.org/10.1145/210089.210111
+        - The test output that the authors publish with their code, as algorithm 748 of the Collected Algorithms
+          of the ACM: the roots of the paper's test problems, which the test suite reproduces.
+          https://www.netlib.org/toms/748
     """
 
     # `TOMS748Paper` is a new implementation of the solver `toms748`, so it takes the name of `TOMS748` with the next
