@@ -19,10 +19,11 @@ class TwinSolver(Solver):
     different numbers of points even where every point agrees.
 
     Where sunnbear's solver has a stopping criterion of its own, not `BracketingSolver`'s, or does not split its
-    interval at every evaluated x-value, the subclass also overrides `_root_if_sunnbear_solver_stops` with that
-    solver's criterion and interval. Where the reference implementation stops by exactly that criterion, the subclass
-    instead lets the reference implementation stop: its `_root_if_sunnbear_solver_stops` returns ``None`` on every
-    call, and its `_run_reference` raises `TwinConvergedSignal` with the reference implementation's root.
+    interval at every evaluated x-value, the subclass also overrides `_root_if_sunnbear_solver_stops` to apply that
+    solver's criterion to that solver's own interval. Where the reference implementation stops by exactly that
+    criterion, the subclass instead lets the reference implementation stop: its `_root_if_sunnbear_solver_stops`
+    returns ``None`` on every call, and its `_run_reference` raises `TwinConvergedSignal` with the reference
+    implementation's root.
 
     Attributes:
         n_reevaluated_bounds: The number of evaluations that the reference implementation makes at the interval
@@ -65,8 +66,9 @@ class TwinSolver(Solver):
 
         ``evaluations`` holds every ``(x, f(x))`` that the reference implementation evaluated, in order, without the
         evaluations at the interval bounds; ``interval_split_at_evaluations`` is ``initial_interval``, the solve's
-        initial interval, split at each of those x-values. All 3 hold plain floats. This default is the stopping
-        criterion of `BracketingSolver`, `Interval.is_converged`.
+        initial interval, split at each of those x-values. ``evaluations``, ``initial_interval`` and
+        ``interval_split_at_evaluations`` hold plain floats. This default is the stopping criterion of
+        `BracketingSolver`, `Interval.is_converged`.
 
         The twin of a solver that does not split its interval at every evaluated x-value replays that solver's interval
         from ``initial_interval`` and ``evaluations``.

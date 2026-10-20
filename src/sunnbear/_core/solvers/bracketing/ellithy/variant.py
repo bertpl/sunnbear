@@ -12,7 +12,7 @@ class EllithyVariant(StrEnum):
     TFMS = "tfms"
 
     @property
-    def is_bisection(self) -> bool:
+    def has_bisection_step(self) -> bool:
         """Return whether phase 1 of the variant's method is bisection; otherwise it is trisection."""
         return self in (EllithyVariant.BF, EllithyVariant.BFMS)
 

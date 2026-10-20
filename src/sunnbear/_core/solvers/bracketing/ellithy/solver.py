@@ -4,9 +4,9 @@ from sunnbear._core.solvers.core import Interval, IntervalBound, Solver, SolveSt
 
 from .variant import EllithyVariant
 
-# `_EPSILON` is the article's guard against a zero denominator in the modified-secant step: where the denominator is
-# exactly 0, the step adds `_EPSILON` to it.
-_EPSILON = 1e-15
+# `_ZERO_DENOMINATOR_GUARD` is the article's `eps`, its guard against a zero denominator in the modified-secant step:
+# where the denominator is exactly 0, the step adds `_ZERO_DENOMINATOR_GUARD` to it.
+_ZERO_DENOMINATOR_GUARD = 1e-15
 
 
 class Ellithy(Solver):
@@ -47,8 +47,13 @@ class Ellithy(Solver):
     - 3 or 4 times in ``"bfms"``;
     - 4 or 5 times in ``"tfms"``.
 
-    The solve ends by the shared stopping criterion of the bracketing solvers, which `Ellithy` checks at each point
-    where the article tests its own stopping criterion, ``|f(x)| <= tol``, after the interval update of that phase:
+    The shared stopping criterion of the bracketing solvers ends the solve once the interval is at most ``2*xtol``
+    wide, or once the function value at an interval bound is exactly 0. It returns that bound, or else the interval's
+    midpoint, which then lies within ``xtol`` of a root. As in the article, there is no check before the first
+    iteration.
+
+    `Ellithy` checks this criterion at each point where the article tests its own stopping criterion, ``|f(x)| <= tol``,
+    after the interval update of that phase:
 
     - ``"bf"``: after the bisection, and after the false position;
     - ``"bfms"``: after the false position, and after an accepted ``x_S``. Algorithm 2 has no test after its bisection,
@@ -56,20 +61,17 @@ class Ellithy(Solver):
     - ``"tf"``: after the trisection, and after the false position;
     - ``"tfms"``: after the trisection, after the false position, and after an accepted ``x_S``.
 
-    The shared stopping criterion ends the solve once the interval is at most ``2*xtol`` wide, or once the function
-    value at an interval bound is exactly 0. It returns that bound, or else the interval's midpoint, which then lies
-    within ``xtol`` of a root. As in the article, there is no check before the first iteration.
-
     `Ellithy` departs from Ellithy (2026) in these places:
 
     - **Stopping criterion:** `Ellithy` stops by the shared stopping criterion above. The article's pseudocode tests
-      ``|f(x)| <= tol`` where the list above checks, and returns that ``x``, or returns the interval's midpoint after
-      ``max_iter`` iterations. ``xtol`` is a tolerance on x and cannot express a tolerance on ``|f(x)|``, and `Ellithy`
-      has no iteration limit, so the evaluation budget ends a long solve.
+      ``|f(x)| <= tol`` at the points that the list above names, and returns that ``x``, or returns the interval's
+      midpoint after ``max_iter`` iterations.
+
+      ``xtol`` is a tolerance on x and cannot express a tolerance on ``|f(x)|``, and `Ellithy` has no iteration limit,
+      so the evaluation budget ends a long solve.
 
       The article's section 5.2 states a different criterion, ``|b - a| < 1e-14`` and ``|f(x)| < 1e-14``. The
-      pseudocode and the authors' code test ``|f(x)|`` alone, and the article's published iteration counts reproduce
-      only with that test.
+      pseudocode and the authors' code test ``|f(x)|`` alone.
     - **Sign tests:** the article tests the sign of a product, such as ``fa*f(x_B) < 0``; the product of 2 small
       function values can underflow to 0, so `Ellithy` compares the signs directly, with `Interval.split_at`.
     - **A zero at** ``x1``: where ``f(x1) = 0``, the article's trisection update would move ``a`` to ``x2`` and lose
@@ -108,8 +110,7 @@ class Ellithy(Solver):
 
           https://doi.org/10.21608/joems.2026.440115.1078
         - The authors' code, at commit ``7f22131ef4e1def3e3928dc6558f46f756d0a5ea`` (MIT license). Its experiment
-          scripts follow Algorithms 1 to 4 line by line. They give the step ``delta`` of the modified-secant step a
-          default of 1e-4, which their loop replaces by the ``delta`` of equation 2, which grows with ``|x_FP|``.
+          scripts follow Algorithms 1 to 4 line by line.
           https://github.com/Abdelrhman-Ellithy/hybridroots
         - The package ``hybridroots``, the authors' implementation of the 4 methods; the test suite checks `Ellithy`
           against version 1.0.1. https://pypi.org/project/hybridroots/
@@ -142,12 +143,12 @@ class Ellithy(Solver):
         """
         interval = state.interval
         xtol_doubled = 2.0 * state.xtol
-        is_bisection = self.variant.is_bisection
+        has_bisection_step = self.variant.has_bisection_step
         has_secant_step = self.variant.has_secant_step
         n = 0
         while True:
             n += 1
-            if is_bisection:
+            if has_bisection_step:
                 # --- phase 1: bisection ---------
                 x_b = interval.midpoint
                 fx_b = state.f(x_b)
@@ -196,7 +197,7 @@ class Ellithy(Solver):
                 try:
                     x_s = x_fp - (delta * fx_fp) / (f_probe - fx_fp)
                 except ZeroDivisionError:
-                    x_s = x_fp - (delta * fx_fp) / ((f_probe - fx_fp) + _EPSILON)
+                    x_s = x_fp - (delta * fx_fp) / ((f_probe - fx_fp) + _ZERO_DENOMINATOR_GUARD)
                 if interval.a < x_s < interval.b:
                     fx_s = state.f(x_s)
                     if abs(fx_s) < abs(fx_fp):
@@ -214,14 +215,14 @@ class Ellithy(Solver):
         interval: Interval,
         xtol_doubled: float,
         iteration_number: int,
-        tested_evaluations: tuple[tuple[float, float], ...],
+        evaluations_tested_by_article: tuple[tuple[float, float], ...],
     ) -> float | None:
         """Return the root estimate if the solve ends at ``interval``, or ``None`` if it continues.
 
-        ``iteration_number`` is the iteration's number, and ``tested_evaluations`` holds the ``(x, f(x))`` pairs whose
-        ``|f(x)|`` the article tests at this point. Neither is used: the test suite overrides this method to apply the
-        article's own stopping criterion, which needs both, where it reproduces the article's published iteration
-        counts.
+        ``iteration_number`` is the iteration's number, and ``evaluations_tested_by_article`` holds the ``(x, f(x))``
+        pairs whose ``|f(x)|`` the article tests at this point. Neither is used here: the test suite reproduces the
+        article's published iteration counts with a subclass that overrides this method with the article's own stopping
+        criterion, which needs both.
         """
         if interval.is_converged(xtol_doubled):
             return interval.root()

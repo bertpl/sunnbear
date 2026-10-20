@@ -145,12 +145,12 @@ class _EllithyWithPaperStoppingCriterion(Ellithy):
         interval: Interval,
         xtol_doubled: float,
         iteration_number: int,
-        tested_evaluations: tuple[tuple[float, float], ...],
+        evaluations_tested_by_article: tuple[tuple[float, float], ...],
     ) -> float | None:
-        """Return the first x-value of ``tested_evaluations`` with ``|f(x)| <= 1e-14``, and record
+        """Return the first x-value of ``evaluations_tested_by_article`` with ``|f(x)| <= 1e-14``, and record
         ``iteration_number``, or return ``None`` if the solve continues; ``interval`` and ``xtol_doubled`` are
         ignored."""
-        for x, fx in tested_evaluations:
+        for x, fx in evaluations_tested_by_article:
             if abs(fx) <= _PAPER_TOL:
                 self.n_iterations = iteration_number
                 return x

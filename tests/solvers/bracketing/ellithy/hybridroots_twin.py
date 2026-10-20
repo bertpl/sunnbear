@@ -16,7 +16,7 @@ _HYBRIDROOTS_FUNCTIONS = {
 
 
 class EllithyHybridrootsTwin(TwinSolver):
-    """`EllithyHybridrootsTwin` hands the interval to the function of hybridroots that implements the twin's variant,
+    """`EllithyHybridrootsTwin` passes the interval to the function of hybridroots that implements the twin's variant,
     and returns the root estimate where `Ellithy`, in the same variant, would stop.
 
     hybridroots 1.0.1 is the authors' package of the 4 methods of Ellithy (2026): its functions ``mpbf``, ``mpbfms``,
@@ -31,8 +31,8 @@ class EllithyHybridrootsTwin(TwinSolver):
     - it never splits its interval at the probe ``x_FP + delta`` or at a rejected ``x_S``;
     - it splits its interval at ``x2`` only where ``x1`` replaced the lower bound.
 
-    So the twin's version replays the interval of `Ellithy` from the solve's initial interval, which
-    `StoppingWrappedFunction` passes it for that purpose.
+    So this twin's `_root_if_sunnbear_solver_stops` rebuilds the interval of `Ellithy` from the solve's initial
+    interval, which `StoppingWrappedFunction` passes to it.
 
     The twin deviates from exact agreement in these declared ways:
 
@@ -85,14 +85,14 @@ class EllithyHybridrootsTwin(TwinSolver):
         where ``x_S`` lies inside the interval, so the replay computes ``x_S`` from ``x_FP`` and the probe, as `Ellithy`
         does, to tell whether the next evaluation is ``x_S`` or the next iteration's first x-value.
         """
-        is_bisection = self.variant.is_bisection
+        has_bisection_step = self.variant.has_bisection_step
         has_secant_step = self.variant.has_secant_step
         replayed_interval = initial_interval
         n_evaluations = len(evaluations)
         i = 0  # i is the index of the next evaluation in the replay
         while True:
             # --- phase 1 ------------------------
-            if is_bisection:
+            if has_bisection_step:
                 x_b, fx_b = evaluations[i]
                 i += 1
                 replayed_interval = replayed_interval.split_at(x_b, fx_b)
@@ -129,7 +129,8 @@ class EllithyHybridrootsTwin(TwinSolver):
                 except ZeroDivisionError:
                     x_s = x_fp - (delta * fx_fp) / ((f_probe - fx_fp) + 1e-15)
                 if replayed_interval.a < x_s < replayed_interval.b:
-                    # The evaluation holds x_S, which hybridroots computes by the same formula.
+                    # evaluations[i] holds the x_S of hybridroots, computed by the same formula, so the replay takes
+                    # x_S from there.
                     x_s, fx_s = evaluations[i]
                     i += 1
                     is_accepted = abs(fx_s) < abs(fx_fp)

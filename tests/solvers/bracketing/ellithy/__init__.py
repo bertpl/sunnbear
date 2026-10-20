@@ -1,8 +1,9 @@
 """This package tests `Ellithy`.
 
 The article's runs stop by the stopping criterion of its pseudocode, ``|f(x)| <= 1e-14`` at the x-values that each
-algorithm tests, so ``test_paper.py`` reproduces its tables with a test-only subclass of `Ellithy` that stops by that
-criterion and counts the iterations.
+algorithm tests, not by the criterion of its section 5.2, ``|b - a| < 1e-14`` and ``|f(x)| < 1e-14``: the published
+iteration counts reproduce only with the pseudocode's criterion. So ``test_paper.py`` reproduces its tables with a
+test-only subclass of `Ellithy` that stops by that criterion and counts the iterations.
 
 The article publishes iteration counts only; an iteration evaluates the function a varying number of times, so the
 iteration counts do not convert to evaluation counts.
@@ -10,9 +11,11 @@ iteration counts do not convert to evaluation counts.
 Published results:
 
 - Ellithy (2026), Table 12, the columns "Opt.BF", "Opt.BFMS", "Opt.TF" and "Opt.TFMS": reproduced, in
-  ``test_paper.py``: all 192 iteration counts exactly. Of these, 163 reproduce with the article's adaptive ``delta``.
-  The other 29, in the columns of Opt.BFMS and Opt.TFMS, reproduce only with a fixed ``delta = 1e-4``, and the
-  adaptive ``delta`` takes 1 iteration fewer on each:
+  ``test_paper.py``: all 192 iteration counts exactly.
+
+  Of these, 163 reproduce with the article's adaptive ``delta``, the ``delta = 1e-8*max(1, |x_FP|) + 1e-15`` of its
+  equation 2. The other 29, in the columns of Opt.BFMS and Opt.TFMS, reproduce only with a fixed ``delta = 1e-4``, and
+  the adaptive ``delta`` takes 1 iteration fewer on each:
 
   - Opt.BFMS: f4, f5, f7, f10, f16, f18, f19, f34, f37, f43 and f47;
   - Opt.TFMS: f2, f4, f5, f9, f10, f12, f13, f20, f22, f26, f29, f32, f35, f37, f43, f44, f46 and f48.
