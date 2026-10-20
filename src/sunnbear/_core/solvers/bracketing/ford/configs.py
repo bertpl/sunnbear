@@ -17,9 +17,14 @@ class FordConfigsDeclaration(SolverConfigsDeclaration):
     configs' roles.
     """
 
-    solver_cls = Ford
     configs = (
-        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": FordVariant.METHOD_1}),
-        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": FordVariant.METHOD_3}),
-        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": FordVariant.METHOD_4}),
+        SolverConfig(
+            solver_cls=Ford, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": FordVariant.METHOD_1}
+        ),
+        SolverConfig(
+            solver_cls=Ford, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": FordVariant.METHOD_3}
+        ),
+        SolverConfig(
+            solver_cls=Ford, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": FordVariant.METHOD_4}
+        ),
     )
