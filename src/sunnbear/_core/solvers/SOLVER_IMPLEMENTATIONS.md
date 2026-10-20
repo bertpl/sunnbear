@@ -37,14 +37,14 @@ Due to the goals of section I.a and the challenges of section I.b, we...
 
 ## II. Solvers Overview
 
-The `sunnbear` package implements **17 solver algorithms**, several provided in different flavors and settings, totaling **27 solver configurations**.
+The `sunnbear` package implements **17 solver algorithms**, several provided in different flavors and settings, totaling **28 solver configurations**.
 
 | Algorithm | Type | Configs | core config? | Year | Reference |
 | --------- | ---- | ------- | ------------ | ---- | --------- |
 | `Bisection` | bracketing | 1 | | – | – |
 | `RegulaFalsi` | bracketing | 1 | | – | – |
 | `Secant` | open | 1 | | – | – |
-| `Brent` | bracketing | 1 | ✓ | 1971 | Brent (1971, 1973) |
+| `Brent` | bracketing | 2 | ✓ | 1971 | Brent (1971, 1973) |
 | `Illinois` | bracketing | 1 | ✓ | 1971 | Dowell and Jarratt (1971) |
 | `Pegasus` | bracketing | 1 | | 1972 | Dowell and Jarratt (1972) |
 | `AndersonBjorck` | bracketing | 1 | | 1973 | Anderson and Björck (1973) |
@@ -191,6 +191,8 @@ Only a secondary config may deviate from section IV.
 | | `ellithy[variant='bfms']` | secondary | Opt.BFMS: Opt.BF with a modified secant step | yes |
 | | `ellithy[variant='tf']` | secondary | Opt.TF: trisection, then false position | yes |
 | | `ellithy[variant='tfms']` | secondary | Opt.TFMS: Opt.TF with a modified secant step | yes |
+| `Brent` | `brent[variant='inverse_quadratic']` | core | Brent's method, with inverse quadratic interpolation | yes |
+| | `brent[variant='hyperbolic']` | secondary | SciPy's `brenth`: rational interpolation in place of inverse quadratic | yes |
 
 ### V.a. Ridders
 
@@ -254,6 +256,14 @@ All 4 configs follow section IV, and all 4 are secondary: the method is not esta
 - **`ellithy[variant='tf']` (secondary):** Opt.TF, 3 evaluations per iteration.
 - **`ellithy[variant='tfms']` (secondary):** Opt.TFMS, 4 or 5 evaluations per iteration.
 
+### V.g. Brent
+
+Each step of Brent's method that does not bisect interpolates through the last x-values: linearly through 2 of them, or through 3 of them by inverse quadratic interpolation. SciPy's `brenth` is SciPy's `brentq`, Brent's method, with the 3-point step replaced by the rational interpolation of Bus and Dekker (1975); everything else is Brent's. Both configs follow section IV.
+- **`brent[variant='inverse_quadratic']` (core):** Brent's method as Brent (1971, 1973) publishes it.
+- **`brent[variant='hyperbolic']` (secondary):** the method of SciPy's `brenth`. It is secondary because the core config already represents Brent's method.
+
+SciPy's documentation attributes `brenth` to Algorithm M of Bus and Dekker (1975), which `sunnbear` does not implement: Algorithm M chooses its steps by rules of its own, among them a bisection that it forces after 3 steps that do not halve the interval, and `brenth` has none of them.
+
 ## VI. Code Organization & Validation
 
 ### VI.a. Solver Classes
@@ -279,6 +289,7 @@ The tests compare each solver with the published results and reference implement
 - **Atkinson, K. E. (1989)**. An Introduction to Numerical Analysis, 2nd edition. John Wiley & Sons, New York. Section 2.3 (the secant method and its error test) and section 2.6 (Aitken's error formula).
 - **Brent, R. P. (1971)**. An algorithm with guaranteed convergence for finding a zero of a function. The Computer Journal 14(4), 422–425. https://doi.org/10.1093/comjnl/14.4.422
 - **Brent, R. P. (1973)**. Algorithms for Minimization without Derivatives. Prentice-Hall, Englewood Cliffs, New Jersey. A scan is available on the author's page: https://maths-people.anu.edu.au/~brent/pub/pub011.html
+- **Bus, J. C. P. and Dekker, T. J. (1975)**. Two efficient algorithms with guaranteed convergence for finding a zero of a function. ACM Transactions on Mathematical Software 1(4), 330–345. https://doi.org/10.1145/355656.355659
 - **Chandrupatla, T. R. (1997)**. A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear function without using derivatives. Advances in Engineering Software 28(3), 145–149. https://doi.org/10.1016/S0965-9978(96)00051-8
 - **Dowell, M. and Jarratt, P. (1971)**. A modified regula falsi method for computing the root of an equation. BIT 11(2), 168–174. https://doi.org/10.1007/BF01934364
 - **Dowell, M. and Jarratt, P. (1972)**. The "Pegasus" method for computing the root of an equation. BIT 12(4), 503–508. https://doi.org/10.1007/BF01932959

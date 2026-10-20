@@ -36,7 +36,8 @@ from .example_solvers import WeightedSplitSolver, define_configs_declaration
 _BUILT_IN_CONFIG_ROWS = [
     ("anderson_bjorck", AndersonBjorck, SolverRole.BUILTIN_SECONDARY),
     ("bisection", Bisection, SolverRole.BUILTIN_BASELINE),
-    ("brent", Brent, SolverRole.BUILTIN_CORE),
+    ("brent[variant='hyperbolic']", Brent, SolverRole.BUILTIN_SECONDARY),
+    ("brent[variant='inverse_quadratic']", Brent, SolverRole.BUILTIN_CORE),
     ("carf", CARF, SolverRole.BUILTIN_SECONDARY),
     ("chandrupatla", Chandrupatla, SolverRole.BUILTIN_CORE),
     ("ellithy[variant='bf']", Ellithy, SolverRole.BUILTIN_SECONDARY),
@@ -110,7 +111,8 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
     assert solver_ids == [
         "anderson_bjorck",
         "bisection",
-        "brent",
+        "brent[variant='hyperbolic']",
+        "brent[variant='inverse_quadratic']",
         "carf",
         "chandrupatla",
         "ellithy[variant='bf']",

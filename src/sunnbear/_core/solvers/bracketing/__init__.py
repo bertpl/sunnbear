@@ -13,7 +13,7 @@ each solver class holds its whole algorithm.
 
 from .anderson_bjorck import AndersonBjorck
 from .bisection import Bisection
-from .brent import Brent
+from .brent import Brent, BrentVariant
 from .carf import CARF
 from .chandrupatla import Chandrupatla
 from .ellithy import Ellithy, EllithyVariant
