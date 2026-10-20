@@ -7,8 +7,7 @@ Published results:
   test solves at ``xtol = 0`` and counts the iterations until the article's stopping rule stops.
 
   The count of Method 4 on ``3[350,850]``, function 3 of the table on ``[350, 850]``, is not reproduced, cause unknown:
-  `Ford` takes 13 iterations, against Ford's 19, and the count stays 13 in arithmetic of 53 to 113 bits, while Methods 1
-  and 3 reproduce their counts on the same problem.
+  `Ford` takes 13 iterations, against Ford's 19.
 - Ford (1997), Table 4, the column "Method 2": not compared, because `Ford` does not implement Method 2.
 - Ford (1997), the asymptotic patterns of steps and the orders of convergence that its analysis derives: not compared,
   because they describe the steps near a simple root in exact arithmetic, not a run that the article reports.

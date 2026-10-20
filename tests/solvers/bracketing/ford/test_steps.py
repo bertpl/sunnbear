@@ -63,11 +63,12 @@ def test_each_method_scales_the_retained_f_by_its_own_gamma(variant, x3):
 
 @pytest.mark.parametrize("variant", FordVariant)
 def test_a_gamma_that_is_not_positive_falls_back_to_0_5(variant):
-    """On `_cubic_with_a_local_maximum` over ``[-3, 0]``, the first iterate has a function value above ``f(0) > 0``, so
+    """On `_cubic_with_a_local_maximum` over ``[-3, 0]``, the first iterate has a function value above ``f(0) = 2``, so
     it replaces the upper bound, on the same side of the root, and the second step is modified.
 
-    The numerator of ``gamma``, the slope at the first iterate of the quadratic through the 3 x-values, is negative, as
-    f's own slope is there, while every method's denominator is positive; so every variant halves ``f(-3)``.
+    The numerator of ``gamma``, the slope at the first iterate of the quadratic through the 3 x-values, is negative,
+    like the slope of f at that iterate, while every method's denominator is positive; so every variant halves
+    ``f(-3)``.
     """
     # --- arrange ----------------------
     a, b = -3.0, 0.0
@@ -91,16 +92,16 @@ def test_a_step_that_rounds_onto_the_most_recent_iterate_takes_the_factor_0_5(va
     """On `cubic` over ``[1, 2]`` at ``xtol = 0``, an iterate reaches a float next to the root, and the next 2 steps
     round onto that iterate.
 
-    Each time, ``f[x_(i+1), x_i]`` is ``0 / 0``; the factor 0.5, taken at each of them, then moves the following step
-    away from that iterate.
+    Each time, ``f[x_(i+1), x_i]`` is ``0 / 0``; the factor 0.5, taken at each of those 2 steps, then moves the
+    following step away from that iterate.
     """
     # --- act --------------------------
     result = Ford(variant=variant).solve(cubic, 1.0, 2.0, xtol=0.0, max_fevals=20, history_enabled=True)
 
     # --- assert -----------------------
     x_values = result.evaluated_x_values
-    first_repeat = next(i for i in range(2, len(x_values) - 1) if x_values[i] == x_values[i + 1])
-    iterate, next_x_1, next_x_2, next_x_3 = x_values[first_repeat : first_repeat + 4]
+    first_repeat_index = next(i for i in range(2, len(x_values) - 1) if x_values[i] == x_values[i + 1])
+    iterate, next_x_1, next_x_2, next_x_3 = x_values[first_repeat_index : first_repeat_index + 4]
     assert iterate == next_x_1 == next_x_2 != next_x_3
     # At xtol = 0, the solve runs until its budget is spent; a division of 0 by 0 would have ended it as SOLVER_ERROR.
     assert result.status is SolveStatus.MAX_FEVALS

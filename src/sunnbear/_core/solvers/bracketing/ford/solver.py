@@ -51,11 +51,9 @@ class Ford(BracketingSolver[FordState]):
     further iteration that keeps the retained bound scales that scaled value again.
 
     `Ford` computes every step in the form of the article's equation 5, ``(s*fr - r*fs) / (fr - fs)``, with
-    ``fs = f(s)``, and ``fr`` the scaled or unscaled function value at ``r``.
-
-    The article gives the unmodified step in 2 forms, its equations 2 and 3, which are equal in exact arithmetic but
-    round differently; equation 5 is equation 3 with the scaled value, so `Ford` uses the form of equation 3 for every
-    step.
+    ``fs = f(s)``, and ``fr`` the scaled or unscaled function value at ``r``. Equation 5 is the article's equation 3
+    with the scaled value. The article also gives the unmodified step as its equation 2, which equals equation 3 in
+    exact arithmetic but rounds differently.
 
     Ford's Method 2 is left out: Ford finds that it behaves very much like the Anderson-Björck method, which
     `AndersonBjorck` implements, and drops it from the article's discussion.
@@ -82,16 +80,23 @@ class Ford(BracketingSolver[FordState]):
     - **Side of the root:** the article tests whether a new iterate lies on the other side of the root by the sign of
       ``f_(i+1)*f_i``; the product of 2 small function values can underflow to 0, so `Ford` splits the interval by the
       sign of ``f_(i+1)`` alone, with `Interval.split_at`.
-    - **Division by 0:** `Ford` takes ``gamma = 0.5`` where ``x_(i+1)`` equals ``x_i``, so that ``f[x_(i+1), x_i]``
-      would be ``0/0``, and where the denominator of ``gamma`` is exactly 0; Method 1's denominator can round to 0.
-      Both tests only keep Python from raising a ``ZeroDivisionError``; the article has neither. ``x_(i+1)`` can equal
-      ``x_i`` where ``xtol`` lies below half the float spacing near the root, as at ``xtol = 0``.
+    - **Division by 0:** `Ford` takes ``gamma = 0.5`` in 2 cases that the article does not handle, only to keep Python
+      from raising a ``ZeroDivisionError``:
+
+      - where ``x_(i+1)`` equals ``x_i``, so that ``f[x_(i+1), x_i]`` would be ``0/0``; this happens where ``xtol``
+        lies below half the float spacing near the root, as at ``xtol = 0``;
+      - where the denominator of ``gamma`` is exactly 0, which Method 1's denominator can round to.
 
     References:
         - Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia
-          Iranica 4(1&2), 28-34. Its equations 3 and 5 are the steps, its Table 3 the approximations of the 2 slopes
-          whose ratio is ``gamma``, and its equations 23 to 25 the repeated scaling; the test suite reproduces the
-          iteration counts of Methods 1, 3 and 4 in its Table 4. https://scientiairanica.sharif.edu/article_21758.html
+          Iranica 4(1&2), 28-34:
+
+          - its equations 3 and 5 are the steps;
+          - its Table 3 gives the approximations of the 2 slopes whose ratio is ``gamma``;
+          - its equations 23 to 25 give the repeated scaling;
+          - the test suite reproduces the iteration counts of Methods 1, 3 and 4 in its Table 4.
+
+          https://scientiairanica.sharif.edu/article_21758.html
         - Anderson, N. and Björck, Å. (1973). A new high order method of regula falsi type for computing a root of an
           equation. BIT 13(3), 253-264. Its section 3 takes 0.5 in place of a factor that is not positive; `Ford`
           reads Ford's fallback the same way. https://doi.org/10.1007/BF01951936

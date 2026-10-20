@@ -80,8 +80,8 @@ TABLE_4_BY_VARIANT = {
         FordTable4Problem.F2_I3.with_n_iterations(59),
         FordTable4Problem.F3_I1.with_n_iterations(6),
         FordTable4Problem.F3_I2.with_n_iterations(12),
-        # `with_n_iterations` cannot leave a count unchecked, so this row gives Ford's 19 iterations as an evaluation
-        # count, adding the 2 evaluations at the interval bounds.
+        # `with_n_iterations` cannot leave a count unchecked, but `with_n_fevals` can, with ``deviation=None``; so this
+        # row gives Ford's 19 iterations as an evaluation count, adding the 2 evaluations at the interval bounds.
         FordTable4Problem.F3_I3.with_n_fevals(
             19 + 2,
             deviation=None,

@@ -14,8 +14,8 @@ def test_a_function_converges_to_its_root_except_at_a_multiple_root(f, a, b, roo
     `CONVERGENCE_TEST_CASES`, except on `ninth_power`, where no variant converges within 500 evaluations.
 
     Ford (1997) assumes a simple root. Near the multiple root of `ninth_power`, every iterate lies on the same side of
-    the root, below it, so the interval keeps its upper bound 4 and stays wider than ``2*xtol``, while each iterate lies
-    only about 8 to 10 % closer to the root than the one before.
+    the root, below it, so the interval keeps its upper bound, 4, and stays wider than ``2*xtol``, while each iterate
+    lies only about 8 to 10 % closer to the root than the one before.
     """
     # --- arrange ----------------------
     xtol = 1e-10

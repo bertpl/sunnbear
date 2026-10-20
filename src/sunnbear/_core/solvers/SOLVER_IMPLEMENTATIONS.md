@@ -226,7 +226,7 @@ Both configs follow section IV, and both are secondary: neither method is establ
 
 Ford (1997) treats the methods of `Illinois`, `Pegasus` and `AndersonBjorck` as 1 family: regula falsi in which a step that keeps the same interval bound as the step before scales the function value stored at that bound by a factor `γ`.
 
-His Methods 1 to 4 estimate `γ` from the divided differences `f[u, v] = (f(u) - f(v)) / (u - v)` between the last 3 x-values: the kept bound `x_(i-1)`, the previous iterate `x_i` and the new iterate `x_(i+1)`. The 4 methods differ only in the denominator of that estimate.
+His Methods 1 to 4 estimate `γ` from the divided differences `f[u, v] = (f(u) - f(v)) / (u - v)` between the last 3 x-values: the kept bound `x_(i-1)`, the previous iterate `x_i` and the new iterate `x_(i+1)`. The 4 methods compute `γ` as a quotient with the same numerator, `f[x_(i+1), x_i] + f[x_(i+1), x_(i-1)] - f[x_i, x_(i-1)]`, and differ only in its denominator.
 
 The 3 configs follow section IV, and are secondary: the config of `Illinois` already represents this family among the core configs. The Ford configs could become core if results show that they behave differently from the `Illinois` config.
 - **`ford[variant='method_1']` (secondary):** Method 1, with the denominator `f[x_(i-1), x_(i+1)] + f[x_(i-1), x_i] - f[x_(i+1), x_i]`.
