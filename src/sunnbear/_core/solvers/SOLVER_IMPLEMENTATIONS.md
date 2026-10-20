@@ -20,7 +20,7 @@ Some domains have inherent challenges in this area (e.g., non-exact sciences or 
 
 However, reproducing results can be challenging.  **Out of the 14 references** in section II...
 - **6** publish no code of the method, neither in the article nor as a separate download
-- **4** give evaluation counts for fewer than 10 runs of the method
+- **3** give evaluation or iteration counts for fewer than 10 runs of the method
 - **7** contain apparent typos in the algorithm description
 - **2** state that their experiments ran on a machine without IEEE 754 (64-bit) floating point
 - **2** publish results that reproduce only with a detail that the article leaves out
