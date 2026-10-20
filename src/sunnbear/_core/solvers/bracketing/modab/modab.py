@@ -1,5 +1,8 @@
 """`ModAB` implements the modified Anderson-Björck method, which switches between bisection and Anderson-Björck."""
 
+# `ModAB` is ported from C# code under the MIT license, © 2026 Ned Ganchovski; THIRD_PARTY_NOTICES.md holds that code's
+# copyright and license notice.
+
 from sunnbear._core.solvers.core import IntervalBound, Solver, SolveState
 from sunnbear._core.solvers.core.stopping import interval_root_if_converged
 
@@ -63,6 +66,9 @@ class ModAB(Solver):
     - it falls back to bisection after a fixed number of iterations;
     - it stops once 2 successive x-values lie within the tolerance.
 
+    Tomov and Ganchovski (2026) correct 2 defects of the C# code and replace its fallback rule; `ModABSafeguarded`
+    implements their method.
+
     In a clamped iteration, `ModAB` evaluates nothing, so it writes its own loop, not `BracketingSolver`'s.
 
     References:
@@ -72,8 +78,8 @@ class ModAB(Solver):
         - Ganchovski, N. and Traykov, A. (2023). Modified Anderson-Björck's method for solving non-linear equations in
           structural mechanics. IOP Conference Series: Materials Science and Engineering 1276, 012010. It
           describes the method's first version. https://doi.org/10.1088/1757-899X/1276/1/012010
-        - The authors' repository, https://github.com/Just-A-Random-Geek/ModAB-Root-Finding, which holds the C# code
-          of the 2026 paper's supplementary material, and later versions of the method in several languages.
+        - The authors' repository, https://github.com/Proektsoft-EOOD/ModAB-Root-Finding, which holds the C# code of
+          the 2026 paper's supplementary material, and later versions of the method in several languages.
         - pymodab, https://pypi.org/project/pymodab/, a Python wrapper of the authors' compiled C library.
     """
 
@@ -84,7 +90,7 @@ class ModAB(Solver):
         """Run the loop of the paper's C# code, and return the root estimate of `_root_if_converged` or ``x3``.
 
         The variables keep the names of the C# code, except for those listed below; the C# code also groups ``x1``
-        and ``y1`` into the point ``p1``, and likewise ``p2`` and ``p3``.
+        and ``y1`` into the point ``p1``, ``x2`` and ``y2`` into ``p2``, and ``x3`` and ``y3`` into ``p3``.
 
         - ``(x_new, y_new)`` is the point that replaces a bound: ``(x3, y3)``, or, when ``x3`` is clamped onto a
           bound, that bound with its stored function value;
@@ -176,7 +182,8 @@ class ModAB(Solver):
     def _root_if_converged(x1: float, y1: float, x2: float, y2: float, x3: float, xtol_doubled: float) -> float | None:
         """Return the root estimate if the solve ends before evaluating ``x3``, or ``None`` if it continues.
 
-        ``x3`` is not used. The test suite overrides this method to apply the C# code's own stopping criterion, the
-        interval at most ``aTol + rTol*|x3|`` wide, where it reproduces the paper's published counts.
+        ``x3`` is not used here. The test suite overrides this method to apply the C# code's own stopping criterion,
+        which ends the solve once the interval is at most ``aTol + rTol*|x3|`` wide; with that criterion, the solver
+        reproduces the paper's published counts.
         """
         return interval_root_if_converged(x1, y1, x2, y2, xtol_doubled)

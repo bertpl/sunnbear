@@ -12,5 +12,4 @@ class CARFConfigsDeclaration(SolverConfigsDeclaration):
     (published 2026), and `CARF` reconstructs it from the paper's description, without the author's code.
     """
 
-    solver_cls = CARF
-    configs = (SolverConfig(role=SolverRole.BUILTIN_SECONDARY),)
+    configs = (SolverConfig(solver_cls=CARF, role=SolverRole.BUILTIN_SECONDARY),)

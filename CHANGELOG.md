@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add the safeguarded modified Anderson-Björck method of Tomov and Ganchovski (2026), `sunnbear.solvers.ModABSafeguarded`
+
 ### Changed
+
+- Move `solver_cls` from `SolverConfigsDeclaration` to each `SolverConfig`, so that 1 `SolverConfigsDeclaration` subclass can declare the configs of several solver classes
 
 ### Deprecated
 

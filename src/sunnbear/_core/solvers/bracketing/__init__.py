@@ -18,7 +18,7 @@ from .carf import CARF
 from .chandrupatla import Chandrupatla
 from .illinois import Illinois
 from .itp import ITP, ITPVariant
-from .modab import ModAB
+from .modab import ModAB, ModABSafeguarded
 from .pegasus import Pegasus
 from .regula_falsi import RegulaFalsi
 from .ridders import Ridders, RiddersVariant

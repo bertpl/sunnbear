@@ -18,7 +18,7 @@ A **core principle of the scientific approach is reproducibility** of results.  
 
 Some domains have inherent challenges in this area (e.g., non-exact sciences or studies that involve exceptionally expensive equipment), but numerical algorithms and especially **root-finding algorithms seem well-suited**: digitally shareable, self-contained algorithms that can run on essentially any off-the-shelf computer.
 
-However, reproducing results can be challenging.  **Out of the 11 solvers** in section II that have a reference, the references of...
+However, reproducing results can be challenging.  **Out of the 12 references** in section II...
 - **5** publish no code of the method, neither in the article nor as a separate download
 - **3** give evaluation counts for fewer than 10 runs of the method
 - **5** contain apparent typos in the algorithm description
@@ -37,7 +37,7 @@ Due to the goals of section I.a and the challenges of section I.b, we...
 
 ## II. Solvers Overview
 
-The `sunnbear` package implements **14 solver algorithms**, several provided in different flavors and settings, totaling **19 solver configurations**.
+The `sunnbear` package implements **15 solver algorithms**, several provided in different flavors and settings, totaling **20 solver configurations**.
 
 | Algorithm | Type | Configs | core config? | Year | Reference |
 | --------- | ---- | ------- | ------------ | ---- | --------- |
@@ -55,6 +55,7 @@ The `sunnbear` package implements **14 solver algorithms**, several provided in 
 | `SteffenBrent` | bracketing | 1 | | 2025 | Steffen et al. (2025) |
 | `CARF` | bracketing | 1 | | 2026 | Gao (2026) |
 | `ModAB` | bracketing | 1 | | 2026 | Ganchovski et al. (2026) |
+| `ModABSafeguarded` | bracketing | 1 | | 2026 | Tomov and Ganchovski (2026) |
 
 The `core config?` column marks the algorithms that have a core config, which characterizes the test problems (section V).
 
@@ -142,6 +143,7 @@ The table lists what each source states, and what the `sunnbear` solver implemen
 | `SteffenBrent` | width ≤ `tol1`, or `\|f(b)\|` ≤ `tol2` | `b` | – |
 | `CARF` | `\|f\| < ε1`, or width < `ε2 + \|t\|*ε1` | not stated | – |
 | `ModAB` | width ≤ `aTol + rTol*\|x3\|`, or `f = 0` | the next iterate, not evaluated | – (it clamps each new iterate into the interval, without a tolerance) |
+| `ModABSafeguarded` | width ≤ `aTol + rTol*\|x3\|`, or `f = 0` | the next iterate, not evaluated | – (it projects each new iterate into the interval, without a tolerance) |
 
 `Bisection` and `RegulaFalsi` have no reference; they follow the shared stopping criterion and return value as they are.
 
@@ -176,6 +178,8 @@ Only a secondary config may deviate from section IV.
 | `ITP` | `itp[n_slack=0,variant='paper_experiments']` | core | the projection radius of the authors' code, `n_slack = 0` | yes |
 | | `itp[n_slack=0,variant='paper_pseudocode']` | secondary | the projection radius of the article's pseudocode, `n_slack = 0` | yes |
 | | `itp[n_slack=4,variant='paper_experiments']` | secondary | the projection radius of the authors' code, `n_slack = 4` | yes |
+| `ModAB` | `modab` | secondary | the method of Ganchovski et al. (2026) | yes |
+| `ModABSafeguarded` | `modab_safeguarded` | secondary | the corrected method of Tomov and Ganchovski (2026) | yes |
 
 ### V.a. Ridders
 
@@ -198,6 +202,20 @@ The 3 configs follow section IV, and differ in 2 settings: the projection radius
 - **`itp[n_slack=0,variant='paper_experiments']` (core):** the settings of the article's experiments and of the authors' code, with `n_slack = 0`. The authors' code lowers the article's projection radius to `max(0.99*r - xtol/2, 0)`, a margin against rounding; with it, the config reproduces 23 of the 24 evaluation counts of the article's Table 1.
 - **`itp[n_slack=0,variant='paper_pseudocode']` (secondary):** the article's pseudocode as printed, without that margin; this config reproduces 17 of the 24 counts. This config shows the effect of the margin: without it, rounding makes more solves exceed the iteration bound of `ITP`.
 - **`itp[n_slack=4,variant='paper_experiments']` (secondary):** the core config with `n_slack = 4`: about 10 % slack on the 40 evaluations of bisection at `n_bisection_fevals = 40`, the largest value that the benchmark uses. No source states a value; 4 is meant as a neutral value larger than 1, to show how extra slack changes the evaluation counts, and that rounding can still make a solve exceed the iteration bound of `ITP` by 1 iteration.
+
+### V.d. ModAB and ModABSafeguarded
+
+Both methods start with bisection steps, switch to Anderson–Björck steps once the function is close to a straight line, and fall back to bisection when an Anderson–Björck step leaves the interval wider than a fallback threshold, which the switch sets and each Anderson–Björck step halves. A phase is the sequence of Anderson–Björck steps from a switch to the next fallback.
+
+Tomov and Ganchovski (2026) correct 2 defects in the code of Ganchovski et al. (2026), and replace its fallback to bisection by an adaptive rule.
+
+Both configs follow section IV, and both are secondary: neither method is established yet (published 2026), and the evidence for each so far comes from its authors' own benchmarks.
+- **`modab` (secondary):** the method as Ganchovski et al. (2026) publish it, ported from the C# code in their article.
+- **`modab_safeguarded` (secondary):** the corrected method of Tomov and Ganchovski (2026), ported from the authors' C# code. The corrected method differs from the method of Ganchovski et al. (2026) in 4 ways; the 2 ways that concern the true function values correct the 2 defects:
+  - it keeps the true function values apart from the scaled values of its Anderson–Björck steps, so a scaled value never replaces a true one;
+  - it starts each phase of Anderson–Björck steps from the true function values, without scaling a value in its first step;
+  - when it switches to Anderson–Björck steps, it sets the fallback threshold to 2 times the interval width after the new x-value replaces a bound, not 16 times the width before;
+  - it allows up to 3 Anderson–Björck steps in a row that leave the interval wider than the fallback threshold, as long as each one brings the magnitude of the function value at its new x-value below half the smaller magnitude of the function values at the interval bounds before the step.
 
 ## VI. Code Organization & Validation
 
@@ -232,3 +250,4 @@ The tests compare each solver with the published results and reference implement
 - **Oliveira, I. F. D. and Takahashi, R. H. C. (2020)**. An enhancement of the bisection method average performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), Article 5. https://doi.org/10.1145/3423597
 - **Ridders, C. J. F. (1979)**. A new algorithm for computing a single root of a real continuous function. IEEE Transactions on Circuits and Systems 26(11), 979–980. https://doi.org/10.1109/TCS.1979.1084580
 - **Steffen, V., Della Pasqua, C. C., de Oliveira, M. S. and da Silva, E. A. (2025)**. Halving interval guaranteed for Dekker and Brent root finding methods. Examples and Counterexamples 7, 100173. https://doi.org/10.1016/j.exco.2024.100173
+- **Tomov, L. and Ganchovski, N. (2026)**. Global convergence and reliable stopping in a safeguarded modified Anderson–Björck method. arXiv preprint 2610.14193. https://doi.org/10.48550/arXiv.2610.14193

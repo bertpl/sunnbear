@@ -1,4 +1,5 @@
-"""This package holds `ModAB` and its built-in configs; importing it registers the configs."""
+"""This package holds `ModAB`, `ModABSafeguarded` and their built-in configs; importing it registers the configs."""
 
 from . import configs
-from .solver import ModAB
+from .modab import ModAB
+from .modab_safeguarded import ModABSafeguarded

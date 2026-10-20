@@ -11,5 +11,4 @@ class BrentConfigsDeclaration(SolverConfigsDeclaration):
     It is a core config. Brent's method is the de facto standard bracketing solver.
     """
 
-    solver_cls = Brent
-    configs = (SolverConfig(role=SolverRole.BUILTIN_CORE),)
+    configs = (SolverConfig(solver_cls=Brent, role=SolverRole.BUILTIN_CORE),)

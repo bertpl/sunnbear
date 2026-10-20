@@ -12,5 +12,4 @@ class SecantConfigsDeclaration(SolverConfigsDeclaration):
     interval, so its results do not reliably characterize the test functions.
     """
 
-    solver_cls = Secant
-    configs = (SolverConfig(role=SolverRole.BUILTIN_SECONDARY),)
+    configs = (SolverConfig(solver_cls=Secant, role=SolverRole.BUILTIN_SECONDARY),)

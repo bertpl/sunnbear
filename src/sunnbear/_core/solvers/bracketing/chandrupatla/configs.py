@@ -12,5 +12,4 @@ class ChandrupatlaConfigsDeclaration(SolverConfigsDeclaration):
     converges slowly, and Chandrupatla's method switches to bisection while Brent's method keeps interpolating.
     """
 
-    solver_cls = Chandrupatla
-    configs = (SolverConfig(role=SolverRole.BUILTIN_CORE),)
+    configs = (SolverConfig(solver_cls=Chandrupatla, role=SolverRole.BUILTIN_CORE),)

@@ -6,7 +6,7 @@ description = "Under construction."
 # rewriting the relative splash link to a tag-pinned absolute URL (config below).
 dynamic = ["readme"]
 license = "Apache-2.0"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 authors = [
     { name = "Bert Pluymers", email = "bert.pluymers@gmail.com" }
 ]
@@ -198,7 +198,8 @@ invalid-method-override = "ignore"
 
 [tool.codespell]
 # "intoto": the in-toto attestation format (provenance.intoto.jsonl).
-ignore-words-list = "intoto"
+# "ned" is the first name of Ned Ganchovski, whose code THIRD_PARTY_NOTICES.md covers.
+ignore-words-list = "intoto,ned"
 
 [tool.pytest.ini_options]
 addopts = "--strict-markers"

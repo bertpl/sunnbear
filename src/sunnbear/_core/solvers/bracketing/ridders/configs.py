@@ -19,11 +19,18 @@ class RiddersConfigsDeclaration(SolverConfigsDeclaration):
     config vary more between near-identical functions than those of ``ridders[variant='scipy']``.
     """
 
-    solver_cls = Ridders
     configs = (
         SolverConfig(
-            role=SolverRole.BUILTIN_CORE, solver_kwargs={"variant": RiddersVariant.STANDARD_STOPPING_CRITERION}
+            solver_cls=Ridders,
+            role=SolverRole.BUILTIN_CORE,
+            solver_kwargs={"variant": RiddersVariant.STANDARD_STOPPING_CRITERION},
         ),
-        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": RiddersVariant.SCIPY}),
-        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": RiddersVariant.COMMONS_MATH}),
+        SolverConfig(
+            solver_cls=Ridders, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": RiddersVariant.SCIPY}
+        ),
+        SolverConfig(
+            solver_cls=Ridders,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"variant": RiddersVariant.COMMONS_MATH},
+        ),
     )

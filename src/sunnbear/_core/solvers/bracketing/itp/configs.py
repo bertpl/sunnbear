@@ -19,15 +19,20 @@ class ITPConfigsDeclaration(SolverConfigsDeclaration):
     configs' roles, and for ``n_slack = 4``.
     """
 
-    solver_cls = ITP
     configs = (
         SolverConfig(
-            role=SolverRole.BUILTIN_CORE, solver_kwargs={"n_slack": 0, "variant": ITPVariant.PAPER_EXPERIMENTS}
+            solver_cls=ITP,
+            role=SolverRole.BUILTIN_CORE,
+            solver_kwargs={"n_slack": 0, "variant": ITPVariant.PAPER_EXPERIMENTS},
         ),
         SolverConfig(
-            role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"n_slack": 0, "variant": ITPVariant.PAPER_PSEUDOCODE}
+            solver_cls=ITP,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"n_slack": 0, "variant": ITPVariant.PAPER_PSEUDOCODE},
         ),
         SolverConfig(
-            role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"n_slack": 4, "variant": ITPVariant.PAPER_EXPERIMENTS}
+            solver_cls=ITP,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"n_slack": 4, "variant": ITPVariant.PAPER_EXPERIMENTS},
         ),
     )

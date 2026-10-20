@@ -12,5 +12,4 @@ class PegasusConfigsDeclaration(SolverConfigsDeclaration):
     falsi family among the core configs.
     """
 
-    solver_cls = Pegasus
-    configs = (SolverConfig(role=SolverRole.BUILTIN_SECONDARY),)
+    configs = (SolverConfig(solver_cls=Pegasus, role=SolverRole.BUILTIN_SECONDARY),)

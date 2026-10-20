@@ -12,5 +12,4 @@ class IllinoisConfigsDeclaration(SolverConfigsDeclaration):
     characterize the test functions.
     """
 
-    solver_cls = Illinois
-    configs = (SolverConfig(role=SolverRole.BUILTIN_CORE),)
+    configs = (SolverConfig(solver_cls=Illinois, role=SolverRole.BUILTIN_CORE),)

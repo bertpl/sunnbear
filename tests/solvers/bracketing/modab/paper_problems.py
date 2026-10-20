@@ -1,9 +1,26 @@
-"""This module holds `TABLE_2`, the problems of Table 2 of Ganchovski et al. (2026), with modAB's evaluation count in
-that table and its root in the paper's supplementary results."""
+"""This module holds the published results of `ModAB` and `ModABSafeguarded` on the problems of their authors' C#
+benchmark, and on 1 problem of Tomov and Ganchovski (2026):
 
-from tests.solvers.paper_problems import UNSTATED_RUN_DETAILS
-from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
+- `TABLE_2`, the problems of Table 2 of Ganchovski et al. (2026), with modAB's evaluation count in that table and its
+  root in the paper's supplementary results;
+- `TABLE_3_BY_SETTING`, the 8 cases of Table 3 of Tomov and Ganchovski (2026), with the safeguarded method's
+  evaluation count under each of the table's 3 settings;
+- `TABLE_3_VALIDATED_NON_STRESS_CASES`, the 86 cases that Table 3's non-stress sums cover, and
+  `TABLE_3_VALIDATED_NON_STRESS_SUMS_BY_SETTING`, the value of that sum under each setting;
+- `TABLE_4_CAP_M_3`, the row "Cap M = 3" of Table 4 of Tomov and Ganchovski (2026), on `EQUATION_27`, the preprint's
+  equation 27;
+- `TABLE_5` and `TABLE_5_TOTAL_N_FEVALS`, the x-values that the safeguarded method returns on the 3 cases of Table 5 of
+  Tomov and Ganchovski (2026), and its total evaluation count on them.
+"""
 
+from dataclasses import replace
+
+from tests.solvers.paper_problems import UNSTATED_RUN_DETAILS, PaperProblem
+from tests.solvers.paper_problems.ganchovski_et_al import GANCHOVSKI_ET_AL_ADDED_PROBLEMS, GanchovskiEtAlTable2Problem
+
+# ==================================================================================================
+#  Ganchovski et al. (2026)
+# ==================================================================================================
 # On the problems whose row carries this reason, the evaluation count differs from Table 2's, presumably because the
 # authors' .NET runtime rounds the last bit of a library function's result differently from the correctly rounded
 # values here, which changes the x-values that the solve evaluates.
@@ -125,3 +142,82 @@ TABLE_2 = [
     GanchovskiEtAlTable2Problem.F91.with_n_fevals_and_root(13, root=0.120778011811926),
     GanchovskiEtAlTable2Problem.F92.with_n_fevals_and_root(25, root=0.1),
 ]
+
+
+# ==================================================================================================
+#  Tomov and Ganchovski (2026)
+# ==================================================================================================
+# This dict maps each name to its problem, for the problems of the authors' benchmark that sunnbear accepts, f01 to
+# f99.
+#
+# In that benchmark, f49 computes x^(1/3) for x > 0, not x^0 as in Table 2 of Ganchovski et al. (2026); the
+# safeguarded method takes the same number of evaluations on both forms, under each setting of Table 3, so the tests
+# use `GanchovskiEtAlTable2Problem.F49`.
+_BENCHMARK_PROBLEMS_BY_NAME = {
+    problem.name: problem
+    for problem in [member.value for member in GanchovskiEtAlTable2Problem] + GANCHOVSKI_ET_AL_ADDED_PROBLEMS
+}
+
+# Table 3 runs the safeguarded method under 3 settings of its 2 constants, which the tests name fixed_delay,
+# early_fallback and adaptive. Each row holds a case and its evaluation counts under the 3 settings; each count
+# includes the 2 evaluations at the interval bounds.
+_TABLE_3_ROWS = [
+    {"name": "f64", "fixed_delay": 9, "early_fallback": 14, "adaptive": 9},
+    {"name": "f84", "fixed_delay": 9, "early_fallback": 16, "adaptive": 9},
+    {"name": "f92", "fixed_delay": 24, "early_fallback": 21, "adaptive": 21},
+    {"name": "f93", "fixed_delay": 23, "early_fallback": 21, "adaptive": 21},
+    {"name": "f94", "fixed_delay": 24, "early_fallback": 21, "adaptive": 21},
+    {"name": "f95", "fixed_delay": 22, "early_fallback": 19, "adaptive": 19},
+    {"name": "f96", "fixed_delay": 23, "early_fallback": 20, "adaptive": 20},
+    {"name": "f97", "fixed_delay": 24, "early_fallback": 21, "adaptive": 21},
+]
+TABLE_3_BY_SETTING = {
+    setting: [replace(_BENCHMARK_PROBLEMS_BY_NAME[row["name"]], n_fevals=row[setting]) for row in _TABLE_3_ROWS]
+    for setting in ("fixed_delay", "early_fallback", "adaptive")
+}
+
+
+def _equation_27(x: float) -> float:
+    """Return the preprint's equation 27: ``-x^2`` for ``x < 0``, and ``7*x^2`` for ``x >= 0``, computed as
+    ``7*(x*x)``."""
+    if x < 0.0:
+        return -(x * x)
+    else:
+        return 7.0 * (x * x)
+
+
+# `EQUATION_27` is the preprint's equation 27 on [-3, 1], the problem of its Proposition 3.6 and its Table 4. The
+# benchmark's f101 is the same problem, but computes 7*x*x, which rounds differently from the 7*(x*x) that Table 4's
+# values need.
+EQUATION_27 = PaperProblem(name="equation_27", f=_equation_27, a=-3.0, b=1.0)
+
+# The row "Cap M = 3" of Table 4 holds the evaluation count; the preprint's Section 7.4 prints the returned x-value and
+# the width of the final interval to all digits.
+TABLE_4_CAP_M_3 = replace(EQUATION_27, n_fevals=77, root=-7.776095734362668e-16)
+TABLE_4_CAP_M_3_FINAL_WIDTH = 5.516726238025032e-15
+
+# Table 5 gives the x-value that the safeguarded method returns on 3 cases, under each setting of Table 3. It prints
+# f29's x-value to 10 significant digits, and the other 2 to all digits.
+TABLE_5 = [
+    replace(GanchovskiEtAlTable2Problem.F27.value, root=1.88916015625),
+    replace(GanchovskiEtAlTable2Problem.F29.value, root=3.000390625, root_rel_tol=1e-10),
+    replace(GanchovskiEtAlTable2Problem.F75.value, root=0.3333333134651184),
+]
+# The preprint's Section 7.3 gives the total evaluation count over the 3 cases of Table 5, the same under each setting.
+TABLE_5_TOTAL_N_FEVALS = 53
+
+# Table 3's sums over its 86 validated non-stress cases leave out 14 of the benchmark's f01 to f100:
+# - the 8 cases without a reference root;
+# - the 3 cases of Table 5, whose returned x-value fails the authors' validation;
+# - the 3 stress cases: f82 and f83, which are discontinuous, and f100, whose function is infinite at its lower bound.
+_NAMES_LEFT_OUT_OF_THE_VALIDATED_NON_STRESS_SUMS = (
+    {"f38", "f39", "f40", "f76", "f77", "f78", "f79", "f81"}
+    | {problem.name for problem in TABLE_5}
+    | {"f82", "f83", "f100"}
+)
+TABLE_3_VALIDATED_NON_STRESS_CASES = [
+    problem
+    for name, problem in _BENCHMARK_PROBLEMS_BY_NAME.items()
+    if name not in _NAMES_LEFT_OUT_OF_THE_VALIDATED_NON_STRESS_SUMS
+]
+TABLE_3_VALIDATED_NON_STRESS_SUMS_BY_SETTING = {"fixed_delay": 1492, "early_fallback": 1507, "adaptive": 1475}
