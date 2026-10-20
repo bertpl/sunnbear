@@ -1,0 +1,20 @@
+"""These tests assert that both algorithms of `TOMS748Paper` converge to a root of the test functions."""
+
+import pytest
+
+from sunnbear._core.solvers.bracketing.toms748_paper import TOMS748Paper
+from sunnbear.solvers import SolveStatus
+from tests.solvers.example_functions import CONVERGENCE_TEST_CASES
+
+
+@pytest.mark.parametrize("k", [1, 2])
+@pytest.mark.parametrize("f, a, b, root", CONVERGENCE_TEST_CASES)
+def test_a_function_converges_to_its_root(f, a, b, root, k: int):
+    """Both algorithms of `TOMS748Paper` return an x-value within ``xtol`` of the root on each function of
+    `CONVERGENCE_TEST_CASES`."""
+    # --- act --------------------------
+    result = TOMS748Paper(k=k).solve(f, a, b, xtol=1e-10, max_fevals=500)
+
+    # --- assert -----------------------
+    assert result.status is SolveStatus.CONVERGED
+    assert abs(result.x - root) <= 1e-10
