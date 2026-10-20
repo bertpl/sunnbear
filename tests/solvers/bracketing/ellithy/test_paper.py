@@ -17,8 +17,8 @@ from .paper_problems import (
     TABLES_2_TO_5_BY_VARIANT,
 )
 
-# The article's tolerance on |f(x)|, with which its experiments ran.
-_ARTICLE_TOL = 1e-14
+# The article's experiments ran with this tolerance on |f(x)|.
+_PAPER_TOL = 1e-14
 
 # The article's runs repeat each problem 10000 times, 480000 runs in total (section 6.4).
 _N_RUNS_PER_PROBLEM = 10000
@@ -45,11 +45,7 @@ def test_the_rows_of_table_12_name_every_problem_in_order(variant: EllithyVarian
     ],
 )
 def test_the_iteration_counts_of_table_12_are_reproduced(variant: EllithyVariant, problem: PaperProblem):
-    """On every row of Table 12, each variant takes the table's iteration count for its method.
-
-    The solve stops by the article's stopping criterion, with the article's adaptive ``delta``, or with a fixed
-    ``delta = 1e-4`` on the problems of `TABLE_12_FIXED_DELTA_PROBLEM_NAMES`.
-    """
+    """On every row of Table 12, each variant takes the table's iteration count for its method."""
     # --- arrange ----------------------
     if problem.name in TABLE_12_FIXED_DELTA_PROBLEM_NAMES.get(variant, frozenset()):
         solver = _EllithyWithFixedDelta(variant=variant)
@@ -57,7 +53,7 @@ def test_the_iteration_counts_of_table_12_are_reproduced(variant: EllithyVariant
         solver = _EllithyWithPaperStoppingCriterion(variant=variant)
 
     # --- act / assert -----------------
-    assert _n_iterations_until_stop(solver, problem) == problem.n_iterations
+    assert solver.n_iterations_until_stop(problem) == problem.n_iterations
 
 
 @pytest.mark.parametrize(
@@ -75,7 +71,7 @@ def test_the_adaptive_delta_takes_1_iteration_fewer_than_table_12_on_the_fixed_d
     """On each problem of `TABLE_12_FIXED_DELTA_PROBLEM_NAMES`, the adaptive ``delta`` takes 1 iteration fewer than
     Table 12."""
     # --- act / assert -----------------
-    n_iterations = _n_iterations_until_stop(_EllithyWithPaperStoppingCriterion(variant=variant), problem)
+    n_iterations = _EllithyWithPaperStoppingCriterion(variant=variant).n_iterations_until_stop(problem)
     assert n_iterations == problem.n_iterations - 1
 
 
@@ -91,26 +87,23 @@ def test_the_adaptive_delta_takes_1_iteration_fewer_than_table_12_on_the_fixed_d
     ],
 )
 def test_the_iteration_counts_of_tables_2_to_5_are_reproduced(variant: EllithyVariant, problem: PaperProblem):
-    """On the problem of each of Tables 2 to 5, each variant takes the table's iteration count for its method.
-
-    The solve stops by the article's stopping criterion, with the article's adaptive ``delta``.
-    """
+    """On the problem of each of Tables 2 to 5, each variant takes the table's iteration count for its method."""
     # --- act / assert -----------------
-    n_iterations = _n_iterations_until_stop(_EllithyWithPaperStoppingCriterion(variant=variant), problem)
+    n_iterations = _EllithyWithPaperStoppingCriterion(variant=variant).n_iterations_until_stop(problem)
     assert n_iterations == problem.n_iterations
 
 
 @pytest.mark.parametrize("variant", EllithyVariant)
 def test_the_statistics_of_table_7_are_reproduced(variant: EllithyVariant):
-    """The iteration counts of each variant on the 48 problems have the statistics that Table 7 reports for its method.
+    """The iteration counts of each variant on the 48 problems have Table 7's statistics for its method.
 
-    The solves stop by the article's stopping criterion, with the article's adaptive ``delta``. Table 7's standard
-    deviation is the sample standard deviation over the article's 480000 runs, which repeat each problem 10000 times, so
-    it exceeds the standard deviation of the 48 counts by the factor ``sqrt(N / (N - 1))``, with ``N = 480000``.
+    Table 7's standard deviation is the sample standard deviation over the article's 480000 runs, which repeat each
+    problem 10000 times, so Table 7's value exceeds the standard deviation of the 48 counts by the factor
+    ``sqrt(N / (N - 1))``, with ``N = 480000``.
     """
     # --- act --------------------------
     counts = [
-        _n_iterations_until_stop(_EllithyWithPaperStoppingCriterion(variant=variant), problem)
+        _EllithyWithPaperStoppingCriterion(variant=variant).n_iterations_until_stop(problem)
         for problem in PROBLEMS_BY_NUMBER.values()
     ]
 
@@ -134,8 +127,8 @@ class _EllithyWithPaperStoppingCriterion(Ellithy):
     """`_EllithyWithPaperStoppingCriterion` is `Ellithy` with the stopping criterion of the article's pseudocode: the
     solve ends once ``|f(x)| <= 1e-14`` at an x-value that the article tests, and returns that x-value.
 
-    It records in `n_iterations` the number of the iteration in which the solve ends. The tests pass ``xtol = 0``,
-    which this class ignores.
+    It records in `n_iterations` the number of the iteration in which the solve ends. `n_iterations_until_stop` passes
+    ``xtol = 0``, which this class ignores.
     """
 
     def __init__(self, *, variant: EllithyVariant) -> None:
@@ -151,16 +144,24 @@ class _EllithyWithPaperStoppingCriterion(Ellithy):
         self,
         interval: Interval,
         xtol_doubled: float,
-        n: int,
+        iteration_number: int,
         tested_evaluations: tuple[tuple[float, float], ...],
     ) -> float | None:
-        """Return the first x-value of ``tested_evaluations`` with ``|f(x)| <= 1e-14``, and record ``n``, or return
-        ``None`` if the solve continues; ``interval`` and ``xtol_doubled`` are ignored."""
+        """Return the first x-value of ``tested_evaluations`` with ``|f(x)| <= 1e-14``, and record
+        ``iteration_number``, or return ``None`` if the solve continues; ``interval`` and ``xtol_doubled`` are
+        ignored."""
         for x, fx in tested_evaluations:
-            if abs(fx) <= _ARTICLE_TOL:
-                self.n_iterations = n
+            if abs(fx) <= _PAPER_TOL:
+                self.n_iterations = iteration_number
                 return x
         return None
+
+    def n_iterations_until_stop(self, problem: PaperProblem) -> int:
+        """Return the number of iterations that this solver takes on ``problem`` until the article's stopping
+        criterion stops it, counted as the article counts them."""
+        result = self.solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=300)
+        assert result.status is SolveStatus.CONVERGED
+        return self.n_iterations
 
 
 class _EllithyWithFixedDelta(_EllithyWithPaperStoppingCriterion):
@@ -169,11 +170,3 @@ class _EllithyWithFixedDelta(_EllithyWithPaperStoppingCriterion):
 
     _DELTA_FACTOR = 0.0
     _DELTA_OFFSET = 1e-4
-
-
-def _n_iterations_until_stop(solver: _EllithyWithPaperStoppingCriterion, problem: PaperProblem) -> int:
-    """Return the number of iterations that ``solver`` takes on ``problem`` until the article's stopping criterion
-    stops it, counted as the article counts them."""
-    result = solver.solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=300)
-    assert result.status is SolveStatus.CONVERGED
-    return solver.n_iterations

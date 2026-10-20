@@ -9,8 +9,8 @@
 - `TABLE_7_BY_VARIANT`, the statistics of the iteration counts in Table 7.
 
 The functions follow the article's section 5.4. The authors' code defines 2 constants in a different form, with no
-effect on any count: f43 prints ``2.7e-5`` where the code has ``0.000027027``, and f45 prints ``24.618`` where the code
-has ``0.08206 * 300``, which is the same float64.
+effect on any count: for f43 the article prints ``2.7e-5`` where the code has ``0.000027027``, and for f45 it prints
+``24.618`` where the code has ``0.08206 * 300``, which evaluates to the same float64.
 """
 
 import math

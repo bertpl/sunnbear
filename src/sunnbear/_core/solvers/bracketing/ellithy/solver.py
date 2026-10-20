@@ -4,8 +4,8 @@ from sunnbear._core.solvers.core import Interval, IntervalBound, Solver, SolveSt
 
 from .variant import EllithyVariant
 
-# The article's guard against a zero denominator in the modified-secant step: where the denominator is exactly 0, the
-# step adds this value to it.
+# `_EPSILON` is the article's guard against a zero denominator in the modified-secant step: where the denominator is
+# exactly 0, the step adds `_EPSILON` to it.
 _EPSILON = 1e-15
 
 
@@ -13,7 +13,7 @@ class Ellithy(Solver):
     """`Ellithy` implements the 4 multi-phase hybrid bracketing methods of Ellithy (2026), in 4 variants.
 
     The article presents its 4 methods as settings of 1 design: each iteration runs up to 3 phases on the interval
-    ``[a, b]``, with ``fa = f(a)`` and ``fb = f(b)``, and each phase works on the interval that the phase before left:
+    ``[a, b]``, with ``fa = f(a)`` and ``fb = f(b)``, and each phase works on the previous phase's interval:
 
     - **phase 1, bisection or trisection:** bisection evaluates the midpoint ``x_B = 0.5*(a + b)`` and splits the
       interval there. Trisection evaluates both ``x1 = a + (b - a)/3`` and ``x2 = b - (b - a)/3`` before it updates
@@ -40,11 +40,15 @@ class Ellithy(Solver):
         "tf":    Opt.TF, the article's Algorithm 3: trisection, then false position
         "tfms":  Opt.TFMS, the article's Algorithm 4: trisection, false position, then modified secant
 
-    A complete iteration evaluates the function 2 times in ``"bf"``, 3 in ``"tf"``, 3 or 4 in ``"bfms"`` and 4 or 5 in
-    ``"tfms"``.
+    A complete iteration evaluates the function:
 
-    The solve ends by the shared stopping criterion of the bracketing solvers, which it checks at each point where the
-    article tests its own stopping criterion, ``|f(x)| <= tol``, after the interval update of that phase:
+    - 2 times in ``"bf"``;
+    - 3 times in ``"tf"``;
+    - 3 or 4 times in ``"bfms"``;
+    - 4 or 5 times in ``"tfms"``.
+
+    The solve ends by the shared stopping criterion of the bracketing solvers, which `Ellithy` checks at each point
+    where the article tests its own stopping criterion, ``|f(x)| <= tol``, after the interval update of that phase:
 
     - ``"bf"``: after the bisection, and after the false position;
     - ``"bfms"``: after the false position, and after an accepted ``x_S``. Algorithm 2 has no test after its bisection,
@@ -77,8 +81,9 @@ class Ellithy(Solver):
     - **The probe, evaluated once:** where the denominator of the modified-secant step is 0, the article evaluates
       ``f(x_FP + delta)`` a second time; `Ellithy` reuses the value of the first evaluation.
     - **Guards against a zero denominator:** the article adds ``eps`` to a denominator where its division raises an
-      error. A float division in Python raises only for a denominator of 0, so `Ellithy` adds ``eps`` only there. The
-      article also guards the false position, whose denominator ``fb - fa`` is never 0, because ``fa`` and ``fb``
+      error. A float division in Python raises only for a denominator of 0, so `Ellithy` adds ``eps`` only there.
+
+      The article also guards the false position, whose denominator ``fb - fa`` is never 0, because ``fa`` and ``fb``
       differ in sign; `Ellithy` leaves that guard out.
 
     A known caveat: where ``x_FP`` lies within ``delta`` of the upper bound of the initial interval, the probe
@@ -104,8 +109,7 @@ class Ellithy(Solver):
           https://doi.org/10.21608/joems.2026.440115.1078
         - The authors' code, at commit ``7f22131ef4e1def3e3928dc6558f46f756d0a5ea`` (MIT license). Its experiment
           scripts follow Algorithms 1 to 4 line by line. They give the step ``delta`` of the modified-secant step a
-          default of 1e-4, which their loop replaces by the adaptive ``delta``; with a fixed ``delta = 1e-4``, the test
-          suite reproduces the columns of Opt.BFMS and Opt.TFMS in Table 12.
+          default of 1e-4, which their loop replaces by the ``delta`` of equation 2, which grows with ``|x_FP|``.
           https://github.com/Abdelrhman-Ellithy/hybridroots
         - The package ``hybridroots``, the authors' implementation of the 4 methods; the test suite checks `Ellithy`
           against version 1.0.1. https://pypi.org/project/hybridroots/
@@ -114,9 +118,9 @@ class Ellithy(Solver):
     name = "ellithy"
     version = 1
 
-    # The 2 constants of the article's step delta = _DELTA_FACTOR * max(1, |x_FP|) + _DELTA_OFFSET. They are class
-    # attributes, so that the test suite can set a fixed delta in a subclass, with which the columns of Opt.BFMS and
-    # Opt.TFMS in the article's Table 12 reproduce.
+    # These are the 2 constants of the article's step delta = _DELTA_FACTOR * max(1, |x_FP|) + _DELTA_OFFSET. They are
+    # class attributes, so that the test suite can set a fixed delta in a subclass: some counts of Opt.BFMS and Opt.TFMS
+    # in the article's Table 12 reproduce only with a fixed delta.
     _DELTA_FACTOR = 1e-8
     _DELTA_OFFSET = 1e-15
 
@@ -138,8 +142,8 @@ class Ellithy(Solver):
         """
         interval = state.interval
         xtol_doubled = 2.0 * state.xtol
-        is_bisection = self.variant in (EllithyVariant.BF, EllithyVariant.BFMS)
-        has_secant_step = self.variant in (EllithyVariant.BFMS, EllithyVariant.TFMS)
+        is_bisection = self.variant.is_bisection
+        has_secant_step = self.variant.has_secant_step
         n = 0
         while True:
             n += 1
@@ -184,8 +188,8 @@ class Ellithy(Solver):
 
             # --- phase 3: modified secant -------
             if has_secant_step:
-                # Where |x_fp| <= 1, max returns the plain float 1.0, so delta is a constant, and its 2 operations
-                # are not counted.
+                # Where |x_fp| <= 1, max returns the plain float 1.0, not a flop-counted value, so delta is a plain
+                # constant and its 2 operations add no flops to the count.
                 delta = self._DELTA_FACTOR * max(1.0, abs(x_fp)) + self._DELTA_OFFSET
                 # The probe and a rejected x_s are not estimates of the root, so they leave state.x_best unchanged.
                 f_probe = state.f(x_fp + delta)
@@ -207,13 +211,17 @@ class Ellithy(Solver):
     # --------------------------------------------------------------------------
     @staticmethod
     def _root_if_converged(
-        interval: Interval, xtol_doubled: float, n: int, tested_evaluations: tuple[tuple[float, float], ...]
+        interval: Interval,
+        xtol_doubled: float,
+        iteration_number: int,
+        tested_evaluations: tuple[tuple[float, float], ...],
     ) -> float | None:
         """Return the root estimate if the solve ends at ``interval``, or ``None`` if it continues.
 
-        ``n`` is the iteration's number, and ``tested_evaluations`` holds the ``(x, f(x))`` pairs whose ``|f(x)|`` the
-        article tests at this point. Neither is used: the test suite overrides this method to apply the article's own
-        stopping criterion, which needs both, where it reproduces the article's published iteration counts.
+        ``iteration_number`` is the iteration's number, and ``tested_evaluations`` holds the ``(x, f(x))`` pairs whose
+        ``|f(x)|`` the article tests at this point. Neither is used: the test suite overrides this method to apply the
+        article's own stopping criterion, which needs both, where it reproduces the article's published iteration
+        counts.
         """
         if interval.is_converged(xtol_doubled):
             return interval.root()

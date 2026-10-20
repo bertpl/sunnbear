@@ -53,11 +53,12 @@ def test_the_trisection_variants_evaluate_both_thirds_then_the_false_position(va
 
 
 @pytest.mark.parametrize(
-    "variant, x_fp, newton_step",
+    "variant, x_fp, x_newton",
     [(EllithyVariant.BFMS, 4.0 / 3.0, 17.0 / 12.0), (EllithyVariant.TFMS, 1.4, 1.4 + 1.0 / 70.0)],
 )
-def test_the_secant_variants_take_a_modified_secant_step_from_the_false_position(variant, x_fp, newton_step):
-    """The secant variants evaluate the probe ``x_FP + delta``, then ``x_S`` near Newton's step, which replaces a bound.
+def test_the_secant_variants_take_a_modified_secant_step_from_the_false_position(variant, x_fp, x_newton):
+    """The secant variants evaluate the probe ``x_FP + delta``, then ``x_S``, which lies near Newton's step and
+    replaces a bound.
 
     On `_quadratic` over ``[0, 2]``, the false position ``x_FP`` is 4/3 for ``"bfms"`` and 7/5 for ``"tfms"``, and
     ``delta = 1e-8*x_FP + 1e-15``. ``x_S`` lies within about ``delta`` of Newton's step ``x_FP - f(x_FP) / (2*x_FP)``,
@@ -72,7 +73,7 @@ def test_the_secant_variants_take_a_modified_secant_step_from_the_false_position
     x_fp_evaluated, probe, x_s, x_next = result.evaluated_x_values[i_fp : i_fp + 4]
     assert x_fp_evaluated == pytest.approx(x_fp, rel=1e-15)
     assert probe == x_fp_evaluated + (1e-8 * x_fp_evaluated + 1e-15)
-    assert x_s == pytest.approx(newton_step, rel=1e-8)
+    assert x_s == pytest.approx(x_newton, rel=1e-8)
     if variant is EllithyVariant.BFMS:
         assert x_next == 0.5 * (x_fp_evaluated + x_s)
     else:
@@ -113,9 +114,9 @@ def test_a_zero_at_x1_ends_the_solve_at_x1(variant):
 def test_a_zero_secant_denominator_adds_eps_and_an_x_s_that_does_not_lower_f_is_rejected():
     """The modified-secant step adds ``eps`` to a denominator of 0, and rejects an ``x_S`` that does not lower ``|f|``.
 
-    On a function that is ``-1e-9`` below 1.9 and 1 above, over ``[0, 2]``, ``"bfms"`` evaluates the midpoint 1 and
-    the false position ``x_FP``, just above 1. ``f`` is flat there, so ``f(x_FP + delta) - f(x_FP)`` is 0, and the
-    step divides by ``eps = 1e-15``; ``x_S`` then lies about 0.01 above ``x_FP``, inside the interval.
+    On a function that equals ``-1e-9`` for x below 1.9 and 1 from 1.9 up, over ``[0, 2]``, ``"bfms"`` evaluates the
+    midpoint 1 and the false position ``x_FP``, just above 1. ``f`` is flat there, so ``f(x_FP + delta) - f(x_FP)``
+    is 0, and the step divides by ``eps = 1e-15``; ``x_S`` then lies about 0.01 above ``x_FP``, inside the interval.
     ``|f(x_S)|`` equals ``|f(x_FP)|``, so the next iteration bisects ``[x_FP, 2]``.
     """
 
@@ -140,9 +141,10 @@ def test_a_zero_secant_denominator_adds_eps_and_an_x_s_that_does_not_lower_f_is_
 def test_an_x_s_outside_the_interval_is_not_evaluated():
     """An ``x_S`` outside the interval is not evaluated, and the next iteration starts.
 
-    On a function that is -1 below 1.9 and 1 above, over ``[0, 2]``, ``"bfms"`` evaluates the midpoint 1, and the false
-    position 1.5. ``f`` is flat there, so the step divides by ``eps = 1e-15``, and ``x_S``, about ``1.5e7`` above 1.5,
-    lies outside the interval ``[1.5, 2]``: the next evaluation is the next iteration's midpoint, 1.75.
+    On a function that equals -1 for x below 1.9 and 1 from 1.9 up, over ``[0, 2]``, ``"bfms"`` evaluates the midpoint
+    1, and the false position 1.5. ``f`` is flat there, so the step divides by ``eps = 1e-15``, and ``x_S``, about
+    ``1.5e7`` above 1.5, lies outside the interval ``[1.5, 2]``: the next evaluation is the next iteration's midpoint,
+    1.75.
     """
 
     # --- arrange ----------------------
@@ -163,8 +165,9 @@ def test_an_x_s_outside_the_interval_is_not_evaluated():
 def test_a_probe_outside_the_initial_interval_where_f_fails_ends_the_solve_as_diverged(variant):
     """Where ``f`` fails at a probe outside the initial interval, the solve ends as ``DIVERGED``, at the false position.
 
-    On ``1e-18 - (1 - x)^2`` over ``[0.5, 1]``, which raises above 1, the false position of the first iteration is the
-    upper bound 1, where ``|f|`` is 1e-18, so the probe ``1 + delta`` lies outside the initial interval.
+    On ``1e-18 - (1 - x)^2`` over ``[0.5, 1]``, a function that raises ``ValueError`` above 1, the false position of
+    the first iteration is the upper bound 1, where ``|f|`` is 1e-18, so the probe ``1 + delta`` lies outside the
+    initial interval.
     """
 
     # --- arrange ----------------------

@@ -37,7 +37,11 @@ class SecantScipyTwin(TwinSolver):
             raise TwinConvergedSignal(float(root))
 
     def _root_if_sunnbear_solver_stops(
-        self, initial_interval: Interval, interval: Interval, evaluations: list[tuple[float, float]], xtol: float
+        self,
+        initial_interval: Interval,
+        interval_split_at_evaluations: Interval,
+        evaluations: list[tuple[float, float]],
+        xtol: float,
     ) -> float | None:
         """Return ``None``: SciPy stops by the stopping rule of `Secant`, so the twin never interrupts SciPy."""
         return None

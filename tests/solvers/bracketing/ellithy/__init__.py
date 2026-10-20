@@ -2,13 +2,15 @@
 
 The article's runs stop by the stopping criterion of its pseudocode, ``|f(x)| <= 1e-14`` at the x-values that each
 algorithm tests, so ``test_paper.py`` reproduces its tables with a test-only subclass of `Ellithy` that stops by that
-criterion and counts the iterations. The article publishes iteration counts only; an iteration evaluates the function
-a varying number of times, so they do not convert to evaluation counts.
+criterion and counts the iterations.
+
+The article publishes iteration counts only; an iteration evaluates the function a varying number of times, so the
+iteration counts do not convert to evaluation counts.
 
 Published results:
 
 - Ellithy (2026), Table 12, the columns "Opt.BF", "Opt.BFMS", "Opt.TF" and "Opt.TFMS": reproduced, in
-  ``test_paper.py``: all 192 iteration counts exactly. 163 of them reproduce with the article's adaptive ``delta``.
+  ``test_paper.py``: all 192 iteration counts exactly. Of these, 163 reproduce with the article's adaptive ``delta``.
   The other 29, in the columns of Opt.BFMS and Opt.TFMS, reproduce only with a fixed ``delta = 1e-4``, and the
   adaptive ``delta`` takes 1 iteration fewer on each:
 
@@ -24,13 +26,13 @@ Published results:
 - Ellithy (2026), Tables 2 to 5: reproduced, in ``test_paper.py``, with the adaptive ``delta``: the 16 iteration counts
   of the 4 methods on f19, f44, f30 and f48.
 - Ellithy (2026), Table 7: reproduced, in ``test_paper.py``, with the adaptive ``delta``: the mean, minimum, maximum,
-  median and standard deviation of each method's 48 iteration counts. The standard deviation is that of a sample of the
-  article's 480000 runs, which repeat each problem 10000 times.
+  median and standard deviation of each method's 48 iteration counts. The standard deviation is the sample standard
+  deviation over the article's 480000 runs, which repeat each problem 10000 times.
 - Ellithy (2026), the results of the article's other methods in Tables 2 to 12: not compared, because `Ellithy` does
   not implement those methods.
 - Ellithy (2026), Tables 6 and 11: not compared, because they give CPU times.
-- Ellithy (2026), Tables 8 to 10 and 13 to 15: not compared, because they give estimates of evaluations and flops,
-  derived from the average iteration counts of Table 7, or summaries of the other tables.
+- Ellithy (2026), Tables 8 to 10 and 13 to 15: not compared, because they give either summaries of the other tables or
+  estimates of evaluations and flops derived from the average iteration counts of Table 7.
 
 Third-party published results:
 

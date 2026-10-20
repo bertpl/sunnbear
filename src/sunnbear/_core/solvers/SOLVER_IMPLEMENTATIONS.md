@@ -243,11 +243,13 @@ Method 2 is left out: the article reports that it behaves very much like the met
 
 ### V.f. Ellithy
 
-Ellithy (2026) builds 4 algorithms from 1 architecture: each iteration takes a bisection or a trisection step, then a false position step, and in 2 of the algorithms a modified secant step, whose derivative estimate is a finite difference with a fixed step `δ`. All 4 configs follow section IV, and all 4 are secondary: the method is not established yet (published 2026), and the evidence for it so far comes from its author's own benchmarks.
-- **`ellithy[variant='bf']` (secondary):** Opt.BF, bisection and false position.
-- **`ellithy[variant='bfms']` (secondary):** Opt.BFMS, Opt.BF with the modified secant step.
-- **`ellithy[variant='tf']` (secondary):** Opt.TF, trisection and false position.
-- **`ellithy[variant='tfms']` (secondary):** Opt.TFMS, Opt.TF with the modified secant step.
+Ellithy (2026) builds 4 algorithms from 1 architecture: each iteration takes a bisection or a trisection step, then a false position step, and in 2 of the algorithms a modified secant step, whose derivative estimate is a finite difference with a small step `δ` that grows with `|x_FP|`.
+
+All 4 configs follow section IV, and all 4 are secondary: the method is not established yet (published 2026), and the evidence for it so far comes from its author's own benchmarks.
+- **`ellithy[variant='bf']` (secondary):** Opt.BF, 2 evaluations per iteration.
+- **`ellithy[variant='bfms']` (secondary):** Opt.BFMS, 3 or 4 evaluations per iteration.
+- **`ellithy[variant='tf']` (secondary):** Opt.TF, 3 evaluations per iteration.
+- **`ellithy[variant='tfms']` (secondary):** Opt.TFMS, 4 or 5 evaluations per iteration.
 
 ## VI. Code Organization & Validation
 
