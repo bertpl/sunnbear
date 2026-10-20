@@ -8,8 +8,8 @@ from tests.solvers.example_functions import cubic
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
 
-from .history_replay import bisection_iterations
 from .paper_problems import EQUATION_27
+from .replay_from_history import bisection_iterations
 
 
 @pytest.mark.parametrize("solver_cls", [ModAB, ModABSafeguarded], ids=lambda cls: cls.__name__)

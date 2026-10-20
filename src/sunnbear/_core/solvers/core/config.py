@@ -132,7 +132,7 @@ class SolverConfigsDeclaration:
         """Validate the subclass and its configs, and register each config with `SolverConfigRegistry`.
 
         `SolverConfig` checks each config's solver class and init arguments when the config is built; this method
-        checks what depends on the subclass.
+        checks ``configs`` itself, and that the subclass's module may use each config's role.
 
         Raises:
             TypeError: If ``configs`` is missing, or is not a non-empty tuple of `SolverConfig` values.
@@ -140,6 +140,8 @@ class SolverConfigsDeclaration:
                 fails (see `SolverConfigRegistry.register`).
         """
         super().__init_subclass__(**kwargs)
+        # Every config is checked before any is registered, so a subclass with 1 malformed config registers none of its
+        # configs.
         cls._validate_configs()
         # declaring_module_name is not an init argument, so the loop sets it on each registered copy with
         # object.__setattr__, which can set a field of a frozen dataclass outside __init__.
@@ -153,11 +155,7 @@ class SolverConfigsDeclaration:
     # --------------------------------------------------------------------------
     @classmethod
     def _validate_configs(cls) -> None:
-        """Check ``configs``, and that this subclass may declare each of them.
-
-        Every config is checked before any is registered, so a subclass with 1 malformed config registers none of its
-        configs; the registry checks across configs.
-        """
+        """Check ``configs``, and that this subclass may declare each of them; the registry checks across configs."""
         if not hasattr(cls, "configs"):
             raise TypeError(f"{cls.__name__} must define configs.")
         if not isinstance(cls.configs, tuple) or not cls.configs:

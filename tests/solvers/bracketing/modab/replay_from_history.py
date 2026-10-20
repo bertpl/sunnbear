@@ -7,7 +7,7 @@ def bisection_iterations(
     history: tuple[tuple[float, float], ...], solver_cls: type[ModAB] | type[ModABSafeguarded]
 ) -> list[int]:
     """Return the 1-based numbers of the iterations whose x-value is the midpoint of the interval, in the form that
-    ``solver_cls`` computes: ``(x1 + x2) / 2`` for `ModAB` and ``0.5*x1 + 0.5*x2`` for `ModABSafeguarded`.
+    ``solver_cls`` computes: ``0.5*(x1 + x2)`` for `ModAB` and ``0.5*x1 + 0.5*x2`` for `ModABSafeguarded`.
 
     The interval is replayed from ``history``: each evaluated x-value replaces the bound whose function value has the
     same sign as the function value at that x-value. The replay holds only for a solve that evaluates a new x-value in
@@ -18,7 +18,7 @@ def bisection_iterations(
     iterations = []
     for iteration, (x, fx) in enumerate(evaluations, start=1):
         if solver_cls is ModAB:
-            midpoint = (interval.a + interval.b) / 2.0
+            midpoint = 0.5 * (interval.a + interval.b)
         else:
             midpoint = 0.5 * interval.a + 0.5 * interval.b
         if x == midpoint:

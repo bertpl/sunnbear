@@ -211,7 +211,7 @@ TABLE_5_TOTAL_N_FEVALS = 53
 # - the 8 cases without a reference root;
 # - the 3 cases of Table 5, whose returned x-value fails the authors' validation;
 # - the 3 stress cases: f82 and f83, which are discontinuous, and f100, whose function is infinite at its lower bound.
-_CASES_LEFT_OUT_OF_THE_NON_STRESS_SUMS = (
+_NAMES_LEFT_OUT_OF_THE_NON_STRESS_SUMS = (
     {"f38", "f39", "f40", "f76", "f77", "f78", "f79", "f81"}
     | {problem.name for problem in TABLE_5}
     | {"f82", "f83", "f100"}
@@ -219,6 +219,6 @@ _CASES_LEFT_OUT_OF_THE_NON_STRESS_SUMS = (
 TABLE_3_NON_STRESS_CASES = [
     problem
     for name, problem in _BENCHMARK_PROBLEMS_BY_NAME.items()
-    if name not in _CASES_LEFT_OUT_OF_THE_NON_STRESS_SUMS
+    if name not in _NAMES_LEFT_OUT_OF_THE_NON_STRESS_SUMS
 ]
 TABLE_3_NON_STRESS_SUMS_BY_SETTING = {"fixed_delay": 1492, "early_fallback": 1507, "adaptive": 1475}

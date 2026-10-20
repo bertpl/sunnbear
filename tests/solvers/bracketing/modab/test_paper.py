@@ -8,7 +8,6 @@ from sunnbear.solvers import ModAB, ModABSafeguarded
 from tests.solvers.paper_problems import PaperProblem
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem, ganchovski_et_al_stop_width
 
-from .history_replay import bisection_iterations, final_interval
 from .paper_problems import (
     TABLE_2,
     TABLE_3_BY_SETTING,
@@ -19,6 +18,7 @@ from .paper_problems import (
     TABLE_5,
     TABLE_5_TOTAL_N_FEVALS,
 )
+from .replay_from_history import bisection_iterations, final_interval
 
 
 # ==================================================================================================
@@ -139,8 +139,8 @@ def test_the_x_values_of_table_5_of_the_safeguarded_paper_are_reproduced(setting
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-class _PaperStoppingCriterion:
-    """`_PaperStoppingCriterion` gives `ModAB` or `ModABSafeguarded`, as the first base of a subclass, the stopping
+class _PaperStoppingCriterionMixin:
+    """`_PaperStoppingCriterionMixin` gives `ModAB` or `ModABSafeguarded`, as the first base of a subclass, the stopping
     criterion and the return value of their C# code, at the absolute and relative tolerances ``aTol`` and ``rTol`` that
     both papers use.
 
@@ -160,11 +160,11 @@ class _PaperStoppingCriterion:
             return None
 
 
-class _ModABWithPaperStoppingCriterion(_PaperStoppingCriterion, ModAB):
+class _ModABWithPaperStoppingCriterion(_PaperStoppingCriterionMixin, ModAB):
     """`_ModABWithPaperStoppingCriterion` is `ModAB` with the stopping criterion of its C# code."""
 
 
-class _ModABSafeguardedWithPaperStoppingCriterion(_PaperStoppingCriterion, ModABSafeguarded):
+class _ModABSafeguardedWithPaperStoppingCriterion(_PaperStoppingCriterionMixin, ModABSafeguarded):
     """`_ModABSafeguardedWithPaperStoppingCriterion` is `ModABSafeguarded` with its C# code's stopping criterion."""
 
 

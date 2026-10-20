@@ -198,7 +198,7 @@ invalid-method-override = "ignore"
 
 [tool.codespell]
 # "intoto": the in-toto attestation format (provenance.intoto.jsonl).
-# "ned": the first name of Ned Ganchovski, whose code THIRD_PARTY_NOTICES.md covers.
+# "ned" is the first name of Ned Ganchovski, whose code THIRD_PARTY_NOTICES.md covers.
 ignore-words-list = "intoto,ned"
 
 [tool.pytest.ini_options]

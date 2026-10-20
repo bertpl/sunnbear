@@ -182,7 +182,8 @@ class ModAB(Solver):
     def _root_if_converged(x1: float, y1: float, x2: float, y2: float, x3: float, xtol_doubled: float) -> float | None:
         """Return the root estimate if the solve ends before evaluating ``x3``, or ``None`` if it continues.
 
-        ``x3`` is not used. The test suite overrides this method to apply the C# code's own stopping criterion, the
-        interval at most ``aTol + rTol*|x3|`` wide, where it reproduces the paper's published counts.
+        ``x3`` is not used here. The test suite overrides this method to apply the C# code's own stopping criterion,
+        which ends the solve once the interval is at most ``aTol + rTol*|x3|`` wide; with that criterion, the solver
+        reproduces the paper's published counts.
         """
         return interval_root_if_converged(x1, y1, x2, y2, xtol_doubled)

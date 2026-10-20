@@ -12,17 +12,19 @@ from sunnbear._core.solvers.core.stopping import interval_root_if_converged
 class ModABSafeguarded(Solver):
     """`ModABSafeguarded` ports the safeguarded modified Anderson-Björck method from the authors' ``SgModAB.cs``.
 
-    The method is that of `ModAB`, whose class docstring describes its 2 modes, bisection and Anderson-Björck, with 4
-    changes. Tomov and Ganchovski (2026) find 2 defects in the C# code of `ModAB`, which the first 2 changes correct:
+    The method is that of `ModAB` with 4 changes; the class docstring of `ModAB` describes its 2 modes, bisection and
+    Anderson-Björck. Tomov and Ganchovski (2026) find 2 defects in the C# code of `ModAB`, which the changes *No
+    scaling in the first Anderson-Björck step* and *True function values kept apart* correct:
 
     - **No scaling in the first Anderson-Björck step:** in `ModAB`, the bisection step that switches already counts as
       the first of 2 iterations in a row that retain a bound, so a first Anderson-Björck step that retains the same
       bound scales that bound's stored function value. `ModABSafeguarded` starts each Anderson-Björck phase, the
-      sequence of Anderson-Björck steps from a switch to the next fallback, with no bound recorded.
-    - **True function values kept apart:** `ModABSafeguarded` scales copies of ``y1`` and ``y2``, the ordinates that
-      only the secant reads, and resets the ordinates to ``y1`` and ``y2`` at each switch. In `ModAB`, as its C# code
-      shows, a scaled value replaces the stored function value, and stays stored after a fallback to bisection, where
-      the switching test reads it.
+      sequence of Anderson-Björck steps from a switch to the next fallback, with no record of which bound the previous
+      step replaced.
+    - **True function values kept apart:** `ModABSafeguarded` scales copies of ``y1`` and ``y2``, the ordinates
+      ``f1`` and ``f2``, which only the secant reads, and resets the ordinates to ``y1`` and ``y2`` at each switch. In
+      `ModAB`, as its C# code shows, a scaled value replaces the stored function value, and stays stored after a
+      fallback to bisection, where the switching test reads it.
     - **Fallback rule:** the switch sets the threshold to `_FALLBACK_THRESHOLD_FACTOR` times the interval width after
       ``x3`` replaces a bound. An Anderson-Björck step that leaves the interval wider than the threshold still continues
       the phase, as a residual exception, if ``|y3|`` is below half the smaller of ``|y1|`` and ``|y2|`` before the
@@ -98,13 +100,13 @@ class ModABSafeguarded(Solver):
 
         - computes ``x3``, projected into the interval in Anderson-Björck mode, and ends the solve once
           `_root_if_converged` returns a root estimate, at the point where the C# code tests the interval's width;
-        - evaluates ``x3``, unless it lies on a bound, whose function value it then reuses;
+        - evaluates ``x3``, or, where ``x3`` lies on a bound, reuses that bound's function value;
         - ends the solve if ``y3 = 0``, and returns ``x3``;
         - in Anderson-Björck mode, records the smaller of ``|y1|`` and ``|y2|``, replaces a bound by ``(x3, y3)``,
           scales the retained bound's ordinate ``f1`` or ``f2``, and falls back to bisection if the interval is wider
-          than the threshold, unless it grants a residual exception;
-        - in bisection mode, tests whether to switch, replaces a bound by ``(x3, y3)``, and then switches, setting the
-          threshold from the new interval's width and the ordinates ``f1`` and ``f2`` to ``y1`` and ``y2``.
+          than the threshold, unless the step is granted a residual exception;
+        - in bisection mode, tests whether to switch, replaces a bound by ``(x3, y3)``, and switches if the test passed,
+          setting the threshold from the new interval's width and the ordinates ``f1`` and ``f2`` to ``y1`` and ``y2``.
         """
         interval = state.interval
         x1, y1, x2, y2 = interval.a, interval.fa, interval.b, interval.fb
@@ -143,8 +145,7 @@ class ModABSafeguarded(Solver):
                 # The fallback rule compares |y3| with half the smaller |y| at the bounds before the update.
                 y_min = min(abs(y1), abs(y2))
             else:
-                # The C# code computes y2 - y1 twice; computing it once gives the same value. The C# code skips the
-                # test where y2 - y1 overflows.
+                # The C# code computes y2 - y1 twice; computing it once gives the same value.
                 y2_minus_y1 = y2 - y1
                 if math.isfinite(y2_minus_y1):
                     ym = 0.5 * (y1 + y2)
@@ -219,7 +220,8 @@ class ModABSafeguarded(Solver):
     def _root_if_converged(x1: float, y1: float, x2: float, y2: float, x3: float, xtol_doubled: float) -> float | None:
         """Return the root estimate if the solve ends before evaluating ``x3``, or ``None`` if it continues.
 
-        ``x3`` is not used. The test suite overrides this method to apply the C# code's own stopping criterion, the
-        interval at most ``aTol + rTol*|x3|`` wide, where it reproduces the preprint's published counts.
+        ``x3`` is not used here. The test suite overrides this method to apply the C# code's own stopping criterion,
+        which ends the solve once the interval is at most ``aTol + rTol*|x3|`` wide; with that criterion, the solver
+        reproduces the preprint's published counts.
         """
         return interval_root_if_converged(x1, y1, x2, y2, xtol_doubled)
