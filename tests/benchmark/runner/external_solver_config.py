@@ -17,5 +17,4 @@ class ExternalBisection(Bisection):
 class ExternalBisectionConfigsDeclaration(SolverConfigsDeclaration):
     """`ExternalBisectionConfigsDeclaration` declares the only config of `ExternalBisection`."""
 
-    solver_cls = ExternalBisection
-    configs = (SolverConfig(role=SolverRole.USER_OTHER),)
+    configs = (SolverConfig(solver_cls=ExternalBisection, role=SolverRole.USER_OTHER),)

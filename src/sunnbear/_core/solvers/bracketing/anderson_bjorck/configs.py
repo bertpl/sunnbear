@@ -12,5 +12,4 @@ class AndersonBjorckConfigsDeclaration(SolverConfigsDeclaration):
     falsi family among the core configs.
     """
 
-    solver_cls = AndersonBjorck
-    configs = (SolverConfig(role=SolverRole.BUILTIN_SECONDARY),)
+    configs = (SolverConfig(solver_cls=AndersonBjorck, role=SolverRole.BUILTIN_SECONDARY),)

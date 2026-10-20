@@ -17,8 +17,13 @@ class ModABConfigsDeclaration(SolverConfigsDeclaration):
     configs' roles.
     """
 
-    solver_cls = ModAB
     configs = (
-        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": ModABVariant.ALGORITHMS_2026}),
-        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": ModABVariant.SAFEGUARDED_2026}),
+        SolverConfig(
+            solver_cls=ModAB, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": ModABVariant.ALGORITHMS_2026}
+        ),
+        SolverConfig(
+            solver_cls=ModAB,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"variant": ModABVariant.SAFEGUARDED_2026},
+        ),
     )

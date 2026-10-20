@@ -12,5 +12,4 @@ class RegulaFalsiConfigsDeclaration(SolverConfigsDeclaration):
     functions reliably.
     """
 
-    solver_cls = RegulaFalsi
-    configs = (SolverConfig(role=SolverRole.BUILTIN_SECONDARY),)
+    configs = (SolverConfig(solver_cls=RegulaFalsi, role=SolverRole.BUILTIN_SECONDARY),)

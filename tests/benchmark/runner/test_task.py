@@ -62,12 +62,10 @@ def unevaluated_midpoint_and_stalling_configs(isolated_solver_config_registry) -
     """Return configs of `_UnevaluatedMidpointSolver` and `_StallingSolver`, registered only for the test."""
 
     class _UnevaluatedMidpointConfigsDeclaration(SolverConfigsDeclaration):
-        solver_cls = _UnevaluatedMidpointSolver
-        configs = (SolverConfig(role=SolverRole.USER_OTHER),)
+        configs = (SolverConfig(solver_cls=_UnevaluatedMidpointSolver, role=SolverRole.USER_OTHER),)
 
     class _StallingConfigsDeclaration(SolverConfigsDeclaration):
-        solver_cls = _StallingSolver
-        configs = (SolverConfig(role=SolverRole.USER_OTHER),)
+        configs = (SolverConfig(solver_cls=_StallingSolver, role=SolverRole.USER_OTHER),)
 
     return SolverConfigRegistry.config_from_id("unevaluated_midpoint"), SolverConfigRegistry.config_from_id("stalling")
 

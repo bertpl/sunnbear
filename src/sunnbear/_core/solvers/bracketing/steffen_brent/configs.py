@@ -12,5 +12,4 @@ class SteffenBrentConfigsDeclaration(SolverConfigsDeclaration):
     tests it on 2 functions only.
     """
 
-    solver_cls = SteffenBrent
-    configs = (SolverConfig(role=SolverRole.BUILTIN_SECONDARY),)
+    configs = (SolverConfig(solver_cls=SteffenBrent, role=SolverRole.BUILTIN_SECONDARY),)

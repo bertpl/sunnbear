@@ -11,5 +11,4 @@ class BisectionConfigsDeclaration(SolverConfigsDeclaration):
     It is the baseline config. Its evaluation count is the benchmark's reference cost.
     """
 
-    solver_cls = Bisection
-    configs = (SolverConfig(role=SolverRole.BUILTIN_BASELINE),)
+    configs = (SolverConfig(solver_cls=Bisection, role=SolverRole.BUILTIN_BASELINE),)
