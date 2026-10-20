@@ -14,8 +14,9 @@ class TOMS748Paper(Solver):
     names this ``k`` in its Algorithm 5.7, of which Algorithms 4.1 and 4.2 are the cases ``k = 1`` and ``k = 2``.
 
     Each iteration ``n`` starts from the interval ``[a_n, b_n]``, where ``f`` changes sign, and from up to 2 earlier
-    x-values outside it: ``d_n``, the bound that the last call of the subroutine ``bracket`` dropped, and ``e_n``, the
-    bound that the call before that dropped. The iteration takes these steps, numbered as in Algorithm 4.1:
+    x-values outside it. The subroutine ``bracket`` keeps the part of the interval that holds the sign change and drops
+    the other bound: ``d_n`` is the bound that its last call dropped, and ``e_n`` the bound that the call before that
+    dropped. The iteration takes these steps, numbered as in Algorithm 4.1:
 
     - **4.1.3, an interpolation step:** the zero of the inverse cubic interpolation through ``a_n``, ``b_n``, ``d_n``
       and ``e_n``, from the subroutine ``ipzero``. In 3 cases, the step takes 2 Newton steps on the quadratic
@@ -28,11 +29,11 @@ class TOMS748Paper(Solver):
     - **4.1.9, a bisection:** only where the 2 steps above have not reduced the interval to less than ``mu = 0.5``
       times the width of ``[a_n, b_n]``.
 
-    Algorithm 4.2 repeats the interpolation step once, on the interval that the first one leaves, with 3 Newton steps
-    in place of 2 where it falls back to ``Newton-Quadratic``: its steps 4.2.4 to 4.2.6. The first iteration, at
-    ``n = 2``, follows a secant step from ``a_1``, the paper's step 4.1.1.
+    Algorithm 4.2 repeats the interpolation step once, on the interval that the first interpolation step leaves, with 3
+    Newton steps in place of 2 where the repeated step falls back to ``Newton-Quadratic``: its steps 4.2.4 to 4.2.6. The
+    first iteration, at ``n = 2``, follows a secant step from ``a_1``, the paper's step 4.1.1.
 
-    Each step hands its x-value ``c`` to ``bracket``, which evaluates ``f`` there and keeps the part of the interval
+    Each step passes its x-value ``c`` to ``bracket``, which evaluates ``f`` there and keeps the part of the interval
     that still holds the sign change. `TOMS748Paper` implements ``bracket`` as the paper's section 6 modifies it for
     the paper's experiments, with a margin and a termination test:
 
@@ -44,27 +45,31 @@ class TOMS748Paper(Solver):
       ``[a_bar, b_bar]`` is at most ``2*tole(a_bar, b_bar)`` wide.
 
     In place of the paper's termination test, `TOMS748Paper` applies the shared stopping criterion of the bracketing
-    solvers, at the same point: after each call of ``bracket``. The solve ends once the new interval is at most
-    ``2*xtol`` wide, or once ``f`` is exactly 0 at one of its bounds, which then is ``c``. It returns that bound, or
-    else the interval's midpoint, which then lies within ``xtol`` of a root. Each iteration calls ``bracket`` 2 or 3
-    times with ``k = 1``, and 3 or 4 times with ``k = 2``.
+    solvers, at the same point: after each call of ``bracket``.
+
+    The solve ends once the new interval is at most ``2*xtol`` wide, or once ``f`` is exactly 0 at one of its bounds,
+    which then is ``c``. `TOMS748Paper` returns that bound, or else the interval's midpoint, which then lies within
+    ``xtol`` of a root.
+
+    Each iteration calls ``bracket`` 2 or 3 times with ``k = 1``, and 3 or 4 times with ``k = 2``.
 
     The paper's tolerances take these values in `TOMS748Paper`:
 
     - ``tol``, the paper's absolute tolerance, is ``xtol``. The paper's termination test then holds at a width of
       ``2*xtol`` plus the machine-precision term ``4*|u|*macheps``, which the shared stopping criterion drops; the
-      margin ``2*delta`` is about ``1.4*xtol``, the fraction ``lambda`` of the shared stopping width ``2*xtol``, as it
-      is the fraction ``lambda`` of the paper's width ``2*tole``. A step that keeps this margin from the bound next to
-      the root therefore leaves an interval narrower than ``2*xtol``, and no step lands on a bound;
+      margin ``2*delta`` is about ``1.4*xtol``: ``lambda`` times the shared stopping width ``2*xtol``, as the paper's
+      margin is ``lambda`` times its width ``2*tole``. A step that keeps this margin from the bound next to the root
+      therefore leaves an interval narrower than ``2*xtol``, and no step lands on a bound;
     - ``macheps``, the paper's relative machine precision, is `FLOAT64_EPS`, 2^-52, the distance from 1.0 to the next
       larger float64. The paper states the value of its own machine, 1.9073486328e-16, and takes its termination test
-      from Brent's method, for which `Brent` takes ``macheps`` as 2^-52 too. ``macheps`` stays only inside the steps,
-      in the margin.
+      from Brent's method, for which `Brent` takes ``macheps`` as 2^-52 too. ``macheps`` enters only the margin of
+      ``bracket``, not the stopping criterion.
 
     `TOMS748Paper` departs from the paper in these places:
 
     - **Stopping criterion and return value:** the shared stopping criterion above replaces the paper's termination
-      test; the paper does not state which x-value its runs return when the width test ends them.
+      test; the paper does not state which x-value its runs return when its termination test holds because the
+      interval is narrow enough.
     - **Tests written as products:** the paper states 4 tests as the sign of a product, or as a product equal to 0.
       `TOMS748Paper` tests the factors instead, because a product of small numbers can underflow to 0, which changes
       the outcome of the test:
@@ -78,8 +83,8 @@ class TOMS748Paper(Solver):
 
     `TOMS748Paper` reads the paper's text in these places, where the text allows more than 1 reading:
 
-    - **The Newton step (4):** its second line divides ``B(r_(i-1))`` by the derivative of ``P``; this is a typo for
-      ``P(r_(i-1))``, the numerator of its first line.
+    - **The Newton step, the paper's equation (4):** its second line divides ``B(r_(i-1))`` by the derivative of ``P``;
+      ``B(r_(i-1))`` is a typo for ``P(r_(i-1))``, the numerator of its first line.
     - **The case** ``A = 0`` **of** ``Newton-Quadratic``: the line ``r = a - B^-1 f(a)`` ends the subroutine. The
       Newton steps that the paper lists after it would replace that ``r``, so the line would otherwise have no effect.
     - **The inverse notation:** the paper writes a division by a divided difference as a product with its inverse, as
@@ -88,10 +93,8 @@ class TOMS748Paper(Solver):
       fraction of function values, such as ``Q11 = (c - d)*(f(c) / (f(d) - f(c)))``, computed with the fraction first,
       as the paper typesets it.
 
-    `TOMS748Paper` settles 1 case that the paper leaves open:
-
-    - **A tie in** ``tole``: where ``|f(a)| = |f(b)|``, ``u`` is ``b``, by the rule of step 4.1.5, which picks ``u``
-      from the same 2 bounds.
+    `TOMS748Paper` settles 1 case that the paper leaves open, a tie in ``tole``: where ``|f(a)| = |f(b)|``, ``u`` is
+    ``b``, by the rule of step 4.1.5, which picks ``u`` from the same 2 bounds.
 
     The formulas keep the paper's form, and with it these failures in float64:
 
@@ -112,16 +115,18 @@ class TOMS748Paper(Solver):
     References:
         - Alefeld, G. E., Potra, F. A. and Shi, Y. (1995). Algorithm 748: Enclosing zeros of continuous functions. ACM
           Transactions on Mathematical Software 21(3), 327-344. Its sections 2 to 4 and 6 state the method, which
-          `TOMS748Paper` follows step by step. The test suite reproduces 153 of the 154 roots of the authors' published
-          test output, the totals of the paper's Table II within 1.2 % for ``k = 1`` and 0.4 % for ``k = 2``, and the
-          counts of its Tables IV to VI. https://doi.org/10.1145/210089.210111
+          `TOMS748Paper` follows step by step. The test suite reproduces the roots of the authors' published test
+          output, the totals of the paper's Table II and the counts of its Tables IV to VI.
+          https://doi.org/10.1145/210089.210111
     """
 
+    # `TOMS748Paper` is a new implementation of the solver `toms748`, so it takes the name of `TOMS748` with the next
+    # version number.
     name = "toms748"
     version = 3
 
-    # The paper's constants: mu of Algorithms 4.1 and 4.2, and lambda and macheps of the subroutine bracket of section
-    # 6. The class docstring states the reasons for the value of macheps.
+    # The paper's constants are mu of Algorithms 4.1 and 4.2, and lambda and macheps of the subroutine bracket of
+    # section 6. The class docstring states the reasons for the value of macheps.
     mu = 0.5
     lambda_ = 0.7
     macheps = FLOAT64_EPS
@@ -142,7 +147,7 @@ class TOMS748Paper(Solver):
         The variables keep the paper's names, without the iteration's subscript ``n``: ``a``, ``b``, ``d`` and ``e``
         are ``a_n``, ``b_n``, ``d_n`` and ``e_n``. The suffixes ``_bar`` and ``_hat`` stand for the paper's bar and
         hat accents, as ``a_bar`` for ``a_n`` with a bar. A name with the prefix ``f`` holds the function value at the
-        x-value of the name, as ``fa`` holds ``f(a)``. Comments give the paper's step numbers.
+        x-value of the name, as ``fa`` holds ``f(a)``.
 
         Each iteration takes the steps of the class docstring, and calls `_root_if_converged` after each call of
         ``bracket``, where the paper's section 6 places its termination test.
@@ -152,12 +157,12 @@ class TOMS748Paper(Solver):
         tol = state.xtol
         xtol_doubled = 2.0 * state.xtol
 
-        # --- 4.1.1 / 4.2.1 ------------------------
+        # --- 4.1.1 / 4.2.1 ----------------------
         # c_1 = a_1 - f[a_1, b_1]^-1 f(a_1), with the divided difference f[a, b] = (f(b) - f(a)) / (b - a).
         c = a - fa / ((fb - fa) / (b - a))
 
-        # --- 4.1.2 / 4.2.2 ------------------------
-        a, fa, b, fb, d, fd = self.bracket(state, a, fa, b, fb, c, tol)
+        # --- 4.1.2 / 4.2.2 ----------------------
+        a, fa, b, fb, d, fd = self.bracket(state, a, fa, b, fb, c)
         x_root = self._root_if_converged(a, fa, b, fb, tol, xtol_doubled)
         if x_root is not None:
             return x_root
@@ -166,75 +171,74 @@ class TOMS748Paper(Solver):
         e, fe = math.nan, math.nan
         n = 2
         while True:
-            # --- 4.1.3 / 4.2.3 --------------------
+            # --- 4.1.3 / 4.2.3 ------------------
             if n == 2 or self._has_equal_values(fa, fb, fd, fe):
                 c = self.newton_quadratic(a, fa, b, fb, d, fd, 2)
             else:
                 c = self.ipzero(a, fa, b, fb, d, fd, e, fe)
-                # The paper's test (c_n - a_n)(c_n - b_n) >= 0, on the factors.
+                # The comparisons test the factors of the paper's product (c_n - a_n)(c_n - b_n) >= 0.
                 if c <= a or c >= b:
                     c = self.newton_quadratic(a, fa, b, fb, d, fd, 2)
 
             if self.k == 1:
-                # --- 4.1.4 ------------------------
-                a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar = self.bracket(state, a, fa, b, fb, c, tol)
+                # --- 4.1.4 ----------------------
+                a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar = self.bracket(state, a, fa, b, fb, c)
                 x_root = self._root_if_converged(a_bar, fa_bar, b_bar, fb_bar, tol, xtol_doubled)
                 if x_root is not None:
                     return x_root
             else:
-                # --- 4.2.4 ------------------------
+                # --- 4.2.4 ----------------------
                 e_bar, fe_bar = d, fd
-                a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar = self.bracket(state, a, fa, b, fb, c, tol)
+                a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar = self.bracket(state, a, fa, b, fb, c)
                 x_root = self._root_if_converged(a_bar, fa_bar, b_bar, fb_bar, tol, xtol_doubled)
                 if x_root is not None:
                     return x_root
 
-                # --- 4.2.5 ------------------------
+                # --- 4.2.5 ----------------------
                 if self._has_equal_values(fa_bar, fb_bar, fd_bar, fe_bar):
                     c_bar = self.newton_quadratic(a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar, 3)
                 else:
                     c_bar = self.ipzero(a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar, e_bar, fe_bar)
-                    # The paper's test (c_bar_n - a_bar_n)(c_bar_n - b_bar_n) >= 0, on the factors.
+                    # The comparisons test the factors of the paper's product
+                    # (c_bar_n - a_bar_n)(c_bar_n - b_bar_n) >= 0.
                     if c_bar <= a_bar or c_bar >= b_bar:
                         c_bar = self.newton_quadratic(a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar, 3)
 
-                # --- 4.2.6 ------------------------
-                a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar = self.bracket(
-                    state, a_bar, fa_bar, b_bar, fb_bar, c_bar, tol
-                )
+                # --- 4.2.6 ----------------------
+                a_bar, fa_bar, b_bar, fb_bar, d_bar, fd_bar = self.bracket(state, a_bar, fa_bar, b_bar, fb_bar, c_bar)
                 x_root = self._root_if_converged(a_bar, fa_bar, b_bar, fb_bar, tol, xtol_doubled)
                 if x_root is not None:
                     return x_root
 
-            # --- 4.1.5 / 4.2.7 --------------------
+            # --- 4.1.5 / 4.2.7 ------------------
             if abs(fa_bar) < abs(fb_bar):
                 u, fu = a_bar, fa_bar
             else:
                 u, fu = b_bar, fb_bar
 
-            # --- 4.1.6 / 4.2.8 --------------------
+            # --- 4.1.6 / 4.2.8 ------------------
             # c_bar_n = u_n - 2 f[a_bar_n, b_bar_n]^-1 f(u_n), the double-length secant step from u_n.
             c_bar = u - 2.0 * fu / ((fb_bar - fa_bar) / (b_bar - a_bar))
 
-            # --- 4.1.7 / 4.2.9 --------------------
+            # --- 4.1.7 / 4.2.9 ------------------
             if abs(c_bar - u) > 0.5 * (b_bar - a_bar):
                 c_hat = 0.5 * (b_bar + a_bar)
             else:
                 c_hat = c_bar
 
-            # --- 4.1.8 / 4.2.10 -------------------
-            a_hat, fa_hat, b_hat, fb_hat, d_hat, fd_hat = self.bracket(state, a_bar, fa_bar, b_bar, fb_bar, c_hat, tol)
+            # --- 4.1.8 / 4.2.10 -----------------
+            a_hat, fa_hat, b_hat, fb_hat, d_hat, fd_hat = self.bracket(state, a_bar, fa_bar, b_bar, fb_bar, c_hat)
             x_root = self._root_if_converged(a_hat, fa_hat, b_hat, fb_hat, tol, xtol_doubled)
             if x_root is not None:
                 return x_root
 
-            # --- 4.1.9 / 4.2.11 -------------------
+            # --- 4.1.9 / 4.2.11 -----------------
             if b_hat - a_hat < self.mu * (b - a):
                 a, fa, b, fb, d, fd = a_hat, fa_hat, b_hat, fb_hat, d_hat, fd_hat
                 e, fe = d_bar, fd_bar
             else:
                 e, fe = d_hat, fd_hat
-                a, fa, b, fb, d, fd = self.bracket(state, a_hat, fa_hat, b_hat, fb_hat, 0.5 * (a_hat + b_hat), tol)
+                a, fa, b, fb, d, fd = self.bracket(state, a_hat, fa_hat, b_hat, fb_hat, 0.5 * (a_hat + b_hat))
                 x_root = self._root_if_converged(a, fa, b, fb, tol, xtol_doubled)
                 if x_root is not None:
                     return x_root
@@ -244,7 +248,7 @@ class TOMS748Paper(Solver):
     #  The paper's subroutines
     # --------------------------------------------------------------------------
     def bracket(
-        self, state: SolveState, a: float, fa: float, b: float, fb: float, c: float, tol: float
+        self, state: SolveState, a: float, fa: float, b: float, fb: float, c: float
     ) -> tuple[float, float, float, float, float, float]:
         """Return ``(a_bar, f(a_bar), b_bar, f(b_bar), d, f(d))`` of ``bracket(a, b, c, a_bar, b_bar, d)``.
 
@@ -252,19 +256,19 @@ class TOMS748Paper(Solver):
 
         - the margin: where ``[a, b]`` is at most ``4*delta`` wide, ``c`` becomes the midpoint; elsewhere, a ``c`` that
           lies less than ``2*delta`` inside ``[a, b]``, or outside it, moves to ``2*delta`` from the nearer bound. Here
-          ``delta = lambda*tole(a, b)``, with ``tol`` the paper's absolute tolerance;
+          ``delta = lambda*tole(a, b)``, with the paper's absolute tolerance ``tol`` taken as ``state.xtol``;
         - ``f`` is evaluated at ``c``;
         - ``[a_bar, b_bar]`` is the part of ``[a, b]`` on either side of ``c`` that holds the sign change, and ``d`` is
-          the bound of ``[a, b]`` that it drops.
+          the bound of ``[a, b]`` that ``c`` replaces.
 
-        Section 6 ends the subroutine with its termination test, which `_solve` applies after each call, through
-        `_root_if_converged`. Where ``f(c) = 0``, the paper terminates at ``c``; here ``c`` becomes ``a_bar``, and the
+        Section 6 ends the subroutine with its termination test; `_solve` instead calls `_root_if_converged` after each
+        call of ``bracket``. Where ``f(c) = 0``, the paper terminates at ``c``; here ``c`` becomes ``a_bar``, and the
         shared stopping criterion ends the solve there.
         """
         # --- the margin of section 6 ------------
-        delta = self.lambda_ * self.tole(a, fa, b, fb, tol)
+        delta = self.lambda_ * self.tole(a, fa, b, fb, state.xtol)
         if b - a <= 4.0 * delta:
-            # The paper's c = (a + b)/2, which gives the same value.
+            # The paper writes c = (a + b)/2; 0.5*(a + b) gives the same float64 value.
             c = 0.5 * (a + b)
         elif c <= a + 2.0 * delta:
             c = a + 2.0 * delta
@@ -274,8 +278,8 @@ class TOMS748Paper(Solver):
         # --- the paper's label 10 ---------------
         fc = state.f(c)
         state.x_best = c
-        # The paper's test f(a)f(c) < 0, on the signs of the factors. Because f(a) and f(b) differ in sign, the else
-        # branch holds where the paper's second test, f(b)f(c) < 0, holds, and where f(c) = 0.
+        # The condition compares the signs of the factors of the paper's test f(a)f(c) < 0. Because f(a) and f(b)
+        # differ in sign, the else branch holds where the paper's second test, f(b)f(c) < 0, holds, and where f(c) = 0.
         if (fa < 0.0 < fc) or (fc < 0.0 < fa):
             return a, fa, c, fc, b, fb
         else:
@@ -300,7 +304,7 @@ class TOMS748Paper(Solver):
         ``r`` approximates the zero in ``[a, b]`` of ``P``, the quadratic interpolation through ``a``, ``b`` and ``d``:
         ``P(x) = f(a) + f[a, b]*(x - a) + f[a, b, d]*(x - a)*(x - b)``, with ``A = f[a, b, d]`` and ``B = f[a, b]``.
         Where ``A = 0``, ``P`` is a line, and ``r`` is its zero ``a - f(a) / B``. Elsewhere, ``r`` takes ``k`` Newton
-        steps (4) on ``P``, from ``a`` where ``A*f(a) > 0``, and from ``b`` otherwise.
+        steps, the paper's equation (4), on ``P``, from ``a`` where ``A*f(a) > 0``, and from ``b`` otherwise.
 
         The subroutine's ``k`` is its number of Newton steps, not the solver's ``k``. The subroutine assumes that ``d``
         lies outside ``[a, b]``, with ``f(d)`` of the sign of ``f`` at the nearer bound, which ``bracket`` ensures.
@@ -310,15 +314,17 @@ class TOMS748Paper(Solver):
         A = ((fd - fb) / (d - b) - B) / (d - a)  # noqa: N806 — the paper's name
         if A == 0.0:
             return a - fa / B
-        # The paper's test A f(a) > 0, on the signs of the factors; neither is 0 here.
-        if (A > 0.0) == (fa > 0.0):
-            r = a
         else:
-            r = b
-        for _ in range(k):
-            # The Newton step (4): r_i = r_(i-1) - P(r_(i-1)) / (B + A*(2*r_(i-1) - a - b)).
-            r = r - (fa + B * (r - a) + A * (r - a) * (r - b)) / (B + A * (2.0 * r - a - b))
-        return r
+            # The condition compares the signs of the factors of the paper's test A f(a) > 0; neither factor is 0 here.
+            if (A > 0.0) == (fa > 0.0):
+                r = a
+            else:
+                r = b
+            for _ in range(k):
+                # The Newton step of the paper's equation (4) computes
+                # r_i = r_(i-1) - P(r_(i-1)) / (B + A*(2*r_(i-1) - a - b)).
+                r = r - (fa + B * (r - a) + A * (r - a) * (r - b)) / (B + A * (2.0 * r - a - b))
+            return r
 
     @staticmethod
     def ipzero(a: float, fa: float, b: float, fb: float, c: float, fc: float, d: float, fd: float) -> float:
@@ -353,8 +359,8 @@ class TOMS748Paper(Solver):
     ) -> float | None:
         """Return the root estimate if the solve ends at the interval that ``bracket`` returned, or ``None``.
 
-        ``[a_bar, b_bar]`` is that interval, and ``tol`` is not used. The test suite overrides this method to apply the
-        paper's termination test, which reads ``tole(a_bar, b_bar)`` and so ``tol``, where it reproduces the paper's
-        published counts.
+        ``[a_bar, b_bar]`` is that interval, and ``tol`` is not used. The test suite overrides this method with the
+        paper's termination test, which reads ``tol`` through ``tole(a_bar, b_bar)``, to reproduce the paper's published
+        counts.
         """
         return interval_root_if_converged(a_bar, fa_bar, b_bar, fb_bar, xtol_doubled)

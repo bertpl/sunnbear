@@ -27,8 +27,8 @@ def test_its_arithmetic_is_flop_counted(monkeypatch, k: int):
     """With counted-float set to raise at each operation that it cannot count, a solve of `TOMS748Paper` still
     converges, and its flop count is not empty.
 
-    `Solver.solve` opens its own flop-counting context, so the test makes that context raise; `Solver.solve` would
-    record such an error as ``SOLVER_ERROR``.
+    `Solver.solve` opens its own flop-counting context, so the test patches that context to raise. A raised error would
+    make `Solver.solve` report ``SOLVER_ERROR``, so a ``CONVERGED`` status shows that no operation went uncounted.
     """
     # --- arrange ----------------------
     monkeypatch.setattr(

@@ -2,9 +2,8 @@
 implementations take the same steps, and differ only in the places listed below.
 
 In 60-digit arithmetic, formulas that are equal in exact arithmetic give the same x-value to far below the float64
-spacing. There, both implementations pass the same float64 x-values to ``f`` on every compared problem: the problems of
-the authors' test output, each at the ``xtol`` values on which bisection spends 10, 20, 30 and 40 evaluations, the
-convergence test cases, and the twin test cases.
+spacing. At 60 digits, both implementations pass the same float64 x-values to ``f`` on every solve of
+`_COMPARED_SOLVES`.
 
 In float64, the 2 implementations differ in these places:
 
@@ -42,14 +41,16 @@ from tests.solvers.paper_problems.alefeld_potra_shi import ALEFELD_POTRA_SHI_PRO
 from tests.solvers.twins import TWIN_TEST_CASES
 
 # 60 digits leave about 200 bits for each x-value, so that 2 forms of 1 formula round to the same float64 x-value,
-# except where they lie within about 10^-44 times the float spacing of a value halfway between 2 float64 values.
+# except where the formula's exact value lies within about 10^-44 times the float spacing of a value halfway between
+# 2 float64 values.
 _N_DIGITS = 60
 
 # No compared solve reaches this budget.
 _MAX_FEVALS = 400
 
-# The compared solves, as (label, f, a, b, xtol). The xtol values of each problem of the authors' test output lie in
-# the middle of the range on which bisection spends 10, 20, 30 and 40 evaluations.
+# Each compared solve is a tuple (label, f, a, b, xtol). For each problem of the authors' test output and each n of
+# 10, 20, 30 and 40, xtol is 1.5 times the smallest xtol at which bisection spends n evaluations. The compared
+# solves also cover `CONVERGENCE_TEST_CASES` and `TWIN_TEST_CASES`.
 _COMPARED_SOLVES = [
     *[
         (f"{problem.name}@{n}", problem.f, problem.a, problem.b, 1.5 * xtol_min)
@@ -71,12 +72,12 @@ def test_in_60_digit_arithmetic_both_implementations_evaluate_the_same_x_values(
     """In 60-digit arithmetic, `TOMS748Paper` and `TOMS748` pass the same float64 x-values to ``f``, in the same order,
     and return the same root estimate."""
     # --- act --------------------------
-    x_values, x_root = _solve_in_60_digit_arithmetic(TOMS748Paper(k=k), f, a, b, xtol)
+    x_values_toms748_paper, x_root_toms748_paper = _solve_in_60_digit_arithmetic(TOMS748Paper(k=k), f, a, b, xtol)
     x_values_toms748, x_root_toms748 = _solve_in_60_digit_arithmetic(TOMS748(k=k), f, a, b, xtol)
 
     # --- assert -----------------------
-    assert x_values == x_values_toms748
-    assert x_root == x_root_toms748
+    assert x_values_toms748_paper == x_values_toms748
+    assert x_root_toms748_paper == x_root_toms748
 
 
 @pytest.mark.parametrize("k", [1, 2])
@@ -88,11 +89,11 @@ def test_on_an_initial_interval_at_most_2_xtol_wide_toms748_paper_takes_1_evalua
     a, b, xtol = 1.32471795, 1.32471796, 1e-8
 
     # --- act --------------------------
-    n_fevals = TOMS748Paper(k=k).solve(cubic, a, b, xtol=xtol, max_fevals=10).n_fevals
+    n_fevals_toms748_paper = TOMS748Paper(k=k).solve(cubic, a, b, xtol=xtol, max_fevals=10).n_fevals
     n_fevals_toms748 = TOMS748(k=k).solve(cubic, a, b, xtol=xtol, max_fevals=10).n_fevals
 
     # --- assert -----------------------
-    assert (n_fevals, n_fevals_toms748) == (3, 2)
+    assert (n_fevals_toms748_paper, n_fevals_toms748) == (3, 2)
 
 
 # ==================================================================================================

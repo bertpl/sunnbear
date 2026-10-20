@@ -21,16 +21,16 @@ from .paper_problems import AUTHORS_TEST_OUTPUT, TABLES_IV_TO_VI_BY_K, tol_as_th
 # any x-value of that interval is a root of the function as computed.
 _ZERO_INTERVAL_PROBLEM_NAME = "26[n=1]"
 
-# The paper's Table II: the total evaluation count over all 154 problems, per k and per tol = 10^-n_digits, with
-# n_digits = None for tol = 0.
+# The paper's Table II gives the total evaluation count over all 154 problems, per k and per tol = 10^-n_digits;
+# n_digits = None stands for tol = 0.
 _TABLE_II_TOTALS = {
     1: {7: 2696, 10: 2835, 15: 2908, None: 2950},
     2: {7: 2650, 10: 2786, 15: 2859, None: 2884},
 }
 
-# The relative tolerance on the totals of Table II, per k. On macOS, the totals lie 0.24 % to 1.08 % below the paper's
-# for k = 1, and 0.10 % to 0.25 % below for k = 2; each tolerance is the next tenth of a percent above the largest of
-# these, plus 0.1 %, for the counts of 1 that a platform's math library can shift.
+# Each k has its own relative tolerance on the totals of Table II. On macOS, the totals lie 0.24 % to 1.08 % below the
+# paper's for k = 1, and 0.10 % to 0.25 % below for k = 2; each tolerance is the next tenth of a percent above the
+# largest of these, plus 0.1 % for the problems whose count a platform's math library can shift by 1.
 _TABLE_II_REL_TOL = {1: 0.012, 2: 0.004}
 
 
@@ -42,7 +42,7 @@ def test_the_roots_of_the_authors_test_output_are_reproduced(problem: PaperProbl
     """On each problem of the authors' test output except 26[n=1], both algorithms with ``tol = 0`` return the root
     that the test output prints, within its 14 printed digits."""
     # --- act --------------------------
-    result = _TOMS748PaperWithPaperTerminationTest(k=k).solve(
+    result = _TOMS748PaperWithPaperStoppingCriterion(k=k).solve(
         problem.f, problem.a, problem.b, xtol=0.0, max_fevals=1000
     )
 
@@ -61,7 +61,7 @@ def test_the_solve_of_problem_26_ends_where_its_function_is_0(k: int):
     (problem,) = [problem for problem in AUTHORS_TEST_OUTPUT if problem.name == _ZERO_INTERVAL_PROBLEM_NAME]
 
     # --- act --------------------------
-    result = _TOMS748PaperWithPaperTerminationTest(k=k).solve(
+    result = _TOMS748PaperWithPaperStoppingCriterion(k=k).solve(
         problem.f, problem.a, problem.b, xtol=0.0, max_fevals=1000
     )
 
@@ -80,12 +80,12 @@ def test_the_totals_of_table_ii_are_reproduced_within_the_tolerance_of_k(
     """Over all 154 problems, the total evaluation count of each algorithm, at each of the paper's tolerances, lies
     within the relative tolerance of its ``k`` of the paper's Table II.
 
-    The totals count the 2 evaluations at the interval bounds of each problem, the counting with which the counts of
-    Tables IV to VI reproduce. They lie below the paper's, for a cause not known, which the docstring of this test
+    The totals include the 2 evaluations at the interval bounds of each problem, as the counts of Tables IV to VI do.
+    They lie below the paper's, for a cause not known, which the docstring of this test
     package discusses.
     """
     # --- arrange ----------------------
-    solver = _TOMS748PaperWithPaperTerminationTest(k=k)
+    solver = _TOMS748PaperWithPaperStoppingCriterion(k=k)
     tol = tol_as_the_driver_computes_it(n_digits)
 
     # --- act --------------------------
@@ -117,7 +117,7 @@ def test_the_evaluation_counts_of_tables_iv_to_vi_are_reproduced(k: int, problem
     """On every row of the paper's Tables IV to VI, each algorithm with ``tol = 10^-15`` evaluates as often as the
     paper reports for its ``k``, except where the problem states an allowed deviation."""
     # --- act --------------------------
-    result = _TOMS748PaperWithPaperTerminationTest(k=k).solve(
+    result = _TOMS748PaperWithPaperStoppingCriterion(k=k).solve(
         problem.f, problem.a, problem.b, xtol=tol_as_the_driver_computes_it(15), max_fevals=1000
     )
 
@@ -128,8 +128,8 @@ def test_the_evaluation_counts_of_tables_iv_to_vi_are_reproduced(k: int, problem
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-class _TOMS748PaperWithPaperTerminationTest(TOMS748Paper):
-    """`_TOMS748PaperWithPaperTerminationTest` is `TOMS748Paper` with the termination test of the subroutine
+class _TOMS748PaperWithPaperStoppingCriterion(TOMS748Paper):
+    """`_TOMS748PaperWithPaperStoppingCriterion` is `TOMS748Paper` with the termination test of the subroutine
     ``bracket`` of the paper's section 6."""
 
     def _root_if_converged(

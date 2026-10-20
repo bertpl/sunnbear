@@ -44,9 +44,9 @@ def test_the_step_at_n_2_takes_2_newton_steps_on_the_quadratic_interpolation(k: 
 
 
 def test_algorithm_4_1_then_takes_the_double_length_secant_step():
-    """With ``k = 1``, the x-value after the one of step 4.1.3 is the double-length secant step of steps 4.1.5 to
-    4.1.7, ``u - 2*f(u) / f[a_bar, b_bar]``, from the bound ``u`` of ``[c_1, c_2]`` with the smaller ``|f|``, which is
-    ``c_2``."""
+    """With ``k = 1``, the x-value evaluated after the x-value of step 4.1.3 is the double-length secant step of steps
+    4.1.5 to 4.1.7, ``u - 2*f(u) / f[a_bar, b_bar]``, from the bound ``u`` of ``[c_1, c_2]`` with the smaller ``|f|``,
+    which is ``c_2``."""
     # --- act --------------------------
     result = TOMS748Paper(k=1).solve(cubic, 1.0, 2.0, xtol=1e-10, max_fevals=60, history_enabled=True)
 
@@ -103,7 +103,7 @@ def test_ipzero_is_exact_where_the_inverse_function_is_a_cubic():
     """Where ``x`` is a cubic polynomial of ``y = f(x)``, here ``x = 1 + y + y^2 + y^3``, the inverse cubic
     interpolation through 4 points is that polynomial, and ``ipzero`` returns its value at ``y = 0``, which is 1."""
     # --- arrange ----------------------
-    # The x-values at y = -1, 1, 2 and -2.
+    # Each point is (x, y), with x = 1 + y + y^2 + y^3 at y = -1, 1, 2 and -2.
     points = [(0.0, -1.0), (4.0, 1.0), (15.0, 2.0), (-5.0, -2.0)]
 
     # --- act --------------------------
@@ -135,7 +135,7 @@ def test_the_margin_of_bracket_keeps_c_2_delta_inside_the_interval(a, b, root, c
     state = SolveState(f=f, interval=Interval.from_interval_bounds(a, b, fa, fb), xtol=1e-6)
 
     # --- act --------------------------
-    a_bar, _, b_bar, _, d, _ = TOMS748Paper(k=1).bracket(state, a, fa, b, fb, c, 1e-6)
+    a_bar, _, b_bar, _, d, _ = TOMS748Paper(k=1).bracket(state, a, fa, b, fb, c)
 
     # --- assert -----------------------
     assert f.history[-1][0] == pytest.approx(expected_x, abs=1e-20)
@@ -152,7 +152,7 @@ def test_bracket_keeps_the_sign_change_where_the_product_of_the_paper_underflows
     state = SolveState(f=f, interval=Interval.from_interval_bounds(0.0, 1.0, fa, fb), xtol=1e-6)
 
     # --- act --------------------------
-    a_bar, _, b_bar, fb_bar, d, _ = TOMS748Paper(k=1).bracket(state, 0.0, fa, 1.0, fb, 0.5, 1e-6)
+    a_bar, _, b_bar, fb_bar, d, _ = TOMS748Paper(k=1).bracket(state, 0.0, fa, 1.0, fb, 0.5)
 
     # --- assert -----------------------
     assert fa * fb_bar == 0.0
@@ -190,7 +190,7 @@ def test_tole_takes_u_at_the_bound_with_the_smaller_abs_f_and_at_b_on_a_tie(fa, 
         ],
     ],
 )
-def test_the_distinctness_test_compares_the_4_values_pair_by_pair(values, expected):
+def test_has_equal_values_compares_the_4_values_pair_by_pair(values, expected):
     """The test ``prod_(i != j) (f_i - f_j) = 0`` of steps 4.1.3, 4.2.3 and 4.2.5 holds exactly where 2 of the 4 values
     are equal, also where the product of their differences would underflow to 0."""
     # --- act / assert -----------------
