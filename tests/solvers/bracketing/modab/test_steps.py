@@ -64,7 +64,7 @@ def test_only_modab_safeguarded_scales_no_stored_value_in_its_first_anderson_bjo
     - `ModABSafeguarded` starts the phase with no bound recorded, so it does not scale ``y2``, and its second secant's
       zero is ``-75/121``, which the preprint's Proposition 3.6 gives;
     - `ModAB` recorded the upper bound as retained in the bisection step that switched, so it multiplies ``y2`` by
-      ``m = 1 - 0.5625``, which puts its second secant's zero at ``-111/232``.
+      ``m = 1 - f(-0.75)/f(-1) = 1 - 0.5625``, which puts its second secant's zero at ``-111/232``.
     """
     # --- act --------------------------
     result = solver_cls().solve(
@@ -165,8 +165,8 @@ def test_modab_safeguarded_projects_x3_into_the_interval_and_evaluates_nothing_o
     result = solver.solve(problem.f, problem.a, problem.b, xtol=1e-13, max_fevals=60)
 
     # --- assert -----------------------
-    assert all(x1 <= x3 <= x2 for x1, x3, x2 in solver.iterations)
-    assert sum(x3 in (x1, x2) for x1, x3, x2 in solver.iterations) == n_x3_on_a_bound
+    assert all(x1 <= x3 <= x2 for x1, x3, x2 in solver.x1_x3_x2_per_iteration)
+    assert sum(x3 in (x1, x2) for x1, x3, x2 in solver.x1_x3_x2_per_iteration) == n_x3_on_a_bound
     assert len(set(result.evaluated_x_values)) == len(result.evaluated_x_values)
 
 
@@ -176,8 +176,9 @@ def test_modab_safeguarded_projects_x3_into_the_interval_and_evaluates_nothing_o
 def _function_with_huge_values(x: float) -> float:
     """Return the value at ``x`` of a function that reaches 1.5e308 on ``[-1, 1]``, computed without overflow.
 
-    Left of 0, the function is the line ``2.3e308*(x + 1) - 8e307``; it is 1.5e308 at 0 and has its root at
-    ``-1 + 8/23``. Right of 0, it falls linearly to 8.0001e307 at 1.
+    Left of 0, the function is the line ``2.3e308*(x + 1) - 8e307``; its slope 2.3e308 exceeds the largest float, so
+    the code adds 2 halves of it. The line is 1.5e308 at 0 and has its root at ``-1 + 8/23``. Right of 0, the function
+    falls linearly to 8.0001e307 at 1.
     """
     if x <= 0.0:
         return (1.15e308 * (x + 1.0) - 8e307) + 1.15e308 * (x + 1.0)
@@ -186,17 +187,18 @@ def _function_with_huge_values(x: float) -> float:
 
 
 class _ModABSafeguardedRecordingIterations(ModABSafeguarded):
-    """`_ModABSafeguardedRecordingIterations` is `ModABSafeguarded` that records ``(x1, x3, x2)`` in ``iterations`` at
-    each check of the stopping criterion, which follows the computation of ``x3`` in each iteration."""
+    """`_ModABSafeguardedRecordingIterations` is `ModABSafeguarded` that records ``(x1, x3, x2)`` in
+    ``x1_x3_x2_per_iteration`` at each check of the stopping criterion, which follows the computation of ``x3`` in each
+    iteration."""
 
     def __init__(self) -> None:
-        """Start with no recorded iterations."""
+        """Start with no recorded x-values."""
         super().__init__()
-        self.iterations: list[tuple[float, float, float]] = []
+        self.x1_x3_x2_per_iteration: list[tuple[float, float, float]] = []
 
     def _root_if_converged(
         self, x1: float, y1: float, x2: float, y2: float, x3: float, xtol_doubled: float
     ) -> float | None:
         """Record ``(x1, x3, x2)``, and return what `ModABSafeguarded._root_if_converged` returns."""
-        self.iterations.append((float(x1), float(x3), float(x2)))
+        self.x1_x3_x2_per_iteration.append((float(x1), float(x3), float(x2)))
         return ModABSafeguarded._root_if_converged(x1, y1, x2, y2, x3, xtol_doubled)

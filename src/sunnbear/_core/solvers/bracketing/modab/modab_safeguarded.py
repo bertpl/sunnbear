@@ -16,15 +16,15 @@ class ModABSafeguarded(Solver):
     Anderson-Björck. Tomov and Ganchovski (2026) find 2 defects in the C# code of `ModAB`, which the changes *No
     scaling in the first Anderson-Björck step* and *True function values kept apart* correct:
 
-    - **No scaling in the first Anderson-Björck step:** in `ModAB`, the bisection step that switches already counts as
-      the first of 2 iterations in a row that retain a bound, so a first Anderson-Björck step that retains the same
-      bound scales that bound's stored function value. `ModABSafeguarded` starts each Anderson-Björck phase, the
-      sequence of Anderson-Björck steps from a switch to the next fallback, with no record of which bound the previous
-      step replaced.
-    - **True function values kept apart:** `ModABSafeguarded` scales copies of ``y1`` and ``y2``, the ordinates
-      ``f1`` and ``f2``, which only the secant reads, and resets the ordinates to ``y1`` and ``y2`` at each switch. In
-      `ModAB`, as its C# code shows, a scaled value replaces the stored function value, and stays stored after a
-      fallback to bisection, where the switching test reads it.
+    - **No scaling in the first Anderson-Björck step:** in `ModAB`, the bisection step that switches to
+      Anderson-Björck mode already counts as the first of 2 iterations in a row that retain a bound, so a first
+      Anderson-Björck step that retains the same bound scales that bound's stored function value. `ModABSafeguarded`
+      starts each Anderson-Björck phase, the sequence of Anderson-Björck steps from a switch to the next fallback, with
+      no record of which bound the previous step replaced.
+    - **True function values kept apart:** `ModABSafeguarded` scales copies ``f1`` and ``f2`` of ``y1`` and ``y2``,
+      called the ordinates; only the secant reads them, and each switch resets them to ``y1`` and ``y2``. In `ModAB`,
+      as its C# code shows, a scaled value replaces the stored function value, and stays stored after a fallback to
+      bisection, where the switching test reads it.
     - **Fallback rule:** the switch sets the threshold to `_FALLBACK_THRESHOLD_FACTOR` times the interval width after
       ``x3`` replaces a bound. An Anderson-Björck step that leaves the interval wider than the threshold still continues
       the phase, as a residual exception, if ``|y3|`` is below half the smaller of ``|y1|`` and ``|y2|`` before the
@@ -88,8 +88,10 @@ class ModABSafeguarded(Solver):
         """Run the loop of ``SgModAB.cs``, and return the root estimate of `_root_if_converged` or ``x3``.
 
         ``y1`` and ``y2`` are always the function values at the bounds, and ``f1`` and ``f2`` the ordinates that the
-        Anderson-Björck steps scale. The variables keep the names of the C# code, except for those listed below; the
-        C# code also groups ``x1`` and ``y1`` into the node ``p1``, and likewise ``p2`` and ``p3``.
+        Anderson-Björck steps scale.
+
+        The variables keep the names of the C# code, except for those listed below; the C# code also groups ``x1``
+        and ``y1`` into the node ``p1``, ``x2`` and ``y2`` into ``p2``, and ``x3`` and ``y3`` into ``p3``.
 
         - ``moved_bound`` is the bound that the last Anderson-Björck step replaced, ``None`` at the start of each
           Anderson-Björck phase; the C# code stores it as the integer ``sideMoved``;

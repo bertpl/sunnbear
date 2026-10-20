@@ -20,7 +20,8 @@ Published results:
   the 2 settings of the table that differ from `ModABSafeguarded`'s own:
 
   - all 24 evaluation counts of its 8 cases under its 3 settings, exactly;
-  - its sums over the 86 non-stress cases whose returned x-value the authors validated, exactly. Its other 3 sums
+  - its sums over the 86 cases that are not among the 3 stress cases f82, f83 and f100 and whose returned x-value
+    the authors validated, exactly. Its other 3 sums
     are not compared, because each includes f100, whose function is infinite at its lower bound, which sunnbear
     rejects.
 - Tomov and Ganchovski (2026), Table 4: the row "Cap M = 3" reproduced by `ModABSafeguarded`, in

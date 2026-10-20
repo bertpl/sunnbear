@@ -5,9 +5,8 @@ benchmark, and on 1 problem of Tomov and Ganchovski (2026):
   root in the paper's supplementary results;
 - `TABLE_3_BY_SETTING`, the 8 cases of Table 3 of Tomov and Ganchovski (2026), with the safeguarded method's
   evaluation count under each of the table's 3 settings;
-- `TABLE_3_NON_STRESS_CASES`, the 86 cases that 1 sum of Table 3 covers: the benchmark's f01 to f100 without its 3
-  stress cases and without the 11 cases whose returned x-value the authors could not validate, and
-  `TABLE_3_NON_STRESS_SUMS_BY_SETTING`, the value of that sum under each setting;
+- `TABLE_3_VALIDATED_NON_STRESS_CASES`, the 86 cases that Table 3's non-stress sums cover, and
+  `TABLE_3_VALIDATED_NON_STRESS_SUMS_BY_SETTING`, the value of that sum under each setting;
 - `TABLE_4_CAP_M_3`, the row "Cap M = 3" of Table 4 of Tomov and Ganchovski (2026), on `EQUATION_27`, the preprint's
   equation 27;
 - `TABLE_5` and `TABLE_5_TOTAL_N_FEVALS`, the x-values that the safeguarded method returns on the 3 cases of Table 5 of
@@ -211,14 +210,14 @@ TABLE_5_TOTAL_N_FEVALS = 53
 # - the 8 cases without a reference root;
 # - the 3 cases of Table 5, whose returned x-value fails the authors' validation;
 # - the 3 stress cases: f82 and f83, which are discontinuous, and f100, whose function is infinite at its lower bound.
-_NAMES_LEFT_OUT_OF_THE_NON_STRESS_SUMS = (
+_NAMES_LEFT_OUT_OF_THE_VALIDATED_NON_STRESS_SUMS = (
     {"f38", "f39", "f40", "f76", "f77", "f78", "f79", "f81"}
     | {problem.name for problem in TABLE_5}
     | {"f82", "f83", "f100"}
 )
-TABLE_3_NON_STRESS_CASES = [
+TABLE_3_VALIDATED_NON_STRESS_CASES = [
     problem
     for name, problem in _BENCHMARK_PROBLEMS_BY_NAME.items()
-    if name not in _NAMES_LEFT_OUT_OF_THE_NON_STRESS_SUMS
+    if name not in _NAMES_LEFT_OUT_OF_THE_VALIDATED_NON_STRESS_SUMS
 ]
-TABLE_3_NON_STRESS_SUMS_BY_SETTING = {"fixed_delay": 1492, "early_fallback": 1507, "adaptive": 1475}
+TABLE_3_VALIDATED_NON_STRESS_SUMS_BY_SETTING = {"fixed_delay": 1492, "early_fallback": 1507, "adaptive": 1475}

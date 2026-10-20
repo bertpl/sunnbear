@@ -13,8 +13,7 @@ from tests.solvers.example_functions import cubic
     ids=["ModAB", "ModABSafeguarded"],
 )
 def test_name_version_and_that_its_arithmetic_is_counted(solver_cls, name, version):
-    """`ModAB` is named ``modab``, at version 3, and `ModABSafeguarded` ``modab_safeguarded``, at version 1; the
-    arithmetic of each is flop-counted."""
+    """Each solver class has its expected name and version, and its arithmetic is flop-counted."""
     # --- act --------------------------
     result = solver_cls().solve(cubic, 1.0, 2.0, xtol=1e-3, max_fevals=20)
 

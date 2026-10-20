@@ -11,8 +11,8 @@ from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Pr
 from .paper_problems import (
     TABLE_2,
     TABLE_3_BY_SETTING,
-    TABLE_3_NON_STRESS_CASES,
-    TABLE_3_NON_STRESS_SUMS_BY_SETTING,
+    TABLE_3_VALIDATED_NON_STRESS_CASES,
+    TABLE_3_VALIDATED_NON_STRESS_SUMS_BY_SETTING,
     TABLE_4_CAP_M_3,
     TABLE_4_CAP_M_3_FINAL_WIDTH,
     TABLE_5,
@@ -77,8 +77,8 @@ def test_the_switches_of_table_1_of_the_paper_are_reproduced():
     ids=str,
 )
 def test_the_evaluation_counts_of_table_3_of_the_safeguarded_paper_are_reproduced(setting: str, problem: PaperProblem):
-    """With the stopping criterion of the C# code and the tolerances that the preprint uses, `ModABSafeguarded`
-    evaluates as often as Table 3 reports on each of its 8 cases, under each of its 3 settings."""
+    """With the stopping criterion of the C# code and the preprint's tolerances, `ModABSafeguarded` evaluates as
+    often as Table 3 reports on each of its 8 cases, under each of its 3 settings."""
     # --- act --------------------------
     result = _SOLVER_CLS_BY_TABLE_3_SETTING[setting]().solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=300)
 
@@ -86,8 +86,10 @@ def test_the_evaluation_counts_of_table_3_of_the_safeguarded_paper_are_reproduce
     problem.assert_reproduced_by(result)
 
 
-@pytest.mark.parametrize("setting, published_sum", TABLE_3_NON_STRESS_SUMS_BY_SETTING.items())
-def test_the_sums_of_table_3_over_its_86_non_stress_cases_are_reproduced(setting: str, published_sum: int):
+@pytest.mark.parametrize("setting, published_sum", TABLE_3_VALIDATED_NON_STRESS_SUMS_BY_SETTING.items())
+def test_the_sums_of_table_3_of_the_safeguarded_paper_over_its_86_validated_non_stress_cases_are_reproduced(
+    setting: str, published_sum: int
+):
     """Under each setting of Table 3, the evaluation counts of `ModABSafeguarded` with the C# code's stopping criterion
     add up, over the table's 86 validated non-stress cases, to the table's sum."""
     # --- arrange ----------------------
@@ -96,19 +98,22 @@ def test_the_sums_of_table_3_over_its_86_non_stress_cases_are_reproduced(setting
     # --- act --------------------------
     total = sum(
         solver.solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=300).n_fevals
-        for problem in TABLE_3_NON_STRESS_CASES
+        for problem in TABLE_3_VALIDATED_NON_STRESS_CASES
     )
 
     # --- assert -----------------------
-    assert len(TABLE_3_NON_STRESS_CASES) == 86
+    assert len(TABLE_3_VALIDATED_NON_STRESS_CASES) == 86
     assert total == published_sum
 
 
 def test_the_row_cap_m_3_of_table_4_of_the_safeguarded_paper_is_reproduced():
-    """On the preprint's equation 27 over ``[-3, 1]``, with the stopping criterion of the C# code and the tolerances
-    that the preprint uses, `ModABSafeguarded` reproduces the row "Cap M = 3" of Table 4: it converges after 77
-    evaluations, returns the x-value that the preprint's Section 7.4 prints, and leaves a final interval as wide as
-    that section reports."""
+    """On the preprint's equation 27 over ``[-3, 1]``, with the stopping criterion of the C# code and the preprint's
+    tolerances, `ModABSafeguarded` reproduces the row "Cap M = 3" of Table 4:
+
+    - it evaluates as often as that row reports;
+    - it returns the x-value that the preprint's Section 7.4 prints;
+    - it leaves a final interval as wide as that section reports.
+    """
     # --- act --------------------------
     result = _ModABSafeguardedWithPaperStoppingCriterion().solve(
         TABLE_4_CAP_M_3.f, TABLE_4_CAP_M_3.a, TABLE_4_CAP_M_3.b, xtol=0.0, max_fevals=300, history_enabled=True
@@ -140,9 +145,9 @@ def test_the_x_values_of_table_5_of_the_safeguarded_paper_are_reproduced(setting
 #  Helpers
 # ==================================================================================================
 class _PaperStoppingCriterionMixin:
-    """`_PaperStoppingCriterionMixin` gives `ModAB` or `ModABSafeguarded`, as the first base of a subclass, the stopping
-    criterion and the return value of their C# code, at the absolute and relative tolerances ``aTol`` and ``rTol`` that
-    both papers use.
+    """`_PaperStoppingCriterionMixin`, as the first base of a subclass of `ModAB` or `ModABSafeguarded`, gives that
+    subclass the stopping criterion and the return value of their C# code, at the absolute and relative tolerances
+    ``aTol`` and ``rTol`` that both papers use.
 
     The tolerances are those of `ganchovski_et_al_stop_width`, so a test passes ``xtol = 0``, which this class ignores.
     """

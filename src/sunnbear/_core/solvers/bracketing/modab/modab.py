@@ -90,7 +90,7 @@ class ModAB(Solver):
         """Run the loop of the paper's C# code, and return the root estimate of `_root_if_converged` or ``x3``.
 
         The variables keep the names of the C# code, except for those listed below; the C# code also groups ``x1``
-        and ``y1`` into the point ``p1``, and likewise ``p2`` and ``p3``.
+        and ``y1`` into the point ``p1``, ``x2`` and ``y2`` into ``p2``, and ``x3`` and ``y3`` into ``p3``.
 
         - ``(x_new, y_new)`` is the point that replaces a bound: ``(x3, y3)``, or, when ``x3`` is clamped onto a
           bound, that bound with its stored function value;
