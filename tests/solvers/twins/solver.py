@@ -18,8 +18,9 @@ class TwinSolver(Solver):
     Reference implementations stop by criteria of their own, so without the interruption the 2 solves would evaluate
     different numbers of points even where every point agrees.
 
-    Where sunnbear's solver has a stopping criterion of its own, not `BracketingSolver`'s, the subclass also overrides
-    `_root_if_sunnbear_solver_stops` with that criterion. Where the reference implementation stops by exactly that
+    Where sunnbear's solver has a stopping criterion of its own, not `BracketingSolver`'s, or does not split its
+    interval at every evaluated x-value, the subclass also overrides `_root_if_sunnbear_solver_stops` to apply that
+    solver's criterion to that solver's own interval. Where the reference implementation stops by exactly that
     criterion, the subclass instead lets the reference implementation stop: its `_root_if_sunnbear_solver_stops`
     returns ``None`` on every call, and its `_run_reference` raises `TwinConvergedSignal` with the reference
     implementation's root.
@@ -55,16 +56,25 @@ class TwinSolver(Solver):
         """Run the reference implementation on ``f`` over ``[a, b]``."""
 
     def _root_if_sunnbear_solver_stops(
-        self, interval: Interval, evaluations: list[tuple[float, float]], xtol: float
+        self,
+        initial_interval: Interval,
+        interval_split_at_evaluations: Interval,
+        evaluations: list[tuple[float, float]],
+        xtol: float,
     ) -> float | None:
         """Return the root estimate if sunnbear's solver stops after ``evaluations``, or ``None`` if it continues.
 
         ``evaluations`` holds every ``(x, f(x))`` that the reference implementation evaluated, in order, without the
-        evaluations at the interval bounds; ``interval`` is the initial interval split at each of those x-values. Both
-        hold plain floats. This default is the stopping criterion of `BracketingSolver`, `Interval.is_converged`.
+        evaluations at the interval bounds; ``interval_split_at_evaluations`` is ``initial_interval``, the solve's
+        initial interval, split at each of those x-values. ``evaluations``, ``initial_interval`` and
+        ``interval_split_at_evaluations`` hold plain floats. This default is the stopping criterion of
+        `BracketingSolver`, `Interval.is_converged`.
+
+        The twin of a solver that does not split its interval at every evaluated x-value replays that solver's interval
+        from ``initial_interval`` and ``evaluations``.
         """
-        if interval.is_converged(2.0 * xtol):
-            return interval.root()
+        if interval_split_at_evaluations.is_converged(2.0 * xtol):
+            return interval_split_at_evaluations.root()
         else:
             return None
 
@@ -112,9 +122,10 @@ class StoppingWrappedFunction:
         interval = state.interval
         self._f = state.f
         self._twin = twin
-        self._interval = Interval.from_interval_bounds(
+        self._initial_interval = Interval.from_interval_bounds(
             float(interval.a), float(interval.b), float(interval.fa), float(interval.fb)
         )
+        self._interval_split_at_evaluations = self._initial_interval
         self._xtol = float(state.xtol)
         self._evaluations: list[tuple[float, float]] = []
         self._n_reevaluated_bounds_left = twin.n_reevaluated_bounds
@@ -125,9 +136,11 @@ class StoppingWrappedFunction:
         if self._n_reevaluated_bounds_left > 0:
             self._n_reevaluated_bounds_left -= 1
         else:
-            self._interval = self._interval.split_at(float(x), fx)
+            self._interval_split_at_evaluations = self._interval_split_at_evaluations.split_at(float(x), fx)
             self._evaluations.append((float(x), fx))
-            x_root = self._twin._root_if_sunnbear_solver_stops(self._interval, self._evaluations, self._xtol)
+            x_root = self._twin._root_if_sunnbear_solver_stops(
+                self._initial_interval, self._interval_split_at_evaluations, self._evaluations, self._xtol
+            )
             if x_root is not None:
                 raise TwinConvergedSignal(x_root)
         return fx

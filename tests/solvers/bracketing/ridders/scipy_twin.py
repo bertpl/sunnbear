@@ -58,7 +58,11 @@ class RiddersScipyTwin(TwinSolver):
         scipy.optimize.ridder(f, a, b, xtol=scipy_xtol, rtol=4.0 * FLOAT64_EPS)
 
     def _root_if_sunnbear_solver_stops(
-        self, interval: Interval, evaluations: list[tuple[float, float]], xtol: float
+        self,
+        initial_interval: Interval,
+        interval_split_at_evaluations: Interval,
+        evaluations: list[tuple[float, float]],
+        xtol: float,
     ) -> float | None:
         """Return the root estimate if `Ridders` stops after the last of ``evaluations``, or ``None`` if it continues.
 
@@ -79,9 +83,11 @@ class RiddersScipyTwin(TwinSolver):
             else:
                 return None
         elif self.variant is RiddersVariant.SCIPY:
-            if interval.width < xtol:
+            if interval_split_at_evaluations.width < xtol:
                 return x
             else:
                 return None
         else:
-            return super()._root_if_sunnbear_solver_stops(interval, evaluations, xtol)
+            return super()._root_if_sunnbear_solver_stops(
+                initial_interval, interval_split_at_evaluations, evaluations, xtol
+            )

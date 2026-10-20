@@ -348,6 +348,15 @@ wheels = [
 ]
 
 [[package]]
+name = "hybridroots"
+version = "1.0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/c9/01b33dbdd45bfa816ce5f60556a81bafd98b2b91424327a1c9169053de48/hybridroots-1.0.1.tar.gz", hash = "sha256:09d5bbba0a8c3b1bc3004e3f4c55db8bf32a52053ecfc41a544ba86425fb9b93", size = 15597, upload-time = "2026-04-25T15:42:18.375Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ef/87/a85c03f58f54c18f676adca392155cf07cf4a2f397a4daff94151807def2/hybridroots-1.0.1-py3-none-any.whl", hash = "sha256:c47de90605dd1c7adcaa1576e2c64e88044d2fd7cfb15061e25dbbf5b376dcaa", size = 16117, upload-time = "2026-04-25T15:42:16.761Z" },
+]
+
+[[package]]
 name = "icc-rt"
 version = "2020.0.133"
 source = { registry = "https://pypi.org/simple" }
@@ -1640,6 +1649,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "hybridroots" },
     { name = "mpmath" },
     { name = "pre-commit" },
     { name = "pytest" },
@@ -1686,6 +1696,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "hybridroots", specifier = ">=1.0.1" },
     { name = "mpmath", specifier = ">=1.3.0" },
     { name = "pre-commit", specifier = ">=4.0" },
     { name = "pytest", specifier = ">=8.0" },
