@@ -29,8 +29,8 @@ class Brent(Solver):
     The steps use these quantities of Brent's procedure:
 
     - ``b`` and ``c`` are the interval bounds, ``b`` the one with the smaller ``|f|``, which is the best estimate;
-    - ``a`` is the previous value of ``b``; at the start, and after a step lands on the other side of the root from the
-      previous ``b``, ``a`` and ``c`` coincide, and only 2 distinct x-values are known;
+    - ``a`` is the previous value of ``b``. ``a`` and ``c`` coincide at the start, and after a step lands on the other
+      side of the root from the previous ``b``; only 2 distinct x-values are then known;
     - ``m = 0.5*(c - b)`` is half the signed width of the interval, from ``b`` toward ``c``;
     - ``tol = 2*macheps*|b| + t`` is the tolerance, with ``macheps`` set to `FLOAT64_EPS` and ``t`` set to ``xtol``.
 
@@ -41,13 +41,14 @@ class Brent(Solver):
       function of ``f`` through the 3 x-values and their function values, and takes its value at ``f = 0``.
     - ``"hyperbolic"``, the method of SciPy's ``brenth``: hyperbolic interpolation, which fits the rational function
       ``(x - z) / (g*x + h)`` through the 3 x-values and their function values, and takes its zero ``z``. This ``z``
-      is formula (3.1.5) of Bus and Dekker (1975), applied to ``b``, ``a`` and ``c``. `Brent` computes the step from
-      ``b`` to ``z`` in the form of SciPy's ``brenth``, with the divided differences
+      is formula (3.1.5) of Bus and Dekker (1975), applied to ``b``, ``a`` and ``c``.
+
+      `Brent` computes the step from ``b`` to ``z`` in the form of SciPy's ``brenth``, with the divided differences
       ``f[u, v] = (f(u) - f(v)) / (u - v)``: ``-fb*(fc - fa) / (fc*f[a, b] - fa*f[c, b])``.
 
       SciPy's documentation attributes ``brenth`` to Algorithm M of Bus and Dekker (1975), but ``brenth`` is ``brentq``
-      with only this step replaced; section V.g of ``SOLVER_IMPLEMENTATIONS.md``, in the package
-      `sunnbear._core.solvers`, states why ``brenth`` is not Algorithm M.
+      with only the interpolation through 3 x-values replaced; section V.g of ``SOLVER_IMPLEMENTATIONS.md``, in the
+      package `sunnbear._core.solvers`, states why ``brenth`` is not Algorithm M.
 
     In both variants, the rules of the steps guarantee that the solve converges within a bounded number of
     evaluations, at most about the square of bisection's count, whatever the function, as long as ``xtol`` exceeds
@@ -57,7 +58,7 @@ class Brent(Solver):
     ``2*xtol``, and the solve then evaluates ``c`` again and again until its evaluation budget is exhausted.
 
     In both variants, `Brent` departs from the procedure ``zero``, or settles a value that the procedure leaves to its
-    caller, in these places:
+    caller, in these places, besides the interpolation formula of ``"hyperbolic"``:
 
     - **Stopping criterion:** `Brent` and the procedure check their criteria at each pass through the procedure's
       label ``ext``:
@@ -85,15 +86,15 @@ class Brent(Solver):
           https://maths-people.anu.edu.au/~brent/pub/pub011.html
         - Bus, J. C. P. and Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence for finding a
           zero of a function. ACM Transactions on Mathematical Software 1(4), 330-345. Its formula (3.1.5) gives the
-          zero of the hyperbolic interpolation of ``"hyperbolic"``; `Brent` computes that zero in SciPy's form. Its
-          Tables I to IV hold the column "B" of evaluation counts of Brent's method, which the test suite reproduces
-          with ``"inverse_quadratic"``. https://doi.org/10.1145/355656.355659
+          zero of the hyperbolic interpolation that ``"hyperbolic"`` uses. Its Tables I to IV hold the column "B" of
+          evaluation counts of Brent's method, which the test suite reproduces with ``"inverse_quadratic"``.
+          https://doi.org/10.1145/355656.355659
         - SciPy's ``scipy.optimize.brentq``, whose tolerance ``(xtol + rtol*|b|) / 2`` equals ``tol`` when SciPy's
           ``xtol`` is ``2*t`` and its ``rtol`` is ``4*macheps``; the test suite checks ``"inverse_quadratic"`` against
           ``scipy.optimize.brentq``.
-        - SciPy's ``scipy.optimize.brenth``, which has the tolerance of ``brentq``; `Brent` computes the step of
-          ``"hyperbolic"`` through 3 x-values in the form of SciPy's source file ``brenth.c``, and the test suite
-          checks ``"hyperbolic"`` against ``scipy.optimize.brenth``.
+        - SciPy's ``scipy.optimize.brenth``, which has the tolerance of ``brentq``; `Brent` computes the interpolation
+          step of ``"hyperbolic"`` in the form of SciPy's source file ``brenth.c``, and the test suite checks
+          ``"hyperbolic"`` against ``scipy.optimize.brenth``.
           https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/Zeros/brenth.c
         - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section 9.3.
           Cambridge University Press. Its routine ``zbrent`` takes ``macheps`` as 2^-52, as `Brent` does.
@@ -187,7 +188,7 @@ class Brent(Solver):
                     # xcur, xpre and xblk are b, a and c here, and whose divided differences dpre and dblk are
                     # div_diff_ab and div_diff_cb. SciPy computes the step as
                     # -fb*(fc - fa) / (fc*div_diff_ab - fa*div_diff_cb); p leaves out the leading minus, because the
-                    # sign flip below negates p / q.
+                    # block below that makes p non-negative also negates p / q.
                     div_diff_ab = (fa - fb) / (a - b)
                     div_diff_cb = (fc - fb) / (c - b)
                     p = fb * (fc - fa)

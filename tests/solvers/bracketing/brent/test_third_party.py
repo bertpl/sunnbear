@@ -17,9 +17,11 @@ Each paper ran Brent's procedure ``zero``, stopping criterion included, with its
 - Ganchovski et al. used a larger relative part.
 
 The tests therefore run `BrentWithPaperStoppingCriterion`, which is `Brent` with the procedure's own stopping criterion,
-and set only its tolerance ``t``, passed as ``xtol``: either to the paper's value, which for Bus and Dekker is the
-absolute part of their tolerance, or, for Ganchovski et al., to the value that makes ``tol`` equal to the paper's
-tolerance.
+and set only its tolerance ``t``, passed as ``xtol``:
+
+- for Bus and Dekker, to the absolute part of their tolerance;
+- for Ganchovski et al., to the value that makes ``tol`` equal to the paper's tolerance;
+- for the other papers, to the paper's value.
 """
 
 import pytest
@@ -32,7 +34,7 @@ from tests.solvers.paper_problems.alefeld_potra_shi import (
     AlefeldPotraShiTablesIVToVIProblem,
 )
 from tests.solvers.paper_problems.anderson_bjorck import AndersonBjorckExampleProblem
-from tests.solvers.paper_problems.bus_dekker import BusDekkerProblem
+from tests.solvers.paper_problems.bus_dekker import BusDekkerTablesIToIVProblem
 from tests.solvers.paper_problems.chandrupatla import ChandrupatlaTable2Problem
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem, ganchovski_et_al_stop_width
 
@@ -61,7 +63,7 @@ _CHANDRUPATLA_T = 0.5e-5
         pytest.param(ALEFELD_POTRA_SHI_TABLES_IV_TO_VI, AlefeldPotraShiTablesIVToVIProblem, id="alefeld_potra_shi"),
         pytest.param(ANDERSON_BJORCK_EXAMPLES_1_TO_7, AndersonBjorckExampleProblem, id="anderson_bjorck"),
         pytest.param(GANCHOVSKI_ET_AL_TABLE_2, GanchovskiEtAlTable2Problem, id="ganchovski_et_al"),
-        pytest.param(BUS_DEKKER_TABLES_I_TO_IV, BusDekkerProblem, id="bus_dekker"),
+        pytest.param(BUS_DEKKER_TABLES_I_TO_IV, BusDekkerTablesIToIVProblem, id="bus_dekker"),
     ],
 )
 def test_each_published_column_names_every_problem_of_its_table_in_order(problems, table):
@@ -103,13 +105,28 @@ def test_the_bisection_switch_counts_of_chandrupatla_table_2_are_reproduced(
     assert _count_bisection_switches(result.history) == n_bisection_switches
 
 
-@pytest.mark.parametrize("problem", ALEFELD_POTRA_SHI_TABLES_IV_TO_VI, ids=str)
-def test_the_evaluation_counts_of_alefeld_potra_shi_tables_iv_to_vi_are_reproduced(problem: PaperProblem):
-    """On every problem of Tables IV to VI of Alefeld, Potra and Shi (1995), `Brent` with ``t = 10^-15`` evaluates as
-    often as the column "BR" reports, except where the problem states an allowed deviation."""
+@pytest.mark.parametrize(
+    "problem, t",
+    [
+        *[
+            pytest.param(problem, 1e-15, id=f"alefeld_potra_shi-{problem}")
+            for problem in ALEFELD_POTRA_SHI_TABLES_IV_TO_VI
+        ],
+        *[pytest.param(problem, 1e-14, id=f"bus_dekker-{problem}") for problem in BUS_DEKKER_TABLES_I_TO_IV],
+    ],
+)
+def test_the_published_evaluation_counts_are_reproduced(problem: PaperProblem, t: float):
+    """`Brent` with the paper's ``t`` evaluates as often as the published column reports, except where the problem
+    states an allowed deviation: the column "BR" of Tables IV to VI of Alefeld, Potra and Shi (1995), with
+    ``t = 10^-15``, and the column "B" of Tables I to IV of Bus and Dekker (1975), with ``t = 1e-14``.
+
+    For Bus and Dekker, Brent's tolerance and the article's, ``|x|*1e-14 + 1e-14``, differ by less than 1e-14 near
+    the roots, which all lie within 1 of 0; every count that the test checks is the same as with the ``t`` that makes
+    the 2 tolerances equal at the root.
+    """
     # --- act --------------------------
     result = BrentWithPaperStoppingCriterion(variant=BrentVariant.INVERSE_QUADRATIC).solve(
-        problem.f, problem.a, problem.b, xtol=1e-15, max_fevals=300
+        problem.f, problem.a, problem.b, xtol=t, max_fevals=300
     )
 
     # --- assert -----------------------
@@ -164,24 +181,6 @@ def test_the_evaluation_counts_and_roots_of_ganchovski_et_al_table_2_are_reprodu
     # --- act --------------------------
     result = BrentWithPaperStoppingCriterion(variant=BrentVariant.INVERSE_QUADRATIC).solve(
         problem.f, problem.a, problem.b, xtol=_ganchovski_et_al_t(problem), max_fevals=300
-    )
-
-    # --- assert -----------------------
-    problem.assert_reproduced_by(result)
-
-
-@pytest.mark.parametrize("problem", BUS_DEKKER_TABLES_I_TO_IV, ids=str)
-def test_the_evaluation_counts_of_bus_dekker_tables_i_to_iv_are_reproduced(problem: PaperProblem):
-    """On every problem of Tables I to IV of Bus and Dekker (1975), `Brent` with ``t = 1e-14`` evaluates as often as
-    the column "B" reports, except where the problem states an allowed deviation.
-
-    With ``t = 1e-14``, Brent's tolerance and the article's, ``|x|*1e-14 + 1e-14``, differ by less than 1e-14 near the
-    roots, which all lie within 1 of 0; every count that the test checks is the same as with the ``t`` that makes the 2
-    tolerances equal at the root.
-    """
-    # --- act --------------------------
-    result = BrentWithPaperStoppingCriterion(variant=BrentVariant.INVERSE_QUADRATIC).solve(
-        problem.f, problem.a, problem.b, xtol=1e-14, max_fevals=300
     )
 
     # --- assert -----------------------

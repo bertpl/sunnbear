@@ -30,7 +30,7 @@ def test_the_second_step_interpolates_through_3_x_values_by_the_formula_of_the_v
     quadratic one.
 
     With ``f(7/6) = -125/216``, the divided differences of the hyperbolic step are ``f[a, b] = 91/36`` and
-    ``f[c, b] = 241/36``, so its step ``-fb*(fc - fa) / (fc*f[a, b] - fa*f[c, b])`` from ``b`` is 125/696.
+    ``f[c, b] = 241/36``, so the hyperbolic step ``-fb*(fc - fa) / (fc*f[a, b] - fa*f[c, b])`` from ``b`` is 125/696.
     """
     # --- act --------------------------
     result = Brent(variant=variant).solve(cubic, 1.0, 2.0, xtol=1e-10, max_fevals=60, history_enabled=True)

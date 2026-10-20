@@ -51,8 +51,9 @@ Third-party published results:
   2 counts deviate.
 - Bus and Dekker (1975), Tables I to IV, the column "B": reproduced, in ``test_third_party.py``: 27 of the 36
   evaluation counts exactly, 5 within 1, 1 within 2 and 1 within 3; the counts of the other 2 are not checked, and the
-  test data states why. The article ran its tables on a CDC Cyber 73, whose significand has 48 bits. It states no
-  interval for Table II; on ``[-1, 10]``, the interval of Table III, all 12 counts of Table II reproduce.
+  test data states why. The article ran its tables on a CDC Cyber 73, whose significand has 48 bits; in an emulation
+  of that arithmetic, 5 of the 7 deviating counts match the table. The article states no interval for Table II; on
+  ``[-1, 10]``, the interval of Table III, all 12 counts of Table II reproduce.
 - Oliveira and Takahashi (2020), Table 1, the column "Matlab": not checked by a test, because its counts are those of
   MATLAB's ``fzero``, a descendant of ``zero``, and the paper does not state which ``t`` its tolerance of 1e-10 gives.
 - Gao (2026), Tables 2 and 4, the columns "Brentq": not checked by a test, because their counts are those of SciPy's

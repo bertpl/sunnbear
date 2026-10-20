@@ -12,7 +12,7 @@
 from tests.solvers.paper_problems import UNSTATED_RUN_DETAILS
 from tests.solvers.paper_problems.alefeld_potra_shi import AlefeldPotraShiTablesIVToVIProblem
 from tests.solvers.paper_problems.anderson_bjorck import AndersonBjorckExampleProblem
-from tests.solvers.paper_problems.bus_dekker import BusDekkerProblem
+from tests.solvers.paper_problems.bus_dekker import BusDekkerTablesIToIVProblem
 from tests.solvers.paper_problems.chandrupatla import ChandrupatlaTable2Problem
 from tests.solvers.paper_problems.ganchovski_et_al import GanchovskiEtAlTable2Problem
 
@@ -260,95 +260,95 @@ GANCHOVSKI_ET_AL_TABLE_2 = [
 
 # The article ran its tables on a CDC Cyber 73, whose floating-point significand has 48 bits. Its column "B" counts the
 # 2 evaluations at the interval bounds.
-_CYBER_48_BIT_EMULATION = "an emulation of the 48-bit truncating arithmetic of the article's CDC Cyber 73"
+_CYBER_48_BIT_EMULATION_PHRASE = "an emulation of the 48-bit truncating arithmetic of the article's CDC Cyber 73"
 BUS_DEKKER_TABLES_I_TO_IV = [
-    BusDekkerProblem.I1.with_n_fevals(
+    BusDekkerTablesIToIVProblem.I1.with_n_fevals(
         8,
         deviation=2,
         reason=(
             "cause not known: the solve takes 10 evaluations in float64, in "
-            f"{_CYBER_48_BIT_EMULATION}, and in the same emulation with rounding"
+            f"{_CYBER_48_BIT_EMULATION_PHRASE}, and in the same emulation with rounding"
         ),
     ),
-    BusDekkerProblem.I2_N1.with_n_fevals(8),
-    BusDekkerProblem.I2_N2.with_n_fevals(
+    BusDekkerTablesIToIVProblem.I2_N1.with_n_fevals(8),
+    BusDekkerTablesIToIVProblem.I2_N2.with_n_fevals(
         9,
         deviation=1,
         reason=UNSTATED_RUN_DETAILS,
-        observation=f"the solve takes 1 evaluation more; in {_CYBER_48_BIT_EMULATION}, it takes the table's 9",
+        observation=f"the solve takes 1 evaluation more; in {_CYBER_48_BIT_EMULATION_PHRASE}, it takes the table's 9",
     ),
-    BusDekkerProblem.I2_N3.with_n_fevals(
+    BusDekkerTablesIToIVProblem.I2_N3.with_n_fevals(
         10,
         deviation=1,
         reason=UNSTATED_RUN_DETAILS,
-        observation=f"the solve takes 1 evaluation fewer; in {_CYBER_48_BIT_EMULATION}, it takes the table's 10",
+        observation=f"the solve takes 1 evaluation fewer; in {_CYBER_48_BIT_EMULATION_PHRASE}, it takes the table's 10",
     ),
-    BusDekkerProblem.I2_N4.with_n_fevals(
+    BusDekkerTablesIToIVProblem.I2_N4.with_n_fevals(
         10,
         deviation=1,
         reason=UNSTATED_RUN_DETAILS,
-        observation=f"the solve takes 1 evaluation more; in {_CYBER_48_BIT_EMULATION}, it takes the table's 10",
+        observation=f"the solve takes 1 evaluation more; in {_CYBER_48_BIT_EMULATION_PHRASE}, it takes the table's 10",
     ),
-    BusDekkerProblem.I3_N1.with_n_fevals(
+    BusDekkerTablesIToIVProblem.I3_N1.with_n_fevals(
         8,
         deviation=1,
         reason=UNSTATED_RUN_DETAILS,
-        observation=f"the solve takes 1 evaluation more, also in {_CYBER_48_BIT_EMULATION}",
+        observation=f"the solve takes 1 evaluation more, also in {_CYBER_48_BIT_EMULATION_PHRASE}",
     ),
-    BusDekkerProblem.I3_N5.with_n_fevals(9),
-    BusDekkerProblem.I3_N10.with_n_fevals(9),
-    BusDekkerProblem.I4_N1.with_n_fevals(9),
-    BusDekkerProblem.I4_N5.with_n_fevals(9),
-    BusDekkerProblem.I4_N10.with_n_fevals(10),
-    BusDekkerProblem.I5_N1.with_n_fevals(
+    BusDekkerTablesIToIVProblem.I3_N5.with_n_fevals(9),
+    BusDekkerTablesIToIVProblem.I3_N10.with_n_fevals(9),
+    BusDekkerTablesIToIVProblem.I4_N1.with_n_fevals(9),
+    BusDekkerTablesIToIVProblem.I4_N5.with_n_fevals(9),
+    BusDekkerTablesIToIVProblem.I4_N10.with_n_fevals(10),
+    BusDekkerTablesIToIVProblem.I5_N1.with_n_fevals(
         9,
         deviation=1,
         reason=UNSTATED_RUN_DETAILS,
-        observation=f"the solve takes 1 evaluation more; in {_CYBER_48_BIT_EMULATION}, it takes the table's 9",
+        observation=f"the solve takes 1 evaluation more; in {_CYBER_48_BIT_EMULATION_PHRASE}, it takes the table's 9",
     ),
-    BusDekkerProblem.I5_N4.with_n_fevals(8),
-    BusDekkerProblem.I5_N8.with_n_fevals(7),
-    BusDekkerProblem.I6_N1.with_n_fevals(9),
-    BusDekkerProblem.I6_N5.with_n_fevals(9),
-    BusDekkerProblem.I6_N10.with_n_fevals(9),
-    BusDekkerProblem.II_A1_B0_N3.with_n_fevals(15),
-    BusDekkerProblem.II_A1_B0_N5.with_n_fevals(14),
-    BusDekkerProblem.II_A1_B0_N9.with_n_fevals(16),
-    BusDekkerProblem.II_A1_B0_N19.with_n_fevals(16),
-    BusDekkerProblem.II_A0_B1EM4_N3.with_n_fevals(26),
-    BusDekkerProblem.II_A0_B1EM4_N5.with_n_fevals(27),
-    BusDekkerProblem.II_A0_B1EM4_N9.with_n_fevals(25),
-    BusDekkerProblem.II_A0_B1EM4_N19.with_n_fevals(24),
-    BusDekkerProblem.II_A1_B1EM4_N3.with_n_fevals(14),
-    BusDekkerProblem.II_A1_B1EM4_N5.with_n_fevals(14),
-    BusDekkerProblem.II_A1_B1EM4_N9.with_n_fevals(16),
-    BusDekkerProblem.II_A1_B1EM4_N19.with_n_fevals(16),
-    BusDekkerProblem.III_N3.with_n_fevals(147),
-    BusDekkerProblem.III_N5.with_n_fevals(
+    BusDekkerTablesIToIVProblem.I5_N4.with_n_fevals(8),
+    BusDekkerTablesIToIVProblem.I5_N8.with_n_fevals(7),
+    BusDekkerTablesIToIVProblem.I6_N1.with_n_fevals(9),
+    BusDekkerTablesIToIVProblem.I6_N5.with_n_fevals(9),
+    BusDekkerTablesIToIVProblem.I6_N10.with_n_fevals(9),
+    BusDekkerTablesIToIVProblem.II_A1_B0_N3.with_n_fevals(15),
+    BusDekkerTablesIToIVProblem.II_A1_B0_N5.with_n_fevals(14),
+    BusDekkerTablesIToIVProblem.II_A1_B0_N9.with_n_fevals(16),
+    BusDekkerTablesIToIVProblem.II_A1_B0_N19.with_n_fevals(16),
+    BusDekkerTablesIToIVProblem.II_A0_B1EM4_N3.with_n_fevals(26),
+    BusDekkerTablesIToIVProblem.II_A0_B1EM4_N5.with_n_fevals(27),
+    BusDekkerTablesIToIVProblem.II_A0_B1EM4_N9.with_n_fevals(25),
+    BusDekkerTablesIToIVProblem.II_A0_B1EM4_N19.with_n_fevals(24),
+    BusDekkerTablesIToIVProblem.II_A1_B1EM4_N3.with_n_fevals(14),
+    BusDekkerTablesIToIVProblem.II_A1_B1EM4_N5.with_n_fevals(14),
+    BusDekkerTablesIToIVProblem.II_A1_B1EM4_N9.with_n_fevals(16),
+    BusDekkerTablesIToIVProblem.II_A1_B1EM4_N19.with_n_fevals(16),
+    BusDekkerTablesIToIVProblem.III_N3.with_n_fevals(147),
+    BusDekkerTablesIToIVProblem.III_N5.with_n_fevals(
         122,
         deviation=None,
         reason=(
             "the count depends on the arithmetic near the multiple root: the solve takes 129 evaluations in float64, "
-            f"and 126 in {_CYBER_48_BIT_EMULATION}"
+            f"and 126 in {_CYBER_48_BIT_EMULATION_PHRASE}"
         ),
     ),
-    BusDekkerProblem.III_N7.with_n_fevals(138),
-    BusDekkerProblem.III_N9.with_n_fevals(137),
-    BusDekkerProblem.III_N19.with_n_fevals(
+    BusDekkerTablesIToIVProblem.III_N7.with_n_fevals(138),
+    BusDekkerTablesIToIVProblem.III_N9.with_n_fevals(137),
+    BusDekkerTablesIToIVProblem.III_N19.with_n_fevals(
         141,
         deviation=3,
         reason=(
             "the count depends on the arithmetic near the multiple root: the solve takes 138 evaluations in float64, "
-            f"and the table's 141 in {_CYBER_48_BIT_EMULATION}"
+            f"and the table's 141 in {_CYBER_48_BIT_EMULATION_PHRASE}"
         ),
     ),
-    BusDekkerProblem.III_N25.with_n_fevals(
+    BusDekkerTablesIToIVProblem.III_N25.with_n_fevals(
         123,
         deviation=None,
         reason=(
             "the count depends on the arithmetic near the multiple root: the solve takes 132 evaluations in float64, "
-            f"and 124 in {_CYBER_48_BIT_EMULATION}"
+            f"and 124 in {_CYBER_48_BIT_EMULATION_PHRASE}"
         ),
     ),
-    BusDekkerProblem.IV.with_n_fevals(18),
+    BusDekkerTablesIToIVProblem.IV.with_n_fevals(18),
 ]

@@ -192,7 +192,7 @@ Only a secondary config may deviate from section IV.
 | | `ellithy[variant='tf']` | secondary | Opt.TF: trisection, then false position | yes |
 | | `ellithy[variant='tfms']` | secondary | Opt.TFMS: Opt.TF with a modified secant step | yes |
 | `Brent` | `brent[variant='inverse_quadratic']` | core | Brent's method, with inverse quadratic interpolation | yes |
-| | `brent[variant='hyperbolic']` | secondary | SciPy's `brenth`: rational interpolation in place of inverse quadratic | yes |
+| | `brent[variant='hyperbolic']` | secondary | SciPy's `brenth`: hyperbolic interpolation in place of inverse quadratic interpolation | yes |
 
 ### V.a. Ridders
 
@@ -260,11 +260,11 @@ All 4 configs follow section IV, and all 4 are secondary: the method is not esta
 
 Each step of Brent's method that does not bisect interpolates through the last x-values: linearly through 2 of them, or through 3 of them by inverse quadratic interpolation.
 
-SciPy's `brenth` is SciPy's `brentq`, which implements Brent's method, with the inverse quadratic interpolation replaced by the rational interpolation of Bus and Dekker (1975); everything else is Brent's. Both configs follow section IV.
+SciPy's `brentq` implements Brent's method, and SciPy's `brenth` is `brentq` with the inverse quadratic interpolation replaced by the hyperbolic interpolation of Bus and Dekker (1975); the rest of `brenth` follows Brent's method. Both configs follow section IV.
 - **`brent[variant='inverse_quadratic']` (core):** Brent's method as Brent (1971, 1973) publishes it.
 - **`brent[variant='hyperbolic']` (secondary):** the method of SciPy's `brenth`. It is secondary because the core config already represents Brent's method.
 
-SciPy's documentation attributes `brenth` to Algorithm M of Bus and Dekker (1975), which `sunnbear` does not implement: Algorithm M chooses its steps by rules of its own, among them a bisection that it forces after 3 steps that do not halve the interval, and `brenth` has none of them.
+SciPy's documentation attributes `brenth` to Algorithm M of Bus and Dekker (1975), which `sunnbear` does not implement. Algorithm M chooses its steps by rules of its own, such as a bisection that it forces after 3 steps that do not halve the interval; `brenth` has none of these rules.
 
 ## VI. Code Organization & Validation
 

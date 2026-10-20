@@ -1,4 +1,4 @@
-"""This module holds `BusDekkerProblem`, the test problems of Tables I to IV of Bus and Dekker (1975), without results.
+"""This module holds `BusDekkerTablesIToIVProblem`, the test problems of Bus and Dekker (1975), without results.
 
 The article's section 5 defines 4 groups of test functions, and Tables I to IV give the evaluation counts on them, 1
 table per group. A problem's name holds its group and, where the group has several, its function and parameters, e.g.
@@ -58,7 +58,7 @@ def _group_3_function(x: float, *, n: float) -> float:
 
 
 def _group_4_function(x: float) -> float:
-    """Return Group IV's function, ``x exp(-x^-2)``, and 0 at ``x = 0``, where all its derivatives vanish too.
+    """Return Group IV's function, ``x exp(-x^-2)``, extended by 0 at ``x = 0``, where all its derivatives vanish too.
 
     In float64, the function underflows to 0 for ``|x|`` below about 0.0375.
     """
@@ -91,8 +91,8 @@ def _group_3_problem(n: int) -> PaperProblem:
 # ==================================================================================================
 #  The problems, in the order of the article's tables
 # ==================================================================================================
-class BusDekkerProblem(PaperProblemEnum):
-    """`BusDekkerProblem` holds the problems of Tables I to IV of Bus and Dekker (1975), in the tables' order.
+class BusDekkerTablesIToIVProblem(PaperProblemEnum):
+    """`BusDekkerTablesIToIVProblem` holds the problems of the article's Tables I to IV, in the tables' order.
 
     Each member is named after its group and, where the group has several, its function and parameters, e.g.
     ``I2_N3`` or ``II_A1_B1EM4_N9``.
