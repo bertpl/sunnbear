@@ -20,10 +20,17 @@ class EllithyConfigsDeclaration(SolverConfigsDeclaration):
     configs' roles.
     """
 
-    solver_cls = Ellithy
     configs = (
-        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": EllithyVariant.BF}),
-        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": EllithyVariant.BFMS}),
-        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": EllithyVariant.TF}),
-        SolverConfig(role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": EllithyVariant.TFMS}),
+        SolverConfig(
+            solver_cls=Ellithy, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": EllithyVariant.BF}
+        ),
+        SolverConfig(
+            solver_cls=Ellithy, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": EllithyVariant.BFMS}
+        ),
+        SolverConfig(
+            solver_cls=Ellithy, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": EllithyVariant.TF}
+        ),
+        SolverConfig(
+            solver_cls=Ellithy, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": EllithyVariant.TFMS}
+        ),
     )
