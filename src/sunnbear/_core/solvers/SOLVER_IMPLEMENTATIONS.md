@@ -258,7 +258,9 @@ All 4 configs follow section IV, and all 4 are secondary: the method is not esta
 
 ### V.g. Brent
 
-Each step of Brent's method that does not bisect interpolates through the last x-values: linearly through 2 of them, or through 3 of them by inverse quadratic interpolation. SciPy's `brenth` is SciPy's `brentq`, Brent's method, with the 3-point step replaced by the rational interpolation of Bus and Dekker (1975); everything else is Brent's. Both configs follow section IV.
+Each step of Brent's method that does not bisect interpolates through the last x-values: linearly through 2 of them, or through 3 of them by inverse quadratic interpolation.
+
+SciPy's `brenth` is SciPy's `brentq`, which implements Brent's method, with the inverse quadratic interpolation replaced by the rational interpolation of Bus and Dekker (1975); everything else is Brent's. Both configs follow section IV.
 - **`brent[variant='inverse_quadratic']` (core):** Brent's method as Brent (1971, 1973) publishes it.
 - **`brent[variant='hyperbolic']` (secondary):** the method of SciPy's `brenth`. It is secondary because the core config already represents Brent's method.
 

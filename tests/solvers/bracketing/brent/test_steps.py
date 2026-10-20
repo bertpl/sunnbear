@@ -18,13 +18,13 @@ def test_the_first_step_is_a_secant_step_from_the_bound_with_the_smaller_abs_f(v
 
 
 @pytest.mark.parametrize(
-    "variant, x_second_step",
+    "variant, x_after_second_step",
     [
         (BrentVariant.HYPERBOLIC, 937.0 / 696.0),
         (BrentVariant.INVERSE_QUADRATIC, 180517.0 / 131586.0),
     ],
 )
-def test_the_second_step_interpolates_through_3_x_values_by_the_formula_of_the_variant(variant, x_second_step):
+def test_the_second_step_interpolates_through_3_x_values_by_the_formula_of_the_variant(variant, x_after_second_step):
     """On `cubic` over ``[1, 2]``, the second step interpolates through ``a = 1``, ``b = 7/6`` and ``c = 2``, and each
     variant reaches the zero of its own interpolation: 937/696 for the hyperbolic one, 180517/131586 for the inverse
     quadratic one.
@@ -36,4 +36,4 @@ def test_the_second_step_interpolates_through_3_x_values_by_the_formula_of_the_v
     result = Brent(variant=variant).solve(cubic, 1.0, 2.0, xtol=1e-10, max_fevals=60, history_enabled=True)
 
     # --- assert -----------------------
-    assert result.history[3][0] == pytest.approx(x_second_step, abs=1e-15)
+    assert result.history[3][0] == pytest.approx(x_after_second_step, abs=1e-15)

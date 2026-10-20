@@ -4,7 +4,7 @@ from enum import StrEnum
 
 
 class BrentVariant(StrEnum):
-    """`BrentVariant` names the variants of `Brent`, 1 per form of its 3-point step; `Brent` describes each variant."""
+    """`BrentVariant` names the variants of `Brent`, 1 per formula of its interpolation through 3 x-values."""
 
     HYPERBOLIC = "hyperbolic"
     INVERSE_QUADRATIC = "inverse_quadratic"

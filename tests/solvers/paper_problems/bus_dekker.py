@@ -68,12 +68,9 @@ def _group_4_function(x: float) -> float:
         return x * math.exp(-(x**-2))
 
 
-def _group_1_problem(function_number: int, function: Callable[..., float], n: int | None) -> PaperProblem:
-    """Return Group I's problem for ``function`` and ``n`` on ``[0, 1]``, or, for function 1, on ``[0, 1.5]``."""
-    if n is None:
-        return PaperProblem(name=f"I.{function_number}", f=function, a=0.0, b=1.5)
-    else:
-        return PaperProblem(name=f"I.{function_number}[n={n}]", f=functools.partial(function, n=float(n)), a=0.0, b=1.0)
+def _group_1_problem(function_number: int, function: Callable[..., float], n: int) -> PaperProblem:
+    """Return Group I's problem for ``function`` and ``n``, on ``[0, 1]``."""
+    return PaperProblem(name=f"I.{function_number}[n={n}]", f=functools.partial(function, n=float(n)), a=0.0, b=1.0)
 
 
 def _group_2_problem(a: float, b: float, n: int) -> PaperProblem:
@@ -101,8 +98,10 @@ class BusDekkerProblem(PaperProblemEnum):
     ``I2_N3`` or ``II_A1_B1EM4_N9``.
     """
 
-    # --- Table I, Group I ---------------
-    I1 = _group_1_problem(1, _group_1_function_1, None)
+    # --------------------------------------------------------------------------
+    #  Table I, Group I
+    # --------------------------------------------------------------------------
+    I1 = PaperProblem(name="I.1", f=_group_1_function_1, a=0.0, b=1.5)
     I2_N1 = _group_1_problem(2, _group_1_function_2, 1)
     I2_N2 = _group_1_problem(2, _group_1_function_2, 2)
     I2_N3 = _group_1_problem(2, _group_1_function_2, 3)
@@ -119,7 +118,10 @@ class BusDekkerProblem(PaperProblemEnum):
     I6_N1 = _group_1_problem(6, _group_1_function_6, 1)
     I6_N5 = _group_1_problem(6, _group_1_function_6, 5)
     I6_N10 = _group_1_problem(6, _group_1_function_6, 10)
-    # --- Table II, Group II -------------
+
+    # --------------------------------------------------------------------------
+    #  Table II, Group II
+    # --------------------------------------------------------------------------
     II_A1_B0_N3 = _group_2_problem(1.0, 0.0, 3)
     II_A1_B0_N5 = _group_2_problem(1.0, 0.0, 5)
     II_A1_B0_N9 = _group_2_problem(1.0, 0.0, 9)
@@ -132,12 +134,18 @@ class BusDekkerProblem(PaperProblemEnum):
     II_A1_B1EM4_N5 = _group_2_problem(1.0, 1e-4, 5)
     II_A1_B1EM4_N9 = _group_2_problem(1.0, 1e-4, 9)
     II_A1_B1EM4_N19 = _group_2_problem(1.0, 1e-4, 19)
-    # --- Table III, Group III -----------
+
+    # --------------------------------------------------------------------------
+    #  Table III, Group III
+    # --------------------------------------------------------------------------
     III_N3 = _group_3_problem(3)
     III_N5 = _group_3_problem(5)
     III_N7 = _group_3_problem(7)
     III_N9 = _group_3_problem(9)
     III_N19 = _group_3_problem(19)
     III_N25 = _group_3_problem(25)
-    # --- Table IV, Group IV -------------
+
+    # --------------------------------------------------------------------------
+    #  Table IV, Group IV
+    # --------------------------------------------------------------------------
     IV = PaperProblem(name="IV", f=_group_4_function, a=-1.0, b=4.0)

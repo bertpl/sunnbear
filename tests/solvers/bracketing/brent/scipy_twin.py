@@ -20,7 +20,9 @@ class BrentScipyTwin(TwinSolver):
 
     SciPy's ``brentq`` is SciPy's own C implementation of Brent's method, the method of ``"inverse_quadratic"``.
     SciPy's ``brenth``, the method of ``"hyperbolic"``, is ``brentq`` with hyperbolic interpolation in place of inverse
-    quadratic interpolation. Their tolerance, ``(xtol + rtol*|b|) / 2``, equals Brent's ``tol = 2*macheps*|b| + t``
+    quadratic interpolation.
+
+    Their tolerance, ``(xtol + rtol*|b|) / 2``, equals Brent's ``tol = 2*macheps*|b| + t``
     with ``t = xtol``, as `Brent` sets it, when the twin passes SciPy ``xtol=2*xtol`` and ``rtol=4*macheps``, so SciPy's
     steps match those of `Brent`.
 

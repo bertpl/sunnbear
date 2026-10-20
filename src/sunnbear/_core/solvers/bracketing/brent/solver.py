@@ -29,8 +29,8 @@ class Brent(Solver):
     The steps use these quantities of Brent's procedure:
 
     - ``b`` and ``c`` are the interval bounds, ``b`` the one with the smaller ``|f|``, which is the best estimate;
-    - ``a`` is the previous value of ``b``; at the start and after ``b`` crosses the root, ``a`` and ``c`` coincide, and
-      only 2 distinct x-values are known;
+    - ``a`` is the previous value of ``b``; at the start, and after a step lands on the other side of the root from the
+      previous ``b``, ``a`` and ``c`` coincide, and only 2 distinct x-values are known;
     - ``m = 0.5*(c - b)`` is half the signed width of the interval, from ``b`` toward ``c``;
     - ``tol = 2*macheps*|b| + t`` is the tolerance, with ``macheps`` set to `FLOAT64_EPS` and ``t`` set to ``xtol``.
 
@@ -45,12 +45,9 @@ class Brent(Solver):
       ``b`` to ``z`` in the form of SciPy's ``brenth``, with the divided differences
       ``f[u, v] = (f(u) - f(v)) / (u - v)``: ``-fb*(fc - fa) / (fc*f[a, b] - fa*f[c, b])``.
 
-      SciPy's documentation attributes ``brenth`` to Algorithm M of Bus and Dekker (1975), but SciPy's source files
-      ``brenth.c`` and ``brentq.c`` differ only in this step, apart from the function's name, comments and layout (at
-      SciPy 1.18.1). Algorithm M chooses its steps by rules of its own, and its bound of 4 times bisection's evaluation
-      count comes from a bisection that it forces after 3 steps that do not halve the interval. ``brenth`` has neither
-      these rules nor this forced bisection, so ``"hyperbolic"`` has the guarantee of Brent's method, which the next
-      paragraph states.
+      SciPy's documentation attributes ``brenth`` to Algorithm M of Bus and Dekker (1975), but ``brenth`` is ``brentq``
+      with only this step replaced; section V.g of ``SOLVER_IMPLEMENTATIONS.md``, in the package
+      `sunnbear._core.solvers`, states why ``brenth`` is not Algorithm M.
 
     In both variants, the rules of the steps guarantee that the solve converges within a bounded number of
     evaluations, at most about the square of bisection's count, whatever the function, as long as ``xtol`` exceeds
@@ -87,16 +84,16 @@ class Brent(Solver):
           functions do not underflow near the root. A scan is available on the author's page:
           https://maths-people.anu.edu.au/~brent/pub/pub011.html
         - Bus, J. C. P. and Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence for finding a
-          zero of a function. ACM Transactions on Mathematical Software 1(4), 330-345. Its formula (3.1.5) is the
-          zero of the hyperbolic interpolation of ``"hyperbolic"``, which `Brent` computes in SciPy's form, and its
+          zero of a function. ACM Transactions on Mathematical Software 1(4), 330-345. Its formula (3.1.5) gives the
+          zero of the hyperbolic interpolation of ``"hyperbolic"``; `Brent` computes that zero in SciPy's form. Its
           Tables I to IV hold the column "B" of evaluation counts of Brent's method, which the test suite reproduces
           with ``"inverse_quadratic"``. https://doi.org/10.1145/355656.355659
         - SciPy's ``scipy.optimize.brentq``, whose tolerance ``(xtol + rtol*|b|) / 2`` equals ``tol`` when SciPy's
           ``xtol`` is ``2*t`` and its ``rtol`` is ``4*macheps``; the test suite checks ``"inverse_quadratic"`` against
           ``scipy.optimize.brentq``.
-        - SciPy's ``scipy.optimize.brenth``, which has the tolerance of ``brentq``; its source file ``brenth.c`` gives
-          the step of ``"hyperbolic"`` through 3 x-values in the form that `Brent` keeps, and the test suite checks
-          ``"hyperbolic"`` against ``scipy.optimize.brenth``.
+        - SciPy's ``scipy.optimize.brenth``, which has the tolerance of ``brentq``; `Brent` computes the step of
+          ``"hyperbolic"`` through 3 x-values in the form of SciPy's source file ``brenth.c``, and the test suite
+          checks ``"hyperbolic"`` against ``scipy.optimize.brenth``.
           https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/Zeros/brenth.c
         - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section 9.3.
           Cambridge University Press. Its routine ``zbrent`` takes ``macheps`` as 2^-52, as `Brent` does.
@@ -121,7 +118,9 @@ class Brent(Solver):
     version = 2
 
     def __init__(self, *, variant: BrentVariant) -> None:
-        """Configure the variant; the class docstring describes each. A plain string such as ``"hyperbolic"`` works too.
+        """Configure the variant; the class docstring describes each variant.
+
+        A plain string such as ``"hyperbolic"`` works too.
 
         Raises:
             ValueError: If ``variant`` is not a value of `BrentVariant`.
@@ -185,13 +184,14 @@ class Brent(Solver):
                     q = (q - 1.0) * (r - 1.0) * (s - 1.0)
                 else:
                     # The step is a hyperbolic interpolation through a, b and c, in the form of SciPy's brenth.c, whose
-                    # xcur, xpre and xblk are b, a and c here, and whose divided differences dpre and dblk are fab and
-                    # fcb. SciPy computes the step as -fb*(fc - fa) / (fc*fab - fa*fcb); p leaves out the leading
-                    # minus, because the sign flip below negates p / q.
-                    fab = (fa - fb) / (a - b)
-                    fcb = (fc - fb) / (c - b)
+                    # xcur, xpre and xblk are b, a and c here, and whose divided differences dpre and dblk are
+                    # div_diff_ab and div_diff_cb. SciPy computes the step as
+                    # -fb*(fc - fa) / (fc*div_diff_ab - fa*div_diff_cb); p leaves out the leading minus, because the
+                    # sign flip below negates p / q.
+                    div_diff_ab = (fa - fb) / (a - b)
+                    div_diff_cb = (fc - fb) / (c - b)
                     p = fb * (fc - fa)
-                    q = fc * fab - fa * fcb
+                    q = fc * div_diff_ab - fa * div_diff_cb
                 # Make p non-negative, so that q carries the sign of the step p / q.
                 if p > 0.0:
                     q = -q

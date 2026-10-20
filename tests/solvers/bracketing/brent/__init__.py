@@ -1,9 +1,11 @@
 """This package tests `Brent`, in both variants.
 
 The tests of published results reproduce counts of Brent's method, so they run ``"inverse_quadratic"``; no publication
-gives counts of ``"hyperbolic"`` that they could reproduce. Those counts come from runs that stop by the stopping
-criterion of Brent's procedure ``zero``, so the tests run `BrentWithPaperStoppingCriterion`, which is `Brent` with that
-criterion, and pass the procedure's tolerance ``t`` as ``xtol``.
+gives counts of ``"hyperbolic"`` that they could reproduce.
+
+The published counts come from runs that stop by the stopping criterion of Brent's procedure ``zero``, so the tests run
+`BrentWithPaperStoppingCriterion`, which is `Brent` with that criterion, and pass the procedure's tolerance ``t`` as
+``xtol``.
 
 Published results:
 
