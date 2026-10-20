@@ -1,8 +1,9 @@
-"""These tests assert that `Brent` reproduces the evaluation counts of Table 4.1 of Brent's 1973 book, on the rows
-whose functions do not underflow near the root."""
+"""These tests assert that `Brent`, with ``"inverse_quadratic"``, reproduces the evaluation counts of Table 4.1 of
+Brent's 1973 book, on the rows whose functions do not underflow near the root."""
 
 import pytest
 
+from sunnbear.solvers import BrentVariant
 from tests.solvers.paper_problems import PaperProblem
 
 from .paper_problems import TABLE_4_1_WITH_T
@@ -15,7 +16,9 @@ def test_the_evaluation_counts_of_table_4_1_of_the_book_are_reproduced(problem: 
     `Brent`, with the book's tolerance ``t`` and the stopping criterion of the procedure ``zero``, is within the row's
     allowed deviation of the book's count."""
     # --- act --------------------------
-    result = BrentWithPaperStoppingCriterion().solve(problem.f, problem.a, problem.b, xtol=t, max_fevals=300)
+    result = BrentWithPaperStoppingCriterion(variant=BrentVariant.INVERSE_QUADRATIC).solve(
+        problem.f, problem.a, problem.b, xtol=t, max_fevals=300
+    )
 
     # --- assert -----------------------
     problem.assert_reproduced_by(result)

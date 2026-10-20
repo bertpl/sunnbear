@@ -12,10 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add the safeguarded modified Anderson-Björck method of Tomov and Ganchovski (2026), `sunnbear.solvers.ModABSafeguarded`
 - Add Ford's Illinois-type Methods 1, 3 and 4, `sunnbear.solvers.Ford`
 - Add Ellithy's 4 multi-phase hybrid bracketing algorithms, `sunnbear.solvers.Ellithy`
+- Add the `"hyperbolic"` variant of `Brent`, the method of SciPy's `brenth`
 
 ### Changed
 
 - Move `solver_cls` from `SolverConfigsDeclaration` to each `SolverConfig`, so that 1 `SolverConfigsDeclaration` subclass can declare the configs of several solver classes
+- Rename the config `brent` to `brent[variant='inverse_quadratic']`, and add a required `variant` argument to `Brent`
 
 ### Deprecated
 

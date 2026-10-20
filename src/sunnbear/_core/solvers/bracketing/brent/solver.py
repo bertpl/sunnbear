@@ -4,13 +4,15 @@ from sunnbear._core.solvers.core import Solver, SolveState
 from sunnbear._core.solvers.core.stopping import interval_root_if_converged
 from sunnbear._core.utils.floats import FLOAT64_EPS
 
+from .variant import BrentVariant
+
 
 class Brent(Solver):
-    """`Brent` implements Brent's method, as the Algol 60 procedure ``zero`` (Brent, 1971).
+    """`Brent` implements Brent's method, as the Algol 60 procedure ``zero`` (Brent, 1971), in 2 variants.
 
     Each iteration evaluates 1 x-value, reached by 1 of 3 steps from the best estimate so far:
 
-    - inverse quadratic interpolation through the last 3 x-values;
+    - interpolation through the 3 x-values ``a``, ``b`` and ``c`` (defined below), by the formula of the variant;
     - linear interpolation, a secant step, when only 2 distinct x-values are known;
     - bisection, in 2 cases:
 
@@ -27,17 +29,36 @@ class Brent(Solver):
     The steps use these quantities of Brent's procedure:
 
     - ``b`` and ``c`` are the interval bounds, ``b`` the one with the smaller ``|f|``, which is the best estimate;
+    - ``a`` is the previous value of ``b``. ``a`` and ``c`` coincide at the start, and after a step lands on the other
+      side of the root from the previous ``b``; only 2 distinct x-values are then known;
     - ``m = 0.5*(c - b)`` is half the signed width of the interval, from ``b`` toward ``c``;
     - ``tol = 2*macheps*|b| + t`` is the tolerance, with ``macheps`` set to `FLOAT64_EPS` and ``t`` set to ``xtol``.
 
-    The rules of the steps guarantee that the solve converges within a bounded number of evaluations, at most about the
-    square of bisection's count, whatever the function, as long as ``xtol`` exceeds ``2.5*macheps*|b|``.
+    ``variant``, a value of `BrentVariant`, picks the formula of the interpolation through 3 x-values, and changes
+    nothing else:
+
+    - ``"inverse_quadratic"``, Brent's method: inverse quadratic interpolation, which fits ``x`` as a quadratic
+      function of ``f`` through the 3 x-values and their function values, and takes its value at ``f = 0``.
+    - ``"hyperbolic"``, the method of SciPy's ``brenth``: hyperbolic interpolation, which fits the rational function
+      ``(x - z) / (g*x + h)`` through the 3 x-values and their function values, and takes its zero ``z``. This ``z``
+      is formula (3.1.5) of Bus and Dekker (1975), applied to ``b``, ``a`` and ``c``.
+
+      `Brent` computes the step from ``b`` to ``z`` in the form of SciPy's ``brenth``, with the divided differences
+      ``f[u, v] = (f(u) - f(v)) / (u - v)``: ``-fb*(fc - fa) / (fc*f[a, b] - fa*f[c, b])``.
+
+      SciPy's documentation attributes ``brenth`` to Algorithm M of Bus and Dekker (1975), but ``brenth`` is ``brentq``
+      with only the interpolation through 3 x-values replaced; section V.g of ``SOLVER_IMPLEMENTATIONS.md``, in the
+      package `sunnbear._core.solvers`, states why ``brenth`` is not Algorithm M.
+
+    In both variants, the rules of the steps guarantee that the solve converges within a bounded number of
+    evaluations, at most about the square of bisection's count, whatever the function, as long as ``xtol`` exceeds
+    ``2.5*macheps*|b|``.
 
     For a smaller ``xtol``, a step lengthened to ``tol`` can round onto ``c`` while the interval is still wider than
     ``2*xtol``, and the solve then evaluates ``c`` again and again until its evaluation budget is exhausted.
 
-    `Brent` departs from the procedure ``zero``, or settles a value that the procedure leaves to its caller, in these
-    places:
+    In both variants, `Brent` departs from the procedure ``zero``, or settles a value that the procedure leaves to its
+    caller, in these places, besides the interpolation formula of ``"hyperbolic"``:
 
     - **Stopping criterion:** `Brent` and the procedure check their criteria at each pass through the procedure's
       label ``ext``:
@@ -63,12 +84,22 @@ class Brent(Solver):
           the 1971 paper with the procedure ``zero``, and the test suite reproduces the rows of its Table 4.1 whose
           functions do not underflow near the root. A scan is available on the author's page:
           https://maths-people.anu.edu.au/~brent/pub/pub011.html
+        - Bus, J. C. P. and Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence for finding a
+          zero of a function. ACM Transactions on Mathematical Software 1(4), 330-345. Its formula (3.1.5) gives the
+          zero of the hyperbolic interpolation that ``"hyperbolic"`` uses. Its Tables I to IV hold the column "B" of
+          evaluation counts of Brent's method, which the test suite reproduces with ``"inverse_quadratic"``.
+          https://doi.org/10.1145/355656.355659
         - SciPy's ``scipy.optimize.brentq``, whose tolerance ``(xtol + rtol*|b|) / 2`` equals ``tol`` when SciPy's
-          ``xtol`` is ``2*t`` and its ``rtol`` is ``4*macheps``; the test suite checks `Brent` against
+          ``xtol`` is ``2*t`` and its ``rtol`` is ``4*macheps``; the test suite checks ``"inverse_quadratic"`` against
           ``scipy.optimize.brentq``.
+        - SciPy's ``scipy.optimize.brenth``, which has the tolerance of ``brentq``; `Brent` computes the interpolation
+          step of ``"hyperbolic"`` in the form of SciPy's source file ``brenth.c``, and the test suite checks
+          ``"hyperbolic"`` against ``scipy.optimize.brenth``.
+          https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/Zeros/brenth.c
         - Press, W. H. et al. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition, section 9.3.
           Cambridge University Press. Its routine ``zbrent`` takes ``macheps`` as 2^-52, as `Brent` does.
-        - Third parties that publish evaluation counts of Brent's method, which the test suite reproduces:
+        - Third parties that publish evaluation counts of Brent's method, which the test suite reproduces with
+          ``"inverse_quadratic"``:
 
           - Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear
             function without using derivatives. Advances in Engineering Software 28(3), 145-149. Its Table 2
@@ -87,14 +118,23 @@ class Brent(Solver):
     name = "brent"
     version = 2
 
+    def __init__(self, *, variant: BrentVariant) -> None:
+        """Configure the variant; the class docstring describes each variant.
+
+        A plain string such as ``"hyperbolic"`` works too.
+
+        Raises:
+            ValueError: If ``variant`` is not a value of `BrentVariant`.
+        """
+        self.variant = BrentVariant(variant)
+
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with Brent's Algol procedure
         """Run Brent's procedure until `_root_if_converged` returns a root estimate, and return that estimate.
 
         The variables keep the names of the Algol procedure, and comments mark where its labels ``int`` and ``ext``
-        fall, so that the code can be compared with the procedure line by line. Besides ``b``, ``c``, ``m``, ``tol``
-        and ``t``, which the class docstring defines:
+        fall, so that the code can be compared with the procedure line by line. Besides ``a``, ``b``, ``c``, ``m``,
+        ``tol`` and ``t``, which the class docstring defines:
 
-        - ``a`` is the previous value of ``b``;
         - ``d`` is the step taken from ``b``, and ``e`` the step taken in the iteration before it; while the next
           step is chosen, ``d`` therefore holds the previous step and ``e`` the step before the previous one;
         - ``p / q`` is the interpolation step, computed as a separate numerator and denominator so that the division
@@ -129,17 +169,30 @@ class Brent(Solver):
             if abs(e) < tol or abs(fa) <= abs(fb):
                 d = e = m  # A bisection is forced.
             else:
-                s = fb / fa
+                # The procedure computes s = fb / fa before it picks the step; here only the 2 steps that use s compute
+                # it, so that the flop count of the hyperbolic step includes no division that the step does not use.
                 if a == c:
                     # The step is a linear interpolation through b and c.
+                    s = fb / fa
                     p = 2.0 * m * s
                     q = 1.0 - s
-                else:
+                elif self.variant is BrentVariant.INVERSE_QUADRATIC:
                     # The step is an inverse quadratic interpolation through a, b and c.
+                    s = fb / fa
                     q = fa / fc
                     r = fb / fc
                     p = s * (2.0 * m * q * (q - r) - (b - a) * (r - 1.0))
                     q = (q - 1.0) * (r - 1.0) * (s - 1.0)
+                else:
+                    # The step is a hyperbolic interpolation through a, b and c, in the form of SciPy's brenth.c, whose
+                    # xcur, xpre and xblk are b, a and c here, and whose divided differences dpre and dblk are
+                    # div_diff_ab and div_diff_cb. SciPy computes the step as
+                    # -fb*(fc - fa) / (fc*div_diff_ab - fa*div_diff_cb); p leaves out the leading minus, because the
+                    # block below that makes p non-negative also negates p / q.
+                    div_diff_ab = (fa - fb) / (a - b)
+                    div_diff_cb = (fc - fb) / (c - b)
+                    p = fb * (fc - fa)
+                    q = fc * div_diff_ab - fa * div_diff_cb
                 # Make p non-negative, so that q carries the sign of the step p / q.
                 if p > 0.0:
                     q = -q
