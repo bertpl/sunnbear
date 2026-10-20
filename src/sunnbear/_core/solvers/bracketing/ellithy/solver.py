@@ -71,6 +71,9 @@ class Ellithy(Solver):
     - **A zero at** ``x1``: where ``f(x1) = 0``, the article's trisection update would move ``a`` to ``x2`` and lose
       that zero, but the article's test ``|f(x1)| <= tol`` has already returned ``x1``. `Ellithy` keeps ``x1`` as the
       lower bound, so the shared stopping criterion ends the solve at ``x1``.
+    - **A zero at** ``x2`` **outside the new interval:** where ``f(x2) = 0`` but the trisection update keeps
+      ``[a, x1]``, which holds a sign change too, the article's test ``|f(x2)| <= tol`` returns ``x2``. The shared
+      stopping criterion reads only the interval bounds, so `Ellithy` continues on ``[a, x1]`` to a root there.
     - **The probe, evaluated once:** where the denominator of the modified-secant step is 0, the article evaluates
       ``f(x_FP + delta)`` a second time; `Ellithy` reuses the value of the first evaluation.
     - **Guards against a zero denominator:** the article adds ``eps`` to a denominator where its division raises an
