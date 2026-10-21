@@ -1,0 +1,50 @@
+title = 'Higham (2002): Accuracy and Stability of Numerical Algorithms'
+reference = 'Higham, N. J. (2002). Accuracy and Stability of Numerical Algorithms, 2nd edition. Society for Industrial and Applied Mathematics (SIAM), Philadelphia. ISBN 0-89871-521-0. https://doi.org/10.1137/1.9780898718027.'
+year = 2002
+subcategory = '1.4'
+where_in_source = '''
+the places in the whole text that give a concrete function for root finding (Newton, bisection, secant, roots and zeros of functions), since the book has no chapter on solving an equation in 1 variable:
+- Section 1.8, "Solving a Quadratic Equation" (pp. 10–11), and Section 2.6, "Fused Multiply-Add Operation" (p. 46);
+- Section 26.3.3, "Roots of a Cubic" (pp. 479–481);
+- Problems 2.25 (p. 60) and 27.6 (pp. 507–508).
+
+The rows leave out:
+- chapter 25, "Nonlinear Systems and Newton's Method" (pp. 459–470), whose examples are systems;
+- Section 5.1 (p. 96), which evaluates the expanded form of `(x - 2)^3` at 200 points near 2 to test error bounds for Horner's method, with no root-finding run.
+'''
+transcribed_from = "the book's PDF, which has a text layer, checked against the page images."
+rows_summary = '6: 4 from the text, 2 from problems.'
+notes = '**Keys** are section or problem numbers; `§1.8 (1)` and `§1.8 (2)` are the 2 equations of Section 1.8 in the order printed.'
+
+[[rows]]
+key = '§1.8 (1)'
+f = '10^20*x^2 - 3*10^20*x + 2*10^20'
+notes = 'Roots 1 and 2. The quadratic formula (1.3) overflows in IEEE single precision; dividing the equation by `max(abs(a), abs(b), abs(c))` avoids that.'
+
+[[rows]]
+key = '§1.8 (2)'
+f = '10^-20*x^2 - 3*x + 2*10^20'
+notes = 'Roots `10^20` and `2*10^20`. Dividing does not avoid the overflow; the substitution `x = 10^20*y` turns it into §1.8 (1).'
+
+[[rows]]
+key = '§2.6'
+f = 'a - 1/x'
+parameters = '`a` free'
+notes = "Newton's method `x_{k+1} = x_k + (1 - x_k*a)*x_k` computes `1/a` with 2 fused multiply-adds per step and converges quadratically. No numbers printed."
+
+[[rows]]
+key = 'P2.25'
+f = '(((x - 0.5) + x) - 0.5) + x'
+notes = 'Equals `3*x - 1`, with root `1/3`. The problem (attributed to Kahan) asks to show that, evaluated as written in IEEE single or double precision, `f(x) != 0` for every floating-point `x`.'
+
+[[rows]]
+key = '§26.3.3'
+f = 'x^3 + a*x^2 + b*x + c'
+parameters = '`[a b c] = [1.732 1 1.2704]`; `[a b c] = [-5.89E2 3.15E2 -1.36E1]`'
+notes = 'Coefficients that a direct search found to make the explicit formulas for the roots inaccurate: the first with the "+" square root in (26.5), the second with the sign choice (26.6). First cubic: real root `-1.6026` and roots `-6.4678E-2 ± 8.8798E-1i`. Second cubic: computed roots `4.75E-2`, `4.87E-1` and `5.89E2`, printed to 3 digits.'
+
+[[rows]]
+key = 'P27.6'
+f = 'x^2 - p^2'
+parameters = '`p = sqrt(x0^2 + y0^2)`, `0 < y0 <= x0`'
+notes = "Halley's method on this `f` gives the Moler–Morrison iteration for the Pythagorean sum, `pythag(a, b)`; the worked call `pythag(3, 4)` reaches `p = 5` in 3 iterations."

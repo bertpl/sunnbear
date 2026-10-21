@@ -1,0 +1,630 @@
+title = 'Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026): improvements to modAB'
+reference = "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to the modified Anderson–Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. https://doi.org/10.3390/a19050332. Supplementary materials: https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder `MDPI-Algorithms-Data` of the authors' repository https://github.com/Just-A-Random-Geek/ModAB-Root-Finding."
+year = 2026
+subcategory = '1.1'
+where_in_source = '''
+- The article's Table 2 (pp. 7–9), "Benchmark results for solving f_nn(x) = 0 in the interval [a; b]", gives 92 functions f01–f92, each on 1 interval. §5 names the origin of each block of functions.
+- The supplementary `Test Functions.pdf` repeats each function with a plot and its root to 3 significant digits, and names f63–f92.
+- The supplementary C# benchmark (`CSharp code/Numerical.Benchmark/Root.cs`) holds the functions and intervals that produced Table 2.
+'''
+transcribed_from = '''
+the article's Table 2, checked against `Test Functions.pdf`, the C# code, and sunnbear's transcription in `tests/solvers/paper_problems/ganchovski_et_al.py`.
+- sunnbear's transcription matches the C# code on every row.
+- The rows follow the article, except f28, whose printed expression has an unmatched parenthesis; that row follows the C# code.
+- The rows' notes list every difference between the article, `Test Functions.pdf` and the C# code; a source that a row's notes do not name agrees with the row.
+'''
+rows_summary = '92, 1 per function of Table 2.'
+notes = '''
+- **In the rows' notes, TF is `Test Functions.pdf` and C# is the C# code.**
+- **`if(c; a; b)`** is the article's notation: `a` where `c` holds, `b` otherwise.
+- **`log` is the natural log** in all 3 sources: the article prints `log`, TF prints `ln`, and C# calls `Math.Log`.
+- **`name`** comes from TF, which names only f63–f92. The C# comments give the same names, except where the rows' notes say otherwise.
+- **`also_in`** gives the origin that §5 of the article names for each block of functions. TF and the C# comments name the same origins, with 2 exceptions:
+  - C# has no comment for Suhadolnik, so f51–f62 sit below its comment for Swift & Lindfield.
+  - TF prints its heading "SciML Benchmarks test suite" above the row of plots that holds f83 and f84.
+- **The origins**, as the article's reference list gives them:
+  - **Galdino (2011)**, f01–f30: Galdino, S. A family of regula falsi root-finding methods. Proceedings of 2011 World Congress on Engineering and Technology, IEEE Press, Shanghai, pp. 514–517 (article ref. [16]). TF adds the URL http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543. Its rows are in `2011_galdino`.
+  - **Ganchovski (2025)**, f31–f32: Ganchovski, N. Structural Analysis by Functional Modelling in the Cloud. PhD thesis, UACEG, Sofia, 2025 (ref. [7]). §5 calls these "Custom functions"; TF and C# call them "My functions".
+  - **Stage (2013)**, f33–f40: Stage, S. A. Comments on An Improvement to the Brent's Method. Int. J. Exp. Algorithms 4 (2013), 1–16 (ref. [17]). Its rows are in `2013_stage`.
+  - **Swift & Lindfield (1978)**, f41–f50: Swift, A., Lindfield, G. R. Comparison of a continuation method with Brent's method for the numerical solution of a single nonlinear equation. Comput. J. 21 (1978), 359–362 (ref. [18]). TF adds https://doi.org/10.1093/comjnl/21.4.359.
+  - **Suhadolnik (2012)**, f51–f62: Suhadolnik, A. Combined bracketing methods for solving nonlinear equations. Appl. Math. Lett. 25 (2012), 1755–1760 (ref. [19]). TF adds https://doi.org/10.1016/j.aml.2012.02.006. Its rows are in `2012_suhadolnik`.
+  - **Oliveira & Takahashi (2021)**, f63–f83: Oliveira, I., Takahashi, R. An Enhancement of the Bisection Method Average Performance Preserving Minmax Optimality. ACM Trans. Math. Softw. 47 (2021), 5 (ref. [5]). Its rows are in `2021_oliveira_takahashi`.
+  - **SciML Benchmarks suite**, f84–f92: cited as Pal, A. et al. NonlinearSolve.jl: High-Performance and Robust Solvers for Systems of Nonlinear Equations in Julia. ACM Trans. Math. Softw. 52 (2026), 1 (ref. [11]). The rows of the suite are in `sciml_interval_suite`.
+'''
+
+[[rows]]
+key = 'f01'
+f = 'x^3 - 1'
+interval = '[0.5, 1.5]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f02'
+f = 'x^2*(x^2/3 + sqrt(2)*sin(x)) - sqrt(x)/18'
+interval = '[0.1, 1]'
+also_in = 'Galdino (2011)'
+notes = 'TF and C# have `sqrt(3)/18` as the last term.'
+
+[[rows]]
+key = 'f03'
+f = '11*x^11 - 1'
+interval = '[0.1, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f04'
+f = 'x^3 + 1'
+interval = '[-1.8, 0]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f05'
+f = 'x^3 - 2*x - 5'
+interval = '[2, 3]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f06'
+f = '2*x*exp(-5) + 1 - 2*exp(-5*x)'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f07'
+f = '2*x*exp(-10) + 1 - 2*exp(-10*x)'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f08'
+f = '2*x*exp(-20) + 1 - 2*exp(-20*x)'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f09'
+f = '(1 + (1 - 5)^2)*x^2 - (1 - 5*x)^2'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f10'
+f = '(1 + (1 - 10)^2)*x^2 - (1 - 10*x)^2'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f11'
+f = '(1 + (1 - 20)^2)*x^2 - (1 - 20*x)^2'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f12'
+f = 'x^2 - (1 - x)^5'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f13'
+f = 'x^2 - (1 - x)^10'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f14'
+f = 'x^2 - (1 - x)^20'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f15'
+f = '(1 + (1 - 5)^4)*x - (1 - 5*x)^4'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f16'
+f = '(1 + (1 - 10)^4)*x - (1 - 10*x)^4'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f17'
+f = '(1 + (1 - 20)^4)*x - (1 - 20*x)^4'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f18'
+f = 'exp(-5*x)*(x - 1) + x^5'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f19'
+f = 'exp(-10*x)*(x - 1) + x^10'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f20'
+f = 'exp(-20*x)*(x - 1) + x^20'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f21'
+f = 'x^2 + sin(x/5) - 1/4'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f22'
+f = 'x^2 + sin(x/10) - 1/4'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f23'
+f = 'x^2 + sin(x/20) - 1/4'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f24'
+f = '(x + 2)*(x + 1)*(x - 3)^3'
+interval = '[2.6, 4.6]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f25'
+f = '(x - 4)^5*log(x)'
+interval = '[3.6, 5.6]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f26'
+f = '(sin(x) - x/4)^3'
+interval = '[2, 4]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f27'
+f_description = '`(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 - p(x)))))*sign(p(x) - 3)`, where `p(x) = x + 1.11111`'
+interval = '[1, 3]'
+also_in = 'Galdino (2011)'
+notes = 'TF prints `p(x) = x + 1.11`.'
+
+[[rows]]
+key = 'f28'
+f = 'sin((x - 7.143)^3)'
+interval = '[7, 8]'
+also_in = 'Galdino (2011)'
+notes = 'Follows C#. The article prints `sin(x - 7.143)^3)`, with an unmatched parenthesis; TF prints `sin((x - 7.14)^3)`.'
+
+[[rows]]
+key = 'f29'
+f = 'exp((x - 3)^5) - 1'
+interval = '[2.6, 4.6]'
+also_in = 'Galdino (2011)'
+notes = 'TF gives the interval `[2.6, 3.6]`.'
+
+[[rows]]
+key = 'f30'
+f = 'exp((x - 3)^5) - exp(x - 1)'
+interval = '[4, 5]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f31'
+f = 'pi - 1/x'
+interval = '[0.05, 5]'
+also_in = 'Ganchovski (2025)'
+notes = 'TF prints the interval as `[0.05v5]`.'
+
+[[rows]]
+key = 'f32'
+f = '4 - tan(x)'
+interval = '[0, 1.5]'
+also_in = 'Ganchovski (2025)'
+
+[[rows]]
+key = 'f33'
+f = 'cos(x) - x^3'
+interval = '[0, 4]'
+also_in = 'Stage (2013)'
+
+[[rows]]
+key = 'f34'
+f = 'cos(x) - x'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+
+[[rows]]
+key = 'f35'
+f = 'sqrt(abs(x - 2/3))*if(x <= 2/3; 1; -1) - 0.1'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+
+[[rows]]
+key = 'f36'
+f = 'abs(x - 2/3)^0.2*if(x <= 2/3; 1; -1)'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+
+[[rows]]
+key = 'f37'
+f = '(x - 7/9)^3 + (x - 7/9)*10^-3'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+
+[[rows]]
+key = 'f38'
+f = 'if(x <= 1/3; -0.5; 0.5)'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+
+[[rows]]
+key = 'f39'
+f = 'if(x <= 1/3; -10^-3; 1 - 10^-3)'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+
+[[rows]]
+key = 'f40'
+f = 'if(x = 0; 0.0; 1/(x - 2/3))'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+
+[[rows]]
+key = 'f41'
+f = '2*x*exp(-5) - 2*exp(-5*x) + 1'
+interval = '[0, 10]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f42'
+f = '(x^2 - x - 6)*(x^2 - 3*x + 2)'
+interval = '[0, pi]'
+also_in = 'Swift & Lindfield (1978)'
+notes = 'TF gives the interval `[0, 4]`.'
+
+[[rows]]
+key = 'f43'
+f = 'x^3'
+interval = '[-1, 1.5]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f44'
+f = 'x^5'
+interval = '[-1, 1.5]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f45'
+f = 'x^7'
+interval = '[-1, 1.5]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f46'
+f = '(exp(-5*x) - x - 0.5)/x^5'
+interval = '[0.09, 0.7]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f47'
+f = '1/sqrt(x) - 2*log(5*10^3*sqrt(x)) + 0.8'
+interval = '[0.0005, 0.5]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f48'
+f = '1/sqrt(x) - 2*log(5*10^7*sqrt(x)) + 0.8'
+interval = '[0.0005, 0.5]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f49'
+f = 'if(x <= 0; -x^3 - x - 1; x^(1/3) - x - 1)'
+interval = '[-1, 1]'
+also_in = 'Swift & Lindfield (1978)'
+notes = "C# writes the exponent `1/3` as an integer division, which is 0, so it computes `x^0 - x - 1` for `x > 0`; sunnbear's transcription follows C#."
+
+[[rows]]
+key = 'f50'
+f = 'x^3 - 2*x - x + 3'
+interval = '[-3, 2]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f51'
+f = 'log(x)'
+interval = '[0.5, 5]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f52'
+f = '(10 - x)*exp(-10*x) - x^10 + 1'
+interval = '[0.5, 8]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f53'
+f = 'exp(sin(x)) - x - 1'
+interval = '[1.0, 4]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f54'
+f = '2*sin(x) - 1'
+interval = '[0.1, pi/3]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f55'
+f = '(x - 1)*exp(-x)'
+interval = '[0.0, 1.5]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f56'
+f = '(x - 1)^3 - 1'
+interval = '[1.5, 3]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f57'
+f = 'exp(x^2 + 7*x - 30) - 1'
+interval = '[2.6, 3.5]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f58'
+f = 'atan(x) - 1'
+interval = '[1.0, 8]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f59'
+f = 'exp(x) - 2*x - 1'
+interval = '[0.2, 3]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f60'
+f = 'exp(-x) - x - sin(x)'
+interval = '[0.0, 2]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f61'
+f = 'x^2 - sin(x)^2 - 1'
+interval = '[-1, 2]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f62'
+f = 'sin(x) - x/2'
+interval = '[pi/2, pi]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f63'
+f = 'x*exp(x) - 1'
+name = 'Lambert'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f64'
+f = 'tan(x - 1/10)'
+name = 'Trigonometric 1'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f65'
+f = 'sin(x) + 0.5'
+name = 'Trigonometric 2'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f66'
+f = '4*x^5 + x^2 + 1'
+name = 'Polynomial 1'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f67'
+f = 'x + x^10 - 1'
+name = 'Polynomial 2'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f68'
+f = 'pi^x - e'
+name = 'Exponential'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f69'
+f = 'log(abs(x - 10/9))'
+name = 'Logarithmic'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f70'
+f = '1/3 + sign(x)*abs(x)^(1/3) + x^3'
+name = 'Polynomial'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = 'C# names it Posynomial.'
+
+[[rows]]
+key = 'f71'
+f = '(x + 2/3)/(x + 101/100)'
+name = 'Poly. Frac.'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f72'
+f = '(x*10^6 - 1)^3'
+name = 'Polynomial 3'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f73'
+f = 'exp(x)*(x*10^6 - 1)^3'
+name = 'Exp. Poly.'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f74'
+f = '(x - 1/3)^2*atan(x - 1/3)'
+name = 'Tan. Poly.'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f75'
+f = 'sign(3*x - 1)*(1 - sqrt(1 - (3*x - 1)^2/81))'
+name = 'Circles'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f76'
+f = 'if(x > (1 - 10^6)/10^6; (1 + 10^6)/10^6; -1)'
+name = 'Step Function'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = 'TF prints `if(x > (1 - 10^6)/10^6; (1 + 10^6)/10^6; 0) - 1`, which is `10^-6` above the step.'
+
+[[rows]]
+key = 'f77'
+f = 'if(x != 1/21; 1/(21*x - 1); 0)'
+name = 'Geometric'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f78'
+f = 'x^2/4 + ceil(x/2) - 0.5'
+name = 'Trunc. Poly.'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = 'The article prints `ceiling`.'
+
+[[rows]]
+key = 'f79'
+f = 'ceil(10*x - 1) + 0.5'
+name = 'Staircase'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = 'The article prints `ceiling`.'
+
+[[rows]]
+key = 'f80'
+f = 'x + sin(x*10^6)/10 + 10^-3'
+name = 'Noisy Line'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f81'
+f = 'if(x > -1; 1 + sin(1/(x + 1)); -1)'
+name = 'Warsaw'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = "TF prints the first branch as `1 + sin(1/(x + 1)) - 1` and the second as `0`. TF draws the closing brace of a case brace only where a term follows it (f35, f76), and draws none here, so the `- 1` belongs to the first branch and the else branch is 0. TF's root, -0.682, is a zero of that first branch, `sin(1/(x + 1))`."
+
+[[rows]]
+key = 'f82'
+f = '202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 0.1'
+name = 'Sawtooth'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = 'TF prints the argument of `floor` as `(2*x + 10^-2)/2*10^-2`, with `10^-2` outside the fraction.'
+
+[[rows]]
+key = 'f83'
+f = '(202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 0.1)^3'
+name = 'Sawtooth Cube'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = 'TF prints the argument of `floor` as in f82.'
+
+[[rows]]
+key = 'f84'
+f = '(x - 1)*(x - 2)*(x - 3)*(x - 4)*(x - 5) - 0.05'
+name = 'Polynomial with multiple roots'
+interval = '[0.5, 5.5]'
+also_in = 'SciML Benchmarks suite'
+
+[[rows]]
+key = 'f85'
+f = 'sin(x) - 0.5*x - 0.3'
+name = 'Trigonometric with multiple roots'
+interval = '[-10.0, 10.0]'
+also_in = 'SciML Benchmarks suite'
+
+[[rows]]
+key = 'f86'
+f = 'exp(x) - 1 - x - x^2/2 - 0.005'
+name = 'Exponential function (sensitive near zero)'
+interval = '[-2.0, 2.0]'
+also_in = 'SciML Benchmarks suite'
+
+[[rows]]
+key = 'f87'
+f = '1/(x - 0.5) - 2 - 0.05'
+name = 'Rational function with pole'
+interval = '[0.6, 2.0]'
+also_in = 'SciML Benchmarks suite'
+
+[[rows]]
+key = 'f88'
+f = 'log(x) - x + 2 - 0.05'
+name = 'Logarithmic function'
+interval = '[0.1, 3.0]'
+also_in = 'SciML Benchmarks suite'
+
+[[rows]]
+key = 'f89'
+f = 'sin(20*x) + 0.1*x - 0.1'
+name = 'High oscillation function'
+interval = '[-4.0, 5.0]'
+also_in = 'SciML Benchmarks suite'
+
+[[rows]]
+key = 'f90'
+f = 'x^3 - 2*x^2 + x - 0.025'
+name = 'Function with very flat region'
+interval = '[-1.0, 2.0]'
+also_in = 'SciML Benchmarks suite'
+
+[[rows]]
+key = 'f91'
+f = 'x*sin(1/x) - 0.1 - 0.01'
+name = 'Bessel-like function'
+interval = '[0.01, 1.0]'
+also_in = 'SciML Benchmarks suite'
+
+[[rows]]
+key = 'f92'
+f = 'x^3 - 0.001'
+name = 'Nearly asymmetric function'
+interval = '[-10, 10]'
+also_in = 'SciML Benchmarks suite'
+notes = 'C# names it Near symmetric function. TF writes the interval in its root line as `[-0; 10]`; its plot spans `[-10, 10]`.'

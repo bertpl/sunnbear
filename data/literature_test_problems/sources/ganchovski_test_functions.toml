@@ -1,0 +1,714 @@
+title = 'Ganchovski (2026): Root-finding Test Functions, revision of 2026-09-29'
+reference = '''
+Ganchovski, N. (2026). Root-finding Test Functions. The file `Test functions.pdf` in the repository https://github.com/Proektsoft-EOOD/ModAB-Root-Finding at commit `b3309e9a5177d6305ac84deba6537adb9b878c5e`: https://raw.githubusercontent.com/Proektsoft-EOOD/ModAB-Root-Finding/b3309e9a5177d6305ac84deba6537adb9b878c5e/Test%20functions.pdf.
+- The PDF prints no author or date: its metadata give 2026-09-29 as its creation date. The repository's README puts it under the MIT License of `C/LICENSE`, which names Ned Ganchovski as the copyright holder.
+- An earlier version was posted on ResearchGate in 2023 as "Additional test functions", https://www.researchgate.net/publication/373922895_Additional_test_functions; roots-fortran (`roots_fortran`) cites that version.
+'''
+year = 2026
+subcategory = '1.3'
+where_in_source = '''
+17 pages that hold 101 functions, f01–f101, in a grid of 2 columns.
+- Each cell gives the function, a plot of it on its interval, and a root line in the notation of Calcpad, `x_nn = $Root{f_nn(x) = 0; x ∈ [a; b]} = r`, with the root `r` to about 3 significant digits. The interval of each row is the one in its root line, except f31's, whose root line is garbled (see its note).
+- The root lines of 9 functions use `$Find{f_nn(x); x ∈ [a; b]}` in place of `$Root`: f36, f38, f39, f40, f76, f77, f78, f79 and f101.
+- The cells name f63–f101; f01–f62 have no names.
+- A heading above each block of cells names the block's origin. The headings name the same references as the article of Ganchovski et al. (2026) (`2026_ganchovski_et_al`) for its blocks, except that Oliveira & Takahashi's heading gives no year or venue, and f31–f32 sit under the heading "My functions".
+'''
+transcribed_from = '''
+the PDF's page images, checked against its text layer.
+- The PDF is the same file (same MD5) as `Test functions.pdf` at commit `0d6efd5` of the authors' earlier repository, https://github.com/Just-A-Random-Geek/ModAB-Root-Finding.
+- Its text for f01–f92 equals, apart from layout, the text of the article's supplementary `Test Functions.pdf` (folder `MDPI-Algorithms-Data/` at that commit, created 2026-04-12), which ends at f92.
+'''
+rows_summary = '101, 1 per function.'
+notes = '''
+How to read the rows:
+- **`log` is the natural log**, printed `ln`. **`exp(u)`** writes both the PDF's `exp(u)` and its `e^u`; `e` alone (f68, f100) is Euler's number.
+- **`if(c; a; b)`** writes the PDF's case brace "if c: a, else: b": `a` where `c` holds, `b` otherwise. `==` and `!=` write the PDF's `≡` and `≠`.
+- **`cbrt` is the real cube root**, printed as a radical with index 3 (f70, f100). `abs(u)` writes `|u|`; `ceiling`, `floor`, `sign` and `atan` are as printed.
+- **`also_in`** gives the heading of each block, with the short labels of `2026_ganchovski_et_al`, such as Galdino (2011). f31–f32 sit under "My functions", so they have no `also_in`. The heading "SciML Benchmarks test suite" sits above the row of cells that holds f83 and f84, and no heading follows it; `also_in` gives it for f83–f100, and is empty for f101, whose name credits L. Tomov.
+- **Roots** are left out, except where a note needs one.
+'''
+
+[[relations]]
+sources = ['2026_tomov_ganchovski_benchmark']
+text = '''
+The rows of Tomov & Ganchovski's benchmark (`2026_tomov_ganchovski_benchmark`) come from its C# code at commit `0d6efd5`. Its f01–f101 are the f01–f101 of this PDF, and its rows take the names of f63–f101 from this PDF. Apart from notation, 92 rows have the same function and interval in both; these 9 differ:
+- **f27, f28:** the code has `p(x) = x + 1.11111` and `sin((x - 7.143)^3)`; this PDF prints `1.11` and `7.14`.
+- **f29, f42, f92:** the code's intervals are `[2.6, 4.6]`, `[0, pi]` and `[-10, 10]`; this PDF prints `[2.6, 3.6]`, `[0, 4]` and `[-0, 10]`.
+- **f76:** the code returns `(1 + 1e6)/1e6` above the step and -1 below it; here the `- 1` follows the whole `if`, so the value above the step is `10^-6`.
+- **f81:** the code has `if(x > -1; 1 + sin(1/(x + 1)); 0 - 1)`, which touches 0 without a sign change, and the benchmark leaves it out of its statistics; here the first branch is `1 + sin(1/(x + 1)) - 1`, which changes sign at the printed root -0.682, and the else branch is 0.
+- **f82, f83:** inside `floor`, the code divides by `2e-2`; this PDF divides by 2 and multiplies by `10^-2`.
+'''
+
+[[relations]]
+sources = ['2026_ganchovski_et_al']
+text = '''
+The f01–f92 of Ganchovski et al. (2026) (`2026_ganchovski_et_al`), from the article's Table 2, are the f01–f92 of this PDF, and 82 rows have the same function and interval in both. These 10 differ:
+- **The 9 rows that differ from Tomov & Ganchovski's benchmark** (`2026_tomov_ganchovski_benchmark`) differ from the article's rows in the same way. The f28 row of `2026_ganchovski_et_al` follows the code, because the article prints `sin(x - 7.143)^3)`, with an unmatched parenthesis.
+- **f02:** its last term is `sqrt(3)/18` here and `sqrt(x)/18` in the article.
+'''
+
+[[relations]]
+sources = ['roots_fortran']
+text = '''
+The cases 146–157 of roots-fortran (`roots_fortran`), whose comment cites Galdino (2011) and the 2023 version of this PDF, are 10 functions of this PDF: 146 = f01, 147 = f02, 148 = f04, 149 = f28, 150 = f29, 151 = f30, 152 = f31, 153 = f32, 154 = f41 and 155–157 = f42.
+- Where this PDF differs from the C# code of Tomov & Ganchovski's benchmark, the cases follow this PDF: f28's `7.14` and f29's `[2.6, 3.6]`.
+- **Case 146** starts its bracket at 0.51, where f01 starts at 0.5; the case's comment says that roots-fortran moved the start, so that the first midpoint of bisection is not the root.
+- **Cases 155–157** replace f42's `[0, 4]` by 1 bracket around each of its roots 1, 2 and 3: `[0, 1.9]`, `[1.001, 2.001]` and `[2.5, 10]`.
+- The comment names Galdino (2011) for all 12 cases, where this PDF puts f31–f32 under "My functions" and f41–f42 under Swift & Lindfield (1978).
+'''
+
+[[rows]]
+key = 'f01'
+f = 'x^3 - 1'
+interval = '[0.5, 1.5]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f02'
+f = 'x^2*(x^2/3 + sqrt(2)*sin(x)) - sqrt(3)/18'
+interval = '[0.1, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f03'
+f = '11*x^11 - 1'
+interval = '[0.1, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f04'
+f = 'x^3 + 1'
+interval = '[-1.8, 0]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f05'
+f = 'x^3 - 2*x - 5'
+interval = '[2, 3]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f06'
+f = '2*x*exp(-5) + 1 - 2*exp(-5*x)'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f07'
+f = '2*x*exp(-10) + 1 - 2*exp(-10*x)'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f08'
+f = '2*x*exp(-20) + 1 - 2*exp(-20*x)'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f09'
+f = '(1 + (1 - 5)^2)*x^2 - (1 - 5*x)^2'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f10'
+f = '(1 + (1 - 10)^2)*x^2 - (1 - 10*x)^2'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f11'
+f = '(1 + (1 - 20)^2)*x^2 - (1 - 20*x)^2'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f12'
+f = 'x^2 - (1 - x)^5'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f13'
+f = 'x^2 - (1 - x)^10'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f14'
+f = 'x^2 - (1 - x)^20'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f15'
+f = '(1 + (1 - 5)^4)*x - (1 - 5*x)^4'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f16'
+f = '(1 + (1 - 10)^4)*x - (1 - 10*x)^4'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f17'
+f = '(1 + (1 - 20)^4)*x - (1 - 20*x)^4'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f18'
+f = 'exp(-5*x)*(x - 1) + x^5'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f19'
+f = 'exp(-10*x)*(x - 1) + x^10'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f20'
+f = 'exp(-20*x)*(x - 1) + x^20'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f21'
+f = 'x^2 + sin(x/5) - 1/4'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f22'
+f = 'x^2 + sin(x/10) - 1/4'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f23'
+f = 'x^2 + sin(x/20) - 1/4'
+interval = '[0, 1]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f24'
+f = '(x + 2)*(x + 1)*(x - 3)^3'
+interval = '[2.6, 4.6]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f25'
+f = '(x - 4)^5*log(x)'
+interval = '[3.6, 5.6]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f26'
+f = '(sin(x) - x/4)^3'
+interval = '[2, 4]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f27'
+f_description = '`(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 - p(x)))))*(sign(p(x) - 3))`, where `p(x) = x + 1.11`'
+interval = '[1, 3]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f28'
+f = 'sin((x - 7.14)^3)'
+interval = '[7, 8]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f29'
+f = 'exp((x - 3)^5) - 1'
+interval = '[2.6, 3.6]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f30'
+f = 'exp((x - 3)^5) - exp(x - 1)'
+interval = '[4, 5]'
+also_in = 'Galdino (2011)'
+
+[[rows]]
+key = 'f31'
+f = 'pi - 1/x'
+interval = '[0.05, 5]'
+notes = 'The root line prints the interval as `[0.05v5]`; the plot spans `[0.05, 5]`.'
+
+[[rows]]
+key = 'f32'
+f = '4 - tan(x)'
+interval = '[0, 1.5]'
+
+[[rows]]
+key = 'f33'
+f = 'cos(x) - x^3'
+interval = '[0, 4]'
+also_in = 'Stage (2013)'
+
+[[rows]]
+key = 'f34'
+f = 'cos(x) - x'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+
+[[rows]]
+key = 'f35'
+f = 'sqrt(abs(x - 2/3))*if(x <= 2/3; 1; -1) - 0.1'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+
+[[rows]]
+key = 'f36'
+f = '(abs(x - 2/3))^0.2*if(x <= 2/3; 1; -1)'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+notes = 'The root line uses `$Find`.'
+
+[[rows]]
+key = 'f37'
+f = '(x - 7/9)^3 + (x - 7/9)*10^-3'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+
+[[rows]]
+key = 'f38'
+f = 'if(x <= 1/3; -0.5; 0.5)'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+notes = 'The root line uses `$Find`.'
+
+[[rows]]
+key = 'f39'
+f = 'if(x <= 1/3; -10^-3; 1 - 10^-3)'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+notes = 'The root line uses `$Find`.'
+
+[[rows]]
+key = 'f40'
+f = 'if(x == 0; 0; 1/(x - 2/3))'
+interval = '[-11, 9]'
+also_in = 'Stage (2013)'
+notes = 'The root line uses `$Find`.'
+
+[[rows]]
+key = 'f41'
+f = '2*x*exp(-5) - 2*exp(-5*x) + 1'
+interval = '[0, 10]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f42'
+f = '(x^2 - x - 6)*(x^2 - 3*x + 2)'
+interval = '[0, 4]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f43'
+f = 'x^3'
+interval = '[-1, 1.5]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f44'
+f = 'x^5'
+interval = '[-1, 1.5]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f45'
+f = 'x^7'
+interval = '[-1, 1.5]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f46'
+f = '(exp(-5*x) - x - 0.5)/x^5'
+interval = '[0.09, 0.7]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f47'
+f = '1/sqrt(x) - 2*log(5*10^3*sqrt(x)) + 0.8'
+interval = '[0.0005, 0.5]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f48'
+f = '1/sqrt(x) - 2*log(5*10^7*sqrt(x)) + 0.8'
+interval = '[0.0005, 0.5]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f49'
+f = 'if(x <= 0; -x^3 - x - 1; x^(1/3) - x - 1)'
+interval = '[-1, 1]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f50'
+f = 'x^3 - 2*x - x + 3'
+interval = '[-3, 2]'
+also_in = 'Swift & Lindfield (1978)'
+
+[[rows]]
+key = 'f51'
+f = 'log(x)'
+interval = '[0.5, 5]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f52'
+f = '(10 - x)*exp(-10*x) - x^10 + 1'
+interval = '[0.5, 8]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f53'
+f = 'exp(sin(x)) - x - 1'
+interval = '[1, 4]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f54'
+f = '2*sin(x) - 1'
+interval = '[0.1, pi/3]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f55'
+f = '(x - 1)*exp(-x)'
+interval = '[0, 1.5]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f56'
+f = '(x - 1)^3 - 1'
+interval = '[1.5, 3]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f57'
+f = 'exp(x^2 + 7*x - 30) - 1'
+interval = '[2.6, 3.5]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f58'
+f = 'atan(x) - 1'
+interval = '[1, 8]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f59'
+f = 'exp(x) - 2*x - 1'
+interval = '[0.2, 3]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f60'
+f = 'exp(-x) - x - sin(x)'
+interval = '[0, 2]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f61'
+f = 'x^2 - sin(x)^2 - 1'
+interval = '[-1, 2]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f62'
+f = 'sin(x) - x/2'
+interval = '[pi/2, pi]'
+also_in = 'Suhadolnik (2012)'
+
+[[rows]]
+key = 'f63'
+f = 'x*exp(x) - 1'
+name = 'Lambert'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f64'
+f = 'tan(x - 1/10)'
+name = 'Trigonometric 1'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f65'
+f = 'sin(x) + 0.5'
+name = 'Trigonometric 2'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f66'
+f = '4*x^5 + x*x + 1'
+name = 'Polynomial 1'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f67'
+f = 'x + x^10 - 1'
+name = 'Polynomial 2'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f68'
+f = 'pi^x - e'
+name = 'Exponential'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f69'
+f = 'log(abs(x - 10/9))'
+name = 'Logarithmic'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f70'
+f = '1/3 + sign(x)*cbrt(abs(x)) + x^3'
+name = 'Polynomial'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f71'
+f = '(x + 2/3)/(x + 101/100)'
+name = 'Poly. Frac.'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f72'
+f = '(x*10^6 - 1)^3'
+name = 'Polynomial 3'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f73'
+f = 'exp(x)*(x*10^6 - 1)^3'
+name = 'Exp. Poly.'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f74'
+f = '(x - 1/3)^2*(atan(x - 1/3))'
+name = 'Tan. Poly.'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f75'
+f = 'sign(3*x - 1)*(1 - sqrt(1 - (3*x - 1)^2/81))'
+name = 'Circles'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f76'
+f = 'if(x > (1 - 10^6)/10^6; (1 + 10^6)/10^6; 0) - 1'
+name = 'Step Function'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = 'The root line uses `$Find`.'
+
+[[rows]]
+key = 'f77'
+f = 'if(x != 1/21; 1/(21*x - 1); 0)'
+name = 'Geometric'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = 'The root line uses `$Find`.'
+
+[[rows]]
+key = 'f78'
+f = 'x*x/4 + ceiling(x/2) - 0.5'
+name = 'Trunc. Poly.'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = 'The root line uses `$Find`.'
+
+[[rows]]
+key = 'f79'
+f = 'ceiling(10*x - 1) + 0.5'
+name = 'Staircase'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = 'The root line uses `$Find`.'
+
+[[rows]]
+key = 'f80'
+f = 'x + sin(x*10^6)/10 + 10^-3'
+name = 'Noisy Line'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+
+[[rows]]
+key = 'f81'
+f = 'if(x > (-1); 1 + sin(1/(x + 1)) - 1; 0)'
+name = 'Warsaw'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = 'The PDF draws the closing brace of a case brace only before a following term, as in f35 and f76, and draws none here, so the `- 1` belongs to the first branch, which equals `sin(1/(x + 1))`. The printed root -0.682 is `1/pi - 1`, a zero of that branch.'
+
+[[rows]]
+key = 'f82'
+f = '202*x - 2*floor((2*x + 10^-2)/2*10^-2) - 0.1'
+name = 'Sawtooth'
+interval = '[-1, 1]'
+also_in = 'Oliveira & Takahashi (2021)'
+notes = 'The fraction bar puts `2*x + 10^-2` over `2`, and `10^-2` multiplies the fraction. The plot shows many teeth on `[-1, 1]`, as a division by `2*10^-2` gives; the printed argument makes `floor` jump only once there.'
+
+[[rows]]
+key = 'f83'
+f = '(202*x - 2*floor((2*x + 10^-2)/2*10^-2) - 0.1)^3'
+name = 'Sawtooth Cube'
+interval = '[-1, 1]'
+also_in = 'SciML Benchmarks test suite'
+notes = "The argument of `floor` as in f82. The heading of the SciML block sits above the row of cells that holds f83 and f84; f83's name and expression continue f82."
+
+[[rows]]
+key = 'f84'
+f = '(x - 1)*(x - 2)*(x - 3)*(x - 4)*(x - 5) - 0.05'
+name = 'Polynomial with multiple roots'
+interval = '[0.5, 5.5]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f85'
+f = 'sin(x) - 0.5*x - 0.3'
+name = 'Trigonometric with multiple roots'
+interval = '[-10, 10]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f86'
+f = 'exp(x) - 1 - x - x*x/2 - 0.005'
+name = 'Exponential function (sensitive near zero)'
+interval = '[-2, 2]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f87'
+f = '1/(x - 0.5) - 2 - 0.05'
+name = 'Rational function with pole'
+interval = '[0.6, 2]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f88'
+f = 'log(x) - x + 2 - 0.05'
+name = 'Logarithmic function'
+interval = '[0.1, 3]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f89'
+f = 'sin(20*x) + 0.1*x - 0.1'
+name = 'High oscillation function'
+interval = '[-4, 5]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f90'
+f = 'x*x*x - 2*x*x + x - 0.025'
+name = 'Function with very flat region'
+interval = '[-1, 2]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f91'
+f = 'x*sin(1/x) - 0.1 - 0.01'
+name = 'Bessel-like function'
+interval = '[0.01, 1]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f92'
+f = 'x^3 - 0.001'
+name = 'Nearly asymmetric function'
+interval = '[-0, 10]'
+also_in = 'SciML Benchmarks test suite'
+notes = 'As the root line prints it; the plot spans `[-10, 10]`.'
+
+[[rows]]
+key = 'f93'
+f = 'x^5 - 0.001'
+name = 'Flat function 1'
+interval = '[-10, 10]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f94'
+f = 'x^7 - 0.001'
+name = 'Flat function 2'
+interval = '[-10, 10]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f95'
+f = 'x^9 - 0.001'
+name = 'Flat function 3'
+interval = '[-10, 10]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f96'
+f = 'x^11 - 0.001'
+name = 'Flat function 4'
+interval = '[-10, 10]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f97'
+f = 'x^13 - 0.001'
+name = 'Flat function 5'
+interval = '[-10, 10]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f98'
+f = 'x^15 - 0.001'
+name = 'Flat function 6'
+interval = '[-10, 10]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f99'
+f = 'x^17 - 0.001'
+name = 'Flat function 7'
+interval = '[-10, 10]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f100'
+f = 'cbrt((4*x - 3)/x)'
+name = 'Vertical tangent at root'
+interval = '[0, e]'
+also_in = 'SciML Benchmarks test suite'
+
+[[rows]]
+key = 'f101'
+f = 'if(x < 0; -(x^2); 7*x^2)'
+name = 'L. Tomov counterexample'
+interval = '[-3, 1]'
+notes = 'The root line uses `$Find`.'

@@ -1,0 +1,127 @@
+title = 'Gao (2026): clipped power interpolation (CARF)'
+reference = 'Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied Mathematics Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928.'
+year = 2026
+subcategory = '1.1'
+where_in_source = '''
+- Section 1, the introduction, names `x^(1/5)` and `x^5` as examples, without intervals.
+- Section 3, "Numerical experiments", has 4 parts:
+  - a list of 3 functions with steep slopes (results in Table 1);
+  - 2 functions with a vanishing derivative (Table 2);
+  - 2 suites from other articles (Tables 3 and 4).
+- Table 3 runs the Alefeld–Potra–Shi suite, "154 functions from 15 types" in Table 1 of Alefeld, Potra, Shi (1995), the article's ref. [13], whose rows are in `1995_alefeld_potra_shi`. Table 3 prints only `sin x - 1/2 x`, as an example from that suite.
+- Table 4 runs Chandrupatla's suite, from Table 1 of Chandrupatla (1997), ref. [15], whose rows are in `1997_chandrupatla`: 9 functions, each on 5 intervals, all printed, run with `eps_1 = 1E-15`, `eps_2 = 1E-12` and at most 200 iterations.
+'''
+transcribed_from = "the article (text layer, checked against the page images). sunnbear's `tests/solvers/bracketing/carf/paper_problems.py` holds Table 4 only, and takes its functions from Chandrupatla's article. Where Gao's Table 4 and Chandrupatla's article differ (`T4.8`, `T4.9`), the rows follow what Gao prints, and the rows' notes give sunnbear's form."
+rows_summary = "16: the introduction's `x^(1/5)` (its `x^5` is row `T2.1`), Section 3's 3 listed functions, Table 2's 2, Table 3's 1 printed example, and Table 4's 9. The article prints no other functions."
+notes = '''
+The article does not number the functions. The keys are:
+- `S1.1`, the introduction's example;
+- `S3.1` to `S3.3`, Section 3's list;
+- `T2.1`, `T2.2` and `T4.1` to `T4.9`, the rows of Tables 2 and 4 in the order printed;
+- `T3`, the printed example of Table 3's suite.
+'''
+
+[[rows]]
+key = 'S1.1'
+f = 'x^(1/5)'
+interval = 'not printed'
+notes = 'Introduction: an example of a steep slope near the root, where IQI needs fewer iterations than quadratic interpolation. Section 3 does not run it.'
+
+[[rows]]
+key = 'S3.1'
+f = 'x^(1/3)'
+name = 'f'
+interval = '[-5, 1]'
+notes = 'Steep slope near the root; results in Table 1.'
+
+[[rows]]
+key = 'S3.2'
+f = 'x^(1/5)/(1 + abs(x)^(1/5))'
+name = 'g'
+interval = '[-5, 10]'
+notes = 'Printed with 5th-root signs. Results in Table 1.'
+
+[[rows]]
+key = 'S3.3'
+f = '1 + sum(z_i^2/(d_i - x), i = 1..n)'
+name = 'phi'
+parameters = '`n = 1000`; each `z_i` drawn from `U(0, 10)`; each gap `d_(k+1) - d_k` drawn from `U(0, 10)`; `d_1 < d_2 < ... < d_n`'
+interval = '`(d_1, d_n) \ {d_2, ..., d_(n-1)}`; 1 bracket per root, built as in Appendix B'
+also_in = 'the secular equation of Bunch, Nielsen, Sorensen (1978) and Gu, Eisenstat (1995), refs. [9, 10]'
+notes = '1 root between each pair of adjacent poles. Table 1 gives the mean ± sd evaluations over "each of the 1000 roots", to `1E-10`. `d_1` is not printed. Appendix B writes `c_j` for `z_j`, and also brackets a root on `[d_(n-1), inf)`.'
+
+[[rows]]
+key = 'T2.1'
+f = 'x^5'
+interval = '[-1, 3]'
+notes = 'Vanishing derivative at the root. Also named in the introduction.'
+
+[[rows]]
+key = 'T2.2'
+f = 'x^7'
+interval = '[-3, 5]'
+notes = "Also named in Section 3's opening paragraphs."
+
+[[rows]]
+key = 'T3'
+f = 'sin(x) - x/2'
+interval = 'not printed'
+also_in = 'Alefeld, Potra, Shi (1995), Table 1 (ref. [13])'
+notes = 'Printed as `sin x - 1/2 x`.'
+
+[[rows]]
+key = 'T4.1'
+f = 'x^3 - 2*x - 5'
+interval = '`[2, 3]`; `[1, 10]`; `[1, 100]`; `[-1E4, 1E4]`; `[-1E10, 1E10]`'
+also_in = 'Chandrupatla (1997), Table 1 (ref. [15])'
+
+[[rows]]
+key = 'T4.2'
+f = '1 - 1/x^2'
+interval = '`[0.5, 1.51]`; `[1E-4, 1E4]`; `[1E-6, 1E6]`; `[1E-10, 1E10]`; `[1E-12, 1E12]`'
+also_in = 'Chandrupatla (1997), Table 1 (ref. [15])'
+
+[[rows]]
+key = 'T4.3'
+f = '(x - 3)^3'
+interval = '`[0, 5]`; `[-10, 10]`; `[-1E4, 1E4]`; `[-1E6, 1E6]`; `[-1E10, 1E10]`'
+also_in = 'Chandrupatla (1997), Table 1 (ref. [15])'
+
+[[rows]]
+key = 'T4.4'
+f = '6*(x - 2)^5'
+interval = '`[0, 5]`; `[-10, 10]`; `[-1E4, 1E4]`; `[-1E6, 1E6]`; `[-1E10, 1E10]`'
+also_in = 'Chandrupatla (1997), Table 1 (ref. [15])'
+
+[[rows]]
+key = 'T4.5'
+f = 'x^9'
+interval = '`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`'
+also_in = 'Chandrupatla (1997), Table 1 (ref. [15])'
+
+[[rows]]
+key = 'T4.6'
+f = 'x^19'
+interval = '`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`'
+also_in = 'Chandrupatla (1997), Table 1 (ref. [15])'
+
+[[rows]]
+key = 'T4.7'
+f_description = '`0` if `x = 0`; `x*exp(-1/x^2)` if `x != 0`'
+interval = '`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`'
+also_in = 'Chandrupatla (1997), Table 1 (ref. [15])'
+
+[[rows]]
+key = 'T4.8'
+f = '-3062*(1 - xi)/(xi + (1 - xi)*exp(-x)) - 1013 + 1628/x'
+parameters = 'xi = 0.61489'
+interval = '`[2E-4, 2]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`'
+also_in = 'Chandrupatla (1997), Table 1 (ref. [15])'
+notes = "As printed, the first term has no `exp(-x)` in its numerator. sunnbear's tests use `-3062*(1 - xi)*exp(-x)/(xi + (1 - xi)*exp(-x)) - 1013 + 1628/x`."
+
+[[rows]]
+key = 'T4.9'
+f = 'exp(x) - 2 - 0.01/x - 0.000002/x^3'
+interval = '`[2E-4, 1]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`'
+also_in = 'Chandrupatla (1997), Table 1 (ref. [15])'
+notes = "sunnbear's tests use `exp(x) - 2 - 0.01/x^2 + 0.000002/x^3`."

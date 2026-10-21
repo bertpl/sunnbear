@@ -1,0 +1,65 @@
+title = 'Brent (1973): Algorithms for Minimization without Derivatives, chapter 4'
+reference = "Brent, R. P. (1973). Algorithms for Minimization without Derivatives. Prentice-Hall, Englewood Cliffs, NJ. ISBN 0-13-022335-2. Author's scan: https://maths-people.anu.edu.au/~brent/pub/pub011.html. Erratum: Brent, R. P. (1975). Table Errata 520. Mathematics of Computation, p. 1166."
+year = 1973
+subcategory = '1.1'
+where_in_source = '''
+chapter 4, "An algorithm with guaranteed convergence for finding a zero of a function" (pp. 47–60), which defines the procedures `zero` and `zero2`.
+- Section 2, "The algorithm" (pp. 48–50), gives 2 functions on which Dekker's algorithm converges slowly, equations (2.1) and (2.7).
+- Section 4, "Practical tests" (pp. 54–56): Table 4.1 runs `zero2` on `x^9`, `x^19`, `f_1` (4.1) and `f_2` (4.2), with `macheps = 16^-13` and the absolute tolerance `t` per row. Table 4.2 compares `zero` with Dekker's procedure on the eigenvalues of the band matrix (4.3).
+'''
+transcribed_from = "the book's scan (2 book pages per sheet, no text layer), read from the page images. sunnbear's `tests/solvers/bracketing/brent/paper_problems.py` holds Table 4.1's 2 `x^9` rows with the same intervals and `t`. The erratum corrects only a line on p. 163 (chapter 7), so nothing in chapter 4 changes."
+rows_summary = '''
+7: Section 2's 2 functions, Table 4.1's 4 functions (5 runs, because `x^9` runs on 2 intervals), and Table 4.2's determinant. These functions get no row:
+- Section 5's equation (5.1), `f(x) = phi(t_i) - c` with `i = ceil(x - 1/2)`, with which Section 5 proposes `zero` for searching an ordered file, with no concrete `phi` and no test.
+- The 4 polynomials of chapter 3, Section 9, "Some numerical examples" (pp. 43–45), which lies outside chapter 4. Chapter 4 cites that section for an illustration of superlinear convergence; that section runs successive interpolation, not `zero`, from starting points without a bracket.
+'''
+notes = '''
+- The keys are chapter 4's equation numbers where the book numbers the function. Table 4.1's functions without an equation number get the keys `T4.1 r1-2`, for the table's rows 1 and 2, and `T4.1 r3`, for its row 3.
+- The book writes `1'-9` for `1*10^-9`; the rows write `1E-9`.
+- The preface says that parts of chapter 4 appeared in Brent (1971), The Computer Journal, without naming which parts. The rows of that article are in `1971_brent`.
+'''
+
+[[rows]]
+key = '(2.1)'
+f_description = '`2^(x/delta)` for `a + delta <= x <= b`; `-((b - a - delta)/delta)*2^(b/delta)` for `x = a`; arbitrary for `a < x < a + delta`'
+parameters = '`a`, `b`, `delta` free'
+interval = '[a, b]'
+notes = "`delta` is the algorithm's tolerance (eq. (2.9)), so the function is built for a given tolerance. Dekker's algorithm takes steps of `delta` on it, about `(b - a)/delta` evaluations. Section 4: Dekker's algorithm needs more than 10^6 evaluations on (2.1) and (2.7), and `zero` at most 3 times the count of bisection."
+
+[[rows]]
+key = '(2.7)'
+f_description = '`0` if `x = 0`; `x*exp(-x^-2)` if `x != 0`'
+interval = 'an interval containing the origin'
+notes = 'The book: successive linear interpolation converges sublinearly on it; `f` and all its derivatives vanish at the origin.'
+
+[[rows]]
+key = 'T4.1 r1-2'
+f = 'x^9'
+interval = '`[-1.0, +1.1]` with `t = 1E-9`; `[-1.0, +4.0]` with `t = 1E-20`'
+notes = "Section 2 (p. 48) also names `x^9`: on an IBM 360, `f` vanished on an interval through underflow, and Dekker's procedure then took many small steps."
+
+[[rows]]
+key = 'T4.1 r3'
+f = 'x^19'
+interval = '`[-1.0, +4.0]` with `t = 1E-20`'
+
+[[rows]]
+key = '(4.1)'
+f_description = '`0` if `abs(x) < 3.8*10^-4`; `fl(x*exp(-x^-2))` otherwise'
+name = 'f_1'
+interval = '`[-1.0, +4.0]` with `t = 1E-20`'
+notes = "`fl(.)` is the computed floating-point value. Table 4.1's footnote: `zero2` returned `2.17E-4`, where `f_1 = 0`."
+
+[[rows]]
+key = '(4.2)'
+f_description = '`fl(exp(x))` if `x > -10^6`; `fl(exp(-10^6) - (x + 10^6)^2)` otherwise'
+name = 'f_2'
+interval = '`[-1001200, 0]` with `t = 1E-20`'
+notes = '`fl(.)` as in (4.1).'
+
+[[rows]]
+key = '(4.3)'
+f_description = '`det(A - x*I)`, with `A` the `n` by `n` 5-diagonal matrix: `a_ij = p - r` if `i = j = 1` or `i = j = n`; `p` if `1 < i = j < n`; `2*q` if `abs(i - j) = 1`; `r` if `abs(i - j) = 2`; `0` if `abs(i - j) > 2`'
+parameters = '`n = 15, p = 7, q = 7/4, r = 1/2`, "a typical set" of the several values tested'
+interval = 'not printed'
+notes = 'The book finds the eigenvalues "by repeated determinant evaluation" (p. 55) and names `det(A - x*I)` as an `f` on p. 52; it prints no `f`. Roots: `lambda_k = p - 4*q*cos(k*pi/(n + 1)) + 2*r*cos(2*k*pi/(n + 1))`, `k = 1..n` (eq. (4.4), cited from Ehrlich, 1970); Table 4.2 prints all 15 to 15 digits. The eigenvalue program sets the tolerance, for a relative error below `5E-14`.'

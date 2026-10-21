@@ -1,0 +1,109 @@
+title = 'Jo, Wagemakers, Periwal (2024): annealing approach to root-finding'
+reference = "Jo, J., Wagemakers, A., Periwal, V. (2024). Annealing approach to root-finding. arXiv preprint 2404.15338v2. http://arxiv.org/abs/2404.15338v2. The authors' Julia scripts: https://github.com/awage/RootFinding."
+year = 2024
+subcategory = '1.2'
+where_in_source = '''
+- Tables I and II (Sections III D and IV B) list 14 functions `f1` to `f14`; both tables use the same functions.
+- Fig. 3 (Section III E) shows basins of attraction for `f2`, `f7` and `f14`, written in `z`.
+- Section III C analyzes the cube root function; the introduction (Eq. (6)) states a 2-rotor Kuramoto equation as a motivating example.
+'''
+transcribed_from = "the article, checked against the page images. The authors' Julia scripts were not read."
+rows_summary = '16: the 14 functions of Tables I and II, the cube root function of Section III C, and the Kuramoto equation, Eq. (6).'
+notes = '''
+- **Keys:** the article's labels `f1` to `f14`, and for the other 2 rows the section number `III C` and the equation number `(6)`.
+- **Starting points:** the article gives no intervals: each function is iterated from a 1000 x 1000 grid of complex starting points `z0` in the square `[-2, 2] x [-2, 2]`.
+- **`also_in`:** empty in every row. The article says that "some" of the functions were adopted from Weerakoon and Fernando, Applied Mathematics Letters 13, 87 (2000), without saying which.
+'''
+
+[[relations]]
+sources = ['2000_weerakoon']
+text = '`f7`–`f13` are functions 1–7 of Weerakoon & Fernando (2000), in the same order. `f9` is unchanged, and the other 6 are shifted in `x`.'
+
+[[rows]]
+key = 'f1'
+f = '(x^2 - 1)*(x^2 + 1)'
+interval = 'none'
+
+[[rows]]
+key = 'f2'
+f = 'x^3 - 1'
+interval = 'none'
+notes = 'Also used for the basins of Fig. 3, as `z^3 - 1`.'
+
+[[rows]]
+key = 'f3'
+f = 'x^12 - 1'
+interval = 'none'
+
+[[rows]]
+key = 'f4'
+f = '(x^2 - 4)*(x + 1.5)*(x - 0.5)'
+interval = 'none'
+
+[[rows]]
+key = 'f5'
+f = '(x + 2)*(x + 1.5)^2*(x - 0.5)*(x - 2)'
+interval = 'none'
+notes = 'The article reports linear convergence near the double root.'
+
+[[rows]]
+key = 'f6'
+f = 'sin(x)'
+interval = 'none'
+
+[[rows]]
+key = 'f7'
+f = '(x - 1)^3 + 4*(x - 1)^2 - 10'
+interval = 'none'
+notes = 'Also used for the basins of Fig. 3.'
+
+[[rows]]
+key = 'f8'
+f = 'sin(x - 14/10)^2 - (x - 14/10)^2 + 1'
+interval = 'none'
+
+[[rows]]
+key = 'f9'
+f = 'x^2 - exp(x) - 3*x + 2'
+interval = 'none'
+
+[[rows]]
+key = 'f10'
+f = 'cos(x - 3/4) - x + 3/4'
+interval = 'none'
+
+[[rows]]
+key = 'f11'
+f = '(x + 1)^3 - 1'
+interval = 'none'
+
+[[rows]]
+key = 'f12'
+f = '(x - 2)^3 - 10'
+interval = 'none'
+
+[[rows]]
+key = 'f13'
+f = '(x + 5/4)*exp((x + 5/4)^2) - sin(x + 5/4)^2 + 3*cos(x + 5/4) + 5'
+interval = 'none'
+
+[[rows]]
+key = 'f14'
+f = 'x + sin(2/x)*x^2'
+interval = 'none'
+notes = 'Also used for the basins of Fig. 3, as `z + z^2*sin(2/z)`.'
+
+[[rows]]
+key = 'III C'
+f = 'x^(1/3)'
+name = 'cube root function'
+interval = 'none'
+notes = "Analyzed in closed form: Newton's method diverges on it, and the article derives the range of its parameter `beta` for which its own method converges. Not in Tables I and II."
+
+[[rows]]
+key = '(6)'
+f = 'Gamma01*sin(phi1 - Psi01) + Gamma10*sin(phi1 + Psi10)'
+name = '2-rotor Kuramoto synchronization'
+parameters = '`Gamma01`, `Gamma10`, `Psi01`, `Psi10`; no values given'
+interval = 'none'
+notes = 'The unknown is `phi1`. Motivating example in the introduction; the article does not solve it.'

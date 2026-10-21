@@ -1,0 +1,7 @@
+title = 'Sikorski, Trojan (1984): asymptotic optimality of bisection'
+reference = 'Sikorski, K., Trojan, G. M. (1984). Asymptotic optimality of the bisection method. Technical report CUCS-92-84, Department of Computer Science, Columbia University. https://doi.org/10.7916/D8F76MKT.'
+year = 1984
+subcategory = '1.1'
+where_in_source = "nowhere. The report's lemmas construct auxiliary functions (`v1` in Lemma 3.2, `H_{n,1}` and `H_{n,2}` in Lemma 3.3) as steps of the proof, not as test problems."
+transcribed_from = 'the report, a scan with a text layer: its summary, the constructions in Section 3 and the final remarks were read, and the rest was searched for examples, tables and numerical results.'
+rows_summary = 'no test functions: the report is a proof and holds no numerical experiments.'

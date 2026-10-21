@@ -1,0 +1,718 @@
+title = 'Burden, Faires, Burden (2016): Numerical Analysis, chapter 2'
+reference = 'Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and the print year 2014.'
+year = 2016
+subcategory = '1.4'
+where_in_source = '''
+chapter 2, "Solutions of Equations in One Variable" (pp. 47–102): the introduction, Sections 2.1–2.7 with their examples and illustrations, Tables 2.1–2.13, Figures 2.1–2.13, and the exercise sets that end Sections 2.1–2.6.
+- Each exercise set numbers its exercises, applied exercises and theoretical exercises in 1 sequence, and its discussion questions apart. Section 2.7 has only discussion questions, none with a function.
+- Exercises 2.3-7 to 2.3-10 repeat 2.3-5 and 2.3-6 with the secant method and false position; 2.4-3 and 2.4-4 repeat 2.4-1 and 2.4-2 with the modified Newton method (2.13); 2.6-3 and 2.6-4 repeat 2.6-1 and 2.6-2 with Müller's method. The rows do not repeat those keys.
+- The rows leave out:
+  - the exercises and discussion questions about a method, a sequence or a generic `f` (2.1-19, 2.2-19, 2.2-21, 2.2-22(a), 2.2-25, 2.2-26, 2.3-30 to 2.3-32, 2.4-6 to 2.4-14, 2.5-5, 2.5-6, 2.5-13 to 2.5-17, and every discussion question except 2.3-D3, 2.3-D4 and 2.4-D2);
+  - the Illustration of §2.4 (p. 79) and §2.5 Ex. 1, which compare or accelerate sequences;
+  - the 5 word problems that the book states without an equation: 2.3-19 and 2.3-20 (the point of a curve nearest a given point), 2.3-21 (2 numbers with a given sum), 2.6-8 (crossed ladders) and 2.6-9 (a can made of the least material);
+  - 2.3-25 and 2.3-26, which fit the 3 constants of a population model to census data on p. 103, outside the chapter.
+'''
+transcribed_from = 'the scanned PDF of the chapter, whose text layer comes from OCR. Every expression was read from the page images; the exercise sets of Sections 2.1, 2.3 and 2.6 were also checked against the text layer.'
+rows_summary = '116, 1 per distinct function: a function that several examples or exercises use is 1 row whose key lists them all. 12 rows come from the introduction, the text, its examples, illustrations and figures, and the exercises reuse 4 of them; 104 rows come from the exercises and discussion questions alone.'
+notes = '''
+How to read the rows:
+- **Keys:**
+  - `§2.k Ex. n` is Example n of Section 2.k, since the book numbers its examples per section;
+  - `§2.k Ill. (p. n)` is an Illustration;
+  - `§2.k (p. n)` is an example in the text or a margin note;
+  - `§2 (pp. 47–48)` is the chapter introduction;
+  - `2.k-m` is exercise m of Exercise Set 2.k, with its part letter, and `2.k-Dm` is its discussion question m;
+  - `Table` and `Fig.` are the book's tables and figures.
+- **Equations:** an equation that the book prints as `lhs = rhs` stays in that form; `f(x) = 0` is written as `f(x)`.
+- **Fixed-point problems:** a fixed-point problem, which the book states as `x = g(x)` or as an iteration `p_n = g(p_{n-1})`, is written as `x = g(x)` and is its own row, except where the book derives it from a root problem: then its forms are in that row's notes (§2.2 Ill. (p. 60), §2.3 Ex. 1, 2.2-1, 2.2-3, 2.2-4).
+- **Notation:** the book writes `ln` for the natural log; the rows write `log`. It gives an interval as `[a, b]` or as `a <= x <= b`; the rows write `[a, b]`.
+
+Other sources with the same function:
+- `x^3 - 2*x - 5`, `cos(x) - x` and `x - cos(x)` are in many sources, on other intervals or from starting points.
+- `x^2 - 3` on `[1, 2]` is Badr's P1 (`2021_badr`) and Sabharwal's T2.1 (`2019_sabharwal`), both citing Harder, *Numerical Analysis for Engineering*; 2.1-14 gives no interval.
+- `x = cos(x)` is in Bradie (2.3-5) (`2006_bradie`) and Epperson (3.1-4) (`2013_epperson`). `x = tan(x)` is Moler's Ex. 4.9 (`2004_moler`), and Atkinson's P3 (`1989_atkinson`) is `x - tan(x)`.
+- 2.2-20's `x = 2*x - A*x^2` is Newton's iteration for `1/x - A`, as in Atkinson (2.0.3), Bradie's 2.4-8 and Epperson's §3.4. The `x = (1/2)*x + A/(2*x)` of 2.2-23 and 2.2-24 is Newton's iteration for `x^2 - A`, as in Atkinson (2.5.3), Bradie's 2.4-7 and Epperson's §3.9.
+'''
+
+[[relations]]
+sources = ['2006_bradie']
+text = '''
+Bradie (2006) (`2006_bradie`) has 3 polynomials of its Section 2.7 in this chapter, with other tasks:
+- Bradie's 2.7-2(b) is 2.1-3 and 2.6-2(h);
+- Bradie's 2.7-2(d) is 2.6-5(b);
+- Bradie's 2.7-4(f) is 2.6-6.
+
+Bradie's racquetball shutout (2.5-19) is 2.3-27, which writes `p` for Bradie's `w` and asks only for `P = 1/2`.
+'''
+
+[[relations]]
+sources = ['2013_epperson']
+text = "Epperson's 3.9-8 (`2013_epperson`), `2*sin(pi*x) + x` on `[1, 2]`, is 2.2-17. Epperson's annuity equation (3.1-6) is 2.3-23's ordinary annuity equation, with `r/12` for `i` and `12*m` for `n`."
+
+[[relations]]
+sources = ['2019_tiruneh', '2000_weerakoon', '2026_cadenas_reflected_box', 'roots_fortran', '2026_gao', '2024_jo_annealing', '2025_romadani_python_implementations']
+text = '''
+Tiruneh (2019) (`2019_tiruneh`) cites no source for its functions, and 3 of them are in this chapter:
+- **T1.1 is the chapter's running example** `x^3 + 4*x^2 - 10`, from starting points. Weerakoon & Fernando (2000)'s function 1 (`2000_weerakoon`) and Cadenas's f1 (`2026_cadenas_reflected_box`) are the same function; roots-fortran's case 63 (`roots_fortran`) takes it from Tiruneh, on `[0, 1.5]` where the book has `[1, 2]`.
+- **T2.5 is 2.3-D3**, solved for its roots `4 + sqrt(5)` and `4 - sqrt(5)`, where the book seeks its root 4.
+- **T2.6 is 2.3-D4**, `x^(1/3)`, from other starting points; Gao (2026) (`2026_gao`), Jo (2024) (`2024_jo_annealing`) and Romadani (2025) (`2025_romadani_python_implementations`) hold it too.
+'''
+
+[[relations]]
+sources = ['2026_ellithy']
+text = '''
+Ellithy (2026) (`2026_ellithy`) has 3 functions of this chapter:
+- its 2 is 2.1-17 (`x^3 - x - 1` on `[1, 2]`);
+- its 14 is 2.2-14(b) (`x^3 - 2*x - 5` on `[2, 3]`);
+- its 15 is 2.3-6(e) (`exp(x) - 3*x^2` on `[0, 1]`).
+'''
+
+[[rows]]
+key = '§2 (pp. 47–48); 2.3-22'
+f = '1564000 = 1000000*exp(lambda) + (435000/lambda)*(exp(lambda) - 1)'
+notes = 'Unknown `lambda`, the birthrate of a population. From the model `N(t) = N0*exp(lambda*t) + (v/lambda)*(exp(lambda*t) - 1)` with `N0 = 1000000`, immigration `v = 435000` per year and `N(1) = 1564000`; the figure on p. 47 plots `N(lambda)` in thousands up to `lambda = 1`. 2.3-22 asks for `lambda` to `1E-4`, then predicts the population after 2 years.'
+
+[[rows]]
+key = '§2.1 (p. 50)'
+f = '2*x^3 - x^2 + x - 1'
+interval = '`[-4, 4]`; `[0, 1]`'
+notes = '`f(-4)*f(4) < 0` and `f(0)*f(1) < 0`: bisection on `[0, 1]` needs 3 fewer iterations than on `[-4, 4]` for the same accuracy.'
+
+[[rows]]
+key = '§2.1 Ex. 1, 2; Table 2.1; §2.2 Ill. (pp. 60, 62–63), Table 2.2; §2.4 Ill. (p. 84); §2.5 Ill. (p. 89), Table 2.11'
+f = 'x^3 + 4*x^2 - 10'
+interval = '[1, 2]'
+notes = "The chapter's running example: unique root `1.365230013` in `[1, 2]`. Bisection until the bound on the relative error is below `1E-4` gives `p13 = 1.365112305` (Ex. 1, Table 2.1); Theorem 2.1's bound gives 10 iterations for `1E-3` (Ex. 2). §2.2 rewrites it as 5 fixed-point problems, iterated from `p0 = 1.5` (Table 2.2): `g1 = x - x^3 - 4*x^2 + 10`, which diverges; `g2 = (10/x - 4*x)^(1/2)`, which becomes undefined; `g3 = (1/2)*(10 - x^3)^(1/2)`; `g4 = (10/(4 + x))^(1/2)`; and `g5 = x - (x^3 + 4*x^2 - 10)/(3*x^2 + 8*x)`, Newton's iteration. The second Illustration checks Theorem 2.4 for each on `[1, 2]`, and for `g3` on `[1, 1.5]`. Newton and the modified Newton method (2.13) from `p0 = 1.5` (§2.4); Steffensen's method on `g4` from `p0 = 1.5` (§2.5, Table 2.11)."
+
+[[rows]]
+key = '§2.2 Ex. 1; Fig. 2.2'
+f = 'x = x^2 - 2'
+notes = 'Fixed points -1 and 2, from `(p + 1)*(p - 2) = 0`.'
+
+[[rows]]
+key = '§2.2 Ex. 2; Fig. 2.4'
+f = 'x = (x^2 - 1)/3'
+interval = '`[-1, 1]`; `[3, 4]`'
+notes = "Unique fixed point `(3 - sqrt(13))/2` on `[-1, 1]`, where `g` meets the hypotheses of Theorem 2.3. Unique fixed point `(3 + sqrt(13))/2` on `[3, 4]` too, though `g(4) = 5` and `g'(4) = 8/3 > 1` break those hypotheses."
+
+[[rows]]
+key = '§2.2 Ex. 3; Fig. 2.5; 2.5-1(c)'
+f = 'x = 3^-x'
+interval = '[0, 1]'
+notes = "Unique fixed point on `[0, 1]`, which Theorem 2.3 cannot show, since `abs(g'(0)) = log(3) > 1`. 2.5-1(c) applies Aitken's method to the iteration from `p0 = 0.5`."
+
+[[rows]]
+key = '§2.3 Ex. 1–3; Fig. 2.8; Tables 2.3–2.6; 2.5-1(d)'
+f = 'cos(x) - x'
+interval = '`[0, pi/2]` (Fig. 2.8)'
+notes = "Root `0.7390851332`, the fixed point of `x = cos(x)`. Fixed-point iteration on `x = cos(x)` (Table 2.3) and Newton (Table 2.4), both from `p0 = pi/4`; secant (Ex. 2, Table 2.5) and false position (Ex. 3, Table 2.6), both from `p0 = 0.5, p1 = pi/4`. 2.5-1(d) applies Aitken's method to the iteration on `x = cos(x)` from `p0 = 0.5`."
+
+[[rows]]
+key = '§2.3 (p. 66); 2.2-14(b); 2.5-12(b)'
+f = 'x^3 - 2*x - 5'
+interval = '`[2, 3]` (2.2-14(b))'
+notes = "A margin note on p. 66 says that Newton introduced his method to find a root of `y^3 - 2*y - 5 = 0`. Fixed-point iteration to `1E-5` with a function `g` of the reader's choice (2.2-14); Steffensen's method on that `g` (2.5-12)."
+
+[[rows]]
+key = '§2.4 Ex. 1, 2; Fig. 2.11; Tables 2.8, 2.9'
+f = 'exp(x) - x - 1'
+interval = '`[-1, 1]` (Fig. 2.11)'
+notes = 'Root 0 of multiplicity 2. Newton from `p0 = 1` converges, but not quadratically (Ex. 1, Table 2.8, 16 iterations); the modified Newton method (2.13) from `p0 = 1` (Ex. 2, Table 2.9), whose last iterates improve little in 10-digit arithmetic.'
+
+[[rows]]
+key = '§2.6 Ex. 1'
+f = 'x^3 - 5*x^2 + 17*x - 13'
+notes = 'Zeros 1 and `2 ± 3i`, by division by `x - 1` and the quadratic formula.'
+
+[[rows]]
+key = '§2.6 Ex. 2, 3'
+f = '2*x^4 - 3*x^2 + 3*x - 4'
+notes = "Horner's method at `x0 = -2` (Ex. 2). Newton from `x0 = -2`, with Horner's method for `P` and `P'`, gives `x3 = -1.73897`; the zero to 5 decimal places is `-1.73896` (Ex. 3)."
+
+[[rows]]
+key = '§2.6 Ill. (p. 98); Fig. 2.13; Tables 2.12, 2.13'
+f = 'x^4 - 3*x^3 + x^2 + x + 1'
+notes = "Müller's method with `TOL = 1E-5`: from `p0 = 0.5, p1 = -0.5, p2 = 0` to the complex zeros `-0.339093 ± 0.446630i` (Table 2.12); from `0.5, 1.0, 1.5` to the real zero `1.38939`, and from `1.5, 2.0, 2.5` to `2.28879` (Table 2.13)."
+
+[[rows]]
+key = '2.1-1'
+f = 'sqrt(x) - cos(x)'
+interval = '[0, 1]'
+notes = 'Bisection to `p3`.'
+
+[[rows]]
+key = '2.1-2'
+f = '3*(x + 1)*(x - 1/2)*(x - 1)'
+interval = '`[-2, 1.5]`; `[-1.25, 2.5]`'
+notes = 'Roots -1, 1/2 and 1. Bisection to `p3` on each interval.'
+
+[[rows]]
+key = '2.1-3; 2.6-2(h)'
+f = 'x^3 - 7*x^2 + 14*x - 6'
+interval = '`[0, 1]`; `[1, 3.2]`; `[3.2, 4]`'
+notes = 'Bisection to `1E-2` on each interval (2.1-3); all zeros to `1E-5` by Newton with deflation (2.6-2).'
+
+[[rows]]
+key = '2.1-4; 2.6-2(g)'
+f = 'x^4 - 2*x^3 - 4*x^2 + 4*x + 4'
+interval = '`[-2, -1]`; `[0, 2]`; `[2, 3]`; `[-1, 0]`'
+notes = 'As 2.1-3.'
+
+[[rows]]
+key = '2.1-5(a); 2.5-8'
+f = 'x - 2^-x'
+interval = '[0, 1]'
+notes = "Bisection to `1E-5` (2.1-5); Steffensen's method to `1E-4`, compared with 2.2-10 (2.5-8). Its root is the fixed point of 2.2-10's `x = 2^-x`."
+
+[[rows]]
+key = '2.1-5(b)'
+f = 'exp(x) - x^2 + 3*x - 2'
+interval = '[0, 1]'
+notes = 'Bisection to `1E-5`.'
+
+[[rows]]
+key = '2.1-5(c)'
+f = '2*x*cos(2*x) - (x + 1)^2'
+interval = '`[-3, -2]`; `[-1, 0]`'
+notes = 'As 2.1-5(b).'
+
+[[rows]]
+key = '2.1-5(d)'
+f = 'x*cos(x) - 2*x^2 + 3*x - 1'
+interval = '`[0.2, 0.3]`; `[1.2, 1.3]`'
+notes = 'As 2.1-5(b).'
+
+[[rows]]
+key = '2.1-6(a); 2.3-11(a)'
+f = '3*x - exp(x)'
+interval = '[1, 2]'
+notes = 'Bisection to `1E-5` (2.1-6); Newton, secant and false position to `1E-5` (2.3-11).'
+
+[[rows]]
+key = '2.1-6(b); 2.3-11(b)'
+f = '2*x + 3*cos(x) - exp(x)'
+interval = '`[0, 1]` (2.1-6); `[1, 2]` (2.3-11)'
+notes = 'As 2.1-6(a).'
+
+[[rows]]
+key = '2.1-6(c); 2.3-12(a)'
+f = 'x^2 - 4*x + 4 - log(x)'
+interval = '`[1, 2]`; `[2, 4]`'
+notes = 'Bisection to `1E-5` (2.1-6); Newton, secant and false position to `1E-7` (2.3-12).'
+
+[[rows]]
+key = '2.1-6(d); 2.3-12(b)'
+f = 'x + 1 - 2*sin(pi*x)'
+interval = '`[0, 0.5]`; `[0.5, 1]`'
+notes = 'As 2.1-6(c).'
+
+[[rows]]
+key = '2.1-7'
+f = 'x = 2*sin(x)'
+notes = 'The first positive solution by bisection to `1E-5`, after a sketch of `y = x` and `y = 2*sin(x)`.'
+
+[[rows]]
+key = '2.1-8; 2.2-16'
+f = 'x = tan(x)'
+interval = '`[4, 5]` (2.2-16)'
+notes = 'The first positive solution by bisection to `1E-5` (2.1-8); the solution in `[4, 5]` by fixed-point iteration to `1E-4` (2.2-16).'
+
+[[rows]]
+key = '2.1-9'
+f = 'exp(x) - 2 = cos(exp(x) - 2)'
+interval = '[0.5, 1.5]'
+notes = 'Bisection to `1E-5`, after a sketch of both sides.'
+
+[[rows]]
+key = '2.1-10'
+f = 'x^2 - 1 = exp(1 - x^2)'
+interval = '[-2, 0]'
+notes = 'Bisection to `1E-3`, after a sketch of both sides.'
+
+[[rows]]
+key = '2.1-11'
+f = '(x + 2)*(x + 1)*x*(x - 1)^3*(x - 2)'
+interval = '`[-3, 2.5]`; `[-2.5, 3]`; `[-1.75, 1.5]`; `[-1.5, 1.75]`'
+notes = 'Zeros -2, -1, 0, 1 (triple) and 2; asks to which zero bisection converges on each interval.'
+
+[[rows]]
+key = '2.1-12'
+f = '(x + 2)*(x + 1)^2*x*(x - 1)^3*(x - 2)'
+interval = '`[-1.5, 2.5]`; `[-0.5, 2.4]`; `[-0.5, 3]`; `[-3, -0.5]`'
+notes = 'As 2.1-11, with -1 a double zero.'
+
+[[rows]]
+key = '2.1-13; 2.2-12; 2.5-10'
+f = 'x^3 - 25'
+notes = "Root `25^(1/3)`, to `1E-4`: by bisection, with the hint `f(x) = x^3 - 25` (2.1-13); by a fixed-point iteration of the reader's choice (2.2-12); by Steffensen's method from `p0 = 3` (2.5-10)."
+
+[[rows]]
+key = '2.1-14; 2.2-11; 2.5-9'
+f = 'x^2 - 3'
+notes = "Root `sqrt(3)`, to `1E-4`; as 2.1-13, with Steffensen's method from `p0 = 2` (2.5-9)."
+
+[[rows]]
+key = '2.1-15'
+f = 'V = L*(0.5*pi*r^2 - r^2*arcsin(h/r) - h*(r^2 - h^2)^(1/2))'
+parameters = '`L = 10` ft, `r = 1` ft, `V = 12.4` ft^3'
+notes = 'Unknown `h`, the distance from the water to the top of a trough of length `L` whose cross section is a semicircle of radius `r`; the exercise asks for the depth of the water, to 0.01 ft.'
+
+[[rows]]
+key = '2.1-16'
+f = 'x(t) = -(g/(2*omega^2))*((exp(omega*t) - exp(-omega*t))/2 - sin(omega*t))'
+parameters = '`x(t) = 1.7` ft at `t = 1` s, `g = 32.17` ft/s^2'
+notes = 'Unknown `omega < 0`, the constant rate at which the angle of an inclined plane changes; `x(t)` is the distance that a particle starting at rest moves along the plane in `t` seconds. To `1E-5`. The scan prints the exponents as `wt`.'
+
+[[rows]]
+key = '2.1-17; 2.2-8; 2.5-7; 2.6-1(c)'
+f = 'x^3 - x - 1'
+interval = '[1, 2]'
+notes = "Theorem 2.1's bound on the bisection iterations for `1E-4`, then the root (2.1-17); fixed-point iteration from `p0 = 1` to `1E-2` (2.2-8); Steffensen's method to `1E-4` (2.5-7); all real zeros by Newton to `1E-4` (2.6-1)."
+
+[[rows]]
+key = '2.1-18'
+f = 'x^3 + x - 4'
+interval = '[1, 4]'
+notes = 'As 2.1-17, to `1E-3`.'
+
+[[rows]]
+key = '2.1-20'
+f = '(x - 1)^10'
+notes = 'Root 1. With `p_n = 1 + 1/n`, `abs(f(p_n)) < 1E-3` for every `n > 1`, but `abs(1 - p_n) < 1E-3` needs `n > 1000`.'
+
+[[rows]]
+key = '2.1-21'
+f = 'sin(pi*x)'
+parameters = '`-1 < a < 0`, `2 < b < 3`'
+interval = '[a, b]'
+notes = 'Zeros at every integer. Bisection converges to 0 if `a + b < 2`, to 2 if `a + b > 2`, and to 1 if `a + b = 2`.'
+
+[[rows]]
+key = '2.2-1, 2.2-2; 2.6-1(d)'
+f = 'x^4 + 2*x^2 - x - 3'
+notes = '2.2-1 shows that each of 4 functions has a fixed point exactly where `f` has a root: `g1 = (3 + x - 2*x^2)^(1/4)`, `g2 = ((x + 3 - x^4)/2)^(1/2)`, `g3 = ((x + 3)/(x^2 + 2))^(1/2)` and `g4 = (3*x^4 + 2*x^2 + 3)/(4*x^3 + 4*x - 1)`. 2.2-2 iterates each 4 times from `p0 = 1`, where possible. All real zeros by Newton to `1E-4` (2.6-1).'
+
+[[rows]]
+key = '2.2-3'
+f = 'x^3 - 2*x + 1'
+notes = '4 fixed-point problems for its roots, each iterated from `p0 = 1/2` to `p4`: `x = (1/2)*(x^3 + 1)`, `x = 2/x - 1/x^2`, `x = sqrt(2 - 1/x)` and `x = -(1 - 2*x)^(1/3)`.'
+
+[[rows]]
+key = '2.2-4'
+f = 'x^4 + 3*x^2 - 2'
+notes = 'As 2.2-3, from `p0 = 1`: `x = sqrt((2 - x^4)/3)`, `x = (2 - 3*x^2)^(1/4)`, `x = (2 - x^4)/(3*x)` and `x = ((2 - 3*x^2)/x)^(1/3)`.'
+
+[[rows]]
+key = '2.2-5(a)'
+f = 'x = (20*x + 21/x^2)/21'
+notes = '2.2-5 ranks 4 iterations for `21^(1/3)`, each from `p0 = 1`, by their apparent speed of convergence.'
+
+[[rows]]
+key = '2.2-5(b)'
+f = 'x = x - (x^3 - 21)/(3*x^2)'
+notes = 'As 2.2-5(a).'
+
+[[rows]]
+key = '2.2-5(c)'
+f = 'x = x - (x^4 - 21*x)/(x^2 - 21)'
+notes = 'As 2.2-5(a).'
+
+[[rows]]
+key = '2.2-5(d)'
+f = 'x = (21/x)^(1/2)'
+notes = 'As 2.2-5(a).'
+
+[[rows]]
+key = '2.2-6(a)'
+f = 'x = x*(1 + (7 - x^5)/x^2)^3'
+notes = 'As 2.2-5(a), for `7^(1/5)`.'
+
+[[rows]]
+key = '2.2-6(b)'
+f = 'x = x - (x^5 - 7)/x^2'
+notes = 'As 2.2-6(a).'
+
+[[rows]]
+key = '2.2-6(c)'
+f = 'x = x - (x^5 - 7)/(5*x^4)'
+notes = 'As 2.2-6(a).'
+
+[[rows]]
+key = '2.2-6(d)'
+f = 'x = x - (x^5 - 7)/12'
+notes = 'As 2.2-6(a).'
+
+[[rows]]
+key = '2.2-7'
+f = 'x^4 - 3*x^2 - 3'
+interval = '[1, 2]'
+notes = 'Fixed-point iteration from `p0 = 1` to `1E-2`.'
+
+[[rows]]
+key = '2.2-9'
+f = 'x = pi + 0.5*sin(x/2)'
+interval = '[0, 2*pi]'
+notes = "Unique fixed point on the interval by Theorem 2.3. Fixed-point iteration to `1E-2`, and Corollary 2.5's bound on the number of iterations compared with the number needed."
+
+[[rows]]
+key = '2.2-10'
+f = 'x = 2^-x'
+interval = '[1/3, 1]'
+notes = 'As 2.2-9, to `1E-4`.'
+
+[[rows]]
+key = '2.2-13(a); 2.5-1(a); 2.5-11(a)'
+f = 'x = (2 - exp(x) + x^2)/3'
+notes = "Fixed-point iteration to `1E-5` on an interval of the reader's choice, with an estimate of the number of iterations (2.2-13); Aitken's method on the iteration from `p0 = 0.5` (2.5-1); Steffensen's method to `1E-5` (2.5-11)."
+
+[[rows]]
+key = '2.2-13(b)'
+f = 'x = 5/x^2 + 2'
+notes = 'Fixed-point iteration as in 2.2-13(a).'
+
+[[rows]]
+key = '2.2-13(c); 2.5-1(b); 2.5-11(c)'
+f = 'x = (exp(x)/3)^(1/2)'
+notes = 'As 2.2-13(a); 2.5-1 starts from `p0 = 0.75`.'
+
+[[rows]]
+key = '2.2-13(d); 2.5-11(d)'
+f = 'x = 5^-x'
+notes = "Fixed-point iteration as in 2.2-13(a); Steffensen's method (2.5-11)."
+
+[[rows]]
+key = '2.2-13(e)'
+f = 'x = 6^-x'
+notes = 'Fixed-point iteration as in 2.2-13(a).'
+
+[[rows]]
+key = '2.2-13(f); 2.5-11(b)'
+f = 'x = 0.5*(sin(x) + cos(x))'
+notes = 'As 2.2-13(d).'
+
+[[rows]]
+key = '2.2-14(a); 2.5-12(a)'
+f = '2 + sin(x) - x'
+interval = '[2, 3]'
+notes = "Fixed-point iteration to `1E-5` with a function `g` of the reader's choice (2.2-14); Steffensen's method on that `g` (2.5-12)."
+
+[[rows]]
+key = '2.2-14(c); 2.5-12(c)'
+f = '3*x^2 - exp(x)'
+notes = "As 2.2-14(a), on an interval of the reader's choice. 2.3-6(e) has its negative."
+
+[[rows]]
+key = '2.2-14(d); 2.3-5(c); 2.5-12(d)'
+f = 'x - cos(x)'
+interval = '`[0, pi/2]` (2.3-5)'
+notes = 'As 2.2-14(a); Newton to `1E-4` (2.3-5). The negative of the function of §2.3 Ex. 1.'
+
+[[rows]]
+key = '2.2-15'
+f = 'x^2 + 10*cos(x)'
+notes = "All zeros to `1E-4`, by fixed-point iteration with a function of the reader's choice."
+
+[[rows]]
+key = '2.2-17'
+f = '2*sin(pi*x) + x'
+interval = '[1, 2]'
+notes = 'Printed as `x = 2*sin(pi*x) + x = 0`. Fixed-point iteration from `p0 = 1` to `1E-2`.'
+
+[[rows]]
+key = '2.2-18'
+f = 's(t) = s0 - (m*g/k)*t + (m^2*g/k^2)*(1 - exp(-k*t/m))'
+parameters = '`s0 = 300` ft, `m = 0.25` lb, `k = 0.1` lb-s/ft, `g = 32.17` ft/s^2'
+notes = 'Unknown `t`, the time at which an object dropped from the height `s0`, slowed by air resistance, hits the ground: `s(t) = 0`, to 0.01 s.'
+
+[[rows]]
+key = '2.2-20'
+f = 'x = 2*x - A*x^2'
+parameters = 'A > 0'
+notes = 'A nonzero limit of the fixed-point iteration is `1/A`, so `1/A` can be found with multiplications and subtractions only; asks for an interval about `1/A` on which the iteration converges.'
+
+[[rows]]
+key = '2.2-22(b)'
+f = 'x = 1 - x^2'
+interval = '[0, 1]'
+notes = "A counterexample: Theorem 2.4 may fail when `abs(g'(x)) <= k` is replaced by `g'(x) <= k`."
+
+[[rows]]
+key = '2.2-23, 2.2-24'
+f = 'x = (1/2)*x + A/(2*x)'
+parameters = '`A > 0` (2.2-24); `A = 2` (2.2-23)'
+notes = 'The iteration converges to `sqrt(A)` for every `x0 > 0`; 2.2-24(b) asks what happens for `x0 < 0`. 2.2-23 prints it at `A = 2` as `x = (1/2)*x + 1/x`.'
+
+[[rows]]
+key = '2.3-1, 2.3-3'
+f = 'x^2 - 6'
+notes = 'Newton from `p0 = 1` to `p2` (2.3-1); secant and false position from `p0 = 3, p1 = 2` to `p3`, and which is closer to `sqrt(6)` (2.3-3).'
+
+[[rows]]
+key = '2.3-2, 2.3-4'
+f = '-x^3 - cos(x)'
+notes = 'Newton from `p0 = -1` to `p2`, and whether `p0 = 0` could be used (2.3-2); secant and false position from `p0 = -1, p1 = 0` to `p3` (2.3-4).'
+
+[[rows]]
+key = '2.3-5(a); 2.6-1(a)'
+f = 'x^3 - 2*x^2 - 5'
+interval = '[1, 4]'
+notes = 'Newton to `1E-4` (2.3-5); all real zeros by Newton to `1E-4` (2.6-1).'
+
+[[rows]]
+key = '2.3-5(b); 2.6-1(b)'
+f = 'x^3 + 3*x^2 - 1'
+interval = '[-3, -2]'
+notes = 'As 2.3-5(a). 2.4-2(b) prints, on the same interval, a function that with 1 misprint corrected is its square.'
+
+[[rows]]
+key = '2.3-5(d)'
+f = 'x - 0.8 - 0.2*sin(x)'
+interval = '[0, pi/2]'
+notes = 'Newton to `1E-4`.'
+
+[[rows]]
+key = '2.3-6(a)'
+f = 'exp(x) + 2^-x + 2*cos(x) - 6'
+interval = '[1, 2]'
+notes = 'Newton to `1E-5`.'
+
+[[rows]]
+key = '2.3-6(b)'
+f = 'log(x - 1) + cos(x - 1)'
+interval = '[1.3, 2]'
+notes = 'As 2.3-6(a).'
+
+[[rows]]
+key = '2.3-6(c)'
+f = '2*x*cos(2*x) - (x - 2)^2'
+interval = '`[2, 3]`; `[3, 4]`'
+notes = 'As 2.3-6(a).'
+
+[[rows]]
+key = '2.3-6(d)'
+f = '(x - 2)^2 - log(x)'
+interval = '`[1, 2]`; `[e, 4]`'
+notes = 'As 2.3-6(a).'
+
+[[rows]]
+key = '2.3-6(e)'
+f = 'exp(x) - 3*x^2'
+interval = '`[0, 1]`; `[3, 5]`'
+notes = 'As 2.3-6(a). 2.4-2(d) is its cube, and 2.2-14(c) its negative.'
+
+[[rows]]
+key = '2.3-6(f)'
+f = 'sin(x) - exp(-x)'
+interval = '`[0, 1]`; `[3, 4]`; `[6, 7]`'
+notes = 'As 2.3-6(a).'
+
+[[rows]]
+key = '2.3-13'
+f = '230*x^4 + 18*x^3 + 9*x^2 - 221*x - 9'
+interval = '`[-1, 0]`; `[0, 1]`'
+notes = "2 real zeros, 1 in each interval, to `1E-6`: false position and secant from the interval's endpoints, Newton from its midpoint."
+
+[[rows]]
+key = '2.3-14'
+f = 'tan(pi*x) - 6'
+interval = '[0, 0.48]'
+notes = 'Zero `(1/pi)*arctan(6) = 0.447431543`. 10 iterations each of bisection, false position and secant from `p0 = 0, p1 = 0.48`; asks which works best, and why.'
+
+[[rows]]
+key = '2.3-15'
+f = '4*x^2 - exp(x) - exp(-x)'
+notes = '2 positive solutions. Newton to `1E-5` from `p0 = -10, -5, -3, -1, 0, 1, 3, 5, 10`.'
+
+[[rows]]
+key = '2.3-16'
+f = 'x^2 - 10*cos(x)'
+notes = 'Solutions `±1.3793646`. Newton to `1E-5` from `p0 = -100, -50, -25, 25, 50, 100`.'
+
+[[rows]]
+key = '2.3-17'
+f = 'log(x^2 + 1) - exp(0.4*x)*cos(pi*x)'
+notes = "Infinitely many zeros. To `1E-6`: the only negative zero, the 4 smallest positive zeros, and the 25th smallest positive zero, from an initial approximation of the reader's choice."
+
+[[rows]]
+key = '2.3-18'
+f = '1/2 + (1/4)*x^2 - x*sin(x) - (1/2)*cos(2*x)'
+notes = "Printed as the equation `0 = 1/2 + (1/4)*x^2 - x*sin(x) - (1/2)*cos(2*x)`. Newton to `1E-5` from `p0 = pi/2`, and why the result seems unusual for Newton's method; also from `p0 = 5*pi` and `10*pi`. It equals `(x/2 - sin(x))^2`, so every root is double."
+
+[[rows]]
+key = '2.3-23'
+f = 'A = (P/i)*(1 - (1 + i)^-n)'
+name = 'ordinary annuity equation'
+parameters = '`A = 135000`, `P = 1000` per month, over 30 years'
+notes = 'Unknown `i`, the interest rate per period: the largest rate at which payments of $1000 per month pay off a 30-year mortgage of $135,000, so `n = 360`.'
+
+[[rows]]
+key = '2.3-24'
+f = 'A = (P/i)*((1 + i)^n - 1)'
+name = 'annuity due equation'
+parameters = '`A = 750000`, `P = 1500` per month, over 20 years'
+notes = 'Unknown `i`, the interest rate per period: the smallest rate, compounded monthly, at which deposits of $1500 per month reach $750,000 in 20 years, so `n = 240`.'
+
+[[rows]]
+key = '2.3-27'
+f = 'P = ((1 + p)/2)*(p/(1 - p + p^2))^21'
+parameters = 'P = 1/2'
+also_in = "[Keller, J], p. 267, which the book cites; Bradie's 2.5-19 cites it as Keller (1984), SIAM Review 26, 267–268"
+notes = '`P` is the probability that player A shuts out player B (21–0) in racquetball, and `p` the probability that A wins a rally. Asks for the smallest `p`, to `1E-3`, for which A shuts out B in at least half the matches.'
+
+[[rows]]
+key = '2.3-28'
+f = 'c(t) = A*t*exp(-t/3)'
+parameters = 'maximum safe concentration 1 mg/mL; second injection at 0.25 mg/mL, of 75% of `A`'
+notes = 'The concentration in mg/mL `t` hours after injecting `A` units of a drug. (a) The `A` whose maximum is 1 mg/mL, and the time of that maximum; (b) the time at which the concentration falls to 0.25 mg/mL, to the nearest minute; (c) with the second injection given then and concentrations that add, the time at which it falls to 0.25 mg/mL again.'
+
+[[rows]]
+key = '2.3-29'
+f = 'A*sin(alpha)*cos(alpha) + B*sin(alpha)^2 - C*cos(alpha) - E*sin(alpha)'
+parameters = '`A = l*sin(beta1)`, `B = l*cos(beta1)`, `C = (h + 0.5*D)*sin(beta1) - 0.5*D*tan(beta1)`, `E = (h + 0.5*D)*cos(beta1) - 0.5*D`; `l = 89` in, `h = 49` in, `beta1 = 11.5` degrees; `D = 55` in (a), `D = 30` in (b)'
+also_in = '[Bek], which the book cites'
+notes = 'Unknown `alpha`, the largest angle that an all-terrain vehicle can negotiate without nose-in failure. (a) checks that `alpha` is about 33 degrees; (b) asks for `alpha` at `D = 30` in.'
+
+[[rows]]
+key = '2.3-D3'
+f = '0.5*x^3 - 6*x^2 + 21.5*x - 22'
+notes = 'Zero at `x = 4`. Compares Newton from `p0 = 5` with secant from `p0 = 5, p1 = 4.5`.'
+
+[[rows]]
+key = '2.3-D4'
+f = 'x^(1/3)'
+notes = 'Root 0. Compares Newton from `x = 1` with secant from `p0 = 5, p1 = 0.5`.'
+
+[[rows]]
+key = '2.4-1(a)'
+f = 'x^2 - 2*x*exp(-x) + exp(-2*x)'
+interval = '[0, 1]'
+notes = 'Newton to `1E-5`. It equals `(x - exp(-x))^2`, so its root is double.'
+
+[[rows]]
+key = '2.4-1(b)'
+f = 'cos(x + sqrt(2)) + x*(x/2 + sqrt(2))'
+interval = '[-2, -1]'
+notes = 'As 2.4-1(a). With `u = x + sqrt(2)` it equals `cos(u) + u^2/2 - 1`: root `-sqrt(2)` of multiplicity 4.'
+
+[[rows]]
+key = '2.4-1(c)'
+f = 'x^3 - 3*x^2*(2^-x) + 3*x*(4^-x) - 8^-x'
+interval = '[0, 1]'
+notes = "As 2.4-1(a). It equals `(x - 2^-x)^3`, the cube of 2.1-5(a)'s function."
+
+[[rows]]
+key = '2.4-1(d); 2.5-2'
+f = 'exp(6*x) + 3*(log(2))^2*exp(2*x) - log(8)*exp(4*x) - (log(2))^3'
+interval = '[-1, 0]'
+notes = "As 2.4-1(a). It equals `(exp(2*x) - log(2))^3`. 2.5-2 runs Newton from `p0 = 0` until `abs(p_{n+1} - p_n) < 0.0002`, then Aitken's method."
+
+[[rows]]
+key = '2.4-2(a)'
+f = '1 - 4*x*cos(x) + 2*x^2 + cos(2*x)'
+interval = '[0, 1]'
+notes = 'Newton to `1E-5`. It equals `2*(x - cos(x))^2`.'
+
+[[rows]]
+key = '2.4-2(b)'
+f = 'x^2 + 6*x^5 + 9*x^4 - 2*x^3 - 6*x^2 + 1'
+interval = '[-3, -2]'
+notes = "As 2.4-2(a). As printed, with 2 terms in `x^2`; with `x^6` for the first, it equals `(x^3 + 3*x^2 - 1)^2`, the square of 2.3-5(b)'s function."
+
+[[rows]]
+key = '2.4-2(c)'
+f = 'sin(3*x) + 3*exp(-2*x)*sin(x) - 3*exp(-x)*sin(2*x) - exp(-3*x)'
+interval = '[3, 4]'
+notes = 'As 2.4-2(a). With `sin(x)^3` for `sin(3*x)` and `sin(x)^2` for `sin(2*x)`, it would equal `(sin(x) - exp(-x))^3`, as the other parts of 2.4-1 and 2.4-2 equal powers of simpler functions.'
+
+[[rows]]
+key = '2.4-2(d)'
+f = 'exp(3*x) - 27*x^6 + 27*x^4*exp(x) - 9*x^2*exp(2*x)'
+interval = '[3, 5]'
+notes = "As 2.4-2(a). It equals `(exp(x) - 3*x^2)^3`, the cube of 2.3-6(e)'s function."
+
+[[rows]]
+key = '2.4-5'
+f = 'exp(6*x) + 1.441*exp(2*x) - 2.079*exp(4*x) - 0.3330'
+interval = '[-1, 0]'
+notes = '2.4-1(d) with its coefficients rounded to 4 digits, as the book says. Newton and the modified Newton method (2.13) to `1E-5`, compared with 2.4-1(d) and 2.4-2(d).'
+
+[[rows]]
+key = '2.4-D2'
+f = 'x^2*(x - 1)'
+notes = 'Double root 0 and simple root 1; asks when Newton converges linearly and when quadratically.'
+
+[[rows]]
+key = '2.5-3'
+f = 'x = cos(x - 1)'
+notes = "Steffensen's method from `p0 = 2`, to `p0^(1)`."
+
+[[rows]]
+key = '2.5-4'
+f = 'x = 1 + (sin(x))^2'
+notes = "Steffensen's method from `p0 = 1`, to `p0^(1)` and `p0^(2)`."
+
+[[rows]]
+key = '2.6-1(e)'
+f = 'x^3 + 4.001*x^2 + 4.002*x + 1.101'
+notes = 'All real zeros by Newton to `1E-4`.'
+
+[[rows]]
+key = '2.6-1(f)'
+f = 'x^5 - x^4 + 2*x^3 - 3*x^2 + x - 4'
+notes = 'As 2.6-1(e).'
+
+[[rows]]
+key = '2.6-2(a)'
+f = 'x^4 + 5*x^3 - 9*x^2 - 85*x - 136'
+notes = 'All zeros to `1E-5`: the real ones by Newton, the complex ones by deflation.'
+
+[[rows]]
+key = '2.6-2(b)'
+f = 'x^4 - 2*x^3 - 12*x^2 + 16*x - 40'
+notes = 'As 2.6-2(a).'
+
+[[rows]]
+key = '2.6-2(c)'
+f = 'x^4 + x^3 + 3*x^2 + 2*x + 2'
+notes = 'As 2.6-2(a).'
+
+[[rows]]
+key = '2.6-2(d)'
+f = 'x^5 + 11*x^4 - 21*x^3 - 10*x^2 - 21*x - 5'
+notes = 'As 2.6-2(a).'
+
+[[rows]]
+key = '2.6-2(e)'
+f = '16*x^4 + 88*x^3 + 159*x^2 + 76*x - 240'
+notes = 'As 2.6-2(a).'
+
+[[rows]]
+key = '2.6-2(f)'
+f = 'x^4 - 4*x^2 - 3*x + 5'
+notes = 'As 2.6-2(a).'
+
+[[rows]]
+key = '2.6-5(a)'
+f = 'x^3 - 9*x^2 + 12'
+notes = 'Its zeros and critical points by Newton to `1E-3`, to sketch its graph.'
+
+[[rows]]
+key = '2.6-5(b)'
+f = 'x^4 - 2*x^3 - 5*x^2 + 12*x - 5'
+notes = 'As 2.6-5(a).'
+
+[[rows]]
+key = '2.6-6'
+f = '10*x^3 - 8.3*x^2 + 2.295*x - 0.21141'
+notes = 'Root 0.29. Newton from `x0 = 0.28`, and an explanation of what happens.'
+
+[[rows]]
+key = '2.6-7'
+f = '600*x^4 - 550*x^3 + 200*x^2 - 20*x - 1'
+interval = '[0.1, 1]'
+notes = "A solution in the interval to `1E-4` by bisection, Newton, secant, false position and Müller's method."
+
+[[rows]]
+key = '2.6-10'
+f = 'x^3 + 2*x^2 + 10*x = 20'
+notes = 'The equation that Leonardo of Pisa (Fibonacci) solved in 1224: it has no rational root and only 1 real root, which he gave in base 60 as `1 + 22/60 + 7/60^2 + 42/60^3 + 33/60^4 + 4/60^5 + 40/60^6`; asks how accurate that is.'

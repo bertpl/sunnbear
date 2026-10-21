@@ -1,0 +1,188 @@
+title = 'Moler (2004): Numerical Computing with MATLAB, chapter 4 and Sections 1.1 and 1.7'
+reference = "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); The MathWorks, Natick, MA (electronic edition). ISBN 978-0-898716-60-3. The author's web edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
+year = 2004
+subcategory = '1.4'
+where_in_source = '''
+chapter 4, "Zeros and Roots" (25 pages): Sections 4.1–4.10 and Exercises 4.1–4.22; and 2 examples of chapter 1:
+- the golden-ratio equation of Section 1.1, "The Golden Ratio" (pp. 3–5, Figure 1.2), the chapter's only zero-finding example;
+- the last example of Section 1.7, "Floating-Point Arithmetic" (pp. 43–44, Figure 1.9), for which Burkardt's TEST_ZERO (`burkardt_test_zero`) cites the book.
+
+Exercise 4.1 runs `fzerogui` (§4.8) on 7 functions, each on its own interval, and asks what interesting or unusual behavior each one shows; the rows of those functions do not repeat the question.
+
+The rows leave out:
+- the rest of chapter 1;
+- §4.6 and §4.9, which describe algorithms without a function;
+- the minimization problems of §4.10 and of Exercises 4.18 (`9*x^2 - 6*x + 2`) and 4.22 (`sin(tan(x)) - tan(sin(x))` on `[0, pi]`);
+- the equation `rho^2 - 3*rho + 1 = 0` of §4.10, which the text solves in closed form;
+- the exercises about an algorithm without a function (4.4–4.6, 4.17, 4.20, 4.21);
+- Exercises 4.11–4.12, about the size of `Gamma(n + 1)` and the accuracy of 2 approximations of `log(Gamma(x + 1))`, which print no equation to solve.
+'''
+transcribed_from = '''
+the web edition's PDFs of chapter 4, dated September 21, 2013 in its footer, and of chapter 1, dated September 18, 2013: the author's revision, not the printed SIAM edition.
+
+Chapter 4's expressions were read from the page images and checked against the PDF's text layer; the §1.1 and §1.7 rows were read from chapter 1's text layer only.
+'''
+rows_summary = '23, 1 per distinct function: a function that several sections or exercises use is 1 row whose key lists them all. 10 rows come from the text (2 of them from chapter 1), and the exercises reuse 3 of them; 13 rows come from the exercises alone.'
+notes = '''
+How to read the rows:
+- **Keys:** `§1.n` and `§4.n` are the text of Section 1.n and of Section 4.n, and `Ex. 4.n` is Exercise 4.n, with its part letter.
+- **Equations:** an equation that the book prints as `lhs = rhs` stays in that form; `f(x) = 0` is written as `f(x)`.
+- **`J0` and `Y0`** are the Bessel functions of order 0 of the first and second kind; MATLAB's `besselj(0, x)` is `J0(x)`.
+
+Other sources with the same function:
+- `x^3 - 2*x - 5` is in many sources; Chandrupatla (1997) (`1997_chandrupatla`) cites Forsythe, Malcolm and Moler (1977) for it.
+- `x^3 - 0.001` is Ganchovski et al.'s f92 (`2026_ganchovski_et_al`), on `[-10, 10]` where Ex. 4.1 has `[-1, 1]`.
+- `J0(x)` is in Press et al. (2007) (`2007_press_numerical_recipes`), Section 9.4; `1/(x - pi)` is their (9.1.1) `1/(x - c)` with `c = pi`.
+- `x = tan(x)` is Atkinson's P3 (`1989_atkinson`), `x - tan(x)`. `sin(x)` is in GSL's tests (`gsl_roots_tests`) and Roots.jl (`roots_jl`), on other intervals.
+- `x^2 - M` is the `x^2 - a` of Atkinson's (2.5.3) and of Epperson's §3.7 row (`2013_epperson`).
+- Ex. 4.16's model of a freezing water main is Epperson's 3.3-6, with other constants and units.
+- Ganchovski et al.'s f35, `sqrt(abs(x - 2/3))*if(x <= 2/3; 1; -1) - 0.1`, is this chapter's `sign(x - a)*sqrt(abs(x - a))` at `a = 2/3`, negated and shifted by -0.1.
+'''
+
+[[relations]]
+sources = ['burkardt_test_zero']
+text = '''
+Burkardt's TEST_ZERO (`burkardt_test_zero`) shares these functions with the book:
+- **`p18` is the §1.7 row times `10^14`.** TEST_ZERO cites this book for `p18`, `10^14*(x - 1)^7` expanded term by term on `[0.988, 1.012]`; Moler's polynomial lacks the factor `10^14`, and Moler plots it without solving for a root.
+- **`p17`**, `x^3 - 2*x - 5` on `[2, 3]`, is Ex. 4.2's function, and Ex. 4.2 tells the history of Wallis that `p17`'s comment gives without a reference.
+- **`p14`** (The Camel) equals `humps(x) + 2*x + 0.8`, with MATLAB's demo function `humps` of §4.7 and §4.10.
+- **`p16`** is Kepler's equation in degrees with other constants than Ex. 4.15.
+'''
+
+[[rows]]
+key = '§1.1'
+f = '1/x - (x - 1)'
+name = 'golden ratio'
+interval = '`[0, 4]` (Figure 1.2)'
+notes = 'The aspect ratio equation `1/x = x - 1` of the golden rectangle, whose positive root is the golden ratio `(1 + sqrt(5))/2`. §1.1 solves it 3 ways: as the polynomial `x^2 - x - 1` with `roots`; symbolically with `solve(1/x == x-1)`; and as `f = @(x) 1./x-(x-1)` with `fzero(f,1)`, from the starting point `x = 1`. `ezplot(f,0,4)` plots `f` on `[0, 4]` (Figure 1.2), where it becomes infinite as `x` tends to 0.'
+
+[[rows]]
+key = '§1.7'
+f = 'x^7 - 7*x^6 + 21*x^5 - 35*x^4 + 35*x^3 - 21*x^2 + 7*x - 1'
+interval = '[0.988, 1.012]'
+notes = 'The expanded form of `(x - 1)^7`, which the book says was made with the Symbolic Toolbox. §1.7 plots it at `x = 0.988:.0001:1.012` (Figure 1.9, "Is this a polynomial?") to show roundoff error: the plot is not smooth, with values of order `10^-14`, because of subtractive cancellation; evaluated as `(x-1).^7`, the plot is smooth. No root is sought.'
+
+[[rows]]
+key = '§4.1, §4.2, §4.4, §4.5'
+f = 'x^2 - M'
+parameters = 'M = 2'
+interval = '[1, 2]'
+notes = "§4.2 prints `f(x) = x^2 - M` for computing `sqrt(M)`; §4.1's bisection code tests `x^2 > M`, and §4.5 writes `x^2 - 2`. Bisection on `[1, 2]` takes 52 steps (§4.1); Newton from `x = 1` takes 6 iterations (§4.2); secant from `a = 1, b = 2` takes 7 (§4.4). Inverse quadratic interpolation from `a = -2, b = 0, c = 2` is undefined at its first step, because `f(a) = f(c)`, and from `a = -2.001, b = 0, c = 1.999` its next iterate is near `x = 500` (§4.5)."
+
+[[rows]]
+key = '§4.3, §4.4; Ex. 4.1, 4.8'
+f = 'sign(x - a)*sqrt(abs(x - a))'
+name = 'perverse function'
+parameters = '`a` free; `a = 2` in Figure 4.1 and Ex. 4.1'
+interval = '`[0, 4]` (Figure 4.1); `[1, 4]` (Ex. 4.1)'
+notes = "§4.3 derives it as the function on which Newton's method cycles forever around its zero `x = a`, since `f'(x)` is unbounded as `x` tends to `a`; Figure 4.1 plots it with `ezplot` on `[0, 4]`. §4.4 and Ex. 4.8 ask how the secant method behaves on it."
+
+[[rows]]
+key = '§4.7, §4.8; Ex. 4.7, 4.10(a)'
+f = 'J0(x)'
+name = 'Bessel function `J0`'
+interval = '`[(n - 1)*pi, n*pi]`, `n = 1, ..., 10` (§4.7); `[0, pi]` (§4.7, Ex. 4.7); `[0, 3.83]` (§4.8)'
+notes = "§4.7 finds its first 10 zeros with `fzerotx`, 1 per interval, and plots it on `[0, 10*pi]` (Figure 4.2); it also calls `fzerotx(@bessj0,[0,pi])`. §4.8 steps `fzerogui` toward its first zero on `[0, 3.83]`, 3.83 being near its first local minimum (Figures 4.3–4.6). Ex. 4.7 calls `fzerotx(@besselj,[0 pi],0)`, which by `fzerotx`'s rule for extra arguments evaluates `besselj(x, 0)`, the Bessel function of order `x` at 0, and returns 3.1416; the exercise asks why. Ex. 4.10(a) asks for its first 10 zeros."
+
+[[rows]]
+key = '§4.7'
+f = 'cos(x)'
+notes = '§4.7 names the handle `@cos` as an example of syntax, with no interval or result. Ex. 4.19 uses it to test the minimizer `fmintx`.'
+
+[[rows]]
+key = '§4.7, §4.10'
+f = '1/((x - 0.3)^2 + 0.01) + 1/((x - 0.9)^2 + 0.04) - 6'
+name = 'humps'
+notes = "MATLAB's demo function `humps`, which §4.10 says illustrates graphics, quadrature and zero-finding routines; §4.7 names the handle `@humps` as an example of syntax. The chapter uses it only for minimization: `fmintx` minimizes `-humps(x)` on `[-1, 2]` (§4.10, Figure 4.8; Ex. 4.17)."
+
+[[rows]]
+key = '§4.7'
+f = 'cos(pi*t)'
+notes = 'An example of anonymous-function syntax, `F = @(t) cos(pi*t)`, with no interval or result.'
+
+[[rows]]
+key = '§4.7; Ex. 4.1, 4.2'
+f = 'x^3 - 2*x - 5'
+interval = '`[0, 3]` (Ex. 4.1); `[2, 3]` (Ex. 4.2)'
+notes = "§4.7 writes it as the anonymous function `G = @(z) z^3-2*z-5`, an example of syntax. Ex. 4.2: Wallis used it when he first presented Newton's method to the French Academy; it has 1 real root, between 2 and 3, and a pair of complex conjugate roots. Ex. 4.2 asks for the 3 roots symbolically and with `roots`, for the real root with `fzerotx`, and for a complex root by Newton's method from a complex starting value."
+
+[[rows]]
+key = '§4.7'
+f = 'J0(x) - y'
+parameters = 'y = 0.5'
+interval = '[0, 2]'
+notes = '§4.7 states the equation `J0(xi) = 0.5` and passes `F = @(x,y) besselj(0,x)-y`, or `B = @(x,n,y) besselj(n,x)-y` with `n = 0`, to `fzerotx` with `y = 0.5`. Result `xi = 1.5211`, marked in Figure 4.2.'
+
+[[rows]]
+key = 'Ex. 4.1'
+f = 'sin(x)'
+interval = '[1, 4]'
+
+[[rows]]
+key = 'Ex. 4.1'
+f = 'x^3 - 0.001'
+interval = '[-1, 1]'
+
+[[rows]]
+key = 'Ex. 4.1'
+f = 'log(x + 2/3)'
+interval = '[0, 1]'
+
+[[rows]]
+key = 'Ex. 4.1'
+f = 'atan(x) - pi/3'
+interval = '[0, 5]'
+
+[[rows]]
+key = 'Ex. 4.1'
+f = '1/(x - pi)'
+interval = '[0, 5]'
+notes = 'No root: the sign change on `[0, 5]` comes from the pole at `x = pi`.'
+
+[[rows]]
+key = 'Ex. 4.3'
+f = '816*x^3 - 3835*x^2 + 6000*x - 3125'
+interval = '[1, 2]'
+notes = 'The book calls `p(x)` a cubic with 3 closely spaced real roots. Ex. 4.3 asks for its exact roots; plots it for `1.43 <= x <= 1.71`; runs Newton from `x0 = 1.5`, the secant method from `x0 = 1, x1 = 2`, and bisection on `[1, 2]`; and asks what `fzerotx(p,[1,2])` returns, and why.'
+
+[[rows]]
+key = 'Ex. 4.9'
+f = 'x = tan(x)'
+notes = 'The first 10 positive solutions.'
+
+[[rows]]
+key = 'Ex. 4.10(b)'
+f = 'Y0(x)'
+name = 'Bessel function `Y0`'
+notes = 'The first 10 zeros; Ex. 4.10(d) plots it with `J0` for `0 <= x <= 10*pi`.'
+
+[[rows]]
+key = 'Ex. 4.10(c)'
+f = 'J0(x) = Y0(x)'
+interval = '[0, 10*pi]'
+notes = 'All solutions between 0 and `10*pi`.'
+
+[[rows]]
+key = 'Ex. 4.13'
+f = 'log(Gamma(y)) = x'
+parameters = '`x` given'
+notes = "Unknown `y`. The exercise asks for a function `gammalninv` that returns the `y` for which `gammaln(y)`, MATLAB's `log(Gamma(y))`, equals `x`; it plots this inverse for `y` from 2 to 10, and asks for the appropriate ranges of `x` and `y`."
+
+[[rows]]
+key = 'Ex. 4.14'
+f = 'd(v) = 60'
+parameters = '`d` interpolates the table `v = 0, 10, 20, 30, 40, 50, 60` m/s, `d = 0, 5, 20, 46, 70, 102, 153` m'
+notes = 'Unknown `v`, the speed limit at which a vehicle stops within 60 m. The exercise asks for 3 ways: piecewise linear interpolation, piecewise cubic interpolation with `pchiptx`, and reverse piecewise cubic interpolation with `pchiptx` (§4.9), which needs no zero finder.'
+
+[[rows]]
+key = 'Ex. 4.15'
+f = 'M = E - e*sin(E)'
+name = "Kepler's equation"
+parameters = '`M = 24.851090`, `e = 0.1`'
+notes = "Unknown `E`, the eccentric anomaly; `e` is the orbit's eccentricity, not Euler's number. (a) solves `E - e*sin(E) - M = 0` with `fzerotx`; no interval is given. (b) compares the result with the series `E = M + 2*sum(Jm(m*e)*sin(m*M)/m, m = 1, 2, ...)`."
+
+[[rows]]
+key = 'Ex. 4.16'
+f = '(T(x, t) - Ts)/(Ti - Ts) = erf(x/(2*sqrt(alpha*t)))'
+parameters = '`alpha = 0.138*10^-6` m^2/s; `Ti = 20` °C; `Ts = -15` °C; `T(x, t) = 0` °C; `t` = 60 days'
+notes = "Unknown `x`, the depth in meters at which a water main does not freeze within 60 days of a cold snap; `t` is in seconds. `Ts` is the surface temperature during the cold period, `Ti` the soil's initial temperature, and `alpha` the soil's thermal conductivity."

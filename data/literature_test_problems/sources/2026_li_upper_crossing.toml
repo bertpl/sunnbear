@@ -1,0 +1,195 @@
+title = 'Li, Zhou, Lange, Tian (2026): upper-crossing/solution (US) algorithm'
+reference = "Li, X.-J., Zhou, H., Lange, K., Tian, G.-L. (2026). The upper–crossing/solution (US) algorithm with strongly stable convergence and an acceleration technique for root–finding problems. Statistics and Computing. https://doi.org/10.1007/s11222-026-10902-z. Preprint: https://arxiv.org/abs/2212.00797. The authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
+year = 2026
+subcategory = '1.2'
+where_in_source = '''
+- Main text: Examples 1 to 4 (Sections 1 to 4.1), the applications of Sections 4.1.2 to 4.3, and the numerical experiments of Section 7 (Tables 1 to 4, Figs. 1 to 3).
+- Appendices D and E: R code with a cubic as example.
+- Supplementary material (pp. 58–69 of the preprint): 12 more statistical applications, numbered 1.1.1 to 1.3.3.
+- Only Example 1 and Sections 7.1 to 7.4 (with Appendix D) report numerical results. For the other equations, the article derives the US iteration with symbolic parameters or data and no values.
+'''
+transcribed_from = "the arXiv v2 preprint (8 Nov 2025), which includes the acceleration technique, the appendices and the supplementary material. The journal version and the authors' R code were not read."
+rows_summary = '23: 11 from the main text and appendices, 12 from the supplementary material.'
+notes = '''
+- The statistical rows depend on a sample `x_1, ..., x_n`; `xbar` is its mean and `G(x) = (1/n)*sum_i log(x_i)`. No data set is published, and Section 7.4 draws random samples.
+- The article writes conditional arguments as `Phi(x|mu, sigma^2)`; the rows write `;` for `|`.
+- Keys are the example number, the section or the appendix. Where a section of Section 7 runs an earlier equation, the section's number follows in parentheses, as in `Ex. 3 (7.2)`. The keys of the supplementary sections carry an `S` prefix.
+'''
+
+[[rows]]
+key = 'Ex. 1'
+f = 'cos(0.5*pi*x) - x'
+name = 'equation with a trigonometric function'
+interval = '`x` in R; starting values `x(0) = -1, 2`'
+notes = 'Stated root `0.594612`. Table 1, Fig. 1.'
+
+[[rows]]
+key = 'Ex. 2a'
+f = 'theta^3 - 2*theta + 1'
+name = 'cubic equation'
+interval = 'theta >= 0'
+notes = 'No numerical results.'
+
+[[rows]]
+key = 'Ex. 2b'
+f = '-theta^3 + 2*theta + 2'
+name = 'cubic equation'
+interval = 'theta >= 0'
+notes = 'No numerical results.'
+
+[[rows]]
+key = 'Ex. 3 (7.2)'
+f = 'p - Phi(x; mu, sigma^2)'
+name = 'quantile of the normal distribution'
+parameters = 'Fig. 2: `p = 0.05`, `mu = 1`, `sigma = 1`. Table 3: `p = 0.01, 0.9` and `mu = -2, 2`, with `sigma = 1`.'
+interval = '`x` in R; starting values drawn from `U(-4, 4)`'
+notes = '`Phi` is the normal cdf. Fig. 2 states the root `-0.6448536`.'
+
+[[rows]]
+key = 'Ex. 4'
+f = 'p - F(x; mu, sigma^2, alpha)'
+name = 'quantile of the skew normal distribution'
+parameters = '`mu` in R, `sigma^2 > 0`, `alpha >= 0`; no values'
+interval = '`x` in R'
+notes = '`F` is the cdf of the pdf `2/(sigma*sqrt(2*pi))*exp(-(x - mu)^2/(2*sigma^2))*Phi(alpha*(x - mu)/sigma)` (eq. (4.5)), with `Phi` the cdf of `N(0, 1)`. No numerical results.'
+
+[[rows]]
+key = '4.1.2'
+f = 'p - F(x; alpha, beta)'
+name = 'quantile of the beta distribution'
+parameters = '`alpha`, `beta` in `(0, 1)`, `p` in `(0, 1)`; no values'
+interval = '(0, 1)'
+notes = '`F` is the cdf of `Beta(alpha, beta)`. No numerical results.'
+
+[[rows]]
+key = '4.2 (7.4)'
+f = 'n/theta + sum_{i=1..n} (-sum_{m=0..x_i - 1} 1/(m + theta + 1))'
+name = 'MLE of `theta` in the Yule–Simon distribution'
+parameters = 'Section 7.4: samples of size `n = 400` with true `theta = 0.5, 1, 5, 10`'
+interval = '`theta > 0`; starting values drawn from `U(1, 5)`'
+notes = 'Eq. (7.9) writes the same function as `u1(theta) + u2(theta)`. Table 4.'
+
+[[rows]]
+key = '4.3'
+f = '-n*xbar + sum_{i=1..n} (x_i - 1)*x_i/(lambda + theta*x_i)'
+name = 'MLE of `theta` in the generalized Poisson distribution'
+parameters = '`lambda > 0`, `max(-1, -lambda/r) < theta < 0`, with `r >= 4` the largest integer with `lambda + theta*r > 0`; no values'
+interval = 'theta < 0'
+notes = 'Eq. (4.10). Given `theta`, `lambda = (1 - theta)*xbar`. No numerical results.'
+
+[[rows]]
+key = '7.1'
+f = 'a3*theta^m + a2*theta^2 + a1*theta + a0'
+name = 'high-order polynomial equation'
+parameters = '`{a0, a1, a2, a3, m} = {1, -1, 1, -1, 3}` and `{1, -1, -3, 1, 3}`; `a = 2`'
+interval = '`(0, a)`; starting values drawn from `U(0, 2)`'
+notes = 'Eq. (7.1), with `m >= 3` real and `a0 > 0`. The article states the roots `0.4608111` and `1` "for the two cases"; with the printed coefficients, the first case has root `1` and the second `0.4608111`. Table 2.'
+
+[[rows]]
+key = 'App. D'
+f = 'x^3 - 3*x^2 + x + 1'
+interval = '`(0, 2)`; starting value `x0 = 0`'
+notes = 'Example of the R code for eq. (7.1) (`a3 = 1`, `a2 = -3`, `a1 = 1`, `a0 = 1`, `m = 3`); output root `1`. Appendix E solves the same cubic in closed form: roots `2.4142136`, `-0.4142136`, `1`.'
+
+[[rows]]
+key = '7.3'
+f = '-0.5*x - 2*sin(x) + 1'
+name = 'equation with multiple roots'
+interval = '`x` in R; starting value `x(0) = 0`'
+notes = 'Eq. (7.6). Stated roots `0.4090497`, `3.535612`, `5.308993`. Fig. 3.'
+
+[[rows]]
+key = 'S1.1.1-I'
+f = 'm0*log(x_u) - x_u - c0'
+name = 'chi-squared null distribution, upper point'
+parameters = '`m0 = nu - 2`, `c0 = m0*log(chi_obs) - chi_obs`, with `chi_obs < m0`; no values'
+interval = 'x_u > m0'
+notes = 'Exact p-value of a variance test with `chi2(nu)` null distribution. No numerical results.'
+
+[[rows]]
+key = 'S1.1.1-II'
+f = 'x_l - m0*log(x_l) + c0'
+name = 'chi-squared null distribution, lower point'
+parameters = 'as in S1.1.1-I, with `chi_obs > m0`'
+interval = '(0, m0)'
+notes = 'No numerical results.'
+
+[[rows]]
+key = 'S1.1.2-I'
+f = 'm1*log(x_u) - nu12*log(1 + nu*x_u) - c0'
+name = 'F null distribution, upper point'
+parameters = '`m1 = nu1 - 2`, `nu = nu1/nu2`, `nu12 = nu1 + nu2`, `m0 = m1*nu2/(nu1*(nu2 + 2))`, `c0 = m1*log(F_obs) - nu12*log(1 + nu*F_obs)`, with `F_obs < m0`; no values'
+interval = 'x_u > m0'
+notes = 'No numerical results.'
+
+[[rows]]
+key = 'S1.1.2-II'
+f = 'c0 - m1*log(x_l) + nu12*log(1 + nu*x_l)'
+name = 'F null distribution, lower point'
+parameters = 'as in S1.1.2-I, with `F_obs > m0`'
+interval = '(0, m0)'
+notes = 'No numerical results.'
+
+[[rows]]
+key = 'S1.2.1a'
+f = 'c0 - psi(alpha)'
+name = 'MLE of `alpha` in the gamma distribution, given `beta`'
+parameters = '`c0 = G(x) + log(beta)`; no values'
+interval = 'alpha > 0'
+notes = '`psi` is the digamma function. No numerical results.'
+
+[[rows]]
+key = 'S1.2.1b'
+f = 'log(alpha) + G(x) - log(xbar) - psi(alpha)'
+name = 'profile MLE of `alpha` in the gamma distribution'
+parameters = 'sample only; no values'
+interval = 'alpha > 0'
+notes = 'No numerical results.'
+
+[[rows]]
+key = 'S1.2.2'
+f = 'G(x) + 1/theta - sum_i x_i^theta*log(x_i) / sum_i x_i^theta'
+name = 'MLE of `theta` in the Weibull distribution'
+parameters = 'sample only; no values'
+interval = 'theta > 0'
+notes = 'No numerical results.'
+
+[[rows]]
+key = 'S1.2.3'
+f = 'n/2*(psi((nu + 1)/2) - psi(nu/2) - 1/nu) - 1/2*sum_i log(1 + z_i/nu) + (nu + 1)/(2*nu^2)*sum_i tau_i(nu)'
+name = "MLE of `nu` in Student's t-distribution"
+parameters = '`z_i = (x_i - mu)^2/sigma^2`, `tau_i(nu) = z_i*(1 + z_i/nu)^(-1)`, with `mu` and `sigma^2` fixed; no values'
+interval = 'nu > 0'
+notes = 'No numerical results.'
+
+[[rows]]
+key = 'S1.2.4'
+f = '-n/((alpha + 1)*log(alpha + 1)) - sum_i x_i^alpha*log(x_i)/(1 - x_i^alpha)'
+name = 'MLE of `alpha` in the unit power–logarithmic distribution'
+parameters = 'sample in `(0, 1)`; no values'
+interval = 'alpha > 0'
+notes = 'No numerical results.'
+
+[[rows]]
+key = 'S1.3.1'
+f = "-G(x) - Z'(theta)/Z(theta)"
+name = 'MLE of `theta` in the zeta distribution'
+parameters = 'sample of positive integers; no values'
+interval = 'theta > 1'
+notes = "`Z` is Riemann's zeta function. No numerical results."
+
+[[rows]]
+key = 'S1.3.2'
+f = 'sum_{i=1..n} I(x_i >= 1)*sum_{m=0..x_i - 1} 1/(m + alpha) + n*log(alpha) - n*log(alpha + xbar)'
+name = 'MLE of `alpha` in the gamma–Poisson distribution'
+parameters = 'sample of non-negative integers; no values'
+interval = 'alpha > 0'
+notes = '`I` is the indicator function. No numerical results.'
+
+[[rows]]
+key = 'S1.3.3'
+f = 'n*xbar*(log(beta - 1) + log(xbar) - log(xbar*beta - 1)) + sum_{k=2..K} sum_{j=2..k} f_k/(beta - j/k)'
+name = 'MLE of `beta` in the Geeta distribution'
+parameters = 'observations `1, ..., K` with frequencies `f_1, ..., f_K`, `n = sum_k f_k`; no values'
+interval = 'beta > 1'
+notes = 'No numerical results.'

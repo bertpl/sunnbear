@@ -1,0 +1,177 @@
+title = 'Oliveira, Takahashi (2021): the ITP method'
+reference = 'Oliveira, I. F. D., Takahashi, R. H. C. (2021). An enhancement of the bisection method average performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), Article 5. https://doi.org/10.1145/3423597. The article itself is dated December 2020.'
+year = 2020
+subcategory = '1.1'
+where_in_source = '''
+- Table 1 (Section 3.1, p. 5:11) lists 24 functions by name, without numbers, in 2 groups of 12: "Well-behaved Functions" and "Ill-behaved Functions". The ill-behaved group has 3 subheadings: "Non-simple Zero" (keys 2.1–2.4), "Discontinuous" (2.5–2.8) and "Multiple Roots" (2.9–2.12).
+- Section 3 solves every function on `[-1, 1]` with `epsilon = 10^-10`.
+- Appendix C (p. 5:20) tests the order of convergence on 1 more function, equation (23).
+'''
+transcribed_from = '''
+the article.
+- The authors' code, which is unpublished, served only to resolve ambiguities; the code defines the 24 functions in Table 1's order.
+- sunnbear's transcription, `tests/solvers/paper_problems/oliveira_takahashi.py`, follows the code.
+- The rows follow the article; the rows' notes say where the code or sunnbear differs, and where the row follows the code because the article's typesetting is ambiguous (key 1.9).
+'''
+rows_summary = "25: Table 1's 24 functions and function (23) of Appendix C. sunnbear's transcription holds the 24 functions of Table 1 only."
+notes = '''
+- Keys `1.k` and `2.k` give the group and the position within it in Table 1. Key `(23)` is the article's equation number.
+- `(x > c)` is 1 where the condition holds and 0 elsewhere, as the article uses it in 2.5 and 2.10; `Phi` and `phi` are the cumulative distribution function and the density function of the standard normal distribution.
+'''
+
+[[rows]]
+key = '1.1'
+f = 'x*exp(x) - 1'
+name = 'Lambert'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '1.2'
+f = 'tan(x - 1/10)'
+name = 'Trigonometric 1'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '1.3'
+f = 'sin(x) + 1/2'
+name = 'Trigonometric 2'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '1.4'
+f = '4*x^5 + x^2 + 1'
+name = 'Polynomial 1'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '1.5'
+f = 'x + x^10 - 1'
+name = 'Polynomial 2'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '1.6'
+f = 'pi^x - e'
+name = 'Exponential'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '1.7'
+f = 'log(abs(x - 10/9))'
+name = 'Logarithmic'
+interval = '[-1, 1]'
+notes = 'The code and sunnbear use the negation, `-log(abs(x - 10/9))`.'
+
+[[rows]]
+key = '1.8'
+f = '1/3 + sign(x)*abs(x)^(1/3) + x^3'
+name = 'Posynomial'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '1.9'
+f = '1/10^3 + sum(sin(pi*i^3*x/2)/(pi*i^3), i = 1..10)'
+name = 'Weierstrass'
+interval = '[-1, 1]'
+notes = 'The article prints the divisor as `/pi i^3`, without parentheses; the row follows the code and sunnbear, which divide by `pi*i^3`.'
+
+[[rows]]
+key = '1.10'
+f = '(x + 2/3)/(x + 101/100)'
+name = 'Poly.Frac.'
+interval = '[-1, 1]'
+notes = 'The code calls it "Polynomial Fraction".'
+
+[[rows]]
+key = '1.11'
+f = 'Phi(x - 1) - sqrt(2)/4'
+name = 'Normal CDF'
+interval = '[-1, 1]'
+notes = 'sunnbear writes `Phi` with `erf`.'
+
+[[rows]]
+key = '1.12'
+f = 'phi(x - 1) - sqrt(2)/4'
+name = 'Normal PDF'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '2.1'
+f = '(x*10^6 - 1)^3'
+name = 'Polynomial 3'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '2.2'
+f = 'exp(x)*(x*10^6 - 1)^3'
+name = 'Exp.Poly.'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '2.3'
+f = '(x - 1/3)^2*atan(x - 1/3)'
+name = 'Tan.Poly.'
+interval = '[-1, 1]'
+notes = 'The article writes `atan` as `tan^-1`.'
+
+[[rows]]
+key = '2.4'
+f = 'sign(3*x + 1)*(1 - sqrt(1 - (3*x + 1)^2/9^2))'
+name = 'Circles'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '2.5'
+f = '(x > (1 - 10^6)/10^6)*((1 + 10^6)/10^6) - 1'
+name = 'Step Function'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '2.6'
+f_description = '`1/(21*x - 1)`, with `(x != 1/21)` printed beside it'
+name = 'Geometric'
+interval = '[-1, 1]'
+notes = 'The code and sunnbear return 0 at `x = 1/21`.'
+
+[[rows]]
+key = '2.7'
+f = '(x/2)^2 + ceil(x/2) - 1/2'
+name = 'Trunc.Poly.'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '2.8'
+f = 'ceil(10*x - 1) + 1/2'
+name = 'Staircase'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '2.9'
+f = 'x + sin(x*10^6)/10 + 1/10^3'
+name = 'Noisy Line'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '2.10'
+f = '(x > -1)*(1 + sin(1/(x + 1))) - 1'
+name = 'Warsaw'
+interval = '[-1, 1]'
+notes = 'The code and sunnbear write the same function as `sin(1/(x + 1))` for `x > -1` and `-1` elsewhere.'
+
+[[rows]]
+key = '2.11'
+f = '202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 1/10'
+name = 'Sawtooth'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '2.12'
+f = '(202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 1/10)^3'
+name = 'Sawtooth Cube'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '(23)'
+f = '(x - (100 + 10*pi))*(x - 10*pi)'
+interval = '[-100, 100]'
+notes = "Appendix C, not in Table 1. The root is `x* = 10*pi`; the article solves it with `epsilon = 10^-50` at 1,000-bit precision. Not in sunnbear's transcription."

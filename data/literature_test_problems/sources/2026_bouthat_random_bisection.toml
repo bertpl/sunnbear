@@ -1,0 +1,16 @@
+title = 'Bouthat, Luneau, Petitclerc (2026): random bisection method'
+reference = 'Bouthat, L., Luneau, P.-A., Petitclerc, P. (2026). Convergence Analysis of the Random Bisection Method. arXiv preprint 2603.20483v2. http://arxiv.org/abs/2603.20483v2.'
+year = 2026
+subcategory = '1.2'
+where_in_source = '''
+Section 5, "Numerical Experiments" (Sections 5.1 to 5.3, Tables 1 to 5). Every experiment runs the article's Algorithm 1 (bisection with a random cut point) on the same linear function and varies how its root `r` is chosen.
+'''
+transcribed_from = 'the article.'
+rows_summary = '1: the linear function of every experiment of Section 5.'
+
+[[rows]]
+key = 'Section 5'
+f = 'x - r'
+parameters = 'Section 5.1: `r` drawn from `U(0, 1)` (Tables 1, 2), or fixed at `r = 0.1, 0.3, 0.45` (Table 3). Section 5.2: `r` drawn from `U(0, 1)`, `Beta(2, 2)`, `Beta(0.5, 2)`, `Bates(20)`, `Beta(3, 5)`, `Beta(1, 20)`, `Beta(0.1, 2)` and a density `p(x) = (1 - alpha)/2^alpha*abs(x - 1/2)^(-alpha)` with `alpha = 0.9`. Section 5.3: `r` drawn from `Beta(5, 50)`.'
+interval = 'not stated for Section 5'
+notes = "All root distributions lie on `(0, 1)`, and the experiments normalize the root to `[0, 1]`; the article's rescaled Algorithm 2 starts from `[0, 1]`. The distributions in Tables 1 to 3 other than `U(0, 1)` are those of the cut point, not of the root."

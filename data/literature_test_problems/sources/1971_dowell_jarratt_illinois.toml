@@ -1,0 +1,63 @@
+title = 'Dowell, Jarratt (1971): the Illinois method'
+reference = 'Dowell, M., Jarratt, P. (1971). A modified regula falsi method for computing the root of an equation. BIT 11(2), 168–174. https://doi.org/10.1007/BF01934364.'
+year = 1971
+subcategory = '1.1'
+where_in_source = '''
+Section 3, "Numerical Illustrations" (pp. 170–173).
+- Table 1 follows the Illinois iterates on 1 equation.
+- Tables 2 to 7 each give 1 function family in the caption, with a parameter `n`, and the iteration counts of 4 methods for 4 values of `n`. The article says that the roots of all 6 families lie in `[0, 1]`.
+'''
+transcribed_from = "the article, a scan with a text layer, checked against the page images. sunnbear's `tests/solvers/bracketing/illinois/test_paper.py` uses Table 1's function and starting values as the article gives them; no sunnbear file transcribes Tables 2 to 7."
+rows_summary = "7, 1 per table: Table 1's equation and the 6 function families of Tables 2 to 7, with 24 parameter values in all."
+notes = '''
+- The keys are the table numbers.
+- The article gives starting values `x0` and `x1`, not intervals; the `interval` column holds the interval between them.
+'''
+
+[[rows]]
+key = 'Table 1'
+f = 'sin(x) - 0.5'
+interval = '[0, 1.5]'
+notes = 'Root `pi/6`. Starting values `x0 = 0.0`, `x1 = 1.5`.'
+
+[[rows]]
+key = 'Table 2'
+f = '2*x*exp(-n) + 1 - 2*exp(-n*x)'
+parameters = 'n = 1, 5, 15, 20'
+interval = '[0, 1]'
+notes = 'The caption says the function has no turning points or inflection points on `[0, 1]`.'
+
+[[rows]]
+key = 'Table 3'
+f = '(1 + (1 - n)^2)*x - (1 - n*x)^2'
+parameters = 'n = 2, 5, 15, 20'
+interval = '[0, 1]'
+notes = 'The caption says the function has 1 turning point on `[0, 1]`.'
+
+[[rows]]
+key = 'Table 4'
+f = 'x^2 - (1 - x)^n'
+parameters = 'n = 2, 5, 15, 20'
+interval = '[0, 1]'
+notes = 'The caption says the function has 1 inflection point on `[0, 1]`.'
+
+[[rows]]
+key = 'Table 5'
+f = '(1 + (1 - n)^4)*x - (1 - n*x)^4'
+parameters = 'n = 2, 5, 15, 20'
+interval = '[0, 1]'
+notes = 'The caption says the function has 1 turning point and 1 inflection point on `[0, 1]`.'
+
+[[rows]]
+key = 'Table 6'
+f = 'exp(-n*x)*(x - 1) + x^n'
+parameters = 'n = 1, 5, 10, 15'
+interval = '[0, 1]'
+notes = 'The caption says the curves lie closer to the x-axis as `n` grows.'
+
+[[rows]]
+key = 'Table 7'
+f = '(n*x - 1)/((n - 1)*x)'
+parameters = 'n = 2, 5, 15, 20'
+interval = '[0.01, 1]'
+notes = 'The caption says the y-axis is an asymptote. Starting values `x0 = 0.01`, `x1 = 1.0`.'

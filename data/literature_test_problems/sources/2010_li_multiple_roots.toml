@@ -1,0 +1,101 @@
+title = 'Li, Mu, Ma, Hou (2010): fifth-order method for multiple roots'
+reference = 'Li, X., Mu, C., Ma, J., Hou, L. (2011). Fifth-order iterative method for finding multiple roots of nonlinear equations. Numerical Algorithms 57(3), 389–398. Published online 30 October 2010. https://doi.org/10.1007/s11075-010-9434-5.'
+year = 2010
+subcategory = '1.2'
+where_in_source = '''
+- Section 2, "Numerical results", lists 15 test functions `f01` to `f015` (page 7 of the PDF, which has no journal page numbers), each with its root `x*` and the root's multiplicity `m`.
+- Table 1 (page 6 of the PDF) gives the iterations of 6 methods per function from 1 starting point `x0`; the 2 methods that need 2 starting values use `x1 = x0 - 0.1`.
+- The article cites no source for its functions.
+'''
+transcribed_from = "the article's text layer, checked against the page images."
+rows_summary = '15, 1 per test function of Section 2.'
+notes = '''
+- **Keys:** the article's labels, printed as `f01` to `f09` and `f010` to `f015`.
+- **Starting points:** the article gives starting points, not intervals, so no row has an `interval`; each row's `notes` gives the stated root, its multiplicity and the starting point `x0`.
+'''
+
+[[relations]]
+sources = ['roots_jl']
+text = '''
+This is the article at the URL of the `## multiplicity` comment that stands above `func13`–`func18` in Roots.jl.
+- `func14`, `func15`, `func17` and `func18` are `f02`, `f03`, `f05` and `f06`, with the same expressions; their `alpha` values in the code equal the article's `x*`.
+- `func13` is `f01` with `+ 2` in the denominator where `f01` has `+ 1`; both have the root `sqrt(5)`, and `func13`'s `alpha` equals `f01`'s `x*`.
+- `func16`, `1e6*(x - 1)^7` written out, is not in the article.
+- The starting points differ: Roots.jl spreads 10 over a range per problem, and none of them is the article's `x0`.
+- `f04` and `f07`–`f015` are not in Roots.jl's set.
+'''
+
+[[rows]]
+key = 'f01'
+f = '(x - sqrt(5))^4/((x - 1)^2 + 1)'
+notes = 'Stated: root `2.236067977499790` of multiplicity 4. `x0 = 4.30`.'
+
+[[rows]]
+key = 'f02'
+f = '(sin(x)^2 - 2*x + 1)^5'
+notes = 'Stated: root `0.71483582544138924` of multiplicity 5. `x0 = 4.50`.'
+
+[[rows]]
+key = 'f03'
+f = '(8*x*exp(-x^2) - 2*x - 3)^8'
+notes = 'Stated: root `-1.7903531791589544` of multiplicity 8. `x0 = 5.00`.'
+
+[[rows]]
+key = 'f04'
+f = '(2*x*cos(x) + x^2 - 3)^10/(x^2 + 1)'
+notes = 'Stated: root `2.9806452794385368` of multiplicity 10. `x0 = 4.90`.'
+
+[[rows]]
+key = 'f05'
+f = '(exp(-x^2 + x + 3) - x + 2)^9'
+notes = 'Stated: root `2.4905398276083051` of multiplicity 9. `x0 = 6.50`.'
+
+[[rows]]
+key = 'f06'
+f = '(exp(-x) + 2*sin(x))^4'
+notes = 'Stated: root `3.1627488709263654` of multiplicity 4. `x0 = 3.80`.'
+
+[[rows]]
+key = 'f07'
+f = '(log(x^2 + 3*x + 5) - 2*x + 7)^8'
+notes = 'Printed with `ln`. Stated: root `5.4690123359101421` of multiplicity 8. `x0 = 8.30`.'
+
+[[rows]]
+key = 'f08'
+f = '(sqrt(x^2 + 2*x + 5) - 2*sin(x) - x^2 + 3)^5'
+notes = 'Stated: root `2.3319676558839640` of multiplicity 5. `x0 = 5.50`.'
+
+[[rows]]
+key = 'f09'
+f = '(x - 2)^4/((x - 1)^2 + 1)'
+notes = 'Stated: root `2.0000000000000000` of multiplicity 4. `x0 = 3.50`.'
+
+[[rows]]
+key = 'f010'
+f = '(x - 2.5)^(15/4)*exp(x)'
+notes = 'Stated: root `2.500000000000000` of multiplicity `15/4`. `x0 = 3.10`.'
+
+[[rows]]
+key = 'f011'
+f = '(sqrt(x) - 1/x - 1)^7'
+notes = 'Stated: root `2.147899035704787` of multiplicity 7. `x0 = 4.50`.'
+
+[[rows]]
+key = 'f012'
+f = '(log(x) + sqrt(x) - 5)^3'
+notes = 'Printed with `ln`. Stated: root `8.309432694231572` of multiplicity 3. `x0 = 12.0`.'
+
+[[rows]]
+key = 'f013'
+f = '(sin(x)*cos(x) - x^3 + 1)^9'
+notes = 'Stated: root `1.117078770687451` of multiplicity 9. `x0 = 2.20`.'
+
+[[rows]]
+key = 'f014'
+f = '((x - 3)*exp(x))^5'
+notes = 'Stated: root `3.0000000000000000` of multiplicity 5. `x0 = 7.00`.'
+
+[[rows]]
+key = 'f015'
+f = '(log(x) + sqrt(x^4 + 1) - 2)^7'
+notes = 'Printed with `ln`. Stated: root `1.222813963628973` of multiplicity 7. `x0 = 6.00`.'

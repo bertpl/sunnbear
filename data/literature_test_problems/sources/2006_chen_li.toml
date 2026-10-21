@@ -1,0 +1,63 @@
+title = 'Chen, Li (2006): exponential regula falsi methods'
+reference = '''
+Chen, J., Li, W. (2007). An improved exponential regula falsi methods with quadratic convergence of both diameter and point for solving nonlinear equations. Applied Numerical Mathematics 57(1), 80–88. Published online 14 February 2006. https://doi.org/10.1016/j.apnum.2006.01.001. The article prints the volume and the year 2007 but no issue number; the issue number is Crossref's. The year 2006 of the title follows the online date that the article prints; the issue is dated 2007.
+'''
+year = 2006
+subcategory = '1.2'
+where_in_source = '''
+- Section 4, "Numerical experiments" (p. 87), lists Examples 1–4, each with an interval `[a, b]`. Every method starts from `x0 = b`, with error `10^-15` and at most 100 iterations.
+- Table 1 gives the iterations `n`, the result `x_n` and `|f(x_n)|` of the article's Algorithm 2 (EXRF), of regula falsi (its Algorithm 1), and of Steffensen's and Newton's methods.
+'''
+transcribed_from = "the article, the publisher's PDF with a text layer, checked against the page images."
+rows_summary = '4, 1 per example.'
+notes = '''
+- **Keys:** the example numbers.
+- **`also_in`:** empty in every row, because the article does not say where its examples come from.
+- **Wu, Shen & Xia (2003):** the article generalizes the method of that article, which is the article's own formula (10), but does not say that its examples come from there, and does not run that method. That article has no source file in this folder.
+'''
+
+[[relations]]
+sources = ['1992_alefeld_potra', '1993_alefeld_potra_shi', '1995_alefeld_potra_shi', '2011_galdino']
+text = '''
+Example 3, `11*x^11 - 1` on `[0.1, 1]`, is problem 3 of Alefeld & Potra (1992) and `g3` of Galdino (2011), on the same interval. Example 3 is not in the tables of Alefeld, Potra & Shi (1993, 1995). Examples 1, 2 and 4 are in none of the 4 articles.
+
+The article cites the 1992 and 1993 articles only for the convergence of the diameters of other methods.
+'''
+
+[[relations]]
+sources = ['2005_parida_gupta']
+text = 'Example 3 is Example 3 of Parida & Gupta (2005), on the same interval; the 2 articles share no other function.'
+
+[[relations]]
+sources = ['2012_suhadolnik']
+text = '''
+Suhadolnik (2012) does not cite this article, but Suhadolnik's examples 1, 3 and 4 are Examples 1, 2 and 3 here.
+- Suhadolnik's example 1 has the same expression and interval as Example 1.
+- Suhadolnik's example 3, `exp(sin(x)) - x - 1` on `[1, 4]`, is Example 2 with the opposite sign, on the same interval.
+- Suhadolnik's example 4 is Example 3 on `[.5, 1]`.
+- Ganchovski et al.'s f51 and f53 and roots-fortran's cases 134 and 136 are Suhadolnik's examples 1 and 3.
+'''
+
+[[rows]]
+key = '1'
+f = 'log(x)'
+interval = '[0.5, 5]'
+notes = 'The article prints `ln`. `x0 = 5`.'
+
+[[rows]]
+key = '2'
+f = 'x - exp(sin(x)) + 1'
+interval = '[1, 4]'
+notes = '`x0 = 4`. Root 1.69681.'
+
+[[rows]]
+key = '3'
+f = '11*x^11 - 1'
+interval = '[0.1, 1]'
+notes = '`x0 = 1`.'
+
+[[rows]]
+key = '4'
+f = 'x*exp(-x) - 0.1'
+interval = '[0, 1]'
+notes = '`x0 = 1`. Root 0.111833.'

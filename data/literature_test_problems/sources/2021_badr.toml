@@ -1,0 +1,134 @@
+title = 'Badr, Almotairi, El Ghamry (2021): blended trisection and false position'
+reference = 'Badr, E., Almotairi, S., El Ghamry, A. (2021). A comparative study among new hybrid root finding algorithms and traditional methods. Mathematics 9(11), 1306. https://doi.org/10.3390/math9111306.'
+year = 2021
+subcategory = '1.2'
+where_in_source = '''
+- Table 1, "Fifteen benchmark problems" (Section 4, p. 9), lists 15 functions `P1` to `P15`, each with an interval and a reference. Tables 3–9 give the results of each method on all 15; Table 2 gives the results of all methods on `P4` only.
+- The article's own method is Algorithm 7, `blendTF` (trisection and false position).
+'''
+transcribed_from = 'the article, with Table 1 checked against its page image.'
+rows_summary = "15: Table 1's 15 functions."
+notes = '''
+- **Keys:** the article's labels.
+- **`also_in`:** Table 1's column "References" names 1 source per function, which `also_in` gives as printed, with the article's reference number. The reference list resolves these numbers as:
+  - [6] Ehiwario & Aghamie (2014), IOSR Journal of Engineering;
+  - [9] Srivastava & Srivastava (2011), Journal of Chemical, Biological and Physical Sciences;
+  - [10] Moazzam, Chakraborty & Bhuiyan (2012), International Journal of Computer Science Issues;
+  - [11] Nayak & Dash (2012), conference AIRES-2012;
+  - [17] Chapra & Canale, Numerical Methods for Engineers, 7th ed. (2015);
+  - [18] Harder, Numerical Analysis for Engineering, web pages of the University of Waterloo;
+  - [19] Calhoun, a web page of Boise State University; Table 1 spells the name "Callhoun";
+  - [20] Mathews & Fink, Numerical Methods Using Matlab, 4th ed. (2004);
+  - [21] Esfandiari, Numerical Methods for Engineers and Scientists Using MATLAB (2013);
+  - [22] Numerical Methods for Engineers and Scientists, 2nd ed. (2001), whose author the reference list gives as "Joe, D.H." and Table 1 as "Hoffman" (Joe D. Hoffman).
+'''
+
+[[relations]]
+sources = ['roots_fortran']
+text = '''
+This is the article that the comment "P1 in BlendTF paper" of roots-fortran means. Cases 103–117 are `P1`–`P15` in order, all 15 of them, though the comment names only `P1`. The expressions are the same; only the interval of `P3` (case 105) differs: the article gives `[3, 4]`, roots-fortran `[3, 7]`.
+'''
+
+[[relations]]
+sources = ['2019_sabharwal']
+text = '''
+This article compares its method with that of Sabharwal (2019), but does not say that its problems come from there.
+- `P1`–`P9` are Sabharwal's Table 2 rows 1–5 and 7–10, in order, with the same expressions and the same cited sources.
+- This article leaves out Sabharwal's 2 rows cited to Sivanandam, neither of which changes sign on its interval, and adds `P10`–`P15`.
+- Only the interval of `P7` differs: Sabharwal gives `[-1, 1]`, which holds no root of `x*exp(x) - 7`; this article gives `[0, 2]`.
+'''
+
+[[relations]]
+sources = ['2026_ellithy']
+text = 'The test set of Ellithy (2026) holds 11 of the 15 problems (`P3`–`P5`, `P7`–`P12`, `P14` and `P15`), 10 on the same interval; `P7` is on `[1, 2]` there.'
+
+[[rows]]
+key = 'P1'
+f = 'x^2 - 3'
+interval = '[1, 2]'
+also_in = 'Harder [18]'
+
+[[rows]]
+key = 'P2'
+f = 'x^2 - 5'
+interval = '[2, 7]'
+also_in = 'Srivastava [9]'
+
+[[rows]]
+key = 'P3'
+f = 'x^2 - 10'
+interval = '[3, 4]'
+also_in = 'Harder [18]'
+
+[[rows]]
+key = 'P4'
+f = 'x^2 - x - 2'
+interval = '[1, 4]'
+also_in = 'Moazzam [10]'
+notes = 'Table 2 compares all methods on this function. Section 1 cites [12], Mansouri et al. (2015), for the same function.'
+
+[[rows]]
+key = 'P5'
+f = 'x^2 + 2*x - 7'
+interval = '[1, 3]'
+also_in = 'Nayak [11]'
+
+[[rows]]
+key = 'P6'
+f = 'x^3 - 2'
+interval = '[0, 2]'
+also_in = 'Harder [18]'
+
+[[rows]]
+key = 'P7'
+f = 'x*exp(x) - 7'
+interval = '[0, 2]'
+also_in = 'Callhoun [19]'
+
+[[rows]]
+key = 'P8'
+f = 'x - cos(x)'
+interval = '[0, 1]'
+also_in = 'Ehiwario [6]'
+
+[[rows]]
+key = 'P9'
+f = 'x*sin(x) - 1'
+interval = '[0, 2]'
+also_in = 'Mathews [20]'
+
+[[rows]]
+key = 'P10'
+f = 'x*cos(x) + 1'
+interval = '[-2, 4]'
+also_in = 'Esfandiari [21]'
+
+[[rows]]
+key = 'P11'
+f = 'x^10 - 1'
+interval = '[0, 1.3]'
+also_in = 'Chapra [17]'
+
+[[rows]]
+key = 'P12'
+f = 'x^2 + exp(x/2) - 5'
+interval = '[1, 2]'
+also_in = 'Esfandiari [21]'
+
+[[rows]]
+key = 'P13'
+f = 'sin(x)*sinh(x) + 1'
+interval = '[3, 4]'
+also_in = 'Esfandiari [21]'
+
+[[rows]]
+key = 'P14'
+f = 'exp(x) - 3*x - 2'
+interval = '[2, 3]'
+also_in = 'Hoffman [22]'
+
+[[rows]]
+key = 'P15'
+f = 'sin(x) - x^2'
+interval = '[0.5, 1]'
+also_in = 'Chapra [17]'

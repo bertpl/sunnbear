@@ -1,0 +1,280 @@
+title = 'SciPy (2026): the `_tstutils` test problems of release 1.18.1'
+reference = '''
+SciPy 1.18.1, module `scipy/optimize/_tstutils.py`, https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py. The module cites 2 sources:
+- [1] Alefeld, G. E., Potra, F. A. and Shi, Y., "Algorithm 748: Enclosing Zeros of Continuous Functions", ACM Trans. Math. Softw. (1995), https://dl.acm.org/doi/10.1145/210089.210111
+- [2] Chandrupatla, T. R., "A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear function without using derivatives", Advances in Engineering Software 28.3 (1997): 145-149 (no DOI in the module)
+'''
+year = 2026
+subcategory = '1.3'
+where_in_source = '''
+4 collections of test cases, each returned by `get_tests(collection)`:
+- `original` (`_ORIGINAL_TESTS`): 6 functions `f1`–`f6`, 6 test cases.
+- `aps` (`_APS_TESTS`): 15 functions `aps01_f`–`aps15_f`, 154 test cases; the module says that they appear in [1].
+- `complex` (`_COMPLEX_TESTS`): 2 complex-valued functions `cplx01_f`, `cplx02_f`, 6 test cases, with starting values and no bracket.
+- `chandrupatla` (`_CHANDRUPATLA_TESTS`): 9 functions `fun1`–`fun9`, 45 test cases; the module says that they appear in [2].
+
+The module docstring names only the first 3 collections. A list `functions = [f2, f3, f4, f5, f6]`, kept for backwards compatibility, adds no functions.
+'''
+transcribed_from = 'the code of the module in SciPy 1.18.1: function bodies and test-case lists. Where a docstring and the code differ, the rows follow the code (`aps14_f`, `aps15_f`).'
+rows_summary = "32, 1 per function (6 + 15 + 2 + 9), covering the module's 211 test cases (6 + 154 + 6 + 45)."
+notes = '''
+How to read the rows:
+- **`name`** holds the function's docstring, since the module gives no other names; `fun1`–`fun9` have none.
+- **Each test case also gives a root**, which the rows leave out. The `original` and `aps` cases add a start `x0` for Newton and Halley, which the rows also leave out; the `chandrupatla` cases add the number of function evaluations that Chandrupatla's algorithm needed.
+- **Smoothness:** the `original`, `aps` and `complex` cases give an order of differentiability; it is `np.inf` unless `notes` states it.
+- **Derivatives:** "derivatives given" in `notes` means that the module defines `<name>_fp` and `<name>_fpp` (1st and 2nd derivative); only Newton-type methods (Newton, Halley) use them.
+- **Test IDs** in `notes` follow the order of the parameter values or intervals in the row.
+'''
+
+[[rows]]
+key = 'f1'
+f = 'x*(x - 1.)'
+name = 'f1 is a quadratic with roots at 0 and 1'
+interval = '[0.5, sqrt(3)]'
+notes = 'ID original.01.00; derivatives given'
+
+[[rows]]
+key = 'f2'
+f = 'x^2 - 1'
+name = 'f2 is a symmetric parabola, x^2 - 1'
+interval = '[0.5, sqrt(3)]'
+notes = 'ID original.02.00; derivatives given'
+
+[[rows]]
+key = 'f3'
+f = 'x*(x - 1.)*(x - 2.)*(x - 3.)'
+name = 'A quartic with roots at 0, 1, 2 and 3'
+interval = '[0.5, sqrt(3)]'
+notes = 'ID original.03.00; derivatives given'
+
+[[rows]]
+key = 'f4'
+f_description = '`1.0 + .1*x` (x > 1); `-1.0 + .1*x` (x < 1); `0` (x = 1)'
+name = 'Piecewise linear, left- and right- discontinuous at x=1, the root.'
+interval = '[0.5, sqrt(3)]'
+notes = 'ID original.04.00; smoothness -1; no derivatives'
+
+[[rows]]
+key = 'f5'
+f_description = '`1.0/(1. - x)` (x != 1); `0` (x = 1)'
+name = 'Hyperbola with a pole at x=1, but pole replaced with 0. Not continuous at root.'
+interval = '[0.5, sqrt(3)]'
+notes = 'ID original.05.00; smoothness -1; no derivatives'
+
+[[rows]]
+key = 'f6'
+f_description = '`random()` (x > 1); `-random()` (x < 1); `0` (x = 1)'
+name = '(no docstring; the module docstring says: f6 is randomly positive on one side of the root, randomly negative on the other)'
+interval = '[0.5, sqrt(3)]'
+notes = "ID original.05.00, the same ID as `f5`; smoothness -inf; `random()` is Python's uniform draw from [0, 1); the value per x is cached, so a repeat call at the same x returns the same value; no derivatives"
+
+[[rows]]
+key = 'aps01_f'
+f = 'sin(x) - x/2'
+name = 'Straightforward sum of trigonometric function and polynomial'
+interval = '[pi/2, pi]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'ID aps.01.00; derivatives given'
+
+[[rows]]
+key = 'aps02_f'
+f_description = '`-2*sum((2*ii - 5)^2/(x - ii^2)^3)`, summed over ii = 1, ..., 20'
+name = 'poles at x=n^2, 1st and 2nd derivatives at root are also close to 0'
+interval = '[1 + 1e-9, 4 - 1e-9], [4 + 1e-9, 9 - 1e-9], [9 + 1e-9, 16 - 1e-9], [16 + 1e-9, 25 - 1e-9], [25 + 1e-9, 36 - 1e-9], [36 + 1e-9, 49 - 1e-9], [49 + 1e-9, 64 - 1e-9], [64 + 1e-9, 81 - 1e-9], [81 + 1e-9, 100 - 1e-9], [100 + 1e-9, 121 - 1e-9]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'IDs aps.02.00–aps.02.09; derivatives given'
+
+[[rows]]
+key = 'aps03_f'
+f = 'a*x*exp(b*x)'
+name = 'Rapidly changing at the root'
+parameters = '(a, b) = (-40, -1), (-100, -2), (-200, -3)'
+interval = '[-9, 31]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'IDs aps.03.00–aps.03.02; derivatives given'
+
+[[rows]]
+key = 'aps04_f'
+f = 'x^n - a'
+name = 'Medium-degree polynomial'
+parameters = '(n, a) = (4, 0.2), (6, 0.2), (8, 0.2), (10, 0.2), (12, 0.2), (4, 1), (6, 1), (8, 1), (10, 1), (12, 1) on [0, 5]; (8, 1), (10, 1), (12, 1), (14, 1) on [-0.95, 4.05]'
+interval = '[0, 5] (10 cases); [-0.95, 4.05] (4 cases)'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'IDs aps.04.00–aps.04.13; derivatives given'
+
+[[rows]]
+key = 'aps05_f'
+f = 'sin(x) - 1.0/2'
+name = 'Simple Trigonometric function'
+interval = '[0, 1.5]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'ID aps.05.00; derivatives given'
+
+[[rows]]
+key = 'aps06_f'
+f = '2*x*exp(-n) - 2*exp(-n*x) + 1'
+name = 'Exponential rapidly changing from -1 to 1 at x=0'
+parameters = 'n = 1, 2, 3, 4, 5, 20, 40, 60, 80, 100'
+interval = '[0, 1]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'IDs aps.06.00–aps.06.09; derivatives given'
+
+[[rows]]
+key = 'aps07_f'
+f = '(1 + (1 - n)^2)*x - (1 - n*x)^2'
+name = 'Upside down parabola with parametrizable height'
+parameters = 'n = 5, 10, 20'
+interval = '[0, 1]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'IDs aps.07.00–aps.07.02; derivatives given'
+
+[[rows]]
+key = 'aps08_f'
+f = 'x*x - (1 - x)^n'
+name = 'Degree n polynomial'
+parameters = 'n = 2, 5, 10, 15, 20'
+interval = '[0, 1]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'IDs aps.08.00–aps.08.04; derivatives given'
+
+[[rows]]
+key = 'aps09_f'
+f = '(1 + (1 - n)^4)*x - (1 - n*x)^4'
+name = 'Upside down quartic with parametrizable height'
+parameters = 'n = 1, 2, 4, 5, 8, 15, 20'
+interval = '[0, 1]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'IDs aps.09.00–aps.09.06; derivatives given'
+
+[[rows]]
+key = 'aps10_f'
+f = 'exp(-n*x)*(x - 1) + x^n'
+name = 'Exponential plus a polynomial'
+parameters = 'n = 1, 5, 10, 15, 20'
+interval = '[0, 1]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'IDs aps.10.00–aps.10.04; derivatives given'
+
+[[rows]]
+key = 'aps11_f'
+f = '(n*x - 1)/((n - 1)*x)'
+name = 'Rational function with a zero at x=1/n and a pole at x=0'
+parameters = 'n = 2, 5, 15, 20'
+interval = '[0.01, 1]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'IDs aps.11.00–aps.11.03; derivatives given'
+
+[[rows]]
+key = 'aps12_f'
+f = 'x^(1.0/n) - n^(1.0/n)'
+name = 'nth root of x, with a zero at x=n'
+parameters = 'n = 2, 3, 4, 5, 6, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33'
+interval = '[1, 100]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'IDs aps.12.00–aps.12.18; derivatives given'
+
+[[rows]]
+key = 'aps13_f'
+f_description = '`x/exp(1/x^2)` (x != 0); `0` (x = 0, or 1/x^2 > `_MAX_EXPABLE`)'
+name = 'Function with *all* derivatives 0 at the root'
+interval = '[-1, 4]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'ID aps.13.00; `_MAX_EXPABLE` = `log(np.finfo(float).max)`; derivatives given'
+
+[[rows]]
+key = 'aps14_f'
+f_description = '`n/20.0*(x/1.5 + sin(x) - 1)` (x > 0); `-n/20.0` (x <= 0)'
+name = '0 for negative x-values, trigonometric+linear for x positive'
+parameters = 'n = 1, 2, ..., 40'
+interval = '[-1000, pi/2]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'IDs aps.14.00–aps.14.39; smoothness 0; the interval starts at -1000, where Alefeld–Potra–Shi (1995), Table I, and their driver start it at -10^4; for x <= 0 the code returns `-n/20.0`, not the 0 of the docstring; derivatives given'
+
+[[rows]]
+key = 'aps15_f'
+f_description = '`-0.859` (x < 0); `exp((n + 1)*x/2*1000) - 1.859` (0 <= x <= 2*1e-3/(1 + n)); `e - 1.859` (x > 2*1e-3/(1 + n))'
+name = 'piecewise linear, constant outside of [0, 0.002/(1+n)]'
+parameters = 'n = 20, 21, ..., 40, 100, 200, ..., 1000'
+interval = '[-1000, 1e-4]'
+also_in = 'Alefeld–Potra–Shi 1995 [1]'
+notes = 'IDs aps.15.00–aps.15.30; smoothness 0; the interval starts at -1000, where Alefeld–Potra–Shi (1995), Table I, and their driver start it at -10^4; `e` is `np.e`; the middle piece is exponential, not linear as the docstring says; derivatives given'
+
+[[rows]]
+key = 'cplx01_f'
+f = 'z^n - a'
+name = 'z^n-a: Use to find the nth root of a'
+parameters = '(n, a) = (2, -1), (3, 1), (3, -1), (3, 8)'
+interval = 'none; starting values (x0, x1) = (1 + 1j, 0.5 + 0.5j), (-1 + 1j, -0.5 + 2.0j), (1j, 0.5 + 0.5j), (5, 4)'
+notes = 'IDs complex.01.00–complex.01.03; complex-valued; derivatives given'
+
+[[rows]]
+key = 'cplx02_f'
+f = 'exp(z) - a'
+name = 'e^z - a: Use to find the log of a'
+parameters = 'a = -1, 1j'
+interval = 'none; starting values (x0, x1) = (1 + 2j, 0.5 + 0.5j) for both'
+notes = 'IDs complex.02.00–complex.02.01; complex-valued; derivatives given'
+
+[[rows]]
+key = 'fun1'
+f = 'x^3 - 2*x - 5'
+interval = '[2, 3], [1, 10], [1, 100], [-1e4, 1e4], [-1e10, 1e10]'
+also_in = 'Chandrupatla 1997 [2]'
+notes = 'IDs fun1.1–fun1.5; no derivatives'
+
+[[rows]]
+key = 'fun2'
+f = '1 - 1/x^2'
+interval = '[0.5, 1.51], [1e-4, 1e4], [1e-6, 1e6], [1e-10, 1e10], [1e-12, 1e12]'
+also_in = 'Chandrupatla 1997 [2]'
+notes = 'IDs fun2.1–fun2.5; no derivatives'
+
+[[rows]]
+key = 'fun3'
+f = '(x-3)^3'
+interval = '[0, 5], [-10, 10], [-1e4, 1e4], [-1e6, 1e6], [-1e10, 1e10]'
+also_in = 'Chandrupatla 1997 [2]'
+notes = 'IDs fun3.1–fun3.5; no derivatives'
+
+[[rows]]
+key = 'fun4'
+f = '6*(x-2)^5'
+interval = '[0, 5], [-10, 10], [-1e4, 1e4], [-1e6, 1e6], [-1e10, 1e10]'
+also_in = 'Chandrupatla 1997 [2]'
+notes = 'IDs fun4.1–fun4.5; no derivatives'
+
+[[rows]]
+key = 'fun5'
+f = 'x^9'
+interval = '[-1, 4], [-2, 5], [-1, 10], [-5, 50], [-10, 100]'
+also_in = 'Chandrupatla 1997 [2]'
+notes = 'IDs fun5.1–fun5.5; no derivatives'
+
+[[rows]]
+key = 'fun6'
+f = 'x^19'
+interval = '[-1., 4.], [-2., 5.], [-1., 10.], [-5., 50.], [-10., 100.]'
+also_in = 'Chandrupatla 1997 [2]'
+notes = 'IDs fun6.1–fun6.5; no derivatives'
+
+[[rows]]
+key = 'fun7'
+f_description = '`0` (abs(x) < 3.8e-4); `x*exp(-x^(-2))` (otherwise)'
+interval = '[-1, 4], [-2, 5], [-1, 10], [-5, 50], [-10, 100]'
+also_in = 'Chandrupatla 1997 [2]'
+notes = 'IDs fun7.1–fun7.5; no derivatives'
+
+[[rows]]
+key = 'fun8'
+f = '-(3062*(1-xi)*exp(-x))/(xi + (1-xi)*exp(-x)) - 1013 + 1628/x'
+parameters = 'xi = 0.61489, a constant in the function body'
+interval = '[2e-4, 2], [2e-4, 3], [2e-4, 9], [2e-4, 27], [2e-4, 81]'
+also_in = 'Chandrupatla 1997 [2]'
+notes = 'IDs fun8.1–fun8.5; no derivatives'
+
+[[rows]]
+key = 'fun9'
+f = 'exp(x) - 2 - 0.01/x^2 + .000002/x^3'
+interval = '[2e-4, 1], [2e-4, 3], [2e-4, 9], [2e-4, 27], [2e-4, 81]'
+also_in = 'Chandrupatla 1997 [2]'
+notes = 'IDs fun9.1–fun9.5; no derivatives'

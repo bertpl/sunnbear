@@ -1,0 +1,149 @@
+title = 'Tomov, Ganchovski (2026): safeguarded modified Anderson–Björck method'
+reference = "Tomov, L., Ganchovski, N. (2026). Global convergence and reliable stopping in a safeguarded modified Anderson–Björck method. arXiv preprint 2610.14193. https://doi.org/10.48550/arxiv.2610.14193 (https://arxiv.org/abs/2610.14193). The authors' C# code and benchmark definitions are in https://github.com/Proektsoft-EOOD/ModAB-Root-Finding; Section 7.3 pins commit `9111cdcc6912401eb684a7b771df3a469795d5b8` (the preprint's reference [16]), and Section 7.4 pins commit `51a6d1b` (reference [17])."
+year = 2026
+subcategory = '1.1'
+where_in_source = '''
+- **Benchmark cases:** the experiments run on a "broader development benchmark" of 100 named cases, 92 of them "reference-eligible" (Sections 7.2 and 7.3, Table 3).
+  - The preprint does not list these cases and does not say where they come from; for their definitions, it points to the repository at the commit that Section 7.3 pins.
+  - The preprint names 14 of them: f64, f84 and f92–f97 in Table 3, f27, f29 and f75 in Table 5, and f82, f83 and f100 in the text of Section 7.3.
+  - The preprint prints the expression of only 5: f64 and f84 (Section 7.3), and f27, f29 and f75 (Section 7.5).
+- **The preprint's own examples:** equations (25) and (27) in Section 3, equation (61) in Sections 7.1 and 7.6, and 4 unnumbered functions in the checks of Section 7.6.
+'''
+transcribed_from = "the preprint only: its text, checked against the page images of pp. 7–8 and 26–31. The authors' code was not read."
+rows_summary = '21: the 14 benchmark cases that the preprint names (9 of them without an expression), and 7 functions of its own examples. The benchmark itself counts 100 cases.'
+notes = 'The 4 unnumbered functions of Section 7.6 get the keys `7.6-a` to `7.6-d`, in the order that the section states them.'
+
+[[relations]]
+sources = ['2026_tomov_ganchovski_benchmark']
+text = "The source `2026_tomov_ganchovski_benchmark` holds the benchmark that the preprint runs on, from a later commit of the authors' code that adds 1 case, f101. That source gives the expressions of the 9 cases that the preprint names without one."
+
+[[rows]]
+key = '(25)'
+f_description = '`x` if `x <= 0`; `x + x^2` if `x > 0`'
+name = 'Proposition 3.5, "a one-sided quadratic AB phase"'
+interval = '`[-1, 1]`; `[-3, 1]`'
+notes = 'Proposition 3.5 starts an AB phase on `[-1, 1]`. The text after it starts the hybrid method on `[-3, 1]`, whose first bisection leads to the same phase.'
+
+[[rows]]
+key = '(27)'
+f_description = '`-x^2` if `x < 0`; `7*x^2` if `x >= 0`'
+name = 'Proposition 3.6, "residual contraction without width convergence"; Table 4 calls it "the C^1 counterexample"'
+interval = '[-3, 1]'
+notes = 'Also the test function of Section 7.4 (Table 4).'
+
+[[rows]]
+key = 'f27'
+f = '(x + 1.11111 - 3)^4 * sign(x + 1.11111 - 3)'
+interval = 'not given'
+notes = 'Section 7.5. The benchmark evaluates the expanded form of the quartic, which the preprint does not print. Table 5 gives the zero as 1.88889.'
+
+[[rows]]
+key = 'f29'
+f = 'exp((x - 3)^5) - 1'
+interval = 'not given'
+notes = 'Section 7.5. Table 5 gives the zero as 3.'
+
+[[rows]]
+key = 'f64'
+f = 'tan(x - 0.1)'
+interval = '[-1, 1]'
+notes = 'Section 7.3.'
+
+[[rows]]
+key = 'f75'
+f = 'sign(3*x - 1) * (1 - sqrt(1 - (3*x - 1)^2/81))'
+interval = 'not given'
+notes = 'Section 7.5. Table 5 gives the zero as 1/3.'
+
+[[rows]]
+key = 'f82'
+f_description = 'not given'
+interval = 'not given'
+notes = 'Section 7.3 calls f82 and f83 "discontinuous sawtooth cases", with jumps through zero that are not roots.'
+
+[[rows]]
+key = 'f83'
+f_description = 'not given'
+interval = 'not given'
+notes = 'A discontinuous sawtooth case; see f82.'
+
+[[rows]]
+key = 'f84'
+f = 'prod(x - j, j = 1..5) - 0.05'
+interval = '[0.5, 5.5]'
+notes = 'Section 7.3.'
+
+[[rows]]
+key = 'f92'
+f_description = 'not given'
+interval = 'not given'
+notes = 'Table 3 gives only evaluation counts for f92–f97. Section 7.3 mentions "the odd-power cases" without naming them.'
+
+[[rows]]
+key = 'f93'
+f_description = 'not given'
+interval = 'not given'
+notes = 'Table 3 only; see f92.'
+
+[[rows]]
+key = 'f94'
+f_description = 'not given'
+interval = 'not given'
+notes = 'Table 3 only; see f92.'
+
+[[rows]]
+key = 'f95'
+f_description = 'not given'
+interval = 'not given'
+notes = 'Table 3 only; see f92.'
+
+[[rows]]
+key = 'f96'
+f_description = 'not given'
+interval = 'not given'
+notes = 'Table 3 only; see f92.'
+
+[[rows]]
+key = 'f97'
+f_description = 'not given'
+interval = 'not given'
+notes = 'Table 3 only; see f92.'
+
+[[rows]]
+key = 'f100'
+f_description = 'not given'
+interval = 'not given'
+notes = 'Section 7.3 calls it "the singular-endpoint case".'
+
+[[rows]]
+key = '(61)'
+f = 'x^p - 10^(-3)'
+name = 'f_p'
+parameters = 'p = 3, 5, 7, 9, 11, 13, 15, 17'
+interval = '[-10, 10]'
+notes = 'Section 7.1 introduces it for odd `p` and discusses `p = 13, 15, 17`; equation (61) in Section 7.6 lists the 8 values.'
+
+[[rows]]
+key = '7.6-a'
+f = '10^(-320)*(x - 1/4)^3'
+interval = 'not given'
+notes = 'Also in Section 7.1. The preprint writes it as a computed callback, `F`-hat. It is evaluated at `x = 0.26`, where it can return 0, to check that this machine zero fails root-location validation at tolerance `10^(-14)`.'
+
+[[rows]]
+key = '7.6-b'
+f = 'x - 1/4'
+interval = 'endpoint pairs `(1/4, 1)` and `(1, 1/4)`'
+notes = 'The solver must return the endpoint root. The second pair gives the endpoints in reversed order.'
+
+[[rows]]
+key = '7.6-c'
+f = 'x'
+interval = '[-1, 1]'
+notes = 'The evaluation at the midpoint is replaced by NaN; the solver must report invalid input.'
+
+[[rows]]
+key = '7.6-d'
+f = 's*(x^3 - 2)'
+parameters = 's = 1, 10^120'
+interval = '[0, 2]'
+notes = 'The check compares the returned values for the 2 values of `s`.'

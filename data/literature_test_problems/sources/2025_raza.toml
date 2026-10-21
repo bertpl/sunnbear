@@ -1,0 +1,47 @@
+title = 'Raza, Toheed, Rehman (2025): optimal fourth-order derivative-free method'
+reference = 'Raza, M., Toheed, D., Rehman, N. A. (2025). Optimizing nonlinear root finding: a novel fourth order derivative-free iterative method with maximum efficiency index and comparative analysis. Research Square preprint, posted 26 Aug 2025. https://doi.org/10.21203/rs.3.rs-7439716/v1.'
+year = 2025
+subcategory = '1.2'
+where_in_source = '''
+- Table 1, "Test functions and their roots" (Section 4), lists 5 functions `eta1(l)` to `eta5(l)` with a targeted root and an initial guess each.
+- Tables 2 to 6 give the errors of the first 5 iterates per function ("nonlinear problem 1" to 5), and Figs. 1 to 5 the logarithm of the residuals.
+- Section 3 says the set includes "some nonlinear equations governing from real-life phenomenon", without saying which.
+'''
+transcribed_from = 'the article, checked against the page images.'
+rows_summary = '5, 1 per function of Table 1.'
+notes = '''
+- The unknown is `l`.
+- The article gives initial guesses, not intervals; the `interval` of each row gives its guess `l0`.
+- The article cites no source for its functions.
+- Keys are the article's labels `η1` to `η5`, spelled `eta1` to `eta5`.
+'''
+
+[[rows]]
+key = 'eta1'
+f = '(l^2 - 1/4)*(l^2 + 9/4)'
+interval = 'none; `l0 = -0.55`'
+notes = 'Stated root `-0.5`.'
+
+[[rows]]
+key = 'eta2'
+f = 'sin(l)^2 - l^2 + 1'
+interval = 'none; `l0 = -1.3`'
+notes = 'Stated root `-1.40449164...`.'
+
+[[rows]]
+key = 'eta3'
+f = 'exp(-l) - cos(l)'
+interval = 'none; `l0 = 1.1`'
+notes = 'Stated root `1.29269571...`.'
+
+[[rows]]
+key = 'eta4'
+f = 'atan(l) - l^2 + 1'
+interval = 'none; `l0 = 1.28`'
+notes = 'Stated root `1.39615365...`.'
+
+[[rows]]
+key = 'eta5'
+f = '8*(4 - l)^2*l^2/((6 - 3*l)^2*(2 - l)) - 0.186'
+interval = 'none; `l0 = 0.4`'
+notes = 'Stated root `0.2777595...`.'

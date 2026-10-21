@@ -1,0 +1,94 @@
+title = 'Alefeld, Potra (1992): some efficient methods for enclosing simple zeros'
+reference = 'Alefeld, G. E., Potra, F. A. (1992). Some efficient methods for enclosing simple zeros of nonlinear equations. BIT 32(2), 334–344. https://doi.org/10.1007/bf01994885.'
+year = 1992
+subcategory = '1.2'
+where_in_source = '''
+- Table 1, "Test problems" (p. 343), lists 11 functions `# 1` to `# 11` with their initial intervals; its caption says that `n` is a positive integer.
+- Section 4 says that problems 5 to 11 were run with `n = 5, 10, 20`, each at `tol = 10^-2, 10^-5, 10^-7, 10^-10, 10^-15` and 0. Tables 2–4 give total evaluation counts only, over all problems or over a group of them.
+'''
+transcribed_from = 'the article, a scan with a text layer, read from the page images. No code accompanies the article.'
+rows_summary = '11, 1 per problem of Table 1. With 3 values of `n` for problems 5 to 11, the 11 rows make 25 cases per tolerance; the article states no count.'
+notes = '''
+- **Keys:** the numbers of Table 1.
+- **`also_in`:** empty in every row. The abstract calls the functions "a series of published examples", but the article does not say where they come from.
+'''
+
+[[relations]]
+sources = ['1995_alefeld_potra_shi']
+text = '''
+Problems 5 to 9 and 11 here are problems 6 to 11 of Table I of Alefeld, Potra & Shi (1995), in the same order and on the same intervals; problems 1 to 4 and 10 are not in it. The differences:
+- Problem 6 has `x^2` where the 1995 problem 7 has `x`.
+- `n = 10` is not among the 1995 values of problems 6, 9 and 11 (here problems 5, 8 and 11).
+'''
+
+[[relations]]
+sources = ['2011_galdino']
+text = '''
+Table II of Galdino (2011) holds problems 1 to 10.
+- Galdino's `g1`–`g4` and `g6`–`g23` are problems 1 to 10 here, in the same order, with each of problems 5 to 10 split into 3 functions at `n = 5, 10, 20`. Problem 11 is not in Galdino, and `g5`, `x^3 - 2*x - 5` on `[2, 3]`, is not here.
+- Expressions and intervals agree, except `g19` and `g20`: Galdino prints them with the expression of problem 8, where problem 9 at `n = 10, 20` gives the expression of `g18`, as Ganchovski et al. (2026) have it in f19 and f20.
+'''
+
+[[rows]]
+key = '1'
+f = 'x^3 - 1'
+interval = '[0.5, 1.5]'
+
+[[rows]]
+key = '2'
+f = 'x^2*(x^2/3 + sqrt(2)*sin(x)) - sqrt(3)/18'
+interval = '[0.1, 1]'
+
+[[rows]]
+key = '3'
+f = '11*x^11 - 1'
+interval = '[0.1, 1]'
+
+[[rows]]
+key = '4'
+f = 'x^3 + 1'
+interval = '[-1.8, 0]'
+
+[[rows]]
+key = '5'
+f = '2*x*exp(-n) + 1 - 2*exp(-n*x)'
+parameters = 'n = 5, 10, 20'
+interval = '[0, 1]'
+
+[[rows]]
+key = '6'
+f = '(1 + (1 - n)^2)*x^2 - (1 - n*x)^2'
+parameters = 'n = 5, 10, 20'
+interval = '[0, 1]'
+notes = 'The article writes the first factor in square brackets.'
+
+[[rows]]
+key = '7'
+f = 'x^2 - (1 - x)^n'
+parameters = 'n = 5, 10, 20'
+interval = '[0, 1]'
+
+[[rows]]
+key = '8'
+f = '(1 + (1 - n)^4)*x - (1 - n*x)^4'
+parameters = 'n = 5, 10, 20'
+interval = '[0, 1]'
+notes = 'The article writes the first factor in square brackets.'
+
+[[rows]]
+key = '9'
+f = 'exp(-n*x)*(x - 1) + x^n'
+parameters = 'n = 5, 10, 20'
+interval = '[0, 1]'
+
+[[rows]]
+key = '10'
+f = 'x^2 + sin(x/n) - 1/4'
+parameters = 'n = 5, 10, 20'
+interval = '[0, 1]'
+
+[[rows]]
+key = '11'
+f = '(n*x - 1)/((n - 1)*x)'
+parameters = 'n = 5, 10, 20'
+interval = '[0.01, 1]'

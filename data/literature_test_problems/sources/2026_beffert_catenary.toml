@@ -1,0 +1,30 @@
+title = 'Beffert, Zell (2026): real-time bounded catenary solver'
+reference = 'Beffert, M., Zell, A. (2026). Real-Time Bounded Catenary Solver for UAV Tether Modeling. arXiv preprint 2609.18482v1. https://doi.org/10.48550/arxiv.2609.18482.'
+year = 2026
+subcategory = '1.2'
+where_in_source = '''
+- Section III A reduces the catenary boundary-value problem to 1 equation: first in the scale parameter `a` (eq. (3)), then in `b_hat = abs(dx)/(2*a)` (eq. (4), repeated as eq. (12) in Appendix A.3), where `dx` is the offset between the endpoints in `x`. The solver works on eq. (4).
+- Section III C and Appendix E give the bracket; Section IV gives the parameter ranges of 2 flights and of a parameter sweep.
+'''
+transcribed_from = 'the article.'
+rows_summary = "2: the solver's equation in `b_hat` (eq. (4)), and the form in `a` (eq. (3)), which the article does not solve."
+notes = '''
+- The article writes `Δx`, `Δy` and `b̂`; the rows write `dx`, `dy` and `b_hat`.
+- Keys are equation numbers.
+'''
+
+[[rows]]
+key = '(4)'
+f = 'abs(dx)*sinh(b_hat)/b_hat - sqrt(L^2 - dy^2)'
+name = 'catenary equation in `b_hat`'
+parameters = 'Endpoint offsets `dx`, `dy` and cable length `L`, with `L > sqrt(dx^2 + dy^2) + eps`, `abs(dx) > eps`, `eps = 1e-6` m. Only `r = sqrt(L^2 - dy^2)/abs(dx)` matters, with `1 < r <= r_max = L/eps = 3*10^7` for a 30 m tether. Flight 1: 266 solves with `r` from 1.050 to 2723.957 (median 2.008); Flight 2: 4875 configurations; plus a logarithmic sweep of 20000 values of `r` in `(1, r_max]`.'
+interval = '`[0, b_hi]` with `b_hi = sqrt(-10 + sqrt(100 + 120*(r - 1)))` (eqs. (7), (19))'
+notes = 'Same as eq. (12). Dividing by `abs(dx)` gives `sinh(b_hat)/b_hat - r`. In practice `b_hi` is scaled by `1 + 1e-6`. The flight data are not published.'
+
+[[rows]]
+key = '(3)'
+f = '2*a*sinh(abs(dx)/(2*a)) - sqrt(L^2 - dy^2)'
+name = 'catenary equation in `a`'
+parameters = 'as in row (4)'
+interval = '(0, inf)'
+notes = 'The article calls this the standard reduction and does not solve it: `a` ranges over an unbounded interval, the argument of `sinh` diverges as `a -> 0`, and the derivative vanishes as `a -> inf`.'

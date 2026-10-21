@@ -1,0 +1,42 @@
+title = 'Jerezano, Chicharro, Garrido (2026): derivative-free optimal multiple-root family'
+reference = 'Jerezano, J. H., Chicharro, F. I., Garrido, N. (2026). Derivative-free optimal multiple-root finding family of iterative methods. Computational and Applied Mathematics 45, 304. https://doi.org/10.1007/s40314-026-03702-8.'
+year = 2026
+subcategory = '1.2'
+where_in_source = '''
+- Section 4, "Numerical benchmark", lists 3 functions `g1` to `g3` with multiple roots, and Tables 1 to 3 give the results per function from 2 starting points each.
+- Sections 3.2 and 3.3 study the stability of the article's methods M1 and M2 on the polynomial `p(z) = (z - 1)^2`, over complex starting points.
+'''
+transcribed_from = "the article (text layer), with Section 4's functions and Tables 1 to 3 checked against the page images."
+rows_summary = '4: the 3 functions of Section 4 and the polynomial of Sections 3.2 and 3.3.'
+notes = '''
+- The article gives starting points `x0`, not intervals.
+- Keys are the article's labels, or the sections.
+'''
+
+[[rows]]
+key = 'g1'
+f = 'x^3 - 5.22*x^2 + 9.0825*x - 5.2675'
+name = 'Van der Waals equation (a particular case)'
+interval = 'none; `x0 = 1.9, 3`'
+notes = 'Printed as "Van de Waals". Stated roots: a double root at `1.75` and a simple root at `1.72`. Results in Table 1.'
+
+[[rows]]
+key = 'g2'
+f = '(exp(-x) - 1 + x/5)^3'
+name = "energy density in a black body (Planck's law of radiation)"
+interval = 'none; `x0 = 5.3, 10`'
+also_in = 'Bradie (2006)'
+notes = 'Stated: a triple root at about `4.96511423174428`. Results in Table 2. Bradie (2006), §2.4, Application Problem 2 (p. 103), gives `exp(-x) - 1 + x/5` without the cube (`2006_bradie`); the cube makes both of its roots, 0 and about 4.965, triple.'
+
+[[rows]]
+key = 'g3'
+f = 'x^9 - 29*x^8 + 349*x^7 - 2261*x^6 + 8455*x^5 - 17663*x^4 + 15927*x^3 + 6993*x^2 - 24732*x + 12960'
+name = 'characteristic equation of a 9 x 9 matrix'
+interval = 'none; `x0 = 2.8, 3.4`'
+notes = 'Printed with thousands separators, as in `17,663`. Stated: a root of multiplicity 4 at `3`. Results in Table 3.'
+
+[[rows]]
+key = '3.2, 3.3'
+f = '(z - 1)^2'
+interval = 'none; complex starting points in `[-20, 20] x [-20, 20]` and `[-5, 5] x [-5, 5]`'
+notes = 'Double root at `1`. The article iterates methods M1 and M2 on it to map their basins of attraction for several values of the method parameter `beta`; no table.'

@@ -1,0 +1,145 @@
+title = 'Bus, Dekker (1975): Algorithms M and R'
+reference = 'Bus, J. C. P., Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence for finding a zero of a function. ACM Transactions on Mathematical Software 1(4), 330–345. https://doi.org/10.1145/355656.355659.'
+year = 1975
+subcategory = '1.2'
+where_in_source = '''
+- Section 5, "Numerical results" (p. 340), defines 4 groups of test functions, each with its parameter values and, except Group II, its interval.
+- Tables I–IV (pp. 341–342) give the evaluation counts of 5 algorithms on the 4 groups, 1 table per group, and repeat only the function numbers and parameter values. The algorithms are Dekker's A, the article's M and R, Brent's (B) and Anderson–Björck's (C).
+- Sections 1–4 and the appendix hold no test functions.
+'''
+transcribed_from = "the article (ACM's PDF, whose text layer has OCR errors), read from the page images of pp. 340–342. The rows were checked against sunnbear's `tests/solvers/paper_problems/bus_dekker.py`, which agrees on every function, parameter value and stated interval; for Group II, the test file assumes the interval `[-1, 10]` of Group III."
+rows_summary = "11: Group I's 6 functions, Group II's 3 pairs of `a` and `b`, and the function of each of Groups III and IV. With the values of `n`, the article solves 36 cases: 17 in Table I, 12 in Table II, 6 in Table III and 1 in Table IV."
+notes = '''
+- **Keys:** Group I numbers its 6 functions 1 to 6, and Group II numbers its 3 pairs of `a` and `b` 1 to 3; Groups III and IV hold 1 function each. A key is the group and, where the group numbers its items, the number.
+- **Notation:** the article writes `10-4` for `10^-4`; the rows write `10^-4`.
+- **Runs:** all runs use the tolerance function `delta(x) = |x|*10^-14 + 10^-14`, on a CDC Cyber 73 with a precision of 48 bits.
+- **Other sources with these functions:**
+  - `IV` on `[-1, 4]` is also Gao (2026)'s T4.7 (`2026_gao`) on 1 of its 5 intervals, and SciPy's `aps13_f` (`scipy_tstutils`), which copies problem 13 of Alefeld, Potra & Shi (1995).
+  - Brent (1973)'s `f_1` (`1973_brent_book`), Chandrupatla (1997)'s function 7 (`1997_chandrupatla`), SciPy's `fun7` and roots-fortran's cases 57–58 (`roots_fortran`) set the function of `IV` to 0 for `abs(x) < 3.8*10^-4`. Each runs this changed function on `[-1, 4]`; the last 3 also run it on other intervals.
+  - `III` at `n = 9, 19` on `[-1, 10]` is in Chandrupatla (1997)'s functions 5 and 6, and in their copies in Gao (2026) and SciPy (`fun5`, `fun6`); each of these functions has 5 intervals, `[-1, 10]` among them.
+  - Of the other sources, only Norton (1985) holds `II.1`–`II.3`.
+  - `I.1`–`I.6` are the functions of Dowell & Jarratt (1971), which many sources hold with other values of `n`; only Alefeld, Potra & Shi (1993) holds all 17 cases of Table I.
+'''
+
+[[relations]]
+sources = ['1971_dowell_jarratt_illinois']
+text = '''
+The article cites Dowell & Jarratt (1971) for Group I.
+- `I.1`–`I.6` are Tables 1–6 of Dowell & Jarratt, with the same expressions and intervals; `I.6` writes the factors of its first term in the other order. Dowell & Jarratt's Table 7, `(n*x - 1)/((n - 1)*x)`, is not in this article.
+- The values of `n` differ. Only these are in both: `n = 1` of `I.2`, `n = 5` of `I.3` and `I.4`, and all 3 values of `I.6`. `I.5` shares none.
+'''
+
+[[relations]]
+sources = ['1985_norton']
+text = '''
+Norton (1985) says only that its 3 groups come from Anderson & Björck (1973) and/or this article.
+- Norton's functions 8–12 are `II.1`–`II.3`, `III` and `IV`, in the same order and with the same values of `a`, `b` and `n`. Anderson & Björck hold none of them, so of Norton's 2 sources, only this article can be the source of functions 8–12. Norton puts `III` and `IV` together in its Group III.
+- Norton gives functions 8–10 the interval `[-0.7, 1]`, which this article does not state, and gives function 12 no interval, where `IV` has `[-1, 4]`.
+- Norton's functions 1–6 have the expressions of `I.1`–`I.6`, as this article prints them: function 5 without Anderson & Björck's leading `1 +`, and function 6 with the factor `(x - 1)` first.
+- Norton takes `n = 2, 5, 10, 20` for each of functions 2–6. The values in both are `n = 2` of `I.2`, `n = 5, 10` of `I.3`, `I.4` and `I.6`, and none of `I.5`.
+- Norton's function 7, `(n*x - 1)/((n - 1)*x)`, is not in this article.
+'''
+
+[[relations]]
+sources = ['1971_brent', 'roots_fortran']
+text = '''
+Brent (1971) and roots-fortran's case 26 hold `IV` too.
+- Brent (1971)'s function 3.2, which the article cites for `IV`, is the same function on "an interval containing the origin". The interval `[-1, 4]` is this article's choice: "The interval is chosen to be [-1, 4]".
+- roots-fortran's case 26 is `IV` on `[-1, 4]`, coded as `x/exp(1.0/(x*x))`, and names no source. Its case 27 runs the same function on `[-1.1234, 4.4567]`.
+'''
+
+[[relations]]
+sources = ['1993_alefeld_potra_shi']
+text = '''
+Alefeld, Potra & Shi (1993) does not cite this article, but holds several of its functions.
+- `T5.3` is `III`, with the same values of `n` and interval; so is Norton's function 11.
+- `T5.1-12` is `IV` on `[-1, 4]`.
+- `T5.1-5` to `T5.1-10` hold all 17 cases of Table I. In each of `T5.1-6` to `T5.1-10`, the values of `n` are exactly those of `I.2`–`I.6` together with those of Anderson & Björck (1973)'s Ex. 2–6.
+'''
+
+[[relations]]
+sources = ['1995_alefeld_potra_shi']
+text = '''
+Alefeld, Potra & Shi (1995) runs Algorithms M and R but does not say where its problems come from.
+- Problem 13 is `IV` on `[-1, 4]`.
+- Problems 5, 6, 9 and 10 hold all values of `I.1`, `I.2`, `I.5` and `I.6`; problems 7 and 8 lack `n = 1` of `I.3` and `I.4`.
+- `III` is not in its Table I.
+'''
+
+[[rows]]
+key = 'I.1'
+f = 'sin(x) - 0.5'
+interval = '[0, 1.5]'
+also_in = 'Dowell, Jarratt (1971), BIT 11, 168–174 (article ref. 4), for all of Group I'
+notes = 'Group I: a simple zero in the interval.'
+
+[[rows]]
+key = 'I.2'
+f = '2*x*exp(-n) + 1 - 2*exp(-n*x)'
+parameters = 'n = 1, 2, 3, 4'
+interval = '[0, 1]'
+also_in = 'as `I.1`'
+
+[[rows]]
+key = 'I.3'
+f = '(1 + (1 - n)^2)*x - (1 - n*x)^2'
+parameters = 'n = 1, 5, 10'
+interval = '[0, 1]'
+also_in = 'as `I.1`'
+notes = 'The article: 1 turning point in `[0, 1]`.'
+
+[[rows]]
+key = 'I.4'
+f = 'x^2 - (1 - x)^n'
+parameters = 'n = 1, 5, 10'
+interval = '[0, 1]'
+also_in = 'as `I.1`'
+notes = 'The article: 1 inflection point in `[0, 1]`.'
+
+[[rows]]
+key = 'I.5'
+f = '(1 + (1 - n)^4)*x - (1 - n*x)^4'
+parameters = 'n = 1, 4, 8'
+interval = '[0, 1]'
+also_in = 'as `I.1`'
+notes = 'The article: 1 turning point and 1 inflection point in `[0, 1]`.'
+
+[[rows]]
+key = 'I.6'
+f = '(x - 1)*exp(-n*x) + x^n'
+parameters = 'n = 1, 5, 10'
+interval = '[0, 1]'
+also_in = 'as `I.1`'
+notes = 'The article: the curves lie closer to the x-axis as `n` grows.'
+
+[[rows]]
+key = 'II.1'
+f = 'x^n + a*x + b'
+parameters = '`a = 1, b = 0`; `n = 3, 5, 9, 19`'
+notes = 'Group II: a simple zero, and an inflection point of order `n - 1` or `n` at or near it. The article states no interval for Group II.'
+
+[[rows]]
+key = 'II.2'
+f = 'x^n + a*x + b'
+parameters = '`a = 0, b = 10^-4`; `n = 3, 5, 9, 19`'
+notes = 'Group II; no interval stated.'
+
+[[rows]]
+key = 'II.3'
+f = 'x^n + a*x + b'
+parameters = '`a = 1, b = 10^-4`; `n = 3, 5, 9, 19`'
+notes = 'Group II; no interval stated.'
+
+[[rows]]
+key = 'III'
+f = 'x^n'
+parameters = 'n = 3, 5, 7, 9, 19, 25'
+interval = '[-1, 10]'
+notes = 'Group III: a zero of multiplicity `n` at 0.'
+
+[[rows]]
+key = 'IV'
+f_description = '`0` if `x = 0`; `x*exp(-x^-2)` otherwise'
+interval = '[-1, 4]'
+also_in = 'Brent (1971), Computer J. 14, 422–425 (article ref. 2)'
+notes = 'Group IV: all derivatives vanish at the zero, which the article calls a multiplicity of infinity.'

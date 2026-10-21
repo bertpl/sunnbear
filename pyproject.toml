@@ -89,6 +89,10 @@ dev = [
     # its minimal version is its first release with a 3.15 wheel.
     "scipy>=1.16.2; python_version < '3.15'",
     "scipy>=1.18.1; python_version >= '3.15'",
+    # scripts/literature_test_problems/ parses the published test problems with sympy, which is never a runtime
+    # dependency. Its minimal version is its first release that declares 3.12 and 3.13; it is pure Python, so 1
+    # requirement covers every Python version.
+    "sympy>=1.14.0",
     "ty==0.0.56",  # pre-1.0 type checker — pin exactly; its ruleset is still evolving
 ]
 # This group holds the packaging-integrity tooling for the _package_check.yml CI gate, which installs it with
@@ -204,7 +208,8 @@ invalid-method-override = "ignore"
 [tool.codespell]
 # "intoto": the in-toto attestation format (provenance.intoto.jsonl).
 # "ned" is the first name of Ned Ganchovski, whose code THIRD_PARTY_NOTICES.md covers.
-ignore-words-list = "intoto,ned"
+# "trough" is a water trough in a textbook exercise of data/literature_test_problems/.
+ignore-words-list = "intoto,ned,trough"
 
 [tool.pytest.ini_options]
 addopts = "--strict-markers"

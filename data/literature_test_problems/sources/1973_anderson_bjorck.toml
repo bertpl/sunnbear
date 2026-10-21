@@ -1,0 +1,61 @@
+title = 'Anderson, Björck (1973): a regula falsi method of high order'
+reference = 'Anderson, N., Björck, Å. (1973). A new high order method of regula falsi type for computing a root of an equation. BIT 13(3), 253–264. https://doi.org/10.1007/BF01951936.'
+year = 1973
+subcategory = '1.1'
+where_in_source = '''
+Section 5, "Numerical examples" (pp. 260–262), labels its examples "Ex. 1" to "Ex. 7".
+- Each example gives `f(x)`, its 2 starting points `x0` and `x1`, and the values of `n` in its table of iteration counts.
+- The section says the examples were taken from the article's reference [3], Dowell and Jarratt (1971), whose rows are in `1971_dowell_jarratt_illinois`.
+'''
+transcribed_from = "the article, checked against sunnbear's transcription in `tests/solvers/paper_problems/anderson_bjorck.py`. That file holds all 26 problems and agrees with the article on every function, interval and value of `n`, except for Ex. 5 (see its row)."
+rows_summary = '7, 1 per example. With the values of `n`, the examples make 26 problems.'
+notes = "The `interval` column holds `[x0, x1]`, and the `also_in` column gives the article's reference [3]."
+
+[[rows]]
+key = 'Ex. 1'
+f = 'sin(x) - 0.5'
+interval = '[0, 1.5]'
+also_in = 'Dowell, Jarratt (1971), BIT 11, 168–174 (article ref. 3)'
+
+[[rows]]
+key = 'Ex. 2'
+f = '2*x*exp(-n) + 1 - 2*exp(-n*x)'
+parameters = 'n = 1, 5, 15, 20'
+interval = '[0, 1]'
+also_in = 'Dowell, Jarratt (1971) (article ref. 3)'
+
+[[rows]]
+key = 'Ex. 3'
+f = '(1 + (1 - n)^2)*x - (1 - n*x)^2'
+parameters = 'n = 2, 5, 15, 20'
+interval = '[0, 1]'
+also_in = 'Dowell, Jarratt (1971) (article ref. 3)'
+
+[[rows]]
+key = 'Ex. 4'
+f = 'x^2 - (1 - x)^n'
+parameters = 'n = 2, 5, 15, 20'
+interval = '[0, 1]'
+also_in = 'Dowell, Jarratt (1971) (article ref. 3)'
+
+[[rows]]
+key = 'Ex. 5'
+f = '1 + (1 + (1 - n)^4)*x - (1 - n*x)^4'
+parameters = 'n = 2, 5, 15, 20'
+interval = '[0, 1]'
+also_in = 'Dowell, Jarratt (1971) (article ref. 3)'
+notes = "The row follows the article. sunnbear drops the leading `1 +` as a misprint, because it makes `f(0) = 0` and because, by sunnbear's account, Table 5 of Dowell and Jarratt (1971) prints the function without it."
+
+[[rows]]
+key = 'Ex. 6'
+f = 'exp(-n*x)*(x - 1) + x^n'
+parameters = 'n = 1, 5, 10, 15, 20'
+interval = '[0, 1]'
+also_in = 'Dowell, Jarratt (1971) (article ref. 3)'
+
+[[rows]]
+key = 'Ex. 7'
+f = '(n*x - 1)/((n - 1)*x)'
+parameters = 'n = 2, 5, 15, 20'
+interval = '[0.01, 1.0]'
+also_in = 'Dowell, Jarratt (1971) (article ref. 3)'

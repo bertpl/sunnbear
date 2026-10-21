@@ -1,0 +1,30 @@
+title = 'Neupane (2026): divided-difference multiplicity detection'
+reference = 'Neupane, H. (2026). Divided-Difference Multiplicity Detection: A Derivative-Free, Perturbation-Robust Extension of Critical-Point Root Isolation. SSRN preprint 7203982, not peer reviewed. https://doi.org/10.2139/ssrn.7203982.'
+year = 2026
+subcategory = '1.2'
+where_in_source = '''
+- Section 6, "Numerical Experiments", uses 1 family, `f_m(x) = (x - 1)^m*(x + 2)`:
+  - Table 1 gives the detected multiplicity for `m = 1, ..., 8` at 7 step sizes.
+  - Table 2 adds noise at `m = 4`.
+  - Table 3 gives the function evaluations of 3 methods at `m = 4`.
+- Sections 1 and 2 use the same function at `m = 4` as the motivating example.
+- Section 4.1 uses `x + b*x^2` as a model case, analyzed in closed form.
+'''
+transcribed_from = 'the article, checked against the page images.'
+rows_summary = '2: the family of Section 6 and the model case of Section 4.1.'
+notes = '''
+- The rows give no interval, because the method does not search for a root: it takes a root `c` that an earlier root-isolation step has located, here `c = 1`, and evaluates `f` at `c, c + h, ..., c + k*h`. Only Newton's method, run for comparison, has a starting point.
+- Keys are the article's name `f_m`, or the section.
+'''
+
+[[rows]]
+key = 'f_m'
+f = '(x - 1)^m*(x + 2)'
+parameters = 'm = 1, ..., 8'
+notes = "Root `1` of multiplicity `m`. Table 1 puts `m = 5, ..., 8` in 1 row. Table 2 adds noise of level `sigma = 1e-12, 1e-9, 1e-6` at `m = 4`. Newton's method starts from `x0 = 1.5` at `m = 4` (Section 2, Table 3)."
+
+[[rows]]
+key = '4.1'
+f = 'x + b*x^2'
+parameters = '`b`; no value given'
+notes = "Root `0` of multiplicity 1. Model case for how conservative the article's step-size bound is; no numerical run."

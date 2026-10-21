@@ -1,0 +1,121 @@
+title = 'Alefeld, Potra, Shi (1995): Algorithm 748'
+reference = "Alefeld, G. E., Potra, F. A., Shi, Y. (1995). Algorithm 748: enclosing zeros of continuous functions. ACM Transactions on Mathematical Software 21(3), 327–344. https://doi.org/10.1145/210089.210111. The authors' code is CALGO 748: https://www.netlib.org/toms/748."
+year = 1995
+subcategory = '1.1'
+where_in_source = "the article's Table I, \"Test Problems\" (p. 341). In the authors' code, the subroutines `FUNC` and `INIT` in `driver.f` hold the functions and intervals, and `testdata` holds the parameter values."
+transcribed_from = '''
+the article's Table I, checked against the authors' `driver.f` and `testdata`, and against sunnbear's transcription in `tests/solvers/paper_problems/alefeld_potra_shi.py`, which follows the driver.
+- All 3 agree on every function, interval and parameter value, apart from the driver's `pi = 3.1416` in the intervals of rows 1 and 14.
+- The rows follow the article, except where the article's scan is unclear (problem 15), where they follow the driver; the rows' notes say where the code writes a problem differently.
+'''
+rows_summary = '''
+15, 1 per problem number of Table I.
+- The article counts 154 cases over all intervals and parameter values, and `testdata` holds the same 154.
+- The driver numbers 28 problems, because it splits 3 of Table I's problems:
+  - problem 2 into 10 problems, 1 per interval;
+  - problem 3 into 3, 1 per pair of `a` and `b`;
+  - problem 4 into 3, 1 per value of `a` and interval.
+'''
+notes = "The `parameters` column keeps Table I's notation `a(s)b` for the values from `a` to `b` in steps of `s`."
+
+[[rows]]
+key = '1'
+f = 'sin(x) - x/2'
+interval = '[pi/2, pi]'
+notes = 'Driver problem 1. The driver sets `pi = 3.1416` for the interval.'
+
+[[rows]]
+key = '2'
+f = '-2*sum((2*i - 5)^2/(x - i^2)^3, i = 1..20)'
+parameters = 'n = 1(1)10'
+interval = '`[a_n, b_n]` with `a_n = n^2 + 10^(-9)`, `b_n = (n + 1)^2 - 10^(-9)`'
+notes = 'Driver problems 2–11: interval `n` is driver problem `n + 1`. `n` only selects the interval between the poles at `n^2` and `(n + 1)^2`; `f` has no parameter.'
+
+[[rows]]
+key = '3'
+f = 'a*x*exp(b*x)'
+parameters = '`a = -40, b = -1`; `a = -100, b = -2`; `a = -200, b = -3`'
+interval = '[-9, 31]'
+notes = "Driver problems 12–14, in the listed order. Here `a` and `b` are the function's parameters, not the interval's endpoints. The driver writes the 3 functions out, as `-40*x*exp(-1*x)` and so on."
+
+[[rows]]
+key = '4'
+f = 'x^n - a'
+parameters = 'on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)12`; on `[-0.95, 4.05]`: `a = 1`, `n = 8(2)14`'
+interval = '`[0, 5]`; `[-0.95, 4.05]`'
+notes = 'Driver problems 15 (`a = 0.2` on `[0, 5]`), 16 (`a = 1` on `[0, 5]`) and 17 (`a = 1` on `[-0.95, 4.05]`).'
+
+[[rows]]
+key = '5'
+f = 'sin(x) - 0.5'
+interval = '[0, 1.5]'
+notes = 'Driver problem 18.'
+
+[[rows]]
+key = '6'
+f = '2*x*exp(-n) - 2*exp(-n*x) + 1'
+parameters = 'n = 1(1)5, 20(20)100'
+interval = '[0, 1]'
+notes = 'Driver problem 19.'
+
+[[rows]]
+key = '7'
+f = '(1 + (1 - n)^2)*x - (1 - n*x)^2'
+parameters = 'n = 5, 10, 20'
+interval = '[0, 1]'
+notes = 'Driver problem 20. The article writes the first factor in square brackets.'
+
+[[rows]]
+key = '8'
+f = 'x^2 - (1 - x)^n'
+parameters = 'n = 2, 5, 10, 15, 20'
+interval = '[0, 1]'
+notes = 'Driver problem 21.'
+
+[[rows]]
+key = '9'
+f = '(1 + (1 - n)^4)*x - (1 - n*x)^4'
+parameters = 'n = 1, 2, 4, 5, 8, 15, 20'
+interval = '[0, 1]'
+notes = 'Driver problem 22. The article writes the first factor in square brackets.'
+
+[[rows]]
+key = '10'
+f = 'exp(-n*x)*(x - 1) + x^n'
+parameters = 'n = 1, 5, 10, 15, 20'
+interval = '[0, 1]'
+notes = 'Driver problem 23.'
+
+[[rows]]
+key = '11'
+f = '(n*x - 1)/((n - 1)*x)'
+parameters = 'n = 2, 5, 15, 20'
+interval = '[0.01, 1]'
+notes = 'Driver problem 24.'
+
+[[rows]]
+key = '12'
+f = 'x^(1/n) - n^(1/n)'
+parameters = 'n = 2(1)6, 7(2)33'
+interval = '[1, 100]'
+notes = 'Driver problem 25.'
+
+[[rows]]
+key = '13'
+f_description = '`0` if `x = 0`; `x*exp(-x^(-2))` otherwise'
+interval = '[-1, 4]'
+notes = "Driver problem 26. The article (pp. 342–343) notes that coded as `x*exp(-1/x^2)`, the solvers return about 0.02, where that product underflows to 0; coded as `x/exp(1/x^2)`, they find the root at 0. The driver uses `x/exp(1/x^2)`, and sunnbear's transcription returns 0 where `exp(1/x^2)` overflows in Python."
+
+[[rows]]
+key = '14'
+f_description = '`n/20*(x/1.5 + sin(x) - 1)` if `x >= 0`; `-n/20` otherwise'
+parameters = 'n = 1(1)40'
+interval = '[-10^4, pi/2]'
+notes = 'Driver problem 27. The driver sets `pi = 3.1416` for the interval.'
+
+[[rows]]
+key = '15'
+f_description = '`e - 1.859` if `x > 2*10^(-3)/(1 + n)`; `exp((n + 1)*x/2*10^3) - 1.859` if `x` in `[0, 2*10^(-3)/(1 + n)]`; `-0.859` if `x < 0`'
+parameters = 'n = 20(1)40, 100(100)1000'
+interval = '[-10^4, 10^(-4)]'
+notes = "Driver problem 28. The scan prints the factor `*10^3` of the middle branch between the exponent and the baseline; the row follows the driver, which puts it in the exponent (`exp((n+1)*0.5*x*1.0e3)`). Only that reading makes the branches meet at `x = 0` and at `x = 2*10^(-3)/(1 + n)`. At `x = 2*10^(-3)/(1 + n)` itself, the driver uses the first branch and the article the middle one; both give `e - 1.859`. Alefeld, Potra & Shi (1993) print all of `(n + 1)*x/2*10^3` in the exponent (`1993_alefeld_potra_shi`, `T5.1-14`), which confirms the driver's reading."

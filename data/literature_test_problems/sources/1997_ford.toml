@@ -1,0 +1,46 @@
+title = 'Ford (1997): improved Illinois-type methods'
+reference = "Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia Iranica 4(1&2), 28–34. The article has no working DOI: the journal's page, https://scientiairanica.sharif.edu/article_21758.html, lists 10.24200/sci.2020.21758, which doi.org does not resolve. An earlier version is the University of Essex technical report CSM-257 (1995)."
+year = 1997
+subcategory = '1.1'
+where_in_source = '''
+section "Numerical Tests".
+- The list "The Test Functions" (p. 30) numbers the 5 functions and prints each one's root `x*`.
+- Table 4 (p. 31) gives 3 initial brackets per function.
+- The text says where 3 of the functions come from.
+'''
+transcribed_from = "the article, a scan without a text layer, read from the page images, and checked against sunnbear's transcription in `tests/solvers/paper_problems/ford.py`, which holds the 5 functions and the 15 bracket problems and agrees with the article on every function, constant and interval."
+rows_summary = '5, 1 per function. Table 4 solves each function on 3 brackets, 15 problems in all.'
+notes = "The `also_in` column gives the article's references for 3 of the functions. The rows of Anderson and Björck (1973), the article's reference 4, are in `1973_anderson_bjorck`."
+
+[[rows]]
+key = '1'
+f = 'sin(0.01/x) - 0.01'
+interval = '`[0.5, 2]`; `[0.2, 6]`; `[0.004, 200]`'
+notes = 'Printed root: `x* = 0.99998333286109`.'
+
+[[rows]]
+key = '2'
+f = '10^-8*(x - 1)*prod(x^2 + x + i, i = 1..10)'
+interval = '`[0.9, 1.1]`; `[0.5, 1.5]`; `[-5, 10]`'
+also_in = 'Hopgood, McKee (1974), "Improved root-finding methods derived from inverse interpolation", J. Inst. Maths. Applics. 14, 217–228 (article ref. 7)'
+notes = 'Printed root: `x* = 1.0`. The article says Hopgood and McKee study this function.'
+
+[[rows]]
+key = '3'
+f = 'exp(21000/x)/(1.11*10^11*x^2) - 1'
+interval = '`[550, 560]`; `[400, 600]`; `[350, 850]`'
+also_in = 'Shacham, Kehat (1973), "Converging interval methods for the iterative solution of a non-linear equation", Chem. Eng. Sci. 28, 2187–2193 (article ref. 8)'
+notes = 'Printed root: `x* = 551.77382493033`. The article prints the constant as `21,000`.'
+
+[[rows]]
+key = '4'
+f = '2*x*exp(-20) + 1 - 2*exp(-20*x)'
+interval = '`[0, 1]`; `[-0.1, 1.5]`; `[-0.5, 2]`'
+also_in = 'Anderson, Björck (1973), "A new high order method of regula falsi type for computing a root of an equation", BIT 13, 253–264 (article ref. 4)'
+notes = 'Printed root: `x* = 0.034657358821882`.'
+
+[[rows]]
+key = '5'
+f = 'exp(x^-1 - 25) - 1'
+interval = '`[0.035, 0.05]`; `[0.03, 0.09]`; `[0.025, 0.5]`'
+notes = 'Printed root: `x* = 0.04`.'

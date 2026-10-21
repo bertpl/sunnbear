@@ -1,0 +1,62 @@
+title = 'Cadenas (2026): reflected box method'
+reference = 'Cadenas, O. (2026). Reflected Box Method: A Fast Quadratic-Convergent Root Solver. The Journal of Engineering (IET) 2026, e70179. https://doi.org/10.1049/tje2.70179.'
+year = 2026
+subcategory = '1.2'
+where_in_source = 'Section 3, "Benchmark Comparison", lists 8 functions with a name each, and Table 1 gives the results per function. Section 4 (Fig. 2) uses `g1` again for the convergence order.'
+transcribed_from = 'the article, checked against the page images.'
+rows_summary = '8, 1 per function of Section 3.'
+notes = '''
+- The article gives no intervals or starting points: the method needs points `B`, `C` with `f(B) > 0 > f(C)` and a starting guess, and the article states none of them.
+- Keys are the article's labels `g1` to `g3` and `f1` to `f5`.
+'''
+
+[[rows]]
+key = 'g1'
+f = '(x - 2)*cos(5*x)'
+name = 'oscillatory shifted root'
+interval = 'not given'
+notes = 'Also the function of Section 4 and Fig. 2.'
+
+[[rows]]
+key = 'g2'
+f = 'exp(-x^2) - 0.1'
+name = 'Gaussian decay'
+interval = 'not given'
+
+[[rows]]
+key = 'g3'
+f = 'atan(10*(x - 2))'
+name = 'steep transition'
+interval = 'not given'
+notes = 'Printed as `tan^-1(10(x - 2))`.'
+
+[[rows]]
+key = 'f1'
+f = 'x^3 + 4*x^2 - 10'
+name = 'polynomial'
+interval = 'not given'
+
+[[rows]]
+key = 'f2'
+f = 'cos(x)'
+name = 'transcendental'
+interval = 'not given'
+
+[[rows]]
+key = 'f3'
+f = 'sin(x)^2 - x^2 + 1'
+name = 'bounded composite'
+interval = 'not given'
+notes = 'Printed as `sin^2(x)`.'
+
+[[rows]]
+key = 'f4'
+f = '0.001*x^3 + 0.05*x^2 + 1.2*x - 10'
+name = 'temperature sensor model'
+interval = 'not given'
+
+[[rows]]
+key = 'f5'
+f = '5*exp(0.1*x) - 8'
+name = 'pressure sensor model'
+interval = 'not given'

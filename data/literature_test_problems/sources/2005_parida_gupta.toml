@@ -1,0 +1,57 @@
+title = 'Parida, Gupta (2005): an improved regula-falsi method'
+reference = '''
+Parida, P. K., Gupta, D. K. (2006). An improved regula-falsi method for enclosing simple zeros of nonlinear equations. Applied Mathematics and Computation 177(2), 769–776. https://doi.org/10.1016/j.amc.2005.11.034. The article prints the volume and the year 2006 but no issue number; the issue number is Crossref's. The year 2005 of the title follows the article's copyright line, "© 2005 Elsevier Inc.", which is also the year in the DOI; the article prints no online date.
+'''
+year = 2005
+subcategory = '1.2'
+where_in_source = '''
+- Section 5, "Numerical result" (p. 775), lists Examples 1–4, each with an interval `[a, b]` and a starting point `x0`.
+- Table 1, "Comparison of results", gives the iterations `n`, the result `x_n` and `|f(x_n)|` of the article's method RFNL and of 2 earlier methods, STFA (Wu, Shen & Xia, 2003) and AC (Zhu & Wu, 2003), at `eps1 = eps2 = 10^-12`.
+'''
+transcribed_from = "the article, the publisher's PDF with a text layer, read from the page images: the text layer drops the minus signs, as in `[20, 20]` for `[-20, 20]`."
+rows_summary = '4, 1 per example.'
+notes = '''
+- **Keys:** the example numbers.
+- **`also_in`:** empty in every row, because the article does not say where its examples come from.
+- **Wu, Shen & Xia (2003):** the article runs the method STFA of that article on its own 4 examples, and does not say whether Wu, Shen & Xia (2003) or Zhu & Wu (2003) hold them. Neither article has a source file in this folder.
+'''
+
+[[relations]]
+sources = ['1992_alefeld_potra', '1993_alefeld_potra_shi', '1995_alefeld_potra_shi', '2011_galdino']
+text = '''
+Example 3, `11*x^11 - 1` on `[0.1, 1]`, is problem 3 of Alefeld & Potra (1992) and `g3` of Galdino (2011), on the same interval. Example 3 is not in the tables of Alefeld, Potra & Shi (1993, 1995). Examples 1, 2 and 4 are in none of the 4 articles.
+'''
+
+[[relations]]
+sources = ['1989_atkinson']
+text = '''
+The article cites Atkinson (1989) only for root-finding methods in general.
+- Example 1 is the book's Problem 43.
+- Example 2 is the derivative of the book's (2.7.6), which the book solves with Newton's method.
+- Example 4 is the book's Laguerre polynomial of degree 6 (§2.9, p. 101).
+- The book gives no intervals for these 3 functions.
+'''
+
+[[rows]]
+key = '1'
+f = 'x^5 - 300*x^2 - 126*x + 5005'
+interval = '[-20, 20]'
+notes = '`x0 = -20`. The interval holds 3 roots: -3.909221, 5 and about 5.00105. Table 1 reports -3.909221 for all 3 methods.'
+
+[[rows]]
+key = '2'
+f = '3*x^2 - 11.12*x + 9.1389'
+interval = '[-30, 2]'
+notes = '`x0 = -30`. Root 1.23; the other root, about 2.4767, lies outside the interval.'
+
+[[rows]]
+key = '3'
+f = '11*x^11 - 1'
+interval = '[0.1, 1]'
+notes = '`x0 = 0.1`.'
+
+[[rows]]
+key = '4'
+f = 'x^6 - 36*x^5 + 450*x^4 - 2400*x^3 + 5400*x^2 - 4320*x + 720'
+interval = '[10, 22]'
+notes = '`x0 = 22`. Root 15.9828739, the largest root of the polynomial.'

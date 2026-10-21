@@ -1,0 +1,48 @@
+title = 'Dowell, Jarratt (1972): the Pegasus method'
+reference = 'Dowell, M., Jarratt, P. (1972). The "Pegasus" method for computing the root of an equation. BIT 12(4), 503–508. https://doi.org/10.1007/BF01932959.'
+year = 1972
+subcategory = '1.1'
+where_in_source = '''
+Section 4, "Numerical Illustrations" (pp. 505–507).
+- Table 1 follows the Pegasus iterates on 1 equation.
+- Problems 1 to 4 compare the iteration counts of the Pegasus, Illinois and Regula Falsi methods.
+'''
+transcribed_from = "the article, a scan with a text layer, checked against the page images. sunnbear's `tests/solvers/bracketing/pegasus/test_paper.py` transcribes Table 1 only, in a mirrored form (see its row)."
+rows_summary = "5: Table 1's equation and Problems 1 to 4."
+notes = '''
+- The keys are the article's own labels.
+- The article gives starting values `x0` and `x1`, not intervals; the `interval` column holds the interval between them.
+'''
+
+[[rows]]
+key = 'Table 1'
+f = 'x^3 + 1'
+interval = '[-2, 0]'
+notes = "Root `-1`. Starting values `x0 = 0`, `x1 = -2`. The row follows the article. sunnbear's `test_paper.py` solves the mirrored `1 - x^3` on `[0, 2]`, because sunnbear's `Pegasus` takes the upper bound as its newest starting point."
+
+[[rows]]
+key = 'Problem 1'
+f = '(N*x - 1)/((N - 1)*x)'
+parameters = 'N = 2, 10, 20'
+interval = '[0.01, 1]'
+notes = 'Starting values `x0 = 0.01`, `x1 = 1.0`. The article chose it to show the slow convergence of Regula Falsi.'
+
+[[rows]]
+key = 'Problem 2'
+f = 'J0(K)*Y1(K*x) - J1(K*x)*Y0(K)'
+parameters = 'K = 2.5, 3.0'
+interval = '[0.1, 1]'
+notes = 'Starting values `x0 = 0.1`, `x1 = 1.0`. Roots `0.149436` for `K = 2.5` and `0.370989` for `K = 3.0`. The article does not define `J` and `Y`; they read as the Bessel functions of the first and second kind. The article says the problem arises in nuclear reactor theory.'
+
+[[rows]]
+key = 'Problem 3'
+f = 'sum((-1)^n*x^((3*n^2 + n)/2), n = -inf..inf) - 1'
+interval = '[-0.9999, -0.0001]'
+notes = 'Defined for `-1 < x < 1`. Root `-0.679334`. Starting values `x0 = -0.0001`, `x1 = -0.9999`. The article calls it a well-behaved function.'
+
+[[rows]]
+key = 'Problem 4'
+f_description = '`integral(phi(u)*(1 - Phi(v))^(K - 1), u = -inf..inf) - P*`, with `phi(u) = exp(-u^2/2)/sqrt(2*pi)`, `Phi(v) = integral(exp(-t^2/2), t = -inf..v)/sqrt(2*pi)` and `v = (u - x)/c`'
+parameters = '(c, K, P*) = (1, 4, 0.8), (1, 3, 0.5)'
+also_in = 'Chambers, Jarratt (1964), "Use of double sampling for selecting best population", Biometrika 51(1–2), 49–64'
+notes = "The article gives no starting values. The table's last column, headed `phi`, gives `0.205528` and `0.106712`. The article computes the integral with Gauss-Hermite roots and weights, without stating the number of points. It says the problem arises in the statistical theory of double sampling."
