@@ -27,7 +27,7 @@ key = 'Equation 2'
 f = 'log(x)'
 interval = '[0, 2]'
 also_in = 'Rahman et al. (2022), "An improved bracketing method for numerical solution of nonlinear equations based on ridders method", Matrix Science Mathematic 6(2), 30–33 (article ref. [9]), which the article says uses a "similar equation"'
-notes = 'Root `1`. The text below Table 3 gives the interval `[2, 3.5]`, which holds no root of `log(x)`: it repeats the text of Equation 1, so the interval leaves it out.'
+notes = "Root `1`. The text below Table 3 gives the interval `[2, 3.5]`, which holds no root of `log(x)`: the article repeats the interval of Equation 1 there, so the row's `interval` leaves `[2, 3.5]` out."
 
 [[rows]]
 key = 'Equation 3'

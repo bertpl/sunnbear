@@ -10,7 +10,7 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
-from .data_files import FINAL_STATUSES, SUBCATEGORY_DESCRIPTIONS, UNDECIDED, RowsTableLine, Source, join_row_ids
+from .data_files import DECIDED_STATUSES, SUBCATEGORY_DESCRIPTIONS, UNDECIDED, RowsTableLine, Source, join_row_ids
 
 COMMON_MIN_SOURCES = 6
 COMMON_MAX_LENGTH = 14
@@ -32,7 +32,7 @@ class Overview:
 
     def status_counts(self, source_id: str) -> dict[str, int]:
         """Return the number of rows of a source in total and per status."""
-        counts = dict.fromkeys(("rows", *FINAL_STATUSES, UNDECIDED), 0)
+        counts = dict.fromkeys(("rows", *DECIDED_STATUSES, UNDECIDED), 0)
         for row in self.rows:
             if row.source_id == source_id:
                 counts["rows"] += 1
@@ -41,7 +41,7 @@ class Overview:
 
     def summary_markdown(self) -> str:
         """Return `summary.md`: the totals, 1 table line per source, and the common functions."""
-        totals = dict.fromkeys(FINAL_STATUSES, 0)
+        totals = dict.fromkeys(DECIDED_STATUSES, 0)
         for row in self.rows:
             totals[row.final_status.status] = totals.get(row.final_status.status, 0) + 1
         lines = [
@@ -93,7 +93,7 @@ class Overview:
                     "year": source.year,
                     "subcategory": source.subcategory,
                     "counts": self.status_counts(source.source_id),
-                    "namesEarlier": [
+                    "rowsNamingEarlier": [
                         [row.key, row.final_status.status, join_row_ids(row.final_status.named_row_ids)]
                         for row in self.rows
                         if row.source_id == source.source_id and row.final_status.named_row_ids

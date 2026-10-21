@@ -127,7 +127,7 @@ def test_readme_lists_every_subcategory(script_modules, folder):
 
 
 def test_readme_lists_every_status(script_modules, folder):
-    """The README's lists of statuses name exactly the final statuses and the status of an undecided row."""
+    """The README's lists of statuses name exactly the decided statuses and the status of an undecided row."""
     # --- arrange / act ----------------
     data_files = script_modules["data_files"]
     readme = folder.readme_file.read_text(encoding="utf-8")
@@ -135,7 +135,19 @@ def test_readme_lists_every_status(script_modules, folder):
     listed = set(re.findall(r"^- \*\*`(\w+)`:\*\*", statuses_section, flags=re.MULTILINE))
 
     # --- assert -----------------------
-    assert listed == {*data_files.FINAL_STATUSES, data_files.UNDECIDED}
+    assert listed == {*data_files.DECIDED_STATUSES, data_files.UNDECIDED}
+
+
+def test_timeline_template_counts_every_status(script_modules):
+    """The timeline's line of row counts names exactly the decided statuses and the status of an undecided row."""
+    # --- arrange / act ----------------
+    data_files = script_modules["data_files"]
+    template = script_modules["overview"].TIMELINE_TEMPLATE.read_text(encoding="utf-8")
+    counts_line = re.search(r"\$\{c\.rows\} rows: (.*)</p>", template).group(1)
+    listed = set(re.findall(r"\$\{c\.(\w+)\}", counts_line))
+
+    # --- assert -----------------------
+    assert listed == {*data_files.DECIDED_STATUSES, data_files.UNDECIDED}
 
 
 # ==================================================================================================
@@ -184,7 +196,7 @@ def test_decide_final_statuses_names_the_first_appearance(script_modules, automa
 def test_find_problems_checks_each_status(
     script_modules, status, duplicate_of, derived_from, reason, expected_problems
 ):
-    """`find_problems` reports a row whose status and named rows break the rules of the statuses."""
+    """`find_problems` reports each rule of the statuses that a row breaks, and nothing for a row that breaks none."""
     # --- arrange ----------------------
     final_status_cls = script_modules["data_files"].FinalStatus
     final_statuses = {

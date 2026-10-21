@@ -16,7 +16,7 @@ SUBCATEGORY_DESCRIPTIONS = {
     "1.3": "public benchmark suites",
     "1.4": "textbooks",
 }
-FINAL_STATUSES = ("new", "duplicate", "incomplete")
+DECIDED_STATUSES = ("new", "duplicate", "incomplete")
 # UNDECIDED is the status of a row that the script could not decide and that no decision covers yet.
 UNDECIDED = "undecided"
 # ROW_ID_SEPARATOR separates the row ids in 1 field.
@@ -226,8 +226,8 @@ class AutomaticStatus:
     """An `AutomaticStatus` holds the status that the script finds for a row by comparing it with every earlier row.
 
     `match_kind` names the comparisons that found `matches`, the matched row ids joined by `ROW_ID_SEPARATOR`; for an
-    `incomplete` row it names the case instead, such as "no interval". `n_instances` is 0 for a row whose f does not
-    parse.
+    `incomplete` row it names why the row is incomplete instead, such as "no interval", and for an undecided row why a
+    person must decide, such as "no test function". `n_instances` is 0 for a row whose f does not parse.
     """
 
     status: str
@@ -266,6 +266,26 @@ class FinalStatus:
         """Return the ids of every earlier row that the row names, in `duplicate_of` or in `derived_from`."""
         return [*self.duplicate_of_ids, *self.derived_from_ids]
 
+    def find_status_problems(self, row_id: str) -> list[str]:
+        """Return the problem of the status and the fields that it fills, as a list of at most 1 problem.
+
+        `row_id` is the id of the row that has this status; each problem starts with it.
+        """
+        if self.status == UNDECIDED:
+            return [f"{row_id} needs a decision in decisions.csv"]
+        elif self.status not in DECIDED_STATUSES:
+            return [f"{row_id} has an unknown status, {self.status}"]
+        elif self.status == "duplicate" and not self.duplicate_of:
+            return [f"{row_id} is duplicate but names no row in duplicate_of"]
+        elif self.status == "duplicate" and self.derived_from:
+            return [f"{row_id} is duplicate but names rows in derived_from"]
+        elif self.status != "duplicate" and self.duplicate_of:
+            return [f"{row_id} is {self.status} but names rows in duplicate_of"]
+        elif self.status == "incomplete" and not self.reason:
+            return [f"{row_id} is incomplete but gives no reason"]
+        else:
+            return []
+
     # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------
@@ -274,7 +294,7 @@ class FinalStatus:
         """Return the final status that an automatic status gives a row without a decision.
 
         A `duplicate` names its matches in `duplicate_of`, a `new` or `incomplete` row in `derived_from`, and an
-        `incomplete` row takes its case as the reason; an undecided row names no row.
+        `incomplete` row takes `match_kind` as the reason; an undecided row names no row.
         """
         status, matches = automatic_status.status, automatic_status.matches
         if status == "duplicate":
@@ -298,7 +318,7 @@ def read_decisions(path: Path) -> dict[str, FinalStatus]:
             row_id = line["row_id"].strip()
             if row_id in decisions:
                 raise DataFileError(f"{path.name}: {row_id} is decided twice")
-            elif line["status"] not in FINAL_STATUSES:
+            elif line["status"] not in DECIDED_STATUSES:
                 raise DataFileError(f"{path.name}: {row_id} has unknown status {line['status']!r}")
             else:
                 decisions[row_id] = FinalStatus(

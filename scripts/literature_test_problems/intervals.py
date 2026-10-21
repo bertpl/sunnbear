@@ -13,7 +13,7 @@ from dataclasses import dataclass
 import sympy as sp
 
 from .data_files import SourceRow
-from .parsing import MAX_INSTANCES, ParseError, TimeLimit, parse_math, parse_parameters, parse_value_list
+from .helpers import MAX_INSTANCES, ParseError, TimeLimitContext, parse_math, parse_parameters, parse_value_list
 
 # NO_INTERVAL matches the start of an interval text that says that the source gives no interval.
 NO_INTERVAL = re.compile(r"(none|not given|not printed|not stated)\b", flags=re.IGNORECASE)
@@ -29,9 +29,9 @@ SPAN_ASSIGNMENT = re.compile(r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*=(?!=)\s*(.+?)\s*")
 class Interval:
     """An `Interval` holds 1 interval and the values of the parameters that its bounds use.
 
-    `lower` and `upper` are the bounds as exact sympy numbers in text, the smaller one first, such as `pi/2` and
+    `lower` and `upper` are the bounds as the text of exact sympy numbers, the smaller one first, such as `pi/2` and
     `1/10000`: a decimal bound is read as an exact fraction, so `1E-4`, `10^(-4)` and `0.0001` give the same text,
-    and 2 intervals are equal when their keys are.
+    and 2 intervals are the same interval when their keys are equal.
     """
 
     lower: str
@@ -43,14 +43,23 @@ class Interval:
         """Return the 2 bounds, which identify the interval."""
         return (self.lower, self.upper)
 
-    def fits(self, parameter_values: tuple[tuple[str, sp.Expr], ...]) -> bool:
+    def matches_parameter_values(self, parameter_values: tuple[tuple[str, sp.Expr], ...]) -> bool:
         """Return whether the interval belongs to an instance with these parameter values.
 
-        It does when both give the same value to every parameter that both name, which holds for an interval whose
-        bounds use no parameter of the function.
+        The interval belongs to the instance when the interval and the instance give the same value to every parameter
+        that they both name, which holds for an interval whose bounds use no parameter of the function.
         """
         instance_values = dict(parameter_values)
         return all(instance_values.get(name, value) == value for name, value in self.parameter_values)
+
+    # --------------------------------------------------------------------------
+    #  Factory methods
+    # --------------------------------------------------------------------------
+    @classmethod
+    def from_bounds(cls, bounds: list[sp.Expr], parameter_values: tuple[tuple[str, sp.Expr], ...]) -> "Interval":
+        """Return the interval between 2 exact real bounds, given in either order."""
+        lower, upper = sorted(bounds, key=lambda bound: sp.N(bound, 50))
+        return cls(str(lower), str(upper), parameter_values)
 
 
 # ==================================================================================================
@@ -60,14 +69,14 @@ class Interval:
 class ParsedIntervals:
     """A `ParsedIntervals` holds a row's usable intervals, or why it has none.
 
-    `incomplete_case` is "no interval" where the text says that the source gives none or is empty, "no usable
+    `incomplete_reason` is "no interval" where the text says that the source gives none or is empty, "no usable
     interval" where the text gives no interval with finite numeric bounds, such as `theta > 0`, a starting point, an
     interval with an infinite bound or one with bounds that the row gives no values for, and "" otherwise.
-    `n_unusable` counts the intervals that the text gives but that are left out, beside usable ones.
+    `n_unusable` counts the intervals that the text gives but that are left out as not usable.
     """
 
     intervals: tuple[Interval, ...]
-    incomplete_case: str
+    incomplete_reason: str
     n_unusable: int
 
     # --------------------------------------------------------------------------
@@ -87,26 +96,38 @@ class ParsedIntervals:
             if code[i] not in "[(":
                 i += 1
                 continue
-            depth, parts, start, end = 0, [], i + 1, None
-            for j in range(i, len(code)):
-                if code[j] in "[({":
-                    depth += 1
-                elif code[j] in "])}":
-                    depth -= 1
-                    if depth == 0:
-                        end = j
-                        break
-                elif code[j] == "," and depth == 1:
-                    parts.append(code[start:j])
-                    start = j + 1
-            if end is None:
+            bracket = ParsedIntervals._split_bracket(code, i)
+            if bracket is None:
                 break
-            parts.append(code[start:end])
-            is_call = i > 0 and NAME_CHARACTER.match(code[i - 1])
+            parts, end = bracket
+            if i > 0:
+                is_call = bool(NAME_CHARACTER.match(code[i - 1]))
+            else:
+                is_call = False
             if not is_call and len(parts) == 2:
                 pairs.append((parts[0].strip(), parts[1].strip()))
             i = end + 1
         return pairs
+
+    @staticmethod
+    def _split_bracket(code: str, start: int) -> tuple[list[str], int] | None:
+        """Return the comma-separated parts of the bracket that opens at `code[start]`, and where it closes.
+
+        The result is None if the bracket does not close. Commas inside nested brackets do not separate parts.
+        """
+        depth, parts, part_start = 0, [], start + 1
+        for j in range(start, len(code)):
+            if code[j] in "[({":
+                depth += 1
+            elif code[j] in "])}":
+                depth -= 1
+                if depth == 0:
+                    parts.append(code[part_start:j])
+                    return parts, j
+            elif code[j] == "," and depth == 1:
+                parts.append(code[part_start:j])
+                part_start = j + 1
+        return None
 
     @staticmethod
     def _read_assignments(spans: list[str], parameters: dict[str, list]) -> tuple[dict[str, sp.Expr], dict[str, list]]:
@@ -132,17 +153,26 @@ class ParsedIntervals:
         return definitions, values
 
     @staticmethod
-    def _evaluate(
+    def _evaluate_bounds(
         bounds: tuple[str, str], definitions: dict[str, sp.Expr], values: dict[str, list], parameters: dict
     ) -> list[Interval] | None:
         """Return the intervals that 2 bounds give, 1 per combination of the values of the names that they use.
 
         The result is None where the bounds are not usable: a bound uses a name that has no values, or is infinite.
 
+        Args:
+            bounds: The 2 bounds as the interval text writes them.
+            definitions: The names that the interval text defines by an expression, such as `a_n`.
+            values: The values of each name that a bound may use: the row's parameters and the names that the
+                interval text assigns values to.
+            parameters: The row's parameter values, which `parse_math` uses only to tell whether `e` is a parameter.
+
         Raises:
-            ParseError: If a bound does not parse, is not a real number, or the bounds are equal.
+            ParseError: If a bound does not parse or is not a real number, if the bounds are equal, or if the names
+                give more than `MAX_INSTANCES` combinations.
         """
         exprs = [parse_math(bound, parameters) for bound in bounds]
+        # a definition may use another definition, so substitute up to 3 levels deep
         for _ in range(3):
             exprs = [expr.subs(definitions) for expr in exprs]
         names = sorted({s.name for expr in exprs for s in expr.free_symbols})
@@ -161,8 +191,7 @@ class ParsedIntervals:
                 raise ParseError("interval: a bound is not a real number")
             elif sp.simplify(numbers[0] - numbers[1]) == 0:
                 raise ParseError("interval: equal bounds")
-            lower, upper = sorted(numbers, key=lambda number: sp.N(number, 50))
-            intervals.append(Interval(str(lower), str(upper), tuple(zip(names, combo, strict=True))))
+            intervals.append(Interval.from_bounds(numbers, tuple(zip(names, combo, strict=True))))
         return intervals
 
     @classmethod
@@ -170,7 +199,7 @@ class ParsedIntervals:
         """Parse a row's interval text, or raise `ParseError` with the reason."""
         text = row.interval.strip()
         if not text or NO_INTERVAL.match(text):
-            return cls(intervals=(), incomplete_case="no interval", n_unusable=0)
+            return cls(intervals=(), incomplete_reason="no interval", n_unusable=0)
         if "`" in text:
             spans = re.findall(r"`([^`]*)`", text)
         else:
@@ -182,15 +211,15 @@ class ParsedIntervals:
         n_unusable = 0
         for span in spans:
             for bounds in cls._find_bound_pairs(span):
-                evaluated = cls._evaluate(bounds, definitions, values, row_values)
+                evaluated = cls._evaluate_bounds(bounds, definitions, values, row_values)
                 if evaluated is None:
                     n_unusable += 1
                 else:
                     intervals.update(dict.fromkeys(evaluated))
         if intervals:
-            return cls(intervals=tuple(intervals), incomplete_case="", n_unusable=n_unusable)
+            return cls(intervals=tuple(intervals), incomplete_reason="", n_unusable=n_unusable)
         else:
-            return cls(intervals=(), incomplete_case="no usable interval", n_unusable=n_unusable)
+            return cls(intervals=(), incomplete_reason="no usable interval", n_unusable=n_unusable)
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -198,5 +227,5 @@ class ParsedIntervals:
     @classmethod
     def from_source_row(cls, row: SourceRow) -> "ParsedIntervals":
         """Parse a row's interval text, or raise `ParseError` with the reason, or `ParseTimeoutError` if it is slow."""
-        with TimeLimit():
+        with TimeLimitContext():
             return cls._parse(row)

@@ -1,6 +1,6 @@
 """This module combines the automatic statuses with the decisions into each row's final status."""
 
-from .data_files import FINAL_STATUSES, UNDECIDED, AutomaticStatus, FinalStatus, join_row_ids
+from .data_files import AutomaticStatus, FinalStatus, join_row_ids
 
 
 def decide_final_statuses(
@@ -22,29 +22,30 @@ def decide_final_statuses(
         else:
             final_statuses[row_id] = FinalStatus.from_automatic_status(automatic)
     # the rows come in time order, so each earlier row already names its own first appearances
-    resolved: dict[str, FinalStatus] = {}
+    resolved_statuses: dict[str, FinalStatus] = {}
     for row_id, final in final_statuses.items():
-        resolved[row_id] = FinalStatus(
+        resolved_statuses[row_id] = FinalStatus(
             final.status,
-            join_row_ids(_first_appearances(final.duplicate_of_ids, resolved)),
-            join_row_ids(_first_appearances(final.derived_from_ids, resolved)),
+            join_row_ids(_first_appearances(final.duplicate_of_ids, resolved_statuses)),
+            join_row_ids(_first_appearances(final.derived_from_ids, resolved_statuses)),
             final.reason,
         )
-    return resolved
+    return resolved_statuses
 
 
 def find_problems(final_statuses: dict[str, FinalStatus], decisions: dict[str, FinalStatus]) -> list[str]:
     """Return the problems of the final statuses, for rows given in time order; an empty list if there are none.
 
     A problem is a decision for an unknown row, a row that names an unknown or a later row, an undecided row, a row
-    with an unknown status, a duplicate that names no row in `duplicate_of` or names a row that is not `new`, a row
-    that names rows in the field of the other statuses, or an `incomplete` row without a reason.
+    with an unknown status, a duplicate that names no row in `duplicate_of`, names a row there that is not `new`, or
+    names rows in `derived_from`, a row that is not a duplicate and names rows in `duplicate_of`, or an `incomplete`
+    row without a reason.
     """
     position = {row_id: i for i, row_id in enumerate(final_statuses)}
     problems = [f"decisions.csv names an unknown row, {row_id}" for row_id in decisions if row_id not in position]
     for row_id, final in final_statuses.items():
         problems += _named_row_problems(row_id, final, final_statuses, position)
-        problems += _status_problems(row_id, final)
+        problems += final.find_status_problems(row_id)
     return problems
 
 
@@ -67,33 +68,15 @@ def _named_row_problems(
     return problems
 
 
-def _status_problems(row_id: str, final: FinalStatus) -> list[str]:
-    """Return the problem of 1 row's status and the fields that it fills, as a list of at most 1 problem."""
-    if final.status == UNDECIDED:
-        return [f"{row_id} needs a decision in decisions.csv"]
-    elif final.status not in FINAL_STATUSES:
-        return [f"{row_id} has an unknown status, {final.status}"]
-    elif final.status == "duplicate" and not final.duplicate_of:
-        return [f"{row_id} is duplicate but names no row in duplicate_of"]
-    elif final.status == "duplicate" and final.derived_from:
-        return [f"{row_id} is duplicate but names rows in derived_from"]
-    elif final.status != "duplicate" and final.duplicate_of:
-        return [f"{row_id} is {final.status} but names rows in duplicate_of"]
-    elif final.status == "incomplete" and not final.reason:
-        return [f"{row_id} is incomplete but gives no reason"]
-    else:
-        return []
-
-
-def _first_appearances(row_ids: list[str], resolved: dict[str, FinalStatus]) -> list[str]:
+def _first_appearances(row_ids: list[str], resolved_statuses: dict[str, FinalStatus]) -> list[str]:
     """Return the row ids with each resolved duplicate replaced by the rows in its `duplicate_of`.
 
-    `resolved` holds the final statuses of the earlier rows, which already name their own first appearances.
+    `resolved_statuses` holds the final statuses of the earlier rows, which already name their own first appearances.
     """
     first_appearances = []
     for row_id in row_ids:
-        if row_id in resolved and resolved[row_id].status == "duplicate":
-            first_appearances.extend(resolved[row_id].duplicate_of_ids)
+        if row_id in resolved_statuses and resolved_statuses[row_id].status == "duplicate":
+            first_appearances.extend(resolved_statuses[row_id].duplicate_of_ids)
         else:
             first_appearances.append(row_id)
     return first_appearances

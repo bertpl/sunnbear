@@ -133,7 +133,7 @@ function select(i) {
     <p>${c.rows} rows: ${c.new} new, ${c.duplicate} duplicate, ${c.incomplete} incomplete${c.undecided ? `, ${c.undecided} undecided` : ""}</p>
     ${from.length ? `<details open><summary>Takes rows from (${from.length})</summary><table>${list(from)}</table></details>` : ""}
     ${to.length ? `<details open><summary>Rows taken by (${to.length})</summary><table>${list(to)}</table></details>` : ""}
-    ${s.namesEarlier.length ? `<details><summary>Rows that name earlier rows (${s.namesEarlier.length})</summary><table>${s.namesEarlier.map(([k, st, d]) =>
+    ${s.rowsNamingEarlier.length ? `<details><summary>Rows that name earlier rows (${s.rowsNamingEarlier.length})</summary><table>${s.rowsNamingEarlier.map(([k, st, d]) =>
       `<tr><td>${esc(k)}</td><td>${st}</td><td>${esc(d)}</td></tr>`).join("")}</table></details>` : ""}`;
   document.getElementById("panel").classList.add("open");
 }
