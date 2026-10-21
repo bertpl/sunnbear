@@ -4,7 +4,7 @@ John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, https://people.sc
 - [1] George Donovan, Arnold Miller, Timothy Moreland, "Pathological Functions for Newton's Method", American Mathematical Monthly, January 1993, pages 53-58 (no DOI in the file), for `p15`.
 - [2] Peter Colwell, Solving Kepler's Equation Over Three Centuries, Willmann-Bell, 1993, and [3] Jean Meeus, Astronomical Algorithms, Willman-Bell, 1991, for `p16`.
 - [4] Cleve Moler, Numerical Computing with MATLAB, SIAM, 2004, ISBN 978-0-898716-60-3, for `p18`.
-- `p17`'s comment says that Wallis used it to illustrate Newton's method, with no reference.
+- `p17`'s comment says that Wallis used the function to illustrate Newton's method, with no reference.
 
 The file's `brent` solver cites Brent's 1973 book for the algorithm, not for any function.
 '''

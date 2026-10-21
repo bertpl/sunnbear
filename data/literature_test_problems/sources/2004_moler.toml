@@ -7,7 +7,7 @@ chapter 4, "Zeros and Roots" (25 pages): Sections 4.1–4.10 and Exercises 4.1�
 - the golden-ratio equation of Section 1.1, "The Golden Ratio" (pp. 3–5, Figure 1.2), the chapter's only zero-finding example;
 - the last example of Section 1.7, "Floating-Point Arithmetic" (pp. 43–44, Figure 1.9), for which Burkardt's TEST_ZERO (`burkardt_test_zero`) cites the book.
 
-Ex. 4.1 runs `fzerogui` (§4.8) on 7 functions, each on its own interval, and asks what interesting or unusual behavior each one shows; the rows of those functions do not repeat this.
+Exercise 4.1 runs `fzerogui` (§4.8) on 7 functions, each on its own interval, and asks what interesting or unusual behavior each one shows; the rows of those functions do not repeat the question.
 
 The rows leave out:
 - the rest of chapter 1;
@@ -17,7 +17,11 @@ The rows leave out:
 - the exercises about an algorithm without a function (4.4–4.6, 4.17, 4.20, 4.21);
 - Exercises 4.11–4.12, about the size of `Gamma(n + 1)` and the accuracy of 2 approximations of `log(Gamma(x + 1))`, which print no equation to solve.
 '''
-transcribed_from = "the web edition's PDFs of chapter 4, dated September 21, 2013 in its footer, and of chapter 1, dated September 18, 2013: the author's revision, not the printed SIAM edition. Chapter 4's expressions were read from the page images and checked against the PDF's text layer; the §1.1 and §1.7 rows were read from chapter 1's text layer only."
+transcribed_from = '''
+the web edition's PDFs of chapter 4, dated September 21, 2013 in its footer, and of chapter 1, dated September 18, 2013: the author's revision, not the printed SIAM edition.
+
+Chapter 4's expressions were read from the page images and checked against the PDF's text layer; the §1.1 and §1.7 rows were read from chapter 1's text layer only.
+'''
 rows_summary = '23, 1 per distinct function: a function that several sections or exercises use is 1 row whose key lists them all. 10 rows come from the text (2 of them from chapter 1), and the exercises reuse 3 of them; 13 rows come from the exercises alone.'
 notes = '''
 How to read the rows:
@@ -41,7 +45,8 @@ text = '''
 Burkardt's TEST_ZERO (`burkardt_test_zero`) shares these functions with the book:
 - **`p18` is the §1.7 row.** TEST_ZERO cites this book for `p18`, `10^14*(x - 1)^7` expanded term by term on `[0.988, 1.012]`; Moler's polynomial lacks the factor `10^14`, and Moler plots it without solving for a root.
 - **`p17`**, `x^3 - 2*x - 5` on `[2, 3]`, is Ex. 4.2's function, and Ex. 4.2 tells the history of Wallis that `p17`'s comment gives without a reference.
-- **`p14`** (The Camel) equals `humps(x) + 2*x + 0.8`, and **`p16`** is Kepler's equation in degrees with other constants than Ex. 4.15.
+- **`p14`** (The Camel) equals `humps(x) + 2*x + 0.8`, with MATLAB's demo function `humps` of §4.7 and §4.10.
+- **`p16`** is Kepler's equation in degrees with other constants than Ex. 4.15.
 '''
 
 [[rows]]

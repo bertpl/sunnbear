@@ -1,32 +1,20 @@
 """This module builds `summary.md` and `timeline.html`, which give an overview of the sources and how they relate.
 
-An edge runs from an earlier source to a later one for every later row that names a row of the earlier source as
-its earlier row; its weight is the number of such rows. Common functions count in the rows of each source but give
-no edges, since they would join nearly every source: a row is a common function when later rows of at least
-`COMMON_SOURCES` sources name it and its f is at most `COMMON_MAX_LENGTH` characters long. The length limit keeps
-out short functions that many sources hold, such as `cos(x) - x`, while the longer families that sources copy from
-each other keep their edges.
+The folder's README gives the rules for the edges and the common functions; `COMMON_MIN_SOURCES` and
+`COMMON_MAX_LENGTH` set the 2 limits of a common function.
 """
 
 import json
 import re
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
-from .data_files import FINAL_STATUSES, HOME_NAMES, UNDECIDED, RowStatus, Source
+from .data_files import FINAL_STATUSES, HOME_DESCRIPTIONS, UNDECIDED, RowsTableLine, Source
 
-COMMON_SOURCES = 6
+COMMON_MIN_SOURCES = 6
 COMMON_MAX_LENGTH = 14
 TIMELINE_TEMPLATE = Path(__file__).with_name("timeline_template.html")
-
-
-@dataclass(frozen=True)
-class CommonFunction:
-    """A row that later rows of many sources name, and that gives no edges."""
-
-    row_id: str
-    f: str
-    n_sources: int
 
 
 # ==================================================================================================
@@ -34,13 +22,13 @@ class CommonFunction:
 # ==================================================================================================
 @dataclass(frozen=True)
 class Overview:
-    """The sources in time order, with their status counts, the edges between them, and the common functions."""
+    """An `Overview` holds the sources in time order, their status counts, their edges and the common functions."""
 
     sources: tuple[Source, ...]
-    rows: tuple[RowStatus, ...]
-    # edges as (index of the earlier source, index of the later source) -> number of rows
+    rows: tuple[RowsTableLine, ...]
+    # edges maps (index of the earlier source, index of the later source) to the number of rows.
     edges: dict[tuple[int, int], int]
-    common: tuple[CommonFunction, ...]
+    common: tuple["CommonFunction", ...]
 
     def status_counts(self, source_id: str) -> dict[str, int]:
         """Return the number of rows of a source in total and per status."""
@@ -80,8 +68,9 @@ class Overview:
             "",
             "## Common functions",
             "",
-            f"Rows of at most {COMMON_MAX_LENGTH} characters that later rows of at least {COMMON_SOURCES} sources name "
-            "as their earlier row. They count in the rows of each source, but not in the column *takes rows from*.",
+            f"A common function is a row whose `f` has at most {COMMON_MAX_LENGTH} characters and that later rows of "
+            f"at least {COMMON_MIN_SOURCES} sources name as their earlier row. Common functions count in the rows of "
+            "each source, but not in the column *takes rows from*.",
             "",
             "| row | f | sources |",
             "|---|---|---|",
@@ -111,11 +100,12 @@ class Overview:
             ],
             "edges": [{"from": a, "to": b, "rows": n} for (a, b), n in sorted(self.edges.items())],
             "common": [{"row": c.row_id, "f": c.f, "sources": c.n_sources} for c in self.common],
-            "homes": HOME_NAMES,
-            "commonSources": COMMON_SOURCES,
+            "homes": HOME_DESCRIPTIONS,
+            "commonMinSources": COMMON_MIN_SOURCES,
             "commonMaxLength": COMMON_MAX_LENGTH,
         }
         template = TIMELINE_TEMPLATE.read_text(encoding="utf-8")
+        # escape "</" so that no string in the data can close the page's <script> element
         return template.replace("/*DATA*/", json.dumps(data).replace("</", "<\\/"))
 
     # --------------------------------------------------------------------------
@@ -130,11 +120,11 @@ class Overview:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def build(cls, sources: list[Source], rows: list[RowStatus]) -> "Overview":
-        """Return the overview of the sources, in time order, and their rows, also in time order."""
+    def build(cls, sources: list[Source], rows: list[RowsTableLine]) -> "Overview":
+        """Return the overview of the sources and their rows, both given in time order."""
         index_of_source = {source.source_id: i for i, source in enumerate(sources)}
         row_by_id = {row.row_id: row for row in rows}
-        # the sources whose rows name each row as their earlier row
+        # sources_naming maps each row id to the sources whose rows name that row as their earlier row.
         sources_naming: dict[str, set[str]] = {}
         for row in rows:
             for earlier in row.final.earlier_row_ids:
@@ -143,15 +133,26 @@ class Overview:
         common = []
         for row_id in sorted(sources_naming, key=lambda r: (-len(sources_naming[r]), position.get(r, len(rows)))):
             f = row_by_id[row_id].f if row_id in row_by_id else ""
-            if f and len(sources_naming[row_id]) >= COMMON_SOURCES and len(f) <= COMMON_MAX_LENGTH:
+            if f and len(sources_naming[row_id]) >= COMMON_MIN_SOURCES and len(f) <= COMMON_MAX_LENGTH:
                 common.append(CommonFunction(row_id, f, len(sources_naming[row_id])))
         common_ids = {c.row_id for c in common}
-        edges: dict[tuple[int, int], int] = {}
+        edges: Counter[tuple[int, int]] = Counter()
         for row in rows:
             earlier_sources = {
                 row_by_id[e].source_id for e in row.final.earlier_row_ids if e in row_by_id and e not in common_ids
             }
             for earlier_source in sorted(earlier_sources - {row.source_id}):
-                key = (index_of_source[earlier_source], index_of_source[row.source_id])
-                edges[key] = edges.get(key, 0) + 1
-        return cls(sources=tuple(sources), rows=tuple(rows), edges=edges, common=tuple(common))
+                edges[(index_of_source[earlier_source], index_of_source[row.source_id])] += 1
+        return cls(sources=tuple(sources), rows=tuple(rows), edges=dict(edges), common=tuple(common))
+
+
+# ==================================================================================================
+#  CommonFunction
+# ==================================================================================================
+@dataclass(frozen=True)
+class CommonFunction:
+    """A `CommonFunction` is a row that later rows of many sources name, and that gives no edges."""
+
+    row_id: str
+    f: str
+    n_sources: int

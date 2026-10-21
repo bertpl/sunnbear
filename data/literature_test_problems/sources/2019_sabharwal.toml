@@ -3,7 +3,7 @@ reference = 'Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms
 year = 2019
 home = '1.2'
 where_in_source = '''
-- Figures 1–4 (Section 2.2.3, pp. 5–6) run the false position method on 4 functions, with tolerance `0.00001` and at most 10 iterations, to show that 1 endpoint stays fixed. Each plot title gives the function and the interval.
+- Figures 1–4 (Section 2.2.3, pp. 5–6) plot runs of the false position method on 4 functions, with tolerance `0.00001` and at most 10 iterations, to show that 1 endpoint stays fixed. Each plot title gives the function and the interval.
 - Table 2, "From the literature function, domain interval and author of the function" (Section 5.2, p. 12), lists 11 functions, each with an interval and an author. Section 5.2 says that the article's algorithm was tested on all of them, but the article prints results only for `x^2 - x - 2` on `[1, 4]` (`T2.4`).
 - Not in the rows: Section 2.3.2's `x^2 - 1` and `x^3`, each from `r0 = 0`, which illustrate the first step of Newton's method without a run; and Section 2.5's `x^2`, which the article names as another article's genetic-algorithm experiment, with no interval.
 '''
@@ -12,7 +12,7 @@ rows_summary = "15: the 4 functions of Figures 1–4 and Table 2's 11."
 notes = '''
 - **Keys:** the figures and Table 2 do not number the functions, so a key `Fig. k` gives the figure, and a key `T2.k` the position within Table 2.
 - **Figures 1–4:** a row's `notes` give the fixed endpoint that the figure's caption states.
-- **`also_in`:** Table 2's column "Reference" names 1 author per function, which `also_in` gives as printed. Table 2 prints no reference numbers; `also_in` adds the number of the matching entry in the reference list, which resolves them as:
+- **`also_in`:** Table 2's column "Reference" names 1 author per function, which `also_in` gives as printed. Table 2 prints no reference numbers; `also_in` adds the number of the matching entry in the reference list. These entries are:
   - [2] Calhoun, a web page of Boise State University; Table 2 spells the name "Calhun";
   - [12] Srivastava & Srivastava (2011), Journal of Chemical, Biological and Physical Sciences;
   - [14] Ehiwario & Aghamie (2014), IOSR Journal of Engineering;

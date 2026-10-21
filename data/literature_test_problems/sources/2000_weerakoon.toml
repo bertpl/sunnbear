@@ -3,7 +3,7 @@ reference = "Weerakoon, S., Fernando, T. G. I. (2000). A variant of Newton's met
 year = 2000
 home = '1.2'
 where_in_source = '''
-- Table 1 (Section 4, page 92) lists 9 functions, numbered (1) to (9), each with 1 to 4 starting points `x0` and a stated root. Per starting point, it gives the iterations, the computational order of convergence and the function evaluations of Newton's method and of the article's variant.
+- Table 1 (Section 4, page 92) lists 9 functions, numbered (1) to (9), each with 1 to 4 starting points `x0` and a stated root. Per starting point, the table gives the iterations, the computational order of convergence and the function evaluations of Newton's method and of the article's variant.
 - The article cites no source for its functions.
 '''
 transcribed_from = 'the page images: the PDF is a scan, and its text layer holds only the first row of Table 1.'
@@ -18,7 +18,13 @@ sources = ['2024_jo_annealing']
 text = '''
 Jo et al. (2024) state that "some" of their functions come from this article.
 - Jo's f7–f13 are functions 1–7 here, in the same order.
-- Jo's f9 equals function 3. The other 6 are shifted in `x`: f7 is function 1 with `x - 1` for `x`, f8 is function 2 with `x - 14/10`, f10 is function 4 with `x - 3/4`, f11 is function 5 with `x + 2`, f12 is function 6 with `x - 2`, and f13 is function 7 with `x + 5/4`.
+- Jo's f9 equals function 3. The other 6 are shifted in `x`:
+  - f7 is function 1 with `x - 1` for `x`;
+  - f8 is function 2 with `x - 14/10`;
+  - f10 is function 4 with `x - 3/4`;
+  - f11 is function 5 with `x + 2`;
+  - f12 is function 6 with `x - 2`;
+  - f13 is function 7 with `x + 5/4`.
 - Functions 8 and 9 are not in Jo et al.
 '''
 

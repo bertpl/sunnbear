@@ -1,4 +1,4 @@
-title = 'Ellithy (2026): four multi-phase hybrid bracketing algorithms'
+title = 'Ellithy (2026): 4 multi-phase hybrid bracketing algorithms'
 reference = "Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root finding. Journal of the Egyptian Mathematical Society 34(1), 91–115. https://doi.org/10.21608/joems.2026.440115.1078. Code and data: the authors' repository https://github.com/Abdelrhman-Ellithy/hybridroots, at commit `7f22131ef4e1def3e3928dc6558f46f756d0a5ea`."
 year = 2026
 home = '1.2'

@@ -4,13 +4,13 @@ year = 2024
 home = '1.2'
 where_in_source = '''
 - Tables I and II (Sections III D and IV B) list 14 functions `f1` to `f14`; both tables use the same functions.
-- Fig. 3 (Section III E) computes basins of attraction for `f2`, `f7` and `f14`, written in `z`.
+- Fig. 3 (Section III E) shows basins of attraction for `f2`, `f7` and `f14`, written in `z`.
 - Section III C analyzes the cube root function; the introduction (Eq. (6)) states a 2-rotor Kuramoto equation as a motivating example.
 '''
 transcribed_from = "the article, checked against the page images. The authors' Julia scripts were not read."
-rows_summary = '16: the 14 functions of Tables I and II, the cube root function of Section III C and Eq. (6).'
+rows_summary = '16: the 14 functions of Tables I and II, the cube root function of Section III C, and the Kuramoto equation, Eq. (6).'
 notes = '''
-- **Keys:** the article's labels, or the section and equation number.
+- **Keys:** the article's labels `f1` to `f14`, and for the other 2 rows the section number `III C` and the equation number `(6)`.
 - **Starting points:** the article gives no intervals: each function is iterated from a 1000 x 1000 grid of complex starting points `z0` in the square `[-2, 2] x [-2, 2]`.
 - **`also_in`:** empty in every row. The article says that "some" of the functions were adopted from Weerakoon and Fernando, Applied Mathematics Letters 13, 87 (2000), without saying which.
 '''

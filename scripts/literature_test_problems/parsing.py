@@ -22,7 +22,7 @@ FUNCTIONS = {
     "bessely": sp.bessely, "max": sp.Max, "min": sp.Min, "atan2": sp.atan2,
 }
 CONSTANTS = {"pi": sp.pi, "inf": sp.oo}
-# words that mark an expression as conditions or prose, not 1 expression
+# The words in TEXT_WORDS mark an expression as conditions or prose, not 1 expression.
 TEXT_WORDS = {
     "if", "otherwise", "for", "given", "with", "where", "sum", "sum_", "integral", "det", "fl", "not", "in", "and",
     "or", "arbitrary",
@@ -32,45 +32,45 @@ IDENTIFIER = re.compile(r"(?<![0-9.A-Za-z_])([A-Za-z_][A-Za-z0-9_]*)")
 ASSIGNMENT = re.compile(r"(?<![A-Za-z0-9_<>!=])([A-Za-z_][A-Za-z0-9_]*)\s*=(?!=)\s*")
 NUMBER_PREFIX = re.compile(r"^[-+0-9.()*/^ ]*(?:pi)?[-+0-9.()*/^ eE]*")
 TRANSFORMATIONS = (*standard_transformations, convert_xor, rationalize)
-# the x-values at which the value comparison evaluates each instance
+# The value comparison evaluates each instance at these x-values.
 SAMPLE_POINTS = ["-2.7", "-1.3", "-0.6", "-0.15", "0.11", "0.37", "0.73", "1.21", "1.9", "2.6", "3.7", "5.3"]
 MAX_INSTANCES = 64
 X = sp.Symbol("x")
 
 
 class ParseError(Exception):
-    """A row's f or parameters that the script does not parse."""
+    """A `ParseError` reports a row's f or parameters that the script does not parse."""
 
 
 class ParseTimeoutError(Exception):
-    """A parse or an evaluation of a row that took too long."""
+    """A `ParseTimeoutError` reports a parse or an evaluation of a row that took too long."""
 
 
 @dataclass(frozen=True)
 class ParsedRow:
-    """A row's instances, 1 per combination of its parameter values, and its family form, all in canonical form.
+    """A `ParsedRow` holds a row's instances, 1 per combination of its parameter values, and its family form.
 
-    The family form keeps the parameters as symbols. `has_values` tells whether any parameter of the expression has
-    values, so that the instances differ from the family form.
+    All forms are canonical (`_normalize`), and the family form keeps the parameters as symbols. `has_values` tells
+    whether any parameter of the expression has values, so that the instances differ from the family form.
     """
 
     instances: tuple[sp.Expr, ...]
     family: sp.Expr
     has_values: bool
 
-    def fingerprints(self) -> list[tuple | None]:
+    def scaled_values(self) -> list[tuple | None]:
         """Return each instance's values at the sample points, divided by the first finite nonzero one.
 
         An instance gets None where it has free symbols other than x, or fewer than 4 finite values.
         """
-        return [self._fingerprint(instance) for instance in self.instances]
+        return [self._scaled_values(instance) for instance in self.instances]
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
     @staticmethod
-    def _fingerprint(expr: sp.Expr) -> tuple | None:
-        """Return 1 instance's fingerprint, in 40-digit arithmetic, or None if it has too few values."""
+    def _scaled_values(expr: sp.Expr) -> tuple | None:
+        """Return 1 instance's scaled values, in 40-digit arithmetic, or None if it has too few values."""
         if expr.free_symbols - {X}:
             return None
         function = sp.lambdify(X, expr, modules="mpmath")
@@ -85,10 +85,13 @@ class ParsedRow:
             reference = next((v for v in values if v is not None and abs(v) > mpmath.mpf(10) ** -30), None)
             if reference is None or sum(v is not None for v in values) < 4:
                 return None
-            return tuple(
-                None if v is None else (mpmath.nstr((v / reference).real, 10), mpmath.nstr((v / reference).imag, 10))
-                for v in values
-            )
+            else:
+                return tuple(
+                    None
+                    if v is None
+                    else (mpmath.nstr((v / reference).real, 10), mpmath.nstr((v / reference).imag, 10))
+                    for v in values
+                )
 
     @staticmethod
     def _parse_expression(text: str, parameters: dict) -> sp.Expr:
@@ -114,7 +117,10 @@ class ParsedRow:
 
     @staticmethod
     def _local_names(text: str, parameters: dict) -> dict:
-        """Return what each name in an expression means to sympy's parser: a function, a constant or a symbol."""
+        """Return what each name in an expression means to sympy's parser: a function, a constant or a symbol.
+
+        `e` is Euler's number unless a parameter is named `e`.
+        """
         local = {}
         for match in IDENTIFIER.finditer(text):
             name = match.group(1)
@@ -147,7 +153,10 @@ class ParsedRow:
 
     @staticmethod
     def _parse_value_list(chunk: str) -> list:
-        """Return the numbers that 1 assignment lists, expanding `1, 2, ..., 8` and `1(1)19`."""
+        """Return the numbers that 1 assignment lists.
+
+        The list expands `1, 2, ..., 8` and the step notation `1(1)19`, 1 to 19 in steps of 1.
+        """
         step_range = re.match(r"\s*(-?\d+)\((\d+)\)(-?\d+)", chunk)
         if step_range:
             start, step, stop = (int(g) for g in step_range.groups())
@@ -166,20 +175,29 @@ class ParsedRow:
                 )
             except Exception:  # noqa: BLE001 - a piece that does not parse is not a value
                 continue
-            if value.is_number:
-                values.append(sp.nsimplify(value, rational=True) if value.is_Float else value)
+            if value.is_Float:
+                values.append(sp.nsimplify(value, rational=True))
+            elif value.is_number:
+                values.append(value)
         return values
 
     @staticmethod
     def _expand_ellipsis(pieces: list[str]) -> list:
-        """Return the integers of `first, second, ..., last`, or [] if the list is irregular or long."""
+        """Return the integers of `first, second, ..., last`.
+
+        The result is [] if `...` is not second to last, if the step is not positive, or if the range spans more than
+        40 steps.
+        """
         ints = [p for p in pieces if re.fullmatch(r"-?\d+", p)]
         if len(ints) >= 2 and pieces.index("...") == len(pieces) - 2:
             first, last = int(ints[0]), int(ints[-1])
             step = int(ints[1]) - first if len(ints) >= 3 else 1
             if step > 0 and (last - first) // step <= 40:
                 return [sp.Integer(v) for v in range(first, last + 1, step)]
-        return []
+            else:
+                return []
+        else:
+            return []
 
     @staticmethod
     def _find_variable(expr: sp.Expr, parameters: dict, notes: str) -> sp.Symbol:
@@ -201,8 +219,8 @@ class ParsedRow:
         """Return a canonical form: floats as exact rationals, no constant factor, a fixed sign, symbols renamed.
 
         The free symbols other than x are renamed q0, q1, ..., so that 2 sources that name a parameter differently
-        still match: with up to 3 symbols, every order is tried and the smallest form kept; with more, the order of
-        their names is used.
+        still match: with up to 3 symbols, every order is tried and the form whose `srepr` sorts first is kept; with
+        more, the order of their names is used.
         """
         expr = expr.xreplace({f: sp.Rational(str(f)) for f in expr.atoms(sp.Float)})
         others = sorted((s for s in expr.free_symbols if s != X), key=lambda s: s.name)

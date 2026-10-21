@@ -7,14 +7,21 @@ where_in_source = '''
 - The supplementary `Test Functions.pdf` repeats each function with a plot and its root to 3 significant digits, and names f63–f92.
 - The supplementary C# benchmark (`CSharp code/Numerical.Benchmark/Root.cs`) holds the functions and intervals that produced Table 2.
 '''
-transcribed_from = "the article's Table 2, checked against `Test Functions.pdf`, the C# code, and sunnbear's transcription in `tests/solvers/paper_problems/ganchovski_et_al.py`. sunnbear's transcription matches the C# code on every row. The rows follow the article, except f28, whose printed expression has an unmatched parenthesis; that row follows the C# code. The rows' notes list every difference between the article, `Test Functions.pdf` and the C# code; a source that a row's notes do not name agrees with the row."
+transcribed_from = '''
+the article's Table 2, checked against `Test Functions.pdf`, the C# code, and sunnbear's transcription in `tests/solvers/paper_problems/ganchovski_et_al.py`.
+- sunnbear's transcription matches the C# code on every row.
+- The rows follow the article, except f28, whose printed expression has an unmatched parenthesis; that row follows the C# code.
+- The rows' notes list every difference between the article, `Test Functions.pdf` and the C# code; a source that a row's notes do not name agrees with the row.
+'''
 rows_summary = '92, 1 per function of Table 2.'
 notes = '''
 - **In the rows' notes, TF is `Test Functions.pdf` and C# is the C# code.**
 - **`if(c; a; b)`** is the article's notation: `a` where `c` holds, `b` otherwise.
 - **`log` is the natural log** in all 3 sources: the article prints `log`, TF prints `ln`, and C# calls `Math.Log`.
 - **`name`** comes from TF, which names only f63–f92. The C# comments give the same names, except where the rows' notes say otherwise.
-- **`also_in`** gives the origin that §5 of the article names for each block of functions. TF and the C# comments name the same origins, with 2 exceptions: C# has no comment for Suhadolnik, so f51–f62 sit below its comment for Swift & Lindfield; and TF prints its heading "SciML Benchmarks test suite" above the row of plots that holds f83 and f84.
+- **`also_in`** gives the origin that §5 of the article names for each block of functions. TF and the C# comments name the same origins, with 2 exceptions:
+  - C# has no comment for Suhadolnik, so f51–f62 sit below its comment for Swift & Lindfield.
+  - TF prints its heading "SciML Benchmarks test suite" above the row of plots that holds f83 and f84.
 - **The origins**, as the article's reference list gives them:
   - **Galdino (2011)**, f01–f30: Galdino, S. A family of regula falsi root-finding methods. Proceedings of 2011 World Congress on Engineering and Technology, IEEE Press, Shanghai, pp. 514–517 (article ref. [16]). TF adds the URL http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543. Its rows are in `2011_galdino`.
   - **Ganchovski (2025)**, f31–f32: Ganchovski, N. Structural Analysis by Functional Modelling in the Cloud. PhD thesis, UACEG, Sofia, 2025 (ref. [7]). §5 calls these "Custom functions"; TF and C# call them "My functions".

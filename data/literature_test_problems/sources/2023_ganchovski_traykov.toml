@@ -5,7 +5,7 @@ home = '1.1'
 where_in_source = '''
 - **§7, Table 2** "Results from numerical tests" (pp. 9–10): 21 functions f01–f21, all on the interval `[-1, 1]` with `ϵ = 10^-15`. §7 says they are "some of the functions that Oliveira and Takahashi used for their ITP method" (ref. [4]).
 - **§3 and §5** (Figures 10 and 12): the convergence charts use `f(x) = 4 - tan(x)` on `[0, 1.5]`.
-- **§2.3.1** mentions `x^3` and `x^5`, citing Suhadolnik (ref. [10]), as functions on which Brent's method falls far below bisection. It gives no interval and runs no test on them, so they get no row.
+- **§2.3.1** mentions `x^3` and `x^5`, citing Suhadolnik (ref. [10]), as functions on which Brent's method falls far below bisection. §2.3.1 gives no interval and runs no test on them, so they get no row.
 '''
 transcribed_from = 'the article only; it publishes no benchmark code. The C# listing in §6 is the algorithm.'
 rows_summary = '22: the 21 functions of Table 2, and 1 for the function of §3 and §5.'

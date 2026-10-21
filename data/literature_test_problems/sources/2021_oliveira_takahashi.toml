@@ -3,14 +3,20 @@ reference = 'Oliveira, I. F. D., Takahashi, R. H. C. (2021). An enhancement of t
 year = 2020
 home = '1.1'
 where_in_source = '''
-- Table 1 (Section 3.1, p. 5:11) lists 24 functions by name, without numbers, in 2 groups of 12: "Well-behaved Functions" and "Ill-behaved Functions". The ill-behaved group has 3 subheadings: "Non-simple Zero" (2.1–2.4), "Discontinuous" (2.5–2.8) and "Multiple Roots" (2.9–2.12). Section 3 solves every function on `[-1, 1]` with `epsilon = 10^-10`.
+- Table 1 (Section 3.1, p. 5:11) lists 24 functions by name, without numbers, in 2 groups of 12: "Well-behaved Functions" and "Ill-behaved Functions". The ill-behaved group has 3 subheadings: "Non-simple Zero" (keys 2.1–2.4), "Discontinuous" (2.5–2.8) and "Multiple Roots" (2.9–2.12).
+- Section 3 solves every function on `[-1, 1]` with `epsilon = 10^-10`.
 - Appendix C (p. 5:20) tests the order of convergence on 1 more function, eqn (23).
 '''
-transcribed_from = "the article. The authors' code, which is unpublished, served only to resolve ambiguities; it defines the 24 functions in Table 1's order. sunnbear's transcription, `tests/solvers/paper_problems/oliveira_takahashi.py`, follows the code. The rows follow the article; the rows' notes say where the code or sunnbear differs, and where the row follows the code because the article's typesetting is ambiguous (1.9)."
+transcribed_from = '''
+the article.
+- The authors' code, which is unpublished, served only to resolve ambiguities; the code defines the 24 functions in Table 1's order.
+- sunnbear's transcription, `tests/solvers/paper_problems/oliveira_takahashi.py`, follows the code.
+- The rows follow the article; the rows' notes say where the code or sunnbear differs, and where the row follows the code because the article's typesetting is ambiguous (key 1.9).
+'''
 rows_summary = "25: Table 1's 24 functions and function (23) of Appendix C. sunnbear's transcription holds the 24 functions of Table 1 only."
 notes = '''
 - Keys `1.k` and `2.k` give the group and the position within it in Table 1. Key `(23)` is the article's equation number.
-- `(x > c)` is 1 where the condition holds and 0 elsewhere, as the article uses it in 2.5 and 2.10; `Phi` and `phi` are the standard normal CDF and PDF.
+- `(x > c)` is 1 where the condition holds and 0 elsewhere, as the article uses it in 2.5 and 2.10; `Phi` and `phi` are the cumulative distribution function and the density function of the standard normal distribution.
 '''
 
 [[rows]]

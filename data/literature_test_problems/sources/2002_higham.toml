@@ -8,7 +8,9 @@ the places in the whole text that give a concrete function for root finding (New
 - Section 26.3.3, "Roots of a Cubic" (pp. 479–481);
 - Problems 2.25 (p. 60) and 27.6 (pp. 507–508).
 
-The rows leave out chapter 25, "Nonlinear Systems and Newton's Method" (pp. 459–470), whose examples are systems, and Section 5.1 (p. 96), which evaluates the expanded form of `(x - 2)^3` at 200 points near 2 to test error bounds for Horner's method, with no root-finding run.
+The rows leave out:
+- chapter 25, "Nonlinear Systems and Newton's Method" (pp. 459–470), whose examples are systems;
+- Section 5.1 (p. 96), which evaluates the expanded form of `(x - 2)^3` at 200 points near 2 to test error bounds for Horner's method, with no root-finding run.
 '''
 transcribed_from = "the book's PDF, which has a text layer, checked against the page images."
 rows_summary = '6: 4 from the text, 2 from problems.'

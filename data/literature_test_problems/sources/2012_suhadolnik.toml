@@ -31,7 +31,12 @@ In roots-fortran, the comment "see Table 1 from RBP paper" heads cases 134–144
 
 [[relations]]
 sources = ['1992_alefeld_potra']
-text = "The article cites Alefeld & Potra (1992) as [5]. Example 6 is problem 10 of its Table 1 at `n = 10`, on the same interval. Examples 4 and 14 are its problems 3 and 1, on `[.5, 1]` and `[.1, 1.5]` where Alefeld & Potra have `[0.1, 1]` and `[0.5, 1.5]`. Galdino's `g22`, `g3` and `g1` are the same 3 functions."
+text = '''
+The article cites Alefeld & Potra (1992) as [5].
+- Example 6 is problem 10 of Table 1 of Alefeld & Potra at `n = 10`, on the same interval.
+- Examples 4 and 14 are their problems 3 and 1, on `[.5, 1]` and `[.1, 1.5]` where Alefeld & Potra have `[0.1, 1]` and `[0.5, 1.5]`.
+- Galdino (2011)'s `g22`, `g3` and `g1` are the same 3 functions.
+'''
 
 [[rows]]
 key = '1'

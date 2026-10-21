@@ -19,7 +19,9 @@ notes = '''
 [[relations]]
 sources = ['1992_alefeld_potra', '1993_alefeld_potra_shi', '1995_alefeld_potra_shi', '2011_galdino']
 text = '''
-Example 3, `11*x^11 - 1` on `[0.1, 1]`, is problem 3 of Alefeld & Potra (1992) and `g3` of Galdino (2011), on the same interval. It is not in the tables of Alefeld, Potra & Shi (1993, 1995). Examples 1, 2 and 4 are in none of the 4 articles. The article cites the 1992 and 1993 articles only for the convergence of the diameters of other methods.
+Example 3, `11*x^11 - 1` on `[0.1, 1]`, is problem 3 of Alefeld & Potra (1992) and `g3` of Galdino (2011), on the same interval. Example 3 is not in the tables of Alefeld, Potra & Shi (1993, 1995). Examples 1, 2 and 4 are in none of the 4 articles.
+
+The article cites the 1992 and 1993 articles only for the convergence of the diameters of other methods.
 '''
 
 [[relations]]
@@ -29,10 +31,10 @@ text = 'Example 3 is Example 3 of Parida & Gupta (2005), on the same interval; t
 [[relations]]
 sources = ['2012_suhadolnik']
 text = '''
-Suhadolnik (2012) does not cite this article, but its examples 1, 3 and 4 are Examples 1, 2 and 3 here.
-- Its example 1 has the same expression and interval as Example 1.
-- Its example 3, `exp(sin(x)) - x - 1` on `[1, 4]`, is Example 2 with the opposite sign, on the same interval.
-- Its example 4 is Example 3 on `[.5, 1]`.
+Suhadolnik (2012) does not cite this article, but Suhadolnik's examples 1, 3 and 4 are Examples 1, 2 and 3 here.
+- Suhadolnik's example 1 has the same expression and interval as Example 1.
+- Suhadolnik's example 3, `exp(sin(x)) - x - 1` on `[1, 4]`, is Example 2 with the opposite sign, on the same interval.
+- Suhadolnik's example 4 is Example 3 on `[.5, 1]`.
 - Ganchovski et al.'s f51 and f53 and roots-fortran's cases 134 and 136 are Suhadolnik's examples 1 and 3.
 '''
 

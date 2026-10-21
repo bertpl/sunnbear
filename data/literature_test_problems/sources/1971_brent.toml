@@ -4,7 +4,8 @@ year = 1971
 home = '1.1'
 where_in_source = '''
 - Section 3, "The algorithm" (p. 422), gives 2 functions on which Dekker's algorithm converges slowly.
-- Section 9, "Practical tests" (p. 424), says that `zero` never needed more than 3 times the evaluations of bisection, "even for the pathological functions given in Section 3", where Dekker's algorithm needs more than 10^6. It prints no table. For numerical results it refers to a book that it cites as Brent (1971) and that appeared as Brent (1973); the rows of that book are in `1973_brent_book`.
+- Section 9, "Practical tests" (p. 424), says that the article's procedure `zero` never needed more than 3 times the evaluations of bisection, "even for the pathological functions given in Section 3", where Dekker's algorithm needs more than 10^6 evaluations. Section 9 prints no table.
+- For numerical results, the article refers to a book that it cites as Brent (1971) and that appeared as Brent (1973); the rows of that book are in `1973_brent_book`.
 '''
 transcribed_from = 'the article, a scan, read from the page images.'
 rows_summary = "2, Section 3's 2 functions. The article has no numbered test set."

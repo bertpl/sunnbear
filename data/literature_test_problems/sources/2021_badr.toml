@@ -10,7 +10,7 @@ transcribed_from = 'the article, with Table 1 checked against its page image.'
 rows_summary = "15: Table 1's 15 functions."
 notes = '''
 - **Keys:** the article's labels.
-- **`also_in`:** Table 1's column "References" names 1 source per function, which `also_in` gives as printed, with the article's reference number. The reference list resolves them as:
+- **`also_in`:** Table 1's column "References" names 1 source per function, which `also_in` gives as printed, with the article's reference number. The reference list resolves these numbers as:
   - [6] Ehiwario & Aghamie (2014), IOSR Journal of Engineering;
   - [9] Srivastava & Srivastava (2011), Journal of Chemical, Biological and Physical Sciences;
   - [10] Moazzam, Chakraborty & Bhuiyan (2012), International Journal of Computer Science Issues;
@@ -32,12 +32,15 @@ This is the article that the comment "P1 in BlendTF paper" of roots-fortran mean
 [[relations]]
 sources = ['2019_sabharwal']
 text = '''
-This article compares its method with that of Sabharwal (2019), but does not say that its problems come from there. `P1`–`P9` are Sabharwal's Table 2 rows 1–5 and 7–10, in order, with the same expressions and the same cited sources. This article leaves out Sabharwal's 2 rows cited to Sivanandam, neither of which changes sign on its interval, and adds `P10`–`P15`. Only the interval of `P7` differs: Sabharwal gives `[-1, 1]`, which holds no root of `x*exp(x) - 7`; this article gives `[0, 2]`.
+This article compares its method with that of Sabharwal (2019), but does not say that its problems come from there.
+- `P1`–`P9` are Sabharwal's Table 2 rows 1–5 and 7–10, in order, with the same expressions and the same cited sources.
+- This article leaves out Sabharwal's 2 rows cited to Sivanandam, neither of which changes sign on its interval, and adds `P10`–`P15`.
+- Only the interval of `P7` differs: Sabharwal gives `[-1, 1]`, which holds no root of `x*exp(x) - 7`; this article gives `[0, 2]`.
 '''
 
 [[relations]]
 sources = ['2026_ellithy']
-text = 'The set of Ellithy (2026) holds 11 of the 15 problems (`P3`–`P5`, `P7`–`P12`, `P14` and `P15`), 10 on the same interval; `P7` is on `[1, 2]` there.'
+text = 'The test set of Ellithy (2026) holds 11 of the 15 problems (`P3`–`P5`, `P7`–`P12`, `P14` and `P15`), 10 on the same interval; `P7` is on `[1, 2]` there.'
 
 [[rows]]
 key = 'P1'

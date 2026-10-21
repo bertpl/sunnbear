@@ -4,10 +4,10 @@ year = 2026
 home = '1.2'
 where_in_source = '''
 - Section III A reduces the catenary boundary-value problem to 1 equation: first in the scale parameter `a` (eq. (3)), then in `b_hat = abs(dx)/(2*a)` (eq. (4), repeated as eq. (12) in Appendix A.3). The solver works on eq. (4).
-- Section III C and Appendix E give the bracket; Section IV gives the parameter ranges of the 2 flights and of the sweep.
+- Section III C and Appendix E give the bracket; Section IV gives the parameter ranges of 2 flights and of a parameter sweep.
 '''
 transcribed_from = 'the article.'
-rows_summary = '2: the equation that the solver works on, and the form in `a` that the article sets aside.'
+rows_summary = "2: the solver's equation in `b_hat` (eq. (4)), and the form in `a` (eq. (3)), which the article does not solve."
 notes = '''
 - The article writes `Δx`, `Δy` and `b̂`; the rows write `dx`, `dy` and `b_hat`.
 - Keys are equation numbers.

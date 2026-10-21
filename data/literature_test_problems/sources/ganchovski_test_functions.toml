@@ -41,15 +41,19 @@ The rows of Tomov & Ganchovski's benchmark (`2026_tomov_ganchovski_benchmark`) c
 
 [[relations]]
 sources = ['2026_ganchovski_et_al']
-text = "The f01–f92 of Ganchovski et al. (2026) (`2026_ganchovski_et_al`), from the article's Table 2, are the f01–f92 of this PDF, and 82 rows have the same function and interval in both. The 9 rows that differ from Tomov & Ganchovski's benchmark (`2026_tomov_ganchovski_benchmark`) differ from the article's rows in the same way; the f28 row of `2026_ganchovski_et_al` follows the code, because the article prints `sin(x - 7.143)^3)`, with an unmatched parenthesis. **f02** differs too: its last term is `sqrt(3)/18` here and `sqrt(x)/18` in the article."
+text = '''
+The f01–f92 of Ganchovski et al. (2026) (`2026_ganchovski_et_al`), from the article's Table 2, are the f01–f92 of this PDF, and 82 rows have the same function and interval in both. These 10 differ:
+- **The 9 rows that differ from Tomov & Ganchovski's benchmark** (`2026_tomov_ganchovski_benchmark`) differ from the article's rows in the same way. The f28 row of `2026_ganchovski_et_al` follows the code, because the article prints `sin(x - 7.143)^3)`, with an unmatched parenthesis.
+- **f02:** its last term is `sqrt(3)/18` here and `sqrt(x)/18` in the article.
+'''
 
 [[relations]]
 sources = ['roots_fortran']
 text = '''
 The cases 146–157 of roots-fortran (`roots_fortran`), whose comment cites Galdino (2011) and the 2023 version of this PDF, are 10 functions of this PDF: 146 = f01, 147 = f02, 148 = f04, 149 = f28, 150 = f29, 151 = f30, 152 = f31, 153 = f32, 154 = f41 and 155–157 = f42.
 - Where this PDF differs from the C# code, the cases follow this PDF: f28's `7.14` and f29's `[2.6, 3.6]`.
-- **Case 146** starts its bracket at 0.51, where f01 starts at 0.5; the case's comment says that roots-fortran moved it, so that the first midpoint of bisection is not the root.
-- **Cases 155–157** replace f42's `[0, 4]` by 1 bracket around each of its roots 1, 2 and 3: `[0, 1.9]`, `[1.001, 2.001]` and `[2.5, 10]`. Whether the 2023 version had these brackets is unknown.
+- **Case 146** starts its bracket at 0.51, where f01 starts at 0.5; the case's comment says that roots-fortran moved the start, so that the first midpoint of bisection is not the root.
+- **Cases 155–157** replace f42's `[0, 4]` by 1 bracket around each of its roots 1, 2 and 3: `[0, 1.9]`, `[1.001, 2.001]` and `[2.5, 10]`.
 - The comment names Galdino (2011) for all 12 cases, where this PDF puts f31–f32 under "My functions" and f41–f42 under Swift & Lindfield (1978).
 '''
 

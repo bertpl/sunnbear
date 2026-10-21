@@ -1,9 +1,16 @@
 title = 'Chapra & Canale (2015): Numerical Methods for Engineers, Part Two'
-reference = 'Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. McGraw-Hill Education. ISBN 978-0-07-339792-4. The latest edition is the 8th (2021); the rows follow the 7th.'
+reference = 'Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. McGraw-Hill Education. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021; the rows follow the 7th.'
 year = 2015
 home = '1.4'
 where_in_source = '''
-Part Two, "Roots of Equations" (pp. 117–228): the introduction PT2.1–PT2.3 (pp. 117–122); chapters 5, "Bracketing Methods" (pp. 123–144), 6, "Open Methods" (pp. 145–175), 7, "Roots of Polynomials" (pp. 176–203), and 8, "Case Studies: Roots of Equations" (pp. 204–225); their examples, figures and end-of-chapter problems. The epilogue (pp. 226–228) holds no function.
+Part Two, "Roots of Equations" (pp. 117–228), with the examples, figures and end-of-chapter problems of its parts:
+- the introduction PT2.1–PT2.3 (pp. 117–122);
+- chapter 5, "Bracketing Methods" (pp. 123–144);
+- chapter 6, "Open Methods" (pp. 145–175);
+- chapter 7, "Roots of Polynomials" (pp. 176–203);
+- chapter 8, "Case Studies: Roots of Equations" (pp. 204–225).
+
+The epilogue (pp. 226–228) holds no function.
 - The rows leave out:
   - the general forms that name no concrete function: (PT2.5), (PT2.6), (7.1), (7.29), the ODEs (7.2)–(7.6), and `u(x) = f(x)/f'(x)` (6.13);
   - figures that sketch a function without its expression: Figures 5.2, 5.3(b), 5.16, 6.1, 6.3, 6.6, 6.13(c) (a quadruple root) and 7.3;
@@ -13,7 +20,11 @@ Part Two, "Roots of Equations" (pp. 117–228): the introduction PT2.1–PT2.3 (
   - Prob. 7.16, which runs Müller's method through 3 data points, without a function.
 - Every problem that names a method without a function repeats an example or another problem (5.21–5.26, 6.27–6.30, 7.6–7.9, 7.15, 7.20–7.24); its key is in that function's row.
 '''
-transcribed_from = "the book's PDF, whose page number is the book's plus 17. All of Part Two was read from the page images; the problems' coefficients were checked against the text layer, which encodes some symbols as other characters (`5` for `=`, `2` for a minus sign, `1` for `+`), so the page images win where the 2 differ."
+transcribed_from = '''
+the book's PDF, whose page number is the book's plus 17.
+
+All of Part Two was read from the page images; the problems' coefficients were checked against the text layer, which encodes some symbols as other characters (`5` for `=`, `2` for a minus sign, `1` for `+`), so the page images win where the 2 differ.
+'''
 rows_summary = '118, 1 per distinct function of the unknown: a function that several examples or problems use is 1 row whose key lists them all. 30 rows come from the introduction, the text, its examples, figures and case studies; 88 come from the problems alone.'
 notes = '''
 How to read the rows:

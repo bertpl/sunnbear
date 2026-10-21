@@ -3,16 +3,19 @@ reference = "Tomov, L., Ganchovski, N. (2026). Global convergence and reliable s
 year = 2026
 home = '1.1'
 where_in_source = '''
-- **Benchmark cases:** the experiments run on a "broader development benchmark" of 100 named cases, 92 of them "reference-eligible" (Sections 7.2 and 7.3, Table 3). The preprint does not list these cases and does not say where they come from; it points to the repository at the pinned commit for their definitions. It names 14 of them: f64, f84 and f92–f97 in Table 3, f27, f29 and f75 in Table 5, and f82, f83 and f100 in the text of Section 7.3. It prints the expression of only 5: f64 and f84 (Section 7.3), and f27, f29 and f75 (Section 7.5).
+- **Benchmark cases:** the experiments run on a "broader development benchmark" of 100 named cases, 92 of them "reference-eligible" (Sections 7.2 and 7.3, Table 3).
+  - The preprint does not list these cases and does not say where they come from; for their definitions, it points to the repository at the commit that Section 7.3 pins.
+  - The preprint names 14 of them: f64, f84 and f92–f97 in Table 3, f27, f29 and f75 in Table 5, and f82, f83 and f100 in the text of Section 7.3.
+  - The preprint prints the expression of only 5: f64 and f84 (Section 7.3), and f27, f29 and f75 (Section 7.5).
 - **The preprint's own examples:** equations (25) and (27) in Section 3, equation (61) in Sections 7.1 and 7.6, and 4 unnumbered functions in the checks of Section 7.6.
 '''
 transcribed_from = "the preprint only: its text, checked against the page images of pp. 7–8 and 26–31. The authors' code was not read."
 rows_summary = '21: the 14 benchmark cases that the preprint names (9 of them without an expression), and 7 functions of its own examples. The benchmark itself counts 100 cases.'
-notes = 'The 4 unnumbered functions of Section 7.6 get the keys `7.6-a` to `7.6-d`, in the order the section states them.'
+notes = 'The 4 unnumbered functions of Section 7.6 get the keys `7.6-a` to `7.6-d`, in the order that the section states them.'
 
 [[relations]]
 sources = ['2026_tomov_ganchovski_benchmark']
-text = "The benchmark that the preprint runs on is in `2026_tomov_ganchovski_benchmark`, from the authors' code; it gives the expressions of the 9 cases that the preprint names without one."
+text = "The source `2026_tomov_ganchovski_benchmark` holds the benchmark that the preprint runs on, from a later commit of the authors' code that adds 1 case, f101. That source gives the expressions of the 9 cases that the preprint names without one."
 
 [[rows]]
 key = '(25)'

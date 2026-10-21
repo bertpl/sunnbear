@@ -3,7 +3,8 @@ reference = 'Raza, M., Toheed, D., Rehman, N. A. (2025). Optimizing nonlinear ro
 year = 2025
 home = '1.2'
 where_in_source = '''
-- Table 1, "Test functions and their roots" (Section 4), lists 5 functions `eta1(l)` to `eta5(l)` with a targeted root and an initial guess each. Tables 2 to 6 give the errors of the first 5 iterates per function ("nonlinear problem 1" to 5), and Figs. 1 to 5 the logarithm of the residuals.
+- Table 1, "Test functions and their roots" (Section 4), lists 5 functions `eta1(l)` to `eta5(l)` with a targeted root and an initial guess each.
+- Tables 2 to 6 give the errors of the first 5 iterates per function ("nonlinear problem 1" to 5), and Figs. 1 to 5 the logarithm of the residuals.
 - Section 3 says the set includes "some nonlinear equations governing from real-life phenomenon", without saying which.
 '''
 transcribed_from = 'the article, checked against the page images.'

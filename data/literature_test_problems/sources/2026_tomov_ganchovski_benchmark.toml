@@ -2,7 +2,9 @@ title = "Tomov, Ganchovski (2026): benchmark cases in the authors' repository at
 reference = '''
 the authors' repository https://github.com/Just-A-Random-Geek/ModAB-Root-Finding at commit `0d6efd59e5dcb34b7bccf90e1d4a9eee6d486e70` of 2026-10-07, folder `MDPI-Algorithms-Data-2`. The repository now lives at https://github.com/Proektsoft-EOOD/ModAB-Root-Finding.
 
-The folder appears to hold the benchmark of Tomov, L., Ganchovski, N. (2026). Global convergence and reliable stopping in a safeguarded modified Anderson–Björck method. arXiv preprint 2610.14193. https://doi.org/10.48550/arxiv.2610.14193, whose rows are in `2026_tomov_ganchovski`: the folder's benchmark runs `SgModAB` ("Safeguarded Modified Anderson-Björck Corrected Sept 2026"), and its cases match the ones that the preprint names (see the relation to `2026_tomov_ganchovski`). The preprint's Section 7.3 pins an earlier commit of the same repository, `9111cdcc6912401eb684a7b771df3a469795d5b8`.
+The folder appears to hold the benchmark of Tomov, L., Ganchovski, N. (2026). Global convergence and reliable stopping in a safeguarded modified Anderson–Björck method. arXiv preprint 2610.14193. https://doi.org/10.48550/arxiv.2610.14193, whose rows are in `2026_tomov_ganchovski`.
+
+The folder's benchmark runs `SgModAB` ("Safeguarded Modified Anderson-Björck Corrected Sept 2026"), and its cases match the ones that the preprint names (see the relation to `2026_tomov_ganchovski`). The preprint's Section 7.3 pins an earlier commit of the same repository, `9111cdcc6912401eb684a7b771df3a469795d5b8`.
 '''
 year = 2026
 home = '1.1'
@@ -12,7 +14,11 @@ the folder `MDPI-Algorithms-Data-2`.
 - `Root.Benchmark/BenchmarkCount.cs` runs the 3 arrays, and `Benchmark results.md` holds a run on all 101 cases.
 - `Test functions.pdf` prints each function with a plot and its root to 3 significant digits, and names f63–f101.
 '''
-transcribed_from = "the C# code, which wins where `Test functions.pdf` differs. The PDF was checked through its extracted text for every row, and through its page images for f73–f101. The rows' notes list every difference in a function or an interval between the PDF and the code; a difference in notation alone, such as `ceiling` for `ceil`, is not listed."
+transcribed_from = '''
+the C# code, which wins where `Test functions.pdf` differs.
+- The PDF was checked through its extracted text for every row, and through its page images for f73–f101.
+- The rows' notes list every difference in a function or an interval between the PDF and the code; a difference in notation alone, such as `ceiling` for `ceil`, is not listed.
+'''
 rows_summary = '101, 1 per case of the code. The preprint counts 100 cases, 92 of them "reference-eligible"; the bullet *Cases left out of the statistics* of the notes explains the difference.'
 notes = '''
 - **In the rows' notes, TF is `Test functions.pdf` and C# is the code.**
@@ -23,27 +29,33 @@ notes = '''
   - f31–f32 sit under the heading "My functions" in both, which names no other source, so the column is "—".
   - C# has no comment for Suhadolnik, so f51–f62 sit below its comment for Swift & Lindfield. The column follows TF's heading for Suhadolnik.
   - TF prints its heading "SciML Benchmarks test suite" above the row of plots that holds f83 and f84. The column follows C#, which puts f83 in `Set2`, under Oliveira & Takahashi.
-  - C#'s comment "SciML Benchmarks test suite" heads `Set3`, which holds f84–f101, and TF prints no heading after it. Neither marks where the SciML block ends, so the column gives the suite for f84–f100 on that heading alone. The C# comment and TF title of f101 are "L. Tomov counterexample"; its column is "—".
-- **Cases left out of the statistics:** the code does not use the term "reference-eligible". 8 cases have an empty root list: f38, f39, f40, f76, f77, f78, f79 and f81. For these, `BenchmarkCount.cs` sets every solver's return code to Invalid and leaves the case out of the statistics, and `Benchmark results.md` reports 8 Invalid cases for every solver. The rows' notes mark these cases "Excluded".
-  - That leaves 93 counted cases of 101, where the preprint counts 92 of 100, so the preprint's commit holds 1 counted case fewer. That case is f101: GitHub's comparison of the 2 commits shows that the benchmark at the preprint's commit `9111cdc`, 47 commits before `0d6efd5`, ends at f100, and that f101 was added later; f01–f100 are unchanged between the 2 commits. The 2 commits after `0d6efd5`, both of 2026-10-10, change no benchmark function.
+  - C#'s comment "SciML Benchmarks test suite" heads `Set3`, which holds f84–f101, and TF prints no heading after it. Neither marks where the SciML block ends, so the column gives the suite for f84–f100 on that heading alone.
+  - The C# comment and TF title of f101 are "L. Tomov counterexample"; f101's column is "—".
+- **Cases left out of the statistics:** the code does not use the term "reference-eligible". The root list is empty for 8 cases: f38, f39, f40, f76, f77, f78, f79 and f81.
+  - For these, `BenchmarkCount.cs` sets every solver's return code to Invalid and leaves the case out of the statistics, and `Benchmark results.md` reports 8 Invalid cases for every solver. The rows' notes mark these cases "Excluded".
+  - That leaves 93 counted cases of 101, where the preprint counts 92 of 100, so the preprint's commit holds 1 counted case fewer.
+  - The case that the preprint's commit lacks is f101: GitHub's comparison of the 2 commits shows that the benchmark at the preprint's commit `9111cdc`, 47 commits before `0d6efd5`, ends at f100, and that f101 was added later; f01–f100 are unchanged between the 2 commits.
+  - The 2 commits after `0d6efd5`, both of 2026-10-10, change no benchmark function.
 '''
 
 [[relations]]
 sources = ['2026_tomov_ganchovski']
 text = '''
 The cases that the preprint names agree with the code:
-- **Its 5 printed expressions match the code:** f27, f29, f64, f75 and f84, with f64 and f84 also on the interval that the preprint gives. For f27, the code evaluates the expanded quartic in `P(x) = x + 1.11111`, which equals the preprint's `(P(x) - 3)^4*sign(P(x) - 3)`. The zeros that its Table 5 gives for f27, f29 and f75 are the code's listed roots.
+- **Its 5 printed expressions match the code:** f27, f29, f64, f75 and f84, with f64 and f84 also on the interval that the preprint gives.
+  - For f27, the code evaluates the expanded quartic in `P(x) = x + 1.11111`, which equals the preprint's `(P(x) - 3)^4*sign(P(x) - 3)`.
+  - The zeros that the preprint's Table 5 gives for f27, f29 and f75 are the code's listed roots.
 - **Its 9 named cases without an expression agree with the preprint's descriptions:**
   - f82 and f83 are the sawtooth functions; the code's comment counts their jumps through zero at the cell boundaries as discontinuities, not roots.
   - f92–f97 are `x^p - 0.001` for the odd powers `p` from 3 to 13.
   - f100, `cbrt((4*x - 3)/x)` on `[0, e]`, divides by zero at its endpoint `x = 0`.
-- **2 more of the preprint's functions are cases of the code:** f92–f99 are its equation (61), `x^p - 10^(-3)` for `p = 3, 5, ..., 17` on `[-10, 10]`, and f101 is its equation (27), on the same interval `[-3, 1]`.
+- **The code also holds 2 more of the preprint's functions:** f92–f99 are its equation (61), `x^p - 10^(-3)` for `p = 3, 5, ..., 17` on `[-10, 10]`, and f101 is its equation (27), on the same interval `[-3, 1]`.
 '''
 
 [[relations]]
 sources = ['2026_ganchovski_et_al']
 text = '''
-- **91 of f01–f92 have the same function and interval as the row of the same number in `2026_ganchovski_et_al`**, apart from notation (`x*x` for `x^2`, `1e-3` for `10^-3`).
+- **Of f01–f92, 91 have the same function and interval as the row of the same number in `2026_ganchovski_et_al`**, apart from notation (`x*x` for `x^2`, `1e-3` for `10^-3`).
 - **f02 differs:** the row there follows the article's `sqrt(x)/18`; this code has `sqrt(3)/18`, as do the earlier paper's C# code and TF.
 - **f49 matches the row there, but not the earlier paper's C# code:** that code wrote the exponent `1/3` as an integer division, which gives 0; this code writes `1.0/3.0`. Apart from f49, the C# definitions of f01–f92 are identical, ignoring whitespace, to the earlier paper's `Numerical.Benchmark/Root.cs`.
 '''

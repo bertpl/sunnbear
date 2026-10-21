@@ -3,8 +3,19 @@ reference = "Alefeld, G. E., Potra, F. A., Shi, Y. (1995). Algorithm 748: enclos
 year = 1995
 home = '1.1'
 where_in_source = "the article's Table I, \"Test Problems\" (p. 341). In the authors' code, the subroutines `FUNC` and `INIT` in `driver.f` hold the functions and intervals, and `testdata` holds the parameter values."
-transcribed_from = "the article's Table I, checked against the authors' `driver.f` and `testdata`, and against sunnbear's transcription in `tests/solvers/paper_problems/alefeld_potra_shi.py`, which follows the driver. All 3 agree on every function, interval and parameter value. The rows follow the article, except where the scan is unclear (problem 15), where they follow the driver; the rows' notes say where the code writes a problem differently."
-rows_summary = "15, 1 per problem number of Table I. The article counts 154 cases over all intervals and parameter values, and `testdata` holds the same 154. The driver numbers 28 problems, because it splits Table I's problem 2 into 10 problems (1 per interval), problem 3 into 3 (1 per pair of `a` and `b`) and problem 4 into 3 (1 per value of `a` and interval)."
+transcribed_from = '''
+the article's Table I, checked against the authors' `driver.f` and `testdata`, and against sunnbear's transcription in `tests/solvers/paper_problems/alefeld_potra_shi.py`, which follows the driver.
+- All 3 agree on every function, interval and parameter value, apart from the driver's `pi = 3.1416` in the intervals of rows 1 and 14.
+- The rows follow the article, except where the scan is unclear (problem 15), where they follow the driver; the rows' notes say where the code writes a problem differently.
+'''
+rows_summary = '''
+15, 1 per problem number of Table I.
+- The article counts 154 cases over all intervals and parameter values, and `testdata` holds the same 154.
+- The driver numbers 28 problems, because it splits 3 of Table I's problems:
+  - problem 2 into 10 problems, 1 per interval;
+  - problem 3 into 3, 1 per pair of `a` and `b`;
+  - problem 4 into 3, 1 per value of `a` and interval.
+'''
 notes = "The `parameters` column keeps Table I's notation `a(s)b` for the values from `a` to `b` in steps of `s`."
 
 [[rows]]

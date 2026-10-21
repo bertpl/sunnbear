@@ -3,14 +3,17 @@ reference = 'Ismuniyarto, Pinheiro, D., Sokhna, E. H. L. (2025). A numerical stu
 year = 2025
 home = '1.2'
 where_in_source = '''
-- Section 3, "Results and discussion" (pp. 215–216), solves 1 function `f(n)` of the year `n` on `[a, b] = [2, 10]` with bisection, regula falsi and the secant method, at tolerance 0.001 (Table 2). It then puts the root into 2 equations `A_t`, 1 for buying Intel Pentium and 1 for buying AMD (Table 1).
+- Section 3, "Results and discussion" (pp. 215–216), solves 1 function `f(n)` of the year `n` on `[a, b] = [2, 10]` with bisection, regula falsi and the secant method, at tolerance 0.001 (Table 2).
+- Section 3 then puts the root into 2 equations `A_t`, 1 for buying Intel Pentium and 1 for buying AMD (Table 1).
 - Section 3 also reports 10 trials "for different values of a and b", but gives neither those intervals nor their table.
 '''
 transcribed_from = '''
-the article, the publisher's PDF with a text layer, checked against the page images at 300 dpi. The article does not print `f(n)`, so the row reconstructs it: its `f` is the AMD equation minus the Pentium equation, with each printed denominator `(1.2)^(n - 1)` read as `1.2^n - 1`, and the printed `(1..2)` read as `1.2`. This reading reproduces every value of `f` in Table 2 and the printed `f(a)*f(b) = -2711558.49`; with the denominators as printed, the difference has the same sign at 2 and at 10.
+the article, the publisher's PDF with a text layer, checked against the page images at 300 dpi.
 '''
-rows_summary = '1: the function that the 3 methods solve. The 2 equations `A_t` are its parts, not functions whose root the article seeks.'
+rows_summary = '1: `f(n)`, which the 3 methods solve. The 2 equations `A_t` are its parts, not functions whose root the article seeks.'
 notes = '''
+- The article does not print `f(n)`, so the row reconstructs it: its `f` is the AMD equation minus the Pentium equation, with each printed denominator `(1.2)^(n - 1)` read as `1.2^n - 1`, and the printed `(1..2)` read as `1.2`.
+- The reconstruction reproduces every value of `f` in Table 2 and the printed `f(a)*f(b) = -2711558.49`. With the denominators as printed, the difference of the 2 equations has the same sign at 2 and at 10.
 - The article cites no source for its function, and no other source file gives it.
 - The key `§3` names the section.
 '''

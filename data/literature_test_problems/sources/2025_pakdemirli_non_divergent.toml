@@ -3,7 +3,8 @@ reference = 'Pakdemirli, M. (2025). A New Non-Divergent Root Finding Algorithm. 
 year = 2025
 home = '1.2'
 where_in_source = '''
-- Section 4, "Numerical Simulations", gives 4 examples, 4.1 to 4.4 (equations (4.1) to (4.4)). Tables 1, 2, 3 and 5 list, per example, the iterates of Newton's method, the article's method and a hybrid of the 2; Table 4 gives, for Example 4.3, the range of starting points from which each method converges to the first positive root.
+- Section 4, "Numerical Simulations", gives 4 examples, 4.1 to 4.4 (equations (4.1) to (4.4)).
+- Tables 1, 2, 3 and 5 list, per example, the iterates of Newton's method, the article's method and a hybrid of the 2; Table 4 gives, for Example 4.3, the range of starting points from which each method converges to the first positive root.
 - Each example runs from 1 starting point, which Section 4 says is chosen far from the root and where the first derivative is very small.
 '''
 transcribed_from = 'the article (text layer), checked against the page images.'

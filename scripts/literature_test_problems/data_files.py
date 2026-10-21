@@ -3,25 +3,28 @@
 import csv
 import re
 import tomllib
+from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
-# The subcategories of category 1 of sunnbear's formula catalog, which the `home` of each source names.
-HOME_NAMES = {
+# HOME_DESCRIPTIONS describes each subcategory of category 1 of sunnbear's formula catalog; the `home` of each
+# source is 1 of its keys.
+HOME_DESCRIPTIONS = {
     "1.1": "articles of solvers that sunnbear implements",
     "1.2": "articles of other solvers",
     "1.3": "public benchmark suites",
     "1.4": "textbooks",
 }
 FINAL_STATUSES = ("new", "duplicate", "variant", "extended")
-# the status of a row that the script could not decide and that no decision covers yet
+# UNDECIDED is the status of a row that the script could not decide and that no decision covers yet.
 UNDECIDED = "judge"
-# the separator between the row ids that 1 field names
+# ROW_ID_SEPARATOR separates the row ids in 1 field.
 ROW_ID_SEPARATOR = " | "
 
 
 class DataFileError(ValueError):
-    """A file of the data folder that does not follow its format."""
+    """A `DataFileError` reports a file of the data folder that does not follow its format."""
 
 
 # ==================================================================================================
@@ -29,7 +32,7 @@ class DataFileError(ValueError):
 # ==================================================================================================
 @dataclass(frozen=True)
 class DataFolder:
-    """The data folder of the literature test problems, and the path of each of its files."""
+    """A `DataFolder` holds the path of the literature test problems' data folder, and gives the path of each file."""
 
     path: Path
 
@@ -72,7 +75,7 @@ class DataFolder:
 # ==================================================================================================
 @dataclass(frozen=True)
 class SourceRow:
-    """1 test problem as its source gives it, with the row id that the other files use for it.
+    """A `SourceRow` holds 1 test problem as its source gives it, with the row id that the other files use for it.
 
     Exactly 1 of `f` and `f_description` is set: `f` holds the row's function as 1 expression, and
     `f_description` describes a function that 1 expression does not give, such as a piecewise function.
@@ -94,15 +97,16 @@ class SourceRow:
     @classmethod
     def from_toml(cls, table: dict, row_id: str, where: str) -> "SourceRow":
         """Return the row of 1 `[[rows]]` table of a source file, or raise `DataFileError`."""
-        values = _take_strings(table, required={"key"}, optional=_ROW_FIELDS - {"key"}, where=where)
+        values = _read_string_fields(table, required={"key"}, optional=_ROW_FIELDS - {"key"}, where=where)
         if bool(values["f"]) == bool(values["f_description"]):
             raise DataFileError(f"{where}: needs exactly 1 of f and f_description")
-        return cls(row_id=row_id, **values)
+        else:
+            return cls(row_id=row_id, **values)
 
 
 @dataclass(frozen=True)
 class Relation:
-    """A note on how the rows of 1 source relate to the rows of other sources."""
+    """A `Relation` notes how the rows of 1 source relate to the rows of other sources."""
 
     source_ids: tuple[str, ...]
     text: str
@@ -126,7 +130,7 @@ class Relation:
 
 @dataclass(frozen=True)
 class Source:
-    """1 published source of test problems: its reference, where its rows come from, and its rows."""
+    """A `Source` holds 1 published source of test problems: its reference, where its rows come from, and its rows."""
 
     source_id: str
     title: str
@@ -140,10 +144,23 @@ class Source:
     relations: tuple[Relation, ...]
     rows: tuple[SourceRow, ...]
 
-    @property
-    def time_order_key(self) -> tuple[int, str]:
-        """Return the key that orders the sources in time: the year, then the id without its leading year."""
-        return self.year, re.sub(r"^\d{4}_", "", self.source_id)
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _rows_from_toml(source_id: str, tables: list[dict], file_name: str) -> tuple[SourceRow, ...]:
+        """Return the rows of a source file, adding a suffix `#2`, `#3`, ... to each repeat of a key."""
+        rows = []
+        seen_keys: Counter[str] = Counter()
+        for i, table in enumerate(tables):
+            key = str(table.get("key", "")).strip()
+            seen_keys[key] += 1
+            if seen_keys[key] > 1:
+                row_id = f"{source_id}:{key}#{seen_keys[key]}"
+            else:
+                row_id = f"{source_id}:{key}"
+            rows.append(SourceRow.from_toml(table, row_id, where=f"{file_name}, row {i + 1}"))
+        return tuple(rows)
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -163,34 +180,22 @@ class Source:
             for i, table in enumerate(data.pop("relations", []))
         )
         rows = cls._rows_from_toml(path.stem, data.pop("rows", []), path.name)
-        values = _take_strings(data, required=_SOURCE_FIELDS, optional={"notes"}, where=path.name)
-        if values["home"] not in HOME_NAMES:
+        values = _read_string_fields(data, required=_SOURCE_FIELDS, optional={"notes"}, where=path.name)
+        if values["home"] not in HOME_DESCRIPTIONS:
             raise DataFileError(f"{path.name}: unknown home {values['home']!r}")
         stated = re.match(r"(\d+)\b", values["rows_summary"])
         if (int(stated.group(1)) if stated else 0) != len(rows):
             raise DataFileError(f"{path.name}: rows_summary does not start with the number of rows, {len(rows)}")
-        return cls(source_id=path.stem, year=year, relations=relations, rows=rows, **values)
-
-    @staticmethod
-    def _rows_from_toml(source_id: str, tables: list[dict], file_name: str) -> tuple[SourceRow, ...]:
-        """Return the rows of a source file, giving a key that the source repeats a suffix `#2`, `#3`, ..."""
-        rows = []
-        seen_keys: dict[str, int] = {}
-        for i, table in enumerate(tables):
-            key = str(table.get("key", "")).strip()
-            seen_keys[key] = seen_keys.get(key, 0) + 1
-            if seen_keys[key] > 1:
-                row_id = f"{source_id}:{key}#{seen_keys[key]}"
-            else:
-                row_id = f"{source_id}:{key}"
-            rows.append(SourceRow.from_toml(table, row_id, where=f"{file_name}, row {i + 1}"))
-        return tuple(rows)
+        else:
+            return cls(source_id=path.stem, year=year, relations=relations, rows=rows, **values)
 
 
 def read_sources(sources_dir: Path) -> list[Source]:
     """Return every source in time order, or raise `DataFileError` where a source file breaks the format."""
+    # time order: by year, then by id without its leading year
     sources = sorted(
-        (Source.from_toml_file(path) for path in sources_dir.glob("*.toml")), key=lambda s: s.time_order_key
+        (Source.from_toml_file(path) for path in sources_dir.glob("*.toml")),
+        key=lambda s: (s.year, re.sub(r"^\d{4}_", "", s.source_id)),
     )
     known = {source.source_id for source in sources}
     for source in sources:
@@ -206,18 +211,22 @@ def read_sources(sources_dir: Path) -> list[Source]:
 # ==================================================================================================
 @dataclass(frozen=True)
 class AutomaticStatus:
-    """The status that the script finds for a row by comparing it with every earlier row."""
+    """An `AutomaticStatus` holds the status that the script finds for a row by comparing it with every earlier row.
+
+    `matches` holds the matched row ids joined by `ROW_ID_SEPARATOR`, and `n_instances` is 0 for a row that does
+    not parse.
+    """
 
     status: str
     match_kind: str
     matches: str
     parse_note: str
-    instances: int
+    n_instances: int
 
 
 @dataclass(frozen=True)
 class FinalStatus:
-    """A row's final status, the earlier rows that it matches, and the reason where a person decided it."""
+    """A `FinalStatus` holds a row's final status, its earlier rows, and the reason where a person decided it."""
 
     status: str
     earlier_rows: str
@@ -227,6 +236,11 @@ class FinalStatus:
     def earlier_row_ids(self) -> list[str]:
         """Return the ids of the earlier rows."""
         return [row_id.strip() for row_id in self.earlier_rows.split(ROW_ID_SEPARATOR) if row_id.strip()]
+
+
+def join_row_ids(row_ids: Iterable[str | None]) -> str:
+    """Join the distinct row ids, in their first order, into 1 field that `FinalStatus.earlier_row_ids` splits."""
+    return ROW_ID_SEPARATOR.join(dict.fromkeys(r for r in row_ids if r))
 
 
 def read_decisions(path: Path) -> dict[str, FinalStatus]:
@@ -248,8 +262,8 @@ def read_decisions(path: Path) -> dict[str, FinalStatus]:
 
 
 @dataclass(frozen=True)
-class RowStatus:
-    """A row of the survey with its automatic and final status: 1 line of `rows.csv`."""
+class RowsTableLine:
+    """A `RowsTableLine` holds 1 line of `rows.csv`: a row of the survey with its automatic and final status."""
 
     row_id: str
     year: int
@@ -282,8 +296,8 @@ class RowStatus:
             "parameters": self.parameters,
             "interval": self.interval,
             "parse_note": self.automatic.parse_note,
-            "instances": str(self.automatic.instances),
-            "auto_status": self.automatic.status,
+            "instances": str(self.automatic.n_instances),
+            "automatic_status": self.automatic.status,
             "match_kind": self.automatic.match_kind,
             "matches": self.automatic.matches,
             "status": self.final.status,
@@ -295,7 +309,7 @@ class RowStatus:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def from_csv_line(cls, line: dict[str, str]) -> "RowStatus":
+    def from_csv_line(cls, line: dict[str, str]) -> "RowsTableLine":
         """Return the row of 1 line of `rows.csv`."""
         return cls(
             row_id=line["row_id"],
@@ -306,11 +320,11 @@ class RowStatus:
             parameters=line["parameters"],
             interval=line["interval"],
             automatic=AutomaticStatus(
-                status=line["auto_status"],
+                status=line["automatic_status"],
                 match_kind=line["match_kind"],
                 matches=line["matches"],
                 parse_note=line["parse_note"],
-                instances=int(line["instances"]),
+                n_instances=int(line["instances"]),
             ),
             final=FinalStatus(status=line["status"], earlier_rows=line["earlier_rows"], reason=line["reason"]),
         )
@@ -318,7 +332,7 @@ class RowStatus:
     @classmethod
     def from_source_row(
         cls, source: Source, row: SourceRow, automatic: AutomaticStatus, final: FinalStatus
-    ) -> "RowStatus":
+    ) -> "RowsTableLine":
         """Return a source row with its statuses."""
         return cls(
             row_id=row.row_id,
@@ -333,14 +347,14 @@ class RowStatus:
         )
 
 
-def read_rows_table(path: Path) -> list[RowStatus]:
+def read_rows_table(path: Path) -> list[RowsTableLine]:
     """Return the rows of `rows.csv`, in time order."""
     with path.open(encoding="utf-8", newline="") as f:
-        return [RowStatus.from_csv_line(line) for line in csv.DictReader(f)]
+        return [RowsTableLine.from_csv_line(line) for line in csv.DictReader(f)]
 
 
-def write_rows_table(path: Path, rows: list[RowStatus]) -> None:
-    """Write `rows.csv`, with Unix line endings."""
+def write_rows_table(path: Path, rows: list[RowsTableLine]) -> None:
+    """Write `rows.csv`, with Unix line endings; `rows` must not be empty."""
     lines = [row.to_csv_line() for row in rows]
     with path.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=list(lines[0]), lineterminator="\n")
@@ -356,8 +370,12 @@ _ROW_FIELDS = {"key", "f", "f_description", "name", "parameters", "interval", "a
 _DECISION_COLUMNS = ["row_id", "status", "earlier_rows", "reason"]
 
 
-def _take_strings(table: dict, required: set[str], optional: set[str], where: str) -> dict[str, str]:
-    """Return the string fields of a TOML table, stripped, with "" for each missing optional field, or raise."""
+def _read_string_fields(table: dict, required: set[str], optional: set[str], where: str) -> dict[str, str]:
+    """Return the string fields of a TOML table, stripped, with "" for each missing optional field.
+
+    Raises:
+        DataFileError: If the table lacks a required field, has an unknown field, or a field is not a string.
+    """
     unknown = sorted(set(table) - required - optional)
     missing = sorted(required - set(table))
     if unknown or missing:

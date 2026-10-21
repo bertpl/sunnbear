@@ -10,8 +10,8 @@ chapter 4, "An algorithm with guaranteed convergence for finding a zero of a fun
 transcribed_from = "the book's scan (2 book pages per sheet, no text layer), read from the page images. sunnbear's `tests/solvers/bracketing/brent/paper_problems.py` holds Table 4.1's 2 `x^9` rows with the same intervals and `t`. The erratum corrects only a line on p. 163 (chapter 7), so nothing in chapter 4 changes."
 rows_summary = '''
 7: Section 2's 2 functions, Table 4.1's 4 functions (5 runs, because `x^9` runs on 2 intervals), and Table 4.2's determinant. These functions get no row:
-- Section 5's equation (5.1), `f(x) = phi(t_i) - c` with `i = ceil(x - 1/2)`, which proposes `zero` for searching an ordered file, with no concrete `phi` and no test.
-- The 4 polynomials of chapter 3, Section 9, "Some numerical examples" (pp. 43–45), which lies outside chapter 4. Chapter 4 cites that section for an illustration of superlinear convergence; it runs successive interpolation, not `zero`, from starting points without a bracket.
+- Section 5's equation (5.1), `f(x) = phi(t_i) - c` with `i = ceil(x - 1/2)`, with which Section 5 proposes `zero` for searching an ordered file, with no concrete `phi` and no test.
+- The 4 polynomials of chapter 3, Section 9, "Some numerical examples" (pp. 43–45), which lies outside chapter 4. Chapter 4 cites that section for an illustration of superlinear convergence; that section runs successive interpolation, not `zero`, from starting points without a bracket.
 '''
 notes = '''
 - The keys are chapter 4's equation numbers where the book numbers the function. `T4.1 r1-2` and `T4.1 r3` are the unnumbered rows of Table 4.1.

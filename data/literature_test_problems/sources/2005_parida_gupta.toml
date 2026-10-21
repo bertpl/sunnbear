@@ -19,13 +19,17 @@ notes = '''
 [[relations]]
 sources = ['1992_alefeld_potra', '1993_alefeld_potra_shi', '1995_alefeld_potra_shi', '2011_galdino']
 text = '''
-Example 3, `11*x^11 - 1` on `[0.1, 1]`, is problem 3 of Alefeld & Potra (1992) and `g3` of Galdino (2011), on the same interval. It is not in the tables of Alefeld, Potra & Shi (1993, 1995). Examples 1, 2 and 4 are in none of the 4 articles.
+Example 3, `11*x^11 - 1` on `[0.1, 1]`, is problem 3 of Alefeld & Potra (1992) and `g3` of Galdino (2011), on the same interval. Example 3 is not in the tables of Alefeld, Potra & Shi (1993, 1995). Examples 1, 2 and 4 are in none of the 4 articles.
 '''
 
 [[relations]]
 sources = ['1989_atkinson']
 text = '''
-The article cites Atkinson (1989) only for root-finding methods in general. Example 1 is the book's Problem 43; Example 2 is the derivative of its (2.7.6), which the book solves with Newton's method; Example 4 is its Laguerre polynomial of degree 6 (§2.9, p. 101). The book gives no intervals for them.
+The article cites Atkinson (1989) only for root-finding methods in general.
+- Example 1 is the book's Problem 43.
+- Example 2 is the derivative of the book's (2.7.6), which the book solves with Newton's method.
+- Example 4 is the book's Laguerre polynomial of degree 6 (§2.9, p. 101).
+- The book gives no intervals for these 3 functions.
 '''
 
 [[rows]]

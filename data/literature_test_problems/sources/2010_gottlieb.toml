@@ -21,7 +21,7 @@ text = "This is the article that the comment \"Gottlieb's paper [table 1 & 2]\" 
 [[relations]]
 sources = ['2008_naghipoor']
 text = '''
-Tests 2–7 are the 6 functions of Table 1 of Naghipoor, Ahmadian & Soheili (2008), in the same order, with the same expressions; test 1, `3*sin(x) - 2`, is not in it, so it is the article's own function. Only the interval of test 7 differs: Naghipoor et al. give `[0.5, 1.5]`, this article `[0.5, 2.0]`.
+Tests 2–7 are the 6 functions of Table 1 of Naghipoor, Ahmadian & Soheili (2008), in the same order, with the same expressions; test 1, `3*sin(x) - 2`, is not in that table, so test 1 is the article's own function. Only the interval of test 7 differs: Naghipoor et al. give `[0.5, 1.5]`, this article `[0.5, 2.0]`.
 '''
 
 [[rows]]

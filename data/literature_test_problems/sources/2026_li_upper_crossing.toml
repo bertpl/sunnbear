@@ -13,7 +13,7 @@ rows_summary = '23: 11 from the main text and appendices, 12 from the supplement
 notes = '''
 - The statistical rows depend on a sample `x_1, ..., x_n`; `xbar` is its mean and `G(x) = (1/n)*sum_i log(x_i)`. No data set is published, and Section 7.4 draws random samples.
 - The article writes conditional arguments as `Phi(x|mu, sigma^2)`; the rows write `;` for `|`.
-- Keys are the example number, the section or the appendix. Where a section of Section 7 runs an earlier equation, its number follows in parentheses, as in `Ex. 3 (7.2)`. The keys of the supplementary sections carry an `S` prefix.
+- Keys are the example number, the section or the appendix. Where a section of Section 7 runs an earlier equation, the section's number follows in parentheses, as in `Ex. 3 (7.2)`. The keys of the supplementary sections carry an `S` prefix.
 '''
 
 [[rows]]

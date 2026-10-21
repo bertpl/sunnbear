@@ -1,4 +1,4 @@
-row_id,year,home,f,f_description,parameters,interval,parse_note,instances,auto_status,match_kind,matches,status,earlier_rows,reason
+row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automatic_status,match_kind,matches,status,earlier_rows,reason
 1971_brent:3.1,1971,1.1,,`2^(x/delta)` for `a + delta <= x <= b`; `-((b - a - delta)/delta)*2^(b/delta)` for `x = a`; arbitrary for `a < x < a + delta`,"`a`, `b`, `delta` free","[a, b]",not 1 expression,0,judge,unparsed,,new,,
 1971_brent:3.2,1971,1.1,,`0` if `x = 0`; `x*exp(-x^-2)` if `x != 0`,,an interval containing the origin,not 1 expression,0,judge,unparsed,,new,,
 1971_dowell_jarratt_illinois:Table 1,1971,1.1,sin(x) - 0.5,,,"[0, 1.5]",,1,new,,,new,,

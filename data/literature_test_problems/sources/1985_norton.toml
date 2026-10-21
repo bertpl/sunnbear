@@ -1,20 +1,22 @@
 title = "Norton (1985): Algorithm 631, Larkin's method of rational interpolation"
-reference = "Norton, V. (1985). Algorithm 631: Finding a bracketed zero by Larkin's method of rational interpolation. ACM Transactions on Mathematical Software 11(2), 120–134. https://doi.org/10.1145/214392.214396. The authors' Fortran code is CALGO 631, https://www.netlib.org/toms/631."
+reference = "Norton, V. (1985). Algorithm 631: Finding a bracketed zero by Larkin's method of rational interpolation. ACM Transactions on Mathematical Software 11(2), 120–134. https://doi.org/10.1145/214392.214396. The author's Fortran code is Algorithm 631 of the Collected Algorithms of the ACM (CALGO), https://www.netlib.org/toms/631."
 year = 1985
 home = '1.2'
 where_in_source = '''
-- Section 4 (pp. 128–130) numbers 12 functions in 3 groups, which Tables III–V solve. The article says that the 3 groups were "previously described" in Anderson and Björck (1973) and/or Bus and Dekker (1975), without saying which function comes from which.
+- Section 4 (pp. 128–130) numbers 12 functions in 3 groups, whose results Tables III–V give. The article says that the 3 groups were "previously described" in Anderson and Björck (1973) and/or Bus and Dekker (1975), without saying which function comes from which.
 - Tables III–V also give evaluation counts for Anderson–Björck's Algorithm A, Brent's method, Bus–Dekker's Algorithm R and Cox's method, each changed to stop on the article's own test, `|x0 - x1| <= 2*tol` with `tol = 2*eps*|x0| + eta`. The runs used a DECSYSTEM-2060.
-- Tables VIa and VIb (pp. 131–133) solve 10,000 random polynomials of degree 30, on an IBM 4341.
-- The driver of the authors' code solves 1 more function.
+- Tables VIa and VIb (pp. 131–133) give the results on 10,000 random polynomials of degree 30, run on an IBM 4341.
+- The driver of the author's code solves 1 more function.
 '''
-transcribed_from = "the article, a scan, read from the page images; the driver's function from the authors' code. No sunnbear transcription exists to check against."
+transcribed_from = "the article, a scan, read from the page images; the driver's function from the author's code. No sunnbear transcription exists to check against."
 rows_summary = "14: the article's 12 functions, the random polynomials of Table VI, and the driver's function."
 
 [[relations]]
 sources = ['1975_bus_dekker']
 text = '''
-Functions 8–12 are the Groups II–IV of Bus & Dekker (1975), with the same values of `a`, `b` and `n`; Anderson & Björck (1973) hold none of them. Functions 1–6 follow the expressions that Bus & Dekker print (function 5 without Anderson & Björck's leading `1 +`); function 7 is in neither. The file of Bus & Dekker, `1975_bus_dekker`, lists the differences in `n` and in the intervals.
+- Functions 8–12 are the Groups II–IV of Bus & Dekker (1975), with the same values of `a`, `b` and `n`; Anderson & Björck (1973) hold none of them.
+- Functions 1–6 follow the expressions that Bus & Dekker print (function 5 without Anderson & Björck's leading `1 +`); function 7 is in neither.
+- The file of Bus & Dekker, `1975_bus_dekker`, lists the differences in `n` and in the intervals.
 '''
 
 [[rows]]

@@ -8,7 +8,7 @@ where_in_source = '''
 - Tables 5.2 and 5.3 give total evaluation counts only, at `tol = 10^-7, 10^-10, 10^-15` and 0.
 '''
 transcribed_from = 'the article, a scan with a text layer, read from the page images. No code accompanies the article.'
-rows_summary = "15: Table 5.1's 14 functions and the `x^n` problem of Section 5. The article counts 145 cases for Table 5.1, which its parameter column gives."
+rows_summary = "15: Table 5.1's 14 functions and the `x^n` problem of Section 5. The article counts 145 cases for Table 5.1, the number that its parameter column gives."
 notes = '''
 - **Keys:** Table 5.1 numbers neither its functions nor its rows, so the keys `T5.1-1` to `T5.1-14` count the functions in printed order. The `x^n` problem of Section 5 has the key `T5.3`.
 - **Notation:** the parameter column of Table 5.1, and the rows' `parameters`, write the values from `a` to `b` in steps of `s` as `a(s)b`.
@@ -18,7 +18,8 @@ notes = '''
 [[relations]]
 sources = ['1995_alefeld_potra_shi']
 text = '''
-`T5.1-1` to `T5.1-11` are problems 1 to 11 of Table I of Alefeld, Potra & Shi (1995), and `T5.1-12` to `T5.1-14` its problems 13 to 15, in the same order and with the same expressions. Its problem 12, `x^(1/n) - n^(1/n)`, is not here, and `T5.3` is not in its table. The differences:
+`T5.1-1` to `T5.1-11` are problems 1 to 11 of Table I of Alefeld, Potra & Shi (1995), and `T5.1-12` to `T5.1-14` its problems 13 to 15, in the same order and with the same expressions. The differences:
+- Problem 12 of the 1995 article, `x^(1/n) - n^(1/n)`, is not here, and `T5.3` is not in the 1995 table.
 - `T5.1-2` (problem 2): `n = 1(1)19`, where 1995 has `n = 1(1)10`.
 - `T5.1-4` (problem 4): the second interval is `[0.95, 4.05]`, where 1995 has `[-0.95, 4.05]`.
 - `T5.1-6` (problem 6): `n = 1(1)5, 15, 20`, where 1995 has `n = 1(1)5, 20(20)100`.
@@ -29,10 +30,10 @@ text = '''
 [[relations]]
 sources = ['2011_galdino']
 text = '''
-This article holds 8 of the 23 functions of Table II of Galdino (2011) as printed, and 10 with `g19` and `g20` as Ganchovski et al. (2026) read them:
+This article holds 9 of the 23 functions of Table II of Galdino (2011) as printed, and 10 with `g19` and `g20` as Ganchovski et al. (2026) read them:
 - `T5.1-6` holds `g6` and `g8` (`n = 5, 20`), but not `g7` (`n = 10`).
 - `T5.1-8` holds `g12`–`g14`.
-- `T5.1-9` holds `g15` and `g17` (`n = 5, 20`), but not `g16` (`n = 10`).
+- `T5.1-9` holds `g15` and `g17` (`n = 5, 20`), and `g20` as printed, but not `g16` (`n = 10`).
 - `T5.1-10` holds `g18`, and `g19` and `g20` as Ganchovski et al. read them.
 - `T5.1-7` has `x` where `g9`–`g11` have `x^2`.
 '''

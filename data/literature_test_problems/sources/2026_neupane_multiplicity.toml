@@ -3,7 +3,10 @@ reference = 'Neupane, H. (2026). Divided-Difference Multiplicity Detection: A De
 year = 2026
 home = '1.2'
 where_in_source = '''
-- Section 6, "Numerical Experiments", uses 1 family, `f_m(x) = (x - 1)^m*(x + 2)`. Table 1 gives the detected multiplicity for `m = 1, ..., 8` at 7 step sizes; Table 2 adds noise at `m = 4`; Table 3 gives the function evaluations of 3 methods at `m = 4`.
+- Section 6, "Numerical Experiments", uses 1 family, `f_m(x) = (x - 1)^m*(x + 2)`:
+  - Table 1 gives the detected multiplicity for `m = 1, ..., 8` at 7 step sizes.
+  - Table 2 adds noise at `m = 4`.
+  - Table 3 gives the function evaluations of 3 methods at `m = 4`.
 - Sections 1 and 2 use the same function at `m = 4` as the motivating example.
 - Section 4.1 uses `x + b*x^2` as a model case, analyzed in closed form.
 '''

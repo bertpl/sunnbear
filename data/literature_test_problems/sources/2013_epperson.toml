@@ -4,8 +4,8 @@ year = 2013
 home = '1.4'
 where_in_source = '''
 chapter 3, "Root-Finding" (pp. 89–169): Examples 3.1–3.20, the text examples and figures of Sections 3.1–3.12, Tables 3.1–3.19, and the exercises that end each section.
-- Section 4.4 (pp. 192–195) applies Muller's method and inverse quadratic interpolation to 2 functions of chapter 3; its uses appear in those rows.
-- Problem 3 of Section 3.1 (rows keyed 3.1-3) returns in 3.1-11 (regula falsi), 3.8-3 (secant from the interval's endpoints), 3.11-6 to 3.11-8 (chord method from the midpoint, with Aitken extrapolation) and 4.4-9 (Muller, inverse quadratic interpolation); the rows do not repeat those keys.
+- Section 4.4 (pp. 192–195) applies Muller's method and inverse quadratic interpolation to 2 functions of chapter 3; the rows of those 2 functions list Section 4.4's tables and exercises in their keys.
+- Exercise 3 of Section 3.1 (rows keyed 3.1-3) is used again in 3.1-11 (regula falsi), 3.8-3 (secant from the interval's endpoints), 3.11-6 to 3.11-8 (chord method from the midpoint, with Aitken extrapolation) and 4.4-9 (Muller, inverse quadratic interpolation); the rows do not repeat those keys.
 - The rows leave out:
   - exercises about a generic `f` or a method (for example 3.2-7, 3.2-8, 3.5-1 to 3.5-4, 3.6-1 to 3.6-7, 3.8-4 to 3.8-7);
   - the initial-guess polynomials of Sections 3.4 and 3.7;

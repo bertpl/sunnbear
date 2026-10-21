@@ -8,7 +8,7 @@ with status 1 if there is a problem.
 import sys
 from collections import Counter
 
-from .data_files import DataFolder, RowStatus, read_decisions, read_sources, write_rows_table
+from .data_files import DataFolder, RowsTableLine, read_decisions, read_sources, write_rows_table
 from .matching import compute_automatic_statuses
 from .overview import Overview
 from .statuses import decide_final_statuses, find_problems
@@ -20,10 +20,10 @@ def main() -> int:
     sources = read_sources(folder.sources_dir)
     decisions = read_decisions(folder.decisions_file)
     # --- statuses stage -------------------------
-    automatic = compute_automatic_statuses([row for source in sources for row in source.rows])
-    final = decide_final_statuses(automatic, decisions)
+    automatic_statuses = compute_automatic_statuses([row for source in sources for row in source.rows])
+    final_statuses = decide_final_statuses(automatic_statuses, decisions)
     rows = [
-        RowStatus.from_source_row(source, row, automatic[row.row_id], final[row.row_id])
+        RowsTableLine.from_source_row(source, row, automatic_statuses[row.row_id], final_statuses[row.row_id])
         for source in sources
         for row in source.rows
     ]
@@ -36,7 +36,7 @@ def main() -> int:
     print(f"{len(sources)} sources, {len(rows)} rows")
     print("automatic status:", dict(Counter(row.automatic.status for row in rows).most_common()))
     print("final status:", dict(Counter(row.final.status for row in rows).most_common()))
-    problems = find_problems(final, decisions)
+    problems = find_problems(final_statuses, decisions)
     for problem in problems:
         print(f"problem: {problem}")
     if problems:

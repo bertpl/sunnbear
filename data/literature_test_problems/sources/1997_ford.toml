@@ -1,5 +1,5 @@
 title = 'Ford (1997): improved Illinois-type methods'
-reference = "Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia Iranica 4(1&2), 28–34. No working DOI: the journal's page, https://scientiairanica.sharif.edu/article_21758.html, lists 10.24200/sci.2020.21758, which doi.org does not resolve. An earlier version is the University of Essex technical report CSM-257 (1995)."
+reference = "Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia Iranica 4(1&2), 28–34. The article has no working DOI: the journal's page, https://scientiairanica.sharif.edu/article_21758.html, lists 10.24200/sci.2020.21758, which doi.org does not resolve. An earlier version is the University of Essex technical report CSM-257 (1995)."
 year = 1997
 home = '1.1'
 where_in_source = '''
@@ -10,7 +10,7 @@ section "Numerical Tests".
 '''
 transcribed_from = "the article, a scan without a text layer, read from the page images, and checked against sunnbear's transcription in `tests/solvers/paper_problems/ford.py`, which holds the 5 functions and the 15 bracket problems and agrees with the article on every function, constant and interval."
 rows_summary = '5, 1 per function. Table 4 solves each function on 3 brackets, 15 problems in all.'
-notes = "The `also_in` column gives the article's references for 3 of the functions. The rows of Anderson and Björck (1973), its reference 4, are in `1973_anderson_bjorck`."
+notes = "The `also_in` column gives the article's references for 3 of the functions. The rows of Anderson and Björck (1973), the article's reference 4, are in `1973_anderson_bjorck`."
 
 [[rows]]
 key = '1'

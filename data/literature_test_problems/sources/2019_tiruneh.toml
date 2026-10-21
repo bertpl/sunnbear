@@ -19,7 +19,7 @@ notes = '''
 [[relations]]
 sources = ['roots_fortran']
 text = '''
-This is the article that the comment "A modified three-point Secant method with improved rate and characteristics of convergence" of roots-fortran means; the comment names no author and dates it July 2019. The differences:
+This is the article that the comment "A modified three-point Secant method with improved rate and characteristics of convergence" of roots-fortran means; the comment names no author and dates the article July 2019. The differences:
 - Cases 63–68 are `T1.1`, `T1.2`, `T1.4`, `T1.5`, `T1.6` and `T1.7`, in order, with the same expressions. roots-fortran leaves out `T1.3` and all 7 functions of Table 2.
 - The article gives starting points, not intervals. The brackets of cases 63–68 are roots-fortran's own; each holds the article's stated root.
 '''
