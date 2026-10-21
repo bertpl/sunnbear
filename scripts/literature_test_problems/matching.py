@@ -9,7 +9,7 @@ instances in 3 ways:
   are removed;
 - **value:** they agree, up to a constant factor, at the fixed x-values of `functions.SAMPLE_POINTS`, in 40-digit
   arithmetic;
-- **family:** the row's expression is equal with its parameters left as symbols.
+- **family:** the row's expression, with its parameters left as symbols, is equal to the earlier row's.
 
 Every row with code in its f or f_description is also compared by its text: its f or f_description and its
 parameters, without whitespace and backticks. A row's test functions count as found when an earlier complete row has
@@ -44,10 +44,8 @@ class EarlierRowIndex:
         self._first_row_by_function: dict[tuple, str] = {}
         # _first_complete_row_by_test_function maps each test function key to the earliest complete row with it.
         self._first_complete_row_by_test_function: dict[tuple, str] = {}
-        # _unpaired_rows holds the complete rows for which the index may hold test functions that their source does
-        # not give: rows with several instances and several intervals that no parameter ties to an instance, so that
-        # every instance is paired with every interval, and rows whose instances combine several sets of parameter
-        # values (`ParsedFunction.has_value_sets`).
+        # _unpaired_rows holds the complete rows whose test functions may include some that their source does not give
+        # (`TestFunctionKeys.is_unpaired`).
         self._unpaired_rows: set[str] = set()
 
     @classmethod
@@ -61,7 +59,10 @@ class EarlierRowIndex:
         earlier_row_index = cls()
         statuses = {}
         for row in rows:
-            is_decided_incomplete = row.row_id in decisions and decisions[row.row_id].status == "incomplete"
+            if row.row_id in decisions:
+                is_decided_incomplete = decisions[row.row_id].status == "incomplete"
+            else:
+                is_decided_incomplete = False
             statuses[row.row_id] = earlier_row_index.match_and_add(row, is_decided_incomplete)
         return statuses
 
@@ -72,7 +73,7 @@ class EarlierRowIndex:
 
         - `incomplete` when the row gives no usable interval, or no function (an f_description without code);
         - `undecided` when its interval does not parse;
-        - `duplicate` when every test function of a row whose f does not parse is found by its text, and otherwise
+        - for a row whose f does not parse: `duplicate` when every test function is found by its text, and otherwise
           `undecided`;
         - `undecided` when an instance keeps a parameter without values, or when no interval matches any instance;
         - `duplicate` when every test function is found by structure, unless one is found only in a row whose
@@ -83,6 +84,43 @@ class EarlierRowIndex:
 
         `is_decided_incomplete` keeps the row's test functions out of the index.
         """
+        parsed_function, parsed_intervals, parse_note = self._parse_row(row)
+        n_instances = len(parsed_function.instances) if parsed_function else 0
+        function_keys = self._function_keys(row, parsed_function)
+        derived_matches = self._derived_matches(function_keys)
+        test_function_keys = TestFunctionKeys.from_source_row(row, parsed_function, parsed_intervals)
+        if parsed_intervals and parsed_intervals.incomplete_reason:
+            status = AutomaticStatus(
+                "incomplete", parsed_intervals.incomplete_reason, derived_matches[1], parse_note, n_instances
+            )
+        elif not function_keys:
+            status = AutomaticStatus("incomplete", "no function", "", parse_note, n_instances)
+        elif parsed_intervals is None:
+            status = AutomaticStatus(UNDECIDED, "interval does not parse", derived_matches[1], parse_note, n_instances)
+        elif parsed_function is None:
+            status = self._match_by_text(test_function_keys.text_keys, derived_matches, parse_note)
+        elif any(instance.free_symbols - {X} for instance in parsed_function.instances):
+            status = AutomaticStatus(
+                UNDECIDED, "parameters without values", derived_matches[1], parse_note, n_instances
+            )
+        else:
+            status = self._match_parsed(test_function_keys, derived_matches, parse_note, n_instances)
+        if parsed_intervals and not parsed_intervals.incomplete_reason:
+            is_complete = not is_decided_incomplete
+        else:
+            is_complete = False
+        self._add(row.row_id, function_keys, test_function_keys, is_complete)
+        return status
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _parse_row(row: SourceRow) -> tuple[ParsedFunction | None, ParsedIntervals | None, str]:
+        """Return a row's parsed function and parsed intervals, None for each that does not parse, and the parse note.
+
+        The parse note says why the f or the interval text does not parse, or how many intervals were left out.
+        """
         try:
             parsed_function = ParsedFunction.from_source_row(row)
         except (ParseError, ParseTimeoutError) as error:
@@ -90,38 +128,14 @@ class EarlierRowIndex:
         else:
             function_note = ""
         try:
-            intervals = ParsedIntervals.from_source_row(row)
+            parsed_intervals = ParsedIntervals.from_source_row(row)
         except (ParseError, ParseTimeoutError) as error:
-            intervals, interval_note = None, str(error) or "interval: timeout"
+            parsed_intervals, interval_note = None, str(error) or "interval: timeout"
         else:
-            interval_note = f"interval: {intervals.n_unusable} left out" if intervals.n_unusable else ""
+            interval_note = f"interval: {parsed_intervals.n_unusable} left out" if parsed_intervals.n_unusable else ""
         parse_note = "; ".join(note for note in (function_note, interval_note) if note)
-        n_instances = len(parsed_function.instances) if parsed_function else 0
-        function_keys = self._function_keys(row, parsed_function)
-        derived_matches = self._derived_matches(function_keys)
-        test_function_keys = TestFunctionKeys.from_row(row, parsed_function, intervals)
-        if intervals and intervals.incomplete_reason:
-            status = AutomaticStatus(
-                "incomplete", intervals.incomplete_reason, derived_matches[1], parse_note, n_instances
-            )
-        elif not function_keys:
-            status = AutomaticStatus("incomplete", "no function", "", parse_note, n_instances)
-        elif intervals is None:
-            status = AutomaticStatus(UNDECIDED, "interval does not parse", derived_matches[1], parse_note, n_instances)
-        elif parsed_function is None:
-            status = self._match_by_text(test_function_keys.text, derived_matches, parse_note)
-        elif any(instance.free_symbols - {X} for instance in parsed_function.instances):
-            status = AutomaticStatus(
-                UNDECIDED, "parameters without values", derived_matches[1], parse_note, n_instances
-            )
-        else:
-            status = self._match_parsed(test_function_keys, derived_matches, parse_note, n_instances)
-        self._add(row.row_id, function_keys, test_function_keys, parsed_function, intervals, is_decided_incomplete)
-        return status
+        return parsed_function, parsed_intervals, parse_note
 
-    # --------------------------------------------------------------------------
-    #  Helpers
-    # --------------------------------------------------------------------------
     def _derived_matches(self, function_keys: list[tuple]) -> tuple[str, str]:
         """Return the comparisons that find earlier rows with any of the function keys, and those rows, as 2 fields."""
         kinds, row_ids = [], []
@@ -149,14 +163,14 @@ class EarlierRowIndex:
         n_instances: int,
     ) -> AutomaticStatus:
         """Return the status of a row whose f and intervals parse, from its test functions by structure and by value."""
-        by_structure = [self._first_complete_row_by_test_function.get(key) for key in test_function_keys.structure]
+        by_structure = [self._first_complete_row_by_test_function.get(key) for key in test_function_keys.structure_keys]
         by_structure_or_value = []
-        for found, value_key in zip(by_structure, test_function_keys.value, strict=True):
+        for found, value_key in zip(by_structure, test_function_keys.value_keys, strict=True):
             if found or value_key is None:
                 by_structure_or_value.append(found)
             else:
                 by_structure_or_value.append(self._first_complete_row_by_test_function.get(value_key))
-        if not test_function_keys.structure:
+        if not test_function_keys.structure_keys:
             return AutomaticStatus(UNDECIDED, "no test function", derived_matches[1], parse_note, n_instances)
         elif all(by_structure) and self._unpaired_rows.isdisjoint(by_structure):
             return AutomaticStatus("duplicate", "structure", join_row_ids(by_structure), parse_note, n_instances)
@@ -168,33 +182,23 @@ class EarlierRowIndex:
             return AutomaticStatus("new", derived_matches[0], derived_matches[1], parse_note, n_instances)
 
     def _add(
-        self,
-        row_id: str,
-        function_keys: list[tuple],
-        test_function_keys: "TestFunctionKeys",
-        parsed_function: ParsedFunction | None,
-        intervals: ParsedIntervals | None,
-        is_decided_incomplete: bool,
+        self, row_id: str, function_keys: list[tuple], test_function_keys: "TestFunctionKeys", is_complete: bool
     ) -> None:
-        """Add a row's function keys to the index, and its test functions where it has usable intervals and is complete.
+        """Add a row's function keys to the index, and its test functions where the row is complete.
 
-        The row also joins `_unpaired_rows` where its test functions can be more than its source gives.
+        A complete row also joins `_unpaired_rows` where its test functions may include some that its source does not
+        give.
         """
         for key in function_keys:
             self._first_row_by_function.setdefault(key, row_id)
-        if is_decided_incomplete or not intervals or intervals.incomplete_reason:
+        if not is_complete:
             return
-        for key in [*test_function_keys.structure, *test_function_keys.value, *test_function_keys.text]:
+        test_keys = [*test_function_keys.structure_keys, *test_function_keys.value_keys, *test_function_keys.text_keys]
+        for key in test_keys:
             if key:
                 self._first_complete_row_by_test_function.setdefault(key, row_id)
-        if parsed_function and len(parsed_function.instances) > 1:
-            is_every_pair_a_test_function = len({interval.key for interval in intervals.intervals}) > 1
-            for interval in intervals.intervals:
-                for values in parsed_function.instance_parameter_values:
-                    if not interval.matches_parameter_values(values):
-                        is_every_pair_a_test_function = False
-            if is_every_pair_a_test_function or parsed_function.has_value_sets:
-                self._unpaired_rows.add(row_id)
+        if test_function_keys.is_unpaired:
+            self._unpaired_rows.add(row_id)
 
     @staticmethod
     def _function_keys(row: SourceRow, parsed_function: ParsedFunction | None) -> list[tuple]:
@@ -222,41 +226,54 @@ class EarlierRowIndex:
 class TestFunctionKeys:
     """A `TestFunctionKeys` holds the keys of a row's test functions by structure, by value and by text.
 
-    `value` is aligned with `structure`: it holds, at the position of each key in `structure`, the same test function
-    keyed by the instance's scaled values, or None where the instance has no scaled values.
+    `value_keys` is aligned with `structure_keys`: it holds, at the position of each key in `structure_keys`, the same
+    test function keyed by the instance's scaled values, or None where the instance has no scaled values.
+
+    `is_unpaired` tells whether the keys may hold test functions that the row's source does not give: the row has
+    several instances and several intervals that no parameter ties to an instance, so that every instance is paired
+    with every interval, or its instances combine several sets of parameter values (`ParsedFunction.has_value_sets`).
     """
 
-    structure: list[tuple]
-    value: list[tuple | None]
-    text: list[tuple]
+    structure_keys: list[tuple]
+    value_keys: list[tuple | None]
+    text_keys: list[tuple]
+    is_unpaired: bool
 
     # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def from_row(
-        cls, row: SourceRow, parsed_function: ParsedFunction | None, intervals: ParsedIntervals | None
+    def from_source_row(
+        cls, row: SourceRow, parsed_function: ParsedFunction | None, parsed_intervals: ParsedIntervals | None
     ) -> "TestFunctionKeys":
         """Return the keys of a row's test functions by structure, by value and by text.
 
         A parsed instance takes every interval that matches its parameter values; the text takes every interval.
         """
-        structure, value, text = [], [], []
-        if intervals and parsed_function:
+        structure_keys, value_keys, text_keys = [], [], []
+        is_unpaired = False
+        if parsed_intervals and parsed_function:
             for instance, values, parameter_values in zip(
                 parsed_function.instances,
                 parsed_function.scaled_values,
                 parsed_function.instance_parameter_values,
                 strict=True,
             ):
-                for interval in intervals.intervals:
+                for interval in parsed_intervals.intervals:
                     if interval.matches_parameter_values(parameter_values):
-                        structure.append((("structure", sp.srepr(instance)), interval.key))
-                        value.append((("value", values), interval.key) if values is not None else None)
+                        structure_keys.append((("structure", sp.srepr(instance)), interval.key))
+                        value_keys.append((("value", values), interval.key) if values is not None else None)
+            if len(parsed_function.instances) > 1:
+                is_every_pair_a_test_function = len({interval.key for interval in parsed_intervals.intervals}) > 1
+                for interval in parsed_intervals.intervals:
+                    for parameter_values in parsed_function.instance_parameter_values:
+                        if not interval.matches_parameter_values(parameter_values):
+                            is_every_pair_a_test_function = False
+                is_unpaired = is_every_pair_a_test_function or parsed_function.has_value_sets
         text_key = _text_key(row)
-        if intervals and text_key:
-            text = [(text_key, interval.key) for interval in intervals.intervals]
-        return cls(structure, value, text)
+        if parsed_intervals and text_key:
+            text_keys = [(text_key, interval.key) for interval in parsed_intervals.intervals]
+        return cls(structure_keys, value_keys, text_keys, is_unpaired)
 
 
 # ==================================================================================================

@@ -30,9 +30,9 @@ SPAN_ASSIGNMENT = re.compile(r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*=(?!=)\s*(.+?)\s*")
 class Interval:
     """An `Interval` holds 1 interval and the values of the parameters that its bounds use.
 
-    `lower` and `upper` are the bounds as the text of exact sympy numbers, the smaller one first, such as `pi/2` and
-    `1/10000`: a decimal bound is read as an exact fraction, so `1E-4`, `10^(-4)` and `0.0001` give the same text,
-    and 2 intervals are the same interval when their bounds are equal.
+    `lower` and `upper` are the bounds, each the string of an exact sympy number, the smaller one first, such as
+    `pi/2` and `1/10000`: a decimal bound is read as an exact fraction, so `1E-4`, `10^(-4)` and `0.0001` give the
+    same text, and 2 intervals are the same interval when their bounds are equal.
     """
 
     lower: str
@@ -70,9 +70,13 @@ class Interval:
 class ParsedIntervals:
     """A `ParsedIntervals` holds a row's usable intervals, or why it has none.
 
-    `incomplete_reason` is "no interval" where the text says that the source gives none or is empty, "no usable
-    interval" where the text gives no interval with finite numeric bounds, such as `theta > 0`, a starting point, an
-    interval with an infinite bound or one with bounds that the row gives no values for, and "" otherwise.
+    `incomplete_reason` is 1 of these:
+
+    - "no interval" where the text is empty or says that the source gives none;
+    - "no usable interval" where the text gives no interval with finite numeric bounds, such as `theta > 0`, a
+      starting point, an interval with an infinite bound, or one with bounds that the row gives no values for;
+    - "" otherwise.
+
     `n_unusable` counts the intervals that the text gives but that are left out as not usable.
     """
 
@@ -195,33 +199,6 @@ class ParsedIntervals:
             intervals.append(Interval.from_bounds(numbers, tuple(zip(names, combo, strict=True))))
         return intervals
 
-    @classmethod
-    def _parse(cls, row: SourceRow) -> "ParsedIntervals":
-        """Parse a row's interval text, or raise `ParseError` with the reason."""
-        text = row.interval.strip()
-        if not text or NO_INTERVAL.match(text):
-            return cls(intervals=(), incomplete_reason="no interval", n_unusable=0)
-        if "`" in text:
-            spans = re.findall(r"`([^`]*)`", text)
-        else:
-            spans = [text]
-        row_values = parse_parameters(row.parameters)
-        definitions, local_values = cls._read_assignments(spans, row_values)
-        values = {**row_values, **local_values}
-        intervals: dict[Interval, None] = {}
-        n_unusable = 0
-        for span in spans:
-            for bounds in cls._find_bound_pairs(span):
-                evaluated = cls._evaluate_bounds(bounds, definitions, values, row_values)
-                if evaluated is None:
-                    n_unusable += 1
-                else:
-                    intervals.update(dict.fromkeys(evaluated))
-        if intervals:
-            return cls(intervals=tuple(intervals), incomplete_reason="", n_unusable=n_unusable)
-        else:
-            return cls(intervals=(), incomplete_reason="no usable interval", n_unusable=n_unusable)
-
     # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------
@@ -233,4 +210,26 @@ class ParsedIntervals:
         `TimeLimitContext`.
         """
         with TimeLimitContext():
-            return cls._parse(row)
+            text = row.interval.strip()
+            if not text or NO_INTERVAL.match(text):
+                return cls(intervals=(), incomplete_reason="no interval", n_unusable=0)
+            if "`" in text:
+                spans = re.findall(r"`([^`]*)`", text)
+            else:
+                spans = [text]
+            row_values = parse_parameters(row.parameters)
+            definitions, local_values = cls._read_assignments(spans, row_values)
+            values = {**row_values, **local_values}
+            intervals: dict[Interval, None] = {}
+            n_unusable = 0
+            for span in spans:
+                for bounds in cls._find_bound_pairs(span):
+                    evaluated = cls._evaluate_bounds(bounds, definitions, values, row_values)
+                    if evaluated is None:
+                        n_unusable += 1
+                    else:
+                        intervals.update(dict.fromkeys(evaluated))
+            if intervals:
+                return cls(intervals=tuple(intervals), incomplete_reason="", n_unusable=n_unusable)
+            else:
+                return cls(intervals=(), incomplete_reason="no usable interval", n_unusable=n_unusable)

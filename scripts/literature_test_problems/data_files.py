@@ -244,8 +244,8 @@ class AutomaticStatus:
 class FinalStatus:
     """A `FinalStatus` holds a row's final status, the earlier rows that it names, and the reason for the status.
 
-    A `duplicate` names the earlier rows that already give its test functions in `duplicate_of`; a `new` or
-    `incomplete` row names the earlier rows whose function it copies or changes in `derived_from`. Each field joins
+    A `duplicate` names, in `duplicate_of`, the earlier rows that already give its test functions; a `new` or
+    `incomplete` row names, in `derived_from`, the earlier rows whose function it copies or changes. Each field joins
     its row ids by `ROW_ID_SEPARATOR`.
     """
 
@@ -293,7 +293,7 @@ class FinalStatus:
     def find_named_row_problems(
         self, row_id: str, final_statuses: dict[str, "FinalStatus"], position: dict[str, int]
     ) -> list[str]:
-        """Return the problems of the rows that the row names: unknown, not earlier, or not `new` in `duplicate_of`.
+        """Return the problems of the rows that the row names: unknown or not earlier, or in `duplicate_of` not `new`.
 
         `row_id` is the id of the row that has this status; `position` holds each row's index in time order.
         """

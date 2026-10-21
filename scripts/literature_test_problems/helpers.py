@@ -32,8 +32,8 @@ TRANSFORMATIONS = (*standard_transformations, convert_xor, rationalize)
 # MAX_INSTANCES limits the combinations of parameter values that a row's f, or 1 pair of interval bounds, may give;
 # more raises ParseError.
 MAX_INSTANCES = 64
-# PARSE_TIMEOUT_SECONDS limits the time of each parse: of a row's f together with its scaled values, and, separately,
-# of its interval text.
+# PARSE_TIMEOUT_SECONDS limits the time of each parse: of a row's f together with the evaluation of its instances at
+# fixed x-values, and, separately, of its interval text.
 PARSE_TIMEOUT_SECONDS = 10
 
 
@@ -139,9 +139,13 @@ def _fill_ellipsis(pieces: list[str], i: int) -> list | None:
     """Return the numbers that the `...` at `pieces[i]` stands for, strictly between its 2 neighbors, or None.
 
     The step is the difference of the 2 numbers before `...`, or 1 where only 1 number precedes it and both
-    neighbors are integers. The result is None if a neighbor is not a plain decimal number, such as `-24` or `0.1`,
-    which is read as an exact fraction, if the step is not positive, if the number after `...` is not a whole number
-    of steps away, or if `...` stands for more than 40 steps.
+    neighbors are integers. A plain decimal number, such as `-24` or `0.1`, is read as an exact fraction. The result
+    is None if:
+
+    - a neighbor is not a plain decimal number;
+    - the step is not positive;
+    - the number after `...` is not a whole number of steps away;
+    - `...` stands for more than 40 steps.
     """
     neighbors = []
     for j in (i - 2, i - 1, i + 1):

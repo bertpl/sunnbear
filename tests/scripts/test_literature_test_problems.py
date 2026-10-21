@@ -165,28 +165,28 @@ def test_timeline_template_counts_every_status(script_modules):
 #  The rules of the final statuses
 # ==================================================================================================
 @pytest.mark.parametrize(
-    "automatic_status, field",
+    "status, field_name",
     [
         ("duplicate", "duplicate_of"),  # a duplicate of a duplicate names the first appearance
         ("new", "derived_from"),  # a row derived from a duplicate names the first appearance too
         ("incomplete", "derived_from"),
     ],
 )
-def test_decide_final_statuses_names_the_first_appearance(script_modules, automatic_status, field):
+def test_decide_final_statuses_names_the_first_appearance(script_modules, status, field_name):
     """A row that names a duplicate, in either field, names that duplicate's first appearance instead."""
     # --- arrange ----------------------
     data_files = script_modules["data_files"]
     automatic_statuses = {
         "s:1": data_files.AutomaticStatus("new", "", "", "", 1),
         "s:2": data_files.AutomaticStatus("duplicate", "structure", "s:1", "", 1),
-        "s:3": data_files.AutomaticStatus(automatic_status, "structure", "s:2", "", 1),
+        "s:3": data_files.AutomaticStatus(status, "structure", "s:2", "", 1),
     }
 
     # --- act --------------------------
     final_statuses = script_modules["statuses"].decide_final_statuses(automatic_statuses, decisions={})
 
     # --- assert -----------------------
-    assert getattr(final_statuses["s:3"], field) == "s:1"
+    assert getattr(final_statuses["s:3"], field_name) == "s:1"
 
 
 @pytest.mark.parametrize(

@@ -29,20 +29,21 @@ X = sp.Symbol("x")
 class ParsedFunction:
     """A `ParsedFunction` holds a row's instances, 1 per combination of its parameter values, and its family form.
 
-    All forms are canonical (`_normalize`), and the family form keeps the parameters as symbols. `has_values` tells
-    whether any parameter of the expression has values; only then do the instances differ from the family form.
-    `instance_parameter_values` holds, for each instance, the value of each parameter of the expression, as
-    `(name, value)` pairs. `has_value_sets` tells whether the parameters give several sets of values, separated by
-    `;`, for 2 or more parameters, as in `a = -40, b = -1; a = -100, b = -2`: the instances combine every value of
-    each parameter, so some may be combinations that the source never gives. `scaled_values` holds each instance's
-    values at the sample points, divided by the first finite nonzero one; an instance gets None where it has free
-    symbols other than x, or fewer than 4 finite values.
+    All forms are canonical (`_normalize`), and the family form keeps the parameters as symbols. Its other fields are
+    these:
+
+    - `instance_parameter_values` holds, for each instance, the value of each parameter of the expression, as
+      `(name, value)` pairs.
+    - `has_value_sets` tells whether the parameters give several sets of values, separated by `;`, for 2 or more
+      parameters, as in `a = -40, b = -1; a = -100, b = -2`: the instances combine every value of each parameter, so
+      some may be combinations that the source never gives.
+    - `scaled_values` holds each instance's values at the sample points, divided by the first finite nonzero one; an
+      instance gets None where it has free symbols other than x, or fewer than 4 finite values.
     """
 
     instances: tuple[sp.Expr, ...]
     instance_parameter_values: tuple[tuple[tuple[str, sp.Expr], ...], ...]
     family: sp.Expr
-    has_values: bool
     has_value_sets: bool
     scaled_values: tuple[tuple | None, ...]
 
@@ -139,35 +140,6 @@ class ParsedFunction:
             forms.append(-form if form.could_extract_minus_sign() else form)
         return min(forms, key=sp.srepr)
 
-    @classmethod
-    def _parse(cls, row: SourceRow) -> "ParsedFunction":
-        """Parse a row into its instances, family form and scaled values, or raise `ParseError` with the reason."""
-        if not row.f:
-            raise ParseError("not 1 expression")
-        words = set(IDENTIFIER.findall(row.f))
-        if words & TEXT_WORDS or "..." in row.f or "<" in row.f or ">" in row.f or "!=" in row.f:
-            raise ParseError("conditions or prose")
-        parameters = parse_parameters(row.parameters)
-        expr = cls._parse_expression(row.f, parameters)
-        expr = expr.subs(cls._find_variable(expr, parameters, row.notes), X)
-        assigned = sorted((s for s in expr.free_symbols if s.name in parameters and s != X), key=lambda s: s.name)
-        combos = list(itertools.islice(itertools.product(*(parameters[s.name] for s in assigned)), MAX_INSTANCES + 1))
-        if len(combos) > MAX_INSTANCES:
-            raise ParseError("too many parameter combinations")
-        instances = tuple(cls._normalize(expr.subs(dict(zip(assigned, combo, strict=True)))) for combo in combos)
-        return cls(
-            instances=instances,
-            instance_parameter_values=tuple(
-                tuple((s.name, value) for s, value in zip(assigned, combo, strict=True)) for combo in combos
-            ),
-            family=cls._normalize(expr),
-            has_values=bool(assigned),
-            has_value_sets=cls._has_value_sets(
-                row.parameters, {s.name for s in assigned if len(parameters[s.name]) > 1}
-            ),
-            scaled_values=tuple(cls._scaled_values(instance) for instance in instances),
-        )
-
     # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------
@@ -179,4 +151,29 @@ class ParsedFunction:
         `TimeLimitContext`.
         """
         with TimeLimitContext():
-            return cls._parse(row)
+            if not row.f:
+                raise ParseError("not 1 expression")
+            words = set(IDENTIFIER.findall(row.f))
+            if words & TEXT_WORDS or "..." in row.f or "<" in row.f or ">" in row.f or "!=" in row.f:
+                raise ParseError("conditions or prose")
+            parameters = parse_parameters(row.parameters)
+            expr = cls._parse_expression(row.f, parameters)
+            expr = expr.subs(cls._find_variable(expr, parameters, row.notes), X)
+            assigned = sorted((s for s in expr.free_symbols if s.name in parameters and s != X), key=lambda s: s.name)
+            combos = list(
+                itertools.islice(itertools.product(*(parameters[s.name] for s in assigned)), MAX_INSTANCES + 1)
+            )
+            if len(combos) > MAX_INSTANCES:
+                raise ParseError("too many parameter combinations")
+            instances = tuple(cls._normalize(expr.subs(dict(zip(assigned, combo, strict=True)))) for combo in combos)
+            return cls(
+                instances=instances,
+                instance_parameter_values=tuple(
+                    tuple((s.name, value) for s, value in zip(assigned, combo, strict=True)) for combo in combos
+                ),
+                family=cls._normalize(expr),
+                has_value_sets=cls._has_value_sets(
+                    row.parameters, {s.name for s in assigned if len(parameters[s.name]) > 1}
+                ),
+                scaled_values=tuple(cls._scaled_values(instance) for instance in instances),
+            )

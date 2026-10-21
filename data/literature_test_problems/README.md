@@ -72,7 +72,7 @@ Each row has 1 of 3 final statuses, decided in this order; the paragraphs *The s
 - **`incomplete`:** the source does not give enough to define a test function; every other row is complete. The row's reason starts with 1 of 4 cases:
   - `no interval`: the source gives no interval, or only starting points;
   - `no usable interval`: the interval text gives no interval with finite numeric bounds, such as prose (`an interval containing the origin`), a half-line (`theta > 0`), an infinite bound, or bounds without values (`[a, b]`);
-  - `no function`: the source gives no function, or one that needs data that it does not print, such as a sample; a function with random noise of a stated distribution counts as given;
+  - `no function`: the source gives no function, or one that needs data that the source does not print, such as a sample; a function with random noise of a stated distribution counts as given;
   - `parameters without values`: a parameter of the function has no published value, such as an `eps` that is only "small".
 - **`duplicate`:** earlier complete rows already give each of the row's test functions: the same function on the same interval with the same parameter values. `duplicate_of` names those earlier rows.
 - **`new`:** every other complete row. That includes:
@@ -105,17 +105,17 @@ Where a source misprints a function, the row is compared as the function that th
 
 **How the script decides.** It parses each row's `f` and `parameters` with sympy into its instances, and its interval text into intervals; the docstrings of `matching.py` and `intervals.py` in `scripts/literature_test_problems/` give the comparisons.
 
-The automatic status is `incomplete` where that condition holds; otherwise `undecided` where any of its conditions holds; otherwise `duplicate` or `new`:
+The automatic status is `incomplete` where the `incomplete` condition below holds; otherwise `undecided` where any of the `undecided` conditions below holds; otherwise `duplicate` or `new`:
 
 - **`incomplete`:** the interval text gives no usable interval, or the row has no code for its function (`f_description` without backticks);
 - **`duplicate`:** earlier complete rows have each of its test functions, compared by structure: equal after an equation becomes its difference form, and after a constant factor and the sign are removed; a row whose `f` does not parse is compared by its text instead: its `f` or `f_description` and its `parameters`, ignoring whitespace and backticks;
-- **`new`:** the row parses with a value for every parameter, and earlier complete rows lack some of its test functions; `derived_from` names the earlier rows that share with the row an instance, its family (the expression with its parameters as symbols) or its text;
+- **`new`:** the row parses with a value for every parameter, and earlier complete rows lack some of its test functions; `derived_from` names each earlier row that has 1 of the row's instances, the row's family (its expression with its parameters as symbols) or the row's text;
 - **`undecided`:** a person decides the status in `decisions.csv`. `match_kind` gives why:
   - `unparsed`: the `f` does not parse, and earlier rows with the same text lack some of its test functions;
   - `interval does not parse`;
   - `parameters without values`: an instance still holds a parameter as a symbol, because the script found no value for it; the source may give its values in a form that the script does not read;
   - `value`: some test functions are found only by value, with the same values up to a constant factor at fixed x-values, so the function may be the same or round differently;
-  - `unpaired`: every test function is found, but some only in an earlier row for which the script may list test functions that the earlier source does not give. That earlier row is 1 of these:
+  - `unpaired`: every test function is found, but some only in an earlier row of 1 of the 2 kinds below, for which the script may list test functions that the earlier source does not give:
     - a row with several instances and several intervals that the script cannot pair with each other;
     - a row whose parameters give several sets of values, separated by `;`, which the script combines into every possible combination;
   - `no test function`: no interval belongs to any instance, so the row has no test function.

@@ -584,7 +584,7 @@ f = '(202*x - 2*floor((2*x + 10^-2)/2*10^-2) - 0.1)^3'
 name = 'Sawtooth Cube'
 interval = '[-1, 1]'
 also_in = 'SciML Benchmarks test suite'
-notes = "The argument of `floor` as in f82, a misprint of `(2*x + 10^-2)/(2*10^-2)`; the row is compared as the function with that argument. The heading of the SciML block sits above the row of cells that holds f83 and f84; f83's name and expression continue f82."
+notes = "The argument of `floor` is as in f82, a misprint of `(2*x + 10^-2)/(2*10^-2)`; the row is compared as the function with that argument. The heading of the SciML block sits above the row of cells that holds f83 and f84; f83's name and expression continue f82."
 
 [[rows]]
 key = 'f84'
