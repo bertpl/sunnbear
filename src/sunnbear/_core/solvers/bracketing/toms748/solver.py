@@ -299,18 +299,19 @@ class TOMS748(Solver):
         return 2.0 * abs(u) * self.macheps + tol
 
     @staticmethod
-    def newton_quadratic(a: float, fa: float, b: float, fb: float, d: float, fd: float, k: int) -> float:
+    def newton_quadratic(a: float, fa: float, b: float, fb: float, d: float, fd: float, n_newton_steps: int) -> float:
         """Return ``r`` of the subroutine ``Newton-Quadratic(a, b, d, r, k)`` of the paper's section 2.
 
         ``r`` approximates the zero in ``[a, b]`` of ``P``, the quadratic interpolation through ``a``, ``b`` and ``d``:
         ``P(x) = f(a) + f[a, b]*(x - a) + f[a, b, d]*(x - a)*(x - b)``, with ``A = f[a, b, d]`` and ``B = f[a, b]``.
 
         Where ``A = 0``, ``P`` is a line, and ``r`` is its zero ``a - f(a) / B``. Elsewhere, ``r`` is the result of
-        ``k`` Newton steps on ``P``, the paper's equation (4), starting from ``a`` where ``A*f(a) > 0``, and from ``b``
-        otherwise.
+        ``n_newton_steps`` Newton steps on ``P``, the paper's equation (4), starting from ``a`` where ``A*f(a) > 0``,
+        and from ``b`` otherwise.
 
-        The subroutine's ``k`` is its number of Newton steps, not the solver's ``k``. The subroutine assumes that ``d``
-        lies outside ``[a, b]``, with ``f(d)`` of the sign of ``f`` at the nearer bound, which ``bracket`` ensures.
+        ``n_newton_steps`` is the paper's ``k`` of Newton-Quadratic, renamed because the solver's ``k`` counts
+        something else: the interpolation steps per iteration. The subroutine assumes that ``d`` lies outside
+        ``[a, b]``, with ``f(d)`` of the sign of ``f`` at the nearer bound, which ``bracket`` ensures.
 
         In exact arithmetic, the derivative of ``P`` never vanishes on the Newton steps: they start from the bound where
         ``P`` and its second derivative have the same sign, so they approach the zero of ``P`` from that side. The
@@ -330,7 +331,7 @@ class TOMS748(Solver):
                 r = a
             else:
                 r = b
-            for _ in range(k):
+            for _ in range(n_newton_steps):
                 # The Newton step of the paper's equation (4) computes
                 # r_i = r_(i-1) - P(r_(i-1)) / (B + A*(2*r_(i-1) - a - b)).
                 r = r - (fa + B * (r - a) + A * (r - a) * (r - b)) / (B + A * (2.0 * r - a - b))

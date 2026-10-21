@@ -74,7 +74,7 @@ def test_algorithm_4_2_then_interpolates_through_4_x_values_at_n_2():
 #  The subroutines
 # ==================================================================================================
 @pytest.mark.parametrize(
-    "a, fa, b, fb, d, fd, k, expected_r",
+    "a, fa, b, fb, d, fd, n_newton_steps, expected_r",
     [
         # x^2 - 2 on [1, 2] with d = 3: A*f(a) < 0, so the Newton steps start from b = 2: 2 -> 3/2 -> 17/12 -> 577/408.
         pytest.param(1.0, -1.0, 2.0, 2.0, 3.0, 7.0, 2, 17.0 / 12.0, id="from_b_2_steps"),
@@ -85,16 +85,18 @@ def test_algorithm_4_2_then_interpolates_through_4_x_values_at_n_2():
         pytest.param(0.0, -1.0, 1.0, 1.0, 2.0, 3.0, 2, 0.5, id="line"),
     ],
 )
-def test_newton_quadratic_takes_k_newton_steps_on_the_quadratic_through_a_b_and_d(a, fa, b, fb, d, fd, k, expected_r):
-    """Where ``f`` is a quadratic, ``P`` is ``f`` itself, and ``Newton-Quadratic`` returns the ``k``-th Newton iterate
-    on ``f``, from ``a`` where ``A*f(a) > 0`` and from ``b`` otherwise; where ``A = 0``, it returns the zero of the
-    line ``P``.
+def test_newton_quadratic_takes_n_newton_steps_on_the_quadratic_through_a_b_and_d(
+    a, fa, b, fb, d, fd, n_newton_steps, expected_r
+):
+    """Where ``f`` is a quadratic, ``P`` is ``f`` itself, and ``Newton-Quadratic`` returns the ``n_newton_steps``-th
+    Newton iterate on ``f``, from ``a`` where ``A*f(a) > 0`` and from ``b`` otherwise; where ``A = 0``, it returns the
+    zero of the line ``P``.
 
     The iterates of ``x^2 - 2`` confirm that the Newton step of the paper's equation (4) divides ``P(r)``, not
     ``B(r)``, by the derivative.
     """
     # --- act --------------------------
-    r = TOMS748.newton_quadratic(a, fa, b, fb, d, fd, k)
+    r = TOMS748.newton_quadratic(a, fa, b, fb, d, fd, n_newton_steps)
 
     # --- assert -----------------------
     assert r == pytest.approx(expected_r, abs=1e-15)
@@ -206,8 +208,9 @@ def test_has_2_equal_values_compares_the_4_values_pair_by_pair(values, expected)
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-def _newton_quadratic_in_exact_arithmetic(a, fa, b, fb, d, fd, k) -> Fraction:
-    """Return the ``r`` of ``Newton-Quadratic(a, b, d, r, k)``, computed by the paper's formulas in exact arithmetic.
+def _newton_quadratic_in_exact_arithmetic(a, fa, b, fb, d, fd, n_newton_steps) -> Fraction:
+    """Return the ``r`` of ``Newton-Quadratic(a, b, d, r, k)`` with ``k = n_newton_steps``, computed by the paper's
+    formulas in exact arithmetic.
 
     The paper's divided differences are ``f[a, b] = (f(b) - f(a)) / (b - a)`` and
     ``f[a, b, d] = (f[b, d] - f[a, b]) / (d - a)``.
@@ -219,7 +222,7 @@ def _newton_quadratic_in_exact_arithmetic(a, fa, b, fb, d, fd, k) -> Fraction:
         r = a
     else:
         r = b
-    for _ in range(k):
+    for _ in range(n_newton_steps):
         r = r - (fa + B * (r - a) + A * (r - a) * (r - b)) / (B + A * (2 * r - a - b))
     return r
 
