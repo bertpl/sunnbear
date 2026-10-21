@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Literature test problems</title>
+<style>
+:root {
+  --bg: #fbfbf9; --fg: #1d1d1b; --muted: #6b6b66; --line: #d9d8d2; --panel: #ffffff; --edge: #5b6b8c;
+  --h11: #2f6db5; --h12: #2f9e6e; --h13: #c27c0e; --h14: #a04ab5; --new: #2f9e6e; --old: #c9c7bf;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17181a; --fg: #e8e6e1; --muted: #9a988f; --line: #34353a; --panel: #212226; --edge: #8fa3cc;
+    --h11: #6aa2e6; --h12: #5cc79a; --h13: #e2a443; --h14: #c787d9; --new: #5cc79a; --old: #4a4b50;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 13px/1.4 -apple-system, system-ui, sans-serif; }
+header { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line);
+  padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; }
+header h1 { font-size: 16px; margin: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px;
+  margin-right: 5px; vertical-align: -1px; background: var(--c); }
+#wrap { position: relative; margin: 0 16px 40px; }
+svg { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+.year { position: absolute; left: 0; width: 52px; text-align: right; color: var(--muted); font-weight: 600; }
+.band { position: absolute; left: 60px; right: 0; border-top: 1px dashed var(--line); }
+.box { position: absolute; background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--c);
+  border-radius: 6px; padding: 5px 7px; cursor: pointer; overflow: hidden; }
+.box .t { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.box .n { color: var(--muted); font-size: 12px; }
+.bar { height: 5px; border-radius: 3px; background: var(--old); margin-top: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--new); }
+.box.dim { opacity: .25; } .box.sel { outline: 2px solid var(--c); }
+path.e { fill: none; stroke: var(--edge); }
+text.w { fill: var(--fg); font-size: 11px; font-weight: 600; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
+#panel { position: fixed; right: 0; top: 0; bottom: 0; width: min(440px, 100vw); background: var(--panel);
+  border-left: 1px solid var(--line); padding: 14px 16px; overflow: auto; z-index: 10; display: none; }
+#panel.open { display: block; }
+#panel h2 { font-size: 15px; margin: 0 24px 6px 0; } #panel .x { position: absolute; right: 12px; top: 8px;
+  cursor: pointer; font-size: 18px; color: var(--muted); }
+#panel table { border-collapse: collapse; width: 100%; font-size: 12px; } #panel td { padding: 2px 4px;
+  border-bottom: 1px solid var(--line); vertical-align: top; } #panel .ref { color: var(--muted); font-size: 12px; }
+details { margin-top: 8px; } summary { cursor: pointer; font-weight: 600; }
+code { font-size: 11.5px; word-break: break-word; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Literature test problems: sources in time order</h1>
+  <div class="legend" id="legend"></div>
+  <div class="legend"><span style="--c: var(--new)">new rows</span><span style="--c: var(--old)">rows found earlier</span></div>
+  <details><summary>Common functions (no edges)</summary><div id="common"></div></details>
+</header>
+<div id="wrap"><svg id="edges"></svg></div>
+<div id="panel"><span class="x" id="close">&times;</span><div id="detail"></div></div>
+<script>
+const DATA = /*DATA*/;
+const BOX_W = 196, BOX_H = 62, GAP = 12, AXIS = 60, BAND_PAD = 12;
+const wrap = document.getElementById("wrap"), svg = document.getElementById("edges");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const homeVar = h => "var(--h" + h.replace(".", "") + ")";
+
+document.getElementById("legend").innerHTML = Object.entries(DATA.homes)
+  .map(([h, name]) => `<span style="--c: ${homeVar(h)}">${h} ${esc(name)}</span>`).join("");
+document.getElementById("common").innerHTML = "<p>Rows of at most " + DATA.commonMaxLength + " characters that later rows of at least " + DATA.commonSources +
+  " sources match; they count in the boxes but give no edges.</p><table>" + DATA.common.map(c =>
+  `<tr><td><code>${esc(c.f)}</code></td><td>${esc(c.row)}</td><td>${c.sources} sources</td></tr>`).join("") + "</table>";
+
+let placed = [];
+function layout() {
+  wrap.querySelectorAll(".box, .year, .band").forEach(e => e.remove());
+  const width = wrap.clientWidth, perLine = Math.max(1, Math.floor((width - AXIS + GAP) / (BOX_W + GAP)));
+  const years = [...new Set(DATA.sources.map(s => s.year))].sort((a, b) => a - b);
+  let y = 10; placed = [];
+  for (const year of years) {
+    const here = DATA.sources.map((s, i) => [s, i]).filter(([s]) => s.year === year);
+    const lines = Math.ceil(here.length / perLine), top = y + BAND_PAD;
+    const band = document.createElement("div"); band.className = "band"; band.style.top = y + "px"; wrap.appendChild(band);
+    const label = document.createElement("div"); label.className = "year"; label.textContent = year;
+    label.style.top = top + 18 + "px"; wrap.appendChild(label);
+    here.forEach(([s, i], k) => {
+      const x = AXIS + (k % perLine) * (BOX_W + GAP), by = top + Math.floor(k / perLine) * (BOX_H + GAP);
+      const c = s.counts, box = document.createElement("div");
+      box.className = "box"; box.style.cssText = `left:${x}px;top:${by}px;width:${BOX_W}px;height:${BOX_H}px;--c:${homeVar(s.home)}`;
+      box.innerHTML = `<div class="t" title="${esc(s.title)}">${esc(s.label)}</div>` +
+        `<div class="n">${c.rows} rows, ${c.new} new${c.judge ? `, ${c.judge} open` : ""}</div>` +
+        `<div class="bar"><i style="width:${c.rows ? 100 * c.new / c.rows : 0}%"></i></div>`;
+      box.onmouseenter = () => highlight(i); box.onmouseleave = () => highlight(selected);
+      box.onclick = () => select(i);
+      wrap.appendChild(box); placed[i] = {x, y: by, el: box};
+    });
+    y = top + lines * (BOX_H + GAP) + BAND_PAD;
+  }
+  wrap.style.height = y + "px"; svg.setAttribute("width", width); svg.setAttribute("height", y);
+  drawEdges();
+}
+
+function drawEdges() {
+  svg.innerHTML = DATA.edges.map((e, k) => {
+    const a = placed[e.from], b = placed[e.to];
+    const x1 = a.x + BOX_W / 2, y1 = a.y + BOX_H, x2 = b.x + BOX_W / 2, y2 = b.y, dy = Math.max(30, (y2 - y1) / 2);
+    const w = 0.8 + Math.log2(1 + e.rows);
+    return `<path class="e" data-k="${k}" stroke-width="${w}" d="M${x1},${y1} C${x1},${y1 + dy} ${x2},${y2 - dy} ${x2},${y2}"/>` +
+      `<text class="w" data-k="${k}" x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2}" text-anchor="middle">${e.rows}</text>`;
+  }).join("");
+  highlight(selected);
+}
+
+let selected = null;
+function highlight(i) {
+  const touches = e => i === null || e.from === i || e.to === i;
+  const linked = new Set(i === null ? [] : DATA.edges.filter(touches).flatMap(e => [e.from, e.to]));
+  DATA.edges.forEach((e, k) => {
+    const on = touches(e);
+    svg.querySelectorAll(`[data-k="${k}"]`).forEach(el => {
+      el.style.opacity = i === null ? (el.tagName === "text" ? 0 : 0.18) : on ? 1 : 0.04;
+    });
+  });
+  placed.forEach((p, k) => p.el.classList.toggle("dim", i !== null && k !== i && !linked.has(k)));
+}
+
+function select(i) {
+  selected = i; placed.forEach((p, k) => p.el.classList.toggle("sel", k === i)); highlight(i);
+  const s = DATA.sources[i], c = s.counts;
+  const from = DATA.edges.filter(e => e.to === i).sort((a, b) => b.rows - a.rows);
+  const to = DATA.edges.filter(e => e.from === i).sort((a, b) => b.rows - a.rows);
+  const list = es => es.map(e => `<tr><td>${esc(DATA.sources[e.from === i ? e.to : e.from].label)}</td><td>${e.rows}</td></tr>`).join("");
+  document.getElementById("detail").innerHTML = `<h2>${esc(s.title)}</h2><div class="ref">${esc(s.reference)}</div>
+    <p>${s.year} &middot; ${s.home} ${esc(DATA.homes[s.home])} &middot; <code>${esc(s.id)}</code></p>
+    <p>${c.rows} rows: ${c.new} new, ${c.duplicate} duplicate, ${c.variant} variant, ${c.extended} extended${c.judge ? `, ${c.judge} open` : ""}</p>
+    ${from.length ? `<details open><summary>Takes rows from (${from.length})</summary><table>${list(from)}</table></details>` : ""}
+    ${to.length ? `<details open><summary>Rows taken by (${to.length})</summary><table>${list(to)}</table></details>` : ""}
+    ${s.nonNew.length ? `<details><summary>Rows found earlier (${s.nonNew.length})</summary><table>${s.nonNew.map(([k, st, d]) =>
+      `<tr><td>${esc(k)}</td><td>${st}</td><td>${esc(d)}</td></tr>`).join("")}</table></details>` : ""}`;
+  document.getElementById("panel").classList.add("open");
+}
+document.getElementById("close").onclick = () => { document.getElementById("panel").classList.remove("open"); select_none(); };
+function select_none() { selected = null; placed.forEach(p => p.el.classList.remove("sel")); highlight(null); }
+window.addEventListener("resize", layout);
+layout();
+</script>
+</body>
+</html>
