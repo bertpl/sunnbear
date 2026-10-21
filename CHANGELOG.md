@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.2.11 (2026-10-21)
 
 ### Added
 
@@ -20,14 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rename the config `brent` to `brent[variant='inverse_quadratic']`, and add a required `variant` argument to `Brent`
 - Reimplement `TOMS748` from the paper of Alefeld, Potra and Shi (1995), which changes its benchmark results
 - Make `toms748[k=1]` the core config of `TOMS748`, which changes how the benchmark characterizes the test functions
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 0.2.10 (2026-10-19)
 
