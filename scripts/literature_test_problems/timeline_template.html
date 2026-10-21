@@ -51,7 +51,7 @@ code { font-size: 11.5px; word-break: break-word; }
 <header>
   <h1>Literature test problems: sources in time order</h1>
   <div class="legend" id="legend"></div>
-  <div class="legend"><span style="--c: var(--new)">new rows</span><span style="--c: var(--old)">rows found earlier</span></div>
+  <div class="legend"><span style="--c: var(--new)">new rows</span><span style="--c: var(--old)">duplicate or incomplete rows</span></div>
   <details><summary>Common functions (no edges)</summary><div id="common"></div></details>
 </header>
 <div id="wrap"><svg id="edges"></svg></div>
@@ -66,7 +66,7 @@ const subcategoryColor = h => "var(--h" + h.replace(".", "") + ")";
 document.getElementById("legend").innerHTML = Object.entries(DATA.subcategories)
   .map(([h, name]) => `<span style="--c: ${subcategoryColor(h)}">${h} ${esc(name)}</span>`).join("");
 document.getElementById("common").innerHTML = "<p>Common functions are rows whose f has at most " + DATA.commonMaxLength + " characters and that later rows of at least " + DATA.commonMinSources +
-  " sources match; they count in each box's row counts but add no edges.</p><table>" + DATA.common.map(c =>
+  " sources name; they count in each box's row counts but add no edges.</p><table>" + DATA.common.map(c =>
   `<tr><td><code>${esc(c.f)}</code></td><td>${esc(c.row)}</td><td>${c.sources} sources</td></tr>`).join("") + "</table>";
 
 let placed = [];
@@ -130,10 +130,10 @@ function select(i) {
   const list = es => es.map(e => `<tr><td>${esc(DATA.sources[e.from === i ? e.to : e.from].label)}</td><td>${e.rows}</td></tr>`).join("");
   document.getElementById("detail").innerHTML = `<h2>${esc(s.title)}</h2><div class="ref">${esc(s.reference)}</div>
     <p>${s.year} &middot; ${s.subcategory} ${esc(DATA.subcategories[s.subcategory])} &middot; <code>${esc(s.id)}</code></p>
-    <p>${c.rows} rows: ${c.new} new, ${c.duplicate} duplicate, ${c.variant} variant, ${c.extended} extended${c.undecided ? `, ${c.undecided} undecided` : ""}</p>
+    <p>${c.rows} rows: ${c.new} new, ${c.duplicate} duplicate, ${c.incomplete} incomplete${c.undecided ? `, ${c.undecided} undecided` : ""}</p>
     ${from.length ? `<details open><summary>Takes rows from (${from.length})</summary><table>${list(from)}</table></details>` : ""}
     ${to.length ? `<details open><summary>Rows taken by (${to.length})</summary><table>${list(to)}</table></details>` : ""}
-    ${s.nonNew.length ? `<details><summary>Rows found earlier (${s.nonNew.length})</summary><table>${s.nonNew.map(([k, st, d]) =>
+    ${s.namesEarlier.length ? `<details><summary>Rows that name earlier rows (${s.namesEarlier.length})</summary><table>${s.namesEarlier.map(([k, st, d]) =>
       `<tr><td>${esc(k)}</td><td>${st}</td><td>${esc(d)}</td></tr>`).join("")}</table></details>` : ""}`;
   document.getElementById("panel").classList.add("open");
 }

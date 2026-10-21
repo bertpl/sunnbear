@@ -20,7 +20,10 @@ def main() -> int:
     sources = read_sources(folder.sources_dir)
     decisions = read_decisions(folder.decisions_file)
     # --- statuses stage -------------------------
-    automatic_statuses = compute_automatic_statuses([row for source in sources for row in source.rows])
+    automatic_statuses = compute_automatic_statuses(
+        [row for source in sources for row in source.rows],
+        incomplete_row_ids={row_id for row_id, decision in decisions.items() if decision.status == "incomplete"},
+    )
     final_statuses = decide_final_statuses(automatic_statuses, decisions)
     rows = [
         RowsTableLine.from_source_row(source, row, automatic_statuses[row.row_id], final_statuses[row.row_id])
