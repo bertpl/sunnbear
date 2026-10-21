@@ -4,7 +4,9 @@
 
 The folder is a survey of the test functions of published sources: articles of root-finding methods, public benchmark suites and textbooks.
 
-Each row is 1 function as its source gives it, with its parameters and intervals. A row's test functions are its function at each combination of its parameter values, on each of its intervals. Its status records whether the source gives enough to define those test functions, and whether an earlier source already gives them all.
+Each row is 1 function as its source gives it, with its parameters and intervals. A row's test functions are its function at each combination of its parameter values, on each of its intervals.
+
+A row's status records whether the source gives enough to define those test functions, and whether an earlier source already gives them all.
 
 The rows are the material for category 1, *Existing benchmark suites*, of sunnbear's formula catalog. The catalog holds the package's formulas in `sunnbear.functions`, each a family of test functions.
 
@@ -65,7 +67,7 @@ A row's id is `<source id>:<key>`, such as `2011_zhang:3`; a key that a source r
 
 ## Statuses
 
-Each row has 1 of 3 final statuses, decided in this order; the paragraphs *The same function* and *Test functions and intervals* below the list define the terms that it uses:
+Each row has 1 of 3 final statuses, decided in this order; the paragraphs *The same function* and *Test functions and intervals* below the list define the terms that the list uses:
 
 - **`incomplete`:** the source does not give enough to define a test function; every other row is complete. The row's reason starts with 1 of 4 cases:
   - `no interval`: the source gives no interval, or only starting points;
@@ -95,23 +97,27 @@ Where a source misprints a function, the row is compared as the function that th
 
 **Test functions and intervals.** A row's function has 1 instance per combination of its parameter values. A row's test functions are the pairs of 1 instance and 1 of the row's intervals:
 
-- An interval whose bounds use a parameter, such as `[0, (q - 1)/q]`, belongs to the instances with the same parameter values; any other interval belongs to every instance.
+- An interval belongs to every instance, except an interval whose bounds use a parameter, such as `[0, (q - 1)/q]`, which belongs only to the instances with the same parameter values.
 - Intervals are the same when their bounds are the same numbers: `(a, b)` and `[a, b]` are the same interval, and so are `[-1E4, 1E4]` and `[-10^4, 10^4]`, but `[0.5, sqrt(3)]` and `[0.5, 1.7320508]` are not.
 - Where the interval text holds backticks, only the code between them gives intervals, so that a remark such as `(Ex. 5.3, 5.5)` is not read as one. A name that the text assigns in backticks, such as `` `n = 1, ..., 10` ``, gives values to bounds such as `[(n - 1)*pi, n*pi]`.
 
 **Each row names the first appearance of its function:** a row that names a `duplicate`, in `duplicate_of` or `derived_from`, names the rows in that duplicate's `duplicate_of` instead. A duplicate never names an `incomplete` row, since that row gives no test function.
 
-**How the script decides.** It parses each row's `f` and `parameters` with sympy into its instances, and its interval text into intervals; the docstrings of `matching.py` and `intervals.py` in `scripts/literature_test_problems/` give the comparisons. The automatic status is the first of these that applies, except that a row that meets a condition of `undecided` below is `undecided` even where the condition of `duplicate` or `new` holds:
+**How the script decides.** It parses each row's `f` and `parameters` with sympy into its instances, and its interval text into intervals; the docstrings of `matching.py` and `intervals.py` in `scripts/literature_test_problems/` give the comparisons.
+
+The automatic status is `incomplete` where that condition holds; otherwise `undecided` where any of its conditions holds; otherwise `duplicate` or `new`:
 
 - **`incomplete`:** the interval text gives no usable interval, or the row has no code for its function (`f_description` without backticks);
-- **`duplicate`:** earlier complete rows have each of its test functions, compared by structure: equal after an equation becomes its difference form and a constant factor and the sign are removed; a row whose `f` does not parse is compared by its text instead: its `f` or `f_description` and its `parameters`, ignoring whitespace and backticks;
-- **`new`:** the row parses with a value for every parameter, and earlier complete rows lack some of its test functions; `derived_from` names the earlier rows that share an instance, its family (the expression with its parameters as symbols) or its text;
+- **`duplicate`:** earlier complete rows have each of its test functions, compared by structure: equal after an equation becomes its difference form, and after a constant factor and the sign are removed; a row whose `f` does not parse is compared by its text instead: its `f` or `f_description` and its `parameters`, ignoring whitespace and backticks;
+- **`new`:** the row parses with a value for every parameter, and earlier complete rows lack some of its test functions; `derived_from` names the earlier rows that share with the row an instance, its family (the expression with its parameters as symbols) or its text;
 - **`undecided`:** a person decides the status in `decisions.csv`. `match_kind` gives why:
   - `unparsed`: the `f` does not parse, and earlier rows with the same text lack some of its test functions;
   - `interval does not parse`;
-  - `parameters without values`: an instance keeps a parameter, whose values the source may give in a form that the script does not read;
+  - `parameters without values`: an instance still holds a parameter as a symbol, because the script found no value for it; the source may give its values in a form that the script does not read;
   - `value`: some test functions are found only by value, with the same values up to a constant factor at fixed x-values, so the function may be the same or round differently;
-  - `unpaired`: every test function is found, but some only in an earlier row for which the script may list test functions that the earlier source does not give: a row with several instances and several intervals that the script cannot pair with each other, or a row whose parameters give several sets of values, separated by `;`, which the script combines into every possible combination;
+  - `unpaired`: every test function is found, but some only in an earlier row for which the script may list test functions that the earlier source does not give. That earlier row is 1 of these:
+    - a row with several instances and several intervals that the script cannot pair with each other;
+    - a row whose parameters give several sets of values, separated by `;`, which the script combines into every possible combination;
   - `no test function`: no interval belongs to any instance, so the row has no test function.
 
 ## Decisions
@@ -129,7 +135,9 @@ A field with several row ids separates them by ` | `. A row decided `incomplete`
 | `row_id`, `year`, `subcategory` | the row's id, and its source's year and subcategory |
 | `parse_note` | why the script could not parse the row's `f` or interval, or how many of its intervals it left out as not usable; empty when both parsed |
 | `n_instances` | the number of the row's parsed instances |
-| `automatic_status`, `match_kind`, `matches` | `automatic_status`: the script's status; `match_kind`: the comparisons that found the rows in `matches`, the reason that a row is `incomplete`, or why a row is `undecided`; `matches`: the earlier rows that the script found |
+| `automatic_status` | the script's status |
+| `match_kind` | the comparisons that found the rows in `matches`, the reason that a row is `incomplete`, or why a row is `undecided` |
+| `matches` | the earlier rows that the script found |
 | `status`, `duplicate_of`, `derived_from`, `reason` | the final status, the earlier rows that it names, and the reason, taken from `decisions.csv` where that file has a line for the row; an automatic `incomplete` row's reason is its `match_kind` |
 
 ## The summary and the page

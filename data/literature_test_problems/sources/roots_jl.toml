@@ -24,7 +24,7 @@ The keys `func1`–`func20` and `fn` come from `test_derivative_free.jl`, and th
 
 How to read the rows of `test_derivative_free.jl`:
 - **Starting points:** each problem gives `N` starting points `x0(n) = range(a, stop=b, length=N)[n]`, `n = 1, ..., N`: `N` evenly spaced points from `a` to `b`, both included. `notes` gives `N`, `a` and `b`. Each starting point is 1 case. The field `params = 1:N` only numbers the starting points; the function `val(_, x)` ignores it.
-- **Intervals:** a problem has an interval only where the file computes its roots `alpha` with `find_zeros`, which searches an interval `[a, b]` for every root: `func2`, `func9`, `func10` and `func11`.
+- **Intervals:** only `func2`, `func9`, `func10` and `func11` have an interval: the file computes their roots `alpha` with `find_zeros`, which searches an interval `[a, b]` for every root.
 - **Roots:** each problem also gives a root or roots `alpha`, which the rows leave out; `run_df_tests` counts a result as a failure when `abs(minimum(result - alpha))` exceeds 1.
 - **Comments** above the problems group them:
   - `# easy ones`: `func1`–`func3`;

@@ -1,6 +1,6 @@
 """This module combines the automatic statuses with the decisions into each row's final status."""
 
-from .data_files import AutomaticStatus, FinalStatus, join_row_ids
+from .data_files import AutomaticStatus, FinalStatus
 
 
 def decide_final_statuses(
@@ -24,59 +24,20 @@ def decide_final_statuses(
     # the rows come in time order, so each earlier row already names its own first appearances
     resolved_statuses: dict[str, FinalStatus] = {}
     for row_id, final in final_statuses.items():
-        resolved_statuses[row_id] = FinalStatus(
-            final.status,
-            join_row_ids(_first_appearances(final.duplicate_of_ids, resolved_statuses)),
-            join_row_ids(_first_appearances(final.derived_from_ids, resolved_statuses)),
-            final.reason,
-        )
+        resolved_statuses[row_id] = final.with_first_appearances(resolved_statuses)
     return resolved_statuses
 
 
 def find_problems(final_statuses: dict[str, FinalStatus], decisions: dict[str, FinalStatus]) -> list[str]:
     """Return the problems of the final statuses, for rows given in time order; an empty list if there are none.
 
-    A problem is a decision for an unknown row, a row that names an unknown or a later row, an undecided row, a row
-    with an unknown status, a duplicate that names no row in `duplicate_of`, names a row there that is not `new`, or
-    names rows in `derived_from`, a row that is not a duplicate and names rows in `duplicate_of`, or an `incomplete`
-    row without a reason.
+    A problem is a decision for an unknown row, a problem of the rows that a row names
+    (`FinalStatus.find_named_row_problems`), or a problem of a row's status and its fields
+    (`FinalStatus.find_status_problems`).
     """
     position = {row_id: i for i, row_id in enumerate(final_statuses)}
     problems = [f"decisions.csv names an unknown row, {row_id}" for row_id in decisions if row_id not in position]
     for row_id, final in final_statuses.items():
-        problems += _named_row_problems(row_id, final, final_statuses, position)
+        problems += final.find_named_row_problems(row_id, final_statuses, position)
         problems += final.find_status_problems(row_id)
     return problems
-
-
-# ==================================================================================================
-#  Helpers
-# ==================================================================================================
-def _named_row_problems(
-    row_id: str, final: FinalStatus, final_statuses: dict[str, FinalStatus], position: dict[str, int]
-) -> list[str]:
-    """Return the problems of the rows that 1 row names: unknown, not earlier, or not `new` in `duplicate_of`."""
-    problems = []
-    for earlier in final.named_row_ids:
-        if earlier not in position:
-            problems.append(f"{row_id} names an unknown row, {earlier}")
-        elif position[earlier] >= position[row_id]:
-            problems.append(f"{row_id} names a row that is not earlier, {earlier}")
-    for earlier in final.duplicate_of_ids:
-        if earlier in final_statuses and final_statuses[earlier].status != "new":
-            problems.append(f"{row_id} is a duplicate of a row that is not new, {earlier}")
-    return problems
-
-
-def _first_appearances(row_ids: list[str], resolved_statuses: dict[str, FinalStatus]) -> list[str]:
-    """Return the row ids with each resolved duplicate replaced by the rows in its `duplicate_of`.
-
-    `resolved_statuses` holds the final statuses of the earlier rows, which already name their own first appearances.
-    """
-    first_appearances = []
-    for row_id in row_ids:
-        if row_id in resolved_statuses and resolved_statuses[row_id].status == "duplicate":
-            first_appearances.extend(resolved_statuses[row_id].duplicate_of_ids)
-        else:
-            first_appearances.append(row_id)
-    return first_appearances

@@ -11,7 +11,7 @@ transcribed_from = '''
 the article's Table 2, checked against `Test Functions.pdf`, the C# code, and sunnbear's transcription in `tests/solvers/paper_problems/ganchovski_et_al.py`.
 - sunnbear's transcription matches the C# code on every row.
 - The rows follow the article, except f28, whose printed expression has an unmatched parenthesis; that row follows the C# code.
-- The `interval` of f29 and f42 also holds the interval that `Test Functions.pdf` gives in the line that states each function's root, which differs from the article's.
+- For f29 and f42, the line of `Test Functions.pdf` that states each function's root gives an interval that differs from the article's; the row's `interval` holds both.
 - The rows' notes list every difference between the article, `Test Functions.pdf` and the C# code; a source that a row's notes do not name agrees with the row.
 '''
 rows_summary = '92, 1 per function of Table 2.'

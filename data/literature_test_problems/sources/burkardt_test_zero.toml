@@ -28,7 +28,7 @@ rows_summary = '19, 1 per problem.'
 notes = '''
 How to read the rows:
 - **`name`** holds the `pNN_title` string.
-- **`interval`** holds `pNN_rang`, and the bracket of starting points 1 and 2 that bisection, Brent and regula falsi run on, where the function values there differ in sign and the bracket differs from `pNN_rang`.
+- **`interval`** holds `pNN_rang`, and the bracket of starting points 1 and 2 that bisection, Brent and regula falsi run on, where the function values there differ in sign and the bracket differs from `pNN_rang`. The remark after each bracket names the starting points in the order of its bounds, so `(starts 2 and 1)` means that start 2 is the lower bound.
 - **`parameters`** holds constants that the function body defines, under the code's names.
 - **Starting points** are in `notes`, in the order of their index `i` (1, 2, ...).
 - **Roots:** each problem also gives its known roots, which the rows leave out.

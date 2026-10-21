@@ -152,14 +152,14 @@ key = 'g19'
 f = '(1 + (1 - n)^4)*x - (1 - n*x)^4'
 parameters = 'n = 10'
 interval = '[0, 1]'
-notes = 'Printed with the expression and `n` of `g16`. Table III reports other evaluation counts for `g19` than for `g16`. A misprint: the function meant is `exp(-n*x)*(x - 1) + x^n` at `n = 10`, problem 9 of Alefeld & Potra (1992), and the row is compared as that function.'
+notes = 'Printed with the expression and `n` of `g16`. Table III reports other evaluation counts for `g19` than for `g16`. The printed function is a misprint: the function meant is `exp(-n*x)*(x - 1) + x^n` at `n = 10`, problem 9 of Alefeld & Potra (1992), and the row is compared as that function.'
 
 [[rows]]
 key = 'g20'
 f = '(1 + (1 - n)^4)*x - (1 - n*x)^4'
 parameters = 'n = 20'
 interval = '[0, 1]'
-notes = 'Printed with the expression and `n` of `g17`. Table III reports other evaluation counts for `g20` than for `g17`. A misprint: the function meant is `exp(-n*x)*(x - 1) + x^n` at `n = 20`, problem 9 of Alefeld & Potra (1992), and the row is compared as that function.'
+notes = 'Printed with the expression and `n` of `g17`. Table III reports other evaluation counts for `g20` than for `g17`. The printed function is a misprint: the function meant is `exp(-n*x)*(x - 1) + x^n` at `n = 20`, problem 9 of Alefeld & Potra (1992), and the row is compared as that function.'
 
 [[rows]]
 key = 'g21'

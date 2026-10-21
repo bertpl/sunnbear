@@ -29,8 +29,11 @@ STEP_RANGE = re.compile(r"(-?\d+)\((\d+)\)(-?\d+)")
 # NUMBER_PREFIX matches the leading numeric part of a listed value, such as `2*pi` or `1e-3`, before any text.
 NUMBER_PREFIX = re.compile(r"^[-+0-9.()*/^ ]*(?:pi)?[-+0-9.()*/^ eE]*")
 TRANSFORMATIONS = (*standard_transformations, convert_xor, rationalize)
+# MAX_INSTANCES limits the combinations of parameter values that a row's f, or 1 pair of interval bounds, may give;
+# more raises ParseError.
 MAX_INSTANCES = 64
-# PARSE_TIMEOUT_SECONDS limits the time that parsing a row and computing its scaled values may take.
+# PARSE_TIMEOUT_SECONDS limits the time of each parse: of a row's f together with its scaled values, and, separately,
+# of its interval text.
 PARSE_TIMEOUT_SECONDS = 10
 
 
@@ -60,6 +63,9 @@ class TimeLimitContext:
         """Stop the alarm."""
         signal.alarm(0)
 
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
     @staticmethod
     def _on_alarm(signum: int, frame: object) -> None:
         """Stop parsing a row that takes too long."""
@@ -133,12 +139,17 @@ def _fill_ellipsis(pieces: list[str], i: int) -> list | None:
     """Return the numbers that the `...` at `pieces[i]` stands for, strictly between its 2 neighbors, or None.
 
     The step is the difference of the 2 numbers before `...`, or 1 where only 1 number precedes it and both
-    neighbors are integers. The result is None if a neighbor is not a plain number, if the step is not positive, if
-    the number after `...` is not a whole number of steps away, or if `...` stands for more than 40 steps.
+    neighbors are integers. The result is None if a neighbor is not a plain decimal number, such as `-24` or `0.1`,
+    which is read as an exact fraction, if the step is not positive, if the number after `...` is not a whole number
+    of steps away, or if `...` stands for more than 40 steps.
     """
-    before_before, before, after = (
-        _parse_plain_number(pieces[j]) if 0 <= j < len(pieces) else None for j in (i - 2, i - 1, i + 1)
-    )
+    neighbors = []
+    for j in (i - 2, i - 1, i + 1):
+        if 0 <= j < len(pieces) and re.fullmatch(r"-?\d+(\.\d+)?", pieces[j]):
+            neighbors.append(sp.Rational(pieces[j]))
+        else:
+            neighbors.append(None)
+    before_before, before, after = neighbors
     if before is None or after is None:
         return None
     elif before_before is not None:
@@ -153,14 +164,6 @@ def _fill_ellipsis(pieces: list[str], i: int) -> list | None:
         n_steps = None
     if n_steps is not None and n_steps.is_Integer and 1 <= n_steps <= 40:
         return [before + k * step for k in range(1, int(n_steps))]
-    else:
-        return None
-
-
-def _parse_plain_number(piece: str) -> sp.Rational | None:
-    """Return a piece that is a plain decimal number, such as `-24` or `0.1`, as an exact fraction, or None."""
-    if re.fullmatch(r"-?\d+(\.\d+)?", piece):
-        return sp.Rational(piece)
     else:
         return None
 

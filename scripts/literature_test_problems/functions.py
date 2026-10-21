@@ -1,4 +1,4 @@
-"""This module parses a row's f and parameters into the sympy forms that the matching compares."""
+"""This module parses a row's f and parameters into the sympy forms of its function that the matching compares."""
 
 import itertools
 import re
@@ -23,11 +23,11 @@ X = sp.Symbol("x")
 
 
 # ==================================================================================================
-#  ParsedRow
+#  ParsedFunction
 # ==================================================================================================
 @dataclass(frozen=True)
-class ParsedRow:
-    """A `ParsedRow` holds a row's instances, 1 per combination of its parameter values, and its family form.
+class ParsedFunction:
+    """A `ParsedFunction` holds a row's instances, 1 per combination of its parameter values, and its family form.
 
     All forms are canonical (`_normalize`), and the family form keeps the parameters as symbols. `has_values` tells
     whether any parameter of the expression has values; only then do the instances differ from the family form.
@@ -103,14 +103,20 @@ class ParsedRow:
 
     @staticmethod
     def _has_value_sets(text: str, varied_names: set[str]) -> bool:
-        """Return whether 2 or more parameters have several values and 1 of them is assigned in several `;` groups."""
+        """Return whether the parameters give several sets of values for 2 or more parameters.
+
+        That holds when 2 or more parameters have several values and 1 of them is assigned in several groups separated
+        by `;`.
+        """
         groups = [
             {match.group(1) for match in ASSIGNMENT.finditer(group)} for group in text.replace("`", "").split(";")
         ]
+        is_reassigned = False
         if len(varied_names) >= 2:
-            return any(sum(name in group for group in groups) >= 2 for name in varied_names)
-        else:
-            return False
+            for name in varied_names:
+                if sum(name in group for group in groups) >= 2:
+                    is_reassigned = True
+        return is_reassigned
 
     @staticmethod
     def _normalize(expr: sp.Expr) -> sp.Expr:
@@ -134,7 +140,7 @@ class ParsedRow:
         return min(forms, key=sp.srepr)
 
     @classmethod
-    def _parse(cls, row: SourceRow) -> "ParsedRow":
+    def _parse(cls, row: SourceRow) -> "ParsedFunction":
         """Parse a row into its instances, family form and scaled values, or raise `ParseError` with the reason."""
         if not row.f:
             raise ParseError("not 1 expression")
@@ -166,7 +172,11 @@ class ParsedRow:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def from_source_row(cls, row: SourceRow) -> "ParsedRow":
-        """Parse a row, or raise `ParseError` with the reason, or `ParseTimeoutError` after `PARSE_TIMEOUT_SECONDS`."""
+    def from_source_row(cls, row: SourceRow) -> "ParsedFunction":
+        """Parse a row, or raise `ParseError` with the reason, or `ParseTimeoutError` after `PARSE_TIMEOUT_SECONDS`.
+
+        Parsing works only on Unix and in the main thread, where Python can install the SIGALRM handler of
+        `TimeLimitContext`.
+        """
         with TimeLimitContext():
             return cls._parse(row)

@@ -138,6 +138,17 @@ def test_readme_lists_every_status(script_modules, folder):
     assert listed == {*data_files.DECIDED_STATUSES, data_files.UNDECIDED}
 
 
+def test_readme_lists_every_decision_column(script_modules, folder):
+    """The README's list of the columns of `decisions.csv` equals the columns that the script reads."""
+    # --- arrange / act ----------------
+    readme = folder.readme_file.read_text(encoding="utf-8")
+    columns_sentence = re.search(r"with the columns (.+?)\. ", readme).group(1)
+    listed = re.findall(r"`(\w+)`", columns_sentence)
+
+    # --- assert -----------------------
+    assert listed == script_modules["data_files"].DECISION_COLUMNS
+
+
 def test_timeline_template_counts_every_status(script_modules):
     """The timeline's line of row counts names exactly the decided statuses and the status of an undecided row."""
     # --- arrange / act ----------------

@@ -19,6 +19,7 @@ from .helpers import MAX_INSTANCES, ParseError, TimeLimitContext, parse_math, pa
 NO_INTERVAL = re.compile(r"(none|not given|not printed|not stated)\b", flags=re.IGNORECASE)
 # NAME_CHARACTER matches a character after which a bracket opens a function call, such as `U(1, 5)`, not an interval.
 NAME_CHARACTER = re.compile(r"[A-Za-z0-9_]")
+# SPAN_ASSIGNMENT matches a backtick span that is a whole assignment `name = right side`, such as `n = 1, ..., 10`.
 SPAN_ASSIGNMENT = re.compile(r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*=(?!=)\s*(.+?)\s*")
 
 
@@ -31,7 +32,7 @@ class Interval:
 
     `lower` and `upper` are the bounds as the text of exact sympy numbers, the smaller one first, such as `pi/2` and
     `1/10000`: a decimal bound is read as an exact fraction, so `1E-4`, `10^(-4)` and `0.0001` give the same text,
-    and 2 intervals are the same interval when their keys are equal.
+    and 2 intervals are the same interval when their bounds are equal.
     """
 
     lower: str
@@ -84,7 +85,7 @@ class ParsedIntervals:
     # --------------------------------------------------------------------------
     @staticmethod
     def _find_bound_pairs(code: str) -> list[tuple[str, str]]:
-        """Return the 2 bounds of each bracket pair in the code that holds exactly 2 values, as written.
+        """Return the 2 values, as written, of each bracket that holds exactly 2 values.
 
         A bracket opens at `[` or `(` and closes at the matching `]` or `)`, either one, so `[0.1, inf)` counts. A
         bracket right after a name, such as `U(1, 5)`, is a function call, and a bracket with 1 or more than 2
@@ -226,6 +227,10 @@ class ParsedIntervals:
     # --------------------------------------------------------------------------
     @classmethod
     def from_source_row(cls, row: SourceRow) -> "ParsedIntervals":
-        """Parse a row's interval text, or raise `ParseError` with the reason, or `ParseTimeoutError` if it is slow."""
+        """Parse a row's interval text, or raise `ParseError` with the reason, or `ParseTimeoutError` if it is slow.
+
+        Parsing works only on Unix and in the main thread, where Python can install the SIGALRM handler of
+        `TimeLimitContext`.
+        """
         with TimeLimitContext():
             return cls._parse(row)
