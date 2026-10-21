@@ -177,8 +177,8 @@ Only a secondary config may deviate from section IV.
 | `Ridders` | `ridders[variant='standard_stopping_criterion']` | core | Ridders' steps, as the article states them | yes |
 | | `ridders[variant='scipy']` | secondary | SciPy's step limit and stopping criterion | no: SciPy's stopping criterion |
 | | `ridders[variant='commons_math']` | secondary | Apache Commons Math's stopping criterion | no: Commons Math's stopping criterion |
-| `TOMS748` | `toms748[k=2]` | core | `k = 2`, the article's Algorithm 4.2 | yes |
-| | `toms748[k=1]` | secondary | `k = 1`, the article's Algorithm 4.1 | yes |
+| `TOMS748` | `toms748[k=1]` | core | `k = 1`, the article's Algorithm 4.1 | yes |
+| | `toms748[k=2]` | secondary | `k = 2`, the article's Algorithm 4.2 | yes |
 | `ITP` | `itp[n_slack=0,variant='paper_experiments']` | core | the projection radius of the authors' code, `n_slack = 0` | yes |
 | | `itp[n_slack=0,variant='paper_pseudocode']` | secondary | the projection radius of the article's pseudocode, `n_slack = 0` | yes |
 | | `itp[n_slack=4,variant='paper_experiments']` | secondary | the projection radius of the authors' code, `n_slack = 4` | yes |
@@ -206,8 +206,8 @@ Ridders (1979) states no stopping criterion, so the core config fills that gap w
 ### V.b. TOMS748
 
 Alefeld, Potra and Shi (1995) publish 2 algorithms, which differ only in `k`, the number of interpolation steps in each iteration. Both configs follow section IV, so `k` is their only difference:
-- **`toms748[k=2]` (core):** `k = 2`, Algorithm 4.2. The authors' published code implements only this algorithm, and the article's Table II reports fewer evaluations for it than for Algorithm 4.1.
-- **`toms748[k=1]` (secondary):** `k = 1`, Algorithm 4.1, the default of SciPy's `toms748`.
+- **`toms748[k=1]` (core):** `k = 1`, Algorithm 4.1, the default of SciPy's `toms748`.
+- **`toms748[k=2]` (secondary):** `k = 2`, Algorithm 4.2. The paper's Table II reports about 2 % fewer evaluations for it than for Algorithm 4.1, at each of its 4 tolerances.
 
 ### V.c. ITP
 
