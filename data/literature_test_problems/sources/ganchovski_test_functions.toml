@@ -576,7 +576,7 @@ f = '202*x - 2*floor((2*x + 10^-2)/2*10^-2) - 0.1'
 name = 'Sawtooth'
 interval = '[-1, 1]'
 also_in = 'Oliveira & Takahashi (2021)'
-notes = 'The fraction bar puts `2*x + 10^-2` over `2`, and `10^-2` multiplies the fraction. The plot shows many teeth on `[-1, 1]`, as a division by `2*10^-2` gives; the printed argument makes `floor` jump only once there.'
+notes = 'The fraction bar puts `2*x + 10^-2` over `2`, and `10^-2` multiplies the fraction. The plot shows many teeth on `[-1, 1]`, as a division by `2*10^-2` gives; the printed argument makes `floor` jump only once there. So the printed argument is a misprint of `(2*x + 10^-2)/(2*10^-2)`, and the row is compared as that function.'
 
 [[rows]]
 key = 'f83'
@@ -584,7 +584,7 @@ f = '(202*x - 2*floor((2*x + 10^-2)/2*10^-2) - 0.1)^3'
 name = 'Sawtooth Cube'
 interval = '[-1, 1]'
 also_in = 'SciML Benchmarks test suite'
-notes = "The argument of `floor` as in f82. The heading of the SciML block sits above the row of cells that holds f83 and f84; f83's name and expression continue f82."
+notes = "The argument of `floor` as in f82, a misprint of `(2*x + 10^-2)/(2*10^-2)`; the row is compared as that function. The heading of the SciML block sits above the row of cells that holds f83 and f84; f83's name and expression continue f82."
 
 [[rows]]
 key = 'f84'

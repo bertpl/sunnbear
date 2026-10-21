@@ -70,7 +70,7 @@ notes = 'Printed as `cos^3(2x)`. Stated roots `2.758392986844` (in the bracket) 
 key = '5.3'
 f = 'exp(-x) - exp(-2*x) - exp(-3*x)'
 name = 'exponential function'
-interval = '`[0, 1]`; root search over `[-2, 2]`'
+interval = '`[0, 1]`; root search over `[-2, 2]`; global analysis over `[-2, 60]`'
 notes = 'Stated root `0.481211825060`. The article also states a second root near `x = 56.27` on `[-2, 60]`; the function equals `exp(-x)*(1 - exp(-x) - exp(-2*x))`, which has no root other than the first.'
 
 [[rows]]

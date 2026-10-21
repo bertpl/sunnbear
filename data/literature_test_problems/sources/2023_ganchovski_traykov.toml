@@ -113,6 +113,7 @@ key = 'f16'
 f = '(x/2)^2 + ceil(x/2) - 1'
 interval = '[-1, 1]'
 also_in = 'Oliveira & Takahashi (2021)'
+notes = "Printed with `- 1`. A misprint: f10–f20 are Oliveira & Takahashi (2021)'s 2.1–2.11 in order, which puts f16 at their 2.7, and with `- 1` the function touches 0 from the right, which cannot give Table 2's iteration counts; the function meant is their 2.7, `(x/2)^2 + ceil(x/2) - 1/2`, and the row is compared as that function."
 
 [[rows]]
 key = 'f17'
@@ -143,7 +144,7 @@ key = 'f21'
 f = '202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 1/10'
 interval = '[-1, 1]'
 also_in = 'Oliveira & Takahashi (2021)'
-notes = "Printed identical to f20, but its iteration counts in Table 2 differ from f20's."
+notes = "Printed identical to f20, but its iteration counts in Table 2 differ from f20's. A misprint: f10–f20 are Oliveira & Takahashi (2021)'s 2.1–2.11 in order, and f21's counts are those of a multiple root, so the function meant is their 2.12, the Sawtooth Cube `(202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 1/10)^3`, and the row is compared as that function."
 
 [[rows]]
 key = '§3'

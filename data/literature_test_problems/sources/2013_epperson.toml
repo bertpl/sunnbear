@@ -42,7 +42,7 @@ notes = '3.1-2 asks for the root to an accuracy of 0.1 by bisection, by hand.'
 [[rows]]
 key = '3.1-2(b)'
 f = 'log(x) + x'
-interval = '[1/16, 1]'
+interval = '[1/10, 1]'
 notes = 'As 3.1-2(a).'
 
 [[rows]]

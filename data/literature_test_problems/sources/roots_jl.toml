@@ -23,7 +23,8 @@ notes = '''
 The keys `func1`–`func20` and `fn` come from `test_derivative_free.jl`, and the keys `f1`–`f10` from `runbenchmarks.jl`.
 
 How to read the rows of `test_derivative_free.jl`:
-- **Starting points:** each problem has no interval, only `N` starting points `x0(n) = range(a, stop=b, length=N)[n]`, `n = 1, ..., N`: `N` evenly spaced points from `a` to `b`, both included. `notes` gives `N`, `a` and `b`. Each starting point is 1 case. The field `params = 1:N` only numbers the starting points; the function `val(_, x)` ignores it.
+- **Starting points:** each problem gives `N` starting points `x0(n) = range(a, stop=b, length=N)[n]`, `n = 1, ..., N`: `N` evenly spaced points from `a` to `b`, both included. `notes` gives `N`, `a` and `b`. Each starting point is 1 case. The field `params = 1:N` only numbers the starting points; the function `val(_, x)` ignores it.
+- **Intervals:** a problem has an interval only where the file computes its roots `alpha` with `find_zeros`, which searches an interval `[a, b]` for every root: `func2`, `func9`, `func10` and `func11`.
 - **Roots:** each problem also gives a root or roots `alpha`, which the rows leave out; `run_df_tests` counts a result as a failure when `abs(minimum(result - alpha))` exceeds 1.
 - **Comments** above the problems group them:
   - `# easy ones`: `func1`–`func3`;
@@ -50,6 +51,7 @@ notes = 'N = 10 starts from 0.0 to pi/2'
 [[rows]]
 key = 'func2'
 f = 'exp(x) - x^4'
+interval = '`[-5.0, 20.0]` (`find_zeros`)'
 notes = 'N = 11 starts from 5.0 to 20.0'
 
 [[rows]]
@@ -85,16 +87,19 @@ notes = 'N = 10 starts from 0.0 to 3pi/4'
 [[rows]]
 key = 'func9'
 f = 'tanh(x) - tan(x)'
+interval = '`[5, 12]` (`find_zeros`)'
 notes = 'N = 8 starts from 5.0 to 10.0'
 
 [[rows]]
 key = 'func10'
 f = 'asin(x^2 - 1) - x/2 + 1'
+interval = '`[-0.5, 1.0]` (`find_zeros`)'
 notes = 'N = 10 starts from -0.5 to 0.9'
 
 [[rows]]
 key = 'func11'
 f = 'exp(-x) - cos(x)'
+interval = '`[-2, 2]` (`find_zeros`)'
 notes = 'N = 10 starts from -2.0 to 2.0'
 
 [[rows]]

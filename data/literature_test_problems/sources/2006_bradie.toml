@@ -49,6 +49,7 @@ notes = "Root 0 of multiplicity 3: `f(0) = f'(0) = f''(0) = 0`, `f'''(0) = -4`."
 [[rows]]
 key = '§2 (p. 58)'
 f = '3*x^2 + (1/pi^4)*log((pi - x)^2) + 1'
+interval = '`(pi - 1, pi)`; `(pi, pi + 1)`'
 notes = "Undefined at `x = pi`. 2 simple real roots, 1 in `(pi - 1, pi)` and 1 in `(pi, pi + 1)`, both at about `pi ± 10^-647`, which no floating-point system resolves: the book's pathological example."
 
 [[rows]]
@@ -70,7 +71,7 @@ notes = 'Root 1; the real 7th root. Figure only, plotted on `[0, 2]`: nearly ver
 [[rows]]
 key = 'Ex. 2.2; Fig. 2.3; Tables 2.2, 2.3, 2.5; §2.4 (pp. 98, 100); §2.5 (p. 109); 2.1-13; 2.5-15; 2.6-3'
 f = 'tan(pi*x) - x - 6'
-interval = '(0.40, 0.48)'
+interval = '`(0.40, 0.48)`; `[0, 0.48]` (§2.4, p. 100)'
 notes = 'The second standard test problem: infinitely many roots; the smallest positive one is `0.4510472588`. Bisection and false position on the interval (Ex. 2.2, Tables 2.2, 2.3; Aitken on the false-position sequence in 2.6-3). Newton from `p0 = 0.48` converges in 5 iterations; from `p0 = 0.4` it does not converge in 5000; from `p0 = 0` it converges to the root `697.4995475` (p. 98). Secant from `p0 = 0.4, p1 = 0.48` (p. 109) and from `(0, 0.48)`, `(0.24, 0.48)`, `(0.4, 0.48)` (2.5-15). 2.1-13 seeks the next smallest positive root.'
 
 [[rows]]
