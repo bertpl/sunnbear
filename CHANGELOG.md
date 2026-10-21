@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Move `solver_cls` from `SolverConfigsDeclaration` to each `SolverConfig`, so that 1 `SolverConfigsDeclaration` subclass can declare the configs of several solver classes
 - Rename the config `brent` to `brent[variant='inverse_quadratic']`, and add a required `variant` argument to `Brent`
+- Reimplement `TOMS748` from the paper of Alefeld, Potra and Shi (1995), which changes its benchmark results
 
 ### Deprecated
 

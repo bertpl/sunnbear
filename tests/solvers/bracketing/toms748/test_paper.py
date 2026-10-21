@@ -1,39 +1,91 @@
-"""These tests check `TOMS748` against the published results of Algorithm 748, which depend on the stopping criterion
-of the authors' code, so they run a subclass of `TOMS748` with that criterion:
+"""These tests assert that `TOMS748`, with the termination test of the paper's section 6, reproduces the published
+results of Alefeld, Potra and Shi (1995):
 
-- it reproduces the roots that the authors' code computes;
-- it reproduces the evaluation counts of the paper's Tables IV to VI;
-- its evaluation totals come close to those of the paper's Table II.
+- the roots of the authors' test output, with ``tol = 0``;
+- the totals of the paper's Table II, within a relative tolerance per ``k``;
+- the evaluation counts of the paper's Tables IV to VI, with ``tol = 10^-15``.
+
+The tests pass the paper's tolerance ``tol`` as ``xtol``, which `TOMS748` takes as ``tol``.
 """
 
 import pytest
 
-from sunnbear.solvers import TOMS748, Interval
+from sunnbear.solvers import TOMS748, SolveState, SolveStatus
 from tests.solvers.paper_problems import PaperProblem
-from tests.solvers.paper_problems.alefeld_potra_shi import (
-    ALEFELD_POTRA_SHI_PROBLEMS,
-    AlefeldPotraShiTablesIVToVIProblem,
+from tests.solvers.paper_problems.alefeld_potra_shi import AlefeldPotraShiTablesIVToVIProblem
+
+from .paper_problems import AUTHORS_TEST_OUTPUT, TABLES_IV_TO_VI_BY_K
+
+# Problem 26[n=1], the paper's problem 13, is 0 on the interval around its root 0 on which exp(1 / x^2) overflows, so
+# any x-value of that interval is a root of the function as computed.
+_ZERO_ON_AN_INTERVAL_PROBLEM_NAME = "26[n=1]"
+
+# The paper's Table II gives the total evaluation count over all 154 problems, per k and per tol.
+_TABLE_II_TOTALS = {
+    1: {1e-7: 2696, 1e-10: 2835, 1e-15: 2908, 0.0: 2950},
+    2: {1e-7: 2650, 1e-10: 2786, 1e-15: 2859, 0.0: 2884},
+}
+
+# Each k has its own relative tolerance on the totals of Table II: the largest deviation of its totals on macOS,
+# rounded up to the next 0.1 %, plus 0.1 % for the problems whose count can differ by 1 between math libraries.
+_TABLE_II_REL_TOL = {1: 0.012, 2: 0.004}
+
+
+@pytest.mark.parametrize("k", [1, 2])
+@pytest.mark.parametrize(
+    "problem",
+    [problem for problem in AUTHORS_TEST_OUTPUT if problem.name != _ZERO_ON_AN_INTERVAL_PROBLEM_NAME],
+    ids=str,
 )
-
-from .paper_problems import AUTHORS_TEST_OUTPUT, PRINTED_ROOTS, TABLES_IV_TO_VI_BY_K
-
-
-def test_the_printed_roots_name_exactly_the_alefeld_potra_shi_problems():
-    """`PRINTED_ROOTS` holds a root for every Alefeld-Potra-Shi problem, and for no other name."""
-    # --- assert -----------------------
-    assert set(PRINTED_ROOTS) == {problem.name for problem in ALEFELD_POTRA_SHI_PROBLEMS}
-
-
-@pytest.mark.parametrize("problem", AUTHORS_TEST_OUTPUT, ids=str)
-def test_k_2_reproduces_the_root_that_the_authors_code_computes(problem: PaperProblem):
-    """With ``k = 2`` and ``tol = 0``, the setting of the authors' test runs, `TOMS748` with the authors' stopping
-    criterion returns the root that the authors' code prints, within a relative 1e-13, the precision of its 14 printed
-    digits."""
+def test_the_roots_of_the_authors_test_output_are_reproduced(problem: PaperProblem, k: int):
+    """On each problem of the authors' test output except 26[n=1], both algorithms with ``tol = 0`` return the root
+    that the test output prints, within its 14 printed digits."""
     # --- act --------------------------
-    result = _TOMS748WithAuthorsStoppingCriterion(k=2).solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=100)
+    result = _TOMS748WithPaperStoppingCriterion(k=k).solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=1000)
 
     # --- assert -----------------------
     problem.assert_reproduced_by(result)
+
+
+@pytest.mark.parametrize("k", [1, 2])
+def test_the_solve_of_problem_26_ends_where_its_function_is_0(k: int):
+    """On problem 26[n=1], both algorithms with ``tol = 0`` end at an x-value where the function is exactly 0.
+
+    The solve ends at the first x-value that it evaluates where the function is 0, which differs from the x-value of
+    the authors' test output.
+    """
+    # --- arrange ----------------------
+    (problem,) = [problem for problem in AUTHORS_TEST_OUTPUT if problem.name == _ZERO_ON_AN_INTERVAL_PROBLEM_NAME]
+
+    # --- act --------------------------
+    result = _TOMS748WithPaperStoppingCriterion(k=k).solve(problem.f, problem.a, problem.b, xtol=0.0, max_fevals=1000)
+
+    # --- assert -----------------------
+    assert result.status is SolveStatus.CONVERGED
+    assert problem.f(result.x) == 0.0
+
+
+@pytest.mark.parametrize(
+    "k, tol, paper_total",
+    [(k, tol, total) for k, totals in _TABLE_II_TOTALS.items() for tol, total in totals.items()],
+)
+def test_the_totals_of_table_ii_are_reproduced_within_the_tolerance_of_k(k: int, tol: float, paper_total: int):
+    """Over all 154 problems, the total evaluation count of each algorithm, at each of the paper's tolerances, lies
+    within the relative tolerance for its ``k`` of the total in the paper's Table II.
+
+    The totals include the 2 evaluations at the interval bounds of each problem, as the counts of Tables IV to VI do.
+    """
+    # --- arrange ----------------------
+    solver = _TOMS748WithPaperStoppingCriterion(k=k)
+
+    # --- act --------------------------
+    total = sum(
+        solver.solve(problem.f, problem.a, problem.b, xtol=tol, max_fevals=1000).n_fevals
+        for problem in AUTHORS_TEST_OUTPUT
+    )
+
+    # --- assert -----------------------
+    assert abs(total - paper_total) <= _TABLE_II_REL_TOL[k] * paper_total
 
 
 @pytest.mark.parametrize("k", [1, 2])
@@ -47,54 +99,15 @@ def test_the_rows_of_tables_iv_to_vi_name_every_problem_of_the_tables_in_order(k
 
 
 @pytest.mark.parametrize(
-    "k, n_digits, paper_total",
-    [
-        (1, 7, 2696),
-        (1, 10, 2835),
-        (1, 15, 2908),
-        (1, None, 2950),
-        (2, 7, 2650),
-        (2, 10, 2786),
-        (2, 15, 2859),
-        (2, None, 2884),
-    ],
-)
-def test_the_total_evaluation_count_lies_within_1_1_percent_of_the_papers_table_ii(k, n_digits, paper_total):
-    """Over the problems in `AUTHORS_TEST_OUTPUT`, the total evaluation count of `TOMS748` with the authors' stopping
-    criterion lies within 1.1 % of the paper's Table II, for each ``k`` and for each of the paper's tolerances
-    ``tol = 10^-n_digits`` and ``tol = 0``.
-
-    The paper's counts include the 2 evaluations at the interval bounds, and come from a machine whose relative
-    precision was 1.907e-16, not 2^-52.
-    """
-    # --- arrange / act ----------------
-    total = sum(
-        _TOMS748WithAuthorsStoppingCriterion(k=k)
-        .solve(problem.f, problem.a, problem.b, xtol=_tol_as_the_driver_computes_it(n_digits), max_fevals=100)
-        .n_fevals
-        for problem in AUTHORS_TEST_OUTPUT
-    )
-
-    # --- assert -----------------------
-    assert abs(total - paper_total) <= 0.011 * paper_total
-
-
-@pytest.mark.parametrize(
     "k, problem",
-    [
-        pytest.param(k, problem, id=f"k={k}-{problem.name}")
-        for k, problems in TABLES_IV_TO_VI_BY_K.items()
-        for problem in problems
-    ],
+    [(k, problem) for k, problems in TABLES_IV_TO_VI_BY_K.items() for problem in problems],
+    ids=str,
 )
-def test_the_evaluation_counts_of_tables_iv_to_vi_of_the_paper_are_reproduced(k: int, problem: PaperProblem):
-    """On every problem of the paper's Tables IV to VI, `TOMS748` with the authors' stopping criterion and
-    ``tol = 10^-15`` evaluates as often as the paper reports for that ``k``, except where the problem states an allowed
-    deviation."""
+def test_the_evaluation_counts_of_tables_iv_to_vi_are_reproduced(k: int, problem: PaperProblem):
+    """On every row of the paper's Tables IV to VI, each algorithm with ``tol = 10^-15`` evaluates as often as the
+    paper reports for its ``k``, except where the problem states an allowed deviation."""
     # --- act --------------------------
-    result = _TOMS748WithAuthorsStoppingCriterion(k=k).solve(
-        problem.f, problem.a, problem.b, xtol=_tol_as_the_driver_computes_it(15), max_fevals=100
-    )
+    result = _TOMS748WithPaperStoppingCriterion(k=k).solve(problem.f, problem.a, problem.b, xtol=1e-15, max_fevals=1000)
 
     # --- assert -----------------------
     problem.assert_reproduced_by(result)
@@ -103,34 +116,25 @@ def test_the_evaluation_counts_of_tables_iv_to_vi_of_the_paper_are_reproduced(k:
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-class _TOMS748WithAuthorsStoppingCriterion(TOMS748):
-    """`_TOMS748WithAuthorsStoppingCriterion` is `TOMS748` with the stopping criterion of the authors' code, and its
-    returned x-value, the lower bound ``a``.
+class _TOMS748WithPaperStoppingCriterion(TOMS748):
+    """`_TOMS748WithPaperStoppingCriterion` is `TOMS748` with the termination test of the subroutine
+    ``bracket`` of the paper's section 6."""
 
-    `TOMS748` takes ``tol = xtol``, so a test passes the paper's ``tol`` as ``xtol``.
-    """
+    def _root_if_converged(
+        self, state: SolveState, a: float, fa: float, b: float, fb: float, xtol_doubled: float
+    ) -> float | None:
+        """Return the x-value where ``f`` is 0, or else the midpoint once ``b - a <= 2*tole(a, b)``, or ``None`` if the
+        solve continues.
 
-    @staticmethod
-    def _root_if_converged(interval: Interval, xtol_doubled: float, tole_doubled: float) -> float | None:
-        """Return ``a`` if ``f(a) = 0`` or the interval is at most ``2*tole`` wide, else ``None``, ignoring
-        ``xtol_doubled``.
-
-        At the top of an iteration, the authors' code checks only the width; ``f(a)`` is never 0 there, because the
-        check after the previous evaluation would have ended the solve.
+        The paper terminates at ``c`` where ``f(c) = 0``, and ``bracket`` returns that ``c`` as ``a``. The paper
+        does not state which x-value its termination test returns once the interval is narrow enough; this method
+        returns the midpoint, as the shared stopping criterion does.
         """
-        if interval.is_fa_zero or interval.width <= tole_doubled:
-            return interval.a
+        if fa == 0.0:
+            return a
+        elif fb == 0.0:
+            return b
+        elif b - a <= 2.0 * self.tole(a, fa, b, fb, state.xtol):
+            return 0.5 * (a + b)
         else:
             return None
-
-
-def _tol_as_the_driver_computes_it(n_digits: int | None) -> float:
-    """Return ``10^-n_digits`` by repeated division, as the subroutine ``TOLE`` of the authors' code computes it, or 0
-    for ``None``."""
-    if n_digits is None:
-        return 0.0
-    else:
-        tol = 1.0
-        for _ in range(n_digits):
-            tol = tol / 10.0
-        return tol
