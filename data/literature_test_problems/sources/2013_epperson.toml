@@ -1,0 +1,485 @@
+title = 'Epperson (2013): An Introduction to Numerical Methods and Analysis, chapter 3'
+reference = 'Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9.'
+year = 2013
+home = '1.4'
+where_in_source = '''
+chapter 3, "Root-Finding" (pp. 89–169): Examples 3.1–3.20, the text examples and figures of Sections 3.1–3.12, Tables 3.1–3.19, and the exercises that end each section.
+- Section 4.4 (pp. 192–195) applies Muller's method and inverse quadratic interpolation to 2 functions of chapter 3; its uses appear in those rows.
+- Problem 3 of Section 3.1 (rows keyed 3.1-3) returns in 3.1-11 (regula falsi), 3.8-3 (secant from the interval's endpoints), 3.11-6 to 3.11-8 (chord method from the midpoint, with Aitken extrapolation) and 4.4-9 (Muller, inverse quadratic interpolation); the rows do not repeat those keys.
+- The rows leave out:
+  - exercises about a generic `f` or a method (for example 3.2-7, 3.2-8, 3.5-1 to 3.5-4, 3.6-1 to 3.6-7, 3.8-4 to 3.8-7);
+  - the initial-guess polynomials of Sections 3.4 and 3.7;
+  - 3.10-2(a), whose roots are all complex;
+  - 3.10-7, a random polynomial.
+'''
+transcribed_from = "the book's PDF, whose text layer comes from OCR; every expression was read from the page images."
+rows_summary = '82, 1 per distinct function: a function that several examples or exercises use is 1 row whose key lists them all. 20 rows come from the text, its examples and figures; 62 come from the exercises alone.'
+notes = '''
+How to read the rows:
+- **Keys:** `Ex. 3.n` is Example 3.n; `3.k-m` is exercise m of Section 3.k, with its sub-item letter; `Fig.` and `Table` are the book's figures and tables; `§3.k (p. n)` is a text example.
+- **Equations:** an equation that the book prints as `lhs = rhs` stays in that form, and a fixed-point iteration `x_{n+1} = g(x_n)` is written as the equation `x = g(x)`; `f(x) = 0` is written as `f(x)`.
+- **Notation:** the book writes `ln` and `log` for the natural log, and `ε` where the rows write `eps`.
+'''
+
+[[rows]]
+key = 'Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13; Tables 4.13, 4.14; 4.4-1, 4.4-2'
+f = '2 - exp(x)'
+interval = '[0, 1]'
+notes = "The chapter's running example; root `log(2) = 0.6931471806`. Bisection on `[0, 1]` (Ex. 3.1, Table 3.1); Newton from `x0 = 0` (Ex. 3.2, Table 3.2); secant from `x0 = 0, x1 = 1` (Ex. 3.7, Table 3.5; 3.11-13); the chord method from `x0 = 0` (Ex. 3.17); Halley's 2 methods from `x0 = 0` (Table 3.13); Newton, Halley and Chun–Neta (Table 3.17); Steffensen from `x0 = 0` (3.9-12); Muller and inverse quadratic interpolation from 0, 1/2, 1 (Section 4.4)."
+
+[[rows]]
+key = '3.1-1, 3.1-3(a), 3.1-10; 3.2-2, 3.2-5(h); 3.3-3(h); 3.8-1, 3.8-2'
+f = 'x^3 - 2'
+interval = '[0, 2]'
+notes = 'Bisection (3.1-1, 3.1-3) and regula falsi (3.1-10) on `[0, 2]`; Newton from `x0 = 1` (3.2-5, 3.3-3); secant from `x0 = 0, x1 = 1` and from `x0 = 1, x1 = 0` (3.8-1, 3.8-2). 3.2-2 asks what its root computes.'
+
+[[rows]]
+key = '3.1-2(a)'
+f = 'x - exp(-x^2)'
+interval = '[0, 1]'
+notes = '3.1-2 asks for the root to an accuracy of 0.1 by bisection, by hand.'
+
+[[rows]]
+key = '3.1-2(b)'
+f = 'log(x) + x'
+interval = '[1/16, 1]'
+notes = 'As 3.1-2(a).'
+
+[[rows]]
+key = '3.1-2(c)'
+f = 'x^3 - 3'
+interval = '[0, 3]'
+notes = 'As 3.1-2(a).'
+
+[[rows]]
+key = '3.1-2(d), 3.1-3(d); 3.2-5(a); 3.3-3(f); Ex. 3.10, 3.12, 3.20; 4.4-3, 4.4-4'
+f = 'x^6 - x - 1'
+interval = '[0, 2]'
+notes = 'Real roots 1.13472413840152 and -0.77808959867860 (Ex. 3.20). Bisection on `[0, 2]` (3.1); Newton from `x0 = 1` (3.2-5, 3.3-3); Durand–Kerner for all 6 roots (Ex. 3.12, Table 3.9); Newton, Halley, super Halley and Chun–Neta from `x0 = 2` (Table 3.18) and toward the negative root (Table 3.19); Muller and inverse quadratic interpolation from 0, 1, 2 (4.4-3, 4.4-4). Ex. 3.10 names it as a polynomial whose deflation leaves a quartic.'
+
+[[rows]]
+key = '3.1-2(e)'
+f = '3 - 2^x'
+interval = '[0, 2]'
+notes = 'As 3.1-2(a).'
+
+[[rows]]
+key = '3.1-3(b); 3.2-5(g); 3.3-3(d)'
+f = 'exp(x) - 2'
+interval = '[0, 1]'
+notes = 'Bisection to `1E-6` (3.1-3); Newton from `x0 = 1` (3.2-5, 3.3-3).'
+
+[[rows]]
+key = '3.1-3(c); 3.2-5(i); 3.3-3(e)'
+f = 'x - exp(-x)'
+interval = '[0, 1]'
+notes = 'Bisection to `1E-6`; Newton from `x0 = 1`.'
+
+[[rows]]
+key = '3.1-3(e); 3.2-5(f); 3.3-3(c)'
+f = 'x^3 - 2*x - 5'
+interval = '[0, 3]'
+notes = 'Bisection to `1E-6`; Newton from `x0 = 2`.'
+
+[[rows]]
+key = '3.1-3(f); 3.2-5(c); 3.3-3(a)'
+f = '1 - 2*x*exp(-x/2)'
+interval = '[0, 2]'
+notes = 'Bisection to `1E-6`; Newton from `x0 = 0`.'
+
+[[rows]]
+key = '3.1-3(g); 3.2-5(d); 3.3-3(b)'
+f = '5 - x^-1'
+interval = '[0.1, 0.25]'
+notes = 'Bisection to `1E-6`; Newton from `x0 = 1/2` (3.2-5) and from `x0 = 1/4` (3.3-3).'
+
+[[rows]]
+key = '3.1-3(h); 3.2-5(e); 3.3-3(g)'
+f = 'x^2 - sin(x)'
+interval = '[0, pi]'
+notes = 'Bisection to `1E-6`; Newton from `x0 = 1/2`.'
+
+[[rows]]
+key = '3.1-4; 3.9-1(a), 3.9-5(c)'
+f = 'x = cos(x)'
+notes = "Bisection on an interval of the reader's choice (3.1-4); fixed-point iteration from `x0 = 0` (3.9-1) and on an interval that `g` maps into itself (3.9-5)."
+
+[[rows]]
+key = '3.1-5; 3.9-1(b); 3.11-3'
+f = 'x = exp(-x)'
+notes = "Bisection on an interval of the reader's choice (3.1-5); fixed-point iteration from `x0 = 0` (3.9-1) and from `x0 = 1/2` with both Aitken algorithms (3.11-3)."
+
+[[rows]]
+key = '3.1-6, 3.1-7; 3.3-8, 3.3-9'
+f = 'L = (12*M/r)*(1 - (1 + r/12)^(-12*m))'
+name = 'annuity equation'
+parameters = '`L = 150000, M = 600, m = 30` (3.1-6); `L = 100000` (3.1-7); `m = 15` (3.3-9)'
+notes = 'Unknown `r`, the annual interest rate; bisection (3.1) and Newton (3.3).'
+
+[[rows]]
+key = '(3.6); 3.1-8, 3.1-12; 3.8-8'
+f = 'theta*exp(-z^2) - z*erf(z)'
+parameters = '`theta = 0.001, 0.1, 10, 1000` (3.1-8); `theta_k = 10^(k/4)`, `k = -24, ..., 24` (3.8-8)'
+notes = 'From a model of melting (the Stefan problem): `beta` solves `((T_M - T_0)*k/(lambda*sqrt(pi)))*exp(-beta^2/k) = beta*erf(beta/sqrt(k))`, which 3.1-8(a) reduces to (3.6). Bisection (3.1-8), regula falsi (3.1-12), secant (3.8-8). Without a built-in `erf`, the book offers `E(z) = 1 - (a1*xi + a2*xi^2 + a3*xi^3)*exp(-z^2)` with `xi = 1/(1 + p*z)`, `p = 0.47047, a1 = 0.3480242, a2 = -0.0958798, a3 = 0.747856`.'
+
+[[rows]]
+key = '3.1-13; 3.11-24'
+f = 'exp(-4*x) - 1/10'
+interval = '[0, 5]'
+notes = 'Bisection against regula falsi (3.1-13); regula falsi against the hybrid method, 5 iterations each (3.11-24).'
+
+[[rows]]
+key = '3.1-14(a)'
+f = '1/(x^2 + 1)'
+interval = '[0, 5]'
+notes = 'No root. Bisection and regula falsi, with a comment on their behavior.'
+
+[[rows]]
+key = '3.1-14(b)'
+f = '1/(x - 1)'
+interval = '[0, 3]'
+notes = 'No root: a pole at `x = 1`. As 3.1-14(a).'
+
+[[rows]]
+key = '§3.1 (p. 94)'
+f = 'x^2'
+notes = "Root 0 without a sign change: the book's example of a root that bisection cannot find."
+
+[[rows]]
+key = 'Fig. 3.2, 3.6, 3.7'
+f = 'x^2 - 1/2'
+notes = "Roots `±sqrt(1/2)`. Figures only: Newton's tangent lines (Fig. 3.2), secant lines (Fig. 3.6), and its fixed point `(1 + sqrt(3))/2` next to its root (Fig. 3.7)."
+
+[[rows]]
+key = 'Fig. 3.8'
+f = '(1/2)*x^2 - 1/2'
+notes = 'Figure only: 2 Newton steps.'
+
+[[rows]]
+key = '§3.2 (p. 99), Fig. 3.3'
+f = '(4/3)*exp(2 - x/2)*(1 + x^-1*log(x))'
+notes = 'Single root near `x = 0.5`. Newton from `x0` in about `[0.8, 1.2]` gives `x1 < 0`, outside the domain; from `x0 > 1.2` it grows without bound, where `f -> 0`.'
+
+[[rows]]
+key = '§3.2 (p. 100), Fig. 3.4, Table 3.3; Ex. 3.19, Table 3.16'
+f = '(20*x - 1)/(19*x)'
+interval = '`[0.01, 1]` (Table 3.16)'
+notes = 'Root 0.05. Table 3.3: the first Newton step from `x0 = 1, 0.5, 0.25, 0.125, 0.0625` gives `x1 < 0` until `x0 = 1/16`. Table 3.16: the hybrid method (Algorithm 3.6), from `x0 = 0.01, x1 = 1`.'
+
+[[rows]]
+key = '§3.2 (p. 100); 3.2-9 to 3.2-11'
+f = 'arctan(x)'
+notes = 'Root 0. Newton cycles between `1.39174520027...` and `-1.39174520027...`; the exercises compute this `beta` by bisection and run Newton from `x0 = beta`, `beta/2` and `beta - eps`, with `eps = O(u)`.'
+
+[[rows]]
+key = '3.2-1'
+f = 'x^2 - 2'
+notes = 'Asks for the simplified Newton iteration and what its root computes.'
+
+[[rows]]
+key = '3.2-3'
+f = 'x^n - a'
+parameters = '`n`, `a` free'
+notes = 'As 3.2-1.'
+
+[[rows]]
+key = '3.2-4; §3.4, Ex. 3.3; 3.4-1 to 3.4-5'
+f = 'a - x^-1'
+parameters = '`a = 0.8` (Ex. 3.3); `a = 0.75, 2/3, 0.6` (3.4-1 to 3.4-3, 3.4-5); `a = 7, pi, 6, 5, 3` (3.4-4)'
+also_in = 'Atkinson (1989), which a footnote to Section 3.4 names as its source'
+notes = "Section 3.4 prints it as `a - 1/x`: Newton's iteration `x_{n+1} = x_n*(2 - a*x_n)` computes `1/a` without division, for `a` reduced to `[1/2, 1]`, from `x0 = 3 - 2*a`. Ex. 3.3 reaches 1.25 from `x0 = 1.4` in 4 steps."
+
+[[rows]]
+key = '3.2-5(b); 3.3-3(i)'
+f = 'x + tan(x)'
+notes = 'Newton from `x0 = 3`.'
+
+[[rows]]
+key = '3.2-5(j); 3.3-3(j)'
+f = '2 - x^-1*log(x)'
+notes = 'Newton from `x0 = 1/3`.'
+
+[[rows]]
+key = '3.2-6'
+f = '3 - exp(x)'
+notes = 'Newton from `x0 = 1, 2, 4, 8, 16`.'
+
+[[rows]]
+key = '3.3-4, 3.3-5'
+f = 'x - eps*sin(x) = 2*pi*t/T'
+name = "Kepler's equation"
+parameters = '`eps = 0.01` (3.3-4), `eps = 0.9` (3.3-5); `t = T/4, T/8`'
+notes = 'Unknown `x`, an angle in radians; Newton.'
+
+[[rows]]
+key = '3.3-6'
+f = '(u(x, t) - T)/(T0 - T) = erf(x/(2*sqrt(a*t)))'
+parameters = '`a = 1.25E-6` ft^2/s; `t` = 30 days; a temperature drop of 40 °C'
+notes = 'Unknown depth `x` (feet) at which `u` does not reach 0 °C. The exercise gives no `T0`; 3.3-7 plots `u` over time for `T0 = 40, 50, 60` °C.'
+
+[[rows]]
+key = 'Ex. 3.4'
+f = '16*t^3 - 18*t^2 + 3'
+notes = 'Critical points of an error function, found by Newton or bisection: `t1 = 0.886`, `t2 = 0.595`, `t3 = -0.356`.'
+
+[[rows]]
+key = 'Ex. 3.6'
+f = 'exp(-a*x) - x'
+parameters = '0 < a <= 1'
+interval = '[0, 2]'
+notes = 'The root lies in `[0, 2]` for every `a > 0`; the analysis shows Newton from `x0 = 1` reaches an error below `5E-10` in 5 steps. No numbers computed.'
+
+[[rows]]
+key = '3.5-6, 3.5-7; 3.11-15, 3.11-16'
+f = '4*x - cos(x)'
+interval = '[-2, 2]'
+notes = 'Newton (3.5) and secant (3.11) to `1E-8` from any `x0` in `[-2, 2]`; bisection on `[-2, 2]` for comparison.'
+
+[[rows]]
+key = '3.5-8, 3.5-9'
+f = '7*x - cos(2*pi*x)'
+interval = '[0, 1]'
+notes = 'Newton from several `x0` in `[0, 1]`.'
+
+[[rows]]
+key = '3.6-8'
+f = 'x - a*sin(x) - b'
+parameters = '`a, b > 0`, `a < 1`'
+notes = 'Asks whether Newton from `x0 = b` always converges.'
+
+[[rows]]
+key = '3.6-9'
+f = '1 - exp(-x^2)'
+notes = 'Root 0; Newton, watching `(alpha - x_{n+1})/(alpha - x_n)^2`.'
+
+[[rows]]
+key = '§3.7; 3.7-1; §3.9 (eq. (3.30)); 3.9-13; 3.11-10; 3.12-2 to 3.12-4'
+f = 'x^2 - a'
+parameters = '`a = pi, 5, 7, 3, 6` (3.7-1); `a = 3, 2, pi` (3.9-13); `a = 5` (3.11-10); `a = 0.5` (3.12-2); `a = 0.3, 0.6, 0.9` (3.12-3); `a = 0.25, 0.251, ..., 1` (3.12-4)'
+also_in = 'Atkinson (1989), whose exercise Section 3.7 names as its basis'
+notes = 'Root `sqrt(a)`. Section 3.7 reduces `a` to `b` in `[1/4, 1]` and runs Newton on `x^2 - b` from `x0 = (2*b + 1)/3`. Section 3.9 rewrites it as the fixed-point iterations `x = (x + a/x)/2`, `x = x + (x^2 - a)/2`, `x = a/x` and `x = a + x - x^2`. Steffensen (3.9-13), Halley (3.11-10, 3.12-2), super Halley (3.12-2).'
+
+[[rows]]
+key = '3.7-5'
+f = 'x^3 - a'
+parameters = '`a` free'
+notes = "Asks to extend Section 3.7's analysis to cube roots."
+
+[[rows]]
+key = 'Ex. 3.8, 3.9, 3.15, 3.16; Table 3.12'
+f = 'x = (1/2)*exp(-x)'
+interval = '`[0, 1/2]` (Ex. 3.9)'
+notes = 'Fixed point 0.35173371124920. Fixed-point iteration from `x0 = 0, 5, -5` (Table 3.6); both Aitken algorithms from `x0 = 0` (Ex. 3.15, 3.16, Table 3.12). Figure 3.9 draws it.'
+
+[[rows]]
+key = 'Table 3.12'
+f = 'x - (1/2)*exp(-x)'
+notes = "Newton from `x0 = 0`; the book notes that its root is the fixed point of Ex. 3.8's `g`."
+
+[[rows]]
+key = '3.9-1(c)'
+f = 'x = log(1 + x)'
+notes = 'Fixed-point iteration from `x0 = 1/2`.'
+
+[[rows]]
+key = '3.9-1(d)'
+f = 'x = (x + 3/x)/2'
+notes = 'Fixed-point iteration from `x0 = 3`.'
+
+[[rows]]
+key = '3.9-2'
+f = 'y = Y + (1/2)*h*(-Y*log(Y) - y*log(y))'
+parameters = '`Y = 1/2`, `h = 1/8`'
+notes = '3 steps of fixed-point iteration from `y0 = Y`.'
+
+[[rows]]
+key = '3.9-3'
+f = 'y = (4/3)*Y1 - (1/3)*Y0 - 2*h*y*log(y)'
+parameters = '`Y0 = 1/2`, `Y1 = 0.54332169878500`, `h = 1/8`'
+notes = '3 steps of fixed-point iteration from `y0 = Y1`.'
+
+[[rows]]
+key = '3.9-4, 3.9-5(d); 3.11-1'
+f = 'x = 1 + exp(-x)'
+interval = '[1, 2]'
+notes = 'Fixed-point iteration from any `x0` in `[1, 2]` to `1E-5` (3.9-4); from `x0 = 0`, with both Aitken algorithms (3.11-1).'
+
+[[rows]]
+key = '3.9-5(a)'
+f = 'x = (x + 2/x)/2'
+notes = '3.9-5 asks for an interval `[a, b]` that `g` maps into itself, then iterates from a fixed point estimated by eye.'
+
+[[rows]]
+key = '3.9-5(b)'
+f = 'x = x + exp(-x) - 1/4'
+notes = 'As 3.9-5(a).'
+
+[[rows]]
+key = '3.9-5(e)'
+f = 'x = (x^2 + 1)/2'
+notes = 'As 3.9-5(a).'
+
+[[rows]]
+key = '3.9-6'
+f = '1 - x^2/4'
+notes = 'Root 2. The exercise iterates `x = h(x)` from `x0 = 1/2`, which seeks the fixed point of `h`, not its root.'
+
+[[rows]]
+key = '3.9-7'
+f = '3 - exp(-x)'
+notes = 'Newton from `x0 = 2` for the root; then `x = h(x)` iterated from `x0 = 2`, for comparison.'
+
+[[rows]]
+key = '3.9-8'
+f = '2*sin(pi*x) + x'
+interval = '[1, 2]'
+notes = 'By fixed-point iteration.'
+
+[[rows]]
+key = '3.9-9'
+f = 'x = (x^3 + x^2 - x*a + a)/(x^2 + 2*x - a)'
+parameters = '`a = 4, 2` from `x0 = 3/2`; `a = 5` from `x0 = 2`'
+notes = 'Asks what the iteration computes, and compares it with Newton.'
+
+[[rows]]
+key = '3.9-10'
+f = 'x = ((N - 1)*x^(N + 1) + a*x)/(N*x^N)'
+parameters = '`N = 3`, `a = 8`'
+notes = 'From `x0 = 3/2`; asks what it converges to.'
+
+[[rows]]
+key = 'Ex. 3.10, 3.11, 3.14'
+f = 'x^4 - x - 1'
+interval = '`[-2, 2]` (Fig. 3.11)'
+notes = 'Real roots 1.22074408460576 and -0.72449195900052, complex roots `-0.24812606280262 ± 1.03398206097597i`. Newton from `x0 = 1.25` and `x0 = -0.75`, then deflation (Ex. 3.10, Table 3.7); Durand–Kerner from complex starts (Ex. 3.11, Table 3.8), and from the real starts 1, -1, 2, -2, where it fails (Ex. 3.14, Table 3.11).'
+
+[[rows]]
+key = 'Ex. 3.13'
+f = 'x^4 + 5*x^3 + 9*x^2 + 8*x + 4'
+notes = 'Printed also as `(x^2 + x + 1)*(x + 2)^2`: double root -2 and roots `(-1 ± sqrt(3)*i)/2`. Durand–Kerner from `±3 ± 3i` converges slowly to the double root (Table 3.10).'
+
+[[rows]]
+key = '3.10-1'
+f = 'x^4 - 10*x^3 + 35*x^2 - 50*x + 24'
+notes = 'Roots 1, 2, 3, 4, by Durand–Kerner.'
+
+[[rows]]
+key = '3.10-2(b)'
+f = 'x^6 - x^5 - 1'
+notes = 'All roots by Durand–Kerner.'
+
+[[rows]]
+key = '3.10-2(c)'
+f = 'x^9 - x^8 - 1'
+notes = 'As 3.10-2(b).'
+
+[[rows]]
+key = '3.10-2(d)'
+f = 'x^5 - 1'
+notes = 'As 3.10-2(b).'
+
+[[rows]]
+key = '3.10-3'
+f = 'x^7 - x - 1'
+notes = 'As 3.10-2(b).'
+
+[[rows]]
+key = '3.10-4'
+f = 'x^8 - x - 1'
+notes = 'As 3.10-2(b).'
+
+[[rows]]
+key = '3.10-5'
+f = 'x^6 - a*x - 1'
+parameters = '`a` in `[-2, 2]`, then beyond'
+notes = 'Roots as a function of `a`.'
+
+[[rows]]
+key = '3.10-6'
+f = 'x^6 - x - b'
+parameters = '`b` in `[-2, 2]`'
+notes = 'Roots as a function of `b`.'
+
+[[rows]]
+key = 'Ex. 3.18'
+f = 'cos(x)^2'
+notes = 'Double root `pi/2`, written as `(x - pi/2)^2*F(x)` with `F(pi/2) = 1`.'
+
+[[rows]]
+key = '§3.11.4, Tables 3.14, 3.15; 3.11-18, 3.11-20'
+f = '1 - x*exp(1 - x)'
+notes = "Double root 1. Newton from `x0 = 0` and secant from `x_-1 = -1, x0 = 0` (Table 3.14); the modified Newton (3.59), Newton and secant on `u = f/f'`, and Newton with Aitken extrapolation (Table 3.15)."
+
+[[rows]]
+key = '§3.11.4, Fig. 3.12'
+f = 'x^5 - (5/2)*x^4 + (5/2)*x^3 - (5/4)*x^2 + (5/16)*x - 1/32'
+interval = '[0.45, 0.55]'
+notes = 'Printed also as `(x - 1/2)^5`. Evaluated in floating point at 8000 points of the interval, its values form a band around 0.'
+
+[[rows]]
+key = 'Ex. 3.19; 3.11-22'
+f = '2*x*exp(-15) - 2*exp(-15*x) + 1'
+interval = '[0, 1]'
+notes = '`f(0) = -1`, `f(1) = 1`. The hybrid method (Algorithm 3.6): 2 steps in the text, 6 by hand in 3.11-22, which prints `x6 = 0.4541055E-1`.'
+
+[[rows]]
+key = '3.11-2'
+f = 'x = (1/2)*log(1 + x)'
+notes = 'Fixed-point iteration from `x0 = 1/2`, with both Aitken algorithms.'
+
+[[rows]]
+key = '3.11-11'
+f = 'x^N - a'
+parameters = '`N = 3, 4, 5`; `a = 2, 3, 4, 5`'
+notes = "Halley's method (3.44) for cube, 4th and 5th roots."
+
+[[rows]]
+key = '3.11-12'
+f = 'a - exp(x)'
+parameters = '`a` in `[1/2, 1]`'
+notes = "Root `log(a)`; Halley's second method gives `x_{n+1} = x_n + 2*(a*exp(-x_n) - 1)/(a*exp(-x_n) + 1)`."
+
+[[rows]]
+key = '3.11-23(a)'
+f = 'x^(1/19) - 19^(1/19)'
+interval = '[1, 100]'
+notes = 'The hybrid method.'
+
+[[rows]]
+key = '3.11-23(b)'
+f = '2*x*exp(-5) - 2*exp(-5*x) + 1'
+interval = '[0, 1]'
+notes = 'As 3.11-23(a).'
+
+[[rows]]
+key = '3.11-23(c)'
+f = 'x^2 - (1 - x)^20'
+interval = '[0, 1]'
+notes = 'As 3.11-23(a).'
+
+[[rows]]
+key = '3.11-23(d)'
+f = '2*x*exp(-20) - 2*exp(-20*x) + 1'
+interval = '[0, 1]'
+notes = 'As 3.11-23(a).'
+
+[[rows]]
+key = '3.11-25'
+f = '(x - 1)^5'
+interval = '[0.998, 1.002]'
+notes = 'Evaluated at 400 points in 3 forms: `(x - 1)^5`, `x^5 - 5*x^4 + 10*x^3 - 10*x^2 + 5*x - 1` and `-1 + x*(5 + x*(-10 + x*(10 + x*(-5 + x))))`.'
+
+[[rows]]
+key = '3.12-1(a)'
+f = 'sin(x) - x/2'
+notes = 'Printed root `x* = 1.895494267`; Chun–Neta and super Halley from `x0 = 2, 2.5, 3`.'
+
+[[rows]]
+key = '3.12-1(b)'
+f = 'exp(x^2 + 7*x - 30) - 1'
+notes = 'Printed root `x* = 3`; as 3.12-1(a), from `x0 = 4, 5, 6`.'
+
+[[rows]]
+key = '3.12-1(c)'
+f = 'exp(x)*sin(x) + log(1 + x^2)'
+notes = 'Printed root `x* = 1`; as 3.12-1(a), from `x0 = 0, -1, -2`. As printed, `f(0) = 0` and `f(1)` is about 2.98.'

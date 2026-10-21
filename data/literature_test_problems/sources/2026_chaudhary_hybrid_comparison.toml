@@ -1,0 +1,7 @@
+title = 'Chaudhary (2026): comparative study and hybrid root-finding approach'
+reference = 'Chaudhary, M. P. (2026). A Comparative Study and Novel Hybrid Approach to Root-Finding Methods for Nonlinear Equations. International Journal of Scientific Research in Engineering and Management. https://doi.org/10.55041/ijsrem65683.'
+year = 2026
+home = '1.2'
+where_in_source = "none of the article's 6 pages holds a test function."
+transcribed_from = 'the article.'
+rows_summary = "no test functions: the article describes a hybrid of Newton's and the secant method in prose and reports no numerical experiments."

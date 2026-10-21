@@ -1,0 +1,832 @@
+title = 'Chapra & Canale (2015): Numerical Methods for Engineers, Part Two'
+reference = 'Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. McGraw-Hill Education. ISBN 978-0-07-339792-4. The latest edition is the 8th (2021); the rows follow the 7th.'
+year = 2015
+home = '1.4'
+where_in_source = '''
+Part Two, "Roots of Equations" (pp. 117–228): the introduction PT2.1–PT2.3 (pp. 117–122); chapters 5, "Bracketing Methods" (pp. 123–144), 6, "Open Methods" (pp. 145–175), 7, "Roots of Polynomials" (pp. 176–203), and 8, "Case Studies: Roots of Equations" (pp. 204–225); their examples, figures and end-of-chapter problems. The epilogue (pp. 226–228) holds no function.
+- The rows leave out:
+  - the general forms that name no concrete function: (PT2.5), (PT2.6), (7.1), (7.29), the ODEs (7.2)–(7.6), and `u(x) = f(x)/f'(x)` (6.13);
+  - figures that sketch a function without its expression: Figures 5.2, 5.3(b), 5.16, 6.1, 6.3, 6.6, 6.13(c) (a quadruple root) and 7.3;
+  - formulas that are evaluated, not solved: Ex. 6.9's inverse parabola `g(y) = 0.5*y^2 - 2.5*y + 4` (printed with `x` for `y`), §8.2's trend of `pCO2`, the Swamee–Jain formula (8.22), Prob. 8.13's pressure drop and Prob. 8.48's Stokes-law velocity (P8.48.2);
+  - systems of nonlinear equations: §6.6 ((6.19), Ex. 6.11, 6.12), Ex. 7.5, Figure 7.9, §8.2's system (8.6)–(8.10) before it is reduced to (8.14), and Prob. 6.22–6.24, 6.31, 6.32, 7.12, 7.13, 7.18, 8.6 and 8.43–8.46;
+  - problems whose function of the unknown the reader derives: Prob. 5.20 (a floating frustum of a cone: the book prints the frustum's volume, but not the radius at the waterline as a function of the unknown height), 8.41 (the energy balance of a mixer, from 2 printed heat capacities) and 8.47 (the moment on the space shuttle at liftoff, from Figure P8.47);
+  - Prob. 7.16, which runs Müller's method through 3 data points, without a function.
+- Every problem that names a method without a function repeats an example or another problem (5.21–5.26, 6.27–6.30, 7.6–7.9, 7.15, 7.20–7.24); its key is in that function's row.
+'''
+transcribed_from = "the book's PDF, whose page number is the book's plus 17. All of Part Two was read from the page images; the problems' coefficients were checked against the text layer, which encodes some symbols as other characters (`5` for `=`, `2` for a minus sign, `1` for `+`), so the page images win where the 2 differ."
+rows_summary = '118, 1 per distinct function of the unknown: a function that several examples or problems use is 1 row whose key lists them all. 30 rows come from the introduction, the text, its examples, figures and case studies; 88 come from the problems alone.'
+notes = '''
+How to read the rows:
+- **Keys:** `(PT2.n)` and `(n.m)` are the book's equation numbers; `§` is a passage of the text, with its page; `Ex.`, `Fig.` and `Prob.` are the book's Examples, Figures and end-of-chapter Problems, with a part letter where a problem has several functions.
+- **Equations:** an equation that the book prints as `lhs = rhs` stays in that form; `f(x) = 0` and `0 = f(x)` are written as `f(x)`. A fixed-point form `x = g(x)` is its own row. The parachutist's equation and the circuit's equation are 2 rows each, 1 per unknown (`c` or `m`; `R` or `L`), because they are different functions of the unknown.
+- **Notation:** the book writes `ln` for the natural log, which the rows write `log`, and `log` for the base-10 log of the Colebrook equation, which the rows write `log10`; `cos^-1` becomes `arccos`. Subscripts join their names: `Pu,max` becomes `Pu_max`, `c_a,0` becomes `ca0`, `[H+]` becomes `H`, `[HCO3-]` becomes `HCO3`. A number printed as `1.671 × 10^-4` is written `1.671E-4`. `<x - a>^n` is a singularity function, as Prob. 8.24 defines it: `(x - a)^n` for `x > a`, else 0.
+- **Intervals:** the initial guesses `xl` and `xu` of a bracketing method are written as the interval `[xl, xu]`; the starting points of the open methods are in `notes`.
+
+Differences from the 6th edition (2010):
+- **Text:** of the functions of the 30 rows from the text, only the parachutist's changed, and the van der Waals row's through its Prob. 8.1.
+- **Numbering:** problems were renumbered mainly among the program problems of chapters 5 and 6, in chapter 6 from 6.14 on, and in chapter 8 at 8.3–8.6, 8.11–8.13 and from 8.28 on. The keys of the rows are the 7th's numbers.
+- **Changed functions** (36 rows; the 6th's form in parentheses):
+  - parachutist, unknown `c`: Ex. 5.1 takes `g = 9.81`, so (E5.1.1) is `(668.06/c)*(1 - exp(-0.146843*c)) - 40`, root 14.8011 (6th: `g = 9.8`, `667.38/c`, root 14.7802); Prob. 5.14 takes `m = 82` on `[3, 5]`, which holds the root (6th: `m = 80` on `[0.1, 0.2]`, which did not);
+  - parachutist, unknown `m`: `g = 9.81` in both problems (6th: `9.8`); Prob. 5.13 has `v = 36`, `t = 10` (6th: `v = 35`, `t = 9`), and Prob. 7.11 has `c = 15` (6th: `c = 14`);
+  - van der Waals, Prob. 8.1: ethyl alcohol, `a = 12.02`, `b = 0.08407`, `T = 375` K, `p = 2.0` atm (6th: acetone, `a = 14.09`, `b = 0.0994`, `T = 400` K, `p = 2.5` atm);
+  - Prob. 5.1: `-0.5*x^2 + 2.5*x + 4.5` (6th: `-0.6*x^2 + 2.4*x + 5.5`);
+  - Prob. 5.2: `5*x^3 - 5*x^2 + 6*x - 2` (6th: `4*x^3 - 6*x^2 + 7*x - 2.3`);
+  - Prob. 5.3: `-25 + 82*x - 90*x^2 + 44*x^3 - 8*x^4 + 0.7*x^5` (6th: `-26 + 85*x - 91*x^2 + 44*x^3 - 8*x^4 + x^5`);
+  - Prob. 5.4: `-12 - 21*x + 18*x^2 - 2.75*x^3` (6th: `-13 - 20*x + 19*x^2 - 3*x^3`);
+  - Prob. 5.5: `sin(x) = x^2` (6th: `sin(x) = x^3`);
+  - Prob. 5.6: `log(x^2) = 0.7` (6th: `log(x^4) = 0.7`);
+  - Prob. 6.1: `sin(sqrt(x)) - x`, to `es <= 0.01%` (6th: `2*sin(sqrt(x)) - x`, to `0.001%`);
+  - Prob. 6.3: `-0.9*x^2 + 1.7*x + 2.5`, to `es = 0.01%` (6th: `-x^2 + 1.8*x + 2.5`, to `0.05%`);
+  - Prob. 6.9: `x^3 - 6*x^2 + 11*x - 6.1` (6th: `0.95*x^3 - 5.9*x^2 + 10.9*x - 6`);
+  - Prob. 6.10: `7*sin(x)*exp(-x) - 1` (6th: `8*sin(x)*exp(-x) - 1`);
+  - Prob. 7.1: `x^4 - 7.5*x^3 + 14.5*x^2 + 3*x - 20` (6th: `x^4 - 5*x^3 + 5*x^2 + 5*x - 6`);
+  - Prob. 7.2: `x^5 - 5*x^4 + x^3 - 6*x^2 - 7*x + 10` (6th: `x^5 - 6*x^4 + x^3 - 7*x^2 - 7*x + 12`);
+  - Prob. 7.14: `(x + 2)*(x + 5)*(x - 6)*(x - 4)*(x - 8)` (6th: `(x - 6)*(x + 2)*(x - 1)*(x + 4)*(x - 8)`);
+  - Prob. 7.19, numerator: `s^3 + 9*s^2 + 26*s + 24` (6th: `s^3 + 12.5*s^2 + 50.5*s + 66`);
+  - Prob. 7.19, denominator: `s^4 + 15*s^3 + 77*s^2 + 153*s + 90` (6th: `s^4 + 19*s^3 + 122*s^2 + 296*s + 192`);
+  - recycle rate, Prob. 8.2: `XAf = 0.9` (6th: `0.96`);
+  - dissociation of water vapor, Prob. 8.3: `pt = 3` atm, `K = 0.05` (6th: Prob. 8.5, `pt = 3.5`, `K = 0.04`);
+  - chemical equilibrium, Prob. 8.5 only: `K = 0.015`, `cb0 = 30` (6th: Prob. 5.19 and 8.3, `K = 0.016`, `cb0 = 28`);
+  - the 2 fixed-point forms of the spherical tank, Prob. 8.10: `V = 0.5` m^3 (6th: `V = 0.75`);
+  - enzymatic plug flow reactor, Prob. 8.11: `V = 100` L, `F = 80` L/s, `Cin = 0.2` M, `kmax = 1E-2` 1/s (6th: Prob. 8.13, `V = 500`, `F = 40`, `Cin = 0.5`, `kmax = 5E-3`);
+  - secant formula for a column, Prob. 8.14: `e*c/k^2 = 0.2`, `L/k = 100` (6th: `0.4`, `50`);
+  - oxygen downstream of a sewage discharge, Prob. 8.15: `c = 10 - 20*(exp(-0.2*x) - exp(-0.75*x))` (6th: `exp(-0.15*x) - exp(-0.5*x)` in the parentheses);
+  - bacteria in a lake, Prob. 8.16: `c = 70*exp(-1.5*t) + 25*exp(-0.075*t)` with `c = 9`, Newton from `t = 10` (6th: `75*exp(-1.5*t) + 20*exp(-0.075*t)` with `c = 15`, from `t = 6`);
+  - catenary cable, Prob. 8.17: `w = 10`, `y0 = 5` (6th: `w = 12`, `y0 = 6`);
+  - elastic curve of a beam, Prob. 8.18 only: `L = 450` cm, `w0 = 1.75` kN/cm (6th: Prob. 5.20 and 8.18, `L = 600`, `w0 = 2.5`);
+  - damped oscillation, Prob. 8.19: `y = 8*exp(-k*t)*cos(omega*t)`, `k = 0.5`, `omega = 3`, `y = 4` (6th: factor 9, `k = 0.7`, `omega = 4`, `y = 3.5`);
+  - present worth, Prob. 8.22 only: `P = 20000`, `A = 4000` (6th: Prob. 5.21 and 8.22, `P = 25000`, `A = 5500`);
+  - oscillating current, Prob. 8.30: `i = 9*exp(-t)*sin(2*pi*t)`, its lowest root (6th: Prob. 8.29, `cos` for `sin`, every root);
+  - resistivity of doped silicon, Prob. 8.31: `mu0 = 1300`, `q = 1.6E-19`, `rho = 6E6` (6th: Prob. 8.30, `1350`, `1.7E-19`, `6.5E6`);
+  - thrown ball, Prob. 8.37: `x = 40` m, `y0 = 1.8` m (6th: Prob. 8.36, `x = 35`, `y0 = 2`);
+  - rocket, Prob. 8.39: `u = 2200`, `m0 = 160000`, `q = 2680`, `v = 1000` (6th: Prob. 8.38, `2000`, `150000`, `2700`, `750`);
+  - phase angle of a car's vibration, Prob. 8.40: `phi = omega/2 - 1` (6th: Prob. 8.39, `omega/3 - 1`).
+- **Functions new in the 7th** (5 rows): Prob. 5.15 (water discharged from a tank through a pipe), 6.14 (a quintic), 8.28 (§8.2's pH with a lake's alkalinity), 8.29 (§8.3's circuit with the inductance as unknown) and 8.48 (the settling velocity of a particle). Prob. 5.19, a floating sphere, is a new use of the spherical-tank row's function.
+- **Functions of the 6th that the 7th no longer has** (3):
+  - Prob. 5.12: `-2*x^6 - 1.6*x^4 + 12*x + 1`, its maximum on `[0, 1]` by bisection to `es = 5%`, a root of `f'(x)`; the 7th's Prob. 5.12 takes Prob. 6.12's function;
+  - Prob. 6.5: `-2 + 6*x - 4*x^2 + 0.5*x^3`, Newton from `x0 = 4.2` and from `x0 = 4.43`; the 7th's Prob. 6.5 takes Prob. 6.4's function;
+  - Prob. 8.28: §8.3's circuit with the capacitance `C` as unknown, `exp(-R*t/(2*L))*cos(sqrt(1/(L*C) - (R/(2*L))^2)*t) - q/q0` with `R = 280` ohm, `L = 7.5` H, `t = 0.05` s, `q/q0 = 0.01`; the 7th's Prob. 8.29 makes `L` the unknown.
+- **Problems that the rows leave out:** the 7th no longer has the 6th's Prob. 5.15 (the moment of a beam, read from a figure), and it adds Prob. 5.20.
+
+Other sources with the same function:
+- `log(x)` on `[0.5, 5]` (Ex. 6.7) is Suhadolnik (2012)'s example 1 (`2012_suhadolnik`), and is in Chen & Li (2006) (`2006_chen_li`), Ganchovski et al.'s f51 (`2026_ganchovski_et_al`) and roots-fortran's case 134 (`roots_fortran`).
+- `exp(-x) - x` is Bradie's 2.1-1(c) (`2006_bradie`), on `(0, 1)`, and Alhseno's 22 (`2026_alhseno`); `x = exp(-x)` is in Bradie (Ex. 2.6) and Epperson (3.1-5) (`2013_epperson`).
+- `x - cos(x)` is Badr's `P8` (`2021_badr`), Sabharwal's `T2.9` (`2019_sabharwal`) and Ellithy's 4 (`2026_ellithy`), all on `[0, 1]`.
+- `(x - 3)*(x - 1)*(x - 1)` (6.11) is Alhseno's 19, `(x - 1)^2*(x - 3)`.
+'''
+
+[[relations]]
+sources = ['2021_badr', 'roots_fortran', '2026_ellithy']
+text = '''
+Badr et al. (2021) (`2021_badr`) cite this edition for 2 of their 15 problems, both as this edition prints them:
+- **`P11`**, `x^10 - 1` on `[0, 1.3]`, is Ex. 5.6. roots-fortran's case 113 (`roots_fortran`) copies it from Badr, and Ellithy (2026)'s 12 (`2026_ellithy`) has it too.
+- **`P15`**, `sin(x) - x^2` on `[0.5, 1]`, is Prob. 5.5, `sin(x) = x^2` on the same interval. roots-fortran's case 117 copies it from Badr, and Ellithy's 6 has it too.
+'''
+
+[[relations]]
+sources = ['2006_bradie']
+text = '''
+Bradie (2006) (`2006_bradie`) has 4 of the book's applied equations, with other notation or constants:
+- **van der Waals:** Bradie writes it for `n` moles of chlorine; §8.1 writes it per mole (`v = V/n`), for carbon dioxide and oxygen, and Prob. 8.1 for ethyl alcohol.
+- **Redlich–Kwong** (Bradie 2.4-15): per mole, with `a = 0.42747*R^2*Tc^(5/2)/Pc`, `b = 0.08664*R*Tc/Pc` and `R = 0.08206`; Prob. 8.7 writes it per kg, with the factors `0.427` and `0.0866` and `R = 0.518` kJ/(kg K), for methane.
+- **Liquid in a horizontal cylinder** (Bradie 2.2-13): the same expression, with `r = 1` m, `L = 3` m, `V = 7` m^3; Prob. 8.8 has `r = 2`, `L = 5`, `V = 8`.
+- **Bradie's depth of submersion** (§2.2) is the spherical tank's cubic in `h`: it sets the spherical cap's volume `pi*h^2*(3*R - h)/3` equal to `(4/3)*pi*R^3*rho_o/rho_f`. Prob. 5.19 floats a sphere too, but its `h` is the height above water, so its cap is the part above water, of volume `(4/3)*pi*r^3*(1 - rho_s/rho_w)`.
+'''
+
+[[relations]]
+sources = ['2026_ellithy']
+text = '''
+Ellithy (2026) (`2026_ellithy`) holds 3 more of the book's functions, besides its 12 and 6, which it shares with Badr et al. (2021), and its 4, `x - cos(x)`:
+- its 43 is the only other Colebrook equation among the sources of this survey: it has `Re = 10^7` and `eps/D = 10^-4` on `[0.008, 0.03]`, and is the negative of (8.21); §8.4 has `Re = 13743` and `eps/D = 0.0003` on `[0.008, 0.08]`;
+- its 45 is §8.1's van der Waals equation for carbon dioxide at `p = 10` atm and `T = 300` K, with `R = 0.08206` where §8.1 has `0.082054`, on `[2, 3]`;
+- its 23 is Prob. 6.3's `-0.9*x^2 + 1.7*x + 2.5`, on `[2.8, 3.0]`; Prob. 6.3 gives no interval and starts from `x0 = 5`.
+'''
+
+[[rows]]
+key = '(PT2.1), (PT2.2); (7.7)'
+f = 'a*x^2 + b*x + c'
+name = 'quadratic'
+parameters = '`a`, `b`, `c` free'
+notes = "Roots by the quadratic formula (PT2.1). (7.7) is the same polynomial in `r`, `a2*r^2 + a1*r + a0`: the characteristic equation of the ODE (7.6), whose roots are the system's eigenvalues."
+
+[[rows]]
+key = '§PT2.1.1 (p. 117); Ex. 6.2–6.4, 6.6, 6.8; Fig. 6.2, 6.9; Prob. 6.27–6.29, 7.22–7.24'
+f = 'exp(-x) - x'
+notes = "Root `0.56714329`. §PT2.1.1 names it as a function without an analytical root. Ex. 6.2 plots `y1 = x` and `y2 = exp(-x)` and reads the root at their intersection (Fig. 6.2(b)). Newton from `x0 = 0` (Ex. 6.3, 6.4); secant from `x(-1) = 0`, `x0 = 1` (Ex. 6.6); modified secant from `x0 = 1` with `delta = 0.01` (Ex. 6.8). Fig. 6.9 compares the methods' errors on it; the problems repeat the examples with the reader's programs."
+
+[[rows]]
+key = '(PT2.3), (PT2.4); Ex. 5.1, 5.3–5.5; Fig. 5.1, 5.6, 5.7, 5.13; Prob. 5.14, 5.21, 5.23, 5.26, 7.20, 7.21'
+f = '(g*m/c)*(1 - exp(-(c/m)*t)) - v'
+name = "parachutist's velocity, unknown drag coefficient"
+parameters = '`g = 9.81` m/s^2, `m = 68.1` kg, `v = 40` m/s, `t = 10` s (Ex. 5.1); `m = 82`, `v = 36`, `t = 4` (Prob. 5.14)'
+interval = '`[12, 16]` (Ex. 5.3, 5.5); `[3, 5]` (Prob. 5.14)'
+notes = "Unknown `c`, the drag coefficient (kg/s) that gives a parachutist of mass `m` the velocity `v` after `t` seconds of free fall. Ex. 5.1 prints it with the values as (E5.1.1), `(668.06/c)*(1 - exp(-0.146843*c)) - 40`, and reads 14.75 off a plot; Ex. 5.3 gives the root `14.8011`. By bisection to `es = 0.5%` (Ex. 5.3, 5.4) and by false position (Ex. 5.5). Prob. 5.14 runs bisection to `es = 2%`; its interval holds the root, about 3.586. The other problems repeat Ex. 5.3–5.5 with the reader's programs; Prob. 5.26 stops by Eq. (5.5), with `Ea,d = 0.0001`."
+
+[[rows]]
+key = '(PT2.7)'
+f = '1 - 2.37*x + 7.5*x^2'
+notes = 'An example of an algebraic function; the book does not solve it. Its roots are complex.'
+
+[[rows]]
+key = '(PT2.8)'
+f = '5*x^2 - x^3 + 7*x^6'
+notes = 'As (PT2.7). Its only real root is 0, a double root.'
+
+[[rows]]
+key = '(PT2.9)'
+f = 'log(x^2) - 1'
+notes = 'An example of a transcendental function; the book does not solve it. Printed as `ln x^2 - 1`; roots `±exp(1/2)`.'
+
+[[rows]]
+key = '(PT2.10)'
+f = 'exp(-0.2*x)*sin(3*x - 0.5)'
+notes = 'As (PT2.9).'
+
+[[rows]]
+key = '§5.1 (p. 125)'
+f = '(x - 2)*(x - 2)*(x - 4)'
+notes = "Double root 2 and simple root 4: the book's example of a function tangent to the x axis, as Fig. 5.3(a) sketches."
+
+[[rows]]
+key = 'Ex. 5.2; Fig. 5.4'
+f = 'sin(10*x) + cos(3*x)'
+interval = '[0, 5]'
+notes = 'Several roots on the interval. Plots on narrower ranges (Fig. 5.4) show that the apparent double root near 4.2 is 2 distinct roots, at about 4.23 and 4.26.'
+
+[[rows]]
+key = 'Ex. 5.6, §5.3.2, Fig. 5.14; Ex. 6.5; Ex. 7.6; Prob. 5.22, 5.24, 5.25'
+f = 'x^10 - 1'
+interval = '`[0, 1.3]`; `[-1.3, 0]` (Ex. 7.6)'
+notes = "Roots 1 and -1. On `[0, 1.3]`, false position converges slowly and bisection beats it (Ex. 5.6); to `es = 0.01%`, bisection takes 14 iterations, false position 39 and modified false position 12 (§5.3.2). Newton from `x0 = 0.5` jumps to 51.65, then converges slowly (Ex. 6.5). MATLAB's `fzero` on both intervals, and from `x0 = 0`, where it finds -1 (Ex. 7.6, whose statement names the interval `[0, 4]`). The problems repeat Ex. 5.6 with the reader's programs."
+
+[[rows]]
+key = '§6.1 (p. 146)'
+f = 'x^2 - 2*x + 3'
+notes = "The book's example of rearranging `f(x) = 0` into `x = g(x)`. It has no real root."
+
+[[rows]]
+key = '§6.1 (p. 146)'
+f = 'x = (x^2 + 3)/2'
+notes = 'The fixed-point form of `x^2 - 2*x + 3`; not iterated.'
+
+[[rows]]
+key = '§6.1 (p. 146)'
+f = 'sin(x)'
+notes = 'Rearranged into `x = sin(x) + x` by adding `x` to both sides.'
+
+[[rows]]
+key = '§6.1 (p. 146)'
+f = 'x = sin(x) + x'
+notes = 'The fixed-point form of `sin(x)`; not iterated.'
+
+[[rows]]
+key = 'Ex. 6.1'
+f = 'x = exp(-x)'
+notes = 'Fixed-point iteration from `x0 = 0`: 10 iterations reach 0.564879, converging linearly to `0.56714329`.'
+
+[[rows]]
+key = 'Ex. 6.7; Fig. 6.8'
+f = 'log(x)'
+interval = '[0.5, 5.0]'
+notes = 'Root 1. False position converges (1.8546, 1.2163, 1.0585, ...); the secant method from `x(i-1) = 0.5`, `x(i) = 5.0` diverges: its 2nd iterate is -0.10438.'
+
+[[rows]]
+key = 'Ex. 6.9; Fig. 6.11'
+f = 'x^2 - 4*x + 5'
+notes = 'The parabola through the points `(1, 2)`, `(2, 1)` and `(4, 5)`; its roots are complex, `2 ± i`. Inverse quadratic interpolation through the same points gives the estimate 4.'
+
+[[rows]]
+key = '(6.11), Fig. 6.13(a); Ex. 6.10'
+f = '(x - 3)*(x - 1)*(x - 1)'
+notes = 'Printed also as `x^3 - 5*x^2 + 7*x - 3`: double root 1 and simple root 3. From `x0 = 0`, Newton converges linearly to 1 and the modified Newton method (6.16) quadratically; from `x0 = 4`, both converge to 3, the standard method faster.'
+
+[[rows]]
+key = '§6.5 (p. 166), Fig. 6.13(b)'
+f = '(x - 3)*(x - 1)*(x - 1)*(x - 1)'
+notes = 'Printed also as `x^4 - 6*x^3 + 12*x^2 - 10*x + 3`: triple root 1 and simple root 3.'
+
+[[rows]]
+key = '(7.14), (7.15); (7.28)'
+f = '-120 - 46*x + 79*x^2 - 3*x^3 - 7*x^4 + x^5'
+notes = 'Printed also as `(x + 1)*(x - 4)*(x - 5)*(x + 3)*(x - 2)`: roots -1, 4, 5, -3 and 2. Dividing by `x + 3` leaves `-40 - 2*x + 27*x^2 - 10*x^3 + x^4` (7.16), with remainder 0; §7.5 divides by `x + 6`, which leaves a remainder.'
+
+[[rows]]
+key = 'Ex. 7.1'
+f = 'x^2 + 2*x - 24'
+notes = 'Printed also as `(x - 4)*(x + 6)`. Synthetic division by `x - 4` gives the quotient `x + 6` with remainder 0.'
+
+[[rows]]
+key = 'Ex. 7.2; Prob. 7.6'
+f = 'x^3 - 13*x - 12'
+notes = "Roots -3, -1 and 4. Müller's method from `x0 = 4.5`, `x1 = 5.5`, `x2 = 5` converges to 4 in 4 iterations."
+
+[[rows]]
+key = 'Ex. 7.3, 7.7; Prob. 7.8'
+f = 'x^5 - 3.5*x^4 + 2.75*x^3 + 2.125*x^2 - 3.875*x + 1.25'
+notes = "Roots 0.5, -1, 2 and `1 ± 0.5i`. Bairstow's method from `r = s = -1` to `es = 1%` finds the quadratic factor with roots 0.5 and -1, then runs on the quotient `x^3 - 4*x^2 + 5.25*x - 2.5` (Ex. 7.3, which prints the complex pair as `1 ± 0.499i`). Ex. 7.7 finds all roots with MATLAB's `roots`, and divides by `x^2 + 0.5*x - 0.5` with `deconv`."
+
+[[rows]]
+key = '§7.7.1, Fig. 7.6; Ex. 7.4; §7.7.3, Fig. 7.7'
+f = 'x - cos(x)'
+notes = "Root 0.739085. Excel: trial and error after a plot on `[0, 2]` (Fig. 7.6), and Goal Seek (Ex. 7.4); Mathcad's `root` from `x = 1`, with a plot on `[-10, 10]` (Fig. 7.7)."
+
+[[rows]]
+key = 'Fig. 7.8'
+f = 'x^3 - 10*x + 2'
+notes = "Roots -3.257897, 0.20081 and 3.057087, by Mathcad's `polyroots`; plotted on `[-4, 4]`."
+
+[[rows]]
+key = '§8.1, (8.3), Table 8.1; Prob. 8.1'
+f = '(p + a/v^2)*(v - b) - R*T'
+name = 'van der Waals equation'
+parameters = '`R = 0.082054` L atm/(mol K); carbon dioxide `a = 3.592`, `b = 0.04267`; oxygen `a = 1.360`, `b = 0.03183`; `p = 1, 10, 100` atm and `T = 300, 500, 700` K (§8.1); ethyl alcohol `a = 12.02`, `b = 0.08407`, `T = 375` K, `p = 2.0` atm (Prob. 8.1)'
+notes = 'Unknown `v`, the molal volume (L/mol) of a gas; the book prints the derivative (8.4). Newton from the ideal-gas volume `R*T/p`: for carbon dioxide at 300 K and 1 atm, from 24.6162 to 24.5126 in 2 iterations; Table 8.1 lists the 18 results.'
+
+[[rows]]
+key = '§8.2, (8.14)'
+f = 'K1/(10^6*H)*KH*pCO2 + 2*K2*K1/(10^6*H^2)*KH*pCO2 + Kw/H - H'
+name = 'pH of rainwater'
+parameters = '`KH = 10^-1.46`, `K1 = 10^-6.3`, `K2 = 10^-10.3`, `Kw = 10^-14`; `pCO2 = 315` ppm (1958), `375` ppm (2003)'
+interval = '`[2, 12]` in pH'
+notes = 'Unknown `H`, the hydrogen-ion concentration `[H+]`, which gives the pH `-log10(H)` of rainwater; the book derives (8.14) from 5 equilibrium equations, and calls it a cubic in `[H+]`. Bisection on the pH: 11 iterations, for an absolute error of 0.005, give 5.6279 for 1958, and 35 give 5.6304; 2003 gives 5.59.'
+
+[[rows]]
+key = '§8.3, (8.19), (8.20), Fig. 8.4'
+f = 'exp(-R*t/(2*L))*cos(sqrt(1/(L*C) - (R/(2*L))^2)*t) - q/q0'
+name = 'charge on the capacitor of an RLC circuit, unknown resistance'
+parameters = '`L = 5` H, `C = 10^-4` F, `t = 0.05` s, `q/q0 = 0.01`'
+interval = '[0, 400]'
+notes = "Unknown `R`, the resistance (ohm) at which the capacitor's charge decays to 1% of its initial value in 0.05 s. Printed with the values as (8.20), `exp(-0.005*R)*cos(sqrt(2000 - 0.01*R^2)*0.05) - 0.01`, which needs `2000 - 0.01*R^2 > 0`. 21 bisection iterations give `R = 328.1515`."
+
+[[rows]]
+key = '§8.4, (8.21), Fig. 8.5; Prob. 8.13'
+f = '1/sqrt(f) + 2.0*log10(eps/(3.7*D) + 2.51/(Re*sqrt(f)))'
+name = 'Colebrook equation'
+parameters = '`Re = rho*V*D/mu`; `rho = 1.23` kg/m^3, `mu = 1.79E-5` N s/m^2, `D = 0.005` m, `V = 40` m/s, `eps = 0.0015` mm, so `Re = 13743` (§8.4, Prob. 8.13(a)); `eps = 0.045` mm (Prob. 8.13(b))'
+interval = '[0.008, 0.08]'
+notes = "Unknown `f`, the friction factor of turbulent flow in a pipe of roughness `eps` and diameter `D`. The book prints `log`, a base-10 log as its MATLAB code shows; Prob. 8.13 prints `1/sqrt(f) = -2.0*log(...)`. Root `0.0289678`. Bisection takes 22 iterations and false position 26. Newton converges from 0.008 in 6 iterations, diverges from 0.08 (it converges only from below about 0.066), and converges in 3 from the Swamee–Jain estimate (8.22), 0.029031. MATLAB's `fzero` fails from 0.008, where it meets a complex value, and works from above about 0.016. Prob. 8.13 suggests the Blasius estimate `0.316/Re^0.25` as the initial guess."
+
+[[rows]]
+key = '§8.4, (8.23), Fig. 8.6'
+f = 'f = 0.25/(log10(eps/(3.7*D) + 2.51/(Re*sqrt(f))))^2'
+name = 'Colebrook equation, fixed-point form'
+parameters = "as in §8.4's Colebrook row"
+interval = '[0.008, 0.08]'
+notes = '(8.21) solved for its first `f`; the book prints `log`, base 10. Fixed-point iteration from any guess in the interval reaches an error below 0.008% in 6 or fewer iterations.'
+
+[[rows]]
+key = 'Prob. 5.1'
+f = '-0.5*x^2 + 2.5*x + 4.5'
+interval = '[5, 10]'
+notes = 'The real roots, graphically and by the quadratic formula; 3 bisection iterations for the highest root.'
+
+[[rows]]
+key = 'Prob. 5.2'
+f = '5*x^3 - 5*x^2 + 6*x - 2'
+interval = '[0, 1]'
+notes = 'The real root, graphically and by bisection to `es = 10%`.'
+
+[[rows]]
+key = 'Prob. 5.3'
+f = '-25 + 82*x - 90*x^2 + 44*x^3 - 8*x^4 + 0.7*x^5'
+interval = '[0.5, 1.0]'
+notes = 'The real root, graphically, by bisection to `es = 10%` and by false position to `es = 0.2%`.'
+
+[[rows]]
+key = 'Prob. 5.4'
+f = '-12 - 21*x + 18*x^2 - 2.75*x^3'
+interval = '[-1, 0]'
+notes = 'The roots graphically; the first root by bisection and false position to `es = 1%`.'
+
+[[rows]]
+key = 'Prob. 5.5'
+f = 'sin(x) = x^2'
+interval = '[0.5, 1]'
+notes = 'The first nontrivial root, graphically and by bisection to `es = 2%`.'
+
+[[rows]]
+key = 'Prob. 5.6'
+f = 'log(x^2) = 0.7'
+interval = '[0.5, 2]'
+notes = 'The positive real root: graphically, and by 3 iterations each of bisection and false position.'
+
+[[rows]]
+key = 'Prob. 5.7'
+f = '(0.8 - 0.3*x)/x'
+interval = '[1, 3]'
+notes = 'Root 8/3: analytically, graphically, and by 3 false-position iterations; the problem asks whether the result has a problem.'
+
+[[rows]]
+key = 'Prob. 5.8'
+f = 'x^2 - 18'
+interval = '[4, 5]'
+notes = 'The problem asks for the positive square root of 18 by false position to `es = 0.5%`; it prints no function.'
+
+[[rows]]
+key = 'Prob. 5.9'
+f = 'x^2*abs(cos(sqrt(x))) = 5'
+notes = 'The smallest positive root, by false position to `es = 1%`, after a plot on `[0, 5]`.'
+
+[[rows]]
+key = 'Prob. 5.10'
+f = 'x^4 - 8*x^3 - 35*x^2 + 450*x - 1001'
+interval = '[4.5, 6]'
+notes = 'Positive real root 5.60979, as the book states; 5 false-position iterations, a plot to explain the result, then false position to `es = 1.0%`.'
+
+[[rows]]
+key = 'Prob. 5.11, 6.8, 7.10'
+f = 'x^3.5 = 80'
+interval = '`[2.0, 5.0]` (5.11)'
+notes = 'Analytically and by false position to `es = 2.5%` (5.11); modified secant from `x0 = 3.5` with `delta = 0.01` to `es = 0.1%` (6.8); Excel, MATLAB or Mathcad (7.10).'
+
+[[rows]]
+key = 'Prob. 5.12, 6.12'
+f = '-2*x^6 - 1.5*x^4 + 10*x + 2'
+interval = '[0, 1]'
+notes = "The maximum, a root of `f'(x)`: by bisection to `es = 5%` (5.12); by a method of the reader's choice to `es = 5%` (6.12), with the interval for a bracketing method, `x(i) = 1` for Newton or modified secant, `x(i-1) = 0`, `x(i) = 1` for secant."
+
+[[rows]]
+key = 'Prob. 5.13, 7.11'
+f = '(g*m/c)*(1 - exp(-(c/m)*t)) - v'
+name = "parachutist's velocity, unknown mass"
+parameters = '`g = 9.81` m/s^2 and `c = 15` kg/s in both; `v = 36` m/s, `t = 10` s (5.13); `v = 35`, `t = 8` (7.11)'
+notes = 'Unknown `m`, the mass (kg), in the equation of the row of (PT2.4); the problems print it as `v = (g*m/c)*(1 - exp(-(c/m)*t))`. False position to `es = 0.1%` (5.13); Excel, MATLAB or Mathcad (7.11).'
+
+[[rows]]
+key = 'Prob. 5.15'
+f = 'v = sqrt(2*g*H)*tanh(sqrt(2*g*H)/(2*L)*t)'
+name = 'velocity of water discharged from a tank through a long pipe'
+parameters = '`g = 9.81` m/s^2, `L = 4` m, `t = 2.5` s, `v = 5` m/s'
+interval = '[0, 2]'
+notes = "Unknown `H`, the initial head (m) of the cylindrical tank of Fig. P5.15; `L` is the pipe's length and `t` the elapsed time. Graphically, and by bisection and false position to `es = 1%`."
+
+[[rows]]
+key = 'Prob. 5.16'
+f = '1 - Q^2/(g*Ac^3)*B'
+name = 'critical depth of a trapezoidal channel'
+parameters = '`Q = 20` m^3/s, `g = 9.81` m/s^2, `B = 3 + y`, `Ac = 3*y + y^2/2`'
+interval = '[0.5, 2.5]'
+notes = 'Unknown `y`, the critical depth (m); `B` is the width at the surface and `Ac` the cross-sectional area. Graphically, and by bisection and false position to `es = 1%` or at most 10 iterations.'
+
+[[rows]]
+key = 'Prob. 5.17, 5.19, 6.19, 8.9'
+f = 'V = pi*h^2*(3*R - h)/3'
+name = 'volume of water in a spherical tank; part of a floating sphere above water'
+parameters = '`R = 3` m, `V = 30` m^3 (5.17, 6.19); `R = 1` m, `V = 0.5` m^3 (8.9, which writes `r`); `r = 1` m, `V = (4/3)*pi*r^3*(1 - rho_s/rho_w)`, `rho_s = 200`, `rho_w = 1000` kg/m^3 (5.19)'
+interval = '`[0, 3]` (5.17)'
+notes = "Unknown `h`, the depth of water in a spherical tank of radius `R`: 3 false-position iterations on `[0, R]` (5.17); 3 Newton iterations from `h0 = R`, which the book says always converges (6.19). In Prob. 5.19, `h` is the height above water of a floating sphere of density `rho_s`, by bisection; the problem prints the volume of that cap and states Archimedes' principle, from which its `V` follows, though the book does not print that value. Prob. 8.10 gives 2 fixed-point forms."
+
+[[rows]]
+key = 'Prob. 5.18'
+f = 'log(osf) = -139.34411 + 1.575701E5/Ta - 6.642308E7/Ta^2 + 1.243800E10/Ta^3 - 8.621949E11/Ta^4'
+name = 'saturation concentration of dissolved oxygen'
+parameters = '`Ta = T + 273.15`; `osf = 8, 10, 12` mg/L'
+interval = '[0, 40]'
+also_in = 'APHA (1992), Standard Methods for the Examination of Water and Wastewater, 18th ed., which the book cites'
+notes = 'Unknown `T`, the temperature (°C) of freshwater at 1 atm whose saturation concentration of dissolved oxygen is `osf`. Bisection to an absolute error of 0.05 °C; the problem first asks how many iterations that takes. The book prints `ln`.'
+
+[[rows]]
+key = 'Prob. 6.1'
+f = 'sin(sqrt(x)) - x'
+notes = 'Fixed-point iteration from `x0 = 0.5` to `es <= 0.01%`, which converges linearly; the problem prints no iteration function.'
+
+[[rows]]
+key = 'Prob. 6.2'
+f = '2*x^3 - 11.7*x^2 + 17.7*x - 5'
+notes = 'The highest real root: graphically, and by 3 iterations each of fixed-point iteration and Newton from `x0 = 3`, the secant method from `x(-1) = 3`, `x0 = 4`, and the modified secant method from `x0 = 3` with `delta = 0.01`.'
+
+[[rows]]
+key = 'Prob. 6.3'
+f = '-0.9*x^2 + 1.7*x + 2.5'
+notes = 'A root, by fixed-point iteration and Newton from `x0 = 5` to `es = 0.01%`.'
+
+[[rows]]
+key = 'Prob. 6.4, 6.5'
+f = '-1 + 5.5*x - 4*x^2 + 0.5*x^3'
+notes = "The real roots, graphically and by Newton to `es = 0.01%` (6.4); a real root by Newton from `x0 = 4.52` and from `x0 = 4.54`, with the peculiarities explained graphically and analytically (6.5). The 2 starting points lie on either side of the local minimum near 4.523, where `f'(x) = 0`; the book does not say so."
+
+[[rows]]
+key = 'Prob. 6.6, 6.30'
+f = '-12 - 21*x + 18*x^2 - 2.4*x^3'
+notes = "The lowest real root: graphically and by the secant method to 3 significant figures (6.6); with the reader's program of Brent's method (6.30)."
+
+[[rows]]
+key = 'Prob. 6.7'
+f = 'sin(x) + cos(1 + x^2) - 1'
+notes = 'The first positive root: 4 secant iterations from `(x(i-1), x(i)) = (1.0, 3.0)`, `(1.5, 2.5)` and `(1.5, 2.25)`, and a plot to explain the results.'
+
+[[rows]]
+key = 'Prob. 6.9'
+f = 'x^3 - 6*x^2 + 11*x - 6.1'
+notes = "The highest real root: graphically, and by 3 iterations each of Newton from `x(i) = 3.5`, the secant method from 2.5 and `x(i) = 3.5`, and the modified secant method from `x(i) = 3.5` with `delta = 0.01`. The secant method's starting point 2.5 is printed as `x(i+1)`."
+
+[[rows]]
+key = 'Prob. 6.10'
+f = '7*sin(x)*exp(-x) - 1'
+notes = 'The lowest positive root: graphically, by 3 Newton iterations from `x(i) = 0.3`, 5 secant iterations from `x(i-1) = 0.5`, `x(i) = 0.4`, and 3 modified secant iterations from `x(i) = 0.3` with `delta = 0.01`.'
+
+[[rows]]
+key = 'Prob. 6.11'
+f = 'exp(-0.5*x)*(4 - x) - 2'
+notes = 'Newton from `x0 = 2`, 6 and 8; the problem asks to explain the results.'
+
+[[rows]]
+key = 'Prob. 6.13'
+f = 'exp(0.5*x) = 5 - 5*x'
+interval = '[0, 2]'
+notes = "The root, by a method of the reader's choice to `es = 2%`: the interval for a bracketing method, `x(i) = 0.7` for Newton or modified secant, `x(i-1) = 0`, `x(i) = 2` for secant. The book states that from positive initial guesses every method except fixed-point iteration converges."
+
+[[rows]]
+key = 'Prob. 6.14'
+f = 'x^5 - 16.05*x^4 + 88.75*x^3 - 192.0375*x^2 + 116.35*x + 31.6875'
+notes = 'A root by Newton and by the modified secant method with `delta = 0.05`, both from `x = 0.5825` to `es = 0.01%`; the problem asks to explain the results. It equals `(x + 0.2)*(x - 1.5)*(x - 3.25)*(x - 5)*(x - 6.5)`, which the book does not print.'
+
+[[rows]]
+key = 'Prob. 6.15'
+f = 'x = (x + a/x)/2'
+name = 'divide and average'
+parameters = '`a > 0` free'
+notes = 'The old method for `sqrt(a)`; the problem asks to prove that it is the Newton-Raphson algorithm.'
+
+[[rows]]
+key = 'Prob. 6.16'
+f = 'tanh(x^2 - 9)'
+notes = 'Root 3, as the book states. Newton from `x0 = 3.2`, at least 4 iterations, and a sketch of whether it converges.'
+
+[[rows]]
+key = 'Prob. 6.17'
+f = '0.0074*x^4 - 0.284*x^3 + 3.355*x^2 - 12.183*x + 5'
+interval = '[15, 20]'
+notes = 'A real root between 15 and 20, as the book states; Newton from `x0 = 16.15`, and an explanation of the result.'
+
+[[rows]]
+key = 'Prob. 6.18'
+f = '(x + 1)^2 + (y - 2)^2 = 16'
+name = 'circle function'
+notes = 'The positive real root, where the circle crosses `y = 0`: the secant method on `y` as a function of `x`, from `x(i) = 3`, `x(i-1) = 0.5`, approaching from the 1st and the 4th quadrant, where `y` takes the negative square root. The problem asks why the solution diverges.'
+
+[[rows]]
+key = 'Prob. 6.20, 8.20'
+f = 'Q = sqrt(S)*(B*H)^(5/3)/(n*(B + 2*H)^(2/3))'
+name = 'Manning equation'
+parameters = '`Q = 5` m^3/s, `S = 0.0002`, `B = 20`, `n = 0.03`'
+notes = 'Unknown `H`, the depth (m) of a rectangular open channel of width `B`, slope `S` and roughness coefficient `n`. The problems ask for a fixed-point iteration scheme and a proof that it converges for all initial guesses of at least 0.'
+
+[[rows]]
+key = 'Prob. 6.21'
+f = 'x^3 - 2*x^2 - 4*x + 8'
+notes = 'Double root 2, as the book states. Newton (6.6) and the modified Newton methods (6.12) and (6.16) from `x0 = 1.2`, comparing their rates of convergence.'
+
+[[rows]]
+key = 'Prob. 6.25'
+f = 'W - Q*c - k*V*sqrt(c)'
+name = 'steady-state concentration of a pollutant in a lake'
+parameters = '`V = 1E6` m^3, `Q = 1E5` m^3/yr, `W = 1E6` g/yr, `k = 0.25` m^0.5/g^0.5/yr'
+notes = 'Unknown `c` (g/m^3). The book prints the mass balance `V*dc/dt = W - Q*c - k*V*sqrt(c)` of a well-mixed lake, whose right side is 0 at steady state. 3 modified secant iterations from `c = 4` with `delta = 0.5`.'
+
+[[rows]]
+key = 'Prob. 6.26'
+f = 'c = ((W - Q*c)/(k*V))^2'
+name = 'steady-state concentration of a pollutant in a lake, fixed-point form'
+parameters = 'as in Prob. 6.25'
+notes = "1 of 2 fixed-point forms of Prob. 6.25's equation. The problem states that only 1 of them converges for initial guesses `2 < c < 6`, and asks which, and why it always does."
+
+[[rows]]
+key = 'Prob. 6.26'
+f = 'c = (W - k*V*sqrt(c))/Q'
+name = 'steady-state concentration of a pollutant in a lake, fixed-point form'
+parameters = 'as in Prob. 6.25'
+notes = 'The other fixed-point form of Prob. 6.26.'
+
+[[rows]]
+key = 'Prob. 7.1'
+f = 'x^4 - 7.5*x^3 + 14.5*x^2 + 3*x - 20'
+notes = 'Division by `x - 2`, and whether 2 is a root: it is. Its other roots are -1, 2.5 and 4.'
+
+[[rows]]
+key = 'Prob. 7.2'
+f = 'x^5 - 5*x^4 + x^3 - 6*x^2 - 7*x + 10'
+notes = 'Division by `x - 2`, which is not a factor.'
+
+[[rows]]
+key = 'Prob. 7.3(a)'
+f = 'x^3 + x^2 - 4*x - 4'
+notes = "The positive real root, by Müller's method. Roots -2, -1 and 2."
+
+[[rows]]
+key = 'Prob. 7.3(b)'
+f = 'x^3 - 0.5*x^2 + 4*x - 2'
+notes = 'As 7.3(a). Real root 0.5 and complex roots `±2i`.'
+
+[[rows]]
+key = 'Prob. 7.4(a), 7.7'
+f = 'x^3 - x^2 + 2*x - 2'
+notes = "The real and complex roots by Müller's method or MATLAB (7.4); the real roots with the reader's Müller program, from starting guesses read off a graph (7.7). Roots 1 and `±sqrt(2)*i`."
+
+[[rows]]
+key = 'Prob. 7.4(b)'
+f = '2*x^4 + 6*x^2 + 8'
+notes = 'As 7.4(a). All roots are complex.'
+
+[[rows]]
+key = 'Prob. 7.4(c), 7.5(c), 7.9, 7.15'
+f = 'x^4 - 2*x^3 + 6*x^2 - 2*x + 5'
+notes = "Müller's method or MATLAB (7.4), Bairstow's method (7.5, 7.9), MATLAB or Mathcad (7.15). All roots are complex: `±i` and `1 ± 2i`."
+
+[[rows]]
+key = 'Prob. 7.5(a), 7.9, 7.15'
+f = '-2 + 6.2*x - 4*x^2 + 0.7*x^3'
+notes = "All roots, by Bairstow's method (7.5, 7.9) and by MATLAB or Mathcad (7.15)."
+
+[[rows]]
+key = 'Prob. 7.5(b), 7.9, 7.15'
+f = '9.34 - 21.97*x + 16.3*x^2 - 3.704*x^3'
+notes = 'As 7.5(a).'
+
+[[rows]]
+key = 'Prob. 7.14'
+f = '(x + 2)*(x + 5)*(x - 6)*(x - 4)*(x - 8)'
+notes = "Roots -2, -5, 6, 4 and 8. All roots with MATLAB's `poly` and `roots`, as in Ex. 7.7, or with another software package."
+
+[[rows]]
+key = 'Prob. 7.17'
+f = 'x^3 + 3.5*x^2 - 40'
+name = 'acidity of magnesium hydroxide in hydrochloric acid'
+notes = 'Printed as `A(x)`. Unknown `x`, the hydronium ion concentration of a saturated solution, where the acidity `A(x)` is 0; by 2 methods in MATLAB, such as a graph and `roots`.'
+
+[[rows]]
+key = 'Prob. 7.19, numerator'
+f = 's^3 + 9*s^2 + 26*s + 24'
+name = 'transfer function of a robotic positioning system'
+notes = 'The numerator `C(s)` of `G(s) = C(s)/N(s)`. The problem asks for the roots of numerator and denominator, to factor `G(s)` as `(s + a1)*(s + a2)*(s + a3)/((s + b1)*(s + b2)*(s + b3)*(s + b4))`. Roots -2, -3 and -4.'
+
+[[rows]]
+key = 'Prob. 7.19, denominator'
+f = 's^4 + 15*s^3 + 77*s^2 + 153*s + 90'
+name = 'transfer function of a robotic positioning system'
+notes = 'The denominator `N(s)`; as the numerator row. Roots -1, -3, -5 and -6, so it shares the root -3 with the numerator.'
+
+[[rows]]
+key = 'Prob. 8.2'
+f = 'log((1 + R*(1 - XAf))/(R*(1 - XAf))) = (R + 1)/(R*(1 + R*(1 - XAf)))'
+name = 'optimal recycle rate of a plug flow reactor'
+parameters = 'XAf = 0.9'
+notes = 'Unknown `R`, the recycle ratio that minimizes the size of a plug flow reactor with an autocatalytic reaction, for the converted fraction `XAf`. The book prints `ln`.'
+
+[[rows]]
+key = 'Prob. 8.3'
+f = 'K = x/(1 - x)*sqrt(2*pt/(2 + x))'
+name = 'dissociation of water vapor'
+parameters = '`pt = 3` atm, `K = 0.05`'
+notes = '(P8.3.1). Unknown `x`, the mole fraction of water vapor that dissociates into hydrogen and oxygen at total pressure `pt`.'
+
+[[rows]]
+key = 'Prob. 8.4'
+f = 'c = cin*(1 - exp(-0.04*t)) + c0*exp(-0.04*t)'
+name = 'concentration in a completely mixed reactor'
+parameters = '`c0 = 4`, `cin = 10`, `c = 0.93*cin`'
+notes = 'Unknown `t`, the time for the concentration to reach 93% of the inflow concentration.'
+
+[[rows]]
+key = 'Prob. 8.5'
+f = 'K = (cc0 + x)/((ca0 - 2*x)^2*(cb0 - x))'
+name = 'chemical equilibrium'
+parameters = '`K = 0.015`, `ca0 = 42`, `cb0 = 30`, `cc0 = 4`'
+interval = '[0, 20]'
+notes = 'Unknown `x`, the moles of C produced by the reversible reaction `2A + B = C`; `ca0`, `cb0` and `cc0` are the initial concentrations. Graphically, then by bisection or false position to `es = 0.5%`.'
+
+[[rows]]
+key = 'Prob. 8.7'
+f = 'p = R*T/(v - b) - a/(v*(v + b)*sqrt(T))'
+name = 'Redlich–Kwong equation of state'
+parameters = '`a = 0.427*R^2*Tc^2.5/pc`, `b = 0.0866*R*Tc/pc`; `R = 0.518` kJ/(kg K); methane `pc = 4600` kPa, `Tc = 191` K; `T = -40` °C, `p = 65000` kPa'
+notes = 'Unknown `v`, the volume (m^3/kg) of a kg of methane, which gives the mass of methane in a 3 m^3 tank.'
+
+[[rows]]
+key = 'Prob. 8.8'
+f = 'V = (r^2*arccos((r - h)/r) - (r - h)*sqrt(2*r*h - h^2))*L'
+name = 'volume of liquid in a horizontal cylinder'
+parameters = '`r = 2` m, `L = 5` m, `V = 8` m^3'
+notes = 'Unknown `h`, the depth of the liquid. The book gives `arccos(x) = pi/2 - arctan(x/sqrt(1 - x^2))` for software without an arc cosine.'
+
+[[rows]]
+key = 'Prob. 8.10'
+f = 'h = sqrt((h^3 + 3*V/pi)/(3*r))'
+name = 'volume of water in a spherical tank, fixed-point form'
+parameters = '`r = 1` m, `V = 0.5` m^3'
+notes = '1 of 2 fixed-point forms of the spherical-tank equation (Prob. 8.9). The problem asks whether each form is stable, and for which initial guesses.'
+
+[[rows]]
+key = 'Prob. 8.10'
+f = 'h = (3*(r*h^2 - V/pi))^(1/3)'
+name = 'volume of water in a spherical tank, fixed-point form'
+parameters = '`r = 1` m, `V = 0.5` m^3'
+notes = 'The other fixed-point form of Prob. 8.10, printed as a cube root.'
+
+[[rows]]
+key = 'Prob. 8.11'
+f = 'V/F = -int_Cin^Cout (K/(kmax*C) + 1/kmax) dC'
+name = 'enzymatic plug flow reactor'
+parameters = '`V = 100` L, `F = 80` L/s, `Cin = 0.2` M, `kmax = 1E-2` 1/s, `K = 0.1` M'
+notes = 'Unknown `Cout`, the outlet concentration of a constant-density reactor. The integral is `(K/kmax)*log(Cin/Cout) + (Cin - Cout)/kmax`.'
+
+[[rows]]
+key = 'Prob. 8.12'
+f = '(dP*rho/G0^2)*(Dp/L)*(eps^3/(1 - eps)) = 150*(1 - eps)/(Dp*G0/mu) + 1.75'
+name = 'Ergun equation'
+parameters = '`Dp*G0/mu = 1000`, `dP*rho*Dp/(G0^2*L) = 10`'
+notes = 'Unknown `eps`, the void fraction of a packed bed; `dP` is the pressure drop, `G0` the mass velocity and `Dp` the particle diameter.'
+
+[[rows]]
+key = 'Prob. 8.14'
+f = 'P/A = sigma_m/(1 + (e*c/k^2)*sec(0.5*sqrt(P/(E*A))*(L/k)))'
+name = 'secant formula for a column'
+parameters = '`E = 200000` MPa, `e*c/k^2 = 0.2`, `sigma_m = 250` MPa, `L/k = 100`'
+notes = 'Unknown `P/A`, the force per unit area that causes the maximum stress `sigma_m` in a steel beam of slenderness ratio `L/k`; `e*c/k^2` is the eccentricity ratio, and `sec(x) = 1/cos(x)`.'
+
+[[rows]]
+key = 'Prob. 8.15'
+f = 'c = 10 - 20*(exp(-0.2*x) - exp(-0.75*x))'
+name = 'oxygen level downstream of a sewage discharge'
+parameters = '`c = 5` mg/L (a)'
+notes = "Unknown `x`, the distance (km) downstream: (a) where `c` first falls to 5, to 1% error, which the book's hint places within 2 km; (b) where `c` is minimal, a root of `dc/dx`."
+
+[[rows]]
+key = 'Prob. 8.16'
+f = 'c = 70*exp(-1.5*t) + 25*exp(-0.075*t)'
+name = 'bacteria concentration in a lake'
+parameters = 'c = 9'
+notes = 'Unknown `t`, when the concentration falls to 9: graphically, and by Newton from `t = 10` to `es = 0.5%`.'
+
+[[rows]]
+key = 'Prob. 8.17'
+f = 'y = (TA/w)*cosh((w/TA)*x) + y0 - TA/w'
+name = 'catenary cable'
+parameters = '`w = 10`, `y0 = 5`; `y = 15` at `x = 50`'
+notes = 'Unknown `TA`, the tension at the end A, the lowest point of the section of Fig. P8.17, of a cable that hangs under its own weight `w` per unit length; the book gives `cosh(x) = (exp(x) + exp(-x))/2`.'
+
+[[rows]]
+key = 'Prob. 8.18'
+f = 'y = (w0/(120*E*I*L))*(-x^5 + 2*L^2*x^3 - L^4*x)'
+name = 'elastic curve of a beam'
+parameters = '`L = 450` cm, `E = 50000` kN/cm^2, `I = 30000` cm^4, `w0 = 1.75` kN/cm'
+notes = '(P8.18.1), the deflection of a uniform beam under a linearly increasing load. The point of maximum deflection by bisection, a root of `dy/dx`, then the deflection there.'
+
+[[rows]]
+key = 'Prob. 8.19'
+f = 'y = 8*exp(-k*t)*cos(omega*t)'
+name = 'damped oscillation of a structure'
+parameters = '`k = 0.5`, `omega = 3`, `y = 4`'
+notes = 'Unknown `t`, when the displacement decreases to 4: graphically, then by Newton and secant to `es = 0.01%`.'
+
+[[rows]]
+key = 'Prob. 8.21'
+f = 'h = h0*(sin(2*pi*x/lambda)*cos(2*pi*t*v/lambda) + exp(-x))'
+name = 'reflected standing wave in a harbor'
+parameters = '`lambda = 16`, `t = 12`, `v = 48`, `h = 0.4*h0`'
+notes = 'Unknown `x`, its lowest positive value.'
+
+[[rows]]
+key = 'Prob. 8.22'
+f = 'A = P*i*(1 + i)^n/((1 + i)^n - 1)'
+name = 'present worth and annual payments'
+parameters = '`P = 20000`, `A = 4000`, `n = 6`'
+notes = 'Unknown `i`, the interest rate on equipment of $20,000 bought for nothing down and 6 annual payments of $4,000.'
+
+[[rows]]
+key = 'Prob. 8.23'
+f = 'Ps_max/(1 + (Ps_max/P0 - 1)*exp(-ks*t)) = 1.2*(Pu_max*exp(-ku*t) + Pu_min)'
+name = 'urban and suburban populations'
+parameters = '`Pu_max = 75000`, `ku = 0.045`/yr, `Pu_min = 100000`, `Ps_max = 300000`, `P0 = 10000`, `ks = 0.08`/yr'
+notes = 'Unknown `t` (yr), when the suburban population `Ps(t)` is 20% larger than the urban population `Pu(t)`. The book prints `Pu(t) = Pu_max*exp(-ku*t) + Pu_min` and `Ps(t) = Ps_max/(1 + (Ps_max/P0 - 1)*exp(-ks*t))`, and states the condition in words. Graphically, by false position and by the modified secant method.'
+
+[[rows]]
+key = 'Prob. 8.24'
+f = '20*(<x - 0>^1 - <x - 5>^1) - 15*<x - 8>^0 - 57'
+name = 'shear along a beam'
+notes = '`V(x)` of the simply supported beam of Fig. P8.24, with singularity functions; the point(s) where the shear is 0.'
+
+[[rows]]
+key = 'Prob. 8.25'
+f = '-10*(<x - 0>^2 - <x - 5>^2) + 15*<x - 8>^1 + 150*<x - 7>^0 + 57*x'
+name = 'moment along a beam'
+notes = '`M(x)` of the beam of Prob. 8.24; the point(s) where the moment is 0.'
+
+[[rows]]
+key = 'Prob. 8.26, 8.27(b)'
+f = '(-10/3)*(<x - 0>^3 - <x - 5>^3) + (15/2)*<x - 8>^2 + 150*<x - 7>^1 + (57/2)*x^2 - 238.25'
+name = 'slope along a beam'
+notes = '`du_y/dx(x)` of the beam of Prob. 8.24; the point(s) where the slope is 0. 8.27(b) asks how a root-location method finds the minimum displacement, a root of this slope.'
+
+[[rows]]
+key = 'Prob. 8.27(a)'
+f = '(-5/6)*(<x - 0>^4 - <x - 5>^4) + (15/6)*<x - 8>^3 + 75*<x - 7>^2 + (57/6)*x^3 - 238.25*x'
+name = 'displacement along a beam'
+notes = '`u_y(x)` of the beam of Prob. 8.24; the point(s) where the displacement is 0.'
+
+[[rows]]
+key = 'Prob. 8.28'
+f = 'Alk + H = HCO3 + 2*CO3 + OH'
+name = 'pH of a lake with alkalinity'
+parameters = '`HCO3 = K1/(10^6*H)*KH*pCO2` (8.11), `CO3 = K2*K1/(10^6*H^2)*KH*pCO2` (8.13), `OH = Kw/H` (8.8); `KH`, `K1`, `K2`, `Kw` as in §8.2; `Alk = 0.4E-3` eq/L (Lake Superior); `pCO2` of 2008, not given'
+notes = "(P8.28). Unknown `H`, the hydrogen-ion concentration of Lake Superior in 2008. (P8.28) is §8.2's charge balance (8.10) with the alkalinity `Alk` added, and the problem asks to repeat §8.2's computation, a bisection on the pH in `[2, 12]`, with it; the resulting function, (8.14) minus `Alk`, is not printed. The problem gives no `pCO2` for 2008; §8.2's quadratic trend gives about 385 ppm for that year."
+
+[[rows]]
+key = 'Prob. 8.29'
+f = 'exp(-R*t/(2*L))*cos(sqrt(1/(L*C) - (R/(2*L))^2)*t) - q/q0'
+name = 'charge on the capacitor of an RLC circuit, unknown inductance'
+parameters = '`R = 280` ohm, `C = 1E-4` F, `t = 0.05` s, `q/q0 = 0.01`'
+notes = "Unknown `L`, the inductance (H), in the equation of the §8.3 row: graphically, by bisection, and with Excel's Solver, MATLAB's `fzero` or Mathcad's `root`. The square root is real only for `L > R^2*C/4 = 1.96` H, and the function has 2 roots above that bound, near 2.40 and 7.84; the book states neither."
+
+[[rows]]
+key = 'Prob. 8.30'
+f = 'i = 9*exp(-t)*sin(2*pi*t)'
+name = 'oscillating current'
+parameters = 'i = 3.5'
+notes = 'Unknown `t` (s): the lowest value at which the current is 3.5.'
+
+[[rows]]
+key = 'Prob. 8.31'
+f = 'rho = 1/(q*n*mu)'
+name = 'resistivity of doped silicon'
+parameters = '`n = (1/2)*(N + sqrt(N^2 + 4*ni^2))`, `mu = mu0*(T/T0)^-2.42`; `T0 = 300` K, `T = 1000` K, `mu0 = 1300` cm^2/(V s), `q = 1.6E-19` C, `ni = 6.21E9` cm^-3, `rho = 6E6` V s cm/C'
+notes = 'Unknown `N`, the doping density; by bisection and the modified secant method.'
+
+[[rows]]
+key = 'Prob. 8.32'
+f = 'F = (1/(4*pi*e0))*q*Q*x/(x^2 + a^2)^(3/2)'
+name = 'force of a charged ring on a point charge'
+parameters = '`e0 = 8.85E-12` C^2/(N m^2), `q = Q = 2E-5` C, `a = 0.9` m, `F = 1` N'
+notes = 'Unknown `x`, the distance of the charge from the center of the ring.'
+
+[[rows]]
+key = 'Prob. 8.33'
+f = '1/Z = sqrt(1/R^2 + (omega*C - 1/(omega*L))^2)'
+name = 'impedance of a parallel RLC circuit'
+parameters = '`R = 225` ohm, `C = 0.6E-6` F, `L = 0.5` H, `Z = 75` ohm'
+interval = '[1, 1000]'
+notes = 'Unknown `omega`, the angular frequency. Bisection and false position to `es = 0.1%`, with a graph to explain any difficulties.'
+
+[[rows]]
+key = 'Prob. 8.34'
+f = '1/sqrt(f) = 4*log10(Re*sqrt(f)) - 0.4'
+name = 'von Karman equation'
+parameters = '`Re` from 2500 to 1000000'
+notes = 'Unknown `f`, the Fanning friction factor; the book gives typical values from 0.001 to 0.01, for `Re` from 10,000 to 500,000. A bisection function with an absolute error below 0.000005.'
+
+[[rows]]
+key = 'Prob. 8.35'
+f = '2*k2*d^(5/2)/5 + (1/2)*k1*d^2 - m*g*d - m*g*h'
+name = 'nonlinear spring'
+parameters = '`k1 = 40000` g/s^2, `k2 = 40` g/(s^2 m^0.5), `m = 95` g, `g = 9.81` m/s^2, `h = 0.43` m'
+notes = 'Unknown `d`, the deflection of a spring with resistance `F = -(k1*d + k2*d^(3/2))` when a mass `m` falls on it from height `h`; from conservation of energy.'
+
+[[rows]]
+key = 'Prob. 8.36'
+f = 'cp = 0.99403 + 1.671E-4*T + 9.7215E-8*T^2 - 9.5838E-11*T^3 + 1.9520E-14*T^4'
+name = 'specific heat of dry air'
+parameters = '`cp = 1.2` kJ/(kg K)'
+notes = 'Unknown `T` (K), the temperature at which the zero-pressure specific heat is 1.2.'
+
+[[rows]]
+key = 'Prob. 8.37'
+f = 'y = tan(theta0)*x - g/(2*v0^2*cos(theta0)^2)*x^2 + y0'
+name = 'trajectory of a thrown ball'
+parameters = '`v0 = 20` m/s, `x = 40` m, `y0 = 1.8` m, `y = 1` m, `g = 9.81` m/s^2'
+notes = 'Unknown `theta0`, the initial angle, in degrees; initial guesses from a graph.'
+
+[[rows]]
+key = 'Prob. 8.38'
+f = 'sigma^3 - I*sigma^2 + II*sigma - III'
+name = 'principal stresses'
+parameters = '`I = sxx + syy + szz`, `II = sxx*syy + sxx*szz + syy*szz - sxy^2 - sxz^2 - syz^2`, `III = sxx*syy*szz - sxx*syz^2 - syy*sxz^2 - szz*sxy^2 + 2*sxy*sxz*syz`; `sxx = 10`, `syy = 7`, `szz = 16`, `sxy = 14`, `sxz = 25`, `syz = 15` MPa'
+notes = 'Unknown `sigma`: its 3 roots are the principal stresses (MPa) of a 3-dimensional stress field; `I`, `II` and `III` are the stress invariants. With these stresses, `I = 33`, `II = -704` and `III = 1859`, which the book does not print.'
+
+[[rows]]
+key = 'Prob. 8.39'
+f = 'v = u*log(m0/(m0 - q*t)) - g*t'
+name = 'upward velocity of a rocket'
+parameters = '`u = 2200` m/s, `m0 = 160000` kg, `q = 2680` kg/s, `g = 9.81` m/s^2, `v = 1000` m/s'
+interval = '[10, 50]'
+notes = "Unknown `t`, the time at which the velocity is 1000 m/s, to within 1%; the book's hint gives the interval. The book prints `ln`."
+
+[[rows]]
+key = 'Prob. 8.40'
+f = 'tan(phi) = 2*(c/cc)*(omega/p)/(1 - (omega/p)^2)'
+name = "phase angle of a car's forced vibration"
+parameters = '`phi = omega/2 - 1`; `c/cc` and `p` not given'
+notes = "Unknown `omega`, at which the phase angle between a rough road's forcing and the car's motion is `omega/2 - 1`. The problem takes `c/cc` and `p` from \"the section\", which Part Two does not contain; the book's text mentions the rough road nowhere else."
+
+[[rows]]
+key = 'Prob. 8.42'
+f = 'HP = (z*R*T1/MW)*(n/(n - 1))*(Rc^((n - 1)/n) - 1)'
+name = 'polytropic efficiency of a compressor'
+parameters = '`HP = z*R*T1/MW`, `Rc = 3.0`'
+notes = 'Unknown `n`, the polytropic efficiency of a compressor at compression ratio `Rc`, whose power requirement `HP` equals `z*R*T1/MW`, so that this factor cancels.'
+
+[[rows]]
+key = 'Prob. 8.48'
+f = 'v = sqrt(4*g*(rho_s - rho)*d/(3*CD*rho))'
+name = 'settling velocity of a spherical particle'
+parameters = '`CD = 24/Re + 3/sqrt(Re) + 0.34` (P8.48.4), `Re = rho*d*v/mu` (P8.48.1); `g = 9.81` m/s^2; an iron particle in water: `d = 200` µm, `rho = 1` g/cm^3, `rho_s = 7.874` g/cm^3, `mu = 0.014` g/(cm s)'
+notes = "(P8.48.3). Unknown `v`, the settling velocity of a particle of diameter `d` and density `rho_s` in a fluid of density `rho` and viscosity `mu`, beyond the laminar regime (`Re < 0.1`) of Stokes' law. (a) asks to combine the 3 equations into `f(v) = 0`, which the book does not print; (b) runs the modified secant method with `delta = 1E-3` to `es = 0.05%`, from the Stokes-law velocity (P8.48.2); (d) and (e) ask for a fixed-point iteration, which (P8.48.3) itself is, and a graph showing that it converges for any positive guess. The problem gives `g` in m/s^2 and the rest in cgs units."

@@ -1,0 +1,68 @@
+title = "Weerakoon, Fernando (2000): a variant of Newton's method with third-order convergence"
+reference = "Weerakoon, S., Fernando, T. G. I. (2000). A variant of Newton's method with accelerated third-order convergence. Applied Mathematics Letters 13(8), 87–93. https://doi.org/10.1016/S0893-9659(00)00100-2."
+year = 2000
+home = '1.2'
+where_in_source = '''
+- Table 1 (Section 4, page 92) lists 9 functions, numbered (1) to (9), each with 1 to 4 starting points `x0` and a stated root. Per starting point, it gives the iterations, the computational order of convergence and the function evaluations of Newton's method and of the article's variant.
+- The article cites no source for its functions.
+'''
+transcribed_from = 'the page images: the PDF is a scan, and its text layer holds only the first row of Table 1.'
+rows_summary = '9, 1 per function of Table 1.'
+notes = '''
+- **Keys:** the numbers of Table 1, printed as (1) to (9).
+- **Starting points:** the article gives starting points, not intervals, so no row has an `interval`; each row's `notes` gives its starting points `x0` and the stated root.
+'''
+
+[[relations]]
+sources = ['2024_jo_annealing']
+text = '''
+Jo et al. (2024) state that "some" of their functions come from this article.
+- Jo's f7–f13 are functions 1–7 here, in the same order.
+- Jo's f9 equals function 3. The other 6 are shifted in `x`: f7 is function 1 with `x - 1` for `x`, f8 is function 2 with `x - 14/10`, f10 is function 4 with `x - 3/4`, f11 is function 5 with `x + 2`, f12 is function 6 with `x - 2`, and f13 is function 7 with `x + 5/4`.
+- Functions 8 and 9 are not in Jo et al.
+'''
+
+[[rows]]
+key = '1'
+f = 'x^3 + 4*x^2 - 10'
+notes = '`x0 = -0.5, 1, 2, -0.3`. Stated root `1.36523001341448`.'
+
+[[rows]]
+key = '2'
+f = 'sin(x)^2 - x^2 + 1'
+notes = 'Printed as `sin^2(x)`. `x0 = 1, 3`. Stated root `1.40449164821621`.'
+
+[[rows]]
+key = '3'
+f = 'x^2 - exp(x) - 3*x + 2'
+notes = 'Printed with `e^x`. `x0 = 2, 3`. Stated root `0.257530285439771`.'
+
+[[rows]]
+key = '4'
+f = 'cos(x) - x'
+notes = '`x0 = 1, 1.7, -0.3`. Stated root `0.739085133214758`.'
+
+[[rows]]
+key = '5'
+f = '(x - 1)^3 - 1'
+notes = '`x0 = 3.5, 2.5`. Stated root `2`.'
+
+[[rows]]
+key = '6'
+f = 'x^3 - 10'
+notes = '`x0 = 1.5`. Stated root `2.15443469003367`.'
+
+[[rows]]
+key = '7'
+f = 'x*exp(x^2) - sin(x)^2 + 3*cos(x) + 5'
+notes = '`x0 = -2`. Stated root `-1.20764782713013`.'
+
+[[rows]]
+key = '8'
+f = 'x^2*sin(x)^2 + exp(x^2*cos(x)*sin(x)) - 28'
+notes = "Printed as `x^2 sin^2(x) + exp[x^2 cos(x) sin(x)] - 28`. `x0 = 5`. The stated root `4.82458931731526` does not solve the printed function, which is about -4.94 there; it solves `x^2*sin(x)^2 + exp(x^2*cos(x) + sin(x)) - 28`. The printed function's root nearest to `x0` is about `4.62210`."
+
+[[rows]]
+key = '9'
+f = 'exp(x^2 + 7*x - 30) - 1'
+notes = '`x0 = 3.5, 3.25`. Stated root `3`.'

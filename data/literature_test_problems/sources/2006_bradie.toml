@@ -1,0 +1,515 @@
+title = 'Bradie (2006): A Friendly Introduction to Numerical Analysis, chapter 2'
+reference = 'Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, Upper Saddle River, NJ. ISBN 0-13-013054-0.'
+year = 2006
+home = '1.4'
+where_in_source = '''
+chapter 2, "Rootfinding" (pp. 54–137): the chapter overview (pp. 54–58), Sections 2.1–2.7 with Examples 2.1–2.21, Tables 2.1–2.6, Figures 2.1–2.3, 2.7 and 2.9, the application problems, and the exercises that end each section.
+- The overview of chapter 1 (p. 2) sets up the "Solving a Crime" problem; Section 2.5 solves its 2 equations, so their rows come from there.
+- The rows leave out:
+  - exercises about a method or a generic `f` (2.1-6 to 2.1-9, 2.2-2, 2.2-3, 2.2-12, 2.3-1 to 2.3-4, 2.4-2, 2.5-2 to 2.5-4, 2.6-1, 2.6-2, 2.6-16, 2.7-3);
+  - Example 2.4, an inequality;
+  - 2.7-13 and 2.7-14, chemical equilibria that the book states without an equation.
+- Chapter 3 treats systems.
+'''
+transcribed_from = 'a scan of the book, which has no text layer; every expression was read from the page images.'
+rows_summary = '85, 1 per distinct function: a function that several examples or exercises use is 1 row whose key lists them all. 26 rows come from the overview, the text, its examples, application problems and figures; 59 come from the exercises alone.'
+notes = '''
+How to read the rows:
+- **Keys:** `Ex. 2.n` is Example 2.n; `2.k-m` is exercise m of Section 2.k, with its sub-item letter; `Table` and `Fig.` are the book's tables and figures; `§2.k (p. n)` is a text example or an application problem of Section 2.k, and `§2 (p. n)` one of the chapter overview.
+- **Equations:** an equation that the book prints as `lhs = rhs` stays in that form; `f(x) = 0` is written as `f(x)`.
+- **Fixed-point problems:** a fixed-point problem, which the book states as an iteration function `g` with `p_n = g(p_{n-1})`, is written as the equation `x = g(x)`, and is its own row apart from the root form `x - g(x)`, except where the book derives one from the other (Table 2.4, 2.4-7, 2.4-8).
+- **Notation:** the book writes `ln` for the natural log and `cos^-1` for `arccos`; the rows write `log` and `arccos`. It prints intervals as open intervals `(a, b)`, and the rows keep them so.
+'''
+
+[[rows]]
+key = '§2 (p. 54); §2.4 (p. 102)'
+f = '(P + n^2*a/V^2)*(V - n*b) - n*R*T'
+name = 'van der Waals equation'
+parameters = '`n = 1` mole of chlorine, `P = 2` atm, `T = 313` K, `a = 6.29` atm liter^2/mole^2, `b = 0.0562` liter/mole, `R = 0.08206` atm liter/(mole K)'
+notes = 'Unknown `V`, the volume in liters. The overview prints the equation `(P + n^2*a/V^2)*(V - n*b) = n*R*T`; Section 2.4 runs Newton to `5E-7` from the ideal-gas volume `V0 = 12.84239`, reaching `V = 12.6510993` in 3 iterations.'
+
+[[rows]]
+key = '§2 (p. 55); §2.2 (p. 78); 2.2-15'
+f = '(rho_f/3)*h^3 - R*rho_f*h^2 + (4/3)*R^3*rho_o'
+name = 'depth of submersion'
+parameters = '`R = 5` cm, `rho_o = 0.120`, `rho_f = 0.890` g/cm^3 (§2.2); `R = 2`, `rho_o = 0.040`, `rho_f = 0.998` (2.2-15)'
+interval = '`(0, 10)` (§2.2)'
+notes = 'Unknown `h`, the depth to which a sphere of radius `R` and density `rho_o` sinks in a fluid of density `rho_f`; the derivation assumes the sphere is not fully submerged. False position on `(0, 10)` with tolerance `5E-5` gives `p5 = 2.3043353119`.'
+
+[[rows]]
+key = '§2 (p. 56)'
+f = 'x^6 + x^5 - 12*x^4 + 2*x^3 + 41*x^2 - 51*x + 18'
+notes = "Printed also as `(x - 1)^3*(x + 3)^2*(x - 2)`: a triple root at 1, a double root at -3 and a simple root at 2. The book's example of multiplicity."
+
+[[rows]]
+key = '§2 (pp. 56–57)'
+f = '2*x + log((1 - x)/(1 + x))'
+notes = "Root 0 of multiplicity 3: `f(0) = f'(0) = f''(0) = 0`, `f'''(0) = -4`."
+
+[[rows]]
+key = '§2 (p. 58)'
+f = '3*x^2 + (1/pi^4)*log((pi - x)^2) + 1'
+notes = "Undefined at `x = pi`. 2 simple real roots, 1 in `(pi - 1, pi)` and 1 in `(pi, pi + 1)`, both at about `pi ± 10^-647`, which no floating-point system resolves: the book's pathological example."
+
+[[rows]]
+key = '§2.1 (p. 59); Ex. 2.1–2.3, 2.8, 2.9, 2.11–2.13; Tables 2.1–2.3, 2.5, 2.6; Fig. 2.1; §2.2 (p. 74); §2.4 (p. 98); 2.1-10; 2.2-10; 2.4-13; 2.5-12 to 2.5-14, 2.5-17'
+f = 'x^3 + 2*x^2 - 3*x - 1'
+interval = '`(1, 2)`; `(-3, -2)`; `(-1, 0)`'
+notes = "The chapter's first standard test problem: 3 simple roots, 1 in each interval, among them `1.1986912435` and `-2.9122291785`. Bisection with tolerance `5E-5` on `(1, 2)` (Ex. 2.1, 2.2, Table 2.1) and on the other 2 intervals (2.1-10); false position on `(1, 2)` and `(-3, -2)` (Ex. 2.3, Tables 2.2, 2.3), and with Aitken extrapolation (Ex. 2.13); Newton from `p0 = 1, 2, 3` (Ex. 2.8, 2.9, Table 2.6) and from `p0 = -3, -2.5, -2` (Table 2.5, p. 98); secant from `p0 = 2, p1 = 1` (Ex. 2.11, 2.12), from `p0 = -2, p1 = -3` (2.5-12) and from the 8 pairs of 2.5-13 and 2.5-14. 2.2-10, 2.4-13 and 2.5-17 seek the root in `(-1, 0)` to `5E-5`."
+
+[[rows]]
+key = 'Fig. 2.2'
+f = '(x - 1)^7'
+notes = 'Root 1. Figure only, plotted on `[0, 2]`: its flat plateau means that `abs(f) < 1E-7` only guarantees `x` within `1E-1` of the root.'
+
+[[rows]]
+key = 'Fig. 2.2'
+f = '(x - 1)^(1/7)'
+notes = 'Root 1; the real 7th root. Figure only, plotted on `[0, 2]`: nearly vertical at the root, so `x` within `1E-7` of it still gives `f` about `1E-1`.'
+
+[[rows]]
+key = 'Ex. 2.2; Fig. 2.3; Tables 2.2, 2.3, 2.5; §2.4 (pp. 98, 100); §2.5 (p. 109); 2.1-13; 2.5-15; 2.6-3'
+f = 'tan(pi*x) - x - 6'
+interval = '(0.40, 0.48)'
+notes = 'The second standard test problem: infinitely many roots; the smallest positive one is `0.4510472588`. Bisection and false position on the interval (Ex. 2.2, Tables 2.2, 2.3; Aitken on the false-position sequence in 2.6-3). Newton from `p0 = 0.48` converges in 5 iterations; from `p0 = 0.4` it does not converge in 5000; from `p0 = 0` it converges to the root `697.4995475` (p. 98). Secant from `p0 = 0.4, p1 = 0.48` (p. 109) and from `(0, 0.48)`, `(0.24, 0.48)`, `(0.4, 0.48)` (2.5-15). 2.1-13 seeks the next smallest positive root.'
+
+[[rows]]
+key = '§2.1 (p. 67); 2.1-19; 2.5-20'
+f = '13500*(1 + r/12)^36 + 250*((1 + r/12)^36 - 1)/(r/12) - 25000'
+name = 'saving for a down payment'
+parameters = 'initial investment, monthly deposit and goal: `13500, 250, 25000` (§2.1); `14000, 250, 25000` and `12500, 300, 25000` (2.1-19); `13000, 200, 20000` and `13000, 250, 20000` (2.5-20)'
+interval = '`[0.01, 0.10]` (§2.1)'
+notes = 'Unknown `r`, the annual interest rate, compounded monthly over 3 years. `f(0.01) = -1956.54`, `f(0.10) = 3645.91`; bisection to `5E-6` gives `r = 0.0439395` after 15 iterations.'
+
+[[rows]]
+key = '2.1-1(a); 2.2-1(a); 2.4-1(a); 2.5-1(a)'
+f = 'log(1 + x) - cos(x)'
+interval = '(0, 1)'
+notes = 'Bisection and false position to `p3` (2.1-1, 2.2-1), Newton and secant to `p4` (2.4-1, 2.5-1).'
+
+[[rows]]
+key = '2.1-1(b); 2.2-1(b); 2.4-1(b); 2.5-1(b)'
+f = 'x^5 + 2*x - 1'
+interval = '(0, 1)'
+notes = 'As 2.1-1(a).'
+
+[[rows]]
+key = '2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c)'
+f = 'exp(-x) - x'
+interval = '(0, 1)'
+notes = 'As 2.1-1(a). Its root is the fixed point of `x = exp(-x)` (Ex. 2.6).'
+
+[[rows]]
+key = '2.1-1(d); 2.2-1(d); 2.4-1(d); 2.5-1(d)'
+f = 'cos(x) - x'
+interval = '(0, 1)'
+notes = 'As 2.1-1(a). Its root is the fixed point of `x = cos(x)` (2.3-5).'
+
+[[rows]]
+key = '2.1-2; §2.3 (p. 86), Table 2.4; 2.2-4; 2.4-3; 2.5-5'
+f = 'x^3 + x^2 - 3*x - 3'
+interval = '(1, 2)'
+notes = 'Root `sqrt(3)` in the interval, and -1 outside it. Bisection (2.1-2), false position (2.2-4), Newton (2.4-3) and secant (2.5-5). Table 2.4 runs fixed-point iteration from `p0 = 1` to `1E-7` with 5 iteration functions: `g1 = (x^3 + x^2 - 3)/3`, which converges to -1; `g2 = -1 + (3*x + 3)/x^2`, which does not converge; `g3 = (3 + 3*x - x^2)^(1/3)`; `g4 = sqrt((3 + 3*x - x^2)/x)`; and `g5 = x - (x^3 + x^2 - 3*x - 3)/(3*x^2 + 2*x - 3)`.'
+
+[[rows]]
+key = '2.1-3; 2.2-8; 2.4-9; 2.5-9'
+f = 'sin(x)'
+interval = '(3, 4)'
+notes = 'Root `pi`. Bisection (2.1-3), false position (2.2-8), Newton from `p0 = 4` (2.4-9) and secant from `p0 = 3, p1 = 4` (2.5-9); the last 3 ask for the apparent order of convergence.'
+
+[[rows]]
+key = '2.1-4'
+f = '1 - log(x)'
+interval = '(2, 3)'
+notes = 'Root `e`; 5 iterations of bisection.'
+
+[[rows]]
+key = '2.1-5'
+f = 'x^6 - 3'
+interval = '(1, 2)'
+notes = 'Root `3^(1/6)`; as 2.1-4.'
+
+[[rows]]
+key = '2.1-11; 2.2-6; 2.4-5; 2.5-7'
+f = 'x^3 - 13'
+interval = '`(2, 3)` (2.2-6, 2.4-5, 2.5-7)'
+notes = 'Root `13^(1/3)`. 2.1-11 asks for 3 decimal places by bisection, with no interval.'
+
+[[rows]]
+key = '2.1-12; 2.2-7; 2.4-6; 2.5-8'
+f = '1/x - 37'
+interval = '`(0.01, 0.1)` (2.2-7, 2.4-6, 2.5-8)'
+notes = 'Root `1/37`. 2.1-12 asks for 5 decimal places by bisection, with no interval.'
+
+[[rows]]
+key = '2.1-14'
+f = '(x - 0.5)*(x + 1)^3*(x - 2)'
+interval = '`(-3, 3)`; `(-1.5, 3)`; `(-2, 4)`; `(-2, 3)`; `(-1.5, 2.2)`; `(-7, 3)`'
+notes = 'Roots -1 (triple), 0.5 and 2, all inside each interval; asks to which root bisection converges from each.'
+
+[[rows]]
+key = '2.1-15'
+f = '(3/2)*x - 6 - (1/2)*sin(2*x)'
+notes = 'Unique real root; bisection to `1E-5` on an interval that the reader finds.'
+
+[[rows]]
+key = '2.1-16(a); 2.2-11(a); 2.3-14; 2.4-14(a); 2.5-18(a)'
+f = 'exp(x) + x^2 - x - 4'
+interval = '`(1, 2)` (2.3-14)'
+notes = "All real roots to `1E-6` by bisection, false position, Newton and secant. 2.3-14 compares 3 fixed-point iteration functions of the reader's choice for its unique zero on `(1, 2)`."
+
+[[rows]]
+key = '2.1-16(b); 2.2-11(b); 2.3-15; 2.4-14(b); 2.5-18(b)'
+f = 'x^3 - x^2 - 10*x + 7'
+interval = '`(0, 1)` (2.3-15)'
+notes = 'As 2.1-16(a).'
+
+[[rows]]
+key = '2.1-16(c); 2.2-11(c); 2.3-16; 2.4-14(c); 2.5-18(c)'
+f = '1.05 - 1.04*x + log(x)'
+interval = '`(1, 2)` (2.3-16)'
+notes = 'As 2.1-16(a). 2.6-9 iterates its fixed-point form `x = (1.05 + log(x))/1.04`.'
+
+[[rows]]
+key = '2.1-17'
+f = 'cos(4*zeta*sqrt(1 - zeta^2)) = -1 + 8*zeta^2 - 8*zeta^4'
+name = 'optimum spring-damper design'
+interval = '(0, 1/2)'
+also_in = 'Peters (1997), SIAM Review 39(1), 118–122, which the book cites'
+notes = 'Unknown `zeta`, the nondimensional damping coefficient, to `5E-7`; the exercise then computes the maximum force from it.'
+
+[[rows]]
+key = '2.1-18'
+f = 'z = (1 + y + y^2 - y^3)/(1 - y)^3'
+name = 'compressibility factor of real gases'
+parameters = 'z = 0.892'
+also_in = 'DeSantis, Gironi, Marelli (1976), Industrial and Engineering Chemistry Fundamentals 15, 182–189, which the book cites'
+notes = 'Unknown `y`, related to the van der Waals volume correction factor.'
+
+[[rows]]
+key = '2.2-5; 2.4-4; 2.5-6'
+f = 'x^7 = 3'
+interval = '(1, 2)'
+notes = 'Root `3^(1/7)`. False position, Newton and secant.'
+
+[[rows]]
+key = '2.2-9; 2.4-10; 2.5-10'
+f = 'x^4 - 18*x^2 + 45'
+interval = '`(1, 2)`; `(3, 4)`'
+notes = 'Roots `sqrt(3)` and `sqrt(15)`. False position, Newton from `p0 = 1` and secant from `p0 = 1, p1 = 2` toward `sqrt(3)`; the exercises compare the order of convergence at the 2 roots.'
+
+[[rows]]
+key = '2.2-13'
+f = 'V = (r^2*arccos((r - h)/r) - (r - h)*sqrt(2*r*h - h^2))*L'
+name = 'volume of fluid in a horizontal cylindrical tank'
+parameters = '`r = 1` m, `L = 3` m, `V = 7` m^3'
+notes = 'Unknown `h`, the depth of the fluid.'
+
+[[rows]]
+key = '2.2-14'
+f = 'x^2 = 1 - cos(sqrt(2)*x) + sqrt(2)*sin(sqrt(2)*x)'
+also_in = 'Gottlieb (1998), American Journal of Physics 66(10), 903–906, which the book cites'
+notes = '2 real roots, 1 at `x = 0`; asks for an interval around the other and for that root to 3 decimal places.'
+
+[[rows]]
+key = 'Ex. 2.5; §2.3 (p. 85); 2.3-7'
+f = 'x = c*x*(1 - x)'
+name = 'logistic equation'
+parameters = '`0 < c < 4` (Ex. 2.5); `c = 4` (p. 85); `c = 2` (2.3-7)'
+interval = '`[0.1, inf)` (p. 85)'
+notes = "Ex. 2.5 writes `p` for `x`. Fixed points 0 and `(c - 1)/c`, solved by hand. With `c = 4` on `[0.1, inf)`, `g` breaks the hypotheses of the book's uniqueness theorem yet has the unique fixed point 3/4 there (p. 85). 2.3-7 iterates from `p0` in `(0, 1)` toward the fixed point 1/2."
+
+[[rows]]
+key = 'Fig. 2.7; Ex. 2.6, 2.7, 2.14, 2.15'
+f = 'x = exp(-x)'
+notes = 'Fixed point `0.5671432904`. Fixed-point iteration from `p0 = 0` (Ex. 2.6), with the error estimate, reaching `p21 = 0.5671477143` at tolerance `5E-6` (Ex. 2.7); Aitken extrapolation (Ex. 2.14) and Steffensen, whose `p3 = 0.5671432948` (Ex. 2.15). Figure 2.7 plots it on `[-2, 5]`.'
+
+[[rows]]
+key = '§2.3 (p. 84)'
+f = 'x = exp(x)'
+notes = 'No fixed point: the graphs of `exp(x)` and `x` never intersect.'
+
+[[rows]]
+key = '§2.3 (p. 84)'
+f = 'x = log(x)'
+notes = 'No fixed point; as `x = exp(x)`.'
+
+[[rows]]
+key = '§2.3 (p. 84)'
+f = 'x = x^2 + 1'
+notes = 'No fixed point; as `x = exp(x)`.'
+
+[[rows]]
+key = '2.3-5; 2.6-7'
+f = 'x = cos(x)'
+notes = 'Fixed point `0.73908513321516064166` (2.6-7). Fixed-point iteration from `p0 = 0`: 7 iterations with the error estimate (2.3-5); 10 iterations, then Aitken and Steffensen (2.6-7).'
+
+[[rows]]
+key = '2.3-6'
+f = 'x = 1 + x - (1/8)*x^3'
+notes = 'Unique fixed point on the real line; 7 iterations from `p0 = 0`.'
+
+[[rows]]
+key = '2.3-8; 2.4-7'
+f = 'x^2 - a'
+parameters = '`a` free'
+notes = "2.4-7 shows that Newton's iteration function for it is `(1/2)*(x + a/x)`; 2.3-8 asks for the order of convergence of that iteration toward its fixed point `sqrt(a)`."
+
+[[rows]]
+key = '2.3-9'
+f = 'x = (x^3 + 3*x*a)/(3*x^2 + a)'
+parameters = '`a` free'
+notes = 'Fixed point `sqrt(a)`; asks for the order of convergence and the asymptotic error constant.'
+
+[[rows]]
+key = '2.3-10; 2.4-8'
+f = '1/x - a'
+parameters = '`a` free'
+notes = "2.4-8 shows that Newton's iteration function for it is `x*(2 - a*x)`; 2.3-10 asks for the order of convergence of that iteration toward its fixed point `1/a`."
+
+[[rows]]
+key = '2.3-11'
+f = 'x = exp(-x^2)'
+interval = '[0, 1]'
+notes = 'Unique fixed point on the interval; iteration from `p0 = 0` to `5E-7`, compared with the theoretical bound on the number of iterations.'
+
+[[rows]]
+key = '2.3-12'
+f = 'x = (1/2)*cos(x)'
+interval = '[0, 1]'
+notes = 'As 2.3-11.'
+
+[[rows]]
+key = '2.3-13'
+f = 'x = (1/3)*(2 - exp(x) + x^2)'
+interval = '[0, 1]'
+notes = 'As 2.3-11.'
+
+[[rows]]
+key = 'Ex. 2.10; 2.5-11(a); 2.6-4, 2.6-12'
+f = 'x*(1 - cos(x))'
+interval = '`[-2, 1]` (Ex. 2.10)'
+notes = 'Root 0 of multiplicity 3. Newton from `p0 = 1` converges linearly, at rate 2/3, and bisection on `[-2, 1]` beats it (Ex. 2.10); secant from `p0 = -1, p1 = 2` (2.5-11); Aitken on the Newton sequence (2.6-4); both techniques for restoring quadratic convergence, from `p0 = 1` (2.6-12).'
+
+[[rows]]
+key = '§2.4 (p. 103)'
+f = 'exp(-x) - 1 + x/5'
+name = "location of the maximum in an energy distribution (Planck's radiation law)"
+notes = '`x = c*h/(lambda_max*k*T)`, where `lambda_max` maximizes the energy density `8*pi*c*h*lambda^-5/(exp(c*h/(lambda*k*T)) - 1)`. Roots 0, which is not wanted, and about 4.965, which Newton from `p0 = 5` with tolerance `5E-3` reaches in 2 iterations.'
+
+[[rows]]
+key = '2.4-11; 2.5-11(b); 2.6-10, 2.6-14(b), 2.6-15(b)'
+f = '27*x^4 + 162*x^3 - 180*x^2 + 62*x - 7'
+notes = "Root 1/3 of multiplicity 3. Newton from `p0 = 0`, 10 iterations (2.4-11); secant, 10 iterations (2.5-11); both techniques for restoring quadratic convergence from `p0 = 0` (2.6-10); secant on `f/f'` (2.6-14) and the secant step multiplied by `m = 3` (2.6-15)."
+
+[[rows]]
+key = '2.4-12; 2.5-11(c); 2.6-11, 2.6-14(c), 2.6-15(c)'
+f = 'x/(1 + x^2) - (500/841)*(1 - 21*x/125)'
+notes = 'Root 2.5 of multiplicity 2. Newton from `p0 = 2` (2.4-12, 2.6-11); otherwise as 2.4-11, with `m = 2`.'
+
+[[rows]]
+key = '2.4-15'
+f = 'P = R*T/(V - b) - a/(V*(V + b)*sqrt(T))'
+name = 'Redlich–Kwong equation of state'
+parameters = '`a = 0.42747*R^2*Tc^(5/2)/Pc`, `b = 0.08664*R*Tc/Pc`, `R = 0.08206`; carbon dioxide: `T = 323.15` K, `P = 1` atm, `Tc = 304.2` K, `Pc = 72.9` atm (a); ammonia: `T = 450` K, `P = 56` atm, `Tc = 405.5` K, `Pc = 111.3` atm (b)'
+notes = 'Unknown `V`, the volume of 1 mole of gas.'
+
+[[rows]]
+key = '2.4-16; 2.7-11'
+f = 'p^3*(1 - beta^2) + (0.4*h*beta^2 - sigma*h^2/r^2)*p^2 + (sigma^2*h^4/(3*r^4))*p - (sigma*h^2/(3*r^2))^3'
+name = 'ice breaking with an air cushion vehicle'
+parameters = '`beta = 0.5`, `r = 40` ft, `sigma = 150` psi; `h = 0.6, 1.2, 1.8, 2.4, 3.0, 3.6, 4.2` ft (2.4-16); `h = 6` ft (2.7-11)'
+also_in = 'Muller (1987), in Mathematical Modeling: Classroom Notes in Applied Mathematics, M. S. Klamkin (ed.), SIAM, which the book cites'
+notes = 'Unknown `p`, the minimum cushion pressure that breaks ice of thickness `h`. 2.4-16 names the size of the air cushion `R` in its text and `r` in the equation.'
+
+[[rows]]
+key = '2.4-17; Fig. 2.9'
+f = 'kL*tan(kL) = 6*I1*L/(I*L1)'
+name = 'buckling load of a frame'
+parameters = '`E = 30*10^6` lb/in^2, `I = 15.2` in^4, `L = 144` in, `I1 = 9.7` in^4, `L1 = 120` in'
+notes = 'Unknown `kL`, 1 symbol: its smallest positive solution gives the buckling load `P = (kL)^2*E*I/L^2`.'
+
+[[rows]]
+key = '§2.5 (p. 111)'
+f = '-12 - 1/k + (18 + 1/k)*exp(-k)'
+name = "solving a crime (Newton's law of cooling)"
+notes = 'From the equation `73 - 1/k + (18 + 1/k)*exp(-k) = 85`. Unknown `k`; secant from `p0 = 0.1, p1 = 1` to `5E-7` gives `k = 0.337114` in 6 iterations.'
+
+[[rows]]
+key = '§2.5 (p. 111); 2.5-21'
+f = '72 + t_d - 1/k + (18 + 1/k)*exp(-k*t_d) = 98.6'
+name = "solving a crime (Newton's law of cooling)"
+parameters = '`k = 0.337114`; the right side is 98.6 (§2.5), 103 (2.5-21)'
+notes = 'Unknown `t_d`, the time of death in hours after 8:00 PM. Section 2.5 rewrites it as `-26.6 + t_d - 1/0.337114 + (18 + 1/0.337114)*exp(-0.337114*t_d)`; secant from `p0 = -2, p1 = 0` gives `t_d = -1.130939` in 6 iterations.'
+
+[[rows]]
+key = '2.5-16'
+f = 'x^3 - 2*x - 5'
+notes = 'Secant from `p0 = 1, p1 = 3`, `p0 = 1, p1 = 2` and `p0 = 3, p1 = 2`, to `5E-7`.'
+
+[[rows]]
+key = '2.5-19'
+f = 'P = ((1 + w)/2)*(w/(1 - w + w^2))^21'
+name = 'probability of a shutout in racquetball'
+parameters = 'P = 1/4, 1/2, 3/4'
+also_in = 'Keller (1984), SIAM Review 26, 267–268, which the book cites'
+notes = 'Unknown `w`, the probability that player A wins a rally; asks for the smallest `w` that reaches each `P`.'
+
+[[rows]]
+key = 'Ex. 2.16, 2.17; 2.6-13, 2.6-14(a), 2.6-15(a)'
+f = '1 + log(x) - x'
+notes = "Root 1 of multiplicity 2. Newton on `f` and on `f/f'` from `p0 = 2` to `1E-5` (Ex. 2.16), and Newton with its step multiplied by `m = 2` (Ex. 2.17); 2.6-13 estimates the multiplicity from the Newton sequence. Secant on `f/f'` (2.6-14) and the secant step multiplied by `m = 2` (2.6-15), from `p0 = -1, p1 = 2` as the scan reads, where `log` is undefined at -1."
+
+[[rows]]
+key = '2.6-5'
+f = 'x = sqrt(10/(2 + x))'
+notes = 'Unique fixed point `1.654249158`. The exercise prints 7 iterates, from `2.236067977`, for Aitken extrapolation.'
+
+[[rows]]
+key = '2.6-6'
+f = 'x = (1/2)*sqrt(10 - x^3)'
+notes = 'Fixed point nearest 1: `1.3652300134140968458`. Steffensen from `p0 = 1`, 4 iterations.'
+
+[[rows]]
+key = '2.6-8'
+f = 'x = log(4 + x - x^2)'
+notes = 'Fixed point `1.2886779668238684115`. 10 iterations from `p0 = 2`, then Aitken and Steffensen.'
+
+[[rows]]
+key = '2.6-9'
+f = 'x = (1.05 + log(x))/1.04'
+notes = 'Fixed point `1.1097123038867133005`; as 2.6-8, from `p0 = 1`.'
+
+[[rows]]
+key = 'Ex. 2.18'
+f = 'x^4 + 2*x^3 + 4*x^2 - 2*x - 5'
+notes = 'Roots 1, -1 and `-1 ± 2i`, found by deflation with synthetic division.'
+
+[[rows]]
+key = 'Ex. 2.19, 2.20'
+f = '16*x^4 + 70*x^3 - 169*x^2 - 580*x + 75'
+notes = "Roots 0.125, -2.5, 3 and -5. Laguerre's method from `x0 = 0` with tolerance `5E-11`, with deflation."
+
+[[rows]]
+key = 'Ex. 2.21'
+f = 'x^5 - 3.4*x^4 + 5.4531*x^3 - 4.20772*x^2 + 1.50924*x - 0.20304'
+notes = 'Roots 0.45, 0.47, 0.48 and `1 ± i`; as Ex. 2.19.'
+
+[[rows]]
+key = 'Ex. 2.21'
+f = '4*x^4 - 9*x^3 + 3*x^2 + 5*x - 3'
+notes = "Simple root -0.75 and triple root 1. As Ex. 2.19: Laguerre's method returns 1 real root and a complex pair clustered around 1."
+
+[[rows]]
+key = '§2.7 (p. 133)'
+f = '3.999375*x^4 - 15.9975*x^3 - 978.67*x^2 - 11.85*x + 2.37'
+name = 'chemical equilibrium'
+notes = 'From `2.37*10^-3 = x^2/((1 - x/2)*(1 - 3*x/2)^3)`, the equilibrium of `N2 + 3*H2 = 2*NH3` at 1000 K; unknown `x`, the moles of ammonia. Roots 0.04351, -0.05566, -13.76348 and 17.77563, of which only 0.04351 is physical.'
+
+[[rows]]
+key = '2.7-1(a)'
+f = 'x^4 - 2.25*x^3 - 25.75*x^2 + 28.5*x + 126'
+notes = 'Deflation by the root 3.'
+
+[[rows]]
+key = '2.7-1(b)'
+f = 'x^4 + 1.83*x^3 - 0.081*x^2 + 1.83*x - 1.081'
+notes = 'Deflation by the root -2.3.'
+
+[[rows]]
+key = '2.7-1(c), 2.7-2(c)'
+f = 'x^4 + 20.5*x^3 + 129.5*x^2 + 230*x - 150'
+notes = "Deflation by the root 0.5 (2.7-1); Laguerre's method from `x0 = 0` with tolerance `5E-11` (2.7-2)."
+
+[[rows]]
+key = '2.7-2(a)'
+f = 'x^3 - 4*x^2 - 3*x + 5'
+notes = "Laguerre's method from `x0 = 0` with tolerance `5E-11`."
+
+[[rows]]
+key = '2.7-2(b)'
+f = 'x^3 - 7*x^2 + 14*x - 6'
+notes = 'As 2.7-2(a).'
+
+[[rows]]
+key = '2.7-2(d)'
+f = 'x^4 - 2*x^3 - 5*x^2 + 12*x - 5'
+notes = 'As 2.7-2(a).'
+
+[[rows]]
+key = '2.7-4(a)'
+f = '2*x^5 - 6*x^4 + 5*x^3 + x^2 + 2'
+notes = 'All roots, to `5E-11`.'
+
+[[rows]]
+key = '2.7-4(b)'
+f = '-3*x^6 + x^3 + 10*x - 1'
+notes = 'As 2.7-4(a).'
+
+[[rows]]
+key = '2.7-4(c)'
+f = 'x^6 + x^5 - 9*x^4 - 8*x^3 + 29*x^2 - 4*x + 4'
+notes = 'As 2.7-4(a).'
+
+[[rows]]
+key = '2.7-4(d)'
+f = 'x^4 + 5*x^3 + 7*x^2 + 1'
+notes = 'As 2.7-4(a).'
+
+[[rows]]
+key = '2.7-4(e)'
+f = '16*x^4 - 40*x^3 + 5*x^2 + 20*x + 6'
+notes = 'As 2.7-4(a).'
+
+[[rows]]
+key = '2.7-4(f)'
+f = '10*x^3 - 8.3*x^2 + 2.295*x - 0.21141'
+notes = 'As 2.7-4(a).'
+
+[[rows]]
+key = '2.7-5'
+f = 'T_6(x)'
+name = 'Chebyshev polynomial of degree 6'
+notes = 'The book gives the recurrence `T_(i+1)(x) = 2*x*T_i(x) - T_(i-1)(x)` with `T_0(x) = 1`, `T_1(x) = x`, and asks for `T_6` and all its roots.'
+
+[[rows]]
+key = '2.7-6'
+f = 'H_5(x)'
+name = 'Hermite polynomial of degree 5'
+notes = 'The book gives the recurrence `H_(i+1)(x) = 2*x*H_i(x) - 2*i*H_(i-1)(x)` with `H_0(x) = 1` and, as printed, `H_1(x) = x`, where the usual Hermite polynomials have `H_1(x) = 2*x`. As 2.7-5.'
+
+[[rows]]
+key = '2.7-7'
+f = 'L_4(x)'
+name = 'Laguerre polynomial of degree 4'
+notes = 'The book gives the recurrence `L_(i+1)(x) = (1 + 2*i - x)*L_i(x) - i^2*L_(i-1)(x)` with `L_0(x) = 1`, `L_1(x) = 1 - x`. As 2.7-5.'
+
+[[rows]]
+key = '2.7-8'
+f = 'P_5(x)'
+name = 'Legendre polynomial of degree 5'
+notes = 'The book gives the recurrence `P_(i+1)(x) = ((2*i + 1)/(i + 1))*x*P_i(x) - (i/(i + 1))*P_(i-1)(x)` with `P_0(x) = 1`, `P_1(x) = x`. As 2.7-5.'
+
+[[rows]]
+key = '2.7-9'
+f = 'C = (3*t^2 + t)/(50 + t^3)'
+name = 'concentration of a drug in the bloodstream'
+notes = 'Unknown `t`, in hours; asks when `C` is greatest, which is a root of `dC/dt`.'
+
+[[rows]]
+key = '2.7-10'
+f = '(1/3)*(Vf/V0)^3 - B*(Vf/V0) - 1/3 + B*cos(gamma0)'
+name = 'altitude loss in a pull-up from a dive'
+parameters = '`B = g/(k*V0^2)`, `g = 9.8` m/s^2; `V0 = 100` m/s, `gamma0 = -30` degrees, `k = 0.00196` 1/m (a); `150`, `-10`, `0.00145` (b); `200`, `-45`, `0.00128` (c); `250`, `-30`, `0.00112` (d)'
+also_in = 'DeSanti (1988), SIAM Review 30(4), 625–628, which the book cites'
+notes = 'Unknown `Vf/V0`, the ratio of the final and initial velocity, which gives the altitude loss `(1 - (Vf/V0)^2)/(2*k*B)`.'
+
+[[rows]]
+key = '2.7-12, P'
+f = '(x - 1)*(x - 2)*(x - 3)*(x - 4)*(x - 5)*(x - 6)*(x - 7)*(x - 8)*(x - 9)*(x - 10)'
+notes = "Roots 1 to 10; Laguerre's method from `x0 = 0` with tolerance `5E-11`."
+
+[[rows]]
+key = '2.7-12, P~'
+f = '(x - 1)*(x - 2)*(x - 3)*(x - 4)*(x - 5)*(x - 6)*(x - 7)*(x - 8)*(x - 9)*(x - 10) + x^5'
+notes = "The book's `P` with a tilde: `P` perturbed by `x^5`. As 2.7-12 `P`."

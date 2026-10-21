@@ -1,0 +1,67 @@
+title = 'Gottlieb, Thompson (2010): bisected direct quadratic regula falsi'
+reference = "Gottlieb, R. G., Thompson, B. F. (2010). Bisected direct quadratic regula falsi. Applied Mathematical Sciences 4(15), 709–718. No DOI; the publisher's copy: http://www.m-hikari.com/ams/ams-2010/ams-13-16-2010/gottliebAMS13-16-2010.pdf."
+year = 2010
+home = '1.2'
+where_in_source = '''
+- Table 1, "Test case functions and initial search intervals" (Section 3, p. 717), lists 7 equations by "Test No." with an initial interval each.
+- Table 2 gives the function calls per method and the root `x` per test, with tolerance `10^-10`.
+'''
+transcribed_from = 'the article, checked against the page images.'
+rows_summary = "7: Table 1's 7 functions."
+notes = '''
+- **Keys:** the test numbers.
+- **`f`:** Table 1 prints each function as an equation `... = 0`; a row's `f` gives its left-hand side.
+- **`also_in`:** empty in every row. Section 3 says that the functions come from Naghipoor, Ahmadian & Soheili (2008), "An improved regula falsi method for finding simple zeros of nonlinear equations", Applied Mathematical Sciences 2(8), 381–386, "plus an additional test function of our own", without saying which one is new.
+'''
+
+[[relations]]
+sources = ['roots_fortran']
+text = "This is the article that the comment \"Gottlieb's paper [table 1 & 2]\" of roots-fortran means. Its cases 30–36 are tests 1–7 in order, with the same expressions and intervals; there are no differences."
+
+[[relations]]
+sources = ['2008_naghipoor']
+text = '''
+Tests 2–7 are the 6 functions of Table 1 of Naghipoor, Ahmadian & Soheili (2008), in the same order, with the same expressions; test 1, `3*sin(x) - 2`, is not in it, so it is the article's own function. Only the interval of test 7 differs: Naghipoor et al. give `[0.5, 1.5]`, this article `[0.5, 2.0]`.
+'''
+
+[[rows]]
+key = '1'
+f = '3*sin(x) - 2'
+interval = '[0, 1]'
+notes = "Table 2's root `0.7297276562`."
+
+[[rows]]
+key = '2'
+f = 'x*exp(x) - 1'
+interval = '[-1, 1]'
+notes = "Table 2's root `0.5671432904`."
+
+[[rows]]
+key = '3'
+f = '11*x^11 - 1'
+interval = '[0.1, 0.9]'
+notes = "Table 2's root `0.8041330975`."
+
+[[rows]]
+key = '4'
+f = 'exp(x^2 + 7*x - 30) - 1'
+interval = '[2.8, 3.1]'
+notes = "Table 2's root `3.0000000000`."
+
+[[rows]]
+key = '5'
+f = '1/x - sin(x) + 1'
+interval = '[-1.3, -0.5]'
+notes = "Table 2's root `-0.6294464841`."
+
+[[rows]]
+key = '6'
+f = 'x^3 - 2*x - 5'
+interval = '[2, 3]'
+notes = "Table 2's root `2.0945514815`."
+
+[[rows]]
+key = '7'
+f = '1/x - 1'
+interval = '[0.5, 2.0]'
+notes = "Table 2's root `1.0000000000`."

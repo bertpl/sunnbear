@@ -1,0 +1,70 @@
+title = 'Chandrupatla (1997): hybrid quadratic/bisection algorithm'
+reference = 'Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear function without using derivatives. Advances in Engineering Software 28(3), 145–149. https://doi.org/10.1016/S0965-9978(96)00051-8.'
+year = 1997
+home = '1.1'
+where_in_source = "Table 1, \"Test functions\" (p. 146), numbers the 9 functions and prints each one's zero. Table 2 (p. 147) gives the 5 intervals of each function. A superscript on a function's number in Table 1 cites the article's reference list."
+transcribed_from = "the article's Tables 1 and 2, checked against sunnbear's transcription in `tests/solvers/paper_problems/chandrupatla.py`. That file holds all 9 functions and all 45 interval problems, and agrees with the article on every function, constant and interval. For function 7 it also holds a second version without the article's cutoff near 0."
+rows_summary = '9, 1 per function number of Table 1. Table 2 solves each function on 5 intervals, 45 problems in all.'
+notes = 'The `also_in` column gives the references that the superscripts of Table 1 cite. The rows of Brent (1973) are in `1973_brent_book`.'
+
+[[rows]]
+key = '1'
+f = 'x^3 - 2*x - 5'
+interval = '`[2, 3]`; `[1, 10]`; `[1, 100]`; `[-1E4, 1E4]`; `[-1E10, 1E10]`'
+also_in = 'Forsythe, Malcolm, Moler (1977), *Computer Methods for Mathematical Computations* (article ref. 3)'
+notes = 'Printed zero: `x = 2.0945515`. The article calls it "extensively tried out in the literature". Its appendix program evaluates this function.'
+
+[[rows]]
+key = '2'
+f = '1 - 1/x^2'
+interval = '`[0.5, 1.51]`; `[1E-4, 1E4]`; `[1E-6, 1E6]`; `[1E-10, 1E10]`; `[1E-12, 1E12]`'
+notes = 'Printed zero: `x = 1`. The article says the author proposed it.'
+
+[[rows]]
+key = '3'
+f = '(x - 3)^3'
+interval = '`[0, 5]`; `[-10, 10]`; `[-1E4, 1E4]`; `[-1E6, 1E6]`; `[-1E10, 1E10]`'
+notes = 'Printed zero: `x = 3`.'
+
+[[rows]]
+key = '4'
+f = '6*(x - 2)^5'
+interval = '`[0, 5]`; `[-10, 10]`; `[-1E4, 1E4]`; `[-1E6, 1E6]`; `[-1E10, 1E10]`'
+also_in = 'Thisted (1988), *Elements of Statistical Computing*, pp. 163–166 (article ref. 6)'
+notes = 'Printed zero: `x = 2`.'
+
+[[rows]]
+key = '5'
+f = 'x^9'
+interval = '`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`'
+also_in = 'Brent (1973), *Algorithms for Minimization without Derivatives* (article ref. 2)'
+notes = 'Printed zero: `x = 0`.'
+
+[[rows]]
+key = '6'
+f = 'x^19'
+interval = '`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`'
+also_in = 'Brent (1973) (article ref. 2)'
+notes = 'Printed zero: `x = 0`.'
+
+[[rows]]
+key = '7'
+f_description = '`0` if `abs(x) < 3.8*10^-4`, `x*exp(-x^-2)` otherwise'
+interval = '`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`'
+also_in = 'Brent (1973) (article ref. 2)'
+notes = 'Printed zero: `x = 0`. The article says Brent discusses it. sunnbear holds it as printed, and also as `x*exp(-1/x^2)` everywhere, with 0 at `x = 0`.'
+
+[[rows]]
+key = '8'
+f = '-3062*(1 - xi)*exp(-x)/(xi + (1 - xi)*exp(-x)) - 1013 + 1628/x'
+parameters = 'xi = 0.61489'
+interval = '`[2E-4, 2]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`'
+also_in = 'Thisted (1988) (article ref. 6)'
+notes = 'Printed zero: `x = 1.037536`.'
+
+[[rows]]
+key = '9'
+f = 'exp(x) - 2 - 0.01/x^2 + 0.000002/x^3'
+interval = '`[2E-4, 1]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`'
+also_in = 'Scales (1985), *Introduction to Non-Linear Optimization*, pp. 51–53 (article ref. 7)'
+notes = 'Printed zero: `x = 0.7032`.'

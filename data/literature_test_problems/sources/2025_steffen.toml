@@ -1,0 +1,24 @@
+title = 'Steffen et al. (2025): halving interval for Dekker and Brent'
+reference = 'Steffen, V., Della Pasqua, C. C., de Oliveira, M. S., da Silva, E. A. (2025). Halving interval guaranteed for Dekker and Brent root finding methods. Examples and Counterexamples 7, 100173. https://doi.org/10.1016/j.exco.2024.100173.'
+year = 2024
+home = '1.1'
+where_in_source = 'Section 3, "Results and discussion": case study 1 is Eq. (6) (p. 3); case study 2 is Eq. (8) with the Peng–Robinson values and Eq. (9) (p. 4).'
+transcribed_from = "the article (text layer, checked against the page images). sunnbear's `tests/solvers/bracketing/steffen_brent/paper_problems.py` holds both case studies with the same functions and intervals, but computes the Peng–Robinson constants `Lambda` and `Gamma` at full precision; the rows follow the article."
+rows_summary = '2, 1 per case study.'
+notes = 'The keys are the equation numbers.'
+
+[[rows]]
+key = '(6)'
+f = 'exp(-x^2/4) - 2*cos(x) + x/2 - 5/2'
+name = 'case study 1'
+interval = '[1.0, 3.0]'
+notes = '3 printed roots: `xi_1 ≈ 2.1584`, `xi_2 ≈ 4.6196`, `xi_3 ≈ 7.2550`; the interval holds `xi_1`.'
+
+[[rows]]
+key = '(8)'
+f = '(V/b)^3 - (1 - lambda + Tr/(Gamma*Pr))*(V/b)^2 + (sigma - lambda - lambda*Tr/(Gamma*Pr) + Lambda*alpha(omega, Tr)/(Gamma^2*Pr))*(V/b) - (sigma + sigma*Tr/(Gamma*Pr) + Lambda*alpha(omega, Tr)/(Gamma^2*Pr))'
+name = 'case study 2 (Peng–Robinson)'
+parameters = '`lambda = 2, sigma = -1, Lambda = 0.45724, Gamma = 0.07780`; `alpha(omega, Tr) = (1 + (0.37464 + 1.54226*omega - 0.26992*omega^2)*(1 - sqrt(Tr)))^2` (Eq. (9)); `omega = 0.200, Tr = 0.85, Pr = 0.45`'
+interval = '[14, 17]'
+also_in = 'Steffen and Silva, cited as ref. [16], for the generic cubic of Eqs. (7)–(8); Peng and Robinson (1976), ref. [19], for `lambda`, `sigma`, `Lambda`, `Gamma` and Eq. (9)'
+notes = "The variable is `V/b`, the volume over the covolume parameter. It has 3 roots (Fig. 5); the interval holds the vapor-phase one. Tolerance `1E-10`; printed root `15.0676609061`. That root matches `Lambda` and `Gamma` at full precision; with the printed `0.45724` and `0.07780`, the root on `[14, 17]` is about `15.0670`. The article's list gives ref. [16] as a particle-swarm paper by Steffen alone."

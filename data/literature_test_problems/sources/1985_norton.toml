@@ -1,0 +1,127 @@
+title = "Norton (1985): Algorithm 631, Larkin's method of rational interpolation"
+reference = "Norton, V. (1985). Algorithm 631: Finding a bracketed zero by Larkin's method of rational interpolation. ACM Transactions on Mathematical Software 11(2), 120–134. https://doi.org/10.1145/214392.214396. The authors' Fortran code is CALGO 631, https://www.netlib.org/toms/631."
+year = 1985
+home = '1.2'
+where_in_source = '''
+- Section 4 (pp. 128–130) numbers 12 functions in 3 groups, which Tables III–V solve. The article says that the 3 groups were "previously described" in Anderson and Björck (1973) and/or Bus and Dekker (1975), without saying which function comes from which.
+- Tables III–V also give evaluation counts for Anderson–Björck's Algorithm A, Brent's method, Bus–Dekker's Algorithm R and Cox's method, each changed to stop on the article's own test, `|x0 - x1| <= 2*tol` with `tol = 2*eps*|x0| + eta`. The runs used a DECSYSTEM-2060.
+- Tables VIa and VIb (pp. 131–133) solve 10,000 random polynomials of degree 30, on an IBM 4341.
+- The driver of the authors' code solves 1 more function.
+'''
+transcribed_from = "the article, a scan, read from the page images; the driver's function from the authors' code. No sunnbear transcription exists to check against."
+rows_summary = "14: the article's 12 functions, the random polynomials of Table VI, and the driver's function."
+
+[[relations]]
+sources = ['1975_bus_dekker']
+text = '''
+Functions 8–12 are the Groups II–IV of Bus & Dekker (1975), with the same values of `a`, `b` and `n`; Anderson & Björck (1973) hold none of them. Functions 1–6 follow the expressions that Bus & Dekker print (function 5 without Anderson & Björck's leading `1 +`); function 7 is in neither. The file of Bus & Dekker, `1975_bus_dekker`, lists the differences in `n` and in the intervals.
+'''
+
+[[rows]]
+key = '1'
+f = 'sin(x) - 0.5'
+interval = '[0, 1.5]'
+also_in = 'Anderson, Björck (1973) and/or Bus, Dekker (1975) (article refs. 1, 4), for all 3 groups'
+notes = 'Group I: a simple zero.'
+
+[[rows]]
+key = '2'
+f = '2*x*exp(-n) + 1 - 2*exp(-n*x)'
+parameters = 'n = 2, 5, 10, 20'
+interval = '[0, 1]'
+also_in = 'as row 1'
+notes = 'Group I.'
+
+[[rows]]
+key = '3'
+f = '(1 + (1 - n)^2)*x - (1 - n*x)^2'
+parameters = 'n = 2, 5, 10, 20'
+interval = '[0, 1]'
+also_in = 'as row 1'
+notes = 'Group I; the article: 1 turning point in `[0, 1]`.'
+
+[[rows]]
+key = '4'
+f = 'x^2 - (1 - x)^n'
+parameters = 'n = 2, 5, 10, 20'
+interval = '[0, 1]'
+also_in = 'as row 1'
+notes = 'Group I; the article: 1 inflection point in `[0, 1]`.'
+
+[[rows]]
+key = '5'
+f = '(1 + (1 - n)^4)*x - (1 - n*x)^4'
+parameters = 'n = 2, 5, 10, 20'
+interval = '[0, 1]'
+also_in = 'as row 1'
+notes = 'Group I; the article: 1 turning point and 1 inflection point in `[0, 1]`.'
+
+[[rows]]
+key = '6'
+f = '(x - 1)*exp(-n*x) + x^n'
+parameters = 'n = 2, 5, 10, 20'
+interval = '[0, 1]'
+also_in = 'as row 1'
+notes = 'Group I; the article: increasingly close to the x-axis for large `n`.'
+
+[[rows]]
+key = '7'
+f = '(n*x - 1)/((n - 1)*x)'
+parameters = 'n = 2, 5, 10, 20'
+interval = '[0.01, 1]'
+also_in = 'as row 1'
+notes = 'Group I; the article: each curve is asymptotic to the y-axis.'
+
+[[rows]]
+key = '8'
+f = 'x^n + a*x + b'
+parameters = '`a = 1, b = 0`; `n = 3, 5, 9, 19`'
+interval = '[-0.7, 1]'
+also_in = 'as row 1'
+notes = "Group II: a simple zero, and an inflection point of order `n - 1` or `n` at or near it. The root is exactly 0; the article notes that Bus–Dekker's Algorithm R needs 362 evaluations for `x^3 + x` at `eps = 2^-62`, `eta = 2^-129`."
+
+[[rows]]
+key = '9'
+f = 'x^n + a*x + b'
+parameters = '`a = 0, b = 10^-4`; `n = 3, 5, 9, 19`'
+interval = '[-0.7, 1]'
+also_in = 'as row 1'
+notes = 'Group II.'
+
+[[rows]]
+key = '10'
+f = 'x^n + a*x + b'
+parameters = '`a = 1, b = 10^-4`; `n = 3, 5, 9, 19`'
+interval = '[-0.7, 1]'
+also_in = 'as row 1'
+notes = 'Group II.'
+
+[[rows]]
+key = '11'
+f = 'x^n'
+parameters = 'n = 3, 5, 7, 9, 19, 25'
+interval = '[-1, 10]'
+also_in = 'as row 1'
+notes = "Group III: a multiple zero at 0. The article notes that Cox's method overflows on `x^19` and `x^25`, and that its Group III counts differ much from those of Bus and Dekker (1975), which it puts down to the 2 machines' arithmetic."
+
+[[rows]]
+key = '12'
+f_description = '`0` if `x = 0`; `x*exp(-x^(-2))` otherwise'
+interval = 'not given'
+also_in = 'as row 1'
+notes = 'Group III. The article gives an interval only for function 11.'
+
+[[rows]]
+key = 'Table VI'
+f = 'sum(c_i*x^i, i = 0..30)'
+name = 'random polynomials of degree 30'
+parameters = "`c_i` uniform in `[-1, 1]`, from IMSL's `GGUBS`; 10,000 polynomials"
+interval = '[-1, 1]'
+also_in = 'Cox (1970), "A bracketing technique for computing a zero of a function", Comput. J. 13, 101–102 (article ref. 5), whose tests the article follows'
+notes = "A polynomial is kept only if its values at -1 and 1 differ in sign, and only if every routine's zero lies within `10*(2*eps*|x0| + eta)` of the zero that `zero1` finds with `N = 2`. The seed is not given."
+
+[[rows]]
+key = 'driver'
+f = 'x^7 + 28*x^4 - 480'
+interval = '[1, 2]'
+notes = "From the code's `DRIVER`, not the article. Its sample output gives the zero `1.922884153250999`."

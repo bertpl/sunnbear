@@ -1,0 +1,328 @@
+title = 'Alhseno (2026): Al-Hseno algorithm'
+reference = 'Alhseno, M. (2026). Al-Hseno algorithm: a robust derivative-free root-finding method with adaptive multiplicity estimation, geometric damping, and curvature correction. Research Square preprint, posted 5 May 2026. https://doi.org/10.21203/rs.3.rs-9596848/v1.'
+year = 2026
+home = '1.2'
+where_in_source = '''
+- Appendix A, "Complete Benchmark Suite: 43 Test Functions", lists functions 1 to 43, each with a "Challenge" label and a stated root `alpha`.
+- Table 1 (Section 4.1) repeats functions 1 to 15, with shorter challenge labels; it writes function 4 as `prod_i (x - r_i) + 0.05*sin(50*x)`, without the `r_i`.
+- Table 3 (Section 4.4) repeats functions 1, 5, 6, 8, 9, 12, 16, 17, 19 and 40.
+- Section 4.5 computes basins of attraction for `z^3 - 1`, which Appendix A does not hold.
+'''
+transcribed_from = 'the article, checked against the page images.'
+rows_summary = '44: the 43 functions of Appendix A and the basin function of Section 4.5.'
+notes = '''
+- The article gives no intervals and no starting points: the method starts from 2 points `x0`, `x1`, and Section 4.2 says each method was started "using the same starting points".
+- Function 41 has no real root; the article uses it as a negative control.
+- The article cites no source for its functions.
+- Keys are the function numbers of Appendix A; the basin row is keyed by its section.
+- `name` holds the challenge label of Appendix A, since the article gives no other names.
+- `log` is the natural log: the stated roots of functions 2 and 23 solve the printed functions with it.
+- **The stated roots of 5 functions do not solve the printed function** (functions 7, 35, 36, 39 and 40); the notes of these rows give the function's value at the stated root. The article prints these expressions legibly.
+'''
+
+[[rows]]
+key = '1'
+f = '(x - 0.5)^3 + 0.001*(x - 0.5) + 0.2*sin(30*x)'
+name = 'Flat plateau'
+interval = 'none'
+notes = 'Stated root `0.313038703502`.'
+
+[[rows]]
+key = '2'
+f = 'log(abs(x - 2) + 10^(-5)) + 0.5*exp(x - 2) - 1'
+name = 'Log-exp isolated'
+interval = 'none'
+notes = 'Stated root `2.846882214844`.'
+
+[[rows]]
+key = '3'
+f = '(x - 1)^2/(x - 0.5) + 0.1*sin(20*x)'
+name = 'Rational singularity, double root'
+interval = 'none'
+notes = 'Stated root `1.109449761731`.'
+
+[[rows]]
+key = '4'
+f = '(x - 1)*(x - 1.01)*(x - 2)*(x - 2.02)*(x - 3) + 0.05*sin(50*x)'
+name = 'Wilkinson-type clustered'
+interval = 'none'
+notes = 'Stated root `1.889982394484`.'
+
+[[rows]]
+key = '5'
+f = '(x - 2)^7 + 0.5*sin(80*x)*exp(-(x - 2)^2)'
+name = 'Septic root, violent oscillation'
+interval = 'none'
+notes = 'Stated root `1.414547610571`.'
+
+[[rows]]
+key = '6'
+f = '(x - 1)^2 + 0.15*sin(80/(x - 1 + 0.01))'
+name = 'Chirped oscillation'
+interval = 'none'
+notes = 'Stated root `0.754501887869`.'
+
+[[rows]]
+key = '7'
+f = 'exp(x - 2)*sin(10*x) - 0.5*x + 0.5'
+name = 'Exp-trig, multiple roots'
+interval = 'none'
+notes = 'Stated root `0.456152157299`, where the printed function is `0.061`.'
+
+[[rows]]
+key = '8'
+f = '(x - 3)^4 + 0.01*sin(300*x) - 0.005'
+name = 'Quartic root, ultra-high freq.'
+interval = 'none'
+notes = 'Stated root `2.722400343588`.'
+
+[[rows]]
+key = '9'
+f = '(x + 1)^2*exp(3*x) + 0.3*cos(50*x/(x + 1.01))'
+name = 'Double root, exp growth'
+interval = 'none'
+notes = 'Stated root `-0.514923392007`.'
+
+[[rows]]
+key = '10'
+f = 'sin(10*x) - x'
+name = 'High-freq trigonometric'
+interval = 'none'
+notes = 'Stated root `0.0`.'
+
+[[rows]]
+key = '11'
+f = 'x^3 - 2*x + 2'
+name = 'Newton spiral'
+interval = 'none'
+notes = 'Stated root `-1.769292354238`.'
+
+[[rows]]
+key = '12'
+f = 'exp(x) - 2*x - 1'
+name = 'Double root'
+interval = 'none'
+notes = 'Stated root `0.0`.'
+
+[[rows]]
+key = '13'
+f = 'atan(x)'
+name = 'Extremely flat'
+interval = 'none'
+notes = 'Stated root `0.0`.'
+
+[[rows]]
+key = '14'
+f = 'sinh(x) - 12*x'
+name = 'Hyperbolic, multiple'
+interval = 'none'
+notes = 'Stated root `0.0`.'
+
+[[rows]]
+key = '15'
+f = 'cos(x) - x'
+name = 'Trigonometric fixed point'
+interval = 'none'
+notes = 'Stated root `0.739085133215`.'
+
+[[rows]]
+key = '16'
+f = '(x - 2)^3'
+name = 'Triple root'
+interval = 'none'
+notes = 'Stated root `2.0`.'
+
+[[rows]]
+key = '17'
+f = '(x + 1)^5'
+name = 'Quintic root'
+interval = 'none'
+notes = 'Stated root `-1.0`.'
+
+[[rows]]
+key = '18'
+f = 'x^4 - 5*x^3 + 6*x^2'
+name = 'Multiple roots'
+interval = 'none'
+notes = 'Stated roots `0.0, 2.0, 3.0`.'
+
+[[rows]]
+key = '19'
+f = '(x - 1)^2*(x - 3)'
+name = 'Double and simple'
+interval = 'none'
+notes = 'Stated roots `1.0, 3.0`.'
+
+[[rows]]
+key = '20'
+f = 'x^3 - 2*x - 5'
+name = 'Simple root'
+interval = 'none'
+notes = 'Stated root `2.094551481542`.'
+
+[[rows]]
+key = '21'
+f = 'exp(x) - 3*x'
+name = 'Exponential'
+interval = 'none'
+notes = 'Stated root `0.619061286735`.'
+
+[[rows]]
+key = '22'
+f = 'exp(-x) - x'
+name = 'Exponential'
+interval = 'none'
+notes = 'Stated root `0.567143290409`.'
+
+[[rows]]
+key = '23'
+f = 'log(x) - 2'
+name = 'Logarithmic'
+interval = 'none'
+notes = 'Stated root `7.389056098930`.'
+
+[[rows]]
+key = '24'
+f = 'exp(x) - 4*x^2'
+name = 'Exp-polynomial'
+interval = 'none'
+notes = 'Stated root `0.714805912362`.'
+
+[[rows]]
+key = '25'
+f = 'x*exp(x) - 1'
+name = 'Lambert W'
+interval = 'none'
+notes = 'Stated root `0.567143290409`.'
+
+[[rows]]
+key = '26'
+f = 'sin(x) - x/2'
+name = 'Trigonometric'
+interval = 'none'
+notes = 'Stated root `0.0`.'
+
+[[rows]]
+key = '27'
+f = 'cos(x) - 2*x'
+name = 'Trigonometric'
+interval = 'none'
+notes = 'Stated root `0.450183611294`.'
+
+[[rows]]
+key = '28'
+f = 'tan(x) - x'
+name = 'Trigonometric'
+interval = 'none'
+notes = 'Stated root `0.0`.'
+
+[[rows]]
+key = '29'
+f = 'sin(x) + cos(x) - 1'
+name = 'Trigonometric'
+interval = 'none'
+notes = 'Stated root `1.570796326794`.'
+
+[[rows]]
+key = '30'
+f = 'x*sin(x) - 1'
+name = 'Trigonometric'
+interval = 'none'
+notes = 'Stated root `1.114157140871`.'
+
+[[rows]]
+key = '31'
+f = 'sinh(x) - 2*x'
+name = 'Hyperbolic'
+interval = 'none'
+notes = 'Stated root `0.0`.'
+
+[[rows]]
+key = '32'
+f = 'cosh(x) - 3'
+name = 'Hyperbolic'
+interval = 'none'
+notes = 'Stated root `1.762747174039`.'
+
+[[rows]]
+key = '33'
+f = 'tanh(x) - 0.5*x'
+name = 'Hyperbolic'
+interval = 'none'
+notes = 'Stated root `0.0`.'
+
+[[rows]]
+key = '34'
+f = 'x - sinh(x)/3'
+name = 'Hyperbolic'
+interval = 'none'
+notes = 'Stated root `0.0`.'
+
+[[rows]]
+key = '35'
+f = 'cosh(x) + x - 2'
+name = 'Hyperbolic'
+interval = 'none'
+notes = 'Stated root `0.0`, where the printed function is `-1`.'
+
+[[rows]]
+key = '36'
+f = 'x^2*sin(1/x) - 0.1'
+name = 'Oscillatory near zero'
+interval = 'none'
+notes = 'Stated root `0.286`, where the printed function is `-0.13`.'
+
+[[rows]]
+key = '37'
+f = 'sin(10*x) - x/5'
+name = 'High-frequency trig'
+interval = 'none'
+notes = 'Stated root `0.0`.'
+
+[[rows]]
+key = '38'
+f = 'exp(-x)*sin(5*x) - 0.1'
+name = 'Damped oscillation'
+interval = 'none'
+notes = 'Stated root `0.020`.'
+
+[[rows]]
+key = '39'
+f = '(x - 1)^3 + sin(20*x)/10'
+name = 'Oscillatory'
+interval = 'none'
+notes = 'Stated root `1.0`, where the printed function is `0.091`.'
+
+[[rows]]
+key = '40'
+f = 'x^2 - cos(10*x)'
+name = 'High-frequency trig'
+interval = 'none'
+notes = 'Stated root `0.1`, where the printed function is `-0.53`.'
+
+[[rows]]
+key = '41'
+f = '(x - 2)^4 + 10^(-5)'
+name = 'No real root'
+interval = 'none'
+notes = "No stated root; the article's negative control."
+
+[[rows]]
+key = '42'
+f = 'atan(x) - 0.5'
+name = 'Inverse trig'
+interval = 'none'
+notes = 'Stated root `0.546302489843`.'
+
+[[rows]]
+key = '43'
+f = 'erf(x) - 0.5'
+name = 'Error function'
+interval = 'none'
+notes = 'Stated root `0.476936276204`.'
+
+[[rows]]
+key = '4.5'
+f = 'z^3 - 1'
+interval = 'none; basins of attraction over `[-2, 2] x [-2, 2]` in the complex plane'
+notes = 'Fig. 1 compares the basins of the Al-Hseno, Newton and Halley methods. Not in Appendix A.'

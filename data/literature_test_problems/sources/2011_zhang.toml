@@ -1,0 +1,20 @@
+title = "Zhang (2011): an improvement to Brent's method"
+reference = "Zhang, Z. (2011). An Improvement to the Brent's Method. International Journal of Experimental Algorithms 2(1), 21–26. No DOI; the publisher's page: https://www.cscjournals.org/library/manuscriptinfo.php?mc=IJEA-7."
+year = 2011
+home = '1.2'
+where_in_source = '''
+Section 3, "Experimental test" (p. 24), solves 1 equation, `cos(x) - x^3 = 0`, with `a = -4` and `b = 4` and a termination error of `1.0E-5`. Table 1 prints the interval after each step, for Brent's method and for the new method.
+'''
+transcribed_from = "the article, the publisher's PDF with a text layer, read from the page images."
+rows_summary = "1, the article's only test function."
+notes = 'The function has no number, so its key `3` is the number of Section 3.'
+
+[[relations]]
+sources = ['2013_stage', '2026_ganchovski_et_al', 'roots_fortran']
+text = "Stage (2013) §3.4, Ganchovski et al. (2026) f33 and roots-fortran case 145 all have the same function on `[0, 4]`, where Zhang's text gives `[-4, 4]`. The first intervals that Table 1 prints have the endpoints 0 and 4, and Stage writes that `(0,4)` corresponds to Zhang."
+
+[[rows]]
+key = '3'
+f = 'cos(x) - x^3'
+interval = '[-4, 4]'
+notes = "Table 1's last interval of the new method is `[0.865470, 0.865474]`."

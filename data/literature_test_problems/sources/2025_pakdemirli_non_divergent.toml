@@ -1,0 +1,35 @@
+title = 'Pakdemirli (2025): a non-divergent root-finding algorithm'
+reference = 'Pakdemirli, M. (2025). A New Non-Divergent Root Finding Algorithm. Journal of Informatics and Mathematical Sciences 17(4), 365–374. https://doi.org/10.26713/jims.v17i4.3334.'
+year = 2025
+home = '1.2'
+where_in_source = '''
+- Section 4, "Numerical Simulations", gives 4 examples, 4.1 to 4.4 (equations (4.1) to (4.4)). Tables 1, 2, 3 and 5 list, per example, the iterates of Newton's method, the article's method and a hybrid of the 2; Table 4 gives, for Example 4.3, the range of starting points from which each method converges to the first positive root.
+- Each example runs from 1 starting point, which Section 4 says is chosen far from the root and where the first derivative is very small.
+'''
+transcribed_from = 'the article (text layer), checked against the page images.'
+rows_summary = '4, 1 per example.'
+notes = '''
+- The article gives starting points, not intervals; the notes of each row give its starting point `x0`.
+- The article cites no source for its examples.
+- Keys are the example numbers.
+'''
+
+[[rows]]
+key = '4.1'
+f = '-x^2 + 1'
+notes = "`x0 = 0.01` (Table 1), next to the maximum at `0`; all 3 methods reach the root `1`. The article says that from `x0 = 0` Newton's method diverges and its own methods do not move."
+
+[[rows]]
+key = '4.2'
+f = 'x^3 + 3*x^2 - 4'
+notes = "`x0 = 0.01` (Table 2), next to the local minimum at `0`; all 3 methods reach the root `1`. The function's other root, `-2`, is a double root, which the article does not mention."
+
+[[rows]]
+key = '4.3'
+f = 'cos(x)'
+notes = "Target: the first positive root, `pi/2`. `x0 = 0.1` (Table 3); Newton's method converges to another root, printed as `10.9956`. Table 4: Newton's method converges to `pi/2` from `[0.41, pi - 0.41]`, the article's 2 methods from `(0, pi)`."
+
+[[rows]]
+key = '4.4'
+f = '2*exp(-x) + x^2 - 4'
+notes = 'Printed with `e^(-x)`. Target: the positive root, printed as `1.9257`. `x0 = 0.6` (Table 5), where the derivative is close to 0.'

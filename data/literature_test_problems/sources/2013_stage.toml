@@ -1,0 +1,99 @@
+title = "Stage (2013): comments on an improvement to Brent's method"
+reference = "Stage, S. A. (2013). Comments on An Improvement to the Brent's Method. International Journal of Experimental Algorithms 4(1), 1–16. No DOI; the publisher's PDF: https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf."
+year = 2013
+home = '1.2'
+where_in_source = '''
+- Section 3, "Performance tests", compares 7 methods on 10 functions, 1 per subsection §3.4–§3.13. Each subsection prints its function under "Function tested", then a convergence plot whose title gives the function in a shorthand form.
+- §3.2 sets the initial interval to `(-10, 10)` unless a subsection says otherwise, and states that all functions have their roots between 0 and 1.
+- §3.3 stops a run when `|a - b|`, `|f(a)|` or `|f(b)|` is at most `10^-15`, or when `|a - b| <= 0.5*|a + b|*10^-15`.
+'''
+transcribed_from = "the article, the publisher's PDF with a text layer, checked against the page images at 300 dpi. The rows follow the printed functions, not the plot titles; the notes give the one plot title that differs in substance."
+rows_summary = '10, 1 per subsection §3.4–§3.13.'
+notes = '''
+- **Keys and names:** the functions have no numbers, so a key is the subsection number, and `name` is the subsection title without its leading "Testing" and article.
+- **Intervals:** Stage writes intervals in parentheses, as `(0,4)`; the rows write them as `[a, b]`.
+'''
+
+[[relations]]
+sources = ['2026_ganchovski_et_al', '2026_tomov_ganchovski_benchmark']
+text = '''
+Ganchovski et al. (2026) hold 8 of the 10 functions as f33–f40, and the benchmark of Tomov & Ganchovski (2026) repeats these rows.
+- f33–f40 are §3.4, §3.5, §3.7, §3.9, §3.10, §3.11, §3.12 and §3.13, in this order. §3.6 and §3.8 are not there.
+- f34–f40 run on `[-11, 9]`, where Stage uses `[-10, 10]`. f33 has Figure 1's `[0, 4]`.
+- f40's second branch is `1/(x - 2/3)`, the plot title's form, where Stage prints `(1 - 2/3)^-1`. f40 keeps the printed first branch, `0` if `x = 0`.
+'''
+
+[[relations]]
+sources = ['roots_fortran']
+text = '''
+roots-fortran holds several of the functions, inside and outside its "Stage paper" block.
+- The "Stage paper" block, cases 99–102: case 99 is `cos(x) + x`, where §3.5 has `cos(x) - x`; case 100 is §3.6; case 101, `x^2 + sin(x/n) - 0.25` on `[0, 1]`, is no Stage function (it is Galdino's `g21`–`g23`); case 102 is §3.10. Commented-out code in the block holds §3.8 and §3.9 on `[-10, 10]`.
+- Outside that block, cases 138–139 (the "RBP paper" block) are §3.7, on `[-10, 10]` and `[-10000, 10]`, and case 145 ("Zhang test case") is §3.4 on `[0, 4]`.
+- The block's comment "see also #26" points to no Stage function: case 26 is Brent (1971)'s `x*exp(-x^-2)` with `0` at `x = 0`, and #26 in the roots-fortran GitHub repository is a pull request that fixes the ITP method.
+'''
+
+[[rows]]
+key = '3.4'
+f = 'cos(x) - x^3'
+name = 'Function From Zhang'
+interval = '`[0, 4]` (Figure 1); `[-10, 10]` (Figure 2)'
+also_in = 'Zhang (2011)'
+notes = "Stage says `(0,4)` corresponds to Zhang, and that its code reproduces Zhang's Table 1."
+
+[[rows]]
+key = '3.5'
+f = 'cos(x) - x'
+name = 'Another Cosine Function'
+interval = '[-10, 10]'
+
+[[rows]]
+key = '3.6'
+f = '1 - (3/4)*x'
+name = 'Linear Function'
+interval = '[-10, 10]'
+notes = 'The root is `4/3`, outside the range that §3.2 states for all functions.'
+
+[[rows]]
+key = '3.7'
+f_description = '`abs(x - 2/3)^0.5 - 0.1` if `x <= 2/3`; `-abs(x - 2/3)^0.5 - 0.1` otherwise'
+name = 'Inverse Quadratic Function'
+interval = '[-10, 10]'
+
+[[rows]]
+key = '3.8'
+f_description = '`abs(x - 2/3)^0.5` if `x <= 2/3`; `-abs(x - 2/3)^0.5` otherwise'
+name = 'More Difficult Inverse Quadratic Function'
+interval = '[-10, 10]'
+
+[[rows]]
+key = '3.9'
+f_description = '`abs(x - 2/3)^0.2` if `x <= 2/3`; `-abs(x - 2/3)^0.2` otherwise'
+name = 'Inverse 5th Order Polynomial Function'
+interval = '[-10, 10]'
+
+[[rows]]
+key = '3.10'
+f = '(x - 7/9)^3 + 0.001*(x - 7/9)'
+name = 'Cubic Polynomial Function'
+interval = '[-10, 10]'
+notes = 'The subsection title reads "Testing an Cubic Polynomial Function".'
+
+[[rows]]
+key = '3.11'
+f_description = '`-0.5` if `x <= 1/3`; `0.5` otherwise'
+name = 'Heaviside Function'
+interval = '[-10, 10]'
+notes = 'The article says the function has no actual root, only a discontinuity at `x = 1/3`.'
+
+[[rows]]
+key = '3.12'
+f_description = '`-10^-3` if `x <= 1/3`; `1 - 10^-3` otherwise'
+name = 'More Difficult Heaviside Function'
+interval = '[-10, 10]'
+
+[[rows]]
+key = '3.13'
+f_description = '`0` if `x = 0`; `(1 - 2/3)^-1` otherwise'
+name = 'Discontinuous Function'
+interval = '`[-10, 10]` (Figure 11); `[0, 7]` (text)'
+notes = 'Printed so, which makes the second branch the constant 3. The plot title is `f = 1 / (x - 2/3)`, and the text describes an infinite-magnitude discontinuity in place of a root.'

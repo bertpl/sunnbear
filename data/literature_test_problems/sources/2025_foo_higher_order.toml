@@ -1,0 +1,37 @@
+title = 'Foo, Tan (2025): higher-order root-finding algorithm'
+reference = 'Foo, W. G., Tan, C. H. (2025). Higher-Order Root-Finding Algorithm and its Applications. arXiv preprint 2509.20897v1. http://arxiv.org/abs/2509.20897v1.'
+year = 2025
+home = '1.2'
+where_in_source = '''
+- Section 4.2 (Table 1, Fig. 1) solves `H2(x) = y` for the binary entropy function `H2` (eq. (6)); Fig. 3 shows the basins of attraction for `y = 0.3`.
+- Section 4.3.1 (Table 2) solves `Hq(x) = y` for the q-ary entropy function `Hq` (Definition 1) with a large prime `q`.
+- Section 5 (Fig. 2) computes basins of attraction for `z^6 - z + 1 = 0` in the complex plane.
+'''
+transcribed_from = 'the article.'
+rows_summary = '3, 1 per section with a solved equation.'
+notes = '''
+- The article writes its equations in the form `H(x) = y`; the rows write them as `H(x) - y`.
+- Keys are section numbers.
+'''
+
+[[rows]]
+key = '4.2'
+f = '-x*log2(x) - (1 - x)*log2(1 - x) - y'
+name = 'binary entropy preimage'
+parameters = 'y = 0.1, 0.2, ..., 0.9'
+interval = '[0, 0.5]'
+notes = 'Eq. (21) gives the 9 roots to 14 digits, from `0.01298686205551` (`y = 0.1`) to `0.31601934632361` (`y = 0.9`). Starting values solve `4*x*(1 - x) = y` or `(4*x*(1 - x))^(1/log(4)) = y`.'
+
+[[rows]]
+key = '4.3.1'
+f = 'x*log(q - 1)/log(q) - x*log(x)/log(q) - (1 - x)*log(1 - x)/log(q) - y'
+name = 'q-ary entropy preimage'
+parameters = '`q = 2^127 - 1`; `y = 0.1, 0.2, ..., 0.9`'
+interval = '[0, (q - 1)/q]'
+notes = 'Published as `Hq(x) = x*logq(q - 1) - x*logq(x) - (1 - x)*logq(1 - x)` with base-q logarithms. Starting value `x0 = y`.'
+
+[[rows]]
+key = '5'
+f = 'z^6 - z + 1'
+interval = 'none (complex plane)'
+notes = 'Used only for basins of attraction.'

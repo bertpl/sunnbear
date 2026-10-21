@@ -1,0 +1,55 @@
+title = 'Kumar, Srivastav (2026): randomized bracketing method'
+reference = "Kumar, D., Srivastav, S. K. (2026). A randomized bracketing method for derivative-free root finding with uniform spacing contraction. Research Square preprint. https://doi.org/10.21203/rs.3.rs-10070193/v1. The article's supplementary material holds the authors' code."
+year = 2026
+home = '1.2'
+where_in_source = '''
+- Table 3 (Section 5.2) lists 6 functions `f1` to `f6`, each with its root and initial interval. `f1` to `f5` are the main test set of Tables 4 to 7 and Figs. 2 to 5; `f6` is an exploratory non-monotone example, for which no table or figure gives results.
+- Appendix A.2 runs `g(x) = x - e^-x` on `[0, 1]` with random noise added to each evaluation (Table 8).
+'''
+transcribed_from = "the article (text layer), with Table 3 checked against its page image. The authors' code in the supplementary material was not read."
+rows_summary = "7: Table 3's 6 functions and the noisy function of Appendix A.2."
+notes = "Keys are the article's labels, and `A.2` for the function of Appendix A.2."
+
+[[rows]]
+key = 'f1'
+f = 'x - exp(-x)'
+interval = '[0, 1]'
+notes = 'Stated root `0.567143...`. Appendix A.2 adds noise to the same expression (row A.2).'
+
+[[rows]]
+key = 'f2'
+f = 'x^3 + x - 1'
+interval = '[0, 1]'
+notes = 'Stated root `0.682328...`.'
+
+[[rows]]
+key = 'f3'
+f = 'atan(x) - 0.3'
+interval = '[0, 1]'
+notes = 'Printed as `arctan(x)`. Stated root `tan(0.3)`.'
+
+[[rows]]
+key = 'f4'
+f = '(x - x*)^3 + 0.05*(x - x*)'
+parameters = 'x* = 0.6'
+interval = '[0, 1]'
+notes = '`x*` is the stated root.'
+
+[[rows]]
+key = 'f5'
+f = 'log(1 + x) - 0.4'
+interval = '[0, 1]'
+notes = 'Stated root `e^0.4 - 1`, so the log is natural.'
+
+[[rows]]
+key = 'f6'
+f = 'sin(x) - 0.3'
+interval = '[0, 2]'
+notes = 'Stated root `0.304693...`. The article calls it not monotone on its interval and leaves it out of Tables 4 to 7.'
+
+[[rows]]
+key = 'A.2'
+f = 'x - exp(-x) + eps'
+parameters = '`eps ~ N(0, sigma^2)`, drawn independently at each evaluation; `sigma = 10^-3`'
+interval = '[0, 1]'
+notes = "The article writes it as `g(x) + eps` with `g(x) = x - e^-x`, and states the root `0.5671432904`. Table 8's caption writes the noise as `N(0, 10^-3)`, but gives its standard deviation as `10^-3`, as the text does."

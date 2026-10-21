@@ -1,0 +1,128 @@
+title = 'Suhadolnik (2012): combined bracketing methods'
+reference = 'Suhadolnik, A. (2012). Combined bracketing methods for solving nonlinear equations. Applied Mathematics Letters 25(11), 1755–1760. https://doi.org/10.1016/j.aml.2012.02.006.'
+year = 2012
+home = '1.2'
+where_in_source = '''
+Section 5, "Numerical examples", Table 1 (p. 1759), lists 18 functions with their intervals `[x_a, x_b]` and the iteration counts of 8 methods, at `eps = 10^-15` and `N_max = 10^5`. The article's own method is the regula falsi–bisection–parabolic (RBP) method.
+'''
+transcribed_from = "the article, the publisher's PDF with a text layer, checked against the page image at 400 dpi."
+rows_summary = '18, 1 per example of Table 1.'
+notes = '''
+- **Keys:** the numbers of Table 1's column "No.".
+- **`also_in`:** empty in every row. The abstract says that the examples were published in the literature, but the article does not say which example comes from where.
+'''
+
+[[relations]]
+sources = ['2026_ganchovski_et_al', '2026_tomov_ganchovski_benchmark']
+text = '''
+Ganchovski et al. (2026) hold 12 of the 18 examples as f51–f62, and the benchmark of Tomov & Ganchovski (2026) repeats these rows.
+- f51–f62 are examples 1, 2, 3, 5, 7, 9, 10, 11, 12, 13, 15 and 16, in this order. Examples 4, 6, 8, 14, 17 and 18 are not there.
+- Expressions and intervals agree, except f60 (example 13), whose interval is `[0.0, 2]` where Table 1 has `[0, .5]`.
+'''
+
+[[relations]]
+sources = ['roots_fortran']
+text = '''
+In roots-fortran, the comment "see Table 1 from RBP paper" heads cases 134–144.
+- Cases 134–137 and 140–144 are examples 1, 2, 3, 5, 7, 8, 10, 17 and 18, with the same expressions and intervals. The RBP method's name and these 9 matches identify the "RBP paper" as this article.
+- Cases 138–139 are not in Table 1: they hold the §3.7 function of Stage (2013).
+- Case 1, outside the block, is example 16.
+'''
+
+[[relations]]
+sources = ['1992_alefeld_potra']
+text = "The article cites Alefeld & Potra (1992) as [5]. Example 6 is problem 10 of its Table 1 at `n = 10`, on the same interval. Examples 4 and 14 are its problems 3 and 1, on `[.5, 1]` and `[.1, 1.5]` where Alefeld & Potra have `[0.1, 1]` and `[0.5, 1.5]`. Galdino's `g22`, `g3` and `g1` are the same 3 functions."
+
+[[rows]]
+key = '1'
+f = 'log(x)'
+interval = '[.5, 5]'
+notes = 'The article prints `ln`.'
+
+[[rows]]
+key = '2'
+f = '(10 - x)*exp(-10*x) - x^10 + 1'
+interval = '[.5, 8]'
+
+[[rows]]
+key = '3'
+f = 'exp(sin(x)) - x - 1'
+interval = '[1, 4]'
+
+[[rows]]
+key = '4'
+f = '11*x^11 - 1'
+interval = '[.5, 1]'
+
+[[rows]]
+key = '5'
+f = '2*sin(x) - 1'
+interval = '[.1, pi/3]'
+
+[[rows]]
+key = '6'
+f = 'x^2 + sin(x/10) - .25'
+interval = '[0, 1]'
+
+[[rows]]
+key = '7'
+f = '(x - 1)*exp(-x)'
+interval = '[0, 1.5]'
+
+[[rows]]
+key = '8'
+f = 'cos(x) - x'
+interval = '[0, 1.7]'
+
+[[rows]]
+key = '9'
+f = '(x - 1)^3 - 1'
+interval = '[1.5, 3]'
+
+[[rows]]
+key = '10'
+f = 'exp(x^2 + 7*x - 30) - 1'
+interval = '[2.6, 3.5]'
+
+[[rows]]
+key = '11'
+f = 'atan(x) - 1'
+interval = '[1, 8]'
+notes = 'The article prints `arctan`.'
+
+[[rows]]
+key = '12'
+f = 'exp(x) - 2*x - 1'
+interval = '[.2, 3]'
+
+[[rows]]
+key = '13'
+f = 'exp(-x) - x - sin(x)'
+interval = '[0, .5]'
+
+[[rows]]
+key = '14'
+f = 'x^3 - 1'
+interval = '[.1, 1.5]'
+
+[[rows]]
+key = '15'
+f = 'x^2 - sin(x)^2 - 1'
+interval = '[-1, 2]'
+
+[[rows]]
+key = '16'
+f = 'sin(x) - x/2'
+interval = '[pi/2, pi]'
+
+[[rows]]
+key = '17'
+f = 'x^3'
+interval = '[-0.5, 1/3]'
+notes = "Section 4 names examples 17 and 18 as cases where `f'(x*) = 0`, on which the methods may converge slowly."
+
+[[rows]]
+key = '18'
+f = 'x^5'
+interval = '[-0.5, 1/3]'
+notes = 'See example 17.'

@@ -1,0 +1,112 @@
+title = 'Süli, Mayers (2003): An Introduction to Numerical Analysis, chapter 1'
+reference = 'Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge University Press, Cambridge. https://doi.org/10.1017/CBO9780511801181.'
+year = 2003
+home = '1.4'
+where_in_source = '''
+chapter 1, "Solution of equations by iteration" (pp. 1–38): Examples 1.1–1.8, the text examples of Sections 1.1, 1.2 and 1.7, Tables 1.1–1.4, and Exercises 1.1–1.12 (pp. 35–38).
+
+The rows leave out Example 1.8, a sequence with no function, the generic quadratic of Section 1.1, and Exercises 1.7, 1.8, 1.10 and 1.11, which concern a generic `f`. Chapter 4 treats systems.
+'''
+transcribed_from = "the book's PDF, which has a text layer, checked against the page images."
+rows_summary = '16: 11 from the text and its examples, 5 from the exercises alone.'
+notes = '''
+How to read the rows:
+- **Keys:** the book's equation number where it numbers the function, else the example or exercise number; `§1.n` is a text example of Section 1.n. The book cross-references Example 1.5 with Exercise 1.1, and Example 1.7 with Exercises 1.3 and 1.4, so each pair shares a row.
+- **Equations:** an equation that the book prints as `lhs = rhs` stays in that form; `f(x) = 0` is written as `f(x)`.
+- **`log`** is the natural log, which the book writes `ln`.
+'''
+
+[[rows]]
+key = '§1.1'
+f = 'x^5 - 4*x - 2'
+notes = "The book's example of a polynomial equation with no solution in radicals (p. 2). No root is computed."
+
+[[rows]]
+key = '§1.2'
+f = 'x^2 + 1'
+notes = "No real root: the book's example of an equation without a solution in any interval of the real line (p. 2)."
+
+[[rows]]
+key = '(1.2)'
+f = '1/2 - 1/(1 + M*abs(x - 1.05))'
+parameters = '`M = 200` (Fig. 1.1); `M = 2000, 20000, 200000, 2000000, 20000000` (Remark 1.1)'
+interval = '`[0.8, 1.8]`; `[1.04999, 1.05001]`'
+notes = '2 roots, `1.05 - 1/M` and `1.05 + 1/M`, only `2/M` apart. Remark 1.1 replots it in Maple, on the smaller interval for the 2 largest `M`. A footnote in Section 1.6 (p. 28) notes that bisection applies although `f` is not differentiable at 1.05.'
+
+[[rows]]
+key = 'Examples 1.1–1.3'
+f = 'exp(x) - 2*x - 1'
+interval = '[1, 2]'
+notes = 'Fixed-point form `x = log(2*x + 1)`, iterated from `x0 = 1` (eq. (1.8), Table 1.1); `x25` is correct to 6 decimals, `xi = 1.256431`. Example 1.1 also names `x = (exp(x) - 1)/2`, which does not map `[1, 2]` into itself.'
+
+[[rows]]
+key = 'Example 1.4'
+f_description = '`x = g(x)`, with `g(x) = 2^(-(1 + log2(1/x)^(1/alpha))^alpha)` for `0 < x <= 1` and `g(0) = 0`'
+parameters = '`alpha > 0`; `alpha = 1/2, 1, 2` (Fig. 1.3)'
+interval = '[0, 1]'
+notes = 'Fixed point 0. From `x0 = 1`, `x_k = 2^(-k^alpha)`: sublinear for `alpha < 1`, linear for `alpha = 1`, superlinear for `alpha > 1`.'
+
+[[rows]]
+key = 'Example 1.5; Exercise 1.1'
+f = 'x = (x^2 + c)/2'
+parameters = '`c < 1`; Exercise 1.1: `0 < c < 1`'
+notes = 'Fixed points `1 - sqrt(1 - c)`, stable for `-3 < c < 1`, and `1 + sqrt(1 - c)`, unstable. The iteration converges to the smaller one for `-xi2 < x0 < xi2`, and quadratically for `c = 0`.'
+
+[[rows]]
+key = 'Example 1.6 (g1)'
+f = 'x = 0.99*x'
+name = 'g1'
+notes = 'Fixed point 0, linear rate 0.99, from `u0 = 1` (Table 1.2).'
+
+[[rows]]
+key = 'Example 1.6 (g2)'
+f = 'x = x/(1 + x^(1/10))^10'
+name = 'g2'
+notes = "Fixed point 0, sublinear: `v_k = (k + 1)^(-10)` from `v0 = 1` (Table 1.2), yet closer to 0 than `g1`'s iterates until `k = 9067`."
+
+[[rows]]
+key = 'Example 1.7; Table 1.3; Exercises 1.3, 1.4'
+f = 'exp(x) - x - 2'
+interval = '`(1, 2)`; `(-2, -1)`'
+notes = '1 root in each interval. Fixed-point forms `x = log(x + 2)` (eq. (1.17), converges to the positive root), `x = exp(x) - 2` (to the negative root) and `x = x*(exp(x) - x)/2` (to neither). Table 1.3: secant from `x0 = 1, x1 = 3` and Newton from `x0 = 1`, both to 1.146193. Exercise 1.3: Newton from `x0 = 100` and `x0 = -100`. Exercise 1.4: the iteration `x_{k+1} = x_k - f(x_k)^2/(f(x_k + f(x_k)) - f(x_k))` from `x0 = 1, 10, -10`.'
+
+[[rows]]
+key = '(1.33)'
+f = 'x = a*x*(1 - x)'
+name = 'logistic equation'
+parameters = '`0 < a <= 4`; `a = 3.4, 3.5, 3.99`'
+interval = '[0, 1]'
+notes = 'Fixed points 0 and `1 - 1/a`. For `a = 3.4` the iterates approach a 2-cycle, 0.45 and 0.84, the fixed points of `g(g(x))` (eq. (1.34)); for `a = 3.5` a 4-cycle; for `a = 3.99`, from `x0 = 0.75`, no regular pattern.'
+
+[[rows]]
+key = '(1.37)'
+f = 'x*(x^2 - 1)*(x - 3)*exp(-(x - 1)^2/2)'
+notes = 'Zeros -1, 0, 1, 3. Newton from any `x0` in `(-0.327, 0.445)` converges to 0. Table 1.4 starts Newton at 0.4457840 to 0.4457900 in steps of `5E-7`, and the limits jump between 0, 1, -1, 3, `+infinity` and `-infinity`.'
+
+[[rows]]
+key = 'Exercise 1.2'
+f_description = '`x = g(x)`, with `g(x) = -x*sin(1/x)^2` for `0 < x <= 1` and `g(0) = 0`'
+parameters = '`k` integer'
+interval = '[0, 1]'
+notes = 'Fixed point 0, neither stable nor unstable; starts `x0 = 1/(k*pi)` and `x0 = 2/((2*k + 1)*pi)`.'
+
+[[rows]]
+key = 'Exercise 1.5'
+f = 'exp(x) - x - 1.000000005'
+notes = 'Positive zero close to 0.0001; Newton from `x0 = 0.0005`.'
+
+[[rows]]
+key = 'Exercise 1.6'
+f = 'exp(x) = 1 + x'
+notes = 'Double root 0; Newton from `x0 = 1` converges linearly.'
+
+[[rows]]
+key = 'Exercise 1.9'
+f = 'x^2 - 1'
+parameters = '`eps` small'
+notes = 'Secant from `x0 = 1 + eps, x1 = -1 + eps` converges to -1; with the 2 starts swapped, to 1.'
+
+[[rows]]
+key = 'Exercise 1.12'
+f = 'x*(x^2 - 1)'
+notes = 'Newton has a 2-cycle `a, -a`; asks for `a` and whether the 2-cycle is stable.'

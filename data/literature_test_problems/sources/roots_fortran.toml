@@ -1,0 +1,812 @@
+title = 'roots-fortran (2025): the test problems of `root_tests.f90` at commit 390e7ea'
+reference = '''
+Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25, the last commit to the file), https://github.com/jacobwilliams/roots-fortran/blob/390e7ea30751fe2ab23ddb876a3563e07bef1b76/test/root_tests.f90. BSD-3-Clause. The program's header comment gives 1 reference, without naming cases: Alefeld, G. E., Potra, F. A. and Shi, Y., "Algorithm 748: Enclosing Zeros of Continuous Functions", ACM Trans. Math. Softw. 21(3), September 1995, pp. 327–344 (no DOI in the file).
+
+Comments name these sources for cases or blocks, as they give them:
+- "Dowell & Jarratt", with no year (cases 18–24).
+- "Gottlieb's paper [table 1 & 2]", with no further detail (cases 30–36). This is Gottlieb & Thompson (2010), whose rows are in `2010_gottlieb`; cases 30–36 are its tests 1–7, unchanged.
+- http://www.mth.pdx.edu/~daescu/mth451_551/Muller_bisection.pdf (cases 41, 42). The host is gone, and no web archive captured the file.
+- Alefeld–Potra–Shi (1995), "case 11 from Algorithm 748" (case 45).
+- Chandrupatla, T. R., "A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear function without using derivatives", Advances in Engineering Software 28(3), April 1997, pp. 145–149 (cases 47–62).
+- "A modified three-point Secant method with improved rate and characteristics of convergence", July 2019, with no author (cases 63–68). This is Tiruneh (2019), whose rows are in `2019_tiruneh`; cases 63–68 are 6 of the 7 functions of its Table 1. The article gives starting points, not intervals, so the brackets are roots-fortran's own.
+- Popovski, D., "A note on King's method F for finding a bracketed root", 1982, https://www.semanticscholar.org/paper/A-note-on-King's-method-F-for-finding-a-bracketed-Popovski/513ffdb3befbf48c38bb70dbec60934472cc9903 (cases 73–98). This survey has no source file for the article.
+- "Stage paper", with "see also #26" (cases 99–102). This is Stage (2013), whose rows are in `2013_stage`. Case 99 is Stage's §3.5 with its sign flipped, case 100 is §3.6 and case 102 is §3.10; case 101 is no Stage function, but Galdino's `g21`–`g23`. "see also #26" points to no Stage function: case 26 is Brent (1971)'s `x*exp(-x^-2)`.
+- "P1 in BlendTF paper" (cases 103–117). This is Badr, Almotairi & El Ghamry (2021), whose rows are in `2021_badr`. Cases 103–117 are all 15 of its problems `P1`–`P15`, not only `P1`; the only difference is the interval of `P3`, which is `[3, 4]` in the article and `[3, 7]` in case 105.
+- Wikipedia, ITP method, https://en.wikipedia.org/wiki/ITP_method#Example:_Finding_the_root_of_a_polynomial (case 118). Its rows are in `2025_wikipedia_itp_method`, whose function matches case 118.
+- "the ITP paper : Table 1" (cases 119–127).
+- "Table 1 from RBP paper" (cases 134–144). This is Suhadolnik (2012), whose rows are in `2012_suhadolnik`. Cases 134–137 and 140–144 are the examples 1, 2, 3, 5, 7, 8, 10, 17 and 18 of its Table 1, unchanged; cases 138–139 hold Stage's §3.7, not a Suhadolnik function.
+- "Zhang test case" (case 145). This is Zhang (2011), whose rows are in `2011_zhang`, on `[0, 4]`, the interval at which Zhang's Table 1 starts.
+- http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543, the file of Galdino (2011) (`2011_galdino`), and "Root-test-functions.pdf : https://www.researchgate.net/publication/373922895_Additional_test_functions" (cases 146–157). That PDF is the 2023 version of Ganchovski's "Root-finding Test Functions", whose revision of 2026-09-29 is `ganchovski_test_functions`. Cases 146–157 are its f01, f02, f04, f28–f32, f41 and f42, with f42 split over cases 155–157, and follow the PDF where it differs from the C# code of Tomov & Ganchovski's benchmark (`2026_tomov_ganchovski_benchmark`). The brackets of 2 cases differ: case 146 starts at 0.51, as roots-fortran's own comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`.
+'''
+year = 2025
+home = '1.3'
+where_in_source = '''
+the subroutine `problems` of the program `root_tests`, a `select case (nprob)` over the cases `nprob = 1, ..., 157` (`num_of_problems = 157`).
+- A block such as `case (2:11)` gives 1 function, with 1 bracket per case number.
+- A case may set a list `ns` of values of an integer `n`; the driver then runs the case once per value. A case without `ns` runs once.
+'''
+transcribed_from = '''
+the code of the file at commit `390e7ea`: the assignments to `f`, the bounds `a` and `b`, and the lists `ns`. Each case also holds 2 strings for a LaTeX results table, the function (`latex`) and the bracket (`bounds`); where they differ from the code, the code wins (cases 70, 147).
+'''
+rows_summary = "120, 1 per `case` block, covering the file's 157 numbered cases. With each value of `n` counted, the driver runs 223 cases."
+notes = '''
+How to read the rows:
+- **`key`** holds the case number, or the range of case numbers of a block.
+- **`f`** is the code's expression with `**` written as `^` and the `_wp` kind suffix dropped. Helper variables are written out: `dn` and `di` are `n` and `i` converted to real, and `t1`, `emx` and `ex` are replaced by their expressions. `pi` is `acos(-1.0)`. `sign(1.0, y)` is Fortran's 1.0 with the sign of `y`.
+- **`parameters`** gives the values of `n` in the case's list `ns`, or constants that the case defines.
+- **`interval`** gives the code's `[a, b]`. In a block, each bracket carries its case number.
+- **Each case also gives a root**, 1 per value of `n` where it depends on `n`; the rows leave out the roots.
+- **`also_in`** holds the source that a comment names, by these rules:
+  - a comment that gives a range of cases (`18-24`, `30-36`) applies to that range;
+  - a comment inside a case applies to that case, in place of its block's source (case 145);
+  - any other comment between cases applies to the cases below it, up to the next such comment. So the comment "P1 in BlendTF paper" above case 103 covers cases 103–117, and the comment "ill-behaved functions" above case 128, which names no source, ends the ITP block at case 127.
+  - The program's header reference to Alefeld–Potra–Shi (1995) is not repeated in `also_in`.
+- **Commented-out code** holds no rows; `notes` mention it where it holds functions or values of `n`.
+'''
+
+[[rows]]
+key = '1'
+f = 'sin(x) - x/2.0'
+interval = '[pi/2, pi]'
+
+[[rows]]
+key = '2–11'
+f_description = '`-2.0*sum((2.0*i - 5.0)^2/(x - i*i)^3)`, summed over i = 1, ..., 20'
+interval = '[1 + 1.0e-9, 4 - 1.0e-9] (2), [4 + 1.0e-9, 9 - 1.0e-9] (3), [9 + 1.0e-9, 16 - 1.0e-9] (4), [16 + 1.0e-9, 25 - 1.0e-9] (5), [25 + 1.0e-9, 36 - 1.0e-9] (6), [36 + 1.0e-9, 49 - 1.0e-9] (7), [49 + 1.0e-9, 64 - 1.0e-9] (8), [64 + 1.0e-9, 81 - 1.0e-9] (9), [81 + 1.0e-9, 100 - 1.0e-9] (10), [100 + 1.0e-9, 121 - 1.0e-9] (11)'
+notes = 'a different root in each bracket'
+
+[[rows]]
+key = '12'
+f = '-n*x*exp(-1.0*x)'
+parameters = 'n = 40, 100, 200'
+interval = '[-9, 31]'
+notes = 'the comment says some of these do not converge to the right root in real64, because the function value at a bound is below the tolerance; commented-out cases 13 and 14 below it hold `-100.0*x*exp(-2.0*x)` and `-200.0*x*exp(-3.0*x)` on [-9, 31]'
+
+[[rows]]
+key = '13'
+f = 'x^3 - 2.0*x - x + 3.0'
+interval = '[-3, 2]'
+
+[[rows]]
+key = '14'
+f = 'exp(-x) - x - sin(x)'
+interval = '[0, 2]'
+
+[[rows]]
+key = '15'
+f = 'x^n - 0.2'
+parameters = 'n = 4, 6, 8, 10, 12'
+interval = '[0, 5]'
+
+[[rows]]
+key = '16–17'
+f = 'x^n - 1.0'
+parameters = 'n = 4, 6, 8, 10, 12 (16); n = 8, 10, 12, 14 (17)'
+interval = '[0, 5] (16), [-0.95, 4.05] (17)'
+
+[[rows]]
+key = '18'
+f = 'sin(x) - 0.5'
+interval = '[0, 1.5]'
+also_in = 'Dowell & Jarratt'
+notes = 'the comment on this case says "18-24 are also in Dowell & Jarratt"'
+
+[[rows]]
+key = '19'
+f = '2.0*x*exp(-n) - 2.0*exp(-n*x) + 1.0'
+parameters = 'n = 1, 2, 3, 4, 5, 10, 20, 40, 60, 80, 100'
+interval = '[0, 1]'
+also_in = 'Dowell & Jarratt'
+
+[[rows]]
+key = '20'
+f = '(1.0 + (1.0 - n)^2)*x - (1.0 - n*x)^2'
+parameters = 'n = 5, 10, 20'
+interval = '[0, 1]'
+also_in = 'Dowell & Jarratt'
+
+[[rows]]
+key = '21'
+f = 'x^2 - (1.0 - x)^n'
+parameters = 'n = 2, 5, 10, 15, 20'
+interval = '[0, 1.01]'
+also_in = 'Dowell & Jarratt'
+
+[[rows]]
+key = '22'
+f = '(1.0 + (1.0 - n)^4)*x - (1.0 - n*x)^4'
+parameters = 'n = 1, 2, 4, 5, 8, 15, 20'
+interval = '[0, 1]'
+also_in = 'Dowell & Jarratt'
+
+[[rows]]
+key = '23'
+f = '(x - 1.0)*exp(-n*x) + x^n'
+parameters = 'n = 1, 5, 10, 15, 20'
+interval = '[0, 1]'
+also_in = 'Dowell & Jarratt'
+
+[[rows]]
+key = '24'
+f = '(n*x - 1.0)/((n - 1.0)*x)'
+parameters = 'n = 2, 5, 15, 20'
+interval = '[0.01, 1]'
+also_in = 'Dowell & Jarratt'
+
+[[rows]]
+key = '25'
+f = 'x^(1.0/n) - n^(1.0/n)'
+parameters = 'n = 2, 3, 4, 5, 6, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33'
+interval = '[1, 100]'
+
+[[rows]]
+key = '26–27'
+f_description = '`x/exp(1.0/(x*x))` (x != 0); `0.0` (x = 0)'
+interval = '[-1, 4] (26), [-1.1234, 4.4567] (27)'
+notes = 'the comment on the root 0 says it is "just almost impossible to get"'
+
+[[rows]]
+key = '28'
+f_description = '`(x/1.5 + sin(x) - 1.0)*n/20.0` (x >= 0); `-n/20.0` (x < 0)'
+parameters = 'n = 1, 2'
+interval = '[-10000, pi/2]'
+notes = 'a commented-out line gives n = 1, ..., 40'
+
+[[rows]]
+key = '29'
+f_description = '`exp(1.0) - 1.859` (x >= 1.0e-3*2.0/(n + 1.0)); `exp((n + 1.0)*0.5*x*1000.0) - 1.859` (0 <= x < 1.0e-3*2.0/(n + 1.0)); `-0.859` (x < 0)'
+parameters = 'n = 20, 40, 100'
+interval = '[-10000, 1.0e-4]'
+notes = 'a commented-out line gives n = 20, ..., 40 and n = 100, 200, ..., 1000, and the code holds a root for each of those'
+
+[[rows]]
+key = '30'
+f = '3.0*sin(x) - 2.0'
+interval = '[0, 1]'
+also_in = 'Gottlieb, Tables 1 and 2'
+
+[[rows]]
+key = '31'
+f = 'x*exp(x) - 1.0'
+interval = '[-1, 1]'
+also_in = 'Gottlieb, Tables 1 and 2'
+notes = "the same function and interval as case 119, the ITP paper's Lambert function"
+
+[[rows]]
+key = '32'
+f = '11.0*x^11 - 1.0'
+interval = '[0.1, 0.9]'
+also_in = 'Gottlieb, Tables 1 and 2'
+
+[[rows]]
+key = '33'
+f = 'exp(x^2 + 7.0*x - 30.0) - 1.0'
+interval = '[2.8, 3.1]'
+also_in = 'Gottlieb, Tables 1 and 2'
+
+[[rows]]
+key = '34'
+f = '1.0/x - sin(x) + 1.0'
+interval = '[-1.3, -0.5]'
+also_in = 'Gottlieb, Tables 1 and 2'
+
+[[rows]]
+key = '35'
+f = 'x^3 - 2.0*x - 5.0'
+interval = '[2, 3]'
+also_in = 'Gottlieb, Tables 1 and 2'
+
+[[rows]]
+key = '36'
+f = '1.0/x - 1.0'
+interval = '[0.5, 2]'
+also_in = 'Gottlieb, Tables 1 and 2'
+
+[[rows]]
+key = '37'
+f = 'x^3 - 5.0*x^2 + 12.0*x - 8.0'
+interval = '[-10, 10]'
+
+[[rows]]
+key = '38'
+f = 'x^5 - 61.0*x^4 + 1368.0*x^3 - 13548.0*x^2 + 54256.0*x - 42016.0'
+interval = '[0, 10]'
+
+[[rows]]
+key = '39'
+f = 'x^5 - 61.0*x^4 + 6801.0/5.0*x^3 - 66531.0/5.0*x^2 + 5205601.0/100.0*x - 4005001.0/100.0'
+interval = '[0, 10]'
+
+[[rows]]
+key = '40'
+f = '(x - 1.0)^5'
+interval = '[0, 10]'
+
+[[rows]]
+key = '41'
+f = 'atan(x)'
+interval = '[-2, 3]'
+also_in = 'Muller_bisection.pdf (mth.pdx.edu)'
+
+[[rows]]
+key = '42'
+f = 'exp(x) - 2.0*x - 1.0'
+interval = '[-0.001, 1]'
+also_in = 'Muller_bisection.pdf (mth.pdx.edu)'
+notes = 'the comment says the bracket was [0, 3] and was changed, because "x1" lies close to the root'
+
+[[rows]]
+key = '43'
+f = '3.0*x*sin(x*20.0)*cos(x) + x - 2.0'
+interval = '[0, 0.7]'
+
+[[rows]]
+key = '44'
+f = '3.0*x^2*sin(x*20.0) + cos(x*2.0)'
+interval = '[-0.7, 0.4]'
+
+[[rows]]
+key = '45'
+f = '(n*x - 1.0)/((n - 1.0)*x)'
+parameters = 'n = 20, 30'
+interval = '[0.01, 1]'
+also_in = 'Alefeld–Potra–Shi (1995), case 11'
+notes = 'the comment says "case 11 from Algorithm 748" with n = 20'
+
+[[rows]]
+key = '46'
+f = 'sin(x*10.0) + sin(x*2.0) + atan(x/3.0)*x^2 + exp(x) - 1.0'
+interval = '[-10, 5]'
+
+[[rows]]
+key = '47–48'
+f = '1.0 - 1.0/(x^2)'
+interval = '[0.5, 1.51] (47), [1.0e-12, 1.0e12] (48)'
+also_in = 'Chandrupatla (1997)'
+
+[[rows]]
+key = '49–50'
+f = '(x - 3.0)^3'
+interval = '[0, 5] (49), [-1.0e10, 1.0e10] (50)'
+also_in = 'Chandrupatla (1997)'
+
+[[rows]]
+key = '51–52'
+f = '6.0*(x - 2.0)^5'
+interval = '[0, 5] (51), [-1.0e10, 1.0e10] (52)'
+also_in = 'Chandrupatla (1997)'
+
+[[rows]]
+key = '53–54'
+f = 'x^9'
+interval = '[-1, 4] (53), [-10, 100] (54)'
+also_in = 'Chandrupatla (1997)'
+
+[[rows]]
+key = '55–56'
+f = 'x^19'
+interval = '[-1, 4] (55), [-10, 100] (56)'
+also_in = 'Chandrupatla (1997)'
+
+[[rows]]
+key = '57–58'
+f_description = '`0.0` (abs(x) < 3.8e-4); `x*exp(-x^(-2))` (otherwise)'
+interval = '[-1, 4] (57), [-10, 100] (58)'
+also_in = 'Chandrupatla (1997)'
+notes = 'the comment on the first branch says the function is the "same as one above except for this"'
+
+[[rows]]
+key = '59–60'
+f = '-(3062.0*(1.0 - xi)*exp(-x))/(xi + (1.0 - xi)*exp(-x)) - 1013.0 + 1628.0/x'
+parameters = 'xi = 0.61489, a constant in the function body'
+interval = '[2.0e-4, 2] (59), [2.0e-4, 81] (60)'
+also_in = 'Chandrupatla (1997)'
+
+[[rows]]
+key = '61–62'
+f = 'exp(x) - 2.0 - 0.01/(x*x) + 2.0e-6/(x*x*x)'
+interval = '[2.0e-4, 1] (61), [2.0e-4, 81] (62)'
+also_in = 'Chandrupatla (1997)'
+
+[[rows]]
+key = '63'
+f = 'x^3 + 4.0*x^2 - 10.0'
+interval = '[0, 1.5]'
+also_in = 'modified three-point secant method (2019)'
+
+[[rows]]
+key = '64'
+f = 'sin(x)^2 - x^2 + 1.0'
+interval = '[-2, -1]'
+also_in = 'modified three-point secant method (2019)'
+
+[[rows]]
+key = '65'
+f = '(x - 1.0)^6 - 1.0'
+interval = '[1, 2.1]'
+also_in = 'modified three-point secant method (2019)'
+
+[[rows]]
+key = '66'
+f = 'sin(x)*exp(x) + log(x^2 + 1.0)'
+interval = '[-0.9, -0.1]'
+also_in = 'modified three-point secant method (2019)'
+
+[[rows]]
+key = '67'
+f = 'exp(x^2 + 7.0*x - 30.0) - 1.0'
+interval = '[1, 3.1]'
+also_in = 'modified three-point secant method (2019)'
+
+[[rows]]
+key = '68'
+f = 'x - 3.0*log(x)'
+interval = '[1, 2.1]'
+also_in = 'modified three-point secant method (2019)'
+
+[[rows]]
+key = '69'
+f = 'x^2 - 1.0'
+interval = '[0.1001, 10.0001]'
+
+[[rows]]
+key = '70'
+f = 'x^2 - 1.0038273894 + sin(x/10000.0)'
+interval = '[0.0001, 10.0001]'
+notes = "the case's `bounds` string says [0.1001, 10.0001]"
+
+[[rows]]
+key = '71–72'
+f = 'x'
+interval = '[-2.0001, 1.0001] (71), [-0.0001, 1.0001] (72)'
+notes = 'the comment on case 72 says "root very close to a"'
+
+[[rows]]
+key = '73'
+f = '(x - 1.0)*x*x - 1.0'
+interval = '[0, 5]'
+also_in = 'Popovski (1982)'
+
+[[rows]]
+key = '74'
+f = '((x - 3.0)*x - 9.0)*x - 6.0'
+interval = '[0, 8]'
+also_in = 'Popovski (1982)'
+
+[[rows]]
+key = '75–78'
+f = '((x*x - 27.0)*x - 54.0)*x - 10.0'
+interval = '[-5, -3] (75), [-3, -2] (76), [-2, 0] (77), [0, 9] (78)'
+also_in = 'Popovski (1982)'
+notes = 'a different root in each bracket'
+
+[[rows]]
+key = '79–82'
+f = '(((x - 20.0)*x + 133.0)*x - 330.0)*x + 236.0'
+interval = '[0, 2] (79), [2, 4] (80), [4, 8] (81), [8, 9] (82)'
+also_in = 'Popovski (1982)'
+notes = 'a different root in each bracket'
+
+[[rows]]
+key = '83'
+f = '(x - 1.0)*x^6 - 1.0'
+interval = '[0, 3]'
+also_in = 'Popovski (1982)'
+
+[[rows]]
+key = '84–85'
+f = '(((x*x - 6.0)*x - 8.0)*x - 3.0)*x^4 - 1.0'
+interval = '[-5, 0] (84), [0, 5] (85)'
+also_in = 'Popovski (1982)'
+notes = 'a different root in each bracket'
+
+[[rows]]
+key = '86–88'
+f = '((x - 13.0)*x + 47.0)*x - 36.0 - sqrt(x)'
+interval = '[0, 2] (86), [2, 6] (87), [6, 8] (88)'
+also_in = 'Popovski (1982)'
+notes = 'a different root in each bracket'
+
+[[rows]]
+key = '89–90'
+f = 'exp(1.0 - x)*(x - 1.0)*10.0 - 1.0'
+interval = '[0, 2] (89), [2, 5] (90)'
+also_in = 'Popovski (1982)'
+notes = 'a different root in each bracket'
+
+[[rows]]
+key = '91'
+f = 'exp(x) + x - 20.0'
+interval = '[2, 3]'
+also_in = 'Popovski (1982)'
+
+[[rows]]
+key = '92'
+f = 'exp(x) + x - 5.0'
+interval = '[0, 2]'
+also_in = 'Popovski (1982)'
+notes = 'the comment says the root in the paper is wrong for this case'
+
+[[rows]]
+key = '93–94'
+f = '(x - 10.0)*x + 23.0 - x^0.4'
+interval = '[0, 6] (93), [6, 8] (94)'
+also_in = 'Popovski (1982)'
+notes = 'a different root in each bracket'
+
+[[rows]]
+key = '95–98'
+f = '(0.04*x - 0.4)*x + 0.5 - sin(x)'
+interval = '[0, 1] (95), [1, 5] (96), [5, 7] (97), [7, 10] (98)'
+also_in = 'Popovski (1982)'
+notes = 'a different root in each bracket'
+
+[[rows]]
+key = '99'
+f = 'cos(x) + x'
+interval = '[-10, 10]'
+also_in = 'Stage'
+notes = "the block's comment adds \"see also #26\"; Stage §3.5 with its sign flipped"
+
+[[rows]]
+key = '100'
+f = '1.0 - 0.75*x'
+interval = '[-10, 10]'
+also_in = 'Stage'
+
+[[rows]]
+key = '101'
+f = 'x^2 + sin(x/n) - 0.25'
+parameters = 'n = 5, 10, 20'
+interval = '[0, 1]'
+also_in = 'Stage'
+notes = 'Galdino `g21`–`g23`, though in the Stage block'
+
+[[rows]]
+key = '102'
+f = '(x - 7.0/9.0)^3 + 0.001*(x - 7.0/9.0)'
+interval = '[-10, 10]'
+also_in = 'Stage'
+notes = 'commented-out cases 102 and 103 above it hold `abs(x - 2.0/3.0)^0.5` (x <= 2.0/3.0), `-abs(x - 2.0/3.0)^0.5` (otherwise), and the same with the power 0.2, both on [-10, 10]'
+
+[[rows]]
+key = '103'
+f = 'x^2 - 3.0'
+interval = '[1, 2]'
+also_in = 'BlendTF paper, P1'
+
+[[rows]]
+key = '104'
+f = 'x^2 - 5.0'
+interval = '[2, 7]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P2`'
+
+[[rows]]
+key = '105'
+f = 'x^2 - 10.0'
+interval = '[3, 7]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P3`'
+
+[[rows]]
+key = '106'
+f = 'x^2 - x - 2.0'
+interval = '[1, 4]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P4`'
+
+[[rows]]
+key = '107'
+f = 'x^2 + 2.0*x - 7.0'
+interval = '[1, 3]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P5`'
+
+[[rows]]
+key = '108'
+f = 'x^3 - 2.0'
+interval = '[0, 2]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P6`'
+
+[[rows]]
+key = '109'
+f = 'x*exp(x) - 7.0'
+interval = '[0, 2]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P7`'
+
+[[rows]]
+key = '110'
+f = 'x - cos(x)'
+interval = '[0, 1]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P8`'
+
+[[rows]]
+key = '111'
+f = 'x*sin(x) - 1.0'
+interval = '[0, 2]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P9`'
+
+[[rows]]
+key = '112'
+f = 'x*cos(x) + 1.0'
+interval = '[-2, 4]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P10`'
+
+[[rows]]
+key = '113'
+f = 'x^10 - 1.0'
+interval = '[0, 1.3]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P11`'
+
+[[rows]]
+key = '114'
+f = 'x^2 + exp(x/2.0) - 5.0'
+interval = '[1, 2]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P12`'
+
+[[rows]]
+key = '115'
+f = 'sin(x)*sinh(x) + 1.0'
+interval = '[3, 4]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P13`'
+
+[[rows]]
+key = '116'
+f = 'exp(x) - 3.0*x - 2.0'
+interval = '[2, 3]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P14`'
+
+[[rows]]
+key = '117'
+f = 'sin(x) - x^2'
+interval = '[0.5, 1]'
+also_in = 'BlendTF paper'
+notes = 'Badr `P15`'
+
+[[rows]]
+key = '118'
+f = 'x^3 - x - 2.0'
+interval = '[1, 2]'
+also_in = 'Wikipedia, ITP method'
+
+[[rows]]
+key = '119'
+f = 'x*exp(x) - 1.0'
+name = 'Lambert'
+interval = '[-1, 1]'
+also_in = 'ITP paper, Table 1'
+notes = "the same function and interval as case 31, Gottlieb's test 2"
+
+[[rows]]
+key = '120'
+f = 'tan(x - 1.0/10.0)'
+name = 'Trigonometric 1'
+interval = '[-1, 1]'
+also_in = 'ITP paper, Table 1'
+
+[[rows]]
+key = '121'
+f = 'sin(x) + 1.0/2.0'
+name = 'Trigonometric 2'
+interval = '[-1, 1]'
+also_in = 'ITP paper, Table 1'
+
+[[rows]]
+key = '122'
+f = '4.0*x^5 + x^2 + 1.0'
+name = 'Polynomial 1'
+interval = '[-1, 1]'
+also_in = 'ITP paper, Table 1'
+
+[[rows]]
+key = '123'
+f = 'x + x^10 - 1.0'
+name = 'Polynomial 2'
+interval = '[-1, 1]'
+also_in = 'ITP paper, Table 1'
+
+[[rows]]
+key = '124'
+f = 'pi^x - exp(1.0)'
+name = 'Exponential'
+interval = '[-1, 1]'
+also_in = 'ITP paper, Table 1'
+
+[[rows]]
+key = '125'
+f = '1.0/3.0 + sign(1.0, x)*abs(x)^(1.0/3.0) + x^3'
+name = 'Posynomial'
+interval = '[-1, 1]'
+also_in = 'ITP paper, Table 1'
+
+[[rows]]
+key = '126'
+f_description = '`1.0/10.0^3 + sum(sin(pi*i^3*x/2.0)/pi/i^3)`, summed over i = 1, ..., 10'
+name = 'Weierstrass'
+interval = '[-1, 1]'
+also_in = 'ITP paper, Table 1'
+
+[[rows]]
+key = '127'
+f = '(x + 2.0/3.0)/(x + 101.0/100.0)'
+name = 'Poly.Frac.'
+interval = '[-1, 1]'
+also_in = 'ITP paper, Table 1'
+
+[[rows]]
+key = '128'
+f = '(x*1.0e6 - 1.0)^3'
+name = 'Polynomial 3'
+interval = '[-1, 1]'
+notes = 'the comment above it reads "ill-behaved functions" and names no source'
+
+[[rows]]
+key = '129'
+f = 'exp(x)*(x*1.0e6 - 1.0)^3'
+name = 'Exp.Poly.'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '130'
+f = '(x - 1.0/3.0)^2*atan(x - 1.0/3.0)'
+name = 'Tan.Poly.'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '131'
+f = 'sign(1.0, 3.0*x + 1.0)*(1.0 - sqrt(1.0 - (3.0*x + 1.0)^2/(9^2)))'
+name = 'Circles'
+interval = '[-1, 1]'
+
+[[rows]]
+key = '132'
+f = 'x'
+interval = '[-1000, 1]'
+
+[[rows]]
+key = '133'
+f = 'y1 + ((x - x1)/(x2 - x1))*(y2 - y1)'
+parameters = 'x1 = 0.0, x2 = 157.08, y1 = 1012.0, y2 = -1114.0, constants in the case'
+interval = '[x1, x2] = [0, 157.08]'
+notes = 'the comment calls it "another linear test case" and says "see Issue #25"'
+
+[[rows]]
+key = '134'
+f = 'log(x)'
+interval = '[0.5, 5]'
+also_in = 'RBP paper, Table 1'
+
+[[rows]]
+key = '135'
+f = '(10.0 - x)*exp(-10.0*x) - x^10 + 1.0'
+interval = '[0.5, 8]'
+also_in = 'RBP paper, Table 1'
+
+[[rows]]
+key = '136'
+f = 'exp(sin(x)) - x - 1.0'
+interval = '[1, 4]'
+also_in = 'RBP paper, Table 1'
+
+[[rows]]
+key = '137'
+f = '2.0*sin(x) - 1.0'
+interval = '[0.1, pi/3]'
+also_in = 'RBP paper, Table 1'
+
+[[rows]]
+key = '138–139'
+f_description = '`abs(x - 2.0/3.0)^0.5 - 0.1` (x <= 2.0/3.0); `-abs(x - 2.0/3.0)^0.5 - 0.1` (otherwise)'
+interval = '[-10, 10] (138), [-10000, 10] (139)'
+also_in = 'RBP paper, Table 1'
+notes = 'Stage §3.7'
+
+[[rows]]
+key = '140'
+f = '(x - 1.0)*exp(-x)'
+interval = '[0, 1.5]'
+also_in = 'RBP paper, Table 1'
+
+[[rows]]
+key = '141'
+f = 'cos(x) - x'
+interval = '[0, 1.7]'
+also_in = 'RBP paper, Table 1'
+
+[[rows]]
+key = '142'
+f = 'exp(x^2 + 7*x - 30.0) - 1.0'
+interval = '[2.6, 3.5]'
+also_in = 'RBP paper, Table 1'
+
+[[rows]]
+key = '143'
+f = 'x^3'
+interval = '[-0.5, 1/3]'
+also_in = 'RBP paper, Table 1'
+
+[[rows]]
+key = '144'
+f = 'x^5'
+interval = '[-0.5, 1/3]'
+also_in = 'RBP paper, Table 1'
+
+[[rows]]
+key = '145'
+f = 'cos(x) - x^3'
+interval = '[0, 4]'
+also_in = 'Zhang'
+notes = 'the comment inside the case says "Zhang test case"'
+
+[[rows]]
+key = '146'
+f = 'x^3 - 1.0'
+interval = '[0.51, 1.5]'
+also_in = 'Galdino (2011); Additional test functions'
+notes = 'the comment says the bracket was changed from [0.5, 1.5], so that the first bisection step does not land on the root'
+
+[[rows]]
+key = '147'
+f = 'x^2*(x^2/3.0 + sqrt(2.0)*sin(x)) - sqrt(3.0)/18.0'
+interval = '[0.1, 1]'
+also_in = 'Galdino (2011); Additional test functions'
+notes = "the case's `latex` string writes the last term as `sqrt(3/18)`"
+
+[[rows]]
+key = '148'
+f = 'x^3 + 1.0'
+interval = '[-1.8, 0]'
+also_in = 'Galdino (2011); Additional test functions'
+
+[[rows]]
+key = '149'
+f = 'sin((x - 7.14)^3)'
+interval = '[7, 8]'
+also_in = 'Galdino (2011); Additional test functions'
+
+[[rows]]
+key = '150'
+f = 'exp((x - 3.0)^5) - 1.0'
+interval = '[2.6, 3.6]'
+also_in = 'Galdino (2011); Additional test functions'
+
+[[rows]]
+key = '151'
+f = 'exp((x - 3.0)^5) - exp(x - 1.0)'
+interval = '[4, 5]'
+also_in = 'Galdino (2011); Additional test functions'
+
+[[rows]]
+key = '152'
+f = 'pi - 1.0/x'
+interval = '[0.05, 5]'
+also_in = 'Galdino (2011); Additional test functions'
+
+[[rows]]
+key = '153'
+f = '4.0 - tan(x)'
+interval = '[0, 1.5]'
+also_in = 'Galdino (2011); Additional test functions'
+
+[[rows]]
+key = '154'
+f = '2.0*x*exp(-5.0) - 2.0*exp(-5.0*x) + 1.0'
+interval = '[0, 10]'
+also_in = 'Galdino (2011); Additional test functions'
+
+[[rows]]
+key = '155–157'
+f = '(x^2 - x - 6.0)*(x^2 - 3.0*x + 2.0)'
+interval = '[0, 1.9] (155), [1.001, 2.001] (156), [2.5, 10] (157)'
+also_in = 'Galdino (2011); Additional test functions'
+notes = 'a different root in each bracket'

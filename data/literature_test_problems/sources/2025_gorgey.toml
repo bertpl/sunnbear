@@ -1,0 +1,56 @@
+title = "Gorgey et al. (2025): efficiency of Ridders' method in Scilab"
+reference = "Gorgey, A., Azim, F. A., Zulkifly, Z. H., Hassim, H. (2025). Efficiency of Ridders' method in solving nonlinear equations using Scilab programming. Data Analytics and Applied Mathematics 6(1), 23–35. https://doi.org/10.15282/daam.v6i1.11307."
+year = 2025
+home = '1.1'
+where_in_source = '''
+Section 4, "Numerical Results and Discussion" (pp. 30–34).
+- It numbers 6 equations, each with an interval in its heading, a figure, and a results table (Tables 2 to 7).
+- The article says its problems are taken from its refs. [9] to [11], and names the reference for Equations 1, 2, 5 and 6.
+- For 3 equations, the text states a second interval that differs from the heading's.
+'''
+transcribed_from = 'the article, which has a text layer, checked against the page images. No sunnbear file transcribes these equations.'
+rows_summary = '6, 1 per equation.'
+notes = '''
+- The `interval` column holds the interval of the heading; the row's notes give the text's second interval where there is one.
+- The `also_in` column gives the reference that the article names for Equations 1, 2, 5 and 6. The rows of Galdino (2011), ref. [11], are in `2011_galdino`.
+'''
+
+[[rows]]
+key = 'Equation 1'
+f = '(x + 2)*(x + 1)*(x - 3)^3'
+interval = '[-2.5, 3]'
+also_in = 'Galdino (2011), "A family of regula falsi root-finding methods", Proc. 2011 World Congress on Engineering and Technology (CET 2011), vol. 1, 514–517 (article ref. [11])'
+notes = "Roots `-2`, `-1` and `3`; the text names `3` as the root found. Figure 1's caption and the text below Table 2 give the interval `[2, 3.5]`."
+
+[[rows]]
+key = 'Equation 2'
+f = 'log(x)'
+interval = '[0, 2]'
+also_in = 'Rahman et al. (2022), "An improved bracketing method for numerical solution of nonlinear equations based on ridders method", Matrix Science Mathematic 6(2), 30–33 (article ref. [9]), which the article says uses a "similar equation"'
+notes = 'Root `1`. The text below Table 3 gives the interval `[2, 3.5]`.'
+
+[[rows]]
+key = 'Equation 3'
+f = '(sin(x) - x/4)^3'
+interval = '[-1, 2]'
+notes = 'Root found: `0`. The text below Table 4 gives the interval `[-0.5, 1]`.'
+
+[[rows]]
+key = 'Equation 4'
+f = 'exp((x - 3)^5) - 1'
+interval = '[2, 4]'
+notes = 'Root `3`.'
+
+[[rows]]
+key = 'Equation 5'
+f = 'x*sin(x) - x^2*exp(x) + exp(-x) + cos(x)'
+interval = '[-1, 1]'
+also_in = 'Rahman et al. (2022) (article ref. [9]), which the article says solves a "similar problem"'
+notes = 'Root `0.85638`.'
+
+[[rows]]
+key = 'Equation 6'
+f = 'x^2 + sin(x/5) - 1/4'
+interval = '[0, 1]'
+also_in = 'Noor, Khan, Hussain (2007), "A new modified Halley method without second derivatives for nonlinear equation", Applied Mathematics and Computation 189(2), 1268–1273 (article ref. [10]), which the article says uses a "similar equation"'
+notes = 'Root found: `0.40999`; Figure 6 also shows the root `-0.60961`.'

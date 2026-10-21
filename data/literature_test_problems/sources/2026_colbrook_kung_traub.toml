@@ -1,0 +1,9 @@
+title = 'Colbrook (2026): a proof of the Kung–Traub conjecture'
+reference = 'Colbrook, M. J. (2026). Adversarial Wronskians: A proof of the Kung–Traub conjecture. Zenodo preprint. https://doi.org/10.5281/zenodo.23045144.'
+year = 2026
+home = '1.2'
+where_in_source = 'the counterexamples of Sections 3 and 4 are the only functions of the article, such as `f_s(t) = t + exp(-t^2)*P_s(t)` in eq. (4.1).'
+transcribed_from = 'the article.'
+rows_summary = '''
+no test functions: the article is a proof and reports no numerical experiments. Its counterexamples have no fixed expression, because the polynomial `P_s` is constructed from the method under study.
+'''

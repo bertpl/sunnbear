@@ -1,0 +1,25 @@
+title = 'Brent (1971): guaranteed convergence for finding a zero'
+reference = 'Brent, R. P. (1971). An algorithm with guaranteed convergence for finding a zero of a function. The Computer Journal 14(4), 422–425. https://doi.org/10.1093/comjnl/14.4.422.'
+year = 1971
+home = '1.1'
+where_in_source = '''
+- Section 3, "The algorithm" (p. 422), gives 2 functions on which Dekker's algorithm converges slowly.
+- Section 9, "Practical tests" (p. 424), says that `zero` never needed more than 3 times the evaluations of bisection, "even for the pathological functions given in Section 3", where Dekker's algorithm needs more than 10^6. It prints no table. For numerical results it refers to a book that it cites as Brent (1971) and that appeared as Brent (1973); the rows of that book are in `1973_brent_book`.
+'''
+transcribed_from = 'the article, a scan, read from the page images.'
+rows_summary = "2, Section 3's 2 functions. The article has no numbered test set."
+notes = "The article does not number Section 3's functions: keys `3.1` and `3.2` are the functions in the order printed."
+
+[[rows]]
+key = '3.1'
+f_description = '`2^(x/delta)` for `a + delta <= x <= b`; `-((b - a - delta)/delta)*2^(b/delta)` for `x = a`; arbitrary for `a < x < a + delta`'
+parameters = '`a`, `b`, `delta` free'
+interval = '[a, b]'
+notes = "`delta` is the algorithm's tolerance (Section 6), so the function is built for a given tolerance. Dekker's algorithm takes steps of `delta` on it, `b - delta`, `b - 2*delta`, ..., about `(b - a)/delta` evaluations."
+
+[[rows]]
+key = '3.2'
+f_description = '`0` if `x = 0`; `x*exp(-x^-2)` if `x != 0`'
+interval = 'an interval containing the origin'
+also_in = 'Brent (1973), *Algorithms for Minimization without Derivatives*, cited as "(Brent, 1971)"'
+notes = 'The article gives it as an example where successive linear interpolation converges worse than linearly, because the zero has high multiplicity.'

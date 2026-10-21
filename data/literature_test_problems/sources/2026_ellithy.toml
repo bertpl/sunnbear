@@ -1,0 +1,271 @@
+title = 'Ellithy (2026): four multi-phase hybrid bracketing algorithms'
+reference = "Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root finding. Journal of the Egyptian Mathematical Society 34(1), 91–115. https://doi.org/10.21608/joems.2026.440115.1078. Code and data: the authors' repository https://github.com/Abdelrhman-Ellithy/hybridroots, at commit `7f22131ef4e1def3e3928dc6558f46f756d0a5ea`."
+year = 2026
+home = '1.2'
+where_in_source = '''
+the file `Paper Experiment and Results/dataset.json` of the authors' repository lists 48 problems. Each has an `expression` in Python syntax and the interval ends `a` and `b`; the last 6 also have a `note`, which names an application.
+'''
+transcribed_from = '''
+the authors' file `Paper Experiment and Results/dataset.json`. The rows were not checked against the article, so whether the article's 48 problems equal the file's is not known.
+'''
+rows_summary = '48, 1 per entry of the file. Entries 30 and 31 hold the same expression on 2 intervals.'
+notes = '''
+- The file gives no ids, so keys are the positions in the file, 1 to 48.
+- The file gives no source for any function, so `also_in` is empty.
+- `name` is the start of the file's `note`, and the `notes` of the row quote the full `note`.
+'''
+
+[[rows]]
+key = '1'
+f = 'x * exp(x) - 7'
+interval = '[1, 2]'
+
+[[rows]]
+key = '2'
+f = 'x^3 - x - 1'
+interval = '[1, 2]'
+
+[[rows]]
+key = '3'
+f = 'x^2 - x - 2'
+interval = '[1, 4]'
+
+[[rows]]
+key = '4'
+f = 'x - cos(x)'
+interval = '[0, 1]'
+
+[[rows]]
+key = '5'
+f = 'x^2 - 10'
+interval = '[3, 4]'
+
+[[rows]]
+key = '6'
+f = 'sin(x) - x^2'
+interval = '[0.5, 1]'
+
+[[rows]]
+key = '7'
+f = 'x + log(x)'
+interval = '[0.1, 1]'
+notes = 'Written `ln(x)` in the file.'
+
+[[rows]]
+key = '8'
+f = 'exp(x) - 3*x - 2'
+interval = '[2, 3]'
+
+[[rows]]
+key = '9'
+f = 'x^2 + exp(x/2) - 5'
+interval = '[1, 2]'
+
+[[rows]]
+key = '10'
+f = 'x * sin(x) - 1'
+interval = '[0, 2]'
+
+[[rows]]
+key = '11'
+f = 'x * cos(x) + 1'
+interval = '[-2, 4]'
+
+[[rows]]
+key = '12'
+f = 'x^10 - 1'
+interval = '[0, 1.3]'
+
+[[rows]]
+key = '13'
+f = 'x^2 + 2*x - 7'
+interval = '[1, 3]'
+
+[[rows]]
+key = '14'
+f = 'x^3 - 2*x - 5'
+interval = '[2, 3]'
+
+[[rows]]
+key = '15'
+f = 'exp(x) - 3*x^2'
+interval = '[0, 1]'
+
+[[rows]]
+key = '16'
+f = 'sin(10*x) - 0.5*x'
+interval = '[0.1, 0.4]'
+
+[[rows]]
+key = '17'
+f = 'x - 0.8*sin(x) - 1.2'
+interval = '[1, 3]'
+
+[[rows]]
+key = '18'
+f = 'x^2 - exp(x) - 3*x + 2'
+interval = '[0, 1]'
+
+[[rows]]
+key = '19'
+f = '(x - 1)^3 + 4*(x - 1)^2 - 10'
+interval = '[0, 3]'
+
+[[rows]]
+key = '20'
+f = 'exp(x^2) - exp(sqrt(2)*x)'
+interval = '[0.5, 1.5]'
+
+[[rows]]
+key = '21'
+f = '(x^2 - 4)*(x + 1.5)*(x - 0.5)'
+interval = '[0, 2]'
+
+[[rows]]
+key = '22'
+f = 'x^3 - 3*x^2 - 4*x + 13'
+interval = '[-3, -2]'
+
+[[rows]]
+key = '23'
+f = '-0.9*x^2 + 1.7*x + 2.5'
+interval = '[2.8, 3.0]'
+
+[[rows]]
+key = '24'
+f = '1 - 0.61 * x'
+interval = '[1.5, 2.0]'
+
+[[rows]]
+key = '25'
+f = 'x^2 * abs(sin(x)) - 4.1'
+interval = '[0, 4]'
+
+[[rows]]
+key = '26'
+f = 'x^5 - 3*x^4 + 25'
+interval = '[-3, -1]'
+
+[[rows]]
+key = '27'
+f = 'x^4 - 2*x^2 - 4'
+interval = '[1, 3]'
+
+[[rows]]
+key = '28'
+f = 'x - 0.5 * sin(x) - 1'
+interval = '[0, 3]'
+
+[[rows]]
+key = '29'
+f = 'exp(-x) - cos(3*x) - 0.5'
+interval = '[0, 1]'
+
+[[rows]]
+key = '30'
+f = '(x - 1)*(x - 2)*...*(x - 20)'
+interval = '[0, 1.5]'
+notes = 'Written out in the file as the product of all 20 factors `(x - 1)` to `(x - 20)`. Same expression as entry 31, on another interval.'
+
+[[rows]]
+key = '31'
+f = '(x - 1)*(x - 2)*...*(x - 20)'
+interval = '[19, 21]'
+notes = 'Written out in the file as the product of all 20 factors `(x - 1)` to `(x - 20)`. Same expression as entry 30, on another interval.'
+
+[[rows]]
+key = '32'
+f = 'x^4 + 2*x^2 - x - 1'
+interval = '[-0.5, 0]'
+
+[[rows]]
+key = '33'
+f = 'x^4 - 10*x^3 + 35*x^2 - 50*x + 24'
+interval = '[0, 1.5]'
+
+[[rows]]
+key = '34'
+f = '4*sin(x) - x + 1'
+interval = '[-1, 0]'
+
+[[rows]]
+key = '35'
+f = 'x^25 - 1'
+interval = '[0, 2]'
+
+[[rows]]
+key = '36'
+f = '(x - 1.8)^6 * (x - 1.81)'
+interval = '[0, 2]'
+
+[[rows]]
+key = '37'
+f = 'sin(20*x) - 0.3*x'
+interval = '[0.05, 0.25]'
+
+[[rows]]
+key = '38'
+f = 'x^4 + 2*x^3 - 13*x^2 - 14*x + 24'
+interval = '[-3, 1]'
+
+[[rows]]
+key = '39'
+f = 'exp(x^2) - exp(1.2*x)'
+interval = '[0, 2]'
+
+[[rows]]
+key = '40'
+f = 'x^5 - 3*x^4 + 2*x^3 - x + 0.1'
+interval = '[-1, 3]'
+
+[[rows]]
+key = '41'
+f = '(x + 0.3)^7 - 0.01'
+interval = '[-2, 1]'
+
+[[rows]]
+key = '42'
+f = 'x^6 - 8*x^5 + 24*x^4 - 32*x^3 + 16*x^2'
+interval = '[0, 4]'
+
+[[rows]]
+key = '43'
+f = '-2 * log10(0.000027027 + (2.51 / (10000000 * sqrt(x)))) - 1/sqrt(x)'
+name = 'Colebrook-White'
+interval = '[0.008, 0.03]'
+notes = "Written `log(..., 10)` in the file, a base-10 log. The file's note: \"Colebrook-White: Friction factor for Re=1e7, e/D=0.0001\"."
+
+[[rows]]
+key = '44'
+f = 'x - 0.99 * sin(x) - 2.0'
+name = 'Kepler Equation'
+interval = '[2.0, 3.0]'
+notes = "The file's note: \"Kepler Equation: Eccentric anomaly for e=0.99, Mean Anomaly=2.0\"."
+
+[[rows]]
+key = '45'
+f = '(10.0 + 3.592/x^2) * (x - 0.04267) - 0.08206 * 300'
+name = 'Van der Waals'
+interval = '[2.0, 3.0]'
+notes = "The file's note: \"Van der Waals: Volume of CO2 at P=10atm, T=300K\"."
+
+[[rows]]
+key = '46'
+f = 'x * exp(x/2) - 1.5'
+name = 'Proxy for Financial Option Volatility'
+interval = '[0.0, 1.0]'
+notes = "The file's note: \"Proxy for Financial Option Volatility (Transcendental growth)\"."
+
+[[rows]]
+key = '47'
+f = 'cos(x) + 1.0 * (1 - cos(x))^2 - 0.05 * x^2'
+name = 'Beam Deflection'
+interval = '[3.0, 6.0]'
+notes = "The file's note: \"Beam Deflection (Non-linear transcendental)\"."
+
+[[rows]]
+key = '48'
+f = '0.05 - x^3 / ((1 - x) * (0.8 - 2*x)^2)'
+name = 'Chemical Equilibrium'
+interval = '[0.01, 0.3]'
+notes = "The file's note: \"Chemical Equilibrium: Solving extent of reaction (Singularity at x=0.4)\"."

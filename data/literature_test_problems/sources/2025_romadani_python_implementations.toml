@@ -1,0 +1,81 @@
+title = 'Romadani (2025): classical root-finding methods in Python'
+reference = 'Romadani, M. N. H. (2025). From Theory to Code: Transforming Classical Root-Finding Methods into Efficient Python Implementations. ICCK Journal of Applied Mathematics 1(3), 154–189. https://doi.org/10.62762/jam.2025.840767.'
+year = 2025
+home = '1.2'
+where_in_source = '''
+- Section 3.3, "Computational Experiment Design", lists 6 example test functions in 4 numbered classes; the article reports no results for them.
+- Sections 5.1 to 5.4 test 7 methods on 1 function each (polynomial, trigonometric, exponential, mixed), with results in Tables 2, 4, 6 and 8. Each of these sections gives a bracketing interval, and Sections 5.2 to 5.4 also give a wider range used to search for the exact root.
+'''
+transcribed_from = 'the article, checked against the page images.'
+rows_summary = '10: the 6 examples of Section 3.3 and the 4 functions of Section 5.'
+notes = 'Keys are `3.3-<class>` for the examples of Section 3.3, with a letter added where a class holds 2 examples, and the section number for Sections 5.1 to 5.4.'
+
+[[rows]]
+key = '3.3-1'
+f = 'x^2 - 4'
+name = 'simple polynomial'
+interval = 'not given'
+notes = 'Example only; no results reported.'
+
+[[rows]]
+key = '3.3-2a'
+f = 'exp(x) - 2'
+name = 'transcendental'
+interval = 'not given'
+notes = 'Example only; no results reported.'
+
+[[rows]]
+key = '3.3-2b'
+f = 'sin(x) - x/2'
+name = 'transcendental'
+interval = 'not given'
+notes = 'Example only; no results reported.'
+
+[[rows]]
+key = '3.3-3'
+f = '(x - 1)^2'
+name = 'multiple root'
+interval = 'not given'
+notes = 'Example only; no results reported.'
+
+[[rows]]
+key = '3.3-4a'
+f = 'x^(1/3)'
+name = 'challenging numerical behavior'
+interval = 'not given'
+notes = 'The article notes the infinite derivative at `x = 0`. Example only; no results reported.'
+
+[[rows]]
+key = '3.3-4b'
+f = 'x*cos(x) - 1'
+name = 'challenging numerical behavior'
+interval = 'not given'
+notes = 'The article notes strong oscillations. Example only; no results reported.'
+
+[[rows]]
+key = '5.1'
+f = 'x^7 - 2*x^6 + 4*x^5 - 1'
+name = 'polynomial function'
+interval = '[0, 1]'
+notes = 'Eq. (8). Stated root `0.800631154473`.'
+
+[[rows]]
+key = '5.2'
+f = 'sin(x) - cos(2*x)^3'
+name = 'trigonometric function'
+interval = '`[2.5, 3]`; root search over `[0, 3]`'
+notes = 'Printed as `cos^3(2x)`. Stated roots `2.758392986844` (in the bracket) and `0.383199666746` (reached by the fixed-point, Aitken and Steffensen methods).'
+
+[[rows]]
+key = '5.3'
+f = 'exp(-x) - exp(-2*x) - exp(-3*x)'
+name = 'exponential function'
+interval = '`[0, 1]`; root search over `[-2, 2]`'
+notes = 'Stated root `0.481211825060`. The article also states a second root near `x = 56.27` on `[-2, 60]`; the function equals `exp(-x)*(1 - exp(-x) - exp(-2*x))`, which has no root other than the first.'
+
+[[rows]]
+key = '5.4'
+f = 'cos(exp(x/2))^3 - x^3'
+name = 'mixed function'
+interval = '`[0, 1]`; root search over `[-1, 1]`'
+notes = 'Printed as `cos^3(e^(x/2)) - x^3`. Stated root `0.363177127637`.'

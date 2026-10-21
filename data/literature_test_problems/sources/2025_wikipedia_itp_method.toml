@@ -1,0 +1,22 @@
+title = 'Wikipedia, "ITP method" (revision of 2025-09-02)'
+reference = 'Wikipedia contributors. ITP method. English Wikipedia, revision 1309083765 of 2 September 2025. https://en.wikipedia.org/w/index.php?title=ITP_method&oldid=1309083765. Text under CC BY-SA 4.0.'
+year = 2025
+home = '1.1'
+where_in_source = 'the section "Example: Finding the root of a polynomial", which runs the ITP method on 1 polynomial and lists its 6 iterations in a table. No other section holds a test function.'
+transcribed_from = "the page at the revision of the reference: the section's text, the alt text (LaTeX) of its formulas, and its iteration table."
+rows_summary = "1, the polynomial of the section's example."
+notes = 'The section has no label; the key is `Example`.'
+
+[[relations]]
+sources = ['roots_fortran']
+text = "roots-fortran's comment on its case 118 links to this page, by the same section anchor, and case 118 has the same function and bracket, with no differences. The revision of the reference, of 2025-09-02, is later than roots-fortran's commit of 2025-01-25, so the revision that roots-fortran read is not checked."
+
+[[relations]]
+sources = ['2021_oliveira_takahashi']
+text = "The page cites Oliveira & Takahashi (2021), the ITP article, as its main reference, but the article does not use this function. Its Section 3 runs every test on `[-1, 1]` with `epsilon = 10^-10`, `kappa1 = 0.1`, `kappa2 = 2` and `n_max = n_1/2`, that is `n0 = 0`. The page's example uses the same `kappa1` and `kappa2`, with `epsilon = 0.0005` and `n0 = 1`."
+
+[[rows]]
+key = 'Example'
+f = 'x^3 - x - 2'
+interval = '[1, 2]'
+notes = "The text gives no interval; the iteration table starts from `a = 1`, `b = 2`. The example runs ITP with `epsilon = 0.0005`, `kappa1 = 0.1`, `kappa2 = 2` and `n0 = 1`, and ends after 5 iterations with the bracket `[1.52137899116052, 1.52138301273268]`. The page says the example \"can be compared to\" the example of Wikipedia's article \"Bisection method\", without giving that function."
