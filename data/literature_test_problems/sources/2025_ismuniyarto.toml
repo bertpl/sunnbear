@@ -1,7 +1,7 @@
 title = 'Ismuniyarto, Pinheiro, Sokhna (2025): bracketing methods for a break-even point'
 reference = 'Ismuniyarto, Pinheiro, D., Sokhna, E. H. L. (2025). A numerical study of bracketing root-finding methods for nonlinear equations: applications to break-even point determination. Interval: Indonesian Journal of Mathematical Education 3(2), 213–218. https://doi.org/10.37251/ijome.v3i2.2782. The first author has a single name.'
 year = 2025
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Section 3, "Results and discussion" (pp. 215–216), solves 1 function `f(n)` of the year `n` on `[a, b] = [2, 10]` with bisection, regula falsi and the secant method, at tolerance 0.001 (Table 2).
 - Section 3 then puts the root into 2 equations `A_t`, 1 for buying Intel Pentium and 1 for buying AMD (Table 1).
@@ -10,9 +10,9 @@ where_in_source = '''
 transcribed_from = '''
 the article, the publisher's PDF with a text layer, checked against the page images at 300 dpi.
 '''
-rows_summary = '1: `f(n)`, which the 3 methods solve. The 2 equations `A_t` are its parts, not functions whose root the article seeks.'
+rows_summary = '1: `f(n)`, which the 3 methods solve. The 2 equations `A_t` are the parts of `f(n)`, not functions whose root the article seeks.'
 notes = '''
-- The article does not print `f(n)`, so the row reconstructs it: its `f` is the AMD equation minus the Pentium equation, with each printed denominator `(1.2)^(n - 1)` read as `1.2^n - 1`, and the printed `(1..2)` read as `1.2`.
+- The article does not print `f(n)`, so the row reconstructs it: the row's `f` is the AMD equation minus the Pentium equation, with each printed denominator `(1.2)^(n - 1)` read as `1.2^n - 1`, and the printed `(1..2)` read as `1.2`.
 - The reconstruction reproduces every value of `f` in Table 2 and the printed `f(a)*f(b) = -2711558.49`. With the denominators as printed, the difference of the 2 equations has the same sign at 2 and at 10.
 - The article cites no source for its function, and no other source file gives it.
 - The key `§3` names the section.

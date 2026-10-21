@@ -1,7 +1,7 @@
 title = "Nnedinma, Etin-Osa (2026): modified Steffensen's type method"
 reference = "Nnedinma, C. A., Etin-Osa, B. F. (2026). Solution of Nonlinear Equations Using the Modified Steffensen's Type Method. Applied and Computational Mathematics 15(3), 75–88. https://doi.org/10.11648/j.acm.20261503.12."
 year = 2026
-home = '1.2'
+subcategory = '1.2'
 where_in_source = 'Table 1, "Test Functions and their simple roots" (Section 4), lists 7 equations with a root and a starting point each; Tables 2 to 8 give the iterates per equation.'
 transcribed_from = 'the article, checked against the page images.'
 rows_summary = '7, 1 per equation of Table 1.'

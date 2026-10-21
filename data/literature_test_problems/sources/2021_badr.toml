@@ -1,7 +1,7 @@
 title = 'Badr, Almotairi, El Ghamry (2021): blended trisection and false position'
 reference = 'Badr, E., Almotairi, S., El Ghamry, A. (2021). A comparative study among new hybrid root finding algorithms and traditional methods. Mathematics 9(11), 1306. https://doi.org/10.3390/math9111306.'
 year = 2021
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Table 1, "Fifteen benchmark problems" (Section 4, p. 9), lists 15 functions `P1` to `P15`, each with an interval and a reference. Tables 3–9 give the results of each method on all 15; Table 2 gives the results of all methods on `P4` only.
 - The article's own method is Algorithm 7, `blendTF` (trisection and false position).

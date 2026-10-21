@@ -1,7 +1,7 @@
 title = 'Cadenas (2026): reflected box method'
 reference = 'Cadenas, O. (2026). Reflected Box Method: A Fast Quadratic-Convergent Root Solver. The Journal of Engineering (IET) 2026, e70179. https://doi.org/10.1049/tje2.70179.'
 year = 2026
-home = '1.2'
+subcategory = '1.2'
 where_in_source = 'Section 3, "Benchmark Comparison", lists 8 functions with a name each, and Table 1 gives the results per function. Section 4 (Fig. 2) uses `g1` again for the convergence order.'
 transcribed_from = 'the article, checked against the page images.'
 rows_summary = '8, 1 per function of Section 3.'

@@ -31,11 +31,11 @@ def main() -> int:
     # --- overview stage -------------------------
     overview = Overview.build(sources, rows)
     folder.summary_file.write_text(overview.summary_markdown(), encoding="utf-8")
-    folder.timeline_file.write_text(overview.timeline_page(), encoding="utf-8")
+    folder.timeline_file.write_text(overview.timeline_html(), encoding="utf-8")
     # --- report ---------------------------------
     print(f"{len(sources)} sources, {len(rows)} rows")
-    print("automatic status:", dict(Counter(row.automatic.status for row in rows).most_common()))
-    print("final status:", dict(Counter(row.final.status for row in rows).most_common()))
+    print("automatic status:", dict(Counter(row.automatic_status.status for row in rows).most_common()))
+    print("final status:", dict(Counter(row.final_status.status for row in rows).most_common()))
     problems = find_problems(final_statuses, decisions)
     for problem in problems:
         print(f"problem: {problem}")

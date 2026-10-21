@@ -1,7 +1,7 @@
 title = 'Brent (1973): Algorithms for Minimization without Derivatives, chapter 4'
 reference = "Brent, R. P. (1973). Algorithms for Minimization without Derivatives. Prentice-Hall, Englewood Cliffs, NJ. ISBN 0-13-022335-2. Author's scan: https://maths-people.anu.edu.au/~brent/pub/pub011.html. Erratum: Brent, R. P. (1975). Table Errata 520. Mathematics of Computation, p. 1166."
 year = 1973
-home = '1.1'
+subcategory = '1.1'
 where_in_source = '''
 chapter 4, "An algorithm with guaranteed convergence for finding a zero of a function" (pp. 47–60), which defines the procedures `zero` and `zero2`.
 - Section 2, "The algorithm" (pp. 48–50), gives 2 functions on which Dekker's algorithm converges slowly, equations (2.1) and (2.7).
@@ -14,7 +14,7 @@ rows_summary = '''
 - The 4 polynomials of chapter 3, Section 9, "Some numerical examples" (pp. 43–45), which lies outside chapter 4. Chapter 4 cites that section for an illustration of superlinear convergence; that section runs successive interpolation, not `zero`, from starting points without a bracket.
 '''
 notes = '''
-- The keys are chapter 4's equation numbers where the book numbers the function. `T4.1 r1-2` and `T4.1 r3` are the unnumbered rows of Table 4.1.
+- The keys are chapter 4's equation numbers where the book numbers the function. Table 4.1's functions without an equation number get the keys `T4.1 r1-2`, for the table's rows 1 and 2, and `T4.1 r3`, for its row 3.
 - The book writes `1'-9` for `1*10^-9`; the rows write `1E-9`.
 - The preface says that parts of chapter 4 appeared in Brent (1971), The Computer Journal, without naming which parts. The rows of that article are in `1971_brent`.
 '''

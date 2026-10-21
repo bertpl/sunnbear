@@ -1,7 +1,7 @@
 title = 'Higham (2002): Accuracy and Stability of Numerical Algorithms'
 reference = 'Higham, N. J. (2002). Accuracy and Stability of Numerical Algorithms, 2nd edition. Society for Industrial and Applied Mathematics (SIAM), Philadelphia. ISBN 0-89871-521-0. https://doi.org/10.1137/1.9780898718027.'
 year = 2002
-home = '1.4'
+subcategory = '1.4'
 where_in_source = '''
 the places in the whole text that give a concrete function for root finding (Newton, bisection, secant, roots and zeros of functions), since the book has no chapter on solving an equation in 1 variable:
 - Section 1.8, "Solving a Quadratic Equation" (pp. 10–11), and Section 2.6, "Fused Multiply-Add Operation" (p. 46);

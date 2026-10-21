@@ -1,11 +1,12 @@
 """The generated files of `data/literature_test_problems/` agree with the folder's source files and decisions.
 
-The tests use the script's modules that need only the standard library; the statuses stage, which needs sympy, is
-not run here, because another sympy version could change a match.
+The tests use the script's modules that need only the standard library; the row comparison in `matching`, which
+needs sympy, is not run here, because another sympy version could change a match.
 """
 
 import importlib
 import importlib.util
+import re
 import sys
 from pathlib import Path
 from types import ModuleType
@@ -67,11 +68,11 @@ def test_rows_table_holds_the_rows_of_the_source_files(sources, rows):
     """`rows.csv` holds exactly the rows of the source files, in time order."""
     # --- arrange / act ----------------
     from_sources = [
-        (row.row_id, source.year, source.home, row.f, row.f_description, row.parameters, row.interval)
+        (row.row_id, source.year, source.subcategory, row.f, row.f_description, row.parameters, row.interval)
         for source in sources
         for row in source.rows
     ]
-    from_table = [(r.row_id, r.year, r.home, r.f, r.f_description, r.parameters, r.interval) for r in rows]
+    from_table = [(r.row_id, r.year, r.subcategory, r.f, r.f_description, r.parameters, r.interval) for r in rows]
 
     # --- assert -----------------------
     assert from_table == from_sources
@@ -80,19 +81,19 @@ def test_rows_table_holds_the_rows_of_the_source_files(sources, rows):
 def test_rows_table_applies_every_decision(script_modules, rows, decisions):
     """The final statuses in `rows.csv` equal its automatic statuses with every decision applied."""
     # --- arrange ----------------------
-    automatic_statuses = {row.row_id: row.automatic for row in rows}
+    automatic_statuses = {row.row_id: row.automatic_status for row in rows}
 
     # --- act --------------------------
     final_statuses = script_modules["statuses"].decide_final_statuses(automatic_statuses, decisions)
 
     # --- assert -----------------------
-    assert {row.row_id: row.final for row in rows} == final_statuses
+    assert {row.row_id: row.final_status for row in rows} == final_statuses
 
 
 def test_rows_table_has_no_problems(script_modules, rows, decisions):
     """The final statuses in `rows.csv` have no problems: every row is decided and names only earlier rows."""
     # --- act --------------------------
-    problems = script_modules["statuses"].find_problems({row.row_id: row.final for row in rows}, decisions)
+    problems = script_modules["statuses"].find_problems({row.row_id: row.final_status for row in rows}, decisions)
 
     # --- assert -----------------------
     assert problems == []
@@ -102,7 +103,7 @@ def test_rows_table_has_no_problems(script_modules, rows, decisions):
     "file_property, build_method",
     [
         ("summary_file", "summary_markdown"),
-        ("timeline_file", "timeline_page"),
+        ("timeline_file", "timeline_html"),
     ],
 )
 def test_overview_file_matches_its_inputs(script_modules, folder, sources, rows, file_property, build_method):
@@ -113,6 +114,16 @@ def test_overview_file_matches_its_inputs(script_modules, folder, sources, rows,
 
     # --- assert -----------------------
     assert built == getattr(folder, file_property).read_text(encoding="utf-8")
+
+
+def test_readme_lists_every_subcategory(script_modules, folder):
+    """The README's list of subcategories equals `SUBCATEGORY_DESCRIPTIONS`."""
+    # --- arrange / act ----------------
+    readme = folder.readme_file.read_text(encoding="utf-8")
+    listed = dict(re.findall(r"^- `(\d\.\d)`: (.+)$", readme, flags=re.MULTILINE))
+
+    # --- assert -----------------------
+    assert listed == script_modules["data_files"].SUBCATEGORY_DESCRIPTIONS
 
 
 # ==================================================================================================

@@ -1,7 +1,7 @@
 title = "Ridders (1979): Ridders' method"
 reference = 'Ridders, C. J. F. (1979). A new algorithm for computing a single root of a real continuous function. IEEE Transactions on Circuits and Systems 26(11), 979–980. https://doi.org/10.1109/TCS.1979.1084580.'
 year = 1979
-home = '1.1'
+subcategory = '1.1'
 where_in_source = '''
 - Section I, "Method" (p. 979), works through the first iteration on 1 example.
 - Section III, "Examples" (p. 980), prints the iterates of 5 runs on 3 functions.

@@ -1,7 +1,7 @@
 title = 'Borchers (2026): pracma Handbook, chapter 5, Root Finding'
 reference = 'Borchers, H. W. *pracma Handbook*, chapter 5, "Root Finding". https://hwborchers.lima-city.de/pracmaHandbook/rootfinding.html, accessed 2026-10-18. The page is unversioned and gives no author or date; it is on the website of Hans W. Borchers, the author of the R package pracma. The chapter cites no source for its test functions.'
 year = 2026
-home = '1.3'
+subcategory = '1.3'
 where_in_source = '''
 section 5.6, "Appendix: Test functions", an R code block that defines `f1`–`f12`, each with a comment that gives its interval and its root.
 

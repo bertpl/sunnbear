@@ -1,10 +1,10 @@
 title = 'Alefeld, Potra, Shi (1993): on enclosing simple roots of nonlinear equations'
 reference = 'Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear equations. Mathematics of Computation 61(204), 733–744. https://doi.org/10.1090/s0025-5718-1993-1192965-2.'
 year = 1993
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Table 5.1, "Test problems" (p. 741), lists 14 functions with their intervals and parameters.
-- Section 5 also solves `x^n = 0` on `[-1, 10]`, to compare the methods with bisection; Table 5.3 gives its evaluation counts.
+- Section 5 also solves `x^n = 0` on `[-1, 10]`, to compare the methods with bisection; Table 5.3 gives the evaluation counts on `x^n`.
 - Tables 5.2 and 5.3 give total evaluation counts only, at `tol = 10^-7, 10^-10, 10^-15` and 0.
 '''
 transcribed_from = 'the article, a scan with a text layer, read from the page images. No code accompanies the article.'

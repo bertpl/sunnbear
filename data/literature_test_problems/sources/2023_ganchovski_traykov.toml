@@ -1,7 +1,7 @@
 title = "Ganchovski, Traykov (2023): modified Anderson-Bjork's method"
 reference = "Ganchovski, N., Traykov, A. (2023). Modified Anderson-Bjork's method for solving nonlinear equations in structural mechanics. IOP Conf. Series: Materials Science and Engineering 1276, 012010. https://doi.org/10.1088/1757-899X/1276/1/012010."
 year = 2023
-home = '1.1'
+subcategory = '1.1'
 where_in_source = '''
 - **§7, Table 2** "Results from numerical tests" (pp. 9–10): 21 functions f01–f21, all on the interval `[-1, 1]` with `ϵ = 10^-15`. §7 says they are "some of the functions that Oliveira and Takahashi used for their ITP method" (ref. [4]).
 - **§3 and §5** (Figures 10 and 12): the convergence charts use `f(x) = 4 - tan(x)` on `[0, 1.5]`.
@@ -10,7 +10,7 @@ where_in_source = '''
 transcribed_from = 'the article only; it publishes no benchmark code. The C# listing in §6 is the algorithm.'
 rows_summary = '22: the 21 functions of Table 2, and 1 for the function of §3 and §5.'
 notes = '''
-- **f14, f15 and f19 print a condition in parentheses as a factor**, as in `(x > -1)*(...)`. The article does not define this notation.
+- **In f14, f15 and f19, the article prints a condition in parentheses as a factor**, as in `(x > -1)*(...)`, and does not define this notation.
 - **Oliveira & Takahashi (2021)** is ref. [4]: Oliveira, I., Takahashi, R. An Enhancement of the Bisection Method Average Performance Preserving Minmax Optimality. ACM Trans. Math. Softw. 47 (2021), 1, Article 5. Its rows are in `2021_oliveira_takahashi`.
 '''
 

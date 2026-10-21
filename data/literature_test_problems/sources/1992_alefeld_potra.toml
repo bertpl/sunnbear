@@ -1,13 +1,13 @@
 title = 'Alefeld, Potra (1992): some efficient methods for enclosing simple zeros'
 reference = 'Alefeld, G. E., Potra, F. A. (1992). Some efficient methods for enclosing simple zeros of nonlinear equations. BIT 32(2), 334–344. https://doi.org/10.1007/bf01994885.'
 year = 1992
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Table 1, "Test problems" (p. 343), lists 11 functions `# 1` to `# 11` with their initial intervals; its caption says that `n` is a positive integer.
 - Section 4 says that problems 5 to 11 were run with `n = 5, 10, 20`, each at `tol = 10^-2, 10^-5, 10^-7, 10^-10, 10^-15` and 0. Tables 2–4 give total evaluation counts only, over all problems or over a group of them.
 '''
 transcribed_from = 'the article, a scan with a text layer, read from the page images. No code accompanies the article.'
-rows_summary = '11, 1 per problem of Table 1. With 3 values of `n` for problems 5 to 11, they make 25 cases per tolerance; the article states no count.'
+rows_summary = '11, 1 per problem of Table 1. With 3 values of `n` for problems 5 to 11, the 11 rows make 25 cases per tolerance; the article states no count.'
 notes = '''
 - **Keys:** the numbers of Table 1.
 - **`also_in`:** empty in every row. The abstract calls the functions "a series of published examples", but the article does not say where they come from.

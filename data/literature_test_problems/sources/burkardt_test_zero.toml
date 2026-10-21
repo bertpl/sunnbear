@@ -9,7 +9,7 @@ John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, https://people.sc
 The file's `brent` solver cites Brent's 1973 book for the algorithm, not for any function.
 '''
 year = 2016
-home = '1.3'
+subcategory = '1.3'
 where_in_source = '''
 19 problems `p01`–`p19` (`p00_prob_num` returns 19); the `p00_*` functions dispatch on the problem number. Each problem `pNN` defines these functions:
 - `pNN_fx`, the function, and `pNN_fx1` and `pNN_fx2`, its 1st and 2nd derivative;
@@ -23,7 +23,7 @@ The test drivers use the data as follows:
 - Newton starts from point 1, and secant from points 1 and 2, both with `rang` as the limits `xmin`, `xmax`;
 - Muller starts from points 1, 2 and 3.
 '''
-transcribed_from = 'the code of `pNN_fx`, `pNN_rang`, `pNN_start` and `pNN_title`. Where the docstring of `pNN_fx` or the title differs from the code, the code wins (`p06`).'
+transcribed_from = 'the code of `pNN_fx`, `pNN_rang`, `pNN_start` and `pNN_title`. Where the docstring of `pNN_fx` or the title differs from the code, the rows follow the code (`p06`).'
 rows_summary = '19, 1 per problem.'
 notes = '''
 How to read the rows:

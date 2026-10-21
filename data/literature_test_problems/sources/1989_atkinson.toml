@@ -1,7 +1,7 @@
 title = 'Atkinson (1989): An Introduction to Numerical Analysis, chapter 2'
 reference = 'Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & Sons, New York. ISBN 0-471-62489-6.'
 year = 1989
-home = '1.4'
+subcategory = '1.4'
 where_in_source = '''
 chapter 2, "Rootfinding for Nonlinear Equations" (pp. 53–127).
 - Sections 2.0–2.9 (pp. 53–102) hold the worked examples and Tables 2.1–2.18; Problems 1–54 (pp. 117–127) end the chapter.

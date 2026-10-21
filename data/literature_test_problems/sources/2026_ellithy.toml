@@ -1,12 +1,12 @@
 title = 'Ellithy (2026): 4 multi-phase hybrid bracketing algorithms'
-reference = "Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root finding. Journal of the Egyptian Mathematical Society 34(1), 91–115. https://doi.org/10.21608/joems.2026.440115.1078. Code and data: the authors' repository https://github.com/Abdelrhman-Ellithy/hybridroots, at commit `7f22131ef4e1def3e3928dc6558f46f756d0a5ea`."
+reference = "Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root finding. Journal of the Egyptian Mathematical Society 34(1), 91–115. https://doi.org/10.21608/joems.2026.440115.1078. Code and data: the author's repository https://github.com/Abdelrhman-Ellithy/hybridroots, at commit `7f22131ef4e1def3e3928dc6558f46f756d0a5ea`."
 year = 2026
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
-the file `Paper Experiment and Results/dataset.json` of the authors' repository lists 48 problems. Each has an `expression` in Python syntax and the interval ends `a` and `b`; the last 6 also have a `note`, which names an application.
+the file `Paper Experiment and Results/dataset.json` of the author's repository lists 48 problems. Each has an `expression` in Python syntax and the interval ends `a` and `b`; the last 6 also have a `note`, which names an application.
 '''
 transcribed_from = '''
-the authors' file `Paper Experiment and Results/dataset.json`. The rows were not checked against the article, so whether the article's 48 problems equal the file's is not known.
+the author's file `Paper Experiment and Results/dataset.json`. The rows were not checked against the article, so whether the article's 48 problems equal the file's is not known.
 '''
 rows_summary = '48, 1 per entry of the file. Entries 30 and 31 hold the same expression on 2 intervals.'
 notes = '''

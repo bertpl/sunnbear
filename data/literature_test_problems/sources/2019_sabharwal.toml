@@ -1,7 +1,7 @@
 title = 'Sabharwal (2019): blended bisection and regula falsi'
 reference = 'Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms Bisection and Regula Falsi Algorithms. Mathematics 7(11), 1118. https://doi.org/10.3390/math7111118.'
 year = 2019
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Figures 1–4 (Section 2.2.3, pp. 5–6) plot runs of the false position method on 4 functions, with tolerance `0.00001` and at most 10 iterations, to show that 1 endpoint stays fixed. Each plot title gives the function and the interval.
 - Table 2, "From the literature function, domain interval and author of the function" (Section 5.2, p. 12), lists 11 functions, each with an interval and an author. Section 5.2 says that the article's algorithm was tested on all of them, but the article prints results only for `x^2 - x - 2` on `[1, 4]` (`T2.4`).

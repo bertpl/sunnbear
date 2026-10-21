@@ -18,19 +18,22 @@ Comments name these sources for cases or blocks, as they give them:
 - "the ITP paper : Table 1" (cases 119–127).
 - "Table 1 from RBP paper" (cases 134–144). This is Suhadolnik (2012), whose rows are in `2012_suhadolnik`. Cases 134–137 and 140–144 are the examples 1, 2, 3, 5, 7, 8, 10, 17 and 18 of its Table 1, unchanged; cases 138–139 hold Stage's §3.7, not a Suhadolnik function.
 - "Zhang test case" (case 145). This is Zhang (2011), whose rows are in `2011_zhang`; the case's bracket is `[0, 4]`, the interval at which Zhang's Table 1 starts.
-- http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543, the file of Galdino (2011) (`2011_galdino`), and "Root-test-functions.pdf : https://www.researchgate.net/publication/373922895_Additional_test_functions" (cases 146–157). That PDF is the 2023 version of Ganchovski's "Root-finding Test Functions", whose revision of 2026-09-29 is `ganchovski_test_functions`. Cases 146–157 are its f01, f02, f04, f28–f32, f41 and f42, with f42 split over cases 155–157, and follow the PDF where it differs from the C# code of Tomov & Ganchovski's benchmark (`2026_tomov_ganchovski_benchmark`). The brackets of 4 cases differ: case 146 starts at 0.51, as roots-fortran's own comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`.
+- http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543, the file of Galdino (2011) (`2011_galdino`), and "Root-test-functions.pdf : https://www.researchgate.net/publication/373922895_Additional_test_functions" (cases 146–157).
+  - That PDF is the 2023 version of Ganchovski's "Root-finding Test Functions", whose revision of 2026-09-29 is `ganchovski_test_functions`.
+  - Cases 146–157 are its f01, f02, f04, f28–f32, f41 and f42, with f42 split over cases 155–157, and follow the PDF where it differs from the C# code of Tomov & Ganchovski's benchmark (`2026_tomov_ganchovski_benchmark`).
+  - The brackets of 4 cases differ: case 146 starts at 0.51, as roots-fortran's own comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`.
 '''
 year = 2025
-home = '1.3'
+subcategory = '1.3'
 where_in_source = '''
 the subroutine `problems` of the program `root_tests`, a `select case (nprob)` over the cases `nprob = 1, ..., 157` (`num_of_problems = 157`).
 - A block such as `case (2:11)` gives 1 function, with 1 bracket per case number.
 - A case may set a list `ns` of values of an integer `n`; the driver then runs the case once per value. A case without `ns` runs once.
 '''
 transcribed_from = '''
-the code of the file at commit `390e7ea`: the assignments to `f`, the bounds `a` and `b`, and the lists `ns`. Each case also holds 2 strings for a LaTeX results table, the function (`latex`) and the bracket (`bounds`); where they differ from the code, the code wins (cases 70, 147).
+the code of the file at commit `390e7ea`: the assignments to `f`, the bounds `a` and `b`, and the lists `ns`. Each case also holds 2 strings for a LaTeX results table, the function (`latex`) and the bracket (`bounds`); where they differ from the code, the rows follow the code (cases 70, 147).
 '''
-rows_summary = "120, 1 per `case` block, covering the file's 157 numbered cases. With each value of `n` counted, the driver runs 223 cases."
+rows_summary = "120, 1 per `case` block, covering the file's 157 numbered cases. With each value of `n` counted, the driver makes 223 runs."
 notes = '''
 How to read the rows:
 - **`key`** holds the case number, or the range of case numbers of a block.

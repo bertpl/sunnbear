@@ -1,7 +1,7 @@
 title = 'Suhadolnik (2012): combined bracketing methods'
 reference = 'Suhadolnik, A. (2012). Combined bracketing methods for solving nonlinear equations. Applied Mathematics Letters 25(11), 1755–1760. https://doi.org/10.1016/j.aml.2012.02.006.'
 year = 2012
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 Section 5, "Numerical examples", Table 1 (p. 1759), lists 18 functions with their intervals `[x_a, x_b]` and the iteration counts of 8 methods, at `eps = 10^-15` and `N_max = 10^5`. The article's own method is the regula falsi–bisection–parabolic (RBP) method.
 '''

@@ -1,7 +1,7 @@
 title = 'Moler (2004): Numerical Computing with MATLAB, chapter 4 and Sections 1.1 and 1.7'
 reference = "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); The MathWorks, Natick, MA (electronic edition). ISBN 978-0-898716-60-3. The author's web edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
 year = 2004
-home = '1.4'
+subcategory = '1.4'
 where_in_source = '''
 chapter 4, "Zeros and Roots" (25 pages): Sections 4.1–4.10 and Exercises 4.1–4.22; and 2 examples of chapter 1:
 - the golden-ratio equation of Section 1.1, "The Golden Ratio" (pp. 3–5, Figure 1.2), the chapter's only zero-finding example;
@@ -43,7 +43,7 @@ Other sources with the same function:
 sources = ['burkardt_test_zero']
 text = '''
 Burkardt's TEST_ZERO (`burkardt_test_zero`) shares these functions with the book:
-- **`p18` is the §1.7 row.** TEST_ZERO cites this book for `p18`, `10^14*(x - 1)^7` expanded term by term on `[0.988, 1.012]`; Moler's polynomial lacks the factor `10^14`, and Moler plots it without solving for a root.
+- **`p18` is the §1.7 row times `10^14`.** TEST_ZERO cites this book for `p18`, `10^14*(x - 1)^7` expanded term by term on `[0.988, 1.012]`; Moler's polynomial lacks the factor `10^14`, and Moler plots it without solving for a root.
 - **`p17`**, `x^3 - 2*x - 5` on `[2, 3]`, is Ex. 4.2's function, and Ex. 4.2 tells the history of Wallis that `p17`'s comment gives without a reference.
 - **`p14`** (The Camel) equals `humps(x) + 2*x + 0.8`, with MATLAB's demo function `humps` of §4.7 and §4.10.
 - **`p16`** is Kepler's equation in degrees with other constants than Ex. 4.15.

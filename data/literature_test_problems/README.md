@@ -2,9 +2,11 @@
 
 **Nothing in this folder ships with the sunnbear package.** The data artifacts that ship are those of `sunnbear.data`; this folder is maintainer data, read only by the script `scripts/literature_test_problems/` and its test.
 
-The folder is a survey of the test functions that published sources give: articles of root-finding methods, public benchmark suites and textbooks.
+The folder is a survey of the test functions of published sources: articles of root-finding methods, public benchmark suites and textbooks.
 
-Each row is 1 test function as its source gives it, with its parameters and interval, and each row records whether an earlier source already gives the same function. The rows are the material for the formulas of category 1, *Existing benchmark suites*, of sunnbear's formula catalog: the formulas that the package ships in `sunnbear.functions`, each a family of test functions.
+Each row is 1 test function as its source gives it, with its parameters and interval, and each row records whether an earlier source already gives the same function.
+
+The rows are the material for category 1, *Existing benchmark suites*, of sunnbear's formula catalog. The catalog holds the package's formulas in `sunnbear.functions`, each a family of test functions.
 
 ## Files
 
@@ -12,34 +14,34 @@ Each row is 1 test function as its source gives it, with its parameters and inte
 |---|---|---|
 | `sources/<id>.toml` | hand | 1 source: its reference, where in the source its rows are, and its rows |
 | `decisions.csv` | hand | the statuses that a person decided, where the script cannot decide or decides wrongly |
-| `rows.csv` | script | every row, in time order, with its automatic and its final status |
-| `summary.md` | script | 1 line per source: its year, title, home (the kind of source, § Source files), rows and new rows, and the sources that it takes rows from |
-| `timeline.html` | script | a page that draws the sources in time order, with an edge from each source to the later sources that take its rows |
+| `rows.csv` | script | every row, in time order, with its automatic and its final status (§ Statuses) |
+| `summary.md` | script | 1 line per source: its year, title, subcategory (the kind of source, § Source files), rows and new rows, and the sources that it takes rows from |
+| `timeline.html` | script | a page that draws the sources in time order, with an edge from each source to every later source whose rows match its rows (§ The summary and the page) |
 
 Do not edit the 3 generated files by hand; regenerate them (§ Regenerating).
 
 ## Source files
 
-A source's id is its file name: `<year>_<first author>_<subject>` for a publication, such as `1971_dowell_jarratt_illinois`, and the suite's name for a code suite, such as `roots_fortran`. Each file holds these fields:
+A source's id is its file name: `<year>_<author names>` for a publication, optionally followed by `_<subject>`, such as `2011_zhang` and `1971_dowell_jarratt_illinois`, and the suite's name for a code suite, such as `roots_fortran`. Each file holds these fields:
 
 | field | content |
 |---|---|
-| `title` | `Authors (year): subject`; the page shows the part before the colon |
+| `title` | `Authors (year): subject`; `timeline.html` shows the part before the colon |
 | `reference` | the full reference with its DOI, or its URL where it has none |
 | `year` | the year of the edition or version that `reference` cites (see **Year** below) |
-| `home` | the subcategory of category 1 where the source's formulas belong (see **Home** below) |
+| `subcategory` | the subcategory of category 1 where the source's formulas belong (see **Subcategory** below) |
 | `where_in_source` | the tables, sections or files of the source that hold the functions |
 | `transcribed_from` | what the rows were read from, and which one is followed where they differ |
-| `rows_summary` | the number of rows, first, and how they relate to the source's own count |
+| `rows_summary` | starts with the number of rows, then says how that number relates to the source's own count |
 | `notes` | optional: how to read the rows of this source, and other facts about it |
 | `[[relations]]` | optional, any number: `sources`, the ids of other sources, and `text`, how this source's rows relate to theirs |
 | `[[rows]]` | 1 table per row, below |
 
 **Year.** A textbook's year is that of the cited edition, and a code suite's that of the cited release or commit. An article that appeared online before its issue takes the online year, so the year can differ from the one in its id (`2021_oliveira_takahashi` appeared online in 2020).
 
-The sources are in time order by year, then by id without its leading year.
+The generated files list the sources in time order: by year, then by id without its leading year.
 
-**Home**, the kind of source:
+**Subcategory** gives the kind of source:
 
 - `1.1`: articles of solvers that sunnbear implements
 - `1.2`: articles of other solvers
@@ -63,25 +65,29 @@ A row's id is `<source id>:<key>`, such as `2011_zhang:3`; a key that a source r
 
 ## Statuses
 
-Each row has 1 of 4 final statuses; every status other than `new` names the earlier rows that the row matches, and for each match only the earliest such row:
+Each row has 1 of 4 final statuses; every status other than `new` names the earlier rows that the row matches, and where several earlier rows match the same instance, it names the earliest:
 
-- **`duplicate`:** the same expression written differently without changing how it is computed (reordered terms or factors, `x*x*x` against `x^3`), the same expression on another interval, a sign flip, a constant factor, or an equation against its difference form (`sin(x) = x^2` against `sin(x) - x^2`).
+- **`duplicate`:** the row matches an earlier row in 1 of these ways:
+  - the same expression written differently without changing how it is computed (reordered terms or factors, `x*x*x` against `x^3`);
+  - the same expression on another interval;
+  - a sign flip or a constant factor;
+  - an equation against its difference form (`sin(x) = x^2` against `sin(x) - x^2`).
 - **`variant`:** the same model with other constants (`g = 9.8` against `9.81`), or a shift in `x`.
 - **`extended`:** a family that only adds parameter values to an earlier family.
-- **`new`:** everything else. That includes a function with the same roots but other values, such as 2 fixed-point forms `x = g(x)` of 1 equation, and the same function in a form that rounds differently, such as a polynomial in expanded form compared with the same polynomial in factored or nested form.
+- **`new`:** everything else. That includes a function with the same roots but different values away from them, such as 2 fixed-point forms `x = g(x)` of 1 equation, and the same function in a form that rounds differently, such as a polynomial in expanded form compared with the same polynomial in factored or nested form.
 
-Where a source misprints a function, the row is compared as the function that the source meant, and its notes say so. Every row that is not `new` names an earlier row; a duplicate that neither the script nor `decisions.csv` finds stays `new`.
+Where a source misprints a function, the row is compared as the function that the source meant, and its notes say so. Every row that is not `new` names an earlier row; a duplicate that the script does not find and `decisions.csv` does not record stays `new`.
 
 **How the script decides.** It parses each row's `f` and `parameters` with sympy into 1 instance per combination of parameter values, and compares each row with every earlier row (the docstring of `scripts/literature_test_problems/matching.py` gives the 3 comparisons). The automatic status follows from the matches:
 
 - **`duplicate`:** earlier rows already have each instance of the row.
-- **`extended`:** the row's expression matches an earlier family, with new parameter values.
+- **`extended`:** the row's expression, with its parameters left as symbols, matches an earlier row's, and the row adds parameter values.
 - **`new`:** the row parses and matches nothing.
-- **`judge`:** a match by value only, a match of only some of its instances, or a row that does not parse; a person decides the status in `decisions.csv`.
+- **`undecided`:** a match only by the values at fixed x-values, a match of only some of its instances, a match of the expression of a row without parameter values, or a row that does not parse; a person decides the status in `decisions.csv`.
 
-A row that does not parse still matches an earlier row with the same text.
+A row that matches nothing else, parsed or not, is still a `duplicate` of an earlier row with the same text: the same `f` or `f_description` and `parameters`, ignoring whitespace and backticks.
 
-**Chains end at the first appearance:** a row whose earlier row is itself a `duplicate` names that row's earlier row instead. A row whose earlier row is a `variant` or `extended` row keeps naming that row, since it is the first appearance of its constants or parameter values.
+**Each row names the first appearance of its function:** a row whose earlier row is itself a `duplicate` names that row's earlier row instead. A row whose earlier row is a `variant` or `extended` row keeps naming that row, since it is the first appearance of its constants or parameter values.
 
 ## Decisions
 
@@ -93,36 +99,36 @@ A row that does not parse still matches an earlier row with the same text.
 
 | column | content |
 |---|---|
-| `row_id`, `year`, `home` | the row's id, and its source's year and home |
+| `row_id`, `year`, `subcategory` | the row's id, and its source's year and subcategory |
 | `parse_note` | why the script could not parse the row; empty when it parsed |
-| `instances` | the number of the row's parsed instances |
+| `n_instances` | the number of the row's parsed instances |
 | `automatic_status`, `match_kind`, `matches` | the script's status, the comparison that found it, and the earlier rows that matched |
-| `status`, `earlier_rows`, `reason` | the final status, from `decisions.csv` where it decides the row |
+| `status`, `earlier_rows`, `reason` | the final status, its earlier rows and the reason, taken from `decisions.csv` where that file has a line for the row |
 
 ## The summary and the page
 
 An edge runs from an earlier source to a later one for every later row that names a row of the earlier source; `summary.md` lists the edges into each source as *takes rows from*.
 
-Short functions that many sources hold, such as `cos(x) - x`, would join nearly every source, so they give no edges: a row is such a common function when later rows of at least `COMMON_MIN_SOURCES` sources name it and its `f` is at most `COMMON_MAX_LENGTH` characters long (both set in `scripts/literature_test_problems/overview.py`).
+Short functions that many sources hold, such as `cos(x) - x`, would connect nearly every pair of sources, so they add no edges: a row is such a common function when later rows of at least `COMMON_MIN_SOURCES` sources name it and its `f` is at most `COMMON_MAX_LENGTH` characters long (both set in `scripts/literature_test_problems/overview.py`).
 
 Common functions and the rows that name them still count in the row counts of their sources, and `summary.md` lists the common functions.
 
 ## Adding a source
 
-1. Write `sources/<id>.toml`. Add a relation where a reader needs to know how its rows relate to another source's, such as a block of functions that it copies with changes; the statuses already name every match.
-2. Regenerate. The script prints each row that needs a decision; `rows.csv` gives the comparison and the earlier rows that the script found for it.
+1. Write `sources/<id>.toml`. Add a relation where a reader needs to know how its rows relate to another source's rows, such as a block of functions that the new source copies with changes; the statuses already name every match.
+2. Regenerate. The script prints each row that needs a decision; `rows.csv` gives, in `match_kind` and `matches`, the comparison and the earlier rows that the script found for it.
 3. Add a line to `decisions.csv` for each of those rows, and for any automatic status that is wrong, then regenerate until the script prints no problems.
 4. Commit the source file, `decisions.csv` and the 3 generated files together.
 
 ## Regenerating
 
-From the repo root, with the dev dependencies installed:
+Run the script from the repo root, with the dev dependencies installed:
 
 ```
 uv run python -m scripts.literature_test_problems
 ```
 
-The script writes the 3 generated files, prints the counts per status and every problem that it finds, and exits with status 1 if there is one. It needs sympy, from the dev dependency group, and a Unix system, because it limits the time of each parse with `SIGALRM`.
+The script writes the 3 generated files, prints the counts per status and every problem that it finds, and exits with status 1 if there is one. It needs sympy, from the dev dependency group, and a Unix system, because it limits the time of parsing each row with `SIGALRM`.
 
 CI does not regenerate `rows.csv`, because another sympy version could change a match. Instead, `tests/scripts/test_literature_test_problems.py` checks, with the standard library only, that:
 
@@ -131,4 +137,4 @@ CI does not regenerate `rows.csv`, because another sympy version could change a 
 - every source file has its fields;
 - `summary.md` and `timeline.html` equal what the script builds from `rows.csv` and the source files.
 
-A change to the matching in `scripts/literature_test_problems/` is the one change that the test cannot see: whoever makes it regenerates `rows.csv`.
+A change to the parsing or matching in `scripts/literature_test_problems/`, or to the sympy version, is what the test does not check: whoever makes it regenerates `rows.csv`.

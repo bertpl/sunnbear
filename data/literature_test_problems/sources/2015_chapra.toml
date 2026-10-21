@@ -1,7 +1,7 @@
-title = 'Chapra & Canale (2015): Numerical Methods for Engineers, Part Two'
+title = 'Chapra, Canale (2015): Numerical Methods for Engineers, Part Two'
 reference = 'Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. McGraw-Hill Education. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021; the rows follow the 7th.'
 year = 2015
-home = '1.4'
+subcategory = '1.4'
 where_in_source = '''
 Part Two, "Roots of Equations" (pp. 117–228), with the examples, figures and end-of-chapter problems of its parts:
 - the introduction PT2.1–PT2.3 (pp. 117–122);
@@ -16,21 +16,25 @@ The epilogue (pp. 226–228) holds no function.
   - figures that sketch a function without its expression: Figures 5.2, 5.3(b), 5.16, 6.1, 6.3, 6.6, 6.13(c) (a quadruple root) and 7.3;
   - formulas that are evaluated, not solved: Ex. 6.9's inverse parabola `g(y) = 0.5*y^2 - 2.5*y + 4` (printed with `x` for `y`), §8.2's trend of `pCO2`, the Swamee–Jain formula (8.22), Prob. 8.13's pressure drop and Prob. 8.48's Stokes-law velocity (P8.48.2);
   - systems of nonlinear equations: §6.6 ((6.19), Ex. 6.11, 6.12), Ex. 7.5, Figure 7.9, §8.2's system (8.6)–(8.10) before it is reduced to (8.14), and Prob. 6.22–6.24, 6.31, 6.32, 7.12, 7.13, 7.18, 8.6 and 8.43–8.46;
-  - problems whose function of the unknown the reader derives: Prob. 5.20 (a floating frustum of a cone: the book prints the frustum's volume, but not the radius at the waterline as a function of the unknown height), 8.41 (the energy balance of a mixer, from 2 printed heat capacities) and 8.47 (the moment on the space shuttle at liftoff, from Figure P8.47);
+  - problems that leave the reader to derive the function of the unknown: Prob. 5.20 (a floating frustum of a cone: the book prints the frustum's volume, but not the radius at the waterline as a function of the unknown height), 8.41 (the energy balance of a mixer, from 2 printed heat capacities) and 8.47 (the moment on the space shuttle at liftoff, from Figure P8.47);
   - Prob. 7.16, which runs Müller's method through 3 data points, without a function.
 - Every problem that names a method without a function repeats an example or another problem (5.21–5.26, 6.27–6.30, 7.6–7.9, 7.15, 7.20–7.24); its key is in that function's row.
 '''
 transcribed_from = '''
 the book's PDF, whose page number is the book's plus 17.
 
-All of Part Two was read from the page images; the problems' coefficients were checked against the text layer, which encodes some symbols as other characters (`5` for `=`, `2` for a minus sign, `1` for `+`), so the page images win where the 2 differ.
+All of Part Two was read from the page images; the problems' coefficients were checked against the text layer, which encodes some symbols as other characters (`5` for `=`, `2` for a minus sign, `1` for `+`), so the rows follow the page images where the 2 differ.
 '''
 rows_summary = '118, 1 per distinct function of the unknown: a function that several examples or problems use is 1 row whose key lists them all. 30 rows come from the introduction, the text, its examples, figures and case studies; 88 come from the problems alone.'
 notes = '''
 How to read the rows:
 - **Keys:** `(PT2.n)` and `(n.m)` are the book's equation numbers; `§` is a passage of the text, with its page; `Ex.`, `Fig.` and `Prob.` are the book's Examples, Figures and end-of-chapter Problems, with a part letter where a problem has several functions.
 - **Equations:** an equation that the book prints as `lhs = rhs` stays in that form; `f(x) = 0` and `0 = f(x)` are written as `f(x)`. A fixed-point form `x = g(x)` is its own row. The parachutist's equation and the circuit's equation are 2 rows each, 1 per unknown (`c` or `m`; `R` or `L`), because they are different functions of the unknown.
-- **Notation:** the book writes `ln` for the natural log, which the rows write `log`, and `log` for the base-10 log of the Colebrook equation, which the rows write `log10`; `cos^-1` becomes `arccos`. Subscripts join their names: `Pu,max` becomes `Pu_max`, `c_a,0` becomes `ca0`, `[H+]` becomes `H`, `[HCO3-]` becomes `HCO3`. A number printed as `1.671 × 10^-4` is written `1.671E-4`. `<x - a>^n` is a singularity function, as Prob. 8.24 defines it: `(x - a)^n` for `x > a`, else 0.
+- **Notation:**
+  - the book writes `ln` for the natural log, which the rows write `log`, and `log` for the base-10 log of the Colebrook equation, which the rows write `log10`; `cos^-1` becomes `arccos`;
+  - subscripts join their names: `Pu,max` becomes `Pu_max`, `c_a,0` becomes `ca0`, `[H+]` becomes `H`, `[HCO3-]` becomes `HCO3`;
+  - a number printed as `1.671 × 10^-4` is written `1.671E-4`;
+  - `<x - a>^n` is a singularity function, as Prob. 8.24 defines it: `(x - a)^n` for `x > a`, else 0.
 - **Intervals:** the initial guesses `xl` and `xu` of a bracketing method are written as the interval `[xl, xu]`; the starting points of the open methods are in `notes`.
 
 Differences from the 6th edition (2010):
@@ -72,7 +76,13 @@ Differences from the 6th edition (2010):
   - thrown ball, Prob. 8.37: `x = 40` m, `y0 = 1.8` m (6th: Prob. 8.36, `x = 35`, `y0 = 2`);
   - rocket, Prob. 8.39: `u = 2200`, `m0 = 160000`, `q = 2680`, `v = 1000` (6th: Prob. 8.38, `2000`, `150000`, `2700`, `750`);
   - phase angle of a car's vibration, Prob. 8.40: `phi = omega/2 - 1` (6th: Prob. 8.39, `omega/3 - 1`).
-- **Functions new in the 7th** (5 rows): Prob. 5.15 (water discharged from a tank through a pipe), 6.14 (a quintic), 8.28 (§8.2's pH with a lake's alkalinity), 8.29 (§8.3's circuit with the inductance as unknown) and 8.48 (the settling velocity of a particle). Prob. 5.19, a floating sphere, is a new use of the spherical-tank row's function.
+- **Functions new in the 7th** (5 rows):
+  - Prob. 5.15, water discharged from a tank through a pipe;
+  - Prob. 6.14, a quintic;
+  - Prob. 8.28, §8.2's pH with a lake's alkalinity;
+  - Prob. 8.29, §8.3's circuit with the inductance as unknown;
+  - Prob. 8.48, the settling velocity of a particle.
+- **A new use of a function:** Prob. 5.19, a floating sphere, is a new use of the spherical-tank row's function.
 - **Functions of the 6th that the 7th no longer has** (3):
   - Prob. 5.12: `-2*x^6 - 1.6*x^4 + 12*x + 1`, its maximum on `[0, 1]` by bisection to `es = 5%`, a root of `f'(x)`; the 7th's Prob. 5.12 takes Prob. 6.12's function;
   - Prob. 6.5: `-2 + 6*x - 4*x^2 + 0.5*x^3`, Newton from `x0 = 4.2` and from `x0 = 4.43`; the 7th's Prob. 6.5 takes Prob. 6.4's function;

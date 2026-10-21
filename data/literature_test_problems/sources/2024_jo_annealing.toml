@@ -1,7 +1,7 @@
 title = 'Jo, Wagemakers, Periwal (2024): annealing approach to root-finding'
 reference = "Jo, J., Wagemakers, A., Periwal, V. (2024). Annealing approach to root-finding. arXiv preprint 2404.15338v2. http://arxiv.org/abs/2404.15338v2. The authors' Julia scripts: https://github.com/awage/RootFinding."
 year = 2024
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Tables I and II (Sections III D and IV B) list 14 functions `f1` to `f14`; both tables use the same functions.
 - Fig. 3 (Section III E) shows basins of attraction for `f2`, `f7` and `f14`, written in `z`.

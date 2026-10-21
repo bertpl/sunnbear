@@ -1,14 +1,17 @@
 title = 'Gao (2026): clipped power interpolation (CARF)'
 reference = 'Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied Mathematics Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928.'
 year = 2026
-home = '1.1'
+subcategory = '1.1'
 where_in_source = '''
 - Section 1, the introduction, names `x^(1/5)` and `x^5` as examples, without intervals.
-- Section 3, "Numerical experiments", has 4 parts: a list of 3 functions with steep slopes (results in Table 1), 2 functions with a vanishing derivative (Table 2), and 2 suites from other articles (Tables 3 and 4).
+- Section 3, "Numerical experiments", has 4 parts:
+  - a list of 3 functions with steep slopes (results in Table 1);
+  - 2 functions with a vanishing derivative (Table 2);
+  - 2 suites from other articles (Tables 3 and 4).
 - Table 3 runs the Alefeld–Potra–Shi suite, "154 functions from 15 types" in Table 1 of Alefeld, Potra, Shi (1995), the article's ref. [13], whose rows are in `1995_alefeld_potra_shi`. Table 3 prints only `sin x - 1/2 x`, as an example from that suite.
 - Table 4 runs Chandrupatla's suite, from Table 1 of Chandrupatla (1997), ref. [15], whose rows are in `1997_chandrupatla`: 9 functions, each on 5 intervals, all printed, run with `eps_1 = 1E-15`, `eps_2 = 1E-12` and at most 200 iterations.
 '''
-transcribed_from = "the article (text layer, checked against the page images). sunnbear's `tests/solvers/bracketing/carf/paper_problems.py` holds Table 4 only, and takes its functions from Chandrupatla's article. Where Gao's Table 4 and Chandrupatla's article differ (`T4.8`, `T4.9`), the rows follow Gao's print and the rows' notes give sunnbear's form."
+transcribed_from = "the article (text layer, checked against the page images). sunnbear's `tests/solvers/bracketing/carf/paper_problems.py` holds Table 4 only, and takes its functions from Chandrupatla's article. Where Gao's Table 4 and Chandrupatla's article differ (`T4.8`, `T4.9`), the rows follow what Gao prints, and the rows' notes give sunnbear's form."
 rows_summary = "16: the introduction's `x^(1/5)` (its `x^5` is row `T2.1`), Section 3's 3 listed functions, Table 2's 2, Table 3's 1 printed example, and Table 4's 9. The article prints no other functions."
 notes = '''
 The article does not number the functions. The keys are:

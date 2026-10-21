@@ -1,7 +1,7 @@
 title = 'Dowell, Jarratt (1972): the Pegasus method'
 reference = 'Dowell, M., Jarratt, P. (1972). The "Pegasus" method for computing the root of an equation. BIT 12(4), 503–508. https://doi.org/10.1007/BF01932959.'
 year = 1972
-home = '1.1'
+subcategory = '1.1'
 where_in_source = '''
 Section 4, "Numerical Illustrations" (pp. 505–507).
 - Table 1 follows the Pegasus iterates on 1 equation.

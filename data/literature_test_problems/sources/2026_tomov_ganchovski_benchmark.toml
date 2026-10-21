@@ -7,7 +7,7 @@ The folder appears to hold the benchmark of Tomov, L., Ganchovski, N. (2026). Gl
 The folder's benchmark runs `SgModAB` ("Safeguarded Modified Anderson-Björck Corrected Sept 2026"), and its cases match the ones that the preprint names (see the relation to `2026_tomov_ganchovski`). The preprint's Section 7.3 pins an earlier commit of the same repository, `9111cdcc6912401eb684a7b771df3a469795d5b8`.
 '''
 year = 2026
-home = '1.1'
+subcategory = '1.1'
 where_in_source = '''
 the folder `MDPI-Algorithms-Data-2`.
 - `Root.Benchmark/BenchmarkProblems.cs` defines 101 cases, f01–f101, in 3 arrays: `Set1` (f01–f62), `Set2` (f63–f83) and `Set3` (f84–f101). Each case has a function, an interval and a list of known roots.
@@ -15,7 +15,7 @@ the folder `MDPI-Algorithms-Data-2`.
 - `Test functions.pdf` prints each function with a plot and its root to 3 significant digits, and names f63–f101.
 '''
 transcribed_from = '''
-the C# code, which wins where `Test functions.pdf` differs.
+the C# code, which the rows follow where `Test functions.pdf` differs.
 - The PDF was checked through its extracted text for every row, and through its page images for f73–f101.
 - The rows' notes list every difference in a function or an interval between the PDF and the code; a difference in notation alone, such as `ceiling` for `ceil`, is not listed.
 '''

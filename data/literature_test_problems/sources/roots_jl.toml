@@ -9,7 +9,7 @@ The files cite 1 source: the comment `## multiplicity: http://ir.igsnrr.ac.cn/bi
 The paper at the URL is Li et al. (2010): Li, X., Mu, C., Ma, J., Hou, L. (2011). Fifth-order iterative method for finding multiple roots of nonlinear equations. Numerical Algorithms 57(3), 389–398, published online in 2010. https://doi.org/10.1007/s11075-010-9434-5. Its rows are in `2010_li_multiple_roots`.
 '''
 year = 2026
-home = '1.3'
+subcategory = '1.3'
 where_in_source = '''
 2 files of the test folder.
 - `test_derivative_free.jl` defines 20 problems `func1`–`func20` with the macro `@Func1`, and 1 more function `fn` in the test set "derivative free, non Float64".
@@ -25,7 +25,15 @@ The keys `func1`–`func20` and `fn` come from `test_derivative_free.jl`, and th
 How to read the rows of `test_derivative_free.jl`:
 - **Starting points:** each problem has no interval, only `N` starting points `x0(n) = range(a, stop=b, length=N)[n]`, `n = 1, ..., N`: `N` evenly spaced points from `a` to `b`, both included. `notes` gives `N`, `a` and `b`. Each starting point is 1 case. The field `params = 1:N` only numbers the starting points; the function `val(_, x)` ignores it.
 - **Roots:** each problem also gives a root or roots `alpha`, which the rows leave out; `run_df_tests` counts a result as a failure when `abs(minimum(result - alpha))` exceeds 1.
-- **Comments** above the problems group them: `# easy ones` (`func1`–`func3`), `# wider range` (`func4`, `func5`), `# once over hump, hard to get back to 0` (`func6`), `# once outside of extrema, points away from zero` (`func7`), `# should have some failures here` (`func8`–`func12`), `## multiplicity: <URL>` (`func13`–`func18`) and `## hard w/o aggressive bracketing` (`func19`, `func20`). The file does not say which of `func13`–`func18` come from the cited paper; `also_in` gives the paper for all 6.
+- **Comments** above the problems group them:
+  - `# easy ones`: `func1`–`func3`;
+  - `# wider range`: `func4`, `func5`;
+  - `# once over hump, hard to get back to 0`: `func6`;
+  - `# once outside of extrema, points away from zero`: `func7`;
+  - `# should have some failures here`: `func8`–`func12`;
+  - `## multiplicity: <URL>`: `func13`–`func18`;
+  - `## hard w/o aggressive bracketing`: `func19`, `func20`.
+- **`also_in`** gives the cited paper for all 6 of `func13`–`func18`; the file does not say which of them come from it.
 - **Derivatives:** none are given; the Newton, Halley and Schröder runs use central differences `D(f)` and `D2(f)` with step `h = 1e-4`.
 
 How to read the rows of `runbenchmarks.jl`:

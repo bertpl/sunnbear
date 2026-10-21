@@ -1,11 +1,11 @@
 title = 'Oliveira, Takahashi (2021): the ITP method'
 reference = 'Oliveira, I. F. D., Takahashi, R. H. C. (2021). An enhancement of the bisection method average performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), Article 5. https://doi.org/10.1145/3423597. The article itself is dated December 2020.'
 year = 2020
-home = '1.1'
+subcategory = '1.1'
 where_in_source = '''
 - Table 1 (Section 3.1, p. 5:11) lists 24 functions by name, without numbers, in 2 groups of 12: "Well-behaved Functions" and "Ill-behaved Functions". The ill-behaved group has 3 subheadings: "Non-simple Zero" (keys 2.1–2.4), "Discontinuous" (2.5–2.8) and "Multiple Roots" (2.9–2.12).
 - Section 3 solves every function on `[-1, 1]` with `epsilon = 10^-10`.
-- Appendix C (p. 5:20) tests the order of convergence on 1 more function, eqn (23).
+- Appendix C (p. 5:20) tests the order of convergence on 1 more function, equation (23).
 '''
 transcribed_from = '''
 the article.

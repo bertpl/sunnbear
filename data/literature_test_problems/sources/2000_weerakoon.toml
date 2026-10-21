@@ -1,7 +1,7 @@
 title = "Weerakoon, Fernando (2000): a variant of Newton's method with third-order convergence"
 reference = "Weerakoon, S., Fernando, T. G. I. (2000). A variant of Newton's method with accelerated third-order convergence. Applied Mathematics Letters 13(8), 87–93. https://doi.org/10.1016/S0893-9659(00)00100-2."
 year = 2000
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Table 1 (Section 4, page 92) lists 9 functions, numbered (1) to (9), each with 1 to 4 starting points `x0` and a stated root. Per starting point, the table gives the iterations, the computational order of convergence and the function evaluations of Newton's method and of the article's variant.
 - The article cites no source for its functions.

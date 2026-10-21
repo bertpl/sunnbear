@@ -1,7 +1,7 @@
 title = 'Alhseno (2026): Al-Hseno algorithm'
 reference = 'Alhseno, M. (2026). Al-Hseno algorithm: a robust derivative-free root-finding method with adaptive multiplicity estimation, geometric damping, and curvature correction. Research Square preprint, posted 5 May 2026. https://doi.org/10.21203/rs.3.rs-9596848/v1.'
 year = 2026
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Appendix A, "Complete Benchmark Suite: 43 Test Functions", lists functions 1 to 43, each with a "Challenge" label and a stated root `alpha`.
 - Table 1 (Section 4.1) repeats functions 1 to 15, with shorter challenge labels; it writes function 4 as `prod_i (x - r_i) + 0.05*sin(50*x)`, without the `r_i`.

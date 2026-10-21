@@ -1,7 +1,7 @@
 title = 'Neupane (2026): divided-difference multiplicity detection'
 reference = 'Neupane, H. (2026). Divided-Difference Multiplicity Detection: A Derivative-Free, Perturbation-Robust Extension of Critical-Point Root Isolation. SSRN preprint 7203982, not peer reviewed. https://doi.org/10.2139/ssrn.7203982.'
 year = 2026
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Section 6, "Numerical Experiments", uses 1 family, `f_m(x) = (x - 1)^m*(x + 2)`:
   - Table 1 gives the detected multiplicity for `m = 1, ..., 8` at 7 step sizes.

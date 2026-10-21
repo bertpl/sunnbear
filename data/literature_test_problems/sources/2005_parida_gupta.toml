@@ -3,7 +3,7 @@ reference = '''
 Parida, P. K., Gupta, D. K. (2006). An improved regula-falsi method for enclosing simple zeros of nonlinear equations. Applied Mathematics and Computation 177(2), 769–776. https://doi.org/10.1016/j.amc.2005.11.034. The article prints the volume and the year 2006 but no issue number; the issue number is Crossref's. The year 2005 of the title follows the article's copyright line, "© 2005 Elsevier Inc.", which is also the year in the DOI; the article prints no online date.
 '''
 year = 2005
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Section 5, "Numerical result" (p. 775), lists Examples 1–4, each with an interval `[a, b]` and a starting point `x0`.
 - Table 1, "Comparison of results", gives the iterations `n`, the result `x_n` and `|f(x_n)|` of the article's method RFNL and of 2 earlier methods, STFA (Wu, Shen & Xia, 2003) and AC (Zhu & Wu, 2003), at `eps1 = eps2 = 10^-12`.

@@ -1,7 +1,7 @@
 title = 'Bouthat, Luneau, Petitclerc (2026): random bisection method'
 reference = 'Bouthat, L., Luneau, P.-A., Petitclerc, P. (2026). Convergence Analysis of the Random Bisection Method. arXiv preprint 2603.20483v2. http://arxiv.org/abs/2603.20483v2.'
 year = 2026
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 Section 5, "Numerical Experiments" (Sections 5.1 to 5.3, Tables 1 to 5). Every experiment runs the article's Algorithm 1 (bisection with a random cut point) on the same linear function and varies how its root `r` is chosen.
 '''

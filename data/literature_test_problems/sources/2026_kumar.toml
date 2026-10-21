@@ -1,7 +1,7 @@
 title = 'Kumar, Srivastav (2026): randomized bracketing method'
 reference = "Kumar, D., Srivastav, S. K. (2026). A randomized bracketing method for derivative-free root finding with uniform spacing contraction. Research Square preprint. https://doi.org/10.21203/rs.3.rs-10070193/v1. The article's supplementary material holds the authors' code."
 year = 2026
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Table 3 (Section 5.2) lists 6 functions `f1` to `f6`, each with its root and initial interval. `f1` to `f5` are the main test set of Tables 4 to 7 and Figs. 2 to 5; `f6` is an exploratory non-monotone example, for which no table or figure gives results.
 - Appendix A.2 runs `g(x) = x - e^-x` on `[0, 1]` with random noise added to each evaluation (Table 8).

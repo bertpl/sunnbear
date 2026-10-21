@@ -1,7 +1,7 @@
 title = 'Bus, Dekker (1975): Algorithms M and R'
 reference = 'Bus, J. C. P., Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence for finding a zero of a function. ACM Transactions on Mathematical Software 1(4), 330–345. https://doi.org/10.1145/355656.355659.'
 year = 1975
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Section 5, "Numerical results" (p. 340), defines 4 groups of test functions, each with its parameter values and, except Group II, its interval.
 - Tables I–IV (pp. 341–342) give the evaluation counts of 5 algorithms on the 4 groups, 1 table per group, and repeat only the function numbers and parameter values. The algorithms are Dekker's A, the article's M and R, Brent's (B) and Anderson–Björck's (C).
@@ -14,8 +14,8 @@ notes = '''
 - **Notation:** the article writes `10-4` for `10^-4`; the rows write `10^-4`.
 - **Runs:** all runs use the tolerance function `delta(x) = |x|*10^-14 + 10^-14`, on a CDC Cyber 73 with a precision of 48 bits.
 - **Other sources with these functions:**
-  - `IV` on `[-1, 4]` is also SciPy's `aps13_f` (`scipy_tstutils`), which copies problem 13 of Alefeld, Potra & Shi (1995), and Gao (2026)'s T4.7 (`2026_gao`) on 1 of its 5 intervals.
-  - Brent (1973)'s `f_1` (`1973_brent_book`), Chandrupatla (1997)'s function 7 (`1997_chandrupatla`), SciPy's `fun7` and roots-fortran's cases 57–58 (`roots_fortran`) set the function of `IV` to 0 for `abs(x) < 3.8*10^-4`. Each runs it on `[-1, 4]`; the last 3 also run it on other intervals.
+  - `IV` on `[-1, 4]` is also Gao (2026)'s T4.7 (`2026_gao`) on 1 of its 5 intervals, and SciPy's `aps13_f` (`scipy_tstutils`), which copies problem 13 of Alefeld, Potra & Shi (1995).
+  - Brent (1973)'s `f_1` (`1973_brent_book`), Chandrupatla (1997)'s function 7 (`1997_chandrupatla`), SciPy's `fun7` and roots-fortran's cases 57–58 (`roots_fortran`) set the function of `IV` to 0 for `abs(x) < 3.8*10^-4`. Each runs this changed function on `[-1, 4]`; the last 3 also run it on other intervals.
   - `III` at `n = 9, 19` on `[-1, 10]` is in Chandrupatla (1997)'s functions 5 and 6, and in their copies in Gao (2026) and SciPy (`fun5`, `fun6`); each of these functions has 5 intervals, `[-1, 10]` among them.
   - Of the other sources, only Norton (1985) holds `II.1`–`II.3`.
   - `I.1`–`I.6` are the functions of Dowell & Jarratt (1971), which many sources hold with other values of `n`; only Alefeld, Potra & Shi (1993) holds all 17 cases of Table I.
@@ -36,7 +36,7 @@ Norton (1985) says only that its 3 groups come from Anderson & Björck (1973) an
 - Norton's functions 8–12 are `II.1`–`II.3`, `III` and `IV`, in the same order and with the same values of `a`, `b` and `n`. Anderson & Björck hold none of them, so of Norton's 2 sources, only this article can be the source of functions 8–12. Norton puts `III` and `IV` together in its Group III.
 - Norton gives functions 8–10 the interval `[-0.7, 1]`, which this article does not state, and gives function 12 no interval, where `IV` has `[-1, 4]`.
 - Norton's functions 1–6 have the expressions of `I.1`–`I.6`, as this article prints them: function 5 without Anderson & Björck's leading `1 +`, and function 6 with the factor `(x - 1)` first.
-- Norton takes `n = 2, 5, 10, 20` for each of functions 2–6. Values in both: `n = 2` of `I.2`, `n = 5, 10` of `I.3`, `I.4` and `I.6`, and none of `I.5`.
+- Norton takes `n = 2, 5, 10, 20` for each of functions 2–6. The values in both are `n = 2` of `I.2`, `n = 5, 10` of `I.3`, `I.4` and `I.6`, and none of `I.5`.
 - Norton's function 7, `(n*x - 1)/((n - 1)*x)`, is not in this article.
 '''
 

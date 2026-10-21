@@ -1,9 +1,9 @@
 title = 'Beffert, Zell (2026): real-time bounded catenary solver'
 reference = 'Beffert, M., Zell, A. (2026). Real-Time Bounded Catenary Solver for UAV Tether Modeling. arXiv preprint 2609.18482v1. https://doi.org/10.48550/arxiv.2609.18482.'
 year = 2026
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
-- Section III A reduces the catenary boundary-value problem to 1 equation: first in the scale parameter `a` (eq. (3)), then in `b_hat = abs(dx)/(2*a)` (eq. (4), repeated as eq. (12) in Appendix A.3). The solver works on eq. (4).
+- Section III A reduces the catenary boundary-value problem to 1 equation: first in the scale parameter `a` (eq. (3)), then in `b_hat = abs(dx)/(2*a)` (eq. (4), repeated as eq. (12) in Appendix A.3), where `dx` is the offset between the endpoints in `x`. The solver works on eq. (4).
 - Section III C and Appendix E give the bracket; Section IV gives the parameter ranges of 2 flights and of a parameter sweep.
 '''
 transcribed_from = 'the article.'

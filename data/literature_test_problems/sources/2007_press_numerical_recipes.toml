@@ -1,7 +1,7 @@
 title = 'Press et al. (2007): Numerical Recipes, chapter 9'
 reference = 'Press, W. H., Teukolsky, S. A., Vetterling, W. T., Flannery, B. P. (2007). Numerical Recipes: The Art of Scientific Computing, 3rd edition. Cambridge University Press, Cambridge. ISBN 978-0-511-33555-6 (e-book), 978-0-521-88068-8 (hardback).'
 year = 2007
-home = '1.4'
+subcategory = '1.4'
 where_in_source = '''
 chapter 9, "Root Finding and Nonlinear Sets of Equations", Sections 9.0–9.5 (pp. 442–473), its 1-dimensional parts. Sections 9.6–9.7 treat systems, and the rows leave them out.
 - The chapter has no numbered examples, no tables of results and no exercises: its functions appear in the text.

@@ -1,7 +1,7 @@
 title = "Stage (2013): comments on an improvement to Brent's method"
 reference = "Stage, S. A. (2013). Comments on An Improvement to the Brent's Method. International Journal of Experimental Algorithms 4(1), 1–16. No DOI; the publisher's PDF: https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf."
 year = 2013
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Section 3, "Performance tests", compares 7 methods on 10 functions, 1 per subsection §3.4–§3.13. Each subsection prints its function under "Function tested", then a convergence plot whose title gives the function in a shorthand form.
 - §3.2 sets the initial interval to `(-10, 10)` unless a subsection says otherwise, and states that all functions have their roots between 0 and 1.
@@ -10,7 +10,7 @@ where_in_source = '''
 transcribed_from = "the article, the publisher's PDF with a text layer, checked against the page images at 300 dpi. The rows follow the printed functions, not the plot titles; the notes of row `3.13` give the one plot title that differs in substance."
 rows_summary = '10, 1 per subsection §3.4–§3.13.'
 notes = '''
-- **Keys and names:** the functions have no numbers, so a key is the subsection number, and `name` is the subsection title without its leading "Testing" and article.
+- **Keys and names:** the functions have no numbers, so a key is the subsection number, and `name` is the subsection title without its leading "Testing" and the "a" or "an" after it.
 - **Intervals:** Stage writes intervals in parentheses, as `(0,4)`; the rows write them as `[a, b]`.
 '''
 

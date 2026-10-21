@@ -1,7 +1,7 @@
 title = 'Raza, Toheed, Rehman (2025): optimal fourth-order derivative-free method'
 reference = 'Raza, M., Toheed, D., Rehman, N. A. (2025). Optimizing nonlinear root finding: a novel fourth order derivative-free iterative method with maximum efficiency index and comparative analysis. Research Square preprint, posted 26 Aug 2025. https://doi.org/10.21203/rs.3.rs-7439716/v1.'
 year = 2025
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Table 1, "Test functions and their roots" (Section 4), lists 5 functions `eta1(l)` to `eta5(l)` with a targeted root and an initial guess each.
 - Tables 2 to 6 give the errors of the first 5 iterates per function ("nonlinear problem 1" to 5), and Figs. 1 to 5 the logarithm of the residuals.

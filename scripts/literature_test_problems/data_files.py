@@ -8,17 +8,17 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
-# HOME_DESCRIPTIONS describes each subcategory of category 1 of sunnbear's formula catalog; the `home` of each
-# source is 1 of its keys.
-HOME_DESCRIPTIONS = {
+# SUBCATEGORY_DESCRIPTIONS describes each subcategory of category 1 of sunnbear's formula catalog; the
+# `subcategory` of each source is 1 of its keys.
+SUBCATEGORY_DESCRIPTIONS = {
     "1.1": "articles of solvers that sunnbear implements",
     "1.2": "articles of other solvers",
     "1.3": "public benchmark suites",
     "1.4": "textbooks",
 }
-FINAL_STATUSES = ("new", "duplicate", "variant", "extended")
+DECIDED_STATUSES = ("new", "duplicate", "variant", "extended")
 # UNDECIDED is the status of a row that the script could not decide and that no decision covers yet.
-UNDECIDED = "judge"
+UNDECIDED = "undecided"
 # ROW_ID_SEPARATOR separates the row ids in 1 field.
 ROW_ID_SEPARATOR = " | "
 
@@ -61,6 +61,11 @@ class DataFolder:
         """Return the generated page that draws the sources in time order."""
         return self.path / "timeline.html"
 
+    @property
+    def readme_file(self) -> Path:
+        """Return the README, which defines the format of every file."""
+        return self.path / "README.md"
+
     # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------
@@ -96,7 +101,10 @@ class SourceRow:
     # --------------------------------------------------------------------------
     @classmethod
     def from_toml(cls, table: dict, row_id: str, where: str) -> "SourceRow":
-        """Return the row of 1 `[[rows]]` table of a source file, or raise `DataFileError`."""
+        """Return the row of 1 `[[rows]]` table of a source file, or raise `DataFileError`.
+
+        `where` names the table's place in its file, which starts each error message.
+        """
         values = _read_string_fields(table, required={"key"}, optional=_ROW_FIELDS - {"key"}, where=where)
         if bool(values["f"]) == bool(values["f_description"]):
             raise DataFileError(f"{where}: needs exactly 1 of f and f_description")
@@ -136,7 +144,7 @@ class Source:
     title: str
     reference: str
     year: int
-    home: str
+    subcategory: str
     where_in_source: str
     transcribed_from: str
     rows_summary: str
@@ -181,10 +189,14 @@ class Source:
         )
         rows = cls._rows_from_toml(path.stem, data.pop("rows", []), path.name)
         values = _read_string_fields(data, required=_SOURCE_FIELDS, optional={"notes"}, where=path.name)
-        if values["home"] not in HOME_DESCRIPTIONS:
-            raise DataFileError(f"{path.name}: unknown home {values['home']!r}")
+        if values["subcategory"] not in SUBCATEGORY_DESCRIPTIONS:
+            raise DataFileError(f"{path.name}: unknown subcategory {values['subcategory']!r}")
         stated = re.match(r"(\d+)\b", values["rows_summary"])
-        if (int(stated.group(1)) if stated else 0) != len(rows):
+        if stated:
+            n_stated_rows = int(stated.group(1))
+        else:
+            n_stated_rows = 0
+        if n_stated_rows != len(rows):
             raise DataFileError(f"{path.name}: rows_summary does not start with the number of rows, {len(rows)}")
         else:
             return cls(source_id=path.stem, year=year, relations=relations, rows=rows, **values)
@@ -192,7 +204,7 @@ class Source:
 
 def read_sources(sources_dir: Path) -> list[Source]:
     """Return every source in time order, or raise `DataFileError` where a source file breaks the format."""
-    # time order: by year, then by id without its leading year
+    # the sources sort in time order: by year, then by id without its leading year
     sources = sorted(
         (Source.from_toml_file(path) for path in sources_dir.glob("*.toml")),
         key=lambda s: (s.year, re.sub(r"^\d{4}_", "", s.source_id)),
@@ -237,10 +249,19 @@ class FinalStatus:
         """Return the ids of the earlier rows."""
         return [row_id.strip() for row_id in self.earlier_rows.split(ROW_ID_SEPARATOR) if row_id.strip()]
 
+    # --------------------------------------------------------------------------
+    #  Factory methods
+    # --------------------------------------------------------------------------
+    @classmethod
+    def from_automatic_status(cls, automatic_status: AutomaticStatus) -> "FinalStatus":
+        """Return the final status that an automatic status gives a row without a decision.
 
-def join_row_ids(row_ids: Iterable[str | None]) -> str:
-    """Join the distinct row ids, in their first order, into 1 field that `FinalStatus.earlier_row_ids` splits."""
-    return ROW_ID_SEPARATOR.join(dict.fromkeys(r for r in row_ids if r))
+        A `new` or undecided automatic status names no earlier row; any other keeps its matches as the earlier rows.
+        """
+        if automatic_status.status in ("new", UNDECIDED):
+            return cls(automatic_status.status, "", "")
+        else:
+            return cls(automatic_status.status, automatic_status.matches, "")
 
 
 def read_decisions(path: Path) -> dict[str, FinalStatus]:
@@ -254,7 +275,7 @@ def read_decisions(path: Path) -> dict[str, FinalStatus]:
             row_id = line["row_id"].strip()
             if row_id in decisions:
                 raise DataFileError(f"{path.name}: {row_id} is decided twice")
-            elif line["status"] not in FINAL_STATUSES:
+            elif line["status"] not in DECIDED_STATUSES:
                 raise DataFileError(f"{path.name}: {row_id} has unknown status {line['status']!r}")
             else:
                 decisions[row_id] = FinalStatus(line["status"], line["earlier_rows"].strip(), line["reason"].strip())
@@ -267,13 +288,13 @@ class RowsTableLine:
 
     row_id: str
     year: int
-    home: str
+    subcategory: str
     f: str
     f_description: str
     parameters: str
     interval: str
-    automatic: AutomaticStatus
-    final: FinalStatus
+    automatic_status: AutomaticStatus
+    final_status: FinalStatus
 
     @property
     def source_id(self) -> str:
@@ -290,19 +311,19 @@ class RowsTableLine:
         return {
             "row_id": self.row_id,
             "year": str(self.year),
-            "home": self.home,
+            "subcategory": self.subcategory,
             "f": self.f,
             "f_description": self.f_description,
             "parameters": self.parameters,
             "interval": self.interval,
-            "parse_note": self.automatic.parse_note,
-            "instances": str(self.automatic.n_instances),
-            "automatic_status": self.automatic.status,
-            "match_kind": self.automatic.match_kind,
-            "matches": self.automatic.matches,
-            "status": self.final.status,
-            "earlier_rows": self.final.earlier_rows,
-            "reason": self.final.reason,
+            "parse_note": self.automatic_status.parse_note,
+            "n_instances": str(self.automatic_status.n_instances),
+            "automatic_status": self.automatic_status.status,
+            "match_kind": self.automatic_status.match_kind,
+            "matches": self.automatic_status.matches,
+            "status": self.final_status.status,
+            "earlier_rows": self.final_status.earlier_rows,
+            "reason": self.final_status.reason,
         }
 
     # --------------------------------------------------------------------------
@@ -314,36 +335,36 @@ class RowsTableLine:
         return cls(
             row_id=line["row_id"],
             year=int(line["year"]),
-            home=line["home"],
+            subcategory=line["subcategory"],
             f=line["f"],
             f_description=line["f_description"],
             parameters=line["parameters"],
             interval=line["interval"],
-            automatic=AutomaticStatus(
+            automatic_status=AutomaticStatus(
                 status=line["automatic_status"],
                 match_kind=line["match_kind"],
                 matches=line["matches"],
                 parse_note=line["parse_note"],
-                n_instances=int(line["instances"]),
+                n_instances=int(line["n_instances"]),
             ),
-            final=FinalStatus(status=line["status"], earlier_rows=line["earlier_rows"], reason=line["reason"]),
+            final_status=FinalStatus(status=line["status"], earlier_rows=line["earlier_rows"], reason=line["reason"]),
         )
 
     @classmethod
     def from_source_row(
-        cls, source: Source, row: SourceRow, automatic: AutomaticStatus, final: FinalStatus
+        cls, source: Source, row: SourceRow, automatic_status: AutomaticStatus, final_status: FinalStatus
     ) -> "RowsTableLine":
         """Return a source row with its statuses."""
         return cls(
             row_id=row.row_id,
             year=source.year,
-            home=source.home,
+            subcategory=source.subcategory,
             f=row.f,
             f_description=row.f_description,
             parameters=row.parameters,
             interval=row.interval,
-            automatic=automatic,
-            final=final,
+            automatic_status=automatic_status,
+            final_status=final_status,
         )
 
 
@@ -365,9 +386,17 @@ def write_rows_table(path: Path, rows: list[RowsTableLine]) -> None:
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-_SOURCE_FIELDS = {"title", "reference", "home", "where_in_source", "transcribed_from", "rows_summary"}
+_SOURCE_FIELDS = {"title", "reference", "subcategory", "where_in_source", "transcribed_from", "rows_summary"}
 _ROW_FIELDS = {"key", "f", "f_description", "name", "parameters", "interval", "also_in", "notes"}
 _DECISION_COLUMNS = ["row_id", "status", "earlier_rows", "reason"]
+
+
+def join_row_ids(row_ids: Iterable[str | None]) -> str:
+    """Join the distinct row ids, in the order that each first occurs, into 1 field.
+
+    `FinalStatus.earlier_row_ids` splits the field again.
+    """
+    return ROW_ID_SEPARATOR.join(dict.fromkeys(r for r in row_ids if r))
 
 
 def _read_string_fields(table: dict, required: set[str], optional: set[str], where: str) -> dict[str, str]:
@@ -383,4 +412,5 @@ def _read_string_fields(table: dict, required: set[str], optional: set[str], whe
     not_strings = sorted(name for name, value in table.items() if not isinstance(value, str))
     if not_strings:
         raise DataFileError(f"{where}: fields {not_strings} must be strings")
-    return {name: table.get(name, "").strip() for name in required | optional}
+    else:
+        return {name: table.get(name, "").strip() for name in required | optional}

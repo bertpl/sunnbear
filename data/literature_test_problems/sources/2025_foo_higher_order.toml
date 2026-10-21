@@ -1,7 +1,7 @@
 title = 'Foo, Tan (2025): higher-order root-finding algorithm'
 reference = 'Foo, W. G., Tan, C. H. (2025). Higher-Order Root-Finding Algorithm and its Applications. arXiv preprint 2509.20897v1. http://arxiv.org/abs/2509.20897v1.'
 year = 2025
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Section 4.2 (Table 1, Fig. 1) solves `H2(x) = y` for the binary entropy function `H2` (eq. (6)); Fig. 3 shows the basins of attraction for `y = 0.3`.
 - Section 4.3.1 (Table 2) solves `Hq(x) = y` for the q-ary entropy function `Hq` (Definition 1) with a large prime `q`.

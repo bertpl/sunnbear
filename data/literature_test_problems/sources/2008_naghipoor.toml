@@ -1,7 +1,7 @@
 title = 'Naghipoor, Ahmadian, Soheili (2008): an improved regula falsi method'
 reference = "Naghipoor, J., Ahmadian, S. A., Soheili, A. R. (2008). An Improved Regula Falsi Method for Finding Simple Zeros of Nonlinear Equations. Applied Mathematical Sciences 2(8), 381–386. No DOI; the publisher's copy: https://www.m-hikari.com/ams/ams-password-2008/ams-password5-8-2008/soheiliAMS5-8-2008.pdf."
 year = 2008
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Table 1 (Section 4, "Numerical experiments", p. 384) lists 6 equations, each with an initial interval, the iteration counts of classic regula falsi and of the article's improved method, and the final iterate `x_n`. Table 2 gives the CPU times of both methods on the same 6 equations.
 - Section 4 stops each run when `|f(x_{i+1})| < eps` or `|x_{i+1} - x_i| < eps`, with `eps = 1E-10`, or after 200 iterations; Section 2 sets the method's parameter `alpha = 1`.

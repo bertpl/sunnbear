@@ -1,7 +1,7 @@
-title = 'Burden, Faires & Burden (2016): Numerical Analysis, chapter 2'
+title = 'Burden, Faires, Burden (2016): Numerical Analysis, chapter 2'
 reference = 'Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and the print year 2014.'
 year = 2016
-home = '1.4'
+subcategory = '1.4'
 where_in_source = '''
 chapter 2, "Solutions of Equations in One Variable" (pp. 47–102): the introduction, Sections 2.1–2.7 with their examples and illustrations, Tables 2.1–2.13, Figures 2.1–2.13, and the exercise sets that end Sections 2.1–2.6.
 - Each exercise set numbers its exercises, applied exercises and theoretical exercises in 1 sequence, and its discussion questions apart. Section 2.7 has only discussion questions, none with a function.
@@ -16,14 +16,20 @@ transcribed_from = 'the scanned PDF of the chapter, whose text layer comes from 
 rows_summary = '116, 1 per distinct function: a function that several examples or exercises use is 1 row whose key lists them all. 12 rows come from the introduction, the text, its examples, illustrations and figures, and the exercises reuse 4 of them; 104 rows come from the exercises and discussion questions alone.'
 notes = '''
 How to read the rows:
-- **Keys:** `§2.k Ex. n` is Example n of Section 2.k, since the book numbers its examples per section; `§2.k Ill. (p. n)` is an Illustration; `§2.k (p. n)` is an example in the text or a margin note; `§2 (pp. 47–48)` is the chapter introduction; `2.k-m` is exercise m of Exercise Set 2.k, with its part letter, and `2.k-Dm` is its discussion question m; `Table` and `Fig.` are the book's tables and figures.
+- **Keys:**
+  - `§2.k Ex. n` is Example n of Section 2.k, since the book numbers its examples per section;
+  - `§2.k Ill. (p. n)` is an Illustration;
+  - `§2.k (p. n)` is an example in the text or a margin note;
+  - `§2 (pp. 47–48)` is the chapter introduction;
+  - `2.k-m` is exercise m of Exercise Set 2.k, with its part letter, and `2.k-Dm` is its discussion question m;
+  - `Table` and `Fig.` are the book's tables and figures.
 - **Equations:** an equation that the book prints as `lhs = rhs` stays in that form; `f(x) = 0` is written as `f(x)`.
 - **Fixed-point problems:** a fixed-point problem, which the book states as `x = g(x)` or as an iteration `p_n = g(p_{n-1})`, is written as `x = g(x)` and is its own row, except where the book derives it from a root problem: then its forms are in that row's notes (§2.2 Ill. (p. 60), §2.3 Ex. 1, 2.2-1, 2.2-3, 2.2-4).
 - **Notation:** the book writes `ln` for the natural log; the rows write `log`. It gives an interval as `[a, b]` or as `a <= x <= b`; the rows write `[a, b]`.
 
 Other sources with the same function:
 - `x^3 - 2*x - 5`, `cos(x) - x` and `x - cos(x)` are in many sources, on other intervals or from starting points.
-- `x^2 - 3` on `[1, 2]` is Badr's P1 (`2021_badr`) and Sabharwal's T2.1 (`2019_sabharwal`), both citing Harder; 2.1-14 gives no interval.
+- `x^2 - 3` on `[1, 2]` is Badr's P1 (`2021_badr`) and Sabharwal's T2.1 (`2019_sabharwal`), both citing Harder, *Numerical Analysis for Engineering*; 2.1-14 gives no interval.
 - `x = cos(x)` is in Bradie (2.3-5) (`2006_bradie`) and Epperson (3.1-4) (`2013_epperson`). `x = tan(x)` is Moler's Ex. 4.9 (`2004_moler`), and Atkinson's P3 (`1989_atkinson`) is `x - tan(x)`.
 - 2.2-20's `x = 2*x - A*x^2` is Newton's iteration for `1/x - A`, as in Atkinson (2.0.3), Bradie's 2.4-8 and Epperson's §3.4. The `x = (1/2)*x + A/(2*x)` of 2.2-23 and 2.2-24 is Newton's iteration for `x^2 - A`, as in Atkinson (2.5.3), Bradie's 2.4-7 and Epperson's §3.9.
 '''

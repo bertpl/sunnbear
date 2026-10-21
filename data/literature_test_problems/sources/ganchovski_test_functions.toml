@@ -5,7 +5,7 @@ Ganchovski, N. (2026). Root-finding Test Functions. The file `Test functions.pdf
 - An earlier version was posted on ResearchGate in 2023 as "Additional test functions", https://www.researchgate.net/publication/373922895_Additional_test_functions; roots-fortran (`roots_fortran`) cites that version.
 '''
 year = 2026
-home = '1.3'
+subcategory = '1.3'
 where_in_source = '''
 17 pages that hold 101 functions, f01–f101, in a grid of 2 columns.
 - Each cell gives the function, a plot of it on its interval, and a root line in the notation of Calcpad, `x_nn = $Root{f_nn(x) = 0; x ∈ [a; b]} = r`, with the root `r` to about 3 significant digits. The interval of each row is the one in its root line, except f31's, whose root line is garbled (see its note).
@@ -51,7 +51,7 @@ The f01–f92 of Ganchovski et al. (2026) (`2026_ganchovski_et_al`), from the ar
 sources = ['roots_fortran']
 text = '''
 The cases 146–157 of roots-fortran (`roots_fortran`), whose comment cites Galdino (2011) and the 2023 version of this PDF, are 10 functions of this PDF: 146 = f01, 147 = f02, 148 = f04, 149 = f28, 150 = f29, 151 = f30, 152 = f31, 153 = f32, 154 = f41 and 155–157 = f42.
-- Where this PDF differs from the C# code, the cases follow this PDF: f28's `7.14` and f29's `[2.6, 3.6]`.
+- Where this PDF differs from the C# code of Tomov & Ganchovski's benchmark, the cases follow this PDF: f28's `7.14` and f29's `[2.6, 3.6]`.
 - **Case 146** starts its bracket at 0.51, where f01 starts at 0.5; the case's comment says that roots-fortran moved the start, so that the first midpoint of bisection is not the root.
 - **Cases 155–157** replace f42's `[0, 4]` by 1 bracket around each of its roots 1, 2 and 3: `[0, 1.9]`, `[1.001, 2.001]` and `[2.5, 10]`.
 - The comment names Galdino (2011) for all 12 cases, where this PDF puts f31–f32 under "My functions" and f41–f42 under Swift & Lindfield (1978).

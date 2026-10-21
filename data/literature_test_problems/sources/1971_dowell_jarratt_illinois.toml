@@ -1,11 +1,11 @@
 title = 'Dowell, Jarratt (1971): the Illinois method'
 reference = 'Dowell, M., Jarratt, P. (1971). A modified regula falsi method for computing the root of an equation. BIT 11(2), 168–174. https://doi.org/10.1007/BF01934364.'
 year = 1971
-home = '1.1'
+subcategory = '1.1'
 where_in_source = '''
 Section 3, "Numerical Illustrations" (pp. 170–173).
 - Table 1 follows the Illinois iterates on 1 equation.
-- Tables 2 to 7 each give 1 function family in the caption, with a parameter `n`, and the iteration counts of 4 methods for 4 values of `n`. The article says all their roots lie in `[0, 1]`.
+- Tables 2 to 7 each give 1 function family in the caption, with a parameter `n`, and the iteration counts of 4 methods for 4 values of `n`. The article says that the roots of all 6 families lie in `[0, 1]`.
 '''
 transcribed_from = "the article, a scan with a text layer, checked against the page images. sunnbear's `tests/solvers/bracketing/illinois/test_paper.py` uses Table 1's function and starting values as the article gives them; no sunnbear file transcribes Tables 2 to 7."
 rows_summary = "7, 1 per table: Table 1's equation and the 6 function families of Tables 2 to 7, with 24 parameter values in all."

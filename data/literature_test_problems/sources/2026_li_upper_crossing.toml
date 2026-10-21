@@ -1,7 +1,7 @@
 title = 'Li, Zhou, Lange, Tian (2026): upper-crossing/solution (US) algorithm'
 reference = "Li, X.-J., Zhou, H., Lange, K., Tian, G.-L. (2026). The upper–crossing/solution (US) algorithm with strongly stable convergence and an acceleration technique for root–finding problems. Statistics and Computing. https://doi.org/10.1007/s11222-026-10902-z. Preprint: https://arxiv.org/abs/2212.00797. The authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
 year = 2026
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Main text: Examples 1 to 4 (Sections 1 to 4.1), the applications of Sections 4.1.2 to 4.3, and the numerical experiments of Section 7 (Tables 1 to 4, Figs. 1 to 3).
 - Appendices D and E: R code with a cubic as example.

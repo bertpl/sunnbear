@@ -1,7 +1,7 @@
 title = 'Süli, Mayers (2003): An Introduction to Numerical Analysis, chapter 1'
 reference = 'Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge University Press, Cambridge. https://doi.org/10.1017/CBO9780511801181.'
 year = 2003
-home = '1.4'
+subcategory = '1.4'
 where_in_source = '''
 chapter 1, "Solution of equations by iteration" (pp. 1–38): Examples 1.1–1.8, the text examples of Sections 1.1, 1.2 and 1.7, Tables 1.1–1.4, and Exercises 1.1–1.12 (pp. 35–38).
 

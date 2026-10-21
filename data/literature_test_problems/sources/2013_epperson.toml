@@ -1,7 +1,7 @@
 title = 'Epperson (2013): An Introduction to Numerical Methods and Analysis, chapter 3'
 reference = 'Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9.'
 year = 2013
-home = '1.4'
+subcategory = '1.4'
 where_in_source = '''
 chapter 3, "Root-Finding" (pp. 89–169): Examples 3.1–3.20, the text examples and figures of Sections 3.1–3.12, Tables 3.1–3.19, and the exercises that end each section.
 - Section 4.4 (pp. 192–195) applies Muller's method and inverse quadratic interpolation to 2 functions of chapter 3; the rows of those 2 functions list Section 4.4's tables and exercises in their keys.

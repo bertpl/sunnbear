@@ -1,10 +1,10 @@
 title = "Gorgey et al. (2025): efficiency of Ridders' method in Scilab"
 reference = "Gorgey, A., Azim, F. A., Zulkifly, Z. H., Hassim, H. (2025). Efficiency of Ridders' method in solving nonlinear equations using Scilab programming. Data Analytics and Applied Mathematics 6(1), 23–35. https://doi.org/10.15282/daam.v6i1.11307."
 year = 2025
-home = '1.1'
+subcategory = '1.1'
 where_in_source = '''
 Section 4, "Numerical Results and Discussion" (pp. 30–34).
-- It numbers 6 equations, each with an interval in its heading, a figure, and a results table (Tables 2 to 7).
+- Section 4 numbers 6 equations, each with an interval in its heading, a figure, and a results table (Tables 2 to 7).
 - The article says its problems are taken from its refs. [9] to [11], and names the reference for Equations 1, 2, 5 and 6.
 - For 3 equations, the text states a second interval that differs from the heading's.
 '''

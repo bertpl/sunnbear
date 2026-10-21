@@ -1,7 +1,7 @@
 title = "Zhang (2011): an improvement to Brent's method"
 reference = "Zhang, Z. (2011). An Improvement to the Brent's Method. International Journal of Experimental Algorithms 2(1), 21–26. No DOI; the publisher's page: https://www.cscjournals.org/library/manuscriptinfo.php?mc=IJEA-7."
 year = 2011
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 Section 3, "Experimental test" (p. 24), solves 1 equation, `cos(x) - x^3 = 0`, with `a = -4` and `b = 4` and a termination error of `1.0E-5`. Table 1 prints the interval after each step, for Brent's method and for the new method.
 '''

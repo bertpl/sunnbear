@@ -2,6 +2,7 @@
 
 import itertools
 import re
+import signal
 from dataclasses import dataclass
 
 import mpmath
@@ -22,19 +23,24 @@ FUNCTIONS = {
     "bessely": sp.bessely, "max": sp.Max, "min": sp.Min, "atan2": sp.atan2,
 }
 CONSTANTS = {"pi": sp.pi, "inf": sp.oo}
-# The words in TEXT_WORDS mark an expression as conditions or prose, not 1 expression.
+# The words in TEXT_WORDS mark an `f` as conditions or prose, which the script does not parse.
 TEXT_WORDS = {
     "if", "otherwise", "for", "given", "with", "where", "sum", "sum_", "integral", "det", "fl", "not", "in", "and",
     "or", "arbitrary",
 }
 # fmt: on
+# IDENTIFIER matches a name that is not part of a number or of a longer name.
 IDENTIFIER = re.compile(r"(?<![0-9.A-Za-z_])([A-Za-z_][A-Za-z0-9_]*)")
+# ASSIGNMENT matches `name =` in the parameters, but not `==`, `<=`, `>=` or `!=`.
 ASSIGNMENT = re.compile(r"(?<![A-Za-z0-9_<>!=])([A-Za-z_][A-Za-z0-9_]*)\s*=(?!=)\s*")
+# NUMBER_PREFIX matches the leading numeric part of a listed value, such as `2*pi` or `1e-3`, before any text.
 NUMBER_PREFIX = re.compile(r"^[-+0-9.()*/^ ]*(?:pi)?[-+0-9.()*/^ eE]*")
 TRANSFORMATIONS = (*standard_transformations, convert_xor, rationalize)
 # The value comparison evaluates each instance at these x-values.
 SAMPLE_POINTS = ["-2.7", "-1.3", "-0.6", "-0.15", "0.11", "0.37", "0.73", "1.21", "1.9", "2.6", "3.7", "5.3"]
 MAX_INSTANCES = 64
+# PARSE_TIMEOUT_SECONDS limits the time that parsing a row and computing its scaled values may take.
+PARSE_TIMEOUT_SECONDS = 10
 X = sp.Symbol("x")
 
 
@@ -43,7 +49,7 @@ class ParseError(Exception):
 
 
 class ParseTimeoutError(Exception):
-    """A `ParseTimeoutError` reports a parse or an evaluation of a row that took too long."""
+    """A `ParseTimeoutError` reports parsing or evaluating a row that took too long."""
 
 
 @dataclass(frozen=True)
@@ -51,19 +57,15 @@ class ParsedRow:
     """A `ParsedRow` holds a row's instances, 1 per combination of its parameter values, and its family form.
 
     All forms are canonical (`_normalize`), and the family form keeps the parameters as symbols. `has_values` tells
-    whether any parameter of the expression has values, so that the instances differ from the family form.
+    whether any parameter of the expression has values; only then do the instances differ from the family form.
+    `scaled_values` holds each instance's values at the sample points, divided by the first finite nonzero one; an
+    instance gets None where it has free symbols other than x, or fewer than 4 finite values.
     """
 
     instances: tuple[sp.Expr, ...]
     family: sp.Expr
     has_values: bool
-
-    def scaled_values(self) -> list[tuple | None]:
-        """Return each instance's values at the sample points, divided by the first finite nonzero one.
-
-        An instance gets None where it has free symbols other than x, or fewer than 4 finite values.
-        """
-        return [self._scaled_values(instance) for instance in self.instances]
+    scaled_values: tuple[tuple | None, ...]
 
     # --------------------------------------------------------------------------
     #  Helpers
@@ -145,6 +147,7 @@ class ParsedRow:
         values: dict[str, list] = {}
         for i, match in enumerate(matches):
             end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+            # a value list ends at `;` or at a remark in parentheses
             chunk = re.split(r";|\s\(", text[match.end() : end])[0]
             for value in ParsedRow._parse_value_list(chunk):
                 if value not in values.setdefault(match.group(1), []):
@@ -201,7 +204,7 @@ class ParsedRow:
 
     @staticmethod
     def _find_variable(expr: sp.Expr, parameters: dict, notes: str) -> sp.Symbol:
-        """Return the unknown: `x` if present, else the one that the notes name, else the only free symbol left."""
+        """Return the unknown: `x`, the symbol that the notes name, or the only symbol that is not a parameter."""
         names = {s.name: s for s in expr.free_symbols}
         if "x" in names:
             return names["x"]
@@ -235,12 +238,14 @@ class ParsedRow:
             forms.append(-form if form.could_extract_minus_sign() else form)
         return min(forms, key=sp.srepr)
 
-    # --------------------------------------------------------------------------
-    #  Factory methods
-    # --------------------------------------------------------------------------
+    @staticmethod
+    def _on_alarm(signum: int, frame: object) -> None:
+        """Stop parsing a row that takes too long."""
+        raise ParseTimeoutError
+
     @classmethod
-    def from_source_row(cls, row: SourceRow) -> "ParsedRow":
-        """Parse a row into its instances and family form, or raise `ParseError` with the reason."""
+    def _parse(cls, row: SourceRow) -> "ParsedRow":
+        """Parse a row into its instances, family form and scaled values, or raise `ParseError` with the reason."""
         if not row.f:
             raise ParseError("not 1 expression")
         words = set(IDENTIFIER.findall(row.f))
@@ -254,4 +259,25 @@ class ParsedRow:
         if len(combos) > MAX_INSTANCES:
             raise ParseError("too many parameter combinations")
         instances = tuple(cls._normalize(expr.subs(dict(zip(assigned, combo, strict=True)))) for combo in combos)
-        return cls(instances=instances, family=cls._normalize(expr), has_values=bool(assigned))
+        return cls(
+            instances=instances,
+            family=cls._normalize(expr),
+            has_values=bool(assigned),
+            scaled_values=tuple(cls._scaled_values(instance) for instance in instances),
+        )
+
+    # --------------------------------------------------------------------------
+    #  Factory methods
+    # --------------------------------------------------------------------------
+    @classmethod
+    def from_source_row(cls, row: SourceRow) -> "ParsedRow":
+        """Parse a row, or raise `ParseError` with the reason, or `ParseTimeoutError` after `PARSE_TIMEOUT_SECONDS`.
+
+        Python installs a SIGALRM handler only on Unix and in the main thread, so parsing works only there.
+        """
+        signal.signal(signal.SIGALRM, cls._on_alarm)
+        signal.alarm(PARSE_TIMEOUT_SECONDS)
+        try:
+            return cls._parse(row)
+        finally:
+            signal.alarm(0)

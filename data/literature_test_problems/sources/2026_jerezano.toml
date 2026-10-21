@@ -1,7 +1,7 @@
 title = 'Jerezano, Chicharro, Garrido (2026): derivative-free optimal multiple-root family'
 reference = 'Jerezano, J. H., Chicharro, F. I., Garrido, N. (2026). Derivative-free optimal multiple-root finding family of iterative methods. Computational and Applied Mathematics 45, 304. https://doi.org/10.1007/s40314-026-03702-8.'
 year = 2026
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Section 4, "Numerical benchmark", lists 3 functions `g1` to `g3` with multiple roots, and Tables 1 to 3 give the results per function from 2 starting points each.
 - Sections 3.2 and 3.3 study the stability of the article's methods M1 and M2 on the polynomial `p(z) = (z - 1)^2`, over complex starting points.

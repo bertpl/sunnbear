@@ -1,6 +1,6 @@
-row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automatic_status,match_kind,matches,status,earlier_rows,reason
-1971_brent:3.1,1971,1.1,,`2^(x/delta)` for `a + delta <= x <= b`; `-((b - a - delta)/delta)*2^(b/delta)` for `x = a`; arbitrary for `a < x < a + delta`,"`a`, `b`, `delta` free","[a, b]",not 1 expression,0,judge,unparsed,,new,,
-1971_brent:3.2,1971,1.1,,`0` if `x = 0`; `x*exp(-x^-2)` if `x != 0`,,an interval containing the origin,not 1 expression,0,judge,unparsed,,new,,
+row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instances,automatic_status,match_kind,matches,status,earlier_rows,reason
+1971_brent:3.1,1971,1.1,,`2^(x/delta)` for `a + delta <= x <= b`; `-((b - a - delta)/delta)*2^(b/delta)` for `x = a`; arbitrary for `a < x < a + delta`,"`a`, `b`, `delta` free","[a, b]",not 1 expression,0,undecided,unparsed,,new,,
+1971_brent:3.2,1971,1.1,,`0` if `x = 0`; `x*exp(-x^-2)` if `x != 0`,,an interval containing the origin,not 1 expression,0,undecided,unparsed,,new,,
 1971_dowell_jarratt_illinois:Table 1,1971,1.1,sin(x) - 0.5,,,"[0, 1.5]",,1,new,,,new,,
 1971_dowell_jarratt_illinois:Table 2,1971,1.1,2*x*exp(-n) + 1 - 2*exp(-n*x),,"n = 1, 5, 15, 20","[0, 1]",,4,new,,,new,,
 1971_dowell_jarratt_illinois:Table 3,1971,1.1,(1 + (1 - n)^2)*x - (1 - n*x)^2,,"n = 2, 5, 15, 20","[0, 1]",,4,new,,,new,,
@@ -10,9 +10,9 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 1971_dowell_jarratt_illinois:Table 7,1971,1.1,(n*x - 1)/((n - 1)*x),,"n = 2, 5, 15, 20","[0.01, 1]",,4,new,,,new,,
 1972_dowell_jarratt_pegasus:Table 1,1972,1.1,x^3 + 1,,,"[-2, 0]",,1,new,,,new,,
 1972_dowell_jarratt_pegasus:Problem 1,1972,1.1,(N*x - 1)/((N - 1)*x),,"N = 2, 10, 20","[0.01, 1]",,3,extended,"family, new parameter values",1971_dowell_jarratt_illinois:Table 7,extended,1971_dowell_jarratt_illinois:Table 7,
-1972_dowell_jarratt_pegasus:Problem 2,1972,1.1,J0(K)*Y1(K*x) - J1(K*x)*Y0(K),,"K = 2.5, 3.0","[0.1, 1]",unknown function Y1,0,judge,unparsed,,new,,
-1972_dowell_jarratt_pegasus:Problem 3,1972,1.1,"sum((-1)^n*x^((3*n^2 + n)/2), n = -inf..inf) - 1",,,"[-0.9999, -0.0001]",conditions or prose,0,judge,unparsed,,new,,
-1972_dowell_jarratt_pegasus:Problem 4,1972,1.1,,"`integral(phi(u)*(1 - Phi(v))^(K - 1), u = -inf..inf) - P*`, with `phi(u) = exp(-u^2/2)/sqrt(2*pi)`, `Phi(v) = integral(exp(-t^2/2), t = -inf..v)/sqrt(2*pi)` and `v = (u - x)/c`","(c, K, P*) = (1, 4, 0.8), (1, 3, 0.5)",,not 1 expression,0,judge,unparsed,,new,,
+1972_dowell_jarratt_pegasus:Problem 2,1972,1.1,J0(K)*Y1(K*x) - J1(K*x)*Y0(K),,"K = 2.5, 3.0","[0.1, 1]",unknown function Y1,0,undecided,unparsed,,new,,
+1972_dowell_jarratt_pegasus:Problem 3,1972,1.1,"sum((-1)^n*x^((3*n^2 + n)/2), n = -inf..inf) - 1",,,"[-0.9999, -0.0001]",conditions or prose,0,undecided,unparsed,,new,,
+1972_dowell_jarratt_pegasus:Problem 4,1972,1.1,,"`integral(phi(u)*(1 - Phi(v))^(K - 1), u = -inf..inf) - P*`, with `phi(u) = exp(-u^2/2)/sqrt(2*pi)`, `Phi(v) = integral(exp(-t^2/2), t = -inf..v)/sqrt(2*pi)` and `v = (u - x)/c`","(c, K, P*) = (1, 4, 0.8), (1, 3, 0.5)",,not 1 expression,0,undecided,unparsed,,new,,
 1973_anderson_bjorck:Ex. 1,1973,1.1,sin(x) - 0.5,,,"[0, 1.5]",,1,duplicate,structure,1971_dowell_jarratt_illinois:Table 1,duplicate,1971_dowell_jarratt_illinois:Table 1,
 1973_anderson_bjorck:Ex. 2,1973,1.1,2*x*exp(-n) + 1 - 2*exp(-n*x),,"n = 1, 5, 15, 20","[0, 1]",,4,duplicate,structure,1971_dowell_jarratt_illinois:Table 2,duplicate,1971_dowell_jarratt_illinois:Table 2,
 1973_anderson_bjorck:Ex. 3,1973,1.1,(1 + (1 - n)^2)*x - (1 - n*x)^2,,"n = 2, 5, 15, 20","[0, 1]",,4,duplicate,structure,1971_dowell_jarratt_illinois:Table 3,duplicate,1971_dowell_jarratt_illinois:Table 3,
@@ -24,9 +24,9 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 1973_brent_book:(2.7),1973,1.1,,`0` if `x = 0`; `x*exp(-x^-2)` if `x != 0`,,an interval containing the origin,not 1 expression,0,duplicate,same text,1971_brent:3.2,duplicate,1971_brent:3.2,
 1973_brent_book:T4.1 r1-2,1973,1.1,x^9,,,"`[-1.0, +1.1]` with `t = 1E-9`; `[-1.0, +4.0]` with `t = 1E-20`",,1,new,,,new,,
 1973_brent_book:T4.1 r3,1973,1.1,x^19,,,"`[-1.0, +4.0]` with `t = 1E-20`",,1,new,,,new,,
-1973_brent_book:(4.1),1973,1.1,,`0` if `abs(x) < 3.8*10^-4`; `fl(x*exp(-x^-2))` otherwise,,"`[-1.0, +4.0]` with `t = 1E-20`",not 1 expression,0,judge,unparsed,,duplicate,1971_brent:3.2,"Brent's 3.2 with a cutoff to 0 for abs(x) < 3.8*10^-4, where x*exp(-x^-2) underflows to 0 anyway."
-1973_brent_book:(4.2),1973,1.1,,`fl(exp(x))` if `x > -10^6`; `fl(exp(-10^6) - (x + 10^6)^2)` otherwise,,"`[-1001200, 0]` with `t = 1E-20`",not 1 expression,0,judge,unparsed,,new,,
-1973_brent_book:(4.3),1973,1.1,,"`det(A - x*I)`, with `A` the `n` by `n` 5-diagonal matrix: `a_ij = p - r` if `i = j = 1` or `i = j = n`; `p` if `1 < i = j < n`; `2*q` if `abs(i - j) = 1`; `r` if `abs(i - j) = 2`; `0` if `abs(i - j) > 2`","`n = 15, p = 7, q = 7/4, r = 1/2`, ""a typical set"" of the several values tested",not printed,not 1 expression,0,judge,unparsed,,new,,
+1973_brent_book:(4.1),1973,1.1,,`0` if `abs(x) < 3.8*10^-4`; `fl(x*exp(-x^-2))` otherwise,,"`[-1.0, +4.0]` with `t = 1E-20`",not 1 expression,0,undecided,unparsed,,duplicate,1971_brent:3.2,"Brent's 3.2 with a cutoff to 0 for abs(x) < 3.8*10^-4, where x*exp(-x^-2) underflows to 0 anyway."
+1973_brent_book:(4.2),1973,1.1,,`fl(exp(x))` if `x > -10^6`; `fl(exp(-10^6) - (x + 10^6)^2)` otherwise,,"`[-1001200, 0]` with `t = 1E-20`",not 1 expression,0,undecided,unparsed,,new,,
+1973_brent_book:(4.3),1973,1.1,,"`det(A - x*I)`, with `A` the `n` by `n` 5-diagonal matrix: `a_ij = p - r` if `i = j = 1` or `i = j = n`; `p` if `1 < i = j < n`; `2*q` if `abs(i - j) = 1`; `r` if `abs(i - j) = 2`; `0` if `abs(i - j) > 2`","`n = 15, p = 7, q = 7/4, r = 1/2`, ""a typical set"" of the several values tested",not printed,not 1 expression,0,undecided,unparsed,,new,,
 1975_bus_dekker:I.1,1975,1.2,sin(x) - 0.5,,,"[0, 1.5]",,1,duplicate,structure,1971_dowell_jarratt_illinois:Table 1,duplicate,1971_dowell_jarratt_illinois:Table 1,
 1975_bus_dekker:I.2,1975,1.2,2*x*exp(-n) + 1 - 2*exp(-n*x),,"n = 1, 2, 3, 4","[0, 1]",,4,extended,"family, new parameter values",1971_dowell_jarratt_illinois:Table 2,extended,1971_dowell_jarratt_illinois:Table 2,
 1975_bus_dekker:I.3,1975,1.2,(1 + (1 - n)^2)*x - (1 - n*x)^2,,"n = 1, 5, 10","[0, 1]",,3,extended,"family, new parameter values",1971_dowell_jarratt_illinois:Table 3,extended,1971_dowell_jarratt_illinois:Table 3,
@@ -36,8 +36,8 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 1975_bus_dekker:II.1,1975,1.2,x^n + a*x + b,,"`a = 1, b = 0`; `n = 3, 5, 9, 19`",,,4,new,,,new,,
 1975_bus_dekker:II.2,1975,1.2,x^n + a*x + b,,"`a = 0, b = 10^-4`; `n = 3, 5, 9, 19`",,,4,extended,"family, new parameter values",1975_bus_dekker:II.1,extended,1975_bus_dekker:II.1,"Group II's family x^n + a*x + b with a = 0, b = 10^-4."
 1975_bus_dekker:II.3,1975,1.2,x^n + a*x + b,,"`a = 1, b = 10^-4`; `n = 3, 5, 9, 19`",,,4,extended,"family, new parameter values",1975_bus_dekker:II.1,extended,1975_bus_dekker:II.1,"Group II's family x^n + a*x + b with a = 1, b = 10^-4."
-1975_bus_dekker:III,1975,1.2,x^n,,"n = 3, 5, 7, 9, 19, 25","[-1, 10]",,6,judge,partial,1973_brent_book:T4.1 r1-2 | 1973_brent_book:T4.1 r3,new,,"N = 9 and 19 are Brent (1973)'s x^9 and x^19 (Table 4.1); n = 3, 5, 7, 25 are in no earlier row."
-1975_bus_dekker:IV,1975,1.2,,`0` if `x = 0`; `x*exp(-x^-2)` otherwise,,"[-1, 4]",not 1 expression,0,judge,unparsed,,duplicate,1971_brent:3.2,"Brent (1971)'s function 3.2, on [-1, 4]."
+1975_bus_dekker:III,1975,1.2,x^n,,"n = 3, 5, 7, 9, 19, 25","[-1, 10]",,6,undecided,partial,1973_brent_book:T4.1 r1-2 | 1973_brent_book:T4.1 r3,new,,"N = 9 and 19 are Brent (1973)'s x^9 and x^19 (Table 4.1); n = 3, 5, 7, 25 are in no earlier row."
+1975_bus_dekker:IV,1975,1.2,,`0` if `x = 0`; `x*exp(-x^-2)` otherwise,,"[-1, 4]",not 1 expression,0,undecided,unparsed,,duplicate,1971_brent:3.2,"Brent (1971)'s function 3.2, on [-1, 4]."
 1979_ridders:I,1979,1.1,x^3 - x - 5,,,"[-1, 3]",,1,new,,,new,,
 1979_ridders:III.1,1979,1.1,x*exp(x) - 10,,,"`[-10, 10]`; `[-100, 100]`",,1,new,,,new,,
 1979_ridders:III.2,1979,1.1,tan(x)^tan(x) - 10^3,,,"`[1.3, 1.4]`; `[0, 1.5]`",,1,new,,,new,,
@@ -53,13 +53,13 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 1985_norton:9,1985,1.2,x^n + a*x + b,,"`a = 0, b = 10^-4`; `n = 3, 5, 9, 19`","[-0.7, 1]",,4,duplicate,structure,1975_bus_dekker:II.2,duplicate,1975_bus_dekker:II.2,
 1985_norton:10,1985,1.2,x^n + a*x + b,,"`a = 1, b = 10^-4`; `n = 3, 5, 9, 19`","[-0.7, 1]",,4,duplicate,structure,1975_bus_dekker:II.3,duplicate,1975_bus_dekker:II.3,
 1985_norton:11,1985,1.2,x^n,,"n = 3, 5, 7, 9, 19, 25","[-1, 10]",,6,duplicate,structure,1975_bus_dekker:III | 1973_brent_book:T4.1 r1-2 | 1973_brent_book:T4.1 r3,duplicate,1975_bus_dekker:III | 1973_brent_book:T4.1 r1-2 | 1973_brent_book:T4.1 r3,
-1985_norton:12,1985,1.2,,`0` if `x = 0`; `x*exp(-x^(-2))` otherwise,,not given,not 1 expression,0,judge,unparsed,,duplicate,1971_brent:3.2,Brent (1971)'s function 3.2; Norton gives no interval.
-1985_norton:Table VI,1985,1.2,"sum(c_i*x^i, i = 0..30)",,"`c_i` uniform in `[-1, 1]`, from IMSL's `GGUBS`; 10,000 polynomials","[-1, 1]",conditions or prose,0,judge,unparsed,,new,,
+1985_norton:12,1985,1.2,,`0` if `x = 0`; `x*exp(-x^(-2))` otherwise,,not given,not 1 expression,0,undecided,unparsed,,duplicate,1971_brent:3.2,Brent (1971)'s function 3.2; Norton gives no interval.
+1985_norton:Table VI,1985,1.2,"sum(c_i*x^i, i = 0..30)",,"`c_i` uniform in `[-1, 1]`, from IMSL's `GGUBS`; 10,000 polynomials","[-1, 1]",conditions or prose,0,undecided,unparsed,,new,,
 1985_norton:driver,1985,1.2,x^7 + 28*x^4 - 480,,,"[1, 2]",,1,new,,,new,,
 1989_atkinson:(2.0.3),1989,1.4,a - 1/x,,a > 0,,,1,new,,,new,,
 1989_atkinson:(2.1.2),1989,1.4,x^6 - x - 1,,,"[1, 2]",,1,new,,,new,,
 1989_atkinson:§2.4 ex. 1,1989,1.4,x^20 - 1,,,,,1,new,,,new,,
-1989_atkinson:§2.4 ex. 2,1989,1.4,L_12(x),,,,unknown function L_12,0,judge,unparsed,,new,,
+1989_atkinson:§2.4 ex. 2,1989,1.4,L_12(x),,,,unknown function L_12,0,undecided,unparsed,,new,,
 1989_atkinson:§2.4 ex. 3,1989,1.4,x^6 - 12*x^5 + 63*x^4 - 216*x^3 + 567*x^2 - 972*x + 729,,,,,1,new,,,new,,
 1989_atkinson:(2.5.3),1989,1.4,x^2 - a,,`a > 0`; `a = 3` in Tables 2.6–2.7,,,1,new,,,new,,
 1989_atkinson:(2.6.6),1989,1.4,x = 6.28 + sin(x),,,,,1,new,,,new,,
@@ -70,7 +70,7 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 1989_atkinson:(2.7.6),1989,1.4,-4.68999 + x*(9.1389 + x*(-5.56 + x)),,,,,1,new,,,new,,
 1989_atkinson:§2.8 case (1); P34(i),1989,1.4,(x - 1)*(1 + (x - 1)^2),,,"[0, 3]",,1,new,,,new,,
 1989_atkinson:§2.8 case (2); P34(ii); P14,1989,1.4,x^2 - 1,,,"[0, 3]",,1,new,,,new,,
-1989_atkinson:§2.8 case (3); P34(iii),1989,1.4,-1 + x*(3 + x*(-3 + x)),,,"[0, 3]",,1,judge,value,1989_atkinson:(1.3.6),new,,(x - 1)^3 in nested (Horner) form; (1.3.6) is its expanded form.
+1989_atkinson:§2.8 case (3); P34(iii),1989,1.4,-1 + x*(3 + x*(-3 + x)),,,"[0, 3]",,1,undecided,value,1989_atkinson:(1.3.6),new,,(x - 1)^3 in nested (Horner) form; (1.3.6) is its expanded form.
 1989_atkinson:§2.8 case (4); P34(iv),1989,1.4,(x - 1)*exp(-1/(x - 1)^2),,,"[0, 3]",,1,new,,,variant,1971_brent:3.2,Brent's 3.2 shifted by 1 in x; at x = 1 the expression evaluates to 0 in floating point.
 1989_atkinson:§2.9 (p. 98),1989,1.4,(x - 1)^3 - eps,,eps = 0.001,,,1,new,,,new,,
 1989_atkinson:(2.9.21); P42,1989,1.4,(x - 1)*(x - 2)*(x - 3)*(x - 4)*(x - 5)*(x - 6)*(x - 7) + eps*x^6,,`eps = -0.002`; `eps = 0`,,,2,new,,,new,,
@@ -82,8 +82,8 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 1989_atkinson:P3,1989,1.4,x - tan(x),,,,,1,new,,,new,,
 1989_atkinson:P6,1989,1.4,x + exp(-B*x^2)*cos(x),,"`B > 0`, for example `B = 1, 5, 10, 25, 50`",,,5,new,,,new,,
 1989_atkinson:P7,1989,1.4,P1*((1 + r)^N1 - 1) = P2*(1 - (1 + r)^(-N2)),,"N1 = 30, N2 = 20, P1 = 2000, P2 = 8000",,,1,new,,,new,,
-1989_atkinson:P15(a),1989,1.4,,`sqrt(x)` if `x >= 0`; `-sqrt(-x)` if `x < 0`,,,not 1 expression,0,judge,unparsed,,new,,
-1989_atkinson:P15(b),1989,1.4,,`(x^2)^(1/3)` if `x >= 0`; `-(x^2)^(1/3)` if `x < 0`,,,not 1 expression,0,judge,unparsed,,new,,
+1989_atkinson:P15(a),1989,1.4,,`sqrt(x)` if `x >= 0`; `-sqrt(-x)` if `x < 0`,,,not 1 expression,0,undecided,unparsed,,new,,
+1989_atkinson:P15(b),1989,1.4,,`(x^2)^(1/3)` if `x >= 0`; `-(x^2)^(1/3)` if `x < 0`,,,not 1 expression,0,undecided,unparsed,,new,,
 1989_atkinson:P17,1989,1.4,cos(x) + sin(50*x)^2,,,,,1,new,,,new,,
 1989_atkinson:P19,1989,1.4,x = 1 + arctan(x),,,,,1,new,,,new,,
 1989_atkinson:P20,1989,1.4,x = 3 - 2*log(1 + exp(-x)),,,,,1,new,,,new,,
@@ -110,7 +110,7 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 1992_alefeld_potra:10,1992,1.2,x^2 + sin(x/n) - 1/4,,"n = 5, 10, 20","[0, 1]",,3,new,,,new,,
 1992_alefeld_potra:11,1992,1.2,(n*x - 1)/((n - 1)*x),,"n = 5, 10, 20","[0.01, 1]",,3,duplicate,structure,1971_dowell_jarratt_illinois:Table 7 | 1972_dowell_jarratt_pegasus:Problem 1,duplicate,1971_dowell_jarratt_illinois:Table 7 | 1972_dowell_jarratt_pegasus:Problem 1,
 1993_alefeld_potra_shi:T5.1-1,1993,1.2,sin(x) - x/2,,,"[pi/2, pi]",,1,new,,,new,,
-1993_alefeld_potra_shi:T5.1-2,1993,1.2,"-2*sum((2*i - 5)^2/(x - i^2)^3, i = 1..20)",,n = 1(1)19,"`[a_n, b_n]` with `a_n = n^2 + 10^(-9)`, `b_n = (n + 1)^2 - 10^(-9)`",conditions or prose,0,judge,unparsed,,new,,
+1993_alefeld_potra_shi:T5.1-2,1993,1.2,"-2*sum((2*i - 5)^2/(x - i^2)^3, i = 1..20)",,n = 1(1)19,"`[a_n, b_n]` with `a_n = n^2 + 10^(-9)`, `b_n = (n + 1)^2 - 10^(-9)`",conditions or prose,0,undecided,unparsed,,new,,
 1993_alefeld_potra_shi:T5.1-3,1993,1.2,a*x*exp(b*x),,"`a = -40, b = -1`; `a = -100, b = -2`; `a = -200, b = -3`","[-9, 31]",,9,new,,,new,,
 1993_alefeld_potra_shi:T5.1-4,1993,1.2,x^n - a,,"on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)12`; on `[0.95, 4.05]`: `a = 1`, `n = 8(2)14`","`[0, 5]`; `[0.95, 4.05]`",,12,new,,,new,,
 1993_alefeld_potra_shi:T5.1-5,1993,1.2,sin(x) - 0.5,,,"[0, 1.5]",,1,duplicate,structure,1971_dowell_jarratt_illinois:Table 1,duplicate,1971_dowell_jarratt_illinois:Table 1,
@@ -121,11 +121,11 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 1993_alefeld_potra_shi:T5.1-10,1993,1.2,exp(-n*x)*(x - 1) + x^n,,"n = 1, 5, 10, 15, 20","[0, 1]",,5,duplicate,structure,1971_dowell_jarratt_illinois:Table 6 | 1973_anderson_bjorck:Ex. 6,duplicate,1971_dowell_jarratt_illinois:Table 6 | 1973_anderson_bjorck:Ex. 6,
 1993_alefeld_potra_shi:T5.1-11,1993,1.2,(n*x - 1)/((n - 1)*x),,"n = 2, 5, 15, 20","[0.01, 1]",,4,duplicate,structure,1971_dowell_jarratt_illinois:Table 7,duplicate,1971_dowell_jarratt_illinois:Table 7,
 1993_alefeld_potra_shi:T5.1-12,1993,1.2,,`0` if `x = 0`; `x*exp(-x^(-2))` otherwise,,"[-1, 4]",not 1 expression,0,duplicate,same text,1985_norton:12,duplicate,1971_brent:3.2,"Brent (1971)'s function 3.2, which Norton's 12 repeats."
-1993_alefeld_potra_shi:T5.1-13,1993,1.2,,`n/20*(x/1.5 + sin(x) - 1)` if `x >= 0`; `-n/20` otherwise,n = 1(1)40,"[-10^4, pi/2]",not 1 expression,0,judge,unparsed,,new,,
-1993_alefeld_potra_shi:T5.1-14,1993,1.2,,"`e - 1.859` if `x > 2*10^(-3)/(1 + n)`; `exp((n + 1)*x/2*10^3) - 1.859` if `x` in `[0, 2*10^(-3)/(1 + n)]`; `-0.859` if `x < 0`","n = 20(1)40, 100(100)1000","[-10^4, 10^(-4)]",not 1 expression,0,judge,unparsed,,new,,
+1993_alefeld_potra_shi:T5.1-13,1993,1.2,,`n/20*(x/1.5 + sin(x) - 1)` if `x >= 0`; `-n/20` otherwise,n = 1(1)40,"[-10^4, pi/2]",not 1 expression,0,undecided,unparsed,,new,,
+1993_alefeld_potra_shi:T5.1-14,1993,1.2,,"`e - 1.859` if `x > 2*10^(-3)/(1 + n)`; `exp((n + 1)*x/2*10^3) - 1.859` if `x` in `[0, 2*10^(-3)/(1 + n)]`; `-0.859` if `x < 0`","n = 20(1)40, 100(100)1000","[-10^4, 10^(-4)]",not 1 expression,0,undecided,unparsed,,new,,
 1993_alefeld_potra_shi:T5.3,1993,1.2,x^n,,"n = 3, 5, 7, 9, 19, 25","[-1, 10]",,6,duplicate,structure,1975_bus_dekker:III | 1973_brent_book:T4.1 r1-2 | 1973_brent_book:T4.1 r3,duplicate,1975_bus_dekker:III | 1973_brent_book:T4.1 r1-2 | 1973_brent_book:T4.1 r3,
 1995_alefeld_potra_shi:1,1995,1.1,sin(x) - x/2,,,"[pi/2, pi]",,1,duplicate,structure,1993_alefeld_potra_shi:T5.1-1,duplicate,1993_alefeld_potra_shi:T5.1-1,
-1995_alefeld_potra_shi:2,1995,1.1,"-2*sum((2*i - 5)^2/(x - i^2)^3, i = 1..20)",,n = 1(1)10,"`[a_n, b_n]` with `a_n = n^2 + 10^(-9)`, `b_n = (n + 1)^2 - 10^(-9)`",conditions or prose,0,judge,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-2,Its intervals n = 1(1)10 are a subset of the 1993 article's n = 1(1)19.
+1995_alefeld_potra_shi:2,1995,1.1,"-2*sum((2*i - 5)^2/(x - i^2)^3, i = 1..20)",,n = 1(1)10,"`[a_n, b_n]` with `a_n = n^2 + 10^(-9)`, `b_n = (n + 1)^2 - 10^(-9)`",conditions or prose,0,undecided,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-2,Its intervals n = 1(1)10 are a subset of the 1993 article's n = 1(1)19.
 1995_alefeld_potra_shi:3,1995,1.1,a*x*exp(b*x),,"`a = -40, b = -1`; `a = -100, b = -2`; `a = -200, b = -3`","[-9, 31]",,9,duplicate,structure,1993_alefeld_potra_shi:T5.1-3,duplicate,1993_alefeld_potra_shi:T5.1-3,
 1995_alefeld_potra_shi:4,1995,1.1,x^n - a,,"on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)12`; on `[-0.95, 4.05]`: `a = 1`, `n = 8(2)14`","`[0, 5]`; `[-0.95, 4.05]`",,12,duplicate,structure,1993_alefeld_potra_shi:T5.1-4,duplicate,1993_alefeld_potra_shi:T5.1-4,
 1995_alefeld_potra_shi:5,1995,1.1,sin(x) - 0.5,,,"[0, 1.5]",,1,duplicate,structure,1971_dowell_jarratt_illinois:Table 1,duplicate,1971_dowell_jarratt_illinois:Table 1,
@@ -145,11 +145,11 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 1997_chandrupatla:4,1997,1.1,6*(x - 2)^5,,,"`[0, 5]`; `[-10, 10]`; `[-1E4, 1E4]`; `[-1E6, 1E6]`; `[-1E10, 1E10]`",,1,new,,,variant,1975_bus_dekker:III,"Bus-Dekker's x^n at n = 5, times 6 and shifted to the root 2."
 1997_chandrupatla:5,1997,1.1,x^9,,,"`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`",,1,duplicate,structure,1973_brent_book:T4.1 r1-2,duplicate,1973_brent_book:T4.1 r1-2,
 1997_chandrupatla:6,1997,1.1,x^19,,,"`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`",,1,duplicate,structure,1973_brent_book:T4.1 r3,duplicate,1973_brent_book:T4.1 r3,
-1997_chandrupatla:7,1997,1.1,,"`0` if `abs(x) < 3.8*10^-4`, `x*exp(-x^-2)` otherwise",,"`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`",not 1 expression,0,judge,unparsed,,duplicate,1971_brent:3.2,"Brent's (4.1), whose cutoff to 0 for abs(x) < 3.8*10^-4 changes no computed value."
+1997_chandrupatla:7,1997,1.1,,"`0` if `abs(x) < 3.8*10^-4`, `x*exp(-x^-2)` otherwise",,"`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`",not 1 expression,0,undecided,unparsed,,duplicate,1971_brent:3.2,"Brent's (4.1), whose cutoff to 0 for abs(x) < 3.8*10^-4 changes no computed value."
 1997_chandrupatla:8,1997,1.1,-3062*(1 - xi)*exp(-x)/(xi + (1 - xi)*exp(-x)) - 1013 + 1628/x,,xi = 0.61489,"`[2E-4, 2]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`",,1,new,,,new,,
 1997_chandrupatla:9,1997,1.1,exp(x) - 2 - 0.01/x^2 + 0.000002/x^3,,,"`[2E-4, 1]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`",,1,new,,,new,,
 1997_ford:1,1997,1.1,sin(0.01/x) - 0.01,,,"`[0.5, 2]`; `[0.2, 6]`; `[0.004, 200]`",,1,new,,,new,,
-1997_ford:2,1997,1.1,"10^-8*(x - 1)*prod(x^2 + x + i, i = 1..10)",,,"`[0.9, 1.1]`; `[0.5, 1.5]`; `[-5, 10]`",unknown function prod,0,judge,unparsed,,new,,
+1997_ford:2,1997,1.1,"10^-8*(x - 1)*prod(x^2 + x + i, i = 1..10)",,,"`[0.9, 1.1]`; `[0.5, 1.5]`; `[-5, 10]`",unknown function prod,0,undecided,unparsed,,new,,
 1997_ford:3,1997,1.1,exp(21000/x)/(1.11*10^11*x^2) - 1,,,"`[550, 560]`; `[400, 600]`; `[350, 850]`",,1,new,,,new,,
 1997_ford:4,1997,1.1,2*x*exp(-20) + 1 - 2*exp(-20*x),,,"`[0, 1]`; `[-0.1, 1.5]`; `[-0.5, 2]`",,1,duplicate,structure,1971_dowell_jarratt_illinois:Table 2,duplicate,1971_dowell_jarratt_illinois:Table 2,
 1997_ford:5,1997,1.1,exp(x^-1 - 25) - 1,,,"`[0.035, 0.05]`; `[0.03, 0.09]`; `[0.025, 0.5]`",,1,new,,,new,,
@@ -172,14 +172,14 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2003_suli_mayers:§1.2,2003,1.4,x^2 + 1,,,,,1,new,,,new,,
 2003_suli_mayers:(1.2),2003,1.4,1/2 - 1/(1 + M*abs(x - 1.05)),,"`M = 200` (Fig. 1.1); `M = 2000, 20000, 200000, 2000000, 20000000` (Remark 1.1)","`[0.8, 1.8]`; `[1.04999, 1.05001]`",,6,new,,,new,,
 2003_suli_mayers:Examples 1.1–1.3,2003,1.4,exp(x) - 2*x - 1,,,"[1, 2]",,1,new,,,new,,
-2003_suli_mayers:Example 1.4,2003,1.4,,"`x = g(x)`, with `g(x) = 2^(-(1 + log2(1/x)^(1/alpha))^alpha)` for `0 < x <= 1` and `g(0) = 0`","`alpha > 0`; `alpha = 1/2, 1, 2` (Fig. 1.3)","[0, 1]",not 1 expression,0,judge,unparsed,,new,,
+2003_suli_mayers:Example 1.4,2003,1.4,,"`x = g(x)`, with `g(x) = 2^(-(1 + log2(1/x)^(1/alpha))^alpha)` for `0 < x <= 1` and `g(0) = 0`","`alpha > 0`; `alpha = 1/2, 1, 2` (Fig. 1.3)","[0, 1]",not 1 expression,0,undecided,unparsed,,new,,
 2003_suli_mayers:Example 1.5; Exercise 1.1,2003,1.4,x = (x^2 + c)/2,,`c < 1`; Exercise 1.1: `0 < c < 1`,,,1,new,,,new,,
 2003_suli_mayers:Example 1.6 (g1),2003,1.4,x = 0.99*x,,,,,1,new,,,new,,
 2003_suli_mayers:Example 1.6 (g2),2003,1.4,x = x/(1 + x^(1/10))^10,,,,,1,new,,,new,,
 "2003_suli_mayers:Example 1.7; Table 1.3; Exercises 1.3, 1.4",2003,1.4,exp(x) - x - 2,,,"`(1, 2)`; `(-2, -1)`",,1,new,,,new,,
 2003_suli_mayers:(1.33),2003,1.4,x = a*x*(1 - x),,"`0 < a <= 4`; `a = 3.4, 3.5, 3.99`","[0, 1]",,3,new,,,new,,
 2003_suli_mayers:(1.37),2003,1.4,x*(x^2 - 1)*(x - 3)*exp(-(x - 1)^2/2),,,,,1,new,,,new,,
-2003_suli_mayers:Exercise 1.2,2003,1.4,,"`x = g(x)`, with `g(x) = -x*sin(1/x)^2` for `0 < x <= 1` and `g(0) = 0`",`k` integer,"[0, 1]",not 1 expression,0,judge,unparsed,,new,,
+2003_suli_mayers:Exercise 1.2,2003,1.4,,"`x = g(x)`, with `g(x) = -x*sin(1/x)^2` for `0 < x <= 1` and `g(0) = 0`",`k` integer,"[0, 1]",not 1 expression,0,undecided,unparsed,,new,,
 2003_suli_mayers:Exercise 1.5,2003,1.4,exp(x) - x - 1.000000005,,,,,1,new,,,new,,
 2003_suli_mayers:Exercise 1.6,2003,1.4,exp(x) = 1 + x,,,,,1,new,,,new,,
 2003_suli_mayers:Exercise 1.9,2003,1.4,x^2 - 1,,`eps` small,,,1,duplicate,structure,1989_atkinson:§2.8 case (2); P34(ii); P14,duplicate,1989_atkinson:§2.8 case (2); P34(ii); P14,
@@ -204,9 +204,9 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2004_moler:Ex. 4.10(b),2004,1.4,Y0(x),,,,,1,new,,,new,,
 2004_moler:Ex. 4.10(c),2004,1.4,J0(x) = Y0(x),,,"[0, 10*pi]",,1,new,,,new,,
 2004_moler:Ex. 4.13,2004,1.4,log(Gamma(y)) = x,,`x` given,,,1,new,,,new,,
-2004_moler:Ex. 4.14,2004,1.4,d(v) = 60,,"`d` interpolates the table `v = 0, 10, 20, 30, 40, 50, 60` m/s, `d = 0, 5, 20, 46, 70, 102, 153` m",,unknown function d,0,judge,unparsed,,new,,The function interpolates a data table.
+2004_moler:Ex. 4.14,2004,1.4,d(v) = 60,,"`d` interpolates the table `v = 0, 10, 20, 30, 40, 50, 60` m/s, `d = 0, 5, 20, 46, 70, 102, 153` m",,unknown function d,0,undecided,unparsed,,new,,The function interpolates a data table.
 2004_moler:Ex. 4.15,2004,1.4,M = E - e*sin(E),,"`M = 24.851090`, `e = 0.1`",,,1,new,,,new,,
-2004_moler:Ex. 4.16,2004,1.4,"(T(x, t) - Ts)/(Ti - Ts) = erf(x/(2*sqrt(alpha*t)))",,"`alpha = 0.138*10^-6` m^2/s; `Ti = 20` °C; `Ts = -15` °C; `T(x, t) = 0` °C; `t` = 60 days",,unknown function T,0,judge,unparsed,,new,,
+2004_moler:Ex. 4.16,2004,1.4,"(T(x, t) - Ts)/(Ti - Ts) = erf(x/(2*sqrt(alpha*t)))",,"`alpha = 0.138*10^-6` m^2/s; `Ti = 20` °C; `Ts = -15` °C; `T(x, t) = 0` °C; `t` = 60 days",,unknown function T,0,undecided,unparsed,,new,,
 2005_parida_gupta:1,2005,1.2,x^5 - 300*x^2 - 126*x + 5005,,,"[-20, 20]",,1,duplicate,structure,1989_atkinson:P43,duplicate,1989_atkinson:P43,
 2005_parida_gupta:2,2005,1.2,3*x^2 - 11.12*x + 9.1389,,,"[-30, 2]",,1,new,,,new,,
 2005_parida_gupta:3,2005,1.2,11*x^11 - 1,,,"[0.1, 1]",,1,duplicate,structure,1992_alefeld_potra:3,duplicate,1992_alefeld_potra:3,
@@ -217,7 +217,7 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2006_bradie:§2 (pp. 56–57),2006,1.4,2*x + log((1 - x)/(1 + x)),,,,,1,new,,,new,,
 2006_bradie:§2 (p. 58),2006,1.4,3*x^2 + (1/pi^4)*log((pi - x)^2) + 1,,,,,1,new,,,new,,
 "2006_bradie:§2.1 (p. 59); Ex. 2.1–2.3, 2.8, 2.9, 2.11–2.13; Tables 2.1–2.3, 2.5, 2.6; Fig. 2.1; §2.2 (p. 74); §2.4 (p. 98); 2.1-10; 2.2-10; 2.4-13; 2.5-12 to 2.5-14, 2.5-17",2006,1.4,x^3 + 2*x^2 - 3*x - 1,,,"`(1, 2)`; `(-3, -2)`; `(-1, 0)`",,1,new,,,new,,
-2006_bradie:Fig. 2.2,2006,1.4,(x - 1)^7,,,,,1,judge,value,2004_moler:§1.7,new,,The factored (x - 1)^7; Moler's §1.7 row is its expanded form.
+2006_bradie:Fig. 2.2,2006,1.4,(x - 1)^7,,,,,1,undecided,value,2004_moler:§1.7,new,,The factored (x - 1)^7; Moler's §1.7 row is its expanded form.
 2006_bradie:Fig. 2.2#2,2006,1.4,(x - 1)^(1/7),,,,,1,new,,,new,,
 "2006_bradie:Ex. 2.2; Fig. 2.3; Tables 2.2, 2.3, 2.5; §2.4 (pp. 98, 100); §2.5 (p. 109); 2.1-13; 2.5-15; 2.6-3",2006,1.4,tan(pi*x) - x - 6,,,"(0.40, 0.48)",,1,new,,,new,,
 2006_bradie:§2.1 (p. 67); 2.1-19; 2.5-20,2006,1.4,13500*(1 + r/12)^36 + 250*((1 + r/12)^36 - 1)/(r/12) - 25000,,"initial investment, monthly deposit and goal: `13500, 250, 25000` (§2.1); `14000, 250, 25000` and `12500, 300, 25000` (2.1-19); `13000, 200, 20000` and `13000, 250, 20000` (2.5-20)","`[0.01, 0.10]` (§2.1)",,1,new,,,new,,
@@ -249,7 +249,7 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2006_bradie:§2.3 (p. 84)#3,2006,1.4,x = x^2 + 1,,,,,1,new,,,new,,
 2006_bradie:2.3-5; 2.6-7,2006,1.4,x = cos(x),,,,,1,duplicate,structure,2000_weerakoon:4,duplicate,2000_weerakoon:4,
 2006_bradie:2.3-6,2006,1.4,x = 1 + x - (1/8)*x^3,,,,,1,new,,,new,,
-2006_bradie:2.3-8; 2.4-7,2006,1.4,x^2 - a,,`a` free,,,1,judge,"family, no parsed values",1989_atkinson:(2.5.3),duplicate,1989_atkinson:(2.5.3),"Atkinson's family x^2 - a, without values."
+2006_bradie:2.3-8; 2.4-7,2006,1.4,x^2 - a,,`a` free,,,1,undecided,"family, no parsed values",1989_atkinson:(2.5.3),duplicate,1989_atkinson:(2.5.3),"Atkinson's family x^2 - a, without values."
 2006_bradie:2.3-9,2006,1.4,x = (x^3 + 3*x*a)/(3*x^2 + a),,`a` free,,,1,new,,,new,,
 2006_bradie:2.3-10; 2.4-8,2006,1.4,1/x - a,,`a` free,,,1,duplicate,structure,1989_atkinson:(2.0.3),duplicate,1989_atkinson:(2.0.3),
 2006_bradie:2.3-11,2006,1.4,x = exp(-x^2),,,"[0, 1]",,1,new,,,new,,
@@ -288,12 +288,12 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2006_bradie:2.7-4(d),2006,1.4,x^4 + 5*x^3 + 7*x^2 + 1,,,,,1,new,,,new,,
 2006_bradie:2.7-4(e),2006,1.4,16*x^4 - 40*x^3 + 5*x^2 + 20*x + 6,,,,,1,new,,,new,,
 2006_bradie:2.7-4(f),2006,1.4,10*x^3 - 8.3*x^2 + 2.295*x - 0.21141,,,,,1,new,,,new,,
-2006_bradie:2.7-5,2006,1.4,T_6(x),,,,unknown function T_6,0,judge,unparsed,,new,,
-2006_bradie:2.7-6,2006,1.4,H_5(x),,,,unknown function H_5,0,judge,unparsed,,new,,
-2006_bradie:2.7-7,2006,1.4,L_4(x),,,,unknown function L_4,0,judge,unparsed,,new,,"Atkinson's §2.4 ex. 2 is the Laguerre polynomial of degree 12, another function."
-2006_bradie:2.7-8,2006,1.4,P_5(x),,,,unknown function P_5,0,judge,unparsed,,new,,
+2006_bradie:2.7-5,2006,1.4,T_6(x),,,,unknown function T_6,0,undecided,unparsed,,new,,
+2006_bradie:2.7-6,2006,1.4,H_5(x),,,,unknown function H_5,0,undecided,unparsed,,new,,
+2006_bradie:2.7-7,2006,1.4,L_4(x),,,,unknown function L_4,0,undecided,unparsed,,new,,"Atkinson's §2.4 ex. 2 is the Laguerre polynomial of degree 12, another function."
+2006_bradie:2.7-8,2006,1.4,P_5(x),,,,unknown function P_5,0,undecided,unparsed,,new,,
 2006_bradie:2.7-9,2006,1.4,C = (3*t^2 + t)/(50 + t^3),,,,,1,new,,,new,,
-2006_bradie:2.7-10,2006,1.4,(1/3)*(Vf/V0)^3 - B*(Vf/V0) - 1/3 + B*cos(gamma0),,"`B = g/(k*V0^2)`, `g = 9.8` m/s^2; `V0 = 100` m/s, `gamma0 = -30` degrees, `k = 0.00196` 1/m (a); `150`, `-10`, `0.00145` (b); `200`, `-45`, `0.00128` (c); `250`, `-30`, `0.00112` (d)",,unknown variable unclear,0,judge,unparsed,,new,,
+2006_bradie:2.7-10,2006,1.4,(1/3)*(Vf/V0)^3 - B*(Vf/V0) - 1/3 + B*cos(gamma0),,"`B = g/(k*V0^2)`, `g = 9.8` m/s^2; `V0 = 100` m/s, `gamma0 = -30` degrees, `k = 0.00196` 1/m (a); `150`, `-10`, `0.00145` (b); `200`, `-45`, `0.00128` (c); `250`, `-30`, `0.00112` (d)",,unknown variable unclear,0,undecided,unparsed,,new,,
 "2006_bradie:2.7-12, P",2006,1.4,(x - 1)*(x - 2)*(x - 3)*(x - 4)*(x - 5)*(x - 6)*(x - 7)*(x - 8)*(x - 9)*(x - 10),,,,,1,new,,,new,,
 "2006_bradie:2.7-12, P~",2006,1.4,(x - 1)*(x - 2)*(x - 3)*(x - 4)*(x - 5)*(x - 6)*(x - 7)*(x - 8)*(x - 9)*(x - 10) + x^5,,,,,1,new,,,new,,
 2006_chen_li:1,2006,1.2,log(x),,,"[0.5, 5]",,1,new,,,new,,
@@ -359,7 +359,7 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2011_galdino:f1,2011,1.2,(x + 2)*(x + 1)*(x - 3)^3,,,"[2.5, 3.5]",,1,new,,,new,,
 2011_galdino:f2,2011,1.2,(x - 4)^5*log(x),,,"[3.5, 4.5]",,1,new,,,new,,
 2011_galdino:f3,2011,1.2,(sin(x) - x/4)^3,,,"[2, 3]",,1,new,,,new,,
-2011_galdino:f4,2011,1.2,,"`(81 - p*(108 - p*(54 - p*(12 - p))))*sign(p - 3)`, where `p = x + 1.11111`",,"[1, 2]",not 1 expression,0,judge,unparsed,,new,,"Equals (p - 3)^4*sign(p - 3), written in nested form."
+2011_galdino:f4,2011,1.2,,"`(81 - p*(108 - p*(54 - p*(12 - p))))*sign(p - 3)`, where `p = x + 1.11111`",,"[1, 2]",not 1 expression,0,undecided,unparsed,,new,,"Equals (p - 3)^4*sign(p - 3), written in nested form."
 2011_galdino:f5,2011,1.2,sin((x - 7.143)^3),,,"[7, 8]",,1,new,,,new,,
 2011_galdino:f6,2011,1.2,exp((x - 3)^5) - 1,,,"[2.5, 3.5]",,1,new,,,new,,
 2011_galdino:f7,2011,1.2,exp((x - 3)^5) - exp(x - 1),,,"[4, 5]",,1,new,,,new,,
@@ -393,7 +393,7 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2013_epperson:3.1-3(c); 3.2-5(i); 3.3-3(e),2013,1.4,x - exp(-x),,,"[0, 1]",,1,duplicate,structure,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),duplicate,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),
 2013_epperson:3.1-3(e); 3.2-5(f); 3.3-3(c),2013,1.4,x^3 - 2*x - 5,,,"[0, 3]",,1,duplicate,structure,1997_chandrupatla:1,duplicate,1997_chandrupatla:1,
 2013_epperson:3.1-3(f); 3.2-5(c); 3.3-3(a),2013,1.4,1 - 2*x*exp(-x/2),,,"[0, 2]",,1,new,,,new,,
-2013_epperson:3.1-3(g); 3.2-5(d); 3.3-3(b),2013,1.4,5 - x^-1,,,"[0.1, 0.25]",,1,judge,value,1971_dowell_jarratt_illinois:Table 7,extended,1989_atkinson:(2.0.3),"Atkinson's a - 1/x at a = 5; it is also 4 times Dowell–Jarratt's Table 7 at n = 5, which is written in another form."
+2013_epperson:3.1-3(g); 3.2-5(d); 3.3-3(b),2013,1.4,5 - x^-1,,,"[0.1, 0.25]",,1,undecided,value,1971_dowell_jarratt_illinois:Table 7,extended,1989_atkinson:(2.0.3),"Atkinson's a - 1/x at a = 5; it is also 4 times Dowell–Jarratt's Table 7 at n = 5, which is written in another form."
 2013_epperson:3.1-3(h); 3.2-5(e); 3.3-3(g),2013,1.4,x^2 - sin(x),,,"[0, pi]",,1,new,,,new,,
 "2013_epperson:3.1-4; 3.9-1(a), 3.9-5(c)",2013,1.4,x = cos(x),,,,,1,duplicate,structure,2000_weerakoon:4,duplicate,2000_weerakoon:4,
 2013_epperson:3.1-5; 3.9-1(b); 3.11-3,2013,1.4,x = exp(-x),,,,,1,duplicate,structure,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),duplicate,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),
@@ -409,18 +409,18 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 "2013_epperson:§3.2 (p. 100), Fig. 3.4, Table 3.3; Ex. 3.19, Table 3.16",2013,1.4,(20*x - 1)/(19*x),,,"`[0.01, 1]` (Table 3.16)",,1,duplicate,structure,1971_dowell_jarratt_illinois:Table 7,duplicate,1971_dowell_jarratt_illinois:Table 7,
 2013_epperson:§3.2 (p. 100); 3.2-9 to 3.2-11,2013,1.4,arctan(x),,,,,1,new,,,new,,
 2013_epperson:3.2-1,2013,1.4,x^2 - 2,,,,,1,duplicate,structure,"2004_moler:§4.1, §4.2, §4.4, §4.5",duplicate,"2004_moler:§4.1, §4.2, §4.4, §4.5",
-2013_epperson:3.2-3,2013,1.4,x^n - a,,"`n`, `a` free",,,1,judge,"family, no parsed values",1993_alefeld_potra_shi:T5.1-4,duplicate,1993_alefeld_potra_shi:T5.1-4,"The family x^n - a, without values."
+2013_epperson:3.2-3,2013,1.4,x^n - a,,"`n`, `a` free",,,1,undecided,"family, no parsed values",1993_alefeld_potra_shi:T5.1-4,duplicate,1993_alefeld_potra_shi:T5.1-4,"The family x^n - a, without values."
 "2013_epperson:3.2-4; §3.4, Ex. 3.3; 3.4-1 to 3.4-5",2013,1.4,a - x^-1,,"`a = 0.8` (Ex. 3.3); `a = 0.75, 2/3, 0.6` (3.4-1 to 3.4-3, 3.4-5); `a = 7, pi, 6, 5, 3` (3.4-4)",,,9,extended,"family, new parameter values",1989_atkinson:(2.0.3),extended,1989_atkinson:(2.0.3),
 2013_epperson:3.2-5(b); 3.3-3(i),2013,1.4,x + tan(x),,,,,1,new,,,new,,
 2013_epperson:3.2-5(j); 3.3-3(j),2013,1.4,2 - x^-1*log(x),,,,,1,new,,,new,,
 2013_epperson:3.2-6,2013,1.4,3 - exp(x),,,,,1,new,,,new,,
 "2013_epperson:3.3-4, 3.3-5",2013,1.4,x - eps*sin(x) = 2*pi*t/T,,"`eps = 0.01` (3.3-4), `eps = 0.9` (3.3-5); `t = T/4, T/8`",,,2,new,,,variant,2004_moler:Ex. 4.15,"Kepler's equation x - eps*sin(x) - b with other constants (eps = 0.01, 0.9; b = pi/2, pi/4)."
-2013_epperson:3.3-6,2013,1.4,"(u(x, t) - T)/(T0 - T) = erf(x/(2*sqrt(a*t)))",,`a = 1.25E-6` ft^2/s; `t` = 30 days; a temperature drop of 40 °C,,unknown function u,0,judge,unparsed,,variant,2004_moler:Ex. 4.16,"Moler's freezing water main, with other constants and units."
+2013_epperson:3.3-6,2013,1.4,"(u(x, t) - T)/(T0 - T) = erf(x/(2*sqrt(a*t)))",,`a = 1.25E-6` ft^2/s; `t` = 30 days; a temperature drop of 40 °C,,unknown function u,0,undecided,unparsed,,variant,2004_moler:Ex. 4.16,"Moler's freezing water main, with other constants and units."
 2013_epperson:Ex. 3.4,2013,1.4,16*t^3 - 18*t^2 + 3,,,,,1,new,,,new,,
 2013_epperson:Ex. 3.6,2013,1.4,exp(-a*x) - x,,0 < a <= 1,"[0, 2]",,1,new,,,new,,
 "2013_epperson:3.5-6, 3.5-7; 3.11-15, 3.11-16",2013,1.4,4*x - cos(x),,,"[-2, 2]",,1,new,,,new,,
 "2013_epperson:3.5-8, 3.5-9",2013,1.4,7*x - cos(2*pi*x),,,"[0, 1]",,1,new,,,new,,
-2013_epperson:3.6-8,2013,1.4,x - a*sin(x) - b,,"`a, b > 0`, `a < 1`",,,1,judge,"family, no parsed values",2004_moler:Ex. 4.15,duplicate,2004_moler:Ex. 4.15,"Kepler's equation E - e*sin(E) - M with a = e and b = M, without values: Epperson gives only 0 < a < 1 and b > 0."
+2013_epperson:3.6-8,2013,1.4,x - a*sin(x) - b,,"`a, b > 0`, `a < 1`",,,1,undecided,"family, no parsed values",2004_moler:Ex. 4.15,duplicate,2004_moler:Ex. 4.15,"Kepler's equation E - e*sin(E) - M with a = e and b = M, without values: Epperson gives only 0 < a < 1 and b > 0."
 2013_epperson:3.6-9,2013,1.4,1 - exp(-x^2),,,,,1,new,,,new,,
 2013_epperson:§3.7; 3.7-1; §3.9 (eq. (3.30)); 3.9-13; 3.11-10; 3.12-2 to 3.12-4,2013,1.4,x^2 - a,,"`a = pi, 5, 7, 3, 6` (3.7-1); `a = 3, 2, pi` (3.9-13); `a = 5` (3.11-10); `a = 0.5` (3.12-2); `a = 0.3, 0.6, 0.9` (3.12-3); `a = 0.25, 0.251, ..., 1` (3.12-4)",,,10,extended,"family, new parameter values",1989_atkinson:(2.5.3),extended,1989_atkinson:(2.5.3),
 2013_epperson:3.7-5,2013,1.4,x^3 - a,,`a` free,,,1,new,,,new,,
@@ -467,13 +467,13 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2013_stage:3.4,2013,1.2,cos(x) - x^3,,,"`[0, 4]` (Figure 1); `[-10, 10]` (Figure 2)",,1,duplicate,structure,2011_zhang:3,duplicate,2011_zhang:3,
 2013_stage:3.5,2013,1.2,cos(x) - x,,,"[-10, 10]",,1,duplicate,structure,2000_weerakoon:4,duplicate,2000_weerakoon:4,
 2013_stage:3.6,2013,1.2,1 - (3/4)*x,,,"[-10, 10]",,1,new,,,new,,
-2013_stage:3.7,2013,1.2,,`abs(x - 2/3)^0.5 - 0.1` if `x <= 2/3`; `-abs(x - 2/3)^0.5 - 0.1` otherwise,,"[-10, 10]",not 1 expression,0,judge,unparsed,,new,,"3.8 minus 0.1, which moves the root to 2/3 - 0.01; no earlier row adds such an offset."
-2013_stage:3.8,2013,1.2,,`abs(x - 2/3)^0.5` if `x <= 2/3`; `-abs(x - 2/3)^0.5` otherwise,,"[-10, 10]",not 1 expression,0,judge,unparsed,,variant,1989_atkinson:P15(a),"Atkinson's P15(a) negated and shifted by 2/3; Moler's sign(x - a)*sqrt(abs(x - a)) at a = 2/3, negated."
-2013_stage:3.9,2013,1.2,,`abs(x - 2/3)^0.2` if `x <= 2/3`; `-abs(x - 2/3)^0.2` otherwise,,"[-10, 10]",not 1 expression,0,judge,unparsed,,new,,3.8 with the exponent 0.2.
+2013_stage:3.7,2013,1.2,,`abs(x - 2/3)^0.5 - 0.1` if `x <= 2/3`; `-abs(x - 2/3)^0.5 - 0.1` otherwise,,"[-10, 10]",not 1 expression,0,undecided,unparsed,,new,,"3.8 minus 0.1, which moves the root to 2/3 - 0.01; no earlier row adds such an offset."
+2013_stage:3.8,2013,1.2,,`abs(x - 2/3)^0.5` if `x <= 2/3`; `-abs(x - 2/3)^0.5` otherwise,,"[-10, 10]",not 1 expression,0,undecided,unparsed,,variant,1989_atkinson:P15(a),"Atkinson's P15(a) negated and shifted by 2/3; Moler's sign(x - a)*sqrt(abs(x - a)) at a = 2/3, negated."
+2013_stage:3.9,2013,1.2,,`abs(x - 2/3)^0.2` if `x <= 2/3`; `-abs(x - 2/3)^0.2` otherwise,,"[-10, 10]",not 1 expression,0,undecided,unparsed,,new,,3.8 with the exponent 0.2.
 2013_stage:3.10,2013,1.2,(x - 7/9)^3 + 0.001*(x - 7/9),,,"[-10, 10]",,1,new,,,variant,1975_bus_dekker:II.1,"Bus-Dekker's x^n + a*x + b at n = 3, b = 0, with a = 0.001 and shifted to the root 7/9."
-2013_stage:3.11,2013,1.2,,`-0.5` if `x <= 1/3`; `0.5` otherwise,,"[-10, 10]",not 1 expression,0,judge,unparsed,,new,,
-2013_stage:3.12,2013,1.2,,`-10^-3` if `x <= 1/3`; `1 - 10^-3` otherwise,,"[-10, 10]",not 1 expression,0,judge,unparsed,,new,,"3.11 plus 0.499: the same jump at 1/3, with other values."
-2013_stage:3.13,2013,1.2,,`0` if `x = 0`; `(1 - 2/3)^-1` otherwise,,"`[-10, 10]` (Figure 11); `[0, 7]` (text)",not 1 expression,0,judge,unparsed,,new,,"Misprint: the plot title's 1/(x - 2/3) is meant, which is Moler's 1/(x - pi) shifted, but the branch 0 at x = 0 makes it another function."
+2013_stage:3.11,2013,1.2,,`-0.5` if `x <= 1/3`; `0.5` otherwise,,"[-10, 10]",not 1 expression,0,undecided,unparsed,,new,,
+2013_stage:3.12,2013,1.2,,`-10^-3` if `x <= 1/3`; `1 - 10^-3` otherwise,,"[-10, 10]",not 1 expression,0,undecided,unparsed,,new,,"3.11 plus 0.499: the same jump at 1/3, with other values."
+2013_stage:3.13,2013,1.2,,`0` if `x = 0`; `(1 - 2/3)^-1` otherwise,,"`[-10, 10]` (Figure 11); `[0, 7]` (text)",not 1 expression,0,undecided,unparsed,,new,,"Misprint: the plot title's 1/(x - 2/3) is meant, which is Moler's 1/(x - pi) shifted, but the branch 0 at x = 0 makes it another function."
 "2015_chapra:(PT2.1), (PT2.2); (7.7)",2015,1.4,a*x^2 + b*x + c,,"`a`, `b`, `c` free",,,1,new,,,new,,
 "2015_chapra:§PT2.1.1 (p. 117); Ex. 6.2–6.4, 6.6, 6.8; Fig. 6.2, 6.9; Prob. 6.27–6.29, 7.22–7.24",2015,1.4,exp(-x) - x,,,,,1,duplicate,structure,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),duplicate,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),
 "2015_chapra:(PT2.3), (PT2.4); Ex. 5.1, 5.3–5.5; Fig. 5.1, 5.6, 5.7, 5.13; Prob. 5.14, 5.21, 5.23, 5.26, 7.20, 7.21",2015,1.4,(g*m/c)*(1 - exp(-(c/m)*t)) - v,,"`g = 9.81` m/s^2, `m = 68.1` kg, `v = 40` m/s, `t = 10` s (Ex. 5.1); `m = 82`, `v = 36`, `t = 4` (Prob. 5.14)","`[12, 16]` (Ex. 5.3, 5.5); `[3, 5]` (Prob. 5.14)",,8,new,,,new,,
@@ -499,11 +499,11 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 "2015_chapra:Ex. 7.3, 7.7; Prob. 7.8",2015,1.4,x^5 - 3.5*x^4 + 2.75*x^3 + 2.125*x^2 - 3.875*x + 1.25,,,,,1,new,,,new,,
 "2015_chapra:§7.7.1, Fig. 7.6; Ex. 7.4; §7.7.3, Fig. 7.7",2015,1.4,x - cos(x),,,,,1,duplicate,structure,2000_weerakoon:4,duplicate,2000_weerakoon:4,
 2015_chapra:Fig. 7.8,2015,1.4,x^3 - 10*x + 2,,,,,1,new,,,new,,
-"2015_chapra:§8.1, (8.3), Table 8.1; Prob. 8.1",2015,1.4,(p + a/v^2)*(v - b) - R*T,,"`R = 0.082054` L atm/(mol K); carbon dioxide `a = 3.592`, `b = 0.04267`; oxygen `a = 1.360`, `b = 0.03183`; `p = 1, 10, 100` atm and `T = 300, 500, 700` K (§8.1); ethyl alcohol `a = 12.02`, `b = 0.08407`, `T = 375` K, `p = 2.0` atm (Prob. 8.1)",,too many parameter combinations,0,judge,unparsed,,variant,2006_bradie:§2 (p. 54); §2.4 (p. 102),"Bradie's van der Waals equation per mole (n = 1), for other gases."
+"2015_chapra:§8.1, (8.3), Table 8.1; Prob. 8.1",2015,1.4,(p + a/v^2)*(v - b) - R*T,,"`R = 0.082054` L atm/(mol K); carbon dioxide `a = 3.592`, `b = 0.04267`; oxygen `a = 1.360`, `b = 0.03183`; `p = 1, 10, 100` atm and `T = 300, 500, 700` K (§8.1); ethyl alcohol `a = 12.02`, `b = 0.08407`, `T = 375` K, `p = 2.0` atm (Prob. 8.1)",,too many parameter combinations,0,undecided,unparsed,,variant,2006_bradie:§2 (p. 54); §2.4 (p. 102),"Bradie's van der Waals equation per mole (n = 1), for other gases."
 "2015_chapra:§8.2, (8.14)",2015,1.4,K1/(10^6*H)*KH*pCO2 + 2*K2*K1/(10^6*H^2)*KH*pCO2 + Kw/H - H,,"`KH = 10^-1.46`, `K1 = 10^-6.3`, `K2 = 10^-10.3`, `Kw = 10^-14`; `pCO2 = 315` ppm (1958), `375` ppm (2003)","`[2, 12]` in pH",,1,new,,,new,,
 "2015_chapra:§8.3, (8.19), (8.20), Fig. 8.4",2015,1.4,exp(-R*t/(2*L))*cos(sqrt(1/(L*C) - (R/(2*L))^2)*t) - q/q0,,"`L = 5` H, `C = 10^-4` F, `t = 0.05` s, `q/q0 = 0.01`","[0, 400]",,1,new,,,new,,
 "2015_chapra:§8.4, (8.21), Fig. 8.5; Prob. 8.13",2015,1.4,1/sqrt(f) + 2.0*log10(eps/(3.7*D) + 2.51/(Re*sqrt(f))),,"`Re = rho*V*D/mu`; `rho = 1.23` kg/m^3, `mu = 1.79E-5` N s/m^2, `D = 0.005` m, `V = 40` m/s, `eps = 0.0015` mm, so `Re = 13743` (§8.4, Prob. 8.13(a)); `eps = 0.045` mm (Prob. 8.13(b))","[0.008, 0.08]",,2,new,,,new,,
-"2015_chapra:§8.4, (8.23), Fig. 8.6",2015,1.4,f = 0.25/(log10(eps/(3.7*D) + 2.51/(Re*sqrt(f))))^2,,as in §8.4's Colebrook row,"[0.008, 0.08]",unknown variable unclear,0,judge,unparsed,,new,,Fixed-point form of the Colebrook row (8.21); f - g(f) has the same root but other values.
+"2015_chapra:§8.4, (8.23), Fig. 8.6",2015,1.4,f = 0.25/(log10(eps/(3.7*D) + 2.51/(Re*sqrt(f))))^2,,as in §8.4's Colebrook row,"[0.008, 0.08]",unknown variable unclear,0,undecided,unparsed,,new,,Fixed-point form of the Colebrook row (8.21); f - g(f) has the same root but other values.
 2015_chapra:Prob. 5.1,2015,1.4,-0.5*x^2 + 2.5*x + 4.5,,,"[5, 10]",,1,new,,,new,,
 2015_chapra:Prob. 5.2,2015,1.4,5*x^3 - 5*x^2 + 6*x - 2,,,"[0, 1]",,1,new,,,new,,
 2015_chapra:Prob. 5.3,2015,1.4,-25 + 82*x - 90*x^2 + 44*x^3 - 8*x^4 + 0.7*x^5,,,"[0.5, 1.0]",,1,new,,,new,,
@@ -518,7 +518,7 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 "2015_chapra:Prob. 5.12, 6.12",2015,1.4,-2*x^6 - 1.5*x^4 + 10*x + 2,,,"[0, 1]",,1,new,,,new,,
 "2015_chapra:Prob. 5.13, 7.11",2015,1.4,(g*m/c)*(1 - exp(-(c/m)*t)) - v,,"`g = 9.81` m/s^2 and `c = 15` kg/s in both; `v = 36` m/s, `t = 10` s (5.13); `v = 35`, `t = 8` (7.11)",,,4,new,,,new,,
 2015_chapra:Prob. 5.15,2015,1.4,v = sqrt(2*g*H)*tanh(sqrt(2*g*H)/(2*L)*t),,"`g = 9.81` m/s^2, `L = 4` m, `t = 2.5` s, `v = 5` m/s","[0, 2]",,1,new,,,new,,
-2015_chapra:Prob. 5.16,2015,1.4,1 - Q^2/(g*Ac^3)*B,,"`Q = 20` m^3/s, `g = 9.81` m/s^2, `B = 3 + y`, `Ac = 3*y + y^2/2`","[0.5, 2.5]",unknown variable unclear,0,judge,unparsed,,new,,
+2015_chapra:Prob. 5.16,2015,1.4,1 - Q^2/(g*Ac^3)*B,,"`Q = 20` m^3/s, `g = 9.81` m/s^2, `B = 3 + y`, `Ac = 3*y + y^2/2`","[0.5, 2.5]",unknown variable unclear,0,undecided,unparsed,,new,,
 "2015_chapra:Prob. 5.17, 5.19, 6.19, 8.9",2015,1.4,V = pi*h^2*(3*R - h)/3,,"`R = 3` m, `V = 30` m^3 (5.17, 6.19); `R = 1` m, `V = 0.5` m^3 (8.9, which writes `r`); `r = 1` m, `V = (4/3)*pi*r^3*(1 - rho_s/rho_w)`, `rho_s = 200`, `rho_w = 1000` kg/m^3 (5.19)","`[0, 3]` (5.17)",,4,new,,,new,,
 2015_chapra:Prob. 5.18,2015,1.4,log(osf) = -139.34411 + 1.575701E5/Ta - 6.642308E7/Ta^2 + 1.243800E10/Ta^3 - 8.621949E11/Ta^4,,"`Ta = T + 273.15`; `osf = 8, 10, 12` mg/L","[0, 40]",,3,new,,,new,,
 2015_chapra:Prob. 6.1,2015,1.4,sin(sqrt(x)) - x,,,,,1,new,,,new,,
@@ -539,8 +539,8 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 "2015_chapra:Prob. 6.20, 8.20",2015,1.4,Q = sqrt(S)*(B*H)^(5/3)/(n*(B + 2*H)^(2/3)),,"`Q = 5` m^3/s, `S = 0.0002`, `B = 20`, `n = 0.03`",,,1,new,,,new,,
 2015_chapra:Prob. 6.21,2015,1.4,x^3 - 2*x^2 - 4*x + 8,,,,,1,new,,,new,,
 2015_chapra:Prob. 6.25,2015,1.4,W - Q*c - k*V*sqrt(c),,"`V = 1E6` m^3, `Q = 1E5` m^3/yr, `W = 1E6` g/yr, `k = 0.25` m^0.5/g^0.5/yr",,,1,new,,,new,,
-2015_chapra:Prob. 6.26,2015,1.4,c = ((W - Q*c)/(k*V))^2,,as in Prob. 6.25,,unknown variable unclear,0,judge,unparsed,,new,,Fixed-point form of Prob. 6.25; c - g(c) has the same root but other values.
-2015_chapra:Prob. 6.26#2,2015,1.4,c = (W - k*V*sqrt(c))/Q,,as in Prob. 6.25,,unknown variable unclear,0,judge,unparsed,,duplicate,2015_chapra:Prob. 6.25,Fixed-point form whose c - g(c) is Prob. 6.25's function divided by -Q.
+2015_chapra:Prob. 6.26,2015,1.4,c = ((W - Q*c)/(k*V))^2,,as in Prob. 6.25,,unknown variable unclear,0,undecided,unparsed,,new,,Fixed-point form of Prob. 6.25; c - g(c) has the same root but other values.
+2015_chapra:Prob. 6.26#2,2015,1.4,c = (W - k*V*sqrt(c))/Q,,as in Prob. 6.25,,unknown variable unclear,0,undecided,unparsed,,duplicate,2015_chapra:Prob. 6.25,Fixed-point form whose c - g(c) is Prob. 6.25's function divided by -Q.
 2015_chapra:Prob. 7.1,2015,1.4,x^4 - 7.5*x^3 + 14.5*x^2 + 3*x - 20,,,,,1,new,,,new,,
 2015_chapra:Prob. 7.2,2015,1.4,x^5 - 5*x^4 + x^3 - 6*x^2 - 7*x + 10,,,,,1,new,,,new,,
 2015_chapra:Prob. 7.3(a),2015,1.4,x^3 + x^2 - 4*x - 4,,,,,1,new,,,new,,
@@ -562,9 +562,9 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2015_chapra:Prob. 8.8,2015,1.4,V = (r^2*arccos((r - h)/r) - (r - h)*sqrt(2*r*h - h^2))*L,,"`r = 2` m, `L = 5` m, `V = 8` m^3",,,1,extended,"family, new parameter values",2006_bradie:2.2-13,variant,2006_bradie:2.2-13,"Bradie's horizontal cylinder with r = 2, L = 5, V = 8."
 2015_chapra:Prob. 8.10,2015,1.4,h = sqrt((h^3 + 3*V/pi)/(3*r)),,"`r = 1` m, `V = 0.5` m^3",,,1,new,,,new,,
 2015_chapra:Prob. 8.10#2,2015,1.4,h = (3*(r*h^2 - V/pi))^(1/3),,"`r = 1` m, `V = 0.5` m^3",,,1,new,,,new,,
-2015_chapra:Prob. 8.11,2015,1.4,V/F = -int_Cin^Cout (K/(kmax*C) + 1/kmax) dC,,"`V = 100` L, `F = 80` L/s, `Cin = 0.2` M, `kmax = 1E-2` 1/s, `K = 0.1` M",,unknown function Cout,0,judge,unparsed,,new,,
+2015_chapra:Prob. 8.11,2015,1.4,V/F = -int_Cin^Cout (K/(kmax*C) + 1/kmax) dC,,"`V = 100` L, `F = 80` L/s, `Cin = 0.2` M, `kmax = 1E-2` 1/s, `K = 0.1` M",,unknown function Cout,0,undecided,unparsed,,new,,
 2015_chapra:Prob. 8.12,2015,1.4,(dP*rho/G0^2)*(Dp/L)*(eps^3/(1 - eps)) = 150*(1 - eps)/(Dp*G0/mu) + 1.75,,"`Dp*G0/mu = 1000`, `dP*rho*Dp/(G0^2*L) = 10`",,,1,new,,,new,,
-2015_chapra:Prob. 8.14,2015,1.4,P/A = sigma_m/(1 + (e*c/k^2)*sec(0.5*sqrt(P/(E*A))*(L/k))),,"`E = 200000` MPa, `e*c/k^2 = 0.2`, `sigma_m = 250` MPa, `L/k = 100`",,unknown variable unclear,0,judge,unparsed,,new,,
+2015_chapra:Prob. 8.14,2015,1.4,P/A = sigma_m/(1 + (e*c/k^2)*sec(0.5*sqrt(P/(E*A))*(L/k))),,"`E = 200000` MPa, `e*c/k^2 = 0.2`, `sigma_m = 250` MPa, `L/k = 100`",,unknown variable unclear,0,undecided,unparsed,,new,,
 2015_chapra:Prob. 8.15,2015,1.4,c = 10 - 20*(exp(-0.2*x) - exp(-0.75*x)),,`c = 5` mg/L (a),,,1,new,,,new,,
 2015_chapra:Prob. 8.16,2015,1.4,c = 70*exp(-1.5*t) + 25*exp(-0.075*t),,c = 9,,,1,new,,,new,,
 2015_chapra:Prob. 8.17,2015,1.4,y = (TA/w)*cosh((w/TA)*x) + y0 - TA/w,,"`w = 10`, `y0 = 5`; `y = 15` at `x = 50`",,,1,new,,,new,,
@@ -573,14 +573,14 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2015_chapra:Prob. 8.21,2015,1.4,h = h0*(sin(2*pi*x/lambda)*cos(2*pi*t*v/lambda) + exp(-x)),,"`lambda = 16`, `t = 12`, `v = 48`, `h = 0.4*h0`",,,1,new,,,new,,
 2015_chapra:Prob. 8.22,2015,1.4,A = P*i*(1 + i)^n/((1 + i)^n - 1),,"`P = 20000`, `A = 4000`, `n = 6`",,,1,new,,,new,,
 2015_chapra:Prob. 8.23,2015,1.4,Ps_max/(1 + (Ps_max/P0 - 1)*exp(-ks*t)) = 1.2*(Pu_max*exp(-ku*t) + Pu_min),,"`Pu_max = 75000`, `ku = 0.045`/yr, `Pu_min = 100000`, `Ps_max = 300000`, `P0 = 10000`, `ks = 0.08`/yr",,,1,new,,,new,,
-2015_chapra:Prob. 8.24,2015,1.4,20*(<x - 0>^1 - <x - 5>^1) - 15*<x - 8>^0 - 57,,,,conditions or prose,0,judge,unparsed,,new,,
-2015_chapra:Prob. 8.25,2015,1.4,-10*(<x - 0>^2 - <x - 5>^2) + 15*<x - 8>^1 + 150*<x - 7>^0 + 57*x,,,,conditions or prose,0,judge,unparsed,,new,,
-"2015_chapra:Prob. 8.26, 8.27(b)",2015,1.4,(-10/3)*(<x - 0>^3 - <x - 5>^3) + (15/2)*<x - 8>^2 + 150*<x - 7>^1 + (57/2)*x^2 - 238.25,,,,conditions or prose,0,judge,unparsed,,new,,
-2015_chapra:Prob. 8.27(a),2015,1.4,(-5/6)*(<x - 0>^4 - <x - 5>^4) + (15/6)*<x - 8>^3 + 75*<x - 7>^2 + (57/6)*x^3 - 238.25*x,,,,conditions or prose,0,judge,unparsed,,new,,
+2015_chapra:Prob. 8.24,2015,1.4,20*(<x - 0>^1 - <x - 5>^1) - 15*<x - 8>^0 - 57,,,,conditions or prose,0,undecided,unparsed,,new,,
+2015_chapra:Prob. 8.25,2015,1.4,-10*(<x - 0>^2 - <x - 5>^2) + 15*<x - 8>^1 + 150*<x - 7>^0 + 57*x,,,,conditions or prose,0,undecided,unparsed,,new,,
+"2015_chapra:Prob. 8.26, 8.27(b)",2015,1.4,(-10/3)*(<x - 0>^3 - <x - 5>^3) + (15/2)*<x - 8>^2 + 150*<x - 7>^1 + (57/2)*x^2 - 238.25,,,,conditions or prose,0,undecided,unparsed,,new,,
+2015_chapra:Prob. 8.27(a),2015,1.4,(-5/6)*(<x - 0>^4 - <x - 5>^4) + (15/6)*<x - 8>^3 + 75*<x - 7>^2 + (57/6)*x^3 - 238.25*x,,,,conditions or prose,0,undecided,unparsed,,new,,
 2015_chapra:Prob. 8.28,2015,1.4,Alk + H = HCO3 + 2*CO3 + OH,,"`HCO3 = K1/(10^6*H)*KH*pCO2` (8.11), `CO3 = K2*K1/(10^6*H^2)*KH*pCO2` (8.13), `OH = Kw/H` (8.8); `KH`, `K1`, `K2`, `Kw` as in §8.2; `Alk = 0.4E-3` eq/L (Lake Superior); `pCO2` of 2008, not given",,,1,new,,,new,,
 2015_chapra:Prob. 8.29,2015,1.4,exp(-R*t/(2*L))*cos(sqrt(1/(L*C) - (R/(2*L))^2)*t) - q/q0,,"`R = 280` ohm, `C = 1E-4` F, `t = 0.05` s, `q/q0 = 0.01`",,,1,new,,,new,,
 2015_chapra:Prob. 8.30,2015,1.4,i = 9*exp(-t)*sin(2*pi*t),,i = 3.5,,,1,new,,,new,,
-2015_chapra:Prob. 8.31,2015,1.4,rho = 1/(q*n*mu),,"`n = (1/2)*(N + sqrt(N^2 + 4*ni^2))`, `mu = mu0*(T/T0)^-2.42`; `T0 = 300` K, `T = 1000` K, `mu0 = 1300` cm^2/(V s), `q = 1.6E-19` C, `ni = 6.21E9` cm^-3, `rho = 6E6` V s cm/C",,unknown variable unclear,0,judge,unparsed,,new,,
+2015_chapra:Prob. 8.31,2015,1.4,rho = 1/(q*n*mu),,"`n = (1/2)*(N + sqrt(N^2 + 4*ni^2))`, `mu = mu0*(T/T0)^-2.42`; `T0 = 300` K, `T = 1000` K, `mu0 = 1300` cm^2/(V s), `q = 1.6E-19` C, `ni = 6.21E9` cm^-3, `rho = 6E6` V s cm/C",,unknown variable unclear,0,undecided,unparsed,,new,,
 2015_chapra:Prob. 8.32,2015,1.4,F = (1/(4*pi*e0))*q*Q*x/(x^2 + a^2)^(3/2),,"`e0 = 8.85E-12` C^2/(N m^2), `q = Q = 2E-5` C, `a = 0.9` m, `F = 1` N",,,1,new,,,new,,
 2015_chapra:Prob. 8.33,2015,1.4,1/Z = sqrt(1/R^2 + (omega*C - 1/(omega*L))^2),,"`R = 225` ohm, `C = 0.6E-6` F, `L = 0.5` H, `Z = 75` ohm","[1, 1000]",,1,new,,,new,,
 2015_chapra:Prob. 8.34,2015,1.4,1/sqrt(f) = 4*log10(Re*sqrt(f)) - 0.4,,`Re` from 2500 to 1000000,,,1,new,,,new,,
@@ -625,7 +625,7 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2016_burden:2.1-13; 2.2-12; 2.5-10,2016,1.4,x^3 - 25,,,,,1,new,,,new,,
 2016_burden:2.1-14; 2.2-11; 2.5-9,2016,1.4,x^2 - 3,,,,,1,duplicate,structure,1989_atkinson:(2.5.3),duplicate,1989_atkinson:(2.5.3),
 2016_burden:2.1-15,2016,1.4,V = L*(0.5*pi*r^2 - r^2*arcsin(h/r) - h*(r^2 - h^2)^(1/2)),,"`L = 10` ft, `r = 1` ft, `V = 12.4` ft^3",,,1,new,,,new,,
-2016_burden:2.1-16,2016,1.4,x(t) = -(g/(2*omega^2))*((exp(omega*t) - exp(-omega*t))/2 - sin(omega*t)),,"`x(t) = 1.7` ft at `t = 1` s, `g = 32.17` ft/s^2",,unknown function x,0,judge,unparsed,,new,,
+2016_burden:2.1-16,2016,1.4,x(t) = -(g/(2*omega^2))*((exp(omega*t) - exp(-omega*t))/2 - sin(omega*t)),,"`x(t) = 1.7` ft at `t = 1` s, `g = 32.17` ft/s^2",,unknown function x,0,undecided,unparsed,,new,,
 2016_burden:2.1-17; 2.2-8; 2.5-7; 2.6-1(c),2016,1.4,x^3 - x - 1,,,"[1, 2]",,1,new,,,new,,
 2016_burden:2.1-18,2016,1.4,x^3 + x - 4,,,"[1, 4]",,1,new,,,new,,
 2016_burden:2.1-20,2016,1.4,(x - 1)^10,,,,,1,new,,,new,,
@@ -634,7 +634,7 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2016_burden:2.2-3,2016,1.4,x^3 - 2*x + 1,,,,,1,new,,,new,,
 2016_burden:2.2-4,2016,1.4,x^4 + 3*x^2 - 2,,,,,1,new,,,new,,
 2016_burden:2.2-5(a),2016,1.4,x = (20*x + 21/x^2)/21,,,,,1,new,,,new,,
-2016_burden:2.2-5(b),2016,1.4,x = x - (x^3 - 21)/(3*x^2),,,,,1,judge,value,2016_burden:2.2-5(a),new,,"Another fixed-point form of x^3 = 21: x - g(x) is 7 times that of 2.2-5(a), as 1 fraction where (a)'s is a sum."
+2016_burden:2.2-5(b),2016,1.4,x = x - (x^3 - 21)/(3*x^2),,,,,1,undecided,value,2016_burden:2.2-5(a),new,,"Another fixed-point form of x^3 = 21: x - g(x) is 7 times that of 2.2-5(a), as 1 fraction where (a)'s is a sum."
 2016_burden:2.2-5(c),2016,1.4,x = x - (x^4 - 21*x)/(x^2 - 21),,,,,1,new,,,new,,
 2016_burden:2.2-5(d),2016,1.4,x = (21/x)^(1/2),,,,,1,new,,,new,,
 2016_burden:2.2-6(a),2016,1.4,x = x*(1 + (7 - x^5)/x^2)^3,,,,,1,new,,,new,,
@@ -655,7 +655,7 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2016_burden:2.2-14(d); 2.3-5(c); 2.5-12(d),2016,1.4,x - cos(x),,,"`[0, pi/2]` (2.3-5)",,1,duplicate,structure,2000_weerakoon:4,duplicate,2000_weerakoon:4,
 2016_burden:2.2-15,2016,1.4,x^2 + 10*cos(x),,,,,1,new,,,new,,
 2016_burden:2.2-17,2016,1.4,2*sin(pi*x) + x,,,"[1, 2]",,1,duplicate,structure,2013_epperson:3.9-8,duplicate,2013_epperson:3.9-8,
-2016_burden:2.2-18,2016,1.4,s(t) = s0 - (m*g/k)*t + (m^2*g/k^2)*(1 - exp(-k*t/m)),,"`s0 = 300` ft, `m = 0.25` lb, `k = 0.1` lb-s/ft, `g = 32.17` ft/s^2",,unknown function s,0,judge,unparsed,,new,,
+2016_burden:2.2-18,2016,1.4,s(t) = s0 - (m*g/k)*t + (m^2*g/k^2)*(1 - exp(-k*t/m)),,"`s0 = 300` ft, `m = 0.25` lb, `k = 0.1` lb-s/ft, `g = 32.17` ft/s^2",,unknown function s,0,undecided,unparsed,,new,,
 2016_burden:2.2-20,2016,1.4,x = 2*x - A*x^2,,A > 0,,,1,new,,,new,,
 2016_burden:2.2-22(b),2016,1.4,x = 1 - x^2,,,"[0, 1]",,1,duplicate,structure,1975_bus_dekker:I.4,duplicate,1975_bus_dekker:I.4,
 "2016_burden:2.2-23, 2.2-24",2016,1.4,x = (1/2)*x + A/(2*x),,`A > 0` (2.2-24); `A = 2` (2.2-23),,,1,duplicate,structure,2013_epperson:3.9-5(a),duplicate,2013_epperson:3.9-5(a),
@@ -667,7 +667,7 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2016_burden:2.3-6(a),2016,1.4,exp(x) + 2^-x + 2*cos(x) - 6,,,"[1, 2]",,1,new,,,new,,
 2016_burden:2.3-6(b),2016,1.4,log(x - 1) + cos(x - 1),,,"[1.3, 2]",,1,new,,,new,,
 2016_burden:2.3-6(c),2016,1.4,2*x*cos(2*x) - (x - 2)^2,,,"`[2, 3]`; `[3, 4]`",,1,new,,,new,,
-2016_burden:2.3-6(d),2016,1.4,(x - 2)^2 - log(x),,,"`[1, 2]`; `[e, 4]`",,1,judge,value,2016_burden:2.1-6(c); 2.3-12(a),new,,The factored form of 2.1-6(c)'s x^2 - 4*x + 4 - log(x).
+2016_burden:2.3-6(d),2016,1.4,(x - 2)^2 - log(x),,,"`[1, 2]`; `[e, 4]`",,1,undecided,value,2016_burden:2.1-6(c); 2.3-12(a),new,,The factored form of 2.1-6(c)'s x^2 - 4*x + 4 - log(x).
 2016_burden:2.3-6(e),2016,1.4,exp(x) - 3*x^2,,,"`[0, 1]`; `[3, 5]`",,1,duplicate,structure,1989_atkinson:P2(a),duplicate,1989_atkinson:P2(a),
 2016_burden:2.3-6(f),2016,1.4,sin(x) - exp(-x),,,"`[0, 1]`; `[3, 4]`; `[6, 7]`",,1,new,,,new,,
 2016_burden:2.3-13,2016,1.4,230*x^4 + 18*x^3 + 9*x^2 - 221*x - 9,,,"`[-1, 0]`; `[0, 1]`",,1,new,,,new,,
@@ -679,7 +679,7 @@ row_id,year,home,f,f_description,parameters,interval,parse_note,instances,automa
 2016_burden:2.3-23,2016,1.4,A = (P/i)*(1 - (1 + i)^-n),,"`A = 135000`, `P = 1000` per month, over 30 years",,,1,new,,,new,,
 2016_burden:2.3-24,2016,1.4,A = (P/i)*((1 + i)^n - 1),,"`A = 750000`, `P = 1500` per month, over 20 years",,,1,new,,,new,,
 2016_burden:2.3-27,2016,1.4,P = ((1 + p)/2)*(p/(1 - p + p^2))^21,,P = 1/2,,,1,duplicate,structure,2006_bradie:2.5-19,duplicate,2006_bradie:2.5-19,
-2016_burden:2.3-28,2016,1.4,c(t) = A*t*exp(-t/3),,"maximum safe concentration 1 mg/mL; second injection at 0.25 mg/mL, of 75% of `A`",,unknown function c,0,judge,unparsed,,new,,
+2016_burden:2.3-28,2016,1.4,c(t) = A*t*exp(-t/3),,"maximum safe concentration 1 mg/mL; second injection at 0.25 mg/mL, of 75% of `A`",,unknown function c,0,undecided,unparsed,,new,,
 2016_burden:2.3-29,2016,1.4,A*sin(alpha)*cos(alpha) + B*sin(alpha)^2 - C*cos(alpha) - E*sin(alpha),,"`A = l*sin(beta1)`, `B = l*cos(beta1)`, `C = (h + 0.5*D)*sin(beta1) - 0.5*D*tan(beta1)`, `E = (h + 0.5*D)*cos(beta1) - 0.5*D`; `l = 89` in, `h = 49` in, `beta1 = 11.5` degrees; `D = 55` in (a), `D = 30` in (b)",,,1,new,,,new,,
 2016_burden:2.3-D3,2016,1.4,0.5*x^3 - 6*x^2 + 21.5*x - 22,,,,,1,new,,,new,,
 2016_burden:2.3-D4,2016,1.4,x^(1/3),,,,,1,new,,,new,,
@@ -716,13 +716,13 @@ burkardt_test_zero:p05,2016,1.3,(x + 3.0)*(x - 1.0)*(x - 1.0),,,"[-1000.0, 1000.
 burkardt_test_zero:p06,2016,1.3,exp(x) - 2.0 - 1.0/(10.0*x)^2 + 2.0/(100.0*x)^3,,,"[0.00001, 20.0]",,1,duplicate,structure,1997_chandrupatla:9,duplicate,1997_chandrupatla:9,
 burkardt_test_zero:p07,2016,1.3,x^3,,,"[-1000.0, 999.0]",,1,duplicate,structure,1975_bus_dekker:III,duplicate,1975_bus_dekker:III,
 burkardt_test_zero:p08,2016,1.3,cos(x) - x,,,"[-10.0, 10.0]",,1,duplicate,structure,2000_weerakoon:4,duplicate,2000_weerakoon:4,
-burkardt_test_zero:p09,2016,1.3,,`0.75*(x - 6.25) - 0.3125` (x < 6.0); `2.00*(x - 6.25)` (6.0 <= x <= 6.50); `0.75*(x - 6.25) + 0.3125` (x > 6.50),,"[-5.0, 16.0]",not 1 expression,0,judge,unparsed,,new,,
+burkardt_test_zero:p09,2016,1.3,,`0.75*(x - 6.25) - 0.3125` (x < 6.0); `2.00*(x - 6.25)` (6.0 <= x <= 6.50); `0.75*(x - 6.25) + 0.3125` (x > 6.50),,"[-5.0, 16.0]",not 1 expression,0,undecided,unparsed,,new,,
 burkardt_test_zero:p10,2016,1.3,20.0*x/(100.0*x*x + 1.0),,,"[-10.0, 11.0]",,1,new,,,new,,
 burkardt_test_zero:p11,2016,1.3,(16.0 - x^4)/(16.0*x^4 + epsilon),,epsilon = 0.00001,"[0.0, 10.0]",,1,new,,,new,,
-burkardt_test_zero:p12,2016,1.3,,`-exp(log(factor) + log(abs(x - 1.0)) - 1.0/(x - 1.0)^2)` (x < 1.0); `0.0` (x = 1.0); `+exp(log(factor) + log(abs(x - 1.0)) - 1.0/(x - 1.0)^2)` (x > 1.0),factor = 1000.0,"[-4.0, 4.1]",not 1 expression,0,judge,unparsed,,variant,1971_brent:3.2,"Brent's 3.2 shifted to x = 1 and scaled by 1000, computed as the exp of a sum of logs."
+burkardt_test_zero:p12,2016,1.3,,`-exp(log(factor) + log(abs(x - 1.0)) - 1.0/(x - 1.0)^2)` (x < 1.0); `0.0` (x = 1.0); `+exp(log(factor) + log(abs(x - 1.0)) - 1.0/(x - 1.0)^2)` (x > 1.0),factor = 1000.0,"[-4.0, 4.1]",not 1 expression,0,undecided,unparsed,,variant,1971_brent:3.2,"Brent's 3.2 shifted to x = 1 and scaled by 1000, computed as the exp of a sum of logs."
 burkardt_test_zero:p13,2016,1.3,slope*(x - 100.0),,slope = 0.00000000001,"[-10000000000000.0, 10000000000000.0]",,1,new,,,new,,
 burkardt_test_zero:p14,2016,1.3,1.0/((x - 0.3)^2 + 0.01) + 1.0/((x - 0.9)^2 + 0.04) + 2.0*x - 5.2,,,"[-10.0, 10.0]",,1,new,,,new,,
-burkardt_test_zero:p15,2016,1.3,,`-abs(x)^(1.0/3.0)*exp(-x^2)` (x < 0.0); `0.0` (x = 0.0); `abs(x)^(1.0/3.0)*exp(-x^2)` (x > 0.0),,"[-10.0, 10.0]",not 1 expression,0,judge,unparsed,,new,,
+burkardt_test_zero:p15,2016,1.3,,`-abs(x)^(1.0/3.0)*exp(-x^2)` (x < 0.0); `0.0` (x = 0.0); `abs(x)^(1.0/3.0)*exp(-x^2)` (x > 0.0),,"[-10.0, 10.0]",not 1 expression,0,undecided,unparsed,,new,,
 burkardt_test_zero:p16,2016,1.3,pi*(x - m)/180.0 - e*sin(pi*x/180.0),,"e = 0.8, m = 5.0","[m - 180.0, m + 180.0]",,1,new,,,variant,2004_moler:Ex. 4.15,"Kepler's equation in degrees, with e = 0.8 and m = 5 (as the source file `2004_moler` says)."
 burkardt_test_zero:p17,2016,1.3,x^3 - 2.0*x - 5.0,,,"[2.0, 3.0]",,1,duplicate,structure,1997_chandrupatla:1,duplicate,1997_chandrupatla:1,
 burkardt_test_zero:p18,2016,1.3,10.0^14*(1.0*x^7 - 7.0*x^6 + 21.0*x^5 - 35.0*x^4 + 35.0*x^3 - 21.0*x^2 + 7.0*x - 1.0),,,"[0.988, 1.012]",,1,duplicate,structure,2004_moler:§1.7,duplicate,2004_moler:§1.7,
@@ -764,20 +764,20 @@ burkardt_test_zero:p19,2016,1.3,cos(100.0*x) - 4.0*erf(30.0*x - 10.0),,,"[0.0, 1
 2021_oliveira_takahashi:1.6,2020,1.1,pi^x - e,,,"[-1, 1]",,1,new,,,new,,
 2021_oliveira_takahashi:1.7,2020,1.1,log(abs(x - 10/9)),,,"[-1, 1]",,1,new,,,new,,
 2021_oliveira_takahashi:1.8,2020,1.1,1/3 + sign(x)*abs(x)^(1/3) + x^3,,,"[-1, 1]",,1,new,,,new,,
-2021_oliveira_takahashi:1.9,2020,1.1,"1/10^3 + sum(sin(pi*i^3*x/2)/(pi*i^3), i = 1..10)",,,"[-1, 1]",conditions or prose,0,judge,unparsed,,new,,
+2021_oliveira_takahashi:1.9,2020,1.1,"1/10^3 + sum(sin(pi*i^3*x/2)/(pi*i^3), i = 1..10)",,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,new,,
 2021_oliveira_takahashi:1.10,2020,1.1,(x + 2/3)/(x + 101/100),,,"[-1, 1]",,1,new,,,new,,
-2021_oliveira_takahashi:1.11,2020,1.1,Phi(x - 1) - sqrt(2)/4,,,"[-1, 1]",unknown function Phi,0,judge,unparsed,,new,,
-2021_oliveira_takahashi:1.12,2020,1.1,phi(x - 1) - sqrt(2)/4,,,"[-1, 1]",unknown function phi,0,judge,unparsed,,new,,
+2021_oliveira_takahashi:1.11,2020,1.1,Phi(x - 1) - sqrt(2)/4,,,"[-1, 1]",unknown function Phi,0,undecided,unparsed,,new,,
+2021_oliveira_takahashi:1.12,2020,1.1,phi(x - 1) - sqrt(2)/4,,,"[-1, 1]",unknown function phi,0,undecided,unparsed,,new,,
 2021_oliveira_takahashi:2.1,2020,1.1,(x*10^6 - 1)^3,,,"[-1, 1]",,1,new,,,new,,
 2021_oliveira_takahashi:2.2,2020,1.1,exp(x)*(x*10^6 - 1)^3,,,"[-1, 1]",,1,new,,,new,,
 2021_oliveira_takahashi:2.3,2020,1.1,(x - 1/3)^2*atan(x - 1/3),,,"[-1, 1]",,1,new,,,new,,
 2021_oliveira_takahashi:2.4,2020,1.1,sign(3*x + 1)*(1 - sqrt(1 - (3*x + 1)^2/9^2)),,,"[-1, 1]",,1,new,,,new,,
-2021_oliveira_takahashi:2.5,2020,1.1,(x > (1 - 10^6)/10^6)*((1 + 10^6)/10^6) - 1,,,"[-1, 1]",conditions or prose,0,judge,unparsed,,new,,"A step function like Stage's 3.11 and 3.12, with other levels and another jump point."
-2021_oliveira_takahashi:2.6,2020,1.1,,"`1/(21*x - 1)`, with `(x != 1/21)` printed beside it",,"[-1, 1]",not 1 expression,0,judge,unparsed,,new,,"Similar to 2004_moler:Ex. 4.1#5 and to Stage 3.13, a pole without a root, but a different function."
+2021_oliveira_takahashi:2.5,2020,1.1,(x > (1 - 10^6)/10^6)*((1 + 10^6)/10^6) - 1,,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,new,,"A step function like Stage's 3.11 and 3.12, with other levels and another jump point."
+2021_oliveira_takahashi:2.6,2020,1.1,,"`1/(21*x - 1)`, with `(x != 1/21)` printed beside it",,"[-1, 1]",not 1 expression,0,undecided,unparsed,,new,,"Similar to 2004_moler:Ex. 4.1#5 and to Stage 3.13, a pole without a root, but a different function."
 2021_oliveira_takahashi:2.7,2020,1.1,(x/2)^2 + ceil(x/2) - 1/2,,,"[-1, 1]",,1,new,,,new,,
 2021_oliveira_takahashi:2.8,2020,1.1,ceil(10*x - 1) + 1/2,,,"[-1, 1]",,1,new,,,new,,
 2021_oliveira_takahashi:2.9,2020,1.1,x + sin(x*10^6)/10 + 1/10^3,,,"[-1, 1]",,1,new,,,new,,
-2021_oliveira_takahashi:2.10,2020,1.1,(x > -1)*(1 + sin(1/(x + 1))) - 1,,,"[-1, 1]",conditions or prose,0,judge,unparsed,,new,,
+2021_oliveira_takahashi:2.10,2020,1.1,(x > -1)*(1 + sin(1/(x + 1))) - 1,,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,new,,
 2021_oliveira_takahashi:2.11,2020,1.1,202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 1/10,,,"[-1, 1]",,1,new,,,new,,
 2021_oliveira_takahashi:2.12,2020,1.1,(202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 1/10)^3,,,"[-1, 1]",,1,new,,,new,,
 2021_oliveira_takahashi:(23),2020,1.1,(x - (100 + 10*pi))*(x - 10*pi),,,"[-100, 100]",,1,new,,,new,,
@@ -809,8 +809,8 @@ burkardt_test_zero:p19,2016,1.3,cos(100.0*x) - 4.0*erf(30.0*x - 10.0),,,"[0.0, 1
 2023_ganchovski_traykov:f11,2023,1.1,exp(x)*(x*10^6 - 1)^3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.2,duplicate,2021_oliveira_takahashi:2.2,
 2023_ganchovski_traykov:f12,2023,1.1,(x - 1/3)^2*atan(x - 1/3),,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.3,duplicate,2021_oliveira_takahashi:2.3,
 2023_ganchovski_traykov:f13,2023,1.1,sign(3*x + 1)*(1 - sqrt(1 - (3*x + 1)^2/9^2)),,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.4,duplicate,2021_oliveira_takahashi:2.4,
-2023_ganchovski_traykov:f14,2023,1.1,(x > (1 - 10^6)/10^6)*(1 + 10^6)/10^6 - 1,,,"[-1, 1]",conditions or prose,0,judge,unparsed,,duplicate,2021_oliveira_takahashi:2.5,
-2023_ganchovski_traykov:f15,2023,1.1,1/(21*x - 1)*(x != 1/21),,,"[-1, 1]",conditions or prose,0,judge,unparsed,,duplicate,2021_oliveira_takahashi:2.6,
+2023_ganchovski_traykov:f14,2023,1.1,(x > (1 - 10^6)/10^6)*(1 + 10^6)/10^6 - 1,,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:2.5,
+2023_ganchovski_traykov:f15,2023,1.1,1/(21*x - 1)*(x != 1/21),,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:2.6,
 2023_ganchovski_traykov:f16,2023,1.1,(x/2)^2 + ceil(x/2) - 1,,,"[-1, 1]",,1,new,,,new,,
 2023_ganchovski_traykov:f17,2023,1.1,ceil(10*x - 1) + 1/2,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.8,duplicate,2021_oliveira_takahashi:2.8,
 2023_ganchovski_traykov:f18,2023,1.1,x + sin(x*10^6)/10 + 1/10^3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.9,duplicate,2021_oliveira_takahashi:2.9,
@@ -827,7 +827,7 @@ gsl_roots_tests:func6,2024,1.3,(x - 1)^7,,,"[0.9995, 1.0002]",,1,duplicate,struc
 gsl_roots_tests:sin_f,2024,1.3,sin(x),,,"[3, 4], [-4, -3], [-1/3, 1]",,1,duplicate,structure,1979_ridders:III.3,duplicate,1979_ridders:III.3,
 gsl_roots_tests:cos_f,2024,1.3,cos(x),,,"[0, 3], [-3, 0]",,1,duplicate,structure,2004_moler:§4.7,duplicate,2004_moler:§4.7,
 gsl_roots_tests:func7,2024,1.3,-M_PI*x + M_E,,,,,1,new,,,new,,
-2024_jo_annealing:f1,2024,1.2,(x^2 - 1)*(x^2 + 1),,,none,,1,judge,value,1993_alefeld_potra_shi:T5.1-4,new,,"The factored x^4 - 1, which Alefeld–Potra–Shi's T5.1-4 holds expanded (n = 4, a = 1)."
+2024_jo_annealing:f1,2024,1.2,(x^2 - 1)*(x^2 + 1),,,none,,1,undecided,value,1993_alefeld_potra_shi:T5.1-4,new,,"The factored x^4 - 1, which Alefeld–Potra–Shi's T5.1-4 holds expanded (n = 4, a = 1)."
 2024_jo_annealing:f2,2024,1.2,x^3 - 1,,,none,,1,duplicate,structure,1992_alefeld_potra:1,duplicate,1992_alefeld_potra:1,
 2024_jo_annealing:f3,2024,1.2,x^12 - 1,,,none,,1,duplicate,structure,1993_alefeld_potra_shi:T5.1-4,duplicate,1993_alefeld_potra_shi:T5.1-4,
 2024_jo_annealing:f4,2024,1.2,(x^2 - 4)*(x + 1.5)*(x - 0.5),,,none,,1,new,,,new,,
@@ -842,9 +842,9 @@ gsl_roots_tests:func7,2024,1.3,-M_PI*x + M_E,,,,,1,new,,,new,,
 2024_jo_annealing:f13,2024,1.2,(x + 5/4)*exp((x + 5/4)^2) - sin(x + 5/4)^2 + 3*cos(x + 5/4) + 5,,,none,,1,new,,,new,,
 2024_jo_annealing:f14,2024,1.2,x + sin(2/x)*x^2,,,none,,1,new,,,new,,
 2024_jo_annealing:III C,2024,1.2,x^(1/3),,,none,,1,duplicate,structure,2016_burden:2.3-D4,duplicate,2016_burden:2.3-D4,
-2024_jo_annealing:(6),2024,1.2,Gamma01*sin(phi1 - Psi01) + Gamma10*sin(phi1 + Psi10),,"`Gamma01`, `Gamma10`, `Psi01`, `Psi10`; no values given",none,unknown variable unclear,0,judge,unparsed,,new,,
+2024_jo_annealing:(6),2024,1.2,Gamma01*sin(phi1 - Psi01) + Gamma10*sin(phi1 + Psi10),,"`Gamma01`, `Gamma10`, `Psi01`, `Psi10`; no values given",none,unknown variable unclear,0,undecided,unparsed,,new,,
 2025_steffen:(6),2024,1.1,exp(-x^2/4) - 2*cos(x) + x/2 - 5/2,,,"[1.0, 3.0]",,1,new,,,new,,
-2025_steffen:(8),2024,1.1,"(V/b)^3 - (1 - lambda + Tr/(Gamma*Pr))*(V/b)^2 + (sigma - lambda - lambda*Tr/(Gamma*Pr) + Lambda*alpha(omega, Tr)/(Gamma^2*Pr))*(V/b) - (sigma + sigma*Tr/(Gamma*Pr) + Lambda*alpha(omega, Tr)/(Gamma^2*Pr))",,"`lambda = 2, sigma = -1, Lambda = 0.45724, Gamma = 0.07780`; `alpha(omega, Tr) = (1 + (0.37464 + 1.54226*omega - 0.26992*omega^2)*(1 - sqrt(Tr)))^2` (Eq. (9)); `omega = 0.200, Tr = 0.85, Pr = 0.45`","[14, 17]",unknown function alpha,0,judge,unparsed,,new,,
+2025_steffen:(8),2024,1.1,"(V/b)^3 - (1 - lambda + Tr/(Gamma*Pr))*(V/b)^2 + (sigma - lambda - lambda*Tr/(Gamma*Pr) + Lambda*alpha(omega, Tr)/(Gamma^2*Pr))*(V/b) - (sigma + sigma*Tr/(Gamma*Pr) + Lambda*alpha(omega, Tr)/(Gamma^2*Pr))",,"`lambda = 2, sigma = -1, Lambda = 0.45724, Gamma = 0.07780`; `alpha(omega, Tr) = (1 + (0.37464 + 1.54226*omega - 0.26992*omega^2)*(1 - sqrt(Tr)))^2` (Eq. (9)); `omega = 0.200, Tr = 0.85, Pr = 0.45`","[14, 17]",unknown function alpha,0,undecided,unparsed,,new,,
 2025_foo_higher_order:4.2,2025,1.2,-x*log2(x) - (1 - x)*log2(1 - x) - y,,"y = 0.1, 0.2, ..., 0.9","[0, 0.5]",,1,new,,,new,,
 2025_foo_higher_order:4.3.1,2025,1.2,x*log(q - 1)/log(q) - x*log(x)/log(q) - (1 - x)*log(1 - x)/log(q) - y,,"`q = 2^127 - 1`; `y = 0.1, 0.2, ..., 0.9`","[0, (q - 1)/q]",,1,new,,,new,,
 2025_foo_higher_order:5,2025,1.2,z^6 - z + 1,,,none (complex plane),,1,new,,,new,,
@@ -867,7 +867,7 @@ gsl_roots_tests:func7,2024,1.3,-M_PI*x + M_E,,,,,1,new,,,new,,
 2025_romadani_python_implementations:3.3-1,2025,1.2,x^2 - 4,,,not given,,1,duplicate,structure,2013_epperson:3.9-6,duplicate,2013_epperson:3.9-6,
 2025_romadani_python_implementations:3.3-2a,2025,1.2,exp(x) - 2,,,not given,,1,duplicate,structure,"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13; Tables 4.13, 4.14; 4.4-1, 4.4-2",duplicate,"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13; Tables 4.13, 4.14; 4.4-1, 4.4-2",
 2025_romadani_python_implementations:3.3-2b,2025,1.2,sin(x) - x/2,,,not given,,1,duplicate,structure,1993_alefeld_potra_shi:T5.1-1,duplicate,1993_alefeld_potra_shi:T5.1-1,
-2025_romadani_python_implementations:3.3-3,2025,1.2,(x - 1)^2,,,not given,,1,judge,value,2013_epperson:3.9-5(e),new,,"The factored (x - 1)^2; x - g(x) of Epperson's 3.9-5(e), x = (x^2 + 1)/2, is its expanded form times -1/2."
+2025_romadani_python_implementations:3.3-3,2025,1.2,(x - 1)^2,,,not given,,1,undecided,value,2013_epperson:3.9-5(e),new,,"The factored (x - 1)^2; x - g(x) of Epperson's 3.9-5(e), x = (x^2 + 1)/2, is its expanded form times -1/2."
 2025_romadani_python_implementations:3.3-4a,2025,1.2,x^(1/3),,,not given,,1,duplicate,structure,2016_burden:2.3-D4,duplicate,2016_burden:2.3-D4,
 2025_romadani_python_implementations:3.3-4b,2025,1.2,x*cos(x) - 1,,,not given,,1,new,,,new,,
 2025_romadani_python_implementations:5.1,2025,1.2,x^7 - 2*x^6 + 4*x^5 - 1,,,"[0, 1]",,1,new,,,new,,
@@ -875,7 +875,7 @@ gsl_roots_tests:func7,2024,1.3,-M_PI*x + M_E,,,,,1,new,,,new,,
 2025_romadani_python_implementations:5.3,2025,1.2,exp(-x) - exp(-2*x) - exp(-3*x),,,"`[0, 1]`; root search over `[-2, 2]`",,1,new,,,new,,
 2025_romadani_python_implementations:5.4,2025,1.2,cos(exp(x/2))^3 - x^3,,,"`[0, 1]`; root search over `[-1, 1]`",,1,new,,,new,,
 roots_fortran:1,2025,1.3,sin(x) - x/2.0,,,"[pi/2, pi]",,1,duplicate,structure,1993_alefeld_potra_shi:T5.1-1,duplicate,1993_alefeld_potra_shi:T5.1-1,
-roots_fortran:2–11,2025,1.3,,"`-2.0*sum((2.0*i - 5.0)^2/(x - i*i)^3)`, summed over i = 1, ..., 20",,"[1 + 1.0e-9, 4 - 1.0e-9] (2), [4 + 1.0e-9, 9 - 1.0e-9] (3), [9 + 1.0e-9, 16 - 1.0e-9] (4), [16 + 1.0e-9, 25 - 1.0e-9] (5), [25 + 1.0e-9, 36 - 1.0e-9] (6), [36 + 1.0e-9, 49 - 1.0e-9] (7), [49 + 1.0e-9, 64 - 1.0e-9] (8), [64 + 1.0e-9, 81 - 1.0e-9] (9), [81 + 1.0e-9, 100 - 1.0e-9] (10), [100 + 1.0e-9, 121 - 1.0e-9] (11)",not 1 expression,0,judge,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-2,Its intervals n = 1(1)10 are a subset of the 1993 article's n = 1(1)19.
+roots_fortran:2–11,2025,1.3,,"`-2.0*sum((2.0*i - 5.0)^2/(x - i*i)^3)`, summed over i = 1, ..., 20",,"[1 + 1.0e-9, 4 - 1.0e-9] (2), [4 + 1.0e-9, 9 - 1.0e-9] (3), [9 + 1.0e-9, 16 - 1.0e-9] (4), [16 + 1.0e-9, 25 - 1.0e-9] (5), [25 + 1.0e-9, 36 - 1.0e-9] (6), [36 + 1.0e-9, 49 - 1.0e-9] (7), [49 + 1.0e-9, 64 - 1.0e-9] (8), [64 + 1.0e-9, 81 - 1.0e-9] (9), [81 + 1.0e-9, 100 - 1.0e-9] (10), [100 + 1.0e-9, 121 - 1.0e-9] (11)",not 1 expression,0,undecided,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-2,Its intervals n = 1(1)10 are a subset of the 1993 article's n = 1(1)19.
 roots_fortran:12,2025,1.3,-n*x*exp(-1.0*x),,"n = 40, 100, 200","[-9, 31]",,3,duplicate,structure,1993_alefeld_potra_shi:T5.1-3,duplicate,1993_alefeld_potra_shi:T5.1-3,
 roots_fortran:13,2025,1.3,x^3 - 2.0*x - x + 3.0,,,"[-3, 2]",,1,new,,,new,,
 roots_fortran:14,2025,1.3,exp(-x) - x - sin(x),,,"[0, 2]",,1,duplicate,structure,2012_suhadolnik:13,duplicate,2012_suhadolnik:13,
@@ -889,9 +889,9 @@ roots_fortran:22,2025,1.3,(1.0 + (1.0 - n)^4)*x - (1.0 - n*x)^4,,"n = 1, 2, 4, 5
 roots_fortran:23,2025,1.3,(x - 1.0)*exp(-n*x) + x^n,,"n = 1, 5, 10, 15, 20","[0, 1]",,5,duplicate,structure,1971_dowell_jarratt_illinois:Table 6 | 1973_anderson_bjorck:Ex. 6,duplicate,1971_dowell_jarratt_illinois:Table 6 | 1973_anderson_bjorck:Ex. 6,
 roots_fortran:24,2025,1.3,(n*x - 1.0)/((n - 1.0)*x),,"n = 2, 5, 15, 20","[0.01, 1]",,4,duplicate,structure,1971_dowell_jarratt_illinois:Table 7,duplicate,1971_dowell_jarratt_illinois:Table 7,
 roots_fortran:25,2025,1.3,x^(1.0/n) - n^(1.0/n),,"n = 2, 3, 4, 5, 6, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33","[1, 100]",,19,extended,"family, new parameter values",1995_alefeld_potra_shi:12,extended,1995_alefeld_potra_shi:12,
-roots_fortran:26–27,2025,1.3,,`x/exp(1.0/(x*x))` (x != 0); `0.0` (x = 0),,"[-1, 4] (26), [-1.1234, 4.4567] (27)",not 1 expression,0,judge,unparsed,,duplicate,1971_brent:3.2,"Written as x/exp(1/x^2), the form of TOMS 748's driver; in double precision both forms are 0 for abs(x) below about 0.037 and agree elsewhere up to rounding."
-roots_fortran:28,2025,1.3,,`(x/1.5 + sin(x) - 1.0)*n/20.0` (x >= 0); `-n/20.0` (x < 0),"n = 1, 2","[-10000, pi/2]",not 1 expression,0,judge,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-13,"Its n = 1, 2 are among the 1993 article's n = 1(1)40."
-roots_fortran:29,2025,1.3,,`exp(1.0) - 1.859` (x >= 1.0e-3*2.0/(n + 1.0)); `exp((n + 1.0)*0.5*x*1000.0) - 1.859` (0 <= x < 1.0e-3*2.0/(n + 1.0)); `-0.859` (x < 0),"n = 20, 40, 100","[-10000, 1.0e-4]",not 1 expression,0,judge,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-14,"Its n = 20, 40, 100 are among the 1993 article's values of n."
+roots_fortran:26–27,2025,1.3,,`x/exp(1.0/(x*x))` (x != 0); `0.0` (x = 0),,"[-1, 4] (26), [-1.1234, 4.4567] (27)",not 1 expression,0,undecided,unparsed,,duplicate,1971_brent:3.2,"Written as x/exp(1/x^2), the form of TOMS 748's driver; in double precision both forms are 0 for abs(x) below about 0.037 and agree elsewhere up to rounding."
+roots_fortran:28,2025,1.3,,`(x/1.5 + sin(x) - 1.0)*n/20.0` (x >= 0); `-n/20.0` (x < 0),"n = 1, 2","[-10000, pi/2]",not 1 expression,0,undecided,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-13,"Its n = 1, 2 are among the 1993 article's n = 1(1)40."
+roots_fortran:29,2025,1.3,,`exp(1.0) - 1.859` (x >= 1.0e-3*2.0/(n + 1.0)); `exp((n + 1.0)*0.5*x*1000.0) - 1.859` (0 <= x < 1.0e-3*2.0/(n + 1.0)); `-0.859` (x < 0),"n = 20, 40, 100","[-10000, 1.0e-4]",not 1 expression,0,undecided,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-14,"Its n = 20, 40, 100 are among the 1993 article's values of n."
 roots_fortran:30,2025,1.3,3.0*sin(x) - 2.0,,,"[0, 1]",,1,duplicate,structure,2010_gottlieb:1,duplicate,2010_gottlieb:1,
 roots_fortran:31,2025,1.3,x*exp(x) - 1.0,,,"[-1, 1]",,1,duplicate,structure,2008_naghipoor:T1.1,duplicate,2008_naghipoor:T1.1,
 roots_fortran:32,2025,1.3,11.0*x^11 - 1.0,,,"[0.1, 0.9]",,1,duplicate,structure,1992_alefeld_potra:3,duplicate,1992_alefeld_potra:3,
@@ -914,7 +914,7 @@ roots_fortran:49–50,2025,1.3,(x - 3.0)^3,,,"[0, 5] (49), [-1.0e10, 1.0e10] (50
 roots_fortran:51–52,2025,1.3,6.0*(x - 2.0)^5,,,"[0, 5] (51), [-1.0e10, 1.0e10] (52)",,1,duplicate,structure,1997_chandrupatla:4,duplicate,1997_chandrupatla:4,
 roots_fortran:53–54,2025,1.3,x^9,,,"[-1, 4] (53), [-10, 100] (54)",,1,duplicate,structure,1973_brent_book:T4.1 r1-2,duplicate,1973_brent_book:T4.1 r1-2,
 roots_fortran:55–56,2025,1.3,x^19,,,"[-1, 4] (55), [-10, 100] (56)",,1,duplicate,structure,1973_brent_book:T4.1 r3,duplicate,1973_brent_book:T4.1 r3,
-roots_fortran:57–58,2025,1.3,,`0.0` (abs(x) < 3.8e-4); `x*exp(-x^(-2))` (otherwise),,"[-1, 4] (57), [-10, 100] (58)",not 1 expression,0,judge,unparsed,,duplicate,1971_brent:3.2,"Brent's (4.1), whose cutoff to 0 for abs(x) < 3.8*10^-4 changes no computed value."
+roots_fortran:57–58,2025,1.3,,`0.0` (abs(x) < 3.8e-4); `x*exp(-x^(-2))` (otherwise),,"[-1, 4] (57), [-10, 100] (58)",not 1 expression,0,undecided,unparsed,,duplicate,1971_brent:3.2,"Brent's (4.1), whose cutoff to 0 for abs(x) < 3.8*10^-4 changes no computed value."
 roots_fortran:59–60,2025,1.3,-(3062.0*(1.0 - xi)*exp(-x))/(xi + (1.0 - xi)*exp(-x)) - 1013.0 + 1628.0/x,,"xi = 0.61489, a constant in the function body","[2.0e-4, 2] (59), [2.0e-4, 81] (60)",,1,duplicate,structure,1997_chandrupatla:8,duplicate,1997_chandrupatla:8,
 roots_fortran:61–62,2025,1.3,exp(x) - 2.0 - 0.01/(x*x) + 2.0e-6/(x*x*x),,,"[2.0e-4, 1] (61), [2.0e-4, 81] (62)",,1,duplicate,structure,1997_chandrupatla:9,duplicate,1997_chandrupatla:9,
 roots_fortran:63,2025,1.3,x^3 + 4.0*x^2 - 10.0,,,"[0, 1.5]",,1,duplicate,structure,2000_weerakoon:1,duplicate,2000_weerakoon:1,
@@ -964,20 +964,20 @@ roots_fortran:121,2025,1.3,sin(x) + 1.0/2.0,,,"[-1, 1]",,1,duplicate,structure,2
 roots_fortran:122,2025,1.3,4.0*x^5 + x^2 + 1.0,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:1.4,duplicate,2021_oliveira_takahashi:1.4,
 roots_fortran:123,2025,1.3,x + x^10 - 1.0,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:1.5,duplicate,2021_oliveira_takahashi:1.5,
 roots_fortran:124,2025,1.3,pi^x - exp(1.0),,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:1.6,duplicate,2021_oliveira_takahashi:1.6,
-roots_fortran:125,2025,1.3,"1.0/3.0 + sign(1.0, x)*abs(x)^(1.0/3.0) + x^3",,,"[-1, 1]",sympy: TypeError,0,judge,unparsed,,duplicate,2021_oliveira_takahashi:1.8,"Fortran's sign(1.0, x) is 1 at x = 0, where sign(x) is 0, but the term that it multiplies is 0 there."
-roots_fortran:126,2025,1.3,,"`1.0/10.0^3 + sum(sin(pi*i^3*x/2.0)/pi/i^3)`, summed over i = 1, ..., 10",,"[-1, 1]",not 1 expression,0,judge,unparsed,,duplicate,2021_oliveira_takahashi:1.9,
+roots_fortran:125,2025,1.3,"1.0/3.0 + sign(1.0, x)*abs(x)^(1.0/3.0) + x^3",,,"[-1, 1]",sympy: TypeError,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:1.8,"Fortran's sign(1.0, x) is 1 at x = 0, where sign(x) is 0, but the term that it multiplies is 0 there."
+roots_fortran:126,2025,1.3,,"`1.0/10.0^3 + sum(sin(pi*i^3*x/2.0)/pi/i^3)`, summed over i = 1, ..., 10",,"[-1, 1]",not 1 expression,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:1.9,
 roots_fortran:127,2025,1.3,(x + 2.0/3.0)/(x + 101.0/100.0),,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:1.10,duplicate,2021_oliveira_takahashi:1.10,
 roots_fortran:128,2025,1.3,(x*1.0e6 - 1.0)^3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.1,duplicate,2021_oliveira_takahashi:2.1,
 roots_fortran:129,2025,1.3,exp(x)*(x*1.0e6 - 1.0)^3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.2,duplicate,2021_oliveira_takahashi:2.2,
 roots_fortran:130,2025,1.3,(x - 1.0/3.0)^2*atan(x - 1.0/3.0),,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.3,duplicate,2021_oliveira_takahashi:2.3,
-roots_fortran:131,2025,1.3,"sign(1.0, 3.0*x + 1.0)*(1.0 - sqrt(1.0 - (3.0*x + 1.0)^2/(9^2)))",,,"[-1, 1]",sympy: TypeError,0,judge,unparsed,,duplicate,2021_oliveira_takahashi:2.4,"Fortran's sign(1.0, 3*x + 1) differs from sign(3*x + 1) only where the factor that it multiplies is 0."
+roots_fortran:131,2025,1.3,"sign(1.0, 3.0*x + 1.0)*(1.0 - sqrt(1.0 - (3.0*x + 1.0)^2/(9^2)))",,,"[-1, 1]",sympy: TypeError,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:2.4,"Fortran's sign(1.0, 3*x + 1) differs from sign(3*x + 1) only where the factor that it multiplies is 0."
 roots_fortran:132,2025,1.3,x,,,"[-1000, 1]",,1,duplicate,structure,2003_suli_mayers:Example 1.6 (g1),duplicate,2003_suli_mayers:Example 1.6 (g1),
 roots_fortran:133,2025,1.3,y1 + ((x - x1)/(x2 - x1))*(y2 - y1),,"x1 = 0.0, x2 = 157.08, y1 = 1012.0, y2 = -1114.0, constants in the case","[x1, x2] = [0, 157.08]",,1,new,,,new,,
 roots_fortran:134,2025,1.3,log(x),,,"[0.5, 5]",,1,duplicate,structure,2006_chen_li:1,duplicate,2006_chen_li:1,
 roots_fortran:135,2025,1.3,(10.0 - x)*exp(-10.0*x) - x^10 + 1.0,,,"[0.5, 8]",,1,duplicate,structure,2012_suhadolnik:2,duplicate,2012_suhadolnik:2,
 roots_fortran:136,2025,1.3,exp(sin(x)) - x - 1.0,,,"[1, 4]",,1,duplicate,structure,2006_chen_li:2,duplicate,2006_chen_li:2,
 roots_fortran:137,2025,1.3,2.0*sin(x) - 1.0,,,"[0.1, pi/3]",,1,duplicate,structure,1971_dowell_jarratt_illinois:Table 1,duplicate,1971_dowell_jarratt_illinois:Table 1,
-roots_fortran:138–139,2025,1.3,,`abs(x - 2.0/3.0)^0.5 - 0.1` (x <= 2.0/3.0); `-abs(x - 2.0/3.0)^0.5 - 0.1` (otherwise),,"[-10, 10] (138), [-10000, 10] (139)",not 1 expression,0,judge,unparsed,,duplicate,2013_stage:3.7,
+roots_fortran:138–139,2025,1.3,,`abs(x - 2.0/3.0)^0.5 - 0.1` (x <= 2.0/3.0); `-abs(x - 2.0/3.0)^0.5 - 0.1` (otherwise),,"[-10, 10] (138), [-10000, 10] (139)",not 1 expression,0,undecided,unparsed,,duplicate,2013_stage:3.7,
 roots_fortran:140,2025,1.3,(x - 1.0)*exp(-x),,,"[0, 1.5]",,1,duplicate,structure,2012_suhadolnik:7,duplicate,2012_suhadolnik:7,
 roots_fortran:141,2025,1.3,cos(x) - x,,,"[0, 1.7]",,1,duplicate,structure,2000_weerakoon:4,duplicate,2000_weerakoon:4,
 roots_fortran:142,2025,1.3,exp(x^2 + 7*x - 30.0) - 1.0,,,"[2.6, 3.5]",,1,duplicate,structure,2000_weerakoon:9,duplicate,2000_weerakoon:9,
@@ -1039,8 +1039,8 @@ roots_fortran:155–157,2025,1.3,(x^2 - x - 6.0)*(x^2 - 3.0*x + 2.0),,,"[0, 1.9]
 2026_alhseno:42,2026,1.2,atan(x) - 0.5,,,none,,1,new,,,new,,
 2026_alhseno:43,2026,1.2,erf(x) - 0.5,,,none,,1,new,,,new,,
 2026_alhseno:4.5,2026,1.2,z^3 - 1,,,"none; basins of attraction over `[-2, 2] x [-2, 2]` in the complex plane",,1,duplicate,structure,1992_alefeld_potra:1,duplicate,1992_alefeld_potra:1,
-2026_beffert_catenary:(4),2026,1.2,abs(dx)*sinh(b_hat)/b_hat - sqrt(L^2 - dy^2),,"Endpoint offsets `dx`, `dy` and cable length `L`, with `L > sqrt(dx^2 + dy^2) + eps`, `abs(dx) > eps`, `eps = 1e-6` m. Only `r = sqrt(L^2 - dy^2)/abs(dx)` matters, with `1 < r <= r_max = L/eps = 3*10^7` for a 30 m tether. Flight 1: 266 solves with `r` from 1.050 to 2723.957 (median 2.008); Flight 2: 4875 configurations; plus a logarithmic sweep of 20000 values of `r` in `(1, r_max]`.","`[0, b_hi]` with `b_hi = sqrt(-10 + sqrt(100 + 120*(r - 1)))` (eqs. (7), (19))",unknown variable unclear,0,judge,unparsed,,new,,
-2026_beffert_catenary:(3),2026,1.2,2*a*sinh(abs(dx)/(2*a)) - sqrt(L^2 - dy^2),,as in row (4),"(0, inf)",unknown variable unclear,0,judge,unparsed,,new,,"Row (4) in the variable a = abs(dx)/(2*b_hat): a change of variable, not a shift."
+2026_beffert_catenary:(4),2026,1.2,abs(dx)*sinh(b_hat)/b_hat - sqrt(L^2 - dy^2),,"Endpoint offsets `dx`, `dy` and cable length `L`, with `L > sqrt(dx^2 + dy^2) + eps`, `abs(dx) > eps`, `eps = 1e-6` m. Only `r = sqrt(L^2 - dy^2)/abs(dx)` matters, with `1 < r <= r_max = L/eps = 3*10^7` for a 30 m tether. Flight 1: 266 solves with `r` from 1.050 to 2723.957 (median 2.008); Flight 2: 4875 configurations; plus a logarithmic sweep of 20000 values of `r` in `(1, r_max]`.","`[0, b_hi]` with `b_hi = sqrt(-10 + sqrt(100 + 120*(r - 1)))` (eqs. (7), (19))",unknown variable unclear,0,undecided,unparsed,,new,,
+2026_beffert_catenary:(3),2026,1.2,2*a*sinh(abs(dx)/(2*a)) - sqrt(L^2 - dy^2),,as in row (4),"(0, inf)",unknown variable unclear,0,undecided,unparsed,,new,,"Row (4) in the variable a = abs(dx)/(2*b_hat): a change of variable, not a shift."
 2026_bouthat_random_bisection:Section 5,2026,1.2,x - r,,"Section 5.1: `r` drawn from `U(0, 1)` (Tables 1, 2), or fixed at `r = 0.1, 0.3, 0.45` (Table 3). Section 5.2: `r` drawn from `U(0, 1)`, `Beta(2, 2)`, `Beta(0.5, 2)`, `Bates(20)`, `Beta(3, 5)`, `Beta(1, 20)`, `Beta(0.1, 2)` and a density `p(x) = (1 - alpha)/2^alpha*abs(x - 1/2)^(-alpha)` with `alpha = 0.9`. Section 5.3: `r` drawn from `Beta(5, 50)`.",not stated for Section 5,,3,new,,,new,,
 2026_cadenas_reflected_box:g1,2026,1.2,(x - 2)*cos(5*x),,,not given,,1,new,,,new,,
 2026_cadenas_reflected_box:g2,2026,1.2,exp(-x^2) - 0.1,,,not given,,1,new,,,new,,
@@ -1079,7 +1079,7 @@ roots_fortran:155–157,2025,1.3,(x^2 - x - 6.0)*(x^2 - 3.0*x + 2.0),,,"[0, 1.9]
 2026_ellithy:27,2026,1.2,x^4 - 2*x^2 - 4,,,"[1, 3]",,1,new,,,new,,
 2026_ellithy:28,2026,1.2,x - 0.5 * sin(x) - 1,,,"[0, 3]",,1,new,,,new,,
 2026_ellithy:29,2026,1.2,exp(-x) - cos(3*x) - 0.5,,,"[0, 1]",,1,new,,,new,,
-2026_ellithy:30,2026,1.2,(x - 1)*(x - 2)*...*(x - 20),,,"[0, 1.5]",conditions or prose,0,judge,unparsed,,new,,Wilkinson's polynomial as a product; no earlier row holds it.
+2026_ellithy:30,2026,1.2,(x - 1)*(x - 2)*...*(x - 20),,,"[0, 1.5]",conditions or prose,0,undecided,unparsed,,new,,Wilkinson's polynomial as a product; no earlier row holds it.
 2026_ellithy:31,2026,1.2,(x - 1)*(x - 2)*...*(x - 20),,,"[19, 21]",conditions or prose,0,duplicate,same text,2026_ellithy:30,duplicate,2026_ellithy:30,
 2026_ellithy:32,2026,1.2,x^4 + 2*x^2 - x - 1,,,"[-0.5, 0]",,1,new,,,new,,
 2026_ellithy:33,2026,1.2,x^4 - 10*x^3 + 35*x^2 - 50*x + 24,,,"[0, 1.5]",,1,duplicate,structure,2013_epperson:3.10-1,duplicate,2013_epperson:3.10-1,
@@ -1124,7 +1124,7 @@ roots_fortran:155–157,2025,1.3,(x^2 - x - 6.0)*(x^2 - 3.0*x + 2.0),,,"[0, 1.9]
 2026_ganchovski_et_al:f24,2026,1.1,(x + 2)*(x + 1)*(x - 3)^3,,,"[2.6, 4.6]",,1,duplicate,structure,2011_galdino:f1,duplicate,2011_galdino:f1,
 2026_ganchovski_et_al:f25,2026,1.1,(x - 4)^5*log(x),,,"[3.6, 5.6]",,1,duplicate,structure,2011_galdino:f2,duplicate,2011_galdino:f2,
 2026_ganchovski_et_al:f26,2026,1.1,(sin(x) - x/4)^3,,,"[2, 4]",,1,duplicate,structure,2011_galdino:f3,duplicate,2011_galdino:f3,
-2026_ganchovski_et_al:f27,2026,1.1,,"`(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 - p(x)))))*sign(p(x) - 3)`, where `p(x) = x + 1.11111`",,"[1, 3]",not 1 expression,0,judge,unparsed,,duplicate,2011_galdino:f4,
+2026_ganchovski_et_al:f27,2026,1.1,,"`(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 - p(x)))))*sign(p(x) - 3)`, where `p(x) = x + 1.11111`",,"[1, 3]",not 1 expression,0,undecided,unparsed,,duplicate,2011_galdino:f4,
 2026_ganchovski_et_al:f28,2026,1.1,sin((x - 7.143)^3),,,"[7, 8]",,1,duplicate,structure,2011_galdino:f5,duplicate,2011_galdino:f5,
 2026_ganchovski_et_al:f29,2026,1.1,exp((x - 3)^5) - 1,,,"[2.6, 4.6]",,1,duplicate,structure,2011_galdino:f6,duplicate,2011_galdino:f6,
 2026_ganchovski_et_al:f30,2026,1.1,exp((x - 3)^5) - exp(x - 1),,,"[4, 5]",,1,duplicate,structure,2011_galdino:f7,duplicate,2011_galdino:f7,
@@ -1132,12 +1132,12 @@ roots_fortran:155–157,2025,1.3,(x^2 - x - 6.0)*(x^2 - 3.0*x + 2.0),,,"[0, 1.9]
 2026_ganchovski_et_al:f32,2026,1.1,4 - tan(x),,,"[0, 1.5]",,1,duplicate,structure,2023_ganchovski_traykov:§3,duplicate,2023_ganchovski_traykov:§3,
 2026_ganchovski_et_al:f33,2026,1.1,cos(x) - x^3,,,"[0, 4]",,1,duplicate,structure,2011_zhang:3,duplicate,2011_zhang:3,
 2026_ganchovski_et_al:f34,2026,1.1,cos(x) - x,,,"[-11, 9]",,1,duplicate,structure,2000_weerakoon:4,duplicate,2000_weerakoon:4,
-2026_ganchovski_et_al:f35,2026,1.1,sqrt(abs(x - 2/3))*if(x <= 2/3; 1; -1) - 0.1,,,"[-11, 9]",conditions or prose,0,judge,unparsed,,duplicate,2013_stage:3.7,
-2026_ganchovski_et_al:f36,2026,1.1,abs(x - 2/3)^0.2*if(x <= 2/3; 1; -1),,,"[-11, 9]",conditions or prose,0,judge,unparsed,,duplicate,2013_stage:3.9,
+2026_ganchovski_et_al:f35,2026,1.1,sqrt(abs(x - 2/3))*if(x <= 2/3; 1; -1) - 0.1,,,"[-11, 9]",conditions or prose,0,undecided,unparsed,,duplicate,2013_stage:3.7,
+2026_ganchovski_et_al:f36,2026,1.1,abs(x - 2/3)^0.2*if(x <= 2/3; 1; -1),,,"[-11, 9]",conditions or prose,0,undecided,unparsed,,duplicate,2013_stage:3.9,
 2026_ganchovski_et_al:f37,2026,1.1,(x - 7/9)^3 + (x - 7/9)*10^-3,,,"[-11, 9]",,1,duplicate,structure,2013_stage:3.10,duplicate,2013_stage:3.10,
-2026_ganchovski_et_al:f38,2026,1.1,if(x <= 1/3; -0.5; 0.5),,,"[-11, 9]",conditions or prose,0,judge,unparsed,,duplicate,2013_stage:3.11,
-2026_ganchovski_et_al:f39,2026,1.1,if(x <= 1/3; -10^-3; 1 - 10^-3),,,"[-11, 9]",conditions or prose,0,judge,unparsed,,duplicate,2013_stage:3.12,
-2026_ganchovski_et_al:f40,2026,1.1,if(x = 0; 0.0; 1/(x - 2/3)),,,"[-11, 9]",conditions or prose,0,judge,unparsed,,duplicate,2013_stage:3.13,"Compared with the function that Stage meant: Stage's printed (1 - 2/3)^-1 is a misprint for 1/(x - 2/3), the form of its plot title."
+2026_ganchovski_et_al:f38,2026,1.1,if(x <= 1/3; -0.5; 0.5),,,"[-11, 9]",conditions or prose,0,undecided,unparsed,,duplicate,2013_stage:3.11,
+2026_ganchovski_et_al:f39,2026,1.1,if(x <= 1/3; -10^-3; 1 - 10^-3),,,"[-11, 9]",conditions or prose,0,undecided,unparsed,,duplicate,2013_stage:3.12,
+2026_ganchovski_et_al:f40,2026,1.1,if(x = 0; 0.0; 1/(x - 2/3)),,,"[-11, 9]",conditions or prose,0,undecided,unparsed,,duplicate,2013_stage:3.13,"Compared with the function that Stage meant: Stage's printed (1 - 2/3)^-1 is a misprint for 1/(x - 2/3), the form of its plot title."
 2026_ganchovski_et_al:f41,2026,1.1,2*x*exp(-5) - 2*exp(-5*x) + 1,,,"[0, 10]",,1,duplicate,structure,1971_dowell_jarratt_illinois:Table 2,duplicate,1971_dowell_jarratt_illinois:Table 2,
 2026_ganchovski_et_al:f42,2026,1.1,(x^2 - x - 6)*(x^2 - 3*x + 2),,,"[0, pi]",,1,duplicate,structure,roots_fortran:155–157,duplicate,roots_fortran:155–157,
 2026_ganchovski_et_al:f43,2026,1.1,x^3,,,"[-1, 1.5]",,1,duplicate,structure,1975_bus_dekker:III,duplicate,1975_bus_dekker:III,
@@ -1146,7 +1146,7 @@ roots_fortran:155–157,2025,1.3,(x^2 - x - 6.0)*(x^2 - 3.0*x + 2.0),,,"[0, 1.9]
 2026_ganchovski_et_al:f46,2026,1.1,(exp(-5*x) - x - 0.5)/x^5,,,"[0.09, 0.7]",,1,new,,,new,,
 2026_ganchovski_et_al:f47,2026,1.1,1/sqrt(x) - 2*log(5*10^3*sqrt(x)) + 0.8,,,"[0.0005, 0.5]",,1,new,,,new,,
 2026_ganchovski_et_al:f48,2026,1.1,1/sqrt(x) - 2*log(5*10^7*sqrt(x)) + 0.8,,,"[0.0005, 0.5]",,1,new,,,new,,
-2026_ganchovski_et_al:f49,2026,1.1,if(x <= 0; -x^3 - x - 1; x^(1/3) - x - 1),,,"[-1, 1]",conditions or prose,0,judge,unparsed,,new,,
+2026_ganchovski_et_al:f49,2026,1.1,if(x <= 0; -x^3 - x - 1; x^(1/3) - x - 1),,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,new,,
 2026_ganchovski_et_al:f50,2026,1.1,x^3 - 2*x - x + 3,,,"[-3, 2]",,1,duplicate,structure,roots_fortran:13,duplicate,roots_fortran:13,
 2026_ganchovski_et_al:f51,2026,1.1,log(x),,,"[0.5, 5]",,1,duplicate,structure,2006_chen_li:1,duplicate,2006_chen_li:1,
 2026_ganchovski_et_al:f52,2026,1.1,(10 - x)*exp(-10*x) - x^10 + 1,,,"[0.5, 8]",,1,duplicate,structure,2012_suhadolnik:2,duplicate,2012_suhadolnik:2,
@@ -1173,12 +1173,12 @@ roots_fortran:155–157,2025,1.3,(x^2 - x - 6.0)*(x^2 - 3.0*x + 2.0),,,"[0, 1.9]
 2026_ganchovski_et_al:f73,2026,1.1,exp(x)*(x*10^6 - 1)^3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.2,duplicate,2021_oliveira_takahashi:2.2,
 2026_ganchovski_et_al:f74,2026,1.1,(x - 1/3)^2*atan(x - 1/3),,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.3,duplicate,2021_oliveira_takahashi:2.3,
 2026_ganchovski_et_al:f75,2026,1.1,sign(3*x - 1)*(1 - sqrt(1 - (3*x - 1)^2/81)),,,"[-1, 1]",,1,new,,,variant,2021_oliveira_takahashi:2.4,Oliveira-Takahashi's Circles function shifted by 2/3 in x (3*x - 1 for 3*x + 1).
-2026_ganchovski_et_al:f76,2026,1.1,if(x > (1 - 10^6)/10^6; (1 + 10^6)/10^6; -1),,,"[-1, 1]",conditions or prose,0,judge,unparsed,,new,,"Similar to 2013_stage:3.11, a step, but a different function."
-2026_ganchovski_et_al:f77,2026,1.1,if(x != 1/21; 1/(21*x - 1); 0),,,"[-1, 1]",conditions or prose,0,judge,unparsed,,duplicate,2021_oliveira_takahashi:2.6,
+2026_ganchovski_et_al:f76,2026,1.1,if(x > (1 - 10^6)/10^6; (1 + 10^6)/10^6; -1),,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,new,,"Similar to 2013_stage:3.11, a step, but a different function."
+2026_ganchovski_et_al:f77,2026,1.1,if(x != 1/21; 1/(21*x - 1); 0),,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:2.6,
 2026_ganchovski_et_al:f78,2026,1.1,x^2/4 + ceil(x/2) - 0.5,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.7,duplicate,2021_oliveira_takahashi:2.7,
 2026_ganchovski_et_al:f79,2026,1.1,ceil(10*x - 1) + 0.5,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.8,duplicate,2021_oliveira_takahashi:2.8,
 2026_ganchovski_et_al:f80,2026,1.1,x + sin(x*10^6)/10 + 10^-3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.9,duplicate,2021_oliveira_takahashi:2.9,
-2026_ganchovski_et_al:f81,2026,1.1,if(x > -1; 1 + sin(1/(x + 1)); -1),,,"[-1, 1]",conditions or prose,0,judge,unparsed,,new,,"Not Oliveira-Takahashi 2.10, which the article names: the first branch lacks Oliveira-Takahashi's - 1, so 1 + sin(1/(x + 1)) touches 0 without a sign change."
+2026_ganchovski_et_al:f81,2026,1.1,if(x > -1; 1 + sin(1/(x + 1)); -1),,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,new,,"Not Oliveira-Takahashi 2.10, which the article names: the first branch lacks Oliveira-Takahashi's - 1, so 1 + sin(1/(x + 1)) touches 0 without a sign change."
 2026_ganchovski_et_al:f82,2026,1.1,202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 0.1,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.11,duplicate,2021_oliveira_takahashi:2.11,
 2026_ganchovski_et_al:f83,2026,1.1,(202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 0.1)^3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.12,duplicate,2021_oliveira_takahashi:2.12,
 2026_ganchovski_et_al:f84,2026,1.1,(x - 1)*(x - 2)*(x - 3)*(x - 4)*(x - 5) - 0.05,,,"[0.5, 5.5]",,1,new,,,new,,
@@ -1216,7 +1216,7 @@ ganchovski_test_functions:f23,2026,1.3,x^2 + sin(x/20) - 1/4,,,"[0, 1]",,1,dupli
 ganchovski_test_functions:f24,2026,1.3,(x + 2)*(x + 1)*(x - 3)^3,,,"[2.6, 4.6]",,1,duplicate,structure,2011_galdino:f1,duplicate,2011_galdino:f1,
 ganchovski_test_functions:f25,2026,1.3,(x - 4)^5*log(x),,,"[3.6, 5.6]",,1,duplicate,structure,2011_galdino:f2,duplicate,2011_galdino:f2,
 ganchovski_test_functions:f26,2026,1.3,(sin(x) - x/4)^3,,,"[2, 4]",,1,duplicate,structure,2011_galdino:f3,duplicate,2011_galdino:f3,
-ganchovski_test_functions:f27,2026,1.3,,"`(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 - p(x)))))*(sign(p(x) - 3))`, where `p(x) = x + 1.11`",,"[1, 3]",not 1 expression,0,judge,unparsed,,variant,2011_galdino:f4,"P = x + 1.11 where Galdino has x + 1.11111, a shift in x."
+ganchovski_test_functions:f27,2026,1.3,,"`(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 - p(x)))))*(sign(p(x) - 3))`, where `p(x) = x + 1.11`",,"[1, 3]",not 1 expression,0,undecided,unparsed,,variant,2011_galdino:f4,"P = x + 1.11 where Galdino has x + 1.11111, a shift in x."
 ganchovski_test_functions:f28,2026,1.3,sin((x - 7.14)^3),,,"[7, 8]",,1,duplicate,structure,roots_fortran:149,duplicate,roots_fortran:149,
 ganchovski_test_functions:f29,2026,1.3,exp((x - 3)^5) - 1,,,"[2.6, 3.6]",,1,duplicate,structure,2011_galdino:f6,duplicate,2011_galdino:f6,
 ganchovski_test_functions:f30,2026,1.3,exp((x - 3)^5) - exp(x - 1),,,"[4, 5]",,1,duplicate,structure,2011_galdino:f7,duplicate,2011_galdino:f7,
@@ -1225,11 +1225,11 @@ ganchovski_test_functions:f32,2026,1.3,4 - tan(x),,,"[0, 1.5]",,1,duplicate,stru
 ganchovski_test_functions:f33,2026,1.3,cos(x) - x^3,,,"[0, 4]",,1,duplicate,structure,2011_zhang:3,duplicate,2011_zhang:3,
 ganchovski_test_functions:f34,2026,1.3,cos(x) - x,,,"[-11, 9]",,1,duplicate,structure,2000_weerakoon:4,duplicate,2000_weerakoon:4,
 ganchovski_test_functions:f35,2026,1.3,sqrt(abs(x - 2/3))*if(x <= 2/3; 1; -1) - 0.1,,,"[-11, 9]",conditions or prose,0,duplicate,same text,2026_ganchovski_et_al:f35,duplicate,2013_stage:3.7,"The same function as 2026_ganchovski_et_al:f35, which is itself a duplicate of this earlier row."
-ganchovski_test_functions:f36,2026,1.3,(abs(x - 2/3))^0.2*if(x <= 2/3; 1; -1),,,"[-11, 9]",conditions or prose,0,judge,unparsed,,duplicate,2013_stage:3.9,
+ganchovski_test_functions:f36,2026,1.3,(abs(x - 2/3))^0.2*if(x <= 2/3; 1; -1),,,"[-11, 9]",conditions or prose,0,undecided,unparsed,,duplicate,2013_stage:3.9,
 ganchovski_test_functions:f37,2026,1.3,(x - 7/9)^3 + (x - 7/9)*10^-3,,,"[-11, 9]",,1,duplicate,structure,2013_stage:3.10,duplicate,2013_stage:3.10,
 ganchovski_test_functions:f38,2026,1.3,if(x <= 1/3; -0.5; 0.5),,,"[-11, 9]",conditions or prose,0,duplicate,same text,2026_ganchovski_et_al:f38,duplicate,2013_stage:3.11,"The same function as 2026_ganchovski_et_al:f38, which is itself a duplicate of this earlier row."
 ganchovski_test_functions:f39,2026,1.3,if(x <= 1/3; -10^-3; 1 - 10^-3),,,"[-11, 9]",conditions or prose,0,duplicate,same text,2026_ganchovski_et_al:f39,duplicate,2013_stage:3.12,"The same function as 2026_ganchovski_et_al:f39, which is itself a duplicate of this earlier row."
-ganchovski_test_functions:f40,2026,1.3,if(x == 0; 0; 1/(x - 2/3)),,,"[-11, 9]",conditions or prose,0,judge,unparsed,,duplicate,2013_stage:3.13,"Compared with the function that Stage meant, 1/(x - 2/3), as for Ganchovski et al.'s f40."
+ganchovski_test_functions:f40,2026,1.3,if(x == 0; 0; 1/(x - 2/3)),,,"[-11, 9]",conditions or prose,0,undecided,unparsed,,duplicate,2013_stage:3.13,"Compared with the function that Stage meant, 1/(x - 2/3), as for Ganchovski et al.'s f40."
 ganchovski_test_functions:f41,2026,1.3,2*x*exp(-5) - 2*exp(-5*x) + 1,,,"[0, 10]",,1,duplicate,structure,1971_dowell_jarratt_illinois:Table 2,duplicate,1971_dowell_jarratt_illinois:Table 2,
 ganchovski_test_functions:f42,2026,1.3,(x^2 - x - 6)*(x^2 - 3*x + 2),,,"[0, 4]",,1,duplicate,structure,roots_fortran:155–157,duplicate,roots_fortran:155–157,
 ganchovski_test_functions:f43,2026,1.3,x^3,,,"[-1, 1.5]",,1,duplicate,structure,1975_bus_dekker:III,duplicate,1975_bus_dekker:III,
@@ -1265,12 +1265,12 @@ ganchovski_test_functions:f72,2026,1.3,(x*10^6 - 1)^3,,,"[-1, 1]",,1,duplicate,s
 ganchovski_test_functions:f73,2026,1.3,exp(x)*(x*10^6 - 1)^3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.2,duplicate,2021_oliveira_takahashi:2.2,
 ganchovski_test_functions:f74,2026,1.3,(x - 1/3)^2*(atan(x - 1/3)),,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.3,duplicate,2021_oliveira_takahashi:2.3,
 ganchovski_test_functions:f75,2026,1.3,sign(3*x - 1)*(1 - sqrt(1 - (3*x - 1)^2/81)),,,"[-1, 1]",,1,duplicate,structure,2026_ganchovski_et_al:f75,duplicate,2026_ganchovski_et_al:f75,
-ganchovski_test_functions:f76,2026,1.3,if(x > (1 - 10^6)/10^6; (1 + 10^6)/10^6; 0) - 1,,,"[-1, 1]",conditions or prose,0,judge,unparsed,,duplicate,2021_oliveira_takahashi:2.5,"The - 1 follows the whole if, so the step goes up to about 10^-6, as in Oliveira-Takahashi 2.5."
+ganchovski_test_functions:f76,2026,1.3,if(x > (1 - 10^6)/10^6; (1 + 10^6)/10^6; 0) - 1,,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:2.5,"The - 1 follows the whole if, so the step goes up to about 10^-6, as in Oliveira-Takahashi 2.5."
 ganchovski_test_functions:f77,2026,1.3,if(x != 1/21; 1/(21*x - 1); 0),,,"[-1, 1]",conditions or prose,0,duplicate,same text,2026_ganchovski_et_al:f77,duplicate,2021_oliveira_takahashi:2.6,"The same function as 2026_ganchovski_et_al:f77, which is itself a duplicate of this earlier row."
-ganchovski_test_functions:f78,2026,1.3,x*x/4 + ceiling(x/2) - 0.5,,,"[-1, 1]",unknown function ceiling,0,judge,unparsed,,duplicate,2021_oliveira_takahashi:2.7,
-ganchovski_test_functions:f79,2026,1.3,ceiling(10*x - 1) + 0.5,,,"[-1, 1]",unknown function ceiling,0,judge,unparsed,,duplicate,2021_oliveira_takahashi:2.8,
+ganchovski_test_functions:f78,2026,1.3,x*x/4 + ceiling(x/2) - 0.5,,,"[-1, 1]",unknown function ceiling,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:2.7,
+ganchovski_test_functions:f79,2026,1.3,ceiling(10*x - 1) + 0.5,,,"[-1, 1]",unknown function ceiling,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:2.8,
 ganchovski_test_functions:f80,2026,1.3,x + sin(x*10^6)/10 + 10^-3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.9,duplicate,2021_oliveira_takahashi:2.9,
-ganchovski_test_functions:f81,2026,1.3,if(x > (-1); 1 + sin(1/(x + 1)) - 1; 0),,,"[-1, 1]",conditions or prose,0,judge,unparsed,,duplicate,2021_oliveira_takahashi:2.10,"Equal to Oliveira-Takahashi 2.10 for x > -1; at x = -1, the left end of [-1, 1], the PDF gives 0 where Oliveira-Takahashi gives -1."
+ganchovski_test_functions:f81,2026,1.3,if(x > (-1); 1 + sin(1/(x + 1)) - 1; 0),,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:2.10,"Equal to Oliveira-Takahashi 2.10 for x > -1; at x = -1, the left end of [-1, 1], the PDF gives 0 where Oliveira-Takahashi gives -1."
 ganchovski_test_functions:f82,2026,1.3,202*x - 2*floor((2*x + 10^-2)/2*10^-2) - 0.1,,,"[-1, 1]",,1,new,,,duplicate,2021_oliveira_takahashi:2.11,"Compared with the function meant: the PDF's argument of floor is a misprint for (2*x + 10^-2)/(2*10^-2), as its plot and the C# code show."
 ganchovski_test_functions:f83,2026,1.3,(202*x - 2*floor((2*x + 10^-2)/2*10^-2) - 0.1)^3,,,"[-1, 1]",,1,new,,,duplicate,2021_oliveira_takahashi:2.12,"Compared with the function meant: the PDF's argument of floor is a misprint for (2*x + 10^-2)/(2*10^-2), as its plot and the C# code show."
 ganchovski_test_functions:f84,2026,1.3,(x - 1)*(x - 2)*(x - 3)*(x - 4)*(x - 5) - 0.05,,,"[0.5, 5.5]",,1,duplicate,structure,2026_ganchovski_et_al:f84,duplicate,2026_ganchovski_et_al:f84,
@@ -1290,11 +1290,11 @@ ganchovski_test_functions:f97,2026,1.3,x^13 - 0.001,,,"[-10, 10]",,1,new,,,new,,
 ganchovski_test_functions:f98,2026,1.3,x^15 - 0.001,,,"[-10, 10]",,1,new,,,new,,
 ganchovski_test_functions:f99,2026,1.3,x^17 - 0.001,,,"[-10, 10]",,1,new,,,new,,
 ganchovski_test_functions:f100,2026,1.3,cbrt((4*x - 3)/x),,,"[0, e]",,1,new,,,new,,
-ganchovski_test_functions:f101,2026,1.3,if(x < 0; -(x^2); 7*x^2),,,"[-3, 1]",conditions or prose,0,judge,unparsed,,new,,
+ganchovski_test_functions:f101,2026,1.3,if(x < 0; -(x^2); 7*x^2),,,"[-3, 1]",conditions or prose,0,undecided,unparsed,,new,,
 2026_gao:S1.1,2026,1.1,x^(1/5),,,not printed,,1,new,,,new,,
 2026_gao:S3.1,2026,1.1,x^(1/3),,,"[-5, 1]",,1,duplicate,structure,2016_burden:2.3-D4,duplicate,2016_burden:2.3-D4,
 2026_gao:S3.2,2026,1.1,x^(1/5)/(1 + abs(x)^(1/5)),,,"[-5, 10]",,1,new,,,new,,
-2026_gao:S3.3,2026,1.1,"1 + sum(z_i^2/(d_i - x), i = 1..n)",,"`n = 1000`; each `z_i` drawn from `U(0, 10)`; each gap `d_(k+1) - d_k` drawn from `U(0, 10)`; `d_1 < d_2 < ... < d_n`","`(d_1, d_n) \ {d_2, ..., d_(n-1)}`; 1 bracket per root, built as in Appendix B",conditions or prose,0,judge,unparsed,,new,,
+2026_gao:S3.3,2026,1.1,"1 + sum(z_i^2/(d_i - x), i = 1..n)",,"`n = 1000`; each `z_i` drawn from `U(0, 10)`; each gap `d_(k+1) - d_k` drawn from `U(0, 10)`; `d_1 < d_2 < ... < d_n`","`(d_1, d_n) \ {d_2, ..., d_(n-1)}`; 1 bracket per root, built as in Appendix B",conditions or prose,0,undecided,unparsed,,new,,
 2026_gao:T2.1,2026,1.1,x^5,,,"[-1, 3]",,1,duplicate,structure,1975_bus_dekker:III,duplicate,1975_bus_dekker:III,
 2026_gao:T2.2,2026,1.1,x^7,,,"[-3, 5]",,1,duplicate,structure,1975_bus_dekker:III,duplicate,1975_bus_dekker:III,
 2026_gao:T3,2026,1.1,sin(x) - x/2,,,not printed,,1,duplicate,structure,1993_alefeld_potra_shi:T5.1-1,duplicate,1993_alefeld_potra_shi:T5.1-1,
@@ -1304,7 +1304,7 @@ ganchovski_test_functions:f101,2026,1.3,if(x < 0; -(x^2); 7*x^2),,,"[-3, 1]",con
 2026_gao:T4.4,2026,1.1,6*(x - 2)^5,,,"`[0, 5]`; `[-10, 10]`; `[-1E4, 1E4]`; `[-1E6, 1E6]`; `[-1E10, 1E10]`",,1,duplicate,structure,1997_chandrupatla:4,duplicate,1997_chandrupatla:4,
 2026_gao:T4.5,2026,1.1,x^9,,,"`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`",,1,duplicate,structure,1973_brent_book:T4.1 r1-2,duplicate,1973_brent_book:T4.1 r1-2,
 2026_gao:T4.6,2026,1.1,x^19,,,"`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`",,1,duplicate,structure,1973_brent_book:T4.1 r3,duplicate,1973_brent_book:T4.1 r3,
-2026_gao:T4.7,2026,1.1,,`0` if `x = 0`; `x*exp(-1/x^2)` if `x != 0`,,"`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`",not 1 expression,0,judge,unparsed,,duplicate,1971_brent:3.2,"Chandrupatla's function 7, printed without its cutoff."
+2026_gao:T4.7,2026,1.1,,`0` if `x = 0`; `x*exp(-1/x^2)` if `x != 0`,,"`[-1, 4]`; `[-2, 5]`; `[-1, 10]`; `[-5, 50]`; `[-10, 100]`",not 1 expression,0,undecided,unparsed,,duplicate,1971_brent:3.2,"Chandrupatla's function 7, printed without its cutoff."
 2026_gao:T4.8,2026,1.1,-3062*(1 - xi)/(xi + (1 - xi)*exp(-x)) - 1013 + 1628/x,,xi = 0.61489,"`[2E-4, 2]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`",,1,new,,,new,,
 2026_gao:T4.9,2026,1.1,exp(x) - 2 - 0.01/x - 0.000002/x^3,,,"`[2E-4, 1]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`",,1,new,,,new,,
 2026_jerezano:g1,2026,1.2,x^3 - 5.22*x^2 + 9.0825*x - 5.2675,,,"none; `x0 = 1.9, 3`",,1,new,,,new,,
@@ -1314,33 +1314,33 @@ ganchovski_test_functions:f101,2026,1.3,if(x < 0; -(x^2); 7*x^2),,,"[-3, 1]",con
 2026_kumar:f1,2026,1.2,x - exp(-x),,,"[0, 1]",,1,duplicate,structure,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),duplicate,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),
 2026_kumar:f2,2026,1.2,x^3 + x - 1,,,"[0, 1]",,1,new,,,new,,
 2026_kumar:f3,2026,1.2,atan(x) - 0.3,,,"[0, 1]",,1,new,,,new,,
-2026_kumar:f4,2026,1.2,(x - x*)^3 + 0.05*(x - x*),,x* = 0.6,"[0, 1]",sympy: SyntaxError,0,judge,unparsed,,variant,1975_bus_dekker:II.1,"Bus–Dekker's x^3 + a*x with a = 0.05, shifted to the root 0.6; Stage's 3.10 is the same with 0.001 and 7/9."
+2026_kumar:f4,2026,1.2,(x - x*)^3 + 0.05*(x - x*),,x* = 0.6,"[0, 1]",sympy: SyntaxError,0,undecided,unparsed,,variant,1975_bus_dekker:II.1,"Bus–Dekker's x^3 + a*x with a = 0.05, shifted to the root 0.6; Stage's 3.10 is the same with 0.001 and 7/9."
 2026_kumar:f5,2026,1.2,log(1 + x) - 0.4,,,"[0, 1]",,1,new,,,new,,
 2026_kumar:f6,2026,1.2,sin(x) - 0.3,,,"[0, 2]",,1,new,,,new,,
 2026_kumar:A.2,2026,1.2,x - exp(-x) + eps,,"`eps ~ N(0, sigma^2)`, drawn independently at each evaluation; `sigma = 10^-3`","[0, 1]",,1,new,,,new,,
 2026_li_upper_crossing:Ex. 1,2026,1.2,cos(0.5*pi*x) - x,,,"`x` in R; starting values `x(0) = -1, 2`",,1,new,,,new,,
 2026_li_upper_crossing:Ex. 2a,2026,1.2,theta^3 - 2*theta + 1,,,theta >= 0,,1,duplicate,structure,2016_burden:2.2-3,duplicate,2016_burden:2.2-3,
 2026_li_upper_crossing:Ex. 2b,2026,1.2,-theta^3 + 2*theta + 2,,,theta >= 0,,1,new,,,new,,
-2026_li_upper_crossing:Ex. 3 (7.2),2026,1.2,"p - Phi(x; mu, sigma^2)",,"Fig. 2: `p = 0.05`, `mu = 1`, `sigma = 1`. Table 3: `p = 0.01, 0.9` and `mu = -2, 2`, with `sigma = 1`.","`x` in R; starting values drawn from `U(-4, 4)`",unknown function Phi,0,judge,unparsed,,variant,2021_oliveira_takahashi:1.11,"Oliveira–Takahashi's Phi(x - 1) - sqrt(2)/4, negated, with other p and mu."
-2026_li_upper_crossing:Ex. 4,2026,1.2,"p - F(x; mu, sigma^2, alpha)",,"`mu` in R, `sigma^2 > 0`, `alpha >= 0`; no values",`x` in R,unknown function F,0,judge,unparsed,,new,,
-2026_li_upper_crossing:4.1.2,2026,1.2,"p - F(x; alpha, beta)",,"`alpha`, `beta` in `(0, 1)`, `p` in `(0, 1)`; no values","(0, 1)",unknown function F,0,judge,unparsed,,new,,
-2026_li_upper_crossing:4.2 (7.4),2026,1.2,n/theta + sum_{i=1..n} (-sum_{m=0..x_i - 1} 1/(m + theta + 1)),,"Section 7.4: samples of size `n = 400` with true `theta = 0.5, 1, 5, 10`","`theta > 0`; starting values drawn from `U(1, 5)`",conditions or prose,0,judge,unparsed,,new,,
-2026_li_upper_crossing:4.3,2026,1.2,-n*xbar + sum_{i=1..n} (x_i - 1)*x_i/(lambda + theta*x_i),,"`lambda > 0`, `max(-1, -lambda/r) < theta < 0`, with `r >= 4` the largest integer with `lambda + theta*r > 0`; no values",theta < 0,conditions or prose,0,judge,unparsed,,new,,
-2026_li_upper_crossing:7.1,2026,1.2,a3*theta^m + a2*theta^2 + a1*theta + a0,,"`{a0, a1, a2, a3, m} = {1, -1, 1, -1, 3}` and `{1, -1, -3, 1, 3}`; `a = 2`","`(0, a)`; starting values drawn from `U(0, 2)`",unknown variable unclear,0,judge,unparsed,,new,,
+2026_li_upper_crossing:Ex. 3 (7.2),2026,1.2,"p - Phi(x; mu, sigma^2)",,"Fig. 2: `p = 0.05`, `mu = 1`, `sigma = 1`. Table 3: `p = 0.01, 0.9` and `mu = -2, 2`, with `sigma = 1`.","`x` in R; starting values drawn from `U(-4, 4)`",unknown function Phi,0,undecided,unparsed,,variant,2021_oliveira_takahashi:1.11,"Oliveira–Takahashi's Phi(x - 1) - sqrt(2)/4, negated, with other p and mu."
+2026_li_upper_crossing:Ex. 4,2026,1.2,"p - F(x; mu, sigma^2, alpha)",,"`mu` in R, `sigma^2 > 0`, `alpha >= 0`; no values",`x` in R,unknown function F,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:4.1.2,2026,1.2,"p - F(x; alpha, beta)",,"`alpha`, `beta` in `(0, 1)`, `p` in `(0, 1)`; no values","(0, 1)",unknown function F,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:4.2 (7.4),2026,1.2,n/theta + sum_{i=1..n} (-sum_{m=0..x_i - 1} 1/(m + theta + 1)),,"Section 7.4: samples of size `n = 400` with true `theta = 0.5, 1, 5, 10`","`theta > 0`; starting values drawn from `U(1, 5)`",conditions or prose,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:4.3,2026,1.2,-n*xbar + sum_{i=1..n} (x_i - 1)*x_i/(lambda + theta*x_i),,"`lambda > 0`, `max(-1, -lambda/r) < theta < 0`, with `r >= 4` the largest integer with `lambda + theta*r > 0`; no values",theta < 0,conditions or prose,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:7.1,2026,1.2,a3*theta^m + a2*theta^2 + a1*theta + a0,,"`{a0, a1, a2, a3, m} = {1, -1, 1, -1, 3}` and `{1, -1, -3, 1, 3}`; `a = 2`","`(0, a)`; starting values drawn from `U(0, 2)`",unknown variable unclear,0,undecided,unparsed,,new,,
 2026_li_upper_crossing:App. D,2026,1.2,x^3 - 3*x^2 + x + 1,,,"`(0, 2)`; starting value `x0 = 0`",,1,new,,,extended,2026_li_upper_crossing:7.1,"Eq. (7.1) with {a0, a1, a2, a3, m} = {1, 1, -3, 1, 3}, a set of coefficients that 7.1 does not have."
 2026_li_upper_crossing:7.3,2026,1.2,-0.5*x - 2*sin(x) + 1,,,`x` in R; starting value `x(0) = 0`,,1,new,,,new,,
-2026_li_upper_crossing:S1.1.1-I,2026,1.2,m0*log(x_u) - x_u - c0,,"`m0 = nu - 2`, `c0 = m0*log(chi_obs) - chi_obs`, with `chi_obs < m0`; no values",x_u > m0,unknown variable unclear,0,judge,unparsed,,new,,
-2026_li_upper_crossing:S1.1.1-II,2026,1.2,x_l - m0*log(x_l) + c0,,"as in S1.1.1-I, with `chi_obs > m0`","(0, m0)",unknown variable unclear,0,judge,unparsed,,duplicate,2026_li_upper_crossing:S1.1.1-I,"S1.1.1-I negated, for the root below m0."
-2026_li_upper_crossing:S1.1.2-I,2026,1.2,m1*log(x_u) - nu12*log(1 + nu*x_u) - c0,,"`m1 = nu1 - 2`, `nu = nu1/nu2`, `nu12 = nu1 + nu2`, `m0 = m1*nu2/(nu1*(nu2 + 2))`, `c0 = m1*log(F_obs) - nu12*log(1 + nu*F_obs)`, with `F_obs < m0`; no values",x_u > m0,unknown variable unclear,0,judge,unparsed,,new,,
-2026_li_upper_crossing:S1.1.2-II,2026,1.2,c0 - m1*log(x_l) + nu12*log(1 + nu*x_l),,"as in S1.1.2-I, with `F_obs > m0`","(0, m0)",unknown variable unclear,0,judge,unparsed,,duplicate,2026_li_upper_crossing:S1.1.2-I,"S1.1.2-I negated, for the root below m0."
-2026_li_upper_crossing:S1.2.1a,2026,1.2,c0 - psi(alpha),,`c0 = G(x) + log(beta)`; no values,alpha > 0,unknown function psi,0,judge,unparsed,,new,,
-2026_li_upper_crossing:S1.2.1b,2026,1.2,log(alpha) + G(x) - log(xbar) - psi(alpha),,sample only; no values,alpha > 0,unknown function G,0,judge,unparsed,,new,,
-2026_li_upper_crossing:S1.2.2,2026,1.2,G(x) + 1/theta - sum_i x_i^theta*log(x_i) / sum_i x_i^theta,,sample only; no values,theta > 0,unknown function G,0,judge,unparsed,,new,,
-2026_li_upper_crossing:S1.2.3,2026,1.2,n/2*(psi((nu + 1)/2) - psi(nu/2) - 1/nu) - 1/2*sum_i log(1 + z_i/nu) + (nu + 1)/(2*nu^2)*sum_i tau_i(nu),,"`z_i = (x_i - mu)^2/sigma^2`, `tau_i(nu) = z_i*(1 + z_i/nu)^(-1)`, with `mu` and `sigma^2` fixed; no values",nu > 0,unknown function psi,0,judge,unparsed,,new,,
-2026_li_upper_crossing:S1.2.4,2026,1.2,-n/((alpha + 1)*log(alpha + 1)) - sum_i x_i^alpha*log(x_i)/(1 - x_i^alpha),,"sample in `(0, 1)`; no values",alpha > 0,sympy: SyntaxError,0,judge,unparsed,,new,,
-2026_li_upper_crossing:S1.3.1,2026,1.2,-G(x) - Z'(theta)/Z(theta),,sample of positive integers; no values,theta > 1,unknown function G,0,judge,unparsed,,new,,
-2026_li_upper_crossing:S1.3.2,2026,1.2,sum_{i=1..n} I(x_i >= 1)*sum_{m=0..x_i - 1} 1/(m + alpha) + n*log(alpha) - n*log(alpha + xbar),,sample of non-negative integers; no values,alpha > 0,conditions or prose,0,judge,unparsed,,new,,
-2026_li_upper_crossing:S1.3.3,2026,1.2,n*xbar*(log(beta - 1) + log(xbar) - log(xbar*beta - 1)) + sum_{k=2..K} sum_{j=2..k} f_k/(beta - j/k),,"observations `1, ..., K` with frequencies `f_1, ..., f_K`, `n = sum_k f_k`; no values",beta > 1,conditions or prose,0,judge,unparsed,,new,,
+2026_li_upper_crossing:S1.1.1-I,2026,1.2,m0*log(x_u) - x_u - c0,,"`m0 = nu - 2`, `c0 = m0*log(chi_obs) - chi_obs`, with `chi_obs < m0`; no values",x_u > m0,unknown variable unclear,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:S1.1.1-II,2026,1.2,x_l - m0*log(x_l) + c0,,"as in S1.1.1-I, with `chi_obs > m0`","(0, m0)",unknown variable unclear,0,undecided,unparsed,,duplicate,2026_li_upper_crossing:S1.1.1-I,"S1.1.1-I negated, for the root below m0."
+2026_li_upper_crossing:S1.1.2-I,2026,1.2,m1*log(x_u) - nu12*log(1 + nu*x_u) - c0,,"`m1 = nu1 - 2`, `nu = nu1/nu2`, `nu12 = nu1 + nu2`, `m0 = m1*nu2/(nu1*(nu2 + 2))`, `c0 = m1*log(F_obs) - nu12*log(1 + nu*F_obs)`, with `F_obs < m0`; no values",x_u > m0,unknown variable unclear,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:S1.1.2-II,2026,1.2,c0 - m1*log(x_l) + nu12*log(1 + nu*x_l),,"as in S1.1.2-I, with `F_obs > m0`","(0, m0)",unknown variable unclear,0,undecided,unparsed,,duplicate,2026_li_upper_crossing:S1.1.2-I,"S1.1.2-I negated, for the root below m0."
+2026_li_upper_crossing:S1.2.1a,2026,1.2,c0 - psi(alpha),,`c0 = G(x) + log(beta)`; no values,alpha > 0,unknown function psi,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:S1.2.1b,2026,1.2,log(alpha) + G(x) - log(xbar) - psi(alpha),,sample only; no values,alpha > 0,unknown function G,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:S1.2.2,2026,1.2,G(x) + 1/theta - sum_i x_i^theta*log(x_i) / sum_i x_i^theta,,sample only; no values,theta > 0,unknown function G,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:S1.2.3,2026,1.2,n/2*(psi((nu + 1)/2) - psi(nu/2) - 1/nu) - 1/2*sum_i log(1 + z_i/nu) + (nu + 1)/(2*nu^2)*sum_i tau_i(nu),,"`z_i = (x_i - mu)^2/sigma^2`, `tau_i(nu) = z_i*(1 + z_i/nu)^(-1)`, with `mu` and `sigma^2` fixed; no values",nu > 0,unknown function psi,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:S1.2.4,2026,1.2,-n/((alpha + 1)*log(alpha + 1)) - sum_i x_i^alpha*log(x_i)/(1 - x_i^alpha),,"sample in `(0, 1)`; no values",alpha > 0,sympy: SyntaxError,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:S1.3.1,2026,1.2,-G(x) - Z'(theta)/Z(theta),,sample of positive integers; no values,theta > 1,unknown function G,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:S1.3.2,2026,1.2,sum_{i=1..n} I(x_i >= 1)*sum_{m=0..x_i - 1} 1/(m + alpha) + n*log(alpha) - n*log(alpha + xbar),,sample of non-negative integers; no values,alpha > 0,conditions or prose,0,undecided,unparsed,,new,,
+2026_li_upper_crossing:S1.3.3,2026,1.2,n*xbar*(log(beta - 1) + log(xbar) - log(xbar*beta - 1)) + sum_{k=2..K} sum_{j=2..k} f_k/(beta - j/k),,"observations `1, ..., K` with frequencies `f_1, ..., f_K`, `n = sum_k f_k`; no values",beta > 1,conditions or prose,0,undecided,unparsed,,new,,
 2026_neupane_multiplicity:f_m,2026,1.2,(x - 1)^m*(x + 2),,"m = 1, ..., 8",,,8,new,,,new,,
 2026_neupane_multiplicity:4.1,2026,1.2,x + b*x^2,,`b`; no value given,,,1,new,,,new,,
 2026_nnedinma_modified_steffensen:1,2026,1.2,cos(x) - x,,,none; `x0 = -2`,,1,duplicate,structure,2000_weerakoon:4,duplicate,2000_weerakoon:4,
@@ -1382,7 +1382,7 @@ roots_jl:func16,2026,1.3,1e6*(x^7 - 7*x^6 + 21*x^5 - 35*x^4 + 35*x^3 - 21*x^2 + 
 roots_jl:func17,2026,1.3,(exp(-x^2 + x + 3) - x + 2)^9,,,,,1,duplicate,structure,2010_li_multiple_roots:f05,duplicate,2010_li_multiple_roots:f05,
 roots_jl:func18,2026,1.3,(exp(-x) + 2*sin(x))^4,,,,,1,duplicate,structure,2010_li_multiple_roots:f06,duplicate,2010_li_multiple_roots:f06,
 roots_jl:func19,2026,1.3,cbrt(x),,,,,1,duplicate,structure,2016_burden:2.3-D4,duplicate,2016_burden:2.3-D4,
-roots_jl:func20,2026,1.3,,`3/4*x - 0.3125` (x < -1/4); `2*x` (-1/4 <= x < 1/4); `3/4*x + 0.3125` (x >= 1/4),,,not 1 expression,0,judge,unparsed,,variant,burkardt_test_zero:p09,Burkardt's p09 shifted by 6.25 in x.
+roots_jl:func20,2026,1.3,,`3/4*x - 0.3125` (x < -1/4); `2*x` (-1/4 <= x < 1/4); `3/4*x + 0.3125` (x >= 1/4),,,not 1 expression,0,undecided,unparsed,,variant,burkardt_test_zero:p09,Burkardt's p09 shifted by 6.25 in x.
 roots_jl:fn,2026,1.3,x^3 - 2*x - 5,,,,,1,duplicate,structure,1997_chandrupatla:1,duplicate,1997_chandrupatla:1,
 roots_jl:f1,2026,1.3,sin(x),,,"[3.0, 4.0]",,1,duplicate,structure,1979_ridders:III.3,duplicate,1979_ridders:III.3,
 roots_jl:f2,2026,1.3,x^5 - x - 1,,,"[0.5, 5.0]",,1,duplicate,structure,roots_jl:func3,duplicate,roots_jl:func3,
@@ -1394,7 +1394,7 @@ roots_jl:f7,2026,1.3,tanh(x) - tan(x),,,"[4.0, 8.0]",,1,duplicate,structure,root
 roots_jl:f8,2026,1.3,exp(-x^2 + x + 2) - cos(x) + x^3 + 1,,,"[-2.0, 1.0]",,1,new,,,new,,
 roots_jl:f9,2026,1.3,log(x) + sqrt(x) - 5,,,"[7.0, 10.0]",,1,new,,,new,,
 roots_jl:f10,2026,1.3,log(x) + sqrt(x) - 5,,,"[7.0, 10.0]",,1,duplicate,structure,roots_jl:f9,duplicate,roots_jl:f9,
-sciml_interval_suite:f,2026,1.3,u*sin(u) - p,,"p = 1.5 .* rand(N), N = 100_000, after `Random.seed!(42)`","[0.0, 2.0]",unknown variable unclear,0,judge,unparsed,,new,,"Sabharwal's T2.10, x*sin(x) - 1, has the same form at p = 1; here p is random in [0, 1.5)."
+sciml_interval_suite:f,2026,1.3,u*sin(u) - p,,"p = 1.5 .* rand(N), N = 100_000, after `Random.seed!(42)`","[0.0, 2.0]",unknown variable unclear,0,undecided,unparsed,,new,,"Sabharwal's T2.10, x*sin(x) - 1, has the same form at p = 1; here p is random in [0, 1.5)."
 sciml_interval_suite:g,2026,1.3,exp(u) - 1e-15,,,"[-100.0, 0.0]",,1,new,,,new,,
 sciml_interval_suite:1,2026,1.3,(u - 1)*(u - 2)*(u - 3)*(u - 4)*(u - 5) - p,,p = 0.05,"[0.5, 5.5]",,1,duplicate,structure,2026_ganchovski_et_al:f84,duplicate,2026_ganchovski_et_al:f84,
 sciml_interval_suite:2,2026,1.3,sin(u) - 0.5*u - p,,p = 0.3,"[-10.0, 10.0]",,1,duplicate,structure,2026_ganchovski_et_al:f85,duplicate,2026_ganchovski_et_al:f85,
@@ -1407,12 +1407,12 @@ sciml_interval_suite:8,2026,1.3,u*sin(1/u) - 0.1 - p,,p = 0.01,"[0.01, 1.0]",,1,
 scipy_tstutils:f1,2026,1.3,x*(x - 1.),,,"[0.5, sqrt(3)]",,1,new,,,new,,
 scipy_tstutils:f2,2026,1.3,x^2 - 1,,,"[0.5, sqrt(3)]",,1,duplicate,structure,1989_atkinson:§2.8 case (2); P34(ii); P14,duplicate,1989_atkinson:§2.8 case (2); P34(ii); P14,
 scipy_tstutils:f3,2026,1.3,x*(x - 1.)*(x - 2.)*(x - 3.),,,"[0.5, sqrt(3)]",,1,new,,,new,,
-scipy_tstutils:f4,2026,1.3,,`1.0 + .1*x` (x > 1); `-1.0 + .1*x` (x < 1); `0` (x = 1),,"[0.5, sqrt(3)]",not 1 expression,0,judge,unparsed,,new,,
-scipy_tstutils:f5,2026,1.3,,`1.0/(1. - x)` (x != 1); `0` (x = 1),,"[0.5, sqrt(3)]",not 1 expression,0,judge,unparsed,,duplicate,2013_epperson:3.1-14(b),1/(1 - x) is Epperson's 1/(x - 1) negated; SciPy only adds the value 0 at the pole x = 1. Oliveira-Takahashi 2.6 is a later row of the same model.
-scipy_tstutils:f6,2026,1.3,,`random()` (x > 1); `-random()` (x < 1); `0` (x = 1),,"[0.5, sqrt(3)]",not 1 expression,0,judge,unparsed,,new,,
+scipy_tstutils:f4,2026,1.3,,`1.0 + .1*x` (x > 1); `-1.0 + .1*x` (x < 1); `0` (x = 1),,"[0.5, sqrt(3)]",not 1 expression,0,undecided,unparsed,,new,,
+scipy_tstutils:f5,2026,1.3,,`1.0/(1. - x)` (x != 1); `0` (x = 1),,"[0.5, sqrt(3)]",not 1 expression,0,undecided,unparsed,,duplicate,2013_epperson:3.1-14(b),1/(1 - x) is Epperson's 1/(x - 1) negated; SciPy only adds the value 0 at the pole x = 1. Oliveira-Takahashi 2.6 is a later row of the same model.
+scipy_tstutils:f6,2026,1.3,,`random()` (x > 1); `-random()` (x < 1); `0` (x = 1),,"[0.5, sqrt(3)]",not 1 expression,0,undecided,unparsed,,new,,
 scipy_tstutils:aps01_f,2026,1.3,sin(x) - x/2,,,"[pi/2, pi]",,1,duplicate,structure,1993_alefeld_potra_shi:T5.1-1,duplicate,1993_alefeld_potra_shi:T5.1-1,
-scipy_tstutils:aps02_f,2026,1.3,,"`-2*sum((2*ii - 5)^2/(x - ii^2)^3)`, summed over ii = 1, ..., 20",,"[1 + 1e-9, 4 - 1e-9], [4 + 1e-9, 9 - 1e-9], [9 + 1e-9, 16 - 1e-9], [16 + 1e-9, 25 - 1e-9], [25 + 1e-9, 36 - 1e-9], [36 + 1e-9, 49 - 1e-9], [49 + 1e-9, 64 - 1e-9], [64 + 1e-9, 81 - 1e-9], [81 + 1e-9, 100 - 1e-9], [100 + 1e-9, 121 - 1e-9]",not 1 expression,0,judge,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-2,Its intervals n = 1(1)10 are a subset of the 1993 article's n = 1(1)19.
-scipy_tstutils:aps03_f,2026,1.3,a*x*exp(b*x),,"(a, b) = (-40, -1), (-100, -2), (-200, -3)","[-9, 31]",,1,judge,"family, no parsed values",1993_alefeld_potra_shi:T5.1-3,duplicate,1993_alefeld_potra_shi:T5.1-3,
+scipy_tstutils:aps02_f,2026,1.3,,"`-2*sum((2*ii - 5)^2/(x - ii^2)^3)`, summed over ii = 1, ..., 20",,"[1 + 1e-9, 4 - 1e-9], [4 + 1e-9, 9 - 1e-9], [9 + 1e-9, 16 - 1e-9], [16 + 1e-9, 25 - 1e-9], [25 + 1e-9, 36 - 1e-9], [36 + 1e-9, 49 - 1e-9], [49 + 1e-9, 64 - 1e-9], [64 + 1e-9, 81 - 1e-9], [81 + 1e-9, 100 - 1e-9], [100 + 1e-9, 121 - 1e-9]",not 1 expression,0,undecided,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-2,Its intervals n = 1(1)10 are a subset of the 1993 article's n = 1(1)19.
+scipy_tstutils:aps03_f,2026,1.3,a*x*exp(b*x),,"(a, b) = (-40, -1), (-100, -2), (-200, -3)","[-9, 31]",,1,undecided,"family, no parsed values",1993_alefeld_potra_shi:T5.1-3,duplicate,1993_alefeld_potra_shi:T5.1-3,
 scipy_tstutils:aps04_f,2026,1.3,x^n - a,,"(n, a) = (4, 0.2), (6, 0.2), (8, 0.2), (10, 0.2), (12, 0.2), (4, 1), (6, 1), (8, 1), (10, 1), (12, 1) on [0, 5]; (8, 1), (10, 1), (12, 1), (14, 1) on [-0.95, 4.05]","[0, 5] (10 cases); [-0.95, 4.05] (4 cases)",,1,duplicate,structure,2013_epperson:3.2-3,duplicate,1993_alefeld_potra_shi:T5.1-4,"Alefeld-Potra-Shi's x^n - a with the same values of n and a. The script matched Epperson's 3.2-3, the family without values, because it did not parse SciPy's (n, a) pairs."
 scipy_tstutils:aps05_f,2026,1.3,sin(x) - 1.0/2,,,"[0, 1.5]",,1,duplicate,structure,1971_dowell_jarratt_illinois:Table 1,duplicate,1971_dowell_jarratt_illinois:Table 1,
 scipy_tstutils:aps06_f,2026,1.3,2*x*exp(-n) - 2*exp(-n*x) + 1,,"n = 1, 2, 3, 4, 5, 20, 40, 60, 80, 100","[0, 1]",,10,duplicate,structure,1971_dowell_jarratt_illinois:Table 2 | 1975_bus_dekker:I.2 | roots_fortran:19,duplicate,1971_dowell_jarratt_illinois:Table 2 | 1975_bus_dekker:I.2 | roots_fortran:19,
@@ -1422,10 +1422,10 @@ scipy_tstutils:aps09_f,2026,1.3,(1 + (1 - n)^4)*x - (1 - n*x)^4,,"n = 1, 2, 4, 5
 scipy_tstutils:aps10_f,2026,1.3,exp(-n*x)*(x - 1) + x^n,,"n = 1, 5, 10, 15, 20","[0, 1]",,5,duplicate,structure,1971_dowell_jarratt_illinois:Table 6 | 1973_anderson_bjorck:Ex. 6,duplicate,1971_dowell_jarratt_illinois:Table 6 | 1973_anderson_bjorck:Ex. 6,
 scipy_tstutils:aps11_f,2026,1.3,(n*x - 1)/((n - 1)*x),,"n = 2, 5, 15, 20","[0.01, 1]",,4,duplicate,structure,1971_dowell_jarratt_illinois:Table 7,duplicate,1971_dowell_jarratt_illinois:Table 7,
 scipy_tstutils:aps12_f,2026,1.3,x^(1.0/n) - n^(1.0/n),,"n = 2, 3, 4, 5, 6, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33","[1, 100]",,19,duplicate,structure,1995_alefeld_potra_shi:12 | roots_fortran:25 | 2013_epperson:3.11-23(a),duplicate,1995_alefeld_potra_shi:12 | roots_fortran:25 | 2013_epperson:3.11-23(a),
-scipy_tstutils:aps13_f,2026,1.3,,"`x/exp(1/x^2)` (x != 0); `0` (x = 0, or 1/x^2 > `_MAX_EXPABLE`)",,"[-1, 4]",not 1 expression,0,judge,unparsed,,duplicate,1971_brent:3.2,"Written as x/exp(1/x^2), with 0 where exp(1/x^2) overflows; it agrees with x*exp(-x^-2) up to rounding."
-scipy_tstutils:aps14_f,2026,1.3,,`n/20.0*(x/1.5 + sin(x) - 1)` (x > 0); `-n/20.0` (x <= 0),"n = 1, 2, ..., 40","[-1000, pi/2]",not 1 expression,0,judge,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-13,"SciPy starts the interval at -1000, where the 1993 article has -10^4."
-scipy_tstutils:aps15_f,2026,1.3,,`-0.859` (x < 0); `exp((n + 1)*x/2*1000) - 1.859` (0 <= x <= 2*1e-3/(1 + n)); `e - 1.859` (x > 2*1e-3/(1 + n)),"n = 20, 21, ..., 40, 100, 200, ..., 1000","[-1000, 1e-4]",not 1 expression,0,judge,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-14,"SciPy starts the interval at -1000, where the 1993 article has -10^4."
-scipy_tstutils:cplx01_f,2026,1.3,z^n - a,,"(n, a) = (2, -1), (3, 1), (3, -1), (3, 8)","none; starting values (x0, x1) = (1 + 1j, 0.5 + 0.5j), (-1 + 1j, -0.5 + 2.0j), (1j, 0.5 + 0.5j), (5, 4)",unknown variable unclear,0,judge,unparsed,,extended,1993_alefeld_potra_shi:T5.1-4,"Complex roots of z^n - a; its cases (3, 1), (3, -1) and (2, -1) are also the earlier single rows x^3 - 1, x^3 + 1 and x^2 + 1."
+scipy_tstutils:aps13_f,2026,1.3,,"`x/exp(1/x^2)` (x != 0); `0` (x = 0, or 1/x^2 > `_MAX_EXPABLE`)",,"[-1, 4]",not 1 expression,0,undecided,unparsed,,duplicate,1971_brent:3.2,"Written as x/exp(1/x^2), with 0 where exp(1/x^2) overflows; it agrees with x*exp(-x^-2) up to rounding."
+scipy_tstutils:aps14_f,2026,1.3,,`n/20.0*(x/1.5 + sin(x) - 1)` (x > 0); `-n/20.0` (x <= 0),"n = 1, 2, ..., 40","[-1000, pi/2]",not 1 expression,0,undecided,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-13,"SciPy starts the interval at -1000, where the 1993 article has -10^4."
+scipy_tstutils:aps15_f,2026,1.3,,`-0.859` (x < 0); `exp((n + 1)*x/2*1000) - 1.859` (0 <= x <= 2*1e-3/(1 + n)); `e - 1.859` (x > 2*1e-3/(1 + n)),"n = 20, 21, ..., 40, 100, 200, ..., 1000","[-1000, 1e-4]",not 1 expression,0,undecided,unparsed,,duplicate,1993_alefeld_potra_shi:T5.1-14,"SciPy starts the interval at -1000, where the 1993 article has -10^4."
+scipy_tstutils:cplx01_f,2026,1.3,z^n - a,,"(n, a) = (2, -1), (3, 1), (3, -1), (3, 8)","none; starting values (x0, x1) = (1 + 1j, 0.5 + 0.5j), (-1 + 1j, -0.5 + 2.0j), (1j, 0.5 + 0.5j), (5, 4)",unknown variable unclear,0,undecided,unparsed,,extended,1993_alefeld_potra_shi:T5.1-4,"Complex roots of z^n - a; its cases (3, 1), (3, -1) and (2, -1) are also the earlier single rows x^3 - 1, x^3 + 1 and x^2 + 1."
 scipy_tstutils:cplx02_f,2026,1.3,exp(z) - a,,"a = -1, 1j","none; starting values (x0, x1) = (1 + 2j, 0.5 + 0.5j) for both",,2,extended,"family, new parameter values",2013_epperson:3.11-12,extended,2013_epperson:3.11-12,"Exp(z) - a with a = -1, 1j adds complex values to Epperson's a - exp(x), a in [1/2, 1]."
 scipy_tstutils:fun1,2026,1.3,x^3 - 2*x - 5,,,"[2, 3], [1, 10], [1, 100], [-1e4, 1e4], [-1e10, 1e10]",,1,duplicate,structure,1997_chandrupatla:1,duplicate,1997_chandrupatla:1,
 scipy_tstutils:fun2,2026,1.3,1 - 1/x^2,,,"[0.5, 1.51], [1e-4, 1e4], [1e-6, 1e6], [1e-10, 1e10], [1e-12, 1e12]",,1,duplicate,structure,1997_chandrupatla:2,duplicate,1997_chandrupatla:2,
@@ -1433,25 +1433,25 @@ scipy_tstutils:fun3,2026,1.3,(x-3)^3,,,"[0, 5], [-10, 10], [-1e4, 1e4], [-1e6, 1
 scipy_tstutils:fun4,2026,1.3,6*(x-2)^5,,,"[0, 5], [-10, 10], [-1e4, 1e4], [-1e6, 1e6], [-1e10, 1e10]",,1,duplicate,structure,1997_chandrupatla:4,duplicate,1997_chandrupatla:4,
 scipy_tstutils:fun5,2026,1.3,x^9,,,"[-1, 4], [-2, 5], [-1, 10], [-5, 50], [-10, 100]",,1,duplicate,structure,1973_brent_book:T4.1 r1-2,duplicate,1973_brent_book:T4.1 r1-2,
 scipy_tstutils:fun6,2026,1.3,x^19,,,"[-1., 4.], [-2., 5.], [-1., 10.], [-5., 50.], [-10., 100.]",,1,duplicate,structure,1973_brent_book:T4.1 r3,duplicate,1973_brent_book:T4.1 r3,
-scipy_tstutils:fun7,2026,1.3,,`0` (abs(x) < 3.8e-4); `x*exp(-x^(-2))` (otherwise),,"[-1, 4], [-2, 5], [-1, 10], [-5, 50], [-10, 100]",not 1 expression,0,judge,unparsed,,duplicate,1971_brent:3.2,"Brent's (4.1), whose cutoff to 0 for abs(x) < 3.8*10^-4 changes no computed value."
+scipy_tstutils:fun7,2026,1.3,,`0` (abs(x) < 3.8e-4); `x*exp(-x^(-2))` (otherwise),,"[-1, 4], [-2, 5], [-1, 10], [-5, 50], [-10, 100]",not 1 expression,0,undecided,unparsed,,duplicate,1971_brent:3.2,"Brent's (4.1), whose cutoff to 0 for abs(x) < 3.8*10^-4 changes no computed value."
 scipy_tstutils:fun8,2026,1.3,-(3062*(1-xi)*exp(-x))/(xi + (1-xi)*exp(-x)) - 1013 + 1628/x,,"xi = 0.61489, a constant in the function body","[2e-4, 2], [2e-4, 3], [2e-4, 9], [2e-4, 27], [2e-4, 81]",,1,duplicate,structure,1997_chandrupatla:8,duplicate,1997_chandrupatla:8,
 scipy_tstutils:fun9,2026,1.3,exp(x) - 2 - 0.01/x^2 + .000002/x^3,,,"[2e-4, 1], [2e-4, 3], [2e-4, 9], [2e-4, 27], [2e-4, 81]",,1,duplicate,structure,1997_chandrupatla:9,duplicate,1997_chandrupatla:9,
-2026_tomov_ganchovski:(25),2026,1.1,,`x` if `x <= 0`; `x + x^2` if `x > 0`,,"`[-1, 1]`; `[-3, 1]`",not 1 expression,0,judge,unparsed,,new,,
-2026_tomov_ganchovski:(27),2026,1.1,,`-x^2` if `x < 0`; `7*x^2` if `x >= 0`,,"[-3, 1]",not 1 expression,0,judge,unparsed,,duplicate,ganchovski_test_functions:f101,
+2026_tomov_ganchovski:(25),2026,1.1,,`x` if `x <= 0`; `x + x^2` if `x > 0`,,"`[-1, 1]`; `[-3, 1]`",not 1 expression,0,undecided,unparsed,,new,,
+2026_tomov_ganchovski:(27),2026,1.1,,`-x^2` if `x < 0`; `7*x^2` if `x >= 0`,,"[-3, 1]",not 1 expression,0,undecided,unparsed,,duplicate,ganchovski_test_functions:f101,
 2026_tomov_ganchovski:f27,2026,1.1,(x + 1.11111 - 3)^4 * sign(x + 1.11111 - 3),,,not given,,1,new,,,new,,
 2026_tomov_ganchovski:f29,2026,1.1,exp((x - 3)^5) - 1,,,not given,,1,duplicate,structure,2011_galdino:f6,duplicate,2011_galdino:f6,
 2026_tomov_ganchovski:f64,2026,1.1,tan(x - 0.1),,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:1.2,duplicate,2021_oliveira_takahashi:1.2,
 2026_tomov_ganchovski:f75,2026,1.1,sign(3*x - 1) * (1 - sqrt(1 - (3*x - 1)^2/81)),,,not given,,1,duplicate,structure,2026_ganchovski_et_al:f75,duplicate,2026_ganchovski_et_al:f75,
-2026_tomov_ganchovski:f82,2026,1.1,,not given,,not given,not 1 expression,0,judge,unparsed,,duplicate,2021_oliveira_takahashi:2.11,The preprint names benchmark case f82 without its expression; that case is this sawtooth.
-2026_tomov_ganchovski:f83,2026,1.1,,not given,,not given,not 1 expression,0,judge,unparsed,,duplicate,2021_oliveira_takahashi:2.12,"The preprint names benchmark case f83 without its expression; in 2026_tomov_ganchovski_benchmark that case is Oliveira-Takahashi's sawtooth cube on [-1, 1], which this earlier row holds."
-2026_tomov_ganchovski:f84,2026,1.1,"prod(x - j, j = 1..5) - 0.05",,,"[0.5, 5.5]",unknown function prod,0,judge,unparsed,,duplicate,2026_ganchovski_et_al:f84,
-2026_tomov_ganchovski:f92,2026,1.1,,not given,,not given,not 1 expression,0,judge,unparsed,,duplicate,2004_moler:Ex. 4.1#2,"The preprint names benchmark case f92 without its expression; in 2026_tomov_ganchovski_benchmark that case is x^3 - 0.001 on [-10, 10], which this earlier row holds."
-2026_tomov_ganchovski:f93,2026,1.1,,not given,,not given,not 1 expression,0,judge,unparsed,,duplicate,ganchovski_test_functions:f93,"The preprint names benchmark case f93 without its expression; in 2026_tomov_ganchovski_benchmark that case is x^5 - 0.001 on [-10, 10], which this earlier row holds."
-2026_tomov_ganchovski:f94,2026,1.1,,not given,,not given,not 1 expression,0,judge,unparsed,,duplicate,ganchovski_test_functions:f94,"The preprint names benchmark case f94 without its expression; in 2026_tomov_ganchovski_benchmark that case is x^7 - 0.001 on [-10, 10], which this earlier row holds."
-2026_tomov_ganchovski:f95,2026,1.1,,not given,,not given,not 1 expression,0,judge,unparsed,,duplicate,ganchovski_test_functions:f95,"The preprint names benchmark case f95 without its expression; in 2026_tomov_ganchovski_benchmark that case is x^9 - 0.001 on [-10, 10], which this earlier row holds."
-2026_tomov_ganchovski:f96,2026,1.1,,not given,,not given,not 1 expression,0,judge,unparsed,,duplicate,ganchovski_test_functions:f96,"The preprint names benchmark case f96 without its expression; in 2026_tomov_ganchovski_benchmark that case is x^11 - 0.001 on [-10, 10], which this earlier row holds."
-2026_tomov_ganchovski:f97,2026,1.1,,not given,,not given,not 1 expression,0,judge,unparsed,,duplicate,ganchovski_test_functions:f97,"The preprint names benchmark case f97 without its expression; in 2026_tomov_ganchovski_benchmark that case is x^13 - 0.001 on [-10, 10], which this earlier row holds."
-2026_tomov_ganchovski:f100,2026,1.1,,not given,,not given,not 1 expression,0,judge,unparsed,,duplicate,ganchovski_test_functions:f100,"The preprint names benchmark case f100 without its expression; in 2026_tomov_ganchovski_benchmark that case is cbrt((4*x - 3)/x) on [0, e], which this earlier row holds."
+2026_tomov_ganchovski:f82,2026,1.1,,not given,,not given,not 1 expression,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:2.11,The preprint names benchmark case f82 without its expression; that case is this sawtooth.
+2026_tomov_ganchovski:f83,2026,1.1,,not given,,not given,not 1 expression,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:2.12,"The preprint names benchmark case f83 without its expression; in 2026_tomov_ganchovski_benchmark that case is Oliveira-Takahashi's sawtooth cube on [-1, 1], which this earlier row holds."
+2026_tomov_ganchovski:f84,2026,1.1,"prod(x - j, j = 1..5) - 0.05",,,"[0.5, 5.5]",unknown function prod,0,undecided,unparsed,,duplicate,2026_ganchovski_et_al:f84,
+2026_tomov_ganchovski:f92,2026,1.1,,not given,,not given,not 1 expression,0,undecided,unparsed,,duplicate,2004_moler:Ex. 4.1#2,"The preprint names benchmark case f92 without its expression; in 2026_tomov_ganchovski_benchmark that case is x^3 - 0.001 on [-10, 10], which this earlier row holds."
+2026_tomov_ganchovski:f93,2026,1.1,,not given,,not given,not 1 expression,0,undecided,unparsed,,duplicate,ganchovski_test_functions:f93,"The preprint names benchmark case f93 without its expression; in 2026_tomov_ganchovski_benchmark that case is x^5 - 0.001 on [-10, 10], which this earlier row holds."
+2026_tomov_ganchovski:f94,2026,1.1,,not given,,not given,not 1 expression,0,undecided,unparsed,,duplicate,ganchovski_test_functions:f94,"The preprint names benchmark case f94 without its expression; in 2026_tomov_ganchovski_benchmark that case is x^7 - 0.001 on [-10, 10], which this earlier row holds."
+2026_tomov_ganchovski:f95,2026,1.1,,not given,,not given,not 1 expression,0,undecided,unparsed,,duplicate,ganchovski_test_functions:f95,"The preprint names benchmark case f95 without its expression; in 2026_tomov_ganchovski_benchmark that case is x^9 - 0.001 on [-10, 10], which this earlier row holds."
+2026_tomov_ganchovski:f96,2026,1.1,,not given,,not given,not 1 expression,0,undecided,unparsed,,duplicate,ganchovski_test_functions:f96,"The preprint names benchmark case f96 without its expression; in 2026_tomov_ganchovski_benchmark that case is x^11 - 0.001 on [-10, 10], which this earlier row holds."
+2026_tomov_ganchovski:f97,2026,1.1,,not given,,not given,not 1 expression,0,undecided,unparsed,,duplicate,ganchovski_test_functions:f97,"The preprint names benchmark case f97 without its expression; in 2026_tomov_ganchovski_benchmark that case is x^13 - 0.001 on [-10, 10], which this earlier row holds."
+2026_tomov_ganchovski:f100,2026,1.1,,not given,,not given,not 1 expression,0,undecided,unparsed,,duplicate,ganchovski_test_functions:f100,"The preprint names benchmark case f100 without its expression; in 2026_tomov_ganchovski_benchmark that case is cbrt((4*x - 3)/x) on [0, e], which this earlier row holds."
 2026_tomov_ganchovski:(61),2026,1.1,x^p - 10^(-3),,"p = 3, 5, 7, 9, 11, 13, 15, 17","[-10, 10]",,8,duplicate,structure,2004_moler:Ex. 4.1#2 | ganchovski_test_functions:f93 | ganchovski_test_functions:f94 | ganchovski_test_functions:f95 | ganchovski_test_functions:f96 | ganchovski_test_functions:f97 | ganchovski_test_functions:f98 | ganchovski_test_functions:f99,duplicate,2004_moler:Ex. 4.1#2 | ganchovski_test_functions:f93 | ganchovski_test_functions:f94 | ganchovski_test_functions:f95 | ganchovski_test_functions:f96 | ganchovski_test_functions:f97 | ganchovski_test_functions:f98 | ganchovski_test_functions:f99,
 2026_tomov_ganchovski:7.6-a,2026,1.1,10^(-320)*(x - 1/4)^3,,,not given,,1,new,,,new,,
 2026_tomov_ganchovski:7.6-b,2026,1.1,x - 1/4,,,"endpoint pairs `(1/4, 1)` and `(1, 1/4)`",,1,new,,,new,,
@@ -1483,7 +1483,7 @@ scipy_tstutils:fun9,2026,1.3,exp(x) - 2 - 0.01/x^2 + .000002/x^3,,,"[2e-4, 1], [
 2026_tomov_ganchovski_benchmark:f24,2026,1.1,(x + 2)*(x + 1)*(x - 3)^3,,,"[2.6, 4.6]",,1,duplicate,structure,2011_galdino:f1,duplicate,2011_galdino:f1,
 2026_tomov_ganchovski_benchmark:f25,2026,1.1,(x - 4)^5*log(x),,,"[3.6, 5.6]",,1,duplicate,structure,2011_galdino:f2,duplicate,2011_galdino:f2,
 2026_tomov_ganchovski_benchmark:f26,2026,1.1,(sin(x) - x/4)^3,,,"[2, 4]",,1,duplicate,structure,2011_galdino:f3,duplicate,2011_galdino:f3,
-2026_tomov_ganchovski_benchmark:f27,2026,1.1,,"`(81 - P(x)*(108 - P(x)*(54 - P(x)*(12 - P(x)))))*sign(P(x) - 3)`, where `P(x) = x + 1.11111`",,"[1, 3]",not 1 expression,0,judge,unparsed,,duplicate,2011_galdino:f4,
+2026_tomov_ganchovski_benchmark:f27,2026,1.1,,"`(81 - P(x)*(108 - P(x)*(54 - P(x)*(12 - P(x)))))*sign(P(x) - 3)`, where `P(x) = x + 1.11111`",,"[1, 3]",not 1 expression,0,undecided,unparsed,,duplicate,2011_galdino:f4,
 2026_tomov_ganchovski_benchmark:f28,2026,1.1,sin((x - 7.143)^3),,,"[7, 8]",,1,duplicate,structure,2011_galdino:f5,duplicate,2011_galdino:f5,
 2026_tomov_ganchovski_benchmark:f29,2026,1.1,exp((x - 3)^5) - 1,,,"[2.6, 4.6]",,1,duplicate,structure,2011_galdino:f6,duplicate,2011_galdino:f6,
 2026_tomov_ganchovski_benchmark:f30,2026,1.1,exp((x - 3)^5) - exp(x - 1),,,"[4, 5]",,1,duplicate,structure,2011_galdino:f7,duplicate,2011_galdino:f7,
@@ -1495,7 +1495,7 @@ scipy_tstutils:fun9,2026,1.3,exp(x) - 2 - 0.01/x^2 + .000002/x^3,,,"[2e-4, 1], [
 2026_tomov_ganchovski_benchmark:f36,2026,1.1,abs(x - 2/3)^0.2*if(x <= 2/3; 1; -1),,,"[-11, 9]",conditions or prose,0,duplicate,same text,2026_ganchovski_et_al:f36,duplicate,2013_stage:3.9,"The same function as 2026_ganchovski_et_al:f36, which is itself a duplicate of this earlier row."
 2026_tomov_ganchovski_benchmark:f37,2026,1.1,(x - 7/9)^3 + (x - 7/9)*1e-3,,,"[-11, 9]",,1,duplicate,structure,2013_stage:3.10,duplicate,2013_stage:3.10,
 2026_tomov_ganchovski_benchmark:f38,2026,1.1,if(x <= 1/3; -0.5; 0.5),,,"[-11, 9]",conditions or prose,0,duplicate,same text,2026_ganchovski_et_al:f38,duplicate,2013_stage:3.11,"The same function as 2026_ganchovski_et_al:f38, which is itself a duplicate of this earlier row."
-2026_tomov_ganchovski_benchmark:f39,2026,1.1,if(x <= 1/3; -1e-3; 1 - 1e-3),,,"[-11, 9]",conditions or prose,0,judge,unparsed,,duplicate,2013_stage:3.12,
+2026_tomov_ganchovski_benchmark:f39,2026,1.1,if(x <= 1/3; -1e-3; 1 - 1e-3),,,"[-11, 9]",conditions or prose,0,undecided,unparsed,,duplicate,2013_stage:3.12,
 2026_tomov_ganchovski_benchmark:f40,2026,1.1,if(x == 0; 0; 1/(x - 2/3)),,,"[-11, 9]",conditions or prose,0,duplicate,same text,ganchovski_test_functions:f40,duplicate,2013_stage:3.13,"Compared with the function that Stage meant, 1/(x - 2/3) with 0 at x = 0; The same function as ganchovski_test_functions:f40, which is itself a duplicate of this earlier row."
 2026_tomov_ganchovski_benchmark:f41,2026,1.1,2*x*exp(-5) - 2*exp(-5*x) + 1,,,"[0, 10]",,1,duplicate,structure,1971_dowell_jarratt_illinois:Table 2,duplicate,1971_dowell_jarratt_illinois:Table 2,
 2026_tomov_ganchovski_benchmark:f42,2026,1.1,(x^2 - x - 6)*(x^2 - 3*x + 2),,,"[0, pi]",,1,duplicate,structure,roots_fortran:155–157,duplicate,roots_fortran:155–157,
@@ -1505,7 +1505,7 @@ scipy_tstutils:fun9,2026,1.3,exp(x) - 2 - 0.01/x^2 + .000002/x^3,,,"[2e-4, 1], [
 2026_tomov_ganchovski_benchmark:f46,2026,1.1,(exp(-5*x) - x - 0.5)/x^5,,,"[0.09, 0.7]",,1,duplicate,structure,2026_ganchovski_et_al:f46,duplicate,2026_ganchovski_et_al:f46,
 2026_tomov_ganchovski_benchmark:f47,2026,1.1,1/sqrt(x) - 2*log(5e3*sqrt(x)) + 0.8,,,"[0.0005, 0.5]",,1,duplicate,structure,2026_ganchovski_et_al:f47,duplicate,2026_ganchovski_et_al:f47,
 2026_tomov_ganchovski_benchmark:f48,2026,1.1,1/sqrt(x) - 2*log(5e7*sqrt(x)) + 0.8,,,"[0.0005, 0.5]",,1,duplicate,structure,2026_ganchovski_et_al:f48,duplicate,2026_ganchovski_et_al:f48,
-2026_tomov_ganchovski_benchmark:f49,2026,1.1,if(x <= 0; -x^3 - x - 1; x^(1.0/3.0) - x - 1),,,"[-1, 1]",conditions or prose,0,judge,unparsed,,duplicate,2026_ganchovski_et_al:f49,
+2026_tomov_ganchovski_benchmark:f49,2026,1.1,if(x <= 0; -x^3 - x - 1; x^(1.0/3.0) - x - 1),,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,duplicate,2026_ganchovski_et_al:f49,
 2026_tomov_ganchovski_benchmark:f50,2026,1.1,x^3 - 2*x - x + 3,,,"[-3, 2]",,1,duplicate,structure,roots_fortran:13,duplicate,roots_fortran:13,
 2026_tomov_ganchovski_benchmark:f51,2026,1.1,log(x),,,"[0.5, 5]",,1,duplicate,structure,2006_chen_li:1,duplicate,2006_chen_li:1,
 2026_tomov_ganchovski_benchmark:f52,2026,1.1,(10 - x)*exp(-10*x) - x^10 + 1,,,"[0.5, 8]",,1,duplicate,structure,2012_suhadolnik:2,duplicate,2012_suhadolnik:2,
@@ -1532,12 +1532,12 @@ scipy_tstutils:fun9,2026,1.3,exp(x) - 2 - 0.01/x^2 + .000002/x^3,,,"[2e-4, 1], [
 2026_tomov_ganchovski_benchmark:f73,2026,1.1,exp(x)*(x*1e6 - 1)^3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.2,duplicate,2021_oliveira_takahashi:2.2,
 2026_tomov_ganchovski_benchmark:f74,2026,1.1,(x - 1/3)^2*atan(x - 1/3),,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.3,duplicate,2021_oliveira_takahashi:2.3,
 2026_tomov_ganchovski_benchmark:f75,2026,1.1,sign(3*x - 1)*(1 - sqrt(1 - (3*x - 1)^2/81)),,,"[-1, 1]",,1,duplicate,structure,2026_ganchovski_et_al:f75,duplicate,2026_ganchovski_et_al:f75,
-2026_tomov_ganchovski_benchmark:f76,2026,1.1,if(x > (1 - 1e6)/1e6; (1 + 1e6)/1e6; 0 - 1),,,"[-1, 1]",conditions or prose,0,judge,unparsed,,duplicate,2026_ganchovski_et_al:f76,
+2026_tomov_ganchovski_benchmark:f76,2026,1.1,if(x > (1 - 1e6)/1e6; (1 + 1e6)/1e6; 0 - 1),,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,duplicate,2026_ganchovski_et_al:f76,
 2026_tomov_ganchovski_benchmark:f77,2026,1.1,if(x != 1/21; 1/(21*x - 1); 0),,,"[-1, 1]",conditions or prose,0,duplicate,same text,2026_ganchovski_et_al:f77,duplicate,2021_oliveira_takahashi:2.6,"The same function as 2026_ganchovski_et_al:f77, which is itself a duplicate of this earlier row."
 2026_tomov_ganchovski_benchmark:f78,2026,1.1,x*x/4 + ceil(x/2) - 0.5,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.7,duplicate,2021_oliveira_takahashi:2.7,
 2026_tomov_ganchovski_benchmark:f79,2026,1.1,ceil(10*x - 1) + 0.5,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.8,duplicate,2021_oliveira_takahashi:2.8,
 2026_tomov_ganchovski_benchmark:f80,2026,1.1,x + sin(x*1e6)/10 + 1e-3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.9,duplicate,2021_oliveira_takahashi:2.9,
-2026_tomov_ganchovski_benchmark:f81,2026,1.1,if(x > -1; 1 + sin(1/(x + 1)); 0 - 1),,,"[-1, 1]",conditions or prose,0,judge,unparsed,,duplicate,2026_ganchovski_et_al:f81,
+2026_tomov_ganchovski_benchmark:f81,2026,1.1,if(x > -1; 1 + sin(1/(x + 1)); 0 - 1),,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,duplicate,2026_ganchovski_et_al:f81,
 2026_tomov_ganchovski_benchmark:f82,2026,1.1,202*x - 2*floor((2*x + 1e-2)/2e-2) - 0.1,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.11,duplicate,2021_oliveira_takahashi:2.11,
 2026_tomov_ganchovski_benchmark:f83,2026,1.1,(202*x - 2*floor((2*x + 1e-2)/2e-2) - 0.1)^3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.12,duplicate,2021_oliveira_takahashi:2.12,
 2026_tomov_ganchovski_benchmark:f84,2026,1.1,(x - 1)*(x - 2)*(x - 3)*(x - 4)*(x - 5) - 0.05,,,"[0.5, 5.5]",,1,duplicate,structure,2026_ganchovski_et_al:f84,duplicate,2026_ganchovski_et_al:f84,
@@ -1557,4 +1557,4 @@ scipy_tstutils:fun9,2026,1.3,exp(x) - 2 - 0.01/x^2 + .000002/x^3,,,"[2e-4, 1], [
 2026_tomov_ganchovski_benchmark:f98,2026,1.1,x^15 - 0.001,,,"[-10, 10]",,1,duplicate,structure,ganchovski_test_functions:f98,duplicate,ganchovski_test_functions:f98,
 2026_tomov_ganchovski_benchmark:f99,2026,1.1,x^17 - 0.001,,,"[-10, 10]",,1,duplicate,structure,ganchovski_test_functions:f99,duplicate,ganchovski_test_functions:f99,
 2026_tomov_ganchovski_benchmark:f100,2026,1.1,cbrt((4*x - 3)/x),,,"[0, e]",,1,duplicate,structure,ganchovski_test_functions:f100,duplicate,ganchovski_test_functions:f100,
-2026_tomov_ganchovski_benchmark:f101,2026,1.1,if(x < 0; -x*x; 7*x*x),,,"[-3, 1]",conditions or prose,0,judge,unparsed,,duplicate,ganchovski_test_functions:f101,
+2026_tomov_ganchovski_benchmark:f101,2026,1.1,if(x < 0; -x*x; 7*x*x),,,"[-3, 1]",conditions or prose,0,undecided,unparsed,,duplicate,ganchovski_test_functions:f101,

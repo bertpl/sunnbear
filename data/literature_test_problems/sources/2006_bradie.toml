@@ -1,7 +1,7 @@
 title = 'Bradie (2006): A Friendly Introduction to Numerical Analysis, chapter 2'
 reference = 'Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, Upper Saddle River, NJ. ISBN 0-13-013054-0.'
 year = 2006
-home = '1.4'
+subcategory = '1.4'
 where_in_source = '''
 chapter 2, "Rootfinding" (pp. 54–137): the chapter overview (pp. 54–58), Sections 2.1–2.7 with Examples 2.1–2.21, Tables 2.1–2.6, Figures 2.1–2.3, 2.7 and 2.9, the application problems, and the exercises that end each section.
 - The overview of chapter 1 (p. 2) sets up the "Solving a Crime" problem; Section 2.5 solves its 2 equations, so their rows come from there.

@@ -1,7 +1,7 @@
 title = 'Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026): improvements to modAB'
 reference = "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to the modified Anderson–Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. https://doi.org/10.3390/a19050332. Supplementary materials: https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder `MDPI-Algorithms-Data` of the authors' repository https://github.com/Just-A-Random-Geek/ModAB-Root-Finding."
 year = 2026
-home = '1.1'
+subcategory = '1.1'
 where_in_source = '''
 - The article's Table 2 (pp. 7–9), "Benchmark results for solving f_nn(x) = 0 in the interval [a; b]", gives 92 functions f01–f92, each on 1 interval. §5 names the origin of each block of functions.
 - The supplementary `Test Functions.pdf` repeats each function with a plot and its root to 3 significant digits, and names f63–f92.

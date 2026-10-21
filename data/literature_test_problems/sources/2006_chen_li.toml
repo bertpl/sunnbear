@@ -3,7 +3,7 @@ reference = '''
 Chen, J., Li, W. (2007). An improved exponential regula falsi methods with quadratic convergence of both diameter and point for solving nonlinear equations. Applied Numerical Mathematics 57(1), 80–88. Published online 14 February 2006. https://doi.org/10.1016/j.apnum.2006.01.001. The article prints the volume and the year 2007 but no issue number; the issue number is Crossref's. The year 2006 of the title follows the online date that the article prints; the issue is dated 2007.
 '''
 year = 2006
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Section 4, "Numerical experiments" (p. 87), lists Examples 1–4, each with an interval `[a, b]`. Every method starts from `x0 = b`, with error `10^-15` and at most 100 iterations.
 - Table 1 gives the iterations `n`, the result `x_n` and `|f(x_n)|` of the article's Algorithm 2 (EXRF), of regula falsi (its Algorithm 1), and of Steffensen's and Newton's methods.
@@ -13,7 +13,7 @@ rows_summary = '4, 1 per example.'
 notes = '''
 - **Keys:** the example numbers.
 - **`also_in`:** empty in every row, because the article does not say where its examples come from.
-- **Wu, Shen & Xia (2003):** the article generalizes the method of that article (its formula (10)), but does not say that its examples come from there, and does not run that method. That article has no source file in this folder.
+- **Wu, Shen & Xia (2003):** the article generalizes the method of that article, which is the article's own formula (10), but does not say that its examples come from there, and does not run that method. That article has no source file in this folder.
 '''
 
 [[relations]]

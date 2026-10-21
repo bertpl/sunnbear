@@ -1,10 +1,10 @@
 title = 'Galdino (2011): a family of regula falsi root-finding methods'
 reference = "Galdino, S. (2011). A family of regula falsi root-finding methods. Proceedings of the 2011 World Congress on Engineering and Technology, IEEE Press, Shanghai, pp. 514–517. ISBN 978-1-61284-365-0. No DOI; the author's copy: http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543."
 year = 2011
-home = '1.2'
+subcategory = '1.2'
 where_in_source = '''
 - Table II, "First set of functions used in numerical experiments of root-find methods", lists 23 functions `g1` to `g23` with simple zeros (case study 1, Section IV.A); Table III gives the function evaluations per function and method.
-- Table IV, "Example functions for numerical comparisons of root-find methods", lists 7 functions `f1` to `f7` with multiple zeros (case study 2, Section IV.B); Table V gives the function evaluations. The appendix states the multiplicity of 4 of them.
+- Table IV, "Example functions for numerical comparisons of root-find methods", lists 7 functions `f1` to `f7` with multiple zeros (case study 2, Section IV.B); Table V gives the function evaluations. The appendix states the multiplicity of 4 of the 7 functions.
 - A footnote to both tables says that each interval is an initial interval that holds the root.
 '''
 transcribed_from = "the article, checked against the page images. The article's Scilab script (Section IV) holds only `f1`."

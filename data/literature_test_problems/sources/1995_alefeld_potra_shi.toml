@@ -1,12 +1,12 @@
 title = 'Alefeld, Potra, Shi (1995): Algorithm 748'
 reference = "Alefeld, G. E., Potra, F. A., Shi, Y. (1995). Algorithm 748: enclosing zeros of continuous functions. ACM Transactions on Mathematical Software 21(3), 327–344. https://doi.org/10.1145/210089.210111. The authors' code is CALGO 748: https://www.netlib.org/toms/748."
 year = 1995
-home = '1.1'
+subcategory = '1.1'
 where_in_source = "the article's Table I, \"Test Problems\" (p. 341). In the authors' code, the subroutines `FUNC` and `INIT` in `driver.f` hold the functions and intervals, and `testdata` holds the parameter values."
 transcribed_from = '''
 the article's Table I, checked against the authors' `driver.f` and `testdata`, and against sunnbear's transcription in `tests/solvers/paper_problems/alefeld_potra_shi.py`, which follows the driver.
 - All 3 agree on every function, interval and parameter value, apart from the driver's `pi = 3.1416` in the intervals of rows 1 and 14.
-- The rows follow the article, except where the scan is unclear (problem 15), where they follow the driver; the rows' notes say where the code writes a problem differently.
+- The rows follow the article, except where the article's scan is unclear (problem 15), where they follow the driver; the rows' notes say where the code writes a problem differently.
 '''
 rows_summary = '''
 15, 1 per problem number of Table I.
