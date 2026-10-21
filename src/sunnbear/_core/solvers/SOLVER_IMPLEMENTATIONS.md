@@ -206,8 +206,8 @@ Ridders (1979) states no stopping criterion, so the core config fills that gap w
 ### V.b. TOMS748
 
 Alefeld, Potra and Shi (1995) publish 2 algorithms, which differ only in `k`, the number of interpolation steps in each iteration. Both configs follow section IV, so `k` is their only difference:
-- **`toms748[k=1]` (core):** `k = 1`, Algorithm 4.1, the default of SciPy's `toms748`.
-- **`toms748[k=2]` (secondary):** `k = 2`, Algorithm 4.2. The paper's Table II reports about 2 % fewer evaluations for it than for Algorithm 4.1, at each of its 4 tolerances.
+- **`toms748[k=1]` (core):** `k = 1`, Algorithm 4.1. It is the core config because it is the default of SciPy's `toms748`.
+- **`toms748[k=2]` (secondary):** `k = 2`, Algorithm 4.2. The article's Table II reports only about 2 % fewer evaluations for it than for Algorithm 4.1, at each of the table's 4 tolerances.
 
 ### V.c. ITP
 
