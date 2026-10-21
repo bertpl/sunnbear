@@ -118,8 +118,8 @@ class SolverConfigsDeclaration:
 
         class TOMS748ConfigsDeclaration(SolverConfigsDeclaration):
             configs = (
-                SolverConfig(solver_cls=TOMS748, role=SolverRole.BUILTIN_CORE, solver_kwargs={"k": 2}),
-                SolverConfig(solver_cls=TOMS748, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"k": 1}),
+                SolverConfig(solver_cls=TOMS748, role=SolverRole.BUILTIN_CORE, solver_kwargs={"k": 1}),
+                SolverConfig(solver_cls=TOMS748, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"k": 2}),
             )
 
     Class attributes:

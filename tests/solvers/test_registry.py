@@ -60,8 +60,8 @@ _BUILT_IN_CONFIG_ROWS = [
     ("ridders[variant='standard_stopping_criterion']", Ridders, SolverRole.BUILTIN_CORE),
     ("secant", Secant, SolverRole.BUILTIN_SECONDARY),
     ("steffen_brent", SteffenBrent, SolverRole.BUILTIN_SECONDARY),
-    ("toms748[k=1]", TOMS748, SolverRole.BUILTIN_SECONDARY),
-    ("toms748[k=2]", TOMS748, SolverRole.BUILTIN_CORE),
+    ("toms748[k=1]", TOMS748, SolverRole.BUILTIN_CORE),
+    ("toms748[k=2]", TOMS748, SolverRole.BUILTIN_SECONDARY),
 ]
 
 
