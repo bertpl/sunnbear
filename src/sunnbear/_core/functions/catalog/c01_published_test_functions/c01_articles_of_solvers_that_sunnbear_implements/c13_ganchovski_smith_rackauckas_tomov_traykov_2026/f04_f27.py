@@ -1,7 +1,8 @@
 """This module holds the formula that Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026) labels f27.
 
-The survey describes this function in words, not as 1 expression, so a person writes this module: a change of the
-formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+The survey gives this function as an expression in a helper variable ``p``, defined beside it, not as 1 expression in x,
+so a person writes this module: a change of the formula's row in `data/literature_test_problems/sources/` needs a change
+of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe

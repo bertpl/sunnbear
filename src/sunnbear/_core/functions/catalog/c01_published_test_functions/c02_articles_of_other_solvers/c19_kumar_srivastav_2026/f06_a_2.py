@@ -19,8 +19,10 @@ class KumarSrivastav2026A2(Formula):
     independently at each evaluation; ``sigma = 10^-3``; the formula's interval is ``[0, 1]``.
 
     A formula is a pure function of x, so ``eps`` is ``sigma`` times ``normal_noise(x)``, a value that depends only on x
-    and is distributed as a standard normal random draw: 2 evaluations at the same x give the same value, and 2 at
-    different x-values give values that are as independent as random draws.
+    and is distributed as a standard normal random draw.
+
+    Evaluations at the same x give the same value, and evaluations at different x-values give values that are as
+    independent as random draws.
 
     The article writes it as ``g(x) + eps`` with ``g(x) = x - e^-x``, and states the root ``0.5671432904``. Table 8's
     caption writes the noise as ``N(0, 10^-3)``, but gives its standard deviation as ``10^-3``, as the text does.

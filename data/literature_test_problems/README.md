@@ -235,7 +235,7 @@ For each source named, the script writes the source's package and its formula mo
 
 For a formula of several rows, the script checks that each row's own `f`, at that row's values, gives the formula's function.
 
-**A value that needs more than 12 significant digits,** such as `pi`, is rounded to 12, the most that a parameter value holds; this applies to a parameter value and to a bound of a formula with several intervals.
+**A value that needs more significant digits than a parameter value holds,** such as `pi`, is rounded to `CANONICAL_DIGITS` significant digits, the most that a parameter value holds; this applies to a parameter value and to a bound of a formula with several intervals.
 
 The module's docstring names each rounded value, and its test cases evaluate the function at the rounded value.
 

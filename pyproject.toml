@@ -220,7 +220,8 @@ markers = [
     "only_with_numba_jit: the test needs numba's JIT, so it skips when NUMBA_DISABLE_JIT is set (tests/conftest.py)",
 ]
 # With numba's JIT disabled, the noise functions' splitmix64 runs as numpy uint64 arithmetic, whose overflow wraps
-# around as splitmix64 needs; the module's own filter for the warning does not survive pytest's import of it.
+# around as splitmix64 needs. noise.py sets its own filter on import, but pytest restores its warning filters after
+# collecting the tests, so that filter no longer applies when a test runs.
 filterwarnings = [
     "ignore:overflow encountered in scalar:RuntimeWarning:sunnbear._core.utils.math_functions.noise",
 ]

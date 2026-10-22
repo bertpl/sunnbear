@@ -365,7 +365,7 @@ class FormulaModuleSpec:
 
     @staticmethod
     def _parameter_value(value: sp.Expr) -> tuple[float, bool]:
-        """Return a published value as a float that a parameter holds, and whether the value was rounded to fit it.
+        """Return a published value as a float that a parameter holds, and whether that float is rounded.
 
         A value that no `ParamNotation` holds exactly, such as `pi`, is rounded to `CANONICAL_DIGITS` significant
         digits, as `ParamNotation.DECIMAL` rounds it.
@@ -486,14 +486,17 @@ class FormulaModuleSpec:
     def _tuple_values(
         cls, published_test_function: PublishedTestFunction, has_interval_parameters: bool
     ) -> tuple[tuple[float, ...], tuple[float, float], list[str], dict[str, sp.Expr]]:
-        """Return a published test function's parameter tuple, bounds, rounded values' texts, and mpmath's values.
+        """Return a published test function's parameter tuple and bounds, and the values that the module's text needs.
 
-        The 4 results are the tuple, the bounds, the exact text of each value that is rounded, and the parameter values
-        at which mpmath evaluates the function, keyed by survey name.
+        A parameter value that no `ParamNotation` holds exactly is rounded by `_parameter_value`, and mpmath evaluates
+        the function at the rounded value, because the formula receives the rounded value too.
 
-        A parameter value is rounded where no parameter holds it exactly, as `_parameter_value` does, and mpmath then
-        evaluates the function at the rounded value, as the formula does. With `has_interval_parameters`, the bounds
-        are parameters too, rounded by the same rule, both in the returned bounds and at the end of the tuple.
+        With `has_interval_parameters`, the bounds are parameters too, rounded by the same rule, both in the returned
+        bounds and at the end of the tuple.
+
+        Returns:
+            The parameter tuple; the bounds; the exact text of each rounded value; and the parameter values at which
+            mpmath evaluates the function, keyed by survey name.
         """
         values, exact_texts_of_rounded_values, mpmath_parameter_values = [], [], {}
         for name, exact_value in published_test_function.parameter_values:

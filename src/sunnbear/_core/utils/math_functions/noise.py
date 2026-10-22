@@ -1,7 +1,9 @@
-"""This module holds noise that is a pure function of x: the same x always gives the same value.
+"""The noise functions return values that depend only on x: the same x always gives the same value.
 
 A formula is a pure function of x, c and its parameters, so a published function with random noise takes its noise
-from x itself. The noise functions mix the 64 bits of x with splitmix64's finalizer (Sebastiano Vigna,
+from x itself.
+
+The noise functions mix the 64 bits of x with splitmix64's finalizer (Sebastiano Vigna,
 https://prng.di.unimi.it/splitmix64.c), whose output bits each depend on every input bit, so neighboring x-values get
 unrelated noise, distributed like independent random draws.
 """
@@ -40,18 +42,15 @@ def uniform_noise(x: float) -> float:
 
 @numba.njit
 def normal_noise(x: float) -> float:
-    """Return a value that depends only on x, distributed as a standard normal random draw; NaN for a non-finite x.
-
-    The Box-Muller transform turns 2 uniform values into the normal value: the first comes from the mixed integer of x,
-    and the second from that integer mixed once more.
-    """
+    """Return a value that depends only on x, distributed as a standard normal random draw; NaN for a non-finite x."""
     if not math.isfinite(x):
         return math.nan
     else:
         mixed_integer = _splitmix64(_float_bits(x))
-        radius_uniform = 1.0 - _unit_value(mixed_integer)  # in (0, 1], so that its log is finite
-        angle_uniform = _unit_value(_splitmix64(mixed_integer))
-        return math.sqrt(-2.0 * math.log(radius_uniform)) * math.cos(2.0 * math.pi * angle_uniform)
+        radius_unit_value = 1.0 - _unit_value(mixed_integer)  # in (0, 1], so that its log is finite
+        angle_unit_value = _unit_value(_splitmix64(mixed_integer))
+        # the Box-Muller transform turns the 2 uniform values into 1 standard normal value
+        return math.sqrt(-2.0 * math.log(radius_unit_value)) * math.cos(2.0 * math.pi * angle_unit_value)
 
 
 # ==================================================================================================
@@ -61,16 +60,18 @@ def normal_noise(x: float) -> float:
 def _float_bits(x: float) -> uint64:
     """Return the 64 bits of a finite float64 x, as IEEE 754 lays them out: sign, 11 exponent bits, 52 mantissa bits.
 
-    The bits are computed from `math.frexp`, which numba compiles for a scalar, unlike a view of x's memory. `frexp`
-    gives `|x| = m*2^e` with `0.5 <= m < 1`; a normal x stores `e + 1022` as its exponent field and the 52 bits after
-    the leading 1 of `m`, and a subnormal x stores 0 and `|x|*2^1074`.
+    The bits are computed from `math.frexp`, because numba cannot compile a view of a scalar float's memory as an
+    integer.
     """
+    # frexp gives |x| = m*2^e with 0.5 <= m < 1
     mantissa, exponent = math.frexp(abs(x))
     if x == 0.0:
         exponent_field, mantissa_field = 0, 0
     elif exponent > -1022:
+        # a normal x stores e + 1022 as its exponent field, and the 52 bits after the leading 1 of m
         exponent_field, mantissa_field = exponent + 1022, int(math.ldexp(mantissa, 53)) - 2**52
     else:
+        # a subnormal x stores 0 as its exponent field, and |x|*2^1074 as its mantissa field
         exponent_field, mantissa_field = 0, int(math.ldexp(abs(x), 1074))
     sign_field = 1 if math.copysign(1.0, x) < 0.0 else 0
     return (uint64(sign_field) << uint64(63)) | (uint64(exponent_field) << uint64(52)) | uint64(mantissa_field)
@@ -78,7 +79,10 @@ def _float_bits(x: float) -> uint64:
 
 @numba.njit
 def _splitmix64(z: uint64) -> uint64:
-    """Return splitmix64's next output for the state `z`: `z` plus splitmix64's increment, through its finalizer."""
+    """Return splitmix64's next output for the state `z`.
+
+    The output is `z` plus splitmix64's increment, with its bits then mixed by 3 xor-shifts and 2 multiplications.
+    """
     z = z + uint64(0x9E3779B97F4A7C15)
     z = (z ^ (z >> uint64(30))) * uint64(0xBF58476D1CE4E5B9)
     z = (z ^ (z >> uint64(27))) * uint64(0x94D049BB133111EB)
