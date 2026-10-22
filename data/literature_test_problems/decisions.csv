@@ -23,7 +23,7 @@ row_id,status,duplicate_of,derived_from,reason
 2003_suli_mayers:Example 1.4,new,,,"No earlier row gives this fixed-point function, and Fig. 1.3 gives its values `alpha = 1/2, 1, 2`."
 2003_suli_mayers:Exercise 1.2,new,,,"The piecewise `g` defines the function on all of [0, 1], and `k` indexes only the starting points, not the function; no earlier row has `x*sin(1/x)^2`."
 "2004_moler:§4.3, §4.4; Ex. 4.1, 4.8",new,,1989_atkinson:P15(a),"Atkinson's P15(a), sign(x)*sqrt(abs(x)), shifted by a; a = 2 in Figure 4.1 and Ex. 4.1, on [0, 4] and [1, 4]."
-2006_bradie:Fig. 2.2,incomplete,,1975_bus_dekker:III | 2004_moler:§1.7,"no interval: Figure 2.2 only plots (x - 1)^7 on [0, 2]; (x - 1)^7 is Bus-Dekker's x^n at n = 7, shifted to the root 1, and Moler's §1.7 row is its expanded form."
+2006_bradie:Fig. 2.2,new,,1975_bus_dekker:III | 2004_moler:§1.7,"(x - 1)^7 on [0, 2], the range of Figure 2.2; it is Bus & Dekker (1975)'s x^n at n = 7 shifted to the root 1, and the factored form of Moler (2004)'s §1.7 polynomial, which rounds differently."
 2007_press_numerical_recipes:(9.1.1),incomplete,,2004_moler:Ex. 4.1#5,no interval: the book gives no bracket and no value of `c`; Moler's 1/(x - pi) is the family 1/(x - c) at c = pi.
 2011_galdino:g19,duplicate,1971_dowell_jarratt_illinois:Table 6,,"Compared with the function that Galdino meant, exp(-n*x)*(x - 1) + x^n at n = 10; Galdino prints g16's expression."
 2011_galdino:g20,duplicate,1973_anderson_bjorck:Ex. 6,,"Compared with the function that Galdino meant, exp(-n*x)*(x - 1) + x^n at n = 20; Galdino prints g17's expression."
@@ -113,7 +113,7 @@ ganchovski_test_functions:f101,new,,,"No earlier row has this piecewise function
 2026_gao:T4.7,new,,1971_brent:3.2 | 1997_chandrupatla:7,"Chandrupatla (1997)'s function 7 on its 5 intervals, printed without its cutoff to 0 for abs(x) < 3.8*10^-4, so it is Brent (1971)'s function 3.2, which earlier rows give only on [-1, 4]."
 2026_kumar:f4,new,,1975_bus_dekker:II.1 | 2013_stage:3.10,"Bus-Dekker (1975)'s x^3 + a*x with a = 0.05, shifted to the root 0.6; Stage (2013)'s 3.10 is the same form with 0.001 and 7/9."
 2026_kumar:A.2,new,,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),"`x - exp(-x)` with a noise `eps` that is drawn from `N(0, sigma^2)` at each evaluation; the source states the distribution, so the function is defined."
-2026_li_upper_crossing:Ex. 3 (7.2),incomplete,,2021_oliveira_takahashi:1.11,"no usable interval: the source gives `x` in R and draws starting values from `U(-4, 4)`; the function is Oliveira-Takahashi's `Phi(x - 1) - sqrt(2)/4` negated, with other values of `p`, and of `mu` in Table 3."
+2026_li_upper_crossing:Ex. 3 (7.2),new,,2021_oliveira_takahashi:1.11,"The normal quantile equation p - Phi(x; mu, sigma^2), which Figure 2 plots on [-2.5, -0.5] for p = 0.05, mu = 1, sigma = 1; Oliveira & Takahashi (2021)'s 1.11 is the same equation negated, with other values of p."
 2026_li_upper_crossing:4.1.2,incomplete,,,"parameters without values: `p`, `alpha` and `beta` are only said to lie in `(0, 1)`."
 2026_li_upper_crossing:7.1,new,,,"Eq. (7.1) for its 2 published coefficient sets, the cubics `-theta^3 + theta^2 - theta + 1` and `theta^3 - 3*theta^2 - theta + 1`, on `(0, 2)`; no earlier row has either cubic."
 2026_li_upper_crossing:App. D,new,,2026_li_upper_crossing:7.1,"Eq. (7.1) with {a0, a1, a2, a3, m} = {1, 1, -3, 1, 3}, a set of coefficients that 7.1 does not have."

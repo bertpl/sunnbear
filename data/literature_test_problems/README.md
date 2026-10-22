@@ -59,7 +59,7 @@ The generated files list the sources in time order: by year, then by id without 
 | `f` | the function as 1 expression in ASCII operators (`x^n - 0.2`, `exp(-n*x)`, `sqrt(x)`), or an equation `lhs = rhs` |
 | `f_description` | instead of `f`: a function that 1 expression does not give, such as a piecewise function or one that needs data |
 | `parameters` | the values of the source's own parameters, as published (`n = 4, 6, 8, 10, 12`) |
-| `interval` | the interval or intervals as published, or the starting points where the source gives no interval |
+| `interval` | the interval or intervals as published, including the x-range of a figure that plots the function where both bounds can be read exactly, such as ```[0, 2]` (Fig. 2.2)``; or the starting points where the source gives no interval |
 | `also_in` | other sources of the function, where this source names them |
 | `notes` | what a reader needs to read the row, such as a rounded constant or a misprint |
 

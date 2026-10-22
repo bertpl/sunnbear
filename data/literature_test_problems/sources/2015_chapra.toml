@@ -133,6 +133,7 @@ notes = "Roots by the quadratic formula (PT2.1). (7.7) is the same polynomial in
 [[rows]]
 key = '§PT2.1.1 (p. 117); Ex. 6.2–6.4, 6.6, 6.8; Fig. 6.2, 6.9; Prob. 6.27–6.29, 7.22–7.24'
 f = 'exp(-x) - x'
+interval = '`[0, 1]` (Fig. 6.2)'
 notes = "Root `0.56714329`. §PT2.1.1 names it as a function without an analytical root. Ex. 6.2 plots `y1 = x` and `y2 = exp(-x)` and reads the root at their intersection (Fig. 6.2(b)). Newton from `x0 = 0` (Ex. 6.3, 6.4); secant from `x(-1) = 0`, `x0 = 1` (Ex. 6.6); modified secant from `x0 = 1` with `delta = 0.01` (Ex. 6.8). Fig. 6.9 compares the methods' errors on it; the problems repeat the examples with the reader's programs."
 
 [[rows]]
@@ -140,7 +141,7 @@ key = '(PT2.3), (PT2.4); Ex. 5.1, 5.3–5.5; Fig. 5.1, 5.6, 5.7, 5.13; Prob. 5.1
 f = '(g*m/c)*(1 - exp(-(c/m)*t)) - v'
 name = "parachutist's velocity, unknown drag coefficient"
 parameters = '`g = 9.81` m/s^2, `m = 68.1` kg, `v = 40` m/s, `t = 10` s (Ex. 5.1); `m = 82`, `v = 36`, `t = 4` (Prob. 5.14)'
-interval = '`[12, 16]` (Ex. 5.3, 5.5); `[3, 5]` (Prob. 5.14)'
+interval = '`[12, 16]` (Ex. 5.3, 5.5); `[3, 5]` (Prob. 5.14); `[4, 20]` (Fig. 5.1)'
 notes = "Unknown `c`, the drag coefficient (kg/s) that gives a parachutist of mass `m` the velocity `v` after `t` seconds of free fall. Ex. 5.1 prints it with the values as (E5.1.1), `(668.06/c)*(1 - exp(-0.146843*c)) - 40`, and reads 14.75 off a plot; Ex. 5.3 gives the root `14.8011`. By bisection to `es = 0.5%` (Ex. 5.3, 5.4) and by false position (Ex. 5.5). Prob. 5.14 runs bisection to `es = 2%`; its interval holds the root, about 3.586. The other problems repeat Ex. 5.3–5.5 with the reader's programs; Prob. 5.26 stops by Eq. (5.5), with `Ea,d = 0.0001`."
 
 [[rows]]
@@ -171,7 +172,7 @@ notes = "Double root 2 and simple root 4: the book's example of a function tange
 [[rows]]
 key = 'Ex. 5.2; Fig. 5.4'
 f = 'sin(10*x) + cos(3*x)'
-interval = '[0, 5]'
+interval = '`[0, 5]`; `[3, 5]` (Fig. 5.4(b)); `[4.2, 4.3]` (Fig. 5.4(c))'
 notes = 'Several roots on the interval. Plots on narrower ranges (Fig. 5.4) show that the apparent double root near 4.2 is 2 distinct roots, at about 4.23 and 4.26.'
 
 [[rows]]
@@ -203,6 +204,7 @@ notes = 'The fixed-point form of `sin(x)`; not iterated.'
 [[rows]]
 key = 'Ex. 6.1'
 f = 'x = exp(-x)'
+interval = '`[0, 1]` (Fig. 6.2(b))'
 notes = 'Fixed-point iteration from `x0 = 0`: 10 iterations reach 0.564879, converging linearly to `0.56714329`.'
 
 [[rows]]
@@ -249,11 +251,13 @@ notes = "Roots 0.5, -1, 2 and `1 ± 0.5i`. Bairstow's method from `r = s = -1` t
 [[rows]]
 key = '§7.7.1, Fig. 7.6; Ex. 7.4; §7.7.3, Fig. 7.7'
 f = 'x - cos(x)'
+interval = '`[0, 2]` (Fig. 7.6); `[-10, 10]` (Fig. 7.7)'
 notes = "Root 0.739085. Excel: trial and error after a plot on `[0, 2]` (Fig. 7.6), and Goal Seek (Ex. 7.4); Mathcad's `root` from `x = 1`, with a plot on `[-10, 10]` (Fig. 7.7)."
 
 [[rows]]
 key = 'Fig. 7.8'
 f = 'x^3 - 10*x + 2'
+interval = '`[-4, 4]` (Fig. 7.8)'
 notes = "Roots -3.257897, 0.20081 and 3.057087, by Mathcad's `polyroots`; plotted on `[-4, 4]`."
 
 [[rows]]

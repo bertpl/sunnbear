@@ -81,7 +81,7 @@ notes = "§4.3 derives it as the function on which Newton's method cycles foreve
 key = '§4.7, §4.8; Ex. 4.7, 4.10(a)'
 f = 'J0(x)'
 name = 'Bessel function `J0`'
-interval = '`[(n - 1)*pi, n*pi]`, `n = 1, ..., 10` (§4.7); `[0, pi]` (§4.7, Ex. 4.7); `[0, 3.83]` (§4.8)'
+interval = '`[(n - 1)*pi, n*pi]`, `n = 1, ..., 10` (§4.7); `[0, pi]` (§4.7, Ex. 4.7); `[0, 3.83]` (§4.8); `[0, 10*pi]` (Figure 4.2)'
 notes = "§4.7 finds its first 10 zeros with `fzerotx`, 1 per interval, and plots it on `[0, 10*pi]` (Figure 4.2); it also calls `fzerotx(@bessj0,[0,pi])`. §4.8 steps `fzerogui` toward its first zero on `[0, 3.83]`, 3.83 being near its first local minimum (Figures 4.3–4.6). Ex. 4.7 calls `fzerotx(@besselj,[0 pi],0)`, which by `fzerotx`'s rule for extra arguments evaluates `besselj(x, 0)`, the Bessel function of order `x` at 0, and returns 3.1416; the exercise asks why. Ex. 4.10(a) asks for its first 10 zeros."
 
 [[rows]]
@@ -92,6 +92,7 @@ notes = '§4.7 names the handle `@cos` as an example of syntax, with no interval
 [[rows]]
 key = '§4.7, §4.10'
 f = '1/((x - 0.3)^2 + 0.01) + 1/((x - 0.9)^2 + 0.04) - 6'
+interval = '`[-1, 2]` (Figure 4.8)'
 name = 'humps'
 notes = "MATLAB's demo function `humps`, which §4.10 says illustrates graphics, quadrature and zero-finding routines; §4.7 names the handle `@humps` as an example of syntax. The chapter uses it only for minimization: `fmintx` minimizes `-humps(x)` on `[-1, 2]` (§4.10, Figure 4.8; Ex. 4.17)."
 
@@ -110,7 +111,7 @@ notes = "§4.7 writes it as the anonymous function `G = @(z) z^3-2*z-5`, an exam
 key = '§4.7'
 f = 'J0(x) - y'
 parameters = 'y = 0.5'
-interval = '[0, 2]'
+interval = '`[0, 2]`; `[0, 10*pi]` (Figure 4.2)'
 notes = '§4.7 states the equation `J0(xi) = 0.5` and passes `F = @(x,y) besselj(0,x)-y`, or `B = @(x,n,y) besselj(n,x)-y` with `n = 0`, to `fzerotx` with `y = 0.5`. Result `xi = 1.5211`, marked in Figure 4.2.'
 
 [[rows]]

@@ -24,7 +24,7 @@ How to read the rows:
 [[rows]]
 key = 'Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13; Tables 4.13, 4.14; 4.4-1, 4.4-2'
 f = '2 - exp(x)'
-interval = '[0, 1]'
+interval = '`[0, 1]`; `[-5, 5]` (Fig. 4.5)'
 notes = "The chapter's running example; root `log(2) = 0.6931471806`. Bisection on `[0, 1]` (Ex. 3.1, Table 3.1); Newton from `x0 = 0` (Ex. 3.2, Table 3.2); secant from `x0 = 0, x1 = 1` (Ex. 3.7, Table 3.5; 3.11-13); the chord method from `x0 = 0` (Ex. 3.17); Halley's 2 methods from `x0 = 0` (Table 3.13); Newton, Halley and Chun–Neta (Table 3.17); Steffensen from `x0 = 0` (3.9-12); Muller and inverse quadratic interpolation from 0, 1/2, 1 (Section 4.4)."
 
 [[rows]]
@@ -148,22 +148,25 @@ notes = "Root 0 without a sign change: the book's example of a root that bisecti
 [[rows]]
 key = 'Fig. 3.2, 3.6, 3.7'
 f = 'x^2 - 1/2'
+interval = '`[0, 4]` (Fig. 3.2, 3.6); `[0, 2]` (Fig. 3.7)'
 notes = "Roots `±sqrt(1/2)`. Figures only: Newton's tangent lines (Fig. 3.2), secant lines (Fig. 3.6), and its fixed point `(1 + sqrt(3))/2` next to its root (Fig. 3.7)."
 
 [[rows]]
 key = 'Fig. 3.8'
 f = '(1/2)*x^2 - 1/2'
+interval = '`[0, 4]` (Fig. 3.8)'
 notes = 'Figure only: 2 Newton steps.'
 
 [[rows]]
 key = '§3.2 (p. 99), Fig. 3.3'
 f = '(4/3)*exp(2 - x/2)*(1 + x^-1*log(x))'
+interval = '`[0, 8]` (Fig. 3.3)'
 notes = 'Single root near `x = 0.5`. Newton from `x0` in about `[0.8, 1.2]` gives `x1 < 0`, outside the domain; from `x0 > 1.2` it grows without bound, where `f -> 0`.'
 
 [[rows]]
 key = '§3.2 (p. 100), Fig. 3.4, Table 3.3; Ex. 3.19, Table 3.16'
 f = '(20*x - 1)/(19*x)'
-interval = '`[0.01, 1]` (Table 3.16)'
+interval = '`[0.01, 1]` (Table 3.16); `[-0.2, 0.2]` (Fig. 3.4)'
 notes = 'Root 0.05. Table 3.3: the first Newton step from `x0 = 1, 0.5, 0.25, 0.125, 0.0625` gives `x1 < 0` until `x0 = 1/16`. Table 3.16: the hybrid method (Algorithm 3.6), from `x0 = 0.01, x1 = 1`.'
 
 [[rows]]
@@ -268,7 +271,7 @@ notes = "Asks to extend Section 3.7's analysis to cube roots."
 [[rows]]
 key = 'Ex. 3.8, 3.9, 3.15, 3.16; Table 3.12'
 f = 'x = (1/2)*exp(-x)'
-interval = '`[0, 1/2]` (Ex. 3.9)'
+interval = '`[0, 1/2]` (Ex. 3.9); `[0, 1]` (Fig. 3.9, 3.10)'
 notes = 'Fixed point 0.35173371124920. Fixed-point iteration from `x0 = 0, 5, -5` (Table 3.6); both Aitken algorithms from `x0 = 0` (Ex. 3.15, 3.16, Table 3.12). Figure 3.9 draws it.'
 
 [[rows]]

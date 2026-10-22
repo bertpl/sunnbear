@@ -70,6 +70,7 @@ Ellithy (2026) (`2026_ellithy`) has 3 functions of this chapter:
 [[rows]]
 key = '§2 (pp. 47–48); 2.3-22'
 f = '1564000 = 1000000*exp(lambda) + (435000/lambda)*(exp(lambda) - 1)'
+interval = '`(0, 1]` (figure, p. 47)'
 notes = 'Unknown `lambda`, the birthrate of a population. From the model `N(t) = N0*exp(lambda*t) + (v/lambda)*(exp(lambda*t) - 1)` with `N0 = 1000000`, immigration `v = 435000` per year and `N(1) = 1564000`; the figure on p. 47 plots `N(lambda)` in thousands up to `lambda = 1`. 2.3-22 asks for `lambda` to `1E-4`, then predicts the population after 2 years.'
 
 [[rows]]
@@ -87,6 +88,7 @@ notes = "The chapter's running example: unique root `1.365230013` in `[1, 2]`. B
 [[rows]]
 key = '§2.2 Ex. 1; Fig. 2.2'
 f = 'x = x^2 - 2'
+interval = '`[-3, 3]` (Fig. 2.2)'
 notes = 'Fixed points -1 and 2, from `(p + 1)*(p - 2) = 0`.'
 
 [[rows]]

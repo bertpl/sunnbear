@@ -92,7 +92,7 @@ interval = '[2.6, 3.5]'
 [[rows]]
 key = '11'
 f = 'atan(x) - 1'
-interval = '[1, 8]'
+interval = '`[1, 8]`; `[0, 9]` (Fig. 1, 2)'
 notes = 'The article prints `arctan`.'
 
 [[rows]]
