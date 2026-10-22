@@ -1,9 +1,9 @@
 """This module reads the published test functions of 1 formula from the survey: its function and its cases.
 
 A case is 1 test function that a source publishes: 1 combination of the formula's parameter values, on 1 interval. A
-formula's function is the `f` of its first row, or the `f` of its line in `formulas.csv`, which a person gives in
-`formula_decisions.csv` for a formula whose rows give 1 function with other values of a parameter; the line's
-`parameters` then gives each row's values of those parameters.
+formula's function is the `f` of its first row, unless the formula's line in `formulas.csv` gives an `f` of its own.
+A person gives that `f` in `formula_decisions.csv` for a formula whose rows print 1 function, each row with its own
+values of some parameters; the line's `parameters` then gives each row's values of those parameters.
 
 A row whose parameters give several sets of values, separated by `;`, pairs each set with intervals: those that the
 set names after `on`, as in `on [0, 5]: a = 0.2, 1, n = 4(2)12`, or the row's only interval.
@@ -29,8 +29,8 @@ ON_INTERVALS = re.compile(r"\s*on\s+(.+?):\s+")
 CHECK_FRACTIONS = (0.13, 0.29, 0.41, 0.58, 0.77, 0.94)
 
 
-class PublicationError(Exception):
-    """A `PublicationError` reports a formula whose cases the survey does not give in a form that this module reads."""
+class PublishedCasesError(Exception):
+    """A `PublishedCasesError` reports a formula whose cases the survey gives in a form that this module cannot read."""
 
 
 # ==================================================================================================
@@ -61,51 +61,48 @@ class PublishedFormula:
         parameter_names: The survey names of the function's parameters, in the order in which the first row's
             parameters name them.
         cases: The published cases, row by row, in the order of each row's values and intervals.
+        is_family_form: Whether `f` is a person's family form of the rows' functions, from `formulas.csv`, and not
+            the first row's `f`.
     """
 
     f: str
     variable: str
     parameter_names: tuple[str, ...]
     cases: tuple[PublishedCase, ...]
+    is_family_form: bool
 
     @property
-    def rows(self) -> tuple[SourceRow, ...]:
-        """Return the formula's rows that have cases, in the order of the formula's rows."""
-        return tuple(dict.fromkeys(case.row for case in self.cases))
+    def has_interval_parameters(self) -> bool:
+        """Return whether the cases lie on more than 1 interval, so that each tuple carries its own `a` and `b`."""
+        return len({case.interval.key for case in self.cases}) > 1
 
-    def check_rows(self, expression: FormulaExpression, is_template: bool) -> None:
+    def check_rows(self, expression: FormulaExpression) -> None:
         """Check that each row's own `f` gives the formula's function at each of the row's cases.
 
-        The 2 functions are compared by value at `CHECK_FRACTIONS` of each interval, in 30-digit arithmetic. With
-        `is_template`, the formula's function is a person's family form of the rows' functions, which must give each
-        row's function exactly; otherwise it is the first row's `f`, and the other rows may give it multiplied by a
-        constant, the sign flip of an equation's other difference form included.
+        The 2 functions are compared by value at `CHECK_FRACTIONS` of each interval, in 30-digit arithmetic. Where
+        `is_family_form` holds, the formula's function is the family form that a person wrote to cover all the rows'
+        functions, and it must equal each row's function exactly. Otherwise, the formula's function is the first row's
+        `f`, and another row's `f` may equal it times a constant; that constant is -1 for a row that writes the
+        equation with its 2 sides swapped.
 
         Raises:
-            PublicationError: If a row's function differs from the formula's.
+            PublishedCasesError: If a row's function differs from the formula's.
         """
-        for row in self.rows:
+        for row in dict.fromkeys(case.row for case in self.cases):
             row_names = {name: name for name in FormulaExpression.free_names(row.f) if name != self.variable}
             try:
                 row_expression = FormulaExpression.from_text(row.f, self.variable, row_names)
             except TranslationError as error:
-                raise PublicationError(f"{row.row_id}: {error}") from error
+                raise PublishedCasesError(f"{row.row_id}: {error}") from error
             for case in (case for case in self.cases if case.row == row):
-                values = {sp.Symbol(name): value for name, value in case.parameter_values}
-                row_values = {sp.Symbol(name): value for name, value in parse_parameters(row.parameters).items()}
-                formula_function = sp.lambdify(
-                    expression.variable, expression.sympy_expr.subs(values), modules="mpmath"
-                )
-                row_function = sp.lambdify(
-                    row_expression.variable,
-                    row_expression.sympy_expr.subs({**{s: v[0] for s, v in row_values.items()}, **values}),
-                    modules="mpmath",
-                )
+                row_values = {name: values[0] for name, values in parse_parameters(row.parameters).items()}
+                formula_function = expression.mpmath_function(dict(case.parameter_values))
+                row_function = row_expression.mpmath_function({**row_values, **dict(case.parameter_values)})
                 ratios = self._value_ratios(formula_function, row_function, case.interval)
-                if not ratios or (is_template and any(abs(r - 1) > 1e-20 for r in ratios)):
-                    raise PublicationError(f"{row.row_id}: the row's f differs from the formula's function")
+                if not ratios or (self.is_family_form and any(abs(r - 1) > 1e-20 for r in ratios)):
+                    raise PublishedCasesError(f"{row.row_id}: the row's f differs from the formula's function")
                 elif any(abs(r - ratios[0]) > 1e-20 * abs(ratios[0]) for r in ratios):
-                    raise PublicationError(f"{row.row_id}: the row's f is not a multiple of the formula's function")
+                    raise PublishedCasesError(f"{row.row_id}: the row's f is not a multiple of the formula's function")
 
     # --------------------------------------------------------------------------
     #  Helpers
@@ -131,7 +128,7 @@ class PublishedFormula:
         """Return the function's variable: `x`, the name that the notes call the unknown, or the only other name.
 
         Raises:
-            PublicationError: If none of these gives 1 name.
+            PublishedCasesError: If none of these gives 1 name.
         """
         named = re.search(r"unknown `([A-Za-z_][A-Za-z0-9_]*)`", notes, flags=re.IGNORECASE)
         free = [name for name in names if name not in parameter_names and name != "e"]
@@ -142,7 +139,7 @@ class PublishedFormula:
         elif len(free) == 1:
             return free[0]
         else:
-            raise PublicationError(f"the variable of {names} is unclear")
+            raise PublishedCasesError(f"the variable of {names} is unclear")
 
     @staticmethod
     def _value_sets(row: SourceRow, values_text: str) -> list[tuple[dict[str, list], tuple[Interval, ...]]]:
@@ -152,8 +149,8 @@ class PublishedFormula:
         does not assign a parameter takes the first set's values of it.
 
         Raises:
-            PublicationError: If several sets are published but some set does not name its intervals, while the row
-                has more than 1.
+            PublishedCasesError: If the row gives several sets of values and more than 1 interval, and a set does not
+                name its intervals.
         """
         row_intervals = ParsedIntervals.from_source_row(row).intervals
         groups = [group for group in values_text.replace("`", "").split(";") if group.strip()]
@@ -163,19 +160,20 @@ class PublishedFormula:
         )
         if not is_reassigned:
             return [(parse_parameters(values_text), row_intervals)]
-        value_sets = []
-        for group in groups:
-            on_match = ON_INTERVALS.match(group)
-            if on_match:
-                intervals = ParsedIntervals.from_source_row(replace(row, interval=on_match.group(1))).intervals
-                assignments = group[on_match.end() :]
-            elif len(row_intervals) == 1:
-                intervals, assignments = row_intervals, group
-            else:
-                raise PublicationError(f"{row.row_id}: a set of parameter values does not name its intervals")
-            first_set = value_sets[0][0] if value_sets else {}
-            value_sets.append(({**first_set, **parse_parameters(assignments)}, intervals))
-        return value_sets
+        else:
+            value_sets = []
+            for group in groups:
+                on_match = ON_INTERVALS.match(group)
+                if on_match:
+                    intervals = ParsedIntervals.from_source_row(replace(row, interval=on_match.group(1))).intervals
+                    assignments = group[on_match.end() :]
+                elif len(row_intervals) == 1:
+                    intervals, assignments = row_intervals, group
+                else:
+                    raise PublishedCasesError(f"{row.row_id}: a set of parameter values does not name its intervals")
+                first_set = value_sets[0][0] if value_sets else {}
+                value_sets.append(({**first_set, **parse_parameters(assignments)}, intervals))
+            return value_sets
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -185,18 +183,18 @@ class PublishedFormula:
         """Return the formula of a line of `formulas.csv`, with the cases of its rows.
 
         Raises:
-            PublicationError: If the line's `parameters` does not give 1 set per row, the variable is unclear, a
-                parameter has no published value, the cases are more than `MAX_INSTANCES`, or no case has an
-                interval.
+            PublishedCasesError: If the line's `parameters` does not give 1 set per row, the variable is unclear, a
+                parameter has no published value, the cases are more than `MAX_INSTANCES`, no case has an
+                interval, or a row's function differs from the formula's.
         """
-        rows = [source.find_row(row_id) for row_id in formulas_table_line.row_ids]
-        f = formulas_table_line.function.f or rows[0].f
-        row_values = formulas_table_line.function.row_parameters() or [""] * len(rows)
-        if len(row_values) != len(rows):
-            raise PublicationError(f"{formulas_table_line.formula_id}: its parameters do not give 1 set per row")
+        rows = list(formulas_table_line.rows(source))
+        f = formulas_table_line.function_decision.f or rows[0].f
+        values_per_row = formulas_table_line.function_decision.values_per_row() or [""] * len(rows)
+        if len(values_per_row) != len(rows):
+            raise PublishedCasesError(f"{formulas_table_line.formula_id}: its parameters do not give 1 set per row")
         values_texts = [
             f"{row.parameters}; {values}" if values.strip() else row.parameters
-            for row, values in zip(rows, row_values, strict=True)
+            for row, values in zip(rows, values_per_row, strict=True)
         ]
         assigned_names = {
             match.group(1) for text in values_texts for match in ASSIGNMENT.finditer(text.replace("`", ""))
@@ -212,7 +210,7 @@ class PublishedFormula:
             for values, intervals in cls._value_sets(row, values_text):
                 missing = [name for name in parameter_names if not values.get(name)]
                 if missing:
-                    raise PublicationError(f"{row.row_id}: the parameter {missing[0]} has no published value")
+                    raise PublishedCasesError(f"{row.row_id}: the parameter {missing[0]} has no published value")
                 for combo in itertools.product(*(values[name] for name in parameter_names)):
                     parameter_values = tuple(zip(parameter_names, combo, strict=True))
                     cases += [
@@ -221,7 +219,25 @@ class PublishedFormula:
                         if interval.matches_parameter_values(parameter_values)
                     ]
         if len(cases) > MAX_INSTANCES:
-            raise PublicationError(f"{formulas_table_line.formula_id}: more than {MAX_INSTANCES} cases")
+            raise PublishedCasesError(f"{formulas_table_line.formula_id}: more than {MAX_INSTANCES} cases")
         elif not cases:
-            raise PublicationError(f"{formulas_table_line.formula_id}: no case has a usable interval")
-        return cls(f=f, variable=variable, parameter_names=tuple(parameter_names), cases=tuple(cases))
+            raise PublishedCasesError(f"{formulas_table_line.formula_id}: no case has a usable interval")
+        else:
+            published_formula = cls(
+                f=f,
+                variable=variable,
+                parameter_names=tuple(parameter_names),
+                cases=tuple(cases),
+                is_family_form=bool(formulas_table_line.function_decision.f),
+            )
+            if len(rows) > 1:
+                # `check_rows` reads only the sympy expression; the `_` keeps each Python name clear of Python's
+                # keywords, such as `lambda`
+                try:
+                    expression = FormulaExpression.from_text(
+                        f, variable, {name: f"{name}_" for name in parameter_names}
+                    )
+                except TranslationError as error:
+                    raise PublishedCasesError(f"{formulas_table_line.formula_id}: {error}") from error
+                published_formula.check_rows(expression)
+            return published_formula

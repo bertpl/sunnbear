@@ -12,8 +12,9 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 class Brent197341(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source describes ``0`` if ``abs(x) < 3.8*10^-4``; ``fl(x*exp(-x^-2))`` otherwise; the formula's interval is
-    ``[-1.0, +4.0]``, with ``t = 1E-20``.
+    The source describes the function in words; the survey writes it as ``0`` if ``abs(x) < 3.8*10^-4``;
+    ``fl(x*exp(-x^-2))`` otherwise. The formula's interval is ``[-1.0, +4.0]``, on which the source solves with the
+    tolerance ``t = 1E-20``.
 
     ``fl(.)`` is the computed floating-point value. Table 4.1's footnote: ``zero2`` returned ``2.17E-4``, where ``f_1 =
     0``.

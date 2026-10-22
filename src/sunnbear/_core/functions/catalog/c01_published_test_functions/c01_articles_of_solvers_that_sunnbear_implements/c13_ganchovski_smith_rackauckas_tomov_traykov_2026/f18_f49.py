@@ -41,7 +41,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026F49(Formula):
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - 2.0 * c
-        return (-(x**3) - x - 1) if (x) <= (0) else (real_root(x, 3) - x - 1)
+        if x <= 0:
+            return -(x**3) - x - 1
+        else:
+            return real_root(x, 3) - x - 1
 
     def interval_bounds(self) -> tuple[float, float]:
         """Return the formula's interval."""

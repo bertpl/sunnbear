@@ -195,7 +195,7 @@ A join or split can also come from formulas that an earlier regeneration appende
 
 `row_ids` separates the formula's rows by ` | `, and `reason` says why the rows are 1 function, or how the formula in the new variable reproduces the source's results. A line of 1 row must give a `variable_change`, and a row is in at most 1 line.
 
-**A line whose rows give 1 function with other values of a parameter gives the formula's function**, which the formula modules need (§ Formula modules):
+**A line whose rows print 1 function, each row with its own values of some parameters, gives the formula's function**, which the formula modules need (§ Formula modules):
 
 - `f` is the rows' function in its family form, with each value that differs between the rows as a parameter, such as `x^3 - a`. A parameter is not named `c`, which every formula uses for its shift along x.
 - `parameters` gives each row's values of those parameters, in the order of `row_ids` and separated by ` | `, such as `a = 1 | a = -1`.
@@ -206,7 +206,7 @@ Rows of different sources never share a formula, so that each formula's id credi
 
 A function in 2 forms that compute differently, such as a polynomial expanded and factored, gives 2 separate `new` rows, which stay separate formulas. A formula of several rows keeps each row's parameter values together with that row's intervals: it never combines 1 row's parameter values with another row's interval.
 
-`formulas.csv` lists the formulas in id order, retired ones included, with the columns `formula_id`, `status`, `source_id`, `row_ids`, `variable_change`, `f` and `parameters`. A formula's `status` is `active` or `retired`; the last 3 columns copy those of the formula's line in `formula_decisions.csv`, with the sets of `parameters` in the order of the formula's rows.
+`formulas.csv` lists the formulas in id order, retired ones included, with the columns `formula_id`, `status`, `source_id`, `row_ids`, `variable_change`, `f` and `parameters`. A formula's `status` is `active` or `retired`; `variable_change`, `f` and `parameters` copy those of the formula's line in `formula_decisions.csv`, with the sets of `parameters` in the order of the formula's rows.
 
 ## Formula modules
 
@@ -218,17 +218,22 @@ uv run python -m scripts.literature_test_problems.formula_modules <source id> ..
 
 For each source named, the script writes the source's package and its formula modules, and rewrites the `__init__.py` of each subcategory. A generated formula module:
 
-- evaluates the formula's function at `x - (b - a)*c`, where `[a, b]` is the formula's interval: the formula's `c` shifts the function along x by a multiple of the interval's width. The function is the `f` of the formula's line in `formulas.csv`, or else the `f` of its first row, as the source prints it;
+- evaluates the formula's function at `x - (b - a)*c`, where `[a, b]` is the formula's interval: the formula's `c` shifts the function along x by a multiple of the interval's width. The function is the `f` of the formula's first row, as the source prints it, unless the formula's line in `formulas.csv` gives an `f`;
 - lists the formula's published cases in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds as 2 more parameters, `a` and `b`;
 - names its source in a `FormulaSource`: the source's `reference`, and the keys of the formula's rows as the location;
 - holds test cases whose expected values mpmath computes from the function;
-- holds `SURVEY_FIELDS_HASH`, a hash of the fields that the module depends on: the source's `title` and `reference`, the last 3 columns of the formula's line in `formulas.csv`, and the fields of its rows, so that the hash changes with each change of those fields.
+- holds `SURVEY_FIELDS_HASH`, a hash of the fields that the module depends on: the source's `title` and `reference`, the formula's `variable_change`, `f` and `parameters` in `formulas.csv`, and the fields of its rows, so that the hash changes with each change of those fields.
 
 **The function** may use, besides the operators and the functions of Python's `math`, the constructs that the docstring of `formula_expressions.py` lists, such as `if(condition; a; b)`, `sum(term, i = m..n)` and the Bessel functions. A power `base^(1/q)` with an odd `q` is the real root, negative for a negative base, as the sources mean it.
 
-**The cases:** a row's parameters give 1 set of values, whose combinations each pair with the row's intervals, or several sets of values, separated by `;`, where the same parameter gets values in more than 1 set. Each set then names its intervals after `on`, as in `` on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)12`; on `[-0.95, 4.05]`: `a = 1`, `n = 8(2)14` ``, unless the row gives only 1 interval. A formula of several rows checks that each row's own `f` gives the formula's function, at the row's values.
+**The cases:** a row's parameters give 1 or several sets of values:
 
-**A case whose function is ill-conditioned,** such as `sin(x*10^6)`, gets an `atol` of 10 times how far the function's value moves within 4 float64 steps of x, where its Python value differs from mpmath's by more than `1E-13` but within that spread.
+- **1 set:** each combination of its values pairs with each of the row's intervals.
+- **Several sets,** separated by `;`, where the same parameter gets values in more than 1 set: each set names its intervals after `on`, as in `` on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)12`; on `[-0.95, 4.05]`: `a = 1`, `n = 8(2)14` ``, unless the row gives only 1 interval.
+
+A formula of several rows checks that each row's own `f` gives the formula's function, at the row's values.
+
+**A case whose function is ill-conditioned,** such as `sin(x*10^6)`, gets an `atol` of 10 times the spread of the function's exact values within `CASE_X_ULPS` float64 steps of x on either side, where its Python value differs from mpmath's by more than `CASE_ATOL` but by no more than that spread (both set in `scripts/literature_test_problems/formula_modules.py`).
 
 The modules of 2 kinds of formulas are written by hand, and the script only imports them:
 
@@ -239,7 +244,7 @@ The script stops, and names each formula that it cannot generate, on:
 
 - a formula with a `variable_change`;
 - a function, parameter values or intervals that it cannot read, such as a parameter without a published value, or several sets of values with several intervals and no `on`;
-- a formula of several rows, 1 of whose rows gives another function than the formula's;
+- a formula of several rows in which a row's own `f` differs from the formula's function;
 - a function that is complex at an x-value of a case, or whose Python value agrees with mpmath at none of the x-values tried.
 
 After a change of a source file, regenerate the modules of its formulas: the tests recompute each module's `SURVEY_FIELDS_HASH` from the source files, so that a module that was not regenerated fails the tests.
@@ -249,7 +254,7 @@ After a change of a source file, regenerate the modules of its formulas: the tes
 1. Write `sources/<id>.toml`. Add a relation where a reader needs to know how its rows relate to another source's rows, such as a block of functions that the new source copies with changes; `duplicate_of` and `derived_from` already name every earlier row that the script finds.
 2. Regenerate. The script prints each row that needs a decision; `rows.csv` gives, in `match_kind` and `matches`, why it needs one and the earlier rows that the script found for it.
 3. Add a line to `decisions.csv` for each of those rows, and for any automatic status that is wrong, then regenerate until the script prints no problems.
-4. Add a line to `formula_decisions.csv` for each set of the source's `new` rows that are obviously 1 function, with `f` and `parameters` where the rows give other values of a parameter, and for each row whose formula takes another variable (§ Formulas). Restore `formulas.csv` from git, because the regenerations above already appended the source's formulas without these decisions, then regenerate.
+4. Add a line to `formula_decisions.csv` for each set of the source's `new` rows that are obviously 1 function, with `f` and `parameters` where each row gives its own values of a parameter, and for each row whose formula takes another variable (§ Formulas). Restore `formulas.csv` from git, because the regenerations above already appended the source's formulas without these decisions, then regenerate.
 5. Generate the source's formula modules (§ Formula modules), and write by hand the modules of its formulas whose rows give only an `f_description`, or whose `f` the script cannot translate (add those to its `HAND_WRITTEN_FORMULAS`).
 6. Commit the source file, `decisions.csv`, `formula_decisions.csv`, the generated files and the formula modules together.
 

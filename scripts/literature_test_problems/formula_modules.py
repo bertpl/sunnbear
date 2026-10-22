@@ -15,6 +15,7 @@ The README of `data/literature_test_problems/` (§ Formula modules) describes wh
 which formulas are written by hand, and which formulas the script cannot generate.
 """
 
+import ast
 import hashlib
 import json
 import keyword
@@ -32,16 +33,16 @@ from sunnbear._core.utils import math_functions
 from sunnbear._core.utils.slugify import slugify
 from sunnbear.functions import CANONICAL_DIGITS, ParamNotation
 
-from .data_files import SUBCATEGORY_DESCRIPTIONS, DataFileError, DataFolder, Source, SourceRow, read_sources
+from .data_files import SUBCATEGORY_DESCRIPTIONS, DataFolder, Source, SourceRow, read_sources
 from .formula_expressions import FormulaExpression, TranslationError
 from .formulas import FormulasTable, FormulasTableLine
-from .published_cases import PublicationError, PublishedCase, PublishedFormula
+from .published_cases import PublishedCase, PublishedCasesError, PublishedFormula
 
 CATALOG_DIR = (
     Path(__file__).resolve().parents[2] / "src" / "sunnbear" / "_core" / "functions" / "catalog"
 ) / "c01_published_test_functions"
 # HAND_WRITTEN_FORMULAS holds, with the reason, each formula whose rows give an `f` that the script cannot translate,
-# and whose module is therefore written by hand, as is that of every formula whose row gives only an `f_description`.
+# and whose module is therefore written by hand.
 HAND_WRITTEN_FORMULAS = {
     "f1.1.2.4": "an infinite sum, which the module sums until its terms vanish in float64",
     "f1.1.11.2": "a function `alpha` that the row's parameters define",
@@ -57,9 +58,8 @@ CASE_SHIFT = 0.25
 # differ slightly from the Python one, still passes that test.
 CASE_RTOL = 1e-13
 CASE_ATOL = 1e-13
-# CASE_X_ULPS is how many float64 steps of x the spread of an ill-conditioned function's values is measured over: a
-# case whose Python value is off by more than `CASE_ATOL`, but by no more than that spread, gets an `atol` of 10 times
-# the spread, since float64 arithmetic cannot do better there.
+# CASE_X_ULPS is the number of float64 steps of x, on each side of a case's x-value, over which
+# `FormulaModuleSpec._find_case` measures the spread of the function's exact values.
 CASE_X_ULPS = 4
 # DOCSTRING_WIDTH is the width of a wrapped docstring line, inside a class at 4 spaces of indentation.
 DOCSTRING_WIDTH = 120 - 4
@@ -84,7 +84,6 @@ class FormulaModuleSpec:
     """A `FormulaModuleSpec` holds the contents of 1 generated formula module.
 
     Attributes:
-        published: The formula's function and published cases, as the survey gives them.
         expression: The formula's function as Python code and as a sympy expression.
         param_names: The Python names of the formula's parameters, in tuple order; a formula with several
             intervals ends them with `a` and `b`.
@@ -96,7 +95,6 @@ class FormulaModuleSpec:
 
     formulas_table_line: FormulasTableLine
     source: Source
-    published: PublishedFormula
     expression: FormulaExpression
     param_names: tuple[str, ...]
     tuples: tuple[tuple[float, ...], ...]
@@ -107,18 +105,14 @@ class FormulaModuleSpec:
     @property
     def rows(self) -> tuple[SourceRow, ...]:
         """Return the formula's rows, in the order of `formulas.csv`."""
-        return tuple(self.source.find_row(row_id) for row_id in self.formulas_table_line.row_ids)
-
-    @property
-    def location(self) -> str:
-        """Return where the source prints the formula: the keys of its rows."""
-        return ", ".join(row.key for row in self.rows)
+        return self.formulas_table_line.rows(self.source)
 
     def module_text(self) -> str:
         """Return the formula's module as Python source, before ruff formats it."""
+        location = ", ".join(row.key for row in self.rows)
         command = f"uv run python -m scripts.literature_test_problems.formula_modules {self.source.source_id}"
         module_docstring = (
-            f"This module holds the formula of {self.location} in {self.source.short_title}.\n\n"
+            f"This module holds the formula of {location} in {self.source.short_title}.\n\n"
             "A script generates this module from the survey of published test problems: to change the formula, change "
             f"its source file in `data/literature_test_problems/sources/` and run `{command}`, never this file."
         )
@@ -158,7 +152,7 @@ class FormulaModuleSpec:
                 f"    param_names = {self.param_names!r}",
                 "    source = FormulaSource(",
                 f"        reference={_string_code(self.source.reference, width=90)},",
-                f"        location={self.location!r},",
+                f"        location={location!r},",
                 "    )",
                 "",
                 "    @staticmethod",
@@ -190,16 +184,14 @@ class FormulaModuleSpec:
         Raises:
             DataFileError: If `source` is not the formula's source, or lacks 1 of the formula's rows.
         """
-        if source.source_id != formulas_table_line.source_id:
-            raise DataFileError(f"{formulas_table_line.formula_id}: {source.source_id} is not its source")
-        function = formulas_table_line.function
+        function_decision = formulas_table_line.function_decision
         fields = [
             source.title,
             source.reference,
-            [function.variable_change, function.f, function.parameters],
+            [function_decision.variable_change, function_decision.f, function_decision.parameters],
             [
                 [row.row_id, row.f, row.f_description, row.parameters, row.interval, row.notes]
-                for row in (source.find_row(row_id) for row_id in formulas_table_line.row_ids)
+                for row in formulas_table_line.rows(source)
             ],
         ]
         return hashlib.sha256(json.dumps(fields).encode("utf-8")).hexdigest()[:16]
@@ -217,18 +209,18 @@ class FormulaModuleSpec:
         if len(self.rows) == 1:
             paragraphs.append(f"The source prints {self._row_text(self.rows[0])}.")
         else:
-            function = self.formulas_table_line.function
-            if function.f:
+            function_decision = self.formulas_table_line.function_decision
+            if function_decision.f:
                 paragraphs.append(
-                    f"The source prints 1 function with other parameter values in {len(self.rows)} rows, which the "
-                    f"formula writes as ``{function.f}``:"
+                    f"The source prints 1 function in {len(self.rows)} rows, each with its own parameter values; the "
+                    f"formula writes that function as ``{function_decision.f}``:"
                 )
             else:
-                paragraphs.append(f"The source prints 1 function on other intervals in {len(self.rows)} rows:")
-            values_per_row = function.row_parameters() or [""] * len(self.rows)
+                paragraphs.append(f"The source prints 1 function in {len(self.rows)} rows, each on its own interval:")
+            values_per_row = function_decision.values_per_row() or [""] * len(self.rows)
             paragraphs.append(
                 "\n".join(
-                    f"- {row.key}: {self._row_text(row)}" + (f", with ``{values}``" if values else "")
+                    f"- {row.key}" + (f", with ``{values}``" if values else "") + f": {self._row_text(row)}"
                     for row, values in zip(self.rows, values_per_row, strict=True)
                 )
             )
@@ -259,13 +251,27 @@ class FormulaModuleSpec:
             return f"``{row.f}``; the formula's interval is {interval_text}"
 
     def _parametrized_fun_body(self, interval_width_code: str) -> list[str]:
-        """Return the lines of `parametrized_fun` after its docstring: the shift of x, and the function's value.
+        """Return the lines of `parametrized_fun` after its docstring: the shift of x, then the function's value.
 
-        A function that is x itself returns the shifted x at once, since a variable assigned only to be returned
-        breaks the lint rules.
+        The lines differ for 2 forms of the function:
+
+        - when the published function is `x` itself, the method returns the shifted x directly, because assigning x
+          only to return it breaks ruff's rule RET504;
+        - when the whole Python expression is a conditional `a if condition else b`, the method writes it as an `if`
+          statement with a `return` in each branch, so that each branch stands on its own line. A conditional
+          inside a larger expression stays an expression, because the published `if(...)` is part of that expression.
         """
+        expression_node = ast.parse(self.expression.python_code, mode="eval").body
         if self.expression.python_code.strip() == "x":
             return [f"        return x - {interval_width_code} * c"]
+        elif isinstance(expression_node, ast.IfExp):
+            return [
+                f"        x = x - {interval_width_code} * c",
+                f"        if {ast.unparse(expression_node.test)}:",
+                f"            return {ast.unparse(expression_node.body)}",
+                "        else:",
+                f"            return {ast.unparse(expression_node.orelse)}",
+            ]
         else:
             return [f"        x = x - {interval_width_code} * c", f"        return {self.expression.python_code}"]
 
@@ -334,13 +340,14 @@ class FormulaModuleSpec:
         mpmath both evaluate the function at the float `x - (b - a)*c`, computed as the generated code computes it,
         so that only the function's own arithmetic can differ. The first x-value where they agree within `CASE_RTOL`
         and `CASE_ATOL` is kept; failing that, the first where they differ by no more than the function's spread over
-        `CASE_X_ULPS` float64 steps of x, with an `atol` of 10 times that spread.
+        `CASE_X_ULPS` float64 steps of x, with an `atol` of 10 times that spread, since float64 arithmetic cannot do
+        better there.
 
         Raises:
             GenerationError: If the function is complex at an x-value tried, or the Python agrees with mpmath at none.
         """
         a, b = interval
-        widened = None
+        fallback_case = None
         for fraction in CASE_FRACTIONS:
             x = float(f"{a + fraction * (b - a):.6g}")
             shifted = x - (b - a) * c
@@ -361,17 +368,17 @@ class FormulaModuleSpec:
                 continue
             if math.isclose(python_value, expected, rel_tol=CASE_RTOL, abs_tol=CASE_ATOL):
                 return x, expected, None
-            elif widened is None:
-                spread = FormulaModuleSpec._spread(exact_function, shifted, expected)
+            elif fallback_case is None:
+                spread = FormulaModuleSpec._value_spread(exact_function, shifted, expected)
                 if abs(python_value - expected) <= spread:
-                    widened = (x, expected, float(f"{10 * spread:.1g}"))
-        if widened is not None:
-            return widened
+                    fallback_case = (x, expected, float(f"{10 * spread:.1g}"))
+        if fallback_case is not None:
+            return fallback_case
         else:
             raise GenerationError(f"the Python form agrees with mpmath at none of the x-values tried, c = {c}")
 
     @staticmethod
-    def _spread(exact_function: object, x: float, expected: float) -> float:
+    def _value_spread(exact_function: object, x: float, expected: float) -> float:
         """Return how far the function's exact value moves from `expected` within `CASE_X_ULPS` float64 steps of x."""
         spread = 0.0
         with mpmath.workdps(50):
@@ -382,65 +389,6 @@ class FormulaModuleSpec:
                     continue
                 spread = max(spread, abs(float(value) - expected))
         return spread
-
-    # --------------------------------------------------------------------------
-    #  Factory methods
-    # --------------------------------------------------------------------------
-    @classmethod
-    def from_survey(cls, formulas_table_line: FormulasTableLine, source: Source) -> "FormulaModuleSpec":
-        """Build the spec of 1 formula's module from its line of `formulas.csv` and its source's rows.
-
-        Raises:
-            GenerationError: If the formula changes its variable, if its function, parameters or intervals cannot be
-                read or translated, if a row's function differs from the formula's, or if no case can be found.
-        """
-        formula_id = formulas_table_line.formula_id
-        if formulas_table_line.function.variable_change:
-            raise GenerationError(f"{formula_id} changes its variable, which the generator does not support")
-        try:
-            published = PublishedFormula.from_survey(formulas_table_line, source)
-            has_interval_parameters = len({case.interval.key for case in published.cases}) > 1
-            python_names = cls._python_parameter_names(published.parameter_names, has_interval_parameters)
-            expression = FormulaExpression.from_text(published.f, published.variable, python_names)
-            if len(formulas_table_line.row_ids) > 1:
-                published.check_rows(expression, is_template=bool(formulas_table_line.function.f))
-        except (PublicationError, TranslationError) as error:
-            raise GenerationError(f"{formula_id}: {error}") from error
-        param_names = tuple(python_names[name] for name in published.parameter_names)
-        if has_interval_parameters:
-            param_names += ("a", "b")
-        tuples, cases, exact_texts_of_rounded_bounds = [], [], []
-        bounds_cases: dict[tuple[float, float], str] = {}
-        for published_case in published.cases:
-            values, bounds, rounded_texts = cls._tuple_values(published_case, has_interval_parameters)
-            exact_texts_of_rounded_bounds += rounded_texts
-            tuples.append(values)
-            params = dict(zip(param_names, values, strict=True))
-            python_values = {name: value for name, value in params.items() if name in python_names.values()}
-            exact_expression = expression.sympy_expr.subs(
-                {sp.Symbol(name): value for name, value in published_case.parameter_values}
-            )
-            exact_function = sp.lambdify(expression.variable, exact_expression, modules="mpmath")
-            # the first tuple gets a 2nd value case, which shifts x
-            shifts = (0.0, CASE_SHIFT) if not cases else (0.0,)
-            for c in shifts:
-                x, expected, atol = cls._find_case(exact_function, expression.python_code, python_values, bounds, c=c)
-                tolerance = f", atol={atol!r}" if atol is not None else ""
-                cases.append(
-                    f"FormulaTestCase.value(params={params!r}, x={x!r}, c={c!r}, expected={expected!r}{tolerance})"
-                )
-            bounds_cases.setdefault(bounds, f"FormulaTestCase.interval_bounds(params={params!r}, expected={bounds!r})")
-        return cls(
-            formulas_table_line=formulas_table_line,
-            source=source,
-            published=published,
-            expression=expression,
-            param_names=param_names,
-            tuples=tuple(tuples),
-            interval=None if has_interval_parameters else bounds,
-            exact_texts_of_rounded_bounds=tuple(dict.fromkeys(exact_texts_of_rounded_bounds)),
-            cases=(*cases, *bounds_cases.values()),
-        )
 
     @classmethod
     def _tuple_values(
@@ -454,13 +402,70 @@ class FormulaModuleSpec:
         values = tuple(cls._parameter_value(value, name) for name, value in published_case.parameter_values)
         exact_bounds = (sp.sympify(published_case.interval.lower), sp.sympify(published_case.interval.upper))
         bounds = tuple(float(sp.N(bound, 30)) for bound in exact_bounds)
-        rounded_texts = []
+        exact_texts_of_rounded_bounds = []
         if has_interval_parameters:
             rounded = tuple(float(f"{bound:.{CANONICAL_DIGITS}g}") for bound in bounds)
-            rounded_texts = [str(e) for e, r, f in zip(exact_bounds, rounded, bounds, strict=True) if r != f]
+            exact_texts_of_rounded_bounds = [
+                str(e) for e, r, f in zip(exact_bounds, rounded, bounds, strict=True) if r != f
+            ]
             bounds = rounded
             values += bounds
-        return values, bounds, rounded_texts
+        return values, bounds, exact_texts_of_rounded_bounds
+
+    # --------------------------------------------------------------------------
+    #  Factory methods
+    # --------------------------------------------------------------------------
+    @classmethod
+    def from_survey(cls, formulas_table_line: FormulasTableLine, source: Source) -> "FormulaModuleSpec":
+        """Build the spec of 1 formula's module from its line of `formulas.csv` and its source's rows.
+
+        Raises:
+            GenerationError: If the formula changes its variable, if its function, parameters or intervals cannot be
+                read or translated, if a row's function differs from the formula's, or if no case can be found.
+        """
+        formula_id = formulas_table_line.formula_id
+        if formulas_table_line.function_decision.variable_change:
+            raise GenerationError(f"{formula_id} changes its variable, which the generator does not support")
+        try:
+            published_formula = PublishedFormula.from_survey(formulas_table_line, source)
+            has_interval_parameters = published_formula.has_interval_parameters
+            python_names = cls._python_parameter_names(published_formula.parameter_names, has_interval_parameters)
+            expression = FormulaExpression.from_text(published_formula.f, published_formula.variable, python_names)
+        except (PublishedCasesError, TranslationError) as error:
+            raise GenerationError(f"{formula_id}: {error}") from error
+        param_names = tuple(python_names[name] for name in published_formula.parameter_names)
+        if has_interval_parameters:
+            param_names += ("a", "b")
+        tuples, cases, exact_texts_of_rounded_bounds = [], [], []
+        bounds_cases: dict[tuple[float, float], str] = {}
+        for published_case in published_formula.cases:
+            values, bounds, case_exact_texts_of_rounded_bounds = cls._tuple_values(
+                published_case, has_interval_parameters
+            )
+            exact_texts_of_rounded_bounds += case_exact_texts_of_rounded_bounds
+            tuples.append(values)
+            params = dict(zip(param_names, values, strict=True))
+            python_values = {name: value for name, value in params.items() if name in python_names.values()}
+            exact_function = expression.mpmath_function(dict(published_case.parameter_values))
+            # the first tuple gets a 2nd value case, which shifts x
+            shifts = (0.0, CASE_SHIFT) if not cases else (0.0,)
+            for c in shifts:
+                x, expected, atol = cls._find_case(exact_function, expression.python_code, python_values, bounds, c=c)
+                tolerance = f", atol={atol!r}" if atol is not None else ""
+                cases.append(
+                    f"FormulaTestCase.value(params={params!r}, x={x!r}, c={c!r}, expected={expected!r}{tolerance})"
+                )
+            bounds_cases.setdefault(bounds, f"FormulaTestCase.interval_bounds(params={params!r}, expected={bounds!r})")
+        return cls(
+            formulas_table_line=formulas_table_line,
+            source=source,
+            expression=expression,
+            param_names=param_names,
+            tuples=tuple(tuples),
+            interval=None if has_interval_parameters else bounds,
+            exact_texts_of_rounded_bounds=tuple(dict.fromkeys(exact_texts_of_rounded_bounds)),
+            cases=(*cases, *bounds_cases.values()),
+        )
 
 
 # ==================================================================================================
@@ -570,10 +575,10 @@ def write_source_package(source: Source, formulas_table_lines: list[FormulasTabl
 def is_hand_written(formulas_table_line: FormulasTableLine, source: Source) -> bool:
     """Return whether a formula's module is written by hand.
 
-    It is where a row of the formula gives only an `f_description`, or where the formula is 1 of
-    `HAND_WRITTEN_FORMULAS`.
+    A formula's module is written by hand when a row of the formula gives only an `f_description`, or when the formula
+    is 1 of `HAND_WRITTEN_FORMULAS`.
     """
-    has_description = any(source.find_row(row_id).f_description for row_id in formulas_table_line.row_ids)
+    has_description = any(row.f_description for row in formulas_table_line.rows(source))
     return has_description or formulas_table_line.formula_id in HAND_WRITTEN_FORMULAS
 
 
@@ -653,15 +658,16 @@ def main(source_ids: list[str]) -> int:
         print(f"problem: {problem}")
     if problems:
         return 1
-    written += write_subcategory_packages()
-    paths = [str(path) for path in written]
-    # formatting first shortens the long lines, so that `check --fix`, which sorts the imports, reports only real
-    # problems
-    subprocess.run([sys.executable, "-m", "ruff", "format", "--quiet", *paths], check=True)
-    subprocess.run([sys.executable, "-m", "ruff", "check", "--fix", "--quiet", *paths], check=False)
-    subprocess.run([sys.executable, "-m", "ruff", "format", "--quiet", *paths], check=True)
-    print(f"wrote {len(written)} files")
-    return 0
+    else:
+        written += write_subcategory_packages()
+        paths = [str(path) for path in written]
+        # formatting first shortens the long lines, so that `check --fix`, which sorts the imports, reports only real
+        # problems
+        subprocess.run([sys.executable, "-m", "ruff", "format", "--quiet", *paths], check=True)
+        subprocess.run([sys.executable, "-m", "ruff", "check", "--fix", "--quiet", *paths], check=False)
+        subprocess.run([sys.executable, "-m", "ruff", "format", "--quiet", *paths], check=True)
+        print(f"wrote {len(written)} files")
+        return 0
 
 
 if __name__ == "__main__":

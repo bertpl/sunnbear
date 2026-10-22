@@ -10,8 +10,8 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 class TomovGanchovski202625(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source describes ``x`` if ``x <= 0``; ``x + x^2`` if ``x > 0``; the formula's intervals are ``[-1, 1]``; ``[-3,
-    1]``.
+    The source describes the function in words; the survey writes it as ``x`` if ``x <= 0``; ``x + x^2`` if
+    ``x > 0``; the formula's intervals are ``[-1, 1]``; ``[-3, 1]``.
 
     Proposition 3.5 starts an AB phase on ``[-1, 1]``. The text after it starts the hybrid method on ``[-3, 1]``, whose
     first bisection leads to the same phase.

@@ -5,7 +5,8 @@ import pytest
 
 from sunnbear._core.utils.math_functions import bessel_j0, bessel_j1, bessel_y0, bessel_y1, real_root, sign
 
-# _BESSEL_X_VALUES reach each range of the Bessel functions: tiny, up to 5, from 5 to 10, and above 10.
+# _BESSEL_X_VALUES reach each range of the Bessel functions: tiny, up to 5, from 5 to 10, and above 10;
+# 2.4048255576957727 is the first zero of J0.
 _BESSEL_X_VALUES = [1e-9, 2e-6, 0.5, 2.4048255576957727, 4.99, 5.5, 9.99, 10.5, 31.4, 60.0]
 
 

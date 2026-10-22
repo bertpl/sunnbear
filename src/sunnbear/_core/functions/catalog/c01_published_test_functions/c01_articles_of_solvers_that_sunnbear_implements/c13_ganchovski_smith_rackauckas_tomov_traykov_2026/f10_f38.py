@@ -15,11 +15,11 @@ SURVEY_FIELDS_HASH = "1d2460ee04bf6e48"
 class GanchovskiSmithRackauckasTomovTraykov2026F38(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints 1 function with other parameter values in 2 rows, which the formula writes as ``if(x <= 1/3; -d; 1
-    - d)``:
+    The source prints 1 function in 2 rows, each with its own parameter values; the formula writes that function as
+    ``if(x <= 1/3; -d; 1 - d)``:
 
-    - f38: ``if(x <= 1/3; -0.5; 0.5)``; the formula's interval is ``[-11, 9]``, with ``d = 0.5``
-    - f39: ``if(x <= 1/3; -10^-3; 1 - 10^-3)``; the formula's interval is ``[-11, 9]``, with ``d = 10^-3``
+    - f38, with ``d = 0.5``: ``if(x <= 1/3; -0.5; 0.5)``; the formula's interval is ``[-11, 9]``
+    - f39, with ``d = 10^-3``: ``if(x <= 1/3; -10^-3; 1 - 10^-3)``; the formula's interval is ``[-11, 9]``
     """
 
     number = (1, 1, 13, 10)
@@ -41,7 +41,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026F38(Formula):
     def parametrized_fun(x: float, c: float, d: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - 20.0 * c
-        return (-d) if (x) <= (1 / 3) else (1 - d)
+        if x <= 1 / 3:
+            return -d
+        else:
+            return 1 - d
 
     def interval_bounds(self, d: float) -> tuple[float, float]:
         """Return the formula's interval."""

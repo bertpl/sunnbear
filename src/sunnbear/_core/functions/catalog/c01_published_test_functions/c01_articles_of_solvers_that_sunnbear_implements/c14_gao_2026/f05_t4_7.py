@@ -12,8 +12,8 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 class Gao2026T47(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source describes ``0`` if ``x = 0``; ``x*exp(-1/x^2)`` if ``x != 0``; the formula's intervals are ``[-1, 4]``;
-    ``[-2, 5]``; ``[-1, 10]``; ``[-5, 50]``; ``[-10, 100]``.
+    The source describes the function in words; the survey writes it as ``0`` if ``x = 0``; ``x*exp(-1/x^2)`` if
+    ``x != 0``; the formula's intervals are ``[-1, 4]``; ``[-2, 5]``; ``[-1, 10]``; ``[-5, 50]``; ``[-10, 100]``.
     """
 
     number = (1, 1, 14, 5)

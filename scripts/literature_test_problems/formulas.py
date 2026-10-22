@@ -17,6 +17,8 @@ from .data_files import (
     FormulaDecision,
     FunctionDecision,
     RowsTableLine,
+    Source,
+    SourceRow,
     join_row_ids,
     source_id_of_row_id,
     split_row_ids,
@@ -96,14 +98,14 @@ class FormulasTable:
                     continue
                 formula_decision = formula_decision_by_row_id.get(row.row_id)
                 if formula_decision is None:
-                    row_ids, function = (row.row_id,), FunctionDecision()
+                    row_ids, function_decision = (row.row_id,), FunctionDecision()
                 else:
                     # keep the decision's rows that are `new` rows of this source, in the source's order;
                     # FormulaDecision.find_problems reports the other rows that the decision names
                     row_ids = tuple(r.row_id for r in new_rows if r.row_id in formula_decision.row_ids)
-                    function = formula_decision.function.for_rows(formula_decision.row_ids, row_ids)
+                    function_decision = formula_decision.function_decision.for_rows(formula_decision.row_ids, row_ids)
                 placed_row_ids.update(row_ids)
-                formulas.append((source_id, row_ids, function))
+                formulas.append((source_id, row_ids, function_decision))
         return formulas
 
     @staticmethod
@@ -181,7 +183,7 @@ class FormulasTable:
         problems = committed_table.find_problems(rows)
         formulas_to_append = []
         # --- keep the committed ids -------------
-        for (source_id, row_ids, function), numbers in zip(
+        for (source_id, row_ids, function_decision), numbers in zip(
             formulas_of_new_rows, active_numbers_per_formula, strict=True
         ):
             joined_formula_ids = ", ".join(formula_by_number[number].formula_id for number in numbers)
@@ -195,10 +197,10 @@ class FormulasTable:
             elif numbers or matching_retired_numbers:
                 number = (numbers or matching_retired_numbers)[0]
                 formula_by_number[number] = replace(
-                    formula_by_number[number], row_ids=row_ids, function=function, is_retired=False
+                    formula_by_number[number], row_ids=row_ids, function_decision=function_decision, is_retired=False
                 )
             else:
-                formulas_to_append.append((source_id, row_ids, function))
+                formulas_to_append.append((source_id, row_ids, function_decision))
         # --- retire the rest --------------------
         for formula in committed_table.formulas:
             if not formula.is_retired and formula.number not in n_formulas_of_new_rows_by_number:
@@ -208,7 +210,7 @@ class FormulasTable:
         # --- append the other formulas ----------
         # the numbers of retired formulas count as taken too, so that no number is given twice
         formulas = list(formula_by_number.values())
-        for source_id, row_ids, function in formulas_to_append:
+        for source_id, row_ids, function_decision in formulas_to_append:
             subcategory_number = subcategory_number_by_source[source_id]
             source_numbers = [
                 formula.source_number
@@ -220,7 +222,7 @@ class FormulasTable:
             else:
                 source_number = cls._next_free_number(subcategory_number, formulas)
             number = cls._next_free_number(source_number, formulas)
-            formulas.append(FormulasTableLine(number, source_id, row_ids, function, is_retired=False))
+            formulas.append(FormulasTableLine(number, source_id, row_ids, function_decision, is_retired=False))
         return cls(tuple(sorted(formulas, key=lambda formula: formula.number)))
 
     @classmethod
@@ -297,8 +299,8 @@ class FormulasTableLine:
     """A `FormulasTableLine` holds 1 line of `formulas.csv`: a formula's number, its source and its rows.
 
     `number` is the formula's place in the catalog's tree: category 1, the subcategory, the source and the formula,
-    such as `(1, 4, 12, 3)`. `function` is empty unless a person decided that the formula's function differs from the
-    `f` of its first row (`FunctionDecision`).
+    such as `(1, 4, 12, 3)`. `function_decision` is empty unless a person decided that the formula's function differs
+    from the `f` of its first row (`FunctionDecision`).
 
     A retired formula keeps the rows that it held when it was retired, so that it becomes active again with its own
     id if those rows are `new` again.
@@ -307,7 +309,7 @@ class FormulasTableLine:
     number: tuple[int, ...]
     source_id: str
     row_ids: tuple[str, ...]
-    function: FunctionDecision
+    function_decision: FunctionDecision
     is_retired: bool
 
     @property
@@ -325,6 +327,17 @@ class FormulasTableLine:
         """Return the number of the formula's source, such as `(1, 4, 12)` for `f1.4.12.3`."""
         return self.number[:3]
 
+    def rows(self, source: Source) -> tuple[SourceRow, ...]:
+        """Return the formula's rows from its source, in the order of `row_ids`.
+
+        Raises:
+            DataFileError: If `source` is not the formula's source, or lacks 1 of the formula's rows.
+        """
+        if source.source_id != self.source_id:
+            raise DataFileError(f"{self.formula_id}: {source.source_id} is not its source")
+        else:
+            return tuple(source.find_row(row_id) for row_id in self.row_ids)
+
     def to_csv_line(self) -> dict[str, str]:
         """Return the formula as 1 line of `formulas.csv`, keyed by column."""
         return {
@@ -332,9 +345,9 @@ class FormulasTableLine:
             "status": "retired" if self.is_retired else "active",
             "source_id": self.source_id,
             "row_ids": join_row_ids(self.row_ids),
-            "variable_change": self.function.variable_change,
-            "f": self.function.f,
-            "parameters": self.function.parameters,
+            "variable_change": self.function_decision.variable_change,
+            "f": self.function_decision.f,
+            "parameters": self.function_decision.parameters,
         }
 
     # --------------------------------------------------------------------------
@@ -362,7 +375,7 @@ class FormulasTableLine:
                 number=tuple(int(part) for part in match.group(1).split(".")),
                 source_id=line["source_id"].strip(),
                 row_ids=row_ids,
-                function=FunctionDecision(
+                function_decision=FunctionDecision(
                     variable_change=line["variable_change"].strip(),
                     f=line["f"].strip(),
                     parameters=line["parameters"].strip(),

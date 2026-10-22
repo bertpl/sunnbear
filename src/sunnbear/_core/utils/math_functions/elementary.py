@@ -20,8 +20,8 @@ def sign(value: float) -> float:
 def real_root(value: float, n: int) -> float:
     """Return the real `n`-th root of `value`, for an odd `n`: negative for a negative `value`.
 
-    `value**(1/n)` is NaN for a negative `value`. For a value of 0 or more, the result is `value**(1/n)` exactly, with
-    the rounding of that power.
+    In numba, `value**(1/n)` is NaN for a negative `value`, and in plain Python it is complex. For a value of 0 or more,
+    the result is `value**(1/n)` exactly, with the rounding of that power.
     """
     if value < 0.0:
         return -((-value) ** (1.0 / n))

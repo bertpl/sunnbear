@@ -1,9 +1,9 @@
 """This module holds the Bessel functions of the first and second kind of orders 0 and 1, for real arguments.
 
-Each function evaluates rational approximations on 2 or 3 ranges of `|x|`: a rational function of `x^2` up to 5, and
-the Hankel asymptotic expansion, with 2 rational functions of `25/x^2`, above. Their absolute error is about 1E-15 on
-`[0, 30]`, as the original code states. The Bessel functions of the second kind are real only for `x > 0`: they return
-minus infinity at 0 and NaN for a negative `x`.
+Each function evaluates a rational function of `x^2` for `|x|` up to 5, and above 5 the Hankel asymptotic expansion,
+with 2 rational functions of `25/x^2`. Their absolute error is about 1E-15 on `[0, 30]`, as the original code states.
+The Bessel functions of the second kind are real only for `x > 0`: they return minus infinity at 0 and NaN for a
+negative `x`.
 """
 
 # These functions are ported from C++ code under the BSD 3-Clause license, © 2024 SciPy, itself translated from the
@@ -23,8 +23,8 @@ _SQRT1_2 = 7.071067811865475244008443621048490392848e-1  # sqrt(1/2)
 _SQRT_EPS = 1.490116119384765625e-8
 
 # fmt: off
-# The coefficient tuples hold each polynomial's coefficients from the highest power down; a tuple named for `p1evl`
-# omits the leading coefficient, which is 1.
+# The coefficient tuples hold each polynomial's coefficients from the highest power down. A tuple marked `for p1evl`
+# goes to `_p1evl`, which evaluates a polynomial whose leading coefficient is 1, so the tuple omits that coefficient.
 _J0_PP = (
     7.96936729297347051624e-4, 8.28352392107440799803e-2, 1.23953371646414299388e0, 5.44725003058768775090e0,
     8.74716500199817011941e0, 5.30324038235394892183e0, 9.99999999999999997821e-1,
@@ -106,6 +106,7 @@ def bessel_j0(x: float) -> float:
             # x^2/4 is below float64's machine epsilon, so 1 - x^2/4 rounds to 1
             return 1.0
         elif x < 1e-5:
+            # the next term of the series, x^4/64, is below float64's machine epsilon
             return 1.0 - x * x / 4.0
         else:
             z = x * x
@@ -130,7 +131,7 @@ def bessel_y0(x: float) -> float:
         elif x < 0.0:
             return math.nan
         elif x < 3e-8:
-            # x^2/4 is below float64's machine epsilon, so the rational function takes its value at 0
+            # x^2/4 is below float64's machine epsilon, so the rational function takes its value at 0 and J0(x) is 1
             return _J0_YP[7] / _J0_YQ[6] + _TWOOPI * math.log(x)
         else:
             z = x * x

@@ -10,8 +10,8 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 class OliveiraTakahashi202126(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source describes ``1/(21*x - 1)``, with ``(x != 1/21)`` printed beside it; the formula's interval is ``[-1,
-    1]``.
+    The source describes the function in words; the survey writes it as ``1/(21*x - 1)``, with ``(x != 1/21)``
+    printed beside it; the formula's interval is ``[-1, 1]``.
 
     The authors' code returns 0 at ``x = 1/21``; the formula returns 0 where ``21*x - 1`` is 0 in float64, which holds
     at the float64 value of ``1/21``.

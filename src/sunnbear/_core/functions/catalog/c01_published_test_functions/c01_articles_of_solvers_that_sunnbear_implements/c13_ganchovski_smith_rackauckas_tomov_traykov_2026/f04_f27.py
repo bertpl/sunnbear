@@ -11,8 +11,8 @@ from sunnbear._core.utils.math_functions import sign
 class GanchovskiSmithRackauckasTomovTraykov2026F27(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source describes ``(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 - p(x)))))*sign(p(x) - 3)``, where ``p(x) = x +
-    1.11111``; the formula's interval is ``[1, 3]``.
+    The source describes the function in words; the survey writes it as ``(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 -
+    p(x)))))*sign(p(x) - 3)``, where ``p(x) = x + 1.11111``; the formula's interval is ``[1, 3]``.
 
     TF prints ``p(x) = x + 1.11``.
     """

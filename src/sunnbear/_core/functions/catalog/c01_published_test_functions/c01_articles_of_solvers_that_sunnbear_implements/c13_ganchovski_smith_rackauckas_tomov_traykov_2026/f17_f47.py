@@ -17,11 +17,11 @@ SURVEY_FIELDS_HASH = "f984c1aa05702df9"
 class GanchovskiSmithRackauckasTomovTraykov2026F47(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints 1 function with other parameter values in 2 rows, which the formula writes as ``1/sqrt(x) -
-    2*log(5*10^k*sqrt(x)) + 0.8``:
+    The source prints 1 function in 2 rows, each with its own parameter values; the formula writes that function as
+    ``1/sqrt(x) - 2*log(5*10^k*sqrt(x)) + 0.8``:
 
-    - f47: ``1/sqrt(x) - 2*log(5*10^3*sqrt(x)) + 0.8``; the formula's interval is ``[0.0005, 0.5]``, with ``k = 3``
-    - f48: ``1/sqrt(x) - 2*log(5*10^7*sqrt(x)) + 0.8``; the formula's interval is ``[0.0005, 0.5]``, with ``k = 7``
+    - f47, with ``k = 3``: ``1/sqrt(x) - 2*log(5*10^3*sqrt(x)) + 0.8``; the formula's interval is ``[0.0005, 0.5]``
+    - f48, with ``k = 7``: ``1/sqrt(x) - 2*log(5*10^7*sqrt(x)) + 0.8``; the formula's interval is ``[0.0005, 0.5]``
     """
 
     number = (1, 1, 13, 17)

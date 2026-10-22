@@ -18,9 +18,9 @@ SUBCATEGORY_DESCRIPTIONS = {
 DECIDED_STATUSES = ("new", "duplicate", "incomplete")
 # UNDECIDED is the status of a row that the script could not decide and that no decision covers yet.
 UNDECIDED = "undecided"
-# ROW_ID_SEPARATOR separates the row ids in 1 field, and the rows' sets of values in the field `parameters` of
-# `formula_decisions.csv`.
-ROW_ID_SEPARATOR = " | "
+# ROW_SEPARATOR separates the items of 1 field that belong to different rows: the row ids, and the rows' sets of values
+# in the field `parameters` of `formula_decisions.csv`.
+ROW_SEPARATOR = " | "
 # DECISION_COLUMNS are the columns of `decisions.csv`, in order.
 DECISION_COLUMNS = ["row_id", "status", "duplicate_of", "derived_from", "reason"]
 # FORMULA_DECISION_COLUMNS are the columns of `formula_decisions.csv`, in order.
@@ -258,7 +258,7 @@ def read_sources(sources_dir: Path) -> list[Source]:
 class AutomaticStatus:
     """An `AutomaticStatus` holds the status that the script finds for a row by comparing it with every earlier row.
 
-    `matches` holds the matched row ids joined by `ROW_ID_SEPARATOR`, and `match_kind` names the comparisons that
+    `matches` holds the matched row ids joined by `ROW_SEPARATOR`, and `match_kind` names the comparisons that
     found them; for an `incomplete` row, `match_kind` names why the row is incomplete instead, such as "no interval",
     and for an undecided row why a person must decide, such as "no test function". `n_instances` is 0 for a row
     whose f does not parse.
@@ -277,7 +277,7 @@ class FinalStatus:
 
     A `duplicate` names, in `duplicate_of`, the earlier rows that already give its test functions; a `new` or
     `incomplete` row names, in `derived_from`, the earlier rows whose function it copies or changes. Each field joins
-    its row ids by `ROW_ID_SEPARATOR`.
+    its row ids by `ROW_SEPARATOR`.
     """
 
     status: str
@@ -525,28 +525,32 @@ class FunctionDecision:
     All 3 fields are empty for a formula that takes the `f` of its first row as it is. Otherwise:
 
     - `variable_change` describes the variable of a formula that takes another variable than that of its row's `f`;
-    - `f` is the function of a formula whose rows give 1 function with other values of a parameter, in its family
-      form, with that parameter as a name, such as `x^3 - a`;
+    - `f` is the family form of a formula whose rows print 1 function, each row with its own values of some
+      parameters: that function with each such parameter as a name, such as `x^3 - a`;
     - `parameters` gives each row's values of the parameters of `f`, 1 set per row in the order of the rows,
-      separated by `ROW_ID_SEPARATOR`, such as `a = 1 | a = -1`.
+      separated by `ROW_SEPARATOR`, such as `a = 1 | a = -1`.
     """
 
     variable_change: str = ""
     f: str = ""
     parameters: str = ""
 
-    def row_parameters(self) -> list[str]:
+    def values_per_row(self) -> list[str]:
         """Return the sets of values of `parameters`, 1 per row, or [] if `parameters` is empty."""
         if self.parameters:
-            return [values.strip() for values in self.parameters.split(ROW_ID_SEPARATOR.strip())]
+            return [values.strip() for values in self.parameters.split(ROW_SEPARATOR.strip())]
         else:
             return []
 
     def for_rows(self, decided_row_ids: tuple[str, ...], row_ids: tuple[str, ...]) -> "FunctionDecision":
-        """Return the decision for `row_ids`, some of the `decided_row_ids` in another order: its sets follow them."""
+        """Return the decision for `row_ids`, a subset of `decided_row_ids` in any order.
+
+        `decided_row_ids` are the rows that `parameters` gives 1 set for, in that order; the returned decision gives
+        the sets of `parameters` in the order of `row_ids`.
+        """
         if self.parameters:
-            values_by_row_id = dict(zip(decided_row_ids, self.row_parameters(), strict=True))
-            return replace(self, parameters=ROW_ID_SEPARATOR.join(values_by_row_id[row_id] for row_id in row_ids))
+            values_by_row_id = dict(zip(decided_row_ids, self.values_per_row(), strict=True))
+            return replace(self, parameters=ROW_SEPARATOR.join(values_by_row_id[row_id] for row_id in row_ids))
         else:
             return self
 
@@ -559,13 +563,14 @@ class FormulaDecision:
 
     - it puts several rows of 1 source that are obviously 1 function into 1 formula;
     - it gives 1 row's formula a different variable from that of the row's `f`;
-    - it gives the formula of several rows that give 1 function with other values of a parameter its family form.
+    - it writes, for several rows that print 1 function with their own values of a parameter, that function with the
+      parameter as a name.
 
-    `function` holds the last 2 (`FunctionDecision`).
+    `function_decision` holds the variable change and the family form, as a `FunctionDecision`.
     """
 
     row_ids: tuple[str, ...]
-    function: FunctionDecision
+    function_decision: FunctionDecision
     reason: str
 
     def find_problems(self, status_by_row_id: dict[str, str]) -> list[str]:
@@ -604,19 +609,19 @@ class FormulaDecision:
                 - it names 1 row and no variable change;
                 - it gives `parameters` without `f`, or `f` without 1 set of `parameters` per row.
         """
-        function = FunctionDecision(
+        function_decision = FunctionDecision(
             variable_change=line["variable_change"].strip(), f=line["f"].strip(), parameters=line["parameters"].strip()
         )
-        decision = cls(tuple(split_row_ids(line["row_ids"])), function, line["reason"].strip())
+        decision = cls(tuple(split_row_ids(line["row_ids"])), function_decision, line["reason"].strip())
         if not decision.row_ids or not decision.reason:
             raise DataFileError(f"{file_name}: each line needs row_ids and a reason")
-        elif len(decision.row_ids) == 1 and not function.variable_change:
+        elif len(decision.row_ids) == 1 and not function_decision.variable_change:
             raise DataFileError(f"{file_name}: {decision.row_ids[0]} is alone in its line but changes no variable")
-        elif bool(function.f) != bool(function.parameters):
+        elif bool(function_decision.f) != bool(function_decision.parameters):
             raise DataFileError(
                 f"{file_name}: the line of {decision.row_ids[0]} needs both f and parameters, or neither"
             )
-        elif function.parameters and len(function.row_parameters()) != len(decision.row_ids):
+        elif function_decision.parameters and len(function_decision.values_per_row()) != len(decision.row_ids):
             raise DataFileError(f"{file_name}: the parameters of {decision.row_ids[0]} do not give 1 set per row")
         else:
             return decision
@@ -656,12 +661,12 @@ _ROW_FIELDS = {"key", "f", "f_description", "name", "parameters", "interval", "a
 
 def join_row_ids(row_ids: Iterable[str | None]) -> str:
     """Join the distinct row ids, in the order that each first occurs, into 1 field that `FinalStatus` splits again."""
-    return ROW_ID_SEPARATOR.join(dict.fromkeys(r for r in row_ids if r))
+    return ROW_SEPARATOR.join(dict.fromkeys(r for r in row_ids if r))
 
 
 def split_row_ids(field: str) -> list[str]:
     """Return the row ids of 1 field that `join_row_ids` built, or that a person wrote in the same form."""
-    return [row_id.strip() for row_id in field.split(ROW_ID_SEPARATOR) if row_id.strip()]
+    return [row_id.strip() for row_id in field.split(ROW_SEPARATOR) if row_id.strip()]
 
 
 def source_id_of_row_id(row_id: str) -> str:

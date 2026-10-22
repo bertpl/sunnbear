@@ -1,6 +1,6 @@
 """This module holds the formula of Problem 3 in Dowell, Jarratt (1972).
 
-The survey gives this function as 1 expression that the script does not translate, an infinite sum, so a person writes
+The survey gives this function as an infinite sum, an expression that the script does not translate, so a person writes
 this module: a change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
@@ -41,15 +41,17 @@ class DowellJarratt1972Problem3(Formula):
         if not -1.0 < x < 1.0:
             # the series diverges outside (-1, 1)
             return math.nan
-        # the terms of n and -n, from n = 1 up, until adding them no longer changes the sum
-        total = 1.0
-        n = 1
-        while True:
-            term = (-1.0) ** n * (x ** ((3 * n * n - n) // 2) + x ** ((3 * n * n + n) // 2))
-            if total + term == total:
-                return total - 1.0
-            total += term
-            n += 1
+        else:
+            # the term of n = 0 is 1; then the terms of n and -n, from n = 1 up, until adding them no longer
+            # changes the sum
+            total = 1.0
+            n = 1
+            while True:
+                term = (-1.0) ** n * (x ** ((3 * n * n - n) // 2) + x ** ((3 * n * n + n) // 2))
+                if total + term == total:
+                    return total - 1.0
+                total += term
+                n += 1
 
     def interval_bounds(self) -> tuple[float, float]:
         """Return the formula's interval."""
