@@ -13,9 +13,9 @@ class LiZhouLangeTian2026(FormulaCategory):
     """`LiZhouLangeTian2026` is the category of the formulas of 1 publication.
 
     Li, X.-J., Zhou, H., Lange, K., Tian, G.-L. (2026). The upper–crossing/solution (US) algorithm with strongly stable
-    convergence and an acceleration technique for root–finding problems. Statistics and Computing.
-    https://doi.org/10.1007/s11222-026-10902-z. Preprint: https://arxiv.org/abs/2212.00797. The authors' R code:
-    https://github.com/Xunjian-Li/US-algorithm.git.
+    convergence and an acceleration technique for root–finding problems. Statistics and Computing 36(4), 197.
+    https://doi.org/10.1007/s11222-026-10902-z. Preprint: arXiv 2212.00797v2 (8 November 2025),
+    https://arxiv.org/abs/2212.00797v2. The authors' R code: https://github.com/Xunjian-Li/US-algorithm.git.
     """
 
     number = (1, 2, 20)

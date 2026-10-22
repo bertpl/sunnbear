@@ -46,25 +46,25 @@ Cases 103–111 of roots-fortran are Badr's `P1`–`P9`, so they hold `T2.1`–`
 key = 'Fig. 1'
 f = '4 - (x - 1)^3'
 interval = '[1.00, 4.00]'
-notes = 'The right endpoint stays fixed. Root `1 + 4^(1/3)`.'
+notes = "In Figure 1's run of the false position method, the right endpoint stays fixed. The root is `1 + 4^(1/3)`."
 
 [[rows]]
 key = 'Fig. 2'
 f = '4 - (3 - x)^3'
 interval = '[0.20, 3.50]'
-notes = 'The left endpoint stays fixed. Root `3 - 4^(1/3)`.'
+notes = "In Figure 2's run of the false position method, the left endpoint stays fixed. The root is `3 - 4^(1/3)`."
 
 [[rows]]
 key = 'Fig. 3'
 f = 'x^9 - 8'
 interval = '[0.00, 1.50]'
-notes = 'The right endpoint stays fixed. Root `2^(1/3)`.'
+notes = "In Figure 3's run of the false position method, the right endpoint stays fixed. The root is `2^(1/3)`."
 
 [[rows]]
 key = 'Fig. 4'
 f = '(1.5 - x)^9 - 8'
 interval = '[0.00, 1.50]'
-notes = 'The left endpoint stays fixed. Root `1.5 - 2^(1/3)`.'
+notes = "In Figure 4's run of the false position method, the left endpoint stays fixed. The root is `1.5 - 2^(1/3)`."
 
 [[rows]]
 key = 'T2.1'
@@ -89,7 +89,7 @@ key = 'T2.4'
 f = 'x^2 - x - 2'
 interval = '[1, 4]'
 also_in = 'Moazzam [16]'
-notes = "The article's only results: Tables 1 and 3–7 and Figures 5–9 compare 5 methods on this function, with tolerance `0.00001`; Newton's method starts from `x0 = 1`, the secant method from `1` and `4`."
+notes = "The article's only results for a function of Table 2: Tables 1 and 3–7 and Figures 5–9 compare 5 methods on this function, with tolerance `0.00001`; Newton's method starts from `x0 = 1`, the secant method from `1` and `4`."
 
 [[rows]]
 key = 'T2.5'

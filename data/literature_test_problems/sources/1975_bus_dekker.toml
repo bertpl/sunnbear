@@ -86,7 +86,7 @@ f = '(1 + (1 - n)^2)*x - (1 - n*x)^2'
 parameters = 'n = 1, 5, 10'
 interval = '[0, 1]'
 also_in = 'as `I.1`'
-notes = 'The article: 1 turning point in `[0, 1]`.'
+notes = 'The article says that the functions have 1 turning point in `[0, 1]`; at `n = 1`, the only turning point is at `x = 1.5`, outside the interval.'
 
 [[rows]]
 key = 'I.4'

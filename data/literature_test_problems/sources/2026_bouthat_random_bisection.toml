@@ -1,5 +1,5 @@
 title = 'Bouthat, Luneau, Petitclerc (2026): random bisection method'
-reference = 'Bouthat, L., Luneau, P.-A., Petitclerc, P. (2026). Convergence Analysis of the Random Bisection Method. arXiv preprint 2603.20483v2. http://arxiv.org/abs/2603.20483v2.'
+reference = 'Bouthat, L., Luneau, P.-A., Petitclerc, P. (2026). Convergence Analysis of the Random Bisection Method. arXiv preprint 2603.20483v2. https://doi.org/10.48550/arxiv.2603.20483 (https://arxiv.org/abs/2603.20483v2).'
 year = 2026
 subcategory = '1.2'
 where_in_source = '''

@@ -1,5 +1,5 @@
 title = 'Li, Zhou, Lange, Tian (2026): upper-crossing/solution (US) algorithm'
-reference = "Li, X.-J., Zhou, H., Lange, K., Tian, G.-L. (2026). The upper–crossing/solution (US) algorithm with strongly stable convergence and an acceleration technique for root–finding problems. Statistics and Computing. https://doi.org/10.1007/s11222-026-10902-z. Preprint: https://arxiv.org/abs/2212.00797. The authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
+reference = "Li, X.-J., Zhou, H., Lange, K., Tian, G.-L. (2026). The upper–crossing/solution (US) algorithm with strongly stable convergence and an acceleration technique for root–finding problems. Statistics and Computing 36(4), 197. https://doi.org/10.1007/s11222-026-10902-z. Preprint: arXiv 2212.00797v2 (8 November 2025), https://arxiv.org/abs/2212.00797v2. The authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
 year = 2026
 subcategory = '1.2'
 where_in_source = '''
@@ -43,7 +43,7 @@ f = 'p - Phi(x; mu, sigma^2)'
 name = 'quantile of the normal distribution'
 parameters = 'Fig. 2: `p = 0.05`, `mu = 1`, `sigma = 1`. Table 3: `p = 0.01, 0.9` and `mu = -2, 2`, with `sigma = 1`.'
 interval = '`x` in R; starting values drawn from `U(-4, 4)`; `[-2.5, -0.5]` (Figure 2)'
-notes = '`Phi` is the normal cdf. Fig. 2 states the root `-0.6448536`.'
+notes = "`Phi` is the normal cdf. Fig. 2 states the root `-0.6448536`. Section 7.2 says that Table 3's experiments seek the root of (7.1), which is a misprint: (7.1) is Section 7.1's polynomial, and Section 7.2 sets `p`, `mu` and `sigma` and runs eqs. (7.4) and (7.5), which are built from this function."
 
 [[rows]]
 key = 'Ex. 4'
@@ -95,8 +95,8 @@ notes = 'Example of the R code for eq. (7.1) (`a3 = 1`, `a2 = -3`, `a1 = 1`, `a0
 key = '7.3'
 f = '-0.5*x - 2*sin(x) + 1'
 name = 'equation with multiple roots'
-interval = '`x` in R; starting value `x(0) = 0`; `[0, 7]` (Fig. 3(a))'
-notes = 'Eq. (7.6). Stated roots `0.4090497`, `3.535612`, `5.308993`. Fig. 3.'
+interval = '`x` in R; starting values `x(0) = 0` and `x(0) = x2* + 10^-6` (eq. (7.7)); `[0, 7]` (Fig. 3(a))'
+notes = 'The function is eq. (7.6), whose stated roots are `x1* = 0.4090497`, `x2* = 3.535612` and `x3* = 5.308993` (Fig. 3). From `x(0) = x2* + 10^-6`, the iteration (7.7) converges to `x3*`; eq. (7.8) runs the iteration on the negated function from `x(0) = x1* + 10^-6` and converges to `x2*`.'
 
 [[rows]]
 key = 'S1.1.1-I'

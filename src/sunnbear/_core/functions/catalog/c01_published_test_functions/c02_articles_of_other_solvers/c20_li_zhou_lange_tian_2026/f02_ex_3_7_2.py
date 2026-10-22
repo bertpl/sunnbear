@@ -1,9 +1,9 @@
-"""This module holds the formula that Li, Zhou, Lange, Tian (2026) labels Ex. 3 (7.2).
+"""This module holds a formula of Li, Zhou, Lange, Tian (2026).
 
-The survey gives this function as 1 expression that the module generator,
-`scripts/literature_test_problems/formula_modules.py`, cannot translate: a normal cumulative distribution function with
-a mean and a variance. A person therefore writes this module, and a change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``Ex. 3 (7.2)`` in the survey of published test problems. The survey gives
+this function as 1 expression that the module generator, `scripts/literature_test_problems/formula_modules.py`, cannot
+translate: a normal cumulative distribution function with a mean and a variance. A person therefore writes this module,
+and a change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math
@@ -20,6 +20,10 @@ class LiZhouLangeTian2026Ex372(Formula):
 
     Table 3's parameter values (``p = 0.01, 0.9``, ``mu = -2, 2``, ``sigma = 1``) are left out, because the source gives
     them no interval: it draws starting values from ``U(-4, 4)``. Fig. 2 states the root ``-0.6448536``.
+
+    Section 7.2 says that Table 3's experiments seek the root of (7.1), which is a misprint: (7.1) is Section 7.1's
+    polynomial, and Section 7.2 sets ``p``, ``mu`` and ``sigma`` and runs eqs. (7.4) and (7.5), which are built from
+    this function.
     """
 
     number = (1, 2, 20, 2)
@@ -29,9 +33,9 @@ class LiZhouLangeTian2026Ex372(Formula):
         reference=(
             "Li, X.-J., Zhou, H., Lange, K., Tian, G.-L. (2026). The upper–crossing/solution (US) "
             "algorithm with strongly stable convergence and an acceleration technique for root–finding "
-            "problems. Statistics and Computing. https://doi.org/10.1007/s11222-026-10902-z. Preprint: "
-            "https://arxiv.org/abs/2212.00797. The authors' R code: "
-            "https://github.com/Xunjian-Li/US-algorithm.git."
+            "problems. Statistics and Computing 36(4), 197. https://doi.org/10.1007/s11222-026-10902-z."
+            " Preprint: arXiv 2212.00797v2 (8 November 2025), https://arxiv.org/abs/2212.00797v2. The "
+            "authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
         ),
         location="Ex. 3 (7.2)",
     )

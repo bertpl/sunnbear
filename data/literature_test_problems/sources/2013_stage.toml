@@ -43,7 +43,7 @@ f = 'cos(x) - x^3'
 name = 'Function From Zhang'
 interval = '`[0, 4]` (Figure 1); `[-10, 10]` (Figure 2)'
 also_in = 'Zhang (2011)'
-notes = "Stage says `(0,4)` corresponds to Zhang, and that its code reproduces Zhang's Table 1."
+notes = "Stage says `(0,4)` corresponds to Zhang, and that the article's code reproduces Zhang's Table 1."
 
 [[rows]]
 key = '3.5'
@@ -101,4 +101,4 @@ key = '3.13'
 f_description = '`0` if `x = 0`; `(1 - 2/3)^-1` otherwise'
 name = 'Discontinuous Function'
 interval = '`[-10, 10]` (Figure 11); `[0, 7]` (text)'
-notes = 'Printed so, which makes the second branch the constant 3. The plot title is `f = 1 / (x - 2/3)`, and the text describes an infinite-magnitude discontinuity in place of a root.'
+notes = "Printed so, which makes the second branch the constant 3. The plot title is `f = 1 / (x - 2/3)`, and the text describes an infinite-magnitude discontinuity in place of a root. The printed first branch, `0` at `x = 0`, is a misprint too: it makes `x = 0` a root, the first bisection midpoint of `[-10, 10]` and a bound of `[0, 7]`. That contradicts §3.2, whose roots are not exact bisection points, the text, which says that on `(0,7)` only Brent's method stumbles into the root, and Figure 11, where bisection needs about 57 calls. The likely meaning, which the article does not print, is `0` at the pole `x = 2/3`."

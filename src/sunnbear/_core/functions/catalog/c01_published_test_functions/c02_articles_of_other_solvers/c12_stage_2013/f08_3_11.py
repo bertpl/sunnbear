@@ -1,7 +1,8 @@
-"""This module holds the formula that Stage (2013) labels 3.11 and 3.12.
+"""This module holds a formula of Stage (2013).
 
-The survey describes this function in words, not as 1 expression, so a person writes this module: a change of the
-formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the rows with the keys ``3.11`` and ``3.12`` in the survey of published test problems. The survey
+describes this function in words, not as 1 expression, so a person writes this module: a change of the formula's rows in
+`data/literature_test_problems/sources/` needs a change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
@@ -10,8 +11,8 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 class Stage2013311(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints 1 function in 2 rows, each with its own parameter values; with each row's values replaced by
-    parameters, that function is ``-d`` if ``x <= 1/3``; ``1 - d`` otherwise:
+    The source prints 2 functions that differ only in the values of some constants; with those constants replaced by
+    parameters, the 2 functions become 1 function, ``-d`` if ``x <= 1/3``; ``1 - d`` otherwise:
 
     - 3.11, with ``d = 0.5``: the survey writes the source's function as ``-0.5`` if ``x <= 1/3``; ``0.5`` otherwise;
       the formula's interval is ``[-10, 10]``

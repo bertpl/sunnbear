@@ -1,8 +1,9 @@
-"""This module holds the formula that Dowell, Jarratt (1972) labels Problem 3.
+"""This module holds a formula of Dowell, Jarratt (1972).
 
-The survey gives this function as 1 expression that the module generator,
-`scripts/literature_test_problems/formula_modules.py`, cannot translate: an infinite sum. A person therefore writes this
-module, and a change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``Problem 3`` in the survey of published test problems. The survey gives
+this function as 1 expression that the module generator, `scripts/literature_test_problems/formula_modules.py`, cannot
+translate: an infinite sum. A person therefore writes this module, and a change of the formula's row in
+`data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math

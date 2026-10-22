@@ -13,7 +13,7 @@ class FooTan2025(FormulaCategory):
     """`FooTan2025` is the category of the formulas of 1 publication.
 
     Foo, W. G., Tan, C. H. (2025). Higher-Order Root-Finding Algorithm and its Applications. arXiv preprint
-    2509.20897v1. http://arxiv.org/abs/2509.20897v1.
+    2509.20897v1. https://doi.org/10.48550/arxiv.2509.20897 (https://arxiv.org/abs/2509.20897v1).
     """
 
     number = (1, 2, 15)

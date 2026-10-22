@@ -1,9 +1,9 @@
-"""This module holds the formula that Li, Zhou, Lange, Tian (2026) labels 7.1.
+"""This module holds a formula of Li, Zhou, Lange, Tian (2026).
 
-The survey gives this function as 1 expression that the module generator,
-`scripts/literature_test_problems/formula_modules.py`, cannot translate: an expression whose parameters are given as
-sets ``{a0, a1, a2, a3, m}``. A person therefore writes this module, and a change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``7.1`` in the survey of published test problems. The survey gives this
+function as 1 expression that the module generator, `scripts/literature_test_problems/formula_modules.py`, cannot
+translate: an expression whose parameters are given as sets ``{a0, a1, a2, a3, m}``. A person therefore writes this
+module, and a change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
@@ -13,7 +13,8 @@ class LiZhouLangeTian202671(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
     The survey writes the source's function as ``a3*theta^m + a2*theta^2 + a1*theta + a0``, with the parameters ``{a0,
-    a1, a2, a3, m} = {1, -1, 1, -1, 3}`` and ``{1, -1, -3, 1, 3}``; the formula's interval is ``(0, a)`` with ``a = 2``.
+    a1, a2, a3, m} = {1, -1, 1, -1, 3}`` and ``{1, -1, -3, 1, 3}``; the formula's interval is ``(0, a)`` with ``a = 2``;
+    starting values drawn from ``U(0, 2)``.
 
     The formula's x is the source's ``theta``. Eq. (7.1), with ``m >= 3`` real and ``a0 > 0``. The article states the
     roots ``0.4608111`` and ``1`` "for the two cases"; with the printed coefficients, the first case has root ``1`` and
@@ -27,9 +28,9 @@ class LiZhouLangeTian202671(Formula):
         reference=(
             "Li, X.-J., Zhou, H., Lange, K., Tian, G.-L. (2026). The upper–crossing/solution (US) "
             "algorithm with strongly stable convergence and an acceleration technique for root–finding "
-            "problems. Statistics and Computing. https://doi.org/10.1007/s11222-026-10902-z. Preprint: "
-            "https://arxiv.org/abs/2212.00797. The authors' R code: "
-            "https://github.com/Xunjian-Li/US-algorithm.git."
+            "problems. Statistics and Computing 36(4), 197. https://doi.org/10.1007/s11222-026-10902-z."
+            " Preprint: arXiv 2212.00797v2 (8 November 2025), https://arxiv.org/abs/2212.00797v2. The "
+            "authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
         ),
         location="7.1",
     )

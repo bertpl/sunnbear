@@ -12,8 +12,6 @@ the article, the publisher's PDF with a text layer, checked against the page ima
 '''
 rows_summary = '1: `f(n)`, which the 3 methods solve. The 2 equations `A_t` are the parts of `f(n)`, not functions whose root the article seeks.'
 notes = '''
-- The article does not print `f(n)`, so the row reconstructs it: the row's `f` is the AMD equation minus the Pentium equation, with each printed denominator `(1.2)^(n - 1)` read as `1.2^n - 1`, and the printed `(1..2)` read as `1.2`.
-- The reconstruction reproduces every value of `f` in Table 2 and the printed `f(a)*f(b) = -2711558.49`. With the denominators as printed, the difference of the 2 equations has the same sign at 2 and at 10.
 - The article cites no source for its function, and no other source file gives it.
 - The key `§3` names the section.
 '''
@@ -22,4 +20,4 @@ notes = '''
 key = '§3'
 f = '-2000*1.2^n/(1.2^n - 1) + 50*n/(1.2^n - 1) + 3750 - (-600*(1 + 0.20)^n/(1.2^n - 1) + 200*n/(1.2^n - 1))'
 interval = '[2, 10]'
-notes = 'The variable is the year `n`. The article prints the 2 parts as `A_t = -600*(1 + 0.20)^n/(1.2)^(n - 1) + 200*n/1.2^(n - 1)` (Intel Pentium) and `A_t = -2000*(1..2)^n/(1.2)^(n - 1) + [50*n/(1.2)^(n - 1)] + 3750` (AMD). Root 3.22949 by bisection. The secant method starts from the same 2 points.'
+notes = "The variable is the year `n`. The article does not print `f(n)`; the row's `f` is the AMD equation minus the Intel Pentium equation. The article prints the 2 equations as `A_t = -600*(1 + 0.20)^n/(1.2)^(n - 1) + 200*n/1.2^(n - 1)` (Intel Pentium) and `A_t = -2000*(1..2)^n/(1.2)^(n - 1) + [50*n/(1.2)^(n - 1)] + 3750` (AMD). Each printed denominator, `(1.2)^(n - 1)` or `1.2^(n - 1)`, is a misprint for `1.2^n - 1`, and the printed `(1..2)` is a misprint for `1.2`: with both readings, the row's `f` reproduces every value of `f(n)` in Table 2 and the printed `f(a)*f(b) = -2711558.49`, while with the denominators as printed, the difference of the 2 equations has the same sign at 2 and at 10. Bisection gives the root 3.22949. The article gives no starting points for the secant method; Table 2's secant iterates follow from the first starting point 10 and the second starting point 2, but its first relative error, 0.76560, is measured from 10."

@@ -1,7 +1,8 @@
-"""This module holds the formula that Bus, Dekker (1975) labels IV.
+"""This module holds a formula of Bus, Dekker (1975).
 
-The survey describes this function in words, not as 1 expression, so a person writes this module: a change of the
-formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``IV`` in the survey of published test problems. The survey describes this
+function in words, not as 1 expression, so a person writes this module: a change of the formula's row in
+`data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math
@@ -34,7 +35,8 @@ class BusDekker1975Iv(Formula):
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - 5.0 * c
-        if x == 0.0:
+        # below 1e-100, float64 rounds x*exp(-x^-2) to 0, and x**-2 overflows
+        if abs(x) < 1e-100:
             return 0.0
         else:
             return x * math.exp(-(x**-2))
@@ -51,5 +53,6 @@ class BusDekker1975Iv(Formula):
         FormulaTestCase.value(params={}, x=0.5, c=0.0, expected=0.00915781944436709),
         FormulaTestCase.value(params={}, x=0.5, c=0.25, expected=-0.12675998655454956),
         FormulaTestCase.value(params={}, x=0.0, c=0.0, expected=0.0),
+        FormulaTestCase.value(params={}, x=1e-200, c=0.0, expected=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 4.0)),
     )

@@ -1,7 +1,8 @@
-"""This module holds the formula that Gao (2026) labels T4.7.
+"""This module holds a formula of Gao (2026).
 
-The survey describes this function in words, not as 1 expression, so a person writes this module: a change of the
-formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``T4.7`` in the survey of published test problems. The survey describes this
+function in words, not as 1 expression, so a person writes this module: a change of the formula's row in
+`data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math
@@ -31,7 +32,8 @@ class Gao2026T47(Formula):
     def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - (b - a) * c
-        if x == 0.0:
+        # below 1e-100, float64 rounds x*exp(-1/x^2) to 0, and x**2 underflows to 0
+        if abs(x) < 1e-100:
             return 0.0
         else:
             return x * math.exp(-1 / x**2)
@@ -50,6 +52,7 @@ class Gao2026T47(Formula):
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.0, expected=0.00915781944436709),
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.25, expected=-0.12675998655454956),
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.0, c=0.0, expected=0.0),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=1e-200, c=0.0, expected=0.0),
         FormulaTestCase.value(params={"a": -2.0, "b": 5.0}, x=0.1, c=0.0, expected=3.7200759760208773e-45),
         FormulaTestCase.value(params={"a": -1.0, "b": 10.0}, x=2.3, c=0.0, expected=1.9038405842623145),
         FormulaTestCase.value(params={"a": -5.0, "b": 50.0}, x=11.5, c=0.0, expected=11.413371409313232),

@@ -1,8 +1,8 @@
-"""This module holds the formula that Galdino (2011) labels f4.
+"""This module holds a formula of Galdino (2011).
 
-The survey gives this function as an expression in a helper variable ``p``, defined beside it, not as 1 expression in x,
-so a person writes this module: a change of the formula's row in `data/literature_test_problems/sources/` needs a change
-of this module.
+The formula comes from the row with the key ``f4`` in the survey of published test problems. The survey gives this
+function as an expression in a helper variable ``p``, defined beside it, not as 1 expression in x, so a person writes
+this module: a change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe

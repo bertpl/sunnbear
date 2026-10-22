@@ -66,7 +66,7 @@ key = 'T5.1-4'
 f = 'x^n - a'
 parameters = 'on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)12`; on `[0.95, 4.05]`: `a = 1`, `n = 8(2)14`'
 interval = '`[0, 5]`; `[0.95, 4.05]`'
-notes = 'The table pairs each interval with the parameter line beside it. The second interval is printed without a minus sign, legibly.'
+notes = 'The table pairs each interval with the parameter line beside it. The second interval is printed legibly as `[0.95, 4.05]`, where Alefeld, Potra, Shi (1995) print `[-0.95, 4.05]`.'
 
 [[rows]]
 key = 'T5.1-5'

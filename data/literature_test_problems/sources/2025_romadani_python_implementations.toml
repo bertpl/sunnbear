@@ -63,19 +63,19 @@ notes = 'Eq. (8). Stated root `0.800631154473`.'
 key = '5.2'
 f = 'sin(x) - cos(2*x)^3'
 name = 'trigonometric function'
-interval = '`[2.5, 3]`; root search over `[0, 3]`'
-notes = 'Printed as `cos^3(2x)`. Stated roots `2.758392986844` (in the bracket) and `0.383199666746` (reached by the fixed-point, Aitken and Steffensen methods).'
+interval = '`[2.5, 3]` (the bracketing methods); the search for the exact roots runs over [0, 3]'
+notes = 'The article prints `cos(2*x)^3` as `cos^3(2x)`. Its stated roots are `2.758392986844`, in the bracket, and `0.383199666746`, which the fixed-point, Aitken and Steffensen methods reach. The function does not change sign on `[0, 3]`, which holds both roots.'
 
 [[rows]]
 key = '5.3'
 f = 'exp(-x) - exp(-2*x) - exp(-3*x)'
 name = 'exponential function'
-interval = '`[0, 1]`; root search over `[-2, 2]`; global analysis over `[-2, 60]`'
+interval = '`[0, 1]` (the bracketing methods), `[-2, 2]` (the search for the exact root) and `[-2, 60]` (the global analysis)'
 notes = 'Stated root `0.481211825060`. The article also states a second root near `x = 56.27` on `[-2, 60]`; the function equals `exp(-x)*(1 - exp(-x) - exp(-2*x))`, which has no root other than the first.'
 
 [[rows]]
 key = '5.4'
 f = 'cos(exp(x/2))^3 - x^3'
 name = 'mixed function'
-interval = '`[0, 1]`; root search over `[-1, 1]`'
+interval = '`[0, 1]` (the bracketing methods) and `[-1, 1]` (the search for the exact root)'
 notes = 'Printed as `cos^3(e^(x/2)) - x^3`. Stated root `0.363177127637`.'

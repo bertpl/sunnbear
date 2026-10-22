@@ -1,9 +1,9 @@
-"""This module holds the formula that Kumar, Srivastav (2026) labels A.2.
+"""This module holds a formula of Kumar, Srivastav (2026).
 
-The survey gives this function as 1 expression that the module generator,
-`scripts/literature_test_problems/formula_modules.py`, cannot translate: an expression with noise of a stated
-distribution. A person therefore writes this module, and a change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``A.2`` in the survey of published test problems. The survey gives this
+function as 1 expression that the module generator, `scripts/literature_test_problems/formula_modules.py`, cannot
+translate: an expression with noise of a stated distribution. A person therefore writes this module, and a change of the
+formula's row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math
@@ -35,8 +35,8 @@ class KumarSrivastav2026A2(Formula):
         reference=(
             "Kumar, D., Srivastav, S. K. (2026). A randomized bracketing method for derivative-free "
             "root finding with uniform spacing contraction. Research Square preprint. "
-            "https://doi.org/10.21203/rs.3.rs-10070193/v1. The article's supplementary material holds "
-            "the authors' code."
+            "https://doi.org/10.21203/rs.3.rs-10070193/v1. The article's Data Availability statement "
+            "offers the authors' scripts from the corresponding author on request."
         ),
         location="A.2",
     )
