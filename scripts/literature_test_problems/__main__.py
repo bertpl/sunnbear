@@ -20,7 +20,7 @@ from .data_files import (
     read_sources,
     write_rows_table,
 )
-from .formulas import FormulaIdError, FormulasTable, read_formulas_table
+from .formulas import FormulaIdChangeError, FormulasTable
 from .matching import EarlierRowIndex
 from .overview import Overview
 from .statuses import decide_final_statuses, find_problems
@@ -48,11 +48,11 @@ def main() -> int:
     folder.summary_file.write_text(overview.summary_markdown(), encoding="utf-8")
     folder.timeline_file.write_text(overview.timeline_html(), encoding="utf-8")
     # --- formulas stage -------------------------
-    committed_formulas_table = read_formulas_table(folder.formulas_file)
+    committed_formulas_table = FormulasTable.read(folder.formulas_file)
     try:
         formulas_table = FormulasTable.build(rows, formula_decisions, committed_formulas_table)
-    except FormulaIdError as error:
-        # a change that would move an id leaves formulas.csv as it is, for a person to resolve
+    except FormulaIdChangeError as error:
+        # a change that would change the id of a formula leaves formulas.csv as it is, for a person to resolve
         formulas_table = committed_formulas_table
         formula_id_problems = error.problems
     else:

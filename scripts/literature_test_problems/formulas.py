@@ -1,4 +1,4 @@
-"""This module builds `formulas.csv`, which maps each formula id of category 1 to its `new` rows, and reads it back.
+"""This module builds `formulas.csv`, which maps each formula id of category 1 to its rows, and reads it back.
 
 The folder's README gives the rules: which sources get a number, how the ids of new formulas are appended to the ids
 already given, and when several rows share a formula.
@@ -17,8 +17,8 @@ FORMULA_COLUMNS = ["formula_id", "status", "source_id", "row_ids", "variable_cha
 FORMULA_STATUSES = ("active", "retired")
 
 
-class FormulaIdError(ValueError):
-    """A `FormulaIdError` reports changes that would move a formula id, which a person must resolve."""
+class FormulaIdChangeError(ValueError):
+    """A `FormulaIdChangeError` reports changes that would change the id of a formula, which a person must resolve."""
 
     def __init__(self, problems: list[str]) -> None:
         """Keep `problems`, 1 sentence per change, and join them into the message."""
@@ -31,7 +31,7 @@ class FormulaIdError(ValueError):
 # ==================================================================================================
 @dataclass(frozen=True)
 class FormulasTable:
-    """A `FormulasTable` holds the formulas of category 1 in id order, each with its `new` rows, retired ones too."""
+    """A `FormulasTable` holds the formulas of category 1 in id order, active and retired, each with its rows."""
 
     formulas: tuple["FormulasTableLine", ...]
 
@@ -98,13 +98,14 @@ class FormulasTable:
         return formulas_by_source
 
     @staticmethod
-    def _next_free_number(prefix: tuple[int, ...], numbers: Iterable[tuple[int, ...]]) -> tuple[int, ...]:
-        """Return `prefix` with 1 more element: 1 more than the largest that any of `numbers` has at that position.
+    def _next_free_number(prefix: tuple[int, ...], formulas: Iterable["FormulasTableLine"]) -> tuple[int, ...]:
+        """Return `prefix` with 1 more element, the next number after those of `formulas` that start with `prefix`.
 
-        With the number of a subcategory as `prefix`, this is the next free source number; with the number of a
-        source, the next free formula number. Retired formulas count, so that no number is given twice.
+        The added element is 1 more than the largest element at that position among those numbers, or 1 if no number
+        starts with `prefix`. With the number of a subcategory as `prefix`, the returned number is the next free source
+        number; with the number of a source, the next free formula number.
         """
-        taken = [number[len(prefix)] for number in numbers if number[: len(prefix)] == prefix]
+        taken = [formula.number[len(prefix)] for formula in formulas if formula.number[: len(prefix)] == prefix]
         return (*prefix, max(taken, default=0) + 1)
 
     # --------------------------------------------------------------------------
@@ -118,87 +119,92 @@ class FormulasTable:
 
         A formula of `committed_table` keeps its id while it holds the same rows, and is retired once none of its rows
         is `new`; a retired formula that holds the same rows again becomes active again. Every other formula is
-        appended: it gets the next free number of its source, and a source without a number the next free number of
-        its subcategory. From an empty `committed_table`, this numbers the sources in time order and their formulas
-        in the order of their rows.
+        appended: it gets the next free number of its source, and a source without a number gets the next free number
+        of its subcategory. From an empty `committed_table`, `build` numbers the sources in time order and their
+        formulas in the order of their rows.
 
         Raises:
-            FormulaIdError: If a change would move an id, which a person must resolve: a formula of
-                `committed_table` that would join with another or split, that names a row that no longer exists, or
-                whose source is now in another subcategory.
+            FormulaIdChangeError: If a change would change the id of a formula, which a person must resolve: a formula
+                of `committed_table` that would join with another or split, that names a row that no longer exists,
+                or whose source is now in another subcategory.
         """
-        committed_by_row_ids = {frozenset(formula.row_ids): formula for formula in committed_table.formulas}
-        committed_by_row_id = {row_id: formula for formula in committed_table.formulas for row_id in formula.row_ids}
+        committed_formula_by_row_set = {frozenset(formula.row_ids): formula for formula in committed_table.formulas}
+        committed_formula_by_row_id = {
+            row_id: formula for formula in committed_table.formulas for row_id in formula.row_ids
+        }
         problems = committed_table.find_problems(rows)
         # --- keep the committed ids -------------
         formulas = []
-        kept_numbers = set()
         formulas_to_append = []
-        for source_id, new_formulas in cls._group_new_rows(rows, formula_decisions).items():
-            for row_ids, variable_change in new_formulas:
-                committed = committed_by_row_ids.get(frozenset(row_ids))
+        for source_id, formulas_of_source in cls._group_new_rows(rows, formula_decisions).items():
+            for row_ids, variable_change in formulas_of_source:
+                committed_formula = committed_formula_by_row_set.get(frozenset(row_ids))
                 overlapping_ids = sorted(
-                    {committed_by_row_id[row_id].formula_id for row_id in row_ids if row_id in committed_by_row_id}
+                    {
+                        committed_formula_by_row_id[row_id].formula_id
+                        for row_id in row_ids
+                        if row_id in committed_formula_by_row_id
+                    }
                 )
-                if committed is not None:
+                if committed_formula is not None:
                     formulas.append(
-                        replace(committed, row_ids=row_ids, variable_change=variable_change, is_retired=False)
+                        replace(committed_formula, row_ids=row_ids, variable_change=variable_change, is_retired=False)
                     )
-                    kept_numbers.add(committed.number)
                 elif overlapping_ids:
                     problems.append(f"the formula of {row_ids[0]} would join or split {', '.join(overlapping_ids)}")
                 else:
                     formulas_to_append.append((source_id, row_ids, variable_change))
         # --- retire the rest --------------------
-        # each of them holds no `new` row: one that does is kept above, or reported as a join or split
+        # each committed formula that is not kept above holds no `new` row: a formula that holds one is kept above,
+        # or reported as a join or split
+        kept_numbers = {formula.number for formula in formulas}
         formulas += [
             replace(formula, is_retired=True)
             for formula in committed_table.formulas
             if formula.number not in kept_numbers
         ]
         if problems:
-            raise FormulaIdError(problems)
+            raise FormulaIdChangeError(problems)
         # --- append the other formulas ----------
+        # the numbers of retired formulas count as taken too, so that no number is given twice
         subcategory_number_by_source = {row.source_id: row.subcategory_number for row in rows}
-        numbers = [formula.number for formula in formulas]
         source_number_by_source = {formula.source_id: formula.number[:-1] for formula in formulas}
         for source_id, row_ids, variable_change in formulas_to_append:
             if source_id not in source_number_by_source:
                 source_number_by_source[source_id] = cls._next_free_number(
-                    subcategory_number_by_source[source_id], numbers
+                    subcategory_number_by_source[source_id], formulas
                 )
-            number = cls._next_free_number(source_number_by_source[source_id], numbers)
-            numbers.append(number)
+            number = cls._next_free_number(source_number_by_source[source_id], formulas)
             formulas.append(FormulasTableLine(number, source_id, row_ids, variable_change, is_retired=False))
         return cls(tuple(sorted(formulas, key=lambda formula: formula.number)))
 
+    @classmethod
+    def read(cls, path: Path) -> "FormulasTable":
+        """Return the formulas of `formulas.csv`, or an empty table if the file does not exist.
 
-def read_formulas_table(path: Path) -> FormulasTable:
-    """Return the formulas of `formulas.csv`, or an empty table if the file does not exist.
-
-    Raises:
-        DataFileError: If the columns are wrong, a line breaks its format, an id or a row is in more than 1 line, or
-            a source has more than 1 number or a number more than 1 source.
-    """
-    if not path.exists():
-        return FormulasTable(())
-    else:
-        with path.open(encoding="utf-8", newline="") as f:
-            reader = csv.DictReader(f)
-            if reader.fieldnames != FORMULA_COLUMNS:
-                raise DataFileError(f"{path.name}: the columns must be {FORMULA_COLUMNS}")
-            formulas = [FormulasTableLine.from_csv_line(line, path.name) for line in reader]
-        numbers = [formula.number for formula in formulas]
-        row_ids = [row_id for formula in formulas for row_id in formula.row_ids]
-        source_number_pairs = {(formula.source_id, formula.number[:-1]) for formula in formulas}
-        n_sources = len({source_id for source_id, _ in source_number_pairs})
-        n_source_numbers = len({source_number for _, source_number in source_number_pairs})
-        if len(set(numbers)) < len(numbers) or len(set(row_ids)) < len(row_ids):
-            raise DataFileError(f"{path.name}: an id or a row is in more than 1 line")
-        elif n_sources < len(source_number_pairs) or n_source_numbers < len(source_number_pairs):
-            raise DataFileError(f"{path.name}: a source has more than 1 number, or a number more than 1 source")
+        Raises:
+            DataFileError: If the columns are wrong, a line breaks its format, an id or a row is in more than 1 line,
+                or a source has more than 1 number or a number more than 1 source.
+        """
+        if not path.exists():
+            return cls(())
         else:
-            return FormulasTable(tuple(formulas))
+            with path.open(encoding="utf-8", newline="") as f:
+                reader = csv.DictReader(f)
+                if reader.fieldnames != FORMULA_COLUMNS:
+                    raise DataFileError(f"{path.name}: the columns must be {FORMULA_COLUMNS}")
+                formulas = [FormulasTableLine.from_csv_line(line, path.name) for line in reader]
+            numbers = [formula.number for formula in formulas]
+            row_ids = [row_id for formula in formulas for row_id in formula.row_ids]
+            source_number_pairs = {(formula.source_id, formula.number[:-1]) for formula in formulas}
+            n_sources = len({source_id for source_id, _ in source_number_pairs})
+            n_source_numbers = len({source_number for _, source_number in source_number_pairs})
+            if len(set(numbers)) < len(numbers) or len(set(row_ids)) < len(row_ids):
+                raise DataFileError(f"{path.name}: an id or a row is in more than 1 line")
+            elif n_sources < len(source_number_pairs) or n_source_numbers < len(source_number_pairs):
+                raise DataFileError(f"{path.name}: a source has more than 1 number, or a number more than 1 source")
+            else:
+                return cls(tuple(formulas))
 
 
 # ==================================================================================================
@@ -206,11 +212,12 @@ def read_formulas_table(path: Path) -> FormulasTable:
 # ==================================================================================================
 @dataclass(frozen=True)
 class FormulasTableLine:
-    """A `FormulasTableLine` holds 1 line of `formulas.csv`: a formula's number, its source and its `new` rows.
+    """A `FormulasTableLine` holds 1 line of `formulas.csv`: a formula's number, its source and its rows.
 
     `number` is the formula's place in the catalog's tree: category 1, the subcategory, the source and the formula,
     such as `(1, 4, 12, 3)`. `variable_change` is empty unless the formula's variable differs from that of its row's
-    `f`. A retired formula keeps the rows that it held when it was retired, so that its id is never given again.
+    `f`. A retired formula keeps the rows that it held when it was retired, so that it becomes active again with its
+    own id if those rows are `new` again.
     """
 
     number: tuple[int, ...]
@@ -239,7 +246,7 @@ class FormulasTableLine:
     # --------------------------------------------------------------------------
     @classmethod
     def from_csv_line(cls, line: dict[str, str], file_name: str) -> "FormulasTableLine":
-        """Return the formula of 1 line of `formulas.csv`, or raise `DataFileError`.
+        """Return the formula of 1 line of `formulas.csv`.
 
         Raises:
             DataFileError: If the id is not `f` and 4 dotted positive integers, the status is unknown, or the line
