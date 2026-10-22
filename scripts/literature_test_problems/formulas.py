@@ -5,9 +5,7 @@ already given, and when several rows share a formula.
 """
 
 import csv
-import hashlib
 import io
-import json
 import re
 from collections import Counter
 from collections.abc import Iterable
@@ -18,7 +16,6 @@ from .data_files import (
     DataFileError,
     FormulaDecision,
     RowsTableLine,
-    Source,
     join_row_ids,
     source_id_of_row_id,
     split_row_ids,
@@ -326,28 +323,6 @@ class FormulasTableLine:
     def source_number(self) -> tuple[int, ...]:
         """Return the number of the formula's source, such as `(1, 4, 12)` for `f1.4.12.3`."""
         return self.number[:3]
-
-    def survey_fields_hash(self, source: Source) -> str:
-        """Return a hash of the formula's survey fields, the input of its generated module in sunnbear's catalog.
-
-        The hash covers every survey field that the generated module depends on, so it changes with every change of
-        the survey that changes the module.
-
-        Raises:
-            DataFileError: If `source` is not the formula's source, or lacks 1 of the formula's rows.
-        """
-        if source.source_id != self.source_id:
-            raise DataFileError(f"{self.formula_id}: {source.source_id} is not its source")
-        fields = [
-            source.title,
-            source.reference,
-            self.variable_change,
-            [
-                [row.row_id, row.f, row.f_description, row.parameters, row.interval, row.notes]
-                for row in (source.find_row(row_id) for row_id in self.row_ids)
-            ],
-        ]
-        return hashlib.sha256(json.dumps(fields).encode("utf-8")).hexdigest()[:16]
 
     def to_csv_line(self) -> dict[str, str]:
         """Return the formula as 1 line of `formulas.csv`, keyed by column."""

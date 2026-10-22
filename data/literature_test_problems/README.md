@@ -252,7 +252,7 @@ The script:
 
 It needs sympy, from the dev dependency group, and a Unix system, because it limits the time of parsing each row with `SIGALRM`.
 
-CI does not regenerate `rows.csv`, because another sympy version could change a match. Instead, `tests/scripts/test_literature_test_problems.py` checks, with the standard library only, that:
+CI does not regenerate `rows.csv`, because another sympy version could change a match. Instead, `tests/scripts/test_literature_test_problems.py` checks, without running the matching, that:
 
 - `rows.csv` holds exactly the rows of the source files;
 - every decision is applied, and every final status follows its rules (§ Statuses): no row names an unknown or a later row, and no duplicate names an `incomplete` row;

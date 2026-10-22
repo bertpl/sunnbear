@@ -1,9 +1,8 @@
 """The generated files of `data/literature_test_problems/` agree with the folder's source files and decisions.
 
-The tests use the script's modules that need only the standard library; the row comparison in `matching`, which
-needs sympy, is not run here, because another sympy version could change a match. The tests do not regenerate the
-formula modules of category 1 in sunnbear's catalog either, because that needs sympy too; they compare each module
-with the survey.
+The tests do not run the row comparison in `matching`, because another sympy version could change a match, and they
+do not regenerate the formula modules of category 1 in sunnbear's catalog; they recompute each module's hash from the
+survey.
 """
 
 import importlib
@@ -37,7 +36,7 @@ _FIRST_RUN_LINES = [
 # ==================================================================================================
 @pytest.fixture(scope="module")
 def script_modules() -> dict[str, ModuleType]:
-    """Return the script's modules that need only the standard library, keyed by name.
+    """Return the script's modules that the tests use, keyed by name.
 
     They are imported by path, because the `scripts` folder is not an installed package.
     """
@@ -49,7 +48,7 @@ def script_modules() -> dict[str, ModuleType]:
     spec.loader.exec_module(package)
     return {
         name: importlib.import_module(f"literature_test_problems.{name}")
-        for name in ("data_files", "statuses", "overview", "formulas")
+        for name in ("data_files", "statuses", "overview", "formulas", "formula_modules")
     }
 
 
@@ -260,7 +259,7 @@ def test_timeline_template_counts_every_status(script_modules):
 #  The formulas of category 1 in sunnbear's catalog
 # ==================================================================================================
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
-def test_category_1_formula_matches_the_survey(formula, sources, committed_formulas_table):
+def test_category_1_formula_matches_the_survey(formula, script_modules, sources, committed_formulas_table):
     """A formula of category 1 has an active line in `formulas.csv`, and its category and `source` match its source.
 
     The category's name must be the source's short title, and `source` must hold the source's reference and its rows'
@@ -286,7 +285,9 @@ def test_category_1_formula_matches_the_survey(formula, sources, committed_formu
     if survey_fields_hash is None:
         assert any(source.find_row(row_id).f_description for row_id in line.row_ids)
     else:
-        assert survey_fields_hash == line.survey_fields_hash(source)
+        assert survey_fields_hash == script_modules["formula_modules"].FormulaModuleSpec.survey_fields_hash(
+            line, source
+        )
 
 
 def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table):

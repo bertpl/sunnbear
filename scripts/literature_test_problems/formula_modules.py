@@ -15,7 +15,9 @@ The README of `data/literature_test_problems/` (§ Formula modules) describes wh
 which formulas are written by hand, and which formulas the script cannot generate.
 """
 
+import hashlib
 import itertools
+import json
 import keyword
 import math
 import re
@@ -31,7 +33,7 @@ import sympy as sp
 from sunnbear._core.utils.slugify import slugify
 from sunnbear.functions import CANONICAL_DIGITS, ParamNotation
 
-from .data_files import SUBCATEGORY_DESCRIPTIONS, DataFolder, Source, SourceRow, read_sources
+from .data_files import SUBCATEGORY_DESCRIPTIONS, DataFileError, DataFolder, Source, SourceRow, read_sources
 from .formulas import FormulasTable, FormulasTableLine
 from .functions import ParsedFunction
 from .helpers import IDENTIFIER, MAX_INSTANCES
@@ -136,7 +138,7 @@ class FormulaModuleSpec:
                 "",
                 "# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the",
                 "# survey, so that a test fails when the survey changes and this module is not regenerated.",
-                f'SURVEY_FIELDS_HASH = "{self.formulas_table_line.survey_fields_hash(self.source)}"',
+                f'SURVEY_FIELDS_HASH = "{self.survey_fields_hash(self.formulas_table_line, self.source)}"',
                 "",
                 "",
                 f"class {class_name}(Formula):",
@@ -169,6 +171,29 @@ class FormulaModuleSpec:
                 "",
             ]
         )
+
+    @staticmethod
+    def survey_fields_hash(formulas_table_line: FormulasTableLine, source: Source) -> str:
+        """Return a hash of the formula's survey fields: every field of the survey that its generated module depends on.
+
+        The tests recompute the hash and compare it with the module's `SURVEY_FIELDS_HASH`, so that a module left stale
+        after a change of the survey fails them. A row's id holds its key, so the hash covers the key too.
+
+        Raises:
+            DataFileError: If `source` is not the formula's source, or lacks 1 of the formula's rows.
+        """
+        if source.source_id != formulas_table_line.source_id:
+            raise DataFileError(f"{formulas_table_line.formula_id}: {source.source_id} is not its source")
+        fields = [
+            source.title,
+            source.reference,
+            formulas_table_line.variable_change,
+            [
+                [row.row_id, row.f, row.f_description, row.parameters, row.interval, row.notes]
+                for row in (source.find_row(row_id) for row_id in formulas_table_line.row_ids)
+            ],
+        ]
+        return hashlib.sha256(json.dumps(fields).encode("utf-8")).hexdigest()[:16]
 
     # --------------------------------------------------------------------------
     #  Helpers
