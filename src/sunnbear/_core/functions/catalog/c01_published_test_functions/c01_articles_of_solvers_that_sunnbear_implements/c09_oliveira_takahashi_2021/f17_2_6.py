@@ -52,5 +52,6 @@ class OliveiraTakahashi202126(Formula):
     cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-0.10638297872340426),
         FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-0.05025125628140703),
+        FormulaTestCase.value(params={}, x=1 / 21, c=0.0, expected=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

@@ -49,6 +49,7 @@ class Gao2026T47(Formula):
     cases = (
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.0, expected=0.00915781944436709),
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.25, expected=-0.12675998655454956),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.0, c=0.0, expected=0.0),
         FormulaTestCase.value(params={"a": -2.0, "b": 5.0}, x=0.1, c=0.0, expected=3.7200759760208773e-45),
         FormulaTestCase.value(params={"a": -1.0, "b": 10.0}, x=2.3, c=0.0, expected=1.9038405842623145),
         FormulaTestCase.value(params={"a": -5.0, "b": 50.0}, x=11.5, c=0.0, expected=11.413371409313232),

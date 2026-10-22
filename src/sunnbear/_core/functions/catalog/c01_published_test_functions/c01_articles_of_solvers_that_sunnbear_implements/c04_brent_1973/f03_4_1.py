@@ -58,5 +58,6 @@ class Brent197341(Formula):
     cases = (
         FormulaTestCase.value(params={}, x=0.5, c=0.0, expected=0.00915781944436709),
         FormulaTestCase.value(params={}, x=0.5, c=0.25, expected=-0.12675998655454956),
+        FormulaTestCase.value(params={}, x=0.0001, c=0.0, expected=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 4.0)),
     )

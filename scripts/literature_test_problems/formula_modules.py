@@ -54,6 +54,9 @@ UNTRANSLATABLE_FORMULAS = {
 CASE_FRACTIONS = (0.3, 0.7, 0.45, 0.85, 0.6, 0.35)
 # SHIFTED_CASE_C is the value of c of the 1 case per formula that exercises the shift of x.
 SHIFTED_CASE_C = 0.25
+# BRANCH_CASE_GAP is how far, relative to its size, a branch case's x-value lies beside a value that a condition
+# compares x with, so that float64 and mpmath take the same branch there.
+BRANCH_CASE_GAP = 1e-9
 # CASE_RTOL and CASE_ATOL bound how far the generated Python may be from mpmath at a case's x-value: 10 times smaller
 # than the default tolerances of the generic formula test, so that the numba-compiled function, whose result may
 # differ slightly from the Python one, still passes that test.
@@ -427,6 +430,48 @@ class FormulaModuleSpec:
                 spread = max(spread, abs(float(value) - expected))
         return spread
 
+    @staticmethod
+    def _find_branch_case(
+        exact_function: object,
+        formula_expression: FormulaExpression,
+        python_values: dict[str, float],
+        interval: tuple[float, float],
+        condition: ast.expr,
+        is_condition_met: bool,
+    ) -> tuple[float, float] | None:
+        """Return an x-value in the interval where `condition` is `is_condition_met`, and the formula's value there.
+
+        The case is for c = 0, and makes a test case reach a branch of a function that is 1 conditional. The x-values
+        tried are the interval's bounds, each value that the condition compares x with, the values `BRANCH_CASE_GAP`
+        beside each of those, and `CASE_FRACTIONS` of the interval; the first where the generated Python code agrees
+        with mpmath within `CASE_RTOL` and `CASE_ATOL` is kept. The result is None if none is found.
+        """
+        a, b = interval
+        namespace = {"math": math, **vars(math_functions), **python_values}
+        compared_values = []
+        for node in ast.walk(condition):
+            if isinstance(node, ast.Compare):
+                for side in (node.left, *node.comparators):
+                    if not any(isinstance(name, ast.Name) and name.id == "x" for name in ast.walk(side)):
+                        compared_values.append(float(eval(ast.unparse(side), namespace)))
+        candidates = [a, b]
+        for value in compared_values:
+            gap = BRANCH_CASE_GAP * max(1.0, abs(value))
+            candidates += [value, value - gap, value + gap]
+        candidates += [float(f"{a + fraction * (b - a):.6g}") for fraction in CASE_FRACTIONS]
+        for x in candidates:
+            if not a <= x <= b or eval(ast.unparse(condition), namespace, {"x": x}) != is_condition_met:
+                continue
+            try:
+                with mpmath.workdps(50):
+                    expected = float(mpmath.re(exact_function(mpmath.mpf(x))))
+                python_value = formula_expression.python_value(x, python_values)
+            except (ArithmeticError, ValueError, TypeError):
+                continue
+            if math.isfinite(expected) and math.isclose(python_value, expected, rel_tol=CASE_RTOL, abs_tol=CASE_ATOL):
+                return x, expected
+        return None
+
     @classmethod
     def _tuple_values(
         cls, published_test_function: PublishedTestFunction, has_interval_parameters: bool
@@ -491,12 +536,36 @@ class FormulaModuleSpec:
             exact_function = formula_expression.mpmath_function(dict(published_test_function.parameter_values))
             # the first tuple gets a 2nd value case, which shifts x
             shifts = (0.0, SHIFTED_CASE_C) if not cases else (0.0,)
+            shifted_xs = []
             for c in shifts:
                 x, expected, atol = cls._find_case(exact_function, formula_expression, python_values, bounds, c=c)
                 tolerance = f", atol={atol!r}" if atol is not None else ""
                 cases.append(
                     f"FormulaTestCase.value(params={params!r}, x={x!r}, c={c!r}, expected={expected!r}{tolerance})"
                 )
+                shifted_xs.append(x - (bounds[1] - bounds[0]) * c)
+            # the first tuple also reaches each branch of a function that is 1 conditional, so that a test reaches
+            # every line of the module
+            expression_node = ast.parse(formula_expression.python_code, mode="eval").body
+            if len(tuples) == 1 and isinstance(expression_node, ast.IfExp):
+                namespace = {"math": math, **vars(math_functions), **python_values}
+                condition_code = ast.unparse(expression_node.test)
+                reached = {bool(eval(condition_code, namespace, {"x": x})) for x in shifted_xs}
+                for is_condition_met in {True, False} - reached:
+                    branch_case = cls._find_branch_case(
+                        exact_function,
+                        formula_expression,
+                        python_values,
+                        bounds,
+                        expression_node.test,
+                        is_condition_met,
+                    )
+                    if branch_case is None:
+                        raise GenerationError(
+                            f"{formula_id}: no case reaches the branch where {condition_code} is {is_condition_met}"
+                        )
+                    x, expected = branch_case
+                    cases.append(f"FormulaTestCase.value(params={params!r}, x={x!r}, c=0.0, expected={expected!r})")
             bounds_cases.setdefault(bounds, f"FormulaTestCase.interval_bounds(params={params!r}, expected={bounds!r})")
         return cls(
             survey_formula=survey_formula,

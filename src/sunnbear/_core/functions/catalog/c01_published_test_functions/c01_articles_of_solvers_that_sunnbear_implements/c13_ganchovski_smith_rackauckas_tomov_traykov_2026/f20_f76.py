@@ -57,5 +57,6 @@ class GanchovskiSmithRackauckasTomovTraykov2026F76(Formula):
     cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=1.000001),
         FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=1.000001),
+        FormulaTestCase.value(params={}, x=-1.0, c=0.0, expected=-1.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

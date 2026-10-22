@@ -131,7 +131,7 @@ key = '2.6'
 f_description = '`1/(21*x - 1)`, with `(x != 1/21)` printed beside it'
 name = 'Geometric'
 interval = '[-1, 1]'
-notes = 'The code and sunnbear return 0 at `x = 1/21`.'
+notes = "The authors' MATLAB code and sunnbear's test transcription in `tests/solvers/paper_problems/oliveira_takahashi.py` return 0 at `x = 1/21`."
 
 [[rows]]
 key = '2.7'

@@ -23,7 +23,11 @@ def test_formula_test_case(formula, case):
         case ValueTestCase(params=params, x=x, c=c, expected=expected, rtol=rtol, atol=atol):
             p = formula.param_dict_to_tuple(params)
             assert formula.is_param_tuple_valid(*p)
-            assert math.isclose(formula.bind_xc_fun(p)(x, c), expected, rel_tol=rtol, abs_tol=atol)
+            value = formula.bind_xc_fun(p)(x, c)
+            if math.isnan(expected):
+                assert math.isnan(value)
+            else:
+                assert math.isclose(value, expected, rel_tol=rtol, abs_tol=atol)
         case InvalidTestCase(params=params):
             assert not formula.is_param_tuple_valid(*formula.param_dict_to_tuple(params))
         case IntervalBoundsTestCase(params=params, expected=(lo, hi), rtol=rtol, atol=atol):
