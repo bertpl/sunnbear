@@ -449,7 +449,7 @@ f1.4.6.20,2015_chapra,"2015_chapra:Prob. 5.12, 6.12",
 f1.4.6.21,2015_chapra,2015_chapra:Prob. 5.15,
 f1.4.6.22,2015_chapra,2015_chapra:Prob. 5.16,
 f1.4.6.23,2015_chapra,"2015_chapra:Prob. 5.17, 5.19, 6.19, 8.9",
-f1.4.6.24,2015_chapra,2015_chapra:Prob. 5.18,"the temperature `T` in deg C, as `f(T + 273.15)` on `[0, 40]`"
+f1.4.6.24,2015_chapra,2015_chapra:Prob. 5.18,"the temperature `T` in °C, as `f(T + 273.15)` on `[0, 40]`"
 f1.4.6.25,2015_chapra,2015_chapra:Prob. 6.13,
 f1.4.6.26,2015_chapra,2015_chapra:Prob. 6.17,
 f1.4.6.27,2015_chapra,2015_chapra:Prob. 8.5,
