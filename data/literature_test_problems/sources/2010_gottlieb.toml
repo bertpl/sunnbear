@@ -41,7 +41,7 @@ notes = "Table 2's root `0.5671432904`."
 [[rows]]
 key = '3'
 f = '11*x^11 - 1'
-interval = '[0.1, 0.9]'
+interval = '`[0.1, 0.9]`; `[0.4, 1]` (Figure 1)'
 notes = "Table 2's root `0.8041330975`."
 
 [[rows]]

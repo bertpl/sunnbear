@@ -4,7 +4,9 @@
 
 The folder is a survey of the test functions of published sources: articles of root-finding methods, public benchmark suites and textbooks.
 
-Each row is 1 test function as its source gives it, with its parameters and interval, and each row records whether an earlier source already gives the same function.
+Each row is 1 function as its source gives it, with its parameters and intervals. A row's test functions are its function at each combination of its parameter values, on each of its intervals.
+
+A row's status records whether the source gives enough to define those test functions, and whether an earlier source already gives them all.
 
 The rows are the material for category 1, *Existing benchmark suites*, of sunnbear's formula catalog. The catalog holds the package's formulas in `sunnbear.functions`, each a family of test functions.
 
@@ -13,10 +15,10 @@ The rows are the material for category 1, *Existing benchmark suites*, of sunnbe
 | file | written by | content |
 |---|---|---|
 | `sources/<id>.toml` | hand | 1 source: its reference, where in the source its rows are, and its rows |
-| `decisions.csv` | hand | the statuses that a person decided, where the script cannot decide or decides wrongly |
+| `decisions.csv` | hand | the statuses that a person decided, where the script cannot decide or decides wrongly (§ Decisions) |
 | `rows.csv` | script | every row, in time order, with its automatic and its final status (§ Statuses) |
 | `summary.md` | script | 1 line per source: its year, title, subcategory (the kind of source, § Source files), rows and new rows, and the sources that it takes rows from |
-| `timeline.html` | script | a page that draws the sources in time order, with an edge from each source to every later source whose rows match its rows (§ The summary and the page) |
+| `timeline.html` | script | a page that draws the sources in time order, with an edge from each source to every later source whose rows name its rows (§ The summary and the page) |
 
 Do not edit the 3 generated files by hand; regenerate them (§ Regenerating).
 
@@ -57,7 +59,7 @@ The generated files list the sources in time order: by year, then by id without 
 | `f` | the function as 1 expression in ASCII operators (`x^n - 0.2`, `exp(-n*x)`, `sqrt(x)`), or an equation `lhs = rhs` |
 | `f_description` | instead of `f`: a function that 1 expression does not give, such as a piecewise function or one that needs data |
 | `parameters` | the values of the source's own parameters, as published (`n = 4, 6, 8, 10, 12`) |
-| `interval` | the interval or intervals as published, or the starting points where the source gives no interval |
+| `interval` | the interval or intervals as published, including the x-range of a figure that plots the function where both bounds can be read exactly, such as `` `[0, 2]` (Fig. 2.2) ``; or the starting points where the source gives no interval |
 | `also_in` | other sources of the function, where this source names them |
 | `notes` | what a reader needs to read the row, such as a rounded constant or a misprint |
 
@@ -65,33 +67,64 @@ A row's id is `<source id>:<key>`, such as `2011_zhang:3`; a key that a source r
 
 ## Statuses
 
-Each row has 1 of 4 final statuses; every status other than `new` names the earlier rows that the row matches, and where several earlier rows match the same instance, it names the earliest:
+Each row has 1 of 3 final statuses, decided in this order; the paragraphs *The same function* and *Test functions and intervals* below the list define the terms that the list uses:
 
-- **`duplicate`:** the row matches an earlier row in 1 of these ways:
-  - the same expression written differently without changing how it is computed (reordered terms or factors, `x*x*x` against `x^3`);
-  - the same expression on another interval;
-  - a sign flip or a constant factor;
-  - an equation against its difference form (`sin(x) = x^2` against `sin(x) - x^2`).
-- **`variant`:** the same model with other constants (`g = 9.8` against `9.81`), or a shift in `x`.
-- **`extended`:** a family that only adds parameter values to an earlier family.
-- **`new`:** everything else. That includes a function with the same roots but different values away from them, such as 2 fixed-point forms `x = g(x)` of 1 equation, and the same function in a form that rounds differently, such as a polynomial in expanded form compared with the same polynomial in factored or nested form.
+- **`incomplete`:** the source does not give enough to define a test function; every other row is complete. The row's reason starts with 1 of 4 cases:
+  - `no interval`: the source gives no interval, or only starting points;
+  - `no usable interval`: the interval text gives no interval with finite numeric bounds, such as prose (`an interval containing the origin`), a half-line (`theta > 0`), an infinite bound, or bounds without values (`[a, b]`);
+  - `no function`: the source gives no function, or one that needs data that the source does not print, such as a sample; a function with random noise of a stated distribution counts as given;
+  - `parameters without values`: a parameter of the function has no published value, such as an `eps` that is only "small".
+- **`duplicate`:** earlier complete rows already give each of the row's test functions: the same function on the same interval with the same parameter values. `duplicate_of` names those earlier rows.
+- **`new`:** every other complete row. That includes:
+  - the same function on another interval or with other parameter values;
+  - the same function in a form that rounds differently, such as a polynomial in expanded form compared with the same polynomial in factored or nested form, or 2 fixed-point forms `x = g(x)` of 1 equation.
 
-Where a source misprints a function, the row is compared as the function that the source meant, and its notes say so. Every row that is not `new` names an earlier row; a duplicate that the script does not find and `decisions.csv` does not record stays `new`.
+A `new` or `incomplete` row names, in `derived_from`, the earlier rows whose function it copies or changes:
 
-**How the script decides.** It parses each row's `f` and `parameters` with sympy into 1 instance per combination of parameter values, and compares each row with every earlier row (the docstring of `scripts/literature_test_problems/matching.py` gives the 3 comparisons). The automatic status follows from the matches:
+- the same function on other intervals or with other parameter values;
+- the same model with other constants (`g = 9.8` against `9.81`);
+- the same function shifted in `x`.
 
-- **`duplicate`:** earlier rows already have each instance of the row.
-- **`extended`:** the row's expression, with its parameters left as symbols, matches an earlier row's, and the row adds parameter values.
-- **`new`:** the row parses and matches nothing.
-- **`undecided`:** a match only by the values at fixed x-values, a match of only some of its instances, a match of the expression of a row without parameter values, or a row that does not parse; a person decides the status in `decisions.csv`.
+`derived_from` changes no status; it only adds edges between sources in `summary.md` and `timeline.html` (§ The summary and the page).
 
-A row that matches nothing else, parsed or not, is still a `duplicate` of an earlier row with the same text: the same `f` or `f_description` and `parameters`, ignoring whitespace and backticks.
+**The same function.** A row has the same function as another row when one is the other in 1 of these forms:
 
-**Each row names the first appearance of its function:** a row whose earlier row is itself a `duplicate` names that row's earlier row instead. A row whose earlier row is a `variant` or `extended` row keeps naming that row, since it is the first appearance of its constants or parameter values.
+- written differently without changing how it is computed (reordered terms or factors, `x*x*x` against `x^3`);
+- with its sign flipped, or multiplied by a constant;
+- as an equation against its difference form (`sin(x) = x^2` against `sin(x) - x^2`).
+
+Where a source misprints a function, the row is compared as the function that the source meant, and its notes say so.
+
+**Test functions and intervals.** A row's function has 1 instance per combination of its parameter values. A row's test functions are the pairs of 1 instance and 1 of the row's intervals:
+
+- An interval belongs to every instance, except an interval whose bounds use a parameter, such as `[0, (q - 1)/q]`, which belongs only to the instances with the same parameter values.
+- Intervals are the same when their bounds are the same numbers: `(a, b)` and `[a, b]` are the same interval, and so are `[-1E4, 1E4]` and `[-10^4, 10^4]`, but `[0.5, sqrt(3)]` and `[0.5, 1.7320508]` are not.
+- Where the interval text holds backticks, only the code between them gives intervals, so that a remark such as `(Ex. 5.3, 5.5)` is not read as one. A name that the text assigns in backticks, such as `` `n = 1, ..., 10` ``, gives values to bounds such as `[(n - 1)*pi, n*pi]`.
+
+**Each row names the first appearance of its function:** a row that names a `duplicate`, in `duplicate_of` or `derived_from`, names the rows in that duplicate's `duplicate_of` instead. A duplicate never names an `incomplete` row, since that row gives no test function.
+
+**How the script decides.** It parses each row's `f` and `parameters` with sympy into its instances, and its interval text into intervals; the docstrings of `matching.py` and `intervals.py` in `scripts/literature_test_problems/` give the comparisons.
+
+The automatic status is `incomplete` where the `incomplete` condition below holds; otherwise `undecided` where any of the `undecided` conditions below holds; otherwise `duplicate` or `new`:
+
+- **`incomplete`:** the interval text gives no usable interval, or the row has no code for its function (`f_description` without backticks);
+- **`duplicate`:** earlier complete rows have each of its test functions, compared by structure: equal after an equation becomes its difference form, and after a constant factor and the sign are removed; a row whose `f` does not parse is compared by its text instead: its `f` or `f_description` and its `parameters`, ignoring whitespace and backticks;
+- **`new`:** the row parses with a value for every parameter, and earlier complete rows lack some of its test functions; `derived_from` names each earlier row that has 1 of the row's instances, the row's family (its expression with its parameters as symbols) or the row's text;
+- **`undecided`:** a person decides the status in `decisions.csv`. `match_kind` gives why:
+  - `unparsed`: the `f` does not parse, and earlier rows with the same text lack some of its test functions;
+  - `interval does not parse`;
+  - `parameters without values`: an instance still holds a parameter as a symbol, because the script found no value for it; the source may give its values in a form that the script does not read;
+  - `value`: some test functions are found only by value, with the same values up to a constant factor at fixed x-values, so the function may be the same or round differently;
+  - `unpaired`: every test function is found, but some only in an earlier row of 1 of the 2 kinds below, for which the script may list test functions that the earlier source does not give:
+    - a row with several instances and several intervals that the script cannot pair with each other;
+    - a row whose parameters give several sets of values, separated by `;`, which the script combines into every possible combination;
+  - `no test function`: no interval belongs to any instance, so the row has no test function.
 
 ## Decisions
 
-`decisions.csv` holds 1 line per row that a person decided, with the columns `row_id`, `status`, `earlier_rows` and `reason`. A decision overrides the script's automatic status, so it also corrects a wrong one. `earlier_rows` separates several row ids by ` | `.
+`decisions.csv` holds 1 line per row that a person decided, with the columns `row_id`, `status`, `duplicate_of`, `derived_from` and `reason`. A decision replaces the script's automatic status, named rows and reason for that row, so it also corrects a wrong one.
+
+A field with several row ids separates them by ` | `. A row decided `incomplete` gives no test functions that a later row could duplicate.
 
 ## The table of rows
 
@@ -100,14 +133,16 @@ A row that matches nothing else, parsed or not, is still a `duplicate` of an ear
 | column | content |
 |---|---|
 | `row_id`, `year`, `subcategory` | the row's id, and its source's year and subcategory |
-| `parse_note` | why the script could not parse the row; empty when it parsed |
+| `parse_note` | why the script could not parse the row's `f` or interval, or how many of its intervals it left out as not usable; empty when both parsed |
 | `n_instances` | the number of the row's parsed instances |
-| `automatic_status`, `match_kind`, `matches` | the script's status, the comparison that found it, and the earlier rows that matched |
-| `status`, `earlier_rows`, `reason` | the final status, its earlier rows and the reason, taken from `decisions.csv` where that file has a line for the row |
+| `automatic_status` | the script's status |
+| `match_kind` | the comparisons that found the rows in `matches`, the reason that a row is `incomplete`, or why a row is `undecided` |
+| `matches` | the earlier rows that the script found |
+| `status`, `duplicate_of`, `derived_from`, `reason` | the final status, the earlier rows that it names, and the reason, taken from `decisions.csv` where that file has a line for the row; an automatic `incomplete` row's reason is its `match_kind` |
 
 ## The summary and the page
 
-An edge runs from an earlier source to a later one for every later row that names a row of the earlier source; `summary.md` lists the edges into each source as *takes rows from*.
+An edge runs from an earlier source to a later one for every later row that names a row of the earlier source, in `duplicate_of` or `derived_from`; `summary.md` lists the edges into each source as *takes rows from*.
 
 Short functions that many sources hold, such as `cos(x) - x`, would connect nearly every pair of sources, so they add no edges: a row is such a common function when later rows of at least `COMMON_MIN_SOURCES` sources name it and its `f` is at most `COMMON_MAX_LENGTH` characters long (both set in `scripts/literature_test_problems/overview.py`).
 
@@ -115,8 +150,8 @@ Common functions and the rows that name them still count in the row counts of th
 
 ## Adding a source
 
-1. Write `sources/<id>.toml`. Add a relation where a reader needs to know how its rows relate to another source's rows, such as a block of functions that the new source copies with changes; the statuses already name every match.
-2. Regenerate. The script prints each row that needs a decision; `rows.csv` gives, in `match_kind` and `matches`, the comparison and the earlier rows that the script found for it.
+1. Write `sources/<id>.toml`. Add a relation where a reader needs to know how its rows relate to another source's rows, such as a block of functions that the new source copies with changes; `duplicate_of` and `derived_from` already name every earlier row that the script finds.
+2. Regenerate. The script prints each row that needs a decision; `rows.csv` gives, in `match_kind` and `matches`, why it needs one and the earlier rows that the script found for it.
 3. Add a line to `decisions.csv` for each of those rows, and for any automatic status that is wrong, then regenerate until the script prints no problems.
 4. Commit the source file, `decisions.csv` and the 3 generated files together.
 
@@ -133,7 +168,7 @@ The script writes the 3 generated files, prints the counts per status and every 
 CI does not regenerate `rows.csv`, because another sympy version could change a match. Instead, `tests/scripts/test_literature_test_problems.py` checks, with the standard library only, that:
 
 - `rows.csv` holds exactly the rows of the source files;
-- every decision is applied, and no row names an unknown or a later row;
+- every decision is applied, and every final status follows its rules (§ Statuses): no row names an unknown or a later row, and no duplicate names an `incomplete` row;
 - every source file has its fields;
 - `summary.md` and `timeline.html` equal what the script builds from `rows.csv` and the source files.
 

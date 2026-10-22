@@ -9,7 +9,7 @@ import sys
 from collections import Counter
 
 from .data_files import DataFolder, RowsTableLine, read_decisions, read_sources, write_rows_table
-from .matching import compute_automatic_statuses
+from .matching import EarlierRowIndex
 from .overview import Overview
 from .statuses import decide_final_statuses, find_problems
 
@@ -20,7 +20,9 @@ def main() -> int:
     sources = read_sources(folder.sources_dir)
     decisions = read_decisions(folder.decisions_file)
     # --- statuses stage -------------------------
-    automatic_statuses = compute_automatic_statuses([row for source in sources for row in source.rows])
+    automatic_statuses = EarlierRowIndex.compute_automatic_statuses(
+        [row for source in sources for row in source.rows], decisions
+    )
     final_statuses = decide_final_statuses(automatic_statuses, decisions)
     rows = [
         RowsTableLine.from_source_row(source, row, automatic_statuses[row.row_id], final_statuses[row.row_id])

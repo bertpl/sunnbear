@@ -6,8 +6,8 @@ Run it from the repo root:
 
 It runs in 2 stages:
 
-- **Statuses** (`matching`, `statuses`; needs sympy): compare every row with all earlier rows, apply
-  `decisions.csv`, and write `rows.csv`.
+- **Statuses** (`statuses`, and `helpers`, `functions`, `intervals` and `matching`, which need sympy): parse every
+  row's function and intervals, compare every row with all earlier rows, apply `decisions.csv`, and write `rows.csv`.
 - **Overview** (`overview`; standard library only): write `summary.md` and `timeline.html` from `rows.csv` and the
   source files.
 

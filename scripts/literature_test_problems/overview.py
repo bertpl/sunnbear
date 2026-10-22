@@ -10,7 +10,7 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
-from .data_files import DECIDED_STATUSES, SUBCATEGORY_DESCRIPTIONS, UNDECIDED, RowsTableLine, Source
+from .data_files import DECIDED_STATUSES, SUBCATEGORY_DESCRIPTIONS, UNDECIDED, RowsTableLine, Source, join_row_ids
 
 COMMON_MIN_SOURCES = 6
 COMMON_MAX_LENGTH = 14
@@ -70,8 +70,8 @@ class Overview:
             "## Common functions",
             "",
             f"A common function is a row whose `f` has at most {COMMON_MAX_LENGTH} characters and that later rows of "
-            f"at least {COMMON_MIN_SOURCES} sources name as their earlier row. Common functions count in the rows of "
-            "each source, but not in the column *takes rows from*.",
+            f"at least {COMMON_MIN_SOURCES} sources name in `duplicate_of` or `derived_from`. Common functions "
+            "count in the rows of each source, but not in the column *takes rows from*.",
             "",
             "| row | f | sources |",
             "|---|---|---|",
@@ -93,10 +93,10 @@ class Overview:
                     "year": source.year,
                     "subcategory": source.subcategory,
                     "counts": self.status_counts(source.source_id),
-                    "nonNew": [
-                        [row.key, row.final_status.status, row.final_status.earlier_rows]
+                    "rowsNamingEarlier": [
+                        [row.key, row.final_status.status, join_row_ids(row.final_status.named_row_ids)]
                         for row in self.rows
-                        if row.source_id == source.source_id and row.final_status.status != "new"
+                        if row.source_id == source.source_id and row.final_status.named_row_ids
                     ],
                 }
                 for source in self.sources
@@ -132,10 +132,10 @@ class Overview:
         """
         index_of_source = {source.source_id: i for i, source in enumerate(sources)}
         row_by_id = {row.row_id: row for row in rows}
-        # sources_naming maps each row id to the sources whose rows name that row as their earlier row.
+        # sources_naming maps each row id to the sources whose rows name that row in duplicate_of or derived_from.
         sources_naming: dict[str, set[str]] = {}
         for row in rows:
-            for earlier in row.final_status.earlier_row_ids:
+            for earlier in row.final_status.named_row_ids:
                 sources_naming.setdefault(earlier, set()).add(row.source_id)
         position = {row.row_id: i for i, row in enumerate(rows)}
         common = []
@@ -147,9 +147,7 @@ class Overview:
         edges: Counter[tuple[int, int]] = Counter()
         for row in rows:
             earlier_sources = {
-                row_by_id[e].source_id
-                for e in row.final_status.earlier_row_ids
-                if e in row_by_id and e not in common_ids
+                row_by_id[e].source_id for e in row.final_status.named_row_ids if e in row_by_id and e not in common_ids
             }
             for earlier_source in sorted(earlier_sources - {row.source_id}):
                 edges[(index_of_source[earlier_source], index_of_source[row.source_id])] += 1

@@ -8,7 +8,7 @@ year = 2026
 subcategory = '1.3'
 where_in_source = '''
 17 pages that hold 101 functions, f01–f101, in a grid of 2 columns.
-- Each cell gives the function, a plot of it on its interval, and a root line in the notation of Calcpad, `x_nn = $Root{f_nn(x) = 0; x ∈ [a; b]} = r`, with the root `r` to about 3 significant digits. The interval of each row is the one in its root line, except f31's, whose root line is garbled (see its note).
+- Each cell gives the function, a plot of it on its interval, and a root line in the notation of Calcpad, `x_nn = $Root{f_nn(x) = 0; x ∈ [a; b]} = r`, with the root `r` to about 3 significant digits. The interval of each row is the one in its root line, except f31's, whose root line is garbled (see its note); f92 also holds the range of its plot, which differs from its root line's.
 - The root lines of 9 functions use `$Find{f_nn(x); x ∈ [a; b]}` in place of `$Root`: f36, f38, f39, f40, f76, f77, f78, f79 and f101.
 - The cells name f63–f101; f01–f62 have no names.
 - A heading above each block of cells names the block's origin. The headings name the same references as the article of Ganchovski et al. (2026) (`2026_ganchovski_et_al`) for its blocks, except that Oliveira & Takahashi's heading gives no year or venue, and f31–f32 sit under the heading "My functions".
@@ -576,7 +576,7 @@ f = '202*x - 2*floor((2*x + 10^-2)/2*10^-2) - 0.1'
 name = 'Sawtooth'
 interval = '[-1, 1]'
 also_in = 'Oliveira & Takahashi (2021)'
-notes = 'The fraction bar puts `2*x + 10^-2` over `2`, and `10^-2` multiplies the fraction. The plot shows many teeth on `[-1, 1]`, as a division by `2*10^-2` gives; the printed argument makes `floor` jump only once there.'
+notes = 'The fraction bar puts `2*x + 10^-2` over `2`, and `10^-2` multiplies the fraction. The plot shows many jumps on `[-1, 1]`, as a division by `2*10^-2` gives; the printed argument makes `floor` jump only once there. So the printed argument is a misprint of `(2*x + 10^-2)/(2*10^-2)`, and the row is compared as the function with that argument.'
 
 [[rows]]
 key = 'f83'
@@ -584,7 +584,7 @@ f = '(202*x - 2*floor((2*x + 10^-2)/2*10^-2) - 0.1)^3'
 name = 'Sawtooth Cube'
 interval = '[-1, 1]'
 also_in = 'SciML Benchmarks test suite'
-notes = "The argument of `floor` as in f82. The heading of the SciML block sits above the row of cells that holds f83 and f84; f83's name and expression continue f82."
+notes = "The argument of `floor` is as in f82, a misprint of `(2*x + 10^-2)/(2*10^-2)`; the row is compared as the function with that argument. The heading of the SciML block sits above the row of cells that holds f83 and f84; f83's name and expression continue f82."
 
 [[rows]]
 key = 'f84'
@@ -646,7 +646,7 @@ also_in = 'SciML Benchmarks test suite'
 key = 'f92'
 f = 'x^3 - 0.001'
 name = 'Nearly asymmetric function'
-interval = '[-0, 10]'
+interval = '`[-0, 10]`; `[-10, 10]` (plot, p. 16)'
 also_in = 'SciML Benchmarks test suite'
 notes = 'As the root line prints it; the plot spans `[-10, 10]`.'
 

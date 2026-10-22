@@ -11,6 +11,7 @@ transcribed_from = '''
 the article's Table 2, checked against `Test Functions.pdf`, the C# code, and sunnbear's transcription in `tests/solvers/paper_problems/ganchovski_et_al.py`.
 - sunnbear's transcription matches the C# code on every row.
 - The rows follow the article, except f28, whose printed expression has an unmatched parenthesis; that row follows the C# code.
+- For f29 and f42, the line of `Test Functions.pdf` that states each function's root gives an interval that differs from the article's; the row's `interval` holds both.
 - The rows' notes list every difference between the article, `Test Functions.pdf` and the C# code; a source that a row's notes do not name agrees with the row.
 '''
 rows_summary = '92, 1 per function of Table 2.'
@@ -43,7 +44,7 @@ key = 'f02'
 f = 'x^2*(x^2/3 + sqrt(2)*sin(x)) - sqrt(x)/18'
 interval = '[0.1, 1]'
 also_in = 'Galdino (2011)'
-notes = 'TF and C# have `sqrt(3)/18` as the last term.'
+notes = "TF and C# have `sqrt(3)/18` as the last term, so the article's `sqrt(x)/18` is a misprint, and the row is compared as `sqrt(3)/18`."
 
 [[rows]]
 key = 'f03'
@@ -206,7 +207,7 @@ notes = 'Follows C#. The article prints `sin(x - 7.143)^3)`, with an unmatched p
 [[rows]]
 key = 'f29'
 f = 'exp((x - 3)^5) - 1'
-interval = '[2.6, 4.6]'
+interval = '`[2.6, 4.6]`; `[2.6, 3.6]` (TF)'
 also_in = 'Galdino (2011)'
 notes = 'TF gives the interval `[2.6, 3.6]`.'
 
@@ -286,7 +287,7 @@ also_in = 'Swift & Lindfield (1978)'
 [[rows]]
 key = 'f42'
 f = '(x^2 - x - 6)*(x^2 - 3*x + 2)'
-interval = '[0, pi]'
+interval = '`[0, pi]`; `[0, 4]` (TF)'
 also_in = 'Swift & Lindfield (1978)'
 notes = 'TF gives the interval `[0, 4]`.'
 

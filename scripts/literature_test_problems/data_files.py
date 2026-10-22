@@ -16,11 +16,13 @@ SUBCATEGORY_DESCRIPTIONS = {
     "1.3": "public benchmark suites",
     "1.4": "textbooks",
 }
-DECIDED_STATUSES = ("new", "duplicate", "variant", "extended")
+DECIDED_STATUSES = ("new", "duplicate", "incomplete")
 # UNDECIDED is the status of a row that the script could not decide and that no decision covers yet.
 UNDECIDED = "undecided"
 # ROW_ID_SEPARATOR separates the row ids in 1 field.
 ROW_ID_SEPARATOR = " | "
+# DECISION_COLUMNS are the columns of `decisions.csv`, in order.
+DECISION_COLUMNS = ["row_id", "status", "duplicate_of", "derived_from", "reason"]
 
 
 class DataFileError(ValueError):
@@ -225,8 +227,10 @@ def read_sources(sources_dir: Path) -> list[Source]:
 class AutomaticStatus:
     """An `AutomaticStatus` holds the status that the script finds for a row by comparing it with every earlier row.
 
-    `matches` holds the matched row ids joined by `ROW_ID_SEPARATOR`, and `n_instances` is 0 for a row that does
-    not parse.
+    `matches` holds the matched row ids joined by `ROW_ID_SEPARATOR`, and `match_kind` names the comparisons that
+    found them; for an `incomplete` row, `match_kind` names why the row is incomplete instead, such as "no interval",
+    and for an undecided row why a person must decide, such as "no test function". `n_instances` is 0 for a row
+    whose f does not parse.
     """
 
     status: str
@@ -238,30 +242,119 @@ class AutomaticStatus:
 
 @dataclass(frozen=True)
 class FinalStatus:
-    """A `FinalStatus` holds a row's final status, its earlier rows, and the reason where a person decided it."""
+    """A `FinalStatus` holds a row's final status, the earlier rows that it names, and the reason for the status.
+
+    A `duplicate` names, in `duplicate_of`, the earlier rows that already give its test functions; a `new` or
+    `incomplete` row names, in `derived_from`, the earlier rows whose function it copies or changes. Each field joins
+    its row ids by `ROW_ID_SEPARATOR`.
+    """
 
     status: str
-    earlier_rows: str
+    duplicate_of: str
+    derived_from: str
     reason: str
 
     @property
-    def earlier_row_ids(self) -> list[str]:
-        """Return the ids of the earlier rows."""
-        return [row_id.strip() for row_id in self.earlier_rows.split(ROW_ID_SEPARATOR) if row_id.strip()]
+    def duplicate_of_ids(self) -> list[str]:
+        """Return the ids of the rows in `duplicate_of`."""
+        return self._split_row_ids(self.duplicate_of)
+
+    @property
+    def derived_from_ids(self) -> list[str]:
+        """Return the ids of the rows in `derived_from`."""
+        return self._split_row_ids(self.derived_from)
+
+    @property
+    def named_row_ids(self) -> list[str]:
+        """Return the ids of every earlier row that the row names, in `duplicate_of` or in `derived_from`."""
+        return [*self.duplicate_of_ids, *self.derived_from_ids]
+
+    def find_status_problems(self, row_id: str) -> list[str]:
+        """Return the first problem of the status and of its fields `duplicate_of`, `derived_from` and `reason`.
+
+        The result is a list of at most 1 problem. `row_id` is the id of the row that has this status; each problem
+        starts with it.
+        """
+        if self.status == UNDECIDED:
+            return [f"{row_id} needs a decision in decisions.csv"]
+        elif self.status not in DECIDED_STATUSES:
+            return [f"{row_id} has an unknown status, {self.status}"]
+        elif self.status == "duplicate" and not self.duplicate_of:
+            return [f"{row_id} is duplicate but names no row in duplicate_of"]
+        elif self.status == "duplicate" and self.derived_from:
+            return [f"{row_id} is duplicate but names rows in derived_from"]
+        elif self.status != "duplicate" and self.duplicate_of:
+            return [f"{row_id} is {self.status} but names rows in duplicate_of"]
+        elif self.status == "incomplete" and not self.reason:
+            return [f"{row_id} is incomplete but gives no reason"]
+        else:
+            return []
+
+    def find_named_row_problems(
+        self, row_id: str, final_statuses: dict[str, "FinalStatus"], position: dict[str, int]
+    ) -> list[str]:
+        """Return the problems of the rows that the row names: unknown or not earlier, or in `duplicate_of` not `new`.
+
+        `row_id` is the id of the row that has this status; `position` holds each row's index in time order.
+        """
+        problems = []
+        for named_row_id in self.named_row_ids:
+            if named_row_id not in position:
+                problems.append(f"{row_id} names an unknown row, {named_row_id}")
+            elif position[named_row_id] >= position[row_id]:
+                problems.append(f"{row_id} names a row that is not earlier, {named_row_id}")
+        for named_row_id in self.duplicate_of_ids:
+            if named_row_id in final_statuses and final_statuses[named_row_id].status != "new":
+                problems.append(f"{row_id} is a duplicate of a row that is not new, {named_row_id}")
+        return problems
+
+    def with_first_appearances(self, resolved_statuses: dict[str, "FinalStatus"]) -> "FinalStatus":
+        """Return the status with each named duplicate replaced by the rows in its `duplicate_of`.
+
+        `resolved_statuses` holds the final statuses of the earlier rows, which already name their own first
+        appearances.
+        """
+        return FinalStatus(
+            self.status,
+            join_row_ids(self._first_appearances(self.duplicate_of_ids, resolved_statuses)),
+            join_row_ids(self._first_appearances(self.derived_from_ids, resolved_statuses)),
+            self.reason,
+        )
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _first_appearances(row_ids: list[str], resolved_statuses: dict[str, "FinalStatus"]) -> list[str]:
+        """Return the row ids with each resolved duplicate replaced by the rows in its `duplicate_of`."""
+        first_appearances = []
+        for row_id in row_ids:
+            if row_id in resolved_statuses and resolved_statuses[row_id].status == "duplicate":
+                first_appearances.extend(resolved_statuses[row_id].duplicate_of_ids)
+            else:
+                first_appearances.append(row_id)
+        return first_appearances
+
+    @staticmethod
+    def _split_row_ids(field: str) -> list[str]:
+        """Return the row ids of 1 field that `join_row_ids` built."""
+        return [row_id.strip() for row_id in field.split(ROW_ID_SEPARATOR) if row_id.strip()]
 
     # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
     def from_automatic_status(cls, automatic_status: AutomaticStatus) -> "FinalStatus":
-        """Return the final status that an automatic status gives a row without a decision.
-
-        A `new` or undecided automatic status names no earlier row; any other keeps its matches as the earlier rows.
-        """
-        if automatic_status.status in ("new", UNDECIDED):
-            return cls(automatic_status.status, "", "")
+        """Return the final status that an automatic status gives a row without a decision."""
+        status, matches = automatic_status.status, automatic_status.matches
+        if status == "duplicate":
+            return cls(status, duplicate_of=matches, derived_from="", reason="")
+        elif status == "new":
+            return cls(status, duplicate_of="", derived_from=matches, reason="")
+        elif status == "incomplete":
+            return cls(status, duplicate_of="", derived_from=matches, reason=automatic_status.match_kind)
         else:
-            return cls(automatic_status.status, automatic_status.matches, "")
+            return cls(status, duplicate_of="", derived_from="", reason="")
 
 
 def read_decisions(path: Path) -> dict[str, FinalStatus]:
@@ -269,8 +362,8 @@ def read_decisions(path: Path) -> dict[str, FinalStatus]:
     decisions = {}
     with path.open(encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
-        if reader.fieldnames != _DECISION_COLUMNS:
-            raise DataFileError(f"{path.name}: the columns must be {_DECISION_COLUMNS}")
+        if reader.fieldnames != DECISION_COLUMNS:
+            raise DataFileError(f"{path.name}: the columns must be {DECISION_COLUMNS}")
         for line in reader:
             row_id = line["row_id"].strip()
             if row_id in decisions:
@@ -278,7 +371,9 @@ def read_decisions(path: Path) -> dict[str, FinalStatus]:
             elif line["status"] not in DECIDED_STATUSES:
                 raise DataFileError(f"{path.name}: {row_id} has unknown status {line['status']!r}")
             else:
-                decisions[row_id] = FinalStatus(line["status"], line["earlier_rows"].strip(), line["reason"].strip())
+                decisions[row_id] = FinalStatus(
+                    line["status"], line["duplicate_of"].strip(), line["derived_from"].strip(), line["reason"].strip()
+                )
     return decisions
 
 
@@ -322,7 +417,8 @@ class RowsTableLine:
             "match_kind": self.automatic_status.match_kind,
             "matches": self.automatic_status.matches,
             "status": self.final_status.status,
-            "earlier_rows": self.final_status.earlier_rows,
+            "duplicate_of": self.final_status.duplicate_of,
+            "derived_from": self.final_status.derived_from,
             "reason": self.final_status.reason,
         }
 
@@ -347,7 +443,12 @@ class RowsTableLine:
                 parse_note=line["parse_note"],
                 n_instances=int(line["n_instances"]),
             ),
-            final_status=FinalStatus(status=line["status"], earlier_rows=line["earlier_rows"], reason=line["reason"]),
+            final_status=FinalStatus(
+                status=line["status"],
+                duplicate_of=line["duplicate_of"],
+                derived_from=line["derived_from"],
+                reason=line["reason"],
+            ),
         )
 
     @classmethod
@@ -388,14 +489,10 @@ def write_rows_table(path: Path, rows: list[RowsTableLine]) -> None:
 # ==================================================================================================
 _SOURCE_FIELDS = {"title", "reference", "subcategory", "where_in_source", "transcribed_from", "rows_summary"}
 _ROW_FIELDS = {"key", "f", "f_description", "name", "parameters", "interval", "also_in", "notes"}
-_DECISION_COLUMNS = ["row_id", "status", "earlier_rows", "reason"]
 
 
 def join_row_ids(row_ids: Iterable[str | None]) -> str:
-    """Join the distinct row ids, in the order that each first occurs, into 1 field.
-
-    `FinalStatus.earlier_row_ids` splits the field again.
-    """
+    """Join the distinct row ids, in the order that each first occurs, into 1 field that `FinalStatus` splits again."""
     return ROW_ID_SEPARATOR.join(dict.fromkeys(r for r in row_ids if r))
 
 

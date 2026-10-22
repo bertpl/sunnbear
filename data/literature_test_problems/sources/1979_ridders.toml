@@ -30,6 +30,6 @@ notes = 'Last printed iterate: `1.354710442`.'
 
 [[rows]]
 key = 'III.3'
-f = 'sin(x)'
+f = 'sin(pi*x/180)'
 interval = '[10, 280]'
-notes = "`x` is in degrees, so the root is `180`. The article calls it a trivial example. sunnbear's `test_paper.py` writes it as `sin(radians(x))`."
+notes = "`x` is in degrees, so the root is `180`. The article prints `sin x`; `f` converts `x` from degrees to radians. The article calls it a trivial example. sunnbear's `test_paper.py` writes it as `sin(radians(x))`."

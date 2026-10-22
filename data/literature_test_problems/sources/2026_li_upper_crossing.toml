@@ -20,7 +20,7 @@ notes = '''
 key = 'Ex. 1'
 f = 'cos(0.5*pi*x) - x'
 name = 'equation with a trigonometric function'
-interval = '`x` in R; starting values `x(0) = -1, 2`'
+interval = '`x` in R; starting values `x(0) = -1, 2`; `[-2, 1]` (Figure 1(a)); `[0, 4]` (Figure 1(b))'
 notes = 'Stated root `0.594612`. Table 1, Fig. 1.'
 
 [[rows]]
@@ -42,7 +42,7 @@ key = 'Ex. 3 (7.2)'
 f = 'p - Phi(x; mu, sigma^2)'
 name = 'quantile of the normal distribution'
 parameters = 'Fig. 2: `p = 0.05`, `mu = 1`, `sigma = 1`. Table 3: `p = 0.01, 0.9` and `mu = -2, 2`, with `sigma = 1`.'
-interval = '`x` in R; starting values drawn from `U(-4, 4)`'
+interval = '`x` in R; starting values drawn from `U(-4, 4)`; `[-2.5, -0.5]` (Figure 2)'
 notes = '`Phi` is the normal cdf. Fig. 2 states the root `-0.6448536`.'
 
 [[rows]]
@@ -95,7 +95,7 @@ notes = 'Example of the R code for eq. (7.1) (`a3 = 1`, `a2 = -3`, `a1 = 1`, `a0
 key = '7.3'
 f = '-0.5*x - 2*sin(x) + 1'
 name = 'equation with multiple roots'
-interval = '`x` in R; starting value `x(0) = 0`'
+interval = '`x` in R; starting value `x(0) = 0`; `[0, 7]` (Fig. 3(a))'
 notes = 'Eq. (7.6). Stated roots `0.4090497`, `3.535612`, `5.308993`. Fig. 3.'
 
 [[rows]]

@@ -126,30 +126,99 @@ def test_readme_lists_every_subcategory(script_modules, folder):
     assert listed == script_modules["data_files"].SUBCATEGORY_DESCRIPTIONS
 
 
+def test_readme_lists_every_status(script_modules, folder):
+    """The README's lists of statuses name exactly the decided statuses and the status of an undecided row."""
+    # --- arrange / act ----------------
+    data_files = script_modules["data_files"]
+    readme = folder.readme_file.read_text(encoding="utf-8")
+    statuses_section = readme.split("\n## Statuses\n")[1].split("\n## ")[0]
+    listed = set(re.findall(r"^- \*\*`(\w+)`:\*\*", statuses_section, flags=re.MULTILINE))
+
+    # --- assert -----------------------
+    assert listed == {*data_files.DECIDED_STATUSES, data_files.UNDECIDED}
+
+
+def test_readme_lists_every_decision_column(script_modules, folder):
+    """The README's list of the columns of `decisions.csv` equals the columns that the script reads."""
+    # --- arrange / act ----------------
+    readme = folder.readme_file.read_text(encoding="utf-8")
+    columns_sentence = re.search(r"with the columns (.+?)\. ", readme).group(1)
+    listed = re.findall(r"`(\w+)`", columns_sentence)
+
+    # --- assert -----------------------
+    assert listed == script_modules["data_files"].DECISION_COLUMNS
+
+
+def test_timeline_template_counts_every_status(script_modules):
+    """The timeline's line of row counts names exactly the decided statuses and the status of an undecided row."""
+    # --- arrange / act ----------------
+    data_files = script_modules["data_files"]
+    template = script_modules["overview"].TIMELINE_TEMPLATE.read_text(encoding="utf-8")
+    counts_line = re.search(r"\$\{c\.rows\} rows: (.*)</p>", template).group(1)
+    listed = set(re.findall(r"\$\{c\.(\w+)\}", counts_line))
+
+    # --- assert -----------------------
+    assert listed == {*data_files.DECIDED_STATUSES, data_files.UNDECIDED}
+
+
 # ==================================================================================================
 #  The rules of the final statuses
 # ==================================================================================================
 @pytest.mark.parametrize(
-    "middle_status, expected_earlier_rows",
+    "status, field_name",
     [
-        ("duplicate", "s:1"),  # a duplicate of a duplicate names the first appearance
-        ("variant", "s:2"),  # a variant is the first appearance of its constants, so it stays named
+        ("duplicate", "duplicate_of"),  # a duplicate of a duplicate names the first appearance
+        ("new", "derived_from"),  # a row derived from a duplicate names the first appearance too
+        ("incomplete", "derived_from"),
     ],
 )
-def test_decide_final_statuses_follows_duplicates_to_the_first_appearance(
-    script_modules, middle_status, expected_earlier_rows
-):
-    """A row that names a duplicate names that duplicate's first appearance; a named variant stays named."""
+def test_decide_final_statuses_names_the_first_appearance(script_modules, status, field_name):
+    """A row that names a duplicate, in either field, names that duplicate's first appearance instead."""
     # --- arrange ----------------------
     data_files = script_modules["data_files"]
     automatic_statuses = {
         "s:1": data_files.AutomaticStatus("new", "", "", "", 1),
-        "s:2": data_files.AutomaticStatus(middle_status, "structure", "s:1", "", 1),
-        "s:3": data_files.AutomaticStatus("duplicate", "structure", "s:2", "", 1),
+        "s:2": data_files.AutomaticStatus("duplicate", "structure", "s:1", "", 1),
+        "s:3": data_files.AutomaticStatus(status, "structure", "s:2", "", 1),
     }
 
     # --- act --------------------------
     final_statuses = script_modules["statuses"].decide_final_statuses(automatic_statuses, decisions={})
 
     # --- assert -----------------------
-    assert final_statuses["s:3"].earlier_rows == expected_earlier_rows
+    assert getattr(final_statuses["s:3"], field_name) == "s:1"
+
+
+@pytest.mark.parametrize(
+    "status, duplicate_of, derived_from, reason, expected_problems",
+    [
+        ("duplicate", "s:1", "", "", []),
+        ("duplicate", "s:2", "", "", ["s:3 is a duplicate of a row that is not new, s:2"]),
+        ("duplicate", "", "", "", ["s:3 is duplicate but names no row in duplicate_of"]),
+        ("duplicate", "s:1", "s:2", "", ["s:3 is duplicate but names rows in derived_from"]),
+        ("new", "s:1", "", "", ["s:3 is new but names rows in duplicate_of"]),
+        ("new", "", "s:2", "", []),
+        ("incomplete", "", "s:1", "", ["s:3 is incomplete but gives no reason"]),
+        ("incomplete", "", "s:1", "no interval", []),
+        ("new", "", "s:4", "", ["s:3 names a row that is not earlier, s:4"]),
+        ("undecided", "", "", "", ["s:3 needs a decision in decisions.csv"]),
+    ],
+)
+def test_find_problems_checks_each_status(
+    script_modules, status, duplicate_of, derived_from, reason, expected_problems
+):
+    """`find_problems` reports each rule of the statuses that a row breaks, and nothing for a row that breaks none."""
+    # --- arrange ----------------------
+    final_status_cls = script_modules["data_files"].FinalStatus
+    final_statuses = {
+        "s:1": final_status_cls("new", "", "", ""),
+        "s:2": final_status_cls("incomplete", "", "", "no interval"),
+        "s:3": final_status_cls(status, duplicate_of, derived_from, reason),
+        "s:4": final_status_cls("new", "", "", ""),
+    }
+
+    # --- act --------------------------
+    problems = script_modules["statuses"].find_problems(final_statuses, decisions={})
+
+    # --- assert -----------------------
+    assert problems == expected_problems

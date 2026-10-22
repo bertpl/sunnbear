@@ -15,7 +15,7 @@ the folder `MDPI-Algorithms-Data-2`.
 - `Test functions.pdf` prints each function with a plot and its root to 3 significant digits, and names f63–f101.
 '''
 transcribed_from = '''
-the C# code, which the rows follow where `Test functions.pdf` differs.
+the C# code, which the rows follow where `Test functions.pdf` differs; f29 and f42 also hold the range of their plot in `Test functions.pdf`, which differs from the code's interval.
 - The PDF was checked through its extracted text for every row, and through its page images for f73–f101.
 - The rows' notes list every difference in a function or an interval between the PDF and the code; a difference in notation alone, such as `ceiling` for `ceil`, is not listed.
 '''
@@ -237,7 +237,7 @@ notes = 'TF prints `sin((x - 7.14)^3)`.'
 [[rows]]
 key = 'f29'
 f = 'exp((x - 3)^5) - 1'
-interval = '[2.6, 4.6]'
+interval = '`[2.6, 4.6]`; `[2.6, 3.6]` (TF plot)'
 also_in = 'Galdino (2011)'
 notes = 'TF gives the interval `[2.6, 3.6]`.'
 
@@ -319,7 +319,7 @@ also_in = 'Swift & Lindfield (1978)'
 [[rows]]
 key = 'f42'
 f = '(x^2 - x - 6)*(x^2 - 3*x + 2)'
-interval = '[0, pi]'
+interval = '`[0, pi]`; `[0, 4]` (TF plot)'
 also_in = 'Swift & Lindfield (1978)'
 notes = 'TF gives the interval `[0, 4]`.'
 

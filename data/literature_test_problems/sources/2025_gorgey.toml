@@ -11,14 +11,14 @@ Section 4, "Numerical Results and Discussion" (pp. 30–34).
 transcribed_from = 'the article, which has a text layer, checked against the page images. No sunnbear file transcribes these equations.'
 rows_summary = '6, 1 per equation.'
 notes = '''
-- The `interval` column holds the interval of the heading; the row's notes give the text's second interval where there is one.
+- The `interval` column holds the interval of the heading, and the text's second interval where there is one, except in Equation 2, whose second interval holds no root.
 - The `also_in` column gives the reference that the article names for Equations 1, 2, 5 and 6. The rows of Galdino (2011), ref. [11], are in `2011_galdino`.
 '''
 
 [[rows]]
 key = 'Equation 1'
 f = '(x + 2)*(x + 1)*(x - 3)^3'
-interval = '[-2.5, 3]'
+interval = '`[-2.5, 3]`; `[2, 3.5]` (the text below Table 2)'
 also_in = 'Galdino (2011), "A family of regula falsi root-finding methods", Proc. 2011 World Congress on Engineering and Technology (CET 2011), vol. 1, 514–517 (article ref. [11])'
 notes = "Roots `-2`, `-1` and `3`; the text names `3` as the root found. Figure 1's caption and the text below Table 2 give the interval `[2, 3.5]`."
 
@@ -27,12 +27,12 @@ key = 'Equation 2'
 f = 'log(x)'
 interval = '[0, 2]'
 also_in = 'Rahman et al. (2022), "An improved bracketing method for numerical solution of nonlinear equations based on ridders method", Matrix Science Mathematic 6(2), 30–33 (article ref. [9]), which the article says uses a "similar equation"'
-notes = 'Root `1`. The text below Table 3 gives the interval `[2, 3.5]`.'
+notes = "Root `1`. The text below Table 3 gives the interval `[2, 3.5]`, which holds no root of `log(x)`: the article repeats the interval of Equation 1 there, so the row's `interval` leaves `[2, 3.5]` out."
 
 [[rows]]
 key = 'Equation 3'
 f = '(sin(x) - x/4)^3'
-interval = '[-1, 2]'
+interval = '`[-1, 2]`; `[-0.5, 1]` (the text below Table 4)'
 notes = 'Root found: `0`. The text below Table 4 gives the interval `[-0.5, 1]`.'
 
 [[rows]]
