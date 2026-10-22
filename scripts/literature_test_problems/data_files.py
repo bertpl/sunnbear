@@ -165,6 +165,22 @@ class Source:
     relations: tuple[Relation, ...]
     rows: tuple[SourceRow, ...]
 
+    @property
+    def short_title(self) -> str:
+        """Return the source's short title: its title up to the colon, such as "Dowell, Jarratt (1971)"."""
+        return self.title.split(":")[0].strip()
+
+    def find_row(self, row_id: str) -> SourceRow:
+        """Return the source's row with the id `row_id`.
+
+        Raises:
+            DataFileError: If the source has no row with that id.
+        """
+        for row in self.rows:
+            if row.row_id == row_id:
+                return row
+        raise DataFileError(f"{self.source_id} has no row {row_id}")
+
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------

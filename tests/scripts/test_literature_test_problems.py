@@ -1,7 +1,8 @@
 """The generated files of `data/literature_test_problems/` agree with the folder's source files and decisions.
 
-The tests use the script's modules that need only the standard library; the row comparison in `matching`, which
-needs sympy, is not run here, because another sympy version could change a match.
+The tests do not run the row comparison in `matching`, because another sympy version could change a match, and they
+do not regenerate the formula modules of category 1 in sunnbear's catalog; they recompute each module's hash from the
+survey.
 """
 
 import importlib
@@ -13,7 +14,10 @@ from types import ModuleType
 
 import pytest
 
+from sunnbear.functions import FormulaRegistry, FormulaSource
+
 _PACKAGE_DIR = Path(__file__).resolve().parents[2] / "scripts" / "literature_test_problems"
+_CATEGORY_1_FORMULAS = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 1]
 # _FIRST_RUN_LINES are the rows of a small survey on its first run, each as (row id, subcategory, final status).
 _FIRST_RUN_LINES = [
     ("a:1", "1.1", "new"),
@@ -32,7 +36,7 @@ _FIRST_RUN_LINES = [
 # ==================================================================================================
 @pytest.fixture(scope="module")
 def script_modules() -> dict[str, ModuleType]:
-    """Return the script's modules that need only the standard library, keyed by name.
+    """Return the script's modules that the tests use, keyed by name.
 
     They are imported by path, because the `scripts` folder is not an installed package.
     """
@@ -44,7 +48,7 @@ def script_modules() -> dict[str, ModuleType]:
     spec.loader.exec_module(package)
     return {
         name: importlib.import_module(f"literature_test_problems.{name}")
-        for name in ("data_files", "statuses", "overview", "formulas")
+        for name in ("data_files", "statuses", "overview", "formulas", "formula_modules")
     }
 
 
@@ -249,6 +253,82 @@ def test_timeline_template_counts_every_status(script_modules):
 
     # --- assert -----------------------
     assert listed == {*data_files.DECIDED_STATUSES, data_files.UNDECIDED}
+
+
+# ==================================================================================================
+#  The formulas of category 1 in sunnbear's catalog
+# ==================================================================================================
+@pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
+def test_category_1_formula_matches_the_survey(formula, script_modules, sources, committed_formulas_table):
+    """A formula of category 1 has an active line in `formulas.csv`, and its category and `source` match its source.
+
+    The category's name must be the source's short title, and `source` must hold the source's reference and its rows'
+    keys as the location.
+
+    A generated module's hash must equal the hash of its survey fields, so that a module left stale after a change
+    of the survey fails; a module without a hash must be the hand-written module of a formula whose row only
+    describes its function.
+    """
+    # --- arrange ----------------------
+    line = {line.number: line for line in committed_formulas_table.formulas}[formula.number]
+    source = {source.source_id: source for source in sources}[line.source_id]
+    category = {category.number: category for category in FormulaRegistry.categories()}[formula.number[:3]]
+    survey_fields_hash = getattr(sys.modules[type(formula).__module__], "SURVEY_FIELDS_HASH", None)
+
+    # --- act --------------------------
+    location = ", ".join(source.find_row(row_id).key for row_id in line.row_ids)
+
+    # --- assert -----------------------
+    assert not line.is_retired
+    assert category.name == source.short_title
+    assert formula.source == FormulaSource(reference=source.reference, location=location)
+    if survey_fields_hash is None:
+        assert any(source.find_row(row_id).f_description for row_id in line.row_ids)
+    else:
+        assert survey_fields_hash == script_modules["formula_modules"].FormulaModuleSpec.survey_fields_hash(
+            line, source
+        )
+
+
+def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table):
+    """A source with a formula in the catalog has each of its active formulas of `formulas.csv` there."""
+    # --- arrange ----------------------
+    numbers_in_catalog = {formula.number for formula in _CATEGORY_1_FORMULAS}
+    source_numbers_in_catalog = {number[:3] for number in numbers_in_catalog}
+
+    # --- act --------------------------
+    missing = [
+        line.formula_id
+        for line in committed_formulas_table.formulas
+        if not line.is_retired
+        and line.source_number in source_numbers_in_catalog
+        and line.number not in numbers_in_catalog
+    ]
+
+    # --- assert -----------------------
+    assert numbers_in_catalog
+    assert missing == []
+
+
+@pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
+@pytest.mark.parametrize("c", [0.25, -0.25])
+def test_category_1_formula_shifts_along_x_by_its_interval_width(formula, c):
+    """A formula of category 1 at ``c`` equals the formula at ``c = 0``, evaluated at ``x - (b - a)*c``.
+
+    Evaluating the shifted x-value at ``c = 0`` repeats the formula's own float arithmetic, so the 2 values are equal
+    exactly; the x-values lie in the interval, and so do their shifted values.
+    """
+    for candidate in formula.build_all_candidates():
+        # --- arrange ----------------------
+        width = candidate.b - candidate.a
+        x = candidate.a + 0.6 * width
+
+        # --- act --------------------------
+        shifted = candidate.xc_fun(x, c)
+        unshifted = candidate.xc_fun(x - width * c, 0.0)
+
+        # --- assert -----------------------
+        assert shifted == unshifted, candidate.id
 
 
 # ==================================================================================================

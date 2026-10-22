@@ -1,20 +1,17 @@
 """This formula is the odd power ``x^p1 - c``."""
 
-from sunnbear._core.functions.core import Formula, FormulaTestCase, ParamRecipe
+from sunnbear._core.functions.core import Formula, FormulaTestCase, ParamGrid, ParamRecipe
 
 
 class OddPower(Formula):
     """Difficulty-knob polynomial: higher odd powers flatten the root at ``c = 0``.
 
     Higher powers turn a benign polynomial into a derivative-zero stress case.
-    Implemented without numba (``jit = False``) to exercise the framework's
-    plain-Python path.
     """
 
     number = (2, 1, 2)
     name = "Odd power"
     param_names = ("p1",)
-    jit = False
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p1: float) -> float:
@@ -27,7 +24,7 @@ class OddPower(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Sweep the power over the odd integers."""
-        return (ParamRecipe.decimal("p1", 1.0, 7.0, step=2.0),)
+        return (ParamGrid.decimal("p1", 1.0, 7.0, step=2.0),)
 
     def is_param_tuple_valid(self, p1: float) -> bool:
         """Require an odd integer power (even powers break the sign change across the interval)."""

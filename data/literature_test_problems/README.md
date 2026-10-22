@@ -201,13 +201,40 @@ A function in 2 forms that compute differently, such as a polynomial expanded an
 
 `formulas.csv` lists the formulas in id order, retired ones included, with the columns `formula_id`, `status`, `source_id`, `row_ids` and `variable_change`. A formula's `status` is `active` or `retired`.
 
+## Formula modules
+
+Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, below `src/sunnbear/_core/functions/catalog/c01_published_test_functions/`: 1 package per subcategory, 1 package per source and 1 module per formula. A script generates the modules from the source files:
+
+```
+uv run python -m scripts.literature_test_problems.formula_modules <source id> ...
+```
+
+For each source named, the script writes the source's package and its formula modules, and rewrites the `__init__.py` of each subcategory. A generated formula module:
+
+- evaluates the row's `f`, as the source prints it, at `x - (b - a)*c`, where `[a, b]` is the formula's interval: the formula's `c` shifts the function along x by a multiple of the interval's width;
+- lists the row's parameter values in a `ParamTable`, with 1 tuple for each interval that the source gives for a combination of parameter values; a formula with several intervals takes their bounds as 2 more parameters, `a` and `b`;
+- names its source in a `FormulaSource`: the source's `reference`, and the row's key as the location;
+- holds test cases whose expected values mpmath computes from `f`;
+- holds `SURVEY_FIELDS_HASH`, a hash of the fields that the module depends on: the source's `title` and `reference`, the formula's `variable_change`, and the fields of its row, so that the hash changes with each change of those fields.
+
+A formula with a row that gives only an `f_description` is written by hand, and the script only imports its module.
+
+The script stops on a formula that it cannot generate:
+
+- a formula with several rows;
+- a formula with a `variable_change`;
+- a formula whose parameters give several sets of values.
+
+After a change of a source file, regenerate the modules of its formulas: the tests recompute each module's `SURVEY_FIELDS_HASH` from the source files, so that a module that was not regenerated fails the tests.
+
 ## Adding a source
 
 1. Write `sources/<id>.toml`. Add a relation where a reader needs to know how its rows relate to another source's rows, such as a block of functions that the new source copies with changes; `duplicate_of` and `derived_from` already name every earlier row that the script finds.
 2. Regenerate. The script prints each row that needs a decision; `rows.csv` gives, in `match_kind` and `matches`, why it needs one and the earlier rows that the script found for it.
 3. Add a line to `decisions.csv` for each of those rows, and for any automatic status that is wrong, then regenerate until the script prints no problems.
 4. Add a line to `formula_decisions.csv` for each set of the source's `new` rows that are obviously 1 function, and for each row whose formula takes another variable (§ Formulas). Restore `formulas.csv` from git, because the regenerations above already appended the source's formulas without these decisions, then regenerate.
-5. Commit the source file, `decisions.csv`, `formula_decisions.csv` and the generated files together.
+5. Generate the source's formula modules (§ Formula modules), and write by hand the modules of its formulas whose rows give only an `f_description`.
+6. Commit the source file, `decisions.csv`, `formula_decisions.csv`, the generated files and the formula modules together.
 
 ## Regenerating
 
@@ -225,12 +252,14 @@ The script:
 
 It needs sympy, from the dev dependency group, and a Unix system, because it limits the time of parsing each row with `SIGALRM`.
 
-CI does not regenerate `rows.csv`, because another sympy version could change a match. Instead, `tests/scripts/test_literature_test_problems.py` checks, with the standard library only, that:
+CI does not regenerate `rows.csv`, because another sympy version could change a match. Instead, `tests/scripts/test_literature_test_problems.py` checks, without running the matching, that:
 
 - `rows.csv` holds exactly the rows of the source files;
 - every decision is applied, and every final status follows its rules (§ Statuses): no row names an unknown or a later row, and no duplicate names an `incomplete` row;
 - every source file has its fields;
 - `summary.md` and `timeline.html` equal what the script builds from `rows.csv` and the source files;
-- the active formulas of `formulas.csv` hold every `new` row exactly once and no other row, the rows of each formula come from its own source, and the file equals what the script builds from `rows.csv`, `formula_decisions.csv` and the file's own ids.
+- the active formulas of `formulas.csv` hold every `new` row exactly once and no other row, the rows of each formula come from its own source, and the file equals what the script builds from `rows.csv`, `formula_decisions.csv` and the file's own ids;
+- each formula of category 1 in sunnbear's catalog has an active line in `formulas.csv`; its category is named after its source, its `source` holds the source's reference and its rows' keys as the location, and a generated module holds the current `SURVEY_FIELDS_HASH`;
+- every active formula of a source that has a formula in the catalog is in the catalog too.
 
 A change to the parsing or matching in `scripts/literature_test_problems/`, or to the sympy version, is what the test does not check: whoever makes it regenerates `rows.csv`.

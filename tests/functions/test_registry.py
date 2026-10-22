@@ -1,4 +1,7 @@
+import math
+
 import pytest
+from counted_float import FlopCountingContext
 
 from sunnbear._core.functions.catalog.c02_standard_function_families.c01_polynomials.f01_cubic import Cubic
 from sunnbear._core.functions.catalog.c02_standard_function_families.c01_polynomials.f02_odd_power import OddPower
@@ -8,6 +11,7 @@ from sunnbear.functions import (
     FormulaRegistry,
     FunctionId,
     ParamAxis,
+    ParamGrid,
     ParamRecipe,
 )
 
@@ -46,7 +50,7 @@ def test_candidates_applies_validity_filter():
 
 @pytest.mark.parametrize("formula_cls", [Cubic, OddPower])
 def test_candidates_functions_evaluate(formula_cls):
-    """Both compilation paths (jitted cubic, plain odd power) produce working f(x, c) callables."""
+    """The cubic and the odd power each produce a working f(x, c) callable."""
     # --- arrange ----------------------
     candidate = formula_cls().build_all_candidates()[0]  # p1 = 0.0 resp. 1.0
 
@@ -71,7 +75,7 @@ def test_candidates_deduplicates_across_recipes():
             return (-1.0, 1.0)
 
         def recipes(self) -> tuple[ParamRecipe, ...]:
-            return (ParamRecipe.decimal("p1", 0.0, 1.0, 0.5), ParamRecipe.decimal("p1", 0.5, 1.5, 0.5))
+            return (ParamGrid.decimal("p1", 0.0, 1.0, 0.5), ParamGrid.decimal("p1", 0.5, 1.5, 0.5))
 
     # --- act --------------------------
     params = [c.id.param_values for c in DupTest().build_all_candidates()]
@@ -163,7 +167,7 @@ def test_candidates_deduplicates_across_notations():
 
         def recipes(self) -> tuple[ParamRecipe, ...]:
             # a DECIMAL axis builds 4.0 and a POW2 axis builds 2^2.0: the same float, so one value
-            return (ParamRecipe.decimal("p1", 4.0, 4.0, 1.0), ParamRecipe.pow2("p1", 2.0, 2.0, 1.0))
+            return (ParamGrid.decimal("p1", 4.0, 4.0, 1.0), ParamGrid.pow2("p1", 2.0, 2.0, 1.0))
 
     # --- act --------------------------
     ids = [c.id for c in CrossNotation().build_all_candidates()]
@@ -193,7 +197,7 @@ def _formula_cls(number_last_element: int, declared: tuple[str, ...], recipes: t
 def test_recipe_axis_order_must_match_declared_params():
     """Transposed axes would silently swap parameter values, so they must be rejected."""
     # --- arrange ----------------------
-    transposed = ParamRecipe(axes=(ParamAxis("p2", 7.0, 7.0, 1.0), ParamAxis("p1", 3.0, 3.0, 1.0)))
+    transposed = ParamGrid(axes=(ParamAxis("p2", 7.0, 7.0, 1.0), ParamAxis("p1", 3.0, 3.0, 1.0)))
     cls = _formula_cls(
         990,
         ("p1", "p2"),
@@ -202,24 +206,24 @@ def test_recipe_axis_order_must_match_declared_params():
     )
 
     # --- act / assert -----------------
-    with pytest.raises(ValueError, match="recipe axes must match the declared parameters"):
+    with pytest.raises(ValueError, match="recipe parameter names must match the declared parameters"):
         cls().build_all_candidates()
 
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_recipe_arity_must_match_declared_params():
     # --- arrange ----------------------
-    cls = _formula_cls(989, ("p1", "p2"), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, p1, p2: x - c)
+    cls = _formula_cls(989, ("p1", "p2"), (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, p1, p2: x - c)
 
     # --- act / assert -----------------
-    with pytest.raises(ValueError, match="recipe axes must match the declared parameters"):
+    with pytest.raises(ValueError, match="recipe parameter names must match the declared parameters"):
         cls().build_all_candidates()
 
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_declared_params_must_match_parametrized_fun_signature():
     # --- arrange ----------------------
-    cls = _formula_cls(988, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, other: x - c)
+    cls = _formula_cls(988, ("p1",), (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, other: x - c)
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="parametrized_fun takes"):
@@ -233,7 +237,7 @@ def test_declared_params_must_match_interval_bounds_signature():
     cls = _formula_cls(
         981,
         ("p1",),
-        (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),),
+        (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),),
         interval_bounds=lambda self, other: (-1.0, 1.0),
     )
 
@@ -245,7 +249,7 @@ def test_declared_params_must_match_interval_bounds_signature():
 @pytest.mark.usefixtures("isolated_registry")
 def test_declared_params_must_match_overridden_validity_hook_signature():
     # --- arrange ----------------------
-    cls = _formula_cls(980, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),))
+    cls = _formula_cls(980, ("p1",), (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),))
     cls.is_param_tuple_valid = lambda self, other: True
 
     # --- act / assert -----------------
@@ -257,7 +261,7 @@ def test_declared_params_must_match_overridden_validity_hook_signature():
 def test_varargs_parametrized_fun_is_rejected():
     """Hooks must name their parameters, so declaration/implementation/recipes stay cross-checkable."""
     # --- arrange ----------------------
-    cls = _formula_cls(987, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, *params: x - c)
+    cls = _formula_cls(987, ("p1",), (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, *params: x - c)
 
     # --- act / assert -----------------
     with pytest.raises(TypeError, match="must name its parameters"):
@@ -270,7 +274,7 @@ def test_varargs_interval_bounds_is_rejected():
     cls = _formula_cls(
         984,
         ("p1",),
-        (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),),
+        (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),),
         interval_bounds=lambda self, *params: (-1.0, 1.0),
     )
 
@@ -283,7 +287,7 @@ def test_varargs_interval_bounds_is_rejected():
 def test_varargs_overridden_validity_hook_is_rejected():
     """The base default legitimately takes *params, so only overrides are checked."""
     # --- arrange ----------------------
-    cls = _formula_cls(983, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),))
+    cls = _formula_cls(983, ("p1",), (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),))
     cls.is_param_tuple_valid = lambda self, *params: True
 
     # --- act / assert -----------------
@@ -295,7 +299,7 @@ def test_varargs_overridden_validity_hook_is_rejected():
 def test_unoverridden_validity_hook_is_not_checked():
     """A formula that does not override is_param_tuple_valid inherits the *params default, and is fine."""
     # --- arrange ----------------------
-    cls = _formula_cls(982, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),))
+    cls = _formula_cls(982, ("p1",), (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),))
 
     # --- act / assert -----------------
     assert [c.id.param_values for c in cls().build_all_candidates()] == [(0.0,), (1.0,)]
@@ -314,7 +318,7 @@ def test_declared_params_without_recipes_is_rejected():
 @pytest.mark.usefixtures("isolated_registry")
 def test_formula_yielding_no_candidates_is_rejected():
     # --- arrange ----------------------
-    cls = _formula_cls(985, ("p1",), (ParamRecipe.decimal("p1", 0.0, 1.0, 1.0),))
+    cls = _formula_cls(985, ("p1",), (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),))
     cls.is_param_tuple_valid = lambda self, p1: False
 
     # --- act / assert -----------------
@@ -361,6 +365,52 @@ def test_compiled_formula_rejects_plain_method():
     with pytest.raises(TypeError, match="staticmethod"):
         # the candidate defers compilation, so the guard fires on first callable use
         _ = PlainMethod().build_candidate(()).xc_fun
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_formula_without_jit_keeps_its_plain_python_function():
+    """A formula with `jit = False` keeps its plain Python `parametrized_fun` as its compiled function."""
+    # --- arrange ----------------------
+    formula_cls = define_formula_cls((99, 994))
+
+    # --- act / assert -----------------
+    assert formula_cls()._compiled_formula() is formula_cls.parametrized_fun
+
+
+@pytest.mark.usefixtures("isolated_registry")
+def test_bound_formula_calls_math_functions_inside_flop_counting():
+    """A formula compiled when its first parameter tuple is bound runs inside the flop-counting context of a solve.
+
+    That context replaces the `math` functions with counting wrappers, and numba cannot compile a call to such a
+    wrapper, so the formula must be compiled before the context starts.
+    """
+
+    # --- arrange ----------------------
+    class Sine(Formula):
+        number = (99, 995)
+        name = "Sine"
+
+        @staticmethod
+        def parametrized_fun(x: float, c: float) -> float:
+            return math.sin(x) - c
+
+        def interval_bounds(self) -> tuple[float, float]:
+            return (-1.0, 1.0)
+
+        def recipes(self) -> tuple[ParamRecipe, ...]:
+            return ()
+
+    # compile another formula first, as the earlier solves of a run do, so that numba has loaded its registries
+    # before `Sine` is bound
+    Cubic().build_all_candidates()[0].xc_fun(0.0, 0.0)
+    x_fun = Sine().bind_x_fun((), 0.25)
+
+    # --- act --------------------------
+    with FlopCountingContext():
+        value = x_fun(0.5)
+
+    # --- assert -----------------------
+    assert value == pytest.approx(math.sin(0.5) - 0.25)
 
 
 # ==================================================================================================

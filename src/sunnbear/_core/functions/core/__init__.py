@@ -3,7 +3,7 @@
 How the pieces tie together, from authored code to a solvable function::
 
     Formula (subclass, auto-registered on definition)
-      │ build_all_candidates() ── ParamRecipe grids ──▶ p-tuples,
+      │ build_all_candidates() ── ParamRecipe grids and tables ──▶ p-tuples,
       │                          validated against param_names,
       │                          filtered by is_param_tuple_valid(),
       │                          then near-duplicates dropped (deduplicate_param_tuples)
@@ -55,8 +55,9 @@ from .param_values import (
     ParamNotation,
     deduplicate_param_tuples,
 )
-from .recipes import ParamAxis, ParamRecipe
+from .recipes import ParamAxis, ParamGrid, ParamRecipe, ParamTable
 from .registry import FormulaRegistry
+from .source import FormulaSource
 from .test_cases import FormulaTestCase
 from .test_function import CandidateTestFunction, TestFunction
 from .types import XCFun, XFun

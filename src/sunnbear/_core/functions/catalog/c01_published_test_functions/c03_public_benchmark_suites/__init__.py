@@ -1,0 +1,14 @@
+"""This category holds the formulas of public benchmark suites, in 1 subcategory per source.
+
+A script generates this file from the survey of published test problems: to change it, change the survey and run
+`scripts/literature_test_problems/formula_modules.py`, never this file.
+"""
+
+from sunnbear._core.functions.core import FormulaCategory
+
+
+class PublicBenchmarkSuites(FormulaCategory):
+    """`PublicBenchmarkSuites` is subcategory 1.3 of the published test functions."""
+
+    number = (1, 3)
+    name = "Public benchmark suites"

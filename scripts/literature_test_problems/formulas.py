@@ -12,7 +12,14 @@ from collections.abc import Iterable
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-from .data_files import DataFileError, FormulaDecision, RowsTableLine, join_row_ids, source_id_of_row_id, split_row_ids
+from .data_files import (
+    DataFileError,
+    FormulaDecision,
+    RowsTableLine,
+    join_row_ids,
+    source_id_of_row_id,
+    split_row_ids,
+)
 
 FORMULA_COLUMNS = ["formula_id", "status", "source_id", "row_ids", "variable_change"]
 FORMULA_STATUSES = ("active", "retired")

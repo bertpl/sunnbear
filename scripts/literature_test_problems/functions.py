@@ -48,33 +48,18 @@ class ParsedFunction:
     scaled_values: tuple[tuple | None, ...]
 
     # --------------------------------------------------------------------------
+    #  Parsing
+    # --------------------------------------------------------------------------
+    @classmethod
+    def parse_row_expression(cls, row: SourceRow) -> tuple[sp.Expr, sp.Symbol, dict]:
+        """Return a row's expression as written, its unknown, and its parameters (`parse_parameters`)."""
+        parameters = parse_parameters(row.parameters)
+        expr = cls._parse_expression(row.f, parameters)
+        return expr, cls._find_variable(expr, parameters, row.notes), parameters
+
+    # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
-    @staticmethod
-    def _scaled_values(expr: sp.Expr) -> tuple | None:
-        """Return 1 instance's scaled values, in 40-digit arithmetic, or None if it has too few values."""
-        if expr.free_symbols - {X}:
-            return None
-        function = sp.lambdify(X, expr, modules="mpmath")
-        values = []
-        with mpmath.workdps(40):
-            for point in SAMPLE_POINTS:
-                try:
-                    value = mpmath.mpc(function(mpmath.mpf(point)))
-                    values.append(value if mpmath.isfinite(value) else None)
-                except Exception:  # noqa: BLE001 - any failure to evaluate leaves out that sample point
-                    values.append(None)
-            reference = next((v for v in values if v is not None and abs(v) > mpmath.mpf(10) ** -30), None)
-            if reference is None or sum(v is not None for v in values) < 4:
-                return None
-            else:
-                return tuple(
-                    None
-                    if v is None
-                    else (mpmath.nstr((v / reference).real, 10), mpmath.nstr((v / reference).imag, 10))
-                    for v in values
-                )
-
     @staticmethod
     def _parse_expression(text: str, parameters: dict) -> sp.Expr:
         """Parse 1 expression, or an equation `lhs = rhs` into `lhs - rhs`."""
@@ -101,6 +86,31 @@ class ParsedFunction:
             return free[0]
         else:
             raise ParseError("unknown variable unclear")
+
+    @staticmethod
+    def _scaled_values(expr: sp.Expr) -> tuple | None:
+        """Return 1 instance's scaled values, in 40-digit arithmetic, or None if it has too few values."""
+        if expr.free_symbols - {X}:
+            return None
+        function = sp.lambdify(X, expr, modules="mpmath")
+        values = []
+        with mpmath.workdps(40):
+            for point in SAMPLE_POINTS:
+                try:
+                    value = mpmath.mpc(function(mpmath.mpf(point)))
+                    values.append(value if mpmath.isfinite(value) else None)
+                except Exception:  # noqa: BLE001 - any failure to evaluate leaves out that sample point
+                    values.append(None)
+            reference = next((v for v in values if v is not None and abs(v) > mpmath.mpf(10) ** -30), None)
+            if reference is None or sum(v is not None for v in values) < 4:
+                return None
+            else:
+                return tuple(
+                    None
+                    if v is None
+                    else (mpmath.nstr((v / reference).real, 10), mpmath.nstr((v / reference).imag, 10))
+                    for v in values
+                )
 
     @staticmethod
     def _has_value_sets(text: str, varied_names: set[str]) -> bool:
@@ -156,9 +166,8 @@ class ParsedFunction:
             words = set(IDENTIFIER.findall(row.f))
             if words & TEXT_WORDS or "..." in row.f or "<" in row.f or ">" in row.f or "!=" in row.f:
                 raise ParseError("conditions or prose")
-            parameters = parse_parameters(row.parameters)
-            expr = cls._parse_expression(row.f, parameters)
-            expr = expr.subs(cls._find_variable(expr, parameters, row.notes), X)
+            expr, variable, parameters = cls.parse_row_expression(row)
+            expr = expr.subs(variable, X)
             assigned = sorted((s for s in expr.free_symbols if s.name in parameters and s != X), key=lambda s: s.name)
             combos = list(
                 itertools.islice(itertools.product(*(parameters[s.name] for s in assigned)), MAX_INSTANCES + 1)
