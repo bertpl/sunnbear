@@ -24,5 +24,6 @@ from .core import (
     TestFunction,
     XCFun,
     XFun,
+    XShiftedFormula,
     deduplicate_param_tuples,
 )

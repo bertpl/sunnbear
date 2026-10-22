@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `FormulaSource` and `Formula.source`, which record a formula's publication
 - Add `ParamTable`, a `ParamRecipe` that lists its parameter tuples
+- Add `XShiftedFormula`, a `Formula` whose `c` shifts its function along x by `c` times the width of its interval
 - Add the formulas of Dowell and Jarratt (1971), `f1.1.1.1` to `f1.1.1.7`, to the category "Published test functions"
 
 ### Changed

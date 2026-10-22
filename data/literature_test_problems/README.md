@@ -211,7 +211,7 @@ uv run python -m scripts.literature_test_problems.formula_modules <source id> ..
 
 For each source named, the script writes the source's package and its formula modules, and rewrites the `__init__.py` of each subcategory. A generated formula module:
 
-- evaluates the row's `f`, as the source prints it, at `x - (b - a)*c`, where `[a, b]` is the formula's interval: the formula's `c` shifts the function along x by a multiple of the interval's width;
+- is an `XShiftedFormula`, which evaluates the row's `f`, as the source prints it, at `x - (b - a)*c`, where `[a, b]` is the formula's interval: the formula's `c` shifts the function along x by a multiple of the interval's width;
 - lists the row's parameter values in a `ParamTable`, with 1 tuple for each interval that the source gives for a combination of parameter values; a formula with several intervals takes their bounds as 2 more parameters, `a` and `b`;
 - names its source in a `FormulaSource`: the source's `reference`, and the row's key as the location;
 - holds test cases whose expected values mpmath computes from `f`;

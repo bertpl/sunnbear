@@ -169,10 +169,19 @@ class Formula(FormulaTaxonomyNode, ABC):
             param_names = _declared_hook_param_names(fn, cls.__name__, "parametrized_fun", n_leading=2)
             if cls.jit:
                 signature = f"float64({', '.join(['float64'] * (2 + len(param_names)))})"
-                cls._compiled_formula_cache = numba.njit(signature)(fn)
+                cls._compiled_formula_cache = numba.njit(signature)(cls._parametrized_fun_for_numba())
             else:
                 cls._compiled_formula_cache = fn
         return cls._compiled_formula_cache
+
+    @classmethod
+    def _parametrized_fun_for_numba(cls) -> Callable[..., float]:
+        """Return the function that `_compiled_formula` compiles: `parametrized_fun` itself.
+
+        A subclass that builds `parametrized_fun` from other hooks overrides this, to return a form whose calls of
+        those hooks numba can compile.
+        """
+        return cls.parametrized_fun
 
     def build_candidate(self, param_values: "tuple[float, ...]") -> CandidateTestFunction:
         """Build one candidate test function for a bound parameter tuple.
@@ -301,19 +310,32 @@ class Formula(FormulaTaxonomyNode, ABC):
                 non-static `parametrized_fun`).
         """
         cls = type(self)
-        hooks: list[tuple[str, Callable[..., object], int]] = [
-            ("parametrized_fun", cls.parametrized_fun, 2),  # after (x, c)
-            ("interval_bounds", cls.interval_bounds, 1),  # after self
-        ]
-        if cls.is_param_tuple_valid is not Formula.is_param_tuple_valid:
-            hooks.append(("is_param_tuple_valid", cls.is_param_tuple_valid, 1))  # after self
-        for hook, fun, n_leading in hooks:
+        for hook, fun, n_leading in cls._hooks_with_param_tuple():
             signature_names = _declared_hook_param_names(fun, cls.__name__, hook, n_leading)
             if signature_names != self.param_names:
                 raise ValueError(
                     f"Formula {cls.__name__} declares param_names={self.param_names} but "
                     f"{hook} takes {signature_names}; the two must agree."
                 )
+
+    @classmethod
+    def _hooks_with_param_tuple(cls) -> list[tuple[str, Callable[..., object], int]]:
+        """Return each hook that receives the parameter tuple, with the number of fixed arguments before the tuple.
+
+        `interval_bounds` may be a ``@staticmethod``, which takes no ``self``. A subclass with hooks of its own adds
+        them to the list.
+        """
+        if isinstance(inspect.getattr_static(cls, "interval_bounds"), staticmethod):
+            n_leading_interval_bounds = 0
+        else:
+            n_leading_interval_bounds = 1  # self
+        hooks: list[tuple[str, Callable[..., object], int]] = [
+            ("parametrized_fun", cls.parametrized_fun, 2),  # after (x, c)
+            ("interval_bounds", cls.interval_bounds, n_leading_interval_bounds),
+        ]
+        if cls.is_param_tuple_valid is not Formula.is_param_tuple_valid:
+            hooks.append(("is_param_tuple_valid", cls.is_param_tuple_valid, 1))  # after self
+        return hooks
 
 
 def _declared_hook_param_names(fun: "Callable[..., object]", owner: str, hook: str, n_leading: int) -> tuple[str, ...]:

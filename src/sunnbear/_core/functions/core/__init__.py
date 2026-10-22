@@ -61,3 +61,4 @@ from .source import FormulaSource
 from .test_cases import FormulaTestCase
 from .test_function import CandidateTestFunction, TestFunction
 from .types import XCFun, XFun
+from .x_shifted_formula import XShiftedFormula
