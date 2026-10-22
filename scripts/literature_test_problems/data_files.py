@@ -401,7 +401,7 @@ class RowsTableLine:
     @property
     def source_id(self) -> str:
         """Return the id of the row's source."""
-        return source_id_of_row(self.row_id)
+        return source_id_of_row_id(self.row_id)
 
     @property
     def key(self) -> str:
@@ -498,9 +498,11 @@ def write_rows_table(path: Path, rows: list[RowsTableLine]) -> None:
 class FormulaDecision:
     """A `FormulaDecision` holds 1 line of `formula_decisions.csv`: the rows of 1 formula, decided by a person.
 
-    Without a decision, each `new` row is a formula of its own. A decision does 1 or both of these: it puts several
-    rows of 1 source that are obviously 1 function into 1 formula, or it gives 1 row's formula a different variable
-    from the row's `f`, which `variable_change` describes.
+    Without a decision, each `new` row is a formula of its own. A decision does 1 or both of these:
+
+    - it puts several rows of 1 source that are obviously 1 function into 1 formula;
+    - it gives 1 row's formula a different variable from that of the row's `f`, and `variable_change` describes the
+      new variable.
     """
 
     row_ids: tuple[str, ...]
@@ -518,7 +520,7 @@ class FormulaDecision:
                 problems.append(f"formula_decisions.csv names an unknown row, {row_id}")
             elif status_by_row_id[row_id] != "new":
                 problems.append(f"formula_decisions.csv names a row that is not new, {row_id}")
-        source_ids = {source_id_of_row(row_id) for row_id in self.row_ids}
+        source_ids = {source_id_of_row_id(row_id) for row_id in self.row_ids}
         if len(source_ids) > 1:
             problems.append(f"formula_decisions.csv joins rows of {len(source_ids)} sources, {self.row_ids[0]}")
         return problems
@@ -552,24 +554,25 @@ def read_formula_decisions(path: Path) -> list[FormulaDecision]:
     """Return the decisions of `formula_decisions.csv`, or raise `DataFileError`.
 
     Raises:
-        DataFileError: If the columns are wrong, a line gives no reason, a line of 1 row gives no variable change,
-            or a row is in more than 1 line.
+        DataFileError: If the columns are wrong, a line names no rows or gives no reason, a line of 1 row gives no
+            variable change, or a row is in more than 1 line.
     """
-    decisions = []
+    formula_decisions = []
     seen_row_ids: set[str] = set()
     with path.open(encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
         if reader.fieldnames != FORMULA_DECISION_COLUMNS:
             raise DataFileError(f"{path.name}: the columns must be {FORMULA_DECISION_COLUMNS}")
         for line in reader:
-            decision = FormulaDecision.from_csv_line(line, path.name)
-            repeated = [r for r in decision.row_ids if r in seen_row_ids or decision.row_ids.count(r) > 1]
+            formula_decision = FormulaDecision.from_csv_line(line, path.name)
+            row_ids = formula_decision.row_ids
+            repeated = [r for r in row_ids if r in seen_row_ids or row_ids.count(r) > 1]
             if repeated:
                 raise DataFileError(f"{path.name}: {repeated[0]} is in more than 1 line")
             else:
-                decisions.append(decision)
-                seen_row_ids.update(decision.row_ids)
-    return decisions
+                formula_decisions.append(formula_decision)
+                seen_row_ids.update(row_ids)
+    return formula_decisions
 
 
 # ==================================================================================================
@@ -589,7 +592,7 @@ def split_row_ids(field: str) -> list[str]:
     return [row_id.strip() for row_id in field.split(ROW_ID_SEPARATOR) if row_id.strip()]
 
 
-def source_id_of_row(row_id: str) -> str:
+def source_id_of_row_id(row_id: str) -> str:
     """Return the id of the source that a row id names, the part before its first `:`."""
     return row_id.split(":", 1)[0]
 

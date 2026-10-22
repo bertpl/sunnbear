@@ -159,7 +159,7 @@ def test_formulas_file_keeps_each_formula_within_its_source(script_modules, comm
         (formula_id, row_id)
         for formula_id, source_id, row_ids in committed_formulas
         for row_id in row_ids
-        if script_modules["data_files"].source_id_of_row(row_id) != source_id
+        if script_modules["data_files"].source_id_of_row_id(row_id) != source_id
     ]
 
     # --- assert -----------------------
@@ -215,6 +215,19 @@ def test_readme_lists_every_column(script_modules, folder, file_name, module_nam
 
     # --- assert -----------------------
     assert listed == getattr(script_modules[module_name], columns_name)
+
+
+def test_readme_lists_every_file(script_modules, folder):
+    """The README's table of files names every file of `DataFolder` except the README itself."""
+    # --- arrange / act ----------------
+    readme = folder.readme_file.read_text(encoding="utf-8")
+    files_section = readme.split("\n## Files\n")[1].split("\n## ")[0]
+    listed = set(re.findall(r"^\| `([^`/]+)` \|", files_section, re.MULTILINE))
+    property_names = [name for name in vars(script_modules["data_files"].DataFolder) if name.endswith("_file")]
+    file_names = {getattr(folder, name).name for name in property_names} - {folder.readme_file.name}
+
+    # --- assert -----------------------
+    assert listed == file_names
 
 
 def test_timeline_template_counts_every_status(script_modules):
@@ -296,10 +309,7 @@ def test_find_problems_checks_each_status(
 #  The rules of the formulas
 # ==================================================================================================
 def test_formulas_table_numbers_sources_and_formulas(script_modules):
-    """Sources with a `new` row are numbered per subcategory in time order, and their formulas in row order.
-
-    A formula of several rows is numbered at the position of its first row.
-    """
+    """Sources with a `new` row are numbered per subcategory in time order, and formulas by their first row."""
     # --- arrange ----------------------
     data_files = script_modules["data_files"]
     lines = [

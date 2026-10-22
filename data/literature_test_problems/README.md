@@ -16,7 +16,7 @@ The rows are the material for category 1, *Published test functions*, of sunnbea
 |---|---|---|
 | `sources/<id>.toml` | hand | 1 source: its reference, where in the source its rows are, and its rows |
 | `decisions.csv` | hand | the statuses that a person decided, where the script cannot decide or decides wrongly (§ Decisions) |
-| `formula_decisions.csv` | hand | the formulas that hold several rows, or whose variable differs from that of their row's function (§ Formulas) |
+| `formula_decisions.csv` | hand | the formulas that hold several rows, or whose variable differs from the variable of their row's function (§ Formulas) |
 | `rows.csv` | script | every row, in time order, with its automatic and its final status (§ Statuses) |
 | `summary.md` | script | 1 line per source: its year, title, subcategory (the kind of source, § Source files), rows and new rows, and the sources that it takes rows from |
 | `timeline.html` | script | a page that draws the sources in time order, with an edge from each source to every later source whose rows name its rows (§ The summary and the page) |
@@ -152,15 +152,18 @@ Common functions and the rows that name them still count in the row counts of th
 
 ## Formulas
 
-Every `new` row belongs to exactly 1 formula of category 1, under its own source; `duplicate` and `incomplete` rows belong to none. By default, each `new` row is a formula of its own. A formula's id is `f<subcategory>.<source>.<formula>`, such as `f1.4.12.3`, formula 3 of source 12 of subcategory `1.4`:
+Every `new` row belongs to exactly 1 formula of category 1, and that formula belongs to the row's source; `duplicate` and `incomplete` rows belong to none. By default, each `new` row is a formula of its own. A formula's id is `f<subcategory>.<source>.<formula>`, such as `f1.4.12.3`, formula 3 of source 12 of subcategory `1.4`:
 
 - **Sources:** within each subcategory, the sources that have a `new` row are numbered in time order, from 1; a source without a `new` row gets no number.
 - **Formulas:** within a source, the formulas follow the order of its rows, from 1; a formula of several rows is numbered at the position of its first row.
 
 `formula_decisions.csv` holds 1 line per formula that a person decided, with the columns `row_ids`, `variable_change` and `reason`. A line does 1 or both of these:
 
-- **It puts several `new` rows of 1 source into 1 formula,** where they are obviously 1 function: the same expression, in which only the intervals and the values of at most 2 constants or parameters differ. A varied constant must not change the kind of function, such as the degree of a polynomial, unless the source presents the rows as 1 family. When in doubt, the rows stay separate formulas.
-- **It changes the variable of 1 row's formula,** where the source prints its function in 1 variable but solves for another: the formula takes the variable that the source solves for, provided that the formula in that variable reproduces the source's results. The row keeps the function as the source prints it, and `variable_change` gives the formula's variable, such as `` the pH, as `f(10^-pH)` on `[2, 12]` `` for a function printed in `H`.
+- **It puts several `new` rows of 1 source into 1 formula,** where they are obviously 1 function: the same expression, in which only the intervals and the values of at most 2 constants or parameters differ.
+  - A varied constant must not change the kind of function, such as the degree of a polynomial, unless the source presents the rows as 1 family.
+  - When in doubt, the rows stay separate formulas.
+- **It changes the variable of 1 row's formula,** where the source prints its function in 1 variable but solves for another: the formula takes the variable that the source solves for, provided that the formula in that variable reproduces the source's results.
+  - The row keeps the function as the source prints it, and `variable_change` describes the formula's variable in words, such as `` the pH, as `f(10^-pH)` on `[2, 12]` `` for a function `f(H)` that the source prints in `H`.
 
 `row_ids` separates the formula's rows by ` | `, and `reason` says why the rows are 1 function, or how the formula in the new variable reproduces the source's results. A line of 1 row must give a `variable_change`, and a row is in at most 1 line.
 

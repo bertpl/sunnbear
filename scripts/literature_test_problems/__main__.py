@@ -1,8 +1,11 @@
 """Build the generated files of `data/literature_test_problems/` from its source files and decisions.
 
-Run from the repo root with `uv run python -m scripts.literature_test_problems`. The script writes every generated
-file, then prints the counts per status, the number of formulas, and every problem that it found, such as a row
-that needs a decision; it exits with status 1 if there is a problem.
+Run from the repo root with `uv run python -m scripts.literature_test_problems`. The script:
+
+- writes every generated file;
+- prints the counts per status, the number of formulas, and every problem that it found, such as a row that needs a
+  decision;
+- exits with status 1 if there is a problem.
 """
 
 import sys
