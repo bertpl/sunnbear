@@ -50,13 +50,13 @@ def test_axis_never_yields_an_empty_grid(start, stop, step):
 
 def test_coupled_sweep_with_tiny_magnitude_axis():
     # --- arrange ----------------------
-    recipe = ParamGrid(
+    grid = ParamGrid(
         axes=(ParamAxis("p1", 0.0, 2.0, 1.0), ParamAxis("p2", -1e-05, -1e-05, 1.0)),
         product=False,
     )
 
     # --- act / assert -----------------
-    assert list(recipe.tuples()) == [
+    assert list(grid.tuples()) == [
         (0.0, -1e-05),
         (1.0, -1e-05),
         (2.0, -1e-05),
@@ -118,51 +118,51 @@ def test_axis_accepts_offset_but_clean_grid():
 # ==================================================================================================
 #  ParamGrid
 # ==================================================================================================
-def test_recipe_product():
+def test_grid_product():
     # --- arrange ----------------------
-    recipe = ParamGrid(axes=(ParamAxis("p1", 0.0, 1.0, 1.0), ParamAxis("p2", 5.0, 6.0, 1.0)))
+    grid = ParamGrid(axes=(ParamAxis("p1", 0.0, 1.0, 1.0), ParamAxis("p2", 5.0, 6.0, 1.0)))
 
     # --- act / assert -----------------
-    assert list(recipe.tuples()) == [(0.0, 5.0), (0.0, 6.0), (1.0, 5.0), (1.0, 6.0)]
+    assert list(grid.tuples()) == [(0.0, 5.0), (0.0, 6.0), (1.0, 5.0), (1.0, 6.0)]
 
 
-def test_recipe_coupled_sweep_same_lengths():
+def test_grid_coupled_sweep_same_lengths():
     # --- arrange ----------------------
-    recipe = ParamGrid(
+    grid = ParamGrid(
         axes=(ParamAxis("p1", 0.0, 1.0, 1.0), ParamAxis("p2", 5.0, 6.0, 1.0)),
         product=False,
     )
 
     # --- act / assert -----------------
-    assert list(recipe.tuples()) == [(0.0, 5.0), (1.0, 6.0)]
+    assert list(grid.tuples()) == [(0.0, 5.0), (1.0, 6.0)]
 
 
-def test_recipe_coupled_sweep_unequal_lengths():
+def test_grid_coupled_sweep_unequal_lengths():
     """Axes advance one coordinate at a time along a shared axis; lengths need not match."""
     # --- arrange ----------------------
-    recipe = ParamGrid(
+    grid = ParamGrid(
         axes=(ParamAxis("p1", 0.0, 4.0, 1.0), ParamAxis("p2", 0.0, 2.0, 1.0)),  # 5 values, 3 values
         product=False,
     )
 
     # --- act --------------------------
-    tuples = list(recipe.tuples())
+    tuples = list(grid.tuples())
 
     # --- assert -----------------------
     assert tuples == [(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (2.0, 1.0), (3.0, 1.0), (3.0, 2.0), (4.0, 2.0)]
 
 
 @pytest.mark.parametrize("n_p1, n_p2", [(5, 3), (32, 50), (101, 11), (7, 7), (2, 9)])
-def test_recipe_coupled_sweep_covers_every_value(n_p1, n_p2):
+def test_grid_coupled_sweep_covers_every_value(n_p1, n_p2):
     """No axis ever loses a value, and consecutive tuples differ in exactly the stepping axes."""
     # --- arrange ----------------------
-    recipe = ParamGrid(
+    grid = ParamGrid(
         axes=(ParamAxis("p1", 0.0, float(n_p1 - 1), 1.0), ParamAxis("p2", 0.0, float(n_p2 - 1), 1.0)),
         product=False,
     )
 
     # --- act --------------------------
-    tuples = list(recipe.tuples())
+    tuples = list(grid.tuples())
 
     # --- assert -----------------------
     assert {t[0] for t in tuples} == {float(i) for i in range(n_p1)}  # every p1 value appears
@@ -172,15 +172,15 @@ def test_recipe_coupled_sweep_covers_every_value(n_p1, n_p2):
     assert all(a <= b for a, b in itertools.pairwise(tuples))  # monotone in both axes
 
 
-def test_recipe_coupled_sweep_equal_lengths_is_a_zip():
+def test_grid_coupled_sweep_equal_lengths_is_a_zip():
     # --- arrange ----------------------
-    recipe = ParamGrid(
+    grid = ParamGrid(
         axes=(ParamAxis("p1", 0.0, 3.0, 1.0), ParamAxis("p2", 10.0, 13.0, 1.0)),
         product=False,
     )
 
     # --- act / assert -----------------
-    assert list(recipe.tuples()) == [
+    assert list(grid.tuples()) == [
         (0.0, 10.0),
         (1.0, 11.0),
         (2.0, 12.0),
@@ -188,27 +188,27 @@ def test_recipe_coupled_sweep_equal_lengths_is_a_zip():
     ]
 
 
-def test_recipe_coupled_sweep_all_single_value_axes():
+def test_grid_coupled_sweep_all_single_value_axes():
     # --- arrange ----------------------
-    recipe = ParamGrid(
+    grid = ParamGrid(
         axes=(ParamAxis("p1", 3.0, 3.0, 1.0), ParamAxis("p2", 7.0, 7.0, 1.0)),
         product=False,
     )
 
     # --- act / assert -----------------
-    assert list(recipe.tuples()) == [(3.0, 7.0)]
+    assert list(grid.tuples()) == [(3.0, 7.0)]
 
 
-def test_recipe_coupled_sweep_coinciding_boundaries_step_together():
+def test_grid_coupled_sweep_coinciding_boundaries_step_together():
     """Axes whose plateau boundaries coincide advance in the same step (2- and 4-value axes share 1/2)."""
     # --- arrange ----------------------
-    recipe = ParamGrid(
+    grid = ParamGrid(
         axes=(ParamAxis("p1", 0.0, 1.0, 1.0), ParamAxis("p2", 0.0, 3.0, 1.0)),  # 2 values, 4 values
         product=False,
     )
 
     # --- act / assert -----------------
-    assert list(recipe.tuples()) == [
+    assert list(grid.tuples()) == [
         (0.0, 0.0),
         (0.0, 1.0),
         (1.0, 2.0),  # both axes crossed the shared boundary 1/2 in one step
@@ -216,23 +216,23 @@ def test_recipe_coupled_sweep_coinciding_boundaries_step_together():
     ]
 
 
-def test_recipe_mixed_notations_survive_tuple_assembly():
+def test_grid_mixed_notations_survive_tuple_assembly():
     """Each axis's notation determines its values in the assembled tuples: the POW2 axis gives powers of 2."""
     # --- arrange ----------------------
-    recipe = ParamGrid(
+    grid = ParamGrid(
         axes=(ParamAxis("p1", 0.0, 1.0, 1.0), ParamAxis("p2", 0.0, 1.0, 1.0, ParamNotation.POW2)),
     )
 
     # --- act --------------------------
-    tuples = list(recipe.tuples())
+    tuples = list(grid.tuples())
 
     # --- assert -----------------------
     assert tuples == [(0.0, 1.0), (0.0, 2.0), (1.0, 1.0), (1.0, 2.0)]
 
 
-def test_recipe_coupled_sweep_three_axes():
+def test_grid_coupled_sweep_three_axes():
     # --- arrange ----------------------
-    recipe = ParamGrid(
+    grid = ParamGrid(
         axes=(
             ParamAxis("p1", 0.0, 2.0, 1.0),
             ParamAxis("p2", 0.0, 1.0, 1.0),
@@ -242,7 +242,7 @@ def test_recipe_coupled_sweep_three_axes():
     )
 
     # --- act --------------------------
-    tuples = list(recipe.tuples())
+    tuples = list(grid.tuples())
 
     # --- assert -----------------------
     assert {t[0] for t in tuples} == {0.0, 1.0, 2.0}
@@ -256,21 +256,21 @@ def test_axis_grid_with_large_magnitude_values():
     assert ParamAxis("p1", 1e16, 3e16, step=1e16).values() == (1e16, 2e16, 3e16)
 
 
-def test_recipe_pow10_convenience():
+def test_grid_pow10_convenience():
     # --- arrange / act ----------------
-    recipe = ParamGrid.pow10("p1", -1.0, 1.0, step=1.0)
+    grid = ParamGrid.pow10("p1", -1.0, 1.0, step=1.0)
 
     # --- assert -----------------------
-    assert list(recipe.tuples()) == [(0.1,), (1.0,), (10.0,)]
+    assert list(grid.tuples()) == [(0.1,), (1.0,), (10.0,)]
 
 
-def test_recipe_single_axis_convenience():
+def test_grid_single_axis_convenience():
     # --- arrange / act ----------------
-    recipe = ParamGrid.pow2("p1", 0.0, 1.0, step=0.5)
-    tuples = list(recipe.tuples())
+    grid = ParamGrid.pow2("p1", 0.0, 1.0, step=0.5)
+    tuples = list(grid.tuples())
 
     # --- assert -----------------------
-    assert recipe.param_names() == ("p1",)
+    assert grid.param_names() == ("p1",)
     # arguments are rounded to 12 significant digits, so compare at that resolution
     assert [p[0] for p in tuples] == pytest.approx([1.0, 2**0.5, 2.0], rel=1e-9)
     assert [ParamNotation.spell_value_canonically(p[0]) for p in tuples] == ["1.0", "2^0.5", "2.0"]
@@ -301,5 +301,6 @@ def test_table_yields_its_rows_in_order_as_floats():
     ],
 )
 def test_table_rejects_a_malformed_table(names, rows, message):
+    # --- act / assert -----------------
     with pytest.raises(ValueError, match=message):
         ParamTable(names=names, rows=rows)

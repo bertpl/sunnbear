@@ -1,8 +1,8 @@
-"""Parameter recipes: how a formula specifies its parameter tuples, as grids or as tables.
+"""A parameter recipe specifies a formula's parameter tuples, as a grid or as a table.
 
 A `ParamRecipe` materializes parameter tuples, and comes in 2 kinds:
 
-- **`ParamGrid`** sweeps a grid. Three small pieces compose, innermost first::
+- **`ParamGrid`** sweeps a grid. A grid composes 3 small pieces, innermost first::
 
       ParamNotation  how one axis maps grid arguments to values
           │          (DECIMAL, or POW2/POW10 where the grid lives in exponent space)
@@ -224,7 +224,7 @@ class ParamGrid(ParamRecipe):
             yield tuple(values[index] for values, index in zip(per_axis, indices, strict=True))
 
     def tuples(self) -> Iterator[tuple[float, ...]]:
-        """Materialize the recipe's parameter tuples."""
+        """Materialize the grid's parameter tuples."""
         per_axis = [axis.values() for axis in self.axes]
         if self.product:
             yield from itertools.product(*per_axis)
@@ -255,16 +255,16 @@ class ParamGrid(ParamRecipe):
 # ==================================================================================================
 @dataclass(frozen=True)
 class ParamTable(ParamRecipe):
-    """A table of parameter tuples, materialized as listed, in order.
+    """`ParamTable` lists parameter tuples and materializes them in the order listed.
 
     A table holds values that form no grid, such as the values that a paper publishes (``n = 1, 5, 15, 20``), or
-    the combinations of several parameters that it gives, where their product would add combinations that it does
-    not give.
+    the combinations of several parameters that the paper gives, where the product of the parameters' values would
+    add combinations that the paper does not give.
 
     Attributes:
         names: The names of the parameters, in tuple position order.
         rows: The parameter tuples, each with 1 value per name. Every value must be a valid parameter value
-            (`ParamNotation.is_valid_value`), so that the identity of each candidate renders.
+            (`ParamNotation.is_valid_value`), so that each candidate's `FunctionId` can spell its parameter values.
     """
 
     names: tuple[str, ...]

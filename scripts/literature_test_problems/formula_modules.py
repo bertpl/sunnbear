@@ -4,25 +4,18 @@ Run it from the repo root, naming the sources whose formulas to write:
 
     uv run python -m scripts.literature_test_problems.formula_modules 1971_dowell_jarratt_illinois
 
-For each named source, the script writes the source's category package below `CATALOG_DIR`, with 1 module per active
-formula of the source in `formulas.csv`; it then rewrites the `__init__.py` of each subcategory, so that it imports
-every source package present, and formats every file that it wrote with ruff. A formula with a row that gives only a
-description of its function is written by hand: the script leaves its module alone and only imports it.
+For each named source, the script:
 
-Each generated formula:
+- writes the source's category package below `CATALOG_DIR`, with 1 module per active formula of the source in
+  `formulas.csv`;
+- rewrites the `__init__.py` of each subcategory, so that it imports every source package present;
+- formats every file that it wrote with ruff.
 
-- evaluates the published expression at `x - (b - a)*c`, written as the survey writes it, with `^` as `**` and each
-  function taken from Python's `math` module, so that it computes in the order that the source prints;
-- lists the published parameter values in a `ParamTable`: 1 tuple per instance and interval that belongs to it; a
-  formula with several intervals takes `a` and `b` as 2 more parameters, rounded to `CANONICAL_DIGITS` significant
-  digits where they need more;
-- carries `cases` whose expected values mpmath computes from the survey's expression, at x-values where the generated
-  Python agrees with them;
-- records the fingerprint of the survey fields that it was generated from (`FormulasTableLine.fingerprint`), which the
-  repo's tests compare with the survey.
+A formula with a row that gives only a description of its function is written by hand: the script leaves its module
+alone and only imports it.
 
-The script stops with an error on a formula that it cannot generate yet: one of several rows, one with a change of
-variable, or one whose parameters give several sets of values.
+The README of `data/literature_test_problems/` (§ Formula modules) describes what a generated formula module holds,
+and which formulas the script cannot generate.
 """
 
 import itertools
@@ -38,13 +31,13 @@ from pathlib import Path
 import mpmath
 import sympy as sp
 
-from sunnbear._core.functions.core.param_values import CANONICAL_DIGITS, ParamNotation
 from sunnbear._core.utils.slugify import slugify
+from sunnbear.functions import CANONICAL_DIGITS, ParamNotation
 
 from .data_files import SUBCATEGORY_DESCRIPTIONS, DataFolder, Source, SourceRow, read_sources
 from .formulas import FormulasTable, FormulasTableLine
 from .functions import ParsedFunction
-from .helpers import IDENTIFIER, MAX_INSTANCES, parse_parameters
+from .helpers import IDENTIFIER, MAX_INSTANCES
 from .intervals import ParsedIntervals
 
 CATALOG_DIR = (
@@ -72,8 +65,9 @@ PYTHON_CONSTANTS = {"pi": "math.pi", "e": "math.e"}
 CASE_FRACTIONS = (0.3, 0.7, 0.45, 0.85, 0.6, 0.35)
 # CASE_SHIFT is the value of c of the 1 case per formula that exercises the shift of x.
 CASE_SHIFT = 0.25
-# CASE_RTOL and CASE_ATOL bound how far the generated Python may be from mpmath at a case's x-value: 10 times tighter
-# than the generic test's default tolerances, which leaves room for the numba-compiled form.
+# CASE_RTOL and CASE_ATOL bound how far the generated Python may be from mpmath at a case's x-value: 10 times smaller
+# than the default tolerances of the generic formula test, so that the numba-compiled function, whose result may
+# differ slightly from the Python one, still passes that test.
 CASE_RTOL = 1e-13
 CASE_ATOL = 1e-13
 # DOCSTRING_WIDTH is the width of a wrapped docstring line, inside a class at 4 spaces of indentation.
@@ -87,140 +81,75 @@ class GenerationError(Exception):
 
 
 # ==================================================================================================
-#  PythonExpression
+#  FormulaModuleSpec
 # ==================================================================================================
 @dataclass(frozen=True)
-class PythonExpression:
-    """A `PythonExpression` holds a row's expression as Python code that numba compiles, in the variable `x`."""
-
-    code: str
-
-    # --------------------------------------------------------------------------
-    #  Factory methods
-    # --------------------------------------------------------------------------
-    @classmethod
-    def from_survey_text(cls, text: str, variable: str, parameter_names: dict[str, str]) -> "PythonExpression":
-        """Translate the survey's expression text into Python, keeping the order of its operations.
-
-        An equation `lhs = rhs` becomes `(lhs) - (rhs)`, `^` becomes `**`, the variable becomes `x`, and each
-        function and constant takes its Python form (`PYTHON_FUNCTIONS`, `PYTHON_CONSTANTS`).
-
-        Args:
-            text: The row's `f`.
-            variable: The name of the row's unknown.
-            parameter_names: The Python name of each parameter of the row, keyed by its name in the survey.
-
-        Raises:
-            GenerationError: If the text names a function or a name that the translation does not know, or the
-                result is not a Python expression.
-        """
-        sides = text.split("=")
-        if len(sides) == 2:
-            text = f"({sides[0].strip()}) - ({sides[1].strip()})"
-        text = text.replace("^", "**")
-
-        def to_python(match: re.Match) -> str:
-            """Return the Python form of 1 name of the expression."""
-            name = match.group(1)
-            is_call = text[match.end() :].lstrip().startswith("(")
-            if is_call and name in PYTHON_FUNCTIONS:
-                return PYTHON_FUNCTIONS[name]
-            elif is_call:
-                raise GenerationError(f"the function {name} has no Python form in the generator")
-            elif name == variable:
-                return "x"
-            elif name in parameter_names:
-                return parameter_names[name]
-            elif name in PYTHON_CONSTANTS:
-                return PYTHON_CONSTANTS[name]
-            else:
-                raise GenerationError(f"the name {name} is neither the variable, a parameter nor a constant")
-
-        code = IDENTIFIER.sub(to_python, text)
-        try:
-            compile(code, "<expression>", "eval")
-        except SyntaxError as error:
-            raise GenerationError(f"the Python form {code!r} does not compile") from error
-        return cls(code)
-
-
-# ==================================================================================================
-#  GeneratedFormula
-# ==================================================================================================
-@dataclass(frozen=True)
-class GeneratedFormula:
-    """A `GeneratedFormula` holds everything that the module of 1 generated formula states.
+class FormulaModuleSpec:
+    """A `FormulaModuleSpec` holds the contents of 1 generated formula module.
 
     `param_names` are the Python names of the formula's parameters, in tuple order; a formula with several intervals
     ends them with `a` and `b`. `interval` is the single interval of a formula that has 1, and None otherwise.
-    `cases` holds each case as the Python code of a `FormulaTestCase` factory call.
+    `interval_width_code` is the code of the interval's width in `parametrized_fun`: a number for a formula with 1
+    interval, and `(b - a)` otherwise. `rounded_bounds` holds the exact text of each bound that the tuples round to
+    `CANONICAL_DIGITS` significant digits. `cases` holds each case as the Python code of a `FormulaTestCase` factory
+    call.
     """
 
-    line: FormulasTableLine
+    formulas_table_line: FormulasTableLine
     source: Source
     row: SourceRow
     class_name: str
     param_names: tuple[str, ...]
-    expression: PythonExpression
-    width_code: str
+    expression_code: str
+    interval_width_code: str
     tuples: tuple[tuple[float, ...], ...]
     interval: tuple[float, float] | None
     rounded_bounds: tuple[str, ...]
     cases: tuple[str, ...]
 
-    @property
-    def name(self) -> str:
-        """Return the formula's display name: the key of its row, such as "Table 2"."""
-        return self.row.key
-
-    @property
-    def module_name(self) -> str:
-        """Return the formula's module name, such as ``f02_table_2``."""
-        return f"f{self.line.number[-1]:02d}_{slugify(self.name)}"
-
     def module_text(self) -> str:
         """Return the formula's module as Python source, before ruff formats it."""
-        source_name = source_category_name(self.source)
         command = f"uv run python -m scripts.literature_test_problems.formula_modules {self.source.source_id}"
         module_docstring = (
-            f"This module holds the formula of {self.name} in {source_name}.\n\n"
+            f"This module holds the formula of {self.row.key} in {self.source.category_name}.\n\n"
             "A script generates this module from the survey of published test problems: to change the formula, change "
             f"its source file in `data/literature_test_problems/sources/` and run `{command}`, never this file."
         )
-        uses_math = "math." in self.expression.code
-        uses_table = bool(self.param_names)
+        needs_math_import = "math." in self.expression_code
+        needs_param_table_import = bool(self.param_names)
         imported_names = ["Formula", "FormulaSource", "FormulaTestCase", "ParamRecipe"]
-        if uses_table:
+        if needs_param_table_import:
             imported_names.append("ParamTable")
         signature = "".join(f", {name}: float" for name in self.param_names)
         return "\n".join(
             [
                 _docstring(module_docstring, width=120),
                 "",
-                *(["import math", ""] if uses_math else []),
+                *(["import math", ""] if needs_math_import else []),
                 f"from sunnbear._core.functions.core import {', '.join(imported_names)}",
                 "",
-                "# The fingerprint of the survey fields that this module is generated from; the tests compare it with",
-                "# the survey, so that a module left stale after a change of the survey fails them.",
-                f'SURVEY_FINGERPRINT = "{self.line.fingerprint(self.source)}"',
+                "# SURVEY_HASH is a hash of this formula's survey fields; the tests compare it with the survey, so",
+                "# that a test fails when the survey changes and this module is not regenerated.",
+                f'SURVEY_HASH = "{self.formulas_table_line.survey_hash(self.source)}"',
                 "",
                 "",
                 f"class {self.class_name}(Formula):",
                 textwrap.indent(_docstring(self._class_docstring(), width=DOCSTRING_WIDTH), "    "),
                 "",
-                f"    number = {self.line.number!r}",
-                f"    name = {self.name!r}",
+                f"    number = {self.formulas_table_line.number!r}",
+                f"    name = {self.row.key!r}",
                 f"    param_names = {self.param_names!r}",
                 "    source = FormulaSource(",
                 f"        reference={_string_code(self.source.reference, width=90)},",
-                f"        location={self.name!r},",
+                f"        location={self.row.key!r},",
                 "    )",
                 "",
                 "    @staticmethod",
                 f"    def parametrized_fun(x: float, c: float{signature}) -> float:",
-                '        """Evaluate the published function at ``x - (b - a)*c``."""',
-                f"        x = x - {self.width_code} * c",
-                f"        return {self.expression.code}",
+                '        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula\'s '
+                'interval."""',
+                f"        x = x - {self.interval_width_code} * c",
+                f"        return {self.expression_code}",
                 "",
                 f"    def interval_bounds(self{signature}) -> tuple[float, float]:",
                 *self._interval_bounds_body(),
@@ -240,11 +169,14 @@ class GeneratedFormula:
     # --------------------------------------------------------------------------
     def _class_docstring(self) -> str:
         """Return the class docstring: what the formula evaluates, the published values, the row's notes."""
-        paragraphs = [f"`{self.class_name}` evaluates the published function at ``x - (b - a)*c``."]
+        paragraphs = [
+            "This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval."
+        ]
         interval_text = self.row.interval.strip()
         if "`" not in interval_text:
             interval_text = f"``{interval_text}``"
-        # the survey's interval may span a source's 2 starting values, so the sentence does not say that it is printed
+        # the survey's interval may be the span between a source's 2 starting values, so the docstring does not claim
+        # that the source prints the interval
         if self.row.parameters.strip():
             paragraphs.append(
                 f"The source prints ``{self.row.f}``, with the parameters ``{self.row.parameters.strip()}``; the "
@@ -291,6 +223,51 @@ class GeneratedFormula:
             ]
 
     @staticmethod
+    def _python_expression_code(text: str, variable: str, parameter_names: dict[str, str]) -> str:
+        """Translate the survey's expression text into Python code that numba compiles, keeping its operation order.
+
+        An equation `lhs = rhs` becomes `(lhs) - (rhs)`, `^` becomes `**`, the variable becomes `x`, and each
+        function and constant takes its Python form (`PYTHON_FUNCTIONS`, `PYTHON_CONSTANTS`).
+
+        Args:
+            text: The row's `f`.
+            variable: The name of the row's unknown.
+            parameter_names: The Python name of each parameter of the row, keyed by its name in the survey.
+
+        Raises:
+            GenerationError: If the text names a function or a name that the translation does not know, or the
+                result is not a Python expression.
+        """
+        sides = text.split("=")
+        if len(sides) == 2:
+            text = f"({sides[0].strip()}) - ({sides[1].strip()})"
+        text = text.replace("^", "**")
+
+        def to_python(match: re.Match) -> str:
+            """Return the Python form of 1 name of the expression."""
+            name = match.group(1)
+            is_call = text[match.end() :].lstrip().startswith("(")
+            if is_call and name in PYTHON_FUNCTIONS:
+                return PYTHON_FUNCTIONS[name]
+            elif is_call:
+                raise GenerationError(f"the function {name} has no Python form in the generator")
+            elif name == variable:
+                return "x"
+            elif name in parameter_names:
+                return parameter_names[name]
+            elif name in PYTHON_CONSTANTS:
+                return PYTHON_CONSTANTS[name]
+            else:
+                raise GenerationError(f"the name {name} is neither the variable, a parameter nor a constant")
+
+        code = IDENTIFIER.sub(to_python, text)
+        try:
+            compile(code, "<expression>", "eval")
+        except SyntaxError as error:
+            raise GenerationError(f"the Python form {code!r} does not compile") from error
+        return code
+
+    @staticmethod
     def _python_parameter_names(survey_names: list[str], has_interval_parameters: bool) -> dict[str, str]:
         """Return the Python name of each survey parameter: its own name, with `_` added where Python needs it."""
         reserved = RESERVED_NAMES | ({"a", "b"} if has_interval_parameters else set())
@@ -303,32 +280,27 @@ class GeneratedFormula:
         return python_names
 
     @staticmethod
-    def _parameter_value(value: sp.Expr, what: str) -> float:
+    def _parameter_value(value: sp.Expr, name: str) -> float:
         """Return a published parameter value as a float, or raise `GenerationError` if no parameter can hold it."""
         number = float(sp.N(value, 30))
         if not ParamNotation.is_valid_value(number):
-            raise GenerationError(f"{what} = {value} needs more than {CANONICAL_DIGITS} significant digits")
+            raise GenerationError(f"{name} = {value} needs more than {CANONICAL_DIGITS} significant digits")
         return number
 
     @staticmethod
-    def _case_code(params: dict[str, float], x: float, c: float, expected: float) -> str:
-        """Return the code of 1 value case."""
-        return f"FormulaTestCase.value(params={params!r}, x={x!r}, c={c!r}, expected={expected!r})"
-
-    @staticmethod
-    def _find_value_case(
+    def _find_case_x_and_expected(
         exact: sp.Expr,
         variable: sp.Symbol,
-        expression: PythonExpression,
+        expression_code: str,
         python_values: dict[str, float],
         interval: tuple[float, float],
         c: float,
     ) -> tuple[float, float]:
         """Return an x-value in the interval and the formula's value there, where the Python agrees with mpmath.
 
-        The x-values tried are `CASE_FRACTIONS` of the interval, rounded to 6 significant digits; the formula
-        evaluates the expression at `x - (b - a)*c`, which the Python and mpmath both get from the float arithmetic
-        of the generated code.
+        The x-values tried are `CASE_FRACTIONS` of the interval, rounded to 6 significant digits. The Python and
+        mpmath both evaluate the expression at the float `x - (b - a)*c`, computed as the generated code computes it,
+        so that only the expression's own arithmetic can differ.
 
         Raises:
             GenerationError: If the Python agrees with mpmath at none of the x-values tried.
@@ -343,7 +315,7 @@ class GeneratedFormula:
             try:
                 with mpmath.workdps(50):
                     exact_value = mpmath.mpmathify(exact_function(mpmath.mpf(shifted)))
-                python_value = eval(expression.code, {"math": math}, {**python_values, "x": shifted})
+                python_value = eval(expression_code, {"math": math}, {**python_values, "x": shifted})
             except (ArithmeticError, ValueError, TypeError):
                 continue
             if isinstance(exact_value, mpmath.mpc) or not isinstance(python_value, float):
@@ -357,29 +329,27 @@ class GeneratedFormula:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def from_survey(cls, line: FormulasTableLine, source: Source) -> "GeneratedFormula":
-        """Build the formula of 1 line of `formulas.csv` from its source's row.
+    def from_survey(cls, formulas_table_line: FormulasTableLine, source: Source) -> "FormulaModuleSpec":
+        """Build the module of 1 formula of `formulas.csv` from its source's row.
 
         Raises:
-            GenerationError: If the formula is one that the script cannot generate yet (module docstring), or its
-                expression, parameters or intervals cannot be translated.
+            GenerationError: If the formula holds several rows, changes its variable, or has parameters that give
+                several sets of values, or if its expression, parameters or intervals cannot be translated.
         """
-        if len(line.row_ids) > 1:
-            raise GenerationError(f"{line.formula_id} holds several rows, which the generator does not support yet")
-        elif line.variable_change:
-            raise GenerationError(f"{line.formula_id} changes its variable, which the generator does not support yet")
-        row = next(row for row in source.rows if row.row_id == line.row_ids[0])
-        # --- parse the row ------------------------
-        parsed = ParsedFunction.from_source_row(row)
-        if parsed.has_value_sets:
-            raise GenerationError(f"{line.formula_id}: its parameters give several sets of values")
-        survey_parameters = parse_parameters(row.parameters)
-        expr = ParsedFunction.parse_expression(row.f, survey_parameters)
-        variable = ParsedFunction.find_variable(expr, survey_parameters, row.notes)
+        formula_id = formulas_table_line.formula_id
+        if len(formulas_table_line.row_ids) > 1:
+            raise GenerationError(f"{formula_id} holds several rows, which the generator does not support")
+        elif formulas_table_line.variable_change:
+            raise GenerationError(f"{formula_id} changes its variable, which the generator does not support")
+        row = next(row for row in source.rows if row.row_id == formulas_table_line.row_ids[0])
+        # --- parse the row ----------------------
+        if ParsedFunction.from_source_row(row).has_value_sets:
+            raise GenerationError(f"{formula_id}: its parameters give several sets of values")
+        expr, variable, survey_parameters = ParsedFunction.parse_row_expression(row)
         names = [name for name in survey_parameters if sp.Symbol(name) in expr.free_symbols]
         combos = list(itertools.product(*(survey_parameters[name] for name in names)))
         if len(combos) > MAX_INSTANCES:
-            raise GenerationError(f"{line.formula_id}: more than {MAX_INSTANCES} parameter combinations")
+            raise GenerationError(f"{formula_id}: more than {MAX_INSTANCES} parameter combinations")
         intervals = ParsedIntervals.from_source_row(row).intervals
         pairs = [
             (combo, interval)
@@ -388,11 +358,11 @@ class GeneratedFormula:
             if interval.matches_parameter_values(tuple(zip(names, combo, strict=True)))
         ]
         if not pairs:
-            raise GenerationError(f"{line.formula_id}: no instance has a usable interval")
-        # --- the formula's parameters -------------
+            raise GenerationError(f"{formula_id}: no instance has a usable interval")
+        # --- the formula's parameters -----------
         has_interval_parameters = len({interval.key for _, interval in pairs}) > 1
         python_names = cls._python_parameter_names(names, has_interval_parameters)
-        expression = PythonExpression.from_survey_text(row.f, variable.name, python_names)
+        expression_code = cls._python_expression_code(row.f, variable.name, python_names)
         param_names = tuple(python_names[name] for name in names) + (("a", "b") if has_interval_parameters else ())
         tuples, cases, rounded_bounds = [], [], []
         bounds_cases: dict[tuple[float, float], str] = {}
@@ -409,20 +379,24 @@ class GeneratedFormula:
             params = dict(zip(param_names, values, strict=True))
             python_values = {name: value for name, value in params.items() if name in python_names.values()}
             exact = expr.subs(dict(zip((sp.Symbol(name) for name in names), combo, strict=True)))
-            x, expected = cls._find_value_case(exact, variable, expression, python_values, bounds, c=0.0)
-            cases.append(cls._case_code(params, x, 0.0, expected))
+            x, expected = cls._find_case_x_and_expected(exact, variable, expression_code, python_values, bounds, c=0.0)
+            cases.append(f"FormulaTestCase.value(params={params!r}, x={x!r}, c=0.0, expected={expected!r})")
             if len(cases) == 1:
-                x, expected = cls._find_value_case(exact, variable, expression, python_values, bounds, c=CASE_SHIFT)
-                cases.append(cls._case_code(params, x, CASE_SHIFT, expected))
+                x, expected = cls._find_case_x_and_expected(
+                    exact, variable, expression_code, python_values, bounds, c=CASE_SHIFT
+                )
+                cases.append(
+                    f"FormulaTestCase.value(params={params!r}, x={x!r}, c={CASE_SHIFT!r}, expected={expected!r})"
+                )
             bounds_cases.setdefault(bounds, f"FormulaTestCase.interval_bounds(params={params!r}, expected={bounds!r})")
         return cls(
-            line=line,
+            formulas_table_line=formulas_table_line,
             source=source,
             row=row,
             class_name=source_category_class_name(source) + _camel_case(slugify(row.key)),
             param_names=param_names,
-            expression=expression,
-            width_code="(b - a)" if has_interval_parameters else repr(bounds[1] - bounds[0]),
+            expression_code=expression_code,
+            interval_width_code="(b - a)" if has_interval_parameters else repr(bounds[1] - bounds[0]),
             tuples=tuple(tuples),
             interval=None if has_interval_parameters else bounds,
             rounded_bounds=tuple(dict.fromkeys(rounded_bounds)),
@@ -433,22 +407,16 @@ class GeneratedFormula:
 # ==================================================================================================
 #  Category packages
 # ==================================================================================================
-def source_category_name(source: Source) -> str:
-    """Return the display name of a source's category: its title up to the colon, such as "Dowell, Jarratt (1971)"."""
-    return source.title.split(":")[0].strip()
-
-
 def source_category_class_name(source: Source) -> str:
     """Return the class name of a source's category, such as ``DowellJarratt1971``."""
-    return _camel_case(slugify(source_category_name(source)))
+    return _camel_case(slugify(source.category_name))
 
 
-def source_package_text(source: Source, lines: list[FormulasTableLine], module_names: list[str]) -> str:
+def source_package_text(source: Source, formulas_table_lines: list[FormulasTableLine], module_names: list[str]) -> str:
     """Return the `__init__.py` of a source's category package, which imports every formula module of the source."""
-    name = source_category_name(source)
     class_name = source_category_class_name(source)
     module_docstring = (
-        f"This category holds the formulas of {name}.\n\n"
+        f"This category holds the formulas of {source.category_name}.\n\n"
         "A script generates this package from the survey of published test problems."
     )
     class_docstring = f"`{class_name}` is the category of the formulas of 1 publication.\n\n{source.reference}"
@@ -464,8 +432,8 @@ def source_package_text(source: Source, lines: list[FormulasTableLine], module_n
             f"class {class_name}(FormulaCategory):",
             textwrap.indent(_docstring(class_docstring, width=DOCSTRING_WIDTH), "    "),
             "",
-            f"    number = {lines[0].source_number!r}",
-            f"    name = {name!r}",
+            f"    number = {formulas_table_lines[0].source_number!r}",
+            f"    name = {source.category_name!r}",
             "",
         ]
     )
@@ -478,7 +446,7 @@ def subcategory_package_text(subcategory: str, source_package_names: list[str]) 
     class_name = _camel_case(slugify(description))
     number = tuple(int(part) for part in subcategory.split("."))
     module_docstring = (
-        f"This category holds the formulas of {description}, 1 category per source.\n\n"
+        f"This category holds the formulas of {description}, in 1 subcategory per source.\n\n"
         "A script generates this file from the survey of published test problems."
     )
     imports = [f"from . import {', '.join(source_package_names)}", ""] if source_package_names else []
@@ -506,34 +474,35 @@ def subcategory_dir(subcategory: str) -> Path:
     return CATALOG_DIR / f"c{number:02d}_{slugify(SUBCATEGORY_DESCRIPTIONS[subcategory])}"
 
 
-def write_source(source: Source, lines: list[FormulasTableLine]) -> list[Path]:
+def write_source_package(source: Source, formulas_table_lines: list[FormulasTableLine]) -> list[Path]:
     """Write a source's category package and its generated formula modules, and return the paths written.
 
     Raises:
         GenerationError: If a formula cannot be generated, or a hand-written module is missing.
     """
-    package_name = f"c{lines[0].source_number[-1]:02d}_{slugify(source_category_name(source))}"
+    package_name = f"c{formulas_table_lines[0].source_number[-1]:02d}_{slugify(source.category_name)}"
     package_dir = subcategory_dir(source.subcategory) / package_name
     package_dir.mkdir(parents=True, exist_ok=True)
     written, module_names = [], []
-    for line in lines:
-        row = next(row for row in source.rows if row.row_id == line.row_ids[0])
+    for formulas_table_line in formulas_table_lines:
+        row = next(row for row in source.rows if row.row_id == formulas_table_line.row_ids[0])
+        module_name = f"f{formulas_table_line.number[-1]:02d}_{slugify(row.key)}"
         if row.f_description:
-            module_name = f"f{line.number[-1]:02d}_{slugify(row.key)}"
             if not (package_dir / f"{module_name}.py").exists():
-                raise GenerationError(f"{line.formula_id}: its hand-written module {module_name}.py is missing")
+                raise GenerationError(
+                    f"{formulas_table_line.formula_id}: its hand-written module {module_name}.py is missing"
+                )
         else:
             try:
-                formula = GeneratedFormula.from_survey(line, source)
+                formula = FormulaModuleSpec.from_survey(formulas_table_line, source)
             except GenerationError as error:
-                raise GenerationError(f"{line.formula_id} ({row.row_id}): {error}") from error
-            module_name = formula.module_name
+                raise GenerationError(f"{formulas_table_line.formula_id} ({row.row_id}): {error}") from error
             path = package_dir / f"{module_name}.py"
             path.write_text(formula.module_text(), encoding="utf-8")
             written.append(path)
         module_names.append(module_name)
     init_path = package_dir / "__init__.py"
-    init_path.write_text(source_package_text(source, lines, module_names), encoding="utf-8")
+    init_path.write_text(source_package_text(source, formulas_table_lines, module_names), encoding="utf-8")
     return [*written, init_path]
 
 
@@ -598,12 +567,14 @@ def main(source_ids: list[str]) -> int:
     formulas_table = FormulasTable.read(folder.formulas_file)
     written: list[Path] = []
     for source_id in source_ids:
-        lines = [line for line in formulas_table.formulas if line.source_id == source_id and not line.is_retired]
-        if source_id not in sources or not lines:
+        formulas_table_lines = [
+            line for line in formulas_table.formulas if line.source_id == source_id and not line.is_retired
+        ]
+        if source_id not in sources or not formulas_table_lines:
             print(f"problem: {source_id} is no source with active formulas")
             return 1
         try:
-            written += write_source(sources[source_id], lines)
+            written += write_source_package(sources[source_id], formulas_table_lines)
         except GenerationError as error:
             print(f"problem: {error}")
             return 1

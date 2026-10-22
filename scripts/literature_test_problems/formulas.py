@@ -327,12 +327,11 @@ class FormulasTableLine:
         """Return the number of the formula's source, such as `(1, 4, 12)` for `f1.4.12.3`."""
         return self.number[:3]
 
-    def fingerprint(self, source: Source) -> str:
-        """Return a hash of the survey fields that the formula's module in sunnbear's catalog is generated from.
+    def survey_hash(self, source: Source) -> str:
+        """Return a hash of the formula's survey fields, the input of its generated module in sunnbear's catalog.
 
-        The hash covers the source's title and reference, the formula's change of variable, and each of its rows'
-        id, f, f_description, parameters, interval and notes, so it changes with every change of the survey that
-        changes the generated module.
+        The hash covers every survey field that the generated module depends on, so it changes with every change of
+        the survey that changes the module.
 
         Raises:
             DataFileError: If `source` is not the formula's source, or lacks 1 of the formula's rows.

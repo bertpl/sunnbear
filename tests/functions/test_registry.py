@@ -378,9 +378,10 @@ def test_formula_without_jit_keeps_its_plain_python_function():
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_bound_formula_calls_math_functions_inside_flop_counting():
-    """A formula is compiled when it is bound, so it runs inside the flop-counting context of a solve.
+    """A formula compiled when it is bound runs inside the flop-counting context of a solve.
 
-    That context replaces the `math` functions with counting wrappers, which numba cannot compile a call to.
+    That context replaces the `math` functions with counting wrappers, and numba cannot compile a call to such a
+    wrapper, so the formula must be compiled before the context starts.
     """
 
     # --- arrange ----------------------
@@ -398,7 +399,9 @@ def test_bound_formula_calls_math_functions_inside_flop_counting():
         def recipes(self) -> tuple[ParamRecipe, ...]:
             return ()
 
-    Cubic().build_all_candidates()[0].xc_fun(0.0, 0.0)  # numba's first compilation in a process loads its registries
+    # compile another formula first, as the earlier solves of a run do, so that numba has loaded its registries
+    # before `Sine` is bound
+    Cubic().build_all_candidates()[0].xc_fun(0.0, 0.0)
     x_fun = Sine().bind_x_fun((), 0.25)
 
     # --- act --------------------------

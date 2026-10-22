@@ -50,7 +50,7 @@ class Formula(FormulaTaxonomyNode, ABC):
             False for formulas numba cannot compile.
         cases: The formula's self-declared behavioral traits (`FormulaTestCase`),
             exercised by the generic formula test.
-        source: The publication that the formula comes from (`FormulaSource`), or None (default)
+        source: The formula's publication (`FormulaSource`), or None (default)
             for a formula that no publication gives.
     """
 
@@ -156,8 +156,8 @@ class Formula(FormulaTaxonomyNode, ABC):
         - **Lazy (first use), not at class definition**: importing the catalog
           must stay cheap; numba decoration and compilation are only paid by
           processes that actually evaluate the formula.
-        - **Compiled here, with an explicit all-float64 signature, not at the
-          first call**: the first call usually happens inside `Solver.solve`,
+        - **Compiled when the formula is first bound, with an explicit
+          all-float64 signature, not at its first call**: the first call usually happens inside `Solver.solve`,
           whose flop-counting context replaces the functions of the `math`
           module with counting wrappers, and numba cannot compile a call to
           those. Compiling when the formula is first bound keeps compilation

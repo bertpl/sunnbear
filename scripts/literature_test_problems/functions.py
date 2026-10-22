@@ -77,6 +77,13 @@ class ParsedFunction:
         else:
             raise ParseError("unknown variable unclear")
 
+    @classmethod
+    def parse_row_expression(cls, row: SourceRow) -> tuple[sp.Expr, sp.Symbol, dict]:
+        """Return a row's expression as written, its unknown, and its parameters (`parse_parameters`)."""
+        parameters = parse_parameters(row.parameters)
+        expr = cls.parse_expression(row.f, parameters)
+        return expr, cls.find_variable(expr, parameters, row.notes), parameters
+
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
@@ -159,9 +166,8 @@ class ParsedFunction:
             words = set(IDENTIFIER.findall(row.f))
             if words & TEXT_WORDS or "..." in row.f or "<" in row.f or ">" in row.f or "!=" in row.f:
                 raise ParseError("conditions or prose")
-            parameters = parse_parameters(row.parameters)
-            expr = cls.parse_expression(row.f, parameters)
-            expr = expr.subs(cls.find_variable(expr, parameters, row.notes), X)
+            expr, variable, parameters = cls.parse_row_expression(row)
+            expr = expr.subs(variable, X)
             assigned = sorted((s for s in expr.free_symbols if s.name in parameters and s != X), key=lambda s: s.name)
             combos = list(
                 itertools.islice(itertools.product(*(parameters[s.name] for s in assigned)), MAX_INSTANCES + 1)

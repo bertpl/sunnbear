@@ -1,4 +1,4 @@
-"""This category holds the formulas of articles of other solvers, 1 category per source.
+"""This category holds the formulas of articles of other solvers, in 1 subcategory per source.
 
 A script generates this file from the survey of published test problems.
 """

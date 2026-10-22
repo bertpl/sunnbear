@@ -9,13 +9,13 @@ import math
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
-# The fingerprint of the survey fields that this module is generated from; the tests compare it with
-# the survey, so that a module left stale after a change of the survey fails them.
-SURVEY_FINGERPRINT = "a2ee3c96371c4032"
+# SURVEY_HASH is a hash of this formula's survey fields; the tests compare it with the survey, so
+# that a test fails when the survey changes and this module is not regenerated.
+SURVEY_HASH = "a2ee3c96371c4032"
 
 
 class DowellJarratt1971Table6(Formula):
-    """`DowellJarratt1971Table6` evaluates the published function at ``x - (b - a)*c``.
+    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
     The source prints ``exp(-n*x)*(x - 1) + x^n``, with the parameters ``n = 1, 5, 10, 15``; the formula's interval is
     ``[0, 1]``.
@@ -36,7 +36,7 @@ class DowellJarratt1971Table6(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``."""
+        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - 1.0 * c
         return math.exp(-n * x) * (x - 1) + x**n
 

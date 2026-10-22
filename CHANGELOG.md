@@ -11,11 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `FormulaSource` and `Formula.source`, which record the publication that a formula comes from
 - Add `ParamTable`, a `ParamRecipe` that lists its parameter tuples
-- Add the formulas of Dowell and Jarratt (1971), `f1.1.1.1` to `f1.1.1.7`, the first formulas of category 1
+- Add the formulas of Dowell and Jarratt (1971), `f1.1.1.1` to `f1.1.1.7`, the first formulas of category 1, Published test functions
 
 ### Changed
 
-- Rename the grid recipe `ParamRecipe` to `ParamGrid`; `ParamRecipe` is now the base class of `ParamGrid` and `ParamTable`
+- Rename `ParamRecipe` to `ParamGrid`, and make `ParamRecipe` the base class of `ParamGrid` and `ParamTable`
 
 ### Deprecated
 
@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix a formula that calls a function of `math` failing to compile when it is first evaluated inside a solve
+- Fix a formula that calls a function of `math` failing to compile when it is first evaluated inside `Solver.solve`
 
 ### Security
 

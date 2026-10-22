@@ -1,4 +1,4 @@
-"""`FormulaSource` records the publication that a formula comes from."""
+"""`FormulaSource` records a formula's publication."""
 
 from dataclasses import dataclass
 

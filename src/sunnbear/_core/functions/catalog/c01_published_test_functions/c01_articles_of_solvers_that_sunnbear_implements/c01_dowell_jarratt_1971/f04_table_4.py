@@ -7,13 +7,13 @@ in `data/literature_test_problems/sources/` and run `uv run python -m scripts.li
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
-# The fingerprint of the survey fields that this module is generated from; the tests compare it with
-# the survey, so that a module left stale after a change of the survey fails them.
-SURVEY_FINGERPRINT = "fedf6c18c727ef0f"
+# SURVEY_HASH is a hash of this formula's survey fields; the tests compare it with the survey, so
+# that a test fails when the survey changes and this module is not regenerated.
+SURVEY_HASH = "fedf6c18c727ef0f"
 
 
 class DowellJarratt1971Table4(Formula):
-    """`DowellJarratt1971Table4` evaluates the published function at ``x - (b - a)*c``.
+    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
     The source prints ``x^2 - (1 - x)^n``, with the parameters ``n = 2, 5, 15, 20``; the formula's interval is ``[0,
     1]``.
@@ -34,7 +34,7 @@ class DowellJarratt1971Table4(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``."""
+        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - 1.0 * c
         return x**2 - (1 - x) ** n
 

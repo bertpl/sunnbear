@@ -165,6 +165,11 @@ class Source:
     relations: tuple[Relation, ...]
     rows: tuple[SourceRow, ...]
 
+    @property
+    def category_name(self) -> str:
+        """Return the source's category name: its title up to the colon, such as "Dowell, Jarratt (1971)"."""
+        return self.title.split(":")[0].strip()
+
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
