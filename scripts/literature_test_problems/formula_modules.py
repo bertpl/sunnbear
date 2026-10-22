@@ -120,12 +120,15 @@ class FormulaModuleSpec:
         )
         needs_math_import = "math." in self.expression_code
         needs_param_table_import = bool(self.param_names)
-        imported_names = ["FormulaSource", "FormulaTestCase", "ParamRecipe", "XShiftedFormula"]
+        imported_names = ["Formula", "FormulaSource", "FormulaTestCase", "ParamRecipe"]
         if needs_param_table_import:
             imported_names.append("ParamTable")
+        if self.interval is None:
+            interval_width_code = "(b - a)"
+        else:
+            interval_width_code = repr(self.interval[1] - self.interval[0])
         class_name = source_category_class_name(self.source) + _camel_case(slugify(self.row.key))
-        params_signature = ", ".join(f"{name}: float" for name in self.param_names)
-        unshifted_fun_signature = ", ".join(["x: float", *(f"{name}: float" for name in self.param_names)])
+        signature = "".join(f", {name}: float" for name in self.param_names)
         return "\n".join(
             [
                 _docstring(module_docstring, width=120),
@@ -138,7 +141,7 @@ class FormulaModuleSpec:
                 f'SURVEY_FIELDS_HASH = "{self.survey_fields_hash(self.formulas_table_line, self.source)}"',
                 "",
                 "",
-                f"class {class_name}(XShiftedFormula):",
+                f"class {class_name}(Formula):",
                 textwrap.indent(_docstring(self._class_docstring(), width=DOCSTRING_WIDTH), "    "),
                 "",
                 f"    number = {self.formulas_table_line.number!r}",
@@ -150,12 +153,13 @@ class FormulaModuleSpec:
                 "    )",
                 "",
                 "    @staticmethod",
-                f"    def unshifted_fun({unshifted_fun_signature}) -> float:",
-                '        """Evaluate the published function."""',
+                f"    def parametrized_fun(x: float, c: float{signature}) -> float:",
+                '        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula\'s '
+                'interval."""',
+                f"        x = x - {interval_width_code} * c",
                 f"        return {self.expression_code}",
                 "",
-                "    @staticmethod",
-                f"    def interval_bounds({params_signature}) -> tuple[float, float]:",
+                f"    def interval_bounds(self{signature}) -> tuple[float, float]:",
                 *self._interval_bounds_body(),
                 "",
                 "    def recipes(self) -> tuple[ParamRecipe, ...]:",

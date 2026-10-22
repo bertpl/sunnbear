@@ -310,6 +310,27 @@ def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table
     assert missing == []
 
 
+@pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
+@pytest.mark.parametrize("c", [0.25, -0.25])
+def test_category_1_formula_shifts_along_x_by_its_interval_width(formula, c):
+    """A formula of category 1 at ``c`` equals the formula at ``c = 0``, evaluated at ``x - (b - a)*c``.
+
+    Evaluating the shifted x-value at ``c = 0`` repeats the formula's own float arithmetic, so the 2 values are equal
+    exactly; the x-values lie in the interval, and so do their shifted values.
+    """
+    for candidate in formula.build_all_candidates():
+        # --- arrange ----------------------
+        width = candidate.b - candidate.a
+        x = candidate.a + 0.6 * width
+
+        # --- act --------------------------
+        shifted = candidate.xc_fun(x, c)
+        unshifted = candidate.xc_fun(x - width * c, 0.0)
+
+        # --- assert -----------------------
+        assert shifted == unshifted, candidate.id
+
+
 # ==================================================================================================
 #  The rules of the final statuses
 # ==================================================================================================

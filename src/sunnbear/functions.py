@@ -23,7 +23,6 @@ from ._core.functions import (
     TestFunction,
     XCFun,
     XFun,
-    XShiftedFormula,
     deduplicate_param_tuples,
 )
 
@@ -46,6 +45,5 @@ __all__ = [
     "TestFunction",
     "XCFun",
     "XFun",
-    "XShiftedFormula",
     "deduplicate_param_tuples",
 ]

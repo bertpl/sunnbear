@@ -7,14 +7,14 @@ in `data/literature_test_problems/sources/` and run `uv run python -m scripts.li
 
 import math
 
-from sunnbear._core.functions.core import FormulaSource, FormulaTestCase, ParamRecipe, XShiftedFormula
+from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
 SURVEY_FIELDS_HASH = "d32e45cc60268183"
 
 
-class DowellJarratt1971Table1(XShiftedFormula):
+class DowellJarratt1971Table1(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
     The source prints ``sin(x) - 0.5``; the formula's interval is ``[0, 1.5]``.
@@ -34,12 +34,12 @@ class DowellJarratt1971Table1(XShiftedFormula):
     )
 
     @staticmethod
-    def unshifted_fun(x: float) -> float:
-        """Evaluate the published function."""
+    def parametrized_fun(x: float, c: float) -> float:
+        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        x = x - 1.5 * c
         return math.sin(x) - 0.5
 
-    @staticmethod
-    def interval_bounds() -> tuple[float, float]:
+    def interval_bounds(self) -> tuple[float, float]:
         """Return the formula's interval."""
         return (0.0, 1.5)
 

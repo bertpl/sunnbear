@@ -7,14 +7,14 @@ in `data/literature_test_problems/sources/` and run `uv run python -m scripts.li
 
 import math
 
-from sunnbear._core.functions.core import FormulaSource, FormulaTestCase, ParamRecipe, ParamTable, XShiftedFormula
+from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
 SURVEY_FIELDS_HASH = "894b9b3bb78ed57f"
 
 
-class DowellJarratt1971Table2(XShiftedFormula):
+class DowellJarratt1971Table2(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
     The source prints ``2*x*exp(-n) + 1 - 2*exp(-n*x)``, with the parameters ``n = 1, 5, 15, 20``; the formula's
@@ -35,12 +35,12 @@ class DowellJarratt1971Table2(XShiftedFormula):
     )
 
     @staticmethod
-    def unshifted_fun(x: float, n: float) -> float:
-        """Evaluate the published function."""
+    def parametrized_fun(x: float, c: float, n: float) -> float:
+        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        x = x - 1.0 * c
         return 2 * x * math.exp(-n) + 1 - 2 * math.exp(-n * x)
 
-    @staticmethod
-    def interval_bounds(n: float) -> tuple[float, float]:
+    def interval_bounds(self, n: float) -> tuple[float, float]:
         """Return the formula's interval."""
         return (0.0, 1.0)
 
