@@ -1,8 +1,9 @@
 """This module holds the formula that Kumar, Srivastav (2026) labels f4.
 
-The survey gives this function as 1 expression that the script does not translate, with the stated root ``x*`` as a
-parameter, so a person writes this module: a change of the formula's row in `data/literature_test_problems/sources/`
-needs a change of this module.
+The survey gives this function as 1 expression that the module generator,
+`scripts/literature_test_problems/formula_modules.py`, cannot translate: an expression with the stated root ``x*`` as a
+parameter. A person therefore writes this module, and a change of the formula's row in
+`data/literature_test_problems/sources/` needs a change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable

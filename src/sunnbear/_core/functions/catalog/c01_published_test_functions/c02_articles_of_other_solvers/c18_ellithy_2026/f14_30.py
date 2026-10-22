@@ -1,8 +1,9 @@
 """This module holds the formula that Ellithy (2026) labels 30 and 31.
 
-The survey gives this function as 1 expression that the script does not translate, a product written with ``...``, so a
-person writes this module: a change of the formula's row in `data/literature_test_problems/sources/` needs a change of
-this module.
+The survey gives this function as 1 expression that the module generator,
+`scripts/literature_test_problems/formula_modules.py`, cannot translate: a product written with ``...``. A person
+therefore writes this module, and a change of the formula's row in `data/literature_test_problems/sources/` needs a
+change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
@@ -18,8 +19,8 @@ class Ellithy202630(Formula):
     - 31: the survey writes the source's function as ``(x - 1)*(x - 2)*...*(x - 20)``; the formula's interval is ``[19,
       21]``
 
-    Wilkinson's polynomial, written out in the authors' file as the product of all 20 factors ``(x - 1)`` to ``(x -
-    20)``.
+    The function is Wilkinson's polynomial, which the authors' file writes out as the product of all 20 factors ``(x -
+    1)`` to ``(x - 20)``.
     """
 
     number = (1, 2, 18, 14)
@@ -40,7 +41,7 @@ class Ellithy202630(Formula):
     def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - (b - a) * c
-        # the 20 factors (x - 1) to (x - 20), multiplied from the left, as the authors' file writes them out
+        # the loop multiplies the 20 factors (x - 1) to (x - 20) from the left, in the order of the authors' file
         product = x - 1
         for i in range(2, 21):
             product *= x - i

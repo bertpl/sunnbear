@@ -18,7 +18,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F42(Formula):
     The survey writes the source's function as ``(x^2 - x - 6)*(x^2 - 3*x + 2)``; the formula's intervals are `[0, pi]`;
     `[0, 4]` (`Test Functions.pdf`).
 
-    The bound ``pi`` is rounded to 12 significant digits, the most that a parameter value holds.
+    The value ``pi`` is rounded to 12 significant digits, the most that a parameter value holds.
 
     `Test Functions.pdf` gives the interval `[0, 4]`.
     """

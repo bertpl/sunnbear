@@ -100,8 +100,7 @@ class FormulaModuleSpec:
             name and its Python name.
         interval: The single interval of a formula that has 1, and None otherwise.
         exact_texts_of_rounded_values: The exact text of each parameter value or bound that the tuples round to
-            `CANONICAL_DIGITS`
-            significant digits.
+            `CANONICAL_DIGITS` significant digits.
         cases: Each case as the Python code of a `FormulaTestCase` factory call.
     """
 
@@ -262,7 +261,7 @@ class FormulaModuleSpec:
         return " ".join(sentences)
 
     def _rounded_values_text(self) -> str:
-        """Return the sentence that names the values that the tuples round to `CANONICAL_DIGITS` significant digits."""
+        """Return the sentence that names the tuples' rounded values and the significant digits that they keep."""
         rounded_values = ", ".join(f"``{value}``" for value in self.exact_texts_of_rounded_values)
         if len(self.exact_texts_of_rounded_values) == 1:
             subject = f"The value {rounded_values} is"
@@ -366,15 +365,16 @@ class FormulaModuleSpec:
 
     @staticmethod
     def _parameter_value(value: sp.Expr) -> tuple[float, bool]:
-        """Return a published parameter value as a float that a parameter holds, and whether it was rounded for that.
+        """Return a published value as a float that a parameter holds, and whether the value was rounded to fit it.
 
-        A value that needs more than `CANONICAL_DIGITS` significant digits, such as `sqrt(2)`, is rounded to them.
+        A value that no `ParamNotation` holds exactly, such as `pi`, is rounded to `CANONICAL_DIGITS` significant
+        digits, as `ParamNotation.DECIMAL` rounds it.
         """
         number = float(sp.N(value, 30))
         if ParamNotation.is_valid_value(number):
             return number, False
         else:
-            return float(f"{number:.{CANONICAL_DIGITS}g}"), True
+            return ParamNotation.DECIMAL.build_value_from_argument(number), True
 
     @staticmethod
     def _find_case(
@@ -486,35 +486,38 @@ class FormulaModuleSpec:
     def _tuple_values(
         cls, published_test_function: PublishedTestFunction, has_interval_parameters: bool
     ) -> tuple[tuple[float, ...], tuple[float, float], list[str], dict[str, sp.Expr]]:
-        """Return a published test function's parameter tuple, bounds, rounded values and the values for mpmath.
+        """Return a published test function's parameter tuple, bounds, rounded values' texts, and mpmath's values.
 
         The 4 results are the tuple, the bounds, the exact text of each value that is rounded, and the parameter values
         at which mpmath evaluates the function, keyed by survey name.
 
-        A parameter value is rounded to `CANONICAL_DIGITS` significant digits where it needs more
-        (`_parameter_value`), and mpmath then evaluates the function at the rounded value, as the formula does. With
-        `has_interval_parameters`, the bounds are rounded too, both in the returned bounds and at the end of the tuple.
+        A parameter value is rounded where no parameter holds it exactly, as `_parameter_value` does, and mpmath then
+        evaluates the function at the rounded value, as the formula does. With `has_interval_parameters`, the bounds
+        are parameters too, rounded by the same rule, both in the returned bounds and at the end of the tuple.
         """
-        values, exact_texts_of_rounded_values, reference_values = [], [], {}
+        values, exact_texts_of_rounded_values, mpmath_parameter_values = [], [], {}
         for name, exact_value in published_test_function.parameter_values:
             value, is_rounded = cls._parameter_value(exact_value)
             values.append(value)
             if is_rounded:
                 exact_texts_of_rounded_values.append(str(exact_value))
-                reference_values[name] = sp.Rational(repr(value))
+                mpmath_parameter_values[name] = sp.Rational(repr(value))
             else:
-                reference_values[name] = exact_value
+                mpmath_parameter_values[name] = exact_value
         interval = published_test_function.interval
         exact_bounds = (sp.sympify(interval.lower), sp.sympify(interval.upper))
-        bounds = tuple(float(sp.N(bound, 30)) for bound in exact_bounds)
         if has_interval_parameters:
-            rounded = tuple(float(f"{bound:.{CANONICAL_DIGITS}g}") for bound in bounds)
-            exact_texts_of_rounded_values += [
-                str(e) for e, r, f in zip(exact_bounds, rounded, bounds, strict=True) if r != f
-            ]
-            bounds = rounded
+            bounds = []
+            for exact_bound in exact_bounds:
+                bound, is_rounded = cls._parameter_value(exact_bound)
+                bounds.append(bound)
+                if is_rounded:
+                    exact_texts_of_rounded_values.append(str(exact_bound))
+            bounds = tuple(bounds)
             values += bounds
-        return tuple(values), bounds, exact_texts_of_rounded_values, reference_values
+        else:
+            bounds = tuple(float(sp.N(bound, 30)) for bound in exact_bounds)
+        return tuple(values), bounds, exact_texts_of_rounded_values, mpmath_parameter_values
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -547,14 +550,14 @@ class FormulaModuleSpec:
         tuples, cases, exact_texts_of_rounded_values = [], [], []
         bounds_cases: dict[tuple[float, float], str] = {}
         for published_test_function in published_formula.test_functions:
-            values, bounds, test_function_exact_texts_of_rounded_values, reference_values = cls._tuple_values(
+            values, bounds, test_function_exact_texts_of_rounded_values, mpmath_parameter_values = cls._tuple_values(
                 published_test_function, has_interval_parameters
             )
             exact_texts_of_rounded_values += test_function_exact_texts_of_rounded_values
             tuples.append(values)
             params = dict(zip(param_names, values, strict=True))
             python_values = {name: value for name, value in params.items() if name in python_names.values()}
-            exact_function = formula_expression.mpmath_function(reference_values)
+            exact_function = formula_expression.mpmath_function(mpmath_parameter_values)
             # the first tuple gets a 2nd value case, which shifts x
             shifts = (0.0, SHIFTED_CASE_C) if not cases else (0.0,)
             shifted_xs = []

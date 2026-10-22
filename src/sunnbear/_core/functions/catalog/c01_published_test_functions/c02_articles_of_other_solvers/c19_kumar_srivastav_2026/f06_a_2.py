@@ -1,8 +1,9 @@
 """This module holds the formula that Kumar, Srivastav (2026) labels A.2.
 
-The survey gives this function as 1 expression that the script does not translate, with noise of a stated distribution,
-so a person writes this module: a change of the formula's row in `data/literature_test_problems/sources/` needs a change
-of this module.
+The survey gives this function as 1 expression that the module generator,
+`scripts/literature_test_problems/formula_modules.py`, cannot translate: an expression with noise of a stated
+distribution. A person therefore writes this module, and a change of the formula's row in
+`data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math
@@ -53,7 +54,7 @@ class KumarSrivastav2026A2(Formula):
         return (ParamTable(names=("sigma",), rows=((0.001,),)),)
 
     cases = (
-        FormulaTestCase.value(params={"sigma": 0.001}, x=0.3, c=0.0, expected=-0.44001066985152143),
-        FormulaTestCase.value(params={"sigma": 0.001}, x=0.3, c=0.25, expected=-0.9010746895282977),
+        FormulaTestCase.value(params={"sigma": 0.001}, x=0.3, c=0.0, expected=-0.44033624226830675),
+        FormulaTestCase.value(params={"sigma": 0.001}, x=0.3, c=0.25, expected=-0.9047881711348748),
         FormulaTestCase.interval_bounds(params={"sigma": 0.001}, expected=(0.0, 1.0)),
     )

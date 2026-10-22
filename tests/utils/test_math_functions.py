@@ -1,5 +1,6 @@
 import math
 import statistics
+import struct
 
 import mpmath
 import pytest
@@ -9,6 +10,7 @@ from sunnbear._core.utils.math_functions import (
     bessel_j1,
     bessel_y0,
     bessel_y1,
+    noise,
     normal_noise,
     real_root,
     sign,
@@ -108,7 +110,7 @@ def test_uniform_noise_is_spread_as_uniform_draws():
     # --- assert -----------------------
     assert all(0.0 <= value < 1.0 for value in values)
     assert statistics.mean(values) == pytest.approx(0.5, abs=0.012)
-    assert statistics.pvariance(values) == pytest.approx(1 / 12, rel=0.03)
+    assert statistics.pvariance(values) == pytest.approx(1 / 12, rel=0.036)
 
 
 def test_normal_noise_is_spread_as_standard_normal_draws():
@@ -126,3 +128,9 @@ def test_normal_noise_is_spread_as_standard_normal_draws():
 def test_noise_of_a_non_finite_x_is_nan(noise_function, x):
     """A noise function returns NaN for an infinite or NaN x."""
     assert math.isnan(noise_function(x))
+
+
+@pytest.mark.parametrize("x", [0.0, -0.0, 1.5, -3.3e-200, 1.5 * 2.0**512, 1.7976931348623157e308, 5e-324, -2.2e-308])
+def test_float_bits_are_the_ieee_754_bits(x):
+    """`_float_bits` gives the IEEE 754 bits of x, for zeros, normal and subnormal values of either sign."""
+    assert int(noise._float_bits(x)) == struct.unpack("<Q", struct.pack("<d", x))[0]

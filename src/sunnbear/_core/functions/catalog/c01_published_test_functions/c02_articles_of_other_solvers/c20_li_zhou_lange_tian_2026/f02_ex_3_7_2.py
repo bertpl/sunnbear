@@ -1,7 +1,8 @@
 """This module holds the formula that Li, Zhou, Lange, Tian (2026) labels Ex. 3 (7.2).
 
-The survey gives this function as 1 expression that the script does not translate, a normal cumulative distribution
-function with a mean and a variance, so a person writes this module: a change of the formula's row in
+The survey gives this function as 1 expression that the module generator,
+`scripts/literature_test_problems/formula_modules.py`, cannot translate: a normal cumulative distribution function with
+a mean and a variance. A person therefore writes this module, and a change of the formula's row in
 `data/literature_test_problems/sources/` needs a change of this module.
 """
 
