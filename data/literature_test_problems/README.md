@@ -20,9 +20,9 @@ The rows are the material for category 1, *Published test functions*, of sunnbea
 | `rows.csv` | script | every row, in time order, with its automatic and its final status (§ Statuses) |
 | `summary.md` | script | 1 line per source: its year, title, subcategory (the kind of source, § Source files), rows and new rows, and the sources that it takes rows from |
 | `timeline.html` | script | a page that draws the sources in time order, with an edge from each source to every later source whose rows name its rows (§ The summary and the page) |
-| `formulas.csv` | script | every formula of category 1, with its `new` rows (§ Formulas) |
+| `formulas.csv` | script | every formula of category 1, active and retired, with its rows; the script keeps every id that the file already holds (§ Formulas) |
 
-Do not edit the generated files by hand; regenerate them (§ Regenerating).
+Do not edit the generated files by hand; regenerate them (§ Regenerating). The 1 exception is `formulas.csv` after the script stops on a change that would change the id of a formula: a person then edits `formulas.csv` by hand (§ Formulas).
 
 ## Source files
 
@@ -65,7 +65,9 @@ The generated files list the sources in time order: by year, then by id without 
 | `also_in` | other sources of the function, where this source names them |
 | `notes` | what a reader needs to read the row, such as a rounded constant or a misprint |
 
-A row's id is `<source id>:<key>`, such as `2011_zhang:3`; a key that a source repeats gets `#2`, `#3`, ... in the order of the rows. Every text field is markdown, with code in backticks; a field that holds only code, such as `interval = '[0, 1]'`, is written without them.
+A row's id is `<source id>:<key>`, such as `2011_zhang:3`. No 2 rows of a source have the same key, and the script stops on a source file in which they do: a key that the source repeats is written in `key` with a suffix `#2`, `#3`, ..., such as `key = 'Ex. 4.1#2'`, and a row added later takes the next free suffix, so that adding a row never changes the id of another row.
+
+Every text field is markdown, with code in backticks; a field that holds only code, such as `interval = '[0, 1]'`, is written without them.
 
 ## Statuses
 
@@ -152,10 +154,36 @@ Common functions and the rows that name them still count in the row counts of th
 
 ## Formulas
 
-Every `new` row belongs to exactly 1 formula of category 1, and that formula belongs to the row's source; `duplicate` and `incomplete` rows belong to none. By default, each `new` row is a formula of its own. A formula's id is `f<subcategory>.<source>.<formula>`, such as `f1.4.12.3`, formula 3 of source 12 of subcategory `1.4`:
+A formula is `active` while it holds a `new` row, and `retired` once it holds none. Every `new` row belongs to exactly 1 active formula of category 1, and that formula belongs to the row's source; `duplicate` and `incomplete` rows belong to no active formula.
 
-- **Sources:** within each subcategory, the sources that have a `new` row are numbered in time order, from 1; a source without a `new` row gets no number.
-- **Formulas:** within a source, the formulas follow the order of its rows, from 1; a formula of several rows is numbered at the position of its first row.
+By default, each `new` row is a formula of its own. A formula's id is `f<subcategory>.<source>.<formula>`, such as `f1.4.12.3`, formula 3 of source 12 of subcategory `1.4`.
+
+**An id never changes once given.** The script keeps every id that `formulas.csv` already holds, and gives new ids only by appending:
+
+- **Sources:** a source gets a number when it first has a `new` row: 1 more than the largest source number of its subcategory, retired formulas included. A source without a `new` row gets no number.
+- **Formulas:** a new formula gets 1 more than the largest formula number of its source, retired formulas included.
+- **Changed rows:** a formula keeps its id while its rows change, as long as it joins no other formula and does not split. A row that stops being `new` leaves the formula, and a row that becomes `new` can join the formula through `formula_decisions.csv`. The formula's `variable_change` can change too.
+- **Retired formulas:** a formula that no longer holds a `new` row stays in `formulas.csv` as `retired`, so that its id is never given again. This happens, for example, when a source that is older but was added later holds the same functions, so that the formula's rows become `duplicate`. A retired formula becomes `active` again if the same rows become `new` again.
+- **Retired lines keep their history:** the rows of a retired line may no longer exist, or may belong to an active formula; the script checks only active formulas against `rows.csv`.
+
+Without a `formulas.csv`, the script numbers the sources of each subcategory in time order, and the formulas of each source in the order of its rows; a formula of several rows takes the position of its first row.
+
+Deleting `formulas.csv` renumbers every formula in this way, which only a major release after 1.0.0 may do.
+
+**A change that would change the id of a formula stops the script.** These changes do:
+
+- a join: a formula that would hold the rows of 2 active formulas;
+- a split: an active formula whose `new` rows would be in 2 formulas;
+- an active formula that names a row that no longer exists;
+- an active formula whose source is now in another subcategory.
+
+The script then leaves `formulas.csv` as it is and reports the problem, and a person resolves it:
+
+1. Decide which ids stay.
+2. Edit `formulas.csv` by hand to match. Never delete a line: for each formula whose id does not stay, set its `status` to `retired`, so that its id is never given again.
+3. Regenerate.
+
+A join or split can also come from formulas that an earlier regeneration appended to `formulas.csv` but that are not committed yet, such as a new source's formulas from before its lines in `formula_decisions.csv`. Restore `formulas.csv` from git then, and regenerate.
 
 `formula_decisions.csv` holds 1 line per formula that a person decided, with the columns `row_ids`, `variable_change` and `reason`. A line does 1 or both of these:
 
@@ -171,14 +199,14 @@ Rows of different sources never share a formula, so that each formula's id credi
 
 A function in 2 forms that compute differently, such as a polynomial expanded and factored, gives 2 separate `new` rows, which stay separate formulas. A formula of several rows keeps each row's parameter values together with that row's intervals: it never combines 1 row's parameter values with another row's interval.
 
-`formulas.csv` lists the formulas in id order, with the columns `formula_id`, `source_id`, `row_ids` and `variable_change`.
+`formulas.csv` lists the formulas in id order, retired ones included, with the columns `formula_id`, `status`, `source_id`, `row_ids` and `variable_change`. A formula's `status` is `active` or `retired`.
 
 ## Adding a source
 
 1. Write `sources/<id>.toml`. Add a relation where a reader needs to know how its rows relate to another source's rows, such as a block of functions that the new source copies with changes; `duplicate_of` and `derived_from` already name every earlier row that the script finds.
 2. Regenerate. The script prints each row that needs a decision; `rows.csv` gives, in `match_kind` and `matches`, why it needs one and the earlier rows that the script found for it.
 3. Add a line to `decisions.csv` for each of those rows, and for any automatic status that is wrong, then regenerate until the script prints no problems.
-4. Add a line to `formula_decisions.csv` for each set of the source's `new` rows that are obviously 1 function, and for each row whose formula takes another variable (§ Formulas), then regenerate.
+4. Add a line to `formula_decisions.csv` for each set of the source's `new` rows that are obviously 1 function, and for each row whose formula takes another variable (§ Formulas). Restore `formulas.csv` from git, because the regenerations above already appended the source's formulas without these decisions, then regenerate.
 5. Commit the source file, `decisions.csv`, `formula_decisions.csv` and the generated files together.
 
 ## Regenerating
@@ -192,7 +220,7 @@ uv run python -m scripts.literature_test_problems
 The script:
 
 - writes the generated files;
-- prints the counts per status, the number of formulas and every problem that it finds;
+- prints the counts per status, the numbers of active and retired formulas, and every problem that it finds;
 - exits with status 1 if there is a problem.
 
 It needs sympy, from the dev dependency group, and a Unix system, because it limits the time of parsing each row with `SIGALRM`.
@@ -203,6 +231,6 @@ CI does not regenerate `rows.csv`, because another sympy version could change a 
 - every decision is applied, and every final status follows its rules (§ Statuses): no row names an unknown or a later row, and no duplicate names an `incomplete` row;
 - every source file has its fields;
 - `summary.md` and `timeline.html` equal what the script builds from `rows.csv` and the source files;
-- `formulas.csv` holds every `new` row exactly once and no other row, the rows of each formula come from its own source, and the file equals what the script builds from `rows.csv` and `formula_decisions.csv`.
+- the active formulas of `formulas.csv` hold every `new` row exactly once and no other row, the rows of each formula come from its own source, and the file equals what the script builds from `rows.csv`, `formula_decisions.csv` and the file's own ids.
 
 A change to the parsing or matching in `scripts/literature_test_problems/`, or to the sympy version, is what the test does not check: whoever makes it regenerates `rows.csv`.

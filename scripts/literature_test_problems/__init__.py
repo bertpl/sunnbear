@@ -11,7 +11,7 @@ It runs in these stages:
 - **Overview** (`overview`; standard library only): write `summary.md` and `timeline.html` from `rows.csv` and the
   source files.
 - **Formulas** (`formulas`; standard library only): write `formulas.csv`, which maps each formula id of category 1
-  to its `new` rows, from `rows.csv` and `formula_decisions.csv`.
+  to its rows, from `rows.csv` and `formula_decisions.csv`, keeping every id of the committed `formulas.csv`.
 
 The folder's README gives the format of each file and the rules that decide a row's status.
 """

@@ -3,7 +3,6 @@
 import csv
 import re
 import tomllib
-from collections import Counter
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
@@ -171,17 +170,20 @@ class Source:
     # --------------------------------------------------------------------------
     @staticmethod
     def _rows_from_toml(source_id: str, tables: list[dict], file_name: str) -> tuple[SourceRow, ...]:
-        """Return the rows of a source file, adding a suffix `#2`, `#3`, ... to each repeat of a key."""
+        """Return the rows of a source file, or raise `DataFileError` if 2 rows have the same key.
+
+        A row's id is fixed by its key alone, not by its position, so that adding a row never changes the id of
+        another row; a key that the source repeats is written with a suffix `#2`, `#3`, ... in the file.
+        """
         rows = []
-        seen_keys: Counter[str] = Counter()
+        seen_keys: set[str] = set()
         for i, table in enumerate(tables):
             key = str(table.get("key", "")).strip()
-            seen_keys[key] += 1
-            if seen_keys[key] > 1:
-                row_id = f"{source_id}:{key}#{seen_keys[key]}"
+            if key in seen_keys:
+                raise DataFileError(f"{file_name}, row {i + 1}: the key {key!r} is in more than 1 row")
             else:
-                row_id = f"{source_id}:{key}"
-            rows.append(SourceRow.from_toml(table, row_id, where=f"{file_name}, row {i + 1}"))
+                seen_keys.add(key)
+                rows.append(SourceRow.from_toml(table, f"{source_id}:{key}", where=f"{file_name}, row {i + 1}"))
         return tuple(rows)
 
     # --------------------------------------------------------------------------
@@ -407,6 +409,11 @@ class RowsTableLine:
     def key(self) -> str:
         """Return the row's key within its source, with the suffix of a repeated key."""
         return self.row_id.split(":", 1)[1]
+
+    @property
+    def subcategory_number(self) -> tuple[int, ...]:
+        """Return the subcategory as a taxonomy number, such as `(1, 4)` for `1.4`."""
+        return tuple(int(part) for part in self.subcategory.split("."))
 
     def to_csv_line(self) -> dict[str, str]:
         """Return the row as 1 line of `rows.csv`, keyed by column."""

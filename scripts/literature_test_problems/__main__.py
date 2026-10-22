@@ -48,15 +48,16 @@ def main() -> int:
     folder.summary_file.write_text(overview.summary_markdown(), encoding="utf-8")
     folder.timeline_file.write_text(overview.timeline_html(), encoding="utf-8")
     # --- formulas stage -------------------------
-    formulas_table = FormulasTable.build(rows, formula_decisions)
-    folder.formulas_file.write_text(formulas_table.csv_text(), encoding="utf-8")
+    formulas_table, formula_id_problems = FormulasTable.update_file(folder.formulas_file, rows, formula_decisions)
     # --- report ---------------------------------
     print(f"{len(sources)} sources, {len(rows)} rows")
     print("automatic status:", dict(Counter(row.automatic_status.status for row in rows).most_common()))
     print("final status:", dict(Counter(row.final_status.status for row in rows).most_common()))
-    print(f"{len(formulas_table.formulas)} formulas")
+    n_retired = sum(formula.is_retired for formula in formulas_table.formulas)
+    print(f"{len(formulas_table.formulas) - n_retired} formulas, {n_retired} retired")
     problems = find_problems(final_statuses, decisions)
     problems += FormulaDecision.find_all_problems(formula_decisions, rows)
+    problems += formula_id_problems
     for problem in problems:
         print(f"problem: {problem}")
     if problems:

@@ -97,7 +97,7 @@ name = 'humps'
 notes = "MATLAB's demo function `humps`, which §4.10 says illustrates graphics, quadrature and zero-finding routines; §4.7 names the handle `@humps` as an example of syntax. The chapter uses it only for minimization: `fmintx` minimizes `-humps(x)` on `[-1, 2]` (§4.10, Figure 4.8; Ex. 4.17)."
 
 [[rows]]
-key = '§4.7'
+key = '§4.7#2'
 f = 'cos(pi*t)'
 notes = 'An example of anonymous-function syntax, `F = @(t) cos(pi*t)`, with no interval or result.'
 
@@ -108,7 +108,7 @@ interval = '`[0, 3]` (Ex. 4.1); `[2, 3]` (Ex. 4.2)'
 notes = "§4.7 writes it as the anonymous function `G = @(z) z^3-2*z-5`, an example of syntax. Ex. 4.2: Wallis used it when he first presented Newton's method to the French Academy; it has 1 real root, between 2 and 3, and a pair of complex conjugate roots. Ex. 4.2 asks for the 3 roots symbolically and with `roots`, for the real root with `fzerotx`, and for a complex root by Newton's method from a complex starting value."
 
 [[rows]]
-key = '§4.7'
+key = '§4.7#3'
 f = 'J0(x) - y'
 parameters = 'y = 0.5'
 interval = '`[0, 2]`; `[0, 10*pi]` (Figure 4.2)'
@@ -120,22 +120,22 @@ f = 'sin(x)'
 interval = '[1, 4]'
 
 [[rows]]
-key = 'Ex. 4.1'
+key = 'Ex. 4.1#2'
 f = 'x^3 - 0.001'
 interval = '[-1, 1]'
 
 [[rows]]
-key = 'Ex. 4.1'
+key = 'Ex. 4.1#3'
 f = 'log(x + 2/3)'
 interval = '[0, 1]'
 
 [[rows]]
-key = 'Ex. 4.1'
+key = 'Ex. 4.1#4'
 f = 'atan(x) - pi/3'
 interval = '[0, 5]'
 
 [[rows]]
-key = 'Ex. 4.1'
+key = 'Ex. 4.1#5'
 f = '1/(x - pi)'
 interval = '[0, 5]'
 notes = 'No root: the sign change on `[0, 5]` comes from the pole at `x = pi`.'

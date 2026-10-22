@@ -65,7 +65,7 @@ interval = '`[0, 2]` (Fig. 2.2)'
 notes = 'Root 1. Figure only, plotted on `[0, 2]`: its flat plateau means that `abs(f) < 1E-7` only guarantees `x` within `1E-1` of the root.'
 
 [[rows]]
-key = 'Fig. 2.2'
+key = 'Fig. 2.2#2'
 f = '(x - 1)^(1/7)'
 interval = '`[0, 2]` (Fig. 2.2)'
 notes = 'Root 1; the real 7th root. Figure only, plotted on `[0, 2]`: nearly vertical at the root, so `x` within `1E-7` of it still gives `f` about `1E-1`.'
@@ -234,12 +234,12 @@ f = 'x = exp(x)'
 notes = 'No fixed point: the graphs of `exp(x)` and `x` never intersect.'
 
 [[rows]]
-key = '§2.3 (p. 84)'
+key = '§2.3 (p. 84)#2'
 f = 'x = log(x)'
 notes = 'No fixed point; as `x = exp(x)`.'
 
 [[rows]]
-key = '§2.3 (p. 84)'
+key = '§2.3 (p. 84)#3'
 f = 'x = x^2 + 1'
 notes = 'No fixed point; as `x = exp(x)`.'
 
@@ -400,7 +400,7 @@ f = 'x^5 - 3.4*x^4 + 5.4531*x^3 - 4.20772*x^2 + 1.50924*x - 0.20304'
 notes = 'Roots 0.45, 0.47, 0.48 and `1 ± i`; as Ex. 2.19.'
 
 [[rows]]
-key = 'Ex. 2.21'
+key = 'Ex. 2.21#2'
 f = '4*x^4 - 9*x^3 + 3*x^2 + 5*x - 3'
 notes = "Simple root -0.75 and triple root 1. As Ex. 2.19: Laguerre's method returns 1 real root and a complex pair clustered around 1."
 
