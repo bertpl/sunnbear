@@ -5,18 +5,13 @@ do not regenerate the formula modules of category 1 in sunnbear's catalog; they 
 survey.
 """
 
-import importlib
-import importlib.util
 import re
 import sys
-from pathlib import Path
-from types import ModuleType
 
 import pytest
 
 from sunnbear.functions import FormulaRegistry, FormulaSource
 
-_PACKAGE_DIR = Path(__file__).resolve().parents[2] / "scripts" / "literature_test_problems"
 _CATEGORY_1_FORMULAS = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 1]
 # _FIRST_RUN_LINES are the rows of a small survey on its first run, each as (row id, subcategory, final status).
 _FIRST_RUN_LINES = [
@@ -34,24 +29,6 @@ _FIRST_RUN_LINES = [
 # ==================================================================================================
 #  Fixtures
 # ==================================================================================================
-@pytest.fixture(scope="module")
-def script_modules() -> dict[str, ModuleType]:
-    """Return the script's modules that the tests use, keyed by name.
-
-    They are imported by path, because the `scripts` folder is not an installed package.
-    """
-    spec = importlib.util.spec_from_file_location(
-        "literature_test_problems", _PACKAGE_DIR / "__init__.py", submodule_search_locations=[str(_PACKAGE_DIR)]
-    )
-    package = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = package
-    spec.loader.exec_module(package)
-    return {
-        name: importlib.import_module(f"literature_test_problems.{name}")
-        for name in ("data_files", "statuses", "overview", "formulas", "formula_modules")
-    }
-
-
 @pytest.fixture(scope="module")
 def folder(script_modules):
     """Return the repo's data folder."""
@@ -267,7 +244,7 @@ def test_category_1_formula_matches_the_survey(formula, script_modules, sources,
 
     A generated module's hash must equal the hash of its survey fields, so that a module left stale after a change
     of the survey fails; a module without a hash must be the hand-written module of a formula whose row only
-    describes its function.
+    describes its function, or of 1 of the generator's `HAND_WRITTEN_FORMULAS`.
     """
     # --- arrange ----------------------
     line = {line.number: line for line in committed_formulas_table.formulas}[formula.number]
@@ -283,7 +260,7 @@ def test_category_1_formula_matches_the_survey(formula, script_modules, sources,
     assert category.name == source.short_title
     assert formula.source == FormulaSource(reference=source.reference, location=location)
     if survey_fields_hash is None:
-        assert any(source.find_row(row_id).f_description for row_id in line.row_ids)
+        assert script_modules["formula_modules"].is_hand_written(line, source)
     else:
         assert survey_fields_hash == script_modules["formula_modules"].FormulaModuleSpec.survey_fields_hash(
             line, source
@@ -570,16 +547,17 @@ def test_formulas_table_keeps_a_retired_id_that_a_person_resolved(script_modules
     # --- arrange ----------------------
     formulas_module = script_modules["formulas"]
     formulas_table_line_cls = formulas_module.FormulasTableLine
+    no_function_decision = script_modules["data_files"].FunctionDecision()
     # a person resolved the join of f1.1.2.1 and f1.1.2.2: f1.1.2.1 holds d:1, d:2 and d:3, f1.1.2.2 is retired, and
     # the formula of a removed row x:1 was retired too
     resolved_table = formulas_module.FormulasTable(
         (
-            formulas_table_line_cls((1, 1, 1, 1), "a", ("a:1",), "", is_retired=False),
-            formulas_table_line_cls((1, 1, 1, 2), "a", ("a:3",), "", is_retired=False),
-            formulas_table_line_cls((1, 1, 1, 3), "a", ("a:9",), "", is_retired=True),
-            formulas_table_line_cls((1, 1, 2, 1), "d", ("d:1", "d:2", "d:3"), "", is_retired=False),
-            formulas_table_line_cls((1, 1, 2, 2), "d", ("d:2",), "", is_retired=True),
-            formulas_table_line_cls((1, 2, 1, 1), "c", ("c:1",), "", is_retired=False),
+            formulas_table_line_cls((1, 1, 1, 1), "a", ("a:1",), no_function_decision, is_retired=False),
+            formulas_table_line_cls((1, 1, 1, 2), "a", ("a:3",), no_function_decision, is_retired=False),
+            formulas_table_line_cls((1, 1, 1, 3), "a", ("a:9",), no_function_decision, is_retired=True),
+            formulas_table_line_cls((1, 1, 2, 1), "d", ("d:1", "d:2", "d:3"), no_function_decision, is_retired=False),
+            formulas_table_line_cls((1, 1, 2, 2), "d", ("d:2",), no_function_decision, is_retired=True),
+            formulas_table_line_cls((1, 2, 1, 1), "c", ("c:1",), no_function_decision, is_retired=False),
         )
     )
     later_lines = [*_FIRST_RUN_LINES, ("a:4", "1.1", "new"), ("d:4", "1.1", "new")]
@@ -602,20 +580,20 @@ def test_formulas_table_keeps_a_retired_id_that_a_person_resolved(script_modules
 @pytest.mark.parametrize(
     "lines, expected_message",
     [
-        (["f1.1.1.1,active,zz,a:1,"], "a formula names a row of another source than its source_id"),
-        (["f1.1.1.1,active,a"], "the line of f1.1.1.1 does not have 5 fields"),
-        (["f1.1.1.1,active,a,a:1,", "f1.1.1.2,active,a,a:1,"], "a row is in more than 1 active formula"),
-        (["f1.1.1.1,active,a,a:1,", "f1.1.1.1,retired,a,a:2,"], "an id is in more than 1 line"),
-        (["f1.1.1.1,active,a,a:1,", "f1.1.1.2,active,b,b:1,"], "a source number belongs to more than 1 source"),
-        (["f1.1.1.1,active,a,a:1,", "f1.1.2.1,active,a,a:2,"], "a source has more than 1 number in 1 subcategory"),
-        (["g1.1.1.1,active,a,a:1,"], "the line of g1.1.1.1 breaks the format"),
+        (["f1.1.1.1,active,zz,a:1,,,"], "a formula names a row of another source than its source_id"),
+        (["f1.1.1.1,active,a"], "the line of f1.1.1.1 does not have 7 fields"),
+        (["f1.1.1.1,active,a,a:1,,,", "f1.1.1.2,active,a,a:1,,,"], "a row is in more than 1 active formula"),
+        (["f1.1.1.1,active,a,a:1,,,", "f1.1.1.1,retired,a,a:2,,,"], "an id is in more than 1 line"),
+        (["f1.1.1.1,active,a,a:1,,,", "f1.1.1.2,active,b,b:1,,,"], "a source number belongs to more than 1 source"),
+        (["f1.1.1.1,active,a,a:1,,,", "f1.1.2.1,active,a,a:2,,,"], "a source has more than 1 number in 1 subcategory"),
+        (["g1.1.1.1,active,a,a:1,,,"], "the line of g1.1.1.1 breaks the format"),
     ],
 )
 def test_formulas_table_read_rejects_a_broken_file(script_modules, tmp_path, lines, expected_message):
     """`FormulasTable.read` raises `DataFileError` for each way that a file, such as one edited by hand, can break."""
     # --- arrange ----------------------
     path = tmp_path / "formulas.csv"
-    path.write_text("\n".join(["formula_id,status,source_id,row_ids,variable_change", *lines]) + "\n")
+    path.write_text("\n".join(["formula_id,status,source_id,row_ids,variable_change,f,parameters", *lines]) + "\n")
 
     # --- act / assert -----------------
     with pytest.raises(script_modules["data_files"].DataFileError, match=re.escape(expected_message)):
@@ -671,8 +649,9 @@ def test_formulas_table_read_of_a_missing_file_is_empty(script_modules, tmp_path
 def test_formula_decision_find_problems(script_modules, row_ids, expected_problems):
     """`FormulaDecision.find_problems` reports each row that a formula may not hold, and nothing for allowed rows."""
     # --- arrange ----------------------
-    formula_decision = script_modules["data_files"].FormulaDecision(
-        row_ids, "", "the same function on another interval"
+    data_files = script_modules["data_files"]
+    formula_decision = data_files.FormulaDecision(
+        row_ids, data_files.FunctionDecision(), "the same function on another interval"
     )
     status_by_row_id = {"s:1": "new", "s:2": "duplicate", "s:3": "new", "t:1": "new"}
 
@@ -707,9 +686,10 @@ def _rows_table_lines(script_modules, lines):
 
 def _formula_decisions(script_modules, decided_row_id_groups):
     """Return a formula decision for each tuple of row ids of `decided_row_id_groups`."""
-    formula_decision_cls = script_modules["data_files"].FormulaDecision
+    data_files = script_modules["data_files"]
     return [
-        formula_decision_cls(row_ids, "", "the same function on another interval") for row_ids in decided_row_id_groups
+        data_files.FormulaDecision(row_ids, data_files.FunctionDecision(), "the same function on another interval")
+        for row_ids in decided_row_id_groups
     ]
 
 

@@ -1,23 +1,23 @@
-row_ids,variable_change,reason
-1992_alefeld_potra:1 | 1992_alefeld_potra:4,,"`x^3 - a`, with `a = 1` (1) and `a = -1` (4)."
-"2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c) | 2006_bradie:Fig. 2.7; Ex. 2.6, 2.7, 2.14, 2.15",,The same function `exp(-x) - x` on other intervals; Fig. 2.7 gives it as the fixed-point form `x = exp(-x)`.
-"2013_epperson:3.1-1, 3.1-3(a), 3.1-10; 3.2-2, 3.2-5(h); 3.3-3(h); 3.8-1, 3.8-2 | 2013_epperson:3.1-2(c)",,"`x^3 - a`, with `a = 2` (3.1-1) and `a = 3` (3.1-2(c))."
-2013_stage:3.11 | 2013_stage:3.12,,"A unit step at `x = 1/3` shifted down by `c`, `-c` if `x <= 1/3` and `1 - c` otherwise, with `c = 0.5` (3.11) and `c = 10^-3` (3.12)."
-"2015_chapra:§8.2, (8.14)","the pH, as `f(10^-pH)` on `[2, 12]`","The book prints the charge balance (8.14) in `H` and bisects on the pH from 2 to 12; 11 bisection steps of `f(10^-pH)` give pH 5.6279 for 1958 and 5.5889 for 2003, which match the book's 5.6279 and 5.59."
-2015_chapra:Prob. 5.18,"the temperature `T` in °C, as `f(T + 273.15)` on `[0, 40]`","The problem gives the formula in the absolute temperature `Ta` and asks for `T` in °C, with initial guesses 0 and 40 °C; the formula gives the book's 14.621 mg/L at 0 °C and 6.413 mg/L at 40 °C."
-2016_burden:2.1-5(a); 2.5-8 | 2016_burden:§2.2 Ex. 3; Fig. 2.5; 2.5-1(c) | 2016_burden:2.2-10,,"`x - a^-x`, with `a = 2` (2.1-5(a)), `a = 3` (§2.2 Ex. 3, the fixed-point form `x = 3^-x`) and `a = 2` (2.2-10, the fixed-point form `x = 2^-x`); the book's 2.5-8 compares the root of `x - 2^-x` on `[0, 1]` with 2.2-10."
-2016_burden:2.1-5(c) | 2016_burden:2.3-6(c),,"`2*x*cos(2*x) - (x - a)^2`, with `a = -1` (2.1-5(c), printed with `(x + 1)^2`) and `a = 2` (2.3-6(c))."
-2019_sabharwal:T2.1 | 2019_sabharwal:T2.2 | 2019_sabharwal:T2.3,,"`x^2 - a`, with `a = 3` (T2.1), `a = 5` (T2.2) and `a = 10` (T2.3)."
-roots_fortran:69 | roots_fortran:105,,"`x^2 - a`, with `a = 1` (69) and `a = 10` (105)."
-roots_fortran:71–72 | roots_fortran:132,,The same function `x` on other intervals.
-roots_fortran:91 | roots_fortran:92,,"`exp(x) + x - a`, with `a = 20` (91) and `a = 5` (92)."
-2026_ellithy:16 | 2026_ellithy:37,,"`sin(a*x) - b*x`, with `a = 10, b = 0.5` (16) and `a = 20, b = 0.3` (37)."
-2026_ellithy:17 | 2026_ellithy:28 | 2026_ellithy:44,,"Kepler's equation `x - e*sin(x) - M`, with `e = 0.8, M = 1.2` (17), `e = 0.5, M = 1` (28) and `e = 0.99, M = 2` (44)."
-2026_ellithy:20 | 2026_ellithy:39,,"`exp(x^2) - exp(c*x)`, with `c = sqrt(2)` (20) and `c = 1.2` (39)."
-2026_ellithy:30 | 2026_ellithy:31,,"The same function, Wilkinson's polynomial `(x - 1)*(x - 2)*...*(x - 20)`, on other intervals."
-2026_ganchovski_et_al:f38 | 2026_ganchovski_et_al:f39,,"A unit step at `x = 1/3` shifted down by `c`, `if(x <= 1/3; -c; 1 - c)`, with `c = 0.5` (f38) and `c = 10^-3` (f39)."
-2026_ganchovski_et_al:f47 | 2026_ganchovski_et_al:f48,,"`1/sqrt(x) - 2*log(5*10^k*sqrt(x)) + 0.8`, with `k = 3` (f47) and `k = 7` (f48)."
-ganchovski_test_functions:f93 | ganchovski_test_functions:f94 | ganchovski_test_functions:f95 | ganchovski_test_functions:f96 | ganchovski_test_functions:f97 | ganchovski_test_functions:f98 | ganchovski_test_functions:f99,,"`x^n - 0.001`, with `n = 5, 7, ..., 17` (f93 to f99); the source presents the 7 rows as 1 family, named Flat function 1 to Flat function 7."
-roots_jl:func2 | roots_jl:f3,,"The same function `exp(x) - x^4` on other intervals, in `test_derivative_free.jl` (func2) and `runbenchmarks.jl` (f3)."
-roots_jl:func9 | roots_jl:f7,,"The same function `tanh(x) - tan(x)` on other intervals, in `test_derivative_free.jl` (func9) and `runbenchmarks.jl` (f7)."
-roots_jl:f5 | roots_jl:f6,,The same function `x^2 - exp(x) - 3*x + 2` on other intervals.
+row_ids,variable_change,f,parameters,reason
+1992_alefeld_potra:1 | 1992_alefeld_potra:4,,,,"`x^3 - a`, with `a = 1` (1) and `a = -1` (4)."
+"2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c) | 2006_bradie:Fig. 2.7; Ex. 2.6, 2.7, 2.14, 2.15",,,,The same function `exp(-x) - x` on other intervals; Fig. 2.7 gives it as the fixed-point form `x = exp(-x)`.
+"2013_epperson:3.1-1, 3.1-3(a), 3.1-10; 3.2-2, 3.2-5(h); 3.3-3(h); 3.8-1, 3.8-2 | 2013_epperson:3.1-2(c)",,,,"`x^3 - a`, with `a = 2` (3.1-1) and `a = 3` (3.1-2(c))."
+2013_stage:3.11 | 2013_stage:3.12,,,,"A unit step at `x = 1/3` shifted down by `c`, `-c` if `x <= 1/3` and `1 - c` otherwise, with `c = 0.5` (3.11) and `c = 10^-3` (3.12)."
+"2015_chapra:§8.2, (8.14)","the pH, as `f(10^-pH)` on `[2, 12]`",,,"The book prints the charge balance (8.14) in `H` and bisects on the pH from 2 to 12; 11 bisection steps of `f(10^-pH)` give pH 5.6279 for 1958 and 5.5889 for 2003, which match the book's 5.6279 and 5.59."
+2015_chapra:Prob. 5.18,"the temperature `T` in °C, as `f(T + 273.15)` on `[0, 40]`",,,"The problem gives the formula in the absolute temperature `Ta` and asks for `T` in °C, with initial guesses 0 and 40 °C; the formula gives the book's 14.621 mg/L at 0 °C and 6.413 mg/L at 40 °C."
+2016_burden:2.1-5(a); 2.5-8 | 2016_burden:§2.2 Ex. 3; Fig. 2.5; 2.5-1(c) | 2016_burden:2.2-10,,,,"`x - a^-x`, with `a = 2` (2.1-5(a)), `a = 3` (§2.2 Ex. 3, the fixed-point form `x = 3^-x`) and `a = 2` (2.2-10, the fixed-point form `x = 2^-x`); the book's 2.5-8 compares the root of `x - 2^-x` on `[0, 1]` with 2.2-10."
+2016_burden:2.1-5(c) | 2016_burden:2.3-6(c),,,,"`2*x*cos(2*x) - (x - a)^2`, with `a = -1` (2.1-5(c), printed with `(x + 1)^2`) and `a = 2` (2.3-6(c))."
+2019_sabharwal:T2.1 | 2019_sabharwal:T2.2 | 2019_sabharwal:T2.3,,,,"`x^2 - a`, with `a = 3` (T2.1), `a = 5` (T2.2) and `a = 10` (T2.3)."
+roots_fortran:69 | roots_fortran:105,,,,"`x^2 - a`, with `a = 1` (69) and `a = 10` (105)."
+roots_fortran:71–72 | roots_fortran:132,,,,The same function `x` on other intervals.
+roots_fortran:91 | roots_fortran:92,,,,"`exp(x) + x - a`, with `a = 20` (91) and `a = 5` (92)."
+2026_ellithy:16 | 2026_ellithy:37,,,,"`sin(a*x) - b*x`, with `a = 10, b = 0.5` (16) and `a = 20, b = 0.3` (37)."
+2026_ellithy:17 | 2026_ellithy:28 | 2026_ellithy:44,,,,"Kepler's equation `x - e*sin(x) - M`, with `e = 0.8, M = 1.2` (17), `e = 0.5, M = 1` (28) and `e = 0.99, M = 2` (44)."
+2026_ellithy:20 | 2026_ellithy:39,,,,"`exp(x^2) - exp(c*x)`, with `c = sqrt(2)` (20) and `c = 1.2` (39)."
+2026_ellithy:30 | 2026_ellithy:31,,,,"The same function, Wilkinson's polynomial `(x - 1)*(x - 2)*...*(x - 20)`, on other intervals."
+2026_ganchovski_et_al:f38 | 2026_ganchovski_et_al:f39,,if(x <= 1/3; -d; 1 - d),d = 0.5 | d = 10^-3,"A unit step at `x = 1/3` shifted down by `d`, `if(x <= 1/3; -d; 1 - d)`, with `d = 0.5` (f38) and `d = 10^-3` (f39)."
+2026_ganchovski_et_al:f47 | 2026_ganchovski_et_al:f48,,1/sqrt(x) - 2*log(5*10^k*sqrt(x)) + 0.8,k = 3 | k = 7,"`1/sqrt(x) - 2*log(5*10^k*sqrt(x)) + 0.8`, with `k = 3` (f47) and `k = 7` (f48)."
+ganchovski_test_functions:f93 | ganchovski_test_functions:f94 | ganchovski_test_functions:f95 | ganchovski_test_functions:f96 | ganchovski_test_functions:f97 | ganchovski_test_functions:f98 | ganchovski_test_functions:f99,,,,"`x^n - 0.001`, with `n = 5, 7, ..., 17` (f93 to f99); the source presents the 7 rows as 1 family, named Flat function 1 to Flat function 7."
+roots_jl:func2 | roots_jl:f3,,,,"The same function `exp(x) - x^4` on other intervals, in `test_derivative_free.jl` (func2) and `runbenchmarks.jl` (f3)."
+roots_jl:func9 | roots_jl:f7,,,,"The same function `tanh(x) - tan(x)` on other intervals, in `test_derivative_free.jl` (func9) and `runbenchmarks.jl` (f7)."
+roots_jl:f5 | roots_jl:f6,,,,The same function `x^2 - exp(x) - 3*x + 2` on other intervals.

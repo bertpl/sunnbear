@@ -1,0 +1,53 @@
+"""This category holds the formulas of Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
+
+A script generates this package from the survey of published test problems: to change it, change the survey and run
+`scripts/literature_test_problems/formula_modules.py`, never this file.
+"""
+
+from sunnbear._core.functions.core import FormulaCategory
+
+from . import (
+    f01_f24,
+    f02_f25,
+    f03_f26,
+    f04_f27,
+    f05_f29,
+    f06_f34,
+    f07_f35,
+    f08_f36,
+    f09_f37,
+    f10_f38,
+    f11_f40,
+    f12_f42,
+    f13_f43,
+    f14_f44,
+    f15_f45,
+    f16_f46,
+    f17_f47,
+    f18_f49,
+    f19_f75,
+    f20_f76,
+    f21_f81,
+    f22_f84,
+    f23_f85,
+    f24_f86,
+    f25_f87,
+    f26_f88,
+    f27_f89,
+    f28_f90,
+    f29_f91,
+    f30_f92,
+)
+
+
+class GanchovskiSmithRackauckasTomovTraykov2026(FormulaCategory):
+    """`GanchovskiSmithRackauckasTomovTraykov2026` is the category of the formulas of 1 publication.
+
+    Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to the modified
+    Anderson–Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. https://doi.org/10.3390/a19050332.
+    Supplementary materials: https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder `MDPI-Algorithms-
+    Data` of the authors' repository https://github.com/Just-A-Random-Geek/ModAB-Root-Finding.
+    """
+
+    number = (1, 1, 13)
+    name = "Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026)"

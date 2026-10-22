@@ -1,0 +1,80 @@
+"""This module holds the formula of 4 in Ford (1997).
+
+A script generates this module from the survey of published test problems: to change the formula, change its source file
+in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
+1997_ford`, never this file.
+"""
+
+import math
+
+from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+
+# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
+# survey, so that a test fails when the survey changes and this module is not regenerated.
+SURVEY_FIELDS_HASH = "d540263d14077040"
+
+
+class Ford19974(Formula):
+    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+
+    The source prints ``2*x*exp(-20) + 1 - 2*exp(-20*x)``; the formula's interval is `[0, 1]`; `[-0.1, 1.5]`; `[-0.5,
+    2]`.
+
+    Printed root: `x* = 0.034657358821882`.
+    """
+
+    number = (1, 1, 8, 4)
+    name = "4"
+    param_names = ("a", "b")
+    source = FormulaSource(
+        reference=(
+            "Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear "
+            "equations. Scientia Iranica 4(1&2), 28–34. The article has no working DOI: the journal's "
+            "page, https://scientiairanica.sharif.edu/article_21758.html, lists "
+            "10.24200/sci.2020.21758, which doi.org does not resolve. An earlier version is the "
+            "University of Essex technical report CSM-257 (1995)."
+        ),
+        location="4",
+    )
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
+        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        x = x - (b - a) * c
+        return 2 * x * math.exp(-20) + 1 - 2 * math.exp(-20 * x)
+
+    def interval_bounds(self, a: float, b: float) -> tuple[float, float]:
+        """Return the interval of the tuple, its parameters ``a`` and ``b``."""
+        return (a, b)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the published parameter values."""
+        return (
+            ParamTable(
+                names=("a", "b"),
+                rows=(
+                    (
+                        0.0,
+                        1.0,
+                    ),
+                    (
+                        -0.1,
+                        1.5,
+                    ),
+                    (
+                        -0.5,
+                        2.0,
+                    ),
+                ),
+            ),
+        )
+
+    cases = (
+        FormulaTestCase.value(params={"a": 0.0, "b": 1.0}, x=0.3, c=0.0, expected=0.9950424968833594),
+        FormulaTestCase.value(params={"a": 0.0, "b": 1.0}, x=0.3, c=0.25, expected=0.26424111786323057),
+        FormulaTestCase.value(params={"a": -0.1, "b": 1.5}, x=0.38, c=0.0, expected=0.9989990986995956),
+        FormulaTestCase.value(params={"a": -0.5, "b": 2.0}, x=0.25, c=0.0, expected=0.9865241070324059),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 1.0}, expected=(0.0, 1.0)),
+        FormulaTestCase.interval_bounds(params={"a": -0.1, "b": 1.5}, expected=(-0.1, 1.5)),
+        FormulaTestCase.interval_bounds(params={"a": -0.5, "b": 2.0}, expected=(-0.5, 2.0)),
+    )

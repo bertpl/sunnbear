@@ -1,0 +1,72 @@
+"""This module holds the formula of T4.1 r1-2 in Brent (1973).
+
+A script generates this module from the survey of published test problems: to change the formula, change its source file
+in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
+1973_brent_book`, never this file.
+"""
+
+from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+
+# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
+# survey, so that a test fails when the survey changes and this module is not regenerated.
+SURVEY_FIELDS_HASH = "9181c5246b466c2b"
+
+
+class Brent1973T41R12(Formula):
+    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+
+    The source prints ``x^9``; the formula's interval is `[-1.0, +1.1]` with `t = 1E-9`; `[-1.0, +4.0]` with `t =
+    1E-20`.
+
+    Section 2 (p. 48) also names `x^9`: on an IBM 360, `f` vanished on an interval through underflow, and Dekker's
+    procedure then took many small steps.
+    """
+
+    number = (1, 1, 4, 1)
+    name = "T4.1 r1-2"
+    param_names = ("a", "b")
+    source = FormulaSource(
+        reference=(
+            "Brent, R. P. (1973). Algorithms for Minimization without Derivatives. Prentice-Hall, "
+            "Englewood Cliffs, NJ. ISBN 0-13-022335-2. Author's scan: "
+            "https://maths-people.anu.edu.au/~brent/pub/pub011.html. Erratum: Brent, R. P. (1975). "
+            "Table Errata 520. Mathematics of Computation, p. 1166."
+        ),
+        location="T4.1 r1-2",
+    )
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
+        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        x = x - (b - a) * c
+        return x**9
+
+    def interval_bounds(self, a: float, b: float) -> tuple[float, float]:
+        """Return the interval of the tuple, its parameters ``a`` and ``b``."""
+        return (a, b)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the published parameter values."""
+        return (
+            ParamTable(
+                names=("a", "b"),
+                rows=(
+                    (
+                        -1.0,
+                        1.1,
+                    ),
+                    (
+                        -1.0,
+                        4.0,
+                    ),
+                ),
+            ),
+        )
+
+    cases = (
+        FormulaTestCase.value(params={"a": -1.0, "b": 1.1}, x=-0.37, c=0.0, expected=-0.00012996173979507698),
+        FormulaTestCase.value(params={"a": -1.0, "b": 1.1}, x=-0.37, c=0.25, expected=-0.36847439787320274),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.0, expected=0.001953125),
+        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 1.1}, expected=(-1.0, 1.1)),
+        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 4.0}, expected=(-1.0, 4.0)),
+    )

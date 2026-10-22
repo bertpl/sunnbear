@@ -1,0 +1,89 @@
+"""This module holds the formula of T4.9 in Gao (2026).
+
+A script generates this module from the survey of published test problems: to change the formula, change its source file
+in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
+2026_gao`, never this file.
+"""
+
+import math
+
+from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+
+# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
+# survey, so that a test fails when the survey changes and this module is not regenerated.
+SURVEY_FIELDS_HASH = "4a80f5a33cafd182"
+
+
+class Gao2026T49(Formula):
+    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+
+    The source prints ``exp(x) - 2 - 0.01/x - 0.000002/x^3``; the formula's interval is `[2E-4, 1]`; `[2E-4, 3]`;
+    `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`.
+
+    sunnbear's tests use `exp(x) - 2 - 0.01/x^2 + 0.000002/x^3`.
+    """
+
+    number = (1, 1, 14, 7)
+    name = "T4.9"
+    param_names = ("a", "b")
+    source = FormulaSource(
+        reference=(
+            "Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied "
+            "Mathematics Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928."
+        ),
+        location="T4.9",
+    )
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
+        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        x = x - (b - a) * c
+        return math.exp(x) - 2 - 0.01 / x - 0.000002 / x**3
+
+    def interval_bounds(self, a: float, b: float) -> tuple[float, float]:
+        """Return the interval of the tuple, its parameters ``a`` and ``b``."""
+        return (a, b)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the published parameter values."""
+        return (
+            ParamTable(
+                names=("a", "b"),
+                rows=(
+                    (
+                        0.0002,
+                        1.0,
+                    ),
+                    (
+                        0.0002,
+                        3.0,
+                    ),
+                    (
+                        0.0002,
+                        9.0,
+                    ),
+                    (
+                        0.0002,
+                        27.0,
+                    ),
+                    (
+                        0.0002,
+                        81.0,
+                    ),
+                ),
+            ),
+        )
+
+    cases = (
+        FormulaTestCase.value(params={"a": 0.0002, "b": 1.0}, x=0.30014, c=0.0, expected=-0.6833439544624388),
+        FormulaTestCase.value(params={"a": 0.0002, "b": 1.0}, x=0.30014, c=0.25, expected=-1.1635909977164225),
+        FormulaTestCase.value(params={"a": 0.0002, "b": 3.0}, x=0.90014, c=0.0, expected=0.4488353545085476),
+        FormulaTestCase.value(params={"a": 0.0002, "b": 9.0}, x=2.70014, c=0.0, expected=12.878111419878008),
+        FormulaTestCase.value(params={"a": 0.0002, "b": 27.0}, x=8.10014, c=0.0, expected=3292.9280985513474),
+        FormulaTestCase.value(params={"a": 0.0002, "b": 81.0}, x=24.3001, c=0.0, expected=35760150646.19526),
+        FormulaTestCase.interval_bounds(params={"a": 0.0002, "b": 1.0}, expected=(0.0002, 1.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0002, "b": 3.0}, expected=(0.0002, 3.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0002, "b": 9.0}, expected=(0.0002, 9.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0002, "b": 27.0}, expected=(0.0002, 27.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0002, "b": 81.0}, expected=(0.0002, 81.0)),
+    )

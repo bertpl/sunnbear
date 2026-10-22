@@ -1,0 +1,57 @@
+"""This module holds the formula of 7.6-b in Tomov, Ganchovski (2026).
+
+A script generates this module from the survey of published test problems: to change the formula, change its source file
+in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
+2026_tomov_ganchovski`, never this file.
+"""
+
+from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+
+# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
+# survey, so that a test fails when the survey changes and this module is not regenerated.
+SURVEY_FIELDS_HASH = "72c405af35701987"
+
+
+class TomovGanchovski202676B(Formula):
+    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+
+    The source prints ``x - 1/4``; the formula's interval is endpoint pairs `(1/4, 1)` and `(1, 1/4)`.
+
+    The solver must return the endpoint root. The second pair gives the endpoints in reversed order.
+    """
+
+    number = (1, 1, 15, 2)
+    name = "7.6-b"
+    param_names = ()
+    source = FormulaSource(
+        reference=(
+            "Tomov, L., Ganchovski, N. (2026). Global convergence and reliable stopping in a "
+            "safeguarded modified Anderson–Björck method. arXiv preprint 2610.14193. "
+            "https://doi.org/10.48550/arxiv.2610.14193 (https://arxiv.org/abs/2610.14193). The authors'"
+            " C# code and benchmark definitions are in "
+            "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding; Section 7.3 pins commit "
+            "`9111cdcc6912401eb684a7b771df3a469795d5b8` (the preprint's reference [16]), and Section "
+            "7.4 pins commit `51a6d1b` (reference [17])."
+        ),
+        location="7.6-b",
+    )
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float) -> float:
+        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        x = x - 0.75 * c
+        return x - 1 / 4
+
+    def interval_bounds(self) -> tuple[float, float]:
+        """Return the formula's interval."""
+        return (0.25, 1.0)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return no recipe, since the published function has no parameters."""
+        return ()
+
+    cases = (
+        FormulaTestCase.value(params={}, x=0.475, c=0.0, expected=0.22499999999999998),
+        FormulaTestCase.value(params={}, x=0.475, c=0.25, expected=0.03749999999999998),
+        FormulaTestCase.interval_bounds(params={}, expected=(0.25, 1.0)),
+    )

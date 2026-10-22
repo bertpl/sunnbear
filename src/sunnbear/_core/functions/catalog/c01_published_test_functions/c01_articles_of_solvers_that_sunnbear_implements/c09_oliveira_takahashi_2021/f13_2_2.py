@@ -1,0 +1,54 @@
+"""This module holds the formula of 2.2 in Oliveira, Takahashi (2021).
+
+A script generates this module from the survey of published test problems: to change the formula, change its source file
+in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
+2021_oliveira_takahashi`, never this file.
+"""
+
+import math
+
+from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+
+# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
+# survey, so that a test fails when the survey changes and this module is not regenerated.
+SURVEY_FIELDS_HASH = "cc2de702231847da"
+
+
+class OliveiraTakahashi202122(Formula):
+    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+
+    The source prints ``exp(x)*(x*10^6 - 1)^3``; the formula's interval is ``[-1, 1]``.
+    """
+
+    number = (1, 1, 9, 13)
+    name = "2.2"
+    param_names = ()
+    source = FormulaSource(
+        reference=(
+            "Oliveira, I. F. D., Takahashi, R. H. C. (2021). An enhancement of the bisection method "
+            "average performance preserving minmax optimality. ACM Transactions on Mathematical "
+            "Software 47(1), Article 5. https://doi.org/10.1145/3423597. The article itself is dated "
+            "December 2020."
+        ),
+        location="2.2",
+    )
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float) -> float:
+        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        x = x - 2.0 * c
+        return math.exp(x) * (x * 10**6 - 1) ** 3
+
+    def interval_bounds(self) -> tuple[float, float]:
+        """Return the formula's interval."""
+        return (-1.0, 1.0)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return no recipe, since the published function has no parameters."""
+        return ()
+
+    cases = (
+        FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-4.29008047007074e16),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-2.9639026991626765e17),
+        FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
+    )

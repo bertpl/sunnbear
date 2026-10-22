@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "a2ee3c96371c4032"
+SURVEY_FIELDS_HASH = "db43ba3a20c3e339"
 
 
 class DowellJarratt1971Table6(Formula):

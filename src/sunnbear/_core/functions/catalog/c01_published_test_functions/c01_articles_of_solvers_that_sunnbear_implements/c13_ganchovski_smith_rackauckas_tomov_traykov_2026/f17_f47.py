@@ -1,0 +1,61 @@
+"""This module holds the formula of f47, f48 in Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
+
+A script generates this module from the survey of published test problems: to change the formula, change its source file
+in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
+2026_ganchovski_et_al`, never this file.
+"""
+
+import math
+
+from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+
+# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
+# survey, so that a test fails when the survey changes and this module is not regenerated.
+SURVEY_FIELDS_HASH = "f984c1aa05702df9"
+
+
+class GanchovskiSmithRackauckasTomovTraykov2026F47(Formula):
+    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+
+    The source prints 1 function with other parameter values in 2 rows, which the formula writes as ``1/sqrt(x) -
+    2*log(5*10^k*sqrt(x)) + 0.8``:
+
+    - f47: ``1/sqrt(x) - 2*log(5*10^3*sqrt(x)) + 0.8``; the formula's interval is ``[0.0005, 0.5]``, with ``k = 3``
+    - f48: ``1/sqrt(x) - 2*log(5*10^7*sqrt(x)) + 0.8``; the formula's interval is ``[0.0005, 0.5]``, with ``k = 7``
+    """
+
+    number = (1, 1, 13, 17)
+    name = "f47"
+    param_names = ("k",)
+    source = FormulaSource(
+        reference=(
+            "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to "
+            "the modified Anderson–Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. "
+            "https://doi.org/10.3390/a19050332. Supplementary materials: "
+            "https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder "
+            "`MDPI-Algorithms-Data` of the authors' repository "
+            "https://github.com/Just-A-Random-Geek/ModAB-Root-Finding."
+        ),
+        location="f47, f48",
+    )
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, k: float) -> float:
+        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        x = x - 0.4995 * c
+        return 1 / math.sqrt(x) - 2 * math.log(5 * 10**k * math.sqrt(x)) + 0.8
+
+    def interval_bounds(self, k: float) -> tuple[float, float]:
+        """Return the formula's interval."""
+        return (0.0005, 0.5)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the published parameter values."""
+        return (ParamTable(names=("k",), rows=((3.0,), (7.0,))),)
+
+    cases = (
+        FormulaTestCase.value(params={"k": 3.0}, x=0.15035, c=0.0, expected=-11.760615174862355),
+        FormulaTestCase.value(params={"k": 3.0}, x=0.15035, c=0.25, expected=-6.299013786192742),
+        FormulaTestCase.value(params={"k": 7.0}, x=0.15035, c=0.0, expected=-30.181295918814723),
+        FormulaTestCase.interval_bounds(params={"k": 3.0}, expected=(0.0005, 0.5)),
+    )

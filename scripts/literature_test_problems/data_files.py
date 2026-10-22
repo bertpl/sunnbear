@@ -4,7 +4,7 @@ import csv
 import re
 import tomllib
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 # SUBCATEGORY_DESCRIPTIONS describes each subcategory of category 1 of sunnbear's formula catalog; the
@@ -18,12 +18,13 @@ SUBCATEGORY_DESCRIPTIONS = {
 DECIDED_STATUSES = ("new", "duplicate", "incomplete")
 # UNDECIDED is the status of a row that the script could not decide and that no decision covers yet.
 UNDECIDED = "undecided"
-# ROW_ID_SEPARATOR separates the row ids in 1 field.
+# ROW_ID_SEPARATOR separates the row ids in 1 field, and the rows' sets of values in the field `parameters` of
+# `formula_decisions.csv`.
 ROW_ID_SEPARATOR = " | "
 # DECISION_COLUMNS are the columns of `decisions.csv`, in order.
 DECISION_COLUMNS = ["row_id", "status", "duplicate_of", "derived_from", "reason"]
 # FORMULA_DECISION_COLUMNS are the columns of `formula_decisions.csv`, in order.
-FORMULA_DECISION_COLUMNS = ["row_ids", "variable_change", "reason"]
+FORMULA_DECISION_COLUMNS = ["row_ids", "variable_change", "f", "parameters", "reason"]
 
 
 class DataFileError(ValueError):
@@ -518,18 +519,53 @@ def write_rows_table(path: Path, rows: list[RowsTableLine]) -> None:
 #  Formula decisions
 # ==================================================================================================
 @dataclass(frozen=True)
+class FunctionDecision:
+    """A `FunctionDecision` holds how a person decided that a formula's function differs from the `f` of its rows.
+
+    All 3 fields are empty for a formula that takes the `f` of its first row as it is. Otherwise:
+
+    - `variable_change` describes the variable of a formula that takes another variable than that of its row's `f`;
+    - `f` is the function of a formula whose rows give 1 function with other values of a parameter, in its family
+      form, with that parameter as a name, such as `x^3 - a`;
+    - `parameters` gives each row's values of the parameters of `f`, 1 set per row in the order of the rows,
+      separated by `ROW_ID_SEPARATOR`, such as `a = 1 | a = -1`.
+    """
+
+    variable_change: str = ""
+    f: str = ""
+    parameters: str = ""
+
+    def row_parameters(self) -> list[str]:
+        """Return the sets of values of `parameters`, 1 per row, or [] if `parameters` is empty."""
+        if self.parameters:
+            return [values.strip() for values in self.parameters.split(ROW_ID_SEPARATOR.strip())]
+        else:
+            return []
+
+    def for_rows(self, decided_row_ids: tuple[str, ...], row_ids: tuple[str, ...]) -> "FunctionDecision":
+        """Return the decision for `row_ids`, some of the `decided_row_ids` in another order: its sets follow them."""
+        if self.parameters:
+            values_by_row_id = dict(zip(decided_row_ids, self.row_parameters(), strict=True))
+            return replace(self, parameters=ROW_ID_SEPARATOR.join(values_by_row_id[row_id] for row_id in row_ids))
+        else:
+            return self
+
+
+@dataclass(frozen=True)
 class FormulaDecision:
     """A `FormulaDecision` holds 1 line of `formula_decisions.csv`: the rows of 1 formula, decided by a person.
 
-    Without a decision, each `new` row is a formula of its own. A decision does 1 or both of these:
+    Without a decision, each `new` row is a formula of its own. A decision does 1 or more of these:
 
     - it puts several rows of 1 source that are obviously 1 function into 1 formula;
-    - it gives 1 row's formula a different variable from that of the row's `f`, and `variable_change` describes the
-      new variable.
+    - it gives 1 row's formula a different variable from that of the row's `f`;
+    - it gives the formula of several rows that give 1 function with other values of a parameter its family form.
+
+    `function` holds the last 2 (`FunctionDecision`).
     """
 
     row_ids: tuple[str, ...]
-    variable_change: str
+    function: FunctionDecision
     reason: str
 
     def find_problems(self, status_by_row_id: dict[str, str]) -> list[str]:
@@ -562,13 +598,26 @@ class FormulaDecision:
         """Return the decision of 1 line of `formula_decisions.csv`, or raise `DataFileError`.
 
         Raises:
-            DataFileError: If the line names no rows, gives no reason, or names 1 row and no variable change.
+            DataFileError: If 1 of these holds:
+
+                - the line names no rows or gives no reason;
+                - it names 1 row and no variable change;
+                - it gives `parameters` without `f`, or `f` without 1 set of `parameters` per row.
         """
-        decision = cls(tuple(split_row_ids(line["row_ids"])), line["variable_change"].strip(), line["reason"].strip())
+        function = FunctionDecision(
+            variable_change=line["variable_change"].strip(), f=line["f"].strip(), parameters=line["parameters"].strip()
+        )
+        decision = cls(tuple(split_row_ids(line["row_ids"])), function, line["reason"].strip())
         if not decision.row_ids or not decision.reason:
             raise DataFileError(f"{file_name}: each line needs row_ids and a reason")
-        elif len(decision.row_ids) == 1 and not decision.variable_change:
+        elif len(decision.row_ids) == 1 and not function.variable_change:
             raise DataFileError(f"{file_name}: {decision.row_ids[0]} is alone in its line but changes no variable")
+        elif bool(function.f) != bool(function.parameters):
+            raise DataFileError(
+                f"{file_name}: the line of {decision.row_ids[0]} needs both f and parameters, or neither"
+            )
+        elif function.parameters and len(function.row_parameters()) != len(decision.row_ids):
+            raise DataFileError(f"{file_name}: the parameters of {decision.row_ids[0]} do not give 1 set per row")
         else:
             return decision
 

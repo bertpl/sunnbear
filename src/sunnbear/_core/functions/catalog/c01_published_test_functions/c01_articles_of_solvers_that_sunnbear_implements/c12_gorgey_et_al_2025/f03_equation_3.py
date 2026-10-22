@@ -1,0 +1,71 @@
+"""This module holds the formula of Equation 3 in Gorgey et al. (2025).
+
+A script generates this module from the survey of published test problems: to change the formula, change its source file
+in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
+2025_gorgey`, never this file.
+"""
+
+import math
+
+from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+
+# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
+# survey, so that a test fails when the survey changes and this module is not regenerated.
+SURVEY_FIELDS_HASH = "f6bf7899b4ac1a5c"
+
+
+class GorgeyEtAl2025Equation3(Formula):
+    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+
+    The source prints ``(sin(x) - x/4)^3``; the formula's interval is `[-1, 2]`; `[-0.5, 1]` (the text below Table 4).
+
+    Root found: `0`. The text below Table 4 gives the interval `[-0.5, 1]`.
+    """
+
+    number = (1, 1, 12, 3)
+    name = "Equation 3"
+    param_names = ("a", "b")
+    source = FormulaSource(
+        reference=(
+            "Gorgey, A., Azim, F. A., Zulkifly, Z. H., Hassim, H. (2025). Efficiency of Ridders' method"
+            " in solving nonlinear equations using Scilab programming. Data Analytics and Applied "
+            "Mathematics 6(1), 23–35. https://doi.org/10.15282/daam.v6i1.11307."
+        ),
+        location="Equation 3",
+    )
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
+        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        x = x - (b - a) * c
+        return (math.sin(x) - x / 4) ** 3
+
+    def interval_bounds(self, a: float, b: float) -> tuple[float, float]:
+        """Return the interval of the tuple, its parameters ``a`` and ``b``."""
+        return (a, b)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the published parameter values."""
+        return (
+            ParamTable(
+                names=("a", "b"),
+                rows=(
+                    (
+                        -1.0,
+                        2.0,
+                    ),
+                    (
+                        -0.5,
+                        1.0,
+                    ),
+                ),
+            ),
+        )
+
+    cases = (
+        FormulaTestCase.value(params={"a": -1.0, "b": 2.0}, x=-0.1, c=0.0, expected=-0.0004190701450455845),
+        FormulaTestCase.value(params={"a": -1.0, "b": 2.0}, x=-0.1, c=0.25, expected=-0.15639950620951584),
+        FormulaTestCase.value(params={"a": -0.5, "b": 1.0}, x=-0.05, c=0.0, expected=-5.264654416755481e-05),
+        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 2.0}, expected=(-1.0, 2.0)),
+        FormulaTestCase.interval_bounds(params={"a": -0.5, "b": 1.0}, expected=(-0.5, 1.0)),
+    )

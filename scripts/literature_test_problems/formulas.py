@@ -15,13 +15,14 @@ from pathlib import Path
 from .data_files import (
     DataFileError,
     FormulaDecision,
+    FunctionDecision,
     RowsTableLine,
     join_row_ids,
     source_id_of_row_id,
     split_row_ids,
 )
 
-FORMULA_COLUMNS = ["formula_id", "status", "source_id", "row_ids", "variable_change"]
+FORMULA_COLUMNS = ["formula_id", "status", "source_id", "row_ids", "variable_change", "f", "parameters"]
 FORMULA_STATUSES = ("active", "retired")
 
 
@@ -74,8 +75,8 @@ class FormulasTable:
     @staticmethod
     def _group_new_rows(
         rows: list[RowsTableLine], formula_decisions: list[FormulaDecision]
-    ) -> list[tuple[str, tuple[str, ...], str]]:
-        """Return the formulas of the `new` rows, each as its source, its rows and its variable change.
+    ) -> list[tuple[str, tuple[str, ...], FunctionDecision]]:
+        """Return the formulas of the `new` rows, each as its source, its rows and its decided function.
 
         The sources come in time order and their formulas in the order of their rows: a formula of several rows comes
         at the position of its first row. A `new` row that no decision names is a formula of its own.
@@ -95,14 +96,14 @@ class FormulasTable:
                     continue
                 formula_decision = formula_decision_by_row_id.get(row.row_id)
                 if formula_decision is None:
-                    row_ids, variable_change = (row.row_id,), ""
+                    row_ids, function = (row.row_id,), FunctionDecision()
                 else:
                     # keep the decision's rows that are `new` rows of this source, in the source's order;
                     # FormulaDecision.find_problems reports the other rows that the decision names
                     row_ids = tuple(r.row_id for r in new_rows if r.row_id in formula_decision.row_ids)
-                    variable_change = formula_decision.variable_change
+                    function = formula_decision.function.for_rows(formula_decision.row_ids, row_ids)
                 placed_row_ids.update(row_ids)
-                formulas.append((source_id, row_ids, variable_change))
+                formulas.append((source_id, row_ids, function))
         return formulas
 
     @staticmethod
@@ -180,7 +181,7 @@ class FormulasTable:
         problems = committed_table.find_problems(rows)
         formulas_to_append = []
         # --- keep the committed ids -------------
-        for (source_id, row_ids, variable_change), numbers in zip(
+        for (source_id, row_ids, function), numbers in zip(
             formulas_of_new_rows, active_numbers_per_formula, strict=True
         ):
             joined_formula_ids = ", ".join(formula_by_number[number].formula_id for number in numbers)
@@ -194,10 +195,10 @@ class FormulasTable:
             elif numbers or matching_retired_numbers:
                 number = (numbers or matching_retired_numbers)[0]
                 formula_by_number[number] = replace(
-                    formula_by_number[number], row_ids=row_ids, variable_change=variable_change, is_retired=False
+                    formula_by_number[number], row_ids=row_ids, function=function, is_retired=False
                 )
             else:
-                formulas_to_append.append((source_id, row_ids, variable_change))
+                formulas_to_append.append((source_id, row_ids, function))
         # --- retire the rest --------------------
         for formula in committed_table.formulas:
             if not formula.is_retired and formula.number not in n_formulas_of_new_rows_by_number:
@@ -207,7 +208,7 @@ class FormulasTable:
         # --- append the other formulas ----------
         # the numbers of retired formulas count as taken too, so that no number is given twice
         formulas = list(formula_by_number.values())
-        for source_id, row_ids, variable_change in formulas_to_append:
+        for source_id, row_ids, function in formulas_to_append:
             subcategory_number = subcategory_number_by_source[source_id]
             source_numbers = [
                 formula.source_number
@@ -219,7 +220,7 @@ class FormulasTable:
             else:
                 source_number = cls._next_free_number(subcategory_number, formulas)
             number = cls._next_free_number(source_number, formulas)
-            formulas.append(FormulasTableLine(number, source_id, row_ids, variable_change, is_retired=False))
+            formulas.append(FormulasTableLine(number, source_id, row_ids, function, is_retired=False))
         return cls(tuple(sorted(formulas, key=lambda formula: formula.number)))
 
     @classmethod
@@ -296,8 +297,8 @@ class FormulasTableLine:
     """A `FormulasTableLine` holds 1 line of `formulas.csv`: a formula's number, its source and its rows.
 
     `number` is the formula's place in the catalog's tree: category 1, the subcategory, the source and the formula,
-    such as `(1, 4, 12, 3)`. `variable_change` is empty unless the formula's variable differs from that of its row's
-    `f`.
+    such as `(1, 4, 12, 3)`. `function` is empty unless a person decided that the formula's function differs from the
+    `f` of its first row (`FunctionDecision`).
 
     A retired formula keeps the rows that it held when it was retired, so that it becomes active again with its own
     id if those rows are `new` again.
@@ -306,7 +307,7 @@ class FormulasTableLine:
     number: tuple[int, ...]
     source_id: str
     row_ids: tuple[str, ...]
-    variable_change: str
+    function: FunctionDecision
     is_retired: bool
 
     @property
@@ -331,7 +332,9 @@ class FormulasTableLine:
             "status": "retired" if self.is_retired else "active",
             "source_id": self.source_id,
             "row_ids": join_row_ids(self.row_ids),
-            "variable_change": self.variable_change,
+            "variable_change": self.function.variable_change,
+            "f": self.function.f,
+            "parameters": self.function.parameters,
         }
 
     # --------------------------------------------------------------------------
@@ -347,7 +350,9 @@ class FormulasTableLine:
         """
         # csv.DictReader gives a missing field as None, and puts extra fields under the key None
         if None in line or any(line[column] is None for column in FORMULA_COLUMNS):
-            raise DataFileError(f"{file_name}: the line of {line['formula_id']} does not have 5 fields")
+            raise DataFileError(
+                f"{file_name}: the line of {line['formula_id']} does not have {len(FORMULA_COLUMNS)} fields"
+            )
         match = re.fullmatch(r"f([1-9][0-9]*(?:\.[1-9][0-9]*){3})", line["formula_id"])
         row_ids = tuple(split_row_ids(line["row_ids"]))
         if match is None or line["status"] not in FORMULA_STATUSES or not row_ids:
@@ -357,6 +362,10 @@ class FormulasTableLine:
                 number=tuple(int(part) for part in match.group(1).split(".")),
                 source_id=line["source_id"].strip(),
                 row_ids=row_ids,
-                variable_change=line["variable_change"].strip(),
+                function=FunctionDecision(
+                    variable_change=line["variable_change"].strip(),
+                    f=line["f"].strip(),
+                    parameters=line["parameters"].strip(),
+                ),
                 is_retired=line["status"] == "retired",
             )

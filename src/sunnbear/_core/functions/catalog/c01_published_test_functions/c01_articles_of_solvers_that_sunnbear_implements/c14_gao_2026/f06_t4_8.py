@@ -1,0 +1,107 @@
+"""This module holds the formula of T4.8 in Gao (2026).
+
+A script generates this module from the survey of published test problems: to change the formula, change its source file
+in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
+2026_gao`, never this file.
+"""
+
+import math
+
+from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+
+# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
+# survey, so that a test fails when the survey changes and this module is not regenerated.
+SURVEY_FIELDS_HASH = "c8288f00a7a6683b"
+
+
+class Gao2026T48(Formula):
+    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+
+    The source prints ``-3062*(1 - xi)/(xi + (1 - xi)*exp(-x)) - 1013 + 1628/x``, with the parameters ``xi = 0.61489``;
+    the formula's interval is `[2E-4, 2]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`.
+
+    As printed, the first term has no `exp(-x)` in its numerator. sunnbear's tests use `-3062*(1 - xi)*exp(-x)/(xi + (1
+    - xi)*exp(-x)) - 1013 + 1628/x`.
+    """
+
+    number = (1, 1, 14, 6)
+    name = "T4.8"
+    param_names = ("xi", "a", "b")
+    source = FormulaSource(
+        reference=(
+            "Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied "
+            "Mathematics Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928."
+        ),
+        location="T4.8",
+    )
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, xi: float, a: float, b: float) -> float:
+        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        x = x - (b - a) * c
+        return -3062 * (1 - xi) / (xi + (1 - xi) * math.exp(-x)) - 1013 + 1628 / x
+
+    def interval_bounds(self, xi: float, a: float, b: float) -> tuple[float, float]:
+        """Return the interval of the tuple, its parameters ``a`` and ``b``."""
+        return (a, b)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the published parameter values."""
+        return (
+            ParamTable(
+                names=("xi", "a", "b"),
+                rows=(
+                    (
+                        0.61489,
+                        0.0002,
+                        2.0,
+                    ),
+                    (
+                        0.61489,
+                        0.0002,
+                        3.0,
+                    ),
+                    (
+                        0.61489,
+                        0.0002,
+                        9.0,
+                    ),
+                    (
+                        0.61489,
+                        0.0002,
+                        27.0,
+                    ),
+                    (
+                        0.61489,
+                        0.0002,
+                        81.0,
+                    ),
+                ),
+            ),
+        )
+
+    cases = (
+        FormulaTestCase.value(
+            params={"xi": 0.61489, "a": 0.0002, "b": 2.0}, x=0.60014, c=0.0, expected=272.4577021285953
+        ),
+        FormulaTestCase.value(
+            params={"xi": 0.61489, "a": 0.0002, "b": 2.0}, x=0.60014, c=0.25, expected=14011.976051464839
+        ),
+        FormulaTestCase.value(
+            params={"xi": 0.61489, "a": 0.0002, "b": 3.0}, x=0.90014, c=0.0, expected=-732.967031487869
+        ),
+        FormulaTestCase.value(
+            params={"xi": 0.61489, "a": 0.0002, "b": 9.0}, x=2.70014, c=0.0, expected=-2250.3709042618284
+        ),
+        FormulaTestCase.value(
+            params={"xi": 0.61489, "a": 0.0002, "b": 27.0}, x=8.10014, c=0.0, expected=-2729.403834358517
+        ),
+        FormulaTestCase.value(
+            params={"xi": 0.61489, "a": 0.0002, "b": 81.0}, x=24.3001, c=0.0, expected=-2863.756866947472
+        ),
+        FormulaTestCase.interval_bounds(params={"xi": 0.61489, "a": 0.0002, "b": 2.0}, expected=(0.0002, 2.0)),
+        FormulaTestCase.interval_bounds(params={"xi": 0.61489, "a": 0.0002, "b": 3.0}, expected=(0.0002, 3.0)),
+        FormulaTestCase.interval_bounds(params={"xi": 0.61489, "a": 0.0002, "b": 9.0}, expected=(0.0002, 9.0)),
+        FormulaTestCase.interval_bounds(params={"xi": 0.61489, "a": 0.0002, "b": 27.0}, expected=(0.0002, 27.0)),
+        FormulaTestCase.interval_bounds(params={"xi": 0.61489, "a": 0.0002, "b": 81.0}, expected=(0.0002, 81.0)),
+    )
