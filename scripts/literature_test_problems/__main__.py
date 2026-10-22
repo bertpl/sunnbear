@@ -20,7 +20,7 @@ from .data_files import (
     read_sources,
     write_rows_table,
 )
-from .formulas import FormulaIdChangeError, FormulasTable
+from .formulas import FormulasTable
 from .matching import EarlierRowIndex
 from .overview import Overview
 from .statuses import decide_final_statuses, find_problems
@@ -48,16 +48,7 @@ def main() -> int:
     folder.summary_file.write_text(overview.summary_markdown(), encoding="utf-8")
     folder.timeline_file.write_text(overview.timeline_html(), encoding="utf-8")
     # --- formulas stage -------------------------
-    committed_formulas_table = FormulasTable.read(folder.formulas_file)
-    try:
-        formulas_table = FormulasTable.build(rows, formula_decisions, committed_formulas_table)
-    except FormulaIdChangeError as error:
-        # a change that would change the id of a formula leaves formulas.csv as it is, for a person to resolve
-        formulas_table = committed_formulas_table
-        formula_id_problems = error.problems
-    else:
-        folder.formulas_file.write_text(formulas_table.csv_text(), encoding="utf-8")
-        formula_id_problems = []
+    formulas_table, formula_id_problems = FormulasTable.update_file(folder.formulas_file, rows, formula_decisions)
     # --- report ---------------------------------
     print(f"{len(sources)} sources, {len(rows)} rows")
     print("automatic status:", dict(Counter(row.automatic_status.status for row in rows).most_common()))

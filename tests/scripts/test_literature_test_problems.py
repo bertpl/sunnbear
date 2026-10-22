@@ -383,13 +383,13 @@ def test_formulas_table_reactivates_a_retired_formula(script_modules):
         (row_id, subcategory, "duplicate" if row_id == "a:3" else status)
         for row_id, subcategory, status in _FIRST_RUN_LINES
     ]
-    retired_formulas_table = formulas_table_cls.build(
+    a3_retired_formulas_table = formulas_table_cls.build(
         _rows_table_lines(script_modules, a3_duplicate_lines), formula_decisions, first_run_formulas_table
     )
 
     # --- act --------------------------
     formulas_table = formulas_table_cls.build(
-        _rows_table_lines(script_modules, _FIRST_RUN_LINES), formula_decisions, retired_formulas_table
+        _rows_table_lines(script_modules, _FIRST_RUN_LINES), formula_decisions, a3_retired_formulas_table
     )
 
     # --- assert -----------------------
@@ -397,7 +397,7 @@ def test_formulas_table_reactivates_a_retired_formula(script_modules):
 
 
 @pytest.mark.parametrize(
-    "lines, decided_row_ids, expected_problems",
+    "lines, decided_row_id_groups, expected_problems",
     [
         # A decision joins 2 committed formulas.
         (_FIRST_RUN_LINES, [("d:1", "d:2", "d:3")], ["the formula of d:1 would join f1.1.2.1, f1.1.2.2"]),
@@ -424,8 +424,8 @@ def test_formulas_table_reactivates_a_retired_formula(script_modules):
         ),
     ],
 )
-def test_formulas_table_stops_on_a_change_that_moves_an_id(script_modules, lines, decided_row_ids, expected_problems):
-    """`FormulasTable.build` raises `FormulaIdChangeError` with every change that would move a committed id."""
+def test_formulas_table_stops_on_a_change_of_an_id(script_modules, lines, decided_row_id_groups, expected_problems):
+    """`FormulasTable.build` raises `FormulaIdChangeError` with every change that would change a committed id."""
     # --- arrange ----------------------
     formulas_module = script_modules["formulas"]
     first_run_formulas_table = _first_run_formulas_table(script_modules)
@@ -434,7 +434,7 @@ def test_formulas_table_stops_on_a_change_that_moves_an_id(script_modules, lines
     with pytest.raises(formulas_module.FormulaIdChangeError) as error:
         formulas_module.FormulasTable.build(
             _rows_table_lines(script_modules, lines),
-            _formula_decisions(script_modules, decided_row_ids),
+            _formula_decisions(script_modules, decided_row_id_groups),
             first_run_formulas_table,
         )
 
@@ -443,7 +443,7 @@ def test_formulas_table_stops_on_a_change_that_moves_an_id(script_modules, lines
 
 
 @pytest.mark.parametrize(
-    "later_lines, decided_row_ids, expected_formulas",
+    "later_lines, decided_row_id_groups, expected_formulas",
     [
         # A row of d's 2-row formula is a duplicate now: the formula keeps its id with 1 row.
         (
@@ -463,7 +463,7 @@ def test_formulas_table_stops_on_a_change_that_moves_an_id(script_modules, lines
     ],
 )
 def test_formulas_table_keeps_the_id_of_a_formula_whose_rows_change(
-    script_modules, later_lines, decided_row_ids, expected_formulas
+    script_modules, later_lines, decided_row_id_groups, expected_formulas
 ):
     """A formula whose rows shrink or grow, without joining another formula, keeps its id."""
     # --- arrange ----------------------
@@ -472,7 +472,7 @@ def test_formulas_table_keeps_the_id_of_a_formula_whose_rows_change(
     # --- act --------------------------
     formulas_table = script_modules["formulas"].FormulasTable.build(
         _rows_table_lines(script_modules, later_lines),
-        _formula_decisions(script_modules, decided_row_ids),
+        _formula_decisions(script_modules, decided_row_id_groups),
         first_run_formulas_table,
     )
 
@@ -486,20 +486,20 @@ def test_formulas_table_keeps_the_id_of_a_formula_whose_rows_change(
 
 
 def test_formulas_table_keeps_a_retired_id_that_a_person_resolved(script_modules):
-    """A retired line whose rows another formula holds, or that no longer exist, keeps its id from being given again."""
+    """A retired line keeps its id from being given again, also when another formula holds its rows or they are gone."""
     # --- arrange ----------------------
     formulas_module = script_modules["formulas"]
-    line_cls = formulas_module.FormulasTableLine
+    formulas_table_line_cls = formulas_module.FormulasTableLine
     # a person resolved the join of f1.1.2.1 and f1.1.2.2: f1.1.2.1 holds d:1, d:2 and d:3, f1.1.2.2 is retired, and
     # the formula of a removed row x:1 was retired too
     resolved_table = formulas_module.FormulasTable(
         (
-            line_cls((1, 1, 1, 1), "a", ("a:1",), "", is_retired=False),
-            line_cls((1, 1, 1, 2), "a", ("a:3",), "", is_retired=False),
-            line_cls((1, 1, 1, 3), "a", ("a:9",), "", is_retired=True),
-            line_cls((1, 1, 2, 1), "d", ("d:1", "d:2", "d:3"), "", is_retired=False),
-            line_cls((1, 1, 2, 2), "d", ("d:2",), "", is_retired=True),
-            line_cls((1, 2, 1, 1), "c", ("c:1",), "", is_retired=False),
+            formulas_table_line_cls((1, 1, 1, 1), "a", ("a:1",), "", is_retired=False),
+            formulas_table_line_cls((1, 1, 1, 2), "a", ("a:3",), "", is_retired=False),
+            formulas_table_line_cls((1, 1, 1, 3), "a", ("a:9",), "", is_retired=True),
+            formulas_table_line_cls((1, 1, 2, 1), "d", ("d:1", "d:2", "d:3"), "", is_retired=False),
+            formulas_table_line_cls((1, 1, 2, 2), "d", ("d:2",), "", is_retired=True),
+            formulas_table_line_cls((1, 2, 1, 1), "c", ("c:1",), "", is_retired=False),
         )
     )
     later_lines = [*_FIRST_RUN_LINES, ("a:4", "1.1", "new"), ("d:4", "1.1", "new")]
@@ -625,10 +625,12 @@ def _rows_table_lines(script_modules, lines):
     ]
 
 
-def _formula_decisions(script_modules, decided_row_ids):
-    """Return a formula decision for each tuple of row ids of `decided_row_ids`."""
+def _formula_decisions(script_modules, decided_row_id_groups):
+    """Return a formula decision for each tuple of row ids of `decided_row_id_groups`."""
     formula_decision_cls = script_modules["data_files"].FormulaDecision
-    return [formula_decision_cls(row_ids, "", "the same function on another interval") for row_ids in decided_row_ids]
+    return [
+        formula_decision_cls(row_ids, "", "the same function on another interval") for row_ids in decided_row_id_groups
+    ]
 
 
 def _first_run_formulas_table(script_modules):
