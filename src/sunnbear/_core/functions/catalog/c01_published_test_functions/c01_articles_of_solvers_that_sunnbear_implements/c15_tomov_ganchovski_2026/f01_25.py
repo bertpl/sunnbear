@@ -48,21 +48,7 @@ class TomovGanchovski202625(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (
-            ParamTable(
-                names=("a", "b"),
-                rows=(
-                    (
-                        -1.0,
-                        1.0,
-                    ),
-                    (
-                        -3.0,
-                        1.0,
-                    ),
-                ),
-            ),
-        )
+        return (ParamTable(names=("a", "b"), rows=((-1.0, 1.0), (-3.0, 1.0))),)
 
     cases = (
         FormulaTestCase.value(params={"a": -1.0, "b": 1.0}, x=-0.4, c=0.0, expected=-0.4),

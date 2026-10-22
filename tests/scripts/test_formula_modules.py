@@ -1,11 +1,9 @@
-"""The formula modules' generator translates the survey's functions and reads their published cases correctly."""
+"""The formula modules' generator translates the survey's functions and reads their published test functions."""
 
 import math
 
 import mpmath
 import pytest
-
-from sunnbear._core.utils import math_functions
 
 
 # ==================================================================================================
@@ -33,19 +31,17 @@ from sunnbear._core.utils import math_functions
     ],
 )
 def test_formula_expression_python_agrees_with_sympy(script_modules, text, variable, parameters, x):
-    """The Python code and the sympy expression of a function, with each construct of the translation, agree."""
+    """For a function with each construct of the translation, the Python code and the sympy expression agree."""
     # --- arrange ----------------------
     formula_expression_cls = script_modules["formula_expressions"].FormulaExpression
     python_names = {name: f"{name}_" for name in parameters}
     python_values = {python_names[name]: value for name, value in parameters.items()}
-    namespace = {"math": math, **vars(math_functions)}
 
     # --- act --------------------------
-    expression = formula_expression_cls.from_text(text, variable, python_names)
-    # the code comes from the translation of a test's own text, as the generator evaluates it
-    python_value = eval(expression.python_code, namespace, {**python_values, "x": x})  # noqa: S307
+    formula_expression = formula_expression_cls.from_text(text, variable, python_names)
+    python_value = formula_expression.python_value(x, python_values)
     with mpmath.workdps(40):
-        exact_value = float(expression.mpmath_function(parameters)(mpmath.mpf(x)))
+        exact_value = float(formula_expression.mpmath_function(parameters)(mpmath.mpf(x)))
 
     # --- assert -----------------------
     assert math.isclose(python_value, exact_value, rel_tol=1e-13, abs_tol=1e-13)
@@ -72,10 +68,12 @@ def test_formula_expression_rejects_what_it_cannot_translate(script_modules, tex
         formula_expressions.FormulaExpression.from_text(text, "x", {})
 
 
-def test_formula_expression_names_its_helper_functions(script_modules):
-    """A function's Python code imports exactly the helper functions that it calls."""
-    expression = script_modules["formula_expressions"].FormulaExpression.from_text("sign(x)*J0(x)^(1/3)", "x", {})
-    assert expression.helper_functions == ("bessel_j0", "real_root", "sign")
+def test_formula_expression_names_its_sunnbear_math_functions(script_modules):
+    """A function's Python code imports exactly the functions of `math_functions` that it calls."""
+    formula_expression = script_modules["formula_expressions"].FormulaExpression.from_text(
+        "sign(x)*J0(x)^(1/3)", "x", {}
+    )
+    assert formula_expression.sunnbear_math_functions == ("bessel_j0", "real_root", "sign")
 
 
 def test_free_names_leaves_out_functions_constants_and_indices(script_modules):
@@ -97,15 +95,16 @@ def test_published_formula_pairs_each_set_of_values_with_its_intervals(script_mo
         parameters="on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)8`; on `[-1, 4]`: `a = 1`, `n = 10`",
         interval="`[0, 5]`; `[-1, 4]`",
     )
-    source, line = _source_and_line(script_modules, [row])
+    survey_formula = _survey_formula(script_modules, [row])
 
     # --- act --------------------------
-    published = script_modules["published_cases"].PublishedFormula.from_survey(line, source)
+    published = script_modules["published_test_functions"].PublishedFormula.from_survey(survey_formula)
 
     # --- assert -----------------------
-    assert published.parameter_names == ("a", "n")
+    assert published.survey_parameter_names == ("a", "n")
     assert [
-        (tuple(float(value) for _, value in case.parameter_values), case.interval.key) for case in published.cases
+        (tuple(float(value) for _, value in test_function.parameter_values), test_function.interval.key)
+        for test_function in published.test_functions
     ] == [
         ((0.2, 4.0), ("0", "5")),
         ((0.2, 6.0), ("0", "5")),
@@ -127,7 +126,7 @@ def test_published_formula_pairs_each_set_of_values_with_its_intervals(script_mo
 def test_published_formula_checks_that_each_row_gives_its_function(script_modules, parameters, is_accepted):
     """A formula of several rows accepts its line's `f` only where it equals each row's own `f` at that row's values."""
     # --- arrange ----------------------
-    published_cases = script_modules["published_cases"]
+    published_test_functions = script_modules["published_test_functions"]
     rows = [
         _source_row(script_modules, "s:1", "if(x <= 1/3; -0.5; 0.5)", interval="[-11, 9]"),
         _source_row(script_modules, "s:2", "if(x <= 1/3; -10^-3; 1 - 10^-3)", interval="[-11, 9]"),
@@ -135,14 +134,14 @@ def test_published_formula_checks_that_each_row_gives_its_function(script_module
     function_decision = script_modules["data_files"].FunctionDecision(
         f="if(x <= 1/3; -d; 1 - d)", parameters=parameters
     )
-    source, line = _source_and_line(script_modules, rows, function_decision)
+    survey_formula = _survey_formula(script_modules, rows, function_decision)
 
     # --- act / assert -----------------
     if is_accepted:
-        published_cases.PublishedFormula.from_survey(line, source)
+        published_test_functions.PublishedFormula.from_survey(survey_formula)
     else:
-        with pytest.raises(published_cases.PublishedCasesError, match="s:1"):
-            published_cases.PublishedFormula.from_survey(line, source)
+        with pytest.raises(published_test_functions.PublishedTestFunctionsError, match="s:1"):
+            published_test_functions.PublishedFormula.from_survey(survey_formula)
 
 
 # ==================================================================================================
@@ -163,8 +162,8 @@ def _source_row(script_modules, row_id, f, *, parameters="", interval="[0, 1]"):
     )
 
 
-def _source_and_line(script_modules, rows, function_decision=None):
-    """Return source `s` with the rows, and the line of `formulas.csv` of its formula that holds them all."""
+def _survey_formula(script_modules, rows, function_decision=None):
+    """Return the `SurveyFormula` of source `s`, whose 1 formula holds all the rows."""
     data_files = script_modules["data_files"]
     source = data_files.Source(
         source_id="s",
@@ -179,11 +178,12 @@ def _source_and_line(script_modules, rows, function_decision=None):
         relations=(),
         rows=tuple(rows),
     )
-    line = script_modules["formulas"].FormulasTableLine(
+    formulas_module = script_modules["formulas"]
+    line = formulas_module.FormulasTableLine(
         number=(1, 1, 1, 1),
         source_id="s",
         row_ids=tuple(row.row_id for row in rows),
         function_decision=function_decision or data_files.FunctionDecision(),
         is_retired=False,
     )
-    return source, line
+    return formulas_module.SurveyFormula(line, source)

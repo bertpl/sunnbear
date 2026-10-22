@@ -39,7 +39,10 @@ def test_real_root(value, n, expected):
 )
 @pytest.mark.parametrize("x", _BESSEL_X_VALUES)
 def test_bessel_function_agrees_with_mpmath(bessel_function, order, kind, x):
-    """Each Bessel function is within 2E-15 of mpmath's, relative above 1 and absolute below, in each of its ranges."""
+    """Each Bessel function is within 2E-15 of mpmath's value in each of its ranges.
+
+    The bound is relative where that value exceeds 1 in magnitude, and absolute elsewhere.
+    """
     # --- arrange ----------------------
     with mpmath.workdps(40):
         if kind == "j":
@@ -56,7 +59,7 @@ def test_bessel_function_agrees_with_mpmath(bessel_function, order, kind, x):
 
 @pytest.mark.parametrize("x", [-0.5, -7.0, -12.0])
 def test_bessel_functions_of_the_first_kind_have_their_parity(x):
-    """J0 is even and J1 is odd, so both take negative arguments."""
+    """`bessel_j0` and `bessel_j1` accept a negative argument: J0 is even and J1 is odd."""
     assert bessel_j0(x) == bessel_j0(-x)
     assert bessel_j1(x) == -bessel_j1(-x)
 

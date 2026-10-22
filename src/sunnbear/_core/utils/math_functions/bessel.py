@@ -1,9 +1,9 @@
 """This module holds the Bessel functions of the first and second kind of orders 0 and 1, for real arguments.
 
 Each function evaluates a rational function of `x^2` for `|x|` up to 5, and above 5 the Hankel asymptotic expansion,
-with 2 rational functions of `25/x^2`. Their absolute error is about 1E-15 on `[0, 30]`, as the original code states.
-The Bessel functions of the second kind are real only for `x > 0`: they return minus infinity at 0 and NaN for a
-negative `x`.
+with 2 rational functions of `25/x^2`. The absolute error of each Bessel function is about 1E-15 on `[0, 30]`, as the
+original code states. The Bessel functions of the second kind are real only for `x > 0`: they return minus infinity
+at 0 and NaN for a negative `x`.
 """
 
 # These functions are ported from C++ code under the BSD 3-Clause license, © 2024 SciPy, itself translated from the
@@ -49,8 +49,8 @@ _J0_YQ = (  # for p1evl
     1.04128353664259848412e3, 6.26107330137134956842e5, 2.68919633393814121987e8, 8.64002487103935000337e10,
     2.02979612750105546709e13, 3.17157752842975028269e15, 2.50596256172653059228e17,
 )
-_J0_DR1 = 5.78318596294678452118e0  # the square of the first zero of J0
-_J0_DR2 = 3.04712623436620863991e1  # the square of the second zero of J0
+_J0_DR1 = 5.78318596294678452118e0  # _J0_DR1 is the square of the first zero of J0
+_J0_DR2 = 3.04712623436620863991e1  # _J0_DR2 is the square of the second zero of J0
 _J0_RP = (
     -4.79443220978201773821e9, 1.95617491946556577543e12, -2.49248344360967716204e14, 9.70862251047306323952e15,
 )
@@ -89,8 +89,8 @@ _J1_YQ = (  # for p1evl
     5.94301592346128195359e2, 2.35564092943068577943e5, 7.34811944459721705660e7, 1.87601316108706159478e10,
     3.88231277496238566008e12, 6.20557727146953693363e14, 6.87141087355300489866e16, 3.97270608116560655612e18,
 )
-_J1_Z1 = 1.46819706421238932572e1  # the square of the first positive zero of J1
-_J1_Z2 = 4.92184563216946036703e1  # the square of the second positive zero of J1
+_J1_Z1 = 1.46819706421238932572e1  # _J1_Z1 is the square of the first positive zero of J1
+_J1_Z2 = 4.92184563216946036703e1  # _J1_Z2 is the square of the second positive zero of J1
 # fmt: on
 
 

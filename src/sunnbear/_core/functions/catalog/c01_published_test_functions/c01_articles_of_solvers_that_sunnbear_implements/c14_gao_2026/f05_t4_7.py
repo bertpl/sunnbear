@@ -43,31 +43,7 @@ class Gao2026T47(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
         return (
-            ParamTable(
-                names=("a", "b"),
-                rows=(
-                    (
-                        -1.0,
-                        4.0,
-                    ),
-                    (
-                        -2.0,
-                        5.0,
-                    ),
-                    (
-                        -1.0,
-                        10.0,
-                    ),
-                    (
-                        -5.0,
-                        50.0,
-                    ),
-                    (
-                        -10.0,
-                        100.0,
-                    ),
-                ),
-            ),
+            ParamTable(names=("a", "b"), rows=((-1.0, 4.0), (-2.0, 5.0), (-1.0, 10.0), (-5.0, 50.0), (-10.0, 100.0))),
         )
 
     cases = (

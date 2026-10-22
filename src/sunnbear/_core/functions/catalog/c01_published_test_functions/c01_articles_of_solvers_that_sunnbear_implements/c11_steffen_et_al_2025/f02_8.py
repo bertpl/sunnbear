@@ -19,7 +19,7 @@ class SteffenEtAl20258(Formula):
     ``alpha(omega, Tr) = (1 + (0.37464 + 1.54226*omega - 0.26992*omega^2)*(1 - sqrt(Tr)))^2`` (Eq. (9)); ``omega =
     0.200, Tr = 0.85, Pr = 0.45``; the formula's interval is ``[14, 17]``.
 
-    The formula's x is ``V/b``, and its parameter ``lambda_`` is ``lambda``.
+    The formula's parameter ``lambda_`` is the source's ``lambda``.
 
     The variable is ``V/b``, the volume over the covolume parameter. It has 3 roots (Fig. 5); the interval holds the
     vapor-phase one. Tolerance ``1E-10``; printed root ``15.0676609061``. That root matches ``Lambda`` and ``Gamma`` at
@@ -71,17 +71,7 @@ class SteffenEtAl20258(Formula):
         return (
             ParamTable(
                 names=("lambda_", "sigma", "Lambda", "Gamma", "omega", "Tr", "Pr"),
-                rows=(
-                    (
-                        2.0,
-                        -1.0,
-                        0.45724,
-                        0.0778,
-                        0.2,
-                        0.85,
-                        0.45,
-                    ),
-                ),
+                rows=((2.0, -1.0, 0.45724, 0.0778, 0.2, 0.85, 0.45),),
             ),
         )
 

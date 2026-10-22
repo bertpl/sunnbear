@@ -18,9 +18,9 @@ SUBCATEGORY_DESCRIPTIONS = {
 DECIDED_STATUSES = ("new", "duplicate", "incomplete")
 # UNDECIDED is the status of a row that the script could not decide and that no decision covers yet.
 UNDECIDED = "undecided"
-# ROW_SEPARATOR separates the items of 1 field that belong to different rows: the row ids, and the rows' sets of values
-# in the field `parameters` of `formula_decisions.csv`.
-ROW_SEPARATOR = " | "
+# ROW_ITEMS_SEPARATOR separates the items of 1 field that belong to different rows: the row ids, and the rows' sets of
+# values in the field `parameters` of `formula_decisions.csv`.
+ROW_ITEMS_SEPARATOR = " | "
 # DECISION_COLUMNS are the columns of `decisions.csv`, in order.
 DECISION_COLUMNS = ["row_id", "status", "duplicate_of", "derived_from", "reason"]
 # FORMULA_DECISION_COLUMNS are the columns of `formula_decisions.csv`, in order.
@@ -258,7 +258,7 @@ def read_sources(sources_dir: Path) -> list[Source]:
 class AutomaticStatus:
     """An `AutomaticStatus` holds the status that the script finds for a row by comparing it with every earlier row.
 
-    `matches` holds the matched row ids joined by `ROW_SEPARATOR`, and `match_kind` names the comparisons that
+    `matches` holds the matched row ids joined by `ROW_ITEMS_SEPARATOR`, and `match_kind` names the comparisons that
     found them; for an `incomplete` row, `match_kind` names why the row is incomplete instead, such as "no interval",
     and for an undecided row why a person must decide, such as "no test function". `n_instances` is 0 for a row
     whose f does not parse.
@@ -277,7 +277,7 @@ class FinalStatus:
 
     A `duplicate` names, in `duplicate_of`, the earlier rows that already give its test functions; a `new` or
     `incomplete` row names, in `derived_from`, the earlier rows whose function it copies or changes. Each field joins
-    its row ids by `ROW_SEPARATOR`.
+    its row ids by `ROW_ITEMS_SEPARATOR`.
     """
 
     status: str
@@ -522,13 +522,13 @@ def write_rows_table(path: Path, rows: list[RowsTableLine]) -> None:
 class FunctionDecision:
     """A `FunctionDecision` holds how a person decided that a formula's function differs from the `f` of its rows.
 
-    All 3 fields are empty for a formula that takes the `f` of its first row as it is. Otherwise:
+    Every field is empty for a formula that takes the `f` of its first row as it is. Otherwise:
 
     - `variable_change` describes the variable of a formula that takes another variable than that of its row's `f`;
     - `f` is the family form of a formula whose rows print 1 function, each row with its own values of some
       parameters: that function with each such parameter as a name, such as `x^3 - a`;
     - `parameters` gives each row's values of the parameters of `f`, 1 set per row in the order of the rows,
-      separated by `ROW_SEPARATOR`, such as `a = 1 | a = -1`.
+      separated by `ROW_ITEMS_SEPARATOR`, such as `a = 1 | a = -1`.
     """
 
     variable_change: str = ""
@@ -538,19 +538,19 @@ class FunctionDecision:
     def values_per_row(self) -> list[str]:
         """Return the sets of values of `parameters`, 1 per row, or [] if `parameters` is empty."""
         if self.parameters:
-            return [values.strip() for values in self.parameters.split(ROW_SEPARATOR.strip())]
+            return [values.strip() for values in self.parameters.split(ROW_ITEMS_SEPARATOR.strip())]
         else:
             return []
 
     def for_rows(self, decided_row_ids: tuple[str, ...], row_ids: tuple[str, ...]) -> "FunctionDecision":
         """Return the decision for `row_ids`, a subset of `decided_row_ids` in any order.
 
-        `decided_row_ids` are the rows that `parameters` gives 1 set for, in that order; the returned decision gives
+        `parameters` gives 1 set per row of `decided_row_ids`, in that order; the returned decision gives
         the sets of `parameters` in the order of `row_ids`.
         """
         if self.parameters:
             values_by_row_id = dict(zip(decided_row_ids, self.values_per_row(), strict=True))
-            return replace(self, parameters=ROW_SEPARATOR.join(values_by_row_id[row_id] for row_id in row_ids))
+            return replace(self, parameters=ROW_ITEMS_SEPARATOR.join(values_by_row_id[row_id] for row_id in row_ids))
         else:
             return self
 
@@ -563,7 +563,7 @@ class FormulaDecision:
 
     - it puts several rows of 1 source that are obviously 1 function into 1 formula;
     - it gives 1 row's formula a different variable from that of the row's `f`;
-    - it writes, for several rows that print 1 function with their own values of a parameter, that function with the
+    - for several rows that print 1 function, each with its own values of a parameter, it writes that function with the
       parameter as a name.
 
     `function_decision` holds the variable change and the family form, as a `FunctionDecision`.
@@ -661,12 +661,12 @@ _ROW_FIELDS = {"key", "f", "f_description", "name", "parameters", "interval", "a
 
 def join_row_ids(row_ids: Iterable[str | None]) -> str:
     """Join the distinct row ids, in the order that each first occurs, into 1 field that `FinalStatus` splits again."""
-    return ROW_SEPARATOR.join(dict.fromkeys(r for r in row_ids if r))
+    return ROW_ITEMS_SEPARATOR.join(dict.fromkeys(r for r in row_ids if r))
 
 
 def split_row_ids(field: str) -> list[str]:
     """Return the row ids of 1 field that `join_row_ids` built, or that a person wrote in the same form."""
-    return [row_id.strip() for row_id in field.split(ROW_SEPARATOR) if row_id.strip()]
+    return [row_id.strip() for row_id in field.split(ROW_ITEMS_SEPARATOR) if row_id.strip()]
 
 
 def source_id_of_row_id(row_id: str) -> str:

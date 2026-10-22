@@ -243,12 +243,13 @@ def test_category_1_formula_matches_the_survey(formula, script_modules, sources,
     keys as the location.
 
     A generated module's hash must equal the hash of its survey fields, so that a module left stale after a change
-    of the survey fails; a module without a hash must be the hand-written module of a formula whose row only
-    describes its function, or of 1 of the generator's `HAND_WRITTEN_FORMULAS`.
+    of the survey fails; a module has no hash exactly when it is hand-written: when a row of its formula only
+    describes its function, or the formula is 1 of the generator's `UNTRANSLATABLE_FORMULAS`.
     """
     # --- arrange ----------------------
     line = {line.number: line for line in committed_formulas_table.formulas}[formula.number]
     source = {source.source_id: source for source in sources}[line.source_id]
+    survey_formula = script_modules["formulas"].SurveyFormula(line, source)
     category = {category.number: category for category in FormulaRegistry.categories()}[formula.number[:3]]
     survey_fields_hash = getattr(sys.modules[type(formula).__module__], "SURVEY_FIELDS_HASH", None)
 
@@ -259,11 +260,11 @@ def test_category_1_formula_matches_the_survey(formula, script_modules, sources,
     assert not line.is_retired
     assert category.name == source.short_title
     assert formula.source == FormulaSource(reference=source.reference, location=location)
-    if survey_fields_hash is None:
-        assert script_modules["formula_modules"].is_hand_written(line, source)
+    if script_modules["formula_modules"].is_hand_written(survey_formula):
+        assert survey_fields_hash is None
     else:
         assert survey_fields_hash == script_modules["formula_modules"].FormulaModuleSpec.survey_fields_hash(
-            line, source
+            survey_formula
         )
 
 

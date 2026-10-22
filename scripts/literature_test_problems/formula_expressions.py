@@ -10,13 +10,14 @@ translation reads:
 - `sum(term, i = m..n)` and `prod(term, i = m..n)`, over the integers `i` from `m` to `n`, written out term by term;
 - `Phi(z)` and `phi(z)`, the cumulative distribution function and the density of the standard normal distribution;
 - `sign`, `cbrt`, and the Bessel functions `J0`, `J1`, `Y0` and `Y1`;
-- a power `base^(1/q)` with an odd integer `q`, as the real root: negative for a negative base.
+- a power `base^(1/q)` with an odd integer `q`, as the real root, as the sources mean it: negative for a negative base.
 
 Python parses the Python code, and sympy parses a second text that writes the constructs above in sympy's terms. The 2
 parsers work independently, so the generator can check the Python code against the sympy expression by their values.
 """
 
 import keyword
+import math
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -30,7 +31,7 @@ from .helpers import CONSTANTS, FUNCTIONS, IDENTIFIER, TRANSFORMATIONS
 
 # fmt: off
 # PYTHON_FUNCTIONS maps each function name that the translation reads to its Python form: a function of `math`, a
-# builtin, or a function of `sunnbear._core.utils.math_functions` (`HELPER_FUNCTIONS`).
+# builtin, or a function of `sunnbear._core.utils.math_functions`.
 PYTHON_FUNCTIONS = {
     "exp": "math.exp", "sin": "math.sin", "cos": "math.cos", "tan": "math.tan",
     "asin": "math.asin", "acos": "math.acos", "atan": "math.atan",
@@ -51,8 +52,6 @@ SYMPY_FUNCTIONS = {
     "J1": lambda a: sp.besselj(1, a), "Y1": lambda a: sp.bessely(1, a),
 }
 # fmt: on
-# HELPER_FUNCTIONS are the Python forms that a generated module imports from `sunnbear._core.utils.math_functions`.
-HELPER_FUNCTIONS = tuple(math_functions.__all__)
 # PYTHON_CONSTANTS maps each constant to its Python form; `e` is a constant unless a parameter has its name.
 PYTHON_CONSTANTS = {"pi": "math.pi", "e": "math.e"}
 # SYMPY_NAMES are the names of sympy's own that the sympy text may hold.
@@ -91,10 +90,10 @@ class FormulaExpression:
     variable: sp.Symbol
 
     @property
-    def helper_functions(self) -> tuple[str, ...]:
-        """Return the names of `HELPER_FUNCTIONS` that the Python code calls, in the order of that tuple."""
+    def sunnbear_math_functions(self) -> tuple[str, ...]:
+        """Return the names of `math_functions.__all__` that the Python code calls, in the order of that list."""
         names = set(IDENTIFIER.findall(self.python_code))
-        return tuple(name for name in HELPER_FUNCTIONS if name in names)
+        return tuple(name for name in math_functions.__all__ if name in names)
 
     def mpmath_function(self, parameter_values: dict[str, sp.Expr]) -> Callable:
         """Return the function of the variable that mpmath evaluates, with the parameters at `parameter_values`.
@@ -104,6 +103,11 @@ class FormulaExpression:
         """
         values = {sp.Symbol(name): value for name, value in parameter_values.items()}
         return sp.lambdify(self.variable, self.sympy_expr.subs(values), modules="mpmath")
+
+    def python_value(self, x: float, python_values: dict[str, float]) -> float:
+        """Return the value of the Python code at `x`, with each parameter's value keyed by its Python name."""
+        # the code comes from the translation of the survey's text, which reads only its own names and functions
+        return eval(self.python_code, {"math": math, **vars(math_functions)}, {**python_values, "x": x})
 
     @staticmethod
     def free_names(text: str) -> list[str]:
@@ -128,7 +132,7 @@ class FormulaExpression:
     def _rewrite_constructs(text: str, target: str) -> str:
         """Return `text` with each construct of the module docstring written for `target`, "python" or "sympy".
 
-        The result is still in the survey's notation otherwise: its names are translated afterwards.
+        Apart from those constructs, the result keeps the survey's notation; a later step translates its names.
         """
         rewritten = []
         position = 0
@@ -139,13 +143,15 @@ class FormulaExpression:
             name = match.group(1)
             if name is None:
                 rewritten.append(text[position:open_index])
-                # a bracket that holds a comparison becomes 1 where the comparison holds and 0 elsewhere; any other
+                # a bracket that holds a comparison must give 1 where the comparison holds and 0 elsewhere; any other
                 # bracket stays a bracket
                 if FormulaExpression._top_level_comparisons(inner) and target == "python":
                     # Python and numba compute with a comparison's bool as 1 or 0, so the bracket stays as published
-                    rewritten.append(f"({FormulaExpression._condition(inner, target)})")
+                    rewritten.append(f"({FormulaExpression._rewrite_condition(inner, target)})")
                 elif FormulaExpression._top_level_comparisons(inner):
-                    rewritten.append(f"Piecewise((1, {FormulaExpression._condition(inner, target)}), (0, True))")
+                    rewritten.append(
+                        f"Piecewise((1, {FormulaExpression._rewrite_condition(inner, target)}), (0, True))"
+                    )
                 else:
                     rewritten.append(f"({FormulaExpression._rewrite_constructs(inner, target)})")
             else:
@@ -162,7 +168,7 @@ class FormulaExpression:
             parts = FormulaExpression._split_top_level(inner, ";")
             if len(parts) != 3:
                 raise TranslationError(f"if({inner}) does not hold 3 parts")
-            condition = FormulaExpression._condition(parts[0], target)
+            condition = FormulaExpression._rewrite_condition(parts[0], target)
             when_true, when_false = (FormulaExpression._rewrite_constructs(part.strip(), target) for part in parts[1:])
             if target == "python":
                 return f"(({when_true}) if {condition} else ({when_false}))"
@@ -193,7 +199,7 @@ class FormulaExpression:
             return f"(exp(-({FormulaExpression._rewrite_constructs(inner, target)})^2/2)/sqrt(2*pi))"
 
     @staticmethod
-    def _condition(text: str, target: str) -> str:
+    def _rewrite_condition(text: str, target: str) -> str:
         """Return a condition of `if(...)`, 1 comparison, written for `target`: `=` is a test of equality."""
         sides = FormulaExpression._split_comparison(text)
         if sides is None:
@@ -260,7 +266,8 @@ class FormulaExpression:
         """Rename each name in `text` that sympy's parser cannot take, and return the renamed text with a dict.
 
         The dict maps each name of the renamed text to the sympy object that the name stands for. The variable and the
-        parameters become symbols of their survey names; `lambda`, a Python keyword, becomes `lambda_`.
+        parameters become symbols of their survey names; `lambda`, a Python keyword, becomes `lambda_`. Only the keys of
+        `python_names`, the parameters' survey names, are read.
         """
         local_names: dict = {FormulaExpression._sympy_name(variable): sp.Symbol(variable)}
         for name in IDENTIFIER.findall(text):
@@ -321,7 +328,7 @@ class FormulaExpression:
     @staticmethod
     def _top_level_comparisons(text: str) -> list[re.Match]:
         """Return the comparison operators of `text` that are outside any bracket."""
-        depth_at = FormulaExpression._depths(text)
+        depth_at = FormulaExpression._bracket_depths(text)
         return [match for match in COMPARISON.finditer(text) if depth_at[match.start()] == 0]
 
     @staticmethod
@@ -333,7 +340,7 @@ class FormulaExpression:
         Raises:
             TranslationError: If a bracket in `text` does not close.
         """
-        depth_at = FormulaExpression._depths(text)
+        depth_at = FormulaExpression._bracket_depths(text)
         parts, start = [], 0
         for i, character in enumerate(text):
             is_part_of_comparison = separator == "=" and (
@@ -347,7 +354,7 @@ class FormulaExpression:
         return parts
 
     @staticmethod
-    def _depths(text: str) -> list[int]:
+    def _bracket_depths(text: str) -> list[int]:
         """Return the bracket depth at each character of `text`; a bracket itself is at the depth outside it.
 
         Raises:
@@ -364,7 +371,8 @@ class FormulaExpression:
                 depth += 1
         if depth != 0:
             raise TranslationError(f"{text!r} leaves a bracket open")
-        return depths
+        else:
+            return depths
 
     @staticmethod
     def _matching_bracket(text: str, open_index: int) -> int:

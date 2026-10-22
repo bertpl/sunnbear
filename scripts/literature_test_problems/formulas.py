@@ -300,7 +300,7 @@ class FormulasTableLine:
 
     `number` is the formula's place in the catalog's tree: category 1, the subcategory, the source and the formula,
     such as `(1, 4, 12, 3)`. `function_decision` is empty unless a person decided that the formula's function differs
-    from the `f` of its first row (`FunctionDecision`).
+    from the `f` of its first row; `FunctionDecision` describes its fields.
 
     A retired formula keeps the rows that it held when it was retired, so that it becomes active again with its own
     id if those rows are `new` again.
@@ -327,16 +327,9 @@ class FormulasTableLine:
         """Return the number of the formula's source, such as `(1, 4, 12)` for `f1.4.12.3`."""
         return self.number[:3]
 
-    def rows(self, source: Source) -> tuple[SourceRow, ...]:
-        """Return the formula's rows from its source, in the order of `row_ids`.
-
-        Raises:
-            DataFileError: If `source` is not the formula's source, or lacks 1 of the formula's rows.
-        """
-        if source.source_id != self.source_id:
-            raise DataFileError(f"{self.formula_id}: {source.source_id} is not its source")
-        else:
-            return tuple(source.find_row(row_id) for row_id in self.row_ids)
+    def values_per_row(self) -> list[str]:
+        """Return each row's decided parameter values, in the order of `row_ids`; each is "" without a family form."""
+        return self.function_decision.values_per_row() or [""] * len(self.row_ids)
 
     def to_csv_line(self) -> dict[str, str]:
         """Return the formula as 1 line of `formulas.csv`, keyed by column."""
@@ -382,3 +375,24 @@ class FormulasTableLine:
                 ),
                 is_retired=line["status"] == "retired",
             )
+
+
+# ==================================================================================================
+#  SurveyFormula
+# ==================================================================================================
+@dataclass(frozen=True)
+class SurveyFormula:
+    """A `SurveyFormula` holds 1 formula's line of `formulas.csv` together with the source that holds its rows."""
+
+    formulas_table_line: FormulasTableLine
+    source: Source
+
+    def __post_init__(self) -> None:
+        """Raise `DataFileError` if `source` is not the formula's source."""
+        if self.source.source_id != self.formulas_table_line.source_id:
+            raise DataFileError(f"{self.formulas_table_line.formula_id}: {self.source.source_id} is not its source")
+
+    @property
+    def rows(self) -> tuple[SourceRow, ...]:
+        """Return the formula's rows from its source, in the order of `row_ids`."""
+        return tuple(self.source.find_row(row_id) for row_id in self.formulas_table_line.row_ids)
