@@ -401,7 +401,7 @@ class RowsTableLine:
     @property
     def source_id(self) -> str:
         """Return the id of the row's source."""
-        return self.row_id.split(":", 1)[0]
+        return source_id_of_row(self.row_id)
 
     @property
     def key(self) -> str:
@@ -476,13 +476,31 @@ class RowsTableLine:
         )
 
 
+def read_rows_table(path: Path) -> list[RowsTableLine]:
+    """Return the rows of `rows.csv`, in time order."""
+    with path.open(encoding="utf-8", newline="") as f:
+        return [RowsTableLine.from_csv_line(line) for line in csv.DictReader(f)]
+
+
+def write_rows_table(path: Path, rows: list[RowsTableLine]) -> None:
+    """Write `rows.csv`, with Unix line endings; `rows` must not be empty."""
+    lines = [row.to_csv_line() for row in rows]
+    with path.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=list(lines[0]), lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(lines)
+
+
+# ==================================================================================================
+#  Formula decisions
+# ==================================================================================================
 @dataclass(frozen=True)
 class FormulaDecision:
     """A `FormulaDecision` holds 1 line of `formula_decisions.csv`: the rows of 1 formula, decided by a person.
 
-    A formula holds 1 `new` row unless a decision says otherwise: a decision names several rows of 1 source that are
-    obviously 1 function, or 1 row whose formula takes another variable than the row's f, as `variable_change`
-    describes; it may do both.
+    Without a decision, each `new` row is a formula of its own. A decision does 1 or both of these: it puts several
+    rows of 1 source that are obviously 1 function into 1 formula, or it gives 1 row's formula a different variable
+    from the row's `f`, which `variable_change` describes.
     """
 
     row_ids: tuple[str, ...]
@@ -490,7 +508,7 @@ class FormulaDecision:
     reason: str
 
     def find_problems(self, status_by_row_id: dict[str, str]) -> list[str]:
-        """Return the problems of the rows that the decision names: unknown, not `new`, or of more than 1 source.
+        """Return the problems of the decision's rows: unknown, not `new`, or of more than 1 source.
 
         `status_by_row_id` holds the final status of every row.
         """
@@ -500,10 +518,34 @@ class FormulaDecision:
                 problems.append(f"formula_decisions.csv names an unknown row, {row_id}")
             elif status_by_row_id[row_id] != "new":
                 problems.append(f"formula_decisions.csv names a row that is not new, {row_id}")
-        source_ids = {row_id.split(":", 1)[0] for row_id in self.row_ids}
+        source_ids = {source_id_of_row(row_id) for row_id in self.row_ids}
         if len(source_ids) > 1:
             problems.append(f"formula_decisions.csv joins rows of {len(source_ids)} sources, {self.row_ids[0]}")
         return problems
+
+    @staticmethod
+    def find_all_problems(formula_decisions: list["FormulaDecision"], rows: list[RowsTableLine]) -> list[str]:
+        """Return the problems of every decision, for the rows of `rows.csv` with their final statuses."""
+        status_by_row_id = {row.row_id: row.final_status.status for row in rows}
+        return [problem for decision in formula_decisions for problem in decision.find_problems(status_by_row_id)]
+
+    # --------------------------------------------------------------------------
+    #  Factory methods
+    # --------------------------------------------------------------------------
+    @classmethod
+    def from_csv_line(cls, line: dict[str, str], file_name: str) -> "FormulaDecision":
+        """Return the decision of 1 line of `formula_decisions.csv`, or raise `DataFileError`.
+
+        Raises:
+            DataFileError: If the line names no rows, gives no reason, or names 1 row and no variable change.
+        """
+        decision = cls(tuple(split_row_ids(line["row_ids"])), line["variable_change"].strip(), line["reason"].strip())
+        if not decision.row_ids or not decision.reason:
+            raise DataFileError(f"{file_name}: each line needs row_ids and a reason")
+        elif len(decision.row_ids) == 1 and not decision.variable_change:
+            raise DataFileError(f"{file_name}: {decision.row_ids[0]} is alone in its line but changes no variable")
+        else:
+            return decision
 
 
 def read_formula_decisions(path: Path) -> list[FormulaDecision]:
@@ -520,34 +562,14 @@ def read_formula_decisions(path: Path) -> list[FormulaDecision]:
         if reader.fieldnames != FORMULA_DECISION_COLUMNS:
             raise DataFileError(f"{path.name}: the columns must be {FORMULA_DECISION_COLUMNS}")
         for line in reader:
-            row_ids = split_row_ids(line["row_ids"])
-            decision = FormulaDecision(tuple(row_ids), line["variable_change"].strip(), line["reason"].strip())
-            repeated = [row_id for row_id in row_ids if row_id in seen_row_ids or row_ids.count(row_id) > 1]
-            if not row_ids or not decision.reason:
-                raise DataFileError(f"{path.name}: each line needs row_ids and a reason")
-            elif len(row_ids) == 1 and not decision.variable_change:
-                raise DataFileError(f"{path.name}: {row_ids[0]} is alone in its line but changes no variable")
-            elif repeated:
+            decision = FormulaDecision.from_csv_line(line, path.name)
+            repeated = [r for r in decision.row_ids if r in seen_row_ids or decision.row_ids.count(r) > 1]
+            if repeated:
                 raise DataFileError(f"{path.name}: {repeated[0]} is in more than 1 line")
             else:
                 decisions.append(decision)
-                seen_row_ids.update(row_ids)
+                seen_row_ids.update(decision.row_ids)
     return decisions
-
-
-def read_rows_table(path: Path) -> list[RowsTableLine]:
-    """Return the rows of `rows.csv`, in time order."""
-    with path.open(encoding="utf-8", newline="") as f:
-        return [RowsTableLine.from_csv_line(line) for line in csv.DictReader(f)]
-
-
-def write_rows_table(path: Path, rows: list[RowsTableLine]) -> None:
-    """Write `rows.csv`, with Unix line endings; `rows` must not be empty."""
-    lines = [row.to_csv_line() for row in rows]
-    with path.open("w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=list(lines[0]), lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(lines)
 
 
 # ==================================================================================================
@@ -565,6 +587,11 @@ def join_row_ids(row_ids: Iterable[str | None]) -> str:
 def split_row_ids(field: str) -> list[str]:
     """Return the row ids of 1 field that `join_row_ids` built, or that a person wrote in the same form."""
     return [row_id.strip() for row_id in field.split(ROW_ID_SEPARATOR) if row_id.strip()]
+
+
+def source_id_of_row(row_id: str) -> str:
+    """Return the id of the source that a row id names, the part before its first `:`."""
+    return row_id.split(":", 1)[0]
 
 
 def _read_string_fields(table: dict, required: set[str], optional: set[str], where: str) -> dict[str, str]:

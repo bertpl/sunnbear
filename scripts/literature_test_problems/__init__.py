@@ -4,7 +4,7 @@ Run it from the repo root:
 
     uv run python -m scripts.literature_test_problems
 
-It runs in 3 stages:
+It runs in these stages:
 
 - **Statuses** (`statuses`, and `helpers`, `functions`, `intervals` and `matching`, which need sympy): parse every
   row's function and intervals, compare every row with all earlier rows, apply `decisions.csv`, and write `rows.csv`.
