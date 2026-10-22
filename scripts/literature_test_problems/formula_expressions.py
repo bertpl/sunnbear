@@ -111,6 +111,20 @@ class FormulaExpression:
         values = {sp.Symbol(name): value for name, value in parameter_values.items()}
         return sp.lambdify(self.variable, self.sympy_expr.subs(values), modules="mpmath")
 
+    def mpmath_magnitude_function(self, parameter_values: dict[str, sp.Expr]) -> Callable:
+        """Return the function of the variable that bounds the magnitudes that float64 evaluation of the function adds.
+
+        It is the function with every sum replaced by the sum of its terms' absolute values, recursively, so that
+        float64 rounding while evaluating the function errs by a small multiple of 2^-53 times its value; for an
+        expanded polynomial near a multiple root, it is far larger than the function itself.
+
+        Args:
+            parameter_values: The value of each parameter, keyed by its survey name.
+        """
+        values = {sp.Symbol(name): value for name, value in parameter_values.items()}
+        magnitude = FormulaExpression._magnitude(sp.expand(self.sympy_expr.subs(values)))
+        return sp.lambdify(self.variable, magnitude, modules="mpmath")
+
     def python_value(self, x: float, python_values: dict[str, float]) -> float:
         """Return the value of the Python code at `x`, with each parameter's value keyed by its Python name."""
         # the code comes from the translation of the survey's text, which reads only its own names and functions
@@ -131,6 +145,18 @@ class FormulaExpression:
             if not is_call and name not in indices and name not in CONSTANTS and name not in names:
                 names.append(name)
         return names
+
+    @staticmethod
+    def _magnitude(expr: sp.Expr) -> sp.Expr:
+        """Return `expr` with every sum, product and power taken over the absolute values of its parts."""
+        if expr.is_Add:
+            return sp.Add(*(FormulaExpression._magnitude(term) for term in expr.args))
+        elif expr.is_Mul:
+            return sp.Mul(*(FormulaExpression._magnitude(factor) for factor in expr.args))
+        elif expr.is_Pow and expr.exp.is_number:
+            return sp.Pow(FormulaExpression._magnitude(expr.base), expr.exp)
+        else:
+            return sp.Abs(expr)
 
     # --------------------------------------------------------------------------
     #  Helpers: rewriting the constructs

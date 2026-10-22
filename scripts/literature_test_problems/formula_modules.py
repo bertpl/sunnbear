@@ -70,6 +70,10 @@ CASE_ATOL = 1e-13
 # CASE_X_ULPS is the number of float64 steps of x, on each side of a case's x-value, over which
 # `FormulaModuleSpec._find_case` measures the spread of the function's exact values.
 CASE_X_ULPS = 4
+# CASE_ROUNDING_UNITS is how many units of float64 rounding, 2^-53 times the function's magnitude
+# (`FormulaExpression.mpmath_magnitude_function`), `FormulaModuleSpec._find_case` lets a case's Python value differ by
+# where the function cancels, as an expanded polynomial does near a multiple root.
+CASE_ROUNDING_UNITS = 16
 # DOCSTRING_WIDTH is the width of a wrapped docstring line, inside a class at 4 spaces of indentation.
 DOCSTRING_WIDTH = 120 - 4
 # RESERVED_NAMES are the names that a parameter of the source may not keep, because the formula module uses them.
@@ -396,9 +400,11 @@ class FormulaModuleSpec:
         else:
             return ParamNotation.DECIMAL.build_value_from_argument(number), True
 
-    @staticmethod
+    @classmethod
     def _find_case(
+        cls,
         exact_function: object,
+        magnitude_function: object,
         formula_expression: FormulaExpression,
         python_values: dict[str, float],
         interval: tuple[float, float],
@@ -408,44 +414,79 @@ class FormulaModuleSpec:
 
         The x-values tried are `CASE_FRACTIONS` of the interval, rounded to 6 significant digits. The generated Python
         code and mpmath both evaluate the function at the float `x - (b - a)*c`, computed as the generated code computes
-        it, so that only the function's own arithmetic can differ. The case takes:
-
-        - the first x-value where they agree within `CASE_RTOL` and `CASE_ATOL`, with no `atol`;
-        - failing that, the first x-value where they differ by no more than the function's spread over `CASE_X_ULPS`
-          float64 steps of x, with an `atol` of 10 times that spread, since float64 arithmetic cannot do better there.
+        it, so that only the function's own arithmetic can differ. The case takes the first x-value with the strictest
+        tolerance that its 2 values meet (`_case_tolerance`).
 
         Raises:
             GenerationError: If the function is complex at an x-value tried, or the generated Python code agrees with
                 mpmath at none.
         """
         a, b = interval
-        fallback_case = None
+        cases = []
         for fraction in CASE_FRACTIONS:
             x = float(f"{a + fraction * (b - a):.6g}")
             shifted = x - (b - a) * c
-            if not a < x < b:
-                continue
-            try:
-                with mpmath.workdps(50):
-                    exact_value = mpmath.mpmathify(exact_function(mpmath.mpf(shifted)))
-                python_value = formula_expression.python_value(shifted, python_values)
-            except (ArithmeticError, ValueError, TypeError):
-                continue
-            if isinstance(exact_value, mpmath.mpc) and abs(exact_value.imag) > 1e-30 * abs(exact_value):
-                raise GenerationError(f"the function is complex at x = {shifted!r}")
-            expected = float(mpmath.re(exact_value))
-            if not math.isfinite(expected) or not isinstance(python_value, float):
-                continue
-            if math.isclose(python_value, expected, rel_tol=CASE_RTOL, abs_tol=CASE_ATOL):
-                return x, expected, None
-            elif fallback_case is None:
-                spread = FormulaModuleSpec._value_spread(exact_function, shifted, expected)
-                if abs(python_value - expected) <= spread:
-                    fallback_case = (x, expected, float(f"{10 * spread:.1g}"))
-        if fallback_case is not None:
-            return fallback_case
+            values = cls._case_values(exact_function, formula_expression, python_values, shifted) if a < x < b else None
+            if values is not None:
+                tolerance = cls._case_tolerance(exact_function, magnitude_function, shifted, *values)
+                if tolerance is not None:
+                    strictness, atol = tolerance
+                    cases.append((strictness, x, values[0], atol))
+        if cases:
+            _, x, expected, atol = min(cases, key=lambda case: case[0])
+            return x, expected, atol
         else:
             raise GenerationError(f"the Python form agrees with mpmath at none of the x-values tried, c = {c}")
+
+    @staticmethod
+    def _case_values(
+        exact_function: object, formula_expression: FormulaExpression, python_values: dict[str, float], x: float
+    ) -> tuple[float, float] | None:
+        """Return the function's exact value at x, rounded to float64, and its Python value; None where either fails.
+
+        Raises:
+            GenerationError: If the function is complex at x.
+        """
+        try:
+            with mpmath.workdps(50):
+                exact_value = mpmath.mpmathify(exact_function(mpmath.mpf(x)))
+            python_value = formula_expression.python_value(x, python_values)
+        except (ArithmeticError, ValueError, TypeError):
+            return None
+        if isinstance(exact_value, mpmath.mpc) and abs(exact_value.imag) > 1e-30 * abs(exact_value):
+            raise GenerationError(f"the function is complex at x = {x!r}")
+        expected = float(mpmath.re(exact_value))
+        if math.isfinite(expected) and isinstance(python_value, float):
+            return expected, python_value
+        else:
+            return None
+
+    @staticmethod
+    def _case_tolerance(
+        exact_function: object, magnitude_function: object, x: float, expected: float, python_value: float
+    ) -> tuple[int, float | None] | None:
+        """Return the strictest tolerance that a case at x meets, as its rank and its `atol`, or None if it meets none.
+
+        The tolerances, from the strictest:
+
+        - rank 0: `CASE_RTOL` and `CASE_ATOL`, with no `atol` of its own;
+        - rank 1: the function's spread over `CASE_X_ULPS` float64 steps of x, with an `atol` of 10 times that spread,
+          since float64 arithmetic cannot do better there;
+        - rank 2: `CASE_ROUNDING_UNITS` units of float64 rounding of the function's magnitude (`magnitude_function`),
+          with an `atol` of twice that bound: the function cancels there, and float64 cannot evaluate it better.
+        """
+        difference = abs(python_value - expected)
+        if math.isclose(python_value, expected, rel_tol=CASE_RTOL, abs_tol=CASE_ATOL):
+            return 0, None
+        spread = FormulaModuleSpec._value_spread(exact_function, x, expected)
+        with mpmath.workdps(50):
+            rounding_bound = CASE_ROUNDING_UNITS * 2.0**-53 * float(mpmath.re(magnitude_function(mpmath.mpf(x))))
+        if difference <= spread:
+            return 1, float(f"{10 * spread:.1g}")
+        elif difference <= rounding_bound:
+            return 2, float(f"{2 * rounding_bound:.1g}")
+        else:
+            return None
 
     @staticmethod
     def _value_spread(exact_function: object, x: float, expected: float) -> float:
@@ -579,11 +620,14 @@ class FormulaModuleSpec:
             params = dict(zip(param_names, values, strict=True))
             python_values = {name: value for name, value in params.items() if name in python_names.values()}
             exact_function = formula_expression.mpmath_function(mpmath_parameter_values)
+            magnitude_function = formula_expression.mpmath_magnitude_function(mpmath_parameter_values)
             # the first tuple gets a 2nd value case, which shifts x
             shifts = (0.0, SHIFTED_CASE_C) if not cases else (0.0,)
             shifted_xs = []
             for c in shifts:
-                x, expected, atol = cls._find_case(exact_function, formula_expression, python_values, bounds, c=c)
+                x, expected, atol = cls._find_case(
+                    exact_function, magnitude_function, formula_expression, python_values, bounds, c=c
+                )
                 tolerance = f", atol={atol!r}" if atol is not None else ""
                 cases.append(
                     f"FormulaTestCase.value(params={params!r}, x={x!r}, c={c!r}, expected={expected!r}{tolerance})"
@@ -770,16 +814,19 @@ def _join_words(words: list[str]) -> str:
 def _docstring(text: str, width: int) -> str:
     """Return `text` as a docstring: each paragraph wrapped at `width`, the opening quotes on its first line.
 
-    A paragraph whose lines all start with `- ` is a list, whose items are wrapped one by one.
+    The lines of a paragraph that start with `- ` are list items, each wrapped on its own; the lines before the first
+    item are wrapped together.
     """
     paragraphs = []
     for i, paragraph in enumerate(text.split("\n\n")):
         initial_indent = '"""' if i == 0 else ""
         lines = paragraph.splitlines()
-        if all(line.startswith("- ") for line in lines):
-            paragraphs.append("\n".join(textwrap.fill(line, width=width, subsequent_indent="  ") for line in lines))
-        else:
-            paragraphs.append(textwrap.fill(paragraph, width=width, initial_indent=initial_indent))
+        n_lead = next((k for k, line in enumerate(lines) if line.startswith("- ")), len(lines))
+        wrapped = []
+        if n_lead:
+            wrapped.append(textwrap.fill(" ".join(lines[:n_lead]), width=width, initial_indent=initial_indent))
+        wrapped += [textwrap.fill(line, width=width, subsequent_indent="  ") for line in lines[n_lead:]]
+        paragraphs.append("\n".join(wrapped))
     if len(paragraphs) == 1 and "\n" not in paragraphs[0] and len(paragraphs[0]) + 3 <= width:
         return paragraphs[0] + '"""'
     else:
@@ -787,8 +834,22 @@ def _docstring(text: str, width: int) -> str:
 
 
 def _string_code(text: str, width: int) -> str:
-    """Return the code of a string literal, split into implicitly joined pieces of at most `width` characters."""
-    pieces = textwrap.wrap(text, width=width, drop_whitespace=False, break_long_words=False, break_on_hyphens=False)
+    """Return the code of a string literal, split into implicitly joined pieces of at most `width` characters.
+
+    A piece never spans a line break of `text`, so that the code keeps the text's lines.
+    """
+    pieces = [
+        piece
+        for line in text.splitlines(keepends=True)
+        for piece in textwrap.wrap(
+            line,
+            width=width,
+            replace_whitespace=False,
+            drop_whitespace=False,
+            break_long_words=False,
+            break_on_hyphens=False,
+        )
+    ]
     if "".join(pieces) != text:
         raise GenerationError(f"the text {text!r} does not split into pieces that join back to it")
     elif len(pieces) == 1:
