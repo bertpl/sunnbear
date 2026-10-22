@@ -47,6 +47,11 @@ CATALOG_DIR = (
 UNTRANSLATABLE_FORMULAS = {
     "f1.1.2.4": "an infinite sum, which the module sums until its terms vanish in float64",
     "f1.1.11.2": "a function `alpha` that the row's parameters define",
+    "f1.2.18.14": "a product written with `...`",
+    "f1.2.19.3": "the stated root `x*` as a parameter",
+    "f1.2.19.6": "noise of a stated distribution, which the module takes from `normal_noise`",
+    "f1.2.20.2": "a normal cumulative distribution function with a mean and a variance, `Phi(x; mu, sigma^2)`",
+    "f1.2.20.3": "parameters given as sets, `{a0, a1, a2, a3, m} = {...}`",
 }
 # CASE_FRACTIONS are the positions in the interval, as fractions of its width, at which the cases are tried, in
 # order; the first position where the generated Python agrees with mpmath is kept. Every fraction is at least
@@ -94,7 +99,8 @@ class FormulaModuleSpec:
         renamed_parameters: Each parameter whose Python name differs from its survey name, as the pair of its survey
             name and its Python name.
         interval: The single interval of a formula that has 1, and None otherwise.
-        exact_texts_of_rounded_bounds: The exact text of each bound that the tuples round to `CANONICAL_DIGITS`
+        exact_texts_of_rounded_values: The exact text of each parameter value or bound that the tuples round to
+            `CANONICAL_DIGITS`
             significant digits.
         cases: Each case as the Python code of a `FormulaTestCase` factory call.
     """
@@ -105,7 +111,7 @@ class FormulaModuleSpec:
     renamed_parameters: tuple[tuple[str, str], ...]
     tuples: tuple[tuple[float, ...], ...]
     interval: tuple[float, float] | None
-    exact_texts_of_rounded_bounds: tuple[str, ...]
+    exact_texts_of_rounded_values: tuple[str, ...]
     cases: tuple[str, ...]
 
     def module_text(self) -> str:
@@ -232,8 +238,8 @@ class FormulaModuleSpec:
             )
         if self.renamed_parameters:
             paragraphs.append(self._renamed_parameters_text())
-        if self.exact_texts_of_rounded_bounds:
-            paragraphs.append(self._rounded_bounds_text())
+        if self.exact_texts_of_rounded_values:
+            paragraphs.append(self._rounded_values_text())
         for row in rows:
             if row.notes.strip() and len(rows) == 1:
                 paragraphs.append(row.notes.strip())
@@ -255,13 +261,13 @@ class FormulaModuleSpec:
             )
         return " ".join(sentences)
 
-    def _rounded_bounds_text(self) -> str:
-        """Return the sentence that names the bounds that the tuples round to `CANONICAL_DIGITS` significant digits."""
-        rounded_bounds = ", ".join(f"``{bound}``" for bound in self.exact_texts_of_rounded_bounds)
-        if len(self.exact_texts_of_rounded_bounds) == 1:
-            subject = f"The bound {rounded_bounds} is"
+    def _rounded_values_text(self) -> str:
+        """Return the sentence that names the values that the tuples round to `CANONICAL_DIGITS` significant digits."""
+        rounded_values = ", ".join(f"``{value}``" for value in self.exact_texts_of_rounded_values)
+        if len(self.exact_texts_of_rounded_values) == 1:
+            subject = f"The value {rounded_values} is"
         else:
-            subject = f"The bounds {rounded_bounds} are"
+            subject = f"The values {rounded_values} are"
         return f"{subject} rounded to {CANONICAL_DIGITS} significant digits, the most that a parameter value holds."
 
     @staticmethod
@@ -359,12 +365,16 @@ class FormulaModuleSpec:
         return python_names
 
     @staticmethod
-    def _parameter_value(value: sp.Expr, name: str) -> float:
-        """Return a published parameter value as a float, or raise `GenerationError` if no parameter can hold it."""
+    def _parameter_value(value: sp.Expr) -> tuple[float, bool]:
+        """Return a published parameter value as a float that a parameter holds, and whether it was rounded for that.
+
+        A value that needs more than `CANONICAL_DIGITS` significant digits, such as `sqrt(2)`, is rounded to them.
+        """
         number = float(sp.N(value, 30))
-        if not ParamNotation.is_valid_value(number):
-            raise GenerationError(f"{name} = {value} needs more than {CANONICAL_DIGITS} significant digits")
-        return number
+        if ParamNotation.is_valid_value(number):
+            return number, False
+        else:
+            return float(f"{number:.{CANONICAL_DIGITS}g}"), True
 
     @staticmethod
     def _find_case(
@@ -475,25 +485,36 @@ class FormulaModuleSpec:
     @classmethod
     def _tuple_values(
         cls, published_test_function: PublishedTestFunction, has_interval_parameters: bool
-    ) -> tuple[tuple[float, ...], tuple[float, float], list[str]]:
-        """Return a published test function's parameter tuple, its bounds, and the exact text of each rounded bound.
+    ) -> tuple[tuple[float, ...], tuple[float, float], list[str], dict[str, sp.Expr]]:
+        """Return a published test function's parameter tuple, bounds, rounded values and the values for mpmath.
 
-        With `has_interval_parameters`, the bounds are rounded to `CANONICAL_DIGITS` significant digits, both in the
-        returned bounds and at the end of the tuple.
+        The 4 results are the tuple, the bounds, the exact text of each value that is rounded, and the parameter values
+        at which mpmath evaluates the function, keyed by survey name.
+
+        A parameter value is rounded to `CANONICAL_DIGITS` significant digits where it needs more
+        (`_parameter_value`), and mpmath then evaluates the function at the rounded value, as the formula does. With
+        `has_interval_parameters`, the bounds are rounded too, both in the returned bounds and at the end of the tuple.
         """
-        values = tuple(cls._parameter_value(value, name) for name, value in published_test_function.parameter_values)
+        values, exact_texts_of_rounded_values, reference_values = [], [], {}
+        for name, exact_value in published_test_function.parameter_values:
+            value, is_rounded = cls._parameter_value(exact_value)
+            values.append(value)
+            if is_rounded:
+                exact_texts_of_rounded_values.append(str(exact_value))
+                reference_values[name] = sp.Rational(repr(value))
+            else:
+                reference_values[name] = exact_value
         interval = published_test_function.interval
         exact_bounds = (sp.sympify(interval.lower), sp.sympify(interval.upper))
         bounds = tuple(float(sp.N(bound, 30)) for bound in exact_bounds)
-        exact_texts_of_rounded_bounds = []
         if has_interval_parameters:
             rounded = tuple(float(f"{bound:.{CANONICAL_DIGITS}g}") for bound in bounds)
-            exact_texts_of_rounded_bounds = [
+            exact_texts_of_rounded_values += [
                 str(e) for e, r, f in zip(exact_bounds, rounded, bounds, strict=True) if r != f
             ]
             bounds = rounded
             values += bounds
-        return values, bounds, exact_texts_of_rounded_bounds
+        return tuple(values), bounds, exact_texts_of_rounded_values, reference_values
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -523,17 +544,17 @@ class FormulaModuleSpec:
         param_names = tuple(python_names[name] for name in published_formula.survey_parameter_names)
         if has_interval_parameters:
             param_names += ("a", "b")
-        tuples, cases, exact_texts_of_rounded_bounds = [], [], []
+        tuples, cases, exact_texts_of_rounded_values = [], [], []
         bounds_cases: dict[tuple[float, float], str] = {}
         for published_test_function in published_formula.test_functions:
-            values, bounds, test_function_exact_texts_of_rounded_bounds = cls._tuple_values(
+            values, bounds, test_function_exact_texts_of_rounded_values, reference_values = cls._tuple_values(
                 published_test_function, has_interval_parameters
             )
-            exact_texts_of_rounded_bounds += test_function_exact_texts_of_rounded_bounds
+            exact_texts_of_rounded_values += test_function_exact_texts_of_rounded_values
             tuples.append(values)
             params = dict(zip(param_names, values, strict=True))
             python_values = {name: value for name, value in params.items() if name in python_names.values()}
-            exact_function = formula_expression.mpmath_function(dict(published_test_function.parameter_values))
+            exact_function = formula_expression.mpmath_function(reference_values)
             # the first tuple gets a 2nd value case, which shifts x
             shifts = (0.0, SHIFTED_CASE_C) if not cases else (0.0,)
             shifted_xs = []
@@ -576,7 +597,7 @@ class FormulaModuleSpec:
             ),
             tuples=tuple(tuples),
             interval=None if has_interval_parameters else bounds,
-            exact_texts_of_rounded_bounds=tuple(dict.fromkeys(exact_texts_of_rounded_bounds)),
+            exact_texts_of_rounded_values=tuple(dict.fromkeys(exact_texts_of_rounded_values)),
             cases=(*cases, *bounds_cases.values()),
         )
 

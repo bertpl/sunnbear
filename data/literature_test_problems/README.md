@@ -235,6 +235,8 @@ For each source named, the script writes the source's package and its formula mo
 
 For a formula of several rows, the script checks that each row's own `f`, at that row's values, gives the formula's function.
 
+**A value that needs more than 12 significant digits,** a parameter value such as `sqrt(2)` or a bound such as `pi` of a formula with several intervals, is rounded to 12, the most that a parameter value holds; the module's docstring names each rounded value, and its test cases evaluate the function at the rounded value.
+
 **A test case whose function is ill-conditioned,** such as `sin(x*10^6)`, gets a wider `atol`, which `FormulaModuleSpec._find_case` in `scripts/literature_test_problems/formula_modules.py` sets:
 
 - **When:** the test case's Python value differs from mpmath's by more than `CASE_ATOL`, but by no more than the spread of the function's exact values within `CASE_X_ULPS` float64 steps of x on either side.

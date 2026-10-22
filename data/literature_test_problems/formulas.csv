@@ -121,7 +121,7 @@ f1.2.2.4,active,1985_norton,1985_norton:8,,,
 f1.2.2.5,active,1985_norton,1985_norton:9,,,
 f1.2.2.6,active,1985_norton,1985_norton:10,,,
 f1.2.2.7,active,1985_norton,1985_norton:driver,,,
-f1.2.3.1,active,1992_alefeld_potra,1992_alefeld_potra:1 | 1992_alefeld_potra:4,,,
+f1.2.3.1,active,1992_alefeld_potra,1992_alefeld_potra:1 | 1992_alefeld_potra:4,,x^3 - a,a = 1 | a = -1
 f1.2.3.2,active,1992_alefeld_potra,1992_alefeld_potra:2,,,
 f1.2.3.3,active,1992_alefeld_potra,1992_alefeld_potra:3,,,
 f1.2.3.4,active,1992_alefeld_potra,1992_alefeld_potra:6,,,
@@ -181,7 +181,7 @@ f1.2.13.1,active,2019_sabharwal,2019_sabharwal:Fig. 1,,,
 f1.2.13.2,active,2019_sabharwal,2019_sabharwal:Fig. 2,,,
 f1.2.13.3,active,2019_sabharwal,2019_sabharwal:Fig. 3,,,
 f1.2.13.4,active,2019_sabharwal,2019_sabharwal:Fig. 4,,,
-f1.2.13.5,active,2019_sabharwal,2019_sabharwal:T2.1 | 2019_sabharwal:T2.2 | 2019_sabharwal:T2.3,,,
+f1.2.13.5,active,2019_sabharwal,2019_sabharwal:T2.1 | 2019_sabharwal:T2.2 | 2019_sabharwal:T2.3,,x^2 - a,a = 3 | a = 5 | a = 10
 f1.2.13.6,active,2019_sabharwal,2019_sabharwal:T2.4,,,
 f1.2.13.7,active,2019_sabharwal,2019_sabharwal:T2.5,,,
 f1.2.13.8,active,2019_sabharwal,2019_sabharwal:T2.6,,,
@@ -201,10 +201,10 @@ f1.2.17.2,active,2025_romadani_python_implementations,2025_romadani_python_imple
 f1.2.17.3,active,2025_romadani_python_implementations,2025_romadani_python_implementations:5.3,,,
 f1.2.17.4,active,2025_romadani_python_implementations,2025_romadani_python_implementations:5.4,,,
 f1.2.18.1,active,2026_ellithy,2026_ellithy:1,,,
-f1.2.18.2,active,2026_ellithy,2026_ellithy:16 | 2026_ellithy:37,,,
-f1.2.18.3,active,2026_ellithy,2026_ellithy:17 | 2026_ellithy:28 | 2026_ellithy:44,,,
+f1.2.18.2,active,2026_ellithy,2026_ellithy:16 | 2026_ellithy:37,,sin(a*x) - b*x,"a = 10, b = 0.5 | a = 20, b = 0.3"
+f1.2.18.3,active,2026_ellithy,2026_ellithy:17 | 2026_ellithy:28 | 2026_ellithy:44,,x - e*sin(x) - M,"e = 0.8, M = 1.2 | e = 0.5, M = 1 | e = 0.99, M = 2"
 f1.2.18.4,active,2026_ellithy,2026_ellithy:19,,,
-f1.2.18.5,active,2026_ellithy,2026_ellithy:20 | 2026_ellithy:39,,,
+f1.2.18.5,active,2026_ellithy,2026_ellithy:20 | 2026_ellithy:39,,exp(x^2) - exp(a*x),a = 2^(1/2) | a = 1.2
 f1.2.18.6,active,2026_ellithy,2026_ellithy:21,,,
 f1.2.18.7,active,2026_ellithy,2026_ellithy:22,,,
 f1.2.18.8,active,2026_ellithy,2026_ellithy:23,,,
