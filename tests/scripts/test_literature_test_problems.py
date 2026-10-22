@@ -4,6 +4,7 @@ The tests use the script's modules that need only the standard library; the row 
 needs sympy, is not run here, because another sympy version could change a match.
 """
 
+import csv
 import importlib
 import importlib.util
 import re
@@ -33,7 +34,7 @@ def script_modules() -> dict[str, ModuleType]:
     spec.loader.exec_module(package)
     return {
         name: importlib.import_module(f"literature_test_problems.{name}")
-        for name in ("data_files", "statuses", "overview")
+        for name in ("data_files", "statuses", "overview", "formulas")
     }
 
 
@@ -59,6 +60,22 @@ def rows(script_modules, folder):
 def decisions(script_modules, folder):
     """Return the committed decisions."""
     return script_modules["data_files"].read_decisions(folder.decisions_file)
+
+
+@pytest.fixture(scope="module")
+def formula_decisions(script_modules, folder):
+    """Return the committed decisions of the formulas."""
+    return script_modules["data_files"].read_formula_decisions(folder.formula_decisions_file)
+
+
+@pytest.fixture(scope="module")
+def committed_formulas(script_modules, folder):
+    """Return the committed `formulas.csv` as a list of (formula id, source id, row ids)."""
+    with folder.formulas_file.open(encoding="utf-8", newline="") as f:
+        return [
+            (line["formula_id"], line["source_id"], script_modules["data_files"].split_row_ids(line["row_ids"]))
+            for line in csv.DictReader(f)
+        ]
 
 
 # ==================================================================================================
@@ -116,6 +133,51 @@ def test_overview_file_matches_its_inputs(script_modules, folder, sources, rows,
     assert built == getattr(folder, file_property).read_text(encoding="utf-8")
 
 
+def test_formulas_file_matches_its_inputs(script_modules, folder, rows, formula_decisions):
+    """`formulas.csv` equals what the script builds from `rows.csv` and `formula_decisions.csv`."""
+    # --- arrange / act ----------------
+    built = script_modules["formulas"].FormulaMapping.build(rows, formula_decisions).csv_text()
+
+    # --- assert -----------------------
+    assert built == folder.formulas_file.read_text(encoding="utf-8")
+
+
+def test_formulas_file_holds_every_new_row_once(rows, committed_formulas):
+    """`formulas.csv` names every `new` row exactly once, and no other row."""
+    # --- arrange / act ----------------
+    named_row_ids = [row_id for _, _, row_ids in committed_formulas for row_id in row_ids]
+    new_row_ids = [row.row_id for row in rows if row.final_status.status == "new"]
+
+    # --- assert -----------------------
+    assert sorted(named_row_ids) == sorted(new_row_ids)
+
+
+def test_formulas_file_keeps_each_formula_within_its_source(committed_formulas):
+    """Every row of a formula in `formulas.csv` comes from the formula's own source."""
+    # --- arrange / act ----------------
+    rows_of_other_sources = [
+        (formula_id, row_id)
+        for formula_id, source_id, row_ids in committed_formulas
+        for row_id in row_ids
+        if row_id.split(":", 1)[0] != source_id
+    ]
+
+    # --- assert -----------------------
+    assert rows_of_other_sources == []
+
+
+def test_formula_decisions_have_no_problems(rows, formula_decisions):
+    """Every line of `formula_decisions.csv` names known `new` rows of 1 source."""
+    # --- arrange ----------------------
+    status_by_row_id = {row.row_id: row.final_status.status for row in rows}
+
+    # --- act --------------------------
+    problems = [problem for decision in formula_decisions for problem in decision.find_problems(status_by_row_id)]
+
+    # --- assert -----------------------
+    assert problems == []
+
+
 def test_readme_lists_every_subcategory(script_modules, folder):
     """The README's list of subcategories equals `SUBCATEGORY_DESCRIPTIONS`."""
     # --- arrange / act ----------------
@@ -138,15 +200,23 @@ def test_readme_lists_every_status(script_modules, folder):
     assert listed == {*data_files.DECIDED_STATUSES, data_files.UNDECIDED}
 
 
-def test_readme_lists_every_decision_column(script_modules, folder):
-    """The README's list of the columns of `decisions.csv` equals the columns that the script reads."""
+@pytest.mark.parametrize(
+    "section, columns_name",
+    [
+        ("Decisions", "DECISION_COLUMNS"),
+        ("Formulas", "FORMULA_DECISION_COLUMNS"),
+    ],
+)
+def test_readme_lists_every_decision_column(script_modules, folder, section, columns_name):
+    """The README's list of the columns of each file of decisions equals the columns that the script reads."""
     # --- arrange / act ----------------
     readme = folder.readme_file.read_text(encoding="utf-8")
-    columns_sentence = re.search(r"with the columns (.+?)\. ", readme).group(1)
+    section_text = readme.split(f"\n## {section}\n")[1].split("\n## ")[0]
+    columns_sentence = re.search(r"with the columns (.+?)\. ", section_text).group(1)
     listed = re.findall(r"`(\w+)`", columns_sentence)
 
     # --- assert -----------------------
-    assert listed == script_modules["data_files"].DECISION_COLUMNS
+    assert listed == getattr(script_modules["data_files"], columns_name)
 
 
 def test_timeline_template_counts_every_status(script_modules):
@@ -219,6 +289,74 @@ def test_find_problems_checks_each_status(
 
     # --- act --------------------------
     problems = script_modules["statuses"].find_problems(final_statuses, decisions={})
+
+    # --- assert -----------------------
+    assert problems == expected_problems
+
+
+# ==================================================================================================
+#  The rules of the formulas
+# ==================================================================================================
+def test_formula_mapping_numbers_sources_and_formulas(script_modules):
+    """Sources with a `new` row are numbered per subcategory in time order; a group takes the place of its first row."""
+    # --- arrange ----------------------
+    data_files = script_modules["data_files"]
+    lines = [
+        ("a:1", "1.1", "new"),
+        ("a:2", "1.1", "duplicate"),
+        ("a:3", "1.1", "new"),
+        ("b:1", "1.1", "incomplete"),  # b has no new row, so it gets no number
+        ("c:1", "1.2", "new"),
+        ("d:1", "1.1", "new"),
+        ("d:2", "1.1", "new"),
+        ("d:3", "1.1", "new"),
+    ]
+    rows = [
+        data_files.RowsTableLine(
+            row_id,
+            2000,
+            subcategory,
+            "x",
+            "",
+            "",
+            "[0, 1]",
+            data_files.AutomaticStatus(status, "", "", "", 1),
+            data_files.FinalStatus(status, "", "", ""),
+        )
+        for row_id, subcategory, status in lines
+    ]
+    formula_decisions = [data_files.FormulaDecision(("d:3", "d:1"), "", "the same function on another interval")]
+
+    # --- act --------------------------
+    mapping = script_modules["formulas"].FormulaMapping.build(rows, formula_decisions)
+
+    # --- assert -----------------------
+    assert [(formula.formula_id, formula.row_ids) for formula in mapping.formulas] == [
+        ("f1.1.1.1", ("a:1",)),
+        ("f1.1.1.2", ("a:3",)),
+        ("f1.1.2.1", ("d:1", "d:3")),
+        ("f1.1.2.2", ("d:2",)),
+        ("f1.2.1.1", ("c:1",)),
+    ]
+
+
+@pytest.mark.parametrize(
+    "row_ids, expected_problems",
+    [
+        (("s:1", "s:3"), []),
+        (("s:1", "s:2"), ["formula_decisions.csv names a row that is not new, s:2"]),
+        (("s:1", "s:9"), ["formula_decisions.csv names an unknown row, s:9"]),
+        (("s:1", "t:1"), ["formula_decisions.csv joins rows of 2 sources, s:1"]),
+    ],
+)
+def test_formula_decision_find_problems(script_modules, row_ids, expected_problems):
+    """`FormulaDecision.find_problems` reports each row that a formula may not hold, and nothing for allowed rows."""
+    # --- arrange ----------------------
+    decision = script_modules["data_files"].FormulaDecision(row_ids, "", "the same function on another interval")
+    status_by_row_id = {"s:1": "new", "s:2": "duplicate", "s:3": "new", "t:1": "new"}
+
+    # --- act --------------------------
+    problems = decision.find_problems(status_by_row_id)
 
     # --- assert -----------------------
     assert problems == expected_problems

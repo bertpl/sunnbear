@@ -1,0 +1,3 @@
+row_ids,variable_change,reason
+"2015_chapra:§8.2, (8.14)","the pH, as `f(10^-pH)` on `[2, 12]`","The book prints the charge balance (8.14) in `H` and bisects on the pH from 2 to 12; 11 bisection steps of `f(10^-pH)` give pH 5.6279 for 1958 and 5.5889 for 2003, the book's 5.6279 and 5.59."
+2015_chapra:Prob. 5.18,"the temperature `T` in deg C, as `f(T + 273.15)` on `[0, 40]`","The problem gives the formula in the absolute temperature `Ta` and asks for `T` in deg C, with initial guesses 0 and 40 deg C; the formula gives the book's 14.621 mg/L at 0 deg C and 6.413 mg/L at 40 deg C."

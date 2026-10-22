@@ -23,6 +23,8 @@ UNDECIDED = "undecided"
 ROW_ID_SEPARATOR = " | "
 # DECISION_COLUMNS are the columns of `decisions.csv`, in order.
 DECISION_COLUMNS = ["row_id", "status", "duplicate_of", "derived_from", "reason"]
+# FORMULA_DECISION_COLUMNS are the columns of `formula_decisions.csv`, in order.
+FORMULA_DECISION_COLUMNS = ["row_ids", "variable_change", "reason"]
 
 
 class DataFileError(ValueError):
@@ -49,9 +51,19 @@ class DataFolder:
         return self.path / "decisions.csv"
 
     @property
+    def formula_decisions_file(self) -> Path:
+        """Return the curated file of the formulas that hold several rows or change a row's variable."""
+        return self.path / "formula_decisions.csv"
+
+    @property
     def rows_file(self) -> Path:
         """Return the generated table of every row with its automatic and final status."""
         return self.path / "rows.csv"
+
+    @property
+    def formulas_file(self) -> Path:
+        """Return the generated table that maps each formula id to its rows."""
+        return self.path / "formulas.csv"
 
     @property
     def summary_file(self) -> Path:
@@ -257,12 +269,12 @@ class FinalStatus:
     @property
     def duplicate_of_ids(self) -> list[str]:
         """Return the ids of the rows in `duplicate_of`."""
-        return self._split_row_ids(self.duplicate_of)
+        return split_row_ids(self.duplicate_of)
 
     @property
     def derived_from_ids(self) -> list[str]:
         """Return the ids of the rows in `derived_from`."""
-        return self._split_row_ids(self.derived_from)
+        return split_row_ids(self.derived_from)
 
     @property
     def named_row_ids(self) -> list[str]:
@@ -334,11 +346,6 @@ class FinalStatus:
             else:
                 first_appearances.append(row_id)
         return first_appearances
-
-    @staticmethod
-    def _split_row_ids(field: str) -> list[str]:
-        """Return the row ids of 1 field that `join_row_ids` built."""
-        return [row_id.strip() for row_id in field.split(ROW_ID_SEPARATOR) if row_id.strip()]
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -469,6 +476,65 @@ class RowsTableLine:
         )
 
 
+@dataclass(frozen=True)
+class FormulaDecision:
+    """A `FormulaDecision` holds 1 line of `formula_decisions.csv`: the rows of 1 formula, decided by a person.
+
+    A formula holds 1 `new` row unless a decision says otherwise: a decision names several rows of 1 source that are
+    obviously 1 function, or 1 row whose formula takes another variable than the row's f, as `variable_change`
+    describes; it may do both.
+    """
+
+    row_ids: tuple[str, ...]
+    variable_change: str
+    reason: str
+
+    def find_problems(self, status_by_row_id: dict[str, str]) -> list[str]:
+        """Return the problems of the rows that the decision names: unknown, not `new`, or of more than 1 source.
+
+        `status_by_row_id` holds the final status of every row.
+        """
+        problems = []
+        for row_id in self.row_ids:
+            if row_id not in status_by_row_id:
+                problems.append(f"formula_decisions.csv names an unknown row, {row_id}")
+            elif status_by_row_id[row_id] != "new":
+                problems.append(f"formula_decisions.csv names a row that is not new, {row_id}")
+        source_ids = {row_id.split(":", 1)[0] for row_id in self.row_ids}
+        if len(source_ids) > 1:
+            problems.append(f"formula_decisions.csv joins rows of {len(source_ids)} sources, {self.row_ids[0]}")
+        return problems
+
+
+def read_formula_decisions(path: Path) -> list[FormulaDecision]:
+    """Return the decisions of `formula_decisions.csv`, or raise `DataFileError`.
+
+    Raises:
+        DataFileError: If the columns are wrong, a line gives no reason, a line of 1 row gives no variable change,
+            or a row is in more than 1 line.
+    """
+    decisions = []
+    seen_row_ids: set[str] = set()
+    with path.open(encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames != FORMULA_DECISION_COLUMNS:
+            raise DataFileError(f"{path.name}: the columns must be {FORMULA_DECISION_COLUMNS}")
+        for line in reader:
+            row_ids = split_row_ids(line["row_ids"])
+            decision = FormulaDecision(tuple(row_ids), line["variable_change"].strip(), line["reason"].strip())
+            repeated = [row_id for row_id in row_ids if row_id in seen_row_ids or row_ids.count(row_id) > 1]
+            if not row_ids or not decision.reason:
+                raise DataFileError(f"{path.name}: each line needs row_ids and a reason")
+            elif len(row_ids) == 1 and not decision.variable_change:
+                raise DataFileError(f"{path.name}: {row_ids[0]} is alone in its line but changes no variable")
+            elif repeated:
+                raise DataFileError(f"{path.name}: {repeated[0]} is in more than 1 line")
+            else:
+                decisions.append(decision)
+                seen_row_ids.update(row_ids)
+    return decisions
+
+
 def read_rows_table(path: Path) -> list[RowsTableLine]:
     """Return the rows of `rows.csv`, in time order."""
     with path.open(encoding="utf-8", newline="") as f:
@@ -494,6 +560,11 @@ _ROW_FIELDS = {"key", "f", "f_description", "name", "parameters", "interval", "a
 def join_row_ids(row_ids: Iterable[str | None]) -> str:
     """Join the distinct row ids, in the order that each first occurs, into 1 field that `FinalStatus` splits again."""
     return ROW_ID_SEPARATOR.join(dict.fromkeys(r for r in row_ids if r))
+
+
+def split_row_ids(field: str) -> list[str]:
+    """Return the row ids of 1 field that `join_row_ids` built, or that a person wrote in the same form."""
+    return [row_id.strip() for row_id in field.split(ROW_ID_SEPARATOR) if row_id.strip()]
 
 
 def _read_string_fields(table: dict, required: set[str], optional: set[str], where: str) -> dict[str, str]:
