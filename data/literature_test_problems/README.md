@@ -8,7 +8,7 @@ Each row is 1 function as its source gives it, with its parameters and intervals
 
 A row's status records whether the source gives enough to define those test functions, and whether an earlier source already gives them all.
 
-The rows are the material for category 1, *Existing benchmark suites*, of sunnbear's formula catalog. The catalog holds the package's formulas in `sunnbear.functions`, each a family of test functions.
+The rows are the material for category 1, *Published test functions*, of sunnbear's formula catalog. The catalog holds the package's formulas in `sunnbear.functions`, each a family of test functions.
 
 ## Files
 
@@ -16,11 +16,13 @@ The rows are the material for category 1, *Existing benchmark suites*, of sunnbe
 |---|---|---|
 | `sources/<id>.toml` | hand | 1 source: its reference, where in the source its rows are, and its rows |
 | `decisions.csv` | hand | the statuses that a person decided, where the script cannot decide or decides wrongly (§ Decisions) |
+| `formula_decisions.csv` | hand | the formulas that hold several rows, or whose variable differs from the variable of their row's function (§ Formulas) |
 | `rows.csv` | script | every row, in time order, with its automatic and its final status (§ Statuses) |
 | `summary.md` | script | 1 line per source: its year, title, subcategory (the kind of source, § Source files), rows and new rows, and the sources that it takes rows from |
 | `timeline.html` | script | a page that draws the sources in time order, with an edge from each source to every later source whose rows name its rows (§ The summary and the page) |
+| `formulas.csv` | script | every formula of category 1, with its `new` rows (§ Formulas) |
 
-Do not edit the 3 generated files by hand; regenerate them (§ Regenerating).
+Do not edit the generated files by hand; regenerate them (§ Regenerating).
 
 ## Source files
 
@@ -148,12 +150,36 @@ Short functions that many sources hold, such as `cos(x) - x`, would connect near
 
 Common functions and the rows that name them still count in the row counts of their sources, and `summary.md` lists the common functions.
 
+## Formulas
+
+Every `new` row belongs to exactly 1 formula of category 1, and that formula belongs to the row's source; `duplicate` and `incomplete` rows belong to none. By default, each `new` row is a formula of its own. A formula's id is `f<subcategory>.<source>.<formula>`, such as `f1.4.12.3`, formula 3 of source 12 of subcategory `1.4`:
+
+- **Sources:** within each subcategory, the sources that have a `new` row are numbered in time order, from 1; a source without a `new` row gets no number.
+- **Formulas:** within a source, the formulas follow the order of its rows, from 1; a formula of several rows is numbered at the position of its first row.
+
+`formula_decisions.csv` holds 1 line per formula that a person decided, with the columns `row_ids`, `variable_change` and `reason`. A line does 1 or both of these:
+
+- **It puts several `new` rows of 1 source into 1 formula,** where they are obviously 1 function: the same expression, in which only the intervals and the values of at most 2 constants or parameters differ.
+  - A varied constant must not change the kind of function, such as the degree of a polynomial, unless the source presents the rows as 1 family.
+  - When in doubt, the rows stay separate formulas.
+- **It changes the variable of 1 row's formula,** where the source prints its function in 1 variable but solves for another: the formula takes the variable that the source solves for, provided that the formula in that variable reproduces the source's results.
+  - The row keeps the function as the source prints it, and `variable_change` describes the formula's variable in words, such as `` the pH, as `f(10^-pH)` on `[2, 12]` `` for a function `f(H)` that the source prints in `H`.
+
+`row_ids` separates the formula's rows by ` | `, and `reason` says why the rows are 1 function, or how the formula in the new variable reproduces the source's results. A line of 1 row must give a `variable_change`, and a row is in at most 1 line.
+
+Rows of different sources never share a formula, so that each formula's id credits the source that introduced its test functions.
+
+A function in 2 forms that compute differently, such as a polynomial expanded and factored, gives 2 separate `new` rows, which stay separate formulas. A formula of several rows keeps each row's parameter values together with that row's intervals: it never combines 1 row's parameter values with another row's interval.
+
+`formulas.csv` lists the formulas in id order, with the columns `formula_id`, `source_id`, `row_ids` and `variable_change`.
+
 ## Adding a source
 
 1. Write `sources/<id>.toml`. Add a relation where a reader needs to know how its rows relate to another source's rows, such as a block of functions that the new source copies with changes; `duplicate_of` and `derived_from` already name every earlier row that the script finds.
 2. Regenerate. The script prints each row that needs a decision; `rows.csv` gives, in `match_kind` and `matches`, why it needs one and the earlier rows that the script found for it.
 3. Add a line to `decisions.csv` for each of those rows, and for any automatic status that is wrong, then regenerate until the script prints no problems.
-4. Commit the source file, `decisions.csv` and the 3 generated files together.
+4. Add a line to `formula_decisions.csv` for each set of the source's `new` rows that are obviously 1 function, and for each row whose formula takes another variable (§ Formulas), then regenerate.
+5. Commit the source file, `decisions.csv`, `formula_decisions.csv` and the generated files together.
 
 ## Regenerating
 
@@ -163,13 +189,20 @@ Run the script from the repo root, with the dev dependencies installed:
 uv run python -m scripts.literature_test_problems
 ```
 
-The script writes the 3 generated files, prints the counts per status and every problem that it finds, and exits with status 1 if there is one. It needs sympy, from the dev dependency group, and a Unix system, because it limits the time of parsing each row with `SIGALRM`.
+The script:
+
+- writes the generated files;
+- prints the counts per status, the number of formulas and every problem that it finds;
+- exits with status 1 if there is a problem.
+
+It needs sympy, from the dev dependency group, and a Unix system, because it limits the time of parsing each row with `SIGALRM`.
 
 CI does not regenerate `rows.csv`, because another sympy version could change a match. Instead, `tests/scripts/test_literature_test_problems.py` checks, with the standard library only, that:
 
 - `rows.csv` holds exactly the rows of the source files;
 - every decision is applied, and every final status follows its rules (§ Statuses): no row names an unknown or a later row, and no duplicate names an `incomplete` row;
 - every source file has its fields;
-- `summary.md` and `timeline.html` equal what the script builds from `rows.csv` and the source files.
+- `summary.md` and `timeline.html` equal what the script builds from `rows.csv` and the source files;
+- `formulas.csv` holds every `new` row exactly once and no other row, the rows of each formula come from its own source, and the file equals what the script builds from `rows.csv` and `formula_decisions.csv`.
 
 A change to the parsing or matching in `scripts/literature_test_problems/`, or to the sympy version, is what the test does not check: whoever makes it regenerates `rows.csv`.

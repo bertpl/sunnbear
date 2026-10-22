@@ -13,7 +13,7 @@ Importing this package registers every shipped formula and category.
 """
 
 from . import (
-    c01_existing_benchmark_suites,
+    c01_published_test_functions,
     c02_standard_function_families,
     c03_purpose_built_functions,
     c99_user_defined_functions,
