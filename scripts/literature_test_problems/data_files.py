@@ -408,6 +408,11 @@ class RowsTableLine:
         """Return the row's key within its source, with the suffix of a repeated key."""
         return self.row_id.split(":", 1)[1]
 
+    @property
+    def subcategory_number(self) -> tuple[int, ...]:
+        """Return the subcategory as a taxonomy number, such as `(1, 4)` for `1.4`."""
+        return tuple(int(part) for part in self.subcategory.split("."))
+
     def to_csv_line(self) -> dict[str, str]:
         """Return the row as 1 line of `rows.csv`, keyed by column."""
         return {

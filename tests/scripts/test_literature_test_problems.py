@@ -4,7 +4,6 @@ The tests use the script's modules that need only the standard library; the row 
 needs sympy, is not run here, because another sympy version could change a match.
 """
 
-import csv
 import importlib
 import importlib.util
 import re
@@ -15,6 +14,17 @@ from types import ModuleType
 import pytest
 
 _PACKAGE_DIR = Path(__file__).resolve().parents[2] / "scripts" / "literature_test_problems"
+# _FIRST_LINES are the rows of a small survey, each as (row id, subcategory, final status).
+_FIRST_LINES = [
+    ("a:1", "1.1", "new"),
+    ("a:2", "1.1", "duplicate"),
+    ("a:3", "1.1", "new"),
+    ("b:1", "1.1", "incomplete"),  # b has no new row, so it gets no number
+    ("c:1", "1.2", "new"),
+    ("d:1", "1.1", "new"),
+    ("d:2", "1.1", "new"),
+    ("d:3", "1.1", "new"),
+]
 
 
 # ==================================================================================================
@@ -69,13 +79,9 @@ def formula_decisions(script_modules, folder):
 
 
 @pytest.fixture(scope="module")
-def committed_formulas(script_modules, folder):
-    """Return the committed `formulas.csv` as a list of (formula id, source id, row ids)."""
-    with folder.formulas_file.open(encoding="utf-8", newline="") as f:
-        return [
-            (line["formula_id"], line["source_id"], script_modules["data_files"].split_row_ids(line["row_ids"]))
-            for line in csv.DictReader(f)
-        ]
+def committed_formulas_table(script_modules, folder):
+    """Return the formulas of the committed `formulas.csv`."""
+    return script_modules["formulas"].read_formulas_table(folder.formulas_file)
 
 
 # ==================================================================================================
@@ -133,33 +139,36 @@ def test_overview_file_matches_its_inputs(script_modules, folder, sources, rows,
     assert built == getattr(folder, file_property).read_text(encoding="utf-8")
 
 
-def test_formulas_file_matches_its_inputs(script_modules, folder, rows, formula_decisions):
-    """`formulas.csv` equals what the script builds from `rows.csv` and `formula_decisions.csv`."""
+def test_formulas_file_matches_its_inputs(script_modules, folder, rows, formula_decisions, committed_formulas_table):
+    """`formulas.csv` equals what the script builds from `rows.csv`, `formula_decisions.csv` and its own ids."""
     # --- arrange / act ----------------
-    built = script_modules["formulas"].FormulasTable.build(rows, formula_decisions).csv_text()
+    formulas_table_cls = script_modules["formulas"].FormulasTable
+    built = formulas_table_cls.build(rows, formula_decisions, committed_formulas_table).csv_text()
 
     # --- assert -----------------------
     assert built == folder.formulas_file.read_text(encoding="utf-8")
 
 
-def test_formulas_file_holds_every_new_row_once(rows, committed_formulas):
-    """`formulas.csv` names every `new` row exactly once, and no other row."""
+def test_formulas_file_holds_every_new_row_once(rows, committed_formulas_table):
+    """The active formulas of `formulas.csv` name every `new` row exactly once, and no other row."""
     # --- arrange / act ----------------
-    named_row_ids = [row_id for _, _, row_ids in committed_formulas for row_id in row_ids]
+    named_row_ids = [
+        row_id for formula in committed_formulas_table.formulas if not formula.is_retired for row_id in formula.row_ids
+    ]
     new_row_ids = [row.row_id for row in rows if row.final_status.status == "new"]
 
     # --- assert -----------------------
     assert sorted(named_row_ids) == sorted(new_row_ids)
 
 
-def test_formulas_file_keeps_each_formula_within_its_source(script_modules, committed_formulas):
+def test_formulas_file_keeps_each_formula_within_its_source(script_modules, committed_formulas_table):
     """Every row of a formula in `formulas.csv` comes from the formula's own source."""
     # --- arrange / act ----------------
     rows_of_other_sources = [
-        (formula_id, row_id)
-        for formula_id, source_id, row_ids in committed_formulas
-        for row_id in row_ids
-        if script_modules["data_files"].source_id_of_row_id(row_id) != source_id
+        (formula.formula_id, row_id)
+        for formula in committed_formulas_table.formulas
+        for row_id in formula.row_ids
+        if script_modules["data_files"].source_id_of_row_id(row_id) != formula.source_id
     ]
 
     # --- assert -----------------------
@@ -309,37 +318,14 @@ def test_find_problems_checks_each_status(
 #  The rules of the formulas
 # ==================================================================================================
 def test_formulas_table_numbers_sources_and_formulas(script_modules):
-    """Sources with a `new` row are numbered per subcategory in time order, and formulas by their first row."""
+    """Built without committed ids, sources are numbered per subcategory in time order, formulas by their first row."""
     # --- arrange ----------------------
-    data_files = script_modules["data_files"]
-    lines = [
-        ("a:1", "1.1", "new"),
-        ("a:2", "1.1", "duplicate"),
-        ("a:3", "1.1", "new"),
-        ("b:1", "1.1", "incomplete"),  # b has no new row, so it gets no number
-        ("c:1", "1.2", "new"),
-        ("d:1", "1.1", "new"),
-        ("d:2", "1.1", "new"),
-        ("d:3", "1.1", "new"),
-    ]
-    rows = [
-        data_files.RowsTableLine(
-            row_id,
-            2000,
-            subcategory,
-            "x",
-            "",
-            "",
-            "[0, 1]",
-            data_files.AutomaticStatus(status, "", "", "", 1),
-            data_files.FinalStatus(status, "", "", ""),
-        )
-        for row_id, subcategory, status in lines
-    ]
-    formula_decisions = [data_files.FormulaDecision(("d:3", "d:1"), "", "the same function on another interval")]
+    rows = _rows_table_lines(script_modules, _FIRST_LINES)
+    formula_decisions = _formula_decisions(script_modules, [("d:3", "d:1")])
+    formulas_table_cls = script_modules["formulas"].FormulasTable
 
     # --- act --------------------------
-    formulas_table = script_modules["formulas"].FormulasTable.build(rows, formula_decisions)
+    formulas_table = formulas_table_cls.build(rows, formula_decisions, formulas_table_cls(()))
 
     # --- assert -----------------------
     assert [(formula.formula_id, formula.row_ids) for formula in formulas_table.formulas] == [
@@ -349,6 +335,114 @@ def test_formulas_table_numbers_sources_and_formulas(script_modules):
         ("f1.1.2.2", ("d:2",)),
         ("f1.2.1.1", ("c:1",)),
     ]
+
+
+def test_formulas_table_appends_new_ids_and_retires_old_ones(script_modules):
+    """Later rows keep every committed id, append new ones, and retire a formula whose row is no longer `new`."""
+    # --- arrange ----------------------
+    formula_decisions = _formula_decisions(script_modules, [("d:3", "d:1")])
+    committed_table = _first_formulas_table(script_modules)
+    later_lines = [
+        ("z:1", "1.1", "new"),  # an older source, added later
+        ("a:1", "1.1", "new"),
+        ("a:4", "1.1", "new"),  # a row added between a's rows
+        ("a:2", "1.1", "duplicate"),
+        ("a:3", "1.1", "duplicate"),  # now a duplicate of z:1
+        ("b:1", "1.1", "new"),  # b's row became complete, so b gets a number
+        ("c:1", "1.2", "new"),
+        ("d:1", "1.1", "new"),
+        ("d:2", "1.1", "new"),
+        ("d:3", "1.1", "new"),
+    ]
+
+    # --- act --------------------------
+    formulas_table = script_modules["formulas"].FormulasTable.build(
+        _rows_table_lines(script_modules, later_lines), formula_decisions, committed_table
+    )
+
+    # --- assert -----------------------
+    assert [(f.formula_id, f.row_ids, f.is_retired) for f in formulas_table.formulas] == [
+        ("f1.1.1.1", ("a:1",), False),
+        ("f1.1.1.2", ("a:3",), True),
+        ("f1.1.1.3", ("a:4",), False),
+        ("f1.1.2.1", ("d:1", "d:3"), False),
+        ("f1.1.2.2", ("d:2",), False),
+        ("f1.1.3.1", ("z:1",), False),
+        ("f1.1.4.1", ("b:1",), False),
+        ("f1.2.1.1", ("c:1",), False),
+    ]
+
+
+def test_formulas_table_reactivates_a_retired_formula(script_modules):
+    """A retired formula whose rows are `new` again becomes active again with its own id."""
+    # --- arrange ----------------------
+    formulas_table_cls = script_modules["formulas"].FormulasTable
+    formula_decisions = _formula_decisions(script_modules, [("d:3", "d:1")])
+    first_table = _first_formulas_table(script_modules)
+    a3_duplicate_lines = [(row_id, s, "duplicate" if row_id == "a:3" else status) for row_id, s, status in _FIRST_LINES]
+    retired_table = formulas_table_cls.build(
+        _rows_table_lines(script_modules, a3_duplicate_lines), formula_decisions, first_table
+    )
+
+    # --- act --------------------------
+    formulas_table = formulas_table_cls.build(
+        _rows_table_lines(script_modules, _FIRST_LINES), formula_decisions, retired_table
+    )
+
+    # --- assert -----------------------
+    assert formulas_table == first_table
+
+
+@pytest.mark.parametrize(
+    "lines, decided_row_ids, expected_problems",
+    [
+        # a decision that joins 2 committed formulas
+        (_FIRST_LINES, [("d:1", "d:2", "d:3")], ["the formula of d:1 would join or split f1.1.2.1, f1.1.2.2"]),
+        # a removed decision, which splits a committed formula
+        (
+            _FIRST_LINES,
+            [],
+            ["the formula of d:1 would join or split f1.1.2.1", "the formula of d:3 would join or split f1.1.2.1"],
+        ),
+        # a row that no longer exists
+        (
+            [line for line in _FIRST_LINES if line[0] != "d:2"],
+            [("d:3", "d:1")],
+            ["f1.1.2.2 names a row that no longer exists, d:2"],
+        ),
+        # a source that moved to another subcategory
+        (
+            [(row_id, "1.1", status) if row_id == "c:1" else (row_id, s, status) for row_id, s, status in _FIRST_LINES],
+            [("d:3", "d:1")],
+            ["the source of f1.2.1.1 is now in another subcategory"],
+        ),
+    ],
+)
+def test_formulas_table_stops_on_a_change_that_moves_an_id(script_modules, lines, decided_row_ids, expected_problems):
+    """`FormulasTable.build` raises `FormulaIdError` with every change that would move a committed id."""
+    # --- arrange ----------------------
+    formulas_module = script_modules["formulas"]
+    committed_table = _first_formulas_table(script_modules)
+
+    # --- act --------------------------
+    with pytest.raises(formulas_module.FormulaIdError) as error:
+        formulas_module.FormulasTable.build(
+            _rows_table_lines(script_modules, lines),
+            _formula_decisions(script_modules, decided_row_ids),
+            committed_table,
+        )
+
+    # --- assert -----------------------
+    assert error.value.problems == expected_problems
+
+
+def test_read_formulas_table_of_a_missing_file_is_empty(script_modules, tmp_path):
+    """Without `formulas.csv`, the committed table is empty, so the script numbers every formula from scratch."""
+    # --- arrange / act ----------------
+    formulas_table = script_modules["formulas"].read_formulas_table(tmp_path / "formulas.csv")
+
+    # --- assert -----------------------
+    assert formulas_table.formulas == ()
 
 
 @pytest.mark.parametrize(
@@ -373,3 +467,41 @@ def test_formula_decision_find_problems(script_modules, row_ids, expected_proble
 
     # --- assert -----------------------
     assert problems == expected_problems
+
+
+# ==================================================================================================
+#  Helpers
+# ==================================================================================================
+def _rows_table_lines(script_modules, lines):
+    """Return a row of `rows.csv` for each (row id, subcategory, final status) of `lines`, in the same order."""
+    data_files = script_modules["data_files"]
+    return [
+        data_files.RowsTableLine(
+            row_id,
+            2000,
+            subcategory,
+            "x",
+            "",
+            "",
+            "[0, 1]",
+            data_files.AutomaticStatus(status, "", "", "", 1),
+            data_files.FinalStatus(status, "", "", ""),
+        )
+        for row_id, subcategory, status in lines
+    ]
+
+
+def _formula_decisions(script_modules, decided_row_ids):
+    """Return a formula decision for each tuple of row ids of `decided_row_ids`."""
+    formula_decision_cls = script_modules["data_files"].FormulaDecision
+    return [formula_decision_cls(row_ids, "", "the same function on another interval") for row_ids in decided_row_ids]
+
+
+def _first_formulas_table(script_modules):
+    """Return the formulas that `_FIRST_LINES` give from scratch, with d:1 and d:3 in 1 formula."""
+    formulas_table_cls = script_modules["formulas"].FormulasTable
+    return formulas_table_cls.build(
+        _rows_table_lines(script_modules, _FIRST_LINES),
+        _formula_decisions(script_modules, [("d:3", "d:1")]),
+        formulas_table_cls(()),
+    )
