@@ -1,4 +1,4 @@
-"""This module holds the formula of 9 in Chandrupatla (1997).
+"""This module holds the formula that Chandrupatla (1997) labels 9.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -17,8 +17,8 @@ SURVEY_FIELDS_HASH = "51ca802219f447e8"
 class Chandrupatla19979(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``exp(x) - 2 - 0.01/x^2 + 0.000002/x^3``; the formula's interval is `[2E-4, 1]`; `[2E-4, 3]`;
-    `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`.
+    The survey writes the source's function as ``exp(x) - 2 - 0.01/x^2 + 0.000002/x^3``; the formula's intervals are
+    `[2E-4, 1]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`.
 
     Printed zero: `x = 0.7032`.
     """

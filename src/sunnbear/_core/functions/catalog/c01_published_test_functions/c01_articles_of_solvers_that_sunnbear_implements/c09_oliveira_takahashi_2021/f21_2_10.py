@@ -1,4 +1,4 @@
-"""This module holds the formula of 2.10 in Oliveira, Takahashi (2021).
+"""This module holds the formula that Oliveira, Takahashi (2021) labels 2.10.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -11,15 +11,18 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "aee4413e20a03122"
+SURVEY_FIELDS_HASH = "94887e6a1e3639e9"
 
 
 class OliveiraTakahashi2021210(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``(x > -1)*(1 + sin(1/(x + 1))) - 1``; the formula's interval is ``[-1, 1]``.
+    The survey writes the source's function as ``(x > -1)*(1 + sin(1/(x + 1))) - 1``; the formula's interval is ``[-1,
+    1]``.
 
-    The code and sunnbear write the same function as `sin(1/(x + 1))` for `x > -1` and `-1` elsewhere.
+    The authors' MATLAB code and sunnbear's test transcription in `tests/solvers/paper_problems/oliveira_takahashi.py`
+    write the same function as `sin(1/(x + 1))` for `x > -1` and `-1` elsewhere. At `x = -1`, where the printed product
+    holds `sin(1/0)`, they return `-1`, and so does the formula, which evaluates `sin(1/(x + 1))` only for `x > -1`.
     """
 
     number = (1, 1, 9, 21)
@@ -39,7 +42,7 @@ class OliveiraTakahashi2021210(Formula):
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - 2.0 * c
-        return ((x) > (-1)) * (1 + math.sin(1 / (x + 1))) - 1
+        return ((1 + math.sin(1 / (x + 1))) if (x) > (-1) else 0.0) - 1
 
     def interval_bounds(self) -> tuple[float, float]:
         """Return the formula's interval."""

@@ -1,4 +1,4 @@
-"""This module holds the formula of 1.6 in Oliveira, Takahashi (2021).
+"""This module holds the formula that Oliveira, Takahashi (2021) labels 1.6.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -17,7 +17,7 @@ SURVEY_FIELDS_HASH = "6e728b20aae5fcde"
 class OliveiraTakahashi202116(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``pi^x - e``; the formula's interval is ``[-1, 1]``.
+    The survey writes the source's function as ``pi^x - e``; the formula's interval is ``[-1, 1]``.
     """
 
     number = (1, 1, 9, 5)

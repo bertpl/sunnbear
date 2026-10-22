@@ -1,4 +1,4 @@
-"""This module holds the formula of III.1 in Ridders (1979).
+"""This module holds the formula that Ridders (1979) labels III.1.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -17,7 +17,8 @@ SURVEY_FIELDS_HASH = "5eb49ebcb23c36fa"
 class Ridders1979Iii1(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``x*exp(x) - 10``; the formula's interval is `[-10, 10]`; `[-100, 100]`.
+    The survey writes the source's function as ``x*exp(x) - 10``; the formula's intervals are `[-10, 10]`; `[-100,
+    100]`.
 
     Last printed iterate: `1.745528003`.
     """

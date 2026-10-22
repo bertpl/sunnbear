@@ -1,4 +1,4 @@
-"""This module holds the formula of 12 in Alefeld, Potra, Shi (1995).
+"""This module holds the formula that Alefeld, Potra, Shi (1995) labels 12.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -15,8 +15,8 @@ SURVEY_FIELDS_HASH = "f89f7a12b97d28fc"
 class AlefeldPotraShi199512(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``x^(1/n) - n^(1/n)``, with the parameters ``n = 2(1)6, 7(2)33``; the formula's interval is ``[1,
-    100]``.
+    The survey writes the source's function as ``x^(1/n) - n^(1/n)``, with the parameters ``n = 2(1)6, 7(2)33``; the
+    formula's interval is ``[1, 100]``.
 
     Driver problem 25.
     """

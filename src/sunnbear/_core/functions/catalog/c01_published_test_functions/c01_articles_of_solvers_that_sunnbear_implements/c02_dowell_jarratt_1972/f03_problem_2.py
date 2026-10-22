@@ -1,4 +1,4 @@
-"""This module holds the formula of Problem 2 in Dowell, Jarratt (1972).
+"""This module holds the formula that Dowell, Jarratt (1972) labels Problem 2.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -16,8 +16,8 @@ SURVEY_FIELDS_HASH = "ec66590e86154058"
 class DowellJarratt1972Problem2(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``J0(K)*Y1(K*x) - J1(K*x)*Y0(K)``, with the parameters ``K = 2.5, 3.0``; the formula's interval is
-    ``[0.1, 1]``.
+    The survey writes the source's function as ``J0(K)*Y1(K*x) - J1(K*x)*Y0(K)``, with the parameters ``K = 2.5, 3.0``;
+    the formula's interval is ``[0.1, 1]``.
 
     Starting values `x0 = 0.1`, `x1 = 1.0`. Roots `0.149436` for `K = 2.5` and `0.370989` for `K = 3.0`. The article
     does not define `J` and `Y`; they read as the Bessel functions of the first and second kind. The article says the

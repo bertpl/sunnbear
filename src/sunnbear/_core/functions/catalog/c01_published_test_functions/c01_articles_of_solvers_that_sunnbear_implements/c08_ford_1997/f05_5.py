@@ -1,4 +1,4 @@
-"""This module holds the formula of 5 in Ford (1997).
+"""This module holds the formula that Ford (1997) labels 5.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -17,7 +17,8 @@ SURVEY_FIELDS_HASH = "52568ef146571dd0"
 class Ford19975(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``exp(x^-1 - 25) - 1``; the formula's interval is `[0.035, 0.05]`; `[0.03, 0.09]`; `[0.025, 0.5]`.
+    The survey writes the source's function as ``exp(x^-1 - 25) - 1``; the formula's intervals are `[0.035, 0.05]`;
+    `[0.03, 0.09]`; `[0.025, 0.5]`.
 
     Printed root: `x* = 0.04`.
     """

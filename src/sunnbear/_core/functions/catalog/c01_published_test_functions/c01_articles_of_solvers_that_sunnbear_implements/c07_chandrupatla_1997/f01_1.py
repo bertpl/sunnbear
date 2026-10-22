@@ -1,4 +1,4 @@
-"""This module holds the formula of 1 in Chandrupatla (1997).
+"""This module holds the formula that Chandrupatla (1997) labels 1.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -15,8 +15,8 @@ SURVEY_FIELDS_HASH = "86dbdfd5af6ae2ca"
 class Chandrupatla19971(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``x^3 - 2*x - 5``; the formula's interval is `[2, 3]`; `[1, 10]`; `[1, 100]`; `[-1E4, 1E4]`;
-    `[-1E10, 1E10]`.
+    The survey writes the source's function as ``x^3 - 2*x - 5``; the formula's intervals are `[2, 3]`; `[1, 10]`; `[1,
+    100]`; `[-1E4, 1E4]`; `[-1E10, 1E10]`.
 
     Printed zero: `x = 2.0945515`. The article calls it "extensively tried out in the literature". Its appendix program
     evaluates this function.

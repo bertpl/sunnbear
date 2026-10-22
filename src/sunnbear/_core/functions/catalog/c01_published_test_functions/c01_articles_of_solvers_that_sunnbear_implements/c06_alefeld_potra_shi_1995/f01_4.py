@@ -1,4 +1,4 @@
-"""This module holds the formula of 4 in Alefeld, Potra, Shi (1995).
+"""This module holds the formula that Alefeld, Potra, Shi (1995) labels 4.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -15,8 +15,10 @@ SURVEY_FIELDS_HASH = "b95999341bd2b1cd"
 class AlefeldPotraShi19954(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``x^n - a``, with the parameters ``on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)12`; on `[-0.95, 4.05]`: `a
-    = 1`, `n = 8(2)14```; the formula's interval is `[0, 5]`; `[-0.95, 4.05]`.
+    The survey writes the source's function as ``x^n - a``, with the parameters on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)12`;
+    on `[-0.95, 4.05]`: `a = 1`, `n = 8(2)14`; the formula's intervals are `[0, 5]`; `[-0.95, 4.05]`.
+
+    The formula's parameter ``a_`` is the source's ``a``, renamed because the formula uses ``a`` for another value.
 
     Driver problems 15 (`a = 0.2` on `[0, 5]`), 16 (`a = 1` on `[0, 5]`) and 17 (`a = 1` on `[-0.95, 4.05]`).
     """

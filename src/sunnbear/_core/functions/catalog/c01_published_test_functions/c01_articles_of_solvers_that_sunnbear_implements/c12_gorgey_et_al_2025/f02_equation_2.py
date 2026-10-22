@@ -1,4 +1,4 @@
-"""This module holds the formula of Equation 2 in Gorgey et al. (2025).
+"""This module holds the formula that Gorgey et al. (2025) labels Equation 2.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -17,7 +17,7 @@ SURVEY_FIELDS_HASH = "389d3bfbed80c480"
 class GorgeyEtAl2025Equation2(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``log(x)``; the formula's interval is ``[0, 2]``.
+    The survey writes the source's function as ``log(x)``; the formula's interval is ``[0, 2]``.
 
     Root `1`. The text below Table 3 gives the interval `[2, 3.5]`, which holds no root of `log(x)`: the article repeats
     the interval of Equation 1 there, so the row's `interval` leaves `[2, 3.5]` out.

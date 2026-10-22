@@ -1,4 +1,4 @@
-"""This module holds the formula of Equation 1 in Gorgey et al. (2025).
+"""This module holds the formula that Gorgey et al. (2025) labels Equation 1.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -9,17 +9,16 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "5f0d788d8363c35a"
+SURVEY_FIELDS_HASH = "39bf139496c5b21d"
 
 
 class GorgeyEtAl2025Equation1(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``(x + 2)*(x + 1)*(x - 3)^3``; the formula's interval is `[-2.5, 3]`; `[2, 3.5]` (the text below
-    Table 2).
+    The survey writes the source's function as ``(x + 2)*(x + 1)*(x - 3)^3``; the formula's intervals are `[-2.5, 3]`;
+    `[2, 3.5]` (Figure 1's caption and the text below Table 2).
 
-    Roots `-2`, `-1` and `3`; the text names `3` as the root found. Figure 1's caption and the text below Table 2 give
-    the interval `[2, 3.5]`.
+    Roots `-2`, `-1` and `3`; the text names `3` as the root found.
     """
 
     number = (1, 1, 12, 1)

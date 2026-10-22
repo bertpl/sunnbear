@@ -1,4 +1,4 @@
-"""This module holds the formula of 2.4 in Oliveira, Takahashi (2021).
+"""This module holds the formula that Oliveira, Takahashi (2021) labels 2.4.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -18,7 +18,8 @@ SURVEY_FIELDS_HASH = "a56a18a5a9af329c"
 class OliveiraTakahashi202124(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``sign(3*x + 1)*(1 - sqrt(1 - (3*x + 1)^2/9^2))``; the formula's interval is ``[-1, 1]``.
+    The survey writes the source's function as ``sign(3*x + 1)*(1 - sqrt(1 - (3*x + 1)^2/9^2))``; the formula's interval
+    is ``[-1, 1]``.
     """
 
     number = (1, 1, 9, 15)

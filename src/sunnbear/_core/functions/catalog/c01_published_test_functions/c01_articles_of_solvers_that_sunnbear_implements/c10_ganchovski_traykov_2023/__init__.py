@@ -12,7 +12,7 @@ from . import f01_3
 class GanchovskiTraykov2023(FormulaCategory):
     """`GanchovskiTraykov2023` is the category of the formulas of 1 publication.
 
-    Ganchovski, N., Traykov, A. (2023). Modified Anderson-Bjork's method for solving nonlinear equations in structural
+    Ganchovski, N., Traykov, A. (2023). Modified Anderson-Bjork's method for solving non-linear equations in structural
     mechanics. IOP Conf. Series: Materials Science and Engineering 1276, 012010.
     https://doi.org/10.1088/1757-899X/1276/1/012010.
     """

@@ -1,4 +1,4 @@
-"""This module holds the formula of f92 in Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
+"""This module holds the formula that Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026) labels f92.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -9,16 +9,18 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "ca0a3ed6a7078b03"
+SURVEY_FIELDS_HASH = "deae27c39c69677a"
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F92(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``x^3 - 0.001``; the formula's interval is ``[-10, 10]``.
+    The survey writes the source's function as ``x^3 - 0.001``; the formula's interval is ``[-10, 10]``.
 
-    C# names it Near symmetric function. TF writes the interval in its root line as `[-0; 10]`; its plot spans `[-10,
-    10]`.
+    `Test Functions.pdf` names it Nearly asymmetric function; the C# code names it Near symmetric function, and §4.2 of
+    the article calls it a nearly symmetrical function. §4.2 also solves it on `[-10, 10]` and plots it in Figure 2, and
+    Table 1 gives the iterations at which the original and the proposed modAB switch modes and stop. `Test
+    Functions.pdf` writes the interval in its root line as `[-0;10]`; its plot spans `[-10, 10]`.
     """
 
     number = (1, 1, 13, 30)
@@ -31,7 +33,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F92(Formula):
             "https://doi.org/10.3390/a19050332. Supplementary materials: "
             "https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder "
             "`MDPI-Algorithms-Data` of the authors' repository "
-            "https://github.com/Just-A-Random-Geek/ModAB-Root-Finding."
+            "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
         location="f92",
     )

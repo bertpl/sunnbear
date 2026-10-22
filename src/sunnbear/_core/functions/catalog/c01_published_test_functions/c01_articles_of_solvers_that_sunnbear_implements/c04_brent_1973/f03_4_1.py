@@ -1,4 +1,4 @@
-"""This module holds the formula of (4.1) in Brent (1973).
+"""This module holds the formula that Brent (1973) labels (4.1).
 
 The survey describes this function in words, not as 1 expression, so a person writes this module: a change of the
 formula's row in `data/literature_test_problems/sources/` needs a change of this module.
@@ -12,12 +12,16 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 class Brent197341(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source describes the function in words; the survey writes it as ``0`` if ``abs(x) < 3.8*10^-4``;
-    ``fl(x*exp(-x^-2))`` otherwise. The formula's interval is ``[-1.0, +4.0]``, on which the source solves with the
-    tolerance ``t = 1E-20``.
+    The survey writes the source's function as ``0`` if ``abs(x) < 3.8*10^-4``; ``fl(x*exp(-x^-2))`` otherwise. The
+    source names it ``f_1``. The formula's interval is ``[-1.0, +4.0]``, on which the book's procedure ``zero2`` solves
+    with the absolute tolerance ``t = 1E-20``.
 
     ``fl(.)`` is the computed floating-point value. Table 4.1's footnote: ``zero2`` returned ``2.17E-4``, where ``f_1 =
     0``.
+
+    In float64, ``x*exp(-x^-2)`` underflows to 0 for ``abs(x)`` below about 0.0367, so the formula is 0 on about
+    ``[-0.0367, 0.0367]``. The book's procedure ``zero2`` represents each function value as ``y*2^z`` and does not
+    underflow, so its ``f_1`` is 0 only for ``abs(x) < 3.8*10^-4``.
     """
 
     number = (1, 1, 4, 3)
@@ -28,7 +32,8 @@ class Brent197341(Formula):
             "Brent, R. P. (1973). Algorithms for Minimization without Derivatives. Prentice-Hall, "
             "Englewood Cliffs, NJ. ISBN 0-13-022335-2. Author's scan: "
             "https://maths-people.anu.edu.au/~brent/pub/pub011.html. Erratum: Brent, R. P. (1975). "
-            "Table Errata 520. Mathematics of Computation, p. 1166."
+            "Table Errata 520. Mathematics of Computation 29(132), 1166. "
+            "https://doi.org/10.1090/s0025-5718-1975-0371062-9."
         ),
         location="(4.1)",
     )

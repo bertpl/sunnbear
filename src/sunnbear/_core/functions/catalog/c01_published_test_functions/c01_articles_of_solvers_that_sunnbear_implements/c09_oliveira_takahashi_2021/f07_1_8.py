@@ -1,4 +1,4 @@
-"""This module holds the formula of 1.8 in Oliveira, Takahashi (2021).
+"""This module holds the formula that Oliveira, Takahashi (2021) labels 1.8.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -16,7 +16,8 @@ SURVEY_FIELDS_HASH = "218d19205b29cb80"
 class OliveiraTakahashi202118(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``1/3 + sign(x)*abs(x)^(1/3) + x^3``; the formula's interval is ``[-1, 1]``.
+    The survey writes the source's function as ``1/3 + sign(x)*abs(x)^(1/3) + x^3``; the formula's interval is ``[-1,
+    1]``.
     """
 
     number = (1, 1, 9, 7)

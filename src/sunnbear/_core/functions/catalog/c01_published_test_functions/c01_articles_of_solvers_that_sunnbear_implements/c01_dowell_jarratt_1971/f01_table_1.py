@@ -1,4 +1,4 @@
-"""This module holds the formula of Table 1 in Dowell, Jarratt (1971).
+"""This module holds the formula that Dowell, Jarratt (1971) labels Table 1.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -17,7 +17,7 @@ SURVEY_FIELDS_HASH = "43d382e0091520b4"
 class DowellJarratt1971Table1(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``sin(x) - 0.5``; the formula's interval is ``[0, 1.5]``.
+    The survey writes the source's function as ``sin(x) - 0.5``; the formula's interval is ``[0, 1.5]``.
 
     Root `pi/6`. Starting values `x0 = 0.0`, `x1 = 1.5`.
     """

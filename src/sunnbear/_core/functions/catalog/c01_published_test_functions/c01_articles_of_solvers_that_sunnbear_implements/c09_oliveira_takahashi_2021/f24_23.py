@@ -1,4 +1,4 @@
-"""This module holds the formula of (23) in Oliveira, Takahashi (2021).
+"""This module holds the formula that Oliveira, Takahashi (2021) labels (23).
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -17,7 +17,8 @@ SURVEY_FIELDS_HASH = "a51862b47e71a4a0"
 class OliveiraTakahashi202123(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``(x - (100 + 10*pi))*(x - 10*pi)``; the formula's interval is ``[-100, 100]``.
+    The survey writes the source's function as ``(x - (100 + 10*pi))*(x - 10*pi)``; the formula's interval is ``[-100,
+    100]``.
 
     Appendix C, not in Table 1. The root is `x* = 10*pi`; the article solves it with `epsilon = 10^-50` at 1,000-bit
     precision. Not in sunnbear's transcription.

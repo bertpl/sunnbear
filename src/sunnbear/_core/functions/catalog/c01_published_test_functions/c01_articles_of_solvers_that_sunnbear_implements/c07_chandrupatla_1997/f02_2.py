@@ -1,4 +1,4 @@
-"""This module holds the formula of 2 in Chandrupatla (1997).
+"""This module holds the formula that Chandrupatla (1997) labels 2.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -15,8 +15,8 @@ SURVEY_FIELDS_HASH = "dfe44c28e8e3922c"
 class Chandrupatla19972(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``1 - 1/x^2``; the formula's interval is `[0.5, 1.51]`; `[1E-4, 1E4]`; `[1E-6, 1E6]`; `[1E-10,
-    1E10]`; `[1E-12, 1E12]`.
+    The survey writes the source's function as ``1 - 1/x^2``; the formula's intervals are `[0.5, 1.51]`; `[1E-4, 1E4]`;
+    `[1E-6, 1E6]`; `[1E-10, 1E10]`; `[1E-12, 1E12]`.
 
     Printed zero: `x = 1`. The article says the author proposed it.
     """

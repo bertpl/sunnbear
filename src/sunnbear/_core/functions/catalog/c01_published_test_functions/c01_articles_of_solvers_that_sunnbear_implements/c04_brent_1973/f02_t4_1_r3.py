@@ -1,4 +1,4 @@
-"""This module holds the formula of T4.1 r3 in Brent (1973).
+"""This module holds the formula that Brent (1973) labels T4.1 r3.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -9,13 +9,14 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "9eb9fc0a4deebf3c"
+SURVEY_FIELDS_HASH = "9959162ebe953e06"
 
 
 class Brent1973T41R3(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``x^19``; the formula's interval is `[-1.0, +4.0]` with `t = 1E-20`.
+    The survey writes the source's function as ``x^19``; the formula's interval is `[-1.0, +4.0]` with the absolute
+    tolerance `t = 1E-20` of procedure `zero2`.
     """
 
     number = (1, 1, 4, 2)
@@ -26,7 +27,8 @@ class Brent1973T41R3(Formula):
             "Brent, R. P. (1973). Algorithms for Minimization without Derivatives. Prentice-Hall, "
             "Englewood Cliffs, NJ. ISBN 0-13-022335-2. Author's scan: "
             "https://maths-people.anu.edu.au/~brent/pub/pub011.html. Erratum: Brent, R. P. (1975). "
-            "Table Errata 520. Mathematics of Computation, p. 1166."
+            "Table Errata 520. Mathematics of Computation 29(132), 1166. "
+            "https://doi.org/10.1090/s0025-5718-1975-0371062-9."
         ),
         location="T4.1 r3",
     )

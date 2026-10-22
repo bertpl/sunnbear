@@ -1,4 +1,4 @@
-"""This module holds the formula of Equation 3 in Gorgey et al. (2025).
+"""This module holds the formula that Gorgey et al. (2025) labels Equation 3.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -11,15 +11,18 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "f6bf7899b4ac1a5c"
+SURVEY_FIELDS_HASH = "497985db912f6213"
 
 
 class GorgeyEtAl2025Equation3(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``(sin(x) - x/4)^3``; the formula's interval is `[-1, 2]`; `[-0.5, 1]` (the text below Table 4).
+    The survey writes the source's function as ``(sin(x) - x/4)^3``; the formula's intervals are `[-1, 2]`; `[-0.5, 1]`
+    (the text below Table 4).
 
-    Root found: `0`. The text below Table 4 gives the interval `[-0.5, 1]`.
+    Root found: `0`; Figure 3 also shows the roots `-2.47458` and `2.47458`, and the line under Figure 3 misprints the
+    second as `2.48458`. Table 4's results for bisection, the secant method, Newton-Raphson from `-0.5` and Ridders'
+    method reproduce on `[-0.5, 1]`, not on `[-1, 2]`.
     """
 
     number = (1, 1, 12, 3)

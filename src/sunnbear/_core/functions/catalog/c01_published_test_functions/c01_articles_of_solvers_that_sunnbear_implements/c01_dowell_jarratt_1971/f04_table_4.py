@@ -1,4 +1,4 @@
-"""This module holds the formula of Table 4 in Dowell, Jarratt (1971).
+"""This module holds the formula that Dowell, Jarratt (1971) labels Table 4.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -15,8 +15,8 @@ SURVEY_FIELDS_HASH = "a77136c97bc23ce9"
 class DowellJarratt1971Table4(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``x^2 - (1 - x)^n``, with the parameters ``n = 2, 5, 15, 20``; the formula's interval is ``[0,
-    1]``.
+    The survey writes the source's function as ``x^2 - (1 - x)^n``, with the parameters ``n = 2, 5, 15, 20``; the
+    formula's interval is ``[0, 1]``.
 
     The caption says the function has 1 inflection point on `[0, 1]`.
     """

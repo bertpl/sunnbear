@@ -1,4 +1,4 @@
-"""This module holds the formula of 2.5 in Oliveira, Takahashi (2021).
+"""This module holds the formula that Oliveira, Takahashi (2021) labels 2.5.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -15,7 +15,8 @@ SURVEY_FIELDS_HASH = "55a34e2bd4e13c52"
 class OliveiraTakahashi202125(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``(x > (1 - 10^6)/10^6)*((1 + 10^6)/10^6) - 1``; the formula's interval is ``[-1, 1]``.
+    The survey writes the source's function as ``(x > (1 - 10^6)/10^6)*((1 + 10^6)/10^6) - 1``; the formula's interval
+    is ``[-1, 1]``.
     """
 
     number = (1, 1, 9, 16)
@@ -35,7 +36,7 @@ class OliveiraTakahashi202125(Formula):
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - 2.0 * c
-        return ((x) > ((1 - 10**6) / 10**6)) * ((1 + 10**6) / 10**6) - 1
+        return (((1 + 10**6) / 10**6) if (x) > ((1 - 10**6) / 10**6) else 0.0) - 1
 
     def interval_bounds(self) -> tuple[float, float]:
         """Return the formula's interval."""

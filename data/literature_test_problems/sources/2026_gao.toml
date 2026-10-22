@@ -11,7 +11,7 @@ where_in_source = '''
 - Table 3 runs the Alefeld–Potra–Shi suite, "154 functions from 15 types" in Table 1 of Alefeld, Potra, Shi (1995), the article's ref. [13], whose rows are in `1995_alefeld_potra_shi`. Table 3 prints only `sin x - 1/2 x`, as an example from that suite.
 - Table 4 runs Chandrupatla's suite, from Table 1 of Chandrupatla (1997), ref. [15], whose rows are in `1997_chandrupatla`: 9 functions, each on 5 intervals, all printed, run with `eps_1 = 1E-15`, `eps_2 = 1E-12` and at most 200 iterations.
 '''
-transcribed_from = "the article (text layer, checked against the page images). sunnbear's `tests/solvers/bracketing/carf/paper_problems.py` holds Table 4 only, and takes its functions from Chandrupatla's article. Where Gao's Table 4 and Chandrupatla's article differ (`T4.8`, `T4.9`), the rows follow what Gao prints, and the rows' notes give sunnbear's form."
+transcribed_from = "the article (text layer, checked against the page images). sunnbear's `tests/solvers/bracketing/carf/paper_problems.py` holds Table 4 only, and takes its functions from Chandrupatla's article. Where Gao's Table 4 and Chandrupatla's article differ (`T4.8`, `T4.9`), Table 4 misprints Chandrupatla's function: the rows keep the printed `f`, and their notes name each misprint and the function meant."
 rows_summary = "16: the introduction's `x^(1/5)` (its `x^5` is row `T2.1`), Section 3's 3 listed functions, Table 2's 2, Table 3's 1 printed example, and Table 4's 9. The article prints no other functions."
 notes = '''
 The article does not number the functions. The keys are:
@@ -117,11 +117,11 @@ f = '-3062*(1 - xi)/(xi + (1 - xi)*exp(-x)) - 1013 + 1628/x'
 parameters = 'xi = 0.61489'
 interval = '`[2E-4, 2]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`'
 also_in = 'Chandrupatla (1997), Table 1 (ref. [15])'
-notes = "As printed, the first term has no `exp(-x)` in its numerator. sunnbear's tests use `-3062*(1 - xi)*exp(-x)/(xi + (1 - xi)*exp(-x)) - 1013 + 1628/x`."
+notes = "Table 4 prints the first term without `exp(-x)` in its numerator, which is a misprint: the article takes the suite from Table 1 of Chandrupatla (1997), whose function 8 has it, and Table 4's evaluation counts are reproduced only with that function. The function meant is `-3062*(1 - xi)*exp(-x)/(xi + (1 - xi)*exp(-x)) - 1013 + 1628/x`, and the row is compared as that function."
 
 [[rows]]
 key = 'T4.9'
 f = 'exp(x) - 2 - 0.01/x - 0.000002/x^3'
 interval = '`[2E-4, 1]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`'
 also_in = 'Chandrupatla (1997), Table 1 (ref. [15])'
-notes = "sunnbear's tests use `exp(x) - 2 - 0.01/x^2 + 0.000002/x^3`."
+notes = "Table 4 prints `0.01/x` and `- 0.000002/x^3`, which is a misprint: the article takes the suite from Table 1 of Chandrupatla (1997), whose function 9 has `0.01/x^2` and `+ 0.000002/x^3`, and Table 4's evaluation counts are reproduced only with that function. The function meant is `exp(x) - 2 - 0.01/x^2 + 0.000002/x^3`, and the row is compared as that function."

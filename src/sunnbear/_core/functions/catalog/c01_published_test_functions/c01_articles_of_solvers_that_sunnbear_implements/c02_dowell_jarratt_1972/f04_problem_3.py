@@ -1,4 +1,4 @@
-"""This module holds the formula of Problem 3 in Dowell, Jarratt (1972).
+"""This module holds the formula that Dowell, Jarratt (1972) labels Problem 3.
 
 The survey gives this function as an infinite sum, an expression that the script does not translate, so a person writes
 this module: a change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
@@ -12,8 +12,8 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 class DowellJarratt1972Problem3(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``sum((-1)^n*x^((3*n^2 + n)/2), n = -inf..inf) - 1``; the formula's interval is ``[-0.9999,
-    -0.0001]``.
+    The survey writes the source's function as ``sum((-1)^n*x^((3*n^2 + n)/2), n = -inf..inf) - 1``; the formula's
+    interval is ``[-0.9999, -0.0001]``.
 
     The formula sums the terms of ``n`` and ``-n`` together, from ``n = 1`` up, until adding them no longer changes the
     sum in float64, which happens for every x in ``(-1, 1)``; outside ``(-1, 1)``, where the series diverges, the

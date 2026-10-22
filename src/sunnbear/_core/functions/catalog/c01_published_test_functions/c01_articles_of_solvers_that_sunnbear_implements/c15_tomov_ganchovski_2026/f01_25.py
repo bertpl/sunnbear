@@ -1,4 +1,4 @@
-"""This module holds the formula of (25) in Tomov, Ganchovski (2026).
+"""This module holds the formula that Tomov, Ganchovski (2026) labels (25).
 
 The survey describes this function in words, not as 1 expression, so a person writes this module: a change of the
 formula's row in `data/literature_test_problems/sources/` needs a change of this module.
@@ -10,8 +10,8 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 class TomovGanchovski202625(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source describes the function in words; the survey writes it as ``x`` if ``x <= 0``; ``x + x^2`` if
-    ``x > 0``; the formula's intervals are ``[-1, 1]``; ``[-3, 1]``.
+    The survey writes the source's function as ``x`` if ``x <= 0``; ``x + x^2`` if ``x > 0``; the formula's intervals
+    are ``[-1, 1]``; ``[-3, 1]``.
 
     Proposition 3.5 starts an AB phase on ``[-1, 1]``. The text after it starts the hybrid method on ``[-3, 1]``, whose
     first bisection leads to the same phase.
@@ -28,7 +28,7 @@ class TomovGanchovski202625(Formula):
             " C# code and benchmark definitions are in "
             "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding; Section 7.3 pins commit "
             "`9111cdcc6912401eb684a7b771df3a469795d5b8` (the preprint's reference [16]), and Section "
-            "7.4 pins commit `51a6d1b` (reference [17])."
+            "7.4 pins commit `51a6d1b421fa6b5422b974b61c88acb3ae1945bb` (reference [17])."
         ),
         location="(25)",
     )

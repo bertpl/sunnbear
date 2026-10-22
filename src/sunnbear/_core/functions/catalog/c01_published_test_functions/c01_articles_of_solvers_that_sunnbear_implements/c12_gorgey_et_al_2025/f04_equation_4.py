@@ -1,4 +1,4 @@
-"""This module holds the formula of Equation 4 in Gorgey et al. (2025).
+"""This module holds the formula that Gorgey et al. (2025) labels Equation 4.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -17,7 +17,7 @@ SURVEY_FIELDS_HASH = "a02e4c8603e3f93c"
 class GorgeyEtAl2025Equation4(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``exp((x - 3)^5) - 1``; the formula's interval is ``[2, 4]``.
+    The survey writes the source's function as ``exp((x - 3)^5) - 1``; the formula's interval is ``[2, 4]``.
 
     Root `3`.
     """

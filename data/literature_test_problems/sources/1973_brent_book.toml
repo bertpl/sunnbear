@@ -1,5 +1,5 @@
 title = 'Brent (1973): Algorithms for Minimization without Derivatives, chapter 4'
-reference = "Brent, R. P. (1973). Algorithms for Minimization without Derivatives. Prentice-Hall, Englewood Cliffs, NJ. ISBN 0-13-022335-2. Author's scan: https://maths-people.anu.edu.au/~brent/pub/pub011.html. Erratum: Brent, R. P. (1975). Table Errata 520. Mathematics of Computation, p. 1166."
+reference = "Brent, R. P. (1973). Algorithms for Minimization without Derivatives. Prentice-Hall, Englewood Cliffs, NJ. ISBN 0-13-022335-2. Author's scan: https://maths-people.anu.edu.au/~brent/pub/pub011.html. Erratum: Brent, R. P. (1975). Table Errata 520. Mathematics of Computation 29(132), 1166. https://doi.org/10.1090/s0025-5718-1975-0371062-9."
 year = 1973
 subcategory = '1.1'
 where_in_source = '''
@@ -35,26 +35,26 @@ notes = 'The book: successive linear interpolation converges sublinearly on it; 
 [[rows]]
 key = 'T4.1 r1-2'
 f = 'x^9'
-interval = '`[-1.0, +1.1]` with `t = 1E-9`; `[-1.0, +4.0]` with `t = 1E-20`'
+interval = '`[-1.0, +1.1]` with the absolute tolerance `t = 1E-9` of procedure `zero2`; `[-1.0, +4.0]` with `t = 1E-20`'
 notes = "Section 2 (p. 48) also names `x^9`: on an IBM 360, `f` vanished on an interval through underflow, and Dekker's procedure then took many small steps."
 
 [[rows]]
 key = 'T4.1 r3'
 f = 'x^19'
-interval = '`[-1.0, +4.0]` with `t = 1E-20`'
+interval = '`[-1.0, +4.0]` with the absolute tolerance `t = 1E-20` of procedure `zero2`'
 
 [[rows]]
 key = '(4.1)'
 f_description = '`0` if `abs(x) < 3.8*10^-4`; `fl(x*exp(-x^-2))` otherwise'
 name = 'f_1'
-interval = '`[-1.0, +4.0]` with `t = 1E-20`'
+interval = '`[-1.0, +4.0]` with the absolute tolerance `t = 1E-20` of procedure `zero2`'
 notes = "`fl(.)` is the computed floating-point value. Table 4.1's footnote: `zero2` returned `2.17E-4`, where `f_1 = 0`."
 
 [[rows]]
 key = '(4.2)'
 f_description = '`fl(exp(x))` if `x > -10^6`; `fl(exp(-10^6) - (x + 10^6)^2)` otherwise'
 name = 'f_2'
-interval = '`[-1001200, 0]` with `t = 1E-20`'
+interval = '`[-1001200, 0]` with the absolute tolerance `t = 1E-20` of procedure `zero2`'
 notes = '`fl(.)` as in (4.1).'
 
 [[rows]]

@@ -1,4 +1,4 @@
-"""This module holds the formula of III.2 in Ridders (1979).
+"""This module holds the formula that Ridders (1979) labels III.2.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -17,7 +17,8 @@ SURVEY_FIELDS_HASH = "3ec51ddb6cc34351"
 class Ridders1979Iii2(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``tan(x)^tan(x) - 10^3``; the formula's interval is `[1.3, 1.4]`; `[0, 1.5]`.
+    The survey writes the source's function as ``tan(x)^tan(x) - 10^3``; the formula's intervals are `[1.3, 1.4]`; `[0,
+    1.5]`.
 
     Last printed iterate: `1.354710442`.
     """

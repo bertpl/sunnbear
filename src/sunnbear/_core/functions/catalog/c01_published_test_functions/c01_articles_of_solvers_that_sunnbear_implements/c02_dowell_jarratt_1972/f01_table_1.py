@@ -1,4 +1,4 @@
-"""This module holds the formula of Table 1 in Dowell, Jarratt (1972).
+"""This module holds the formula that Dowell, Jarratt (1972) labels Table 1.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -9,16 +9,17 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "589275090e4fc081"
+SURVEY_FIELDS_HASH = "5053b702d4747dcd"
 
 
 class DowellJarratt1972Table1(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``x^3 + 1``; the formula's interval is ``[-2, 0]``.
+    The survey writes the source's function as ``x^3 + 1``; the formula's interval is ``[-2, 0]``.
 
-    Root `-1`. Starting values `x0 = 0`, `x1 = -2`. The row follows the article. sunnbear's `test_paper.py` solves the
-    mirrored `1 - x^3` on `[0, 2]`, because sunnbear's `Pegasus` takes the upper bound as its newest starting point.
+    Root `-1`. Starting values `x0 = 0`, `x1 = -2`. The formula keeps the article's form. sunnbear's
+    `tests/solvers/bracketing/pegasus/test_paper.py` solves the mirrored `1 - x^3` on `[0, 2]`, because sunnbear's
+    `Pegasus` takes the upper bound as its newest starting point.
     """
 
     number = (1, 1, 2, 1)

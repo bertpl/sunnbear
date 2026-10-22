@@ -1,11 +1,12 @@
 title = 'Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026): improvements to modAB'
-reference = "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to the modified Anderson–Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. https://doi.org/10.3390/a19050332. Supplementary materials: https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder `MDPI-Algorithms-Data` of the authors' repository https://github.com/Just-A-Random-Geek/ModAB-Root-Finding."
+reference = "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to the modified Anderson–Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. https://doi.org/10.3390/a19050332. Supplementary materials: https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder `MDPI-Algorithms-Data` of the authors' repository https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
 year = 2026
 subcategory = '1.1'
 where_in_source = '''
 - The article's Table 2 (pp. 7–9), "Benchmark results for solving f_nn(x) = 0 in the interval [a; b]", gives 92 functions f01–f92, each on 1 interval. §5 names the origin of each block of functions.
 - The supplementary `Test Functions.pdf` repeats each function with a plot and its root to 3 significant digits, and names f63–f92.
 - The supplementary C# benchmark (`CSharp code/Numerical.Benchmark/Root.cs`) holds the functions and intervals that produced Table 2.
+- §4.2 (p. 4) solves f92 on `[-10, 10]` to demonstrate the switching criteria and plots it in Figure 2; Table 1 (p. 5) gives the iterations at which the original and the proposed modAB switch modes and stop.
 '''
 transcribed_from = '''
 the article's Table 2, checked against `Test Functions.pdf`, the C# code, and sunnbear's transcription in `tests/solvers/paper_problems/ganchovski_et_al.py`.
@@ -16,19 +17,18 @@ the article's Table 2, checked against `Test Functions.pdf`, the C# code, and su
 '''
 rows_summary = '92, 1 per function of Table 2.'
 notes = '''
-- **In the rows' notes, TF is `Test Functions.pdf` and C# is the C# code.**
 - **`if(c; a; b)`** is the article's notation: `a` where `c` holds, `b` otherwise.
-- **`log` is the natural log** in all 3 sources: the article prints `log`, TF prints `ln`, and C# calls `Math.Log`.
-- **`name`** comes from TF, which names only f63–f92. The C# comments give the same names, except where the rows' notes say otherwise.
-- **`also_in`** gives the origin that §5 of the article names for each block of functions. TF and the C# comments name the same origins, with 2 exceptions:
-  - C# has no comment for Suhadolnik, so f51–f62 sit below its comment for Swift & Lindfield.
-  - TF prints its heading "SciML Benchmarks test suite" above the row of plots that holds f83 and f84.
+- **`log` is the natural log** in all 3 sources: the article prints `log`, `Test Functions.pdf` prints `ln`, and the C# code calls `Math.Log`.
+- **`name`** comes from `Test Functions.pdf`, which names only f63–f92. The comments in the C# code give the same names, except where the rows' notes say otherwise.
+- **`also_in`** gives the origin that §5 of the article names for each block of functions. `Test Functions.pdf` and the comments in the C# code name the same origins, with 2 exceptions:
+  - The C# code has no comment for Suhadolnik, so f51–f62 sit below its comment for Swift & Lindfield.
+  - `Test Functions.pdf` prints its heading "SciML Benchmarks test suite" above the row of plots that holds f83 and f84.
 - **The origins**, as the article's reference list gives them:
-  - **Galdino (2011)**, f01–f30: Galdino, S. A family of regula falsi root-finding methods. Proceedings of 2011 World Congress on Engineering and Technology, IEEE Press, Shanghai, pp. 514–517 (article ref. [16]). TF adds the URL http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543. Its rows are in `2011_galdino`.
-  - **Ganchovski (2025)**, f31–f32: Ganchovski, N. Structural Analysis by Functional Modelling in the Cloud. PhD thesis, UACEG, Sofia, 2025 (ref. [7]). §5 calls these "Custom functions"; TF and C# call them "My functions".
+  - **Galdino (2011)**, f01–f30: Galdino, S. A family of regula falsi root-finding methods. Proceedings of 2011 World Congress on Engineering and Technology, IEEE Press, Shanghai, pp. 514–517 (article ref. [16]). `Test Functions.pdf` adds the URL http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543. Its rows are in `2011_galdino`.
+  - **Ganchovski (2025)**, f31–f32: Ganchovski, N. Structural Analysis by Functional Modelling in the Cloud. PhD thesis, UACEG, Sofia, 2025 (ref. [7]). §5 calls these "Custom functions"; `Test Functions.pdf` and the C# code call them "My functions".
   - **Stage (2013)**, f33–f40: Stage, S. A. Comments on An Improvement to the Brent's Method. Int. J. Exp. Algorithms 4 (2013), 1–16 (ref. [17]). Its rows are in `2013_stage`.
-  - **Swift & Lindfield (1978)**, f41–f50: Swift, A., Lindfield, G. R. Comparison of a continuation method with Brent's method for the numerical solution of a single nonlinear equation. Comput. J. 21 (1978), 359–362 (ref. [18]). TF adds https://doi.org/10.1093/comjnl/21.4.359.
-  - **Suhadolnik (2012)**, f51–f62: Suhadolnik, A. Combined bracketing methods for solving nonlinear equations. Appl. Math. Lett. 25 (2012), 1755–1760 (ref. [19]). TF adds https://doi.org/10.1016/j.aml.2012.02.006. Its rows are in `2012_suhadolnik`.
+  - **Swift & Lindfield (1978)**, f41–f50: Swift, A., Lindfield, G. R. Comparison of a continuation method with Brent's method for the numerical solution of a single nonlinear equation. Comput. J. 21 (1978), 359–362 (ref. [18]). `Test Functions.pdf` adds https://doi.org/10.1093/comjnl/21.4.359.
+  - **Suhadolnik (2012)**, f51–f62: Suhadolnik, A. Combined bracketing methods for solving nonlinear equations. Appl. Math. Lett. 25 (2012), 1755–1760 (ref. [19]). `Test Functions.pdf` adds https://doi.org/10.1016/j.aml.2012.02.006. Its rows are in `2012_suhadolnik`.
   - **Oliveira & Takahashi (2021)**, f63–f83: Oliveira, I., Takahashi, R. An Enhancement of the Bisection Method Average Performance Preserving Minmax Optimality. ACM Trans. Math. Softw. 47 (2021), 5 (ref. [5]). Its rows are in `2021_oliveira_takahashi`.
   - **SciML Benchmarks suite**, f84–f92: cited as Pal, A. et al. NonlinearSolve.jl: High-Performance and Robust Solvers for Systems of Nonlinear Equations in Julia. ACM Trans. Math. Softw. 52 (2026), 1 (ref. [11]). The rows of the suite are in `sciml_interval_suite`.
 '''
@@ -44,7 +44,7 @@ key = 'f02'
 f = 'x^2*(x^2/3 + sqrt(2)*sin(x)) - sqrt(x)/18'
 interval = '[0.1, 1]'
 also_in = 'Galdino (2011)'
-notes = "TF and C# have `sqrt(3)/18` as the last term, so the article's `sqrt(x)/18` is a misprint, and the row is compared as `sqrt(3)/18`."
+notes = "`Test Functions.pdf` and the C# code have `sqrt(3)/18` as the last term, so the article's `sqrt(x)/18` is a misprint, and the row is compared as `sqrt(3)/18`."
 
 [[rows]]
 key = 'f03'
@@ -195,21 +195,21 @@ key = 'f27'
 f_description = '`(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 - p(x)))))*sign(p(x) - 3)`, where `p(x) = x + 1.11111`'
 interval = '[1, 3]'
 also_in = 'Galdino (2011)'
-notes = 'TF prints `p(x) = x + 1.11`.'
+notes = '`Test Functions.pdf` prints `p(x) = x + 1.11`.'
 
 [[rows]]
 key = 'f28'
 f = 'sin((x - 7.143)^3)'
 interval = '[7, 8]'
 also_in = 'Galdino (2011)'
-notes = 'Follows C#. The article prints `sin(x - 7.143)^3)`, with an unmatched parenthesis; TF prints `sin((x - 7.14)^3)`.'
+notes = 'Follows the C# code. The article prints `sin(x - 7.143)^3)`, with an unmatched parenthesis; `Test Functions.pdf` prints `sin((x - 7.14)^3)`.'
 
 [[rows]]
 key = 'f29'
 f = 'exp((x - 3)^5) - 1'
-interval = '`[2.6, 4.6]`; `[2.6, 3.6]` (TF)'
+interval = '`[2.6, 4.6]`; `[2.6, 3.6]` (`Test Functions.pdf`)'
 also_in = 'Galdino (2011)'
-notes = 'TF gives the interval `[2.6, 3.6]`.'
+notes = '`Test Functions.pdf` gives the interval `[2.6, 3.6]`.'
 
 [[rows]]
 key = 'f30'
@@ -222,7 +222,7 @@ key = 'f31'
 f = 'pi - 1/x'
 interval = '[0.05, 5]'
 also_in = 'Ganchovski (2025)'
-notes = 'TF prints the interval as `[0.05v5]`.'
+notes = '`Test Functions.pdf` prints the interval as `[0.05v5]`.'
 
 [[rows]]
 key = 'f32'
@@ -287,9 +287,9 @@ also_in = 'Swift & Lindfield (1978)'
 [[rows]]
 key = 'f42'
 f = '(x^2 - x - 6)*(x^2 - 3*x + 2)'
-interval = '`[0, pi]`; `[0, 4]` (TF)'
+interval = '`[0, pi]`; `[0, 4]` (`Test Functions.pdf`)'
 also_in = 'Swift & Lindfield (1978)'
-notes = 'TF gives the interval `[0, 4]`.'
+notes = '`Test Functions.pdf` gives the interval `[0, 4]`.'
 
 [[rows]]
 key = 'f43'
@@ -332,7 +332,7 @@ key = 'f49'
 f = 'if(x <= 0; -x^3 - x - 1; x^(1/3) - x - 1)'
 interval = '[-1, 1]'
 also_in = 'Swift & Lindfield (1978)'
-notes = "C# writes the exponent `1/3` as an integer division, which is 0, so it computes `x^0 - x - 1` for `x > 0`; sunnbear's transcription follows C#."
+notes = "The formula follows the article and `Test Functions.pdf`, which print `x^(1/3)`; the plot in `Test Functions.pdf` shows the cube-root branch. The C# code writes the exponent `1/3` as an integer division, which is 0, so it computes `x^0 - x - 1` for `x > 0`, as does sunnbear's test transcription in `tests/solvers/paper_problems/ganchovski_et_al.py`."
 
 [[rows]]
 key = 'f50'
@@ -467,7 +467,7 @@ f = '1/3 + sign(x)*abs(x)^(1/3) + x^3'
 name = 'Polynomial'
 interval = '[-1, 1]'
 also_in = 'Oliveira & Takahashi (2021)'
-notes = 'C# names it Posynomial.'
+notes = 'The C# code names it Posynomial.'
 
 [[rows]]
 key = 'f71'
@@ -510,7 +510,7 @@ f = 'if(x > (1 - 10^6)/10^6; (1 + 10^6)/10^6; -1)'
 name = 'Step Function'
 interval = '[-1, 1]'
 also_in = 'Oliveira & Takahashi (2021)'
-notes = 'TF prints `if(x > (1 - 10^6)/10^6; (1 + 10^6)/10^6; 0) - 1`, which is `10^-6` above the step.'
+notes = '`Test Functions.pdf` prints `if(x > (1 - 10^6)/10^6; (1 + 10^6)/10^6; 0) - 1`, which right of the step is `10^-6`, not `1 + 10^-6`.'
 
 [[rows]]
 key = 'f77'
@@ -548,7 +548,7 @@ f = 'if(x > -1; 1 + sin(1/(x + 1)); -1)'
 name = 'Warsaw'
 interval = '[-1, 1]'
 also_in = 'Oliveira & Takahashi (2021)'
-notes = "TF prints the first branch as `1 + sin(1/(x + 1)) - 1` and the second as `0`. TF draws the closing brace of a case brace only where a term follows it (f35, f76), and draws none here, so the `- 1` belongs to the first branch and the else branch is 0. TF's root, -0.682, is a zero of that first branch, `sin(1/(x + 1))`."
+notes = "`Test Functions.pdf` prints the first branch as `1 + sin(1/(x + 1)) - 1` and the second as `0`. `Test Functions.pdf` draws the closing brace of a case brace only where a term follows it (f35, f76), and draws none here, so the `- 1` belongs to the first branch and the else branch is 0. The root that `Test Functions.pdf` gives, -0.682, is a zero of that first branch, `sin(1/(x + 1))`."
 
 [[rows]]
 key = 'f82'
@@ -556,7 +556,7 @@ f = '202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 0.1'
 name = 'Sawtooth'
 interval = '[-1, 1]'
 also_in = 'Oliveira & Takahashi (2021)'
-notes = 'TF prints the argument of `floor` as `(2*x + 10^-2)/2*10^-2`, with `10^-2` outside the fraction.'
+notes = '`Test Functions.pdf` prints the argument of `floor` as `(2*x + 10^-2)/2*10^-2`, with `10^-2` outside the fraction.'
 
 [[rows]]
 key = 'f83'
@@ -564,7 +564,7 @@ f = '(202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 0.1)^3'
 name = 'Sawtooth Cube'
 interval = '[-1, 1]'
 also_in = 'Oliveira & Takahashi (2021)'
-notes = 'TF prints the argument of `floor` as in f82.'
+notes = '`Test Functions.pdf` prints the argument of `floor` as in f82.'
 
 [[rows]]
 key = 'f84'
@@ -628,4 +628,4 @@ f = 'x^3 - 0.001'
 name = 'Nearly asymmetric function'
 interval = '[-10, 10]'
 also_in = 'SciML Benchmarks suite'
-notes = 'C# names it Near symmetric function. TF writes the interval in its root line as `[-0; 10]`; its plot spans `[-10, 10]`.'
+notes = '`Test Functions.pdf` names it Nearly asymmetric function; the C# code names it Near symmetric function, and §4.2 of the article calls it a nearly symmetrical function. §4.2 also solves it on `[-10, 10]` and plots it in Figure 2, and Table 1 gives the iterations at which the original and the proposed modAB switch modes and stop. `Test Functions.pdf` writes the interval in its root line as `[-0;10]`; its plot spans `[-10, 10]`.'

@@ -1,4 +1,4 @@
-"""This module holds the formula of f49 in Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
+"""This module holds the formula that Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026) labels f49.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -10,16 +10,19 @@ from sunnbear._core.utils.math_functions import real_root
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "db6c6275b912b502"
+SURVEY_FIELDS_HASH = "0127d133fe194cfd"
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F49(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``if(x <= 0; -x^3 - x - 1; x^(1/3) - x - 1)``; the formula's interval is ``[-1, 1]``.
+    The survey writes the source's function as ``if(x <= 0; -x^3 - x - 1; x^(1/3) - x - 1)``; the formula's interval is
+    ``[-1, 1]``.
 
-    C# writes the exponent `1/3` as an integer division, which is 0, so it computes `x^0 - x - 1` for `x > 0`;
-    sunnbear's transcription follows C#.
+    The formula follows the article and `Test Functions.pdf`, which print `x^(1/3)`; the plot in `Test Functions.pdf`
+    shows the cube-root branch. The C# code writes the exponent `1/3` as an integer division, which is 0, so it computes
+    `x^0 - x - 1` for `x > 0`, as does sunnbear's test transcription in
+    `tests/solvers/paper_problems/ganchovski_et_al.py`.
     """
 
     number = (1, 1, 13, 18)
@@ -32,7 +35,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F49(Formula):
             "https://doi.org/10.3390/a19050332. Supplementary materials: "
             "https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder "
             "`MDPI-Algorithms-Data` of the authors' repository "
-            "https://github.com/Just-A-Random-Geek/ModAB-Root-Finding."
+            "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
         location="f49",
     )

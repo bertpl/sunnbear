@@ -1,4 +1,4 @@
-"""This module holds the formula of 2 in Ford (1997).
+"""This module holds the formula that Ford (1997) labels 2.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -15,8 +15,8 @@ SURVEY_FIELDS_HASH = "a6aaeedd0071ca72"
 class Ford19972(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``10^-8*(x - 1)*prod(x^2 + x + i, i = 1..10)``; the formula's interval is `[0.9, 1.1]`; `[0.5,
-    1.5]`; `[-5, 10]`.
+    The survey writes the source's function as ``10^-8*(x - 1)*prod(x^2 + x + i, i = 1..10)``; the formula's intervals
+    are `[0.9, 1.1]`; `[0.5, 1.5]`; `[-5, 10]`.
 
     Printed root: `x* = 1.0`. The article says Hopgood and McKee study this function.
     """

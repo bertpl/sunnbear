@@ -1,4 +1,4 @@
-"""This module holds the formula of T2.1 in Gao (2026).
+"""This module holds the formula that Gao (2026) labels T2.1.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "1ca0bbc2e47e93d9"
 class Gao2026T21(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``x^5``; the formula's interval is ``[-1, 3]``.
+    The survey writes the source's function as ``x^5``; the formula's interval is ``[-1, 3]``.
 
     Vanishing derivative at the root. Also named in the introduction.
     """

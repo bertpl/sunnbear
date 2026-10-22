@@ -1,4 +1,4 @@
-"""This module holds the formula of 4 in Ford (1997).
+"""This module holds the formula that Ford (1997) labels 4.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -11,16 +11,17 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "d540263d14077040"
+SURVEY_FIELDS_HASH = "624ef1bcaee08379"
 
 
 class Ford19974(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``2*x*exp(-20) + 1 - 2*exp(-20*x)``; the formula's interval is `[0, 1]`; `[-0.1, 1.5]`; `[-0.5,
-    2]`.
+    The survey writes the source's function as ``2*x*exp(-20) + 1 - 2*exp(-20*x)``; the formula's intervals are `[0,
+    1]`; `[-0.1, 1.5]`; `[-0.5, 2]`.
 
-    Printed root: `x* = 0.034657358821882`.
+    Printed root: `x* = 0.034657358821882`. The printed root is not a root of the printed function, whose root is
+    `0.034657359020854`: it is the root of `2*exp(-20) + 1 - 2*exp(-20*x)`, the printed function without the factor `x`.
     """
 
     number = (1, 1, 8, 4)

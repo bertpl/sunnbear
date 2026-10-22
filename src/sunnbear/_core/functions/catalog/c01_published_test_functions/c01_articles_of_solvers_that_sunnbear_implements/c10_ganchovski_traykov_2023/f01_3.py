@@ -1,4 +1,4 @@
-"""This module holds the formula of §3 in Ganchovski, Traykov (2023).
+"""This module holds the formula that Ganchovski, Traykov (2023) labels §3.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -11,13 +11,13 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "d7adb4c3a66a1b53"
+SURVEY_FIELDS_HASH = "37ed88de804dc84c"
 
 
 class GanchovskiTraykov20233(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``4 - tan(x)``; the formula's interval is ``[0, 1.5]``.
+    The survey writes the source's function as ``4 - tan(x)``; the formula's interval is ``[0, 1.5]``.
 
     Not in Table 2; used for the convergence charts of Figures 10 (§3) and 12 (§5). §3 prints the interval as `[0.
     1.5]`.
@@ -28,9 +28,9 @@ class GanchovskiTraykov20233(Formula):
     param_names = ()
     source = FormulaSource(
         reference=(
-            "Ganchovski, N., Traykov, A. (2023). Modified Anderson-Bjork's method for solving nonlinear"
-            " equations in structural mechanics. IOP Conf. Series: Materials Science and Engineering "
-            "1276, 012010. https://doi.org/10.1088/1757-899X/1276/1/012010."
+            "Ganchovski, N., Traykov, A. (2023). Modified Anderson-Bjork's method for solving "
+            "non-linear equations in structural mechanics. IOP Conf. Series: Materials Science and "
+            "Engineering 1276, 012010. https://doi.org/10.1088/1757-899X/1276/1/012010."
         ),
         location="§3",
     )

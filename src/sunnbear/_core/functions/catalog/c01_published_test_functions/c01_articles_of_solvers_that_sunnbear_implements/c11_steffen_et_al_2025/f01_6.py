@@ -1,4 +1,4 @@
-"""This module holds the formula of (6) in Steffen et al. (2025).
+"""This module holds the formula that Steffen et al. (2025) labels (6).
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -17,7 +17,8 @@ SURVEY_FIELDS_HASH = "2a9db5d158ac41fb"
 class SteffenEtAl20256(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``exp(-x^2/4) - 2*cos(x) + x/2 - 5/2``; the formula's interval is ``[1.0, 3.0]``.
+    The survey writes the source's function as ``exp(-x^2/4) - 2*cos(x) + x/2 - 5/2``; the formula's interval is ``[1.0,
+    3.0]``.
 
     3 printed roots: `xi_1 ≈ 2.1584`, `xi_2 ≈ 4.6196`, `xi_3 ≈ 7.2550`; the interval holds `xi_1`.
     """

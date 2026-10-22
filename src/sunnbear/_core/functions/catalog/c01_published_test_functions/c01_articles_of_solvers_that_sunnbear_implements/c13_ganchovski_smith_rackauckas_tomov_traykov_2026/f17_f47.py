@@ -1,4 +1,4 @@
-"""This module holds the formula of f47 and f48 in Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
+"""This module holds the formula that Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026) labels f47 and f48.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "f984c1aa05702df9"
+SURVEY_FIELDS_HASH = "ce57cc8b669753ea"
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F47(Formula):
@@ -34,7 +34,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F47(Formula):
             "https://doi.org/10.3390/a19050332. Supplementary materials: "
             "https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder "
             "`MDPI-Algorithms-Data` of the authors' repository "
-            "https://github.com/Just-A-Random-Geek/ModAB-Root-Finding."
+            "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
         location="f47, f48",
     )

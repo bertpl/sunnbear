@@ -1,4 +1,4 @@
-"""This module holds the formula of f27 in Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
+"""This module holds the formula that Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026) labels f27.
 
 The survey describes this function in words, not as 1 expression, so a person writes this module: a change of the
 formula's row in `data/literature_test_problems/sources/` needs a change of this module.
@@ -11,10 +11,10 @@ from sunnbear._core.utils.math_functions import sign
 class GanchovskiSmithRackauckasTomovTraykov2026F27(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source describes the function in words; the survey writes it as ``(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 -
-    p(x)))))*sign(p(x) - 3)``, where ``p(x) = x + 1.11111``; the formula's interval is ``[1, 3]``.
+    The survey writes the source's function as ``(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 - p(x)))))*sign(p(x) - 3)``,
+    where ``p(x) = x + 1.11111``; the formula's interval is ``[1, 3]``.
 
-    TF prints ``p(x) = x + 1.11``.
+    ``Test Functions.pdf`` prints ``p(x) = x + 1.11``.
     """
 
     number = (1, 1, 13, 4)
@@ -27,7 +27,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F27(Formula):
             "https://doi.org/10.3390/a19050332. Supplementary materials: "
             "https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder "
             "`MDPI-Algorithms-Data` of the authors' repository "
-            "https://github.com/Just-A-Random-Geek/ModAB-Root-Finding."
+            "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
         location="f27",
     )

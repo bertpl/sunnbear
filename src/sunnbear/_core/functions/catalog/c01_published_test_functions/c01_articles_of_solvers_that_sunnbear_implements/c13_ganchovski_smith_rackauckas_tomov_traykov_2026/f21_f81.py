@@ -1,4 +1,4 @@
-"""This module holds the formula of f81 in Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
+"""This module holds the formula that Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026) labels f81.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -11,17 +11,19 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "6181efee459707a3"
+SURVEY_FIELDS_HASH = "d271eadcb6828b33"
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``if(x > -1; 1 + sin(1/(x + 1)); -1)``; the formula's interval is ``[-1, 1]``.
+    The survey writes the source's function as ``if(x > -1; 1 + sin(1/(x + 1)); -1)``; the formula's interval is ``[-1,
+    1]``.
 
-    TF prints the first branch as `1 + sin(1/(x + 1)) - 1` and the second as `0`. TF draws the closing brace of a case
-    brace only where a term follows it (f35, f76), and draws none here, so the `- 1` belongs to the first branch and the
-    else branch is 0. TF's root, -0.682, is a zero of that first branch, `sin(1/(x + 1))`.
+    `Test Functions.pdf` prints the first branch as `1 + sin(1/(x + 1)) - 1` and the second as `0`. `Test Functions.pdf`
+    draws the closing brace of a case brace only where a term follows it (f35, f76), and draws none here, so the `- 1`
+    belongs to the first branch and the else branch is 0. The root that `Test Functions.pdf` gives, -0.682, is a zero of
+    that first branch, `sin(1/(x + 1))`.
     """
 
     number = (1, 1, 13, 21)
@@ -34,7 +36,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
             "https://doi.org/10.3390/a19050332. Supplementary materials: "
             "https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder "
             "`MDPI-Algorithms-Data` of the authors' repository "
-            "https://github.com/Just-A-Random-Geek/ModAB-Root-Finding."
+            "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
         location="f81",
     )

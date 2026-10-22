@@ -16,7 +16,7 @@ class TomovGanchovski2026(FormulaCategory):
     method. arXiv preprint 2610.14193. https://doi.org/10.48550/arxiv.2610.14193 (https://arxiv.org/abs/2610.14193). The
     authors' C# code and benchmark definitions are in https://github.com/Proektsoft-EOOD/ModAB-Root-Finding; Section 7.3
     pins commit `9111cdcc6912401eb684a7b771df3a469795d5b8` (the preprint's reference [16]), and Section 7.4 pins commit
-    `51a6d1b` (reference [17]).
+    `51a6d1b421fa6b5422b974b61c88acb3ae1945bb` (reference [17]).
     """
 
     number = (1, 1, 15)

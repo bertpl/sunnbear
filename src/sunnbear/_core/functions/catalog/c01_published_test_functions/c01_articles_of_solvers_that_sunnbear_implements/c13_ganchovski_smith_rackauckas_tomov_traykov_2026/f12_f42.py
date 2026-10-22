@@ -1,4 +1,4 @@
-"""This module holds the formula of f42 in Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
+"""This module holds the formula that Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026) labels f42.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -9,17 +9,18 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "a12e09ff4b25510b"
+SURVEY_FIELDS_HASH = "3c965a61549d4b93"
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F42(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``(x^2 - x - 6)*(x^2 - 3*x + 2)``; the formula's interval is `[0, pi]`; `[0, 4]` (TF).
+    The survey writes the source's function as ``(x^2 - x - 6)*(x^2 - 3*x + 2)``; the formula's intervals are `[0, pi]`;
+    `[0, 4]` (`Test Functions.pdf`).
 
-    The bounds ``pi`` are rounded to 12 significant digits, the most that a parameter value holds.
+    The bound ``pi`` is rounded to 12 significant digits, the most that a parameter value holds.
 
-    TF gives the interval `[0, 4]`.
+    `Test Functions.pdf` gives the interval `[0, 4]`.
     """
 
     number = (1, 1, 13, 12)
@@ -32,7 +33,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F42(Formula):
             "https://doi.org/10.3390/a19050332. Supplementary materials: "
             "https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder "
             "`MDPI-Algorithms-Data` of the authors' repository "
-            "https://github.com/Just-A-Random-Geek/ModAB-Root-Finding."
+            "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
         location="f42",
     )

@@ -1,4 +1,4 @@
-"""This module holds the formula of S3.1 in Gao (2026).
+"""This module holds the formula that Gao (2026) labels S3.1.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -16,7 +16,7 @@ SURVEY_FIELDS_HASH = "3c03bc063362b31b"
 class Gao2026S31(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``x^(1/3)``; the formula's interval is ``[-5, 1]``.
+    The survey writes the source's function as ``x^(1/3)``; the formula's interval is ``[-5, 1]``.
 
     Steep slope near the root; results in Table 1.
     """

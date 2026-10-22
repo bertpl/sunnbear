@@ -6,7 +6,10 @@ translation reads:
 
 - `if(condition; a; b)`: `a` where the condition holds and `b` elsewhere; a condition compares with `<`, `<=`, `>`,
   `>=`, or `=` for equality;
-- a comparison in parentheses, as in `(x > 1)*(x - 1)`: 1 where it holds and 0 elsewhere;
+- a comparison in parentheses, as in `(x > 1)`: 1 where it holds and 0 elsewhere. Followed by `*` and an operand, which
+  is a bracket, a call, a name or a number, as in `(x > -1)*(1 + sin(1/(x + 1)))`, it gives the operand where the
+  comparison holds and 0 elsewhere, and the operand is evaluated only where the comparison holds, so that it may be
+  undefined elsewhere;
 - `sum(term, i = m..n)` and `prod(term, i = m..n)`, over the integers `i` from `m` to `n`, written out term by term;
 - `Phi(z)` and `phi(z)`, the cumulative distribution function and the density of the standard normal distribution;
 - `sign`, `cbrt`, and the Bessel functions `J0`, `J1`, `Y0` and `Y1`;
@@ -65,6 +68,10 @@ REAL_ROOT_POWER = re.compile(r"\^\s*\(\s*1\s*/\s*(\d*[13579])\s*\)")
 COMPARISON = re.compile(r"<=|>=|==|!=|<|>|=")
 # RANGE matches the range `i = m..n` of a sum or a product.
 RANGE = re.compile(r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(-?\d+)\s*\.\.\s*(-?\d+)\s*")
+# MULTIPLICATION matches a `*` with the spaces around it, but not a `**`.
+MULTIPLICATION = re.compile(r"\s*\*(?!\*)\s*")
+# NUMBER matches an unsigned number, such as `2`, `0.5`, `.5` or `1E-4`.
+NUMBER = re.compile(r"(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
 
 
 class TranslationError(Exception):
@@ -139,27 +146,46 @@ class FormulaExpression:
         while (match := CONSTRUCT_START.search(text, position)) is not None:
             open_index = match.end() - 1
             close_index = FormulaExpression._matching_bracket(text, open_index)
-            inner = text[open_index + 1 : close_index]
             name = match.group(1)
             if name is None:
                 rewritten.append(text[position:open_index])
-                # a bracket that holds a comparison must give 1 where the comparison holds and 0 elsewhere; any other
-                # bracket stays a bracket
-                if FormulaExpression._top_level_comparisons(inner) and target == "python":
-                    # Python and numba compute with a comparison's bool as 1 or 0, so the bracket stays as published
-                    rewritten.append(f"({FormulaExpression._rewrite_condition(inner, target)})")
-                elif FormulaExpression._top_level_comparisons(inner):
-                    rewritten.append(
-                        f"Piecewise((1, {FormulaExpression._rewrite_condition(inner, target)}), (0, True))"
-                    )
-                else:
-                    rewritten.append(f"({FormulaExpression._rewrite_constructs(inner, target)})")
+                bracket_code, position = FormulaExpression._rewrite_bracket(text, open_index, close_index, target)
+                rewritten.append(bracket_code)
             else:
                 rewritten.append(text[position : match.start(1)])
-                rewritten.append(FormulaExpression._rewrite_call(name, inner, target))
-            position = close_index + 1
+                rewritten.append(FormulaExpression._rewrite_call(name, text[open_index + 1 : close_index], target))
+                position = close_index + 1
         rewritten.append(text[position:])
         return FormulaExpression._rewrite_real_roots("".join(rewritten), target)
+
+    @staticmethod
+    def _rewrite_bracket(text: str, open_index: int, close_index: int, target: str) -> tuple[str, int]:
+        """Return the bracket at `open_index`, written for `target`, and the index where the text that it replaces ends.
+
+        A bracket that holds a comparison gives 1 where the comparison holds and 0 elsewhere. Followed by `*` and an
+        operand, it gives the operand where the comparison holds and 0 elsewhere, and replaces the operand too: the
+        result evaluates the operand only where the comparison holds, so that the operand may be undefined elsewhere,
+        as `1/(x + 1)` is at `x = -1`. Any other bracket stays a bracket.
+        """
+        inner = text[open_index + 1 : close_index]
+        operand_span = FormulaExpression._multiplied_operand(text, close_index + 1)
+        if not FormulaExpression._top_level_comparisons(inner):
+            return f"({FormulaExpression._rewrite_constructs(inner, target)})", close_index + 1
+        elif operand_span is not None and target == "python":
+            # every operand that `_multiplied_operand` accepts is an atom of Python's grammar once rewritten
+            operand = FormulaExpression._rewrite_constructs(text[operand_span[0] : operand_span[1]], target)
+            return f"({operand} if {FormulaExpression._rewrite_condition(inner, target)} else 0.0)", operand_span[1]
+        elif operand_span is not None:
+            operand = FormulaExpression._rewrite_constructs(text[operand_span[0] : operand_span[1]], target)
+            return (
+                f"Piecewise(({operand}, {FormulaExpression._rewrite_condition(inner, target)}), (0, True))",
+                operand_span[1],
+            )
+        elif target == "python":
+            # Python and numba compute with a comparison's bool as 1 or 0, so the bracket stays as published
+            return f"({FormulaExpression._rewrite_condition(inner, target)})", close_index + 1
+        else:
+            return f"Piecewise((1, {FormulaExpression._rewrite_condition(inner, target)}), (0, True))", close_index + 1
 
     @staticmethod
     def _rewrite_call(name: str, inner: str, target: str) -> str:
@@ -390,6 +416,34 @@ class FormulaExpression:
                 if depth == 0:
                     return i
         raise TranslationError(f"{text!r} leaves a bracket open")
+
+    @staticmethod
+    def _multiplied_operand(text: str, start: int) -> tuple[int, int] | None:
+        """Return the start and end of the operand of a `*` at `start`: a bracket, a call, a name or a number.
+
+        Return None if no `*` follows `start`, after optional spaces, or if no such operand follows the `*`, or if the
+        operand is raised to a power, since the `*` then multiplies the power.
+        """
+        multiplication = MULTIPLICATION.match(text, start)
+        if multiplication is None:
+            return None
+        operand_start = multiplication.end()
+        name = IDENTIFIER.match(text, operand_start)
+        number = NUMBER.match(text, operand_start)
+        if text.startswith("(", operand_start):
+            operand_end = FormulaExpression._matching_bracket(text, operand_start) + 1
+        elif name is not None and text[name.end() :].lstrip().startswith("("):
+            operand_end = FormulaExpression._matching_bracket(text, text.index("(", name.end())) + 1
+        elif name is not None:
+            operand_end = name.end()
+        elif number is not None:
+            operand_end = number.end()
+        else:
+            return None
+        if text[operand_end:].lstrip().startswith("^"):
+            return None
+        else:
+            return operand_start, operand_end
 
     @staticmethod
     def _operand_start(text: str, end: int) -> int:

@@ -1,4 +1,4 @@
-"""This module holds the formula of 1.10 in Oliveira, Takahashi (2021).
+"""This module holds the formula that Oliveira, Takahashi (2021) labels 1.10.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -9,15 +9,15 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "d475735076d3fd13"
+SURVEY_FIELDS_HASH = "4df30c5c044ccf23"
 
 
 class OliveiraTakahashi2021110(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``(x + 2/3)/(x + 101/100)``; the formula's interval is ``[-1, 1]``.
+    The survey writes the source's function as ``(x + 2/3)/(x + 101/100)``; the formula's interval is ``[-1, 1]``.
 
-    The code calls it "Polynomial Fraction".
+    Table 1 names it "Poly.Frac."; the authors' MATLAB code calls it "Polynomial Fraction".
     """
 
     number = (1, 1, 9, 9)

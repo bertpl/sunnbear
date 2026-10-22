@@ -1,4 +1,4 @@
-"""This module holds the formula of III.3 in Ridders (1979).
+"""This module holds the formula that Ridders (1979) labels III.3.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -11,16 +11,17 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "1c76d8364a3e04f7"
+SURVEY_FIELDS_HASH = "07690fc231ba09e4"
 
 
 class Ridders1979Iii3(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``sin(pi*x/180)``; the formula's interval is ``[10, 280]``.
+    The survey writes the source's function as ``sin(pi*x/180)``; the formula's interval is ``[10, 280]``.
 
-    `x` is in degrees, so the root is `180`. The article prints `sin x`; `f` converts `x` from degrees to radians. The
-    article calls it a trivial example. sunnbear's `test_paper.py` writes it as `sin(radians(x))`.
+    `x` is in degrees, so the root is `180`. The article prints `sin x`; the formula converts `x` from degrees to
+    radians. The article calls it a trivial example. sunnbear's `tests/solvers/bracketing/ridders/test_paper.py` writes
+    it as `sin(radians(x))`.
     """
 
     number = (1, 1, 5, 4)

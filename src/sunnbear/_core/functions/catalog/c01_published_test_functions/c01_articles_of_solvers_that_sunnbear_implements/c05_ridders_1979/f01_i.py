@@ -1,4 +1,4 @@
-"""This module holds the formula of I in Ridders (1979).
+"""This module holds the formula that Ridders (1979) labels I.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "eebb0f0acb66e362"
 class Ridders1979I(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``x^3 - x - 5``; the formula's interval is ``[-1, 3]``.
+    The survey writes the source's function as ``x^3 - x - 5``; the formula's interval is ``[-1, 3]``.
 
     Printed root: `1.904160859...`.
     """

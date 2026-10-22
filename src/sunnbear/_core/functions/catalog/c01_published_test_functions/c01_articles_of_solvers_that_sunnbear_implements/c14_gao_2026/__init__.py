@@ -6,7 +6,7 @@ A script generates this package from the survey of published test problems: to c
 
 from sunnbear._core.functions.core import FormulaCategory
 
-from . import f01_s3_1, f02_s3_2, f03_t2_1, f04_t2_2, f05_t4_7, f06_t4_8, f07_t4_9
+from . import f01_s3_1, f02_s3_2, f03_t2_1, f04_t2_2, f05_t4_7
 
 
 class Gao2026(FormulaCategory):

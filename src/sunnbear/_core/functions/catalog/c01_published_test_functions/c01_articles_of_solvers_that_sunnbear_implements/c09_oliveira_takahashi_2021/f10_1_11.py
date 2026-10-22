@@ -1,4 +1,4 @@
-"""This module holds the formula of 1.11 in Oliveira, Takahashi (2021).
+"""This module holds the formula that Oliveira, Takahashi (2021) labels 1.11.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -11,15 +11,17 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "231d783e28696776"
+SURVEY_FIELDS_HASH = "28265ebb55610bb1"
 
 
 class OliveiraTakahashi2021111(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``Phi(x - 1) - sqrt(2)/4``; the formula's interval is ``[-1, 1]``.
+    The survey writes the source's function as ``Phi(x - 1) - sqrt(2)/4``; the formula's interval is ``[-1, 1]``.
 
-    sunnbear writes `Phi` with `erf`.
+    `Phi` is the cumulative distribution function of the standard normal distribution; the article names the function
+    "Normal CDF" but does not define `Phi`. The formula writes `Phi` with `erfc`, and sunnbear's test transcription in
+    `tests/solvers/paper_problems/oliveira_takahashi.py` with `erf`.
     """
 
     number = (1, 1, 9, 10)

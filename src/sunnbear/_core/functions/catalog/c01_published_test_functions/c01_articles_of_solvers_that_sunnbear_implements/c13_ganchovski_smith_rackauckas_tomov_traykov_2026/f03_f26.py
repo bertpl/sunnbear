@@ -1,4 +1,4 @@
-"""This module holds the formula of f26 in Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
+"""This module holds the formula that Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026) labels f26.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -11,13 +11,13 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "1bfd4d73ab8b9ed8"
+SURVEY_FIELDS_HASH = "8852574832315881"
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F26(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``(sin(x) - x/4)^3``; the formula's interval is ``[2, 4]``.
+    The survey writes the source's function as ``(sin(x) - x/4)^3``; the formula's interval is ``[2, 4]``.
     """
 
     number = (1, 1, 13, 3)
@@ -30,7 +30,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F26(Formula):
             "https://doi.org/10.3390/a19050332. Supplementary materials: "
             "https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder "
             "`MDPI-Algorithms-Data` of the authors' repository "
-            "https://github.com/Just-A-Random-Geek/ModAB-Root-Finding."
+            "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
         location="f26",
     )

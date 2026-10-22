@@ -1,4 +1,4 @@
-"""This module holds the formula of 2.11 in Oliveira, Takahashi (2021).
+"""This module holds the formula that Oliveira, Takahashi (2021) labels 2.11.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -17,7 +17,8 @@ SURVEY_FIELDS_HASH = "54614cac0de0cc3e"
 class OliveiraTakahashi2021211(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 1/10``; the formula's interval is ``[-1, 1]``.
+    The survey writes the source's function as ``202*x - 2*floor((2*x + 10^-2)/(2*10^-2)) - 1/10``; the formula's
+    interval is ``[-1, 1]``.
     """
 
     number = (1, 1, 9, 22)

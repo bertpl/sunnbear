@@ -1,4 +1,4 @@
-"""This module holds the formula of 7 in Chandrupatla (1997).
+"""This module holds the formula that Chandrupatla (1997) labels 7.
 
 The survey describes this function in words, not as 1 expression, so a person writes this module: a change of the
 formula's row in `data/literature_test_problems/sources/` needs a change of this module.
@@ -12,9 +12,8 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 class Chandrupatla19977(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source describes the function in words; the survey writes it as ``0`` if ``abs(x) < 3.8*10^-4``,
-    ``x*exp(-x^-2)`` otherwise; the formula's intervals are ``[-1, 4]``; ``[-2, 5]``; ``[-1, 10]``; ``[-5, 50]``;
-    ``[-10, 100]``.
+    The survey writes the source's function as ``0`` if ``abs(x) < 3.8*10^-4``, ``x*exp(-x^-2)`` otherwise; the
+    formula's intervals are ``[-1, 4]``; ``[-2, 5]``; ``[-1, 10]``; ``[-5, 50]``; ``[-10, 100]``.
 
     Printed zero: ``x = 0``. The article says Brent discusses it.
     """

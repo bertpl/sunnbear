@@ -1,4 +1,4 @@
-"""This module holds the formula of 7.6-b in Tomov, Ganchovski (2026).
+"""This module holds the formula that Tomov, Ganchovski (2026) labels 7.6-b.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -9,13 +9,14 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "72c405af35701987"
+SURVEY_FIELDS_HASH = "039ce29392b4e505"
 
 
 class TomovGanchovski202676B(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``x - 1/4``; the formula's interval is endpoint pairs `(1/4, 1)` and `(1, 1/4)`.
+    The survey writes the source's function as ``x - 1/4``; the formula's interval is endpoint pairs `(1/4, 1)` and `(1,
+    1/4)`.
 
     The solver must return the endpoint root. The second pair gives the endpoints in reversed order.
     """
@@ -31,7 +32,7 @@ class TomovGanchovski202676B(Formula):
             " C# code and benchmark definitions are in "
             "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding; Section 7.3 pins commit "
             "`9111cdcc6912401eb684a7b771df3a469795d5b8` (the preprint's reference [16]), and Section "
-            "7.4 pins commit `51a6d1b` (reference [17])."
+            "7.4 pins commit `51a6d1b421fa6b5422b974b61c88acb3ae1945bb` (reference [17])."
         ),
         location="7.6-b",
     )

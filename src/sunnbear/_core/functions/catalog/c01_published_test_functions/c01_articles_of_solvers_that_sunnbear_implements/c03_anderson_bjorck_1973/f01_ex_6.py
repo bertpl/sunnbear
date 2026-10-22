@@ -1,4 +1,4 @@
-"""This module holds the formula of Ex. 6 in Anderson, Björck (1973).
+"""This module holds the formula that Anderson, Björck (1973) labels Ex. 6.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -17,8 +17,8 @@ SURVEY_FIELDS_HASH = "9b0e24fea5a268f2"
 class AndersonBjorck1973Ex6(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``exp(-n*x)*(x - 1) + x^n``, with the parameters ``n = 1, 5, 10, 15, 20``; the formula's interval
-    is ``[0, 1]``.
+    The survey writes the source's function as ``exp(-n*x)*(x - 1) + x^n``, with the parameters ``n = 1, 5, 10, 15,
+    20``; the formula's interval is ``[0, 1]``.
     """
 
     number = (1, 1, 3, 1)

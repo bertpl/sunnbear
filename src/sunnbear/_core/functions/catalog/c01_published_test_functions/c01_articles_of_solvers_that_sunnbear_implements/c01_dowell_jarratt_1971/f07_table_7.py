@@ -1,4 +1,4 @@
-"""This module holds the formula of Table 7 in Dowell, Jarratt (1971).
+"""This module holds the formula that Dowell, Jarratt (1971) labels Table 7.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -15,8 +15,8 @@ SURVEY_FIELDS_HASH = "cb1b1d600c4b8ea2"
 class DowellJarratt1971Table7(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``(n*x - 1)/((n - 1)*x)``, with the parameters ``n = 2, 5, 15, 20``; the formula's interval is
-    ``[0.01, 1]``.
+    The survey writes the source's function as ``(n*x - 1)/((n - 1)*x)``, with the parameters ``n = 2, 5, 15, 20``; the
+    formula's interval is ``[0.01, 1]``.
 
     The caption says the y-axis is an asymptote. Starting values `x0 = 0.01`, `x1 = 1.0`.
     """

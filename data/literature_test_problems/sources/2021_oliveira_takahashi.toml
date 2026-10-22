@@ -60,7 +60,7 @@ key = '1.7'
 f = 'log(abs(x - 10/9))'
 name = 'Logarithmic'
 interval = '[-1, 1]'
-notes = 'The code and sunnbear use the negation, `-log(abs(x - 10/9))`.'
+notes = "The authors' MATLAB code and sunnbear's test transcription in `tests/solvers/paper_problems/oliveira_takahashi.py` use the negation, `-log(abs(x - 10/9))`; the formula follows the article."
 
 [[rows]]
 key = '1.8'
@@ -73,21 +73,21 @@ key = '1.9'
 f = '1/10^3 + sum(sin(pi*i^3*x/2)/(pi*i^3), i = 1..10)'
 name = 'Weierstrass'
 interval = '[-1, 1]'
-notes = 'The article prints the divisor as `/pi i^3`, without parentheses; the row follows the code and sunnbear, which divide by `pi*i^3`.'
+notes = "The article prints the divisor as `/pi i^3`, without parentheses; the formula divides by `pi*i^3`, as the authors' MATLAB code and sunnbear's test transcription in `tests/solvers/paper_problems/oliveira_takahashi.py` do."
 
 [[rows]]
 key = '1.10'
 f = '(x + 2/3)/(x + 101/100)'
 name = 'Poly.Frac.'
 interval = '[-1, 1]'
-notes = 'The code calls it "Polynomial Fraction".'
+notes = "Table 1 names it \"Poly.Frac.\"; the authors' MATLAB code calls it \"Polynomial Fraction\"."
 
 [[rows]]
 key = '1.11'
 f = 'Phi(x - 1) - sqrt(2)/4'
 name = 'Normal CDF'
 interval = '[-1, 1]'
-notes = 'sunnbear writes `Phi` with `erf`.'
+notes = "`Phi` is the cumulative distribution function of the standard normal distribution; the article names the function \"Normal CDF\" but does not define `Phi`. The formula writes `Phi` with `erfc`, and sunnbear's test transcription in `tests/solvers/paper_problems/oliveira_takahashi.py` with `erf`."
 
 [[rows]]
 key = '1.12'
@@ -156,7 +156,7 @@ key = '2.10'
 f = '(x > -1)*(1 + sin(1/(x + 1))) - 1'
 name = 'Warsaw'
 interval = '[-1, 1]'
-notes = 'The code and sunnbear write the same function as `sin(1/(x + 1))` for `x > -1` and `-1` elsewhere.'
+notes = "The authors' MATLAB code and sunnbear's test transcription in `tests/solvers/paper_problems/oliveira_takahashi.py` write the same function as `sin(1/(x + 1))` for `x > -1` and `-1` elsewhere. At `x = -1`, where the printed product holds `sin(1/0)`, they return `-1`, and so does the formula, which evaluates `sin(1/(x + 1))` only for `x > -1`."
 
 [[rows]]
 key = '2.11'

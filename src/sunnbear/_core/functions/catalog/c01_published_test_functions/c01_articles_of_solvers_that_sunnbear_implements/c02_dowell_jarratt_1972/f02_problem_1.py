@@ -1,4 +1,4 @@
-"""This module holds the formula of Problem 1 in Dowell, Jarratt (1972).
+"""This module holds the formula that Dowell, Jarratt (1972) labels Problem 1.
 
 A script generates this module from the survey of published test problems: to change the formula, change its source file
 in `data/literature_test_problems/sources/` and run `uv run python -m scripts.literature_test_problems.formula_modules
@@ -15,8 +15,8 @@ SURVEY_FIELDS_HASH = "fb7c40d9a422068c"
 class DowellJarratt1972Problem1(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The source prints ``(N*x - 1)/((N - 1)*x)``, with the parameters ``N = 2, 10, 20``; the formula's interval is
-    ``[0.01, 1]``.
+    The survey writes the source's function as ``(N*x - 1)/((N - 1)*x)``, with the parameters ``N = 2, 10, 20``; the
+    formula's interval is ``[0.01, 1]``.
 
     Starting values `x0 = 0.01`, `x1 = 1.0`. The article chose it to show the slow convergence of Regula Falsi.
     """
