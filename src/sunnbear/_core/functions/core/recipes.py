@@ -1,23 +1,28 @@
-"""Declarative parameter grids: how a formula's parameter sweeps are specified.
+"""Parameter recipes: how a formula specifies its parameter tuples, as grids or as tables.
 
-Three small pieces compose, innermost first::
+A `ParamRecipe` materializes parameter tuples, and comes in 2 kinds:
 
-    ParamNotation  how one axis maps grid arguments to values
-        │          (DECIMAL, or POW2/POW10 where the grid lives in exponent space)
-        │
-    ParamAxis      one swept parameter: a named argument grid from `start` to
-        │          `stop` in steps of `step`, materialized by values() through
-        │          the axis's notation (a POW2 axis emits 2^g)
-        │
-    ParamRecipe    one or more axes, combined into parameter tuples by tuples():
-                   - product=True  (default) -> the axes' Cartesian product
-                   - product=False           -> a coupled sweep, in which the
-                     axes advance together at their own resolutions and their
-                     lengths need not match (see ParamRecipe._coupled_param_sweep)
+- **`ParamGrid`** sweeps a grid. Three small pieces compose, innermost first::
+
+      ParamNotation  how one axis maps grid arguments to values
+          │          (DECIMAL, or POW2/POW10 where the grid lives in exponent space)
+          │
+      ParamAxis      one swept parameter: a named argument grid from `start` to
+          │          `stop` in steps of `step`, materialized by values() through
+          │          the axis's notation (a POW2 axis emits 2^g)
+          │
+      ParamGrid      one or more axes, combined into parameter tuples by tuples():
+                     - product=True  (default) -> the axes' Cartesian product
+                     - product=False           -> a coupled sweep, in which the
+                       axes advance together at their own resolutions and their
+                       lengths need not match (see ParamGrid._coupled_param_sweep)
+
+- **`ParamTable`** lists its tuples one by one, for parameter values that form no grid, such as the values that
+  a paper publishes.
 
 A formula holds a *tuple* of recipes and its candidates are their concatenation,
 so recipes are additive: anything the small grammar above cannot express is
-written as one more recipe rather than as a richer axis. Every recipe's axis
+written as one more recipe rather than as a richer axis. Every recipe's parameter
 names must match the formula's declared `param_names`, which is what fixes the
 meaning of tuple position (`Formula._validate_recipes`).
 
@@ -27,6 +32,7 @@ short, are easy for a person to scan, and reproduce exactly.
 """
 
 import itertools
+from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from dataclasses import dataclass
 from decimal import Decimal
@@ -125,8 +131,23 @@ class ParamAxis:
 # ==================================================================================================
 #  ParamRecipe
 # ==================================================================================================
+class ParamRecipe(ABC):
+    """`ParamRecipe` is the base class of a recipe that materializes parameter tuples: a grid or a table."""
+
+    @abstractmethod
+    def param_names(self) -> tuple[str, ...]:
+        """Return the names of the recipe's parameters, in tuple position order."""
+
+    @abstractmethod
+    def tuples(self) -> Iterator[tuple[float, ...]]:
+        """Materialize the recipe's parameter tuples."""
+
+
+# ==================================================================================================
+#  ParamGrid
+# ==================================================================================================
 @dataclass(frozen=True)
-class ParamRecipe:
+class ParamGrid(ParamRecipe):
     """A set of axes materializing parameter tuples, as a full product or coupled.
 
     ``product=True`` (default): the axes span their Cartesian product.
@@ -214,16 +235,65 @@ class ParamRecipe:
     #  Single-axis conveniences
     # --------------------------------------------------------------------------
     @classmethod
-    def decimal(cls, name: str, start: float, stop: float, step: float) -> "ParamRecipe":
-        """Build a single-axis recipe whose grid is the values themselves (DECIMAL notation)."""
+    def decimal(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
+        """Build a single-axis grid whose values are the grid arguments themselves (DECIMAL notation)."""
         return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.DECIMAL),))
 
     @classmethod
-    def pow2(cls, name: str, start: float, stop: float, step: float) -> "ParamRecipe":
-        """Build a single-axis recipe gridded in base-2 exponent space (POW2 notation)."""
+    def pow2(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
+        """Build a single-axis grid in base-2 exponent space (POW2 notation)."""
         return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW2),))
 
     @classmethod
-    def pow10(cls, name: str, start: float, stop: float, step: float) -> "ParamRecipe":
-        """Build a single-axis recipe gridded in base-10 exponent space (POW10 notation)."""
+    def pow10(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
+        """Build a single-axis grid in base-10 exponent space (POW10 notation)."""
         return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW10),))
+
+
+# ==================================================================================================
+#  ParamTable
+# ==================================================================================================
+@dataclass(frozen=True)
+class ParamTable(ParamRecipe):
+    """A table of parameter tuples, materialized as listed, in order.
+
+    A table holds values that form no grid, such as the values that a paper publishes (``n = 1, 5, 15, 20``), or
+    the combinations of several parameters that it gives, where their product would add combinations that it does
+    not give.
+
+    Attributes:
+        names: The names of the parameters, in tuple position order.
+        rows: The parameter tuples, each with 1 value per name. Every value must be a valid parameter value
+            (`ParamNotation.is_valid_value`), so that the identity of each candidate renders.
+    """
+
+    names: tuple[str, ...]
+    rows: tuple[tuple[float, ...], ...]
+
+    def __post_init__(self) -> None:
+        """Check that the table has rows, that each row has 1 value per name, and that every value is valid.
+
+        Raises:
+            ValueError: If the table has no rows, a row's length differs from the number of names, or a value is
+                not a valid parameter value.
+        """
+        if not self.rows:
+            raise ValueError("A ParamTable needs at least 1 row.")
+        for row in self.rows:
+            if len(row) != len(self.names):
+                raise ValueError(f"ParamTable row {row} does not have 1 value for each of the names {self.names}.")
+            for value in row:
+                if not ParamNotation.is_valid_value(value):
+                    raise ValueError(
+                        f"ParamTable value {value!r} is not a valid parameter value: no notation spells it with "
+                        f"{CANONICAL_DIGITS} significant digits or fewer."
+                    )
+
+    def param_names(self) -> tuple[str, ...]:
+        """Return the names of the table's parameters, in tuple position order."""
+        return self.names
+
+    def tuples(self) -> Iterator[tuple[float, ...]]:
+        """Materialize the table's rows, in order, with each value as a float."""
+        for row in self.rows:
+            yield tuple(float(value) for value in row)

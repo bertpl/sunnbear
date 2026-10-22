@@ -1,6 +1,6 @@
 """This formula is the cubic ``x^3 - p1*x - c``."""
 
-from sunnbear._core.functions.core import Formula, FormulaTestCase, ParamRecipe
+from sunnbear._core.functions.core import Formula, FormulaTestCase, ParamGrid, ParamRecipe
 
 
 class Cubic(Formula):
@@ -21,7 +21,7 @@ class Cubic(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Sweep the slope knob linearly."""
-        return (ParamRecipe.decimal("p1", 0.0, 1.0, step=0.2),)
+        return (ParamGrid.decimal("p1", 0.0, 1.0, step=0.2),)
 
     cases = (
         FormulaTestCase.value(params={"p1": 0.0}, x=0.0, c=0.0, expected=0.0),  # root at the origin

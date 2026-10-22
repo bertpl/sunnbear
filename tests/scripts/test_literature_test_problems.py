@@ -1,7 +1,8 @@
 """The generated files of `data/literature_test_problems/` agree with the folder's source files and decisions.
 
 The tests use the script's modules that need only the standard library; the row comparison in `matching`, which
-needs sympy, is not run here, because another sympy version could change a match.
+needs sympy, is not run here, because another sympy version could change a match. The same holds for the formula
+modules of category 1 in sunnbear's catalog, which the tests compare with the survey without regenerating them.
 """
 
 import importlib
@@ -13,7 +14,11 @@ from types import ModuleType
 
 import pytest
 
+from sunnbear.functions import FormulaRegistry, FormulaSource
+
 _PACKAGE_DIR = Path(__file__).resolve().parents[2] / "scripts" / "literature_test_problems"
+# _CATEGORY_1_FORMULAS are the formulas of category 1 in sunnbear's catalog.
+_CATEGORY_1_FORMULAS = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 1]
 # _FIRST_RUN_LINES are the rows of a small survey on its first run, each as (row id, subcategory, final status).
 _FIRST_RUN_LINES = [
     ("a:1", "1.1", "new"),
@@ -249,6 +254,54 @@ def test_timeline_template_counts_every_status(script_modules):
 
     # --- assert -----------------------
     assert listed == {*data_files.DECIDED_STATUSES, data_files.UNDECIDED}
+
+
+# ==================================================================================================
+#  The formulas of category 1 in sunnbear's catalog
+# ==================================================================================================
+@pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
+def test_category_1_formula_matches_the_survey(formula, sources, committed_formulas_table):
+    """A formula of category 1 has an active line in `formulas.csv`, its source's name and reference, and its rows.
+
+    A generated module's fingerprint must equal the fingerprint of its survey fields, so that a module left stale
+    after a change of the survey fails; a module without one must hold a row that only describes its function.
+    """
+    # --- arrange ----------------------
+    line = {line.number: line for line in committed_formulas_table.formulas}[formula.number]
+    source = {source.source_id: source for source in sources}[line.source_id]
+    rows_by_id = {row.row_id: row for row in source.rows}
+    category = {category.number: category for category in FormulaRegistry.categories()}[formula.number[:3]]
+    fingerprint = getattr(sys.modules[type(formula).__module__], "SURVEY_FINGERPRINT", None)
+
+    # --- act --------------------------
+    location = ", ".join(rows_by_id[row_id].key for row_id in line.row_ids)
+
+    # --- assert -----------------------
+    assert not line.is_retired
+    assert category.name == source.title.split(":")[0].strip()
+    assert formula.source == FormulaSource(reference=source.reference, location=location)
+    if fingerprint is None:
+        assert any(rows_by_id[row_id].f_description for row_id in line.row_ids)
+    else:
+        assert fingerprint == line.fingerprint(source)
+
+
+def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table):
+    """A source with a formula in the catalog has each of its active formulas of `formulas.csv` there."""
+    # --- arrange ----------------------
+    numbers_in_catalog = {formula.number for formula in _CATEGORY_1_FORMULAS}
+    sources_in_catalog = {number[:3] for number in numbers_in_catalog}
+
+    # --- act --------------------------
+    missing = [
+        line.formula_id
+        for line in committed_formulas_table.formulas
+        if not line.is_retired and line.source_number in sources_in_catalog and line.number not in numbers_in_catalog
+    ]
+
+    # --- assert -----------------------
+    assert numbers_in_catalog
+    assert missing == []
 
 
 # ==================================================================================================

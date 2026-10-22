@@ -13,5 +13,8 @@ It runs in these stages:
 - **Formulas** (`formulas`; standard library only): write `formulas.csv`, which maps each formula id of category 1
   to its rows, from `rows.csv` and `formula_decisions.csv`, keeping every id of the committed `formulas.csv`.
 
+The module `formula_modules` (needs sympy) runs on its own: it writes the modules of category 1's formulas into
+sunnbear's formula catalog, from the source files and `formulas.csv`.
+
 The folder's README gives the format of each file and the rules that decide a row's status.
 """

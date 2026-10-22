@@ -48,6 +48,36 @@ class ParsedFunction:
     scaled_values: tuple[tuple | None, ...]
 
     # --------------------------------------------------------------------------
+    #  Parsing
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def parse_expression(text: str, parameters: dict) -> sp.Expr:
+        """Parse 1 expression, or an equation `lhs = rhs` into `lhs - rhs`."""
+        sides = text.split("=")
+        if len(sides) > 2:
+            raise ParseError("several equals signs")
+        parsed = [parse_math(side, parameters) for side in sides]
+        if len(parsed) == 2:
+            return parsed[0] - parsed[1]
+        else:
+            return parsed[0]
+
+    @staticmethod
+    def find_variable(expr: sp.Expr, parameters: dict, notes: str) -> sp.Symbol:
+        """Return the unknown: `x`, the symbol that the notes name, or the only symbol that is not a parameter."""
+        names = {s.name: s for s in expr.free_symbols}
+        if "x" in names:
+            return names["x"]
+        named = re.search(r"unknown `([A-Za-z_][A-Za-z0-9_]*)`", notes, flags=re.IGNORECASE)
+        if named and named.group(1) in names:
+            return names[named.group(1)]
+        free = [s for name, s in names.items() if name not in parameters]
+        if len(free) == 1:
+            return free[0]
+        else:
+            raise ParseError("unknown variable unclear")
+
+    # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
     @staticmethod
@@ -74,33 +104,6 @@ class ParsedFunction:
                     else (mpmath.nstr((v / reference).real, 10), mpmath.nstr((v / reference).imag, 10))
                     for v in values
                 )
-
-    @staticmethod
-    def _parse_expression(text: str, parameters: dict) -> sp.Expr:
-        """Parse 1 expression, or an equation `lhs = rhs` into `lhs - rhs`."""
-        sides = text.split("=")
-        if len(sides) > 2:
-            raise ParseError("several equals signs")
-        parsed = [parse_math(side, parameters) for side in sides]
-        if len(parsed) == 2:
-            return parsed[0] - parsed[1]
-        else:
-            return parsed[0]
-
-    @staticmethod
-    def _find_variable(expr: sp.Expr, parameters: dict, notes: str) -> sp.Symbol:
-        """Return the unknown: `x`, the symbol that the notes name, or the only symbol that is not a parameter."""
-        names = {s.name: s for s in expr.free_symbols}
-        if "x" in names:
-            return names["x"]
-        named = re.search(r"unknown `([A-Za-z_][A-Za-z0-9_]*)`", notes, flags=re.IGNORECASE)
-        if named and named.group(1) in names:
-            return names[named.group(1)]
-        free = [s for name, s in names.items() if name not in parameters]
-        if len(free) == 1:
-            return free[0]
-        else:
-            raise ParseError("unknown variable unclear")
 
     @staticmethod
     def _has_value_sets(text: str, varied_names: set[str]) -> bool:
@@ -157,8 +160,8 @@ class ParsedFunction:
             if words & TEXT_WORDS or "..." in row.f or "<" in row.f or ">" in row.f or "!=" in row.f:
                 raise ParseError("conditions or prose")
             parameters = parse_parameters(row.parameters)
-            expr = cls._parse_expression(row.f, parameters)
-            expr = expr.subs(cls._find_variable(expr, parameters, row.notes), X)
+            expr = cls.parse_expression(row.f, parameters)
+            expr = expr.subs(cls.find_variable(expr, parameters, row.notes), X)
             assigned = sorted((s for s in expr.free_symbols if s.name in parameters and s != X), key=lambda s: s.name)
             combos = list(
                 itertools.islice(itertools.product(*(parameters[s.name] for s in assigned)), MAX_INSTANCES + 1)

@@ -5,14 +5,24 @@ already given, and when several rows share a formula.
 """
 
 import csv
+import hashlib
 import io
+import json
 import re
 from collections import Counter
 from collections.abc import Iterable
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-from .data_files import DataFileError, FormulaDecision, RowsTableLine, join_row_ids, source_id_of_row_id, split_row_ids
+from .data_files import (
+    DataFileError,
+    FormulaDecision,
+    RowsTableLine,
+    Source,
+    join_row_ids,
+    source_id_of_row_id,
+    split_row_ids,
+)
 
 FORMULA_COLUMNS = ["formula_id", "status", "source_id", "row_ids", "variable_change"]
 FORMULA_STATUSES = ("active", "retired")
@@ -316,6 +326,30 @@ class FormulasTableLine:
     def source_number(self) -> tuple[int, ...]:
         """Return the number of the formula's source, such as `(1, 4, 12)` for `f1.4.12.3`."""
         return self.number[:3]
+
+    def fingerprint(self, source: Source) -> str:
+        """Return a hash of the survey fields that the formula's module in sunnbear's catalog is generated from.
+
+        The hash covers the source's title and reference, the formula's change of variable, and each of its rows'
+        id, f, f_description, parameters, interval and notes, so it changes with every change of the survey that
+        changes the generated module.
+
+        Raises:
+            DataFileError: If `source` is not the formula's source, or lacks 1 of the formula's rows.
+        """
+        rows_by_id = {row.row_id: row for row in source.rows}
+        if source.source_id != self.source_id or not set(self.row_ids) <= set(rows_by_id):
+            raise DataFileError(f"{self.formula_id}: its rows are not all in the source {source.source_id}")
+        fields = [
+            source.title,
+            source.reference,
+            self.variable_change,
+            [
+                [row.row_id, row.f, row.f_description, row.parameters, row.interval, row.notes]
+                for row in (rows_by_id[row_id] for row_id in self.row_ids)
+            ],
+        ]
+        return hashlib.sha256(json.dumps(fields).encode("utf-8")).hexdigest()[:16]
 
     def to_csv_line(self) -> dict[str, str]:
         """Return the formula as 1 line of `formulas.csv`, keyed by column."""

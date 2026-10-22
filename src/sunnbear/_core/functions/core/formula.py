@@ -25,6 +25,7 @@ from .identity import FunctionId
 from .param_values import DEDUP_DIGITS, deduplicate_param_tuples
 from .recipes import ParamRecipe
 from .registry import FormulaRegistry
+from .source import FormulaSource
 from .taxonomy import FormulaTaxonomyNode
 from .test_cases import FormulaTestCase
 from .test_function import CandidateTestFunction
@@ -49,11 +50,14 @@ class Formula(FormulaTaxonomyNode, ABC):
             False for formulas numba cannot compile.
         cases: The formula's self-declared behavioral traits (`FormulaTestCase`),
             exercised by the generic formula test.
+        source: The publication that the formula comes from (`FormulaSource`), or None (default)
+            for a formula that no publication gives.
     """
 
     param_names: ClassVar[tuple[str, ...]] = ()
     jit: ClassVar[bool] = True
     cases: ClassVar[tuple[FormulaTestCase, ...]] = ()
+    source: ClassVar[FormulaSource | None] = None
     # populated lazily per concrete class by _compiled_formula (annotation only — no value,
     # so the `in cls.__dict__` cache check below is not satisfied by this declaration)
     _compiled_formula_cache: ClassVar["Callable[..., float]"]
@@ -100,7 +104,7 @@ class Formula(FormulaTaxonomyNode, ABC):
 
     @abstractmethod
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the grid recipes that materialize candidate parameter tuples.
+        """Return the recipes, grids or tables, that materialize candidate parameter tuples.
 
         The order matters where recipes overlap: among near-duplicate tuples, the one from the
         first recipe is kept (see `build_all_candidates`).
@@ -152,12 +156,22 @@ class Formula(FormulaTaxonomyNode, ABC):
         - **Lazy (first use), not at class definition**: importing the catalog
           must stay cheap; numba decoration and compilation are only paid by
           processes that actually evaluate the formula.
+        - **Compiled here, with an explicit all-float64 signature, not at the
+          first call**: the first call usually happens inside `Solver.solve`,
+          whose flop-counting context replaces the functions of the `math`
+          module with counting wrappers, and numba cannot compile a call to
+          those. Compiling when the formula is first bound keeps compilation
+          outside every solve.
         """
         cls = type(self)
         if "_compiled_formula_cache" not in cls.__dict__:
             fn = cls.parametrized_fun
-            _declared_hook_param_names(fn, cls.__name__, "parametrized_fun", n_leading=2)  # signature gate
-            cls._compiled_formula_cache = numba.njit(fn) if cls.jit else fn
+            param_names = _declared_hook_param_names(fn, cls.__name__, "parametrized_fun", n_leading=2)
+            if cls.jit:
+                signature = f"float64({', '.join(['float64'] * (2 + len(param_names)))})"
+                cls._compiled_formula_cache = numba.njit(signature)(fn)
+            else:
+                cls._compiled_formula_cache = fn
         return cls._compiled_formula_cache
 
     def build_candidate(self, param_values: "tuple[float, ...]") -> CandidateTestFunction:
