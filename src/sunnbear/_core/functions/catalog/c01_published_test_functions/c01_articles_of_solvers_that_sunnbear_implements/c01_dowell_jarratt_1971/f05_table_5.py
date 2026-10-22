@@ -7,9 +7,9 @@ in `data/literature_test_problems/sources/` and run `uv run python -m scripts.li
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
-# SURVEY_HASH is a hash of this formula's survey fields; the tests compare it with the survey, so
-# that a test fails when the survey changes and this module is not regenerated.
-SURVEY_HASH = "a3c0d3fd6defb478"
+# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
+# survey, so that a test fails when the survey changes and this module is not regenerated.
+SURVEY_FIELDS_HASH = "a3c0d3fd6defb478"
 
 
 class DowellJarratt1971Table5(Formula):

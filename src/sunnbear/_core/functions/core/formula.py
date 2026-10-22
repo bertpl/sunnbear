@@ -1,6 +1,6 @@
 """The `Formula` base class: hand-written function families plus generation metadata.
 
-A formula owns three parameter layers with distinct roles: the recipe-swept
+A formula owns three parameter layers with distinct roles: the recipe-given
 ``p`` tuple (bound once per test function, consciously shaping its character),
 the Monte-Carlo parameter ``c`` (varied per benchmark run), and — downstream,
 never stored here — the tolerance ``xtol``.
@@ -153,15 +153,15 @@ class Formula(FormulaTaxonomyNode, ABC):
           the override is a ``@staticmethod``; a plain method would surface
           later as an inscrutable numba typing error about ``self``, so it is
           rejected here with an actionable message.
-        - **Lazy (first use), not at class definition**: importing the catalog
+        - **Lazy (first bind), not at class definition**: importing the catalog
           must stay cheap; numba decoration and compilation are only paid by
-          processes that actually evaluate the formula.
-        - **Compiled when the formula is first bound, with an explicit
-          all-float64 signature, not at its first call**: the first call usually happens inside `Solver.solve`,
-          whose flop-counting context replaces the functions of the `math`
-          module with counting wrappers, and numba cannot compile a call to
-          those. Compiling when the formula is first bound keeps compilation
-          outside every solve.
+          processes that bind a parameter tuple of the formula.
+        - **Compiled when the formula is first bound, not at its first call**:
+          the explicit all-float64 signature makes numba compile at decoration,
+          which happens in the first `bind_xc_fun` or `bind_x_fun`. The first
+          call usually happens inside `Solver.solve`, whose flop-counting
+          context replaces the functions of the `math` module with counting
+          wrappers, and numba cannot compile a call to those.
         """
         cls = type(self)
         if "_compiled_formula_cache" not in cls.__dict__:
@@ -262,7 +262,7 @@ class Formula(FormulaTaxonomyNode, ABC):
     #  Validation
     # --------------------------------------------------------------------------
     def _validate_recipes(self, recipes: "tuple[ParamRecipe, ...]") -> None:
-        """Check that every recipe's axes agree with `param_names`.
+        """Check that every recipe's parameter names agree with `param_names`.
 
         Axis order determines tuple order, which lands positionally on
         `parametrized_fun` — so axes declared in the wrong order silently
@@ -272,14 +272,14 @@ class Formula(FormulaTaxonomyNode, ABC):
         too, since it can never materialize a tuple.
 
         Raises:
-            ValueError: If a recipe's axes disagree with `param_names`, or if
+            ValueError: If a recipe's parameter names disagree with `param_names`, or if
                 `param_names` is non-empty but no recipes are defined.
         """
         for recipe in recipes:
             if recipe.param_names() != self.param_names:
                 raise ValueError(
-                    f"Formula {type(self).__name__} declares param_names={self.param_names} but a recipe "
-                    f"sweeps {recipe.param_names()}; recipe axes must match the declared parameters, in order."
+                    f"Formula {type(self).__name__} declares param_names={self.param_names} but a recipe gives "
+                    f"{recipe.param_names()}; recipe parameter names must match the declared parameters, in order."
                 )
         if not recipes and self.param_names:
             raise ValueError(

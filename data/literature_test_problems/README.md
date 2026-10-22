@@ -212,10 +212,10 @@ uv run python -m scripts.literature_test_problems.formula_modules <source id> ..
 For each source named, the script writes the source's package and its formula modules, and rewrites the `__init__.py` of each subcategory. A generated formula module:
 
 - evaluates the row's `f`, as the source prints it, at `x - (b - a)*c`, where `[a, b]` is the formula's interval: the formula's `c` shifts the function along x by a multiple of the interval's width;
-- lists the row's parameter values in a `ParamTable`, with 1 tuple per pair of a combination of parameter values and an interval that the source gives for that combination; a formula with several intervals takes their bounds as 2 more parameters, `a` and `b`;
+- lists the row's parameter values in a `ParamTable`, with 1 tuple for each interval that the source gives for a combination of parameter values; a formula with several intervals takes their bounds as 2 more parameters, `a` and `b`;
 - names its source in a `FormulaSource`: the source's `reference`, and the row's key as the location;
 - holds test cases whose expected values mpmath computes from `f`;
-- holds the hash of its formula's survey fields, `SURVEY_HASH`, which changes with each change of those fields.
+- holds `SURVEY_FIELDS_HASH`, a hash of the fields that the module depends on: the source's `title` and `reference`, the formula's `variable_change`, and the fields of its row, so that the hash changes with each change of those fields.
 
 A formula with a row that gives only an `f_description` is written by hand, and the script only imports its module.
 
@@ -225,7 +225,7 @@ The script stops on a formula that it cannot generate:
 - a formula with a `variable_change`;
 - a formula whose parameters give several sets of values.
 
-After a change of a source file, regenerate the modules of its formulas: the tests compare each module's hash with the survey, so that a stale module fails them.
+After a change of a source file, regenerate the modules of its formulas: the tests recompute each module's `SURVEY_FIELDS_HASH` from the source files, so that a module that was not regenerated fails the tests.
 
 ## Adding a source
 
@@ -259,7 +259,7 @@ CI does not regenerate `rows.csv`, because another sympy version could change a 
 - every source file has its fields;
 - `summary.md` and `timeline.html` equal what the script builds from `rows.csv` and the source files;
 - the active formulas of `formulas.csv` hold every `new` row exactly once and no other row, the rows of each formula come from its own source, and the file equals what the script builds from `rows.csv`, `formula_decisions.csv` and the file's own ids;
-- each formula of category 1 in sunnbear's catalog has an active line in `formulas.csv`; its category is named after its source, its `source` holds the source's reference and its rows' keys as the location, and a generated module holds the current hash of its survey fields;
+- each formula of category 1 in sunnbear's catalog has an active line in `formulas.csv`; its category is named after its source, its `source` holds the source's reference and its rows' keys as the location, and a generated module holds the current `SURVEY_FIELDS_HASH`;
 - every active formula of a source that has a formula in the catalog is in the catalog too.
 
 A change to the parsing or matching in `scripts/literature_test_problems/`, or to the sympy version, is what the test does not check: whoever makes it regenerates `rows.csv`.

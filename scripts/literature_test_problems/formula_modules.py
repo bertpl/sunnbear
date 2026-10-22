@@ -11,11 +11,8 @@ For each named source, the script:
 - rewrites the `__init__.py` of each subcategory, so that it imports every source package present;
 - formats every file that it wrote with ruff.
 
-A formula with a row that gives only a description of its function is written by hand: the script leaves its module
-alone and only imports it.
-
 The README of `data/literature_test_problems/` (§ Formula modules) describes what a generated formula module holds,
-and which formulas the script cannot generate.
+which formulas are written by hand, and which formulas the script cannot generate.
 """
 
 import itertools
@@ -74,6 +71,11 @@ CASE_ATOL = 1e-13
 DOCSTRING_WIDTH = 120 - 4
 # RESERVED_NAMES are the names that a parameter of the source may not keep, because the formula module uses them.
 RESERVED_NAMES = {"x", "c", "self", "math"}
+# GENERATED_PACKAGE_NOTE ends the module docstring of each generated package's `__init__.py`.
+GENERATED_PACKAGE_NOTE = (
+    "A script generates this {kind} from the survey of published test problems: to change it, change the survey and "
+    "run `scripts/literature_test_problems/formula_modules.py`, never this file."
+)
 
 
 class GenerationError(Exception):
@@ -87,31 +89,30 @@ class GenerationError(Exception):
 class FormulaModuleSpec:
     """A `FormulaModuleSpec` holds the contents of 1 generated formula module.
 
-    `param_names` are the Python names of the formula's parameters, in tuple order; a formula with several intervals
-    ends them with `a` and `b`. `interval` is the single interval of a formula that has 1, and None otherwise.
-    `interval_width_code` is the code of the interval's width in `parametrized_fun`: a number for a formula with 1
-    interval, and `(b - a)` otherwise. `rounded_bounds` holds the exact text of each bound that the tuples round to
-    `CANONICAL_DIGITS` significant digits. `cases` holds each case as the Python code of a `FormulaTestCase` factory
-    call.
+    Attributes:
+        param_names: The Python names of the formula's parameters, in tuple order; a formula with several
+            intervals ends them with `a` and `b`.
+        interval: The single interval of a formula that has 1, and None otherwise.
+        exact_texts_of_rounded_bounds: The exact text of each bound that the tuples round to `CANONICAL_DIGITS`
+            significant digits.
+        cases: Each case as the Python code of a `FormulaTestCase` factory call.
     """
 
     formulas_table_line: FormulasTableLine
     source: Source
     row: SourceRow
-    class_name: str
     param_names: tuple[str, ...]
     expression_code: str
-    interval_width_code: str
     tuples: tuple[tuple[float, ...], ...]
     interval: tuple[float, float] | None
-    rounded_bounds: tuple[str, ...]
+    exact_texts_of_rounded_bounds: tuple[str, ...]
     cases: tuple[str, ...]
 
     def module_text(self) -> str:
         """Return the formula's module as Python source, before ruff formats it."""
         command = f"uv run python -m scripts.literature_test_problems.formula_modules {self.source.source_id}"
         module_docstring = (
-            f"This module holds the formula of {self.row.key} in {self.source.category_name}.\n\n"
+            f"This module holds the formula of {self.row.key} in {self.source.short_title}.\n\n"
             "A script generates this module from the survey of published test problems: to change the formula, change "
             f"its source file in `data/literature_test_problems/sources/` and run `{command}`, never this file."
         )
@@ -120,6 +121,11 @@ class FormulaModuleSpec:
         imported_names = ["Formula", "FormulaSource", "FormulaTestCase", "ParamRecipe"]
         if needs_param_table_import:
             imported_names.append("ParamTable")
+        if self.interval is None:
+            interval_width_code = "(b - a)"
+        else:
+            interval_width_code = repr(self.interval[1] - self.interval[0])
+        class_name = source_category_class_name(self.source) + _camel_case(slugify(self.row.key))
         signature = "".join(f", {name}: float" for name in self.param_names)
         return "\n".join(
             [
@@ -128,12 +134,12 @@ class FormulaModuleSpec:
                 *(["import math", ""] if needs_math_import else []),
                 f"from sunnbear._core.functions.core import {', '.join(imported_names)}",
                 "",
-                "# SURVEY_HASH is a hash of this formula's survey fields; the tests compare it with the survey, so",
-                "# that a test fails when the survey changes and this module is not regenerated.",
-                f'SURVEY_HASH = "{self.formulas_table_line.survey_hash(self.source)}"',
+                "# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the",
+                "# survey, so that a test fails when the survey changes and this module is not regenerated.",
+                f'SURVEY_FIELDS_HASH = "{self.formulas_table_line.survey_fields_hash(self.source)}"',
                 "",
                 "",
-                f"class {self.class_name}(Formula):",
+                f"class {class_name}(Formula):",
                 textwrap.indent(_docstring(self._class_docstring(), width=DOCSTRING_WIDTH), "    "),
                 "",
                 f"    number = {self.formulas_table_line.number!r}",
@@ -148,7 +154,7 @@ class FormulaModuleSpec:
                 f"    def parametrized_fun(x: float, c: float{signature}) -> float:",
                 '        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula\'s '
                 'interval."""',
-                f"        x = x - {self.interval_width_code} * c",
+                f"        x = x - {interval_width_code} * c",
                 f"        return {self.expression_code}",
                 "",
                 f"    def interval_bounds(self{signature}) -> tuple[float, float]:",
@@ -168,7 +174,7 @@ class FormulaModuleSpec:
     #  Helpers
     # --------------------------------------------------------------------------
     def _class_docstring(self) -> str:
-        """Return the class docstring: what the formula evaluates, the published values, the row's notes."""
+        """Return the class docstring: what the formula evaluates, the row's values, rounded bounds and notes."""
         paragraphs = [
             "This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval."
         ]
@@ -184,17 +190,17 @@ class FormulaModuleSpec:
             )
         else:
             paragraphs.append(f"The source prints ``{self.row.f}``; the formula's interval is {interval_text}.")
-        if self.rounded_bounds:
+        if self.exact_texts_of_rounded_bounds:
             paragraphs.append(
-                f"The bounds {', '.join(f'``{bound}``' for bound in self.rounded_bounds)} are rounded to "
-                f"{CANONICAL_DIGITS} significant digits, the most that a parameter value holds."
+                f"The bounds {', '.join(f'``{bound}``' for bound in self.exact_texts_of_rounded_bounds)} are rounded "
+                f"to {CANONICAL_DIGITS} significant digits, the most that a parameter value holds."
             )
         if self.row.notes.strip():
             paragraphs.append(self.row.notes.strip())
         return "\n\n".join(paragraphs)
 
     def _interval_bounds_body(self) -> list[str]:
-        """Return the lines of `interval_bounds`: the published interval, or the tuple's own `a` and `b`."""
+        """Return the lines of `interval_bounds`: the formula's single interval, or the tuple's own `a` and `b`."""
         if self.interval is not None:
             return [
                 '        """Return the formula\'s interval."""',
@@ -209,12 +215,14 @@ class FormulaModuleSpec:
     def _recipes_body(self) -> list[str]:
         """Return the lines of `recipes`: 1 `ParamTable` of the published tuples, or none without parameters."""
         if self.param_names:
-            rows = ", ".join(f"({', '.join(repr(value) for value in row)},)" for row in self.tuples)
+            tuples_code = ", ".join(
+                f"({', '.join(repr(value) for value in param_tuple)},)" for param_tuple in self.tuples
+            )
             if len(self.tuples) == 1:
-                rows += ","
+                tuples_code += ","
             return [
                 '        """Return the published parameter values."""',
-                f"        return (ParamTable(names={self.param_names!r}, rows=({rows})),)",
+                f"        return (ParamTable(names={self.param_names!r}, rows=({tuples_code})),)",
             ]
         else:
             return [
@@ -289,7 +297,7 @@ class FormulaModuleSpec:
 
     @staticmethod
     def _find_case_x_and_expected(
-        exact: sp.Expr,
+        exact_expression: sp.Expr,
         variable: sp.Symbol,
         expression_code: str,
         python_values: dict[str, float],
@@ -306,7 +314,7 @@ class FormulaModuleSpec:
             GenerationError: If the Python agrees with mpmath at none of the x-values tried.
         """
         a, b = interval
-        exact_function = sp.lambdify(variable, exact, modules="mpmath")
+        exact_function = sp.lambdify(variable, exact_expression, modules="mpmath")
         for fraction in CASE_FRACTIONS:
             x = float(f"{a + fraction * (b - a):.6g}")
             shifted = x - (b - a) * c
@@ -330,7 +338,7 @@ class FormulaModuleSpec:
     # --------------------------------------------------------------------------
     @classmethod
     def from_survey(cls, formulas_table_line: FormulasTableLine, source: Source) -> "FormulaModuleSpec":
-        """Build the module of 1 formula of `formulas.csv` from its source's row.
+        """Build the spec of 1 formula's module from its line of `formulas.csv` and its source's row.
 
         Raises:
             GenerationError: If the formula holds several rows, changes its variable, or has parameters that give
@@ -341,13 +349,13 @@ class FormulaModuleSpec:
             raise GenerationError(f"{formula_id} holds several rows, which the generator does not support")
         elif formulas_table_line.variable_change:
             raise GenerationError(f"{formula_id} changes its variable, which the generator does not support")
-        row = next(row for row in source.rows if row.row_id == formulas_table_line.row_ids[0])
+        row = source.find_row(formulas_table_line.row_ids[0])
         # --- parse the row ----------------------
         if ParsedFunction.from_source_row(row).has_value_sets:
             raise GenerationError(f"{formula_id}: its parameters give several sets of values")
         expr, variable, survey_parameters = ParsedFunction.parse_row_expression(row)
-        names = [name for name in survey_parameters if sp.Symbol(name) in expr.free_symbols]
-        combos = list(itertools.product(*(survey_parameters[name] for name in names)))
+        survey_names = [name for name in survey_parameters if sp.Symbol(name) in expr.free_symbols]
+        combos = list(itertools.product(*(survey_parameters[name] for name in survey_names)))
         if len(combos) > MAX_INSTANCES:
             raise GenerationError(f"{formula_id}: more than {MAX_INSTANCES} parameter combinations")
         intervals = ParsedIntervals.from_source_row(row).intervals
@@ -355,51 +363,51 @@ class FormulaModuleSpec:
             (combo, interval)
             for combo in combos
             for interval in intervals
-            if interval.matches_parameter_values(tuple(zip(names, combo, strict=True)))
+            if interval.matches_parameter_values(tuple(zip(survey_names, combo, strict=True)))
         ]
         if not pairs:
             raise GenerationError(f"{formula_id}: no instance has a usable interval")
         # --- the formula's parameters -----------
         has_interval_parameters = len({interval.key for _, interval in pairs}) > 1
-        python_names = cls._python_parameter_names(names, has_interval_parameters)
+        python_names = cls._python_parameter_names(survey_names, has_interval_parameters)
         expression_code = cls._python_expression_code(row.f, variable.name, python_names)
-        param_names = tuple(python_names[name] for name in names) + (("a", "b") if has_interval_parameters else ())
-        tuples, cases, rounded_bounds = [], [], []
+        param_names = tuple(python_names[name] for name in survey_names)
+        if has_interval_parameters:
+            param_names += ("a", "b")
+        tuples, cases, exact_texts_of_rounded_bounds = [], [], []
         bounds_cases: dict[tuple[float, float], str] = {}
         for combo, interval in pairs:
-            values = tuple(cls._parameter_value(value, name) for name, value in zip(names, combo, strict=True))
+            values = tuple(cls._parameter_value(value, name) for name, value in zip(survey_names, combo, strict=True))
             exact_bounds = (sp.sympify(interval.lower), sp.sympify(interval.upper))
             bounds = tuple(float(sp.N(bound, 30)) for bound in exact_bounds)
             if has_interval_parameters:
                 rounded = tuple(float(f"{bound:.{CANONICAL_DIGITS}g}") for bound in bounds)
-                rounded_bounds += [str(e) for e, r, f in zip(exact_bounds, rounded, bounds, strict=True) if r != f]
+                exact_texts_of_rounded_bounds += [
+                    str(e) for e, r, f in zip(exact_bounds, rounded, bounds, strict=True) if r != f
+                ]
                 bounds = rounded
                 values += bounds
             tuples.append(values)
             params = dict(zip(param_names, values, strict=True))
             python_values = {name: value for name, value in params.items() if name in python_names.values()}
-            exact = expr.subs(dict(zip((sp.Symbol(name) for name in names), combo, strict=True)))
-            x, expected = cls._find_case_x_and_expected(exact, variable, expression_code, python_values, bounds, c=0.0)
-            cases.append(f"FormulaTestCase.value(params={params!r}, x={x!r}, c=0.0, expected={expected!r})")
-            if len(cases) == 1:
+            exact_expression = expr.subs(dict(zip((sp.Symbol(name) for name in survey_names), combo, strict=True)))
+            # the first tuple gets a 2nd value case, which shifts x
+            shifts = (0.0, CASE_SHIFT) if not cases else (0.0,)
+            for c in shifts:
                 x, expected = cls._find_case_x_and_expected(
-                    exact, variable, expression_code, python_values, bounds, c=CASE_SHIFT
+                    exact_expression, variable, expression_code, python_values, bounds, c=c
                 )
-                cases.append(
-                    f"FormulaTestCase.value(params={params!r}, x={x!r}, c={CASE_SHIFT!r}, expected={expected!r})"
-                )
+                cases.append(f"FormulaTestCase.value(params={params!r}, x={x!r}, c={c!r}, expected={expected!r})")
             bounds_cases.setdefault(bounds, f"FormulaTestCase.interval_bounds(params={params!r}, expected={bounds!r})")
         return cls(
             formulas_table_line=formulas_table_line,
             source=source,
             row=row,
-            class_name=source_category_class_name(source) + _camel_case(slugify(row.key)),
             param_names=param_names,
             expression_code=expression_code,
-            interval_width_code="(b - a)" if has_interval_parameters else repr(bounds[1] - bounds[0]),
             tuples=tuple(tuples),
             interval=None if has_interval_parameters else bounds,
-            rounded_bounds=tuple(dict.fromkeys(rounded_bounds)),
+            exact_texts_of_rounded_bounds=tuple(dict.fromkeys(exact_texts_of_rounded_bounds)),
             cases=(*cases, *bounds_cases.values()),
         )
 
@@ -409,15 +417,14 @@ class FormulaModuleSpec:
 # ==================================================================================================
 def source_category_class_name(source: Source) -> str:
     """Return the class name of a source's category, such as ``DowellJarratt1971``."""
-    return _camel_case(slugify(source.category_name))
+    return _camel_case(slugify(source.short_title))
 
 
 def source_package_text(source: Source, formulas_table_lines: list[FormulasTableLine], module_names: list[str]) -> str:
     """Return the `__init__.py` of a source's category package, which imports every formula module of the source."""
     class_name = source_category_class_name(source)
     module_docstring = (
-        f"This category holds the formulas of {source.category_name}.\n\n"
-        "A script generates this package from the survey of published test problems."
+        f"This category holds the formulas of {source.short_title}.\n\n{GENERATED_PACKAGE_NOTE.format(kind='package')}"
     )
     class_docstring = f"`{class_name}` is the category of the formulas of 1 publication.\n\n{source.reference}"
     return "\n".join(
@@ -433,7 +440,7 @@ def source_package_text(source: Source, formulas_table_lines: list[FormulasTable
             textwrap.indent(_docstring(class_docstring, width=DOCSTRING_WIDTH), "    "),
             "",
             f"    number = {formulas_table_lines[0].source_number!r}",
-            f"    name = {source.category_name!r}",
+            f"    name = {source.short_title!r}",
             "",
         ]
     )
@@ -447,7 +454,7 @@ def subcategory_package_text(subcategory: str, source_package_names: list[str]) 
     number = tuple(int(part) for part in subcategory.split("."))
     module_docstring = (
         f"This category holds the formulas of {description}, in 1 subcategory per source.\n\n"
-        "A script generates this file from the survey of published test problems."
+        f"{GENERATED_PACKAGE_NOTE.format(kind='file')}"
     )
     imports = [f"from . import {', '.join(source_package_names)}", ""] if source_package_names else []
     return "\n".join(
@@ -480,12 +487,12 @@ def write_source_package(source: Source, formulas_table_lines: list[FormulasTabl
     Raises:
         GenerationError: If a formula cannot be generated, or a hand-written module is missing.
     """
-    package_name = f"c{formulas_table_lines[0].source_number[-1]:02d}_{slugify(source.category_name)}"
+    package_name = f"c{formulas_table_lines[0].source_number[-1]:02d}_{slugify(source.short_title)}"
     package_dir = subcategory_dir(source.subcategory) / package_name
     package_dir.mkdir(parents=True, exist_ok=True)
     written, module_names = [], []
     for formulas_table_line in formulas_table_lines:
-        row = next(row for row in source.rows if row.row_id == formulas_table_line.row_ids[0])
+        row = source.find_row(formulas_table_line.row_ids[0])
         module_name = f"f{formulas_table_line.number[-1]:02d}_{slugify(row.key)}"
         if row.f_description:
             if not (package_dir / f"{module_name}.py").exists():
@@ -494,11 +501,11 @@ def write_source_package(source: Source, formulas_table_lines: list[FormulasTabl
                 )
         else:
             try:
-                formula = FormulaModuleSpec.from_survey(formulas_table_line, source)
+                module_spec = FormulaModuleSpec.from_survey(formulas_table_line, source)
             except GenerationError as error:
                 raise GenerationError(f"{formulas_table_line.formula_id} ({row.row_id}): {error}") from error
             path = package_dir / f"{module_name}.py"
-            path.write_text(formula.module_text(), encoding="utf-8")
+            path.write_text(module_spec.module_text(), encoding="utf-8")
             written.append(path)
         module_names.append(module_name)
     init_path = package_dir / "__init__.py"
@@ -506,7 +513,7 @@ def write_source_package(source: Source, formulas_table_lines: list[FormulasTabl
     return [*written, init_path]
 
 
-def write_subcategories() -> list[Path]:
+def write_subcategory_packages() -> list[Path]:
     """Rewrite the `__init__.py` of every subcategory from the source packages present, and return the paths."""
     written = []
     for subcategory in SUBCATEGORY_DESCRIPTIONS:
@@ -578,9 +585,10 @@ def main(source_ids: list[str]) -> int:
         except GenerationError as error:
             print(f"problem: {error}")
             return 1
-    written += write_subcategories()
+    written += write_subcategory_packages()
     paths = [str(path) for path in written]
-    # formatting first shortens the long lines, so that the import sort of `check --fix` reports only real problems
+    # formatting first shortens the long lines, so that `check --fix`, which sorts the imports, reports only real
+    # problems
     subprocess.run([sys.executable, "-m", "ruff", "format", "--quiet", *paths], check=True)
     subprocess.run([sys.executable, "-m", "ruff", "check", "--fix", "--quiet", *paths], check=False)
     subprocess.run([sys.executable, "-m", "ruff", "format", "--quiet", *paths], check=True)

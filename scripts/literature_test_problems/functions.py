@@ -50,8 +50,18 @@ class ParsedFunction:
     # --------------------------------------------------------------------------
     #  Parsing
     # --------------------------------------------------------------------------
+    @classmethod
+    def parse_row_expression(cls, row: SourceRow) -> tuple[sp.Expr, sp.Symbol, dict]:
+        """Return a row's expression as written, its unknown, and its parameters (`parse_parameters`)."""
+        parameters = parse_parameters(row.parameters)
+        expr = cls._parse_expression(row.f, parameters)
+        return expr, cls._find_variable(expr, parameters, row.notes), parameters
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
     @staticmethod
-    def parse_expression(text: str, parameters: dict) -> sp.Expr:
+    def _parse_expression(text: str, parameters: dict) -> sp.Expr:
         """Parse 1 expression, or an equation `lhs = rhs` into `lhs - rhs`."""
         sides = text.split("=")
         if len(sides) > 2:
@@ -63,7 +73,7 @@ class ParsedFunction:
             return parsed[0]
 
     @staticmethod
-    def find_variable(expr: sp.Expr, parameters: dict, notes: str) -> sp.Symbol:
+    def _find_variable(expr: sp.Expr, parameters: dict, notes: str) -> sp.Symbol:
         """Return the unknown: `x`, the symbol that the notes name, or the only symbol that is not a parameter."""
         names = {s.name: s for s in expr.free_symbols}
         if "x" in names:
@@ -77,16 +87,6 @@ class ParsedFunction:
         else:
             raise ParseError("unknown variable unclear")
 
-    @classmethod
-    def parse_row_expression(cls, row: SourceRow) -> tuple[sp.Expr, sp.Symbol, dict]:
-        """Return a row's expression as written, its unknown, and its parameters (`parse_parameters`)."""
-        parameters = parse_parameters(row.parameters)
-        expr = cls.parse_expression(row.f, parameters)
-        return expr, cls.find_variable(expr, parameters, row.notes), parameters
-
-    # --------------------------------------------------------------------------
-    #  Helpers
-    # --------------------------------------------------------------------------
     @staticmethod
     def _scaled_values(expr: sp.Expr) -> tuple | None:
         """Return 1 instance's scaled values, in 40-digit arithmetic, or None if it has too few values."""

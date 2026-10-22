@@ -17,12 +17,12 @@ A `ParamRecipe` materializes parameter tuples, and comes in 2 kinds:
                        axes advance together at their own resolutions and their
                        lengths need not match (see ParamGrid._coupled_param_sweep)
 
-- **`ParamTable`** lists its tuples one by one, for parameter values that form no grid, such as the values that
-  a paper publishes.
+- **`ParamTable`** lists its tuples one by one, for parameter values that form no grid, such as a paper's
+  published values.
 
 A formula holds a *tuple* of recipes and its candidates are their concatenation,
 so recipes are additive: anything the small grammar above cannot express is
-written as one more recipe rather than as a richer axis. Every recipe's parameter
+written as one more recipe, not as a richer axis. Every recipe's parameter
 names must match the formula's declared `param_names`, which is what fixes the
 meaning of tuple position (`Formula._validate_recipes`).
 
@@ -257,7 +257,7 @@ class ParamGrid(ParamRecipe):
 class ParamTable(ParamRecipe):
     """`ParamTable` lists parameter tuples and materializes them in the order listed.
 
-    A table holds values that form no grid, such as the values that a paper publishes (``n = 1, 5, 15, 20``), or
+    A table holds values that form no grid, such as a paper's published values (``n = 1, 5, 15, 20``), or
     the combinations of several parameters that the paper gives, where the product of the parameters' values would
     add combinations that the paper does not give.
 

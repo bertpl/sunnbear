@@ -216,7 +216,7 @@ def test_grid_coupled_sweep_coinciding_boundaries_step_together():
     ]
 
 
-def test_grid_mixed_notations_survive_tuple_assembly():
+def test_grid_mixed_notations_survive_combining_into_tuples():
     """Each axis's notation determines its values in the assembled tuples: the POW2 axis gives powers of 2."""
     # --- arrange ----------------------
     grid = ParamGrid(
@@ -280,6 +280,7 @@ def test_grid_single_axis_convenience():
 #  ParamTable
 # ==================================================================================================
 def test_table_yields_its_rows_in_order_as_floats():
+    """A table yields its rows in the order listed, with every value as a float."""
     # --- arrange ----------------------
     table = ParamTable(names=("n", "a"), rows=((5, 0.5), (1, 0.25), (20, 1e-05)))
 
@@ -301,6 +302,7 @@ def test_table_yields_its_rows_in_order_as_floats():
     ],
 )
 def test_table_rejects_a_malformed_table(names, rows, message):
+    """A table without rows, with a row of the wrong length, or with an invalid value raises `ValueError`."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=message):
         ParamTable(names=names, rows=rows)

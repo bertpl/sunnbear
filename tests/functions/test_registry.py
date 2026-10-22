@@ -50,7 +50,7 @@ def test_candidates_applies_validity_filter():
 
 @pytest.mark.parametrize("formula_cls", [Cubic, OddPower])
 def test_candidates_functions_evaluate(formula_cls):
-    """Each shipped formula of category 2 produces a working f(x, c) callable."""
+    """The cubic and the odd power each produce a working f(x, c) callable."""
     # --- arrange ----------------------
     candidate = formula_cls().build_all_candidates()[0]  # p1 = 0.0 resp. 1.0
 
@@ -206,7 +206,7 @@ def test_recipe_axis_order_must_match_declared_params():
     )
 
     # --- act / assert -----------------
-    with pytest.raises(ValueError, match="recipe axes must match the declared parameters"):
+    with pytest.raises(ValueError, match="recipe parameter names must match the declared parameters"):
         cls().build_all_candidates()
 
 
@@ -216,7 +216,7 @@ def test_recipe_arity_must_match_declared_params():
     cls = _formula_cls(989, ("p1", "p2"), (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, p1, p2: x - c)
 
     # --- act / assert -----------------
-    with pytest.raises(ValueError, match="recipe axes must match the declared parameters"):
+    with pytest.raises(ValueError, match="recipe parameter names must match the declared parameters"):
         cls().build_all_candidates()
 
 
@@ -369,6 +369,7 @@ def test_compiled_formula_rejects_plain_method():
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_formula_without_jit_keeps_its_plain_python_function():
+    """A formula with `jit = False` keeps its plain Python `parametrized_fun` as its compiled function."""
     # --- arrange ----------------------
     formula_cls = define_formula_cls((99, 994))
 
@@ -378,7 +379,7 @@ def test_formula_without_jit_keeps_its_plain_python_function():
 
 @pytest.mark.usefixtures("isolated_registry")
 def test_bound_formula_calls_math_functions_inside_flop_counting():
-    """A formula compiled when it is bound runs inside the flop-counting context of a solve.
+    """A formula compiled when its first parameter tuple is bound runs inside the flop-counting context of a solve.
 
     That context replaces the `math` functions with counting wrappers, and numba cannot compile a call to such a
     wrapper, so the formula must be compiled before the context starts.

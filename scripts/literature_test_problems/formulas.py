@@ -327,7 +327,7 @@ class FormulasTableLine:
         """Return the number of the formula's source, such as `(1, 4, 12)` for `f1.4.12.3`."""
         return self.number[:3]
 
-    def survey_hash(self, source: Source) -> str:
+    def survey_fields_hash(self, source: Source) -> str:
         """Return a hash of the formula's survey fields, the input of its generated module in sunnbear's catalog.
 
         The hash covers every survey field that the generated module depends on, so it changes with every change of
@@ -336,16 +336,15 @@ class FormulasTableLine:
         Raises:
             DataFileError: If `source` is not the formula's source, or lacks 1 of the formula's rows.
         """
-        rows_by_id = {row.row_id: row for row in source.rows}
-        if source.source_id != self.source_id or not set(self.row_ids) <= set(rows_by_id):
-            raise DataFileError(f"{self.formula_id}: its rows are not all in the source {source.source_id}")
+        if source.source_id != self.source_id:
+            raise DataFileError(f"{self.formula_id}: {source.source_id} is not its source")
         fields = [
             source.title,
             source.reference,
             self.variable_change,
             [
                 [row.row_id, row.f, row.f_description, row.parameters, row.interval, row.notes]
-                for row in (rows_by_id[row_id] for row_id in self.row_ids)
+                for row in (source.find_row(row_id) for row_id in self.row_ids)
             ],
         ]
         return hashlib.sha256(json.dumps(fields).encode("utf-8")).hexdigest()[:16]

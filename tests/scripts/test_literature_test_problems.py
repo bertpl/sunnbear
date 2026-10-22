@@ -261,42 +261,47 @@ def test_timeline_template_counts_every_status(script_modules):
 # ==================================================================================================
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
 def test_category_1_formula_matches_the_survey(formula, sources, committed_formulas_table):
-    """A formula of category 1 has an active line in `formulas.csv`, its source's name and reference, and its rows.
+    """A formula of category 1 has an active line in `formulas.csv`, and its category and `source` match its source.
+
+    The category's name must be the source's short title, and `source` must hold the source's reference and its rows'
+    keys as the location.
 
     A generated module's hash must equal the hash of its survey fields, so that a module left stale after a change
-    of the survey fails; a module without one must hold a row that only describes its function.
+    of the survey fails; a module without a hash must be the hand-written module of a formula whose row only
+    describes its function.
     """
     # --- arrange ----------------------
     line = {line.number: line for line in committed_formulas_table.formulas}[formula.number]
     source = {source.source_id: source for source in sources}[line.source_id]
-    rows_by_id = {row.row_id: row for row in source.rows}
     category = {category.number: category for category in FormulaRegistry.categories()}[formula.number[:3]]
-    survey_hash = getattr(sys.modules[type(formula).__module__], "SURVEY_HASH", None)
+    survey_fields_hash = getattr(sys.modules[type(formula).__module__], "SURVEY_FIELDS_HASH", None)
 
     # --- act --------------------------
-    location = ", ".join(rows_by_id[row_id].key for row_id in line.row_ids)
+    location = ", ".join(source.find_row(row_id).key for row_id in line.row_ids)
 
     # --- assert -----------------------
     assert not line.is_retired
-    assert category.name == source.category_name
+    assert category.name == source.short_title
     assert formula.source == FormulaSource(reference=source.reference, location=location)
-    if survey_hash is None:
-        assert any(rows_by_id[row_id].f_description for row_id in line.row_ids)
+    if survey_fields_hash is None:
+        assert any(source.find_row(row_id).f_description for row_id in line.row_ids)
     else:
-        assert survey_hash == line.survey_hash(source)
+        assert survey_fields_hash == line.survey_fields_hash(source)
 
 
 def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table):
     """A source with a formula in the catalog has each of its active formulas of `formulas.csv` there."""
     # --- arrange ----------------------
     numbers_in_catalog = {formula.number for formula in _CATEGORY_1_FORMULAS}
-    sources_in_catalog = {number[:3] for number in numbers_in_catalog}
+    source_numbers_in_catalog = {number[:3] for number in numbers_in_catalog}
 
     # --- act --------------------------
     missing = [
         line.formula_id
         for line in committed_formulas_table.formulas
-        if not line.is_retired and line.source_number in sources_in_catalog and line.number not in numbers_in_catalog
+        if not line.is_retired
+        and line.source_number in source_numbers_in_catalog
+        and line.number not in numbers_in_catalog
     ]
 
     # --- assert -----------------------

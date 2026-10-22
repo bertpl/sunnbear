@@ -1,6 +1,7 @@
 """This category holds the formulas of Dowell, Jarratt (1971).
 
-A script generates this package from the survey of published test problems.
+A script generates this package from the survey of published test problems: to change it, change the survey and run
+`scripts/literature_test_problems/formula_modules.py`, never this file.
 """
 
 from sunnbear._core.functions.core import FormulaCategory
