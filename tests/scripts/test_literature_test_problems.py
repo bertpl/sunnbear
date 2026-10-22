@@ -400,12 +400,12 @@ def test_formulas_table_reactivates_a_retired_formula(script_modules):
     "lines, decided_row_ids, expected_problems",
     [
         # A decision joins 2 committed formulas.
-        (_FIRST_RUN_LINES, [("d:1", "d:2", "d:3")], ["the formula of d:1 would join or split f1.1.2.1, f1.1.2.2"]),
+        (_FIRST_RUN_LINES, [("d:1", "d:2", "d:3")], ["the formula of d:1 would join f1.1.2.1, f1.1.2.2"]),
         # A removed decision splits a committed formula.
         (
             _FIRST_RUN_LINES,
             [],
-            ["the formula of d:1 would join or split f1.1.2.1", "the formula of d:3 would join or split f1.1.2.1"],
+            ["the formula of d:1 would split from f1.1.2.1", "the formula of d:3 would split from f1.1.2.1"],
         ),
         # A row no longer exists.
         (
@@ -440,6 +440,134 @@ def test_formulas_table_stops_on_a_change_that_moves_an_id(script_modules, lines
 
     # --- assert -----------------------
     assert error.value.problems == expected_problems
+
+
+@pytest.mark.parametrize(
+    "later_lines, decided_row_ids, expected_formulas",
+    [
+        # A row of d's 2-row formula is a duplicate now: the formula keeps its id with 1 row.
+        (
+            [
+                (row_id, subcategory, "duplicate" if row_id == "d:3" else status)
+                for row_id, subcategory, status in _FIRST_RUN_LINES
+            ],
+            [("d:3", "d:1")],
+            [("f1.1.2.1", ("d:1",), False), ("f1.1.2.2", ("d:2",), False)],
+        ),
+        # A row that became `new` joins d's formula through a decision: the formula keeps its id with 3 rows.
+        (
+            [*_FIRST_RUN_LINES, ("d:4", "1.1", "new")],
+            [("d:3", "d:1", "d:4")],
+            [("f1.1.2.1", ("d:1", "d:3", "d:4"), False), ("f1.1.2.2", ("d:2",), False)],
+        ),
+    ],
+)
+def test_formulas_table_keeps_the_id_of_a_formula_whose_rows_change(
+    script_modules, later_lines, decided_row_ids, expected_formulas
+):
+    """A formula whose rows shrink or grow, without joining another formula, keeps its id."""
+    # --- arrange ----------------------
+    first_run_formulas_table = _first_run_formulas_table(script_modules)
+
+    # --- act --------------------------
+    formulas_table = script_modules["formulas"].FormulasTable.build(
+        _rows_table_lines(script_modules, later_lines),
+        _formula_decisions(script_modules, decided_row_ids),
+        first_run_formulas_table,
+    )
+
+    # --- assert -----------------------
+    d_formulas = [
+        (formula.formula_id, formula.row_ids, formula.is_retired)
+        for formula in formulas_table.formulas
+        if formula.source_id == "d"
+    ]
+    assert d_formulas == expected_formulas
+
+
+def test_formulas_table_keeps_a_retired_id_that_a_person_resolved(script_modules):
+    """A retired line whose rows another formula holds, or that no longer exist, keeps its id from being given again."""
+    # --- arrange ----------------------
+    formulas_module = script_modules["formulas"]
+    line_cls = formulas_module.FormulasTableLine
+    # a person resolved the join of f1.1.2.1 and f1.1.2.2: f1.1.2.1 holds d:1, d:2 and d:3, f1.1.2.2 is retired, and
+    # the formula of a removed row x:1 was retired too
+    resolved_table = formulas_module.FormulasTable(
+        (
+            line_cls((1, 1, 1, 1), "a", ("a:1",), "", is_retired=False),
+            line_cls((1, 1, 1, 2), "a", ("a:3",), "", is_retired=False),
+            line_cls((1, 1, 1, 3), "a", ("a:9",), "", is_retired=True),
+            line_cls((1, 1, 2, 1), "d", ("d:1", "d:2", "d:3"), "", is_retired=False),
+            line_cls((1, 1, 2, 2), "d", ("d:2",), "", is_retired=True),
+            line_cls((1, 2, 1, 1), "c", ("c:1",), "", is_retired=False),
+        )
+    )
+    later_lines = [*_FIRST_RUN_LINES, ("a:4", "1.1", "new"), ("d:4", "1.1", "new")]
+
+    # --- act --------------------------
+    formulas_table = formulas_module.FormulasTable.build(
+        _rows_table_lines(script_modules, later_lines),
+        _formula_decisions(script_modules, [("d:1", "d:2", "d:3")]),
+        resolved_table,
+    )
+
+    # --- assert -----------------------
+    appended = [formula for formula in formulas_table.formulas if formula not in resolved_table.formulas]
+    assert [(formula.formula_id, formula.row_ids) for formula in appended] == [
+        ("f1.1.1.4", ("a:4",)),
+        ("f1.1.2.3", ("d:4",)),
+    ]
+
+
+@pytest.mark.parametrize(
+    "lines, expected_message",
+    [
+        (["f1.1.1.1,active,zz,a:1,"], "a formula names a row of another source than its source_id"),
+        (["f1.1.1.1,active,a"], "the line of f1.1.1.1 does not have 5 fields"),
+        (["f1.1.1.1,active,a,a:1,", "f1.1.1.2,active,a,a:1,"], "a row is in more than 1 active formula"),
+        (["f1.1.1.1,active,a,a:1,", "f1.1.1.1,retired,a,a:2,"], "an id is in more than 1 line"),
+        (["f1.1.1.1,active,a,a:1,", "f1.1.1.2,active,b,b:1,"], "a source number belongs to more than 1 source"),
+        (["f1.1.1.1,active,a,a:1,", "f1.1.2.1,active,a,a:2,"], "a source has more than 1 number in 1 subcategory"),
+        (["g1.1.1.1,active,a,a:1,"], "the line of g1.1.1.1 breaks the format"),
+    ],
+)
+def test_formulas_table_read_rejects_a_broken_file(script_modules, tmp_path, lines, expected_message):
+    """`FormulasTable.read` raises `DataFileError` for each way that a file, such as one edited by hand, can break."""
+    # --- arrange ----------------------
+    path = tmp_path / "formulas.csv"
+    path.write_text("\n".join(["formula_id,status,source_id,row_ids,variable_change", *lines]) + "\n")
+
+    # --- act / assert -----------------
+    with pytest.raises(script_modules["data_files"].DataFileError, match=re.escape(expected_message)):
+        script_modules["formulas"].FormulasTable.read(path)
+
+
+def test_source_with_a_repeated_key_is_rejected(script_modules, tmp_path):
+    """A source file that gives 2 rows the same key raises `DataFileError`, so that no row id depends on position."""
+    # --- arrange ----------------------
+    path = tmp_path / "2000_a.toml"
+    path.write_text(
+        """title = 'A (2000): a'
+reference = 'A (2000).'
+year = 2000
+subcategory = '1.1'
+where_in_source = 'Table 1'
+transcribed_from = 'the article'
+rows_summary = '2 rows'
+
+[[rows]]
+key = '3'
+f = 'sin(x)'
+
+[[rows]]
+key = '3'
+f = 'cos(x)'
+"""
+    )
+
+    # --- act / assert -----------------
+    with pytest.raises(script_modules["data_files"].DataFileError, match="is in more than 1 row"):
+        script_modules["data_files"].Source.from_toml_file(path)
 
 
 def test_formulas_table_read_of_a_missing_file_is_empty(script_modules, tmp_path):
