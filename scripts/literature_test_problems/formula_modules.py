@@ -29,6 +29,7 @@ from pathlib import Path
 import mpmath
 import sympy as sp
 
+from sunnbear._core.functions.core.test_cases import DEFAULT_ATOL
 from sunnbear._core.utils import math_functions
 from sunnbear._core.utils.slugify import slugify
 from sunnbear.functions import CANONICAL_DIGITS, ParamNotation
@@ -75,6 +76,14 @@ CASE_X_ULPS = 4
 # multiple root. A unit is 2^-53 times the magnitude of the function's terms
 # (`FormulaExpression.mpmath_term_magnitude_function`).
 CASE_ROUNDING_UNITS = 16
+# CASE_SMALL_VALUE is the size below which a case's expected value tests little under the generic formula test's
+# default `atol`, which accepts any value within `DEFAULT_ATOL` of it, 0 among them.
+CASE_SMALL_VALUE = 1000 * DEFAULT_ATOL
+# CASE_X_STEP and CASE_MIN_CHANGE decide whether a case tests how the function depends on x: the function's value must
+# change by more than `CASE_MIN_CHANGE` of itself when x moves by `CASE_X_STEP` of the interval's width. Elsewhere,
+# such as at x = 0.2 for `35*x^35 - 1`, the terms that x drives are below the test's tolerance.
+CASE_X_STEP = 0.01
+CASE_MIN_CHANGE = 1e-9
 # DOCSTRING_WIDTH is the width of a wrapped docstring line, inside a class at 4 spaces of indentation.
 DOCSTRING_WIDTH = 120 - 4
 # RESERVED_NAMES are the names that a parameter of the source may not keep, because the formula module uses them.
@@ -193,10 +202,18 @@ class FormulaModuleSpec:
                 "",
                 *(
                     [
-                        "    # a case with an `atol` lies where float64 cannot evaluate the function to the default",
-                        "    # tolerance, because the function is ill-conditioned or cancels there",
+                        "    # a case with a positive `atol` lies where float64 cannot evaluate the function to the",
+                        "    # default tolerance, because the function is ill-conditioned or cancels there",
                     ]
-                    if any("atol=" in case for case in self.cases)
+                    if any("atol=" in case and "atol=0.0)" not in case for case in self.cases)
+                    else []
+                ),
+                *(
+                    [
+                        "    # a case with `atol=0.0` has an expected value so small that the default `atol`",
+                        "    # would accept any value near 0, 0 among them",
+                    ]
+                    if any("atol=0.0)" in case for case in self.cases)
                     else []
                 ),
                 "    cases = (",
@@ -424,9 +441,13 @@ class FormulaModuleSpec:
         The x-values tried are `CASE_FRACTIONS` of the interval, rounded to 6 significant digits. The generated Python
         code and mpmath both evaluate the function at the float `x - (b - a)*c`, computed as the generated code computes
         it, so that only the function's own arithmetic can differ. The case takes the x-value whose exact and Python
-        values meet the strictest tolerance (`_case_tolerance`); among equals, the first one. `term_magnitude_function`
-        is the function of the variable that `FormulaExpression.mpmath_term_magnitude_function` returns, from which
-        `_case_tolerance` bounds the float64 rounding of the function.
+        values meet the strictest tolerance (`_case_tolerance`); among equals, the first one where the case tests the
+        function (`_is_testing_case`). `term_magnitude_function` is the function of the variable that
+        `FormulaExpression.mpmath_term_magnitude_function` returns, from which `_case_tolerance` bounds the float64
+        rounding of the function.
+
+        A case whose expected value is below `CASE_SMALL_VALUE` gets an `atol` of 0 where the Python value meets
+        `CASE_RTOL` alone, so that the test compares the values relatively.
 
         Raises:
             GenerationError: If the function is complex at an x-value tried, or the generated Python code agrees with
@@ -445,9 +466,13 @@ class FormulaModuleSpec:
                 tolerance = cls._case_tolerance(exact_function, term_magnitude_function, shifted, *values)
                 if tolerance is not None:
                     rank, atol = tolerance
-                    cases.append((rank, x, values[0], atol))
+                    is_testing = cls._is_testing_case(exact_function, shifted, values[0], b - a)
+                    cases.append((rank, not is_testing, x, *values, atol))
         if cases:
-            _, x, expected, atol = min(cases, key=lambda case: case[0])
+            _, _, x, expected, python_value, atol = min(cases, key=lambda case: case[:2])
+            is_small = abs(expected) < CASE_SMALL_VALUE
+            if atol is None and is_small and math.isclose(python_value, expected, rel_tol=CASE_RTOL, abs_tol=0.0):
+                atol = 0.0
             return x, expected, atol
         else:
             raise GenerationError(f"the Python form agrees with mpmath at none of the x-values tried, c = {c}")
@@ -515,6 +540,26 @@ class FormulaModuleSpec:
                     continue
                 spread = max(spread, abs(float(value) - expected))
         return spread
+
+    @staticmethod
+    def _is_testing_case(exact_function: object, x: float, expected: float, width: float) -> bool:
+        """Return whether a case at x tests the function: whether a function with other terms in x would fail it.
+
+        It does not where its expected value is below `CASE_SMALL_VALUE`, or where the function's value changes by
+        less than `CASE_MIN_CHANGE` of itself when x moves by `CASE_X_STEP` of the interval's `width`, in either
+        direction where the function is defined.
+        """
+        if abs(expected) < CASE_SMALL_VALUE:
+            return False
+        with mpmath.workdps(50):
+            for step in (CASE_X_STEP * width, -CASE_X_STEP * width):
+                try:
+                    moved_value = float(mpmath.re(exact_function(mpmath.mpf(x) + step)))
+                except (ArithmeticError, ValueError, TypeError):
+                    continue
+                if math.isfinite(moved_value):
+                    return abs(moved_value - expected) > CASE_MIN_CHANGE * abs(expected)
+        return True
 
     @staticmethod
     def _find_branch_case(

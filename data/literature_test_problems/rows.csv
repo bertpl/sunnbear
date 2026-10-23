@@ -972,7 +972,7 @@ roots_fortran:129,2025,1.3,exp(x)*(x*1.0e6 - 1.0)^3,,,"[-1, 1]",,1,duplicate,str
 roots_fortran:130,2025,1.3,(x - 1.0/3.0)^2*atan(x - 1.0/3.0),,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.3,duplicate,2021_oliveira_takahashi:2.3,,
 roots_fortran:131,2025,1.3,"sign(1.0, 3.0*x + 1.0)*(1.0 - sqrt(1.0 - (3.0*x + 1.0)^2/(9^2)))",,,"[-1, 1]",sympy: TypeError,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:2.4,,"Fortran's sign(1.0, 3*x + 1) differs from sign(3*x + 1) only where the factor that it multiplies is 0."
 roots_fortran:132,2025,1.3,x,,,"[-1000, 1]",,1,new,"structure, value, family, text",2003_suli_mayers:Example 1.6 (g1) | roots_fortran:71–72,new,,2003_suli_mayers:Example 1.6 (g1) | roots_fortran:71–72,
-roots_fortran:133,2025,1.3,y1 + ((x - x1)/(x2 - x1))*(y2 - y1),,"x1 = 0.0, x2 = 157.08, y1 = 1012.0, y2 = -1114.0, constants in the case","[x1, x2] = [0, 157.08]",,1,new,,,new,,,
+roots_fortran:133,2025,1.3,y1 + ((x - x1)/(x2 - x1))*(y2 - y1),,"x1 = 0.0, x2 = 157.08, y1 = 1012.0, y2 = -1114.0","[0, 157.08]",,1,new,,,new,,,
 roots_fortran:134,2025,1.3,log(x),,,"[0.5, 5]",,1,duplicate,structure,2006_chen_li:1,duplicate,2006_chen_li:1,,
 roots_fortran:135,2025,1.3,(10.0 - x)*exp(-10.0*x) - x^10 + 1.0,,,"[0.5, 8]",,1,duplicate,structure,2012_suhadolnik:2,duplicate,2012_suhadolnik:2,,
 roots_fortran:136,2025,1.3,exp(sin(x)) - x - 1.0,,,"[1, 4]",,1,duplicate,structure,2006_chen_li:2,duplicate,2006_chen_li:2,,
@@ -1216,8 +1216,8 @@ ganchovski_test_functions:f23,2026,1.3,x^2 + sin(x/20) - 1/4,,,"[0, 1]",,1,dupli
 ganchovski_test_functions:f24,2026,1.3,(x + 2)*(x + 1)*(x - 3)^3,,,"[2.6, 4.6]",,1,duplicate,structure,2026_ganchovski_et_al:f24,duplicate,2026_ganchovski_et_al:f24,,
 ganchovski_test_functions:f25,2026,1.3,(x - 4)^5*log(x),,,"[3.6, 5.6]",,1,duplicate,structure,2026_ganchovski_et_al:f25,duplicate,2026_ganchovski_et_al:f25,,
 ganchovski_test_functions:f26,2026,1.3,(sin(x) - x/4)^3,,,"[2, 4]",,1,duplicate,structure,2026_ganchovski_et_al:f26,duplicate,2026_ganchovski_et_al:f26,,
-ganchovski_test_functions:f27,2026,1.3,,"`(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 - p(x)))))*(sign(p(x) - 3))`, where `p(x) = x + 1.11`",,"[1, 3]",not 1 expression,0,undecided,unparsed,,new,,2011_galdino:f4,"`p(x) = x + 1.11` where Galdino (2011) and 2026_ganchovski_et_al:f27 have `x + 1.11111`, a shift in x."
-ganchovski_test_functions:f28,2026,1.3,sin((x - 7.14)^3),,,"[7, 8]",,1,duplicate,structure,roots_fortran:149,duplicate,roots_fortran:149,,
+ganchovski_test_functions:f27,2026,1.3,,"`(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 - p(x)))))*(sign(p(x) - 3))`, where `p(x) = x + 1.11`",,"[1, 3]",not 1 expression,0,undecided,unparsed,,duplicate,2026_ganchovski_et_al:f27,,"Compared with the function meant: the PDF's p(x) = x + 1.11 is a misprint for x + 1.11111, as its plot and the authors' Calcpad worksheet show."
+ganchovski_test_functions:f28,2026,1.3,sin((x - 7.14)^3),,,"[7, 8]",,1,duplicate,structure,roots_fortran:149,duplicate,2011_galdino:f5,,"Compared with the function meant: the PDF's 7.14 is a misprint for 7.143, as its plot and the authors' code show."
 ganchovski_test_functions:f29,2026,1.3,exp((x - 3)^5) - 1,,,"[2.6, 3.6]",,1,duplicate,structure,roots_fortran:150,duplicate,roots_fortran:150,,
 ganchovski_test_functions:f30,2026,1.3,exp((x - 3)^5) - exp(x - 1),,,"[4, 5]",,1,duplicate,structure,2011_galdino:f7,duplicate,2011_galdino:f7,,
 ganchovski_test_functions:f31,2026,1.3,pi - 1/x,,,"[0.05, 5]",,1,duplicate,structure,roots_fortran:152,duplicate,roots_fortran:152,,
@@ -1270,7 +1270,7 @@ ganchovski_test_functions:f77,2026,1.3,if(x != 1/21; 1/(21*x - 1); 0),,,"[-1, 1]
 ganchovski_test_functions:f78,2026,1.3,x*x/4 + ceiling(x/2) - 0.5,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.7,duplicate,2021_oliveira_takahashi:2.7,,
 ganchovski_test_functions:f79,2026,1.3,ceiling(10*x - 1) + 0.5,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.8,duplicate,2021_oliveira_takahashi:2.8,,
 ganchovski_test_functions:f80,2026,1.3,x + sin(x*10^6)/10 + 10^-3,,,"[-1, 1]",,1,duplicate,structure,2021_oliveira_takahashi:2.9,duplicate,2021_oliveira_takahashi:2.9,,
-ganchovski_test_functions:f81,2026,1.3,if(x > (-1); 1 + sin(1/(x + 1)) - 1; 0),,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,new,,2021_oliveira_takahashi:2.10 | 2026_ganchovski_et_al:f81,"Equal to Oliveira-Takahashi 2.10 for x > -1, but at x = -1, the left end of [-1, 1], the PDF gives 0 where Oliveira-Takahashi gives -1, so the left end is an exact root; 2026_ganchovski_et_al:f81, the same entry in the article, has the first branch 1 + sin(1/(x + 1)) and the else branch -1."
+ganchovski_test_functions:f81,2026,1.3,if(x > (-1); 1 + sin(1/(x + 1)) - 1; 0),,,"[-1, 1]",conditions or prose,0,undecided,unparsed,,duplicate,2021_oliveira_takahashi:2.10,,"Compared with the function meant: the PDF's case brace without its closing brace is a misprint for if(x > -1; 1 + sin(1/(x + 1)); 0) - 1, as the authors' Calcpad worksheet and the printed root -0.682 show."
 ganchovski_test_functions:f82,2026,1.3,202*x - 2*floor((2*x + 10^-2)/2*10^-2) - 0.1,,,"[-1, 1]",,1,new,,,duplicate,2021_oliveira_takahashi:2.11,,"Compared with the function meant: the PDF's argument of floor is a misprint for (2*x + 10^-2)/(2*10^-2), as its plot and the authors' C# code show."
 ganchovski_test_functions:f83,2026,1.3,(202*x - 2*floor((2*x + 10^-2)/2*10^-2) - 0.1)^3,,,"[-1, 1]",,1,new,,,duplicate,2021_oliveira_takahashi:2.12,,"Compared with the function meant: the PDF's argument of floor is a misprint for (2*x + 10^-2)/(2*10^-2), as its plot and the authors' C# code show."
 ganchovski_test_functions:f84,2026,1.3,(x - 1)*(x - 2)*(x - 3)*(x - 4)*(x - 5) - 0.05,,,"[0.5, 5.5]",,1,duplicate,structure,2026_ganchovski_et_al:f84,duplicate,2026_ganchovski_et_al:f84,,
@@ -1281,7 +1281,7 @@ ganchovski_test_functions:f88,2026,1.3,log(x) - x + 2 - 0.05,,,"[0.1, 3]",,1,dup
 ganchovski_test_functions:f89,2026,1.3,sin(20*x) + 0.1*x - 0.1,,,"[-4, 5]",,1,duplicate,structure,2026_ganchovski_et_al:f89,duplicate,2026_ganchovski_et_al:f89,,
 ganchovski_test_functions:f90,2026,1.3,x*x*x - 2*x*x + x - 0.025,,,"[-1, 2]",,1,duplicate,structure,2026_ganchovski_et_al:f90,duplicate,2026_ganchovski_et_al:f90,,
 ganchovski_test_functions:f91,2026,1.3,x*sin(1/x) - 0.1 - 0.01,,,"[0.01, 1]",,1,duplicate,structure,2026_ganchovski_et_al:f91,duplicate,2026_ganchovski_et_al:f91,,
-ganchovski_test_functions:f92,2026,1.3,x^3 - 0.001,,,"`[-0, 10]`; `[-10, 10]` (plot, p. 16)",,1,new,"structure, value, family, text",2004_moler:Ex. 4.1#2,new,,2004_moler:Ex. 4.1#2,
+ganchovski_test_functions:f92,2026,1.3,x^3 - 0.001,,,"[-10, 10]",,1,duplicate,structure,2026_ganchovski_et_al:f92,duplicate,2026_ganchovski_et_al:f92,,
 ganchovski_test_functions:f93,2026,1.3,x^5 - 0.001,,,"[-10, 10]",,1,new,,,new,,,
 ganchovski_test_functions:f94,2026,1.3,x^7 - 0.001,,,"[-10, 10]",,1,new,,,new,,,
 ganchovski_test_functions:f95,2026,1.3,x^9 - 0.001,,,"[-10, 10]",,1,new,,,new,,,
@@ -1357,8 +1357,8 @@ pracma_handbook:f4,2026,1.3,2*(x*exp(-9) - exp(-9*x)) + 1,,,"[-0.5, 0.7]",,1,new
 pracma_handbook:f5,2026,1.3,x^2 - (1 - x)^9,,,"[-1.4, 1]",,1,new,,,new,,,
 pracma_handbook:f6,2026,1.3,(x - 1)*exp(-9*x) + x^9,,,"[-0.8, 1.6], [-1.4, 1.0]",,1,new,,,new,,,
 pracma_handbook:f7,2026,1.3,x^2 + sin(x/9) - 1/4,,,"[-0.5, 1.9]",,1,new,,,new,,,
-pracma_handbook:f8,2026,1.3,1/8*(9 - 1/x),,,"[0.001, 1.201]",,1,new,,,new,,,
-pracma_handbook:f9,2026,1.3,tan(x) - x - 0.0463025,,,"[-0.9, 1.5]",,1,new,,,new,,,
+pracma_handbook:f8,2026,1.3,1/8*(9 - 1/x),,,"[0.001, 1.201]",,1,new,,,new,,1971_dowell_jarratt_illinois:Table 7 | 1989_atkinson:(2.0.3),"Dowell–Jarratt's Table 7, (n*x - 1)/((n - 1)*x), at n = 9, on [0.001, 1.201]; it is also 1/8 times Atkinson's a - 1/x at a = 9."
+pracma_handbook:f9,2026,1.3,tan(x) - x - 0.0463025,,,"[-0.9, 1.5]",,1,new,,,new,,1989_atkinson:P45,"Atkinson (1989)'s P45, x - tan(x) + eps, negated and with eps = 0.0463025, on [-0.9, 1.5]."
 pracma_handbook:f10,2026,1.3,x^2 + x*sin(sqrt(75)*x) - 0.2,,,"[0.4, 1]",,1,new,,,new,,,
 pracma_handbook:f11,2026,1.3,x^9 + 0.0001,,,"[-1.2, 0]",,1,new,"structure, value",1975_bus_dekker:II.2,new,,1975_bus_dekker:II.2,
 pracma_handbook:f12,2026,1.3,log(x) + x^2/(2*exp(1)) - 2*x/sqrt(exp(1)) + 1,,,"`[1, 3.4]`; `[1.0, 2.5]` (figure of §5.2.3)",,1,new,,,new,,,

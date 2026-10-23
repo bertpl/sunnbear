@@ -11,13 +11,15 @@ from sunnbear._core.utils.math_functions import real_root
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "4e3430659c8f2615"
+SURVEY_FIELDS_HASH = "b04513acf9335e45"
 
 
 class Ganchovski2026F100(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
     The survey writes the source's function as ``cbrt((4*x - 3)/x)``; the formula's interval is ``[0, e]``.
+
+    The root line, `$Root{f_100(x); x ∈ [0; e]}`, is the only `$Root` line in the PDF without `= 0`.
     """
 
     number = (1, 3, 4, 5)

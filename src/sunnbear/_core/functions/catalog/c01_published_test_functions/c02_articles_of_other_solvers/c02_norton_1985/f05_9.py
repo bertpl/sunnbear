@@ -64,7 +64,7 @@ class Norton19859(Formula):
         ),
         FormulaTestCase.value(params={"a_": 0.0, "b_": 0.0001, "n": 9.0}, x=-0.19, c=0.0, expected=9.9677312302221e-05),
         FormulaTestCase.value(
-            params={"a_": 0.0, "b_": 0.0001, "n": 19.0}, x=-0.19, c=0.0, expected=9.999999998021581e-05
+            params={"a_": 0.0, "b_": 0.0001, "n": 19.0}, x=0.49, c=0.0, expected=0.00010129934811447123
         ),
         FormulaTestCase.interval_bounds(params={"a_": 0.0, "b_": 0.0001, "n": 3.0}, expected=(-0.7, 1.0)),
     )

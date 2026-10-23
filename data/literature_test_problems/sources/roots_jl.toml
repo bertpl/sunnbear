@@ -46,174 +46,174 @@ How to read the rows of `runbenchmarks.jl`:
 [[rows]]
 key = 'func1'
 f = 'cos(x) - x/2'
-notes = 'N = 10 starts from 0.0 to pi/2'
+notes = "The source's 10 starting points are evenly spaced from `0.0` to `pi/2`."
 
 [[rows]]
 key = 'func2'
 f = 'exp(x) - x^4'
 interval = '`[-5.0, 20.0]` (`find_zeros`)'
-notes = 'N = 11 starts from 5.0 to 20.0'
+notes = "The source's 11 starting points are evenly spaced from `5.0` to `20.0`."
 
 [[rows]]
 key = 'func3'
 f = 'x^5 - x - 1'
-notes = "N = 10 starts from 0.5 to 2.0; the code's `alpha`, 0.1673039782614187, is not a root: the real root is 1.1673039782614187"
+notes = "The source's 10 starting points are evenly spaced from `0.5` to `2.0`. The code's `alpha`, 0.1673039782614187, is not a root: the real root is 1.1673039782614187."
 
 [[rows]]
 key = 'func4'
 f = '(1 + cos(x))*(exp(x) - 2)'
-notes = 'N = 15 starts from 0.0 to 1.7'
+notes = "The source's 15 starting points are evenly spaced from `0.0` to `1.7`."
 
 [[rows]]
 key = 'func5'
 f = '2*x - exp(-x)'
-notes = 'N = 15 starts from -5.0 to 5.0'
+notes = "The source's 15 starting points are evenly spaced from `-5.0` to `5.0`."
 
 [[rows]]
 key = 'func6'
 f = 'x*exp(-x)'
-notes = 'N = 15 starts from -5.0 to 5.0'
+notes = "The source's 15 starting points are evenly spaced from `-5.0` to `5.0`."
 
 [[rows]]
 key = 'func7'
 f = '20.0*x/(100.0*x^2 + 1.0)'
-notes = 'N = 15 starts from -0.2 to 0.2'
+notes = "The source's 15 starting points are evenly spaced from `-0.2` to `0.2`."
 
 [[rows]]
 key = 'func8'
 f = 'cos(x) - x/2'
-notes = 'N = 10 starts from 0.0 to 3pi/4'
+notes = "The source's 10 starting points are evenly spaced from `0.0` to `3pi/4`."
 
 [[rows]]
 key = 'func9'
 f = 'tanh(x) - tan(x)'
 interval = '`[5, 12]` (`find_zeros`)'
-notes = 'N = 8 starts from 5.0 to 10.0'
+notes = "The source's 8 starting points are evenly spaced from `5.0` to `10.0`."
 
 [[rows]]
 key = 'func10'
 f = 'asin(x^2 - 1) - x/2 + 1'
 interval = '`[-0.5, 1.0]` (`find_zeros`)'
-notes = 'N = 10 starts from -0.5 to 0.9'
+notes = "The source's 10 starting points are evenly spaced from `-0.5` to `0.9`."
 
 [[rows]]
 key = 'func11'
 f = 'exp(-x) - cos(x)'
 interval = '`[-2, 2]` (`find_zeros`)'
-notes = 'N = 10 starts from -2.0 to 2.0'
+notes = "The source's 10 starting points are evenly spaced from `-2.0` to `2.0`."
 
 [[rows]]
 key = 'func12'
 f = 'sqrt(x) - 1/x - 3'
-notes = 'N = 10 starts from 5 to 20'
+notes = "The source's 10 starting points are evenly spaced from `5` to `20`."
 
 [[rows]]
 key = 'func13'
 f = '(x - sqrt(5))^4/((x - 1)^2 + 2)'
 also_in = 'the paper at the `## multiplicity` URL (see header)'
-notes = "N = 10 starts from 3.0 to 4.5; Li et al. (2010)'s `f01` with `+ 2` in its denominator where Li has `+ 1`; none of these starts is Li's `x0`"
+notes = "The source's 10 starting points are evenly spaced from `3.0` to `4.5`. None of them is Li's `x0`. The function is Li et al. (2010)'s `f01` with `+ 2` in its denominator where Li has `+ 1`."
 
 [[rows]]
 key = 'func14'
 f = '(sin(x)^2 - 2*x + 1)^5'
 also_in = 'the paper at the `## multiplicity` URL (see header)'
-notes = "N = 10 starts from 3.0 to 5.0; Li et al. (2010)'s `f02`; none of these starts is Li's `x0`"
+notes = "The source's 10 starting points are evenly spaced from `3.0` to `5.0`. None of them is Li's `x0`. The function is Li et al. (2010)'s `f02`."
 
 [[rows]]
 key = 'func15'
 f = '(8*x*exp(-x^2) - 2*x - 3)^8'
 also_in = 'the paper at the `## multiplicity` URL (see header)'
-notes = "N = 10 starts from -2.0 to -1.5; Li et al. (2010)'s `f03`; none of these starts is Li's `x0`"
+notes = "The source's 10 starting points are evenly spaced from `-2.0` to `-1.5`. None of them is Li's `x0`. The function is Li et al. (2010)'s `f03`."
 
 [[rows]]
 key = 'func16'
 f = '1e6*(x^7 - 7*x^6 + 21*x^5 - 35*x^4 + 35*x^3 - 21*x^2 + 7*x - 1)'
 also_in = 'the paper at the `## multiplicity` URL (see header)'
-notes = 'N = 10 starts from -0.0 to 2.0; its own comment: `# this is 1e6 * (x-1)^7, has many "zeros" near 1`; not in Li et al. (2010)'
+notes = "The source's 10 starting points are evenly spaced from `-0.0` to `2.0`. The code's own comment reads `# this is 1e6 * (x-1)^7, has many \"zeros\" near 1`; the function is not in Li et al. (2010)."
 
 [[rows]]
 key = 'func17'
 f = '(exp(-x^2 + x + 3) - x + 2)^9'
 also_in = 'the paper at the `## multiplicity` URL (see header)'
-notes = "N = 10 starts from 2.4 to 2.5; Li et al. (2010)'s `f05`; none of these starts is Li's `x0`"
+notes = "The source's 10 starting points are evenly spaced from `2.4` to `2.5`. None of them is Li's `x0`. The function is Li et al. (2010)'s `f05`."
 
 [[rows]]
 key = 'func18'
 f = '(exp(-x) + 2*sin(x))^4'
 also_in = 'the paper at the `## multiplicity` URL (see header)'
-notes = "N = 10 starts from 3.0 to 3.4; Li et al. (2010)'s `f06`; none of these starts is Li's `x0`"
+notes = "The source's 10 starting points are evenly spaced from `3.0` to `3.4`. None of them is Li's `x0`. The function is Li et al. (2010)'s `f06`."
 
 [[rows]]
 key = 'func19'
 f = 'cbrt(x)'
-notes = 'N = 10 starts from -3.0 to 3.0; `cbrt` is the real cube root'
+notes = "The source's 10 starting points are evenly spaced from `-3.0` to `3.0`. Here `cbrt` is the real cube root."
 
 [[rows]]
 key = 'func20'
 f_description = '`3/4*x - 0.3125` (x < -1/4); `2*x` (-1/4 <= x < 1/4); `3/4*x + 0.3125` (x >= 1/4)'
-notes = 'N = 10 starts from -1.0 to 1.0'
+notes = "The source's 10 starting points are evenly spaced from `-1.0` to `1.0`."
 
 [[rows]]
 key = 'fn'
 f = 'x^3 - 2*x - 5'
-notes = 'test set "derivative free, non Float64": 1 start, x0 = 2.0, run in Float16, Float32 and BigFloat; its root `alpha` is given to 79 significant digits'
+notes = "The source's starting point is `x0 = 2.0`, which the test set \"derivative free, non Float64\" runs in Float16, Float32 and BigFloat; the root `alpha` is given to 79 significant digits."
 
 [[rows]]
 key = 'f1'
 f = 'sin(x)'
 interval = '[3.0, 4.0]'
-notes = 'x0 = 3.0'
+notes = "The source's starting point is `x0 = 3.0`."
 
 [[rows]]
 key = 'f2'
 f = 'x^5 - x - 1'
 interval = '[0.5, 5.0]'
-notes = 'x0 = 1.0'
+notes = "The source's starting point is `x0 = 1.0`."
 
 [[rows]]
 key = 'f3'
 f = 'exp(x) - x^4'
 interval = '[5.0, 20.0]'
-notes = 'x0 = 7.0'
+notes = "The source's starting point is `x0 = 7.0`."
 
 [[rows]]
 key = 'f4'
 f = 'cos(x) - x/2'
 interval = '[0.0, pi/2]'
-notes = 'x0 = pi/4'
+notes = "The source's starting point is `x0 = pi/4`."
 
 [[rows]]
 key = 'f5'
 f = 'x^2 - exp(x) - 3*x + 2'
 interval = '[-1.0, 1.0]'
-notes = 'x0 = -0.5'
+notes = "The source's starting point is `x0 = -0.5`."
 
 [[rows]]
 key = 'f6'
 f = 'x^2 - exp(x) - 3*x + 2'
 interval = '[0.0, 3.0]'
-notes = 'x0 = 2.0'
+notes = "The source's starting point is `x0 = 2.0`."
 
 [[rows]]
 key = 'f7'
 f = 'tanh(x) - tan(x)'
 interval = '[4.0, 8.0]'
-notes = 'x0 = 7.6'
+notes = "The source's starting point is `x0 = 7.6`."
 
 [[rows]]
 key = 'f8'
 f = 'exp(-x^2 + x + 2) - cos(x) + x^3 + 1'
 interval = '[-2.0, 1.0]'
-notes = 'x0 = -0.5'
+notes = "The source's starting point is `x0 = -0.5`."
 
 [[rows]]
 key = 'f9'
 f = 'log(x) + sqrt(x) - 5'
 interval = '[7.0, 10.0]'
-notes = 'x0 = 7'
+notes = "The source's starting point is `x0 = 7`."
 
 [[rows]]
 key = 'f10'
 f = 'log(x) + sqrt(x) - 5'
 interval = '[7.0, 10.0]'
-notes = 'x0 = 20, outside the bracket'
+notes = "The source's starting point is `x0 = 20`, outside the interval."

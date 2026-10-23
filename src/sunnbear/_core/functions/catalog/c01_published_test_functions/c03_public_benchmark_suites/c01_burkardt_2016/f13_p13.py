@@ -9,7 +9,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "eed9802373b336dd"
+SURVEY_FIELDS_HASH = "5a253aff386e3dcc"
 
 
 class Burkardt2016P13(Formula):
@@ -19,7 +19,8 @@ class Burkardt2016P13(Formula):
     formula's intervals are `[-10000000000000.0, 10000000000000.0]` (rang); `[-100000000000.0, 100000000.0]` (starts 2
     and 1).
 
-    the interval is [-1e13, 1e13]; starts 100000000.0, -100000000000.0, 100000013.0
+    The `rang` interval is `[-1e13, 1e13]`. The source's starting points, in order, are `100000000.0`, `-100000000000.0`
+    and `100000013.0`.
     """
 
     number = (1, 3, 1, 13)
@@ -28,11 +29,17 @@ class Burkardt2016P13(Formula):
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "
-            "https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py, MIT license. The file "
-            "is unversioned: its header says that it was last modified on 1 December 2016, and the rows"
-            " come from the version with sha256 "
-            "`658ed0a0b520eba30e87d4a08d73b444fe4f3edf14a8a94339703eca2ef9680c`. The file cites sources"
-            " for 3 of its functions, and names a 4th origin without a reference:\n"
+            "https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py, MIT license.\n"
+            "\n"
+            "The file is unversioned and has no file header; the rows come from the version with sha256"
+            " `658ed0a0b520eba30e87d4a08d73b444fe4f3edf14a8a94339703eca2ef9680c`. The comment of each "
+            "function gives the date on which that function was last modified, and the latest is 16 "
+            "October 2020, for `p16_root`. The year is 2016 because every function that the rows "
+            "transcribe (`pNN_fx`, `pNN_rang`, `pNN_start` and `pNN_title`) is dated 2 December 2016 or"
+            " earlier.\n"
+            "\n"
+            "The file cites sources for 3 of its functions, and names a 4th origin without a reference:"
+            "\n"
             '- [1] George Donovan, Arnold Miller, Timothy Moreland, "Pathological Functions for '
             "Newton's Method\", American Mathematical Monthly, January 1993, pages 53-58 (no DOI in the "
             "file), for `p15`.\n"

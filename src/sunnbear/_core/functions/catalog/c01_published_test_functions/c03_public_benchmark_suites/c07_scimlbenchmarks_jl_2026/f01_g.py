@@ -52,8 +52,10 @@ class ScimlbenchmarksJl2026G(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
+    # a case with `atol=0.0` has an expected value so small that the default `atol`
+    # would accept any value near 0, 0 among them
     cases = (
-        FormulaTestCase.value(params={}, x=-70.0, c=0.0, expected=-9.999999999999997e-16),
-        FormulaTestCase.value(params={}, x=-70.0, c=0.25, expected=-1e-15),
+        FormulaTestCase.value(params={}, x=-15.0, c=0.0, expected=3.059023195018258e-07),
+        FormulaTestCase.value(params={}, x=-70.0, c=0.25, expected=-1e-15, atol=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-100.0, 0.0)),
     )

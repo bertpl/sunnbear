@@ -12,7 +12,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "1ca318113d0a2955"
+SURVEY_FIELDS_HASH = "8cf5c7ca9607d225"
 
 
 class RootsJl2026Func2(Formula):
@@ -23,9 +23,9 @@ class RootsJl2026Func2(Formula):
     - func2: ``exp(x) - x^4``; the formula's interval is `[-5.0, 20.0]` (`find_zeros`)
     - f3: ``exp(x) - x^4``; the formula's interval is ``[5.0, 20.0]``
 
-    func2: N = 11 starts from 5.0 to 20.0
+    func2: The source's 11 starting points are evenly spaced from `5.0` to `20.0`.
 
-    f3: x0 = 7.0
+    f3: The source's starting point is `x0 = 7.0`.
     """
 
     number = (1, 3, 6, 1)

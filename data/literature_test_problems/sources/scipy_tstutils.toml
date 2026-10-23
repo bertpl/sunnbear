@@ -1,7 +1,7 @@
 title = 'SciPy (2026): the `_tstutils` test problems of release 1.18.1'
 reference = '''
 SciPy 1.18.1, module `scipy/optimize/_tstutils.py`, https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py. The module cites 2 sources:
-- [1] Alefeld, G. E., Potra, F. A. and Shi, Y., "Algorithm 748: Enclosing Zeros of Continuous Functions", ACM Trans. Math. Softw. (1995), https://dl.acm.org/doi/10.1145/210089.210111
+- [1] Alefeld, G. E., Potra, F. A. and Shi, Y., "Algorithm 748: Enclosing Zeros of Continuous Functions", ACM Trans. Math. Softw. 21(3), September 1995, pp. 327–344, https://dl.acm.org/doi/10.1145/210089.210111; the module misprints the volume as "Volume 221" and gives no issue or pages
 - [2] Chandrupatla, T. R., "A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear function without using derivatives", Advances in Engineering Software 28.3 (1997): 145-149 (no DOI in the module)
 '''
 year = 2026
@@ -15,7 +15,7 @@ where_in_source = '''
 
 The module docstring names only the first 3 collections. A list `functions = [f2, f3, f4, f5, f6]`, kept for backwards compatibility, adds no functions.
 '''
-transcribed_from = 'the code of the module in SciPy 1.18.1: function bodies and test-case lists. Where a docstring and the code differ, the rows follow the code (`aps14_f`, `aps15_f`).'
+transcribed_from = "the code of the module in SciPy 1.18.1: function bodies and test-case lists. Where a docstring or the module's `description` string differs from the code, the rows follow the code (`f6`, `aps14_f`, `aps15_f`)."
 rows_summary = "32, 1 per function (6 + 15 + 2 + 9), covering the module's 211 test cases (6 + 154 + 6 + 45)."
 notes = '''
 How to read the rows:
@@ -66,7 +66,7 @@ key = 'f6'
 f_description = '`random()` (x > 1); `-random()` (x < 1); `0` (x = 1)'
 name = '(no docstring; the module docstring says: f6 is randomly positive on one side of the root, randomly negative on the other)'
 interval = '[0.5, sqrt(3)]'
-notes = "ID original.05.00, the same ID as `f5`; smoothness -inf; `random()` is Python's uniform draw from [0, 1); the value per x is cached, so a repeat call at the same x returns the same value; no derivatives"
+notes = "ID original.05.00, the same ID as `f5`; smoothness -inf; `random()` is Python's uniform draw from [0, 1); the value per x is cached, so a repeat call at the same x returns the same value; no derivatives; the module's `description` string says that f6 is positive to the left of 1 and negative to the right, the reverse of the code"
 
 [[rows]]
 key = 'aps01_f'

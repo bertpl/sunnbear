@@ -32,10 +32,15 @@ class Burkardt2016(FormulaCategory):
     """`Burkardt2016` is the category of the formulas of 1 publication.
 
     John Burkardt, TEST_ZERO, Python version, file `test_zero.py`,
-    https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py, MIT license. The file is unversioned: its header
-    says that it was last modified on 1 December 2016, and the rows come from the version with sha256
-    `658ed0a0b520eba30e87d4a08d73b444fe4f3edf14a8a94339703eca2ef9680c`. The file cites sources for 3 of its functions,
-    and names a 4th origin without a reference:
+    https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py, MIT license.
+
+    The file is unversioned and has no file header; the rows come from the version with sha256
+    `658ed0a0b520eba30e87d4a08d73b444fe4f3edf14a8a94339703eca2ef9680c`. The comment of each function gives the date on
+    which that function was last modified, and the latest is 16 October 2020, for `p16_root`. The year is 2016 because
+    every function that the rows transcribe (`pNN_fx`, `pNN_rang`, `pNN_start` and `pNN_title`) is dated 2 December 2016
+    or earlier.
+
+    The file cites sources for 3 of its functions, and names a 4th origin without a reference:
     - [1] George Donovan, Arnold Miller, Timothy Moreland, "Pathological Functions for Newton's Method", American
       Mathematical Monthly, January 1993, pages 53-58 (no DOI in the file), for `p15`.
     - [2] Peter Colwell, Solving Kepler's Equation Over Three Centuries, Willmann-Bell, 1993, and [3] Jean Meeus,

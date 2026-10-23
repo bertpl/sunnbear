@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "aba9dbd47c5ac847"
+SURVEY_FIELDS_HASH = "d293bde0683d9f84"
 
 
 class RootsJl2026Func10(Formula):
@@ -20,7 +20,7 @@ class RootsJl2026Func10(Formula):
     The survey writes the source's function as ``asin(x^2 - 1) - x/2 + 1``; the formula's interval is `[-0.5, 1.0]`
     (`find_zeros`).
 
-    N = 10 starts from -0.5 to 0.9
+    The source's 10 starting points are evenly spaced from `-0.5` to `0.9`.
     """
 
     number = (1, 3, 6, 3)

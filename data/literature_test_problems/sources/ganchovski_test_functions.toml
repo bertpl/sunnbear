@@ -8,8 +8,9 @@ year = 2026
 subcategory = '1.3'
 where_in_source = '''
 17 pages that hold 101 functions, f01–f101, in a grid of 2 columns.
-- Each cell gives the function, a plot of it on its interval, and a root line in the notation of Calcpad, `x_nn = $Root{f_nn(x) = 0; x ∈ [a; b]} = r`, with the root `r` to about 3 significant digits. The interval of each row is the one in its root line, except f31's, whose root line is garbled (see its note); f92 also holds the range of its plot, which differs from its root line's.
+- Each cell gives the function, a plot of it on its interval, and a root line in the notation of Calcpad, `x_nn = $Root{f_nn(x) = 0; x ∈ [a; b]} = r`, with the root `r` to about 3 significant digits. The interval of each row is the one in its root line, except f31's, whose root line is garbled, and f92's, whose root line misprints `[-10; 10]` as `[-0;10]` (see their notes).
 - The root lines of 9 functions use `$Find{f_nn(x); x ∈ [a; b]}` in place of `$Root`: f36, f38, f39, f40, f76, f77, f78, f79 and f101.
+- The root line of f100, `$Root{f_100(x); x ∈ [0; e]}`, is the only `$Root` line without `= 0`.
 - The cells name f63–f101; f01–f62 have no names.
 - A heading above each block of cells names the block's origin. The headings name the same references as the article of Ganchovski et al. (2026) (`2026_ganchovski_et_al`) for its blocks, except that Oliveira & Takahashi's heading gives no year or venue, and f31–f32 sit under the heading "My functions".
 '''
@@ -31,19 +32,19 @@ How to read the rows:
 [[relations]]
 sources = ['2026_tomov_ganchovski_benchmark']
 text = '''
-The rows of Tomov & Ganchovski's benchmark (`2026_tomov_ganchovski_benchmark`) come from its C# code at commit `0d6efd5`. Its f01–f101 are the f01–f101 of this PDF, and its rows take the names of f63–f101 from this PDF. Apart from notation, 92 rows have the same function and interval in both; these 9 differ:
+The rows of Tomov & Ganchovski's benchmark (`2026_tomov_ganchovski_benchmark`) come from its C# code at commit `0d6efd5`. Its f01–f101 are the f01–f101 of this PDF, and its rows take the names of f63–f101 from this PDF. Apart from notation, this PDF prints the same function and interval as the code for 92 functions; these 9 differ:
 - **f27, f28:** the code has `p(x) = x + 1.11111` and `sin((x - 7.143)^3)`; this PDF prints `1.11` and `7.14`.
-- **f29, f42, f92:** the code's intervals are `[2.6, 4.6]`, `[0, pi]` and `[-10, 10]`; this PDF prints `[2.6, 3.6]`, `[0, 4]` and `[-0, 10]`.
+- **f29, f42, f92:** the code's intervals are `[2.6, 4.6]`, `[0, pi]` and `[-10, 10]`; this PDF prints `[2.6, 3.6]`, `[0, 4]` and `[-0, 10]`, the last a misprint that f92's row reads as `[-10, 10]`.
 - **f76:** the code returns `(1 + 1e6)/1e6` above the step and -1 below it; here the `- 1` follows the whole `if`, so the value above the step is `10^-6`.
-- **f81:** the code has `if(x > -1; 1 + sin(1/(x + 1)); 0 - 1)`, which touches 0 without a sign change, and the benchmark leaves it out of its statistics; here the first branch is `1 + sin(1/(x + 1)) - 1`, which changes sign at the printed root -0.682, and the else branch is 0.
+- **f81:** the code has `if(x > -1; 1 + sin(1/(x + 1)); 0 - 1)`, which touches 0 without a sign change, and the benchmark leaves it out of its statistics; this PDF means `if(x > -1; 1 + sin(1/(x + 1)); 0) - 1`, which changes sign at the printed root -0.682, but prints it without the closing brace of its case brace (see the f81 row).
 - **f82, f83:** inside `floor`, the code divides by `2e-2`; this PDF divides by 2 and multiplies by `10^-2`.
 '''
 
 [[relations]]
 sources = ['2026_ganchovski_et_al']
 text = '''
-The f01–f92 of Ganchovski et al. (2026) (`2026_ganchovski_et_al`), from the article's Table 2, are the f01–f92 of this PDF, and 82 rows have the same function and interval in both. These 10 differ:
-- **The 9 rows that differ from Tomov & Ganchovski's benchmark** (`2026_tomov_ganchovski_benchmark`) differ from the article's rows in the same way. The f28 row of `2026_ganchovski_et_al` follows the code, because the article prints `sin(x - 7.143)^3)`, with an unmatched parenthesis.
+The f01–f92 of Ganchovski et al. (2026) (`2026_ganchovski_et_al`), from the article's Table 2, are the f01–f92 of this PDF, which prints the same function and interval as the article for 82 of them. These 10 differ:
+- **The 9 functions that differ from Tomov & Ganchovski's benchmark** (`2026_tomov_ganchovski_benchmark`) differ from the article's in the same way. The f28 row of `2026_ganchovski_et_al` follows the code, because the article prints `sin(x - 7.143)^3)`, with an unmatched parenthesis.
 - **f02:** its last term is `sqrt(3)/18` here and `sqrt(x)/18` in the article.
 '''
 
@@ -218,12 +219,14 @@ key = 'f27'
 f_description = '`(81 - p(x)*(108 - p(x)*(54 - p(x)*(12 - p(x)))))*(sign(p(x) - 3))`, where `p(x) = x + 1.11`'
 interval = '[1, 3]'
 also_in = 'Galdino (2011)'
+notes = "The PDF prints the constant of `p(x)` as `1.11`, a misprint of `1.11111`: the plot labels the value at `x = 1` as -0.624, which needs `1.11111` (`1.11` gives -0.627), and the authors' Calcpad worksheet `Root finding tests.cpd`, beside this PDF at commit `0d6efd5`, defines `p(x) = x + 1.11111`. The row is compared as the function with `1.11111`."
 
 [[rows]]
 key = 'f28'
 f = 'sin((x - 7.14)^3)'
 interval = '[7, 8]'
 also_in = 'Galdino (2011)'
+notes = "The PDF prints the constant as `7.14`, a misprint of `7.143`: the plot labels the values at `x = 7` and `x = 8` as -0.00292 and 0.589, which need `7.143` (`7.14` gives -0.00274 and 0.594), and the authors' code at commit `0d6efd5` uses `7.143`. The row is compared as the function with `7.143`."
 
 [[rows]]
 key = 'f29'
@@ -568,7 +571,7 @@ f = 'if(x > (-1); 1 + sin(1/(x + 1)) - 1; 0)'
 name = 'Warsaw'
 interval = '[-1, 1]'
 also_in = 'Oliveira & Takahashi (2021)'
-notes = 'The PDF draws the closing brace of a case brace only before a following term, as in f35 and f76, and draws none here, so the `- 1` belongs to the first branch, which equals `sin(1/(x + 1))`. The printed root -0.682 is `1/pi - 1`, a zero of that branch.'
+notes = "The printed function, which has no closing brace after its case brace, is a misprint of `if(x > -1; 1 + sin(1/(x + 1)); 0) - 1`: the authors' Calcpad worksheet `Root finding tests.cpd`, beside this PDF at commit `0d6efd5`, defines that function, and as printed the function is 0 at the left end `x = -1`, where a bracketing method on `[-1, 1]` stops in place of the printed root -0.682. The row is compared as the worksheet's function."
 
 [[rows]]
 key = 'f82'
@@ -646,9 +649,9 @@ also_in = 'SciML Benchmarks test suite'
 key = 'f92'
 f = 'x^3 - 0.001'
 name = 'Nearly asymmetric function'
-interval = '`[-0, 10]`; `[-10, 10]` (plot, p. 16)'
+interval = '[-10, 10]'
 also_in = 'SciML Benchmarks test suite'
-notes = 'As the root line prints it; the plot spans `[-10, 10]`.'
+notes = "The root line prints the interval as `[-0;10]`, a misprint of `[-10; 10]`: the plot spans `[-10, 10]`, and the authors' Calcpad worksheet `Root finding tests.cpd`, beside this PDF at commit `0d6efd5`, solves f92 on `-10 : 10`."
 
 [[rows]]
 key = 'f93'
@@ -705,6 +708,7 @@ f = 'cbrt((4*x - 3)/x)'
 name = 'Vertical tangent at root'
 interval = '[0, e]'
 also_in = 'SciML Benchmarks test suite'
+notes = 'The root line, `$Root{f_100(x); x ∈ [0; e]}`, is the only `$Root` line in the PDF without `= 0`.'
 
 [[rows]]
 key = 'f101'

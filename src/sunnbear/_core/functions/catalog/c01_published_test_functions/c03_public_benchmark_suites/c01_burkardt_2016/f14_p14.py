@@ -9,7 +9,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "23a395a12b1f5378"
+SURVEY_FIELDS_HASH = "58fb9e985f8f48d5"
 
 
 class Burkardt2016P14(Formula):
@@ -18,8 +18,8 @@ class Burkardt2016P14(Formula):
     The survey writes the source's function as ``1.0/((x - 0.3)^2 + 0.01) + 1.0/((x - 0.9)^2 + 0.04) + 2.0*x - 5.2``;
     the formula's intervals are `[-10.0, 10.0]` (rang); `[-0.5, 3.0]` (starts 2 and 1).
 
-    starts 3.0, -0.5, 0.0, 2.12742; the code selects the 4th with `i % 3 == 0`, where the first 3 use `i % 4`, so
-    `p14_start(4)` matches no branch and fails
+    The source's starting points, in order, are `3.0`, `-0.5`, `0.0` and `2.12742`. The code selects the 4th with `i % 3
+    == 0`, where the first 3 use `i % 4`, so `p14_start(4)` matches no branch and fails.
     """
 
     number = (1, 3, 1, 14)
@@ -28,11 +28,17 @@ class Burkardt2016P14(Formula):
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "
-            "https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py, MIT license. The file "
-            "is unversioned: its header says that it was last modified on 1 December 2016, and the rows"
-            " come from the version with sha256 "
-            "`658ed0a0b520eba30e87d4a08d73b444fe4f3edf14a8a94339703eca2ef9680c`. The file cites sources"
-            " for 3 of its functions, and names a 4th origin without a reference:\n"
+            "https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py, MIT license.\n"
+            "\n"
+            "The file is unversioned and has no file header; the rows come from the version with sha256"
+            " `658ed0a0b520eba30e87d4a08d73b444fe4f3edf14a8a94339703eca2ef9680c`. The comment of each "
+            "function gives the date on which that function was last modified, and the latest is 16 "
+            "October 2020, for `p16_root`. The year is 2016 because every function that the rows "
+            "transcribe (`pNN_fx`, `pNN_rang`, `pNN_start` and `pNN_title`) is dated 2 December 2016 or"
+            " earlier.\n"
+            "\n"
+            "The file cites sources for 3 of its functions, and names a 4th origin without a reference:"
+            "\n"
             '- [1] George Donovan, Arnold Miller, Timothy Moreland, "Pathological Functions for '
             "Newton's Method\", American Mathematical Monthly, January 1993, pages 53-58 (no DOI in the "
             "file), for `p15`.\n"

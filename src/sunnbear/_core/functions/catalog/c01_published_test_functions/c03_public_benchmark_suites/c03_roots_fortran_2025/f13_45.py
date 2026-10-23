@@ -9,7 +9,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "b9e09a98f743d803"
+SURVEY_FIELDS_HASH = "4b7f8cdab882c9dc"
 
 
 class RootsFortran202545(Formula):
@@ -18,7 +18,8 @@ class RootsFortran202545(Formula):
     The survey writes the source's function as ``(n*x - 1.0)/((n - 1.0)*x)``, with the parameters ``n = 20, 30``; the
     formula's interval is ``[0.01, 1]``.
 
-    the comment says "case 11 from Algorithm 748" with n = 20
+    the comment calls it case 11 from "Algorithm 748: Enclosing Zeros of Continuous Functions", with n = 20;
+    Alefeld–Potra–Shi (1995) give that function at n = 2, 5, 15 and 20, so n = 30 is roots-fortran's own
     """
 
     number = (1, 3, 3, 13)
@@ -42,7 +43,8 @@ class RootsFortran202545(Formula):
             "unchanged.\n"
             "- http://www.mth.pdx.edu/~daescu/mth451_551/Muller_bisection.pdf (cases 41, 42). The host "
             "is gone, and no web archive captured the file.\n"
-            '- Alefeld–Potra–Shi (1995), "case 11 from Algorithm 748" (case 45).\n'
+            '- Alefeld–Potra–Shi (1995), as case 11 from "Algorithm 748: Enclosing Zeros of Continuous '
+            'Functions", with n = 20 (case 45).\n'
             '- Chandrupatla, T. R., "A new hybrid quadratic/bisection algorithm for finding the zero of'
             ' a nonlinear function without using derivatives", Advances in Engineering Software 28(3), '
             "April 1997, pp. 145–149 (cases 47–62).\n"
@@ -54,9 +56,9 @@ class RootsFortran202545(Formula):
             "https://www.semanticscholar.org/paper/A-note-on-King's-method-F-for-finding-a-bracketed-Popovski/513ffdb3befbf48c38bb70dbec60934472cc9903"
             " (cases 73–98). No file in `sources/` gives the article's rows.\n"
             '- "Stage paper", with "see also #26" (cases 99–102). This is Stage (2013), whose rows are '
-            "in `2013_stage`. Case 99 is Stage's §3.5 with its sign flipped, case 100 is §3.6 and case "
-            '102 is §3.10; case 101 is no Stage function, but Galdino\'s `g21`–`g23`. "see also #26" '
-            "points to no Stage function: case 26 is Brent (1971)'s `x*exp(-x^-2)`.\n"
+            "in `2013_stage`. Case 99 is Stage's §3.5 with `x` replaced by `-x`, case 100 is §3.6 and "
+            "case 102 is §3.10; case 101 is no Stage function, but Galdino's `g21`–`g23`. \"see also "
+            "#26\" points to no Stage function: case 26 is Brent (1971)'s `x*exp(-x^-2)`.\n"
             '- "P1 in BlendTF paper" (cases 103–117). This is Badr, Almotairi & El Ghamry (2021), whose'
             " rows are in `2021_badr`. Cases 103–117 are all 15 of its problems `P1`–`P15`, not only "
             "`P1`; the only difference is the interval of `P3`, which is `[3, 4]` in the article and "

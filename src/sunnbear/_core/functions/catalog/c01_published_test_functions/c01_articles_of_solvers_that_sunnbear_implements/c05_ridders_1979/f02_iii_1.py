@@ -52,7 +52,7 @@ class Ridders1979Iii1(Formula):
     cases = (
         FormulaTestCase.value(params={"a": -10.0, "b": 10.0}, x=-4.0, c=0.0, expected=-10.073262555554937),
         FormulaTestCase.value(params={"a": -10.0, "b": 10.0}, x=-4.0, c=0.25, expected=-10.00111068823678),
-        FormulaTestCase.value(params={"a": -100.0, "b": 100.0}, x=-40.0, c=0.0, expected=-10.0),
+        FormulaTestCase.value(params={"a": -100.0, "b": 100.0}, x=40.0, c=0.0, expected=9.4154106734808e18),
         FormulaTestCase.interval_bounds(params={"a": -10.0, "b": 10.0}, expected=(-10.0, 10.0)),
         FormulaTestCase.interval_bounds(params={"a": -100.0, "b": 100.0}, expected=(-100.0, 100.0)),
     )

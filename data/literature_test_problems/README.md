@@ -239,6 +239,8 @@ For a formula of several rows, the script checks that each row's own `f`, at tha
 
 The module's docstring names each rounded value, and its test cases evaluate the function at the rounded value.
 
+**A test case's x-value is 1 where the case tests the function,** where 1 exists among the x-values tried: its expected value is at least `CASE_SMALL_VALUE`, and the function's value changes by more than `CASE_MIN_CHANGE` of itself when x moves by `CASE_X_STEP` of the interval's width. A case whose expected value stays below `CASE_SMALL_VALUE` gets `atol=0.0`, because the default `atol` would accept any value near 0.
+
 **A test case whose function cannot be evaluated in float64 to within `CASE_ATOL`** gets a wider `atol`, which `FormulaModuleSpec._case_tolerance` in `scripts/literature_test_problems/formula_modules.py` sets, for 1 of 2 reasons:
 
 - **An ill-conditioned function,** such as `sin(x*10^6)`: the test case's Python value differs from mpmath's by no more than the spread of the function's exact values within `CASE_X_ULPS` float64 steps of x on either side; the `atol` is a multiple of that spread.

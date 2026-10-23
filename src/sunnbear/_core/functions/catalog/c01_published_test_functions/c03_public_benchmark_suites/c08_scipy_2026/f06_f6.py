@@ -1,7 +1,7 @@
 """This module holds a formula of SciPy (2026).
 
-The formula comes from the row with the key ``f6`` in the survey of published test problems. The survey describes this
-function in words, not as 1 expression, so a person writes this module: a change of the formula's row in
+The formula comes from the row with the key ``f6`` in the survey of published test problems. The survey gives this
+function as a description, not as 1 expression, so a person writes this module: a change of the formula's row in
 `data/literature_test_problems/sources/` needs a change of this module.
 """
 
@@ -20,7 +20,8 @@ class Scipy2026F6(Formula):
     at the same x.
 
     ID original.05.00, the same ID as ``f5``; smoothness -inf; ``random()`` is Python's uniform draw from ``[0, 1)``; no
-    derivatives
+    derivatives; the module's ``description`` string says that f6 is positive to the left of 1 and negative to the
+    right, the reverse of the code
     """
 
     number = (1, 3, 8, 6)
@@ -32,8 +33,9 @@ class Scipy2026F6(Formula):
             "https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py. The module cites "
             "2 sources:\n"
             '- [1] Alefeld, G. E., Potra, F. A. and Shi, Y., "Algorithm 748: Enclosing Zeros of '
-            'Continuous Functions", ACM Trans. Math. Softw. (1995), '
-            "https://dl.acm.org/doi/10.1145/210089.210111\n"
+            'Continuous Functions", ACM Trans. Math. Softw. 21(3), September 1995, pp. 327–344, '
+            'https://dl.acm.org/doi/10.1145/210089.210111; the module misprints the volume as "Volume '
+            '221" and gives no issue or pages\n'
             '- [2] Chandrupatla, T. R., "A new hybrid quadratic/bisection algorithm for finding the '
             'zero of a nonlinear function without using derivatives", Advances in Engineering Software '
             "28.3 (1997): 145-149 (no DOI in the module)"

@@ -1,7 +1,7 @@
 """This module holds a formula of Alefeld, Potra, Shi (1993).
 
-The formula comes from the row with the key ``T5.1-13`` in the survey of published test problems. The survey describes
-this function in words, not as 1 expression, so a person writes this module: a change of the formula's row in
+The formula comes from the row with the key ``T5.1-13`` in the survey of published test problems. The survey gives this
+function as a description, not as 1 expression, so a person writes this module: a change of the formula's row in
 `data/literature_test_problems/sources/` needs a change of this module.
 """
 

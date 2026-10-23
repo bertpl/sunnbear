@@ -1,13 +1,16 @@
 """This module holds a formula of roots-fortran (2025).
 
-The formula comes from the row with the key ``26–27`` in the survey of published test problems. The survey describes
-this function in words, not as 1 expression, so a person writes this module: a change of the formula's row in
+The formula comes from the row with the key ``26–27`` in the survey of published test problems. The survey gives this
+function as a description, not as 1 expression, so a person writes this module: a change of the formula's row in
 `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+
+# MAX_EXP_ARGUMENT is log(sys.float_info.max), the largest argument for which float64 exp does not overflow.
+MAX_EXP_ARGUMENT = 709.782712893384
 
 
 class RootsFortran20252627(Formula):
@@ -40,7 +43,8 @@ class RootsFortran20252627(Formula):
             "unchanged.\n"
             "- http://www.mth.pdx.edu/~daescu/mth451_551/Muller_bisection.pdf (cases 41, 42). The host "
             "is gone, and no web archive captured the file.\n"
-            '- Alefeld–Potra–Shi (1995), "case 11 from Algorithm 748" (case 45).\n'
+            '- Alefeld–Potra–Shi (1995), as case 11 from "Algorithm 748: Enclosing Zeros of Continuous '
+            'Functions", with n = 20 (case 45).\n'
             '- Chandrupatla, T. R., "A new hybrid quadratic/bisection algorithm for finding the zero of'
             ' a nonlinear function without using derivatives", Advances in Engineering Software 28(3), '
             "April 1997, pp. 145–149 (cases 47–62).\n"
@@ -52,9 +56,9 @@ class RootsFortran20252627(Formula):
             "https://www.semanticscholar.org/paper/A-note-on-King's-method-F-for-finding-a-bracketed-Popovski/513ffdb3befbf48c38bb70dbec60934472cc9903"
             " (cases 73–98). No file in `sources/` gives the article's rows.\n"
             '- "Stage paper", with "see also #26" (cases 99–102). This is Stage (2013), whose rows are '
-            "in `2013_stage`. Case 99 is Stage's §3.5 with its sign flipped, case 100 is §3.6 and case "
-            '102 is §3.10; case 101 is no Stage function, but Galdino\'s `g21`–`g23`. "see also #26" '
-            "points to no Stage function: case 26 is Brent (1971)'s `x*exp(-x^-2)`.\n"
+            "in `2013_stage`. Case 99 is Stage's §3.5 with `x` replaced by `-x`, case 100 is §3.6 and "
+            "case 102 is §3.10; case 101 is no Stage function, but Galdino's `g21`–`g23`. \"see also "
+            "#26\" points to no Stage function: case 26 is Brent (1971)'s `x*exp(-x^-2)`.\n"
             '- "P1 in BlendTF paper" (cases 103–117). This is Badr, Almotairi & El Ghamry (2021), whose'
             " rows are in `2021_badr`. Cases 103–117 are all 15 of its problems `P1`–`P15`, not only "
             "`P1`; the only difference is the interval of `P3`, which is `[3, 4]` in the article and "
@@ -88,9 +92,9 @@ class RootsFortran20252627(Formula):
     def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - (b - a) * c
-        # for abs(x) below 1e-100, float64 rounds x/exp(1/(x*x)) to 0, and x*x underflows to 0, so that 1/(x*x)
-        # divides by 0
-        if abs(x) < 1e-100:
+        # where 1/(x*x) exceeds MAX_EXP_ARGUMENT, for abs(x) below about 0.0375, exp overflows and the source's float64
+        # value is x/inf = 0; the comparison also holds where x*x underflows to 0
+        if x * x * MAX_EXP_ARGUMENT < 1.0:
             return 0.0
         else:
             return x / math.exp(1.0 / (x * x))
@@ -117,12 +121,16 @@ class RootsFortran20252627(Formula):
             ),
         )
 
+    # a case with `atol=0.0` has an expected value so small that the default `atol`
+    # would accept any value near 0, 0 among them
     cases = (
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.0, expected=0.00915781944436709),
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.25, expected=-0.12675998655454956),
         FormulaTestCase.value(params={"a": -1.1234, "b": 4.4567}, x=0.55063, c=0.0, expected=0.020345061698967323),
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.0, c=0.0, expected=0.0),
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=1e-200, c=0.0, expected=0.0),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.01, c=0.0, expected=0.0, atol=0.0),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.04, c=0.0, expected=1.4723423419207585e-273, atol=0.0),
         FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 4.0}, expected=(-1.0, 4.0)),
         FormulaTestCase.interval_bounds(params={"a": -1.1234, "b": 4.4567}, expected=(-1.1234, 4.4567)),
     )

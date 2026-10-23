@@ -1,7 +1,7 @@
 """This module holds a formula of Burkardt (2016).
 
-The formula comes from the row with the key ``p12`` in the survey of published test problems. The survey describes this
-function in words, not as 1 expression, so a person writes this module: a change of the formula's row in
+The formula comes from the row with the key ``p12`` in the survey of published test problems. The survey gives this
+function as a description, not as 1 expression, so a person writes this module: a change of the formula's row in
 `data/literature_test_problems/sources/` needs a change of this module.
 """
 
@@ -17,7 +17,7 @@ class Burkardt2016P12(Formula):
     ``0.0`` (x = 1.0); ``+exp(log(factor) + log(abs(x - 1.0)) - 1.0/(x - 1.0)^2)`` (x > 1.0), with the parameters
     ``factor = 1000.0``; the formula's intervals are ``[-4.0, 4.1]`` (rang); ``[0.50, 2.0]`` (starts 2 and 1).
 
-    starts 2.0, 0.50, 4.0
+    The source's starting points, in order, are ``2.0``, ``0.50`` and ``4.0``.
     """
 
     number = (1, 3, 1, 12)
@@ -26,11 +26,17 @@ class Burkardt2016P12(Formula):
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "
-            "https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py, MIT license. The file "
-            "is unversioned: its header says that it was last modified on 1 December 2016, and the rows"
-            " come from the version with sha256 "
-            "`658ed0a0b520eba30e87d4a08d73b444fe4f3edf14a8a94339703eca2ef9680c`. The file cites sources"
-            " for 3 of its functions, and names a 4th origin without a reference:\n"
+            "https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py, MIT license.\n"
+            "\n"
+            "The file is unversioned and has no file header; the rows come from the version with sha256"
+            " `658ed0a0b520eba30e87d4a08d73b444fe4f3edf14a8a94339703eca2ef9680c`. The comment of each "
+            "function gives the date on which that function was last modified, and the latest is 16 "
+            "October 2020, for `p16_root`. The year is 2016 because every function that the rows "
+            "transcribe (`pNN_fx`, `pNN_rang`, `pNN_start` and `pNN_title`) is dated 2 December 2016 or"
+            " earlier.\n"
+            "\n"
+            "The file cites sources for 3 of its functions, and names a 4th origin without a reference:"
+            "\n"
             '- [1] George Donovan, Arnold Miller, Timothy Moreland, "Pathological Functions for '
             "Newton's Method\", American Mathematical Monthly, January 1993, pages 53-58 (no DOI in the "
             "file), for `p15`.\n"
@@ -81,6 +87,8 @@ class Burkardt2016P12(Formula):
             ),
         )
 
+    # a case with `atol=0.0` has an expected value so small that the default `atol`
+    # would accept any value near 0, 0 among them
     cases = (
         FormulaTestCase.value(
             params={"factor": 1000.0, "a": -4.0, "b": 4.1}, x=-1.57, c=0.0, expected=-2208.918772196994
@@ -89,7 +97,7 @@ class Burkardt2016P12(Formula):
             params={"factor": 1000.0, "a": -4.0, "b": 4.1}, x=-1.57, c=0.25, expected=-4382.445368656935
         ),
         FormulaTestCase.value(
-            params={"factor": 1000.0, "a": 0.5, "b": 2.0}, x=0.95, c=0.0, expected=-9.575847983576841e-173
+            params={"factor": 1000.0, "a": 0.5, "b": 2.0}, x=0.95, c=0.0, expected=-9.575847983576841e-173, atol=0.0
         ),
         FormulaTestCase.value(params={"factor": 1000.0, "a": -4.0, "b": 4.1}, x=1.0, c=0.0, expected=0.0),
         FormulaTestCase.value(params={"factor": 1000.0, "a": -4.0, "b": 4.1}, x=1.5, c=0.0, expected=9.15781944436709),

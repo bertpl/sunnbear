@@ -9,17 +9,17 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "b90c5faafc73affb"
+SURVEY_FIELDS_HASH = "fec918798027b4cc"
 
 
 class RootsFortran2025133(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
     The survey writes the source's function as ``y1 + ((x - x1)/(x2 - x1))*(y2 - y1)``, with the parameters ``x1 = 0.0,
-    x2 = 157.08, y1 = 1012.0, y2 = -1114.0, constants in the case``; the formula's intervals are ``[x1, x2] = [0,
-    157.08]``.
+    x2 = 157.08, y1 = 1012.0, y2 = -1114.0``; the formula's interval is ``[0, 157.08]``.
 
-    the comment calls it "another linear test case" and says "see Issue #25"
+    the comment calls it "another linear test case" and says "see Issue #25"; `x1`, `x2`, `y1` and `y2` are constants in
+    the case, and its bracket is `[x1, x2]`
     """
 
     number = (1, 3, 3, 37)
@@ -43,7 +43,8 @@ class RootsFortran2025133(Formula):
             "unchanged.\n"
             "- http://www.mth.pdx.edu/~daescu/mth451_551/Muller_bisection.pdf (cases 41, 42). The host "
             "is gone, and no web archive captured the file.\n"
-            '- Alefeld–Potra–Shi (1995), "case 11 from Algorithm 748" (case 45).\n'
+            '- Alefeld–Potra–Shi (1995), as case 11 from "Algorithm 748: Enclosing Zeros of Continuous '
+            'Functions", with n = 20 (case 45).\n'
             '- Chandrupatla, T. R., "A new hybrid quadratic/bisection algorithm for finding the zero of'
             ' a nonlinear function without using derivatives", Advances in Engineering Software 28(3), '
             "April 1997, pp. 145–149 (cases 47–62).\n"
@@ -55,9 +56,9 @@ class RootsFortran2025133(Formula):
             "https://www.semanticscholar.org/paper/A-note-on-King's-method-F-for-finding-a-bracketed-Popovski/513ffdb3befbf48c38bb70dbec60934472cc9903"
             " (cases 73–98). No file in `sources/` gives the article's rows.\n"
             '- "Stage paper", with "see also #26" (cases 99–102). This is Stage (2013), whose rows are '
-            "in `2013_stage`. Case 99 is Stage's §3.5 with its sign flipped, case 100 is §3.6 and case "
-            '102 is §3.10; case 101 is no Stage function, but Galdino\'s `g21`–`g23`. "see also #26" '
-            "points to no Stage function: case 26 is Brent (1971)'s `x*exp(-x^-2)`.\n"
+            "in `2013_stage`. Case 99 is Stage's §3.5 with `x` replaced by `-x`, case 100 is §3.6 and "
+            "case 102 is §3.10; case 101 is no Stage function, but Galdino's `g21`–`g23`. \"see also "
+            "#26\" points to no Stage function: case 26 is Brent (1971)'s `x*exp(-x^-2)`.\n"
             '- "P1 in BlendTF paper" (cases 103–117). This is Badr, Almotairi & El Ghamry (2021), whose'
             " rows are in `2021_badr`. Cases 103–117 are all 15 of its problems `P1`–`P15`, not only "
             "`P1`; the only difference is the interval of `P3`, which is `[3, 4]` in the article and "
@@ -99,11 +100,7 @@ class RootsFortran2025133(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (
-            ParamTable(
-                names=("x1", "x2", "y1", "y2"), rows=((0.0, 157.08, 1012.0, -1114.0), (0.0, 157.08, 1012.0, -1114.0))
-            ),
-        )
+        return (ParamTable(names=("x1", "x2", "y1", "y2"), rows=((0.0, 157.08, 1012.0, -1114.0),)),)
 
     cases = (
         FormulaTestCase.value(
@@ -111,9 +108,6 @@ class RootsFortran2025133(Formula):
         ),
         FormulaTestCase.value(
             params={"x1": 0.0, "x2": 157.08, "y1": 1012.0, "y2": -1114.0}, x=47.124, c=0.25, expected=905.7
-        ),
-        FormulaTestCase.value(
-            params={"x1": 0.0, "x2": 157.08, "y1": 1012.0, "y2": -1114.0}, x=47.124, c=0.0, expected=374.2
         ),
         FormulaTestCase.interval_bounds(
             params={"x1": 0.0, "x2": 157.08, "y1": 1012.0, "y2": -1114.0}, expected=(0.0, 157.08)

@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "d271eadcb6828b33"
+SURVEY_FIELDS_HASH = "934503ab026e9739"
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
@@ -20,10 +20,11 @@ class GanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
     The survey writes the source's function as ``if(x > -1; 1 + sin(1/(x + 1)); -1)``; the formula's interval is ``[-1,
     1]``.
 
-    `Test Functions.pdf` prints the first branch as `1 + sin(1/(x + 1)) - 1` and the second as `0`. `Test Functions.pdf`
-    draws the closing brace of a case brace only where a term follows it (f35, f76), and draws none here, so the `- 1`
-    belongs to the first branch and the else branch is 0. The root that `Test Functions.pdf` gives, -0.682, is a zero of
-    that first branch, `sin(1/(x + 1))`.
+    `Test Functions.pdf` prints the first branch as `1 + sin(1/(x + 1)) - 1` and the second as `0`, with no closing
+    brace after the case brace. That layout is a misprint of `if(x > -1; 1 + sin(1/(x + 1)); 0) - 1`, Oliveira &
+    Takahashi's function, which the authors' Calcpad worksheet `Root finding tests.cpd` defines (commit `0d6efd5` of
+    https://github.com/Just-A-Random-Geek/ModAB-Root-Finding); as printed, the function is 0 at the left end `x = -1`,
+    where a bracketing method on `[-1, 1]` stops in place of the printed root -0.682.
     """
 
     number = (1, 1, 13, 21)

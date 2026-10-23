@@ -49,6 +49,6 @@ class Gsl2024Func1(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=0.67, c=0.0, expected=-0.9996677262338297),
-        FormulaTestCase.value(params={}, x=0.67, c=0.25, expected=-0.9999999999999937),
+        FormulaTestCase.value(params={}, x=1.43, c=0.25, expected=-0.6018310116739696),
         FormulaTestCase.interval_bounds(params={}, expected=(0.1, 2.0)),
     )
