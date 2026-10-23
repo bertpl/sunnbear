@@ -24,7 +24,7 @@ class ChapraCanale2015Prob833(Formula):
     difficulties.
     """
 
-    number = (1, 4, 6, 29)
+    number = (1, 4, 6, 28)
     name = "Prob. 8.33"
     param_names = ("R", "C", "L", "Z")
     source = FormulaSource(

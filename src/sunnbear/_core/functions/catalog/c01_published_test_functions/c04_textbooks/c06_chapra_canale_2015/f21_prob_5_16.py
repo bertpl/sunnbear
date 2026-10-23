@@ -22,7 +22,7 @@ class ChapraCanale2015Prob516(Formula):
     The formula's ``x`` is the source's depth ``y``.
     """
 
-    number = (1, 4, 6, 22)
+    number = (1, 4, 6, 21)
     name = "Prob. 5.16"
     param_names = ()
     source = FormulaSource(

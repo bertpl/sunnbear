@@ -22,7 +22,7 @@ class Ganchovski2026F100(Formula):
     The root line, `$Root{f_100(x); x ∈ [0; e]}`, is the only `$Root` line in the PDF without `= 0`.
     """
 
-    number = (1, 3, 4, 5)
+    number = (1, 3, 4, 2)
     name = "f100"
     param_names = ()
     source = FormulaSource(

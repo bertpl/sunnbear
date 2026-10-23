@@ -26,7 +26,7 @@ class ChapraCanale2015Prob815(Formula):
     within 2 km; (b) where `c` is minimal, a root of `dc/dx`.
     """
 
-    number = (1, 4, 6, 28)
+    number = (1, 4, 6, 27)
     name = "Prob. 8.15"
     param_names = ("c_",)
     source = FormulaSource(

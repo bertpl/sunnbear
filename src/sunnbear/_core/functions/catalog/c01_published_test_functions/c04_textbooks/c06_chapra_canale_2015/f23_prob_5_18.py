@@ -27,7 +27,7 @@ class ChapraCanale2015Prob518(Formula):
     (...)`` of the printed equation.
     """
 
-    number = (1, 4, 6, 24)
+    number = (1, 4, 6, 23)
     name = "Prob. 5.18"
     param_names = ("osf",)
     source = FormulaSource(

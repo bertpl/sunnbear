@@ -21,7 +21,7 @@ class Ganchovski2026F101(Formula):
     The root line uses `$Find`.
     """
 
-    number = (1, 3, 4, 6)
+    number = (1, 3, 4, 3)
     name = "f101"
     param_names = ()
     source = FormulaSource(

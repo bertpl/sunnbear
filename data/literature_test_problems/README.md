@@ -22,7 +22,7 @@ The rows are the material for category 1, *Published test functions*, of sunnbea
 | `timeline.html` | script | a page that draws the sources in time order, with an edge from each source to every later source whose rows name its rows (§ The summary and the page) |
 | `formulas.csv` | script | every formula of category 1, active and retired, with its rows; the script keeps every id that the file already holds (§ Formulas) |
 
-Do not edit the generated files by hand; regenerate them (§ Regenerating). The 1 exception is `formulas.csv` after the script stops on a change that would change the id of a formula: a person then edits `formulas.csv` by hand (§ Formulas).
+Do not edit the generated files by hand; regenerate them (§ Regenerating). The exceptions are `formulas.csv` after the script stops on a change that would change the id of a formula, and `formulas.csv` when a person compacts the ids that a correction retired: a person then edits `formulas.csv` by hand (§ Formulas).
 
 ## Source files
 
@@ -159,7 +159,7 @@ A formula is `active` while it holds a `new` row, and `retired` once it holds no
 
 By default, each `new` row is a formula of its own. A formula's id is `f<subcategory>.<source>.<formula>`, such as `f1.4.12.3`, formula 3 of source 12 of subcategory `1.4`.
 
-**An id never changes once given.** The script keeps every id that `formulas.csv` already holds, and gives new ids only by appending:
+**The script never changes an id once given.** The script keeps every id that `formulas.csv` already holds, and gives new ids only by appending:
 
 - **Sources:** a source gets a number when it first has a `new` row: 1 more than the largest source number of its subcategory, retired formulas included. A source without a `new` row gets no number.
 - **Formulas:** a new formula gets 1 more than the largest formula number of its source, retired formulas included.
@@ -170,6 +170,14 @@ By default, each `new` row is a formula of its own. A formula's id is `f<subcate
 Without a `formulas.csv`, the script numbers the sources of each subcategory in time order, and the formulas of each source in the order of its rows; a formula of several rows takes the position of its first row.
 
 Deleting `formulas.csv` renumbers every formula in this way, which only a major release after 1.0.0 may do.
+
+**Before 1.0.0, a person may compact the ids that a correction retired.** A correction fixes the rows or decisions of sources that the survey already holds, such as a misprint read as meant, or a row that turns out to pose no root-finding problem. The appending rules above exist so that adding a source never shifts the ids of the sources already there; before 1.0.0, no other use of an id relies on it staying the same. To compact:
+
+1. Delete the retired line from `formulas.csv`. This is the 1 case in which a line leaves the file.
+2. Give each later formula of the same source the next lower number: in `formulas.csv`, in its module's file name and `number`, in the import of the source's `__init__.py`, and wherever tracked code names its id, such as the generator's `UNTRANSLATABLE_FORMULAS`.
+3. Regenerate the source's modules and the survey: neither changes the edits of step 2.
+
+A formula that a newly added source retired stays retired. Compacting it would shift the ids of a source that was already in the survey, which is exactly what the appending rules prevent.
 
 **A change that would change the id of a formula stops the script.** These changes do:
 
