@@ -73,12 +73,12 @@ Every text field is markdown, with code in backticks; a field that holds only co
 
 Each row has 1 of 3 final statuses, decided in this order; the paragraphs *The same function* and *Test functions and intervals* below the list define the terms that the list uses:
 
-- **`incomplete`:** the source does not give enough to define a test function, or poses no root-finding problem; every other row is complete. The row's reason starts with 1 of 5 cases:
+- **`incomplete`:** the source does not give enough to define a test function, or poses no root-finding problem, so the survey cannot use the row as a root-finding test; every other row is complete. The row's reason starts with 1 of these cases:
   - `no interval`: the source gives no interval, or only starting points;
   - `no usable interval`: the interval text gives no interval with finite numeric bounds, such as prose (`an interval containing the origin`), a half-line (`theta > 0`), an infinite bound, or bounds without values (`[a, b]`);
   - `no function`: the source gives no function, or one that needs data that the source does not print, such as a sample; a function with random noise of a stated distribution counts as given;
   - `parameters without values`: a parameter of the function has no published value, such as an `eps` that is only "small";
-  - `no root-finding problem`: the source asks for something other than a root of the function, such as its maximum. The survey does not turn such a problem into one of finding a root, such as a root of the derivative.
+  - `no root-finding problem`: the source asks for something other than a root of the function, such as its maximum. The survey does not replace such a problem with the search for a root of another function, such as the function's derivative.
 - **`duplicate`:** earlier complete rows already give each of the row's test functions: the same function on the same interval with the same parameter values. `duplicate_of` names those earlier rows.
 - **`new`:** every other complete row. That includes:
   - the same function on another interval or with other parameter values;
@@ -269,7 +269,7 @@ The script stops and names each formula that it cannot generate. It cannot gener
 
 After a change of a source file, regenerate the modules of its formulas: the tests recompute each module's `SURVEY_FIELDS_HASH` from the source files, so that a module that was not regenerated fails the tests.
 
-**When a formula retires, delete its module and its import in the source's `__init__.py` by hand,** then regenerate the source's modules. The script imports sunnbear's catalog, so it stops while an `__init__.py` imports a module that no longer exists.
+**When a formula retires, delete its module and its import in the source's `__init__.py` by hand,** then regenerate the source's modules. The script imports sunnbear's catalog, so the script stops as long as an `__init__.py` still imports a deleted module.
 
 ## Adding a source
 

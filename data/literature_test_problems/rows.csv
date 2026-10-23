@@ -515,7 +515,7 @@ row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instanc
 2015_chapra:Prob. 5.9,2015,1.4,x^2*abs(cos(sqrt(x))) = 5,,,,,1,incomplete,no interval,,incomplete,,,no interval
 2015_chapra:Prob. 5.10,2015,1.4,x^4 - 8*x^3 - 35*x^2 + 450*x - 1001,,,"[4.5, 6]",,1,new,,,new,,,
 "2015_chapra:Prob. 5.11, 6.8, 7.10",2015,1.4,x^3.5 = 80,,,"`[2.0, 5.0]` (5.11)",,1,new,,,new,,,
-"2015_chapra:Prob. 5.12, 6.12",2015,1.4,-2*x^6 - 1.5*x^4 + 10*x + 2,,,"[0, 1]",,1,new,,,incomplete,,,"no root-finding problem: both problems seek the function's maximum on `[0, 1]`, where the function has no zero; the survey does not turn the maximum into a root of the derivative."
+"2015_chapra:Prob. 5.12, 6.12",2015,1.4,-2*x^6 - 1.5*x^4 + 10*x + 2,,,"[0, 1]",,1,new,,,incomplete,,,"no root-finding problem: both problems seek the function's maximum on `[0, 1]`, where the function has no zero."
 "2015_chapra:Prob. 5.13, 7.11",2015,1.4,(g*m/c)*(1 - exp(-(c/m)*t)) - v,,"`g = 9.81` m/s^2 and `c = 15` kg/s in both; `v = 36` m/s, `t = 10` s (5.13); `v = 35`, `t = 8` (7.11)",,,4,incomplete,no interval,,incomplete,,,no interval
 2015_chapra:Prob. 5.15,2015,1.4,v = sqrt(2*g*H)*tanh(sqrt(2*g*H)/(2*L)*t),,"`g = 9.81` m/s^2, `L = 4` m, `t = 2.5` s, `v = 5` m/s","[0, 2]",,1,new,,,new,,,
 2015_chapra:Prob. 5.16,2015,1.4,1 - Q^2/(g*Ac^3)*B,,"`Q = 20` m^3/s, `g = 9.81` m/s^2, `B = 3 + y`, `Ac = 3*y + y^2/2`","[0.5, 2.5]",unknown variable unclear,0,undecided,unparsed,,new,,,"Critical depth of a trapezoidal channel, with `B = 3 + y` and `Ac = 3*y + y^2/2`; no earlier row has this function."
