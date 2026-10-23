@@ -30,6 +30,7 @@ from pathlib import Path
 import mpmath
 import sympy as sp
 
+from sunnbear._core.functions.catalog.c01_published_test_functions import PublishedTestFunctions
 from sunnbear._core.functions.core.test_cases import DEFAULT_ATOL
 from sunnbear._core.utils import math_functions
 from sunnbear._core.utils.slugify import slugify
@@ -107,9 +108,6 @@ CASE_X_STEP_FRACTION = 0.01
 CASE_MIN_RELATIVE_CHANGE = 1e-9
 # DOCSTRING_WIDTH is the width of a wrapped docstring line, inside a class at 4 spaces of indentation.
 DOCSTRING_WIDTH = 120 - 4
-# C_SCALE_DIGITS is the number of significant digits of `c_scale`, the scale of a formula's shift along x: the width of
-# the formula's interval, rounded. The class docstring of `PublishedTestFunctions`, category 1, states the rule.
-C_SCALE_DIGITS = 3
 # RESERVED_NAMES are the names that a parameter of the source may not keep, because the formula module uses them.
 RESERVED_NAMES = {"x", "c", "c_scale", "self", "math", *math_functions.__all__}
 # INTERVAL_BOUND_NAMES are the names of the bounds of a formula's interval: the class docstring of category 1 names a
@@ -186,7 +184,7 @@ class FormulaModuleSpec:
         if self.interval is None:
             c_scale_code = "c_scale"
         else:
-            c_scale_code = repr(self._c_scale(self.interval))
+            c_scale_code = repr(PublishedTestFunctions.c_scale(*self.interval))
         class_name = source_category_class_name(source) + _camel_case(slugify(formula_name))
         signature = "".join(f", {param_name}: float" for param_name in self.param_names)
         return "\n".join(
@@ -443,12 +441,6 @@ class FormulaModuleSpec:
         return python_names
 
     @staticmethod
-    def _c_scale(interval: tuple[float, float]) -> float:
-        """Return the formula's `c_scale` for an interval: its width, rounded to `C_SCALE_DIGITS` significant digits."""
-        a, b = interval
-        return float(f"{b - a:.{C_SCALE_DIGITS}g}")
-
-    @staticmethod
     def _parameter_value(value: sp.Expr) -> tuple[float, bool]:
         """Return a published value as a float that a parameter holds, and whether that float is rounded.
 
@@ -498,7 +490,7 @@ class FormulaModuleSpec:
         candidates = []
         for fraction in CASE_FRACTIONS:
             x = float(f"{a + fraction * (b - a):.6g}")
-            shifted = x - cls._c_scale(interval) * c
+            shifted = x - PublishedTestFunctions.c_scale(a, b) * c
             if a < x < b:
                 values = cls._case_values(exact_function, formula_expression, python_values, shifted)
             else:
@@ -694,7 +686,7 @@ class FormulaModuleSpec:
                 if is_rounded:
                     exact_texts_of_rounded_values.append(cls._exact_text(exact_bound))
             bounds = tuple(bounds)
-            values += [*bounds, cls._c_scale(bounds)]
+            values += [*bounds, PublishedTestFunctions.c_scale(*bounds)]
         else:
             bounds = tuple(float(sp.N(bound, 30)) for bound in exact_bounds)
         return tuple(values), bounds, exact_texts_of_rounded_values, mpmath_parameter_values
@@ -752,7 +744,7 @@ class FormulaModuleSpec:
                 cases.append(
                     f"FormulaTestCase.value(params={params!r}, x={x!r}, c={c!r}, expected={expected!r}{tolerance})"
                 )
-                shifted_xs.append(x - cls._c_scale(bounds) * c)
+                shifted_xs.append(x - PublishedTestFunctions.c_scale(*bounds) * c)
             # the first tuple also reaches each branch of a function that is 1 conditional, so that a test reaches
             # every line of the module
             expression_node = ast.parse(formula_expression.python_code, mode="eval").body
