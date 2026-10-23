@@ -108,7 +108,9 @@ CASE_X_STEP_FRACTION = 0.01
 CASE_MIN_RELATIVE_CHANGE = 1e-9
 # DOCSTRING_WIDTH is the width of a wrapped docstring line, inside a class at 4 spaces of indentation.
 DOCSTRING_WIDTH = 120 - 4
-# RESERVED_NAMES are the names that a parameter of the source may not keep, because the formula module uses them.
+# RESERVED_NAMES are the names that a parameter of the source may not keep, because the formula module uses them;
+# `c_scale` is reserved also in a formula with 1 interval, whose code writes it as a number, so that the name always
+# means the scale of the shift.
 RESERVED_NAMES = {"x", "c", "c_scale", "self", "math", *math_functions.__all__}
 # INTERVAL_BOUND_NAMES are the names of the bounds of a formula's interval: the class docstring of category 1 names a
 # formula's interval `[a, b]`, and a formula with several intervals takes its bounds as the parameters `a` and `b`, so

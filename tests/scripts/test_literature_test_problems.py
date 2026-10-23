@@ -294,7 +294,7 @@ def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table
 
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
 @pytest.mark.parametrize("c", [0.25, -0.25])
-def test_category_1_formula_shifts_along_x_by_its_c_scale(formula, c):
+def test_category_1_formula_shifts_along_x_by_c_scale_times_c(formula, c):
     """A formula of category 1 at ``c`` equals the formula at ``c = 0``, evaluated at ``x - c_scale*c``.
 
     Evaluating the shifted x-value at ``c = 0`` repeats the formula's own float arithmetic, so the 2 values are equal

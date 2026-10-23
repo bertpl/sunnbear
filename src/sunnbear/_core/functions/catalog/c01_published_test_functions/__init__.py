@@ -13,16 +13,18 @@ from . import (
 class PublishedTestFunctions(FormulaCategory):
     """`PublishedTestFunctions` is the top-level category of formulas taken from published sources.
 
-    Each formula of this category evaluates its published function at ``x - c_scale*c``, where ``c_scale`` is about
-    the width of the formula's interval, so that ``c`` shifts the function along x, and at ``c = 0`` the formula is the
-    published function. A shift along x keeps the function's shape around its root; a shift of its values,
-    ``f(x) - c``, would turn a multiple root into a simple one.
+    Each formula of this category evaluates its published function at ``x - c_scale*c``, where ``c_scale`` is the
+    rounded width of the formula's interval, so that ``c`` shifts the function along x, and at ``c = 0`` the formula is
+    the published function.
+
+    A shift along x keeps the function's shape around its root; a shift of its values, ``f(x) - c``, would turn a
+    multiple root into a simple one.
 
     ``c_scale`` is the width of the formula's interval ``[a, b]``, rounded to 3 significant digits. Scaling by the
     width means that, for every formula, the values of ``c`` that keep a root inside the interval span a range of
     about 1.
 
-    The rounding changes that range by at most 0.5%, and keeps long numbers out of the code, such as
+    The rounding changes that range by at most 0.5%, and keeps long numbers out of the formula modules, such as
     ``1.9999999999999996`` for the width of ``[2.6, 4.6]``.
 
     - A formula with 1 interval writes ``c_scale`` as a number.
