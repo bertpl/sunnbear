@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.3.0 (2026-10-23)
 
 ### Added
 
@@ -17,15 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Rename `ParamRecipe` to `ParamGrid`, and make `ParamRecipe` the base class of `ParamGrid` and `ParamTable`
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Fix a formula that calls a function of `math` failing to compile when the formula is first evaluated inside `Solver.solve`
-
-### Security
 
 ## 0.2.11 (2026-10-21)
 
