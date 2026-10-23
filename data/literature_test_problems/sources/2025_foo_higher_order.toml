@@ -1,5 +1,5 @@
 title = 'Foo, Tan (2025): higher-order root-finding algorithm'
-reference = 'Foo, W. G., Tan, C. H. (2025). Higher-Order Root-Finding Algorithm and its Applications. arXiv preprint 2509.20897v1. http://arxiv.org/abs/2509.20897v1.'
+reference = 'Foo, W. G., Tan, C. H. (2025). Higher-Order Root-Finding Algorithm and its Applications. arXiv preprint 2509.20897v1. https://doi.org/10.48550/arxiv.2509.20897 (https://arxiv.org/abs/2509.20897v1).'
 year = 2025
 subcategory = '1.2'
 where_in_source = '''
@@ -16,19 +16,19 @@ notes = '''
 
 [[rows]]
 key = '4.2'
-f = '-x*log2(x) - (1 - x)*log2(1 - x) - y'
+f = 'if(x = 0; 0; -x*log2(x)) - (1 - x)*log2(1 - x) - y'
 name = 'binary entropy preimage'
 parameters = 'y = 0.1, 0.2, ..., 0.9'
 interval = '[0, 0.5]'
-notes = 'Eq. (21) gives the 9 roots to 14 digits, from `0.01298686205551` (`y = 0.1`) to `0.31601934632361` (`y = 0.9`). Starting values solve `4*x*(1 - x) = y` or `(4*x*(1 - x))^(1/log(4)) = y`.'
+notes = 'Definition 1 defines the entropy function on `[0, 1]`, so that `H2(0) = 0`, the limit of `-x*log2(x)` at `x = 0`. The row writes that value of the term at `x = 0` as a conditional, and keeps the rest of eq. (6) as printed. Eq. (21) prints the 9 roots with 14 decimals, from `0.01298686205551` (`y = 0.1`) to `0.31601934632361` (`y = 0.9`); the last decimal of the roots for `y = 0.1` to `0.4` is truncated, not rounded. Starting values solve `4*x*(1 - x) = y` or `(4*x*(1 - x))^(1/log(4)) = y`.'
 
 [[rows]]
 key = '4.3.1'
-f = 'x*log(q - 1)/log(q) - x*log(x)/log(q) - (1 - x)*log(1 - x)/log(q) - y'
+f = 'x*log(q - 1)/log(q) - if(x = 0; 0; x*log(x))/log(q) - if(x = 1; 0; (1 - x)*log(1 - x))/log(q) - y'
 name = 'q-ary entropy preimage'
 parameters = '`q = 2^127 - 1`; `y = 0.1, 0.2, ..., 0.9`'
 interval = '[0, (q - 1)/q]'
-notes = 'Published as `Hq(x) = x*logq(q - 1) - x*logq(x) - (1 - x)*logq(1 - x)` with base-q logarithms. Starting value `x0 = y`.'
+notes = "The article writes `Hq(x) = x*logq(q - 1) - x*logq(x) - (1 - x)*logq(1 - x)` with base-q logarithms. Definition 1 defines `Hq` on `[0, 1]`, so that the terms `x*logq(x)` and `(1 - x)*logq(1 - x)` are `0` at `x = 0` and at `x = 1`. The row writes these 2 values as conditionals, which float64 needs at both bounds, because the upper bound `(q - 1)/q` rounds to `1`; it keeps the rest of the function as printed. The starting value is `x0 = y`. Table 2's values match `q = 2^156`, not the stated `q = 2^127 - 1`; the text and Prop. 10, whose bound `0.0157` is `2/127`, confirm `2^127 - 1`, which the row keeps."
 
 [[rows]]
 key = '5'

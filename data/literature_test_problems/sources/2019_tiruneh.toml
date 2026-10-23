@@ -1,5 +1,5 @@
 title = 'Tiruneh (2019): a modified three-point secant method'
-reference = 'Tiruneh, A. T. (2019). A modified three-point Secant method with improved rate and characteristics of convergence. arXiv preprint 1902.09058, version 1 (the only one), 25 February 2019. https://arxiv.org/abs/1902.09058.'
+reference = 'Tiruneh, A. T. (2019). A modified three-point Secant method with improved rate and characteristics of convergence. arXiv preprint 1902.09058, version 1 (the only one), 25 February 2019. https://doi.org/10.48550/arxiv.1902.09058 (https://arxiv.org/abs/1902.09058).'
 year = 2019
 subcategory = '1.2'
 where_in_source = '''

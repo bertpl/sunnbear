@@ -525,10 +525,10 @@ class FunctionDecision:
     Every field is empty for a formula that takes the `f` of its first row as it is. Otherwise:
 
     - `variable_change` describes the variable of a formula that takes another variable than that of its row's `f`;
-    - `f` is the family form of a formula whose rows print 1 function, each row with its own values of some
-      parameters: that function with each such parameter as a name, such as `x^3 - a`;
+    - `f` is the family form of a formula whose rows print functions that differ only in the values of some constants
+      or parameters: that function with each such value as a parameter, such as `x^3 - k`;
     - `parameters` gives each row's values of the parameters of `f`, 1 set per row in the order of the rows,
-      separated by `ROW_ITEMS_SEPARATOR`, such as `a = 1 | a = -1`.
+      separated by `ROW_ITEMS_SEPARATOR`, such as `k = 1 | k = -1`.
     """
 
     variable_change: str = ""
@@ -563,8 +563,8 @@ class FormulaDecision:
 
     - it puts several rows of 1 source that are obviously 1 function into 1 formula;
     - it gives 1 row's formula a different variable from that of the row's `f`;
-    - for several rows that print 1 function, each with its own values of a parameter, it writes that function with the
-      parameter as a name.
+    - for several rows whose functions differ only in the values of some constants or parameters, it writes those
+      functions as 1 function, with each such value as a parameter.
 
     `function_decision` holds the variable change and the family form, as a `FunctionDecision`.
     """

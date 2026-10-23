@@ -195,10 +195,10 @@ A join or split can also come from formulas that an earlier regeneration appende
 
 `row_ids` separates the formula's rows by ` | `, and `reason` says why the rows are 1 function, or how the formula in the new variable reproduces the source's results. A line of 1 row must give a `variable_change`, and a row is in at most 1 line.
 
-**A line whose rows print 1 function, each row with its own values of some parameters, gives the formula's function**, which the formula modules need (§ Formula modules):
+**A line whose rows print functions that differ only in the values of some constants or parameters gives the formula's function**, which the formula modules need (§ Formula modules):
 
-- `f` is the rows' function in its family form, with each value that differs between the rows as a parameter, such as `x^3 - a`. A parameter is not named `c`, which every formula uses for its shift along x.
-- `parameters` gives each row's values of those parameters, in the order of `row_ids` and separated by ` | `, such as `a = 1 | a = -1`.
+- `f` is the rows' function in its family form, with each value that differs between the rows as a parameter, such as `x^3 - k`. A parameter is named neither `c`, which every formula uses for its shift along x, nor `a` or `b`, which name the bounds of the formula's interval.
+- `parameters` gives each row's values of those parameters, in the order of `row_ids` and separated by ` | `, such as `k = 1 | k = -1`.
 
 A line gives both or neither; a line whose rows give the same function and differ only in their intervals gives neither, and the formula takes the `f` of its first row.
 
@@ -221,7 +221,7 @@ uv run python -m scripts.literature_test_problems.formula_modules <source id> ..
 For each source named, the script writes the source's package and its formula modules, and rewrites the `__init__.py` of each subcategory. A generated formula module:
 
 - evaluates the formula's function at `x - (b - a)*c`, where `[a, b]` is the formula's interval: the formula's `c` shifts the function along x by a multiple of the interval's width. The function is the `f` of the formula's first row, as the source prints it, unless the formula's line in `formulas.csv` gives an `f`;
-- lists the formula's published test functions in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds as 2 more parameters, `a` and `b`;
+- lists the formula's published test functions in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds as 2 more parameters, `a` and `b`. A source's own parameters `a` and `b` become `a_` and `b_` in every formula, so that `a` and `b` always name the bounds of the interval;
 - names its source in a `FormulaSource`: the source's `reference`, and the keys of the formula's rows as the location;
 - holds test cases whose expected values mpmath computes from the function;
 - holds `SURVEY_FIELDS_HASH`, a hash of the fields that the module depends on: the source's `title` and `reference`, the formula's `variable_change`, `f` and `parameters` in `formulas.csv`, and the fields of its rows, so that the hash changes with each change of those fields.
@@ -234,6 +234,10 @@ For each source named, the script writes the source's package and its formula mo
 - **Several sets,** separated by `;`, where the same parameter gets values in more than 1 set: each set names its intervals after `on`, as in `` on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)12`; on `[-0.95, 4.05]`: `a = 1`, `n = 8(2)14` ``, unless the row gives only 1 interval.
 
 For a formula of several rows, the script checks that each row's own `f`, at that row's values, gives the formula's function.
+
+**A value that needs more significant digits than a parameter value holds,** such as `pi`, is rounded to `CANONICAL_DIGITS` significant digits, the most that a parameter value holds; this applies to a parameter value and to a bound of a formula with several intervals.
+
+The module's docstring names each rounded value, and its test cases evaluate the function at the rounded value.
 
 **A test case whose function is ill-conditioned,** such as `sin(x*10^6)`, gets a wider `atol`, which `FormulaModuleSpec._find_case` in `scripts/literature_test_problems/formula_modules.py` sets:
 

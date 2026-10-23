@@ -130,4 +130,4 @@ notes = "Section 4 names examples 17 and 18 as cases where `f'(x*) = 0`, on whic
 key = '18'
 f = 'x^5'
 interval = '[-0.5, 1/3]'
-notes = 'See example 17.'
+notes = "Section 4 names examples 17 and 18 as cases where `f'(x*) = 0`, on which the methods may converge slowly."

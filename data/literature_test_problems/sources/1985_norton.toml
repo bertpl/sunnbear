@@ -12,10 +12,10 @@ transcribed_from = "the article, a scan, read from the page images; the driver's
 rows_summary = "14: the article's 12 functions, the random polynomials of Table VI, and the driver's function."
 
 [[relations]]
-sources = ['1975_bus_dekker']
+sources = ['1975_bus_dekker', '1973_anderson_bjorck']
 text = '''
 - Functions 8–12 are the Groups II–IV of Bus & Dekker (1975), with the same values of `a`, `b` and `n`; Anderson & Björck (1973) hold none of them.
-- Functions 1–6 follow the expressions that Bus & Dekker print (function 5 without Anderson & Björck's leading `1 +`); function 7 is in neither.
+- Functions 1–6 follow the expressions that Bus & Dekker print (function 5 without Anderson & Björck's leading `1 +`). Function 7 is not in Bus & Dekker; it is Anderson & Björck's Ex. 7, with `n = 2, 5, 10, 20` in place of their `n = 2, 5, 15, 20`.
 - The file of Bus & Dekker, `1975_bus_dekker`, lists the differences in `n` and in the intervals.
 '''
 

@@ -1,12 +1,12 @@
 title = 'Kumar, Srivastav (2026): randomized bracketing method'
-reference = "Kumar, D., Srivastav, S. K. (2026). A randomized bracketing method for derivative-free root finding with uniform spacing contraction. Research Square preprint. https://doi.org/10.21203/rs.3.rs-10070193/v1. The article's supplementary material holds the authors' code."
+reference = "Kumar, D., Srivastav, S. K. (2026). A randomized bracketing method for derivative-free root finding with uniform spacing contraction. Research Square preprint. https://doi.org/10.21203/rs.3.rs-10070193/v1. The article's Data Availability statement offers the authors' scripts from the corresponding author on request."
 year = 2026
 subcategory = '1.2'
 where_in_source = '''
-- Table 3 (Section 5.2) lists 6 functions `f1` to `f6`, each with its root and initial interval. `f1` to `f5` are the main test set of Tables 4 to 7 and Figs. 2 to 5; `f6` is an exploratory non-monotone example, for which no table or figure gives results.
+- Table 3 (Section 5.2) lists 6 functions `f1` to `f6`, each with its root and initial interval. `f1` to `f5` are the main test set of Tables 4 to 7 and Figs. 2 to 5, although Table 6, whose caption names all 5, prints rows for `f1` only; `f6` is an exploratory non-monotone example, for which no table or figure gives results.
 - Appendix A.2 runs `g(x) = x - e^-x` on `[0, 1]` with random noise added to each evaluation (Table 8).
 '''
-transcribed_from = "the article (text layer), with Table 3 checked against its page image. The authors' code in the supplementary material was not read."
+transcribed_from = "the article (text layer), with Table 3 checked against its page image. The authors' code is not public, so it was not read."
 rows_summary = "7: Table 3's 6 functions and the noisy function of Appendix A.2."
 notes = "Keys are the article's labels, and `A.2` for the function of Appendix A.2."
 
