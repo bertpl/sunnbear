@@ -54,17 +54,21 @@ UNTRANSLATABLE_FORMULAS = {
     "f1.2.19.6": "noise of a stated distribution, which the module takes from `normal_noise`",
     "f1.2.20.2": "a normal cumulative distribution function with a mean and a variance, `Phi(x; mu, sigma^2)`",
     "f1.2.20.3": "parameters given as sets, `{a0, a1, a2, a3, m} = {...}`",
-    "f1.4.1.7": "a removable singularity at its root `x = 1`, where the expression divides by 0",
+    "f1.4.1.7": (
+        "a removable singularity at its root `x = 1`, where the expression divides by 0 and the formula needs the "
+        "limit 0"
+    ),
     "f1.4.4.7": (
-        "constants named in words, the initial investment, the monthly deposit and the goal, with 3 sets of values"
+        "constants named in words (the initial investment, the monthly deposit and the goal), with several sets of "
+        "values"
     ),
     "f1.4.6.6": "a change of its variable to the pH, as `f(10^-pH)`",
     "f1.4.6.7": "a parameter given as a ratio, `q/q0 = 0.01`",
     "f1.4.6.8": "a parameter defined by a formula of the other parameters, `Re = rho*V*D/mu`",
     "f1.4.6.9": "a variable named `f`, and a parameter defined by a formula of the other parameters, `Re = rho*V*D/mu`",
     "f1.4.6.22": (
-        "helper variables of the unknown `y` that the row lists among its parameters, `B = 3 + y` and "
-        "`Ac = 3*y + y^2/2`"
+        "variables that depend on the unknown `y`, `B = 3 + y` and `Ac = 3*y + y^2/2`, which the row lists among its "
+        "parameters"
     ),
     "f1.4.6.24": "a change of its variable to the temperature `T` in °C, as `f(T + 273.15)`",
     "f1.4.7.1": "a variable named `lambda`, a keyword of Python",
@@ -358,7 +362,7 @@ class FormulaModuleSpec:
         if not parameters_text:
             return f"``{row.f}``; {intervals_clause}"
         elif parameters_text.startswith("on "):
-            return f"``{row.f}``, with the parameters of each interval: {parameters_text}; {intervals_clause}"
+            return f"``{row.f}``, with the parameters given per interval, {parameters_text}; {intervals_clause}"
         elif "`" in parameters_text:
             return f"``{row.f}``, with the parameters {parameters_text}; {intervals_clause}"
         else:
@@ -450,6 +454,11 @@ class FormulaModuleSpec:
         else:
             return ParamNotation.DECIMAL.build_value_from_argument(number), True
 
+    @staticmethod
+    def _exact_text(value: sp.Expr) -> str:
+        """Return a published value's text as the survey writes it: Euler's number as e, where sympy prints E."""
+        return str(sp.sympify(value).subs(sp.E, sp.Symbol("e")))
+
     @classmethod
     def _find_case(
         cls,
@@ -530,16 +539,17 @@ class FormulaModuleSpec:
 
         The tolerances are, from the strictest:
 
-        - rank 0: for an expected value of at least `CASE_SMALL_VALUE`, `CASE_RTOL` and `CASE_ATOL`, with no `atol` of
-          its own; for a smaller one, `CASE_RTOL` alone, with an `atol` of 0, so that the test compares the values
-          relatively;
+        - rank 0: `CASE_RTOL` and `CASE_ATOL`, with no `atol` of the case's own, for an expected value of at least
+          `CASE_SMALL_VALUE`; `CASE_RTOL` alone, with an `atol` of 0, for a smaller expected value, so that the test
+          compares the values relatively;
         - rank 1: the function's spread over `CASE_X_ULPS` float64 steps of x, with an `atol` of 10 times that spread,
           since float64 arithmetic cannot do better there;
         - rank 2: `CASE_ROUNDING_UNITS` times 2^-53 times the summed magnitude of the function's terms
           (`term_magnitude_function`), with an `atol` of twice that bound: the function's terms cancel there, and
           float64 cannot evaluate it better;
-        - rank 3: for an expected value below `CASE_SMALL_VALUE`, `CASE_RTOL` and `CASE_ATOL`, with no `atol` of its
-          own: the generic test's default `atol` then accepts any value near 0, so the case tests little.
+        - rank 3: `CASE_RTOL` and `CASE_ATOL`, with no `atol` of the case's own, for an expected value below
+          `CASE_SMALL_VALUE`: the generic formula test's default `atol` then accepts any value near 0, so the case tests
+          little.
         """
         is_small = abs(expected) < CASE_SMALL_VALUE
         if is_small and math.isclose(python_value, expected, rel_tol=CASE_RTOL, abs_tol=0.0):
@@ -663,8 +673,7 @@ class FormulaModuleSpec:
             value, is_rounded = cls._parameter_value(exact_value)
             values.append(value)
             if is_rounded:
-                # sympy prints Euler's number as E; the survey writes e
-                exact_texts_of_rounded_values.append(str(sp.sympify(exact_value).subs(sp.E, sp.Symbol("e"))))
+                exact_texts_of_rounded_values.append(cls._exact_text(exact_value))
                 mpmath_parameter_values[name] = sp.Rational(repr(value))
             else:
                 mpmath_parameter_values[name] = exact_value
@@ -676,7 +685,7 @@ class FormulaModuleSpec:
                 bound, is_rounded = cls._parameter_value(exact_bound)
                 bounds.append(bound)
                 if is_rounded:
-                    exact_texts_of_rounded_values.append(str(exact_bound.subs(sp.E, sp.Symbol("e"))))
+                    exact_texts_of_rounded_values.append(cls._exact_text(exact_bound))
             bounds = tuple(bounds)
             values += bounds
         else:
@@ -716,7 +725,8 @@ class FormulaModuleSpec:
                 published_test_function, has_interval_parameters
             )
             if values in tuples:
-                # a test function that an earlier row or set of values already gives adds no tuple and no case
+                # 2 rows, or 2 sets of values of 1 row, can give the same test function; its tuple and cases would only
+                # repeat the earlier ones
                 continue
             exact_texts_of_rounded_values += test_function_exact_texts_of_rounded_values
             tuples.append(values)
@@ -788,22 +798,28 @@ def formula_names(keys: list[str]) -> list[str]:
     rows do; the formula's `location` keeps them all.
 
     So that a key of many locations does not make a long name, the name is the key up to the end of its first location.
-    While the names of several formulas of the source give module names that differ only in their number, each of
-    those names takes its key's next location too. Names can still give module names that differ only in their number,
-    when their keys run out of locations.
+    While the names of several formulas of the source give module names that differ only in their `fNN` prefix, each
+    of those names takes its key's next location too.
+
+    Names can still give module names that differ only in their `fNN` prefix, when their keys have no further location.
 
     Args:
         keys: The key of each formula of the source, in the order of the formulas.
     """
     # re.split with a group keeps the separators, so that a name is the key's own text: location, separator, location
-    pieces = [re.split(r"([;,])", key) for key in keys]
+    locations_and_separators = [re.split(r"([;,])", key) for key in keys]
     n_locations_in_name = [1] * len(keys)
     while True:
-        names = ["".join(parts[: 2 * n - 1]).strip() for parts, n in zip(pieces, n_locations_in_name, strict=True)]
+        names = [
+            "".join(key_parts[: 2 * n - 1]).strip()
+            for key_parts, n in zip(locations_and_separators, n_locations_in_name, strict=True)
+        ]
         slugs = [slugify(name) for name in names]
         duplicate_slugs = {slug for slug in slugs if slugs.count(slug) > 1}
         extendable_indices = [
-            i for i, slug in enumerate(slugs) if slug in duplicate_slugs and 2 * n_locations_in_name[i] < len(pieces[i])
+            i
+            for i, slug in enumerate(slugs)
+            if slug in duplicate_slugs and 2 * n_locations_in_name[i] < len(locations_and_separators[i])
         ]
         if extendable_indices:
             for i in extendable_indices:
@@ -914,7 +930,10 @@ def write_source_package(source: Source, formulas_table_lines: list[FormulasTabl
 
 
 def is_hand_written(survey_formula: SurveyFormula) -> bool:
-    """Return whether a formula's module is written by hand: a row has no `f`, or it is in `UNTRANSLATABLE_FORMULAS`."""
+    """Return whether a formula's module is written by hand.
+
+    A formula's module is written by hand when a row has no `f`, or when the formula is in `UNTRANSLATABLE_FORMULAS`.
+    """
     has_description = any(row.f_description for row in survey_formula.rows)
     return has_description or survey_formula.formulas_table_line.formula_id in UNTRANSLATABLE_FORMULAS
 

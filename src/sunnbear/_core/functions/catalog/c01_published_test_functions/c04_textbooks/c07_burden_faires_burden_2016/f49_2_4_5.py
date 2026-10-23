@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "eb7f49abeaea758b"
+SURVEY_FIELDS_HASH = "df9248d509af50f7"
 
 
 class BurdenFairesBurden2016245(Formula):
@@ -21,8 +21,8 @@ class BurdenFairesBurden2016245(Formula):
     interval is ``[-1, 0]``.
 
     2.4-1(d) with its coefficients rounded to 4 digits, as the book says. Newton and the modified Newton method (2.13)
-    to `1E-5`, compared with the results of 2.4-1(d) and 2(d). The book's 2(d) is most likely a slip for 3(d), the
-    modified Newton method on 2.4-1(d), because 2.4-2(d) is an unrelated function.
+    to `1E-5`, compared with the results of 2.4-1(d) and of the book's "2(d)". That "2(d)" is most likely a slip for
+    2.4-3(d), the modified Newton method on 2.4-1(d), because 2.4-2(d) is an unrelated function.
     """
 
     number = (1, 4, 7, 49)

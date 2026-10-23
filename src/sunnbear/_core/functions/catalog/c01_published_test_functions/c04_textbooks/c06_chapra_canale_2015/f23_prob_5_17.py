@@ -12,7 +12,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "0f3e68a2bd4b21d1"
+SURVEY_FIELDS_HASH = "e8a0bbd2a842e2a4"
 
 
 class ChapraCanale2015Prob517(Formula):
@@ -24,10 +24,10 @@ class ChapraCanale2015Prob517(Formula):
     Unknown `h`, the depth of water in a spherical tank of radius `R`: 3 false-position iterations on `[0, R]` (5.17); 3
     Newton iterations from `h0 = R`, which the book says always converges (6.19). Prob. 8.9 asks for `h` at `R = 1` m
     (written `r`) and `V = 0.5` m^3, and gives no interval or starting point. In Prob. 5.19, `h` is the height above
-    water of a floating sphere, by bisection, with no interval: the problem gives `r = 1` m, the densities `rho_s = 200`
-    and `rho_w = 1000` kg/m^3 of the sphere and the water, the volume of the cap above water, and Archimedes' principle,
-    so that `R = 1` m and `V = (4/3)*pi*r^3*(1 - rho_s/rho_w) = 3.35103216383` m^3; the book does not print that value
-    of `V`. Prob. 8.10 gives 2 fixed-point forms.
+    water of a floating sphere, which the problem asks for by bisection, with no interval. The problem gives `r = 1` m,
+    the densities `rho_s = 200` and `rho_w = 1000` kg/m^3 of the sphere and the water, the volume of the cap above
+    water, and Archimedes' principle, so that `R = 1` m and `V = (4/3)*pi*r^3*(1 - rho_s/rho_w) = 3.35103216383` m^3;
+    the book does not print that value of `V`. Prob. 8.10 gives 2 fixed-point forms.
     """
 
     number = (1, 4, 6, 23)

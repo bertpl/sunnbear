@@ -223,7 +223,7 @@ For each source named, the script writes the source's package and its formula mo
 - evaluates the formula's function at `x - (b - a)*c`, where `[a, b]` is the formula's interval: the formula's `c` shifts the function along x by a multiple of the interval's width. The function is the `f` of the formula's first row, as the source prints it, unless the formula's line in `formulas.csv` gives an `f`;
 - lists the formula's published test functions in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds as 2 more parameters, `a` and `b`. A source's own parameters `a` and `b` become `a_` and `b_` in every formula, so that `a` and `b` always name the bounds of the interval;
 - names its source in a `FormulaSource`: the source's `reference`, and the keys of the formula's rows as the location;
-- takes its name, and its module and class names, from the key of the formula's first row. Where the key lists several locations, separated by `;` or `,`, the name ends after the first location; while the names of several formulas of the source would give module names that differ only in their number, each of those names takes its key's next location too;
+- takes its name, and its module and class names, from the key of the formula's first row. Where the key lists several locations, separated by `;` or `,`, the name ends after the first location; while the names of several formulas of the source would give module names that differ only in their `fNN` prefix, each of those names takes its key's next location too;
 - holds test cases whose expected values mpmath computes from the function;
 - holds `SURVEY_FIELDS_HASH`, a hash of the fields that the module depends on: the source's `title` and `reference`, the formula's `variable_change`, `f` and `parameters` in `formulas.csv`, and the fields of its rows, so that the hash changes with each change of those fields.
 
@@ -245,7 +245,7 @@ The module's docstring names each rounded value, and its test cases evaluate the
 - its expected value is at least `CASE_SMALL_VALUE`;
 - the function's value changes by more than `CASE_MIN_RELATIVE_CHANGE` of itself when x moves by `CASE_X_STEP_FRACTION` of the interval's width.
 
-A case whose expected value stays below `CASE_SMALL_VALUE`, and whose Python value agrees with mpmath's within `CASE_RTOL` alone, gets `atol=0.0`, because the default `atol` would accept any value near 0.
+A case whose expected value stays below `CASE_SMALL_VALUE`, and whose Python value agrees with mpmath's within `CASE_RTOL` alone, gets `atol=0.0`, because the default `atol` would accept any value near 0. Where its Python value does not agree that closely, the case gets a wider `atol` for 1 of the 2 reasons below, or else no `atol` of its own; the script keeps such a case only where no x-value that it tries gives a case that meets a stricter tolerance.
 
 **A test case whose function cannot be evaluated in float64 to within `CASE_ATOL`** gets a wider `atol`, which `FormulaModuleSpec._case_tolerance` in `scripts/literature_test_problems/formula_modules.py` sets, for 1 of 2 reasons:
 

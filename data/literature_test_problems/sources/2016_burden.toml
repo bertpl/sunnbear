@@ -626,7 +626,7 @@ notes = "As 2.4-2(a). The book prints the first term as `x^2`, a misprint: as pr
 key = '2.4-2(c)'
 f = 'sin(x)^3 + 3*exp(-2*x)*sin(x) - 3*exp(-x)*sin(x)^2 - exp(-3*x)'
 interval = '[3, 4]'
-notes = "As 2.4-2(a). The book prints `sin 3x` and `sin 2x`, misprints for `sin(x)^3` and `sin(x)^2`: with them the 4 terms are the expansion of `(sin(x) - exp(-x))^3`, the cube of 2.3-6(f)'s function on the same `[3, 4]`, with a triple root at 3.096364, and every other part of 2.4-1 and 2.4-2 has a multiple root too (2.4-2(b) once its misprint is corrected). As printed, the function has a simple root at 3.141568."
+notes = "As 2.4-2(a). The book prints `sin 3x` and `sin 2x`, misprints for `sin(x)^3` and `sin(x)^2`: with them the 4 terms are the expansion of `(sin(x) - exp(-x))^3`, the cube of 2.3-6(f)'s function on the same `[3, 4]`, with a triple root at 3.096364. Every other part of 2.4-1 and 2.4-2 has a multiple root too (2.4-2(b) once its misprint is corrected). As printed, the function has a simple root at 3.141568."
 
 [[rows]]
 key = '2.4-2(d)'
@@ -638,7 +638,7 @@ notes = "As 2.4-2(a). It equals `(exp(x) - 3*x^2)^3`, the cube of 2.3-6(e)'s fun
 key = '2.4-5'
 f = 'exp(6*x) + 1.441*exp(2*x) - 2.079*exp(4*x) - 0.3330'
 interval = '[-1, 0]'
-notes = "2.4-1(d) with its coefficients rounded to 4 digits, as the book says. Newton and the modified Newton method (2.13) to `1E-5`, compared with the results of 2.4-1(d) and 2(d). The book's 2(d) is most likely a slip for 3(d), the modified Newton method on 2.4-1(d), because 2.4-2(d) is an unrelated function."
+notes = "2.4-1(d) with its coefficients rounded to 4 digits, as the book says. Newton and the modified Newton method (2.13) to `1E-5`, compared with the results of 2.4-1(d) and of the book's \"2(d)\". That \"2(d)\" is most likely a slip for 2.4-3(d), the modified Newton method on 2.4-1(d), because 2.4-2(d) is an unrelated function."
 
 [[rows]]
 key = '2.4-D2'

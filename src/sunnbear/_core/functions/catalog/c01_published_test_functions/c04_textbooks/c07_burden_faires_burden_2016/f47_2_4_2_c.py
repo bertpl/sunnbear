@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "f13b79b650e76c01"
+SURVEY_FIELDS_HASH = "4dc24f9672a6221c"
 
 
 class BurdenFairesBurden2016242C(Formula):
@@ -22,7 +22,7 @@ class BurdenFairesBurden2016242C(Formula):
 
     As 2.4-2(a). The book prints `sin 3x` and `sin 2x`, misprints for `sin(x)^3` and `sin(x)^2`: with them the 4 terms
     are the expansion of `(sin(x) - exp(-x))^3`, the cube of 2.3-6(f)'s function on the same `[3, 4]`, with a triple
-    root at 3.096364, and every other part of 2.4-1 and 2.4-2 has a multiple root too (2.4-2(b) once its misprint is
+    root at 3.096364. Every other part of 2.4-1 and 2.4-2 has a multiple root too (2.4-2(b) once its misprint is
     corrected). As printed, the function has a simple root at 3.141568.
     """
 

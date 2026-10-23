@@ -10,7 +10,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "26aeb23d3442322b"
+SURVEY_FIELDS_HASH = "71ee87bec6409748"
 
 
 class Bradie20062P55(Formula):
@@ -22,8 +22,8 @@ class Bradie20062P55(Formula):
     Unknown `h`, the depth to which a sphere of radius `R` and density `rho_o` sinks in a fluid of density `rho_f`; the
     derivation assumes the sphere is not fully submerged. False position on `(0, 10)` with tolerance `5E-5` gives `p5 =
     2.3043353119`. 2.2-15 reworks the problem for a glass marble, `R = 2`, `rho_o = 0.040`, `rho_f = 0.998`, and gives
-    no interval. Its physical root is about 0.48212. On `(0, 10)` that cubic has no sign change: it also has the root
-    5.96394 there, beyond the marble's diameter `2*R = 4`, where the derivation no longer holds.
+    no interval. The marble's cubic has its physical root at about 0.48212, but no sign change on `(0, 10)`: the cubic
+    also has the root 5.96394 there, beyond the marble's diameter `2*R = 4`, where the derivation no longer holds.
     """
 
     number = (1, 4, 4, 1)

@@ -43,7 +43,8 @@ class ChapraCanale201584823(Formula):
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - 0.07200000000000001 * c
-        # the formula is the difference form of the fixed-point equation f = g(f), with Section 8.4's values
+        # the formula is the difference form x - 0.25/(...)^2 of the fixed-point equation (8.23), with the values
+        # of Section 8.4's example
         diameter, eps = 0.005, 1.5e-6
         reynolds = 1.23 * 40.0 * diameter / 1.79e-5
         return x - 0.25 / math.log10(eps / (3.7 * diameter) + 2.51 / (reynolds * math.sqrt(x))) ** 2

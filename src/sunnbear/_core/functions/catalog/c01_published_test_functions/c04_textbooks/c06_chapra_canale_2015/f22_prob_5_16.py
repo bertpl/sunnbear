@@ -2,8 +2,8 @@
 
 The formula comes from the row with the key ``Prob. 5.16`` in the survey of published test problems. The survey gives
 this function as 1 expression that the module generator, `scripts/literature_test_problems/formula_modules.py`, cannot
-translate: helper variables of the unknown `y` that the row lists among its parameters, `B = 3 + y` and `Ac = 3*y +
-y^2/2`. A person therefore writes this module, and a change of the formula's row in
+translate: variables that depend on the unknown `y`, `B = 3 + y` and `Ac = 3*y + y^2/2`, which the row lists among its
+parameters. A person therefore writes this module, and a change of the formula's row in
 `data/literature_test_problems/sources/` needs a change of this module.
 """
 

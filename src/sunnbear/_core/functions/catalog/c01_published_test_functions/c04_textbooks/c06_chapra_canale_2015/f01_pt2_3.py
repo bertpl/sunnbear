@@ -18,8 +18,8 @@ SURVEY_FIELDS_HASH = "6c888e0ceacf78be"
 class ChapraCanale2015Pt23(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The survey writes the source's function as ``(g*m/c)*(1 - exp(-(c/m)*t)) - v``, with the parameters of each
-    interval: on `[12, 16]`, `[4, 20]`: `g = 9.81` m/s^2, `m = 68.1` kg, `v = 40` m/s, `t = 10` s (Ex. 5.1); on `[3,
+    The survey writes the source's function as ``(g*m/c)*(1 - exp(-(c/m)*t)) - v``, with the parameters given per
+    interval, on `[12, 16]`, `[4, 20]`: `g = 9.81` m/s^2, `m = 68.1` kg, `v = 40` m/s, `t = 10` s (Ex. 5.1); on `[3,
     5]`: `m = 82`, `v = 36`, `t = 4` (Prob. 5.14); the formula's intervals are `[12, 16]` (Ex. 5.3, 5.5); `[3, 5]`
     (Prob. 5.14); `[4, 20]` (Fig. 5.1).
 

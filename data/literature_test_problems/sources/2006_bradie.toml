@@ -34,7 +34,7 @@ f = '(rho_f/3)*h^3 - R*rho_f*h^2 + (4/3)*R^3*rho_o'
 name = 'depth of submersion'
 parameters = '`R = 5` cm, `rho_o = 0.120`, `rho_f = 0.890` g/cm^3 (§2.2)'
 interval = '`(0, 10)` (§2.2)'
-notes = "Unknown `h`, the depth to which a sphere of radius `R` and density `rho_o` sinks in a fluid of density `rho_f`; the derivation assumes the sphere is not fully submerged. False position on `(0, 10)` with tolerance `5E-5` gives `p5 = 2.3043353119`. 2.2-15 reworks the problem for a glass marble, `R = 2`, `rho_o = 0.040`, `rho_f = 0.998`, and gives no interval. Its physical root is about 0.48212. On `(0, 10)` that cubic has no sign change: it also has the root 5.96394 there, beyond the marble's diameter `2*R = 4`, where the derivation no longer holds."
+notes = "Unknown `h`, the depth to which a sphere of radius `R` and density `rho_o` sinks in a fluid of density `rho_f`; the derivation assumes the sphere is not fully submerged. False position on `(0, 10)` with tolerance `5E-5` gives `p5 = 2.3043353119`. 2.2-15 reworks the problem for a glass marble, `R = 2`, `rho_o = 0.040`, `rho_f = 0.998`, and gives no interval. The marble's cubic has its physical root at about 0.48212, but no sign change on `(0, 10)`: the cubic also has the root 5.96394 there, beyond the marble's diameter `2*R = 4`, where the derivation no longer holds."
 
 [[rows]]
 key = '§2 (p. 56)'
