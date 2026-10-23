@@ -269,7 +269,7 @@ The script stops and names each formula that it cannot generate. It cannot gener
 
 After a change of a source file, regenerate the modules of its formulas: the tests recompute each module's `SURVEY_FIELDS_HASH` from the source files, so that a module that was not regenerated fails the tests.
 
-**When a formula retires, delete its module and its import in the source's `__init__.py` by hand,** then regenerate the source's modules. The script imports sunnbear's catalog, so the script stops as long as an `__init__.py` still imports a deleted module.
+**When a formula retires, delete its module and its import in the source's `__init__.py` by hand,** then regenerate the source's modules. The script imports sunnbear's catalog, so it fails with an import error while an `__init__.py` still imports a deleted module.
 
 ## Adding a source
 
