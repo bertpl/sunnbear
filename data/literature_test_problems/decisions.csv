@@ -44,6 +44,7 @@ row_id,status,duplicate_of,derived_from,reason
 "2015_chapra:§8.1, (8.3), Table 8.1; Prob. 8.1",incomplete,,2006_bradie:§2 (p. 54); §2.4 (p. 102),"no interval: Bradie (2006)'s van der Waals equation per mole (n = 1), for other gases, solved by Newton from the ideal-gas volume `R*T/p` without an interval."
 "2015_chapra:§8.3, (8.19), (8.20), Fig. 8.4",new,,,"Complete, because `q/q0 = 0.01` gives the ratio, the only form in which `q` and `q0` enter the function, and no earlier row has this RLC circuit equation."
 "2015_chapra:§8.4, (8.23), Fig. 8.6",new,,"2015_chapra:§8.4, (8.21), Fig. 8.5; Prob. 8.13",Fixed-point form of the Colebrook row (8.21); f - g(f) has the same root but other values.
+"2015_chapra:Prob. 5.12, 6.12",incomplete,,,"no root-finding problem: both problems seek the function's maximum on `[0, 1]`, where the function has no zero."
 2015_chapra:Prob. 5.16,new,,,"Critical depth of a trapezoidal channel, with `B = 3 + y` and `Ac = 3*y + y^2/2`; no earlier row has this function."
 2015_chapra:Prob. 6.26,incomplete,,2015_chapra:Prob. 6.25,"no interval: the problem gives only the initial guesses `2 < c < 6` for this fixed-point form of Prob. 6.25's equation, which has no interval either."
 2015_chapra:Prob. 6.26#2,incomplete,,2015_chapra:Prob. 6.25,"no interval: the problem gives only the initial guesses `2 < c < 6`, and c - g(c) is Prob. 6.25's function divided by -Q."
