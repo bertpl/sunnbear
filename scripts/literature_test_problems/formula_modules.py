@@ -20,6 +20,7 @@ import hashlib
 import json
 import keyword
 import math
+import re
 import subprocess
 import sys
 import textwrap
@@ -53,6 +54,14 @@ UNTRANSLATABLE_FORMULAS = {
     "f1.2.19.6": "noise of a stated distribution, which the module takes from `normal_noise`",
     "f1.2.20.2": "a normal cumulative distribution function with a mean and a variance, `Phi(x; mu, sigma^2)`",
     "f1.2.20.3": "parameters given as sets, `{a0, a1, a2, a3, m} = {...}`",
+    "f1.4.4.7": "5 sets of its constants, given in words as initial investment, monthly deposit and goal",
+    "f1.4.6.6": "a change of its variable, to the pH of `f(10^-pH)`",
+    "f1.4.6.7": "a parameter given as a ratio, `q/q0 = 0.01`",
+    "f1.4.6.8": "a parameter that a formula of the others defines, `Re = rho*V*D/mu`",
+    "f1.4.6.9": "parameters given by a reference to another row, and a variable named `f`",
+    "f1.4.6.22": "helper variables that the row's parameters define, `B = 3 + y` and `Ac = 3*y + y^2/2`",
+    "f1.4.6.24": "a change of its variable, to the temperature `T` of `f(T + 273.15)`",
+    "f1.4.7.1": "a variable named `lambda`, a keyword of Python",
 }
 # CASE_FRACTIONS are the positions in the interval, as fractions of its width, at which the cases are tried, in
 # order; of the positions whose cases meet the strictest tolerance, `FormulaModuleSpec._find_case` keeps the first where
@@ -133,8 +142,8 @@ class FormulaModuleSpec:
     exact_texts_of_rounded_values: tuple[str, ...]
     cases: tuple[str, ...]
 
-    def module_text(self) -> str:
-        """Return the formula's module as Python source, before ruff formats it."""
+    def module_text(self, name: str) -> str:
+        """Return the formula's module as Python source, before ruff formats it; `name` is from `formula_names`."""
         source, rows = self.survey_formula.source, self.survey_formula.rows
         location = ", ".join(row.key for row in rows)
         command = f"uv run python -m scripts.literature_test_problems.formula_modules {source.source_id}"
@@ -162,7 +171,7 @@ class FormulaModuleSpec:
             interval_width_code = "(b - a)"
         else:
             interval_width_code = repr(self.interval[1] - self.interval[0])
-        class_name = source_category_class_name(source) + _camel_case(slugify(rows[0].key))
+        class_name = source_category_class_name(source) + _camel_case(slugify(name))
         signature = "".join(f", {name}: float" for name in self.param_names)
         return "\n".join(
             [
@@ -185,11 +194,11 @@ class FormulaModuleSpec:
                 textwrap.indent(_docstring(self._class_docstring(), width=DOCSTRING_WIDTH), "    "),
                 "",
                 f"    number = {self.survey_formula.formulas_table_line.number!r}",
-                f"    name = {rows[0].key!r}",
+                f"    name = {name!r}",
                 f"    param_names = {self.param_names!r}",
                 "    source = FormulaSource(",
                 f"        reference={_string_code(source.reference, width=90)},",
-                f"        location={location!r},",
+                f"        location={_string_code(location, width=90)},",
                 "    )",
                 "",
                 "    @staticmethod",
@@ -753,6 +762,32 @@ def source_category_class_name(source: Source) -> str:
     return _camel_case(slugify(source.short_title))
 
 
+def formula_names(keys: list[str]) -> list[str]:
+    """Return the name of each formula of a source, which its module and its class are named after.
+
+    A formula's key, the key of its first row, may list several locations, separated by `;` or `,`, as a textbook's
+    rows do; the formula's `location` keeps them all. The name is the key up to the end of its first location, extended
+    by the next location while another formula of the source has a name of the same slug, so that a key of many
+    locations does not make a long name.
+
+    Args:
+        keys: The key of each formula of the source, in the order of the formulas.
+    """
+    # re.split with a group keeps the separators, so that a name is the key's own text: location, separator, location
+    pieces = [re.split(r"([;,])", key) for key in keys]
+    n_locations = [1] * len(keys)
+    while True:
+        names = ["".join(parts[: 2 * n - 1]).strip() for parts, n in zip(pieces, n_locations, strict=True)]
+        slugs = [slugify(name) for name in names]
+        shared_slugs = {slug for slug in slugs if slugs.count(slug) > 1}
+        extendable = [i for i, slug in enumerate(slugs) if slug in shared_slugs and 2 * n_locations[i] < len(pieces[i])]
+        if extendable:
+            for i in extendable:
+                n_locations[i] += 1
+        else:
+            return names
+
+
 def source_package_text(source: Source, formulas_table_lines: list[FormulasTableLine], module_names: list[str]) -> str:
     """Return the `__init__.py` of a source's category package, which imports every formula module of the source."""
     class_name = source_category_class_name(source)
@@ -826,10 +861,11 @@ def write_source_package(source: Source, formulas_table_lines: list[FormulasTabl
     package_dir = subcategory_dir(source.subcategory) / package_name
     package_dir.mkdir(parents=True, exist_ok=True)
     written, module_names, problems = [], [], []
-    for formulas_table_line in formulas_table_lines:
-        survey_formula = SurveyFormula(formulas_table_line, source)
+    survey_formulas = [SurveyFormula(formulas_table_line, source) for formulas_table_line in formulas_table_lines]
+    names = formula_names([survey_formula.rows[0].key for survey_formula in survey_formulas])
+    for formulas_table_line, survey_formula, name in zip(formulas_table_lines, survey_formulas, names, strict=True):
         row = survey_formula.rows[0]
-        module_name = f"f{formulas_table_line.number[-1]:02d}_{slugify(row.key)}"
+        module_name = f"f{formulas_table_line.number[-1]:02d}_{slugify(name)}"
         path = package_dir / f"{module_name}.py"
         if is_hand_written(survey_formula):
             if not path.exists():
@@ -840,7 +876,7 @@ def write_source_package(source: Source, formulas_table_lines: list[FormulasTabl
             except GenerationError as error:
                 problems.append(f"{row.row_id}: {error}")
             else:
-                path.write_text(module_spec.module_text(), encoding="utf-8")
+                path.write_text(module_spec.module_text(name), encoding="utf-8")
                 written.append(path)
         module_names.append(module_name)
     if problems:

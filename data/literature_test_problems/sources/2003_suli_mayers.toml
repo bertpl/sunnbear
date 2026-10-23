@@ -34,7 +34,7 @@ notes = "No real root: the book's example of an equation without a solution in a
 [[rows]]
 key = '(1.2)'
 f = '1/2 - 1/(1 + M*abs(x - 1.05))'
-parameters = '`M = 200` (Fig. 1.1); `M = 2000, 20000, 200000, 2000000, 20000000` (Remark 1.1)'
+parameters = 'on `[0.8, 1.8]`: `M = 200` (Fig. 1.1), `M = 2000, 20000, 200000, 2000000, 20000000` (Remark 1.1); on `[1.04999, 1.05001]`: `M = 2000000, 20000000` (Remark 1.1)'
 interval = '`[0.8, 1.8]`; `[1.04999, 1.05001]`'
 notes = '2 roots, `1.05 - 1/M` and `1.05 + 1/M`, only `2/M` apart. Remark 1.1 replots it in Maple, on the smaller interval for the 2 largest `M`. A footnote in Section 1.6 (p. 28) notes that bisection applies although `f` is not differentiable at 1.05.'
 

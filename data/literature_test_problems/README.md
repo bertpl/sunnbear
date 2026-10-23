@@ -223,6 +223,7 @@ For each source named, the script writes the source's package and its formula mo
 - evaluates the formula's function at `x - (b - a)*c`, where `[a, b]` is the formula's interval: the formula's `c` shifts the function along x by a multiple of the interval's width. The function is the `f` of the formula's first row, as the source prints it, unless the formula's line in `formulas.csv` gives an `f`;
 - lists the formula's published test functions in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds as 2 more parameters, `a` and `b`. A source's own parameters `a` and `b` become `a_` and `b_` in every formula, so that `a` and `b` always name the bounds of the interval;
 - names its source in a `FormulaSource`: the source's `reference`, and the keys of the formula's rows as the location;
+- takes its name, and its module and class names, from the key of the formula's first row, up to the end of the key's first location where the key lists several, separated by `;` or `,`; the name takes the next location too while another formula of the source would get a name of the same slug;
 - holds test cases whose expected values mpmath computes from the function;
 - holds `SURVEY_FIELDS_HASH`, a hash of the fields that the module depends on: the source's `title` and `reference`, the formula's `variable_change`, `f` and `parameters` in `formulas.csv`, and the fields of its rows, so that the hash changes with each change of those fields.
 
@@ -254,7 +255,7 @@ A case whose expected value stays below `CASE_SMALL_VALUE`, and whose Python val
 The modules of 2 kinds of formulas are written by hand, and the script only imports them:
 
 - a formula with a row that gives only an `f_description`;
-- a formula in the script's `UNTRANSLATABLE_FORMULAS`, whose row's `f` the script cannot translate, such as an infinite sum.
+- a formula in the script's `UNTRANSLATABLE_FORMULAS`, whose row's `f` the script cannot translate, such as an infinite sum, or whose `variable_change` it cannot apply.
 
 The script stops and names each formula that it cannot generate. It cannot generate:
 
