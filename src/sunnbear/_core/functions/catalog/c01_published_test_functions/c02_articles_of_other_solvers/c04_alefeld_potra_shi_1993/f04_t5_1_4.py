@@ -15,8 +15,9 @@ SURVEY_FIELDS_HASH = "042d8d964f8ad28a"
 class AlefeldPotraShi1993T514(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The survey writes the source's function as ``x^n - a``, with the parameters on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)12`;
-    on `[0.95, 4.05]`: `a = 1`, `n = 8(2)14`; the formula's intervals are `[0, 5]`; `[0.95, 4.05]`.
+    The survey writes the source's function as ``x^n - a``, with the parameters given per interval, on `[0, 5]`: `a =
+    0.2, 1`, `n = 4(2)12`; on `[0.95, 4.05]`: `a = 1`, `n = 8(2)14`; the formula's intervals are `[0, 5]`; `[0.95,
+    4.05]`.
 
     The formula's parameter ``a_`` is the source's ``a``, renamed because ``[a, b]`` names the formula's interval.
 

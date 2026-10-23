@@ -65,7 +65,7 @@ row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instanc
 1989_atkinson:(2.6.6),1989,1.4,x = 6.28 + sin(x),,,,,1,incomplete,no interval,,incomplete,,,no interval
 1989_atkinson:§2.7 f_1,1989,1.4,x^2 - 3,,,,,1,incomplete,no interval,1989_atkinson:(2.5.3),incomplete,,1989_atkinson:(2.5.3),no interval
 1989_atkinson:§2.7 f_2,1989,1.4,9 + x^2*(x^2 - 6),,,,,1,incomplete,no interval,,incomplete,,,no interval
-1989_atkinson:(1.3.6),1989,1.4,x^3 - 3*x^2 + 3*x - 1,,,"`[0, 2]`; `[0.998, 1.002]`",,1,new,,,new,,,
+1989_atkinson:(1.3.6),1989,1.4,x^3 - 3*x^2 + 3*x - 1,,,"`[0, 2]` (Figure 1.1); `[0.998, 1.002]` (Figure 1.2)",,1,new,,,new,,,
 1989_atkinson:(2.7.3); P38(b),1989,1.4,x^4 - 5.4*x^3 + 10.56*x^2 - 8.954*x + 2.7951,,,"`[1, 1.2]` (P38(b))",,1,new,,,new,,,
 1989_atkinson:(2.7.6),1989,1.4,-4.68999 + x*(9.1389 + x*(-5.56 + x)),,,,,1,incomplete,no interval,,incomplete,,,no interval
 1989_atkinson:§2.8 case (1); P34(i),1989,1.4,(x - 1)*(1 + (x - 1)^2),,,"[0, 3]",,1,new,,,new,,,
@@ -170,7 +170,7 @@ row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instanc
 2002_higham:P27.6,2002,1.4,x^2 - p^2,,"`p = sqrt(x0^2 + y0^2)`, `0 < y0 <= x0`",,,1,incomplete,no interval,,incomplete,,,no interval
 2003_suli_mayers:§1.1,2003,1.4,x^5 - 4*x - 2,,,,,1,incomplete,no interval,,incomplete,,,no interval
 2003_suli_mayers:§1.2,2003,1.4,x^2 + 1,,,,,1,incomplete,no interval,,incomplete,,,no interval
-2003_suli_mayers:(1.2),2003,1.4,1/2 - 1/(1 + M*abs(x - 1.05)),,"`M = 200` (Fig. 1.1); `M = 2000, 20000, 200000, 2000000, 20000000` (Remark 1.1)","`[0.8, 1.8]`; `[1.04999, 1.05001]`",,6,new,,,new,,,
+2003_suli_mayers:(1.2),2003,1.4,1/2 - 1/(1 + M*abs(x - 1.05)),,"on `[0.8, 1.8]`: `M = 200` (Fig. 1.1), `M = 2000, 20000, 200000, 2000000, 20000000` (Remark 1.1); on `[1.04999, 1.05001]`: `M = 2000000, 20000000` (Remark 1.1)","`[0.8, 1.8]`; `[1.04999, 1.05001]`",,6,new,,,new,,,
 2003_suli_mayers:Examples 1.1–1.3,2003,1.4,exp(x) - 2*x - 1,,,"[1, 2]",,1,new,,,new,,,
 2003_suli_mayers:Example 1.4,2003,1.4,,"`x = g(x)`, with `g(x) = 2^(-(1 + log2(1/x)^(1/alpha))^alpha)` for `0 < x <= 1` and `g(0) = 0`","`alpha > 0`; `alpha = 1/2, 1, 2` (Fig. 1.3)","[0, 1]",not 1 expression,0,undecided,unparsed,,new,,,"No earlier row gives this fixed-point function, and Fig. 1.3 gives its values `alpha = 1/2, 1, 2`."
 2003_suli_mayers:Example 1.5; Exercise 1.1,2003,1.4,x = (x^2 + c)/2,,`c < 1`; Exercise 1.1: `0 < c < 1`,,,1,incomplete,no interval,,incomplete,,,no interval
@@ -193,7 +193,7 @@ row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instanc
 "2004_moler:§4.7, §4.10",2004,1.4,1/((x - 0.3)^2 + 0.01) + 1/((x - 0.9)^2 + 0.04) - 6,,,"`[-1, 2]` (Figure 4.8)",,1,new,,,new,,,
 2004_moler:§4.7#2,2004,1.4,cos(pi*t),,,,,1,incomplete,no interval,,incomplete,,,no interval
 "2004_moler:§4.7; Ex. 4.1, 4.2",2004,1.4,x^3 - 2*x - 5,,,"`[0, 3]` (Ex. 4.1); `[2, 3]` (Ex. 4.2)",,1,new,"structure, value, family, text",1997_chandrupatla:1,new,,1997_chandrupatla:1,
-2004_moler:§4.7#3,2004,1.4,J0(x) - y,,y = 0.5,"`[0, 2]`; `[0, 10*pi]` (Figure 4.2)",,1,new,,,new,,,
+2004_moler:§4.7#3,2004,1.4,J0(x) - y,,y = 0.5,"[0, 2]",,1,new,,,new,,,
 2004_moler:Ex. 4.1,2004,1.4,sin(x),,,"[1, 4]",,1,new,,,new,,,
 2004_moler:Ex. 4.1#2,2004,1.4,x^3 - 0.001,,,"[-1, 1]",,1,new,,,new,,,
 2004_moler:Ex. 4.1#3,2004,1.4,log(x + 2/3),,,"[0, 1]",,1,new,,,new,,,
@@ -212,15 +212,15 @@ row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instanc
 2005_parida_gupta:3,2005,1.2,11*x^11 - 1,,,"[0.1, 1]",,1,duplicate,structure,1992_alefeld_potra:3,duplicate,1992_alefeld_potra:3,,
 2005_parida_gupta:4,2005,1.2,x^6 - 36*x^5 + 450*x^4 - 2400*x^3 + 5400*x^2 - 4320*x + 720,,,"[10, 22]",,1,new,"structure, value, family",1989_atkinson:§2.9 (p. 101),new,,1989_atkinson:§2.9 (p. 101),
 2006_bradie:§2 (p. 54); §2.4 (p. 102),2006,1.4,(P + n^2*a/V^2)*(V - n*b) - n*R*T,,"`n = 1` mole of chlorine, `P = 2` atm, `T = 313` K, `a = 6.29` atm liter^2/mole^2, `b = 0.0562` liter/mole, `R = 0.08206` atm liter/(mole K)",,,1,incomplete,no interval,,incomplete,,,no interval
-2006_bradie:§2 (p. 55); §2.2 (p. 78); 2.2-15,2006,1.4,(rho_f/3)*h^3 - R*rho_f*h^2 + (4/3)*R^3*rho_o,,"`R = 5` cm, `rho_o = 0.120`, `rho_f = 0.890` g/cm^3 (§2.2); `R = 2`, `rho_o = 0.040`, `rho_f = 0.998` (2.2-15)","`(0, 10)` (§2.2)",,8,new,,,new,,,
+2006_bradie:§2 (p. 55); §2.2 (p. 78); 2.2-15,2006,1.4,(rho_f/3)*h^3 - R*rho_f*h^2 + (4/3)*R^3*rho_o,,"`R = 5` cm, `rho_o = 0.120`, `rho_f = 0.890` g/cm^3 (§2.2)","`(0, 10)` (§2.2)",,1,new,,,new,,,
 2006_bradie:§2 (p. 56),2006,1.4,x^6 + x^5 - 12*x^4 + 2*x^3 + 41*x^2 - 51*x + 18,,,,,1,incomplete,no interval,,incomplete,,,no interval
 2006_bradie:§2 (pp. 56–57),2006,1.4,2*x + log((1 - x)/(1 + x)),,,,,1,incomplete,no interval,,incomplete,,,no interval
 2006_bradie:§2 (p. 58),2006,1.4,3*x^2 + (1/pi^4)*log((pi - x)^2) + 1,,,"`(pi - 1, pi)`; `(pi, pi + 1)`",,1,new,,,new,,,
 "2006_bradie:§2.1 (p. 59); Ex. 2.1–2.3, 2.8, 2.9, 2.11–2.13; Tables 2.1–2.3, 2.5, 2.6; Fig. 2.1; §2.2 (p. 74); §2.4 (p. 98); 2.1-10; 2.2-10; 2.4-13; 2.5-12 to 2.5-14, 2.5-17",2006,1.4,x^3 + 2*x^2 - 3*x - 1,,,"`(1, 2)`; `(-3, -2)`; `(-1, 0)`",,1,new,,,new,,,
 2006_bradie:Fig. 2.2,2006,1.4,(x - 1)^7,,,"`[0, 2]` (Fig. 2.2)",,1,new,value,2004_moler:§1.7,new,,1975_bus_dekker:III | 2004_moler:§1.7,"(x - 1)^7 on [0, 2], the range of Figure 2.2; it is Bus & Dekker (1975)'s x^n at n = 7 shifted to the root 1, and the factored form of Moler (2004)'s §1.7 polynomial, which rounds differently."
 2006_bradie:Fig. 2.2#2,2006,1.4,(x - 1)^(1/7),,,"`[0, 2]` (Fig. 2.2)",,1,new,,,new,,,
-"2006_bradie:Ex. 2.2; Fig. 2.3; Tables 2.2, 2.3, 2.5; §2.4 (pp. 98, 100); §2.5 (p. 109); 2.1-13; 2.5-15; 2.6-3",2006,1.4,tan(pi*x) - x - 6,,,"`(0.40, 0.48)`; `[0, 0.48]` (§2.4, p. 100); `[0, 0.5]` (Fig. 2.3)",,1,new,,,new,,,
-2006_bradie:§2.1 (p. 67); 2.1-19; 2.5-20,2006,1.4,13500*(1 + r/12)^36 + 250*((1 + r/12)^36 - 1)/(r/12) - 25000,,"initial investment, monthly deposit and goal: `13500, 250, 25000` (§2.1); `14000, 250, 25000` and `12500, 300, 25000` (2.1-19); `13000, 200, 20000` and `13000, 250, 20000` (2.5-20)","`[0.01, 0.10]` (§2.1)",,1,new,,,new,,,
+"2006_bradie:Ex. 2.2; Fig. 2.3; Tables 2.2, 2.3, 2.5; §2.2 (p. 74); §2.4 (pp. 98, 100); §2.5 (p. 109); 2.1-13; 2.5-15; 2.6-3",2006,1.4,tan(pi*x) - x - 6,,,"`(0.40, 0.48)`; `[0, 0.48]` (§2.4, p. 100); `[0, 0.5]` (Fig. 2.3)",,1,new,,,new,,,
+2006_bradie:§2.1 (p. 67); 2.1-19; 2.5-20,2006,1.4,13500*(1 + r/12)^36 + 250*((1 + r/12)^36 - 1)/(r/12) - 25000,,"initial investment, monthly deposit and goal: `13500, 250, 25000` (§2.1); `14000, 250, 25000` and `12500, 300, 25000` (2.1-19)","`[0.01, 0.10]` (§2.1)",,1,new,,,new,,,
 2006_bradie:2.1-1(a); 2.2-1(a); 2.4-1(a); 2.5-1(a),2006,1.4,log(1 + x) - cos(x),,,"(0, 1)",,1,new,,,new,,,
 2006_bradie:2.1-1(b); 2.2-1(b); 2.4-1(b); 2.5-1(b),2006,1.4,x^5 + 2*x - 1,,,"(0, 1)",,1,new,,,new,,,
 2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),2006,1.4,exp(-x) - x,,,"(0, 1)",,1,new,,,new,,,
@@ -255,7 +255,7 @@ row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instanc
 2006_bradie:2.3-11,2006,1.4,x = exp(-x^2),,,"[0, 1]",,1,new,,,new,,,
 2006_bradie:2.3-12,2006,1.4,x = (1/2)*cos(x),,,"[0, 1]",,1,new,,,new,,,
 2006_bradie:2.3-13,2006,1.4,x = (1/3)*(2 - exp(x) + x^2),,,"[0, 1]",,1,new,"structure, value, family",2000_weerakoon:3,new,,2000_weerakoon:3,
-"2006_bradie:Ex. 2.10; 2.5-11(a); 2.6-4, 2.6-12",2006,1.4,x*(1 - cos(x)),,,"`[-2, 1]` (Ex. 2.10)",,1,new,,,new,,,
+"2006_bradie:Ex. 2.10; 2.5-11(a); 2.6-4, 2.6-12, 2.6-13",2006,1.4,x*(1 - cos(x)),,,"`[-2, 1]` (Ex. 2.10)",,1,new,,,new,,,
 2006_bradie:§2.4 (p. 103),2006,1.4,exp(-x) - 1 + x/5,,,,,1,incomplete,no interval,,incomplete,,,no interval
 "2006_bradie:2.4-11; 2.5-11(b); 2.6-10, 2.6-14(b), 2.6-15(b)",2006,1.4,27*x^4 + 162*x^3 - 180*x^2 + 62*x - 7,,,,,1,incomplete,no interval,,incomplete,,,no interval
 "2006_bradie:2.4-12; 2.5-11(c); 2.6-11, 2.6-14(c), 2.6-15(c)",2006,1.4,x/(1 + x^2) - (500/841)*(1 - 21*x/125),,,,,1,incomplete,no interval,,incomplete,,,no interval
@@ -382,14 +382,14 @@ row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instanc
 2012_suhadolnik:16,2012,1.2,sin(x) - x/2,,,"[pi/2, pi]",,1,duplicate,structure,1993_alefeld_potra_shi:T5.1-1,duplicate,1993_alefeld_potra_shi:T5.1-1,,
 2012_suhadolnik:17,2012,1.2,x^3,,,"[-0.5, 1/3]",,1,new,"structure, value",1975_bus_dekker:III,new,,1975_bus_dekker:III,
 2012_suhadolnik:18,2012,1.2,x^5,,,"[-0.5, 1/3]",,1,new,"structure, value",1975_bus_dekker:III,new,,1975_bus_dekker:III,
-"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13; Tables 4.13, 4.14; 4.4-1, 4.4-2",2013,1.4,2 - exp(x),,,"`[0, 1]`; `[-5, 5]` (Fig. 4.5)",,1,new,,,new,,,
+"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13, 3.11-14; Tables 4.13, 4.14; 4.4-1, 4.4-2",2013,1.4,2 - exp(x),,,"`[0, 1]`; `[-5, 5]` (Fig. 4.5)",,1,new,,,new,,,
 "2013_epperson:3.1-1, 3.1-3(a), 3.1-10; 3.2-2, 3.2-5(h); 3.3-3(h); 3.8-1, 3.8-2",2013,1.4,x^3 - 2,,,"[0, 2]",,1,new,,,new,,,
 2013_epperson:3.1-2(a),2013,1.4,x - exp(-x^2),,,"[0, 1]",,1,duplicate,structure,2006_bradie:2.3-11,duplicate,2006_bradie:2.3-11,,
 2013_epperson:3.1-2(b),2013,1.4,log(x) + x,,,"[1/10, 1]",,1,new,,,new,,,
 2013_epperson:3.1-2(c),2013,1.4,x^3 - 3,,,"[0, 3]",,1,new,,,new,,,
 "2013_epperson:3.1-2(d), 3.1-3(d); 3.2-5(a); 3.3-3(f); Ex. 3.10, 3.12, 3.20; 4.4-3, 4.4-4",2013,1.4,x^6 - x - 1,,,"[0, 2]",,1,new,"structure, value, family, text",1989_atkinson:(2.1.2),new,,1989_atkinson:(2.1.2),
 2013_epperson:3.1-2(e),2013,1.4,3 - 2^x,,,"[0, 2]",,1,new,,,new,,,
-2013_epperson:3.1-3(b); 3.2-5(g); 3.3-3(d),2013,1.4,exp(x) - 2,,,"[0, 1]",,1,duplicate,structure,"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13; Tables 4.13, 4.14; 4.4-1, 4.4-2",duplicate,"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13; Tables 4.13, 4.14; 4.4-1, 4.4-2",,
+2013_epperson:3.1-3(b); 3.2-5(g); 3.3-3(d),2013,1.4,exp(x) - 2,,,"[0, 1]",,1,duplicate,structure,"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13, 3.11-14; Tables 4.13, 4.14; 4.4-1, 4.4-2",duplicate,"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13, 3.11-14; Tables 4.13, 4.14; 4.4-1, 4.4-2",,
 2013_epperson:3.1-3(c); 3.2-5(i); 3.3-3(e),2013,1.4,x - exp(-x),,,"[0, 1]",,1,duplicate,structure,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),duplicate,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),,
 2013_epperson:3.1-3(e); 3.2-5(f); 3.3-3(c),2013,1.4,x^3 - 2*x - 5,,,"[0, 3]",,1,duplicate,structure,"2004_moler:§4.7; Ex. 4.1, 4.2",duplicate,"2004_moler:§4.7; Ex. 4.1, 4.2",,
 2013_epperson:3.1-3(f); 3.2-5(c); 3.3-3(a),2013,1.4,1 - 2*x*exp(-x/2),,,"[0, 2]",,1,new,,,new,,,
@@ -476,7 +476,7 @@ row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instanc
 2013_stage:3.13,2013,1.2,,`0` if `x = 0`; `(1 - 2/3)^-1` otherwise,,"`[-10, 10]` (Figure 11); `[0, 7]` (text)",not 1 expression,0,undecided,unparsed,,new,,2004_moler:Ex. 4.1#5,"Both printed branches are misprints: the function meant is the plot title's 1/(x - 2/3), with 0 at its pole x = 2/3, which is Moler's 1/(x - pi) (2004_moler:Ex. 4.1#5) with its pole moved to 2/3, on other intervals."
 "2015_chapra:(PT2.1), (PT2.2); (7.7)",2015,1.4,a*x^2 + b*x + c,,"`a`, `b`, `c` free",,,1,incomplete,no interval,,incomplete,,,no interval
 "2015_chapra:§PT2.1.1 (p. 117); Ex. 6.2–6.4, 6.6, 6.8; Fig. 6.2, 6.9; Prob. 6.27–6.29, 7.22–7.24",2015,1.4,exp(-x) - x,,,"`[0, 1]` (Fig. 6.2)",,1,duplicate,structure,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),duplicate,2006_bradie:2.1-1(c); 2.2-1(c); 2.4-1(c); 2.5-1(c),,
-"2015_chapra:(PT2.3), (PT2.4); Ex. 5.1, 5.3–5.5; Fig. 5.1, 5.6, 5.7, 5.13; Prob. 5.14, 5.21, 5.23, 5.26, 7.20, 7.21",2015,1.4,(g*m/c)*(1 - exp(-(c/m)*t)) - v,,"`g = 9.81` m/s^2, `m = 68.1` kg, `v = 40` m/s, `t = 10` s (Ex. 5.1); `m = 82`, `v = 36`, `t = 4` (Prob. 5.14)","`[12, 16]` (Ex. 5.3, 5.5); `[3, 5]` (Prob. 5.14); `[4, 20]` (Fig. 5.1)",,8,new,,,new,,,
+"2015_chapra:(PT2.3), (PT2.4); Ex. 5.1, 5.3–5.5; Fig. 5.1, 5.6, 5.7, 5.13; Prob. 5.14, 5.21, 5.23, 5.26, 7.20, 7.21",2015,1.4,(g*m/c)*(1 - exp(-(c/m)*t)) - v,,"on `[12, 16]`, `[4, 20]`: `g = 9.81` m/s^2, `m = 68.1` kg, `v = 40` m/s, `t = 10` s (Ex. 5.1); on `[3, 5]`: `m = 82`, `v = 36`, `t = 4` (Prob. 5.14)","`[12, 16]` (Ex. 5.3, 5.5); `[3, 5]` (Prob. 5.14); `[4, 20]` (Fig. 5.1)",,8,new,,,new,,,
 2015_chapra:(PT2.7),2015,1.4,1 - 2.37*x + 7.5*x^2,,,,,1,incomplete,no interval,,incomplete,,,no interval
 2015_chapra:(PT2.8),2015,1.4,5*x^2 - x^3 + 7*x^6,,,,,1,incomplete,no interval,,incomplete,,,no interval
 2015_chapra:(PT2.9),2015,1.4,log(x^2) - 1,,,,,1,incomplete,no interval,,incomplete,,,no interval
@@ -503,7 +503,7 @@ row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instanc
 "2015_chapra:§8.2, (8.14)",2015,1.4,K1/(10^6*H)*KH*pCO2 + 2*K2*K1/(10^6*H^2)*KH*pCO2 + Kw/H - H,,"`KH = 10^-1.46`, `K1 = 10^-6.3`, `K2 = 10^-10.3`, `Kw = 10^-14`; `pCO2 = 315, 375` ppm (1958, 2003)","`[1E-12, 1E-2]` (the pH from 2 to 12)",,2,new,,,new,,,
 "2015_chapra:§8.3, (8.19), (8.20), Fig. 8.4",2015,1.4,exp(-R*t/(2*L))*cos(sqrt(1/(L*C) - (R/(2*L))^2)*t) - q/q0,,"`L = 5` H, `C = 10^-4` F, `t = 0.05` s, `q/q0 = 0.01`","[0, 400]",,1,undecided,parameters without values,,new,,,"Complete, because `q/q0 = 0.01` gives the ratio, the only form in which `q` and `q0` enter the function, and no earlier row has this RLC circuit equation."
 "2015_chapra:§8.4, (8.21), Fig. 8.5; Prob. 8.13",2015,1.4,1/sqrt(f) + 2.0*log10(eps/(3.7*D) + 2.51/(Re*sqrt(f))),,"`Re = rho*V*D/mu`; `rho = 1.23` kg/m^3, `mu = 1.79E-5` N s/m^2, `D = 0.005` m, `V = 40` m/s, `eps = 1.5E-6` m (the book's 0.0015 mm), so `Re = 13743` (§8.4, Prob. 8.13(a)); `eps = 4.5E-5` m (the book's 0.045 mm, Prob. 8.13(b))","[0.008, 0.08]",,2,new,,,new,,,
-"2015_chapra:§8.4, (8.23), Fig. 8.6",2015,1.4,f = 0.25/(log10(eps/(3.7*D) + 2.51/(Re*sqrt(f))))^2,,as in §8.4's Colebrook row,"[0.008, 0.08]",unknown variable unclear,0,undecided,unparsed,,new,,"2015_chapra:§8.4, (8.21), Fig. 8.5; Prob. 8.13",Fixed-point form of the Colebrook row (8.21); f - g(f) has the same root but other values.
+"2015_chapra:§8.4, (8.23), Fig. 8.6",2015,1.4,f = 0.25/(log10(eps/(3.7*D) + 2.51/(Re*sqrt(f))))^2,,"`Re = rho*V*D/mu`; `rho = 1.23` kg/m^3, `mu = 1.79E-5` N s/m^2, `D = 0.005` m, `V = 40` m/s, `eps = 1.5E-6` m (the book's 0.0015 mm), so `Re = 13743` (§8.4)","[0.008, 0.08]",,1,new,,,new,,"2015_chapra:§8.4, (8.21), Fig. 8.5; Prob. 8.13",Fixed-point form of the Colebrook row (8.21); f - g(f) has the same root but other values.
 2015_chapra:Prob. 5.1,2015,1.4,-0.5*x^2 + 2.5*x + 4.5,,,"[5, 10]",,1,new,,,new,,,
 2015_chapra:Prob. 5.2,2015,1.4,5*x^3 - 5*x^2 + 6*x - 2,,,"[0, 1]",,1,new,,,new,,,
 2015_chapra:Prob. 5.3,2015,1.4,-25 + 82*x - 90*x^2 + 44*x^3 - 8*x^4 + 0.7*x^5,,,"[0.5, 1.0]",,1,new,,,new,,,
@@ -519,7 +519,7 @@ row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instanc
 "2015_chapra:Prob. 5.13, 7.11",2015,1.4,(g*m/c)*(1 - exp(-(c/m)*t)) - v,,"`g = 9.81` m/s^2 and `c = 15` kg/s in both; `v = 36` m/s, `t = 10` s (5.13); `v = 35`, `t = 8` (7.11)",,,4,incomplete,no interval,,incomplete,,,no interval
 2015_chapra:Prob. 5.15,2015,1.4,v = sqrt(2*g*H)*tanh(sqrt(2*g*H)/(2*L)*t),,"`g = 9.81` m/s^2, `L = 4` m, `t = 2.5` s, `v = 5` m/s","[0, 2]",,1,new,,,new,,,
 2015_chapra:Prob. 5.16,2015,1.4,1 - Q^2/(g*Ac^3)*B,,"`Q = 20` m^3/s, `g = 9.81` m/s^2, `B = 3 + y`, `Ac = 3*y + y^2/2`","[0.5, 2.5]",unknown variable unclear,0,undecided,unparsed,,new,,,"Critical depth of a trapezoidal channel, with `B = 3 + y` and `Ac = 3*y + y^2/2`; no earlier row has this function."
-"2015_chapra:Prob. 5.17, 5.19, 6.19, 8.9",2015,1.4,V = pi*h^2*(3*R - h)/3,,"`R = 3` m, `V = 30` m^3 (5.17, 6.19); `R = 1` m, `V = 0.5` m^3 (8.9, which writes `r`); `r = 1` m, `V = (4/3)*pi*r^3*(1 - rho_s/rho_w)`, `rho_s = 200`, `rho_w = 1000` kg/m^3 (5.19)","`[0, 3]` (5.17)",,4,new,,,new,,,
+"2015_chapra:Prob. 5.17, 5.19, 6.19, 8.9",2015,1.4,V = pi*h^2*(3*R - h)/3,,"`R = 3` m, `V = 30` m^3 (5.17, 6.19)","`[0, 3]` (5.17)",,1,new,,,new,,,
 2015_chapra:Prob. 5.18,2015,1.4,log(osf) = -139.34411 + 1.575701E5/Ta - 6.642308E7/Ta^2 + 1.243800E10/Ta^3 - 8.621949E11/Ta^4,,"`Ta = T + 273.15`; `osf = 8, 10, 12` mg/L","`[273.15, 313.15]` (`T` from 0 to 40 °C, as values of `Ta`)",,3,new,,,new,,,
 2015_chapra:Prob. 6.1,2015,1.4,sin(sqrt(x)) - x,,,,,1,incomplete,no interval,,incomplete,,,no interval
 2015_chapra:Prob. 6.2,2015,1.4,2*x^3 - 11.7*x^2 + 17.7*x - 5,,,,,1,incomplete,no interval,,incomplete,,,no interval
@@ -613,7 +613,7 @@ row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instanc
 2016_burden:2.1-5(c),2016,1.4,2*x*cos(2*x) - (x + 1)^2,,,"`[-3, -2]`; `[-1, 0]`",,1,new,,,new,,,
 2016_burden:2.1-5(d),2016,1.4,x*cos(x) - 2*x^2 + 3*x - 1,,,"`[0.2, 0.3]`; `[1.2, 1.3]`",,1,new,,,new,,,
 2016_burden:2.1-6(a); 2.3-11(a),2016,1.4,3*x - exp(x),,,"[1, 2]",,1,new,,,new,,,
-2016_burden:2.1-6(b); 2.3-11(b),2016,1.4,2*x + 3*cos(x) - exp(x),,,"`[0, 1]` (2.1-6); `[1, 2]` (2.3-11)",,1,new,,,new,,,
+2016_burden:2.1-6(b); 2.3-11(b),2016,1.4,2*x + 3*cos(x) - exp(x),,,"[1, 2]",,1,new,,,new,,,
 2016_burden:2.1-6(c); 2.3-12(a),2016,1.4,x^2 - 4*x + 4 - log(x),,,"`[1, 2]`; `[2, 4]`",,1,new,,,new,,,
 2016_burden:2.1-6(d); 2.3-12(b),2016,1.4,x + 1 - 2*sin(pi*x),,,"`[0, 0.5]`; `[0.5, 1]`",,1,new,,,new,,,
 2016_burden:2.1-7,2016,1.4,x = 2*sin(x),,,,,1,incomplete,no interval,1993_alefeld_potra_shi:T5.1-1,incomplete,,1993_alefeld_potra_shi:T5.1-1,no interval
@@ -688,8 +688,8 @@ row_id,year,subcategory,f,f_description,parameters,interval,parse_note,n_instanc
 2016_burden:2.4-1(c),2016,1.4,x^3 - 3*x^2*(2^-x) + 3*x*(4^-x) - 8^-x,,,"[0, 1]",,1,new,,,new,,,
 2016_burden:2.4-1(d); 2.5-2,2016,1.4,exp(6*x) + 3*(log(2))^2*exp(2*x) - log(8)*exp(4*x) - (log(2))^3,,,"[-1, 0]",,1,new,,,new,,,
 2016_burden:2.4-2(a),2016,1.4,1 - 4*x*cos(x) + 2*x^2 + cos(2*x),,,"[0, 1]",,1,new,,,new,,,
-2016_burden:2.4-2(b),2016,1.4,x^2 + 6*x^5 + 9*x^4 - 2*x^3 - 6*x^2 + 1,,,"[-3, -2]",,1,new,,,new,,,
-2016_burden:2.4-2(c),2016,1.4,sin(3*x) + 3*exp(-2*x)*sin(x) - 3*exp(-x)*sin(2*x) - exp(-3*x),,,"[3, 4]",,1,new,,,new,,,
+2016_burden:2.4-2(b),2016,1.4,x^6 + 6*x^5 + 9*x^4 - 2*x^3 - 6*x^2 + 1,,,"[-3, -2]",,1,new,,,new,,,
+2016_burden:2.4-2(c),2016,1.4,sin(x)^3 + 3*exp(-2*x)*sin(x) - 3*exp(-x)*sin(x)^2 - exp(-3*x),,,"[3, 4]",,1,new,,,new,,,
 2016_burden:2.4-2(d),2016,1.4,exp(3*x) - 27*x^6 + 27*x^4*exp(x) - 9*x^2*exp(2*x),,,"[3, 5]",,1,new,,,new,,,
 2016_burden:2.4-5,2016,1.4,exp(6*x) + 1.441*exp(2*x) - 2.079*exp(4*x) - 0.3330,,,"[-1, 0]",,1,new,,,new,,,
 2016_burden:2.4-D2,2016,1.4,x^2*(x - 1),,,,,1,incomplete,no interval,,incomplete,,,no interval
@@ -865,7 +865,7 @@ gsl_roots_tests:func7,2024,1.3,-M_PI*x + M_E,,,,,1,incomplete,no interval,,incom
 2025_raza:eta4,2025,1.2,atan(l) - l^2 + 1,,,none; `l0 = 1.28`,,1,incomplete,no interval,,incomplete,,,no interval
 2025_raza:eta5,2025,1.2,8*(4 - l)^2*l^2/((6 - 3*l)^2*(2 - l)) - 0.186,,,none; `l0 = 0.4`,,1,incomplete,no interval,,incomplete,,,no interval
 2025_romadani_python_implementations:3.3-1,2025,1.2,x^2 - 4,,,not given,,1,incomplete,no interval,2013_epperson:3.9-6,incomplete,,2013_epperson:3.9-6,no interval
-2025_romadani_python_implementations:3.3-2a,2025,1.2,exp(x) - 2,,,not given,,1,incomplete,no interval,"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13; Tables 4.13, 4.14; 4.4-1, 4.4-2 | 2013_epperson:3.1-3(b); 3.2-5(g); 3.3-3(d)",incomplete,,"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13; Tables 4.13, 4.14; 4.4-1, 4.4-2",no interval
+2025_romadani_python_implementations:3.3-2a,2025,1.2,exp(x) - 2,,,not given,,1,incomplete,no interval,"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13, 3.11-14; Tables 4.13, 4.14; 4.4-1, 4.4-2 | 2013_epperson:3.1-3(b); 3.2-5(g); 3.3-3(d)",incomplete,,"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13, 3.11-14; Tables 4.13, 4.14; 4.4-1, 4.4-2",no interval
 2025_romadani_python_implementations:3.3-2b,2025,1.2,sin(x) - x/2,,,not given,,1,incomplete,no interval,1993_alefeld_potra_shi:T5.1-1,incomplete,,1993_alefeld_potra_shi:T5.1-1,no interval
 2025_romadani_python_implementations:3.3-3,2025,1.2,(x - 1)^2,,,not given,,1,incomplete,no interval,2013_epperson:3.9-5(e),incomplete,,2007_press_numerical_recipes:9.5 | 2013_epperson:3.9-5(e),"no interval: Romadani gives (x - 1)^2 only as an example of a multiple root, with no interval; it is Press et al.'s (x - a)^2 at a = 1, and x - g(x) of Epperson's 3.9-5(e), x = (x^2 + 1)/2, is its expanded form times -1/2."
 2025_romadani_python_implementations:3.3-4a,2025,1.2,x^(1/3),,,not given,,1,incomplete,no interval,2016_burden:2.3-D4,incomplete,,2016_burden:2.3-D4,no interval
@@ -1426,7 +1426,7 @@ scipy_tstutils:aps13_f,2026,1.3,,"`x/exp(1/x^2)` (x != 0); `0` (x = 0, or 1/x^2 
 scipy_tstutils:aps14_f,2026,1.3,,`n/20.0*(x/1.5 + sin(x) - 1)` (x > 0); `-n/20.0` (x <= 0),"n = 1, 2, ..., 40","[-1000, pi/2]",not 1 expression,0,undecided,unparsed,,new,,1993_alefeld_potra_shi:T5.1-13,"SciPy starts the interval at -1000, where Alefeld, Potra and Shi (1993) have -10^4; the function and its values of n are the same."
 scipy_tstutils:aps15_f,2026,1.3,,`-0.859` (x < 0); `exp((n + 1)*x/2*1000) - 1.859` (0 <= x <= 2*1e-3/(1 + n)); `e - 1.859` (x > 2*1e-3/(1 + n)),"n = 20, 21, ..., 40, 100, 200, ..., 1000","[-1000, 1e-4]",not 1 expression,0,undecided,unparsed,,new,,1993_alefeld_potra_shi:T5.1-14,"SciPy starts the interval at -1000, where Alefeld, Potra and Shi (1993) have -10^4; the function and its values of n are the same."
 scipy_tstutils:cplx01_f,2026,1.3,z^n - a,,"(n, a) = (2, -1), (3, 1), (3, -1), (3, 8)","none; starting values (x0, x1) = (1 + 1j, 0.5 + 0.5j), (-1 + 1j, -0.5 + 2.0j), (1j, 0.5 + 0.5j), (5, 4)",unknown variable unclear,0,incomplete,no interval,,incomplete,,1972_dowell_jarratt_pegasus:Table 1 | 1992_alefeld_potra:1 | 1993_alefeld_potra_shi:T5.1-4 | 2003_suli_mayers:§1.2 | 2006_bradie:2.3-6,"no interval: the 4 cases give only starting values (x0, x1), 3 of them complex; the cases (2, -1), (3, 1) and (3, -1) are also the earlier single rows x^2 + 1, x^3 - 1 and x^3 + 1, and (3, 8) is the equation x = 1 + x - (1/8)*x^3 of 2006_bradie:2.3-6."
-scipy_tstutils:cplx02_f,2026,1.3,exp(z) - a,,"a = -1, 1j","none; starting values (x0, x1) = (1 + 2j, 0.5 + 0.5j) for both",,2,incomplete,no interval,2013_epperson:3.11-12,incomplete,,"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13; Tables 4.13, 4.14; 4.4-1, 4.4-2 | 2013_epperson:3.11-12","no interval: the source gives only the complex starting values (x0, x1) = (1 + 2j, 0.5 + 0.5j); exp(z) - a is Epperson's (2013) a - exp(x) negated, which Epperson gives with a = 2 and with a in [1/2, 1], but here a = -1 and a = 1j, so the roots are complex."
+scipy_tstutils:cplx02_f,2026,1.3,exp(z) - a,,"a = -1, 1j","none; starting values (x0, x1) = (1 + 2j, 0.5 + 0.5j) for both",,2,incomplete,no interval,2013_epperson:3.11-12,incomplete,,"2013_epperson:Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13, 3.11-14; Tables 4.13, 4.14; 4.4-1, 4.4-2 | 2013_epperson:3.11-12","no interval: the source gives only the complex starting values (x0, x1) = (1 + 2j, 0.5 + 0.5j); exp(z) - a is Epperson's (2013) a - exp(x) negated, which Epperson gives with a = 2 and with a in [1/2, 1], but here a = -1 and a = 1j, so the roots are complex."
 scipy_tstutils:fun1,2026,1.3,x^3 - 2*x - 5,,,"[2, 3], [1, 10], [1, 100], [-1e4, 1e4], [-1e10, 1e10]",,1,duplicate,structure,1997_chandrupatla:1,duplicate,1997_chandrupatla:1,,
 scipy_tstutils:fun2,2026,1.3,1 - 1/x^2,,,"[0.5, 1.51], [1e-4, 1e4], [1e-6, 1e6], [1e-10, 1e10], [1e-12, 1e12]",,1,duplicate,structure,1997_chandrupatla:2,duplicate,1997_chandrupatla:2,,
 scipy_tstutils:fun3,2026,1.3,(x-3)^3,,,"[0, 5], [-10, 10], [-1e4, 1e4], [-1e6, 1e6], [-1e10, 1e10]",,1,duplicate,structure,1997_chandrupatla:3,duplicate,1997_chandrupatla:3,,

@@ -34,9 +34,9 @@ notes = "No real root: the book's example of an equation without a solution in a
 [[rows]]
 key = '(1.2)'
 f = '1/2 - 1/(1 + M*abs(x - 1.05))'
-parameters = '`M = 200` (Fig. 1.1); `M = 2000, 20000, 200000, 2000000, 20000000` (Remark 1.1)'
+parameters = 'on `[0.8, 1.8]`: `M = 200` (Fig. 1.1), `M = 2000, 20000, 200000, 2000000, 20000000` (Remark 1.1); on `[1.04999, 1.05001]`: `M = 2000000, 20000000` (Remark 1.1)'
 interval = '`[0.8, 1.8]`; `[1.04999, 1.05001]`'
-notes = '2 roots, `1.05 - 1/M` and `1.05 + 1/M`, only `2/M` apart. Remark 1.1 replots it in Maple, on the smaller interval for the 2 largest `M`. A footnote in Section 1.6 (p. 28) notes that bisection applies although `f` is not differentiable at 1.05.'
+notes = '2 roots, `1.05 - 1/M` and `1.05 + 1/M`, only `2/M` apart. Remark 1.1 asks the reader to plot it in Maple for each `M`, and to replot it on the smaller interval for the 2 largest `M`. A footnote in Section 1.6 (p. 28) notes that bisection applies although `f` is not differentiable at 1.05.'
 
 [[rows]]
 key = 'Examples 1.1–1.3'
@@ -81,7 +81,7 @@ f = 'x = a*x*(1 - x)'
 name = 'logistic equation'
 parameters = '`0 < a <= 4`; `a = 3.4, 3.5, 3.99`'
 interval = '[0, 1]'
-notes = 'Fixed points 0 and `1 - 1/a`. For `a = 3.4` the iterates approach a 2-cycle, 0.45 and 0.84, the fixed points of `g(g(x))` (eq. (1.34)); for `a = 3.5` a 4-cycle; for `a = 3.99`, from `x0 = 0.75`, no regular pattern.'
+notes = 'Fixed points 0 and `1 - 1/a`. For `a = 3.4` the iterates approach a 2-cycle, 0.45 and 0.84, the 2 stable fixed points of `g(g(x))` (eq. (1.34)); for `a = 3.5` a 4-cycle; for `a = 3.99`, from `x0 = 0.75`, no regular pattern.'
 
 [[rows]]
 key = '(1.37)'

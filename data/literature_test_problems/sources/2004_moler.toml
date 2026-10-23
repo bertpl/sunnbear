@@ -1,20 +1,20 @@
 title = 'Moler (2004): Numerical Computing with MATLAB, chapter 4 and Sections 1.1 and 1.7'
-reference = "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); The MathWorks, Natick, MA (electronic edition). ISBN 978-0-898716-60-3. The author's web edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
+reference = "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); The MathWorks, Natick, MA (electronic edition). ISBN 0-89871-560-1. The author's web edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
 year = 2004
 subcategory = '1.4'
 where_in_source = '''
 chapter 4, "Zeros and Roots" (25 pages): Sections 4.1–4.10 and Exercises 4.1–4.22; and 2 examples of chapter 1:
-- the golden-ratio equation of Section 1.1, "The Golden Ratio" (pp. 3–5, Figure 1.2), the chapter's only zero-finding example;
-- the last example of Section 1.7, "Floating-Point Arithmetic" (pp. 43–44, Figure 1.9), for which Burkardt's TEST_ZERO (`burkardt_test_zero`) cites the book.
+- the golden-ratio equation of Section 1.1, "The Golden Ratio" (pp. 2–5, Figure 1.2), the chapter's only zero-finding example;
+- the last example of Section 1.7, "Floating-Point Arithmetic" (p. 43, Figure 1.9), for which Burkardt's TEST_ZERO (`burkardt_test_zero`) cites the book.
 
 Exercise 4.1 runs `fzerogui` (§4.8) on 7 functions, each on its own interval, and asks what interesting or unusual behavior each one shows; the rows of those functions do not repeat the question.
 
 The rows leave out:
 - the rest of chapter 1;
 - §4.6 and §4.9, which describe algorithms without a function;
-- the minimization problems of §4.10 and of Exercises 4.18 (`9*x^2 - 6*x + 2`) and 4.22 (`sin(tan(x)) - tan(sin(x))` on `[0, pi]`);
+- the minimization problems of §4.10 and of Exercises 4.17 (`-humps(x)` on `[-1, 2]`), 4.18 (`9*x^2 - 6*x + 2`) and 4.22 (`sin(tan(x)) - tan(sin(x))` on `[0, pi]`);
 - the equation `rho^2 - 3*rho + 1 = 0` of §4.10, which the text solves in closed form;
-- the exercises about an algorithm without a function (4.4–4.6, 4.17, 4.20, 4.21);
+- the exercises about an algorithm without a function (4.4–4.6, 4.20, 4.21);
 - Exercises 4.11–4.12, about the size of `Gamma(n + 1)` and the accuracy of 2 approximations of `log(Gamma(x + 1))`, which print no equation to solve.
 '''
 transcribed_from = '''
@@ -54,7 +54,7 @@ key = '§1.1'
 f = '1/x - (x - 1)'
 name = 'golden ratio'
 interval = '`[0, 4]` (Figure 1.2)'
-notes = 'The aspect ratio equation `1/x = x - 1` of the golden rectangle, whose positive root is the golden ratio `(1 + sqrt(5))/2`. §1.1 solves it 3 ways: as the polynomial `x^2 - x - 1` with `roots`; symbolically with `solve(1/x == x-1)`; and as `f = @(x) 1./x-(x-1)` with `fzero(f,1)`, from the starting point `x = 1`. `ezplot(f,0,4)` plots `f` on `[0, 4]` (Figure 1.2), where it becomes infinite as `x` tends to 0.'
+notes = 'The aspect ratio equation `1/x = x - 1` of the golden rectangle, whose positive root is the golden ratio `(1 + sqrt(5))/2`. Besides the quadratic formula, §1.1 solves it 3 ways in MATLAB: as the polynomial `x^2 - x - 1` with `roots`; symbolically with `solve(1/x == x-1)`; and as `f = @(x) 1./x-(x-1)` with `fzero(f,1)`, from the starting point `x = 1`. `ezplot(f,0,4)` plots `f` on `[0, 4]` (Figure 1.2), where it becomes infinite as `x` tends to 0.'
 
 [[rows]]
 key = '§1.7'
@@ -75,7 +75,7 @@ f = 'sign(x - a)*sqrt(abs(x - a))'
 name = 'perverse function'
 parameters = '`a` free; `a = 2` in Figure 4.1 and Ex. 4.1'
 interval = '`[0, 4]` (Figure 4.1); `[1, 4]` (Ex. 4.1)'
-notes = "§4.3 derives it as the function on which Newton's method cycles forever around its zero `x = a`, since `f'(x)` is unbounded as `x` tends to `a`; Figure 4.1 plots it with `ezplot` on `[0, 4]`. §4.4 and Ex. 4.8 ask how the secant method behaves on it."
+notes = "§4.3 derives it as the function on which Newton's method cycles forever around its zero `x = a`; the convergence theory for Newton's method fails on it because `f'(x)` is unbounded as `x` tends to `a`. Figure 4.1 plots it with `ezplot` on `[0, 4]`. §4.4 and Ex. 4.8 ask how the secant method behaves on it."
 
 [[rows]]
 key = '§4.7, §4.8; Ex. 4.7, 4.10(a)'
@@ -111,8 +111,8 @@ notes = "§4.7 writes it as the anonymous function `G = @(z) z^3-2*z-5`, an exam
 key = '§4.7#3'
 f = 'J0(x) - y'
 parameters = 'y = 0.5'
-interval = '`[0, 2]`; `[0, 10*pi]` (Figure 4.2)'
-notes = '§4.7 states the equation `J0(xi) = 0.5` and passes `F = @(x,y) besselj(0,x)-y`, or `B = @(x,n,y) besselj(n,x)-y` with `n = 0`, to `fzerotx` with `y = 0.5`. Result `xi = 1.5211`, marked in Figure 4.2.'
+interval = '[0, 2]'
+notes = '§4.7 states the equation `J0(xi) = 0.5` and passes `F = @(x,y) besselj(0,x)-y`, or `B = @(x,n,y) besselj(n,x)-y` with `n = 0`, to `fzerotx` with `y = 0.5`. Result `xi = 1.5211`; Figure 4.2, which plots `J0(x)` on `[0, 10*pi]`, marks the point `(xi, J0(xi))`.'
 
 [[rows]]
 key = 'Ex. 4.1'

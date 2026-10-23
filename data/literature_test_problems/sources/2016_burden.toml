@@ -83,7 +83,7 @@ notes = '`f(-4)*f(4) < 0` and `f(0)*f(1) < 0`: bisection on `[0, 1]` needs 3 few
 key = '§2.1 Ex. 1, 2; Table 2.1; §2.2 Ill. (pp. 60, 62–63), Table 2.2; §2.4 Ill. (p. 84); §2.5 Ill. (p. 89), Table 2.11'
 f = 'x^3 + 4*x^2 - 10'
 interval = '[1, 2]'
-notes = "The chapter's running example: unique root `1.365230013` in `[1, 2]`. Bisection until the bound on the relative error is below `1E-4` gives `p13 = 1.365112305` (Ex. 1, Table 2.1); Theorem 2.1's bound gives 10 iterations for `1E-3` (Ex. 2). §2.2 rewrites it as 5 fixed-point problems, iterated from `p0 = 1.5` (Table 2.2): `g1 = x - x^3 - 4*x^2 + 10`, which diverges; `g2 = (10/x - 4*x)^(1/2)`, which becomes undefined; `g3 = (1/2)*(10 - x^3)^(1/2)`; `g4 = (10/(4 + x))^(1/2)`; and `g5 = x - (x^3 + 4*x^2 - 10)/(3*x^2 + 8*x)`, Newton's iteration. The second Illustration checks Theorem 2.4 for each on `[1, 2]`, and for `g3` on `[1, 1.5]`. Newton and the modified Newton method (2.13) from `p0 = 1.5` (§2.4); Steffensen's method on `g4` from `p0 = 1.5` (§2.5, Table 2.11)."
+notes = "The chapter's running example: unique root `1.365230013` in `[1, 2]`. Bisection until the bound on the relative error is below `1E-4` gives `p13 = 1.365112305` (Ex. 1, Table 2.1); Theorem 2.1's bound gives 10 iterations for `1E-3` (Ex. 2). §2.2 rewrites it as 5 fixed-point problems, iterated from `p0 = 1.5` (Table 2.2): `g1 = x - x^3 - 4*x^2 + 10`, which diverges; `g2 = (10/x - 4*x)^(1/2)`, which becomes undefined; `g3 = (1/2)*(10 - x^3)^(1/2)`; `g4 = (10/(4 + x))^(1/2)`; and `g5 = x - (x^3 + 4*x^2 - 10)/(3*x^2 + 8*x)`, Newton's iteration. The second Illustration checks Theorem 2.4 for `g1` to `g4` on `[1, 2]`, and for `g3` on `[1, 1.5]`; it notes only that `g5` converges fastest. Newton and the modified Newton method (2.13) from `p0 = 1.5` (§2.4); Steffensen's method on `g4` from `p0 = 1.5` (§2.5, Table 2.11)."
 
 [[rows]]
 key = '§2.2 Ex. 1; Fig. 2.2'
@@ -193,8 +193,8 @@ notes = 'Bisection to `1E-5` (2.1-6); Newton, secant and false position to `1E-5
 [[rows]]
 key = '2.1-6(b); 2.3-11(b)'
 f = '2*x + 3*cos(x) - exp(x)'
-interval = '`[0, 1]` (2.1-6); `[1, 2]` (2.3-11)'
-notes = 'As 2.1-6(a).'
+interval = '[1, 2]'
+notes = 'As 2.1-6(a). 2.1-6(b) prints `[0, 1]`, a misprint: the function is concave there, with `f(0) = 2` and `f(1) = 0.903`, so it has no zero on `[0, 1]`; 2.3-11(b), which repeats the exercise, gives `[1, 2]`, which holds the zero about 1.2397.'
 
 [[rows]]
 key = '2.1-6(c); 2.3-12(a)'
@@ -618,15 +618,15 @@ notes = 'Newton to `1E-5`. It equals `2*(x - cos(x))^2`.'
 
 [[rows]]
 key = '2.4-2(b)'
-f = 'x^2 + 6*x^5 + 9*x^4 - 2*x^3 - 6*x^2 + 1'
+f = 'x^6 + 6*x^5 + 9*x^4 - 2*x^3 - 6*x^2 + 1'
 interval = '[-3, -2]'
-notes = "As 2.4-2(a). As printed, with 2 terms in `x^2`; with `x^6` for the first, it equals `(x^3 + 3*x^2 - 1)^2`, the square of 2.3-5(b)'s function."
+notes = "As 2.4-2(a). The book prints the first term as `x^2`, a misprint: as printed, the function is negative on all of `[-3, -2]` and has no root there. With `x^6` it equals `(x^3 + 3*x^2 - 1)^2`, the square of 2.3-5(b)'s function, with a double root at -2.879385."
 
 [[rows]]
 key = '2.4-2(c)'
-f = 'sin(3*x) + 3*exp(-2*x)*sin(x) - 3*exp(-x)*sin(2*x) - exp(-3*x)'
+f = 'sin(x)^3 + 3*exp(-2*x)*sin(x) - 3*exp(-x)*sin(x)^2 - exp(-3*x)'
 interval = '[3, 4]'
-notes = 'As 2.4-2(a). With `sin(x)^3` for `sin(3*x)` and `sin(x)^2` for `sin(2*x)`, it would equal `(sin(x) - exp(-x))^3`, as the other parts of 2.4-1 and 2.4-2 equal powers of simpler functions.'
+notes = "As 2.4-2(a). The book prints `sin 3x` and `sin 2x`, misprints for `sin(x)^3` and `sin(x)^2`: with them the 4 terms are the expansion of `(sin(x) - exp(-x))^3`, the cube of 2.3-6(f)'s function on the same `[3, 4]`, with a triple root at 3.096364. Every other part of 2.4-1 and 2.4-2 has a multiple root too (2.4-2(b) once its misprint is corrected). As printed, the function has a simple root at 3.141568."
 
 [[rows]]
 key = '2.4-2(d)'
@@ -638,7 +638,7 @@ notes = "As 2.4-2(a). It equals `(exp(x) - 3*x^2)^3`, the cube of 2.3-6(e)'s fun
 key = '2.4-5'
 f = 'exp(6*x) + 1.441*exp(2*x) - 2.079*exp(4*x) - 0.3330'
 interval = '[-1, 0]'
-notes = '2.4-1(d) with its coefficients rounded to 4 digits, as the book says. Newton and the modified Newton method (2.13) to `1E-5`, compared with 2.4-1(d) and 2.4-2(d).'
+notes = "2.4-1(d) with its coefficients rounded to 4 digits, as the book says. Newton and the modified Newton method (2.13) to `1E-5`, compared with the results of 2.4-1(d) and of the book's \"2(d)\". That \"2(d)\" is most likely a slip for 2.4-3(d), the modified Newton method on 2.4-1(d), because 2.4-2(d) is an unrelated function."
 
 [[rows]]
 key = '2.4-D2'
