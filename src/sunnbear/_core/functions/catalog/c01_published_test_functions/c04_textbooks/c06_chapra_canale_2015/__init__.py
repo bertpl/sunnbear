@@ -26,7 +26,6 @@ from . import (
     f17_prob_5_8,
     f18_prob_5_10,
     f19_prob_5_11,
-    f20_prob_5_12,
     f21_prob_5_15,
     f22_prob_5_16,
     f23_prob_5_17,
