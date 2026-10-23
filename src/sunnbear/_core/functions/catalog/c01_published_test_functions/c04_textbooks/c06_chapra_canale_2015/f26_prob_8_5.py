@@ -22,7 +22,7 @@ class ChapraCanale2015Prob85(Formula):
     concentrations. Graphically, then by bisection or false position to `es = 0.5%`.
     """
 
-    number = (1, 4, 6, 27)
+    number = (1, 4, 6, 26)
     name = "Prob. 8.5"
     param_names = ("K", "ca0", "cb0", "cc0")
     source = FormulaSource(

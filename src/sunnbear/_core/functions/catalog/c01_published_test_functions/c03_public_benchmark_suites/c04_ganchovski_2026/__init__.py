@@ -6,7 +6,7 @@ A script generates this package from the survey of published test problems: to c
 
 from sunnbear._core.functions.core import FormulaCategory
 
-from . import f04_f93, f05_f100, f06_f101
+from . import f01_f93, f02_f100, f03_f101
 
 
 class Ganchovski2026(FormulaCategory):

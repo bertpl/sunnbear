@@ -24,7 +24,7 @@ class ChapraCanale2015Prob515(Formula):
     elapsed time. Graphically, and by bisection and false position to `es = 1%`.
     """
 
-    number = (1, 4, 6, 21)
+    number = (1, 4, 6, 20)
     name = "Prob. 5.15"
     param_names = ("g", "L", "t", "v")
     source = FormulaSource(

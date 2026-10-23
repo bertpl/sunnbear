@@ -24,7 +24,7 @@ class ChapraCanale2015Prob839(Formula):
     prints `ln`.
     """
 
-    number = (1, 4, 6, 30)
+    number = (1, 4, 6, 29)
     name = "Prob. 8.39"
     param_names = ("u", "m0", "q", "g", "v")
     source = FormulaSource(

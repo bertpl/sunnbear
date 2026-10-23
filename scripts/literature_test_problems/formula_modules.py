@@ -67,11 +67,11 @@ UNTRANSLATABLE_FORMULAS = {
     "f1.4.6.7": "a parameter given as a ratio, `q/q0 = 0.01`",
     "f1.4.6.8": "a parameter defined by a formula of the other parameters, `Re = rho*V*D/mu`",
     "f1.4.6.9": "a variable named `f`, and a parameter defined by a formula of the other parameters, `Re = rho*V*D/mu`",
-    "f1.4.6.22": (
+    "f1.4.6.21": (
         "variables that depend on the unknown `y`, `B = 3 + y` and `Ac = 3*y + y^2/2`, which the row lists among its "
         "parameters"
     ),
-    "f1.4.6.24": "a change of its variable to the temperature `T` in °C, as `f(T + 273.15)`",
+    "f1.4.6.23": "a change of its variable to the temperature `T` in °C, as `f(T + 273.15)`",
     "f1.4.7.1": "a variable named `lambda`, a keyword of Python",
 }
 # CASE_FRACTIONS are the positions in the interval, as fractions of its width, at which the cases are tried, in

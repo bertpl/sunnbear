@@ -30,7 +30,7 @@ class ChapraCanale2015Prob517(Formula):
     the book does not print that value of `V`. Prob. 8.10 gives 2 fixed-point forms.
     """
 
-    number = (1, 4, 6, 23)
+    number = (1, 4, 6, 22)
     name = "Prob. 5.17"
     param_names = ("R", "V")
     source = FormulaSource(

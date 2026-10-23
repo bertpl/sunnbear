@@ -28,7 +28,7 @@ class Ganchovski2026F93(Formula):
     - f99, with ``n = 17``: ``x^17 - 0.001``; the formula's interval is ``[-10, 10]``
     """
 
-    number = (1, 3, 4, 4)
+    number = (1, 3, 4, 1)
     name = "f93"
     param_names = ("n",)
     source = FormulaSource(
