@@ -13,7 +13,7 @@ from sunnbear._core.utils.math_functions import sign
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "3ffb835d0de8d79c"
+SURVEY_FIELDS_HASH = "a802aba9681ab005"
 
 
 class Moler200443(Formula):
@@ -24,9 +24,9 @@ class Moler200443(Formula):
 
     The formula's parameter ``a_`` is the source's ``a``, renamed because ``[a, b]`` names the formula's interval.
 
-    §4.3 derives it as the function on which Newton's method cycles forever around its zero `x = a`, since `f'(x)` is
-    unbounded as `x` tends to `a`; Figure 4.1 plots it with `ezplot` on `[0, 4]`. §4.4 and Ex. 4.8 ask how the secant
-    method behaves on it.
+    §4.3 derives it as the function on which Newton's method cycles forever around its zero `x = a`; the convergence
+    theory for Newton's method fails on it because `f'(x)` is unbounded as `x` tends to `a`. Figure 4.1 plots it with
+    `ezplot` on `[0, 4]`. §4.4 and Ex. 4.8 ask how the secant method behaves on it.
     """
 
     number = (1, 4, 3, 4)
@@ -35,7 +35,7 @@ class Moler200443(Formula):
     source = FormulaSource(
         reference=(
             "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); "
-            "The MathWorks, Natick, MA (electronic edition). ISBN 978-0-898716-60-3. The author's web "
+            "The MathWorks, Natick, MA (electronic edition). ISBN 0-89871-560-1. The author's web "
             "edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: "
             "https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
         ),

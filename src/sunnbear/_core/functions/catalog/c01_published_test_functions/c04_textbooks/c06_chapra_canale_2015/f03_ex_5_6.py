@@ -10,7 +10,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "fe6ac8e7dfb877fe"
+SURVEY_FIELDS_HASH = "027879634e93b5a0"
 
 
 class ChapraCanale2015Ex56(Formula):
@@ -32,8 +32,8 @@ class ChapraCanale2015Ex56(Formula):
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021; the rows "
-            "follow the 7th."
+            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
+            "2021."
         ),
         location="Ex. 5.6, §5.3.2, Fig. 5.14; Ex. 6.5; Ex. 7.6; Prob. 5.22, 5.24, 5.25",
     )

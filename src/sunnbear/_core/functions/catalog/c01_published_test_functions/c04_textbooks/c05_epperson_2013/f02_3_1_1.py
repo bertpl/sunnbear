@@ -10,7 +10,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "5b5a5239fb089dec"
+SURVEY_FIELDS_HASH = "67f9c87e55e2befe"
 
 
 class Epperson2013311(Formula):
@@ -27,7 +27,7 @@ class Epperson2013311(Formula):
     on `[0, 2]`; Newton from `x0 = 1` (3.2-5, 3.3-3); secant from `x0 = 0, x1 = 1` and from `x0 = 1, x1 = 0` (3.8-1,
     3.8-2). 3.2-2 asks what its root computes.
 
-    3.1-2(c): As 3.1-2(a).
+    3.1-2(c): 3.1-2 asks for the root to an accuracy of 0.1 by bisection, by hand.
     """
 
     number = (1, 4, 5, 2)

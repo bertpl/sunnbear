@@ -11,7 +11,7 @@ from sunnbear._core.utils.math_functions import bessel_j0
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "5bf7f68621696321"
+SURVEY_FIELDS_HASH = "37e537f0219a739f"
 
 
 class Moler20044748(Formula):
@@ -36,7 +36,7 @@ class Moler20044748(Formula):
     source = FormulaSource(
         reference=(
             "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); "
-            "The MathWorks, Natick, MA (electronic edition). ISBN 978-0-898716-60-3. The author's web "
+            "The MathWorks, Natick, MA (electronic edition). ISBN 0-89871-560-1. The author's web "
             "edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: "
             "https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
         ),
@@ -69,7 +69,6 @@ class Moler20044748(Formula):
                     (21.9911485751, 25.1327412287),
                     (25.1327412287, 28.2743338823),
                     (28.2743338823, 31.4159265359),
-                    (0.0, 3.14159265359),
                     (0.0, 3.83),
                     (0.0, 31.4159265359),
                 ),
@@ -106,7 +105,6 @@ class Moler20044748(Formula):
         FormulaTestCase.value(
             params={"a": 28.2743338823, "b": 31.4159265359}, x=29.2168, c=0.0, expected=-0.14588234995066635
         ),
-        FormulaTestCase.value(params={"a": 0.0, "b": 3.14159265359}, x=0.942478, c=0.0, expected=0.7899621483111053),
         FormulaTestCase.value(params={"a": 0.0, "b": 3.83}, x=1.149, c=0.0, expected=0.6962046677389843),
         FormulaTestCase.value(params={"a": 0.0, "b": 31.4159265359}, x=9.42478, c=0.0, expected=-0.1812118138919495),
         FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 3.14159265359}, expected=(0.0, 3.14159265359)),

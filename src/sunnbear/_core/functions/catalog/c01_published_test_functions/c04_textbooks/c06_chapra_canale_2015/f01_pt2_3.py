@@ -12,16 +12,16 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "3b90797d86a2232e"
+SURVEY_FIELDS_HASH = "6c888e0ceacf78be"
 
 
 class ChapraCanale2015Pt23(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The survey writes the source's function as ``(g*m/c)*(1 - exp(-(c/m)*t)) - v``, with the parameters on `[12, 16]`,
-    `[4, 20]`: `g = 9.81` m/s^2, `m = 68.1` kg, `v = 40` m/s, `t = 10` s (Ex. 5.1); on `[3, 5]`: `m = 82`, `v = 36`, `t
-    = 4` (Prob. 5.14); the formula's intervals are `[12, 16]` (Ex. 5.3, 5.5); `[3, 5]` (Prob. 5.14); `[4, 20]` (Fig.
-    5.1).
+    The survey writes the source's function as ``(g*m/c)*(1 - exp(-(c/m)*t)) - v``, with the parameters of each
+    interval: on `[12, 16]`, `[4, 20]`: `g = 9.81` m/s^2, `m = 68.1` kg, `v = 40` m/s, `t = 10` s (Ex. 5.1); on `[3,
+    5]`: `m = 82`, `v = 36`, `t = 4` (Prob. 5.14); the formula's intervals are `[12, 16]` (Ex. 5.3, 5.5); `[3, 5]`
+    (Prob. 5.14); `[4, 20]` (Fig. 5.1).
 
     Unknown `c`, the drag coefficient (kg/s) that gives a parachutist of mass `m` the velocity `v` after `t` seconds of
     free fall. Ex. 5.1 prints it with the values as (E5.1.1), `(668.06/c)*(1 - exp(-0.146843*c)) - 40`, and reads 14.75
@@ -36,8 +36,8 @@ class ChapraCanale2015Pt23(Formula):
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021; the rows "
-            "follow the 7th."
+            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
+            "2021."
         ),
         location=(
             "(PT2.3), (PT2.4); Ex. 5.1, 5.3–5.5; Fig. 5.1, 5.6, 5.7, 5.13; Prob. 5.14, 5.21, 5.23, 5.26, 7.20, 7.21"

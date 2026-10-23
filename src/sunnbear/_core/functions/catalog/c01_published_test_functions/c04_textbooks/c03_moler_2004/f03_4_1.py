@@ -10,7 +10,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "7e6f52cb4a4ccca8"
+SURVEY_FIELDS_HASH = "91fc8e08dc88f7a0"
 
 
 class Moler200441(Formula):
@@ -31,7 +31,7 @@ class Moler200441(Formula):
     source = FormulaSource(
         reference=(
             "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); "
-            "The MathWorks, Natick, MA (electronic edition). ISBN 978-0-898716-60-3. The author's web "
+            "The MathWorks, Natick, MA (electronic edition). ISBN 0-89871-560-1. The author's web "
             "edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: "
             "https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
         ),

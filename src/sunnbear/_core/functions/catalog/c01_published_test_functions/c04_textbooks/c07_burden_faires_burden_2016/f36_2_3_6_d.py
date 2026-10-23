@@ -19,7 +19,7 @@ class BurdenFairesBurden2016236D(Formula):
 
     The survey writes the source's function as ``(x - 2)^2 - log(x)``; the formula's intervals are `[1, 2]`; `[e, 4]`.
 
-    The value ``E`` is rounded to 12 significant digits, the most that a parameter value holds.
+    The value ``e`` is rounded to 12 significant digits, the most that a parameter value holds.
 
     As 2.3-6(a).
     """

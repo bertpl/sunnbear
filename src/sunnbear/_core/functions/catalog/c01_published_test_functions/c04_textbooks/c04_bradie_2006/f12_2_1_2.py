@@ -10,7 +10,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "02e4acbe80e09407"
+SURVEY_FIELDS_HASH = "3dda25b1e2460ce7"
 
 
 class Bradie2006212(Formula):
@@ -18,10 +18,10 @@ class Bradie2006212(Formula):
 
     The survey writes the source's function as ``x^3 + x^2 - 3*x - 3``; the formula's interval is ``(1, 2)``.
 
-    Root `sqrt(3)` in the interval, and -1 outside it. Bisection (2.1-2), false position (2.2-4), Newton (2.4-3) and
-    secant (2.5-5). Table 2.4 runs fixed-point iteration from `p0 = 1` to `1E-7` with 5 iteration functions: `g1 = (x^3
-    + x^2 - 3)/3`, which converges to -1; `g2 = -1 + (3*x + 3)/x^2`, which does not converge; `g3 = (3 + 3*x -
-    x^2)^(1/3)`; `g4 = sqrt((3 + 3*x - x^2)/x)`; and `g5 = x - (x^3 + x^2 - 3*x - 3)/(3*x^2 + 2*x - 3)`.
+    Root `sqrt(3)` in the interval; -1 and `-sqrt(3)` lie outside it. Bisection (2.1-2), false position (2.2-4), Newton
+    (2.4-3) and secant (2.5-5). Table 2.4 runs fixed-point iteration from `p0 = 1` to `1E-7` with 5 iteration functions:
+    `g1 = (x^3 + x^2 - 3)/3`, which converges to -1; `g2 = -1 + (3*x + 3)/x^2`, which does not converge; `g3 = (3 + 3*x
+    - x^2)^(1/3)`; `g4 = sqrt((3 + 3*x - x^2)/x)`; and `g5 = x - (x^3 + x^2 - 3*x - 3)/(3*x^2 + 2*x - 3)`.
     """
 
     number = (1, 4, 4, 12)

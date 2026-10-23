@@ -1,9 +1,9 @@
 """This module holds a formula of Chapra, Canale (2015).
 
 The formula comes from the row with the key ``Prob. 5.18`` in the survey of published test problems. The survey gives
-this function as 1 expression that the module generator, `scripts/literature_test_problems/formula_modules.py`, cannot
-translate: a change of its variable, to the temperature `T` of `f(T + 273.15)`. A person therefore writes this module,
-and a change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+this function as 1 expression with a change of its variable to the temperature `T` in °C, as `f(T + 273.15)`, which the
+module generator, `scripts/literature_test_problems/formula_modules.py`, cannot apply, so a person writes this module: a
+change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math
@@ -15,8 +15,8 @@ class ChapraCanale2015Prob518(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
     The survey writes the source's function as ``log(osf) = -139.34411 + 1.575701E5/Ta - 6.642308E7/Ta^2 +
-    1.243800E10/Ta^3 - 8.621949E11/Ta^4``, with the parameters `Ta = T + 273.15`; `osf = 8, 10, 12` mg/L; the formula's
-    interval is `[273.15, 313.15]` (`T` from 0 to 40 °C, as values of `Ta`).
+    1.243800E10/Ta^3 - 8.621949E11/Ta^4``, with the parameters `Ta = T + 273.15`; `osf = 8, 10, 12` mg/L; the survey's
+    interval, in the source's variable, is `[273.15, 313.15]` (`T` from 0 to 40 °C, as values of `Ta`).
 
     Unknown ``T``, the temperature (°C) of freshwater at 1 atm whose saturation concentration of dissolved oxygen is
     ``osf``. Bisection to an absolute error of 0.05 °C; the problem first asks how many iterations that takes. The book
@@ -33,8 +33,8 @@ class ChapraCanale2015Prob518(Formula):
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021; the rows "
-            "follow the 7th."
+            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
+            "2021."
         ),
         location="Prob. 5.18",
     )

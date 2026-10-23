@@ -10,7 +10,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "82ef750cea4c1d79"
+SURVEY_FIELDS_HASH = "e9b0d2c5095a4663"
 
 
 class Bradie20062116B(Formula):
@@ -18,7 +18,8 @@ class Bradie20062116B(Formula):
 
     The survey writes the source's function as ``x^3 - x^2 - 10*x + 7``; the formula's interval is `(0, 1)` (2.3-15).
 
-    As 2.1-16(a).
+    All real roots to `1E-6` by bisection, false position, Newton and secant. 2.3-15 compares 3 fixed-point iteration
+    functions of the reader's choice for its unique zero on `(0, 1)`.
     """
 
     number = (1, 4, 4, 20)

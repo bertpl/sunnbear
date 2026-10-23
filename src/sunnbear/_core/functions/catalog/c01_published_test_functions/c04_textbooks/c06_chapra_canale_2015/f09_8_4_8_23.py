@@ -2,9 +2,9 @@
 
 The formula comes from the row with the key ``§8.4, (8.23), Fig. 8.6`` in the survey of published test problems. The
 survey gives this function as 1 expression that the module generator,
-`scripts/literature_test_problems/formula_modules.py`, cannot translate: parameters given by a reference to another row,
-and a variable named `f`. A person therefore writes this module, and a change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+`scripts/literature_test_problems/formula_modules.py`, cannot translate: a variable named `f`, and a parameter defined
+by a formula of the other parameters, `Re = rho*V*D/mu`. A person therefore writes this module, and a change of the
+formula's row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math
@@ -16,7 +16,8 @@ class ChapraCanale201584823(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
     The survey writes the source's function as ``f = 0.25/(log10(eps/(3.7*D) + 2.51/(Re*sqrt(f))))^2``, with the
-    parameters ``as in §8.4's Colebrook row``; the formula's interval is ``[0.008, 0.08]``.
+    parameters `Re = rho*V*D/mu`; `rho = 1.23` kg/m^3, `mu = 1.79E-5` N s/m^2, `D = 0.005` m, `V = 40` m/s, `eps =
+    1.5E-6` m (the book's 0.0015 mm), so `Re = 13743` (§8.4); the formula's interval is ``[0.008, 0.08]``.
 
     (8.21) solved for its first ``f``; the book prints ``log``, base 10. Fixed-point iteration from any guess in the
     interval reaches an error below 0.008% in 6 or fewer iterations.
@@ -32,8 +33,8 @@ class ChapraCanale201584823(Formula):
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021; the rows "
-            "follow the 7th."
+            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
+            "2021."
         ),
         location="§8.4, (8.23), Fig. 8.6",
     )
@@ -42,7 +43,7 @@ class ChapraCanale201584823(Formula):
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - 0.07200000000000001 * c
-        # the difference form of the fixed-point equation f = g(f), with the values of Section 8.4's example
+        # the formula is the difference form of the fixed-point equation f = g(f), with Section 8.4's values
         diameter, eps = 0.005, 1.5e-6
         reynolds = 1.23 * 40.0 * diameter / 1.79e-5
         return x - 0.25 / math.log10(eps / (3.7 * diameter) + 2.51 / (reynolds * math.sqrt(x))) ** 2

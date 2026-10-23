@@ -9,7 +9,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "5b6ddf928ff0b65c"
+SURVEY_FIELDS_HASH = "db32e7dd8c2f609d"
 
 
 class Epperson2013312E(Formula):
@@ -17,7 +17,7 @@ class Epperson2013312E(Formula):
 
     The survey writes the source's function as ``3 - 2^x``; the formula's interval is ``[0, 2]``.
 
-    As 3.1-2(a).
+    3.1-2 asks for the root to an accuracy of 0.1 by bisection, by hand.
     """
 
     number = (1, 4, 5, 5)

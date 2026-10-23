@@ -38,7 +38,7 @@ class SuliMayers2003Example14(Formula):
     def parametrized_fun(x: float, c: float, alpha: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - 1.0 * c
-        # the difference form x - g(x) of the fixed-point equation x = g(x), with g(0) = 0
+        # the formula is the difference form x - g(x) of the fixed-point equation x = g(x), with g(0) = 0
         if x == 0.0:
             return 0.0
         else:

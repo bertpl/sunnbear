@@ -1,5 +1,5 @@
 title = 'Chapra, Canale (2015): Numerical Methods for Engineers, Part Two'
-reference = 'Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. McGraw-Hill Education. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021; the rows follow the 7th.'
+reference = 'Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021.'
 year = 2015
 subcategory = '1.4'
 where_in_source = '''
@@ -295,7 +295,7 @@ notes = "Unknown `f`, the friction factor of turbulent flow in a pipe of roughne
 key = '§8.4, (8.23), Fig. 8.6'
 f = 'f = 0.25/(log10(eps/(3.7*D) + 2.51/(Re*sqrt(f))))^2'
 name = 'Colebrook equation, fixed-point form'
-parameters = "as in §8.4's Colebrook row"
+parameters = "`Re = rho*V*D/mu`; `rho = 1.23` kg/m^3, `mu = 1.79E-5` N s/m^2, `D = 0.005` m, `V = 40` m/s, `eps = 1.5E-6` m (the book's 0.0015 mm), so `Re = 13743` (§8.4)"
 interval = '[0.008, 0.08]'
 notes = '(8.21) solved for its first `f`; the book prints `log`, base 10. Fixed-point iteration from any guess in the interval reaches an error below 0.008% in 6 or fewer iterations.'
 
@@ -368,7 +368,7 @@ notes = 'Analytically and by false position to `es = 2.5%` (5.11); modified seca
 key = 'Prob. 5.12, 6.12'
 f = '-2*x^6 - 1.5*x^4 + 10*x + 2'
 interval = '[0, 1]'
-notes = "The maximum, a root of `f'(x)`: by bisection to `es = 5%` (5.12); by a method of the reader's choice to `es = 5%` (6.12), with the interval for a bracketing method, `x(i) = 1` for Newton or modified secant, `x(i-1) = 0`, `x(i) = 1` for secant."
+notes = "The function has no zero on `[0, 1]`, where it runs from 2 to 8.5; the problems seek its maximum, the zero of `f'(x) = -12*x^5 - 6*x^3 + 10` at about 0.871411: by bisection to `es = 5%` (5.12); by a method of the reader's choice to `es = 5%` (6.12), with the interval for a bracketing method, `x(i) = 1` for Newton or modified secant, `x(i-1) = 0`, `x(i) = 1` for secant."
 
 [[rows]]
 key = 'Prob. 5.13, 7.11'
@@ -397,9 +397,9 @@ notes = 'Unknown `y`, the critical depth (m); `B` is the width at the surface an
 key = 'Prob. 5.17, 5.19, 6.19, 8.9'
 f = 'V = pi*h^2*(3*R - h)/3'
 name = 'volume of water in a spherical tank; part of a floating sphere above water'
-parameters = '`R = 3` m, `V = 30` m^3 (5.17, 6.19); `R = 1` m, `V = 0.5` m^3 (8.9, which writes `r`); `r = 1` m, `V = (4/3)*pi*r^3*(1 - rho_s/rho_w)`, `rho_s = 200`, `rho_w = 1000` kg/m^3 (5.19)'
+parameters = '`R = 3` m, `V = 30` m^3 (5.17, 6.19)'
 interval = '`[0, 3]` (5.17)'
-notes = "Unknown `h`, the depth of water in a spherical tank of radius `R`: 3 false-position iterations on `[0, R]` (5.17); 3 Newton iterations from `h0 = R`, which the book says always converges (6.19). In Prob. 5.19, `h` is the height above water of a floating sphere of density `rho_s`, by bisection; the problem prints the volume of that cap and states Archimedes' principle, from which its `V` follows, though the book does not print that value. Prob. 8.10 gives 2 fixed-point forms."
+notes = "Unknown `h`, the depth of water in a spherical tank of radius `R`: 3 false-position iterations on `[0, R]` (5.17); 3 Newton iterations from `h0 = R`, which the book says always converges (6.19). Prob. 8.9 asks for `h` at `R = 1` m (written `r`) and `V = 0.5` m^3, and gives no interval or starting point. In Prob. 5.19, `h` is the height above water of a floating sphere, by bisection, with no interval: the problem gives `r = 1` m, the densities `rho_s = 200` and `rho_w = 1000` kg/m^3 of the sphere and the water, the volume of the cap above water, and Archimedes' principle, so that `R = 1` m and `V = (4/3)*pi*r^3*(1 - rho_s/rho_w) = 3.35103216383` m^3; the book does not print that value of `V`. Prob. 8.10 gives 2 fixed-point forms."
 
 [[rows]]
 key = 'Prob. 5.18'

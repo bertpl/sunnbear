@@ -8,25 +8,26 @@ generates this module from that survey: to change the formula, change its source
 
 import math
 
-from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "57a9a650427ba72a"
+SURVEY_FIELDS_HASH = "d8b3502e1f245ae2"
 
 
 class BurdenFairesBurden2016216B(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The survey writes the source's function as ``2*x + 3*cos(x) - exp(x)``; the formula's intervals are `[0, 1]`
-    (2.1-6); `[1, 2]` (2.3-11).
+    The survey writes the source's function as ``2*x + 3*cos(x) - exp(x)``; the formula's interval is ``[1, 2]``.
 
-    As 2.1-6(a).
+    As 2.1-6(a). 2.1-6(b) prints `[0, 1]`, a misprint: the function is concave there, with `f(0) = 2` and `f(1) =
+    0.903`, so it has no zero on `[0, 1]`; 2.3-11(b), which repeats the exercise, gives `[1, 2]`, which holds the zero
+    about 1.2397.
     """
 
     number = (1, 4, 7, 16)
     name = "2.1-6(b)"
-    param_names = ("a", "b")
+    param_names = ()
     source = FormulaSource(
         reference=(
             "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. "
@@ -37,23 +38,21 @@ class BurdenFairesBurden2016216B(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
+    def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+        x = x - 1.0 * c
         return 2 * x + 3 * math.cos(x) - math.exp(x)
 
-    def interval_bounds(self, a: float, b: float) -> tuple[float, float]:
-        """Return the interval of the tuple, its parameters ``a`` and ``b``."""
-        return (a, b)
+    def interval_bounds(self) -> tuple[float, float]:
+        """Return the formula's interval."""
+        return (1.0, 2.0)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the published parameter values."""
-        return (ParamTable(names=("a", "b"), rows=((0.0, 1.0), (1.0, 2.0))),)
+        """Return no recipe, since the published function has no parameters."""
+        return ()
 
     cases = (
-        FormulaTestCase.value(params={"a": 0.0, "b": 1.0}, x=0.3, c=0.0, expected=2.116150659800815),
-        FormulaTestCase.value(params={"a": 0.0, "b": 1.0}, x=0.3, c=0.25, expected=2.0449796848088746),
-        FormulaTestCase.value(params={"a": 1.0, "b": 2.0}, x=1.3, c=0.0, expected=-0.2668001817454822),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 1.0}, expected=(0.0, 1.0)),
-        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 2.0}, expected=(1.0, 2.0)),
+        FormulaTestCase.value(params={}, x=1.3, c=0.0, expected=-0.2668001817454822),
+        FormulaTestCase.value(params={}, x=1.3, c=0.25, expected=0.7350620256120171),
+        FormulaTestCase.interval_bounds(params={}, expected=(1.0, 2.0)),
     )

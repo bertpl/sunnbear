@@ -43,8 +43,8 @@ from . import (
 class ChapraCanale2015(FormulaCategory):
     """`ChapraCanale2015` is the category of the formulas of 1 publication.
 
-    Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. McGraw-Hill Education. ISBN
-    978-0-07-339792-4. The 8th edition appeared in 2021; the rows follow the 7th.
+    Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. McGraw-Hill Education, New York,
+    NY. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021.
     """
 
     number = (1, 4, 6)

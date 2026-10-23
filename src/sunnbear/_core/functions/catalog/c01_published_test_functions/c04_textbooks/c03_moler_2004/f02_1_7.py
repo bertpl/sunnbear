@@ -9,7 +9,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "5fa906e61dce8b63"
+SURVEY_FIELDS_HASH = "32abf916a5b03152"
 
 
 class Moler200417(Formula):
@@ -30,7 +30,7 @@ class Moler200417(Formula):
     source = FormulaSource(
         reference=(
             "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); "
-            "The MathWorks, Natick, MA (electronic edition). ISBN 978-0-898716-60-3. The author's web "
+            "The MathWorks, Natick, MA (electronic edition). ISBN 0-89871-560-1. The author's web "
             "edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: "
             "https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
         ),
@@ -51,8 +51,10 @@ class Moler200417(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
+    # a case with a positive `atol` lies where float64 cannot evaluate the function to the
+    # default tolerance, because the function is ill-conditioned there or its terms cancel
     cases = (
-        FormulaTestCase.value(params={}, x=0.9952, c=0.0, expected=-5.870683422720226e-17),
-        FormulaTestCase.value(params={}, x=0.9952, c=0.25, expected=-1.7138242687795553e-14),
+        FormulaTestCase.value(params={}, x=0.9952, c=0.0, expected=-5.870683422720226e-17, atol=4e-13),
+        FormulaTestCase.value(params={}, x=0.9952, c=0.25, expected=-1.7138242687795553e-14, atol=4e-13),
         FormulaTestCase.interval_bounds(params={}, expected=(0.988, 1.012)),
     )

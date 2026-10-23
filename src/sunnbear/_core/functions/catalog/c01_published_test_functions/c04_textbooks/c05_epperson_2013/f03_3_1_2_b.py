@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "359f43eaab5d20d7"
+SURVEY_FIELDS_HASH = "9a7b7a832d74f23d"
 
 
 class Epperson2013312B(Formula):
@@ -19,7 +19,7 @@ class Epperson2013312B(Formula):
 
     The survey writes the source's function as ``log(x) + x``; the formula's interval is ``[1/10, 1]``.
 
-    As 3.1-2(a).
+    3.1-2 asks for the root to an accuracy of 0.1 by bisection, by hand.
     """
 
     number = (1, 4, 5, 3)

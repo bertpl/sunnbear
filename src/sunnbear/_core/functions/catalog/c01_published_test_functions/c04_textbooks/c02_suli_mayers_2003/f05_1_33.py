@@ -9,7 +9,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "3e30ffb86f6b9df4"
+SURVEY_FIELDS_HASH = "851e5e720bd76815"
 
 
 class SuliMayers2003133(Formula):
@@ -20,8 +20,8 @@ class SuliMayers2003133(Formula):
 
     The formula's parameter ``a_`` is the source's ``a``, renamed because ``[a, b]`` names the formula's interval.
 
-    Fixed points 0 and `1 - 1/a`. For `a = 3.4` the iterates approach a 2-cycle, 0.45 and 0.84, the fixed points of
-    `g(g(x))` (eq. (1.34)); for `a = 3.5` a 4-cycle; for `a = 3.99`, from `x0 = 0.75`, no regular pattern.
+    Fixed points 0 and `1 - 1/a`. For `a = 3.4` the iterates approach a 2-cycle, 0.45 and 0.84, the 2 stable fixed
+    points of `g(g(x))` (eq. (1.34)); for `a = 3.5` a 4-cycle; for `a = 3.99`, from `x0 = 0.75`, no regular pattern.
     """
 
     number = (1, 4, 2, 5)

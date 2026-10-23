@@ -9,7 +9,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "d4bd366a91730fd0"
+SURVEY_FIELDS_HASH = "b940a9c5ccd441e6"
 
 
 class Moler200411(Formula):
@@ -18,9 +18,9 @@ class Moler200411(Formula):
     The survey writes the source's function as ``1/x - (x - 1)``; the formula's interval is `[0, 4]` (Figure 1.2).
 
     The aspect ratio equation `1/x = x - 1` of the golden rectangle, whose positive root is the golden ratio `(1 +
-    sqrt(5))/2`. §1.1 solves it 3 ways: as the polynomial `x^2 - x - 1` with `roots`; symbolically with `solve(1/x ==
-    x-1)`; and as `f = @(x) 1./x-(x-1)` with `fzero(f,1)`, from the starting point `x = 1`. `ezplot(f,0,4)` plots `f` on
-    `[0, 4]` (Figure 1.2), where it becomes infinite as `x` tends to 0.
+    sqrt(5))/2`. Besides the quadratic formula, §1.1 solves it 3 ways in MATLAB: as the polynomial `x^2 - x - 1` with
+    `roots`; symbolically with `solve(1/x == x-1)`; and as `f = @(x) 1./x-(x-1)` with `fzero(f,1)`, from the starting
+    point `x = 1`. `ezplot(f,0,4)` plots `f` on `[0, 4]` (Figure 1.2), where it becomes infinite as `x` tends to 0.
     """
 
     number = (1, 4, 3, 1)
@@ -29,7 +29,7 @@ class Moler200411(Formula):
     source = FormulaSource(
         reference=(
             "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); "
-            "The MathWorks, Natick, MA (electronic edition). ISBN 978-0-898716-60-3. The author's web "
+            "The MathWorks, Natick, MA (electronic edition). ISBN 0-89871-560-1. The author's web "
             "edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: "
             "https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
         ),

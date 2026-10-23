@@ -24,8 +24,8 @@ class BurdenFairesBurden20162Pp4748(Formula):
     then predicts the population after 2 years.
 
     The formula's ``x`` is the source's ``lambda``, and the formula is the difference form ``1564000 - (...)`` of the
-    printed equation. Its interval is ``[0, 1]``; at ``x = 0``, where the source's function divides 0 by 0, the formula
-    takes its limit, 129000.
+    printed equation. The formula's interval is ``[0, 1]``; at ``x = 0``, where the source's function divides 0 by 0,
+    the formula takes its limit, 129000.
     """
 
     number = (1, 4, 7, 1)

@@ -10,7 +10,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "be5882538e0545bf"
+SURVEY_FIELDS_HASH = "e7ed3e4f8b28a20a"
 
 
 class BurdenFairesBurden201621Ex1(Formula):
@@ -23,8 +23,9 @@ class BurdenFairesBurden201621Ex1(Formula):
     `1E-3` (Ex. 2). §2.2 rewrites it as 5 fixed-point problems, iterated from `p0 = 1.5` (Table 2.2): `g1 = x - x^3 -
     4*x^2 + 10`, which diverges; `g2 = (10/x - 4*x)^(1/2)`, which becomes undefined; `g3 = (1/2)*(10 - x^3)^(1/2)`; `g4
     = (10/(4 + x))^(1/2)`; and `g5 = x - (x^3 + 4*x^2 - 10)/(3*x^2 + 8*x)`, Newton's iteration. The second Illustration
-    checks Theorem 2.4 for each on `[1, 2]`, and for `g3` on `[1, 1.5]`. Newton and the modified Newton method (2.13)
-    from `p0 = 1.5` (§2.4); Steffensen's method on `g4` from `p0 = 1.5` (§2.5, Table 2.11).
+    checks Theorem 2.4 for `g1` to `g4` on `[1, 2]`, and for `g3` on `[1, 1.5]`; it notes only that `g5` converges
+    fastest. Newton and the modified Newton method (2.13) from `p0 = 1.5` (§2.4); Steffensen's method on `g4` from `p0 =
+    1.5` (§2.5, Table 2.11).
     """
 
     number = (1, 4, 7, 3)

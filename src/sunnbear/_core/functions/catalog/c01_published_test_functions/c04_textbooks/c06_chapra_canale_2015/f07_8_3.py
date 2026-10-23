@@ -22,7 +22,7 @@ class ChapraCanale201583(Formula):
     Printed with the values as (8.20), ``exp(-0.005*R)*cos(sqrt(2000 - 0.01*R^2)*0.05) - 0.01``, which needs ``2000 -
     0.01*R^2 > 0``. 21 bisection iterations give ``R = 328.1515``.
 
-    The formula's ``x`` is the source's ``R``, with ``L = 5``, ``C = 10^-4``, ``t = 0.05`` and ``q/q0 = 0.01``.
+    The formula's ``x`` is the source's ``R``, and the parameters' published values are constants of the function.
     """
 
     number = (1, 4, 6, 7)
@@ -31,8 +31,8 @@ class ChapraCanale201583(Formula):
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021; the rows "
-            "follow the 7th."
+            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
+            "2021."
         ),
         location="§8.3, (8.19), (8.20), Fig. 8.4",
     )

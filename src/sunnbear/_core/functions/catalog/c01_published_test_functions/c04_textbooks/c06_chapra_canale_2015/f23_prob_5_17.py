@@ -12,21 +12,22 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "7c17fc958acf4881"
+SURVEY_FIELDS_HASH = "0f3e68a2bd4b21d1"
 
 
 class ChapraCanale2015Prob517(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
     The survey writes the source's function as ``V = pi*h^2*(3*R - h)/3``, with the parameters `R = 3` m, `V = 30` m^3
-    (5.17, 6.19); `R = 1` m, `V = 0.5` m^3 (8.9, which writes `r`); `r = 1` m, `V = (4/3)*pi*r^3*(1 - rho_s/rho_w)`,
-    `rho_s = 200`, `rho_w = 1000` kg/m^3 (5.19); the formula's interval is `[0, 3]` (5.17).
+    (5.17, 6.19); the formula's interval is `[0, 3]` (5.17).
 
     Unknown `h`, the depth of water in a spherical tank of radius `R`: 3 false-position iterations on `[0, R]` (5.17); 3
-    Newton iterations from `h0 = R`, which the book says always converges (6.19). In Prob. 5.19, `h` is the height above
-    water of a floating sphere of density `rho_s`, by bisection; the problem prints the volume of that cap and states
-    Archimedes' principle, from which its `V` follows, though the book does not print that value. Prob. 8.10 gives 2
-    fixed-point forms.
+    Newton iterations from `h0 = R`, which the book says always converges (6.19). Prob. 8.9 asks for `h` at `R = 1` m
+    (written `r`) and `V = 0.5` m^3, and gives no interval or starting point. In Prob. 5.19, `h` is the height above
+    water of a floating sphere, by bisection, with no interval: the problem gives `r = 1` m, the densities `rho_s = 200`
+    and `rho_w = 1000` kg/m^3 of the sphere and the water, the volume of the cap above water, and Archimedes' principle,
+    so that `R = 1` m and `V = (4/3)*pi*r^3*(1 - rho_s/rho_w) = 3.35103216383` m^3; the book does not print that value
+    of `V`. Prob. 8.10 gives 2 fixed-point forms.
     """
 
     number = (1, 4, 6, 23)
@@ -35,8 +36,8 @@ class ChapraCanale2015Prob517(Formula):
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021; the rows "
-            "follow the 7th."
+            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
+            "2021."
         ),
         location="Prob. 5.17, 5.19, 6.19, 8.9",
     )
@@ -53,12 +54,10 @@ class ChapraCanale2015Prob517(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("R", "V"), rows=((3.0, 30.0), (1.0, 0.5), (3.0, 30.0))),)
+        return (ParamTable(names=("R", "V"), rows=((3.0, 30.0),)),)
 
     cases = (
         FormulaTestCase.value(params={"R": 3.0, "V": 30.0}, x=0.9, c=0.0, expected=23.12933686659912),
         FormulaTestCase.value(params={"R": 3.0, "V": 30.0}, x=0.9, c=0.25, expected=29.791476787617977),
-        FormulaTestCase.value(params={"R": 1.0, "V": 0.5}, x=0.9, c=0.0, expected=-1.281283034585413),
-        FormulaTestCase.value(params={"R": 3.0, "V": 30.0}, x=0.9, c=0.0, expected=23.12933686659912),
         FormulaTestCase.interval_bounds(params={"R": 3.0, "V": 30.0}, expected=(0.0, 3.0)),
     )

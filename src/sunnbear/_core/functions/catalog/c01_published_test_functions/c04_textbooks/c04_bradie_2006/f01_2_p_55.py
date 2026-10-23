@@ -10,19 +10,20 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "599053a1fc8ab524"
+SURVEY_FIELDS_HASH = "26aeb23d3442322b"
 
 
 class Bradie20062P55(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
     The survey writes the source's function as ``(rho_f/3)*h^3 - R*rho_f*h^2 + (4/3)*R^3*rho_o``, with the parameters `R
-    = 5` cm, `rho_o = 0.120`, `rho_f = 0.890` g/cm^3 (§2.2); `R = 2`, `rho_o = 0.040`, `rho_f = 0.998` (2.2-15); the
-    formula's interval is `(0, 10)` (§2.2).
+    = 5` cm, `rho_o = 0.120`, `rho_f = 0.890` g/cm^3 (§2.2); the formula's interval is `(0, 10)` (§2.2).
 
     Unknown `h`, the depth to which a sphere of radius `R` and density `rho_o` sinks in a fluid of density `rho_f`; the
     derivation assumes the sphere is not fully submerged. False position on `(0, 10)` with tolerance `5E-5` gives `p5 =
-    2.3043353119`.
+    2.3043353119`. 2.2-15 reworks the problem for a glass marble, `R = 2`, `rho_o = 0.040`, `rho_f = 0.998`, and gives
+    no interval. Its physical root is about 0.48212. On `(0, 10)` that cubic has no sign change: it also has the root
+    5.96394 there, beyond the marble's diameter `2*R = 4`, where the derivation no longer holds.
     """
 
     number = (1, 4, 4, 1)
@@ -48,15 +49,12 @@ class Bradie20062P55(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("R", "rho_o", "rho_f"), rows=((5.0, 0.12, 0.89), (2.0, 0.04, 0.998))),)
+        return (ParamTable(names=("R", "rho_o", "rho_f"), rows=((5.0, 0.12, 0.89),)),)
 
     cases = (
         FormulaTestCase.value(params={"R": 5.0, "rho_o": 0.12, "rho_f": 0.89}, x=3.0, c=0.0, expected=-12.04),
         FormulaTestCase.value(
             params={"R": 5.0, "rho_o": 0.12, "rho_f": 0.89}, x=3.0, c=0.25, expected=18.924583333333334
-        ),
-        FormulaTestCase.value(
-            params={"R": 2.0, "rho_o": 0.04, "rho_f": 0.998}, x=3.0, c=0.0, expected=-8.555333333333333
         ),
         FormulaTestCase.interval_bounds(params={"R": 5.0, "rho_o": 0.12, "rho_f": 0.89}, expected=(0.0, 10.0)),
     )

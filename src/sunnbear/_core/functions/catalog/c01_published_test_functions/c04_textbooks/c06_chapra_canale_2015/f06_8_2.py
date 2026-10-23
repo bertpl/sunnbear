@@ -1,9 +1,9 @@
 """This module holds a formula of Chapra, Canale (2015).
 
 The formula comes from the row with the key ``§8.2, (8.14)`` in the survey of published test problems. The survey gives
-this function as 1 expression that the module generator, `scripts/literature_test_problems/formula_modules.py`, cannot
-translate: a change of its variable, to the pH of `f(10^-pH)`. A person therefore writes this module, and a change of
-the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+this function as 1 expression with a change of its variable to the pH, as `f(10^-pH)`, which the module generator,
+`scripts/literature_test_problems/formula_modules.py`, cannot apply, so a person writes this module: a change of the
+formula's row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
@@ -14,7 +14,7 @@ class ChapraCanale201582(Formula):
 
     The survey writes the source's function as ``K1/(10^6*H)*KH*pCO2 + 2*K2*K1/(10^6*H^2)*KH*pCO2 + Kw/H - H``, with the
     parameters `KH = 10^-1.46`, `K1 = 10^-6.3`, `K2 = 10^-10.3`, `Kw = 10^-14`; `pCO2 = 315, 375` ppm (1958, 2003); the
-    formula's interval is `[1E-12, 1E-2]` (the pH from 2 to 12).
+    survey's interval, in the source's variable, is `[1E-12, 1E-2]` (the pH from 2 to 12).
 
     Unknown ``H``, the hydrogen-ion concentration ``[H+]``, which gives the pH ``-log10(H)`` of rainwater; the book
     derives (8.14) from 5 equilibrium equations, and calls it a cubic in ``[H+]``. Bisection on the pH, from the initial
@@ -32,8 +32,8 @@ class ChapraCanale201582(Formula):
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021; the rows "
-            "follow the 7th."
+            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
+            "2021."
         ),
         location="§8.2, (8.14)",
     )

@@ -9,19 +9,19 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "13f47b9123ad0931"
+SURVEY_FIELDS_HASH = "bb979c7b3156328c"
 
 
 class SuliMayers200312(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The survey writes the source's function as ``1/2 - 1/(1 + M*abs(x - 1.05))``, with the parameters on `[0.8, 1.8]`:
-    `M = 200` (Fig. 1.1), `M = 2000, 20000, 200000, 2000000, 20000000` (Remark 1.1); on `[1.04999, 1.05001]`: `M =
-    2000000, 20000000` (Remark 1.1); the formula's intervals are `[0.8, 1.8]`; `[1.04999, 1.05001]`.
+    The survey writes the source's function as ``1/2 - 1/(1 + M*abs(x - 1.05))``, with the parameters of each interval:
+    on `[0.8, 1.8]`: `M = 200` (Fig. 1.1), `M = 2000, 20000, 200000, 2000000, 20000000` (Remark 1.1); on `[1.04999,
+    1.05001]`: `M = 2000000, 20000000` (Remark 1.1); the formula's intervals are `[0.8, 1.8]`; `[1.04999, 1.05001]`.
 
-    2 roots, `1.05 - 1/M` and `1.05 + 1/M`, only `2/M` apart. Remark 1.1 replots it in Maple, on the smaller interval
-    for the 2 largest `M`. A footnote in Section 1.6 (p. 28) notes that bisection applies although `f` is not
-    differentiable at 1.05.
+    2 roots, `1.05 - 1/M` and `1.05 + 1/M`, only `2/M` apart. Remark 1.1 asks the reader to plot it in Maple for each
+    `M`, and to replot it on the smaller interval for the 2 largest `M`. A footnote in Section 1.6 (p. 28) notes that
+    bisection applies although `f` is not differentiable at 1.05.
     """
 
     number = (1, 4, 2, 1)

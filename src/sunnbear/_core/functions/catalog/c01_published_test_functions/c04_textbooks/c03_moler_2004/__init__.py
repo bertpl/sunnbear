@@ -29,7 +29,7 @@ class Moler2004(FormulaCategory):
     """`Moler2004` is the category of the formulas of 1 publication.
 
     Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); The MathWorks, Natick, MA
-    (electronic edition). ISBN 978-0-898716-60-3. The author's web edition, 1 PDF per chapter:
+    (electronic edition). ISBN 0-89871-560-1. The author's web edition, 1 PDF per chapter:
     https://www.mathworks.com/moler/chapters.html; chapter 4: https://www.mathworks.com/content/dam/mathworks/mathworks-
     dot-com/moler/zeros.pdf.
     """

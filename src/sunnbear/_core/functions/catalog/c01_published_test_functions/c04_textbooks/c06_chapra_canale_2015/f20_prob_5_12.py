@@ -10,7 +10,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "067c1b389fbae386"
+SURVEY_FIELDS_HASH = "d8ce2a13159ee64e"
 
 
 class ChapraCanale2015Prob512(Formula):
@@ -18,9 +18,10 @@ class ChapraCanale2015Prob512(Formula):
 
     The survey writes the source's function as ``-2*x^6 - 1.5*x^4 + 10*x + 2``; the formula's interval is ``[0, 1]``.
 
-    The maximum, a root of `f'(x)`: by bisection to `es = 5%` (5.12); by a method of the reader's choice to `es = 5%`
-    (6.12), with the interval for a bracketing method, `x(i) = 1` for Newton or modified secant, `x(i-1) = 0`, `x(i) =
-    1` for secant.
+    The function has no zero on `[0, 1]`, where it runs from 2 to 8.5; the problems seek its maximum, the zero of `f'(x)
+    = -12*x^5 - 6*x^3 + 10` at about 0.871411: by bisection to `es = 5%` (5.12); by a method of the reader's choice to
+    `es = 5%` (6.12), with the interval for a bracketing method, `x(i) = 1` for Newton or modified secant, `x(i-1) = 0`,
+    `x(i) = 1` for secant.
     """
 
     number = (1, 4, 6, 20)
@@ -29,8 +30,8 @@ class ChapraCanale2015Prob512(Formula):
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021; the rows "
-            "follow the 7th."
+            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
+            "2021."
         ),
         location="Prob. 5.12, 6.12",
     )

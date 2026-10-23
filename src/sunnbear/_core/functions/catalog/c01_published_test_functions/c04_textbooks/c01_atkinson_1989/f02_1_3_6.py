@@ -9,17 +9,17 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "fed18a9113df8e9f"
+SURVEY_FIELDS_HASH = "1a9423c8341fae69"
 
 
 class Atkinson1989136(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The survey writes the source's function as ``x^3 - 3*x^2 + 3*x - 1``; the formula's intervals are `[0, 2]`; `[0.998,
-    1.002]`.
+    The survey writes the source's function as ``x^3 - 3*x^2 + 3*x - 1``; the formula's intervals are `[0, 2]` (Figure
+    1.1); `[0.998, 1.002]` (Figure 1.2).
 
-    Equals `(x - 1)^3`. Chapter 1 evaluates it in single precision: at 640 points of `[0.998, 1.002]` the values form a
-    band around 0 (Figures 1.1–1.2).
+    Equals `(x - 1)^3`. Chapter 1 evaluates it in single precision: Figure 1.1 graphs it on `[0, 2]`, where it looks
+    smooth; at 640 points of `[0.998, 1.002]` the values form a band around 0 (Figure 1.2).
     """
 
     number = (1, 4, 1, 2)

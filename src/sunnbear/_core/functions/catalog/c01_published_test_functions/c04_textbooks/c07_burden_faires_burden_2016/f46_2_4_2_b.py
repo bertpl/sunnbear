@@ -9,17 +9,18 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "97ec5e4a6a584bc1"
+SURVEY_FIELDS_HASH = "15a192c87736753d"
 
 
 class BurdenFairesBurden2016242B(Formula):
     """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
 
-    The survey writes the source's function as ``x^2 + 6*x^5 + 9*x^4 - 2*x^3 - 6*x^2 + 1``; the formula's interval is
+    The survey writes the source's function as ``x^6 + 6*x^5 + 9*x^4 - 2*x^3 - 6*x^2 + 1``; the formula's interval is
     ``[-3, -2]``.
 
-    As 2.4-2(a). As printed, with 2 terms in `x^2`; with `x^6` for the first, it equals `(x^3 + 3*x^2 - 1)^2`, the
-    square of 2.3-5(b)'s function.
+    As 2.4-2(a). The book prints the first term as `x^2`, a misprint: as printed, the function is negative on all of
+    `[-3, -2]` and has no root there. With `x^6` it equals `(x^3 + 3*x^2 - 1)^2`, the square of 2.3-5(b)'s function,
+    with a double root at -2.879385.
     """
 
     number = (1, 4, 7, 46)
@@ -38,7 +39,7 @@ class BurdenFairesBurden2016242B(Formula):
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - 1.0 * c
-        return x**2 + 6 * x**5 + 9 * x**4 - 2 * x**3 - 6 * x**2 + 1
+        return x**6 + 6 * x**5 + 9 * x**4 - 2 * x**3 - 6 * x**2 + 1
 
     def interval_bounds(self) -> tuple[float, float]:
         """Return the formula's interval."""
@@ -49,7 +50,7 @@ class BurdenFairesBurden2016242B(Formula):
         return ()
 
     cases = (
-        FormulaTestCase.value(params={}, x=-2.7, c=0.0, expected=-378.72152000000017),
-        FormulaTestCase.value(params={}, x=-2.7, c=0.25, expected=-650.0492543750003),
+        FormulaTestCase.value(params={}, x=-2.7, c=0.0, expected=1.4089689999999977),
+        FormulaTestCase.value(params={}, x=-2.7, c=0.25, expected=0.3190837656250017),
         FormulaTestCase.interval_bounds(params={}, expected=(-3.0, -2.0)),
     )

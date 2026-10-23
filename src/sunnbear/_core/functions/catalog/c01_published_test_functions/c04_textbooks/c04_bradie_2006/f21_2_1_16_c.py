@@ -12,7 +12,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "d16c70a233bd32b2"
+SURVEY_FIELDS_HASH = "486d7fc720fe74ce"
 
 
 class Bradie20062116C(Formula):
@@ -20,7 +20,9 @@ class Bradie20062116C(Formula):
 
     The survey writes the source's function as ``1.05 - 1.04*x + log(x)``; the formula's interval is `(1, 2)` (2.3-16).
 
-    As 2.1-16(a). 2.6-9 iterates its fixed-point form `x = (1.05 + log(x))/1.04`.
+    All real roots to `1E-6` by bisection, false position, Newton and secant. 2.3-16 compares 3 fixed-point iteration
+    functions of the reader's choice for its unique zero on `(1, 2)`. 2.6-9 iterates its fixed-point form `x = (1.05 +
+    log(x))/1.04`.
     """
 
     number = (1, 4, 4, 21)

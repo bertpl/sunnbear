@@ -12,7 +12,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "e45899c5fe3191d0"
+SURVEY_FIELDS_HASH = "2f5df16c8af6ce8a"
 
 
 class Epperson2013Ex38(Formula):
@@ -22,7 +22,8 @@ class Epperson2013Ex38(Formula):
     `[0, 1]` (Fig. 3.9, 3.10).
 
     Fixed point 0.35173371124920. Fixed-point iteration from `x0 = 0, 5, -5` (Table 3.6); both Aitken algorithms from
-    `x0 = 0` (Ex. 3.15, 3.16, Table 3.12). Figure 3.9 draws it.
+    `x0 = 0` (Ex. 3.15, 3.16, Table 3.12); Newton on `x - (1/2)*exp(-x)` from `x0 = 0` (Table 3.12). Figure 3.9 draws
+    it.
     """
 
     number = (1, 4, 5, 18)

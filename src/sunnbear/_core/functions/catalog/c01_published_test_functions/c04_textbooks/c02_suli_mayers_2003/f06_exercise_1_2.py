@@ -18,8 +18,8 @@ class SuliMayers2003Exercise12(Formula):
 
     Fixed point 0, neither stable nor unstable; starts ``x0 = 1/(k*pi)`` and ``x0 = 2/((2*k + 1)*pi)``.
 
-    The formula is the difference form ``x - g(x)`` of the fixed-point equation ``x = g(x)``; the starting points' ``k``
-    is no parameter of the function.
+    The formula is the difference form ``x - g(x)`` of the fixed-point equation ``x = g(x)``; ``k``, which the starting
+    points use, is not a parameter of the function.
     """
 
     number = (1, 4, 2, 6)
@@ -37,7 +37,7 @@ class SuliMayers2003Exercise12(Formula):
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - 1.0 * c
-        # the difference form x - g(x) of the fixed-point equation x = g(x), with g(0) = 0
+        # the formula is the difference form x - g(x) of the fixed-point equation x = g(x), with g(0) = 0
         if x == 0.0:
             return 0.0
         else:
