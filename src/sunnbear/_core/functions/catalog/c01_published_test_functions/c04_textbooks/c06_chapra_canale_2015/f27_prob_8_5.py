@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "d11765641cf594da"
 
 
 class ChapraCanale2015Prob85(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Chapra, Canale (2015).
 
     The survey writes the source's function as ``K = (cc0 + x)/((ca0 - 2*x)^2*(cb0 - x))``, with the parameters `K =
     0.015`, `ca0 = 42`, `cb0 = 30`, `cc0 = 4`; the formula's interval is ``[0, 20]``.
@@ -36,7 +36,7 @@ class ChapraCanale2015Prob85(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, K: float, ca0: float, cb0: float, cc0: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 20.0 * c
         return (K) - ((cc0 + x) / ((ca0 - 2 * x) ** 2 * (cb0 - x)))
 

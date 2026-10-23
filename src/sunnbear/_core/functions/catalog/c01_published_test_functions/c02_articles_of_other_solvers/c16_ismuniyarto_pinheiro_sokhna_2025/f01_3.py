@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "1fe664960659ab22"
 
 
 class IsmuniyartoPinheiroSokhna20253(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ismuniyarto, Pinheiro, Sokhna (2025).
 
     The survey writes the source's function as ``-2000*1.2^n/(1.2^n - 1) + 50*n/(1.2^n - 1) + 3750 - (-600*(1 +
     0.20)^n/(1.2^n - 1) + 200*n/(1.2^n - 1))``; the formula's interval is ``[2, 10]``.
@@ -44,7 +44,7 @@ class IsmuniyartoPinheiroSokhna20253(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 8.0 * c
         return (
             -2000 * 1.2**x / (1.2**x - 1)

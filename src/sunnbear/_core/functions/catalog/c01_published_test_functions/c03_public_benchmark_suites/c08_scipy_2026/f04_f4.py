@@ -9,7 +9,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class Scipy2026F4(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from SciPy (2026).
 
     The survey writes the source's function as ``1.0 + .1*x`` (x > 1); ``-1.0 + .1*x`` (x < 1); ``0`` (x = 1); the
     formula's interval is ``[0.5, sqrt(3)]``.
@@ -38,8 +38,8 @@ class Scipy2026F4(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 1.2320508075688772 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1.23 * c
         if x > 1.0:
             return 1.0 + 0.1 * x
         elif x < 1.0:
@@ -57,7 +57,7 @@ class Scipy2026F4(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=0.869615, c=0.0, expected=-0.9130385),
-        FormulaTestCase.value(params={}, x=0.869615, c=0.25, expected=-0.9438397701892219),
+        FormulaTestCase.value(params={}, x=0.869615, c=0.25, expected=-0.9437885),
         FormulaTestCase.value(params={}, x=1.5, c=0.0, expected=1.15),
         FormulaTestCase.value(params={}, x=1.0, c=0.0, expected=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(0.5, 1.7320508075688772)),

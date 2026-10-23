@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class AlefeldPotraShi1993T5114(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Alefeld, Potra, Shi (1993).
 
     The survey writes the source's function as ``e - 1.859`` if ``x > 2*10^(-3)/(1 + n)``; ``exp((n + 1)*x/2*10^3) -
     1.859`` if ``x`` in ``[0, 2*10^(-3)/(1 + n)]``; ``-0.859`` if ``x < 0``, with the parameters ``n = 20(1)40,
@@ -36,8 +36,8 @@ class AlefeldPotraShi1993T5114(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 10000.0001 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 10000.0 * c
         if x > 2 * 10**-3 / (1 + n):
             return math.e - 1.859
         elif x >= 0.0:

@@ -14,7 +14,7 @@ SURVEY_FIELDS_HASH = "2fe8da4dd2ebbcad"
 
 
 class Moler2004473(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Moler (2004).
 
     The survey writes the source's function as ``J0(x) - y``, with the parameters ``y = 0.5``; the formula's interval is
     ``[0, 2]``.
@@ -39,7 +39,7 @@ class Moler2004473(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, y: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 2.0 * c
         return bessel_j0(x) - y
 

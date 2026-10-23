@@ -14,7 +14,7 @@ SURVEY_FIELDS_HASH = "afb1800dad6bc616"
 
 
 class ChapraCanale2015Prob511(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Chapra, Canale (2015).
 
     The survey writes the source's function as ``x^3.5 = 80``; the formula's interval is `[2.0, 5.0]` (5.11).
 
@@ -36,7 +36,7 @@ class ChapraCanale2015Prob511(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 3.0 * c
         return (x**3.5) - (80)
 

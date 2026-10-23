@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "3c1518f0ba871698"
 
 
 class Sabharwal2019Fig4(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Sabharwal (2019).
 
     The survey writes the source's function as ``(1.5 - x)^9 - 8``; the formula's interval is ``[0.00, 1.50]``.
 
@@ -33,7 +33,7 @@ class Sabharwal2019Fig4(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.5 * c
         return (1.5 - x) ** 9 - 8
 

@@ -16,7 +16,7 @@ SURVEY_FIELDS_HASH = "1e99782318c555eb"
 
 
 class BurdenFairesBurden2016241D(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Burden, Faires, Burden (2016).
 
     The survey writes the source's function as ``exp(6*x) + 3*(log(2))^2*exp(2*x) - log(8)*exp(4*x) - (log(2))^3``; the
     formula's interval is ``[-1, 0]``.
@@ -39,7 +39,7 @@ class BurdenFairesBurden2016241D(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return (
             math.exp(6 * x)

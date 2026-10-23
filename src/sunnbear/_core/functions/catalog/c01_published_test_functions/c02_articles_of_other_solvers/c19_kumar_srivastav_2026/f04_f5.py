@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "695336956a882325"
 
 
 class KumarSrivastav2026F5(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Kumar, Srivastav (2026).
 
     The survey writes the source's function as ``log(1 + x) - 0.4``; the formula's interval is ``[0, 1]``.
 
@@ -37,7 +37,7 @@ class KumarSrivastav2026F5(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return math.log(1 + x) - 0.4
 

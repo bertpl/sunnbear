@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "b940a9c5ccd441e6"
 
 
 class Moler200411(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Moler (2004).
 
     The survey writes the source's function as ``1/x - (x - 1)``; the formula's interval is `[0, 4]` (Figure 1.2).
 
@@ -38,7 +38,7 @@ class Moler200411(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 4.0 * c
         return 1 / x - (x - 1)
 

@@ -16,7 +16,7 @@ SURVEY_FIELDS_HASH = "1a577dfa1d1916fc"
 
 
 class DowellJarratt1971Table2(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Dowell, Jarratt (1971).
 
     The survey writes the source's function as ``2*x*exp(-n) + 1 - 2*exp(-n*x)``, with the parameters ``n = 1, 5, 15,
     20``; the formula's interval is ``[0, 1]``.
@@ -37,7 +37,7 @@ class DowellJarratt1971Table2(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return 2 * x * math.exp(-n) + 1 - 2 * math.exp(-n * x)
 

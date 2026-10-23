@@ -5,8 +5,11 @@ do not regenerate the formula modules of category 1 in sunnbear's catalog; they 
 survey.
 """
 
+import ast
+import inspect
 import re
 import sys
+import textwrap
 
 import pytest
 
@@ -290,23 +293,60 @@ def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table
 
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
 @pytest.mark.parametrize("c", [0.25, -0.25])
-def test_category_1_formula_shifts_along_x_by_its_interval_width(formula, c):
-    """A formula of category 1 at ``c`` equals the formula at ``c = 0``, evaluated at ``x - (b - a)*c``.
+def test_category_1_formula_shifts_along_x_by_its_c_scale(script_modules, formula, c):
+    """A formula of category 1 at ``c`` equals the formula at ``c = 0``, evaluated at ``x - c_scale*c``.
 
     Evaluating the shifted x-value at ``c = 0`` repeats the formula's own float arithmetic, so the 2 values are equal
     exactly; the x-values lie in the interval, and so do their shifted values.
     """
+    c_scale_digits = script_modules["formula_modules"].C_SCALE_DIGITS
     for candidate in formula.build_all_candidates():
         # --- arrange ----------------------
         width = candidate.b - candidate.a
+        c_scale = float(f"{width:.{c_scale_digits}g}")
         x = candidate.a + 0.6 * width
 
         # --- act --------------------------
         shifted = candidate.xc_fun(x, c)
-        unshifted = candidate.xc_fun(x - width * c, 0.0)
+        unshifted = candidate.xc_fun(x - c_scale * c, 0.0)
 
         # --- assert -----------------------
         assert shifted == unshifted, candidate.id
+
+
+@pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
+def test_category_1_formula_c_scale_is_its_rounded_interval_width(script_modules, formula):
+    """A formula of category 1 multiplies ``c`` by ``c_scale``: the interval's width, rounded to 3 significant digits.
+
+    The factor of ``c`` in ``parametrized_fun`` is a number in a formula with 1 interval, and the parameter
+    ``c_scale`` in a formula with several. The test reads the factor from the source, because a shift test cannot
+    see a number that is 1 float step off, such as ``1.9999999999999996`` for ``2.0``: the shifted x-values round to
+    the same float.
+    """
+    # --- arrange ----------------------
+    c_scale_digits = script_modules["formula_modules"].C_SCALE_DIGITS
+    tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))
+
+    # --- act --------------------------
+    factors = [
+        node.left
+        for node in ast.walk(tree)
+        if isinstance(node, ast.BinOp)
+        and isinstance(node.op, ast.Mult)
+        and isinstance(node.right, ast.Name)
+        and node.right.id == "c"
+    ]
+
+    # --- assert -----------------------
+    assert len(factors) == 1
+    for candidate in formula.build_all_candidates():
+        c_scale = float(f"{candidate.b - candidate.a:.{c_scale_digits}g}")
+        if isinstance(factors[0], ast.Name):
+            params = dict(zip(candidate.id.param_names, candidate.id.param_values, strict=True))
+            assert factors[0].id == "c_scale"
+            assert params["c_scale"] == c_scale, candidate.id
+        else:
+            assert ast.literal_eval(factors[0]) == c_scale, candidate.id
 
 
 # ==================================================================================================

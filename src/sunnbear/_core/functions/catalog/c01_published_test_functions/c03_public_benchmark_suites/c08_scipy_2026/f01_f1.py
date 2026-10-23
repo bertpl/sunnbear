@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "211b492494ff7bda"
 
 
 class Scipy2026F1(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from SciPy (2026).
 
     The survey writes the source's function as ``x*(x - 1.)``; the formula's interval is ``[0.5, sqrt(3)]``.
 
@@ -41,8 +41,8 @@ class Scipy2026F1(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 1.2320508075688772 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1.23 * c
         return x * (x - 1.0)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -55,6 +55,6 @@ class Scipy2026F1(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=0.869615, c=0.0, expected=-0.11338475177499999),
-        FormulaTestCase.value(params={}, x=0.869615, c=0.25, expected=-0.2462051568678401),
+        FormulaTestCase.value(params={}, x=0.869615, c=0.25, expected=-0.24614172677499999),
         FormulaTestCase.interval_bounds(params={}, expected=(0.5, 1.7320508075688772)),
     )

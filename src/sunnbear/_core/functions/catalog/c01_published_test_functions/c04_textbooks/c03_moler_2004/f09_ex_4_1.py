@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "b3cc77ed7a97278d"
 
 
 class Moler2004Ex41(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Moler (2004).
 
     The survey writes the source's function as ``sin(x)``; the formula's interval is ``[1, 4]``.
     """
@@ -35,7 +35,7 @@ class Moler2004Ex41(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 3.0 * c
         return math.sin(x)
 

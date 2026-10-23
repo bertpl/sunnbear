@@ -16,7 +16,7 @@ SURVEY_FIELDS_HASH = "6c888e0ceacf78be"
 
 
 class ChapraCanale2015Pt23(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Chapra, Canale (2015).
 
     The survey writes the source's function as ``(g*m/c)*(1 - exp(-(c/m)*t)) - v``, with the parameters given per
     interval, on `[12, 16]`, `[4, 20]`: `g = 9.81` m/s^2, `m = 68.1` kg, `v = 40` m/s, `t = 10` s (Ex. 5.1); on `[3,
@@ -32,7 +32,7 @@ class ChapraCanale2015Pt23(Formula):
 
     number = (1, 4, 6, 1)
     name = "(PT2.3)"
-    param_names = ("g", "m", "v", "t", "a", "b")
+    param_names = ("g", "m", "v", "t", "a", "b", "c_scale")
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
@@ -45,12 +45,16 @@ class ChapraCanale2015Pt23(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, g: float, m: float, v: float, t: float, a: float, b: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+    def parametrized_fun(
+        x: float, c: float, g: float, m: float, v: float, t: float, a: float, b: float, c_scale: float
+    ) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
         return (g * m / x) * (1 - math.exp(-(x / m) * t)) - v
 
-    def interval_bounds(self, g: float, m: float, v: float, t: float, a: float, b: float) -> tuple[float, float]:
+    def interval_bounds(
+        self, g: float, m: float, v: float, t: float, a: float, b: float, c_scale: float
+    ) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
@@ -58,47 +62,49 @@ class ChapraCanale2015Pt23(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("g", "m", "v", "t", "a", "b"),
+                names=("g", "m", "v", "t", "a", "b", "c_scale"),
                 rows=(
-                    (9.81, 68.1, 40.0, 10.0, 12.0, 16.0),
-                    (9.81, 68.1, 40.0, 10.0, 4.0, 20.0),
-                    (9.81, 82.0, 36.0, 4.0, 3.0, 5.0),
+                    (9.81, 68.1, 40.0, 10.0, 12.0, 16.0, 4.0),
+                    (9.81, 68.1, 40.0, 10.0, 4.0, 20.0, 16.0),
+                    (9.81, 82.0, 36.0, 4.0, 3.0, 5.0, 2.0),
                 ),
             ),
         )
 
     cases = (
         FormulaTestCase.value(
-            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0},
+            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0, "c_scale": 4.0},
             x=13.2,
             c=0.0,
             expected=3.325541753212046,
         ),
         FormulaTestCase.value(
-            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0},
+            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0, "c_scale": 4.0},
             x=13.2,
             c=0.25,
             expected=5.630059449656643,
         ),
         FormulaTestCase.value(
-            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 4.0, "b": 20.0},
+            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 4.0, "b": 20.0, "c_scale": 16.0},
             x=8.8,
             c=0.0,
             expected=15.064844887009704,
         ),
         FormulaTestCase.value(
-            params={"g": 9.81, "m": 82.0, "v": 36.0, "t": 4.0, "a": 3.0, "b": 5.0},
+            params={"g": 9.81, "m": 82.0, "v": 36.0, "t": 4.0, "a": 3.0, "b": 5.0, "c_scale": 2.0},
             x=3.6,
             c=0.0,
             expected=-0.012330135450636158,
         ),
         FormulaTestCase.interval_bounds(
-            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0}, expected=(12.0, 16.0)
+            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0, "c_scale": 4.0},
+            expected=(12.0, 16.0),
         ),
         FormulaTestCase.interval_bounds(
-            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 4.0, "b": 20.0}, expected=(4.0, 20.0)
+            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 4.0, "b": 20.0, "c_scale": 16.0},
+            expected=(4.0, 20.0),
         ),
         FormulaTestCase.interval_bounds(
-            params={"g": 9.81, "m": 82.0, "v": 36.0, "t": 4.0, "a": 3.0, "b": 5.0}, expected=(3.0, 5.0)
+            params={"g": 9.81, "m": 82.0, "v": 36.0, "t": 4.0, "a": 3.0, "b": 5.0, "c_scale": 2.0}, expected=(3.0, 5.0)
         ),
     )

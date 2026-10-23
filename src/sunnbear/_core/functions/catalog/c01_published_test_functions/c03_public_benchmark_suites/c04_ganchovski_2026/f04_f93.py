@@ -14,7 +14,7 @@ SURVEY_FIELDS_HASH = "94045e507cda9089"
 
 
 class Ganchovski2026F93(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ganchovski (2026).
 
     The source prints 7 functions that differ only in the values of some constants; with those constants replaced by
     parameters, the 7 functions become 1 function, ``x^n - 0.001``:
@@ -50,7 +50,7 @@ class Ganchovski2026F93(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 20.0 * c
         return x**n - 0.001
 

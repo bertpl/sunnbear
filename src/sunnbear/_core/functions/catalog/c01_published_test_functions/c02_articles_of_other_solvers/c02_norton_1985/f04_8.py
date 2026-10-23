@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "60ede8d780aae62b"
 
 
 class Norton19858(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Norton (1985).
 
     The survey writes the source's function as ``x^n + a*x + b``, with the parameters `a = 1, b = 0`; `n = 3, 5, 9, 19`;
     the formula's interval is ``[-0.7, 1]``.
@@ -40,7 +40,7 @@ class Norton19858(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a_: float, b_: float, n: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.7 * c
         return x**n + a_ * x + b_
 

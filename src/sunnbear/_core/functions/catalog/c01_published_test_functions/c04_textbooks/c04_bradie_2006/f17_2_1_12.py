@@ -14,7 +14,7 @@ SURVEY_FIELDS_HASH = "57a2c03882029ea1"
 
 
 class Bradie20062112(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Bradie (2006).
 
     The survey writes the source's function as ``1/x - 37``; the formula's interval is `(0.01, 0.1)` (2.2-7, 2.4-6,
     2.5-8).
@@ -35,8 +35,8 @@ class Bradie20062112(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 0.09000000000000001 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 0.09 * c
         return 1 / x - 37
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -49,6 +49,6 @@ class Bradie20062112(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=0.037, c=0.0, expected=-9.972972972972972),
-        FormulaTestCase.value(params={}, x=0.037, c=0.25, expected=31.96551724137933),
+        FormulaTestCase.value(params={}, x=0.037, c=0.25, expected=31.965517241379317),
         FormulaTestCase.interval_bounds(params={}, expected=(0.01, 0.1)),
     )

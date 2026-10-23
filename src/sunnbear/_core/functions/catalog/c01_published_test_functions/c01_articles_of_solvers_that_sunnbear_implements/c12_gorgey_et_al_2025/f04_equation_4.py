@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "a02e4c8603e3f93c"
 
 
 class GorgeyEtAl2025Equation4(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Gorgey et al. (2025).
 
     The survey writes the source's function as ``exp((x - 3)^5) - 1``; the formula's interval is ``[2, 4]``.
 
@@ -36,7 +36,7 @@ class GorgeyEtAl2025Equation4(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 2.0 * c
         return math.exp((x - 3) ** 5) - 1
 

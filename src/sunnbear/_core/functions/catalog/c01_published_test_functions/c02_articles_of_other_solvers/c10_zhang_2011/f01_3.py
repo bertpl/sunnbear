@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "fcbeacc1b855c193"
 
 
 class Zhang20113(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Zhang (2011).
 
     The survey writes the source's function as ``cos(x) - x^3``; the formula's interval is ``[-4, 4]``.
 
@@ -36,7 +36,7 @@ class Zhang20113(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 8.0 * c
         return math.cos(x) - x**3
 

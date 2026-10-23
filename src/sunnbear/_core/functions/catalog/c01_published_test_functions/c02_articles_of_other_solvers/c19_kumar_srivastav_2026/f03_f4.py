@@ -10,7 +10,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class KumarSrivastav2026F4(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Kumar, Srivastav (2026).
 
     The survey writes the source's function as ``(x - x*)^3 + 0.05*(x - x*)``, with the parameters ``x* = 0.6``; the
     formula's interval is ``[0, 1]``.
@@ -33,7 +33,7 @@ class KumarSrivastav2026F4(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, x_star: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return (x - x_star) ** 3 + 0.05 * (x - x_star)
 

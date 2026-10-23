@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "a7b3f0dacf1e9db8"
 
 
 class Atkinson1989P38A(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Atkinson (1989).
 
     The survey writes the source's function as ``x^4 - 5.7*x^3 - 0.47*x^2 + 29.865*x - 26.1602``; the formula's interval
     is ``[-3, 5]``.
@@ -35,7 +35,7 @@ class Atkinson1989P38A(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 8.0 * c
         return x**4 - 5.7 * x**3 - 0.47 * x**2 + 29.865 * x - 26.1602
 

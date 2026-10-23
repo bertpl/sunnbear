@@ -14,7 +14,7 @@ SURVEY_FIELDS_HASH = "f6944c28548af3fb"
 
 
 class Moler2004Ex410C(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Moler (2004).
 
     The survey writes the source's function as ``J0(x) = Y0(x)``; the formula's interval is ``[0, 10*pi]``.
 
@@ -36,8 +36,8 @@ class Moler2004Ex410C(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 31.41592653589793 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 31.4 * c
         return (bessel_j0(x)) - (bessel_y0(x))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class Moler2004Ex410C(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=9.42478, c=0.0, expected=-0.36726657736486834),
-        FormulaTestCase.value(params={}, x=9.42478, c=0.25, expected=0.061995667907528064),
+        FormulaTestCase.value(params={}, x=9.42478, c=0.25, expected=0.05828461127689465),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 31.41592653589793)),
     )

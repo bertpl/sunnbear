@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "d79c07a54b093c85"
 
 
 class TomovGanchovski202676C(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Tomov, Ganchovski (2026).
 
     The survey writes the source's function as ``x``; the formula's interval is ``[-1, 1]``.
 
@@ -39,7 +39,7 @@ class TomovGanchovski202676C(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         return x - 2.0 * c
 
     def interval_bounds(self) -> tuple[float, float]:

@@ -15,7 +15,7 @@ MAX_EXP_ARGUMENT = math.log(sys.float_info.max)
 
 
 class RootsFortran20252627(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from roots-fortran (2025).
 
     The survey writes the source's function as ``x/exp(1.0/(x*x))`` (x != 0); ``0.0`` (x = 0); the formula's intervals
     are ``[-1, 4]`` (26), ``[-1.1234, 4.4567]`` (27).
@@ -25,7 +25,7 @@ class RootsFortran20252627(Formula):
 
     number = (1, 3, 3, 4)
     name = "26–27"
-    param_names = ("a", "b")
+    param_names = ("a", "b", "c_scale")
     source = FormulaSource(
         reference=(
             "Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25, "
@@ -90,9 +90,9 @@ class RootsFortran20252627(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+    def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
         # where 1/(x*x) exceeds MAX_EXP_ARGUMENT, for abs(x) below about 0.0375, exp overflows and the source's float64
         # value is x/inf = 0; the test `x * x * MAX_EXP_ARGUMENT < 1.0` also holds where x*x underflows to 0
         if x * x * MAX_EXP_ARGUMENT < 1.0:
@@ -100,38 +100,32 @@ class RootsFortran20252627(Formula):
         else:
             return x / math.exp(1.0 / (x * x))
 
-    def interval_bounds(self, a: float, b: float) -> tuple[float, float]:
+    def interval_bounds(self, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (
-            ParamTable(
-                names=("a", "b"),
-                rows=(
-                    (
-                        -1.0,
-                        4.0,
-                    ),
-                    (
-                        -1.1234,
-                        4.4567,
-                    ),
-                ),
-            ),
-        )
+        return (ParamTable(names=("a", "b", "c_scale"), rows=((-1.0, 4.0, 5.0), (-1.1234, 4.4567, 5.58))),)
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`
     # would accept any value near 0, 0 among them
     cases = (
-        FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.0, expected=0.00915781944436709),
-        FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.25, expected=-0.12675998655454956),
-        FormulaTestCase.value(params={"a": -1.1234, "b": 4.4567}, x=0.55063, c=0.0, expected=0.020345061698967323),
-        FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.0, c=0.0, expected=0.0),
-        FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=1e-200, c=0.0, expected=0.0),
-        FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.01, c=0.0, expected=0.0, atol=0.0),
-        FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.04, c=0.0, expected=1.4723423419207585e-273, atol=0.0),
-        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 4.0}, expected=(-1.0, 4.0)),
-        FormulaTestCase.interval_bounds(params={"a": -1.1234, "b": 4.4567}, expected=(-1.1234, 4.4567)),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=0.5, c=0.0, expected=0.00915781944436709),
+        FormulaTestCase.value(
+            params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=0.5, c=0.25, expected=-0.12675998655454956
+        ),
+        FormulaTestCase.value(
+            params={"a": -1.1234, "b": 4.4567, "c_scale": 5.58}, x=0.55063, c=0.0, expected=0.020345061698967323
+        ),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=0.0, c=0.0, expected=0.0),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=1e-200, c=0.0, expected=0.0),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=0.01, c=0.0, expected=0.0, atol=0.0),
+        FormulaTestCase.value(
+            params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=0.04, c=0.0, expected=1.4723423419207585e-273, atol=0.0
+        ),
+        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, expected=(-1.0, 4.0)),
+        FormulaTestCase.interval_bounds(
+            params={"a": -1.1234, "b": 4.4567, "c_scale": 5.58}, expected=(-1.1234, 4.4567)
+        ),
     )

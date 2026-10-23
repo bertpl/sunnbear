@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "a51862b47e71a4a0"
 
 
 class OliveiraTakahashi202123(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Oliveira, Takahashi (2021).
 
     The survey writes the source's function as ``(x - (100 + 10*pi))*(x - 10*pi)``; the formula's interval is ``[-100,
     100]``.
@@ -39,7 +39,7 @@ class OliveiraTakahashi202123(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 200.0 * c
         return (x - (100 + 10 * math.pi)) * (x - 10 * math.pi)
 

@@ -9,7 +9,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class Stage2013311(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Stage (2013).
 
     The source prints 2 functions that differ only in the values of some constants; with those constants replaced by
     parameters, the 2 functions become 1 function, ``-d`` if ``x <= 1/3``; ``1 - d`` otherwise:
@@ -36,7 +36,7 @@ class Stage2013311(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, d: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 20.0 * c
         if x <= 1 / 3:
             return -d

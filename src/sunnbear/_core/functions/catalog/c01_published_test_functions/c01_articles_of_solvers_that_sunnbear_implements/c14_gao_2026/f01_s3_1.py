@@ -14,7 +14,7 @@ SURVEY_FIELDS_HASH = "3c03bc063362b31b"
 
 
 class Gao2026S31(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Gao (2026).
 
     The survey writes the source's function as ``x^(1/3)``; the formula's interval is ``[-5, 1]``.
 
@@ -34,7 +34,7 @@ class Gao2026S31(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 6.0 * c
         return real_root(x, 3)
 

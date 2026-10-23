@@ -12,7 +12,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class ChapraCanale2015Prob518(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Chapra, Canale (2015).
 
     The survey writes the source's function as ``log(osf) = -139.34411 + 1.575701E5/Ta - 6.642308E7/Ta^2 +
     1.243800E10/Ta^3 - 8.621949E11/Ta^4``, with the parameters `Ta = T + 273.15`; `osf = 8, 10, 12` mg/L; the survey's
@@ -41,7 +41,7 @@ class ChapraCanale2015Prob518(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, osf: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 40.0 * c
         # the formula's variable is the temperature T in °C; the source's function is in Ta = T + 273.15
         t_a = x + 273.15

@@ -10,7 +10,7 @@ from sunnbear._core.utils.math_functions import sign
 
 
 class Galdino2011F4(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Galdino (2011).
 
     The survey writes the source's function as ``(81 - p*(108 - p*(54 - p*(12 - p))))*sign(p - 3)``, where ``p = x +
     1.11111``; the formula's interval is ``[1, 2]``.
@@ -31,7 +31,7 @@ class Galdino2011F4(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         p = x + 1.11111
         return (81 - p * (108 - p * (54 - p * (12 - p)))) * sign(p - 3)

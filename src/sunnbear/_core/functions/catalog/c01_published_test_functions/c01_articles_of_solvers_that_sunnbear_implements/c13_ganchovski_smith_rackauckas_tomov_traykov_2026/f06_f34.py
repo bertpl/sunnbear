@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "c5c1fd028afdfe1c"
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F34(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
 
     The survey writes the source's function as ``cos(x) - x``; the formula's interval is ``[-11, 9]``.
     """
@@ -37,7 +37,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F34(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 20.0 * c
         return math.cos(x) - x
 

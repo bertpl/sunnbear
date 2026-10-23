@@ -14,7 +14,7 @@ SURVEY_FIELDS_HASH = "71ee87bec6409748"
 
 
 class Bradie20062P55(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Bradie (2006).
 
     The survey writes the source's function as ``(rho_f/3)*h^3 - R*rho_f*h^2 + (4/3)*R^3*rho_o``, with the parameters `R
     = 5` cm, `rho_o = 0.120`, `rho_f = 0.890` g/cm^3 (§2.2); the formula's interval is `(0, 10)` (§2.2).
@@ -39,7 +39,7 @@ class Bradie20062P55(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, R: float, rho_o: float, rho_f: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 10.0 * c
         return (rho_f / 3) * x**3 - R * rho_f * x**2 + (4 / 3) * R**3 * rho_o
 

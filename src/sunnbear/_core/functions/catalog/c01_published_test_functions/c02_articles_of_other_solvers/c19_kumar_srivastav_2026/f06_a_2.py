@@ -13,7 +13,7 @@ from sunnbear._core.utils.math_functions import normal_noise
 
 
 class KumarSrivastav2026A2(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Kumar, Srivastav (2026).
 
     The survey writes the source's function as ``x - exp(-x) + eps``, with the parameters ``eps ~ N(0, sigma^2)``, drawn
     independently at each evaluation; ``sigma = 10^-3``; the formula's interval is ``[0, 1]``.
@@ -43,7 +43,7 @@ class KumarSrivastav2026A2(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, sigma: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return x - math.exp(-x) + sigma * normal_noise(x)
 

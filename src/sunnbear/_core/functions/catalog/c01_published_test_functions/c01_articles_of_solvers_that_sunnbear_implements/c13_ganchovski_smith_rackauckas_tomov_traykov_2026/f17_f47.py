@@ -16,7 +16,7 @@ SURVEY_FIELDS_HASH = "ce57cc8b669753ea"
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F47(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
 
     The source prints 2 functions that differ only in the values of some constants; with those constants replaced by
     parameters, the 2 functions become 1 function, ``1/sqrt(x) - 2*log(5*10^k*sqrt(x)) + 0.8``:
@@ -42,8 +42,8 @@ class GanchovskiSmithRackauckasTomovTraykov2026F47(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, k: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 0.4995 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 0.499 * c
         return 1 / math.sqrt(x) - 2 * math.log(5 * 10**k * math.sqrt(x)) + 0.8
 
     def interval_bounds(self, k: float) -> tuple[float, float]:
@@ -56,7 +56,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F47(Formula):
 
     cases = (
         FormulaTestCase.value(params={"k": 3.0}, x=0.15035, c=0.0, expected=-11.760615174862355),
-        FormulaTestCase.value(params={"k": 3.0}, x=0.15035, c=0.25, expected=-6.299013786192742),
+        FormulaTestCase.value(params={"k": 3.0}, x=0.15035, c=0.25, expected=-6.319223455335856),
         FormulaTestCase.value(params={"k": 7.0}, x=0.15035, c=0.0, expected=-30.181295918814723),
         FormulaTestCase.interval_bounds(params={"k": 3.0}, expected=(0.0005, 0.5)),
     )

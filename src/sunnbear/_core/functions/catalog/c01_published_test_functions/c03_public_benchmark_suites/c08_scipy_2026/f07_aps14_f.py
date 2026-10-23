@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class Scipy2026Aps14F(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from SciPy (2026).
 
     The survey writes the source's function as ``n/20.0*(x/1.5 + sin(x) - 1)`` (x > 0); ``-n/20.0`` (x <= 0), with the
     parameters ``n = 1, 2, ..., 40``; the formula's interval is ``[-1000, pi/2]``.
@@ -42,8 +42,8 @@ class Scipy2026Aps14F(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 1001.570796326795 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1000.0 * c
         if x > 0.0:
             return n / 20.0 * (x / 1.5 + math.sin(x) - 1)
         else:

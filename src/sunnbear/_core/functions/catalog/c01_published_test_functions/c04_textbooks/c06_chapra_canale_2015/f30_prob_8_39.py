@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "d0d11100b35c2d2d"
 
 
 class ChapraCanale2015Prob839(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Chapra, Canale (2015).
 
     The survey writes the source's function as ``v = u*log(m0/(m0 - q*t)) - g*t``, with the parameters `u = 2200` m/s,
     `m0 = 160000` kg, `q = 2680` kg/s, `g = 9.81` m/s^2, `v = 1000` m/s; the formula's interval is ``[10, 50]``.
@@ -38,7 +38,7 @@ class ChapraCanale2015Prob839(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, u: float, m0: float, q: float, g: float, v: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 40.0 * c
         return (v) - (u * math.log(m0 / (m0 - q * x)) - g * x)
 

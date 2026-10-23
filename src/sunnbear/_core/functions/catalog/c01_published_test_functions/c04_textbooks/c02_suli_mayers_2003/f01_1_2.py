@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "bb979c7b3156328c"
 
 
 class SuliMayers200312(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Süli, Mayers (2003).
 
     The survey writes the source's function as ``1/2 - 1/(1 + M*abs(x - 1.05))``, with the parameters given per
     interval, on `[0.8, 1.8]`: `M = 200` (Fig. 1.1), `M = 2000, 20000, 200000, 2000000, 20000000` (Remark 1.1); on
@@ -27,7 +27,7 @@ class SuliMayers200312(Formula):
 
     number = (1, 4, 2, 1)
     name = "(1.2)"
-    param_names = ("M", "a", "b")
+    param_names = ("M", "a", "b", "c_scale")
     source = FormulaSource(
         reference=(
             "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "
@@ -37,12 +37,12 @@ class SuliMayers200312(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, M: float, a: float, b: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+    def parametrized_fun(x: float, c: float, M: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
         return 1 / 2 - 1 / (1 + M * abs(x - 1.05))
 
-    def interval_bounds(self, M: float, a: float, b: float) -> tuple[float, float]:
+    def interval_bounds(self, M: float, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
@@ -50,16 +50,16 @@ class SuliMayers200312(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("M", "a", "b"),
+                names=("M", "a", "b", "c_scale"),
                 rows=(
-                    (200.0, 0.8, 1.8),
-                    (2000.0, 0.8, 1.8),
-                    (20000.0, 0.8, 1.8),
-                    (200000.0, 0.8, 1.8),
-                    (2000000.0, 0.8, 1.8),
-                    (20000000.0, 0.8, 1.8),
-                    (2000000.0, 1.04999, 1.05001),
-                    (20000000.0, 1.04999, 1.05001),
+                    (200.0, 0.8, 1.8, 1.0),
+                    (2000.0, 0.8, 1.8, 1.0),
+                    (20000.0, 0.8, 1.8, 1.0),
+                    (200000.0, 0.8, 1.8, 1.0),
+                    (2000000.0, 0.8, 1.8, 1.0),
+                    (20000000.0, 0.8, 1.8, 1.0),
+                    (2000000.0, 1.04999, 1.05001, 2e-05),
+                    (20000000.0, 1.04999, 1.05001, 2e-05),
                 ),
             ),
         )
@@ -67,29 +67,43 @@ class SuliMayers200312(Formula):
     # a case with a positive `atol` lies where float64 cannot evaluate the function to the
     # default tolerance, because the function is ill-conditioned there or its terms cancel
     cases = (
-        FormulaTestCase.value(params={"M": 200.0, "a": 0.8, "b": 1.8}, x=1.1, c=0.0, expected=0.4090909090909092),
-        FormulaTestCase.value(params={"M": 200.0, "a": 0.8, "b": 1.8}, x=1.1, c=0.25, expected=0.47560975609756095),
-        FormulaTestCase.value(params={"M": 2000.0, "a": 0.8, "b": 1.8}, x=1.1, c=0.0, expected=0.4900990099009901),
-        FormulaTestCase.value(params={"M": 20000.0, "a": 0.8, "b": 1.8}, x=1.1, c=0.0, expected=0.499000999000999),
-        FormulaTestCase.value(params={"M": 200000.0, "a": 0.8, "b": 1.8}, x=1.1, c=0.0, expected=0.4999000099990001),
-        FormulaTestCase.value(params={"M": 2000000.0, "a": 0.8, "b": 1.8}, x=1.1, c=0.0, expected=0.499990000099999),
-        FormulaTestCase.value(params={"M": 20000000.0, "a": 0.8, "b": 1.8}, x=1.1, c=0.0, expected=0.499999000001),
         FormulaTestCase.value(
-            params={"M": 2000000.0, "a": 1.04999, "b": 1.05001},
+            params={"M": 200.0, "a": 0.8, "b": 1.8, "c_scale": 1.0}, x=1.1, c=0.0, expected=0.4090909090909092
+        ),
+        FormulaTestCase.value(
+            params={"M": 200.0, "a": 0.8, "b": 1.8, "c_scale": 1.0}, x=1.1, c=0.25, expected=0.47560975609756095
+        ),
+        FormulaTestCase.value(
+            params={"M": 2000.0, "a": 0.8, "b": 1.8, "c_scale": 1.0}, x=1.1, c=0.0, expected=0.4900990099009901
+        ),
+        FormulaTestCase.value(
+            params={"M": 20000.0, "a": 0.8, "b": 1.8, "c_scale": 1.0}, x=1.1, c=0.0, expected=0.499000999000999
+        ),
+        FormulaTestCase.value(
+            params={"M": 200000.0, "a": 0.8, "b": 1.8, "c_scale": 1.0}, x=1.1, c=0.0, expected=0.4999000099990001
+        ),
+        FormulaTestCase.value(
+            params={"M": 2000000.0, "a": 0.8, "b": 1.8, "c_scale": 1.0}, x=1.1, c=0.0, expected=0.499990000099999
+        ),
+        FormulaTestCase.value(
+            params={"M": 20000000.0, "a": 0.8, "b": 1.8, "c_scale": 1.0}, x=1.1, c=0.0, expected=0.499999000001
+        ),
+        FormulaTestCase.value(
+            params={"M": 2000000.0, "a": 1.04999, "b": 1.05001, "c_scale": 2e-05},
             x=1.05,
             c=0.0,
             expected=-0.49999999991118216,
             atol=2e-08,
         ),
         FormulaTestCase.value(
-            params={"M": 20000000.0, "a": 1.04999, "b": 1.05001},
+            params={"M": 20000000.0, "a": 1.04999, "b": 1.05001, "c_scale": 2e-05},
             x=1.05,
             c=0.0,
             expected=-0.4999999991118216,
             atol=2e-07,
         ),
-        FormulaTestCase.interval_bounds(params={"M": 200.0, "a": 0.8, "b": 1.8}, expected=(0.8, 1.8)),
+        FormulaTestCase.interval_bounds(params={"M": 200.0, "a": 0.8, "b": 1.8, "c_scale": 1.0}, expected=(0.8, 1.8)),
         FormulaTestCase.interval_bounds(
-            params={"M": 2000000.0, "a": 1.04999, "b": 1.05001}, expected=(1.04999, 1.05001)
+            params={"M": 2000000.0, "a": 1.04999, "b": 1.05001, "c_scale": 2e-05}, expected=(1.04999, 1.05001)
         ),
     )

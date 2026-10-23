@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "b7ef411765a29c0c"
 
 
 class BurdenFairesBurden2016235D(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Burden, Faires, Burden (2016).
 
     The survey writes the source's function as ``x - 0.8 - 0.2*sin(x)``; the formula's interval is ``[0, pi/2]``.
 
@@ -36,8 +36,8 @@ class BurdenFairesBurden2016235D(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 1.5707963267948966 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1.57 * c
         return x - 0.8 - 0.2 * math.sin(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class BurdenFairesBurden2016235D(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=0.471239, c=0.0, expected=-0.4195591181175867),
-        FormulaTestCase.value(params={}, x=0.471239, c=0.25, expected=-0.7371519211737365),
+        FormulaTestCase.value(params={}, x=0.471239, c=0.25, expected=-0.7369925327627277),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 1.5707963267948966)),
     )

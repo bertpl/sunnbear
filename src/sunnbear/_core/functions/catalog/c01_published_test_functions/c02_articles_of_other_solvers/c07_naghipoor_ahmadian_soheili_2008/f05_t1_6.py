@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "0578da4c0c20f941"
 
 
 class NaghipoorAhmadianSoheili2008T16(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Naghipoor, Ahmadian, Soheili (2008).
 
     The survey writes the source's function as ``1/x - 1``; the formula's interval is ``[0.5, 1.5]``.
 
@@ -35,7 +35,7 @@ class NaghipoorAhmadianSoheili2008T16(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return 1 / x - 1
 

@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "f3bc54469a359d62"
 
 
 class RootsFortran202542(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from roots-fortran (2025).
 
     The survey writes the source's function as ``exp(x) - 2.0*x - 1.0``; the formula's interval is ``[-0.001, 1]``.
 
@@ -90,8 +90,8 @@ class RootsFortran202542(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 1.001 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1.0 * c
         return math.exp(x) - 2.0 * x - 1.0
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -104,6 +104,6 @@ class RootsFortran202542(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=0.2993, c=0.0, expected=-0.24968576295104566),
-        FormulaTestCase.value(params={}, x=0.2993, c=0.25, expected=-0.04782713692963757),
+        FormulaTestCase.value(params={}, x=0.2993, c=0.25, expected=-0.04806453589010772),
         FormulaTestCase.interval_bounds(params={}, expected=(-0.001, 1.0)),
     )

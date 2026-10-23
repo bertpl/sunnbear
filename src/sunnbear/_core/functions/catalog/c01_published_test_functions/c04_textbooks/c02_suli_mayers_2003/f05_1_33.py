@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "851e5e720bd76815"
 
 
 class SuliMayers2003133(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Süli, Mayers (2003).
 
     The survey writes the source's function as ``x = a*x*(1 - x)``, with the parameters `0 < a <= 4`; `a = 3.4, 3.5,
     3.99`; the formula's interval is ``[0, 1]``.
@@ -37,7 +37,7 @@ class SuliMayers2003133(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a_: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return (x) - (a_ * x * (1 - x))
 

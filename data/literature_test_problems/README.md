@@ -197,7 +197,7 @@ A join or split can also come from formulas that an earlier regeneration appende
 
 **A line whose rows print functions that differ only in the values of some constants or parameters gives the formula's function**, which the formula modules need (§ Formula modules):
 
-- `f` is the rows' function in its family form, with each value that differs between the rows as a parameter, such as `x^3 - k`. A parameter is named neither `c`, which every formula uses for its shift along x, nor `a` or `b`, which name the bounds of the formula's interval.
+- `f` is the rows' function in its family form, with each value that differs between the rows as a parameter, such as `x^3 - k`. A parameter is named neither `c` nor `c_scale`, which every formula uses for its shift along x, nor `a` or `b`, which name the bounds of the formula's interval.
 - `parameters` gives each row's values of those parameters, in the order of `row_ids` and separated by ` | `, such as `k = 1 | k = -1`.
 
 A line gives both or neither; a line whose rows give the same function and differ only in their intervals gives neither, and the formula takes the `f` of its first row.
@@ -220,8 +220,8 @@ uv run python -m scripts.literature_test_problems.formula_modules <source id> ..
 
 For each source named, the script writes the source's package and its formula modules, and rewrites the `__init__.py` of each subcategory. A generated formula module:
 
-- evaluates the formula's function at `x - (b - a)*c`, where `[a, b]` is the formula's interval: the formula's `c` shifts the function along x by a multiple of the interval's width. The function is the `f` of the formula's first row, as the source prints it, unless the formula's line in `formulas.csv` gives an `f`;
-- lists the formula's published test functions in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds as 2 more parameters, `a` and `b`. A source's own parameters `a` and `b` become `a_` and `b_` in every formula, so that `a` and `b` always name the bounds of the interval;
+- evaluates the formula's function at `x - c_scale*c`, so that the formula's `c` shifts the function along x; the class docstring of `PublishedTestFunctions`, category 1, states the rule for `c_scale`. The function is the `f` of the formula's first row, as the source prints it, unless the formula's line in `formulas.csv` gives an `f`;
+- lists the formula's published test functions in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds and `c_scale` as 3 more parameters, `a`, `b` and `c_scale`. A source's own parameters `a`, `b` and `c_scale` become `a_`, `b_` and `c_scale_` in every formula, so that these 3 names always mean the bounds of the interval and the scale of the shift;
 - names its source in a `FormulaSource`: the source's `reference`, and the keys of the formula's rows as the location;
 - takes its name, and its module and class names, from the key of the formula's first row. Where the key lists several locations, separated by `;` or `,`, the name ends after the first location; while the names of several formulas of the source would give module names that differ only in their `fNN` prefix, each of those names takes its key's next location too;
 - holds test cases whose expected values mpmath computes from the function;

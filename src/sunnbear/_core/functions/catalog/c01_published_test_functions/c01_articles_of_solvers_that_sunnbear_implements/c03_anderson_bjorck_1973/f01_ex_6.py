@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "9b0e24fea5a268f2"
 
 
 class AndersonBjorck1973Ex6(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Anderson, Björck (1973).
 
     The survey writes the source's function as ``exp(-n*x)*(x - 1) + x^n``, with the parameters ``n = 1, 5, 10, 15,
     20``; the formula's interval is ``[0, 1]``.
@@ -34,7 +34,7 @@ class AndersonBjorck1973Ex6(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return math.exp(-n * x) * (x - 1) + x**n
 

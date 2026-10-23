@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "6f695ab502c13509"
 
 
 class ChapraCanale2015Prob833(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Chapra, Canale (2015).
 
     The survey writes the source's function as ``1/Z = sqrt(1/R^2 + (omega*C - 1/(omega*L))^2)``, with the parameters `R
     = 225` ohm, `C = 0.6E-6` F, `L = 0.5` H, `Z = 75` ohm; the formula's interval is ``[1, 1000]``.
@@ -38,7 +38,7 @@ class ChapraCanale2015Prob833(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, R: float, C: float, L: float, Z: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 999.0 * c
         return (1 / Z) - (math.sqrt(1 / R**2 + (x * C - 1 / (x * L)) ** 2))
 

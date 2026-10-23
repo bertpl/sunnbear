@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "1a69c087e32d8dca"
 
 
 class Borchers2026F8(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Borchers (2026).
 
     The survey writes the source's function as ``1/8*(9 - 1/x)``; the formula's interval is ``[0.001, 1.201]``.
 
@@ -35,8 +35,8 @@ class Borchers2026F8(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 1.2000000000000002 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1.2 * c
         return 1 / 8 * (9 - 1 / x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -49,6 +49,6 @@ class Borchers2026F8(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=0.361, c=0.0, expected=0.7787396121883656),
-        FormulaTestCase.value(params={}, x=0.361, c=0.25, expected=-0.9241803278688544),
+        FormulaTestCase.value(params={}, x=0.361, c=0.25, expected=-0.9241803278688525),
         FormulaTestCase.interval_bounds(params={}, expected=(0.001, 1.201)),
     )

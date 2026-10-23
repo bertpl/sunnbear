@@ -16,7 +16,7 @@ SURVEY_FIELDS_HASH = "b3aaf99e4757bb82"
 
 
 class Epperson2013313H(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Epperson (2013).
 
     The survey writes the source's function as ``x^2 - sin(x)``; the formula's interval is ``[0, pi]``.
 
@@ -36,8 +36,8 @@ class Epperson2013313H(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 3.141592653589793 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 3.14 * c
         return x**2 - math.sin(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class Epperson2013313H(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=0.942478, c=0.0, expected=0.07924766624610098),
-        FormulaTestCase.value(params={}, x=0.942478, c=0.25, expected=-0.13176059138557406),
+        FormulaTestCase.value(params={}, x=0.942478, c=0.25, expected=-0.1320285948907636),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 3.141592653589793)),
     )

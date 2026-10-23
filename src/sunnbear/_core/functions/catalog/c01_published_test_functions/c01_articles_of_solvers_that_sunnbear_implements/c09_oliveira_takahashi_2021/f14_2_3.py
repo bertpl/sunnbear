@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "e711d0d8ce19087e"
 
 
 class OliveiraTakahashi202123(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Oliveira, Takahashi (2021).
 
     The survey writes the source's function as ``(x - 1/3)^2*atan(x - 1/3)``; the formula's interval is ``[-1, 1]``.
 
@@ -37,7 +37,7 @@ class OliveiraTakahashi202123(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 2.0 * c
         return (x - 1 / 3) ** 2 * math.atan(x - 1 / 3)
 

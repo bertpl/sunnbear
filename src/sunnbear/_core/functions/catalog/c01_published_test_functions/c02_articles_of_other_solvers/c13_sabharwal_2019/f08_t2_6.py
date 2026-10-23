@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "f8c0b5adb711a37f"
 
 
 class Sabharwal2019T26(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Sabharwal (2019).
 
     The survey writes the source's function as ``x^2 + 5*x + 2``; the formula's interval is ``[-6, 0]``.
 
@@ -33,7 +33,7 @@ class Sabharwal2019T26(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 6.0 * c
         return x**2 + 5 * x + 2
 

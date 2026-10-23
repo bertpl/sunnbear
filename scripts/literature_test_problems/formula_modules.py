@@ -107,11 +107,14 @@ CASE_X_STEP_FRACTION = 0.01
 CASE_MIN_RELATIVE_CHANGE = 1e-9
 # DOCSTRING_WIDTH is the width of a wrapped docstring line, inside a class at 4 spaces of indentation.
 DOCSTRING_WIDTH = 120 - 4
+# C_SCALE_DIGITS is the number of significant digits of `c_scale`, the scale of a formula's shift along x: the width of
+# the formula's interval, rounded. The class docstring of `PublishedTestFunctions`, category 1, states the rule.
+C_SCALE_DIGITS = 3
 # RESERVED_NAMES are the names that a parameter of the source may not keep, because the formula module uses them.
-RESERVED_NAMES = {"x", "c", "self", "math", *math_functions.__all__}
-# INTERVAL_BOUND_NAMES are the names of the bounds of a formula's interval: the docstrings of every formula module name
-# its interval `[a, b]`, and a formula with several intervals takes its bounds as the parameters `a` and `b`, so that a
-# parameter of the source may not keep these names either.
+RESERVED_NAMES = {"x", "c", "c_scale", "self", "math", *math_functions.__all__}
+# INTERVAL_BOUND_NAMES are the names of the bounds of a formula's interval: the class docstring of category 1 names a
+# formula's interval `[a, b]`, and a formula with several intervals takes its bounds as the parameters `a` and `b`, so
+# that a parameter of the source may not keep these names either.
 INTERVAL_BOUND_NAMES = {"a", "b"}
 # GENERATED_PACKAGE_NOTE ends the module docstring of each generated package's `__init__.py`.
 GENERATED_PACKAGE_NOTE = (
@@ -134,7 +137,7 @@ class FormulaModuleSpec:
     Attributes:
         formula_expression: The formula's function as Python code and as a sympy expression.
         param_names: The Python names of the formula's parameters, in tuple order; a formula with several
-            intervals ends them with `a` and `b`.
+            intervals ends them with `a`, `b` and `c_scale`.
         renamed_parameters: Each parameter whose Python name differs from its survey name, as the pair of its survey
             name and its Python name.
         interval: The single interval of a formula that has 1, and None otherwise.
@@ -181,9 +184,9 @@ class FormulaModuleSpec:
         if self.param_names:
             imported_names.append("ParamTable")
         if self.interval is None:
-            interval_width_code = "(b - a)"
+            c_scale_code = "c_scale"
         else:
-            interval_width_code = repr(self.interval[1] - self.interval[0])
+            c_scale_code = repr(self._c_scale(self.interval))
         class_name = source_category_class_name(source) + _camel_case(slugify(formula_name))
         signature = "".join(f", {param_name}: float" for param_name in self.param_names)
         return "\n".join(
@@ -216,9 +219,9 @@ class FormulaModuleSpec:
                 "",
                 "    @staticmethod",
                 f"    def parametrized_fun(x: float, c: float{signature}) -> float:",
-                '        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula\'s '
-                'interval."""',
-                *self._parametrized_fun_body(interval_width_code),
+                '        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for '
+                '``c_scale``."""',
+                *self._parametrized_fun_body(c_scale_code),
                 "",
                 f"    def interval_bounds(self{signature}) -> tuple[float, float]:",
                 *self._interval_bounds_body(),
@@ -276,11 +279,9 @@ class FormulaModuleSpec:
     #  Helpers
     # --------------------------------------------------------------------------
     def _class_docstring(self) -> str:
-        """Return the class docstring: what the formula evaluates, the rows' functions and values, and their notes."""
+        """Return the class docstring: the formula's source, the rows' functions and values, and their notes."""
         rows = self.survey_formula.rows
-        paragraphs = [
-            "This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval."
-        ]
+        paragraphs = [f"This formula comes from {self.survey_formula.source.short_title}."]
         # the survey's interval may be the span between a source's 2 starting values, so the docstring does not claim
         # that the source prints the interval
         if len(rows) == 1:
@@ -368,7 +369,7 @@ class FormulaModuleSpec:
         else:
             return f"``{row.f}``, with the parameters ``{parameters_text}``; {intervals_clause}"
 
-    def _parametrized_fun_body(self, interval_width_code: str) -> list[str]:
+    def _parametrized_fun_body(self, c_scale_code: str) -> list[str]:
         """Return the lines of `parametrized_fun` after its docstring: the shift of x, then the function's value.
 
         The lines differ for 2 forms of the function:
@@ -382,10 +383,10 @@ class FormulaModuleSpec:
         """
         expression_node = ast.parse(self.formula_expression.python_code, mode="eval").body
         if self.formula_expression.python_code.strip() == "x":
-            return [f"        return x - {interval_width_code} * c"]
+            return [f"        return x - {c_scale_code} * c"]
         elif isinstance(expression_node, ast.IfExp):
             return [
-                f"        x = x - {interval_width_code} * c",
+                f"        x = x - {c_scale_code} * c",
                 f"        if {ast.unparse(expression_node.test)}:",
                 f"            return {ast.unparse(expression_node.body)}",
                 "        else:",
@@ -393,7 +394,7 @@ class FormulaModuleSpec:
             ]
         else:
             return [
-                f"        x = x - {interval_width_code} * c",
+                f"        x = x - {c_scale_code} * c",
                 f"        return {self.formula_expression.python_code}",
             ]
 
@@ -442,6 +443,12 @@ class FormulaModuleSpec:
         return python_names
 
     @staticmethod
+    def _c_scale(interval: tuple[float, float]) -> float:
+        """Return the formula's `c_scale` for an interval: its width, rounded to `C_SCALE_DIGITS` significant digits."""
+        a, b = interval
+        return float(f"{b - a:.{C_SCALE_DIGITS}g}")
+
+    @staticmethod
     def _parameter_value(value: sp.Expr) -> tuple[float, bool]:
         """Return a published value as a float that a parameter holds, and whether that float is rounded.
 
@@ -472,7 +479,7 @@ class FormulaModuleSpec:
         """Return an x-value in the interval, the formula's value there, and the `atol` that the case needs, if any.
 
         The x-values tried are `CASE_FRACTIONS` of the interval, rounded to 6 significant digits. The generated Python
-        code and mpmath both evaluate the function at the float `x - (b - a)*c`, computed as the generated code computes
+        code and mpmath both evaluate the function at the float `x - c_scale*c`, computed as the generated code computes
         it, so that only the function's own arithmetic can differ.
 
         The case takes the x-value whose exact and Python values meet the strictest tolerance (`_case_tolerance`);
@@ -491,7 +498,7 @@ class FormulaModuleSpec:
         candidates = []
         for fraction in CASE_FRACTIONS:
             x = float(f"{a + fraction * (b - a):.6g}")
-            shifted = x - (b - a) * c
+            shifted = x - cls._c_scale(interval) * c
             if a < x < b:
                 values = cls._case_values(exact_function, formula_expression, python_values, shifted)
             else:
@@ -662,7 +669,7 @@ class FormulaModuleSpec:
         the function at the rounded value, because the formula receives the rounded value too.
 
         With `has_interval_parameters`, the bounds are parameters too, rounded by the same rule, both in the returned
-        bounds and at the end of the tuple.
+        bounds and at the end of the tuple, where `c_scale` follows them.
 
         Returns:
             The parameter tuple; the bounds; the exact text of each rounded value; and the parameter values at which
@@ -687,7 +694,7 @@ class FormulaModuleSpec:
                 if is_rounded:
                     exact_texts_of_rounded_values.append(cls._exact_text(exact_bound))
             bounds = tuple(bounds)
-            values += bounds
+            values += [*bounds, cls._c_scale(bounds)]
         else:
             bounds = tuple(float(sp.N(bound, 30)) for bound in exact_bounds)
         return tuple(values), bounds, exact_texts_of_rounded_values, mpmath_parameter_values
@@ -717,7 +724,7 @@ class FormulaModuleSpec:
             raise GenerationError(f"{formula_id}: {error}") from error
         param_names = tuple(python_names[name] for name in published_formula.survey_parameter_names)
         if has_interval_parameters:
-            param_names += ("a", "b")
+            param_names += ("a", "b", "c_scale")
         tuples, cases, exact_texts_of_rounded_values = [], [], []
         bounds_cases: dict[tuple[float, float], str] = {}
         for published_test_function in published_formula.test_functions:
@@ -745,7 +752,7 @@ class FormulaModuleSpec:
                 cases.append(
                     f"FormulaTestCase.value(params={params!r}, x={x!r}, c={c!r}, expected={expected!r}{tolerance})"
                 )
-                shifted_xs.append(x - (bounds[1] - bounds[0]) * c)
+                shifted_xs.append(x - cls._c_scale(bounds) * c)
             # the first tuple also reaches each branch of a function that is 1 conditional, so that a test reaches
             # every line of the module
             expression_node = ast.parse(formula_expression.python_code, mode="eval").body

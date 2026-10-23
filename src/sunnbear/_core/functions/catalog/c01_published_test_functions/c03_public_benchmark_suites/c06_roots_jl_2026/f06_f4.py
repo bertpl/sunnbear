@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "60d4efd8d4c84fbf"
 
 
 class RootsJl2026F4(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Roots.jl (2026).
 
     The survey writes the source's function as ``cos(x) - x/2``; the formula's interval is ``[0.0, pi/2]``.
 
@@ -49,8 +49,8 @@ class RootsJl2026F4(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 1.5707963267948966 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1.57 * c
         return math.cos(x) - x / 2
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -63,6 +63,6 @@ class RootsJl2026F4(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=0.471239, c=0.0, expected=0.6553869778987967),
-        FormulaTestCase.value(params={}, x=0.471239, c=0.25, expected=0.9576473665826754),
+        FormulaTestCase.value(params={}, x=0.471239, c=0.25, expected=0.9575321861874498),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 1.5707963267948966)),
     )

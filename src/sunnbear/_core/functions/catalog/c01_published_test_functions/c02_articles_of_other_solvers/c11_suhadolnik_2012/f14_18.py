@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "61971f6b1e9a1699"
 
 
 class Suhadolnik201218(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Suhadolnik (2012).
 
     The survey writes the source's function as ``x^5``; the formula's interval is ``[-0.5, 1/3]``.
 
@@ -33,8 +33,8 @@ class Suhadolnik201218(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 0.8333333333333333 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 0.833 * c
         return x**5
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -47,6 +47,6 @@ class Suhadolnik201218(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=-0.25, c=0.0, expected=-0.0009765625),
-        FormulaTestCase.value(params={}, x=-0.25, c=0.25, expected=-0.020225870265882198),
+        FormulaTestCase.value(params={}, x=-0.25, c=0.25, expected=-0.02020748979611757),
         FormulaTestCase.interval_bounds(params={}, expected=(-0.5, 0.3333333333333333)),
     )

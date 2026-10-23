@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "934503ab026e9739"
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
 
     The survey writes the source's function as ``if(x > -1; 1 + sin(1/(x + 1)); -1)``; the formula's interval is ``[-1,
     1]``.
@@ -44,7 +44,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 2.0 * c
         if x > -1:
             return 1 + math.sin(1 / (x + 1))

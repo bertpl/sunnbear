@@ -9,7 +9,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class Burkardt2016P09(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Burkardt (2016).
 
     The survey writes the source's function as ``0.75*(x - 6.25) - 0.3125`` (x < 6.0); ``2.00*(x - 6.25)`` (6.0 <= x <=
     6.50); ``0.75*(x - 6.25) + 0.3125`` (x > 6.50); the formula's intervals are ``[-5.0, 16.0]`` (rang); ``[6.25 - 1.0,
@@ -20,7 +20,7 @@ class Burkardt2016P09(Formula):
 
     number = (1, 3, 1, 9)
     name = "p09"
-    param_names = ("a", "b")
+    param_names = ("a", "b", "c_scale")
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "
@@ -51,9 +51,9 @@ class Burkardt2016P09(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+    def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
         if x < 6.0:
             return 0.75 * (x - 6.25) - 0.3125
         elif x <= 6.50:
@@ -61,34 +61,24 @@ class Burkardt2016P09(Formula):
         else:
             return 0.75 * (x - 6.25) + 0.3125
 
-    def interval_bounds(self, a: float, b: float) -> tuple[float, float]:
+    def interval_bounds(self, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (
-            ParamTable(
-                names=("a", "b"),
-                rows=(
-                    (
-                        -5.0,
-                        16.0,
-                    ),
-                    (
-                        5.25,
-                        11.25,
-                    ),
-                ),
-            ),
-        )
+        return (ParamTable(names=("a", "b", "c_scale"), rows=((-5.0, 16.0, 21.0), (5.25, 11.25, 6.0))),)
 
     cases = (
-        FormulaTestCase.value(params={"a": -5.0, "b": 16.0}, x=1.3, c=0.0, expected=-4.025),
-        FormulaTestCase.value(params={"a": -5.0, "b": 16.0}, x=1.3, c=0.25, expected=-7.9625),
-        FormulaTestCase.value(params={"a": 5.25, "b": 11.25}, x=7.05, c=0.0, expected=0.9124999999999999),
-        FormulaTestCase.value(params={"a": -5.0, "b": 16.0}, x=6.2, c=0.0, expected=-0.09999999999999964),
-        FormulaTestCase.value(params={"a": -5.0, "b": 16.0}, x=7.0, c=0.0, expected=0.875),
-        FormulaTestCase.interval_bounds(params={"a": -5.0, "b": 16.0}, expected=(-5.0, 16.0)),
-        FormulaTestCase.interval_bounds(params={"a": 5.25, "b": 11.25}, expected=(5.25, 11.25)),
+        FormulaTestCase.value(params={"a": -5.0, "b": 16.0, "c_scale": 21.0}, x=1.3, c=0.0, expected=-4.025),
+        FormulaTestCase.value(params={"a": -5.0, "b": 16.0, "c_scale": 21.0}, x=1.3, c=0.25, expected=-7.9625),
+        FormulaTestCase.value(
+            params={"a": 5.25, "b": 11.25, "c_scale": 6.0}, x=7.05, c=0.0, expected=0.9124999999999999
+        ),
+        FormulaTestCase.value(
+            params={"a": -5.0, "b": 16.0, "c_scale": 21.0}, x=6.2, c=0.0, expected=-0.09999999999999964
+        ),
+        FormulaTestCase.value(params={"a": -5.0, "b": 16.0, "c_scale": 21.0}, x=7.0, c=0.0, expected=0.875),
+        FormulaTestCase.interval_bounds(params={"a": -5.0, "b": 16.0, "c_scale": 21.0}, expected=(-5.0, 16.0)),
+        FormulaTestCase.interval_bounds(params={"a": 5.25, "b": 11.25, "c_scale": 6.0}, expected=(5.25, 11.25)),
     )

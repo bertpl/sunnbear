@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "182cb18336f82422"
 
 
 class FooTan202542(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Foo, Tan (2025).
 
     The survey writes the source's function as ``if(x = 0; 0; -x*log2(x)) - (1 - x)*log2(1 - x) - y``, with the
     parameters ``y = 0.1, 0.2, ..., 0.9``; the formula's interval is ``[0, 0.5]``.
@@ -41,7 +41,7 @@ class FooTan202542(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, y: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 0.5 * c
         return ((0) if (x) == (0) else (-x * math.log2(x))) - (1 - x) * math.log2(1 - x) - y
 

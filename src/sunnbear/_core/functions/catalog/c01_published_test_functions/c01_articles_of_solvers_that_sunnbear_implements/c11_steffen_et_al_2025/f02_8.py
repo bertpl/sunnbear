@@ -12,7 +12,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class SteffenEtAl20258(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Steffen et al. (2025).
 
     The survey writes the source's function as ``(V/b)^3 - (1 - lambda + Tr/(Gamma*Pr))*(V/b)^2 + (sigma - lambda -
     lambda*Tr/(Gamma*Pr) + Lambda*alpha(omega, Tr)/(Gamma^2*Pr))*(V/b) - (sigma + sigma*Tr/(Gamma*Pr) +
@@ -52,7 +52,7 @@ class SteffenEtAl20258(Formula):
         Tr: float,
         Pr: float,
     ) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 3.0 * c
         alpha = (1 + (0.37464 + 1.54226 * omega - 0.26992 * omega**2) * (1 - math.sqrt(Tr))) ** 2
         return (

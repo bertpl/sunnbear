@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "b04513acf9335e45"
 
 
 class Ganchovski2026F100(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ganchovski (2026).
 
     The survey writes the source's function as ``cbrt((4*x - 3)/x)``; the formula's interval is ``[0, e]``.
 
@@ -44,8 +44,8 @@ class Ganchovski2026F100(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 2.718281828459045 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 2.72 * c
         return real_root((4 * x - 3) / x, 3)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -58,6 +58,6 @@ class Ganchovski2026F100(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=0.815485, c=0.0, expected=0.6848497192199624),
-        FormulaTestCase.value(params={}, x=0.815485, c=0.25, expected=-2.6242646176845237),
+        FormulaTestCase.value(params={}, x=0.815485, c=0.25, expected=-2.62764740296579),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 2.718281828459045)),
     )

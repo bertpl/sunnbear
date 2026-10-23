@@ -12,7 +12,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class LiZhouLangeTian2026Ex372(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Li, Zhou, Lange, Tian (2026).
 
     The survey writes the source's function as ``p - Phi(x; mu, sigma^2)``, where ``Phi`` is the normal cumulative
     distribution function, with the parameters of Figure 2, ``p = 0.05``, ``mu = 1`` and ``sigma = 1``; the formula's
@@ -42,7 +42,7 @@ class LiZhouLangeTian2026Ex372(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float, mu: float, sigma: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 2.0 * c
         return p - 0.5 * math.erfc(-(x - mu) / (sigma * math.sqrt(2)))
 
