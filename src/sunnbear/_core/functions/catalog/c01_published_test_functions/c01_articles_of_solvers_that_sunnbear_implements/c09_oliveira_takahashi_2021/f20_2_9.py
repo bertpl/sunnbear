@@ -48,7 +48,7 @@ class OliveiraTakahashi202129(Formula):
         return ()
 
     # a case with a positive `atol` lies where float64 cannot evaluate the function to the
-    # default tolerance, because the function is ill-conditioned or cancels there
+    # default tolerance, because the function is ill-conditioned there or its terms cancel
     cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-0.38474614649849187, atol=2e-10),
         FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-0.9306282026349928, atol=4e-10),

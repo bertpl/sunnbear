@@ -6,11 +6,12 @@ function as a description, not as 1 expression, so a person writes this module: 
 """
 
 import math
+import sys
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
-# MAX_EXP_ARGUMENT is log(sys.float_info.max), the largest argument for which float64 exp does not overflow.
-MAX_EXP_ARGUMENT = 709.782712893384
+# MAX_EXP_ARGUMENT is the largest argument for which float64 exp does not overflow.
+MAX_EXP_ARGUMENT = math.log(sys.float_info.max)
 
 
 class RootsFortran20252627(Formula):
@@ -93,7 +94,7 @@ class RootsFortran20252627(Formula):
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - (b - a) * c
         # where 1/(x*x) exceeds MAX_EXP_ARGUMENT, for abs(x) below about 0.0375, exp overflows and the source's float64
-        # value is x/inf = 0; the comparison also holds where x*x underflows to 0
+        # value is x/inf = 0; the test `x * x * MAX_EXP_ARGUMENT < 1.0` also holds where x*x underflows to 0
         if x * x * MAX_EXP_ARGUMENT < 1.0:
             return 0.0
         else:

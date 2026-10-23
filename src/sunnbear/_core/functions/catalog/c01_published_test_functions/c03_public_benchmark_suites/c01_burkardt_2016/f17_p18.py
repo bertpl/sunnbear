@@ -71,7 +71,7 @@ class Burkardt2016P18(Formula):
         return (ParamTable(names=("a", "b"), rows=((0.988, 1.012), (0.99, 1.013))),)
 
     # a case with a positive `atol` lies where float64 cannot evaluate the function to the
-    # default tolerance, because the function is ill-conditioned or cancels there
+    # default tolerance, because the function is ill-conditioned there or its terms cancel
     cases = (
         FormulaTestCase.value(
             params={"a": 0.988, "b": 1.012}, x=0.9952, c=0.0, expected=-0.005870683422720227, atol=40.0
