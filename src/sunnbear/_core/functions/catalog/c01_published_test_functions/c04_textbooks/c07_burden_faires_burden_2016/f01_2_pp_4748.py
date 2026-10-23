@@ -13,7 +13,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class BurdenFairesBurden20162Pp4748(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Burden, Faires, Burden (2016).
 
     The survey writes the source's function as ``1564000 = 1000000*exp(lambda) + (435000/lambda)*(exp(lambda) - 1)``;
     the formula's interval is `(0, 1]` (figure, p. 47).
@@ -42,7 +42,7 @@ class BurdenFairesBurden20162Pp4748(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         if x == 0.0:
             # at x = 0, (435000/x)*(exp(x) - 1) takes its limit 435000

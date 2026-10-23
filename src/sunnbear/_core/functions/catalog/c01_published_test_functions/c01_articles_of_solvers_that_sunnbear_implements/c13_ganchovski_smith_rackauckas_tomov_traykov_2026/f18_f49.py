@@ -14,7 +14,7 @@ SURVEY_FIELDS_HASH = "0127d133fe194cfd"
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F49(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
 
     The survey writes the source's function as ``if(x <= 0; -x^3 - x - 1; x^(1/3) - x - 1)``; the formula's interval is
     ``[-1, 1]``.
@@ -42,7 +42,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F49(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 2.0 * c
         if x <= 0:
             return -(x**3) - x - 1

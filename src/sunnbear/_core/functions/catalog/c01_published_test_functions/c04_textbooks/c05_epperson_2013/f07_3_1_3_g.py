@@ -14,7 +14,7 @@ SURVEY_FIELDS_HASH = "2e1b02c97a91f815"
 
 
 class Epperson2013313G(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Epperson (2013).
 
     The survey writes the source's function as ``5 - x^-1``; the formula's interval is ``[0.1, 0.25]``.
 
@@ -34,7 +34,7 @@ class Epperson2013313G(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 0.15 * c
         return 5 - x**-1
 

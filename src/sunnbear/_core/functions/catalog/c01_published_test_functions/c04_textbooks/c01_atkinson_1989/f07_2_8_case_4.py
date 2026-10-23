@@ -13,7 +13,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class Atkinson198928Case4(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Atkinson (1989).
 
     The survey writes the source's function as ``(x - 1)*exp(-1/(x - 1)^2)``; the formula's interval is ``[0, 3]``.
 
@@ -36,7 +36,7 @@ class Atkinson198928Case4(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 3.0 * c
         if x == 1.0:
             # at its root x = 1, the expression divides by 0; the formula takes its limit 0

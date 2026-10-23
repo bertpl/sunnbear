@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "5eb49ebcb23c36fa"
 
 
 class Ridders1979Iii1(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ridders (1979).
 
     The survey writes the source's function as ``x*exp(x) - 10``; the formula's intervals are `[-10, 10]`; `[-100,
     100]`.
@@ -25,7 +25,7 @@ class Ridders1979Iii1(Formula):
 
     number = (1, 1, 5, 2)
     name = "III.1"
-    param_names = ("a", "b")
+    param_names = ("a", "b", "c_scale")
     source = FormulaSource(
         reference=(
             "Ridders, C. J. F. (1979). A new algorithm for computing a single root of a real continuous"
@@ -36,23 +36,29 @@ class Ridders1979Iii1(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+    def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
         return x * math.exp(x) - 10
 
-    def interval_bounds(self, a: float, b: float) -> tuple[float, float]:
+    def interval_bounds(self, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b"), rows=((-10.0, 10.0), (-100.0, 100.0))),)
+        return (ParamTable(names=("a", "b", "c_scale"), rows=((-10.0, 10.0, 20.0), (-100.0, 100.0, 200.0))),)
 
     cases = (
-        FormulaTestCase.value(params={"a": -10.0, "b": 10.0}, x=-4.0, c=0.0, expected=-10.073262555554937),
-        FormulaTestCase.value(params={"a": -10.0, "b": 10.0}, x=-4.0, c=0.25, expected=-10.00111068823678),
-        FormulaTestCase.value(params={"a": -100.0, "b": 100.0}, x=40.0, c=0.0, expected=9.4154106734808e18),
-        FormulaTestCase.interval_bounds(params={"a": -10.0, "b": 10.0}, expected=(-10.0, 10.0)),
-        FormulaTestCase.interval_bounds(params={"a": -100.0, "b": 100.0}, expected=(-100.0, 100.0)),
+        FormulaTestCase.value(
+            params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, x=-4.0, c=0.0, expected=-10.073262555554937
+        ),
+        FormulaTestCase.value(
+            params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, x=-4.0, c=0.25, expected=-10.00111068823678
+        ),
+        FormulaTestCase.value(
+            params={"a": -100.0, "b": 100.0, "c_scale": 200.0}, x=40.0, c=0.0, expected=9.4154106734808e18
+        ),
+        FormulaTestCase.interval_bounds(params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, expected=(-10.0, 10.0)),
+        FormulaTestCase.interval_bounds(params={"a": -100.0, "b": 100.0, "c_scale": 200.0}, expected=(-100.0, 100.0)),
     )

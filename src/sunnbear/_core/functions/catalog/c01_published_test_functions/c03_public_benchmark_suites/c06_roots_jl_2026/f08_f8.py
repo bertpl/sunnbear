@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "588c0bbab3a6dc51"
 
 
 class RootsJl2026F8(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Roots.jl (2026).
 
     The survey writes the source's function as ``exp(-x^2 + x + 2) - cos(x) + x^3 + 1``; the formula's interval is
     ``[-2.0, 1.0]``.
@@ -50,7 +50,7 @@ class RootsJl2026F8(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 3.0 * c
         return math.exp(-(x**2) + x + 2) - math.cos(x) + x**3 + 1
 

@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "87f34aa1d0da849c"
 
 
 class RootsFortran202521(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from roots-fortran (2025).
 
     The survey writes the source's function as ``x^2 - (1.0 - x)^n``, with the parameters ``n = 2, 5, 10, 15, 20``; the
     formula's interval is ``[0, 1.01]``.
@@ -87,7 +87,7 @@ class RootsFortran202521(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.01 * c
         return x**2 - (1.0 - x) ** n
 

@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "b7e9f50d78b93ccf"
 
 
 class ParidaGupta20054(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Parida, Gupta (2005).
 
     The survey writes the source's function as ``x^6 - 36*x^5 + 450*x^4 - 2400*x^3 + 5400*x^2 - 4320*x + 720``; the
     formula's interval is ``[10, 22]``.
@@ -38,7 +38,7 @@ class ParidaGupta20054(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 12.0 * c
         return x**6 - 36 * x**5 + 450 * x**4 - 2400 * x**3 + 5400 * x**2 - 4320 * x + 720
 

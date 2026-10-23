@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "956f345c71c4921a"
 
 
 class BurdenFairesBurden20162112(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Burden, Faires, Burden (2016).
 
     The survey writes the source's function as ``(x + 2)*(x + 1)^2*x*(x - 1)^3*(x - 2)``; the formula's intervals are
     `[-1.5, 2.5]`; `[-0.5, 2.4]`; `[-0.5, 3]`; `[-3, -0.5]`.
@@ -23,7 +23,7 @@ class BurdenFairesBurden20162112(Formula):
 
     number = (1, 4, 7, 23)
     name = "2.1-12"
-    param_names = ("a", "b")
+    param_names = ("a", "b", "c_scale")
     source = FormulaSource(
         reference=(
             "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. "
@@ -34,27 +34,36 @@ class BurdenFairesBurden20162112(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+    def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
         return (x + 2) * (x + 1) ** 2 * x * (x - 1) ** 3 * (x - 2)
 
-    def interval_bounds(self, a: float, b: float) -> tuple[float, float]:
+    def interval_bounds(self, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b"), rows=((-1.5, 2.5), (-0.5, 2.4), (-0.5, 3.0), (-3.0, -0.5))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((-1.5, 2.5, 4.0), (-0.5, 2.4, 2.9), (-0.5, 3.0, 3.5), (-3.0, -0.5, 2.5)),
+            ),
+        )
 
     cases = (
-        FormulaTestCase.value(params={"a": -1.5, "b": 2.5}, x=-0.3, c=0.0, expected=-1.26276969),
-        FormulaTestCase.value(params={"a": -1.5, "b": 2.5}, x=-0.3, c=0.25, expected=-3.288375090000001),
-        FormulaTestCase.value(params={"a": -0.5, "b": 2.4}, x=0.37, c=0.0, expected=0.6708114349200621),
-        FormulaTestCase.value(params={"a": -0.5, "b": 3.0}, x=0.55, c=0.0, expected=0.4452170726953124),
-        FormulaTestCase.value(params={"a": -3.0, "b": -0.5}, x=-2.25, c=0.0, expected=128.2276153564453),
-        FormulaTestCase.interval_bounds(params={"a": -1.5, "b": 2.5}, expected=(-1.5, 2.5)),
-        FormulaTestCase.interval_bounds(params={"a": -0.5, "b": 2.4}, expected=(-0.5, 2.4)),
-        FormulaTestCase.interval_bounds(params={"a": -0.5, "b": 3.0}, expected=(-0.5, 3.0)),
-        FormulaTestCase.interval_bounds(params={"a": -3.0, "b": -0.5}, expected=(-3.0, -0.5)),
+        FormulaTestCase.value(params={"a": -1.5, "b": 2.5, "c_scale": 4.0}, x=-0.3, c=0.0, expected=-1.26276969),
+        FormulaTestCase.value(
+            params={"a": -1.5, "b": 2.5, "c_scale": 4.0}, x=-0.3, c=0.25, expected=-3.288375090000001
+        ),
+        FormulaTestCase.value(params={"a": -0.5, "b": 2.4, "c_scale": 2.9}, x=0.37, c=0.0, expected=0.6708114349200621),
+        FormulaTestCase.value(params={"a": -0.5, "b": 3.0, "c_scale": 3.5}, x=0.55, c=0.0, expected=0.4452170726953124),
+        FormulaTestCase.value(
+            params={"a": -3.0, "b": -0.5, "c_scale": 2.5}, x=-2.25, c=0.0, expected=128.2276153564453
+        ),
+        FormulaTestCase.interval_bounds(params={"a": -1.5, "b": 2.5, "c_scale": 4.0}, expected=(-1.5, 2.5)),
+        FormulaTestCase.interval_bounds(params={"a": -0.5, "b": 2.4, "c_scale": 2.9}, expected=(-0.5, 2.4)),
+        FormulaTestCase.interval_bounds(params={"a": -0.5, "b": 3.0, "c_scale": 3.5}, expected=(-0.5, 3.0)),
+        FormulaTestCase.interval_bounds(params={"a": -3.0, "b": -0.5, "c_scale": 2.5}, expected=(-3.0, -0.5)),
     )

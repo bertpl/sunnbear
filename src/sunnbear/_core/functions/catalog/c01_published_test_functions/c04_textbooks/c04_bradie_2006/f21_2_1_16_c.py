@@ -16,7 +16,7 @@ SURVEY_FIELDS_HASH = "486d7fc720fe74ce"
 
 
 class Bradie20062116C(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Bradie (2006).
 
     The survey writes the source's function as ``1.05 - 1.04*x + log(x)``; the formula's interval is `(1, 2)` (2.3-16).
 
@@ -38,7 +38,7 @@ class Bradie20062116C(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return 1.05 - 1.04 * x + math.log(x)
 

@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "1148010bfd93347b"
 
 
 class ChapraCanale2015Prob515(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Chapra, Canale (2015).
 
     The survey writes the source's function as ``v = sqrt(2*g*H)*tanh(sqrt(2*g*H)/(2*L)*t)``, with the parameters `g =
     9.81` m/s^2, `L = 4` m, `t = 2.5` s, `v = 5` m/s; the formula's interval is ``[0, 2]``.
@@ -38,7 +38,7 @@ class ChapraCanale2015Prob515(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, g: float, L: float, t: float, v: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 2.0 * c
         return (v) - (math.sqrt(2 * g * x) * math.tanh(math.sqrt(2 * g * x) / (2 * L) * t))
 

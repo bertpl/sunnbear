@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "20ab82dc80ccea57"
 
 
 class Suhadolnik20128(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Suhadolnik (2012).
 
     The survey writes the source's function as ``cos(x) - x``; the formula's interval is ``[0, 1.7]``.
     """
@@ -33,7 +33,7 @@ class Suhadolnik20128(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.7 * c
         return math.cos(x) - x
 

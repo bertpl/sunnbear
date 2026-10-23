@@ -12,7 +12,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class DowellJarratt1972Problem3(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Dowell, Jarratt (1972).
 
     The survey writes the source's function as ``sum((-1)^n*x^((3*n^2 + n)/2), n = -inf..inf) - 1``; the formula's
     interval is ``[-0.9999, -0.0001]``.
@@ -38,8 +38,8 @@ class DowellJarratt1972Problem3(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 0.9998 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1.0 * c
         if not -1.0 < x < 1.0:
             # the series diverges outside (-1, 1)
             return math.nan
@@ -65,7 +65,7 @@ class DowellJarratt1972Problem3(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=-0.69996, c=0.0, expected=-0.04892829857040081),
-        FormulaTestCase.value(params={}, x=-0.69996, c=0.25, expected=-0.9973780415610394),
+        FormulaTestCase.value(params={}, x=-0.69996, c=0.25, expected=-0.9973981399194692),
         FormulaTestCase.value(params={}, x=-0.9999, c=0.25, expected=math.nan),
         FormulaTestCase.interval_bounds(params={}, expected=(-0.9999, -0.0001)),
     )

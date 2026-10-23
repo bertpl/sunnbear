@@ -10,7 +10,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class LiZhouLangeTian202671(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Li, Zhou, Lange, Tian (2026).
 
     The survey writes the source's function as ``a3*theta^m + a2*theta^2 + a1*theta + a0``, with the parameters ``{a0,
     a1, a2, a3, m} = {1, -1, 1, -1, 3}`` and ``{1, -1, -3, 1, 3}``; the formula's interval is ``(0, a)`` with ``a = 2``;
@@ -37,7 +37,7 @@ class LiZhouLangeTian202671(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a0: float, a1: float, a2: float, a3: float, m: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 2.0 * c
         return a3 * x**m + a2 * x**2 + a1 * x + a0
 

@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "36e68fab66cbdde1"
 
 
 class AlefeldPotraShi1993T511(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Alefeld, Potra, Shi (1993).
 
     The survey writes the source's function as ``sin(x) - x/2``; the formula's interval is ``[pi/2, pi]``.
     """
@@ -34,8 +34,8 @@ class AlefeldPotraShi1993T511(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 1.5707963267948966 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1.57 * c
         return math.sin(x) - x / 2
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class AlefeldPotraShi1993T511(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=2.04204, c=0.0, expected=-0.13001564370207735),
-        FormulaTestCase.value(params={}, x=2.04204, c=0.25, expected=0.17224649991586796),
+        FormulaTestCase.value(params={}, x=2.04204, c=0.25, expected=0.17213131859316824),
         FormulaTestCase.interval_bounds(params={}, expected=(1.5707963267948966, 3.141592653589793)),
     )

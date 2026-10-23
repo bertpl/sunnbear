@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "6e83dd963bd9a022"
 
 
 class Ellithy202622(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ellithy (2026).
 
     The survey writes the source's function as ``x^3 - 3*x^2 - 4*x + 13``; the formula's interval is ``[-3, -2]``.
     """
@@ -34,7 +34,7 @@ class Ellithy202622(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return x**3 - 3 * x**2 - 4 * x + 13
 

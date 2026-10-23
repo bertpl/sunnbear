@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class SuliMayers2003Example14(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Süli, Mayers (2003).
 
     The survey writes the source's function as ``x = g(x)``, with ``g(x) = 2^(-(1 + log2(1/x)^(1/alpha))^alpha)`` for
     ``0 < x <= 1`` and ``g(0) = 0``, with the parameters ``alpha > 0``; ``alpha = 1/2, 1, 2`` (Fig. 1.3); the formula's
@@ -36,7 +36,7 @@ class SuliMayers2003Example14(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, alpha: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         # the formula is the difference form x - g(x) of the fixed-point equation x = g(x), with g(0) = 0
         if x == 0.0:

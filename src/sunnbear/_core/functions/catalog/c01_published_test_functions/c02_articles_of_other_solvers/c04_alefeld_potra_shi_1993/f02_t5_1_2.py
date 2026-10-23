@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "ae99592a006d1957"
 
 
 class AlefeldPotraShi1993T512(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Alefeld, Potra, Shi (1993).
 
     The survey writes the source's function as ``-2*sum((2*i - 5)^2/(x - i^2)^3, i = 1..20)``, with the parameters ``n =
     1(1)19``; the formula's intervals are `[a_n, b_n]` with `a_n = n^2 + 10^(-9)`, `b_n = (n + 1)^2 - 10^(-9)`.
@@ -23,7 +23,7 @@ class AlefeldPotraShi1993T512(Formula):
 
     number = (1, 2, 4, 2)
     name = "T5.1-2"
-    param_names = ("a", "b")
+    param_names = ("a", "b", "c_scale")
     source = FormulaSource(
         reference=(
             "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "
@@ -34,9 +34,9 @@ class AlefeldPotraShi1993T512(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+    def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
         return -2 * (
             ((2 * (1) - 5) ** 2 / (x - (1) ** 2) ** 3)
             + ((2 * (2) - 5) ** 2 / (x - (2) ** 2) ** 3)
@@ -60,7 +60,7 @@ class AlefeldPotraShi1993T512(Formula):
             + ((2 * (20) - 5) ** 2 / (x - (20) ** 2) ** 3)
         )
 
-    def interval_bounds(self, a: float, b: float) -> tuple[float, float]:
+    def interval_bounds(self, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
@@ -68,141 +68,177 @@ class AlefeldPotraShi1993T512(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("a", "b"),
+                names=("a", "b", "c_scale"),
                 rows=(
-                    (1.000000001, 3.999999999),
-                    (4.000000001, 8.999999999),
-                    (9.000000001, 15.999999999),
-                    (16.000000001, 24.999999999),
-                    (25.000000001, 35.999999999),
-                    (36.000000001, 48.999999999),
-                    (49.000000001, 63.999999999),
-                    (64.000000001, 80.999999999),
-                    (81.000000001, 99.999999999),
-                    (100.000000001, 120.999999999),
-                    (121.000000001, 143.999999999),
-                    (144.000000001, 168.999999999),
-                    (169.000000001, 195.999999999),
-                    (196.000000001, 224.999999999),
-                    (225.000000001, 255.999999999),
-                    (256.000000001, 288.999999999),
-                    (289.000000001, 323.999999999),
-                    (324.000000001, 360.999999999),
-                    (361.000000001, 399.999999999),
+                    (1.000000001, 3.999999999, 3.0),
+                    (4.000000001, 8.999999999, 5.0),
+                    (9.000000001, 15.999999999, 7.0),
+                    (16.000000001, 24.999999999, 9.0),
+                    (25.000000001, 35.999999999, 11.0),
+                    (36.000000001, 48.999999999, 13.0),
+                    (49.000000001, 63.999999999, 15.0),
+                    (64.000000001, 80.999999999, 17.0),
+                    (81.000000001, 99.999999999, 19.0),
+                    (100.000000001, 120.999999999, 21.0),
+                    (121.000000001, 143.999999999, 23.0),
+                    (144.000000001, 168.999999999, 25.0),
+                    (169.000000001, 195.999999999, 27.0),
+                    (196.000000001, 224.999999999, 29.0),
+                    (225.000000001, 255.999999999, 31.0),
+                    (256.000000001, 288.999999999, 33.0),
+                    (289.000000001, 323.999999999, 35.0),
+                    (324.000000001, 360.999999999, 37.0),
+                    (361.000000001, 399.999999999, 39.0),
                 ),
             ),
         )
 
     cases = (
-        FormulaTestCase.value(params={"a": 1.000000001, "b": 3.999999999}, x=1.9, c=0.0, expected=-24.45179770128443),
-        FormulaTestCase.value(params={"a": 1.000000001, "b": 3.999999999}, x=1.9, c=0.25, expected=-5333.226342975694),
-        FormulaTestCase.value(params={"a": 4.000000001, "b": 8.999999999}, x=5.5, c=0.0, expected=-0.7118000594155782),
         FormulaTestCase.value(
-            params={"a": 9.000000001, "b": 15.999999999}, x=11.1, c=0.0, expected=-0.0532193077164875
+            params={"a": 1.000000001, "b": 3.999999999, "c_scale": 3.0}, x=1.9, c=0.0, expected=-24.45179770128443
         ),
         FormulaTestCase.value(
-            params={"a": 16.000000001, "b": 24.999999999}, x=18.7, c=0.0, expected=-0.6891508421777488
+            params={"a": 1.000000001, "b": 3.999999999, "c_scale": 3.0}, x=1.9, c=0.25, expected=-5333.226396309078
         ),
         FormulaTestCase.value(
-            params={"a": 25.000000001, "b": 35.999999999}, x=28.3, c=0.0, expected=-1.1582276519983778
+            params={"a": 4.000000001, "b": 8.999999999, "c_scale": 5.0}, x=5.5, c=0.0, expected=-0.7118000594155782
         ),
         FormulaTestCase.value(
-            params={"a": 36.000000001, "b": 48.999999999}, x=39.9, c=0.0, expected=-1.4266641633505828
+            params={"a": 9.000000001, "b": 15.999999999, "c_scale": 7.0}, x=11.1, c=0.0, expected=-0.0532193077164875
         ),
         FormulaTestCase.value(
-            params={"a": 49.000000001, "b": 63.999999999}, x=53.5, c=0.0, expected=-1.5643769465075466
+            params={"a": 16.000000001, "b": 24.999999999, "c_scale": 9.0}, x=18.7, c=0.0, expected=-0.6891508421777488
         ),
         FormulaTestCase.value(
-            params={"a": 64.000000001, "b": 80.999999999}, x=69.1, c=0.0, expected=-1.6236996014083958
+            params={"a": 25.000000001, "b": 35.999999999, "c_scale": 11.0}, x=28.3, c=0.0, expected=-1.1582276519983778
         ),
         FormulaTestCase.value(
-            params={"a": 81.000000001, "b": 99.999999999}, x=86.7, c=0.0, expected=-1.6367539271049327
+            params={"a": 36.000000001, "b": 48.999999999, "c_scale": 13.0}, x=39.9, c=0.0, expected=-1.4266641633505828
         ),
         FormulaTestCase.value(
-            params={"a": 100.000000001, "b": 120.999999999}, x=106.3, c=0.0, expected=-1.622659500477147
+            params={"a": 49.000000001, "b": 63.999999999, "c_scale": 15.0}, x=53.5, c=0.0, expected=-1.5643769465075466
         ),
         FormulaTestCase.value(
-            params={"a": 121.000000001, "b": 143.999999999}, x=127.9, c=0.0, expected=-1.5928458490473871
+            params={"a": 64.000000001, "b": 80.999999999, "c_scale": 17.0}, x=69.1, c=0.0, expected=-1.6236996014083958
         ),
         FormulaTestCase.value(
-            params={"a": 144.000000001, "b": 168.999999999}, x=151.5, c=0.0, expected=-1.5542307191409745
+            params={"a": 81.000000001, "b": 99.999999999, "c_scale": 19.0}, x=86.7, c=0.0, expected=-1.6367539271049327
         ),
         FormulaTestCase.value(
-            params={"a": 169.000000001, "b": 195.999999999}, x=177.1, c=0.0, expected=-1.511054425185954
+            params={"a": 100.000000001, "b": 120.999999999, "c_scale": 21.0},
+            x=106.3,
+            c=0.0,
+            expected=-1.622659500477147,
         ),
         FormulaTestCase.value(
-            params={"a": 196.000000001, "b": 224.999999999}, x=204.7, c=0.0, expected=-1.465945256995238
+            params={"a": 121.000000001, "b": 143.999999999, "c_scale": 23.0},
+            x=127.9,
+            c=0.0,
+            expected=-1.5928458490473871,
         ),
         FormulaTestCase.value(
-            params={"a": 225.000000001, "b": 255.999999999}, x=234.3, c=0.0, expected=-1.4205548005209618
+            params={"a": 144.000000001, "b": 168.999999999, "c_scale": 25.0},
+            x=151.5,
+            c=0.0,
+            expected=-1.5542307191409745,
         ),
         FormulaTestCase.value(
-            params={"a": 256.000000001, "b": 288.999999999}, x=265.9, c=0.0, expected=-1.375963293673358
+            params={"a": 169.000000001, "b": 195.999999999, "c_scale": 27.0},
+            x=177.1,
+            c=0.0,
+            expected=-1.511054425185954,
         ),
         FormulaTestCase.value(
-            params={"a": 289.000000001, "b": 323.999999999}, x=299.5, c=0.0, expected=-1.333012002450678
+            params={"a": 196.000000001, "b": 224.999999999, "c_scale": 29.0},
+            x=204.7,
+            c=0.0,
+            expected=-1.465945256995238,
         ),
         FormulaTestCase.value(
-            params={"a": 324.000000001, "b": 360.999999999}, x=335.1, c=0.0, expected=-1.292906790485875
+            params={"a": 225.000000001, "b": 255.999999999, "c_scale": 31.0},
+            x=234.3,
+            c=0.0,
+            expected=-1.4205548005209618,
         ),
         FormulaTestCase.value(
-            params={"a": 361.000000001, "b": 399.999999999}, x=372.7, c=0.0, expected=-1.2607251556545698
+            params={"a": 256.000000001, "b": 288.999999999, "c_scale": 33.0},
+            x=265.9,
+            c=0.0,
+            expected=-1.375963293673358,
+        ),
+        FormulaTestCase.value(
+            params={"a": 289.000000001, "b": 323.999999999, "c_scale": 35.0},
+            x=299.5,
+            c=0.0,
+            expected=-1.333012002450678,
+        ),
+        FormulaTestCase.value(
+            params={"a": 324.000000001, "b": 360.999999999, "c_scale": 37.0},
+            x=335.1,
+            c=0.0,
+            expected=-1.292906790485875,
+        ),
+        FormulaTestCase.value(
+            params={"a": 361.000000001, "b": 399.999999999, "c_scale": 39.0},
+            x=372.7,
+            c=0.0,
+            expected=-1.2607251556545698,
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 1.000000001, "b": 3.999999999}, expected=(1.000000001, 3.999999999)
+            params={"a": 1.000000001, "b": 3.999999999, "c_scale": 3.0}, expected=(1.000000001, 3.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 4.000000001, "b": 8.999999999}, expected=(4.000000001, 8.999999999)
+            params={"a": 4.000000001, "b": 8.999999999, "c_scale": 5.0}, expected=(4.000000001, 8.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 9.000000001, "b": 15.999999999}, expected=(9.000000001, 15.999999999)
+            params={"a": 9.000000001, "b": 15.999999999, "c_scale": 7.0}, expected=(9.000000001, 15.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 16.000000001, "b": 24.999999999}, expected=(16.000000001, 24.999999999)
+            params={"a": 16.000000001, "b": 24.999999999, "c_scale": 9.0}, expected=(16.000000001, 24.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 25.000000001, "b": 35.999999999}, expected=(25.000000001, 35.999999999)
+            params={"a": 25.000000001, "b": 35.999999999, "c_scale": 11.0}, expected=(25.000000001, 35.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 36.000000001, "b": 48.999999999}, expected=(36.000000001, 48.999999999)
+            params={"a": 36.000000001, "b": 48.999999999, "c_scale": 13.0}, expected=(36.000000001, 48.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 49.000000001, "b": 63.999999999}, expected=(49.000000001, 63.999999999)
+            params={"a": 49.000000001, "b": 63.999999999, "c_scale": 15.0}, expected=(49.000000001, 63.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 64.000000001, "b": 80.999999999}, expected=(64.000000001, 80.999999999)
+            params={"a": 64.000000001, "b": 80.999999999, "c_scale": 17.0}, expected=(64.000000001, 80.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 81.000000001, "b": 99.999999999}, expected=(81.000000001, 99.999999999)
+            params={"a": 81.000000001, "b": 99.999999999, "c_scale": 19.0}, expected=(81.000000001, 99.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 100.000000001, "b": 120.999999999}, expected=(100.000000001, 120.999999999)
+            params={"a": 100.000000001, "b": 120.999999999, "c_scale": 21.0}, expected=(100.000000001, 120.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 121.000000001, "b": 143.999999999}, expected=(121.000000001, 143.999999999)
+            params={"a": 121.000000001, "b": 143.999999999, "c_scale": 23.0}, expected=(121.000000001, 143.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 144.000000001, "b": 168.999999999}, expected=(144.000000001, 168.999999999)
+            params={"a": 144.000000001, "b": 168.999999999, "c_scale": 25.0}, expected=(144.000000001, 168.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 169.000000001, "b": 195.999999999}, expected=(169.000000001, 195.999999999)
+            params={"a": 169.000000001, "b": 195.999999999, "c_scale": 27.0}, expected=(169.000000001, 195.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 196.000000001, "b": 224.999999999}, expected=(196.000000001, 224.999999999)
+            params={"a": 196.000000001, "b": 224.999999999, "c_scale": 29.0}, expected=(196.000000001, 224.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 225.000000001, "b": 255.999999999}, expected=(225.000000001, 255.999999999)
+            params={"a": 225.000000001, "b": 255.999999999, "c_scale": 31.0}, expected=(225.000000001, 255.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 256.000000001, "b": 288.999999999}, expected=(256.000000001, 288.999999999)
+            params={"a": 256.000000001, "b": 288.999999999, "c_scale": 33.0}, expected=(256.000000001, 288.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 289.000000001, "b": 323.999999999}, expected=(289.000000001, 323.999999999)
+            params={"a": 289.000000001, "b": 323.999999999, "c_scale": 35.0}, expected=(289.000000001, 323.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 324.000000001, "b": 360.999999999}, expected=(324.000000001, 360.999999999)
+            params={"a": 324.000000001, "b": 360.999999999, "c_scale": 37.0}, expected=(324.000000001, 360.999999999)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 361.000000001, "b": 399.999999999}, expected=(361.000000001, 399.999999999)
+            params={"a": 361.000000001, "b": 399.999999999, "c_scale": 39.0}, expected=(361.000000001, 399.999999999)
         ),
     )

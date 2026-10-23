@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "6b8f862d2b0301bc"
 
 
 class Moler2004Ex43(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Moler (2004).
 
     The survey writes the source's function as ``816*x^3 - 3835*x^2 + 6000*x - 3125``; the formula's interval is ``[1,
     2]``.
@@ -38,7 +38,7 @@ class Moler2004Ex43(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return 816 * x**3 - 3835 * x**2 + 6000 * x - 3125
 

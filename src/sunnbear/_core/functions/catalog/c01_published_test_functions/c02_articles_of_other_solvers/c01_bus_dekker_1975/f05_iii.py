@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "711eeaea9d7a590e"
 
 
 class BusDekker1975Iii(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Bus, Dekker (1975).
 
     The survey writes the source's function as ``x^n``, with the parameters ``n = 3, 5, 7, 9, 19, 25``; the formula's
     interval is ``[-1, 10]``.
@@ -35,7 +35,7 @@ class BusDekker1975Iii(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 11.0 * c
         return x**n
 

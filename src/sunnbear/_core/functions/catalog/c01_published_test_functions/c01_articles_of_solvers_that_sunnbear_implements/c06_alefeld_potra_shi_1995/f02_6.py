@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "55dda2f8c9abf202"
 
 
 class AlefeldPotraShi19956(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Alefeld, Potra, Shi (1995).
 
     The survey writes the source's function as ``2*x*exp(-n) - 2*exp(-n*x) + 1``, with the parameters ``n = 1(1)5,
     20(20)100``; the formula's interval is ``[0, 1]``.
@@ -38,7 +38,7 @@ class AlefeldPotraShi19956(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return 2 * x * math.exp(-n) - 2 * math.exp(-n * x) + 1
 

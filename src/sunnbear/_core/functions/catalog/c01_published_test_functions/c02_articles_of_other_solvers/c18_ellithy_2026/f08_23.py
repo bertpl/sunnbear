@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "7b014016e63fa832"
 
 
 class Ellithy202623(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ellithy (2026).
 
     The survey writes the source's function as ``-0.9*x^2 + 1.7*x + 2.5``; the formula's interval is ``[2.8, 3.0]``.
     """
@@ -34,8 +34,8 @@ class Ellithy202623(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 0.20000000000000018 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 0.2 * c
         return -0.9 * x**2 + 1.7 * x + 2.5
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class Ellithy202623(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=2.86, c=0.0, expected=0.0003600000000004287),
-        FormulaTestCase.value(params={}, x=2.86, c=0.25, expected=0.1705100000000013),
+        FormulaTestCase.value(params={}, x=2.86, c=0.25, expected=0.17050999999999983),
         FormulaTestCase.interval_bounds(params={}, expected=(2.8, 3.0)),
     )

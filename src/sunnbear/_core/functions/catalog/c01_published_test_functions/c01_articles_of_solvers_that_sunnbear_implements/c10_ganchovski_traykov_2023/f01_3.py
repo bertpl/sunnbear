@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "37ed88de804dc84c"
 
 
 class GanchovskiTraykov20233(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ganchovski, Traykov (2023).
 
     The survey writes the source's function as ``4 - tan(x)``; the formula's interval is ``[0, 1.5]``.
 
@@ -37,7 +37,7 @@ class GanchovskiTraykov20233(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.5 * c
         return 4 - math.tan(x)
 

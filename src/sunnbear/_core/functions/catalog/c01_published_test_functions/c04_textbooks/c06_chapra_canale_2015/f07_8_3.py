@@ -13,7 +13,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class ChapraCanale201583(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Chapra, Canale (2015).
 
     The survey writes the source's function as ``exp(-R*t/(2*L))*cos(sqrt(1/(L*C) - (R/(2*L))^2)*t) - q/q0``, with the
     parameters `L = 5` H, `C = 10^-4` F, `t = 0.05` s, `q/q0 = 0.01`; the formula's interval is ``[0, 400]``.
@@ -39,7 +39,7 @@ class ChapraCanale201583(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 400.0 * c
         inductance, capacitance, t = 5.0, 1e-4, 0.05
         omega = math.sqrt(1.0 / (inductance * capacitance) - (x / (2.0 * inductance)) ** 2)

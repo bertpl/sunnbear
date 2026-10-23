@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class BusDekker1975Iv(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Bus, Dekker (1975).
 
     The survey writes the source's function as ``0`` if ``x = 0``; ``x*exp(-x^-2)`` otherwise; the formula's interval is
     ``[-1, 4]``.
@@ -33,7 +33,7 @@ class BusDekker1975Iv(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 5.0 * c
         # below 1e-100, float64 rounds x*exp(-x^-2) to 0, and x**-2 overflows
         if abs(x) < 1e-100:

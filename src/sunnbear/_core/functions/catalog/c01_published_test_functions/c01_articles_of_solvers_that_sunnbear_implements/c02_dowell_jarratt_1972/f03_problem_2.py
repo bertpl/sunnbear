@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "ec66590e86154058"
 
 
 class DowellJarratt1972Problem2(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Dowell, Jarratt (1972).
 
     The survey writes the source's function as ``J0(K)*Y1(K*x) - J1(K*x)*Y0(K)``, with the parameters ``K = 2.5, 3.0``;
     the formula's interval is ``[0.1, 1]``.
@@ -38,7 +38,7 @@ class DowellJarratt1972Problem2(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, K: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 0.9 * c
         return bessel_j0(K) * bessel_y1(K * x) - bessel_j1(K * x) * bessel_y0(K)
 

@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "b00e6c028b889ab1"
 
 
 class Suhadolnik20122(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Suhadolnik (2012).
 
     The survey writes the source's function as ``(10 - x)*exp(-10*x) - x^10 + 1``; the formula's interval is ``[.5,
     8]``.
@@ -34,7 +34,7 @@ class Suhadolnik20122(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 7.5 * c
         return (10 - x) * math.exp(-10 * x) - x**10 + 1
 

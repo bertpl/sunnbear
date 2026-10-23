@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "a37aace39e762faa"
 
 
 class BadrAlmotairiElGhamry2021P14(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Badr, Almotairi, El Ghamry (2021).
 
     The survey writes the source's function as ``exp(x) - 3*x - 2``; the formula's interval is ``[2, 3]``.
     """
@@ -34,7 +34,7 @@ class BadrAlmotairiElGhamry2021P14(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return math.exp(x) - 3 * x - 2
 

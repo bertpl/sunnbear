@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "042d8d964f8ad28a"
 
 
 class AlefeldPotraShi1993T514(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Alefeld, Potra, Shi (1993).
 
     The survey writes the source's function as ``x^n - a``, with the parameters given per interval, on `[0, 5]`: `a =
     0.2, 1`, `n = 4(2)12`; on `[0.95, 4.05]`: `a = 1`, `n = 8(2)14`; the formula's intervals are `[0, 5]`; `[0.95,
@@ -27,7 +27,7 @@ class AlefeldPotraShi1993T514(Formula):
 
     number = (1, 2, 4, 4)
     name = "T5.1-4"
-    param_names = ("a_", "n", "a", "b")
+    param_names = ("a_", "n", "a", "b", "c_scale")
     source = FormulaSource(
         reference=(
             "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "
@@ -38,12 +38,12 @@ class AlefeldPotraShi1993T514(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, a_: float, n: float, a: float, b: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+    def parametrized_fun(x: float, c: float, a_: float, n: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
         return x**n - a_
 
-    def interval_bounds(self, a_: float, n: float, a: float, b: float) -> tuple[float, float]:
+    def interval_bounds(self, a_: float, n: float, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
@@ -51,54 +51,88 @@ class AlefeldPotraShi1993T514(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("a_", "n", "a", "b"),
+                names=("a_", "n", "a", "b", "c_scale"),
                 rows=(
-                    (0.2, 4.0, 0.0, 5.0),
-                    (0.2, 6.0, 0.0, 5.0),
-                    (0.2, 8.0, 0.0, 5.0),
-                    (0.2, 10.0, 0.0, 5.0),
-                    (0.2, 12.0, 0.0, 5.0),
-                    (1.0, 4.0, 0.0, 5.0),
-                    (1.0, 6.0, 0.0, 5.0),
-                    (1.0, 8.0, 0.0, 5.0),
-                    (1.0, 10.0, 0.0, 5.0),
-                    (1.0, 12.0, 0.0, 5.0),
-                    (1.0, 8.0, 0.95, 4.05),
-                    (1.0, 10.0, 0.95, 4.05),
-                    (1.0, 12.0, 0.95, 4.05),
-                    (1.0, 14.0, 0.95, 4.05),
+                    (0.2, 4.0, 0.0, 5.0, 5.0),
+                    (0.2, 6.0, 0.0, 5.0, 5.0),
+                    (0.2, 8.0, 0.0, 5.0, 5.0),
+                    (0.2, 10.0, 0.0, 5.0, 5.0),
+                    (0.2, 12.0, 0.0, 5.0, 5.0),
+                    (1.0, 4.0, 0.0, 5.0, 5.0),
+                    (1.0, 6.0, 0.0, 5.0, 5.0),
+                    (1.0, 8.0, 0.0, 5.0, 5.0),
+                    (1.0, 10.0, 0.0, 5.0, 5.0),
+                    (1.0, 12.0, 0.0, 5.0, 5.0),
+                    (1.0, 8.0, 0.95, 4.05, 3.1),
+                    (1.0, 10.0, 0.95, 4.05, 3.1),
+                    (1.0, 12.0, 0.95, 4.05, 3.1),
+                    (1.0, 14.0, 0.95, 4.05, 3.1),
                 ),
             ),
         )
 
     cases = (
-        FormulaTestCase.value(params={"a_": 0.2, "n": 4.0, "a": 0.0, "b": 5.0}, x=1.5, c=0.0, expected=4.8625),
-        FormulaTestCase.value(params={"a_": 0.2, "n": 4.0, "a": 0.0, "b": 5.0}, x=1.5, c=0.25, expected=-0.19609375),
-        FormulaTestCase.value(params={"a_": 0.2, "n": 6.0, "a": 0.0, "b": 5.0}, x=1.5, c=0.0, expected=11.190625),
-        FormulaTestCase.value(params={"a_": 0.2, "n": 8.0, "a": 0.0, "b": 5.0}, x=1.5, c=0.0, expected=25.42890625),
-        FormulaTestCase.value(params={"a_": 0.2, "n": 10.0, "a": 0.0, "b": 5.0}, x=1.5, c=0.0, expected=57.4650390625),
         FormulaTestCase.value(
-            params={"a_": 0.2, "n": 12.0, "a": 0.0, "b": 5.0}, x=1.5, c=0.0, expected=129.546337890625
-        ),
-        FormulaTestCase.value(params={"a_": 1.0, "n": 4.0, "a": 0.0, "b": 5.0}, x=1.5, c=0.0, expected=4.0625),
-        FormulaTestCase.value(params={"a_": 1.0, "n": 6.0, "a": 0.0, "b": 5.0}, x=1.5, c=0.0, expected=10.390625),
-        FormulaTestCase.value(params={"a_": 1.0, "n": 8.0, "a": 0.0, "b": 5.0}, x=1.5, c=0.0, expected=24.62890625),
-        FormulaTestCase.value(params={"a_": 1.0, "n": 10.0, "a": 0.0, "b": 5.0}, x=1.5, c=0.0, expected=56.6650390625),
-        FormulaTestCase.value(
-            params={"a_": 1.0, "n": 12.0, "a": 0.0, "b": 5.0}, x=1.5, c=0.0, expected=128.746337890625
+            params={"a_": 0.2, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=4.8625
         ),
         FormulaTestCase.value(
-            params={"a_": 1.0, "n": 8.0, "a": 0.95, "b": 4.05}, x=1.88, c=0.0, expected=155.0496482665168
+            params={"a_": 0.2, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.25, expected=-0.19609375
         ),
         FormulaTestCase.value(
-            params={"a_": 1.0, "n": 10.0, "a": 0.95, "b": 4.05}, x=1.88, c=0.0, expected=550.541876833177
+            params={"a_": 0.2, "n": 6.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=11.190625
         ),
         FormulaTestCase.value(
-            params={"a_": 1.0, "n": 12.0, "a": 0.95, "b": 4.05}, x=1.88, c=0.0, expected=1948.3696094791806
+            params={"a_": 0.2, "n": 8.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=25.42890625
         ),
         FormulaTestCase.value(
-            params={"a_": 1.0, "n": 14.0, "a": 0.95, "b": 4.05}, x=1.88, c=0.0, expected=6888.851947743215
+            params={"a_": 0.2, "n": 10.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=57.4650390625
         ),
-        FormulaTestCase.interval_bounds(params={"a_": 0.2, "n": 4.0, "a": 0.0, "b": 5.0}, expected=(0.0, 5.0)),
-        FormulaTestCase.interval_bounds(params={"a_": 1.0, "n": 8.0, "a": 0.95, "b": 4.05}, expected=(0.95, 4.05)),
+        FormulaTestCase.value(
+            params={"a_": 0.2, "n": 12.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=129.546337890625
+        ),
+        FormulaTestCase.value(
+            params={"a_": 1.0, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=4.0625
+        ),
+        FormulaTestCase.value(
+            params={"a_": 1.0, "n": 6.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=10.390625
+        ),
+        FormulaTestCase.value(
+            params={"a_": 1.0, "n": 8.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=24.62890625
+        ),
+        FormulaTestCase.value(
+            params={"a_": 1.0, "n": 10.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=56.6650390625
+        ),
+        FormulaTestCase.value(
+            params={"a_": 1.0, "n": 12.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=128.746337890625
+        ),
+        FormulaTestCase.value(
+            params={"a_": 1.0, "n": 8.0, "a": 0.95, "b": 4.05, "c_scale": 3.1},
+            x=1.88,
+            c=0.0,
+            expected=155.0496482665168,
+        ),
+        FormulaTestCase.value(
+            params={"a_": 1.0, "n": 10.0, "a": 0.95, "b": 4.05, "c_scale": 3.1},
+            x=1.88,
+            c=0.0,
+            expected=550.541876833177,
+        ),
+        FormulaTestCase.value(
+            params={"a_": 1.0, "n": 12.0, "a": 0.95, "b": 4.05, "c_scale": 3.1},
+            x=1.88,
+            c=0.0,
+            expected=1948.3696094791806,
+        ),
+        FormulaTestCase.value(
+            params={"a_": 1.0, "n": 14.0, "a": 0.95, "b": 4.05, "c_scale": 3.1},
+            x=1.88,
+            c=0.0,
+            expected=6888.851947743215,
+        ),
+        FormulaTestCase.interval_bounds(
+            params={"a_": 0.2, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, expected=(0.0, 5.0)
+        ),
+        FormulaTestCase.interval_bounds(
+            params={"a_": 1.0, "n": 8.0, "a": 0.95, "b": 4.05, "c_scale": 3.1}, expected=(0.95, 4.05)
+        ),
     )

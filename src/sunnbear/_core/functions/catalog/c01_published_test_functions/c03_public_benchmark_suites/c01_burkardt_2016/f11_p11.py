@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "a37355e952e08830"
 
 
 class Burkardt2016P11(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Burkardt (2016).
 
     The survey writes the source's function as ``(16.0 - x^4)/(16.0*x^4 + epsilon)``, with the parameters ``epsilon =
     0.00001``; the formula's intervals are `[0.0, 10.0]` (rang); `[0.25, 5.0]` (starts 1 and 2).
@@ -23,7 +23,7 @@ class Burkardt2016P11(Formula):
 
     number = (1, 3, 1, 11)
     name = "p11"
-    param_names = ("epsilon", "a", "b")
+    param_names = ("epsilon", "a", "b", "c_scale")
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "
@@ -54,29 +54,43 @@ class Burkardt2016P11(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, epsilon: float, a: float, b: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+    def parametrized_fun(x: float, c: float, epsilon: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
         return (16.0 - x**4) / (16.0 * x**4 + epsilon)
 
-    def interval_bounds(self, epsilon: float, a: float, b: float) -> tuple[float, float]:
+    def interval_bounds(self, epsilon: float, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("epsilon", "a", "b"), rows=((1e-05, 0.0, 10.0), (1e-05, 0.25, 5.0))),)
+        return (
+            ParamTable(
+                names=("epsilon", "a", "b", "c_scale"), rows=((1e-05, 0.0, 10.0, 10.0), (1e-05, 0.25, 5.0, 4.75))
+            ),
+        )
 
     cases = (
         FormulaTestCase.value(
-            params={"epsilon": 1e-05, "a": 0.0, "b": 10.0}, x=3.0, c=0.0, expected=-0.050154320600661106
+            params={"epsilon": 1e-05, "a": 0.0, "b": 10.0, "c_scale": 10.0},
+            x=3.0,
+            c=0.0,
+            expected=-0.050154320600661106,
         ),
         FormulaTestCase.value(
-            params={"epsilon": 1e-05, "a": 0.0, "b": 10.0}, x=3.0, c=0.25, expected=15.937340626593734
+            params={"epsilon": 1e-05, "a": 0.0, "b": 10.0, "c_scale": 10.0}, x=3.0, c=0.25, expected=15.937340626593734
         ),
         FormulaTestCase.value(
-            params={"epsilon": 1e-05, "a": 0.25, "b": 5.0}, x=1.675, c=0.0, expected=0.06454007368800385
+            params={"epsilon": 1e-05, "a": 0.25, "b": 5.0, "c_scale": 4.75},
+            x=1.675,
+            c=0.0,
+            expected=0.06454007368800385,
         ),
-        FormulaTestCase.interval_bounds(params={"epsilon": 1e-05, "a": 0.0, "b": 10.0}, expected=(0.0, 10.0)),
-        FormulaTestCase.interval_bounds(params={"epsilon": 1e-05, "a": 0.25, "b": 5.0}, expected=(0.25, 5.0)),
+        FormulaTestCase.interval_bounds(
+            params={"epsilon": 1e-05, "a": 0.0, "b": 10.0, "c_scale": 10.0}, expected=(0.0, 10.0)
+        ),
+        FormulaTestCase.interval_bounds(
+            params={"epsilon": 1e-05, "a": 0.25, "b": 5.0, "c_scale": 4.75}, expected=(0.25, 5.0)
+        ),
     )

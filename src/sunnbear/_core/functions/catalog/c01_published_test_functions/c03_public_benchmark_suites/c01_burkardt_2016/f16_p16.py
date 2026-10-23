@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "42edc878641a9599"
 
 
 class Burkardt2016P16(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Burkardt (2016).
 
     The survey writes the source's function as ``pi*(x - m)/180.0 - e*sin(pi*x/180.0)``, with the parameters ``e = 0.8,
     m = 5.0``; the formula's intervals are `[m - 180.0, m + 180.0]` (rang); `[0.0, m + 180.0]` (starts 1 and 2).
@@ -31,7 +31,7 @@ class Burkardt2016P16(Formula):
 
     number = (1, 3, 1, 16)
     name = "p16"
-    param_names = ("e", "m", "a", "b")
+    param_names = ("e", "m", "a", "b", "c_scale")
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "
@@ -62,29 +62,47 @@ class Burkardt2016P16(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, e: float, m: float, a: float, b: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+    def parametrized_fun(x: float, c: float, e: float, m: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
         return math.pi * (x - m) / 180.0 - e * math.sin(math.pi * x / 180.0)
 
-    def interval_bounds(self, e: float, m: float, a: float, b: float) -> tuple[float, float]:
+    def interval_bounds(self, e: float, m: float, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("e", "m", "a", "b"), rows=((0.8, 5.0, -175.0, 185.0), (0.8, 5.0, 0.0, 185.0))),)
+        return (
+            ParamTable(
+                names=("e", "m", "a", "b", "c_scale"),
+                rows=((0.8, 5.0, -175.0, 185.0, 360.0), (0.8, 5.0, 0.0, 185.0, 185.0)),
+            ),
+        )
 
     cases = (
         FormulaTestCase.value(
-            params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0}, x=-67.0, c=0.0, expected=-0.520233178673965
+            params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0, "c_scale": 360.0},
+            x=-67.0,
+            c=0.0,
+            expected=-0.520233178673965,
         ),
         FormulaTestCase.value(
-            params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0}, x=-67.0, c=0.25, expected=-2.514848485439395
+            params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0, "c_scale": 360.0},
+            x=-67.0,
+            c=0.25,
+            expected=-2.514848485439395,
         ),
         FormulaTestCase.value(
-            params={"e": 0.8, "m": 5.0, "a": 0.0, "b": 185.0}, x=55.5, c=0.0, expected=0.22209032135952392
+            params={"e": 0.8, "m": 5.0, "a": 0.0, "b": 185.0, "c_scale": 185.0},
+            x=55.5,
+            c=0.0,
+            expected=0.22209032135952392,
         ),
-        FormulaTestCase.interval_bounds(params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0}, expected=(-175.0, 185.0)),
-        FormulaTestCase.interval_bounds(params={"e": 0.8, "m": 5.0, "a": 0.0, "b": 185.0}, expected=(0.0, 185.0)),
+        FormulaTestCase.interval_bounds(
+            params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0, "c_scale": 360.0}, expected=(-175.0, 185.0)
+        ),
+        FormulaTestCase.interval_bounds(
+            params={"e": 0.8, "m": 5.0, "a": 0.0, "b": 185.0, "c_scale": 185.0}, expected=(0.0, 185.0)
+        ),
     )

@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "5a253aff386e3dcc"
 
 
 class Burkardt2016P13(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Burkardt (2016).
 
     The survey writes the source's function as ``slope*(x - 100.0)``, with the parameters ``slope = 0.00000000001``; the
     formula's intervals are `[-10000000000000.0, 10000000000000.0]` (rang); `[-100000000000.0, 100000000.0]` (starts 2
@@ -25,7 +25,7 @@ class Burkardt2016P13(Formula):
 
     number = (1, 3, 1, 13)
     name = "p13"
-    param_names = ("slope", "a", "b")
+    param_names = ("slope", "a", "b", "c_scale")
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "
@@ -56,12 +56,12 @@ class Burkardt2016P13(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, slope: float, a: float, b: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+    def parametrized_fun(x: float, c: float, slope: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
         return slope * (x - 100.0)
 
-    def interval_bounds(self, slope: float, a: float, b: float) -> tuple[float, float]:
+    def interval_bounds(self, slope: float, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
@@ -69,35 +69,39 @@ class Burkardt2016P13(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("slope", "a", "b"),
-                rows=((1e-11, -10000000000000.0, 10000000000000.0), (1e-11, -100000000000.0, 100000000.0)),
+                names=("slope", "a", "b", "c_scale"),
+                rows=(
+                    (1e-11, -10000000000000.0, 10000000000000.0, 20000000000000.0),
+                    (1e-11, -100000000000.0, 100000000.0, 100000000000.0),
+                ),
             ),
         )
 
     cases = (
         FormulaTestCase.value(
-            params={"slope": 1e-11, "a": -10000000000000.0, "b": 10000000000000.0},
+            params={"slope": 1e-11, "a": -10000000000000.0, "b": 10000000000000.0, "c_scale": 20000000000000.0},
             x=-4000000000000.0,
             c=0.0,
             expected=-40.000000001,
         ),
         FormulaTestCase.value(
-            params={"slope": 1e-11, "a": -10000000000000.0, "b": 10000000000000.0},
+            params={"slope": 1e-11, "a": -10000000000000.0, "b": 10000000000000.0, "c_scale": 20000000000000.0},
             x=-4000000000000.0,
             c=0.25,
             expected=-90.000000001,
         ),
         FormulaTestCase.value(
-            params={"slope": 1e-11, "a": -100000000000.0, "b": 100000000.0},
+            params={"slope": 1e-11, "a": -100000000000.0, "b": 100000000.0, "c_scale": 100000000000.0},
             x=-69970000000.0,
             c=0.0,
             expected=-0.699700001,
         ),
         FormulaTestCase.interval_bounds(
-            params={"slope": 1e-11, "a": -10000000000000.0, "b": 10000000000000.0},
+            params={"slope": 1e-11, "a": -10000000000000.0, "b": 10000000000000.0, "c_scale": 20000000000000.0},
             expected=(-10000000000000.0, 10000000000000.0),
         ),
         FormulaTestCase.interval_bounds(
-            params={"slope": 1e-11, "a": -100000000000.0, "b": 100000000.0}, expected=(-100000000000.0, 100000000.0)
+            params={"slope": 1e-11, "a": -100000000000.0, "b": 100000000.0, "c_scale": 100000000000.0},
+            expected=(-100000000000.0, 100000000.0),
         ),
     )

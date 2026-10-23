@@ -13,7 +13,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class ChapraCanale201584821(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Chapra, Canale (2015).
 
     The survey writes the source's function as ``1/sqrt(f) + 2.0*log10(eps/(3.7*D) + 2.51/(Re*sqrt(f)))``, with the
     parameters `Re = rho*V*D/mu`; `rho = 1.23` kg/m^3, `mu = 1.79E-5` N s/m^2, `D = 0.005` m, `V = 40` m/s, `eps =
@@ -45,8 +45,8 @@ class ChapraCanale201584821(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, eps: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 0.07200000000000001 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 0.072 * c
         # compute the Reynolds number Re = rho*V*D/mu as the book's MATLAB code computes it
         diameter = 0.005
         reynolds = 1.23 * 40.0 * diameter / 1.79e-5
@@ -62,7 +62,7 @@ class ChapraCanale201584821(Formula):
 
     cases = (
         FormulaTestCase.value(params={"eps": 1.5e-06}, x=0.0296, c=0.0, expected=-0.07179608309477187),
-        FormulaTestCase.value(params={"eps": 1.5e-06}, x=0.0296, c=0.25, expected=3.7840607685120085),
+        FormulaTestCase.value(params={"eps": 1.5e-06}, x=0.0296, c=0.25, expected=3.7840607685120067),
         FormulaTestCase.value(params={"eps": 4.5e-05}, x=0.0296, c=0.0, expected=0.899026613174279),
         FormulaTestCase.interval_bounds(params={"eps": 1.5e-06}, expected=(0.008, 0.08)),
     )

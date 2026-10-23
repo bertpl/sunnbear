@@ -16,7 +16,7 @@ SURVEY_FIELDS_HASH = "802288c98a34ccd6"
 
 
 class Romadani202552(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Romadani (2025).
 
     The survey writes the source's function as ``sin(x) - cos(2*x)^3``; the formula's interval is `[2.5, 3]` (the
     bracketing methods); the search for the exact roots runs over [0, 3].
@@ -40,7 +40,7 @@ class Romadani202552(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 0.5 * c
         return math.sin(x) - math.cos(2 * x) ** 3
 

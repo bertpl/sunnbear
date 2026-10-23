@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "4aee55cb001cc3ef"
 
 
 class Gsl2024Func4(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from GSL (2024).
 
     The survey writes the source's function as ``x*exp(-x)``; the formula's interval is ``[-1/3, 2]``.
 
@@ -37,8 +37,8 @@ class Gsl2024Func4(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 2.3333333333333335 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 2.33 * c
         return x * math.exp(-x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Gsl2024Func4(Formula):
 
     cases = (
         FormulaTestCase.value(params={}, x=0.366667, c=0.0, expected=0.2541150403402077),
-        FormulaTestCase.value(params={}, x=0.366667, c=0.25, expected=-0.26908434189236063),
+        FormulaTestCase.value(params={}, x=0.366667, c=0.25, expected=-0.26782611907005804),
         FormulaTestCase.interval_bounds(params={}, expected=(-0.3333333333333333, 2.0)),
     )

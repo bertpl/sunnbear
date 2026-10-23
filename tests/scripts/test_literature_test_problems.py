@@ -5,11 +5,15 @@ do not regenerate the formula modules of category 1 in sunnbear's catalog; they 
 survey.
 """
 
+import ast
+import inspect
 import re
 import sys
+import textwrap
 
 import pytest
 
+from sunnbear._core.functions.catalog.c01_published_test_functions import PublishedTestFunctions
 from sunnbear.functions import FormulaRegistry, FormulaSource
 
 _CATEGORY_1_FORMULAS = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 1]
@@ -290,23 +294,57 @@ def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table
 
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
 @pytest.mark.parametrize("c", [0.25, -0.25])
-def test_category_1_formula_shifts_along_x_by_its_interval_width(formula, c):
-    """A formula of category 1 at ``c`` equals the formula at ``c = 0``, evaluated at ``x - (b - a)*c``.
+def test_category_1_formula_shifts_along_x_by_c_scale_times_c(formula, c):
+    """A formula of category 1 at ``c`` equals the formula at ``c = 0``, evaluated at ``x - c_scale*c``.
 
     Evaluating the shifted x-value at ``c = 0`` repeats the formula's own float arithmetic, so the 2 values are equal
     exactly; the x-values lie in the interval, and so do their shifted values.
     """
     for candidate in formula.build_all_candidates():
         # --- arrange ----------------------
-        width = candidate.b - candidate.a
-        x = candidate.a + 0.6 * width
+        c_scale = PublishedTestFunctions.c_scale(candidate.a, candidate.b)
+        x = candidate.a + 0.6 * (candidate.b - candidate.a)
 
         # --- act --------------------------
         shifted = candidate.xc_fun(x, c)
-        unshifted = candidate.xc_fun(x - width * c, 0.0)
+        unshifted = candidate.xc_fun(x - c_scale * c, 0.0)
 
         # --- assert -----------------------
         assert shifted == unshifted, candidate.id
+
+
+@pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
+def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula):
+    """A formula of category 1 multiplies ``c`` by its interval's width, rounded by ``PublishedTestFunctions.c_scale``.
+
+    The test reads the factor from the code of ``parametrized_fun``, because a test that compares shifted values
+    cannot see a number that is 1 float step off, such as ``1.9999999999999996`` for ``2.0``: the shifted x-values
+    round to the same float.
+    """
+    # --- arrange ----------------------
+    tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))
+
+    # --- act --------------------------
+    factors = []
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.BinOp)
+            and isinstance(node.op, ast.Mult)
+            and isinstance(node.right, ast.Name)
+            and node.right.id == "c"
+        ):
+            factors.append(node.left)
+
+    # --- assert -----------------------
+    assert len(factors) == 1
+    for candidate in formula.build_all_candidates():
+        c_scale = PublishedTestFunctions.c_scale(candidate.a, candidate.b)
+        if isinstance(factors[0], ast.Name):
+            params = dict(zip(candidate.id.param_names, candidate.id.param_values, strict=True))
+            assert factors[0].id == "c_scale"
+            assert params["c_scale"] == c_scale, candidate.id
+        else:
+            assert ast.literal_eval(factors[0]) == c_scale, candidate.id
 
 
 # ==================================================================================================

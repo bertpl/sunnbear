@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "fe1c42df6b8bdfc9"
 
 
 class FooTan2025431(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Foo, Tan (2025).
 
     The survey writes the source's function as ``x*log(q - 1)/log(q) - if(x = 0; 0; x*log(x))/log(q) - if(x = 1; 0; (1 -
     x)*log(1 - x))/log(q) - y``, with the parameters `q = 2^127 - 1`; `y = 0.1, 0.2, ..., 0.9`; the formula's interval
@@ -43,7 +43,7 @@ class FooTan2025431(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, q: float, y: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return (
             x * math.log(q - 1) / math.log(q)

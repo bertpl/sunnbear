@@ -16,7 +16,7 @@ SURVEY_FIELDS_HASH = "de909dab18fc4df7"
 
 
 class Ellithy202617(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ellithy (2026).
 
     The source prints 3 functions that differ only in the values of some constants; with those constants replaced by
     parameters, the 3 functions become 1 function, ``x - e*sin(x) - M``:
@@ -30,7 +30,7 @@ class Ellithy202617(Formula):
 
     number = (1, 2, 18, 3)
     name = "17"
-    param_names = ("e", "M", "a", "b")
+    param_names = ("e", "M", "a", "b", "c_scale")
     source = FormulaSource(
         reference=(
             "Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root "
@@ -43,12 +43,12 @@ class Ellithy202617(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, e: float, M: float, a: float, b: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - (b - a) * c
+    def parametrized_fun(x: float, c: float, e: float, M: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
         return x - e * math.sin(x) - M
 
-    def interval_bounds(self, e: float, M: float, a: float, b: float) -> tuple[float, float]:
+    def interval_bounds(self, e: float, M: float, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
@@ -56,24 +56,34 @@ class Ellithy202617(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("e", "M", "a", "b"), rows=((0.8, 1.2, 1.0, 3.0), (0.5, 1.0, 0.0, 3.0), (0.99, 2.0, 2.0, 3.0))
+                names=("e", "M", "a", "b", "c_scale"),
+                rows=((0.8, 1.2, 1.0, 3.0, 2.0), (0.5, 1.0, 0.0, 3.0, 3.0), (0.99, 2.0, 2.0, 3.0, 1.0)),
             ),
         )
 
     cases = (
         FormulaTestCase.value(
-            params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0}, x=1.6, c=0.0, expected=-0.399658882433204
+            params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0, "c_scale": 2.0}, x=1.6, c=0.0, expected=-0.399658882433204
         ),
         FormulaTestCase.value(
-            params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0}, x=1.6, c=0.25, expected=-0.8129658880491483
+            params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0, "c_scale": 2.0}, x=1.6, c=0.25, expected=-0.8129658880491483
         ),
         FormulaTestCase.value(
-            params={"e": 0.5, "M": 1.0, "a": 0.0, "b": 3.0}, x=0.9, c=0.0, expected=-0.4916634548137417
+            params={"e": 0.5, "M": 1.0, "a": 0.0, "b": 3.0, "c_scale": 3.0}, x=0.9, c=0.0, expected=-0.4916634548137417
         ),
         FormulaTestCase.value(
-            params={"e": 0.99, "M": 2.0, "a": 2.0, "b": 3.0}, x=2.3, c=0.0, expected=-0.43824816005495326
+            params={"e": 0.99, "M": 2.0, "a": 2.0, "b": 3.0, "c_scale": 1.0},
+            x=2.3,
+            c=0.0,
+            expected=-0.43824816005495326,
         ),
-        FormulaTestCase.interval_bounds(params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0}, expected=(1.0, 3.0)),
-        FormulaTestCase.interval_bounds(params={"e": 0.5, "M": 1.0, "a": 0.0, "b": 3.0}, expected=(0.0, 3.0)),
-        FormulaTestCase.interval_bounds(params={"e": 0.99, "M": 2.0, "a": 2.0, "b": 3.0}, expected=(2.0, 3.0)),
+        FormulaTestCase.interval_bounds(
+            params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0, "c_scale": 2.0}, expected=(1.0, 3.0)
+        ),
+        FormulaTestCase.interval_bounds(
+            params={"e": 0.5, "M": 1.0, "a": 0.0, "b": 3.0, "c_scale": 3.0}, expected=(0.0, 3.0)
+        ),
+        FormulaTestCase.interval_bounds(
+            params={"e": 0.99, "M": 2.0, "a": 2.0, "b": 3.0, "c_scale": 1.0}, expected=(2.0, 3.0)
+        ),
     )

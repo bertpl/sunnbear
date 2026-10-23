@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "32abf916a5b03152"
 
 
 class Moler200417(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Moler (2004).
 
     The survey writes the source's function as ``x^7 - 7*x^6 + 21*x^5 - 35*x^4 + 35*x^3 - 21*x^2 + 7*x - 1``; the
     formula's interval is ``[0.988, 1.012]``.
@@ -39,8 +39,8 @@ class Moler200417(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 0.02400000000000002 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 0.024 * c
         return x**7 - 7 * x**6 + 21 * x**5 - 35 * x**4 + 35 * x**3 - 21 * x**2 + 7 * x - 1
 
     def interval_bounds(self) -> tuple[float, float]:

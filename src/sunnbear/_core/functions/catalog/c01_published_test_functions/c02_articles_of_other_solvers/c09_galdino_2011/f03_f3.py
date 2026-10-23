@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "aeacf0e007556d17"
 
 
 class Galdino2011F3(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Galdino (2011).
 
     The survey writes the source's function as ``(sin(x) - x/4)^3``; the formula's interval is ``[2, 3]``.
     """
@@ -35,7 +35,7 @@ class Galdino2011F3(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return (math.sin(x) - x / 4) ** 3
 

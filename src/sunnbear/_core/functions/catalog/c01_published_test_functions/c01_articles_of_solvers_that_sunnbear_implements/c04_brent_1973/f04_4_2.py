@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class Brent197342(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Brent (1973).
 
     The survey writes the source's function as ``fl(exp(x))`` if ``x > -10^6``; ``fl(exp(-10^6) - (x + 10^6)^2)``
     otherwise. The formula's interval is ``[-1001200, 0]``, on which the book's procedure ``zero2`` solves with the
@@ -37,8 +37,8 @@ class Brent197342(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 1001200.0 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1000000.0 * c
         if x > -1e6:
             return math.exp(x)
         else:
@@ -55,6 +55,6 @@ class Brent197342(Formula):
     cases = (
         FormulaTestCase.value(params={}, x=-1.0, c=0.0, expected=0.36787944117144233),
         FormulaTestCase.value(params={}, x=-1000001.0, c=0.0, expected=-1.0),
-        FormulaTestCase.value(params={}, x=-750000.0, c=0.25, expected=-90000.0),
+        FormulaTestCase.value(params={}, x=-750300.0, c=0.25, expected=-90000.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-1001200.0, 0.0)),
     )

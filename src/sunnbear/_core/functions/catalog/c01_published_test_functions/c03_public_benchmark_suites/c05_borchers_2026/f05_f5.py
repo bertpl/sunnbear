@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "d786200e0a4c7548"
 
 
 class Borchers2026F5(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Borchers (2026).
 
     The survey writes the source's function as ``x^2 - (1 - x)^9``; the formula's interval is ``[-1.4, 1]``.
 
@@ -35,7 +35,7 @@ class Borchers2026F5(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 2.4 * c
         return x**2 - (1 - x) ** 9
 

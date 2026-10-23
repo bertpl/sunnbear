@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "32f5b9bfcbde611a"
 
 
 class Stage201336(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Stage (2013).
 
     The survey writes the source's function as ``1 - (3/4)*x``; the formula's interval is ``[-10, 10]``.
 
@@ -34,7 +34,7 @@ class Stage201336(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 20.0 * c
         return 1 - (3 / 4) * x
 

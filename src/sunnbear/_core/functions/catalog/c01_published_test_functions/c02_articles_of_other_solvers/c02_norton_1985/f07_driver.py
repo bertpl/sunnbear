@@ -13,7 +13,7 @@ SURVEY_FIELDS_HASH = "7db93ecb2b2f03b8"
 
 
 class Norton1985Driver(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Norton (1985).
 
     The survey writes the source's function as ``x^7 + 28*x^4 - 480``; the formula's interval is ``[1, 2]``.
 
@@ -35,7 +35,7 @@ class Norton1985Driver(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.0 * c
         return x**7 + 28 * x**4 - 480
 

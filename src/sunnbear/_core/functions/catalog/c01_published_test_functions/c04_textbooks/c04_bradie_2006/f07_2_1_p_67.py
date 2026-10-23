@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class Bradie200621P67(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Bradie (2006).
 
     The survey writes the source's function as ``13500*(1 + r/12)^36 + 250*((1 + r/12)^36 - 1)/(r/12) - 25000``, with
     the parameters initial investment, monthly deposit and goal: `13500, 250, 25000` (§2.1); `14000, 250, 25000` and
@@ -40,8 +40,8 @@ class Bradie200621P67(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, initial_investment: float, monthly_deposit: float, goal: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
-        x = x - 0.09000000000000001 * c
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 0.09 * c
         if x == 0.0:
             # at x = 0, the factor ((1 + x/12)^36 - 1)/(x/12) takes its limit 36
             return initial_investment + 36.0 * monthly_deposit - goal
@@ -91,7 +91,7 @@ class Bradie200621P67(Formula):
             params={"initial_investment": 13500.0, "monthly_deposit": 250.0, "goal": 25000.0},
             x=0.037,
             c=0.25,
-            expected=-1707.2154378902248,
+            expected=-1707.2154378902246,
             atol=2e-09,
         ),
         FormulaTestCase.value(

@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "d293bde0683d9f84"
 
 
 class RootsJl2026Func10(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Roots.jl (2026).
 
     The survey writes the source's function as ``asin(x^2 - 1) - x/2 + 1``; the formula's interval is `[-0.5, 1.0]`
     (`find_zeros`).
@@ -50,7 +50,7 @@ class RootsJl2026Func10(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 1.5 * c
         return math.asin(x**2 - 1) - x / 2 + 1
 

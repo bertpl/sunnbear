@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "9d58c9297aa046ee"
 
 
 class AlefeldPotra19922(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Alefeld, Potra (1992).
 
     The survey writes the source's function as ``x^2*(x^2/3 + sqrt(2)*sin(x)) - sqrt(3)/18``; the formula's interval is
     ``[0.1, 1]``.
@@ -34,7 +34,7 @@ class AlefeldPotra19922(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 0.9 * c
         return x**2 * (x**2 / 3 + math.sqrt(2) * math.sin(x)) - math.sqrt(3) / 18
 

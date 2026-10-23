@@ -11,7 +11,7 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 
 
 class ChapraCanale2015Prob516(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Chapra, Canale (2015).
 
     The survey writes the source's function as ``1 - Q^2/(g*Ac^3)*B``, with the parameters `Q = 20` m^3/s, `g = 9.81`
     m/s^2, `B = 3 + y`, `Ac = 3*y + y^2/2`; the formula's interval is ``[0.5, 2.5]``.
@@ -36,7 +36,7 @@ class ChapraCanale2015Prob516(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 2.0 * c
         surface_width = 3.0 + x
         area = 3.0 * x + x**2 / 2.0

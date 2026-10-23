@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "443ca43139555a85"
 
 
 class Moler2004Ex414(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Moler (2004).
 
     The survey writes the source's function as ``atan(x) - pi/3``; the formula's interval is ``[0, 5]``.
     """
@@ -35,7 +35,7 @@ class Moler2004Ex414(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 5.0 * c
         return math.atan(x) - math.pi / 3
 

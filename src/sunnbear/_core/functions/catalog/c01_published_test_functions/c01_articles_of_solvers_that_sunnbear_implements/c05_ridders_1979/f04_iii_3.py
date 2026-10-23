@@ -15,7 +15,7 @@ SURVEY_FIELDS_HASH = "07690fc231ba09e4"
 
 
 class Ridders1979Iii3(Formula):
-    """This formula evaluates the published function at ``x - (b - a)*c``, where ``[a, b]`` is its interval.
+    """This formula comes from Ridders (1979).
 
     The survey writes the source's function as ``sin(pi*x/180)``; the formula's interval is ``[10, 280]``.
 
@@ -38,7 +38,7 @@ class Ridders1979Iii3(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 270.0 * c
         return math.sin(math.pi * x / 180)
 
