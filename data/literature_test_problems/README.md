@@ -25,7 +25,7 @@ The rows are the material for category 1, *Published test functions*, of sunnbea
 Do not edit the generated files by hand; regenerate them (§ Regenerating). A person edits `formulas.csv` by hand in 2 cases (§ Formulas):
 
 - after the script stops on a change that would change the id of a formula;
-- when the person compacts the ids that a correction retired.
+- when the person deletes the formulas that a correction retired and lowers the numbers of the later formulas of their source to close the gaps.
 
 ## Source files
 
@@ -167,7 +167,7 @@ By default, each `new` row is a formula of its own. A formula's id is `f<subcate
 - **Sources:** a source gets a number when it first has a `new` row: 1 more than the largest source number of its subcategory, retired formulas included. A source without a `new` row gets no number.
 - **Formulas:** a new formula gets 1 more than the largest formula number of its source, retired formulas included.
 - **Changed rows:** a formula keeps its id while its rows change, as long as it joins no other formula and does not split. A row that stops being `new` leaves the formula, and a row that becomes `new` can join the formula through `formula_decisions.csv`. The formula's `variable_change`, `f` and `parameters` can change too.
-- **Retired formulas:** a formula that no longer holds a `new` row stays in `formulas.csv` as `retired`, so that its id is never given again. This happens, for example, when a source that is older but was added later holds the same functions, so that the formula's rows become `duplicate`. A retired formula becomes `active` again if the same rows become `new` again.
+- **Retired formulas:** a formula that no longer holds a `new` row stays in `formulas.csv` as `retired`, so that the script never gives its id again. This happens, for example, when a source that is older but was added later holds the same functions, so that the formula's rows become `duplicate`. A retired formula becomes `active` again if the same rows become `new` again.
 - **Retired lines keep their history:** the rows of a retired line may no longer exist, or may belong to an active formula; the script checks only active formulas against `rows.csv`.
 
 Without a `formulas.csv`, the script numbers the sources of each subcategory in time order, and the formulas of each source in the order of its rows; a formula of several rows takes the position of its first row.
@@ -179,14 +179,14 @@ Deleting `formulas.csv` renumbers every formula in this way, which only a major 
 The appending rules above exist so that adding a source never shifts the ids of the sources already there; before 1.0.0, no other use of an id relies on it staying the same. To compact:
 
 1. Delete each retired line from `formulas.csv`. This is the 1 case in which a line leaves the file.
-2. Lower the number of each later formula of the same source by the number of retired lines deleted before it, in each place that holds that number:
+2. In each source that lost a line, lower the number of each remaining formula by the count of that source's deleted lines with a smaller number, in each place that holds that number:
    - `formulas.csv`;
-   - its module's file name and `number`;
+   - its module's file name and the `number` of the module's class;
    - the import in the source's `__init__.py`;
    - tracked code that names its id, such as `UNTRANSLATABLE_FORMULAS` in `scripts/literature_test_problems/formula_modules.py`.
 3. Regenerate the source's modules and the survey; regenerating keeps the renumbering.
 
-A formula retired by a newly added source stays retired. Compacting it would shift the ids of a source that was already in the survey, which is exactly what the appending rules prevent.
+A formula retired by a newly added source keeps its line and its id: deleting that line would let the addition of a source shift the ids of a source that was already in the survey, which is exactly what the appending rules prevent.
 
 **A change that would change the id of a formula stops the script.** These changes do:
 
@@ -198,7 +198,7 @@ A formula retired by a newly added source stays retired. Compacting it would shi
 The script then leaves `formulas.csv` as it is and reports the problem, and a person resolves it:
 
 1. Decide which ids stay.
-2. Edit `formulas.csv` by hand to match. Never delete a line: for each formula whose id does not stay, set its `status` to `retired`, so that its id is never given again.
+2. Edit `formulas.csv` by hand to match. Never delete a line: for each formula whose id does not stay, set its `status` to `retired`, so that the script never gives its id again.
 3. Regenerate.
 
 A join or split can also come from formulas that an earlier regeneration appended to `formulas.csv` but that are not committed yet, such as a new source's formulas from before its lines in `formula_decisions.csv`. Restore `formulas.csv` from git then, and regenerate.
