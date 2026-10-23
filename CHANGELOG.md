@@ -11,10 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `FormulaSource` and `Formula.source`, which record a formula's publication
 - Add `ParamTable`, a `ParamRecipe` that lists its parameter tuples
-- Add the formulas of "Articles of solvers that sunnbear implements", subcategory 1.1 of "Published test functions"
-- Add the formulas of "Articles of other solvers", subcategory 1.2 of "Published test functions"
-- Add the formulas of "Public benchmark suites", subcategory 1.3 of "Published test functions"
-- Add the formulas of "Textbooks", subcategory 1.4 of "Published test functions"
+- Add category 1 of the formula catalog, "Published test functions": 501 formulas from 50 articles, benchmark suites and textbooks
 
 ### Changed
 
