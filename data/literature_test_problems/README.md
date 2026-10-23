@@ -22,7 +22,10 @@ The rows are the material for category 1, *Published test functions*, of sunnbea
 | `timeline.html` | script | a page that draws the sources in time order, with an edge from each source to every later source whose rows name its rows (§ The summary and the page) |
 | `formulas.csv` | script | every formula of category 1, active and retired, with its rows; the script keeps every id that the file already holds (§ Formulas) |
 
-Do not edit the generated files by hand; regenerate them (§ Regenerating). The exceptions are `formulas.csv` after the script stops on a change that would change the id of a formula, and `formulas.csv` when a person compacts the ids that a correction retired: a person then edits `formulas.csv` by hand (§ Formulas).
+Do not edit the generated files by hand; regenerate them (§ Regenerating). A person edits `formulas.csv` by hand in 2 cases (§ Formulas):
+
+- after the script stops on a change that would change the id of a formula;
+- when the person compacts the ids that a correction retired.
 
 ## Source files
 
@@ -171,13 +174,19 @@ Without a `formulas.csv`, the script numbers the sources of each subcategory in 
 
 Deleting `formulas.csv` renumbers every formula in this way, which only a major release after 1.0.0 may do.
 
-**Before 1.0.0, a person may compact the ids that a correction retired.** A correction fixes the rows or decisions of sources that the survey already holds, such as a misprint read as meant, or a row that turns out to pose no root-finding problem. The appending rules above exist so that adding a source never shifts the ids of the sources already there; before 1.0.0, no other use of an id relies on it staying the same. To compact:
+**Before 1.0.0, a person may compact the ids that a correction retired.** A correction fixes the rows or decisions of sources that the survey already holds, such as a misprint read as meant, or a row that turns out to pose no root-finding problem.
 
-1. Delete the retired line from `formulas.csv`. This is the 1 case in which a line leaves the file.
-2. Give each later formula of the same source the next lower number: in `formulas.csv`, in its module's file name and `number`, in the import of the source's `__init__.py`, and wherever tracked code names its id, such as the generator's `UNTRANSLATABLE_FORMULAS`.
-3. Regenerate the source's modules and the survey: neither changes the edits of step 2.
+The appending rules above exist so that adding a source never shifts the ids of the sources already there; before 1.0.0, no other use of an id relies on it staying the same. To compact:
 
-A formula that a newly added source retired stays retired. Compacting it would shift the ids of a source that was already in the survey, which is exactly what the appending rules prevent.
+1. Delete each retired line from `formulas.csv`. This is the 1 case in which a line leaves the file.
+2. Lower the number of each later formula of the same source by the number of retired lines deleted before it, in each place that holds that number:
+   - `formulas.csv`;
+   - its module's file name and `number`;
+   - the import in the source's `__init__.py`;
+   - tracked code that names its id, such as `UNTRANSLATABLE_FORMULAS` in `scripts/literature_test_problems/formula_modules.py`.
+3. Regenerate the source's modules and the survey; regenerating keeps the renumbering.
+
+A formula retired by a newly added source stays retired. Compacting it would shift the ids of a source that was already in the survey, which is exactly what the appending rules prevent.
 
 **A change that would change the id of a formula stops the script.** These changes do:
 
