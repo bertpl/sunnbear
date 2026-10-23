@@ -239,7 +239,7 @@ For a formula of several rows, the script checks that each row's own `f`, at tha
 
 The module's docstring names each rounded value, and its test cases evaluate the function at the rounded value.
 
-**A test case whose function float64 cannot evaluate to `CASE_ATOL`** gets a wider `atol`, which `FormulaModuleSpec._case_tolerance` in `scripts/literature_test_problems/formula_modules.py` sets, for 1 of 2 reasons:
+**A test case whose function cannot be evaluated in float64 to within `CASE_ATOL`** gets a wider `atol`, which `FormulaModuleSpec._case_tolerance` in `scripts/literature_test_problems/formula_modules.py` sets, for 1 of 2 reasons:
 
 - **An ill-conditioned function,** such as `sin(x*10^6)`: the test case's Python value differs from mpmath's by no more than the spread of the function's exact values within `CASE_X_ULPS` float64 steps of x on either side; the `atol` is a multiple of that spread.
 - **A function that cancels,** such as a polynomial in expanded form near its multiple root: the Python value differs from mpmath's by no more than `CASE_ROUNDING_UNITS` units of float64 rounding of the sum of the magnitudes of the function's terms; the `atol` is a multiple of that bound.

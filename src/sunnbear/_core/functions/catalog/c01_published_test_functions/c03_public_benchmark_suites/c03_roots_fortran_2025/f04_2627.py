@@ -88,7 +88,8 @@ class RootsFortran20252627(Formula):
     def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
         """Evaluate the published function at ``x - (b - a)*c``, where ``[a, b]`` is the formula's interval."""
         x = x - (b - a) * c
-        # below 1e-100, float64 rounds x/exp(1/(x*x)) to 0, and x*x underflows to 0, so that 1/(x*x) divides by 0
+        # for abs(x) below 1e-100, float64 rounds x/exp(1/(x*x)) to 0, and x*x underflows to 0, so that 1/(x*x)
+        # divides by 0
         if abs(x) < 1e-100:
             return 0.0
         else:

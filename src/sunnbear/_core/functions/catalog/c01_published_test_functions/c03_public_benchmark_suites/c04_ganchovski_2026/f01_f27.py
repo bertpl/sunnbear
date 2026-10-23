@@ -1,8 +1,9 @@
 """This module holds a formula of Ganchovski (2026).
 
 The formula comes from the row with the key ``f27`` in the survey of published test problems. The survey gives this
-function as an expression in a helper ``p(x)``, defined beside it, not as 1 expression in x, so a person writes this
-module: a change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+function as an expression in a helper ``p(x)``, which the same row of the survey defines, not as 1 expression in x,
+so a person writes this module: a change of the formula's row in `data/literature_test_problems/sources/` needs a
+change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe

@@ -63,6 +63,8 @@ class Burkardt2016P18(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b"), rows=((0.988, 1.012), (0.99, 1.013))),)
 
+    # a case with an `atol` lies where float64 cannot evaluate the function to the default
+    # tolerance, because the function is ill-conditioned or cancels there
     cases = (
         FormulaTestCase.value(
             params={"a": 0.988, "b": 1.012}, x=0.9952, c=0.0, expected=-0.005870683422720227, atol=40.0

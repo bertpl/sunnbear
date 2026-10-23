@@ -16,8 +16,8 @@ class Scipy2026F6(Formula):
     interval is ``[0.5, sqrt(3)]``.
 
     A formula is a pure function of x, so ``random()`` is ``uniform_noise(x)``, a value in ``[0, 1)`` that depends only
-    on x and is distributed as a uniform random draw; the source's cache, which returns the same value for a repeat call
-    at the same x, behaves the same way.
+    on x and is distributed as a uniform random draw. The source's cache also returns the same value for a repeat call
+    at the same x.
 
     ID original.05.00, the same ID as ``f5``; smoothness -inf; ``random()`` is Python's uniform draw from ``[0, 1)``; no
     derivatives
