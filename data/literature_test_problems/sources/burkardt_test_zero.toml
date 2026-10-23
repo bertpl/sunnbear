@@ -1,6 +1,10 @@
-title = 'Burkardt (2016): TEST_ZERO test problems, Python version of 2016-12-01'
+title = 'Burkardt (2016): TEST_ZERO test problems, Python version'
 reference = '''
-John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py, MIT license. The file is unversioned: its header says that it was last modified on 1 December 2016, and the rows come from the version with sha256 `658ed0a0b520eba30e87d4a08d73b444fe4f3edf14a8a94339703eca2ef9680c`. The file cites sources for 3 of its functions, and names a 4th origin without a reference:
+John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py, MIT license.
+
+The file is unversioned and has no file header; the rows come from the version with sha256 `658ed0a0b520eba30e87d4a08d73b444fe4f3edf14a8a94339703eca2ef9680c`. The comment of each function gives the date on which that function was last modified, and the latest is 16 October 2020, for `p16_root`. The year is 2016 because every function that the rows transcribe (`pNN_fx`, `pNN_rang`, `pNN_start` and `pNN_title`) is dated 2 December 2016 or earlier.
+
+The file cites sources for 3 of its functions, and names a 4th origin without a reference:
 - [1] George Donovan, Arnold Miller, Timothy Moreland, "Pathological Functions for Newton's Method", American Mathematical Monthly, January 1993, pages 53-58 (no DOI in the file), for `p15`.
 - [2] Peter Colwell, Solving Kepler's Equation Over Three Centuries, Willmann-Bell, 1993, and [3] Jean Meeus, Astronomical Algorithms, Willman-Bell, 1991, for `p16`.
 - [4] Cleve Moler, Numerical Computing with MATLAB, SIAM, 2004, ISBN 978-0-898716-60-3, for `p18`.
@@ -40,70 +44,70 @@ key = 'p01'
 f = 'sin(x) - 0.5*x'
 name = 'F(X) = SIN(X) - 0.5 * X'
 interval = '`[-1000.0, 1001.0]` (rang); `[0.5*pi, pi]` (starts 1 and 2)'
-notes = 'starts 0.5*pi, pi'
+notes = "The source's starting points, in order, are `0.5*pi` and `pi`."
 
 [[rows]]
 key = 'p02'
 f = '2.0*x - exp(-x)'
 name = 'F(X) = 2 * X - EXP ( - X )'
 interval = '`[-10.0, 100.0]` (rang); `[0.0, 1.0]` (starts 1 and 2)'
-notes = 'starts 0.0, 1.0, -5.0, 10.0'
+notes = "The source's starting points, in order, are `0.0`, `1.0`, `-5.0` and `10.0`."
 
 [[rows]]
 key = 'p03'
 f = 'x*exp(-x)'
 name = 'F(X) = X * EXP ( - X )'
 interval = '`[-10.0, 100.0]` (rang); `[-1.0, 0.5]` (starts 1 and 2)'
-notes = 'starts -1.0, 0.5, 2.0'
+notes = "The source's starting points, in order, are `-1.0`, `0.5` and `2.0`."
 
 [[rows]]
 key = 'p04'
 f = 'exp(x) - 1.0/(100.0*x*x)'
 name = 'F(X) = EXP ( X ) - 1 / ( 10 * X )^2'
 interval = '`[0.00001, 20.0]` (rang); `[0.03, 1.0]` (starts 1 and 2)'
-notes = 'starts 0.03, 1.0'
+notes = "The source's starting points, in order, are `0.03` and `1.0`."
 
 [[rows]]
 key = 'p05'
 f = '(x + 3.0)*(x - 1.0)*(x - 1.0)'
 name = 'F(X) = ( X + 3 ) * ( X - 1 )^2'
 interval = '`[-1000.0, 1000.0]` (rang); `[-5.0, 2.0]` (starts 2 and 1)'
-notes = 'starts 2.0, -5.0'
+notes = "The source's starting points, in order, are `2.0` and `-5.0`."
 
 [[rows]]
 key = 'p06'
 f = 'exp(x) - 2.0 - 1.0/(10.0*x)^2 + 2.0/(100.0*x)^3'
 name = 'F(X) = EXP(X) - 2 - 1 / ( 10 * X )^2 - 2 / ( 100 * X )^3'
 interval = '`[0.00001, 20.0]` (rang); `[0.0002, 2.0]` (starts 1 and 2)'
-notes = 'starts 0.0002, 2.0; the title has `- 2 / ( 100 * X )^3` where the code and the docstring have `+`'
+notes = "The source's starting points, in order, are `0.0002` and `2.0`. The title has `- 2 / ( 100 * X )^3` where the code and the docstring have `+`. The function does not change sign on `rang`, `[0.00001, 20.0]`, which holds 2 roots, about `0.0001999992` and `0.7032048404`; `p06_root` returns only the 2nd, `0.7032048403631358`."
 
 [[rows]]
 key = 'p07'
 f = 'x^3'
 name = 'F(X) = X^3, only linear Newton convergence.'
 interval = '`[-1000.0, 999.0]` (rang); `[-1000.0, 1.0]` (starts 2 and 1)'
-notes = 'starts 1.0, -1000.0'
+notes = "The source's starting points, in order, are `1.0` and `-1000.0`."
 
 [[rows]]
 key = 'p08'
 f = 'cos(x) - x'
 name = 'F(X) = COS(X) - X'
 interval = '`[-10.0, 10.0]` (rang); `[0.5, 1.0]` (starts 2 and 1)'
-notes = 'starts 1.0, 0.5, -1.6'
+notes = "The source's starting points, in order, are `1.0`, `0.5` and `-1.6`."
 
 [[rows]]
 key = 'p09'
 f_description = '`0.75*(x - 6.25) - 0.3125` (x < 6.0); `2.00*(x - 6.25)` (6.0 <= x <= 6.50); `0.75*(x - 6.25) + 0.3125` (x > 6.50)'
 name = 'The Newton Baffler'
 interval = '`[-5.0, 16.0]` (rang); `[6.25 - 1.0, 6.25 + 5.0]` (starts 2 and 1)'
-notes = 'starts 6.25 + 5.0, 6.25 - 1.0, 6.25 + 0.1'
+notes = "The source's starting points, in order, are `6.25 + 5.0`, `6.25 - 1.0` and `6.25 + 0.1`."
 
 [[rows]]
 key = 'p10'
 f = '20.0*x/(100.0*x*x + 1.0)'
 name = 'The Repeller'
 interval = '`[-10.0, 11.0]` (rang); `[-0.14, 1.0]` (starts 2 and 1)'
-notes = 'starts 1.0, -0.14, 0.041'
+notes = "The source's starting points, in order, are `1.0`, `-0.14` and `0.041`."
 
 [[rows]]
 key = 'p11'
@@ -111,7 +115,7 @@ f = '(16.0 - x^4)/(16.0*x^4 + epsilon)'
 name = 'The Pinhead'
 parameters = 'epsilon = 0.00001'
 interval = '`[0.0, 10.0]` (rang); `[0.25, 5.0]` (starts 1 and 2)'
-notes = 'starts 0.25, 5.0, 1.1'
+notes = "The source's starting points, in order, are `0.25`, `5.0` and `1.1`."
 
 [[rows]]
 key = 'p12'
@@ -119,7 +123,7 @@ f_description = '`-exp(log(factor) + log(abs(x - 1.0)) - 1.0/(x - 1.0)^2)` (x < 
 name = 'Flat Stanley (ALL derivatives are zero at the root.)'
 parameters = 'factor = 1000.0'
 interval = '`[-4.0, 4.1]` (rang); `[0.50, 2.0]` (starts 2 and 1)'
-notes = 'starts 2.0, 0.50, 4.0'
+notes = "The source's starting points, in order, are `2.0`, `0.50` and `4.0`."
 
 [[rows]]
 key = 'p13'
@@ -127,14 +131,14 @@ f = 'slope*(x - 100.0)'
 name = 'Lazy Boy (Linear function, almost flat.)'
 parameters = 'slope = 0.00000000001'
 interval = '`[-10000000000000.0, 10000000000000.0]` (rang); `[-100000000000.0, 100000000.0]` (starts 2 and 1)'
-notes = 'the interval is [-1e13, 1e13]; starts 100000000.0, -100000000000.0, 100000013.0'
+notes = "The `rang` interval is `[-1e13, 1e13]`. The source's starting points, in order, are `100000000.0`, `-100000000000.0` and `100000013.0`."
 
 [[rows]]
 key = 'p14'
 f = '1.0/((x - 0.3)^2 + 0.01) + 1.0/((x - 0.9)^2 + 0.04) + 2.0*x - 5.2'
 name = 'The Camel (double hump and some shallow roots.)'
 interval = '`[-10.0, 10.0]` (rang); `[-0.5, 3.0]` (starts 2 and 1)'
-notes = 'starts 3.0, -0.5, 0.0, 2.12742; the code selects the 4th with `i % 3 == 0`, where the first 3 use `i % 4`, so `p14_start(4)` matches no branch and fails'
+notes = "The source's starting points, in order, are `3.0`, `-0.5`, `0.0` and `2.12742`. The code selects the 4th with `i % 3 == 0`, where the first 3 use `i % 4`, so `p14_start(4)` matches no branch and fails."
 
 [[rows]]
 key = 'p15'
@@ -142,7 +146,7 @@ f_description = '`-abs(x)^(1.0/3.0)*exp(-x^2)` (x < 0.0); `0.0` (x = 0.0); `abs(
 name = 'Donovan/Miller/Moreland Pathological Function'
 interval = '`[-10.0, 10.0]` (rang); `[-0.25, 0.01]` (starts 2 and 1)'
 also_in = 'Donovan, Miller, Moreland 1993 [1]'
-notes = 'starts 0.01, -0.25'
+notes = "The source's starting points, in order, are `0.01` and `-0.25`."
 
 [[rows]]
 key = 'p16'
@@ -151,7 +155,7 @@ name = "Kepler's Eccentric Anomaly Equation, in degrees"
 parameters = 'e = 0.8, m = 5.0'
 interval = '`[m - 180.0, m + 180.0]` (rang); `[0.0, m + 180.0]` (starts 1 and 2)'
 also_in = 'Colwell 1993 [2]; Meeus 1991 [3]'
-notes = "the interval is [-175.0, 185.0]; `e` is the orbit's eccentricity, not Euler's number; x and m are in degrees; starts 0.0, m + 180.0, m; the comment's table of sample results lists x for other values of e and m; `p16_root` returns 22.65657866956775, but `p16_root_num` returns 0, so the drivers print \"Exact root not known\""
+notes = "The `rang` interval is `[-175.0, 185.0]`. Here `e` is the orbit's eccentricity, not Euler's number, and x and m are in degrees. The source's starting points, in order, are `0.0`, `m + 180.0` and `m`. The comment's table of sample results lists x for the row's `e = 0.8`, `m = 5` (`22.656579`) and for 13 other pairs of e and m. The function `p16_root` returns 22.65657866956775, but `p16_root_num` returns 0, so the drivers print \"Exact root not known\". The code writes the title as `'Kepler''s Eccentric Anomaly Equation, in degrees'`; Python reads the doubled quote as 2 adjacent string literals, so `p16_title` returns the title without the apostrophe, and `name` gives the title as meant."
 
 [[rows]]
 key = 'p17'
@@ -159,7 +163,7 @@ f = 'x^3 - 2.0*x - 5.0'
 name = 'The Wallis example, x^3-2x-5=0'
 interval = '[2.0, 3.0]'
 also_in = 'Wallis (named, no reference)'
-notes = 'starts 2.0, 3.0'
+notes = "The source's starting points, in order, are `2.0` and `3.0`."
 
 [[rows]]
 key = 'p18'
@@ -167,11 +171,11 @@ f = '10.0^14*(1.0*x^7 - 7.0*x^6 + 21.0*x^5 - 35.0*x^4 + 35.0*x^3 - 21.0*x^2 + 7.
 name = '10^14 * (x-1)^7, written term by term.'
 interval = '`[0.988, 1.012]` (rang); `[0.990, 1.013]` (starts 1 and 2)'
 also_in = 'Moler 2004 [4]'
-notes = 'starts 0.990, 1.013; the code also holds the Horner form of the polynomial, switched off by `horners = False`'
+notes = "The source's starting points, in order, are `0.990` and `1.013`. The code also holds the Horner form of the polynomial, switched off by `horners = False`."
 
 [[rows]]
 key = 'p19'
 f = 'cos(100.0*x) - 4.0*erf(30.0*x - 10.0)'
 name = 'The jumping cosine'
 interval = '[0.0, 1.0]'
-notes = 'starts 0.0, 1.0, 0.5'
+notes = "The source's starting points, in order, are `0.0`, `1.0` and `0.5`."

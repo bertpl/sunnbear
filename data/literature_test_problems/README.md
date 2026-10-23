@@ -239,10 +239,17 @@ For a formula of several rows, the script checks that each row's own `f`, at tha
 
 The module's docstring names each rounded value, and its test cases evaluate the function at the rounded value.
 
-**A test case whose function is ill-conditioned,** such as `sin(x*10^6)`, gets a wider `atol`, which `FormulaModuleSpec._find_case` in `scripts/literature_test_problems/formula_modules.py` sets:
+**Among the x-values whose cases meet the strictest tolerance, a test case takes one where the case tests the function,** if any does. A case tests the function where both of these hold:
 
-- **When:** the test case's Python value differs from mpmath's by more than `CASE_ATOL`, but by no more than the spread of the function's exact values within `CASE_X_ULPS` float64 steps of x on either side.
-- **Value:** a multiple of that spread.
+- its expected value is at least `CASE_SMALL_VALUE`;
+- the function's value changes by more than `CASE_MIN_RELATIVE_CHANGE` of itself when x moves by `CASE_X_STEP_FRACTION` of the interval's width.
+
+A case whose expected value stays below `CASE_SMALL_VALUE`, and whose Python value agrees with mpmath's within `CASE_RTOL` alone, gets `atol=0.0`, because the default `atol` would accept any value near 0.
+
+**A test case whose function cannot be evaluated in float64 to within `CASE_ATOL`** gets a wider `atol`, which `FormulaModuleSpec._case_tolerance` in `scripts/literature_test_problems/formula_modules.py` sets, for 1 of 2 reasons:
+
+- **An ill-conditioned function,** such as `sin(x*10^6)`: the test case's Python value differs from mpmath's by no more than the spread of the function's exact values within `CASE_X_ULPS` float64 steps of x on either side; the `atol` is a multiple of that spread.
+- **A function that cancels,** such as a polynomial in expanded form near its multiple root: the Python value differs from mpmath's by no more than `CASE_ROUNDING_UNITS` units of float64 rounding of the sum of the magnitudes of the function's terms; the `atol` is a multiple of that bound.
 
 The modules of 2 kinds of formulas are written by hand, and the script only imports them:
 

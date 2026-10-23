@@ -1,7 +1,7 @@
 """This module holds a formula of Gao (2026).
 
-The formula comes from the row with the key ``T4.7`` in the survey of published test problems. The survey describes this
-function in words, not as 1 expression, so a person writes this module: a change of the formula's row in
+The formula comes from the row with the key ``T4.7`` in the survey of published test problems. The survey gives this
+function as a description, not as 1 expression, so a person writes this module: a change of the formula's row in
 `data/literature_test_problems/sources/` needs a change of this module.
 """
 
@@ -48,12 +48,14 @@ class Gao2026T47(Formula):
             ParamTable(names=("a", "b"), rows=((-1.0, 4.0), (-2.0, 5.0), (-1.0, 10.0), (-5.0, 50.0), (-10.0, 100.0))),
         )
 
+    # a case with `atol=0.0` has an expected value so small that the default `atol`
+    # would accept any value near 0, 0 among them
     cases = (
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.0, expected=0.00915781944436709),
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.25, expected=-0.12675998655454956),
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.0, c=0.0, expected=0.0),
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=1e-200, c=0.0, expected=0.0),
-        FormulaTestCase.value(params={"a": -2.0, "b": 5.0}, x=0.1, c=0.0, expected=3.7200759760208773e-45),
+        FormulaTestCase.value(params={"a": -2.0, "b": 5.0}, x=0.1, c=0.0, expected=3.7200759760208773e-45, atol=0.0),
         FormulaTestCase.value(params={"a": -1.0, "b": 10.0}, x=2.3, c=0.0, expected=1.9038405842623145),
         FormulaTestCase.value(params={"a": -5.0, "b": 50.0}, x=11.5, c=0.0, expected=11.413371409313232),
         FormulaTestCase.value(params={"a": -10.0, "b": 100.0}, x=23.0, c=0.0, expected=22.956562808012574),

@@ -52,7 +52,7 @@ class Chandrupatla19976(Formula):
     cases = (
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.0, expected=1.9073486328125e-06),
         FormulaTestCase.value(params={"a": -1.0, "b": 4.0}, x=0.5, c=0.25, expected=-0.004228282585245324),
-        FormulaTestCase.value(params={"a": -2.0, "b": 5.0}, x=0.1, c=0.0, expected=1.000000000000001e-19),
+        FormulaTestCase.value(params={"a": -2.0, "b": 5.0}, x=2.9, c=0.0, expected=610326124.6589988),
         FormulaTestCase.value(params={"a": -1.0, "b": 10.0}, x=2.3, c=0.0, expected=7461547.09275906),
         FormulaTestCase.value(params={"a": -5.0, "b": 50.0}, x=11.5, c=0.0, expected=1.4231771646040098e20),
         FormulaTestCase.value(params={"a": -10.0, "b": 100.0}, x=23.0, c=0.0, expected=7.461547092759071e25),

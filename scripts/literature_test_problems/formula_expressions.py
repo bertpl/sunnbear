@@ -111,6 +111,21 @@ class FormulaExpression:
         values = {sp.Symbol(name): value for name, value in parameter_values.items()}
         return sp.lambdify(self.variable, self.sympy_expr.subs(values), modules="mpmath")
 
+    def mpmath_term_magnitude_function(self, parameter_values: dict[str, sp.Expr]) -> Callable:
+        """Return a function of the variable whose value times 2^-53 bounds the float64 rounding error of the function.
+
+        The returned function is the function, expanded, with every sum, product and power taken over the absolute
+        values of its parts. Float64 rounding while evaluating the function errs by a small multiple of 2^-53 times the
+        returned function's value; for an expanded polynomial near a multiple root, that value is far larger than the
+        function's own.
+
+        Args:
+            parameter_values: The value of each parameter, keyed by its survey name.
+        """
+        values = {sp.Symbol(name): value for name, value in parameter_values.items()}
+        term_magnitude = FormulaExpression._term_magnitude(sp.expand(self.sympy_expr.subs(values)))
+        return sp.lambdify(self.variable, term_magnitude, modules="mpmath")
+
     def python_value(self, x: float, python_values: dict[str, float]) -> float:
         """Return the value of the Python code at `x`, with each parameter's value keyed by its Python name."""
         # the code comes from the translation of the survey's text, which reads only its own names and functions
@@ -131,6 +146,21 @@ class FormulaExpression:
             if not is_call and name not in indices and name not in CONSTANTS and name not in names:
                 names.append(name)
         return names
+
+    # --------------------------------------------------------------------------
+    #  Helpers: bounding the rounding error
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _term_magnitude(expr: sp.Expr) -> sp.Expr:
+        """Return `expr` with every sum, product and power taken over the absolute values of its parts."""
+        if expr.is_Add:
+            return sp.Add(*(FormulaExpression._term_magnitude(term) for term in expr.args))
+        elif expr.is_Mul:
+            return sp.Mul(*(FormulaExpression._term_magnitude(factor) for factor in expr.args))
+        elif expr.is_Pow and expr.exp.is_number:
+            return sp.Pow(FormulaExpression._term_magnitude(expr.base), expr.exp)
+        else:
+            return sp.Abs(expr)
 
     # --------------------------------------------------------------------------
     #  Helpers: rewriting the constructs

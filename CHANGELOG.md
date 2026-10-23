@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `ParamTable`, a `ParamRecipe` that lists its parameter tuples
 - Add the formulas of "Articles of solvers that sunnbear implements", subcategory 1.1 of "Published test functions"
 - Add the formulas of "Articles of other solvers", subcategory 1.2 of "Published test functions"
+- Add the formulas of "Public benchmark suites", subcategory 1.3 of "Published test functions"
 
 ### Changed
 

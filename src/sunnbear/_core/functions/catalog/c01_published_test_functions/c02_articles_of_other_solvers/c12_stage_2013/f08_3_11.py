@@ -1,8 +1,8 @@
 """This module holds a formula of Stage (2013).
 
 The formula comes from the rows with the keys ``3.11`` and ``3.12`` in the survey of published test problems. The survey
-describes this function in words, not as 1 expression, so a person writes this module: a change of the formula's rows in
-`data/literature_test_problems/sources/` needs a change of this module.
+gives this function as a description, not as 1 expression, so a person writes this module: a change of the formula's
+rows in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
