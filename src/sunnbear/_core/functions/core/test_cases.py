@@ -32,7 +32,7 @@ class FormulaTestCase:
         rtol: float = DEFAULT_RTOL,
         atol: float = DEFAULT_ATOL,
     ) -> "FormulaTestCase":
-        """`f(x, c, *params)` must equal `expected` (and `params` must be accepted as valid)."""
+        """`f(x, c, *params)` must equal `expected`, or be NaN where `expected` is NaN (and `params` must be valid)."""
         return ValueTestCase(params, x, c, expected, rtol, atol)
 
     @classmethod

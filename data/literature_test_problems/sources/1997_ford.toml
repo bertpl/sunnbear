@@ -37,7 +37,7 @@ key = '4'
 f = '2*x*exp(-20) + 1 - 2*exp(-20*x)'
 interval = '`[0, 1]`; `[-0.1, 1.5]`; `[-0.5, 2]`'
 also_in = 'Anderson, Björck (1973), "A new high order method of regula falsi type for computing a root of an equation", BIT 13, 253–264 (article ref. 4)'
-notes = 'Printed root: `x* = 0.034657358821882`.'
+notes = 'Printed root: `x* = 0.034657358821882`. The printed root is not a root of the printed function, whose root is `0.034657359020854`: it is the root of `2*exp(-20) + 1 - 2*exp(-20*x)`, the printed function without the factor `x`.'
 
 [[rows]]
 key = '5'

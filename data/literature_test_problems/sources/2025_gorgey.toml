@@ -18,9 +18,9 @@ notes = '''
 [[rows]]
 key = 'Equation 1'
 f = '(x + 2)*(x + 1)*(x - 3)^3'
-interval = '`[-2.5, 3]`; `[2, 3.5]` (the text below Table 2)'
+interval = "`[-2.5, 3]`; `[2, 3.5]` (Figure 1's caption and the text below Table 2)"
 also_in = 'Galdino (2011), "A family of regula falsi root-finding methods", Proc. 2011 World Congress on Engineering and Technology (CET 2011), vol. 1, 514–517 (article ref. [11])'
-notes = "Roots `-2`, `-1` and `3`; the text names `3` as the root found. Figure 1's caption and the text below Table 2 give the interval `[2, 3.5]`."
+notes = "Roots `-2`, `-1` and `3`; the text names `3` as the root found."
 
 [[rows]]
 key = 'Equation 2'
@@ -33,7 +33,7 @@ notes = "Root `1`. The text below Table 3 gives the interval `[2, 3.5]`, which h
 key = 'Equation 3'
 f = '(sin(x) - x/4)^3'
 interval = '`[-1, 2]`; `[-0.5, 1]` (the text below Table 4)'
-notes = 'Root found: `0`. The text below Table 4 gives the interval `[-0.5, 1]`.'
+notes = "Root found: `0`; Figure 3 also shows the roots `-2.47458` and `2.47458`, and the line under Figure 3 misprints the second as `2.48458`. Table 4's results for bisection, the secant method, Newton-Raphson from `-0.5` and Ridders' method reproduce on `[-0.5, 1]`, not on `[-1, 2]`."
 
 [[rows]]
 key = 'Equation 4'

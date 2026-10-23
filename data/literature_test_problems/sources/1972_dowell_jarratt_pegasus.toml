@@ -18,7 +18,7 @@ notes = '''
 key = 'Table 1'
 f = 'x^3 + 1'
 interval = '[-2, 0]'
-notes = "Root `-1`. Starting values `x0 = 0`, `x1 = -2`. The row follows the article. sunnbear's `test_paper.py` solves the mirrored `1 - x^3` on `[0, 2]`, because sunnbear's `Pegasus` takes the upper bound as its newest starting point."
+notes = "Root `-1`. Starting values `x0 = 0`, `x1 = -2`. The formula keeps the article's form. sunnbear's `tests/solvers/bracketing/pegasus/test_paper.py` solves the mirrored `1 - x^3` on `[0, 2]`, because sunnbear's `Pegasus` takes the upper bound as its newest starting point."
 
 [[rows]]
 key = 'Problem 1'
