@@ -1,10 +1,14 @@
 """FormulaTestCase: a formula's self-declared test cases.
 
-A concrete `Formula` lists `test_cases` — one `FormulaTestCase` per behavior worth pinning, built via
+A concrete `Formula` lists `test_cases` — one `FormulaTestCase` per behavior worth checking, built via
 `FormulaTestCase.value` / `.invalid` / `.interval_bounds`. A single generic test drives every registered
-formula through its list, so between them the 3 kinds cover `parametrized_fun`, both sides of
-`is_param_tuple_valid`, and `interval_bounds`; the branch-coverage gate then fails on any formula line
-that no test case reaches.
+formula through its list, so between them the kinds of test case cover:
+
+- `parametrized_fun`;
+- both sides of `is_param_tuple_valid`;
+- `interval_bounds`.
+
+The branch-coverage gate then fails on any formula line that no test case reaches.
 
 Parameters are given by name (`{"p1": 0.0}`) and resolved to positional order against the formula's
 `param_names` when a case runs.
