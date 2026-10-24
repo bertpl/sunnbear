@@ -20,9 +20,11 @@ class ModificationType(StrEnum):
     # The modified function adds the parameter c of category 1 to the published function's value, on the published
     # interval, and does not shift x.
     C_ADDS_TO_F = "c_adds_to_f"
-    # The modified function has its own interval: 1 bound of the published interval, or both, moves away from the pole,
-    # jump, root or other value of x at which the published test function fails; the formula's docstring states the
-    # distance. c shifts x by the rule of category 1, with c_scale the rounded width of the new interval.
+    # The modified function has its own interval; the formula's docstring states the new interval and why the interval
+    # changed. One bound of the published interval, or both, moves in 1 of 2 ways:
+    # - away from the pole, jump, root or other value of x at which the published test function fails;
+    # - past a root, so that the interval holds an odd number of roots.
+    # c shifts x by the rule of category 1, with c_scale the rounded width of the new interval.
     C_SHIFTS_X_ON_NEW_INTERVAL = "c_shifts_x_on_new_interval"
 
 
@@ -30,18 +32,42 @@ class ModificationType(StrEnum):
 MODIFIED_FORMULAS = {
     "f1.1.2.4": ModificationType.C_ADDS_TO_F,
     "f1.1.5.3": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.1.12.1": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.1.12.2": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.1.13.21": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.2.4.2": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.2.13.8": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.2.13.9": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.2.15.1": ModificationType.C_ADDS_TO_F,
     "f1.2.15.2": ModificationType.C_ADDS_TO_F,
+    "f1.2.18.5": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.2.18.6": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.2.18.14": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.2.18.20": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.3.1.6": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.3.2.3": ModificationType.C_ADDS_TO_F,
     "f1.3.3.30": ModificationType.C_ADDS_TO_F,
     "f1.3.3.33": ModificationType.C_ADDS_TO_F,
     "f1.3.4.2": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.3.5.13": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.3.6.2": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.3.6.3": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.3.6.4": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.4.1.8": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.4.2.5": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.4.3.1": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.4.3.5": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.4.3.6": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.4.3.15": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.4.4.6": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.4.5.8": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.4.5.14": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.4.5.15": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.4.5.20": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.4.5.21": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
+    "f1.4.6.2": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.4.6.20": ModificationType.C_ADDS_TO_F,
+    "f1.4.7.4": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.4.7.9": ModificationType.C_ADDS_TO_F,
+    "f1.4.7.19": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
 }
