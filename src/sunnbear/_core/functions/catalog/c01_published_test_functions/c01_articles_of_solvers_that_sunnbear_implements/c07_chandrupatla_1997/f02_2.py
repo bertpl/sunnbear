@@ -22,14 +22,15 @@ class Chandrupatla19972(Formula):
 
     Printed zero: `x = 1`. The article says the author proposed it.
 
-    With ``modified = 1``, the formula keeps the published interval and evaluates the published function at
-    ``x*exp(-c*ln(b/a))``: ``c`` scales x, so that the root moves by a factor, never reaches 0, and moves across the
-    whole interval in log scale as ``c`` goes from 0 to 1.
+    With ``modified = 1``, the formula evaluates the published function at ``x*exp(-c*ln(b/a))`` on the published
+    interval: ``c`` scales x, so that the root moves by the factor ``(b/a)**c`` and never reaches 0. As ``c`` goes from
+    0 to 1, the root moves by the interval's full width in log scale.
 
     The published test functions on ``[1e-4, 1e4]`` and wider fail a benchmark suite's checks of its test functions,
-    because each interval spans orders of magnitude next to the pole at 0, and ``c_scale``, the interval's rounded
-    width, is ``1e4`` or more, so that a shift along x by ``c_scale*c`` takes ``a`` across the pole for every ``c``
-    above ``1e-8``.
+    because each interval spans orders of magnitude next to the pole at 0.
+
+    For these intervals ``c_scale``, the interval's rounded width, is ``1e4`` or more, so that a shift along x by
+    ``c_scale*c`` takes ``a`` across the pole for every ``c`` above ``1e-8``.
     """
 
     number = (1, 1, 7, 2)

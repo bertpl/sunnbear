@@ -22,14 +22,13 @@ class Chandrupatla19979(Formula):
 
     Printed zero: `x = 0.7032`.
 
-    With ``modified = 1``, the formula keeps the published interval and evaluates the published function at
-    ``x*exp(-c*ln(b/a))``: ``c`` scales x, so that the root moves by a factor, never reaches 0, and moves across the
-    whole interval in log scale as ``c`` goes from 0 to 1.
+    With ``modified = 1``, the formula evaluates the published function at ``x*exp(-c*ln(b/a))`` on the published
+    interval: ``c`` scales x, so that the root moves by the factor ``(b/a)**c`` and never reaches 0. As ``c`` goes from
+    0 to 1, the root moves by the interval's full width in log scale.
 
     The published test functions on ``[2e-4, 9]`` and wider fail a benchmark suite's checks of its test functions,
-    because each interval spans orders of magnitude next to the poles of ``0.01/x**2`` and ``0.000002/x**3`` at 0, where
-    the slope of ``f`` is about ``-1e9``, so that even the first shift along x that the checks try changes the sign of
-    ``f(a)``.
+    because each interval spans orders of magnitude next to the poles at 0, so that the smallest shift along x that the
+    checks try changes the sign of ``f(a)``.
     """
 
     number = (1, 1, 7, 9)

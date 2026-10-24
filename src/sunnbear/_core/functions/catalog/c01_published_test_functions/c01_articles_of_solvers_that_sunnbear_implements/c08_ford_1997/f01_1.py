@@ -22,13 +22,15 @@ class Ford19971(Formula):
 
     Printed root: `x* = 0.99998333286109`.
 
-    With ``modified = 1``, the formula keeps the published interval and evaluates the published function at
-    ``x*exp(-c*ln(b/a))``: ``c`` scales x, so that the root moves by a factor, never reaches 0, and moves across the
-    whole interval in log scale as ``c`` goes from 0 to 1.
+    With ``modified = 1``, the formula evaluates the published function at ``x*exp(-c*ln(b/a))`` on the published
+    interval: ``c`` scales x, so that the root moves by the factor ``(b/a)**c`` and never reaches 0. As ``c`` goes from
+    0 to 1, the root moves by the interval's full width in log scale.
 
     The published test function on ``[0.004, 200]`` fails a benchmark suite's checks of its test functions, because the
-    interval spans orders of magnitude next to the singularity of ``sin(0.01/x)`` at 0, so that the range of ``c`` in
-    which ``f(a)`` keeps its sign and size is narrower than the checks allow.
+    interval spans orders of magnitude next to the singularity of ``sin(0.01/x)`` at 0.
+
+    The range of ``c`` in which ``f(a)`` keeps its sign and size is therefore narrower than the minimum width that the
+    checks require.
     """
 
     number = (1, 1, 8, 1)

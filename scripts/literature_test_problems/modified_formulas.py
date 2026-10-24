@@ -27,8 +27,13 @@ class ModificationType(StrEnum):
     # c shifts x by the rule of category 1, with c_scale the rounded width of the new interval.
     C_SHIFTS_X_ON_NEW_INTERVAL = "c_shifts_x_on_new_interval"
     # The modified function keeps the published interval [a, b] and evaluates the published function at
-    # x*exp(-c*ln(b/a)): c scales x, so that the root moves by a factor and never reaches 0.
+    # x*exp(-c*ln(b/a)): c scales x, so that the root moves by the factor (b/a)**c and never reaches 0.
     C_SCALES_X = "c_scales_x"
+
+    @property
+    def has_c_scale_factor(self) -> bool:
+        """Return whether the modified function shifts x by ``c_scale*c``, the rule of category 1."""
+        return self is ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL
 
 
 # MODIFIED_FORMULAS holds the type of modification of each formula of category 1 that has the parameter `modified`.

@@ -312,17 +312,18 @@ def test_category_1_formula_applies_c_as_its_rule_says(formula, c, script_module
     """A formula of category 1 applies ``c`` by category 1's rule, or by its `ModificationType` where ``modified = 1``.
 
     The expected value evaluates the formula at ``c = 0``, which repeats the formula's own float arithmetic, so the
-    value at ``c`` equals it exactly; this holds for ``C_ADDS_TO_F`` because such a formula adds ``c`` as its last
-    operation, and for ``C_SCALES_X`` because the test scales x with the formula's own operations.
+    value at ``c`` equals it exactly. This holds:
 
-    The x-value lies at 0.6 of the interval, in log scale for ``C_SCALES_X``, so that its shifted or scaled values stay
-    in the interval.
+    - for ``C_ADDS_TO_F``, because such a formula adds ``c`` as its last operation;
+    - for ``C_SCALES_X``, because the test scales x with the formula's own operations.
     """
     for candidate in formula.build_all_candidates():
         # --- arrange ----------------------
         modification_type_enum = script_modules["modified_formulas"].ModificationType
         modification_type = _modification_type(candidate, script_modules)
         c_scale = PublishedTestFunctions.c_scale(candidate.a, candidate.b)
+        # the x-value lies at 0.6 of the interval, in log scale for C_SCALES_X, so that the shifted or scaled x-values
+        # stay in the interval
         if modification_type is modification_type_enum.C_SCALES_X:
             x = candidate.a * (candidate.b / candidate.a) ** 0.6
         else:
@@ -347,18 +348,16 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, scrip
 
     The test reads the factor from the code of ``parametrized_fun``, because a test that compares shifted values
     cannot see a number that is 1 float step off, such as ``1.9999999999999996`` for ``2.0``: the shifted x-values
-    round to the same float. A test function with ``modified = 1`` whose `ModificationType` is ``C_ADDS_TO_F`` or
-    ``C_SCALES_X`` applies ``c`` with no factor ``c_scale``, so the test skips it.
+    round to the same float. The test skips a test function with ``modified = 1`` whose
+    ``ModificationType.has_c_scale_factor`` is false, because it applies ``c`` with no factor ``c_scale``.
     """
     # --- arrange ----------------------
     tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))
-    modification_type_enum = script_modules["modified_formulas"].ModificationType
-    shifting_candidates = [
-        candidate
-        for candidate in formula.build_all_candidates()
-        if _modification_type(candidate, script_modules)
-        not in (modification_type_enum.C_ADDS_TO_F, modification_type_enum.C_SCALES_X)
-    ]
+    shifting_candidates = []
+    for candidate in formula.build_all_candidates():
+        modification_type = _modification_type(candidate, script_modules)
+        if modification_type is None or modification_type.has_c_scale_factor:
+            shifting_candidates.append(candidate)
 
     # --- act --------------------------
     factors = []
