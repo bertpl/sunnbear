@@ -1,8 +1,7 @@
 """`WorkerPool` runs tasks in worker processes, or in this process when it has 1 worker.
 
-A task is any picklable object with a `run` method (`WorkerTask`). A pool may also give each worker a function to
-run before its first task, its worker initializer, such as the one of `worker_pool_for_modules`, which imports the
-modules that define the classes that the tasks look up.
+A task is any picklable object with a `run` method (`WorkerTask`). A pool may also give each worker a function, its
+worker initializer, to run before its first task.
 
 Workers start with the "spawn" method on every platform: a worker then never inherits the state of this
 process's threads, e.g. locks held by numba or polars, and a pool behaves the same on Linux, macOS and Windows.
@@ -41,7 +40,8 @@ class WorkerPool:
         Args:
             n_workers: The number of worker processes; ``None`` for 1 per CPU.
             worker_initializer: A picklable function that each worker process calls once, before its first task;
-                ``None`` for none. With 1 worker, the tasks run in this process, which never calls it.
+                ``None`` for none. With 1 worker, the tasks run in this process, which never calls the worker
+                initializer.
 
         Raises:
             ValueError: If `n_workers` is below 1.

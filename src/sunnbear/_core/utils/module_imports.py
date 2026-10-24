@@ -1,8 +1,10 @@
 """`worker_pool_for_modules` returns a `WorkerPool` whose workers first import the modules that the tasks need.
 
 A task may look up a class by id in a registry, such as the class of a formula or a solver config, and a registry holds
-only the classes of the modules that its process has imported. A new worker process has imported only what unpickling
-its first task needs, so each worker of the pool first imports the modules that define those classes.
+only the classes of the modules that its process has imported.
+
+A new worker process has imported only what unpickling its first task needs, so each worker of the pool first imports
+the modules that define the classes that the tasks look up.
 """
 
 import functools
@@ -14,10 +16,12 @@ from .worker_pool import WorkerPool
 
 
 def worker_pool_for_modules(*, n_workers: int | None, module_names: Collection[str]) -> WorkerPool:
-    """Return a `WorkerPool` with `n_workers` workers, each of which imports `module_names` before its first task.
+    """Return a `WorkerPool` with `n_workers` workers, each of which imports the modules in `module_names` first.
 
-    The main module is left out of the modules to import: with "spawn", every worker runs the main script again,
-    which defines the script's classes in that worker.
+    An `n_workers` of ``None`` gives 1 worker per CPU.
+
+    The main module is left out of the modules to import: a `WorkerPool` starts its workers with "spawn", so every
+    worker runs the main script again, which defines the script's classes in that worker.
 
     A class defined in an interactive session has no module file that a worker could import, so a `__main__` module
     of an interactive session allows only 1 worker.
@@ -35,7 +39,8 @@ def worker_pool_for_modules(*, n_workers: int | None, module_names: Collection[s
             "A worker process cannot import a class that is defined in an interactive session; "
             "define the class in a module, or pass n_workers=1."
         )
-    return worker_pool
+    else:
+        return worker_pool
 
 
 def import_modules(module_names: Sequence[str]) -> None:

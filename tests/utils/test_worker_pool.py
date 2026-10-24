@@ -1,6 +1,11 @@
-"""`WorkerPool` runs tasks in this process for 1 worker, or in worker processes that start when the first tasks run,
-run the pool's worker initializer first, and serve every later call of `run` in the same with block; it splits items
-into batches without splitting the items that share a key.
+"""`WorkerPool` runs tasks in this process for 1 worker, and splits items into batches without splitting the items
+that share a key.
+
+With 2 or more workers, the tasks run in worker processes that:
+
+- start when the first tasks run;
+- run the pool's worker initializer before their first task;
+- serve every later call of `run` in the same with block.
 """
 
 import multiprocessing
@@ -11,14 +16,6 @@ import pytest
 
 from sunnbear._core.utils.worker_pool import WorkerPool
 
-# A worker initializer marks the worker process that runs it here.
-_WORKER_STATE = {"is_initialized": False}
-
-
-def mark_initialized() -> None:
-    """Mark the process that calls it as initialized, in `_WORKER_STATE`."""
-    _WORKER_STATE["is_initialized"] = True
-
 
 # ==================================================================================================
 #  Tasks
@@ -28,6 +25,7 @@ class ProcessIdTask:
     """`ProcessIdTask` returns the id of the process that runs it."""
 
     def run(self) -> int:
+        """Return the id of this process."""
         return os.getpid()
 
 
@@ -36,15 +34,30 @@ class FailingTask:
     """`FailingTask` raises a `ValueError`."""
 
     def run(self) -> None:
+        """Raise a `ValueError`."""
         raise ValueError("the task failed")
 
 
 @dataclass(frozen=True)
-class IsInitializedTask:
-    """`IsInitializedTask` returns whether a worker initializer has marked its process as initialized."""
+class IsWorkerInitializedTask:
+    """`IsWorkerInitializedTask` returns whether a worker initializer has marked its process as initialized."""
 
     def run(self) -> bool:
+        """Return whether `mark_initialized` has run in this process."""
         return _WORKER_STATE["is_initialized"]
+
+
+# ==================================================================================================
+#  Helpers
+# ==================================================================================================
+# `mark_initialized` sets `is_initialized` to True in each worker process that calls `mark_initialized` as its worker
+# initializer.
+_WORKER_STATE = {"is_initialized": False}
+
+
+def mark_initialized() -> None:
+    """Mark the calling process as initialized, in `_WORKER_STATE`."""
+    _WORKER_STATE["is_initialized"] = True
 
 
 # ==================================================================================================
@@ -92,7 +105,7 @@ def test_each_worker_runs_the_worker_initializer_before_its_first_task(worker_in
     """A worker runs the pool's worker initializer before its first task; a worker of a pool without one does not."""
     # --- act --------------------------
     with WorkerPool(n_workers=2, worker_initializer=worker_initializer) as worker_pool:
-        [(_, is_initialized)] = list(worker_pool.run({0: IsInitializedTask()}))
+        [(_, is_initialized)] = list(worker_pool.run({0: IsWorkerInitializedTask()}))
 
     # --- assert -----------------------
     assert is_initialized == is_initialized_expected
