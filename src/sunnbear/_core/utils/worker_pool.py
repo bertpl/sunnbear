@@ -19,12 +19,7 @@ import os
 import sys
 from collections.abc import Callable, Collection, Hashable, Iterator, Mapping, Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed, wait
-from typing import Protocol, Self, TypeVar
-
-K = TypeVar("K", bound=Hashable)
-R = TypeVar("R")
-R_co = TypeVar("R_co", covariant=True)
-T = TypeVar("T")
+from typing import Protocol, Self
 
 # `WorkerPool.split_into_batches` aims at this many batches per worker, each run as 1 task, so that a slow task does
 # not leave the other workers idle at the end.
@@ -83,7 +78,7 @@ class WorkerPool:
     # --------------------------------------------------------------------------
     #  Main API
     # --------------------------------------------------------------------------
-    def run(self, tasks: Mapping[K, "WorkerTask[R]"]) -> Iterator[tuple[K, R]]:
+    def run[K: Hashable, R](self, tasks: Mapping[K, "WorkerTask[R]"]) -> Iterator[tuple[K, R]]:
         """Run every task and yield each task's key with its result, as the task finishes.
 
         The tasks run in up to `n_workers` worker processes and finish in any order. With 1 worker, they run in
@@ -115,7 +110,7 @@ class WorkerPool:
                     future.cancel()
                 wait(keys_by_future)
 
-    def split_into_batches(self, items: Sequence[T], *, group_key: Callable[[T], Hashable]) -> list[list[T]]:
+    def split_into_batches[T](self, items: Sequence[T], *, group_key: Callable[[T], Hashable]) -> list[list[T]]:
         """Split `items` into about `TARGET_BATCHES_PER_WORKER` batches per worker, keeping the items of 1 key together.
 
         The items with the same key form a group, which no batch splits, so work that a group's items share, such as
@@ -179,9 +174,9 @@ class WorkerPool:
 # ==================================================================================================
 #  WorkerTask
 # ==================================================================================================
-class WorkerTask(Protocol[R_co]):
+class WorkerTask[R](Protocol):
     """A `WorkerTask` is a picklable object whose `run` method computes the task's result."""
 
-    def run(self) -> R_co:
+    def run(self) -> R:
         """Return the task's result."""
         ...
