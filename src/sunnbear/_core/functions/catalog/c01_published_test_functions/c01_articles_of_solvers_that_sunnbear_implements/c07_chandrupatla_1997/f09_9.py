@@ -28,7 +28,7 @@ class Chandrupatla19979(Formula):
 
     The published test functions on ``[2e-4, 9]`` and wider do not satisfy the benchmark suite inclusion conditions,
     because each interval spans orders of magnitude next to the pole at 0, so that the shift by ``c_scale*c`` at the
-    smallest tested ``c`` changes the sign of ``f(a)``.
+    smallest ``c`` that the benchmark suite pipeline tries changes the sign of ``f(a)``.
     """
 
     number = (1, 1, 7, 9)
