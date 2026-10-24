@@ -4,9 +4,9 @@ The formula comes from the row with the key ``p06`` in the survey of published t
 `scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter ``modified``, which
 selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
-in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
-needs a change of this module.
+A person therefore writes this module by hand, starting from the module that the generator writes for the formula when
+the formula is absent from `MODIFIED_FORMULAS` in `scripts/literature_test_problems/modified_formulas.py`. A change of
+the formula's row in `data/literature_test_problems/sources/` needs a matching change of this module.
 """
 
 import math
@@ -28,8 +28,8 @@ class Burkardt2016P06(Formula):
     root, near 0.00019, so that the interval holds 1 of the 2 roots. ``c`` shifts x as category 1 states, with
     ``c_scale`` the rounded width of the new interval.
 
-    The published test function on ``[1e-05, 20]`` fails a benchmark suite's checks of its test functions, because it
-    holds 2 roots, an even number, so that ``f(a)`` and ``f(b)`` have the same sign.
+    The published test function on ``[1e-05, 20]`` fails a benchmark suite's checks of its test functions, because the
+    published interval holds 2 roots, an even number, so that ``f(a)`` and ``f(b)`` have the same sign.
     """
 
     number = (1, 3, 1, 6)

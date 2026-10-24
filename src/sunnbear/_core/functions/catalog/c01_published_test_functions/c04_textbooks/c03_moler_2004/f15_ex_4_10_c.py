@@ -4,9 +4,9 @@ The formula comes from the row with the key ``Ex. 4.10(c)`` in the survey of pub
 generator, `scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter
 ``modified``, which selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
-in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
-needs a change of this module.
+A person therefore writes this module by hand, starting from the module that the generator writes for the formula when
+the formula is absent from `MODIFIED_FORMULAS` in `scripts/literature_test_problems/modified_formulas.py`. A change of
+the formula's row in `data/literature_test_problems/sources/` needs a matching change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
@@ -28,7 +28,7 @@ class Moler2004Ex410C(Formula):
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
     The published test function fails a benchmark suite's checks of its test functions, because ``f(a)`` is not finite,
-    since ``bessel_y0(0)`` is ``-inf``, and the interval holds 10 roots, an even number.
+    since ``bessel_y0(0)`` is ``-inf``, and the published interval holds 10 roots, an even number.
     """
 
     number = (1, 4, 3, 15)

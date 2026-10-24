@@ -21,8 +21,9 @@ class ModificationType(StrEnum):
     # interval, and does not shift x.
     C_ADDS_TO_F = "c_adds_to_f"
     # The modified function has its own interval: 1 bound of the published interval, or both, moves away from the pole,
-    # jump, root or other value of x at which the published test function fails; the formula's docstring states the
-    # distance. c shifts x by the rule of category 1, with c_scale the rounded width of the new interval.
+    # jump, root or other value of x at which the published test function fails, or moves past a root so that the
+    # interval holds an odd number of roots; the formula's docstring states the new interval and why it changed. c
+    # shifts x by the rule of category 1, with c_scale the rounded width of the new interval.
     C_SHIFTS_X_ON_NEW_INTERVAL = "c_shifts_x_on_new_interval"
 
 

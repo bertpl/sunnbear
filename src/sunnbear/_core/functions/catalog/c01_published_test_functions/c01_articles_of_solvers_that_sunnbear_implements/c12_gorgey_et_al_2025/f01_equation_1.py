@@ -4,9 +4,9 @@ The formula comes from the row with the key ``Equation 1`` in the survey of publ
 generator, `scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter
 ``modified``, which selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
-in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
-needs a change of this module.
+A person therefore writes this module by hand, starting from the module that the generator writes for the formula when
+the formula is absent from `MODIFIED_FORMULAS` in `scripts/literature_test_problems/modified_formulas.py`. A change of
+the formula's row in `data/literature_test_problems/sources/` needs a matching change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
@@ -22,7 +22,7 @@ class GorgeyEtAl2025Equation1(Formula):
 
     With ``modified = 1``, the interval ``[-2.5, 3]`` becomes ``[-2.5, 3.06]``: its upper bound moves right of the
     triple root at 3 by 1% of the published interval's width, rounded half up to 1 significant digit, so that the
-    interval holds its 3 roots.
+    interval holds all 3 roots, -2, -1 and 3.
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 

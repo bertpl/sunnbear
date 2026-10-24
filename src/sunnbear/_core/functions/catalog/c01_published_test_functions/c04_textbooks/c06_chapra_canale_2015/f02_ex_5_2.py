@@ -4,9 +4,9 @@ The formula comes from the row with the key ``Ex. 5.2; Fig. 5.4`` in the survey 
 generator, `scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter
 ``modified``, which selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
-in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
-needs a change of this module.
+A person therefore writes this module by hand, starting from the module that the generator writes for the formula when
+the formula is absent from `MODIFIED_FORMULAS` in `scripts/literature_test_problems/modified_formulas.py`. A change of
+the formula's row in `data/literature_test_problems/sources/` needs a matching change of this module.
 """
 
 import math
@@ -24,13 +24,14 @@ class ChapraCanale2015Ex52(Formula):
     distinct roots, at about 4.23 and 4.26.
 
     With ``modified = 1``, the intervals ``[3, 5]`` and ``[4.2, 4.3]`` become ``[3.3, 5]`` and ``[4.2, 4.26]``, so that
-    each holds an odd number of roots: the first loses its first root, near 3.26, and the second its second root, near
+    each holds an odd number of roots: ``[3.3, 5]`` leaves out the root near 3.26, and ``[4.2, 4.26]`` the root near
     4.264.
 
-    With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
+    With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of each new interval.
 
     The published test functions on ``[3, 5]`` and ``[4.2, 4.3]`` fail a benchmark suite's checks of its test functions,
-    because they hold 6 and 2 roots, even numbers, so that ``f(a)`` and ``f(b)`` have the same sign.
+    because the 2 published intervals hold 6 and 2 roots, even numbers, so that ``f(a)`` and ``f(b)`` have the same
+    sign.
     """
 
     number = (1, 4, 6, 2)

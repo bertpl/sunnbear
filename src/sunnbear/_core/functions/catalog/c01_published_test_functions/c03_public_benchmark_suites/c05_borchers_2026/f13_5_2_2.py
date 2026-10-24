@@ -4,9 +4,9 @@ The formula comes from the row with the key ``5.2.2`` in the survey of published
 `scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter ``modified``, which
 selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
-in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
-needs a change of this module.
+A person therefore writes this module by hand, starting from the module that the generator writes for the formula when
+the formula is absent from `MODIFIED_FORMULAS` in `scripts/literature_test_problems/modified_formulas.py`. A change of
+the formula's row in `data/literature_test_problems/sources/` needs a matching change of this module.
 """
 
 import math
@@ -22,13 +22,13 @@ class Borchers2026522(Formula):
     `findzeros` returns every root in the interval: -2, -1, 0, 1, 2
 
     With ``modified = 1``, the interval ``[-2, 2]`` becomes ``[-2.04, 1.96]``: it moves left by 1% of the published
-    interval's width, rounded half up to 1 significant digit, so that neither bound lies on a root, and it holds the
-    sign changes at -2, -1 and 1.
+    interval's width, rounded half up to 1 significant digit, so that neither bound is a root.
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because its bounds are the roots
-    -2 and 2, where float64 gives ``f`` the same sign.
+    The published test function fails a benchmark suite's checks of its test functions, because the published interval's
+    bounds are the roots -2 and 2, where float64 evaluates ``f`` to about ``-5e-16`` at both, since float64 ``pi`` makes
+    ``sin(pi*x)`` slightly nonzero.
     """
 
     number = (1, 3, 5, 13)
