@@ -31,6 +31,15 @@ class PublishedTestFunctions(FormulaCategory):
     - A formula with several intervals takes ``c_scale`` as a parameter after ``a`` and ``b``, and each parameter
       tuple holds the ``c_scale`` of its own interval, so that ``parametrized_fun`` does not round the width on every
       call.
+
+    A formula with the parameter ``modified`` follows these rules where ``modified = 0``.
+
+    Where ``modified = 1``, it gives a modified version of a published test function that fails a benchmark suite's
+    checks of its test functions. An example is a function that is not defined left of its interval: a shift along x
+    by any ``c > 0`` evaluates that function outside its domain.
+
+    The formula's docstring describes its modification, which keeps the test function as close to the published one as
+    those checks allow.
     """
 
     number = (1,)
