@@ -26,9 +26,9 @@ def main() -> None:
     args = parser.parse_args()
 
     for manifest in run_pipeline(workspace_dir=args.workspace, formulas=FormulaRegistry.formulas()):
-        rejections = ", ".join(f"{count} by {reason}" for reason, count in sorted(manifest.rejection_counts.items()))
-        size_and_duration = f"{manifest.n_rows} rows in {manifest.duration_sec:.2f} s"
-        print(f"{manifest.output_name}: {size_and_duration}; rejected: {rejections or 'none'}")
+        report_names = ", ".join(manifest.report_sha256s) or "none"
+        rows = f"{manifest.n_rows} rows, {manifest.n_dropped_rows} dropped"
+        print(f"{manifest.output_name}: {rows}, in {manifest.duration_sec:.2f} s; reports: {report_names}")
 
 
 if __name__ == "__main__":

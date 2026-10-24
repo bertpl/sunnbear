@@ -1,10 +1,10 @@
 """`PipelineWorkspace` is the only code that writes the files of the benchmark suite pipeline's workspace.
 
-The workspace directory holds:
+The workspace directory holds, for each stage, files named after the stage's `PipelineStage.output_name`:
 
-- 1 Parquet output file per stage, named after the stage's `PipelineStage.output_name`;
-- a manifests directory, which holds 1 `PipelineStageManifest` per stage as a JSON file named after the stage's
-  `PipelineStage.output_name`.
+- its output table, as a Parquet file in the directory itself;
+- its reports, as Parquet files named after the reports, in a reports directory of its own under ``reports``;
+- its `PipelineStageManifest`, as a JSON file under ``manifests``.
 
 Every file is written under a temporary name and then renamed, so a file under its final name is always complete.
 """
@@ -13,14 +13,16 @@ import datetime
 import hashlib
 import io
 import json
+import shutil
 from pathlib import Path
 
 import polars as pl
 
 from .manifest import PipelineStageManifest
-from .stage import PipelineStage
+from .stage import PipelineStage, PipelineStageOutput
 
-_OUTPUT_FILE_SUFFIX = ".parquet"
+_TABLE_FILE_SUFFIX = ".parquet"
+_REPORTS_DIR_NAME = "reports"
 _MANIFESTS_DIR_NAME = "manifests"
 _MANIFEST_FILE_SUFFIX = ".json"
 _TEMPORARY_FILE_SUFFIX = ".tmp"
@@ -43,19 +45,27 @@ class PipelineWorkspace:
         self,
         *,
         stage: PipelineStage,
-        output: pl.DataFrame,
+        output: PipelineStageOutput,
         input_manifest: PipelineStageManifest | None,
         started_at: datetime.datetime,
         duration_sec: float,
     ) -> PipelineStageManifest:
-        """Write the output of `stage` and its manifest, replacing earlier ones, and return the manifest.
+        """Write the output table, reports and manifest of `stage`, replacing earlier ones, and return the manifest.
 
-        `input_manifest` is the manifest of the stage before `stage`, or ``None`` for the first stage.
+        The reports of an earlier run of `stage` are removed first, so the reports directory of `stage` holds exactly
+        the reports in `output`. `input_manifest` is the manifest of the stage before `stage`, or ``None`` for the
+        first stage.
         """
+        reports_dir = self.path / _REPORTS_DIR_NAME / stage.output_name
+        shutil.rmtree(reports_dir, ignore_errors=True)
         manifest = PipelineStageManifest.from_stage_output(
             stage=stage,
-            output=output,
-            output_sha256=self._write_stage_output(stage.output_name, output),
+            table=output.table,
+            output_sha256=self._write_table(self.path / f"{stage.output_name}{_TABLE_FILE_SUFFIX}", output.table),
+            report_sha256s={
+                report_name: self._write_table(reports_dir / f"{report_name}{_TABLE_FILE_SUFFIX}", report)
+                for report_name, report in output.reports.items()
+            },
             input_manifest=input_manifest,
             started_at=started_at,
             duration_sec=duration_sec,
@@ -66,12 +76,12 @@ class PipelineWorkspace:
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
-    def _write_stage_output(self, output_name: str, output: pl.DataFrame) -> str:
-        """Write a stage's output under `output_name`, replacing an earlier one; return the file's sha256 as hex."""
+    def _write_table(self, file: Path, table: pl.DataFrame) -> str:
+        """Write `table` to `file` as Parquet, replacing an earlier file, and return the file's sha256 as hex."""
         buffer = io.BytesIO()
-        output.write_parquet(buffer)
+        table.write_parquet(buffer)
         content = buffer.getvalue()
-        self._write_atomically(self.path / f"{output_name}{_OUTPUT_FILE_SUFFIX}", content)
+        self._write_atomically(file, content)
         return hashlib.sha256(content).hexdigest()
 
     def _write_manifest(self, manifest: PipelineStageManifest) -> None:

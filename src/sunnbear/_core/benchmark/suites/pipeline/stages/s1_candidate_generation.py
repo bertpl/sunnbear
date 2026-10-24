@@ -13,7 +13,7 @@ from collections.abc import Sequence
 
 import polars as pl
 
-from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage
+from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageOutput
 from sunnbear._core.functions.core import Formula
 
 CANDIDATES_SCHEMA: dict[str, pl.DataType] = {
@@ -35,16 +35,16 @@ class CandidateGenerationStage(PipelineStage):
         """Create the stage for `formulas`, the corpus of the pipeline run."""
         self.formulas = formulas
 
-    def compute_output(self, previous_output: pl.DataFrame) -> pl.DataFrame:
+    def compute_output(self, previous_table: pl.DataFrame) -> PipelineStageOutput:
         """Return every candidate of every formula: its id and its interval bounds ``a`` and ``b``.
 
-        As the first stage, it receives an empty `previous_output`.
+        As the first stage, it receives an empty `previous_table`.
 
         Raises:
             ValueError: If a formula fails the checks of `Formula.build_all_candidates`.
         """
         candidates = [candidate for formula in self.formulas for candidate in formula.build_all_candidates()]
-        return pl.DataFrame(
+        table = pl.DataFrame(
             {
                 "function_id": [str(candidate.id) for candidate in candidates],
                 "a": [candidate.a for candidate in candidates],
@@ -52,3 +52,4 @@ class CandidateGenerationStage(PipelineStage):
             },
             schema=CANDIDATES_SCHEMA,
         )
+        return PipelineStageOutput(table=table)

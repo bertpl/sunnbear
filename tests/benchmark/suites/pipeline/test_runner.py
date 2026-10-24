@@ -10,7 +10,7 @@ from sunnbear._core.functions.core import FormulaRegistry
 
 
 def test_the_pipeline_generates_then_validates_the_candidates_of_the_given_formulas(tmp_path):
-    """The pipeline writes the candidates of the given formulas, then the same candidates with their validation."""
+    """The pipeline writes the candidates of the given formulas, then the valid ones: all of them, for category 2."""
     # --- arrange ----------------------
     # The shipped formulas of category 2 form a small corpus, so the pipeline runs fast on them.
     formulas = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 2]
@@ -27,6 +27,6 @@ def test_the_pipeline_generates_then_validates_the_candidates_of_the_given_formu
     )
     assert [manifest.output_name for manifest in manifests] == output_names_expected
     candidates = pl.read_parquet(tmp_path / f"{CandidateGenerationStage.output_name}.parquet")
-    checked_candidates = pl.read_parquet(tmp_path / f"{CandidateValidationStage.output_name}.parquet")
+    valid_candidates = pl.read_parquet(tmp_path / f"{CandidateValidationStage.output_name}.parquet")
     assert candidates.height == sum(len(formula.build_all_candidates()) for formula in formulas)
-    assert checked_candidates.drop("rejected_by").equals(candidates)
+    assert valid_candidates.equals(candidates)

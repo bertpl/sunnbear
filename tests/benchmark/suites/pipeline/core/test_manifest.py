@@ -1,35 +1,24 @@
-"""`PipelineStageManifest.from_stage_output` derives the manifest's counts from a stage's output, and its input hash
-from the manifest of the stage before it."""
+"""`PipelineStageManifest.from_stage_output` derives the manifest's row counts and input hash from a stage's output
+table and the manifest of the stage before it."""
 
 import datetime
 
 import polars as pl
-import pytest
 
 from sunnbear._core.benchmark.suites.pipeline.core.manifest import PipelineStageManifest
 
-from .example_stages import ExampleCheckedNumbersStage, ExampleNumbersStage
+from .example_stages import ExampleNumbersStage, ExampleSmallNumbersStage
 
 
-@pytest.mark.parametrize(
-    "output, rejection_counts_expected",
-    [
-        pytest.param(
-            pl.DataFrame({"rejected_by": ["too_large", "", "too_large"]}),
-            {"too_large": 2},
-            id="output_with_rejections",
-        ),
-        pytest.param(pl.DataFrame({"x": [1.0]}), {}, id="output_without_rejected_by"),
-    ],
-)
-def test_the_manifest_counts_the_rows_and_the_rejections_per_reason(output, rejection_counts_expected):
-    """The manifest counts every row and the rejected rows per reason, and records the sha256 of the output before
-    it; an output without a ``rejected_by`` column has no rejections."""
+def test_the_manifest_counts_the_rows_and_the_dropped_rows_and_records_the_input_hash():
+    """The first stage's manifest has no input hash and drops no rows; a later stage's manifest counts the rows
+    that it dropped from its input, and records the input's sha256 and the sha256 of each report."""
     # --- arrange ----------------------
     first_manifest = PipelineStageManifest.from_stage_output(
         stage=ExampleNumbersStage(),
-        output=pl.DataFrame(),
+        table=pl.DataFrame({"function_id": ["n1", "n2", "n3"]}),
         output_sha256="ab" * 32,
+        report_sha256s={},
         input_manifest=None,
         started_at=datetime.datetime.now(datetime.UTC),
         duration_sec=0.0,
@@ -37,17 +26,17 @@ def test_the_manifest_counts_the_rows_and_the_rejections_per_reason(output, reje
 
     # --- act --------------------------
     manifest = PipelineStageManifest.from_stage_output(
-        stage=ExampleCheckedNumbersStage(),
-        output=output,
+        stage=ExampleSmallNumbersStage(),
+        table=pl.DataFrame({"function_id": ["n1", "n2"]}),
         output_sha256="cd" * 32,
+        report_sha256s={"large_numbers": "ef" * 32},
         input_manifest=first_manifest,
         started_at=datetime.datetime.now(datetime.UTC),
         duration_sec=0.0,
     )
 
     # --- assert -----------------------
-    assert first_manifest.input_sha256 is None
-    assert manifest.output_name == "s2_checked_numbers"
-    assert manifest.n_rows == output.height
-    assert manifest.rejection_counts == rejection_counts_expected
-    assert manifest.input_sha256 == "ab" * 32
+    assert (first_manifest.input_sha256, first_manifest.n_rows, first_manifest.n_dropped_rows) == (None, 3, 0)
+    assert (manifest.input_sha256, manifest.n_rows, manifest.n_dropped_rows) == ("ab" * 32, 2, 1)
+    assert manifest.output_name == "s2_small_numbers"
+    assert manifest.report_sha256s == {"large_numbers": "ef" * 32}
