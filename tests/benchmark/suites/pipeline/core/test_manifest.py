@@ -22,6 +22,7 @@ def test_the_manifest_counts_the_rows_and_the_dropped_rows_and_records_the_input
         input_manifest=None,
         started_at=datetime.datetime.now(datetime.UTC),
         duration_sec=0.0,
+        n_workers=1,
     )
 
     # --- act --------------------------
@@ -33,6 +34,7 @@ def test_the_manifest_counts_the_rows_and_the_dropped_rows_and_records_the_input
         input_manifest=first_manifest,
         started_at=datetime.datetime.now(datetime.UTC),
         duration_sec=0.0,
+        n_workers=1,
     )
 
     # --- assert -----------------------

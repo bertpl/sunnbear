@@ -8,6 +8,7 @@ from sunnbear._core.benchmark.suites.pipeline.stages.s1_candidate_generation imp
     CandidateGenerationStage,
 )
 from sunnbear._core.functions.core import FormulaRegistry
+from sunnbear._core.utils.worker_pool import WorkerPool
 
 
 @pytest.mark.parametrize(
@@ -30,7 +31,9 @@ def test_the_candidates_are_listed_formula_by_formula_in_the_given_order(formula
     ]
 
     # --- act --------------------------
-    output = CandidateGenerationStage(formulas).compute_output(pl.DataFrame())
+    output = CandidateGenerationStage(formulas).compute_output(
+        pl.DataFrame(), worker_pool=WorkerPool(n_workers=1, module_names=[])
+    )
 
     # --- assert -----------------------
     assert output.table.schema == pl.Schema(CANDIDATES_SCHEMA)

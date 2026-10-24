@@ -1,6 +1,6 @@
 """`run_benchmark` runs solvers on test functions over the Monte Carlo samples, writing the results to a run directory.
 
-A run is 1 `BenchmarkTask` per test function, run by a `BenchmarkWorkerPool` in worker processes. Each task's
+A run is 1 `BenchmarkTask` per test function, run by a `WorkerPool` in worker processes. Each task's
 results are written to a file of their own under the run directory's `staging/` as the task finishes, and a
 formula's results file is written as soon as all of the formula's test functions have finished.
 
@@ -19,12 +19,12 @@ import polars as pl
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS
 from sunnbear._core.functions.core import TestFunction
 from sunnbear._core.solvers.core import SolverConfig
+from sunnbear._core.utils.worker_pool import WorkerPool
 
 from .run_dir import BenchmarkRunDir
 from .run_info import BenchmarkRunInfo
 from .run_settings import BenchmarkRunSettings
 from .task import BenchmarkTask
-from .worker_pool import BenchmarkWorkerPool
 
 # The default size of a run's Monte Carlo tuple set, which is the number of samples per (solver, test function) pair.
 DEFAULT_MC_SIZE = 256
@@ -88,7 +88,11 @@ def run_benchmark(
         BenchmarkRunError: If `run_dir` holds a malformed run info, or a run with other inputs or versions.
     """
     run_settings = BenchmarkRunSettings(mc_size=mc_size, n_bisection_fevals=n_bisection_fevals, root_seed=root_seed)
-    worker_pool = BenchmarkWorkerPool.for_run(n_workers=n_workers, solver_configs=solver_configs, functions=functions)
+    worker_pool = WorkerPool.for_modules(
+        n_workers=n_workers,
+        module_names={config.declaring_module_name for config in solver_configs}
+        | {type(function.formula).__module__ for function in functions},
+    )
     benchmark_run_dir = BenchmarkRunDir(run_dir)
     run_info = benchmark_run_dir.store_or_check_run_info(
         BenchmarkRunInfo.for_current_inputs(
@@ -115,9 +119,10 @@ def run_benchmark(
     # results file left to write.
     for formula_id, n_functions in n_functions_by_formula_id.items():
         benchmark_run_dir.write_formula_results_if_all_staged(formula_id, n_functions)
-    for (formula_id, function_idx), results in worker_pool.run(tasks):
-        benchmark_run_dir.stage_function_results(formula_id, function_idx, results)
-        benchmark_run_dir.write_formula_results_if_all_staged(formula_id, n_functions_by_formula_id[formula_id])
+    with worker_pool:
+        for (formula_id, function_idx), results in worker_pool.run(tasks):
+            benchmark_run_dir.stage_function_results(formula_id, function_idx, results)
+            benchmark_run_dir.write_formula_results_if_all_staged(formula_id, n_functions_by_formula_id[formula_id])
 
     benchmark_run_dir.mark_finished(run_info)
 

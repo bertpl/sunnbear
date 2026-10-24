@@ -49,12 +49,13 @@ class PipelineWorkspace:
         input_manifest: PipelineStageManifest | None,
         started_at: datetime.datetime,
         duration_sec: float,
+        n_workers: int,
     ) -> PipelineStageManifest:
         """Write the output table, reports and manifest of `stage`, replacing earlier ones, and return the manifest.
 
         The reports of an earlier run of `stage` are removed first, so the reports directory of `stage` holds exactly
         the reports in `output`. `input_manifest` is the manifest of the stage before `stage`, or ``None`` for the
-        first stage.
+        first stage; `n_workers` is the number of workers of the run's worker pool.
         """
         reports_dir = self.path / _REPORTS_DIR_NAME / stage.output_name
         shutil.rmtree(reports_dir, ignore_errors=True)
@@ -69,6 +70,7 @@ class PipelineWorkspace:
             input_manifest=input_manifest,
             started_at=started_at,
             duration_sec=duration_sec,
+            n_workers=n_workers,
         )
         self._write_manifest(manifest)
         return manifest

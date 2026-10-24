@@ -7,6 +7,8 @@ from typing import ClassVar
 
 import polars as pl
 
+from sunnbear._core.utils.worker_pool import WorkerPool
+
 
 # ==================================================================================================
 #  PipelineStage
@@ -28,11 +30,13 @@ class PipelineStage(ABC):
     output_name: ClassVar[str]
 
     @abstractmethod
-    def compute_output(self, previous_table: pl.DataFrame) -> "PipelineStageOutput":
+    def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> "PipelineStageOutput":
         """Return the stage's output table, which extends `previous_table`, and the stage's reports.
 
         Args:
             previous_table: The output table of the stage before this one; an empty table for the first stage.
+            worker_pool: The worker pool of the run, open for the whole run, in which the stage may run tasks. The
+                stage's output must not depend on the pool's number of workers.
         """
 
 

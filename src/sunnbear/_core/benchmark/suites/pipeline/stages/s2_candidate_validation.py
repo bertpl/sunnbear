@@ -25,6 +25,7 @@ from enum import StrEnum
 import polars as pl
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageOutput
+from sunnbear._core.utils.worker_pool import WorkerPool
 
 from .s1_candidate_generation import CANDIDATES_SCHEMA
 
@@ -55,11 +56,12 @@ class CandidateValidationStage(PipelineStage):
 
     output_name = "s2_valid_candidates"
 
-    def compute_output(self, previous_table: pl.DataFrame) -> PipelineStageOutput:
+    def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
         """Return the valid candidates, and the report ``rejected_candidates`` of the others.
 
         Args:
             previous_table: The output table of candidate generation, with the columns of `CANDIDATES_SCHEMA`.
+            worker_pool: The worker pool of the run, which this stage does not use.
         """
         bound_to_width_ratio = pl.max_horizontal(pl.col("a").abs(), pl.col("b").abs()) / (pl.col("b") - pl.col("a"))
         is_rejected = bound_to_width_ratio > MAX_BOUND_TO_WIDTH_RATIO
