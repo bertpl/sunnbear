@@ -9,7 +9,6 @@ The workspace directory holds, for each stage, files named after the stage's `Pi
 Every file is written under a temporary name and then renamed, so a file under its final name is always complete.
 """
 
-import datetime
 import hashlib
 import io
 import json
@@ -18,7 +17,7 @@ from pathlib import Path
 
 import polars as pl
 
-from .manifest import PipelineStageManifest
+from .manifest import PipelineStageExecutionInfo, PipelineStageManifest
 from .stage import PipelineStage, PipelineStageOutput
 
 _TABLE_FILE_SUFFIX = ".parquet"
@@ -47,8 +46,7 @@ class PipelineWorkspace:
         stage: PipelineStage,
         output: PipelineStageOutput,
         input_manifest: PipelineStageManifest | None,
-        started_at: datetime.datetime,
-        duration_sec: float,
+        execution_info: PipelineStageExecutionInfo,
     ) -> PipelineStageManifest:
         """Write the output table, reports and manifest of `stage`, replacing earlier ones, and return the manifest.
 
@@ -67,8 +65,7 @@ class PipelineWorkspace:
                 for report_name, report in output.reports.items()
             },
             input_manifest=input_manifest,
-            started_at=started_at,
-            duration_sec=duration_sec,
+            execution_info=execution_info,
         )
         self._write_manifest(manifest)
         return manifest

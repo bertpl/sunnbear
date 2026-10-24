@@ -9,6 +9,7 @@ from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation imp
     REJECTED_CANDIDATES_SCHEMA,
     CandidateValidationStage,
 )
+from sunnbear._core.utils.worker_pool import WorkerPool
 
 _FUNCTION_ID = "f2.1.1[p1=0.2]"
 
@@ -35,7 +36,7 @@ def test_the_bound_to_width_ratio_check_rejects_an_interval_whose_ratio_exceeds_
     candidates = pl.DataFrame({"function_id": [_FUNCTION_ID], "a": [a], "b": [b]}, schema=CANDIDATES_SCHEMA)
 
     # --- act --------------------------
-    output = CandidateValidationStage().compute_output(candidates)
+    output = CandidateValidationStage().compute_output(candidates, worker_pool=WorkerPool(n_workers=1))
 
     # --- assert -----------------------
     rejected_candidates = output.reports["rejected_candidates"]

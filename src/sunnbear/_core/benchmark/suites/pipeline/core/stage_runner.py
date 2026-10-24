@@ -6,7 +6,9 @@ from collections.abc import Sequence
 
 import polars as pl
 
-from .manifest import PipelineStageManifest
+from sunnbear._core.utils.worker_pool import WorkerPool
+
+from .manifest import PipelineStageExecutionInfo, PipelineStageManifest
 from .stage import PipelineStage
 from .workspace import PipelineWorkspace
 
@@ -14,10 +16,14 @@ from .workspace import PipelineWorkspace
 # ==================================================================================================
 #  run_stages
 # ==================================================================================================
-def run_stages(workspace: PipelineWorkspace, stages: Sequence[PipelineStage]) -> tuple[PipelineStageManifest, ...]:
+def run_stages(
+    workspace: PipelineWorkspace, stages: Sequence[PipelineStage], *, worker_pool: WorkerPool
+) -> tuple[PipelineStageManifest, ...]:
     """Run `stages` in order, each on the output table of the stage before it, and have `workspace` write each output.
 
-    The first stage receives an empty table.
+    The first stage receives an empty table. Every stage receives `worker_pool`, in which it may run tasks, and its
+    manifest records the pool's number of workers. A `worker_pool` with more than 1 worker must be inside its ``with``
+    block, which `run_stages` does not open.
 
     Returns:
         The manifest of each stage, in run order.
@@ -34,7 +40,7 @@ def run_stages(workspace: PipelineWorkspace, stages: Sequence[PipelineStage]) ->
         # --- output -----------------------------
         started_at = datetime.datetime.now(datetime.UTC)
         t_start = time.perf_counter()
-        output = stage.compute_output(previous_table)
+        output = stage.compute_output(previous_table, worker_pool=worker_pool)
         duration_sec = time.perf_counter() - t_start
         _check_chain_rules(stage, previous_table, output.table)
 
@@ -43,8 +49,9 @@ def run_stages(workspace: PipelineWorkspace, stages: Sequence[PipelineStage]) ->
             stage=stage,
             output=output,
             input_manifest=previous_manifest,
-            started_at=started_at,
-            duration_sec=duration_sec,
+            execution_info=PipelineStageExecutionInfo(
+                started_at=started_at, duration_sec=duration_sec, n_workers=worker_pool.n_workers
+            ),
         )
         manifests.append(manifest)
         previous_table, previous_manifest = output.table, manifest

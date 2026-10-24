@@ -3,7 +3,8 @@
 - each stage runs on the output table of the stage before it, and its output table, reports and manifest are
   written into the workspace;
 - a rerun replaces them;
-- a stage that breaks a rule of the chain stops the run before its output is written.
+- a stage that breaks a rule of the chain stops the run before its output is written;
+- a stage that runs tasks in the worker pool gives the same output with 1 or 2 workers.
 """
 
 import hashlib
@@ -14,6 +15,7 @@ import pytest
 from sunnbear._core.benchmark.suites.pipeline.core.manifest import PipelineStageManifest
 from sunnbear._core.benchmark.suites.pipeline.core.stage_runner import run_stages
 from sunnbear._core.benchmark.suites.pipeline.core.workspace import PipelineWorkspace
+from sunnbear._core.utils.worker_pool import WorkerPool
 
 from .example_stages import (
     ExampleColumnDroppingStage,
@@ -22,7 +24,11 @@ from .example_stages import (
     ExampleRowAddingStage,
     ExampleRowDuplicatingStage,
     ExampleSmallNumbersStage,
+    ExampleSquaresStage,
 )
+
+# A pool with 1 worker runs its tasks in this process and needs no with block.
+_IN_PROCESS_WORKER_POOL = WorkerPool(n_workers=1)
 
 # These are the files that a run of the 2 stages that follow the rules writes, relative to the workspace directory.
 _WORKSPACE_FILES = [
@@ -38,7 +44,11 @@ def test_each_stage_runs_on_the_table_before_it_and_its_files_are_written(tmp_pa
     """Each stage's output table extends the table before it; the manifest matches the bytes of the output table and
     of each report, and records the output table before it."""
     # --- act --------------------------
-    manifests = run_stages(PipelineWorkspace(tmp_path), [ExampleNumbersStage(), ExampleSmallNumbersStage()])
+    manifests = run_stages(
+        PipelineWorkspace(tmp_path),
+        [ExampleNumbersStage(), ExampleSmallNumbersStage()],
+        worker_pool=_IN_PROCESS_WORKER_POOL,
+    )
 
     # --- assert -----------------------
     numbers_manifest, small_numbers_manifest = manifests
@@ -61,10 +71,12 @@ def test_a_rerun_replaces_the_files_and_leaves_no_temporary_files(tmp_path):
     """A second run into the same workspace replaces every file of the first, and leaves only the final files."""
     # --- arrange ----------------------
     workspace = PipelineWorkspace(tmp_path)
-    run_stages(workspace, [ExampleNumbersStage(), ExampleSmallNumbersStage()])
+    run_stages(workspace, [ExampleNumbersStage(), ExampleSmallNumbersStage()], worker_pool=_IN_PROCESS_WORKER_POOL)
 
     # --- act --------------------------
-    second_manifests = run_stages(workspace, [ExampleNumbersStage(), ExampleSmallNumbersStage()])
+    second_manifests = run_stages(
+        workspace, [ExampleNumbersStage(), ExampleSmallNumbersStage()], worker_pool=_IN_PROCESS_WORKER_POOL
+    )
 
     # --- assert -----------------------
     assert [
@@ -100,5 +112,27 @@ def test_a_stage_that_breaks_a_rule_of_the_chain_stops_the_run(tmp_path, stages,
     and its output table is not written."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=message):
-        run_stages(PipelineWorkspace(tmp_path), stages)
+        run_stages(PipelineWorkspace(tmp_path), stages, worker_pool=_IN_PROCESS_WORKER_POOL)
     assert not (tmp_path / f"{stages[-1].output_name}.parquet").exists()
+
+
+def test_a_stage_that_runs_tasks_in_the_worker_pool_gives_the_same_output_with_1_or_2_workers(tmp_path):
+    """A stage whose tasks run in this process or in 2 workers writes the same output file; each manifest records its
+    run's number of workers."""
+    # --- act --------------------------
+    squares_manifests = []
+    for n_workers in (1, 2):
+        with WorkerPool(n_workers=n_workers) as worker_pool:
+            manifests = run_stages(
+                PipelineWorkspace(tmp_path / f"{n_workers}_workers"),
+                [ExampleNumbersStage(), ExampleSquaresStage()],
+                worker_pool=worker_pool,
+            )
+        squares_manifests.append(manifests[-1])
+
+    # --- assert -----------------------
+    in_process_manifest, worker_processes_manifest = squares_manifests
+    assert worker_processes_manifest.output_sha256 == in_process_manifest.output_sha256
+    assert (in_process_manifest.n_workers, worker_processes_manifest.n_workers) == (1, 2)
+    squares = pl.read_parquet(tmp_path / "2_workers" / "s2_squares.parquet")
+    assert squares["squared_x"].to_list() == [1.0, 4.0, 9.0]

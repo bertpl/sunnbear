@@ -2,6 +2,7 @@
 resumes a crashed run, and refuses to resume another run.
 """
 
+import importlib
 from pathlib import Path
 
 import polars as pl
@@ -16,6 +17,8 @@ from sunnbear._core.benchmark.runner.task import BenchmarkTask
 from sunnbear.solvers import SolverConfigRegistry
 
 MC_SIZE = 32
+
+_EXTERNAL_SOLVER_CONFIG_MODULE_NAME = f"{__name__.rpartition('.')[0]}.external_solver_config"
 
 
 # ==================================================================================================
@@ -91,6 +94,22 @@ def test_a_run_in_worker_processes_gives_the_results_of_a_run_in_this_process(fi
     # --- assert -----------------------
     assert sorted(path.name for path in tmp_path.iterdir()) == sorted(path.name for path in finished_run_dir.iterdir())
     assert _results_without_wall_time(tmp_path).equals(_results_without_wall_time(finished_run_dir))
+
+
+@pytest.mark.usefixtures("isolated_solver_config_registry")
+def test_a_run_in_worker_processes_imports_the_module_that_defines_a_solver_config(tmp_path):
+    """A solver config that no sunnbear module defines runs in a worker, which imports the config's module."""
+    # --- arrange ----------------------
+    importlib.import_module(_EXTERNAL_SOLVER_CONFIG_MODULE_NAME)
+    solver_configs = [SolverConfigRegistry.config_from_id("external_bisection")]
+
+    # --- act --------------------------
+    run_benchmark(**_run_inputs(tmp_path, solver_configs=solver_configs, n_workers=2))
+
+    # --- assert -----------------------
+    results = load_results(tmp_path).collect()
+    assert results["solver_id"].unique().to_list() == ["external_bisection"]
+    assert results["is_correct"].all()
 
 
 def test_resuming_a_finished_run_changes_nothing(finished_run_dir, monkeypatch):

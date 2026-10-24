@@ -1,11 +1,12 @@
 """``python -m sunnbear._core.benchmark.suites.pipeline`` runs the pipeline over the shipped formulas into the
-``--workspace`` directory, and refuses to run without one."""
+``--workspace`` directory with ``--n-workers`` workers, and refuses to run without a workspace."""
 
 import runpy
 import sys
 
 import pytest
 
+from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageManifest
 from sunnbear._core.benchmark.suites.pipeline.stages import CandidateGenerationStage, CandidateValidationStage
 
 _PIPELINE_PACKAGE = "sunnbear._core.benchmark.suites.pipeline"
@@ -24,14 +25,20 @@ def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> N
 
 
 def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeypatch, capsys):
-    """The command writes every stage's output into the workspace and prints 1 line per stage, in run order."""
+    """The command writes every stage's output into the workspace with the given number of workers, and prints 1 line
+    per stage, in run order."""
     # --- act --------------------------
-    _run_pipeline_command(monkeypatch, ["--workspace", str(tmp_path)])
+    _run_pipeline_command(monkeypatch, ["--workspace", str(tmp_path), "--n-workers", "3"])
 
     # --- assert -----------------------
     printed_output_names = [line.split(":")[0] for line in capsys.readouterr().out.splitlines()]
     assert printed_output_names == _OUTPUT_NAMES
     assert sorted(path.name for path in tmp_path.glob("*.parquet")) == [f"{name}.parquet" for name in _OUTPUT_NAMES]
+    manifests = [
+        PipelineStageManifest.model_validate_json((tmp_path / "manifests" / f"{name}.json").read_text())
+        for name in _OUTPUT_NAMES
+    ]
+    assert [manifest.n_workers for manifest in manifests] == [3, 3]
 
 
 def test_the_command_requires_a_workspace(monkeypatch, capsys):

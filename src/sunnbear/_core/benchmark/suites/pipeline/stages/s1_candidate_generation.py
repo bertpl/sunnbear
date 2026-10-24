@@ -15,6 +15,7 @@ import polars as pl
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageOutput
 from sunnbear._core.functions.core import Formula
+from sunnbear._core.utils.worker_pool import WorkerPool
 
 CANDIDATES_SCHEMA: dict[str, pl.DataType] = {
     "function_id": pl.String(),
@@ -35,7 +36,7 @@ class CandidateGenerationStage(PipelineStage):
         """Create the stage for `formulas`, the corpus of the pipeline run."""
         self.formulas = formulas
 
-    def compute_output(self, previous_table: pl.DataFrame) -> PipelineStageOutput:
+    def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
         """Return every candidate of every formula: its id and its interval bounds ``a`` and ``b``.
 
         As the first stage, it receives an empty `previous_table`.
