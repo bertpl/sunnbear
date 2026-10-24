@@ -7,6 +7,7 @@ survey.
 
 import ast
 import inspect
+import math
 import re
 import sys
 import textwrap
@@ -312,18 +313,27 @@ def test_category_1_formula_applies_c_as_its_rule_says(formula, c, script_module
 
     The expected value evaluates the formula at ``c = 0``, which repeats the formula's own float arithmetic, so the
     value at ``c`` equals it exactly; this holds for ``C_ADDS_TO_F`` because such a formula adds ``c`` as its last
-    operation. The x-values lie in the interval, and so do their shifted values where ``c`` shifts x.
+    operation, and for ``C_SCALES_X`` because the test scales x with the formula's own operations.
+
+    The x-value lies at 0.6 of the interval, in log scale for ``C_SCALES_X``, so that its shifted or scaled values stay
+    in the interval.
     """
     for candidate in formula.build_all_candidates():
         # --- arrange ----------------------
         modification_type_enum = script_modules["modified_formulas"].ModificationType
+        modification_type = _modification_type(candidate, script_modules)
         c_scale = PublishedTestFunctions.c_scale(candidate.a, candidate.b)
-        x = candidate.a + 0.6 * (candidate.b - candidate.a)
+        if modification_type is modification_type_enum.C_SCALES_X:
+            x = candidate.a * (candidate.b / candidate.a) ** 0.6
+        else:
+            x = candidate.a + 0.6 * (candidate.b - candidate.a)
 
         # --- act --------------------------
         value = candidate.xc_fun(x, c)
-        if _modification_type(candidate, script_modules) is modification_type_enum.C_ADDS_TO_F:
+        if modification_type is modification_type_enum.C_ADDS_TO_F:
             expected = candidate.xc_fun(x, 0.0) + c
+        elif modification_type is modification_type_enum.C_SCALES_X:
+            expected = candidate.xc_fun(x * math.exp(-c * math.log(candidate.b / candidate.a)), 0.0)
         else:
             expected = candidate.xc_fun(x - c_scale * c, 0.0)
 
@@ -337,8 +347,8 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, scrip
 
     The test reads the factor from the code of ``parametrized_fun``, because a test that compares shifted values
     cannot see a number that is 1 float step off, such as ``1.9999999999999996`` for ``2.0``: the shifted x-values
-    round to the same float. A test function with ``modified = 1`` whose `ModificationType` is ``C_ADDS_TO_F`` adds
-    ``c`` with no factor, so the test skips it.
+    round to the same float. A test function with ``modified = 1`` whose `ModificationType` is ``C_ADDS_TO_F`` or
+    ``C_SCALES_X`` applies ``c`` with no factor ``c_scale``, so the test skips it.
     """
     # --- arrange ----------------------
     tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))
@@ -346,7 +356,8 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, scrip
     shifting_candidates = [
         candidate
         for candidate in formula.build_all_candidates()
-        if _modification_type(candidate, script_modules) is not modification_type_enum.C_ADDS_TO_F
+        if _modification_type(candidate, script_modules)
+        not in (modification_type_enum.C_ADDS_TO_F, modification_type_enum.C_SCALES_X)
     ]
 
     # --- act --------------------------
