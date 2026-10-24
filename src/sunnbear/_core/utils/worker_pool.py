@@ -1,23 +1,17 @@
 """`WorkerPool` runs tasks in worker processes, or in this process when it has 1 worker.
 
-A task is any picklable object with a `run` method (`WorkerTask`).
-
-A task may look up a class by id in a registry, such as the class of a formula or a solver config, and a registry holds
-only the classes of the modules that its process has imported.
-
-A new worker has imported only what unpickling its first task needs, so every worker first imports the pool's
-`module_names`.
+A task is any picklable object with a `run` method (`WorkerTask`). A pool may also give each worker a function to
+run before its first task, its worker initializer, such as the one of `worker_pool_for_modules`, which imports the
+modules that define the classes that the tasks look up.
 
 Workers start with the "spawn" method on every platform: a worker then never inherits the state of this
 process's threads, e.g. locks held by numba or polars, and a pool behaves the same on Linux, macOS and Windows.
 """
 
-import importlib
 import math
 import multiprocessing
 import os
-import sys
-from collections.abc import Callable, Collection, Hashable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Hashable, Iterator, Mapping, Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed, wait
 from typing import Protocol, Self
 
@@ -41,16 +35,22 @@ class WorkerPool:
     A caller that calls `run` several times inside 1 ``with`` block therefore starts the pool's workers once.
     """
 
-    def __init__(self, *, n_workers: int, module_names: Sequence[str]) -> None:
-        """Hold the worker count and the names of the modules to import in each worker before its first task.
+    def __init__(self, *, n_workers: int | None, worker_initializer: Callable[[], object] | None = None) -> None:
+        """Hold the worker count and the function that each worker runs before its first task.
+
+        Args:
+            n_workers: The number of worker processes; ``None`` for 1 per CPU.
+            worker_initializer: A picklable function that each worker process calls once, before its first task;
+                ``None`` for none. With 1 worker, the tasks run in this process, which never calls it.
 
         Raises:
             ValueError: If `n_workers` is below 1.
         """
+        n_workers = n_workers if n_workers is not None else (os.cpu_count() or 1)
         if n_workers < 1:
             raise ValueError(f"n_workers must be at least 1 (got {n_workers}).")
         self.n_workers = n_workers
-        self.module_names = tuple(module_names)
+        self.worker_initializer = worker_initializer
         self._executor: ProcessPoolExecutor | None = None
 
     # --------------------------------------------------------------------------
@@ -64,8 +64,7 @@ class WorkerPool:
             self._executor = ProcessPoolExecutor(
                 max_workers=self.n_workers,
                 mp_context=multiprocessing.get_context("spawn"),
-                initializer=self._import_modules,
-                initargs=(self.module_names,),
+                initializer=self.worker_initializer,
             )
         return self
 
@@ -135,40 +134,6 @@ class WorkerPool:
         if batch:
             batches.append(batch)
         return batches
-
-    # --------------------------------------------------------------------------
-    #  Helpers
-    # --------------------------------------------------------------------------
-    @staticmethod
-    def _import_modules(module_names: Sequence[str]) -> None:
-        """Import every module in `module_names`, which registers the classes that they define."""
-        for module_name in module_names:
-            importlib.import_module(module_name)
-
-    # --------------------------------------------------------------------------
-    #  Factory methods
-    # --------------------------------------------------------------------------
-    @classmethod
-    def for_modules(cls, *, n_workers: int | None, module_names: Collection[str]) -> Self:
-        """Return a pool whose workers import `module_names`, with 1 worker per CPU for an `n_workers` of ``None``.
-
-        The main module is left out of the modules to import: with "spawn", every worker runs the main script again,
-        which defines the script's classes in that worker.
-
-        A class defined in an interactive session has no module file that a worker could import, so a `__main__`
-        module of an interactive session allows only 1 worker.
-
-        Raises:
-            ValueError: If `n_workers` is below 1, or is above 1 while `module_names` holds the `__main__` module
-                of an interactive session.
-        """
-        n_workers = n_workers if n_workers is not None else (os.cpu_count() or 1)
-        if n_workers > 1 and "__main__" in module_names and not hasattr(sys.modules["__main__"], "__file__"):
-            raise ValueError(
-                "A worker process cannot import a class that is defined in an interactive session; "
-                "define the class in a module, or pass n_workers=1."
-            )
-        return cls(n_workers=n_workers, module_names=sorted(set(module_names) - {"__main__"}))
 
 
 # ==================================================================================================

@@ -1,19 +1,23 @@
-"""`WorkerPool` runs tasks in this process for 1 worker, or in worker processes that start when the first tasks run and
-serve every later call of `run` in the same with block; it splits items into batches without splitting the items that
-share a key.
+"""`WorkerPool` runs tasks in this process for 1 worker, or in worker processes that start when the first tasks run,
+run the pool's worker initializer first, and serve every later call of `run` in the same with block; it splits items
+into batches without splitting the items that share a key.
 """
 
 import multiprocessing
 import os
-import sys
-import types
 from dataclasses import dataclass
 
 import pytest
 
 from sunnbear._core.utils.worker_pool import WorkerPool
 
-_IMPORTED_MODULE_NAME = f"{__name__.rpartition('.')[0]}.worker_pool_imported_module"
+# A worker initializer marks the worker process that runs it here.
+_WORKER_STATE = {"is_initialized": False}
+
+
+def mark_initialized() -> None:
+    """Mark the process that calls it as initialized, in `_WORKER_STATE`."""
+    _WORKER_STATE["is_initialized"] = True
 
 
 # ==================================================================================================
@@ -36,13 +40,11 @@ class FailingTask:
 
 
 @dataclass(frozen=True)
-class IsModuleImportedTask:
-    """`IsModuleImportedTask` returns whether the process that runs it has imported `module_name`."""
-
-    module_name: str
+class IsInitializedTask:
+    """`IsInitializedTask` returns whether a worker initializer has marked its process as initialized."""
 
     def run(self) -> bool:
-        return self.module_name in sys.modules
+        return _WORKER_STATE["is_initialized"]
 
 
 # ==================================================================================================
@@ -51,7 +53,7 @@ class IsModuleImportedTask:
 def test_a_pool_with_1_worker_runs_the_tasks_in_this_process_in_order():
     """With 1 worker, the tasks run in this process, in the order of the mapping, with or without a with block."""
     # --- arrange ----------------------
-    worker_pool = WorkerPool(n_workers=1, module_names=[])
+    worker_pool = WorkerPool(n_workers=1)
 
     # --- act --------------------------
     results = list(worker_pool.run({"b": ProcessIdTask(), "a": ProcessIdTask()}))
@@ -64,7 +66,7 @@ def test_a_pool_with_workers_runs_the_tasks_in_worker_processes_that_its_runs_sh
     """With 2 workers, each task's key comes with its result, and 2 calls of `run` in 1 with block use at most 2
     processes."""
     # --- act --------------------------
-    with WorkerPool(n_workers=2, module_names=[]) as worker_pool:
+    with WorkerPool(n_workers=2) as worker_pool:
         first_process_ids = dict(worker_pool.run({key: ProcessIdTask() for key in range(4)}))
         second_process_ids = dict(worker_pool.run({key: ProcessIdTask() for key in range(4, 8)}))
 
@@ -78,52 +80,40 @@ def test_a_pool_with_workers_runs_the_tasks_in_worker_processes_that_its_runs_sh
 def test_workers_start_with_the_first_tasks_and_stop_at_the_end_of_the_with_block():
     """No worker process exists before the first tasks run, and none remains after the with block."""
     # --- act / assert -----------------
-    with WorkerPool(n_workers=2, module_names=[]) as worker_pool:
+    with WorkerPool(n_workers=2) as worker_pool:
         assert not multiprocessing.active_children()
         list(worker_pool.run({0: ProcessIdTask()}))
         assert multiprocessing.active_children()
     assert not multiprocessing.active_children()
 
 
-@pytest.mark.parametrize("module_names, is_imported_expected", [([], False), ([_IMPORTED_MODULE_NAME], True)])
-def test_each_worker_imports_the_named_modules(module_names, is_imported_expected):
-    """A worker imports the pool's `module_names` before its first task; a worker of a pool that names none
-    lacks the module."""
+@pytest.mark.parametrize("worker_initializer, is_initialized_expected", [(None, False), (mark_initialized, True)])
+def test_each_worker_runs_the_worker_initializer_before_its_first_task(worker_initializer, is_initialized_expected):
+    """A worker runs the pool's worker initializer before its first task; a worker of a pool without one does not."""
     # --- act --------------------------
-    with WorkerPool(n_workers=2, module_names=module_names) as worker_pool:
-        [(_, is_imported)] = list(worker_pool.run({0: IsModuleImportedTask(_IMPORTED_MODULE_NAME)}))
+    with WorkerPool(n_workers=2, worker_initializer=worker_initializer) as worker_pool:
+        [(_, is_initialized)] = list(worker_pool.run({0: IsInitializedTask()}))
 
     # --- assert -----------------------
-    assert is_imported == is_imported_expected
+    assert is_initialized == is_initialized_expected
 
 
 @pytest.mark.parametrize("n_workers", [1, 2])
 def test_a_failing_task_raises_its_exception(n_workers):
     """The exception of a failing task is raised from `run`, in this process or in a worker."""
     # --- act / assert -----------------
-    with WorkerPool(n_workers=n_workers, module_names=[]) as worker_pool, pytest.raises(ValueError, match="failed"):
+    with WorkerPool(n_workers=n_workers) as worker_pool, pytest.raises(ValueError, match="failed"):
         list(worker_pool.run({0: ProcessIdTask(), 1: FailingTask()}))
 
 
 def test_a_pool_with_workers_runs_no_task_outside_its_with_block():
     """A pool with 2 workers raises `RuntimeError` when it runs tasks outside its with block."""
     # --- arrange ----------------------
-    worker_pool = WorkerPool(n_workers=2, module_names=[])
+    worker_pool = WorkerPool(n_workers=2)
 
     # --- act / assert -----------------
     with pytest.raises(RuntimeError, match="inside its with block"):
         list(worker_pool.run({0: ProcessIdTask()}))
-
-
-def test_importing_the_modules_registers_their_classes():
-    """`_import_modules`, which each worker runs first, imports every named module.
-
-    The test calls it in this process, because coverage does not measure the code that runs in a worker process."""
-    # --- act --------------------------
-    WorkerPool._import_modules([_IMPORTED_MODULE_NAME])
-
-    # --- assert -----------------------
-    assert _IMPORTED_MODULE_NAME in sys.modules
 
 
 # ==================================================================================================
@@ -147,7 +137,7 @@ def test_items_are_split_into_batches_of_whole_groups(items, n_workers, batches_
     """`split_into_batches` keeps the items that share a first letter in 1 batch, in about `TARGET_BATCHES_PER_WORKER`
     batches per worker."""
     # --- arrange ----------------------
-    worker_pool = WorkerPool(n_workers=n_workers, module_names=[])
+    worker_pool = WorkerPool(n_workers=n_workers)
 
     # --- act --------------------------
     batches = worker_pool.split_into_batches(items, group_key=lambda item: item[0])
@@ -157,36 +147,19 @@ def test_items_are_split_into_batches_of_whole_groups(items, n_workers, batches_
 
 
 # ==================================================================================================
-#  for_modules
+#  Worker count
 # ==================================================================================================
-def test_a_pool_for_modules_has_1_worker_per_cpu_by_default_and_leaves_out_the_main_module(monkeypatch):
-    """An `n_workers` of None gives 1 worker per CPU; the main module of a script is not among the modules to import."""
-    # --- arrange ----------------------
-    script_main_module = types.ModuleType("__main__")
-    script_main_module.__file__ = "script.py"
-    monkeypatch.setitem(sys.modules, "__main__", script_main_module)
-
+def test_a_pool_has_1_worker_per_cpu_by_default():
+    """An `n_workers` of None gives 1 worker per CPU."""
     # --- act --------------------------
-    worker_pool = WorkerPool.for_modules(n_workers=None, module_names={"__main__", "b_module", "a_module"})
+    worker_pool = WorkerPool(n_workers=None)
 
     # --- assert -----------------------
     assert worker_pool.n_workers == (os.cpu_count() or 1)
-    assert worker_pool.module_names == ("a_module", "b_module")
-
-
-def test_a_pool_with_workers_refuses_a_main_module_of_an_interactive_session(monkeypatch):
-    """A `__main__` module without a file cannot be imported by a worker, so only 1 worker is allowed."""
-    # --- arrange ----------------------
-    monkeypatch.setitem(sys.modules, "__main__", types.ModuleType("__main__"))
-
-    # --- act / assert -----------------
-    WorkerPool.for_modules(n_workers=1, module_names={"__main__"})
-    with pytest.raises(ValueError, match="defined in an interactive session"):
-        WorkerPool.for_modules(n_workers=2, module_names={"__main__"})
 
 
 def test_a_pool_refuses_fewer_than_1_worker():
     """An `n_workers` below 1 raises `ValueError`."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="n_workers must be at least 1"):
-        WorkerPool(n_workers=0, module_names=[])
+        WorkerPool(n_workers=0)

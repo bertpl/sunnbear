@@ -28,7 +28,7 @@ from .example_stages import (
 )
 
 # A pool with 1 worker runs its tasks in this process and needs no with block.
-_IN_PROCESS_WORKER_POOL = WorkerPool(n_workers=1, module_names=[])
+_IN_PROCESS_WORKER_POOL = WorkerPool(n_workers=1)
 
 # These are the files that a run of the 2 stages that follow the rules writes, relative to the workspace directory.
 _WORKSPACE_FILES = [
@@ -122,7 +122,7 @@ def test_a_stage_that_runs_tasks_in_the_worker_pool_gives_the_same_output_with_1
     # --- act --------------------------
     squares_manifests = []
     for n_workers in (1, 2):
-        with WorkerPool(n_workers=n_workers, module_names=[]) as worker_pool:
+        with WorkerPool(n_workers=n_workers) as worker_pool:
             manifests = run_stages(
                 PipelineWorkspace(tmp_path / f"{n_workers}_workers"),
                 [ExampleNumbersStage(), ExampleSquaresStage()],

@@ -36,7 +36,7 @@ def test_the_bound_to_width_ratio_check_rejects_an_interval_whose_ratio_exceeds_
     candidates = pl.DataFrame({"function_id": [_FUNCTION_ID], "a": [a], "b": [b]}, schema=CANDIDATES_SCHEMA)
 
     # --- act --------------------------
-    output = CandidateValidationStage().compute_output(candidates, worker_pool=WorkerPool(n_workers=1, module_names=[]))
+    output = CandidateValidationStage().compute_output(candidates, worker_pool=WorkerPool(n_workers=1))
 
     # --- assert -----------------------
     rejected_candidates = output.reports["rejected_candidates"]

@@ -19,7 +19,7 @@ import polars as pl
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS
 from sunnbear._core.functions.core import TestFunction
 from sunnbear._core.solvers.core import SolverConfig
-from sunnbear._core.utils.worker_pool import WorkerPool
+from sunnbear._core.utils.module_imports import worker_pool_for_modules
 
 from .run_dir import BenchmarkRunDir
 from .run_info import BenchmarkRunInfo
@@ -88,7 +88,7 @@ def run_benchmark(
         BenchmarkRunError: If `run_dir` holds a malformed run info, or a run with other inputs or versions.
     """
     run_settings = BenchmarkRunSettings(mc_size=mc_size, n_bisection_fevals=n_bisection_fevals, root_seed=root_seed)
-    worker_pool = WorkerPool.for_modules(
+    worker_pool = worker_pool_for_modules(
         n_workers=n_workers,
         module_names={config.declaring_module_name for config in solver_configs}
         | {type(function.formula).__module__ for function in functions},

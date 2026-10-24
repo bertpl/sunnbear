@@ -1,1 +1,1 @@
-"""This module defines nothing: a test of `WorkerPool` names it, to check that each worker imports the named modules."""
+"""This module defines nothing: a test of `worker_pool_for_modules` names it, to check that each worker imports it."""

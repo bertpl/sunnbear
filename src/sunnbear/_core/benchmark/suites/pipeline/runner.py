@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from sunnbear._core.functions.core import Formula
-from sunnbear._core.utils.worker_pool import WorkerPool
+from sunnbear._core.utils.module_imports import worker_pool_for_modules
 
 from .core import PipelineStageManifest, PipelineWorkspace, run_stages
 from .stages import CandidateGenerationStage, CandidateValidationStage
@@ -36,5 +36,5 @@ def run_pipeline(
     """
     stages = [CandidateGenerationStage(formulas), CandidateValidationStage()]
     module_names = {type(formula).__module__ for formula in formulas}
-    with WorkerPool.for_modules(n_workers=n_workers, module_names=module_names) as worker_pool:
+    with worker_pool_for_modules(n_workers=n_workers, module_names=module_names) as worker_pool:
         return run_stages(PipelineWorkspace(workspace_dir), stages, worker_pool=worker_pool)

@@ -31,9 +31,7 @@ def test_the_candidates_are_listed_formula_by_formula_in_the_given_order(formula
     ]
 
     # --- act --------------------------
-    output = CandidateGenerationStage(formulas).compute_output(
-        pl.DataFrame(), worker_pool=WorkerPool(n_workers=1, module_names=[])
-    )
+    output = CandidateGenerationStage(formulas).compute_output(pl.DataFrame(), worker_pool=WorkerPool(n_workers=1))
 
     # --- assert -----------------------
     assert output.table.schema == pl.Schema(CANDIDATES_SCHEMA)
