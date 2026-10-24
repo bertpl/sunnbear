@@ -1,8 +1,9 @@
 """This module holds a formula of GSL (2024).
 
 The formula comes from the row with the key ``func3`` in the survey of published test problems. The module generator,
-`scripts/literature_test_problems/formula_modules.py`, does not write the formula's modified version. A person therefore
-writes this module, starting from the generated one, and a change of the formula's row in
+`scripts/literature_test_problems/formula_modules.py`, does not write the formula's modified version.
+
+A person therefore writes this module, starting from the generated one, and a change of the formula's row in
 `data/literature_test_problems/sources/` needs a change of this module.
 """
 
@@ -17,9 +18,11 @@ class Gsl2024Func3(Formula):
     Starting point 1; derivative given
 
     With ``modified = 1``, the formula evaluates the published function at the unshifted x and adds ``c`` to its value,
-    on the published interval. The published test function fails the checks of a benchmark suite's test functions,
-    because its roots ``-1e-4`` and ``1e-4`` lie ``1e-4`` from ``a = 0``: a shift along x by more than that, in either
-    direction, changes the sign of ``f(a)``.
+    on the published interval.
+
+    The published test function fails the checks that a benchmark suite applies to its test functions, because its roots
+    ``-1e-4`` and ``1e-4`` lie ``1e-4`` from ``a = 0``: a shift along x by more than ``1e-4``, in either direction,
+    changes the sign of ``f(a)``.
     """
 
     number = (1, 3, 2, 3)
@@ -37,7 +40,10 @@ class Gsl2024Func3(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, modified: float) -> float:
-        """Evaluate the published function at ``x - c_scale*c``, or, with ``modified = 1``, at ``x`` and add ``c``."""
+        """Evaluate the published function at ``x - c_scale*c``, or, with ``modified = 1``, at ``x`` and add ``c``.
+
+        Category 1 states the rule for ``c_scale``.
+        """
         if modified == 0:
             x = x - 1.0 * c
             f_offset = 0.0

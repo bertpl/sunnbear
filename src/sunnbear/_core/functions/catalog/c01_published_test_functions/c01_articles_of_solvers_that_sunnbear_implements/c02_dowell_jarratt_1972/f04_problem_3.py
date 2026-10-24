@@ -2,9 +2,10 @@
 
 The formula comes from the row with the key ``Problem 3`` in the survey of published test problems. The survey gives
 this function as 1 expression that the module generator, `scripts/literature_test_problems/formula_modules.py`, cannot
-translate: an infinite sum. The generator does not write the formula's modified version either. A person therefore
-writes this module, and a change of the formula's row in `data/literature_test_problems/sources/` needs a change of
-this module.
+translate: an infinite sum.
+
+The generator does not write the formula's modified version either. A person therefore writes this module, and a change
+of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math
@@ -26,9 +27,11 @@ class DowellJarratt1972Problem3(Formula):
     calls it a well-behaved function.
 
     With ``modified = 1``, the formula evaluates the published function at the unshifted x and adds ``c`` to its value,
-    on the published interval. The published test function fails the checks of a benchmark suite's test functions,
-    because ``b = -0.0001`` lies ``1e-4`` from the root at 0, and ``a = -0.9999`` lies ``1e-4`` from -1: a shift along
-    x by more than ``1e-4`` changes the sign of ``f(b)``, or evaluates the series outside ``(-1, 1)``.
+    on the published interval.
+
+    The published test function fails the checks that a benchmark suite applies to its test functions, because ``b =
+    -0.0001`` lies ``1e-4`` from the root at 0, and ``a = -0.9999`` lies ``1e-4`` from -1: a shift along x by more than
+    ``1e-4`` changes the sign of ``f(b)``, or evaluates the series outside ``(-1, 1)``.
     """
 
     number = (1, 1, 2, 4)
@@ -44,7 +47,10 @@ class DowellJarratt1972Problem3(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, modified: float) -> float:
-        """Evaluate the published function at ``x - c_scale*c``, or, with ``modified = 1``, at ``x`` and add ``c``."""
+        """Evaluate the published function at ``x - c_scale*c``, or, with ``modified = 1``, at ``x`` and add ``c``.
+
+        Category 1 states the rule for ``c_scale``.
+        """
         if modified == 0:
             x = x - 1.0 * c
             f_offset = 0.0

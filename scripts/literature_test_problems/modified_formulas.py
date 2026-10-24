@@ -1,33 +1,33 @@
 """This module lists the formulas of category 1 that have a modified version, and how each version is modified.
 
 A formula of category 1 has a modified version when some of its published test functions fail the validation of the
-benchmark suite pipeline, `sunnbear._core.benchmark.suites.pipeline`. An example is a function that is not defined
-left of its interval, where every shift along x takes the interval's lower bound outside the function's domain. Such a
-formula has the parameter `modified`: 0 for its published test functions, and 1 for modified versions of those that
-fail. Its module is written by hand, starting from its generated module.
+benchmark suite pipeline, `sunnbear._core.benchmark.suites.pipeline`. The class docstring of `PublishedTestFunctions`
+describes the parameter `modified` that such a formula has. Such a formula's module is written by hand, starting from
+its generated module.
 """
 
 from enum import StrEnum
 
 
 # ==================================================================================================
-#  Modification
+#  ModificationType
 # ==================================================================================================
-class Modification(StrEnum):
-    """A `Modification` names how a formula's test functions with ``modified = 1`` differ from its published ones."""
+class ModificationType(StrEnum):
+    """A `ModificationType` names how a formula's test functions with ``modified = 1`` differ from published ones."""
 
-    # c adds to the published function's value, on the published interval, and x is not shifted.
+    # The modified function adds the parameter c of category 1 to the published function's value, on the published
+    # interval, and does not shift x.
     C_ADDS_TO_F = "c_adds_to_f"
 
 
-# MODIFIED_FORMULAS holds the modification of each formula of category 1 that has the parameter `modified`.
+# MODIFIED_FORMULAS holds the type of modification of each formula of category 1 that has the parameter `modified`.
 MODIFIED_FORMULAS = {
-    "f1.1.2.4": Modification.C_ADDS_TO_F,
-    "f1.2.15.1": Modification.C_ADDS_TO_F,
-    "f1.2.15.2": Modification.C_ADDS_TO_F,
-    "f1.3.2.3": Modification.C_ADDS_TO_F,
-    "f1.3.3.30": Modification.C_ADDS_TO_F,
-    "f1.3.3.33": Modification.C_ADDS_TO_F,
-    "f1.4.6.20": Modification.C_ADDS_TO_F,
-    "f1.4.7.9": Modification.C_ADDS_TO_F,
+    "f1.1.2.4": ModificationType.C_ADDS_TO_F,
+    "f1.2.15.1": ModificationType.C_ADDS_TO_F,
+    "f1.2.15.2": ModificationType.C_ADDS_TO_F,
+    "f1.3.2.3": ModificationType.C_ADDS_TO_F,
+    "f1.3.3.30": ModificationType.C_ADDS_TO_F,
+    "f1.3.3.33": ModificationType.C_ADDS_TO_F,
+    "f1.4.6.20": ModificationType.C_ADDS_TO_F,
+    "f1.4.7.9": ModificationType.C_ADDS_TO_F,
 }

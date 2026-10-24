@@ -295,37 +295,33 @@ def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table
 def test_modified_formulas_are_the_formulas_with_the_parameter_modified(script_modules):
     """`MODIFIED_FORMULAS` lists exactly the formulas of category 1 that have the parameter ``modified``."""
     # --- act --------------------------
-    with_parameter = {
+    formula_ids_with_parameter = {
         f"f{formula.format_number(formula.number)}"
         for formula in _CATEGORY_1_FORMULAS
         if "modified" in formula.param_names
     }
 
     # --- assert -----------------------
-    assert with_parameter == set(script_modules["modified_formulas"].MODIFIED_FORMULAS)
+    assert formula_ids_with_parameter == set(script_modules["modified_formulas"].MODIFIED_FORMULAS)
 
 
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
 @pytest.mark.parametrize("c", [0.25, -0.25])
 def test_category_1_formula_applies_c_as_its_rule_says(formula, c, script_modules):
-    """A formula of category 1 at ``c`` follows from the formula at ``c = 0``, as category 1 or its modification says.
-
-    By the rule of category 1, the formula at ``c`` equals the formula at ``c = 0``, evaluated at ``x - c_scale*c``. A
-    test function with ``modified = 1`` follows its formula's `Modification` instead; with ``C_ADDS_TO_F``, it equals
-    the formula at ``c = 0``, plus ``c``.
+    """A formula of category 1 applies ``c`` by category 1's rule, or by its `ModificationType` where ``modified = 1``.
 
     Evaluating the formula at ``c = 0`` repeats its own float arithmetic, so the 2 values are equal exactly; the
-    x-values lie in the interval, and so do their shifted values.
+    x-values lie in the interval, and so do their shifted values where ``c`` shifts x.
     """
-    modification_type = script_modules["modified_formulas"].Modification
     for candidate in formula.build_all_candidates():
         # --- arrange ----------------------
+        modification_types = script_modules["modified_formulas"].ModificationType
         c_scale = PublishedTestFunctions.c_scale(candidate.a, candidate.b)
         x = candidate.a + 0.6 * (candidate.b - candidate.a)
 
         # --- act --------------------------
         value = candidate.xc_fun(x, c)
-        if _modification(candidate, script_modules) is modification_type.C_ADDS_TO_F:
+        if _modification_type(candidate, script_modules) is modification_types.C_ADDS_TO_F:
             expected = candidate.xc_fun(x, 0.0) + c
         else:
             expected = candidate.xc_fun(x - c_scale * c, 0.0)
@@ -340,16 +336,16 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, scrip
 
     The test reads the factor from the code of ``parametrized_fun``, because a test that compares shifted values
     cannot see a number that is 1 float step off, such as ``1.9999999999999996`` for ``2.0``: the shifted x-values
-    round to the same float. A test function with ``modified = 1`` whose `Modification` is ``C_ADDS_TO_F`` adds ``c``
-    with no factor, so the test skips it.
+    round to the same float. A test function with ``modified = 1`` whose `ModificationType` is ``C_ADDS_TO_F`` adds
+    ``c`` with no factor, so the test skips it.
     """
     # --- arrange ----------------------
     tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))
-    modification_type = script_modules["modified_formulas"].Modification
+    modification_types = script_modules["modified_formulas"].ModificationType
     shifting_candidates = [
         candidate
         for candidate in formula.build_all_candidates()
-        if _modification(candidate, script_modules) is not modification_type.C_ADDS_TO_F
+        if _modification_type(candidate, script_modules) is not modification_types.C_ADDS_TO_F
     ]
 
     # --- act --------------------------
@@ -770,8 +766,8 @@ def _first_run_formulas_table(script_modules):
     )
 
 
-def _modification(candidate, script_modules):
-    """Return the `Modification` of a test function with ``modified = 1``, and None for a published test function."""
+def _modification_type(candidate, script_modules):
+    """Return the `ModificationType` of a test function with ``modified = 1``, and None for a published one."""
     params = dict(zip(candidate.id.param_names, candidate.id.param_values, strict=True))
     if params.get("modified") == 1.0:
         return script_modules["modified_formulas"].MODIFIED_FORMULAS[candidate.id.formula_id]

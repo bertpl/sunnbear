@@ -1,8 +1,9 @@
 """This module holds a formula of roots-fortran (2025).
 
 The formula comes from the row with the key ``86–88`` in the survey of published test problems. The module generator,
-`scripts/literature_test_problems/formula_modules.py`, does not write the formula's modified version. A person therefore
-writes this module, starting from the generated one, and a change of the formula's row in
+`scripts/literature_test_problems/formula_modules.py`, does not write the formula's modified version.
+
+A person therefore writes this module, starting from the generated one, and a change of the formula's row in
 `data/literature_test_problems/sources/` needs a change of this module.
 """
 
@@ -20,8 +21,10 @@ class RootsFortran20258688(Formula):
     a different root in each bracket
 
     With ``modified = 1``, the formula evaluates the published function at the unshifted x and adds ``c`` to its value,
-    on the published interval. The published test function on ``[0, 2]`` fails the checks of a benchmark suite's test
-    functions, because a shift along x by any ``c > 0`` evaluates ``sqrt(x)`` left of ``a = 0``, outside its domain.
+    on the published interval.
+
+    The published test function on ``[0, 2]`` fails the checks that a benchmark suite applies to its test functions,
+    because a shift along x by any ``c > 0`` evaluates ``sqrt(x)`` left of ``a = 0``, outside its domain.
     """
 
     number = (1, 3, 3, 30)
@@ -92,7 +95,10 @@ class RootsFortran20258688(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float, modified: float) -> float:
-        """Evaluate the published function at ``x - c_scale*c``, or, with ``modified = 1``, at ``x`` and add ``c``."""
+        """Evaluate the published function at ``x - c_scale*c``, or, with ``modified = 1``, at ``x`` and add ``c``.
+
+        Category 1 states the rule for ``c_scale``.
+        """
         if modified == 0:
             x = x - c_scale * c
             f_offset = 0.0

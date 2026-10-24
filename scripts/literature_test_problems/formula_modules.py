@@ -936,11 +936,7 @@ def write_source_package(source: Source, formulas_table_lines: list[FormulasTabl
 
 
 def is_hand_written(survey_formula: SurveyFormula) -> bool:
-    """Return whether a formula's module is written by hand.
-
-    A formula's module is written by hand when a row has no `f`, or when the formula is in `UNTRANSLATABLE_FORMULAS` or
-    in `MODIFIED_FORMULAS`.
-    """
+    """Return whether a formula's module is written by hand."""
     has_description = any(row.f_description for row in survey_formula.rows)
     formula_id = survey_formula.formulas_table_line.formula_id
     return has_description or formula_id in UNTRANSLATABLE_FORMULAS or formula_id in MODIFIED_FORMULAS

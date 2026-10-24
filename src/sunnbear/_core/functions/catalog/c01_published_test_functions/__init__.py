@@ -33,10 +33,12 @@ class PublishedTestFunctions(FormulaCategory):
       call.
 
     A formula with the parameter ``modified`` follows these rules where ``modified = 0``. Where ``modified = 1``, it
-    gives a modified version of a published test function that fails the checks of a benchmark suite's test
-    functions, such as one that is not defined left of its interval, where every shift along x leaves the function's
-    domain. The formula's docstring describes its modification, which keeps the test function as close to the
-    published one as those checks allow.
+    gives a modified version of a published test function that fails the checks that a benchmark suite applies to its
+    test functions, such as one that is not defined left of its interval, where a shift along x by any ``c > 0``
+    evaluates the function outside its domain.
+
+    The formula's docstring describes its modification, which keeps the test function as close to the published one as
+    those checks allow.
     """
 
     number = (1,)
