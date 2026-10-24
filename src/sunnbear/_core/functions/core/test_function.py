@@ -68,8 +68,9 @@ class CandidateTestFunction:
 class TestFunction:
     """A benchmarkable test function: ``f(x, c)``, its x-interval, and its calibrated c-range.
 
-    For every ``c`` in ``[c_min, c_max]``, ``f(a, c) * f(b, c) < 0`` and the
-    function returns finite values on ``[a, b]``.
+    The benchmark samples ``c`` within ``[c_min, c_max]``. The benchmark suite pipeline calibrates
+    the c-range so that ``f(a, c)`` and ``f(b, c)`` are finite and of opposite signs at every c-value
+    that the benchmark samples.
 
     Attributes:
         id: Stable identity (formula number + named parameter values).

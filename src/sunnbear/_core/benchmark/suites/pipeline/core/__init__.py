@@ -12,7 +12,7 @@ The parts of the framework work together as follows:
   - checks the rules of the chain;
   - has the `PipelineWorkspace` write the stage's output.
 - `PipelineWorkspace` writes each stage's output table and reports into the workspace directory, together with a
-  `PipelineStageManifest`.
+  `PipelineStageManifest`, and reads the reports back.
 - `PipelineStageManifest` records how a stage built its output: from which input, with which code, and when.
 
 This package imports nothing from the package `stages` beside it, which implements the stages.

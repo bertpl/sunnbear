@@ -1,4 +1,4 @@
-"""`PipelineWorkspace` is the only code that writes the files of the benchmark suite pipeline's workspace.
+"""`PipelineWorkspace` is the only code that reads or writes the files of the benchmark suite pipeline's workspace.
 
 The workspace directory holds, for each stage, files named after the stage's `PipelineStage.output_name`:
 
@@ -31,7 +31,7 @@ _TEMPORARY_FILE_SUFFIX = ".tmp"
 #  PipelineWorkspace
 # ==================================================================================================
 class PipelineWorkspace:
-    """`PipelineWorkspace` writes the files of the benchmark suite pipeline's workspace directory."""
+    """`PipelineWorkspace` reads and writes the files of the benchmark suite pipeline's workspace directory."""
 
     def __init__(self, path: Path) -> None:
         """Create a workspace for the directory at `path`, which need not exist yet."""
@@ -54,7 +54,7 @@ class PipelineWorkspace:
         the reports in `output`. `input_manifest` is the manifest of the stage before `stage`, or ``None`` for the
         first stage.
         """
-        reports_dir = self.path / _REPORTS_DIR_NAME / stage.output_name
+        reports_dir = self._reports_dir(stage.output_name)
         shutil.rmtree(reports_dir, ignore_errors=True)
         manifest = PipelineStageManifest.from_stage_output(
             stage=stage,
@@ -70,9 +70,17 @@ class PipelineWorkspace:
         self._write_manifest(manifest)
         return manifest
 
+    def read_report(self, output_name: str, report_name: str) -> pl.DataFrame:
+        """Return the report named `report_name` of the stage whose `PipelineStage.output_name` is `output_name`."""
+        return pl.read_parquet(self._reports_dir(output_name) / f"{report_name}{_TABLE_FILE_SUFFIX}")
+
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
+    def _reports_dir(self, output_name: str) -> Path:
+        """Return the directory of the reports of the stage whose `PipelineStage.output_name` is `output_name`."""
+        return self.path / _REPORTS_DIR_NAME / output_name
+
     def _write_table(self, file: Path, table: pl.DataFrame) -> str:
         """Write `table` to `file` as Parquet, replacing an earlier file, and return the file's sha256 as hex."""
         buffer = io.BytesIO()

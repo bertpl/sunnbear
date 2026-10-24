@@ -9,7 +9,7 @@ from .example_taxonomy_nodes import define_category_cls, define_formula_cls
 # ==================================================================================================
 #  registration
 # ==================================================================================================
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 @pytest.mark.parametrize("is_formula_defined_first", [False, True])
 def test_user_subcategory_under_99_registers_with_its_formulas(is_formula_defined_first):
     """Formula and category register in either order, because a category's ``__init__.py`` imports its
@@ -37,7 +37,7 @@ def test_categories_are_sorted_by_number():
     assert {(1,), (2,), (2, 1), (3,), (99,)} <= set(numbers)
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_category_declaration_from_the_docstring_registers():
     """The declaration pattern in the `FormulaCategory` docstring works as written."""
 
@@ -50,7 +50,7 @@ def test_category_declaration_from_the_docstring_registers():
     assert any(type(c) is Example for c in FormulaRegistry.categories())
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 @pytest.mark.parametrize("define_first", [define_category_cls, define_formula_cls])
 @pytest.mark.parametrize("define_second", [define_category_cls, define_formula_cls])
 def test_duplicate_number_across_formulas_and_categories_is_rejected(define_first, define_second):
@@ -63,7 +63,7 @@ def test_duplicate_number_across_formulas_and_categories_is_rejected(define_firs
         define_second((99, 1))
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 @pytest.mark.parametrize("number", [(4,), (98,), (100,)])
 def test_top_level_category_outside_sunnbear_is_rejected(number):
     """Only sunnbear defines top-level categories; a user's go under 99."""
@@ -71,7 +71,7 @@ def test_top_level_category_outside_sunnbear_is_rejected(number):
         define_category_cls(number)
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_builtin_only_flag_below_the_top_level_is_rejected():
     """A category below the top level that declares ``is_builtin_only`` is rejected at class definition."""
     with pytest.raises(ValueError, match="only a top-level category declares it"):
@@ -81,7 +81,7 @@ def test_builtin_only_flag_below_the_top_level_is_rejected():
 # ==================================================================================================
 #  taxonomy checks, run when the registry is first queried
 # ==================================================================================================
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 @pytest.mark.parametrize("define_orphan", [define_category_cls, define_formula_cls])
 def test_node_without_parent_category_fails_on_read(define_orphan):
     """A category or formula whose parent category is not registered makes the next registry query fail."""
@@ -93,7 +93,7 @@ def test_node_without_parent_category_fails_on_read(define_orphan):
         FormulaRegistry.formulas()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_category_holding_subcategories_and_formulas_fails_on_read():
     """A category that holds both a subcategory and a formula makes the next registry query fail."""
     # --- arrange ----------------------
@@ -106,7 +106,7 @@ def test_category_holding_subcategories_and_formulas_fails_on_read():
         FormulaRegistry.categories()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 @pytest.mark.parametrize("define_node, number", [(define_category_cls, (2, 50)), (define_formula_cls, (2, 1, 50))])
 def test_node_outside_sunnbear_under_builtin_only_top_level_fails_on_read(define_node, number):
     """A node defined outside sunnbear under built-in-only category 2 makes the next registry query fail."""
@@ -118,7 +118,7 @@ def test_node_outside_sunnbear_under_builtin_only_top_level_fails_on_read(define
         FormulaRegistry.formulas()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_candidate_from_id_checks_the_taxonomy_first():
     """`candidate_from_id` raises `FormulaTaxonomyError` for an invalid tree, even for a registered formula's id."""
     # --- arrange ----------------------
@@ -129,7 +129,7 @@ def test_candidate_from_id_checks_the_taxonomy_first():
         FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]")
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_registration_after_a_read_is_checked_on_the_next_read():
     """A node registered after a successful query is checked on the next query."""
     # --- arrange ----------------------

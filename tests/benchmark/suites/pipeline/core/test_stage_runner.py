@@ -1,7 +1,7 @@
 """The tests of `run_stages` check that:
 
 - each stage runs on the output table of the stage before it, and its output table, reports and manifest are
-  written into the workspace;
+  written into the workspace, which reads the reports back;
 - a rerun replaces them;
 - a stage that breaks a rule of the chain stops the run before its output is written;
 - a stage that runs tasks in the worker pool gives the same output with 1 or 2 workers.
@@ -62,7 +62,7 @@ def test_each_stage_runs_on_the_table_before_it_and_its_files_are_written(tmp_pa
         "large_numbers": hashlib.sha256(report_file.read_bytes()).hexdigest()
     }
     assert pl.read_parquet(tmp_path / "s2_small_numbers.parquet").rows() == [("n1", 1.0, 2.0), ("n2", 2.0, 4.0)]
-    assert pl.read_parquet(report_file).rows() == [("n3", 3.0)]
+    assert PipelineWorkspace(tmp_path).read_report("s2_small_numbers", "large_numbers").rows() == [("n3", 3.0)]
     assert small_numbers_manifest.input_sha256 == numbers_manifest.output_sha256
     assert (small_numbers_manifest.n_rows, small_numbers_manifest.n_dropped_rows) == (2, 1)
 
