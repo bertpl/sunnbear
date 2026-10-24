@@ -22,9 +22,10 @@ recorded as ``DIVERGED``; no bound on how far an iterate may stray exists.
 This package relies on 2 facts:
 
 - **Orientation.** The framework supports both orientations: the interval's class, `IncreasingInterval`
-  or `DecreasingInterval`, says which one an interval has. The benchmark's own function portfolio is
-  entirely increasing, ``f(a) < 0 < f(b)``, so a solver may support only that case, and how it
-  treats a decreasing interval is its author's choice.
+  or `DecreasingInterval`, says which one an interval has. A test function of the benchmark keeps the
+  orientation of its formula, so the benchmark runs every solver on both. A solver whose algorithm
+  supports only increasing intervals can solve ``-f`` on a decreasing one: negation is exact in
+  floating point, so its results are those of ``f`` made increasing.
 - **Flop counting.** Everything inside `Solver.solve`'s counting context runs on `CountedFloat` and
   is counted: the zero and sign checks on ``f(a)`` and ``f(b)``, ``xtol``, the bookkeeping of the
   best estimate, and the solver's own arithmetic. The validation before the context and the
