@@ -8,7 +8,7 @@ from sunnbear._core.functions.core.taxonomy import FormulaTaxonomyNode
 from sunnbear._core.functions.core.test_cases import IntervalBoundsTestCase, InvalidTestCase, ValueTestCase
 from sunnbear.functions import FormulaRegistry
 
-# _INDEXED holds every (formula, test case) pair, and _IDS gives each pair a stable unique id
+# _IDS gives each (formula, test case) pair a stable unique id
 _INDEXED = [
     (formula, i, test_case) for formula in FormulaRegistry.formulas() for i, test_case in enumerate(formula.test_cases)
 ]
