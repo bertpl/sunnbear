@@ -47,7 +47,7 @@ class Atkinson1989P38A(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=-0.6, c=0.0, expected=-42.8876),
         FormulaTestCase.value(params={}, x=-0.6, c=0.25, expected=38.89440000000001),
         FormulaTestCase.interval_bounds(params={}, expected=(-3.0, 5.0)),

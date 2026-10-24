@@ -51,7 +51,7 @@ class SuliMayers2003Example17(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((1.0, 2.0, 1.0), (-2.0, -1.0, 1.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": 1.0, "b": 2.0, "c_scale": 1.0}, x=1.3, c=0.0, expected=0.36929666761924435),
         FormulaTestCase.value(
             params={"a": 1.0, "b": 2.0, "c_scale": 1.0}, x=1.3, c=0.25, expected=-0.19234888193683614

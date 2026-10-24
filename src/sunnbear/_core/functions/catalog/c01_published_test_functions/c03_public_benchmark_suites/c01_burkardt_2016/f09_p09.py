@@ -69,7 +69,7 @@ class Burkardt2016P09(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((-5.0, 16.0, 21.0), (5.25, 11.25, 6.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": -5.0, "b": 16.0, "c_scale": 21.0}, x=1.3, c=0.0, expected=-4.025),
         FormulaTestCase.value(params={"a": -5.0, "b": 16.0, "c_scale": 21.0}, x=1.3, c=0.25, expected=-7.9625),
         FormulaTestCase.value(

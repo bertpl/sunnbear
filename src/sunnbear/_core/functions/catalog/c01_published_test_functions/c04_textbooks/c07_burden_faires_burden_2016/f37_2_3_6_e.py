@@ -48,7 +48,7 @@ class BurdenFairesBurden2016236E(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((0.0, 1.0, 1.0), (3.0, 5.0, 2.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.0, expected=1.0798588075760032),
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.25, expected=1.043771096376024),
         FormulaTestCase.value(params={"a": 3.0, "b": 5.0, "c_scale": 2.0}, x=3.6, c=0.0, expected=-2.2817655563220107),

@@ -49,7 +49,7 @@ class Stage201334(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((0.0, 4.0, 4.0), (-10.0, 10.0, 20.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, x=1.2, c=0.0, expected=-1.3656422455233261),
         FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, x=1.2, c=0.25, expected=0.9720665778412416),
         FormulaTestCase.value(

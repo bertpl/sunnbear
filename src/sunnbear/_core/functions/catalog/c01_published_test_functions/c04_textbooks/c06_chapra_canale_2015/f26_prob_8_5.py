@@ -48,7 +48,7 @@ class ChapraCanale2015Prob85(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("K", "ca0", "cb0", "cc0"), rows=((0.015, 42.0, 30.0, 4.0),)),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"K": 0.015, "ca0": 42.0, "cb0": 30.0, "cc0": 4.0}, x=6.0, c=0.0, expected=0.014537037037037038
         ),

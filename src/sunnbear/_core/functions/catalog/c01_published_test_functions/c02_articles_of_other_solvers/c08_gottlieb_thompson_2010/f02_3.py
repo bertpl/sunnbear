@@ -47,7 +47,7 @@ class GottliebThompson20103(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((0.1, 0.9, 0.8), (0.4, 1.0, 0.6))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": 0.1, "b": 0.9, "c_scale": 0.8}, x=0.34, c=0.0, expected=-0.9999227922719982),
         FormulaTestCase.value(
             params={"a": 0.1, "b": 0.9, "c_scale": 0.8}, x=0.34, c=0.25, expected=-0.9999999955454784

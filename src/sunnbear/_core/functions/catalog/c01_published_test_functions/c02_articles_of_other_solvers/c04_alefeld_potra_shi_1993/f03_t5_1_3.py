@@ -52,7 +52,7 @@ class AlefeldPotraShi1993T513(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a_", "b_"), rows=((-40.0, -1.0), (-100.0, -2.0), (-200.0, -3.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a_": -40.0, "b_": -1.0}, x=3.0, c=0.0, expected=-5.974448204143673),
         FormulaTestCase.value(params={"a_": -40.0, "b_": -1.0}, x=3.0, c=0.25, expected=307057.2843599684),
         FormulaTestCase.value(params={"a_": -100.0, "b_": -2.0}, x=3.0, c=0.0, expected=-0.7436256529999076),

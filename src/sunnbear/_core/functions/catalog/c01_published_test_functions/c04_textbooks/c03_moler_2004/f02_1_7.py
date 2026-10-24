@@ -53,7 +53,7 @@ class Moler200417(Formula):
 
     # a case with a positive `atol` lies where float64 cannot evaluate the function to the
     # default tolerance, because the function is ill-conditioned there or its terms cancel
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.9952, c=0.0, expected=-5.870683422720226e-17, atol=4e-13),
         FormulaTestCase.value(params={}, x=0.9952, c=0.25, expected=-1.7138242687795553e-14, atol=4e-13),
         FormulaTestCase.interval_bounds(params={}, expected=(0.988, 1.012)),

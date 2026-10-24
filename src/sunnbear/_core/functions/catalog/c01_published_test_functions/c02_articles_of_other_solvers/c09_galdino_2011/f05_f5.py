@@ -49,7 +49,7 @@ class Galdino2011F5(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=7.3, c=0.0, expected=0.0038698833407079616),
         FormulaTestCase.value(params={}, x=7.3, c=0.25, expected=-0.0008043569132648269),
         FormulaTestCase.interval_bounds(params={}, expected=(7.0, 8.0)),

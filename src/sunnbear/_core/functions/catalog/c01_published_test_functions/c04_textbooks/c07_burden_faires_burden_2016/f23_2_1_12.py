@@ -52,7 +52,7 @@ class BurdenFairesBurden20162112(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": -1.5, "b": 2.5, "c_scale": 4.0}, x=-0.3, c=0.0, expected=-1.26276969),
         FormulaTestCase.value(
             params={"a": -1.5, "b": 2.5, "c_scale": 4.0}, x=-0.3, c=0.25, expected=-3.288375090000001

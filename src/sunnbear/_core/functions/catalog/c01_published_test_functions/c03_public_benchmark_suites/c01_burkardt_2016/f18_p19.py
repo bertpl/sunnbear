@@ -69,7 +69,7 @@ class Burkardt2016P19(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.3, c=0.0, expected=3.525054621686443),
         FormulaTestCase.value(params={}, x=0.3, c=0.25, expected=4.283662185463225),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 1.0)),

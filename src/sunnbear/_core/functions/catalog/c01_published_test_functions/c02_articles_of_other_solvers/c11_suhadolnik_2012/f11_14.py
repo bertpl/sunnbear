@@ -43,7 +43,7 @@ class Suhadolnik201214(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.52, c=0.0, expected=-0.8593919999999999),
         FormulaTestCase.value(params={}, x=0.52, c=0.25, expected=-0.9950869999999999),
         FormulaTestCase.interval_bounds(params={}, expected=(0.1, 1.5)),

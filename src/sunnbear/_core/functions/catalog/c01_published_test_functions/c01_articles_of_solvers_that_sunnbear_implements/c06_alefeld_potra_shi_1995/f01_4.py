@@ -71,7 +71,7 @@ class AlefeldPotraShi19954(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a_": 0.2, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=4.8625
         ),

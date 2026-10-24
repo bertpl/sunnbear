@@ -102,7 +102,7 @@ class RootsFortran202599(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=-4.0, c=0.0, expected=-4.653643620863612),
         FormulaTestCase.value(params={}, x=-4.0, c=0.25, expected=-9.911130261884677),
         FormulaTestCase.interval_bounds(params={}, expected=(-10.0, 10.0)),

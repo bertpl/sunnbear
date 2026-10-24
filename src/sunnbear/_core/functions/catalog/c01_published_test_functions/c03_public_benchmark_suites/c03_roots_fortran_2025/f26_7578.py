@@ -106,7 +106,7 @@ class RootsFortran20257578(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": -5.0, "b": -3.0, "c_scale": 2.0}, x=-4.4, c=0.0, expected=79.68960000000006),
         FormulaTestCase.value(
             params={"a": -5.0, "b": -3.0, "c_scale": 2.0}, x=-4.4, c=0.25, expected=182.8101000000001

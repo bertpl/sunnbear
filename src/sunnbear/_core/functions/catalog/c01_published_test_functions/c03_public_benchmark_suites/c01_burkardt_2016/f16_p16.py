@@ -80,7 +80,7 @@ class Burkardt2016P16(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0, "c_scale": 360.0},
             x=-67.0,

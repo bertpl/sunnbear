@@ -49,7 +49,7 @@ class GorgeyEtAl2025Equation2(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.6, c=0.0, expected=-0.5108256237659907),
         FormulaTestCase.value(params={}, x=0.6, c=0.25, expected=-2.302585092994046),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 2.0)),

@@ -80,7 +80,7 @@ class Bradie200621P67(Formula):
 
     # a case with a positive `atol` lies where float64 cannot evaluate the function to the
     # default tolerance, because the function is ill-conditioned there or its terms cancel
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"initial_investment": 13500.0, "monthly_deposit": 250.0, "goal": 25000.0},
             x=0.037,

@@ -66,7 +66,7 @@ class SuliMayers200312(Formula):
 
     # a case with a positive `atol` lies where float64 cannot evaluate the function to the
     # default tolerance, because the function is ill-conditioned there or its terms cancel
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"M": 200.0, "a": 0.8, "b": 1.8, "c_scale": 1.0}, x=1.1, c=0.0, expected=0.4090909090909092
         ),

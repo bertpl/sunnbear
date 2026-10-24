@@ -56,7 +56,7 @@ class Norton19859(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a_": 0.0, "b_": 0.0001, "n": 3.0}, x=-0.19, c=0.0, expected=-0.006759),
         FormulaTestCase.value(params={"a_": 0.0, "b_": 0.0001, "n": 3.0}, x=-0.19, c=0.25, expected=-0.232508375),
         FormulaTestCase.value(

@@ -72,7 +72,7 @@ class Burkardt2016P18(Formula):
 
     # a case with a positive `atol` lies where float64 cannot evaluate the function to the
     # default tolerance, because the function is ill-conditioned there or its terms cancel
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a": 0.988, "b": 1.012, "c_scale": 0.024},
             x=0.9952,

@@ -54,7 +54,7 @@ class Sabharwal2019T21(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"k": 3.0, "a": 1.0, "b": 2.0, "c_scale": 1.0}, x=1.3, c=0.0, expected=-1.3099999999999998
         ),

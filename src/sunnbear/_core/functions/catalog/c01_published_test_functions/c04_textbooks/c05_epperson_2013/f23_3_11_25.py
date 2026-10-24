@@ -48,7 +48,7 @@ class Epperson201331125(Formula):
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`
     # would accept any value near 0, 0 among them
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.9992, c=0.0, expected=-3.276800000000469e-16, atol=0.0),
         FormulaTestCase.value(params={}, x=0.9992, c=0.25, expected=-1.8895680000001248e-14, atol=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(0.998, 1.002)),

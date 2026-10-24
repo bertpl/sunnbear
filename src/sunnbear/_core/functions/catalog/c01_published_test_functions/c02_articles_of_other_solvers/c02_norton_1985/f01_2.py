@@ -50,7 +50,7 @@ class Norton19852(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("n",), rows=((2.0,), (5.0,), (10.0,), (20.0,))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"n": 2.0}, x=0.3, c=0.0, expected=-0.016422102246085278),
         FormulaTestCase.value(params={"n": 2.0}, x=0.3, c=0.25, expected=-0.7961413077482579),
         FormulaTestCase.value(params={"n": 5.0}, x=0.3, c=0.0, expected=0.5577824479025916),

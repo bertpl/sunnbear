@@ -71,7 +71,7 @@ class ChapraCanale2015Pt23(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0, "c_scale": 4.0},
             x=13.2,

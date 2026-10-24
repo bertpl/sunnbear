@@ -48,7 +48,7 @@ class Epperson20133114(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.48, c=0.0, expected=-3.200000000000014e-09),
         FormulaTestCase.value(params={}, x=0.48, c=0.25, expected=-1.8452812500000082e-07),
         FormulaTestCase.interval_bounds(params={}, expected=(0.45, 0.55)),

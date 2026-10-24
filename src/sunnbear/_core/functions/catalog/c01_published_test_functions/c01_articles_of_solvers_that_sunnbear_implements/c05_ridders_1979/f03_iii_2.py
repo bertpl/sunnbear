@@ -49,7 +49,7 @@ class Ridders1979Iii2(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((1.3, 1.4, 0.1), (0.0, 1.5, 1.5))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": 1.3, "b": 1.4, "c_scale": 0.1}, x=1.33, c=0.0, expected=-695.5887196520625),
         FormulaTestCase.value(params={"a": 1.3, "b": 1.4, "c_scale": 0.1}, x=1.33, c=0.25, expected=-880.9903886606878),
         FormulaTestCase.value(params={"a": 0.0, "b": 1.5, "c_scale": 1.5}, x=0.45, c=0.0, expected=-999.2963560197811),

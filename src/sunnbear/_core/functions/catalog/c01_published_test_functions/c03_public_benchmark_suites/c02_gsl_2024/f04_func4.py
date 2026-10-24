@@ -49,7 +49,7 @@ class Gsl2024Func4(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.366667, c=0.0, expected=0.2541150403402077),
         FormulaTestCase.value(params={}, x=0.366667, c=0.25, expected=-0.26782611907005804),
         FormulaTestCase.interval_bounds(params={}, expected=(-0.3333333333333333, 2.0)),

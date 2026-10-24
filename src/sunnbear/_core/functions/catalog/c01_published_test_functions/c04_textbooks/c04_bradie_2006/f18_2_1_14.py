@@ -58,7 +58,7 @@ class Bradie20062114(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a": -3.0, "b": 3.0, "c_scale": 6.0}, x=-1.2, c=0.0, expected=-0.04351999999999997
         ),

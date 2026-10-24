@@ -47,7 +47,7 @@ class Moler2004Ex413(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.3, c=0.0, expected=-0.03390155167568136),
         FormulaTestCase.value(params={}, x=0.3, c=0.25, expected=-0.33314444652853825),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 1.0)),

@@ -46,7 +46,7 @@ class Gao2026S31(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=-3.2, c=0.0, expected=-1.4736125994561546),
         FormulaTestCase.value(params={}, x=-3.2, c=0.25, expected=-1.6750686836022342),
         FormulaTestCase.interval_bounds(params={}, expected=(-5.0, 1.0)),

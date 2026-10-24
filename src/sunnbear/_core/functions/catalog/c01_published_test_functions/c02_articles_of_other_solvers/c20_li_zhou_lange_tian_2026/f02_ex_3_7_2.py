@@ -65,7 +65,7 @@ class LiZhouLangeTian2026Ex372(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"p": 0.05, "mu": 1.0, "sigma": 1.0}, x=-1.9, c=0.0, expected=0.048134186699615965
         ),

@@ -52,7 +52,7 @@ class Moler200441(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("M",), rows=((2.0,),)),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"M": 2.0}, x=1.3, c=0.0, expected=-0.3099999999999999),
         FormulaTestCase.value(params={"M": 2.0}, x=1.3, c=0.25, expected=-0.8974999999999999),
         FormulaTestCase.interval_bounds(params={"M": 2.0}, expected=(1.0, 2.0)),

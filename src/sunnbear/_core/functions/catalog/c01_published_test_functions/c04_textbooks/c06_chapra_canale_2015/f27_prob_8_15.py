@@ -52,7 +52,7 @@ class ChapraCanale2015Prob815(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("c_",), rows=((5.0,),)),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"c_": 5.0}, x=0.6, c=0.0, expected=-0.014154298092315686),
         FormulaTestCase.value(params={"c_": 5.0}, x=0.6, c=0.25, expected=-3.950896260435952),
         FormulaTestCase.interval_bounds(params={"c_": 5.0}, expected=(0.0, 2.0)),

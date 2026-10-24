@@ -49,7 +49,7 @@ class Gsl2024CosF(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((0.0, 3.0, 3.0), (-3.0, 0.0, 3.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": 0.0, "b": 3.0, "c_scale": 3.0}, x=0.9, c=0.0, expected=0.6216099682706644),
         FormulaTestCase.value(params={"a": 0.0, "b": 3.0, "c_scale": 3.0}, x=0.9, c=0.25, expected=0.9887710779360422),
         FormulaTestCase.value(

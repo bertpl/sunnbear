@@ -55,7 +55,7 @@ class KumarSrivastav2026A2(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("sigma",), rows=((0.001,),)),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"sigma": 0.001}, x=0.3, c=0.0, expected=-0.44033624226830675),
         FormulaTestCase.value(params={"sigma": 0.001}, x=0.3, c=0.25, expected=-0.9047881711348748),
         FormulaTestCase.interval_bounds(params={"sigma": 0.001}, expected=(0.0, 1.0)),

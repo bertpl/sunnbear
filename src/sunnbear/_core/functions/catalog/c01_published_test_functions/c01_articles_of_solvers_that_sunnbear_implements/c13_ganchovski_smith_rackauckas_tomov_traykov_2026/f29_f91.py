@@ -49,7 +49,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F91(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.307, c=0.0, expected=-0.14545178597021027),
         FormulaTestCase.value(params={}, x=0.307, c=0.25, expected=-0.16299331518211085),
         FormulaTestCase.interval_bounds(params={}, expected=(0.01, 1.0)),

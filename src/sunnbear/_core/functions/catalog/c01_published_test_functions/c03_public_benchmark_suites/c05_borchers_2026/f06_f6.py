@@ -51,7 +51,7 @@ class Borchers2026F6(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((-0.8, 1.6, 2.4), (-1.4, 1.0, 2.4))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a": -0.8, "b": 1.6, "c_scale": 2.4}, x=-0.08, c=0.0, expected=-2.2187878676296164
         ),

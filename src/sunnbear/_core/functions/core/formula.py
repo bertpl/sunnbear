@@ -48,15 +48,16 @@ class Formula(FormulaTaxonomyNode, ABC):
             labels reporting uses. Empty for a formula without parameters.
         jit: Whether `parametrized_fun` is numba-compiled (default) — set
             False for formulas numba cannot compile.
-        cases: The formula's self-declared behavioral traits (`FormulaTestCase`),
-            exercised by the generic formula test.
+        test_cases: The formula's own test cases (`FormulaTestCase`), which
+            the generic formula test runs; every registered formula must
+            declare at least 1.
         source: The formula's publication (`FormulaSource`), or None (default)
             for a formula that no publication gives.
     """
 
     param_names: ClassVar[tuple[str, ...]] = ()
     jit: ClassVar[bool] = True
-    cases: ClassVar[tuple[FormulaTestCase, ...]] = ()
+    test_cases: ClassVar[tuple[FormulaTestCase, ...]] = ()
     source: ClassVar[FormulaSource | None] = None
     # populated lazily per concrete class by _compiled_formula (annotation only — no value,
     # so the `in cls.__dict__` cache check below is not satisfied by this declaration)

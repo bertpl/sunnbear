@@ -47,7 +47,7 @@ class Stage2013310(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=-4.0, c=0.0, expected=-109.06787791495199),
         FormulaTestCase.value(params={}, x=-4.0, c=0.25, expected=-934.8136186556927),
         FormulaTestCase.interval_bounds(params={}, expected=(-10.0, 10.0)),

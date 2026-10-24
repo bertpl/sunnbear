@@ -56,7 +56,7 @@ class Gsl2024SinF(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": 3.0, "b": 4.0, "c_scale": 1.0}, x=3.3, c=0.0, expected=-0.1577456941432482),
         FormulaTestCase.value(params={"a": 3.0, "b": 4.0, "c_scale": 1.0}, x=3.3, c=0.25, expected=0.0914646422324372),
         FormulaTestCase.value(

@@ -50,7 +50,7 @@ class DowellJarratt1972Problem2(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("K",), rows=((2.5,), (3.0,))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"K": 2.5}, x=0.37, c=0.0, expected=-0.16549921993513564),
         FormulaTestCase.value(params={"K": 2.5}, x=0.37, c=0.25, expected=0.0050575863514413745),
         FormulaTestCase.value(params={"K": 3.0}, x=0.37, c=0.0, expected=0.0009313171849989814),

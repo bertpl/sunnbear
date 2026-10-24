@@ -61,7 +61,7 @@ class Ellithy202617(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0, "c_scale": 2.0}, x=1.6, c=0.0, expected=-0.399658882433204
         ),

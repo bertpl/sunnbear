@@ -48,7 +48,7 @@ class Ellithy202625(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=1.2, c=0.0, expected=-2.7578637162071944),
         FormulaTestCase.value(params={}, x=1.2, c=0.25, expected=-4.092053226768198),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 4.0)),

@@ -51,7 +51,7 @@ class GorgeyEtAl2025Equation3(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((-1.0, 2.0, 3.0), (-0.5, 1.0, 1.5))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a": -1.0, "b": 2.0, "c_scale": 3.0}, x=-0.1, c=0.0, expected=-0.0004190701450455845
         ),

@@ -77,7 +77,7 @@ class Burkardt2016P13(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"slope": 1e-11, "a": -10000000000000.0, "b": 10000000000000.0, "c_scale": 20000000000000.0},
             x=-4000000000000.0,
