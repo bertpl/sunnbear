@@ -47,7 +47,7 @@ class Norton1985Driver(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=1.3, c=0.0, expected=-393.7543483),
         FormulaTestCase.value(params={}, x=1.3, c=0.25, expected=-444.55872457734375),
         FormulaTestCase.interval_bounds(params={}, expected=(1.0, 2.0)),

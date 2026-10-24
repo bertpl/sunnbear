@@ -75,7 +75,7 @@ class Moler20044748(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a": 0.0, "b": 3.14159265359, "c_scale": 3.14}, x=0.942478, c=0.0, expected=0.7899621483111053
         ),

@@ -49,7 +49,7 @@ class BurdenFairesBurden2016229(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=1.88496, c=0.0, expected=-1.661141798493021),
         FormulaTestCase.value(params={}, x=1.88496, c=0.25, expected=-2.905047598902962),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 6.283185307179586)),

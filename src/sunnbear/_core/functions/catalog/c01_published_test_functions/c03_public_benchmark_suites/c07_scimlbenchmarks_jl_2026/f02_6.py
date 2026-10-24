@@ -52,7 +52,7 @@ class ScimlbenchmarksJl20266(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("p",), rows=((2.0,),)),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"p": 2.0}, x=-2.0, c=0.0, expected=-5.654410587305031),
         FormulaTestCase.value(params={"p": 2.0}, x=-2.0, c=0.25, expected=-6.416466545935461),
         FormulaTestCase.interval_bounds(params={"p": 2.0}, expected=(-5.0, 5.0)),

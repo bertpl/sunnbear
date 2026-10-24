@@ -69,7 +69,7 @@ class LiZhouLangeTian202671(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a0": 1.0, "a1": -1.0, "a2": 1.0, "a3": -1.0, "m": 3.0}, x=0.6, c=0.0, expected=0.544
         ),

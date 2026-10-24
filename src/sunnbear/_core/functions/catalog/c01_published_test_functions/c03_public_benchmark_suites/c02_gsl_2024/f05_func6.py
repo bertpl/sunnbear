@@ -49,7 +49,7 @@ class Gsl2024Func6(Formula):
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`
     # would accept any value near 0, 0 among them
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.99971, c=0.0, expected=-1.7249876309005193e-25, atol=0.0),
         FormulaTestCase.value(params={}, x=0.99971, c=0.25, expected=-4.700788051625088e-24, atol=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(0.9995, 1.0002)),

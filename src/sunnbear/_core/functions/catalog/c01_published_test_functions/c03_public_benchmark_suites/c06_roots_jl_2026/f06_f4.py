@@ -61,7 +61,7 @@ class RootsJl2026F4(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.471239, c=0.0, expected=0.6553869778987967),
         FormulaTestCase.value(params={}, x=0.471239, c=0.25, expected=0.9575321861874498),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 1.5707963267948966)),

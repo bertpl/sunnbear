@@ -56,7 +56,7 @@ class Bradie200621P59(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((1.0, 2.0, 1.0), (-3.0, -2.0, 1.0), (-1.0, 0.0, 1.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": 1.0, "b": 2.0, "c_scale": 1.0}, x=1.3, c=0.0, expected=0.6770000000000003),
         FormulaTestCase.value(params={"a": 1.0, "b": 2.0, "c_scale": 1.0}, x=1.3, c=0.25, expected=-0.7873749999999998),
         FormulaTestCase.value(

@@ -47,7 +47,7 @@ class ChapraCanale2015Prob57(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=1.6, c=0.0, expected=0.19999999999999998),
         FormulaTestCase.value(params={}, x=1.6, c=0.25, expected=0.4272727272727272),
         FormulaTestCase.interval_bounds(params={}, expected=(1.0, 3.0)),

@@ -62,7 +62,7 @@ class Ganchovski2026F93(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("n",), rows=((5.0,), (7.0,), (9.0,), (11.0,), (13.0,), (15.0,), (17.0,))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"n": 5.0}, x=-4.0, c=0.0, expected=-1024.001),
         FormulaTestCase.value(params={"n": 5.0}, x=-4.0, c=0.25, expected=-59049.001),
         FormulaTestCase.value(params={"n": 7.0}, x=-4.0, c=0.0, expected=-16384.001),

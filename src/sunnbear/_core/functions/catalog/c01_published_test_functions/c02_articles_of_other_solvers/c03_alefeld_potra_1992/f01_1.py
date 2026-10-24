@@ -48,7 +48,7 @@ class AlefeldPotra19921(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("k", "a", "b", "c_scale"), rows=((1.0, 0.5, 1.5, 1.0), (-1.0, -1.8, 0.0, 1.8))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"k": 1.0, "a": 0.5, "b": 1.5, "c_scale": 1.0}, x=0.8, c=0.0, expected=-0.48799999999999993
         ),

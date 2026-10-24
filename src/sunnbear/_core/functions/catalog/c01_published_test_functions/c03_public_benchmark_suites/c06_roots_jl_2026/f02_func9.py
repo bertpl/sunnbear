@@ -67,7 +67,7 @@ class RootsJl2026Func9(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((5.0, 12.0, 7.0), (4.0, 8.0, 4.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a": 5.0, "b": 12.0, "c_scale": 7.0}, x=7.1, c=0.0, expected=-0.06489448847872395
         ),

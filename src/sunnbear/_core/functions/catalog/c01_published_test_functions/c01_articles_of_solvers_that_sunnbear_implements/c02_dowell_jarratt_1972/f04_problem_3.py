@@ -63,7 +63,7 @@ class DowellJarratt1972Problem3(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=-0.69996, c=0.0, expected=-0.04892829857040081),
         FormulaTestCase.value(params={}, x=-0.69996, c=0.25, expected=-0.9973981399194692),
         FormulaTestCase.value(params={}, x=-0.9999, c=0.25, expected=math.nan),

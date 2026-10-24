@@ -107,7 +107,7 @@ class RootsFortran202591(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("k", "a", "b", "c_scale"), rows=((20.0, 2.0, 3.0, 1.0), (5.0, 0.0, 2.0, 2.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"k": 20.0, "a": 2.0, "b": 3.0, "c_scale": 1.0}, x=2.3, c=0.0, expected=-7.725817545185281
         ),

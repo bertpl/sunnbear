@@ -53,7 +53,7 @@ class Scipy2026F5(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.869615, c=0.0, expected=7.669593895003261),
         FormulaTestCase.value(params={}, x=0.869615, c=0.25, expected=2.2837046256437192),
         FormulaTestCase.value(params={}, x=1.0, c=0.0, expected=0.0),

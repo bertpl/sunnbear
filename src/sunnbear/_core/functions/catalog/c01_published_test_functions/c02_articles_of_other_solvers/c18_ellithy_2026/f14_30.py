@@ -55,7 +55,7 @@ class Ellithy202630(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((0.0, 1.5, 1.5), (19.0, 21.0, 2.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a": 0.0, "b": 1.5, "c_scale": 1.5}, x=0.45, c=0.0, expected=3.8859900569265306e17
         ),

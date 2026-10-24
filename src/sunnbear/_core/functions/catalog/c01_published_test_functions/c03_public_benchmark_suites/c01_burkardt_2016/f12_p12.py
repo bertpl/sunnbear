@@ -75,7 +75,7 @@ class Burkardt2016P12(Formula):
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`
     # would accept any value near 0, 0 among them
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=-1.57, c=0.0, expected=-2208.918772196994
         ),

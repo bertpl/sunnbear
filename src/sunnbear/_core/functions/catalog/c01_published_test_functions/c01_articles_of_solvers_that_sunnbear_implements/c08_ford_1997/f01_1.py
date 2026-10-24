@@ -53,7 +53,7 @@ class Ford19971(Formula):
             ParamTable(names=("a", "b", "c_scale"), rows=((0.5, 2.0, 1.5), (0.2, 6.0, 5.8), (0.004, 200.0, 200.0))),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a": 0.5, "b": 2.0, "c_scale": 1.5}, x=0.95, c=0.0, expected=0.0005261213987539786
         ),

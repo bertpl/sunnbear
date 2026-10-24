@@ -57,7 +57,7 @@ class ChapraCanale2015Prob518(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("osf",), rows=((8.0,), (10.0,), (12.0,))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"osf": 8.0}, x=28.0, c=0.0, expected=0.021762506592685964),
         FormulaTestCase.value(params={"osf": 8.0}, x=12.0, c=0.25, expected=-0.5474113296149795),
         FormulaTestCase.value(params={"osf": 10.0}, x=28.0, c=0.0, expected=0.2449060579068957),

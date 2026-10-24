@@ -55,7 +55,7 @@ class FooTan202542(Formula):
             ParamTable(names=("y",), rows=((0.1,), (0.2,), (0.3,), (0.4,), (0.5,), (0.6,), (0.7,), (0.8,), (0.9,))),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"y": 0.1}, x=0.15, c=0.0, expected=0.5098403047164004),
         FormulaTestCase.value(params={"y": 0.1}, x=0.15, c=0.25, expected=0.06866093149667019),
         FormulaTestCase.value(params={"y": 0.2}, x=0.15, c=0.0, expected=0.4098403047164004),

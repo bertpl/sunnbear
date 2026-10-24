@@ -1,10 +1,10 @@
 """FormulaTestCase: a formula's self-declared test cases.
 
-A concrete `Formula` lists `cases` — one `FormulaTestCase` per behavior worth pinning, built via
+A concrete `Formula` lists `test_cases` — one `FormulaTestCase` per behavior worth pinning, built via
 `FormulaTestCase.value` / `.invalid` / `.interval_bounds`. A single generic test drives every registered
-formula through its list, so between them the three kinds cover `parametrized_fun`, both sides of
+formula through its list, so between them the 3 kinds cover `parametrized_fun`, both sides of
 `is_param_tuple_valid`, and `interval_bounds`; the branch-coverage gate then fails on any formula line
-that no case reaches.
+that no test case reaches.
 
 Parameters are given by name (`{"p1": 0.0}`) and resolved to positional order against the formula's
 `param_names` when a case runs.
@@ -24,11 +24,11 @@ class FormulaTestCase:
     @classmethod
     def value(
         cls,
+        *,
         params: dict[str, float],
         x: float,
         c: float,
         expected: float,
-        *,
         rtol: float = DEFAULT_RTOL,
         atol: float = DEFAULT_ATOL,
     ) -> "FormulaTestCase":
@@ -36,16 +36,16 @@ class FormulaTestCase:
         return ValueTestCase(params, x, c, expected, rtol, atol)
 
     @classmethod
-    def invalid(cls, params: dict[str, float]) -> "FormulaTestCase":
+    def invalid(cls, *, params: dict[str, float]) -> "FormulaTestCase":
         """`is_param_tuple_valid(*params)` must reject `params`."""
         return InvalidTestCase(params)
 
     @classmethod
     def interval_bounds(
         cls,
+        *,
         params: dict[str, float],
         expected: tuple[float, float],
-        *,
         rtol: float = DEFAULT_RTOL,
         atol: float = DEFAULT_ATOL,
     ) -> "FormulaTestCase":

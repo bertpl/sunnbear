@@ -51,7 +51,7 @@ class SuliMayers2003Exercise12(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=0.3, c=0.0, expected=0.3108948445423537),
         FormulaTestCase.value(params={}, x=0.3, c=0.25, expected=0.0916734515413067),
         FormulaTestCase.value(params={}, x=0.0, c=0.0, expected=0.0),

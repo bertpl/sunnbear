@@ -51,7 +51,7 @@ class LiZhouLangeTian2026Ex1(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((-2.0, 1.0, 3.0), (0.0, 4.0, 4.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": -2.0, "b": 1.0, "c_scale": 3.0}, x=-1.1, c=0.0, expected=0.9435655349597691),
         FormulaTestCase.value(
             params={"a": -2.0, "b": 1.0, "c_scale": 3.0}, x=-1.1, c=0.25, expected=0.8776300796023234

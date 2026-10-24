@@ -48,7 +48,7 @@ class Suhadolnik201211(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((1.0, 8.0, 7.0), (0.0, 9.0, 9.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": 1.0, "b": 8.0, "c_scale": 7.0}, x=3.1, c=0.0, expected=0.2587542052323633),
         FormulaTestCase.value(params={"a": 1.0, "b": 8.0, "c_scale": 7.0}, x=3.1, c=0.25, expected=-0.0667524713437961),
         FormulaTestCase.value(params={"a": 0.0, "b": 9.0, "c_scale": 9.0}, x=2.7, c=0.0, expected=0.21609067478395633),

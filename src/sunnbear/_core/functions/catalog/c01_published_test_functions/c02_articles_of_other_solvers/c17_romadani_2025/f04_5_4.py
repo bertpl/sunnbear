@@ -50,7 +50,7 @@ class Romadani202554(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((0.0, 1.0, 1.0), (-1.0, 1.0, 2.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.0, expected=0.03588203867309906),
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.25, expected=0.13953564474479144),
         FormulaTestCase.value(

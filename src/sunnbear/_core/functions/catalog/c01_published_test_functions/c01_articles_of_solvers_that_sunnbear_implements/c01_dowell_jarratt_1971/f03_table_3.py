@@ -47,7 +47,7 @@ class DowellJarratt1971Table3(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("n",), rows=((2.0,), (5.0,), (15.0,), (20.0,))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"n": 2.0}, x=0.3, c=0.0, expected=0.43999999999999995),
         FormulaTestCase.value(params={"n": 2.0}, x=0.3, c=0.25, expected=-0.7100000000000001),
         FormulaTestCase.value(params={"n": 5.0}, x=0.3, c=0.0, expected=4.85),

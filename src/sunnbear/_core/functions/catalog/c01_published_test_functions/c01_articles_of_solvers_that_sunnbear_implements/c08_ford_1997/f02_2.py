@@ -64,7 +64,7 @@ class Ford19972(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((0.9, 1.1, 0.2), (0.5, 1.5, 1.0), (-5.0, 10.0, 15.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a": 0.9, "b": 1.1, "c_scale": 0.2}, x=0.96, c=0.0, expected=-0.07905914659719734
         ),

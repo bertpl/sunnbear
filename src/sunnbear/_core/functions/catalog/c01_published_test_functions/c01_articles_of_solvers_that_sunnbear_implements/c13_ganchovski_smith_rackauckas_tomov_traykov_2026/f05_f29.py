@@ -52,7 +52,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F29(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((2.6, 4.6, 2.0), (2.6, 3.6, 1.0))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a": 2.6, "b": 4.6, "c_scale": 2.0}, x=3.2, c=0.0, expected=0.0003200512054617717
         ),

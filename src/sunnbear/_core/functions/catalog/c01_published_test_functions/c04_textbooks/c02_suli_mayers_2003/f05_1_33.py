@@ -49,7 +49,7 @@ class SuliMayers2003133(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a_",), rows=((3.4,), (3.5,), (3.99,))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"a_": 3.4}, x=0.3, c=0.0, expected=-0.414),
         FormulaTestCase.value(params={"a_": 3.4}, x=0.3, c=0.25, expected=-0.11149999999999997),
         FormulaTestCase.value(params={"a_": 3.5}, x=0.3, c=0.0, expected=-0.435),

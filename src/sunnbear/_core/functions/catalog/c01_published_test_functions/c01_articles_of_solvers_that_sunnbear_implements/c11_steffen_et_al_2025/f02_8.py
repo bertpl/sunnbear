@@ -77,7 +77,7 @@ class SteffenEtAl20258(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={
                 "lambda_": 2.0,

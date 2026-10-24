@@ -47,7 +47,7 @@ class Borchers2026F11(Formula):
         """Return no recipe, since the published function has no parameters."""
         return ()
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={}, x=-0.84, c=0.0, expected=-0.2081157485309296),
         FormulaTestCase.value(params={}, x=-0.84, c=0.25, expected=-3.2518485211566346),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.2, 0.0)),

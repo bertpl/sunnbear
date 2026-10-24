@@ -8,18 +8,21 @@ from sunnbear._core.functions.core.taxonomy import FormulaTaxonomyNode
 from sunnbear._core.functions.core.test_cases import IntervalBoundsTestCase, InvalidTestCase, ValueTestCase
 from sunnbear.functions import FormulaRegistry
 
-# every (formula, case) pair, with a stable unique id: formula number + case kind + within-formula index
-_INDEXED = [(formula, i, case) for formula in FormulaRegistry.formulas() for i, case in enumerate(formula.cases)]
-_CASES = [(formula, case) for formula, _, case in _INDEXED]
+# every (formula, test case) pair, with a stable unique id: formula number + test case kind + within-formula index
+_INDEXED = [
+    (formula, i, test_case) for formula in FormulaRegistry.formulas() for i, test_case in enumerate(formula.test_cases)
+]
+_TEST_CASES = [(formula, test_case) for formula, _, test_case in _INDEXED]
 _IDS = [
-    f"f{FormulaTaxonomyNode.format_number(formula.number)}:{type(case).__name__}:{i}" for formula, i, case in _INDEXED
+    f"f{FormulaTaxonomyNode.format_number(formula.number)}:{type(test_case).__name__}:{i}"
+    for formula, i, test_case in _INDEXED
 ]
 
 
-@pytest.mark.parametrize("formula, case", _CASES, ids=_IDS)
-def test_formula_test_case(formula, case):
+@pytest.mark.parametrize("formula, test_case", _TEST_CASES, ids=_IDS)
+def test_formula_test_case(formula, test_case):
     # --- act / assert -----------------
-    match case:
+    match test_case:
         case ValueTestCase(params=params, x=x, c=c, expected=expected, rtol=rtol, atol=atol):
             p = formula.param_dict_to_tuple(params)
             assert formula.is_param_tuple_valid(*p)
@@ -47,7 +50,7 @@ def test_param_dict_to_tuple_rejects_unknown_params():
 
 def test_every_formula_defines_test_cases():
     # --- act --------------------------
-    missing = [type(formula).__name__ for formula in FormulaRegistry.formulas() if not formula.cases]
+    missing = [type(formula).__name__ for formula in FormulaRegistry.formulas() if not formula.test_cases]
 
     # --- assert -----------------------
     assert not missing, f"formulas with no test cases: {missing}"

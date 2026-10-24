@@ -61,7 +61,7 @@ class Chandrupatla19978(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"xi": 0.61489, "a": 0.0002, "b": 2.0, "c_scale": 2.0}, x=0.60014, c=0.0, expected=916.522638861195
         ),

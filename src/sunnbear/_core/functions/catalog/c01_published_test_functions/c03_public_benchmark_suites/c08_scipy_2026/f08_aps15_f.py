@@ -97,7 +97,7 @@ class Scipy2026Aps15F(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"n": 20.0}, x=-700.0, c=0.0, expected=-0.859),
         FormulaTestCase.value(params={"n": 20.0}, x=-700.0, c=0.25, expected=-0.859),
         FormulaTestCase.value(params={"n": 21.0}, x=-700.0, c=0.0, expected=-0.859),

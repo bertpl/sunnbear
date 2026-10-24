@@ -51,7 +51,7 @@ class Moler2004473(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("y",), rows=((0.5,),)),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"y": 0.5}, x=0.6, c=0.0, expected=0.41200486349721077),
         FormulaTestCase.value(params={"y": 0.5}, x=0.6, c=0.25, expected=0.49750156206604),
         FormulaTestCase.interval_bounds(params={"y": 0.5}, expected=(0.0, 2.0)),

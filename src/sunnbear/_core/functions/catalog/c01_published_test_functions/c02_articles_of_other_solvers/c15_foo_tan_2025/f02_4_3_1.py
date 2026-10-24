@@ -75,7 +75,7 @@ class FooTan2025431(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"q": 1.7014118346046923e38, "y": 0.1}, x=0.3, c=0.0, expected=0.2069392984191393),
         FormulaTestCase.value(
             params={"q": 1.7014118346046923e38, "y": 0.1}, x=0.3, c=0.25, expected=-0.04774490584948067

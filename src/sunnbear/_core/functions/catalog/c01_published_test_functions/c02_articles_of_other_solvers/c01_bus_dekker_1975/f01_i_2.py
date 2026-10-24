@@ -47,7 +47,7 @@ class BusDekker1975I2(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("n",), rows=((1.0,), (2.0,), (3.0,), (4.0,))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"n": 1.0}, x=0.3, c=0.0, expected=-0.2609087766605704),
         FormulaTestCase.value(params={"n": 1.0}, x=0.3, c=0.25, expected=-0.8656709048842838),
         FormulaTestCase.value(params={"n": 2.0}, x=0.3, c=0.0, expected=-0.016422102246085278),

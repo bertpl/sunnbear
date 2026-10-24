@@ -55,7 +55,7 @@ class Ford19975(Formula):
             ),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a": 0.035, "b": 0.05, "c_scale": 0.015}, x=0.0395, c=0.0, expected=0.37225544476214745
         ),

@@ -48,7 +48,7 @@ class Epperson201332P100(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("a", "b", "c_scale"), rows=((0.01, 1.0, 0.99), (-0.2, 0.2, 0.4))),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"a": 0.01, "b": 1.0, "c_scale": 0.99}, x=0.307, c=0.0, expected=0.8811932110406309
         ),

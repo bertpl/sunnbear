@@ -107,7 +107,7 @@ class RootsFortran202569(Formula):
             ParamTable(names=("k", "a", "b", "c_scale"), rows=((1.0, 0.1001, 10.0001, 9.9), (10.0, 3.0, 7.0, 4.0))),
         )
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(
             params={"k": 1.0, "a": 0.1001, "b": 10.0001, "c_scale": 9.9}, x=3.0701, c=0.0, expected=8.42551401
         ),

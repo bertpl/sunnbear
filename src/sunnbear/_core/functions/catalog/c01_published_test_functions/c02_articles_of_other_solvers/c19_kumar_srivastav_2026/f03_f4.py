@@ -45,7 +45,7 @@ class KumarSrivastav2026F4(Formula):
         """Return the published parameter values."""
         return (ParamTable(names=("x_star",), rows=((0.6,),)),)
 
-    cases = (
+    test_cases = (
         FormulaTestCase.value(params={"x_star": 0.6}, x=0.3, c=0.0, expected=-0.041999999999999996),
         FormulaTestCase.value(params={"x_star": 0.6}, x=0.3, c=0.25, expected=-0.193875),
         FormulaTestCase.interval_bounds(params={"x_star": 0.6}, expected=(0.0, 1.0)),
