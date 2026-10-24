@@ -30,7 +30,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
     width, rounded half up to 1 significant digit; ``c`` shifts x as category 1 states, with ``c_scale`` the rounded
     width of the new interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because the jump lies at
+    The published test function does not satisfy the benchmark suite inclusion conditions, because the jump lies at
     ``a = -1``: with any ``c < 0``, ``f(a)`` takes the branch ``1 + sin(1/(x + 1))``, which is never negative, so that
     ``f`` no longer changes sign on the interval.
     """

@@ -26,8 +26,8 @@ class Ridders1979Iii2(Formula):
     the published interval's width, rounded half up to 1 significant digit; ``c`` shifts x as category 1 states, with
     ``c_scale`` the rounded width of the new interval.
 
-    The published test function on ``[0, 1.5]`` fails a benchmark suite's checks of its test functions, because a shift
-    along x by any ``c > 0`` evaluates ``tan(x)^tan(x)`` left of ``a = 0``, where the base ``tan(x)`` is negative.
+    The published test function on ``[0, 1.5]`` does not satisfy the benchmark suite inclusion conditions, because a
+    shift along x by any ``c > 0`` evaluates ``tan(x)^tan(x)`` left of ``a = 0``, where the base ``tan(x)`` is negative.
     """
 
     number = (1, 1, 5, 3)

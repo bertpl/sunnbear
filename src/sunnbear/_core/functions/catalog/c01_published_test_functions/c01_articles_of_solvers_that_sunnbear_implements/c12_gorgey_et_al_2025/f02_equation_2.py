@@ -26,8 +26,8 @@ class GorgeyEtAl2025Equation2(Formula):
     half up to 1 significant digit; ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new
     interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because ``f(a) = log(0)`` is not
-    finite.
+    The published test function does not satisfy the benchmark suite inclusion conditions, because ``f(a) = log(0)`` is
+    not finite.
     """
 
     number = (1, 1, 12, 2)

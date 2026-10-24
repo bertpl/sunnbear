@@ -36,10 +36,11 @@ class SuliMayers200312(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test functions fail a benchmark suite's checks of its test functions, because each published interval
-    holds an even number of roots, ``1.05 - 1/M`` and ``1.05 + 1/M``, so that ``f(a)`` and ``f(b)`` have the same sign.
+    The published test functions do not satisfy the benchmark suite inclusion conditions, because each published
+    interval holds an even number of roots, ``1.05 - 1/M`` and ``1.05 + 1/M``, so that ``f(a)`` and ``f(b)`` have the
+    same sign.
 
-    The ratio of the narrow published interval's largest bound to its width, about 52,500, is also above the checks'
+    The ratio of the narrow published interval's largest bound to its width, about 52,500, is also above the conditions'
     limit of 100.
     """
 

@@ -29,9 +29,9 @@ class ChapraCanale2015Ex52(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of each new interval.
 
-    The published test functions on ``[3, 5]`` and ``[4.2, 4.3]`` fail a benchmark suite's checks of its test functions,
-    because the 2 published intervals hold 6 and 2 roots, even numbers, so that ``f(a)`` and ``f(b)`` have the same
-    sign.
+    The published test functions on ``[3, 5]`` and ``[4.2, 4.3]`` do not satisfy the benchmark suite inclusion
+    conditions, because the 2 published intervals hold 6 and 2 roots, even numbers, so that ``f(a)`` and ``f(b)`` have
+    the same sign.
     """
 
     number = (1, 4, 6, 2)

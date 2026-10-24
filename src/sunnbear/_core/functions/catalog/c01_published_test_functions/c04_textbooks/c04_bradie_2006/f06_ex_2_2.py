@@ -33,8 +33,9 @@ class Bradie2006Ex22(Formula):
     ``tan(pi*x)`` at 0.5 by 1% of the published interval's width, rounded half up to 1 significant digit; ``c`` shifts x
     as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test function on ``[0, 0.5]`` fails a benchmark suite's checks of its test functions, because ``b =
-    0.5`` is the pole: ``f(b)`` is about ``1.6e16`` in float64, and a shift along x by any ``c < 0`` crosses the pole.
+    The published test function on ``[0, 0.5]`` does not satisfy the benchmark suite inclusion conditions, because
+    ``b = 0.5`` is the pole: ``f(b)`` is about ``1.6e16`` in float64, and a shift along x by any ``c < 0`` crosses the
+    pole.
     """
 
     number = (1, 4, 4, 6)

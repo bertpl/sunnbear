@@ -25,7 +25,7 @@ class RootsFortran20258688(Formula):
     Only the test function on ``[0, 2]`` has a version with ``modified = 1``, which keeps that interval, evaluates the
     published function at x without shifting x, and adds ``c`` to the function's value.
 
-    The published test function on ``[0, 2]`` fails a benchmark suite's checks of its test functions, because a shift
+    The published test function on ``[0, 2]`` does not satisfy the benchmark suite inclusion conditions, because a shift
     along x by any ``c > 0`` evaluates ``sqrt(x)`` left of ``a = 0``, outside its domain.
     """
 

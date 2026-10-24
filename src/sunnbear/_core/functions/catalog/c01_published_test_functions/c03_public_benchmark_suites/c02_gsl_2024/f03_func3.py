@@ -22,9 +22,9 @@ class Gsl2024Func3(Formula):
     With ``modified = 1``, the formula keeps the published interval, evaluates the published function at x without
     shifting x, and adds ``c`` to the function's value.
 
-    The published test function fails a benchmark suite's checks of its test functions, because its roots ``-1e-4`` and
-    ``1e-4`` lie ``1e-4`` from ``a = 0``: a shift along x by more than ``1e-4``, in either direction, changes the sign
-    of ``f(a)``.
+    The published test function does not satisfy the benchmark suite inclusion conditions, because its roots ``-1e-4``
+    and ``1e-4`` lie ``1e-4`` from ``a = 0``: a shift along x by more than ``1e-4``, in either direction, changes the
+    sign of ``f(a)``.
     """
 
     number = (1, 3, 2, 3)

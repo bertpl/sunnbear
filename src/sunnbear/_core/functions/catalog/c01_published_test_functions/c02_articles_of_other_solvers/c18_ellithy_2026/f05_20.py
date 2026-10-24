@@ -28,8 +28,8 @@ class Ellithy202620(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test function on ``[0, 2]`` fails a benchmark suite's checks of its test functions, because ``f(a)``
-    is 0 at the root ``a = 0``.
+    The published test function on ``[0, 2]`` does not satisfy the benchmark suite inclusion conditions, because
+    ``f(a)`` is 0 at the root ``a = 0``.
     """
 
     number = (1, 2, 18, 5)
