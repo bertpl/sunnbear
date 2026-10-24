@@ -21,5 +21,5 @@ class RejectionReason(StrEnum):
     CALIBRATION_NO_BOUND_FOUND = "calibration_no_bound_found"
     # The condition still fails at 1 of the benchmark's c-values after the last return to step 4 of the search.
     CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES = "calibration_fails_at_benchmark_c_values"
-    # The c-range is narrower than calibration's minimum width.
+    # The c-range is narrower than `MIN_C_RANGE_WIDTH` at step 6 of the search.
     CALIBRATION_C_RANGE_TOO_NARROW = "calibration_c_range_too_narrow"

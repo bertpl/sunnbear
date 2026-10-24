@@ -97,7 +97,8 @@ def test_the_c_range_ends_where_an_endpoint_value_falls_to_1_10_of_its_value_at_
             RejectionReason.CALIBRATION_NO_BOUND_FOUND,
             id="no_bound_on_the_positive_side",
         ),
-        # Step 6: the bounds lie just below abs(c) = 9e-5, so the c-range is about 1.8e-4 wide.
+        # Step 6: f(1, c) = 1 - 1e4*c falls to 1/10 of f(1, 0) at c = 9e-5, and f(-1, c) falls to 1/10 of f(-1, 0) at
+        # c = -9e-5, so the bounds lie just inside abs(c) = 9e-5 and the c-range is about 1.8e-4 wide.
         pytest.param(
             lambda x, c: x - 1e4 * c,
             -1.0,

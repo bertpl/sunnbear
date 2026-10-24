@@ -30,8 +30,8 @@ No search can check every c-value in a range, so the search ends by checking the
 5. Map the c-values of the benchmark's tuple set onto the range, and check the condition at each. On each side where
    the condition fails at any of these c-values, return to step 4, which now also uses these c-values; return to
    step 4 at most `MAX_RETURNS_TO_HALVING` times.
-6. Require the range to be at least `MIN_C_RANGE_WIDTH` wide: across a narrower range, ``c`` changes the test function
-   too little to vary the benchmark's samples.
+6. Require the range to be at least `MIN_C_RANGE_WIDTH` wide, because across a narrower range the test functions at
+   the c-values that the benchmark samples differ too little from one another.
 
 A candidate is rejected at the first step that fails, with that step's `RejectionReason`.
 """
