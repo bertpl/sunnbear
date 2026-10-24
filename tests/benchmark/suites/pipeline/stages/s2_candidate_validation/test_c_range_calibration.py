@@ -1,5 +1,5 @@
-"""`calibrate_c_range` finds the widest c-range in which both endpoint values keep their signs and their margin, or
-returns the `RejectionReason` of the step that rejects the candidate."""
+"""`calibrate_c_range` finds the widest c-range in which both endpoint values keep their signs and more than 1/10 of
+their magnitudes at ``c = 0``, or returns the `RejectionReason` of the step that rejects the candidate."""
 
 import math
 
@@ -14,7 +14,7 @@ from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.c_r
 )
 from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.rejection_reason import RejectionReason
 
-# A tuple set whose 2 c-values lie inside every c-range of these tests, except where a test chooses its own.
+# The 2 c-values of this tuple set lie inside every c-range of these tests, except where a test chooses its own.
 _MC_TUPLES = MCTuples(u=[0.5, 0.5], v=[0.25, 0.75])
 
 # On [-1, 1], `_step_xc_fun` gives the c-range [-127/128, 127/128] exactly: the doubling first fails at abs(c) = 1, and
@@ -28,11 +28,6 @@ def _step_xc_fun(x: float, c: float) -> float:
         return x
     else:
         return math.nan
-
-
-def _log_xc_fun(x: float, c: float) -> float:
-    """Return ``log(x + 2)``, which raises a `ValueError` at ``x = -2``."""
-    return math.log(x + 2.0)
 
 
 @pytest.mark.parametrize(
@@ -60,21 +55,26 @@ def test_the_c_range_ends_where_an_endpoint_value_falls_to_1_10_of_its_value_at_
         pytest.param(lambda x, c: x + 2.0, -1.0, 1.0, id="same_sign"),
         pytest.param(lambda x, c: x, 0.0, 1.0, id="zero_at_a"),
         pytest.param(lambda x, c: x if x > 0.0 else math.nan, -1.0, 1.0, id="nan_at_a"),
-        pytest.param(_log_xc_fun, -2.0, 1.0, id="raises_at_a"),
+        pytest.param(lambda x, c: math.log(x + 2.0), -2.0, 1.0, id="raises_at_a"),
         pytest.param(lambda x, c: (x + 0.5) ** 0.5 - 1.0, -1.0, 1.0, id="complex_at_a"),
     ],
 )
-def test_calibration_rejects_a_candidate_without_a_sign_change_at_c_0(xc_fun, a, b):
+def test_calibration_rejects_a_candidate_without_a_finite_sign_change_at_c_0(xc_fun, a, b):
     """A candidate whose ``f(a, 0)`` and ``f(b, 0)`` are not both finite and nonzero, with opposite signs, is
     rejected at step 1."""
-    # --- act / assert -----------------
-    assert calibrate_c_range(xc_fun, a, b, mc_tuples=_MC_TUPLES) == RejectionReason.CALIBRATION_NO_SIGN_CHANGE_AT_0
+    # --- act --------------------------
+    c_range = calibrate_c_range(xc_fun, a, b, mc_tuples=_MC_TUPLES)
+
+    # --- assert -----------------------
+    assert c_range == RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0
 
 
 def test_calibration_rejects_a_candidate_whose_condition_fails_at_the_first_probe():
     """For ``x - 1e10*c`` on [-1, 1], an endpoint value changes sign at ``abs(c) = 1e-10``, below the first probe."""
-    # --- act / assert -----------------
+    # --- act --------------------------
     c_range = calibrate_c_range(lambda x, c: x - 1e10 * c, -1.0, 1.0, mc_tuples=_MC_TUPLES)
+
+    # --- assert -----------------------
     assert c_range == RejectionReason.CALIBRATION_FAILS_AT_FIRST_PROBE
 
 
@@ -87,18 +87,39 @@ def test_calibration_rejects_a_candidate_whose_condition_fails_at_the_first_prob
 )
 def test_calibration_rejects_a_candidate_whose_condition_holds_after_the_last_doubling(xc_fun):
     """A candidate whose condition still holds at the last probe on a side of ``c = 0`` has no bound there."""
-    # --- act / assert -----------------
-    assert calibrate_c_range(xc_fun, -1.0, 1.0, mc_tuples=_MC_TUPLES) == RejectionReason.CALIBRATION_NO_BOUND_FOUND
+    # --- act --------------------------
+    c_range = calibrate_c_range(xc_fun, -1.0, 1.0, mc_tuples=_MC_TUPLES)
+
+    # --- assert -----------------------
+    assert c_range == RejectionReason.CALIBRATION_NO_BOUND_FOUND
 
 
-def test_a_benchmark_c_value_that_fails_narrows_the_c_range_on_its_side():
+@pytest.mark.parametrize(
+    "max_returns_to_halving, c_range_expected",
+    [
+        pytest.param(
+            c_range_calibration.MAX_RETURNS_TO_HALVING,
+            CRange(c_min=-_STEP_C_MAX, c_max=0.25),
+            id="narrows_the_c_range",
+        ),
+        pytest.param(0, RejectionReason.CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES, id="rejects_after_the_last_return"),
+    ],
+)
+def test_a_benchmark_c_value_that_fails_narrows_the_c_range_or_rejects_the_candidate(
+    max_returns_to_halving, c_range_expected, monkeypatch
+):
     """The condition fails within (0.25, 0.5), between 2 probes, so the search misses it; the c-value at about 0.4
-    fails, and the return to the halving narrows the range on the positive side to 0.25, the probe below it."""
+    fails, and the return to the halving narrows the range on the positive side to 0.25, the probe below it. With no
+    return to the halving allowed, that c-value rejects the candidate."""
 
     # --- arrange ----------------------
     def xc_fun(x: float, c: float) -> float:
-        return math.nan if 0.25 < c < 0.5 else _step_xc_fun(x, c)
+        if 0.25 < c < 0.5:
+            return math.nan
+        else:
+            return _step_xc_fun(x, c)
 
+    monkeypatch.setattr(c_range_calibration, "MAX_RETURNS_TO_HALVING", max_returns_to_halving)
     # On [-127/128, 127/128], v = 0.7 maps to c = 0.397, which fails; v = 0.2 maps to c = -0.595.
     mc_tuples = MCTuples(u=[0.5, 0.5], v=[0.7, 0.2])
 
@@ -106,22 +127,7 @@ def test_a_benchmark_c_value_that_fails_narrows_the_c_range_on_its_side():
     c_range = calibrate_c_range(xc_fun, -1.0, 1.0, mc_tuples=mc_tuples)
 
     # --- assert -----------------------
-    assert c_range == CRange(c_min=-_STEP_C_MAX, c_max=0.25)
-
-
-def test_calibration_rejects_a_candidate_when_a_benchmark_c_value_fails_after_the_last_return(monkeypatch):
-    """With no return to the halving allowed, the c-value that fails in the test above rejects the candidate."""
-
-    # --- arrange ----------------------
-    def xc_fun(x: float, c: float) -> float:
-        return math.nan if 0.25 < c < 0.5 else _step_xc_fun(x, c)
-
-    monkeypatch.setattr(c_range_calibration, "MAX_RETURNS_TO_HALVING", 0)
-    mc_tuples = MCTuples(u=[0.5, 0.5], v=[0.7, 0.2])
-
-    # --- act / assert -----------------
-    c_range = calibrate_c_range(xc_fun, -1.0, 1.0, mc_tuples=mc_tuples)
-    assert c_range == RejectionReason.CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES
+    assert c_range == c_range_expected
 
 
 def test_calibration_rejects_a_candidate_when_a_benchmark_c_value_closer_to_0_than_the_first_probe_fails():
@@ -130,11 +136,16 @@ def test_calibration_rejects_a_candidate_when_a_benchmark_c_value_closer_to_0_th
 
     # --- arrange ----------------------
     def xc_fun(x: float, c: float) -> float:
-        return math.nan if 0.0 < c < 2.0**-33 else _step_xc_fun(x, c)
+        if 0.0 < c < 2.0**-33:
+            return math.nan
+        else:
+            return _step_xc_fun(x, c)
 
     # On [-127/128, 127/128], v = 0.5 + 2^-40 maps to c = 127 * 2^-46, between 0 and 2^-33.
     mc_tuples = MCTuples(u=[0.5, 0.5], v=[0.5 + 2.0**-40, 0.2])
 
-    # --- act / assert -----------------
+    # --- act --------------------------
     c_range = calibrate_c_range(xc_fun, -1.0, 1.0, mc_tuples=mc_tuples)
+
+    # --- assert -----------------------
     assert c_range == RejectionReason.CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES

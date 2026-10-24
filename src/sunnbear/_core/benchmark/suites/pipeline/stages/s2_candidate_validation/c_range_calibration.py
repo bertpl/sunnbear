@@ -1,16 +1,20 @@
 """c-range calibration, validation's second check, finds the c-range of a candidate.
 
 A candidate's c-range ``[c_min, c_max]``, with ``c_min < 0 < c_max``, is the range within which the benchmark samples
-``c``. Calibration searches the widest range in which every c-value meets 1 condition: ``f(a, c)`` and ``f(b, c)``
-are finite, and ``min(r_a, r_b) > MIN_ENDPOINT_VALUE_RATIO``, with ``r_a = f(a, c)/f(a, 0)`` and
+``c``.
+
+Calibration searches the widest range in which every c-value meets 1 condition: ``f(a, c)`` and ``f(b, c)`` are
+finite, and ``min(r_a, r_b) > MIN_ENDPOINT_VALUE_RATIO``, with ``r_a = f(a, c)/f(a, 0)`` and
 ``r_b = f(b, c)/f(b, 0)``. The condition gives 3 things:
 
 - **Signs:** each endpoint value keeps its sign from ``c = 0``, so ``f(a, c)`` and ``f(b, c)`` have opposite signs,
   and the test function keeps the orientation that it has at ``c = 0``, increasing or decreasing.
-- **Margin:** each endpoint value stays above 1/10 of its value at ``c = 0``, so the root stays away from both
-  endpoints. The margin also makes the range finite for a formula whose endpoint values shrink as ``abs(c)`` grows.
-- **Robust arithmetic:** a ratio that overflows or underflows still compares correctly with 1/10, while a product of
-  2 values can underflow to 0, as ``1e-170 * -1e-170`` does.
+- **Margin:** each endpoint value keeps more than the fraction `MIN_ENDPOINT_VALUE_RATIO` of its magnitude at
+  ``c = 0``, so the root stays away from both endpoints. The margin also makes the range finite for a formula whose
+  endpoint values shrink as ``abs(c)`` grows.
+- **Overflow and underflow:** a ratio that overflows or underflows still compares correctly with
+  `MIN_ENDPOINT_VALUE_RATIO`, while the product ``f(a, c) * f(b, c)``, the usual sign-change test, can underflow to 0,
+  as ``1e-170 * -1e-170`` does.
 
 No search can check every c-value in a range, so the search ends by checking the c-values that the benchmark samples.
 `calibrate_c_range` runs these steps, steps 2 to 4 on each side of ``c = 0`` separately:
@@ -20,11 +24,12 @@ No search can check every c-value in a range, so the search ends by checking the
 3. Double ``abs(c)`` until the condition fails, at most `MAX_DOUBLINGS` times; doubling keeps every probe exactly
    representable.
 4. Among every c-value evaluated so far on that side, take the interval closest to 0 in which the condition changes
-   from met to failing, and halve it until its ends differ by less than the fraction `MAX_BOUND_REL_GAP`. Its end at
-   which the condition holds is the bound, so the condition holds at every c-value evaluated so far within the range.
+   from met to failing, and halve it until its ends differ by less than the fraction `MAX_BOUND_REL_GAP` of its end
+   closer to 0. The interval's end at which the condition holds is the bound, so the condition holds at every c-value
+   evaluated so far within the range.
 5. Map the c-values of the benchmark's tuple set onto the range, and check the condition at each. On each side where
-   it fails at 1 of them, return to step 4, which then includes these c-values; at most `MAX_RETURNS_TO_HALVING`
-   times.
+   it fails at 1 of them, repeat step 4, whose c-values evaluated so far now include these; repeat at most
+   `MAX_RETURNS_TO_HALVING` times.
 
 A candidate is rejected at the first step that fails, with that step's `RejectionReason`.
 """
@@ -39,13 +44,15 @@ from sunnbear._core.functions.core import XCFun
 
 from .rejection_reason import RejectionReason
 
-# A c-value meets the condition only if both endpoint values exceed this fraction of their values at c = 0.
+# A c-value meets the condition only if each endpoint value keeps its sign and more than this fraction of its
+# magnitude at c = 0.
 MIN_ENDPOINT_VALUE_RATIO = 0.1
-# The absolute value of the first c-value that the search probes on each side of c = 0.
+# The search first probes the c-value of this absolute value on each side of c = 0.
 FIRST_PROBE_ABS_C = 2.0**-32
-# The search doubles abs(c) at most this many times on each side, so its last probe is abs(c) = 2^96.
+# The search doubles abs(c) at most this many times on each side of c = 0.
 MAX_DOUBLINGS = 128
-# The halving stops once the bound and the c-value at which the condition fails differ by less than this fraction.
+# The halving stops once the bound and the c-value at which the condition fails differ by less than this fraction of
+# the bound.
 MAX_BOUND_REL_GAP = 0.01
 # Step 5 returns to the halving at most this many times before it rejects the candidate.
 MAX_RETURNS_TO_HALVING = 10
@@ -73,30 +80,32 @@ def calibrate_c_range(xc_fun: XCFun, a: float, b: float, *, mc_tuples: MCTuples)
             a value that is not finite.
         a: The candidate's lower interval bound.
         b: The candidate's upper interval bound.
-        mc_tuples: The tuple set whose c-values step 5 checks: the benchmark's largest, of which every smaller size
-            is a prefix.
+        mc_tuples: The tuple set whose c-values step 5 checks: the largest size of the benchmark's tuple set, of which
+            every smaller size is a prefix.
     """
     try:
-        # --- steps 1 to 4 ---------------------------
+        # --- steps 1 to 4 -----------------------
         condition = _CRangeCondition(xc_fun, a, b)
-        sides = [_CRangeSide(condition, sign=-1.0), _CRangeSide(condition, sign=1.0)]
-        for side in sides:
-            side.probe_until_failure()
-        bounds = [side.halve_to_bound() for side in sides]
+        side_searches = [_CRangeSideSearch(condition, sign=-1.0), _CRangeSideSearch(condition, sign=1.0)]
+        for side_search in side_searches:
+            side_search.probe_until_failure()
+        bounds = [side_search.halve_to_bound() for side_search in side_searches]
 
-        # --- step 5, with its returns to step 4 -----
+        # --- step 5, with its returns to step 4 -
         n_returns = 0
         while True:
             c_range = CRange(c_min=-bounds[0], c_max=bounds[1])
             c_values = mc_tuples.to_c(c_range.c_min, c_range.c_max)
-            failing_side_idxs = [idx for idx, side in enumerate(sides) if not side.is_met_at_each(c_values)]
+            failing_side_idxs = [
+                idx for idx, side_search in enumerate(side_searches) if not side_search.is_met_at_each(c_values)
+            ]
             if not failing_side_idxs:
                 return c_range
             elif n_returns == MAX_RETURNS_TO_HALVING:
                 raise _CalibrationFailedError(RejectionReason.CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES)
             else:
                 for idx in failing_side_idxs:
-                    bounds[idx] = sides[idx].halve_to_bound()
+                    bounds[idx] = side_searches[idx].halve_to_bound()
                 n_returns += 1
     except _CalibrationFailedError as exc:
         return exc.reason
@@ -120,13 +129,13 @@ class _CRangeCondition:
         self.b = b
         endpoint_values_at_0 = self._endpoint_values(0.0)
         if endpoint_values_at_0 is None:
-            raise _CalibrationFailedError(RejectionReason.CALIBRATION_NO_SIGN_CHANGE_AT_0)
+            raise _CalibrationFailedError(RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0)
         self.fa_0, self.fb_0 = endpoint_values_at_0
         if not (self.fa_0 < 0.0 < self.fb_0 or self.fb_0 < 0.0 < self.fa_0):
-            raise _CalibrationFailedError(RejectionReason.CALIBRATION_NO_SIGN_CHANGE_AT_0)
+            raise _CalibrationFailedError(RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0)
 
     def is_met(self, c: float) -> bool:
-        """Return whether ``f(a, c)`` and ``f(b, c)`` are finite and both exceed the fraction of their values at 0."""
+        """Return whether ``f(a, c)`` and ``f(b, c)`` are finite, with ratios to their values at 0 above the limit."""
         endpoint_values = self._endpoint_values(c)
         if endpoint_values is None:
             return False
@@ -150,8 +159,8 @@ class _CRangeCondition:
             return None
 
 
-class _CRangeSide:
-    """`_CRangeSide` searches the bound of the c-range on 1 side of ``c = 0``.
+class _CRangeSideSearch:
+    """`_CRangeSideSearch` searches the bound of the c-range on 1 side of ``c = 0``.
 
     It identifies each c-value on its side by ``abs(c)``, and keeps whether the condition holds at each c-value that it
     evaluated, for the halving of step 4.
@@ -163,7 +172,7 @@ class _CRangeSide:
         self.sign = sign
         self.is_met_by_abs_c: dict[float, bool] = {}
 
-    def is_met(self, abs_c: float) -> bool:
+    def record_is_met(self, abs_c: float) -> bool:
         """Return whether the condition holds at the c-value ``sign*abs_c``, and keep the result."""
         is_met = self.condition.is_met(self.sign * abs_c)
         self.is_met_by_abs_c[abs_c] = is_met
@@ -176,11 +185,11 @@ class _CRangeSide:
             _CalibrationFailedError: If the condition fails at the first probe, or still holds after the last doubling.
         """
         abs_c = FIRST_PROBE_ABS_C
-        if not self.is_met(abs_c):
+        if not self.record_is_met(abs_c):
             raise _CalibrationFailedError(RejectionReason.CALIBRATION_FAILS_AT_FIRST_PROBE)
         for _ in range(MAX_DOUBLINGS):
             abs_c *= 2.0
-            if not self.is_met(abs_c):
+            if not self.record_is_met(abs_c):
                 return
         raise _CalibrationFailedError(RejectionReason.CALIBRATION_NO_BOUND_FOUND)
 
@@ -190,7 +199,7 @@ class _CRangeSide:
         It evaluates every such c-value, also after the first failure, so that a return to the halving finds the
         failing c-value closest to 0.
         """
-        is_met_at_c_values = [self.is_met(float(c) * self.sign) for c in c_values if c * self.sign > 0.0]
+        is_met_at_c_values = [self.record_is_met(float(c) * self.sign) for c in c_values if c * self.sign > 0.0]
         return all(is_met_at_c_values)
 
     def halve_to_bound(self) -> float:
@@ -198,7 +207,8 @@ class _CRangeSide:
 
         Among those c-values, the first at which the condition fails, counted from 0, and the c-value just closer to 0
         form the interval in which the condition changes from met to failing. The interval is halved until its ends
-        differ by less than `MAX_BOUND_REL_GAP`, and its end at which the condition holds is the bound.
+        differ by less than `MAX_BOUND_REL_GAP` times its end closer to 0, and its end at which the condition holds is
+        the bound.
 
         Raises:
             _CalibrationFailedError: If the condition fails at the evaluated c-value closest to 0. Only a c-value of
@@ -211,7 +221,7 @@ class _CRangeSide:
         abs_c_met, abs_c_failing = abs_cs[idx_first_failing - 1], abs_cs[idx_first_failing]
         while abs_c_failing - abs_c_met >= MAX_BOUND_REL_GAP * abs_c_met:
             abs_c_mid = 0.5 * (abs_c_met + abs_c_failing)
-            if self.is_met(abs_c_mid):
+            if self.record_is_met(abs_c_mid):
                 abs_c_met = abs_c_mid
             else:
                 abs_c_failing = abs_c_mid

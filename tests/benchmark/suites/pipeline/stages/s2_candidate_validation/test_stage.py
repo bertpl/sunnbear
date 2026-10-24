@@ -1,5 +1,5 @@
 """`CandidateValidationStage` keeps the valid candidates with their c-ranges, reports each rejected candidate with its
-`RejectionReason`, counts the rejections per formula, and gives the same output with 1 or 2 workers."""
+`RejectionReason`, counts and summarizes the rejections per formula, and gives the same output with 1 or 2 workers."""
 
 import polars as pl
 
@@ -63,7 +63,7 @@ def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(i
     assert rejected_candidates.schema == pl.Schema({**CANDIDATES_SCHEMA, **REJECTED_BY_SCHEMA})
     assert rejected_candidates.rows() == [
         ("f99.902", 100.0, 101.0, RejectionReason.BOUND_TO_WIDTH_RATIO.value),
-        ("f99.903", -1.0, 1.0, RejectionReason.CALIBRATION_NO_SIGN_CHANGE_AT_0.value),
+        ("f99.903", -1.0, 1.0, RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0.value),
     ]
     rejections_per_formula = output.reports[REJECTIONS_PER_FORMULA_REPORT_NAME]
     assert rejections_per_formula.columns == [
@@ -82,7 +82,7 @@ def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(i
 
 def test_the_stage_gives_the_same_output_with_1_or_2_workers():
     """Calibration runs in tasks of the worker pool; with 2 worker processes, the output and reports equal those of a
-    run in this process, on shipped formulas whose candidates both checks reject in part."""
+    run in this process, on shipped formulas with some candidates that each check rejects."""
     # --- arrange ----------------------
     formulas = [formula for formula in FormulaRegistry.formulas() if formula.number[:3] in {(1, 4, 2), (2, 1, 1)}]
     candidates = CandidateGenerationStage(formulas).compute_output(pl.DataFrame(), worker_pool=WorkerPool(n_workers=1))
@@ -95,11 +95,33 @@ def test_the_stage_gives_the_same_output_with_1_or_2_workers():
 
     # --- assert -----------------------
     rejected_by = in_process_output.reports[REJECTED_CANDIDATES_REPORT_NAME]["rejected_by"]
-    assert {RejectionReason.BOUND_TO_WIDTH_RATIO.value, RejectionReason.CALIBRATION_NO_SIGN_CHANGE_AT_0.value} <= set(
-        rejected_by
-    )
+    assert {
+        RejectionReason.BOUND_TO_WIDTH_RATIO.value,
+        RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0.value,
+    } <= set(rejected_by)
     assert in_process_output.table.height > 0
     assert worker_processes_output.table.equals(in_process_output.table)
     assert worker_processes_output.reports.keys() == in_process_output.reports.keys()
     for report_name, report in worker_processes_output.reports.items():
         assert report.equals(in_process_output.reports[report_name])
+
+
+def test_the_summary_gives_1_line_per_formula_with_rejected_candidates():
+    """Only a formula with a rejected candidate gets a line, which counts the rejections of each reason that rejected
+    any."""
+    # --- arrange ----------------------
+    rejection_counts = {reason.value: [0, 0] for reason in RejectionReason}
+    rejection_counts[RejectionReason.BOUND_TO_WIDTH_RATIO.value] = [1, 0]
+    rejection_counts[RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0.value] = [2, 0]
+    rejections_per_formula = pl.DataFrame(
+        {"formula_id": ["f1.1.1.1", "f1.1.1.2"], "n_candidates": [4, 2], "n_valid": [1, 2], **rejection_counts}
+    )
+
+    # --- act --------------------------
+    lines = CandidateValidationStage.summarize_rejections_per_formula(rejections_per_formula)
+
+    # --- assert -----------------------
+    assert lines == [
+        "formulas with rejected candidates: 1 of 2",
+        "  f1.1.1.1: 1 of 4 candidates valid; bound_to_width_ratio: 1, calibration_no_finite_sign_change_at_0: 2",
+    ]

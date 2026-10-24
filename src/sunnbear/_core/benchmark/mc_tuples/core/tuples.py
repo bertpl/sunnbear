@@ -98,7 +98,7 @@ class MCTuples:
         return xtol_min * np.exp2(self._u), self.to_c(c_min, c_max)
 
     def to_c(self, c_min: float, c_max: float) -> np.ndarray:
-        """Return the `c` value of every tuple for one test function, `c_min + v * (c_max - c_min)`, in tuple order."""
+        """Return the `c` value of every tuple for one test function, with `v` mapped linearly onto `[c_min, c_max]`."""
         return c_min + self._v * (c_max - c_min)
 
     # --------------------------------------------------------------------------

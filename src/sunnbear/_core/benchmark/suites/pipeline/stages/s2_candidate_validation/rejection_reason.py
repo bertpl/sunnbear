@@ -14,7 +14,7 @@ class RejectionReason(StrEnum):
 
     BOUND_TO_WIDTH_RATIO = "bound_to_width_ratio"
     # f(a, 0) and f(b, 0) are not both finite and nonzero, with opposite signs.
-    CALIBRATION_NO_SIGN_CHANGE_AT_0 = "calibration_no_sign_change_at_0"
+    CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0 = "calibration_no_finite_sign_change_at_0"
     # The condition fails at the first probe, on either side of c = 0.
     CALIBRATION_FAILS_AT_FIRST_PROBE = "calibration_fails_at_first_probe"
     # The condition still holds after the last doubling of abs(c), on either side of c = 0.
