@@ -1,14 +1,15 @@
-"""``python -m sunnbear._core.suites.pipeline`` runs the pipeline over the shipped formulas into the ``--workspace``
-directory, and refuses to run without one."""
+"""``python -m sunnbear._core.benchmark.suites.pipeline`` runs the pipeline over the shipped formulas into the
+``--workspace`` directory, and refuses to run without one."""
 
 import runpy
 import sys
 
 import pytest
 
-from sunnbear._core.suites.pipeline.stage import PipelineStage
+from sunnbear._core.benchmark.suites.pipeline.stages import CandidateGeneration, CandidateValidation
 
-_PIPELINE_PACKAGE = "sunnbear._core.suites.pipeline"
+_PIPELINE_PACKAGE = "sunnbear._core.benchmark.suites.pipeline"
+_OUTPUT_NAMES = [CandidateGeneration.output_name, CandidateValidation.output_name]
 
 
 def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> None:
@@ -28,9 +29,9 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
     _run_pipeline_command(monkeypatch, ["--workspace", str(tmp_path)])
 
     # --- assert -----------------------
-    printed_stages = [line.split(":")[0] for line in capsys.readouterr().out.splitlines()]
-    assert printed_stages == list(PipelineStage)
-    assert sorted(path.name for path in tmp_path.glob("*.parquet")) == [f"{stage}.parquet" for stage in PipelineStage]
+    printed_output_names = [line.split(":")[0] for line in capsys.readouterr().out.splitlines()]
+    assert printed_output_names == _OUTPUT_NAMES
+    assert sorted(path.name for path in tmp_path.glob("*.parquet")) == [f"{name}.parquet" for name in _OUTPUT_NAMES]
 
 
 def test_the_command_requires_a_workspace(monkeypatch, capsys):

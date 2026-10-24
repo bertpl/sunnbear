@@ -5,20 +5,20 @@ import datetime
 import polars as pl
 import pytest
 
-from sunnbear._core.suites.pipeline.manifest import PipelineStageManifest
-from sunnbear._core.suites.pipeline.stage import PipelineStage
-from sunnbear._core.suites.pipeline.validation import RejectionReason
+from sunnbear._core.benchmark.suites.pipeline.core.manifest import PipelineStageManifest
+
+from .example_stages import ExampleCheckedNumbers, ExampleNumbers
 
 
 @pytest.mark.parametrize(
     "output, rejection_counts_expected",
     [
         pytest.param(
-            pl.DataFrame({"rejected_by": ["bound_to_width_ratio", "", "bound_to_width_ratio"]}),
-            {RejectionReason.BOUND_TO_WIDTH_RATIO: 2},
+            pl.DataFrame({"rejected_by": ["too_large", "", "too_large"]}),
+            {"too_large": 2},
             id="output_with_rejections",
         ),
-        pytest.param(pl.DataFrame({"function_id": ["f2.1.1[p1=0.2]"]}), {}, id="output_without_rejected_by"),
+        pytest.param(pl.DataFrame({"x": [1.0]}), {}, id="output_without_rejected_by"),
     ],
 )
 def test_the_manifest_counts_the_rows_and_the_rejections_per_reason(output, rejection_counts_expected):
@@ -26,7 +26,7 @@ def test_the_manifest_counts_the_rows_and_the_rejections_per_reason(output, reje
     has no rejections."""
     # --- arrange ----------------------
     input_manifest = PipelineStageManifest.from_stage_output(
-        stage=PipelineStage.CANDIDATE_GENERATION,
+        stage=ExampleNumbers(),
         output=pl.DataFrame(),
         output_sha256="ab" * 32,
         input_manifests=(),
@@ -36,7 +36,7 @@ def test_the_manifest_counts_the_rows_and_the_rejections_per_reason(output, reje
 
     # --- act --------------------------
     manifest = PipelineStageManifest.from_stage_output(
-        stage=PipelineStage.CANDIDATE_VALIDATION,
+        stage=ExampleCheckedNumbers(),
         output=output,
         output_sha256="cd" * 32,
         input_manifests=(input_manifest,),
@@ -45,6 +45,7 @@ def test_the_manifest_counts_the_rows_and_the_rejections_per_reason(output, reje
     )
 
     # --- assert -----------------------
+    assert manifest.output_name == "s2_checked_numbers"
     assert manifest.n_rows == output.height
     assert manifest.rejection_counts == rejection_counts_expected
-    assert manifest.input_sha256s == {PipelineStage.CANDIDATE_GENERATION: "ab" * 32}
+    assert manifest.input_sha256s == {"s1_numbers": "ab" * 32}

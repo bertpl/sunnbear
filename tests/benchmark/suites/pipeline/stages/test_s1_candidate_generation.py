@@ -1,10 +1,13 @@
-"""`generate_candidates` lists every candidate of every formula, formula by formula, with its id and interval bounds."""
+"""`CandidateGeneration` lists every candidate of every formula, formula by formula, with its id and interval bounds."""
 
 import polars as pl
 import pytest
 
+from sunnbear._core.benchmark.suites.pipeline.stages.s1_candidate_generation import (
+    CANDIDATES_SCHEMA,
+    CandidateGeneration,
+)
 from sunnbear._core.functions.core import FormulaRegistry
-from sunnbear._core.suites.pipeline.generation import CANDIDATES_SCHEMA, generate_candidates
 
 
 @pytest.mark.parametrize(
@@ -27,7 +30,7 @@ def test_the_candidates_are_listed_formula_by_formula_in_the_given_order(formula
     ]
 
     # --- act --------------------------
-    candidates = generate_candidates(formulas)
+    candidates = CandidateGeneration(formulas).compute_output({})
 
     # --- assert -----------------------
     assert candidates.schema == pl.Schema(CANDIDATES_SCHEMA)

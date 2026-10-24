@@ -1,10 +1,16 @@
-"""`validate_candidates` keeps every candidate and records the check that rejected it."""
+"""`CandidateValidation` keeps every candidate and records the check that rejected it."""
 
 import polars as pl
 import pytest
 
-from sunnbear._core.suites.pipeline.generation import CANDIDATES_SCHEMA
-from sunnbear._core.suites.pipeline.validation import CHECKED_CANDIDATES_SCHEMA, validate_candidates
+from sunnbear._core.benchmark.suites.pipeline.stages.s1_candidate_generation import (
+    CANDIDATES_SCHEMA,
+    CandidateGeneration,
+)
+from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation import (
+    CHECKED_CANDIDATES_SCHEMA,
+    CandidateValidation,
+)
 
 
 @pytest.mark.parametrize(
@@ -23,8 +29,8 @@ def test_the_interval_check_rejects_an_interval_whose_ratio_exceeds_100(a, b, re
     candidates = pl.DataFrame({"function_id": ["f2.1.1[p1=0.2]"], "a": [a], "b": [b]}, schema=CANDIDATES_SCHEMA)
 
     # --- act --------------------------
-    validated = validate_candidates(candidates)
+    checked_candidates = CandidateValidation().compute_output({CandidateGeneration: candidates})
 
     # --- assert -----------------------
-    assert validated.schema == pl.Schema(CHECKED_CANDIDATES_SCHEMA)
-    assert validated.rows() == [("f2.1.1[p1=0.2]", a, b, rejected_by_expected)]
+    assert checked_candidates.schema == pl.Schema(CHECKED_CANDIDATES_SCHEMA)
+    assert checked_candidates.rows() == [("f2.1.1[p1=0.2]", a, b, rejected_by_expected)]

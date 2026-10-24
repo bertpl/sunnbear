@@ -1,7 +1,7 @@
-"""A `PipelineStageManifest` records how a stage of the suite pipeline built its output in the `PipelineWorkspace`.
+"""A `PipelineStageManifest` records how a stage of the benchmark suite pipeline built its output.
 
-Through their `PipelineStageManifest.input_sha256s`, the manifests trace each stage's output back to that
-stage's inputs.
+The `PipelineWorkspace` writes 1 manifest per stage. Through their `PipelineStageManifest.input_sha256s`, the
+manifests trace each stage's output back to that stage's inputs.
 """
 
 import datetime
@@ -13,7 +13,6 @@ import polars as pl
 from pydantic import BaseModel, ConfigDict
 
 from .stage import PipelineStage
-from .validation import RejectionReason
 
 
 # ==================================================================================================
@@ -22,26 +21,28 @@ from .validation import RejectionReason
 class PipelineStageManifest(BaseModel):
     """A `PipelineStageManifest` records how 1 stage built its output: from which inputs, with which code, and when.
 
-    Pydantic's validation of the fields is strict: a value of the wrong type is refused, not converted, and
-    unknown fields are refused.
+    Pydantic's validation of the fields is strict: a value of the wrong type is refused, not converted, and unknown
+    fields are refused.
 
     Attributes:
+        output_name: The `PipelineStage.output_name` of the stage that built the output.
         output_sha256: The sha256 of the output file's bytes, as hex.
-        input_sha256s: The `output_sha256` of each stage whose output this stage read, keyed by that stage.
-        rejection_counts: The number of rejected candidates in the output per `RejectionReason`; a reason
-            that rejected no candidate is left out.
+        input_sha256s: The `output_sha256` of each stage whose output this stage read, keyed by that stage's
+            `output_name`.
+        rejection_counts: The number of rejected candidates in the output per reason in its ``rejected_by`` column;
+            a reason that rejected no candidate is left out.
         started_at: When the stage started, in UTC.
         duration_sec: How long the stage took to compute its output, excluding the time to write it.
     """
 
     model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
 
-    stage: PipelineStage
+    output_name: str
     output_sha256: str
-    input_sha256s: dict[PipelineStage, str]
+    input_sha256s: dict[str, str]
     sunnbear_version: str
     n_rows: int
-    rejection_counts: dict[RejectionReason, int]
+    rejection_counts: dict[str, int]
     started_at: datetime.datetime
     duration_sec: float
 
@@ -49,19 +50,17 @@ class PipelineStageManifest(BaseModel):
     #  Helpers
     # --------------------------------------------------------------------------
     @staticmethod
-    def _count_rejections(output: pl.DataFrame) -> dict[RejectionReason, int]:
-        """Return the number of rejected candidates per `RejectionReason` in a stage's output.
+    def _count_rejections(output: pl.DataFrame) -> dict[str, int]:
+        """Return the number of rejected candidates per reason in a stage's output.
 
-        An output without a ``rejected_by`` column comes from a stage that rejects no candidate, so the result
-        is an empty dict.
+        An output without a ``rejected_by`` column comes from a stage that rejects no candidate, so the result is an
+        empty dict.
         """
         if "rejected_by" not in output.columns:
             return {}
         else:
             rejected = output.filter(pl.col("rejected_by") != "")
-            return {
-                RejectionReason(reason): count for reason, count in rejected.group_by("rejected_by").len().iter_rows()
-            }
+            return {str(reason): count for reason, count in rejected.group_by("rejected_by").len().iter_rows()}
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -79,9 +78,11 @@ class PipelineStageManifest(BaseModel):
     ) -> Self:
         """Build the manifest of `stage` from its output and the manifests of the stages whose outputs it read."""
         return cls(
-            stage=stage,
+            output_name=stage.output_name,
             output_sha256=output_sha256,
-            input_sha256s={input_manifest.stage: input_manifest.output_sha256 for input_manifest in input_manifests},
+            input_sha256s={
+                input_manifest.output_name: input_manifest.output_sha256 for input_manifest in input_manifests
+            },
             sunnbear_version=importlib.metadata.version("sunnbear"),
             n_rows=output.height,
             rejection_counts=cls._count_rejections(output),
