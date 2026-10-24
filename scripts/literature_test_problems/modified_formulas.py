@@ -29,15 +29,16 @@ class ModificationType(StrEnum):
     # The modified function keeps the published interval [a, b] and evaluates the published function at
     # x*exp(-c*ln(b/a)): c scales x, so that the root moves by the factor (b/a)**c and never reaches 0.
     C_SCALES_X = "c_scales_x"
-    # The modified function evaluates the published function at x + s, where s is a constant that the formula's
-    # docstring states, and has its own interval, which lies around 0; c shifts x by the rule of category 1, with
+    # The modified function evaluates the published function at x + s, where the formula's docstring states the
+    # constant s. The modified function has its own interval, at or around 0, so that the interval is no longer narrow
+    # next to its distance from 0, or holds 1 root of a V-shaped function; c shifts x by the rule of category 1, with
     # c_scale the rounded width of the new interval.
-    C_SHIFTS_X_ON_SHIFTED_AXIS = "c_shifts_x_on_shifted_axis"
+    C_SHIFTS_X_ON_INTERVAL_NEAR_0 = "c_shifts_x_on_interval_near_0"
 
     @property
     def is_x_shifted_by_c_scale(self) -> bool:
         """Return whether the modified function shifts x by ``c_scale*c``, the rule of category 1."""
-        return self in (ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL, ModificationType.C_SHIFTS_X_ON_SHIFTED_AXIS)
+        return self in (ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL, ModificationType.C_SHIFTS_X_ON_INTERVAL_NEAR_0)
 
 
 # MODIFIED_FORMULAS holds the type of modification of each formula of category 1 that has the parameter `modified`.
@@ -63,7 +64,7 @@ MODIFIED_FORMULAS = {
     "f1.3.1.4": ModificationType.C_SCALES_X,
     "f1.3.1.6": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.3.2.3": ModificationType.C_ADDS_TO_F,
-    "f1.3.2.5": ModificationType.C_SHIFTS_X_ON_SHIFTED_AXIS,
+    "f1.3.2.5": ModificationType.C_SHIFTS_X_ON_INTERVAL_NEAR_0,
     "f1.3.3.30": ModificationType.C_ADDS_TO_F,
     "f1.3.3.33": ModificationType.C_ADDS_TO_F,
     "f1.3.4.2": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
@@ -71,9 +72,9 @@ MODIFIED_FORMULAS = {
     "f1.3.6.2": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.3.6.3": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.3.6.4": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
-    "f1.4.1.2": ModificationType.C_SHIFTS_X_ON_SHIFTED_AXIS,
+    "f1.4.1.2": ModificationType.C_SHIFTS_X_ON_INTERVAL_NEAR_0,
     "f1.4.1.8": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
-    "f1.4.2.1": ModificationType.C_SHIFTS_X_ON_SHIFTED_AXIS,
+    "f1.4.2.1": ModificationType.C_SHIFTS_X_ON_INTERVAL_NEAR_0,
     "f1.4.2.5": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.4.3.1": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.4.3.5": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
@@ -85,7 +86,7 @@ MODIFIED_FORMULAS = {
     "f1.4.5.15": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.4.5.20": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.4.5.21": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
-    "f1.4.5.23": ModificationType.C_SHIFTS_X_ON_SHIFTED_AXIS,
+    "f1.4.5.23": ModificationType.C_SHIFTS_X_ON_INTERVAL_NEAR_0,
     "f1.4.6.2": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
     "f1.4.6.20": ModificationType.C_ADDS_TO_F,
     "f1.4.7.4": ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
