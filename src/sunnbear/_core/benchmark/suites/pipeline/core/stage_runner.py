@@ -45,7 +45,7 @@ def run_stages(workspace: PipelineWorkspace, stages: Sequence[PipelineStage]) ->
         duration_sec = time.perf_counter() - t_start
 
         # --- output and manifest files ----------
-        manifests[type(stage)] = workspace.write_stage(
+        manifests[type(stage)] = workspace.write_stage_output_and_manifest(
             stage=stage,
             output=output,
             input_manifests=[manifests[input_stage] for input_stage in stage.input_stages],

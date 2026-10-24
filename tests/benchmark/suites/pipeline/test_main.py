@@ -6,10 +6,10 @@ import sys
 
 import pytest
 
-from sunnbear._core.benchmark.suites.pipeline.stages import CandidateGeneration, CandidateValidation
+from sunnbear._core.benchmark.suites.pipeline.stages import CandidateGenerationStage, CandidateValidationStage
 
 _PIPELINE_PACKAGE = "sunnbear._core.benchmark.suites.pipeline"
-_OUTPUT_NAMES = [CandidateGeneration.output_name, CandidateValidation.output_name]
+_OUTPUT_NAMES = [CandidateGenerationStage.output_name, CandidateValidationStage.output_name]
 
 
 def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> None:

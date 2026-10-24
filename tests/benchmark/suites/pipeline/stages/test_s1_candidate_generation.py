@@ -1,11 +1,11 @@
-"""`CandidateGeneration` lists every candidate of every formula, formula by formula, with its id and interval bounds."""
+"""`CandidateGenerationStage` lists every candidate of every given formula, with its id and interval bounds."""
 
 import polars as pl
 import pytest
 
 from sunnbear._core.benchmark.suites.pipeline.stages.s1_candidate_generation import (
     CANDIDATES_SCHEMA,
-    CandidateGeneration,
+    CandidateGenerationStage,
 )
 from sunnbear._core.functions.core import FormulaRegistry
 
@@ -30,7 +30,7 @@ def test_the_candidates_are_listed_formula_by_formula_in_the_given_order(formula
     ]
 
     # --- act --------------------------
-    candidates = CandidateGeneration(formulas).compute_output({})
+    candidates = CandidateGenerationStage(formulas).compute_output({})
 
     # --- assert -----------------------
     assert candidates.schema == pl.Schema(CANDIDATES_SCHEMA)

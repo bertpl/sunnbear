@@ -1,15 +1,15 @@
-"""`CandidateValidation` keeps every candidate and records the check that rejected it."""
+"""`CandidateValidationStage` keeps every candidate and records the check that rejected it."""
 
 import polars as pl
 import pytest
 
 from sunnbear._core.benchmark.suites.pipeline.stages.s1_candidate_generation import (
     CANDIDATES_SCHEMA,
-    CandidateGeneration,
+    CandidateGenerationStage,
 )
 from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation import (
     CHECKED_CANDIDATES_SCHEMA,
-    CandidateValidation,
+    CandidateValidationStage,
 )
 
 
@@ -22,14 +22,14 @@ from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation imp
         pytest.param(-101.0, -100.0, "bound_to_width_ratio", id="ratio_101_left_of_0"),
     ],
 )
-def test_the_interval_check_rejects_an_interval_whose_ratio_exceeds_100(a, b, rejected_by_expected):
-    """A candidate whose ratio ``max(abs(a), abs(b)) / (b - a)`` exceeds 100 is rejected by the interval check, on
-    either side of 0; one at the limit is valid."""
+def test_the_bound_to_width_ratio_check_rejects_an_interval_whose_ratio_exceeds_100(a, b, rejected_by_expected):
+    """A candidate whose ratio ``max(abs(a), abs(b)) / (b - a)`` exceeds 100 is rejected by the bound-to-width ratio
+    check, on either side of 0; one at the limit is valid."""
     # --- arrange ----------------------
     candidates = pl.DataFrame({"function_id": ["f2.1.1[p1=0.2]"], "a": [a], "b": [b]}, schema=CANDIDATES_SCHEMA)
 
     # --- act --------------------------
-    checked_candidates = CandidateValidation().compute_output({CandidateGeneration: candidates})
+    checked_candidates = CandidateValidationStage().compute_output({CandidateGenerationStage: candidates})
 
     # --- assert -----------------------
     assert checked_candidates.schema == pl.Schema(CHECKED_CANDIDATES_SCHEMA)

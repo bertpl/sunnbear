@@ -40,7 +40,7 @@ class PipelineWorkspace:
     # --------------------------------------------------------------------------
     #  Stage outputs and manifests
     # --------------------------------------------------------------------------
-    def write_stage(
+    def write_stage_output_and_manifest(
         self,
         *,
         stage: PipelineStage,

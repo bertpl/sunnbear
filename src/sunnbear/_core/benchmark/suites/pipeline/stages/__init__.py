@@ -4,10 +4,10 @@ Each module's name starts with ``s`` and its stage's position in the run order, 
 `PipelineStage.output_name` does, so the modules sort in run order.
 """
 
-from .s1_candidate_generation import CANDIDATES_SCHEMA, CandidateGeneration
+from .s1_candidate_generation import CANDIDATES_SCHEMA, CandidateGenerationStage
 from .s2_candidate_validation import (
     CHECKED_CANDIDATES_SCHEMA,
     MAX_BOUND_TO_WIDTH_RATIO,
-    CandidateValidation,
+    CandidateValidationStage,
     RejectionReason,
 )

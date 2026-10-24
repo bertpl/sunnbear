@@ -1,5 +1,9 @@
-"""`run_stages` writes each stage's output and manifest into the workspace, a rerun replaces them, and a stage cannot
-run before the stages whose outputs it reads."""
+"""The tests of `run_stages` check that:
+
+- it writes each stage's output and manifest into the workspace;
+- a rerun replaces them;
+- a stage cannot run before the stages whose outputs it reads.
+"""
 
 import hashlib
 
@@ -10,14 +14,14 @@ from sunnbear._core.benchmark.suites.pipeline.core.manifest import PipelineStage
 from sunnbear._core.benchmark.suites.pipeline.core.stage_runner import run_stages
 from sunnbear._core.benchmark.suites.pipeline.core.workspace import PipelineWorkspace
 
-from .example_stages import ExampleCheckedNumbers, ExampleNumbers
+from .example_stages import ExampleCheckedNumbersStage, ExampleNumbersStage
 
 
 def test_each_stage_writes_its_output_and_a_manifest_that_names_the_outputs_it_read(tmp_path):
     """Each stage's manifest is in the workspace, matches the output file's bytes and rows, and records the sha256 of
     each of the stage's inputs."""
     # --- act --------------------------
-    manifests = run_stages(PipelineWorkspace(tmp_path), [ExampleNumbers(), ExampleCheckedNumbers()])
+    manifests = run_stages(PipelineWorkspace(tmp_path), [ExampleNumbersStage(), ExampleCheckedNumbersStage()])
 
     # --- assert -----------------------
     numbers_manifest, checked_numbers_manifest = manifests
@@ -36,10 +40,10 @@ def test_a_rerun_replaces_the_outputs_and_manifests_and_leaves_no_temporary_file
     """A second run into the same workspace replaces every file of the first, and leaves only the final files."""
     # --- arrange ----------------------
     workspace = PipelineWorkspace(tmp_path)
-    run_stages(workspace, [ExampleNumbers(), ExampleCheckedNumbers()])
+    run_stages(workspace, [ExampleNumbersStage(), ExampleCheckedNumbersStage()])
 
     # --- act --------------------------
-    second_manifests = run_stages(workspace, [ExampleNumbers(), ExampleCheckedNumbers()])
+    second_manifests = run_stages(workspace, [ExampleNumbersStage(), ExampleCheckedNumbersStage()])
 
     # --- assert -----------------------
     assert [
@@ -57,5 +61,5 @@ def test_a_rerun_replaces_the_outputs_and_manifests_and_leaves_no_temporary_file
 def test_a_stage_cannot_run_before_the_stages_whose_outputs_it_reads(tmp_path):
     """A stage whose input stage does not run before it raises `ValueError`, which names the missing stage."""
     # --- act / assert -----------------
-    with pytest.raises(ValueError, match=r"ExampleCheckedNumbers reads the outputs of \['ExampleNumbers'\]"):
-        run_stages(PipelineWorkspace(tmp_path), [ExampleCheckedNumbers()])
+    with pytest.raises(ValueError, match=r"ExampleCheckedNumbersStage reads the outputs of \['ExampleNumbersStage'\]"):
+        run_stages(PipelineWorkspace(tmp_path), [ExampleCheckedNumbersStage()])

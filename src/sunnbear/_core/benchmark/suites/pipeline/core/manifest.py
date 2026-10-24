@@ -1,7 +1,7 @@
 """A `PipelineStageManifest` records how a stage of the benchmark suite pipeline built its output.
 
-The `PipelineWorkspace` writes 1 manifest per stage. Through their `PipelineStageManifest.input_sha256s`, the
-manifests trace each stage's output back to that stage's inputs.
+Through `PipelineStageManifest.input_sha256s`, the manifests of a run trace each stage's output back to that stage's
+inputs.
 """
 
 import datetime

@@ -1,4 +1,4 @@
-"""Candidate validation, the second stage of the benchmark suite pipeline, runs the validation checks.
+"""Candidate validation, the second stage of the benchmark suite pipeline, records which check rejects each candidate.
 
 The checks run in sequence, cheapest first, and a candidate is rejected by its first failed check. Rejected candidates
 stay in the output, so that the reasons can be counted per formula.
@@ -7,18 +7,19 @@ The output holds every candidate of the candidate generation stage, with the col
 its ``rejected_by`` column names the check that rejected the candidate, as a `RejectionReason`, or holds ``""`` for a
 valid candidate.
 
-The interval check, the first check, rejects a candidate whose interval lies far from 0 relative to its width: its
-bound-to-width ratio ``max(abs(a), abs(b)) / (b - a)`` exceeds `MAX_BOUND_TO_WIDTH_RATIO`.
+The bound-to-width ratio check, the first check, rejects a candidate whose interval lies far from 0 relative to its
+width: its bound-to-width ratio ``max(abs(a), abs(b)) / (b - a)`` exceeds `MAX_BOUND_TO_WIDTH_RATIO`.
 
-Rounding a bound changes the interval's width by up to about ``eps * max(abs(a), abs(b))``, with ``eps`` the float64
-machine epsilon; relative to the width, that change is about ``eps`` times the ratio.
+Rounding a bound to float64, as bisection does when a midpoint becomes a new bound, changes the interval's width by up
+to about ``eps * max(abs(a), abs(b))``, with ``eps`` the float64 machine epsilon; relative to the width, that change is
+about ``eps`` times the bound-to-width ratio.
 
-Bisection's evaluation count changes by 1 wherever ``(b - a) / (2*xtol)`` crosses a power of 2, so for an ``xtol``
-close to such a value, the change in width can shift the count by 1. A larger ratio widens the range of ``xtol``
-values at which the count depends on rounding.
+Bisection's evaluation count changes by 1 wherever ``(b - a) / (2*xtol)`` crosses a power of 2, so for an ``xtol`` at
+which that quotient is close to a power of 2, the change in width can shift the count by 1. A larger bound-to-width
+ratio widens the range of ``xtol`` values at which the count depends on rounding.
 
-The limit is stricter than `compute_xtol_range`'s limit for users' own functions at the default
-`n_bisection_fevals`.
+`MAX_BOUND_TO_WIDTH_RATIO` is stricter than the largest bound-to-width ratio that `compute_xtol_range` accepts for
+users' own functions at the default `n_bisection_fevals`.
 """
 
 from collections.abc import Mapping
@@ -28,9 +29,9 @@ import polars as pl
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage
 
-from .s1_candidate_generation import CANDIDATES_SCHEMA, CandidateGeneration
+from .s1_candidate_generation import CANDIDATES_SCHEMA, CandidateGenerationStage
 
-# A candidate whose bound-to-width ratio exceeds this limit is rejected by the interval check.
+# A candidate whose bound-to-width ratio exceeds this limit is rejected by the bound-to-width ratio check.
 MAX_BOUND_TO_WIDTH_RATIO = 100.0
 
 
@@ -50,20 +51,21 @@ CHECKED_CANDIDATES_SCHEMA: dict[str, pl.DataType] = {
 
 
 # ==================================================================================================
-#  CandidateValidation
+#  CandidateValidationStage
 # ==================================================================================================
-class CandidateValidation(PipelineStage):
-    """`CandidateValidation` runs the validation checks on every candidate, and records the check that rejected it."""
+class CandidateValidationStage(PipelineStage):
+    """`CandidateValidationStage` runs the validation checks, and records the check that rejected each candidate."""
 
     output_name = "s2_checked_candidates"
-    input_stages = (CandidateGeneration,)
+    input_stages = (CandidateGenerationStage,)
 
     def compute_output(self, inputs: Mapping[type[PipelineStage], pl.DataFrame]) -> pl.DataFrame:
         """Return the candidates with a ``rejected_by`` column: the check that rejected each, or ``""`` if none did."""
-        candidates = inputs[CandidateGeneration]
+        candidates = inputs[CandidateGenerationStage]
         bound_to_width_ratio = pl.max_horizontal(pl.col("a").abs(), pl.col("b").abs()) / (pl.col("b") - pl.col("a"))
-        # The reason goes in as its string value: polars 1.0 turns an `Enum` member into a literal of an enum type with
-        # that 1 category, to which ``""`` then fails to convert.
+        # The reason goes in as its string value, because polars 1.0 turns a `RejectionReason` member into a literal of
+        # an enum type whose only category is that member, and the ``otherwise`` value ``""`` cannot be cast to that
+        # type.
         rejected_by = (
             pl.when(bound_to_width_ratio > MAX_BOUND_TO_WIDTH_RATIO)
             .then(pl.lit(RejectionReason.BOUND_TO_WIDTH_RATIO.value))

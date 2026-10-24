@@ -6,7 +6,7 @@ from pathlib import Path
 from sunnbear._core.functions.core import Formula
 
 from .core import PipelineStageManifest, PipelineWorkspace, run_stages
-from .stages import CandidateGeneration, CandidateValidation
+from .stages import CandidateGenerationStage, CandidateValidationStage
 
 
 # ==================================================================================================
@@ -23,5 +23,5 @@ def run_pipeline(*, workspace_dir: Path, formulas: Sequence[Formula]) -> tuple[P
     Raises:
         ValueError: If a formula fails the checks of `Formula.build_all_candidates`.
     """
-    stages = [CandidateGeneration(formulas), CandidateValidation()]
+    stages = [CandidateGenerationStage(formulas), CandidateValidationStage()]
     return run_stages(PipelineWorkspace(workspace_dir), stages)

@@ -13,6 +13,10 @@ import polars as pl
 class PipelineStage(ABC):
     """A `PipelineStage` computes 1 output table from the outputs of the stages that run before it.
 
+    A stage that rejects candidates keeps them in its output and marks each one in a ``rejected_by`` column, which
+    names the reason or holds ``""`` for a candidate that the stage keeps; `PipelineStageManifest` counts the
+    rejections per reason.
+
     Class attributes:
         output_name: The name of the stage's output file in the `PipelineWorkspace`, without the suffix, e.g.
             ``s1_candidates``. It starts with ``s`` and the stage's position in the run order, so a listing of the

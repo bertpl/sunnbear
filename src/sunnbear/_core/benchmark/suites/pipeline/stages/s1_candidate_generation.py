@@ -1,8 +1,12 @@
 """Candidate generation, the first stage of the benchmark suite pipeline, builds every candidate of every formula.
 
+A candidate is 1 test function that a formula builds for 1 tuple of its parameters, on its interval ``[a, b]``.
+
 Its output holds 1 row per candidate, with the columns of `CANDIDATES_SCHEMA`. The rows run formula by formula, in
-the given order, and within a formula in the order of `Formula.build_all_candidates`. The output holds only the id
-and the interval bounds, because `FormulaRegistry.candidate_from_id` rebuilds a candidate from its ``function_id``.
+the given order, and within a formula in the order of `Formula.build_all_candidates`.
+
+The output holds only the id and the interval bounds, because `FormulaRegistry.candidate_from_id` rebuilds a
+candidate from its ``function_id``.
 """
 
 from collections.abc import Mapping, Sequence
@@ -20,15 +24,15 @@ CANDIDATES_SCHEMA: dict[str, pl.DataType] = {
 
 
 # ==================================================================================================
-#  CandidateGeneration
+#  CandidateGenerationStage
 # ==================================================================================================
-class CandidateGeneration(PipelineStage):
-    """`CandidateGeneration` lists every candidate of every formula of the corpus, with its id and interval bounds."""
+class CandidateGenerationStage(PipelineStage):
+    """`CandidateGenerationStage` lists every candidate of every given formula, with its id and interval bounds."""
 
     output_name = "s1_candidates"
 
     def __init__(self, formulas: Sequence[Formula]) -> None:
-        """Generate the candidates of `formulas`, the corpus of the pipeline run."""
+        """Create the stage for `formulas`, the corpus of the pipeline run."""
         self.formulas = formulas
 
     def compute_output(self, inputs: Mapping[type[PipelineStage], pl.DataFrame]) -> pl.DataFrame:
