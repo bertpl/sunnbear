@@ -40,6 +40,7 @@ from .data_files import SUBCATEGORY_DESCRIPTIONS, DataFolder, Source, SourceRow,
 from .formula_expressions import FormulaExpression, TranslationError
 from .formulas import FormulasTable, FormulasTableLine, SurveyFormula
 from .intervals import ParsedIntervals
+from .modified_formulas import MODIFIED_FORMULAS
 from .published_test_functions import PublishedFormula, PublishedTestFunction, PublishedTestFunctionsError
 
 CATALOG_DIR = (
@@ -937,10 +938,12 @@ def write_source_package(source: Source, formulas_table_lines: list[FormulasTabl
 def is_hand_written(survey_formula: SurveyFormula) -> bool:
     """Return whether a formula's module is written by hand.
 
-    A formula's module is written by hand when a row has no `f`, or when the formula is in `UNTRANSLATABLE_FORMULAS`.
+    A formula's module is written by hand when a row has no `f`, or when the formula is in `UNTRANSLATABLE_FORMULAS` or
+    in `MODIFIED_FORMULAS`.
     """
     has_description = any(row.f_description for row in survey_formula.rows)
-    return has_description or survey_formula.formulas_table_line.formula_id in UNTRANSLATABLE_FORMULAS
+    formula_id = survey_formula.formulas_table_line.formula_id
+    return has_description or formula_id in UNTRANSLATABLE_FORMULAS or formula_id in MODIFIED_FORMULAS
 
 
 def write_subcategory_packages() -> list[Path]:

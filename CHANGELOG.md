@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Rename `Formula.cases` to `Formula.test_cases`, and make the arguments of `FormulaTestCase`'s factory methods keyword-only
+- Give 8 formulas of category 1 a parameter `modified`, whose value 1 gives a version of their published test functions that passes validation
 
 ### Deprecated
 

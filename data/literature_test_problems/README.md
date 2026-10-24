@@ -272,10 +272,11 @@ A case whose expected value stays below `CASE_SMALL_VALUE`, and whose Python val
 - **An ill-conditioned function,** such as `sin(x*10^6)`: the test case's Python value differs from mpmath's by no more than the spread of the function's exact values within `CASE_X_ULPS` float64 steps of x on either side; the `atol` is a multiple of that spread.
 - **A function that cancels,** such as a polynomial in expanded form near its multiple root: the Python value differs from mpmath's by no more than `CASE_ROUNDING_UNITS` units of float64 rounding of the sum of the magnitudes of the function's terms; the `atol` is a multiple of that bound.
 
-The modules of 2 kinds of formulas are written by hand, and the script only imports them:
+The modules of 3 kinds of formulas are written by hand, and the script only imports them:
 
 - a formula with a row that gives only an `f_description`;
-- a formula in the script's `UNTRANSLATABLE_FORMULAS`, whose row's `f`, `parameters` or `variable_change` the script cannot translate, such as an infinite sum.
+- a formula in the script's `UNTRANSLATABLE_FORMULAS`, whose row's `f`, `parameters` or `variable_change` the script cannot translate, such as an infinite sum;
+- a formula in `MODIFIED_FORMULAS` of `scripts/literature_test_problems/modified_formulas.py`, which has the parameter `modified`: its value 1 gives a modified version of each published test function that fails the checks of a benchmark suite's test functions, as the class docstring of `PublishedTestFunctions` describes. Such a module starts from the generated one.
 
 The script stops and names each formula that it cannot generate. It cannot generate:
 
