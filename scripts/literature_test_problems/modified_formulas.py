@@ -4,8 +4,8 @@ A formula of category 1 has a modified version when some of its published test f
 benchmark suite pipeline, `sunnbear._core.benchmark.suites.pipeline`. The class docstring of `PublishedTestFunctions`
 describes such a formula's parameter `modified`.
 
-Such a formula's module is written by hand, starting from the module that the generator writes while the formula is
-not yet in `MODIFIED_FORMULAS`.
+Such a formula's module is written by hand, starting from the module that the generator writes for the formula when the
+formula is absent from `MODIFIED_FORMULAS`.
 """
 
 from enum import StrEnum
