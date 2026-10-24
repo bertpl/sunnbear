@@ -6,9 +6,9 @@ The formula comes from the row with the key ``Ex. 2.2; Fig. 2.3; Tables 2.2, 2.3
 The module generator, `scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter
 ``modified``, which selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
-in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
-needs a change of this module.
+A person therefore writes this module by hand, starting from the module that the generator writes for the formula when
+the formula is absent from `MODIFIED_FORMULAS` in `scripts/literature_test_problems/modified_formulas.py`. A change of
+the formula's row in `data/literature_test_problems/sources/` needs a matching change of this module.
 """
 
 import math
@@ -31,7 +31,7 @@ class Bradie2006Ex22(Formula):
 
     With ``modified = 1``, the interval ``[0, 0.5]`` becomes ``[0, 0.495]``: its upper bound moves left of the pole of
     ``tan(pi*x)`` at 0.5 by 1% of the published interval's width, rounded half up to 1 significant digit; ``c`` shifts x
-    as category 1 states, with the ``c_scale`` of the new interval.
+    as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
     The published test function on ``[0, 0.5]`` fails a benchmark suite's checks of its test functions, because ``b =
     0.5`` is the pole: ``f(b)`` is about ``1.6e16`` in float64, and a shift along x by any ``c < 0`` crosses the pole.

@@ -4,9 +4,9 @@ The formula comes from the row with the key ``f81`` in the survey of published t
 `scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter ``modified``, which
 selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
-in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
-needs a change of this module.
+A person therefore writes this module by hand, starting from the module that the generator writes for the formula when
+the formula is absent from `MODIFIED_FORMULAS` in `scripts/literature_test_problems/modified_formulas.py`. A change of
+the formula's row in `data/literature_test_problems/sources/` needs a matching change of this module.
 """
 
 import math
@@ -17,8 +17,8 @@ from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCas
 class GanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
     """This formula comes from Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026).
 
-    The survey writes the source's function as ``if(x > -1; 1 + sin(1/(x + 1)); -1)``; the formula's interval is ``[-1,
-    1]``.
+    The survey writes the source's function as ``if(x > -1; 1 + sin(1/(x + 1)); -1)``; the formula's interval is
+    ``[-1, 1]``.
 
     `Test Functions.pdf` prints the first branch as `1 + sin(1/(x + 1)) - 1` and the second as `0`, with no closing
     brace after the case brace. That layout is a misprint of `if(x > -1; 1 + sin(1/(x + 1)); 0) - 1`, Oliveira &
@@ -27,12 +27,12 @@ class GanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
     where a bracketing method on `[-1, 1]` stops in place of the printed root -0.682.
 
     With ``modified = 1``, the interval starts at ``-1.02``, left of the jump at -1 by 1% of the published interval's
-    width, rounded half up to 1 significant digit; ``c`` shifts x as category 1 states, with the ``c_scale`` of the new
-    interval.
+    width, rounded half up to 1 significant digit; ``c`` shifts x as category 1 states, with ``c_scale`` the rounded
+    width of the new interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because ``a = -1`` sits on the
-    jump: a shift along x by any ``c < 0`` evaluates at ``a`` the expression ``1 + sin(1/(x + 1))``, which is never
-    negative, so that ``f`` no longer changes sign on the interval.
+    The published test function fails a benchmark suite's checks of its test functions, because the jump lies at
+    ``a = -1``: with any ``c < 0``, ``f(a)`` takes the branch ``1 + sin(1/(x + 1))``, which is never negative, so that
+    ``f`` no longer changes sign on the interval.
     """
 
     number = (1, 1, 13, 21)

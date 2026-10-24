@@ -4,9 +4,9 @@ The formula comes from the row with the key ``§1.1`` in the survey of published
 `scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter ``modified``, which
 selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
-in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
-needs a change of this module.
+A person therefore writes this module by hand, starting from the module that the generator writes for the formula when
+the formula is absent from `MODIFIED_FORMULAS` in `scripts/literature_test_problems/modified_formulas.py`. A change of
+the formula's row in `data/literature_test_problems/sources/` needs a matching change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
@@ -23,7 +23,8 @@ class Moler200411(Formula):
     point `x = 1`. `ezplot(f,0,4)` plots `f` on `[0, 4]` (Figure 1.2), where it becomes infinite as `x` tends to 0.
 
     With ``modified = 1``, the interval starts at ``0.04``, right of 0 by 1% of the published interval's width, rounded
-    half up to 1 significant digit; ``c`` shifts x as category 1 states, with the ``c_scale`` of the new interval.
+    half up to 1 significant digit; ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new
+    interval.
 
     The published test function fails a benchmark suite's checks of its test functions, because ``f(a)`` divides by 0 in
     ``1/x``.

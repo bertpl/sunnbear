@@ -4,9 +4,9 @@ The formula comes from the row with the key ``T5.1-2`` in the survey of publishe
 `scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter ``modified``, which
 selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
-in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
-needs a change of this module.
+A person therefore writes this module by hand, starting from the module that the generator writes for the formula when
+the formula is absent from `MODIFIED_FORMULAS` in `scripts/literature_test_problems/modified_formulas.py`. A change of
+the formula's row in `data/literature_test_problems/sources/` needs a matching change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
@@ -23,7 +23,7 @@ class AlefeldPotraShi1993T512(Formula):
     With ``modified = 1``, each bound moves away from its pole, at ``n^2`` or ``(n + 1)^2``, to a distance of 1% of the
     published interval's width, rounded half up to 1 significant digit, such as ``[1.03, 3.97]`` for ``n = 1``.
 
-    With ``modified = 1``, ``c`` shifts x as category 1 states, with the ``c_scale`` of the new interval.
+    With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
     The published test functions fail a benchmark suite's checks of its test functions, because each bound lies ``1e-9``
     from a pole, so that a shift along x by more than ``1e-9`` crosses it.
