@@ -29,8 +29,8 @@ class Chandrupatla19972(Formula):
     The published test functions on ``[1e-4, 1e4]`` and wider fail a benchmark suite's checks of its test functions,
     because each interval spans orders of magnitude next to the pole at 0.
 
-    For these intervals ``c_scale``, the interval's rounded width, is ``1e4`` or more, so that a shift along x by
-    ``c_scale*c`` takes ``a`` across the pole for every ``c`` above ``1e-8``.
+    For these intervals, the rounded interval width ``c_scale`` is ``1e4`` or more, so a shift along x by ``c_scale*c``
+    takes ``a`` across the pole for every ``c`` above ``1e-8``.
     """
 
     number = (1, 1, 7, 2)

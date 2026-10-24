@@ -27,8 +27,8 @@ class Chandrupatla19979(Formula):
     0 to 1, the root moves by the interval's full width in log scale.
 
     The published test functions on ``[2e-4, 9]`` and wider fail a benchmark suite's checks of its test functions,
-    because each interval spans orders of magnitude next to the poles at 0, so that the smallest shift along x that the
-    checks try changes the sign of ``f(a)``.
+    because each interval spans orders of magnitude next to the pole at 0, so that the shift by ``c_scale*c`` at the
+    smallest ``c`` that the checks probe changes the sign of ``f(a)``.
     """
 
     number = (1, 1, 7, 9)

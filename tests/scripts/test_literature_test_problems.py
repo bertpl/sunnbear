@@ -312,8 +312,9 @@ def test_category_1_formula_applies_c_as_its_rule_says(formula, c, script_module
     """A formula of category 1 applies ``c`` by category 1's rule, or by its `ModificationType` where ``modified = 1``.
 
     The expected value evaluates the formula at ``c = 0``, which repeats the formula's own float arithmetic, so the
-    value at ``c`` equals it exactly. This holds:
+    value at ``c`` equals the expected value exactly. The equality holds:
 
+    - for a shift along x, because the test subtracts ``c_scale*c`` from x as the formula does;
     - for ``C_ADDS_TO_F``, because such a formula adds ``c`` as its last operation;
     - for ``C_SCALES_X``, because the test scales x with the formula's own operations.
     """
@@ -349,14 +350,15 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, scrip
     The test reads the factor from the code of ``parametrized_fun``, because a test that compares shifted values
     cannot see a number that is 1 float step off, such as ``1.9999999999999996`` for ``2.0``: the shifted x-values
     round to the same float. The test skips a test function with ``modified = 1`` whose
-    ``ModificationType.has_c_scale_factor`` is false, because it applies ``c`` with no factor ``c_scale``.
+    ``ModificationType.is_x_shifted_by_c_scale`` is false, because such a test function applies ``c`` with no factor
+    ``c_scale``.
     """
     # --- arrange ----------------------
     tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))
     shifting_candidates = []
     for candidate in formula.build_all_candidates():
         modification_type = _modification_type(candidate, script_modules)
-        if modification_type is None or modification_type.has_c_scale_factor:
+        if modification_type is None or modification_type.is_x_shifted_by_c_scale:
             shifting_candidates.append(candidate)
 
     # --- act --------------------------

@@ -29,8 +29,9 @@ class Ford19971(Formula):
     The published test function on ``[0.004, 200]`` fails a benchmark suite's checks of its test functions, because the
     interval spans orders of magnitude next to the singularity of ``sin(0.01/x)`` at 0.
 
-    The range of ``c`` in which ``f(a)`` keeps its sign and size is therefore narrower than the minimum width that the
-    checks require.
+    A shift along x by ``c_scale*c`` takes ``a`` to the pole at 0 for a small ``c``, so the range of ``c`` in which
+    ``f(a)`` keeps its sign and at least a tenth of its value at ``c = 0`` is narrower than the minimum width that the
+    checks need.
     """
 
     number = (1, 1, 8, 1)

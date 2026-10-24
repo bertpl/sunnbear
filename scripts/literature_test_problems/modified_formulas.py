@@ -31,7 +31,7 @@ class ModificationType(StrEnum):
     C_SCALES_X = "c_scales_x"
 
     @property
-    def has_c_scale_factor(self) -> bool:
+    def is_x_shifted_by_c_scale(self) -> bool:
         """Return whether the modified function shifts x by ``c_scale*c``, the rule of category 1."""
         return self is ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL
 
