@@ -5,22 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
-### Added
+## 0.3.1 (2026-10-24)
 
 ### Changed
 
 - Rename `Formula.cases` to `Formula.test_cases`, and make the arguments of `FormulaTestCase`'s factory methods keyword-only
 - Give 49 formulas of category 1 a parameter `modified`, whose value 1 gives a version of their published test functions that satisfies benchmark suite inclusion conditions
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 0.3.0 (2026-10-23)
 
