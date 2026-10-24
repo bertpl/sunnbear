@@ -17,18 +17,6 @@ from .stage import PipelineStage
 
 
 # ==================================================================================================
-#  PipelineStageExecution
-# ==================================================================================================
-@dataclass(frozen=True)
-class PipelineStageExecution:
-    """`PipelineStageExecution` records when a stage started, how long it took, and its worker pool's size."""
-
-    started_at: datetime.datetime
-    duration_sec: float
-    pool_n_workers: int
-
-
-# ==================================================================================================
 #  PipelineStageManifest
 # ==================================================================================================
 class PipelineStageManifest(BaseModel):
@@ -48,8 +36,8 @@ class PipelineStageManifest(BaseModel):
             stage, which creates the rows.
         started_at: When the stage started, in UTC.
         duration_sec: How long the stage took to compute its output, excluding the time to write it.
-        pool_n_workers: The number of workers of the run's worker pool, in which the stage could run tasks. It
-            changes `duration_sec`, never the output.
+        n_workers: The number of workers of the run's worker pool, in which the stage could run tasks. The number of
+            workers changes `duration_sec`, never the output.
     """
 
     model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
@@ -63,7 +51,7 @@ class PipelineStageManifest(BaseModel):
     n_dropped_rows: int
     started_at: datetime.datetime
     duration_sec: float
-    pool_n_workers: int
+    n_workers: int
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -77,7 +65,7 @@ class PipelineStageManifest(BaseModel):
         output_sha256: str,
         report_sha256s: Mapping[str, str],
         input_manifest: Self | None,
-        execution: PipelineStageExecution,
+        execution_info: "PipelineStageExecutionInfo",
     ) -> Self:
         """Build the manifest of `stage` from its output table and the manifest of the stage before it, if any."""
         return cls(
@@ -88,7 +76,19 @@ class PipelineStageManifest(BaseModel):
             sunnbear_version=importlib.metadata.version("sunnbear"),
             n_rows=table.height,
             n_dropped_rows=input_manifest.n_rows - table.height if input_manifest is not None else 0,
-            started_at=execution.started_at,
-            duration_sec=execution.duration_sec,
-            pool_n_workers=execution.pool_n_workers,
+            started_at=execution_info.started_at,
+            duration_sec=execution_info.duration_sec,
+            n_workers=execution_info.n_workers,
         )
+
+
+# ==================================================================================================
+#  PipelineStageExecutionInfo
+# ==================================================================================================
+@dataclass(frozen=True)
+class PipelineStageExecutionInfo:
+    """`PipelineStageExecutionInfo` records when a stage started, how long it took, and its worker pool's size."""
+
+    started_at: datetime.datetime
+    duration_sec: float
+    n_workers: int

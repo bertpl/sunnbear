@@ -5,7 +5,7 @@ From the repository root, maintainers run it into a folder under `script_outputs
     uv run python -m sunnbear._core.benchmark.suites.pipeline --workspace script_outputs/pipeline
 
 The workspace has no default directory, because the shipped package cannot assume that the repository's folders
-exist. ``--n-workers`` sets the number of worker processes that the stages share, 1 per CPU by default.
+exist. ``--n-workers`` sets the number of worker processes that the stages share.
 """
 
 import argparse

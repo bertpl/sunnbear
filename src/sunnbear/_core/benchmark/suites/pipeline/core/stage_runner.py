@@ -8,7 +8,7 @@ import polars as pl
 
 from sunnbear._core.utils.worker_pool import WorkerPool
 
-from .manifest import PipelineStageExecution, PipelineStageManifest
+from .manifest import PipelineStageExecutionInfo, PipelineStageManifest
 from .stage import PipelineStage
 from .workspace import PipelineWorkspace
 
@@ -49,8 +49,8 @@ def run_stages(
             stage=stage,
             output=output,
             input_manifest=previous_manifest,
-            execution=PipelineStageExecution(
-                started_at=started_at, duration_sec=duration_sec, pool_n_workers=worker_pool.n_workers
+            execution_info=PipelineStageExecutionInfo(
+                started_at=started_at, duration_sec=duration_sec, n_workers=worker_pool.n_workers
             ),
         )
         manifests.append(manifest)

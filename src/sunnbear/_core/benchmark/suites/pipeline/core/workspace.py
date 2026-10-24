@@ -17,7 +17,7 @@ from pathlib import Path
 
 import polars as pl
 
-from .manifest import PipelineStageExecution, PipelineStageManifest
+from .manifest import PipelineStageExecutionInfo, PipelineStageManifest
 from .stage import PipelineStage, PipelineStageOutput
 
 _TABLE_FILE_SUFFIX = ".parquet"
@@ -46,7 +46,7 @@ class PipelineWorkspace:
         stage: PipelineStage,
         output: PipelineStageOutput,
         input_manifest: PipelineStageManifest | None,
-        execution: PipelineStageExecution,
+        execution_info: PipelineStageExecutionInfo,
     ) -> PipelineStageManifest:
         """Write the output table, reports and manifest of `stage`, replacing earlier ones, and return the manifest.
 
@@ -65,7 +65,7 @@ class PipelineWorkspace:
                 for report_name, report in output.reports.items()
             },
             input_manifest=input_manifest,
-            execution=execution,
+            execution_info=execution_info,
         )
         self._write_manifest(manifest)
         return manifest

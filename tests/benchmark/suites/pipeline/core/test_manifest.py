@@ -5,7 +5,7 @@ import datetime
 
 import polars as pl
 
-from sunnbear._core.benchmark.suites.pipeline.core.manifest import PipelineStageExecution, PipelineStageManifest
+from sunnbear._core.benchmark.suites.pipeline.core.manifest import PipelineStageExecutionInfo, PipelineStageManifest
 
 from .example_stages import ExampleNumbersStage, ExampleSmallNumbersStage
 
@@ -20,8 +20,8 @@ def test_the_manifest_counts_the_rows_and_the_dropped_rows_and_records_the_input
         output_sha256="ab" * 32,
         report_sha256s={},
         input_manifest=None,
-        execution=PipelineStageExecution(
-            started_at=datetime.datetime.now(datetime.UTC), duration_sec=0.0, pool_n_workers=1
+        execution_info=PipelineStageExecutionInfo(
+            started_at=datetime.datetime.now(datetime.UTC), duration_sec=0.0, n_workers=1
         ),
     )
 
@@ -32,8 +32,8 @@ def test_the_manifest_counts_the_rows_and_the_dropped_rows_and_records_the_input
         output_sha256="cd" * 32,
         report_sha256s={"large_numbers": "ef" * 32},
         input_manifest=first_manifest,
-        execution=PipelineStageExecution(
-            started_at=datetime.datetime.now(datetime.UTC), duration_sec=0.0, pool_n_workers=1
+        execution_info=PipelineStageExecutionInfo(
+            started_at=datetime.datetime.now(datetime.UTC), duration_sec=0.0, n_workers=1
         ),
     )
 

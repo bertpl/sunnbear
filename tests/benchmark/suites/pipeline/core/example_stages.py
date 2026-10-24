@@ -1,7 +1,7 @@
 """This module defines small stages for the tests of the pipeline framework, so those tests need no formulas.
 
-The stages that follow the rules of the chain come first, and `ExampleSquaresStage` runs its work as tasks in the run's
-worker pool; each of the others breaks 1 rule.
+The stages that follow the rules of the chain come first; among them, `ExampleSquaresStage` runs its work as tasks in
+the run's worker pool. Each stage after them breaks 1 rule.
 """
 
 from dataclasses import dataclass
@@ -54,7 +54,7 @@ class ExampleSquaresStage(PipelineStage):
 
     def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
         """Return `previous_table` with a column ``squared_x``, from tasks that each square the numbers of 1 batch."""
-        batches = worker_pool.split_into_batches(previous_table.rows(named=True), key=lambda row: int(row["x"]))
+        batches = worker_pool.split_into_batches(previous_table.rows(named=True), group_key=lambda row: int(row["x"]))
         tasks = {
             batch_idx: ExampleSquaringTask(xs=tuple(row["x"] for row in batch))
             for batch_idx, batch in enumerate(batches)

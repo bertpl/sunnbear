@@ -3,8 +3,10 @@
 A task is any picklable object with a `run` method (`WorkerTask`).
 
 A task may look up a class by id in a registry, such as the class of a formula or a solver config, and a registry holds
-only the classes of the modules that its process has imported. A new worker has imported only what unpickling its
-first task needs, so every worker first imports the modules that the pool names.
+only the classes of the modules that its process has imported.
+
+A new worker has imported only what unpickling its first task needs, so every worker first imports the pool's
+`module_names`.
 
 Workers start with the "spawn" method on every platform: a worker then never inherits the state of this
 process's threads, e.g. locks held by numba or polars, and a pool behaves the same on Linux, macOS and Windows.
@@ -26,7 +28,7 @@ T = TypeVar("T")
 
 # `WorkerPool.split_into_batches` aims at this many batches per worker, each run as 1 task, so that a slow task does
 # not leave the other workers idle at the end.
-BATCHES_PER_WORKER = 4
+TARGET_BATCHES_PER_WORKER = 4
 
 
 # ==================================================================================================
@@ -41,7 +43,7 @@ class WorkerPool:
     - every call of `run` inside the block shares them;
     - the block's end stops them.
 
-    A caller that runs tasks in several steps therefore starts its workers once.
+    A caller that calls `run` several times inside 1 ``with`` block therefore starts the pool's workers once.
     """
 
     def __init__(self, *, n_workers: int, module_names: Sequence[str]) -> None:
@@ -113,20 +115,21 @@ class WorkerPool:
                     future.cancel()
                 wait(keys_by_future)
 
-    def split_into_batches(self, items: Sequence[T], *, key: Callable[[T], Hashable]) -> list[list[T]]:
-        """Split `items` into about `BATCHES_PER_WORKER` batches per worker, never splitting the items that share a key.
+    def split_into_batches(self, items: Sequence[T], *, group_key: Callable[[T], Hashable]) -> list[list[T]]:
+        """Split `items` into about `TARGET_BATCHES_PER_WORKER` batches per worker, keeping the items of 1 key together.
 
         The items with the same key form a group, which no batch splits, so work that a group's items share, such as
         compiling a function, happens once per group. The batches are filled as follows:
 
         - the groups fill the batches in order of first appearance, and the items keep their order within a group;
-        - a batch takes the next group as long as it then holds at most
-          `ceil(len(items) / (BATCHES_PER_WORKER * n_workers))` items, so a larger group forms a batch of its own.
+        - a batch takes the next group as long as the batch then holds at most
+          `ceil(len(items) / (TARGET_BATCHES_PER_WORKER * n_workers))` items; a group larger than that maximum forms a
+          batch of its own.
         """
         groups: dict[Hashable, list[T]] = {}
         for item in items:
-            groups.setdefault(key(item), []).append(item)
-        max_batch_size = math.ceil(len(items) / (BATCHES_PER_WORKER * self.n_workers))
+            groups.setdefault(group_key(item), []).append(item)
+        max_batch_size = math.ceil(len(items) / (TARGET_BATCHES_PER_WORKER * self.n_workers))
         batches: list[list[T]] = []
         batch: list[T] = []
         for group in groups.values():

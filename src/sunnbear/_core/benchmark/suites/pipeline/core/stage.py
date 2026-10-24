@@ -35,10 +35,9 @@ class PipelineStage(ABC):
 
         Args:
             previous_table: The output table of the stage before this one; an empty table for the first stage.
-            worker_pool: The worker pool of the run, open for the whole run, in which the stage may run tasks. The
-                stage's output must not depend on the pool's number of workers. Its tasks are picklable `WorkerTask`s,
-                and a worker has imported, beyond what unpickling a task needs, only the modules that define the run's
-                formulas.
+            worker_pool: The worker pool of the run, in which the stage may run tasks. The stage's output must not
+                depend on the pool's number of workers. The stage's tasks must be picklable `WorkerTask`s. A worker has
+                imported the modules that define the run's formulas, and otherwise only what unpickling a task needs.
         """
 
 

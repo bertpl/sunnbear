@@ -131,8 +131,8 @@ def test_a_stage_that_runs_tasks_in_the_worker_pool_gives_the_same_output_with_1
         squares_manifests.append(manifests[-1])
 
     # --- assert -----------------------
-    in_process_manifest, workers_manifest = squares_manifests
-    assert workers_manifest.output_sha256 == in_process_manifest.output_sha256
-    assert (in_process_manifest.pool_n_workers, workers_manifest.pool_n_workers) == (1, 2)
+    in_process_manifest, worker_processes_manifest = squares_manifests
+    assert worker_processes_manifest.output_sha256 == in_process_manifest.output_sha256
+    assert (in_process_manifest.n_workers, worker_processes_manifest.n_workers) == (1, 2)
     squares = pl.read_parquet(tmp_path / "2_workers" / "s2_squares.parquet")
     assert squares["squared_x"].to_list() == [1.0, 4.0, 9.0]

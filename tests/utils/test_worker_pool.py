@@ -87,7 +87,7 @@ def test_workers_start_with_the_first_tasks_and_stop_at_the_end_of_the_with_bloc
 
 @pytest.mark.parametrize("module_names, is_imported_expected", [([], False), ([_IMPORTED_MODULE_NAME], True)])
 def test_each_worker_imports_the_named_modules(module_names, is_imported_expected):
-    """A worker imports the modules that the pool names before its first task; a worker of a pool that names none
+    """A worker imports the pool's `module_names` before its first task; a worker of a pool that names none
     lacks the module."""
     # --- act --------------------------
     with WorkerPool(n_workers=2, module_names=module_names) as worker_pool:
@@ -116,7 +116,9 @@ def test_a_pool_with_workers_runs_no_task_outside_its_with_block():
 
 
 def test_importing_the_modules_registers_their_classes():
-    """`_import_modules`, which each worker runs first, imports every named module."""
+    """`_import_modules`, which each worker runs first, imports every named module.
+
+    The test calls it in this process, because coverage does not measure the code that runs in a worker process."""
     # --- act --------------------------
     WorkerPool._import_modules([_IMPORTED_MODULE_NAME])
 
@@ -142,13 +144,13 @@ def test_importing_the_modules_registers_their_classes():
     ],
 )
 def test_items_are_split_into_batches_of_whole_groups(items, n_workers, batches_expected):
-    """`split_into_batches` keeps the items that share a first letter in 1 batch, in about `BATCHES_PER_WORKER` batches
-    per worker."""
+    """`split_into_batches` keeps the items that share a first letter in 1 batch, in about `TARGET_BATCHES_PER_WORKER`
+    batches per worker."""
     # --- arrange ----------------------
     worker_pool = WorkerPool(n_workers=n_workers, module_names=[])
 
     # --- act --------------------------
-    batches = worker_pool.split_into_batches(items, key=lambda item: item[0])
+    batches = worker_pool.split_into_batches(items, group_key=lambda item: item[0])
 
     # --- assert -----------------------
     assert batches == batches_expected
