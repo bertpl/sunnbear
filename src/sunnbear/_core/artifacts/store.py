@@ -32,7 +32,7 @@ import urllib.request
 from importlib.resources import files
 from importlib.resources.abc import Traversable
 from pathlib import Path
-from typing import Any, TypeVar, assert_never
+from typing import Any, assert_never
 
 import platformdirs
 
@@ -45,8 +45,6 @@ from .exceptions import ArtifactError
 from .manifest import ArtifactArchiveEntry, ArtifactFileEntry, ArtifactManifest
 from .registry import ArtifactRegistry
 from .source import ArtifactSource
-
-T = TypeVar("T")
 
 _MANIFEST_FILE_NAME = "manifest.json"
 # Saving records sunnbear's version with this suffix: an artifact is built from unreleased code, and the
@@ -71,7 +69,7 @@ class ArtifactStore:
     #  Loading
     # --------------------------------------------------------------------------
     @classmethod
-    def load(cls, declaration_cls: type[ArtifactDeclaration[T]]) -> T:
+    def load[T](cls, declaration_cls: type[ArtifactDeclaration[T]]) -> T:
         """Read the artifact's data files and rebuild its value with `from_files`.
 
         Files shipped in the package are read without checking their hashes. The files of a
@@ -152,7 +150,7 @@ class ArtifactStore:
     #  Saving
     # --------------------------------------------------------------------------
     @classmethod
-    def save(
+    def save[T](
         cls,
         declaration_cls: type[ArtifactDeclaration[T]],
         value: T,
