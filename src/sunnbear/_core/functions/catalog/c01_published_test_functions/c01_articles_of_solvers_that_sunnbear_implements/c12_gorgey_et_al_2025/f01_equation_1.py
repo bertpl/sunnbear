@@ -21,8 +21,8 @@ class GorgeyEtAl2025Equation1(Formula):
     Roots `-2`, `-1` and `3`; the text names `3` as the root found.
 
     With ``modified = 1``, the interval ``[-2.5, 3]`` becomes ``[-2.5, 3.06]``: its upper bound moves right of the
-    triple root at 3 by 1% of the published interval's width, rounded half up to 1 significant digit, so that the
-    interval holds all 3 roots, -2, -1 and 3.
+    triple root at 3 by 1% of the published interval's width, rounded half up to 1 significant digit, so that ``b`` is
+    not a root and the interval holds all 3 roots, -2, -1 and 3.
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 

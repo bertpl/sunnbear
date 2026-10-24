@@ -24,8 +24,8 @@ class ChapraCanale2015Ex52(Formula):
     distinct roots, at about 4.23 and 4.26.
 
     With ``modified = 1``, the intervals ``[3, 5]`` and ``[4.2, 4.3]`` become ``[3.3, 5]`` and ``[4.2, 4.26]``, so that
-    each holds an odd number of roots: ``[3.3, 5]`` leaves out the root near 3.26, and ``[4.2, 4.26]`` the root near
-    4.264.
+    each holds an odd number of roots: ``[3.3, 5]`` leaves out the root near 3.26, and ``[4.2, 4.26]`` leaves out the
+    root near 4.264.
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of each new interval.
 
