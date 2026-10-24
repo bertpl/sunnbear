@@ -30,6 +30,8 @@ No search can check every c-value in a range, so the search ends by checking the
 5. Map the c-values of the benchmark's tuple set onto the range, and check the condition at each. On each side where
    the condition fails at any of these c-values, return to step 4, which now also uses these c-values; return to
    step 4 at most `MAX_RETURNS_TO_HALVING` times.
+6. Require the range to be at least `MIN_C_RANGE_WIDTH` wide: across a narrower range, ``c`` changes the test function
+   too little to vary the benchmark's samples.
 
 A candidate is rejected at the first step that fails, with that step's `RejectionReason`.
 """
@@ -56,6 +58,8 @@ MAX_DOUBLINGS = 128
 MAX_BOUND_REL_GAP = 0.01
 # Step 5 returns to step 4 at most this many times before it rejects the candidate.
 MAX_RETURNS_TO_HALVING = 10
+# Step 6 rejects a c-range narrower than this.
+MIN_C_RANGE_WIDTH = 1e-3
 
 
 # ==================================================================================================
@@ -100,13 +104,18 @@ def calibrate_c_range(xc_fun: XCFun, a: float, b: float, *, mc_tuples: MCTuples)
                 idx for idx, side_search in enumerate(side_searches) if not side_search.is_met_at_each(c_values)
             ]
             if not failing_side_idxs:
-                return c_range
-            elif n_returns == MAX_RETURNS_TO_HALVING:
+                break
+            if n_returns == MAX_RETURNS_TO_HALVING:
                 raise _CalibrationFailedError(RejectionReason.CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES)
-            else:
-                for idx in failing_side_idxs:
-                    bounds[idx] = side_searches[idx].halve_to_bound()
-                n_returns += 1
+            for idx in failing_side_idxs:
+                bounds[idx] = side_searches[idx].halve_to_bound()
+            n_returns += 1
+
+        # --- step 6 -----------------------------
+        if c_range.c_max - c_range.c_min < MIN_C_RANGE_WIDTH:
+            raise _CalibrationFailedError(RejectionReason.CALIBRATION_C_RANGE_TOO_NARROW)
+        else:
+            return c_range
     except _CalibrationFailedError as exc:
         return exc.reason
 

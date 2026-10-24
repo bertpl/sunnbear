@@ -97,10 +97,18 @@ def test_the_c_range_ends_where_an_endpoint_value_falls_to_1_10_of_its_value_at_
             RejectionReason.CALIBRATION_NO_BOUND_FOUND,
             id="no_bound_on_the_positive_side",
         ),
+        # Step 6: the bounds lie just below abs(c) = 9e-5, so the c-range is about 1.8e-4 wide.
+        pytest.param(
+            lambda x, c: x - 1e4 * c,
+            -1.0,
+            1.0,
+            RejectionReason.CALIBRATION_C_RANGE_TOO_NARROW,
+            id="c_range_narrower_than_the_minimum",
+        ),
     ],
 )
 def test_calibration_rejects_a_candidate_with_the_reason_of_the_step_that_fails(xc_fun, a, b, reason_expected):
-    """Steps 1 to 3 each reject a candidate whose condition fails there, with that step's `RejectionReason`."""
+    """Steps 1 to 3 and step 6 each reject a candidate that fails there, with that step's `RejectionReason`."""
     # --- act --------------------------
     result = calibrate_c_range(xc_fun, a, b, mc_tuples=_MC_TUPLES)
 

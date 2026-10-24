@@ -74,9 +74,9 @@ def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(i
     ]
     # Each row ends with 1 count per reason, in the order of `RejectionReason`.
     assert rejections_per_formula.rows() == [
-        ("f99.901", 1, 1, 0, 0, 0, 0, 0),
-        ("f99.902", 1, 0, 1, 0, 0, 0, 0),
-        ("f99.903", 1, 0, 0, 1, 0, 0, 0),
+        ("f99.901", 1, 1, 0, 0, 0, 0, 0, 0),
+        ("f99.902", 1, 0, 1, 0, 0, 0, 0, 0),
+        ("f99.903", 1, 0, 0, 1, 0, 0, 0, 0),
     ]
 
 
