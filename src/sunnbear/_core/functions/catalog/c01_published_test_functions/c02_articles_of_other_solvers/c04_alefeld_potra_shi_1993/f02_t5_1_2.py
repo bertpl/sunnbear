@@ -21,8 +21,9 @@ class AlefeldPotraShi1993T512(Formula):
     `n` only selects the interval between the poles at `n^2` and `(n + 1)^2`; `f` has no parameter.
 
     With ``modified = 1``, each bound moves away from its pole, at ``n^2`` or ``(n + 1)^2``, to a distance of 1% of the
-    published interval's width, rounded half up to 1 significant digit, such as ``[1.03, 3.97]`` for ``n = 1``; ``c``
-    shifts x as category 1 states, with the ``c_scale`` of the new interval.
+    published interval's width, rounded half up to 1 significant digit, such as ``[1.03, 3.97]`` for ``n = 1``.
+
+    With ``modified = 1``, ``c`` shifts x as category 1 states, with the ``c_scale`` of the new interval.
 
     The published test functions fail a benchmark suite's checks of its test functions, because each bound lies ``1e-9``
     from a pole, so that a shift along x by more than ``1e-9`` crosses it.

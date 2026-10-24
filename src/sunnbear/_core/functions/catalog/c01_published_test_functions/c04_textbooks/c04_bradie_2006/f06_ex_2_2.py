@@ -1,9 +1,10 @@
 """This module holds a formula of Bradie (2006).
 
 The formula comes from the row with the key ``Ex. 2.2; Fig. 2.3; Tables 2.2, 2.3, 2.5; §2.2 (p. 74); §2.4 (pp. 98, 100);
-§2.5 (p. 109); 2.1-13; 2.5-15; 2.6-3`` in the survey of published test problems. The module generator,
-`scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter ``modified``, which
-selects a modified version of a published test function.
+§2.5 (p. 109); 2.1-13; 2.5-15; 2.6-3`` in the survey of published test problems.
+
+The module generator, `scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter
+``modified``, which selects a modified version of a published test function.
 
 A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
 in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
@@ -28,9 +29,9 @@ class Bradie2006Ex22(Formula):
     98). Secant from `p0 = 0.4, p1 = 0.48` (p. 109) and from `(0, 0.48)`, `(0.24, 0.48)`, `(0.4, 0.48)` (2.5-15). 2.1-13
     seeks the next smallest positive root.
 
-    With ``modified = 1``, the interval ``[0, 0.5]`` ends at ``0.495``, left of the pole of ``tan(pi*x)`` at 0.5 by 1%
-    of the published interval's width, rounded half up to 1 significant digit; ``c`` shifts x as category 1 states, with
-    the ``c_scale`` of the new interval.
+    With ``modified = 1``, the interval ``[0, 0.5]`` becomes ``[0, 0.495]``: its upper bound moves left of the pole of
+    ``tan(pi*x)`` at 0.5 by 1% of the published interval's width, rounded half up to 1 significant digit; ``c`` shifts x
+    as category 1 states, with the ``c_scale`` of the new interval.
 
     The published test function on ``[0, 0.5]`` fails a benchmark suite's checks of its test functions, because ``b =
     0.5`` is the pole: ``f(b)`` is about ``1.6e16`` in float64, and a shift along x by any ``c < 0`` crosses the pole.

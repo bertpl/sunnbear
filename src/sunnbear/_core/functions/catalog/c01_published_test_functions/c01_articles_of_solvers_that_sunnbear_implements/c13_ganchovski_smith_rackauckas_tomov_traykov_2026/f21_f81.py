@@ -31,7 +31,8 @@ class GanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
     interval.
 
     The published test function fails a benchmark suite's checks of its test functions, because ``a = -1`` sits on the
-    jump: a shift along x by any ``c < 0`` evaluates ``1 + sin(1/(x + 1))`` at ``a``, which is never negative.
+    jump: a shift along x by any ``c < 0`` evaluates at ``a`` the expression ``1 + sin(1/(x + 1))``, which is never
+    negative, so that ``f`` no longer changes sign on the interval.
     """
 
     number = (1, 1, 13, 21)
