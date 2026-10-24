@@ -35,11 +35,12 @@ class PublishedTestFunctions(FormulaCategory):
     A formula with the parameter ``modified`` follows these rules where ``modified = 0``.
 
     Where ``modified = 1``, it gives a modified version of a published test function that does not satisfy the benchmark
-    suite inclusion conditions. An example is a function that is not defined left of its interval: a shift along x by
-    any ``c > 0`` evaluates that function outside its domain.
+    suite inclusion conditions, the conditions that every test function of a benchmark suite must satisfy. An example is
+    a function that is not defined left of its interval: a shift along x by any ``c > 0`` evaluates that function
+    outside its domain.
 
     The formula's docstring describes its modification, which keeps the test function as close to the published one as
-    those conditions allow.
+    the benchmark suite inclusion conditions allow.
     """
 
     number = (1,)
