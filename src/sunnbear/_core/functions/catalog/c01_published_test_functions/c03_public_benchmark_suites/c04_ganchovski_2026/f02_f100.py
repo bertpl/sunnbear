@@ -26,7 +26,8 @@ class Ganchovski2026F100(Formula):
     half up to 1 significant digit; ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new
     interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because ``f(a)`` divides by 0.
+    The published test function does not satisfy the benchmark suite inclusion conditions, because ``f(a)`` divides by
+    0.
     """
 
     number = (1, 3, 4, 2)

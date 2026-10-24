@@ -27,8 +27,8 @@ class Moler2004Ex410C(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because ``f(a)`` is not finite,
-    since ``bessel_y0(0)`` is ``-inf``, and the published interval holds 10 roots, an even number.
+    The published test function does not satisfy the benchmark suite inclusion conditions, because ``f(a)`` is not
+    finite, since ``bessel_y0(0)`` is ``-inf``, and the published interval holds 10 roots, an even number.
     """
 
     number = (1, 4, 3, 15)

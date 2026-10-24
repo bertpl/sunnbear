@@ -26,9 +26,9 @@ class Borchers2026522(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because the published interval's
-    bounds are the roots -2 and 2, where float64 ``pi`` makes ``f`` slightly negative at both, so that ``f(a)`` and
-    ``f(b)`` have the same sign.
+    The published test function does not satisfy the benchmark suite inclusion conditions, because the published
+    interval's bounds are the roots -2 and 2, where float64 ``pi`` makes ``f`` slightly negative at both, so that
+    ``f(a)`` and ``f(b)`` have the same sign.
     """
 
     number = (1, 3, 5, 13)

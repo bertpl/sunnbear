@@ -26,9 +26,9 @@ class Chandrupatla19979(Formula):
     interval: ``c`` scales x, so that the root moves by the factor ``(b/a)**c`` and never reaches 0. As ``c`` goes from
     0 to 1, the root moves by the interval's full width in log scale.
 
-    The published test functions on ``[2e-4, 9]`` and wider fail a benchmark suite's checks of its test functions,
+    The published test functions on ``[2e-4, 9]`` and wider do not satisfy the benchmark suite inclusion conditions,
     because each interval spans orders of magnitude next to the pole at 0, so that the shift by ``c_scale*c`` at the
-    smallest ``c`` that the checks probe changes the sign of ``f(a)``.
+    smallest ``c`` that the conditions test changes the sign of ``f(a)``.
     """
 
     number = (1, 1, 7, 9)

@@ -25,9 +25,9 @@ class Epperson201331125(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because its interval is narrow
-    around the root at 1: the ratio of the interval's largest bound to its width, about 250, is above the checks' limit
-    of 100.
+    The published test function does not satisfy the benchmark suite inclusion conditions, because its interval is
+    narrow around the root at 1: the ratio of the interval's largest bound to its width, about 250, is above the
+    conditions' limit of 100.
     """
 
     number = (1, 4, 5, 23)

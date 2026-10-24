@@ -25,7 +25,7 @@ class Sabharwal2019T28(Formula):
     root, near 1.52, so that the interval holds that root. ``c`` shifts x as category 1 states, with ``c_scale`` the
     rounded width of the new interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because the root lies outside
+    The published test function does not satisfy the benchmark suite inclusion conditions, because the root lies outside
     the published interval, so that ``f(a)`` and ``f(b)`` have the same sign.
     """
 

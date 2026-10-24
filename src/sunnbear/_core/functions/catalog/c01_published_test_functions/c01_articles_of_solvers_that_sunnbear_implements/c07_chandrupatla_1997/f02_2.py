@@ -26,7 +26,7 @@ class Chandrupatla19972(Formula):
     interval: ``c`` scales x, so that the root moves by the factor ``(b/a)**c`` and never reaches 0. As ``c`` goes from
     0 to 1, the root moves by the interval's full width in log scale.
 
-    The published test functions on ``[1e-4, 1e4]`` and wider fail a benchmark suite's checks of its test functions,
+    The published test functions on ``[1e-4, 1e4]`` and wider do not satisfy the benchmark suite inclusion conditions,
     because each interval spans orders of magnitude next to the pole at 0.
 
     For these intervals, the rounded interval width ``c_scale`` is ``1e4`` or more, so a shift along x by ``c_scale*c``

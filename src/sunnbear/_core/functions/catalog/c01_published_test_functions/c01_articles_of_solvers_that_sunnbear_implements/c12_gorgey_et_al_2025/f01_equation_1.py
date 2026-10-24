@@ -26,7 +26,7 @@ class GorgeyEtAl2025Equation1(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test function on ``[-2.5, 3]`` fails a benchmark suite's checks of its test functions, because
+    The published test function on ``[-2.5, 3]`` does not satisfy the benchmark suite inclusion conditions, because
     ``f(b)`` is 0 at the triple root ``b = 3``.
     """
 

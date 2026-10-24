@@ -26,8 +26,8 @@ class Epperson201332P100(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test function on ``[-0.2, 0.2]`` fails a benchmark suite's checks of its test functions, because the
-    pole at 0 is a second sign change, so that ``f(a)`` and ``f(b)`` have the same sign.
+    The published test function on ``[-0.2, 0.2]`` does not satisfy the benchmark suite inclusion conditions, because
+    the pole at 0 is a second sign change, so that ``f(a)`` and ``f(b)`` have the same sign.
     """
 
     number = (1, 4, 5, 15)

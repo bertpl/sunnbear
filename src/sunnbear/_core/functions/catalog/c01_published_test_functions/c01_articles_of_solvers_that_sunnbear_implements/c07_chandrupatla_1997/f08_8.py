@@ -27,12 +27,12 @@ class Chandrupatla19978(Formula):
     interval: ``c`` scales x, so that the root moves by the factor ``(b/a)**c`` and never reaches 0. As ``c`` goes from
     0 to 1, the root moves by the interval's full width in log scale.
 
-    The published test functions fail a benchmark suite's checks of its test functions, because each interval spans
+    The published test functions do not satisfy the benchmark suite inclusion conditions, because each interval spans
     orders of magnitude next to the pole of ``1628/x`` at 0.
 
     A shift along x by ``c_scale*c`` takes ``a`` to the pole at 0 for a small ``c``, so the range of ``c`` in which
     ``f(a)`` keeps its sign and at least a tenth of its value at ``c = 0`` is narrower than the minimum width that the
-    checks need.
+    conditions require.
     """
 
     number = (1, 1, 7, 8)

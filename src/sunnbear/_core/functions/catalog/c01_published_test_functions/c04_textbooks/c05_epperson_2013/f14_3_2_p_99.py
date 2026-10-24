@@ -27,7 +27,7 @@ class Epperson201332P99(Formula):
     half up to 1 significant digit; ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new
     interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because ``log(x)/x`` is not
+    The published test function does not satisfy the benchmark suite inclusion conditions, because ``log(x)/x`` is not
     finite at ``a = 0``.
     """
 

@@ -25,8 +25,8 @@ class AlefeldPotraShi1993T512(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test functions fail a benchmark suite's checks of its test functions, because each bound lies ``1e-9``
-    from a pole, so that a shift along x by more than ``1e-9`` crosses it.
+    The published test functions do not satisfy the benchmark suite inclusion conditions, because each bound lies
+    ``1e-9`` from a pole, so that a shift along x by more than ``1e-9`` crosses it.
     """
 
     number = (1, 2, 4, 2)

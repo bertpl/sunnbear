@@ -32,7 +32,7 @@ class Moler20044748(Formula):
     roots, so that the interval holds 9 of the 10 roots. ``c`` shifts x as category 1 states, with ``c_scale`` the
     rounded width of the new interval.
 
-    The published test function on ``[0, 10*pi]`` fails a benchmark suite's checks of its test functions, because the
+    The published test function on ``[0, 10*pi]`` does not satisfy the benchmark suite inclusion conditions, because the
     published interval holds 10 roots, an even number, so that ``f(a)`` and ``f(b)`` have the same sign.
     """
 

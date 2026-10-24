@@ -26,12 +26,12 @@ class Burkardt2016P04(Formula):
     interval: ``c`` scales x, so that the root moves by the factor ``(b/a)**c`` and never reaches 0. As ``c`` goes from
     0 to 1, the root moves by the interval's full width in log scale.
 
-    The published test function on ``[1e-05, 20]`` fails a benchmark suite's checks of its test functions, because the
-    interval spans orders of magnitude next to the pole of ``1/(100*x*x)`` at 0.
+    The published test function on ``[1e-05, 20]`` does not satisfy the benchmark suite inclusion conditions, because
+    the interval spans orders of magnitude next to the pole of ``1/(100*x*x)`` at 0.
 
     A shift along x by ``c_scale*c`` takes ``a`` to the pole at 0 for a small ``c``, so the range of ``c`` in which
     ``f(a)`` keeps its sign and at least a tenth of its value at ``c = 0`` is narrower than the minimum width that the
-    checks need.
+    conditions require.
     """
 
     number = (1, 3, 1, 4)

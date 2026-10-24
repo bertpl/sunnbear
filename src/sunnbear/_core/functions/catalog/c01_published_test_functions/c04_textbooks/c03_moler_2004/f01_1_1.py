@@ -26,8 +26,8 @@ class Moler200411(Formula):
     half up to 1 significant digit; ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new
     interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because ``f(a)`` divides by 0 in
-    ``1/x``.
+    The published test function does not satisfy the benchmark suite inclusion conditions, because ``f(a)`` divides by 0
+    in ``1/x``.
     """
 
     number = (1, 4, 3, 1)

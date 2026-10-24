@@ -25,8 +25,8 @@ class Epperson2013Ex310(Formula):
     near 1.22, so that the interval holds 1 of the 2 roots. ``c`` shifts x as category 1 states, with ``c_scale`` the
     rounded width of the new interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because the published interval
-    holds 2 roots, an even number, so that ``f(a)`` and ``f(b)`` have the same sign.
+    The published test function does not satisfy the benchmark suite inclusion conditions, because the published
+    interval holds 2 roots, an even number, so that ``f(a)`` and ``f(b)`` have the same sign.
     """
 
     number = (1, 4, 5, 21)

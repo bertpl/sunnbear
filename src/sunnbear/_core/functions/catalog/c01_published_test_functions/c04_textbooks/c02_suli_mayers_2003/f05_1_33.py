@@ -28,7 +28,7 @@ class SuliMayers2003133(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    Each published test function fails a benchmark suite's checks of its test functions, because ``f(a)`` is 0 at the
+    Each published test function does not satisfy the benchmark suite inclusion conditions, because ``f(a)`` is 0 at the
     root ``a = 0``.
     """
 

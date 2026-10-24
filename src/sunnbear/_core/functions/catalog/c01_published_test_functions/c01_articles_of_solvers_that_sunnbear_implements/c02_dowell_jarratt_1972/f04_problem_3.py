@@ -30,7 +30,7 @@ class DowellJarratt1972Problem3(Formula):
     With ``modified = 1``, the formula keeps the published interval, evaluates the published function at x without
     shifting x, and adds ``c`` to the function's value.
 
-    The published test function fails a benchmark suite's checks of its test functions, because ``b = -0.0001`` lies
+    The published test function does not satisfy the benchmark suite inclusion conditions, because ``b = -0.0001`` lies
     ``1e-4`` from a second root, at ``x = 0``, and ``a = -0.9999`` lies ``1e-4`` from -1: a shift along x by more than
     ``1e-4`` changes the sign of ``f(b)``, or evaluates the series outside ``(-1, 1)``.
     """

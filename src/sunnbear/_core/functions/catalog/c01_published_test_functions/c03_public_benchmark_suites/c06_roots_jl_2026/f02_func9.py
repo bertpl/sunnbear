@@ -31,7 +31,7 @@ class RootsJl2026Func9(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test function on ``[5, 12]`` fails a benchmark suite's checks of its test functions, because the
+    The published test function on ``[5, 12]`` does not satisfy the benchmark suite inclusion conditions, because the
     function's 2 roots and the 2 poles of ``tan(x)`` give 4 sign changes in the published interval, so that ``f(a)`` and
     ``f(b)`` have the same sign.
     """
