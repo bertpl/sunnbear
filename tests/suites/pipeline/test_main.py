@@ -14,8 +14,8 @@ _PIPELINE_PACKAGE = "sunnbear._core.suites.pipeline"
 def _run_driver(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> None:
     """Run the pipeline package as ``python -m`` runs it, with `args` as its command-line arguments.
 
-    A test that imports every sunnbear module may have imported the driver module in this process; it is
-    removed from `sys.modules` first, because `runpy` warns when it finds the module there.
+    A test that imports every sunnbear module may have imported the package's `__main__` module in this process;
+    that module is removed from `sys.modules` first, because `runpy` warns when it finds the module there.
     """
     monkeypatch.setattr(sys, "argv", ["pipeline", *args])
     monkeypatch.delitem(sys.modules, f"{_PIPELINE_PACKAGE}.__main__", raising=False)

@@ -26,8 +26,8 @@ def main() -> None:
 
     for manifest in run_pipeline(workspace_dir=args.workspace, formulas=FormulaRegistry.formulas()):
         rejections = ", ".join(f"{count} by {reason}" for reason, count in sorted(manifest.rejection_counts.items()))
-        timing = f"{manifest.n_rows} rows in {manifest.duration_sec:.2f} s"
-        print(f"{manifest.stage}: {timing}; rejected: {rejections or 'none'}")
+        size_and_duration = f"{manifest.n_rows} rows in {manifest.duration_sec:.2f} s"
+        print(f"{manifest.stage}: {size_and_duration}; rejected: {rejections or 'none'}")
 
 
 if __name__ == "__main__":

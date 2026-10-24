@@ -1,9 +1,9 @@
 """Candidate generation, the first stage of the suite pipeline, builds every candidate test function of every formula.
 
 Its output holds 1 row per candidate, with the columns of `CANDIDATES_SCHEMA`: formula by formula, in
-the given order, and within a formula in the order of `Formula.build_all_candidates`. Later stages
-refer to a candidate only by its ``function_id``, from which `FormulaRegistry.candidate_from_id`
-rebuilds it.
+the given order, and within a formula in the order of `Formula.build_all_candidates`. The output holds
+only the id and the interval bounds, because `FormulaRegistry.candidate_from_id` rebuilds a candidate
+from its ``function_id``.
 """
 
 from collections.abc import Sequence

@@ -1,16 +1,10 @@
-"""`validate_candidates` keeps every candidate and records the check that rejected it; `count_rejections` counts
-the rejected candidates per reason."""
+"""`validate_candidates` keeps every candidate and records the check that rejected it."""
 
 import polars as pl
 import pytest
 
 from sunnbear._core.suites.pipeline.generation import CANDIDATES_SCHEMA
-from sunnbear._core.suites.pipeline.validation import (
-    VALIDATION_SCHEMA,
-    RejectionReason,
-    count_rejections,
-    validate_candidates,
-)
+from sunnbear._core.suites.pipeline.validation import VALIDATED_CANDIDATES_SCHEMA, validate_candidates
 
 
 @pytest.mark.parametrize(
@@ -32,23 +26,5 @@ def test_the_interval_check_rejects_an_interval_whose_ratio_exceeds_100(a, b, re
     validated = validate_candidates(candidates)
 
     # --- assert -----------------------
-    assert validated.schema == pl.Schema(VALIDATION_SCHEMA)
+    assert validated.schema == pl.Schema(VALIDATED_CANDIDATES_SCHEMA)
     assert validated.rows() == [("f2.1.1[p1=0.2]", a, b, rejected_by_expected)]
-
-
-@pytest.mark.parametrize(
-    "output, counts_expected",
-    [
-        pytest.param(
-            pl.DataFrame({"rejected_by": ["interval_ratio", "", "interval_ratio"]}),
-            {RejectionReason.INTERVAL_RATIO: 2},
-            id="output_with_rejections",
-        ),
-        pytest.param(pl.DataFrame({"function_id": ["f2.1.1[p1=0.2]"]}), {}, id="output_without_rejected_by"),
-    ],
-)
-def test_the_rejections_are_counted_per_reason(output, counts_expected):
-    """`count_rejections` counts the rows per reason, leaving valid rows out, and counts none in an output without a
-    ``rejected_by`` column."""
-    # --- act / assert -----------------
-    assert count_rejections(output) == counts_expected

@@ -1,7 +1,6 @@
 """`run_pipeline` runs the stages of the suite pipeline in order, and writes each stage's output and manifest."""
 
 import datetime
-import importlib.metadata
 import time
 from collections.abc import Callable, Sequence
 from pathlib import Path
@@ -13,7 +12,7 @@ from sunnbear._core.functions.core import Formula
 from .generation import generate_candidates
 from .manifest import PipelineStageManifest
 from .stage import PipelineStage
-from .validation import count_rejections, validate_candidates
+from .validation import validate_candidates
 from .workspace import PipelineWorkspace
 
 
@@ -27,15 +26,18 @@ def run_pipeline(*, workspace_dir: Path, formulas: Sequence[Formula]) -> tuple[P
 
     Returns:
         The manifest of each stage, in run order.
+
+    Raises:
+        ValueError: If a formula fails the checks of `Formula.build_all_candidates`.
     """
     workspace = PipelineWorkspace(workspace_dir)
-    candidates, candidates_manifest = _run_stage(
+    candidates, generation_manifest = _run_stage(
         workspace, PipelineStage.CANDIDATE_GENERATION, (), lambda: generate_candidates(formulas)
     )
     _, validation_manifest = _run_stage(
-        workspace, PipelineStage.VALIDATION, (candidates_manifest,), lambda: validate_candidates(candidates)
+        workspace, PipelineStage.VALIDATION, (generation_manifest,), lambda: validate_candidates(candidates)
     )
-    return (candidates_manifest, validation_manifest)
+    return (generation_manifest, validation_manifest)
 
 
 # ==================================================================================================
@@ -49,23 +51,17 @@ def _run_stage(
 ) -> tuple[pl.DataFrame, PipelineStageManifest]:
     """Compute the output of `stage`, write it and its manifest into `workspace`, and return both.
 
-    Args:
-        workspace: The workspace to write into.
-        stage: The stage to run.
-        input_manifests: The manifests of the stages whose outputs `compute_output` reads.
-        compute_output: Computes the stage's output.
+    `input_manifests` are the manifests of the stages whose outputs `compute_output` reads.
     """
     started_at = datetime.datetime.now(datetime.UTC)
     t_start = time.perf_counter()
     output = compute_output()
     duration_sec = time.perf_counter() - t_start
-    manifest = PipelineStageManifest(
+    manifest = PipelineStageManifest.from_stage_output(
         stage=stage,
+        output=output,
         output_sha256=workspace.write_stage_output(stage, output),
-        input_sha256s={input_manifest.stage: input_manifest.output_sha256 for input_manifest in input_manifests},
-        sunnbear_version=importlib.metadata.version("sunnbear"),
-        n_rows=output.height,
-        rejection_counts=count_rejections(output),
+        input_manifests=input_manifests,
         started_at=started_at,
         duration_sec=duration_sec,
     )

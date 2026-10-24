@@ -14,4 +14,4 @@ class PipelineStage(StrEnum):
     """
 
     CANDIDATE_GENERATION = "s1_candidates"
-    VALIDATION = "s2_valid"
+    VALIDATION = "s2_validated"

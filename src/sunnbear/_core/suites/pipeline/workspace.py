@@ -5,11 +5,12 @@ The directory holds:
 - 1 output file per stage, named after the stage, e.g. `s1_candidates.parquet`;
 - `manifests/`, which holds 1 `PipelineStageManifest` per stage, e.g. `manifests/s1_candidates.json`.
 
-Every file is written under a temporary name and then renamed, so a file that exists is complete.
+Every file is written under a temporary name and then renamed, so a file under its final name is always complete.
 """
 
 import hashlib
 import io
+import json
 from pathlib import Path
 
 import polars as pl
@@ -30,7 +31,7 @@ class PipelineWorkspace:
     """`PipelineWorkspace` writes the files of the suite pipeline's workspace directory."""
 
     def __init__(self, path: Path) -> None:
-        """Refer to the workspace directory at `path`, which need not exist yet."""
+        """Create a workspace for the directory at `path`, which need not exist yet."""
         self.path = path
 
     # --------------------------------------------------------------------------
@@ -45,9 +46,13 @@ class PipelineWorkspace:
         return hashlib.sha256(content).hexdigest()
 
     def write_manifest(self, manifest: PipelineStageManifest) -> None:
-        """Write the manifest of its stage, replacing an earlier one."""
+        """Write `manifest` to the manifest file of `manifest.stage`, replacing an earlier one.
+
+        The JSON has sorted keys, so the same manifest is always written as the same bytes.
+        """
         manifest_file = self.path / _MANIFESTS_DIR_NAME / f"{manifest.stage}{_MANIFEST_FILE_SUFFIX}"
-        self._write_atomically(manifest_file, manifest.to_json().encode())
+        manifest_json = json.dumps(manifest.model_dump(mode="json"), sort_keys=True, indent=2) + "\n"
+        self._write_atomically(manifest_file, manifest_json.encode())
 
     # --------------------------------------------------------------------------
     #  Helpers

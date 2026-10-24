@@ -15,12 +15,12 @@ _CATEGORY_2_FORMULAS = [formula for formula in FormulaRegistry.formulas() if for
 
 def test_each_stage_writes_its_output_and_a_manifest_that_names_the_outputs_it_read(tmp_path):
     """Each stage's manifest is in the workspace, matches the output file's bytes and rows, and records the
-    sha256 of each output that the stage read."""
+    sha256 of each of the stage's inputs."""
     # --- act --------------------------
     manifests = run_pipeline(workspace_dir=tmp_path, formulas=_CATEGORY_2_FORMULAS)
 
     # --- assert -----------------------
-    candidates_manifest, validation_manifest = manifests
+    generation_manifest, validation_manifest = manifests
     assert [manifest.stage for manifest in manifests] == list(PipelineStage)
     for manifest in manifests:
         output_file = tmp_path / f"{manifest.stage}.parquet"
@@ -28,8 +28,8 @@ def test_each_stage_writes_its_output_and_a_manifest_that_names_the_outputs_it_r
         assert hashlib.sha256(output_file.read_bytes()).hexdigest() == manifest.output_sha256
         assert pl.read_parquet(output_file).height == manifest.n_rows
         assert PipelineStageManifest.model_validate_json(manifest_file.read_text()) == manifest
-    assert candidates_manifest.input_sha256s == {}
-    assert validation_manifest.input_sha256s == {PipelineStage.CANDIDATE_GENERATION: candidates_manifest.output_sha256}
+    assert generation_manifest.input_sha256s == {}
+    assert validation_manifest.input_sha256s == {PipelineStage.CANDIDATE_GENERATION: generation_manifest.output_sha256}
 
 
 def test_a_rerun_replaces_the_outputs_and_manifests_and_leaves_no_temporary_files(tmp_path):

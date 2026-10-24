@@ -1,16 +1,20 @@
 """Validation, the second stage of the suite pipeline, runs the validation checks on every candidate.
 
-The checks run in sequence, cheapest first, and a candidate is rejected by the first check that it
-fails. The output holds every candidate of the candidate generation stage, with the columns of
-`VALIDATION_SCHEMA`: its ``rejected_by`` column names the check that rejected the candidate, as a
-`RejectionReason`, or holds ``""`` for a valid candidate. Rejected candidates stay in the output, so
-that the reasons can be counted per formula.
+The checks run in sequence, cheapest first, and a candidate is rejected by the first check that it fails.
+Rejected candidates stay in the output, so that the reasons can be counted per formula.
+
+The output holds every candidate of the candidate generation stage, with the columns of
+`VALIDATED_CANDIDATES_SCHEMA`: its ``rejected_by`` column names the check that rejected the candidate,
+as a `RejectionReason`, or holds ``""`` for a valid candidate.
 
 The interval check, the first check, rejects a candidate whose interval lies far from 0 relative to its
-width: its ratio ``max(abs(a), abs(b)) / (b - a)`` exceeds `MAX_INTERVAL_RATIO`. Rounding in the
-interval bounds can change bisection's evaluation count at the tolerances near the ones where that count
-changes, and the share of tolerances at risk grows with the ratio. The limit is stricter than the one of
-`compute_xtol_range`, which accepts ratios up to 1024 for users' own functions.
+width: its ratio ``max(abs(a), abs(b)) / (b - a)`` exceeds `MAX_INTERVAL_RATIO`.
+
+Rounding a bound changes the interval's width by up to about ``eps * max(abs(a), abs(b))``, a share of
+the width that grows with the ratio. At a tolerance close to one where bisection's evaluation count
+steps by 1, that change can move the count across the step, so a larger ratio puts more tolerances at
+risk. The limit is stricter than the one that `compute_xtol_range` applies to users' own functions at
+the default `n_bisection_fevals`.
 """
 
 from enum import StrEnum
@@ -32,7 +36,7 @@ class RejectionReason(StrEnum):
     INTERVAL_RATIO = "interval_ratio"
 
 
-VALIDATION_SCHEMA: dict[str, pl.DataType] = {
+VALIDATED_CANDIDATES_SCHEMA: dict[str, pl.DataType] = {
     **CANDIDATES_SCHEMA,
     "rejected_by": pl.Enum(["", *RejectionReason]),
 }
@@ -51,19 +55,4 @@ def validate_candidates(candidates: pl.DataFrame) -> pl.DataFrame:
     rejected_by = (
         pl.when(interval_ratio > MAX_INTERVAL_RATIO).then(pl.lit(RejectionReason.INTERVAL_RATIO)).otherwise(pl.lit(""))
     )
-    return candidates.with_columns(rejected_by=rejected_by.cast(VALIDATION_SCHEMA["rejected_by"]))
-
-
-# ==================================================================================================
-#  count_rejections
-# ==================================================================================================
-def count_rejections(output: pl.DataFrame) -> dict[RejectionReason, int]:
-    """Return the number of rejected candidates per `RejectionReason` in a stage's output.
-
-    An output without a ``rejected_by`` column rejects no candidate, so its count is empty.
-    """
-    if "rejected_by" not in output.columns:
-        return {}
-    else:
-        rejected = output.filter(pl.col("rejected_by") != "")
-        return {RejectionReason(reason): count for reason, count in rejected.group_by("rejected_by").len().iter_rows()}
+    return candidates.with_columns(rejected_by=rejected_by.cast(VALIDATED_CANDIDATES_SCHEMA["rejected_by"]))
