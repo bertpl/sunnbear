@@ -13,7 +13,6 @@ import datetime
 import hashlib
 import io
 import json
-from collections.abc import Sequence
 from pathlib import Path
 
 import polars as pl
@@ -45,19 +44,19 @@ class PipelineWorkspace:
         *,
         stage: PipelineStage,
         output: pl.DataFrame,
-        input_manifests: Sequence[PipelineStageManifest],
+        input_manifest: PipelineStageManifest | None,
         started_at: datetime.datetime,
         duration_sec: float,
     ) -> PipelineStageManifest:
         """Write the output of `stage` and its manifest, replacing earlier ones, and return the manifest.
 
-        `input_manifests` are the manifests of the stages whose outputs `stage` read.
+        `input_manifest` is the manifest of the stage before `stage`, or ``None`` for the first stage.
         """
         manifest = PipelineStageManifest.from_stage_output(
             stage=stage,
             output=output,
             output_sha256=self._write_stage_output(stage.output_name, output),
-            input_manifests=input_manifests,
+            input_manifest=input_manifest,
             started_at=started_at,
             duration_sec=duration_sec,
         )

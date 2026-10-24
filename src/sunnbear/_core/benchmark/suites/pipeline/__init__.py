@@ -1,6 +1,6 @@
 """This package holds the benchmark suite pipeline, the maintainer tooling that builds benchmark suites.
 
-The pipeline is a chain of stages, each of which computes 1 output table from the outputs of the stages before it:
+The pipeline is a chain of stages, each of which computes its output table from the output of the stage before it:
 
 - `core` holds the framework: the base class of a stage, the loop that runs the stages, and the workspace that
   stores their outputs;

@@ -1,56 +1,53 @@
-"""`run_stages` runs stages of the benchmark suite pipeline in order, and writes each stage's output and manifest."""
+"""`run_stages` runs the stages of the benchmark suite pipeline as a chain, and writes their outputs and manifests."""
 
 import datetime
 import time
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
+
+import polars as pl
 
 from .manifest import PipelineStageManifest
 from .stage import PipelineStage
 from .workspace import PipelineWorkspace
-
-if TYPE_CHECKING:  # type-only: polars appears here only in the annotation of a local variable
-    import polars as pl
 
 
 # ==================================================================================================
 #  run_stages
 # ==================================================================================================
 def run_stages(workspace: PipelineWorkspace, stages: Sequence[PipelineStage]) -> tuple[PipelineStageManifest, ...]:
-    """Run `stages` in order, and have `workspace` write each stage's output and manifest.
+    """Run `stages` in order, each on the output of the stage before it, and have `workspace` write each output.
 
-    Each stage receives the outputs of its `PipelineStage.input_stages`, which must run before it.
+    The first stage receives an empty table.
 
     Returns:
         The manifest of each stage, in run order.
 
     Raises:
-        ValueError: If a stage reads the output of a stage that does not run before it.
+        ValueError: If a stage's output lacks a column of the output before it.
     """
-    outputs: dict[type[PipelineStage], pl.DataFrame] = {}
-    manifests: dict[type[PipelineStage], PipelineStageManifest] = {}
+    previous_output = pl.DataFrame()
+    previous_manifest: PipelineStageManifest | None = None
+    manifests: list[PipelineStageManifest] = []
     for stage in stages:
-        # --- inputs -----------------------------
-        missing_stage_names = [input_stage.__name__ for input_stage in stage.input_stages if input_stage not in outputs]
-        if missing_stage_names:
-            raise ValueError(
-                f"{type(stage).__name__} reads the outputs of {missing_stage_names}, which do not run before it."
-            )
-        inputs = {input_stage: outputs[input_stage] for input_stage in stage.input_stages}
-
         # --- output -----------------------------
         started_at = datetime.datetime.now(datetime.UTC)
         t_start = time.perf_counter()
-        output = stage.compute_output(inputs)
+        output = stage.compute_output(previous_output)
         duration_sec = time.perf_counter() - t_start
 
+        # --- the chain's rule -------------------
+        dropped_columns = [column for column in previous_output.columns if column not in output.columns]
+        if dropped_columns:
+            raise ValueError(f"{type(stage).__name__} drops the columns {dropped_columns} of the output before it.")
+
         # --- output and manifest files ----------
-        manifests[type(stage)] = workspace.write_stage_output_and_manifest(
+        manifest = workspace.write_stage_output_and_manifest(
             stage=stage,
             output=output,
-            input_manifests=[manifests[input_stage] for input_stage in stage.input_stages],
+            input_manifest=previous_manifest,
             started_at=started_at,
             duration_sec=duration_sec,
         )
-        outputs[type(stage)] = output
-    return tuple(manifests.values())
+        manifests.append(manifest)
+        previous_output, previous_manifest = output, manifest
+    return tuple(manifests)

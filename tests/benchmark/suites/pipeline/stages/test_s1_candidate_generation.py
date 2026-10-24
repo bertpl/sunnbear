@@ -30,7 +30,7 @@ def test_the_candidates_are_listed_formula_by_formula_in_the_given_order(formula
     ]
 
     # --- act --------------------------
-    candidates = CandidateGenerationStage(formulas).compute_output({})
+    candidates = CandidateGenerationStage(formulas).compute_output(pl.DataFrame())
 
     # --- assert -----------------------
     assert candidates.schema == pl.Schema(CANDIDATES_SCHEMA)

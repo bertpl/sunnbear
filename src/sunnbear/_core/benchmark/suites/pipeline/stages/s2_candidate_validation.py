@@ -22,14 +22,13 @@ ratio widens the range of ``xtol`` values at which the count depends on rounding
 users' own functions at the default `n_bisection_fevals`.
 """
 
-from collections.abc import Mapping
 from enum import StrEnum
 
 import polars as pl
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage
 
-from .s1_candidate_generation import CANDIDATES_SCHEMA, CandidateGenerationStage
+from .s1_candidate_generation import CANDIDATES_SCHEMA
 
 # A candidate whose bound-to-width ratio exceeds this limit is rejected by the bound-to-width ratio check.
 MAX_BOUND_TO_WIDTH_RATIO = 100.0
@@ -57,11 +56,13 @@ class CandidateValidationStage(PipelineStage):
     """`CandidateValidationStage` runs the validation checks, and records the check that rejected each candidate."""
 
     output_name = "s2_checked_candidates"
-    input_stages = (CandidateGenerationStage,)
 
-    def compute_output(self, inputs: Mapping[type[PipelineStage], pl.DataFrame]) -> pl.DataFrame:
-        """Return the candidates with a ``rejected_by`` column: the check that rejected each, or ``""`` if none did."""
-        candidates = inputs[CandidateGenerationStage]
+    def compute_output(self, previous_output: pl.DataFrame) -> pl.DataFrame:
+        """Return the candidates with a ``rejected_by`` column: the check that rejected each, or ``""`` if none did.
+
+        Args:
+            previous_output: The output of candidate generation, with the columns of `CANDIDATES_SCHEMA`.
+        """
         bound_to_width_ratio = pl.max_horizontal(pl.col("a").abs(), pl.col("b").abs()) / (pl.col("b") - pl.col("a"))
         # The reason goes in as its string value, because polars 1.0 turns a `RejectionReason` member into a literal of
         # an enum type whose only category is that member, and the ``otherwise`` value ``""`` cannot be cast to that
@@ -71,4 +72,4 @@ class CandidateValidationStage(PipelineStage):
             .then(pl.lit(RejectionReason.BOUND_TO_WIDTH_RATIO.value))
             .otherwise(pl.lit(""))
         )
-        return candidates.with_columns(rejected_by=rejected_by.cast(CHECKED_CANDIDATES_SCHEMA["rejected_by"]))
+        return previous_output.with_columns(rejected_by=rejected_by.cast(CHECKED_CANDIDATES_SCHEMA["rejected_by"]))

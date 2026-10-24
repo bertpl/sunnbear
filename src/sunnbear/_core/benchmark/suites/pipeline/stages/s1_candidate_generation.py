@@ -9,7 +9,7 @@ The output holds only the id and the interval bounds, because `FormulaRegistry.c
 candidate from its ``function_id``.
 """
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 
 import polars as pl
 
@@ -35,8 +35,10 @@ class CandidateGenerationStage(PipelineStage):
         """Create the stage for `formulas`, the corpus of the pipeline run."""
         self.formulas = formulas
 
-    def compute_output(self, inputs: Mapping[type[PipelineStage], pl.DataFrame]) -> pl.DataFrame:
+    def compute_output(self, previous_output: pl.DataFrame) -> pl.DataFrame:
         """Return every candidate of every formula: its id and its interval bounds ``a`` and ``b``.
+
+        As the first stage, it receives an empty `previous_output`.
 
         Raises:
             ValueError: If a formula fails the checks of `Formula.build_all_candidates`.

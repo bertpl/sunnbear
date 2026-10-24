@@ -3,10 +3,7 @@
 import polars as pl
 import pytest
 
-from sunnbear._core.benchmark.suites.pipeline.stages.s1_candidate_generation import (
-    CANDIDATES_SCHEMA,
-    CandidateGenerationStage,
-)
+from sunnbear._core.benchmark.suites.pipeline.stages.s1_candidate_generation import CANDIDATES_SCHEMA
 from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation import (
     CHECKED_CANDIDATES_SCHEMA,
     CandidateValidationStage,
@@ -29,7 +26,7 @@ def test_the_bound_to_width_ratio_check_rejects_an_interval_whose_ratio_exceeds_
     candidates = pl.DataFrame({"function_id": ["f2.1.1[p1=0.2]"], "a": [a], "b": [b]}, schema=CANDIDATES_SCHEMA)
 
     # --- act --------------------------
-    checked_candidates = CandidateValidationStage().compute_output({CandidateGenerationStage: candidates})
+    checked_candidates = CandidateValidationStage().compute_output(candidates)
 
     # --- assert -----------------------
     assert checked_candidates.schema == pl.Schema(CHECKED_CANDIDATES_SCHEMA)
