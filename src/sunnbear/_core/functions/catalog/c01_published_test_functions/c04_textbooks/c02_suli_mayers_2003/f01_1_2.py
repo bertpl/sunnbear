@@ -24,19 +24,21 @@ class SuliMayers200312(Formula):
     `M`, and to replot it on the smaller interval for the 2 largest `M`. A footnote in Section 1.6 (p. 28) notes that
     bisection applies although `f` is not differentiable at 1.05.
 
-    With ``modified = 1``, the formula evaluates the published function at ``x + 1.05``, which puts the minimum of its V
-    shape at 0, on an interval that holds only the left root, ``-1/M``.
+    With ``modified = 1``, the formula evaluates the published function at ``x + 1.05``, which moves its minimum, at
+    1.05, to 0, and has its own interval, which holds only the left root, ``-1/M``.
 
-    On ``[0.8, 1.8]``, that interval is ``[-2/M, 0]``, which puts the root in its middle for every ``M``; on the 2
-    narrow published intervals, ``[1.04999, 1.05001]``, it is their left half, ``[-1e-5, 0]``.
+    For the published interval ``[0.8, 1.8]``, the new interval is ``[-2/M, 0]``, with the root in its middle for every
+    ``M``; for the narrow published interval ``[1.04999, 1.05001]``, used with 2 values of ``M``, the new interval is
+    the left half of that interval shifted by -1.05, ``[-1e-5, 0]``.
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
     The published test functions fail a benchmark suite's checks of its test functions, because each published interval
-    holds both roots, ``1.05 - 1/M`` and ``1.05 + 1/M``, an even number.
+    holds both roots, ``1.05 - 1/M`` and ``1.05 + 1/M``, an even number, so that ``f(a)`` and ``f(b)`` have the same
+    sign.
 
-    The ratio of the narrow published intervals' largest bound to their width, about 52,500, is also above the limit of
-    100 that the checks set.
+    The ratio of the narrow published interval's largest bound to its width, about 52,500, is also above the checks'
+    limit of 100.
     """
 
     number = (1, 4, 2, 1)

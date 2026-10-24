@@ -25,9 +25,9 @@ class Epperson201331125(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because it lies tightly around
-    the root at 1: the ratio of the interval's largest bound to its width, about 250, is above the limit of 100 that the
-    checks set.
+    The published test function fails a benchmark suite's checks of its test functions, because its interval is narrow
+    around the root at 1: the ratio of the interval's largest bound to its width, about 250, is above the checks' limit
+    of 100.
     """
 
     number = (1, 4, 5, 23)
@@ -65,8 +65,6 @@ class Epperson201331125(Formula):
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`
     # would accept any value near 0, 0 among them
-    # a case with a positive `atol` lies where float64 cannot evaluate the function to the default tolerance, because
-    # the function is ill-conditioned there or its terms cancel
     test_cases = (
         FormulaTestCase.value(
             params={"a": 0.998, "b": 1.002, "c_scale": 0.004, "modified": 0.0},

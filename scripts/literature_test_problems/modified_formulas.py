@@ -29,9 +29,9 @@ class ModificationType(StrEnum):
     # The modified function keeps the published interval [a, b] and evaluates the published function at
     # x*exp(-c*ln(b/a)): c scales x, so that the root moves by the factor (b/a)**c and never reaches 0.
     C_SCALES_X = "c_scales_x"
-    # The modified function evaluates the published function at x + s, a shift of the x-axis by a constant s of the
-    # formula, on an interval around 0; c shifts x by the rule of category 1, with c_scale the rounded width of that
-    # interval.
+    # The modified function evaluates the published function at x + s, where s is a constant that the formula's
+    # docstring states, and has its own interval, which lies around 0; c shifts x by the rule of category 1, with
+    # c_scale the rounded width of the new interval.
     C_SHIFTS_X_ON_SHIFTED_AXIS = "c_shifts_x_on_shifted_axis"
 
     @property

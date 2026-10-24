@@ -24,9 +24,9 @@ class Gsl2024Func6(Formula):
 
     With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
 
-    The published test function fails a benchmark suite's checks of its test functions, because it lies tightly around
-    the root at 1: the ratio of the interval's largest bound to its width, about 1429, is above the limit of 100 that
-    the checks set.
+    The published test function fails a benchmark suite's checks of its test functions, because its interval is narrow
+    around the root at 1: the ratio of the interval's largest bound to its width, about 1429, is above the checks' limit
+    of 100.
     """
 
     number = (1, 3, 2, 5)
@@ -66,8 +66,6 @@ class Gsl2024Func6(Formula):
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`
     # would accept any value near 0, 0 among them
-    # a case with a positive `atol` lies where float64 cannot evaluate the function to the default tolerance, because
-    # the function is ill-conditioned there or its terms cancel
     test_cases = (
         FormulaTestCase.value(
             params={"a": 0.9995, "b": 1.0002, "c_scale": 0.0007, "modified": 0.0},
