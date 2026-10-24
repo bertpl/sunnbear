@@ -1,10 +1,12 @@
 """This module holds a formula of Foo, Tan (2025).
 
 The formula comes from the row with the key ``4.3.1`` in the survey of published test problems. The module generator,
-`scripts/literature_test_problems/formula_modules.py`, does not write the formula's modified version.
+`scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter ``modified``, which
+selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the generated one, and a change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
+in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
+needs a change of this module.
 """
 
 import math
@@ -26,12 +28,12 @@ class FooTan2025431(Formula):
     match `q = 2^156`, not the stated `q = 2^127 - 1`; the text and Prop. 10, whose bound `0.0157` is `2/127`, confirm
     `2^127 - 1`, which the row keeps.
 
-    With ``modified = 1``, the formula evaluates the published function at the unshifted x and adds ``c`` to its value,
-    on the published interval.
+    With ``modified = 1``, the formula keeps the published interval, evaluates the published function at x without
+    shifting x, and adds ``c`` to the function's value.
 
-    The published test functions fail the checks that a benchmark suite applies to its test functions, because a shift
-    along x in either direction evaluates a logarithm outside its domain, ``log(x)`` left of ``a = 0`` or ``log(1 - x)``
-    right of ``b = 1``.
+    The published test functions fail a benchmark suite's checks of its test functions, because a shift along x in
+    either direction evaluates a logarithm outside its domain, ``log(x)`` left of ``a = 0`` or ``log(1 - x)`` right of
+    ``b = 1``.
     """
 
     number = (1, 2, 15, 2)

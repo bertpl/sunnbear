@@ -2,8 +2,10 @@
 
 A formula of category 1 has a modified version when some of its published test functions fail the validation of the
 benchmark suite pipeline, `sunnbear._core.benchmark.suites.pipeline`. The class docstring of `PublishedTestFunctions`
-describes the parameter `modified` that such a formula has. Such a formula's module is written by hand, starting from
-its generated module.
+describes such a formula's parameter `modified`.
+
+Such a formula's module is written by hand, starting from the module that the generator writes while the formula is
+not yet in `MODIFIED_FORMULAS`.
 """
 
 from enum import StrEnum

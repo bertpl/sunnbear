@@ -1,10 +1,12 @@
 """This module holds a formula of roots-fortran (2025).
 
 The formula comes from the row with the key ``86–88`` in the survey of published test problems. The module generator,
-`scripts/literature_test_problems/formula_modules.py`, does not write the formula's modified version.
+`scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter ``modified``, which
+selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the generated one, and a change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
+in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
+needs a change of this module.
 """
 
 import math
@@ -20,11 +22,11 @@ class RootsFortran20258688(Formula):
 
     a different root in each bracket
 
-    With ``modified = 1``, the formula evaluates the published function at the unshifted x and adds ``c`` to its value,
-    on the published interval.
+    Only the test function on ``[0, 2]`` has a version with ``modified = 1``, which keeps that interval, evaluates the
+    published function at x without shifting x, and adds ``c`` to the function's value.
 
-    The published test function on ``[0, 2]`` fails the checks that a benchmark suite applies to its test functions,
-    because a shift along x by any ``c > 0`` evaluates ``sqrt(x)`` left of ``a = 0``, outside its domain.
+    The published test function on ``[0, 2]`` fails a benchmark suite's checks of its test functions, because a shift
+    along x by any ``c > 0`` evaluates ``sqrt(x)`` left of ``a = 0``, outside its domain.
     """
 
     number = (1, 3, 3, 30)

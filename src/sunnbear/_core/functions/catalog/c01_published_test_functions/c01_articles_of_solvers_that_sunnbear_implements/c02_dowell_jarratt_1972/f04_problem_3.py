@@ -4,8 +4,9 @@ The formula comes from the row with the key ``Problem 3`` in the survey of publi
 this function as 1 expression that the module generator, `scripts/literature_test_problems/formula_modules.py`, cannot
 translate: an infinite sum.
 
-The generator does not write the formula's modified version either. A person therefore writes this module, and a change
-of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+The generator does not write a formula with the parameter ``modified``, which selects a modified version of a published
+test function, either. A person therefore writes this module, and a change of the formula's row in
+`data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math
@@ -26,11 +27,11 @@ class DowellJarratt1972Problem3(Formula):
     Defined for ``-1 < x < 1``. Root ``-0.679334``. Starting values ``x0 = -0.0001``, ``x1 = -0.9999``. The article
     calls it a well-behaved function.
 
-    With ``modified = 1``, the formula evaluates the published function at the unshifted x and adds ``c`` to its value,
-    on the published interval.
+    With ``modified = 1``, the formula keeps the published interval, evaluates the published function at x without
+    shifting x, and adds ``c`` to the function's value.
 
-    The published test function fails the checks that a benchmark suite applies to its test functions, because ``b =
-    -0.0001`` lies ``1e-4`` from the root at 0, and ``a = -0.9999`` lies ``1e-4`` from -1: a shift along x by more than
+    The published test function fails a benchmark suite's checks of its test functions, because ``b = -0.0001`` lies
+    ``1e-4`` from a second root, at ``x = 0``, and ``a = -0.9999`` lies ``1e-4`` from -1: a shift along x by more than
     ``1e-4`` changes the sign of ``f(b)``, or evaluates the series outside ``(-1, 1)``.
     """
 

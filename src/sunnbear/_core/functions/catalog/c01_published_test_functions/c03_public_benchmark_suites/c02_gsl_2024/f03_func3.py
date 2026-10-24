@@ -1,10 +1,12 @@
 """This module holds a formula of GSL (2024).
 
 The formula comes from the row with the key ``func3`` in the survey of published test problems. The module generator,
-`scripts/literature_test_problems/formula_modules.py`, does not write the formula's modified version.
+`scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter ``modified``, which
+selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the generated one, and a change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
+in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
+needs a change of this module.
 """
 
 from sunnbear._core.functions.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
@@ -17,12 +19,12 @@ class Gsl2024Func3(Formula):
 
     Starting point 1; derivative given
 
-    With ``modified = 1``, the formula evaluates the published function at the unshifted x and adds ``c`` to its value,
-    on the published interval.
+    With ``modified = 1``, the formula keeps the published interval, evaluates the published function at x without
+    shifting x, and adds ``c`` to the function's value.
 
-    The published test function fails the checks that a benchmark suite applies to its test functions, because its roots
-    ``-1e-4`` and ``1e-4`` lie ``1e-4`` from ``a = 0``: a shift along x by more than ``1e-4``, in either direction,
-    changes the sign of ``f(a)``.
+    The published test function fails a benchmark suite's checks of its test functions, because its roots ``-1e-4`` and
+    ``1e-4`` lie ``1e-4`` from ``a = 0``: a shift along x by more than ``1e-4``, in either direction, changes the sign
+    of ``f(a)``.
     """
 
     number = (1, 3, 2, 3)

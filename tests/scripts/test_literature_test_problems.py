@@ -295,14 +295,14 @@ def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table
 def test_modified_formulas_are_the_formulas_with_the_parameter_modified(script_modules):
     """`MODIFIED_FORMULAS` lists exactly the formulas of category 1 that have the parameter ``modified``."""
     # --- act --------------------------
-    formula_ids_with_parameter = {
+    formula_ids_with_parameter_modified = {
         f"f{formula.format_number(formula.number)}"
         for formula in _CATEGORY_1_FORMULAS
         if "modified" in formula.param_names
     }
 
     # --- assert -----------------------
-    assert formula_ids_with_parameter == set(script_modules["modified_formulas"].MODIFIED_FORMULAS)
+    assert formula_ids_with_parameter_modified == set(script_modules["modified_formulas"].MODIFIED_FORMULAS)
 
 
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
@@ -310,18 +310,19 @@ def test_modified_formulas_are_the_formulas_with_the_parameter_modified(script_m
 def test_category_1_formula_applies_c_as_its_rule_says(formula, c, script_modules):
     """A formula of category 1 applies ``c`` by category 1's rule, or by its `ModificationType` where ``modified = 1``.
 
-    Evaluating the formula at ``c = 0`` repeats its own float arithmetic, so the 2 values are equal exactly; the
-    x-values lie in the interval, and so do their shifted values where ``c`` shifts x.
+    The expected value evaluates the formula at ``c = 0``, which repeats the formula's own float arithmetic, so the
+    value at ``c`` equals it exactly; this holds for ``C_ADDS_TO_F`` because such a formula adds ``c`` as its last
+    operation. The x-values lie in the interval, and so do their shifted values where ``c`` shifts x.
     """
     for candidate in formula.build_all_candidates():
         # --- arrange ----------------------
-        modification_types = script_modules["modified_formulas"].ModificationType
+        modification_type_enum = script_modules["modified_formulas"].ModificationType
         c_scale = PublishedTestFunctions.c_scale(candidate.a, candidate.b)
         x = candidate.a + 0.6 * (candidate.b - candidate.a)
 
         # --- act --------------------------
         value = candidate.xc_fun(x, c)
-        if _modification_type(candidate, script_modules) is modification_types.C_ADDS_TO_F:
+        if _modification_type(candidate, script_modules) is modification_type_enum.C_ADDS_TO_F:
             expected = candidate.xc_fun(x, 0.0) + c
         else:
             expected = candidate.xc_fun(x - c_scale * c, 0.0)
@@ -341,11 +342,11 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, scrip
     """
     # --- arrange ----------------------
     tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))
-    modification_types = script_modules["modified_formulas"].ModificationType
+    modification_type_enum = script_modules["modified_formulas"].ModificationType
     shifting_candidates = [
         candidate
         for candidate in formula.build_all_candidates()
-        if _modification_type(candidate, script_modules) is not modification_types.C_ADDS_TO_F
+        if _modification_type(candidate, script_modules) is not modification_type_enum.C_ADDS_TO_F
     ]
 
     # --- act --------------------------

@@ -1,10 +1,12 @@
 """This module holds a formula of Chapra, Canale (2015).
 
 The formula comes from the row with the key ``Prob. 5.15`` in the survey of published test problems. The module
-generator, `scripts/literature_test_problems/formula_modules.py`, does not write the formula's modified version.
+generator, `scripts/literature_test_problems/formula_modules.py`, does not write a formula with the parameter
+``modified``, which selects a modified version of a published test function.
 
-A person therefore writes this module, starting from the generated one, and a change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+A person therefore writes this module, starting from the module that the generator writes while the formula is not yet
+in the generator's `MODIFIED_FORMULAS`, and a change of the formula's row in `data/literature_test_problems/sources/`
+needs a change of this module.
 """
 
 import math
@@ -21,11 +23,11 @@ class ChapraCanale2015Prob515(Formula):
     Unknown `H`, the initial head (m) of the cylindrical tank of Fig. P5.15; `L` is the pipe's length and `t` the
     elapsed time. Graphically, and by bisection and false position to `es = 1%`.
 
-    With ``modified = 1``, the formula evaluates the published function at the unshifted x and adds ``c`` to its value,
-    on the published interval.
+    With ``modified = 1``, the formula keeps the published interval, evaluates the published function at x without
+    shifting x, and adds ``c`` to the function's value.
 
-    The published test function fails the checks that a benchmark suite applies to its test functions, because a shift
-    along x by any ``c > 0`` evaluates ``sqrt(2*g*x)`` left of ``a = 0``, outside its domain.
+    The published test function fails a benchmark suite's checks of its test functions, because a shift along x by any
+    ``c > 0`` evaluates ``sqrt(2*g*x)`` left of ``a = 0``, outside its domain.
     """
 
     number = (1, 4, 6, 20)
