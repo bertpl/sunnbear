@@ -9,7 +9,6 @@ The workspace directory holds, for each stage, files named after the stage's `Pi
 Every file is written under a temporary name and then renamed, so a file under its final name is always complete.
 """
 
-import datetime
 import hashlib
 import io
 import json
@@ -18,7 +17,7 @@ from pathlib import Path
 
 import polars as pl
 
-from .manifest import PipelineStageManifest
+from .manifest import PipelineStageExecution, PipelineStageManifest
 from .stage import PipelineStage, PipelineStageOutput
 
 _TABLE_FILE_SUFFIX = ".parquet"
@@ -47,15 +46,13 @@ class PipelineWorkspace:
         stage: PipelineStage,
         output: PipelineStageOutput,
         input_manifest: PipelineStageManifest | None,
-        started_at: datetime.datetime,
-        duration_sec: float,
-        n_workers: int,
+        execution: PipelineStageExecution,
     ) -> PipelineStageManifest:
         """Write the output table, reports and manifest of `stage`, replacing earlier ones, and return the manifest.
 
         The reports of an earlier run of `stage` are removed first, so the reports directory of `stage` holds exactly
         the reports in `output`. `input_manifest` is the manifest of the stage before `stage`, or ``None`` for the
-        first stage; `n_workers` is the number of workers of the run's worker pool.
+        first stage.
         """
         reports_dir = self.path / _REPORTS_DIR_NAME / stage.output_name
         shutil.rmtree(reports_dir, ignore_errors=True)
@@ -68,9 +65,7 @@ class PipelineWorkspace:
                 for report_name, report in output.reports.items()
             },
             input_manifest=input_manifest,
-            started_at=started_at,
-            duration_sec=duration_sec,
-            n_workers=n_workers,
+            execution=execution,
         )
         self._write_manifest(manifest)
         return manifest

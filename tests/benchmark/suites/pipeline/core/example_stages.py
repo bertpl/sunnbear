@@ -1,7 +1,7 @@
 """This module defines small stages for the tests of the pipeline framework, so those tests need no formulas.
 
-The first 3 stages follow the rules of the chain, and the third runs its work as tasks in the run's worker pool; each
-of the others breaks 1 rule.
+The stages that follow the rules of the chain come first, and `ExampleSquaresStage` runs its work as tasks in the run's
+worker pool; each of the others breaks 1 rule.
 """
 
 from dataclasses import dataclass
@@ -48,7 +48,7 @@ class ExampleSquaringTask:
 
 
 class ExampleSquaresStage(PipelineStage):
-    """`ExampleSquaresStage` adds the squares of the numbers, which tasks in the run's worker pool compute."""
+    """`ExampleSquaresStage` adds the square of each number as a column, computed in tasks of the run's worker pool."""
 
     output_name = "s2_squares"
 

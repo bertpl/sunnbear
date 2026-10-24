@@ -1,8 +1,10 @@
 """`WorkerPool` runs tasks in worker processes, or in this process when it has 1 worker.
 
-A task is any picklable object with a `run` method (`WorkerTask`). A task may look up classes by id in a registry,
-such as a formula or a solver config, and a registry only holds the classes of imported modules. A new worker has
-imported only what unpickling its first task needs, so every worker first imports the modules that the pool names.
+A task is any picklable object with a `run` method (`WorkerTask`).
+
+A task may look up a class by id in a registry, such as the class of a formula or a solver config, and a registry holds
+only the classes of the modules that its process has imported. A new worker has imported only what unpickling its
+first task needs, so every worker first imports the modules that the pool names.
 
 Workers start with the "spawn" method on every platform: a worker then never inherits the state of this
 process's threads, e.g. locks held by numba or polars, and a pool behaves the same on Linux, macOS and Windows.
@@ -22,22 +24,9 @@ R = TypeVar("R")
 R_co = TypeVar("R_co", covariant=True)
 T = TypeVar("T")
 
-# `WorkerPool.split_into_batches` aims at this many batches per worker, so that a slow task does not leave the other
-# workers idle at the end.
-TASKS_PER_WORKER = 4
-
-_MAIN_MODULE_NAME = "__main__"
-
-
-# ==================================================================================================
-#  WorkerTask
-# ==================================================================================================
-class WorkerTask(Protocol[R_co]):
-    """A `WorkerTask` is a picklable object whose `run` method computes the task's result."""
-
-    def run(self) -> R_co:
-        """Return the task's result."""
-        ...
+# `WorkerPool.split_into_batches` aims at this many batches per worker, each run as 1 task, so that a slow task does
+# not leave the other workers idle at the end.
+BATCHES_PER_WORKER = 4
 
 
 # ==================================================================================================
@@ -46,9 +35,13 @@ class WorkerTask(Protocol[R_co]):
 class WorkerPool:
     """`WorkerPool` runs tasks in `n_workers` worker processes, or in this process for 1 worker.
 
-    A pool with more than 1 worker runs tasks only inside a ``with`` block. Its workers start when the first tasks
-    run, every call of `run` inside the block shares them, and the block's end stops them, so a caller that runs tasks
-    in several steps starts its workers once.
+    A pool with more than 1 worker runs tasks only inside a ``with`` block:
+
+    - its workers start when the first tasks run;
+    - every call of `run` inside the block shares them;
+    - the block's end stops them.
+
+    A caller that runs tasks in several steps therefore starts its workers once.
     """
 
     def __init__(self, *, n_workers: int, module_names: Sequence[str]) -> None:
@@ -88,7 +81,7 @@ class WorkerPool:
     # --------------------------------------------------------------------------
     #  Main API
     # --------------------------------------------------------------------------
-    def run(self, tasks: Mapping[K, WorkerTask[R]]) -> Iterator[tuple[K, R]]:
+    def run(self, tasks: Mapping[K, "WorkerTask[R]"]) -> Iterator[tuple[K, R]]:
         """Run every task and yield each task's key with its result, as the task finishes.
 
         The tasks run in up to `n_workers` worker processes and finish in any order. With 1 worker, they run in
@@ -121,17 +114,19 @@ class WorkerPool:
                 wait(keys_by_future)
 
     def split_into_batches(self, items: Sequence[T], *, key: Callable[[T], Hashable]) -> list[list[T]]:
-        """Split `items` into batches of whole groups, about `TASKS_PER_WORKER` batches per worker, 1 task per batch.
+        """Split `items` into about `BATCHES_PER_WORKER` batches per worker, never splitting the items that share a key.
 
-        The items with the same key form a group, which no batch splits: the candidates of 1 formula, for example, then
-        run in 1 worker, which compiles the formula once. The groups fill the batches in order of first appearance,
-        and a batch takes the next group as long as it then holds no more than its share of the items, so a group
-        larger than that share forms a batch of its own. Within a group, the items keep their order.
+        The items with the same key form a group, which no batch splits, so work that a group's items share, such as
+        compiling a function, happens once per group. The batches are filled as follows:
+
+        - the groups fill the batches in order of first appearance, and the items keep their order within a group;
+        - a batch takes the next group as long as it then holds at most
+          `ceil(len(items) / (BATCHES_PER_WORKER * n_workers))` items, so a larger group forms a batch of its own.
         """
         groups: dict[Hashable, list[T]] = {}
         for item in items:
             groups.setdefault(key(item), []).append(item)
-        max_batch_size = math.ceil(len(items) / (TASKS_PER_WORKER * self.n_workers))
+        max_batch_size = math.ceil(len(items) / (BATCHES_PER_WORKER * self.n_workers))
         batches: list[list[T]] = []
         batch: list[T] = []
         for group in groups.values():
@@ -160,21 +155,30 @@ class WorkerPool:
         """Return a pool whose workers import `module_names`, with 1 worker per CPU for an `n_workers` of ``None``.
 
         The main module is left out of the modules to import: with "spawn", every worker runs the main script again,
-        which defines its classes. A class defined in an interactive session has no module file that a worker could
-        import, so a `__main__` module of an interactive session allows only 1 worker.
+        which defines the script's classes in that worker.
+
+        A class defined in an interactive session has no module file that a worker could import, so a `__main__`
+        module of an interactive session allows only 1 worker.
 
         Raises:
             ValueError: If `n_workers` is below 1, or is above 1 while `module_names` holds the `__main__` module
                 of an interactive session.
         """
         n_workers = n_workers if n_workers is not None else (os.cpu_count() or 1)
-        if (
-            n_workers > 1
-            and _MAIN_MODULE_NAME in module_names
-            and not hasattr(sys.modules[_MAIN_MODULE_NAME], "__file__")
-        ):
+        if n_workers > 1 and "__main__" in module_names and not hasattr(sys.modules["__main__"], "__file__"):
             raise ValueError(
                 "A worker process cannot import a class that is defined in an interactive session; "
                 "define the class in a module, or pass n_workers=1."
             )
-        return cls(n_workers=n_workers, module_names=sorted(set(module_names) - {_MAIN_MODULE_NAME}))
+        return cls(n_workers=n_workers, module_names=sorted(set(module_names) - {"__main__"}))
+
+
+# ==================================================================================================
+#  WorkerTask
+# ==================================================================================================
+class WorkerTask(Protocol[R_co]):
+    """A `WorkerTask` is a picklable object whose `run` method computes the task's result."""
+
+    def run(self) -> R_co:
+        """Return the task's result."""
+        ...

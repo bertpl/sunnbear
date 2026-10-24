@@ -8,7 +8,7 @@ import polars as pl
 
 from sunnbear._core.utils.worker_pool import WorkerPool
 
-from .manifest import PipelineStageManifest
+from .manifest import PipelineStageExecution, PipelineStageManifest
 from .stage import PipelineStage
 from .workspace import PipelineWorkspace
 
@@ -22,7 +22,8 @@ def run_stages(
     """Run `stages` in order, each on the output table of the stage before it, and have `workspace` write each output.
 
     The first stage receives an empty table. Every stage receives `worker_pool`, in which it may run tasks, and its
-    manifest records the pool's number of workers.
+    manifest records the pool's number of workers. A `worker_pool` with more than 1 worker must be inside its ``with``
+    block, which `run_stages` does not open.
 
     Returns:
         The manifest of each stage, in run order.
@@ -48,9 +49,9 @@ def run_stages(
             stage=stage,
             output=output,
             input_manifest=previous_manifest,
-            started_at=started_at,
-            duration_sec=duration_sec,
-            n_workers=worker_pool.n_workers,
+            execution=PipelineStageExecution(
+                started_at=started_at, duration_sec=duration_sec, pool_n_workers=worker_pool.n_workers
+            ),
         )
         manifests.append(manifest)
         previous_table, previous_manifest = output.table, manifest

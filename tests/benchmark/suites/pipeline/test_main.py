@@ -38,7 +38,7 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
         PipelineStageManifest.model_validate_json((tmp_path / "manifests" / f"{name}.json").read_text())
         for name in _OUTPUT_NAMES
     ]
-    assert [manifest.n_workers for manifest in manifests] == [3, 3]
+    assert [manifest.pool_n_workers for manifest in manifests] == [3, 3]
 
 
 def test_the_command_requires_a_workspace(monkeypatch, capsys):

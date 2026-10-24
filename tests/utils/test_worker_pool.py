@@ -1,5 +1,6 @@
-"""`WorkerPool` runs tasks in this process for 1 worker, or in worker processes that its runs share and that start only
-when the first tasks run; it splits items into batches of whole groups.
+"""`WorkerPool` runs tasks in this process for 1 worker, or in worker processes that start when the first tasks run and
+serve every later call of `run` in the same with block; it splits items into batches without splitting the items that
+share a key.
 """
 
 import multiprocessing
@@ -35,8 +36,8 @@ class FailingTask:
 
 
 @dataclass(frozen=True)
-class ModuleImportedTask:
-    """`ModuleImportedTask` returns whether the process that runs it has imported `module_name`."""
+class IsModuleImportedTask:
+    """`IsModuleImportedTask` returns whether the process that runs it has imported `module_name`."""
 
     module_name: str
 
@@ -60,7 +61,8 @@ def test_a_pool_with_1_worker_runs_the_tasks_in_this_process_in_order():
 
 
 def test_a_pool_with_workers_runs_the_tasks_in_worker_processes_that_its_runs_share():
-    """With 2 workers, each task's key comes with its result, and 2 runs in 1 with block use at most 2 processes."""
+    """With 2 workers, each task's key comes with its result, and 2 calls of `run` in 1 with block use at most 2
+    processes."""
     # --- act --------------------------
     with WorkerPool(n_workers=2, module_names=[]) as worker_pool:
         first_process_ids = dict(worker_pool.run({key: ProcessIdTask() for key in range(4)}))
@@ -89,7 +91,7 @@ def test_each_worker_imports_the_named_modules(module_names, is_imported_expecte
     lacks the module."""
     # --- act --------------------------
     with WorkerPool(n_workers=2, module_names=module_names) as worker_pool:
-        [(_, is_imported)] = list(worker_pool.run({0: ModuleImportedTask(_IMPORTED_MODULE_NAME)}))
+        [(_, is_imported)] = list(worker_pool.run({0: IsModuleImportedTask(_IMPORTED_MODULE_NAME)}))
 
     # --- assert -----------------------
     assert is_imported == is_imported_expected
@@ -128,19 +130,20 @@ def test_importing_the_modules_registers_their_classes():
 @pytest.mark.parametrize(
     "items, n_workers, batches_expected",
     [
-        # 8 groups of 1 item, 4 batches for 1 worker: 2 items per batch
+        # With 1 worker, the 8 groups of 1 item fill 4 batches of 2 items.
         (["a", "b", "c", "d", "e", "f", "g", "h"], 1, [["a", "b"], ["c", "d"], ["e", "f"], ["g", "h"]]),
-        # 8 batches for 2 workers: 1 item per batch
+        # With 2 workers, the 8 items fill 8 batches of 1 item.
         (["a", "b", "c", "d", "e", "f", "g", "h"], 2, [["a"], ["b"], ["c"], ["d"], ["e"], ["f"], ["g"], ["h"]]),
-        # a group larger than a batch's share of 2 items forms a batch of its own, and no batch splits a group
+        # A group larger than a batch's maximum of 2 items forms a batch of its own, and no batch splits a group.
         (["a1", "a2", "a3", "b1", "c1", "c2"], 1, [["a1", "a2", "a3"], ["b1"], ["c1", "c2"]]),
-        # groups in order of first appearance, items in their order within a group
+        # The groups keep their order of first appearance, and the items keep their order within a group.
         (["b1", "a1", "b2"], 1, [["b1", "b2"], ["a1"]]),
         ([], 1, []),
     ],
 )
 def test_items_are_split_into_batches_of_whole_groups(items, n_workers, batches_expected):
-    """`split_into_batches` keeps each group of items with 1 first letter whole, in about 4 batches per worker."""
+    """`split_into_batches` keeps the items that share a first letter in 1 batch, in about `BATCHES_PER_WORKER` batches
+    per worker."""
     # --- arrange ----------------------
     worker_pool = WorkerPool(n_workers=n_workers, module_names=[])
 
