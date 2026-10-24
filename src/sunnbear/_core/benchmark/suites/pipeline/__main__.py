@@ -7,8 +7,11 @@ From the repository root, maintainers run it into a folder under `script_outputs
 The workspace has no default directory, because the shipped package cannot assume that the repository's folders
 exist. ``--n-workers`` sets the number of worker processes that the stages share.
 
-After the run, the command prints 1 line per stage, then the number of formulas with rejected candidates, and 1 line
-per such formula.
+After the run, the command prints:
+
+- 1 line per stage;
+- the number of formulas with rejected candidates;
+- 1 line per such formula.
 """
 
 import argparse

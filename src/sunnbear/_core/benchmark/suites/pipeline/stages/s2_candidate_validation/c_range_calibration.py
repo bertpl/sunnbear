@@ -23,13 +23,13 @@ No search can check every c-value in a range, so the search ends by checking the
 2. Probe ``abs(c) = FIRST_PROBE_ABS_C``; the condition must hold there.
 3. Double ``abs(c)`` until the condition fails, at most `MAX_DOUBLINGS` times; doubling keeps every probe exactly
    representable.
-4. Among every c-value evaluated so far on that side, take the interval closest to 0 in which the condition changes
-   from met to failing, and halve it until its ends differ by less than the fraction `MAX_BOUND_REL_GAP` of its end
-   closer to 0. The interval's end at which the condition holds is the bound, so the condition holds at every c-value
-   evaluated so far within the range.
+4. Among the c-values evaluated so far on that side, take the one closest to 0 at which the condition fails, and the
+   one just closer to 0, at which it holds; halve the interval between them until its ends differ by less than the
+   fraction `MAX_BOUND_REL_GAP` of its end closer to 0. The interval's end at which the condition holds is the bound,
+   so the condition holds at every c-value evaluated so far within the range.
 5. Map the c-values of the benchmark's tuple set onto the range, and check the condition at each. On each side where
-   it fails at 1 of them, repeat step 4, whose c-values evaluated so far now include these; repeat at most
-   `MAX_RETURNS_TO_HALVING` times.
+   the condition fails at any of these c-values, return to step 4, which now also uses these c-values; return to
+   step 4 at most `MAX_RETURNS_TO_HALVING` times.
 
 A candidate is rejected at the first step that fails, with that step's `RejectionReason`.
 """
@@ -54,7 +54,7 @@ MAX_DOUBLINGS = 128
 # The halving stops once the bound and the c-value at which the condition fails differ by less than this fraction of
 # the bound.
 MAX_BOUND_REL_GAP = 0.01
-# Step 5 returns to the halving at most this many times before it rejects the candidate.
+# Step 5 returns to step 4 at most this many times before it rejects the candidate.
 MAX_RETURNS_TO_HALVING = 10
 
 
@@ -76,8 +76,8 @@ def calibrate_c_range(xc_fun: XCFun, a: float, b: float, *, mc_tuples: MCTuples)
     """Return the c-range of the candidate ``f(x, c)`` on ``[a, b]``, or the reason that calibration rejects it.
 
     Args:
-        xc_fun: The candidate's ``f(x, c)``. A value that is not a float, or an exception that it raises, counts as
-            a value that is not finite.
+        xc_fun: The candidate's ``f(x, c)``. A value of `xc_fun` that is not a float, or an exception that `xc_fun`
+            raises, counts as a value that is not finite.
         a: The candidate's lower interval bound.
         b: The candidate's upper interval bound.
         mc_tuples: The tuple set whose c-values step 5 checks: the largest size of the benchmark's tuple set, of which
@@ -135,7 +135,11 @@ class _CRangeCondition:
             raise _CalibrationFailedError(RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0)
 
     def is_met(self, c: float) -> bool:
-        """Return whether ``f(a, c)`` and ``f(b, c)`` are finite, with ratios to their values at 0 above the limit."""
+        """Return whether the condition holds at `c`.
+
+        The condition holds when ``f(a, c)`` and ``f(b, c)`` are finite, and their ratios to their values at ``c = 0``
+        exceed `MIN_ENDPOINT_VALUE_RATIO`.
+        """
         endpoint_values = self._endpoint_values(c)
         if endpoint_values is None:
             return False
@@ -147,7 +151,8 @@ class _CRangeCondition:
         """Return ``f(a, c)`` and ``f(b, c)``, or ``None`` when ``f`` raises or either value is not a finite float.
 
         Without numba's compilation, a formula can return a complex number where its compiled form returns NaN, e.g.
-        for ``x**0.5`` at a negative ``x``; `float` raises for it, so it counts as a value that is not finite too.
+        for ``x**0.5`` at a negative ``x``; `float` raises for a complex number, so it counts as a value that is not
+        finite too.
         """
         try:
             fa, fb = float(self.xc_fun(self.a, c)), float(self.xc_fun(self.b, c))
@@ -167,12 +172,12 @@ class _CRangeSideSearch:
     """
 
     def __init__(self, condition: _CRangeCondition, *, sign: float) -> None:
-        """Create the side of ``c = 0`` whose c-values have the sign of `sign`, ``-1.0`` or ``1.0``."""
+        """Create the search on the side of ``c = 0`` whose c-values have the sign of `sign`, ``-1.0`` or ``1.0``."""
         self.condition = condition
         self.sign = sign
         self.is_met_by_abs_c: dict[float, bool] = {}
 
-    def record_is_met(self, abs_c: float) -> bool:
+    def evaluate_and_record(self, abs_c: float) -> bool:
         """Return whether the condition holds at the c-value ``sign*abs_c``, and keep the result."""
         is_met = self.condition.is_met(self.sign * abs_c)
         self.is_met_by_abs_c[abs_c] = is_met
@@ -185,34 +190,36 @@ class _CRangeSideSearch:
             _CalibrationFailedError: If the condition fails at the first probe, or still holds after the last doubling.
         """
         abs_c = FIRST_PROBE_ABS_C
-        if not self.record_is_met(abs_c):
+        if not self.evaluate_and_record(abs_c):
             raise _CalibrationFailedError(RejectionReason.CALIBRATION_FAILS_AT_FIRST_PROBE)
         for _ in range(MAX_DOUBLINGS):
             abs_c *= 2.0
-            if not self.record_is_met(abs_c):
+            if not self.evaluate_and_record(abs_c):
                 return
         raise _CalibrationFailedError(RejectionReason.CALIBRATION_NO_BOUND_FOUND)
 
     def is_met_at_each(self, c_values: np.ndarray) -> bool:
         """Return whether the condition holds at each of `c_values` that lies on this side (step 5).
 
-        It evaluates every such c-value, also after the first failure, so that a return to the halving finds the
-        failing c-value closest to 0.
+        Every such c-value is evaluated, also after the first failure, so that a return to step 4 finds the failing
+        c-value closest to 0.
         """
-        is_met_at_c_values = [self.record_is_met(float(c) * self.sign) for c in c_values if c * self.sign > 0.0]
+        is_met_at_c_values = [self.evaluate_and_record(float(c) * self.sign) for c in c_values if c * self.sign > 0.0]
         return all(is_met_at_c_values)
 
     def halve_to_bound(self) -> float:
         """Return the bound of ``abs(c)`` on this side, from the c-values evaluated so far (step 4).
 
-        Among those c-values, the first at which the condition fails, counted from 0, and the c-value just closer to 0
-        form the interval in which the condition changes from met to failing. The interval is halved until its ends
-        differ by less than `MAX_BOUND_REL_GAP` times its end closer to 0, and its end at which the condition holds is
-        the bound.
+        The halving starts from the interval between 2 of those c-values: the one closest to 0 at which the condition
+        fails, and the one just closer to 0, at which it holds.
+
+        It halves the interval until its ends differ by less than `MAX_BOUND_REL_GAP` times its end closer to 0, and
+        returns the end at which the condition holds.
 
         Raises:
             _CalibrationFailedError: If the condition fails at the evaluated c-value closest to 0. Only a c-value of
-                the benchmark's tuple set can lie closer to 0 than the first probe, so step 5 is the failing step.
+                the benchmark's tuple set can lie closer to 0 than the first probe, so the error carries the
+                `RejectionReason` of step 5.
         """
         abs_cs = sorted(self.is_met_by_abs_c)
         idx_first_failing = next(idx for idx, abs_c in enumerate(abs_cs) if not self.is_met_by_abs_c[abs_c])
@@ -221,7 +228,7 @@ class _CRangeSideSearch:
         abs_c_met, abs_c_failing = abs_cs[idx_first_failing - 1], abs_cs[idx_first_failing]
         while abs_c_failing - abs_c_met >= MAX_BOUND_REL_GAP * abs_c_met:
             abs_c_mid = 0.5 * (abs_c_met + abs_c_failing)
-            if self.record_is_met(abs_c_mid):
+            if self.evaluate_and_record(abs_c_mid):
                 abs_c_met = abs_c_mid
             else:
                 abs_c_failing = abs_c_mid

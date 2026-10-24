@@ -19,5 +19,5 @@ class RejectionReason(StrEnum):
     CALIBRATION_FAILS_AT_FIRST_PROBE = "calibration_fails_at_first_probe"
     # The condition still holds after the last doubling of abs(c), on either side of c = 0.
     CALIBRATION_NO_BOUND_FOUND = "calibration_no_bound_found"
-    # The condition still fails at 1 of the benchmark's c-values after the last return to the halving.
+    # The condition still fails at 1 of the benchmark's c-values after the last return to step 4 of the search.
     CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES = "calibration_fails_at_benchmark_c_values"

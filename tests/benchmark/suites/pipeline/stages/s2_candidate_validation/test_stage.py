@@ -40,9 +40,9 @@ def _define_formula_cls(formula_number: tuple[int, ...], xc_fun: XCFun, a: float
     return ExampleFormula
 
 
-def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(isolated_registry):
+def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(isolated_formula_registry):
     """Of 3 candidates, the first is valid, with its c-range; the bound-to-width ratio check rejects the second, and
-    calibration the third; the counts per formula match."""
+    calibration the third; the counts per formula match these 3 outcomes."""
     # --- arrange ----------------------
     formulas = [
         _define_formula_cls((99, 901), lambda x, c: x - c, -1.0, 1.0)(),

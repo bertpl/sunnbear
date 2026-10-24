@@ -27,7 +27,7 @@ def test_parse_number_rejects_invalid(text):
 # ==================================================================================================
 #  number validation
 # ==================================================================================================
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 @pytest.mark.parametrize(
     "number, error, match",
     [
@@ -44,14 +44,14 @@ def test_category_number_is_validated_at_class_definition(number, error, match):
         define_category_cls(number)
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_formula_number_needs_a_parent_category_element():
     """A formula is a leaf under a category, so its number has at least 2 elements."""
     with pytest.raises(ValueError, match="at least 2 element"):
         define_formula_cls((99,))
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 @pytest.mark.parametrize("attrs, missing", [({"name": "No number"}, "number"), ({"number": (99, 1)}, "name")])
 def test_number_and_name_are_required(attrs, missing):
     """A category class without ``number`` or ``name`` is rejected at class definition."""

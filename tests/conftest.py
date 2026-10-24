@@ -25,8 +25,8 @@ from sunnbear.solvers import SolverConfigRegistry
 
 
 @pytest.fixture
-def isolated_registry(monkeypatch):
-    """Give the test its own copy of the registry, so the formulas and categories that a test defines don't stay
+def isolated_formula_registry(monkeypatch):
+    """Give the test its own copy of the formula registry, so the formulas and categories that a test defines don't stay
     registered after the test."""
     monkeypatch.setattr(FormulaRegistry, "_formulas_by_number", dict(FormulaRegistry._formulas_by_number))
     monkeypatch.setattr(FormulaRegistry, "_categories_by_number", dict(FormulaRegistry._categories_by_number))

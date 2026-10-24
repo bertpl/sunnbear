@@ -58,7 +58,7 @@ def test_candidates_functions_evaluate(formula_cls):
     assert candidate.xc_fun(2.0, 1.0) == pytest.approx(candidate.xc_fun(2.0, 0.0) - 1.0)
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_candidates_deduplicates_across_recipes():
     # --- arrange ----------------------
     class DupTest(Formula):
@@ -87,7 +87,7 @@ def test_candidates_deduplicates_across_recipes():
 # ==================================================================================================
 #  registration
 # ==================================================================================================
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_subclass_definition_registers():
     # --- arrange / act ----------------
     cls = define_formula_cls((99, 998))
@@ -96,14 +96,14 @@ def test_subclass_definition_registers():
     assert any(type(f) is cls for f in FormulaRegistry.formulas())
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_defining_a_non_positive_number_is_rejected_at_class_definition():
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="only positive integers"):
         define_formula_cls((99, 0))
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_zero_param_formula_yields_exactly_one_candidate():
     """A formula without parameters materializes the single empty tuple, once."""
     # --- act --------------------------
@@ -126,7 +126,7 @@ def test_registry_holds_one_instance_per_formula():
     assert candidate_a.formula is candidate_b.formula is enumerated
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_formulas_defined_after_first_use_are_registered():
     """A formula defined after a call to `formulas()` appears in the next call: registration is at class definition."""
     # --- arrange ----------------------
@@ -139,7 +139,7 @@ def test_formulas_defined_after_first_use_are_registered():
     assert any(type(f) is cls for f in FormulaRegistry.formulas())
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_abstract_intermediates_are_not_registered():
     # --- arrange ----------------------
     class PolynomialBase(Formula):
@@ -149,7 +149,7 @@ def test_abstract_intermediates_are_not_registered():
     assert all(type(f) is not PolynomialBase for f in FormulaRegistry.formulas())
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_candidates_deduplicates_across_notations():
     # --- arrange ----------------------
     class CrossNotation(Formula):
@@ -193,7 +193,7 @@ def _formula_cls(number_last_element: int, declared: tuple[str, ...], recipes: t
     return type(f"Varying{number_last_element}", (Formula,), namespace)
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_recipe_axis_order_must_match_declared_params():
     """Transposed axes would silently swap parameter values, so they must be rejected."""
     # --- arrange ----------------------
@@ -210,7 +210,7 @@ def test_recipe_axis_order_must_match_declared_params():
         cls().build_all_candidates()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_recipe_arity_must_match_declared_params():
     # --- arrange ----------------------
     cls = _formula_cls(989, ("p1", "p2"), (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, p1, p2: x - c)
@@ -220,7 +220,7 @@ def test_recipe_arity_must_match_declared_params():
         cls().build_all_candidates()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_declared_params_must_match_parametrized_fun_signature():
     # --- arrange ----------------------
     cls = _formula_cls(988, ("p1",), (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),), fun=lambda x, c, other: x - c)
@@ -230,7 +230,7 @@ def test_declared_params_must_match_parametrized_fun_signature():
         cls().build_all_candidates()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_declared_params_must_match_interval_bounds_signature():
     """Right arity but wrong names in interval_bounds is drift too — the cross-check covers every hook."""
     # --- arrange ----------------------
@@ -246,7 +246,7 @@ def test_declared_params_must_match_interval_bounds_signature():
         cls().build_all_candidates()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_declared_params_must_match_overridden_validity_hook_signature():
     # --- arrange ----------------------
     cls = _formula_cls(980, ("p1",), (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),))
@@ -257,7 +257,7 @@ def test_declared_params_must_match_overridden_validity_hook_signature():
         cls().build_all_candidates()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_varargs_parametrized_fun_is_rejected():
     """Hooks must name their parameters, so declaration/implementation/recipes stay cross-checkable."""
     # --- arrange ----------------------
@@ -268,7 +268,7 @@ def test_varargs_parametrized_fun_is_rejected():
         cls().build_all_candidates()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_varargs_interval_bounds_is_rejected():
     # --- arrange ----------------------
     cls = _formula_cls(
@@ -283,7 +283,7 @@ def test_varargs_interval_bounds_is_rejected():
         cls().build_all_candidates()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_varargs_overridden_validity_hook_is_rejected():
     """The base default legitimately takes *params, so only overrides are checked."""
     # --- arrange ----------------------
@@ -295,7 +295,7 @@ def test_varargs_overridden_validity_hook_is_rejected():
         cls().build_all_candidates()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_unoverridden_validity_hook_is_not_checked():
     """A formula that does not override is_param_tuple_valid inherits the *params default, and is fine."""
     # --- arrange ----------------------
@@ -305,7 +305,7 @@ def test_unoverridden_validity_hook_is_not_checked():
     assert [c.id.param_values for c in cls().build_all_candidates()] == [(0.0,), (1.0,)]
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_declared_params_without_recipes_is_rejected():
     # --- arrange ----------------------
     cls = _formula_cls(986, ("p1",), ())
@@ -315,7 +315,7 @@ def test_declared_params_without_recipes_is_rejected():
         cls().build_all_candidates()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_formula_yielding_no_candidates_is_rejected():
     # --- arrange ----------------------
     cls = _formula_cls(985, ("p1",), (ParamGrid.decimal("p1", 0.0, 1.0, 1.0),))
@@ -344,7 +344,7 @@ def test_compiled_formula_is_cached_per_class():
     assert Cubic()._compiled_formula() is not OddPower()._compiled_formula()
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_compiled_formula_rejects_plain_method():
     # --- arrange ----------------------
     class PlainMethod(Formula):
@@ -367,7 +367,7 @@ def test_compiled_formula_rejects_plain_method():
         _ = PlainMethod().build_candidate(()).xc_fun
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_formula_without_jit_keeps_its_plain_python_function():
     """A formula with `jit = False` keeps its plain Python `parametrized_fun` as its compiled function."""
     # --- arrange ----------------------
@@ -377,7 +377,7 @@ def test_formula_without_jit_keeps_its_plain_python_function():
     assert formula_cls()._compiled_formula() is formula_cls.parametrized_fun
 
 
-@pytest.mark.usefixtures("isolated_registry")
+@pytest.mark.usefixtures("isolated_formula_registry")
 def test_bound_formula_calls_math_functions_inside_flop_counting():
     """A formula compiled when its first parameter tuple is bound runs inside the flop-counting context of a solve.
 

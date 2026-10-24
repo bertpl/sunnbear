@@ -6,7 +6,7 @@ from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, Pipelin
 from sunnbear._core.functions.core import FunctionId
 from sunnbear._core.utils.worker_pool import WorkerPool
 
-from .bound_to_width_ratio import exceeds_max_bound_to_width_ratio
+from .bound_to_width_ratio_check import exceeds_max_bound_to_width_ratio
 from .c_range_calibration import CRange
 from .c_range_calibration_task import CRangeCalibrationTask
 from .rejection_reason import RejectionReason
@@ -34,8 +34,8 @@ class CandidateValidationStage(PipelineStage):
         """Return the valid candidates with their c-ranges, and the reports on the rejected candidates.
 
         The checks run in order, and each runs only on the candidates that passed the checks before it. Calibration
-        runs in tasks of `worker_pool`, each of which holds all candidates of its formulas, so each formula is compiled
-        in 1 worker.
+        runs in tasks on `worker_pool`; each task holds every candidate of the formulas that it covers, so each formula
+        is compiled in only 1 worker.
 
         Args:
             previous_table: The output table of candidate generation, with the columns ``function_id``, ``a`` and
@@ -88,7 +88,7 @@ class CandidateValidationStage(PipelineStage):
 
     @staticmethod
     def summarize_rejections_per_formula(rejections_per_formula: pl.DataFrame) -> list[str]:
-        """Return a count of the formulas with rejected candidates, then 1 line per such formula.
+        """Return a line that counts the formulas with rejected candidates, then 1 line per such formula.
 
         `rejections_per_formula` is the report `REJECTIONS_PER_FORMULA_REPORT_NAME`. A formula's line gives its number
         of candidates, how many of them are valid, and the number of rejected candidates per `RejectionReason` that
@@ -114,8 +114,7 @@ class CandidateValidationStage(PipelineStage):
     def _count_rejections_per_formula(table: pl.DataFrame) -> pl.DataFrame:
         """Return the report `REJECTIONS_PER_FORMULA_REPORT_NAME` of `table`, with 1 row per formula.
 
-        The rows follow the order of each formula's first appearance in `table`. Each row counts the formula's
-        candidates, its valid candidates, and its candidates that each `RejectionReason` rejected.
+        The rows follow the order of each formula's first appearance in `table`.
         """
         formula_ids = [FunctionId.from_string(function_id).formula_id for function_id in table["function_id"]]
         return (

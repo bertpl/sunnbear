@@ -23,9 +23,10 @@ This package relies on 2 facts:
 
 - **Orientation.** The framework supports both orientations: the interval's class, `IncreasingInterval`
   or `DecreasingInterval`, says which one an interval has. A test function of the benchmark keeps the
-  orientation of its formula, so the benchmark runs every solver on both. A solver whose algorithm
-  supports only increasing intervals can solve ``-f`` on a decreasing one: negation is exact in
-  floating point, so its results are those of ``f`` made increasing.
+  orientation of its formula, so the benchmark runs every solver on both increasing and decreasing
+  intervals. A solver whose algorithm supports only increasing intervals can solve ``-f`` on a
+  decreasing one: negation is exact in floating point, so the solver's results are exactly those that
+  it gives on the increasing function ``-f``.
 - **Flop counting.** Everything inside `Solver.solve`'s counting context runs on `CountedFloat` and
   is counted: the zero and sign checks on ``f(a)`` and ``f(b)``, ``xtol``, the bookkeeping of the
   best estimate, and the solver's own arithmetic. The validation before the context and the

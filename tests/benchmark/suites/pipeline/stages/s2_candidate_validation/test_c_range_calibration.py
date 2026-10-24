@@ -50,52 +50,66 @@ def test_the_c_range_ends_where_an_endpoint_value_falls_to_1_10_of_its_value_at_
 
 
 @pytest.mark.parametrize(
-    "xc_fun, a, b",
+    "xc_fun, a, b, reason_expected",
     [
-        pytest.param(lambda x, c: x + 2.0, -1.0, 1.0, id="same_sign"),
-        pytest.param(lambda x, c: x, 0.0, 1.0, id="zero_at_a"),
-        pytest.param(lambda x, c: x if x > 0.0 else math.nan, -1.0, 1.0, id="nan_at_a"),
-        pytest.param(lambda x, c: math.log(x + 2.0), -2.0, 1.0, id="raises_at_a"),
-        pytest.param(lambda x, c: (x + 0.5) ** 0.5 - 1.0, -1.0, 1.0, id="complex_at_a"),
+        # Step 1: f(a, 0) and f(b, 0) are not both finite and nonzero, with opposite signs.
+        pytest.param(
+            lambda x, c: x + 2.0, -1.0, 1.0, RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0, id="same_sign"
+        ),
+        pytest.param(lambda x, c: x, 0.0, 1.0, RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0, id="zero_at_a"),
+        pytest.param(
+            lambda x, c: x if x > 0.0 else math.nan,
+            -1.0,
+            1.0,
+            RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0,
+            id="nan_at_a",
+        ),
+        pytest.param(
+            lambda x, c: math.log(x + 2.0),
+            -2.0,
+            1.0,
+            RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0,
+            id="raises_at_a",
+        ),
+        pytest.param(
+            lambda x, c: (x + 0.5) ** 0.5 - 1.0,
+            -1.0,
+            1.0,
+            RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0,
+            id="complex_at_a",
+        ),
+        # Step 2: an endpoint value changes sign at abs(c) = 1e-10, below the first probe.
+        pytest.param(
+            lambda x, c: x - 1e10 * c,
+            -1.0,
+            1.0,
+            RejectionReason.CALIBRATION_FAILS_AT_FIRST_PROBE,
+            id="sign_change_below_the_first_probe",
+        ),
+        # Step 3: the condition still holds at the last probe on a side of c = 0.
+        pytest.param(
+            lambda x, c: x, -1.0, 1.0, RejectionReason.CALIBRATION_NO_BOUND_FOUND, id="no_bound_on_both_sides"
+        ),
+        pytest.param(
+            lambda x, c: x - c if c < 0.0 else x,
+            -1.0,
+            1.0,
+            RejectionReason.CALIBRATION_NO_BOUND_FOUND,
+            id="no_bound_on_the_positive_side",
+        ),
     ],
 )
-def test_calibration_rejects_a_candidate_without_a_finite_sign_change_at_c_0(xc_fun, a, b):
-    """A candidate whose ``f(a, 0)`` and ``f(b, 0)`` are not both finite and nonzero, with opposite signs, is
-    rejected at step 1."""
+def test_calibration_rejects_a_candidate_with_the_reason_of_the_step_that_fails(xc_fun, a, b, reason_expected):
+    """Steps 1 to 3 each reject a candidate whose condition fails there, with that step's `RejectionReason`."""
     # --- act --------------------------
-    c_range = calibrate_c_range(xc_fun, a, b, mc_tuples=_MC_TUPLES)
+    result = calibrate_c_range(xc_fun, a, b, mc_tuples=_MC_TUPLES)
 
     # --- assert -----------------------
-    assert c_range == RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0
-
-
-def test_calibration_rejects_a_candidate_whose_condition_fails_at_the_first_probe():
-    """For ``x - 1e10*c`` on [-1, 1], an endpoint value changes sign at ``abs(c) = 1e-10``, below the first probe."""
-    # --- act --------------------------
-    c_range = calibrate_c_range(lambda x, c: x - 1e10 * c, -1.0, 1.0, mc_tuples=_MC_TUPLES)
-
-    # --- assert -----------------------
-    assert c_range == RejectionReason.CALIBRATION_FAILS_AT_FIRST_PROBE
+    assert result == reason_expected
 
 
 @pytest.mark.parametrize(
-    "xc_fun",
-    [
-        pytest.param(lambda x, c: x, id="both_sides"),
-        pytest.param(lambda x, c: x - c if c < 0.0 else x, id="positive_side"),
-    ],
-)
-def test_calibration_rejects_a_candidate_whose_condition_holds_after_the_last_doubling(xc_fun):
-    """A candidate whose condition still holds at the last probe on a side of ``c = 0`` has no bound there."""
-    # --- act --------------------------
-    c_range = calibrate_c_range(xc_fun, -1.0, 1.0, mc_tuples=_MC_TUPLES)
-
-    # --- assert -----------------------
-    assert c_range == RejectionReason.CALIBRATION_NO_BOUND_FOUND
-
-
-@pytest.mark.parametrize(
-    "max_returns_to_halving, c_range_expected",
+    "max_returns_to_halving, result_expected",
     [
         pytest.param(
             c_range_calibration.MAX_RETURNS_TO_HALVING,
@@ -106,11 +120,11 @@ def test_calibration_rejects_a_candidate_whose_condition_holds_after_the_last_do
     ],
 )
 def test_a_benchmark_c_value_that_fails_narrows_the_c_range_or_rejects_the_candidate(
-    max_returns_to_halving, c_range_expected, monkeypatch
+    max_returns_to_halving, result_expected, monkeypatch
 ):
-    """The condition fails within (0.25, 0.5), between 2 probes, so the search misses it; the c-value at about 0.4
-    fails, and the return to the halving narrows the range on the positive side to 0.25, the probe below it. With no
-    return to the halving allowed, that c-value rejects the candidate."""
+    """The condition fails within (0.25, 0.5), between 2 probes, so the search misses it; the benchmark c-value of
+    about 0.4 fails, and the return to the halving narrows the range on the positive side to 0.25, the probe below it.
+    With no return to the halving allowed, that c-value rejects the candidate."""
 
     # --- arrange ----------------------
     def xc_fun(x: float, c: float) -> float:
@@ -120,19 +134,19 @@ def test_a_benchmark_c_value_that_fails_narrows_the_c_range_or_rejects_the_candi
             return _step_xc_fun(x, c)
 
     monkeypatch.setattr(c_range_calibration, "MAX_RETURNS_TO_HALVING", max_returns_to_halving)
-    # On [-127/128, 127/128], v = 0.7 maps to c = 0.397, which fails; v = 0.2 maps to c = -0.595.
+    # On [-127/128, 127/128], v = 0.7 maps to c = 0.397, which fails; v = 0.2 maps to c = -0.595, which passes.
     mc_tuples = MCTuples(u=[0.5, 0.5], v=[0.7, 0.2])
 
     # --- act --------------------------
-    c_range = calibrate_c_range(xc_fun, -1.0, 1.0, mc_tuples=mc_tuples)
+    result = calibrate_c_range(xc_fun, -1.0, 1.0, mc_tuples=mc_tuples)
 
     # --- assert -----------------------
-    assert c_range == c_range_expected
+    assert result == result_expected
 
 
 def test_calibration_rejects_a_candidate_when_a_benchmark_c_value_closer_to_0_than_the_first_probe_fails():
-    """A c-value that fails closer to 0 than the first probe leaves no c-value on its side at which the condition
-    holds closer to 0, so no return to the halving can narrow the range around it."""
+    """When a benchmark c-value closer to 0 than the first probe fails, no evaluated c-value between it and 0 meets
+    the condition, so no return to the halving can place a bound below it."""
 
     # --- arrange ----------------------
     def xc_fun(x: float, c: float) -> float:
@@ -145,7 +159,7 @@ def test_calibration_rejects_a_candidate_when_a_benchmark_c_value_closer_to_0_th
     mc_tuples = MCTuples(u=[0.5, 0.5], v=[0.5 + 2.0**-40, 0.2])
 
     # --- act --------------------------
-    c_range = calibrate_c_range(xc_fun, -1.0, 1.0, mc_tuples=mc_tuples)
+    result = calibrate_c_range(xc_fun, -1.0, 1.0, mc_tuples=mc_tuples)
 
     # --- assert -----------------------
-    assert c_range == RejectionReason.CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES
+    assert result == RejectionReason.CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES

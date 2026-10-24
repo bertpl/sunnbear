@@ -25,8 +25,7 @@ class CRangeCalibrationTask:
     def run(self) -> list[CRange | RejectionReason]:
         """Return each candidate's c-range, or the reason that calibration rejects it, in the order of `function_ids`.
 
-        Calibration checks the c-values of the largest size of the shipped tuple set, of which every smaller size is a
-        prefix.
+        Calibration checks the c-values of the largest size of the shipped tuple set, as `calibrate_c_range` requires.
         """
         mc_tuples = load_mc_tuples(max(MCTuplesSize))
         candidates = [FormulaRegistry.candidate_from_id(function_id) for function_id in self.function_ids]

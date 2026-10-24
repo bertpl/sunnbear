@@ -2,7 +2,7 @@
 test-function layer.
 
 Defining a formula or category class registers it, so a test that calls these helpers uses the
-``isolated_registry`` fixture.
+``isolated_formula_registry`` fixture.
 """
 
 from sunnbear._core.functions.core.taxonomy import FormulaTaxonomyNode
