@@ -163,7 +163,7 @@ def test_items_are_split_into_batches_of_whole_groups(items, n_workers, batches_
 #  Worker count
 # ==================================================================================================
 def test_a_pool_has_1_worker_per_cpu_by_default():
-    """An `n_workers` of None gives 1 worker per CPU."""
+    """An `n_workers` of None gives 1 worker per logical CPU."""
     # --- act --------------------------
     worker_pool = WorkerPool(n_workers=None)
 

@@ -23,7 +23,7 @@ def main() -> None:
         description="Run the benchmark suite pipeline over the shipped formulas.",
     )
     parser.add_argument("--workspace", type=Path, required=True, help="directory for the outputs of the stages")
-    parser.add_argument("--n-workers", type=int, help="number of worker processes (default: 1 per CPU)")
+    parser.add_argument("--n-workers", type=int, help="number of worker processes (default: 1 per logical CPU)")
     args = parser.parse_args()
 
     manifests = run_pipeline(

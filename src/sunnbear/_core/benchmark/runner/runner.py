@@ -69,7 +69,7 @@ def run_benchmark(
         n_bisection_fevals: The number of function evaluations that bisection spends on each solve; every solve's
             `xtol` range follows from `n_bisection_fevals` (see `compute_xtol_range`), and every solve's evaluation
             budget is `MAX_FEVALS_FACTOR` times `n_bisection_fevals`.
-        n_workers: The number of worker processes; ``None`` for 1 per CPU, and 1 to run every task in this
+        n_workers: The number of worker processes; ``None`` for 1 per logical CPU, and 1 to run every task in this
             process. Each worker imports the modules that define the formulas and solver configs, and a class
             defined in an interactive session has no module file to import, so with more than 1 worker, no
             formula or solver config may be defined in an interactive session. Every worker also runs the main

@@ -18,7 +18,7 @@ from .worker_pool import WorkerPool
 def worker_pool_for_modules(*, n_workers: int | None, module_names: Collection[str]) -> WorkerPool:
     """Return a `WorkerPool` with `n_workers` workers, each of which imports the modules in `module_names` first.
 
-    An `n_workers` of ``None`` gives 1 worker per CPU.
+    An `n_workers` of ``None`` gives 1 worker per logical CPU.
 
     The main module is left out of the modules to import: a `WorkerPool` starts its workers with "spawn", so every
     worker runs the main script again, which defines the script's classes in that worker.

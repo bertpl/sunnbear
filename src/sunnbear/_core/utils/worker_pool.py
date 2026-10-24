@@ -38,7 +38,7 @@ class WorkerPool:
         """Hold the worker count and the function that each worker runs before its first task.
 
         Args:
-            n_workers: The number of worker processes; ``None`` for 1 per CPU.
+            n_workers: The number of worker processes; ``None`` for 1 per logical CPU.
             worker_initializer: A picklable function that each worker process calls once, before its first task;
                 ``None`` for none. With 1 worker, the tasks run in this process, which never calls the worker
                 initializer.

@@ -24,7 +24,7 @@ def run_pipeline(
     Args:
         workspace_dir: The directory for the outputs of the stages.
         formulas: The formulas whose candidates the pipeline builds.
-        n_workers: The number of worker processes; ``None`` for 1 per CPU. Each worker imports the modules that
+        n_workers: The number of worker processes; ``None`` for 1 per logical CPU. Each worker imports the modules that
             define `formulas`, so with more than 1 worker, no formula may be defined in an interactive session.
 
     Returns:
