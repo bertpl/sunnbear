@@ -56,9 +56,11 @@ def validate_candidates(candidates: pl.DataFrame) -> pl.DataFrame:
         candidates: The output of candidate generation, with the columns of `CANDIDATES_SCHEMA`.
     """
     bound_to_width_ratio = pl.max_horizontal(pl.col("a").abs(), pl.col("b").abs()) / (pl.col("b") - pl.col("a"))
+    # The reason goes in as its string value: polars 1.0 turns an `Enum` member into a literal of an enum type with
+    # that 1 category, to which ``""`` then fails to convert.
     rejected_by = (
         pl.when(bound_to_width_ratio > MAX_BOUND_TO_WIDTH_RATIO)
-        .then(pl.lit(RejectionReason.BOUND_TO_WIDTH_RATIO))
+        .then(pl.lit(RejectionReason.BOUND_TO_WIDTH_RATIO.value))
         .otherwise(pl.lit(""))
     )
     return candidates.with_columns(rejected_by=rejected_by.cast(CHECKED_CANDIDATES_SCHEMA["rejected_by"]))
