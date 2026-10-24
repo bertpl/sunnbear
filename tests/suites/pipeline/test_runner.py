@@ -41,7 +41,7 @@ def test_a_rerun_replaces_the_outputs_and_manifests_and_leaves_no_temporary_file
     manifests = run_pipeline(workspace_dir=tmp_path, formulas=_CATEGORY_2_FORMULAS[:1])
 
     # --- assert -----------------------
-    assert pl.read_parquet(tmp_path / f"{PipelineStage.VALIDATION}.parquet").height == manifests[1].n_rows
+    assert pl.read_parquet(tmp_path / f"{PipelineStage.CANDIDATE_VALIDATION}.parquet").height == manifests[1].n_rows
     assert manifests[1].n_rows == len(_CATEGORY_2_FORMULAS[0].build_all_candidates())
     assert sorted(path.relative_to(tmp_path).as_posix() for path in tmp_path.rglob("*.*")) == sorted(
         [f"{stage}.parquet" for stage in PipelineStage] + [f"manifests/{stage}.json" for stage in PipelineStage]

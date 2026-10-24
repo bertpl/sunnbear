@@ -1,4 +1,4 @@
-"""A `PipelineStageManifest` records how a stage of the suite pipeline built its output in the workspace.
+"""A `PipelineStageManifest` records how a stage of the suite pipeline built its output in the `PipelineWorkspace`.
 
 Through their `PipelineStageManifest.input_sha256s`, the manifests trace each stage's output back to that
 stage's inputs.

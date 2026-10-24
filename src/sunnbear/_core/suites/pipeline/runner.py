@@ -35,7 +35,7 @@ def run_pipeline(*, workspace_dir: Path, formulas: Sequence[Formula]) -> tuple[P
         workspace, PipelineStage.CANDIDATE_GENERATION, (), lambda: generate_candidates(formulas)
     )
     _, validation_manifest = _run_stage(
-        workspace, PipelineStage.VALIDATION, (generation_manifest,), lambda: validate_candidates(candidates)
+        workspace, PipelineStage.CANDIDATE_VALIDATION, (generation_manifest,), lambda: validate_candidates(candidates)
     )
     return (generation_manifest, validation_manifest)
 
@@ -57,13 +57,7 @@ def _run_stage(
     t_start = time.perf_counter()
     output = compute_output()
     duration_sec = time.perf_counter() - t_start
-    manifest = PipelineStageManifest.from_stage_output(
-        stage=stage,
-        output=output,
-        output_sha256=workspace.write_stage_output(stage, output),
-        input_manifests=input_manifests,
-        started_at=started_at,
-        duration_sec=duration_sec,
+    manifest = workspace.write_stage(
+        stage=stage, output=output, input_manifests=input_manifests, started_at=started_at, duration_sec=duration_sec
     )
-    workspace.write_manifest(manifest)
     return output, manifest

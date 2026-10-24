@@ -15,8 +15,8 @@ from sunnbear._core.suites.pipeline.generation import CANDIDATES_SCHEMA, generat
     ],
 )
 def test_the_candidates_are_listed_formula_by_formula_in_the_given_order(formula_numbers):
-    """The rows are each formula's candidates in build order, formula by formula in the given order, typed by
-    `CANDIDATES_SCHEMA`."""
+    """The rows are each formula's candidates in the order of `Formula.build_all_candidates`, formula by formula in
+    the given order, typed by `CANDIDATES_SCHEMA`."""
     # --- arrange ----------------------
     formulas_by_number = {formula.number: formula for formula in FormulaRegistry.formulas()}
     formulas = [formulas_by_number[number] for number in formula_numbers]

@@ -7,11 +7,12 @@ from enum import StrEnum
 #  PipelineStage
 # ==================================================================================================
 class PipelineStage(StrEnum):
-    """A `PipelineStage` names 1 stage of the suite pipeline; its value names the stage's output in the workspace.
+    """A `PipelineStage` names 1 stage of the suite pipeline.
 
-    Each value starts with ``s`` and the stage's position in the run order, so a listing of the
-    workspace shows the outputs in run order.
+    Its value is the name of the stage's output file in the `PipelineWorkspace`, without the suffix. Each
+    value starts with ``s`` and the stage's position in the run order, so a listing of the workspace
+    directory shows the outputs in run order.
     """
 
     CANDIDATE_GENERATION = "s1_candidates"
-    VALIDATION = "s2_validated"
+    CANDIDATE_VALIDATION = "s2_checked_candidates"

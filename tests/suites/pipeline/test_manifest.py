@@ -14,8 +14,8 @@ from sunnbear._core.suites.pipeline.validation import RejectionReason
     "output, rejection_counts_expected",
     [
         pytest.param(
-            pl.DataFrame({"rejected_by": ["interval_ratio", "", "interval_ratio"]}),
-            {RejectionReason.INTERVAL_RATIO: 2},
+            pl.DataFrame({"rejected_by": ["bound_to_width_ratio", "", "bound_to_width_ratio"]}),
+            {RejectionReason.BOUND_TO_WIDTH_RATIO: 2},
             id="output_with_rejections",
         ),
         pytest.param(pl.DataFrame({"function_id": ["f2.1.1[p1=0.2]"]}), {}, id="output_without_rejected_by"),
@@ -36,7 +36,7 @@ def test_the_manifest_counts_the_rows_and_the_rejections_per_reason(output, reje
 
     # --- act --------------------------
     manifest = PipelineStageManifest.from_stage_output(
-        stage=PipelineStage.VALIDATION,
+        stage=PipelineStage.CANDIDATE_VALIDATION,
         output=output,
         output_sha256="cd" * 32,
         input_manifests=(input_manifest,),

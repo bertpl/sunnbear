@@ -1,5 +1,5 @@
-"""``python -m sunnbear._core.suites.pipeline`` runs the pipeline over the shipped formulas into the workspace that
-``--workspace`` gives, and refuses to run without one."""
+"""``python -m sunnbear._core.suites.pipeline`` runs the pipeline over the shipped formulas into the ``--workspace``
+directory, and refuses to run without one."""
 
 import runpy
 import sys
@@ -11,7 +11,7 @@ from sunnbear._core.suites.pipeline.stage import PipelineStage
 _PIPELINE_PACKAGE = "sunnbear._core.suites.pipeline"
 
 
-def _run_driver(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> None:
+def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> None:
     """Run the pipeline package as ``python -m`` runs it, with `args` as its command-line arguments.
 
     A test that imports every sunnbear module may have imported the package's `__main__` module in this process;
@@ -22,10 +22,10 @@ def _run_driver(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> None:
     runpy.run_module(_PIPELINE_PACKAGE, run_name="__main__")
 
 
-def test_the_driver_runs_every_stage_into_the_given_workspace(tmp_path, monkeypatch, capsys):
-    """The driver writes every stage's output into the workspace and prints 1 line per stage, in run order."""
+def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeypatch, capsys):
+    """The command writes every stage's output into the workspace and prints 1 line per stage, in run order."""
     # --- act --------------------------
-    _run_driver(monkeypatch, ["--workspace", str(tmp_path)])
+    _run_pipeline_command(monkeypatch, ["--workspace", str(tmp_path)])
 
     # --- assert -----------------------
     printed_stages = [line.split(":")[0] for line in capsys.readouterr().out.splitlines()]
@@ -33,11 +33,11 @@ def test_the_driver_runs_every_stage_into_the_given_workspace(tmp_path, monkeypa
     assert sorted(path.name for path in tmp_path.glob("*.parquet")) == [f"{stage}.parquet" for stage in PipelineStage]
 
 
-def test_the_driver_requires_a_workspace(monkeypatch, capsys):
-    """Without ``--workspace``, the driver exits with argparse's usage error, which names the missing option."""
+def test_the_command_requires_a_workspace(monkeypatch, capsys):
+    """Without ``--workspace``, the command exits with argparse's usage error, which names the missing option."""
     # --- act --------------------------
     with pytest.raises(SystemExit) as exc_info:
-        _run_driver(monkeypatch, [])
+        _run_pipeline_command(monkeypatch, [])
 
     # --- assert -----------------------
     assert exc_info.value.code == 2

@@ -11,12 +11,12 @@ before it:
   its `PipelineStageManifest` into a workspace directory.
 
 Every run recomputes every stage. Maintainers run the pipeline from the command line, as `__main__`
-describes; its workspace is not part of the package.
+describes; the pipeline's workspace directory is not part of the package.
 """
 
 from .generation import CANDIDATES_SCHEMA, generate_candidates
 from .manifest import PipelineStageManifest
 from .runner import run_pipeline
 from .stage import PipelineStage
-from .validation import MAX_INTERVAL_RATIO, VALIDATED_CANDIDATES_SCHEMA, RejectionReason, validate_candidates
+from .validation import CHECKED_CANDIDATES_SCHEMA, MAX_BOUND_TO_WIDTH_RATIO, RejectionReason, validate_candidates
 from .workspace import PipelineWorkspace
