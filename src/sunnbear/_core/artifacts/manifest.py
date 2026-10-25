@@ -50,7 +50,7 @@ class ArtifactManifest(BaseModel):
             package name. Before a release, the sunnbear version is the last release's version plus
             `+dev`; the release replaces it with the release version.
         build_date: The date the artifact was built.
-        generated_by: The public sunnbear function call that generated the artifact, with its
+        generated_by: The sunnbear function call that generated the artifact, with its
             arguments, as JSON-compatible data; ``None`` when no public function generated it.
         archive: Where to download the archive that holds all data files of a downloaded
             artifact, and the archive's hash; ``None`` for an artifact shipped in the package, and

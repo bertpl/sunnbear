@@ -1,6 +1,6 @@
 import pytest
 
-from sunnbear.functions import FunctionId, ParamNotation
+from sunnbear._core.functions.core import FunctionId, ParamNotation
 
 # These rendered identities exercise the parser on names, signs, and exponent notation.
 _RENDERED_IDS = [

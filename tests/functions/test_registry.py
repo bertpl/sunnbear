@@ -5,8 +5,7 @@ from counted_float import FlopCountingContext
 
 from sunnbear._core.functions.catalog.c02_standard_function_families.c01_polynomials.f01_cubic import Cubic
 from sunnbear._core.functions.catalog.c02_standard_function_families.c01_polynomials.f02_odd_power import OddPower
-from sunnbear.exceptions import InvalidParamsError, UnknownFormulaError
-from sunnbear.functions import (
+from sunnbear._core.functions.core import (
     Formula,
     FormulaRegistry,
     FunctionId,
@@ -14,6 +13,7 @@ from sunnbear.functions import (
     ParamGrid,
     ParamRecipe,
 )
+from sunnbear._core.functions.core.exceptions import InvalidParamsError, UnknownFormulaError
 
 from .example_taxonomy_nodes import define_formula_cls
 

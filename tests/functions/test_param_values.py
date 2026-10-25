@@ -1,6 +1,6 @@
 import pytest
 
-from sunnbear.functions import ParamAxis, ParamNotation, deduplicate_param_tuples
+from sunnbear._core.functions.core import ParamAxis, ParamNotation, deduplicate_param_tuples
 
 
 # ==================================================================================================

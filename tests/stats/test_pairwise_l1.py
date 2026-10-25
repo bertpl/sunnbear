@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from sunnbear.stats import gini_mean_difference, mean_pairwise_l1
+from sunnbear._core.stats import gini_mean_difference, mean_pairwise_l1
 
 
 # ==================================================================================================

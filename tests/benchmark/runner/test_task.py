@@ -13,6 +13,7 @@ from sunnbear._core.benchmark.runner import task
 from sunnbear._core.benchmark.runner.results_schema import RESULTS_SCHEMA, solver_flop_count_column_name
 from sunnbear._core.benchmark.runner.run_settings import BenchmarkRunSettings
 from sunnbear._core.benchmark.runner.task import BenchmarkTask
+from sunnbear._core.functions.core import FormulaRegistry
 from sunnbear.solvers import (
     Solver,
     SolverConfig,
@@ -54,7 +55,7 @@ class _StallingSolver(Solver):
 @pytest.fixture(scope="module")
 def cubic() -> functions.TestFunction:
     """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to ``c`` in ``[-1, 1]``."""
-    return functions.FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
+    return FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
 
 
 @pytest.fixture

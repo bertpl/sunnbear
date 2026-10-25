@@ -31,10 +31,10 @@ import mpmath
 import sympy as sp
 
 from sunnbear._core.functions.catalog.c01_published_test_functions import PublishedTestFunctions
+from sunnbear._core.functions.core import CANONICAL_DIGITS, ParamNotation
 from sunnbear._core.functions.core.test_cases import DEFAULT_ATOL
 from sunnbear._core.utils import math_functions
 from sunnbear._core.utils.slugify import slugify
-from sunnbear.functions import CANONICAL_DIGITS, ParamNotation
 
 from .data_files import SUBCATEGORY_DESCRIPTIONS, DataFolder, Source, SourceRow, read_sources
 from .formula_expressions import FormulaExpression, TranslationError

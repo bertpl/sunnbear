@@ -1,26 +1,25 @@
-"""The public modules re-export exactly the public names of the implementation packages that they stand for."""
+"""Each public module re-exports names that it chooses from the implementation packages it stands for, and no others.
+
+A name of an implementation package stays private unless its public module lists it in `__all__`.
+"""
 
 import pytest
 
 import sunnbear._core.artifacts.exceptions
 import sunnbear._core.artifacts.listing
 import sunnbear._core.benchmark
-import sunnbear._core.benchmark.mc_tuples.construction.exceptions
 import sunnbear._core.benchmark.runner.exceptions
 import sunnbear._core.exceptions
 import sunnbear._core.functions.core
-import sunnbear._core.functions.core.exceptions
 import sunnbear._core.solvers.bracketing
 import sunnbear._core.solvers.core
 import sunnbear._core.solvers.core.exceptions
 import sunnbear._core.solvers.open
-import sunnbear._core.stats
 import sunnbear.benchmark
 import sunnbear.data
 import sunnbear.exceptions
 import sunnbear.functions
 import sunnbear.solvers
-import sunnbear.stats
 
 
 def _public_names(*modules) -> set[str]:
@@ -41,37 +40,46 @@ def _is_submodule(module, name: str) -> bool:
     return getattr(attr, "__name__", "").startswith(module.__name__ + ".")
 
 
-@pytest.mark.parametrize(
-    "public_module, implementation_modules",
-    [
-        (sunnbear.stats, (sunnbear._core.stats,)),
-        (sunnbear.benchmark, (sunnbear._core.benchmark,)),
-        (sunnbear.data, (sunnbear._core.artifacts.listing,)),
-        (sunnbear.functions, (sunnbear._core.functions.core,)),
+# Each public module, with the implementation modules whose names it re-exports.
+PUBLIC_MODULES = [
+    (sunnbear.benchmark, (sunnbear._core.benchmark,)),
+    (sunnbear.data, (sunnbear._core.artifacts.listing,)),
+    (sunnbear.functions, (sunnbear._core.functions.core,)),
+    (sunnbear.solvers, (sunnbear._core.solvers.core, sunnbear._core.solvers.bracketing, sunnbear._core.solvers.open)),
+    (
+        sunnbear.exceptions,
         (
-            sunnbear.solvers,
-            (sunnbear._core.solvers.core, sunnbear._core.solvers.bracketing, sunnbear._core.solvers.open),
+            sunnbear._core.artifacts.exceptions,
+            sunnbear._core.benchmark.runner.exceptions,
+            sunnbear._core.exceptions,
+            sunnbear._core.solvers.core.exceptions,
         ),
-        (
-            sunnbear.exceptions,
-            (
-                sunnbear._core.artifacts.exceptions,
-                sunnbear._core.benchmark.mc_tuples.construction.exceptions,
-                sunnbear._core.benchmark.runner.exceptions,
-                sunnbear._core.exceptions,
-                sunnbear._core.functions.core.exceptions,
-                sunnbear._core.solvers.core.exceptions,
-            ),
-        ),
-    ],
-)
-def test_public_module_re_exports_every_public_name(public_module, implementation_modules):
-    """A public module's `__all__` matches every public name of its implementation modules."""
+    ),
+]
+
+
+@pytest.mark.parametrize("public_module, implementation_modules", PUBLIC_MODULES)
+def test_public_module_re_exports_names_of_its_implementation_modules(public_module, implementation_modules):
+    """Every name in a public module's `__all__` is the same object as a public name of its implementation modules."""
     # --- arrange ----------------------
-    expected = _public_names(*implementation_modules)
+    objects_by_name = {
+        name: getattr(module, name) for module in implementation_modules for name in _public_names(module)
+    }
 
     # --- act --------------------------
-    exported = set(public_module.__all__)
+    exported = {name: getattr(public_module, name) for name in public_module.__all__}
 
     # --- assert -----------------------
-    assert exported == expected
+    assert exported == {name: objects_by_name.get(name) for name in exported}
+
+
+@pytest.mark.parametrize("public_module", [public_module for public_module, _ in PUBLIC_MODULES])
+def test_public_module_exposes_no_name_beyond_its_all(public_module):
+    """A public module has no public attribute that its `__all__` leaves out, so no other name imports from it."""
+    # --- arrange / act ----------------
+    exposed = {
+        name for name in dir(public_module) if not name.startswith("_") and not _is_submodule(public_module, name)
+    }
+
+    # --- assert -----------------------
+    assert exposed == set(public_module.__all__)

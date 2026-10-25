@@ -3,8 +3,8 @@
 The maintainer runs this script by hand whenever the tuple set is regenerated, never at release
 time. The script:
 
-- runs `MCTuplesGenerator`, as `sunnbear.benchmark.generate_mc_tuples` does, so that the script can report each size
-  once that size is built;
+- runs `MCTuplesGenerator`, as `sunnbear._core.benchmark.generate_mc_tuples` does, so that the script can report each
+  size once that size is built;
 - prints the arguments of its `MCTuplesGenerator` calls before the construction starts, so that the log records the
   arguments even when `--no-save` skips saving the set and its manifest;
 - prints 3 lines per size as the construction goes:
@@ -133,7 +133,7 @@ def main() -> None:
             MCTuplesDeclaration,
             tuples,
             built_with={"max-div": importlib.metadata.version("max-div")},
-            generated_by={"function": "sunnbear.benchmark.generate_mc_tuples", "arguments": arguments},
+            generated_by={"function": "sunnbear._core.benchmark.generate_mc_tuples", "arguments": arguments},
         )
         print(f"Saved {manifest.short_identity}.")
 

@@ -20,7 +20,7 @@ import numba
 import pytest
 
 import sunnbear
-from sunnbear.functions import FormulaRegistry
+from sunnbear._core.functions.core import FormulaRegistry
 from sunnbear.solvers import SolverConfigRegistry
 
 

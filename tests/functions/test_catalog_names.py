@@ -5,8 +5,8 @@ import re
 import pytest
 
 import sunnbear._core.functions.catalog as catalog
+from sunnbear._core.functions.core import Formula, FormulaRegistry
 from sunnbear._core.functions.core.taxonomy import FormulaTaxonomyNode
-from sunnbear.functions import Formula, FormulaRegistry
 
 _CATALOG_PREFIX = f"{catalog.__name__}."
 

@@ -5,8 +5,8 @@ Defining a formula or category class registers it, so a test that calls these he
 ``isolated_formula_registry`` fixture.
 """
 
+from sunnbear._core.functions.core import Formula, FormulaCategory, ParamRecipe
 from sunnbear._core.functions.core.taxonomy import FormulaTaxonomyNode
-from sunnbear.functions import Formula, FormulaCategory, ParamRecipe
 
 
 def define_formula_cls(formula_number: tuple[int, ...]) -> type[Formula]:

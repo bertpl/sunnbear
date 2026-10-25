@@ -15,7 +15,7 @@ import textwrap
 import pytest
 
 from sunnbear._core.functions.catalog.c01_published_test_functions import PublishedTestFunctions
-from sunnbear.functions import FormulaRegistry, FormulaSource
+from sunnbear._core.functions.core import FormulaRegistry, FormulaSource
 
 _CATEGORY_1_FORMULAS = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 1]
 # _FIRST_RUN_LINES are the rows of a small survey on its first run, each as (row id, subcategory, final status).

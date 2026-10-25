@@ -12,7 +12,7 @@ from sunnbear._core.benchmark.aggregation import (
     gpq_column_name,
     summarize_results,
 )
-from sunnbear.stats import gpq
+from sunnbear._core.stats import gpq
 
 from .results_table import results_table
 

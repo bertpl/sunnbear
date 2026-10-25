@@ -8,7 +8,7 @@ Each row is 1 function as its source gives it, with its parameters and intervals
 
 A row's status records whether the source gives enough to define those test functions, and whether an earlier source already gives them all.
 
-The rows are the material for category 1, *Published test functions*, of sunnbear's formula catalog. The catalog holds the package's formulas in `sunnbear.functions`, each a family of test functions.
+The rows are the material for category 1, *Published test functions*, of sunnbear's formula catalog. The catalog holds the package's formulas in `sunnbear._core.functions`, each a family of test functions.
 
 ## Files
 

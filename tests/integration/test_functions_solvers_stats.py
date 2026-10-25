@@ -12,8 +12,9 @@ import numpy as np
 import pytest
 
 import sunnbear.functions as functions  # The module, so pytest does not try to collect the `TestFunction` class.
+from sunnbear._core.functions.core import FormulaRegistry
+from sunnbear._core.stats import gpq
 from sunnbear.solvers import Bisection, RegulaFalsi, Solver, SolveResult, SolveStatus
-from sunnbear.stats import gpq
 
 # A batch of shift values for the cubic fixture below, inside the range it is calibrated for.
 C_VALUES = np.linspace(-1.0, 1.0, 5)
@@ -22,7 +23,7 @@ C_VALUES = np.linspace(-1.0, 1.0, 5)
 @pytest.fixture(scope="module")
 def cubic() -> functions.TestFunction:
     """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to ``c`` in ``[-1, 1]``."""
-    return functions.FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
+    return FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
 
 
 def _solve_batch(solver: Solver, cubic: functions.TestFunction, xtol: float) -> list[SolveResult]:

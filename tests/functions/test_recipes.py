@@ -2,7 +2,7 @@ import itertools
 
 import pytest
 
-from sunnbear.functions import ParamAxis, ParamGrid, ParamNotation, ParamTable
+from sunnbear._core.functions.core import ParamAxis, ParamGrid, ParamNotation, ParamTable
 
 
 # ==================================================================================================

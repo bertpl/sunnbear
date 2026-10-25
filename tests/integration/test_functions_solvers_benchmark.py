@@ -12,6 +12,8 @@ import polars as pl
 import pytest
 
 import sunnbear.functions as functions  # Import the module, so that pytest does not collect the `TestFunction` class.
+from sunnbear._core.functions.core import FormulaRegistry
+from sunnbear._core.stats import gpq
 from sunnbear.benchmark import (
     DEFAULT_N_BISECTION_FEVALS,
     MAX_FEVALS_FACTOR,
@@ -25,7 +27,6 @@ from sunnbear.benchmark import (
     summarize_results,
 )
 from sunnbear.solvers import SolverConfigRegistry, SolveStatus
-from sunnbear.stats import gpq
 
 SOLVER_IDS = ("bisection", "regula_falsi")
 
@@ -33,7 +34,7 @@ SOLVER_IDS = ("bisection", "regula_falsi")
 @pytest.fixture(scope="module")
 def cubic() -> functions.TestFunction:
     """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to a range of ``c``."""
-    return functions.FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
+    return FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
 
 
 @pytest.fixture(scope="module")
@@ -102,7 +103,7 @@ def test_bisection_spends_exactly_n_bisection_fevals_and_is_correct_on_every_sam
 def test_the_summary_per_solver_follows_from_the_derived_results(run_dir):
     """The summary, computed on a lazy frame from `load_results`, has 1 row per solver in run order, each with the
     solver's converged and correct fractions and its `n_fevals_eff` geometric pseudo-quantile (`gpq`) at level 0.5,
-    equal to `sunnbear.stats.gpq` over that solver's `n_fevals_eff` values."""
+    equal to `gpq` over that solver's `n_fevals_eff` values."""
     # --- arrange ----------------------
     derived_results = add_derived_results(load_results(run_dir))
     n_fevals_eff_by_solver_id = {

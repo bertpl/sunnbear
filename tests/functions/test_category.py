@@ -1,7 +1,7 @@
 import pytest
 
-from sunnbear.exceptions import FormulaTaxonomyError
-from sunnbear.functions import FormulaCategory, FormulaRegistry
+from sunnbear._core.functions.core import FormulaCategory, FormulaRegistry
+from sunnbear._core.functions.core.exceptions import FormulaTaxonomyError
 
 from .example_taxonomy_nodes import define_category_cls, define_formula_cls
 
