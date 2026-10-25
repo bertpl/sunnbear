@@ -51,7 +51,7 @@ class ArtifactManifest(BaseModel):
             `+dev`; the release replaces it with the release version.
         build_date: The date the artifact was built.
         generated_by: The sunnbear function call that generated the artifact, with its
-            arguments, as JSON-compatible data; ``None`` when no public function generated it.
+            arguments, as JSON-compatible data; ``None`` when no sunnbear function generated it.
         archive: Where to download the archive that holds all data files of a downloaded
             artifact, and the archive's hash; ``None`` for an artifact shipped in the package, and
             for a downloaded artifact whose archive is not published yet.

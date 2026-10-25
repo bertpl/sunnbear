@@ -1,4 +1,4 @@
-"""Each public module re-exports names that it chooses from the implementation packages it stands for, and no others.
+"""Each public module re-exports only names that it chooses from the implementation packages that it stands for.
 
 A name of an implementation package stays private unless its public module lists it in `__all__`.
 """
@@ -40,8 +40,8 @@ def _is_submodule(module, name: str) -> bool:
     return getattr(attr, "__name__", "").startswith(module.__name__ + ".")
 
 
-# Each public module, with the implementation modules whose names it re-exports.
-PUBLIC_MODULES = [
+# Each entry pairs a public module with the implementation modules whose names it re-exports.
+PUBLIC_AND_IMPLEMENTATION_MODULES = [
     (sunnbear.benchmark, (sunnbear._core.benchmark,)),
     (sunnbear.data, (sunnbear._core.artifacts.listing,)),
     (sunnbear.functions, (sunnbear._core.functions.core,)),
@@ -58,9 +58,10 @@ PUBLIC_MODULES = [
 ]
 
 
-@pytest.mark.parametrize("public_module, implementation_modules", PUBLIC_MODULES)
+@pytest.mark.parametrize("public_module, implementation_modules", PUBLIC_AND_IMPLEMENTATION_MODULES)
 def test_public_module_re_exports_names_of_its_implementation_modules(public_module, implementation_modules):
-    """Every name in a public module's `__all__` is the same object as a public name of its implementation modules."""
+    """Every name in a public module's `__all__` refers to the same object as the same public name in its implementation
+    modules."""
     # --- arrange ----------------------
     objects_by_name = {
         name: getattr(module, name) for module in implementation_modules for name in _public_names(module)
@@ -73,13 +74,14 @@ def test_public_module_re_exports_names_of_its_implementation_modules(public_mod
     assert exported == {name: objects_by_name.get(name) for name in exported}
 
 
-@pytest.mark.parametrize("public_module", [public_module for public_module, _ in PUBLIC_MODULES])
-def test_public_module_exposes_no_name_beyond_its_all(public_module):
-    """A public module has no public attribute that its `__all__` leaves out, so no other name imports from it."""
+@pytest.mark.parametrize("public_module", [public_module for public_module, _ in PUBLIC_AND_IMPLEMENTATION_MODULES])
+def test_public_module_has_no_public_attribute_beyond_its_all(public_module):
+    """A public module has no public attribute that its `__all__` leaves out, so a user can import no other public name
+    from it."""
     # --- arrange / act ----------------
-    exposed = {
+    public_attributes = {
         name for name in dir(public_module) if not name.startswith("_") and not _is_submodule(public_module, name)
     }
 
     # --- assert -----------------------
-    assert exposed == set(public_module.__all__)
+    assert public_attributes == set(public_module.__all__)

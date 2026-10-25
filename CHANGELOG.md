@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Remove the names that define formulas, `generate_mc_tuples` and the module `sunnbear.stats` from the public API
+- Remove every name from `sunnbear.functions` except `TestFunction`, `FunctionId`, `XFun` and `XCFun`, and remove `generate_mc_tuples` and the module `sunnbear.stats` from the public API
+- Remove `FormulaTaxonomyError`, `InvalidParamsError`, `UnknownFormulaError` and `MCTuplesConstructionError` from `sunnbear.exceptions`
 
 ### Fixed
 
