@@ -71,15 +71,16 @@ def test_first_rejects_a_size_outside_the_set(size):
 
 
 def test_to_xtol_and_c_maps_u_log_uniformly_and_v_linearly():
-    """u = 0.5 lands at `xtol_min * sqrt(2)`, and v places c linearly between `c_min` and `c_max`."""
+    """u = 0.5 lands at the geometric mean of `xtol_min` and `xtol_max`, and v places c linearly between `c_min` and
+    `c_max`."""
     # --- arrange ----------------------
     tuples = MCTuples([0.5, 0.25], [0.5, 0.25])
 
     # --- act --------------------------
-    xtol, c = tuples.to_xtol_and_c(xtol_min=1e-6, c_min=-2.0, c_max=2.0)
+    xtol, c = tuples.to_xtol_and_c(xtol_min=1e-6, xtol_max=4e-6, c_min=-2.0, c_max=2.0)
 
     # --- assert -----------------------
-    assert xtol == pytest.approx([1e-6 * np.sqrt(2), 1e-6 * 2**0.25])
+    assert xtol == pytest.approx([2e-6, 1e-6 * np.sqrt(2)])
     assert c == pytest.approx([0.0, -1.0])
 
 

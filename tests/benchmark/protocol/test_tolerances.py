@@ -1,56 +1,86 @@
-"""Real `Bisection` runs spend exactly `n_bisection_fevals` inside the range that `compute_xtol_range` returns.
+"""Real `Bisection` runs spend exactly `n_bisection_fevals` on the range that `compute_xtol_range` returns.
 
 `max_fevals_for` returns the evaluation budget derived from that count.
 """
 
+import math
+
 import pytest
 
-from sunnbear._core.benchmark.protocol.tolerances import DEFAULT_N_BISECTION_FEVALS, compute_xtol_range, max_fevals_for
+from sunnbear._core.benchmark.protocol.tolerances import (
+    DEFAULT_N_BISECTION_FEVALS,
+    MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND,
+    XTOL_RANGE_MARGIN_SAFETY_FACTOR,
+    compute_xtol_range,
+    max_fevals_for,
+)
 from sunnbear.solvers import Bisection, SolveStatus
-from tests.solvers.example_functions import cubic
+
+
+def _sign_step_at(root: float):
+    """Return a function that is -1 below `root` and 1 from `root` on, so that no midpoint of bisection is a 0 of it."""
+    return lambda x: 1.0 if x >= root else -1.0
 
 
 # ==================================================================================================
 #  compute_xtol_range
 # ==================================================================================================
-@pytest.mark.parametrize("a, b", [(1.0, 2.0), (0.0, 4.0), (1.3, 1.4)])  # Each interval holds the cubic's root.
-@pytest.mark.parametrize("n_bisection_fevals", [3, 10, DEFAULT_N_BISECTION_FEVALS])
 @pytest.mark.parametrize(
-    "edge, xtol_factor, n_fevals_offset",
+    "a, b",
     [
-        ("lower", 1.01, 0),  # just inside the range
-        ("upper", 0.99, 0),
-        ("lower", 0.99, 1),  # just outside: 1 more step below the range, 1 fewer above it
-        ("upper", 1.01, -1),
+        (1.0, 2.0),  # exact binary fractions
+        (-0.3, 0.1),  # around 0
+        (1.3, 1.4),
+        (1022.7, 1023.7),  # max(|a|, |b|) / (b - a) just below 1024, the largest ratio accepted at the default count
+        (-1023.7, -1022.7),
     ],
 )
-def test_bisection_takes_exactly_n_bisection_fevals_inside_the_xtol_range_only(
-    a, b, n_bisection_fevals, edge, xtol_factor, n_fevals_offset
-):
-    """Bisection takes exactly `n_bisection_fevals` for an `xtol` just inside the range, 1 more or 1 fewer just outside.
-
-    The 1 % margins keep `xtol` away from each edge, where the rounding of the midpoints can change the step
-    count when the interval bounds are not exact binary fractions, as for [1.3, 1.4].
-    """
+@pytest.mark.parametrize("n_bisection_fevals", [3, 10, DEFAULT_N_BISECTION_FEVALS])
+@pytest.mark.parametrize("edge", ["lower", "upper"])
+def test_bisection_spends_exactly_n_bisection_fevals_at_both_edges_of_the_xtol_range(a, b, n_bisection_fevals, edge):
+    """Bisection spends exactly `n_bisection_fevals` at both bounds of the range, also on intervals whose bounds are not
+    exact binary fractions and lie far from 0 for their width."""
     # --- arrange ----------------------
-    xtol_lower, xtol_upper = compute_xtol_range(a=a, b=b, n_bisection_fevals=n_bisection_fevals)
-    xtol = xtol_factor * (xtol_lower if edge == "lower" else xtol_upper)
+    xtol_min, xtol_max = compute_xtol_range(a=a, b=b, n_bisection_fevals=n_bisection_fevals)
+    xtol = xtol_min if edge == "lower" else xtol_max
+    f = _sign_step_at(a + (b - a) / math.pi)
 
     # --- act --------------------------
-    result = Bisection().solve(cubic, a, b, xtol=xtol, max_fevals=max_fevals_for(n_bisection_fevals=n_bisection_fevals))
+    result = Bisection().solve(f, a, b, xtol=xtol, max_fevals=max_fevals_for(n_bisection_fevals=n_bisection_fevals))
 
     # --- assert -----------------------
     assert result.status is SolveStatus.CONVERGED
-    assert result.n_fevals == n_bisection_fevals + n_fevals_offset
+    assert result.n_fevals == n_bisection_fevals
 
 
-def test_compute_xtol_range_matches_its_closed_form_on_a_known_interval():
-    """On [-1, 3] with 5 evaluations, the range is `(0.25, 0.5)`: the width 4 times `2^(1 - 5)`, and twice that."""
+def test_the_xtol_range_lies_just_inside_its_exact_arithmetic_range_near_0():
+    """On [-1, 3] with 5 evaluations, the range of exact arithmetic is [0.25, 0.5): the width 4 times `2^(1 - 5)`, and
+    twice that; the margin from each edge is a few float64 spacings."""
     # --- act --------------------------
-    xtol_range = compute_xtol_range(a=-1.0, b=3.0, n_bisection_fevals=5)
+    xtol_min, xtol_max = compute_xtol_range(a=-1.0, b=3.0, n_bisection_fevals=5)
 
     # --- assert -----------------------
-    assert xtol_range == (0.25, 0.5)
+    assert 0.25 < xtol_min < xtol_max < 0.5
+    assert (xtol_min, xtol_max) == pytest.approx((0.25, 0.5), rel=1e-14)
+
+
+def test_the_margin_is_largest_and_below_one_half_at_the_largest_accepted_ratio():
+    """On [1023, 1024], whose ratio `max(|a|, |b|) / (b - a)` is the largest that the default count accepts, the margin
+    in log2(xtol) is `XTOL_RANGE_MARGIN_SAFETY_FACTOR / (2*k*ln(2))`, with `k` the minimum of `xtol` in float64
+    spacings, so the range is never empty."""
+    # --- arrange ----------------------
+    xtol_exact_min = 2.0 ** (1 - DEFAULT_N_BISECTION_FEVALS)
+    delta = XTOL_RANGE_MARGIN_SAFETY_FACTOR / (
+        2 * MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND * math.log(2.0)
+    )
+
+    # --- act --------------------------
+    xtol_min, xtol_max = compute_xtol_range(a=1023.0, b=1024.0, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
+
+    # --- assert -----------------------
+    assert delta < 0.5
+    assert math.log2(xtol_min / xtol_exact_min) == pytest.approx(delta, rel=1e-12)
+    assert math.log2(xtol_max / xtol_exact_min) == pytest.approx(1 - delta, rel=1e-12)
 
 
 @pytest.mark.parametrize(
@@ -71,14 +101,14 @@ def test_compute_xtol_range_rejects_an_ill_ordered_interval_or_too_few_evaluatio
 @pytest.mark.parametrize(
     "a, b, is_accepted",
     [
-        (1023.0, 1024.0, True),  # max(|a|, |b|) = 1024 · (b - a): exactly at the limit
-        (1024.0, 1025.0, False),  # max(|a|, |b|) = 1025 · (b - a): just beyond the limit
+        (1023.0, 1024.0, True),  # max(|a|, |b|) = 1024 * (b - a): exactly at the limit
+        (1024.0, 1025.0, False),  # max(|a|, |b|) = 1025 * (b - a): just beyond the limit
         (-1e6, 1e6, True),  # an interval that contains 0
     ],
 )
 def test_compute_xtol_range_rejects_an_interval_too_far_from_0_for_its_width(a, b, is_accepted):
     """With the default `n_bisection_fevals`, `compute_xtol_range` accepts an interval with
-    `max(|a|, |b|) <= 1024 · (b - a)`, where 1024 =
+    `max(|a|, |b|) <= 1024 * (b - a)`, where 1024 =
     `2^(53 - DEFAULT_N_BISECTION_FEVALS) / MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND`, and raises
     `ValueError` beyond that."""
     # --- act / assert -----------------

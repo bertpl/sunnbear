@@ -104,10 +104,11 @@ class BenchmarkTask:
 
         # --- per-task values ------------------------
         n_bisection_fevals = self.run_settings.n_bisection_fevals
-        # `to_xtol_and_c` spans the range from its lower bound alone, so the upper bound is not needed.
-        xtol_min, _ = compute_xtol_range(a=problem.a, b=problem.b, n_bisection_fevals=n_bisection_fevals)
+        xtol_min, xtol_max = compute_xtol_range(a=problem.a, b=problem.b, n_bisection_fevals=n_bisection_fevals)
         max_fevals = max_fevals_for(n_bisection_fevals=n_bisection_fevals)
-        xtols, cs = mc_tuples.to_xtol_and_c(xtol_min, problem.c_min, problem.c_max)
+        xtols, cs = mc_tuples.to_xtol_and_c(
+            xtol_min=xtol_min, xtol_max=xtol_max, c_min=problem.c_min, c_max=problem.c_max
+        )
 
         # --- 1 row per solve ------------------------
         rows = []
