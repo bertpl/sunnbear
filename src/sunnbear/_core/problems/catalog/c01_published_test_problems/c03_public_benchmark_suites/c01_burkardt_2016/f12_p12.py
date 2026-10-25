@@ -1,13 +1,18 @@
 """This module holds a formula of Burkardt (2016).
 
 The formula comes from the row with the key ``p12`` in the survey of published test problems. The survey gives this
-function as a description, not as 1 expression, so a person writes this module: a change of the formula's row in
+function as a description, not as 1 expression, so the module generator,
+`scripts/literature_test_problems/formula_modules.py`, does not write it.
+
+Nor does the generator write a formula with the parameter ``modified``, which selects a modified version of a published
+test problem. A person therefore writes this module, and a change of the formula's row in
 `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.utils.floats import TINY_LINEAR_TERM_SLOPE
 
 
 class Burkardt2016P12(Formula):
@@ -18,11 +23,28 @@ class Burkardt2016P12(Formula):
     ``factor = 1000.0``; the formula's intervals are ``[-4.0, 4.1]`` (rang); ``[0.50, 2.0]`` (starts 2 and 1).
 
     The source's starting points, in order, are ``2.0``, ``0.50`` and ``4.0``.
+
+    With ``modified = 1``, the formula adds ``TINY_LINEAR_TERM_SLOPE*(x - 1)`` to the published function, on the
+    published intervals; ``c`` shifts x as category 1 states, before the formula adds the term. `TINY_LINEAR_TERM_SLOPE`
+    is ``2**-918``.
+
+    The published test problems do not satisfy the benchmark suite inclusion conditions, because the conditions require
+    bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of
+    f.
+
+    In float64, the published function is exactly 0 within about 0.04 of the root, because its true values there lie
+    below float64's range, so that no form of it avoids the zeros. With the term, f is exactly 0 only within about 5e-48
+    of the root, where the term underflows too; beyond about 0.04 from the root, the term changes f by less than its
+    rounding.
+
+    With ``modified = 1``, the modification changes what the test problem tests: in float64, the published function is
+    exactly 0 within about 0.04 of the root, so that a solver may stop at any x-value there, while with the term a
+    solver must locate the root, near which f is the linear term.
     """
 
     number = (1, 3, 1, 12)
     name = "p12"
-    param_names = ("factor", "a", "b", "c_scale")
+    param_names = ("factor", "a", "b", "c_scale", "modified")
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "
@@ -53,52 +75,106 @@ class Burkardt2016P12(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, factor: float, a: float, b: float, c_scale: float) -> float:
-        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+    def parametrized_fun(
+        x: float, c: float, factor: float, a: float, b: float, c_scale: float, modified: float
+    ) -> float:
+        """Evaluate the published function at ``x - c_scale*c``.
+
+        With ``modified = 1``, add ``TINY_LINEAR_TERM_SLOPE*(y - 1)``, with ``y = x - c_scale*c``. Category 1 states the
+        rule for ``c_scale``.
+        """
         x = x - c_scale * c
         if x < 1.0:
-            return -math.exp(math.log(factor) + math.log(abs(x - 1.0)) - 1.0 / (x - 1.0) ** 2)
+            published_value = -math.exp(math.log(factor) + math.log(abs(x - 1.0)) - 1.0 / (x - 1.0) ** 2)
         elif x == 1.0:
-            return 0.0
+            published_value = 0.0
         else:
-            return math.exp(math.log(factor) + math.log(abs(x - 1.0)) - 1.0 / (x - 1.0) ** 2)
+            published_value = math.exp(math.log(factor) + math.log(abs(x - 1.0)) - 1.0 / (x - 1.0) ** 2)
+        if modified == 1:
+            return published_value + TINY_LINEAR_TERM_SLOPE * (x - 1.0)
+        else:
+            return published_value
 
-    def interval_bounds(self, factor: float, a: float, b: float, c_scale: float) -> tuple[float, float]:
+    def interval_bounds(
+        self, factor: float, a: float, b: float, c_scale: float, modified: float
+    ) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the published parameter values."""
+        """Return the published parameter values, then those of the modified test problems."""
         return (
-            ParamTable(names=("factor", "a", "b", "c_scale"), rows=((1000.0, -4.0, 4.1, 8.1), (1000.0, 0.5, 2.0, 1.5))),
+            ParamTable(
+                names=("factor", "a", "b", "c_scale", "modified"),
+                rows=((1000.0, -4.0, 4.1, 8.1, 0.0), (1000.0, 0.5, 2.0, 1.5, 0.0)),
+            ),
+            ParamTable(
+                names=("factor", "a", "b", "c_scale", "modified"),
+                rows=((1000.0, -4.0, 4.1, 8.1, 1.0), (1000.0, 0.5, 2.0, 1.5, 1.0)),
+            ),
         )
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`
     # would accept any value near 0, 0 among them
     test_cases = (
         FormulaTestCase.value(
-            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=-1.57, c=0.0, expected=-2208.918772196994
+            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1, "modified": 0.0},
+            x=-1.57,
+            c=0.0,
+            expected=-2208.918772196994,
         ),
         FormulaTestCase.value(
-            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=-1.57, c=0.25, expected=-4382.445368656935
+            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1, "modified": 0.0},
+            x=-1.57,
+            c=0.25,
+            expected=-4382.445368656935,
         ),
         FormulaTestCase.value(
-            params={"factor": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.5},
+            params={"factor": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.5, "modified": 0.0},
             x=0.95,
             c=0.0,
             expected=-9.575847983576841e-173,
             atol=0.0,
         ),
         FormulaTestCase.value(
-            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=1.0, c=0.0, expected=0.0
+            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1, "modified": 0.0}, x=1.0, c=0.0, expected=0.0
         ),
         FormulaTestCase.value(
-            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=1.5, c=0.0, expected=9.15781944436709
+            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1, "modified": 0.0},
+            x=1.5,
+            c=0.0,
+            expected=9.15781944436709,
         ),
         FormulaTestCase.interval_bounds(
-            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, expected=(-4.0, 4.1)
+            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1, "modified": 0.0}, expected=(-4.0, 4.1)
         ),
         FormulaTestCase.interval_bounds(
-            params={"factor": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.5}, expected=(0.5, 2.0)
+            params={"factor": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.5, "modified": 0.0}, expected=(0.5, 2.0)
+        ),
+        FormulaTestCase.interval_bounds(
+            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1, "modified": 1.0}, expected=(-4.0, 4.1)
+        ),
+        FormulaTestCase.value(
+            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1, "modified": 1.0},
+            x=-1.57,
+            c=0.25,
+            expected=-4382.445368656935,
+        ),
+        FormulaTestCase.value(
+            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1, "modified": 1.0},
+            x=1.0001,
+            c=0.0,
+            expected=4.512985939661577e-281,
+            atol=0.0,
+        ),
+        FormulaTestCase.interval_bounds(
+            params={"factor": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.5, "modified": 1.0}, expected=(0.5, 2.0)
+        ),
+        FormulaTestCase.value(
+            params={"factor": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.5, "modified": 1.0},
+            x=1.0001,
+            c=0.0,
+            expected=4.512985939661577e-281,
+            atol=0.0,
         ),
     )
