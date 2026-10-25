@@ -11,7 +11,7 @@ hold the rejected candidates, each with its `RejectionReason`, and the counts of
 """
 
 from .bound_to_width_ratio_check import MAX_BOUND_TO_WIDTH_RATIO
-from .c_range_calibration import CRange, calibrate_c_range
+from .c_range_calibration import calibrate_c_range
 from .rejection_reason import RejectionReason
 from .stage import (
     C_RANGE_SCHEMA,

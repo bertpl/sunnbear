@@ -37,11 +37,11 @@ A candidate is rejected at the first step that fails, with that step's `Rejectio
 """
 
 import math
-from dataclasses import dataclass
 
 import numpy as np
 
 from sunnbear._core.benchmark.mc_tuples import MCTuples
+from sunnbear._core.benchmark.protocol import CRange, MCSolveSettings
 from sunnbear._core.problems.core import XCFun
 
 from .rejection_reason import RejectionReason
@@ -60,17 +60,6 @@ MAX_BOUND_REL_GAP = 0.01
 MAX_RETURNS_TO_HALVING = 10
 # Step 6 rejects a c-range narrower than this.
 MIN_C_RANGE_WIDTH = 1e-3
-
-
-# ==================================================================================================
-#  CRange
-# ==================================================================================================
-@dataclass(frozen=True)
-class CRange:
-    """A `CRange` is the calibrated c-range ``[c_min, c_max]`` of a candidate, with ``c_min < 0 < c_max``."""
-
-    c_min: float
-    c_max: float
 
 
 # ==================================================================================================
@@ -99,7 +88,7 @@ def calibrate_c_range(xc_fun: XCFun, a: float, b: float, *, mc_tuples: MCTuples)
         n_returns = 0
         while True:
             c_range = CRange(c_min=-bounds[0], c_max=bounds[1])
-            c_values = mc_tuples.to_c(c_range.c_min, c_range.c_max)
+            c_values = MCSolveSettings.map_v_onto_c_range(mc_tuples.v, c_range)
             failing_side_idxs = [
                 idx for idx, side_search in enumerate(side_searches) if not side_search.is_met_at_each(c_values)
             ]

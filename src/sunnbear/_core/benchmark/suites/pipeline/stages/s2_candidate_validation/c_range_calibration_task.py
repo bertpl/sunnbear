@@ -3,9 +3,10 @@
 from dataclasses import dataclass
 
 from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
+from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.problems.core import FormulaRegistry
 
-from .c_range_calibration import CRange, calibrate_c_range
+from .c_range_calibration import calibrate_c_range
 from .rejection_reason import RejectionReason
 
 

@@ -11,11 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Change the signature of `MCTuples.to_xtol_and_c`
-
 ### Deprecated
 
 ### Removed
+
+- Remove `MCTuples.to_xtol_and_c` and `MCTuples.to_c`
 
 ### Fixed
 
