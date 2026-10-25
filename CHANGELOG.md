@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Remove every name from `sunnbear.functions` except `TestFunction`, `FunctionId`, `XFun` and `XCFun`, remove `generate_mc_tuples` from `sunnbear.benchmark`, and remove the module `sunnbear.stats`
+- Remove `FormulaTaxonomyError`, `InvalidParamsError`, `UnknownFormulaError` and `MCTuplesConstructionError` from `sunnbear.exceptions`
+
 ### Fixed
 
 ### Security

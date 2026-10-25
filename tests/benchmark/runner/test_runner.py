@@ -8,12 +8,12 @@ from pathlib import Path
 import polars as pl
 import pytest
 
-import sunnbear.functions as functions  # Import the module, so pytest does not try to collect `TestFunction`.
 from sunnbear._core.benchmark.runner.exceptions import BenchmarkRunError
 from sunnbear._core.benchmark.runner.results_schema import RESULTS_SCHEMA
 from sunnbear._core.benchmark.runner.run_dir import BenchmarkRunDir
 from sunnbear._core.benchmark.runner.runner import load_results, run_benchmark
 from sunnbear._core.benchmark.runner.task import BenchmarkTask
+from sunnbear._core.functions.core import FormulaRegistry
 from sunnbear.solvers import SolverConfigRegistry
 
 MC_SIZE = 32
@@ -38,8 +38,7 @@ def _run_inputs(run_dir: Path, **changes: object) -> dict[str, object]:
     return {
         "solver_configs": [SolverConfigRegistry.config_from_id(solver_id) for solver_id in _SOLVER_IDS],
         "functions": [
-            functions.FormulaRegistry.candidate_from_id(function_id).calibrated(-1.0, 1.0)
-            for function_id in _FUNCTION_IDS
+            FormulaRegistry.candidate_from_id(function_id).calibrated(-1.0, 1.0) for function_id in _FUNCTION_IDS
         ],
         "run_dir": run_dir,
         "root_seed": 1,
@@ -200,7 +199,7 @@ def test_a_run_that_stopped_before_writing_a_results_file_writes_it_from_the_sta
         ({"mc_size": 64}, "run_settings"),
         ({"solver_configs": [SolverConfigRegistry.config_from_id("bisection")]}, "solver_versions"),
         (
-            {"functions": [functions.FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-0.5, 0.5)]},
+            {"functions": [FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-0.5, 0.5)]},
             "function_infos",
         ),
     ],
@@ -218,7 +217,7 @@ def test_resuming_with_other_inputs_is_refused(finished_run_dir, changes, differ
         ({"solver_configs": []}, "solver_configs must hold at least 1 item"),
         ({"functions": []}, "functions must hold at least 1 item"),
         (
-            {"functions": [functions.FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-1.0, 1.0)] * 2},
+            {"functions": [FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-1.0, 1.0)] * 2},
             r"functions holds these ids more than once: \['f2.1.1\[p1=0.2\]'\]",
         ),
         ({"mc_size": 33}, "size must be one of"),

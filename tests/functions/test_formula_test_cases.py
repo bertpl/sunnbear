@@ -4,9 +4,9 @@ import math
 
 import pytest
 
+from sunnbear._core.functions.core import FormulaRegistry
 from sunnbear._core.functions.core.taxonomy import FormulaTaxonomyNode
 from sunnbear._core.functions.core.test_cases import IntervalBoundsTestCase, InvalidTestCase, ValueTestCase
-from sunnbear.functions import FormulaRegistry
 
 # _IDS gives each (formula, test case) pair a stable unique id
 _INDEXED = [

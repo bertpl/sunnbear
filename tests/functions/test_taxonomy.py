@@ -1,7 +1,7 @@
 import pytest
 
+from sunnbear._core.functions.core import FormulaCategory
 from sunnbear._core.functions.core.taxonomy import FormulaTaxonomyNode
-from sunnbear.functions import FormulaCategory
 
 from .example_taxonomy_nodes import define_category_cls, define_formula_cls
 

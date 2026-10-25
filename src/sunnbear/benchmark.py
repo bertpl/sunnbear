@@ -3,8 +3,10 @@
 A benchmark run solves every test function with every solver at every (u, v) tuple of the chosen MC tuple set size,
 each tuple mapped to a tolerance `xtol` and a value of the function's parameter `c`, and stores 1 row per solve.
 
-- `load_mc_tuples(size)` returns one size of the shipped (u, v) tuple set, which every run uses; `generate_mc_tuples`
-  constructs an equivalent set, and `MCTuples` holds either one;
+- `load_mc_tuples(size)` returns the first `size` tuples of the shipped (u, v) tuple set, which every run uses, as an
+  `MCTuples`;
+- `MCTuples.stats()` returns a tuple set's spread statistics as an `MCTuplesStats`, and `MCTuples.bit_stats()`
+  returns statistics of the bits of information in the set's u and v values as an `MCTuplesBitStats`;
 - `run_benchmark` runs the solvers and writes the rows to a run directory, which `load_results` reads back as a
   results table with the columns of `RESULTS_SCHEMA`;
 - `compute_xtol_range` returns the range of `xtol` values on which bisection spends exactly a given number of
@@ -28,7 +30,6 @@ from ._core.benchmark import (
     MCTuplesStats,
     add_derived_results,
     compute_xtol_range,
-    generate_mc_tuples,
     is_solution_correct,
     load_mc_tuples,
     load_results,
@@ -47,7 +48,6 @@ __all__ = [
     "MCTuplesStats",
     "add_derived_results",
     "compute_xtol_range",
-    "generate_mc_tuples",
     "is_solution_correct",
     "load_mc_tuples",
     "load_results",

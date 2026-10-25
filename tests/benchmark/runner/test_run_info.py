@@ -4,12 +4,12 @@ import datetime
 
 import pytest
 
-import sunnbear.functions as functions  # Import the module, so pytest does not try to collect `TestFunction`.
 from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples.artifact import MCTuplesDeclaration
 from sunnbear._core.benchmark.runner.exceptions import BenchmarkRunError
 from sunnbear._core.benchmark.runner.run_info import BenchmarkRunInfo
 from sunnbear._core.benchmark.runner.run_settings import BenchmarkRunSettings
+from sunnbear._core.functions.core import FormulaRegistry
 from sunnbear.solvers import SolverConfigRegistry
 
 
@@ -22,8 +22,7 @@ def _run_info_of(solver_ids: list[str], function_ids: list[str], c_max: float = 
         run_settings=BenchmarkRunSettings(mc_size=32, n_bisection_fevals=40, root_seed=1),
         solver_configs=[SolverConfigRegistry.config_from_id(solver_id) for solver_id in solver_ids],
         functions=[
-            functions.FormulaRegistry.candidate_from_id(function_id).calibrated(-1.0, c_max)
-            for function_id in function_ids
+            FormulaRegistry.candidate_from_id(function_id).calibrated(-1.0, c_max) for function_id in function_ids
         ],
     )
 

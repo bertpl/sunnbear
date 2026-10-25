@@ -3,8 +3,8 @@
 import numpy as np
 import pytest
 
+from sunnbear._core.stats import owg
 from sunnbear._core.stats.pseudo_quantiles import owg_expression
-from sunnbear.stats import owg
 
 from .sample_values import VALUES_BY_GROUP, VALUES_WITH_A_ZERO, frame_of_values_by_group
 

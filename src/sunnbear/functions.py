@@ -1,49 +1,14 @@
-"""This module re-exports the test-function framework: formulas, categories, recipes, identities, and the registry.
+"""This module re-exports `TestFunction`, its id `FunctionId`, and the callable types `XFun` and `XCFun`.
 
-How the pieces tie together is described in the docstring of the implementation package,
+- `TestFunction` holds a formula with its parameter values, its interval and the range of its parameter `c`;
+- `FunctionId` identifies a test function by its formula number and its named parameter values;
+- `XFun` is the type that `TestFunction.build_x_fun` returns, `f(x)` at a fixed `c`; `XCFun` is the type of
+  `TestFunction.xc_fun`, `f(x, c)`.
+
+How test functions are built from formulas is described in the docstring of the implementation package,
 `sunnbear._core.functions.core`.
 """
 
-from ._core.functions import (
-    CANONICAL_DIGITS,
-    DEDUP_DIGITS,
-    USER_DEFINED_FORMULA_CATEGORY_NUMBER,
-    CandidateTestFunction,
-    Formula,
-    FormulaCategory,
-    FormulaRegistry,
-    FormulaSource,
-    FormulaTestCase,
-    FunctionId,
-    ParamAxis,
-    ParamGrid,
-    ParamNotation,
-    ParamRecipe,
-    ParamTable,
-    TestFunction,
-    XCFun,
-    XFun,
-    deduplicate_param_tuples,
-)
+from ._core.functions import FunctionId, TestFunction, XCFun, XFun
 
-__all__ = [
-    "CANONICAL_DIGITS",
-    "DEDUP_DIGITS",
-    "USER_DEFINED_FORMULA_CATEGORY_NUMBER",
-    "CandidateTestFunction",
-    "Formula",
-    "FormulaCategory",
-    "FormulaRegistry",
-    "FormulaSource",
-    "FormulaTestCase",
-    "FunctionId",
-    "ParamAxis",
-    "ParamGrid",
-    "ParamNotation",
-    "ParamRecipe",
-    "ParamTable",
-    "TestFunction",
-    "XCFun",
-    "XFun",
-    "deduplicate_param_tuples",
-]
+__all__ = ["FunctionId", "TestFunction", "XCFun", "XFun"]

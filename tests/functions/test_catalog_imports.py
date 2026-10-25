@@ -2,7 +2,7 @@ import importlib
 import pkgutil
 
 import sunnbear._core.functions.catalog as catalog
-from sunnbear.functions import FormulaRegistry
+from sunnbear._core.functions.core import FormulaRegistry
 
 
 def _registered_node_classes() -> set[type]:
