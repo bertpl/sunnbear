@@ -30,9 +30,9 @@ class Burkardt2016P18(Formula):
     - on ``[0.988, 1.012]``, f is exactly 0 at many x-values, up to about 0.01 from the root, and the conditions require
       bisection to spend a fixed number of evaluations, while bisection stops early where a midpoint lands on an exact 0
       of f;
-    - on ``[0.990, 1.013]``, rounding changes f by up to about 1.4 near ``a = 0.990``, where f is about -1, and the
-      conditions require ``f(a)``, across a range of ``c`` of a minimum width, to keep the sign of its value at
-      ``c = 0`` and at least a tenth of that value.
+    - on ``[0.990, 1.013]``, rounding changes f by up to about 1.5 near ``a = 0.990``, where f is about -1, so a
+      shift along x by ``c_scale*c`` can change the sign of ``f(a)``, while the conditions require a range of ``c``
+      of a minimum width in which ``f(a)`` keeps its sign and at least a tenth of its value at ``c = 0``.
 
     ``10.0**14*(x - 1)**7`` has no terms that cancel.
 

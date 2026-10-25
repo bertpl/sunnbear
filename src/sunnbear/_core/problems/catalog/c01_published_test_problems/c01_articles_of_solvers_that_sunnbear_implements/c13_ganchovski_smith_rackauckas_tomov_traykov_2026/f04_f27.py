@@ -21,10 +21,12 @@ class GanchovskiSmithRackauckasTomovTraykov2026F27(Formula):
 
     ``Test Functions.pdf`` prints ``p(x) = x + 1.11``.
 
-    With ``modified = 1``, the formula computes the published function, ``(p - 3)**4 * sign(p - 3)``, in the equivalent
-    form ``(x - 1.88889)**3 * abs(x - 1.88889)``, on the published interval, and ``c`` shifts x as category 1 states.
+    With ``modified = 1``, the formula computes the published function, which equals ``(p - 3)**4 * sign(p - 3)``, in
+    the equivalent form ``(x - 1.88889)**3 * abs(x - 1.88889)``, on the published interval, and ``c`` shifts x as
+    category 1 states.
+
     The equivalent form writes the root ``3 - 1.11111`` as the decimal ``1.88889``; float64 rounds ``3 - 1.11111`` and
-    ``1.88889`` to the same value, so both forms are 0 at that x.
+    ``1.88889`` to the same value, so both forms are 0 at ``x = 1.88889``.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because the conditions require
     bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of
