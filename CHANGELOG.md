@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Rename `TestFunction` to `TestProblem`, `FunctionId` to `ProblemId`, the module `sunnbear.functions` to `sunnbear.problems`, the results column `function_id` to `problem_id`, `run_benchmark`'s argument `functions` to `problems` and category 1 of the formula catalog to "Published test problems"
+- Rename `TestFunction` to `TestProblem`, `FunctionId` to `ProblemId`, the module `sunnbear.functions` to `sunnbear.problems`, the results column `function_id` to `problem_id` and `run_benchmark`'s argument `functions` to `problems`
 
 ### Deprecated
 

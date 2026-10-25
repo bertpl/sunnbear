@@ -3,9 +3,9 @@ reference = 'Bus, J. C. P., Dekker, T. J. (1975). Two efficient algorithms with 
 year = 1975
 subcategory = '1.2'
 where_in_source = '''
-- Section 5, "Numerical results" (p. 340), defines 4 groups of test functions, each with its parameter values and, except Group II, its interval.
+- Section 5, "Numerical results" (p. 340), defines 4 groups of test problems, each with its parameter values and, except Group II, its interval.
 - Tables I–IV (pp. 341–342) give the evaluation counts of 5 algorithms on the 4 groups, 1 table per group, and repeat only the function numbers and parameter values. The algorithms are Dekker's A, the article's M and R, Brent's (B) and Anderson–Björck's (C).
-- Sections 1–4 and the appendix hold no test functions.
+- Sections 1–4 and the appendix hold no test problems.
 '''
 transcribed_from = "the article (ACM's PDF, whose text layer has OCR errors), read from the page images of pp. 340–342. The rows were checked against sunnbear's `tests/solvers/paper_problems/bus_dekker.py`, which agrees on every function, parameter value and stated interval; for Group II, the test file assumes the interval `[-1, 10]` of Group III."
 rows_summary = "11: Group I's 6 functions, Group II's 3 pairs of `a` and `b`, and the function of each of Groups III and IV. With the values of `n`, the article solves 36 cases: 17 in Table I, 12 in Table II, 6 in Table III and 1 in Table IV."

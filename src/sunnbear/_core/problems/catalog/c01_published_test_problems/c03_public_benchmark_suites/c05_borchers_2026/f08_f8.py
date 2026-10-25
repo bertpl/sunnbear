@@ -9,7 +9,7 @@ from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase
 
 # SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
 # survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "1a69c087e32d8dca"
+SURVEY_FIELDS_HASH = "5fef94cde1902846"
 
 
 class Borchers2026F8(Formula):
@@ -28,7 +28,7 @@ class Borchers2026F8(Formula):
             'Borchers, H. W. *pracma Handbook*, chapter 5, "Root Finding". '
             "https://hwborchers.lima-city.de/pracmaHandbook/rootfinding.html, accessed 2026-10-18. The "
             "page is unversioned and gives no author or date; it is on the website of Hans W. Borchers,"
-            " the author of the R package pracma. The chapter cites no source for its test functions."
+            " the author of the R package pracma. The chapter cites no source for its test problems."
         ),
         location="f8",
     )

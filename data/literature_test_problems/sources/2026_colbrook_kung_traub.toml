@@ -5,5 +5,5 @@ subcategory = '1.2'
 where_in_source = 'the counterexamples of Sections 3 and 4 are the only functions of the article, such as `f_s(t) = t + exp(-t^2)*P_s(t)` in eq. (4.1).'
 transcribed_from = 'the article.'
 rows_summary = '''
-no test functions: the article is a proof and reports no numerical experiments. Its counterexamples have no fixed expression, because the polynomial `P_s` is constructed from the method under study.
+no test problems: the article is a proof and reports no numerical experiments. Its counterexamples have no fixed expression, because the polynomial `P_s` is constructed from the method under study.
 '''
