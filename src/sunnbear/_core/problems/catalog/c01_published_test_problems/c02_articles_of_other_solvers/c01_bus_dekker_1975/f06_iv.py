@@ -24,8 +24,8 @@ class BusDekker1975Iv(Formula):
     Group IV: all derivatives vanish at the zero, which the article calls a multiplicity of infinity.
 
     With ``modified = 1``, the formula adds ``TINY_LINEAR_TERM_SLOPE*x`` to the published function, on the published
-    interval; ``c`` shifts x as category 1 states, before the formula adds the term. `sunnbear._core.utils.floats`
-    defines `TINY_LINEAR_TERM_SLOPE`.
+    interval; ``c`` shifts x as category 1 states, before the formula adds the term. `TINY_LINEAR_TERM_SLOPE` is about
+    4.5e-277.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because the conditions require
     bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of

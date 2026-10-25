@@ -30,8 +30,8 @@ class Brent197341(Formula):
     underflow, so its ``f_1`` is 0 only for ``abs(x) < 3.8*10^-4``.
 
     With ``modified = 1``, the formula adds ``TINY_LINEAR_TERM_SLOPE*x`` to the published function, on the published
-    interval; ``c`` shifts x as category 1 states, before the formula adds the term. `sunnbear._core.utils.floats`
-    defines `TINY_LINEAR_TERM_SLOPE`.
+    interval; ``c`` shifts x as category 1 states, before the formula adds the term. `TINY_LINEAR_TERM_SLOPE` is about
+    4.5e-277.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because the conditions require
     bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of

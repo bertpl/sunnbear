@@ -25,8 +25,8 @@ class Burkardt2016P12(Formula):
     The source's starting points, in order, are ``2.0``, ``0.50`` and ``4.0``.
 
     With ``modified = 1``, the formula adds ``TINY_LINEAR_TERM_SLOPE*(x - 1)`` to the published function, on the
-    published intervals; ``c`` shifts x as category 1 states, before the formula adds the term.
-    `sunnbear._core.utils.floats` defines `TINY_LINEAR_TERM_SLOPE`.
+    published intervals; ``c`` shifts x as category 1 states, before the formula adds the term. `TINY_LINEAR_TERM_SLOPE`
+    is about 4.5e-277.
 
     The published test problems do not satisfy the benchmark suite inclusion conditions, because the conditions require
     bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of

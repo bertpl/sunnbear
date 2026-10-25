@@ -12,6 +12,6 @@ FLOAT64_MIN = sys.float_info.min
 #
 # Because the slope is a power of 2, its product with a float64 value is exact wherever the product is not subnormal:
 # ``TINY_LINEAR_TERM_SLOPE*(x - r)`` is exact wherever ``abs(x - r)`` is at least ``FLOAT64_EPS**2``. Adding the term
-# changes ``f(x)`` by more than rounding only where ``abs(f(x))`` is below
+# changes ``f(x)`` by more than the rounding error of ``f(x)`` only where ``abs(f(x))`` is below
 # ``TINY_LINEAR_TERM_SLOPE*abs(x - r)/FLOAT64_EPS``.
 TINY_LINEAR_TERM_SLOPE = FLOAT64_MIN / FLOAT64_EPS**2
