@@ -33,9 +33,9 @@ class ChapraCanale2015Ex52(Formula):
     conditions, because the 2 published intervals hold 6 and 2 roots, even numbers, so that ``f(a)`` and ``f(b)`` have
     the same sign.
 
-    With ``modified = 1``, the modification changes what the test problem on ``[4.2, 4.26]`` tests: the source plots f
-    on ``[4.2, 4.3]`` (Fig. 5.4(c)) to show that the apparent double root near 4.2 is 2 distinct roots, and
-    ``[4.2, 4.26]`` holds only the first of them, so the modified test problem does not test telling the 2 roots apart.
+    On ``[4.2, 4.26]``, the modification changes what the test problem tests: the source plots f on ``[4.2, 4.3]``
+    (Fig. 5.4(c)) to show that the apparent double root near 4.2 is 2 distinct roots, and ``[4.2, 4.26]`` holds only
+    the first of them, so the modified test problem does not test telling the 2 roots apart.
     """
 
     number = (1, 4, 6, 2)
