@@ -28,6 +28,10 @@ class RootsJl2026Func10(Formula):
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because the published
     interval holds 2 roots, an even number, so that ``f(a)`` and ``f(b)`` have the same sign.
+
+    With ``modified = 1``, the modification changes what the test problem tests: the source gives ``[-0.5, 1]`` to
+    ``find_zeros``, which finds every zero in an interval, and a solver on ``[-0.2, 1]`` finds 1 of the 2 roots
+    in ``[-0.5, 1]``.
     """
 
     number = (1, 3, 6, 3)

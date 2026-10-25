@@ -13,6 +13,9 @@ from . import (
 class PublishedTestProblems(FormulaCategory):
     """`PublishedTestProblems` is the top-level category of formulas taken from published sources.
 
+    Each test problem of this category is a root-bracketing problem on its interval, whatever the source uses the
+    function for, such as finding every root in an interval, minimizing the function, or iterating to a fixed point.
+
     Each formula of this category evaluates its published function at ``x - c_scale*c``, where ``c_scale`` is the
     rounded width of the formula's interval, so that ``c`` shifts the function along x, and at ``c = 0`` the formula is
     the published function.

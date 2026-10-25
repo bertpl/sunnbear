@@ -34,6 +34,10 @@ class RootsJl2026Func9(Formula):
     The published test problem on ``[5, 12]`` does not satisfy the benchmark suite inclusion conditions, because the
     function's 2 roots and the 2 poles of ``tan(x)`` give 4 sign changes in the published interval, so that ``f(a)`` and
     ``f(b)`` have the same sign.
+
+    With ``modified = 1``, the modification changes what the test problem tests: the source gives ``[5, 12]`` to
+    ``find_zeros``, which finds every zero in an interval, and a solver on ``[5, 7.7]`` finds 1 of the 2 roots in
+    ``[5, 12]``.
     """
 
     number = (1, 3, 6, 2)
