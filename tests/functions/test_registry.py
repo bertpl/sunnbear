@@ -173,7 +173,7 @@ def test_candidates_deduplicates_across_notations():
     ids = [c.id for c in CrossNotation().build_all_candidates()]
 
     # --- assert -----------------------
-    assert [str(fid) for fid in ids] == ["f99.995[p1=4.0]"]
+    assert [str(problem_id) for problem_id in ids] == ["f99.995[p1=4.0]"]
 
 
 # ==================================================================================================

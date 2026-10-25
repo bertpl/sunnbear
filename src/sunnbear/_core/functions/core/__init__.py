@@ -24,7 +24,8 @@ formulas: a formula's number, e.g. ``(2, 1, 1)``, is its category's number, ``(2
 (see `taxonomy`).
 
 `FormulaRegistry.candidate_from_id` re-enters this chain from a stored identity,
-rebuilding the `CandidateTestProblem`, to which `CandidateTestProblem.calibrated` then attaches a suite's c-range.
+rebuilding the `CandidateTestProblem`; `CandidateTestProblem.calibrated` then attaches a suite's c-range to it and
+returns a `TestProblem`.
 
 This package imports nothing from the packages beside it: the shipped formulas in
 `catalog` register themselves when their modules are imported, and the parent

@@ -1,7 +1,7 @@
 """The `Formula` base class: hand-written function families plus generation metadata.
 
 A formula owns three parameter layers with distinct roles: the recipe-given
-``p`` tuple (bound once per test problem, and chosen deliberately to set its properties),
+``p`` tuple (bound once per test problem, and chosen deliberately to set that test problem's properties),
 the Monte-Carlo parameter ``c`` (varied per benchmark run), and — downstream,
 never stored here — the tolerance ``xtol``.
 

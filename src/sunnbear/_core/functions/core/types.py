@@ -1,7 +1,7 @@
 """This module defines the callable type aliases for the functions of test problems.
 
-Kept in their own module so both the formula layer and the materialized
-test-problem layer can import them without depending on each other.
+The aliases live in their own module, so that both the `formula` module and the `test_problem` module can import
+them without depending on each other.
 """
 
 from collections.abc import Callable

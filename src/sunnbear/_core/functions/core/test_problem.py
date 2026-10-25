@@ -3,7 +3,7 @@
 The two types differ by exactly one fact: whether a valid c-range has been
 established. Keeping them separate makes "calibrated" a property of the type
 rather than of a nullable field, so code that requires a benchmarkable
-function cannot silently receive an uncalibrated one.
+test problem cannot silently receive an uncalibrated one.
 
 Both carry the originating `Formula` plus their identity rather than a pre-bound
 callable. The callable forms are derived from those on demand — ``f(x, c)`` as

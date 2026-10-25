@@ -3,7 +3,7 @@ import pytest
 from sunnbear._core.functions.catalog.c02_standard_function_families.c01_polynomials.f01_cubic import Cubic
 from sunnbear._core.functions.core import CandidateTestProblem, ProblemId
 from sunnbear._core.functions.core import (
-    TestProblem as _TestProblem,  # underscore alias: keep pytest from collecting it
+    TestProblem as _TestProblem,  # The underscore alias keeps pytest from collecting the class.
 )
 
 PROBLEM_ID = ProblemId((2, 1, 1), ("p1",), (0.2,))

@@ -4,7 +4,7 @@ from sunnbear._core.exceptions import SunnbearError
 
 
 class UnknownFormulaError(SunnbearError):
-    """Raised when a function identity references a formula number not present in the registry."""
+    """Raised when a `ProblemId` references a formula number not present in the registry."""
 
 
 class InvalidParamsError(SunnbearError):

@@ -11,7 +11,7 @@ so a mismatch between the layers' contracts is caught here.
 import numpy as np
 import pytest
 
-import sunnbear.problems as problems  # The module, so pytest does not try to collect the `TestProblem` class.
+import sunnbear.problems as problems  # Import the module, so that pytest does not collect the `TestProblem` class.
 from sunnbear._core.functions.core import FormulaRegistry
 from sunnbear._core.stats import gpq
 from sunnbear.solvers import Bisection, RegulaFalsi, Solver, SolveResult, SolveStatus
