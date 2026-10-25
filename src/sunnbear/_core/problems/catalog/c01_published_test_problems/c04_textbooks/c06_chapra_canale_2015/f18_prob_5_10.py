@@ -13,8 +13,9 @@ from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase
 
 # ROOT is the float64 nearest to the published polynomial's root near 5.61.
 ROOT = 5.609788960859374
-# TAYLOR_COEFFICIENTS holds the published polynomial's Taylor coefficients at ROOT, of t**0 to t**3 with t = x - ROOT;
-# the coefficient of t**4 is 1. They are computed with mpmath from the published coefficients and rounded to float64.
+# TAYLOR_COEFFICIENTS holds the coefficients of t**0 to t**3 in the published polynomial's Taylor expansion at ROOT,
+# with t = x - ROOT; the coefficient of t**4 is 1. They are computed with mpmath from the published coefficients and
+# rounded to float64.
 TAYLOR_COEFFICIENTS = (4.692574564789708e-16, 8.195425149706974, 19.183458051653208, 14.439155843437497)
 
 
@@ -28,13 +29,17 @@ class ChapraCanale2015Prob510(Formula):
     false position to `es = 1.0%`.
 
     With ``modified = 1``, the formula computes the published polynomial in its re-expansion around ``ROOT``, the
-    float64 nearest to its root, on the published interval; ``c`` shifts x as category 1 states. The re-expansion is
-    ``c0 + t*(c1 + t*(c2 + t*(c3 + t)))``, with ``t = x - ROOT`` and ``c0`` to ``c3`` from `TAYLOR_COEFFICIENTS`.
+    float64 nearest to the polynomial's root, on the published interval; ``c`` shifts x as category 1 states. The
+    re-expansion is ``c0 + t*(c1 + t*(c2 + t*(c3 + t)))``, with ``t = x - ROOT`` and ``c0`` to ``c3`` from
+    `TAYLOR_COEFFICIENTS`.
 
-    A factored form ``(x - r)*q(x)`` would not cancel near the root, but the polynomial has no such form with exact
-    float64 coefficients, so the formula re-expands the polynomial. Near the root, ``c0`` and ``c1*t`` are small, and
-    the other terms are smaller still, so f is not a difference of large, nearly equal terms. Rounding the coefficients
-    to float64 moves the root by a negligible fraction of the float64 spacing there.
+    The formula re-expands the polynomial because the polynomial has no factored form ``(x - r)*q(x)`` with exact
+    float64 coefficients, with ``r`` the root and ``q`` a cubic polynomial; such a form would have no terms that cancel
+    near the root.
+
+    Near the root, ``c0`` and ``c1*t`` are small, and the other terms are smaller still, so f is not a difference of
+    large, nearly equal terms. Rounding the coefficients to float64 moves the root by a negligible fraction of the
+    float64 spacing at the root.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because the conditions require
     bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of
