@@ -34,15 +34,15 @@ class PublishedTestProblems(FormulaCategory):
 
     A formula with the parameter ``modified`` follows these rules where ``modified = 0``.
 
-    Where ``modified = 1``, the formula gives a modified version of a published test problem that does not satisfy the
-    benchmark suite inclusion conditions, the conditions on every test problem of a benchmark suite. The benchmark
-    suite pipeline, `sunnbear._core.benchmark.suites.pipeline`, checks these conditions.
+    Some published test problems do not satisfy the benchmark suite inclusion conditions, the conditions on every test
+    problem of a benchmark suite. Where ``modified = 1``, the formula gives a modified version of such a published test
+    problem. The benchmark suite pipeline, `sunnbear._core.benchmark.suites.pipeline`, checks these conditions.
 
     An example is a published test problem whose function is not defined left of its interval: a shift along x by any
     ``c > 0`` evaluates that function outside its domain.
 
-    The formula's docstring describes its modification, which keeps the test problem as close to the published one as
-    the benchmark suite inclusion conditions allow.
+    The formula's docstring describes its modification, which keeps the modified test problem as close to the
+    published test problem as the benchmark suite inclusion conditions allow.
     """
 
     number = (1,)

@@ -1,8 +1,8 @@
 """This module reads 1 formula from the survey: its function and its published test problems.
 
-A published test problem is 1 combination of the formula's parameter values, on 1 interval. A formula's function is
-the `f` of its first row, unless the formula's line in `formulas.csv` gives an `f` of its own, the family form that
-`FunctionDecision` describes.
+A published test problem is the formula's function at 1 combination of its parameter values, on 1 interval. A
+formula's function is the `f` of its first row, unless the formula's line in `formulas.csv` gives an `f` of its own,
+the family form that `FunctionDecision` describes.
 
 A row whose parameters give several sets of values, separated by `;`, pairs each set with intervals: those that the
 set names after `on`, as in `on [0, 5]: a = 0.2, 1, n = 4(2)12`, or the row's only interval.
@@ -72,7 +72,7 @@ class PublishedFormula:
 
     @property
     def has_interval_parameters(self) -> bool:
-        """Return whether the test problems lie on more than 1 interval, so that each tuple carries its `a` and `b`."""
+        """Return whether the test problems lie on several intervals, so that each parameter tuple holds `a` and `b`."""
         return len({test_problem.interval.key for test_problem in self.test_problems}) > 1
 
     def check_rows(self) -> None:

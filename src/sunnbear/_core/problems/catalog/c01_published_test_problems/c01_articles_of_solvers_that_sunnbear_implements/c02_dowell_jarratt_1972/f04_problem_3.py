@@ -4,8 +4,8 @@ The formula comes from the row with the key ``Problem 3`` in the survey of publi
 this function as 1 expression that the module generator, `scripts/literature_test_problems/formula_modules.py`, cannot
 translate: an infinite sum.
 
-The generator does not write a formula with the parameter ``modified``, which selects a modified version of a published
-test problem, either. A person therefore writes this module, and a change of the formula's row in
+Nor does the generator write a formula with the parameter ``modified``, which selects a modified version of a
+published test problem. A person therefore writes this module, and a change of the formula's row in
 `data/literature_test_problems/sources/` needs a change of this module.
 """
 
@@ -77,7 +77,7 @@ class DowellJarratt1972Problem3(Formula):
         return (-0.9999, -0.0001)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the published test problem, then its modified version."""
+        """Return the published parameter values, then those of the modified test problem."""
         return (
             ParamTable(names=("modified",), rows=((0.0,),)),
             ParamTable(names=("modified",), rows=((1.0,),)),

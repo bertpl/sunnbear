@@ -74,7 +74,7 @@ Every text field is markdown, with code in backticks; a field that holds only co
 
 ## Statuses
 
-Each row has 1 of 3 final statuses, decided in this order; the paragraphs *The same function* and *Test problems and intervals* below the list define the terms that the list uses:
+Each row has 1 of 3 final statuses, decided in this order; the paragraphs *The same function* and *Test problems and intervals* below the list define the list's terms:
 
 - **`incomplete`:** the source does not give enough to define a test problem, or poses no root-finding problem, so the survey cannot use the row; every other row is complete. The row's reason starts with 1 of these cases:
   - `no interval`: the source gives no interval, or only starting points;

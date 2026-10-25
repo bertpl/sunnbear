@@ -58,7 +58,7 @@ class BurdenFairesBurden2016211(Formula):
         return (0.0, 1.0)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the published test problem, then its modified version."""
+        """Return the published parameter values, then those of the modified test problem."""
         return (
             ParamTable(names=("modified",), rows=((0.0,),)),
             ParamTable(names=("modified",), rows=((1.0,),)),

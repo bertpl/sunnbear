@@ -349,9 +349,10 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, scrip
 
     The test reads the factor from the code of ``parametrized_fun``, because a test that compares shifted values
     cannot see a number that is 1 float step off, such as ``1.9999999999999996`` for ``2.0``: the shifted x-values
-    round to the same float. The test skips a test problem with ``modified = 1`` whose
-    ``ModificationType.is_x_shifted_by_c_scale`` is false, because such a test problem applies ``c`` with no factor
-    ``c_scale``.
+    round to the same float.
+
+    The test skips a test problem with ``modified = 1`` whose ``ModificationType.is_x_shifted_by_c_scale`` is false,
+    because such a test problem applies ``c`` with no factor ``c_scale``.
     """
     # --- arrange ----------------------
     tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))

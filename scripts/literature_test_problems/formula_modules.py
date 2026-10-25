@@ -658,7 +658,7 @@ class FormulaModuleSpec:
     def _tuple_values(
         cls, published_test_problem: PublishedTestProblem, has_interval_parameters: bool
     ) -> tuple[tuple[float, ...], tuple[float, float], list[str], dict[str, sp.Expr]]:
-        """Return a published test problem's parameter tuple and bounds, and the values that the module's text needs.
+        """Return a published test problem's parameter tuple, bounds, exact texts of rounded values and mpmath values.
 
         A parameter value that no `ParamNotation` holds exactly is rounded by `_parameter_value`, and mpmath evaluates
         the function at the rounded value, because the formula receives the rounded value too.

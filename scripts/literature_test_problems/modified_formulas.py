@@ -2,8 +2,9 @@
 
 A formula of category 1 has a modified version when some of its published test problems do not satisfy the benchmark
 suite inclusion conditions, the conditions on every test problem of a benchmark suite. The benchmark suite pipeline,
-`sunnbear._core.benchmark.suites.pipeline`, checks these conditions. The class docstring of `PublishedTestProblems`
-describes such a formula's parameter `modified`.
+`sunnbear._core.benchmark.suites.pipeline`, checks these conditions.
+
+The class docstring of `PublishedTestProblems` describes such a formula's parameter `modified`.
 
 Such a formula's module is written by hand, starting from the module that the generator writes for the formula when the
 formula is absent from `MODIFIED_FORMULAS`.
