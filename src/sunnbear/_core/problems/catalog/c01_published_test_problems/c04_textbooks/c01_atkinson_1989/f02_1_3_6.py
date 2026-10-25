@@ -43,6 +43,10 @@ class Atkinson1989136(Formula):
 
     Near the root, the terms of the published form cancel, so that f is exactly 0 at many x-values within about 1e-5 of
     the root; ``x**3`` has no terms that cancel.
+
+    With ``modified = 2``, the modification changes what the test problem on ``[-0.002, 0.002]`` tests: the source uses
+    the interval ``[0.998, 1.002]`` to show the band of noise that rounding gives f around the root (Figure 1.2), and
+    ``x**3`` has no such band. ``modified = 1`` keeps the noise.
     """
 
     number = (1, 4, 1, 2)

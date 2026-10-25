@@ -47,6 +47,10 @@ class PublishedTestProblems(FormulaCategory):
 
     The formula's docstring describes its modifications, which keep the modified test problems as close to the
     published test problems as the benchmark suite inclusion conditions allow.
+
+    Where a modification changes what the published test problem tests, such as when it removes a feature that the
+    source uses the test problem to show, the formula's docstring says so in a paragraph with the words "changes what
+    the test problem tests".
     """
 
     number = (1,)
