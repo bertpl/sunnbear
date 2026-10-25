@@ -35,7 +35,7 @@ def run_info() -> BenchmarkRunInfo:
 #  Construction and JSON
 # ==================================================================================================
 def test_a_new_run_info_records_the_inputs_the_artifacts_and_the_versions(run_info):
-    """A new run info records the solvers, functions, tuple set identity and package versions, and is not finished."""
+    """A new run info records the solvers, problems, tuple set identity and package versions, and is not finished."""
     # --- assert -----------------------
     assert run_info.solver_versions == {"bisection": 1}
     assert [problem_info.problem_id for problem_info in run_info.problem_infos] == ["f2.1.1[p1=0.2]"]

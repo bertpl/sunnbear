@@ -1,4 +1,4 @@
-"""Materialized test problems: `CandidateTestProblem` (pre-calibration) and `TestProblem`.
+"""This module defines `CandidateTestProblem`, a test problem before calibration, and `TestProblem`, a calibrated one.
 
 The two types differ by exactly one fact: whether a valid c-range has been
 established. Keeping them separate makes "calibrated" a property of the type
@@ -54,8 +54,7 @@ class CandidateTestProblem:
     def calibrated(self, c_min: float, c_max: float) -> "TestProblem":
         """Promote to a `TestProblem` by attaching a calibrated c-range.
 
-        The c-range is the one fact separating the two types, so this method
-        is the only way to cross that line — calibration results are always
+        This method is the only way to build a `TestProblem` from a candidate; calibration results are always
         supplied from outside, never derived here.
         """
         return TestProblem(id=self.id, formula=self.formula, a=self.a, b=self.b, c_min=c_min, c_max=c_max)
@@ -66,7 +65,7 @@ class CandidateTestProblem:
 # ==================================================================================================
 @dataclass(frozen=True)
 class TestProblem:
-    """A benchmarkable test problem: ``f(x, c)``, its x-interval, and its calibrated c-range.
+    """A `TestProblem` is a benchmarkable test problem: it holds ``f(x, c)``, its x-interval and its calibrated c-range.
 
     The benchmark samples ``c`` within ``[c_min, c_max]``. The benchmark suite pipeline calibrates
     the c-range so that ``f(a, c)`` and ``f(b, c)`` are finite and of opposite signs at every c-value
@@ -97,7 +96,7 @@ class TestProblem:
 
     @property
     def xc_fun(self) -> XCFun:
-        """The ``f(x, c)`` callable, with this function's parameter tuple bound."""
+        """The ``f(x, c)`` callable, with this test problem's parameter tuple bound."""
         return self.formula.bind_xc_fun(self.id.param_values)
 
     def build_x_fun(self, c: float) -> XFun:

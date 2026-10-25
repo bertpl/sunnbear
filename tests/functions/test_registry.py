@@ -419,23 +419,23 @@ def test_bound_formula_calls_math_functions_inside_flop_counting():
 def test_candidate_from_id_and_string():
     """A `ProblemId` and its rendered string rebuild the same calibrated test problem."""
     # --- act --------------------------
-    tf_from_id = FormulaRegistry.candidate_from_id(ProblemId((2, 1, 1), ("p1",), (0.2,))).calibrated(-5.0, 5.0)
-    tf_from_str = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-5.0, 5.0)
+    problem_from_id = FormulaRegistry.candidate_from_id(ProblemId((2, 1, 1), ("p1",), (0.2,))).calibrated(-5.0, 5.0)
+    problem_from_str = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-5.0, 5.0)
 
     # --- assert -----------------------
-    for tf in (tf_from_id, tf_from_str):
-        assert tf.id == ProblemId((2, 1, 1), ("p1",), (0.2,))
-        assert (tf.a, tf.b, tf.c_min, tf.c_max) == (-2.0, 2.0, -5.0, 5.0)
-        assert tf.xc_fun(2.0, 0.0) == pytest.approx(8.0 - 0.4)
+    for problem in (problem_from_id, problem_from_str):
+        assert problem.id == ProblemId((2, 1, 1), ("p1",), (0.2,))
+        assert (problem.a, problem.b, problem.c_min, problem.c_max) == (-2.0, 2.0, -5.0, 5.0)
+        assert problem.xc_fun(2.0, 0.0) == pytest.approx(8.0 - 0.4)
 
 
 def test_build_x_fun():
     """`build_x_fun` fixes `c` and returns the test problem's function as a function of `x` alone."""
     # --- arrange ----------------------
-    tf = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.0]").calibrated(-5.0, 5.0)
+    problem = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.0]").calibrated(-5.0, 5.0)
 
     # --- act --------------------------
-    f = tf.build_x_fun(c=1.0)
+    f = problem.build_x_fun(c=1.0)
 
     # --- assert -----------------------
     assert f(2.0) == pytest.approx(7.0)
@@ -471,8 +471,8 @@ def test_candidate_from_id_rejects_param_names_that_differ_from_the_formula(text
 
 def test_catalog_brackets_change_sign_within_c_range():
     # --- arrange ----------------------
-    tf = FormulaRegistry.candidate_from_id("f2.1.2[p1=5.0]").calibrated(-1.0, 1.0)
+    problem = FormulaRegistry.candidate_from_id("f2.1.2[p1=5.0]").calibrated(-1.0, 1.0)
 
     # --- act / assert -----------------
     for c in (-1.0, 0.0, 1.0):
-        assert tf.xc_fun(tf.a, c) * tf.xc_fun(tf.b, c) < 0
+        assert problem.xc_fun(problem.a, c) * problem.xc_fun(problem.b, c) < 0

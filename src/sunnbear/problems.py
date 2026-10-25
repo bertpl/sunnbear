@@ -2,7 +2,7 @@
 
 - `TestProblem` holds a formula with its parameter values, its interval and the range of its parameter `c`;
 - `ProblemId` identifies a test problem by its formula number and its named parameter values;
-- `XFun` is the type that `TestProblem.build_x_fun` returns, `f(x)` at a fixed `c`; `XCFun` is the type of
+- `XFun` is the return type of `TestProblem.build_x_fun`, `f(x)` at a fixed `c`; `XCFun` is the type of
   `TestProblem.xc_fun`, `f(x, c)`.
 
 How test problems are built from formulas is described in the docstring of the implementation package,

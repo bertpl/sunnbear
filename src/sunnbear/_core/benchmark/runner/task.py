@@ -77,10 +77,10 @@ class BenchmarkTask:
         that runs the task.
 
         Each sample maps its (u, v) tuple to a tolerance `xtol` within the `xtol` range derived from
-        `n_bisection_fevals` by `compute_xtol_range`, and to a value of the function's parameter `c` within
+        `n_bisection_fevals` by `compute_xtol_range`, and to a value of the test problem's parameter `c` within
         `[c_min, c_max]`.
 
-        Every solver solves `f(x, c)` on the function's interval with that tolerance, within the evaluation
+        Every solver solves `f(x, c)` on the test problem's interval with that tolerance, within the evaluation
         budget that `max_fevals_for` derives from `n_bisection_fevals`, and the solve is timed on a monotonic
         clock. The timed span includes recording every evaluated x-value, which the correctness check probes
         first, as `x_candidates`.

@@ -19,15 +19,15 @@ _RENDERED_IDS = [
 #  ProblemId
 # ==================================================================================================
 @pytest.mark.parametrize(
-    "fid, expected",
+    "problem_id, expected",
     [
         (ProblemId((2, 1, 5), ("p1", "p2"), (2.0**1.2, 0.4)), "f2.1.5[p1=2^1.2,p2=0.4]"),
         (ProblemId((7, 1), (), ()), "f7.1"),  # no parameters: the number alone, without brackets
     ],
 )
-def test_problem_id_display_includes_each_parameter_name(fid, expected):
+def test_problem_id_display_includes_each_parameter_name(problem_id, expected):
     """Each value renders as ``name=value`` in its canonical spelling, in `param_names` order."""
-    assert fid.display() == expected
+    assert problem_id.display() == expected
 
 
 def test_problem_id_renders_one_number_alike_however_it_was_authored():
@@ -114,7 +114,7 @@ def test_problem_id_ordering():
     ordered = sorted(ids)
 
     # --- assert -----------------------
-    assert [str(fid) for fid in ordered] == ["f2.1.1[p1=0.2]", "f2.1.1[p1=0.4]", "f2.1.2[p1=1.0]"]
+    assert [str(problem_id) for problem_id in ordered] == ["f2.1.1[p1=0.2]", "f2.1.1[p1=0.4]", "f2.1.2[p1=1.0]"]
 
 
 @pytest.mark.parametrize(

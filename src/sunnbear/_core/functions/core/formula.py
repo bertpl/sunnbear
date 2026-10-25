@@ -1,7 +1,7 @@
 """The `Formula` base class: hand-written function families plus generation metadata.
 
 A formula owns three parameter layers with distinct roles: the recipe-given
-``p`` tuple (bound once per test problem, consciously shaping its character),
+``p`` tuple (bound once per test problem, and chosen deliberately to set its properties),
 the Monte-Carlo parameter ``c`` (varied per benchmark run), and — downstream,
 never stored here — the tolerance ``xtol``.
 
@@ -36,7 +36,7 @@ from .types import XCFun, XFun
 #  Formula
 # ==================================================================================================
 class Formula(FormulaTaxonomyNode, ABC):
-    """One hand-written formula: the mathematics plus metadata to spawn candidate test problems.
+    """A `Formula` holds one hand-written formula: its mathematics and the metadata to build candidate test problems.
 
     Class attributes:
         number: The formula's place in the taxonomy, e.g. ``(2, 1, 1)``; its parent category is
@@ -176,16 +176,10 @@ class Formula(FormulaTaxonomyNode, ABC):
         return cls._compiled_formula_cache
 
     def build_candidate(self, param_values: "tuple[float, ...]") -> CandidateTestProblem:
-        """Build one candidate test problem for a bound parameter tuple.
-
-        The candidate carries this formula and its identity rather than a
-        pre-bound callable: both callable forms are derived on demand
-        (`bind_xc_fun` / `bind_x_fun`), so binding ``c`` costs one closure over
-        the compiled body instead of a wrapper around a wrapper.
-        """
-        fid = ProblemId(self.number, self.param_names, tuple(param_values))
-        a, b = self.interval_bounds(*fid.param_values)
-        return CandidateTestProblem(id=fid, formula=self, a=a, b=b)
+        """Build one candidate test problem for a bound parameter tuple."""
+        problem_id = ProblemId(self.number, self.param_names, tuple(param_values))
+        a, b = self.interval_bounds(*problem_id.param_values)
+        return CandidateTestProblem(id=problem_id, formula=self, a=a, b=b)
 
     def bind_xc_fun(self, values: "tuple[float, ...]") -> XCFun:
         """Bind a parameter tuple over the once-per-class compiled body, yielding ``f(x, c)``."""

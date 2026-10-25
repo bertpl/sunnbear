@@ -177,7 +177,7 @@ class BenchmarkRunInfo(BaseModel):
             other, ignored_fields=_FIELDS_FOR_INFORMATION_ONLY | _FIELDS_LISTING_SOLVERS_AND_PROBLEMS
         )
 
-        # --- solvers and functions in both runs -
+        # --- solvers and problems in both runs --
         common_solver_ids = common_dict_keys(self.solver_versions, other.solver_versions)
         if any_value_of_common_key_differs(self.solver_versions, other.solver_versions):
             differing_fields.append("solver_versions")

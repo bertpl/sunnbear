@@ -24,7 +24,7 @@ as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
   category itself.
 
 The registry itself imports nothing: the shipped formulas and categories are registered when the
-test-problem package imports the formula catalog.
+`sunnbear._core.functions` package imports the formula catalog.
 """
 
 from typing import TYPE_CHECKING, ClassVar
@@ -124,21 +124,26 @@ class FormulaRegistry:
                 parameter tuple fails the formula's validity criteria.
         """
         cls._ensure_taxonomy_validated()
-        fid = ProblemId.from_string(problem_id) if isinstance(problem_id, str) else problem_id
-        formula = cls._formulas_by_number.get(fid.formula_number)
+        if isinstance(problem_id, str):
+            parsed_problem_id = ProblemId.from_string(problem_id)
+        else:
+            parsed_problem_id = problem_id
+        formula = cls._formulas_by_number.get(parsed_problem_id.formula_number)
         if formula is None:
             raise UnknownFormulaError(
-                f"No registered formula with number {FormulaTaxonomyNode.format_number(fid.formula_number)} "
-                f"(id: {fid})."
+                f"No registered formula with number "
+                f"{FormulaTaxonomyNode.format_number(parsed_problem_id.formula_number)} (id: {parsed_problem_id})."
             )
-        if fid.param_names != formula.param_names:
+        if parsed_problem_id.param_names != formula.param_names:
             raise InvalidParamsError(
-                f"Parameter names {list(fid.param_names)} do not match the parameters {list(formula.param_names)} "
-                f"of formula {formula.name} (id: {fid})."
+                f"Parameter names {list(parsed_problem_id.param_names)} do not match the parameters "
+                f"{list(formula.param_names)} of formula {formula.name} (id: {parsed_problem_id})."
             )
-        if not formula.is_param_tuple_valid(*fid.param_values):
-            raise InvalidParamsError(f"Parameter values are invalid for formula {formula.name} (id: {fid}).")
-        return formula.build_candidate(fid.param_values)
+        if not formula.is_param_tuple_valid(*parsed_problem_id.param_values):
+            raise InvalidParamsError(
+                f"Parameter values are invalid for formula {formula.name} (id: {parsed_problem_id})."
+            )
+        return formula.build_candidate(parsed_problem_id.param_values)
 
     # --------------------------------------------------------------------------
     #  Taxonomy checks

@@ -11,13 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Rename test functions to test problems: `TestFunction`, `FunctionId`, the results column `function_id`, `run_benchmark`'s argument `functions`, and the module `sunnbear.functions`
+- Rename test functions to test problems, replacing "function" with "problem" in `TestFunction`, `FunctionId`, the module `sunnbear.functions`, the results column `function_id` and `run_benchmark`'s argument `functions`
 
 ### Deprecated
 
 ### Removed
 
-- Remove every name from `sunnbear.functions` except `TestFunction`, `FunctionId`, `XFun` and `XCFun`, remove `generate_mc_tuples` from `sunnbear.benchmark`, and remove the module `sunnbear.stats`
+- Remove every name from `sunnbear.functions`, now `sunnbear.problems`, except `TestProblem`, `ProblemId`, `XFun` and `XCFun`, remove `generate_mc_tuples` from `sunnbear.benchmark`, and remove the module `sunnbear.stats`
 - Remove `FormulaTaxonomyError`, `InvalidParamsError`, `UnknownFormulaError` and `MCTuplesConstructionError` from `sunnbear.exceptions`
 
 ### Fixed

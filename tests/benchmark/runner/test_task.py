@@ -173,7 +173,7 @@ def test_only_converged_solves_are_checked_with_the_evaluated_x_values_as_candid
 
 
 def test_a_task_holds_only_ids_and_survives_pickling(cubic):
-    """A task holds the ids of its function and solvers, and a pickled copy, as a worker receives it, runs alike."""
+    """A task holds the ids of its test problem and solvers, and a pickled copy, as a worker receives it, runs alike."""
     # --- arrange ----------------------
     configs = [SolverConfigRegistry.config_from_id("bisection")]
     task_on_cubic = _task_on_cubic(cubic, configs)

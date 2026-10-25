@@ -24,7 +24,7 @@ formulas: a formula's number, e.g. ``(2, 1, 1)``, is its category's number, ``(2
 (see `taxonomy`).
 
 `FormulaRegistry.candidate_from_id` re-enters this chain from a stored identity,
-rebuilding the `CandidateTestProblem` that a suite's c-range then calibrates.
+rebuilding the `CandidateTestProblem`, to which `CandidateTestProblem.calibrated` then attaches a suite's c-range.
 
 This package imports nothing from the packages beside it: the shipped formulas in
 `catalog` register themselves when their modules are imported, and the parent
@@ -41,9 +41,8 @@ Ownership summary:
   identity (`ProblemId` — the formula number and its named parameter tuple, stable, rendered in
   one canonical spelling, and human-readable), candidate assembly and enumeration,
   and lookup (`FormulaRegistry`).
-- `CandidateTestProblem` vs `TestProblem` differ by exactly one fact — whether a
-  calibrated c-range exists — kept as two types so calibrated-ness is a
-  property of the type, not a nullable field.
+- `CandidateTestProblem` and `TestProblem` (in `test_problem`) are a candidate before and after its c-range is
+  calibrated; that module explains why they are 2 types.
 """
 
 from .category import USER_DEFINED_FORMULA_CATEGORY_NUMBER, FormulaCategory
