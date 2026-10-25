@@ -88,6 +88,7 @@ def calibrate_c_range(xc_fun: XCFun, a: float, b: float, *, mc_tuples: MCTuples)
         n_returns = 0
         while True:
             c_range = CRange(c_min=-bounds[0], c_max=bounds[1])
+            # The c-values that the benchmark samples within this trial c-range, which step 5 checks.
             c_values = MCSolveSettings.map_v_onto_c_range(mc_tuples.v, c_range)
             failing_side_idxs = [
                 idx for idx, side_search in enumerate(side_searches) if not side_search.is_met_at_each(c_values)

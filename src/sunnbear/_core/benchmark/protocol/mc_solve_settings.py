@@ -1,4 +1,4 @@
-"""`MCSolveSettings` holds the settings of a test problem's solves at the tuples of a Monte Carlo tuple set."""
+"""`MCSolveSettings` holds the settings of a test problem's solves, 1 solve per tuple of a Monte Carlo tuple set."""
 
 from dataclasses import dataclass
 
@@ -16,7 +16,7 @@ from .tolerances import compute_xtol_range, max_fevals_for
 # ==================================================================================================
 @dataclass(frozen=True, kw_only=True)
 class MCSolveSettings:
-    """`MCSolveSettings` holds the `xtol`, the ``c`` and the evaluation budget of a test problem's solve at each tuple.
+    """`MCSolveSettings` holds each solve's `xtol`, ``c`` and evaluation budget for a test problem, 1 solve per tuple.
 
     Each tuple ``(u, v)`` of `mc_tuples` sets the tolerance and the parameter of 1 solve:
 
@@ -64,10 +64,7 @@ class MCSolveSettings:
 
     @staticmethod
     def map_v_onto_c_range(v: np.ndarray, c_range: CRange) -> np.ndarray:
-        """Return ``c = c_min + v * (c_max - c_min)`` for each value of `v`, so that ``c`` is uniform within `c_range`.
-
-        Calibration calls this method to find the c-values that the benchmark samples within a trial c-range.
-        """
+        """Return ``c = c_min + v * (c_max - c_min)`` for each `v`, so that ``c`` is uniform within `c_range`."""
         return c_range.c_min + v * (c_range.c_max - c_range.c_min)
 
     # --------------------------------------------------------------------------
@@ -77,7 +74,7 @@ class MCSolveSettings:
     def from_test_problem(
         cls, problem: TestProblem, *, n_bisection_fevals: int, mc_tuples: MCTuples
     ) -> "MCSolveSettings":
-        """Return the settings of the solves of a calibrated test problem, with its interval and its c-range."""
+        """Return the settings of a calibrated test problem's solves, taking `a`, `b` and the c-range from it."""
         return cls(
             a=problem.a,
             b=problem.b,

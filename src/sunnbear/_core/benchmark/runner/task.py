@@ -71,7 +71,7 @@ class BenchmarkTask:
         that runs the task.
 
         Each sample maps its (u, v) tuple to a tolerance `xtol` and a value of the test problem's parameter `c`,
-        as `MCSolveSettings` defines from `n_bisection_fevals` and `[c_min, c_max]`.
+        as `MCSolveSettings` defines from `n_bisection_fevals` and the test problem's c-range `[c_min, c_max]`.
 
         Every solver solves `f(x, c)` on the test problem's interval with that tolerance, within the evaluation
         budget of `MCSolveSettings`, and the solve is timed on a monotonic clock. The timed span includes recording

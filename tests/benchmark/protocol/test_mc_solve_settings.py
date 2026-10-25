@@ -10,21 +10,23 @@ from sunnbear._core.problems.core import FormulaRegistry
 
 
 def test_the_settings_map_u_log_uniformly_onto_the_xtol_range_and_v_linearly_onto_the_c_range():
-    """u = 0.5 lands at the geometric mean of the bounds of the `xtol` range, and v places c linearly within the
-    c-range."""
+    """u = 0.5 maps to the geometric mean of the bounds of the `xtol` range, v sets c linearly within the c-range,
+    and every solve gets the evaluation budget of `max_fevals_for`."""
     # --- arrange ----------------------
     mc_tuples = MCTuples([0.5, 0.25], [0.5, 0.25])
     xtol_min, xtol_max = compute_xtol_range(a=-1.0, b=3.0, n_bisection_fevals=5)
 
     # --- act --------------------------
-    settings = MCSolveSettings(
+    mc_solve_settings = MCSolveSettings(
         a=-1.0, b=3.0, n_bisection_fevals=5, c_range=CRange(c_min=-2.0, c_max=2.0), mc_tuples=mc_tuples
     )
 
     # --- assert -----------------------
-    assert settings.xtols == pytest.approx([np.sqrt(xtol_min * xtol_max), xtol_min * (xtol_max / xtol_min) ** 0.25])
-    assert settings.cs == pytest.approx([0.0, -1.0])
-    assert settings.max_fevals == max_fevals_for(n_bisection_fevals=5)
+    assert mc_solve_settings.xtols == pytest.approx(
+        [np.sqrt(xtol_min * xtol_max), xtol_min * (xtol_max / xtol_min) ** 0.25]
+    )
+    assert mc_solve_settings.cs == pytest.approx([0.0, -1.0])
+    assert mc_solve_settings.max_fevals == max_fevals_for(n_bisection_fevals=5)
 
 
 def test_the_settings_of_a_test_problem_take_its_interval_and_its_c_range():
@@ -34,10 +36,10 @@ def test_the_settings_of_a_test_problem_take_its_interval_and_its_c_range():
     mc_tuples = MCTuples([0.5, 0.25], [0.5, 0.25])
 
     # --- act --------------------------
-    settings = MCSolveSettings.from_test_problem(problem, n_bisection_fevals=40, mc_tuples=mc_tuples)
+    mc_solve_settings = MCSolveSettings.from_test_problem(problem, n_bisection_fevals=40, mc_tuples=mc_tuples)
 
     # --- assert -----------------------
-    assert (settings.a, settings.b) == (problem.a, problem.b)
-    assert settings.c_range == CRange(c_min=-1.0, c_max=0.5)
-    assert settings.n_bisection_fevals == 40
-    assert settings.mc_tuples is mc_tuples
+    assert (mc_solve_settings.a, mc_solve_settings.b) == (problem.a, problem.b)
+    assert mc_solve_settings.c_range == CRange(c_min=-1.0, c_max=0.5)
+    assert mc_solve_settings.n_bisection_fevals == 40
+    assert mc_solve_settings.mc_tuples is mc_tuples
