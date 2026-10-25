@@ -23,7 +23,8 @@ class Epperson201331125(Formula):
     With ``modified = 1``, the formula evaluates the published function at ``x + 1``, on the published interval shifted
     by -1, ``[-0.002, 0.002]``, which lies around 0.
 
-    With ``modified = 2``, the formula evaluates the function of ``modified = 1`` as ``x**5``, on the same interval.
+    With ``modified = 2``, the formula computes the function of ``modified = 1`` in the equivalent form ``x**5``, on
+    the same interval.
 
     With ``modified = 1`` or ``2``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new
     interval.
@@ -35,8 +36,8 @@ class Epperson201331125(Formula):
     The test problem with ``modified = 1`` does not satisfy the conditions either, because they require bisection to
     spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of f.
 
-    ``x + 1`` rounds x to the spacing of the floats near 1, about 2.2e-16, so that f is exactly 0 where ``abs(x)`` is
-    below about 1.1e-16; ``x**5`` keeps all bits of x.
+    With ``modified = 1``, adding 1 to x rounds x to the spacing of the floats near 1, about 2.2e-16, so that f is
+    exactly 0 where ``abs(x)`` is below about 1.1e-16; ``x**5`` adds nothing to x, so it does not round x.
     """
 
     number = (1, 4, 5, 23)

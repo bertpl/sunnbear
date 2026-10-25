@@ -294,7 +294,7 @@ def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table
 
 
 def test_modified_formulas_are_the_formulas_with_the_parameter_modified(script_modules):
-    """`MODIFIED_FORMULAS` holds 1 type for each level above 0 of each formula of category 1 with ``modified``."""
+    """`MODIFIED_FORMULAS` holds 1 type for each level above 0 of each formula of category 1 that has ``modified``."""
     # --- act --------------------------
     levels_per_formula_id = {}
     for formula in _CATEGORY_1_FORMULAS:
@@ -357,7 +357,7 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, scrip
     round to the same float.
 
     The test skips a test problem with ``modified > 0`` where ``ModificationType.is_c_scale_shift_kept`` is false
-    for 1 of its levels, because such a test problem applies ``c`` with no factor ``c_scale``.
+    for any of its levels, because such a test problem applies ``c`` with no factor ``c_scale``.
     """
     # --- arrange ----------------------
     tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))

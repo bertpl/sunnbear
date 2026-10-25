@@ -24,7 +24,11 @@ class Atkinson1989136(Formula):
     With ``modified = 1``, the formula evaluates the published function at ``x + 1``, on the published interval shifted
     by -1, which lies around 0: ``[-1, 1]`` for ``[0, 2]``, and ``[-0.002, 0.002]`` for ``[0.998, 1.002]``.
 
-    With ``modified = 2``, the formula evaluates the function of ``modified = 1`` as ``x**3``, on the same interval.
+    With ``modified = 2``, the formula computes the function of ``modified = 1`` in the equivalent form ``x**3``, on
+    the same interval.
+
+    The test problem on ``[0, 2]`` has a version with ``modified = 1`` only so that its version with ``modified = 2``
+    can build on it; the shift alone does not make it satisfy the benchmark suite inclusion conditions.
 
     With ``modified = 1`` or ``2``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new
     interval.
@@ -34,8 +38,8 @@ class Atkinson1989136(Formula):
     above the conditions' limit of 100.
 
     The published test problem on ``[0, 2]`` and the test problems with ``modified = 1`` do not satisfy the conditions
-    either, because they require bisection to spend a fixed number of evaluations, and bisection stops early where a
-    midpoint lands on an exact 0 of f.
+    either, because the conditions require bisection to spend a fixed number of evaluations, and bisection stops early
+    where a midpoint lands on an exact 0 of f.
 
     Near the root, the terms of the published form cancel, so that f is exactly 0 at many x-values within about 1e-5 of
     the root; ``x**3`` has no terms that cancel.
