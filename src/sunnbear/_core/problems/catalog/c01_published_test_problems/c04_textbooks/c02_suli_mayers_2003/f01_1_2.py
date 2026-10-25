@@ -42,6 +42,11 @@ class SuliMayers200312(Formula):
 
     The ratio of the narrow published interval's largest bound to its width, about 52,500, is also above the conditions'
     limit of 100.
+
+    With ``modified = 1``, the modification changes what the test problem tests: the source uses the function to show
+    that where f changes sign an even number of times on an interval, as at its 2 roots only ``2/M`` apart, a
+    subinterval on which f changes sign can be hard to find. Each modified interval is such a subinterval, around the
+    left root.
     """
 
     number = (1, 4, 2, 1)

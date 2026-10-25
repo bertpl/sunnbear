@@ -29,6 +29,9 @@ class Borchers2026522(Formula):
     The published test problem does not satisfy the benchmark suite inclusion conditions, because the published
     interval's bounds are the roots -2 and 2, where float64 ``pi`` makes ``f`` slightly negative at both, so that
     ``f(a)`` and ``f(b)`` have the same sign.
+
+    With ``modified = 1``, the modification changes what the test problem tests: the source gives ``[-2, 2]`` to
+    ``findzeros``, which returns every root in an interval, and a solver on ``[-2.04, 1.96]`` finds 1 of its roots.
     """
 
     number = (1, 3, 5, 13)

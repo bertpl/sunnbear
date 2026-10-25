@@ -32,6 +32,10 @@ class ChapraCanale2015Ex52(Formula):
     The published test problems on ``[3, 5]`` and ``[4.2, 4.3]`` do not satisfy the benchmark suite inclusion
     conditions, because the 2 published intervals hold 6 and 2 roots, even numbers, so that ``f(a)`` and ``f(b)`` have
     the same sign.
+
+    With ``modified = 1``, the modification changes what the test problem on ``[4.2, 4.26]`` tests: the source enlarges
+    the plot to ``[4.2, 4.3]`` to show that the apparent double root near 4.2 is 2 distinct roots, at about 4.23 and
+    4.26 (Fig. 5.4(c)), and ``[4.2, 4.26]`` holds only the first.
     """
 
     number = (1, 4, 6, 2)
