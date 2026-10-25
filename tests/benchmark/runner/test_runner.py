@@ -24,9 +24,9 @@ _EXTERNAL_SOLVER_CONFIG_MODULE_NAME = f"{__name__.rpartition('.')[0]}.external_s
 # ==================================================================================================
 #  Fixtures
 # ==================================================================================================
-# The test functions of the 2 formulas alternate in the list, so the tests check that the run groups them by
-# formula: both test functions of f2.1.1 run first.
-_FUNCTION_IDS = ("f2.1.1[p1=0.2]", "f2.1.2[p1=3.0]", "f2.1.1[p1=0.4]")
+# The test problems of the 2 formulas alternate in the list, so the tests check that the run groups them by
+# formula: both test problems of f2.1.1 run first.
+_PROBLEM_IDS = ("f2.1.1[p1=0.2]", "f2.1.2[p1=3.0]", "f2.1.1[p1=0.4]")
 _SOLVER_IDS = ("bisection", "regula_falsi")
 
 
@@ -37,8 +37,8 @@ def _run_inputs(run_dir: Path, **changes: object) -> dict[str, object]:
     """
     return {
         "solver_configs": [SolverConfigRegistry.config_from_id(solver_id) for solver_id in _SOLVER_IDS],
-        "functions": [
-            FormulaRegistry.candidate_from_id(function_id).calibrated(-1.0, 1.0) for function_id in _FUNCTION_IDS
+        "problems": [
+            FormulaRegistry.candidate_from_id(problem_id).calibrated(-1.0, 1.0) for problem_id in _PROBLEM_IDS
         ],
         "run_dir": run_dir,
         "root_seed": 1,
@@ -75,8 +75,8 @@ def test_a_run_writes_1_results_file_per_formula_and_loads_every_solve(finished_
         "run_info.json",
     ]
     assert dict(results.schema) == RESULTS_SCHEMA
-    assert results.height == len(_FUNCTION_IDS) * len(_SOLVER_IDS) * MC_SIZE
-    assert results["function_id"].unique(maintain_order=True).to_list() == [
+    assert results.height == len(_PROBLEM_IDS) * len(_SOLVER_IDS) * MC_SIZE
+    assert results["problem_id"].unique(maintain_order=True).to_list() == [
         "f2.1.1[p1=0.2]",
         "f2.1.1[p1=0.4]",
         "f2.1.2[p1=3.0]",
@@ -117,7 +117,7 @@ def test_resuming_a_finished_run_changes_nothing(finished_run_dir, monkeypatch):
     file_contents_before = {path.name: path.read_bytes() for path in finished_run_dir.iterdir()}
 
     def fail_if_run(self: BenchmarkTask) -> pl.DataFrame:
-        raise AssertionError(f"Task on {self.function_id} ran again.")
+        raise AssertionError(f"Task on {self.problem_id} ran again.")
 
     monkeypatch.setattr(BenchmarkTask, "run", fail_if_run)
 
@@ -132,12 +132,12 @@ def test_a_crashed_run_resumes_with_only_its_unfinished_tasks(finished_run_dir, 
     """After a crash in the 2nd task, resuming runs only the 2 tasks without staged results, and the results match."""
     # --- arrange ----------------------
     run_task = BenchmarkTask.run
-    function_ids_run: list[str] = []
+    problem_ids_run: list[str] = []
     is_crashing_on_2nd_task = True
 
     def run_and_crash_on_2nd_task(self: BenchmarkTask) -> pl.DataFrame:
-        function_ids_run.append(self.function_id)
-        if is_crashing_on_2nd_task and len(function_ids_run) == 2:
+        problem_ids_run.append(self.problem_id)
+        if is_crashing_on_2nd_task and len(problem_ids_run) == 2:
             raise RuntimeError("crash")
         return run_task(self)
 
@@ -146,7 +146,7 @@ def test_a_crashed_run_resumes_with_only_its_unfinished_tasks(finished_run_dir, 
         run_benchmark(**_run_inputs(tmp_path))
     with pytest.raises(BenchmarkRunError, match="not finished"):
         load_results(tmp_path)
-    function_ids_run.clear()
+    problem_ids_run.clear()
     is_crashing_on_2nd_task = False
 
     # --- act --------------------------
@@ -154,7 +154,7 @@ def test_a_crashed_run_resumes_with_only_its_unfinished_tasks(finished_run_dir, 
 
     # --- assert -----------------------
     # The 1st task's results were staged before the crash, so only the crashed task and the next one run.
-    assert function_ids_run == ["f2.1.1[p1=0.4]", "f2.1.2[p1=3.0]"]
+    assert problem_ids_run == ["f2.1.1[p1=0.4]", "f2.1.2[p1=3.0]"]
     assert _results_without_wall_time(tmp_path).equals(_results_without_wall_time(finished_run_dir))
 
 
@@ -167,7 +167,7 @@ def test_a_run_that_stopped_before_writing_a_results_file_writes_it_from_the_sta
     # --- arrange ----------------------
     write_formula_results = BenchmarkRunDir.write_formula_results
 
-    def crash_before_writing_formula_results(self: BenchmarkRunDir, formula_id: str, n_functions: int) -> None:
+    def crash_before_writing_formula_results(self: BenchmarkRunDir, formula_id: str, n_problems: int) -> None:
         raise RuntimeError("crash")
 
     monkeypatch.setattr(BenchmarkRunDir, "write_formula_results", crash_before_writing_formula_results)
@@ -175,10 +175,10 @@ def test_a_run_that_stopped_before_writing_a_results_file_writes_it_from_the_sta
         run_benchmark(**_run_inputs(tmp_path))
     monkeypatch.setattr(BenchmarkRunDir, "write_formula_results", write_formula_results)
     run_task = BenchmarkTask.run
-    function_ids_run: list[str] = []
+    problem_ids_run: list[str] = []
 
     def record_and_run(self: BenchmarkTask) -> pl.DataFrame:
-        function_ids_run.append(self.function_id)
+        problem_ids_run.append(self.problem_id)
         return run_task(self)
 
     monkeypatch.setattr(BenchmarkTask, "run", record_and_run)
@@ -187,8 +187,8 @@ def test_a_run_that_stopped_before_writing_a_results_file_writes_it_from_the_sta
     run_benchmark(**_run_inputs(tmp_path))
 
     # --- assert -----------------------
-    # The results of both test functions of f2.1.1 were staged before the crash, so only f2.1.2's task runs.
-    assert function_ids_run == ["f2.1.2[p1=3.0]"]
+    # The results of both test problems of f2.1.1 were staged before the crash, so only f2.1.2's task runs.
+    assert problem_ids_run == ["f2.1.2[p1=3.0]"]
     assert _results_without_wall_time(tmp_path).equals(_results_without_wall_time(finished_run_dir))
 
 
@@ -199,8 +199,8 @@ def test_a_run_that_stopped_before_writing_a_results_file_writes_it_from_the_sta
         ({"mc_size": 64}, "run_settings"),
         ({"solver_configs": [SolverConfigRegistry.config_from_id("bisection")]}, "solver_versions"),
         (
-            {"functions": [FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-0.5, 0.5)]},
-            "function_infos",
+            {"problems": [FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-0.5, 0.5)]},
+            "problem_infos",
         ),
     ],
 )
@@ -215,10 +215,10 @@ def test_resuming_with_other_inputs_is_refused(finished_run_dir, changes, differ
     "changes, message",
     [
         ({"solver_configs": []}, "solver_configs must hold at least 1 item"),
-        ({"functions": []}, "functions must hold at least 1 item"),
+        ({"problems": []}, "problems must hold at least 1 item"),
         (
-            {"functions": [FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-1.0, 1.0)] * 2},
-            r"functions holds these ids more than once: \['f2.1.1\[p1=0.2\]'\]",
+            {"problems": [FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-1.0, 1.0)] * 2},
+            r"problems holds these ids more than once: \['f2.1.1\[p1=0.2\]'\]",
         ),
         ({"mc_size": 33}, "size must be one of"),
         ({"n_bisection_fevals": 1}, "n_bisection_fevals must be at least 2"),
@@ -253,7 +253,7 @@ def test_the_runs_of_each_solver_load_as_the_table_of_1_run_of_both(finished_run
     run_dirs = [tmp_path / solver_id for solver_id in _SOLVER_IDS]
     for solver_id, run_dir in zip(_SOLVER_IDS, run_dirs, strict=True):
         run_benchmark(**_run_inputs(run_dir, solver_configs=[SolverConfigRegistry.config_from_id(solver_id)]))
-    sort_columns = ["function_id", "mc_sample_idx", "solver_id"]
+    sort_columns = ["problem_id", "mc_sample_idx", "solver_id"]
 
     # --- act --------------------------
     results = load_results(run_dirs).drop("wall_time_ns").collect()

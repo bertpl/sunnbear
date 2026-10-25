@@ -11,7 +11,7 @@ from pathlib import Path
 import polars as pl
 import pytest
 
-import sunnbear.functions as functions  # Import the module, so that pytest does not collect the `TestFunction` class.
+import sunnbear.problems as problems  # Import the module, so that pytest does not collect the `TestProblem` class.
 from sunnbear._core.functions.core import FormulaRegistry
 from sunnbear._core.stats import gpq
 from sunnbear.benchmark import (
@@ -32,18 +32,18 @@ SOLVER_IDS = ("bisection", "regula_falsi")
 
 
 @pytest.fixture(scope="module")
-def cubic() -> functions.TestFunction:
+def cubic() -> problems.TestProblem:
     """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to a range of ``c``."""
     return FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
 
 
 @pytest.fixture(scope="module")
-def run_dir(cubic: functions.TestFunction, tmp_path_factory: pytest.TempPathFactory) -> Path:
+def run_dir(cubic: problems.TestProblem, tmp_path_factory: pytest.TempPathFactory) -> Path:
     """Return the directory of a run of both solvers on the cubic."""
     run_dir = tmp_path_factory.mktemp("run")
     run_benchmark(
         solver_configs=[SolverConfigRegistry.config_from_id(solver_id) for solver_id in SOLVER_IDS],
-        functions=[cubic],
+        problems=[cubic],
         run_dir=run_dir,
         mc_size=MCTuplesSize.SIZE_32,
         n_workers=1,
@@ -60,7 +60,7 @@ def test_the_results_table_has_the_schema_and_1_row_per_solver_and_sample(run_di
     assert dict(results.schema) == RESULTS_SCHEMA
     assert results.height == len(SOLVER_IDS) * MCTuplesSize.SIZE_32
     assert results["solver_id"].unique(maintain_order=True).to_list() == list(SOLVER_IDS)
-    assert results["function_id"].unique().to_list() == [str(cubic.id)]
+    assert results["problem_id"].unique().to_list() == [str(cubic.id)]
 
 
 def test_every_sample_s_xtol_c_and_budget_follow_the_protocol(run_dir, cubic):

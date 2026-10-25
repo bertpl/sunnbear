@@ -1,8 +1,8 @@
-"""`run_benchmark` runs solvers on test functions over the Monte Carlo samples, writing the results to a run directory.
+"""`run_benchmark` runs solvers on test problems over the Monte Carlo samples, writing the results to a run directory.
 
-A run is 1 `BenchmarkTask` per test function, run by a `WorkerPool` in worker processes. Each task's
+A run is 1 `BenchmarkTask` per test problem, run by a `WorkerPool` in worker processes. Each task's
 results are written to a file of their own under the run directory's `staging/` as the task finishes, and a
-formula's results file is written as soon as all of the formula's test functions have finished.
+formula's results file is written as soon as all of the formula's test problems have finished.
 
 The run info is written before the first task, so a call that resumes the run can check its inputs and
 versions against the stored run info.
@@ -17,7 +17,7 @@ from pathlib import Path
 import polars as pl
 
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS
-from sunnbear._core.functions.core import TestFunction
+from sunnbear._core.functions.core import TestProblem
 from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.utils.module_imports import worker_pool_for_modules
 
@@ -26,7 +26,7 @@ from .run_info import BenchmarkRunInfo
 from .run_settings import BenchmarkRunSettings
 from .task import BenchmarkTask
 
-# The default size of a run's Monte Carlo tuple set, which is the number of samples per (solver, test function) pair.
+# The default size of a run's Monte Carlo tuple set, which is the number of samples per (solver, test problem) pair.
 DEFAULT_MC_SIZE = 256
 
 # The default root seed of a run, from which every seed of the run is derived.
@@ -39,19 +39,19 @@ DEFAULT_ROOT_SEED = 42
 def run_benchmark(
     *,
     solver_configs: Sequence[SolverConfig],
-    functions: Sequence[TestFunction],
+    problems: Sequence[TestProblem],
     run_dir: Path,
     root_seed: int = DEFAULT_ROOT_SEED,
     mc_size: int = DEFAULT_MC_SIZE,
     n_bisection_fevals: int = DEFAULT_N_BISECTION_FEVALS,
     n_workers: int | None = None,
 ) -> None:
-    """Run every solver config on every calibrated test function over `mc_size` Monte Carlo samples, into `run_dir`.
+    """Run every solver config on every calibrated test problem over `mc_size` Monte Carlo samples, into `run_dir`.
 
     When `run_dir` holds no run, the run starts there. When `run_dir` holds a run, the call resumes that run:
 
     - a formula whose results file exists is skipped;
-    - within the other formulas, a test function whose results are already stored in the run directory is
+    - within the other formulas, a test problem whose results are already stored in the run directory is
       skipped.
 
     A run only resumes with the same inputs, and with the same package and data artifact versions, because
@@ -60,11 +60,11 @@ def run_benchmark(
 
     Args:
         solver_configs: The solver configs to run; their order is the order of each sample's result rows.
-        functions: The calibrated test functions to run, each with its c-range. Their result rows are grouped by
+        problems: The calibrated test problems to run, each with its c-range. Their result rows are grouped by
             formula, formulas in order of first appearance, not in the order passed.
         run_dir: The run directory, created when it does not exist.
         root_seed: The run's root seed, from which every seed of the run is derived, such as the seed of the
-            correctness check for each pair of test function and sample.
+            correctness check for each pair of test problem and sample.
         mc_size: The size of the Monte Carlo tuple set, 1 of `MCTuplesSize`.
         n_bisection_fevals: The number of function evaluations that bisection spends on each solve; every solve's
             `xtol` range follows from `n_bisection_fevals` (see `compute_xtol_range`), and every solve's evaluation
@@ -79,7 +79,7 @@ def run_benchmark(
     Raises:
         ValueError: If an input is invalid, which leaves `run_dir` unwritten:
 
-            - `solver_configs` or `functions` is empty or holds an id twice;
+            - `solver_configs` or `problems` is empty or holds an id twice;
             - `mc_size` is not 1 of `MCTuplesSize`;
             - `n_bisection_fevals` is below 2;
             - `n_workers` is below 1, or above 1 while a formula or solver config is defined in an
@@ -91,38 +91,36 @@ def run_benchmark(
     worker_pool = worker_pool_for_modules(
         n_workers=n_workers,
         module_names={config.declaring_module_name for config in solver_configs}
-        | {type(function.formula).__module__ for function in functions},
+        | {type(problem.formula).__module__ for problem in problems},
     )
     benchmark_run_dir = BenchmarkRunDir(run_dir)
     run_info = benchmark_run_dir.store_or_check_run_info(
-        BenchmarkRunInfo.for_current_inputs(
-            run_settings=run_settings, solver_configs=solver_configs, functions=functions
-        )
+        BenchmarkRunInfo.for_current_inputs(run_settings=run_settings, solver_configs=solver_configs, problems=problems)
     )
 
     # --- collect the unfinished tasks -----------
     tasks: dict[tuple[str, int], BenchmarkTask] = {}
-    n_functions_by_formula_id: dict[str, int] = {}
+    n_problems_by_formula_id: dict[str, int] = {}
     for formula_id in run_info.formula_ids:
         if benchmark_run_dir.has_formula_results(formula_id):
             continue
-        formula_functions = [function for function in functions if function.id.formula_id == formula_id]
-        n_functions_by_formula_id[formula_id] = len(formula_functions)
-        for function_idx, function in enumerate(formula_functions):
-            if not benchmark_run_dir.has_staged_function_results(formula_id, function_idx):
-                tasks[formula_id, function_idx] = BenchmarkTask.from_test_function(
-                    function=function, solver_configs=solver_configs, run_settings=run_settings
+        formula_problems = [problem for problem in problems if problem.id.formula_id == formula_id]
+        n_problems_by_formula_id[formula_id] = len(formula_problems)
+        for problem_idx, problem in enumerate(formula_problems):
+            if not benchmark_run_dir.has_staged_problem_results(formula_id, problem_idx):
+                tasks[formula_id, problem_idx] = BenchmarkTask.from_test_problem(
+                    problem=problem, solver_configs=solver_configs, run_settings=run_settings
                 )
 
     # --- run the tasks, write results files -----
-    # A run that stopped after staging the results of a formula's last test function has only the formula's
+    # A run that stopped after staging the results of a formula's last test problem has only the formula's
     # results file left to write.
-    for formula_id, n_functions in n_functions_by_formula_id.items():
-        benchmark_run_dir.write_formula_results_if_all_staged(formula_id, n_functions)
+    for formula_id, n_problems in n_problems_by_formula_id.items():
+        benchmark_run_dir.write_formula_results_if_all_staged(formula_id, n_problems)
     with worker_pool:
-        for (formula_id, function_idx), results in worker_pool.run(tasks):
-            benchmark_run_dir.stage_function_results(formula_id, function_idx, results)
-            benchmark_run_dir.write_formula_results_if_all_staged(formula_id, n_functions_by_formula_id[formula_id])
+        for (formula_id, problem_idx), results in worker_pool.run(tasks):
+            benchmark_run_dir.stage_problem_results(formula_id, problem_idx, results)
+            benchmark_run_dir.write_formula_results_if_all_staged(formula_id, n_problems_by_formula_id[formula_id])
 
     benchmark_run_dir.mark_finished(run_info)
 
@@ -136,8 +134,8 @@ def load_results(run_dirs: Path | Sequence[Path]) -> pl.LazyFrame:
     The rows of several runs follow each other in the order of `run_dirs`. Every pair of runs must be combinable:
 
     - both runs must depend on the same inputs and versions, except that the runs may cover different solvers and
-      test functions;
-    - no solver may have run on the same test function in both runs.
+      test problems;
+    - no solver may have run on the same test problem in both runs.
 
     A query on the frame reads only the files, row groups and columns that it needs. The columns and their
     types are those of `RESULTS_SCHEMA`.

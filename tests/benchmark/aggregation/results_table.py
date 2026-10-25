@@ -15,7 +15,7 @@ def results_table(rows: list[dict[str, object]]) -> pl.DataFrame:
     defaults: dict[str, object] = {
         "solver_id": "bisection",
         "solver_version": 1,
-        "function_id": "f2.1.1[p1=0.2]",
+        "problem_id": "f2.1.1[p1=0.2]",
         "mc_size": 32,
         "mc_sample_idx": 0,
         "u": 0.5,

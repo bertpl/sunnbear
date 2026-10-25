@@ -56,8 +56,8 @@ def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(i
 
     # --- assert -----------------------
     assert output.table.schema == pl.Schema({**CANDIDATES_SCHEMA, **C_RANGE_SCHEMA})
-    [(function_id, a, b, c_min, c_max)] = output.table.rows()
-    assert (function_id, a, b) == ("f99.901", -1.0, 1.0)
+    [(problem_id, a, b, c_min, c_max)] = output.table.rows()
+    assert (problem_id, a, b) == ("f99.901", -1.0, 1.0)
     assert c_min < 0.0 < c_max
     rejected_candidates = output.reports[REJECTED_CANDIDATES_REPORT_NAME]
     assert rejected_candidates.schema == pl.Schema({**CANDIDATES_SCHEMA, **REJECTED_BY_SCHEMA})

@@ -1,4 +1,4 @@
-"""These tests assert that both algorithms of `TOMS748` converge to a root of the test functions."""
+"""These tests assert that both algorithms of `TOMS748` converge to a root of the example functions."""
 
 import pytest
 

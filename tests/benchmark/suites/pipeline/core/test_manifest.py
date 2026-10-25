@@ -16,7 +16,7 @@ def test_the_manifest_counts_the_rows_and_the_dropped_rows_and_records_the_input
     # --- arrange ----------------------
     first_manifest = PipelineStageManifest.from_stage_output(
         stage=ExampleNumbersStage(),
-        table=pl.DataFrame({"function_id": ["n1", "n2", "n3"]}),
+        table=pl.DataFrame({"problem_id": ["n1", "n2", "n3"]}),
         output_sha256="ab" * 32,
         report_sha256s={},
         input_manifest=None,
@@ -28,7 +28,7 @@ def test_the_manifest_counts_the_rows_and_the_dropped_rows_and_records_the_input
     # --- act --------------------------
     manifest = PipelineStageManifest.from_stage_output(
         stage=ExampleSmallNumbersStage(),
-        table=pl.DataFrame({"function_id": ["n1", "n2"]}),
+        table=pl.DataFrame({"problem_id": ["n1", "n2"]}),
         output_sha256="cd" * 32,
         report_sha256s={"large_numbers": "ef" * 32},
         input_manifest=first_manifest,

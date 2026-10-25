@@ -1,5 +1,5 @@
 """This module defines helpers that create throwaway formula and category classes for the tests of the
-test-function layer.
+test-problem layer.
 
 Defining a formula or category class registers it, so a test that calls these helpers uses the
 ``isolated_formula_registry`` fixture.

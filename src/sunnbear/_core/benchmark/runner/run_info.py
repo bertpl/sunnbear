@@ -1,10 +1,10 @@
-"""`BenchmarkRunInfo` records what a run's results depend on, with 1 `BenchmarkRunFunctionInfo` per test function.
+"""`BenchmarkRunInfo` records what a run's results depend on, with 1 `BenchmarkRunProblemInfo` per test problem.
 
 A run's results depend on:
 
 - its `BenchmarkRunSettings`;
 - the solvers, by id and version;
-- the test functions, by id and calibrated c-range;
+- the test problems, by id and calibrated c-range;
 - the identity of every data artifact that the run loads, such as the Monte Carlo tuple set;
 - the versions of Python, of sunnbear, and of sunnbear's installed dependencies.
 
@@ -29,7 +29,7 @@ from pydantic import BaseModel, ConfigDict
 
 from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples import MCTuplesDeclaration
-from sunnbear._core.functions.core import FunctionId, TestFunction
+from sunnbear._core.functions.core import ProblemId, TestProblem
 from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.utils.mapping_comparison import any_value_of_common_key_differs, common_dict_keys
 
@@ -43,9 +43,9 @@ _REQUIREMENT_NAME_END_PATTERN = re.compile(r"[^A-Za-z0-9._-]")
 # These run info fields are recorded for information only; no check compares them.
 _FIELDS_FOR_INFORMATION_ONLY = frozenset({"platform", "started_at", "finished_at"})
 
-# These run info fields list a run's solvers and test functions; runs that are combined may list different ones,
+# These run info fields list a run's solvers and test problems; runs that are combined may list different ones,
 # so `check_combinable_with` compares only the entries that both runs list.
-_FIELDS_LISTING_SOLVERS_AND_FUNCTIONS = frozenset({"solver_versions", "function_infos"})
+_FIELDS_LISTING_SOLVERS_AND_PROBLEMS = frozenset({"solver_versions", "problem_infos"})
 
 
 # ==================================================================================================
@@ -58,7 +58,7 @@ class BenchmarkRunInfo(BaseModel):
         run_settings: The settings that every task of the run shares.
         solver_versions: The version of each solver config's solver class, keyed by solver id, in the
             order of the result rows.
-        function_infos: The test functions, in the caller's order.
+        problem_infos: The test problems, in the caller's order.
         artifact_hashes: The content hash of every data artifact that the run loads, keyed by artifact
             name.
         package_versions: The versions of Python, of sunnbear, and of every installed runtime dependency
@@ -73,7 +73,7 @@ class BenchmarkRunInfo(BaseModel):
 
     run_settings: BenchmarkRunSettings
     solver_versions: dict[str, int]
-    function_infos: tuple["BenchmarkRunFunctionInfo", ...]
+    problem_infos: tuple["BenchmarkRunProblemInfo", ...]
     artifact_hashes: dict[str, str]
     package_versions: dict[str, str]
     platform: str
@@ -89,21 +89,21 @@ class BenchmarkRunInfo(BaseModel):
         *,
         run_settings: BenchmarkRunSettings,
         solver_configs: Sequence[SolverConfig],
-        functions: Sequence[TestFunction],
+        problems: Sequence[TestProblem],
     ) -> Self:
         """Return the run info of these inputs, started now, with this process's artifact hashes and package versions.
 
         A call that resumes a run compares this run info with the stored one.
 
         Raises:
-            ValueError: If `solver_configs` or `functions` is empty or holds an id twice.
+            ValueError: If `solver_configs` or `problems` is empty or holds an id twice.
         """
         cls._validate_ids_are_nonempty_and_unique("solver_configs", [config.solver_id for config in solver_configs])
-        cls._validate_ids_are_nonempty_and_unique("functions", [str(function.id) for function in functions])
+        cls._validate_ids_are_nonempty_and_unique("problems", [str(problem.id) for problem in problems])
         return cls(
             run_settings=run_settings,
             solver_versions={config.solver_id: config.solver_cls.version for config in solver_configs},
-            function_infos=tuple(BenchmarkRunFunctionInfo.from_test_function(function) for function in functions),
+            problem_infos=tuple(BenchmarkRunProblemInfo.from_test_problem(problem) for problem in problems),
             artifact_hashes={
                 MCTuplesDeclaration.name: ArtifactStore.load_manifest(MCTuplesDeclaration).content_hash,
             },
@@ -126,16 +126,16 @@ class BenchmarkRunInfo(BaseModel):
 
     @property
     def formula_ids(self) -> list[str]:
-        """Return the formula ids of the run's test functions, each once, in order of first appearance.
+        """Return the formula ids of the run's test problems, each once, in order of first appearance.
 
         The run runs its formulas in this order, and its results list them in this order.
         """
-        return list(dict.fromkeys(function_info.formula_id for function_info in self.function_infos))
+        return list(dict.fromkeys(problem_info.formula_id for problem_info in self.problem_infos))
 
     @property
-    def function_infos_by_id(self) -> dict[str, "BenchmarkRunFunctionInfo"]:
-        """Return the run's test function infos, keyed by function id."""
-        return {function_info.function_id: function_info for function_info in self.function_infos}
+    def problem_infos_by_id(self) -> dict[str, "BenchmarkRunProblemInfo"]:
+        """Return the run's test problem infos, keyed by problem id."""
+        return {problem_info.problem_id: problem_info for problem_info in self.problem_infos}
 
     # --------------------------------------------------------------------------
     #  Resuming
@@ -161,37 +161,37 @@ class BenchmarkRunInfo(BaseModel):
         """Check that the results of this run info's run and of `other`'s run can be read as 1 table.
 
         Both runs must depend on the same inputs and versions, except that the runs may cover different solvers
-        and test functions:
+        and test problems:
 
-        - a solver in both runs must have the same version, and a test function in both runs must have the
+        - a solver in both runs must have the same version, and a test problem in both runs must have the
           same c-range;
-        - no solver may have run on the same test function in both runs, since the table would then hold
+        - no solver may have run on the same test problem in both runs, since the table would then hold
           those solves twice.
 
         Raises:
             BenchmarkRunError: If a field differs, naming each such field, or if a solver ran on the same
-                test function in both runs.
+                test problem in both runs.
         """
         # --- fields that must be the same -------
         differing_fields = self._differing_fields(
-            other, ignored_fields=_FIELDS_FOR_INFORMATION_ONLY | _FIELDS_LISTING_SOLVERS_AND_FUNCTIONS
+            other, ignored_fields=_FIELDS_FOR_INFORMATION_ONLY | _FIELDS_LISTING_SOLVERS_AND_PROBLEMS
         )
 
-        # --- solvers and functions in both runs -
+        # --- solvers and problems in both runs --
         common_solver_ids = common_dict_keys(self.solver_versions, other.solver_versions)
         if any_value_of_common_key_differs(self.solver_versions, other.solver_versions):
             differing_fields.append("solver_versions")
-        function_infos_by_id = self.function_infos_by_id
-        other_function_infos_by_id = other.function_infos_by_id
-        common_function_ids = common_dict_keys(function_infos_by_id, other_function_infos_by_id)
-        if any_value_of_common_key_differs(function_infos_by_id, other_function_infos_by_id):
-            differing_fields.append("function_infos")
+        problem_infos_by_id = self.problem_infos_by_id
+        other_problem_infos_by_id = other.problem_infos_by_id
+        common_problem_ids = common_dict_keys(problem_infos_by_id, other_problem_infos_by_id)
+        if any_value_of_common_key_differs(problem_infos_by_id, other_problem_infos_by_id):
+            differing_fields.append("problem_infos")
 
         if differing_fields:
             raise BenchmarkRunError(f"The runs have different {', '.join(differing_fields)}.")
-        if common_solver_ids and common_function_ids:
+        if common_solver_ids and common_problem_ids:
             raise BenchmarkRunError(
-                f"Both runs ran the solvers {common_solver_ids} on the test functions {common_function_ids}."
+                f"Both runs ran the solvers {common_solver_ids} on the test problems {common_problem_ids}."
             )
 
     # --------------------------------------------------------------------------
@@ -229,7 +229,7 @@ class BenchmarkRunInfo(BaseModel):
         """Check that `ids`, the ids of the items of the argument `argument_name`, is not empty and holds no id twice.
 
         The run info keys the solvers by id, so a repeated solver id would merge 2 solvers into 1 entry; a
-        repeated function id would run that test function twice.
+        repeated problem id would run that test problem twice.
 
         Raises:
             ValueError: If `ids` is empty or holds an id twice.
@@ -258,23 +258,23 @@ class BenchmarkRunInfo(BaseModel):
 
 
 # ==================================================================================================
-#  BenchmarkRunFunctionInfo
+#  BenchmarkRunProblemInfo
 # ==================================================================================================
-class BenchmarkRunFunctionInfo(BaseModel):
-    """`BenchmarkRunFunctionInfo` records 1 test function of a run: its id and its calibrated c-range."""
+class BenchmarkRunProblemInfo(BaseModel):
+    """`BenchmarkRunProblemInfo` records 1 test problem of a run: its id and its calibrated c-range."""
 
     model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
 
-    function_id: str
+    problem_id: str
     c_min: float
     c_max: float
 
     @classmethod
-    def from_test_function(cls, function: TestFunction) -> Self:
-        """Return the record of a calibrated test function."""
-        return cls(function_id=str(function.id), c_min=function.c_min, c_max=function.c_max)
+    def from_test_problem(cls, problem: TestProblem) -> Self:
+        """Return the record of a calibrated test problem."""
+        return cls(problem_id=str(problem.id), c_min=problem.c_min, c_max=problem.c_max)
 
     @property
     def formula_id(self) -> str:
-        """Return the formula id of the test function, e.g. ``f2.1.1``."""
-        return FunctionId.from_string(self.function_id).formula_id
+        """Return the formula id of the test problem, e.g. ``f2.1.1``."""
+        return ProblemId.from_string(self.problem_id).formula_id

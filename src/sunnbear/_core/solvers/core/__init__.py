@@ -1,7 +1,7 @@
 """This package implements the framework and fundamental building blocks used to implement solvers for benchmarking.
 
 A solver receives a plain ``f(x) -> float`` and a bracketing interval ``[a, b]``; it knows
-nothing of test functions or the benchmark that drives it. One call to ``solve`` runs
+nothing of test problems or the benchmark that drives it. One call to ``solve`` runs
 the pieces in this order::
 
     Solver.solve(f, a, b, xtol=..., max_fevals=...)       [template method]
@@ -22,7 +22,7 @@ recorded as ``DIVERGED``; no bound on how far an iterate may stray exists.
 This package relies on 2 facts:
 
 - **Orientation.** The framework supports both orientations: the interval's class, `IncreasingInterval`
-  or `DecreasingInterval`, says which one an interval has. A test function of the benchmark keeps the
+  or `DecreasingInterval`, says which one an interval has. A test problem of the benchmark keeps the
   orientation of its formula, so the benchmark runs every solver on both increasing and decreasing
   intervals. A solver whose algorithm supports only increasing intervals can solve ``-f`` on a
   decreasing one: negation is exact in floating point, so the solver's results are exactly those that

@@ -16,7 +16,7 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 class PipelineStage(ABC):
     """A `PipelineStage` computes its output table from the output table of the stage before it.
 
-    The stages form a chain of tables with 1 row per candidate, keyed by a ``function_id`` column. The first stage
+    The stages form a chain of tables with 1 row per candidate, keyed by a ``problem_id`` column. The first stage
     creates the rows; each later stage keeps every column of its input and may add columns, and keeps a subset of
     the input's rows. So a stage finds everything that the stages before it computed in its input, and a candidate
     that a stage drops never reaches the stages after it. A stage can explain what it dropped in its reports.

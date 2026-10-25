@@ -9,7 +9,7 @@ It holds:
   directory, and `load_results`, which reads 1 or more runs back as 1 table;
 - `aggregation`: `add_derived_results`, which adds derived columns, such as flop costs, to a results table, and
   `summarize_results`, which summarizes a results table per group;
-- `suites`: the benchmark suite pipeline, the maintainer tooling that builds test functions for benchmark suites;
+- `suites`: the benchmark suite pipeline, the maintainer tooling that builds test problems for benchmark suites;
   no public module re-exports it.
 
 Importing it registers the `mc_tuples` artifact declaration with `ArtifactRegistry`.

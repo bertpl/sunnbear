@@ -1,4 +1,4 @@
-"""This module holds the test functions of Chandrupatla's paper, keyed by their number in its Table 1, and
+"""This module holds the test problems of Chandrupatla's paper, keyed by their number in its Table 1, and
 `ChandrupatlaTable2Problem`, the problems of its Table 2, without results.
 
 Function 7 comes in 2 versions:

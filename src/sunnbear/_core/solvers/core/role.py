@@ -16,7 +16,7 @@ class SolverRole(Enum):
         BUILTIN_BASELINE: The single reference solver. It sets the tolerance and normalizes the
             other solvers' costs; its evaluation count is fixed by construction, so it says nothing
             about a function.
-        BUILTIN_CORE: A built-in solver whose results characterize the test functions.
+        BUILTIN_CORE: A built-in solver whose results characterize the test problems.
         BUILTIN_SECONDARY: A built-in solver reported for information only: redundant with a core
             solver, or too unreliable to characterize but informative to show.
         USER_ACTIVE: A user's solver, benchmarked and reported beside the built-in ones.
@@ -35,8 +35,8 @@ class SolverRole(Enum):
         return self is not SolverRole.USER_OTHER
 
     @property
-    def is_used_for_function_characterization(self) -> bool:
-        """Return whether results of solvers with this role characterize the test functions."""
+    def is_used_for_problem_characterization(self) -> bool:
+        """Return whether results of solvers with this role characterize the test problems."""
         return self is SolverRole.BUILTIN_CORE
 
     @property
@@ -44,6 +44,6 @@ class SolverRole(Enum):
         """Return whether only a config defined inside the sunnbear package may take this role.
 
         This restriction ensures that only sunnbear's own solvers set the baseline and characterize the
-        test functions, so every installation characterizes them identically.
+        test problems, so every installation characterizes them identically.
         """
         return self in (SolverRole.BUILTIN_BASELINE, SolverRole.BUILTIN_CORE, SolverRole.BUILTIN_SECONDARY)

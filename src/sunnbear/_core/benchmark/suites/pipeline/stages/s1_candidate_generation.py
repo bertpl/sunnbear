@@ -1,12 +1,12 @@
 """Candidate generation, the first stage of the benchmark suite pipeline, builds every candidate of every formula.
 
-A candidate is 1 test function that a formula builds for 1 tuple of its parameters, on its interval ``[a, b]``.
+A candidate is 1 test problem that a formula builds for 1 tuple of its parameters, on its interval ``[a, b]``.
 
 Its output holds 1 row per candidate, with the columns of `CANDIDATES_SCHEMA`. The rows run formula by formula, in
 the given order, and within a formula in the order of `Formula.build_all_candidates`.
 
 The output holds only the id and the interval bounds, because `FormulaRegistry.candidate_from_id` rebuilds a
-candidate from its ``function_id``.
+candidate from its ``problem_id``.
 """
 
 from collections.abc import Sequence
@@ -18,7 +18,7 @@ from sunnbear._core.functions.core import Formula
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 CANDIDATES_SCHEMA: dict[str, pl.DataType] = {
-    "function_id": pl.String(),
+    "problem_id": pl.String(),
     "a": pl.Float64(),
     "b": pl.Float64(),
 }
@@ -47,7 +47,7 @@ class CandidateGenerationStage(PipelineStage):
         candidates = [candidate for formula in self.formulas for candidate in formula.build_all_candidates()]
         table = pl.DataFrame(
             {
-                "function_id": [str(candidate.id) for candidate in candidates],
+                "problem_id": [str(candidate.id) for candidate in candidates],
                 "a": [candidate.a for candidate in candidates],
                 "b": [candidate.b for candidate in candidates],
             },

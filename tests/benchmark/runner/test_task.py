@@ -6,7 +6,7 @@ import polars as pl
 import pytest
 from counted_float import FlopType
 
-import sunnbear.functions as functions  # Import the module, so pytest does not try to collect `TestFunction`.
+import sunnbear.problems as problems  # Import the module, so pytest does not try to collect `TestProblem`.
 from sunnbear._core.benchmark.mc_tuples import load_mc_tuples
 from sunnbear._core.benchmark.protocol.tolerances import compute_xtol_range, max_fevals_for
 from sunnbear._core.benchmark.runner import task
@@ -53,7 +53,7 @@ class _StallingSolver(Solver):
 
 
 @pytest.fixture(scope="module")
-def cubic() -> functions.TestFunction:
+def cubic() -> problems.TestProblem:
     """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to ``c`` in ``[-1, 1]``."""
     return FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
 
@@ -71,16 +71,16 @@ def unevaluated_midpoint_and_stalling_configs(isolated_solver_config_registry) -
     return SolverConfigRegistry.config_from_id("unevaluated_midpoint"), SolverConfigRegistry.config_from_id("stalling")
 
 
-def _task_on_cubic(cubic: functions.TestFunction, solver_configs) -> BenchmarkTask:
+def _task_on_cubic(cubic: problems.TestProblem, solver_configs) -> BenchmarkTask:
     """Return the benchmark task on the cubic with the first `SIZE` shipped Monte Carlo tuples."""
-    return BenchmarkTask.from_test_function(
-        function=cubic,
+    return BenchmarkTask.from_test_problem(
+        problem=cubic,
         solver_configs=solver_configs,
         run_settings=BenchmarkRunSettings(mc_size=SIZE, n_bisection_fevals=N_BISECTION_FEVALS, root_seed=1),
     )
 
 
-def _run_task_on_cubic(cubic: functions.TestFunction, solver_configs) -> pl.DataFrame:
+def _run_task_on_cubic(cubic: problems.TestProblem, solver_configs) -> pl.DataFrame:
     """Run the benchmark task on the cubic with the first `SIZE` shipped Monte Carlo tuples."""
     return _task_on_cubic(cubic, solver_configs).run()
 
@@ -108,7 +108,7 @@ def test_a_task_gives_1_row_per_sample_and_solver_in_the_results_schema(cubic):
     assert results.null_count().sum_horizontal().item() == 0  # run_benchmark_task fills every schema column.
     assert results["solver_id"].to_list() == ["bisection", "regula_falsi"] * SIZE
     assert results["mc_sample_idx"].to_list() == [i for i in range(SIZE) for _ in configs]
-    assert set(results["function_id"]) == {"f2.1.1[p1=0.2]"}
+    assert set(results["problem_id"]) == {"f2.1.1[p1=0.2]"}
     assert set(results["mc_size"]) == {SIZE}
     assert results["u"].to_list()[::2] == mc_tuples.u.tolist()
     assert results["xtol"].is_between(xtol_min, xtol_max, closed="left").all()
@@ -173,7 +173,7 @@ def test_only_converged_solves_are_checked_with_the_evaluated_x_values_as_candid
 
 
 def test_a_task_holds_only_ids_and_survives_pickling(cubic):
-    """A task holds the ids of its function and solvers, and a pickled copy, as a worker receives it, runs alike."""
+    """A task holds the ids of its test problem and solvers, and a pickled copy, as a worker receives it, runs alike."""
     # --- arrange ----------------------
     configs = [SolverConfigRegistry.config_from_id("bisection")]
     task_on_cubic = _task_on_cubic(cubic, configs)
@@ -182,7 +182,7 @@ def test_a_task_holds_only_ids_and_survives_pickling(cubic):
     task_copy = pickle.loads(pickle.dumps(task_on_cubic))  # noqa: S301 — the data is this test's own
 
     # --- assert -----------------------
-    assert (task_copy.function_id, task_copy.solver_ids) == ("f2.1.1[p1=0.2]", ("bisection",))
+    assert (task_copy.problem_id, task_copy.solver_ids) == ("f2.1.1[p1=0.2]", ("bisection",))
     assert task_copy == task_on_cubic
     assert task_copy.run().drop("wall_time_ns").equals(task_on_cubic.run().drop("wall_time_ns"))
 

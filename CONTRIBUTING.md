@@ -74,7 +74,7 @@ Subject line uses the same short-form prefixes as branches:
 Examples:
 
 ```
-feat: add parametrized test-function family
+feat: add parametrized formula family
 fix: handle degenerate bracketing interval
 chore: bump numba floor to 0.67
 test(solvers): reproduce published evaluation counts
@@ -83,7 +83,7 @@ docs: clarify solver benchmark protocol
 
 Scopes:
 
-- **package:** `solvers`, `functions`, `benchmark`, `mc-tuples`, `stats`, `data`, `suites`, `reporting`
+- **package:** `solvers`, `problems`, `benchmark`, `mc-tuples`, `stats`, `data`, `suites`, `reporting`
 - **tooling:** `ci`, `release`, `deps`
 
 The body (optional) explains *why*, not *what*. Wrap at ~72 characters.

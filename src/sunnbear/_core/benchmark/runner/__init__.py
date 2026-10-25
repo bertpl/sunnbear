@@ -1,6 +1,6 @@
-"""This package holds the benchmark runner: it runs solvers on test functions and stores the results.
+"""This package holds the benchmark runner: it runs solvers on test problems and stores the results.
 
-- `run_benchmark` runs 1 `BenchmarkTask` per test function in the worker processes of a `WorkerPool`, and
+- `run_benchmark` runs 1 `BenchmarkTask` per test problem in the worker processes of a `WorkerPool`, and
   writes the results to a run directory; every task shares the run's `BenchmarkRunSettings`;
 - `BenchmarkRunDir` reads and writes the run directory's files, among them the `BenchmarkRunInfo` that
   records what the results depend on;

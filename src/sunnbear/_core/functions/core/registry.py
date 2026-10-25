@@ -1,4 +1,4 @@
-"""The formula registry holds formulas and categories, and rebuilds a candidate test function from an identity.
+"""The formula registry holds formulas and categories, and rebuilds a candidate test problem from an identity.
 
 Defining a concrete `Formula` or a `FormulaCategory` subclass registers one instance of it here,
 as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
@@ -24,7 +24,7 @@ as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
   category itself.
 
 The registry itself imports nothing: the shipped formulas and categories are registered when the
-test-function package imports the formula catalog.
+`sunnbear._core.functions` package imports the formula catalog.
 """
 
 from typing import TYPE_CHECKING, ClassVar
@@ -32,9 +32,9 @@ from typing import TYPE_CHECKING, ClassVar
 from sunnbear._core.utils.class_origin import is_sunnbear_module
 
 from .exceptions import FormulaTaxonomyError, InvalidParamsError, UnknownFormulaError
-from .identity import FunctionId
+from .identity import ProblemId
 from .taxonomy import FormulaTaxonomyNode
-from .test_function import CandidateTestFunction
+from .test_problem import CandidateTestProblem
 
 # type-only: formula and category import this module at runtime, so a runtime import would be circular
 if TYPE_CHECKING:
@@ -46,7 +46,7 @@ if TYPE_CHECKING:
 #  FormulaRegistry
 # ==================================================================================================
 class FormulaRegistry:
-    """`FormulaRegistry` enumerates formulas and categories, or rebuilds a candidate test function from an identity.
+    """`FormulaRegistry` enumerates formulas and categories, or rebuilds a candidate test problem from an identity.
 
     `Formula.__init_subclass__` and `FormulaCategory.__init_subclass__` call `register_formula` and
     `register_category`, so the registry is complete as soon as the modules that define the formula and
@@ -108,14 +108,14 @@ class FormulaRegistry:
         return tuple(category for _, category in sorted(cls._categories_by_number.items()))
 
     @classmethod
-    def candidate_from_id(cls, function_id: FunctionId | str) -> CandidateTestFunction:
-        """Reconstruct a candidate test function from its identity.
+    def candidate_from_id(cls, problem_id: ProblemId | str) -> CandidateTestProblem:
+        """Reconstruct a candidate test problem from its identity.
 
-        Attach a calibrated c-range via `CandidateTestFunction.calibrated` to
-        obtain a benchmarkable `TestFunction`.
+        Attach a calibrated c-range via `CandidateTestProblem.calibrated` to
+        obtain a benchmarkable `TestProblem`.
 
         Args:
-            function_id: The identity, as object or canonical string.
+            problem_id: The identity, as object or canonical string.
 
         Raises:
             FormulaTaxonomyError: If the registered nodes do not form a valid taxonomy tree.
@@ -124,21 +124,26 @@ class FormulaRegistry:
                 parameter tuple fails the formula's validity criteria.
         """
         cls._ensure_taxonomy_validated()
-        fid = FunctionId.from_string(function_id) if isinstance(function_id, str) else function_id
-        formula = cls._formulas_by_number.get(fid.formula_number)
+        if isinstance(problem_id, str):
+            parsed_problem_id = ProblemId.from_string(problem_id)
+        else:
+            parsed_problem_id = problem_id
+        formula = cls._formulas_by_number.get(parsed_problem_id.formula_number)
         if formula is None:
             raise UnknownFormulaError(
-                f"No registered formula with number {FormulaTaxonomyNode.format_number(fid.formula_number)} "
-                f"(id: {fid})."
+                f"No registered formula with number "
+                f"{FormulaTaxonomyNode.format_number(parsed_problem_id.formula_number)} (id: {parsed_problem_id})."
             )
-        if fid.param_names != formula.param_names:
+        if parsed_problem_id.param_names != formula.param_names:
             raise InvalidParamsError(
-                f"Parameter names {list(fid.param_names)} do not match the parameters {list(formula.param_names)} "
-                f"of formula {formula.name} (id: {fid})."
+                f"Parameter names {list(parsed_problem_id.param_names)} do not match the parameters "
+                f"{list(formula.param_names)} of formula {formula.name} (id: {parsed_problem_id})."
             )
-        if not formula.is_param_tuple_valid(*fid.param_values):
-            raise InvalidParamsError(f"Parameter values are invalid for formula {formula.name} (id: {fid}).")
-        return formula.build_candidate(fid.param_values)
+        if not formula.is_param_tuple_valid(*parsed_problem_id.param_values):
+            raise InvalidParamsError(
+                f"Parameter values are invalid for formula {formula.name} (id: {parsed_problem_id})."
+            )
+        return formula.build_candidate(parsed_problem_id.param_values)
 
     # --------------------------------------------------------------------------
     #  Taxonomy checks

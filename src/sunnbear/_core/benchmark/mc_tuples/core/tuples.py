@@ -1,8 +1,8 @@
 """`MCTuples` holds a set of (u, v) tuples, the dimensionless samples of every Monte Carlo benchmark run.
 
-A tuple `(u, v)` lies in the open unit square. When the set is mapped onto one test function, `u` sets
+A tuple `(u, v)` lies in the open unit square. When the set is mapped onto one test problem, `u` sets
 the tolerance `xtol` log-uniformly between `xtol_min` and `2*xtol_min`, and `v` sets the parameter `c`
-linearly between the function's `c_min` and `c_max`, so the same set works for every test function.
+linearly between the test problem's `c_min` and `c_max`, so the same set works for every test problem.
 """
 
 from functools import cached_property
@@ -84,10 +84,10 @@ class MCTuples:
         return MCTuples(np.concatenate([self._u, other.u]), np.concatenate([self._v, other.v]))
 
     # --------------------------------------------------------------------------
-    #  Mapping onto a test function
+    #  Mapping onto a test problem
     # --------------------------------------------------------------------------
     def to_xtol_and_c(self, xtol_min: float, c_min: float, c_max: float) -> tuple[np.ndarray, np.ndarray]:
-        """Return the `(xtol, c)` value of every tuple for one test function.
+        """Return the `(xtol, c)` value of every tuple for one test problem.
 
         The mapping is `xtol = xtol_min * 2^u` and `c = c_min + v * (c_max - c_min)`, so `xtol` is
         log-uniform within `(xtol_min, 2*xtol_min)` and `c` is uniform within `(c_min, c_max)`.
@@ -98,7 +98,7 @@ class MCTuples:
         return xtol_min * np.exp2(self._u), self.to_c(c_min, c_max)
 
     def to_c(self, c_min: float, c_max: float) -> np.ndarray:
-        """Return the `c` value of every tuple for one test function, with `v` mapped linearly onto `[c_min, c_max]`."""
+        """Return the `c` value of every tuple for one test problem, with `v` mapped linearly onto `[c_min, c_max]`."""
         return c_min + self._v * (c_max - c_min)
 
     # --------------------------------------------------------------------------
@@ -258,7 +258,7 @@ class MCTuplesBitStats:
     A value holds as many bits as `n_bits` measures. A value is trivial when a few binary or decimal digits or a small
     fraction reproduce it exactly, so that it holds far fewer bits than a random float64 value.
 
-    A test function treated as a black box can have a root or another special point exactly at a trivial value: for
+    A function treated as a black box can have a root or another special point exactly at a trivial value: for
     example, `sin(100*pi*x)` has its roots at the multiples of 0.01, so a value such as `x = 0.25` sits exactly on a
     root.
 

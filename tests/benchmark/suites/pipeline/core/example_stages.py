@@ -19,7 +19,7 @@ class ExampleNumbersStage(PipelineStage):
 
     def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
         """Return a column ``x`` with the numbers 1, 2 and 3."""
-        return PipelineStageOutput(table=pl.DataFrame({"function_id": ["n1", "n2", "n3"], "x": [1.0, 2.0, 3.0]}))
+        return PipelineStageOutput(table=pl.DataFrame({"problem_id": ["n1", "n2", "n3"], "x": [1.0, 2.0, 3.0]}))
 
 
 class ExampleSmallNumbersStage(PipelineStage):
@@ -59,16 +59,16 @@ class ExampleSquaresStage(PipelineStage):
             batch_idx: ExampleSquaringTask(xs=tuple(row["x"] for row in batch))
             for batch_idx, batch in enumerate(batches)
         }
-        squares_by_function_id: dict[str, float] = {}
+        squares_by_problem_id: dict[str, float] = {}
         for batch_idx, squares in worker_pool.run(tasks):
-            function_ids = [row["function_id"] for row in batches[batch_idx]]
-            squares_by_function_id.update(zip(function_ids, squares, strict=True))
-        squared_xs = [squares_by_function_id[function_id] for function_id in previous_table["function_id"]]
+            problem_ids = [row["problem_id"] for row in batches[batch_idx]]
+            squares_by_problem_id.update(zip(problem_ids, squares, strict=True))
+        squared_xs = [squares_by_problem_id[problem_id] for problem_id in previous_table["problem_id"]]
         return PipelineStageOutput(table=previous_table.with_columns(squared_x=pl.Series(squared_xs)))
 
 
 class ExampleIdlessStage(PipelineStage):
-    """`ExampleIdlessStage` breaks a rule of the chain: its output table has no ``function_id`` column."""
+    """`ExampleIdlessStage` breaks a rule of the chain: its output table has no ``problem_id`` column."""
 
     output_name = "s1_idless"
 
@@ -93,8 +93,8 @@ class ExampleColumnDroppingStage(PipelineStage):
     output_name = "s2_ids"
 
     def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
-        """Return the column ``function_id`` only."""
-        return PipelineStageOutput(table=previous_table.select("function_id"))
+        """Return the column ``problem_id`` only."""
+        return PipelineStageOutput(table=previous_table.select("problem_id"))
 
 
 class ExampleRowAddingStage(PipelineStage):
@@ -104,4 +104,4 @@ class ExampleRowAddingStage(PipelineStage):
 
     def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
         """Return `previous_table` with 1 more row."""
-        return PipelineStageOutput(table=pl.concat([previous_table, pl.DataFrame({"function_id": ["n4"], "x": [4.0]})]))
+        return PipelineStageOutput(table=pl.concat([previous_table, pl.DataFrame({"problem_id": ["n4"], "x": [4.0]})]))

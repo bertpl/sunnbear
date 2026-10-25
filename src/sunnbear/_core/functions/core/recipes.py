@@ -264,7 +264,7 @@ class ParamTable(ParamRecipe):
     Attributes:
         names: The names of the parameters, in tuple position order.
         rows: The parameter tuples, each with 1 value per name. Every value must be a valid parameter value
-            (`ParamNotation.is_valid_value`), so that each candidate's `FunctionId` can spell its parameter values.
+            (`ParamNotation.is_valid_value`), so that each candidate's `ProblemId` can spell its parameter values.
     """
 
     names: tuple[str, ...]

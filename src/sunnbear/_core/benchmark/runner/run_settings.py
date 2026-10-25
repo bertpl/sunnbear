@@ -15,7 +15,7 @@ class BenchmarkRunSettings:
 
     Attributes:
         mc_size: The size of the Monte Carlo tuple set, 1 of `MCTuplesSize`: the number of samples per
-            (solver, test function) pair.
+            (solver, test problem) pair.
         n_bisection_fevals: Bisection's evaluation count, from which the `xtol` range and the evaluation
             budget follow.
         root_seed: The run's root seed, from which every seed of the run is derived.

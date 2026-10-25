@@ -9,7 +9,7 @@ class IllinoisConfigsDeclaration(SolverConfigsDeclaration):
     """`IllinoisConfigsDeclaration` declares `Illinois`'s only config, named ``illinois``.
 
     It is a core config. Unlike `RegulaFalsi`, `Illinois` does not stall on a convex or concave function, so its results
-    characterize the test functions.
+    characterize the test problems.
     """
 
     configs = (SolverConfig(solver_cls=Illinois, role=SolverRole.BUILTIN_CORE),)

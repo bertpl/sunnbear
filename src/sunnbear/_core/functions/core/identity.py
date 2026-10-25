@@ -1,6 +1,6 @@
-"""The stable identity of a test function is its formula number plus its named parameter values.
+"""The stable identity of a test problem is its formula number plus its named parameter values.
 
-In particular, a `FunctionId` holds no counter of the order in which candidates were
+In particular, a `ProblemId` holds no counter of the order in which candidates were
 generated: which `ParamRecipe` produced a parameter tuple, or in which order, never affects
 identity, so identities stay the same when recipes are edited or reordered.
 
@@ -32,15 +32,15 @@ from .param_values import ParamNotation
 from .taxonomy import FormulaTaxonomyNode
 
 # A rendered identity is ``f`` + a dotted number, then optionally ``[name=value,...]``.
-_FUNCTION_ID_PATTERN = re.compile(r"f(?P<number>[0-9.]+)(?:\[(?P<params>[^\[\]]+)\])?")
+_PROBLEM_ID_PATTERN = re.compile(r"f(?P<number>[0-9.]+)(?:\[(?P<params>[^\[\]]+)\])?")
 
 
 # ==================================================================================================
-#  FunctionId
+#  ProblemId
 # ==================================================================================================
 @dataclass(frozen=True)
-class FunctionId:
-    """A `FunctionId` identifies one test function by its formula number and its named parameter values.
+class ProblemId:
+    """A `ProblemId` identifies one test problem by its formula number and its named parameter values.
 
     Equality and hashing are the dataclass defaults: exact, comparing the parameter values as
     floats. Rendering is canonical and re-parseable (see the module docstring).
@@ -66,10 +66,10 @@ class FunctionId:
         """
         if len(self.param_names) != len(self.param_values):
             raise ValueError(
-                f"FunctionId has {len(self.param_names)} parameter name(s) but {len(self.param_values)} value(s)."
+                f"ProblemId has {len(self.param_names)} parameter name(s) but {len(self.param_values)} value(s)."
             )
 
-    def __lt__(self, other: "FunctionId") -> bool:
+    def __lt__(self, other: "ProblemId") -> bool:
         """Order by formula number, then parameter values."""
         return (self.formula_number, self.param_values) < (other.formula_number, other.param_values)
 
@@ -105,20 +105,20 @@ class FunctionId:
         return repr(self)
 
     @classmethod
-    def from_string(cls, text: str) -> "FunctionId":
-        """Parse a rendered identity back into a `FunctionId`.
+    def from_string(cls, text: str) -> "ProblemId":
+        """Parse a rendered identity back into a `ProblemId`.
 
         Raises:
             ValueError: If `text` does not follow the rendered form.
         """
-        match = _FUNCTION_ID_PATTERN.fullmatch(text)
+        match = _PROBLEM_ID_PATTERN.fullmatch(text)
         if match is None:
-            raise ValueError(f"Invalid FunctionId string: {text!r}")
+            raise ValueError(f"Invalid ProblemId string: {text!r}")
         try:
             formula_number = FormulaTaxonomyNode.parse_number(match["number"])
             param_names, param_values = cls._parse_named_params(match["params"]) if match["params"] else ((), ())
         except ValueError as exc:
-            raise ValueError(f"Invalid FunctionId string: {text!r}") from exc
+            raise ValueError(f"Invalid ProblemId string: {text!r}") from exc
         return cls(formula_number=formula_number, param_names=param_names, param_values=param_values)
 
     @staticmethod

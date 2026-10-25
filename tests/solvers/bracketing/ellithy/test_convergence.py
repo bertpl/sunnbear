@@ -1,4 +1,4 @@
-"""These tests assert that every variant of `Ellithy` converges to a root of the test functions."""
+"""These tests assert that every variant of `Ellithy` converges to a root of the example functions."""
 
 import pytest
 
