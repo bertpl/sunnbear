@@ -1,8 +1,9 @@
 """`MCTuples` holds a set of (u, v) tuples, the dimensionless samples of every Monte Carlo benchmark run.
 
 A tuple `(u, v)` lies in the open unit square. When the set is mapped onto one test problem, `u` sets
-the tolerance `xtol` log-uniformly between the bounds of the test problem's `xtol` range, and `v` sets the
-parameter `c` linearly between the test problem's `c_min` and `c_max`, so the same set works for every test problem.
+the tolerance `xtol` log-uniformly between the bounds of the `xtol` range from `compute_xtol_range` for the test
+problem's interval, and `v` sets the parameter `c` linearly between the test problem's `c_min` and `c_max`, so the
+same set works for every test problem.
 """
 
 from functools import cached_property
@@ -93,7 +94,7 @@ class MCTuples:
 
         The mapping is `xtol = xtol_min * (xtol_max / xtol_min)^u` and `c = c_min + v * (c_max - c_min)`, so `xtol`
         is log-uniform within `(xtol_min, xtol_max)` and `c` is uniform within `(c_min, c_max)`. A benchmark maps u
-        onto the range that `compute_xtol_range` returns.
+        onto the range from `compute_xtol_range`.
 
         Returns:
             The `xtol` array and the `c` array, in tuple order.

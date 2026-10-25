@@ -8,8 +8,9 @@ to about ``eps * max(abs(a), abs(b))``, with ``eps`` the float64 machine epsilon
 about ``eps`` times the bound-to-width ratio.
 
 Bisection's evaluation count changes by 1 wherever ``(b - a) / (2*xtol)`` crosses a power of 2, so for an ``xtol`` at
-which that quotient is close to a power of 2, the change in width can shift the count by 1. A larger bound-to-width
-ratio widens the range of ``xtol`` values at which the count depends on rounding.
+which that quotient is close to a power of 2, the change in width can shift the count by 1. `compute_xtol_range` keeps
+``xtol`` away from those values by a margin that grows with the bound-to-width ratio, so a larger ratio narrows the
+range of ``xtol`` values that the benchmark samples; the check keeps that margin small.
 
 `MAX_BOUND_TO_WIDTH_RATIO` is stricter than the largest bound-to-width ratio that `compute_xtol_range` accepts for
 users' own functions at the default `n_bisection_fevals`.
