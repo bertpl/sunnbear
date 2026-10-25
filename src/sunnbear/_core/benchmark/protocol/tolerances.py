@@ -25,9 +25,9 @@ MAX_FEVALS_FACTOR = 4
 #   interval bound `c` on the other side of the root from `b`.
 MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND = 8
 
-# `compute_xtol_range` keeps a margin from each edge of the `xtol` range that exact arithmetic gives, as a distance in
-# log2(xtol); the margin is this many times the largest change of log2(xtol) that the rounding of bisection's
-# midpoints can cause.
+# `compute_xtol_range` moves each bound of the `xtol` range inward from its value in exact arithmetic by a margin,
+# measured in log2(xtol); the margin is this many times the largest change of log2(xtol) that the rounding of
+# bisection's midpoints can cause.
 XTOL_RANGE_MARGIN_SAFETY_FACTOR = 2.0
 
 
@@ -40,12 +40,14 @@ def compute_xtol_range(*, a: float, b: float, n_bisection_fevals: int) -> tuple[
     `xtol_min_in_exact_arithmetic <= xtol < 2*xtol_min_in_exact_arithmetic`, with
     `xtol_min_in_exact_arithmetic = (b - a) * 2^(1 - n_bisection_fevals)`.
 
-    In float64, the count can shift by 1 near either edge of that range: the stopping test `width <= 2*xtol` compares
-    2 equal values at `xtol_min_in_exact_arithmetic` and 2 nearly equal values just below
-    `2*xtol_min_in_exact_arithmetic`, and the computed interval bounds are rounded midpoints.
+    In float64, the count can shift by 1 near either edge of that range, for 2 reasons:
 
-    So the returned range keeps a margin `margin_log2` from each edge, measured in log2(xtol), that grows with the
-    bound-to-width ratio `max(|a|, |b|) / (b - a)` and with `n_bisection_fevals`: its bounds are
+    - at `xtol_min_in_exact_arithmetic`, the stopping test `width <= 2*xtol` compares 2 equal values, and just below
+      `2*xtol_min_in_exact_arithmetic` it compares 2 nearly equal values, so a rounding error in the width decides it;
+    - the computed interval bounds are rounded midpoints, so the computed width differs from the exact one.
+
+    So the returned range keeps a margin `margin_log2`, measured in log2(xtol), from each edge; the margin grows with
+    the bound-to-width ratio `max(|a|, |b|) / (b - a)` and with `n_bisection_fevals`, and the returned bounds are
     `xtol_min_in_exact_arithmetic * 2^margin_log2` and `xtol_min_in_exact_arithmetic * 2^(1 - margin_log2)`.
 
     `xtol_min_in_exact_arithmetic` must be at least
@@ -56,9 +58,7 @@ def compute_xtol_range(*, a: float, b: float, n_bisection_fevals: int) -> tuple[
     `MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND`, so an interval far from 0 relative to its width is
     rejected; at the default `n_bisection_fevals`, every interval that contains 0 is accepted.
 
-    On an accepted interval, `margin_log2` is at most `XTOL_RANGE_MARGIN_SAFETY_FACTOR / (2*k*ln(2))`, which is below
-    1/2, so the lower bound `margin_log2` of `log2(xtol / xtol_min_in_exact_arithmetic)` stays below its upper bound
-    `1 - margin_log2` and the range is never empty.
+    On an accepted interval, `margin_log2` stays below 1/2, so `xtol_min < xtol_max` and the range is never empty.
 
     Raises:
         ValueError: If any of these holds:
@@ -78,12 +78,13 @@ def compute_xtol_range(*, a: float, b: float, n_bisection_fevals: int) -> tuple[
             f"FLOAT64_EPS * max(|a|, |b|) = {xtol_min_allowed:g}."
         )
 
-    # The margin `margin_log2`, in log2(xtol), is `XTOL_RANGE_MARGIN_SAFETY_FACTOR` times the bound on rounding's
-    # effect:
+    # The margin `margin_log2`, in log2(xtol), is `XTOL_RANGE_MARGIN_SAFETY_FACTOR` times an upper limit on how far
+    # rounding can move each edge of the range:
     # - after `n_bisection_fevals - 2` halvings, the computed width is off by at most about
-    #   `FLOAT64_EPS * max(|a|, |b|)`, which is `FLOAT64_EPS * bound_to_width_ratio * 2^(n_bisection_fevals - 2)`
-    #   relative to `2*xtol`;
-    # - a relative change of `xtol`, divided by `ln(2)`, is the change of log2(xtol).
+    #   `FLOAT64_EPS * max(|a|, |b|)`; relative to the final width `2*xtol`, that error is
+    #   `FLOAT64_EPS * bound_to_width_ratio * 2^(n_bisection_fevals - 2)`;
+    # - a relative error of the width moves the edge `xtol` by the same relative amount, and a relative change of
+    #   `xtol`, divided by `ln(2)`, is the change of log2(xtol).
     bound_to_width_ratio = max(abs(a), abs(b)) / (b - a)
     margin_log2 = (
         XTOL_RANGE_MARGIN_SAFETY_FACTOR

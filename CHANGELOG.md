@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Change `MCTuples.to_xtol_and_c` to take both bounds of the `xtol` range, and make all its arguments keyword-only
+- Change the signature of `MCTuples.to_xtol_and_c`
 
 ### Deprecated
 
@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix `compute_xtol_range` returning a range in which bisection can spend 1 evaluation more or fewer than `n_bisection_fevals` near the edges; the narrower range changes benchmark results
+- Fix `compute_xtol_range` returning a range in which bisection can spend 1 evaluation more or fewer than `n_bisection_fevals`; the fix narrows the range and changes benchmark results
 
 ### Security
 
