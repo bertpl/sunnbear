@@ -6,7 +6,7 @@ from sunnbear._core.benchmark.suites.pipeline import stages as stages_package
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage
 from sunnbear._core.benchmark.suites.pipeline.runner import run_pipeline
 from sunnbear._core.benchmark.suites.pipeline.stages import CandidateGenerationStage, CandidateValidationStage
-from sunnbear._core.functions.core import FormulaRegistry
+from sunnbear._core.problems.core import FormulaRegistry
 
 
 def test_the_pipeline_generates_then_validates_the_candidates_of_the_given_formulas(tmp_path):

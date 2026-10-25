@@ -15,7 +15,7 @@ from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation imp
     CandidateValidationStage,
     RejectionReason,
 )
-from sunnbear._core.functions.core import Formula, FormulaRegistry, ParamRecipe, XCFun
+from sunnbear._core.problems.core import Formula, FormulaRegistry, ParamRecipe, XCFun
 from sunnbear._core.utils.module_imports import worker_pool_for_modules
 from sunnbear._core.utils.worker_pool import WorkerPool
 

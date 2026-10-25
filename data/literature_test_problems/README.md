@@ -2,13 +2,13 @@
 
 **Nothing in this folder ships with the sunnbear package.** The data artifacts that ship are those of `sunnbear.data`; this folder is maintainer data, read only by the script `scripts/literature_test_problems/` and its test.
 
-The folder is a survey of the test functions of published sources: articles of root-finding methods, public benchmark suites and textbooks.
+The folder is a survey of the test problems of published sources: articles of root-finding methods, public benchmark suites and textbooks.
 
-Each row is 1 function as its source gives it, with its parameters and intervals. A row's test functions are its function at each combination of its parameter values, on each of its intervals.
+Each row is 1 function as its source gives it, with its parameters and intervals. A row's test problems are its function at each combination of its parameter values, on each of its intervals.
 
-A row's status records whether the source gives enough to define those test functions, and whether an earlier source already gives them all.
+A row's status records whether the source gives enough to define those test problems, and whether an earlier source already gives them all.
 
-The rows are the material for category 1, *Published test functions*, of sunnbear's formula catalog. The catalog holds the package's formulas in `sunnbear._core.functions`, each a family of test functions.
+The rows are the material for category 1, *Published test problems*, of sunnbear's formula catalog. The catalog holds the package's formulas in `sunnbear._core.problems`, each a family of test problems.
 
 ## Files
 
@@ -74,15 +74,15 @@ Every text field is markdown, with code in backticks; a field that holds only co
 
 ## Statuses
 
-Each row has 1 of 3 final statuses, decided in this order; the paragraphs *The same function* and *Test functions and intervals* below the list define the terms that the list uses:
+Each row has 1 of 3 final statuses, decided in this order; the paragraphs *The same function* and *Test problems and intervals* below the list define the list's terms:
 
-- **`incomplete`:** the source does not give enough to define a test function, or poses no root-finding problem, so the survey cannot use the row as a root-finding test; every other row is complete. The row's reason starts with 1 of these cases:
+- **`incomplete`:** the source does not give enough to define a test problem, or poses no root-finding problem, so the survey cannot use the row; every other row is complete. The row's reason starts with 1 of these cases:
   - `no interval`: the source gives no interval, or only starting points;
   - `no usable interval`: the interval text gives no interval with finite numeric bounds, such as prose (`an interval containing the origin`), a half-line (`theta > 0`), an infinite bound, or bounds without values (`[a, b]`);
   - `no function`: the source gives no function, or one that needs data that the source does not print, such as a sample; a function with random noise of a stated distribution counts as given;
   - `parameters without values`: a parameter of the function has no published value, such as an `eps` that is only "small";
   - `no root-finding problem`: the source asks for something other than a root of the function, such as its maximum. The survey does not replace such a problem with the search for a root of another function, such as the function's derivative.
-- **`duplicate`:** earlier complete rows already give each of the row's test functions: the same function on the same interval with the same parameter values. `duplicate_of` names those earlier rows.
+- **`duplicate`:** earlier complete rows already give each of the row's test problems: the same function on the same interval with the same parameter values. `duplicate_of` names those earlier rows.
 - **`new`:** every other complete row. That includes:
   - the same function on another interval or with other parameter values;
   - the same function in a form that rounds differently, such as a polynomial in expanded form compared with the same polynomial in factored or nested form, or 2 fixed-point forms `x = g(x)` of 1 equation.
@@ -103,36 +103,36 @@ A `new` or `incomplete` row names, in `derived_from`, the earlier rows whose fun
 
 Where a source misprints a function, the row is compared as the function that the source meant, and its notes say so.
 
-**Test functions and intervals.** A row's function has 1 instance per combination of its parameter values. A row's test functions are the pairs of 1 instance and 1 of the row's intervals:
+**Test problems and intervals.** A row's function has 1 instance per combination of its parameter values. A row's test problems are the pairs of 1 instance and 1 of the row's intervals:
 
 - An interval belongs to every instance, except an interval whose bounds use a parameter, such as `[0, (q - 1)/q]`, which belongs only to the instances with the same parameter values.
 - Intervals are the same when their bounds are the same numbers: `(a, b)` and `[a, b]` are the same interval, and so are `[-1E4, 1E4]` and `[-10^4, 10^4]`, but `[0.5, sqrt(3)]` and `[0.5, 1.7320508]` are not.
 - Where the interval text holds backticks, only the code between them gives intervals, so that a remark such as `(Ex. 5.3, 5.5)` is not read as one. A name that the text assigns in backticks, such as `` `n = 1, ..., 10` ``, gives values to bounds such as `[(n - 1)*pi, n*pi]`.
 
-**Each row names the first appearance of its function:** a row that names a `duplicate`, in `duplicate_of` or `derived_from`, names the rows in that duplicate's `duplicate_of` instead. A duplicate never names an `incomplete` row, since that row gives no test function.
+**Each row names the first appearance of its function:** a row that names a `duplicate`, in `duplicate_of` or `derived_from`, names the rows in that duplicate's `duplicate_of` instead. A duplicate never names an `incomplete` row, since that row gives no test problem.
 
 **How the script decides.** It parses each row's `f` and `parameters` with sympy into its instances, and its interval text into intervals; the docstrings of `matching.py` and `intervals.py` in `scripts/literature_test_problems/` give the comparisons.
 
 The automatic status is `incomplete` where the `incomplete` condition below holds; otherwise `undecided` where any of the `undecided` conditions below holds; otherwise `duplicate` or `new`:
 
 - **`incomplete`:** the interval text gives no usable interval, or the row has no code for its function (`f_description` without backticks);
-- **`duplicate`:** earlier complete rows have each of its test functions, compared by structure: equal after an equation becomes its difference form, and after a constant factor and the sign are removed; a row whose `f` does not parse is compared by its text instead: its `f` or `f_description` and its `parameters`, ignoring whitespace and backticks;
-- **`new`:** the row parses with a value for every parameter, and earlier complete rows lack some of its test functions; `derived_from` names each earlier row that has 1 of the row's instances, the row's family (its expression with its parameters as symbols) or the row's text;
+- **`duplicate`:** earlier complete rows have each of its test problems, compared by structure: equal after an equation becomes its difference form, and after a constant factor and the sign are removed; a row whose `f` does not parse is compared by its text instead: its `f` or `f_description` and its `parameters`, ignoring whitespace and backticks;
+- **`new`:** the row parses with a value for every parameter, and earlier complete rows lack some of its test problems; `derived_from` names each earlier row that has 1 of the row's instances, the row's family (its expression with its parameters as symbols) or the row's text;
 - **`undecided`:** a person decides the status in `decisions.csv`. `match_kind` gives why:
-  - `unparsed`: the `f` does not parse, and earlier rows with the same text lack some of its test functions;
+  - `unparsed`: the `f` does not parse, and earlier rows with the same text lack some of its test problems;
   - `interval does not parse`;
   - `parameters without values`: an instance still holds a parameter as a symbol, because the script found no value for it; the source may give its values in a form that the script does not read;
-  - `value`: some test functions are found only by value, with the same values up to a constant factor at fixed x-values, so the function may be the same or round differently;
-  - `unpaired`: every test function is found, but some only in an earlier row of 1 of the 2 kinds below, for which the script may list test functions that the earlier source does not give:
+  - `value`: some test problems are found only by value, with the same values up to a constant factor at fixed x-values, so the function may be the same or round differently;
+  - `unpaired`: every test problem is found, but some only in an earlier row of 1 of the 2 kinds below, for which the script may list test problems that the earlier source does not give:
     - a row with several instances and several intervals that the script cannot pair with each other;
     - a row whose parameters give several sets of values, separated by `;`, which the script combines into every possible combination;
-  - `no test function`: no interval belongs to any instance, so the row has no test function.
+  - `no test problem`: no interval belongs to any instance, so the row has no test problem.
 
 ## Decisions
 
 `decisions.csv` holds 1 line per row that a person decided, with the columns `row_id`, `status`, `duplicate_of`, `derived_from` and `reason`. A decision replaces the script's automatic status, named rows and reason for that row, so it also corrects a wrong one.
 
-A field with several row ids separates them by ` | `. A row decided `incomplete` gives no test functions that a later row could duplicate.
+A field with several row ids separates them by ` | `. A row decided `incomplete` gives no test problems that a later row could duplicate.
 
 ## The table of rows
 
@@ -220,7 +220,7 @@ A join or split can also come from formulas that an earlier regeneration appende
 
 A line gives both or neither; a line whose rows give the same function and differ only in their intervals gives neither, and the formula takes the `f` of its first row.
 
-Rows of different sources never share a formula, so that each formula's id credits the source that introduced its test functions.
+Rows of different sources never share a formula, so that each formula's id credits the source that introduced its test problems.
 
 A function in 2 forms that compute differently, such as a polynomial expanded and factored, gives 2 separate `new` rows, which stay separate formulas. A formula of several rows keeps each row's parameter values together with that row's intervals: it never combines 1 row's parameter values with another row's interval.
 
@@ -230,7 +230,7 @@ A formula's `status` is `active` or `retired`; `variable_change`, `f` and `param
 
 ## Formula modules
 
-Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, below `src/sunnbear/_core/functions/catalog/c01_published_test_functions/`: 1 package per subcategory, 1 package per source and 1 module per formula. A script generates the modules from the source files:
+Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, below `src/sunnbear/_core/problems/catalog/c01_published_test_problems/`: 1 package per subcategory, 1 package per source and 1 module per formula. A script generates the modules from the source files:
 
 ```
 uv run python -m scripts.literature_test_problems.formula_modules <source id> ...
@@ -239,8 +239,8 @@ uv run python -m scripts.literature_test_problems.formula_modules <source id> ..
 For each source named, the script writes the source's package and its formula modules, and rewrites the `__init__.py` of each subcategory. A generated formula module:
 
 - takes its function from the `f` of the formula's first row, as the source prints it, unless the formula's line in `formulas.csv` gives an `f`;
-- evaluates that function at `x - c_scale*c`, so that the formula's `c` shifts the function along x. `c_scale` is the rounded width of the formula's interval; the class docstring of `PublishedTestFunctions`, the class of category 1, states the rule and its reasons;
-- lists the formula's published test functions in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds and `c_scale` as 3 more parameters, `a`, `b` and `c_scale`;
+- evaluates that function at `x - c_scale*c`, so that the formula's `c` shifts the function along x. `c_scale` is the rounded width of the formula's interval; the class docstring of `PublishedTestProblems`, the class of category 1, states the rule and its reasons;
+- lists the formula's published test problems in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds and `c_scale` as 3 more parameters, `a`, `b` and `c_scale`;
 - renames a source's own parameters `a`, `b` and `c_scale` to `a_`, `b_` and `c_scale_` in every formula, so that these 3 names always mean the bounds of the interval and the scale of the shift;
 - names its source in a `FormulaSource`: the source's `reference`, and the keys of the formula's rows as the location;
 - takes its name, and its module and class names, from the key of the formula's first row. Where the key lists several locations, separated by `;` or `,`, the name ends after the first location; while the names of several formulas of the source would give module names that differ only in their `fNN` prefix, each of those names takes its key's next location too;
@@ -249,7 +249,7 @@ For each source named, the script writes the source's package and its formula mo
 
 **The function** may use, besides the operators and the functions of Python's `math`, the constructs that the docstring of `formula_expressions.py` lists, such as `if(condition; a; b)`, `sum(term, i = m..n)` and the Bessel functions.
 
-**The published test functions:** a row's parameters give 1 or several sets of values:
+**The published test problems:** a row's parameters give 1 or several sets of values:
 
 - **1 set:** each combination of its values pairs with each of the row's intervals.
 - **Several sets,** separated by `;`, where the same parameter gets values in more than 1 set: each set names its intervals after `on`, as in `` on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)12`; on `[-0.95, 4.05]`: `a = 1`, `n = 8(2)14` ``, unless the row gives only 1 interval.
@@ -276,7 +276,7 @@ The modules of 3 kinds of formulas are written by hand, and the script only impo
 
 - a formula with a row that gives only an `f_description`;
 - a formula in the script's `UNTRANSLATABLE_FORMULAS`, whose row's `f`, `parameters` or `variable_change` the script cannot translate, such as an infinite sum;
-- a formula in `MODIFIED_FORMULAS` of `scripts/literature_test_problems/modified_formulas.py`, whose parameter `modified` the class docstring of `PublishedTestFunctions` describes; the script does not write modified versions, so a person writes the formula's module, starting from the module that the script writes for the formula when the formula is absent from `MODIFIED_FORMULAS`.
+- a formula in `MODIFIED_FORMULAS` of `scripts/literature_test_problems/modified_formulas.py`, whose parameter `modified` the class docstring of `PublishedTestProblems` describes; the script does not write modified versions, so a person writes the formula's module, starting from the module that the script writes for the formula when the formula is absent from `MODIFIED_FORMULAS`.
 
 The script stops and names each formula that it cannot generate. It cannot generate:
 

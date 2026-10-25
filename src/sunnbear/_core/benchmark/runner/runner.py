@@ -17,7 +17,7 @@ from pathlib import Path
 import polars as pl
 
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS
-from sunnbear._core.functions.core import TestProblem
+from sunnbear._core.problems.core import TestProblem
 from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.utils.module_imports import worker_pool_for_modules
 

@@ -13,7 +13,7 @@ from sunnbear._core.benchmark.runner import task
 from sunnbear._core.benchmark.runner.results_schema import RESULTS_SCHEMA, solver_flop_count_column_name
 from sunnbear._core.benchmark.runner.run_settings import BenchmarkRunSettings
 from sunnbear._core.benchmark.runner.task import BenchmarkTask
-from sunnbear._core.functions.core import FormulaRegistry
+from sunnbear._core.problems.core import FormulaRegistry
 from sunnbear.solvers import (
     Solver,
     SolverConfig,

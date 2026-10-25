@@ -3,7 +3,7 @@ reference = 'Romadani, M. N. H. (2025). From Theory to Code: Transforming Classi
 year = 2025
 subcategory = '1.2'
 where_in_source = '''
-- Section 3.3, "Computational Experiment Design", lists 6 example test functions in 4 numbered classes; the article reports no results for them.
+- Section 3.3, "Computational Experiment Design", lists 6 example test problems in 4 numbered classes; the article reports no results for them.
 - Sections 5.1 to 5.4 test 7 methods on 1 function each (polynomial, trigonometric, exponential, mixed), with results in Tables 2, 4, 6 and 8. Each of these sections gives a bracketing interval, and Sections 5.2 to 5.4 also give a wider range used to search for the exact root.
 '''
 transcribed_from = 'the article, checked against the page images.'

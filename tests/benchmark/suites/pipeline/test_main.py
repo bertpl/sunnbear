@@ -9,7 +9,7 @@ import pytest
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageManifest
 from sunnbear._core.benchmark.suites.pipeline.stages import CandidateGenerationStage, CandidateValidationStage
-from sunnbear._core.functions.core import FormulaRegistry
+from sunnbear._core.problems.core import FormulaRegistry
 
 _PIPELINE_PACKAGE = "sunnbear._core.benchmark.suites.pipeline"
 _OUTPUT_NAMES = [CandidateGenerationStage.output_name, CandidateValidationStage.output_name]

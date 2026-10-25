@@ -1,4 +1,4 @@
-"""The formula modules' generator translates the survey's functions and reads their published test functions."""
+"""The formula modules' generator translates the survey's functions and reads their published test problems."""
 
 import math
 
@@ -99,13 +99,13 @@ def test_published_formula_pairs_each_set_of_values_with_its_intervals(script_mo
     survey_formula = _survey_formula(script_modules, [row])
 
     # --- act --------------------------
-    published = script_modules["published_test_functions"].PublishedFormula.from_survey(survey_formula)
+    published = script_modules["published_test_problems"].PublishedFormula.from_survey(survey_formula)
 
     # --- assert -----------------------
     assert published.survey_parameter_names == ("a", "n")
     assert [
-        (tuple(float(value) for _, value in test_function.parameter_values), test_function.interval.key)
-        for test_function in published.test_functions
+        (tuple(float(value) for _, value in test_problem.parameter_values), test_problem.interval.key)
+        for test_problem in published.test_problems
     ] == [
         ((0.2, 4.0), ("0", "5")),
         ((0.2, 6.0), ("0", "5")),
@@ -127,7 +127,7 @@ def test_published_formula_pairs_each_set_of_values_with_its_intervals(script_mo
 def test_published_formula_checks_that_each_row_gives_its_function(script_modules, parameters, is_accepted):
     """A formula of several rows accepts its line's `f` only where it equals each row's own `f` at that row's values."""
     # --- arrange ----------------------
-    published_test_functions = script_modules["published_test_functions"]
+    published_test_problems = script_modules["published_test_problems"]
     rows = [
         _source_row(script_modules, "s:1", "if(x <= 1/3; -0.5; 0.5)", interval="[-11, 9]"),
         _source_row(script_modules, "s:2", "if(x <= 1/3; -10^-3; 1 - 10^-3)", interval="[-11, 9]"),
@@ -139,10 +139,10 @@ def test_published_formula_checks_that_each_row_gives_its_function(script_module
 
     # --- act / assert -----------------
     if is_accepted:
-        published_test_functions.PublishedFormula.from_survey(survey_formula)
+        published_test_problems.PublishedFormula.from_survey(survey_formula)
     else:
-        with pytest.raises(published_test_functions.PublishedTestFunctionsError, match="s:1"):
-            published_test_functions.PublishedFormula.from_survey(survey_formula)
+        with pytest.raises(published_test_problems.PublishedTestProblemsError, match="s:1"):
+            published_test_problems.PublishedFormula.from_survey(survey_formula)
 
 
 # ==================================================================================================

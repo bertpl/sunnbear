@@ -3,7 +3,7 @@
 from collections.abc import Sequence
 from pathlib import Path
 
-from sunnbear._core.functions.core import Formula
+from sunnbear._core.problems.core import Formula
 from sunnbear._core.utils.module_imports import worker_pool_for_modules
 
 from .core import PipelineStageManifest, PipelineWorkspace, run_stages

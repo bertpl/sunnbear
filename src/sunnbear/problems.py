@@ -6,9 +6,9 @@
   `TestProblem.xc_fun`, `f(x, c)`.
 
 How test problems are built from formulas is described in the docstring of the implementation package,
-`sunnbear._core.functions.core`.
+`sunnbear._core.problems.core`.
 """
 
-from ._core.functions import ProblemId, TestProblem, XCFun, XFun
+from ._core.problems import ProblemId, TestProblem, XCFun, XFun
 
 __all__ = ["ProblemId", "TestProblem", "XCFun", "XFun"]

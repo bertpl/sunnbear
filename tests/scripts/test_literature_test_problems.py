@@ -14,8 +14,8 @@ import textwrap
 
 import pytest
 
-from sunnbear._core.functions.catalog.c01_published_test_functions import PublishedTestFunctions
-from sunnbear._core.functions.core import FormulaRegistry, FormulaSource
+from sunnbear._core.problems.catalog.c01_published_test_problems import PublishedTestProblems
+from sunnbear._core.problems.core import FormulaRegistry, FormulaSource
 
 _CATEGORY_1_FORMULAS = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 1]
 # _FIRST_RUN_LINES are the rows of a small survey on its first run, each as (row id, subcategory, final status).
@@ -322,7 +322,7 @@ def test_category_1_formula_applies_c_as_its_rule_says(formula, c, script_module
         # --- arrange ----------------------
         modification_type_enum = script_modules["modified_formulas"].ModificationType
         modification_type = _modification_type(candidate, script_modules)
-        c_scale = PublishedTestFunctions.c_scale(candidate.a, candidate.b)
+        c_scale = PublishedTestProblems.c_scale(candidate.a, candidate.b)
         # the x-value lies at 0.6 of the interval, in log scale for C_SCALES_X, so that the shifted or scaled x-values
         # stay in the interval
         if modification_type is modification_type_enum.C_SCALES_X:
@@ -345,13 +345,14 @@ def test_category_1_formula_applies_c_as_its_rule_says(formula, c, script_module
 
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
 def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, script_modules):
-    """A formula of category 1 multiplies ``c`` by its interval's width, rounded by ``PublishedTestFunctions.c_scale``.
+    """A formula of category 1 multiplies ``c`` by its interval's width, rounded by ``PublishedTestProblems.c_scale``.
 
     The test reads the factor from the code of ``parametrized_fun``, because a test that compares shifted values
     cannot see a number that is 1 float step off, such as ``1.9999999999999996`` for ``2.0``: the shifted x-values
-    round to the same float. The test skips a test function with ``modified = 1`` whose
-    ``ModificationType.is_x_shifted_by_c_scale`` is false, because such a test function applies ``c`` with no factor
-    ``c_scale``.
+    round to the same float.
+
+    The test skips a test problem with ``modified = 1`` whose ``ModificationType.is_x_shifted_by_c_scale`` is false,
+    because such a test problem applies ``c`` with no factor ``c_scale``.
     """
     # --- arrange ----------------------
     tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))
@@ -375,7 +376,7 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, scrip
     # --- assert -----------------------
     assert len(factors) == 1
     for candidate in shifting_candidates:
-        c_scale = PublishedTestFunctions.c_scale(candidate.a, candidate.b)
+        c_scale = PublishedTestProblems.c_scale(candidate.a, candidate.b)
         if isinstance(factors[0], ast.Name):
             params = dict(zip(candidate.id.param_names, candidate.id.param_values, strict=True))
             assert factors[0].id == "c_scale"
@@ -780,7 +781,7 @@ def _first_run_formulas_table(script_modules):
 
 
 def _modification_type(candidate, script_modules):
-    """Return the `ModificationType` of a test function with ``modified = 1``, and None for a published one."""
+    """Return the `ModificationType` of a test problem with ``modified = 1``, and None for a published one."""
     params = dict(zip(candidate.id.param_names, candidate.id.param_values, strict=True))
     if params.get("modified") == 1.0:
         return script_modules["modified_formulas"].MODIFIED_FORMULAS[candidate.id.formula_id]

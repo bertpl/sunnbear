@@ -18,7 +18,7 @@ from sunnbear._core.benchmark.protocol import (
     is_solution_correct,
     max_fevals_for,
 )
-from sunnbear._core.functions.core import FormulaRegistry, TestProblem
+from sunnbear._core.problems.core import FormulaRegistry, TestProblem
 from sunnbear._core.solvers.core import SolverConfig, SolverConfigRegistry, SolveStatus
 
 from .results_schema import RESULTS_SCHEMA, solver_flop_count_column_name

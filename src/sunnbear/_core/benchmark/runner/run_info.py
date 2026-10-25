@@ -29,7 +29,7 @@ from pydantic import BaseModel, ConfigDict
 
 from sunnbear._core.artifacts import ArtifactStore
 from sunnbear._core.benchmark.mc_tuples import MCTuplesDeclaration
-from sunnbear._core.functions.core import ProblemId, TestProblem
+from sunnbear._core.problems.core import ProblemId, TestProblem
 from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.utils.mapping_comparison import any_value_of_common_key_differs, common_dict_keys
 

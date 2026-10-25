@@ -29,7 +29,7 @@ key = '(27)'
 f_description = '`-x^2` if `x < 0`; `7*x^2` if `x >= 0`'
 name = 'Proposition 3.6, "residual contraction without width convergence"; Table 4 calls it "the C^1 counterexample"'
 interval = '[-3, 1]'
-notes = 'Also the test function of Section 7.4 (Table 4).'
+notes = 'Also the test problem of Section 7.4 (Table 4).'
 
 [[rows]]
 key = 'f27'

@@ -13,7 +13,7 @@ from sunnbear._core.benchmark.runner.results_schema import RESULTS_SCHEMA
 from sunnbear._core.benchmark.runner.run_dir import BenchmarkRunDir
 from sunnbear._core.benchmark.runner.runner import load_results, run_benchmark
 from sunnbear._core.benchmark.runner.task import BenchmarkTask
-from sunnbear._core.functions.core import FormulaRegistry
+from sunnbear._core.problems.core import FormulaRegistry
 from sunnbear.solvers import SolverConfigRegistry
 
 MC_SIZE = 32

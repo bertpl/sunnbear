@@ -193,7 +193,7 @@ runtime-evaluated-base-classes = ["pydantic.BaseModel"]
 "scripts/**" = ["INP001", "S"]           # maintainer tooling, not the shipped library
 # published references keep their own typography, such as the en dash of a page range, and parameters keep the names
 # that their source prints, such as `K` and `Tr`
-"src/sunnbear/_core/functions/catalog/c01_published_test_functions/**" = ["RUF001", "RUF002", "N803"]
+"src/sunnbear/_core/problems/catalog/c01_published_test_problems/**" = ["RUF001", "RUF002", "N803"]
 ".github/scripts/**" = ["INP001", "S", "D", "ANN"]   # maintainer tooling, not held to shipped-source style
 
 [tool.ty.src]
@@ -203,7 +203,7 @@ include = ["src/sunnbear"]
 # catalog formulas implement the Formula hooks with named parameters (p1, p2, ...)
 # instead of the base's *params — deliberately: readability of 100+ formula modules
 # outweighs strict override variance; the only caller is Formula.candidate(*params).
-include = ["src/sunnbear/_core/functions/catalog/**"]
+include = ["src/sunnbear/_core/problems/catalog/**"]
 
 [tool.ty.overrides.rules]
 invalid-method-override = "ignore"

@@ -3,12 +3,12 @@ reference = 'Li, X., Mu, C., Ma, J., Hou, L. (2011). Fifth-order iterative metho
 year = 2010
 subcategory = '1.2'
 where_in_source = '''
-- Section 2, "Numerical results", lists 15 test functions `f01` to `f015` (page 7 of the PDF, which has no journal page numbers), each with its root `x*` and the root's multiplicity `m`.
+- Section 2, "Numerical results", lists 15 test problems `f01` to `f015` (page 7 of the PDF, which has no journal page numbers), each with its root `x*` and the root's multiplicity `m`.
 - Table 1 (page 6 of the PDF) gives the iterations of 6 methods per function from 1 starting point `x0`; the 2 methods that need 2 starting values use `x1 = x0 - 0.1`.
 - The article cites no source for its functions.
 '''
 transcribed_from = "the article's text layer, checked against the page images."
-rows_summary = '15, 1 per test function of Section 2.'
+rows_summary = '15, 1 per test problem of Section 2.'
 notes = '''
 - **Keys:** the article's labels, printed as `f01` to `f09` and `f010` to `f015`.
 - **Starting points:** the article gives starting points, not intervals, so no row has an `interval`; each row's `notes` gives the stated root, its multiplicity and the starting point `x0`.

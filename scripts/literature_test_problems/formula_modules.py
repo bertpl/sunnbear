@@ -30,9 +30,9 @@ from pathlib import Path
 import mpmath
 import sympy as sp
 
-from sunnbear._core.functions.catalog.c01_published_test_functions import PublishedTestFunctions
-from sunnbear._core.functions.core import CANONICAL_DIGITS, ParamNotation
-from sunnbear._core.functions.core.test_cases import DEFAULT_ATOL
+from sunnbear._core.problems.catalog.c01_published_test_problems import PublishedTestProblems
+from sunnbear._core.problems.core import CANONICAL_DIGITS, ParamNotation
+from sunnbear._core.problems.core.test_cases import DEFAULT_ATOL
 from sunnbear._core.utils import math_functions
 from sunnbear._core.utils.slugify import slugify
 
@@ -41,11 +41,11 @@ from .formula_expressions import FormulaExpression, TranslationError
 from .formulas import FormulasTable, FormulasTableLine, SurveyFormula
 from .intervals import ParsedIntervals
 from .modified_formulas import MODIFIED_FORMULAS
-from .published_test_functions import PublishedFormula, PublishedTestFunction, PublishedTestFunctionsError
+from .published_test_problems import PublishedFormula, PublishedTestProblem, PublishedTestProblemsError
 
 CATALOG_DIR = (
-    Path(__file__).resolve().parents[2] / "src" / "sunnbear" / "_core" / "functions" / "catalog"
-) / "c01_published_test_functions"
+    Path(__file__).resolve().parents[2] / "src" / "sunnbear" / "_core" / "problems" / "catalog"
+) / "c01_published_test_problems"
 # UNTRANSLATABLE_FORMULAS holds, with the reason, each formula whose rows give an `f`, `parameters` or `variable_change`
 # that the script cannot translate, and whose module is therefore written by hand.
 UNTRANSLATABLE_FORMULAS = {
@@ -187,7 +187,7 @@ class FormulaModuleSpec:
         if self.interval is None:
             c_scale_code = "c_scale"
         else:
-            c_scale_code = repr(PublishedTestFunctions.c_scale(*self.interval))
+            c_scale_code = repr(PublishedTestProblems.c_scale(*self.interval))
         class_name = source_category_class_name(source) + _camel_case(slugify(formula_name))
         signature = "".join(f", {param_name}: float" for param_name in self.param_names)
         return "\n".join(
@@ -195,7 +195,7 @@ class FormulaModuleSpec:
                 _docstring(module_docstring, width=120),
                 "",
                 *(["import math", ""] if needs_math_import else []),
-                f"from sunnbear._core.functions.core import {', '.join(imported_names)}",
+                f"from sunnbear._core.problems.core import {', '.join(imported_names)}",
                 *(
                     [f"from sunnbear._core.utils.math_functions import {', '.join(sunnbear_math_functions)}"]
                     if sunnbear_math_functions
@@ -493,7 +493,7 @@ class FormulaModuleSpec:
         candidates = []
         for fraction in CASE_FRACTIONS:
             x = float(f"{a + fraction * (b - a):.6g}")
-            shifted = x - PublishedTestFunctions.c_scale(a, b) * c
+            shifted = x - PublishedTestProblems.c_scale(a, b) * c
             if a < x < b:
                 values = cls._case_values(exact_function, formula_expression, python_values, shifted)
             else:
@@ -656,9 +656,9 @@ class FormulaModuleSpec:
 
     @classmethod
     def _tuple_values(
-        cls, published_test_function: PublishedTestFunction, has_interval_parameters: bool
+        cls, published_test_problem: PublishedTestProblem, has_interval_parameters: bool
     ) -> tuple[tuple[float, ...], tuple[float, float], list[str], dict[str, sp.Expr]]:
-        """Return a published test function's parameter tuple and bounds, and the values that the module's text needs.
+        """Return a published test problem's parameter tuple, bounds, exact texts of rounded values and mpmath values.
 
         A parameter value that no `ParamNotation` holds exactly is rounded by `_parameter_value`, and mpmath evaluates
         the function at the rounded value, because the formula receives the rounded value too.
@@ -671,7 +671,7 @@ class FormulaModuleSpec:
             mpmath evaluates the function, keyed by survey name.
         """
         values, exact_texts_of_rounded_values, mpmath_parameter_values = [], [], {}
-        for name, exact_value in published_test_function.parameter_values:
+        for name, exact_value in published_test_problem.parameter_values:
             value, is_rounded = cls._parameter_value(exact_value)
             values.append(value)
             if is_rounded:
@@ -679,7 +679,7 @@ class FormulaModuleSpec:
                 mpmath_parameter_values[name] = sp.Rational(repr(value))
             else:
                 mpmath_parameter_values[name] = exact_value
-        interval = published_test_function.interval
+        interval = published_test_problem.interval
         exact_bounds = (sp.sympify(interval.lower), sp.sympify(interval.upper))
         if has_interval_parameters:
             bounds = []
@@ -689,7 +689,7 @@ class FormulaModuleSpec:
                 if is_rounded:
                     exact_texts_of_rounded_values.append(cls._exact_text(exact_bound))
             bounds = tuple(bounds)
-            values += [*bounds, PublishedTestFunctions.c_scale(*bounds)]
+            values += [*bounds, PublishedTestProblems.c_scale(*bounds)]
         else:
             bounds = tuple(float(sp.N(bound, 30)) for bound in exact_bounds)
         return tuple(values), bounds, exact_texts_of_rounded_values, mpmath_parameter_values
@@ -715,22 +715,22 @@ class FormulaModuleSpec:
             formula_expression = FormulaExpression.from_text(
                 published_formula.f, published_formula.variable, python_names
             )
-        except (PublishedTestFunctionsError, TranslationError) as error:
+        except (PublishedTestProblemsError, TranslationError) as error:
             raise GenerationError(f"{formula_id}: {error}") from error
         param_names = tuple(python_names[name] for name in published_formula.survey_parameter_names)
         if has_interval_parameters:
             param_names += ("a", "b", "c_scale")
         tuples, test_case_texts, exact_texts_of_rounded_values = [], [], []
         bounds_test_case_texts: dict[tuple[float, float], str] = {}
-        for published_test_function in published_formula.test_functions:
-            values, bounds, test_function_exact_texts_of_rounded_values, mpmath_parameter_values = cls._tuple_values(
-                published_test_function, has_interval_parameters
+        for published_test_problem in published_formula.test_problems:
+            values, bounds, test_problem_exact_texts_of_rounded_values, mpmath_parameter_values = cls._tuple_values(
+                published_test_problem, has_interval_parameters
             )
             if values in tuples:
-                # 2 rows, or 2 sets of values of 1 row, can give the same test function; its tuple and cases would only
+                # 2 rows, or 2 sets of values of 1 row, can give the same test problem; its tuple and cases would only
                 # repeat the earlier ones
                 continue
-            exact_texts_of_rounded_values += test_function_exact_texts_of_rounded_values
+            exact_texts_of_rounded_values += test_problem_exact_texts_of_rounded_values
             tuples.append(values)
             params = dict(zip(param_names, values, strict=True))
             python_values = {name: value for name, value in params.items() if name in python_names.values()}
@@ -747,7 +747,7 @@ class FormulaModuleSpec:
                 test_case_texts.append(
                     f"FormulaTestCase.value(params={params!r}, x={x!r}, c={c!r}, expected={expected!r}{tolerance})"
                 )
-                shifted_xs.append(x - PublishedTestFunctions.c_scale(*bounds) * c)
+                shifted_xs.append(x - PublishedTestProblems.c_scale(*bounds) * c)
             # the first tuple also reaches each branch of a function that is 1 conditional, so that a test reaches
             # every line of the module
             expression_node = ast.parse(formula_expression.python_code, mode="eval").body
@@ -845,7 +845,7 @@ def source_package_text(source: Source, formulas_table_lines: list[FormulasTable
         [
             _docstring(module_docstring, width=120),
             "",
-            "from sunnbear._core.functions.core import FormulaCategory",
+            "from sunnbear._core.problems.core import FormulaCategory",
             "",
             f"from . import {', '.join(module_names)}",
             "",
@@ -875,12 +875,12 @@ def subcategory_package_text(subcategory: str, source_package_names: list[str]) 
         [
             _docstring(module_docstring, width=120),
             "",
-            "from sunnbear._core.functions.core import FormulaCategory",
+            "from sunnbear._core.problems.core import FormulaCategory",
             "",
             *imports,
             "",
             f"class {class_name}(FormulaCategory):",
-            f'    """`{class_name}` is subcategory {subcategory} of the published test functions."""',
+            f'    """`{class_name}` is subcategory {subcategory} of the published test problems."""',
             "",
             f"    number = {number!r}",
             f"    name = {name!r}",
