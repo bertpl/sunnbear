@@ -29,8 +29,8 @@ class AlefeldPotraShi1993T512(Formula):
     ``1e-9`` from a pole, so that a shift along x by more than ``1e-9`` crosses it.
 
     With ``modified = 1``, the modification changes what the test problem tests: at the published bounds, ``abs(f)``
-    is at least about 2e27, and at the modified bounds it is at most about 7e5, so the modified intervals leave out the
-    steepest part of f next to each pole.
+    is at least about 2e27, and at the modified bounds ``abs(f)`` is at most about 7e5, so the modified intervals leave
+    out the steepest part of f next to each pole.
     """
 
     number = (1, 2, 4, 2)

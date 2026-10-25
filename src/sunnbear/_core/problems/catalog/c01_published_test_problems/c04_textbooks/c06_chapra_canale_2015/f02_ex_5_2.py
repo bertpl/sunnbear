@@ -34,8 +34,8 @@ class ChapraCanale2015Ex52(Formula):
     the same sign.
 
     With ``modified = 1``, the modification changes what the test problem on ``[4.2, 4.26]`` tests: the source plots f
-    on the narrower interval ``[4.2, 4.3]`` (Fig. 5.4(c)) to show that the apparent double root near 4.2 is 2 distinct
-    roots, and ``[4.2, 4.26]`` holds only the first of them.
+    on ``[4.2, 4.3]`` (Fig. 5.4(c)) to show that the apparent double root near 4.2 is 2 distinct roots, and
+    ``[4.2, 4.26]`` holds only the first of them, so the modified test problem does not test telling the 2 roots apart.
     """
 
     number = (1, 4, 6, 2)
