@@ -47,6 +47,10 @@ class ModificationType(StrEnum):
     # - at level 1, by the rule of category 1;
     # - at higher levels, as the level below does.
     CANCELLATION_FREE_FORM = "cancellation_free_form"
+    # On the published interval, the modified function adds TINY_LINEAR_TERM_SLOPE*(x - r) to the published function,
+    # with r the published root, so that f is exactly 0 only where the term underflows too; c shifts x by the rule of
+    # category 1 before the term is added. `sunnbear._core.utils.floats` defines TINY_LINEAR_TERM_SLOPE.
+    ADDS_TINY_LINEAR_TERM = "adds_tiny_linear_term"
 
     @property
     def is_c_scale_shift_kept(self) -> bool:
@@ -59,6 +63,7 @@ class ModificationType(StrEnum):
             ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
             ModificationType.C_SHIFTS_X_ON_INTERVAL_NEAR_0,
             ModificationType.CANCELLATION_FREE_FORM,
+            ModificationType.ADDS_TINY_LINEAR_TERM,
         )
 
 
@@ -66,9 +71,11 @@ class ModificationType(StrEnum):
 # each level, starting at `modified = 1`. Each level applies the modifications of the levels below it plus its own type.
 MODIFIED_FORMULAS = {
     "f1.1.2.4": (ModificationType.C_ADDS_TO_F,),
+    "f1.1.4.3": (ModificationType.ADDS_TINY_LINEAR_TERM,),
     "f1.1.5.3": (ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,),
     "f1.1.6.3": (ModificationType.CANCELLATION_FREE_FORM,),
     "f1.1.7.2": (ModificationType.C_SCALES_X,),
+    "f1.1.7.7": (ModificationType.ADDS_TINY_LINEAR_TERM,),
     "f1.1.7.8": (ModificationType.C_SCALES_X,),
     "f1.1.7.9": (ModificationType.C_SCALES_X,),
     "f1.1.8.1": (ModificationType.C_SCALES_X,),
@@ -80,6 +87,9 @@ MODIFIED_FORMULAS = {
     "f1.1.13.5": (ModificationType.CANCELLATION_FREE_FORM,),
     "f1.1.13.19": (ModificationType.CANCELLATION_FREE_FORM,),
     "f1.1.13.21": (ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,),
+    "f1.1.14.5": (ModificationType.ADDS_TINY_LINEAR_TERM,),
+    "f1.2.1.5": (ModificationType.ADDS_TINY_LINEAR_TERM,),
+    "f1.2.1.6": (ModificationType.ADDS_TINY_LINEAR_TERM,),
     "f1.2.4.2": (ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,),
     "f1.2.9.4": (ModificationType.CANCELLATION_FREE_FORM,),
     "f1.2.9.6": (ModificationType.CANCELLATION_FREE_FORM,),
@@ -93,9 +103,11 @@ MODIFIED_FORMULAS = {
     "f1.2.18.20": (ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,),
     "f1.3.1.4": (ModificationType.C_SCALES_X,),
     "f1.3.1.6": (ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,),
+    "f1.3.1.12": (ModificationType.ADDS_TINY_LINEAR_TERM,),
     "f1.3.1.17": (ModificationType.CANCELLATION_FREE_FORM,),
     "f1.3.2.3": (ModificationType.C_ADDS_TO_F,),
     "f1.3.2.5": (ModificationType.C_SHIFTS_X_ON_INTERVAL_NEAR_0, ModificationType.CANCELLATION_FREE_FORM),
+    "f1.3.3.4": (ModificationType.ADDS_TINY_LINEAR_TERM,),
     "f1.3.3.30": (ModificationType.C_ADDS_TO_F,),
     "f1.3.3.33": (ModificationType.C_ADDS_TO_F,),
     "f1.3.3.41": (ModificationType.CANCELLATION_FREE_FORM,),
@@ -107,6 +119,7 @@ MODIFIED_FORMULAS = {
     "f1.3.6.4": (ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,),
     "f1.4.1.2": (ModificationType.C_SHIFTS_X_ON_INTERVAL_NEAR_0, ModificationType.CANCELLATION_FREE_FORM),
     "f1.4.1.6": (ModificationType.CANCELLATION_FREE_FORM,),
+    "f1.4.1.7": (ModificationType.ADDS_TINY_LINEAR_TERM,),
     "f1.4.1.8": (ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,),
     "f1.4.2.1": (ModificationType.C_SHIFTS_X_ON_INTERVAL_NEAR_0,),
     "f1.4.2.5": (ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,),
