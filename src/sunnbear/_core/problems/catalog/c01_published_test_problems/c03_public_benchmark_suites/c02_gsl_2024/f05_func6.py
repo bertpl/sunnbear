@@ -22,11 +22,21 @@ class Gsl2024Func6(Formula):
     With ``modified = 1``, the formula evaluates the published function at ``x + 1``, on the published interval shifted
     by -1, ``[-0.0005, 0.0002]``, which lies around 0.
 
-    With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
+    With ``modified = 2``, the formula computes the function of ``modified = 1`` in the equivalent form ``x**7``, on
+    the same interval.
+
+    With ``modified = 1`` or ``2``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new
+    interval.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because its interval is
     narrow around the root at 1: the ratio of the interval's largest bound to its width, about 1429, is above the
     conditions' limit of 100.
+
+    The test problem with ``modified = 1`` does not satisfy the conditions either, because they require bisection to
+    spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of f.
+
+    With ``modified = 1``, adding 1 to x rounds x to the spacing of the floats near 1, about 2.2e-16, so that f is
+    exactly 0 where ``abs(x)`` is below about 1.1e-16; ``x**7`` adds nothing to x, so it does not round x.
     """
 
     number = (1, 3, 2, 5)
@@ -46,12 +56,16 @@ class Gsl2024Func6(Formula):
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float, modified: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``, or, with ``modified = 1``, at ``x - c_scale*c + 1.0``.
 
-        Category 1 states the rule for ``c_scale``.
+        With ``modified = 2``, evaluate the function of ``modified = 1`` as ``(x - c_scale*c)**7``. Category 1 states
+        the rule for ``c_scale``.
         """
         x = x - c_scale * c
-        if modified == 1:
-            x = x + 1.0
-        return (x - 1) ** 7
+        if modified == 2:
+            return x**7
+        else:
+            if modified == 1:
+                x = x + 1.0
+            return (x - 1) ** 7
 
     def interval_bounds(self, a: float, b: float, c_scale: float, modified: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
@@ -61,7 +75,13 @@ class Gsl2024Func6(Formula):
         """Return the published parameter values, then those of the modified test problems."""
         return (
             ParamTable(names=("a", "b", "c_scale", "modified"), rows=((0.9995, 1.0002, 0.0007, 0.0),)),
-            ParamTable(names=("a", "b", "c_scale", "modified"), rows=((-0.0005, 0.0002, 0.0007, 1.0),)),
+            ParamTable(
+                names=("a", "b", "c_scale", "modified"),
+                rows=(
+                    (-0.0005, 0.0002, 0.0007, 1.0),
+                    (-0.0005, 0.0002, 0.0007, 2.0),
+                ),
+            ),
         )
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`
@@ -92,5 +112,15 @@ class Gsl2024Func6(Formula):
             x=-0.00029,
             c=0.25,
             expected=-4.700788051625088e-24,
+        ),
+        FormulaTestCase.interval_bounds(
+            params={"a": -0.0005, "b": 0.0002, "c_scale": 0.0007, "modified": 2.0}, expected=(-0.0005, 0.0002)
+        ),
+        FormulaTestCase.value(
+            params={"a": -0.0005, "b": 0.0002, "c_scale": 0.0007, "modified": 2.0},
+            x=-0.00029,
+            c=0.25,
+            expected=-4.700788051621643e-24,
+            atol=0.0,
         ),
     )

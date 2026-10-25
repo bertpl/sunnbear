@@ -23,11 +23,21 @@ class Epperson201331125(Formula):
     With ``modified = 1``, the formula evaluates the published function at ``x + 1``, on the published interval shifted
     by -1, ``[-0.002, 0.002]``, which lies around 0.
 
-    With ``modified = 1``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new interval.
+    With ``modified = 2``, the formula computes the function of ``modified = 1`` in the equivalent form ``x**5``, on
+    the same interval.
+
+    With ``modified = 1`` or ``2``, ``c`` shifts x as category 1 states, with ``c_scale`` the rounded width of the new
+    interval.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because its interval is
     narrow around the root at 1: the ratio of the interval's largest bound to its width, about 250, is above the
     conditions' limit of 100.
+
+    The test problem with ``modified = 1`` does not satisfy the conditions either, because they require bisection to
+    spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of f.
+
+    With ``modified = 1``, adding 1 to x rounds x to the spacing of the floats near 1, about 2.2e-16, so that f is
+    exactly 0 where ``abs(x)`` is below about 1.1e-16; ``x**5`` adds nothing to x, so it does not round x.
     """
 
     number = (1, 4, 5, 23)
@@ -45,12 +55,16 @@ class Epperson201331125(Formula):
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float, modified: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``, or, with ``modified = 1``, at ``x - c_scale*c + 1.0``.
 
-        Category 1 states the rule for ``c_scale``.
+        With ``modified = 2``, evaluate the function of ``modified = 1`` as ``(x - c_scale*c)**5``. Category 1 states
+        the rule for ``c_scale``.
         """
         x = x - c_scale * c
-        if modified == 1:
-            x = x + 1.0
-        return (x - 1) ** 5
+        if modified == 2:
+            return x**5
+        else:
+            if modified == 1:
+                x = x + 1.0
+            return (x - 1) ** 5
 
     def interval_bounds(self, a: float, b: float, c_scale: float, modified: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
@@ -60,7 +74,13 @@ class Epperson201331125(Formula):
         """Return the published parameter values, then those of the modified test problems."""
         return (
             ParamTable(names=("a", "b", "c_scale", "modified"), rows=((0.998, 1.002, 0.004, 0.0),)),
-            ParamTable(names=("a", "b", "c_scale", "modified"), rows=((-0.002, 0.002, 0.004, 1.0),)),
+            ParamTable(
+                names=("a", "b", "c_scale", "modified"),
+                rows=(
+                    (-0.002, 0.002, 0.004, 1.0),
+                    (-0.002, 0.002, 0.004, 2.0),
+                ),
+            ),
         )
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`
@@ -91,5 +111,15 @@ class Epperson201331125(Formula):
             x=-0.0008,
             c=0.25,
             expected=-1.8895680000001248e-14,
+        ),
+        FormulaTestCase.interval_bounds(
+            params={"a": -0.002, "b": 0.002, "c_scale": 0.004, "modified": 2.0}, expected=(-0.002, 0.002)
+        ),
+        FormulaTestCase.value(
+            params={"a": -0.002, "b": 0.002, "c_scale": 0.004, "modified": 2.0},
+            x=-0.0008,
+            c=0.25,
+            expected=-1.889568e-14,
+            atol=0.0,
         ),
     )

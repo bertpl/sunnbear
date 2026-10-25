@@ -294,22 +294,27 @@ def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table
 
 
 def test_modified_formulas_are_the_formulas_with_the_parameter_modified(script_modules):
-    """`MODIFIED_FORMULAS` lists exactly the formulas of category 1 that have the parameter ``modified``."""
+    """`MODIFIED_FORMULAS` holds 1 type for each level above 0 of each formula of category 1 that has ``modified``."""
     # --- act --------------------------
-    formula_ids_with_parameter_modified = {
-        f"f{formula.format_number(formula.number)}"
-        for formula in _CATEGORY_1_FORMULAS
-        if "modified" in formula.param_names
-    }
+    levels_per_formula_id = {}
+    for formula in _CATEGORY_1_FORMULAS:
+        if "modified" in formula.param_names:
+            levels_per_formula_id[f"f{formula.format_number(formula.number)}"] = {
+                dict(zip(candidate.id.param_names, candidate.id.param_values, strict=True))["modified"]
+                for candidate in formula.build_all_candidates()
+            }
 
     # --- assert -----------------------
-    assert formula_ids_with_parameter_modified == set(script_modules["modified_formulas"].MODIFIED_FORMULAS)
+    assert levels_per_formula_id == {
+        formula_id: {float(level) for level in range(len(modification_types) + 1)}
+        for formula_id, modification_types in script_modules["modified_formulas"].MODIFIED_FORMULAS.items()
+    }
 
 
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
 @pytest.mark.parametrize("c", [0.25, -0.25])
 def test_category_1_formula_applies_c_as_its_rule_says(formula, c, script_modules):
-    """A formula of category 1 applies ``c`` by category 1's rule, or by its `ModificationType` where ``modified = 1``.
+    """A formula of category 1 applies ``c`` by category 1's rule, or by its `ModificationType`s where ``modified > 0``.
 
     The expected value evaluates the formula at ``c = 0``, which repeats the formula's own float arithmetic, so the
     value at ``c`` equals the expected value exactly. The equality holds:
@@ -321,20 +326,20 @@ def test_category_1_formula_applies_c_as_its_rule_says(formula, c, script_module
     for candidate in formula.build_all_candidates():
         # --- arrange ----------------------
         modification_type_enum = script_modules["modified_formulas"].ModificationType
-        modification_type = _modification_type(candidate, script_modules)
+        modification_types = _modification_types(candidate, script_modules)
         c_scale = PublishedTestProblems.c_scale(candidate.a, candidate.b)
         # the x-value lies at 0.6 of the interval, in log scale for C_SCALES_X, so that the shifted or scaled x-values
         # stay in the interval
-        if modification_type is modification_type_enum.C_SCALES_X:
+        if modification_type_enum.C_SCALES_X in modification_types:
             x = candidate.a * (candidate.b / candidate.a) ** 0.6
         else:
             x = candidate.a + 0.6 * (candidate.b - candidate.a)
 
         # --- act --------------------------
         value = candidate.xc_fun(x, c)
-        if modification_type is modification_type_enum.C_ADDS_TO_F:
+        if modification_type_enum.C_ADDS_TO_F in modification_types:
             expected = candidate.xc_fun(x, 0.0) + c
-        elif modification_type is modification_type_enum.C_SCALES_X:
+        elif modification_type_enum.C_SCALES_X in modification_types:
             expected = candidate.xc_fun(x * math.exp(-c * math.log(candidate.b / candidate.a)), 0.0)
         else:
             expected = candidate.xc_fun(x - c_scale * c, 0.0)
@@ -351,15 +356,15 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, scrip
     cannot see a number that is 1 float step off, such as ``1.9999999999999996`` for ``2.0``: the shifted x-values
     round to the same float.
 
-    The test skips a test problem with ``modified = 1`` whose ``ModificationType.is_x_shifted_by_c_scale`` is false,
-    because such a test problem applies ``c`` with no factor ``c_scale``.
+    The test skips a test problem with ``modified > 0`` where ``ModificationType.is_c_scale_shift_kept`` is false
+    for any of its levels, because such a test problem applies ``c`` with no factor ``c_scale``.
     """
     # --- arrange ----------------------
     tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))
     shifting_candidates = []
     for candidate in formula.build_all_candidates():
-        modification_type = _modification_type(candidate, script_modules)
-        if modification_type is None or modification_type.is_x_shifted_by_c_scale:
+        modification_types = _modification_types(candidate, script_modules)
+        if all(modification_type.is_c_scale_shift_kept for modification_type in modification_types):
             shifting_candidates.append(candidate)
 
     # --- act --------------------------
@@ -780,10 +785,11 @@ def _first_run_formulas_table(script_modules):
     )
 
 
-def _modification_type(candidate, script_modules):
-    """Return the `ModificationType` of a test problem with ``modified = 1``, and None for a published one."""
+def _modification_types(candidate, script_modules):
+    """Return the `ModificationType` of each level from 1 to a test problem's ``modified``, and ``()`` for level 0."""
     params = dict(zip(candidate.id.param_names, candidate.id.param_values, strict=True))
-    if params.get("modified") == 1.0:
-        return script_modules["modified_formulas"].MODIFIED_FORMULAS[candidate.id.formula_id]
+    level = int(params.get("modified", 0.0))
+    if level == 0:
+        return ()
     else:
-        return None
+        return script_modules["modified_formulas"].MODIFIED_FORMULAS[candidate.id.formula_id][:level]

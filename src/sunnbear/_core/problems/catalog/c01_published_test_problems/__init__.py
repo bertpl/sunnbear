@@ -41,8 +41,16 @@ class PublishedTestProblems(FormulaCategory):
     An example is a published test problem whose function is not defined left of its interval: a shift along x by any
     ``c > 0`` evaluates that function outside its domain.
 
-    The formula's docstring describes its modification, which keeps the modified test problem as close to the
-    published test problem as the benchmark suite inclusion conditions allow.
+    The value of ``modified`` is the level of modification, and a formula may also have higher levels, ``modified = 2``
+    and up. Each level exists only where a test problem of the level below does not satisfy the conditions, and applies
+    the modification of the level below plus 1 more.
+
+    The formula's docstring describes its modifications, which keep the modified test problems as close to the
+    published test problems as the benchmark suite inclusion conditions allow.
+
+    Where a modification changes what the published test problem tests, such as when it removes a feature that the
+    source uses the test problem to show, the formula's docstring says so in a paragraph with the words "changes what
+    the test problem tests".
     """
 
     number = (1,)
