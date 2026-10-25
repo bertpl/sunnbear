@@ -1,8 +1,9 @@
-"""This module re-exports `TestFunction`, its id `FunctionId`, and the types of the callables that it returns.
+"""This module re-exports `TestFunction`, its id `FunctionId`, and the callable types `XFun` and `XCFun`.
 
 - `TestFunction` holds a formula with its parameter values, its interval and the range of its parameter `c`;
 - `FunctionId` identifies a test function by its formula number and its named parameter values;
-- `XFun` and `XCFun` are the types of what `TestFunction.build_x_fun` and `TestFunction.xc_fun` return.
+- `XFun` is the type that `TestFunction.build_x_fun` returns, `f(x)` at a fixed `c`; `XCFun` is the type of
+  `TestFunction.xc_fun`, `f(x, c)`.
 
 How test functions are built from formulas is described in the docstring of the implementation package,
 `sunnbear._core.functions.core`.

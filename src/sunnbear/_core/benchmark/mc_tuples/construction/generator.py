@@ -109,8 +109,9 @@ class MCTuplesGenerator:
     def generate(self, t_total_sec: float, max_size: MCTuplesSize = MCTuplesSize.SIZE_1024) -> MCTuples:
         """Construct the nested set up to `max_size` in about `t_total_sec` s; size `k` is its first `k` tuples.
 
-        `generate_mc_tuples`, which runs this method, documents the construction's extra time beyond
-        `t_total_sec` and why a rerun gives a different set.
+        `t_total_sec` covers only the solves, so the construction takes extra time beyond it, and a rerun gives a set
+        of equivalent quality, not the same set; `generate_mc_tuples`, which runs this method, lists what the extra
+        time is spent on.
 
         Args:
             t_total_sec: The total wall-clock time of the solves, at least `MIN_T_TOTAL_SEC`.

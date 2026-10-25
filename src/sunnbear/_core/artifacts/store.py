@@ -178,7 +178,8 @@ class ArtifactStore:
                 `UNRELEASED_SUNNBEAR_VERSION_SUFFIX`, replacing any ``sunnbear`` entry.
             input_artifact_hashes: The content hashes of `value`'s input artifacts, keyed by
                 artifact name.
-            generated_by: The function call that generated `value`, as JSON-compatible data.
+            generated_by: The sunnbear function call that generated `value`, with its arguments, as
+                JSON-compatible data; ``None`` when no sunnbear function generated it.
 
         Returns:
             The manifest that was written.
