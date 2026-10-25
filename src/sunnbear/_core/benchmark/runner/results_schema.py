@@ -1,6 +1,6 @@
 """`RESULTS_SCHEMA` defines the columns and types of the benchmark results table, 1 row per solve.
 
-Each row is 1 solver on 1 Monte Carlo sample of 1 test function.
+Each row is 1 solver on 1 Monte Carlo sample of 1 test problem.
 
 The table stores only raw measurements, not values derived from them, such as an evaluation count adjusted
 for failed solves or a flop cost weighted per flop type, so a change to how such values are derived never
@@ -22,7 +22,7 @@ RESULTS_SCHEMA: dict[str, pl.DataType] = {
     # These columns identify the solve.
     "solver_id": pl.String(),
     "solver_version": pl.Int32(),
-    "function_id": pl.String(),
+    "problem_id": pl.String(),
     "mc_size": pl.Int32(),
     "mc_sample_idx": pl.Int32(),
     # These columns hold the Monte Carlo sample: its (u, v) tuple and that tuple's (xtol, c) values.

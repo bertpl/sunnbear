@@ -1,4 +1,4 @@
-"""These tests assert that `Ridders` converges to a root of the test functions, and that each variant stops by its
+"""These tests assert that `Ridders` converges to a root of the example functions, and that each variant stops by its
 own criterion."""
 
 import itertools

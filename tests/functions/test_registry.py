@@ -8,10 +8,10 @@ from sunnbear._core.functions.catalog.c02_standard_function_families.c01_polynom
 from sunnbear._core.functions.core import (
     Formula,
     FormulaRegistry,
-    FunctionId,
     ParamAxis,
     ParamGrid,
     ParamRecipe,
+    ProblemId,
 )
 from sunnbear._core.functions.core.exceptions import InvalidParamsError, UnknownFormulaError
 
@@ -417,20 +417,20 @@ def test_bound_formula_calls_math_functions_inside_flop_counting():
 #  candidate_from_id / calibrated
 # ==================================================================================================
 def test_candidate_from_id_and_string():
-    """A `FunctionId` and its rendered string rebuild the same calibrated test function."""
+    """A `ProblemId` and its rendered string rebuild the same calibrated test problem."""
     # --- act --------------------------
-    tf_from_id = FormulaRegistry.candidate_from_id(FunctionId((2, 1, 1), ("p1",), (0.2,))).calibrated(-5.0, 5.0)
+    tf_from_id = FormulaRegistry.candidate_from_id(ProblemId((2, 1, 1), ("p1",), (0.2,))).calibrated(-5.0, 5.0)
     tf_from_str = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-5.0, 5.0)
 
     # --- assert -----------------------
     for tf in (tf_from_id, tf_from_str):
-        assert tf.id == FunctionId((2, 1, 1), ("p1",), (0.2,))
+        assert tf.id == ProblemId((2, 1, 1), ("p1",), (0.2,))
         assert (tf.a, tf.b, tf.c_min, tf.c_max) == (-2.0, 2.0, -5.0, 5.0)
         assert tf.xc_fun(2.0, 0.0) == pytest.approx(8.0 - 0.4)
 
 
 def test_build_x_fun():
-    """`build_x_fun` fixes `c` and returns the test function as a function of `x` alone."""
+    """`build_x_fun` fixes `c` and returns the test problem's function as a function of `x` alone."""
     # --- arrange ----------------------
     tf = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.0]").calibrated(-5.0, 5.0)
 
@@ -451,7 +451,7 @@ def test_candidate_from_id_invalid_params():
     """An id whose parameter values fail the formula's validity criteria raises `InvalidParamsError`."""
     with pytest.raises(InvalidParamsError):
         FormulaRegistry.candidate_from_id(
-            FunctionId((2, 1, 2), ("p1",), (2.0,))  # even power: invalid
+            ProblemId((2, 1, 2), ("p1",), (2.0,))  # even power: invalid
         )
 
 

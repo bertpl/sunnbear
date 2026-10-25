@@ -2,7 +2,7 @@
 
 The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples from.
 
-- `MCTuples` holds a set of tuples, maps them onto a test function, reports their spread as `MCTuplesStats`, and
+- `MCTuples` holds a set of tuples, maps them onto a test problem, reports their spread as `MCTuplesStats`, and
   reports how many bits of information their values hold as `MCTuplesBitStats`;
 - each axis is divided into `N_FINE_LANES` equal fine lanes, and `fine_lanes_of` returns the fine lane of each value;
   `TARGET_MEAN` is the mean toward which `generate_mc_tuples` corrects every size's u values and v values, and

@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Rename test functions to test problems: `TestFunction`, `FunctionId`, the results column `function_id`, `run_benchmark`'s argument `functions`, and the module `sunnbear.functions`
+
 ### Deprecated
 
 ### Removed

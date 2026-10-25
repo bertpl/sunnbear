@@ -1,6 +1,6 @@
 """This module holds `BusDekkerTablesIToIVProblem`, the test problems of Bus and Dekker (1975), without results.
 
-The article's section 5 defines 4 groups of test functions, and Tables I to IV give the evaluation counts on them, 1
+The article's section 5 defines 4 groups of test problems, and Tables I to IV give the evaluation counts on them, 1
 table per group. A problem's name holds its group and, where the group has several, its function and parameters, e.g.
 ``I.2[n=3]`` or ``II[a=1,b=0.0001,n=9]``.
 

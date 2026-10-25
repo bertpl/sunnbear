@@ -1,7 +1,7 @@
 """The `Formula` base class: hand-written function families plus generation metadata.
 
 A formula owns three parameter layers with distinct roles: the recipe-given
-``p`` tuple (bound once per test function, consciously shaping its character),
+``p`` tuple (bound once per test problem, consciously shaping its character),
 the Monte-Carlo parameter ``c`` (varied per benchmark run), and — downstream,
 never stored here — the tolerance ``xtol``.
 
@@ -21,14 +21,14 @@ from typing import ClassVar
 
 import numba
 
-from .identity import FunctionId
+from .identity import ProblemId
 from .param_values import DEDUP_DIGITS, deduplicate_param_tuples
 from .recipes import ParamRecipe
 from .registry import FormulaRegistry
 from .source import FormulaSource
 from .taxonomy import FormulaTaxonomyNode
 from .test_cases import FormulaTestCase
-from .test_function import CandidateTestFunction
+from .test_problem import CandidateTestProblem
 from .types import XCFun, XFun
 
 
@@ -36,7 +36,7 @@ from .types import XCFun, XFun
 #  Formula
 # ==================================================================================================
 class Formula(FormulaTaxonomyNode, ABC):
-    """One hand-written formula: the mathematics plus metadata to spawn candidate test functions.
+    """One hand-written formula: the mathematics plus metadata to spawn candidate test problems.
 
     Class attributes:
         number: The formula's place in the taxonomy, e.g. ``(2, 1, 1)``; its parent category is
@@ -175,17 +175,17 @@ class Formula(FormulaTaxonomyNode, ABC):
                 cls._compiled_formula_cache = fn
         return cls._compiled_formula_cache
 
-    def build_candidate(self, param_values: "tuple[float, ...]") -> CandidateTestFunction:
-        """Build one candidate test function for a bound parameter tuple.
+    def build_candidate(self, param_values: "tuple[float, ...]") -> CandidateTestProblem:
+        """Build one candidate test problem for a bound parameter tuple.
 
         The candidate carries this formula and its identity rather than a
         pre-bound callable: both callable forms are derived on demand
         (`bind_xc_fun` / `bind_x_fun`), so binding ``c`` costs one closure over
         the compiled body instead of a wrapper around a wrapper.
         """
-        fid = FunctionId(self.number, self.param_names, tuple(param_values))
+        fid = ProblemId(self.number, self.param_names, tuple(param_values))
         a, b = self.interval_bounds(*fid.param_values)
-        return CandidateTestFunction(id=fid, formula=self, a=a, b=b)
+        return CandidateTestProblem(id=fid, formula=self, a=a, b=b)
 
     def bind_xc_fun(self, values: "tuple[float, ...]") -> XCFun:
         """Bind a parameter tuple over the once-per-class compiled body, yielding ``f(x, c)``."""
@@ -211,7 +211,7 @@ class Formula(FormulaTaxonomyNode, ABC):
 
         return x_fun
 
-    def build_all_candidates(self, digits: int = DEDUP_DIGITS) -> "tuple[CandidateTestFunction, ...]":
+    def build_all_candidates(self, digits: int = DEDUP_DIGITS) -> "tuple[CandidateTestProblem, ...]":
         """Build every candidate this formula defines: recipe tuples, filtered and deduplicated.
 
         Candidates come back in the order the recipes generate their tuples, and **among
@@ -235,7 +235,7 @@ class Formula(FormulaTaxonomyNode, ABC):
 
         Args:
             digits: Significant digits at which two parameter tuples count as
-                the same test function.
+                the same test problem.
 
         Raises:
             ValueError: If a recipe disagrees with `param_names`, if

@@ -30,7 +30,7 @@ def run_stages(
 
     Raises:
         ValueError: If a stage's output table breaks a rule of the chain (see `PipelineStage`): it has no unique
-            ``function_id`` per row, lacks a column of the table before it, or holds a row that the table before it
+            ``problem_id`` per row, lacks a column of the table before it, or holds a row that the table before it
             does not hold. The stage's output is then not written.
     """
     previous_table = pl.DataFrame()
@@ -65,21 +65,21 @@ def _check_chain_rules(stage: PipelineStage, previous_table: pl.DataFrame, table
     """Check that the output table of `stage` extends `previous_table` as the chain requires.
 
     Raises:
-        ValueError: If `table` has no unique ``function_id`` per row, lacks a column of `previous_table`, or holds a
-            ``function_id`` that `previous_table` does not hold, unless `previous_table` is the first stage's empty
+        ValueError: If `table` has no unique ``problem_id`` per row, lacks a column of `previous_table`, or holds a
+            ``problem_id`` that `previous_table` does not hold, unless `previous_table` is the first stage's empty
             input.
     """
     stage_name = type(stage).__name__
-    if "function_id" not in table.columns:
-        raise ValueError(f"{stage_name} outputs a table without a function_id column.")
-    if table["function_id"].is_duplicated().any():
-        raise ValueError(f"{stage_name} outputs a table that holds a function_id more than once.")
+    if "problem_id" not in table.columns:
+        raise ValueError(f"{stage_name} outputs a table without a problem_id column.")
+    if table["problem_id"].is_duplicated().any():
+        raise ValueError(f"{stage_name} outputs a table that holds a problem_id more than once.")
     dropped_columns = [column for column in previous_table.columns if column not in table.columns]
     if dropped_columns:
         raise ValueError(f"{stage_name} drops the columns {dropped_columns} of the table before it.")
-    if "function_id" in previous_table.columns:
-        added_function_ids = set(table["function_id"].to_list()) - set(previous_table["function_id"].to_list())
-        if added_function_ids:
+    if "problem_id" in previous_table.columns:
+        added_problem_ids = set(table["problem_id"].to_list()) - set(previous_table["problem_id"].to_list())
+        if added_problem_ids:
             raise ValueError(
-                f"{stage_name} outputs rows that the table before it does not hold: {sorted(added_function_ids)}."
+                f"{stage_name} outputs rows that the table before it does not hold: {sorted(added_problem_ids)}."
             )

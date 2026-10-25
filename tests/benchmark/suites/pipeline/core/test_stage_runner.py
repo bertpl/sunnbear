@@ -89,10 +89,10 @@ def test_a_rerun_replaces_the_files_and_leaves_no_temporary_files(tmp_path):
 @pytest.mark.parametrize(
     "stages, message",
     [
-        pytest.param([ExampleIdlessStage()], r"ExampleIdlessStage outputs a table without a function_id", id="no_id"),
+        pytest.param([ExampleIdlessStage()], r"ExampleIdlessStage outputs a table without a problem_id", id="no_id"),
         pytest.param(
             [ExampleNumbersStage(), ExampleRowDuplicatingStage()],
-            r"ExampleRowDuplicatingStage outputs a table that holds a function_id more than once",
+            r"ExampleRowDuplicatingStage outputs a table that holds a problem_id more than once",
             id="duplicated_rows",
         ),
         pytest.param(

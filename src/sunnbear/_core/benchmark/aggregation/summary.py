@@ -55,14 +55,14 @@ def summarize_results(
       `<column>_gpq_<q in percent, at least 2 digits>`, e.g. `n_fevals_eff_gpq_05`, `n_fevals_eff_gpq_50` or
       `n_fevals_eff_gpq_12.5`.
 
-    Each `gpq` is computed over all rows of a group at once, so a test function (`function_id`) with more rows in the
+    Each `gpq` is computed over all rows of a group at once, so a test problem (`problem_id`) with more rows in the
     group weighs more in that group's `gpq`.
 
     Args:
         frame: A results table with the columns of `RESULTS_SCHEMA` and, for the default
             `gpq_levels_by_column`, the columns of `DERIVED_RESULTS_SCHEMA` (see `add_derived_results`);
             a `DataFrame` or a `LazyFrame`, and the result is of the same kind.
-        by: The column or columns to group by, e.g. `solver_id` for 1 row per solver, or `["solver_id", "function_id"]`
+        by: The column or columns to group by, e.g. `solver_id` for 1 row per solver, or `["solver_id", "problem_id"]`
             for 1 row per pair.
         gpq_levels_by_column: The `gpq` levels to compute, per column; ``None`` summarizes every column of
             `DERIVED_RESULTS_SCHEMA` at the levels 0.25, 0.5 and 0.75.

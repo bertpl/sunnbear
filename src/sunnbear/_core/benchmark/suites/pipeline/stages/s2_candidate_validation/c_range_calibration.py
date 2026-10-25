@@ -8,7 +8,7 @@ finite, and ``min(r_a, r_b) > MIN_ENDPOINT_VALUE_RATIO``, with ``r_a = f(a, c)/f
 ``r_b = f(b, c)/f(b, 0)``. The condition gives 3 things:
 
 - **Signs:** each endpoint value keeps its sign from ``c = 0``, so ``f(a, c)`` and ``f(b, c)`` have opposite signs,
-  and the test function keeps the orientation that it has at ``c = 0``, increasing or decreasing.
+  and the function keeps the orientation that it has at ``c = 0``, increasing or decreasing.
 - **Margin:** each endpoint value keeps more than the fraction `MIN_ENDPOINT_VALUE_RATIO` of its magnitude at
   ``c = 0``, so the root stays away from both endpoints. The margin also makes the range finite for a formula whose
   endpoint values shrink as ``abs(c)`` grows.
@@ -30,7 +30,7 @@ No search can check every c-value in a range, so the search ends by checking the
 5. Map the c-values of the benchmark's tuple set onto the range, and check the condition at each. On each side where
    the condition fails at any of these c-values, return to step 4, which now also uses these c-values; return to
    step 4 at most `MAX_RETURNS_TO_HALVING` times.
-6. Require the range to be at least `MIN_C_RANGE_WIDTH` wide, because across a narrower range the test functions at
+6. Require the range to be at least `MIN_C_RANGE_WIDTH` wide, because across a narrower range the functions at
    the c-values that the benchmark samples differ too little from one another.
 
 A candidate is rejected at the first step that fails, with that step's `RejectionReason`.

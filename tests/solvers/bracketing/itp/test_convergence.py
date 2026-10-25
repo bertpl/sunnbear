@@ -1,4 +1,4 @@
-"""These tests assert that `ITP` converges to a root of the test functions, and that its paper_experiments variant
+"""These tests assert that `ITP` converges to a root of the example functions, and that its paper_experiments variant
 with slack keeps within its bound on the iteration count on the functions of the paper."""
 
 import pytest

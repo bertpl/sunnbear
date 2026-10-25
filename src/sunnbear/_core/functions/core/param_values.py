@@ -60,7 +60,7 @@ class ParamNotation(StrEnum):
     `build_value_from_argument` for a recipe grid and `parse_value` for a spelling — round the
     argument to `CANONICAL_DIGITS` significant digits.
 
-    A float passed directly to `FunctionId`, such as ``0.1 + 0.2``, is not checked until the id is
+    A float passed directly to `ProblemId`, such as ``0.1 + 0.2``, is not checked until the id is
     rendered; `is_valid_value` checks it up front.
 
     **Canonical spelling.** `spell_value_canonically` spells a valid value in every notation that
@@ -73,7 +73,7 @@ class ParamNotation(StrEnum):
     rounded: ``2^1.23`` can parse to a float that differs in the last bit on another platform, so one
     id string can stand for slightly different floats on 2 platforms.
 
-    The test functions' own results already differ in the last bit across platforms, so the
+    The test problems' function values already differ in the last bit across platforms, so the
     platform's ``pow`` adds no new source of difference.
     """
 

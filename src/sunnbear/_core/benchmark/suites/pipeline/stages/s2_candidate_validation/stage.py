@@ -3,7 +3,7 @@
 import polars as pl
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageOutput
-from sunnbear._core.functions.core import FunctionId
+from sunnbear._core.functions.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 from .bound_to_width_ratio_check import exceeds_max_bound_to_width_ratio
@@ -38,7 +38,7 @@ class CandidateValidationStage(PipelineStage):
         is compiled in only 1 worker.
 
         Args:
-            previous_table: The output table of candidate generation, with the columns ``function_id``, ``a`` and
+            previous_table: The output table of candidate generation, with the columns ``problem_id``, ``a`` and
                 ``b``.
             worker_pool: The worker pool of the run, in which calibration runs.
 
@@ -53,22 +53,22 @@ class CandidateValidationStage(PipelineStage):
         """
         # --- check 1: the bound-to-width ratio --
         is_ratio_too_large = previous_table.select(exceeds_max_bound_to_width_ratio()).to_series()
-        ratio_rejected_function_ids = previous_table.filter(is_ratio_too_large)["function_id"]
-        results_by_function_id: dict[str, CRange | RejectionReason] = dict.fromkeys(
-            ratio_rejected_function_ids, RejectionReason.BOUND_TO_WIDTH_RATIO
+        ratio_rejected_problem_ids = previous_table.filter(is_ratio_too_large)["problem_id"]
+        results_by_problem_id: dict[str, CRange | RejectionReason] = dict.fromkeys(
+            ratio_rejected_problem_ids, RejectionReason.BOUND_TO_WIDTH_RATIO
         )
 
         # --- check 2: c-range calibration -------
-        function_ids_to_calibrate = previous_table.filter(~is_ratio_too_large)["function_id"].to_list()
+        problem_ids_to_calibrate = previous_table.filter(~is_ratio_too_large)["problem_id"].to_list()
         batches = worker_pool.split_into_batches(
-            function_ids_to_calibrate, group_key=lambda function_id: FunctionId.from_string(function_id).formula_id
+            problem_ids_to_calibrate, group_key=lambda problem_id: ProblemId.from_string(problem_id).formula_id
         )
-        tasks = {batch_idx: CRangeCalibrationTask(function_ids=tuple(batch)) for batch_idx, batch in enumerate(batches)}
+        tasks = {batch_idx: CRangeCalibrationTask(problem_ids=tuple(batch)) for batch_idx, batch in enumerate(batches)}
         for batch_idx, results in worker_pool.run(tasks):
-            results_by_function_id.update(zip(batches[batch_idx], results, strict=True))
+            results_by_problem_id.update(zip(batches[batch_idx], results, strict=True))
 
         # --- 1 row per candidate ----------------
-        results = [results_by_function_id[function_id] for function_id in previous_table["function_id"]]
+        results = [results_by_problem_id[problem_id] for problem_id in previous_table["problem_id"]]
         c_mins = [result.c_min if isinstance(result, CRange) else None for result in results]
         c_maxs = [result.c_max if isinstance(result, CRange) else None for result in results]
         rejected_bys = [result.value if isinstance(result, RejectionReason) else None for result in results]
@@ -116,7 +116,7 @@ class CandidateValidationStage(PipelineStage):
 
         The rows follow the order of each formula's first appearance in `table`.
         """
-        formula_ids = [FunctionId.from_string(function_id).formula_id for function_id in table["function_id"]]
+        formula_ids = [ProblemId.from_string(problem_id).formula_id for problem_id in table["problem_id"]]
         return (
             table.with_columns(formula_id=pl.Series(formula_ids, dtype=pl.String()))
             .group_by("formula_id", maintain_order=True)

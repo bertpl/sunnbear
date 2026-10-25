@@ -1,4 +1,4 @@
-"""`MCTuples` validates and stores a tuple set, maps it onto a test function, and reports its spread and the bits of
+"""`MCTuples` validates and stores a tuple set, maps it onto a test problem, and reports its spread and the bits of
 information of its values."""
 
 import numpy as np

@@ -1,4 +1,4 @@
-"""The formula registry holds formulas and categories, and rebuilds a candidate test function from an identity.
+"""The formula registry holds formulas and categories, and rebuilds a candidate test problem from an identity.
 
 Defining a concrete `Formula` or a `FormulaCategory` subclass registers one instance of it here,
 as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
@@ -24,7 +24,7 @@ as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
   category itself.
 
 The registry itself imports nothing: the shipped formulas and categories are registered when the
-test-function package imports the formula catalog.
+test-problem package imports the formula catalog.
 """
 
 from typing import TYPE_CHECKING, ClassVar
@@ -32,9 +32,9 @@ from typing import TYPE_CHECKING, ClassVar
 from sunnbear._core.utils.class_origin import is_sunnbear_module
 
 from .exceptions import FormulaTaxonomyError, InvalidParamsError, UnknownFormulaError
-from .identity import FunctionId
+from .identity import ProblemId
 from .taxonomy import FormulaTaxonomyNode
-from .test_function import CandidateTestFunction
+from .test_problem import CandidateTestProblem
 
 # type-only: formula and category import this module at runtime, so a runtime import would be circular
 if TYPE_CHECKING:
@@ -46,7 +46,7 @@ if TYPE_CHECKING:
 #  FormulaRegistry
 # ==================================================================================================
 class FormulaRegistry:
-    """`FormulaRegistry` enumerates formulas and categories, or rebuilds a candidate test function from an identity.
+    """`FormulaRegistry` enumerates formulas and categories, or rebuilds a candidate test problem from an identity.
 
     `Formula.__init_subclass__` and `FormulaCategory.__init_subclass__` call `register_formula` and
     `register_category`, so the registry is complete as soon as the modules that define the formula and
@@ -108,14 +108,14 @@ class FormulaRegistry:
         return tuple(category for _, category in sorted(cls._categories_by_number.items()))
 
     @classmethod
-    def candidate_from_id(cls, function_id: FunctionId | str) -> CandidateTestFunction:
-        """Reconstruct a candidate test function from its identity.
+    def candidate_from_id(cls, problem_id: ProblemId | str) -> CandidateTestProblem:
+        """Reconstruct a candidate test problem from its identity.
 
-        Attach a calibrated c-range via `CandidateTestFunction.calibrated` to
-        obtain a benchmarkable `TestFunction`.
+        Attach a calibrated c-range via `CandidateTestProblem.calibrated` to
+        obtain a benchmarkable `TestProblem`.
 
         Args:
-            function_id: The identity, as object or canonical string.
+            problem_id: The identity, as object or canonical string.
 
         Raises:
             FormulaTaxonomyError: If the registered nodes do not form a valid taxonomy tree.
@@ -124,7 +124,7 @@ class FormulaRegistry:
                 parameter tuple fails the formula's validity criteria.
         """
         cls._ensure_taxonomy_validated()
-        fid = FunctionId.from_string(function_id) if isinstance(function_id, str) else function_id
+        fid = ProblemId.from_string(problem_id) if isinstance(problem_id, str) else problem_id
         formula = cls._formulas_by_number.get(fid.formula_number)
         if formula is None:
             raise UnknownFormulaError(

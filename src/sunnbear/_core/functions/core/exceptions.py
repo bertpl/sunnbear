@@ -1,4 +1,4 @@
-"""This module defines the exceptions raised by the test-function layer."""
+"""This module defines the exceptions raised by the test-problem layer."""
 
 from sunnbear._core.exceptions import SunnbearError
 
