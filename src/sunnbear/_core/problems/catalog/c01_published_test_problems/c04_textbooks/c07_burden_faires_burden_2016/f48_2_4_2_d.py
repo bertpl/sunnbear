@@ -30,8 +30,8 @@ class BurdenFairesBurden2016242D(Formula):
     f.
 
     Near the root, the 4 terms of the published form cancel, so that f is exactly 0 at many x-values within about 4e-5
-    of the root; ``(exp(x) - 3*x**2)**3`` rounds only ``exp(x) - 3*x**2``, whose root is simple, so that its sign is
-    wrong at most within about 1 float of the root.
+    of the root; in ``(exp(x) - 3*x**2)**3``, the only rounding that can change the sign is that of ``exp(x) - 3*x**2``,
+    whose root is simple, so that the sign of f is wrong at most within about 1 float of the root.
     """
 
     number = (1, 4, 7, 48)

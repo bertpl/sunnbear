@@ -29,7 +29,7 @@ class Galdino2011F6(Formula):
     f.
 
     Near the root, ``exp((x - 3)**5)`` rounds to 1, and the subtraction of 1 cancels, so that f is exactly 0 at many
-    x-values within about 7e-4 of the root; ``expm1`` computes ``exp(u) - 1`` without the subtraction.
+    x-values within about 7e-4 of the root; ``expm1(u)`` computes ``exp(u) - 1`` without the subtraction.
     """
 
     number = (1, 2, 9, 6)

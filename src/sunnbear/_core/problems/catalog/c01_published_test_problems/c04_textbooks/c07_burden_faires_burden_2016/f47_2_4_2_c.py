@@ -33,8 +33,8 @@ class BurdenFairesBurden2016242C(Formula):
     f.
 
     Near the root, the 4 terms of the published form cancel, so that f is exactly 0 at many x-values within about 1e-6
-    of the root; ``(sin(x) - exp(-x))**3`` rounds only ``sin(x) - exp(-x)``, whose root is simple, so that its sign is
-    wrong at most within about 1 float of the root.
+    of the root; in ``(sin(x) - exp(-x))**3``, the only rounding that can change the sign is that of
+    ``sin(x) - exp(-x)``, whose root is simple, so that the sign of f is wrong at most within about 1 float of the root.
     """
 
     number = (1, 4, 7, 47)
