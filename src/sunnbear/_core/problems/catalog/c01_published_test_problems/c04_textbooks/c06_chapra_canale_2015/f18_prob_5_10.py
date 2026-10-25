@@ -11,9 +11,9 @@ the formula's row in `data/literature_test_problems/sources/` needs a matching c
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
-# R0 is the float64 nearest to the published polynomial's root near 5.61.
-R0 = 5.609788960859374
-# TAYLOR_COEFFICIENTS holds the published polynomial's Taylor coefficients at R0, of t**0 to t**3 with t = x - R0;
+# ROOT is the float64 nearest to the published polynomial's root near 5.61.
+ROOT = 5.609788960859374
+# TAYLOR_COEFFICIENTS holds the published polynomial's Taylor coefficients at ROOT, of t**0 to t**3 with t = x - ROOT;
 # the coefficient of t**4 is 1. They are computed with mpmath from the published coefficients and rounded to float64.
 TAYLOR_COEFFICIENTS = (4.692574564789708e-16, 8.195425149706974, 19.183458051653208, 14.439155843437497)
 
@@ -27,13 +27,14 @@ class ChapraCanale2015Prob510(Formula):
     Positive real root 5.60979, as the book states; 5 false-position iterations, a plot to explain the result, then
     false position to `es = 1.0%`.
 
-    With ``modified = 1``, the formula computes the published polynomial in its re-expansion around ``R0``, the float64
-    nearest to its root: ``c0 + t*(c1 + t*(c2 + t*(c3 + t)))``, with ``t = x - R0`` and the coefficients of
-    `TAYLOR_COEFFICIENTS`, on the published interval, and ``c`` shifts x as category 1 states.
+    With ``modified = 1``, the formula computes the published polynomial in its re-expansion around ``ROOT``, the
+    float64 nearest to its root, on the published interval; ``c`` shifts x as category 1 states. The re-expansion is
+    ``c0 + t*(c1 + t*(c2 + t*(c3 + t)))``, with ``t = x - ROOT`` and ``c0`` to ``c3`` from `TAYLOR_COEFFICIENTS`.
 
-    The polynomial has no factored form with exact float64 coefficients, so the formula re-expands it. Near the root,
-    ``c1*t`` is the largest term, and the terms do not cancel. Rounding the coefficients to float64 moves the root by
-    less than 1e-17 of the float64 spacing there.
+    A factored form ``(x - r)*q(x)`` would not cancel near the root, but the polynomial has no such form with exact
+    float64 coefficients, so the formula re-expands the polynomial. Near the root, ``c0`` and ``c1*t`` are small, and
+    the other terms are smaller still, so f is not a difference of large, nearly equal terms. Rounding the coefficients
+    to float64 moves the root by a negligible fraction of the float64 spacing there.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because the conditions require
     bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of
@@ -59,13 +60,13 @@ class ChapraCanale2015Prob510(Formula):
     def parametrized_fun(x: float, c: float, modified: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``.
 
-        With ``modified = 1``, evaluate it in its re-expansion around ``R0``, with ``t = x - c_scale*c - R0``. Category
-        1 states the rule for ``c_scale``.
+        With ``modified = 1``, evaluate the published function in its re-expansion around ``ROOT``, with
+        ``t = x - c_scale*c - ROOT``. Category 1 states the rule for ``c_scale``.
         """
         x = x - 1.5 * c
         if modified == 1:
             c0, c1, c2, c3 = TAYLOR_COEFFICIENTS
-            t = x - R0
+            t = x - ROOT
             return c0 + t * (c1 + t * (c2 + t * (c3 + t)))
         else:
             return x**4 - 8 * x**3 - 35 * x**2 + 450 * x - 1001
