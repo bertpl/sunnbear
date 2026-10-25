@@ -19,7 +19,7 @@ The check at `DEFAULT_N_BISECTION_FEVALS` also covers every smaller `n_bisection
 """
 
 from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
-from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, compute_solve_settings
+from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, MCSolveSettings
 from sunnbear._core.problems.core import TestProblem
 from sunnbear._core.solvers.bracketing import Bisection
 from sunnbear._core.solvers.core import SolveStatus
@@ -29,18 +29,21 @@ def is_bisection_count_exact(problem: TestProblem) -> bool:
     """Return whether `Bisection` converges in exactly `DEFAULT_N_BISECTION_FEVALS` evaluations at every tuple.
 
     The tuples are the largest size of the shipped tuple set, of which every smaller size is a prefix. Each tuple maps
-    onto ``xtol`` and ``c`` through `compute_solve_settings`, as in a benchmark run.
+    onto ``xtol`` and ``c`` through `MCSolveSettings`, as in a benchmark run.
 
     The check runs 1 solve per tuple and stops at the first tuple with another count or a solve that does not converge.
     """
-    mc_tuples = load_mc_tuples(max(MCTuplesSize))
-    xtols, cs, max_fevals = compute_solve_settings(
-        problem, mc_tuples=mc_tuples, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS
+    mc_solve_settings = MCSolveSettings.from_test_problem(
+        problem, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS, mc_tuples=load_mc_tuples(max(MCTuplesSize))
     )
     solver = Bisection()
-    for xtol, c in zip(xtols, cs, strict=True):
+    for xtol, c in zip(mc_solve_settings.xtols, mc_solve_settings.cs, strict=True):
         result = solver.solve(
-            problem.build_x_fun(float(c)), problem.a, problem.b, xtol=float(xtol), max_fevals=max_fevals
+            problem.build_x_fun(float(c)),
+            problem.a,
+            problem.b,
+            xtol=float(xtol),
+            max_fevals=mc_solve_settings.max_fevals,
         )
         if result.status is not SolveStatus.CONVERGED or result.n_fevals != DEFAULT_N_BISECTION_FEVALS:
             return False

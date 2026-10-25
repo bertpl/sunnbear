@@ -13,7 +13,6 @@ from .c_range import CRange
 from .correctness import CORRECTNESS_CHECK_MAX_FEVALS, is_solution_correct
 from .mc_solve_settings import MCSolveSettings
 from .seeds import SeedPurpose, derive_seed
-from .solve_settings import compute_solve_settings
 from .tolerances import (
     DEFAULT_N_BISECTION_FEVALS,
     MAX_FEVALS_FACTOR,
