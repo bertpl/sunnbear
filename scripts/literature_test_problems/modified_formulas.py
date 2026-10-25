@@ -127,6 +127,7 @@ MODIFIED_FORMULAS = {
     "f1.4.5.23": (ModificationType.C_SHIFTS_X_ON_INTERVAL_NEAR_0, ModificationType.CANCELLATION_FREE_FORM),
     "f1.4.6.1": (ModificationType.CANCELLATION_FREE_FORM,),
     "f1.4.6.2": (ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,),
+    "f1.4.6.18": (ModificationType.CANCELLATION_FREE_FORM,),
     "f1.4.6.20": (ModificationType.C_ADDS_TO_F,),
     "f1.4.7.4": (ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,),
     "f1.4.7.9": (ModificationType.C_ADDS_TO_F,),
