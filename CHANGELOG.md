@@ -15,7 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Remove `MCTuples.to_xtol_and_c` and `MCTuples.to_c`
+
 ### Fixed
+
+- Fix `compute_xtol_range` returning a range in which bisection can spend 1 evaluation more or fewer than `n_bisection_fevals`; the fix narrows the range and changes benchmark results
 
 ### Security
 

@@ -18,50 +18,82 @@ DEFAULT_N_BISECTION_FEVALS = 40
 # A solve's evaluation budget is this many times bisection's evaluation count.
 MAX_FEVALS_FACTOR = 4
 
-# `xtol_min` from `compute_xtol_range` must be at least this many times `FLOAT64_EPS * max(|a|, |b|)`, so that `xtol`
-# spans at least this many float64 spacings at the interval bounds:
+# Every `xtol` in the range from `compute_xtol_range` must be at least this many times
+# `FLOAT64_EPS * max(|a|, |b|)`, so that `xtol` spans at least this many float64 spacings at the interval bounds:
 # - the interval can shrink to the shared stopping width of `2*xtol`;
 # - the minimum step of `Brent`, `xtol + 2*FLOAT64_EPS*|b|`, stays below `2*xtol`, so that no step lands on the
 #   interval bound `c` on the other side of the root from `b`.
 MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND = 8
 
+# `compute_xtol_range` moves each bound of the `xtol` range inward from its value in exact arithmetic by a margin,
+# measured in log2(xtol); the margin is this many times the largest change of log2(xtol) that the rounding of
+# bisection's midpoints can cause.
+XTOL_RANGE_MARGIN_SAFETY_FACTOR = 2.0
+
 
 def compute_xtol_range(*, a: float, b: float, n_bisection_fevals: int) -> tuple[float, float]:
-    """Return the bounds `(xtol_min, 2·xtol_min)` of the `xtol` values on which bisection spends `n_bisection_fevals`.
+    """Return the bounds `(xtol_min, xtol_max)` of the `xtol` values on which bisection spends `n_bisection_fevals`.
 
-    `Bisection` spends 1 evaluation per step and takes `ceil(log2((b - a) / (2·xtol)))` steps, so with the 2
-    evaluations at the interval bounds it spends `ceil(log2((b - a) / (2·xtol))) + 2` evaluations in total.
-    With `xtol_min = (b - a) · 2^(1 - n_bisection_fevals)`, that total equals `n_bisection_fevals` exactly when
-    `xtol_min <= xtol < 2·xtol_min`, and no larger interval of `xtol` values has that property. Near either
-    edge, rounding of the midpoints can shift the count by 1 when `a` and `b` are not exact binary fractions,
-    so pick `xtol` well inside the range.
+    `Bisection` spends 1 evaluation per step and takes `ceil(log2((b - a) / (2*xtol)))` steps, so with the 2
+    evaluations at the interval bounds it spends `ceil(log2((b - a) / (2*xtol))) + 2` evaluations in total. In exact
+    arithmetic, that total equals `n_bisection_fevals` exactly when
+    `xtol_min_in_exact_arithmetic <= xtol < 2*xtol_min_in_exact_arithmetic`, with
+    `xtol_min_in_exact_arithmetic = (b - a) * 2^(1 - n_bisection_fevals)`.
 
-    `xtol_min` must be at least
-    `MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND · FLOAT64_EPS · max(|a|, |b|)`, so that every solver can
-    guarantee a result within `xtol_min` of a root.
+    In float64, the count can shift by 1 near either edge of that range, for 2 reasons:
 
-    That minimum is met only when `max(|a|, |b|) <= (b - a) · 2^(53 - n_bisection_fevals) / k`, with `k` the constant
+    - at `xtol_min_in_exact_arithmetic`, the stopping test `width <= 2*xtol` compares 2 equal values, and just below
+      `2*xtol_min_in_exact_arithmetic` it compares 2 nearly equal values, so a rounding error in the width decides it;
+    - the computed interval bounds are rounded midpoints, so the computed width differs from the exact one.
+
+    So the returned range keeps a margin `margin_log2`, measured in log2(xtol), from each edge; the margin grows with
+    the bound-to-width ratio `max(|a|, |b|) / (b - a)` and with `n_bisection_fevals`, and the returned bounds are
+    `xtol_min_in_exact_arithmetic * 2^margin_log2` and `xtol_min_in_exact_arithmetic * 2^(1 - margin_log2)`.
+
+    `xtol_min_in_exact_arithmetic` must be at least
+    `MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND * FLOAT64_EPS * max(|a|, |b|)`, so that every solver can
+    guarantee a result within `xtol` of a root.
+
+    That minimum is met only when `max(|a|, |b|) <= (b - a) * 2^(53 - n_bisection_fevals) / k`, with `k` the constant
     `MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND`, so an interval far from 0 relative to its width is
     rejected; at the default `n_bisection_fevals`, every interval that contains 0 is accepted.
+
+    On an accepted interval, `margin_log2` stays below 1/2, so `xtol_min < xtol_max` and the range is never empty.
 
     Raises:
         ValueError: If any of these holds:
             - `a >= b`;
             - `n_bisection_fevals` is below 2 (bisection always evaluates both interval bounds);
-            - `xtol_min` is below the minimum above.
+            - `xtol_min_in_exact_arithmetic` is below the minimum above.
     """
     if not a < b:
         raise ValueError(f"Interval must satisfy a < b (got a={a}, b={b}).")
     validate_n_bisection_fevals(n_bisection_fevals)
-    xtol_min = math.ldexp(b - a, 1 - n_bisection_fevals)
+    xtol_min_in_exact_arithmetic = math.ldexp(b - a, 1 - n_bisection_fevals)
     xtol_min_allowed = MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND * FLOAT64_EPS * max(abs(a), abs(b))
-    if xtol_min < xtol_min_allowed:
+    if xtol_min_in_exact_arithmetic < xtol_min_allowed:
         raise ValueError(
-            f"The interval [{a}, {b}] lies too far from 0 for its width: its smallest xtol, {xtol_min:g}, is below "
-            f"{MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND} · FLOAT64_EPS · max(|a|, |b|) = "
-            f"{xtol_min_allowed:g}."
+            f"The interval [{a}, {b}] lies too far from 0 for its width: its smallest xtol in exact arithmetic, "
+            f"{xtol_min_in_exact_arithmetic:g}, is below {MIN_ALLOWED_XTOL_IN_FLOAT64_EPS_OF_MAX_ABS_INTERVAL_BOUND} * "
+            f"FLOAT64_EPS * max(|a|, |b|) = {xtol_min_allowed:g}."
         )
-    return xtol_min, 2.0 * xtol_min
+
+    # The margin `margin_log2`, in log2(xtol), is `XTOL_RANGE_MARGIN_SAFETY_FACTOR` times an upper limit on how far
+    # rounding can move each edge of the range:
+    # - after `n_bisection_fevals - 2` halvings, the computed width is off by at most about
+    #   `FLOAT64_EPS * max(|a|, |b|)`; relative to the final width `2*xtol`, that error is
+    #   `FLOAT64_EPS * bound_to_width_ratio * 2^(n_bisection_fevals - 2)`;
+    # - a relative error of the width moves the edge `xtol` by the same relative amount, and a relative change of
+    #   `xtol`, divided by `ln(2)`, is the change of log2(xtol).
+    bound_to_width_ratio = max(abs(a), abs(b)) / (b - a)
+    margin_log2 = (
+        XTOL_RANGE_MARGIN_SAFETY_FACTOR
+        * FLOAT64_EPS
+        * bound_to_width_ratio
+        * math.ldexp(1.0, n_bisection_fevals - 2)
+        / math.log(2.0)
+    )
+    return xtol_min_in_exact_arithmetic * 2.0**margin_log2, xtol_min_in_exact_arithmetic * 2.0 ** (1.0 - margin_log2)
 
 
 def max_fevals_for(*, n_bisection_fevals: int) -> int:

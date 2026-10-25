@@ -11,13 +11,7 @@ from dataclasses import dataclass
 import polars as pl
 
 from sunnbear._core.benchmark.mc_tuples import load_mc_tuples
-from sunnbear._core.benchmark.protocol import (
-    SeedPurpose,
-    compute_xtol_range,
-    derive_seed,
-    is_solution_correct,
-    max_fevals_for,
-)
+from sunnbear._core.benchmark.protocol import MCSolveSettings, SeedPurpose, derive_seed, is_solution_correct
 from sunnbear._core.problems.core import FormulaRegistry, TestProblem
 from sunnbear._core.solvers.core import SolverConfig, SolverConfigRegistry, SolveStatus
 
@@ -76,14 +70,12 @@ class BenchmarkTask:
         from `run_settings.mc_size`, so every solver config and formula must be registered in the process
         that runs the task.
 
-        Each sample maps its (u, v) tuple to a tolerance `xtol` within the `xtol` range derived from
-        `n_bisection_fevals` by `compute_xtol_range`, and to a value of the test problem's parameter `c` within
-        `[c_min, c_max]`.
+        Each sample maps its (u, v) tuple to a tolerance `xtol` and a value of the test problem's parameter `c`,
+        as `MCSolveSettings` defines from `n_bisection_fevals` and the test problem's c-range `[c_min, c_max]`.
 
         Every solver solves `f(x, c)` on the test problem's interval with that tolerance, within the evaluation
-        budget that `max_fevals_for` derives from `n_bisection_fevals`, and the solve is timed on a monotonic
-        clock. The timed span includes recording every evaluated x-value, which the correctness check probes
-        first, as `x_candidates`.
+        budget of `MCSolveSettings`, and the solve is timed on a monotonic clock. The timed span includes recording
+        every evaluated x-value, which the correctness check probes first, as `x_candidates`.
 
         A solve that reports convergence is checked with `is_solution_correct`; a solve with any other status
         is not checked, and its row's `is_correct` is `False`.
@@ -103,15 +95,16 @@ class BenchmarkTask:
         mc_tuples = load_mc_tuples(self.run_settings.mc_size)
 
         # --- per-task values ------------------------
-        n_bisection_fevals = self.run_settings.n_bisection_fevals
-        # `to_xtol_and_c` spans the range from its lower bound alone, so the upper bound is not needed.
-        xtol_min, _ = compute_xtol_range(a=problem.a, b=problem.b, n_bisection_fevals=n_bisection_fevals)
-        max_fevals = max_fevals_for(n_bisection_fevals=n_bisection_fevals)
-        xtols, cs = mc_tuples.to_xtol_and_c(xtol_min, problem.c_min, problem.c_max)
+        mc_solve_settings = MCSolveSettings.from_test_problem(
+            problem, n_bisection_fevals=self.run_settings.n_bisection_fevals, mc_tuples=mc_tuples
+        )
+        max_fevals = mc_solve_settings.max_fevals
 
         # --- 1 row per solve ------------------------
         rows = []
-        for mc_sample_idx, (u, v, xtol, c) in enumerate(zip(mc_tuples.u, mc_tuples.v, xtols, cs, strict=True)):
+        for mc_sample_idx, (u, v, xtol, c) in enumerate(
+            zip(mc_tuples.u, mc_tuples.v, mc_solve_settings.xtols, mc_solve_settings.cs, strict=True)
+        ):
             f = problem.build_x_fun(float(c))
             seed = derive_seed(
                 root_seed=self.run_settings.root_seed,
