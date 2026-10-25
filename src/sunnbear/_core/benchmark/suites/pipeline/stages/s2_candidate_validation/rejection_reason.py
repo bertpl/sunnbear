@@ -23,3 +23,5 @@ class RejectionReason(StrEnum):
     CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES = "calibration_fails_at_benchmark_c_values"
     # The c-range is narrower than `MIN_C_RANGE_WIDTH` at step 6 of the search.
     CALIBRATION_C_RANGE_TOO_NARROW = "calibration_c_range_too_narrow"
+    # At 1 of the tuples, `Bisection` does not converge in exactly `DEFAULT_N_BISECTION_FEVALS` evaluations.
+    BISECTION_COUNT_NOT_EXACT = "bisection_count_not_exact"

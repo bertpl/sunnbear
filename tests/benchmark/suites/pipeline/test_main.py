@@ -29,6 +29,13 @@ def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> N
 def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeypatch, capsys):
     """The command writes every stage's output into the workspace with the given number of workers, and prints 1 line
     per stage, in run order, then the count of the formulas with rejected candidates."""
+    # --- arrange ----------------------
+    # The command runs over every registered formula. The test keeps only the shipped formulas whose numbers start with
+    # (1, 4, 2) or (2, 1, 1), because the bisection count check runs 1 solve per tuple of the largest size of the
+    # shipped tuple set for each valid candidate, which makes a run over every formula slow.
+    formulas = tuple(formula for formula in FormulaRegistry.formulas() if formula.number[:3] in {(1, 4, 2), (2, 1, 1)})
+    monkeypatch.setattr(FormulaRegistry, "formulas", lambda: formulas)
+
     # --- act --------------------------
     _run_pipeline_command(monkeypatch, ["--workspace", str(tmp_path), "--n-workers", "3"])
 

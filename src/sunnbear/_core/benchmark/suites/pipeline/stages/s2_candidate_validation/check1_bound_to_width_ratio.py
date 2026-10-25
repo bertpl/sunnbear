@@ -1,4 +1,4 @@
-"""The bound-to-width ratio check, validation's first check, rejects a candidate whose interval lies far from 0.
+"""The bound-to-width ratio check rejects a candidate whose interval lies far from 0 relative to its width.
 
 A candidate is rejected when its bound-to-width ratio ``max(abs(a), abs(b)) / (b - a)`` exceeds
 `MAX_BOUND_TO_WIDTH_RATIO`.

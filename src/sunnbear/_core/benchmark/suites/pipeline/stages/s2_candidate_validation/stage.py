@@ -7,8 +7,8 @@ from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, Pipelin
 from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
 
-from .bound_to_width_ratio_check import exceeds_max_bound_to_width_ratio
-from .c_range_calibration_task import CRangeCalibrationTask
+from .check1_bound_to_width_ratio import exceeds_max_bound_to_width_ratio
+from .function_evaluating_checks_task import FunctionEvaluatingChecksTask
 from .rejection_reason import RejectionReason
 
 # The stage adds these columns to the valid candidates: their c-ranges.
@@ -33,14 +33,15 @@ class CandidateValidationStage(PipelineStage):
     def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
         """Return the valid candidates with their c-ranges, and the reports on the rejected candidates.
 
-        The checks run in order, and each runs only on the candidates that passed the checks before it. Calibration
-        runs in tasks on `worker_pool`; each task holds every candidate of the formulas that it covers, so each formula
-        is compiled in only 1 worker.
+        The checks run in order, and each runs only on the candidates that passed the checks before it.
+
+        The checks that evaluate f (calibration and the bisection count check) run in tasks on `worker_pool`; each
+        task holds every candidate of the formulas that it covers, so each formula is compiled in only 1 worker.
 
         Args:
             previous_table: The output table of candidate generation, with the columns ``problem_id``, ``a`` and
                 ``b``.
-            worker_pool: The worker pool of the run, in which calibration runs.
+            worker_pool: The worker pool of the run, in which the checks that evaluate f run.
 
         Returns:
             The stage's output, which holds:
@@ -51,19 +52,21 @@ class CandidateValidationStage(PipelineStage):
             - the report `REJECTIONS_PER_FORMULA_REPORT_NAME`: 1 row per formula, with the columns ``formula_id``,
               ``n_candidates``, ``n_valid``, and 1 count per `RejectionReason`, named after its value.
         """
-        # --- check 1: the bound-to-width ratio --
+        # --- the bound-to-width ratio check -----
         is_ratio_too_large = previous_table.select(exceeds_max_bound_to_width_ratio()).to_series()
         ratio_rejected_problem_ids = previous_table.filter(is_ratio_too_large)["problem_id"]
         results_by_problem_id: dict[str, CRange | RejectionReason] = dict.fromkeys(
             ratio_rejected_problem_ids, RejectionReason.BOUND_TO_WIDTH_RATIO
         )
 
-        # --- check 2: c-range calibration -------
-        problem_ids_to_calibrate = previous_table.filter(~is_ratio_too_large)["problem_id"].to_list()
+        # --- the checks that evaluate f ---------
+        problem_ids_to_evaluate = previous_table.filter(~is_ratio_too_large)["problem_id"].to_list()
         batches = worker_pool.split_into_batches(
-            problem_ids_to_calibrate, group_key=lambda problem_id: ProblemId.from_string(problem_id).formula_id
+            problem_ids_to_evaluate, group_key=lambda problem_id: ProblemId.from_string(problem_id).formula_id
         )
-        tasks = {batch_idx: CRangeCalibrationTask(problem_ids=tuple(batch)) for batch_idx, batch in enumerate(batches)}
+        tasks = {
+            batch_idx: FunctionEvaluatingChecksTask(problem_ids=tuple(batch)) for batch_idx, batch in enumerate(batches)
+        }
         for batch_idx, results in worker_pool.run(tasks):
             results_by_problem_id.update(zip(batches[batch_idx], results, strict=True))
 

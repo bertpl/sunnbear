@@ -7,8 +7,8 @@ import pytest
 
 from sunnbear._core.benchmark.mc_tuples import MCTuples
 from sunnbear._core.benchmark.protocol import CRange
-from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation import c_range_calibration
-from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.c_range_calibration import (
+from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation import check2_c_range_calibration
+from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.check2_c_range_calibration import (
     MAX_BOUND_REL_GAP,
     calibrate_c_range,
 )
@@ -121,7 +121,7 @@ def test_calibration_rejects_a_candidate_with_the_reason_of_the_step_that_fails(
     "max_returns_to_halving, result_expected",
     [
         pytest.param(
-            c_range_calibration.MAX_RETURNS_TO_HALVING,
+            check2_c_range_calibration.MAX_RETURNS_TO_HALVING,
             CRange(c_min=-_STEP_C_MAX, c_max=0.25),
             id="narrows_the_c_range",
         ),
@@ -142,7 +142,7 @@ def test_a_benchmark_c_value_that_fails_narrows_the_c_range_or_rejects_the_candi
         else:
             return _step_xc_fun(x, c)
 
-    monkeypatch.setattr(c_range_calibration, "MAX_RETURNS_TO_HALVING", max_returns_to_halving)
+    monkeypatch.setattr(check2_c_range_calibration, "MAX_RETURNS_TO_HALVING", max_returns_to_halving)
     # On [-127/128, 127/128], v = 0.7 maps to c = 0.397, which fails; v = 0.2 maps to c = -0.595, which passes.
     mc_tuples = MCTuples(u=[0.5, 0.5], v=[0.7, 0.2])
 

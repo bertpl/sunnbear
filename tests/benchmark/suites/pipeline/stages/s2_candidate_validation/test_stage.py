@@ -15,39 +15,22 @@ from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation imp
     CandidateValidationStage,
     RejectionReason,
 )
-from sunnbear._core.problems.core import Formula, FormulaRegistry, ParamRecipe, XCFun
+from sunnbear._core.problems.core import FormulaRegistry
 from sunnbear._core.utils.module_imports import worker_pool_for_modules
 from sunnbear._core.utils.worker_pool import WorkerPool
-
-
-def _define_formula_cls(formula_number: tuple[int, ...], xc_fun: XCFun, a: float, b: float) -> type[Formula]:
-    """Define and return a formula without parameters, numbered `formula_number`, that evaluates `xc_fun` on [a, b]."""
-
-    class ExampleFormula(Formula):
-        number = formula_number
-        name = f"Example {formula_number}"
-        jit = False
-        parametrized_fun = staticmethod(xc_fun)
-
-        def interval_bounds(self) -> tuple[float, float]:
-            """Return the interval ``[a, b]``."""
-            return (a, b)
-
-        def recipes(self) -> tuple[ParamRecipe, ...]:
-            """Return no recipes; the formula has no parameters."""
-            return ()
-
-    return ExampleFormula
+from tests.benchmark.suites.pipeline.stages.s2_candidate_validation.example_formulas import define_formula_cls
 
 
 def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(isolated_formula_registry):
-    """Of 3 candidates, the first is valid, with its c-range; the bound-to-width ratio check rejects the second, and
-    calibration the third; the counts per formula match these 3 outcomes."""
+    """Of 4 candidates, 1 is valid and each check rejects 1 other, in the order of the checks; the counts per formula
+    match these 4 outcomes."""
     # --- arrange ----------------------
     formulas = [
-        _define_formula_cls((99, 901), lambda x, c: x - c, -1.0, 1.0)(),
-        _define_formula_cls((99, 902), lambda x, c: x - 100.5 - c, 100.0, 101.0)(),
-        _define_formula_cls((99, 903), lambda x, c: x + 2.0, -1.0, 1.0)(),
+        # the offset 1 / 3 keeps the root off bisection's midpoints, so no solve ends early at an exact 0
+        define_formula_cls((99, 901), lambda x, c: x - c - 1 / 3, -1.0, 1.0)(),
+        define_formula_cls((99, 902), lambda x, c: x - 100.5 - c, 100.0, 101.0)(),
+        define_formula_cls((99, 903), lambda x, c: x + 2.0, -1.0, 1.0)(),
+        define_formula_cls((99, 904), lambda x, c: 0.0 if abs(x - c) < 0.01 else x - c, -1.0, 1.0)(),
     ]
     candidates = CandidateGenerationStage(formulas).compute_output(pl.DataFrame(), worker_pool=WorkerPool(n_workers=1))
 
@@ -64,6 +47,7 @@ def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(i
     assert rejected_candidates.rows() == [
         ("f99.902", 100.0, 101.0, RejectionReason.BOUND_TO_WIDTH_RATIO.value),
         ("f99.903", -1.0, 1.0, RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0.value),
+        ("f99.904", -1.0, 1.0, RejectionReason.BISECTION_COUNT_NOT_EXACT.value),
     ]
     rejections_per_formula = output.reports[REJECTIONS_PER_FORMULA_REPORT_NAME]
     assert rejections_per_formula.columns == [
@@ -74,17 +58,23 @@ def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(i
     ]
     # Each row ends with 1 count per reason, in the order of `RejectionReason`.
     assert rejections_per_formula.rows() == [
-        ("f99.901", 1, 1, 0, 0, 0, 0, 0, 0),
-        ("f99.902", 1, 0, 1, 0, 0, 0, 0, 0),
-        ("f99.903", 1, 0, 0, 1, 0, 0, 0, 0),
+        ("f99.901", 1, 1, 0, 0, 0, 0, 0, 0, 0),
+        ("f99.902", 1, 0, 1, 0, 0, 0, 0, 0, 0),
+        ("f99.903", 1, 0, 0, 1, 0, 0, 0, 0, 0),
+        ("f99.904", 1, 0, 0, 0, 0, 0, 0, 0, 1),
     ]
 
 
 def test_the_stage_gives_the_same_output_with_1_or_2_workers():
-    """Calibration runs in tasks of the worker pool; with 2 worker processes, the output and reports equal those of a
-    run in this process, on shipped formulas with some candidates that each check rejects."""
+    """The checks that evaluate f run in tasks of the worker pool; with 2 worker processes, the output and reports equal
+    those of a run in this process, on shipped formulas with some candidates that each check rejects."""
     # --- arrange ----------------------
-    formulas = [formula for formula in FormulaRegistry.formulas() if formula.number[:3] in {(1, 4, 2), (2, 1, 1)}]
+    # The formula numbered (1, 4, 1, 6) adds candidates that the bisection count check rejects.
+    formulas = [
+        formula
+        for formula in FormulaRegistry.formulas()
+        if formula.number[:3] in {(1, 4, 2), (2, 1, 1)} or formula.number == (1, 4, 1, 6)
+    ]
     candidates = CandidateGenerationStage(formulas).compute_output(pl.DataFrame(), worker_pool=WorkerPool(n_workers=1))
     module_names = {type(formula).__module__ for formula in formulas}
 
@@ -98,6 +88,7 @@ def test_the_stage_gives_the_same_output_with_1_or_2_workers():
     assert {
         RejectionReason.BOUND_TO_WIDTH_RATIO.value,
         RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0.value,
+        RejectionReason.BISECTION_COUNT_NOT_EXACT.value,
     } <= set(rejected_by)
     assert in_process_output.table.height > 0
     assert worker_processes_output.table.equals(in_process_output.table)
