@@ -3,7 +3,7 @@
 import polars as pl
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageOutput
-from sunnbear._core.functions.core import ProblemId
+from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 from .bound_to_width_ratio_check import exceeds_max_bound_to_width_ratio

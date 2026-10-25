@@ -17,7 +17,7 @@ After the run, the command prints:
 import argparse
 from pathlib import Path
 
-from sunnbear._core.functions.core import FormulaRegistry
+from sunnbear._core.problems.core import FormulaRegistry
 
 from .core import PipelineWorkspace
 from .runner import run_pipeline

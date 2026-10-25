@@ -7,7 +7,7 @@ from sunnbear._core.benchmark.suites.pipeline.stages.s1_candidate_generation imp
     CANDIDATES_SCHEMA,
     CandidateGenerationStage,
 )
-from sunnbear._core.functions.core import FormulaRegistry
+from sunnbear._core.problems.core import FormulaRegistry
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 

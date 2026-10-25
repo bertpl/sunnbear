@@ -9,7 +9,7 @@ from sunnbear._core.benchmark.mc_tuples.artifact import MCTuplesDeclaration
 from sunnbear._core.benchmark.runner.exceptions import BenchmarkRunError
 from sunnbear._core.benchmark.runner.run_info import BenchmarkRunInfo
 from sunnbear._core.benchmark.runner.run_settings import BenchmarkRunSettings
-from sunnbear._core.functions.core import FormulaRegistry
+from sunnbear._core.problems.core import FormulaRegistry
 from sunnbear.solvers import SolverConfigRegistry
 
 

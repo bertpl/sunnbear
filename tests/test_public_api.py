@@ -7,7 +7,7 @@ import sunnbear._core.artifacts.listing
 import sunnbear._core.benchmark
 import sunnbear._core.benchmark.runner.exceptions
 import sunnbear._core.exceptions
-import sunnbear._core.functions.core
+import sunnbear._core.problems.core
 import sunnbear._core.solvers.bracketing
 import sunnbear._core.solvers.core
 import sunnbear._core.solvers.core.exceptions
@@ -46,7 +46,7 @@ def _public_attributes(module) -> set[str]:
 PUBLIC_AND_IMPLEMENTATION_MODULES = [
     (sunnbear.benchmark, (sunnbear._core.benchmark,)),
     (sunnbear.data, (sunnbear._core.artifacts.listing,)),
-    (sunnbear.problems, (sunnbear._core.functions.core,)),
+    (sunnbear.problems, (sunnbear._core.problems.core,)),
     (sunnbear.solvers, (sunnbear._core.solvers.core, sunnbear._core.solvers.bracketing, sunnbear._core.solvers.open)),
     (
         sunnbear.exceptions,

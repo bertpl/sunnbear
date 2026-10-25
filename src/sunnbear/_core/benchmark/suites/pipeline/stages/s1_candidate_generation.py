@@ -14,7 +14,7 @@ from collections.abc import Sequence
 import polars as pl
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageOutput
-from sunnbear._core.functions.core import Formula
+from sunnbear._core.problems.core import Formula
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 CANDIDATES_SCHEMA: dict[str, pl.DataType] = {

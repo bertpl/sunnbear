@@ -1,8 +1,8 @@
 """This module lists the formulas of category 1 that have a modified version, and how each version is modified.
 
-A formula of category 1 has a modified version when some of its published test functions do not satisfy the benchmark
-suite inclusion conditions, the conditions on every test function of a benchmark suite. The benchmark suite pipeline,
-`sunnbear._core.benchmark.suites.pipeline`, checks these conditions. The class docstring of `PublishedTestFunctions`
+A formula of category 1 has a modified version when some of its published test problems do not satisfy the benchmark
+suite inclusion conditions, the conditions on every test problem of a benchmark suite. The benchmark suite pipeline,
+`sunnbear._core.benchmark.suites.pipeline`, checks these conditions. The class docstring of `PublishedTestProblems`
 describes such a formula's parameter `modified`.
 
 Such a formula's module is written by hand, starting from the module that the generator writes for the formula when the
@@ -16,14 +16,14 @@ from enum import StrEnum
 #  ModificationType
 # ==================================================================================================
 class ModificationType(StrEnum):
-    """A `ModificationType` names how a formula's test functions with ``modified = 1`` differ from published ones."""
+    """A `ModificationType` names how a formula's test problems with ``modified = 1`` differ from published ones."""
 
     # The modified function adds the parameter c of category 1 to the published function's value, on the published
     # interval, and does not shift x.
     C_ADDS_TO_F = "c_adds_to_f"
     # The modified function has its own interval; the formula's docstring states the new interval and why the interval
     # changed. One bound of the published interval, or both, moves in 1 of 2 ways:
-    # - away from the pole, jump, root or other value of x at which the published test function fails;
+    # - away from the pole, jump, root or other value of x at which the published function fails;
     # - past a root, so that the interval holds an odd number of roots.
     # c shifts x by the rule of category 1, with c_scale the rounded width of the new interval.
     C_SHIFTS_X_ON_NEW_INTERVAL = "c_shifts_x_on_new_interval"

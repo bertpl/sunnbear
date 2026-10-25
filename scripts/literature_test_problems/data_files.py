@@ -260,7 +260,7 @@ class AutomaticStatus:
 
     `matches` holds the matched row ids joined by `ROW_ITEMS_SEPARATOR`, and `match_kind` names the comparisons that
     found them; for an `incomplete` row, `match_kind` names why the row is incomplete instead, such as "no interval",
-    and for an undecided row why a person must decide, such as "no test function". `n_instances` is 0 for a row
+    and for an undecided row why a person must decide, such as "no test problem". `n_instances` is 0 for a row
     whose f does not parse.
     """
 
@@ -275,7 +275,7 @@ class AutomaticStatus:
 class FinalStatus:
     """A `FinalStatus` holds a row's final status, the earlier rows that it names, and the reason for the status.
 
-    A `duplicate` names, in `duplicate_of`, the earlier rows that already give its test functions; a `new` or
+    A `duplicate` names, in `duplicate_of`, the earlier rows that already give its test problems; a `new` or
     `incomplete` row names, in `derived_from`, the earlier rows whose function it copies or changes. Each field joins
     its row ids by `ROW_ITEMS_SEPARATOR`.
     """

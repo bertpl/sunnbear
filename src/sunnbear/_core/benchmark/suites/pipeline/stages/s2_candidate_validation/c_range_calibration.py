@@ -42,7 +42,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from sunnbear._core.benchmark.mc_tuples import MCTuples
-from sunnbear._core.functions.core import XCFun
+from sunnbear._core.problems.core import XCFun
 
 from .rejection_reason import RejectionReason
 

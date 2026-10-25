@@ -9,7 +9,7 @@ class RegulaFalsiConfigsDeclaration(SolverConfigsDeclaration):
     """`RegulaFalsiConfigsDeclaration` declares `RegulaFalsi`'s only config, named ``regula_falsi``.
 
     It is a secondary config. It is not core because the classic method stalls too often to characterize the test
-    functions reliably.
+    problems reliably.
     """
 
     configs = (SolverConfig(solver_cls=RegulaFalsi, role=SolverRole.BUILTIN_SECONDARY),)
