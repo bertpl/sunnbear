@@ -17,9 +17,9 @@ from enum import StrEnum
 #  ModificationType
 # ==================================================================================================
 class ModificationType(StrEnum):
-    """A `ModificationType` names how a formula's test problems at 1 level of ``modified`` differ from the level below.
+    """A `ModificationType` names how test problems with ``modified = n`` differ from those with ``modified = n - 1``.
 
-    Level 0, ``modified = 0``, holds the published test problems.
+    The value of ``modified`` is the level of modification; level 0 holds the published test problems.
     """
 
     # The modified function adds the parameter c of category 1 to the published function's value, on the published
@@ -39,15 +39,19 @@ class ModificationType(StrEnum):
     # next to its distance from 0, or holds 1 root of a V-shaped function; c shifts x by the rule of category 1, with
     # c_scale the rounded width of the new interval.
     C_SHIFTS_X_ON_INTERVAL_NEAR_0 = "c_shifts_x_on_interval_near_0"
-    # The modified function is the function of the level below, the published function at level 1, written in a form
-    # without the cancellation that the level below's form has in float64, as x**3 for x**3 - 3*x**2 + 3*x - 1 near
-    # its root at 1. It keeps the level below's interval, and c applies as at the level below, or by the rule of
-    # category 1 at level 1.
+    # The modified function writes the function of the level below in a form whose terms do not cancel in float64, as
+    # (x - 1)**3 for x**3 - 3*x**2 + 3*x - 1 near its root at 1. At level 1, the level below is the published function.
+    # The modified function keeps the interval of the level below, and applies c:
+    # - at level 1, by the rule of category 1;
+    # - at higher levels, as the level below does.
     CANCELLATION_FREE_FORM = "cancellation_free_form"
 
     @property
-    def is_x_shifted_by_c_scale(self) -> bool:
-        """Return whether the type keeps the rule of category 1, by which ``c`` shifts x by ``c_scale*c``."""
+    def is_c_scale_shift_kept(self) -> bool:
+        """Return whether the type keeps the rule of category 1, by which ``c`` shifts x by ``c_scale*c``.
+
+        `CANCELLATION_FREE_FORM` keeps it only where the levels below it keep it.
+        """
         return self in (
             ModificationType.C_SHIFTS_X_ON_NEW_INTERVAL,
             ModificationType.C_SHIFTS_X_ON_INTERVAL_NEAR_0,

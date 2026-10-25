@@ -31,10 +31,11 @@ class Gsl2024Func6(Formula):
     narrow around the root at 1: the ratio of the interval's largest bound to its width, about 1429, is above the
     conditions' limit of 100.
 
-    The test problem with ``modified = 1`` does not satisfy them either, because the conditions require bisection to
-    spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of f. ``x + 1``
-    rounds x to the spacing of the floats near 1, about 2.2e-16, so that f is exactly 0 where ``abs(x)`` is below about
-    1.1e-16; ``x**7`` keeps all bits of x.
+    The test problem with ``modified = 1`` does not satisfy the conditions either, because they require bisection to
+    spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of f.
+
+    ``x + 1`` rounds x to the spacing of the floats near 1, about 2.2e-16, so that f is exactly 0 where ``abs(x)`` is
+    below about 1.1e-16; ``x**7`` keeps all bits of x.
     """
 
     number = (1, 3, 2, 5)

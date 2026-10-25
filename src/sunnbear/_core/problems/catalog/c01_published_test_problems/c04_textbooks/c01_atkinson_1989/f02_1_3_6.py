@@ -33,10 +33,12 @@ class Atkinson1989136(Formula):
     its interval is narrow around the root at 1: the ratio of the interval's largest bound to its width, about 250, is
     above the conditions' limit of 100.
 
-    The published test problem on ``[0, 2]`` and the test problems with ``modified = 1`` do not satisfy them either,
-    because the conditions require bisection to spend a fixed number of evaluations, and bisection stops early where a
-    midpoint lands on an exact 0 of f. Near the root, the terms of the published form cancel, so that f is exactly 0 at
-    many x-values within about 1e-5 of the root; ``x**3`` has no terms that cancel.
+    The published test problem on ``[0, 2]`` and the test problems with ``modified = 1`` do not satisfy the conditions
+    either, because they require bisection to spend a fixed number of evaluations, and bisection stops early where a
+    midpoint lands on an exact 0 of f.
+
+    Near the root, the terms of the published form cancel, so that f is exactly 0 at many x-values within about 1e-5 of
+    the root; ``x**3`` has no terms that cancel.
     """
 
     number = (1, 4, 1, 2)

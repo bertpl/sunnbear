@@ -294,7 +294,7 @@ def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table
 
 
 def test_modified_formulas_are_the_formulas_with_the_parameter_modified(script_modules):
-    """`MODIFIED_FORMULAS` lists exactly the formulas of category 1 with ``modified``, with 1 type per level used."""
+    """`MODIFIED_FORMULAS` holds 1 type for each level above 0 of each formula of category 1 with ``modified``."""
     # --- act --------------------------
     levels_per_formula_id = {}
     for formula in _CATEGORY_1_FORMULAS:
@@ -356,7 +356,7 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, scrip
     cannot see a number that is 1 float step off, such as ``1.9999999999999996`` for ``2.0``: the shifted x-values
     round to the same float.
 
-    The test skips a test problem with ``modified > 0`` where ``ModificationType.is_x_shifted_by_c_scale`` is false
+    The test skips a test problem with ``modified > 0`` where ``ModificationType.is_c_scale_shift_kept`` is false
     for 1 of its levels, because such a test problem applies ``c`` with no factor ``c_scale``.
     """
     # --- arrange ----------------------
@@ -364,7 +364,7 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula, scrip
     shifting_candidates = []
     for candidate in formula.build_all_candidates():
         modification_types = _modification_types(candidate, script_modules)
-        if all(modification_type.is_x_shifted_by_c_scale for modification_type in modification_types):
+        if all(modification_type.is_c_scale_shift_kept for modification_type in modification_types):
             shifting_candidates.append(candidate)
 
     # --- act --------------------------
@@ -786,7 +786,7 @@ def _first_run_formulas_table(script_modules):
 
 
 def _modification_types(candidate, script_modules):
-    """Return the `ModificationType` of each level from 1 to a test problem's ``modified``, none for a published one."""
+    """Return the `ModificationType` of each level from 1 to a test problem's ``modified``, and ``()`` for level 0."""
     params = dict(zip(candidate.id.param_names, candidate.id.param_values, strict=True))
     level = int(params.get("modified", 0.0))
     if level == 0:
