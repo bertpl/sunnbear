@@ -1,4 +1,4 @@
-"""`compute_solve_settings` maps tuples onto the `xtol` and `c` values and the budget of a test problem's solves."""
+"""`compute_solve_settings` returns the `xtol` and `c` values of a test problem's solves, and their budget."""
 
 import numpy as np
 
@@ -13,8 +13,8 @@ def compute_solve_settings(
 ) -> tuple[np.ndarray, np.ndarray, int]:
     """Return the `xtol` array and the `c` array of every tuple of `mc_tuples` for `problem`, and the evaluation budget.
 
-    `xtol` lies within the range from `compute_xtol_range`, `c` within the c-range of `problem`, and the budget is
-    `max_fevals_for(n_bisection_fevals=n_bisection_fevals)`.
+    `xtol` lies within the range from `compute_xtol_range`, `c` within the c-range of `problem`, and the budget comes
+    from `max_fevals_for`.
     """
     xtol_min, xtol_max = compute_xtol_range(a=problem.a, b=problem.b, n_bisection_fevals=n_bisection_fevals)
     xtols, cs = mc_tuples.to_xtol_and_c(xtol_min=xtol_min, xtol_max=xtol_max, c_min=problem.c_min, c_max=problem.c_max)

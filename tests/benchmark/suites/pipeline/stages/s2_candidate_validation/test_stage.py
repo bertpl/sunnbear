@@ -22,13 +22,8 @@ from tests.benchmark.suites.pipeline.stages.s2_candidate_validation.example_form
 
 
 def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(isolated_formula_registry):
-    """Of 4 candidates, 1 is valid and each check rejects 1 other; the counts per formula match these 4 outcomes:
-
-    - the first is valid, with its c-range;
-    - the bound-to-width ratio check rejects the second;
-    - calibration rejects the third;
-    - the bisection count check rejects the fourth.
-    """
+    """Of 4 candidates, 1 is valid and each check rejects 1 other, in the order of the checks; the counts per formula
+    match these 4 outcomes."""
     # --- arrange ----------------------
     formulas = [
         # the offset 1 / 3 keeps the root off bisection's midpoints, so no solve ends early at an exact 0
@@ -74,7 +69,7 @@ def test_the_stage_gives_the_same_output_with_1_or_2_workers():
     """The checks that evaluate f run in tasks of the worker pool; with 2 worker processes, the output and reports equal
     those of a run in this process, on shipped formulas with some candidates that each check rejects."""
     # --- arrange ----------------------
-    # (1, 4, 1, 6) adds candidates that the bisection count check rejects.
+    # The formula numbered (1, 4, 1, 6) adds candidates that the bisection count check rejects.
     formulas = [
         formula
         for formula in FormulaRegistry.formulas()

@@ -1,7 +1,8 @@
-"""`FunctionEvaluatingChecksTask` runs the checks that evaluate f on a batch of candidates, in a worker or this process.
+"""`FunctionEvaluatingChecksTask` runs the checks that evaluate f on a batch of candidates.
 
-These checks are c-range calibration and then the bisection count check, which needs the c-range. Running both in 1
-task compiles each formula in only 1 worker.
+These checks are c-range calibration and then the bisection count check, which needs the c-range. Both checks run in 1
+task, so the worker that compiles a formula for calibration also runs the bisection count check on it, and each formula
+is compiled in only 1 worker. The task runs in a worker process of the pool, or in the calling process.
 """
 
 from dataclasses import dataclass
@@ -32,8 +33,7 @@ class FunctionEvaluatingChecksTask:
     def run(self) -> list[CRange | RejectionReason]:
         """Return each candidate's c-range, or the reason that a check rejects it, in the order of `problem_ids`.
 
-        Both checks use the largest size of the shipped tuple set, as `calibrate_c_range` and `is_bisection_count_exact`
-        require.
+        Calibration uses the largest size of the shipped tuple set, as `calibrate_c_range` requires.
         """
         mc_tuples = load_mc_tuples(max(MCTuplesSize))
         return [
@@ -50,7 +50,7 @@ class FunctionEvaluatingChecksTask:
         c_range = calibrate_c_range(candidate.xc_fun, candidate.a, candidate.b, mc_tuples=mc_tuples)
         if isinstance(c_range, RejectionReason):
             return c_range
-        elif not is_bisection_count_exact(candidate.calibrated(c_range.c_min, c_range.c_max), mc_tuples=mc_tuples):
+        elif not is_bisection_count_exact(candidate.calibrated(c_range.c_min, c_range.c_max)):
             return RejectionReason.BISECTION_COUNT_NOT_EXACT
         else:
             return c_range

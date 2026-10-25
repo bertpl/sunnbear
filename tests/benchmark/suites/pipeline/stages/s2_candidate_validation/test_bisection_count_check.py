@@ -3,7 +3,6 @@ evaluations at every tuple."""
 
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
 from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.bisection_count_check import (
     is_bisection_count_exact,
 )
@@ -29,10 +28,9 @@ def test_the_check_accepts_only_a_problem_with_bisection_s_exact_count_at_every_
     # --- arrange ----------------------
     define_formula_cls((99, 911), xc_fun, -1.0, 1.0)
     problem = FormulaRegistry.candidate_from_id("f99.911").calibrated(c_min=-0.5, c_max=0.5)
-    mc_tuples = load_mc_tuples(max(MCTuplesSize))
 
     # --- act --------------------------
-    is_exact = is_bisection_count_exact(problem, mc_tuples=mc_tuples)
+    is_exact = is_bisection_count_exact(problem)
 
     # --- assert -----------------------
     assert is_exact is is_exact_expected
