@@ -76,7 +76,7 @@ Every text field is markdown, with code in backticks; a field that holds only co
 
 Each row has 1 of 3 final statuses, decided in this order; the paragraphs *The same function* and *Test problems and intervals* below the list define the terms that the list uses:
 
-- **`incomplete`:** the source does not give enough to define a test problem, or poses no root-finding problem, so the survey cannot use the row as a root-finding test; every other row is complete. The row's reason starts with 1 of these cases:
+- **`incomplete`:** the source does not give enough to define a test problem, or poses no root-finding problem, so the survey cannot use the row; every other row is complete. The row's reason starts with 1 of these cases:
   - `no interval`: the source gives no interval, or only starting points;
   - `no usable interval`: the interval text gives no interval with finite numeric bounds, such as prose (`an interval containing the origin`), a half-line (`theta > 0`), an infinite bound, or bounds without values (`[a, b]`);
   - `no function`: the source gives no function, or one that needs data that the source does not print, such as a sample; a function with random noise of a stated distribution counts as given;

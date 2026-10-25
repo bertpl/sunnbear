@@ -197,9 +197,13 @@ class PublishedFormula:
         """Return the formula of a line of `formulas.csv`, with the test problems of its rows.
 
         Raises:
-            PublishedTestProblemsError: If the line's `parameters` does not give 1 set per row, the variable is
-                unclear, a parameter has no published value, there are more than `MAX_INSTANCES` test problems, no
-                test problem has an interval, or a row's function differs from the formula's.
+            PublishedTestProblemsError: If any of these holds:
+                - the line's `parameters` does not give 1 set per row;
+                - the variable is unclear;
+                - a parameter has no published value;
+                - there are more than `MAX_INSTANCES` test problems;
+                - no test problem has an interval;
+                - a row's function differs from the formula's.
         """
         formulas_table_line = survey_formula.formulas_table_line
         rows = survey_formula.rows
