@@ -47,8 +47,8 @@ class ModificationType(StrEnum):
     # - at level 1, by the rule of category 1;
     # - at higher levels, as the level below does.
     CANCELLATION_FREE_FORM = "cancellation_free_form"
-    # The modified function adds TINY_LINEAR_TERM_SLOPE*(x - r) to the published function, with r the published root, on
-    # the published interval, so that f is exactly 0 only where the term underflows too; c shifts x by the rule of
+    # On the published interval, the modified function adds TINY_LINEAR_TERM_SLOPE*(x - r) to the published function,
+    # with r the published root, so that f is exactly 0 only where the term underflows too; c shifts x by the rule of
     # category 1 before the term is added. `sunnbear._core.utils.floats` defines TINY_LINEAR_TERM_SLOPE.
     ADDS_TINY_LINEAR_TERM = "adds_tiny_linear_term"
 

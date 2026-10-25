@@ -23,15 +23,15 @@ class BusDekker1975Iii(Formula):
 
     Only the test problem with ``n = 25`` has a version with ``modified = 1``, which adds ``TINY_LINEAR_TERM_SLOPE*x``
     to the published function, on the published interval; ``c`` shifts x as category 1 states, before the formula adds
-    the term. `TINY_LINEAR_TERM_SLOPE` is ``2**-918``.
+    the term. `sunnbear._core.utils.floats` defines `TINY_LINEAR_TERM_SLOPE`.
 
     The published test problem with ``n = 25`` does not satisfy the benchmark suite inclusion conditions, because the
     conditions require bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint
     lands on an exact 0 of f.
 
-    ``x**25`` underflows to exactly 0 where ``abs(x)`` is below about 1.1e-13, and no form of it avoids that. With the
-    term, f is exactly 0 only within about 5e-48 of the root, and the term changes f by more than rounding only within
-    about 1.4e-11 of the root.
+    ``x**25`` underflows to exactly 0 where ``abs(x)`` is below about 1.1e-13, and no form of ``x**25`` avoids the
+    underflow. With the term, f is exactly 0 only within about 5e-48 of the root, and the term changes f by more than
+    rounding only within about 1.4e-11 of the root.
 
     For the other published values of ``n``, up to 19, ``x**n`` underflows only within about 1e-17 of the root, and
     bisection lands on no exact 0.

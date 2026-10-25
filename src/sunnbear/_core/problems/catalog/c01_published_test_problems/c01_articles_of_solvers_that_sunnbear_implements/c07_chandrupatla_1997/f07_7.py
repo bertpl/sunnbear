@@ -24,21 +24,22 @@ class Chandrupatla19977(Formula):
     Printed zero: ``x = 0``. The article says Brent discusses it.
 
     With ``modified = 1``, the formula adds ``TINY_LINEAR_TERM_SLOPE*x`` to the published function, on the published
-    intervals; ``c`` shifts x as category 1 states, before the formula adds the term. `TINY_LINEAR_TERM_SLOPE` is
-    ``2**-918``.
+    intervals; ``c`` shifts x as category 1 states, before the formula adds the term. `sunnbear._core.utils.floats`
+    defines `TINY_LINEAR_TERM_SLOPE`.
 
     The published test problems do not satisfy the benchmark suite inclusion conditions, because the conditions require
     bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of
     f.
 
     In float64, the published function is exactly 0 within about 0.04 of the root, because its true values there lie
-    below float64's range, so that no form of it avoids the zeros. With the term, f is exactly 0 only within about 5e-48
-    of the root, where the term underflows too; beyond about 0.04 from the root, the term changes f by less than its
-    rounding.
+    below float64's range; no way of writing the function avoids these exact zeros.
 
-    With ``modified = 1``, the modification changes what the test problem tests: in float64, the published function is
-    exactly 0 within about 0.04 of the root, so that a solver may stop at any x-value there, while with the term a
-    solver must locate the root, near which f is the linear term.
+    With the term, f is exactly 0 only within about 5e-48 of the root, where the term underflows too; beyond about 0.04
+    from the root, the term changes f by less than the rounding error of f.
+
+    With ``modified = 1``, the modification changes what the test problem tests: with the published function, a solver
+    may stop at any x-value within about 0.04 of the root, while with the term a solver must locate the root, near which
+    f is the linear term.
     """
 
     number = (1, 1, 7, 7)

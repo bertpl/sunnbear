@@ -1,4 +1,4 @@
-"""The constants of `floats` have the values that their comments state."""
+"""The constants of `floats` have the values stated in their comments."""
 
 from sunnbear._core.utils.floats import FLOAT64_EPS, FLOAT64_MIN, TINY_LINEAR_TERM_SLOPE
 
