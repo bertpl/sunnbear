@@ -3,7 +3,7 @@ evaluations at every tuple."""
 
 import pytest
 
-from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.bisection_count_check import (
+from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.check3_bisection_count import (
     is_bisection_count_exact,
 )
 from sunnbear._core.problems.core import FormulaRegistry

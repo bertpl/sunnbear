@@ -3,7 +3,7 @@
 import polars as pl
 import pytest
 
-from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.bound_to_width_ratio_check import (
+from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.check1_bound_to_width_ratio import (
     exceeds_max_bound_to_width_ratio,
 )
 

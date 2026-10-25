@@ -11,8 +11,8 @@ from sunnbear._core.benchmark.mc_tuples import MCTuples, MCTuplesSize, load_mc_t
 from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.problems.core import CandidateTestProblem, FormulaRegistry
 
-from .bisection_count_check import is_bisection_count_exact
-from .c_range_calibration import calibrate_c_range
+from .check2_c_range_calibration import calibrate_c_range
+from .check3_bisection_count import is_bisection_count_exact
 from .rejection_reason import RejectionReason
 
 

@@ -7,7 +7,7 @@ from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, Pipelin
 from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
 
-from .bound_to_width_ratio_check import exceeds_max_bound_to_width_ratio
+from .check1_bound_to_width_ratio import exceeds_max_bound_to_width_ratio
 from .function_evaluating_checks_task import FunctionEvaluatingChecksTask
 from .rejection_reason import RejectionReason
 
