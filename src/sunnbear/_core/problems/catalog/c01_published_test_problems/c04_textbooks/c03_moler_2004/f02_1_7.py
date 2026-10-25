@@ -34,8 +34,8 @@ class Moler200417(Formula):
     0.01 from the root; ``(x - 1)**7`` has no terms that cancel.
 
     With ``modified = 1``, the modification changes what the test problem tests: the source plots f on the interval to
-    show the roundoff error that the cancellation of its terms gives f (Figure 1.9), and ``(x - 1)**7`` has no such
-    error.
+    show the roundoff error of f from the cancellation of the published form's terms (Figure 1.9), and ``(x - 1)**7``
+    has no such error.
     """
 
     number = (1, 4, 3, 2)

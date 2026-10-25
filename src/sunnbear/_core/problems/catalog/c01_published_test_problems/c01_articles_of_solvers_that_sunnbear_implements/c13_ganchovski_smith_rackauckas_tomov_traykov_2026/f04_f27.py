@@ -23,8 +23,8 @@ class GanchovskiSmithRackauckasTomovTraykov2026F27(Formula):
 
     With ``modified = 1``, the formula computes the published function, ``(p - 3)**4 * sign(p - 3)``, in the equivalent
     form ``(x - 1.88889)**3 * abs(x - 1.88889)``, on the published interval, and ``c`` shifts x as category 1 states.
-    The form writes the root ``3 - 1.11111`` as the decimal ``1.88889``, which float64 rounds, as it rounds the
-    published form's ``1.11111``.
+    The equivalent form writes the root ``3 - 1.11111`` as the decimal ``1.88889``; float64 rounds ``3 - 1.11111`` and
+    ``1.88889`` to the same value, so both forms are 0 at that x.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because the conditions require
     bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of

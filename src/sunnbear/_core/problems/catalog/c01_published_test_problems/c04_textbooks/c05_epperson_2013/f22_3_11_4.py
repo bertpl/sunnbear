@@ -32,8 +32,8 @@ class Epperson20133114(Formula):
     the root; ``(x - 0.5)**5`` has no terms that cancel.
 
     With ``modified = 1``, the modification changes what the test problem tests: the source evaluates f at 8000 points
-    of the interval to show that near the multiple root its values form a band around 0, on which iterations stop early
-    (Figure 3.12), and ``(x - 0.5)**5`` has no such band.
+    of the interval to show that near the multiple root the values of f form a band around 0, inside which a
+    root-finding method's iterations stop early (Figure 3.12), and ``(x - 0.5)**5`` has no such band.
     """
 
     number = (1, 4, 5, 22)
