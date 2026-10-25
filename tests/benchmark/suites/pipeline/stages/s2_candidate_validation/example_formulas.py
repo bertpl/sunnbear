@@ -1,4 +1,4 @@
-"""`define_formula_cls` defines the formulas without parameters that the tests of the validation stage run on."""
+"""`define_formula_cls` defines formulas without parameters for the tests of the validation stage."""
 
 from sunnbear._core.problems.core import Formula, ParamRecipe, XCFun
 

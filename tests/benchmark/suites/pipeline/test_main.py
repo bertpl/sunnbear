@@ -31,7 +31,8 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
     per stage, in run order, then the count of the formulas with rejected candidates."""
     # --- arrange ----------------------
     # The command runs over every registered formula. The test keeps 2 families of shipped formulas, because the
-    # bisection count check solves 1024 times per valid candidate, which takes about a minute over every formula.
+    # bisection count check runs 1 solve per tuple of the largest tuple set for each valid candidate, which makes a run
+    # over every formula slow.
     formulas = tuple(formula for formula in FormulaRegistry.formulas() if formula.number[:3] in {(1, 4, 2), (2, 1, 1)})
     monkeypatch.setattr(FormulaRegistry, "formulas", lambda: formulas)
 

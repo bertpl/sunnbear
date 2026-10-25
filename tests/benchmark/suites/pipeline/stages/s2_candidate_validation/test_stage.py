@@ -22,10 +22,16 @@ from tests.benchmark.suites.pipeline.stages.s2_candidate_validation.example_form
 
 
 def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(isolated_formula_registry):
-    """Of 4 candidates, the first is valid, with its c-range; the bound-to-width ratio check rejects the second,
-    calibration the third, and the bisection count check the fourth; the counts per formula match these 4 outcomes."""
+    """Of 4 candidates, 1 is valid and each check rejects 1 other; the counts per formula match these 4 outcomes:
+
+    - the first is valid, with its c-range;
+    - the bound-to-width ratio check rejects the second;
+    - calibration rejects the third;
+    - the bisection count check rejects the fourth.
+    """
     # --- arrange ----------------------
     formulas = [
+        # the offset 1 / 3 keeps the root off bisection's midpoints, so no solve ends early at an exact 0
         define_formula_cls((99, 901), lambda x, c: x - c - 1 / 3, -1.0, 1.0)(),
         define_formula_cls((99, 902), lambda x, c: x - 100.5 - c, 100.0, 101.0)(),
         define_formula_cls((99, 903), lambda x, c: x + 2.0, -1.0, 1.0)(),
@@ -46,7 +52,7 @@ def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(i
     assert rejected_candidates.rows() == [
         ("f99.902", 100.0, 101.0, RejectionReason.BOUND_TO_WIDTH_RATIO.value),
         ("f99.903", -1.0, 1.0, RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0.value),
-        ("f99.904", -1.0, 1.0, RejectionReason.BISECTION_COUNT.value),
+        ("f99.904", -1.0, 1.0, RejectionReason.BISECTION_COUNT_NOT_EXACT.value),
     ]
     rejections_per_formula = output.reports[REJECTIONS_PER_FORMULA_REPORT_NAME]
     assert rejections_per_formula.columns == [
@@ -68,6 +74,7 @@ def test_the_stage_gives_the_same_output_with_1_or_2_workers():
     """The checks that evaluate f run in tasks of the worker pool; with 2 worker processes, the output and reports equal
     those of a run in this process, on shipped formulas with some candidates that each check rejects."""
     # --- arrange ----------------------
+    # (1, 4, 1, 6) adds candidates that the bisection count check rejects.
     formulas = [
         formula
         for formula in FormulaRegistry.formulas()
@@ -86,7 +93,7 @@ def test_the_stage_gives_the_same_output_with_1_or_2_workers():
     assert {
         RejectionReason.BOUND_TO_WIDTH_RATIO.value,
         RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0.value,
-        RejectionReason.BISECTION_COUNT.value,
+        RejectionReason.BISECTION_COUNT_NOT_EXACT.value,
     } <= set(rejected_by)
     assert in_process_output.table.height > 0
     assert worker_processes_output.table.equals(in_process_output.table)

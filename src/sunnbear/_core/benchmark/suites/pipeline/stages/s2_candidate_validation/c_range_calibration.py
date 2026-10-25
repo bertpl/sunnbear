@@ -1,4 +1,4 @@
-"""c-range calibration, validation's second check, finds the c-range of a candidate.
+"""c-range calibration finds the c-range of a candidate, and rejects a candidate for which it finds none.
 
 A candidate's c-range ``[c_min, c_max]``, with ``c_min < 0 < c_max``, is the range within which the benchmark samples
 ``c``.

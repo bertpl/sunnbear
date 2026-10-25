@@ -32,8 +32,8 @@ class FunctionEvaluatingChecksTask:
     def run(self) -> list[CRange | RejectionReason]:
         """Return each candidate's c-range, or the reason that a check rejects it, in the order of `problem_ids`.
 
-        Both checks use the largest size of the shipped tuple set: calibration checks its c-values, as
-        `calibrate_c_range` requires, and the bisection count check solves at each of its tuples.
+        Both checks use the largest size of the shipped tuple set, as `calibrate_c_range` and `is_bisection_count_exact`
+        require.
         """
         mc_tuples = load_mc_tuples(max(MCTuplesSize))
         return [
@@ -51,6 +51,6 @@ class FunctionEvaluatingChecksTask:
         if isinstance(c_range, RejectionReason):
             return c_range
         elif not is_bisection_count_exact(candidate.calibrated(c_range.c_min, c_range.c_max), mc_tuples=mc_tuples):
-            return RejectionReason.BISECTION_COUNT
+            return RejectionReason.BISECTION_COUNT_NOT_EXACT
         else:
             return c_range

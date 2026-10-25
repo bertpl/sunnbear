@@ -14,10 +14,11 @@ from tests.benchmark.suites.pipeline.stages.s2_candidate_validation.example_form
 @pytest.mark.parametrize(
     "xc_fun, is_exact_expected",
     [
+        # the offset 1 / 3 keeps the root off bisection's midpoints, so no solve ends early at an exact 0
         pytest.param(lambda x, c: x - c - 1 / 3, True, id="simple_root"),
         # bisection ends early at a midpoint inside the band where f is exactly 0
         pytest.param(lambda x, c: 0.0 if abs(x - c) < 0.01 else x - c, False, id="band_of_exact_zeros"),
-        # bisection ends with a status other than converged at the first midpoint
+        # f is NaN at the first midpoint, so bisection ends with a status other than converged
         pytest.param(lambda x, c: x - c if abs(x) == 1.0 else float("nan"), False, id="nan_between_the_bounds"),
     ],
 )
