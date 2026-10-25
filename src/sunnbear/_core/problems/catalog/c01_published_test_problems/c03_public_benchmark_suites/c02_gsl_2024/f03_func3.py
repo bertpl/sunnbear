@@ -26,9 +26,10 @@ class Gsl2024Func3(Formula):
     and ``1e-4`` lie ``1e-4`` from ``a = 0``: a shift along x by more than ``1e-4``, in either direction, changes the
     sign of ``f(a)``.
 
-    With ``modified = 1``, the modification changes what the test problem tests: the published root, ``1e-4``, lies
-    close to ``a = 0`` on an interval of width 1, and adding ``c`` moves the root to ``sqrt(1e-8 - c)``, so that it lies
-    that close to ``a`` only for ``c`` near 0; for ``c = -0.25``, it lies near 0.5.
+    With ``modified = 1``, the modification changes what the test problem tests: the published test problem has its
+    root, ``1e-4``, close to the bound ``a = 0`` of an interval of width 1. Adding ``c`` moves the root to
+    ``sqrt(1e-8 - c)``, so that the root stays close to ``a`` only for ``c`` near 0; for ``c = -0.25``, the root lies
+    near 0.5.
     """
 
     number = (1, 3, 2, 3)

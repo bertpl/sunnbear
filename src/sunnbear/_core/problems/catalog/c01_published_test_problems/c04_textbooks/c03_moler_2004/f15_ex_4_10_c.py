@@ -31,7 +31,7 @@ class Moler2004Ex410C(Formula):
     finite, since ``bessel_y0(0)`` is ``-inf``, and the published interval holds 10 roots, an even number.
 
     With ``modified = 1``, the modification changes what the test problem tests: Ex. 4.10(c) asks for all solutions
-    between 0 and ``10*pi``, and a solver on ``[2, 10*pi]`` finds 1 of the 9 that it holds.
+    between 0 and ``10*pi``, and a solver on ``[2, 10*pi]`` finds 1 of the 9 solutions in that interval.
     """
 
     number = (1, 4, 3, 15)

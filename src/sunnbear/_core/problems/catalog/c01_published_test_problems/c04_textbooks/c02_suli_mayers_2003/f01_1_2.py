@@ -44,9 +44,11 @@ class SuliMayers200312(Formula):
     limit of 100.
 
     With ``modified = 1``, the modification changes what the test problem tests: the source uses the function to show
-    that where f changes sign an even number of times on an interval, as at its 2 roots only ``2/M`` apart, a
-    subinterval on which f changes sign can be hard to find. Each modified interval is such a subinterval, around the
-    left root.
+    that, when f changes sign an even number of times on an interval, here at 2 roots only ``2/M`` apart, a subinterval
+    on which f changes sign can be hard to find.
+
+    Each modified interval is already such a subinterval, around the left root, so the modified test problem does not
+    test finding that subinterval.
     """
 
     number = (1, 4, 2, 1)
