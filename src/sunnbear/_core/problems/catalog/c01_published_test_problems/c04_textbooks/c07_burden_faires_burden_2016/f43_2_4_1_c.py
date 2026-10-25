@@ -28,8 +28,9 @@ class BurdenFairesBurden2016241C(Formula):
     f.
 
     Near the root, the 4 terms of the published form cancel, so that f is exactly 0 at many x-values within about 5e-6
-    of the root; in ``(x - 2**-x)**3``, the only rounding that can change the sign is that of ``x - 2**-x``, whose root
-    is simple, so that the sign of f is wrong at most within about 1 float of the root.
+    of the root; in ``(x - 2**-x)**3``, only the rounding of ``x - 2**-x`` can change the sign of f, and ``x - 2**-x``
+    has a simple root, so that the sign of f can be wrong only at x-values at most about 1 float64 value away from the
+    root.
     """
 
     number = (1, 4, 7, 43)

@@ -37,11 +37,14 @@ class ChapraCanale2015Pt23(Formula):
     lands on an exact 0 of f.
 
     Near the root, the terms of the published form cancel, so that f is exactly 0 at many x-values within about 3e-14 of
-    the root. ``-expm1(-(x/m)*t)`` computes ``1 - exp(-(x/m)*t)`` without the subtraction; the subtraction of ``v``
-    stays, because it is the function's definition: the velocity after ``t`` seconds minus ``v``.
+    the root.
+
+    ``-expm1(-(x/m)*t)`` computes ``1 - exp(-(x/m)*t)`` without the subtraction; the subtraction of ``v`` stays, because
+    it is the function's definition: the velocity after ``t`` seconds minus ``v``.
 
     The test problem with ``modified = 1`` does not satisfy the conditions either, because the subtraction of ``v``
-    leaves f exactly 0 at x-values within about 8 floats of the root, on which bisection can land.
+    leaves f exactly 0 at x-values at most about 8 float64 values away from the root, on which bisection can land. The
+    formula has no ``modified = 2``, because no equivalent form removes the subtraction of ``v``.
     """
 
     number = (1, 4, 6, 1)

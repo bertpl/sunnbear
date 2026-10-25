@@ -27,10 +27,11 @@ class Borchers2026F12(Formula):
     With ``modified = 1``, the formula computes the published function in the equivalent form ``log1p(s) - s +
     s**2/2``, with ``s = x/sqrt(exp(1)) - 1``, on the published intervals, and ``c`` shifts x as category 1 states.
 
-    Where ``abs(s) < 1/16``, the formula sums the Taylor series of ``log1p(s) - s + s**2/2``, which is ``s**3/3 - s**4/4
-    + s**5/5 - ...``, up to its term in ``s**16``, because near the root, at ``s = 0``, the terms of ``log1p(s) - s +
-    s**2/2`` cancel as the terms of the published form do; the first omitted term, in ``s**17``, is smaller than the
-    rounding error of the sum.
+    Where ``abs(s) < 1/16``, the formula sums the Taylor series of ``log1p(s) - s + s**2/2``, which is
+    ``s**3/3 - s**4/4 + s**5/5 - ...``, up to its term in ``s**16``. The formula sums the series there because near the
+    root, at ``s = 0``, the terms of ``log1p(s) - s + s**2/2`` cancel just as the terms of the published form do.
+
+    The first omitted term of the series, in ``s**17``, is smaller than the rounding error of the sum.
 
     Where ``abs(s)`` is 1/16 or more, ``log1p(s) - s + s**2/2`` loses at most about 3 of float64's 16 digits.
 
@@ -42,8 +43,8 @@ class Borchers2026F12(Formula):
     the root; the series has no terms that cancel.
 
     With ``modified = 1``, the modification changes what the test problem tests: the source uses the function to show
-    that root finders in float64 locate its root only to about 1e-5 (§5.2.3), and the source finds the root in 128-bit
-    precision instead; the modified form is accurate near the root in float64.
+    that root finders in float64 locate its root only to about 1e-5 (§5.2.3), and the source finds the root itself in
+    128-bit precision; the modified form is accurate near the root in float64.
     """
 
     number = (1, 3, 5, 12)
@@ -63,8 +64,9 @@ class Borchers2026F12(Formula):
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float, modified: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``.
 
-        With ``modified = 1``, evaluate it as ``log1p(s) - s + s**2/2``, with ``s = y/sqrt(exp(1)) - 1`` and ``y = x -
-        c_scale*c``, or by its series near the root. Category 1 states the rule for ``c_scale``.
+        With ``modified = 1``, evaluate it as ``log1p(s) - s + s**2/2``, with ``s = y/sqrt(exp(1)) - 1`` and
+        ``y = x - c_scale*c``; where ``abs(s) < 1/16``, sum the Taylor series of ``log1p(s) - s + s**2/2``. Category 1
+        states the rule for ``c_scale``.
         """
         x = x - c_scale * c
         if modified == 1:
@@ -93,7 +95,7 @@ class Borchers2026F12(Formula):
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`
     # would accept any value near 0, 0 among them; the case with `modified = 1` at
-    # `x=1.65` is the only one near enough to the root to evaluate the series
+    # `x=1.65` is the only one with `abs(s) < 1/16`, where the formula sums the series
     test_cases = (
         FormulaTestCase.value(
             params={"a": 1.0, "b": 3.4, "c_scale": 2.4, "modified": 0.0}, x=1.72, c=0.0, expected=2.609079470017915e-05

@@ -31,7 +31,7 @@ class AlefeldPotraShi199512(Formula):
     midpoint lands on an exact 0 of f.
 
     Near the root, ``x = n``, the 2 terms of the published form cancel, so that f is exactly 0 at many x-values within
-    about 1e-13 of the root; of the published values of ``n``, only for ``n = 27`` and ``n = 31`` does bisection land on
+    about 1e-13 of the root. Of the published values of ``n``, only for ``n = 27`` and ``n = 31`` does bisection land on
     one of these x-values. ``expm1(log(x/n)/n)`` computes ``(x/n)**(1/n) - 1`` without the subtraction.
     """
 
