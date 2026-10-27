@@ -44,7 +44,7 @@ class ModifiedPublishedTestProblems(FormulaCategory):
     the test problem tests".
 
     `REJECTED_PUBLISHED_TEST_PROBLEMS.md`, in this package, lists every published test problem that the benchmark
-    suite pipeline rejects, and the decision for it: a modification in this subcategory, or the reason for none.
+    suite pipeline rejects, and the decision for it: a modification in this subcategory, or the reason why it has none.
     """
 
     number = (1, 99)
