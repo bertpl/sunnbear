@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Replace the shipped Monte Carlo tuple set with one that has better overall spread statistics; this changes benchmark results
+
 ### Deprecated
 
 ### Removed
