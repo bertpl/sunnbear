@@ -161,7 +161,7 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.4.4.2[a=2.14159265359,b=3.14159265359,c_scale=1.0]` | `calibration_no_finite_sign_change_at_0` | no action | | the roots lie too close to `pi` for float64: f has the same sign at both bounds | |
 | `f1.4.4.2[a=3.14159265359,b=4.14159265359,c_scale=1.0]` | `calibration_no_finite_sign_change_at_0` | no action | | the roots lie too close to `pi` for float64: f has the same sign at both bounds | |
 | `f1.4.4.6[a=0.0,b=0.5,c_scale=0.5]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.4.4.6` | interval changed to `[0, 0.495]` |  |
-| `f1.4.4.7[initial_investment=14000.0,monthly_deposit=250.0,goal=25000.0]` | `bisection_count_not_exact` | no action | | f is exactly 0, by rounding, at about 15 floats around the root, and no modification has been worked out for it | |
+| `f1.4.4.7[initial_investment=14000.0,monthly_deposit=250.0,goal=25000.0]` | `bisection_count_not_exact` | some parameter tuples modified | `f1.99.4.4.7` | f in an equivalent form without cancellation |  |
 | `f1.4.4.24[a=1.0,b=2.0,c_scale=1.0]` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.4.4.28` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.4.28` | f in an equivalent form without cancellation |  |
 | `f1.4.5.8` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.5.8` | interval changed to `[0.03, 3.141592653589793]` |  |
@@ -181,7 +181,7 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.4.7.4` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.7.4` | interval changed to `[-3, 1]` |  |
 | `f1.4.7.8` | `calibration_no_finite_sign_change_at_0` | no action | | the root has even multiplicity, so f does not change sign | |
 | `f1.4.7.9` | `calibration_fails_at_first_probe` | all parameter tuples modified | `f1.99.4.7.9` | `c` added to f |  |
-| `f1.4.7.11[a=3.2,b=4.0,c_scale=0.8]` | `bisection_count_not_exact` | no action | | f is exactly 0, by rounding, at about 15 floats around the root, and no modification has been worked out for it | |
+| `f1.4.7.11[a=3.2,b=4.0,c_scale=0.8]` | `bisection_count_not_exact` | some parameter tuples modified | `f1.99.4.7.11` | f in an equivalent form without cancellation |  |
 | `f1.4.7.19` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.7.19` | interval changed to `[4, 4.6]` |  |
 | `f1.4.7.41` | `calibration_no_finite_sign_change_at_0` | no action | | the root has even multiplicity, so f does not change sign | |
 | `f1.4.7.42` | `calibration_no_finite_sign_change_at_0` | no action | | the root has even multiplicity, so f does not change sign | |

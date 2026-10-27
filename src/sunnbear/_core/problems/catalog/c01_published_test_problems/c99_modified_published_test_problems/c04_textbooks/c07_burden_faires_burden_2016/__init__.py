@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f04_2_2_ex_1, f09_2_1_1, f19_2_1_8, f43_2_4_1_c, f47_2_4_2_c, f48_2_4_2_d
+from . import f04_2_2_ex_1, f09_2_1_1, f11_2_1_3, f19_2_1_8, f43_2_4_1_c, f47_2_4_2_c, f48_2_4_2_d
 
 
 class ModifiedBurdenFairesBurden2016(FormulaCategory):
