@@ -1,6 +1,7 @@
 """The table of rejected published test problems in subcategory 1.99 names existing test problems and formulas.
 
-Each row's decision must match the row, and every formula of subcategory 1.99 must have a row.
+Each row's decision must be 1 of the file's 3 decisions, and "no action" exactly when the row has no modified test
+problem; every formula of subcategory 1.99 must have a row.
 """
 
 from pathlib import Path
@@ -36,10 +37,11 @@ def test_modified_column_holds_a_candidate_of_the_matching_1_99_formula():
     wrong = []
     for row in _table_rows():
         modified_id = row["Modified test problem"]
-        published_number = ProblemId.from_string(row["Published test problem"]).formula_number
-        expected_number = (1, 99, *published_number[1:])
+        published_formula_number = ProblemId.from_string(row["Published test problem"]).formula_number
+        expected_formula_number = (1, 99, *published_formula_number[1:])
         if modified_id and (
-            modified_id not in modified_ids or ProblemId.from_string(modified_id).formula_number != expected_number
+            modified_id not in modified_ids
+            or ProblemId.from_string(modified_id).formula_number != expected_formula_number
         ):
             wrong.append(modified_id)
 
@@ -52,9 +54,13 @@ def test_decision_says_whether_a_row_has_a_modified_test_problem():
     # --- act --------------------------
     wrong = []
     for row in _table_rows():
-        has_modified = row["Modified test problem"] != ""
-        is_known_decision = row["Decision"] in {"all tuples modified", "some tuples modified", "no action"}
-        if not is_known_decision or (row["Decision"] == "no action") == has_modified:
+        has_modified_test_problem = row["Modified test problem"] != ""
+        is_known_decision = row["Decision"] in {
+            "all parameter tuples modified",
+            "some parameter tuples modified",
+            "no action",
+        }
+        if not is_known_decision or (row["Decision"] == "no action") == has_modified_test_problem:
             wrong.append(row["Published test problem"])
 
     # --- assert -----------------------

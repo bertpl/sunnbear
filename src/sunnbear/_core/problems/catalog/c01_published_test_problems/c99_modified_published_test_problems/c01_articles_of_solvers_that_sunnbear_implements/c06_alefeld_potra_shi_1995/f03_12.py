@@ -28,8 +28,9 @@ class ModifiedAlefeldPotraShi199512(Formula):
     Near the root, ``x = n``, the 2 terms of the published form cancel, so that f is exactly 0 at many x-values within
     about 1e-13 of the root. ``expm1(log(x/n)/n)`` computes ``(x/n)**(1/n) - 1`` without the subtraction.
 
-    Whether bisection lands on such an x-value depends on ``n`` and on the sampled values of ``c``, so the formula holds
-    every published value of ``n``.
+    Whether bisection lands on an x-value where f is exactly 0 depends on ``n`` and on the sampled values of ``c``, so
+    the values of ``n`` that the validation stage rejects can change with the sampled values; the formula therefore
+    holds every published value of ``n``.
     """
 
     number = (1, 99, 1, 6, 3)
@@ -59,7 +60,7 @@ class ModifiedAlefeldPotraShi199512(Formula):
         return (1.0, 100.0)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the published parameter values."""
+        """Return the parameter values of the modified test problems."""
         return (
             ParamTable(
                 names=("n",),
