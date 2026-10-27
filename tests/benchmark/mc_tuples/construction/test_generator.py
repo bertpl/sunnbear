@@ -90,14 +90,16 @@ def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size()
     # --- arrange ----------------------
     results: list[MCTuplesSizeResult] = []
     # On a fresh install, max-div compiles each of its functions inside the first solve that calls it, which leaves the
-    # solve too little of the time budget `t_total_sec` to meet the constraints; `numba_precompile` compiles them all.
+    # solve too little of the time budget `t_total_sec` to meet its max-div constraints; `max_div.numba_precompile`
+    # compiles all of max-div's functions before the construction starts.
     max_div.numba_precompile()
 
     # --- act --------------------------
     generator = MCTuplesGenerator(n_population=2**14, on_size_finished=results.append)
-    # Each solve's budget also covers the start of max-div's worker processes, each of which imports max-div again
-    # (about 1 s on Python 3.15). The start takes longer on a machine that runs other tests beside this one, so the
-    # budget leaves room for the start and for the search for a selection that meets the constraints.
+    # Each solve's budget also covers the start of max-div's worker processes, each of which imports max-div again.
+    #
+    # The worker processes start more slowly on a machine that runs other tests beside this one, so the budget covers
+    # their start and the search for a selection that meets the max-div constraints.
     tuples = generator.generate(t_total_sec=10.0, max_size=MCTuplesSize.SIZE_64)
 
     # --- assert -----------------------
