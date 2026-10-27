@@ -6,15 +6,7 @@ the published formulas of category 1. A change of formula f1.4.4.7 may need a ma
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
-
-# ROOT is the float64 nearest to the published function's root, with initial investment 14000, monthly deposit 250 and
-# goal 25000.
-ROOT = 0.03462803634918049
-# GROWTH_AT_ROOT is ``(1 + ROOT/12)**36 - 1``, and VALUE_AT_ROOT is the published function's value at ROOT; both are
-# computed with mpmath and rounded to float64.
-GROWTH_AT_ROOT = 0.10930590526391942
-VALUE_AT_ROOT = -1.750340631812349e-13
+from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ModifiedBradie200621P67(Formula):
@@ -29,38 +21,33 @@ class ModifiedBradie200621P67(Formula):
     20000`` and ``13000, 250, 20000``, and gives no interval: since ``13000 + 36*200 = 20200`` already exceeds 20000,
     the goal is met even at ``r = 0``, and both roots are negative, about -0.0041 and -0.0405.
 
-    The formula holds only the test problem with initial investment 14000, monthly deposit 250 and goal 25000, and uses
-    these values as constants in the function, because `ROOT`, `GROWTH_AT_ROOT` and `VALUE_AT_ROOT` hold for these
-    values only.
+    The parameters ``initial_investment``, ``monthly_deposit`` and ``goal`` are the initial investment, the monthly
+    deposit and the goal. At ``x = 0``, where the published function divides 0 by 0, the formula takes its limit,
+    ``initial_investment + 36*monthly_deposit - goal``.
 
-    The formula computes the published function as its value at `ROOT`, the float64 nearest to the root, plus the change
-    of the function from `ROOT` to x, on the published interval. At ``x = 0``, where the published function divides 0 by
-    0, the formula takes its limit, -2000.
-
-    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the published interval.
+    The formula holds only the test problem with ``initial_investment = 14000``, ``monthly_deposit = 250`` and ``goal =
+    25000``. The formula computes the published function in the equivalent form ``expm1(36*log1p(x/12)) *
+    (initial_investment + 12*monthly_deposit/x) - (goal - initial_investment)``, on the published interval; ``c`` shifts
+    x by the rule of category 1, with ``c_scale`` the rounded width of the published interval.
 
     The published test problem with these values does not satisfy the benchmark suite inclusion conditions, because the
     conditions require bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint
     lands on an exact 0 of f.
 
-    Near the root, f subtracts the goal, 25000, from a sum near 25000, so that f is exactly 0 at many x-values within
-    about 1e-14 of the root.
+    Near the root, ``1 + x/12`` rounds, and the terms of the published form cancel, so that f is exactly 0 at many
+    x-values within about 1e-14 of the root.
 
-    The change of the published function from `ROOT` to x is ``(1 + GROWTH_AT_ROOT)*relative_growth_factor_change*(14000
-    + 12*250/x) - GROWTH_AT_ROOT*12*250*t/(x*ROOT)``, with ``t = x - ROOT``. ``relative_growth_factor_change =
-    expm1(36*log1p(t/(12 + ROOT)))`` is the relative change of the growth factor ``(1 + x/12)**36`` from `ROOT` to x,
-    since ``(1 + x/12)**36`` equals ``(1 + ROOT/12)**36 * (1 + t/(12 + ROOT))**36``.
+    ``expm1(36*log1p(x/12))`` computes ``(1 + x/12)**36 - 1`` without rounding ``1 + x/12`` and without the subtraction
+    of 1; the subtraction of ``goal - initial_investment`` stays, because it is the function's definition: the savings
+    after 3 years minus the goal.
 
-    Near the root, both terms of the change are proportional to ``t``, so the rounding error of f is a few float64
-    spacings at the value of f, not at 25000, and f is exactly 0 at no x-value near the root.
-
-    Rounding `ROOT`, `GROWTH_AT_ROOT` and `VALUE_AT_ROOT` to float64 moves the root by a negligible fraction of the
-    float64 spacing at the root.
+    The subtraction of ``goal - initial_investment`` still leaves f exactly 0 at 3 x-values, at most 2 float64 values
+    away from the root, so that bisection can still stop early for some values of ``c``.
     """
 
     number = (1, 99, 4, 4, 7)
     name = "§2.1 (p. 67)"
-    param_names = ()
+    param_names = ("initial_investment", "monthly_deposit", "goal")
     source = FormulaSource(
         reference=(
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
@@ -70,34 +57,41 @@ class ModifiedBradie200621P67(Formula):
     )
 
     @staticmethod
-    def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``y = x - c_scale*c``, as its value at `ROOT` plus its change from `ROOT`.
+    def parametrized_fun(x: float, c: float, initial_investment: float, monthly_deposit: float, goal: float) -> float:
+        """Evaluate the published function at ``y = x - c_scale*c``, in an equivalent form with ``expm1`` and ``log1p``.
 
         Category 1 states the rule for ``c_scale``.
         """
         x = x - 0.09 * c
         if x == 0.0:
-            # at x = 0, the published function divides 0 by 0; the formula takes its limit
-            return 14000.0 + 36.0 * 250.0 - 25000.0
+            # at x = 0, the factor ((1 + x/12)^36 - 1)/(x/12) takes its limit 36
+            return initial_investment + 36.0 * monthly_deposit - goal
         else:
-            t = x - ROOT
-            relative_growth_factor_change = math.expm1(36.0 * math.log1p(t / (12.0 + ROOT)))
-            return (
-                VALUE_AT_ROOT
-                + (1.0 + GROWTH_AT_ROOT) * relative_growth_factor_change * (14000.0 + 12.0 * 250.0 / x)
-                - GROWTH_AT_ROOT * 12.0 * 250.0 * t / (x * ROOT)
-            )
+            growth = math.expm1(36.0 * math.log1p(x / 12.0))
+            return growth * (initial_investment + 12.0 * monthly_deposit / x) - (goal - initial_investment)
 
-    def interval_bounds(self) -> tuple[float, float]:
+    def interval_bounds(self, initial_investment: float, monthly_deposit: float, goal: float) -> tuple[float, float]:
         """Return the formula's interval."""
         return (0.01, 0.1)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return no recipe, since the modified function has no parameters."""
-        return ()
+        """Return the parameter values of the modified test problem."""
+        return (ParamTable(names=("initial_investment", "monthly_deposit", "goal"), rows=((14000.0, 250.0, 25000.0),)),)
 
     test_cases = (
-        FormulaTestCase.interval_bounds(params={}, expected=(0.01, 0.1)),
-        FormulaTestCase.value(params={}, x=0.037, c=0.25, expected=-1184.9991543651379),
-        FormulaTestCase.value(params={}, x=0.0, c=0.0, expected=-2000.0),
+        FormulaTestCase.interval_bounds(
+            params={"initial_investment": 14000.0, "monthly_deposit": 250.0, "goal": 25000.0}, expected=(0.01, 0.1)
+        ),
+        FormulaTestCase.value(
+            params={"initial_investment": 14000.0, "monthly_deposit": 250.0, "goal": 25000.0},
+            x=0.037,
+            c=0.25,
+            expected=-1184.9991543651379,
+        ),
+        FormulaTestCase.value(
+            params={"initial_investment": 14000.0, "monthly_deposit": 250.0, "goal": 25000.0},
+            x=0.0,
+            c=0.0,
+            expected=-2000.0,
+        ),
     )
