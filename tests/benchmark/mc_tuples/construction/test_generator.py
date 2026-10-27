@@ -219,7 +219,7 @@ def test_generate_mc_tuples_rejects_invalid_arguments(arguments, message):
     ],
 )
 def test_n_workers_for_uses_1_worker_up_to_15_s_and_all_from_60_s(t_total_sec, n_workers):
-    """The worker count is 1 up to 15 s, grows linearly from 15 s to 60 s, and is all workers from 60 s up."""
+    """The worker count is 1 up to 15 s and grows linearly to all workers, reached at 60 s."""
     # --- act / assert -----------------
     assert MCTuplesGenerator(n_workers=32).n_workers_for(t_total_sec) == n_workers
 
