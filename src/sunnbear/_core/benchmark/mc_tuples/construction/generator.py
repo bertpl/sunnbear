@@ -144,13 +144,17 @@ class MCTuplesGenerator:
     def n_workers_for(self, t_total_sec: float) -> int:
         """Return the worker count of a run of `t_total_sec`.
 
-        Up to `MAX_T_TOTAL_AT_1_WORKER_SEC`, the count is 1; from there, it grows linearly to `n_workers` at
-        `MIN_T_TOTAL_AT_FULL_SCALE_SEC`, and stays at `n_workers` above it. Each worker is a process whose start
-        counts against its solve's budget, and on a loaded machine, starting several of them can take most of a short
-        solve's budget, so a short run, such as a test, uses 1.
+        The count depends on `t_total_sec`:
+
+        - up to `MAX_T_TOTAL_AT_1_WORKER_SEC`, it is 1;
+        - from there to `MIN_T_TOTAL_AT_FULL_SCALE_SEC`, it grows linearly to `n_workers`;
+        - from `MIN_T_TOTAL_AT_FULL_SCALE_SEC` up, it is `n_workers`.
+
+        Each worker is a process whose start counts against its solve's budget. On a loaded machine, starting several
+        workers can take most of a short solve's budget, so a short run, such as a test, uses 1 worker.
         """
-        t_ramp_sec = self.MIN_T_TOTAL_AT_FULL_SCALE_SEC - self.MAX_T_TOTAL_AT_1_WORKER_SEC
-        scale = min(1.0, max(0.0, (t_total_sec - self.MAX_T_TOTAL_AT_1_WORKER_SEC) / t_ramp_sec))
+        t_linear_growth_sec = self.MIN_T_TOTAL_AT_FULL_SCALE_SEC - self.MAX_T_TOTAL_AT_1_WORKER_SEC
+        scale = min(1.0, max(0.0, (t_total_sec - self.MAX_T_TOTAL_AT_1_WORKER_SEC) / t_linear_growth_sec))
         return 1 + round(scale * (self.n_workers - 1))
 
     def t_budget_per_size_sec(self, t_total_sec: float, max_size: MCTuplesSize) -> dict[MCTuplesSize, float]:
@@ -261,8 +265,11 @@ def generate_mc_tuples(
 
     Each size's budget is split 8:1 between its selection solve and its refinement solve.
 
-    Up to 15 s, every solve uses 1 worker, so that a short run does not spend its time starting workers; from 15 s to
-    60 s, the worker count grows linearly to `n_workers`, and from 60 s up, every solve uses all `n_workers` workers.
+    The worker count of every solve depends on `t_total_sec`:
+
+    - up to 15 s, every solve uses 1 worker, so that a short run does not spend its time starting workers;
+    - from 15 s to 60 s, the worker count grows linearly to `n_workers`;
+    - from 60 s up, every solve uses all `n_workers` workers.
 
     `t_total_sec` covers only the solves; other work takes extra time:
 
