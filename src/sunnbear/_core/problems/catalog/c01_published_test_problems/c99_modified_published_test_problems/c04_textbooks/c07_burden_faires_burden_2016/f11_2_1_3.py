@@ -26,9 +26,10 @@ class ModifiedBurdenFairesBurden2016213(Formula):
     Near the root ``2 + sqrt(2)``, the terms of the published form cancel, so that f is exactly 0 at many x-values
     within about 1e-14 of the root.
 
-    The equivalent form rounds only the square ``(x - 2)**2``: on the interval, ``x - 3`` and ``x - 2`` are exact, and so
-    is the subtraction of 2 from the square near the root. No float64 x near the root makes the square round to exactly
-    2, so f is exactly 0 at no x-value near the root.
+    In the equivalent form, ``x - 3`` and ``x - 2`` are exact on the interval, and so is the subtraction of 2 from the
+    square near the root, so that near the root f is exactly 0 only where ``(x - 2)**2`` rounds to exactly 2.
+
+    No float64 x near the root makes the square round to exactly 2, so f is exactly 0 at no x-value near the root.
     """
 
     number = (1, 99, 4, 7, 11)

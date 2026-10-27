@@ -29,12 +29,15 @@ class ModifiedBradie200621P67(Formula):
     20000`` and ``13000, 250, 20000``, and gives no interval: since ``13000 + 36*200 = 20200`` already exceeds 20000,
     the goal is met even at ``r = 0``, and both roots are negative, about -0.0041 and -0.0405.
 
-    The formula holds only the test problem with initial investment 14000, monthly deposit 250 and goal 25000, and
-    writes these values into the function, because `ROOT`, `GROWTH_AT_ROOT` and `VALUE_AT_ROOT` hold for these values
-    only. It computes the published function as its value at `ROOT`, the float64 nearest to the root, plus the change of
-    the function from `ROOT` to x, on the published interval; ``c`` shifts x by the rule of category 1, with ``c_scale``
-    the rounded width of the published interval. At ``x = 0``, where the published function divides 0 by 0, the formula
-    takes its limit, -2000.
+    The formula holds only the test problem with initial investment 14000, monthly deposit 250 and goal 25000, and uses
+    these values as constants in the function, because `ROOT`, `GROWTH_AT_ROOT` and `VALUE_AT_ROOT` hold for these
+    values only.
+
+    The formula computes the published function as its value at `ROOT`, the float64 nearest to the root, plus the change
+    of the function from `ROOT` to x, on the published interval. At ``x = 0``, where the published function divides 0 by
+    0, the formula takes its limit, -2000.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the published interval.
 
     The published test problem with these values does not satisfy the benchmark suite inclusion conditions, because the
     conditions require bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint
@@ -43,11 +46,16 @@ class ModifiedBradie200621P67(Formula):
     Near the root, f subtracts the goal, 25000, from a sum near 25000, so that f is exactly 0 at many x-values within
     about 1e-14 of the root.
 
-    The change of the function is ``(1 + GROWTH_AT_ROOT)*w*(14000 + 12*250/x) - GROWTH_AT_ROOT*12*250*t/(x*ROOT)``, with
-    ``t = x - ROOT`` and ``w = expm1(36*log1p(t/(12 + ROOT)))``, since ``(1 + x/12)**36`` equals ``(1 + ROOT/12)**36 *
-    (1 + t/(12 + ROOT))**36``. Near the root, both terms of the change are proportional to ``t``, so f's rounding error
-    is a few float64 spacings of f's own value, not of 25000, and f is exactly 0 at no x-value near the root. Rounding
-    the constants to float64 moves the root by a negligible fraction of the float64 spacing at the root.
+    The change of the published function from `ROOT` to x is ``(1 + GROWTH_AT_ROOT)*relative_growth_factor_change*(14000
+    + 12*250/x) - GROWTH_AT_ROOT*12*250*t/(x*ROOT)``, with ``t = x - ROOT``. ``relative_growth_factor_change =
+    expm1(36*log1p(t/(12 + ROOT)))`` is the relative change of the growth factor ``(1 + x/12)**36`` from `ROOT` to x,
+    since ``(1 + x/12)**36`` equals ``(1 + ROOT/12)**36 * (1 + t/(12 + ROOT))**36``.
+
+    Near the root, both terms of the change are proportional to ``t``, so the rounding error of f is a few float64
+    spacings at the value of f, not at 25000, and f is exactly 0 at no x-value near the root.
+
+    Rounding `ROOT`, `GROWTH_AT_ROOT` and `VALUE_AT_ROOT` to float64 moves the root by a negligible fraction of the
+    float64 spacing at the root.
     """
 
     number = (1, 99, 4, 4, 7)
@@ -63,7 +71,7 @@ class ModifiedBradie200621P67(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``y = x - c_scale*c``, as its value at `ROOT` plus its change to ``y``.
+        """Evaluate the published function at ``y = x - c_scale*c``, as its value at `ROOT` plus its change from `ROOT`.
 
         Category 1 states the rule for ``c_scale``.
         """
@@ -73,10 +81,10 @@ class ModifiedBradie200621P67(Formula):
             return 14000.0 + 36.0 * 250.0 - 25000.0
         else:
             t = x - ROOT
-            growth_change = math.expm1(36.0 * math.log1p(t / (12.0 + ROOT)))
+            relative_growth_factor_change = math.expm1(36.0 * math.log1p(t / (12.0 + ROOT)))
             return (
                 VALUE_AT_ROOT
-                + (1.0 + GROWTH_AT_ROOT) * growth_change * (14000.0 + 12.0 * 250.0 / x)
+                + (1.0 + GROWTH_AT_ROOT) * relative_growth_factor_change * (14000.0 + 12.0 * 250.0 / x)
                 - GROWTH_AT_ROOT * 12.0 * 250.0 * t / (x * ROOT)
             )
 
