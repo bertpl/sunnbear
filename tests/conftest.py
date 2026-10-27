@@ -16,6 +16,7 @@ functions.
 import os
 from pathlib import Path
 
+import max_div
 import numba
 import pytest
 
@@ -37,6 +38,20 @@ def isolated_formula_registry(monkeypatch):
 def isolated_solver_config_registry(monkeypatch):
     """Give the test its own copy of the registry, so a test's own configs don't stay registered after the test."""
     monkeypatch.setattr(SolverConfigRegistry, "_configs_by_id", dict(SolverConfigRegistry._configs_by_id))
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    """Compile max-div's numba functions once, in the process that starts the test run, before any test runs.
+
+    The compiled code is written to numba's disk cache, from which every xdist worker and every max-div worker
+    process loads it; without this step, max-div compiles each function inside the time budget of the first solve that
+    calls it.
+
+    A collect-only run runs no test, so it skips the step.
+    """
+    is_xdist_worker = hasattr(config, "workerinput")
+    if (not is_xdist_worker) and (not config.option.collectonly):
+        max_div.numba_precompile()
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
