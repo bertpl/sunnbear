@@ -8,7 +8,6 @@
 - scales down the worker count of a short run.
 """
 
-import max_div
 import numpy as np
 import pytest
 
@@ -89,10 +88,6 @@ def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size()
     """
     # --- arrange ----------------------
     results: list[MCTuplesSizeResult] = []
-    # On a fresh install, max-div compiles each of its functions inside the first solve that calls it, which leaves the
-    # solve too little of the time budget `t_total_sec` to meet the max-div constraints; `max_div.numba_precompile`
-    # compiles all of max-div's functions before the construction starts.
-    max_div.numba_precompile()
 
     # --- act --------------------------
     generator = MCTuplesGenerator(n_population=2**14, on_size_finished=results.append)
