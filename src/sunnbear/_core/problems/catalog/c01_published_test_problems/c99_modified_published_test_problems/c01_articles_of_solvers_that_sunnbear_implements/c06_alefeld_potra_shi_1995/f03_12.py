@@ -17,17 +17,20 @@ class ModifiedAlefeldPotraShi199512(Formula):
 
     Driver problem 25.
 
-    The formula holds only the test problems with ``n = 27`` and ``n = 31``. The formula computes the published function
-    in the equivalent form ``n**(1/n) * expm1(log(x/n)/n)``, on the published interval; ``c`` shifts x by the rule of
-    category 1, with ``c_scale`` the rounded width of the published interval.
+    The formula computes the published function in the equivalent form ``n**(1/n) * expm1(log(x/n)/n)``, on the
+    published interval; ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the published
+    interval.
 
-    The published test problems with ``n = 27`` and ``n = 31`` do not satisfy the benchmark suite inclusion conditions,
-    because the conditions require bisection to spend a fixed number of evaluations, and bisection stops early where a
-    midpoint lands on an exact 0 of f.
+    Some of the published test problems do not satisfy the benchmark suite inclusion conditions, because the conditions
+    require bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an
+    exact 0 of f.
 
     Near the root, ``x = n``, the 2 terms of the published form cancel, so that f is exactly 0 at many x-values within
-    about 1e-13 of the root. Of the published values of ``n``, only for ``n = 27`` and ``n = 31`` does bisection land on
-    one of these x-values. ``expm1(log(x/n)/n)`` computes ``(x/n)**(1/n) - 1`` without the subtraction.
+    about 1e-13 of the root. ``expm1(log(x/n)/n)`` computes ``(x/n)**(1/n) - 1`` without the subtraction.
+
+    Whether bisection lands on an x-value where f is exactly 0 depends on ``n`` and on the sampled values of ``c``, so
+    the values of ``n`` that the validation stage rejects can change with the sampled values; the formula therefore
+    holds every published value of ``n``.
     """
 
     number = (1, 99, 1, 6, 3)
@@ -62,8 +65,25 @@ class ModifiedAlefeldPotraShi199512(Formula):
             ParamTable(
                 names=("n",),
                 rows=(
+                    (2.0,),
+                    (3.0,),
+                    (4.0,),
+                    (5.0,),
+                    (6.0,),
+                    (7.0,),
+                    (9.0,),
+                    (11.0,),
+                    (13.0,),
+                    (15.0,),
+                    (17.0,),
+                    (19.0,),
+                    (21.0,),
+                    (23.0,),
+                    (25.0,),
                     (27.0,),
+                    (29.0,),
                     (31.0,),
+                    (33.0,),
                 ),
             ),
         )

@@ -42,6 +42,9 @@ class ModifiedPublishedTestProblems(FormulaCategory):
     Where a modification changes what the published test problem tests, such as when it removes a feature that the
     source uses the test problem to show, the formula's docstring says so in a paragraph with the words "changes what
     the test problem tests".
+
+    `REJECTED_PUBLISHED_TEST_PROBLEMS.md`, in this package, lists every published test problem that the benchmark
+    suite pipeline rejects, and the decision for it: a modification in this subcategory, or the reason why it has none.
     """
 
     number = (1, 99)

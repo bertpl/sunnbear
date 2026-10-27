@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f06_ex_2_2, f28_ex_2_10
+from . import f06_ex_2_2, f07_2_1_p_67, f28_ex_2_10
 
 
 class ModifiedBradie2006(FormulaCategory):
