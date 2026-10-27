@@ -38,7 +38,7 @@ class PublishedTestProblems(FormulaCategory):
 
     Subcategory 1.99 holds modified versions of the published test problems that do not satisfy the benchmark suite
     inclusion conditions; the docstring of `ModifiedPublishedTestProblems` states how the formulas of subcategory 1.99
-    apply ``c``.
+    apply ``c``, and a formula of subcategory 1.99 that shifts x follows the rules above.
     """
 
     number = (1,)

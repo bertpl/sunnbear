@@ -23,9 +23,9 @@ class ModifiedChapraCanale2015Pt23(Formula):
     5.5). Prob. 5.14 runs bisection to `es = 2%`; its interval holds the root, about 3.586. The other problems repeat
     Ex. 5.3–5.5 with the reader's programs; Prob. 5.26 stops by Eq. (5.5), with `Ea,d = 0.0001`.
 
-    The formula holds only the test problem on ``[3, 5]``. It computes the published function in the equivalent form
-    ``(g*m/x)*(-expm1(-(x/m)*t)) - v``, on that interval; ``c`` shifts x by the rule of category 1, with ``c_scale`` the
-    rounded width of the published interval.
+    The formula holds only the test problem on ``[3, 5]``. The formula computes the published function in the equivalent
+    form ``(g*m/x)*(-expm1(-(x/m)*t)) - v``, on that interval; ``c`` shifts x by the rule of category 1, with
+    ``c_scale`` the rounded width of the published interval.
 
     The published test problem on ``[3, 5]`` does not satisfy the benchmark suite inclusion conditions, because the
     conditions require bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint

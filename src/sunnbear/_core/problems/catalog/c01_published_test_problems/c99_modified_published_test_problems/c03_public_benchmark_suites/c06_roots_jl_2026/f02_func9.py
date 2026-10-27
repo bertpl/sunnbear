@@ -21,8 +21,8 @@ class ModifiedRootsJl2026Func9(Formula):
 
     f7: The source's starting point is `x0 = 7.6`.
 
-    The formula holds only the test problem on ``[5, 12]``. It changes that interval to ``[5, 7.7]``: its upper bound
-    moves left of the pole of ``tan(x)`` at ``5*pi/2``, near 7.85, so that the interval holds 1 root and no pole.
+    The formula holds only the test problem on ``[5, 12]``. The formula changes that interval to ``[5, 7.7]``: its upper
+    bound moves left of the pole of ``tan(x)`` at ``5*pi/2``, near 7.85, so that the interval holds 1 root and no pole.
 
     ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
 

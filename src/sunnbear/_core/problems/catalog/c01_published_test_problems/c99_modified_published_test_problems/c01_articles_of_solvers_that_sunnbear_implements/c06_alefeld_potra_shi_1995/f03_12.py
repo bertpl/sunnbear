@@ -17,8 +17,8 @@ class ModifiedAlefeldPotraShi199512(Formula):
 
     Driver problem 25.
 
-    The formula holds only the test problems with ``n = 27`` and ``n = 31``. It computes the published function in the
-    equivalent form ``n**(1/n) * expm1(log(x/n)/n)``, on the published interval; ``c`` shifts x by the rule of
+    The formula holds only the test problems with ``n = 27`` and ``n = 31``. The formula computes the published function
+    in the equivalent form ``n**(1/n) * expm1(log(x/n)/n)``, on the published interval; ``c`` shifts x by the rule of
     category 1, with ``c_scale`` the rounded width of the published interval.
 
     The published test problems with ``n = 27`` and ``n = 31`` do not satisfy the benchmark suite inclusion conditions,

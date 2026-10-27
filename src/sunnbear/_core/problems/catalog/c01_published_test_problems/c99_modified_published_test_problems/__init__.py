@@ -21,10 +21,11 @@ class ModifiedPublishedTestProblems(FormulaCategory):
     ``c > 0`` evaluates that function outside its domain.
 
     Formula 1.99.x.y.z modifies formula 1.x.y.z, and has the same name and `source`; subcategories 1.99.x and 1.99.x.y
-    have the names of subcategories 1.x and 1.x.y. Each formula holds 1 modification, which keeps the test problems as
-    close to the published ones as the conditions allow. A modification may combine several changes where 1 change
-    alone leaves a test problem that does not satisfy the conditions; the formula's docstring then states why each
-    change is needed.
+    have the names of subcategories 1.x and 1.x.y.
+
+    Each formula holds 1 modification, which keeps the test problems as close to the published ones as the conditions
+    allow. A modification may combine several changes where 1 change alone leaves a test problem that does not satisfy
+    the conditions; the formula's docstring then states why each change is needed.
 
     A formula holds either every parameter tuple of the published formula, including tuples whose published test
     problem satisfies the conditions, or only the tuples that need the modification; a formula that holds only some

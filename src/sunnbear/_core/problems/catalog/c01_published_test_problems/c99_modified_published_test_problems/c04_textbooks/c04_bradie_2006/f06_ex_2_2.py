@@ -24,7 +24,9 @@ class ModifiedBradie2006Ex22(Formula):
 
     The formula holds only the test problem on ``[0, 0.5]``. It changes that interval to ``[0, 0.495]``: its upper bound
     moves left of the pole of ``tan(pi*x)`` at 0.5 by 1% of the published interval's width, rounded half up to 1
-    significant digit; ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
+    significant digit.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
 
     The published test problem on ``[0, 0.5]`` does not satisfy the benchmark suite inclusion conditions, because
     ``b = 0.5`` is the pole: ``f(b)`` is about ``1.6e16`` in float64, and a shift along x by any ``c < 0`` crosses the

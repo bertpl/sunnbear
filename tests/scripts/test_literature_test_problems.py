@@ -276,7 +276,7 @@ def test_published_formula_matches_the_survey(formula, script_modules, sources, 
         )
 
 
-def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table):
+def test_published_sources_in_the_catalog_are_complete(committed_formulas_table):
     """A source with a formula in the catalog has each of its active formulas of `formulas.csv` there."""
     # --- arrange ----------------------
     numbers_in_catalog = {formula.number for formula in _PUBLISHED_FORMULAS}
@@ -319,7 +319,9 @@ def test_modified_formula_has_its_published_formula(formula):
 def test_modified_category_has_the_name_of_its_published_category(category):
     """Category 1.99.x or 1.99.x.y has the name of category 1.x or 1.x.y."""
     # --- arrange ----------------------
-    categories = {registered.number: registered for registered in FormulaRegistry.categories()}
+    categories = {
+        registered_category.number: registered_category for registered_category in FormulaRegistry.categories()
+    }
 
     # --- act --------------------------
     published_category = categories[(1, *category.number[2:])]
@@ -791,13 +793,13 @@ def _first_run_formulas_table(script_modules):
 def _c_ways_followed(candidate, c):
     """Return the names of the ways to apply ``c`` that a test problem follows at `c`.
 
-    The 3 ways are those that `ModifiedPublishedTestProblems` states. For each way, the test compares the value at `c`
-    with a value at ``c = 0``. Evaluating the formula at ``c = 0`` repeats the formula's own float arithmetic, so the 2
-    values are equal exactly where the formula applies ``c`` that way:
+    The 3 ways are those that `ModifiedPublishedTestProblems` states. For each way, `_c_ways_followed` compares the
+    value at `c` with a value at ``c = 0``. Evaluating the formula at ``c = 0`` repeats the formula's own float
+    arithmetic, so the 2 values are equal exactly where the formula applies ``c`` that way:
 
-    - "shifts x": the test subtracts ``c_scale*c`` from x, as the formula does;
+    - "shifts x": it subtracts ``c_scale*c`` from x, as the formula does;
     - "adds to f": the formula adds ``c`` as its last operation;
-    - "scales x": the test scales x with the formula's own operations; only for an interval right of 0.
+    - "scales x": it scales x with the formula's own operations; only for an interval right of 0.
 
     The x-value lies at 0.6 of the interval, in log scale for "scales x", so that the shifted or scaled x-values stay in
     the interval.

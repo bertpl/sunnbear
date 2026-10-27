@@ -18,8 +18,9 @@ class ModifiedBurdenFairesBurden2016218(Formula):
     `1E-4` (2.2-16).
 
     The formula changes the published interval ``[4, 5]`` to ``[4, 4.6]``: the upper bound moves left of the pole of
-    ``tan(x)`` at ``3*pi/2``, near 4.71, so that the interval holds its root and no pole; ``c`` shifts x by the rule of
-    category 1, with ``c_scale`` the rounded width of the new interval.
+    ``tan(x)`` at ``3*pi/2``, near 4.71, so that the interval holds its root and no pole.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because the pole inside the
     published interval is a second sign change, so that ``f(a)`` and ``f(b)`` have the same sign.

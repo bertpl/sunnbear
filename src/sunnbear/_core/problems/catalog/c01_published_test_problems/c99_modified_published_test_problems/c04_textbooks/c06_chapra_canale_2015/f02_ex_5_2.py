@@ -20,8 +20,9 @@ class ModifiedChapraCanale2015Ex52(Formula):
 
     The formula holds only the test problems on ``[3, 5]`` and ``[4.2, 4.3]``. It changes these intervals to
     ``[3.3, 5]`` and ``[4.2, 4.26]``, so that each holds an odd number of roots: ``[3.3, 5]`` leaves out the root near
-    3.26, and ``[4.2, 4.26]`` leaves out the root near 4.264; ``c`` shifts x by the rule of category 1, with ``c_scale``
-    the rounded width of each new interval.
+    3.26, and ``[4.2, 4.26]`` leaves out the root near 4.264.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of each new interval.
 
     The published test problems on ``[3, 5]`` and ``[4.2, 4.3]`` do not satisfy the benchmark suite inclusion
     conditions, because the 2 published intervals hold 6 and 2 roots, even numbers, so that ``f(a)`` and ``f(b)`` have

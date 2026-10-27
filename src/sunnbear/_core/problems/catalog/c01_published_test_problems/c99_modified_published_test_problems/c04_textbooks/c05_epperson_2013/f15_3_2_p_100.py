@@ -16,10 +16,11 @@ class ModifiedEpperson201332P100(Formula):
     Root 0.05. Table 3.3: the first Newton step from `x0 = 1, 0.5, 0.25, 0.125, 0.0625` gives `x1 < 0` until `x0 =
     1/16`. Table 3.16: the hybrid method (Algorithm 3.6), from `x0 = 0.01, x1 = 1`.
 
-    The formula holds only the test problem on ``[-0.2, 0.2]``. It changes that interval to ``[0.01, 0.2]``: the
-    lower bound moves right of the pole at 0, to the lower bound of the other published interval, so that the interval
-    holds its root and no pole; ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new
-    interval.
+    The formula holds only the test problem on ``[-0.2, 0.2]``. It changes that interval to ``[0.01, 0.2]``: the lower
+    bound moves right of the pole at 0, to the lower bound of the other published interval, so that the interval holds
+    its root and no pole.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
 
     The published test problem on ``[-0.2, 0.2]`` does not satisfy the benchmark suite inclusion conditions, because
     the pole at 0 is a second sign change, so that ``f(a)`` and ``f(b)`` have the same sign.

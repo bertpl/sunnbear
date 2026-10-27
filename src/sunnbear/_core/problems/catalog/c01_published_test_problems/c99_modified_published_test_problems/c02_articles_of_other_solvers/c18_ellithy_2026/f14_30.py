@@ -20,7 +20,7 @@ class ModifiedEllithy202630(Formula):
     The function is Wilkinson's polynomial, which the author's file writes out as the product of all 20 factors ``(x -
     1)`` to ``(x - 20)``.
 
-    The formula holds only the test problem of row 31. It changes the published interval ``[19, 21]`` to
+    The formula holds only the test problem of row 31. The formula changes the published interval ``[19, 21]`` to
     ``[19.02, 21]``: its lower bound moves right of the root at 19 by 1% of the published interval's width, rounded half
     up to 1 significant digit.
 

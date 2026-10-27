@@ -16,9 +16,10 @@ class ModifiedEpperson2013313H(Formula):
 
     Bisection to `1E-6`; Newton from `x0 = 1/2`.
 
-    The formula changes the published interval ``[0, pi]`` to ``[0.03, pi]``: the lower bound moves right of the root
-    at 0 by 1% of the published interval's width, rounded half up to 1 significant digit; ``c`` shifts x by the rule of
-    category 1, with ``c_scale`` the rounded width of the new interval.
+    The formula changes the published interval ``[0, pi]`` to ``[0.03, pi]``: the lower bound moves right of the root at
+    0 by 1% of the published interval's width, rounded half up to 1 significant digit.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because ``f(a)`` is 0 at the
     root ``a = 0``.

@@ -19,8 +19,8 @@ class ModifiedBurkardt2016P06(Formula):
     and the docstring have `+`. The function does not change sign on `rang`, `[0.00001, 20.0]`, which holds 2 roots,
     about `0.0001999992` and `0.7032048404`; `p06_root` returns only the 2nd, `0.7032048403631358`.
 
-    The formula holds only the test problem on ``[1e-05, 20]``. It changes that interval to ``[0.08, 20]``: its lower
-    bound moves right of the first root, near 0.00019, so that the interval holds 1 of the 2 roots.
+    The formula holds only the test problem on ``[1e-05, 20]``. The formula changes that interval to ``[0.08, 20]``: its
+    lower bound moves right of the first root, near 0.00019, so that the interval holds 1 of the 2 roots.
 
     ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
 

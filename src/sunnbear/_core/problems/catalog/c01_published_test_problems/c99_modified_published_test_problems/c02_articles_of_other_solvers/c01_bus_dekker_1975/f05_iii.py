@@ -16,9 +16,9 @@ class ModifiedBusDekker1975Iii(Formula):
 
     Group III: a zero of multiplicity `n` at 0.
 
-    The formula holds only the test problem with ``n = 25``. It adds ``TINY_LINEAR_TERM_SLOPE*x`` to the published
-    function, on the published interval; ``c`` shifts x by the rule of category 1, before the formula adds the term.
-    `TINY_LINEAR_TERM_SLOPE` is about 4.5e-277.
+    The formula holds only the test problem with ``n = 25``. The formula adds ``TINY_LINEAR_TERM_SLOPE*x`` to the
+    published function, on the published interval; ``c`` shifts x by the rule of category 1, before the formula adds the
+    term. `TINY_LINEAR_TERM_SLOPE` is about 4.5e-277.
 
     The published test problem with ``n = 25`` does not satisfy the benchmark suite inclusion conditions, because the
     conditions require bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint

@@ -15,8 +15,8 @@ class ModifiedRootsFortran20259394(Formula):
 
     a different root in each bracket
 
-    The formula holds only the test problem on ``[0, 6]``. It keeps that interval, evaluates the published function at x
-    without shifting x, and adds ``c`` to the function's value.
+    The formula holds only the test problem on ``[0, 6]``. The formula keeps that interval, evaluates the published
+    function at x without shifting x, and adds ``c`` to the function's value.
 
     The published test problem on ``[0, 6]`` does not satisfy the benchmark suite inclusion conditions, because a shift
     along x by any ``c > 0`` evaluates ``x^0.4`` left of ``a = 0``, where it is not real.

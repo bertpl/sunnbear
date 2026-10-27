@@ -18,8 +18,9 @@ class ModifiedRidders1979Iii2(Formula):
     Last printed iterate: `1.354710442`.
 
     The formula holds only the test problem on ``[0, 1.5]``. The interval ``[0, 1.5]`` becomes ``[0.02, 1.5]``: its
-    lower bound moves right of 0 by 1% of the published interval's width, rounded half up to 1 significant digit; ``c``
-    shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
+    lower bound moves right of 0 by 1% of the published interval's width, rounded half up to 1 significant digit.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
 
     The published test problem on ``[0, 1.5]`` does not satisfy the benchmark suite inclusion conditions, because a
     shift along x by any ``c > 0`` evaluates ``tan(x)^tan(x)`` left of ``a = 0``, where the base ``tan(x)`` is negative.

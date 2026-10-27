@@ -17,7 +17,7 @@ class ModifiedBurkardt2016P04(Formula):
 
     The source's starting points, in order, are `0.03` and `1.0`.
 
-    The formula holds only the test problem on ``[1e-05, 20]``. It evaluates the published function at
+    The formula holds only the test problem on ``[1e-05, 20]``. The formula evaluates the published function at
     ``x*exp(-c*ln(b/a))`` on that interval, ``[a, b]``: ``c`` scales x, so that the root moves by the factor
     ``(b/a)**c`` and never reaches 0.
 

@@ -24,9 +24,11 @@ class ModifiedChapraCanale2015Prob510(Formula):
     false position to `es = 1.0%`.
 
     The formula computes the published polynomial in its re-expansion around ``ROOT``, the float64 nearest to the
-    polynomial's root, on the published interval; ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded
-    width of the published interval. The re-expansion is ``c0 + t*(c1 + t*(c2 + t*(c3 + t)))``, with ``t = x - ROOT``
-    and ``c0`` to ``c3`` from `TAYLOR_COEFFICIENTS`.
+    polynomial's root, on the published interval.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the published interval. The
+    re-expansion is ``c0 + t*(c1 + t*(c2 + t*(c3 + t)))``, with ``t = x - ROOT`` and ``c0`` to ``c3`` from
+    `TAYLOR_COEFFICIENTS`.
 
     The formula re-expands the polynomial because the polynomial has no factored form ``(x - r)*q(x)`` with exact
     float64 coefficients, with ``r`` the root and ``q`` a cubic polynomial; such a form would have no terms that cancel
