@@ -1,4 +1,4 @@
-"""This category holds the modified formulas of Brent (1973)."""
+"""This category holds the modified versions of the formulas of Brent (1973)."""
 
 from sunnbear._core.problems.core import FormulaCategory
 
@@ -6,7 +6,7 @@ from . import f03_4_1
 
 
 class ModifiedBrent1973(FormulaCategory):
-    """`ModifiedBrent1973` is the category of the modified formulas of 1 publication.
+    """`ModifiedBrent1973` holds the modified versions of the formulas of 1 publication.
 
     Brent, R. P. (1973). Algorithms for Minimization without Derivatives. Prentice-Hall, Englewood Cliffs, NJ. ISBN
     0-13-022335-2. Author's scan: https://maths-people.anu.edu.au/~brent/pub/pub011.html. Erratum: Brent, R. P.

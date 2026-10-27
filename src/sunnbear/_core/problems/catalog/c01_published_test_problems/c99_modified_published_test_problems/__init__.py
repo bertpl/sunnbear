@@ -1,4 +1,4 @@
-"""This category holds the modified versions of published test problems, in the subcategories of category 1."""
+"""This category holds the modified versions of published test problems, grouped like the rest of category 1."""
 
 from sunnbear._core.problems.core import FormulaCategory
 
@@ -15,18 +15,25 @@ class ModifiedPublishedTestProblems(FormulaCategory):
 
     Some published test problems do not satisfy the benchmark suite inclusion conditions, the conditions on every test
     problem of a benchmark suite. The benchmark suite pipeline, `sunnbear._core.benchmark.suites.pipeline`, checks
-    these conditions. An example is a published test problem whose function is not defined left of its interval: a
-    shift along x by any ``c > 0`` evaluates that function outside its domain.
+    these conditions.
+
+    An example is a published test problem whose function is not defined left of its interval: a shift along x by any
+    ``c > 0`` evaluates that function outside its domain.
 
     Formula 1.99.x.y.z modifies formula 1.x.y.z, and has the same name and `source`; subcategories 1.99.x and 1.99.x.y
     have the names of subcategories 1.x and 1.x.y. Each formula holds 1 modification, which keeps the test problems as
-    close to the published ones as the conditions allow. A formula may hold every parameter tuple of the published
-    formula, also tuples whose published test problem satisfies the conditions, or only the tuples that need the
-    modification.
+    close to the published ones as the conditions allow. A modification may combine several changes where 1 change
+    alone leaves a test problem that does not satisfy the conditions; the formula's docstring then states why each
+    change is needed.
+
+    A formula holds either every parameter tuple of the published formula, including tuples whose published test
+    problem satisfies the conditions, or only the tuples that need the modification; a formula that holds only some
+    tuples names them in its docstring.
 
     A formula of this subcategory applies ``c`` in 1 of 3 ways, which its docstring states:
 
-    - it shifts x by the rule of category 1, with ``c_scale`` the rounded width of the formula's own interval;
+    - it shifts x by ``c_scale*c``, as the published formulas do, with ``c_scale`` the rounded width of the formula's
+      own interval;
     - it adds ``c`` to the function's value, on the published interval, and does not shift x;
     - it keeps the published interval ``[a, b]`` and evaluates the function at ``x*exp(-c*ln(b/a))``: ``c`` scales x,
       so that the root moves by the factor ``(b/a)**c`` and never reaches 0.

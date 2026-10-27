@@ -13,8 +13,9 @@ class ModifiedEllithy202621(Formula):
     The survey writes the source's function as ``(x^2 - 4)*(x + 1.5)*(x - 0.5)``; the published interval is ``[0, 2]``.
 
     The formula changes the published interval ``[0, 2]`` to ``[0, 1.98]``: its upper bound moves left of the root at 2
-    by 1% of the published interval's width, rounded half up to 1 significant digit. ``c`` shifts x by the rule of
-    category 1, with ``c_scale`` the rounded width of the new interval.
+    by 1% of the published interval's width, rounded half up to 1 significant digit.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because ``f(b)`` is 0 at the
     root ``b = 2``.

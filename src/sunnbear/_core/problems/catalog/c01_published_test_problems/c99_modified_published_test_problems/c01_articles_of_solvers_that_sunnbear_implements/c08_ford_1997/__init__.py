@@ -1,4 +1,4 @@
-"""This category holds the modified formulas of Ford (1997)."""
+"""This category holds the modified versions of the formulas of Ford (1997)."""
 
 from sunnbear._core.problems.core import FormulaCategory
 
@@ -6,7 +6,7 @@ from . import f01_1
 
 
 class ModifiedFord1997(FormulaCategory):
-    """`ModifiedFord1997` is the category of the modified formulas of 1 publication.
+    """`ModifiedFord1997` holds the modified versions of the formulas of 1 publication.
 
     Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear equations. Scientia Iranica 4(1&2),
     28–34. The article has no working DOI: the journal's page,

@@ -1,4 +1,4 @@
-"""This category holds the modified formulas of public benchmark suites, grouped by source."""
+"""This category holds the modified versions of the formulas of public benchmark suites."""
 
 from sunnbear._core.problems.core import FormulaCategory
 
@@ -13,7 +13,10 @@ from . import (
 
 
 class ModifiedPublicBenchmarkSuites(FormulaCategory):
-    """`ModifiedPublicBenchmarkSuites` holds the modified formulas of subcategory 1.3."""
+    """`ModifiedPublicBenchmarkSuites` is subcategory 1.99.3.
+
+    It holds the modified versions of the formulas of subcategory 1.3.
+    """
 
     number = (1, 99, 3)
     name = "Public benchmark suites"

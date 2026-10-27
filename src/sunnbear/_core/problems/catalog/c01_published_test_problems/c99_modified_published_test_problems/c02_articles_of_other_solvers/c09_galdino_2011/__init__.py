@@ -1,4 +1,4 @@
-"""This category holds the modified formulas of Galdino (2011)."""
+"""This category holds the modified versions of the formulas of Galdino (2011)."""
 
 from sunnbear._core.problems.core import FormulaCategory
 
@@ -6,7 +6,7 @@ from . import f04_f4, f06_f6
 
 
 class ModifiedGaldino2011(FormulaCategory):
-    """`ModifiedGaldino2011` is the category of the modified formulas of 1 publication.
+    """`ModifiedGaldino2011` holds the modified versions of the formulas of 1 publication.
 
     Galdino, S. (2011). A family of regula falsi root-finding methods. Proceedings of the 2011 World Congress on
     Engineering and Technology, IEEE Press, Shanghai, pp. 514–517. ISBN 978-1-61284-365-0. No DOI; the author's

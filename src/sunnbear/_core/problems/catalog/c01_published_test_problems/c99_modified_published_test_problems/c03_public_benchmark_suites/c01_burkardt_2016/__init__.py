@@ -1,4 +1,4 @@
-"""This category holds the modified formulas of Burkardt (2016)."""
+"""This category holds the modified versions of the formulas of Burkardt (2016)."""
 
 from sunnbear._core.problems.core import FormulaCategory
 
@@ -6,7 +6,7 @@ from . import f04_p04, f06_p06, f12_p12, f17_p18
 
 
 class ModifiedBurkardt2016(FormulaCategory):
-    """`ModifiedBurkardt2016` is the category of the modified formulas of 1 publication.
+    """`ModifiedBurkardt2016` holds the modified versions of the formulas of 1 publication.
 
     John Burkardt, TEST_ZERO, Python version, file `test_zero.py`,
     https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py, MIT license.

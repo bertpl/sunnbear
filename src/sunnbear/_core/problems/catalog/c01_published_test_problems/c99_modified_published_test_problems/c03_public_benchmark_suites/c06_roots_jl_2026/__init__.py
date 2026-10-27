@@ -1,4 +1,4 @@
-"""This category holds the modified formulas of Roots.jl (2026)."""
+"""This category holds the modified versions of the formulas of Roots.jl (2026)."""
 
 from sunnbear._core.problems.core import FormulaCategory
 
@@ -6,7 +6,7 @@ from . import f02_func9, f03_func10, f04_func11
 
 
 class ModifiedRootsJl2026(FormulaCategory):
-    """`ModifiedRootsJl2026` is the category of the modified formulas of 1 publication.
+    """`ModifiedRootsJl2026` holds the modified versions of the formulas of 1 publication.
 
     Roots.jl v3.0.11, the test folder https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test, MIT license. The
     functions of the rows are in 2 files: - `test/test_derivative_free.jl`,

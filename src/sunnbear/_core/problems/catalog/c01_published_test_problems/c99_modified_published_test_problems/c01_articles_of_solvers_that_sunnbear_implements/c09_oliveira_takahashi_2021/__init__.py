@@ -1,4 +1,4 @@
-"""This category holds the modified formulas of Oliveira, Takahashi (2021)."""
+"""This category holds the modified versions of the formulas of Oliveira, Takahashi (2021)."""
 
 from sunnbear._core.problems.core import FormulaCategory
 
@@ -6,7 +6,7 @@ from . import f15_2_4
 
 
 class ModifiedOliveiraTakahashi2021(FormulaCategory):
-    """`ModifiedOliveiraTakahashi2021` is the category of the modified formulas of 1 publication.
+    """`ModifiedOliveiraTakahashi2021` holds the modified versions of the formulas of 1 publication.
 
     Oliveira, I. F. D., Takahashi, R. H. C. (2021). An enhancement of the bisection method average performance
     preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), Article 5.

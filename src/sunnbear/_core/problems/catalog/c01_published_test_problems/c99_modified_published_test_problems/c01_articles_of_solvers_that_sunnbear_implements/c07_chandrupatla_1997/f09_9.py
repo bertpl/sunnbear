@@ -19,7 +19,9 @@ class ModifiedChandrupatla19979(Formula):
 
     The formula holds the test problems on ``[2e-4, 9]`` and wider. It evaluates the published function at
     ``x*exp(-c*ln(b/a))`` on the published interval: ``c`` scales x, so that the root moves by the factor ``(b/a)**c``
-    and never reaches 0. As ``c`` goes from 0 to 1, the root moves by the interval's full width in log scale.
+    and never reaches 0.
+
+    As ``c`` goes from 0 to 1, the root moves by the interval's full width in log scale.
 
     The published test problems on ``[2e-4, 9]`` and wider do not satisfy the benchmark suite inclusion conditions,
     because each interval spans orders of magnitude next to the pole at 0, so that the shift by ``c_scale*c`` at the

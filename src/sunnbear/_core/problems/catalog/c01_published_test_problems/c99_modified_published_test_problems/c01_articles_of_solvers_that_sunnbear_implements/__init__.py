@@ -1,4 +1,4 @@
-"""This category holds the modified formulas of articles of solvers that sunnbear implements, grouped by source."""
+"""This category holds the modified versions of the formulas of articles of solvers that sunnbear implements."""
 
 from sunnbear._core.problems.core import FormulaCategory
 
@@ -17,7 +17,10 @@ from . import (
 
 
 class ModifiedArticlesOfSolversThatSunnbearImplements(FormulaCategory):
-    """`ModifiedArticlesOfSolversThatSunnbearImplements` holds the modified formulas of subcategory 1.1."""
+    """`ModifiedArticlesOfSolversThatSunnbearImplements` is subcategory 1.99.1.
+
+    It holds the modified versions of the formulas of subcategory 1.1.
+    """
 
     number = (1, 99, 1)
     name = "Articles of solvers that sunnbear implements"

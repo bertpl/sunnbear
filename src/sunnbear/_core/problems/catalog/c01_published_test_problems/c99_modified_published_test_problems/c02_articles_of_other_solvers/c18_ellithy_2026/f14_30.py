@@ -22,8 +22,9 @@ class ModifiedEllithy202630(Formula):
 
     The formula holds only the test problem of row 31. It changes the published interval ``[19, 21]`` to
     ``[19.02, 21]``: its lower bound moves right of the root at 19 by 1% of the published interval's width, rounded half
-    up to 1 significant digit. ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new
-    interval.
+    up to 1 significant digit.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
 
     The published test problem on ``[19, 21]`` does not satisfy the benchmark suite inclusion conditions, because
     ``f(a)`` is 0 at the root ``a = 19``.

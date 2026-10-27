@@ -1,4 +1,4 @@
-"""This category holds the modified formulas of roots-fortran (2025)."""
+"""This category holds the modified versions of the formulas of roots-fortran (2025)."""
 
 from sunnbear._core.problems.core import FormulaCategory
 
@@ -6,7 +6,7 @@ from . import f04_2627, f30_8688, f33_9394, f41_150
 
 
 class ModifiedRootsFortran2025(FormulaCategory):
-    """`ModifiedRootsFortran2025` is the category of the modified formulas of 1 publication.
+    """`ModifiedRootsFortran2025` holds the modified versions of the formulas of 1 publication.
 
     Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25, the last commit to the
     file), https://github.com/jacobwilliams/roots-

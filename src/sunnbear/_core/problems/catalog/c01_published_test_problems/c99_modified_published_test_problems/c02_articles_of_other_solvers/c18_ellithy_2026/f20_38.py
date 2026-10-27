@@ -14,8 +14,9 @@ class ModifiedEllithy202638(Formula):
     1]``.
 
     The formula changes the published interval ``[-3, 1]`` to ``[-3, 0.96]``: its upper bound moves left of the root at
-    1 by 1% of the published interval's width, rounded half up to 1 significant digit. ``c`` shifts x by the rule of
-    category 1, with ``c_scale`` the rounded width of the new interval.
+    1 by 1% of the published interval's width, rounded half up to 1 significant digit.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because ``f(b)`` is 0 at the
     root ``b = 1``.

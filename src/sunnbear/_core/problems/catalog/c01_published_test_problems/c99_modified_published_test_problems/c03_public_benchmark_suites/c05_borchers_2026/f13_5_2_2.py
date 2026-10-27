@@ -17,8 +17,9 @@ class ModifiedBorchers2026522(Formula):
     `findzeros` returns every root in the interval: -2, -1, 0, 1, 2
 
     The formula changes the interval ``[-2, 2]`` to ``[-2.04, 1.96]``: the interval moves left by 1% of the published
-    interval's width, rounded half up to 1 significant digit, so that neither bound is a root. ``c`` shifts x by the
-    rule of category 1, with ``c_scale`` the rounded width of the new interval.
+    interval's width, rounded half up to 1 significant digit, so that neither bound is a root.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because the published
     interval's bounds are the roots -2 and 2, where float64 ``pi`` makes ``f`` slightly negative at both, so that

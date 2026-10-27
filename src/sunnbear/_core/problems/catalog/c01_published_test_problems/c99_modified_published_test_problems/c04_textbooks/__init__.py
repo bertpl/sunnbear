@@ -1,4 +1,4 @@
-"""This category holds the modified formulas of textbooks, grouped by source."""
+"""This category holds the modified versions of the formulas of textbooks."""
 
 from sunnbear._core.problems.core import FormulaCategory
 
@@ -14,7 +14,10 @@ from . import (
 
 
 class ModifiedTextbooks(FormulaCategory):
-    """`ModifiedTextbooks` holds the modified formulas of subcategory 1.4."""
+    """`ModifiedTextbooks` is subcategory 1.99.4.
+
+    It holds the modified versions of the formulas of subcategory 1.4.
+    """
 
     number = (1, 99, 4)
     name = "Textbooks"

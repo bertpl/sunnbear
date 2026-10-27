@@ -17,11 +17,13 @@ class ModifiedAtkinson1989136(Formula):
     smooth; at 640 points of `[0.998, 1.002]` the values form a band around 0 (Figure 1.2).
 
     The formula evaluates ``x**3``, the published function at ``x + 1``, on the published interval shifted by -1, which
-    lies around 0: ``[-1, 1]`` for ``[0, 2]``, and ``[-0.002, 0.002]`` for ``[0.998, 1.002]``. ``c`` shifts x by the
-    rule of category 1, with ``c_scale`` the rounded width of the new interval.
+    lies around 0: ``[-1, 1]`` for ``[0, 2]``, and ``[-0.002, 0.002]`` for ``[0.998, 1.002]``.
 
-    For the test problem on ``[0, 2]``, the shift alone does not make it satisfy the benchmark suite inclusion
-    conditions; the formula shifts that interval only so that both test problems share the form ``x**3``.
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
+
+    For the test problem on ``[0, 2]``, the form ``x**3`` makes it satisfy the benchmark suite inclusion conditions,
+    and the shift by -1 does not; the formula shifts that interval only so that both test problems share the form
+    ``x**3``.
 
     The published test problem on ``[0.998, 1.002]`` does not satisfy the benchmark suite inclusion conditions, because
     its interval is narrow around the root at 1: the ratio of the interval's largest bound to its width, about 250, is

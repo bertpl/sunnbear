@@ -1,4 +1,4 @@
-"""This category holds the modified formulas of Ellithy (2026)."""
+"""This category holds the modified versions of the formulas of Ellithy (2026)."""
 
 from sunnbear._core.problems.core import FormulaCategory
 
@@ -6,7 +6,7 @@ from . import f05_20, f06_21, f14_30, f20_38
 
 
 class ModifiedEllithy2026(FormulaCategory):
-    """`ModifiedEllithy2026` is the category of the modified formulas of 1 publication.
+    """`ModifiedEllithy2026` holds the modified versions of the formulas of 1 publication.
 
     Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root finding. Journal of the
     Egyptian Mathematical Society 34(1), 91–115. https://doi.org/10.21608/joems.2026.440115.1078. Code and data: the

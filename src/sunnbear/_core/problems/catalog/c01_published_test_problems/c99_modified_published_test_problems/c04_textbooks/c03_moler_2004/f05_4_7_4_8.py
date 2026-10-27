@@ -21,8 +21,9 @@ class ModifiedMoler20044748(Formula):
     asks why. Ex. 4.10(a) asks for its first 10 zeros.
 
     The formula holds only the test problem on ``[0, 10*pi]``. It changes that interval to ``[0, 30]``: its upper bound
-    moves between the last 2 roots, so that the interval holds 9 of the 10 roots. ``c`` shifts x by the rule of
-    category 1, with ``c_scale`` the rounded width of the new interval.
+    moves between the last 2 roots, so that the interval holds 9 of the 10 roots.
+
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
 
     The published test problem on ``[0, 10*pi]`` does not satisfy the benchmark suite inclusion conditions, because the
     published interval holds 10 roots, an even number, so that ``f(a)`` and ``f(b)`` have the same sign.

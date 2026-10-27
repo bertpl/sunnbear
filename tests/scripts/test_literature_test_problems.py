@@ -18,7 +18,7 @@ from sunnbear._core.problems.catalog.c01_published_test_problems import Publishe
 from sunnbear._core.problems.core import FormulaRegistry, FormulaSource
 
 _CATEGORY_1_FORMULAS = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 1]
-# _PUBLISHED_FORMULAS are the formulas of subcategories 1.1 to 1.4, _MODIFIED_FORMULAS those of subcategory 1.99.
+# _PUBLISHED_FORMULAS are the formulas of category 1 outside subcategory 1.99, and _MODIFIED_FORMULAS those inside it.
 _PUBLISHED_FORMULAS = [formula for formula in _CATEGORY_1_FORMULAS if formula.number[1] != 99]
 _MODIFIED_FORMULAS = [formula for formula in _CATEGORY_1_FORMULAS if formula.number[1] == 99]
 # _FIRST_RUN_LINES are the rows of a small survey on its first run, each as (row id, subcategory, final status).
@@ -300,15 +300,15 @@ def test_category_1_sources_in_the_catalog_are_complete(committed_formulas_table
 def test_modified_formula_has_its_published_formula(formula):
     """Formula 1.99.x.y.z modifies formula 1.x.y.z, which exists and has the same name and `source`."""
     # --- arrange ----------------------
-    published_formulas = {published.number: published for published in _PUBLISHED_FORMULAS}
+    published_formulas = {published_formula.number: published_formula for published_formula in _PUBLISHED_FORMULAS}
 
     # --- act --------------------------
-    published = published_formulas.get((1, *formula.number[2:]))
+    published_formula = published_formulas.get((1, *formula.number[2:]))
 
     # --- assert -----------------------
-    assert published is not None
-    assert formula.name == published.name
-    assert formula.source == published.source
+    assert published_formula is not None
+    assert formula.name == published_formula.name
+    assert formula.source == published_formula.source
 
 
 @pytest.mark.parametrize(
@@ -319,13 +319,13 @@ def test_modified_formula_has_its_published_formula(formula):
 def test_modified_category_has_the_name_of_its_published_category(category):
     """Category 1.99.x or 1.99.x.y has the name of category 1.x or 1.x.y."""
     # --- arrange ----------------------
-    categories = {published.number: published for published in FormulaRegistry.categories()}
+    categories = {registered.number: registered for registered in FormulaRegistry.categories()}
 
     # --- act --------------------------
-    published = categories[(1, *category.number[2:])]
+    published_category = categories[(1, *category.number[2:])]
 
     # --- assert -----------------------
-    assert category.name == published.name
+    assert category.name == published_category.name
 
 
 @pytest.mark.parametrize("formula", _PUBLISHED_FORMULAS, ids=lambda formula: formula.label)
@@ -333,11 +333,11 @@ def test_modified_category_has_the_name_of_its_published_category(category):
 def test_published_formula_shifts_x_by_c(formula, c):
     """A published formula applies ``c`` by category 1's rule: it shifts x by ``c_scale*c``."""
     for candidate in formula.build_all_candidates():
-        # --- act --------------------------
-        rules = _c_rules_followed(candidate, c)
+        # --- act ----------------------
+        ways = _c_ways_followed(candidate, c)
 
-        # --- assert -----------------------
-        assert "shifts x" in rules, candidate.id
+        # --- assert -------------------
+        assert "shifts x" in ways, candidate.id
 
 
 @pytest.mark.parametrize("formula", _MODIFIED_FORMULAS, ids=lambda formula: formula.label)
@@ -345,16 +345,16 @@ def test_published_formula_shifts_x_by_c(formula, c):
 def test_modified_formula_applies_c_in_a_way_of_its_subcategory(formula, c):
     """A formula of subcategory 1.99 applies ``c`` in 1 of the 3 ways that `ModifiedPublishedTestProblems` states."""
     for candidate in formula.build_all_candidates():
-        # --- act --------------------------
-        rules = _c_rules_followed(candidate, c)
+        # --- act ----------------------
+        ways = _c_ways_followed(candidate, c)
 
-        # --- assert -----------------------
-        assert rules, candidate.id
+        # --- assert -------------------
+        assert ways, candidate.id
 
 
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
 def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula):
-    """A formula of category 1 that shifts x multiplies ``c`` by its interval's width, rounded by ``c_scale``.
+    """A formula of category 1 that shifts x multiplies ``c`` by ``PublishedTestProblems.c_scale`` of its interval.
 
     The test reads the factor from the code of ``parametrized_fun``, because a test that compares shifted values
     cannot see a number that is 1 float step off, such as ``1.9999999999999996`` for ``2.0``: the shifted x-values
@@ -364,7 +364,7 @@ def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula):
     # --- arrange ----------------------
     tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))
     shifting_candidates = [
-        candidate for candidate in formula.build_all_candidates() if "shifts x" in _c_rules_followed(candidate, 0.25)
+        candidate for candidate in formula.build_all_candidates() if "shifts x" in _c_ways_followed(candidate, 0.25)
     ]
 
     # --- act --------------------------
@@ -788,11 +788,12 @@ def _first_run_formulas_table(script_modules):
     )
 
 
-def _c_rules_followed(candidate, c):
-    """Return the names of the ways to apply ``c`` that a test problem follows at `c`, among the 3 of category 1.
+def _c_ways_followed(candidate, c):
+    """Return the names of the ways to apply ``c`` that a test problem follows at `c`.
 
-    Each way compares the value at `c` with a value at ``c = 0``, which repeats the formula's own float arithmetic, so
-    the 2 values are equal exactly where the formula applies ``c`` that way:
+    The 3 ways are those that `ModifiedPublishedTestProblems` states. For each way, the test compares the value at `c`
+    with a value at ``c = 0``. Evaluating the formula at ``c = 0`` repeats the formula's own float arithmetic, so the 2
+    values are equal exactly where the formula applies ``c`` that way:
 
     - "shifts x": the test subtracts ``c_scale*c`` from x, as the formula does;
     - "adds to f": the formula adds ``c`` as its last operation;
@@ -803,16 +804,19 @@ def _c_rules_followed(candidate, c):
     """
     a, b = candidate.a, candidate.b
     x_linear = a + 0.6 * (b - a)
-    # each way maps to the x-value, the x-value at c = 0 that gives the same function value, and the offset to add
-    points = {
+    # each way maps to a tuple of:
+    # - the x-value;
+    # - the x-value at c = 0 that gives the same function value;
+    # - the offset to add to the value at c = 0.
+    comparisons = {
         "shifts x": (x_linear, x_linear - PublishedTestProblems.c_scale(a, b) * c, 0.0),
         "adds to f": (x_linear, x_linear, c),
     }
     if a > 0.0:
         x_log = a * (b / a) ** 0.6
-        points["scales x"] = (x_log, x_log * math.exp(-c * math.log(b / a)), 0.0)
+        comparisons["scales x"] = (x_log, x_log * math.exp(-c * math.log(b / a)), 0.0)
     followed = set()
-    for name, (x, x_at_c_0, offset) in points.items():
+    for name, (x, x_at_c_0, offset) in comparisons.items():
         try:
             is_followed = candidate.xc_fun(x, c) == candidate.xc_fun(x_at_c_0, 0.0) + offset
         except (ArithmeticError, ValueError):

@@ -19,8 +19,9 @@ class ModifiedFord19971(Formula):
 
     The formula holds only the test problem on ``[0.004, 200]``. It evaluates the published function at
     ``x*exp(-c*ln(b/a))`` on the published interval ``[a, b]``: ``c`` scales x, so that the root moves by the factor
-    ``(b/a)**c`` and never reaches 0. As ``c`` goes from 0 to 1, the root moves by the interval's full width in log
-    scale.
+    ``(b/a)**c`` and never reaches 0.
+
+    As ``c`` goes from 0 to 1, the root moves by the interval's full width in log scale.
 
     The published test problem on ``[0.004, 200]`` does not satisfy the benchmark suite inclusion conditions, because
     the interval spans orders of magnitude next to the singularity of ``sin(0.01/x)`` at 0.
