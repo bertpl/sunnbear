@@ -91,8 +91,9 @@ def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size()
 
     # --- act --------------------------
     generator = MCTuplesGenerator(n_population=2**14, on_size_finished=results.append)
-    # Each solve's share of `t_total_sec` also covers the start of max-div's worker processes, each of which imports
-    # max-div again; the worker processes start more slowly on a machine that runs other tests beside this one.
+    # The generator splits `t_total_sec` over 2 max-div solves per size, and each solve's share covers both the solve
+    # and the start of max-div's worker processes, each of which imports max-div again; the worker processes start more
+    # slowly on a machine that runs other tests beside this one.
     tuples = generator.generate(t_total_sec=10.0, max_size=MCTuplesSize.SIZE_64)
 
     # --- assert -----------------------

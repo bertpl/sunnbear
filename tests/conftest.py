@@ -44,10 +44,10 @@ def pytest_configure(config: pytest.Config) -> None:
     """Compile max-div's numba functions once, in the process that starts the test run, before any test runs.
 
     The compiled code is written to numba's disk cache, from which every xdist worker and every max-div worker
-    process loads it; without this step, a test's max-div solves compile the functions inside their time budgets.
+    process loads it; without this step, max-div compiles each function inside the time budget of the first solve that
+    calls it.
 
-    A collect-only run skips the step, because it runs no test; CI makes such a run in every matrix job to count the
-    tests.
+    A collect-only run runs no test, so it skips the step.
     """
     is_xdist_worker = hasattr(config, "workerinput")
     if (not is_xdist_worker) and (not config.option.collectonly):
