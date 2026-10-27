@@ -72,6 +72,7 @@ class MCTuplesGenerator:
     # The refinement solve gets this share of each size's budget; the selection solve gets the rest.
     REFINEMENT_FRACTION_OF_SIZE_T_BUDGET: ClassVar[float] = 1 / 9
     MIN_T_TOTAL_SEC: ClassVar[float] = 1.0
+    MAX_T_TOTAL_AT_1_WORKER_SEC: ClassVar[float] = 15.0
     MIN_T_TOTAL_AT_FULL_SCALE_SEC: ClassVar[float] = 60.0
 
     def __init__(
@@ -143,12 +144,14 @@ class MCTuplesGenerator:
     def n_workers_for(self, t_total_sec: float) -> int:
         """Return the worker count of a run of `t_total_sec`.
 
-        From `MIN_T_TOTAL_AT_FULL_SCALE_SEC` up, the count is `n_workers`; below it, the count scales down in
-        proportion to `t_total_sec`, to at least 1, so that a short run, such as a test, does not spend its time
-        starting workers.
+        Up to `MAX_T_TOTAL_AT_1_WORKER_SEC`, the count is 1; from there, it grows linearly to `n_workers` at
+        `MIN_T_TOTAL_AT_FULL_SCALE_SEC`, and stays at `n_workers` above it. Each worker is a process whose start
+        counts against its solve's budget, and on a loaded machine, starting several of them can take most of a short
+        solve's budget, so a short run, such as a test, uses 1.
         """
-        scale = min(1.0, t_total_sec / self.MIN_T_TOTAL_AT_FULL_SCALE_SEC)
-        return max(1, round(scale * self.n_workers))
+        t_ramp_sec = self.MIN_T_TOTAL_AT_FULL_SCALE_SEC - self.MAX_T_TOTAL_AT_1_WORKER_SEC
+        scale = min(1.0, max(0.0, (t_total_sec - self.MAX_T_TOTAL_AT_1_WORKER_SEC) / t_ramp_sec))
+        return 1 + round(scale * (self.n_workers - 1))
 
     def t_budget_per_size_sec(self, t_total_sec: float, max_size: MCTuplesSize) -> dict[MCTuplesSize, float]:
         """Return the wall-clock budget of every size's 2 solves together in a run of `t_total_sec` up to `max_size`.
@@ -258,8 +261,8 @@ def generate_mc_tuples(
 
     Each size's budget is split 8:1 between its selection solve and its refinement solve.
 
-    From 60 s up, every solve uses all `n_workers` workers; below 60 s, the worker count scales down with the time, so
-    that a short run does not spend its time starting workers.
+    Up to 15 s, every solve uses 1 worker, so that a short run does not spend its time starting workers; from 15 s to
+    60 s, the worker count grows linearly to `n_workers`, and from 60 s up, every solve uses all `n_workers` workers.
 
     `t_total_sec` covers only the solves; other work takes extra time:
 

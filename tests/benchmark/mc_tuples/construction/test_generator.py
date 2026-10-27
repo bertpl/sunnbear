@@ -209,15 +209,17 @@ def test_generate_mc_tuples_rejects_invalid_arguments(arguments, message):
 @pytest.mark.parametrize(
     "t_total_sec, n_workers",
     [
-        (1.0, 1),  # 1 worker at the shortest run
-        (15.0, 8),  # a quarter of full scale
-        (30.0, 16),  # half scale
+        (1.0, 1),  # the shortest run
+        (10.0, 1),
+        (15.0, 1),  # the last total time with 1 worker
+        (20.0, 4),  # 1 + round(31 * 5/45)
+        (45.0, 22),  # 1 + round(31 * 30/45)
         (60.0, 32),  # full scale reached
         (28_800.0, 32),  # full scale
     ],
 )
-def test_n_workers_for_scales_the_workers_down_below_60_s(t_total_sec, n_workers):
-    """Below 60 s, the worker count scales down with the total time, to 1 worker at 1 s; from 60 s up, all are used."""
+def test_n_workers_for_uses_1_worker_up_to_15_s_and_all_from_60_s(t_total_sec, n_workers):
+    """Up to 15 s, the worker count is 1; from 15 s to 60 s, it grows linearly to all workers, which it keeps above."""
     # --- act / assert -----------------
     assert MCTuplesGenerator(n_workers=32).n_workers_for(t_total_sec) == n_workers
 
