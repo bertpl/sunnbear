@@ -8,8 +8,7 @@
 - scales down the worker count of a short run.
 """
 
-import contextlib
-
+import max_div
 import numpy as np
 import pytest
 
@@ -17,7 +16,6 @@ from sunnbear._core.benchmark.mc_tuples import (
     MIN_N_BITS,
     N_FINE_LANES,
     MCTuples,
-    MCTuplesConstructionError,
     MCTuplesGenerator,
     MCTuplesSize,
     MCTuplesSizeResult,
@@ -91,16 +89,16 @@ def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size()
     """
     # --- arrange ----------------------
     results: list[MCTuplesSizeResult] = []
-    # On a fresh install, max-div compiles its functions inside each size's solve, which leaves max-div too little of
-    # the time budget `t_total_sec` to meet the constraints. A first, shorter construction compiles max-div's functions,
-    # and its outcome is ignored: numba compiles a function on its first call, whatever the budget. On Python 3.15, each
-    # worker's import of max-div also uses part of the second construction's `t_total_sec`, so 2 s is too little there.
-    with contextlib.suppress(MCTuplesConstructionError):
-        generate_mc_tuples(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_64, n_population=2**14)
+    # On a fresh install, max-div compiles each of its functions inside the first solve that calls it, which leaves the
+    # solve too little of the time budget `t_total_sec` to meet the constraints; `numba_precompile` compiles them all.
+    max_div.numba_precompile()
 
     # --- act --------------------------
     generator = MCTuplesGenerator(n_population=2**14, on_size_finished=results.append)
-    tuples = generator.generate(t_total_sec=5.0, max_size=MCTuplesSize.SIZE_64)
+    # Each solve's budget also covers the start of max-div's worker processes, each of which imports max-div again
+    # (about 1 s on Python 3.15). The start takes longer on a machine that runs other tests beside this one, so the
+    # budget leaves room for the start and for the search for a selection that meets the constraints.
+    tuples = generator.generate(t_total_sec=10.0, max_size=MCTuplesSize.SIZE_64)
 
     # --- assert -----------------------
     assert tuples.size == 64
