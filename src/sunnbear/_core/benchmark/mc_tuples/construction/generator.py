@@ -45,7 +45,8 @@ from .solve import MCTuplesSolveSettings
 # constants, so that the 3 cannot drift apart; `generate_mc_tuples` documents each argument.
 DEFAULT_N_WORKERS = 32
 DEFAULT_SEED = 42
-DEFAULT_N_POPULATION = 2**20
+# 2^18 = 512^2 gives the smallest size's selection solve about 1 candidate per fine cell of the lower fine lanes.
+DEFAULT_N_POPULATION = 2**18
 DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL = 256
 
 

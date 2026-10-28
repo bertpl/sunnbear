@@ -201,7 +201,7 @@ def test_n_workers_for_uses_1_worker_up_to_15_s_and_all_from_60_s(t_total_sec, n
     [
         (1.0, MCTuplesSize.SIZE_64, 2**14),
         (30.0, MCTuplesSize.SIZE_256, 2**18),
-        (14_400.0, MCTuplesSize.SIZE_1024, 2**20),
+        (3_600.0, MCTuplesSize.SIZE_1024, 2**18),
     ],
 )
 def test_t_budget_per_size_sec_gives_each_size_1_percent_and_splits_the_rest_by_work(
