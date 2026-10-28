@@ -24,16 +24,14 @@ class ModifiedBradie200621P67(Formula):
     At ``x = 0``, where the published function divides 0 by 0, the formula takes its limit, ``initial_investment +
     36*monthly_deposit - goal``.
 
-    The formula holds only the test problem with ``initial_investment = 14000``, ``monthly_deposit = 250`` and ``goal =
-    25000``, because the other parameter tuples of formula f1.4.4.7 satisfy the benchmark suite inclusion conditions.
     The formula computes the published function in the equivalent form ``expm1(36*log1p(x/12)) * (initial_investment +
     12*monthly_deposit/x) - (goal - initial_investment)``, on the published interval.
 
     ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the published interval.
 
-    The published test problem with these values does not satisfy the benchmark suite inclusion conditions, because the
-    conditions require bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint
-    lands on an exact 0 of f.
+    Some of the published test problems do not satisfy the benchmark suite inclusion conditions, because the conditions
+    require bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an
+    exact 0 of f.
 
     Near the root, the published function rounds ``1 + x/12`` to float64, which drops the low bits of x, and then
     subtracts the goal, 25000, from a sum near 25000, so that f is exactly 0 at many x-values within about 1e-14 of the
@@ -43,9 +41,13 @@ class ModifiedBradie200621P67(Formula):
     of 1; the form still subtracts ``goal - initial_investment``, because f is by definition the savings after 3 years
     minus the goal, and the form moves the ``initial_investment`` term of the savings into that subtraction.
 
-    The subtraction of ``goal - initial_investment`` still leaves f exactly 0 at 3 x-values, at most 2 float64 values
-    away from the root, so that bisection can still stop early for some values of ``c``, but for none of the values of
-    ``c`` of the shipped Monte Carlo tuple set.
+    The subtraction of ``goal - initial_investment`` still leaves f exactly 0 at 3 to 10 x-values, depending on the
+    parameter tuple, all within about 1e-16 of the root, so that bisection can still stop early for some values of
+    ``c``, but for none of the values of ``c`` of the shipped Monte Carlo tuple set.
+
+    Whether bisection lands on an x-value where f is exactly 0 depends on the parameter tuple and on the sampled values
+    of ``c``, so the parameter tuples that the validation stage rejects can change with the sampled values; the formula
+    therefore holds every published parameter tuple.
     """
 
     number = (1, 99, 4, 4, 7)
@@ -80,18 +82,35 @@ class ModifiedBradie200621P67(Formula):
         return (0.01, 0.1)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the parameter values of the modified test problem."""
-        return (ParamTable(names=("initial_investment", "monthly_deposit", "goal"), rows=((14000.0, 250.0, 25000.0),)),)
+        """Return the published parameter values."""
+        return (
+            ParamTable(
+                names=("initial_investment", "monthly_deposit", "goal"),
+                rows=((13500.0, 250.0, 25000.0), (14000.0, 250.0, 25000.0), (12500.0, 300.0, 25000.0)),
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.interval_bounds(
             params={"initial_investment": 14000.0, "monthly_deposit": 250.0, "goal": 25000.0}, expected=(0.01, 0.1)
         ),
         FormulaTestCase.value(
+            params={"initial_investment": 13500.0, "monthly_deposit": 250.0, "goal": 25000.0},
+            x=0.037,
+            c=0.25,
+            expected=-1707.2154378902246,
+        ),
+        FormulaTestCase.value(
             params={"initial_investment": 14000.0, "monthly_deposit": 250.0, "goal": 25000.0},
             x=0.037,
             c=0.25,
             expected=-1184.9991543651379,
+        ),
+        FormulaTestCase.value(
+            params={"initial_investment": 12500.0, "monthly_deposit": 300.0, "goal": 25000.0},
+            x=0.037,
+            c=0.25,
+            expected=-913.0590235539113,
         ),
         FormulaTestCase.value(
             params={"initial_investment": 14000.0, "monthly_deposit": 250.0, "goal": 25000.0},
