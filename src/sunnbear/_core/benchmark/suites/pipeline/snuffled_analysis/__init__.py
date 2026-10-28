@@ -4,4 +4,4 @@
 the Monte Carlo tuple set, so that every stage that runs snuffled analyzes a test problem in the same way.
 """
 
-from .budget import SNUFFLED_ANALYSIS_ROOT_SEED, SnuffledAnalysisBudget
+from .budget import SNUFFLED_ANALYSIS_ROOT_SEED, FunctionEvaluationError, SnuffledAnalysisBudget

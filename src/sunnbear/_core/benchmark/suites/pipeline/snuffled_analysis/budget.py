@@ -44,6 +44,9 @@ class SnuffledAnalysisBudget(Enum):
 
         The analysis's seed derives from `SNUFFLED_ANALYSIS_ROOT_SEED`, the problem's id and `mc_sample_idx`, so the
         analysis is the same in every worker process and whatever order the analyses run in.
+
+        When f raises during the analysis, the analysis raises `FunctionEvaluationError`, with f's exception as its
+        cause, so that a caller can tell an exception from f apart from one from snuffled.
         """
         seed = derive_seed(
             root_seed=SNUFFLED_ANALYSIS_ROOT_SEED,
@@ -51,8 +54,17 @@ class SnuffledAnalysisBudget(Enum):
             problem_id=str(problem.id),
             mc_sample_idx=mc_sample_idx,
         )
+        x_fun = problem.build_x_fun(float(mc_solve_settings.cs[mc_sample_idx]))
+
+        def evaluate_f(x: float) -> float:
+            """Return f at `x`, raising `FunctionEvaluationError` from any exception that f raises."""
+            try:
+                return x_fun(x)
+            except Exception as exc:
+                raise FunctionEvaluationError(f"f raised at x = {x!r}") from exc
+
         return Snuffler(
-            problem.build_x_fun(float(mc_solve_settings.cs[mc_sample_idx])),
+            evaluate_f,
             problem.a,
             problem.b,
             dx=float(mc_solve_settings.xtols[mc_sample_idx]),
@@ -62,3 +74,10 @@ class SnuffledAnalysisBudget(Enum):
             n_roots=self.n_roots,
             n_root_samples=self.n_root_samples,
         )
+
+
+# ==================================================================================================
+#  FunctionEvaluationError
+# ==================================================================================================
+class FunctionEvaluationError(Exception):
+    """A `FunctionEvaluationError` reports that f raised during snuffled's analysis; f's exception is its cause."""
