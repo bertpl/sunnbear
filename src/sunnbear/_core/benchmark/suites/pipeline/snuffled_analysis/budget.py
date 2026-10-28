@@ -61,7 +61,7 @@ class SnuffledAnalysisBudget(Enum):
             try:
                 return x_fun(x)
             except Exception as exc:
-                raise FunctionEvaluationError(f"f raised at x = {x!r}") from exc
+                raise FunctionEvaluationError(f"f raised at x = {float(x)!r}") from exc
 
         return Snuffler(
             evaluate_f,
