@@ -53,8 +53,8 @@ def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set(size):
 
 @pytest.mark.parametrize("size", MCTuplesSize)
 def test_each_shipped_size_has_means_of_exactly_0_5_and_at_most_1_tuple_per_fine_lane(size):
-    """Each shipped size's mean u and mean v are exactly 0.5, summed with `math.fsum`, and no 2 of its tuples share a
-    fine lane along u or along v."""
+    """Each shipped size's mean u and mean v are exactly 0.5, and no 2 of its tuples share a fine lane along u or
+    along v."""
     # --- act --------------------------
     tuples = load_mc_tuples(size)
 
@@ -66,7 +66,11 @@ def test_each_shipped_size_has_means_of_exactly_0_5_and_at_most_1_tuple_per_fine
 
 @pytest.mark.parametrize("size", MCTuplesSize)
 def test_each_shipped_size_holds_the_same_u_values_as_v_values(size):
-    """Each shipped size's u values and v values are the same set, bit for bit."""
+    """Each shipped size's u values and v values are the same set, bit for bit.
+
+    The shipped set is symmetric under rotations by 90 degrees around (0.5, 0.5), and such a rotation turns each
+    tuple's v value into the u value of another tuple in the set.
+    """
     # --- act --------------------------
     tuples = load_mc_tuples(size)
 
