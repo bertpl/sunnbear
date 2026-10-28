@@ -43,8 +43,10 @@ dependencies = [
     "platformdirs>=4.0",  # platformdirs finds the user's cache directory for downloaded data artifacts
     # backports.zstd provides zstd for the archives of downloaded data artifacts; the standard library has it from 3.14.
     "backports.zstd>=1.0.0; python_version < '3.14'",
-    "snuffled>=0.1.6; python_version < '3.15'",
-    "snuffled>=0.1.9; python_version >= '3.15'",
+    # The benchmark suite pipeline needs snuffled 0.1.11: from it on, an analysis frees its function and samples when it
+    # ends, and each worker process of the pipeline runs thousands of analyses. INTERVAL_NOT_BRACKETING_READY is 1.0 when
+    # the interval is not ready from 0.1.10 on.
+    "snuffled>=0.1.11",
     # The construction of the Monte Carlo (MC) tuple set computes its distances with DistanceMetric.custom() and weighs
     # the terms of its objective with the `weights` of HybridDiversityMetric.geomean_of(); 0.21.8 is the lowest max-div
     # version on which the tests cover both.

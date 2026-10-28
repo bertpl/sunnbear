@@ -18,7 +18,7 @@ from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation imp
 from sunnbear._core.problems.core import FormulaRegistry
 from sunnbear._core.utils.module_imports import worker_pool_for_modules
 from sunnbear._core.utils.worker_pool import WorkerPool
-from tests.benchmark.suites.pipeline.stages.s2_candidate_validation.example_formulas import define_formula_cls
+from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
 
 
 def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(isolated_formula_registry):

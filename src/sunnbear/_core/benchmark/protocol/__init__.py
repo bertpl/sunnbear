@@ -5,7 +5,8 @@
   `DEFAULT_N_BISECTION_FEVALS`; the budget is `MAX_FEVALS_FACTOR` times `n_bisection_fevals`;
 - `MCSolveSettings` maps the tuples of a Monte Carlo tuple set onto the `xtol` and the ``c`` of a test problem's
   solves, with ``c`` within a `CRange`, and gives those solves their evaluation budget;
-- `derive_seed` derives every seed of a run from its root seed;
+- `derive_seed` derives every seed of a benchmark run, and of the snuffled analyses of the benchmark suite pipeline,
+  from a root seed;
 - `is_solution_correct` judges whether a solver's answer lies within `xtol` of a root.
 """
 

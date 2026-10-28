@@ -1351,8 +1351,7 @@ requires-dist = [
     { name = "pydantic", marker = "python_full_version == '3.13.*'", specifier = ">=2.9" },
     { name = "pydantic", marker = "python_full_version == '3.14.*'", specifier = ">=2.12" },
     { name = "pydantic", marker = "python_full_version >= '3.15'", specifier = ">=2.14" },
-    { name = "snuffled", marker = "python_full_version < '3.15'", specifier = ">=0.1.6" },
-    { name = "snuffled", marker = "python_full_version >= '3.15'", specifier = ">=0.1.9" },
+    { name = "snuffled", specifier = ">=0.1.11" },
     { name = "typing-extensions", specifier = ">=4.4" },
 ]
 

@@ -7,7 +7,7 @@ from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.che
     is_bisection_count_exact,
 )
 from sunnbear._core.problems.core import FormulaRegistry
-from tests.benchmark.suites.pipeline.stages.s2_candidate_validation.example_formulas import define_formula_cls
+from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
 
 
 @pytest.mark.parametrize(

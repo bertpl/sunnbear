@@ -1,4 +1,4 @@
-"""Every random choice in a benchmark run draws from a seed derived from the run's root seed.
+"""Every random choice in a benchmark run, or in a snuffled analysis of the pipeline, draws from a derived seed.
 
 A derived seed depends only on:
 
@@ -23,6 +23,7 @@ class SeedPurpose(StrEnum):
     """`SeedPurpose` names what a derived seed is used for, so 2 consumers never draw from the same seed."""
 
     CORRECTNESS_CHECK = "correctness_check"
+    SNUFFLED_ANALYSIS = "snuffled_analysis"
 
 
 def derive_seed(*, root_seed: int, purpose: SeedPurpose, problem_id: str, mc_sample_idx: int) -> int:
