@@ -8,8 +8,8 @@ from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructio
 from sunnbear._core.benchmark.mc_tuples.construction.refinement import MCTuplesRefinementSolve
 from sunnbear._core.benchmark.mc_tuples.construction.solve import INCLUSION_CONSTRAINT_WEIGHT, MCTuplesSolveSettings
 
-# 32 lower fine lanes, 16 apart: the 8 base tuples of size 32 take the first 16, the 8 new base tuples of size 64 the
-# other 16; u lies in the even ones, v in the odd ones.
+# The base tuples use 32 lower fine lanes, 16 apart: the 8 base tuples of size 32 take the first 16, the 8 new base
+# tuples of size 64 the other 16; u lies in the even ones, v in the odd ones.
 _LANES = 5 + 16 * np.arange(32)
 _BASE_32 = np.column_stack([_LANES[0:16:2] + 0.5, _LANES[1:16:2] + 0.25]) / N_FINE_LANES
 _NEW_OF_SIZE_64 = np.column_stack([_LANES[16::2] + 0.5, _LANES[17::2] + 0.25]) / N_FINE_LANES

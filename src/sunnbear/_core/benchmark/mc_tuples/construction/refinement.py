@@ -55,12 +55,12 @@ class MCTuplesRefinementSolve(MCTuplesSolve):
     # --------------------------------------------------------------------------
     #  Subclass hooks
     # --------------------------------------------------------------------------
-    def _new_tuple_constraints(self) -> list[Constraint]:
+    def _new_base_tuple_constraints(self) -> list[Constraint]:
         """Return 1 constraint per fine cell of a new base tuple, each requiring exactly 1 new base tuple in it."""
         n_per_cell = self.n_random_candidates_per_cell + 1
         return [
             Constraint(int_set=set(range(start, start + n_per_cell)), min_count=1, max_count=1)
-            for start in self.n_kept_candidates + n_per_cell * np.arange(self.n_new_base_tuples)
+            for start in self.n_always_selected_candidates + n_per_cell * np.arange(self.n_new_base_tuples)
         ]
 
     def _initial_new_selection(self) -> np.ndarray:

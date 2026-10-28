@@ -4,12 +4,8 @@ import math
 
 import numpy as np
 
-from sunnbear._core.benchmark.mc_tuples import fine_lanes_of
-from sunnbear._core.benchmark.mc_tuples.construction.rotations import (
-    N_LOWER_FINE_LANES,
-    base_tuple_array_of,
-    tuple_array_of,
-)
+from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, fine_lanes_of
+from sunnbear._core.benchmark.mc_tuples.construction.rotations import N_LOWER_FINE_LANES, tuple_array_of
 
 
 def test_the_4_tuples_of_each_base_tuple_give_equal_axes_with_means_of_0_5_and_1_tuple_per_fine_lane():
@@ -28,8 +24,8 @@ def test_the_4_tuples_of_each_base_tuple_give_equal_axes_with_means_of_0_5_and_1
     tuple_array = tuple_array_of(base_tuple_array)
 
     # --- assert -----------------------
-    assert np.array_equal(base_tuple_array_of(tuple_array), base_tuple_array)
-    for size in (32, 64, 128, 256, 512, 1024):
+    assert np.array_equal(tuple_array[0::4], base_tuple_array)
+    for size in MCTuplesSize:
         u, v = tuple_array[:size, 0], tuple_array[:size, 1]
         assert np.array_equal(np.sort(u), np.sort(v))
         assert math.fsum(u) / size == 0.5

@@ -2,7 +2,7 @@
 
 A base tuple stands for its 4 tuples (`rotations`). Its u and v lie in the lower fine lanes, those of [0, 0.5], so its
 fine cell is the crossing of 2 lower fine lanes. Each size has 2 populations, 1 per max-div solve: the selection's
-(`draw_off_diagonal`) and the refinement's (`draw_in_fine_cells_of`).
+(`draw_in_off_diagonal_cells`) and the refinement's (`draw_in_fine_cells_of`).
 
 The selection's population lies in the off-diagonal fine cells of the lower fine lanes that the size below leaves free.
 A candidate in any other fine cell could never be picked:
@@ -66,11 +66,12 @@ class MCTuplesPopulation:
         """Return 1 random value inside each fine lane in `lanes`, with `MIN_N_BITS` bits in it and in its mirror."""
         lows, highs = fine_lane_edges_of(lanes)
         values = draw_floats_with_min_n_bits(lows, highs, MIN_N_BITS, rng)
-        # A value whose mirror holds too few bits is drawn again, and checked again, until every mirror holds enough.
         to_check = np.arange(values.size)
         while to_check.size > 0:
-            fails = np.array([n_bits(1.0 - float(values[i])) < MIN_N_BITS for i in to_check.tolist()], dtype=bool)
-            to_check = to_check[fails]
+            has_too_few_bits = np.array(
+                [n_bits(1.0 - float(values[i])) < MIN_N_BITS for i in to_check.tolist()], dtype=bool
+            )
+            to_check = to_check[has_too_few_bits]
             values[to_check] = draw_floats_with_min_n_bits(lows[to_check], highs[to_check], MIN_N_BITS, rng)
         return values
 
@@ -78,7 +79,7 @@ class MCTuplesPopulation:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def draw_off_diagonal(
+    def draw_in_off_diagonal_cells(
         cls, n_population: int, free_lanes: np.ndarray, rng: np.random.Generator
     ) -> "MCTuplesPopulation":
         """Draw candidates over the off-diagonal fine cells of `free_lanes` by `free_lanes`.

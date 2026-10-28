@@ -8,16 +8,17 @@ The candidates of the max-div problem are, in this order:
 2. the size below's base tuples;
 3. the population.
 
-The objective is the geomean of 2 gpq terms at `GPQ_LEVEL` over the nearest-neighbor separations (`distances`):
+The objective is the geomean of 2 gpq terms at `GPQ_LEVEL` over the nearest-neighbor distances (`distances`):
 
-- along the axes, with weight 2: 1 metric gives the separations along u and along v, which are the same values;
+- along the axes, with weight 2: one metric covers both axes, because the nearest-neighbor distances along u and
+  along v are the same values;
 - in squared L2, with weight 1: since gpq(d^2) = gpq(d)^2, this term weighs as much as the 2 axis terms together.
 
 The weights make the objective that of 3 equal terms, along u, along v and in squared L2.
 
 A subclass passes its population to the constructor, and its hooks set:
 
-- the constraints on the new base tuples (`_new_tuple_constraints`);
+- the constraints on the new base tuples (`_new_base_tuple_constraints`);
 - the starting selection (`_initial_new_selection`);
 - the check of the selection (`_check_new_selection`).
 
@@ -49,7 +50,7 @@ from max_div.solver import (
 
 from sunnbear._core.benchmark.mc_tuples.core import GPQ_LEVEL, MCTuplesSize
 
-from .distances import PLACEHOLDER_TUPLE_ARRAY, ROTATIONAL_AXIS_DISTANCE_METRIC, ROTATIONAL_SQUARED_L2_DISTANCE_METRIC
+from .distances import BASE_TUPLE_AXES_DISTANCE_METRIC, BASE_TUPLE_SQUARED_L2_DISTANCE_METRIC, PLACEHOLDER_TUPLE_ARRAY
 from .exceptions import MCTuplesConstructionError
 from .population import MCTuplesPopulation
 
@@ -86,7 +87,7 @@ class MCTuplesSolve(ABC):
         self.settings = settings
 
     @property
-    def n_kept_candidates(self) -> int:
+    def n_always_selected_candidates(self) -> int:
         """Return the number of candidates that every selection keeps: the placeholder and the size below's."""
         return 1 + self.required_base_tuple_array.shape[0]
 
@@ -117,16 +118,19 @@ class MCTuplesSolve(ABC):
             np.vstack([PLACEHOLDER_TUPLE_ARRAY, self.required_base_tuple_array, self.population.tuple_array]).astype(
                 np.float32
             ),
-            k=self.n_kept_candidates + self.n_new_base_tuples,
-            distance_metric=ROTATIONAL_SQUARED_L2_DISTANCE_METRIC,
+            k=self.n_always_selected_candidates + self.n_new_base_tuples,
+            distance_metric=BASE_TUPLE_SQUARED_L2_DISTANCE_METRIC,
             # The objective is the geomean of gpq along the axes and over the problem's own distance, squared L2.
             diversity_metric=HybridDiversityMetric.geomean_of(
-                gpq.over(ROTATIONAL_AXIS_DISTANCE_METRIC), gpq, weights=(2.0, 1.0)
+                gpq.over(BASE_TUPLE_AXES_DISTANCE_METRIC), gpq, weights=(2.0, 1.0)
             ),
             constraints=self._constraints(),
         )
         initial_selection = np.concatenate(
-            [np.arange(self.n_kept_candidates), self.n_kept_candidates + self._initial_new_selection()]
+            [
+                np.arange(self.n_always_selected_candidates),
+                self.n_always_selected_candidates + self._initial_new_selection(),
+            ]
         )
         with warnings.catch_warnings():
             # max-div warns when a short run scales down to 1 worker, and when the workers outnumber the cores; both
@@ -151,7 +155,7 @@ class MCTuplesSolve(ABC):
     #  Subclass hooks
     # --------------------------------------------------------------------------
     @abstractmethod
-    def _new_tuple_constraints(self) -> list[Constraint]:
+    def _new_base_tuple_constraints(self) -> list[Constraint]:
         """Return the constraints on the new base tuples, over the problem's candidates."""
 
     @abstractmethod
@@ -170,12 +174,12 @@ class MCTuplesSolve(ABC):
     # --------------------------------------------------------------------------
     def _constraints(self) -> list[Constraint]:
         """Return the subclass's constraints, plus the weighted one that keeps the placeholder and the size below."""
-        constraints = self._new_tuple_constraints()
+        constraints = self._new_base_tuple_constraints()
         constraints.append(
             Constraint(
-                int_set=set(range(self.n_kept_candidates)),
-                min_count=self.n_kept_candidates,
-                max_count=self.n_kept_candidates,
+                int_set=set(range(self.n_always_selected_candidates)),
+                min_count=self.n_always_selected_candidates,
+                max_count=self.n_always_selected_candidates,
                 weight=INCLUSION_CONSTRAINT_WEIGHT,
             )
         )
@@ -188,12 +192,12 @@ class MCTuplesSolve(ABC):
             MCTuplesConstructionError: If the placeholder or a base tuple of the size below is missing, or the new
                 candidates break a constraint of the subclass.
         """
-        n_missing = self.n_kept_candidates - int((selection < self.n_kept_candidates).sum())
+        n_missing = self.n_always_selected_candidates - int((selection < self.n_always_selected_candidates).sum())
         if n_missing > 0:
             raise MCTuplesConstructionError(
                 f"Size {self.size}: {n_missing} of the placeholder and the size below's base tuples are not selected."
             )
-        new = selection[selection >= self.n_kept_candidates] - self.n_kept_candidates
+        new = selection[selection >= self.n_always_selected_candidates] - self.n_always_selected_candidates
         self._check_new_selection(new)
         return new
 

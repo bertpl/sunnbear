@@ -46,8 +46,8 @@ dependencies = [
     "snuffled>=0.1.6; python_version < '3.15'",
     "snuffled>=0.1.9; python_version >= '3.15'",
     # The construction of the Monte Carlo (MC) tuple set computes its distances with DistanceMetric.custom() and weighs
-    # the terms of its objective with the `weights` of HybridDiversityMetric.geomean_of(); the tests cover both from
-    # max-div 0.21.8 up.
+    # the terms of its objective with the `weights` of HybridDiversityMetric.geomean_of(); 0.21.8 is the lowest max-div
+    # version on which the tests cover both.
     "max-div>=0.21.8",
     "mpl-composite>=0.1.2; python_version < '3.15'",
     "mpl-composite>=0.1.4; python_version >= '3.15'",

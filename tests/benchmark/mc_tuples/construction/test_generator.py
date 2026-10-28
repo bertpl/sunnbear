@@ -102,10 +102,10 @@ def test_generator_selects_and_refines_each_size_and_builds_the_next_on_it(monke
     assert [int(result.size) for result in results] == [32, 64, 128]
     _assert_valid_nested_set(tuples, results)
     for result in results:
-        n_required = result.size.n_required // 4
+        n_required_base_tuples = result.size.n_required // 4
         selected, refined = result.selected_base_tuple_array, result.refined_base_tuple_array
-        assert np.array_equal(selected[:n_required], refined[:n_required])
-        assert not np.any(selected[n_required:] == refined[n_required:])
+        assert np.array_equal(selected[:n_required_base_tuples], refined[:n_required_base_tuples])
+        assert not np.any(selected[n_required_base_tuples:] == refined[n_required_base_tuples:])
         assert np.array_equal(fine_lanes_of(selected), fine_lanes_of(refined))
         assert result.selected_tuple_array.shape == (int(result.size), 2)
 

@@ -1,12 +1,13 @@
-"""The distances between base tuples, the placeholder included, give each base tuple its 4 tuples' separations."""
+"""The distance functions give each base tuple the nearest-neighbor distance of its 4 tuples, the placeholder
+included."""
 
 import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples.construction.distances import (
     PLACEHOLDER_TUPLE_ARRAY,
-    rotational_axis_distance,
-    rotational_squared_l2_distance,
+    base_tuple_axes_distance,
+    base_tuple_squared_l2_distance,
 )
 from sunnbear._core.benchmark.mc_tuples.construction.rotations import N_LOWER_FINE_LANES, tuple_array_of
 
@@ -39,12 +40,12 @@ def _separations_through_candidates(base_tuple_array: np.ndarray, distance_funct
 
 @pytest.mark.parametrize("seed", [0, 1, 2])
 def test_the_l2_separation_of_each_base_tuple_is_that_of_its_4_tuples(seed):
-    """Each base tuple's squared L2 separation among the candidates is the squared separation of its 4 tuples."""
+    """Each base tuple's squared L2 nearest-neighbor distance among the candidates is that of its 4 tuples."""
     # --- arrange ----------------------
     base_tuple_array = _random_base_tuple_array(16, seed)
 
     # --- act --------------------------
-    separations = _separations_through_candidates(base_tuple_array, rotational_squared_l2_distance)
+    separations = _separations_through_candidates(base_tuple_array, base_tuple_squared_l2_distance)
 
     # --- assert -----------------------
     expected = _cyclic_separations(tuple_array_of(base_tuple_array), [0, 1]).reshape(-1, 4) ** 2
@@ -59,7 +60,7 @@ def test_the_axis_separation_of_each_base_tuple_is_the_smaller_of_its_2_values(s
     base_tuple_array = _random_base_tuple_array(16, seed)
 
     # --- act --------------------------
-    separations = _separations_through_candidates(base_tuple_array, rotational_axis_distance)
+    separations = _separations_through_candidates(base_tuple_array, base_tuple_axes_distance)
 
     # --- assert -----------------------
     tuple_array = tuple_array_of(base_tuple_array)
@@ -74,7 +75,7 @@ def test_the_placeholder_sees_a_base_tuple_near_the_center_close_to_its_own_rota
     base_tuple = np.array([0.5 - 0.003, 0.5 - 0.004], dtype=np.float32)
 
     # --- act --------------------------
-    distance = rotational_squared_l2_distance(PLACEHOLDER_TUPLE_ARRAY[0].astype(np.float32), base_tuple)
+    distance = base_tuple_squared_l2_distance(PLACEHOLDER_TUPLE_ARRAY[0].astype(np.float32), base_tuple)
 
     # --- assert -----------------------
     assert distance == pytest.approx(2 * (0.003**2 + 0.004**2), abs=1e-7)

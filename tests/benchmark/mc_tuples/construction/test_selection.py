@@ -49,7 +49,7 @@ def test_the_population_lies_only_in_the_lower_fine_lanes_that_the_size_below_le
 
 
 def test_constraints_allow_at_most_1_new_value_per_free_lane_and_keep_the_placeholder_and_the_size_below():
-    """Size 64 gets 1 at-most-1 constraint per free lane, over every candidate with its u or its v in that lane, and
+    """Size 64 gets 1 constraint per free lane that allows at most 1 candidate with its u or its v in that lane, and
     the weighted constraint that keeps the placeholder and the 8 base tuples of the size below."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_64, _BASE_32, n_population=8192)
@@ -144,7 +144,7 @@ def test_validation_refuses_a_selection_without_the_placeholder():
 
 
 def test_validation_refuses_2_new_values_in_1_lane():
-    """7 candidates in distinct lanes and an 8th that shares a lane with the first raise an error."""
+    """A selection of 7 candidates in distinct lanes and an 8th that shares a lane with the first raises an error."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=8192)
     new = _distinct_lane_selection(solve, 7)
