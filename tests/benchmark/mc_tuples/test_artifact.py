@@ -1,5 +1,7 @@
 """The `mc_tuples` artifact round-trips through its CSV file, and `load_mc_tuples(size)` returns the shipped sets."""
 
+import math
+
 import numpy as np
 import pytest
 
@@ -50,15 +52,35 @@ def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set(size):
 
 
 @pytest.mark.parametrize("size", MCTuplesSize)
-def test_each_shipped_size_has_means_of_0_5_and_at_most_1_tuple_per_fine_lane(size):
-    """Each shipped size's mean u and mean v are 0.5, and no 2 of its tuples share a fine lane along u or along v."""
+def test_each_shipped_size_has_means_of_exactly_0_5_and_at_most_1_tuple_per_fine_lane(size):
+    """Each shipped size's mean u and mean v round to exactly 0.5, and no 2 of its tuples share a fine lane along u or
+    along v.
+
+    Each value pairs with its mirror 1 - value, so the exact sum of a size's values differs from size / 2 by far less
+    than half a float step; `math.fsum` rounds only that exact sum, so the mean rounds to 0.5.
+    """
     # --- act --------------------------
     tuples = load_mc_tuples(size)
 
     # --- assert -----------------------
-    assert tuples.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
+    assert [math.fsum(values) / size for values in (tuples.u, tuples.v)] == [0.5, 0.5]
     for values in (tuples.u, tuples.v):
         assert np.bincount(fine_lanes_of(values)).max() == 1
+
+
+@pytest.mark.parametrize("size", MCTuplesSize)
+def test_each_shipped_size_has_the_same_set_of_u_values_as_of_v_values(size):
+    """Each shipped size's u values and v values are the same set, bit for bit.
+
+    Rotating every tuple (u, v), as a point in the unit square, by 90 degrees clockwise around (0.5, 0.5) maps the
+    shipped set onto itself. That rotation maps (u, v) to (v, 1 - u), so each tuple's v value is the u value of a
+    tuple in the set.
+    """
+    # --- act --------------------------
+    tuples = load_mc_tuples(size)
+
+    # --- assert -----------------------
+    assert np.sort(tuples.u).tolist() == np.sort(tuples.v).tolist()
 
 
 def test_the_largest_shipped_size_holds_exactly_1_tuple_per_fine_lane():
