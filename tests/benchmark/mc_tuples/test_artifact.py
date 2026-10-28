@@ -1,5 +1,7 @@
 """The `mc_tuples` artifact round-trips through its CSV file, and `load_mc_tuples(size)` returns the shipped sets."""
 
+import math
+
 import numpy as np
 import pytest
 
@@ -50,15 +52,26 @@ def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set(size):
 
 
 @pytest.mark.parametrize("size", MCTuplesSize)
-def test_each_shipped_size_has_means_of_0_5_and_at_most_1_tuple_per_fine_lane(size):
-    """Each shipped size's mean u and mean v are 0.5, and no 2 of its tuples share a fine lane along u or along v."""
+def test_each_shipped_size_has_means_of_exactly_0_5_and_at_most_1_tuple_per_fine_lane(size):
+    """Each shipped size's mean u and mean v are exactly 0.5, summed with `math.fsum`, and no 2 of its tuples share a
+    fine lane along u or along v."""
     # --- act --------------------------
     tuples = load_mc_tuples(size)
 
     # --- assert -----------------------
-    assert tuples.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
+    assert [math.fsum(values) / size for values in (tuples.u, tuples.v)] == [0.5, 0.5]
     for values in (tuples.u, tuples.v):
         assert np.bincount(fine_lanes_of(values)).max() == 1
+
+
+@pytest.mark.parametrize("size", MCTuplesSize)
+def test_each_shipped_size_holds_the_same_u_values_as_v_values(size):
+    """Each shipped size's u values and v values are the same set, bit for bit."""
+    # --- act --------------------------
+    tuples = load_mc_tuples(size)
+
+    # --- assert -----------------------
+    assert np.sort(tuples.u).tolist() == np.sort(tuples.v).tolist()
 
 
 def test_the_largest_shipped_size_holds_exactly_1_tuple_per_fine_lane():
