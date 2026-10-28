@@ -4,7 +4,7 @@ A candidate of the max-div problem is a base tuple, which stands for its 4 tuple
 tuples selects `S/4` base tuples. Each solve picks the size's new base tuples from its own population of candidates.
 The candidates of the max-div problem are, in this order:
 
-1. the placeholder (`distances`);
+1. the dummy rotational sibling tuple (`distances`);
 2. the size below's base tuples;
 3. the population.
 
@@ -25,8 +25,8 @@ A subclass passes its population to the constructor, and its hooks set:
 
 The `generator` module names the 2 subclasses and the order in which they run.
 
-Besides the subclass's constraints, a weighted constraint keeps the placeholder and every base tuple of the size below
-(`INCLUSION_CONSTRAINT_WEIGHT`).
+Besides the subclass's constraints, a weighted constraint keeps the dummy rotational sibling tuple and every base tuple
+of the size below (`INCLUSION_CONSTRAINT_WEIGHT`).
 
 max-div satisfies its constraints before it raises the diversity score, so it finds a selection that meets every
 constraint within its first iterations. A time budget that runs out before then leaves a constraint unmet, so `run`
@@ -51,12 +51,16 @@ from max_div.solver import (
 
 from sunnbear._core.benchmark.mc_tuples.core import GPQ_LEVEL, MCTuplesSize
 
-from .distances import BASE_TUPLE_SQUARED_L2_DISTANCE_METRIC, BASE_TUPLE_VALUE_DISTANCE_METRIC, PLACEHOLDER_TUPLE_ARRAY
+from .distances import (
+    BASE_TUPLE_SQUARED_L2_DISTANCE_METRIC,
+    BASE_TUPLE_VALUE_DISTANCE_METRIC,
+    DUMMY_ROTATIONAL_SIBLING_TUPLE,
+)
 from .exceptions import MCTuplesConstructionError
 from .population import MCTuplesPopulation
 
-# The constraint that keeps the placeholder and the size below outweighs the other constraints, so max-div meets it
-# first.
+# The constraint that keeps the dummy rotational sibling tuple and the size below outweighs the other constraints, so
+# max-div meets it first.
 INCLUSION_CONSTRAINT_WEIGHT = 10.0
 
 
@@ -89,7 +93,10 @@ class MCTuplesSolve(ABC):
 
     @property
     def n_always_selected_candidates(self) -> int:
-        """Return how many candidates every selection holds: the placeholder and the size below's base tuples."""
+        """Return how many candidates every selection holds.
+
+        They are the dummy rotational sibling tuple and the size below's base tuples.
+        """
         return 1 + self.required_base_tuple_array.shape[0]
 
     @property
@@ -110,14 +117,14 @@ class MCTuplesSolve(ABC):
 
         Raises:
             MCTuplesConstructionError: If the solve cannot form a starting selection, or its selection misses the
-                placeholder or a base tuple of the size below, or breaks a constraint of the subclass, which can happen
-                when `t_budget_sec` is too short for max-div to meet the constraints.
+                dummy rotational sibling tuple or a base tuple of the size below, or breaks a constraint of the
+                subclass, which can happen when `t_budget_sec` is too short for max-div to meet the constraints.
         """
         gpq = DiversityMetric.gpq_separation(GPQ_LEVEL)
         problem = MaxDivProblem.new(
             # max-div works on a float32 copy; the selected candidates are taken by index.
             np.vstack(
-                [PLACEHOLDER_TUPLE_ARRAY, self.required_base_tuple_array, self.population.base_tuple_array]
+                [DUMMY_ROTATIONAL_SIBLING_TUPLE, self.required_base_tuple_array, self.population.base_tuple_array]
             ).astype(np.float32),
             k=self.n_always_selected_candidates + self.n_new_base_tuples,
             distance_metric=BASE_TUPLE_SQUARED_L2_DISTANCE_METRIC,
@@ -174,7 +181,7 @@ class MCTuplesSolve(ABC):
     #  Helpers
     # --------------------------------------------------------------------------
     def _constraints(self) -> list[Constraint]:
-        """Return the subclass's constraints, plus the weighted one that keeps the placeholder and the size below."""
+        """Return the subclass's constraints, plus the weighted one that keeps the always-selected candidates."""
         constraints = self._new_base_tuple_constraints()
         constraints.append(
             Constraint(
@@ -190,13 +197,14 @@ class MCTuplesSolve(ABC):
         """Return the selected new candidates as indices into the population, after checking the constraints.
 
         Raises:
-            MCTuplesConstructionError: If the placeholder or a base tuple of the size below is missing, or the new
-                candidates break a constraint of the subclass.
+            MCTuplesConstructionError: If the dummy rotational sibling tuple or a base tuple of the size below is
+                missing, or the new candidates break a constraint of the subclass.
         """
         n_missing = self.n_always_selected_candidates - int((selection < self.n_always_selected_candidates).sum())
         if n_missing > 0:
             raise MCTuplesConstructionError(
-                f"Size {self.size}: {n_missing} of the placeholder and the size below's base tuples are not selected."
+                f"Size {self.size}: {n_missing} of the dummy rotational sibling tuple and the size below's base tuples "
+                "are not selected."
             )
         new = selection[selection >= self.n_always_selected_candidates] - self.n_always_selected_candidates
         self._check_new_selection(new)

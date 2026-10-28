@@ -3,8 +3,8 @@
 The population lies in the off-diagonal fine cells of the free lower fine lanes, those of [0, 0.5] that the size below's
 base tuples leave free (`MCTuplesPopulation.draw_in_off_diagonal_cells`).
 
-Besides the weighted constraint that keeps the placeholder and the size below (`solve`), 1 constraint per free lower
-fine lane allows at most 1 new base tuple whose u or v lies in that lane.
+Besides the weighted constraint that keeps the dummy rotational sibling tuple and the size below (`solve`), 1 constraint
+per free lower fine lane allows at most 1 new base tuple whose u or v lies in that lane.
 
 At the largest size, the new base tuples need every free lower fine lane, so the number of selected candidates,
 max-div's `k`, forces each lane to be used.
@@ -54,8 +54,8 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
     def work_of(n_population: int, size: MCTuplesSize) -> int:
         """Return the solve's number of candidates times its number of selected candidates, both in base tuples.
 
-        The candidates are the placeholder, the size below's base tuples and the population before its diagonal cells
-        are dropped.
+        The candidates are the dummy rotational sibling tuple, the size below's base tuples and the population before
+        its diagonal cells are dropped.
         """
         return (1 + size.n_required // 4 + n_population) * (1 + size // 4)
 

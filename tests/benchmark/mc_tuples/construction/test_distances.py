@@ -1,11 +1,11 @@
-"""The distance functions give each base tuple the nearest-neighbor distance of its 4 tuples, the placeholder
-included."""
+"""The distance functions give each base tuple the nearest-neighbor distance of its 4 tuples, the dummy rotational
+sibling tuple included."""
 
 import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples.construction.distances import (
-    PLACEHOLDER_TUPLE_ARRAY,
+    DUMMY_ROTATIONAL_SIBLING_TUPLE,
     base_tuple_squared_l2_distance,
     base_tuple_value_distance,
 )
@@ -29,9 +29,9 @@ def _cyclic_separations(tuple_array: np.ndarray, axes: list[int]) -> np.ndarray:
 
 
 def _separations_through_candidates(base_tuple_array: np.ndarray, distance_function) -> np.ndarray:
-    """Return each base tuple's smallest distance to another candidate, the placeholder included, as max-div computes
-    it."""
-    vectors = np.vstack([PLACEHOLDER_TUPLE_ARRAY, base_tuple_array]).astype(np.float32)
+    """Return each base tuple's smallest distance to another candidate, the dummy rotational sibling tuple included,
+    as max-div computes it."""
+    vectors = np.vstack([DUMMY_ROTATIONAL_SIBLING_TUPLE, base_tuple_array]).astype(np.float32)
     n = vectors.shape[0]
     distances = np.full((n, n), np.inf)
     for i in range(n):
@@ -72,14 +72,14 @@ def test_the_axis_separation_of_each_base_tuple_is_the_smaller_of_its_2_values(s
     assert separations == pytest.approx(separations_u.reshape(-1, 4).min(axis=1), abs=1e-7)
 
 
-def test_the_placeholder_sees_a_base_tuple_near_the_center_close_to_its_own_rotations():
-    """Seen from the placeholder, a base tuple at distance d from (0.5, 0.5) lies d * sqrt(2) from its rotation by 90
-    degrees."""
+def test_the_dummy_rotational_sibling_tuple_sees_a_base_tuple_near_the_center_close_to_its_own_rotations():
+    """Seen from the dummy rotational sibling tuple, a base tuple at distance d from (0.5, 0.5) lies d * sqrt(2) from
+    its rotation by 90 degrees."""
     # --- arrange ----------------------
     base_tuple = np.array([0.5 - 0.003, 0.5 - 0.004], dtype=np.float32)
 
     # --- act --------------------------
-    distance = base_tuple_squared_l2_distance(PLACEHOLDER_TUPLE_ARRAY[0].astype(np.float32), base_tuple)
+    distance = base_tuple_squared_l2_distance(DUMMY_ROTATIONAL_SIBLING_TUPLE.astype(np.float32), base_tuple)
 
     # --- assert -----------------------
     assert distance == pytest.approx(2 * (0.003**2 + 0.004**2), abs=1e-7)

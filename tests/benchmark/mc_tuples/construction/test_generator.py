@@ -208,7 +208,8 @@ def test_t_budget_per_size_sec_gives_each_size_1_percent_and_splits_the_rest_by_
     t_total_sec, max_size, n_population
 ):
     """Each size gets 1 % of the total, plus a part of the rest in proportion to the selection solve's number of
-    candidates times its number of selected candidates, both in base tuples and with the placeholder."""
+    candidates times its number of selected candidates, both in base tuples and with the dummy rotational sibling
+    tuple."""
     # --- act --------------------------
     budgets = MCTuplesGenerator(n_population=n_population).t_budget_per_size_sec(t_total_sec, max_size)
 

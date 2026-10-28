@@ -6,8 +6,8 @@ still move to a better position within its fine cell.
 The refinement solve draws a population only in the fine cells of the selected new base tuples: each base tuple,
 followed by many candidates inside its fine cell (`MCTuplesPopulation.draw_in_fine_cells_of`).
 
-Besides the weighted constraint that keeps the placeholder and the size below (`solve`), 1 constraint per fine cell of
-a new base tuple requires exactly 1 new base tuple in that cell.
+Besides the weighted constraint that keeps the dummy rotational sibling tuple and the size below (`solve`), 1 constraint
+per fine cell of a new base tuple requires exactly 1 new base tuple in that cell.
 
 A fine cell fixes a base tuple's 2 lower fine lanes, so every set of new base tuples that meets these constraints keeps
 the limit of 1 tuple per fine lane.

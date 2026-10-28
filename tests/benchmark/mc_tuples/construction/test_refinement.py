@@ -29,9 +29,9 @@ def _solve() -> MCTuplesRefinementSolve:
 # ==================================================================================================
 #  Constraints and starting selection
 # ==================================================================================================
-def test_constraints_hold_exactly_1_new_base_tuple_per_fine_cell_and_the_placeholder_and_the_size_below():
+def test_constraints_hold_1_new_base_tuple_per_fine_cell_and_the_dummy_rotational_sibling_tuple_and_the_size_below():
     """Size 64 gets 1 constraint per fine cell of its 8 new base tuples, each over that cell's 9 candidates, and the
-    weighted constraint that keeps the placeholder and the 8 base tuples of the size below."""
+    weighted constraint that keeps the dummy rotational sibling tuple and the 8 base tuples of the size below."""
     # --- act --------------------------
     constraints = _solve()._constraints()
 

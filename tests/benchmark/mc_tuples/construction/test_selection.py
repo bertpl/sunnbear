@@ -48,9 +48,9 @@ def test_the_population_lies_only_in_the_lower_fine_lanes_that_the_size_below_le
         assert np.isin(lanes, solve.free_lanes).all()
 
 
-def test_constraints_allow_at_most_1_new_value_per_free_lane_and_keep_the_placeholder_and_the_size_below():
+def test_constraints_allow_1_new_value_per_free_lane_and_keep_the_dummy_rotational_sibling_tuple_and_the_size_below():
     """Size 64 gets 1 constraint per free lane that allows at most 1 candidate with its u or its v in that lane, and
-    the weighted constraint that keeps the placeholder and the 8 base tuples of the size below."""
+    the weighted constraint that keeps the dummy rotational sibling tuple and the 8 base tuples of the size below."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_64, _BASE_32, n_population=8192)
     population = solve.population
@@ -123,8 +123,8 @@ def test_the_random_starting_selection_needs_enough_candidates():
 #  Validation
 # ==================================================================================================
 def test_validation_returns_a_valid_selection_s_new_candidates():
-    """A selection of the placeholder and 8 candidates in distinct lanes meets the smallest size's constraints, and its
-    new candidates come back as they are."""
+    """A selection of the dummy rotational sibling tuple and 8 candidates in distinct lanes meets the smallest size's
+    constraints, and its new candidates come back as they are."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_32, np.zeros((0, 2)), n_population=8192)
     new = np.sort(_distinct_lane_selection(solve, 8))
@@ -133,13 +133,15 @@ def test_validation_returns_a_valid_selection_s_new_candidates():
     assert solve._validated_new_selection(np.concatenate([[0], 1 + new])).tolist() == new.tolist()
 
 
-def test_validation_refuses_a_selection_without_the_placeholder():
-    """A size-64 selection that leaves out the placeholder, index 0, raises an error."""
+def test_validation_refuses_a_selection_without_the_dummy_rotational_sibling_tuple():
+    """A size-64 selection that leaves out the dummy rotational sibling tuple, index 0, raises an error."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_64, _BASE_32, n_population=8192)
 
     # --- act / assert -----------------
-    with pytest.raises(MCTuplesConstructionError, match="1 of the placeholder and the size below's base tuples"):
+    with pytest.raises(
+        MCTuplesConstructionError, match="1 of the dummy rotational sibling tuple and the size below's base tuples"
+    ):
         solve._validated_new_selection(np.arange(1, 18))
 
 

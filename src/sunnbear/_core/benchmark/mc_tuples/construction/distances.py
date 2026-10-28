@@ -13,12 +13,13 @@ A rotation keeps every cyclic distance, so the shortest distance between the 4 t
 of base tuple q is the shortest distance from p to the 4 tuples of q; each of the 4 tuples of p has the same
 nearest-neighbor distance.
 
-A tuple's nearest neighbor can also be 1 of the other 3 tuples of its own base tuple. To count these neighbors, every
-problem holds a placeholder at index 0: a vector with u < 0 that every selection includes.
+A tuple's nearest neighbor can also be 1 of its rotational siblings, the other 3 tuples of its own base tuple. To count
+these neighbors, every problem holds the dummy rotational sibling tuple at index 0: a vector with u < 0, which stands
+for no real tuple and which every selection includes.
 
-The distance from the placeholder to a base tuple is that base tuple's distance to the nearest of its own other 3
-tuples. max-div calls a distance function with the vector of the lower index first, so the placeholder is always the
-first vector.
+The distance from the dummy rotational sibling tuple to a base tuple is that base tuple's distance to its nearest
+rotational sibling. max-div calls a distance function with the vector of the lower index first, so the dummy rotational
+sibling tuple is always the first vector.
 
 Along an axis, the 4 tuples of a base tuple hold 4 values, its u and v and their mirrors 1 - u and 1 - v, but max-div
 gives each candidate only 1 nearest-neighbor distance.
@@ -37,8 +38,9 @@ import numba
 import numpy as np
 from max_div.metrics import DistanceMetric
 
-# The placeholder's vector lies outside the unit square, so that a distance function recognizes it by its u < 0.
-PLACEHOLDER_TUPLE_ARRAY = np.array([[-1.0, -1.0]])
+# The dummy rotational sibling tuple lies outside the unit square, so that a distance function recognizes it by its
+# u < 0.
+DUMMY_ROTATIONAL_SIBLING_TUPLE = np.array([-1.0, -1.0])
 
 
 @numba.njit(fastmath={"reassoc", "contract"})
@@ -66,8 +68,8 @@ def _cyclic_distance_to_value_or_mirror(a: float, b: float) -> float:
 def base_tuple_squared_l2_distance(a: np.ndarray, b: np.ndarray) -> float:
     """Return the smallest squared cyclic L2 distance between base tuple `a` and the 4 tuples of base tuple `b`.
 
-    With the placeholder as `a`, return the squared distance from `b` to the nearer of its rotations by 90 and by 180
-    degrees; its rotation by 270 degrees lies as far from it as its rotation by 90 degrees.
+    With the dummy rotational sibling tuple as `a`, return the squared distance from `b` to the nearer of its rotations
+    by 90 and by 180 degrees; its rotation by 270 degrees lies as far from it as its rotation by 90 degrees.
     """
     b_u, b_v = float(b[0]), float(b[1])
     if a[0] < 0.0:
@@ -89,8 +91,8 @@ def base_tuple_squared_l2_distance(a: np.ndarray, b: np.ndarray) -> float:
 def base_tuple_value_distance(a: np.ndarray, b: np.ndarray) -> float:
     """Return the smallest cyclic distance between a value of base tuple `a` and a value or mirror of base tuple `b`.
 
-    With the placeholder as `a`, return the smallest of 3 distances: from the u of `b` to its v or to 1 - v, from u to
-    1 - u, and from v to 1 - v.
+    With the dummy rotational sibling tuple as `a`, return the smallest of 3 distances: from the u of `b` to its v or to
+    1 - v, from u to 1 - u, and from v to 1 - v.
     """
     b_u, b_v = float(b[0]), float(b[1])
     if a[0] < 0.0:
