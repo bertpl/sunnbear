@@ -1,10 +1,13 @@
 """`FunctionEvaluatingChecksTask` runs the checks that evaluate f on a batch of candidates.
 
-These checks are c-range calibration, then the bisection count check and the snuffled diagnostics check, which need the
-c-range.
+These checks run in this order:
 
-All 3 run in 1 task, so the worker that compiles a formula for calibration also runs the other 2 checks on it, and each
-formula is compiled in only 1 worker. The task runs in a worker process of the pool, or in the calling process.
+- c-range calibration;
+- the bisection count check, which needs the c-range;
+- the snuffled diagnostics check, which needs the c-range too.
+
+All these checks run in 1 task, so the worker that compiles a formula for calibration also runs the later checks on it,
+and each formula is compiled in only 1 worker. The task runs in a worker process of the pool, or in the calling process.
 """
 
 from dataclasses import dataclass

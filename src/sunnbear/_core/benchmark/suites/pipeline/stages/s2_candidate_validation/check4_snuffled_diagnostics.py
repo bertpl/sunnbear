@@ -1,16 +1,17 @@
 """The snuffled diagnostics check rejects a candidate on which snuffled's analysis finds a problem at any sampled tuple.
 
 The check samples `N_SNUFFLED_TUPLES` tuples from the largest Monte Carlo tuple set that sunnbear ships; each tuple sets
-the ``c`` and the `xtol` of 1 solve. Sorted by ``c``, the sampled tuples lie closer together near both ends of the
-c-range than in the middle, because a test problem's failures, such as NaN values or a root at an interval bound, occur
-mostly near the ends of its c-range. snuffled analyzes f at each sampled tuple:
+the ``c`` and the `xtol` of 1 solve.
 
-- at the HIGH budget, `SnuffledAnalysisBudget.HIGH`, for the sampled tuples at the positions in `HIGH_BUDGET_POSITIONS`:
-  the 2 outermost tuples and 2 near the middle;
+Sorted by ``c``, the sampled tuples lie closer together near both ends of the c-range than in the middle, because a
+test problem's failures, such as NaN values or a root at an interval bound, occur mostly near the ends of its c-range.
+snuffled analyzes f at each sampled tuple:
+
+- at the HIGH budget, `SnuffledAnalysisBudget.HIGH`, for the sampled tuples at the positions in `HIGH_BUDGET_POSITIONS`;
 - at the LOW budget, `SnuffledAnalysisBudget.LOW`, for the others.
 
-The check reads only snuffled's diagnostics. It rejects the candidate at the first sampled tuple at which 1 of these
-holds:
+The check reads only snuffled's diagnostics, not its function or root properties. It rejects the candidate at the first
+sampled tuple at which 1 of these holds:
 
 - f raises;
 - 1 of the flags in `_FLAG_REJECTION_REASONS` is above 0;
@@ -30,12 +31,15 @@ from sunnbear._core.utils.edge_biased_indices import select_edge_biased_indices
 from .rejection_reason import RejectionReason
 
 N_SNUFFLED_TUPLES = 32
-# snuffled analyzes f at the HIGH budget at these positions among the sampled tuples, sorted by ``c``.
+# snuffled analyzes f at the HIGH budget at these positions among the sampled tuples, sorted by ``c``: the 2 outermost,
+# where failures are most likely, and 2 in between, so that the larger budget also covers the middle of the c-range.
 HIGH_BUDGET_POSITIONS = (0, 14, 17, 31)
 # snuffled's `MAX_ZERO_WIDTH` is 1 float spacing at a root without an exact 0, and 2 at a root with 1 float where f is
-# exactly 0. At `MAX_BOUND_TO_WIDTH_RATIO`, the largest bound-to-width ratio that validation accepts, `xtol` spans the
-# fewest float spacings at the root; this fraction of `xtol` stays well above 2 of them there, or a root with 1 float
-# where f is exactly 0 would be rejected.
+# exactly 0.
+#
+# At `MAX_BOUND_TO_WIDTH_RATIO`, the largest bound-to-width ratio that validation accepts, `xtol` spans the fewest float
+# spacings at the root. At that ratio, this fraction of `xtol` stays well above 2 float spacings, so that a root with 1
+# float where f is exactly 0 is not rejected.
 MAX_ZERO_WIDTH_IN_XTOL = 1 / 16
 # Each flag of snuffled's diagnostics maps to the reason that rejects a candidate when the flag is above 0. The check
 # tests them in this order, NaN first, because snuffled leaves its other diagnostics unspecified when f returns NaN.
@@ -51,7 +55,7 @@ _FLAG_REJECTION_REASONS = {
 def find_snuffled_rejection_reason(problem: TestProblem) -> RejectionReason | None:
     """Return the reason that snuffled's analysis rejects the calibrated test problem, or None if it passes.
 
-    It runs up to `N_SNUFFLED_TUPLES` snuffled analyses, so it is the most expensive check of validation.
+    The check runs up to `N_SNUFFLED_TUPLES` snuffled analyses, so it is the most expensive check of validation.
 
     The analyses run at the sampled tuples from `plan_snuffled_analyses`, in order, and stop at the first tuple that
     the check rejects. Within 1 tuple, the check tests the conditions in this order:
@@ -68,7 +72,8 @@ def find_snuffled_rejection_reason(problem: TestProblem) -> RejectionReason | No
         snuffler = budget.build_snuffler(problem, mc_solve_settings=mc_solve_settings, mc_sample_idx=mc_sample_idx)
         try:
             # The diagnostics are extracted in the order of `Diagnostic`, which puts the NaN and inf flags last, so that
-            # those 2 flags also count the NaN and inf values that f returned while snuffled computed the others.
+            # those 2 flags also count the NaN and inf values that f returned while snuffled computed the other
+            # diagnostics.
             diagnostics = {diagnostic: snuffler.extract(diagnostic) for diagnostic in Diagnostic}
         except FunctionEvaluationError:
             return RejectionReason.SNUFFLED_F_RAISES

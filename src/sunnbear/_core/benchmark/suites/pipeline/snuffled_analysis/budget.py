@@ -48,7 +48,7 @@ class SnuffledAnalysisBudget(Enum):
         analysis is the same in every worker process and whatever order the analyses run in.
 
         When f raises during the analysis, the analysis raises `FunctionEvaluationError`, with f's exception as its
-        cause, so that a caller can tell an exception from f apart from one from snuffled.
+        cause, so that a caller can tell whether an exception came from f or from snuffled.
         """
         seed = derive_seed(
             root_seed=SNUFFLED_ANALYSIS_ROOT_SEED,

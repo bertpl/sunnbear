@@ -56,7 +56,7 @@ from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
         ),
     ],
 )
-def test_the_check_rejects_a_problem_for_each_failed_rule(isolated_formula_registry, xc_fun, reason):
+def test_the_check_rejects_a_problem_for_each_failed_condition(isolated_formula_registry, xc_fun, reason):
     """A simple root passes; each other test problem meets 1 rejection condition, and the check returns its reason."""
     # --- arrange ----------------------
     define_formula_cls((99, 931), xc_fun, -1.0, 1.0)

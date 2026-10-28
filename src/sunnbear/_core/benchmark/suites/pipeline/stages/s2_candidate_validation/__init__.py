@@ -8,7 +8,7 @@ The checks run in sequence, cheapest first, and a candidate is rejected by its f
 3. the bisection count check, in `check3_bisection_count`, which rejects a candidate on which `Bisection` does not
    converge in exactly `DEFAULT_N_BISECTION_FEVALS` evaluations at every tuple of the benchmark;
 4. the snuffled diagnostics check, in `check4_snuffled_diagnostics`, which rejects a candidate when snuffled's analysis
-   finds a problem at any tuple of a sample that is denser near the ends of the c-range.
+   finds a problem at any of the tuples that it samples, more densely near the ends of the c-range.
 
 `CandidateValidationStage` runs the checks. Its output holds the valid candidates with their c-ranges; its reports
 hold the rejected candidates, each with its `RejectionReason`, and the counts of the rejections per formula.
