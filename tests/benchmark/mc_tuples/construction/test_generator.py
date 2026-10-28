@@ -1,19 +1,19 @@
 """`MCTuplesGenerator`, which `generate_mc_tuples` runs:
 
-- builds nested sizes with means of 0.5 and at most 1 tuple per fine lane;
-- rotates each axis in the first value correction of the smallest size, and applies the mean correction in every other
-  value correction;
+- builds nested sizes that are symmetric under rotations by 90 degrees, with means of exactly 0.5, at most 1 tuple per
+  fine lane, and at least `MIN_N_BITS` bits in every value;
 - reports each size;
 - splits the total time over the sizes, and each size's time over its 2 solves;
 - scales down the worker count of a short run.
 """
+
+import math
 
 import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.mc_tuples import (
     MIN_N_BITS,
-    N_FINE_LANES,
     MCTuples,
     MCTuplesGenerator,
     MCTuplesSize,
@@ -25,64 +25,44 @@ from sunnbear._core.benchmark.mc_tuples.construction.refinement import MCTuplesR
 from sunnbear._core.benchmark.mc_tuples.construction.selection import MCTuplesSelectionSolve
 
 
-def _spread_each_gap_s_new_tuples(self: MCTuplesSelectionSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
-    """Replace `MCTuplesSelectionSolve.run`: spread each gap's new tuples evenly over its fine lanes, pair u and v at
-    random, and return them without running max-div."""
-    new_values = []
-    for allocation in (self.gap_allocation.u, self.gap_allocation.v):
-        values = []
-        for gap, count in enumerate(allocation.counts):
-            lanes = np.flatnonzero(allocation.gap_of_fine_lane == gap)
-            picks = np.round(np.linspace(0, lanes.size - 1, count + 2)[1:-1]).astype(np.int64)
-            values.extend((lanes[picks] + 0.5) / N_FINE_LANES)
-        new_values.append(self.settings.rng.permutation(values))
-    return np.vstack([self.required_tuple_array, np.column_stack(new_values)]), None
+def _take_the_starting_selection(self: MCTuplesSelectionSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
+    """Replace `MCTuplesSelectionSolve.run`: return the random starting selection, without running max-div."""
+    new = self._initial_new_selection()
+    return np.vstack([self.required_base_tuple_array, self.population.tuple_array[new]]), None
 
 
 def _pick_each_cell_s_last_candidate(self: MCTuplesRefinementSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
     """Replace `MCTuplesRefinementSolve.run`: pick the last candidate of each fine cell, without running max-div."""
     n_per_cell = self.n_random_candidates_per_cell + 1
-    return np.vstack([self.required_tuple_array, self.population.tuple_array[n_per_cell - 1 :: n_per_cell]]), None
+    new = self.population.tuple_array[n_per_cell - 1 :: n_per_cell]
+    return np.vstack([self.required_base_tuple_array, new]), None
 
 
 def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]) -> None:
     """Assert that every reported size is a prefix of `tuples`, and that in each size:
 
-    - the u and v means are 0.5;
+    - the u values and the v values are the same set;
+    - the u and v means are exactly 0.5;
     - each fine lane holds at most 1 tuple;
     - every value holds at least `MIN_N_BITS` bits of information.
     """
     for result in results:
         size_tuples = tuples.first(result.size)
         assert result.tuples.tuple_array.tolist() == size_tuples.tuple_array.tolist()
-        assert size_tuples.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
-        for values in (size_tuples.u, size_tuples.v):
-            assert np.bincount(fine_lanes_of(values)).max() == 1
+        assert np.array_equal(np.sort(size_tuples.u), np.sort(size_tuples.v))
+        assert math.fsum(size_tuples.u) / result.size == 0.5
+        assert np.bincount(fine_lanes_of(size_tuples.u)).max() == 1
         bit_stats = size_tuples.bit_stats()
         assert min(bit_stats.min_n_bits_u, bit_stats.min_n_bits_v) >= MIN_N_BITS
-
-
-def _assert_only_the_smallest_size_s_first_correction_rotates(results: list[MCTuplesSizeResult]) -> None:
-    """Assert that the first value correction of the smallest size rotates both axes, each with a `rotation_shift`,
-    and that every other value correction applies the mean correction to both axes, each with a `cap`."""
-    for result in results:
-        is_smallest_size = result.size.size_below is None
-        for correction, is_rotation in (
-            (result.first_value_correction, is_smallest_size),
-            (result.second_value_correction, False),
-        ):
-            for axis_correction in (correction.u, correction.v):
-                assert (axis_correction.rotation_shift is not None) == is_rotation
-                assert (axis_correction.cap is None) == is_rotation
 
 
 # ==================================================================================================
 #  MCTuplesGenerator and generate_mc_tuples
 # ==================================================================================================
 @pytest.mark.only_with_numba_jit
-def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size():
-    """A construction up to size 64 builds sizes 32 and 64 as a valid nested set (`_assert_valid_nested_set`), rotates
-    the axes only in size 32's first value correction, and reports both sizes in order.
+def test_generator_builds_nested_symmetric_sizes_and_reports_each_size():
+    """A construction up to size 64 builds sizes 32 and 64 as a valid nested set (`_assert_valid_nested_set`), and
+    reports both sizes in order.
 
     Only the structure is asserted: max-div's spread depends on the wall-clock time.
     """
@@ -100,22 +80,16 @@ def test_generator_builds_nested_sizes_with_means_of_0_5_and_reports_each_size()
     assert tuples.size == 64
     assert [int(result.size) for result in results] == [32, 64]
     _assert_valid_nested_set(tuples, results)
-    _assert_only_the_smallest_size_s_first_correction_rotates(results)
-    assert all(result.refined_tuple_array.shape == (int(result.size), 2) for result in results)
+    assert all(result.refined_base_tuple_array.shape == (int(result.size) // 4, 2) for result in results)
     assert all(result.selection_solution.score_checkpoints for result in results)
     assert all(result.refinement_solution.score_checkpoints for result in results)
 
 
-def test_generator_corrects_refines_and_corrects_each_size_and_builds_the_next_on_it(monkeypatch):
-    """With both solves replaced by stubs that run no max-div, the generator, for each size:
-
-    - corrects the size's means to 0.5, rotating each axis in the smallest size's first correction only;
-    - moves every corrected new tuple within its fine cell;
-    - corrects the means to 0.5 again;
-    - builds the next size on this corrected size.
-    """
+def test_generator_selects_and_refines_each_size_and_builds_the_next_on_it(monkeypatch):
+    """With both solves replaced by stubs that run no max-div, the generator builds a valid nested set, and for each
+    size it moves every selected new base tuple within its fine cell and keeps the size below's base tuples."""
     # --- arrange ----------------------
-    monkeypatch.setattr(MCTuplesSelectionSolve, "run", _spread_each_gap_s_new_tuples)
+    monkeypatch.setattr(MCTuplesSelectionSolve, "run", _take_the_starting_selection)
     monkeypatch.setattr(MCTuplesRefinementSolve, "run", _pick_each_cell_s_last_candidate)
     results: list[MCTuplesSizeResult] = []
 
@@ -127,21 +101,19 @@ def test_generator_corrects_refines_and_corrects_each_size_and_builds_the_next_o
     assert tuples.size == 128
     assert [int(result.size) for result in results] == [32, 64, 128]
     _assert_valid_nested_set(tuples, results)
-    _assert_only_the_smallest_size_s_first_correction_rotates(results)
-    assert results[0].gap_allocation.u.mean_aware_offset_fine_lanes is None
-    assert results[1].gap_allocation.u.mean_aware_offset_fine_lanes is not None
     for result in results:
-        first_corrected, refined = result.first_value_correction.tuple_array, result.refined_tuple_array
-        assert first_corrected.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
-        assert np.array_equal(first_corrected[: result.size.n_required], refined[: result.size.n_required])
-        assert not np.any(first_corrected[result.size.n_required :] == refined[result.size.n_required :])
-        assert np.array_equal(fine_lanes_of(first_corrected), fine_lanes_of(refined))
+        n_required = result.size.n_required // 4
+        selected, refined = result.selected_base_tuple_array, result.refined_base_tuple_array
+        assert np.array_equal(selected[:n_required], refined[:n_required])
+        assert not np.any(selected[n_required:] == refined[n_required:])
+        assert np.array_equal(fine_lanes_of(selected), fine_lanes_of(refined))
+        assert result.selected_tuple_array.shape == (int(result.size), 2)
 
 
-def test_generate_mc_tuples_returns_the_largest_size_corrected_to_0_5(monkeypatch):
-    """`generate_mc_tuples` returns the largest size, with means of 0.5."""
+def test_generate_mc_tuples_returns_the_largest_size_with_means_of_exactly_0_5(monkeypatch):
+    """`generate_mc_tuples` returns the largest size, with means of exactly 0.5."""
     # --- arrange ----------------------
-    monkeypatch.setattr(MCTuplesSelectionSolve, "run", _spread_each_gap_s_new_tuples)
+    monkeypatch.setattr(MCTuplesSelectionSolve, "run", _take_the_starting_selection)
     monkeypatch.setattr(MCTuplesRefinementSolve, "run", _pick_each_cell_s_last_candidate)
 
     # --- act --------------------------
@@ -149,7 +121,7 @@ def test_generate_mc_tuples_returns_the_largest_size_corrected_to_0_5(monkeypatc
 
     # --- assert -----------------------
     assert tuples.size == 64
-    assert tuples.tuple_array.mean(axis=0) == pytest.approx([0.5, 0.5], abs=1e-12)
+    assert [math.fsum(values) / 64 for values in (tuples.u, tuples.v)] == [0.5, 0.5]
 
 
 def test_generator_splits_each_size_s_budget_8_to_1_between_selection_and_refinement(monkeypatch):
@@ -160,7 +132,7 @@ def test_generator_splits_each_size_s_budget_8_to_1_between_selection_and_refine
     def _record_selection_budget(self: MCTuplesSelectionSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
         """Record the selection's budget, then run the selection stub."""
         budgets.append(("selection", t_budget_sec))
-        return _spread_each_gap_s_new_tuples(self, t_budget_sec)
+        return _take_the_starting_selection(self, t_budget_sec)
 
     def _record_refinement_budget(self: MCTuplesRefinementSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
         """Record the refinement's budget, then run the refinement stub."""
@@ -215,7 +187,7 @@ def test_generate_mc_tuples_rejects_invalid_arguments(arguments, message):
         (20.0, 4),  # 1 + round((32 - 1) * (20 - 15) / (60 - 15))
         (45.0, 22),  # 1 + round((32 - 1) * (45 - 15) / (60 - 15))
         (60.0, 32),  # full scale reached
-        (28_800.0, 32),  # full scale
+        (14_400.0, 32),  # full scale
     ],
 )
 def test_n_workers_for_uses_1_worker_up_to_15_s_and_all_from_60_s(t_total_sec, n_workers):
@@ -229,20 +201,20 @@ def test_n_workers_for_uses_1_worker_up_to_15_s_and_all_from_60_s(t_total_sec, n
     [
         (1.0, MCTuplesSize.SIZE_64, 2**14),
         (30.0, MCTuplesSize.SIZE_256, 2**18),
-        (28_800.0, MCTuplesSize.SIZE_1024, 2**20),
+        (14_400.0, MCTuplesSize.SIZE_1024, 2**20),
     ],
 )
 def test_t_budget_per_size_sec_gives_each_size_1_percent_and_splits_the_rest_by_work(
     t_total_sec, max_size, n_population
 ):
-    """Each size gets 1 % of the total, plus a part of the rest in proportion to its size times the selection solve's
-    number of candidates, which is the population plus the tuples of the size below."""
+    """Each size gets 1 % of the total, plus a part of the rest in proportion to the selection solve's number of
+    candidates times its number of selected candidates, both in base tuples and with the placeholder."""
     # --- act --------------------------
     budgets = MCTuplesGenerator(n_population=n_population).t_budget_per_size_sec(t_total_sec, max_size)
 
     # --- assert -----------------------
     sizes = MCTuplesSize.up_to(max_size)
-    work_per_size = {size: (n_population + size.n_required) * size for size in sizes}
+    work_per_size = {size: (n_population + 1 + size.n_required // 4) * (1 + size // 4) for size in sizes}
     t_rest_sec = t_total_sec - 0.01 * t_total_sec * len(sizes)
     assert budgets == pytest.approx(
         {

@@ -1,4 +1,4 @@
-"""`MCTuplesSizeResult` records how 1 size of the tuple-set construction was built: allocation, solves, corrections."""
+"""`MCTuplesSizeResult` records how 1 size of the tuple-set construction was built: its 2 solves."""
 
 from dataclasses import dataclass
 
@@ -7,8 +7,7 @@ from max_div.solver import ParallelMaxDivSolution
 
 from sunnbear._core.benchmark.mc_tuples.core import MCTuples, MCTuplesSize
 
-from .allocation import MCTuplesGapAllocation
-from .correction import MCTuplesValueCorrection
+from .rotations import tuple_array_of
 
 
 # ==================================================================================================
@@ -18,23 +17,15 @@ from .correction import MCTuplesValueCorrection
 class MCTuplesSizeResult:
     """`MCTuplesSizeResult` describes 1 finished size of a construction, for progress reports and inspection.
 
-    The tuple arrays are `(size, 2)` arrays of (u, v) values: the size below's tuples first, then the new tuples.
+    The base tuple arrays are `(size / 4, 2)` arrays: the size below's base tuples first, then the new base tuples.
 
     Attributes:
-        size: The size built.
+        size: The size built, in tuples.
         t_budget_sec: The wall-clock budget of the size's 2 max-div solves together.
-        t_wall_sec: The size's wall-clock time, which covers:
-
-            - the gap allocation;
-            - the 2 populations;
-            - the 2 solves, with max-div's start-up and shut-down time;
-            - the 2 value corrections.
-        gap_allocation: The allocation of the new tuples to the gaps along u and along v.
-        selected_tuple_array: The size's tuples after the selection solve.
-        first_value_correction: The value correction after the selection solve, with what the correction did on each
-            axis and the size's tuples after the correction; the refinement solve starts from those tuples.
-        refined_tuple_array: The size's tuples after the refinement solve.
-        second_value_correction: The value correction after the refinement solve, with the size's final tuples.
+        t_wall_sec: The size's wall-clock time: its 2 populations and its 2 solves, with max-div's start-up and
+            shut-down time.
+        selected_base_tuple_array: The size's base tuples after the selection solve.
+        refined_base_tuple_array: The size's base tuples after the refinement solve, the final ones.
         selection_solution: max-div's solution of the selection solve, with its score checkpoints and timeline.
         refinement_solution: max-div's solution of the refinement solve, with its score checkpoints and timeline.
     """
@@ -42,16 +33,18 @@ class MCTuplesSizeResult:
     size: MCTuplesSize
     t_budget_sec: float
     t_wall_sec: float
-    gap_allocation: MCTuplesGapAllocation
-    selected_tuple_array: np.ndarray
-    first_value_correction: MCTuplesValueCorrection
-    refined_tuple_array: np.ndarray
-    second_value_correction: MCTuplesValueCorrection
+    selected_base_tuple_array: np.ndarray
+    refined_base_tuple_array: np.ndarray
     selection_solution: ParallelMaxDivSolution
     refinement_solution: ParallelMaxDivSolution
 
     @property
+    def selected_tuple_array(self) -> np.ndarray:
+        """Return the size's tuples after the selection solve, with the size below's tuples first."""
+        return tuple_array_of(self.selected_base_tuple_array)
+
+    @property
     def tuples(self) -> MCTuples:
-        """Return the size's tuples after the second value correction, with the size below's tuples first."""
-        tuple_array = self.second_value_correction.tuple_array
+        """Return the size's final tuples, with the size below's tuples first."""
+        tuple_array = tuple_array_of(self.refined_base_tuple_array)
         return MCTuples(tuple_array[:, 0], tuple_array[:, 1])

@@ -14,10 +14,7 @@ about 51 to 54 bits in each representation, and a trivial value far less:
 A multiple of a constant such as π or e does not count as trivial, because there are too many such constants to check.
 Each measure takes a finite value, and returns 0 for 0.
 
-The module also has functions that produce values with a given minimum of `n_bits`:
-
-- `draw_floats_with_min_n_bits` draws them at random in given intervals;
-- `nearest_float_with_min_n_bits` moves a value by the fewest float64 steps that reach such a value.
+`draw_floats_with_min_n_bits` draws values with a given minimum of `n_bits` at random in given intervals.
 """
 
 import math
@@ -98,28 +95,6 @@ def draw_floats_with_min_n_bits(
             else:
                 needs_draw[i] = True
     return values
-
-
-def nearest_float_with_min_n_bits(
-    x: float, min_n_bits: float, low: float, high: float, max_steps: int = 10_000
-) -> float | None:
-    """Return the float64 value nearest to `x` in the open interval `(low, high)` with at least `min_n_bits` bits.
-
-    Nearness counts float64 steps: the search takes 1 step up, then 1 step down, then 2 steps up, and so on, so when a
-    value above `x` and a value below `x` lie the same number of steps away, the higher one is returned.
-
-    `x` itself is returned if it qualifies, and None if no value within `max_steps` steps on either side does.
-    """
-    if low < x < high and n_bits(x) >= min_n_bits:
-        return x
-    else:
-        up, down = x, x
-        for _ in range(max_steps):
-            up, down = math.nextafter(up, math.inf), math.nextafter(down, -math.inf)
-            for candidate in (up, down):
-                if low < candidate < high and n_bits(candidate) >= min_n_bits:
-                    return candidate
-        return None
 
 
 # ==================================================================================================

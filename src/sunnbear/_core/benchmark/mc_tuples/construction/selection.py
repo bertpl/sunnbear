@@ -1,136 +1,92 @@
-"""`MCTuplesSelectionSolve` picks a size's new tuples from its population in the size's first max-div solve.
+"""`MCTuplesSelectionSolve` picks a size's new base tuples from its population in the size's first max-div solve.
 
-A fine cell is the crossing of a fine u-lane and a fine v-lane.
+The population lies in the off-diagonal fine cells of the free lower fine lanes, those of [0, 0.5] that the size below's
+base tuples leave free (`MCTuplesPopulation.draw_off_diagonal`). Besides the weighted constraint that keeps the
+placeholder and the size below (`solve`), 1 constraint per free lower fine lane allows at most 1 new base tuple whose u
+or v lies in that lane. At the largest size, the new base tuples need every free lower fine lane, so k forces each lane
+to be used.
 
-The population's candidates all lie in gaps that get new tuples on both axes
-(`MCTuplesAxisGapAllocation.eligible_fine_lanes`). Besides the constraint that keeps the tuples of the size
-below (`solve`), the constraints are:
-
-- on each axis, each gap holds exactly its allocated number of new tuples;
-- a gap that holds more than 1 new tuple holds at most 1 per fine lane, through 1 constraint per fine lane.
-
-max-div starts from a random selection with at most 1 new tuple per fine lane on each axis, which ignores the counts
-per gap; max-div meets those counts within its first iterations.
+max-div starts from a random selection that meets these constraints (`_initial_new_selection`).
 """
 
 import numpy as np
 from max_div import Constraint
-from scipy.optimize import linear_sum_assignment
 
-from sunnbear._core.benchmark.mc_tuples.core import MCTuplesSize
+from sunnbear._core.benchmark.mc_tuples.core import MCTuplesSize, fine_lanes_of
 from sunnbear._core.utils.grouping import group_indices_by_id
 
-from .allocation import MCTuplesGapAllocation
 from .exceptions import MCTuplesConstructionError
 from .population import MCTuplesPopulation
+from .rotations import N_LOWER_FINE_LANES
 from .solve import MCTuplesSolve, MCTuplesSolveSettings
-
-# `EMPTY_CELL_COST` is the cost of pairing a fine u-lane with a fine v-lane through a fine cell without a candidate, in
-# the random starting selection; it lies far above the random costs in [0, 1).
-EMPTY_CELL_COST = 1e9
 
 
 # ==================================================================================================
 #  MCTuplesSelectionSolve
 # ==================================================================================================
 class MCTuplesSelectionSolve(MCTuplesSolve):
-    """`MCTuplesSelectionSolve` is the max-div solve that picks the new tuples of 1 size from its population.
+    """`MCTuplesSelectionSolve` is the max-div solve that picks the new base tuples of 1 size from its population.
 
     Attributes:
-        gap_allocation: The allocation of new tuples to the gaps along u and along v, which the solve computes from
-            the size below; the population lies in its eligible fine lanes.
+        free_lanes: The lower fine lanes that hold no value of the size below's base tuples, ascending.
     """
 
     def __init__(
         self,
         n_population: int,
-        required_tuple_array: np.ndarray,
+        required_base_tuple_array: np.ndarray,
         size: MCTuplesSize,
         settings: MCTuplesSolveSettings,
     ) -> None:
-        """Allocate the size's new tuples to gaps, and draw its population of `n_population` candidates.
+        """Draw the size's population of about `n_population` candidates over the free lower fine lanes.
 
-        The population lies in the eligible fine lanes, and drawing it advances `settings.rng`.
+        Drawing the population advances `settings.rng`.
         """
-        self.gap_allocation = MCTuplesGapAllocation.of(required_tuple_array, size.n_new)
-        population = MCTuplesPopulation.draw(
-            n_population,
-            self.gap_allocation.u.eligible_fine_lanes,
-            self.gap_allocation.v.eligible_fine_lanes,
-            settings.rng,
-        )
-        super().__init__(population, required_tuple_array, size, settings)
-        self._u_gap = self.gap_allocation.u.gap_of_fine_lane[self.population.u_lane]
-        self._v_gap = self.gap_allocation.v.gap_of_fine_lane[self.population.v_lane]
+        occupied_lanes = fine_lanes_of(required_base_tuple_array.ravel())
+        self.free_lanes = np.setdiff1d(np.arange(N_LOWER_FINE_LANES), occupied_lanes)
+        population = MCTuplesPopulation.draw_off_diagonal(n_population, self.free_lanes, settings.rng)
+        super().__init__(population, required_base_tuple_array, size, settings)
 
     # --------------------------------------------------------------------------
     #  Subclass hooks
     # --------------------------------------------------------------------------
     def _new_tuple_constraints(self) -> list[Constraint]:
-        """Return the constraints on the new tuples, as the module docstring lists them."""
-        n_required = self.size.n_required
-        constraints = []
-        for allocation, gap, lane in (
-            (self.gap_allocation.u, self._u_gap, self.population.u_lane),
-            (self.gap_allocation.v, self._v_gap, self.population.v_lane),
-        ):
-            for group in group_indices_by_id(gap):
-                count = int(allocation.counts[gap[group[0]]])
-                constraints.append(
-                    Constraint(int_set=set((n_required + group).tolist()), min_count=count, max_count=count)
-                )
-            in_gaps_of_several = np.flatnonzero(allocation.counts[gap] > 1)
-            constraints.extend(
-                Constraint(int_set=set((n_required + in_gaps_of_several[group]).tolist()), min_count=0, max_count=1)
-                for group in group_indices_by_id(lane[in_gaps_of_several])
-            )
-        return constraints
+        """Return 1 constraint per free lower fine lane: at most 1 new base tuple with its u or its v in that lane."""
+        n_candidates = self.population.u.size
+        lanes = np.concatenate([self.population.u_lane, self.population.v_lane])
+        candidates = self.n_kept_candidates + np.concatenate([np.arange(n_candidates), np.arange(n_candidates)])
+        return [
+            Constraint(int_set=set(candidates[group].tolist()), min_count=0, max_count=1)
+            for group in group_indices_by_id(lanes)
+        ]
 
     def _initial_new_selection(self) -> np.ndarray:
         """Return a random starting selection of new candidates, ascending, as indices into the population.
 
-        A min-cost matching with random costs assigns each fine u-lane a distinct fine v-lane, such that the fine cell
-        of the 2 lanes holds a candidate; the `n_new` new tuples come from these cells, picked at random, 1 random
-        candidate each. The starting selection holds at most 1 new tuple per fine lane, and ignores the counts per gap.
+        The candidates are taken in random order, each one whose 2 lower fine lanes are still unused, until the size has
+        its new base tuples. A candidate is passed over only when 1 of its lanes is used, so 2 lanes stay unused at the
+        end only if no candidate lies in their fine cells; at the largest size, every pair of free lanes has a candidate
+        in its fine cell, so the pass always uses every free lane.
 
         Raises:
-            MCTuplesConstructionError: If fewer fine-lane pairs than new tuples can be formed through cells that hold a
-                candidate.
+            MCTuplesConstructionError: If the population runs out before the size has its new base tuples.
         """
-        rng = self.settings.rng
-        u_lane, v_lane = self.population.u_lane, self.population.v_lane
-        n_candidates = u_lane.size
-        fine_u_lanes, u_lane_index = np.unique(u_lane, return_inverse=True)
-        fine_v_lanes, v_lane_index = np.unique(v_lane, return_inverse=True)
-        n_u_lanes, n_v_lanes = fine_u_lanes.size, fine_v_lanes.size
-        cells = u_lane_index * n_v_lanes + v_lane_index
-        shuffled = rng.permutation(n_candidates)
-        cells_with_a_candidate, first_in_shuffled = np.unique(cells[shuffled], return_index=True)
-        candidate_of_cell = np.full(n_u_lanes * n_v_lanes, -1, dtype=np.int64)
-        candidate_of_cell[cells_with_a_candidate] = shuffled[first_in_shuffled]
-        costs = rng.random((n_u_lanes, n_v_lanes))
-        costs[candidate_of_cell.reshape(n_u_lanes, n_v_lanes) < 0] = EMPTY_CELL_COST
-        rows, cols = linear_sum_assignment(costs)
-        paired = candidate_of_cell[rows * n_v_lanes + cols]
-        paired = paired[paired >= 0]
-        if paired.size < self.size.n_new:
-            raise MCTuplesConstructionError(
-                f"Size {self.size}: only {paired.size} fine lanes can be paired through cells with a candidate, for "
-                f"{self.size.n_new} new tuples."
-            )
-        return np.sort(rng.choice(paired, size=self.size.n_new, replace=False))
+        is_used = np.zeros(N_LOWER_FINE_LANES, dtype=bool)
+        picked = []
+        u_lanes, v_lanes = self.population.u_lane, self.population.v_lane
+        for candidate in self.settings.rng.permutation(self.population.u.size).tolist():
+            if not (is_used[u_lanes[candidate]] or is_used[v_lanes[candidate]]):
+                is_used[u_lanes[candidate]] = is_used[v_lanes[candidate]] = True
+                picked.append(candidate)
+                if len(picked) == self.n_new_base_tuples:
+                    return np.sort(np.array(picked, dtype=np.int64))
+        raise MCTuplesConstructionError(
+            f"Size {self.size}: only {len(picked)} candidates with unused lanes, "
+            f"for {self.n_new_base_tuples} new base tuples."
+        )
 
     def _check_new_selection(self, new_selection: np.ndarray) -> None:
-        """Raise `MCTuplesConstructionError` if the new tuples break 1 of the constraints in the module docstring."""
-        for axis, allocation, gap, lane in (
-            ("u", self.gap_allocation.u, self._u_gap, self.population.u_lane),
-            ("v", self.gap_allocation.v, self._v_gap, self.population.v_lane),
-        ):
-            counts = np.bincount(gap[new_selection], minlength=allocation.counts.size)
-            n_off = int((counts != allocation.counts).sum())
-            if n_off > 0:
-                raise MCTuplesConstructionError(
-                    f"Size {self.size}: {n_off} gaps along {axis} do not hold their allocated number of new tuples."
-                )
-            if np.bincount(lane[new_selection]).max() > 1:
-                raise MCTuplesConstructionError(f"Size {self.size}: a fine {axis}-lane holds 2 or more new tuples.")
+        """Raise `MCTuplesConstructionError` if a free lower fine lane holds 2 or more values of new base tuples."""
+        lanes = np.concatenate([self.population.u_lane[new_selection], self.population.v_lane[new_selection]])
+        if np.bincount(lanes).max() > 1:
+            raise MCTuplesConstructionError(f"Size {self.size}: a lower fine lane holds 2 or more new values.")

@@ -1,32 +1,21 @@
-"""`generate_mc_tuples` constructs a nested set of (u, v) tuples and corrects every size's means to 0.5.
+"""`generate_mc_tuples` constructs a nested set of (u, v) tuples that is symmetric under rotations by 90 degrees.
 
-The construction builds the sizes bottom-up, the smallest first, and each larger size includes the size below it, so
-every size is a prefix of the next. Each axis is divided into `N_FINE_LANES` equal parts, the fine lanes, and no 2
+A size of `S` tuples consists of `S/4` base tuples in [0, 0.5]^2, each with its rotations by 90, 180 and 270 degrees
+around (0.5, 0.5) (`rotations`), so every size's u values and v values are the same set, and every size's means are
+0.5. The construction builds the sizes bottom-up, the smallest first, and each larger size includes the size below it,
+so every size is a prefix of the next. Each axis is divided into `N_FINE_LANES` equal parts, the fine lanes, and no 2
 tuples of the set share a fine lane.
 
-`MCTuplesGenerator` builds each size in 6 parts, each implemented in the module of this package named in parentheses:
+`MCTuplesGenerator` builds each size in 2 max-div solves over base tuples, each implemented in the module of this
+package named in parentheses:
 
-1. it allocates the new tuples to the gaps that the size below leaves on each axis, so that the size's predicted mean
-   lies close to 0.5 (`allocation`);
-2. it draws the size's population of candidate tuples over the fine lanes of the gaps that get new tuples, each value
-   with at least `MIN_N_BITS` bits of information (`population`);
-3. the selection solve, a max-div solve, picks the new tuples from the population (`selection`);
-4. the first value correction moves the new tuples so that the size's mean u and mean v are exactly 0.5, and for the
-   smallest size it instead rotates each axis, adding the same shift to every value, modulo 1; it then moves each new
-   value with fewer than `MIN_N_BITS` bits by a few float64 steps to a value with at least `MIN_N_BITS` bits
-   (`correction`);
-5. the refinement solve, a second max-div solve, moves each new tuple within its fine cell, the crossing of its fine
-   u-lane and fine v-lane; its candidates lie only in the fine cells of the corrected new tuples (`refinement`);
-6. the second value correction brings the means back to 0.5, after the refinement moved them, and again moves each new
-   value with fewer than `MIN_N_BITS` bits (`correction`).
+1. the selection solve picks the new base tuples from a population over the free lower fine lanes (`selection`);
+2. the refinement solve moves each new base tuple within its fine cell, the crossing of its fine u-lane and fine v-lane
+   (`refinement`).
 
-The first correction comes before the refinement because the first correction can move a new tuple by several fine
-lanes, out of its fine cell, which would undo a refinement done before the first correction.
-
-The refinement moves each tuple by less than 1 fine lane, within its fine cell, so the second correction has little
-left to correct.
-
-Both solves share the max-div objective and the constraint that keeps the tuples of the size below (`solve`).
+Both solves share the max-div objective and the constraint that keeps the size below's base tuples (`solve`), and the
+distances between base tuples (`distances`). Both draw every value of their populations, and its mirror, with at least
+`MIN_N_BITS` bits of information (`population`).
 
 `MCTuplesGenerator` passes each size's result, an `MCTuplesSizeResult`, to the caller's `on_size_finished`, so that a
 long construction can show its progress and store its tuples and max-div's solutions as it goes.
@@ -40,8 +29,8 @@ import numpy as np
 
 from sunnbear._core.benchmark.mc_tuples.core import MCTuples, MCTuplesSize
 
-from .correction import MCTuplesValueCorrection
 from .refinement import MCTuplesRefinementSolve
+from .rotations import base_tuple_array_of
 from .selection import MCTuplesSelectionSolve
 from .size_result import MCTuplesSizeResult
 from .solve import MCTuplesSolveSettings
@@ -64,8 +53,8 @@ class MCTuplesGenerator:
     `generate_mc_tuples` documents.
 
     Attributes:
-        on_size_finished: Called with each size's `MCTuplesSizeResult` as soon as the size is built and its means are
-            corrected for the second time; None reports nothing.
+        on_size_finished: Called with each size's `MCTuplesSizeResult` as soon as the size is built; None reports
+            nothing.
     """
 
     MIN_T_BUDGET_FRACTION_PER_SIZE: ClassVar[float] = 0.01
@@ -123,7 +112,7 @@ class MCTuplesGenerator:
             ValueError: If `t_total_sec` is below `MIN_T_TOTAL_SEC`, or `max_size` is not 1 of `MCTuplesSize`.
             MCTuplesConstructionError: If a size cannot be built within its constraints, which can happen when
                 `t_total_sec` is too short for max-div to meet them, or when `n_population` is too small to place
-                the size's new tuples in distinct fine lanes.
+                the size's new base tuples in distinct fine lanes.
         """
         t_budget_per_size_sec = self.t_budget_per_size_sec(t_total_sec, max_size)
         settings = MCTuplesSolveSettings(
@@ -162,8 +151,9 @@ class MCTuplesGenerator:
         """Return the wall-clock budget of every size's 2 solves together in a run of `t_total_sec` up to `max_size`.
 
         Each size gets `MIN_T_BUDGET_FRACTION_PER_SIZE` of the total, so the solves of the smallest sizes, whose share
-        of the work is tiny, still get time to run; the rest is split in proportion to the size times the selection
-        solve's number of candidates, which is its population plus the tuples of the size below.
+        of the work is tiny, still get time to run; the rest is split in proportion to the selection solve's number of
+        candidates times its number of selected candidates. Both count base tuples and the placeholder, and the
+        candidates count the population before its diagonal cells are dropped.
 
         Raises:
             ValueError: If `t_total_sec` is below `MIN_T_TOTAL_SEC`, or `max_size` is not 1 of `MCTuplesSize`.
@@ -173,7 +163,7 @@ class MCTuplesGenerator:
         sizes = MCTuplesSize.up_to(max_size)
         t_min_per_size_sec = self.MIN_T_BUDGET_FRACTION_PER_SIZE * t_total_sec
         t_rest_sec = t_total_sec - len(sizes) * t_min_per_size_sec
-        work_per_size = {size: (self.n_population + size.n_required) * size for size in sizes}
+        work_per_size = {size: (self.n_population + 1 + size.n_required // 4) * (1 + size // 4) for size in sizes}
         return {
             size: t_min_per_size_sec + t_rest_sec * work / sum(work_per_size.values())
             for size, work in work_per_size.items()
@@ -185,38 +175,30 @@ class MCTuplesGenerator:
     def _build_size(
         self, size: MCTuplesSize, required_tuples: MCTuples | None, t_budget_sec: float, settings: MCTuplesSolveSettings
     ) -> MCTuplesSizeResult:
-        """Build `size` on `required_tuples` and return it.
-
-        `required_tuples` holds the size below's tuples after their second value correction, or None for the smallest
-        size.
-        """
+        """Build `size` on `required_tuples`, the size below's tuples or None for the smallest size, and return it."""
         t_start = time.perf_counter()
-        required_tuple_array = required_tuples.tuple_array if required_tuples is not None else np.zeros((0, 2))
+        if required_tuples is not None:
+            required_base_tuple_array = base_tuple_array_of(required_tuples.tuple_array)
+        else:
+            required_base_tuple_array = np.zeros((0, 2))
         t_refinement_budget_sec = self.REFINEMENT_FRACTION_OF_SIZE_T_BUDGET * t_budget_sec
 
         # --- selection --------------------------
-        selection_solve = MCTuplesSelectionSolve(self.n_population, required_tuple_array, size, settings)
-        selected_tuple_array, selection_solution = selection_solve.run(t_budget_sec - t_refinement_budget_sec)
-
-        # --- first value correction -------------
-        first_value_correction = MCTuplesValueCorrection.first_of(selected_tuple_array, size.n_required)
+        selection_solve = MCTuplesSelectionSolve(self.n_population, required_base_tuple_array, size, settings)
+        selected_base_tuple_array, selection_solution = selection_solve.run(t_budget_sec - t_refinement_budget_sec)
 
         # --- refinement -------------------------
         refinement_solve = MCTuplesRefinementSolve(
-            self.n_refinement_random_candidates_per_cell, first_value_correction.tuple_array, size, settings
+            self.n_refinement_random_candidates_per_cell, selected_base_tuple_array, size, settings
         )
-        refined_tuple_array, refinement_solution = refinement_solve.run(t_refinement_budget_sec)
+        refined_base_tuple_array, refinement_solution = refinement_solve.run(t_refinement_budget_sec)
 
-        # --- second value correction ------------
         return MCTuplesSizeResult(
             size=size,
             t_budget_sec=t_budget_sec,
             t_wall_sec=time.perf_counter() - t_start,
-            gap_allocation=selection_solve.gap_allocation,
-            selected_tuple_array=selected_tuple_array,
-            first_value_correction=first_value_correction,
-            refined_tuple_array=refined_tuple_array,
-            second_value_correction=MCTuplesValueCorrection.of(refined_tuple_array, size.n_required),
+            selected_base_tuple_array=selected_base_tuple_array,
+            refined_base_tuple_array=refined_base_tuple_array,
             selection_solution=selection_solution,
             refinement_solution=refinement_solution,
         )
@@ -236,33 +218,31 @@ def generate_mc_tuples(
 ) -> MCTuples:
     """Construct a nested Monte Carlo (u, v) tuple set up to `max_size` in about `t_total_sec` s.
 
-    Size `k` of the set is its first `k` tuples, and every size's mean u and mean v are 0.5 up to rounding, unless the
-    last correction of the size's means cannot reach 0.5.
+    Size `k` of the set is its first `k` tuples. Each size consists of base tuples in [0, 0.5]^2, each followed by its
+    rotations by 90, 180 and 270 degrees around (0.5, 0.5), which map (u, v) to (1 - v, u), (1 - u, 1 - v) and
+    (v, 1 - u). So every size's u values and v values are the same set, symmetric around 0.5, and every size's mean u
+    and mean v are exactly 0.5.
 
     Each axis is cut into as many equal fine lanes as the largest `MCTuplesSize` holds tuples, and no 2 tuples share a
     fine lane, so the largest size holds exactly 1 tuple per fine lane on each axis.
 
-    Each size's new tuples come from 2 max-div solves:
+    Each size's new base tuples come from 2 max-div solves:
 
-    - the selection solve picks the new tuples from a random population of `n_population` candidate tuples;
-    - the refinement solve, after the first correction of the means, moves each new tuple within its fine cell, the
-      crossing of its fine u-lane and fine v-lane: it picks 1 tuple per fine cell among the tuple itself and
+    - the selection solve picks them from a random population of about `n_population` candidate base tuples;
+    - the refinement solve moves each new base tuple within its fine cell, the crossing of its fine u-lane and fine
+      v-lane: it picks 1 base tuple per fine cell among the base tuple itself and
       `n_refinement_random_candidates_per_cell` random candidates inside that fine cell.
 
     Both solves maximize the geomean of 3 values of gpq(0.1), the geometric pseudo-quantile at level 0.1, a soft
     minimum that `MCTuplesStats` reports: one over each tuple's distance to its nearest other tuple along u, one along v
-    and one in squared L2.
+    and one in squared L2. Along the axes, the solves count a base tuple's separation as the smaller of its 2 values'
+    separations, because max-div gives each candidate 1 separation per distance.
 
-    Every distance is measured cyclically: each axis is a circle on which 0 and 1 meet, so a
-    value near 0 and a value near 1 count as close.
-
-    A correction moves the new tuples to bring the size's means to 0.5 before the refinement solve, and a second
-    correction after it; the smallest size's first correction instead adds the same shift to every value of each axis,
-    modulo 1, which keeps every cyclic distance.
+    Every distance is measured cyclically: each axis is a circle on which 0 and 1 meet, so a value near 0 and a value
+    near 1 count as close.
 
     The construction splits `t_total_sec` over its sizes: each size gets 1 % of the total, plus a part of the rest in
-    proportion to its size times the selection solve's number of candidate tuples, which is the population plus the
-    tuples of the size below.
+    proportion to the selection solve's number of candidates times its number of selected candidates.
 
     Each size's budget is split 8:1 between its selection solve and its refinement solve.
 
@@ -274,8 +254,8 @@ def generate_mc_tuples(
 
     `t_total_sec` covers only the solves; other work takes extra time:
 
-    - allocating each size's new tuples to gaps, drawing its 2 populations, and building its 2 problems;
-    - checking and correcting each size;
+    - drawing each size's 2 populations, and building its 2 problems;
+    - checking each size's selections;
     - compiling the solves' max-div functions, on their first run after an install; compiling them all takes
       seconds, and numba caches the compiled code for later runs.
 
@@ -289,16 +269,17 @@ def generate_mc_tuples(
         seed: The seed of every random draw and of every max-div solve.
         max_size: The largest size to build, 1 of `MCTuplesSize`; every size up to it is built, however short
             `t_total_sec` is, so a short run that wants fewer sizes passes a smaller `max_size`.
-        n_population: The number of candidate tuples of each size's population for the selection solve, at least 1.
-        n_refinement_random_candidates_per_cell: The number of random candidate tuples that the refinement solve
-            draws in each fine cell of a new tuple, at least 1.
+        n_population: The number of candidate base tuples drawn for each size's selection solve, at least 1; the
+            candidates in a diagonal fine cell, whose u and v share a fine lane, are dropped.
+        n_refinement_random_candidates_per_cell: The number of random candidate base tuples that the refinement solve
+            draws in each fine cell of a new base tuple, at least 1.
 
     Raises:
         ValueError: If `t_total_sec` is below 1 s, `n_workers`, `n_population` or
             `n_refinement_random_candidates_per_cell` is below 1, or `max_size` is not 1 of `MCTuplesSize`.
         MCTuplesConstructionError: If a size cannot be built within its constraints, which can happen when
             `t_total_sec` is too short for max-div to meet them, or when `n_population` is too small to place the
-            size's new tuples in distinct fine lanes.
+            size's new base tuples in distinct fine lanes.
     """
     generator = MCTuplesGenerator(
         n_workers=n_workers,

@@ -1,18 +1,15 @@
-"""`MCTuplesRefinementSolve` moves each new tuple of a size within its fine cell, in the size's second max-div solve.
+"""`MCTuplesRefinementSolve` moves each new base tuple of a size within its fine cell, in the size's second solve.
 
-The selection solve (`selection`) draws only a few candidates per fine cell, and picks each new tuple among them; the
-first value correction then moves the new tuples (`correction`).
+The selection solve (`selection`) draws only a few candidates per fine cell, and picks each new base tuple among them.
 
-The refinement solve draws a population only in the fine cells of the corrected new tuples: each corrected tuple,
+The refinement solve draws a population only in the fine cells of the selected new base tuples: each base tuple,
 followed by many candidates inside its fine cell (`MCTuplesPopulation.draw_in_fine_cells_of`).
 
-Besides the constraint that keeps the tuples of the size below (`solve`), 1 constraint per fine cell of a new tuple
-requires exactly 1 new tuple in that cell.
+Besides the weighted constraint that keeps the placeholder and the size below (`solve`), 1 constraint per fine cell of
+a new base tuple requires exactly 1 new base tuple in that cell. A fine cell fixes a base tuple's 2 lower fine lanes, so
+every set of new base tuples that meets these constraints keeps the limit of 1 tuple per fine lane.
 
-A fine cell fixes a tuple's fine u-lane and fine v-lane, so every set of new tuples that meets these constraints keeps
-each gap's allocated number of new tuples and the limit of 1 tuple per fine lane.
-
-max-div starts from the corrected tuples, so the refinement ends with a score at least as high as theirs.
+max-div starts from the selected base tuples, so the refinement ends with a score at least as high as theirs.
 """
 
 import numpy as np
@@ -29,50 +26,52 @@ from .solve import MCTuplesSolve, MCTuplesSolveSettings
 #  MCTuplesRefinementSolve
 # ==================================================================================================
 class MCTuplesRefinementSolve(MCTuplesSolve):
-    """`MCTuplesRefinementSolve` is the max-div solve that moves the new tuples of 1 size within their fine cells.
+    """`MCTuplesRefinementSolve` is the max-div solve that moves the new base tuples of 1 size within their fine cells.
 
     Attributes:
         n_random_candidates_per_cell: The number of candidates that the population draws in each fine cell, besides the
-            selected tuple.
+            selected base tuple.
     """
 
     def __init__(
         self,
         n_random_candidates_per_cell: int,
-        initial_tuple_array: np.ndarray,
+        selected_base_tuple_array: np.ndarray,
         size: MCTuplesSize,
         settings: MCTuplesSolveSettings,
     ) -> None:
-        """Draw the population in the fine cells of the new tuples in `initial_tuple_array`.
+        """Draw the population in the fine cells of the new base tuples in `selected_base_tuple_array`.
 
-        `initial_tuple_array` holds the size's tuples after the first value correction: the size below's tuples first,
-        then the new tuples. Drawing the population advances `settings.rng`.
+        `selected_base_tuple_array` holds the size's base tuples after the selection solve: the size below's base
+        tuples first, then the new base tuples. Drawing the population advances `settings.rng`.
         """
         self.n_random_candidates_per_cell = n_random_candidates_per_cell
+        n_required_base_tuples = size.n_required // 4
         population = MCTuplesPopulation.draw_in_fine_cells_of(
-            initial_tuple_array[size.n_required :], n_random_candidates_per_cell, settings.rng
+            selected_base_tuple_array[n_required_base_tuples:], n_random_candidates_per_cell, settings.rng
         )
-        super().__init__(population, initial_tuple_array[: size.n_required], size, settings)
+        super().__init__(population, selected_base_tuple_array[:n_required_base_tuples], size, settings)
 
     # --------------------------------------------------------------------------
     #  Subclass hooks
     # --------------------------------------------------------------------------
     def _new_tuple_constraints(self) -> list[Constraint]:
-        """Return 1 constraint per fine cell of a new tuple, each requiring exactly 1 new tuple in that cell."""
-        n_required = self.size.n_required
+        """Return 1 constraint per fine cell of a new base tuple, each requiring exactly 1 new base tuple in it."""
         n_per_cell = self.n_random_candidates_per_cell + 1
         return [
             Constraint(int_set=set(range(start, start + n_per_cell)), min_count=1, max_count=1)
-            for start in n_required + n_per_cell * np.arange(self.size.n_new)
+            for start in self.n_kept_candidates + n_per_cell * np.arange(self.n_new_base_tuples)
         ]
 
     def _initial_new_selection(self) -> np.ndarray:
-        """Return the corrected new tuples, each fine cell's first candidate, as indices into the population."""
-        return (self.n_random_candidates_per_cell + 1) * np.arange(self.size.n_new)
+        """Return the selected new base tuples, each fine cell's first candidate, as indices into the population."""
+        return (self.n_random_candidates_per_cell + 1) * np.arange(self.n_new_base_tuples)
 
     def _check_new_selection(self, new_selection: np.ndarray) -> None:
-        """Raise `MCTuplesConstructionError` if a fine cell holds no new tuple, or 2 or more."""
-        counts = np.bincount(new_selection // (self.n_random_candidates_per_cell + 1), minlength=self.size.n_new)
+        """Raise `MCTuplesConstructionError` if a fine cell holds no new base tuple, or 2 or more."""
+        counts = np.bincount(new_selection // (self.n_random_candidates_per_cell + 1), minlength=self.n_new_base_tuples)
         n_off = int((counts != 1).sum())
         if n_off > 0:
-            raise MCTuplesConstructionError(f"Size {self.size}: {n_off} fine cells do not hold exactly 1 new tuple.")
+            raise MCTuplesConstructionError(
+                f"Size {self.size}: {n_off} fine cells do not hold exactly 1 new base tuple."
+            )
