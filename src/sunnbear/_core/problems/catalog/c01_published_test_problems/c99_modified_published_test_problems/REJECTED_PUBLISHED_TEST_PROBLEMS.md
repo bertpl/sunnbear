@@ -43,14 +43,16 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.1.7.9[a=0.0002,b=27.0,c_scale=27.0]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.1.7.9[a=0.0002,b=27.0]` | `c` scales x |  |
 | `f1.1.7.9[a=0.0002,b=81.0,c_scale=81.0]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.1.7.9[a=0.0002,b=81.0]` | `c` scales x |  |
 | `f1.1.8.1[a=0.004,b=200.0,c_scale=200.0]` | `calibration_c_range_too_narrow` | some parameter tuples modified | `f1.99.1.8.1` | `c` scales x |  |
-| `f1.1.9.11` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
+| `f1.1.8.5[a=0.035,b=0.05,c_scale=0.015]` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.1.9.15` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.9.15` | f in an equivalent form without cancellation |  |
 | `f1.1.12.1[a=-2.5,b=3.0,c_scale=5.5]` | `calibration_no_finite_sign_change_at_0` | some parameter tuples modified | `f1.99.1.12.1` | interval changed to `[-2.5, 3.06]` |  |
 | `f1.1.12.2` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.1.12.2` | interval changed to `[0.02, 2]` |  |
 | `f1.1.12.4` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.12.4` | f in an equivalent form without cancellation |  |
+| `f1.1.13.2` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.1.13.4` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.13.4` | f in an equivalent form without cancellation |  |
 | `f1.1.13.5[a=2.6,b=4.6,c_scale=2.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.13.5[a=2.6,b=4.6,c_scale=2.0]` | f in an equivalent form without cancellation |  |
 | `f1.1.13.5[a=2.6,b=3.6,c_scale=1.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.13.5[a=2.6,b=3.6,c_scale=1.0]` | f in an equivalent form without cancellation |  |
+| `f1.1.13.12[a=0.0,b=4.0,c_scale=4.0]` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.1.13.19` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.13.19` | f in an equivalent form without cancellation |  |
 | `f1.1.13.21` | `calibration_fails_at_first_probe` | all parameter tuples modified | `f1.99.1.13.21` | interval changed to `[-1.02, 1]` |  |
 | `f1.1.14.5[a=-1.0,b=4.0,c_scale=5.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.14.5[a=-1.0,b=4.0,c_scale=5.0]` | a tiny linear term added to f | yes |
@@ -82,7 +84,6 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.2.4.2[a=361.000000001,b=399.999999999,c_scale=39.0]` | `calibration_fails_at_first_probe` | all parameter tuples modified | `f1.99.2.4.2[a=361.4,b=399.6,c_scale=38.2]` | interval changed to `[361.4, 399.6]` | yes |
 | `f1.2.9.4` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.2.9.4` | f in an equivalent form without cancellation |  |
 | `f1.2.9.6` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.2.9.6` | f in an equivalent form without cancellation |  |
-| `f1.2.11.7` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.2.13.8` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.2.13.8` | interval changed to `[-6, -0.9]` |  |
 | `f1.2.13.9` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.2.13.9` | interval changed to `[-1, 2]` |  |
 | `f1.2.13.11` | `calibration_no_finite_sign_change_at_0` | no action | | f has no real root | |
@@ -106,30 +107,32 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.2.15.2[q=2^127.0,y=0.9]` | `calibration_fails_at_first_probe` | all parameter tuples modified | `f1.99.2.15.2[q=2^127.0,y=0.9]` | `c` added to f |  |
 | `f1.2.18.5[k=1.2,a=0.0,b=2.0,c_scale=2.0]` | `calibration_no_finite_sign_change_at_0` | some parameter tuples modified | `f1.99.2.18.5[k=1.2]` | interval changed to `[0.02, 2]` |  |
 | `f1.2.18.6` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.2.18.6` | interval changed to `[0, 1.98]` |  |
-| `f1.2.18.14[a=19.0,b=21.0,c_scale=2.0]` | `calibration_no_finite_sign_change_at_0` | some parameter tuples modified | `f1.99.2.18.14` | interval changed to `[19.02, 21]` |  |
-| `f1.2.18.20` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.2.18.20` | interval changed to `[-3, 0.96]` |  |
+| `f1.2.18.14[a=19.0,b=21.0,c_scale=2.0]` | `calibration_no_finite_sign_change_at_0` | some parameter tuples modified | `f1.99.2.18.14` | interval changed to `[19.02, 21]`; the modified test problem is rejected by `bisection_count_not_exact` |  |
+| `f1.2.18.20` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.2.18.20` | interval changed to `[-3, 0.96]`; the modified test problem is rejected by `bisection_count_not_exact` |  |
 | `f1.2.18.23` | `calibration_no_finite_sign_change_at_0` | no action | | the root has even multiplicity, so f does not change sign | |
+| `f1.2.18.24` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.3.1.4[a=1e-05,b=20.0,c_scale=20.0]` | `calibration_c_range_too_narrow` | some parameter tuples modified | `f1.99.3.1.4` | `c` scales x |  |
 | `f1.3.1.6[a=1e-05,b=20.0,c_scale=20.0]` | `calibration_no_finite_sign_change_at_0` | some parameter tuples modified | `f1.99.3.1.6` | interval changed to `[0.08, 20]` |  |
 | `f1.3.1.12[factor=1000.0,a=-4.0,b=4.1,c_scale=8.1]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.1.12[factor=1000.0,a=-4.0,b=4.1,c_scale=8.1]` | a tiny linear term added to f | yes |
 | `f1.3.1.12[factor=1000.0,a=0.5,b=2.0,c_scale=1.5]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.1.12[factor=1000.0,a=0.5,b=2.0,c_scale=1.5]` | a tiny linear term added to f | yes |
-| `f1.3.1.17[a=0.988,b=1.012,c_scale=0.024]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.1.17[a=0.988,b=1.012,c_scale=0.024]` | f in an equivalent form without cancellation | yes |
-| `f1.3.1.17[a=0.99,b=1.013,c_scale=0.023]` | `calibration_fails_at_benchmark_c_values` | all parameter tuples modified | `f1.99.3.1.17[a=0.99,b=1.013,c_scale=0.023]` | f in an equivalent form without cancellation; the modified test problem is rejected by `bisection_count_not_exact` | yes |
+| `f1.3.1.17[a=0.988,b=1.012,c_scale=0.024]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.1.17[a=0.988,b=1.012,c_scale=0.024]` | f in an equivalent form without cancellation; the modified test problem is rejected by `bisection_count_not_exact` | yes |
+| `f1.3.1.17[a=0.99,b=1.013,c_scale=0.023]` | `calibration_fails_at_benchmark_c_values` | all parameter tuples modified | `f1.99.3.1.17[a=0.99,b=1.013,c_scale=0.023]` | f in an equivalent form without cancellation | yes |
 | `f1.3.2.3` | `calibration_c_range_too_narrow` | all parameter tuples modified | `f1.99.3.2.3` | `c` added to f | yes |
 | `f1.3.2.5` | `bound_to_width_ratio` | all parameter tuples modified | `f1.99.3.2.5` | x shifted so that the interval becomes `[-0.0005, 0.0002]`; f in an equivalent form without cancellation |  |
 | `f1.3.3.4[a=-1.0,b=4.0,c_scale=5.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.3.4[a=-1.0,b=4.0,c_scale=5.0]` | a tiny linear term added to f | yes |
 | `f1.3.3.4[a=-1.1234,b=4.4567,c_scale=5.58]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.3.4[a=-1.1234,b=4.4567,c_scale=5.58]` | a tiny linear term added to f | yes |
+| `f1.3.3.27[a=2.0,b=4.0,c_scale=2.0]` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.3.3.30[a=0.0,b=2.0,c_scale=2.0]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.3.3.30` | `c` added to f |  |
 | `f1.3.3.33[a=0.0,b=6.0,c_scale=6.0]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.3.3.33` | `c` added to f |  |
 | `f1.3.3.41` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.3.41` | f in an equivalent form without cancellation |  |
 | `f1.3.4.2` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.3.4.2` | interval changed to `[0.03, 2.718281828459045]` |  |
+| `f1.3.5.10` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.3.5.12[a=1.0,b=3.4,c_scale=2.4]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.5.12[a=1.0,b=3.4,c_scale=2.4]` | f in an equivalent form without cancellation | yes |
 | `f1.3.5.12[a=1.0,b=2.5,c_scale=1.5]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.5.12[a=1.0,b=2.5,c_scale=1.5]` | f in an equivalent form without cancellation | yes |
 | `f1.3.5.13` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.3.5.13` | interval changed to `[-2.04, 1.96]` | yes |
 | `f1.3.6.2[a=5.0,b=12.0,c_scale=7.0]` | `calibration_no_finite_sign_change_at_0` | some parameter tuples modified | `f1.99.3.6.2` | interval changed to `[5, 7.7]` | yes |
 | `f1.3.6.3` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.3.6.3` | interval changed to `[-0.2, 1]` | yes |
 | `f1.3.6.4` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.3.6.4` | interval changed to `[-2, 1]` | yes |
-| `f1.3.8.3` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.3.8.6` | `calibration_fails_at_first_probe` | no action | | rounding noise: the first value of `c` that the validation stage tries, a shift along x, takes `f(a)` from about -0.95 to about -0.008 | |
 | `f1.4.1.2[a=0.0,b=2.0,c_scale=2.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.1.2[a=-1.0,b=1.0,c_scale=2.0]` | x shifted so that the interval becomes `[-1, 1]`; f in an equivalent form without cancellation |  |
 | `f1.4.1.2[a=0.998,b=1.002,c_scale=0.004]` | `bound_to_width_ratio` | all parameter tuples modified | `f1.99.4.1.2[a=-0.002,b=0.002,c_scale=0.004]` | x shifted so that the interval becomes `[-0.002, 0.002]`; f in an equivalent form without cancellation | yes |
@@ -147,13 +150,12 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.4.2.3[alpha=0.5]` | `calibration_no_finite_sign_change_at_0` | no action | | f is exactly 0 at `a`, and the interval holds no other root | |
 | `f1.4.2.3[alpha=1.0]` | `calibration_no_finite_sign_change_at_0` | no action | | f is exactly 0 at `a`, and the interval holds no other root | |
 | `f1.4.2.3[alpha=2.0]` | `calibration_no_finite_sign_change_at_0` | no action | | f is exactly 0 at `a`, and the interval holds no other root | |
-| `f1.4.2.4[a=-2.0,b=-1.0,c_scale=1.0]` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.4.2.5[a_=3.4]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.5[a_=3.4,a=0.01,b=1.0,c_scale=0.99]` | interval changed to `[0.01, 1]` |  |
 | `f1.4.2.5[a_=3.5]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.5[a_=3.5,a=0.01,b=1.0,c_scale=0.99]` | interval changed to `[0.01, 1]` |  |
 | `f1.4.2.5[a_=3.99]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.5[a_=3.99,a=0.01,b=1.0,c_scale=0.99]` | interval changed to `[0.01, 1]` |  |
 | `f1.4.2.6` | `calibration_no_finite_sign_change_at_0` | no action | | f is exactly 0 at `a`, and the interval holds no other root | |
 | `f1.4.3.1` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.3.1` | interval changed to `[0.04, 4]` |  |
-| `f1.4.3.2` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.3.2` | f in an equivalent form without cancellation | yes |
+| `f1.4.3.2` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.3.2` | f in an equivalent form without cancellation; the modified test problem is rejected by `bisection_count_not_exact` | yes |
 | `f1.4.3.5[a=0.0,b=31.4159265359,c_scale=31.4]` | `calibration_no_finite_sign_change_at_0` | some parameter tuples modified | `f1.99.4.3.5` | interval changed to `[0, 30]` |  |
 | `f1.4.3.6` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.3.6` | interval changed to `[-1, 1]` |  |
 | `f1.4.3.14` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.3.14` | f in an equivalent form without cancellation |  |
@@ -161,8 +163,8 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.4.4.2[a=2.14159265359,b=3.14159265359,c_scale=1.0]` | `calibration_no_finite_sign_change_at_0` | no action | | the roots lie too close to `pi` for float64: f has the same sign at both bounds | |
 | `f1.4.4.2[a=3.14159265359,b=4.14159265359,c_scale=1.0]` | `calibration_no_finite_sign_change_at_0` | no action | | the roots lie too close to `pi` for float64: f has the same sign at both bounds | |
 | `f1.4.4.6[a=0.0,b=0.5,c_scale=0.5]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.4.4.6` | interval changed to `[0, 0.495]` |  |
-| `f1.4.4.7[initial_investment=14000.0,monthly_deposit=250.0,goal=25000.0]` | `bisection_count_not_exact` | some parameter tuples modified | `f1.99.4.4.7[initial_investment=14000.0,monthly_deposit=250.0,goal=25000.0]` | f in an equivalent form with less cancellation |  |
-| `f1.4.4.24[a=1.0,b=2.0,c_scale=1.0]` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
+| `f1.4.4.7[initial_investment=13500.0,monthly_deposit=250.0,goal=25000.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.4.7[initial_investment=13500.0,monthly_deposit=250.0,goal=25000.0]` | f in an equivalent form with less cancellation |  |
+| `f1.4.4.7[initial_investment=12500.0,monthly_deposit=300.0,goal=25000.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.4.7[initial_investment=12500.0,monthly_deposit=300.0,goal=25000.0]` | f in an equivalent form with less cancellation |  |
 | `f1.4.4.28` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.4.28` | f in an equivalent form without cancellation |  |
 | `f1.4.5.8` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.5.8` | interval changed to `[0.03, 3.141592653589793]` |  |
 | `f1.4.5.10` | `calibration_no_finite_sign_change_at_0` | no action | | f has no real root | |
@@ -172,17 +174,18 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.4.5.21` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.5.21` | interval changed to `[-2, 1]` |  |
 | `f1.4.5.22` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.5.22` | f in an equivalent form without cancellation | yes |
 | `f1.4.5.23` | `bound_to_width_ratio` | all parameter tuples modified | `f1.99.4.5.23` | x shifted so that the interval becomes `[-0.002, 0.002]`; f in an equivalent form without cancellation |  |
-| `f1.4.6.1[g=9.81,m=82.0,v=36.0,t=4.0,a=3.0,b=5.0,c_scale=2.0]` | `bisection_count_not_exact` | some parameter tuples modified | `f1.99.4.6.1[g=9.81,m=82.0,v=36.0,t=4.0]` | f in an equivalent form with less cancellation |  |
+| `f1.4.6.1[g=9.81,m=82.0,v=36.0,t=4.0,a=3.0,b=5.0,c_scale=2.0]` | `bisection_count_not_exact` | some parameter tuples modified | `f1.99.4.6.1[g=9.81,m=82.0,v=36.0,t=4.0]` | f in an equivalent form with less cancellation; the modified test problem is rejected by `bisection_count_not_exact` |  |
 | `f1.4.6.2[a=3.0,b=5.0,c_scale=2.0]` | `calibration_no_finite_sign_change_at_0` | some parameter tuples modified | `f1.99.4.6.2[a=3.3,b=5.0,c_scale=1.7]` | interval changed to `[3.3, 5]` |  |
 | `f1.4.6.2[a=4.2,b=4.3,c_scale=0.1]` | `calibration_no_finite_sign_change_at_0` | some parameter tuples modified | `f1.99.4.6.2[a=4.2,b=4.26,c_scale=0.06]` | interval changed to `[4.2, 4.26]` | yes |
-| `f1.4.6.16` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.4.6.18` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.6.18` | f in an equivalent form without cancellation |  |
 | `f1.4.6.20[g=9.81,L=4.0,t=2.5,v=5.0]` | `calibration_fails_at_first_probe` | all parameter tuples modified | `f1.99.4.6.20[g=9.81,L=4.0,t=2.5,v=5.0]` | `c` added to f |  |
 | `f1.4.7.4` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.7.4` | interval changed to `[-3, 1]` |  |
 | `f1.4.7.8` | `calibration_no_finite_sign_change_at_0` | no action | | the root has even multiplicity, so f does not change sign | |
 | `f1.4.7.9` | `calibration_fails_at_first_probe` | all parameter tuples modified | `f1.99.4.7.9` | `c` added to f |  |
 | `f1.4.7.11[a=3.2,b=4.0,c_scale=0.8]` | `bisection_count_not_exact` | some parameter tuples modified | `f1.99.4.7.11` | f in an equivalent form without cancellation |  |
+| `f1.4.7.15` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.4.7.19` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.7.19` | interval changed to `[4, 4.6]` |  |
+| `f1.4.7.25` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.4.7.41` | `calibration_no_finite_sign_change_at_0` | no action | | the root has even multiplicity, so f does not change sign | |
 | `f1.4.7.42` | `calibration_no_finite_sign_change_at_0` | no action | | the root has even multiplicity, so f does not change sign | |
 | `f1.4.7.43` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.7.43` | f in an equivalent form without cancellation |  |
