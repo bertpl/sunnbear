@@ -1,4 +1,4 @@
-"""Every random draw in a benchmark run, or in the benchmark suite pipeline's snuffled analyses, uses a derived seed.
+"""Each consumer of randomness, named by a `SeedPurpose`, draws from a seed derived from a root seed.
 
 A derived seed depends only on:
 
@@ -33,8 +33,8 @@ def derive_seed(*, root_seed: int, purpose: SeedPurpose, problem_id: str, mc_sam
     so no problem id can make 2 different sets of arguments encode to the same bytes.
 
     Args:
-        root_seed: The root seed from which every seed of a benchmark run, or of the pipeline's snuffled analyses, is
-            derived.
+        root_seed: The root seed of a benchmark run, or of the benchmark suite pipeline's snuffled analyses; every
+            seed of either is derived from it.
         purpose: What the seed is used for, so that 2 consumers never draw from the same seed.
         problem_id: The id of the test problem, so that each test problem draws its own values.
         mc_sample_idx: The index of the Monte Carlo sample, the (u, v) tuple in the tuple set, so that each

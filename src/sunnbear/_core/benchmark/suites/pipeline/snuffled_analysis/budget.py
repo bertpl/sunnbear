@@ -1,4 +1,4 @@
-"""`SnuffledTier` names a budget of snuffled's analysis, and builds the analysis of a test problem at 1 tuple."""
+"""`SnuffledAnalysisBudget` names a snuffled analysis budget and builds the analysis at 1 Monte Carlo tuple."""
 
 from enum import Enum
 
@@ -13,10 +13,10 @@ SNUFFLED_ANALYSIS_ROOT_SEED = 0
 
 
 # ==================================================================================================
-#  SnuffledTier
+#  SnuffledAnalysisBudget
 # ==================================================================================================
-class SnuffledTier(Enum):
-    """A `SnuffledTier` names a budget of snuffled's analysis of 1 test problem at 1 tuple of the Monte Carlo tuple set.
+class SnuffledAnalysisBudget(Enum):
+    """A `SnuffledAnalysisBudget` names a budget of snuffled's analysis of 1 test problem at 1 Monte Carlo tuple.
 
     Attributes:
         n_fun_samples: The number of x-values at which snuffled samples f across the interval.
@@ -28,7 +28,7 @@ class SnuffledTier(Enum):
     HIGH = (10_000, 100, 100)
 
     def __init__(self, n_fun_samples: int, n_roots: int, n_root_samples: int) -> None:
-        """Store the 3 sample counts of the member's value as the tier's attributes."""
+        """Store the sample counts of the member's value as the budget's attributes."""
         self.n_fun_samples = n_fun_samples
         self.n_roots = n_roots
         self.n_root_samples = n_root_samples
@@ -36,7 +36,7 @@ class SnuffledTier(Enum):
     def build_snuffler(
         self, problem: TestProblem, *, mc_solve_settings: MCSolveSettings, mc_sample_idx: int
     ) -> Snuffler:
-        """Return snuffled's analysis of `problem` at the tuple `mc_sample_idx` of `mc_solve_settings`, at this budget.
+        """Return the analysis of `problem` at this budget, at tuple index `mc_sample_idx` of `mc_solve_settings`.
 
         The analysis covers f at the tuple's ``c`` over the problem's interval. snuffled's `dx` parameter, the smallest
         distance between 2 x-values at which snuffled samples f, is set to the tuple's `xtol`, because snuffled is
