@@ -53,8 +53,12 @@ def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set(size):
 
 @pytest.mark.parametrize("size", MCTuplesSize)
 def test_each_shipped_size_has_means_of_exactly_0_5_and_at_most_1_tuple_per_fine_lane(size):
-    """Each shipped size's mean u and mean v are exactly 0.5, and no 2 of its tuples share a fine lane along u or
-    along v."""
+    """Each shipped size's mean u and mean v round to exactly 0.5, and no 2 of its tuples share a fine lane along u or
+    along v.
+
+    Each value pairs with its mirror 1 - value, so the exact sum of a size's values differs from size / 2 by far less
+    than half a float step; `math.fsum` rounds only that exact sum, so the mean rounds to 0.5.
+    """
     # --- act --------------------------
     tuples = load_mc_tuples(size)
 
@@ -65,11 +69,12 @@ def test_each_shipped_size_has_means_of_exactly_0_5_and_at_most_1_tuple_per_fine
 
 
 @pytest.mark.parametrize("size", MCTuplesSize)
-def test_each_shipped_size_holds_the_same_u_values_as_v_values(size):
+def test_each_shipped_size_has_the_same_set_of_u_values_as_of_v_values(size):
     """Each shipped size's u values and v values are the same set, bit for bit.
 
-    The shipped set is symmetric under rotations by 90 degrees around (0.5, 0.5), and such a rotation turns each
-    tuple's v value into the u value of another tuple in the set.
+    Rotating every tuple (u, v), as a point in the unit square, by 90 degrees clockwise around (0.5, 0.5) maps the
+    shipped set onto itself. That rotation maps (u, v) to (v, 1 - u), so each tuple's v value is the u value of a
+    tuple in the set.
     """
     # --- act --------------------------
     tuples = load_mc_tuples(size)
