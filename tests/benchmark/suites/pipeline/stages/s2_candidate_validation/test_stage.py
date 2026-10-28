@@ -24,8 +24,8 @@ from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
 
 
 def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(isolated_formula_registry):
-    """Of 5 candidates, 1 is valid and each check rejects 1 other, in the order of the checks; the counts per formula
-    match these 5 outcomes."""
+    """Of the candidates, 1 is valid and each check rejects 1 other, in the order of the checks; the counts per formula
+    match these outcomes."""
     # --- arrange ----------------------
     formulas = [
         # the offset 1 / 3 keeps the root off bisection's midpoints, so no solve ends early at an exact 0
@@ -33,7 +33,7 @@ def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(i
         define_formula_cls((99, 902), lambda x, c: x - 100.5 - c, 100.0, 101.0)(),
         define_formula_cls((99, 903), lambda x, c: x + 2.0, -1.0, 1.0)(),
         define_formula_cls((99, 904), lambda x, c: 0.0 if abs(x - c) < 0.01 else x - c, -1.0, 1.0)(),
-        # f is NaN only more than 1.5 left of its root and right of the lower bound, where bisection never evaluates f
+        # f is NaN only between the lower bound and 1.5 left of its root, an interval where bisection never evaluates f
         define_formula_cls((99, 905), lambda x, c: math.nan if -1.0 < x < c - 7 / 6 else x - c - 1 / 3, -1.0, 1.0)(),
     ]
     candidates = CandidateGenerationStage(formulas).compute_output(pl.DataFrame(), worker_pool=WorkerPool(n_workers=1))

@@ -7,6 +7,8 @@ from snuffled import Snuffler
 from sunnbear._core.benchmark.protocol import MCSolveSettings, SeedPurpose, derive_seed
 from sunnbear._core.problems.core import TestProblem
 
+from .function_evaluation_error import FunctionEvaluationError
+
 # Every snuffled analysis in the pipeline derives its seed from this root seed, so that its results are the same in
 # every run of the pipeline.
 SNUFFLED_ANALYSIS_ROOT_SEED = 0
@@ -74,10 +76,3 @@ class SnuffledAnalysisBudget(Enum):
             n_roots=self.n_roots,
             n_root_samples=self.n_root_samples,
         )
-
-
-# ==================================================================================================
-#  FunctionEvaluationError
-# ==================================================================================================
-class FunctionEvaluationError(Exception):
-    """A `FunctionEvaluationError` reports that f raised during snuffled's analysis; f's exception is its cause."""

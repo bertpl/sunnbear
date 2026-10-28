@@ -1,19 +1,21 @@
-"""`find_snuffled_rejection_reason` rejects a candidate for each rule that snuffled's analysis fails at a sampled tuple,
-and `select_snuffled_tuples` samples the tuples closer together near the ends of the c-range."""
+"""`find_snuffled_rejection_reason` rejects a candidate for each condition that snuffled's analysis detects at a
+sampled tuple, and `plan_snuffled_analyses` samples the tuples closer together near the ends of the c-range."""
 
 import math
 
 import numpy as np
 import pytest
+from snuffled import Diagnostic
 
 from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, CRange, MCSolveSettings
 from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import SnuffledAnalysisBudget
 from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation import RejectionReason
 from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.check4_snuffled_diagnostics import (
+    _FLAG_REJECTION_REASONS,
     N_SNUFFLED_TUPLES,
     find_snuffled_rejection_reason,
-    select_snuffled_tuples,
+    plan_snuffled_analyses,
 )
 from sunnbear._core.problems.core import FormulaRegistry
 from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
@@ -39,7 +41,7 @@ from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
             id="inf_values",
         ),
         pytest.param(lambda x, c: x * x + 1.0, RejectionReason.SNUFFLED_NO_ZEROS_DETECTED, id="no_zeros"),
-        # 2 roots, and f has the same sign at both interval bounds
+        # f has 2 roots and the same sign at both interval bounds
         pytest.param(
             lambda x, c: x * x - 0.25, RejectionReason.SNUFFLED_INTERVAL_NOT_BRACKETING_READY, id="no_bracket"
         ),
@@ -55,7 +57,7 @@ from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
     ],
 )
 def test_the_check_rejects_a_problem_for_each_failed_rule(isolated_formula_registry, xc_fun, reason):
-    """A simple root passes; each other test problem fails 1 rule, and the check returns that rule's reason."""
+    """A simple root passes; each other test problem meets 1 rejection condition, and the check returns its reason."""
     # --- arrange ----------------------
     define_formula_cls((99, 931), xc_fun, -1.0, 1.0)
     problem = FormulaRegistry.candidate_from_id("f99.931").calibrated(c_min=-0.5, c_max=0.5)
@@ -67,7 +69,7 @@ def test_the_check_rejects_a_problem_for_each_failed_rule(isolated_formula_regis
     assert rejection_reason is reason
 
 
-def test_the_sampled_tuples_span_the_c_range_with_the_high_budget_at_4_positions():
+def test_the_planned_analyses_span_the_c_range_with_the_high_budget_at_4_positions():
     """The sampled tuples are distinct and ascend in ``c`` from the smallest to the largest ``c``; the HIGH budget falls
     on the 2 outermost and on 2 near the middle."""
     # --- arrange ----------------------
@@ -80,14 +82,20 @@ def test_the_sampled_tuples_span_the_c_range_with_the_high_budget_at_4_positions
     )
 
     # --- act --------------------------
-    sampled_tuples = select_snuffled_tuples(mc_solve_settings)
+    planned_analyses = plan_snuffled_analyses(mc_solve_settings)
 
     # --- assert -----------------------
-    cs = mc_solve_settings.cs[[mc_sample_idx for mc_sample_idx, _ in sampled_tuples]]
-    assert len(sampled_tuples) == N_SNUFFLED_TUPLES
+    cs = mc_solve_settings.cs[[mc_sample_idx for mc_sample_idx, _ in planned_analyses]]
+    assert len(planned_analyses) == N_SNUFFLED_TUPLES
     assert np.all(np.diff(cs) > 0)
     assert (cs[0], cs[-1]) == (mc_solve_settings.cs.min(), mc_solve_settings.cs.max())
     high_budget_positions = [
-        position for position, (_, budget) in enumerate(sampled_tuples) if budget is SnuffledAnalysisBudget.HIGH
+        position for position, (_, budget) in enumerate(planned_analyses) if budget is SnuffledAnalysisBudget.HIGH
     ]
     assert high_budget_positions == [0, 14, 17, 31]
+
+
+def test_the_flags_cover_every_diagnostic_except_the_max_zero_width():
+    """`_FLAG_REJECTION_REASONS` maps every diagnostic of snuffled except `MAX_ZERO_WIDTH` to a reason."""
+    # --- act / assert -----------------
+    assert set(_FLAG_REJECTION_REASONS) == set(Diagnostic) - {Diagnostic.MAX_ZERO_WIDTH}
