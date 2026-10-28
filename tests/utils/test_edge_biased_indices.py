@@ -20,7 +20,7 @@ from sunnbear._core.utils.edge_biased_indices import select_edge_biased_indices
     ],
 )
 def test_select_edge_biased_indices(n_selected, n_total, indices):
-    """The indices follow the rounded geometric gaps whose ratio makes the 2 halves meet at the center."""
+    """The indices are the rounded sums of geometric gaps whose next term is the gap between the 2 middle indices."""
     # --- act / assert -----------------
     assert select_edge_biased_indices(n_selected=n_selected, n_total=n_total).tolist() == indices
 
