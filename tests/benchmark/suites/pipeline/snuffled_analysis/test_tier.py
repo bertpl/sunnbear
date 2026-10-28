@@ -7,7 +7,7 @@ from snuffled import Snuffler
 import sunnbear.problems as problems  # Import the module, so that pytest does not collect the `TestProblem` class.
 from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, MCSolveSettings, SeedPurpose, derive_seed
-from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import ROOT_SEED, SnuffledTier
+from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import SNUFFLED_ANALYSIS_ROOT_SEED, SnuffledTier
 from sunnbear._core.problems.core import FormulaRegistry
 from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
 
@@ -15,7 +15,7 @@ _MC_SAMPLE_IDX = 5
 
 
 def _build_problem_and_settings() -> tuple[problems.TestProblem, MCSolveSettings]:
-    """Return a test problem with its root at ``c + 1/3`` on [-1, 1], and the settings of its solves at size 1024."""
+    """Return a test problem with its root at ``c + 1/3`` on [-1, 1], and its settings at the largest tuple set size."""
     define_formula_cls((99, 921), lambda x, c: x - c - 1 / 3, -1.0, 1.0)
     problem = FormulaRegistry.candidate_from_id("f99.921").calibrated(c_min=-0.5, c_max=0.5)
     mc_solve_settings = MCSolveSettings.from_test_problem(
@@ -26,7 +26,7 @@ def _build_problem_and_settings() -> tuple[problems.TestProblem, MCSolveSettings
 
 @pytest.mark.parametrize("tier", list(SnuffledTier))
 def test_build_snuffler_analyzes_f_at_the_tuple_with_the_tier_budget(isolated_formula_registry, tier):
-    """The analysis finds the root at the tuple's ``c``, has the tier's budget, and the tuple's `xtol` as `dx`."""
+    """Snuffled finds the root at the tuple's ``c`` with `xtol` as `dx` and the tier's `n_fun_samples` and `n_roots`."""
     # --- arrange ----------------------
     problem, mc_solve_settings = _build_problem_and_settings()
 
@@ -42,12 +42,12 @@ def test_build_snuffler_analyzes_f_at_the_tuple_with_the_tier_budget(isolated_fo
 
 
 def test_build_snuffler_draws_from_the_seed_of_the_problem_and_the_tuple(isolated_formula_registry):
-    """The analysis samples f at the x-values that the seed from `derive_seed` gives, and another seed gives others."""
+    """The analysis samples f at x-values drawn from `derive_seed`'s seed; another seed draws other x-values."""
     # --- arrange ----------------------
     problem, mc_solve_settings = _build_problem_and_settings()
     seed = (
         derive_seed(
-            root_seed=ROOT_SEED,
+            root_seed=SNUFFLED_ANALYSIS_ROOT_SEED,
             purpose=SeedPurpose.SNUFFLED_ANALYSIS,
             problem_id="f99.921",
             mc_sample_idx=_MC_SAMPLE_IDX,
