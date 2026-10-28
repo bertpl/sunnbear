@@ -120,7 +120,7 @@ class MCTuplesStats:
     fractions into 1 number by which tuple sets are compared.
 
     `MCTuplesStats` takes an `(n, 2)` array, not an `MCTuples`, so that a caller that holds tuples only as an array,
-    such as a size's tuples before the value correction, does not have to build an `MCTuples` first.
+    such as a size's tuples after its selection solve, does not have to build an `MCTuples` first.
     """
 
     def __init__(self, tuple_array: ArrayLike) -> None:

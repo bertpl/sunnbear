@@ -14,7 +14,6 @@ from sunnbear._core.utils.float_bits import (
     n_bits_binary,
     n_bits_decimal,
     n_bits_rational,
-    nearest_float_with_min_n_bits,
 )
 
 LOG2_10 = math.log2(10)
@@ -112,33 +111,6 @@ def test_draw_floats_with_min_n_bits_draws_inside_each_open_interval_with_at_lea
     # --- assert -----------------------
     assert np.all((values > lows) & (values < highs))
     assert min(n_bits(float(value)) for value in values) >= 50
-
-
-@pytest.mark.parametrize("x", [0.5, 37 / 1024, 0.1, 0.123])
-def test_nearest_float_with_min_n_bits_nudges_a_trivial_value_by_a_few_float64_steps(x):
-    """A trivial value moves to a value with at least 50 bits, a few float64 steps away, inside the interval."""
-    # --- act --------------------------
-    nearest = nearest_float_with_min_n_bits(x, 50, x - 0.01, x + 0.01)
-
-    # --- assert -----------------------
-    assert nearest is not None
-    assert n_bits(nearest) >= 50
-    assert 0 < abs(nearest - x) <= 4 * math.ulp(x)
-
-
-def test_nearest_float_with_min_n_bits_keeps_a_value_that_already_has_them():
-    """A value with at least `min_n_bits` bits comes back unchanged."""
-    # --- arrange ----------------------
-    x = math.pi / 4
-
-    # --- act / assert -----------------
-    assert nearest_float_with_min_n_bits(x, 50, 0.0, 1.0) == x
-
-
-def test_nearest_float_with_min_n_bits_returns_none_when_no_value_inside_the_interval_qualifies():
-    """When the open interval holds only the trivial value 0.5, no value qualifies."""
-    # --- act / assert -----------------
-    assert nearest_float_with_min_n_bits(0.5, 50, math.nextafter(0.5, 0.0), math.nextafter(0.5, 1.0)) is None
 
 
 def test_draw_floats_with_min_n_bits_draws_again_a_value_on_the_edge_of_its_interval():

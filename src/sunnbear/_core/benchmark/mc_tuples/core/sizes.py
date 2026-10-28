@@ -1,16 +1,12 @@
 """`MCTuplesSize` lists the sizes in which the shipped Monte Carlo tuple set comes; the fine lanes follow from them.
 
-The construction corrects every size's u values and v values toward the same mean, `TARGET_MEAN`, and gives each value
-at least `MIN_N_BITS` bits of information.
+The construction gives each value at least `MIN_N_BITS` bits of information.
 """
 
 from enum import IntEnum
 from typing import NoReturn
 
 import numpy as np
-
-# `TARGET_MEAN` is the mean toward which the construction corrects every size's u values and v values.
-TARGET_MEAN = 0.5
 
 # `MIN_N_BITS` is the fewest bits of information (`n_bits`) that the construction leaves in any u value or v value, so
 # that no short binary, decimal or rational description reproduces a value exactly; a random float64 value holds about
@@ -76,11 +72,7 @@ N_FINE_LANES = int(max(MCTuplesSize))
 
 
 def fine_lanes_of(values: np.ndarray) -> np.ndarray:
-    """Return the fine lane of each value; fine lane `i` holds the values in `[i, i + 1) / N_FINE_LANES`.
-
-    A value below 0, such as a value on an axis that the mean correction negates for a right shift, gets a negative
-    `i`.
-    """
+    """Return the fine lane of each value; fine lane `i` holds the values in `[i, i + 1) / N_FINE_LANES`."""
     return np.floor(values * N_FINE_LANES).astype(np.int64)
 
 
