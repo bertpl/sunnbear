@@ -34,7 +34,7 @@ def test_draw_in_off_diagonal_cells_spreads_the_candidates_evenly_over_the_off_d
     population = MCTuplesPopulation.draw_in_off_diagonal_cells(n_population, _FREE_LANES, np.random.default_rng(1))
 
     # --- assert -----------------------
-    assert population.tuple_array.shape == (population.u.size, 2)
+    assert population.base_tuple_array.shape == (population.u.size, 2)
     assert not np.any(population.u_lane == population.v_lane)
     cells = np.zeros((N_FINE_LANES, N_FINE_LANES), dtype=np.int64)
     np.add.at(cells, (population.u_lane, population.v_lane), 1)
@@ -58,7 +58,7 @@ def test_draw_in_fine_cells_of_puts_each_base_tuple_first_and_its_candidates_ins
 
     # --- assert -----------------------
     assert population.u.size == 18
-    assert np.array_equal(population.tuple_array[::6], base_tuple_array)
+    assert np.array_equal(population.base_tuple_array[::6], base_tuple_array)
     for values, lanes, column in ((population.u, population.u_lane, 0), (population.v, population.v_lane, 1)):
         assert np.array_equal(lanes, np.repeat(fine_lanes_of(base_tuple_array[:, column]), 6))
         assert np.array_equal(fine_lanes_of(values), lanes)
@@ -78,7 +78,7 @@ def test_every_drawn_value_and_its_mirror_hold_at_least_min_n_bits():
 
     # --- assert -----------------------
     drawn_values = np.concatenate(
-        [off_diagonal.u, off_diagonal.v, np.delete(in_fine_cells.tuple_array, np.s_[::501], axis=0).ravel()]
+        [off_diagonal.u, off_diagonal.v, np.delete(in_fine_cells.base_tuple_array, np.s_[::501], axis=0).ravel()]
     )
     assert drawn_values.size == 2 * off_diagonal.u.size + 2000
     assert min(n_bits(float(value)) for value in drawn_values) >= MIN_N_BITS

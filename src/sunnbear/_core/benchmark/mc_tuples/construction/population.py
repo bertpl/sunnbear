@@ -4,7 +4,8 @@ A base tuple stands for its 4 tuples (`rotations`). Its u and v lie in the lower
 fine cell is the crossing of 2 lower fine lanes. Each size has 2 populations, 1 per max-div solve: the selection's
 (`draw_in_off_diagonal_cells`) and the refinement's (`draw_in_fine_cells_of`).
 
-The selection's population lies in the off-diagonal fine cells of the lower fine lanes that the size below leaves free.
+The selection's population lies in the fine cells of the lower fine lanes that the size below leaves free, except the
+diagonal cells, whose u and v share a fine lane.
 A candidate in any other fine cell could never be picked:
 
 - a lane that the size below uses would hold 2 values;
@@ -12,17 +13,19 @@ A candidate in any other fine cell could never be picked:
 
 The selection's population is drawn in 2 steps:
 
-1. `spread_evenly_over_grid` picks each candidate's fine cell at random on the grid of free lanes by free lanes, so
-   that every free lane and every fine cell holds the same number of candidates, give or take 1; the candidates in
-   diagonal cells are then dropped;
+1. `spread_evenly_over_grid` picks each candidate's fine cell at random on the grid whose rows and columns are the free
+   lanes, so that every free lane and every fine cell holds the same number of candidates, give or take 1; the
+   candidates in diagonal cells are then dropped;
 2. each candidate lies at its own uniform random position inside its fine cell.
 
 The refinement's population lies only in the fine cells of given base tuples: each base tuple comes first, followed by
 `n_random_candidates_per_cell` candidates at uniform random positions inside its fine cell.
 
 Every value and its mirror, 1 - value, become u values and v values of the set, so both hold at least `MIN_N_BITS`
-bits of information (`draw_floats_with_min_n_bits`). A fine lane's edges are multiples of 1 / `N_FINE_LANES`, and
-`N_FINE_LANES` is a power of 2, so each edge holds few bits; no value lands on an edge.
+bits of information (`draw_floats_with_min_n_bits`).
+
+A fine lane's edges are multiples of 1 / `N_FINE_LANES`, and `N_FINE_LANES` is a power of 2, so each edge holds fewer
+bits than a drawn value, and no value lands on an edge.
 """
 
 from dataclasses import dataclass
@@ -54,8 +57,8 @@ class MCTuplesPopulation:
     v_lane: np.ndarray
 
     @property
-    def tuple_array(self) -> np.ndarray:
-        """Return the candidates as an `(n, 2)` array of (u, v) values."""
+    def base_tuple_array(self) -> np.ndarray:
+        """Return the candidate base tuples as an `(n, 2)` array of (u, v) values."""
         return np.column_stack([self.u, self.v])
 
     # --------------------------------------------------------------------------
@@ -82,7 +85,7 @@ class MCTuplesPopulation:
     def draw_in_off_diagonal_cells(
         cls, n_population: int, free_lanes: np.ndarray, rng: np.random.Generator
     ) -> "MCTuplesPopulation":
-        """Draw candidates over the off-diagonal fine cells of `free_lanes` by `free_lanes`.
+        """Draw candidates over the off-diagonal fine cells of the grid whose rows and columns are `free_lanes`.
 
         `n_population` candidates are spread evenly over all fine cells of the grid, the diagonal included; those in a
         diagonal cell are then dropped, about `n_population / free_lanes.size` of them.

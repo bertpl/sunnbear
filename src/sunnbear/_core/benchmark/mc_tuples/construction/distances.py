@@ -7,25 +7,28 @@ different numbers of gaps:
 - on a circle, the `k` values of a size leave `k` gaps, so the next size's `k` new values fit 1 per gap;
 - on a line whose 2 ends are occupied, `k` values leave `k - 1` gaps, and 1 gap has to take 2 new values.
 
-A candidate of the max-div problem is a base tuple, which stands for its 4 tuples (`rotations`). A rotation keeps every
-cyclic distance, so the shortest distance between the 4 tuples of base tuple p and the 4 tuples of base tuple q is the
-shortest distance from p to the 4 tuples of q; each of the 4 tuples of p has the same nearest-neighbor distance.
+A candidate of the max-div problem is a base tuple, which stands for its 4 tuples (`rotations`).
+
+A rotation keeps every cyclic distance, so the shortest distance between the 4 tuples of base tuple p and the 4 tuples
+of base tuple q is the shortest distance from p to the 4 tuples of q; each of the 4 tuples of p has the same
+nearest-neighbor distance.
 
 A tuple's nearest neighbor can also be 1 of the other 3 tuples of its own base tuple. To count these neighbors, every
-problem holds a placeholder at index 0: a vector with u < 0 that every selection includes. The distance from the
-placeholder to a base tuple is that base tuple's distance to the nearest of its own other 3 tuples.
+problem holds a placeholder at index 0: a vector with u < 0 that every selection includes.
 
-max-div calls a distance function with the vector of the lower index first, so the placeholder is always the first
-vector.
+The distance from the placeholder to a base tuple is that base tuple's distance to the nearest of its own other 3
+tuples. max-div calls a distance function with the vector of the lower index first, so the placeholder is always the
+first vector.
 
-Along an axis, max-div gives each candidate 1 nearest-neighbor distance, but the 4 tuples of a base tuple put 2 values
-on each axis, its u and its v, and their mirrors 1 - u and 1 - v.
+Along an axis, the 4 tuples of a base tuple hold 4 values, its u and v and their mirrors 1 - u and 1 - v, but max-div
+gives each candidate only 1 nearest-neighbor distance.
 
 One metric serves both axes: it takes the shortest distance between a value of 1 base tuple and a value or mirror of
-the other; this covers the first base tuple's mirrors too, because mirroring both values keeps their cyclic distance.
+the other. The first base tuple's mirrors need no separate check, because mirroring both values keeps their cyclic
+distance.
 
-A base tuple's nearest-neighbor distance along an axis is then the smaller of those of its u and its v, and it is the
-same along u and along v.
+A base tuple's nearest-neighbor distance along an axis is then the smaller of the nearest-neighbor distances of its u
+and its v, and this distance is the same along u and along v.
 
 numba compiles the distance functions that max-div calls through `DistanceMetric.custom`, so they are module-level.
 """
@@ -83,11 +86,11 @@ def base_tuple_squared_l2_distance(a: np.ndarray, b: np.ndarray) -> float:
 
 
 @numba.njit(fastmath={"reassoc", "contract"})
-def base_tuple_axes_distance(a: np.ndarray, b: np.ndarray) -> float:
+def base_tuple_value_distance(a: np.ndarray, b: np.ndarray) -> float:
     """Return the smallest cyclic distance between a value of base tuple `a` and a value or mirror of base tuple `b`.
 
-    With the placeholder as `a`, return the smallest distance between a value of `b` and its other value, that value's
-    mirror, or its own mirror.
+    With the placeholder as `a`, return the smallest of 3 distances: from the u of `b` to its v or to 1 - v, from u to
+    1 - u, and from v to 1 - v.
     """
     b_u, b_v = float(b[0]), float(b[1])
     if a[0] < 0.0:
@@ -109,4 +112,4 @@ def base_tuple_axes_distance(a: np.ndarray, b: np.ndarray) -> float:
 BASE_TUPLE_SQUARED_L2_DISTANCE_METRIC = DistanceMetric.custom(
     base_tuple_squared_l2_distance, label="base-tuple cyclic squared L2"
 )
-BASE_TUPLE_AXES_DISTANCE_METRIC = DistanceMetric.custom(base_tuple_axes_distance, label="base-tuple cyclic axes")
+BASE_TUPLE_VALUE_DISTANCE_METRIC = DistanceMetric.custom(base_tuple_value_distance, label="base-tuple cyclic value")

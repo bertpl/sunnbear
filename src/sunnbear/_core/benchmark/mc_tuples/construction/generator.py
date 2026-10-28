@@ -16,9 +16,13 @@ package named in parentheses:
 2. the refinement solve moves each new base tuple within its fine cell, the crossing of its fine u-lane and fine v-lane
    (`refinement`).
 
-Both solves share the max-div objective and the constraint that keeps the size below's base tuples (`solve`), and the
-distances between base tuples (`distances`). Both draw every value of their populations, and its mirror 1 - value, with
-at least `MIN_N_BITS` bits of information (`population`).
+Both solves share:
+
+- the max-div objective and the constraint that keeps the size below's base tuples (`solve`);
+- the distances between base tuples (`distances`).
+
+Both solves draw their populations so that every value, and its mirror 1 - value, holds at least `MIN_N_BITS` bits of
+information (`population`).
 
 `MCTuplesGenerator` passes each size's result, an `MCTuplesSizeResult`, to the caller's `on_size_finished`, so that a
 long construction can show its progress and store its tuples and max-div's solutions as it goes.
@@ -175,14 +179,14 @@ class MCTuplesGenerator:
     def _build_size(
         self,
         size: MCTuplesSize,
-        size_below: MCTuplesSizeResult | None,
+        size_below_result: MCTuplesSizeResult | None,
         t_budget_sec: float,
         settings: MCTuplesSolveSettings,
     ) -> MCTuplesSizeResult:
-        """Build `size` on `size_below`, the size below's result or None for the smallest size, and return it."""
+        """Build `size` on `size_below_result`, None for the smallest size, and return the result of `size`."""
         t_start = time.perf_counter()
-        if size_below is not None:
-            required_base_tuple_array = size_below.refined_base_tuple_array
+        if size_below_result is not None:
+            required_base_tuple_array = size_below_result.refined_base_tuple_array
         else:
             required_base_tuple_array = np.zeros((0, 2))
         t_refinement_budget_sec = self.REFINEMENT_FRACTION_OF_SIZE_T_BUDGET * t_budget_sec
@@ -224,7 +228,9 @@ def generate_mc_tuples(
 
     Size `k` of the set is its first `k` tuples. Each size consists of base tuples in [0, 0.5]^2, each followed by its
     rotations by 90, 180 and 270 degrees around (0.5, 0.5), which map (u, v) to (1 - v, u), (1 - u, 1 - v) and
-    (v, 1 - u). So every size's u values and v values are the same set, symmetric around 0.5, and every size's mean u
+    (v, 1 - u).
+
+    So every size's u values and v values are the same set, symmetric around 0.5, and every size's mean u
     and mean v are exactly 0.5.
 
     Each axis is cut into as many equal fine lanes as the largest `MCTuplesSize` holds tuples, and no 2 tuples share a
@@ -239,9 +245,10 @@ def generate_mc_tuples(
 
     Both solves maximize the geomean of 3 values of gpq(0.1), the geometric pseudo-quantile at level 0.1, a soft
     minimum that `MCTuplesStats` reports: one over each tuple's distance to its nearest other tuple along u, one along v
-    and one in squared L2. Along each axis, a base tuple holds 2 values, its u and its v, but max-div gives each
-    candidate only 1 nearest-neighbor distance per metric, so the solves count the smaller of the 2 values'
-    nearest-neighbor distances.
+    and one in squared L2.
+
+    Along each axis, a base tuple holds 2 values, its u and its v, but max-div gives each candidate only 1
+    nearest-neighbor distance per metric, so the solves count the smaller of the 2 values' nearest-neighbor distances.
 
     Every distance is measured cyclically: each axis is a circle on which 0 and 1 meet, so a value near 0 and a value
     near 1 count as close.

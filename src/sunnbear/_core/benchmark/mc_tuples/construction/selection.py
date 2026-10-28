@@ -77,13 +77,14 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
     def _initial_new_selection(self) -> np.ndarray:
         """Return a random starting selection of new candidates, ascending, as indices into the population.
 
-        The candidates are taken in random order, each one whose 2 lower fine lanes are still unused, until the size has
-        its new base tuples.
+        The candidates are taken in random order, and each one whose 2 lower fine lanes are both still unused is picked,
+        until the size has its new base tuples.
 
-        A candidate is passed over only when 1 of its lanes is used, so 2 lanes stay unused at the end only if no
-        candidate lies in their fine cells. At the largest size, when the population holds at least 1 candidate per fine
-        cell of the free lanes, every pair of free lanes has a candidate in its fine cell, so the random starting
-        selection always uses every free lane.
+        A candidate is passed over only when 1 of its lanes is used, so a pair of free lanes stays unused at the end
+        only if no candidate lies in the 2 fine cells where those lanes cross.
+
+        At the largest size, when the population holds at least 1 candidate per fine cell of the free lanes, every pair
+        of free lanes has a candidate in its fine cell, so the random starting selection always uses every free lane.
 
         Raises:
             MCTuplesConstructionError: If the population runs out before the size has its new base tuples.

@@ -28,13 +28,13 @@ from sunnbear._core.benchmark.mc_tuples.construction.selection import MCTuplesSe
 def _take_the_starting_selection(self: MCTuplesSelectionSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
     """Replace `MCTuplesSelectionSolve.run`: return the random starting selection, without running max-div."""
     new = self._initial_new_selection()
-    return np.vstack([self.required_base_tuple_array, self.population.tuple_array[new]]), None
+    return np.vstack([self.required_base_tuple_array, self.population.base_tuple_array[new]]), None
 
 
 def _pick_each_cell_s_last_candidate(self: MCTuplesRefinementSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
     """Replace `MCTuplesRefinementSolve.run`: pick the last candidate of each fine cell, without running max-div."""
     n_per_cell = self.n_random_candidates_per_cell + 1
-    new = self.population.tuple_array[n_per_cell - 1 :: n_per_cell]
+    new = self.population.base_tuple_array[n_per_cell - 1 :: n_per_cell]
     return np.vstack([self.required_base_tuple_array, new]), None
 
 

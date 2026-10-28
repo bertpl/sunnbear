@@ -132,7 +132,7 @@ def report_size(result: MCTuplesSizeResult, inspection_dir: Path | None) -> None
     spreads = [MCTuplesStats(result.selected_tuple_array), result.tuples.stats()]
     print(f"k={int(result.size)}: budget {result.t_budget_sec:.0f} s, wall {result.t_wall_sec:.0f} s", flush=True)
     print(
-        f"  gpq(0.1) u / v / L2 and score, after the selection → refinement: "
+        f"  gpq(0.1) u / v / L2 and score, after the selection solve → after the refinement solve: "
         f"{' → '.join(format_spread(stats) for stats in spreads)}",
         flush=True,
     )

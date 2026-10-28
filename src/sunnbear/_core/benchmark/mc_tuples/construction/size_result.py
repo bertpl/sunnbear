@@ -7,8 +7,6 @@ from max_div.solver import ParallelMaxDivSolution
 
 from sunnbear._core.benchmark.mc_tuples.core import MCTuples, MCTuplesSize
 
-from .rotations import tuple_array_of
-
 
 # ==================================================================================================
 #  MCTuplesSizeResult
@@ -41,10 +39,31 @@ class MCTuplesSizeResult:
     @property
     def selected_tuple_array(self) -> np.ndarray:
         """Return the size's tuples after the selection solve, with the size below's tuples first."""
-        return tuple_array_of(self.selected_base_tuple_array)
+        return self._tuple_array_of(self.selected_base_tuple_array)
 
     @property
     def tuples(self) -> MCTuples:
         """Return the size's final tuples, with the size below's tuples first."""
-        tuple_array = tuple_array_of(self.refined_base_tuple_array)
+        tuple_array = self._tuple_array_of(self.refined_base_tuple_array)
         return MCTuples(tuple_array[:, 0], tuple_array[:, 1])
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _tuple_array_of(base_tuple_array: np.ndarray) -> np.ndarray:
+        """Return each base tuple's 4 tuples as consecutive rows, the base tuple first.
+
+        The 3 rows after a base tuple are its rotations by 90, 180 and 270 degrees (`rotations`).
+        """
+        u, v = base_tuple_array[:, 0], base_tuple_array[:, 1]
+        # The 4 tuples are built from these 4 values, never by rotating a tuple 3 times: in float64,
+        # `1.0 - (1.0 - v)` is not always `v`.
+        mirrored_u, mirrored_v = 1.0 - u, 1.0 - v
+        rotations = [
+            np.column_stack([u, v]),
+            np.column_stack([mirrored_v, u]),
+            np.column_stack([mirrored_u, mirrored_v]),
+            np.column_stack([v, mirrored_u]),
+        ]
+        return np.stack(rotations, axis=1).reshape(-1, 2)

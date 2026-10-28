@@ -14,7 +14,8 @@ about 51 to 54 bits in each representation, and a trivial value far less:
 A multiple of a constant such as π or e does not count as trivial, because there are too many such constants to check.
 Each measure takes a finite value, and returns 0 for 0.
 
-`draw_floats_with_min_n_bits` draws values with a given minimum of `n_bits` at random in given intervals.
+`draw_floats_with_min_n_bits` draws random values in given intervals, each with at least a given number of bits as
+`n_bits` counts them.
 """
 
 import math

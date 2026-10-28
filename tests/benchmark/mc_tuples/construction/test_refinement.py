@@ -56,7 +56,7 @@ def test_the_starting_selection_is_the_selected_new_base_tuples():
 
     # --- assert -----------------------
     assert start.tolist() == (9 * np.arange(8)).tolist()
-    assert np.array_equal(solve.population.tuple_array[start], _NEW_OF_SIZE_64)
+    assert np.array_equal(solve.population.base_tuple_array[start], _NEW_OF_SIZE_64)
 
 
 # ==================================================================================================
