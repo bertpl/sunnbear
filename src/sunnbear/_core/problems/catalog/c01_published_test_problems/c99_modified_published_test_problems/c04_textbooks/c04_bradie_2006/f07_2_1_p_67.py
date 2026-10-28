@@ -41,9 +41,9 @@ class ModifiedBradie200621P67(Formula):
     of 1; the form still subtracts ``goal - initial_investment``, because f is by definition the savings after 3 years
     minus the goal, and the form moves the ``initial_investment`` term of the savings into that subtraction.
 
-    The subtraction of ``goal - initial_investment`` still leaves f exactly 0 at 3 to 10 x-values, depending on the
-    parameter tuple, all within about 1e-16 of the root, so that bisection can still stop early for some values of
-    ``c``, but for none of the values of ``c`` of the shipped Monte Carlo tuple set.
+    The subtraction of ``goal - initial_investment`` still leaves f exactly 0 at 3 to 10 x-values, all within about
+    1e-16 of the root, so that bisection can still stop early for some values of ``c``, but for none of the values of
+    ``c`` of the shipped Monte Carlo tuple set.
 
     Whether bisection lands on an x-value where f is exactly 0 depends on the parameter tuple and on the sampled values
     of ``c``, so the parameter tuples that the validation stage rejects can change with the sampled values; the formula
