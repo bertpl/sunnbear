@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f04_f27, f05_f29, f19_f75, f21_f81
+from . import f04_f27, f05_f29, f11_f40, f19_f75, f21_f81
 
 
 class ModifiedGanchovskiSmithRackauckasTomovTraykov2026(FormulaCategory):

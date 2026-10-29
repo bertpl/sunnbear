@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f01_1_1, f02_1_7, f05_4_7_4_8, f06_4_7_4_10, f14_ex_4_3, f15_ex_4_10_c
+from . import f01_1_1, f02_1_7, f05_4_7_4_8, f06_4_7_4_10, f13_ex_4_1_5, f14_ex_4_3, f15_ex_4_10_c
 
 
 class ModifiedMoler2004(FormulaCategory):
