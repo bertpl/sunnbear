@@ -10,4 +10,4 @@ A fidelity sets how much work goes into each feature vector. Each such pipeline 
 
 from .characterization_stage import CandidateCharacterizationStage
 from .characterization_task import CandidateCharacterizationTask
-from .fidelity import ANALYTICAL_PROPERTIES, EMPIRICAL_GPQ_LEVELS, FeatureFidelity
+from .fidelity import SNUFFLED_PROPERTIES, SOLVERS_GPQ_LEVELS, FeatureFidelity

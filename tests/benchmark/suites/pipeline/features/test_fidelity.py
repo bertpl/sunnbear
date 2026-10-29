@@ -1,9 +1,9 @@
-"""`FeatureFidelity.feature_column_names` names the empirical block first, then the analytical block, each with the
+"""`FeatureFidelity.feature_column_names` names the solvers block first, then the snuffled block, each with the
 fidelity's prefix."""
 
 from snuffled import FunctionProperty, RootProperty
 
-from sunnbear._core.benchmark.suites.pipeline.features import ANALYTICAL_PROPERTIES, FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.features import SNUFFLED_PROPERTIES, FeatureFidelity
 
 
 def test_the_column_names_hold_1_geomean_per_config_9_gpq_levels_and_10_properties():
@@ -14,9 +14,9 @@ def test_the_column_names_hold_1_geomean_per_config_9_gpq_levels_and_10_properti
 
     # --- assert -----------------------
     assert column_names == [
-        "coarse_emp_geomean_brent",
-        "coarse_emp_geomean_toms748[k=1]",
-        *(f"coarse_emp_gpq_{level}" for level in range(10, 100, 10)),
-        *(f"coarse_ana_{prop.value}" for prop in ANALYTICAL_PROPERTIES),
+        "coarse_solvers_geomean_brent",
+        "coarse_solvers_geomean_toms748[k=1]",
+        *(f"coarse_solvers_gpq_{level}" for level in range(10, 100, 10)),
+        *(f"coarse_snuffled_{prop.value}" for prop in SNUFFLED_PROPERTIES),
     ]
-    assert set(ANALYTICAL_PROPERTIES) == {*RootProperty, *FunctionProperty}
+    assert set(SNUFFLED_PROPERTIES) == {*RootProperty, *FunctionProperty}

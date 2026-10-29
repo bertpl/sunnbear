@@ -89,7 +89,7 @@ def test_the_stage_gives_the_same_output_with_1_or_2_workers():
 
 
 def test_the_stage_needs_a_core_solver_config():
-    """A characterization stage without core solver configs has no empirical block, so it refuses to be created."""
+    """A characterization stage without core solver configs has no solvers block, so it refuses to be created."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="at least 1 core solver config"):
         CoarseCharacterizationStage([])
