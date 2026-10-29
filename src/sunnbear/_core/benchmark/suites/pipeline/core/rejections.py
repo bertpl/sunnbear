@@ -50,6 +50,9 @@ class RejectionReason(StrEnum):
     SNUFFLED_ALL_ROOTS_TOO_CLOSE_TO_EDGE = "snuffled_all_roots_too_close_to_edge"
     # At 1 of the sampled tuples, snuffled's `MAX_ZERO_WIDTH` exceeds `MAX_ZERO_WIDTH_IN_XTOL` times the tuple's `xtol`.
     SNUFFLED_MAX_ZERO_WIDTH_TOO_LARGE = "snuffled_max_zero_width_too_large"
+    # 1 of the solves of a characterization stage ends with `SolveStatus.FUNCTION_ERROR`: f raises, or returns a value
+    # that is not finite, at an x inside the interval.
+    FUNCTION_ERROR = "function_error"
 
 
 # The report `REJECTED_CANDIDATES_REPORT_NAME` adds this column to each rejected candidate: its `RejectionReason`.

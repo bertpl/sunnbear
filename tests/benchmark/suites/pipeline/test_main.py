@@ -2,17 +2,26 @@
 ``--workspace`` directory with ``--n-workers`` workers, prints the rejections per formula, and refuses to run without a
 workspace."""
 
+import re
 import runpy
 import sys
 
 import pytest
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageManifest
-from sunnbear._core.benchmark.suites.pipeline.stages import CandidateGenerationStage, CandidateValidationStage
+from sunnbear._core.benchmark.suites.pipeline.stages import (
+    CandidateGenerationStage,
+    CandidateValidationStage,
+    CoarseCharacterizationStage,
+)
 from sunnbear._core.problems.core import FormulaRegistry
 
 _PIPELINE_PACKAGE = "sunnbear._core.benchmark.suites.pipeline"
-_OUTPUT_NAMES = [CandidateGenerationStage.output_name, CandidateValidationStage.output_name]
+_OUTPUT_NAMES = [
+    CandidateGenerationStage.output_name,
+    CandidateValidationStage.output_name,
+    CoarseCharacterizationStage.output_name,
+]
 
 
 def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> None:
@@ -28,7 +37,8 @@ def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> N
 
 def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeypatch, capsys):
     """The command writes every stage's output into the workspace with the given number of workers, and prints 1 line
-    per stage, in run order, then the count of the formulas with rejected candidates."""
+    per stage, in run order, then for each stage that rejects candidates the count of the formulas with rejected
+    candidates, followed by 1 indented line per such formula."""
     # --- arrange ----------------------
     # The command runs over every registered formula. The test keeps only the shipped formulas whose numbers start with
     # (1, 4, 2) or (2, 1, 1), because the bisection count check runs 1 solve per tuple of the largest size of the
@@ -42,17 +52,21 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
     # --- assert -----------------------
     printed_lines = capsys.readouterr().out.splitlines()
     assert [line.split(":")[0] for line in printed_lines[: len(_OUTPUT_NAMES)]] == _OUTPUT_NAMES
-    n_formulas_with_rejections = len(printed_lines) - len(_OUTPUT_NAMES) - 1
-    assert printed_lines[len(_OUTPUT_NAMES)] == (
-        f"{CandidateValidationStage.output_name}: formulas with rejected candidates: "
-        f"{n_formulas_with_rejections} of {len(FormulaRegistry.formulas())}"
-    )
+    count_line_indices = [idx for idx, line in enumerate(printed_lines) if not line.startswith("  ")]
+    count_line_indices = count_line_indices[len(_OUTPUT_NAMES) :]
+    rejecting_output_names = [CandidateValidationStage.output_name, CoarseCharacterizationStage.output_name]
+    assert [printed_lines[idx].split(":")[0] for idx in count_line_indices] == rejecting_output_names
+    for idx, next_idx in zip(count_line_indices, [*count_line_indices[1:], len(printed_lines)], strict=True):
+        n_formulas_with_rejections = next_idx - idx - 1
+        assert re.fullmatch(
+            rf"\w+: formulas with rejected candidates: {n_formulas_with_rejections} of \d+", printed_lines[idx]
+        )
     assert sorted(path.name for path in tmp_path.glob("*.parquet")) == [f"{name}.parquet" for name in _OUTPUT_NAMES]
     manifests = [
         PipelineStageManifest.model_validate_json((tmp_path / "manifests" / f"{name}.json").read_text())
         for name in _OUTPUT_NAMES
     ]
-    assert [manifest.n_workers for manifest in manifests] == [3, 3]
+    assert [manifest.n_workers for manifest in manifests] == [3, 3, 3]
 
 
 def test_the_command_requires_a_workspace(monkeypatch, capsys):

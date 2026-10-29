@@ -4,31 +4,55 @@ import polars as pl
 
 from sunnbear._core.benchmark.suites.pipeline import stages as stages_package
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage
+from sunnbear._core.benchmark.suites.pipeline.features import FeatureFidelity
 from sunnbear._core.benchmark.suites.pipeline.runner import run_pipeline
-from sunnbear._core.benchmark.suites.pipeline.stages import CandidateGenerationStage, CandidateValidationStage
+from sunnbear._core.benchmark.suites.pipeline.stages import (
+    CandidateGenerationStage,
+    CandidateValidationStage,
+    CoarseCharacterizationStage,
+)
 from sunnbear._core.problems.core import FormulaRegistry
+from sunnbear._core.solvers.core import SolverConfigRegistry
 
 
-def test_the_pipeline_generates_then_validates_the_candidates_of_the_given_formulas(tmp_path):
-    """The pipeline writes the candidates of the given formulas, then the valid ones with their c-ranges: all of them,
-    for category 2."""
+def _stage_classes(stage_cls: type[PipelineStage]) -> list[type[PipelineStage]]:
+    """Return every subclass of `stage_cls`, at any depth."""
+    return [
+        subclass
+        for direct_subclass in stage_cls.__subclasses__()
+        for subclass in [direct_subclass, *_stage_classes(direct_subclass)]
+    ]
+
+
+def test_the_pipeline_generates_validates_and_characterizes_the_candidates_of_the_given_formulas(tmp_path):
+    """The pipeline writes the candidates of the given formulas, the valid ones with their c-ranges, then their coarse
+    feature vectors: all of them, for category 2."""
     # --- arrange ----------------------
     # The shipped formulas of category 2 form a small corpus, so the pipeline runs fast on them.
     formulas = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 2]
+    core_solver_configs = [
+        config for config in SolverConfigRegistry.configs() if config.role.is_used_for_problem_characterization
+    ]
 
     # --- act --------------------------
-    manifests = run_pipeline(workspace_dir=tmp_path, formulas=formulas)
+    manifests = run_pipeline(workspace_dir=tmp_path, formulas=formulas, core_solver_configs=core_solver_configs)
 
     # --- assert -----------------------
     # The output names of the stages package's stages, sorted, are its stages in run order.
     output_names_expected = sorted(
         stage_cls.output_name
-        for stage_cls in PipelineStage.__subclasses__()
+        for stage_cls in _stage_classes(PipelineStage)
         if stage_cls.__module__.startswith(f"{stages_package.__name__}.")
     )
     assert [manifest.output_name for manifest in manifests] == output_names_expected
     candidates = pl.read_parquet(tmp_path / f"{CandidateGenerationStage.output_name}.parquet")
     valid_candidates = pl.read_parquet(tmp_path / f"{CandidateValidationStage.output_name}.parquet")
+    coarse_features = pl.read_parquet(tmp_path / f"{CoarseCharacterizationStage.output_name}.parquet")
     assert candidates.height == sum(len(formula.build_all_candidates()) for formula in formulas)
     assert valid_candidates.select(candidates.columns).equals(candidates)
     assert ((valid_candidates["c_min"] < 0.0) & (valid_candidates["c_max"] > 0.0)).all()
+    feature_column_names = FeatureFidelity.COARSE.feature_column_names(
+        [config.solver_id for config in core_solver_configs]
+    )
+    assert coarse_features.select(valid_candidates.columns).equals(valid_candidates)
+    assert coarse_features.columns == [*valid_candidates.columns, *feature_column_names]

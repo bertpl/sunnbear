@@ -7,6 +7,8 @@ it, adding columns and dropping rows:
   stores their outputs;
 - `stages` holds the stages, 1 module or subpackage per stage, whose names sort in run order;
 - `snuffled_analysis` runs snuffled's analysis of a test problem, for every stage that needs one;
+- `features` holds the base classes of the stages that compute the candidates' feature vectors, whose child classes in
+  `stages` each set a fidelity;
 - `run_pipeline` runs the stages in order on a set of formulas, sharing 1 pool of worker processes between them.
 
 Every run recomputes every stage. Maintainers run the pipeline from the command line, as `__main__` describes; it
@@ -24,6 +26,7 @@ from .core import (
     RejectionReason,
     run_stages,
 )
+from .features import CandidateCharacterizationStage, FeatureFidelity
 from .runner import run_pipeline
 from .stages import (
     C_RANGE_SCHEMA,
@@ -31,4 +34,5 @@ from .stages import (
     MAX_BOUND_TO_WIDTH_RATIO,
     CandidateGenerationStage,
     CandidateValidationStage,
+    CoarseCharacterizationStage,
 )

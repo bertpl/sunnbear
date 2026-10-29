@@ -4,17 +4,22 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from sunnbear._core.problems.core import Formula
+from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.utils.module_imports import worker_pool_for_modules
 
 from .core import PipelineStageManifest, PipelineWorkspace, run_stages
-from .stages import CandidateGenerationStage, CandidateValidationStage
+from .stages import CandidateGenerationStage, CandidateValidationStage, CoarseCharacterizationStage
 
 
 # ==================================================================================================
 #  run_pipeline
 # ==================================================================================================
 def run_pipeline(
-    *, workspace_dir: Path, formulas: Sequence[Formula], n_workers: int | None = None
+    *,
+    workspace_dir: Path,
+    formulas: Sequence[Formula],
+    core_solver_configs: Sequence[SolverConfig],
+    n_workers: int | None = None,
 ) -> tuple[PipelineStageManifest, ...]:
     """Run every stage of the benchmark suite pipeline on `formulas`, into the workspace directory `workspace_dir`.
 
@@ -24,17 +29,27 @@ def run_pipeline(
     Args:
         workspace_dir: The directory for the outputs of the stages.
         formulas: The formulas whose candidates the pipeline builds.
+        core_solver_configs: The solver configs whose solves characterize the candidates: for the benchmark suites,
+            the configs whose role characterizes test problems (`SolverRole.is_used_for_problem_characterization`).
         n_workers: The number of worker processes; ``None`` for 1 per logical CPU. Each worker imports the modules that
-            define `formulas`, so with more than 1 worker, no formula may be defined in an interactive session.
+            define `formulas` and `core_solver_configs`, so with more than 1 worker, none of them may be defined in an
+            interactive session.
 
     Returns:
         The manifest of each stage, in run order.
 
     Raises:
-        ValueError: If a formula fails the checks of `Formula.build_all_candidates`, or if `n_workers` is below 1, or
-            above 1 while a formula is defined in an interactive session.
+        ValueError: If a formula fails the checks of `Formula.build_all_candidates`, if `core_solver_configs` is empty,
+            or if `n_workers` is below 1, or above 1 while a formula or solver config is defined in an interactive
+            session.
     """
-    stages = [CandidateGenerationStage(formulas), CandidateValidationStage()]
-    module_names = {type(formula).__module__ for formula in formulas}
+    stages = [
+        CandidateGenerationStage(formulas),
+        CandidateValidationStage(),
+        CoarseCharacterizationStage(core_solver_configs),
+    ]
+    module_names = {type(formula).__module__ for formula in formulas} | {
+        config.declaring_module_name for config in core_solver_configs
+    }
     with worker_pool_for_modules(n_workers=n_workers, module_names=module_names) as worker_pool:
         return run_stages(PipelineWorkspace(workspace_dir), stages, worker_pool=worker_pool)
