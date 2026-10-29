@@ -1,13 +1,16 @@
-"""`SpacingStage` keeps, per formula and in row order, the candidates at least `min_distance` apart in the balanced
-coarse feature space, keeps at least 2 of every formula with 2 or more candidates, and reports each dropped candidate
-with its nearest kept candidate."""
+"""`SpacingStage` drops near-duplicate candidates of each formula:
+
+- it keeps, in row order, the candidates at least `min_distance` apart in the balanced coarse feature space;
+- it keeps at least 2 of every formula with 2 or more candidates;
+- it reports each dropped candidate with its nearest kept candidate.
+"""
 
 import polars as pl
 import pytest
 
 from sunnbear._core.benchmark.suites.pipeline.features import FeatureBlock, FeatureFidelity
 from sunnbear._core.benchmark.suites.pipeline.stages import (
-    DROPPED_CANDIDATES_PER_FORMULA_REPORT_NAME,
+    CANDIDATE_COUNTS_PER_FORMULA_REPORT_NAME,
     DROPPED_CANDIDATES_REPORT_NAME,
     NEAREST_KEPT_CANDIDATE_SCHEMA,
     SpacingStage,
@@ -51,7 +54,9 @@ def _coarse_features_table(
 def test_the_pass_keeps_the_candidates_far_enough_from_every_kept_one_in_row_order():
     """With the solvers block divided by 2 and the snuffled block by 0.5, the pass keeps p=1, p=3 and p=5 of formula
     f99.1, and drops p=2 and p=4, each closer than 1 to the kept candidate before it; p=3 is kept over p=4 because it
-    comes first. Formula f99.2's only candidate is kept, although it coincides with f99.1's first candidate."""
+    comes first.
+
+    Formula f99.2's only candidate is kept, although it coincides with f99.1's first candidate."""
     # --- arrange ----------------------
     previous_table = _coarse_features_table(
         {
@@ -78,12 +83,13 @@ def test_the_pass_keeps_the_candidates_far_enough_from_every_kept_one_in_row_ord
         ("f99.1[p=2.0]", "f99.1[p=1.0]", pytest.approx(0.6)),
         ("f99.1[p=4.0]", "f99.1[p=3.0]", pytest.approx(0.6)),
     ]
-    assert output.reports[DROPPED_CANDIDATES_PER_FORMULA_REPORT_NAME].rows() == [("f99.1", 5, 3, 2), ("f99.2", 1, 1, 0)]
+    assert output.reports[CANDIDATE_COUNTS_PER_FORMULA_REPORT_NAME].rows() == [("f99.1", 5, 3, 2), ("f99.2", 1, 1, 0)]
 
 
 def test_a_formula_with_2_or_more_candidates_keeps_at_least_2():
-    """Where the pass keeps only a formula's first candidate, the stage also keeps the one farthest from it: p=3 of
-    f99.1, which is then the nearest kept candidate of p=2, and the second of f99.2's 2 identical candidates."""
+    """Where the pass keeps only a formula's first candidate, the stage also keeps the one farthest from it: for
+    f99.1 that is p=3, which then becomes the nearest kept candidate of p=2; for f99.2 it is the second of its 2
+    identical candidates."""
     # --- arrange ----------------------
     previous_table = _coarse_features_table(
         {
@@ -118,4 +124,4 @@ def test_a_single_candidate_with_null_scales_is_kept():
     # --- assert -----------------------
     assert output.table.equals(previous_table)
     assert output.reports[DROPPED_CANDIDATES_REPORT_NAME].is_empty()
-    assert output.reports[DROPPED_CANDIDATES_PER_FORMULA_REPORT_NAME].rows() == [("f99.1", 1, 1, 0)]
+    assert output.reports[CANDIDATE_COUNTS_PER_FORMULA_REPORT_NAME].rows() == [("f99.1", 1, 1, 0)]

@@ -13,7 +13,7 @@ from typing import Self
 import polars as pl
 from pydantic import BaseModel, ConfigDict
 
-from .stage import PipelineStage, PipelineStageParameter
+from .stage import PipelineStage, PipelineStageParameterValue
 
 
 # ==================================================================================================
@@ -47,7 +47,7 @@ class PipelineStageManifest(BaseModel):
     output_sha256: str
     report_sha256s: dict[str, str]
     input_sha256: str | None
-    parameters: dict[str, PipelineStageParameter]
+    parameters: dict[str, PipelineStageParameterValue]
     sunnbear_version: str
     n_rows: int
     n_dropped_rows: int

@@ -13,11 +13,12 @@ from sunnbear._core.benchmark.suites.pipeline.features import FeatureFidelity
 from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
 
-# The default of `SpacingStage`'s `min_distance`: a small value, which drops only candidates whose balanced feature
-# vectors nearly coincide; raise it as the corpus grows, to keep full characterization's run time reasonable.
+# `SpacingStage`'s default `min_distance` is small, so the stage drops only candidates whose feature vectors, with each
+# block divided by its feature scale, nearly coincide; raise it as the corpus grows, to keep full characterization's run
+# time reasonable.
 DEFAULT_SPACING_MIN_DISTANCE = 1e-3
 DROPPED_CANDIDATES_REPORT_NAME = "dropped_candidates"
-DROPPED_CANDIDATES_PER_FORMULA_REPORT_NAME = "dropped_candidates_per_formula"
+CANDIDATE_COUNTS_PER_FORMULA_REPORT_NAME = "candidate_counts_per_formula"
 # The report `DROPPED_CANDIDATES_REPORT_NAME` adds these columns to each dropped candidate: the kept candidate of its
 # formula nearest to it, and the distance between them.
 NEAREST_KEPT_CANDIDATE_SCHEMA: dict[str, pl.DataType] = {
@@ -34,21 +35,22 @@ class SpacingStage(PipelineStage):
 
     The distance between 2 candidates is the L1 distance between their coarse feature vectors, with each block divided
     by its feature scale, as `FeatureFidelity.balanced_feature_vectors` returns them. Each block then has a mean
-    pairwise distance of 1, so `min_distance` is a number in those units.
+    pairwise distance of 1, so `min_distance` is measured in multiples of a block's mean pairwise distance.
 
     Per formula, a pass runs over the candidates in the order of the input table, which is the order of candidate
-    generation, so the result is deterministic. It keeps the formula's first candidate, and each later candidate whose
-    distance to every candidate kept before it is at least `min_distance`. Where the pass keeps only the first of 2 or
-    more candidates, the stage also keeps the candidate farthest from it, so that a formula with count candidates keeps
-    at least min(2, count).
+    generation, so the result is deterministic. The pass keeps the formula's first candidate, and each later candidate
+    whose distance to every candidate kept before it is at least `min_distance`.
+
+    Where the pass keeps only the first of 2 or more candidates, the stage also keeps the candidate farthest from it, so
+    that a formula with 2 or more candidates keeps at least 2.
 
     With fewer than 2 candidates in the input, the feature scales are null, and the stage keeps every candidate.
 
-    The stage runs in its own process, not in the run's worker pool: per formula it compares a few feature vectors, and
-    each worker would have to import the formulas only to receive them.
+    The stage runs in the main process, not in the run's worker pool: per formula it compares a few feature vectors, and
+    each worker would have to import the formulas' modules only to receive the candidates.
     """
 
-    output_name = "s4_spaced"
+    output_name = "s4_spaced_candidates"
 
     def __init__(self, min_distance: float = DEFAULT_SPACING_MIN_DISTANCE) -> None:
         """Create the stage, which keeps, per formula, candidates at least `min_distance` apart."""
@@ -73,7 +75,7 @@ class SpacingStage(PipelineStage):
             - the output table: the kept rows of `previous_table`, in its order, with no added column;
             - the report `DROPPED_CANDIDATES_REPORT_NAME`: the other rows, with the columns of
               `NEAREST_KEPT_CANDIDATE_SCHEMA`;
-            - the report `DROPPED_CANDIDATES_PER_FORMULA_REPORT_NAME`: 1 row per formula, in the order of each
+            - the report `CANDIDATE_COUNTS_PER_FORMULA_REPORT_NAME`: 1 row per formula, in the order of each
               formula's first row in `previous_table`, with the columns ``formula_id``, ``n_candidates``, ``n_kept``
               and ``n_dropped``.
         """
@@ -114,7 +116,7 @@ class SpacingStage(PipelineStage):
                 dtype=NEAREST_KEPT_CANDIDATE_SCHEMA["distance_to_nearest_kept"],
             ),
         ).filter(~is_kept_series)
-        dropped_candidates_per_formula = (
+        candidate_counts_per_formula = (
             pl.DataFrame([pl.Series("formula_id", formula_ids, dtype=pl.String()), is_kept_series])
             .group_by("formula_id", maintain_order=True)
             .agg(n_candidates=pl.len(), n_kept=pl.col("is_kept").sum())
@@ -124,7 +126,7 @@ class SpacingStage(PipelineStage):
             table=previous_table.filter(is_kept_series),
             reports={
                 DROPPED_CANDIDATES_REPORT_NAME: dropped_candidates,
-                DROPPED_CANDIDATES_PER_FORMULA_REPORT_NAME: dropped_candidates_per_formula,
+                CANDIDATE_COUNTS_PER_FORMULA_REPORT_NAME: candidate_counts_per_formula,
             },
         )
 
@@ -132,7 +134,7 @@ class SpacingStage(PipelineStage):
     #  Helpers
     # --------------------------------------------------------------------------
     def _select_kept_positions(self, vectors: np.ndarray) -> list[int]:
-        """Return the positions in `vectors` of the candidates that 1 formula keeps, the first position first.
+        """Return the positions in `vectors` of the candidates that 1 formula keeps, in ascending order.
 
         `vectors` holds the formula's balanced feature vectors, 1 per row, in the order of the input table.
         """
@@ -142,7 +144,7 @@ class SpacingStage(PipelineStage):
             if distances_to_kept.min() >= self.min_distance:
                 kept_positions.append(position)
         if len(kept_positions) == 1 and len(vectors) > 1:
-            # The floor of 2: the first candidate is kept, so the second is the one farthest from it among the others.
+            # Keep at least 2 candidates: the first is already kept, so add the one farthest from it among the others.
             distances_to_first = np.abs(vectors[1:] - vectors[0]).sum(axis=1)
             kept_positions.append(1 + int(np.argmax(distances_to_first)))
         return kept_positions

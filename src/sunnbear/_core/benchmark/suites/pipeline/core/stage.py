@@ -18,7 +18,7 @@ from .rejections import (
 )
 
 # A stage's parameter value is a JSON scalar, so that its manifest can record it.
-type PipelineStageParameter = bool | int | float | str
+type PipelineStageParameterValue = bool | int | float | str
 
 
 # ==================================================================================================
@@ -41,11 +41,11 @@ class PipelineStage(ABC):
     output_name: ClassVar[str]
 
     @property
-    def parameters(self) -> Mapping[str, PipelineStageParameter]:
+    def parameters(self) -> Mapping[str, PipelineStageParameterValue]:
         """Return the values of the stage's parameters, keyed by name, which its `PipelineStageManifest` records.
 
         A stage whose output depends on a value given to its constructor, such as a threshold, returns it here; the
-        default holds no parameter.
+        base implementation returns no parameter.
         """
         return {}
 
