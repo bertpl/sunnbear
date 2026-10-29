@@ -12,9 +12,9 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F40(Formula):
 
     The survey writes the source's function as ``if(x = 0; 0.0; 1/(x - 2/3))``; the published interval is ``[-11, 9]``.
 
-    The formula also returns 0 where ``x - c_scale*c`` equals the float of 2/3, the 1 point at which the published
-    function divides by 0; everywhere else it is the published function. The published function returns 0 at
-    ``x = 0``, not at its pole; the formula keeps that branch.
+    The formula returns 0 where ``x - c_scale*c`` equals 0, as the published function does at ``x = 0``, and also where
+    ``x - c_scale*c`` equals the float of 2/3, the 1 point at which the published function divides by 0; everywhere
+    else it is the published function.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because it raises
     `ZeroDivisionError` at its pole, where a solver's evaluation can land.

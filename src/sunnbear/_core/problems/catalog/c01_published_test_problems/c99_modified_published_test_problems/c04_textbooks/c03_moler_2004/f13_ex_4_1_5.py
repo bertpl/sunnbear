@@ -20,7 +20,7 @@ class ModifiedMoler2004Ex415(Formula):
     divides by 0; everywhere else it is the published function.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because it raises
-    `ZeroDivisionError` at that point, where a solver's evaluation can land.
+    `ZeroDivisionError` at its pole, where a solver's evaluation can land.
     """
 
     number = (1, 99, 4, 3, 13)

@@ -29,10 +29,13 @@ class ModifiedChandrupatla19972(Formula):
     For these intervals, the rounded interval width ``c_scale`` is ``1e4`` or more, so a shift along x by ``c_scale*c``
     takes ``a`` across the pole for every ``c`` above ``1e-8``.
 
-    The widest published interval, ``[1e-12, 1e12]``, becomes ``[1e-12, 1e10]``. On ``[1e-12, 1e12]``, `xtol` is about
-    2, because it scales with the interval's width, and the root lies within `xtol` of ``a`` at the smallest values of
-    ``c``. ``1e10`` is the largest power of 10 for ``b`` at which the root lies farther from ``a`` than the margin of
-    snuffled's diagnostics, a few times `xtol`.
+    The widest published interval, ``[1e-12, 1e12]``, becomes ``[1e-12, 1e10]``. On ``[1e-12, 1e12]``, `xtol` scales
+    with the interval's width and is about 2, so at the smallest values of ``c`` the root lies within `xtol` of ``a``.
+
+    snuffled's diagnostics then report that all roots lie too close to the interval's edge, and the validation stage
+    rejects the test problem with `snuffled_all_roots_too_close_to_edge`. ``1e10`` is the largest power of 10 for ``b``
+    at which the root lies farther from ``a`` than the distance at which snuffled reports that diagnostic, a few times
+    `xtol`.
     """
 
     number = (1, 99, 1, 7, 2)
