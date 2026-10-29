@@ -35,6 +35,7 @@ def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> N
     runpy.run_module(_PIPELINE_PACKAGE, run_name="__main__")
 
 
+@pytest.mark.only_with_numba_jit
 def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeypatch, capsys):
     """The command writes every stage's output into the workspace with the given number of workers, and prints 1 line
     per stage, in run order, then for each stage that rejects candidates the count of the formulas with rejected

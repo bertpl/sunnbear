@@ -1,6 +1,7 @@
 """`run_pipeline` runs every stage of the `stages` package, candidate generation first, on the given formulas."""
 
 import polars as pl
+import pytest
 
 from sunnbear._core.benchmark.suites.pipeline import stages as stages_package
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage
@@ -24,6 +25,7 @@ def _stage_classes(stage_cls: type[PipelineStage]) -> list[type[PipelineStage]]:
     ]
 
 
+@pytest.mark.only_with_numba_jit
 def test_the_pipeline_generates_validates_and_characterizes_the_candidates_of_the_given_formulas(tmp_path):
     """On the formulas of category 2, the pipeline writes their candidates, then the valid ones with their c-ranges,
     then every valid one with its coarse feature vector, and the scale of each feature block in every row."""
@@ -35,7 +37,12 @@ def test_the_pipeline_generates_validates_and_characterizes_the_candidates_of_th
     ]
 
     # --- act --------------------------
-    manifests = run_pipeline(workspace_dir=tmp_path, formulas=formulas, core_solver_configs=core_solver_configs)
+    # By default `run_pipeline` starts 1 worker per CPU, which would only make the workers wait for CPU, because
+    # pytest-xdist already runs 1 test process per CPU. With 2 workers the stages still run in worker processes;
+    # with 1 worker they would run in this test's process.
+    manifests = run_pipeline(
+        workspace_dir=tmp_path, formulas=formulas, core_solver_configs=core_solver_configs, n_workers=2
+    )
 
     # --- assert -----------------------
     # The output names of the stages package's stages, sorted, are its stages in run order.
