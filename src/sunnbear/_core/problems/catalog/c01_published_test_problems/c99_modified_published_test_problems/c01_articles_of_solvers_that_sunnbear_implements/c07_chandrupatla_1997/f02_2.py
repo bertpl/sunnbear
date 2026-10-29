@@ -28,6 +28,11 @@ class ModifiedChandrupatla19972(Formula):
 
     For these intervals, the rounded interval width ``c_scale`` is ``1e4`` or more, so a shift along x by ``c_scale*c``
     takes ``a`` across the pole for every ``c`` above ``1e-8``.
+
+    The widest published interval, ``[1e-12, 1e12]``, becomes ``[1e-12, 1e10]``. On ``[1e-12, 1e12]``, `xtol` is about
+    2, because it scales with the interval's width, and the root lies within `xtol` of ``a`` at the smallest values of
+    ``c``. ``1e10`` is the largest power of 10 for ``b`` at which the root lies farther from ``a`` than the margin of
+    snuffled's diagnostics, a few times `xtol`.
     """
 
     number = (1, 99, 1, 7, 2)
@@ -61,7 +66,7 @@ class ModifiedChandrupatla19972(Formula):
                     (0.0001, 10000.0),
                     (1e-06, 1000000.0),
                     (1e-10, 10000000000.0),
-                    (1e-12, 1000000000000.0),
+                    (1e-12, 10000000000.0),
                 ),
             ),
         )
@@ -70,7 +75,5 @@ class ModifiedChandrupatla19972(Formula):
         FormulaTestCase.value(params={"a": 0.0001, "b": 10000.0}, x=6.30957, c=0.25, expected=-250.18891743125303),
         FormulaTestCase.value(params={"a": 1e-06, "b": 1000000.0}, x=15.8489, c=0.25, expected=-3980.087743782938),
         FormulaTestCase.value(params={"a": 1e-10, "b": 10000000000.0}, x=100.0, c=0.25, expected=-999999.0000000003),
-        FormulaTestCase.value(
-            params={"a": 1e-12, "b": 1000000000000.0}, x=251.189, c=0.25, expected=-15848885.893402303
-        ),
+        FormulaTestCase.value(params={"a": 1e-12, "b": 10000000000.0}, x=251.189, c=0.25, expected=-1584887.6893402336),
     )

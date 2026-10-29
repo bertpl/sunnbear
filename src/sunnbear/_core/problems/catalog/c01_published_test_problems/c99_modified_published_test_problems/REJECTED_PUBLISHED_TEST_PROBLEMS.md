@@ -14,7 +14,7 @@ Which test problems the validation stage rejects depends on:
 
 - the formulas;
 - the stage's checks;
-- the shipped Monte Carlo tuple set, which supplies the values of each formula's parameter `c` for the check that bisection spends a fixed number of evaluations.
+- the shipped Monte Carlo tuple set, which supplies the values of each formula's parameter `c` for the check that bisection spends a fixed number of evaluations and for the check of snuffled's diagnostics.
 
 After a change of any of them, running the pipeline, as `python -m sunnbear._core.benchmark.suites.pipeline --workspace <dir>`, shows whether this file needs an update.
 
@@ -28,7 +28,7 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.1.7.2[a=0.0001,b=10^4.0,c_scale=10^4.0]` | `calibration_c_range_too_narrow` | some parameter tuples modified | `f1.99.1.7.2[a=0.0001,b=10^4.0]` | `c` scales x |  |
 | `f1.1.7.2[a=1e-06,b=10^6.0,c_scale=10^6.0]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.1.7.2[a=1e-06,b=10^6.0]` | `c` scales x |  |
 | `f1.1.7.2[a=1e-10,b=10^10.0,c_scale=10^10.0]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.1.7.2[a=1e-10,b=10^10.0]` | `c` scales x |  |
-| `f1.1.7.2[a=1e-12,b=10^12.0,c_scale=10^12.0]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.1.7.2[a=1e-12,b=10^12.0]` | `c` scales x |  |
+| `f1.1.7.2[a=1e-12,b=10^12.0,c_scale=10^12.0]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.1.7.2[a=1e-12,b=10^10.0]` | `c` scales x; interval changed to `[1e-12, 1e10]` |  |
 | `f1.1.7.7[a=-1.0,b=4.0,c_scale=5.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.7.7[a=-1.0,b=4.0,c_scale=5.0]` | a tiny linear term added to f | yes |
 | `f1.1.7.7[a=-2.0,b=5.0,c_scale=7.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.7.7[a=-2.0,b=5.0,c_scale=7.0]` | a tiny linear term added to f | yes |
 | `f1.1.7.7[a=-1.0,b=10.0,c_scale=11.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.7.7[a=-1.0,b=10.0,c_scale=11.0]` | a tiny linear term added to f | yes |
@@ -52,6 +52,7 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.1.13.4` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.13.4` | f in an equivalent form without cancellation |  |
 | `f1.1.13.5[a=2.6,b=4.6,c_scale=2.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.13.5[a=2.6,b=4.6,c_scale=2.0]` | f in an equivalent form without cancellation |  |
 | `f1.1.13.5[a=2.6,b=3.6,c_scale=1.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.13.5[a=2.6,b=3.6,c_scale=1.0]` | f in an equivalent form without cancellation |  |
+| `f1.1.13.11` | `snuffled_f_raises` | all parameter tuples modified | `f1.99.1.13.11` | f returns 0 at the pole |  |
 | `f1.1.13.12[a=0.0,b=4.0,c_scale=4.0]` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.1.13.19` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.13.19` | f in an equivalent form without cancellation |  |
 | `f1.1.13.21` | `calibration_fails_at_first_probe` | all parameter tuples modified | `f1.99.1.13.21` | interval changed to `[-1.02, 1]` |  |
@@ -158,6 +159,7 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.4.3.2` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.3.2` | f in an equivalent form without cancellation; the modified test problem is rejected by `bisection_count_not_exact` | yes |
 | `f1.4.3.5[a=0.0,b=31.4159265359,c_scale=31.4]` | `calibration_no_finite_sign_change_at_0` | some parameter tuples modified | `f1.99.4.3.5` | interval changed to `[0, 30]` |  |
 | `f1.4.3.6` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.3.6` | interval changed to `[-1, 1]` |  |
+| `f1.4.3.13` | `snuffled_f_raises` | all parameter tuples modified | `f1.99.4.3.13` | f returns 0 at the pole |  |
 | `f1.4.3.14` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.3.14` | f in an equivalent form without cancellation |  |
 | `f1.4.3.15` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.3.15` | interval changed to `[2, 31.41592653589793]` | yes |
 | `f1.4.4.2[a=2.14159265359,b=3.14159265359,c_scale=1.0]` | `calibration_no_finite_sign_change_at_0` | no action | | the roots lie too close to `pi` for float64: f has the same sign at both bounds | |
@@ -168,6 +170,7 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.4.4.28` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.4.28` | f in an equivalent form without cancellation |  |
 | `f1.4.5.8` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.5.8` | interval changed to `[0.03, 3.141592653589793]` |  |
 | `f1.4.5.10` | `calibration_no_finite_sign_change_at_0` | no action | | f has no real root | |
+| `f1.4.5.11` | `snuffled_f_raises` | all parameter tuples modified | `f1.99.4.5.11` | f returns 0 at the pole |  |
 | `f1.4.5.14` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.5.14` | interval changed to `[0.08, 8]` |  |
 | `f1.4.5.15[a=-0.2,b=0.2,c_scale=0.4]` | `calibration_no_finite_sign_change_at_0` | some parameter tuples modified | `f1.99.4.5.15` | interval changed to `[0.01, 0.2]` |  |
 | `f1.4.5.20` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.5.20` | interval changed to `[1.3, 2]` |  |
