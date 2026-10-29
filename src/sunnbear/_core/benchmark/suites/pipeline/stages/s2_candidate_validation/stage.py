@@ -9,7 +9,6 @@ from sunnbear._core.benchmark.suites.pipeline.core import (
     RejectionReason,
     build_output_with_rejection_reports,
 )
-from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 from .check1_bound_to_width_ratio import exceeds_max_bound_to_width_ratio
@@ -56,14 +55,14 @@ class CandidateValidationStage(PipelineStage):
 
         # --- the checks that evaluate f ---------
         problem_ids_to_evaluate = previous_table.filter(~is_ratio_too_large)["problem_id"].to_list()
-        batches = worker_pool.split_into_batches(
-            problem_ids_to_evaluate, group_key=lambda problem_id: ProblemId.from_string(problem_id).formula_id
+        results_by_problem_id.update(
+            self._run_per_formula(
+                problem_ids_to_evaluate,
+                problem_id=str,
+                build_task=lambda batch: FunctionEvaluatingChecksTask(problem_ids=batch),
+                worker_pool=worker_pool,
+            )
         )
-        tasks = {
-            batch_idx: FunctionEvaluatingChecksTask(problem_ids=tuple(batch)) for batch_idx, batch in enumerate(batches)
-        }
-        for batch_idx, results in worker_pool.run(tasks):
-            results_by_problem_id.update(zip(batches[batch_idx], results, strict=True))
 
         # --- 1 row per candidate ----------------
         results = [results_by_problem_id[problem_id] for problem_id in previous_table["problem_id"]]
@@ -73,8 +72,4 @@ class CandidateValidationStage(PipelineStage):
             pl.Series("c_min", c_mins, dtype=C_RANGE_SCHEMA["c_min"]),
             pl.Series("c_max", c_maxs, dtype=C_RANGE_SCHEMA["c_max"]),
         )
-        return build_output_with_rejection_reports(
-            table,
-            [result if isinstance(result, RejectionReason) else None for result in results],
-            added_columns=C_RANGE_SCHEMA,
-        )
+        return build_output_with_rejection_reports(table, results, added_columns=C_RANGE_SCHEMA)

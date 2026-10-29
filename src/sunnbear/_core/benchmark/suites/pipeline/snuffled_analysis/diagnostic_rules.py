@@ -1,6 +1,6 @@
-"""The rules by which snuffled's diagnostics reject a test problem, for every stage that runs snuffled.
+"""snuffled's diagnostics reject a test problem by the same rules in every stage that runs snuffled.
 
-`extract_properties_or_rejection_reason` extracts the requested properties and the 6 diagnostics of 1 analysis, at 1
+`extract_properties_or_rejection_reason` extracts the requested properties and every diagnostic of 1 analysis, at 1
 tuple of the Monte Carlo tuple set, and rejects the test problem when 1 of these holds:
 
 - f raises;
@@ -38,11 +38,11 @@ FLAG_REJECTION_REASONS = {
 def extract_properties_or_rejection_reason(
     snuffler: Snuffler, properties: Sequence[str], *, xtol: float
 ) -> dict[str, float] | RejectionReason:
-    """Return the values of `properties` from `snuffler`'s analysis, or the reason that its diagnostics reject it.
+    """Return `properties` from `snuffler`'s analysis, or the reason that its diagnostics reject the test problem.
 
-    The function extracts `properties` first, in their order, then the 6 diagnostics, in the order of `Diagnostic`,
+    The function extracts `properties` first, in their order, then every diagnostic, in the order of `Diagnostic`,
     which puts the NaN and inf flags last, so that those 2 flags also count the NaN and inf values that f returned
-    while snuffled computed everything else. It then tests the rules in this order:
+    while snuffled computed everything else. The function then tests the rules in this order:
 
     1. f raises;
     2. a flag is above 0, with the flags in the order of `FLAG_REJECTION_REASONS`;
@@ -59,7 +59,7 @@ def extract_properties_or_rejection_reason(
         The value of each of `properties`, keyed by its name, or the `RejectionReason` of the first rule that fails.
     """
     try:
-        values = {prop: snuffler.extract(prop) for prop in properties}
+        property_values = {prop: snuffler.extract(prop) for prop in properties}
         diagnostics = {diagnostic: snuffler.extract(diagnostic) for diagnostic in Diagnostic}
     except FunctionEvaluationError:
         return RejectionReason.SNUFFLED_F_RAISES
@@ -69,4 +69,4 @@ def extract_properties_or_rejection_reason(
     if diagnostics[Diagnostic.MAX_ZERO_WIDTH] > MAX_ZERO_WIDTH_IN_XTOL * xtol:
         return RejectionReason.SNUFFLED_MAX_ZERO_WIDTH_TOO_LARGE
     else:
-        return values
+        return property_values

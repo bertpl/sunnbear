@@ -1,30 +1,11 @@
-"""`CandidateCharacterizationTask` maps the solves' evaluation counts onto [0, 1] on a log scale, and returns a feature
-vector or the reason to reject each candidate, in the order of its candidates."""
+"""`CandidateCharacterizationTask` returns a feature vector or the reason to reject each candidate, in the order of its
+candidates."""
 
 import math
-
-import pytest
 
 from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
 from sunnbear._core.benchmark.suites.pipeline.features import CandidateCharacterizationTask, FeatureFidelity
 from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
-
-
-@pytest.mark.parametrize(
-    "value, normalized_expected",
-    [
-        pytest.param(2, 0.0, id="minimum_of_a_correct_solve"),
-        pytest.param(40, math.log(20) / math.log(80), id="bisection_count"),
-        pytest.param(160, 1.0, id="evaluation_budget"),
-    ],
-)
-def test_the_normalization_maps_2_to_0_and_max_fevals_to_1_on_a_log_scale(value, normalized_expected):
-    """With `max_fevals` 160, a count maps onto ``log(count / 2) / log(80)``."""
-    # --- act --------------------------
-    normalized = CandidateCharacterizationTask._normalize_n_fevals_eff(value, 160)
-
-    # --- assert -----------------------
-    assert normalized == pytest.approx(normalized_expected)
 
 
 def test_the_task_returns_a_feature_vector_or_a_reason_per_candidate(isolated_formula_registry):

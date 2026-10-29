@@ -30,7 +30,8 @@ def run_pipeline(
         workspace_dir: The directory for the outputs of the stages.
         formulas: The formulas whose candidates the pipeline builds.
         core_solver_configs: The solver configs whose solves characterize the candidates: for the benchmark suites,
-            the configs whose role characterizes test problems (`SolverRole.is_used_for_problem_characterization`).
+            the configs whose role marks them for characterizing test problems
+            (`SolverRole.is_used_for_problem_characterization`).
         n_workers: The number of worker processes; ``None`` for 1 per logical CPU. Each worker imports the modules that
             define `formulas` and `core_solver_configs`, so with more than 1 worker, none of them may be defined in an
             interactive session.

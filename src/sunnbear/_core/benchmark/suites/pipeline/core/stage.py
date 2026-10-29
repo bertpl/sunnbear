@@ -1,13 +1,14 @@
 """`PipelineStage` is the base class of a benchmark suite pipeline stage; `PipelineStageOutput` is what it returns."""
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import ClassVar
 
 import polars as pl
 
-from sunnbear._core.utils.worker_pool import WorkerPool
+from sunnbear._core.problems.core import ProblemId
+from sunnbear._core.utils.worker_pool import WorkerPool, WorkerTask
 
 
 # ==================================================================================================
@@ -39,6 +40,30 @@ class PipelineStage(ABC):
                 depend on the pool's number of workers. The stage's tasks must be picklable `WorkerTask`s. A worker has
                 imported the modules that define the run's formulas, and otherwise only what unpickling a task needs.
         """
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _run_per_formula[C, R](
+        candidates: Sequence[C],
+        *,
+        problem_id: Callable[[C], str],
+        build_task: Callable[[tuple[C, ...]], WorkerTask[list[R]]],
+        worker_pool: WorkerPool,
+    ) -> dict[str, R]:
+        """Return each candidate's result from `build_task`, keyed by problem id, with every formula in 1 batch.
+
+        Every candidate of a formula goes to the same task, so each formula is compiled in only 1 worker.
+        """
+        batches = worker_pool.split_into_batches(
+            candidates, group_key=lambda candidate: ProblemId.from_string(problem_id(candidate)).formula_id
+        )
+        tasks = {batch_idx: build_task(tuple(batch)) for batch_idx, batch in enumerate(batches)}
+        results_by_problem_id: dict[str, R] = {}
+        for batch_idx, results in worker_pool.run(tasks):
+            results_by_problem_id.update(zip(map(problem_id, batches[batch_idx]), results, strict=True))
+        return results_by_problem_id
 
 
 # ==================================================================================================

@@ -1,6 +1,7 @@
 """This package holds what the pipeline's stages share to compute the candidates' feature vectors at a fidelity.
 
-Each such pipeline stage is a child class, in the package `stages`, of a base class here, and sets the fidelity:
+A fidelity sets how much work goes into each feature vector. Each such pipeline stage is a child class, in the package
+`stages`, of a base class here, and sets the fidelity:
 
 - `FeatureFidelity` names a fidelity: the tuples of the solves and of snuffled's analyses, the budget of the analyses,
   and the names of the feature columns;

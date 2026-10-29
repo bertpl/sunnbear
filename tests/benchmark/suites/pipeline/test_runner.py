@@ -25,8 +25,8 @@ def _stage_classes(stage_cls: type[PipelineStage]) -> list[type[PipelineStage]]:
 
 
 def test_the_pipeline_generates_validates_and_characterizes_the_candidates_of_the_given_formulas(tmp_path):
-    """The pipeline writes the candidates of the given formulas, the valid ones with their c-ranges, then their coarse
-    feature vectors: all of them, for category 2."""
+    """On the formulas of category 2, the pipeline writes their candidates, then the valid ones with their c-ranges,
+    then every valid one with its coarse feature vector."""
     # --- arrange ----------------------
     # The shipped formulas of category 2 form a small corpus, so the pipeline runs fast on them.
     formulas = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 2]

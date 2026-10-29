@@ -11,8 +11,7 @@ snuffled analyzes f at each sampled tuple:
 - at the LOW budget, `SnuffledAnalysisBudget.LOW`, for the others.
 
 The check reads only snuffled's diagnostics, not its function or root properties. It rejects the candidate at the first
-sampled tuple at which the diagnostics reject it, by the rules of `extract_properties_or_rejection_reason`: f raises,
-a flag is above 0, or the widest region around a root where f is exactly 0 is too wide for the tuple's `xtol`.
+sampled tuple at which the diagnostics reject it, by the rules of `extract_properties_or_rejection_reason`.
 """
 
 import numpy as np
@@ -20,10 +19,7 @@ import numpy as np
 from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, MCSolveSettings
 from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
-from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import (
-    SnuffledAnalysisBudget,
-    extract_properties_or_rejection_reason,
-)
+from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import SnuffledAnalysisBudget
 from sunnbear._core.problems.core import TestProblem
 from sunnbear._core.utils.edge_biased_indices import select_edge_biased_indices
 
@@ -45,10 +41,7 @@ def find_snuffled_rejection_reason(problem: TestProblem) -> RejectionReason | No
         problem, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS, mc_tuples=load_mc_tuples(max(MCTuplesSize))
     )
     for mc_sample_idx, budget in plan_snuffled_analyses(mc_solve_settings):
-        snuffler = budget.build_snuffler(problem, mc_solve_settings=mc_solve_settings, mc_sample_idx=mc_sample_idx)
-        result = extract_properties_or_rejection_reason(
-            snuffler, (), xtol=float(mc_solve_settings.xtols[mc_sample_idx])
-        )
+        result = budget.analyze_or_reject(problem, (), mc_solve_settings=mc_solve_settings, mc_sample_idx=mc_sample_idx)
         if isinstance(result, RejectionReason):
             return result
     return None

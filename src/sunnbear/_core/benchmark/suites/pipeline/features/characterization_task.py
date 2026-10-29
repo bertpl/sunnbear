@@ -1,8 +1,7 @@
 """`CandidateCharacterizationTask` computes the feature vector of each candidate of a batch, or the reason to reject it.
 
-For each candidate, the task first runs the solves of the empirical block, then snuffled's analyses of the
-analytical block, in the same worker, so that each formula is compiled in only 1 worker. The task runs in a worker
-process of the pool, or in the calling process.
+For each candidate, the task first runs the solves of the core solver configs, then snuffled's analyses, in the same
+worker, so that each formula is compiled in only 1 worker.
 """
 
 from dataclasses import dataclass
@@ -14,7 +13,6 @@ from sunnbear._core.benchmark.mc_tuples import load_mc_tuples
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, MCSolveSettings
 from sunnbear._core.benchmark.runner import BenchmarkRunSettings, BenchmarkTask
 from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED, RejectionReason
-from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import extract_properties_or_rejection_reason
 from sunnbear._core.problems.core import FormulaRegistry
 from sunnbear._core.solvers.core import SolveStatus
 from sunnbear._core.stats import gpq
@@ -66,16 +64,17 @@ class CandidateCharacterizationTask:
             c_max=c_max,
             solver_ids=self.solver_ids,
             run_settings=BenchmarkRunSettings(
-                mc_size=self.fidelity.solves_mc_size,
+                mc_size=self.fidelity.solver_mc_size,
                 n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS,
                 root_seed=PIPELINE_ROOT_SEED,
             ),
         ).run()
         if (solve_results["status"] == SolveStatus.FUNCTION_ERROR.value).any():
             return RejectionReason.FUNCTION_ERROR
-        # Every solve without a correct answer counts at the full evaluation budget, `max_fevals`.
+        # Every solve of a candidate has the same evaluation budget, `max_fevals`, so the first row's value holds for
+        # all of them.
         max_fevals = int(solve_results["max_fevals"][0])
-        # The rows run sample by sample, and within a sample, solver by solver in the order of `solver_ids`.
+        # The rows are ordered sample by sample, and within a sample, solver by solver in the order of `solver_ids`.
         n_fevals_eff = add_derived_results(solve_results)["n_fevals_eff"].to_numpy().reshape(-1, len(self.solver_ids))
         empirical_features = [
             *np.exp(np.log(n_fevals_eff).mean(axis=0)),
@@ -91,11 +90,8 @@ class CandidateCharacterizationTask:
         )
         property_values = []
         for mc_sample_idx in range(self.fidelity.snuffled_mc_size):
-            snuffler = self.fidelity.snuffled_budget.build_snuffler(
-                problem, mc_solve_settings=mc_solve_settings, mc_sample_idx=mc_sample_idx
-            )
-            result = extract_properties_or_rejection_reason(
-                snuffler, ANALYTICAL_PROPERTIES, xtol=float(mc_solve_settings.xtols[mc_sample_idx])
+            result = self.fidelity.snuffled_budget.analyze_or_reject(
+                problem, ANALYTICAL_PROPERTIES, mc_solve_settings=mc_solve_settings, mc_sample_idx=mc_sample_idx
             )
             if isinstance(result, RejectionReason):
                 return result
@@ -103,17 +99,10 @@ class CandidateCharacterizationTask:
         analytical_features = np.mean(property_values, axis=0)
 
         # --- feature vector ---------------------
-        values = [
-            *(self._normalize_n_fevals_eff(value, max_fevals) for value in empirical_features),
+        # A correct solve takes at least 2 evaluations, 1 at each interval bound, so each empirical feature is mapped
+        # from [2, max_fevals] onto [0, 1] on a log scale.
+        feature_values = [
+            *(np.log(value / 2) / np.log(max_fevals / 2) for value in empirical_features),
             *analytical_features,
         ]
-        return dict(zip(self.fidelity.feature_column_names(self.solver_ids), map(float, values), strict=True))
-
-    @staticmethod
-    def _normalize_n_fevals_eff(value: float, max_fevals: int) -> float:
-        """Return `value`, a summary of `n_fevals_eff`, mapped from ``[2, max_fevals]`` onto ``[0, 1]`` on a log scale.
-
-        A correct solve takes at least 2 evaluations, 1 at each interval bound, and a solve without a correct answer
-        counts as `max_fevals`, so the result is ``log(value / 2) / log(max_fevals / 2)``.
-        """
-        return float(np.log(value / 2) / np.log(max_fevals / 2))
+        return dict(zip(self.fidelity.feature_column_names(self.solver_ids), map(float, feature_values), strict=True))

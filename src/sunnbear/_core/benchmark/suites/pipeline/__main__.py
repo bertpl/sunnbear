@@ -6,11 +6,11 @@ From the repository root, maintainers run it into a folder under `script_outputs
 
 The workspace has no default directory, because the shipped package cannot assume that the repository's folders
 exist. ``--n-workers`` sets the number of worker processes that the stages share. The candidates are characterized by
-the built-in solver configs whose role is used for problem characterization.
+the solves of the built-in solver configs whose role marks them for characterizing test problems.
 
 After the run, the command prints 1 line per stage, then, for each stage that rejects candidates:
 
-- the number of formulas with rejected candidates, after the stage's output name;
+- the stage's output name, then the number of formulas with rejected candidates;
 - 1 line per such formula.
 """
 

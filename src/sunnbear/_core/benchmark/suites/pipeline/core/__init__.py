@@ -18,7 +18,8 @@ The parts of the framework work together as follows:
 The stages share 2 more things that the framework defines:
 
 - `RejectionReason` names why a stage rejected a candidate, and `build_output_with_rejection_reports` builds the output
-  of a stage that rejects candidates, with the same 2 reports on them for every such stage;
+  of a stage that rejects candidates, with 2 reports on the rejected candidates whose columns are the same for every
+  such stage;
 - `PIPELINE_ROOT_SEED` is the root seed of every random draw of the pipeline.
 
 This package imports nothing from the package `stages` beside it, which implements the stages.

@@ -25,7 +25,7 @@ from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
 
 
 def _core_solver_configs():
-    """Return the built-in solver configs whose role characterizes test problems."""
+    """Return the built-in solver configs whose role marks them for characterizing test problems."""
     return [config for config in SolverConfigRegistry.configs() if config.role.is_used_for_problem_characterization]
 
 

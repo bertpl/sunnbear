@@ -60,7 +60,7 @@ def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(i
     assert rejections_per_formula.columns == [
         "formula_id",
         "n_candidates",
-        "n_valid",
+        "n_kept",
         *(reason.value for reason in RejectionReason),
     ]
     reason_per_formula = {

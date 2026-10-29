@@ -11,7 +11,6 @@ from sunnbear._core.benchmark.suites.pipeline.core import (
     RejectionReason,
     build_output_with_rejection_reports,
 )
-from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.utils.worker_pool import WorkerPool
 
@@ -29,7 +28,7 @@ class CandidateCharacterizationStage(PipelineStage):
     characterization stages differ.
 
     A candidate is rejected when 1 of its solves ends with `SolveStatus.FUNCTION_ERROR`, or when snuffled's diagnostics
-    reject it at 1 of its analyses, by the rules that validation's snuffled diagnostics check applies too.
+    reject it at 1 of its analyses, by the rules of `extract_properties_or_rejection_reason`.
 
     Class attributes:
         fidelity: The fidelity of the feature vectors, which sets the tuples of the solves and of snuffled's analyses,
@@ -39,10 +38,7 @@ class CandidateCharacterizationStage(PipelineStage):
     fidelity: ClassVar[FeatureFidelity]
 
     def __init__(self, core_solver_configs: Sequence[SolverConfig]) -> None:
-        """Create the stage, whose empirical block holds the solves of `core_solver_configs`.
-
-        For the benchmark suites, the configs are those whose role characterizes test problems
-        (`SolverRole.is_used_for_problem_characterization`).
+        """Create the stage, which solves each candidate with `core_solver_configs`.
 
         Raises:
             ValueError: If `core_solver_configs` is empty.
@@ -68,20 +64,14 @@ class CandidateCharacterizationStage(PipelineStage):
             `FeatureFidelity.feature_column_names`, of type `pl.Float64`, to those of `previous_table`.
         """
         # --- characterize, in the worker pool ---
-        candidates = previous_table.select("problem_id", "c_min", "c_max").rows()
-        batches = worker_pool.split_into_batches(
-            candidates, group_key=lambda candidate: ProblemId.from_string(candidate[0]).formula_id
+        results_by_problem_id = self._run_per_formula(
+            previous_table.select("problem_id", "c_min", "c_max").rows(),
+            problem_id=lambda candidate: candidate[0],
+            build_task=lambda batch: CandidateCharacterizationTask(
+                candidates=batch, solver_ids=self.solver_ids, fidelity=self.fidelity
+            ),
+            worker_pool=worker_pool,
         )
-        tasks = {
-            batch_idx: CandidateCharacterizationTask(
-                candidates=tuple(batch), solver_ids=self.solver_ids, fidelity=self.fidelity
-            )
-            for batch_idx, batch in enumerate(batches)
-        }
-        results_by_problem_id: dict[str, dict[str, float] | RejectionReason] = {}
-        for batch_idx, results in worker_pool.run(tasks):
-            batch_problem_ids = [problem_id for problem_id, _, _ in batches[batch_idx]]
-            results_by_problem_id.update(zip(batch_problem_ids, results, strict=True))
 
         # --- 1 row per candidate ----------------
         results = [results_by_problem_id[problem_id] for problem_id in previous_table["problem_id"]]
@@ -94,8 +84,4 @@ class CandidateCharacterizationStage(PipelineStage):
             )
             for column_name in column_names
         )
-        return build_output_with_rejection_reports(
-            table,
-            [result if isinstance(result, RejectionReason) else None for result in results],
-            added_columns=column_names,
-        )
+        return build_output_with_rejection_reports(table, results, added_columns=column_names)

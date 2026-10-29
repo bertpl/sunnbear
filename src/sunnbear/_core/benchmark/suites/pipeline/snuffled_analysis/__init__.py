@@ -2,10 +2,9 @@
 
 Every stage that runs snuffled analyzes a test problem in the same way, through 2 parts of this package:
 
-- `SnuffledAnalysisBudget` names the budget of an analysis, and builds the analysis of a test problem at 1 tuple of the
-  Monte Carlo tuple set;
-- `extract_properties_or_rejection_reason` reads an analysis's properties, and rejects the test problem by the rules on
-  snuffled's diagnostics.
+- `SnuffledAnalysisBudget` names the budget of an analysis, and its `analyze_or_reject` builds the analysis of a test
+  problem at 1 tuple of the Monte Carlo tuple set and reads the analysis's properties;
+- `extract_properties_or_rejection_reason` holds the rules by which snuffled's diagnostics reject the test problem.
 """
 
 from .budget import SnuffledAnalysisBudget

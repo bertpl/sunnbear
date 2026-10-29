@@ -18,10 +18,10 @@ def test_the_output_keeps_the_rows_without_a_reason_and_reports_the_others():
     per formula follow each formula's first row."""
     # --- arrange ----------------------
     table = pl.DataFrame({"problem_id": ["f1.1.1.2", "f1.1.1.1[n=1.0]", "f1.1.1.1[n=2.0]"], "x": [None, 1.0, None]})
-    rejection_reasons = [RejectionReason.BOUND_TO_WIDTH_RATIO, None, RejectionReason.BOUND_TO_WIDTH_RATIO]
+    results = [RejectionReason.BOUND_TO_WIDTH_RATIO, {"x": 1.0}, RejectionReason.BOUND_TO_WIDTH_RATIO]
 
     # --- act --------------------------
-    output = build_output_with_rejection_reports(table, rejection_reasons, added_columns=["x"])
+    output = build_output_with_rejection_reports(table, results, added_columns=["x"])
 
     # --- assert -----------------------
     assert output.table.rows() == [("f1.1.1.1[n=1.0]", 1.0)]
@@ -32,7 +32,7 @@ def test_the_output_keeps_the_rows_without_a_reason_and_reports_the_others():
         ("f1.1.1.1[n=2.0]", RejectionReason.BOUND_TO_WIDTH_RATIO.value),
     ]
     rejections_per_formula = output.reports[REJECTIONS_PER_FORMULA_REPORT_NAME]
-    assert rejections_per_formula.select("formula_id", "n_candidates", "n_valid", "bound_to_width_ratio").rows() == [
+    assert rejections_per_formula.select("formula_id", "n_candidates", "n_kept", "bound_to_width_ratio").rows() == [
         ("f1.1.1.2", 1, 0, 1),
         ("f1.1.1.1", 2, 1, 1),
     ]
@@ -46,7 +46,7 @@ def test_the_summary_gives_1_line_per_formula_with_rejected_candidates():
     rejection_counts[RejectionReason.BOUND_TO_WIDTH_RATIO.value] = [1, 0]
     rejection_counts[RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0.value] = [2, 0]
     rejections_per_formula = pl.DataFrame(
-        {"formula_id": ["f1.1.1.1", "f1.1.1.2"], "n_candidates": [4, 2], "n_valid": [1, 2], **rejection_counts}
+        {"formula_id": ["f1.1.1.1", "f1.1.1.2"], "n_candidates": [4, 2], "n_kept": [1, 2], **rejection_counts}
     )
 
     # --- act --------------------------
@@ -55,5 +55,5 @@ def test_the_summary_gives_1_line_per_formula_with_rejected_candidates():
     # --- assert -----------------------
     assert lines == [
         "formulas with rejected candidates: 1 of 2",
-        "  f1.1.1.1: 1 of 4 candidates valid; bound_to_width_ratio: 1, calibration_no_finite_sign_change_at_0: 2",
+        "  f1.1.1.1: 1 of 4 candidates kept; bound_to_width_ratio: 1, calibration_no_finite_sign_change_at_0: 2",
     ]

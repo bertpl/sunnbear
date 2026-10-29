@@ -1,13 +1,15 @@
-"""`SnuffledAnalysisBudget` names a snuffled analysis budget and builds the analysis at 1 Monte Carlo tuple."""
+"""`SnuffledAnalysisBudget` names a snuffled analysis budget, and runs the analysis at 1 Monte Carlo tuple."""
 
+from collections.abc import Sequence
 from enum import Enum
 
 from snuffled import Snuffler
 
 from sunnbear._core.benchmark.protocol import MCSolveSettings, SeedPurpose, derive_seed
-from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED
+from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED, RejectionReason
 from sunnbear._core.problems.core import TestProblem
 
+from .diagnostic_rules import extract_properties_or_rejection_reason
 from .function_evaluation_error import FunctionEvaluationError
 
 
@@ -72,4 +74,21 @@ class SnuffledAnalysisBudget(Enum):
             n_fun_samples=self.n_fun_samples,
             n_roots=self.n_roots,
             n_root_samples=self.n_root_samples,
+        )
+
+    def analyze_or_reject(
+        self,
+        problem: TestProblem,
+        properties: Sequence[str],
+        *,
+        mc_solve_settings: MCSolveSettings,
+        mc_sample_idx: int,
+    ) -> dict[str, float] | RejectionReason:
+        """Return the values of `properties` from the analysis of `build_snuffler`, or the reason to reject `problem`.
+
+        The rules are those of `extract_properties_or_rejection_reason`, at the `xtol` of tuple `mc_sample_idx`.
+        """
+        snuffler = self.build_snuffler(problem, mc_solve_settings=mc_solve_settings, mc_sample_idx=mc_sample_idx)
+        return extract_properties_or_rejection_reason(
+            snuffler, properties, xtol=float(mc_solve_settings.xtols[mc_sample_idx])
         )
