@@ -11,45 +11,26 @@ snuffled analyzes f at each sampled tuple:
 - at the LOW budget, `SnuffledAnalysisBudget.LOW`, for the others.
 
 The check reads only snuffled's diagnostics, not its function or root properties. It rejects the candidate at the first
-sampled tuple at which 1 of these holds:
-
-- f raises;
-- 1 of the flags in `_FLAG_REJECTION_REASONS` is above 0;
-- `MAX_ZERO_WIDTH`, the width of the widest region around a root where f is exactly 0, exceeds `MAX_ZERO_WIDTH_IN_XTOL`
-  times the tuple's `xtol`.
+sampled tuple at which the diagnostics reject it, by the rules of `extract_properties_or_rejection_reason`: f raises,
+a flag is above 0, or the widest region around a root where f is exactly 0 is too wide for the tuple's `xtol`.
 """
 
 import numpy as np
-from snuffled import Diagnostic
 
 from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, MCSolveSettings
-from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import FunctionEvaluationError, SnuffledAnalysisBudget
+from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
+from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import (
+    SnuffledAnalysisBudget,
+    extract_properties_or_rejection_reason,
+)
 from sunnbear._core.problems.core import TestProblem
 from sunnbear._core.utils.edge_biased_indices import select_edge_biased_indices
-
-from .rejection_reason import RejectionReason
 
 N_SNUFFLED_TUPLES = 32
 # snuffled analyzes f at the HIGH budget at these positions among the sampled tuples, sorted by ``c``: the 2 outermost,
 # where failures are most likely, and 2 in between, so that the larger budget also covers the middle of the c-range.
 HIGH_BUDGET_POSITIONS = (0, 14, 17, 31)
-# snuffled's `MAX_ZERO_WIDTH` is 1 float spacing at a root without an exact 0, and 2 at a root with 1 float where f is
-# exactly 0.
-#
-# At `MAX_BOUND_TO_WIDTH_RATIO`, the largest bound-to-width ratio that validation accepts, `xtol` spans the fewest float
-# spacings at the root. At that ratio, this fraction of `xtol` stays well above 2 float spacings, so that a root with 1
-# float where f is exactly 0 is not rejected.
-MAX_ZERO_WIDTH_IN_XTOL = 1 / 16
-# Each flag of snuffled's diagnostics maps to the reason that rejects a candidate when the flag is above 0. The check
-# tests them in this order, NaN first, because snuffled leaves its other diagnostics unspecified when f returns NaN.
-_FLAG_REJECTION_REASONS = {
-    Diagnostic.NAN_VALUES_DETECTED: RejectionReason.SNUFFLED_NAN_VALUES_DETECTED,
-    Diagnostic.INF_VALUES_DETECTED: RejectionReason.SNUFFLED_INF_VALUES_DETECTED,
-    Diagnostic.NO_ZEROS_DETECTED: RejectionReason.SNUFFLED_NO_ZEROS_DETECTED,
-    Diagnostic.INTERVAL_NOT_BRACKETING_READY: RejectionReason.SNUFFLED_INTERVAL_NOT_BRACKETING_READY,
-    Diagnostic.ALL_ROOTS_TOO_CLOSE_TO_EDGE: RejectionReason.SNUFFLED_ALL_ROOTS_TOO_CLOSE_TO_EDGE,
-}
 
 
 def find_snuffled_rejection_reason(problem: TestProblem) -> RejectionReason | None:
@@ -57,31 +38,19 @@ def find_snuffled_rejection_reason(problem: TestProblem) -> RejectionReason | No
 
     The check runs up to `N_SNUFFLED_TUPLES` snuffled analyses, so it is the most expensive check of validation.
 
-    The analyses run at the sampled tuples from `plan_snuffled_analyses`, in order, and stop at the first tuple that
-    the check rejects. Within 1 tuple, the check tests the conditions in this order:
-
-    1. f raises;
-    2. a flag is above 0, with the flags in the order of `_FLAG_REJECTION_REASONS`;
-    3. the widest region of exact zeros exceeds `MAX_ZERO_WIDTH_IN_XTOL` times the tuple's `xtol`.
+    The analyses run at the sampled tuples from `plan_snuffled_analyses`, in order, and stop at the first tuple at
+    which `extract_properties_or_rejection_reason` rejects the test problem.
     """
     mc_solve_settings = MCSolveSettings.from_test_problem(
         problem, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS, mc_tuples=load_mc_tuples(max(MCTuplesSize))
     )
-    xtols = mc_solve_settings.xtols
     for mc_sample_idx, budget in plan_snuffled_analyses(mc_solve_settings):
         snuffler = budget.build_snuffler(problem, mc_solve_settings=mc_solve_settings, mc_sample_idx=mc_sample_idx)
-        try:
-            # The diagnostics are extracted in the order of `Diagnostic`, which puts the NaN and inf flags last, so that
-            # those 2 flags also count the NaN and inf values that f returned while snuffled computed the other
-            # diagnostics.
-            diagnostics = {diagnostic: snuffler.extract(diagnostic) for diagnostic in Diagnostic}
-        except FunctionEvaluationError:
-            return RejectionReason.SNUFFLED_F_RAISES
-        for flag, reason in _FLAG_REJECTION_REASONS.items():
-            if diagnostics[flag] > 0:
-                return reason
-        if diagnostics[Diagnostic.MAX_ZERO_WIDTH] > MAX_ZERO_WIDTH_IN_XTOL * xtols[mc_sample_idx]:
-            return RejectionReason.SNUFFLED_MAX_ZERO_WIDTH_TOO_LARGE
+        result = extract_properties_or_rejection_reason(
+            snuffler, (), xtol=float(mc_solve_settings.xtols[mc_sample_idx])
+        )
+        if isinstance(result, RejectionReason):
+            return result
     return None
 
 

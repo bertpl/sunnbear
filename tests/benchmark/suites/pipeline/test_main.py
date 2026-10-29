@@ -44,7 +44,8 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
     assert [line.split(":")[0] for line in printed_lines[: len(_OUTPUT_NAMES)]] == _OUTPUT_NAMES
     n_formulas_with_rejections = len(printed_lines) - len(_OUTPUT_NAMES) - 1
     assert printed_lines[len(_OUTPUT_NAMES)] == (
-        f"formulas with rejected candidates: {n_formulas_with_rejections} of {len(FormulaRegistry.formulas())}"
+        f"{CandidateValidationStage.output_name}: formulas with rejected candidates: "
+        f"{n_formulas_with_rejections} of {len(FormulaRegistry.formulas())}"
     )
     assert sorted(path.name for path in tmp_path.glob("*.parquet")) == [f"{name}.parquet" for name in _OUTPUT_NAMES]
     manifests = [

@@ -5,13 +5,10 @@ from enum import Enum
 from snuffled import Snuffler
 
 from sunnbear._core.benchmark.protocol import MCSolveSettings, SeedPurpose, derive_seed
+from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED
 from sunnbear._core.problems.core import TestProblem
 
 from .function_evaluation_error import FunctionEvaluationError
-
-# Every snuffled analysis in the pipeline derives its seed from this root seed, so that its results are the same in
-# every run of the pipeline.
-SNUFFLED_ANALYSIS_ROOT_SEED = 0
 
 
 # ==================================================================================================
@@ -44,14 +41,14 @@ class SnuffledAnalysisBudget(Enum):
         distance between 2 x-values at which snuffled samples f, is set to the tuple's `xtol`, because snuffled is
         designed to receive the solver's tolerance as `dx`.
 
-        The analysis's seed derives from `SNUFFLED_ANALYSIS_ROOT_SEED`, the problem's id and `mc_sample_idx`, so the
+        The analysis's seed derives from `PIPELINE_ROOT_SEED`, the problem's id and `mc_sample_idx`, so the
         analysis is the same in every worker process and whatever order the analyses run in.
 
         When f raises during the analysis, the analysis raises `FunctionEvaluationError`, with f's exception as its
         cause, so that a caller can tell whether an exception came from f or from snuffled.
         """
         seed = derive_seed(
-            root_seed=SNUFFLED_ANALYSIS_ROOT_SEED,
+            root_seed=PIPELINE_ROOT_SEED,
             purpose=SeedPurpose.SNUFFLED_ANALYSIS,
             problem_id=str(problem.id),
             mc_sample_idx=mc_sample_idx,

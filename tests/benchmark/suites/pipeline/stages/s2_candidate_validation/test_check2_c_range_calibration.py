@@ -7,12 +7,12 @@ import pytest
 
 from sunnbear._core.benchmark.mc_tuples import MCTuples
 from sunnbear._core.benchmark.protocol import CRange
+from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
 from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation import check2_c_range_calibration
 from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.check2_c_range_calibration import (
     MAX_BOUND_REL_GAP,
     calibrate_c_range,
 )
-from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.rejection_reason import RejectionReason
 
 # The 2 c-values of this tuple set lie inside every c-range of these tests, except where a test chooses its own.
 _MC_TUPLES = MCTuples(u=[0.5, 0.5], v=[0.25, 0.75])

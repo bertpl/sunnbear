@@ -7,8 +7,8 @@ from snuffled import Snuffler
 import sunnbear.problems as problems  # Import the module, so that pytest does not collect the `TestProblem` class.
 from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, MCSolveSettings, SeedPurpose, derive_seed
+from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED
 from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import (
-    SNUFFLED_ANALYSIS_ROOT_SEED,
     SnuffledAnalysisBudget,
 )
 from sunnbear._core.problems.core import FormulaRegistry
@@ -50,7 +50,7 @@ def test_build_snuffler_draws_from_the_seed_of_the_problem_and_the_tuple(isolate
     problem, mc_solve_settings = _build_problem_and_mc_solve_settings()
     seed = (
         derive_seed(
-            root_seed=SNUFFLED_ANALYSIS_ROOT_SEED,
+            root_seed=PIPELINE_ROOT_SEED,
             purpose=SeedPurpose.SNUFFLED_ANALYSIS,
             problem_id="f99.921",
             mc_sample_idx=_MC_SAMPLE_IDX,

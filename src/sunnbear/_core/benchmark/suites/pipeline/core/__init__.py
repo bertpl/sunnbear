@@ -15,10 +15,25 @@ The parts of the framework work together as follows:
   `PipelineStageManifest`, and reads the reports back.
 - `PipelineStageManifest` records how a stage built its output: from which input, with which code, and when.
 
+The stages share 2 more things that the framework defines:
+
+- `RejectionReason` names why a stage rejected a candidate, and `build_output_with_rejection_reports` builds the output
+  of a stage that rejects candidates, with the same 2 reports on them for every such stage;
+- `PIPELINE_ROOT_SEED` is the root seed of every random draw of the pipeline.
+
 This package imports nothing from the package `stages` beside it, which implements the stages.
 """
 
 from .manifest import PipelineStageManifest
+from .rejections import (
+    REJECTED_BY_SCHEMA,
+    REJECTED_CANDIDATES_REPORT_NAME,
+    REJECTIONS_PER_FORMULA_REPORT_NAME,
+    RejectionReason,
+    build_output_with_rejection_reports,
+    summarize_rejections_per_formula,
+)
+from .root_seed import PIPELINE_ROOT_SEED
 from .stage import PipelineStage, PipelineStageOutput
 from .stage_runner import run_stages
 from .workspace import PipelineWorkspace

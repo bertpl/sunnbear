@@ -42,9 +42,8 @@ import numpy as np
 
 from sunnbear._core.benchmark.mc_tuples import MCTuples
 from sunnbear._core.benchmark.protocol import CRange, MCSolveSettings
+from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
 from sunnbear._core.problems.core import XCFun
-
-from .rejection_reason import RejectionReason
 
 # A c-value meets the condition only if each endpoint value keeps its sign and more than this fraction of its
 # magnitude at c = 0.

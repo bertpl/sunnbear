@@ -5,14 +5,12 @@ import math
 
 import numpy as np
 import pytest
-from snuffled import Diagnostic
 
 from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, CRange, MCSolveSettings
+from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
 from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import SnuffledAnalysisBudget
-from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation import RejectionReason
 from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.check4_snuffled_diagnostics import (
-    _FLAG_REJECTION_REASONS,
     N_SNUFFLED_TUPLES,
     find_snuffled_rejection_reason,
     plan_snuffled_analyses,
@@ -93,9 +91,3 @@ def test_the_planned_analyses_span_the_c_range_with_the_high_budget_at_4_positio
         position for position, (_, budget) in enumerate(planned_analyses) if budget is SnuffledAnalysisBudget.HIGH
     ]
     assert high_budget_positions == [0, 14, 17, 31]
-
-
-def test_the_flags_cover_every_diagnostic_except_the_max_zero_width():
-    """`_FLAG_REJECTION_REASONS` maps every diagnostic of snuffled except `MAX_ZERO_WIDTH` to a reason."""
-    # --- act / assert -----------------
-    assert set(_FLAG_REJECTION_REASONS) == set(Diagnostic) - {Diagnostic.MAX_ZERO_WIDTH}

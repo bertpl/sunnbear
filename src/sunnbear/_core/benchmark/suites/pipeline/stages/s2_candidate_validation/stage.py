@@ -3,20 +3,20 @@
 import polars as pl
 
 from sunnbear._core.benchmark.protocol import CRange
-from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageOutput
+from sunnbear._core.benchmark.suites.pipeline.core import (
+    PipelineStage,
+    PipelineStageOutput,
+    RejectionReason,
+    build_output_with_rejection_reports,
+)
 from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 from .check1_bound_to_width_ratio import exceeds_max_bound_to_width_ratio
 from .function_evaluating_checks_task import FunctionEvaluatingChecksTask
-from .rejection_reason import RejectionReason
 
 # The stage adds these columns to the valid candidates: their c-ranges.
 C_RANGE_SCHEMA: dict[str, pl.DataType] = {"c_min": pl.Float64(), "c_max": pl.Float64()}
-# The stage adds this column to the rejected candidates: the `RejectionReason` of each.
-REJECTED_BY_SCHEMA: dict[str, pl.DataType] = {"rejected_by": pl.Enum([reason.value for reason in RejectionReason])}
-REJECTED_CANDIDATES_REPORT_NAME = "rejected_candidates"
-REJECTIONS_PER_FORMULA_REPORT_NAME = "rejections_per_formula"
 
 
 # ==================================================================================================
@@ -44,13 +44,8 @@ class CandidateValidationStage(PipelineStage):
             worker_pool: The worker pool of the run, in which the checks that evaluate f run.
 
         Returns:
-            The stage's output, which holds:
-
-            - the output table: the valid candidates, with the columns of `previous_table` and of `C_RANGE_SCHEMA`;
-            - the report `REJECTED_CANDIDATES_REPORT_NAME`: the rejected candidates, with the columns of
-              `previous_table` and of `REJECTED_BY_SCHEMA`;
-            - the report `REJECTIONS_PER_FORMULA_REPORT_NAME`: 1 row per formula, with the columns ``formula_id``,
-              ``n_candidates``, ``n_valid``, and 1 count per `RejectionReason`, named after its value.
+            The stage's output, as `build_output_with_rejection_reports` describes it, whose table holds the columns
+            of `previous_table` and of `C_RANGE_SCHEMA`.
         """
         # --- the bound-to-width ratio check -----
         is_ratio_too_large = previous_table.select(exceeds_max_bound_to_width_ratio()).to_series()
@@ -74,58 +69,12 @@ class CandidateValidationStage(PipelineStage):
         results = [results_by_problem_id[problem_id] for problem_id in previous_table["problem_id"]]
         c_mins = [result.c_min if isinstance(result, CRange) else None for result in results]
         c_maxs = [result.c_max if isinstance(result, CRange) else None for result in results]
-        rejected_bys = [result.value if isinstance(result, RejectionReason) else None for result in results]
         table = previous_table.with_columns(
             pl.Series("c_min", c_mins, dtype=C_RANGE_SCHEMA["c_min"]),
             pl.Series("c_max", c_maxs, dtype=C_RANGE_SCHEMA["c_max"]),
-            pl.Series("rejected_by", rejected_bys, dtype=REJECTED_BY_SCHEMA["rejected_by"]),
         )
-        is_valid = pl.col("rejected_by").is_null()
-        return PipelineStageOutput(
-            table=table.filter(is_valid).drop(list(REJECTED_BY_SCHEMA)),
-            reports={
-                REJECTED_CANDIDATES_REPORT_NAME: table.filter(~is_valid).drop(list(C_RANGE_SCHEMA)),
-                REJECTIONS_PER_FORMULA_REPORT_NAME: self._count_rejections_per_formula(table),
-            },
-        )
-
-    @staticmethod
-    def summarize_rejections_per_formula(rejections_per_formula: pl.DataFrame) -> list[str]:
-        """Return a line that counts the formulas with rejected candidates, then 1 line per such formula.
-
-        `rejections_per_formula` is the report `REJECTIONS_PER_FORMULA_REPORT_NAME`. A formula's line gives its number
-        of candidates, how many of them are valid, and the number of rejected candidates per `RejectionReason` that
-        rejected any.
-        """
-        formulas_with_rejections = rejections_per_formula.filter(pl.col("n_valid") < pl.col("n_candidates"))
-        lines = [
-            f"formulas with rejected candidates: {formulas_with_rejections.height} of {rejections_per_formula.height}"
-        ]
-        for row in formulas_with_rejections.iter_rows(named=True):
-            rejections = ", ".join(
-                f"{reason.value}: {row[reason.value]}" for reason in RejectionReason if row[reason.value] > 0
-            )
-            lines.append(
-                f"  {row['formula_id']}: {row['n_valid']} of {row['n_candidates']} candidates valid; {rejections}"
-            )
-        return lines
-
-    # --------------------------------------------------------------------------
-    #  Helpers
-    # --------------------------------------------------------------------------
-    @staticmethod
-    def _count_rejections_per_formula(table: pl.DataFrame) -> pl.DataFrame:
-        """Return the report `REJECTIONS_PER_FORMULA_REPORT_NAME` of `table`, with 1 row per formula.
-
-        The rows follow the order of each formula's first appearance in `table`.
-        """
-        formula_ids = [ProblemId.from_string(problem_id).formula_id for problem_id in table["problem_id"]]
-        return (
-            table.with_columns(formula_id=pl.Series(formula_ids, dtype=pl.String()))
-            .group_by("formula_id", maintain_order=True)
-            .agg(
-                n_candidates=pl.len(),
-                n_valid=pl.col("rejected_by").is_null().sum(),
-                **{reason.value: (pl.col("rejected_by") == reason.value).sum() for reason in RejectionReason},
-            )
+        return build_output_with_rejection_reports(
+            table,
+            [result if isinstance(result, RejectionReason) else None for result in results],
+            added_columns=C_RANGE_SCHEMA,
         )

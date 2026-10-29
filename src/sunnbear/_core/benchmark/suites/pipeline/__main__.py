@@ -7,10 +7,9 @@ From the repository root, maintainers run it into a folder under `script_outputs
 The workspace has no default directory, because the shipped package cannot assume that the repository's folders
 exist. ``--n-workers`` sets the number of worker processes that the stages share.
 
-After the run, the command prints:
+After the run, the command prints 1 line per stage, then, for each stage that rejects candidates:
 
-- 1 line per stage;
-- the number of formulas with rejected candidates;
+- the number of formulas with rejected candidates, after the stage's output name;
 - 1 line per such formula.
 """
 
@@ -19,9 +18,8 @@ from pathlib import Path
 
 from sunnbear._core.problems.core import FormulaRegistry
 
-from .core import PipelineWorkspace
+from .core import REJECTIONS_PER_FORMULA_REPORT_NAME, PipelineWorkspace, summarize_rejections_per_formula
 from .runner import run_pipeline
-from .stages import REJECTIONS_PER_FORMULA_REPORT_NAME, CandidateValidationStage
 
 
 def main() -> None:
@@ -41,11 +39,15 @@ def main() -> None:
         report_names = ", ".join(manifest.report_sha256s) or "none"
         rows = f"{manifest.n_rows} rows, {manifest.n_dropped_rows} dropped"
         print(f"{manifest.output_name}: {rows}, in {manifest.duration_sec:.2f} s; reports: {report_names}")
-    rejections_per_formula = PipelineWorkspace(args.workspace).read_report(
-        CandidateValidationStage.output_name, REJECTIONS_PER_FORMULA_REPORT_NAME
-    )
-    for line in CandidateValidationStage.summarize_rejections_per_formula(rejections_per_formula):
-        print(line)
+    for manifest in manifests:
+        if REJECTIONS_PER_FORMULA_REPORT_NAME in manifest.report_sha256s:
+            rejections_per_formula = PipelineWorkspace(args.workspace).read_report(
+                manifest.output_name, REJECTIONS_PER_FORMULA_REPORT_NAME
+            )
+            [count_line, *formula_lines] = summarize_rejections_per_formula(rejections_per_formula)
+            print(f"{manifest.output_name}: {count_line}")
+            for line in formula_lines:
+                print(line)
 
 
 if __name__ == "__main__":
