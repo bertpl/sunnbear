@@ -35,4 +35,5 @@ from .stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
     CoarseCharacterizationStage,
+    SpacingStage,
 )

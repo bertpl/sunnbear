@@ -13,6 +13,7 @@ from sunnbear._core.benchmark.suites.pipeline.stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
     CoarseCharacterizationStage,
+    SpacingStage,
 )
 from sunnbear._core.problems.core import FormulaRegistry
 
@@ -21,6 +22,7 @@ _OUTPUT_NAMES = [
     CandidateGenerationStage.output_name,
     CandidateValidationStage.output_name,
     CoarseCharacterizationStage.output_name,
+    SpacingStage.output_name,
 ]
 
 
@@ -67,7 +69,7 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
         PipelineStageManifest.model_validate_json((tmp_path / "manifests" / f"{name}.json").read_text())
         for name in _OUTPUT_NAMES
     ]
-    assert [manifest.n_workers for manifest in manifests] == [3, 3, 3]
+    assert [manifest.n_workers for manifest in manifests] == [3] * len(_OUTPUT_NAMES)
 
 
 def test_the_command_requires_a_workspace(monkeypatch, capsys):

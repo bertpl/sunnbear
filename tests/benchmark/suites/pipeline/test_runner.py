@@ -8,9 +8,11 @@ from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage
 from sunnbear._core.benchmark.suites.pipeline.features import FeatureFidelity
 from sunnbear._core.benchmark.suites.pipeline.runner import run_pipeline
 from sunnbear._core.benchmark.suites.pipeline.stages import (
+    DEFAULT_SPACING_MIN_DISTANCE,
     CandidateGenerationStage,
     CandidateValidationStage,
     CoarseCharacterizationStage,
+    SpacingStage,
 )
 from sunnbear._core.problems.core import FormulaRegistry
 from sunnbear._core.solvers.core import SolverConfigRegistry
@@ -26,9 +28,10 @@ def _stage_classes(stage_cls: type[PipelineStage]) -> list[type[PipelineStage]]:
 
 
 @pytest.mark.only_with_numba_jit
-def test_the_pipeline_generates_validates_and_characterizes_the_candidates_of_the_given_formulas(tmp_path):
+def test_the_pipeline_generates_validates_characterizes_and_spaces_the_candidates_of_the_given_formulas(tmp_path):
     """On the formulas of category 2, the pipeline writes their candidates, then the valid ones with their c-ranges,
-    then every valid one with its coarse feature vector, and the scale of each feature block in every row."""
+    then every valid one with its coarse feature vector and the scale of each feature block in every row, then the
+    candidates that spacing keeps at its default minimum distance."""
     # --- arrange ----------------------
     # The shipped formulas of category 2 form a small corpus, so the pipeline runs fast on them.
     formulas = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 2]
@@ -66,3 +69,8 @@ def test_the_pipeline_generates_validates_and_characterizes_the_candidates_of_th
     assert coarse_features.columns == [*valid_candidates.columns, *feature_column_names, *scale_column_names]
     assert coarse_features.select(scale_column_names).n_unique() == 1
     assert all(scale > 0.0 for scale in coarse_features.select(scale_column_names).row(0))
+    spaced_candidates = pl.read_parquet(tmp_path / f"{SpacingStage.output_name}.parquet")
+    assert spaced_candidates.equals(
+        coarse_features.filter(pl.col("problem_id").is_in(spaced_candidates["problem_id"].to_list()))
+    )
+    assert manifests[-1].parameters == {"min_distance": DEFAULT_SPACING_MIN_DISTANCE}

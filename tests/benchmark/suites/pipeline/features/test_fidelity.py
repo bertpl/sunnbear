@@ -1,10 +1,11 @@
 """`FeatureFidelity.feature_column_names` names the solvers block first, then the snuffled block, and starts each column
 with its block's prefix; no feature scale column starts with such a prefix, and `FeatureFidelity.add_feature_scales`
-adds each block's mean pairwise L1 distance."""
+adds each block's mean pairwise L1 distance, by which `FeatureFidelity.balanced_feature_vectors` divides the block."""
 
 import numpy as np
 import polars as pl
 import polars.selectors as cs
+import pytest
 from snuffled import FunctionProperty, RootProperty
 
 from sunnbear._core.benchmark.suites.pipeline.features import SNUFFLED_PROPERTIES, FeatureBlock, FeatureFidelity
@@ -65,3 +66,29 @@ def test_each_blocks_scale_is_its_mean_pairwise_l1_distance_in_every_row():
             table.select(cs.starts_with(fidelity.feature_column_prefix(block))).to_numpy()
         )
         assert table_with_scales[fidelity.feature_scale_column_name(block)].to_list() == [scale_expected] * 5
+
+
+def test_the_balanced_vectors_divide_each_block_by_its_scale():
+    """The balanced vectors hold the feature columns in their order, each divided by its block's scale, so that each
+    block's mean pairwise L1 distance is 1."""
+    # --- arrange ----------------------
+    fidelity = FeatureFidelity.COARSE
+    column_names = fidelity.feature_column_names(["brent", "illinois"])
+    rng = np.random.default_rng(seed=1)
+    table = fidelity.add_feature_scales(
+        pl.DataFrame(
+            {"problem_id": [f"f99.{idx}" for idx in range(5)], **{name: rng.random(5) for name in column_names}}
+        )
+    )
+
+    # --- act --------------------------
+    vectors = fidelity.balanced_feature_vectors(table)
+
+    # --- assert -----------------------
+    features = table.select(column_names).to_numpy()
+    n_solvers_columns = len(column_names) - len(SNUFFLED_PROPERTIES)
+    block_slices = [slice(None, n_solvers_columns), slice(n_solvers_columns, None)]
+    for block, block_slice in zip(FeatureBlock, block_slices, strict=True):
+        scale = table[fidelity.feature_scale_column_name(block)][0]
+        np.testing.assert_array_equal(vectors[:, block_slice], features[:, block_slice] / scale)
+        assert mean_pairwise_l1(vectors[:, block_slice]) == pytest.approx(1.0)

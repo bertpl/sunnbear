@@ -10,6 +10,7 @@ A candidate's feature vector has 1 block per `FeatureBlock`:
 from collections.abc import Sequence
 from enum import Enum, StrEnum
 
+import numpy as np
 import polars as pl
 import polars.selectors as cs
 from snuffled import FunctionProperty, RootProperty
@@ -104,6 +105,24 @@ class FeatureFidelity(Enum):
         return table.with_columns(
             pl.lit(scale, dtype=pl.Float64()).alias(self.feature_scale_column_name(block))
             for block, scale in scales_by_block.items()
+        )
+
+    def balanced_feature_vectors(self, table: pl.DataFrame) -> np.ndarray:
+        """Return the feature vectors of `table`, 1 row per row of `table`, with each block divided by its scale.
+
+        `table` holds the feature columns and the feature scale columns, which `add_feature_scales` added. Over the
+        candidates of that table, each block of the balanced vectors has a mean pairwise L1 distance of 1, so that the
+        blocks contribute equally to an L1 distance between 2 vectors.
+
+        The blocks follow each other in the order of `FeatureBlock`. A row whose feature scales are null, because
+        `add_feature_scales` received fewer than 2 candidates, gets NaN values.
+        """
+        return np.hstack(
+            [
+                table.select(cs.starts_with(self.feature_column_prefix(block))).to_numpy()
+                / table[self.feature_scale_column_name(block)].to_numpy()[:, np.newaxis]
+                for block in FeatureBlock
+            ]
         )
 
 
