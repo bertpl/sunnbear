@@ -9,8 +9,8 @@ coverage.py cannot see inside a numba-compiled function, so CI runs the suite in
 
 The coverage gate applies to both modes' data combined. A test marked `only_with_numba_jit` is
 skipped with JIT off, because as plain Python it would run too slowly, e.g. because it calls into
-max-div. Skipping it loses no coverage, because it runs no line inside sunnbear's own numba-compiled
-functions.
+max-div or runs snuffled's analyses. Skipping it loses no coverage, because it runs no line inside
+sunnbear's own numba-compiled functions.
 """
 
 import os

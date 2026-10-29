@@ -62,6 +62,7 @@ def test_the_stage_adds_the_features_of_the_kept_candidates_and_reports_the_othe
     assert rejected_candidates.rows() == [("f99.972", -1.0, 1.0, -0.5, 0.5, RejectionReason.FUNCTION_ERROR.value)]
 
 
+@pytest.mark.only_with_numba_jit
 def test_the_stage_gives_the_same_output_with_1_or_2_workers():
     """With 2 worker processes, the output equals that of a run in this process, on 3 valid shipped candidates of 2
     formulas."""
