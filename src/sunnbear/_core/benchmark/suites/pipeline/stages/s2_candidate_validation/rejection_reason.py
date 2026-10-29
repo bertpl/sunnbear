@@ -7,9 +7,11 @@ from enum import StrEnum
 #  RejectionReason
 # ==================================================================================================
 class RejectionReason(StrEnum):
-    """A `RejectionReason` names the validation check that rejected a candidate, and for calibration the failing step.
+    """A `RejectionReason` names the check that rejected a candidate, or for some checks the condition that failed.
 
-    The calibration reasons follow the steps of `calibrate_c_range`.
+    The calibration reasons follow the steps of `calibrate_c_range`; the reasons whose names start with `SNUFFLED_` name
+    the conditions under which `find_snuffled_rejection_reason` rejects a candidate, listed in the order in which that
+    function tests them.
     """
 
     BOUND_TO_WIDTH_RATIO = "bound_to_width_ratio"
@@ -25,3 +27,14 @@ class RejectionReason(StrEnum):
     CALIBRATION_C_RANGE_TOO_NARROW = "calibration_c_range_too_narrow"
     # At 1 of the tuples, `Bisection` does not converge in exactly `DEFAULT_N_BISECTION_FEVALS` evaluations.
     BISECTION_COUNT_NOT_EXACT = "bisection_count_not_exact"
+    # At 1 of the sampled tuples, f raises during snuffled's analysis.
+    SNUFFLED_F_RAISES = "snuffled_f_raises"
+    # At 1 of the sampled tuples, the snuffled diagnostic named by the part of the member's name after `SNUFFLED_` is
+    # above 0.
+    SNUFFLED_NAN_VALUES_DETECTED = "snuffled_nan_values_detected"
+    SNUFFLED_INF_VALUES_DETECTED = "snuffled_inf_values_detected"
+    SNUFFLED_NO_ZEROS_DETECTED = "snuffled_no_zeros_detected"
+    SNUFFLED_INTERVAL_NOT_BRACKETING_READY = "snuffled_interval_not_bracketing_ready"
+    SNUFFLED_ALL_ROOTS_TOO_CLOSE_TO_EDGE = "snuffled_all_roots_too_close_to_edge"
+    # At 1 of the sampled tuples, snuffled's `MAX_ZERO_WIDTH` exceeds `MAX_ZERO_WIDTH_IN_XTOL` times the tuple's `xtol`.
+    SNUFFLED_MAX_ZERO_WIDTH_TOO_LARGE = "snuffled_max_zero_width_too_large"

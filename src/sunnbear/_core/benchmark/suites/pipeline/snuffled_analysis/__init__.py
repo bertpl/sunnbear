@@ -5,3 +5,4 @@ the Monte Carlo tuple set, so that every stage that runs snuffled analyzes a tes
 """
 
 from .budget import SNUFFLED_ANALYSIS_ROOT_SEED, SnuffledAnalysisBudget
+from .function_evaluation_error import FunctionEvaluationError

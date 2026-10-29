@@ -1,8 +1,13 @@
 """`FunctionEvaluatingChecksTask` runs the checks that evaluate f on a batch of candidates.
 
-These checks are c-range calibration and then the bisection count check, which needs the c-range. Both checks run in 1
-task, so the worker that compiles a formula for calibration also runs the bisection count check on it, and each formula
-is compiled in only 1 worker. The task runs in a worker process of the pool, or in the calling process.
+These checks run in this order:
+
+- c-range calibration;
+- the bisection count check, which needs the c-range;
+- the snuffled diagnostics check, which needs the c-range too.
+
+All these checks run in 1 task, so the worker that compiles a formula for calibration also runs the later checks on it,
+and each formula is compiled in only 1 worker. The task runs in a worker process of the pool, or in the calling process.
 """
 
 from dataclasses import dataclass
@@ -13,6 +18,7 @@ from sunnbear._core.problems.core import CandidateTestProblem, FormulaRegistry
 
 from .check2_c_range_calibration import calibrate_c_range
 from .check3_bisection_count import is_bisection_count_exact
+from .check4_snuffled_diagnostics import find_snuffled_rejection_reason
 from .rejection_reason import RejectionReason
 
 
@@ -46,11 +52,15 @@ class FunctionEvaluatingChecksTask:
     # --------------------------------------------------------------------------
     @staticmethod
     def _check_candidate(candidate: CandidateTestProblem, *, mc_tuples: MCTuples) -> CRange | RejectionReason:
-        """Return the candidate's c-range, or the reason that calibration or the bisection count check rejects it."""
+        """Return the candidate's c-range, or the reason that 1 of the checks that evaluate f rejects it."""
         c_range = calibrate_c_range(candidate.xc_fun, candidate.a, candidate.b, mc_tuples=mc_tuples)
         if isinstance(c_range, RejectionReason):
             return c_range
-        elif not is_bisection_count_exact(candidate.calibrated(c_range.c_min, c_range.c_max)):
-            return RejectionReason.BISECTION_COUNT_NOT_EXACT
         else:
-            return c_range
+            problem = candidate.calibrated(c_range.c_min, c_range.c_max)
+            if not is_bisection_count_exact(problem):
+                return RejectionReason.BISECTION_COUNT_NOT_EXACT
+            elif (snuffled_rejection_reason := find_snuffled_rejection_reason(problem)) is not None:
+                return snuffled_rejection_reason
+            else:
+                return c_range

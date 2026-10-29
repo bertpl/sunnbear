@@ -7,6 +7,8 @@ from snuffled import Snuffler
 from sunnbear._core.benchmark.protocol import MCSolveSettings, SeedPurpose, derive_seed
 from sunnbear._core.problems.core import TestProblem
 
+from .function_evaluation_error import FunctionEvaluationError
+
 # Every snuffled analysis in the pipeline derives its seed from this root seed, so that its results are the same in
 # every run of the pipeline.
 SNUFFLED_ANALYSIS_ROOT_SEED = 0
@@ -44,6 +46,9 @@ class SnuffledAnalysisBudget(Enum):
 
         The analysis's seed derives from `SNUFFLED_ANALYSIS_ROOT_SEED`, the problem's id and `mc_sample_idx`, so the
         analysis is the same in every worker process and whatever order the analyses run in.
+
+        When f raises during the analysis, the analysis raises `FunctionEvaluationError`, with f's exception as its
+        cause, so that a caller can tell whether an exception came from f or from snuffled.
         """
         seed = derive_seed(
             root_seed=SNUFFLED_ANALYSIS_ROOT_SEED,
@@ -51,8 +56,17 @@ class SnuffledAnalysisBudget(Enum):
             problem_id=str(problem.id),
             mc_sample_idx=mc_sample_idx,
         )
+        x_fun = problem.build_x_fun(float(mc_solve_settings.cs[mc_sample_idx]))
+
+        def evaluate_f(x: float) -> float:
+            """Return f at `x`, raising `FunctionEvaluationError` from any exception that f raises."""
+            try:
+                return x_fun(x)
+            except Exception as exc:
+                raise FunctionEvaluationError(f"f raised at x = {float(x)!r}") from exc
+
         return Snuffler(
-            problem.build_x_fun(float(mc_solve_settings.cs[mc_sample_idx])),
+            evaluate_f,
             problem.a,
             problem.b,
             dx=float(mc_solve_settings.xtols[mc_sample_idx]),

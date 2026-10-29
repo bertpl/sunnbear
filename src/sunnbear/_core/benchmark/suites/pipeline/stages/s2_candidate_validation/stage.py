@@ -35,8 +35,8 @@ class CandidateValidationStage(PipelineStage):
 
         The checks run in order, and each runs only on the candidates that passed the checks before it.
 
-        The checks that evaluate f (calibration and the bisection count check) run in tasks on `worker_pool`; each
-        task holds every candidate of the formulas that it covers, so each formula is compiled in only 1 worker.
+        The checks that evaluate f run in `FunctionEvaluatingChecksTask` tasks on `worker_pool`; each task holds every
+        candidate of its formulas, so each formula is compiled in only 1 worker.
 
         Args:
             previous_table: The output table of candidate generation, with the columns ``problem_id``, ``a`` and
