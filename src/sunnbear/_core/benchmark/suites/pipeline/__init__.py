@@ -6,6 +6,7 @@ it, adding columns and dropping rows:
 - `core` holds the framework: the base class of a stage, the loop that runs the stages, and the workspace that
   stores their outputs;
 - `stages` holds the stages, 1 module or subpackage per stage, whose names sort in run order;
+- `snuffled_analysis` runs snuffled's analysis of a test problem, for every stage that needs one;
 - `run_pipeline` runs the stages in order on a set of formulas, sharing 1 pool of worker processes between them.
 
 Every run recomputes every stage. Maintainers run the pipeline from the command line, as `__main__` describes; it
