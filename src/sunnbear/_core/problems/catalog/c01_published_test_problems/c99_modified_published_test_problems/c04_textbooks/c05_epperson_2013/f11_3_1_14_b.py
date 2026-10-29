@@ -12,9 +12,9 @@ class ModifiedEpperson20133114B(Formula):
 
     The survey writes the source's function as ``1/(x - 1)``; the published interval is ``[0, 3]``.
 
-    No root: a pole at `x = 1`. As 3.1-14(a).
+    No root: a pole at `x = 1`, as in exercise 3.1-14(a).
 
-    The formula returns 0 where ``x - c_scale*c`` equals 1, the 1 point at which the published function divides by 0;
+    The formula returns 0 where ``x - c_scale*c`` equals 1, the only point at which the published function divides by 0;
     everywhere else it is the published function.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because it raises
@@ -34,7 +34,7 @@ class ModifiedEpperson20133114B(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - c_scale*c``, with 0 at the pole; category 1 states ``c_scale``."""
+        """Evaluate f at ``x - c_scale*c``, with 0 at the pole; category 1 states the rule for ``c_scale``."""
         x = x - 3.0 * c
         if x == 1:
             return 0.0

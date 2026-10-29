@@ -18,7 +18,7 @@ class ModifiedChandrupatla19972(Formula):
     Printed zero: `x = 1`. The article says the author proposed it.
 
     The formula holds the test problems on ``[1e-4, 1e4]`` and wider. It evaluates the published function at
-    ``x*exp(-c*ln(b/a))`` on the published interval: ``c`` scales x, so that the root moves by the factor ``(b/a)**c``
+    ``x*exp(-c*ln(b/a))`` on its interval: ``c`` scales x, so that the root moves by the factor ``(b/a)**c``
     and never reaches 0.
 
     As ``c`` goes from 0 to 1, the root moves by the interval's full width in log scale.
@@ -30,12 +30,14 @@ class ModifiedChandrupatla19972(Formula):
     takes ``a`` across the pole for every ``c`` above ``1e-8``.
 
     The widest published interval, ``[1e-12, 1e12]``, becomes ``[1e-12, 1e10]``. On ``[1e-12, 1e12]``, `xtol` scales
-    with the interval's width and is about 2, so at the smallest values of ``c`` the root lies within `xtol` of ``a``.
+    with the interval's width and is about 2. The root lies at ``(b/a)**c``, which is 1 at ``c = 0``, so at the smallest
+    values of ``c`` the root lies within `xtol` of ``a``.
 
-    snuffled's diagnostics then report that all roots lie too close to the interval's edge, and the validation stage
-    rejects the test problem with `snuffled_all_roots_too_close_to_edge`. ``1e10`` is the largest power of 10 for ``b``
-    at which the root lies farther from ``a`` than the distance at which snuffled reports that diagnostic, a few times
-    `xtol`.
+    snuffled's diagnostics report that all roots lie too close to the interval's edge when they lie within a few times
+    `xtol` of a bound, and the validation stage then rejects the test problem with
+    `snuffled_all_roots_too_close_to_edge`.
+
+    ``1e10`` is the largest power of 10 for ``b`` at which the root stays more than a few times `xtol` from ``a``.
     """
 
     number = (1, 99, 1, 7, 2)

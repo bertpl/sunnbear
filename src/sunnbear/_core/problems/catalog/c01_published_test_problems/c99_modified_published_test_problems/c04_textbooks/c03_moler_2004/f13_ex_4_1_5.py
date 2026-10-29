@@ -16,7 +16,7 @@ class ModifiedMoler2004Ex415(Formula):
 
     No root: the sign change on `[0, 5]` comes from the pole at `x = pi`.
 
-    The formula returns 0 where ``x - c_scale*c`` equals the float of pi, the 1 point at which the published function
+    The formula returns 0 where ``x - c_scale*c`` equals the float of pi, the only point at which the published function
     divides by 0; everywhere else it is the published function.
 
     The published test problem does not satisfy the benchmark suite inclusion conditions, because it raises
@@ -38,7 +38,7 @@ class ModifiedMoler2004Ex415(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
-        """Evaluate the published function at ``x - c_scale*c``, with 0 at the pole; category 1 states ``c_scale``."""
+        """Evaluate f at ``x - c_scale*c``, with 0 at the pole; category 1 states the rule for ``c_scale``."""
         x = x - 5.0 * c
         if x == math.pi:
             return 0.0
