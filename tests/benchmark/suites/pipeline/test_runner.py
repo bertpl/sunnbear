@@ -26,7 +26,7 @@ def _stage_classes(stage_cls: type[PipelineStage]) -> list[type[PipelineStage]]:
 
 def test_the_pipeline_generates_validates_and_characterizes_the_candidates_of_the_given_formulas(tmp_path):
     """On the formulas of category 2, the pipeline writes their candidates, then the valid ones with their c-ranges,
-    then every valid one with its coarse feature vector."""
+    then every valid one with its coarse feature vector, and the scale of each feature block in every row."""
     # --- arrange ----------------------
     # The shipped formulas of category 2 form a small corpus, so the pipeline runs fast on them.
     formulas = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 2]
@@ -55,4 +55,7 @@ def test_the_pipeline_generates_validates_and_characterizes_the_candidates_of_th
         [config.solver_id for config in core_solver_configs]
     )
     assert coarse_features.select(valid_candidates.columns).equals(valid_candidates)
-    assert coarse_features.columns == [*valid_candidates.columns, *feature_column_names]
+    scale_column_names = FeatureFidelity.COARSE.feature_scale_column_names()
+    assert coarse_features.columns == [*valid_candidates.columns, *feature_column_names, *scale_column_names]
+    assert coarse_features.select(scale_column_names).n_unique() == 1
+    assert all(scale > 0.0 for scale in coarse_features.select(scale_column_names).row(0))

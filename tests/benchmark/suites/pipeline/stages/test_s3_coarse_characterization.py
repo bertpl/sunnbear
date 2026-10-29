@@ -1,5 +1,5 @@
-"""`CoarseCharacterizationStage` adds the coarse feature vector of each kept candidate, reports the rejected candidates,
-and gives the same output with 1 or 2 workers."""
+"""`CoarseCharacterizationStage` adds the coarse feature vector of each kept candidate and the scale of each feature
+block, reports the rejected candidates, and gives the same output with 1 or 2 workers."""
 
 import math
 
@@ -30,7 +30,8 @@ def _core_solver_configs():
 
 
 def test_the_stage_adds_the_features_of_the_kept_candidates_and_reports_the_others(isolated_formula_registry):
-    """The candidate with a simple root gets 25 features; the candidate whose f is NaN around its root is rejected."""
+    """The candidate with a simple root gets 25 features and null scales, because as the only kept candidate it leaves
+    no pair to measure; the candidate whose f is NaN around its root is rejected."""
     # --- arrange ----------------------
     define_formula_cls((99, 971), lambda x, c: x - c - 1 / 3, -1.0, 1.0)
     define_formula_cls((99, 972), lambda x, c: math.nan if abs(x - c - 1 / 3) < 0.1 else x - c - 1 / 3, -1.0, 1.0)
@@ -50,10 +51,12 @@ def test_the_stage_adds_the_features_of_the_kept_candidates_and_reports_the_othe
 
     # --- assert -----------------------
     column_names = FeatureFidelity.COARSE.feature_column_names(stage.solver_ids)
+    scale_column_names = FeatureFidelity.COARSE.feature_scale_column_names()
     assert len(column_names) == 25
-    assert output.table.columns == [*previous_table.columns, *column_names]
+    assert output.table.columns == [*previous_table.columns, *column_names, *scale_column_names]
     assert output.table["problem_id"].to_list() == ["f99.971"]
     assert all(0.0 <= value <= 1.0 for value in output.table.select(column_names).row(0))
+    assert output.table.select(scale_column_names).row(0) == (None, None)
     rejected_candidates = output.reports[REJECTED_CANDIDATES_REPORT_NAME]
     assert rejected_candidates.schema == pl.Schema({**previous_table.schema, **REJECTED_BY_SCHEMA})
     assert rejected_candidates.rows() == [("f99.972", -1.0, 1.0, -0.5, 0.5, RejectionReason.FUNCTION_ERROR.value)]
