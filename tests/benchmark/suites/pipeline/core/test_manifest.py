@@ -1,5 +1,5 @@
 """`PipelineStageManifest.from_stage_output` derives the manifest's row counts and input hash from a stage's output
-table and the manifest of the stage before it."""
+table and the manifest of the stage before it, and records the stage's parameters."""
 
 import datetime
 
@@ -11,8 +11,9 @@ from .example_stages import ExampleNumbersStage, ExampleSmallNumbersStage
 
 
 def test_the_manifest_counts_the_rows_and_the_dropped_rows_and_records_the_input_hash():
-    """The first stage's manifest has no input hash and drops no rows; a later stage's manifest counts the rows
-    that it dropped from its input, and records the input's sha256 and the sha256 of each report."""
+    """The first stage's manifest has no input hash, drops no rows and records no parameters; a later stage's manifest
+    counts the rows that it dropped from its input, and records the input's sha256, the sha256 of each report and the
+    stage's parameters."""
     # --- arrange ----------------------
     first_manifest = PipelineStageManifest.from_stage_output(
         stage=ExampleNumbersStage(),
@@ -27,7 +28,7 @@ def test_the_manifest_counts_the_rows_and_the_dropped_rows_and_records_the_input
 
     # --- act --------------------------
     manifest = PipelineStageManifest.from_stage_output(
-        stage=ExampleSmallNumbersStage(),
+        stage=ExampleSmallNumbersStage(max_x=2.5),
         table=pl.DataFrame({"problem_id": ["n1", "n2"]}),
         output_sha256="cd" * 32,
         report_sha256s={"large_numbers": "ef" * 32},
@@ -39,6 +40,7 @@ def test_the_manifest_counts_the_rows_and_the_dropped_rows_and_records_the_input
 
     # --- assert -----------------------
     assert (first_manifest.input_sha256, first_manifest.n_rows, first_manifest.n_dropped_rows) == (None, 3, 0)
+    assert (first_manifest.parameters, manifest.parameters) == ({}, {"max_x": 2.5})
     assert (manifest.input_sha256, manifest.n_rows, manifest.n_dropped_rows) == ("ab" * 32, 2, 1)
     assert manifest.output_name == "s2_small_numbers"
     assert manifest.report_sha256s == {"large_numbers": "ef" * 32}

@@ -13,7 +13,7 @@ from typing import Self
 import polars as pl
 from pydantic import BaseModel, ConfigDict
 
-from .stage import PipelineStage
+from .stage import PipelineStage, PipelineStageParameter
 
 
 # ==================================================================================================
@@ -31,6 +31,7 @@ class PipelineStageManifest(BaseModel):
         report_sha256s: The sha256 of each report's file, as hex, keyed by the report's name.
         input_sha256: The `output_sha256` of the stage before this one, whose output table this stage read; ``None``
             for the first stage.
+        parameters: The stage's `PipelineStage.parameters`.
         n_rows: The number of rows of the output table.
         n_dropped_rows: The number of rows of the input table that the output table does not hold; 0 for the first
             stage, which creates the rows.
@@ -46,6 +47,7 @@ class PipelineStageManifest(BaseModel):
     output_sha256: str
     report_sha256s: dict[str, str]
     input_sha256: str | None
+    parameters: dict[str, PipelineStageParameter]
     sunnbear_version: str
     n_rows: int
     n_dropped_rows: int
@@ -73,6 +75,7 @@ class PipelineStageManifest(BaseModel):
             output_sha256=output_sha256,
             report_sha256s=dict(report_sha256s),
             input_sha256=input_manifest.output_sha256 if input_manifest is not None else None,
+            parameters=dict(stage.parameters),
             sunnbear_version=importlib.metadata.version("sunnbear"),
             n_rows=table.height,
             n_dropped_rows=input_manifest.n_rows - table.height if input_manifest is not None else 0,
