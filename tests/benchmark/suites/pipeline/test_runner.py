@@ -38,8 +38,8 @@ def test_the_pipeline_generates_validates_and_characterizes_the_candidates_of_th
 
     # --- act --------------------------
     # By default `run_pipeline` starts 1 worker per CPU, which would only make the workers wait for CPU, because
-    # pytest-xdist already runs 1 test process per CPU. 2 workers still run the stages in worker processes, which
-    # 1 worker would not.
+    # pytest-xdist already runs 1 test process per CPU. With 2 workers the stages still run in worker processes;
+    # with 1 worker they would run in this test's process.
     manifests = run_pipeline(
         workspace_dir=tmp_path, formulas=formulas, core_solver_configs=core_solver_configs, n_workers=2
     )
