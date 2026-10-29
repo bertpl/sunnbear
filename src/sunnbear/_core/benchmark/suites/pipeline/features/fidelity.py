@@ -107,11 +107,11 @@ class FeatureFidelity(Enum):
             for block, scale in scales_by_block.items()
         )
 
-    def balanced_feature_vectors(self, table: pl.DataFrame) -> np.ndarray:
+    def scaled_feature_vectors(self, table: pl.DataFrame) -> np.ndarray:
         """Return the feature vectors of `table`, 1 row per row of `table`, with each block divided by its scale.
 
         `table` holds the feature columns and the feature scale columns, which `add_feature_scales` added. Over the
-        candidates of that table, each block of the balanced vectors has a mean pairwise L1 distance of 1, so that the
+        candidates of that table, each block of the scaled vectors has a mean pairwise L1 distance of 1, so that the
         blocks contribute equally to an L1 distance between 2 vectors.
 
         The blocks follow each other in the order of `FeatureBlock`. A row whose feature scales are null, because

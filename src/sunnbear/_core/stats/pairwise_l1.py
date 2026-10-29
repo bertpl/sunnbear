@@ -69,3 +69,11 @@ def mean_pairwise_l1(vectors: ArrayLike) -> float:
     if x.shape[0] < 2:
         raise ValueError("mean_pairwise_l1 requires at least two vectors.")
     return float(sum(gini_mean_difference(x[:, k]) for k in range(x.shape[1])))
+
+
+# ==================================================================================================
+#  L1 distances to 1 vector
+# ==================================================================================================
+def l1_distances_to(vectors: ArrayLike, vector: ArrayLike) -> np.ndarray:
+    """Return the L1 distance from `vector` to each row of `vectors`."""
+    return np.abs(np.asarray(vectors, dtype=np.float64) - np.asarray(vector, dtype=np.float64)).sum(axis=1)

@@ -42,7 +42,7 @@ class PipelineStage(ABC):
 
     @property
     def parameters(self) -> Mapping[str, PipelineStageParameterValue]:
-        """Return the values of the stage's parameters, keyed by name, which its `PipelineStageManifest` records.
+        """Return the values of the stage's parameters, keyed by name, for its `PipelineStageManifest` to record.
 
         A stage whose output depends on a value given to its constructor, such as a threshold, returns it here; the
         base implementation returns no parameter.
@@ -131,17 +131,26 @@ class PipelineStage(ABC):
         )
 
     @staticmethod
-    def _count_rejections_per_formula(table: pl.DataFrame) -> pl.DataFrame:
-        """Return the report `REJECTIONS_PER_FORMULA_REPORT_NAME` of `table`, which holds a ``rejected_by`` column."""
+    def _count_candidates_per_formula(table: pl.DataFrame, *, is_kept: pl.Expr, **counts: pl.Expr) -> pl.DataFrame:
+        """Return 1 row per formula of `table`: ``formula_id``, ``n_candidates``, ``n_kept`` and 1 column per `counts`.
+
+        The rows follow the order of each formula's first row in `table`; `is_kept` and each of `counts` are evaluated
+        over the formula's rows.
+        """
         formula_ids = [ProblemId.from_string(problem_id).formula_id for problem_id in table["problem_id"]]
         return (
             table.with_columns(formula_id=pl.Series(formula_ids, dtype=pl.String()))
             .group_by("formula_id", maintain_order=True)
-            .agg(
-                n_candidates=pl.len(),
-                n_kept=pl.col("rejected_by").is_null().sum(),
-                **{reason.value: (pl.col("rejected_by") == reason.value).sum() for reason in RejectionReason},
-            )
+            .agg(n_candidates=pl.len(), n_kept=is_kept.sum(), **counts)
+        )
+
+    @staticmethod
+    def _count_rejections_per_formula(table: pl.DataFrame) -> pl.DataFrame:
+        """Return the report `REJECTIONS_PER_FORMULA_REPORT_NAME` of `table`, which holds a ``rejected_by`` column."""
+        return PipelineStage._count_candidates_per_formula(
+            table,
+            is_kept=pl.col("rejected_by").is_null(),
+            **{reason.value: (pl.col("rejected_by") == reason.value).sum() for reason in RejectionReason},
         )
 
 

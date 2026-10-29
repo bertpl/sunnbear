@@ -1,6 +1,6 @@
 """`FeatureFidelity.feature_column_names` names the solvers block first, then the snuffled block, and starts each column
 with its block's prefix; no feature scale column starts with such a prefix, and `FeatureFidelity.add_feature_scales`
-adds each block's mean pairwise L1 distance, by which `FeatureFidelity.balanced_feature_vectors` divides the block."""
+adds each block's mean pairwise L1 distance, by which `FeatureFidelity.scaled_feature_vectors` divides the block."""
 
 import numpy as np
 import polars as pl
@@ -68,8 +68,8 @@ def test_each_blocks_scale_is_its_mean_pairwise_l1_distance_in_every_row():
         assert table_with_scales[fidelity.feature_scale_column_name(block)].to_list() == [scale_expected] * 5
 
 
-def test_the_balanced_vectors_divide_each_block_by_its_scale():
-    """The balanced vectors hold the feature columns in their order, each divided by its block's scale, so that each
+def test_the_scaled_vectors_divide_each_block_by_its_scale():
+    """The scaled vectors hold the feature columns in their order, each divided by its block's scale, so that each
     block's mean pairwise L1 distance is 1."""
     # --- arrange ----------------------
     fidelity = FeatureFidelity.COARSE
@@ -82,7 +82,7 @@ def test_the_balanced_vectors_divide_each_block_by_its_scale():
     )
 
     # --- act --------------------------
-    vectors = fidelity.balanced_feature_vectors(table)
+    vectors = fidelity.scaled_feature_vectors(table)
 
     # --- assert -----------------------
     features = table.select(column_names).to_numpy()
