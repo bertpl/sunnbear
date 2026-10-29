@@ -1,18 +1,14 @@
 """The stages of the benchmark suite pipeline that reject candidates name each rejection with a `RejectionReason`.
 
-`build_output_with_rejection_reports` builds such a stage's output: the candidates that the stage keeps, and 2 reports
-on the others, `REJECTED_CANDIDATES_REPORT_NAME` and `REJECTIONS_PER_FORMULA_REPORT_NAME`, which have the same columns
-for every stage. `summarize_rejections_per_formula` turns the second report into lines of text.
+`PipelineStage._build_output_with_rejection_reports` builds such a stage's output: the candidates that the stage
+keeps, and 2 reports on the rejected candidates, `REJECTED_CANDIDATES_REPORT_NAME` and
+`REJECTIONS_PER_FORMULA_REPORT_NAME`, which have the same columns for every stage. `summarize_rejections_per_formula`
+turns the second report into lines of text.
 """
 
-from collections.abc import Collection, Sequence
 from enum import StrEnum
 
 import polars as pl
-
-from sunnbear._core.problems.core import ProblemId
-
-from .stage import PipelineStageOutput
 
 
 # ==================================================================================================
@@ -41,8 +37,8 @@ class RejectionReason(StrEnum):
     BISECTION_COUNT_NOT_EXACT = "bisection_count_not_exact"
     # At 1 of the tuples of snuffled's analyses, f raises during the analysis.
     SNUFFLED_F_RAISES = "snuffled_f_raises"
-    # At 1 of the tuples of snuffled's analyses, the snuffled diagnostic named by the part of the member's name after
-    # `SNUFFLED_` is above 0.
+    # At 1 of the tuples of snuffled's analyses, the snuffled diagnostic of the same name, without the prefix
+    # `SNUFFLED_`, is above 0.
     SNUFFLED_NAN_VALUES_DETECTED = "snuffled_nan_values_detected"
     SNUFFLED_INF_VALUES_DETECTED = "snuffled_inf_values_detected"
     SNUFFLED_NO_ZEROS_DETECTED = "snuffled_no_zeros_detected"
@@ -63,53 +59,14 @@ REJECTIONS_PER_FORMULA_REPORT_NAME = "rejections_per_formula"
 
 
 # ==================================================================================================
-#  Stage output and summary
+#  Summary
 # ==================================================================================================
-def build_output_with_rejection_reports(
-    table: pl.DataFrame, results: Sequence[object], *, added_columns: Collection[str]
-) -> PipelineStageOutput:
-    """Return the output of a stage that rejects candidates, with its 2 reports on the rejected candidates.
-
-    Args:
-        table: Every row of the stage's input table, with the columns that the stage adds; on a rejected candidate's
-            row, the added columns hold nulls.
-        results: Each row's result in the stage, in the order of `table`: a `RejectionReason` for a candidate that the
-            stage rejects, any other value for one that it keeps.
-        added_columns: The names of the columns that the stage adds to its input table.
-
-    Returns:
-        The stage's output, which holds:
-
-        - the output table: the rows of `table` whose result is not a `RejectionReason`;
-        - the report `REJECTED_CANDIDATES_REPORT_NAME`: the other rows, without `added_columns`, and with the columns of
-          `REJECTED_BY_SCHEMA`;
-        - the report `REJECTIONS_PER_FORMULA_REPORT_NAME`: 1 row per formula, in the order of each formula's first
-          row in `table`, with the columns ``formula_id``, ``n_candidates``, ``n_kept``, and 1 count per
-          `RejectionReason`, named after its value.
-    """
-    table_with_reasons = table.with_columns(
-        pl.Series(
-            "rejected_by",
-            [result.value if isinstance(result, RejectionReason) else None for result in results],
-            dtype=REJECTED_BY_SCHEMA["rejected_by"],
-        )
-    )
-    is_kept = pl.col("rejected_by").is_null()
-    return PipelineStageOutput(
-        table=table_with_reasons.filter(is_kept).drop(list(REJECTED_BY_SCHEMA)),
-        reports={
-            REJECTED_CANDIDATES_REPORT_NAME: table_with_reasons.filter(~is_kept).drop(list(added_columns)),
-            REJECTIONS_PER_FORMULA_REPORT_NAME: _count_rejections_per_formula(table_with_reasons),
-        },
-    )
-
-
 def summarize_rejections_per_formula(rejections_per_formula: pl.DataFrame) -> list[str]:
     """Return a line that counts the formulas with rejected candidates, then 1 line per such formula.
 
     `rejections_per_formula` is a stage's report `REJECTIONS_PER_FORMULA_REPORT_NAME`. A formula's line gives its number
-    of candidates, how many of them the stage keeps, and the number of rejected candidates per `RejectionReason` that
-    rejected any.
+    of candidates, how many of them the stage keeps, and, for each `RejectionReason` that rejected at least 1 of its
+    candidates, the number of candidates that it rejected.
     """
     formulas_with_rejections = rejections_per_formula.filter(pl.col("n_kept") < pl.col("n_candidates"))
     lines = [f"formulas with rejected candidates: {formulas_with_rejections.height} of {rejections_per_formula.height}"]
@@ -119,20 +76,3 @@ def summarize_rejections_per_formula(rejections_per_formula: pl.DataFrame) -> li
         )
         lines.append(f"  {row['formula_id']}: {row['n_kept']} of {row['n_candidates']} candidates kept; {rejections}")
     return lines
-
-
-# ==================================================================================================
-#  Helpers
-# ==================================================================================================
-def _count_rejections_per_formula(table: pl.DataFrame) -> pl.DataFrame:
-    """Return the report `REJECTIONS_PER_FORMULA_REPORT_NAME` of `table`, which holds a ``rejected_by`` column."""
-    formula_ids = [ProblemId.from_string(problem_id).formula_id for problem_id in table["problem_id"]]
-    return (
-        table.with_columns(formula_id=pl.Series(formula_ids, dtype=pl.String()))
-        .group_by("formula_id", maintain_order=True)
-        .agg(
-            n_candidates=pl.len(),
-            n_kept=pl.col("rejected_by").is_null().sum(),
-            **{reason.value: (pl.col("rejected_by") == reason.value).sum() for reason in RejectionReason},
-        )
-    )

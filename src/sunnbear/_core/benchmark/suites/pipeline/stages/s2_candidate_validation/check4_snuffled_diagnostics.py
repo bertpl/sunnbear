@@ -41,7 +41,9 @@ def find_snuffled_rejection_reason(problem: TestProblem) -> RejectionReason | No
         problem, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS, mc_tuples=load_mc_tuples(max(MCTuplesSize))
     )
     for mc_sample_idx, budget in plan_snuffled_analyses(mc_solve_settings):
-        result = budget.analyze_or_reject(problem, (), mc_solve_settings=mc_solve_settings, mc_sample_idx=mc_sample_idx)
+        result = budget.extract_properties_or_rejection_reason(
+            problem, (), mc_solve_settings=mc_solve_settings, mc_sample_idx=mc_sample_idx
+        )
         if isinstance(result, RejectionReason):
             return result
     return None

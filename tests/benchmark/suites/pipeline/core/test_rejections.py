@@ -1,5 +1,5 @@
-"""`build_output_with_rejection_reports` splits a stage's rows into kept and rejected candidates, with their counts per
-formula, and `summarize_rejections_per_formula` gives 1 line per formula with rejected candidates."""
+"""`PipelineStage._build_output_with_rejection_reports` splits a stage's rows into kept and rejected candidates, with
+their counts per formula, and `summarize_rejections_per_formula` gives 1 line per formula with rejected candidates."""
 
 import polars as pl
 
@@ -7,8 +7,8 @@ from sunnbear._core.benchmark.suites.pipeline.core import (
     REJECTED_BY_SCHEMA,
     REJECTED_CANDIDATES_REPORT_NAME,
     REJECTIONS_PER_FORMULA_REPORT_NAME,
+    PipelineStage,
     RejectionReason,
-    build_output_with_rejection_reports,
     summarize_rejections_per_formula,
 )
 
@@ -21,7 +21,7 @@ def test_the_output_keeps_the_rows_without_a_reason_and_reports_the_others():
     results = [RejectionReason.BOUND_TO_WIDTH_RATIO, {"x": 1.0}, RejectionReason.BOUND_TO_WIDTH_RATIO]
 
     # --- act --------------------------
-    output = build_output_with_rejection_reports(table, results, added_columns=["x"])
+    output = PipelineStage._build_output_with_rejection_reports(table, results, added_columns=["x"])
 
     # --- assert -----------------------
     assert output.table.rows() == [("f1.1.1.1[n=1.0]", 1.0)]
@@ -40,7 +40,7 @@ def test_the_output_keeps_the_rows_without_a_reason_and_reports_the_others():
 
 def test_the_summary_gives_1_line_per_formula_with_rejected_candidates():
     """Only a formula with a rejected candidate gets a line, which counts the rejections of each reason that rejected
-    any."""
+    at least 1 of its candidates."""
     # --- arrange ----------------------
     rejection_counts = {reason.value: [0, 0] for reason in RejectionReason}
     rejection_counts[RejectionReason.BOUND_TO_WIDTH_RATIO.value] = [1, 0]

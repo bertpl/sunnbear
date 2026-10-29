@@ -7,7 +7,6 @@ from sunnbear._core.benchmark.suites.pipeline.core import (
     PipelineStage,
     PipelineStageOutput,
     RejectionReason,
-    build_output_with_rejection_reports,
 )
 from sunnbear._core.utils.worker_pool import WorkerPool
 
@@ -34,8 +33,8 @@ class CandidateValidationStage(PipelineStage):
 
         The checks run in order, and each runs only on the candidates that passed the checks before it.
 
-        The checks that evaluate f run in `FunctionEvaluatingChecksTask` tasks on `worker_pool`; each task holds every
-        candidate of its formulas, so each formula is compiled in only 1 worker.
+        The checks that evaluate f run in `FunctionEvaluatingChecksTask` tasks on `worker_pool`, by
+        `_run_in_formula_batches`.
 
         Args:
             previous_table: The output table of candidate generation, with the columns ``problem_id``, ``a`` and
@@ -43,7 +42,7 @@ class CandidateValidationStage(PipelineStage):
             worker_pool: The worker pool of the run, in which the checks that evaluate f run.
 
         Returns:
-            The stage's output, as `build_output_with_rejection_reports` describes it, whose table holds the columns
+            The stage's output, as `_build_output_with_rejection_reports` describes it, whose table holds the columns
             of `previous_table` and of `C_RANGE_SCHEMA`.
         """
         # --- the bound-to-width ratio check -----
@@ -56,9 +55,9 @@ class CandidateValidationStage(PipelineStage):
         # --- the checks that evaluate f ---------
         problem_ids_to_evaluate = previous_table.filter(~is_ratio_too_large)["problem_id"].to_list()
         results_by_problem_id.update(
-            self._run_per_formula(
+            self._run_in_formula_batches(
                 problem_ids_to_evaluate,
-                problem_id=str,
+                problem_id_key=str,
                 build_task=lambda batch: FunctionEvaluatingChecksTask(problem_ids=batch),
                 worker_pool=worker_pool,
             )
@@ -72,4 +71,4 @@ class CandidateValidationStage(PipelineStage):
             pl.Series("c_min", c_mins, dtype=C_RANGE_SCHEMA["c_min"]),
             pl.Series("c_max", c_maxs, dtype=C_RANGE_SCHEMA["c_max"]),
         )
-        return build_output_with_rejection_reports(table, results, added_columns=C_RANGE_SCHEMA)
+        return self._build_output_with_rejection_reports(table, results, added_columns=C_RANGE_SCHEMA)

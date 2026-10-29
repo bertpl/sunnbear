@@ -10,7 +10,7 @@ from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
 
 def test_the_task_returns_a_feature_vector_or_a_reason_per_candidate(isolated_formula_registry):
     """A simple root gets its feature vector, each value in [0, 1]; f that is NaN around its root fails the solves; f
-    that is exactly 0 around its root passes the solves and fails snuffled's zero width rule."""
+    that is exactly 0 around its root passes the solves and is rejected with `SNUFFLED_MAX_ZERO_WIDTH_TOO_LARGE`."""
     # --- arrange ----------------------
     root_offset = 1 / 3
     define_formula_cls((99, 961), lambda x, c: x - c - root_offset, -1.0, 1.0)

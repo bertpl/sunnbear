@@ -76,7 +76,7 @@ class SnuffledAnalysisBudget(Enum):
             n_root_samples=self.n_root_samples,
         )
 
-    def analyze_or_reject(
+    def extract_properties_or_rejection_reason(
         self,
         problem: TestProblem,
         properties: Sequence[str],
@@ -84,7 +84,7 @@ class SnuffledAnalysisBudget(Enum):
         mc_solve_settings: MCSolveSettings,
         mc_sample_idx: int,
     ) -> dict[str, float] | RejectionReason:
-        """Return the values of `properties` from the analysis of `build_snuffler`, or the reason to reject `problem`.
+        """Return `properties` from the analysis that `build_snuffler` builds, or the reason to reject `problem`.
 
         The rules are those of `extract_properties_or_rejection_reason`, at the `xtol` of tuple `mc_sample_idx`.
         """

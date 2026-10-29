@@ -9,7 +9,6 @@ from sunnbear._core.benchmark.suites.pipeline.core import (
     PipelineStage,
     PipelineStageOutput,
     RejectionReason,
-    build_output_with_rejection_reports,
 )
 from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.utils.worker_pool import WorkerPool
@@ -22,7 +21,7 @@ from .fidelity import FeatureFidelity
 #  CandidateCharacterizationStage
 # ==================================================================================================
 class CandidateCharacterizationStage(PipelineStage):
-    """`CandidateCharacterizationStage` adds each candidate's feature vector, and rejects the candidates that fail.
+    """`CandidateCharacterizationStage` adds feature vectors, and rejects candidates whose solves or analyses fail.
 
     A child class is 1 stage of the pipeline: it sets `output_name` and `fidelity`, the only things in which the
     characterization stages differ.
@@ -31,8 +30,7 @@ class CandidateCharacterizationStage(PipelineStage):
     reject it at 1 of its analyses, by the rules of `extract_properties_or_rejection_reason`.
 
     Class attributes:
-        fidelity: The fidelity of the feature vectors, which sets the tuples of the solves and of snuffled's analyses,
-            the budget of the analyses, and the names of the feature columns.
+        fidelity: The `FeatureFidelity` of the feature vectors.
     """
 
     fidelity: ClassVar[FeatureFidelity]
@@ -51,8 +49,8 @@ class CandidateCharacterizationStage(PipelineStage):
     def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
         """Return the kept candidates with their feature vectors, and the reports on the rejected candidates.
 
-        The candidates are characterized in `CandidateCharacterizationTask` tasks on `worker_pool`; each task holds
-        every candidate of its formulas, so each formula is compiled in only 1 worker.
+        The candidates are characterized in `CandidateCharacterizationTask` tasks on `worker_pool`, by
+        `_run_in_formula_batches`.
 
         Args:
             previous_table: The output table of the stage before, with the columns ``problem_id``, ``c_min`` and
@@ -60,13 +58,13 @@ class CandidateCharacterizationStage(PipelineStage):
             worker_pool: The worker pool of the run, in which the candidates are characterized.
 
         Returns:
-            The stage's output, as `build_output_with_rejection_reports` describes it, whose table adds the columns of
+            The stage's output, as `_build_output_with_rejection_reports` describes it, whose table adds the columns of
             `FeatureFidelity.feature_column_names`, of type `pl.Float64`, to those of `previous_table`.
         """
         # --- characterize, in the worker pool ---
-        results_by_problem_id = self._run_per_formula(
+        results_by_problem_id = self._run_in_formula_batches(
             previous_table.select("problem_id", "c_min", "c_max").rows(),
-            problem_id=lambda candidate: candidate[0],
+            problem_id_key=lambda candidate: candidate[0],
             build_task=lambda batch: CandidateCharacterizationTask(
                 candidates=batch, solver_ids=self.solver_ids, fidelity=self.fidelity
             ),
@@ -84,4 +82,4 @@ class CandidateCharacterizationStage(PipelineStage):
             )
             for column_name in column_names
         )
-        return build_output_with_rejection_reports(table, results, added_columns=column_names)
+        return self._build_output_with_rejection_reports(table, results, added_columns=column_names)

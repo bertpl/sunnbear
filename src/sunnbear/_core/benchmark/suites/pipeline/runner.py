@@ -40,9 +40,11 @@ def run_pipeline(
         The manifest of each stage, in run order.
 
     Raises:
-        ValueError: If a formula fails the checks of `Formula.build_all_candidates`, if `core_solver_configs` is empty,
-            or if `n_workers` is below 1, or above 1 while a formula or solver config is defined in an interactive
-            session.
+        ValueError: If 1 of these holds:
+
+            - a formula fails the checks of `Formula.build_all_candidates`;
+            - `core_solver_configs` is empty;
+            - `n_workers` is below 1, or above 1 while a formula or solver config is defined in an interactive session.
     """
     stages = [
         CandidateGenerationStage(formulas),

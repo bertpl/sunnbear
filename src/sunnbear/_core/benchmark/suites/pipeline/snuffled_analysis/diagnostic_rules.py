@@ -1,12 +1,8 @@
 """snuffled's diagnostics reject a test problem by the same rules in every stage that runs snuffled.
 
 `extract_properties_or_rejection_reason` extracts the requested properties and every diagnostic of 1 analysis, at 1
-tuple of the Monte Carlo tuple set, and rejects the test problem when 1 of these holds:
-
-- f raises;
-- 1 of the flags in `FLAG_REJECTION_REASONS` is above 0;
-- `MAX_ZERO_WIDTH`, the width of the widest region around a root where f is exactly 0, exceeds `MAX_ZERO_WIDTH_IN_XTOL`
-  times the tuple's `xtol`.
+tuple of the Monte Carlo tuple set, and rejects the test problem by the rules that its docstring lists.
+`MAX_ZERO_WIDTH` is the width of the widest region around a root where f is exactly 0.
 """
 
 from collections.abc import Sequence
@@ -25,7 +21,7 @@ from .function_evaluation_error import FunctionEvaluationError
 # float where f is exactly 0 is not rejected.
 MAX_ZERO_WIDTH_IN_XTOL = 1 / 16
 # Each flag of snuffled's diagnostics maps to the reason that rejects a test problem when the flag is above 0. The rules
-# test them in this order, NaN first, because snuffled leaves its other diagnostics unspecified when f returns NaN.
+# test the flags in this order, NaN first, because snuffled leaves its other diagnostics unspecified when f returns NaN.
 FLAG_REJECTION_REASONS = {
     Diagnostic.NAN_VALUES_DETECTED: RejectionReason.SNUFFLED_NAN_VALUES_DETECTED,
     Diagnostic.INF_VALUES_DETECTED: RejectionReason.SNUFFLED_INF_VALUES_DETECTED,
@@ -42,7 +38,9 @@ def extract_properties_or_rejection_reason(
 
     The function extracts `properties` first, in their order, then every diagnostic, in the order of `Diagnostic`,
     which puts the NaN and inf flags last, so that those 2 flags also count the NaN and inf values that f returned
-    while snuffled computed everything else. The function then tests the rules in this order:
+    while snuffled computed everything else.
+
+    The function then tests the rules in this order:
 
     1. f raises;
     2. a flag is above 0, with the flags in the order of `FLAG_REJECTION_REASONS`;
@@ -56,7 +54,7 @@ def extract_properties_or_rejection_reason(
         xtol: The `xtol` of the analysis's tuple.
 
     Returns:
-        The value of each of `properties`, keyed by its name, or the `RejectionReason` of the first rule that fails.
+        The value of each of `properties`, keyed by its name, or the `RejectionReason` of the first rule that holds.
     """
     try:
         property_values = {prop: snuffler.extract(prop) for prop in properties}
