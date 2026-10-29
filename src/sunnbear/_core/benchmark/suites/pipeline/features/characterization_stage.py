@@ -1,5 +1,6 @@
 """`CandidateCharacterizationStage` is the base class of the stages that compute the candidates' feature vectors."""
 
+import dataclasses
 from collections.abc import Sequence
 from typing import ClassVar
 
@@ -22,6 +23,10 @@ from .fidelity import FeatureFidelity
 # ==================================================================================================
 class CandidateCharacterizationStage(PipelineStage):
     """`CandidateCharacterizationStage` adds feature vectors, and rejects candidates whose solves or analyses fail.
+
+    The stage also adds the scale of each block of the features, as `FeatureFidelity.add_feature_scales` computes it.
+    A stage reads only the output table of the stage before it, so the scales are stored in this stage's output
+    table, where the next stage can read them, with the same value in every row.
 
     A child class is 1 stage of the pipeline: it sets `output_name` and `fidelity`, the only things in which the
     characterization stages differ.
@@ -58,8 +63,13 @@ class CandidateCharacterizationStage(PipelineStage):
             worker_pool: The worker pool of the run, in which the candidates are characterized.
 
         Returns:
-            The stage's output, as `_build_output_with_rejection_reports` describes it, whose table adds the columns of
-            `FeatureFidelity.feature_column_names`, of type `pl.Float64`, to those of `previous_table`.
+            The stage's output, as `_build_output_with_rejection_reports` describes it. Its table holds these
+            columns; every added column has type `pl.Float64`:
+
+            - the columns of `previous_table`;
+            - the columns of `FeatureFidelity.feature_column_names`;
+            - the columns of `FeatureFidelity.feature_scale_column_names`, each holding, in every row, the scale that
+              `FeatureFidelity.add_feature_scales` computes, or null when fewer than 2 candidates are kept.
         """
         # --- characterize, in the worker pool ---
         results_by_problem_id = self._run_in_formula_batches(
@@ -82,4 +92,5 @@ class CandidateCharacterizationStage(PipelineStage):
             )
             for column_name in column_names
         )
-        return self._build_output_with_rejection_reports(table, results, added_columns=column_names)
+        output = self._build_output_with_rejection_reports(table, results, added_columns=column_names)
+        return dataclasses.replace(output, table=self.fidelity.add_feature_scales(output.table))

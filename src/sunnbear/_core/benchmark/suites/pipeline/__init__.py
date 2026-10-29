@@ -26,7 +26,7 @@ from .core import (
     RejectionReason,
     run_stages,
 )
-from .features import CandidateCharacterizationStage, FeatureFidelity
+from .features import CandidateCharacterizationStage, FeatureBlock, FeatureFidelity
 from .runner import run_pipeline
 from .stages import (
     C_RANGE_SCHEMA,
