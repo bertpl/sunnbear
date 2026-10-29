@@ -1,21 +1,23 @@
 """`CandidateValidationStage` keeps the valid candidates with their c-ranges, reports each rejected candidate with its
-`RejectionReason`, counts and summarizes the rejections per formula, and gives the same output with 1 or 2 workers."""
+`RejectionReason`, counts the rejections per formula, and gives the same output with 1 or 2 workers."""
 
 import math
 
 import polars as pl
 
+from sunnbear._core.benchmark.suites.pipeline.core import (
+    REJECTED_BY_SCHEMA,
+    REJECTED_CANDIDATES_REPORT_NAME,
+    REJECTIONS_PER_FORMULA_REPORT_NAME,
+    RejectionReason,
+)
 from sunnbear._core.benchmark.suites.pipeline.stages.s1_candidate_generation import (
     CANDIDATES_SCHEMA,
     CandidateGenerationStage,
 )
 from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation import (
     C_RANGE_SCHEMA,
-    REJECTED_BY_SCHEMA,
-    REJECTED_CANDIDATES_REPORT_NAME,
-    REJECTIONS_PER_FORMULA_REPORT_NAME,
     CandidateValidationStage,
-    RejectionReason,
 )
 from sunnbear._core.problems.core import FormulaRegistry
 from sunnbear._core.utils.module_imports import worker_pool_for_modules
@@ -58,7 +60,7 @@ def test_the_stage_keeps_the_valid_candidates_and_reports_the_others_per_check(i
     assert rejections_per_formula.columns == [
         "formula_id",
         "n_candidates",
-        "n_valid",
+        "n_kept",
         *(reason.value for reason in RejectionReason),
     ]
     reason_per_formula = {
@@ -105,24 +107,3 @@ def test_the_stage_gives_the_same_output_with_1_or_2_workers():
     assert worker_processes_output.reports.keys() == in_process_output.reports.keys()
     for report_name, report in worker_processes_output.reports.items():
         assert report.equals(in_process_output.reports[report_name])
-
-
-def test_the_summary_gives_1_line_per_formula_with_rejected_candidates():
-    """Only a formula with a rejected candidate gets a line, which counts the rejections of each reason that rejected
-    any."""
-    # --- arrange ----------------------
-    rejection_counts = {reason.value: [0, 0] for reason in RejectionReason}
-    rejection_counts[RejectionReason.BOUND_TO_WIDTH_RATIO.value] = [1, 0]
-    rejection_counts[RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0.value] = [2, 0]
-    rejections_per_formula = pl.DataFrame(
-        {"formula_id": ["f1.1.1.1", "f1.1.1.2"], "n_candidates": [4, 2], "n_valid": [1, 2], **rejection_counts}
-    )
-
-    # --- act --------------------------
-    lines = CandidateValidationStage.summarize_rejections_per_formula(rejections_per_formula)
-
-    # --- assert -----------------------
-    assert lines == [
-        "formulas with rejected candidates: 1 of 2",
-        "  f1.1.1.1: 1 of 4 candidates valid; bound_to_width_ratio: 1, calibration_no_finite_sign_change_at_0: 2",
-    ]

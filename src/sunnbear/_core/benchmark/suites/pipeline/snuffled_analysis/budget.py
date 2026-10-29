@@ -1,17 +1,16 @@
-"""`SnuffledAnalysisBudget` names a snuffled analysis budget and builds the analysis at 1 Monte Carlo tuple."""
+"""`SnuffledAnalysisBudget` names a snuffled analysis budget, and runs the analysis at 1 Monte Carlo tuple."""
 
+from collections.abc import Sequence
 from enum import Enum
 
 from snuffled import Snuffler
 
 from sunnbear._core.benchmark.protocol import MCSolveSettings, SeedPurpose, derive_seed
+from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED, RejectionReason
 from sunnbear._core.problems.core import TestProblem
 
+from .diagnostic_rules import extract_properties_or_rejection_reason
 from .function_evaluation_error import FunctionEvaluationError
-
-# Every snuffled analysis in the pipeline derives its seed from this root seed, so that its results are the same in
-# every run of the pipeline.
-SNUFFLED_ANALYSIS_ROOT_SEED = 0
 
 
 # ==================================================================================================
@@ -44,14 +43,14 @@ class SnuffledAnalysisBudget(Enum):
         distance between 2 x-values at which snuffled samples f, is set to the tuple's `xtol`, because snuffled is
         designed to receive the solver's tolerance as `dx`.
 
-        The analysis's seed derives from `SNUFFLED_ANALYSIS_ROOT_SEED`, the problem's id and `mc_sample_idx`, so the
+        The analysis's seed derives from `PIPELINE_ROOT_SEED`, the problem's id and `mc_sample_idx`, so the
         analysis is the same in every worker process and whatever order the analyses run in.
 
         When f raises during the analysis, the analysis raises `FunctionEvaluationError`, with f's exception as its
         cause, so that a caller can tell whether an exception came from f or from snuffled.
         """
         seed = derive_seed(
-            root_seed=SNUFFLED_ANALYSIS_ROOT_SEED,
+            root_seed=PIPELINE_ROOT_SEED,
             purpose=SeedPurpose.SNUFFLED_ANALYSIS,
             problem_id=str(problem.id),
             mc_sample_idx=mc_sample_idx,
@@ -75,4 +74,21 @@ class SnuffledAnalysisBudget(Enum):
             n_fun_samples=self.n_fun_samples,
             n_roots=self.n_roots,
             n_root_samples=self.n_root_samples,
+        )
+
+    def extract_properties_or_rejection_reason(
+        self,
+        problem: TestProblem,
+        properties: Sequence[str],
+        *,
+        mc_solve_settings: MCSolveSettings,
+        mc_sample_idx: int,
+    ) -> dict[str, float] | RejectionReason:
+        """Return `properties` from the analysis that `build_snuffler` builds, or the reason to reject `problem`.
+
+        The rules are those of `extract_properties_or_rejection_reason`, at the `xtol` of tuple `mc_sample_idx`.
+        """
+        snuffler = self.build_snuffler(problem, mc_solve_settings=mc_solve_settings, mc_sample_idx=mc_sample_idx)
+        return extract_properties_or_rejection_reason(
+            snuffler, properties, xtol=float(mc_solve_settings.xtols[mc_sample_idx])
         )
