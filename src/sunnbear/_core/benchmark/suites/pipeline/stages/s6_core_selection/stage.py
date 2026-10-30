@@ -9,6 +9,7 @@ from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED, Pi
 from sunnbear._core.benchmark.suites.pipeline.selection import (
     DEFAULT_SELECTION_SEC_PER_CANDIDATE,
     EDI_GPQ_LEVEL,
+    CandidatePool,
     DifficultyClass,
     select_diverse_suite,
 )
@@ -92,11 +93,7 @@ class CoreSelectionStage(PipelineStage):
 
         # --- selection --------------------------
         solution = select_diverse_suite(
-            FullCharacterizationStage.scaled_feature_vectors(previous_table),
-            edi_axis=FullCharacterizationStage.scaled_feature_column_index(
-                previous_table, FullCharacterizationStage.solvers_gpq_column_name(EDI_GPQ_LEVEL)
-            ),
-            difficulty_classes=difficulty_classes,
+            self.candidate_pool(table_with_classes),
             composition=core_composition,
             seed=self.seed,
             sec_per_candidate=self.sec_per_candidate,
@@ -108,6 +105,16 @@ class CoreSelectionStage(PipelineStage):
         )
 
     @staticmethod
-    def difficulty_classes(table: pl.DataFrame) -> list[DifficultyClass]:
-        """Return each row's `DifficultyClass` from `table`, an output table of this stage or a table of its rows."""
-        return [DifficultyClass(value) for value in table["difficulty_class"]]
+    def candidate_pool(table: pl.DataFrame) -> CandidatePool:
+        """Return the `CandidatePool` of `table`'s rows, from their full features and their ``difficulty_class`` column.
+
+        `table` is this stage's output table, a subset of its rows, or its input table with the column of
+        `DIFFICULTY_CLASS_SCHEMA` added.
+        """
+        return CandidatePool(
+            vectors=FullCharacterizationStage.scaled_feature_vectors(table),
+            edi_axis=FullCharacterizationStage.scaled_feature_column_index(
+                table, FullCharacterizationStage.solvers_gpq_column_name(EDI_GPQ_LEVEL)
+            ),
+            difficulty_classes=[DifficultyClass(value) for value in table["difficulty_class"]],
+        )

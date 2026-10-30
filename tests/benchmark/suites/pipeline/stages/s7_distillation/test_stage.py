@@ -2,7 +2,7 @@
 
 - the 2 families split the Core in halves, and every suite meets the Core's quotas at its size;
 - each family's smaller suites lie inside its larger ones, also when Da and Db share 1 quota;
-- it records max-div's time per candidate and seed in its parameters.
+- the stage records max-div's time per candidate and seed in its parameters.
 """
 
 import numpy as np
@@ -23,8 +23,8 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 
 A, B, C, DA, DB = DifficultyClass
 
-# The stage runs no tasks in the pool, so its processes never start; max-div runs 1 worker per worker of the pool, and
-# warns that 1 worker gains nothing over a single solve.
+# The stage runs no tasks in the pool, so the pool's processes never start. max-div runs 1 worker per worker of the
+# pool, and with 1 worker it warns that it gains nothing over a single solve, so the pool has 2 workers.
 _TWO_WORKER_POOL = WorkerPool(n_workers=2)
 # In these tests each max-div worker runs for 3.84 s on a pool of 128 candidates and 7.68 s on a pool of 256, which
 # covers the start of the workers' processes and leaves time to meet every quota on a busy CI machine.
@@ -69,7 +69,7 @@ def test_the_families_split_a_core_of_128_into_2_suites_of_64():
     # --- assert -----------------------
     assert output.table.schema == pl.Schema({**previous_table.schema, **SUITE_MEMBERSHIP_SCHEMA})
     assert output.table.select(previous_table.columns).equals(previous_table)
-    assert (output.table["smallest_suite_size"] == 64).all()
+    assert (output.table["smallest_containing_suite_size"] == 64).all()
     for family in ["benchmark", "calibration"]:
         assert _class_counts(output.table.filter(pl.col("suite_family") == family)) == {
             "A": 16,
@@ -89,8 +89,8 @@ def test_the_families_split_a_core_of_128_into_2_suites_of_64():
 
 @pytest.mark.only_with_numba_jit
 def test_each_family_nests_its_suites_under_a_shared_quota_and_records_its_parameters():
-    """A Core of 256 whose classes Da and Db share 1 quota, with a warning, splits into 2 families of 128, and each
-    family's suite of 64 is a subset of its suite of 128 with 16 of A, B, C, and Da and Db together; the stage's
+    """A Core of 256 whose classes Da and Db share 1 quota splits, with a warning, into 2 families of 128; each family's
+    suite of 64 is a subset of its suite of 128, with 16 each of A, B and C and 16 of Da and Db together; the stage's
     parameters record max-div's time per candidate and seed."""
     # --- arrange ----------------------
     previous_table = _core_table({A: 64, B: 64, C: 64, DA: 40, DB: 24})
@@ -103,9 +103,9 @@ def test_each_family_nests_its_suites_under_a_shared_quota_and_records_its_param
     # --- assert -----------------------
     for family in ["benchmark", "calibration"]:
         family_rows = output.table.filter(pl.col("suite_family") == family)
-        assert sorted(family_rows["smallest_suite_size"].unique()) == [64, 128]
+        assert sorted(family_rows["smallest_containing_suite_size"].unique()) == [64, 128]
         for size, quota_expected in [(128, 32), (64, 16)]:
-            counts = _class_counts(family_rows.filter(pl.col("smallest_suite_size") <= size))
+            counts = _class_counts(family_rows.filter(pl.col("smallest_containing_suite_size") <= size))
             assert [counts["A"], counts["B"], counts["C"], counts["Da"] + counts["Db"]] == [quota_expected] * 4
     report = output.reports[SUITE_COMPOSITIONS_REPORT_NAME]
     assert report.select("suite_family", "size").rows() == [

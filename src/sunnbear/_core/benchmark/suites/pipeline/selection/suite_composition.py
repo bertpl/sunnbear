@@ -1,8 +1,7 @@
 """`SuiteComposition` holds a suite's difficulty quotas, each a `DifficultyQuota`, whose counts sum to its size.
 
-A benchmark suite holds each difficulty class in a fixed share of its size, or, while the Core is interim, classes Da
-and Db in 1 shared quota. A suite distilled from a larger suite of the same composition holds half of each quota of the
-larger suite, so every suite of a pipeline run has the composition of the Core, scaled to the suite's size.
+Every suite of the pipeline holds each difficulty class in a fixed share of its size, or classes Da and Db in 1 shared
+quota when either lacks candidates for its own quota in the Core.
 """
 
 from collections import Counter
@@ -60,9 +59,10 @@ class SuiteComposition:
         """
         if any(quota.count % 2 for quota in self.quotas):
             raise ValueError(f"A suite of {self.size} with an odd quota has no composition at half its size.")
-        return SuiteComposition(
-            quotas=tuple(DifficultyQuota(classes=quota.classes, count=quota.count // 2) for quota in self.quotas)
-        )
+        else:
+            return SuiteComposition(
+                quotas=tuple(DifficultyQuota(classes=quota.classes, count=quota.count // 2) for quota in self.quotas)
+            )
 
 
 # ==================================================================================================
