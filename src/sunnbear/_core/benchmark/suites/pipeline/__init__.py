@@ -8,7 +8,7 @@ it, adding columns and dropping rows:
 - `stages` holds the stages, 1 module or subpackage per stage, whose names sort in run order;
 - `snuffled_analysis` runs snuffled's analysis of a test problem, for every stage that needs one;
 - `features` holds the base classes of the stages that compute the candidates' feature vectors; each such stage is a
-  child class in `stages` that sets its `FeatureFidelity`;
+  child class in `stages` that sets its default `FeatureFidelity`;
 - `run_pipeline` runs the stages in order on a set of formulas, sharing 1 pool of worker processes between them, in a
   `PipelineMode` that sets how much work the stages do.
 

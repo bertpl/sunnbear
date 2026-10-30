@@ -1,7 +1,10 @@
-"""``python -m sunnbear._core.benchmark.suites.pipeline`` runs the pipeline over the shipped formulas into the
-``--workspace`` directory with ``--n-workers`` workers, in draft mode with ``--draft``, prints the rejections per
-formula and the stop of a stage that stops the run, exits normally when no stage stops it, and refuses to run without a
-workspace."""
+"""``python -m sunnbear._core.benchmark.suites.pipeline`` runs the pipeline over the shipped formulas:
+
+- it writes into the ``--workspace`` directory with ``--n-workers`` workers, in draft mode with ``--draft``;
+- it prints the rejections per formula and the stage that stops the run;
+- it exits normally when no stage stops it;
+- it refuses to run without a workspace.
+"""
 
 import re
 import runpy

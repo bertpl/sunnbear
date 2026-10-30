@@ -10,7 +10,8 @@ class FullCharacterizationStage(CandidateCharacterizationStage):
     """`FullCharacterizationStage` adds the full feature vector of each candidate kept by spacing.
 
     The benchmark suites are selected by the full feature vectors, so the stage uses, by default, the full fidelity's
-    larger tuple sets and snuffled analysis budget; a draft run of the pipeline gives it the coarse fidelity instead.
+    larger tuple sets and snuffled analysis budget.
+
     Its feature scales are computed only on the candidates that the spacing stage keeps, because the benchmark suites
     are selected from those candidates.
 

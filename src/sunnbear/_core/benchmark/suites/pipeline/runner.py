@@ -44,7 +44,8 @@ def run_pipeline(
         n_workers: The number of worker processes; ``None`` for 1 per logical CPU. Each worker imports the modules that
             define `formulas` and `core_solver_configs`, so with more than 1 worker, none of them may be defined in an
             interactive session.
-        mode: How much work the stages do, as `PipelineMode` describes it.
+        mode: How much work the stages do, as `PipelineMode` describes it; full characterization and core selection
+            are built from its attributes.
 
     Returns:
         The manifest of each stage that wrote its output, in run order, and the stage that stopped the run, if any, as
@@ -63,7 +64,7 @@ def run_pipeline(
         CoarseCharacterizationStage(core_solver_configs),
         SpacingStage(),
         FullCharacterizationStage(core_solver_configs, fidelity=mode.full_characterization_fidelity),
-        CoreSelectionStage(seconds_per_candidate=mode.core_selection_seconds_per_candidate),
+        CoreSelectionStage(sec_per_candidate=mode.core_selection_sec_per_candidate),
     ]
     module_names = {type(formula).__module__ for formula in formulas} | {
         config.declaring_module_name for config in core_solver_configs

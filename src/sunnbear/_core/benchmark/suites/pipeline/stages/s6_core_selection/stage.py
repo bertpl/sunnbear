@@ -20,9 +20,9 @@ DIFFICULTY_CLASS_SCHEMA: dict[str, pl.DataType] = {
     "difficulty_class": pl.Enum([difficulty_class.value for difficulty_class in DifficultyClass])
 }
 CORE_COMPOSITION_REPORT_NAME = "core_composition"
-# Each max-div worker searches for this wall-clock time per candidate of the stage's input, so that the search time
-# grows with the number of candidates that max-div selects from.
-DEFAULT_CORE_SELECTION_SECONDS_PER_CANDIDATE = 0.2
+# Each max-div worker runs for this many seconds of wall-clock time per candidate of the stage's input, so that the
+# search time grows with the number of candidates in the stage's input.
+DEFAULT_CORE_SELECTION_SEC_PER_CANDIDATE = 0.2
 
 
 # ==================================================================================================
@@ -47,15 +47,15 @@ class CoreSelectionStage(PipelineStage):
 
     output_name = "s6_core_suite"
 
-    def __init__(self, seconds_per_candidate: float = DEFAULT_CORE_SELECTION_SECONDS_PER_CANDIDATE) -> None:
-        """Create the stage, whose max-div workers each search for `seconds_per_candidate` per input candidate."""
-        self.seconds_per_candidate = seconds_per_candidate
+    def __init__(self, sec_per_candidate: float = DEFAULT_CORE_SELECTION_SEC_PER_CANDIDATE) -> None:
+        """Create the stage, whose max-div workers each run for `sec_per_candidate` seconds per input candidate."""
+        self.sec_per_candidate = sec_per_candidate
         self.seed = derive_seed(root_seed=PIPELINE_ROOT_SEED, purpose=SeedPurpose.CORE_SELECTION)
 
     @property
     def parameters(self) -> dict[str, float | int]:
         """Return the time per candidate and the seed of max-div's search."""
-        return {"seconds_per_candidate": self.seconds_per_candidate, "seed": self.seed}
+        return {"sec_per_candidate": self.sec_per_candidate, "seed": self.seed}
 
     def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
         """Return the Core's candidates with their difficulty classes, and the report on the Core's composition.
@@ -129,9 +129,9 @@ class CoreSelectionStage(PipelineStage):
         scale of the solvers block multiply that distance by a constant factor, which does not change which selection
         maximizes a geometric mean.
 
-        max-div searches with `n_workers` workers, in groups that share their best selections and merge as
-        the search runs, each worker for `seconds_per_candidate` times the number of rows of `previous_table`. The Core
-        therefore depends on the timing of the workers and can differ between 2 runs.
+        max-div searches with `n_workers` workers, in groups that share their best selections and merge as the search
+        runs. Each worker runs for `sec_per_candidate` seconds per row of `previous_table`. The Core therefore depends
+        on the timing of the workers and can differ between 2 runs.
 
         The geometric mean weighs every selected candidate's separation equally. A statistic that weighs the smallest
         separations more would let the difficulty classes whose candidates lie closest together steer the selection.
@@ -163,7 +163,7 @@ class CoreSelectionStage(PipelineStage):
         solution = (
             ParallelMaxDivSolverBuilder(max_div_problem)
             .with_seed(self.seed)
-            .with_workers(seconds(previous_table.height * self.seconds_per_candidate), n_workers=n_workers)
+            .with_workers(seconds(previous_table.height * self.sec_per_candidate), n_workers=n_workers)
             .build()
             .solve(verbosity=Verbosity.SILENT)
         )

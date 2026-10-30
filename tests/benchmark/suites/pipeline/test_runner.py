@@ -38,7 +38,8 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     - the valid ones with their c-ranges;
     - every valid one with its coarse feature vector, and the scale of each feature block in every row;
     - the candidates that spacing keeps at its default minimum distance;
-    - each of those with its full feature vector, computed at the coarse fidelity, as the stage's manifest records.
+    - each of those with the feature vector of full characterization, computed at the coarse fidelity, as the stage's
+      manifest records.
 
     Core selection then stops the run, because 4 candidates fill no Core.
     """

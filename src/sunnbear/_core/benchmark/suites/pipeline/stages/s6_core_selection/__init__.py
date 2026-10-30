@@ -20,7 +20,7 @@ from .core_composition import (
 from .difficulty_class import EDI_GPQ_LEVEL, DifficultyClass
 from .stage import (
     CORE_COMPOSITION_REPORT_NAME,
-    DEFAULT_CORE_SELECTION_SECONDS_PER_CANDIDATE,
+    DEFAULT_CORE_SELECTION_SEC_PER_CANDIDATE,
     DIFFICULTY_CLASS_SCHEMA,
     CoreSelectionStage,
 )

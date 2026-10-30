@@ -23,9 +23,9 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 # The stage runs no tasks in the pool, so its processes never start; max-div runs 1 worker per worker of the pool, and
 # warns that 1 worker gains nothing over a single solve.
 _TWO_WORKER_POOL = WorkerPool(n_workers=2)
-# Each max-div worker's time per candidate in these tests: 8 s for 160 candidates, which includes the start of the
-# workers' processes and leaves time to meet every quota on a busy CI machine.
-_SECONDS_PER_CANDIDATE = 0.05
+# In these tests each max-div worker runs for 8 s on 160 candidates, which covers the start of the workers' processes
+# and leaves time to meet every quota on a busy CI machine.
+_SEC_PER_CANDIDATE = 0.05
 
 
 def _full_features_table(edis: list[float]) -> pl.DataFrame:
@@ -56,7 +56,7 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
     previous_table = _full_features_table(edis)
 
     # --- act --------------------------
-    output = CoreSelectionStage(_SECONDS_PER_CANDIDATE).compute_output(previous_table, worker_pool=_TWO_WORKER_POOL)
+    output = CoreSelectionStage(_SEC_PER_CANDIDATE).compute_output(previous_table, worker_pool=_TWO_WORKER_POOL)
 
     # --- assert -----------------------
     assert output.table.schema == pl.Schema({**previous_table.schema, **DIFFICULTY_CLASS_SCHEMA})
@@ -82,7 +82,7 @@ def test_the_stage_fills_a_shared_quota_and_records_its_parameters():
     parameters record max-div's time per candidate and seed."""
     # --- arrange ----------------------
     previous_table = _full_features_table([5.0] * 40 + [15.0] * 40 + [30.0] * 40 + [60.0] * 40)
-    stage = CoreSelectionStage(_SECONDS_PER_CANDIDATE)
+    stage = CoreSelectionStage(_SEC_PER_CANDIDATE)
 
     # --- act --------------------------
     with pytest.warns(CoreCompositionWarning):
@@ -90,4 +90,4 @@ def test_the_stage_fills_a_shared_quota_and_records_its_parameters():
 
     # --- assert -----------------------
     assert dict(output.table["difficulty_class"].value_counts().iter_rows()) == {"A": 32, "B": 32, "C": 32, "Da": 32}
-    assert stage.parameters == {"seconds_per_candidate": _SECONDS_PER_CANDIDATE, "seed": stage.seed}
+    assert stage.parameters == {"sec_per_candidate": _SEC_PER_CANDIDATE, "seed": stage.seed}

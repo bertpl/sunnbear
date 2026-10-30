@@ -37,9 +37,11 @@ class CandidateCharacterizationStage(PipelineStage):
     next stage can read them, with the same value in every row.
 
     A child class is 1 stage of the pipeline: it sets `output_name`, `column_prefix` and `default_fidelity`, the only
-    things in which the characterization stages differ. `column_prefix` starts the name of each column that the stage
-    adds, so that 1 table can hold the columns of 2 characterization stages. A later stage reads these columns through
-    the class methods of the child class that added them, such as `scaled_feature_vectors`.
+    things in which the characterization stages differ.
+
+    `column_prefix` starts the name of each column that the stage adds, so that 1 table can hold the columns of 2
+    characterization stages. A later stage reads these columns through the class methods of the child class that added
+    them, such as `scaled_feature_vectors`.
 
     A candidate is rejected when 1 of its solves ends with `SolveStatus.FUNCTION_ERROR`, or when snuffled's diagnostics
     reject it at 1 of its analyses, by the rules of `extract_properties_or_rejection_reason`.
@@ -77,7 +79,7 @@ class CandidateCharacterizationStage(PipelineStage):
 
     @property
     def parameters(self) -> dict[str, str]:
-        """Return the name of the stage's fidelity, its only parameter."""
+        """Return the name of the stage's fidelity."""
         return {"fidelity": self.fidelity.name}
 
     def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
