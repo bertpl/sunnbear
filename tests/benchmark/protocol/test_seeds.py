@@ -27,10 +27,12 @@ def test_the_seed_of_known_values_is_fixed():
         {"root_seed": 43},
         {"problem_id": "f2.1.1[p1=0.3]"},
         {"mc_sample_idx": 8},
+        {"problem_id": None, "mc_sample_idx": None},
     ],
 )
 def test_changing_any_value_changes_the_seed(changed_kwargs):
-    """A different root seed, test problem or Monte Carlo sample gives a different seed within `[0, 2^64)`."""
+    """A different root seed, test problem or Monte Carlo sample gives a different seed within `[0, 2^64)`, and so does
+    leaving out both the test problem and the Monte Carlo sample."""
     # --- act --------------------------
     seed = derive_seed(**(_KWARGS | changed_kwargs))
 

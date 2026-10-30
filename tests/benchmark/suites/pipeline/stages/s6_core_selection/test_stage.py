@@ -1,37 +1,93 @@
-"""`CoreSelectionStage` reads each candidate's EDI from its full features, adds its difficulty class, and reports the
-Core's composition."""
+"""`CoreSelectionStage` selects the Core from the candidates' full features:
 
+- it reads each candidate's EDI from its full features and adds its difficulty class;
+- it selects the Core by max-div under the difficulty quotas, also when Da and Db share 1 quota;
+- it records max-div's budget and seed in its parameters.
+"""
+
+import numpy as np
 import polars as pl
+import pytest
+from max_div import iterations
 
 from sunnbear._core.benchmark.suites.pipeline.features import map_fevals_to_feature
 from sunnbear._core.benchmark.suites.pipeline.stages import (
     CORE_COMPOSITION_REPORT_NAME,
     DIFFICULTY_CLASS_SCHEMA,
+    CoreCompositionWarning,
     CoreSelectionStage,
     FullCharacterizationStage,
 )
+from sunnbear._core.solvers.core import SolverConfigRegistry
 from sunnbear._core.utils.worker_pool import WorkerPool
 
+# The stage runs no tasks in the pool, so its processes never start; max-div runs 1 worker per worker of the pool, and
+# warns that 1 worker gains nothing over a single solve.
+_TWO_WORKER_POOL = WorkerPool(n_workers=2)
+# Each max-div worker's budget in these tests: an iteration count keeps each test short however busy the machine is.
+_BUDGET = iterations(1000)
 
-def test_the_stage_adds_each_candidates_class_and_reports_the_core_composition():
-    """With 128 candidates whose EDIs fall 32 each in A, B and C, 24 in Da and 8 in Db, the stage chooses a Core of 128
-    with all 5 quotas, an interim Core because it is smaller than 2048."""
-    # --- arrange ----------------------
-    edis = [5.0] * 32 + [15.0] * 32 + [30.0] * 32 + [60.0] * 24 + [120.0] * 8
-    previous_table = pl.DataFrame(
+
+def _full_features_table(edis: list[float]) -> pl.DataFrame:
+    """Return a table of full features for 1 core solver config, with the EDI feature from `edis` and the others random.
+
+    Every feature scale is 1, so the scaled feature vectors equal the features.
+    """
+    column_names = FullCharacterizationStage([SolverConfigRegistry.config_from_id("bisection")]).feature_column_names
+    rng = np.random.default_rng(seed=3)
+    return pl.DataFrame(
         {
             "problem_id": [f"f99.{idx}" for idx in range(len(edis))],
-            FullCharacterizationStage.solvers_gpq_column_name(0.5): map_fevals_to_feature(edis, max_fevals=160),
+            **{column_name: rng.random(len(edis)) for column_name in column_names},
         }
+    ).with_columns(
+        pl.Series(FullCharacterizationStage.solvers_gpq_column_name(0.5), map_fevals_to_feature(edis, max_fevals=160)),
+        *(pl.lit(1.0).alias(column_name) for column_name in FullCharacterizationStage.feature_scale_column_names()),
     )
 
+
+@pytest.mark.only_with_numba_jit
+def test_the_stage_selects_a_core_that_meets_every_quota():
+    """From 160 candidates whose EDIs fall 40 each in A, B and C, 30 in Da and 10 in Db, the stage selects a Core of
+    128 with 32 each of A, B and C, 24 of Da and 8 of Db, an interim Core because it is smaller than 2048, and keeps
+    each selected row unchanged and in input order."""
+    # --- arrange ----------------------
+    edis = [5.0] * 40 + [15.0] * 40 + [30.0] * 40 + [60.0] * 30 + [120.0] * 10
+    previous_table = _full_features_table(edis)
+
     # --- act --------------------------
-    output = CoreSelectionStage().compute_output(previous_table, worker_pool=WorkerPool(n_workers=1))
+    output = CoreSelectionStage(budget=_BUDGET).compute_output(previous_table, worker_pool=_TWO_WORKER_POOL)
 
     # --- assert -----------------------
     assert output.table.schema == pl.Schema({**previous_table.schema, **DIFFICULTY_CLASS_SCHEMA})
-    assert output.table["difficulty_class"].to_list() == ["A"] * 32 + ["B"] * 32 + ["C"] * 32 + ["Da"] * 24 + ["Db"] * 8
+    assert output.table.select(previous_table.columns).equals(
+        previous_table.filter(pl.col("problem_id").is_in(output.table["problem_id"].to_list()))
+    )
+    assert dict(output.table["difficulty_class"].value_counts().iter_rows()) == {
+        "A": 32,
+        "B": 32,
+        "C": 32,
+        "Da": 24,
+        "Db": 8,
+    }
     report = output.reports[CORE_COMPOSITION_REPORT_NAME]
     assert report.select("core_size", "is_interim", "quota_a", "quota_da", "quota_db", "quota_d").rows() == [
         (128, True, 32, 24, 8, None)
     ]
+
+
+@pytest.mark.only_with_numba_jit
+def test_the_stage_fills_a_shared_quota_and_records_its_parameters():
+    """The candidates hold no Db, so Da and Db share 1 quota, with a warning, and the selection fills it; the stage's
+    parameters record max-div's budget and seed."""
+    # --- arrange ----------------------
+    previous_table = _full_features_table([5.0] * 40 + [15.0] * 40 + [30.0] * 40 + [60.0] * 40)
+    stage = CoreSelectionStage(budget=_BUDGET)
+
+    # --- act --------------------------
+    with pytest.warns(CoreCompositionWarning):
+        output = stage.compute_output(previous_table, worker_pool=_TWO_WORKER_POOL)
+
+    # --- assert -----------------------
+    assert dict(output.table["difficulty_class"].value_counts().iter_rows()) == {"A": 32, "B": 32, "C": 32, "Da": 32}
+    assert stage.parameters == {"budget": "1_000 it.", "seed": stage.seed}

@@ -17,7 +17,8 @@ Any Core other than one of `MAX_CORE_SIZE` with a quota per class is interim, an
 """
 
 import warnings
-from collections.abc import Mapping
+from collections import Counter
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from fractions import Fraction
 
@@ -90,6 +91,26 @@ class CoreComposition:
         row["quota_d"] = count_by_quota_classes.get(d_classes)
         row["max_core_size_d"] = self._max_core_size(sum(self.class_counts[c] for c in d_classes), _QUARTER)
         return row
+
+    def check_selection(self, selected_classes: Sequence[DifficultyClass]) -> None:
+        """Stop the pipeline unless a selection of candidates, given by their classes, has the Core's size and quotas.
+
+        Raises:
+            PipelineStopError: If `selected_classes` does not hold `core_size` candidates, or does not meet a quota
+                exactly; the message names each such quota with the selection's count.
+        """
+        class_counts = Counter(selected_classes)
+        unmet_quota_descriptions = [
+            f"{' and '.join(sorted(c.value for c in quota.classes))}: {sum(class_counts[c] for c in quota.classes)} "
+            f"of {quota.count}"
+            for quota in self.quotas
+            if sum(class_counts[c] for c in quota.classes) != quota.count
+        ]
+        if len(selected_classes) != self.core_size or unmet_quota_descriptions:
+            raise PipelineStopError(
+                f"The selection holds {len(selected_classes)} candidates for a Core of {self.core_size}; unmet quotas: "
+                f"{'; '.join(unmet_quota_descriptions) or 'none'}."
+            )
 
     def report_table(self) -> pl.DataFrame:
         """Return the report that core selection writes: 1 row with the columns of `report_row`."""

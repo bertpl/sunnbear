@@ -195,11 +195,23 @@ class CandidateCharacterizationStage(PipelineStage):
         """
         return np.hstack(
             [
-                table.select(cs.starts_with(cls.feature_column_prefix(block))).to_numpy()
+                table.select(column_names).to_numpy()
                 / table[cls.feature_scale_column_name(block)].to_numpy()[:, np.newaxis]
-                for block in FeatureBlock
+                for block, column_names in cls._feature_column_names_per_block(table).items()
             ]
         )
+
+    @classmethod
+    def scaled_feature_column_index(cls, table: pl.DataFrame, column_name: str) -> int:
+        """Return the index of the feature column `column_name` among the columns of `scaled_feature_vectors(table)`.
+
+        Raises:
+            ValueError: If `column_name` is not a feature column of this class's stage in `table`.
+        """
+        column_names = [
+            name for block_names in cls._feature_column_names_per_block(table).values() for name in block_names
+        ]
+        return column_names.index(column_name)
 
     @classmethod
     def solvers_gpq_fevals(cls, table: pl.DataFrame, level: float) -> np.ndarray:
@@ -217,6 +229,11 @@ class CandidateCharacterizationStage(PipelineStage):
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
+    @classmethod
+    def _feature_column_names_per_block(cls, table: pl.DataFrame) -> dict[FeatureBlock, list[str]]:
+        """Return the names of `table`'s feature columns per `FeatureBlock`, in the order of the scaled vectors."""
+        return {block: table.select(cs.starts_with(cls.feature_column_prefix(block))).columns for block in FeatureBlock}
+
     @classmethod
     def _add_feature_scales(cls, table: pl.DataFrame) -> pl.DataFrame:
         """Return `table` with 1 added column per `FeatureBlock`, each holding the scale of that block's features.
