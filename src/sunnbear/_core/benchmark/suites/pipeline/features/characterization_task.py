@@ -1,7 +1,8 @@
 """`CandidateCharacterizationTask` computes the feature vector of each candidate of a batch, or the reason to reject it.
 
 For each candidate, the task first runs the solves of the core solver configs, then snuffled's analyses, in the same
-worker, so that each formula is compiled in only 1 worker.
+worker, so that each formula is compiled in only 1 worker. Besides the feature vector, the task counts the candidate's
+incorrect solves for each core solver config.
 """
 
 from dataclasses import dataclass
@@ -26,7 +27,7 @@ from .fidelity import FeatureFidelity
 # ==================================================================================================
 @dataclass(frozen=True, kw_only=True)
 class CandidateCharacterizationTask:
-    """A `CandidateCharacterizationTask` computes the feature vector of each candidate in `candidates`, or rejects it.
+    """A `CandidateCharacterizationTask` computes each candidate's `CandidateCharacterizationResult`, or rejects it.
 
     Attributes:
         candidates: The ``(problem_id, c_min, c_max)`` of each candidate: its id, as rendered by `ProblemId`, and its
@@ -42,11 +43,8 @@ class CandidateCharacterizationTask:
     feature_column_names: tuple[str, ...]
     fidelity: FeatureFidelity
 
-    def run(self) -> list[dict[str, float] | RejectionReason]:
-        """Return each candidate's feature vector, or the reason to reject it, in the order of `candidates`.
-
-        A feature vector maps the names of `feature_column_names` to their values.
-        """
+    def run(self) -> list["CandidateCharacterizationResult | RejectionReason"]:
+        """Return each candidate's characterization result, or the reason to reject it, in the order of `candidates`."""
         return [self._characterize_candidate(problem_id, c_min, c_max) for problem_id, c_min, c_max in self.candidates]
 
     # --------------------------------------------------------------------------
@@ -54,8 +52,8 @@ class CandidateCharacterizationTask:
     # --------------------------------------------------------------------------
     def _characterize_candidate(
         self, problem_id: str, c_min: float, c_max: float
-    ) -> dict[str, float] | RejectionReason:
-        """Return the candidate's feature vector, or the reason to reject it.
+    ) -> "CandidateCharacterizationResult | RejectionReason":
+        """Return the candidate's characterization result, or the reason to reject it.
 
         The solves come first: a solve that ends with `SolveStatus.FUNCTION_ERROR`, where f fails inside the interval,
         rejects the candidate before snuffled runs. snuffled's analyses then run in the order of their tuples, and the
@@ -83,6 +81,7 @@ class CandidateCharacterizationTask:
             n_fevals_eff = (
                 add_derived_results(solve_results)["n_fevals_eff"].to_numpy().reshape(-1, len(self.solver_ids))
             )
+            n_incorrect_solves = (~solve_results["is_correct"]).to_numpy().reshape(-1, len(self.solver_ids)).sum(axis=0)
             solvers_fevals_statistics = [
                 *np.exp(np.log(n_fevals_eff).mean(axis=0)),
                 *(gpq(n_fevals_eff.ravel(), level) for level in SOLVERS_GPQ_LEVELS),
@@ -112,4 +111,24 @@ class CandidateCharacterizationTask:
                 *(np.log(value / 2) / np.log(max_fevals / 2) for value in solvers_fevals_statistics),
                 *snuffled_features,
             ]
-            return dict(zip(self.feature_column_names, map(float, feature_values), strict=True))
+            return CandidateCharacterizationResult(
+                features=dict(zip(self.feature_column_names, map(float, feature_values), strict=True)),
+                n_incorrect_solves_per_config=tuple(int(count) for count in n_incorrect_solves),
+            )
+
+
+# ==================================================================================================
+#  CandidateCharacterizationResult
+# ==================================================================================================
+@dataclass(frozen=True, kw_only=True)
+class CandidateCharacterizationResult:
+    """A `CandidateCharacterizationResult` holds 1 candidate's feature vector, and the counts of its incorrect solves.
+
+    Attributes:
+        features: The feature vector, which maps the task's `feature_column_names` to their values.
+        n_incorrect_solves_per_config: For each core solver config, in the order of the task's `solver_ids`, the
+            number of its solves without a correct answer.
+    """
+
+    features: dict[str, float]
+    n_incorrect_solves_per_config: tuple[int, ...]

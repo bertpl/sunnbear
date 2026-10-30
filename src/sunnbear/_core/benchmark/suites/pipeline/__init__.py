@@ -26,7 +26,12 @@ from .core import (
     RejectionReason,
     run_stages,
 )
-from .features import CandidateCharacterizationStage, FeatureBlock, FeatureFidelity
+from .features import (
+    INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME,
+    CandidateCharacterizationStage,
+    FeatureBlock,
+    FeatureFidelity,
+)
 from .runner import run_pipeline
 from .stages import (
     C_RANGE_SCHEMA,
@@ -35,5 +40,6 @@ from .stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
     CoarseCharacterizationStage,
+    FullCharacterizationStage,
     SpacingStage,
 )

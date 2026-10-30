@@ -11,6 +11,7 @@ from sunnbear._core.benchmark.suites.pipeline.stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
     CoarseCharacterizationStage,
+    FullCharacterizationStage,
     SpacingStage,
 )
 from sunnbear._core.problems.core import FormulaRegistry
@@ -27,13 +28,18 @@ def _stage_classes(stage_cls: type[PipelineStage]) -> list[type[PipelineStage]]:
 
 
 @pytest.mark.only_with_numba_jit
-def test_the_pipeline_generates_validates_characterizes_and_spaces_the_candidates_of_the_given_formulas(tmp_path):
-    """On the formulas of category 2, the pipeline writes their candidates, then the valid ones with their c-ranges,
-    then every valid one with its coarse feature vector and the scale of each feature block in every row, then the
-    candidates that spacing keeps at its default minimum distance."""
+def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(tmp_path):
+    """On formula 2.1.2, the pipeline writes 1 output per stage, in this order:
+
+    - its candidates;
+    - the valid ones with their c-ranges;
+    - every valid one with its coarse feature vector, and the scale of each feature block in every row;
+    - the candidates that spacing keeps at its default minimum distance;
+    - each of those with its full feature vector.
+    """
     # --- arrange ----------------------
-    # The shipped formulas of category 2 form a small corpus, so the pipeline runs fast on them.
-    formulas = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 2]
+    # The shipped formula 2.1.2 has few candidates, so the pipeline runs fast on it.
+    formulas = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 1, 2)]
     core_solver_configs = [
         config for config in SolverConfigRegistry.configs() if config.role.is_used_for_problem_characterization
     ]
@@ -70,4 +76,11 @@ def test_the_pipeline_generates_validates_characterizes_and_spaces_the_candidate
     assert spaced_candidates.equals(
         coarse_features.filter(pl.col("problem_id").is_in(spaced_candidates["problem_id"].to_list()))
     )
-    assert manifests[-1].parameters == {"min_distance": DEFAULT_SPACING_MIN_DISTANCE}
+    assert manifests[3].parameters == {"min_distance": DEFAULT_SPACING_MIN_DISTANCE}
+    full_features = pl.read_parquet(tmp_path / f"{FullCharacterizationStage.output_name}.parquet")
+    assert full_features.select(spaced_candidates.columns).equals(spaced_candidates)
+    assert full_features.columns == [
+        *spaced_candidates.columns,
+        *FullCharacterizationStage(core_solver_configs).feature_column_names,
+        *FullCharacterizationStage.feature_scale_column_names(),
+    ]

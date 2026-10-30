@@ -19,6 +19,7 @@ class FeatureFidelity(Enum):
     """
 
     COARSE = (MCTuplesSize.SIZE_32, MCTuplesSize.SIZE_32, SnuffledAnalysisBudget.LOW)
+    FULL = (MCTuplesSize.SIZE_1024, MCTuplesSize.SIZE_64, SnuffledAnalysisBudget.HIGH)
 
     def __init__(
         self, solver_mc_size: MCTuplesSize, snuffled_mc_size: MCTuplesSize, snuffled_budget: SnuffledAnalysisBudget
