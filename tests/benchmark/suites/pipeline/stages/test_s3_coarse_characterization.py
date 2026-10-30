@@ -11,6 +11,7 @@ from sunnbear._core.benchmark.suites.pipeline.core import (
     REJECTED_CANDIDATES_REPORT_NAME,
     RejectionReason,
 )
+from sunnbear._core.benchmark.suites.pipeline.features import INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME
 from sunnbear._core.benchmark.suites.pipeline.stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
@@ -59,6 +60,36 @@ def test_the_stage_adds_the_features_of_the_kept_candidates_and_reports_the_othe
     rejected_candidates = output.reports[REJECTED_CANDIDATES_REPORT_NAME]
     assert rejected_candidates.schema == pl.Schema({**previous_table.schema, **REJECTED_BY_SCHEMA})
     assert rejected_candidates.rows() == [("f99.972", -1.0, 1.0, -0.5, 0.5, RejectionReason.FUNCTION_ERROR.value)]
+
+
+def test_the_stage_reports_each_configs_incorrect_solves_over_the_kept_candidates(isolated_formula_registry):
+    """The test runs 2 candidates: a simple root, and (x - c - 1/3)^21, whose flat root makes every Illinois solve
+    incorrect and every other core config's solve correct. Illinois then has 32 incorrect solves of 64, and every other
+    core config has none."""
+    # --- arrange ----------------------
+    define_formula_cls((99, 973), lambda x, c: x - c - 1 / 3, -1.0, 1.0)
+    define_formula_cls((99, 974), lambda x, c: (x - c - 1 / 3) ** 21, -1.0, 1.0)
+    previous_table = pl.DataFrame(
+        {
+            "problem_id": ["f99.973", "f99.974"],
+            "a": [-1.0, -1.0],
+            "b": [1.0, 1.0],
+            "c_min": [-0.5, -0.5],
+            "c_max": [0.5, 0.5],
+        }
+    )
+    stage = CoarseCharacterizationStage(_core_solver_configs())
+
+    # --- act --------------------------
+    output = stage.compute_output(previous_table, worker_pool=WorkerPool(n_workers=1))
+
+    # --- assert -----------------------
+    assert output.table.height == 2
+    incorrect_solves = output.reports[INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME]
+    assert incorrect_solves["solver_id"].to_list() == list(stage.solver_ids)
+    assert incorrect_solves.select("n_solves", "n_incorrect_solves", "incorrect_fraction").rows() == [
+        (64, 32, 0.5) if solver_id == "illinois" else (64, 0, 0.0) for solver_id in stage.solver_ids
+    ]
 
 
 @pytest.mark.only_with_numba_jit

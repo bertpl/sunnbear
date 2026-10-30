@@ -14,3 +14,4 @@ from .s4_spacing import (
     NEAREST_KEPT_CANDIDATE_SCHEMA,
     SpacingStage,
 )
+from .s5_full_characterization import FullCharacterizationStage

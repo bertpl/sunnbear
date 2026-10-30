@@ -8,7 +8,13 @@ from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.utils.module_imports import worker_pool_for_modules
 
 from .core import PipelineStageManifest, PipelineWorkspace, run_stages
-from .stages import CandidateGenerationStage, CandidateValidationStage, CoarseCharacterizationStage, SpacingStage
+from .stages import (
+    CandidateGenerationStage,
+    CandidateValidationStage,
+    CoarseCharacterizationStage,
+    FullCharacterizationStage,
+    SpacingStage,
+)
 
 
 # ==================================================================================================
@@ -51,6 +57,7 @@ def run_pipeline(
         CandidateValidationStage(),
         CoarseCharacterizationStage(core_solver_configs),
         SpacingStage(),
+        FullCharacterizationStage(core_solver_configs),
     ]
     module_names = {type(formula).__module__ for formula in formulas} | {
         config.declaring_module_name for config in core_solver_configs

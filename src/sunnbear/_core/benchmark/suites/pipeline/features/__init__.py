@@ -7,10 +7,12 @@ A fidelity sets how much work goes into each feature vector. Each such pipeline 
 - `FeatureBlock` names a block of a feature vector;
 - `CandidateCharacterizationStage` is the base class of the characterization stages, which compute the feature vectors
   in `CandidateCharacterizationTask` tasks, then the scale of each `FeatureBlock`: its mean pairwise L1 distance
-  over the kept candidates. It names the columns that it adds, and later stages read them back through it.
+  over the kept candidates. It names the columns that it adds, and later stages read them back through it. Each
+  characterization stage also reports, for each core solver config, the fraction of its solves that end without a
+  correct answer.
 """
 
-from .characterization_stage import CandidateCharacterizationStage
-from .characterization_task import CandidateCharacterizationTask
+from .characterization_stage import INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME, CandidateCharacterizationStage
+from .characterization_task import CandidateCharacterizationResult, CandidateCharacterizationTask
 from .feature_vector import SNUFFLED_PROPERTIES, SOLVERS_GPQ_LEVELS, FeatureBlock
 from .fidelity import FeatureFidelity

@@ -17,9 +17,11 @@ from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.stats import mean_pairwise_l1
 from sunnbear._core.utils.worker_pool import WorkerPool
 
-from .characterization_task import CandidateCharacterizationTask
+from .characterization_task import CandidateCharacterizationResult, CandidateCharacterizationTask
 from .feature_vector import SNUFFLED_PROPERTIES, SOLVERS_GPQ_LEVELS, FeatureBlock
 from .fidelity import FeatureFidelity
+
+INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME = "incorrect_solves_per_config"
 
 
 # ==================================================================================================
@@ -39,6 +41,13 @@ class CandidateCharacterizationStage(PipelineStage):
 
     A candidate is rejected when 1 of its solves ends with `SolveStatus.FUNCTION_ERROR`, or when snuffled's diagnostics
     reject it at 1 of its analyses, by the rules of `extract_properties_or_rejection_reason`.
+
+    Besides the rejection reports, the stage reports, for each core solver config, the fraction of its solves on the
+    kept candidates that end without a correct answer. An incorrect solve counts as `max_fevals` in `n_fevals_eff`,
+    from which the solvers block is computed, so the fraction shows how much each config's incorrect solves affect the
+    features.
+
+    The report informs the choice of the core solver configs and never rejects a candidate.
 
     Class attributes:
         column_prefix: The start of the name of each column that the stage adds, e.g. ``coarse`` in
@@ -72,8 +81,16 @@ class CandidateCharacterizationStage(PipelineStage):
             worker_pool: The worker pool of the run, in which the candidates are characterized.
 
         Returns:
-            The stage's output, as `_build_output_with_rejection_reports` describes it. Its table holds these
-            columns; every added column has type `pl.Float64`:
+            The stage's output, as `_build_output_with_rejection_reports` describes it, with 1 more report,
+            `INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME`, which holds 1 row per core solver config, in the order of
+            `solver_ids`, with these columns:
+
+            - ``solver_id``;
+            - ``n_solves``: the config's number of solves over the kept candidates;
+            - ``n_incorrect_solves``;
+            - ``incorrect_fraction``, which is null when the stage keeps no candidate.
+
+            The output's table holds these columns; every added column has type `pl.Float64`:
 
             - the columns of `previous_table`;
             - the columns of `feature_column_names`;
@@ -99,13 +116,21 @@ class CandidateCharacterizationStage(PipelineStage):
         table = previous_table.with_columns(
             pl.Series(
                 column_name,
-                [None if isinstance(result, RejectionReason) else result[column_name] for result in results],
+                [None if isinstance(result, RejectionReason) else result.features[column_name] for result in results],
                 dtype=pl.Float64(),
             )
             for column_name in column_names
         )
         output = self._build_output_with_rejection_reports(table, results, added_columns=column_names)
-        return dataclasses.replace(output, table=self._add_feature_scales(output.table))
+        kept_results = [result for result in results if isinstance(result, CandidateCharacterizationResult)]
+        return dataclasses.replace(
+            output,
+            table=self._add_feature_scales(output.table),
+            reports={
+                **output.reports,
+                INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME: self._build_incorrect_solves_report(kept_results),
+            },
+        )
 
     # --------------------------------------------------------------------------
     #  Column names
@@ -194,4 +219,21 @@ class CandidateCharacterizationStage(PipelineStage):
         return table.with_columns(
             pl.lit(scale, dtype=pl.Float64()).alias(cls.feature_scale_column_name(block))
             for block, scale in scales_by_block.items()
+        )
+
+    def _build_incorrect_solves_report(self, kept_results: Sequence[CandidateCharacterizationResult]) -> pl.DataFrame:
+        """Return the report `INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME` over the kept candidates' results."""
+        n_incorrect_solves = np.zeros(len(self.solver_ids), dtype=np.int64)
+        for result in kept_results:
+            n_incorrect_solves += result.n_incorrect_solves_per_config
+        n_solves = len(kept_results) * self.fidelity.solver_mc_size
+        return pl.DataFrame(
+            {
+                "solver_id": list(self.solver_ids),
+                "n_solves": [n_solves] * len(self.solver_ids),
+                "n_incorrect_solves": n_incorrect_solves,
+            },
+            schema={"solver_id": pl.String(), "n_solves": pl.Int64(), "n_incorrect_solves": pl.Int64()},
+        ).with_columns(
+            incorrect_fraction=pl.when(pl.col("n_solves") > 0).then(pl.col("n_incorrect_solves") / pl.col("n_solves"))
         )

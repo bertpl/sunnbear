@@ -13,6 +13,7 @@ from sunnbear._core.benchmark.suites.pipeline.stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
     CoarseCharacterizationStage,
+    FullCharacterizationStage,
     SpacingStage,
 )
 from sunnbear._core.problems.core import FormulaRegistry
@@ -23,6 +24,7 @@ _OUTPUT_NAMES = [
     CandidateValidationStage.output_name,
     CoarseCharacterizationStage.output_name,
     SpacingStage.output_name,
+    FullCharacterizationStage.output_name,
 ]
 
 
@@ -44,9 +46,10 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
     candidates, followed by 1 indented line per such formula."""
     # --- arrange ----------------------
     # The command runs over every registered formula. The test keeps only the shipped formulas whose numbers start with
-    # (1, 4, 2) or (2, 1, 1), because the bisection count check runs 1 solve per tuple of the largest size of the
-    # shipped tuple set for each valid candidate, which makes a run over every formula slow.
-    formulas = tuple(formula for formula in FormulaRegistry.formulas() if formula.number[:3] in {(1, 4, 2), (2, 1, 1)})
+    # (1, 4, 2), because validation runs solves at every tuple of the shipped tuple set's largest size for each
+    # candidate that passes its earlier checks, and full characterization does the same for each candidate that spacing
+    # keeps, which makes a run over every formula slow.
+    formulas = tuple(formula for formula in FormulaRegistry.formulas() if formula.number[:3] == (1, 4, 2))
     monkeypatch.setattr(FormulaRegistry, "formulas", lambda: formulas)
 
     # --- act --------------------------
@@ -57,7 +60,11 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
     assert [line.split(":")[0] for line in printed_lines[: len(_OUTPUT_NAMES)]] == _OUTPUT_NAMES
     count_line_indices = [idx for idx, line in enumerate(printed_lines) if not line.startswith("  ")]
     count_line_indices = count_line_indices[len(_OUTPUT_NAMES) :]
-    rejecting_output_names = [CandidateValidationStage.output_name, CoarseCharacterizationStage.output_name]
+    rejecting_output_names = [
+        CandidateValidationStage.output_name,
+        CoarseCharacterizationStage.output_name,
+        FullCharacterizationStage.output_name,
+    ]
     assert [printed_lines[idx].split(":")[0] for idx in count_line_indices] == rejecting_output_names
     for idx, next_idx in zip(count_line_indices, [*count_line_indices[1:], len(printed_lines)], strict=True):
         n_formulas_with_rejections = next_idx - idx - 1

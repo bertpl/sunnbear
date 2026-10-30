@@ -1,18 +1,23 @@
-"""`CandidateCharacterizationTask` returns a feature vector or the reason to reject each candidate, in the order of its
-candidates."""
+"""`CandidateCharacterizationTask` returns, for each of its candidates in their order, a characterization result or the
+reason to reject the candidate."""
 
 import math
 
 from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
-from sunnbear._core.benchmark.suites.pipeline.features import CandidateCharacterizationTask, FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.features import (
+    CandidateCharacterizationResult,
+    CandidateCharacterizationTask,
+    FeatureFidelity,
+)
 from sunnbear._core.benchmark.suites.pipeline.stages import CoarseCharacterizationStage
 from sunnbear._core.solvers.core import SolverConfigRegistry
 from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
 
 
-def test_the_task_returns_a_feature_vector_or_a_reason_per_candidate(isolated_formula_registry):
-    """A simple root gets its feature vector, each value in [0, 1]; f that is NaN around its root fails the solves; f
-    that is exactly 0 around its root passes the solves and is rejected with `SNUFFLED_MAX_ZERO_WIDTH_TOO_LARGE`."""
+def test_the_task_returns_a_characterization_or_a_reason_per_candidate(isolated_formula_registry):
+    """A simple root gets its feature vector, each value in [0, 1], and no incorrect solve; f that is NaN around its
+    root fails the solves; f that is exactly 0 around its root passes the solves and is rejected with
+    `SNUFFLED_MAX_ZERO_WIDTH_TOO_LARGE`."""
     # --- arrange ----------------------
     root_offset = 1 / 3
     define_formula_cls((99, 961), lambda x, c: x - c - root_offset, -1.0, 1.0)
@@ -36,11 +41,12 @@ def test_the_task_returns_a_feature_vector_or_a_reason_per_candidate(isolated_fo
     )
 
     # --- act --------------------------
-    [features, reason_of_nan, reason_of_zeros] = task.run()
+    [characterization, reason_of_nan, reason_of_zeros] = task.run()
 
     # --- assert -----------------------
-    assert isinstance(features, dict)
-    assert list(features) == stage.feature_column_names
-    assert all(0.0 <= value <= 1.0 for value in features.values())
+    assert isinstance(characterization, CandidateCharacterizationResult)
+    assert list(characterization.features) == stage.feature_column_names
+    assert all(0.0 <= value <= 1.0 for value in characterization.features.values())
+    assert characterization.n_incorrect_solves_per_config == (0, 0)
     assert reason_of_nan is RejectionReason.FUNCTION_ERROR
     assert reason_of_zeros is RejectionReason.SNUFFLED_MAX_ZERO_WIDTH_TOO_LARGE
