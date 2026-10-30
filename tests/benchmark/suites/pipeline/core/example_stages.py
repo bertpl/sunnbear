@@ -1,14 +1,14 @@
 """This module defines small stages for the tests of the pipeline framework, so those tests need no formulas.
 
 The stages that follow the rules of the chain come first; among them, `ExampleSquaresStage` runs its work as tasks in
-the run's worker pool. Each stage after them breaks 1 rule.
+the run's worker pool, and `ExampleStoppingStage` stops the run. Each stage after them breaks 1 rule.
 """
 
 from dataclasses import dataclass
 
 import polars as pl
 
-from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageOutput
+from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageOutput, PipelineStopError
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 
@@ -74,6 +74,16 @@ class ExampleSquaresStage(PipelineStage):
             squares_by_problem_id.update(zip(problem_ids, squares, strict=True))
         squared_xs = [squares_by_problem_id[problem_id] for problem_id in previous_table["problem_id"]]
         return PipelineStageOutput(table=previous_table.with_columns(squared_x=pl.Series(squared_xs)))
+
+
+class ExampleStoppingStage(PipelineStage):
+    """`ExampleStoppingStage` stops the run, as a stage does whose input cannot give a valid output."""
+
+    output_name = "s2_stop"
+
+    def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
+        """Raise `PipelineStopError`, which names the number of rows of `previous_table`."""
+        raise PipelineStopError(f"{previous_table.height} rows are too few.")
 
 
 class ExampleIdlessStage(PipelineStage):
