@@ -5,7 +5,6 @@ import pytest
 
 from sunnbear._core.benchmark.suites.pipeline import stages as stages_package
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage
-from sunnbear._core.benchmark.suites.pipeline.features import FeatureFidelity
 from sunnbear._core.benchmark.suites.pipeline.runner import run_pipeline
 from sunnbear._core.benchmark.suites.pipeline.stages import (
     DEFAULT_SPACING_MIN_DISTANCE,
@@ -61,11 +60,9 @@ def test_the_pipeline_generates_validates_characterizes_and_spaces_the_candidate
     assert candidates.height == sum(len(formula.build_all_candidates()) for formula in formulas)
     assert valid_candidates.select(candidates.columns).equals(candidates)
     assert ((valid_candidates["c_min"] < 0.0) & (valid_candidates["c_max"] > 0.0)).all()
-    feature_column_names = FeatureFidelity.COARSE.feature_column_names(
-        [config.solver_id for config in core_solver_configs]
-    )
+    feature_column_names = CoarseCharacterizationStage(core_solver_configs).feature_column_names
     assert coarse_features.select(valid_candidates.columns).equals(valid_candidates)
-    scale_column_names = FeatureFidelity.COARSE.feature_scale_column_names()
+    scale_column_names = CoarseCharacterizationStage.feature_scale_column_names()
     assert coarse_features.columns == [*valid_candidates.columns, *feature_column_names, *scale_column_names]
     assert coarse_features.select(scale_column_names).n_unique() == 1
     assert all(scale > 0.0 for scale in coarse_features.select(scale_column_names).row(0))

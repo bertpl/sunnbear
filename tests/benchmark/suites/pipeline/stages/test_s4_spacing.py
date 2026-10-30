@@ -8,13 +8,15 @@
 import polars as pl
 import pytest
 
-from sunnbear._core.benchmark.suites.pipeline.features import FeatureBlock, FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.features import FeatureBlock
 from sunnbear._core.benchmark.suites.pipeline.stages import (
     CANDIDATE_COUNTS_PER_FORMULA_REPORT_NAME,
     DROPPED_CANDIDATES_REPORT_NAME,
     NEAREST_KEPT_CANDIDATE_SCHEMA,
+    CoarseCharacterizationStage,
     SpacingStage,
 )
+from sunnbear._core.solvers.core import SolverConfigRegistry
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 _IN_PROCESS_WORKER_POOL = WorkerPool(n_workers=1)
@@ -23,15 +25,14 @@ _IN_PROCESS_WORKER_POOL = WorkerPool(n_workers=1)
 def _coarse_features_table(
     first_features_by_problem_id: dict[str, tuple[float, float]], *, scales: tuple[float | None, float | None]
 ) -> pl.DataFrame:
-    """Return a table of coarse features for 1 core solver config, ``brent``, with the feature scales `scales`.
+    """Return a table of coarse features for 1 core solver config, ``bisection``, with the feature scales `scales`.
 
     Each candidate's tuple holds the value of the first feature of the solvers block and of the snuffled block, in that
     order; its other features are 0. `scales` holds the scale of each `FeatureBlock`, in their order.
     """
-    fidelity = FeatureFidelity.COARSE
-    column_names = fidelity.feature_column_names(["brent"])
+    column_names = CoarseCharacterizationStage([SolverConfigRegistry.config_from_id("bisection")]).feature_column_names
     first_column_names = [
-        next(name for name in column_names if name.startswith(fidelity.feature_column_prefix(block)))
+        next(name for name in column_names if name.startswith(CoarseCharacterizationStage.feature_column_prefix(block)))
         for block in FeatureBlock
     ]
     values_per_block = zip(*first_features_by_problem_id.values(), strict=True)
@@ -45,7 +46,9 @@ def _coarse_features_table(
             ),
             *(
                 pl.lit(scale, dtype=pl.Float64()).alias(column_name)
-                for column_name, scale in zip(fidelity.feature_scale_column_names(), scales, strict=True)
+                for column_name, scale in zip(
+                    CoarseCharacterizationStage.feature_scale_column_names(), scales, strict=True
+                )
             ),
         )
     )

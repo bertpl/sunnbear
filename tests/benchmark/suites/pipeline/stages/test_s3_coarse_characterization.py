@@ -11,7 +11,6 @@ from sunnbear._core.benchmark.suites.pipeline.core import (
     REJECTED_CANDIDATES_REPORT_NAME,
     RejectionReason,
 )
-from sunnbear._core.benchmark.suites.pipeline.features import FeatureFidelity
 from sunnbear._core.benchmark.suites.pipeline.stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
@@ -50,8 +49,8 @@ def test_the_stage_adds_the_features_of_the_kept_candidates_and_reports_the_othe
     output = stage.compute_output(previous_table, worker_pool=WorkerPool(n_workers=1))
 
     # --- assert -----------------------
-    column_names = FeatureFidelity.COARSE.feature_column_names(stage.solver_ids)
-    scale_column_names = FeatureFidelity.COARSE.feature_scale_column_names()
+    column_names = stage.feature_column_names
+    scale_column_names = stage.feature_scale_column_names()
     assert len(column_names) == 25
     assert output.table.columns == [*previous_table.columns, *column_names, *scale_column_names]
     assert output.table["problem_id"].to_list() == ["f99.971"]

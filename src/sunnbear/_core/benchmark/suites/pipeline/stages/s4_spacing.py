@@ -9,10 +9,11 @@ import numpy as np
 import polars as pl
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageOutput
-from sunnbear._core.benchmark.suites.pipeline.features import FeatureFidelity
 from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.stats import l1_distances_to
 from sunnbear._core.utils.worker_pool import WorkerPool
+
+from .s3_coarse_characterization import CoarseCharacterizationStage
 
 # `SpacingStage`'s default `min_distance` is small, so the stage drops only candidates whose feature vectors, with each
 # block divided by its feature scale, nearly coincide; raise it as the corpus grows, so that characterizing the kept
@@ -35,8 +36,8 @@ class SpacingStage(PipelineStage):
     """`SpacingStage` keeps, per formula, candidates that lie at least `min_distance` apart, and drops the others.
 
     The distance between 2 candidates is the L1 distance between their coarse feature vectors, with each block divided
-    by its feature scale, as `FeatureFidelity.scaled_feature_vectors` returns them. Each block then has a mean
-    pairwise distance of 1, so `min_distance` is measured in multiples of a block's mean pairwise distance.
+    by its feature scale, as `CoarseCharacterizationStage.scaled_feature_vectors` returns them. Each block then has a
+    mean pairwise distance of 1, so `min_distance` is measured in multiples of a block's mean pairwise distance.
 
     Per formula, a pass runs over the candidates in the order of the input table, which is the order of candidate
     generation, so the result is deterministic. The pass keeps the formula's first candidate, and each later candidate
@@ -70,7 +71,7 @@ class SpacingStage(PipelineStage):
 
         Args:
             previous_table: The output table of coarse characterization, with the feature columns and the feature
-                scale columns of `FeatureFidelity.COARSE`.
+                scale columns of `CoarseCharacterizationStage`.
             worker_pool: The worker pool of the run, which the stage does not use.
 
         Returns:
@@ -91,7 +92,7 @@ class SpacingStage(PipelineStage):
             row_indices_by_formula.setdefault(formula_id, []).append(row_idx)
 
         # --- spacing, formula by formula --------
-        scaled_feature_vectors = FeatureFidelity.COARSE.scaled_feature_vectors(previous_table)
+        scaled_feature_vectors = CoarseCharacterizationStage.scaled_feature_vectors(previous_table)
         is_kept = np.zeros(previous_table.height, dtype=bool)
         nearest_kept_problem_ids: list[str | None] = [None] * previous_table.height
         distances_to_nearest_kept: list[float | None] = [None] * previous_table.height
