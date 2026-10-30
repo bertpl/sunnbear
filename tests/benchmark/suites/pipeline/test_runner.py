@@ -11,6 +11,7 @@ from sunnbear._core.benchmark.suites.pipeline.stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
     CoarseCharacterizationStage,
+    CoreSelectionStage,
     FullCharacterizationStage,
     SpacingStage,
 )
@@ -36,6 +37,8 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     - every valid one with its coarse feature vector, and the scale of each feature block in every row;
     - the candidates that spacing keeps at its default minimum distance;
     - each of those with its full feature vector.
+
+    Core selection then stops the run, because 4 candidates fill no Core.
     """
     # --- arrange ----------------------
     # The shipped formula 2.1.2 has few candidates, so the pipeline runs fast on it.
@@ -48,7 +51,7 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     # By default `run_pipeline` starts 1 worker per CPU, which would only make the workers wait for CPU, because
     # pytest-xdist already runs 1 test process per CPU. With 2 workers the stages still run in worker processes;
     # with 1 worker they would run in this test's process.
-    manifests = run_pipeline(
+    result = run_pipeline(
         workspace_dir=tmp_path, formulas=formulas, core_solver_configs=core_solver_configs, n_workers=2
     )
 
@@ -59,7 +62,11 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
         for stage_cls in _stage_classes(PipelineStage)
         if stage_cls.__module__.startswith(f"{stages_package.__name__}.")
     )
-    assert [manifest.output_name for manifest in manifests] == output_names_expected
+    manifests = result.manifests
+    assert [manifest.output_name for manifest in manifests] == output_names_expected[:-1]
+    assert result.stop is not None
+    assert result.stop.output_name == CoreSelectionStage.output_name
+    assert result.stop.reason.startswith("The candidates fill no Core of 128 or more")
     candidates = pl.read_parquet(tmp_path / f"{CandidateGenerationStage.output_name}.parquet")
     valid_candidates = pl.read_parquet(tmp_path / f"{CandidateValidationStage.output_name}.parquet")
     coarse_features = pl.read_parquet(tmp_path / f"{CoarseCharacterizationStage.output_name}.parquet")

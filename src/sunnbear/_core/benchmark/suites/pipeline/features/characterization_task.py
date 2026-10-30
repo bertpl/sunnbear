@@ -19,6 +19,7 @@ from sunnbear._core.solvers.core import SolveStatus
 from sunnbear._core.stats import gpq
 
 from .feature_vector import SNUFFLED_PROPERTIES, SOLVERS_GPQ_LEVELS
+from .fevals_mapping import map_fevals_to_feature
 from .fidelity import FeatureFidelity
 
 
@@ -105,10 +106,8 @@ class CandidateCharacterizationTask:
             snuffled_features = np.mean(property_values, axis=0)
 
             # --- feature vector -----------------
-            # A correct solve takes at least 2 evaluations, 1 at each interval bound, so each feature of the solvers
-            # block is mapped from [2, max_fevals] onto [0, 1] on a log scale.
             feature_values = [
-                *(np.log(value / 2) / np.log(max_fevals / 2) for value in solvers_fevals_statistics),
+                *map_fevals_to_feature(solvers_fevals_statistics, max_fevals=max_fevals),
                 *snuffled_features,
             ]
             return CandidateCharacterizationResult(

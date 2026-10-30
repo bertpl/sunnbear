@@ -11,6 +11,9 @@ The parts of the framework work together as follows:
   - times the stage;
   - checks the rules of the chain;
   - has the `PipelineWorkspace` write the stage's output.
+
+  A stage that raises `PipelineStopError` stops the run, which `run_stages` returns as a `PipelineRunResult` with a
+  `PipelineStop`.
 - `PipelineWorkspace` writes each stage's output table and reports into the workspace directory, together with a
   `PipelineStageManifest`, and reads the reports back.
 - `PipelineStageManifest` records how a stage built its output: from which input, with which code and parameters,
@@ -36,5 +39,6 @@ from .rejections import (
 )
 from .root_seed import PIPELINE_ROOT_SEED
 from .stage import PipelineStage, PipelineStageOutput
-from .stage_runner import run_stages
+from .stage_runner import PipelineRunResult, run_stages
+from .stop import PipelineStop, PipelineStopError
 from .workspace import PipelineWorkspace

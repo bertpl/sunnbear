@@ -15,3 +15,12 @@ from .s4_spacing import (
     SpacingStage,
 )
 from .s5_full_characterization import FullCharacterizationStage
+from .s6_core_selection import (
+    CORE_COMPOSITION_REPORT_NAME,
+    DIFFICULTY_CLASS_SCHEMA,
+    CoreComposition,
+    CoreCompositionWarning,
+    CoreSelectionStage,
+    DifficultyClass,
+    DifficultyQuota,
+)

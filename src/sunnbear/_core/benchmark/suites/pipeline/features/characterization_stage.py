@@ -8,6 +8,7 @@ import numpy as np
 import polars as pl
 import polars.selectors as cs
 
+from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, max_fevals_for
 from sunnbear._core.benchmark.suites.pipeline.core import (
     PipelineStage,
     PipelineStageOutput,
@@ -19,6 +20,7 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 
 from .characterization_task import CandidateCharacterizationResult, CandidateCharacterizationTask
 from .feature_vector import SNUFFLED_PROPERTIES, SOLVERS_GPQ_LEVELS, FeatureBlock
+from .fevals_mapping import map_feature_to_fevals
 from .fidelity import FeatureFidelity
 
 INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME = "incorrect_solves_per_config"
@@ -149,7 +151,7 @@ class CandidateCharacterizationStage(PipelineStage):
         solvers_prefix = self.feature_column_prefix(FeatureBlock.SOLVERS)
         return [
             *(f"{solvers_prefix}geomean_{solver_id}" for solver_id in self.solver_ids),
-            *(f"{solvers_prefix}gpq_{round(100 * level):02d}" for level in SOLVERS_GPQ_LEVELS),
+            *(self.solvers_gpq_column_name(level) for level in SOLVERS_GPQ_LEVELS),
             *(f"{self.feature_column_prefix(FeatureBlock.SNUFFLED)}{prop.value}" for prop in SNUFFLED_PROPERTIES),
         ]
 
@@ -157,6 +159,11 @@ class CandidateCharacterizationStage(PipelineStage):
     def feature_column_prefix(cls, block: FeatureBlock) -> str:
         """Return the start of the name of each feature column of `block`, e.g. ``coarse_solvers_``."""
         return f"{cls.column_prefix}_{block.value}_"
+
+    @classmethod
+    def solvers_gpq_column_name(cls, level: float) -> str:
+        """Return the name of the solvers block's column of the gpq at `level`, e.g. ``coarse_solvers_gpq_50``."""
+        return f"{cls.feature_column_prefix(FeatureBlock.SOLVERS)}gpq_{round(100 * level):02d}"
 
     @classmethod
     def feature_scale_column_name(cls, block: FeatureBlock) -> str:
@@ -192,6 +199,19 @@ class CandidateCharacterizationStage(PipelineStage):
                 / table[cls.feature_scale_column_name(block)].to_numpy()[:, np.newaxis]
                 for block in FeatureBlock
             ]
+        )
+
+    @classmethod
+    def solvers_gpq_fevals(cls, table: pl.DataFrame, level: float) -> np.ndarray:
+        """Return each row's gpq at `level` of the solvers block in `table`, as an evaluation count.
+
+        `table` is an output table of this class's stage, or a table of its rows with the same columns. The stage
+        solves with `DEFAULT_N_BISECTION_FEVALS`, so the evaluation budget that the feature was mapped with is
+        `max_fevals_for` of that count.
+        """
+        return map_feature_to_fevals(
+            table[cls.solvers_gpq_column_name(level)].to_numpy(),
+            max_fevals=max_fevals_for(n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS),
         )
 
     # --------------------------------------------------------------------------

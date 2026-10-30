@@ -7,11 +7,12 @@ from sunnbear._core.problems.core import Formula
 from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.utils.module_imports import worker_pool_for_modules
 
-from .core import PipelineStageManifest, PipelineWorkspace, run_stages
+from .core import PipelineRunResult, PipelineWorkspace, run_stages
 from .stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
     CoarseCharacterizationStage,
+    CoreSelectionStage,
     FullCharacterizationStage,
     SpacingStage,
 )
@@ -26,7 +27,7 @@ def run_pipeline(
     formulas: Sequence[Formula],
     core_solver_configs: Sequence[SolverConfig],
     n_workers: int | None = None,
-) -> tuple[PipelineStageManifest, ...]:
+) -> PipelineRunResult:
     """Run every stage of the benchmark suite pipeline on `formulas`, into the workspace directory `workspace_dir`.
 
     Every stage is recomputed, and its output and manifest replace those of an earlier run. The stages share 1
@@ -43,7 +44,8 @@ def run_pipeline(
             interactive session.
 
     Returns:
-        The manifest of each stage, in run order.
+        The manifest of each stage that wrote its output, in run order, and the stage that stopped the run, if any, as
+        `run_stages` describes it.
 
     Raises:
         ValueError: If 1 of these holds:
@@ -58,6 +60,7 @@ def run_pipeline(
         CoarseCharacterizationStage(core_solver_configs),
         SpacingStage(),
         FullCharacterizationStage(core_solver_configs),
+        CoreSelectionStage(),
     ]
     module_names = {type(formula).__module__ for formula in formulas} | {
         config.declaring_module_name for config in core_solver_configs

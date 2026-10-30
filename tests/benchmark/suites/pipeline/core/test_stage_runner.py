@@ -4,6 +4,7 @@
   written into the workspace, which reads the reports back;
 - a rerun replaces them;
 - a stage that breaks a rule of the chain stops the run before its output is written;
+- a stage that raises `PipelineStopError` ends the run, which returns the stop with the earlier stages' manifests;
 - a stage that runs tasks in the worker pool gives the same output with 1 or 2 workers.
 """
 
@@ -14,6 +15,7 @@ import pytest
 
 from sunnbear._core.benchmark.suites.pipeline.core.manifest import PipelineStageManifest
 from sunnbear._core.benchmark.suites.pipeline.core.stage_runner import run_stages
+from sunnbear._core.benchmark.suites.pipeline.core.stop import PipelineStop
 from sunnbear._core.benchmark.suites.pipeline.core.workspace import PipelineWorkspace
 from sunnbear._core.utils.worker_pool import WorkerPool
 
@@ -25,6 +27,7 @@ from .example_stages import (
     ExampleRowDuplicatingStage,
     ExampleSmallNumbersStage,
     ExampleSquaresStage,
+    ExampleStoppingStage,
 )
 
 # A pool with 1 worker runs its tasks in this process and needs no with block.
@@ -44,13 +47,15 @@ def test_each_stage_runs_on_the_table_before_it_and_its_files_are_written(tmp_pa
     """Each stage's output table extends the table before it; the manifest matches the bytes of the output table and
     of each report, and records the output table before it."""
     # --- act --------------------------
-    manifests = run_stages(
+    result = run_stages(
         PipelineWorkspace(tmp_path),
         [ExampleNumbersStage(), ExampleSmallNumbersStage()],
         worker_pool=_IN_PROCESS_WORKER_POOL,
     )
 
     # --- assert -----------------------
+    manifests = result.manifests
+    assert result.stop is None
     numbers_manifest, small_numbers_manifest = manifests
     for manifest in manifests:
         output_file = tmp_path / f"{manifest.output_name}.parquet"
@@ -76,7 +81,7 @@ def test_a_rerun_replaces_the_files_and_leaves_no_temporary_files(tmp_path):
     # --- act --------------------------
     second_manifests = run_stages(
         workspace, [ExampleNumbersStage(), ExampleSmallNumbersStage()], worker_pool=_IN_PROCESS_WORKER_POOL
-    )
+    ).manifests
 
     # --- assert -----------------------
     assert [
@@ -116,6 +121,22 @@ def test_a_stage_that_breaks_a_rule_of_the_chain_stops_the_run(tmp_path, stages,
     assert not (tmp_path / f"{stages[-1].output_name}.parquet").exists()
 
 
+def test_a_stage_that_raises_a_pipeline_stop_error_ends_the_run(tmp_path):
+    """The stopping stage writes no output and the stage after it does not run; the result holds the first stage's
+    manifest and the stop, with the stopping stage's output name and the error's message."""
+    # --- act --------------------------
+    result = run_stages(
+        PipelineWorkspace(tmp_path),
+        [ExampleNumbersStage(), ExampleStoppingStage(), ExampleSmallNumbersStage()],
+        worker_pool=_IN_PROCESS_WORKER_POOL,
+    )
+
+    # --- assert -----------------------
+    assert [manifest.output_name for manifest in result.manifests] == ["s1_numbers"]
+    assert result.stop == PipelineStop(output_name="s2_stop", reason="3 rows are too few.")
+    assert sorted(path.name for path in tmp_path.glob("*.parquet")) == ["s1_numbers.parquet"]
+
+
 def test_a_stage_that_runs_tasks_in_the_worker_pool_gives_the_same_output_with_1_or_2_workers(tmp_path):
     """A stage whose tasks run in this process or in 2 workers writes the same output file; each manifest records its
     run's number of workers."""
@@ -127,7 +148,7 @@ def test_a_stage_that_runs_tasks_in_the_worker_pool_gives_the_same_output_with_1
                 PipelineWorkspace(tmp_path / f"{n_workers}_workers"),
                 [ExampleNumbersStage(), ExampleSquaresStage()],
                 worker_pool=worker_pool,
-            )
+            ).manifests
         squares_manifests.append(manifests[-1])
 
     # --- assert -----------------------

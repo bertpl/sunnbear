@@ -3,6 +3,7 @@
 import datetime
 import time
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 import polars as pl
 
@@ -10,6 +11,7 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 
 from .manifest import PipelineStageExecutionInfo, PipelineStageManifest
 from .stage import PipelineStage
+from .stop import PipelineStop, PipelineStopError
 from .workspace import PipelineWorkspace
 
 
@@ -18,15 +20,19 @@ from .workspace import PipelineWorkspace
 # ==================================================================================================
 def run_stages(
     workspace: PipelineWorkspace, stages: Sequence[PipelineStage], *, worker_pool: WorkerPool
-) -> tuple[PipelineStageManifest, ...]:
+) -> "PipelineRunResult":
     """Run `stages` in order, each on the output table of the stage before it, and have `workspace` write each output.
 
     The first stage receives an empty table. Every stage receives `worker_pool`, in which it may run tasks, and its
     manifest records the pool's number of workers. A `worker_pool` with more than 1 worker must be inside its ``with``
     block, which `run_stages` does not open.
 
+    A stage that raises `PipelineStopError` stops the run: its output is not written, and the stages after it do not
+    run.
+
     Returns:
-        The manifest of each stage, in run order.
+        The manifest of each stage that wrote its output, in run order, and the `PipelineStop` of the stage that
+        stopped the run, if any.
 
     Raises:
         ValueError: If a stage's output table breaks a rule of the chain (see `PipelineStage`): it has no unique
@@ -40,7 +46,12 @@ def run_stages(
         # --- output -----------------------------
         started_at = datetime.datetime.now(datetime.UTC)
         t_start = time.perf_counter()
-        output = stage.compute_output(previous_table, worker_pool=worker_pool)
+        try:
+            output = stage.compute_output(previous_table, worker_pool=worker_pool)
+        except PipelineStopError as error:
+            return PipelineRunResult(
+                manifests=tuple(manifests), stop=PipelineStop(output_name=stage.output_name, reason=str(error))
+            )
         duration_sec = time.perf_counter() - t_start
         _check_chain_rules(stage, previous_table, output.table)
 
@@ -55,7 +66,23 @@ def run_stages(
         )
         manifests.append(manifest)
         previous_table, previous_manifest = output.table, manifest
-    return tuple(manifests)
+    return PipelineRunResult(manifests=tuple(manifests), stop=None)
+
+
+# ==================================================================================================
+#  PipelineRunResult
+# ==================================================================================================
+@dataclass(frozen=True)
+class PipelineRunResult:
+    """A `PipelineRunResult` holds the manifests of a run's stages, and the stop that ended the run early, if any.
+
+    Attributes:
+        manifests: The manifest of each stage that wrote its output, in run order.
+        stop: The stage that stopped the run, and why; ``None`` when every stage wrote its output.
+    """
+
+    manifests: tuple[PipelineStageManifest, ...]
+    stop: PipelineStop | None
 
 
 # ==================================================================================================

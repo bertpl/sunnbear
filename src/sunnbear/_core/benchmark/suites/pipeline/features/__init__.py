@@ -15,4 +15,5 @@ A fidelity sets how much work goes into each feature vector. Each such pipeline 
 from .characterization_stage import INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME, CandidateCharacterizationStage
 from .characterization_task import CandidateCharacterizationResult, CandidateCharacterizationTask
 from .feature_vector import SNUFFLED_PROPERTIES, SOLVERS_GPQ_LEVELS, FeatureBlock
+from .fevals_mapping import map_feature_to_fevals, map_fevals_to_feature
 from .fidelity import FeatureFidelity
