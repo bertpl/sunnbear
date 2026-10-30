@@ -1,4 +1,4 @@
-"""`CandidatePool` holds the candidates that `select_diverse_suite` selects a suite from."""
+"""`CandidatePool` holds the input candidates of `select_diverse_suite`."""
 
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -13,12 +13,12 @@ from .difficulty_class import DifficultyClass
 # ==================================================================================================
 @dataclass(frozen=True)
 class CandidatePool:
-    """A `CandidatePool` holds the candidates that `select_diverse_suite` selects a suite from.
+    """A `CandidatePool` holds the input candidates of `select_diverse_suite`.
 
     Attributes:
         vectors: The candidates' scaled full feature vectors, 1 row per candidate, as
             `FullCharacterizationStage.scaled_feature_vectors` returns them.
-        edi_axis: The column of `vectors` that holds the EDI feature.
+        edi_axis: The column of `vectors` that holds the empirical difficulty index (EDI) feature.
         difficulty_classes: Each candidate's class, in the order of `vectors`' rows.
     """
 

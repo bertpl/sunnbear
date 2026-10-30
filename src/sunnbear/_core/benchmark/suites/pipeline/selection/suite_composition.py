@@ -1,7 +1,7 @@
 """`SuiteComposition` holds a suite's difficulty quotas, each a `DifficultyQuota`, whose counts sum to its size.
 
-Every suite of the pipeline holds each difficulty class in a fixed share of its size, or classes Da and Db in 1 shared
-quota when either lacks candidates for its own quota in the Core.
+Every suite of the pipeline has the Core's composition, as `CoreComposition.from_class_counts` chooses it, scaled to
+the suite's size.
 """
 
 from collections import Counter
@@ -73,7 +73,7 @@ class DifficultyQuota:
     """A `DifficultyQuota` sets how many of a suite's candidates come from a set of difficulty classes.
 
     Attributes:
-        classes: The classes that the quota counts together: 1 class, or Da and Db when they share 1 quota.
+        classes: The quota's classes, counted together: 1 class, or Da and Db when they share 1 quota.
         count: The exact number of the suite's candidates whose class is in `classes`.
     """
 

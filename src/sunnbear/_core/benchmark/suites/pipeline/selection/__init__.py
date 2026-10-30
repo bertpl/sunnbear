@@ -1,11 +1,11 @@
 """This package selects the pipeline's suites: the most diverse candidates under difficulty quotas.
 
-Core selection and distillation select every suite of the benchmark suite pipeline with the same parts, so that every
-suite is selected by the same objective in the same space:
+Core selection and distillation select every suite of the benchmark suite pipeline with the parts below, so that every
+suite is selected by the same objective in the same feature space:
 
 - `DifficultyClass`, which buckets a candidate by its empirical difficulty index (EDI), in `difficulty_class`;
 - `SuiteComposition`, a suite's difficulty quotas, each a `DifficultyQuota`, in `suite_composition`;
-- `CandidatePool`, the candidates that a suite is selected from, in `candidate_pool`;
+- `CandidatePool`, the input candidates of a suite's selection, in `candidate_pool`;
 - `select_diverse_suite`, which selects the most diverse suite of a composition from a `CandidatePool` by max-div, in
   `diverse_selection`.
 

@@ -1,4 +1,4 @@
-"""Distillation, the seventh stage of the benchmark suite pipeline, distills the benchmark and calibration suites.
+"""Distillation, the seventh pipeline stage, selects the benchmark and calibration suites from the Core.
 
 The package holds:
 

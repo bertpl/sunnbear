@@ -1,4 +1,4 @@
-"""`SuiteFamily` names a family of the suites that distillation selects from the Core."""
+"""`SuiteFamily` names a family of the suites distilled from the Core."""
 
 from enum import StrEnum
 

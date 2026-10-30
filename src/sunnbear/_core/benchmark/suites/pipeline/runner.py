@@ -45,8 +45,7 @@ def run_pipeline(
         n_workers: The number of worker processes; ``None`` for 1 per logical CPU. Each worker imports the modules that
             define `formulas` and `core_solver_configs`, so with more than 1 worker, none of them may be defined in an
             interactive session.
-        mode: The `PipelineMode`, which sets how much work the stages do; the full characterization stage, the core
-            selection stage and the distillation stage take their settings from the mode's attributes.
+        mode: The `PipelineMode`, whose attributes set how much work the stages do.
 
     Returns:
         The manifest of each stage that wrote its output, in run order, and the stage that stopped the run, if any, as

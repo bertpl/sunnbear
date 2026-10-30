@@ -41,8 +41,8 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     - each of those with the feature vector of full characterization, computed at the coarse fidelity, as the stage's
       manifest records.
 
-    Core selection then stops the run, because 4 candidates fill no Core, so neither it nor distillation writes an
-    output.
+    Core selection then stops the run, because 4 candidates fill no Core, so neither core selection nor distillation
+    writes an output.
     """
     # --- arrange ----------------------
     # The shipped formula 2.1.2 has few candidates, so the pipeline runs fast on it.

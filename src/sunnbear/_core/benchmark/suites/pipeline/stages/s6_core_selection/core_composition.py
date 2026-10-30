@@ -46,7 +46,7 @@ _CLASSES_PER_QUARTER = (
 # ==================================================================================================
 @dataclass(frozen=True)
 class CoreComposition(SuiteComposition):
-    """A `CoreComposition` is the Core's `SuiteComposition`, with the number of candidates of each class.
+    """A `CoreComposition` is the Core's `SuiteComposition`, plus the number of input candidates of each class.
 
     The Core's size is 1 of `CORE_SIZES`.
 

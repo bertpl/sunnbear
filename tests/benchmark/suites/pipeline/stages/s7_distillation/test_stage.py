@@ -26,8 +26,9 @@ A, B, C, DA, DB = DifficultyClass
 # The stage runs no tasks in the pool, so the pool's processes never start. max-div runs 1 worker per worker of the
 # pool, and with 1 worker it warns that it gains nothing over a single solve, so the pool has 2 workers.
 _TWO_WORKER_POOL = WorkerPool(n_workers=2)
-# In these tests each max-div worker runs for 3.84 s on a pool of 128 candidates and 7.68 s on a pool of 256, which
-# covers the start of the workers' processes and leaves time to meet every quota on a busy CI machine.
+# Each max-div worker runs this long per candidate of the pool it selects from; with the pools of 128 and 256
+# candidates in these tests, that covers the start of the workers' processes and leaves time to meet every quota on
+# a busy CI machine.
 _SEC_PER_CANDIDATE = 0.03
 
 

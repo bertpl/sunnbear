@@ -16,7 +16,8 @@ from sunnbear._core.benchmark.suites.pipeline.selection import (
 @pytest.mark.only_with_numba_jit
 def test_a_selection_that_misses_a_quota_stops_the_pipeline():
     """A composition whose 2 quotas both count class A asks for 8 candidates of A, and for 4 of A and B together, so no
-    selection meets both; max-div returns its best selection, and the check after it stops the pipeline."""
+    selection meets both; max-div returns its best selection, and the check after max-div's selection stops the
+    pipeline."""
     # --- arrange ----------------------
     pool = CandidatePool(
         vectors=np.random.default_rng(seed=5).random((40, 4)),

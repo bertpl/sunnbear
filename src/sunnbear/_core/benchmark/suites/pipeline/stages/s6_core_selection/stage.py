@@ -108,8 +108,8 @@ class CoreSelectionStage(PipelineStage):
     def candidate_pool(table: pl.DataFrame) -> CandidatePool:
         """Return the `CandidatePool` of `table`'s rows, from their full features and their ``difficulty_class`` column.
 
-        `table` is this stage's output table, a subset of its rows, or its input table with the column of
-        `DIFFICULTY_CLASS_SCHEMA` added.
+        `table` is this stage's output table, a subset of the output table's rows, or the stage's input table with the
+        column of `DIFFICULTY_CLASS_SCHEMA` added.
         """
         return CandidatePool(
             vectors=FullCharacterizationStage.scaled_feature_vectors(table),
