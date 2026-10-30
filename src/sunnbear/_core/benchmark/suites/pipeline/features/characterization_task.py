@@ -17,7 +17,8 @@ from sunnbear._core.problems.core import FormulaRegistry
 from sunnbear._core.solvers.core import SolveStatus
 from sunnbear._core.stats import gpq
 
-from .fidelity import SNUFFLED_PROPERTIES, SOLVERS_GPQ_LEVELS, FeatureFidelity
+from .feature_vector import SNUFFLED_PROPERTIES, SOLVERS_GPQ_LEVELS
+from .fidelity import FeatureFidelity
 
 
 # ==================================================================================================
@@ -30,18 +31,21 @@ class CandidateCharacterizationTask:
     Attributes:
         candidates: The ``(problem_id, c_min, c_max)`` of each candidate: its id, as rendered by `ProblemId`, and its
             c-range. The task rebuilds each calibrated test problem from them.
-        solver_ids: The ids of the core solver configs, whose solves give the solvers block of the feature vector, as
-            `FeatureFidelity` describes it.
+        solver_ids: The ids of the core solver configs, whose solves give the solvers block of the feature vector.
+        feature_column_names: The names of the feature vector's columns, in its order, as the characterization stage
+            names them.
+        fidelity: The `FeatureFidelity` of the feature vectors.
     """
 
     candidates: tuple[tuple[str, float, float], ...]
     solver_ids: tuple[str, ...]
+    feature_column_names: tuple[str, ...]
     fidelity: FeatureFidelity
 
     def run(self) -> list[dict[str, float] | RejectionReason]:
         """Return each candidate's feature vector, or the reason to reject it, in the order of `candidates`.
 
-        A feature vector maps the names of `FeatureFidelity.feature_column_names` to their values.
+        A feature vector maps the names of `feature_column_names` to their values.
         """
         return [self._characterize_candidate(problem_id, c_min, c_max) for problem_id, c_min, c_max in self.candidates]
 
@@ -108,5 +112,4 @@ class CandidateCharacterizationTask:
                 *(np.log(value / 2) / np.log(max_fevals / 2) for value in solvers_fevals_statistics),
                 *snuffled_features,
             ]
-            feature_column_names = self.fidelity.feature_column_names(self.solver_ids)
-            return dict(zip(feature_column_names, map(float, feature_values), strict=True))
+            return dict(zip(self.feature_column_names, map(float, feature_values), strict=True))

@@ -23,13 +23,22 @@ class ExampleNumbersStage(PipelineStage):
 
 
 class ExampleSmallNumbersStage(PipelineStage):
-    """`ExampleSmallNumbersStage` keeps the numbers up to 2, adds their doubles, and reports the dropped numbers."""
+    """`ExampleSmallNumbersStage` keeps the numbers up to `max_x`, adds their doubles, and reports the other numbers."""
 
     output_name = "s2_small_numbers"
 
+    def __init__(self, max_x: float = 2.0) -> None:
+        """Create the stage, which keeps the numbers up to `max_x`."""
+        self.max_x = max_x
+
+    @property
+    def parameters(self) -> dict[str, float]:
+        """Return `max_x`, the stage's only parameter."""
+        return {"max_x": self.max_x}
+
     def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
-        """Return the numbers up to 2 with a column ``doubled_x``, and the report ``large_numbers``."""
-        is_large = pl.col("x") > 2.0
+        """Return the numbers up to `max_x` with a column ``doubled_x``, and the report ``large_numbers``."""
+        is_large = pl.col("x") > self.max_x
         return PipelineStageOutput(
             table=previous_table.filter(~is_large).with_columns(doubled_x=2.0 * pl.col("x")),
             reports={"large_numbers": previous_table.filter(is_large)},

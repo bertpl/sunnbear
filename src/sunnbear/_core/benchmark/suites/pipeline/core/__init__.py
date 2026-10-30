@@ -13,7 +13,8 @@ The parts of the framework work together as follows:
   - has the `PipelineWorkspace` write the stage's output.
 - `PipelineWorkspace` writes each stage's output table and reports into the workspace directory, together with a
   `PipelineStageManifest`, and reads the reports back.
-- `PipelineStageManifest` records how a stage built its output: from which input, with which code, and when.
+- `PipelineStageManifest` records how a stage built its output: from which input, with which code and parameters,
+  and when.
 
 The stages share 2 more things that the framework defines:
 

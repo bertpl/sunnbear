@@ -5,6 +5,8 @@ import math
 
 from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
 from sunnbear._core.benchmark.suites.pipeline.features import CandidateCharacterizationTask, FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.stages import CoarseCharacterizationStage
+from sunnbear._core.solvers.core import SolverConfigRegistry
 from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
 
 
@@ -20,10 +22,16 @@ def test_the_task_returns_a_feature_vector_or_a_reason_per_candidate(isolated_fo
     define_formula_cls(
         (99, 963), lambda x, c: 0.0 if abs(x - c - root_offset) < 1e-6 else x - c - root_offset, -1.0, 1.0
     )
-    solver_ids = ("brent[variant='inverse_quadratic']", "illinois")
+    stage = CoarseCharacterizationStage(
+        [
+            SolverConfigRegistry.config_from_id(solver_id)
+            for solver_id in ["brent[variant='inverse_quadratic']", "illinois"]
+        ]
+    )
     task = CandidateCharacterizationTask(
         candidates=tuple((problem_id, -0.5, 0.5) for problem_id in ["f99.961", "f99.962", "f99.963"]),
-        solver_ids=solver_ids,
+        solver_ids=stage.solver_ids,
+        feature_column_names=tuple(stage.feature_column_names),
         fidelity=FeatureFidelity.COARSE,
     )
 
@@ -32,7 +40,7 @@ def test_the_task_returns_a_feature_vector_or_a_reason_per_candidate(isolated_fo
 
     # --- assert -----------------------
     assert isinstance(features, dict)
-    assert list(features) == FeatureFidelity.COARSE.feature_column_names(solver_ids)
+    assert list(features) == stage.feature_column_names
     assert all(0.0 <= value <= 1.0 for value in features.values())
     assert reason_of_nan is RejectionReason.FUNCTION_ERROR
     assert reason_of_zeros is RejectionReason.SNUFFLED_MAX_ZERO_WIDTH_TOO_LARGE

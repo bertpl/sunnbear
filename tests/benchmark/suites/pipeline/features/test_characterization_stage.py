@@ -1,0 +1,104 @@
+"""`CandidateCharacterizationStage.feature_column_names` names the solvers block first, then the snuffled block, and
+starts each column with its block's prefix; no feature scale column starts with such a prefix, `_add_feature_scales`
+adds each block's mean pairwise L1 distance, and `scaled_feature_vectors` divides each block by it."""
+
+import numpy as np
+import polars as pl
+import polars.selectors as cs
+import pytest
+from snuffled import FunctionProperty, RootProperty
+
+from sunnbear._core.benchmark.suites.pipeline.features import SNUFFLED_PROPERTIES, FeatureBlock
+from sunnbear._core.benchmark.suites.pipeline.stages import CoarseCharacterizationStage
+from sunnbear._core.solvers.core import SolverConfigRegistry
+from sunnbear._core.stats import mean_pairwise_l1
+
+
+def _coarse_stage(solver_ids: list[str]) -> CoarseCharacterizationStage:
+    """Return the coarse characterization stage for the registered solver configs `solver_ids`."""
+    return CoarseCharacterizationStage([SolverConfigRegistry.config_from_id(solver_id) for solver_id in solver_ids])
+
+
+def test_the_column_names_hold_1_geomean_per_config_9_gpq_levels_and_10_properties():
+    """For 2 configs, the names are the 2 geomeans in their order, the gpq levels 10 to 90, then snuffled's 10
+    properties."""
+    # --- act --------------------------
+    column_names = _coarse_stage(["regula_falsi", "bisection"]).feature_column_names
+
+    # --- assert -----------------------
+    assert column_names == [
+        "coarse_solvers_geomean_regula_falsi",
+        "coarse_solvers_geomean_bisection",
+        *(f"coarse_solvers_gpq_{level}" for level in range(10, 100, 10)),
+        *(f"coarse_snuffled_{prop.value}" for prop in SNUFFLED_PROPERTIES),
+    ]
+    assert set(SNUFFLED_PROPERTIES) == {*RootProperty, *FunctionProperty}
+
+
+def test_the_scale_columns_are_not_selected_as_feature_columns():
+    """Every feature column starts with its block's prefix, and no column of a block's scale does."""
+    # --- arrange ----------------------
+    prefixes = [CoarseCharacterizationStage.feature_column_prefix(block) for block in FeatureBlock]
+
+    # --- act --------------------------
+    scale_column_names = CoarseCharacterizationStage.feature_scale_column_names()
+
+    # --- assert -----------------------
+    assert prefixes == ["coarse_solvers_", "coarse_snuffled_"]
+    assert scale_column_names == ["coarse_feature_scale_solvers", "coarse_feature_scale_snuffled"]
+    feature_column_names = _coarse_stage(["bisection"]).feature_column_names
+    assert all(column_name.startswith(tuple(prefixes)) for column_name in feature_column_names)
+    assert not any(column_name.startswith(tuple(prefixes)) for column_name in scale_column_names)
+
+
+def test_each_blocks_scale_is_its_mean_pairwise_l1_distance_in_every_row():
+    """The scale of a block is the mean pairwise L1 distance over the columns of that block only."""
+    # --- arrange ----------------------
+    rng = np.random.default_rng(seed=1)
+    table = pl.DataFrame(
+        {
+            "problem_id": [f"f99.{idx}" for idx in range(5)],
+            **{
+                column_name: rng.random(5)
+                for column_name in _coarse_stage(["bisection", "regula_falsi"]).feature_column_names
+            },
+        }
+    )
+
+    # --- act --------------------------
+    table_with_scales = CoarseCharacterizationStage._add_feature_scales(table)
+
+    # --- assert -----------------------
+    assert table_with_scales.select(table.columns).equals(table)
+    for block in FeatureBlock:
+        scale_expected = mean_pairwise_l1(
+            table.select(cs.starts_with(CoarseCharacterizationStage.feature_column_prefix(block))).to_numpy()
+        )
+        assert table_with_scales[CoarseCharacterizationStage.feature_scale_column_name(block)].to_list() == (
+            [scale_expected] * 5
+        )
+
+
+def test_the_scaled_vectors_divide_each_block_by_its_scale():
+    """The scaled vectors hold the feature columns in their order, each divided by its block's scale, so that each
+    block's mean pairwise L1 distance is 1."""
+    # --- arrange ----------------------
+    column_names = _coarse_stage(["bisection", "regula_falsi"]).feature_column_names
+    rng = np.random.default_rng(seed=1)
+    table = CoarseCharacterizationStage._add_feature_scales(
+        pl.DataFrame(
+            {"problem_id": [f"f99.{idx}" for idx in range(5)], **{name: rng.random(5) for name in column_names}}
+        )
+    )
+
+    # --- act --------------------------
+    vectors = CoarseCharacterizationStage.scaled_feature_vectors(table)
+
+    # --- assert -----------------------
+    features = table.select(column_names).to_numpy()
+    n_solvers_columns = len(column_names) - len(SNUFFLED_PROPERTIES)
+    block_slices = [slice(None, n_solvers_columns), slice(n_solvers_columns, None)]
+    for block, block_slice in zip(FeatureBlock, block_slices, strict=True):
+        scale = table[CoarseCharacterizationStage.feature_scale_column_name(block)][0]
+        np.testing.assert_array_equal(vectors[:, block_slice], features[:, block_slice] / scale)
+        assert mean_pairwise_l1(vectors[:, block_slice]) == pytest.approx(1.0)

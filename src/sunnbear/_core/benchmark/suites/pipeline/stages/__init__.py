@@ -7,3 +7,10 @@ stage's `PipelineStage.output_name` does, so the names sort in run order.
 from .s1_candidate_generation import CANDIDATES_SCHEMA, CandidateGenerationStage
 from .s2_candidate_validation import C_RANGE_SCHEMA, MAX_BOUND_TO_WIDTH_RATIO, CandidateValidationStage
 from .s3_coarse_characterization import CoarseCharacterizationStage
+from .s4_spacing import (
+    CANDIDATE_COUNTS_PER_FORMULA_REPORT_NAME,
+    DEFAULT_SPACING_MIN_DISTANCE,
+    DROPPED_CANDIDATES_REPORT_NAME,
+    NEAREST_KEPT_CANDIDATE_SCHEMA,
+    SpacingStage,
+)
