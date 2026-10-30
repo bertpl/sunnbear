@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add coarse and full characterization, spacing, core selection and a draft mode to the internal benchmark suite pipeline
+
 ### Changed
 
 ### Deprecated
