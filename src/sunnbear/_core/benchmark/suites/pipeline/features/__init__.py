@@ -1,7 +1,7 @@
 """This package holds the base classes, the fidelities and the feature blocks of the stages that compute features.
 
-A fidelity sets how much work goes into each feature vector. Each such pipeline stage is a child class, in the package
-`stages`, of a base class here, and sets its default fidelity. The package holds:
+A fidelity sets how much work goes into each feature vector. Each such pipeline stage is a child class of a base class
+here, lives in the package `stages`, and sets its default fidelity. The package holds:
 
 - `FeatureFidelity` names a fidelity;
 - `FeatureBlock` names a block of a feature vector;

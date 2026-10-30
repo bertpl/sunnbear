@@ -8,7 +8,7 @@ The workspace has no default directory, because the shipped package cannot assum
 The candidates are characterized by the solves of the built-in solver configs whose role marks them for characterizing
 test problems.
 
-The command takes 2 optional flags:
+The command also takes these optional flags:
 
 - ``--n-workers`` sets the number of worker processes that the stages share;
 - ``--draft`` runs the stages in `PipelineMode.DRAFT`, which takes a fraction of a full run's time and applies the same

@@ -7,10 +7,10 @@ from sunnbear._core.benchmark.suites.pipeline.features import CandidateCharacter
 #  FullCharacterizationStage
 # ==================================================================================================
 class FullCharacterizationStage(CandidateCharacterizationStage):
-    """`FullCharacterizationStage` adds the full feature vector of each candidate kept by spacing.
+    """`FullCharacterizationStage` adds a feature vector to each candidate that spacing keeps.
 
-    The benchmark suites are selected by the full feature vectors, so the stage uses, by default, the full fidelity's
-    larger tuple sets and snuffled analysis budget.
+    The benchmark suites are selected by the full feature vectors, so by default the stage runs at the full fidelity,
+    whose tuple sets and snuffled analysis budget are larger than the coarse fidelity's.
 
     Its feature scales are computed only on the candidates that the spacing stage keeps, because the benchmark suites
     are selected from those candidates.

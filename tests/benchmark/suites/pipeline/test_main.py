@@ -49,8 +49,8 @@ def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> N
 @pytest.mark.only_with_numba_jit
 def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeypatch, capsys):
     """In draft mode, the command writes each stage's output into the workspace with the given number of workers, until
-    core selection stops the run, because the test's 3 candidates fill no Core; full characterization runs at the
-    coarse fidelity.
+    core selection stops the run, because the test's 3 candidates fill no Core. Full characterization runs at the coarse
+    fidelity.
 
     It prints 1 line per stage that wrote its output, in run order, then for each stage that rejects candidates the
     count of the formulas with rejected candidates, followed by 1 indented line per such formula, then the stop, and
