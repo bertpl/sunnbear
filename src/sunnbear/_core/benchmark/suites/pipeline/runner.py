@@ -8,6 +8,7 @@ from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.utils.module_imports import worker_pool_for_modules
 
 from .core import PipelineRunResult, PipelineWorkspace, run_stages
+from .mode import PipelineMode
 from .stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
@@ -27,6 +28,7 @@ def run_pipeline(
     formulas: Sequence[Formula],
     core_solver_configs: Sequence[SolverConfig],
     n_workers: int | None = None,
+    mode: PipelineMode = PipelineMode.FULL,
 ) -> PipelineRunResult:
     """Run every stage of the benchmark suite pipeline on `formulas`, into the workspace directory `workspace_dir`.
 
@@ -42,6 +44,7 @@ def run_pipeline(
         n_workers: The number of worker processes; ``None`` for 1 per logical CPU. Each worker imports the modules that
             define `formulas` and `core_solver_configs`, so with more than 1 worker, none of them may be defined in an
             interactive session.
+        mode: How much work the stages do, as `PipelineMode` describes it.
 
     Returns:
         The manifest of each stage that wrote its output, in run order, and the stage that stopped the run, if any, as
@@ -59,8 +62,8 @@ def run_pipeline(
         CandidateValidationStage(),
         CoarseCharacterizationStage(core_solver_configs),
         SpacingStage(),
-        FullCharacterizationStage(core_solver_configs),
-        CoreSelectionStage(),
+        FullCharacterizationStage(core_solver_configs, fidelity=mode.full_characterization_fidelity),
+        CoreSelectionStage(seconds_per_candidate=mode.core_selection_seconds_per_candidate),
     ]
     module_names = {type(formula).__module__ for formula in formulas} | {
         config.declaring_module_name for config in core_solver_configs

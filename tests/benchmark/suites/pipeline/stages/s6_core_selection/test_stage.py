@@ -2,13 +2,12 @@
 
 - it reads each candidate's EDI from its full features and adds its difficulty class;
 - it selects the Core by max-div under the difficulty quotas, also when Da and Db share 1 quota;
-- it records max-div's budget and seed in its parameters.
+- it records max-div's time per candidate and seed in its parameters.
 """
 
 import numpy as np
 import polars as pl
 import pytest
-from max_div import iterations
 
 from sunnbear._core.benchmark.suites.pipeline.features import map_fevals_to_feature
 from sunnbear._core.benchmark.suites.pipeline.stages import (
@@ -24,8 +23,9 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 # The stage runs no tasks in the pool, so its processes never start; max-div runs 1 worker per worker of the pool, and
 # warns that 1 worker gains nothing over a single solve.
 _TWO_WORKER_POOL = WorkerPool(n_workers=2)
-# Each max-div worker's budget in these tests: an iteration count keeps each test short however busy the machine is.
-_BUDGET = iterations(1000)
+# Each max-div worker's time per candidate in these tests: 8 s for 160 candidates, which includes the start of the
+# workers' processes and leaves time to meet every quota on a busy CI machine.
+_SECONDS_PER_CANDIDATE = 0.05
 
 
 def _full_features_table(edis: list[float]) -> pl.DataFrame:
@@ -56,7 +56,7 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
     previous_table = _full_features_table(edis)
 
     # --- act --------------------------
-    output = CoreSelectionStage(budget=_BUDGET).compute_output(previous_table, worker_pool=_TWO_WORKER_POOL)
+    output = CoreSelectionStage(_SECONDS_PER_CANDIDATE).compute_output(previous_table, worker_pool=_TWO_WORKER_POOL)
 
     # --- assert -----------------------
     assert output.table.schema == pl.Schema({**previous_table.schema, **DIFFICULTY_CLASS_SCHEMA})
@@ -79,10 +79,10 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
 @pytest.mark.only_with_numba_jit
 def test_the_stage_fills_a_shared_quota_and_records_its_parameters():
     """The candidates hold no Db, so Da and Db share 1 quota, with a warning, and the selection fills it; the stage's
-    parameters record max-div's budget and seed."""
+    parameters record max-div's time per candidate and seed."""
     # --- arrange ----------------------
     previous_table = _full_features_table([5.0] * 40 + [15.0] * 40 + [30.0] * 40 + [60.0] * 40)
-    stage = CoreSelectionStage(budget=_BUDGET)
+    stage = CoreSelectionStage(_SECONDS_PER_CANDIDATE)
 
     # --- act --------------------------
     with pytest.warns(CoreCompositionWarning):
@@ -90,4 +90,4 @@ def test_the_stage_fills_a_shared_quota_and_records_its_parameters():
 
     # --- assert -----------------------
     assert dict(output.table["difficulty_class"].value_counts().iter_rows()) == {"A": 32, "B": 32, "C": 32, "Da": 32}
-    assert stage.parameters == {"budget": "1_000 it.", "seed": stage.seed}
+    assert stage.parameters == {"seconds_per_candidate": _SECONDS_PER_CANDIDATE, "seed": stage.seed}

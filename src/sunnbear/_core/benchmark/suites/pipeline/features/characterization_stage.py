@@ -36,10 +36,10 @@ class CandidateCharacterizationStage(PipelineStage):
     only the output table of the stage before it, so the scales are stored in this stage's output table, where the
     next stage can read them, with the same value in every row.
 
-    A child class is 1 stage of the pipeline: it sets `output_name`, `column_prefix` and `fidelity`, the only things in
-    which the characterization stages differ. `column_prefix` starts the name of each column that the stage adds, so
-    that 1 table can hold the columns of 2 characterization stages. A later stage reads these columns through the class
-    methods of the child class that added them, such as `scaled_feature_vectors`.
+    A child class is 1 stage of the pipeline: it sets `output_name`, `column_prefix` and `default_fidelity`, the only
+    things in which the characterization stages differ. `column_prefix` starts the name of each column that the stage
+    adds, so that 1 table can hold the columns of 2 characterization stages. A later stage reads these columns through
+    the class methods of the child class that added them, such as `scaled_feature_vectors`.
 
     A candidate is rejected when 1 of its solves ends with `SolveStatus.FUNCTION_ERROR`, or when snuffled's diagnostics
     reject it at 1 of its analyses, by the rules of `extract_properties_or_rejection_reason`.
@@ -54,14 +54,17 @@ class CandidateCharacterizationStage(PipelineStage):
     Class attributes:
         column_prefix: The start of the name of each column that the stage adds, e.g. ``coarse`` in
             ``coarse_solvers_gpq_50``.
-        fidelity: The `FeatureFidelity` of the feature vectors.
+        default_fidelity: The `FeatureFidelity` of the feature vectors when the constructor receives none.
     """
 
     column_prefix: ClassVar[str]
-    fidelity: ClassVar[FeatureFidelity]
+    default_fidelity: ClassVar[FeatureFidelity]
 
-    def __init__(self, core_solver_configs: Sequence[SolverConfig]) -> None:
-        """Create the stage, which solves each candidate with `core_solver_configs`.
+    def __init__(self, core_solver_configs: Sequence[SolverConfig], fidelity: FeatureFidelity | None = None) -> None:
+        """Create the stage, which solves each candidate with `core_solver_configs` at `fidelity`.
+
+        `fidelity` sets only how much work goes into each feature vector, never the names of the stage's columns, so a
+        later stage reads them the same way at every fidelity. ``None`` stands for the class's `default_fidelity`.
 
         Raises:
             ValueError: If `core_solver_configs` is empty.
@@ -70,6 +73,12 @@ class CandidateCharacterizationStage(PipelineStage):
             raise ValueError("A characterization stage needs at least 1 core solver config.")
         else:
             self.solver_ids = tuple(config.solver_id for config in core_solver_configs)
+            self.fidelity = fidelity if fidelity is not None else self.default_fidelity
+
+    @property
+    def parameters(self) -> dict[str, str]:
+        """Return the name of the stage's fidelity, its only parameter."""
+        return {"fidelity": self.fidelity.name}
 
     def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
         """Return the kept candidates with their feature vectors, and the reports on the rejected candidates.

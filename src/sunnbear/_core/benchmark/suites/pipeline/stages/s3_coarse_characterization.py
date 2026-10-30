@@ -7,7 +7,7 @@ from sunnbear._core.benchmark.suites.pipeline.features import CandidateCharacter
 #  CoarseCharacterizationStage
 # ==================================================================================================
 class CoarseCharacterizationStage(CandidateCharacterizationStage):
-    """`CoarseCharacterizationStage` adds each valid candidate's feature vector at `FeatureFidelity.COARSE`.
+    """`CoarseCharacterizationStage` adds each valid candidate's coarse feature vector.
 
     The coarse vectors only need to tell the near-duplicate candidates of a formula apart, so the stage runs on every
     valid candidate at the coarse fidelity's small tuple sets and budget.
@@ -15,4 +15,4 @@ class CoarseCharacterizationStage(CandidateCharacterizationStage):
 
     output_name = "s3_coarse_features"
     column_prefix = "coarse"
-    fidelity = FeatureFidelity.COARSE
+    default_fidelity = FeatureFidelity.COARSE

@@ -1,6 +1,7 @@
 """``python -m sunnbear._core.benchmark.suites.pipeline`` runs the pipeline over the shipped formulas into the
-``--workspace`` directory with ``--n-workers`` workers, prints the rejections per formula and the stop of a stage that
-stops the run, exits normally when no stage stops it, and refuses to run without a workspace."""
+``--workspace`` directory with ``--n-workers`` workers, in draft mode with ``--draft``, prints the rejections per
+formula and the stop of a stage that stops the run, exits normally when no stage stops it, and refuses to run without a
+workspace."""
 
 import re
 import runpy
@@ -10,6 +11,7 @@ import pytest
 
 from sunnbear._core.benchmark.suites.pipeline import runner
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineRunResult, PipelineStageManifest
+from sunnbear._core.benchmark.suites.pipeline.features import FeatureFidelity
 from sunnbear._core.benchmark.suites.pipeline.stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
@@ -43,8 +45,9 @@ def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> N
 
 @pytest.mark.only_with_numba_jit
 def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeypatch, capsys):
-    """The command writes each stage's output into the workspace with the given number of workers, until core selection
-    stops the run, because the test's 3 candidates fill no Core.
+    """In draft mode, the command writes each stage's output into the workspace with the given number of workers, until
+    core selection stops the run, because the test's 3 candidates fill no Core; full characterization runs at the
+    coarse fidelity.
 
     It prints 1 line per stage that wrote its output, in run order, then for each stage that rejects candidates the
     count of the formulas with rejected candidates, followed by 1 indented line per such formula, then the stop, and
@@ -52,14 +55,13 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
     # --- arrange ----------------------
     # The command runs over every registered formula. The test keeps only the shipped formulas whose numbers start with
     # (1, 4, 2), because validation runs solves at every tuple of the shipped tuple set's largest size for each
-    # candidate that passes its earlier checks, and full characterization does the same for each candidate that spacing
-    # keeps, which makes a run over every formula slow.
+    # candidate that passes its earlier checks, which makes a run over every formula slow.
     formulas = tuple(formula for formula in FormulaRegistry.formulas() if formula.number[:3] == (1, 4, 2))
     monkeypatch.setattr(FormulaRegistry, "formulas", lambda: formulas)
 
     # --- act --------------------------
     with pytest.raises(SystemExit) as exc_info:
-        _run_pipeline_command(monkeypatch, ["--workspace", str(tmp_path), "--n-workers", "3"])
+        _run_pipeline_command(monkeypatch, ["--workspace", str(tmp_path), "--n-workers", "3", "--draft"])
 
     # --- assert -----------------------
     assert exc_info.value.code == 1
@@ -85,6 +87,7 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
         for name in _OUTPUT_NAMES
     ]
     assert [manifest.n_workers for manifest in manifests] == [3] * len(_OUTPUT_NAMES)
+    assert manifests[-1].parameters == {"fidelity": FeatureFidelity.COARSE.name}
 
 
 def test_the_command_exits_normally_when_no_stage_stops_the_run(tmp_path, monkeypatch, capsys):

@@ -5,6 +5,8 @@ import pytest
 
 from sunnbear._core.benchmark.suites.pipeline import stages as stages_package
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage
+from sunnbear._core.benchmark.suites.pipeline.features import FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.mode import PipelineMode
 from sunnbear._core.benchmark.suites.pipeline.runner import run_pipeline
 from sunnbear._core.benchmark.suites.pipeline.stages import (
     DEFAULT_SPACING_MIN_DISTANCE,
@@ -30,13 +32,13 @@ def _stage_classes(stage_cls: type[PipelineStage]) -> list[type[PipelineStage]]:
 
 @pytest.mark.only_with_numba_jit
 def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(tmp_path):
-    """On formula 2.1.2, the pipeline writes 1 output per stage, in this order:
+    """On formula 2.1.2, the pipeline in draft mode writes 1 output per stage, in this order:
 
     - its candidates;
     - the valid ones with their c-ranges;
     - every valid one with its coarse feature vector, and the scale of each feature block in every row;
     - the candidates that spacing keeps at its default minimum distance;
-    - each of those with its full feature vector.
+    - each of those with its full feature vector, computed at the coarse fidelity, as the stage's manifest records.
 
     Core selection then stops the run, because 4 candidates fill no Core.
     """
@@ -52,7 +54,11 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     # pytest-xdist already runs 1 test process per CPU. With 2 workers the stages still run in worker processes;
     # with 1 worker they would run in this test's process.
     result = run_pipeline(
-        workspace_dir=tmp_path, formulas=formulas, core_solver_configs=core_solver_configs, n_workers=2
+        workspace_dir=tmp_path,
+        formulas=formulas,
+        core_solver_configs=core_solver_configs,
+        n_workers=2,
+        mode=PipelineMode.DRAFT,
     )
 
     # --- assert -----------------------
@@ -91,3 +97,4 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
         *FullCharacterizationStage(core_solver_configs).feature_column_names,
         *FullCharacterizationStage.feature_scale_column_names(),
     ]
+    assert manifests[4].parameters == {"fidelity": FeatureFidelity.COARSE.name}
