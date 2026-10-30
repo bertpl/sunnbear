@@ -22,3 +22,10 @@ from .s6_core_selection import (
     CoreCompositionWarning,
     CoreSelectionStage,
 )
+from .s7_distillation import (
+    SMALLEST_SUITE_SIZE,
+    SUITE_COMPOSITIONS_REPORT_NAME,
+    SUITE_MEMBERSHIP_SCHEMA,
+    DistillationStage,
+    SuiteFamily,
+)

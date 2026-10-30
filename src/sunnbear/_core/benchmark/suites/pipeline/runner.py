@@ -14,6 +14,7 @@ from .stages import (
     CandidateValidationStage,
     CoarseCharacterizationStage,
     CoreSelectionStage,
+    DistillationStage,
     FullCharacterizationStage,
     SpacingStage,
 )
@@ -44,8 +45,8 @@ def run_pipeline(
         n_workers: The number of worker processes; ``None`` for 1 per logical CPU. Each worker imports the modules that
             define `formulas` and `core_solver_configs`, so with more than 1 worker, none of them may be defined in an
             interactive session.
-        mode: The `PipelineMode`, which sets how much work the stages do; the full characterization stage and the core
-            selection stage take their settings from the mode's attributes.
+        mode: The `PipelineMode`, which sets how much work the stages do; the full characterization stage, the core
+            selection stage and the distillation stage take their settings from the mode's attributes.
 
     Returns:
         The manifest of each stage that wrote its output, in run order, and the stage that stopped the run, if any, as
@@ -65,6 +66,7 @@ def run_pipeline(
         SpacingStage(),
         FullCharacterizationStage(core_solver_configs, fidelity=mode.full_characterization_stage_fidelity),
         CoreSelectionStage(sec_per_candidate=mode.selection_sec_per_candidate),
+        DistillationStage(sec_per_candidate=mode.selection_sec_per_candidate),
     ]
     module_names = {type(formula).__module__ for formula in formulas} | {
         config.declaring_module_name for config in core_solver_configs

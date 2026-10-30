@@ -41,7 +41,8 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     - each of those with the feature vector of full characterization, computed at the coarse fidelity, as the stage's
       manifest records.
 
-    Core selection then stops the run, because 4 candidates fill no Core.
+    Core selection then stops the run, because 4 candidates fill no Core, so neither it nor distillation writes an
+    output.
     """
     # --- arrange ----------------------
     # The shipped formula 2.1.2 has few candidates, so the pipeline runs fast on it.
@@ -70,7 +71,7 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
         if stage_cls.__module__.startswith(f"{stages_package.__name__}.")
     )
     manifests = result.manifests
-    assert [manifest.output_name for manifest in manifests] == output_names_expected[:-1]
+    assert [manifest.output_name for manifest in manifests] == output_names_expected[:-2]
     assert result.stop is not None
     assert result.stop.output_name == CoreSelectionStage.output_name
     assert result.stop.reason.startswith("The candidates fill no Core of 128 or more")

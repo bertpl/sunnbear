@@ -47,6 +47,7 @@ from .stages import (
     CandidateValidationStage,
     CoarseCharacterizationStage,
     CoreSelectionStage,
+    DistillationStage,
     FullCharacterizationStage,
     SpacingStage,
 )

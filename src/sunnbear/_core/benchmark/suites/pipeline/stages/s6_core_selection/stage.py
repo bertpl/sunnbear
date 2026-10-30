@@ -106,3 +106,8 @@ class CoreSelectionStage(PipelineStage):
             table=table_with_classes[solution.i_selected],
             reports={CORE_COMPOSITION_REPORT_NAME: core_composition.report_table()},
         )
+
+    @staticmethod
+    def difficulty_classes(table: pl.DataFrame) -> list[DifficultyClass]:
+        """Return each row's `DifficultyClass` from `table`, an output table of this stage or a table of its rows."""
+        return [DifficultyClass(value) for value in table["difficulty_class"]]
