@@ -1,13 +1,14 @@
 """`CoreSelectionStage` selects the Core from the candidates' full features:
 
 - it reads each candidate's EDI from its full features and adds its difficulty class;
-- it selects the Core by max-div under the difficulty quotas;
-- it gives the same Core in every run.
+- it selects the Core by max-div under the difficulty quotas, also when Da and Db share 1 quota;
+- it records max-div's budget and seed in its parameters.
 """
 
 import numpy as np
 import polars as pl
 import pytest
+from max_div import iterations
 
 from sunnbear._core.benchmark.suites.pipeline.features import map_fevals_to_feature
 from sunnbear._core.benchmark.suites.pipeline.stages import (
@@ -21,6 +22,8 @@ from sunnbear._core.solvers.core import SolverConfigRegistry
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 _IN_PROCESS_WORKER_POOL = WorkerPool(n_workers=1)
+# Each max-div worker's budget in these tests: an iteration count keeps each test short however busy the machine is.
+_BUDGET = iterations(1000)
 
 
 def _full_features_table(edis: list[float]) -> pl.DataFrame:
@@ -51,7 +54,7 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
     previous_table = _full_features_table(edis)
 
     # --- act --------------------------
-    output = CoreSelectionStage(n_iterations=1000).compute_output(previous_table, worker_pool=_IN_PROCESS_WORKER_POOL)
+    output = CoreSelectionStage(budget=_BUDGET).compute_output(previous_table, worker_pool=_IN_PROCESS_WORKER_POOL)
 
     # --- assert -----------------------
     assert output.table.schema == pl.Schema({**previous_table.schema, **DIFFICULTY_CLASS_SCHEMA})
@@ -72,18 +75,17 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
 
 
 @pytest.mark.only_with_numba_jit
-def test_the_stage_selects_the_same_core_in_every_run():
-    """With the stage's fixed seed and number of iterations, 2 runs select the same Core, and the stage's parameters
-    record the seed and the number of iterations; the candidates hold no Db, so Da and Db share 1 quota, with a
-    warning."""
+def test_the_stage_fills_a_shared_quota_and_records_its_parameters():
+    """The candidates hold no Db, so Da and Db share 1 quota, with a warning, and the selection fills it; the stage's
+    parameters record max-div's budget and seed."""
     # --- arrange ----------------------
     previous_table = _full_features_table([5.0] * 40 + [15.0] * 40 + [30.0] * 40 + [60.0] * 40)
-    stage = CoreSelectionStage(n_iterations=1000)
+    stage = CoreSelectionStage(budget=_BUDGET)
 
     # --- act --------------------------
     with pytest.warns(CoreCompositionWarning):
-        outputs = [stage.compute_output(previous_table, worker_pool=_IN_PROCESS_WORKER_POOL) for _ in range(2)]
+        output = stage.compute_output(previous_table, worker_pool=_IN_PROCESS_WORKER_POOL)
 
     # --- assert -----------------------
-    assert outputs[0].table.equals(outputs[1].table)
-    assert stage.parameters == {"n_iterations": 1000, "seed": stage.seed}
+    assert dict(output.table["difficulty_class"].value_counts().iter_rows()) == {"A": 32, "B": 32, "C": 32, "Da": 32}
+    assert stage.parameters == {"budget": "1_000 it.", "seed": stage.seed}

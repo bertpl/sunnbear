@@ -17,7 +17,7 @@ from .s4_spacing import (
 from .s5_full_characterization import FullCharacterizationStage
 from .s6_core_selection import (
     CORE_COMPOSITION_REPORT_NAME,
-    DEFAULT_CORE_SELECTION_N_ITERATIONS,
+    DEFAULT_CORE_SELECTION_BUDGET,
     DIFFICULTY_CLASS_SCHEMA,
     CoreComposition,
     CoreCompositionWarning,

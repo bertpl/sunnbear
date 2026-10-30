@@ -4,8 +4,9 @@ from collections import Counter
 
 import numpy as np
 import polars as pl
-from max_div import Constraint, MaxDivProblem, MaxDivSolverBuilder, Verbosity, iterations
+from max_div import Constraint, MaxDivProblem, ParallelMaxDivSolverBuilder, Verbosity, minutes
 from max_div.metrics import DistanceMetric, DiversityMetric, HybridDiversityMetric
+from max_div.solver import TargetDuration
 
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, SeedPurpose, derive_seed
 from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED, PipelineStage, PipelineStageOutput
@@ -20,7 +21,8 @@ DIFFICULTY_CLASS_SCHEMA: dict[str, pl.DataType] = {
     "difficulty_class": pl.Enum([difficulty_class.value for difficulty_class in DifficultyClass])
 }
 CORE_COMPOSITION_REPORT_NAME = "core_composition"
-DEFAULT_CORE_SELECTION_N_ITERATIONS = 100_000
+# The default budget of each max-div worker is a wall-clock time; it is meant to grow as the corpus grows.
+DEFAULT_CORE_SELECTION_BUDGET = minutes(1)
 
 
 # ==================================================================================================
@@ -45,26 +47,23 @@ class CoreSelectionStage(PipelineStage):
 
     output_name = "s6_core_suite"
 
-    def __init__(self, n_iterations: int = DEFAULT_CORE_SELECTION_N_ITERATIONS) -> None:
-        """Create the stage, whose max-div search runs `n_iterations` iterations.
-
-        A fixed number of iterations, not a time budget, makes the selection the same on every machine.
-        """
-        self.n_iterations = n_iterations
+    def __init__(self, budget: TargetDuration = DEFAULT_CORE_SELECTION_BUDGET) -> None:
+        """Create the stage, whose max-div workers each search for `budget`, a wall-clock time or an iteration count."""
+        self.budget = budget
         self.seed = derive_seed(root_seed=PIPELINE_ROOT_SEED, purpose=SeedPurpose.CORE_SELECTION)
 
     @property
-    def parameters(self) -> dict[str, int]:
-        """Return the number of iterations and the seed of max-div's search."""
-        return {"n_iterations": self.n_iterations, "seed": self.seed}
+    def parameters(self) -> dict[str, str | int]:
+        """Return the budget and the seed of max-div's search."""
+        return {"budget": str(self.budget), "seed": self.seed}
 
     def compute_output(self, previous_table: pl.DataFrame, *, worker_pool: WorkerPool) -> PipelineStageOutput:
         """Return the Core's candidates with their difficulty classes, and the report on the Core's composition.
 
         Args:
             previous_table: The output table of `FullCharacterizationStage`.
-            worker_pool: The worker pool of the run, which the stage does not use: max-div searches in a single
-                process, because a search across workers gives a result that depends on their timing.
+            worker_pool: The worker pool of the run, which the stage does not use: max-div starts its own worker
+                processes.
 
         Returns:
             The stage's output, which holds:
@@ -126,6 +125,9 @@ class CoreSelectionStage(PipelineStage):
         scale of the solvers block multiply that distance by a constant factor, which does not change which selection
         maximizes a geometric mean.
 
+        max-div searches with its default number of workers, in groups that share their best selections and merge as
+        the search runs. The Core therefore depends on the timing of the workers and can differ between 2 runs.
+
         The geometric mean weighs every selected candidate's separation equally. A statistic that weighs the smallest
         separations more would let the difficulty classes whose candidates lie closest together steer the selection.
         """
@@ -154,9 +156,9 @@ class CoreSelectionStage(PipelineStage):
             ],
         )
         solution = (
-            MaxDivSolverBuilder(max_div_problem)
+            ParallelMaxDivSolverBuilder(max_div_problem)
             .with_seed(self.seed)
-            .with_preset(iterations(self.n_iterations))
+            .with_workers(self.budget)
             .build()
             .solve(verbosity=Verbosity.SILENT)
         )
