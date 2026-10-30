@@ -21,10 +21,6 @@ DIFFICULTY_CLASS_SCHEMA: dict[str, pl.DataType] = {
 }
 CORE_COMPOSITION_REPORT_NAME = "core_composition"
 DEFAULT_CORE_SELECTION_N_ITERATIONS = 100_000
-# A selected candidate's separation is its distance to the nearest other selected candidate. max-div's objective takes
-# the geometric pseudo-quantile (gpq) of the selection's separations at this level: the lower the level, the more weight
-# the objective puts on the smallest separations.
-CORE_SELECTION_SEPARATION_GPQ_LEVEL = 0.1
 
 
 # ==================================================================================================
@@ -119,8 +115,8 @@ class CoreSelectionStage(PipelineStage):
 
         max-div searches for the `core_composition.core_size` candidates whose scaled full feature vectors are the most
         diverse, under 1 constraint per quota of `core_composition`. Its objective is the geometric mean, with equal
-        weights, of the gpq of the selection's separations at `CORE_SELECTION_SEPARATION_GPQ_LEVEL`, under each of 2
-        distances:
+        weights, of the geometric mean separation under each of 2 distances, where a selected candidate's separation is
+        its distance to the nearest other selected candidate:
 
         - the L1 distance between the scaled vectors, in which every feature block has a mean pairwise L1 distance of 1;
         - the distance along the EDI feature, which is the EDI on a log scale, so that the Core's EDIs also differ
@@ -129,12 +125,15 @@ class CoreSelectionStage(PipelineStage):
         The distance along the EDI feature therefore compares 2 EDIs by their ratio. `map_fevals_to_feature` and the
         scale of the solvers block multiply that distance by a constant factor, which does not change which selection
         maximizes a geometric mean.
+
+        The geometric mean weighs every selected candidate's separation equally. A statistic that weighs the smallest
+        separations more would let the difficulty classes whose candidates lie closest together steer the selection.
         """
         vectors = FullCharacterizationStage.scaled_feature_vectors(previous_table)
         edi_axis = FullCharacterizationStage.scaled_feature_column_index(
             previous_table, FullCharacterizationStage.solvers_gpq_column_name(EDI_GPQ_LEVEL)
         )
-        gpq_separation = DiversityMetric.gpq_separation(CORE_SELECTION_SEPARATION_GPQ_LEVEL)
+        geomean_separation = DiversityMetric.geomean_separation()
         max_div_problem = MaxDivProblem.new(
             # max-div takes float32 vectors; the lost precision does not reach the output, because the Core's rows are
             # taken from `previous_table` by index.
@@ -142,8 +141,8 @@ class CoreSelectionStage(PipelineStage):
             k=core_composition.core_size,
             distance_metric=DistanceMetric.l1_manhattan(),
             diversity_metric=HybridDiversityMetric.geomean_of(
-                gpq_separation.over(DistanceMetric.l1_manhattan()),
-                gpq_separation.over(DistanceMetric.along_axis(edi_axis)),
+                geomean_separation.over(DistanceMetric.l1_manhattan()),
+                geomean_separation.over(DistanceMetric.along_axis(edi_axis)),
             ),
             constraints=[
                 Constraint(
