@@ -14,4 +14,5 @@ class CoarseCharacterizationStage(CandidateCharacterizationStage):
     """
 
     output_name = "s3_coarse_features"
+    column_prefix = "coarse"
     fidelity = FeatureFidelity.COARSE

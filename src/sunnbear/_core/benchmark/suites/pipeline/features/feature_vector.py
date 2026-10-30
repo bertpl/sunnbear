@@ -22,10 +22,7 @@ SNUFFLED_PROPERTIES = (*RootProperty, *FunctionProperty)
 #  FeatureBlock
 # ==================================================================================================
 class FeatureBlock(StrEnum):
-    """A `FeatureBlock` names a block of a feature vector after its source.
-
-    The member's value appears in the name of each of the block's columns.
-    """
+    """A `FeatureBlock` names a block of a feature vector after its source."""
 
     SOLVERS = "solvers"
     SNUFFLED = "snuffled"

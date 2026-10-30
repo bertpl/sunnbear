@@ -32,18 +32,21 @@ class CandidateCharacterizationStage(PipelineStage):
     only the output table of the stage before it, so the scales are stored in this stage's output table, where the
     next stage can read them, with the same value in every row.
 
-    A child class is 1 stage of the pipeline: it sets `output_name` and `fidelity`, the only things in which the
-    characterization stages differ. The fidelity's name, in lower case, starts the name of each column that the stage
-    adds, so that 1 table can hold the columns of 2 fidelities. A later stage reads these columns through the class
+    A child class is 1 stage of the pipeline: it sets `output_name`, `column_prefix` and `fidelity`, the only things in
+    which the characterization stages differ. `column_prefix` starts the name of each column that the stage adds, so
+    that 1 table can hold the columns of 2 characterization stages. A later stage reads these columns through the class
     methods of the child class that added them, such as `scaled_feature_vectors`.
 
     A candidate is rejected when 1 of its solves ends with `SolveStatus.FUNCTION_ERROR`, or when snuffled's diagnostics
     reject it at 1 of its analyses, by the rules of `extract_properties_or_rejection_reason`.
 
     Class attributes:
+        column_prefix: The start of the name of each column that the stage adds, e.g. ``coarse`` in
+            ``coarse_solvers_gpq_50``.
         fidelity: The `FeatureFidelity` of the feature vectors.
     """
 
+    column_prefix: ClassVar[str]
     fidelity: ClassVar[FeatureFidelity]
 
     def __init__(self, core_solver_configs: Sequence[SolverConfig]) -> None:
@@ -128,7 +131,7 @@ class CandidateCharacterizationStage(PipelineStage):
     @classmethod
     def feature_column_prefix(cls, block: FeatureBlock) -> str:
         """Return the start of the name of each feature column of `block`, e.g. ``coarse_solvers_``."""
-        return f"{cls.fidelity.name.lower()}_{block.value}_"
+        return f"{cls.column_prefix}_{block.value}_"
 
     @classmethod
     def feature_scale_column_name(cls, block: FeatureBlock) -> str:
@@ -137,7 +140,7 @@ class CandidateCharacterizationStage(PipelineStage):
         The name, e.g. ``coarse_feature_scale_solvers``, does not start with the block's `feature_column_prefix`, so a
         selection of the block's feature columns by that prefix never includes this column.
         """
-        return f"{cls.fidelity.name.lower()}_feature_scale_{block.value}"
+        return f"{cls.column_prefix}_feature_scale_{block.value}"
 
     @classmethod
     def feature_scale_column_names(cls) -> list[str]:
