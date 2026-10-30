@@ -19,4 +19,5 @@ class FullCharacterizationStage(CandidateCharacterizationStage):
     """
 
     output_name = "s5_full_features"
+    column_prefix = "full"
     fidelity = FeatureFidelity.FULL
