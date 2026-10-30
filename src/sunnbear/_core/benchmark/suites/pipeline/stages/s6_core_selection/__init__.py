@@ -6,7 +6,8 @@ difficulty class in a fixed share. The package holds:
 - `DifficultyClass`, which buckets a candidate by its empirical difficulty index (EDI), in `difficulty_class`;
 - `CoreComposition`, the size and difficulty quotas of the largest Core that the candidates can fill, in
   `core_composition`;
-- `CoreSelectionStage`, which assigns each candidate its class and chooses the Core's composition, in `stage`.
+- `CoreSelectionStage`, which assigns each candidate its class, chooses the Core's composition and selects the Core by
+  max-div, in `stage`.
 """
 
 from .core_composition import (
@@ -17,4 +18,10 @@ from .core_composition import (
     DifficultyQuota,
 )
 from .difficulty_class import EDI_GPQ_LEVEL, DifficultyClass
-from .stage import CORE_COMPOSITION_REPORT_NAME, DIFFICULTY_CLASS_SCHEMA, CoreSelectionStage
+from .stage import (
+    CORE_COMPOSITION_REPORT_NAME,
+    CORE_SELECTION_SEPARATION_GPQ_LEVEL,
+    DEFAULT_CORE_SELECTION_N_ITERATIONS,
+    DIFFICULTY_CLASS_SCHEMA,
+    CoreSelectionStage,
+)
