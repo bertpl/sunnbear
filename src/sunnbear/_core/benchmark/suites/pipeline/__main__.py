@@ -4,9 +4,15 @@ From the repository root, maintainers run it into a folder under `script_outputs
 
     uv run python -m sunnbear._core.benchmark.suites.pipeline --workspace script_outputs/pipeline
 
-The workspace has no default directory, because the shipped package cannot assume that the repository's folders
-exist. ``--n-workers`` sets the number of worker processes that the stages share. The candidates are characterized by
-the solves of the built-in solver configs whose role marks them for characterizing test problems.
+The workspace has no default directory, because the shipped package cannot assume that the repository's folders exist.
+The candidates are characterized by the solves of the built-in solver configs whose role marks them for characterizing
+test problems.
+
+The command also takes these optional flags:
+
+- ``--n-workers`` sets the number of worker processes that the stages share;
+- ``--draft`` runs the stages in `PipelineMode.DRAFT`, which takes a fraction of a full run's time and applies the same
+  selection rules.
 
 After the run, the command prints 1 line per stage that wrote its output, then, for each stage that rejects candidates:
 
@@ -25,6 +31,7 @@ from sunnbear._core.solvers import bracketing  # noqa: F401 - importing the ship
 from sunnbear._core.solvers.core import SolverConfigRegistry
 
 from .core import REJECTIONS_PER_FORMULA_REPORT_NAME, PipelineWorkspace, summarize_rejections_per_formula
+from .mode import PipelineMode
 from .runner import run_pipeline
 
 
@@ -36,6 +43,9 @@ def main() -> None:
     )
     parser.add_argument("--workspace", type=Path, required=True, help="directory for the outputs of the stages")
     parser.add_argument("--n-workers", type=int, help="number of worker processes (default: 1 per logical CPU)")
+    parser.add_argument(
+        "--draft", dest="is_draft", action="store_true", help="do less work in the slowest stages, for a quick rerun"
+    )
     args = parser.parse_args()
 
     result = run_pipeline(
@@ -45,6 +55,7 @@ def main() -> None:
             config for config in SolverConfigRegistry.configs() if config.role.is_used_for_problem_characterization
         ],
         n_workers=args.n_workers,
+        mode=PipelineMode.DRAFT if args.is_draft else PipelineMode.FULL,
     )
     for manifest in result.manifests:
         report_names = ", ".join(manifest.report_sha256s) or "none"
