@@ -21,7 +21,9 @@ from sunnbear._core.benchmark.suites.pipeline.stages import (
 from sunnbear._core.solvers.core import SolverConfigRegistry
 from sunnbear._core.utils.worker_pool import WorkerPool
 
-_IN_PROCESS_WORKER_POOL = WorkerPool(n_workers=1)
+# The stage runs no tasks in the pool, so its processes never start; max-div runs 1 worker per worker of the pool, and
+# warns that 1 worker gains nothing over a single solve.
+_TWO_WORKER_POOL = WorkerPool(n_workers=2)
 # Each max-div worker's budget in these tests: an iteration count keeps each test short however busy the machine is.
 _BUDGET = iterations(1000)
 
@@ -54,7 +56,7 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
     previous_table = _full_features_table(edis)
 
     # --- act --------------------------
-    output = CoreSelectionStage(budget=_BUDGET).compute_output(previous_table, worker_pool=_IN_PROCESS_WORKER_POOL)
+    output = CoreSelectionStage(budget=_BUDGET).compute_output(previous_table, worker_pool=_TWO_WORKER_POOL)
 
     # --- assert -----------------------
     assert output.table.schema == pl.Schema({**previous_table.schema, **DIFFICULTY_CLASS_SCHEMA})
@@ -84,7 +86,7 @@ def test_the_stage_fills_a_shared_quota_and_records_its_parameters():
 
     # --- act --------------------------
     with pytest.warns(CoreCompositionWarning):
-        output = stage.compute_output(previous_table, worker_pool=_IN_PROCESS_WORKER_POOL)
+        output = stage.compute_output(previous_table, worker_pool=_TWO_WORKER_POOL)
 
     # --- assert -----------------------
     assert dict(output.table["difficulty_class"].value_counts().iter_rows()) == {"A": 32, "B": 32, "C": 32, "Da": 32}

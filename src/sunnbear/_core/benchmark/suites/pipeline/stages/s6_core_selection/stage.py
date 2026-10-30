@@ -62,8 +62,8 @@ class CoreSelectionStage(PipelineStage):
 
         Args:
             previous_table: The output table of `FullCharacterizationStage`.
-            worker_pool: The worker pool of the run, which the stage does not use: max-div starts its own worker
-                processes.
+            worker_pool: The worker pool of the run, whose number of workers max-div uses; max-div starts its own
+                worker processes, and the pool's workers stay idle.
 
         Returns:
             The stage's output, which holds:
@@ -94,7 +94,9 @@ class CoreSelectionStage(PipelineStage):
         core_composition = CoreComposition.from_class_counts(Counter(difficulty_classes))
 
         # --- selection --------------------------
-        selected_indices = self._select_core(previous_table, difficulty_classes, core_composition)
+        selected_indices = self._select_core(
+            previous_table, difficulty_classes, core_composition, n_workers=worker_pool.n_workers
+        )
         core_composition.check_selection([difficulty_classes[idx] for idx in selected_indices])
         return PipelineStageOutput(
             table=table_with_classes[selected_indices],
@@ -109,6 +111,8 @@ class CoreSelectionStage(PipelineStage):
         previous_table: pl.DataFrame,
         difficulty_classes: list[DifficultyClass],
         core_composition: CoreComposition,
+        *,
+        n_workers: int,
     ) -> np.ndarray:
         """Return the row indices of the Core in `previous_table`, ascending, as max-div selects them.
 
@@ -125,7 +129,7 @@ class CoreSelectionStage(PipelineStage):
         scale of the solvers block multiply that distance by a constant factor, which does not change which selection
         maximizes a geometric mean.
 
-        max-div searches with its default number of workers, in groups that share their best selections and merge as
+        max-div searches with `n_workers` workers, in groups that share their best selections and merge as
         the search runs. The Core therefore depends on the timing of the workers and can differ between 2 runs.
 
         The geometric mean weighs every selected candidate's separation equally. A statistic that weighs the smallest
@@ -158,7 +162,7 @@ class CoreSelectionStage(PipelineStage):
         solution = (
             ParallelMaxDivSolverBuilder(max_div_problem)
             .with_seed(self.seed)
-            .with_workers(self.budget)
+            .with_workers(self.budget, n_workers=n_workers)
             .build()
             .solve(verbosity=Verbosity.SILENT)
         )
