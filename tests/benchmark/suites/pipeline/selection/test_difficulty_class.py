@@ -3,7 +3,7 @@
 
 import pytest
 
-from sunnbear._core.benchmark.suites.pipeline.stages import DifficultyClass
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyClass
 
 
 @pytest.mark.parametrize(

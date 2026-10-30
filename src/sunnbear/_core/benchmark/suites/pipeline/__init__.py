@@ -9,6 +9,7 @@ it, adding columns and dropping rows:
 - `snuffled_analysis` runs snuffled's analysis of a test problem, for every stage that needs one;
 - `features` holds the base classes of the stages that compute the candidates' feature vectors; each such stage is a
   child class in `stages` that sets its default `FeatureFidelity`;
+- `selection` selects the benchmark suites from the candidates' feature vectors, for every stage that selects one;
 - `run_pipeline` runs the stages in order on a set of formulas, sharing 1 pool of worker processes between them, in a
   `PipelineMode` that sets how much work the stages do.
 

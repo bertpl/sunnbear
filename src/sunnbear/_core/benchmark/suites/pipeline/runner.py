@@ -64,7 +64,7 @@ def run_pipeline(
         CoarseCharacterizationStage(core_solver_configs),
         SpacingStage(),
         FullCharacterizationStage(core_solver_configs, fidelity=mode.full_characterization_stage_fidelity),
-        CoreSelectionStage(sec_per_candidate=mode.core_selection_stage_sec_per_candidate),
+        CoreSelectionStage(sec_per_candidate=mode.selection_sec_per_candidate),
     ]
     module_names = {type(formula).__module__ for formula in formulas} | {
         config.declaring_module_name for config in core_solver_configs

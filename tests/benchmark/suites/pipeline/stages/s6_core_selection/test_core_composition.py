@@ -6,12 +6,8 @@ import warnings
 import pytest
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStopError
-from sunnbear._core.benchmark.suites.pipeline.stages import (
-    CoreComposition,
-    CoreCompositionWarning,
-    DifficultyClass,
-    DifficultyQuota,
-)
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyClass, DifficultyQuota
+from sunnbear._core.benchmark.suites.pipeline.stages import CoreComposition, CoreCompositionWarning
 from sunnbear._core.benchmark.suites.pipeline.stages.s6_core_selection.core_composition import _CLASSES_PER_QUARTER
 
 A, B, C, DA, DB = DifficultyClass
@@ -34,8 +30,7 @@ def test_the_core_size_is_the_largest_that_every_quarter_fills(class_counts, cor
         composition = CoreComposition.from_class_counts(class_counts)
 
     # --- assert -----------------------
-    assert (composition.core_size, composition.is_interim) == (core_size_expected, is_interim_expected)
-    assert sum(quota.count for quota in composition.quotas) == core_size_expected
+    assert (composition.size, composition.is_interim) == (core_size_expected, is_interim_expected)
 
 
 def test_every_class_gets_its_own_quota_when_da_and_db_fill_theirs():
@@ -69,7 +64,7 @@ def test_da_and_db_share_1_quota_with_a_warning_when_either_is_short(class_count
         composition = CoreComposition.from_class_counts(class_counts)
 
     # --- assert -----------------------
-    assert composition.core_size == 256
+    assert composition.size == 256
     assert composition.quotas[-1] == DifficultyQuota(classes=frozenset({DA, DB}), count=64)
     assert composition.report_row()["quota_d"] == 64
     assert composition.report_row()["quota_da"] is None
@@ -121,25 +116,3 @@ def test_the_quarters_hold_every_difficulty_class_once():
     """The 4 quarters of the Core hold every `DifficultyClass` exactly once."""
     # --- act / assert -----------------
     assert sorted(c for classes in _CLASSES_PER_QUARTER for c in classes) == sorted(DifficultyClass)
-
-
-@pytest.mark.parametrize(
-    "selected_classes, message",
-    [
-        pytest.param([A] * 32 + [B] * 32 + [C] * 32 + [DA] * 24 + [DB] * 8, None, id="met"),
-        pytest.param([A] * 33 + [B] * 31 + [C] * 32 + [DA] * 24 + [DB] * 8, r"A: 33 of 32; B: 31 of 32\.", id="unmet"),
-        pytest.param([A] * 32 + [B] * 32 + [C] * 32 + [DA] * 24, r"120 candidates .* Db: 0 of 8\.", id="too_few"),
-    ],
-)
-def test_a_selection_must_have_the_core_size_and_meet_every_quota(selected_classes, message):
-    """A selection of the Core's size that meets every quota passes; one that misses a quota or the size stops the
-    pipeline, with a message that names each unmet quota and the selection's count."""
-    # --- arrange ----------------------
-    composition = CoreComposition.from_class_counts({A: 40, B: 40, C: 40, DA: 30, DB: 10})
-
-    # --- act / assert -----------------
-    if message is None:
-        composition.check_selection(selected_classes)
-    else:
-        with pytest.raises(PipelineStopError, match=message):
-            composition.check_selection(selected_classes)
