@@ -17,11 +17,15 @@ from .s4_spacing import (
 from .s5_full_characterization import FullCharacterizationStage
 from .s6_core_selection import (
     CORE_COMPOSITION_REPORT_NAME,
-    DEFAULT_CORE_SELECTION_SEC_PER_CANDIDATE,
     DIFFICULTY_CLASS_SCHEMA,
     CoreComposition,
     CoreCompositionWarning,
     CoreSelectionStage,
-    DifficultyClass,
-    DifficultyQuota,
+)
+from .s7_distillation import (
+    SMALLEST_SUITE_SIZE,
+    SUITE_COMPOSITIONS_REPORT_NAME,
+    SUITE_MEMBERSHIP_SCHEMA,
+    DistillationStage,
+    SuiteFamily,
 )

@@ -25,6 +25,7 @@ class SeedPurpose(StrEnum):
     CORRECTNESS_CHECK = "correctness_check"
     SNUFFLED_ANALYSIS = "snuffled_analysis"
     CORE_SELECTION = "core_selection"
+    DISTILLATION = "distillation"
 
 
 def derive_seed(

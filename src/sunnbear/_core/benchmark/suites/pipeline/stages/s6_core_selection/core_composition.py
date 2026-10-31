@@ -17,16 +17,14 @@ Any Core other than one of `MAX_CORE_SIZE` with a quota per class is interim, an
 """
 
 import warnings
-from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from dataclasses import dataclass
 from fractions import Fraction
 
 import polars as pl
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStopError
-
-from .difficulty_class import DifficultyClass
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyClass, DifficultyQuota, SuiteComposition
 
 # Every Core size is a power of 2, so that every quota, the size times a `DifficultyClass.core_share`, is a whole number
 # of candidates.
@@ -47,23 +45,21 @@ _CLASSES_PER_QUARTER = (
 #  CoreComposition
 # ==================================================================================================
 @dataclass(frozen=True)
-class CoreComposition:
-    """A `CoreComposition` holds the Core's size, its difficulty quotas, and the number of candidates of each class.
+class CoreComposition(SuiteComposition):
+    """A `CoreComposition` is the Core's `SuiteComposition`, plus the number of input candidates of each class.
+
+    The Core's size is 1 of `CORE_SIZES`.
 
     Attributes:
-        core_size: The number of candidates in the Core, 1 of `CORE_SIZES`.
-        quotas: The Core's difficulty quotas, whose counts sum to `core_size`.
         class_counts: The number of candidates of each `DifficultyClass` among which the Core is selected.
     """
 
-    core_size: int
-    quotas: tuple["DifficultyQuota", ...]
     class_counts: Mapping[DifficultyClass, int]
 
     @property
     def is_interim(self) -> bool:
         """Return whether the Core is not one that ships: not of `MAX_CORE_SIZE`, or without a quota per class."""
-        return (self.core_size != MAX_CORE_SIZE) or (len(self.quotas) != len(DifficultyClass))
+        return (self.size != MAX_CORE_SIZE) or (len(self.quotas) != len(DifficultyClass))
 
     def report_row(self) -> dict[str, int | bool | None]:
         """Return the Core's size and whether it is interim, and per class its quota, count and largest Core size.
@@ -80,7 +76,7 @@ class CoreComposition:
           of `CORE_SIZES` at which their candidates together fill a quarter of the Core, null where they fill none.
         """
         count_by_quota_classes = {quota.classes: quota.count for quota in self.quotas}
-        row: dict[str, int | bool | None] = {"core_size": self.core_size, "is_interim": self.is_interim}
+        row: dict[str, int | bool | None] = {"core_size": self.size, "is_interim": self.is_interim}
         for difficulty_class in DifficultyClass:
             name = difficulty_class.value.lower()
             n_candidates = self.class_counts[difficulty_class]
@@ -91,26 +87,6 @@ class CoreComposition:
         row["quota_d"] = count_by_quota_classes.get(d_classes)
         row["max_core_size_d"] = self._max_core_size(sum(self.class_counts[c] for c in d_classes), _QUARTER)
         return row
-
-    def check_selection(self, selected_classes: Sequence[DifficultyClass]) -> None:
-        """Stop the pipeline unless a selection of candidates, given by their classes, has the Core's size and quotas.
-
-        Raises:
-            PipelineStopError: If `selected_classes` does not hold `core_size` candidates, or does not meet a quota
-                exactly; the message names each such quota with the selection's count.
-        """
-        class_counts = Counter(selected_classes)
-        unmet_quota_descriptions = [
-            f"{' and '.join(sorted(c.value for c in quota.classes))}: {sum(class_counts[c] for c in quota.classes)} "
-            f"of {quota.count}"
-            for quota in self.quotas
-            if sum(class_counts[c] for c in quota.classes) != quota.count
-        ]
-        if len(selected_classes) != self.core_size or unmet_quota_descriptions:
-            raise PipelineStopError(
-                f"The selection holds {len(selected_classes)} candidates for a Core of {self.core_size}; unmet quotas: "
-                f"{'; '.join(unmet_quota_descriptions) or 'none'}."
-            )
 
     def report_table(self) -> pl.DataFrame:
         """Return the report that core selection writes: 1 row with the columns of `report_row`."""
@@ -184,23 +160,7 @@ class CoreComposition:
             quotas = tuple(
                 DifficultyQuota(classes=frozenset({c}), count=int(core_size * c.core_share)) for c in DifficultyClass
             )
-        return cls(core_size=core_size, quotas=quotas, class_counts=counts)
-
-
-# ==================================================================================================
-#  DifficultyQuota
-# ==================================================================================================
-@dataclass(frozen=True)
-class DifficultyQuota:
-    """A `DifficultyQuota` sets how many of the Core's candidates come from a set of difficulty classes.
-
-    Attributes:
-        classes: The classes that the quota counts together: 1 class, or Da and Db when they share 1 quota.
-        count: The exact number of the Core's candidates whose class is in `classes`.
-    """
-
-    classes: frozenset[DifficultyClass]
-    count: int
+        return cls(quotas=quotas, class_counts=counts)
 
 
 # ==================================================================================================
