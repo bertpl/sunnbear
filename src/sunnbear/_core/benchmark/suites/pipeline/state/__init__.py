@@ -7,6 +7,7 @@ which is the contract that the stage adheres to:
 - `PipelineStateStorage` holds that information: the `CandidateRegistry`, with a `CandidateDrop` for each dropped
   candidate, and 1 structure per stage;
 - `PipelineStateAccessor` is the base class of the accessors, 1 per stage, such as `CandidateValidationStateAccessor`;
+- `PipelineState.create_build_details` gives the outcome of a run as `BenchmarkSuitesBuildDetails`, made for reading;
 - the value objects of `stage_information`, such as `CharacterizationResults`, carry a stage's information to and from
   its accessor.
 
@@ -25,6 +26,7 @@ from .accessors import (
     SelectionStateAccessor,
     SpacingStateAccessor,
 )
+from .build_details import BenchmarkSuitesBuildDetails
 from .candidate_registry import CandidateDrop, CandidateRegistry
 from .pipeline_state import PipelineState
 from .stage_information import (

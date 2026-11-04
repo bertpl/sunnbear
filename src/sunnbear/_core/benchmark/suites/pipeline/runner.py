@@ -34,7 +34,7 @@ from .stages import (
     FullCharacterizationStage,
     SpacingStage,
 )
-from .state import PipelineState
+from .state import BenchmarkSuitesBuildDetails, PipelineState
 
 
 # ==================================================================================================
@@ -53,7 +53,7 @@ def run_pipeline(
     workers start only when a stage first runs tasks in it.
 
     Args:
-        workspace_dir: The directory for the manifests of the stages.
+        workspace_dir: The directory for the manifests of the stages and the build details of the run.
         formulas: The formulas whose candidates the pipeline builds.
         n_workers: The number of worker processes; ``None`` for 1 per logical CPU. Each worker imports the modules that
             define `formulas` and `DiversityFeatureFactory.solver_configs`, so with more than 1 worker, no formula may
@@ -91,7 +91,7 @@ def run_pipeline(
 def run_stages(
     workspace: PipelineWorkspace, stages: Sequence[PipelineStage[Any]], *, worker_pool: WorkerPool
 ) -> "PipelineRunResult":
-    """Run `stages` in order on 1 new `PipelineState`, and have `workspace` write each stage's manifest.
+    """Run `stages` in order on 1 new `PipelineState`; write each stage's manifest and the build details to `workspace`.
 
     Each stage runs on the state accessor that the state creates for it, so `stages` must follow the run order of
     `PipelineStageId`, starting at its first member; the list may stop before its last member.
@@ -101,19 +101,18 @@ def run_stages(
     open.
 
     A stage that raises `PipelineStopError` stops the run: it writes no manifest, and the stages after it do not run.
+    Whether a stage stops the run or not, the run ends with its build details, which `workspace` holds too.
 
     Returns:
-        The run's `PipelineRunResult`, which holds:
-
-        - the manifest of each stage that ran to its end, in run order;
-        - the `PipelineStop` of the stage that stopped the run, if any;
-        - the run's state.
+        The run's `PipelineRunResult`: the manifest of each stage that ran to its end, in run order, and the run's
+        build details.
 
     Raises:
         ValueError: If `stages` do not follow the run order of `PipelineStageId`.
     """
     state = PipelineState()
     manifests: list[PipelineStageManifest] = []
+    stop: PipelineStop | None = None
     for stage in stages:
         n_candidates_in = state.n_remaining_candidates
         started_at = datetime.datetime.now(datetime.UTC)
@@ -121,9 +120,8 @@ def run_stages(
         try:
             state.run_stage(stage, worker_pool=worker_pool)
         except PipelineStopError as error:
-            return PipelineRunResult(
-                manifests=tuple(manifests), stop=PipelineStop(stage_id=stage.stage_id, reason=str(error)), state=state
-            )
+            stop = PipelineStop(stage_id=stage.stage_id, reason=str(error))
+            break
         duration_sec = time.perf_counter() - t_start
         manifest = PipelineStageManifest.from_stage_run(
             stage=stage,
@@ -135,7 +133,9 @@ def run_stages(
         )
         workspace.write_manifest(manifest)
         manifests.append(manifest)
-    return PipelineRunResult(manifests=tuple(manifests), stop=None, state=state)
+    build_details = state.create_build_details(stop=stop)
+    build_details.write_files(workspace.clear_build_details_directory())
+    return PipelineRunResult(manifests=tuple(manifests), build_details=build_details)
 
 
 # ==================================================================================================
@@ -143,14 +143,12 @@ def run_stages(
 # ==================================================================================================
 @dataclass(frozen=True)
 class PipelineRunResult:
-    """A `PipelineRunResult` holds the manifests of a run's stages, the stop that ended the run early, and its state.
+    """A `PipelineRunResult` holds the manifests of a run's stages, and the run's build details.
 
     Attributes:
         manifests: The manifest of each stage that ran to its end, in run order.
-        stop: The stage that stopped the run, and why; ``None`` when every stage ran to its end.
-        state: The run's `PipelineState`, with the information of every stage that ran.
+        build_details: The run's `BenchmarkSuitesBuildDetails`, with its stop, if a stage stopped it.
     """
 
     manifests: tuple[PipelineStageManifest, ...]
-    stop: PipelineStop | None
-    state: PipelineState
+    build_details: BenchmarkSuitesBuildDetails

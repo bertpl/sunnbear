@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageId
+from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageId, PipelineStop
 from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
 
@@ -16,6 +16,7 @@ from .accessors import (
     PipelineStateAccessor,
     SpacingStateAccessor,
 )
+from .build_details import BenchmarkSuitesBuildDetails
 from .candidate_registry import CandidateDrop
 from .storage import PipelineStateStorage
 
@@ -97,6 +98,26 @@ class PipelineState:
             raise ValueError(f"{stage_id} has not started, or has finished already.")
         else:
             self._finished_stage_ids.append(stage_id)
+
+    def create_build_details(self, *, stop: PipelineStop | None = None) -> BenchmarkSuitesBuildDetails:
+        """Return the build details of the run, with `stop`, the stop that ended it early, if any.
+
+        The build details hold the information of the stages that finished; a stage that stopped the run did not.
+
+        Raises:
+            ValueError: If a stage that finished did not write a piece of its information.
+        """
+        missing_information = {
+            stage_id: names
+            for stage_id in self._finished_stage_ids
+            if (names := self._storage.missing_information(stage_id))
+        }
+        if missing_information:
+            raise ValueError(f"Finished stages did not write their information: {missing_information}.")
+        else:
+            return BenchmarkSuitesBuildDetails(
+                storage=self._storage, finished_stage_ids=self.finished_stage_ids, stop=stop
+            )
 
     def run_stage(self, stage: PipelineStage[Any], *, worker_pool: WorkerPool) -> None:
         """Run `stage` on the state accessor that the state creates for it, then record that the stage has finished.

@@ -39,14 +39,19 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     # --- assert -----------------------
     manifests = result.manifests
     assert [manifest.stage_id for manifest in manifests] == list(PipelineStageId)[:-2]
-    assert result.stop is not None
-    assert result.stop.stage_id == PipelineStageId.CORE_SELECTION
-    assert result.stop.reason.startswith("The candidates fill no Core of 128 or more")
+    stop = result.build_details.stop
+    assert stop is not None
+    assert stop.stage_id == PipelineStageId.CORE_SELECTION
+    assert stop.reason.startswith("The candidates fill no Core of 128 or more")
     n_candidates = sum(len(formula.build_all_candidates()) for formula in formulas)
     assert manifests[0].n_candidates_out == n_candidates
     assert manifests[3].parameters == {"min_distance": DEFAULT_SPACING_MIN_DISTANCE}
     assert manifests[4].parameters == {"fidelity": FeatureFidelity.COARSE.name}
-    drops = [result.state.drop_of(candidate.id) for formula in formulas for candidate in formula.build_all_candidates()]
+    drops = [
+        result.build_details.drop_of(candidate.id)
+        for formula in formulas
+        for candidate in formula.build_all_candidates()
+    ]
     assert drops.count(None) == manifests[4].n_candidates_out > 0
     assert sorted(path.name for path in (tmp_path / "manifests").iterdir()) == [
         f"{stage_id}.json" for stage_id in list(PipelineStageId)[:-2]
