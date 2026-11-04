@@ -91,7 +91,7 @@ class CandidateRegistry:
     # --------------------------------------------------------------------------
     @classmethod
     def from_table(cls, table: pl.DataFrame) -> Self:
-        """Return the registry whose columns `to_columns` gave, read back from `table`."""
+        """Return the registry that `table` holds in the columns of `to_columns`."""
         registry = cls()
         registry.add([ProblemId.from_string(problem_id) for problem_id in table["problem_id"]])
         for row in table.filter(pl.col("drop_stage_id").is_not_null()).iter_rows(named=True):

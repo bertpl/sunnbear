@@ -13,7 +13,6 @@ import polars as pl
 
 from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
-from sunnbear._core.benchmark.suites.pipeline.features import FeatureFidelity, FeatureVectorDefinition
 from sunnbear._core.benchmark.suites.pipeline.selection import (
     CoreComposition,
     DifficultyClass,
@@ -43,9 +42,9 @@ _JSON_FILE_NAME = "storage.json"
 class PipelineStateStorage:
     """`PipelineStateStorage` holds the registry of a run's candidates, and 1 structure per stage for its information.
 
-    Only the state accessors write the storage. Each attribute below that holds information on candidates names those
-    candidates; a stage's structure is ``None``, or missing from `characterization_results`, until its stage writes the
-    structure.
+    Only the state accessors write the storage. Each attribute below that holds information on candidates identifies
+    those candidates by `ProblemId`; a stage's structure is ``None``, or missing from `characterization_results`, until
+    its stage writes the structure.
 
     Attributes:
         candidate_registry: Every candidate, and the drop of each dropped one.
@@ -107,7 +106,8 @@ class PipelineStateStorage:
           per candidate and the candidate's id in the column ``problem_id``.
         - Each characterization's results are the table ``<stage id>_raw_features``, with 1 column per feature and 1
           column per config with its count of incorrect solves.
-        - The structures that do not hold information per candidate are in 1 JSON file.
+        - The structures that do not hold information per candidate, and each characterization's solver ids and
+          fidelity, are in 1 JSON file.
 
         A structure that its stage has not written has no file.
         """
@@ -117,7 +117,7 @@ class PipelineStateStorage:
         if self.c_ranges is not None:
             self._write_table(directory / "c_ranges", self._columns_of(self.c_ranges, "c_min", "c_max"))
         for stage_id, results in self.characterization_results.items():
-            self._write_table(directory / f"{stage_id}_raw_features", results.raw_features_columns())
+            self._write_table(directory / f"{stage_id}_raw_features", results.to_raw_features_columns())
         if self.nearest_kept_candidates is not None:
             self._write_table(
                 directory / "nearest_kept_candidates",
@@ -157,7 +157,10 @@ class PipelineStateStorage:
     # --------------------------------------------------------------------------
     @staticmethod
     def _columns_of(information: dict[ProblemId, Any], *field_names: str) -> dict[str, list[Any]]:
-        """Return the columns of `information`: its problem ids, and 1 per field of `field_names` of its values."""
+        """Return `information` as table columns.
+
+        The columns are ``problem_id``, and 1 per name in `field_names` with that field of each value.
+        """
         return {
             "problem_id": list(map(str, information)),
             **{name: [getattr(value, name) for value in information.values()] for name in field_names},
@@ -165,11 +168,11 @@ class PipelineStateStorage:
 
     @staticmethod
     def _write_table(file_stem: Path, columns: dict[str, list[Any]]) -> None:
-        """Write `columns` as a Parquet table to `file_stem` with the table suffix."""
+        """Write `columns` as a Parquet table to `file_stem` with the suffix `_TABLE_FILE_SUFFIX`."""
         pl.DataFrame(columns).write_parquet(file_stem.with_suffix(_TABLE_FILE_SUFFIX))
 
     def _json_contents(self) -> dict[str, Any]:
-        """Return the structures that are not tables, as JSON values."""
+        """Return the structures that are not tables, and each characterization's solver ids and fidelity, as JSON."""
         if self.core_composition is not None:
             core_composition = {
                 "quotas": [
@@ -189,8 +192,7 @@ class PipelineStateStorage:
             distilled_suite_summaries = None
         return {
             "characterizations": {
-                stage_id.value: {"solver_ids": list(results.definition.solver_ids), "fidelity": results.fidelity.name}
-                for stage_id, results in self.characterization_results.items()
+                stage_id.value: results.to_json_values() for stage_id, results in self.characterization_results.items()
             },
             "core_composition": core_composition,
             "distilled_suite_summaries": distilled_suite_summaries,
@@ -198,7 +200,7 @@ class PipelineStateStorage:
 
     @staticmethod
     def _value_builders() -> dict[str, Callable[[dict[str, Any]], object]]:
-        """Return, per structure of 1 value per candidate other than the characterizations' results, its value builder.
+        """Return the value builder of each structure with 1 value per candidate, except the characterization results.
 
         Each such structure is written as the table of its name; each value builder builds 1 value of the structure
         from 1 row of that table.
@@ -232,9 +234,7 @@ class PipelineStateStorage:
         for stage_id_value, json_values in json_contents["characterizations"].items():
             stage_id = PipelineStageId(stage_id_value)
             storage.characterization_results[stage_id] = CharacterizationResults.from_raw_features_table(
-                pl.read_parquet(directory / f"{stage_id}_raw_features{_TABLE_FILE_SUFFIX}"),
-                definition=FeatureVectorDefinition(solver_ids=tuple(json_values["solver_ids"])),
-                fidelity=FeatureFidelity[json_values["fidelity"]],
+                pl.read_parquet(directory / f"{stage_id}_raw_features{_TABLE_FILE_SUFFIX}"), json_values
             )
         # Each table of 1 row per candidate becomes the structure of the same name, 1 value per row.
         for name, build_value in cls._value_builders().items():

@@ -1,8 +1,8 @@
-"""Tests of the build details of a pipeline run:
+"""The tests cover the build details of a pipeline run:
 
 - `PipelineState.create_build_details` refuses a finished stage that did not write its information;
 - the build details give only the information of the finished stages;
-- they count the drops and the incorrect solves, and describe the distilled suites;
+- they count the drops and the incorrect solves, list the rejections per formula, and describe the distilled suites;
 - the build details read back from their own files equal the ones that wrote them.
 """
 
@@ -123,7 +123,7 @@ def test_the_build_details_hold_only_the_information_of_finished_stages():
     assert build_details.edis() == dict.fromkeys(problem_ids, 10.0)
     assert build_details.difficulty_classes() is None
     assert build_details.suite_compositions() is None
-    assert build_details.incorrect_solves_per_config(PipelineStageId.COARSE_CHARACTERIZATION) is not None
+    assert build_details.incorrect_solves_table(PipelineStageId.COARSE_CHARACTERIZATION) is not None
 
 
 def test_the_build_details_count_the_drops_per_formula_stage_and_reason():
@@ -146,13 +146,29 @@ def test_the_build_details_count_the_drops_per_formula_stage_and_reason():
     assert build_details.remaining_problem_ids == (_PROBLEM_IDS[1], _PROBLEM_IDS[4])
 
 
+def test_the_build_details_give_each_stages_rejections_per_formula():
+    """Validation's rejections are listed per formula, with its counts and its rejections per reason; spacing drops a
+    valid candidate only, so it has no rejections."""
+    # --- arrange ----------------------
+    build_details = _distilled_state().create_build_details()
+
+    # --- act --------------------------
+    validation_rejections = build_details.rejections_per_formula(PipelineStageId.CANDIDATE_VALIDATION)
+    spacing_rejections = build_details.rejections_per_formula(PipelineStageId.SPACING)
+
+    # --- assert -----------------------
+    assert validation_rejections == [
+        ("f99.1", 3, 2, {"bound_to_width_ratio": 1}),
+        ("f99.2", 2, 1, {"bisection_count_not_exact": 1}),
+    ]
+    assert spacing_rejections == []
+
+
 def test_the_build_details_count_each_configs_incorrect_solves():
     """Over the 3 candidates that coarse characterization kept, with 0, 1 and 2 incorrect solves of 32 each, the
     config has 3 incorrect solves of 96."""
     # --- act --------------------------
-    table = (
-        _distilled_state().create_build_details().incorrect_solves_per_config(PipelineStageId.COARSE_CHARACTERIZATION)
-    )
+    table = _distilled_state().create_build_details().incorrect_solves_table(PipelineStageId.COARSE_CHARACTERIZATION)
 
     # --- assert -----------------------
     assert table.rows() == [("bisection", 96, 3, 3 / 96)]
@@ -219,4 +235,4 @@ def test_the_build_details_of_a_run_that_stopped_early_read_back_their_files(tmp
     assert read_back.c_ranges() == build_details.c_ranges()
     assert read_back.nearest_kept_candidates() is None
     assert read_back.core_composition() is None
-    assert read_back.incorrect_solves_per_config(PipelineStageId.FULL_CHARACTERIZATION) is None
+    assert read_back.incorrect_solves_table(PipelineStageId.FULL_CHARACTERIZATION) is None

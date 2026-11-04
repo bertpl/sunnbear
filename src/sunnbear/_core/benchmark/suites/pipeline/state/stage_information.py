@@ -69,8 +69,11 @@ class CharacterizationResults:
                 self.raw_feature_matrix.subset(problem_ids), self.block_scales
             )
 
-    def raw_features_columns(self) -> dict[str, list[Any]]:
-        """Return the results as columns: ``problem_id``, 1 per feature, and 1 count of incorrect solves per config."""
+    def to_raw_features_columns(self) -> dict[str, list[Any]]:
+        """Return the results as table columns.
+
+        The columns are ``problem_id``, 1 per feature, and 1 per config with its counts of incorrect solves.
+        """
         columns: dict[str, list[Any]] = {"problem_id": list(map(str, self.raw_feature_matrix.problem_ids))}
         for name, values in zip(self.definition.feature_names, self.raw_feature_matrix.values.T, strict=True):
             columns[name] = values.tolist()
@@ -82,7 +85,7 @@ class CharacterizationResults:
         return columns
 
     def incorrect_solves_table(self) -> pl.DataFrame:
-        """Return, per core solver config, its incorrect solves over the kept candidates.
+        """Return, per core solver config, the number and fraction of incorrect solves over the kept candidates.
 
         The columns are ``solver_id``, ``n_solves``, ``n_incorrect_solves`` and ``incorrect_fraction``, which is null
         when the stage kept no candidate; the rows follow the order of `definition.solver_ids`.
@@ -104,14 +107,21 @@ class CharacterizationResults:
             incorrect_fraction=pl.when(pl.col("n_solves") > 0).then(pl.col("n_incorrect_solves") / pl.col("n_solves"))
         )
 
+    def to_json_values(self) -> dict[str, Any]:
+        """Return the parts of the results that `to_raw_features_columns` leaves out, as JSON values."""
+        return {"solver_ids": list(self.definition.solver_ids), "fidelity": self.fidelity.name}
+
     # --------------------------------------------------------------------------
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def from_raw_features_table(
-        cls, table: pl.DataFrame, *, definition: FeatureVectorDefinition, fidelity: FeatureFidelity
-    ) -> Self:
-        """Return the results whose columns `raw_features_columns` gave, read back from `table`."""
+    def from_raw_features_table(cls, table: pl.DataFrame, json_values: dict[str, Any]) -> Self:
+        """Return the results that `table` and `json_values` hold.
+
+        `table` holds the columns of `to_raw_features_columns`, and `json_values` the values of `to_json_values`.
+        """
+        definition = FeatureVectorDefinition(solver_ids=tuple(json_values["solver_ids"]))
+        fidelity = FeatureFidelity[json_values["fidelity"]]
         problem_ids = [ProblemId.from_string(problem_id) for problem_id in table["problem_id"]]
         n_incorrect_solves_per_config = table.select(
             f"{_N_INCORRECT_SOLVES_PREFIX}{solver_id}" for solver_id in definition.solver_ids

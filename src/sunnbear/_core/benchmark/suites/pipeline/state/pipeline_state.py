@@ -100,7 +100,7 @@ class PipelineState:
             self._finished_stage_ids.append(stage_id)
 
     def create_build_details(self, *, stop: PipelineStop | None = None) -> BenchmarkSuitesBuildDetails:
-        """Return the build details of the run, with `stop`, the stop that ended it early, if any.
+        """Return the build details of the run, with `stop`: the stage that ended the run early and why, or ``None``.
 
         Raises:
             ValueError: If a stage that finished did not write a piece of its information.

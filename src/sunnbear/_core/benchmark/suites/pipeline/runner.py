@@ -130,7 +130,7 @@ def run_stages(
         workspace.write_manifest(manifest)
         manifests.append(manifest)
     build_details = state.create_build_details(stop=stop)
-    build_details.write_files(workspace.build_details_directory)
+    build_details.write_files(workspace.build_details_dir)
     return PipelineRunResult(manifests=tuple(manifests), build_details=build_details)
 
 
@@ -143,7 +143,7 @@ class PipelineRunResult:
 
     Attributes:
         manifests: The manifest of each stage that ran to its end, in run order.
-        build_details: The run's `BenchmarkSuitesBuildDetails`, with its stop, if a stage stopped it.
+        build_details: The run's `BenchmarkSuitesBuildDetails`, which hold the stage that stopped the run, if any.
     """
 
     manifests: tuple[PipelineStageManifest, ...]

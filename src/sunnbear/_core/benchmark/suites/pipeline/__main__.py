@@ -18,7 +18,7 @@ After the run, the command prints 1 line per stage that ran to its end: the numb
 kept, and its run time. Then, for each such stage that rejected candidates as invalid, it prints:
 
 - the stage's id, then the number of formulas with rejected candidates;
-- 1 line per such formula, with its counts of kept candidates and of rejections per reason.
+- One line per such formula, with its counts of kept candidates and of rejections per reason.
 
 When a stage stops the run, for example because core selection finds too few candidates for the smallest Core of the
 benchmark suites, the command then prints that stage's id and the reason, and exits with status 1.
@@ -27,8 +27,6 @@ benchmark suites, the command then prints that stage's id and the reason, and ex
 import argparse
 from pathlib import Path
 
-import polars as pl
-
 from sunnbear._core.problems.core import FormulaRegistry
 
 from .mode import PipelineMode
@@ -36,7 +34,10 @@ from .runner import run_pipeline
 
 
 def main() -> None:
-    """Parse the command line, run the pipeline, and print what each stage kept and rejected, and any stop."""
+    """Parse the command line, run the pipeline, and print what each stage kept and rejected.
+
+    If a stage stopped the run, print that stage and why, and exit with status 1.
+    """
     parser = argparse.ArgumentParser(
         prog="python -m sunnbear._core.benchmark.suites.pipeline",
         description="Run the benchmark suite pipeline over the shipped formulas.",
@@ -60,21 +61,14 @@ def main() -> None:
             f"in {manifest.duration_sec:.2f} s"
         )
     build_details = result.build_details
-    drop_counts = build_details.drop_counts()
     for stage_id in build_details.finished_stage_ids:
-        stage_rejection_counts = drop_counts.filter((pl.col("stage_id") == stage_id.value) & pl.col("is_rejection"))
-        if not stage_rejection_counts.is_empty():
-            candidate_counts = build_details.candidate_counts(stage_id)
-            formula_rows = candidate_counts.filter(pl.col("n_kept") < pl.col("n_candidates")).rows(named=True)
-            print(f"{stage_id}: formulas with rejected candidates: {len(formula_rows)} of {candidate_counts.height}")
-            for row in formula_rows:
-                reasons = ", ".join(
-                    f"{reason}: {n_dropped}"
-                    for reason, n_dropped in stage_rejection_counts.filter(pl.col("formula_id") == row["formula_id"])
-                    .select("reason", "n_dropped")
-                    .rows()
-                )
-                print(f"  {row['formula_id']}: {row['n_kept']} of {row['n_candidates']} candidates kept; {reasons}")
+        rejections = build_details.rejections_per_formula(stage_id)
+        if rejections:
+            n_formulas = build_details.candidate_counts(stage_id).height
+            print(f"{stage_id}: formulas with rejected candidates: {len(rejections)} of {n_formulas}")
+            for formula_id, n_candidates, n_kept, n_rejected_per_reason in rejections:
+                reasons = ", ".join(f"{reason}: {n}" for reason, n in n_rejected_per_reason.items())
+                print(f"  {formula_id}: {n_kept} of {n_candidates} candidates kept; {reasons}")
     if build_details.stop is not None:
         print(f"{build_details.stop.stage_id}: stopped: {build_details.stop.reason}")
         raise SystemExit(1)

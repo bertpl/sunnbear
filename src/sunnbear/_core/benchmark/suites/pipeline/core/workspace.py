@@ -1,4 +1,4 @@
-"""`PipelineWorkspace` is the only code that lays out the files of the benchmark suite pipeline's workspace.
+"""`PipelineWorkspace` is the only code that lays out the top level of the benchmark suite pipeline's workspace.
 
 The workspace directory holds:
 
@@ -23,7 +23,7 @@ _TEMPORARY_FILE_SUFFIX = ".tmp"
 #  PipelineWorkspace
 # ==================================================================================================
 class PipelineWorkspace:
-    """`PipelineWorkspace` writes the manifests of the pipeline's workspace, and names the build details' directory."""
+    """`PipelineWorkspace` writes the workspace's manifests, and gives the path of the build details' directory."""
 
     def __init__(self, path: Path) -> None:
         """Create a workspace for the directory at `path`, which need not exist yet."""
@@ -39,7 +39,7 @@ class PipelineWorkspace:
         self._write_atomically(manifest_file, manifest_json.encode())
 
     @property
-    def build_details_directory(self) -> Path:
+    def build_details_dir(self) -> Path:
         """Return the directory for the run's build details."""
         return self.path / _BUILD_DETAILS_DIR_NAME
 
