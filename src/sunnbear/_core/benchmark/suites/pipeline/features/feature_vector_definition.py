@@ -4,13 +4,13 @@ The definition computes the feature vectors in 3 steps:
 
 - per candidate, in the worker that solves and analyzes it: the candidate's raw features, from its solves and snuffled
   analyses, by `FeatureVectorDefinition.compute_raw_features`;
-- over a set of candidates: the scale of each `FeatureBlock`, a `FeatureBlockScales`, by
+- over a set of candidates: the scale of each `FeatureBlock`, held in a `FeatureBlockScales`, by
   `FeatureVectorDefinition.fit_block_scales`;
-- the scaled matrix for the spacing stage and max-div, by `FeatureVectorDefinition.build_scaled_matrix`.
+- the scaled matrix for `SpacingStage` and max-div, by `FeatureVectorDefinition.build_scaled_matrix`.
 
 The raw features are in natural units (evaluation counts and snuffled scores), so that they can be shown as they are.
-Only the matrix maps the solvers block onto a log scale, with `map_fevals_to_feature`, and divides each block by its
-scale.
+Only `build_scaled_matrix` returns the solvers block on the log scale of `map_fevals_to_feature`, with each block
+divided by its scale; `fit_block_scales` maps a copy onto that log scale only to compute the scales.
 """
 
 from collections.abc import Mapping
@@ -25,9 +25,8 @@ from .feature_matrix import FeatureMatrix
 from .feature_vector import SNUFFLED_PROPERTIES, SOLVERS_GPQ_LEVELS, FeatureBlock
 from .fevals_mapping import map_fevals_to_feature
 
-# The characterization stages solve with `DEFAULT_N_BISECTION_FEVALS`, so every evaluation count of the solvers block
-# lies in [2, `_MAX_FEVALS`]: a correct solve takes at least 2 evaluations, and an incorrect one is counted as
-# `_MAX_FEVALS` evaluations, the solve's budget.
+# The characterization stages solve with `DEFAULT_N_BISECTION_FEVALS`, so `_MAX_FEVALS` is the budget of each of their
+# solves, the count that `map_fevals_to_feature` maps to 1.
 _MAX_FEVALS = max_fevals_for(n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
 
 
@@ -40,9 +39,10 @@ class FeatureVectorDefinition:
 
     The vector holds 1 block per `FeatureBlock`, in the order of `FeatureBlock`:
 
-    - the solvers block, from the solves of the core solver configs: per config, in the order of `solver_ids`, the
-      geometric mean of `n_fevals_eff`, then, at each level of `SOLVERS_GPQ_LEVELS`, the geometric pseudo-quantile
-      (`gpq`) of `n_fevals_eff` over the candidate's solves of all configs together;
+    - the solvers block, from the solves of the core solver configs:
+      - per config, in the order of `solver_ids`: the geometric mean of `n_fevals_eff` over the candidate's solves;
+      - per level of `SOLVERS_GPQ_LEVELS`: the geometric pseudo-quantile (`gpq`) of `n_fevals_eff` over the
+        candidate's solves of all configs together;
     - the snuffled block, from snuffled's analyses: the mean of each property of `SNUFFLED_PROPERTIES`.
 
     The definition is picklable, so that a worker task can carry it.
@@ -64,7 +64,7 @@ class FeatureVectorDefinition:
 
     @property
     def feature_names(self) -> tuple[str, ...]:
-        """Return the names of the features, in the order of the vector, each starting with the value of its block."""
+        """Return the feature names, in the order of the vector, each starting with its `FeatureBlock` value."""
         return (
             *(f"{FeatureBlock.SOLVERS}_geomean_{solver_id}" for solver_id in self.solver_ids),
             *(f"{FeatureBlock.SOLVERS}_gpq_{round(100 * level):02d}" for level in SOLVERS_GPQ_LEVELS),
@@ -78,8 +78,9 @@ class FeatureVectorDefinition:
         """Return 1 candidate's raw features, in the order of `feature_names`.
 
         Args:
-            n_fevals_eff: The `n_fevals_eff` of the candidate's solves, 1 row per tuple and 1 column per config, in the
-                order of `solver_ids`.
+            n_fevals_eff: The `n_fevals_eff` of the candidate's solves, 1 row per Monte Carlo sample and 1 column per
+                config, in the order of `solver_ids`; the solves use `DEFAULT_N_BISECTION_FEVALS`, and an incorrect
+                solve counts as its budget.
             snuffled_property_values: The properties of the candidate's snuffled analyses, 1 row per analysis and 1
                 column per property, in the order of `SNUFFLED_PROPERTIES`.
 
@@ -106,15 +107,17 @@ class FeatureVectorDefinition:
     #  Over a set of candidates
     # --------------------------------------------------------------------------
     def fit_block_scales(self, raw_feature_matrix: FeatureMatrix) -> "FeatureBlockScales | None":
-        """Return the scale of each block over the candidates of `raw_feature_matrix`, or ``None`` for fewer than 2.
+        """Return each block's scale over the candidates of `raw_feature_matrix`, or ``None`` if they are fewer than 2.
 
         A block's scale is its mean pairwise L1 distance, computed after the solvers block is mapped onto the log scale
         that `build_scaled_matrix` uses.
 
         A block with more features, or with values that spread more, contributes more to an L1 distance between 2
         feature vectors; dividing each block by its scale gives every block a mean pairwise distance of 1 over these
-        candidates, so that the blocks contribute equally. A block whose values are the same for all the candidates
-        gets a scale of 0, which `build_scaled_matrix` cannot divide by.
+        candidates, so that the blocks contribute equally.
+
+        A block whose values are the same for all the candidates gets a scale of 0, which `build_scaled_matrix` cannot
+        divide by.
         """
         if len(raw_feature_matrix.problem_ids) < 2:
             return None
@@ -129,10 +132,10 @@ class FeatureVectorDefinition:
     def build_scaled_matrix(
         self, raw_feature_matrix: FeatureMatrix, block_scales: "FeatureBlockScales"
     ) -> FeatureMatrix:
-        """Return the scaled matrix of the candidates of `raw_feature_matrix`, for the spacing stage and max-div.
+        """Return the scaled matrix of the candidates of `raw_feature_matrix`, for `SpacingStage` and max-div.
 
-        `map_fevals_to_feature` maps the evaluation counts of the solvers block onto [0, 1] on a log scale; then each
-        block is divided by its scale in `block_scales`.
+        The solvers block is mapped with `map_fevals_to_feature`; then each block is divided by its scale in
+        `block_scales`. It does not check `block_scales`: a block with a scale of 0 gives infinite or NaN values.
         """
         values = self._map_solvers_block_to_log_scale(raw_feature_matrix.values)
         for block, block_slice in self._block_slices.items():

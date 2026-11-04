@@ -14,7 +14,8 @@ from sunnbear._core.problems.core import ProblemId
 class FeatureMatrix:
     """A `FeatureMatrix` holds 1 feature vector per candidate, each paired with the candidate's `ProblemId`.
 
-    A caller finds a candidate's row by its id, so no caller needs to know the order of the rows.
+    A caller finds a candidate's row by the position of its id in `problem_ids`, so no caller needs to rely on a fixed
+    order of the rows.
 
     Attributes:
         problem_ids: The candidates' ids, 1 per row of `values`, each once.
