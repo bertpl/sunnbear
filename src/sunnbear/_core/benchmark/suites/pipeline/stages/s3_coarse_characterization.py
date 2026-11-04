@@ -1,18 +1,21 @@
-"""`CoarseCharacterizationStage`, the third stage of the benchmark suite pipeline, adds the coarse feature vectors."""
+"""`CoarseCharacterizationStage`, the third stage of the benchmark suite pipeline, computes the coarse features."""
 
-from sunnbear._core.benchmark.suites.pipeline.diversity_features import CandidateCharacterizationStage, FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.state import CoarseCharacterizationStateAccessor
+
+from .characterization import CandidateCharacterizationStage
 
 
 # ==================================================================================================
 #  CoarseCharacterizationStage
 # ==================================================================================================
-class CoarseCharacterizationStage(CandidateCharacterizationStage):
-    """`CoarseCharacterizationStage` adds each valid candidate's coarse feature vector.
+class CoarseCharacterizationStage(CandidateCharacterizationStage[CoarseCharacterizationStateAccessor]):
+    """`CoarseCharacterizationStage` computes each valid candidate's coarse features.
 
-    The coarse vectors only need to tell the near-duplicate candidates of a formula apart, so the stage runs on every
+    The coarse features only need to tell the near-duplicate candidates of a formula apart, so the stage runs on every
     valid candidate at the coarse fidelity's small tuple sets and budget.
     """
 
-    output_name = "s3_coarse_features"
-    column_prefix = "coarse"
+    stage_id = PipelineStageId.COARSE_CHARACTERIZATION
     default_fidelity = FeatureFidelity.COARSE

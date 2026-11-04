@@ -1,6 +1,6 @@
-"""Full characterization, the fifth stage of the benchmark suite pipeline, adds the full feature vectors.
+"""Full characterization, the fifth stage of the benchmark suite pipeline, computes the full features and the EDIs.
 
-`FullCharacterizationStage`, in `stage`, is the stage; the stages that follow read its features back through it.
+`FullCharacterizationStage`, in `stage`, is the stage.
 """
 
 from .stage import FullCharacterizationStage

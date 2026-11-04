@@ -1,9 +1,13 @@
 """`CandidatePool` holds the input candidates of `select_diverse_suite`."""
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from typing import Self
 
 import numpy as np
+
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureMatrix
+from sunnbear._core.problems.core import ProblemId
 
 from .difficulty_class import DifficultyClass
 
@@ -13,23 +17,53 @@ from .difficulty_class import DifficultyClass
 # ==================================================================================================
 @dataclass(frozen=True)
 class CandidatePool:
-    """A `CandidatePool` holds the input candidates of `select_diverse_suite`.
+    """A `CandidatePool` holds the input candidates of `select_diverse_suite`, each with its features, EDI and class.
+
+    The EDIs and the classes follow the rows of `feature_matrix`, so each candidate's id comes with all 3.
 
     Attributes:
-        vectors: The candidates' scaled full feature vectors, 1 row per candidate, as
-            `FullCharacterizationStage.scaled_feature_vectors` returns them.
-        edi_axis: The column of `vectors` that holds the empirical difficulty index (EDI) feature.
-        difficulty_classes: Each candidate's class, in the order of `vectors`' rows.
+        feature_matrix: The candidates' scaled full feature vectors, with their ids.
+        edis: Each candidate's empirical difficulty index (EDI), in the order of `feature_matrix`'s rows.
+        difficulty_classes: Each candidate's class, in the order of `feature_matrix`'s rows.
     """
 
-    vectors: np.ndarray
-    edi_axis: int
-    difficulty_classes: Sequence[DifficultyClass]
+    feature_matrix: FeatureMatrix
+    edis: np.ndarray
+    difficulty_classes: tuple[DifficultyClass, ...]
 
-    def subset(self, rows: np.ndarray) -> "CandidatePool":
-        """Return the pool of the candidates at `rows` of this pool, in the order of `rows`."""
-        return CandidatePool(
-            vectors=self.vectors[rows],
-            edi_axis=self.edi_axis,
-            difficulty_classes=[self.difficulty_classes[row] for row in rows],
+    @property
+    def problem_ids(self) -> tuple[ProblemId, ...]:
+        """Return the candidates' ids, in the order of `feature_matrix`'s rows."""
+        return self.feature_matrix.problem_ids
+
+    def subset(self, problem_ids: Sequence[ProblemId]) -> Self:
+        """Return the pool of the candidates `problem_ids`, in their order.
+
+        Raises:
+            KeyError: If 1 of `problem_ids` is not in the pool.
+        """
+        row_by_problem_id = {problem_id: row for row, problem_id in enumerate(self.problem_ids)}
+        rows = [row_by_problem_id[problem_id] for problem_id in problem_ids]
+        return type(self)(
+            feature_matrix=self.feature_matrix.subset(problem_ids),
+            edis=self.edis[rows],
+            difficulty_classes=tuple(self.difficulty_classes[row] for row in rows),
+        )
+
+    # --------------------------------------------------------------------------
+    #  Factory methods
+    # --------------------------------------------------------------------------
+    @classmethod
+    def from_candidates(
+        cls,
+        feature_matrix: FeatureMatrix,
+        *,
+        edis: Mapping[ProblemId, float],
+        difficulty_classes: Mapping[ProblemId, DifficultyClass],
+    ) -> Self:
+        """Return the pool of the candidates of `feature_matrix`, with the EDI and the class of each, keyed by id."""
+        return cls(
+            feature_matrix=feature_matrix,
+            edis=np.array([edis[problem_id] for problem_id in feature_matrix.problem_ids]),
+            difficulty_classes=tuple(difficulty_classes[problem_id] for problem_id in feature_matrix.problem_ids),
         )

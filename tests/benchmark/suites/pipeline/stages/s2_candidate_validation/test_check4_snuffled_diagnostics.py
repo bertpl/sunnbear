@@ -8,7 +8,6 @@ import pytest
 
 from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, CRange, MCSolveSettings
-from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
 from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import SnuffledAnalysisBudget
 from sunnbear._core.benchmark.suites.pipeline.stages.s2_candidate_validation.check4_snuffled_diagnostics import (
     N_SNUFFLED_TUPLES,
@@ -24,32 +23,26 @@ from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
     [
         pytest.param(lambda x, c: x - c - 1 / 3, None, id="simple_root"),
         # f raises everywhere between the interval bounds
-        pytest.param(
-            lambda x, c: x - c - 1 / 3 if abs(x) == 1.0 else 1 / 0, RejectionReason.SNUFFLED_F_RAISES, id="f_raises"
-        ),
+        pytest.param(lambda x, c: x - c - 1 / 3 if abs(x) == 1.0 else 1 / 0, "snuffled_f_raises", id="f_raises"),
         # the region of NaN or inf lies away from every root, which lies in [-1/6, 5/6]
         pytest.param(
             lambda x, c: math.nan if -0.9 < x < -0.7 else x - c - 1 / 3,
-            RejectionReason.SNUFFLED_NAN_VALUES_DETECTED,
+            "snuffled_nan_values_detected",
             id="nan_values",
         ),
         pytest.param(
             lambda x, c: math.inf if -0.9 < x < -0.7 else x - c - 1 / 3,
-            RejectionReason.SNUFFLED_INF_VALUES_DETECTED,
+            "snuffled_inf_values_detected",
             id="inf_values",
         ),
-        pytest.param(lambda x, c: x * x + 1.0, RejectionReason.SNUFFLED_NO_ZEROS_DETECTED, id="no_zeros"),
+        pytest.param(lambda x, c: x * x + 1.0, "snuffled_no_zeros_detected", id="no_zeros"),
         # f has 2 roots and the same sign at both interval bounds
-        pytest.param(
-            lambda x, c: x * x - 0.25, RejectionReason.SNUFFLED_INTERVAL_NOT_BRACKETING_READY, id="no_bracket"
-        ),
+        pytest.param(lambda x, c: x * x - 0.25, "snuffled_interval_not_bracketing_ready", id="no_bracket"),
         # the root lies within a few `xtol` of the lower bound
-        pytest.param(
-            lambda x, c: x + 1.0 - 1e-12, RejectionReason.SNUFFLED_ALL_ROOTS_TOO_CLOSE_TO_EDGE, id="root_at_edge"
-        ),
+        pytest.param(lambda x, c: x + 1.0 - 1e-12, "snuffled_all_roots_too_close_to_edge", id="root_at_edge"),
         pytest.param(
             lambda x, c: 0.0 if abs(x - c - 1 / 3) < 1e-6 else x - c - 1 / 3,
-            RejectionReason.SNUFFLED_MAX_ZERO_WIDTH_TOO_LARGE,
+            "snuffled_max_zero_width_too_large",
             id="wide_zero_region",
         ),
     ],

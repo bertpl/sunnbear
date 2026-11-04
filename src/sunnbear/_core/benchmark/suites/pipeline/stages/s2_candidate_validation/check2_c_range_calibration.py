@@ -33,7 +33,7 @@ No search can check every c-value in a range, so the search ends by checking the
 6. Require the range to be at least `MIN_C_RANGE_WIDTH` wide, because across a narrower range the functions at
    the c-values that the benchmark samples differ too little from one another.
 
-A candidate is rejected at the first step that fails, with that step's `RejectionReason`.
+A candidate is rejected at the first step that fails, with that step's reason, 1 of the `CALIBRATION_` constants.
 """
 
 import math
@@ -42,7 +42,6 @@ import numpy as np
 
 from sunnbear._core.benchmark.mc_tuples import MCTuples
 from sunnbear._core.benchmark.protocol import CRange, MCSolveSettings
-from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
 from sunnbear._core.problems.core import XCFun
 
 # A c-value meets the condition only if each endpoint value keeps its sign and more than this fraction of its
@@ -60,11 +59,23 @@ MAX_RETURNS_TO_HALVING = 10
 # Step 6 rejects a c-range narrower than this.
 MIN_C_RANGE_WIDTH = 1e-3
 
+# The reasons to reject a candidate, by the step that fails:
+# - step 1: f(a, 0) and f(b, 0) are not both finite and nonzero, with opposite signs;
+CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0 = "calibration_no_finite_sign_change_at_0"
+# - step 2: the condition fails at the first probe, on either side of c = 0;
+CALIBRATION_FAILS_AT_FIRST_PROBE = "calibration_fails_at_first_probe"
+# - step 3: the condition still holds after the last doubling of abs(c), on either side of c = 0;
+CALIBRATION_NO_BOUND_FOUND = "calibration_no_bound_found"
+# - step 5: the condition still fails at 1 of the benchmark's c-values after the last return to step 4;
+CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES = "calibration_fails_at_benchmark_c_values"
+# - step 6: the c-range is narrower than `MIN_C_RANGE_WIDTH`.
+CALIBRATION_C_RANGE_TOO_NARROW = "calibration_c_range_too_narrow"
+
 
 # ==================================================================================================
 #  calibrate_c_range
 # ==================================================================================================
-def calibrate_c_range(xc_fun: XCFun, a: float, b: float, *, mc_tuples: MCTuples) -> CRange | RejectionReason:
+def calibrate_c_range(xc_fun: XCFun, a: float, b: float, *, mc_tuples: MCTuples) -> CRange | str:
     """Return the c-range of the candidate ``f(x, c)`` on ``[a, b]``, or the reason that calibration rejects it.
 
     Args:
@@ -95,14 +106,14 @@ def calibrate_c_range(xc_fun: XCFun, a: float, b: float, *, mc_tuples: MCTuples)
             if not failing_side_idxs:
                 break
             if n_returns == MAX_RETURNS_TO_HALVING:
-                raise _CalibrationFailedError(RejectionReason.CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES)
+                raise _CalibrationFailedError(CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES)
             for idx in failing_side_idxs:
                 bounds[idx] = side_searches[idx].halve_to_bound()
             n_returns += 1
 
         # --- step 6 -----------------------------
         if c_range.c_max - c_range.c_min < MIN_C_RANGE_WIDTH:
-            raise _CalibrationFailedError(RejectionReason.CALIBRATION_C_RANGE_TOO_NARROW)
+            raise _CalibrationFailedError(CALIBRATION_C_RANGE_TOO_NARROW)
         else:
             return c_range
     except _CalibrationFailedError as exc:
@@ -127,10 +138,10 @@ class _CRangeCondition:
         self.b = b
         endpoint_values_at_0 = self._endpoint_values(0.0)
         if endpoint_values_at_0 is None:
-            raise _CalibrationFailedError(RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0)
+            raise _CalibrationFailedError(CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0)
         self.fa_0, self.fb_0 = endpoint_values_at_0
         if not (self.fa_0 < 0.0 < self.fb_0 or self.fb_0 < 0.0 < self.fa_0):
-            raise _CalibrationFailedError(RejectionReason.CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0)
+            raise _CalibrationFailedError(CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0)
 
     def is_met(self, c: float) -> bool:
         """Return whether the condition holds at `c`.
@@ -189,12 +200,12 @@ class _CRangeSideSearch:
         """
         abs_c = FIRST_PROBE_ABS_C
         if not self.evaluate_and_record(abs_c):
-            raise _CalibrationFailedError(RejectionReason.CALIBRATION_FAILS_AT_FIRST_PROBE)
+            raise _CalibrationFailedError(CALIBRATION_FAILS_AT_FIRST_PROBE)
         for _ in range(MAX_DOUBLINGS):
             abs_c *= 2.0
             if not self.evaluate_and_record(abs_c):
                 return
-        raise _CalibrationFailedError(RejectionReason.CALIBRATION_NO_BOUND_FOUND)
+        raise _CalibrationFailedError(CALIBRATION_NO_BOUND_FOUND)
 
     def is_met_at_each(self, c_values: np.ndarray) -> bool:
         """Return whether the condition holds at each of `c_values` that lies on this side (step 5).
@@ -217,12 +228,12 @@ class _CRangeSideSearch:
         Raises:
             _CalibrationFailedError: If the condition fails at the evaluated c-value closest to 0. Only a c-value of
                 the benchmark's tuple set can lie closer to 0 than the first probe, so the error carries the
-                `RejectionReason` of step 5.
+                reason of step 5.
         """
         abs_cs = sorted(self.is_met_by_abs_c)
         idx_first_failing = next(idx for idx, abs_c in enumerate(abs_cs) if not self.is_met_by_abs_c[abs_c])
         if idx_first_failing == 0:
-            raise _CalibrationFailedError(RejectionReason.CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES)
+            raise _CalibrationFailedError(CALIBRATION_FAILS_AT_BENCHMARK_C_VALUES)
         abs_c_met, abs_c_failing = abs_cs[idx_first_failing - 1], abs_cs[idx_first_failing]
         while abs_c_failing - abs_c_met >= MAX_BOUND_REL_GAP * abs_c_met:
             abs_c_mid = 0.5 * (abs_c_met + abs_c_failing)
@@ -236,7 +247,7 @@ class _CRangeSideSearch:
 class _CalibrationFailedError(Exception):
     """`_CalibrationFailedError` ends the calibration of a candidate at the step that rejects it."""
 
-    def __init__(self, reason: RejectionReason) -> None:
-        """Hold the `RejectionReason` of the failing step."""
-        super().__init__(reason.value)
+    def __init__(self, reason: str) -> None:
+        """Hold the reason of the failing step."""
+        super().__init__(reason)
         self.reason = reason

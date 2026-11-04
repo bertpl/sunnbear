@@ -1,46 +1,31 @@
-"""`PipelineStageManifest.from_stage_output` derives the manifest's row counts and input hash from a stage's output
-table and the manifest of the stage before it, and records the stage's parameters."""
+"""`PipelineStageManifest.from_stage_run` records the stage's id, parameters and counts of candidates, and when and in
+how many workers it ran."""
 
 import datetime
 
-import polars as pl
-
-from sunnbear._core.benchmark.suites.pipeline.core.manifest import PipelineStageExecutionInfo, PipelineStageManifest
-
-from .example_stages import ExampleNumbersStage, ExampleSmallNumbersStage
+from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageExecutionInfo, PipelineStageManifest
+from sunnbear._core.benchmark.suites.pipeline.stages import SpacingStage
 
 
-def test_the_manifest_counts_the_rows_and_the_dropped_rows_and_records_the_input_hash():
-    """The first stage's manifest has no input hash, drops no rows and records no parameters; a later stage's manifest
-    counts the rows that it dropped from its input, and records the input's sha256, the sha256 of each report and the
-    stage's parameters."""
+def test_the_manifest_records_the_stage_and_its_run():
+    """The manifest of a spacing run that kept 8 of 10 candidates records the stage's id and minimum distance, the 2
+    counts, and the execution info."""
     # --- arrange ----------------------
-    first_manifest = PipelineStageManifest.from_stage_output(
-        stage=ExampleNumbersStage(),
-        table=pl.DataFrame({"problem_id": ["n1", "n2", "n3"]}),
-        output_sha256="ab" * 32,
-        report_sha256s={},
-        input_manifest=None,
-        execution_info=PipelineStageExecutionInfo(
-            started_at=datetime.datetime.now(datetime.UTC), duration_sec=0.0, n_workers=1
-        ),
-    )
+    started_at = datetime.datetime(2026, 11, 4, 12, 0, tzinfo=datetime.UTC)
+    execution_info = PipelineStageExecutionInfo(started_at=started_at, duration_sec=1.5, n_workers=4)
 
     # --- act --------------------------
-    manifest = PipelineStageManifest.from_stage_output(
-        stage=ExampleSmallNumbersStage(max_x=2.5),
-        table=pl.DataFrame({"problem_id": ["n1", "n2"]}),
-        output_sha256="cd" * 32,
-        report_sha256s={"large_numbers": "ef" * 32},
-        input_manifest=first_manifest,
-        execution_info=PipelineStageExecutionInfo(
-            started_at=datetime.datetime.now(datetime.UTC), duration_sec=0.0, n_workers=1
-        ),
+    manifest = PipelineStageManifest.from_stage_run(
+        stage=SpacingStage(min_distance=0.25), n_candidates_in=10, n_candidates_out=8, execution_info=execution_info
     )
 
     # --- assert -----------------------
-    assert (first_manifest.input_sha256, first_manifest.n_rows, first_manifest.n_dropped_rows) == (None, 3, 0)
-    assert (first_manifest.parameters, manifest.parameters) == ({}, {"max_x": 2.5})
-    assert (manifest.input_sha256, manifest.n_rows, manifest.n_dropped_rows) == ("ab" * 32, 2, 1)
-    assert manifest.output_name == "s2_small_numbers"
-    assert manifest.report_sha256s == {"large_numbers": "ef" * 32}
+    assert manifest.model_dump(exclude={"sunnbear_version"}) == {
+        "stage_id": SpacingStage.stage_id,
+        "parameters": {"min_distance": 0.25},
+        "n_candidates_in": 10,
+        "n_candidates_out": 8,
+        "started_at": started_at,
+        "duration_sec": 1.5,
+        "n_workers": 4,
+    }

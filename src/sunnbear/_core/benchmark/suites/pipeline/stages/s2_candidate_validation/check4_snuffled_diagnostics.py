@@ -18,7 +18,6 @@ import numpy as np
 
 from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, MCSolveSettings
-from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
 from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import SnuffledAnalysisBudget
 from sunnbear._core.problems.core import TestProblem
 from sunnbear._core.utils.edge_biased_indices import select_edge_biased_indices
@@ -29,7 +28,7 @@ N_SNUFFLED_TUPLES = 32
 HIGH_BUDGET_POSITIONS = (0, 14, 17, 31)
 
 
-def find_snuffled_rejection_reason(problem: TestProblem) -> RejectionReason | None:
+def find_snuffled_rejection_reason(problem: TestProblem) -> str | None:
     """Return the reason that snuffled's analysis rejects the calibrated test problem, or None if it passes.
 
     The check runs up to `N_SNUFFLED_TUPLES` snuffled analyses, so it is the most expensive check of validation.
@@ -44,7 +43,7 @@ def find_snuffled_rejection_reason(problem: TestProblem) -> RejectionReason | No
         result = budget.extract_properties_or_rejection_reason(
             problem, (), mc_solve_settings=mc_solve_settings, mc_sample_idx=mc_sample_idx
         )
-        if isinstance(result, RejectionReason):
+        if isinstance(result, str):
             return result
     return None
 

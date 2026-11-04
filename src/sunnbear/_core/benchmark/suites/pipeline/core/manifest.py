@@ -1,56 +1,45 @@
-"""A `PipelineStageManifest` records how a stage of the benchmark suite pipeline built its output.
-
-Through `PipelineStageManifest.input_sha256`, the manifests of a run trace each stage's output back to the output
-before it.
-"""
+"""A `PipelineStageManifest` records how a stage of the benchmark suite pipeline ran."""
 
 import datetime
 import importlib.metadata
-from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Self
+from typing import Any, Self
 
-import polars as pl
 from pydantic import BaseModel, ConfigDict
 
 from .stage import PipelineStage, PipelineStageParameterValue
+from .stage_id import PipelineStageId
 
 
 # ==================================================================================================
 #  PipelineStageManifest
 # ==================================================================================================
 class PipelineStageManifest(BaseModel):
-    """A `PipelineStageManifest` records how 1 stage built its output: from which input, with which code, and when.
+    """A `PipelineStageManifest` records how 1 stage ran: with which code and parameters, on how many candidates, when.
 
     Pydantic's validation of the fields is strict: a value of the wrong type is refused, not converted, and unknown
     fields are refused.
 
     Attributes:
-        output_name: The `PipelineStage.output_name` of the stage that built the output.
-        output_sha256: The sha256 of the output table's file, as hex.
-        report_sha256s: The sha256 of each report's file, as hex, keyed by the report's name.
-        input_sha256: The `output_sha256` of the stage before this one, whose output table this stage read; ``None``
-            for the first stage.
+        stage_id: The stage's `PipelineStageId`.
         parameters: The stage's `PipelineStage.parameters`.
-        n_rows: The number of rows of the output table.
-        n_dropped_rows: The number of rows of the input table that the output table does not hold; 0 for the first
-            stage, which creates the rows.
+        sunnbear_version: The version of sunnbear that ran the stage.
+        n_candidates_in: The number of candidates that no stage had dropped when the stage started; 0 for the first
+            stage, which creates the candidates.
+        n_candidates_out: The number of candidates that no stage had dropped when the stage ended.
         started_at: When the stage started, in UTC.
-        duration_sec: How long the stage took to compute its output, excluding the time to write it.
+        duration_sec: How long the stage took.
         n_workers: The number of workers of the run's worker pool, in which the stage could run tasks. The number of
-            workers changes `duration_sec`, never the output.
+            workers changes `duration_sec`, never the stage's results.
     """
 
     model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
 
-    output_name: str
-    output_sha256: str
-    report_sha256s: dict[str, str]
-    input_sha256: str | None
+    stage_id: PipelineStageId
     parameters: dict[str, PipelineStageParameterValue]
     sunnbear_version: str
-    n_rows: int
-    n_dropped_rows: int
+    n_candidates_in: int
+    n_candidates_out: int
     started_at: datetime.datetime
     duration_sec: float
     n_workers: int
@@ -59,26 +48,21 @@ class PipelineStageManifest(BaseModel):
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def from_stage_output(
+    def from_stage_run(
         cls,
         *,
-        stage: PipelineStage,
-        table: pl.DataFrame,
-        output_sha256: str,
-        report_sha256s: Mapping[str, str],
-        input_manifest: Self | None,
+        stage: PipelineStage[Any],
+        n_candidates_in: int,
+        n_candidates_out: int,
         execution_info: "PipelineStageExecutionInfo",
     ) -> Self:
-        """Build the manifest of `stage` from its output table and the manifest of the stage before it, if any."""
+        """Build the manifest of a run of `stage`, from the counts of candidates at its start and at its end."""
         return cls(
-            output_name=stage.output_name,
-            output_sha256=output_sha256,
-            report_sha256s=dict(report_sha256s),
-            input_sha256=input_manifest.output_sha256 if input_manifest is not None else None,
+            stage_id=stage.stage_id,
             parameters=dict(stage.parameters),
             sunnbear_version=importlib.metadata.version("sunnbear"),
-            n_rows=table.height,
-            n_dropped_rows=input_manifest.n_rows - table.height if input_manifest is not None else 0,
+            n_candidates_in=n_candidates_in,
+            n_candidates_out=n_candidates_out,
             started_at=execution_info.started_at,
             duration_sec=execution_info.duration_sec,
             n_workers=execution_info.n_workers,
