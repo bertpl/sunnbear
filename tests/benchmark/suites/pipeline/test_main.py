@@ -61,8 +61,8 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
     assert stop_line.startswith(f"{PipelineStageId.CORE_SELECTION}: stopped: The candidates fill no Core of 128")
     assert [line.split(":")[0] for line in stage_lines] == _FINISHED_STAGE_IDS
     assert all(re.fullmatch(r"\w+: \d+ of \d+ candidates kept, in [0-9.]+ s", line) for line in stage_lines)
-    # Validation rejects candidates of formulas 1.4.2.x, so a count line opens the rejection lines, and 1 line per
-    # formula with rejections follows it.
+    # Validation rejects candidates of formulas 1.4.2.x, so the rejection lines start with 1 line that counts the
+    # formulas with rejected candidates, followed by 1 line per such formula.
     [count_line, *formula_lines] = rejection_lines
     match = re.fullmatch(
         rf"{PipelineStageId.CANDIDATE_VALIDATION}: formulas with rejected candidates: (\d+) of \d+", count_line

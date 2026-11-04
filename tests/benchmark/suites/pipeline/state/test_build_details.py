@@ -1,6 +1,12 @@
-"""`PipelineState.create_build_details` refuses a finished stage that did not write its information, and the build
-details give only finished stages' information, count the drops and incorrect solves, describe the distilled suites,
-and read back the files that they write."""
+"""Tests of the build details of a pipeline run:
+
+- `PipelineState.create_build_details` refuses a finished stage that did not write its information;
+- the build details give only the information of the finished stages;
+- they count the drops and the incorrect solves, and describe the distilled suites;
+- the build details read back from their own files equal the ones that wrote them.
+"""
+
+import dataclasses
 
 import numpy as np
 import pytest
@@ -16,6 +22,7 @@ from sunnbear._core.benchmark.suites.pipeline.state import (
     IntervalBounds,
     NearestKeptCandidate,
     PipelineState,
+    PipelineStateStorage,
     SuiteMembership,
 )
 from tests.benchmark.suites.pipeline.example_states import (
@@ -97,8 +104,8 @@ def test_the_build_details_refuse_a_finished_stage_without_its_information(stage
 
 
 def test_the_build_details_hold_only_the_information_of_finished_stages():
-    """Core selection stored the classes, then stopped the run, so the build details hold the stop, the information of
-    the stages before core selection, and none of core selection's."""
+    """Core selection stored the difficulty classes, then stopped the run, so the build details hold the stop, the
+    information of the stages before core selection, and none of core selection's."""
     # --- arrange ----------------------
     problem_ids = example_problem_ids(3)
     state = build_state_before(PipelineStageId.CORE_SELECTION, problem_ids)
@@ -120,8 +127,8 @@ def test_the_build_details_hold_only_the_information_of_finished_stages():
 
 
 def test_the_build_details_count_the_drops_per_formula_stage_and_reason():
-    """The drop counts hold validation's 2 rejections and spacing's drop, in run order; validation received 3 and 2
-    candidates of the 2 formulas and kept 2 and 1, and spacing received 2 and 1 and kept 1 and 1."""
+    """The drop counts hold validation's 2 rejections and spacing's drop, in run order, and the candidate counts give
+    per formula what each stage received and kept."""
     # --- act --------------------------
     build_details = _distilled_state().create_build_details()
 
@@ -164,7 +171,8 @@ def test_the_build_details_describe_each_distilled_suite():
 
 
 def test_the_build_details_read_back_the_files_that_they_write(tmp_path):
-    """Every read method of the build details read back from their files gives what it gives on the run's own."""
+    """Every read method returns the same value on the build details read back from their files as on the original
+    ones."""
     # --- arrange ----------------------
     build_details = _distilled_state().create_build_details(
         stop=PipelineStop(stage_id=PipelineStageId.DISTILLATION, reason="example")
@@ -179,14 +187,9 @@ def test_the_build_details_read_back_the_files_that_they_write(tmp_path):
     assert read_back.problem_ids == build_details.problem_ids
     assert [read_back.drop_of(p) for p in _PROBLEM_IDS] == [build_details.drop_of(p) for p in _PROBLEM_IDS]
     for read_method in [
-        "interval_bounds",
-        "c_ranges",
-        "nearest_kept_candidates",
-        "edis",
-        "difficulty_classes",
-        "core_composition",
-        "suite_memberships",
-        "distilled_suite_summaries",
+        field.name
+        for field in dataclasses.fields(PipelineStateStorage)
+        if field.name not in ("candidate_registry", "characterization_results")
     ]:
         assert getattr(read_back, read_method)() == getattr(build_details, read_method)()
     for stage_id in (PipelineStageId.COARSE_CHARACTERIZATION, PipelineStageId.FULL_CHARACTERIZATION):
@@ -201,8 +204,8 @@ def test_the_build_details_read_back_the_files_that_they_write(tmp_path):
 
 @pytest.mark.parametrize("n_finished_stages", [0, 3])
 def test_the_build_details_of_a_run_that_stopped_early_read_back_their_files(tmp_path, n_finished_stages: int):
-    """The build details of a run in which no stage, or only the first 3 stages, finished have no files for the
-    later stages, so the ones read back hold none of the later stages' information either."""
+    """When no stage, or only the first 3 stages, finished, the build details write no files for the later stages, and
+    the build details read back from the files hold none of those stages' information."""
     # --- arrange ----------------------
     stage_id = list(PipelineStageId)[n_finished_stages]
     build_details = build_state_before(stage_id, example_problem_ids(3)).create_build_details()

@@ -101,11 +101,7 @@ def run_stages(
     open.
 
     A stage that raises `PipelineStopError` stops the run: it writes no manifest, and the stages after it do not run.
-    Whether a stage stops the run or not, the run ends with its build details, which `workspace` holds too.
-
-    Returns:
-        The run's `PipelineRunResult`: the manifest of each stage that ran to its end, in run order, and the run's
-        build details.
+    Whether a stage stops the run or not, the run then creates its build details and writes their files to `workspace`.
 
     Raises:
         ValueError: If `stages` do not follow the run order of `PipelineStageId`.
@@ -134,7 +130,7 @@ def run_stages(
         workspace.write_manifest(manifest)
         manifests.append(manifest)
     build_details = state.create_build_details(stop=stop)
-    build_details.write_files(workspace.clear_build_details_directory())
+    build_details.write_files(workspace.build_details_directory)
     return PipelineRunResult(manifests=tuple(manifests), build_details=build_details)
 
 

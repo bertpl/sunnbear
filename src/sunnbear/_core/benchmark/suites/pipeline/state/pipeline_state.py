@@ -102,18 +102,16 @@ class PipelineState:
     def create_build_details(self, *, stop: PipelineStop | None = None) -> BenchmarkSuitesBuildDetails:
         """Return the build details of the run, with `stop`, the stop that ended it early, if any.
 
-        The build details hold the information of the stages that finished; a stage that stopped the run did not.
-
         Raises:
             ValueError: If a stage that finished did not write a piece of its information.
         """
-        missing_information = {
+        unwritten_structure_names_per_stage = {
             stage_id: names
             for stage_id in self._finished_stage_ids
-            if (names := self._storage.missing_information(stage_id))
+            if (names := self._storage.unwritten_structure_names(stage_id))
         }
-        if missing_information:
-            raise ValueError(f"Finished stages did not write their information: {missing_information}.")
+        if unwritten_structure_names_per_stage:
+            raise ValueError(f"Finished stages did not write their information: {unwritten_structure_names_per_stage}.")
         else:
             return BenchmarkSuitesBuildDetails(
                 storage=self._storage, finished_stage_ids=self.finished_stage_ids, stop=stop

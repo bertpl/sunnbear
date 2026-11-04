@@ -15,8 +15,7 @@ The command also takes these optional flags:
   selection rules.
 
 After the run, the command prints 1 line per stage that ran to its end: the number of candidates that it received and
-kept, and its run time. Then, for each such stage that rejected candidates as invalid, it prints, from the run's build
-details:
+kept, and its run time. Then, for each such stage that rejected candidates as invalid, it prints:
 
 - the stage's id, then the number of formulas with rejected candidates;
 - 1 line per such formula, with its counts of kept candidates and of rejections per reason.

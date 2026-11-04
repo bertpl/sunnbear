@@ -2,6 +2,9 @@
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Any, Self
+
+import polars as pl
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
 from sunnbear._core.problems.core import ProblemId
@@ -69,6 +72,38 @@ class CandidateRegistry:
             raise ValueError(f"{problem_id} is a candidate that a stage has dropped already.")
         else:
             self._drop_by_problem_id[problem_id] = drop
+
+    def to_columns(self) -> dict[str, list[Any]]:
+        """Return the registry as columns: ``problem_id``, ``drop_stage_id``, ``drop_reason`` and ``is_rejection``.
+
+        The 3 columns of the drop are null for a candidate that no stage has dropped.
+        """
+        drops = [self.drop_of(problem_id) for problem_id in self.problem_ids]
+        return {
+            "problem_id": list(map(str, self.problem_ids)),
+            "drop_stage_id": [drop.stage_id.value if drop is not None else None for drop in drops],
+            "drop_reason": [drop.reason if drop is not None else None for drop in drops],
+            "is_rejection": [drop.is_rejection if drop is not None else None for drop in drops],
+        }
+
+    # --------------------------------------------------------------------------
+    #  Factory methods
+    # --------------------------------------------------------------------------
+    @classmethod
+    def from_table(cls, table: pl.DataFrame) -> Self:
+        """Return the registry whose columns `to_columns` gave, read back from `table`."""
+        registry = cls()
+        registry.add([ProblemId.from_string(problem_id) for problem_id in table["problem_id"]])
+        for row in table.filter(pl.col("drop_stage_id").is_not_null()).iter_rows(named=True):
+            registry.record_drop(
+                ProblemId.from_string(row["problem_id"]),
+                CandidateDrop(
+                    stage_id=PipelineStageId(row["drop_stage_id"]),
+                    reason=row["drop_reason"],
+                    is_rejection=row["is_rejection"],
+                ),
+            )
+        return registry
 
 
 # ==================================================================================================

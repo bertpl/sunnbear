@@ -1,8 +1,13 @@
-"""`BenchmarkSuitesBuildDetails` holds the outcome of 1 run of the benchmark suite pipeline, made for reading.
+"""`BenchmarkSuitesBuildDetails` holds a read-only copy of the outcome of 1 run of the benchmark suite pipeline.
 
-`PipelineState.create_build_details` builds it when the run ends, whether the run reached its last stage or a stage
-stopped it. The build details hold every candidate, what each stage that finished found about it, which stage dropped
-it and why, and the run's stop. Their read methods are general, so that each consumer builds what it needs from them:
+`PipelineState.create_build_details` builds it. The build details hold:
+
+- every candidate;
+- what each stage that finished found about each candidate;
+- which stage dropped each dropped candidate, and why;
+- the run's stop.
+
+Each consumer builds what it needs from the read methods, which return:
 
 - each finished stage's information, keyed by `ProblemId`;
 - each candidate's drop;
@@ -13,6 +18,7 @@ The build details write their files into a directory, and read them back.
 
 import copy
 import json
+import shutil
 from collections import Counter
 from pathlib import Path
 from typing import Self
@@ -34,7 +40,8 @@ from .stage_information import (
 )
 from .storage import PipelineStateStorage
 
-# This file holds the stages that finished and the stop; the storage writes its own files beside it.
+# The run file holds the ids of the stages that finished, and the stop; `PipelineStateStorage` writes its own files
+# beside it.
 _RUN_FILE_NAME = "run.json"
 
 
@@ -46,7 +53,7 @@ class BenchmarkSuitesBuildDetails:
 
     The build details are read-only: they copy the run's information when they are created, and each read method
     returns a copy or an immutable value. A stage that stopped the run did not finish, so its information is not part of
-    the build details; the stop records the stage and the reason.
+    the build details.
 
     Attributes:
         finished_stage_ids: The stages that ran to their end, in run order.
@@ -90,39 +97,66 @@ class BenchmarkSuitesBuildDetails:
     #  Each finished stage's information, or None for a stage that did not finish
     # --------------------------------------------------------------------------
     def interval_bounds(self) -> dict[ProblemId, IntervalBounds] | None:
-        """Return candidate generation's interval bounds of each candidate."""
+        """Return candidate generation's interval bounds of each candidate.
+
+        It returns ``None`` when candidate generation did not finish.
+        """
         return self._copy_if_finished(PipelineStageId.CANDIDATE_GENERATION, self._storage.interval_bounds)
 
     def c_ranges(self) -> dict[ProblemId, CRange] | None:
-        """Return validation's c-range of each valid candidate."""
+        """Return validation's c-range of each valid candidate.
+
+        It returns ``None`` when validation did not finish.
+        """
         return self._copy_if_finished(PipelineStageId.CANDIDATE_VALIDATION, self._storage.c_ranges)
 
     def characterization_results(self, stage_id: PipelineStageId) -> CharacterizationResults | None:
-        """Return the results of the characterization stage `stage_id` on the candidates that it kept."""
+        """Return the results of the characterization stage `stage_id` on the candidates that it kept.
+
+        It returns ``None`` for a stage that did not finish.
+        """
         return self._copy_if_finished(stage_id, self._storage.characterization_results.get(stage_id))
 
     def nearest_kept_candidates(self) -> dict[ProblemId, NearestKeptCandidate] | None:
-        """Return spacing's nearest kept candidate of each candidate that spacing dropped."""
+        """Return spacing's nearest kept candidate of each candidate that spacing dropped.
+
+        It returns ``None`` when spacing did not finish.
+        """
         return self._copy_if_finished(PipelineStageId.SPACING, self._storage.nearest_kept_candidates)
 
     def edis(self) -> dict[ProblemId, float] | None:
-        """Return full characterization's empirical difficulty index (EDI) of each candidate that it kept."""
+        """Return full characterization's empirical difficulty index (EDI) of each candidate that it kept.
+
+        It returns ``None`` when full characterization did not finish.
+        """
         return self._copy_if_finished(PipelineStageId.FULL_CHARACTERIZATION, self._storage.edis)
 
     def difficulty_classes(self) -> dict[ProblemId, DifficultyClass] | None:
-        """Return core selection's difficulty class of each candidate that core selection received."""
+        """Return core selection's difficulty class of each candidate that core selection received.
+
+        It returns ``None`` when core selection did not finish.
+        """
         return self._copy_if_finished(PipelineStageId.CORE_SELECTION, self._storage.difficulty_classes)
 
     def core_composition(self) -> CoreComposition | None:
-        """Return core selection's composition of the Core."""
+        """Return core selection's composition of the Core.
+
+        It returns ``None`` when core selection did not finish.
+        """
         return self._copy_if_finished(PipelineStageId.CORE_SELECTION, self._storage.core_composition)
 
     def suite_memberships(self) -> dict[ProblemId, SuiteMembership] | None:
-        """Return distillation's `SuiteMembership` of each Core member."""
+        """Return distillation's `SuiteMembership` of each Core member.
+
+        It returns ``None`` when distillation did not finish.
+        """
         return self._copy_if_finished(PipelineStageId.DISTILLATION, self._storage.suite_memberships)
 
     def distilled_suite_summaries(self) -> tuple[DistilledSuiteSummary, ...] | None:
-        """Return distillation's summary of each suite, the benchmark suites first, each family from its largest."""
+        """Return distillation's summary of each suite, the benchmark suites first, each family from its largest.
+
+        It returns ``None`` when distillation did not finish.
+        """
         return self._copy_if_finished(PipelineStageId.DISTILLATION, self._storage.distilled_suite_summaries)
 
     # --------------------------------------------------------------------------
@@ -143,8 +177,14 @@ class BenchmarkSuitesBuildDetails:
         rows = sorted(counts.items(), key=lambda item: stage_order.index(item[0][1]))
         return pl.DataFrame(
             [
-                {"formula_id": f, "stage_id": s.value, "reason": r, "is_rejection": j, "n_dropped": n}
-                for (f, s, r, j), n in rows
+                {
+                    "formula_id": formula_id,
+                    "stage_id": stage_id.value,
+                    "reason": reason,
+                    "is_rejection": is_rejection,
+                    "n_dropped": n_dropped,
+                }
+                for (formula_id, stage_id, reason, is_rejection), n_dropped in rows
             ],
             schema={
                 "formula_id": pl.String(),
@@ -158,16 +198,23 @@ class BenchmarkSuitesBuildDetails:
     def candidate_counts(self, stage_id: PipelineStageId) -> pl.DataFrame:
         """Return 1 row per formula whose candidates reached the stage `stage_id`, and how many of them it kept.
 
-        The columns are ``formula_id``, ``n_candidates``, the candidates that no stage before `stage_id` dropped, and
-        ``n_kept``, those of them that `stage_id` did not drop either; the rows follow the order of candidate
-        generation.
+        The columns are:
+
+        - ``formula_id``;
+        - ``n_candidates``, the number of the formula's candidates that no stage before `stage_id` dropped;
+        - ``n_kept``, the number of those candidates that `stage_id` did not drop either.
+
+        The rows follow the order of candidate generation.
         """
         stage_position = list(PipelineStageId).index(stage_id)
         n_candidates: Counter[str] = Counter()
         n_kept: Counter[str] = Counter()
         for problem_id in self.problem_ids:
             drop = self.drop_of(problem_id)
-            drop_position = list(PipelineStageId).index(drop.stage_id) if drop is not None else len(PipelineStageId)
+            if drop is not None:
+                drop_position = list(PipelineStageId).index(drop.stage_id)
+            else:
+                drop_position = len(PipelineStageId)
             if drop_position >= stage_position:
                 n_candidates[problem_id.formula_id] += 1
                 n_kept[problem_id.formula_id] += int(drop_position > stage_position)
@@ -183,39 +230,20 @@ class BenchmarkSuitesBuildDetails:
     def incorrect_solves_per_config(self, stage_id: PipelineStageId) -> pl.DataFrame | None:
         """Return, per core solver config of the characterization stage `stage_id`, its incorrect solves.
 
-        The incorrect solves count over the candidates that the stage kept. The columns are ``solver_id``,
-        ``n_solves``, ``n_incorrect_solves`` and ``incorrect_fraction``, which is null when the stage kept no
-        candidate; the rows follow the order of the stage's `FeatureVectorDefinition.solver_ids`. ``None`` for a stage
-        that did not finish.
+        The columns are those of `CharacterizationResults.incorrect_solves_table`. It returns ``None`` for a stage that
+        did not finish.
         """
         results = self.characterization_results(stage_id)
         if results is None:
             return None
         else:
-            solver_ids = results.definition.solver_ids
-            n_incorrect_solves = [
-                sum(counts[config_idx] for counts in results.n_incorrect_solves_per_config.values())
-                for config_idx in range(len(solver_ids))
-            ]
-            n_solves = len(results.raw_feature_matrix.problem_ids) * results.fidelity.solver_mc_size
-            return pl.DataFrame(
-                {
-                    "solver_id": list(solver_ids),
-                    "n_solves": [n_solves] * len(solver_ids),
-                    "n_incorrect_solves": n_incorrect_solves,
-                },
-                schema={"solver_id": pl.String(), "n_solves": pl.Int64(), "n_incorrect_solves": pl.Int64()},
-            ).with_columns(
-                incorrect_fraction=pl.when(pl.col("n_solves") > 0).then(
-                    pl.col("n_incorrect_solves") / pl.col("n_solves")
-                )
-            )
+            return results.incorrect_solves_table()
 
     def suite_compositions(self) -> pl.DataFrame | None:
         """Return 1 row per distilled suite, in the order of `distilled_suite_summaries`, with its composition.
 
         The columns are ``suite_family``, ``size``, 1 column ``n_candidates_<class>`` per `DifficultyClass`, with the
-        class's value in lower case, and ``diversity``. ``None`` when distillation did not finish.
+        class's value in lower case, and ``diversity``. It returns ``None`` when distillation did not finish.
         """
         summaries = self.distilled_suite_summaries()
         memberships = self.suite_memberships()
@@ -245,16 +273,20 @@ class BenchmarkSuitesBuildDetails:
     #  Files
     # --------------------------------------------------------------------------
     def write_files(self, directory: Path) -> None:
-        """Write the build details into `directory`, which is created if it does not exist.
+        """Write the build details into `directory`, after removing any files that it holds.
 
-        The directory holds the run's stages and stop in 1 JSON file, beside the files of `PipelineStateStorage`.
+        The directory holds the ids of the finished stages and the stop in 1 JSON file, beside the files that
+        `PipelineStateStorage.write_files` writes.
         """
-        directory.mkdir(parents=True, exist_ok=True)
+        shutil.rmtree(directory, ignore_errors=True)
+        directory.mkdir(parents=True)
+        if self.stop is not None:
+            stop = {"stage_id": self.stop.stage_id.value, "reason": self.stop.reason}
+        else:
+            stop = None
         run = {
             "finished_stage_ids": [stage_id.value for stage_id in self.finished_stage_ids],
-            "stop": {"stage_id": self.stop.stage_id.value, "reason": self.stop.reason}
-            if self.stop is not None
-            else None,
+            "stop": stop,
         }
         (directory / _RUN_FILE_NAME).write_text(json.dumps(run, indent=2, sort_keys=True) + "\n")
         self._storage.write_files(directory)

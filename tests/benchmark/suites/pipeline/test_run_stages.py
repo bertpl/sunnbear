@@ -117,8 +117,8 @@ def test_the_stages_run_in_order_and_their_manifests_are_written(tmp_path):
 
 
 def test_a_rerun_replaces_the_manifests_and_leaves_no_temporary_files(tmp_path):
-    """A second run into the same workspace replaces every manifest of the first and its build details, and leaves only
-    the final files."""
+    """A second run into the same workspace replaces every manifest and the build details of the first run, and leaves
+    only the final files."""
     # --- arrange ----------------------
     workspace = PipelineWorkspace(tmp_path)
     run_stages(workspace, [_ExampleGenerationStage(), _ExampleValidationStage()], worker_pool=_IN_PROCESS_WORKER_POOL)

@@ -5,11 +5,10 @@ The workspace directory holds:
 - under ``manifests``, the `PipelineStageManifest` of each stage that ran, as a JSON file named after the stage's
   `PipelineStageId`; each manifest is written under a temporary name and then renamed, so a file under its final name
   is always complete;
-- under ``benchmark_suites_build_details``, the files that the run's build details write.
+- under ``benchmark_suites_build_details``, the files of the run's build details.
 """
 
 import json
-import shutil
 from pathlib import Path
 
 from .stage_manifest import PipelineStageManifest
@@ -24,7 +23,7 @@ _TEMPORARY_FILE_SUFFIX = ".tmp"
 #  PipelineWorkspace
 # ==================================================================================================
 class PipelineWorkspace:
-    """`PipelineWorkspace` writes the manifests of the pipeline's workspace, and clears the build details' directory."""
+    """`PipelineWorkspace` writes the manifests of the pipeline's workspace, and names the build details' directory."""
 
     def __init__(self, path: Path) -> None:
         """Create a workspace for the directory at `path`, which need not exist yet."""
@@ -39,12 +38,10 @@ class PipelineWorkspace:
         manifest_json = json.dumps(manifest.model_dump(mode="json"), sort_keys=True, indent=2) + "\n"
         self._write_atomically(manifest_file, manifest_json.encode())
 
-    def clear_build_details_directory(self) -> Path:
-        """Return the empty directory for the run's build details, after removing the files of an earlier run."""
-        directory = self.path / _BUILD_DETAILS_DIR_NAME
-        shutil.rmtree(directory, ignore_errors=True)
-        directory.mkdir(parents=True)
-        return directory
+    @property
+    def build_details_directory(self) -> Path:
+        """Return the directory for the run's build details."""
+        return self.path / _BUILD_DETAILS_DIR_NAME
 
     # --------------------------------------------------------------------------
     #  Helpers
