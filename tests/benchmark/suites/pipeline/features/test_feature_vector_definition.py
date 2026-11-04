@@ -16,7 +16,6 @@ from sunnbear._core.benchmark.suites.pipeline.features import (
     map_fevals_to_feature,
 )
 from sunnbear._core.problems.core import ProblemId
-from sunnbear._core.solvers.core import SolverConfigRegistry
 from sunnbear._core.stats import gpq, mean_pairwise_l1
 
 _DEFINITION = FeatureVectorDefinition(solver_ids=("regula_falsi", "bisection"))
@@ -24,7 +23,7 @@ _N_SOLVERS_FEATURES = 2 + len(SOLVERS_GPQ_LEVELS)
 _MAX_FEVALS = max_fevals_for(n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
 
 
-def _raw_features(n_candidates: int) -> FeatureMatrix:
+def _raw_feature_matrix(n_candidates: int) -> FeatureMatrix:
     """Return random raw features of `n_candidates` candidates, with evaluation counts in [2, max_fevals]."""
     rng = np.random.default_rng(seed=1)
     values = np.hstack(
@@ -37,9 +36,9 @@ def _raw_features(n_candidates: int) -> FeatureMatrix:
     return FeatureMatrix(problem_ids=problem_ids, values=values)
 
 
-def test_the_names_hold_1_geomean_per_config_9_gpq_levels_and_10_properties():
-    """For 2 configs, the names are the 2 geomeans in their order, the gpq levels 10 to 90, then snuffled's 10
-    properties."""
+def test_the_names_hold_1_geomean_per_config_9_gpq_levels_and_1_name_per_property():
+    """For 2 configs, the names are the 2 geomeans in their order, the gpq levels 10 to 90, then 1 per snuffled
+    property, which covers every root and function property of snuffled."""
     # --- act --------------------------
     feature_names = _DEFINITION.feature_names
 
@@ -53,20 +52,16 @@ def test_the_names_hold_1_geomean_per_config_9_gpq_levels_and_10_properties():
     assert set(SNUFFLED_PROPERTIES) == {*RootProperty, *FunctionProperty}
 
 
-def test_the_definition_takes_the_configs_in_their_order_and_needs_1():
-    """`from_core_solver_configs` keeps the configs' order, and a definition without configs is refused."""
-    # --- arrange ----------------------
-    configs = [SolverConfigRegistry.config_from_id(solver_id) for solver_id in ["regula_falsi", "bisection"]]
-
+def test_a_definition_needs_1_config():
+    """A definition without configs is refused."""
     # --- act / assert -----------------
-    assert FeatureVectorDefinition.from_core_solver_configs(configs) == _DEFINITION
     with pytest.raises(ValueError, match="at least 1 core solver config"):
-        FeatureVectorDefinition.from_core_solver_configs([])
+        FeatureVectorDefinition(solver_ids=())
 
 
 def test_the_raw_features_are_geomeans_pooled_gpqs_and_property_means():
-    """Per config the geometric mean of its column, the gpq levels of all solves together, and the mean of each
-    property, all in natural units."""
+    """The raw features are the geometric mean of each config's column, the gpq at each level over all solves
+    together, and the mean of each property, all in natural units."""
     # --- arrange ----------------------
     n_fevals_eff = np.array([[2.0, 8.0], [8.0, 32.0]])
     snuffled_property_values = np.vstack([np.zeros(len(SNUFFLED_PROPERTIES)), np.ones(len(SNUFFLED_PROPERTIES))])
@@ -98,41 +93,41 @@ def test_the_raw_features_refuse_arrays_with_the_wrong_columns(n_configs: int, n
 def test_each_blocks_scale_is_its_mean_pairwise_l1_distance_on_the_log_scale():
     """The solvers block's scale is computed after `map_fevals_to_feature`, the snuffled block's on its raw values."""
     # --- arrange ----------------------
-    raw_features = _raw_features(5)
+    raw_feature_matrix = _raw_feature_matrix(5)
 
     # --- act --------------------------
-    block_scales = _DEFINITION.fit_block_scales(raw_features)
+    block_scales = _DEFINITION.fit_block_scales(raw_feature_matrix)
 
     # --- assert -----------------------
-    solvers_values = map_fevals_to_feature(raw_features.values[:, :_N_SOLVERS_FEATURES], max_fevals=_MAX_FEVALS)
+    solvers_values = map_fevals_to_feature(raw_feature_matrix.values[:, :_N_SOLVERS_FEATURES], max_fevals=_MAX_FEVALS)
     assert block_scales == FeatureBlockScales(
         scale_per_block={
             FeatureBlock.SOLVERS: mean_pairwise_l1(solvers_values),
-            FeatureBlock.SNUFFLED: mean_pairwise_l1(raw_features.values[:, _N_SOLVERS_FEATURES:]),
+            FeatureBlock.SNUFFLED: mean_pairwise_l1(raw_feature_matrix.values[:, _N_SOLVERS_FEATURES:]),
         }
     )
 
 
 def test_fewer_than_2_candidates_have_no_scales():
-    """1 candidate has no pair, so no scale."""
+    """One candidate has no pair, so no scale."""
     # --- act / assert -----------------
-    assert _DEFINITION.fit_block_scales(_raw_features(1)) is None
+    assert _DEFINITION.fit_block_scales(_raw_feature_matrix(1)) is None
 
 
 def test_the_matrix_divides_each_block_on_the_log_scale_by_its_scale():
-    """The matrix keeps the ids and the raw features, unchanged; each of its blocks has a mean pairwise L1 distance of 1
-    over the candidates that the scales were fitted on."""
+    """The matrix keeps the ids and leaves the raw features unmodified; each of its blocks has a mean pairwise L1
+    distance of 1, because the scales were fitted on the same candidates."""
     # --- arrange ----------------------
-    raw_features = _raw_features(5)
-    raw_values = raw_features.values.copy()
-    block_scales = _DEFINITION.fit_block_scales(raw_features)
+    raw_feature_matrix = _raw_feature_matrix(5)
+    raw_values = raw_feature_matrix.values.copy()
+    block_scales = _DEFINITION.fit_block_scales(raw_feature_matrix)
 
     # --- act --------------------------
-    matrix = _DEFINITION.build_scaled_matrix(raw_features, block_scales)
+    matrix = _DEFINITION.build_scaled_matrix(raw_feature_matrix, block_scales)
 
     # --- assert -----------------------
-    assert matrix.problem_ids == raw_features.problem_ids
-    np.testing.assert_array_equal(raw_features.values, raw_values)
+    assert matrix.problem_ids == raw_feature_matrix.problem_ids
+    np.testing.assert_array_equal(raw_feature_matrix.values, raw_values)
     solvers_values = map_fevals_to_feature(raw_values[:, :_N_SOLVERS_FEATURES], max_fevals=_MAX_FEVALS)
     np.testing.assert_allclose(
         matrix.values[:, :_N_SOLVERS_FEATURES], solvers_values / block_scales.scale_per_block[FeatureBlock.SOLVERS]

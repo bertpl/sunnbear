@@ -5,9 +5,9 @@ here, lives in the package `stages`, and sets its default fidelity. The package 
 
 - `FeatureFidelity` names a fidelity;
 - `FeatureBlock` names a block of a feature vector;
-- `FeatureVectorDefinition` defines the feature vector in 1 place: its features, each candidate's raw features, the
-  scale of each block over a set of candidates, a `FeatureBlockScales`, and the matrix that spacing and max-div take,
-  a `FeatureMatrix`, which pairs each row with its candidate's id;
+- `FeatureVectorDefinition` defines the feature vector: its features, and how they are computed and scaled;
+- `FeatureBlockScales` holds the scale of each `FeatureBlock` over a set of candidates;
+- `FeatureMatrix` holds 1 feature vector per candidate, paired with the candidate's id;
 - `CandidateCharacterizationStage` is the base class of the characterization stages, which compute the feature vectors
   in `CandidateCharacterizationTask` tasks, then the scale of each `FeatureBlock`: its mean pairwise L1 distance
   over the kept candidates. It names the columns that it adds, and later stages read them back through it. Each

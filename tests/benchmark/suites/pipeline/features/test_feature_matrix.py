@@ -16,7 +16,7 @@ from sunnbear._core.problems.core import ProblemId
     ],
 )
 def test_the_matrix_refuses_rows_that_do_not_match_the_ids(problem_ids: tuple[str, ...], shape: tuple, message: str):
-    """3 rows for 2 ids, a 1-dimensional array, and a repeated id are refused."""
+    """The matrix refuses 3 rows for 2 ids, a 1-dimensional array, and a repeated id."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=message):
         FeatureMatrix(problem_ids=tuple(map(ProblemId.from_string, problem_ids)), values=np.zeros(shape))
