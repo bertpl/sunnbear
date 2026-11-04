@@ -7,6 +7,7 @@ or `CoreComposition`, uses that type.
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from functools import cached_property
 from typing import NamedTuple
 
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
@@ -40,7 +41,6 @@ class CharacterizationResults:
         definition: The `DiversityFeatureFactory` of the feature vectors.
         fidelity: The `FeatureFidelity` of the stage's solves and analyses.
         raw_feature_matrix: The raw features of each kept candidate.
-        block_scales: The scale of each block over the kept candidates; ``None`` when the stage keeps fewer than 2.
         n_incorrect_solves_per_config: For each kept candidate, 1 count per core solver config, in the order of
             `definition.solver_ids`: the number of that config's solves that gave no correct answer. Each config
             solves each candidate `fidelity.solver_mc_size` times.
@@ -49,8 +49,12 @@ class CharacterizationResults:
     definition: DiversityFeatureFactory
     fidelity: FeatureFidelity
     raw_feature_matrix: FeatureMatrix
-    block_scales: FeatureBlockScales | None
     n_incorrect_solves_per_config: Mapping[ProblemId, tuple[int, ...]]
+
+    @cached_property
+    def block_scales(self) -> FeatureBlockScales | None:
+        """Return the scale of each block over the kept candidates; ``None`` when the stage keeps fewer than 2."""
+        return self.definition.fit_block_scales(self.raw_feature_matrix)
 
     def build_scaled_feature_matrix(self, problem_ids: Sequence[ProblemId]) -> FeatureMatrix | None:
         """Return the scaled features of the candidates `problem_ids`; ``None`` when the stage has no block scales."""

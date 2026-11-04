@@ -24,7 +24,7 @@ class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccess
     The stage stores, as `CharacterizationResults`, for the candidates that it keeps:
 
     - their raw features;
-    - the scale of each block of the features over them;
+    - the scale of each feature block, fitted on the kept candidates;
     - their incorrect solves per core solver config.
 
     An incorrect solve counts as `max_fevals` in `n_fevals_eff`, from which the solvers block is computed. The counts of
@@ -45,7 +45,7 @@ class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccess
     def __init__(self, core_solver_configs: Sequence[SolverConfig], fidelity: FeatureFidelity | None = None) -> None:
         """Create the stage, which solves each candidate with `core_solver_configs` at `fidelity`.
 
-        `fidelity` sets only how much work goes into each candidate's features, never which features it computes.
+        `fidelity` sets only how much work goes into each candidate's features, never which features the stage computes.
         ``None`` stands for the class's `default_fidelity`.
 
         Raises:
@@ -105,7 +105,6 @@ class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccess
                 definition=self.definition,
                 fidelity=self.fidelity,
                 raw_feature_matrix=raw_feature_matrix,
-                block_scales=self.definition.fit_block_scales(raw_feature_matrix),
                 n_incorrect_solves_per_config={
                     problem_id: result.n_incorrect_solves_per_config for problem_id, result in kept_results.items()
                 },

@@ -24,8 +24,8 @@ from .stage_information import (
 class PipelineStateStorage:
     """`PipelineStateStorage` holds the registry of a run's candidates, and 1 structure per stage for its information.
 
-    Only the state accessors read and write the storage. Each attribute below names the candidates that its stage's
-    structure holds information on; a structure is ``None``, or missing from `characterization_results`, until its
+    Only the state accessors read and write the storage. Each attribute below that holds information on candidates
+    names those candidates; a stage's structure is ``None``, or missing from `characterization_results`, until its
     stage writes the structure.
 
     Attributes:

@@ -31,8 +31,7 @@ def _select_core(edis: list[float], stage: CoreSelectionStage) -> PipelineState:
     state = build_state_before(
         PipelineStageId.CORE_SELECTION, problem_ids, edis=dict(zip(problem_ids, edis, strict=True))
     )
-    stage.run(state.create_state_accessor(PipelineStageId.CORE_SELECTION), worker_pool=_TWO_WORKER_POOL)
-    state.finish_stage(PipelineStageId.CORE_SELECTION)
+    state.run_stage(stage, worker_pool=_TWO_WORKER_POOL)
     return state
 
 

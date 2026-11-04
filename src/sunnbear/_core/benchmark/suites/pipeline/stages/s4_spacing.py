@@ -41,8 +41,8 @@ class SpacingStage(PipelineStage[SpacingStateAccessor]):
     farthest from it, so that a formula with 2 or more candidates keeps at least 2.
 
     The stage drops each other candidate as a near duplicate, which is valid but not kept, and stores, for each dropped
-    candidate, the nearest kept candidate of the same formula. Without scales, which coarse characterization lacks
-    when it kept fewer than 2 candidates, the stage keeps every candidate.
+    candidate, the nearest kept candidate of the same formula. When coarse characterization kept fewer than 2
+    candidates, it has no block scales, and the stage keeps every candidate.
 
     The stage runs in the main process, not in the run's worker pool: per formula it compares a few feature vectors, and
     each worker would have to import the formulas' modules only to receive the candidates.

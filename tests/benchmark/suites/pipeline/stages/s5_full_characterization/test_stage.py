@@ -34,7 +34,7 @@ def test_the_stage_stores_the_full_features_their_scales_and_the_edis(isolated_f
     edis_calls = record_calls(monkeypatch, FullCharacterizationStateAccessor, "set_edis")
 
     # --- act --------------------------
-    stage.run(state.create_state_accessor(stage.stage_id), worker_pool=WorkerPool(n_workers=1))
+    state.run_stage(stage, worker_pool=WorkerPool(n_workers=1))
 
     # --- assert -----------------------
     [(results,)], [(edis,)] = results_calls, edis_calls

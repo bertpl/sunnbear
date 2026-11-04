@@ -1,7 +1,10 @@
 """`PipelineState` holds what a run of the benchmark suite pipeline knows about its candidates."""
 
-from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
+from typing import Any
+
+from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageId
 from sunnbear._core.problems.core import ProblemId
+from sunnbear._core.utils.worker_pool import WorkerPool
 
 from .accessors import (
     CandidateGenerationStateAccessor,
@@ -40,10 +43,10 @@ class PipelineState:
     accessor that `create_state_accessor` makes for it.
 
     The stages run in the order of `PipelineStageId`, so the state makes a stage's accessor only once every earlier
-    stage has finished, and the stage then finds the information of all of them.
+    stage has finished, and the stage then finds the information of every earlier stage.
 
-    A candidate that a stage drops keeps its entry in the state, with the stage, the reason, and whether the drop is a
-    rejection; the later stages no longer see the candidate.
+    A candidate that a stage drops keeps its entry in the state, with the stage, the reason, and whether the stage
+    rejected it as invalid; the later stages no longer see the candidate.
     """
 
     def __init__(self) -> None:
@@ -94,3 +97,14 @@ class PipelineState:
             raise ValueError(f"{stage_id} has not started, or has finished already.")
         else:
             self._finished_stage_ids.append(stage_id)
+
+    def run_stage(self, stage: PipelineStage[Any], *, worker_pool: WorkerPool) -> None:
+        """Run `stage` on the state accessor that the state creates for it, then record that the stage has finished.
+
+        A stage that raises, for example `PipelineStopError`, does not finish, and the error propagates.
+
+        Raises:
+            ValueError: If `stage` is not the next stage in run order.
+        """
+        stage.run(self.create_state_accessor(stage.stage_id), worker_pool=worker_pool)
+        self.finish_stage(stage.stage_id)

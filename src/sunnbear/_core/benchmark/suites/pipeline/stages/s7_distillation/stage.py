@@ -6,9 +6,6 @@ from sunnbear._core.benchmark.protocol import SeedPurpose, derive_seed
 from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED, PipelineStage, PipelineStageId
 from sunnbear._core.benchmark.suites.pipeline.selection import (
     DEFAULT_SELECTION_SEC_PER_CANDIDATE,
-    CandidatePool,
-    DiverseSuite,
-    SuiteComposition,
     SuiteFamily,
     select_diverse_suite,
 )
@@ -70,8 +67,12 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
 
         # --- split ------------------------------
         largest_suite_composition = state_accessor.core_composition().halved()
-        largest_benchmark_suite = self._select_suite(
-            core_pool, largest_suite_composition, n_workers=worker_pool.n_workers
+        largest_benchmark_suite = select_diverse_suite(
+            core_pool,
+            composition=largest_suite_composition,
+            seed=self.seed,
+            sec_per_candidate=self.sec_per_candidate,
+            n_workers=worker_pool.n_workers,
         )
         largest_benchmark_problem_ids = set(largest_benchmark_suite.problem_ids)
         largest_calibration_problem_ids = tuple(
@@ -97,8 +98,12 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
             suite_problem_ids, composition = largest_suite_problem_ids, largest_suite_composition
             while composition.size > SMALLEST_SUITE_SIZE:
                 composition = composition.halved()
-                suite = self._select_suite(
-                    core_pool.subset(suite_problem_ids), composition, n_workers=worker_pool.n_workers
+                suite = select_diverse_suite(
+                    core_pool.subset(suite_problem_ids),
+                    composition=composition,
+                    seed=self.seed,
+                    sec_per_candidate=self.sec_per_candidate,
+                    n_workers=worker_pool.n_workers,
                 )
                 suite_problem_ids = suite.problem_ids
                 smallest_containing_suite_sizes.update(dict.fromkeys(suite_problem_ids, composition.size))
@@ -113,18 +118,3 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
             )
         state_accessor.set_suite_memberships(suite_memberships)
         state_accessor.set_distilled_suite_summaries(distilled_suite_summaries)
-
-    # --------------------------------------------------------------------------
-    #  Helpers
-    # --------------------------------------------------------------------------
-    def _select_suite(
-        self, candidate_pool: CandidatePool, composition: SuiteComposition, *, n_workers: int
-    ) -> DiverseSuite:
-        """Return the suite of `composition` that max-div selects from `candidate_pool`, with the stage's settings."""
-        return select_diverse_suite(
-            candidate_pool,
-            composition=composition,
-            seed=self.seed,
-            sec_per_candidate=self.sec_per_candidate,
-            n_workers=n_workers,
-        )

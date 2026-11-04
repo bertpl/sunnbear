@@ -117,8 +117,8 @@ class DiverseSuite:
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-# A module-level function, because max-div's custom distance takes a `numba.njit` function and numba compiles no
-# method.
+# This function is module-level, because max-div's custom distance takes a `numba.njit` function and numba compiles
+# no method.
 @numba.njit(fastmath={"reassoc", "contract"})
 def l1_distance_over_leading_columns(a: np.ndarray, b: np.ndarray, n_columns: int) -> float:
     """Return the L1 distance between the vectors `a` and `b` over their first `n_columns` coordinates."""

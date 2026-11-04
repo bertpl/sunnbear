@@ -42,7 +42,7 @@ def _characterize(
         c_range=CRange(c_min=-0.5, c_max=0.5),
     )
     calls = record_calls(monkeypatch, CoarseCharacterizationStateAccessor, "set_characterization_results")
-    stage.run(state.create_state_accessor(stage.stage_id), worker_pool=WorkerPool(n_workers=1))
+    state.run_stage(stage, worker_pool=WorkerPool(n_workers=1))
     [(results,)] = calls
     return state, results
 
@@ -111,8 +111,7 @@ def test_the_stage_gives_the_same_results_with_1_or_2_workers():
                 CandidateValidationStage(),
                 CoarseCharacterizationStage(core_solver_configs),
             ]:
-                stage.run(state.create_state_accessor(stage.stage_id), worker_pool=worker_pool)
-                state.finish_stage(stage.stage_id)
+                state.run_stage(stage, worker_pool=worker_pool)
         spacing_accessors.append(state.create_state_accessor(PipelineStageId.SPACING))
 
     # --- assert -----------------------

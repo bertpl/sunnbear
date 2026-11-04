@@ -5,7 +5,7 @@
 - it keeps at least 2 candidates of every formula that has 2 or more;
 - it stores each dropped candidate's nearest kept candidate.
 
-The tests give the stage its scaled coarse features directly, in place of those that the state computes.
+The tests give the stage its scaled coarse features directly, not those that the state computes.
 """
 
 import numpy as np
@@ -47,9 +47,7 @@ def _run_spacing(
     calls = record_calls(monkeypatch, SpacingStateAccessor, "set_nearest_kept_candidates")
     state = build_state_before(PipelineStageId.SPACING, [ProblemId.from_string(p) for p in problem_ids])
 
-    SpacingStage(min_distance=1.0).run(
-        state.create_state_accessor(PipelineStageId.SPACING), worker_pool=_IN_PROCESS_WORKER_POOL
-    )
+    state.run_stage(SpacingStage(min_distance=1.0), worker_pool=_IN_PROCESS_WORKER_POOL)
 
     [(nearest_kept_candidates,)] = calls
     drops = {ProblemId.from_string(p): state.drop_of(ProblemId.from_string(p)) for p in problem_ids}

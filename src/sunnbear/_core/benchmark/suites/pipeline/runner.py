@@ -108,8 +108,11 @@ def run_stages(
     A stage that raises `PipelineStopError` stops the run: it writes no manifest, and the stages after it do not run.
 
     Returns:
-        The manifest of each stage that ran to its end, in run order, the `PipelineStop` of the stage that stopped the
-        run, if any, and the run's state.
+        The run's `PipelineRunResult`, which holds:
+
+        - the manifest of each stage that ran to its end, in run order;
+        - the `PipelineStop` of the stage that stopped the run, if any;
+        - the run's state.
 
     Raises:
         ValueError: If `stages` do not follow the run order of `PipelineStageId`.
@@ -117,18 +120,16 @@ def run_stages(
     state = PipelineState()
     manifests: list[PipelineStageManifest] = []
     for stage in stages:
-        state_accessor = state.create_state_accessor(stage.stage_id)
         n_candidates_in = state.n_remaining_candidates
         started_at = datetime.datetime.now(datetime.UTC)
         t_start = time.perf_counter()
         try:
-            stage.run(state_accessor, worker_pool=worker_pool)
+            state.run_stage(stage, worker_pool=worker_pool)
         except PipelineStopError as error:
             return PipelineRunResult(
                 manifests=tuple(manifests), stop=PipelineStop(stage_id=stage.stage_id, reason=str(error)), state=state
             )
         duration_sec = time.perf_counter() - t_start
-        state.finish_stage(stage.stage_id)
         manifest = PipelineStageManifest.from_stage_run(
             stage=stage,
             n_candidates_in=n_candidates_in,

@@ -32,8 +32,8 @@ _TWO_WORKER_POOL = WorkerPool(n_workers=2)
 # candidates in these tests, that covers the start of the workers' processes and leaves time to meet every quota on
 # a busy CI machine.
 _SEC_PER_CANDIDATE = 0.03
-# The range of each class's EDIs, relative to `DEFAULT_N_BISECTION_FEVALS`; the EDIs differ within a class, so that the
-# distance between 2 EDIs of 1 class is not 0.
+# These are the ranges of each class's EDIs, relative to `DEFAULT_N_BISECTION_FEVALS`; the EDIs differ within a class,
+# so that the distance between 2 EDIs of 1 class is not 0.
 _EDI_RATIO_RANGE_BY_CLASS = {A: (0.1, 0.2), B: (0.3, 0.45), C: (0.6, 0.9), DA: (1.2, 1.8), DB: (2.5, 3.5)}
 
 
@@ -51,9 +51,9 @@ def _distill(
     }
     state = build_state_before(PipelineStageId.DISTILLATION, problem_ids, edis=edis)
     memberships_calls = record_calls(monkeypatch, DistillationStateAccessor, "set_suite_memberships")
-    suites_calls = record_calls(monkeypatch, DistillationStateAccessor, "set_distilled_suite_summaries")
-    stage.run(state.create_state_accessor(PipelineStageId.DISTILLATION), worker_pool=_TWO_WORKER_POOL)
-    [(memberships,)], [(suites,)] = memberships_calls, suites_calls
+    summaries_calls = record_calls(monkeypatch, DistillationStateAccessor, "set_distilled_suite_summaries")
+    state.run_stage(stage, worker_pool=_TWO_WORKER_POOL)
+    [(memberships,)], [(suites,)] = memberships_calls, summaries_calls
     return dict(zip(problem_ids, classes, strict=True)), dict(memberships), tuple(suites)
 
 

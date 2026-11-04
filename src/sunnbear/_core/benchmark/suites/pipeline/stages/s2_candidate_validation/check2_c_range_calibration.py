@@ -59,7 +59,7 @@ MAX_RETURNS_TO_HALVING = 10
 # Step 6 rejects a c-range narrower than this.
 MIN_C_RANGE_WIDTH = 1e-3
 
-# The reasons to reject a candidate, by the step that fails:
+# The constants below are the reasons to reject a candidate, by the step that fails:
 # - step 1: f(a, 0) and f(b, 0) are not both finite and nonzero, with opposite signs;
 CALIBRATION_NO_FINITE_SIGN_CHANGE_AT_0 = "calibration_no_finite_sign_change_at_0"
 # - step 2: the condition fails at the first probe, on either side of c = 0;

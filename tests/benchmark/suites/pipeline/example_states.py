@@ -23,7 +23,7 @@ from sunnbear._core.benchmark.suites.pipeline.selection import CoreComposition, 
 from sunnbear._core.benchmark.suites.pipeline.state import CharacterizationResults, IntervalBounds, PipelineState
 from sunnbear._core.problems.core import ProblemId
 
-# The example states characterize the candidates with 1 core solver config, which gives 20 features.
+# The example states characterize the candidates with 1 core solver config.
 EXAMPLE_DEFINITION = DiversityFeatureFactory(solver_ids=("bisection",))
 _MAX_FEVALS = max_fevals_for(n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
 _DEFAULT_C_RANGE = CRange(c_min=-1.0, c_max=1.0)
@@ -53,7 +53,6 @@ def example_characterization_results(raw_feature_matrix: FeatureMatrix) -> Chara
         definition=EXAMPLE_DEFINITION,
         fidelity=FeatureFidelity.COARSE,
         raw_feature_matrix=raw_feature_matrix,
-        block_scales=EXAMPLE_DEFINITION.fit_block_scales(raw_feature_matrix),
         n_incorrect_solves_per_config=dict.fromkeys(raw_feature_matrix.problem_ids, (0,)),
     )
 
@@ -62,7 +61,7 @@ def build_state_before(
     stage_id: PipelineStageId,
     problem_ids: Sequence[ProblemId],
     *,
-    coarse_raw_feature_matrix: FeatureMatrix | None = None,
+    raw_feature_matrix: FeatureMatrix | None = None,
     edis: Mapping[ProblemId, float] | None = None,
     c_range: CRange = _DEFAULT_C_RANGE,
     core_composition: CoreComposition | None = None,
@@ -72,16 +71,14 @@ def build_state_before(
     The stages write this example information:
 
     - generation and validation: the interval ``[-1, 1]`` and the c-range `c_range` of each candidate;
-    - each characterization: the raw features `coarse_raw_feature_matrix`, by default those of
+    - each characterization: the raw features `raw_feature_matrix`, by default those of
       `example_raw_feature_matrix`, with their block scales and no incorrect solve;
     - full characterization: the EDIs `edis`, by default 10 for each candidate;
     - core selection: each candidate's class from its EDI, and `core_composition`, by default the composition of the
       largest Core that the classes fill.
     """
     state = PipelineState()
-    if coarse_raw_feature_matrix is not None:
-        raw_feature_matrix = coarse_raw_feature_matrix
-    else:
+    if raw_feature_matrix is None:
         raw_feature_matrix = example_raw_feature_matrix(problem_ids)
     edis = edis if edis is not None else dict.fromkeys(problem_ids, 10.0)
     for earlier_stage_id in list(PipelineStageId)[: list(PipelineStageId).index(stage_id)]:

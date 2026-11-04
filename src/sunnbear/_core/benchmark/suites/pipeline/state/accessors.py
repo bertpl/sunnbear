@@ -59,32 +59,30 @@ class PipelineStateAccessor:
         """Drop the candidate `problem_id` as invalid, for `reason`.
 
         Raises:
-            ValueError: If `problem_id` is not a candidate that no stage has dropped.
+            ValueError: If `problem_id` is not a candidate of the run, or a stage has dropped it already.
         """
-        self._record_drop(problem_id, reason, is_rejection=True)
+        self._storage.candidate_registry.record_drop(
+            problem_id, CandidateDrop(stage_id=self.stage_id, reason=reason, is_rejection=True)
+        )
 
     def drop(self, problem_id: ProblemId, reason: str) -> None:
         """Drop the valid candidate `problem_id`, which the stage does not keep, for `reason`.
 
         Raises:
-            ValueError: If `problem_id` is not a candidate that no stage has dropped.
+            ValueError: If `problem_id` is not a candidate of the run, or a stage has dropped it already.
         """
-        self._record_drop(problem_id, reason, is_rejection=False)
+        self._storage.candidate_registry.record_drop(
+            problem_id, CandidateDrop(stage_id=self.stage_id, reason=reason, is_rejection=False)
+        )
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
-    def _record_drop(self, problem_id: ProblemId, reason: str, *, is_rejection: bool) -> None:
-        """Record the drop of `problem_id` by this accessor's stage."""
-        self._storage.candidate_registry.record_drop(
-            problem_id, CandidateDrop(stage_id=self.stage_id, reason=reason, is_rejection=is_rejection)
-        )
-
-    def _check_written_once(self, *, is_written: bool) -> None:
+    def _check_not_written(self, *, is_written: bool) -> None:
         """Check that a piece of the stage's information is not written yet.
 
         Raises:
-            ValueError: If the information `is_written` already.
+            ValueError: If `is_written` is true.
         """
         if is_written:
             raise ValueError(f"{type(self).__name__} writes each piece of its stage's information once.")
@@ -122,7 +120,7 @@ class CandidateGenerationStateAccessor(PipelineStateAccessor):
         Raises:
             ValueError: If the candidates were added before.
         """
-        self._check_written_once(is_written=self._storage.interval_bounds is not None)
+        self._check_not_written(is_written=self._storage.interval_bounds is not None)
         self._storage.candidate_registry.add(list(interval_bounds))
         self._storage.interval_bounds = dict(interval_bounds)
 
@@ -147,7 +145,7 @@ class CandidateValidationStateAccessor(PipelineStateAccessor):
         Raises:
             ValueError: If the c-ranges were stored before, or do not cover exactly those candidates.
         """
-        self._check_written_once(is_written=self._storage.c_ranges is not None)
+        self._check_not_written(is_written=self._storage.c_ranges is not None)
         self._check_covers(c_ranges.keys(), self.remaining_problem_ids)
         self._storage.c_ranges = self._restrict_to_remaining(c_ranges)
 
@@ -171,7 +169,7 @@ class CharacterizationStateAccessor(PipelineStateAccessor):
             ValueError: If the results were stored before, or their raw features or incorrect solves do not cover
                 exactly those candidates.
         """
-        self._check_written_once(is_written=self.stage_id in self._storage.characterization_results)
+        self._check_not_written(is_written=self.stage_id in self._storage.characterization_results)
         self._check_covers(results.raw_feature_matrix.problem_ids, self.remaining_problem_ids)
         self._check_covers(results.n_incorrect_solves_per_config.keys(), self.remaining_problem_ids)
         self._storage.characterization_results[self.stage_id] = results
@@ -181,7 +179,7 @@ class CharacterizationStateAccessor(PipelineStateAccessor):
 #  CoarseCharacterizationStateAccessor
 # ==================================================================================================
 class CoarseCharacterizationStateAccessor(CharacterizationStateAccessor):
-    """`CoarseCharacterizationStateAccessor` is the state accessor of coarse characterization."""
+    """`CoarseCharacterizationStateAccessor` gives the candidates' c-ranges, and takes the stage's results."""
 
     stage_id = PipelineStageId.COARSE_CHARACTERIZATION
 
@@ -211,7 +209,7 @@ class SpacingStateAccessor(PipelineStateAccessor):
             ValueError: If the nearest kept candidates were stored before, or do not cover exactly the candidates that
                 the stage dropped.
         """
-        self._check_written_once(is_written=self._storage.nearest_kept_candidates is not None)
+        self._check_not_written(is_written=self._storage.nearest_kept_candidates is not None)
         self._check_covers(
             nearest_kept_candidates.keys(), self._storage.candidate_registry.problem_ids_dropped_by(self.stage_id)
         )
@@ -222,7 +220,7 @@ class SpacingStateAccessor(PipelineStateAccessor):
 #  FullCharacterizationStateAccessor
 # ==================================================================================================
 class FullCharacterizationStateAccessor(CharacterizationStateAccessor):
-    """`FullCharacterizationStateAccessor` takes full characterization's results, and each candidate's EDI."""
+    """`FullCharacterizationStateAccessor` takes the stage's results and empirical difficulty indices (EDIs)."""
 
     stage_id = PipelineStageId.FULL_CHARACTERIZATION
 
@@ -234,7 +232,7 @@ class FullCharacterizationStateAccessor(CharacterizationStateAccessor):
         Raises:
             ValueError: If the EDIs were stored before, or do not cover exactly those candidates.
         """
-        self._check_written_once(is_written=self._storage.edis is not None)
+        self._check_not_written(is_written=self._storage.edis is not None)
         self._check_covers(edis.keys(), self.remaining_problem_ids)
         self._storage.edis = self._restrict_to_remaining(edis)
 
@@ -243,7 +241,7 @@ class FullCharacterizationStateAccessor(CharacterizationStateAccessor):
 #  SelectionStateAccessor
 # ==================================================================================================
 class SelectionStateAccessor(PipelineStateAccessor):
-    """`SelectionStateAccessor` gives the candidates that max-div selects from, as a `CandidatePool`."""
+    """`SelectionStateAccessor` gives the input candidates of max-div's selection, as a `CandidatePool`."""
 
     def candidate_pool(self) -> CandidatePool:
         """Return the pool of the candidates that no stage has dropped.
@@ -288,7 +286,7 @@ class CoreSelectionStateAccessor(SelectionStateAccessor):
         Raises:
             ValueError: If the classes were stored before, or do not cover exactly those candidates.
         """
-        self._check_written_once(is_written=self._storage.difficulty_classes is not None)
+        self._check_not_written(is_written=self._storage.difficulty_classes is not None)
         self._check_covers(difficulty_classes.keys(), self.remaining_problem_ids)
         self._storage.difficulty_classes = self._restrict_to_remaining(difficulty_classes)
 
@@ -298,7 +296,7 @@ class CoreSelectionStateAccessor(SelectionStateAccessor):
         Raises:
             ValueError: If the composition was stored before.
         """
-        self._check_written_once(is_written=self._storage.core_composition is not None)
+        self._check_not_written(is_written=self._storage.core_composition is not None)
         self._storage.core_composition = core_composition
 
 
@@ -327,7 +325,7 @@ class DistillationStateAccessor(SelectionStateAccessor):
         Raises:
             ValueError: If the memberships were stored before, or do not cover exactly those candidates.
         """
-        self._check_written_once(is_written=self._storage.suite_memberships is not None)
+        self._check_not_written(is_written=self._storage.suite_memberships is not None)
         self._check_covers(suite_memberships.keys(), self.remaining_problem_ids)
         self._storage.suite_memberships = self._restrict_to_remaining(suite_memberships)
 
@@ -340,5 +338,5 @@ class DistillationStateAccessor(SelectionStateAccessor):
         Raises:
             ValueError: If the summaries were stored before.
         """
-        self._check_written_once(is_written=self._storage.distilled_suite_summaries is not None)
+        self._check_not_written(is_written=self._storage.distilled_suite_summaries is not None)
         self._storage.distilled_suite_summaries = tuple(distilled_suite_summaries)

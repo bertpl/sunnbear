@@ -17,8 +17,7 @@ class FullCharacterizationStage(CandidateCharacterizationStage[FullCharacterizat
     tuple sets and snuffled analysis budget are larger than the coarse fidelity's. The stage's block scales are fitted
     only on the candidates that it keeps, because the benchmark suites are selected from those candidates.
 
-    The stage also stores each kept candidate's empirical difficulty index (EDI), computed from the same solves; core
-    selection assigns each candidate its difficulty class from its EDI.
+    The stage also stores each kept candidate's empirical difficulty index (EDI), computed from the same solves.
 
     The full fidelity can reject a candidate that the coarse one kept, for example a candidate whose f fails only at an
     x that the coarse fidelity's solves never evaluate, but the solves on the full fidelity's larger tuple set do.

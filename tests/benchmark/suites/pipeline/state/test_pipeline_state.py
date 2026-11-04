@@ -11,6 +11,7 @@ from sunnbear._core.benchmark.suites.pipeline.state import (
     DistillationStateAccessor,
     PipelineState,
 )
+from sunnbear._core.benchmark.suites.pipeline.state.pipeline_state import _ACCESSOR_CLASSES
 from tests.benchmark.suites.pipeline.example_states import build_state_before, example_problem_ids
 
 
@@ -32,6 +33,12 @@ def test_the_state_creates_each_stages_accessor_in_run_order():
     assert type(first_accessor) is CandidateGenerationStateAccessor
     assert type(last_accessor) is DistillationStateAccessor
     assert state.finished_stage_ids == tuple(PipelineStageId)[:-1]
+
+
+def test_the_state_has_an_accessor_class_for_each_stage():
+    """The state has 1 accessor class per `PipelineStageId`."""
+    # --- act / assert -----------------
+    assert set(_ACCESSOR_CLASSES) == set(PipelineStageId)
 
 
 def test_the_state_refuses_an_accessor_out_of_run_order():

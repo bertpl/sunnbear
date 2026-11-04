@@ -69,6 +69,27 @@ _WRITES_OF_EACH_CANDIDATE: dict[str, tuple[PipelineStageId, Callable[[PipelineSt
     ),
 }
 
+# Each entry is an accessor method that registers the candidates or stores information that is not kept per
+# candidate, with the stage whose accessor has the method.
+_OTHER_WRITES: dict[str, tuple[PipelineStageId, Callable[[PipelineStateAccessor, list], None]]] = {
+    "candidates": (
+        PipelineStageId.CANDIDATE_GENERATION,
+        lambda accessor, problem_ids: accessor.add_candidates(
+            dict.fromkeys(problem_ids, IntervalBounds(a=-1.0, b=1.0))
+        ),
+    ),
+    "core_composition": (
+        PipelineStageId.CORE_SELECTION,
+        lambda accessor, problem_ids: accessor.set_core_composition(_CORE_COMPOSITION),
+    ),
+    "distilled_suite_summaries": (
+        PipelineStageId.DISTILLATION,
+        lambda accessor, problem_ids: accessor.set_distilled_suite_summaries(
+            [DistilledSuiteSummary(suite_family=SuiteFamily.BENCHMARK, size=64, diversity=1.0)]
+        ),
+    ),
+}
+
 
 @pytest.mark.parametrize("write_name", list(_WRITES_OF_EACH_CANDIDATE))
 def test_a_write_covers_exactly_the_remaining_candidates(write_name: str):
@@ -83,30 +104,12 @@ def test_a_write_covers_exactly_the_remaining_candidates(write_name: str):
     write(accessor, _PROBLEM_IDS)
 
 
-@pytest.mark.parametrize(
-    "write_name", [*_WRITES_OF_EACH_CANDIDATE, "candidates", "core_composition", "distilled_suite_summaries"]
-)
+@pytest.mark.parametrize("write_name", [*_WRITES_OF_EACH_CANDIDATE, *_OTHER_WRITES])
 def test_each_piece_of_information_is_written_once(write_name: str):
     """An accessor method refuses to write the same piece of information a second time."""
     # --- arrange ----------------------
-    if write_name == "candidates":
-        accessor = _accessor(PipelineStageId.CANDIDATE_GENERATION)
-        write = lambda accessor, problem_ids: accessor.add_candidates(  # noqa: E731
-            dict.fromkeys(problem_ids, IntervalBounds(a=-1.0, b=1.0))
-        )
-    elif write_name == "core_composition":
-        accessor = _accessor(PipelineStageId.CORE_SELECTION)
-        write = lambda accessor, problem_ids: accessor.set_core_composition(  # noqa: E731
-            _CORE_COMPOSITION
-        )
-    elif write_name == "distilled_suite_summaries":
-        accessor = _accessor(PipelineStageId.DISTILLATION)
-        write = lambda accessor, problem_ids: accessor.set_distilled_suite_summaries(  # noqa: E731
-            [DistilledSuiteSummary(suite_family=SuiteFamily.BENCHMARK, size=64, diversity=1.0)]
-        )
-    else:
-        stage_id, write = _WRITES_OF_EACH_CANDIDATE[write_name]
-        accessor = _accessor(stage_id)
+    stage_id, write = {**_WRITES_OF_EACH_CANDIDATE, **_OTHER_WRITES}[write_name]
+    accessor = _accessor(stage_id)
     write(accessor, _PROBLEM_IDS)
 
     # --- act / assert -----------------
@@ -188,7 +191,7 @@ def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_class
 
 def test_the_candidate_pool_needs_the_classes_and_the_scales():
     """Core selection's accessor gives no pool before the classes are stored, nor after full characterization kept 1
-    candidate only, which leaves it without scales."""
+    candidate only, which leaves full characterization without scales."""
     # --- arrange ----------------------
     accessor = _accessor(PipelineStageId.CORE_SELECTION)
     accessor_without_scales = build_state_before(

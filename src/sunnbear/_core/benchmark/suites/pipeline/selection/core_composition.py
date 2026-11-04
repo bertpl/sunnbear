@@ -76,17 +76,17 @@ class CoreComposition(SuiteComposition):
           of `CORE_SIZES` at which their candidates together fill a quarter of the Core, null where they fill none.
         """
         count_by_quota_classes = {quota.classes: quota.count for quota in self.quotas}
-        row: dict[str, int | bool | None] = {"core_size": self.size, "is_interim": self.is_interim}
+        summary: dict[str, int | bool | None] = {"core_size": self.size, "is_interim": self.is_interim}
         for difficulty_class in DifficultyClass:
             name = difficulty_class.value.lower()
             n_candidates = self.class_counts[difficulty_class]
-            row[f"quota_{name}"] = count_by_quota_classes.get(frozenset({difficulty_class}))
-            row[f"n_candidates_{name}"] = n_candidates
-            row[f"max_core_size_{name}"] = self._max_core_size(n_candidates, difficulty_class.core_share)
+            summary[f"quota_{name}"] = count_by_quota_classes.get(frozenset({difficulty_class}))
+            summary[f"n_candidates_{name}"] = n_candidates
+            summary[f"max_core_size_{name}"] = self._max_core_size(n_candidates, difficulty_class.core_share)
         d_classes = _CLASSES_PER_QUARTER[-1]
-        row["quota_d"] = count_by_quota_classes.get(d_classes)
-        row["max_core_size_d"] = self._max_core_size(sum(self.class_counts[c] for c in d_classes), _QUARTER)
-        return row
+        summary["quota_d"] = count_by_quota_classes.get(d_classes)
+        summary["max_core_size_d"] = self._max_core_size(sum(self.class_counts[c] for c in d_classes), _QUARTER)
+        return summary
 
     # --------------------------------------------------------------------------
     #  Helpers

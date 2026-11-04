@@ -11,7 +11,7 @@ from sunnbear._core.problems.core import ProblemId
 #  CandidateRegistry
 # ==================================================================================================
 class CandidateRegistry:
-    """A `CandidateRegistry` holds every candidate of a run, in the order of candidate generation, and its drop.
+    """A `CandidateRegistry` holds every candidate of a run, in the order in which it was added, and its drop.
 
     A dropped candidate keeps its entry, so the registry tells for every candidate which stage dropped it and why.
     """
