@@ -26,12 +26,12 @@ def test_the_candidates_are_added_formula_by_formula_in_the_given_order(formula_
 
     # --- act --------------------------
     CandidateGenerationStage(formulas).run(
-        state.create_accessor(PipelineStageId.CANDIDATE_GENERATION), worker_pool=WorkerPool(n_workers=1)
+        state.create_state_accessor(PipelineStageId.CANDIDATE_GENERATION), worker_pool=WorkerPool(n_workers=1)
     )
 
     # --- assert -----------------------
     state.finish_stage(PipelineStageId.CANDIDATE_GENERATION)
-    assert state.create_accessor(PipelineStageId.CANDIDATE_VALIDATION).interval_bounds() == {
+    assert state.create_state_accessor(PipelineStageId.CANDIDATE_VALIDATION).interval_bounds() == {
         candidate.id: IntervalBounds(a=candidate.a, b=candidate.b)
         for formula in formulas
         for candidate in formula.build_all_candidates()

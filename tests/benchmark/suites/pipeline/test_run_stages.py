@@ -69,7 +69,7 @@ class _ExampleValidationStage(PipelineStage[CandidateValidationStateAccessor]):
 
     def run(self, state_accessor: CandidateValidationStateAccessor, *, worker_pool: WorkerPool) -> None:
         """Reject the first candidate; compute the c-range of the n-th candidate in a task, as ``[-n, n]``."""
-        [rejected_problem_id, *kept_problem_ids] = state_accessor.problem_ids
+        [rejected_problem_id, *kept_problem_ids] = state_accessor.remaining_problem_ids
         state_accessor.reject(rejected_problem_id, "example_reason")
         batches = worker_pool.split_into_batches(list(range(1, len(kept_problem_ids) + 1)), group_key=lambda n: n)
         tasks = {batch_idx: _ExampleCRangeTask(positions=tuple(batch)) for batch_idx, batch in enumerate(batches)}
@@ -82,13 +82,13 @@ class _ExampleValidationStage(PipelineStage[CandidateValidationStateAccessor]):
 
 
 class _ExampleStoppingStage(PipelineStage[CoarseCharacterizationStateAccessor]):
-    """`_ExampleStoppingStage` stops the run, as a stage does whose candidates cannot give a valid result."""
+    """`_ExampleStoppingStage` stops the run, as a stage does when its candidates cannot give a valid result."""
 
     stage_id = PipelineStageId.COARSE_CHARACTERIZATION
 
     def run(self, state_accessor: CoarseCharacterizationStateAccessor, *, worker_pool: WorkerPool) -> None:
         """Raise `PipelineStopError`, which names the number of candidates."""
-        raise PipelineStopError(f"{len(state_accessor.problem_ids)} candidates are too few.")
+        raise PipelineStopError(f"{len(state_accessor.remaining_problem_ids)} candidates are too few.")
 
 
 def test_the_stages_run_in_order_and_their_manifests_are_written(tmp_path):
@@ -110,7 +110,7 @@ def test_the_stages_run_in_order_and_their_manifests_are_written(tmp_path):
     assert (generation_manifest.n_candidates_in, generation_manifest.n_candidates_out) == (0, 3)
     assert (validation_manifest.n_candidates_in, validation_manifest.n_candidates_out) == (3, 2)
     assert (generation_manifest.parameters, validation_manifest.parameters) == ({}, {"n_rejected": 1})
-    assert result.state.create_accessor(PipelineStageId.COARSE_CHARACTERIZATION).c_ranges() == {
+    assert result.state.create_state_accessor(PipelineStageId.COARSE_CHARACTERIZATION).c_ranges() == {
         _PROBLEM_IDS[1]: CRange(c_min=-1.0, c_max=1.0),
         _PROBLEM_IDS[2]: CRange(c_min=-2.0, c_max=2.0),
     }
@@ -187,6 +187,8 @@ def test_a_stage_that_runs_tasks_in_the_worker_pool_gives_the_same_information_w
 
     # --- assert -----------------------
     in_process_result, worker_processes_result = results
-    c_ranges = [result.state.create_accessor(PipelineStageId.COARSE_CHARACTERIZATION).c_ranges() for result in results]
+    c_ranges = [
+        result.state.create_state_accessor(PipelineStageId.COARSE_CHARACTERIZATION).c_ranges() for result in results
+    ]
     assert c_ranges[0] == c_ranges[1]
     assert (in_process_result.manifests[-1].n_workers, worker_processes_result.manifests[-1].n_workers) == (1, 2)

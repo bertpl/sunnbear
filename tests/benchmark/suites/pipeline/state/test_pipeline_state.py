@@ -25,8 +25,8 @@ def test_the_state_creates_each_stages_accessor_in_run_order():
     )
 
     # --- act --------------------------
-    first_accessor = PipelineState().create_accessor(PipelineStageId.CANDIDATE_GENERATION)
-    last_accessor = state.create_accessor(PipelineStageId.DISTILLATION)
+    first_accessor = PipelineState().create_state_accessor(PipelineStageId.CANDIDATE_GENERATION)
+    last_accessor = state.create_state_accessor(PipelineStageId.DISTILLATION)
 
     # --- assert -----------------------
     assert type(first_accessor) is CandidateGenerationStateAccessor
@@ -39,13 +39,13 @@ def test_the_state_refuses_an_accessor_out_of_run_order():
     refused."""
     # --- arrange ----------------------
     state = PipelineState()
-    state.create_accessor(PipelineStageId.CANDIDATE_GENERATION)
+    state.create_state_accessor(PipelineStageId.CANDIDATE_GENERATION)
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="the next stage to run is s1_candidate_generation"):
-        state.create_accessor(PipelineStageId.CANDIDATE_VALIDATION)
+        state.create_state_accessor(PipelineStageId.CANDIDATE_VALIDATION)
     with pytest.raises(ValueError, match="the next stage to run is s1_candidate_generation"):
-        state.create_accessor(PipelineStageId.CANDIDATE_GENERATION)
+        state.create_state_accessor(PipelineStageId.CANDIDATE_GENERATION)
 
 
 @pytest.mark.parametrize("is_started", [False, True], ids=["not_started", "finished_before"])
@@ -54,7 +54,7 @@ def test_a_stage_finishes_once_after_it_starts(is_started: bool):
     # --- arrange ----------------------
     state = PipelineState()
     if is_started:
-        state.create_accessor(PipelineStageId.CANDIDATE_GENERATION)
+        state.create_state_accessor(PipelineStageId.CANDIDATE_GENERATION)
         state.finish_stage(PipelineStageId.CANDIDATE_GENERATION)
 
     # --- act / assert -----------------
@@ -69,7 +69,7 @@ def test_the_state_gives_each_candidates_drop():
     state = build_state_before(PipelineStageId.CANDIDATE_VALIDATION, problem_ids)
 
     # --- act --------------------------
-    state.create_accessor(PipelineStageId.CANDIDATE_VALIDATION).reject(problem_ids[0], "bound_to_width_ratio")
+    state.create_state_accessor(PipelineStageId.CANDIDATE_VALIDATION).reject(problem_ids[0], "bound_to_width_ratio")
 
     # --- assert -----------------------
     assert state.drop_of(problem_ids[0]) == CandidateDrop(

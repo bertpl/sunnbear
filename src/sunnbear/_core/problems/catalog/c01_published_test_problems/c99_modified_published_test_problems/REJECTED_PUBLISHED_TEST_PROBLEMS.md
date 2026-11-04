@@ -8,7 +8,7 @@ The validation stage of the benchmark suite pipeline, `sunnbear._core.benchmark.
 
 `ModifiedPublishedTestProblems` states the rules of subcategory 1.99, and the docstring of each formula of subcategory 1.99 describes the formula's modification in full. The table names the modification in short, and marks the modifications that change what the test problem tests.
 
-The column "Rejection reason" holds the reason with which the validation stage rejects the candidate; the module of the check that rejects it describes each reason.
+The column "Rejection reason" holds the reason with which the validation stage rejects the candidate.
 
 Which test problems the validation stage rejects depends on:
 

@@ -1,5 +1,5 @@
-"""`CandidateRegistry` keeps every candidate in the order it was added, with the drop of each dropped one, and refuses
-to add a candidate twice or to drop a candidate that is not remaining."""
+"""`CandidateRegistry` keeps every candidate in the order in which it was added, with the drop of each dropped one,
+and refuses to add a candidate twice or to drop a candidate that is not remaining."""
 
 import pytest
 
@@ -43,8 +43,12 @@ def test_the_registry_holds_each_candidate_once(is_added_before: bool):
         registry.add(problem_ids if is_added_before else [problem_ids[0], problem_ids[0]])
 
 
-@pytest.mark.parametrize("is_dropped_before", [False, True], ids=["unknown", "dropped_before"])
-def test_only_a_remaining_candidate_can_be_dropped(is_dropped_before: bool):
+@pytest.mark.parametrize(
+    "is_dropped_before, message",
+    [(False, "not a candidate of the registry"), (True, "dropped already")],
+    ids=["unknown", "dropped_before"],
+)
+def test_only_a_remaining_candidate_can_be_dropped(is_dropped_before: bool, message: str):
     """Dropping a candidate that the registry does not hold, or one dropped before, is refused."""
     # --- arrange ----------------------
     registry = CandidateRegistry()
@@ -54,5 +58,5 @@ def test_only_a_remaining_candidate_can_be_dropped(is_dropped_before: bool):
         registry.record_drop(problem_id, _DROP)
 
     # --- act / assert -----------------
-    with pytest.raises(ValueError, match="not a candidate that no stage has dropped"):
+    with pytest.raises(ValueError, match=message):
         registry.record_drop(problem_id if is_dropped_before else unknown_problem_id, _DROP)

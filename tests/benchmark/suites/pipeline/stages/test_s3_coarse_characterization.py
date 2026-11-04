@@ -42,7 +42,7 @@ def _characterize(
         c_range=CRange(c_min=-0.5, c_max=0.5),
     )
     calls = record_calls(monkeypatch, CoarseCharacterizationStateAccessor, "set_characterization_results")
-    stage.run(state.create_accessor(stage.stage_id), worker_pool=WorkerPool(n_workers=1))
+    stage.run(state.create_state_accessor(stage.stage_id), worker_pool=WorkerPool(n_workers=1))
     [(results,)] = calls
     return state, results
 
@@ -81,7 +81,7 @@ def test_the_stage_stores_each_configs_incorrect_solves_per_candidate(isolated_f
 
     # --- assert -----------------------
     n_solves = FeatureFidelity.COARSE.solver_mc_size
-    assert results.n_incorrect_solves == {
+    assert results.n_incorrect_solves_per_config == {
         ProblemId.from_string("f99.973"): (0,) * len(stage.definition.solver_ids),
         ProblemId.from_string("f99.974"): tuple(
             n_solves if solver_id == "illinois" else 0 for solver_id in stage.definition.solver_ids
@@ -111,9 +111,9 @@ def test_the_stage_gives_the_same_results_with_1_or_2_workers():
                 CandidateValidationStage(),
                 CoarseCharacterizationStage(core_solver_configs),
             ]:
-                stage.run(state.create_accessor(stage.stage_id), worker_pool=worker_pool)
+                stage.run(state.create_state_accessor(stage.stage_id), worker_pool=worker_pool)
                 state.finish_stage(stage.stage_id)
-        spacing_accessors.append(state.create_accessor(PipelineStageId.SPACING))
+        spacing_accessors.append(state.create_state_accessor(PipelineStageId.SPACING))
 
     # --- assert -----------------------
     in_process_matrix, worker_processes_matrix = (

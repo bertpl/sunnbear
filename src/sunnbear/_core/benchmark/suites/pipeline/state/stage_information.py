@@ -1,11 +1,11 @@
-"""The value objects in which the stages of the benchmark suite pipeline hand their information to the state.
+"""The value objects of this module carry each pipeline stage's information to and from the stage's state accessor.
 
 Each stage's state accessor takes and gives the stage's information in these objects and in plain mappings keyed by
-`ProblemId`; the information of the other stages is in objects of other packages, such as `CRange`, `DifficultyClass`
-and `CoreComposition`.
+`ProblemId`; a stage whose information has a type of its own in another package, such as `CRange`, `DifficultyClass`
+or `CoreComposition`, uses that type.
 """
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import NamedTuple
 
@@ -41,16 +41,23 @@ class CharacterizationResults:
         fidelity: The `FeatureFidelity` of the stage's solves and analyses.
         raw_feature_matrix: The raw features of each kept candidate.
         block_scales: The scale of each block over the kept candidates; ``None`` when the stage keeps fewer than 2.
-        n_incorrect_solves: For each kept candidate, the number of solves without a correct answer of each core
-            solver config, in the order of `definition.solver_ids`. Each config solves each candidate
-            `fidelity.solver_mc_size` times.
+        n_incorrect_solves_per_config: For each kept candidate, 1 count per core solver config, in the order of
+            `definition.solver_ids`: the number of that config's solves that gave no correct answer. Each config
+            solves each candidate `fidelity.solver_mc_size` times.
     """
 
     definition: DiversityFeatureFactory
     fidelity: FeatureFidelity
     raw_feature_matrix: FeatureMatrix
     block_scales: FeatureBlockScales | None
-    n_incorrect_solves: Mapping[ProblemId, tuple[int, ...]]
+    n_incorrect_solves_per_config: Mapping[ProblemId, tuple[int, ...]]
+
+    def build_scaled_feature_matrix(self, problem_ids: Sequence[ProblemId]) -> FeatureMatrix | None:
+        """Return the scaled features of the candidates `problem_ids`; ``None`` when the stage has no block scales."""
+        if self.block_scales is None:
+            return None
+        else:
+            return self.definition.build_scaled_matrix(self.raw_feature_matrix.subset(problem_ids), self.block_scales)
 
 
 # ==================================================================================================
@@ -58,11 +65,11 @@ class CharacterizationResults:
 # ==================================================================================================
 @dataclass(frozen=True)
 class NearestKeptCandidate:
-    """A `NearestKeptCandidate` names the kept candidate of the same formula nearest to a candidate that spacing drops.
+    """For a candidate that spacing drops, `NearestKeptCandidate` names the nearest kept candidate of the same formula.
 
     Attributes:
         problem_id: The id of the nearest kept candidate.
-        distance: The distance between the 2 candidates, in the units of spacing's minimum distance.
+        distance: The distance between the 2 candidates, as a multiple of spacing's minimum distance.
     """
 
     problem_id: ProblemId
@@ -87,11 +94,11 @@ class SuiteMembership:
 
 
 # ==================================================================================================
-#  DistilledSuite
+#  DistilledSuiteSummary
 # ==================================================================================================
 @dataclass(frozen=True)
-class DistilledSuite:
-    """A `DistilledSuite` describes 1 suite that distillation selects.
+class DistilledSuiteSummary:
+    """A `DistilledSuiteSummary` gives the family, size and diversity score of 1 suite that distillation selects.
 
     Attributes:
         suite_family: The suite's `SuiteFamily`.

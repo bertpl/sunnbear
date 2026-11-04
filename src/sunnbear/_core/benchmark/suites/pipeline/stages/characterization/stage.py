@@ -21,10 +21,15 @@ from .task import CandidateCharacterizationResult, CandidateCharacterizationTask
 class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccessor](PipelineStage[StateAccessorT]):
     """`CandidateCharacterizationStage` computes the candidates' raw features, and rejects those whose solves fail.
 
-    The stage stores, as `CharacterizationResults`, the raw features of the candidates that it keeps, the scale of each
-    block of the features over them, and their incorrect solves per core solver config. An incorrect solve counts as
-    `max_fevals` in `n_fevals_eff`, from which the solvers block is computed, so the counts show how much each config's
-    incorrect solves affect the features; they never reject a candidate.
+    The stage stores, as `CharacterizationResults`, for the candidates that it keeps:
+
+    - their raw features;
+    - the scale of each block of the features over them;
+    - their incorrect solves per core solver config.
+
+    An incorrect solve counts as `max_fevals` in `n_fevals_eff`, from which the solvers block is computed. The counts of
+    incorrect solves therefore show how much each config's incorrect solves affect the features; the counts never
+    reject a candidate.
 
     A candidate is rejected when 1 of its solves ends with `SolveStatus.FUNCTION_ERROR`, or when snuffled's diagnostics
     reject it at 1 of its analyses, by the rules of `extract_properties_or_rejection_reason`.
@@ -55,7 +60,10 @@ class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccess
         return {"fidelity": self.fidelity.name}
 
     def run(self, state_accessor: StateAccessorT, *, worker_pool: WorkerPool) -> None:
-        """Characterize the candidates, reject those whose solves or analyses fail, and store the results."""
+        """Characterize the candidates, reject those whose solves or analyses fail, and store the results.
+
+        The candidates are characterized in `CandidateCharacterizationTask` tasks on `worker_pool`.
+        """
         self._characterize(state_accessor, worker_pool=worker_pool)
 
     # --------------------------------------------------------------------------
@@ -64,11 +72,7 @@ class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccess
     def _characterize(
         self, state_accessor: StateAccessorT, *, worker_pool: WorkerPool
     ) -> dict[ProblemId, CandidateCharacterizationResult]:
-        """Characterize the candidates as `run` describes it, and return the result of each kept candidate.
-
-        The candidates are characterized in `CandidateCharacterizationTask` tasks on `worker_pool`, by
-        `_run_in_formula_batches`.
-        """
+        """Characterize the candidates as `run` describes it, and return the result of each kept candidate."""
         # --- characterize, in the worker pool ---
         c_ranges = state_accessor.c_ranges()
         results_by_problem_id = self._run_in_formula_batches(
@@ -102,7 +106,7 @@ class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccess
                 fidelity=self.fidelity,
                 raw_feature_matrix=raw_feature_matrix,
                 block_scales=self.definition.fit_block_scales(raw_feature_matrix),
-                n_incorrect_solves={
+                n_incorrect_solves_per_config={
                     problem_id: result.n_incorrect_solves_per_config for problem_id, result in kept_results.items()
                 },
             )

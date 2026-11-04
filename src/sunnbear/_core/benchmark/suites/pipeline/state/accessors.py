@@ -1,12 +1,12 @@
-"""The state accessors, 1 class per stage of the benchmark suite pipeline: all that a stage sees of the state.
+"""This module defines the state accessors, 1 class per stage of the benchmark suite pipeline.
 
-`PipelineStateAccessor` is the base class of every accessor. An accessor reads and writes the `PipelineStateStorage` of
-the run, and is the contract that its stage adheres to:
+A stage sees the state only through its accessor. `PipelineStateAccessor` is the base class of every accessor. An
+accessor reads and writes the `PipelineStateStorage` of the run, and is the contract that its stage adheres to:
 
 - it gives the ids of the candidates that no stage has dropped, and the information of earlier stages on those
   candidates only;
-- it writes its stage's information once, and refuses information on any other set of candidates than the one that
-  the write's docstring names;
+- it writes its stage's information once, and raises `ValueError` when that information covers other candidates than
+  the ones that the writing method's docstring names;
 - it takes its stage's drops, through `PipelineStateAccessor.reject` for an invalid candidate and
   `PipelineStateAccessor.drop` for a valid one that the stage does not keep.
 
@@ -26,7 +26,7 @@ from sunnbear._core.problems.core import ProblemId
 from .candidate_registry import CandidateDrop
 from .stage_information import (
     CharacterizationResults,
-    DistilledSuite,
+    DistilledSuiteSummary,
     IntervalBounds,
     NearestKeptCandidate,
     SuiteMembership,
@@ -51,9 +51,9 @@ class PipelineStateAccessor:
         self._storage = storage
 
     @property
-    def problem_ids(self) -> tuple[ProblemId, ...]:
+    def remaining_problem_ids(self) -> tuple[ProblemId, ...]:
         """Return the ids of the candidates that no stage has dropped, in the order of candidate generation."""
-        return self._storage.registry.remaining_problem_ids
+        return self._storage.candidate_registry.remaining_problem_ids
 
     def reject(self, problem_id: ProblemId, reason: str) -> None:
         """Drop the candidate `problem_id` as invalid, for `reason`.
@@ -76,7 +76,7 @@ class PipelineStateAccessor:
     # --------------------------------------------------------------------------
     def _record_drop(self, problem_id: ProblemId, reason: str, *, is_rejection: bool) -> None:
         """Record the drop of `problem_id` by this accessor's stage."""
-        self._storage.registry.record_drop(
+        self._storage.candidate_registry.record_drop(
             problem_id, CandidateDrop(stage_id=self.stage_id, reason=reason, is_rejection=is_rejection)
         )
 
@@ -89,30 +89,30 @@ class PipelineStateAccessor:
         if is_written:
             raise ValueError(f"{type(self).__name__} writes each piece of its stage's information once.")
 
-    def _check_covers(self, problem_ids: Collection[ProblemId], expected: Collection[ProblemId]) -> None:
-        """Check that a write's information covers the candidates `expected`, no more and no fewer.
+    def _check_covers(self, problem_ids: Collection[ProblemId], expected_problem_ids: Collection[ProblemId]) -> None:
+        """Check that the information to be written covers the candidates `expected_problem_ids`, no more and no fewer.
 
         Raises:
-            ValueError: If `problem_ids` differs from `expected`.
+            ValueError: If `problem_ids` differs from `expected_problem_ids`.
         """
-        n_unexpected = len(set(problem_ids) - set(expected))
-        n_missing = len(set(expected) - set(problem_ids))
+        n_unexpected = len(set(problem_ids) - set(expected_problem_ids))
+        n_missing = len(set(expected_problem_ids) - set(problem_ids))
         if n_unexpected or n_missing:
             raise ValueError(
-                f"{type(self).__name__} takes information on {len(expected)} candidates: {n_unexpected} other "
-                f"candidates given, {n_missing} missing."
+                f"{type(self).__name__} takes information on {len(expected_problem_ids)} candidates: {n_unexpected} "
+                f"other candidates given, {n_missing} missing."
             )
 
     def _restrict_to_remaining[V](self, information: Mapping[ProblemId, V]) -> dict[ProblemId, V]:
-        """Return the entries of `information` of the candidates that no stage has dropped, in their order."""
-        return {problem_id: information[problem_id] for problem_id in self.problem_ids}
+        """Return the entries of `information` for the candidates that no stage has dropped, in the registry's order."""
+        return {problem_id: information[problem_id] for problem_id in self.remaining_problem_ids}
 
 
 # ==================================================================================================
 #  CandidateGenerationStateAccessor
 # ==================================================================================================
 class CandidateGenerationStateAccessor(PipelineStateAccessor):
-    """`CandidateGenerationStateAccessor` takes the run's candidates."""
+    """`CandidateGenerationStateAccessor` registers the run's candidates."""
 
     stage_id = PipelineStageId.CANDIDATE_GENERATION
 
@@ -123,7 +123,7 @@ class CandidateGenerationStateAccessor(PipelineStateAccessor):
             ValueError: If the candidates were added before.
         """
         self._check_written_once(is_written=self._storage.interval_bounds is not None)
-        self._storage.registry.add(list(interval_bounds))
+        self._storage.candidate_registry.add(list(interval_bounds))
         self._storage.interval_bounds = dict(interval_bounds)
 
 
@@ -136,17 +136,19 @@ class CandidateValidationStateAccessor(PipelineStateAccessor):
     stage_id = PipelineStageId.CANDIDATE_VALIDATION
 
     def interval_bounds(self) -> dict[ProblemId, IntervalBounds]:
-        """Return each candidate's interval bounds."""
+        """Return the interval bounds of each candidate that no stage has dropped."""
         return self._restrict_to_remaining(self._storage.interval_bounds or {})
 
     def set_c_ranges(self, c_ranges: Mapping[ProblemId, CRange]) -> None:
-        """Store the c-range of each candidate that no stage has dropped, after the stage's rejections.
+        """Store the c-range of each candidate that no stage has dropped.
+
+        The stage calls this after it has recorded its rejections.
 
         Raises:
             ValueError: If the c-ranges were stored before, or do not cover exactly those candidates.
         """
         self._check_written_once(is_written=self._storage.c_ranges is not None)
-        self._check_covers(c_ranges.keys(), self.problem_ids)
+        self._check_covers(c_ranges.keys(), self.remaining_problem_ids)
         self._storage.c_ranges = self._restrict_to_remaining(c_ranges)
 
 
@@ -157,20 +159,22 @@ class CharacterizationStateAccessor(PipelineStateAccessor):
     """`CharacterizationStateAccessor` gives the candidates' c-ranges, and takes a characterization stage's results."""
 
     def c_ranges(self) -> dict[ProblemId, CRange]:
-        """Return each candidate's c-range."""
+        """Return the c-range of each candidate that no stage has dropped."""
         return self._restrict_to_remaining(self._storage.c_ranges or {})
 
     def set_characterization_results(self, results: CharacterizationResults) -> None:
-        """Store the stage's results on each candidate that no stage has dropped, after the stage's rejections.
+        """Store the stage's results on each candidate that no stage has dropped.
+
+        The stage calls this after it has recorded its rejections.
 
         Raises:
             ValueError: If the results were stored before, or their raw features or incorrect solves do not cover
                 exactly those candidates.
         """
-        self._check_written_once(is_written=self.stage_id in self._storage.characterizations)
-        self._check_covers(results.raw_feature_matrix.problem_ids, self.problem_ids)
-        self._check_covers(results.n_incorrect_solves.keys(), self.problem_ids)
-        self._storage.characterizations[self.stage_id] = results
+        self._check_written_once(is_written=self.stage_id in self._storage.characterization_results)
+        self._check_covers(results.raw_feature_matrix.problem_ids, self.remaining_problem_ids)
+        self._check_covers(results.n_incorrect_solves_per_config.keys(), self.remaining_problem_ids)
+        self._storage.characterization_results[self.stage_id] = results
 
 
 # ==================================================================================================
@@ -195,21 +199,22 @@ class SpacingStateAccessor(PipelineStateAccessor):
 
         Coarse characterization has no scales when it kept fewer than 2 candidates.
         """
-        results = self._storage.characterizations[PipelineStageId.COARSE_CHARACTERIZATION]
-        if results.block_scales is None:
-            return None
-        else:
-            raw_feature_matrix = results.raw_feature_matrix.subset(self.problem_ids)
-            return results.definition.build_scaled_matrix(raw_feature_matrix, results.block_scales)
+        results = self._storage.characterization_results[PipelineStageId.COARSE_CHARACTERIZATION]
+        return results.build_scaled_feature_matrix(self.remaining_problem_ids)
 
     def set_nearest_kept_candidates(self, nearest_kept_candidates: Mapping[ProblemId, NearestKeptCandidate]) -> None:
-        """Store the nearest kept candidate of each candidate that the stage dropped, after the stage's drops.
+        """Store the nearest kept candidate of each candidate that the stage dropped.
+
+        The stage calls this after it has recorded its drops.
 
         Raises:
-            ValueError: If they were stored before, or do not cover exactly the candidates that the stage dropped.
+            ValueError: If the nearest kept candidates were stored before, or do not cover exactly the candidates that
+                the stage dropped.
         """
         self._check_written_once(is_written=self._storage.nearest_kept_candidates is not None)
-        self._check_covers(nearest_kept_candidates.keys(), self._storage.registry.problem_ids_dropped_by(self.stage_id))
+        self._check_covers(
+            nearest_kept_candidates.keys(), self._storage.candidate_registry.problem_ids_dropped_by(self.stage_id)
+        )
         self._storage.nearest_kept_candidates = dict(nearest_kept_candidates)
 
 
@@ -222,13 +227,15 @@ class FullCharacterizationStateAccessor(CharacterizationStateAccessor):
     stage_id = PipelineStageId.FULL_CHARACTERIZATION
 
     def set_edis(self, edis: Mapping[ProblemId, float]) -> None:
-        """Store the EDI of each candidate that no stage has dropped, after the stage's rejections.
+        """Store the EDI of each candidate that no stage has dropped.
+
+        The stage calls this after it has recorded its rejections.
 
         Raises:
             ValueError: If the EDIs were stored before, or do not cover exactly those candidates.
         """
         self._check_written_once(is_written=self._storage.edis is not None)
-        self._check_covers(edis.keys(), self.problem_ids)
+        self._check_covers(edis.keys(), self.remaining_problem_ids)
         self._storage.edis = self._restrict_to_remaining(edis)
 
 
@@ -236,24 +243,26 @@ class FullCharacterizationStateAccessor(CharacterizationStateAccessor):
 #  SelectionStateAccessor
 # ==================================================================================================
 class SelectionStateAccessor(PipelineStateAccessor):
-    """`SelectionStateAccessor` gives the candidates of a selection by max-div, as a `CandidatePool`."""
+    """`SelectionStateAccessor` gives the candidates that max-div selects from, as a `CandidatePool`."""
 
     def candidate_pool(self) -> CandidatePool:
-        """Return the pool of the candidates that no stage has dropped: their scaled full features, EDIs and classes.
+        """Return the pool of the candidates that no stage has dropped.
+
+        The pool holds their scaled features from full characterization, their EDIs and their difficulty classes.
 
         Raises:
             ValueError: If the difficulty classes are not stored yet, or full characterization has no scales, because
                 it kept fewer than 2 candidates.
         """
-        results = self._storage.characterizations[PipelineStageId.FULL_CHARACTERIZATION]
+        results = self._storage.characterization_results[PipelineStageId.FULL_CHARACTERIZATION]
+        scaled_feature_matrix = results.build_scaled_feature_matrix(self.remaining_problem_ids)
         if self._storage.difficulty_classes is None:
             raise ValueError("The candidate pool needs the difficulty classes, which core selection stores.")
-        elif results.block_scales is None:
+        elif scaled_feature_matrix is None:
             raise ValueError("The candidate pool needs the scales of full characterization, which has none.")
         else:
-            raw_feature_matrix = results.raw_feature_matrix.subset(self.problem_ids)
-            return CandidatePool.from_candidates(
-                results.definition.build_scaled_matrix(raw_feature_matrix, results.block_scales),
+            return CandidatePool.from_feature_matrix(
+                scaled_feature_matrix,
                 edis=self._storage.edis or {},
                 difficulty_classes=self._storage.difficulty_classes,
             )
@@ -268,17 +277,19 @@ class CoreSelectionStateAccessor(SelectionStateAccessor):
     stage_id = PipelineStageId.CORE_SELECTION
 
     def edis(self) -> dict[ProblemId, float]:
-        """Return each candidate's EDI."""
+        """Return the EDI of each candidate that no stage has dropped."""
         return self._restrict_to_remaining(self._storage.edis or {})
 
     def set_difficulty_classes(self, difficulty_classes: Mapping[ProblemId, DifficultyClass]) -> None:
-        """Store the class of each candidate that no stage has dropped, before the stage's drops.
+        """Store the class of each candidate that no stage has dropped.
+
+        The stage calls this before it records its drops.
 
         Raises:
             ValueError: If the classes were stored before, or do not cover exactly those candidates.
         """
         self._check_written_once(is_written=self._storage.difficulty_classes is not None)
-        self._check_covers(difficulty_classes.keys(), self.problem_ids)
+        self._check_covers(difficulty_classes.keys(), self.remaining_problem_ids)
         self._storage.difficulty_classes = self._restrict_to_remaining(difficulty_classes)
 
     def set_core_composition(self, core_composition: CoreComposition) -> None:
@@ -317,14 +328,17 @@ class DistillationStateAccessor(SelectionStateAccessor):
             ValueError: If the memberships were stored before, or do not cover exactly those candidates.
         """
         self._check_written_once(is_written=self._storage.suite_memberships is not None)
-        self._check_covers(suite_memberships.keys(), self.problem_ids)
+        self._check_covers(suite_memberships.keys(), self.remaining_problem_ids)
         self._storage.suite_memberships = self._restrict_to_remaining(suite_memberships)
 
-    def set_distilled_suites(self, distilled_suites: Sequence[DistilledSuite]) -> None:
-        """Store the distilled suites, the benchmark suites first, each family from its largest suite down.
+    def set_distilled_suite_summaries(self, distilled_suite_summaries: Sequence[DistilledSuiteSummary]) -> None:
+        """Store the summaries of the distilled suites.
+
+        The summaries list the benchmark suites before the calibration suites, and within each family the suites from
+        largest to smallest.
 
         Raises:
-            ValueError: If the suites were stored before.
+            ValueError: If the summaries were stored before.
         """
-        self._check_written_once(is_written=self._storage.distilled_suites is not None)
-        self._storage.distilled_suites = tuple(distilled_suites)
+        self._check_written_once(is_written=self._storage.distilled_suite_summaries is not None)
+        self._storage.distilled_suite_summaries = tuple(distilled_suite_summaries)

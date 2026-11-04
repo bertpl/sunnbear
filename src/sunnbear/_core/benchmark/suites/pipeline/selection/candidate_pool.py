@@ -19,10 +19,8 @@ from .difficulty_class import DifficultyClass
 class CandidatePool:
     """A `CandidatePool` holds the input candidates of `select_diverse_suite`, each with its features, EDI and class.
 
-    The EDIs and the classes follow the rows of `feature_matrix`, so each candidate's id comes with all 3.
-
     Attributes:
-        feature_matrix: The candidates' scaled full feature vectors, with their ids.
+        feature_matrix: The candidates' scaled feature vectors from full characterization, with their ids.
         edis: Each candidate's empirical difficulty index (EDI), in the order of `feature_matrix`'s rows.
         difficulty_classes: Each candidate's class, in the order of `feature_matrix`'s rows.
     """
@@ -31,19 +29,13 @@ class CandidatePool:
     edis: np.ndarray
     difficulty_classes: tuple[DifficultyClass, ...]
 
-    @property
-    def problem_ids(self) -> tuple[ProblemId, ...]:
-        """Return the candidates' ids, in the order of `feature_matrix`'s rows."""
-        return self.feature_matrix.problem_ids
-
     def subset(self, problem_ids: Sequence[ProblemId]) -> Self:
         """Return the pool of the candidates `problem_ids`, in their order.
 
         Raises:
             KeyError: If 1 of `problem_ids` is not in the pool.
         """
-        row_by_problem_id = {problem_id: row for row, problem_id in enumerate(self.problem_ids)}
-        rows = [row_by_problem_id[problem_id] for problem_id in problem_ids]
+        rows = [self.feature_matrix.row_index_by_problem_id[problem_id] for problem_id in problem_ids]
         return type(self)(
             feature_matrix=self.feature_matrix.subset(problem_ids),
             edis=self.edis[rows],
@@ -54,7 +46,7 @@ class CandidatePool:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def from_candidates(
+    def from_feature_matrix(
         cls,
         feature_matrix: FeatureMatrix,
         *,

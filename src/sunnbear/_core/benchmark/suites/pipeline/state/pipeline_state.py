@@ -36,12 +36,14 @@ _ACCESSOR_CLASSES: dict[PipelineStageId, type[PipelineStateAccessor]] = {
 class PipelineState:
     """A `PipelineState` holds every candidate of a run, and each stage's information on the candidates.
 
-    The state is mutable, and a run keeps 1 for all its stages. Each stage reaches it only through the state accessor
-    that `create_accessor` makes for it. The stages run in the order of `PipelineStageId`, so the state makes a stage's
-    accessor only once every earlier stage has finished, and the stage then finds the information of all of them.
+    The state is mutable, and a run keeps 1 for all its stages. Each stage reaches the state only through the state
+    accessor that `create_state_accessor` makes for it.
+
+    The stages run in the order of `PipelineStageId`, so the state makes a stage's accessor only once every earlier
+    stage has finished, and the stage then finds the information of all of them.
 
     A candidate that a stage drops keeps its entry in the state, with the stage, the reason, and whether the drop is a
-    rejection; the later stages no longer see it.
+    rejection; the later stages no longer see the candidate.
     """
 
     def __init__(self) -> None:
@@ -53,7 +55,7 @@ class PipelineState:
     @property
     def n_remaining_candidates(self) -> int:
         """Return the number of candidates that no stage has dropped."""
-        return len(self._storage.registry.remaining_problem_ids)
+        return len(self._storage.candidate_registry.remaining_problem_ids)
 
     @property
     def finished_stage_ids(self) -> tuple[PipelineStageId, ...]:
@@ -66,9 +68,9 @@ class PipelineState:
         Raises:
             KeyError: If `problem_id` is not a candidate of the run.
         """
-        return self._storage.registry.drop_of(problem_id)
+        return self._storage.candidate_registry.drop_of(problem_id)
 
-    def create_accessor(self, stage_id: PipelineStageId) -> PipelineStateAccessor:
+    def create_state_accessor(self, stage_id: PipelineStageId) -> PipelineStateAccessor:
         """Return the state accessor of the stage `stage_id`, which the stage then runs on.
 
         Raises:

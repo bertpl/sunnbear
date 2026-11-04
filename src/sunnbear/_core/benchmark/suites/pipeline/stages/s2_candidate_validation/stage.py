@@ -26,7 +26,7 @@ class CandidateValidationStage(PipelineStage[CandidateValidationStateAccessor]):
         """Reject each candidate at its first failed check, then store the c-range of each candidate that passes.
 
         The checks run in order, and each runs only on the candidates that passed the checks before it. The checks
-        that evaluate f run in `FunctionEvaluatingChecksTask` tasks on `worker_pool`, by `_run_in_formula_batches`.
+        that evaluate f run in `FunctionEvaluatingChecksTask` tasks on `worker_pool`.
         """
         # --- the bound-to-width ratio check -----
         interval_bounds = state_accessor.interval_bounds()

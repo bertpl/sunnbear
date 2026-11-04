@@ -12,7 +12,11 @@ from sunnbear._core.benchmark.suites.pipeline.selection import (
     SuiteFamily,
     select_diverse_suite,
 )
-from sunnbear._core.benchmark.suites.pipeline.state import DistillationStateAccessor, DistilledSuite, SuiteMembership
+from sunnbear._core.benchmark.suites.pipeline.state import (
+    DistillationStateAccessor,
+    DistilledSuiteSummary,
+    SuiteMembership,
+)
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 if TYPE_CHECKING:
@@ -54,7 +58,7 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
         return {"sec_per_candidate": self.sec_per_candidate, "seed": self.seed}
 
     def run(self, state_accessor: DistillationStateAccessor, *, worker_pool: WorkerPool) -> None:
-        """Distill the suites from the Core, and store each Core member's place in them and each suite's score.
+        """Distill the suites from the Core, and store each member's `SuiteMembership` and each suite's summary.
 
         max-div uses the number of workers of `worker_pool`, but starts its own worker processes, so the pool's
         workers stay idle.
@@ -71,20 +75,22 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
         )
         largest_benchmark_problem_ids = set(largest_benchmark_suite.problem_ids)
         largest_calibration_problem_ids = tuple(
-            problem_id for problem_id in core_pool.problem_ids if problem_id not in largest_benchmark_problem_ids
+            problem_id
+            for problem_id in core_pool.feature_matrix.problem_ids
+            if problem_id not in largest_benchmark_problem_ids
         )
 
         # --- halvings ---------------------------
         suite_memberships: dict[ProblemId, SuiteMembership] = {}
-        distilled_suites: list[DistilledSuite] = []
+        distilled_suite_summaries: list[DistilledSuiteSummary] = []
         for family, largest_suite_problem_ids, largest_suite_diversity in [
             (SuiteFamily.BENCHMARK, largest_benchmark_suite.problem_ids, largest_benchmark_suite.diversity),
             # No max-div run selects the largest calibration suite, so it has no diversity score.
             (SuiteFamily.CALIBRATION, largest_calibration_problem_ids, None),
         ]:
             smallest_containing_suite_sizes = dict.fromkeys(largest_suite_problem_ids, largest_suite_composition.size)
-            distilled_suites.append(
-                DistilledSuite(
+            distilled_suite_summaries.append(
+                DistilledSuiteSummary(
                     suite_family=family, size=len(largest_suite_problem_ids), diversity=largest_suite_diversity
                 )
             )
@@ -96,8 +102,8 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
                 )
                 suite_problem_ids = suite.problem_ids
                 smallest_containing_suite_sizes.update(dict.fromkeys(suite_problem_ids, composition.size))
-                distilled_suites.append(
-                    DistilledSuite(suite_family=family, size=len(suite_problem_ids), diversity=suite.diversity)
+                distilled_suite_summaries.append(
+                    DistilledSuiteSummary(suite_family=family, size=len(suite_problem_ids), diversity=suite.diversity)
                 )
             suite_memberships.update(
                 {
@@ -106,7 +112,7 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
                 }
             )
         state_accessor.set_suite_memberships(suite_memberships)
-        state_accessor.set_distilled_suites(distilled_suites)
+        state_accessor.set_distilled_suite_summaries(distilled_suite_summaries)
 
     # --------------------------------------------------------------------------
     #  Helpers

@@ -30,10 +30,6 @@ class CandidateRegistry:
         """Return the ids of the candidates that no stage has dropped, in the order in which they were added."""
         return tuple(problem_id for problem_id, drop in self._drop_by_problem_id.items() if drop is None)
 
-    def is_remaining(self, problem_id: ProblemId) -> bool:
-        """Return whether `problem_id` is a candidate that no stage has dropped."""
-        return problem_id in self._drop_by_problem_id and self._drop_by_problem_id[problem_id] is None
-
     def drop_of(self, problem_id: ProblemId) -> "CandidateDrop | None":
         """Return the drop of the candidate `problem_id`, or ``None`` if no stage has dropped it.
 
@@ -65,10 +61,12 @@ class CandidateRegistry:
         """Record that a stage dropped the candidate `problem_id`.
 
         Raises:
-            ValueError: If `problem_id` is not a candidate that no stage has dropped.
+            ValueError: If `problem_id` is not a candidate of the registry, or a stage has dropped it already.
         """
-        if not self.is_remaining(problem_id):
-            raise ValueError(f"{problem_id} is not a candidate that no stage has dropped.")
+        if problem_id not in self._drop_by_problem_id:
+            raise ValueError(f"{problem_id} is not a candidate of the registry.")
+        elif self._drop_by_problem_id[problem_id] is not None:
+            raise ValueError(f"{problem_id} is a candidate that a stage has dropped already.")
         else:
             self._drop_by_problem_id[problem_id] = drop
 

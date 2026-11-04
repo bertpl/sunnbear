@@ -18,9 +18,9 @@ def _validate(formulas: Sequence[Formula], worker_pool: WorkerPool) -> tuple[Pip
     """Return the state after generation and validation of `formulas`' candidates, and the stored c-ranges."""
     state = PipelineState()
     for stage in [CandidateGenerationStage(formulas), CandidateValidationStage()]:
-        stage.run(state.create_accessor(stage.stage_id), worker_pool=worker_pool)
+        stage.run(state.create_state_accessor(stage.stage_id), worker_pool=worker_pool)
         state.finish_stage(stage.stage_id)
-    return state, state.create_accessor(PipelineStageId.COARSE_CHARACTERIZATION).c_ranges()
+    return state, state.create_state_accessor(PipelineStageId.COARSE_CHARACTERIZATION).c_ranges()
 
 
 def test_the_stage_rejects_a_candidate_at_each_check_and_keeps_the_valid_one(isolated_formula_registry):

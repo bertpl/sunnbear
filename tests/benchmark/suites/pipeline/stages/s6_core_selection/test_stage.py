@@ -31,7 +31,7 @@ def _select_core(edis: list[float], stage: CoreSelectionStage) -> PipelineState:
     state = build_state_before(
         PipelineStageId.CORE_SELECTION, problem_ids, edis=dict(zip(problem_ids, edis, strict=True))
     )
-    stage.run(state.create_accessor(PipelineStageId.CORE_SELECTION), worker_pool=_TWO_WORKER_POOL)
+    stage.run(state.create_state_accessor(PipelineStageId.CORE_SELECTION), worker_pool=_TWO_WORKER_POOL)
     state.finish_stage(PipelineStageId.CORE_SELECTION)
     return state
 
@@ -48,7 +48,7 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
     state = _select_core(edis, CoreSelectionStage(_SEC_PER_CANDIDATE))
 
     # --- assert -----------------------
-    distillation_accessor = state.create_accessor(PipelineStageId.DISTILLATION)
+    distillation_accessor = state.create_state_accessor(PipelineStageId.DISTILLATION)
     core_classes = Counter(distillation_accessor.candidate_pool().difficulty_classes)
     assert core_classes == {
         DifficultyClass.A: 32,
@@ -82,7 +82,9 @@ def test_the_stage_fills_a_shared_quota_and_records_its_parameters():
         state = _select_core([5.0] * 40 + [15.0] * 40 + [30.0] * 40 + [60.0] * 40, stage)
 
     # --- assert -----------------------
-    core_classes = Counter(state.create_accessor(PipelineStageId.DISTILLATION).candidate_pool().difficulty_classes)
+    core_classes = Counter(
+        state.create_state_accessor(PipelineStageId.DISTILLATION).candidate_pool().difficulty_classes
+    )
     assert core_classes == dict.fromkeys(
         [DifficultyClass.A, DifficultyClass.B, DifficultyClass.C, DifficultyClass.DA], 32
     )

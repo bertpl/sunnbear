@@ -54,7 +54,7 @@ def example_characterization_results(raw_feature_matrix: FeatureMatrix) -> Chara
         fidelity=FeatureFidelity.COARSE,
         raw_feature_matrix=raw_feature_matrix,
         block_scales=EXAMPLE_DEFINITION.fit_block_scales(raw_feature_matrix),
-        n_incorrect_solves=dict.fromkeys(raw_feature_matrix.problem_ids, (0,)),
+        n_incorrect_solves_per_config=dict.fromkeys(raw_feature_matrix.problem_ids, (0,)),
     )
 
 
@@ -79,10 +79,13 @@ def build_state_before(
       largest Core that the classes fill.
     """
     state = PipelineState()
-    raw_feature_matrix = coarse_raw_feature_matrix or example_raw_feature_matrix(problem_ids)
+    if coarse_raw_feature_matrix is not None:
+        raw_feature_matrix = coarse_raw_feature_matrix
+    else:
+        raw_feature_matrix = example_raw_feature_matrix(problem_ids)
     edis = edis if edis is not None else dict.fromkeys(problem_ids, 10.0)
     for earlier_stage_id in list(PipelineStageId)[: list(PipelineStageId).index(stage_id)]:
-        accessor = state.create_accessor(earlier_stage_id)
+        accessor = state.create_state_accessor(earlier_stage_id)
         match earlier_stage_id:
             case PipelineStageId.CANDIDATE_GENERATION:
                 accessor.add_candidates(dict.fromkeys(problem_ids, IntervalBounds(a=-1.0, b=1.0)))
@@ -101,9 +104,11 @@ def build_state_before(
                     for problem_id, edi in edis.items()
                 }
                 accessor.set_difficulty_classes(difficulty_classes)
-                accessor.set_core_composition(
-                    core_composition or CoreComposition.from_class_counts(Counter(difficulty_classes.values()))
-                )
+                if core_composition is not None:
+                    stored_core_composition = core_composition
+                else:
+                    stored_core_composition = CoreComposition.from_class_counts(Counter(difficulty_classes.values()))
+                accessor.set_core_composition(stored_core_composition)
         state.finish_stage(earlier_stage_id)
     return state
 

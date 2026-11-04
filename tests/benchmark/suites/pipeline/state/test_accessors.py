@@ -1,5 +1,6 @@
 """The state accessors give a stage only the candidates that no stage has dropped, write each piece of a stage's
-information once and on exactly the candidates that it covers, and give the candidate pool only once it can be built."""
+information once and only when it covers exactly the remaining candidates, and give the candidate pool only once the
+pool can be built."""
 
 from collections.abc import Callable
 
@@ -10,7 +11,7 @@ from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
 from sunnbear._core.benchmark.suites.pipeline.selection import CoreComposition, DifficultyClass, SuiteFamily
 from sunnbear._core.benchmark.suites.pipeline.state import (
-    DistilledSuite,
+    DistilledSuiteSummary,
     IntervalBounds,
     NearestKeptCandidate,
     PipelineStateAccessor,
@@ -32,10 +33,13 @@ _CORE_COMPOSITION = CoreComposition.from_class_counts(dict.fromkeys(DifficultyCl
 
 def _accessor(stage_id: PipelineStageId) -> PipelineStateAccessor:
     """Return the accessor of `stage_id` on a state in which every earlier stage kept the 3 example candidates."""
-    return build_state_before(stage_id, _PROBLEM_IDS, core_composition=_CORE_COMPOSITION).create_accessor(stage_id)
+    return build_state_before(stage_id, _PROBLEM_IDS, core_composition=_CORE_COMPOSITION).create_state_accessor(
+        stage_id
+    )
 
 
-# The writes that take information on every remaining candidate, each with the stage whose accessor makes it.
+# Each entry is an accessor method that stores information on every remaining candidate, with the stage whose
+# accessor has the method.
 _WRITES_OF_EACH_CANDIDATE: dict[str, tuple[PipelineStageId, Callable[[PipelineStateAccessor, list], None]]] = {
     "c_ranges": (
         PipelineStageId.CANDIDATE_VALIDATION,
@@ -68,7 +72,7 @@ _WRITES_OF_EACH_CANDIDATE: dict[str, tuple[PipelineStageId, Callable[[PipelineSt
 
 @pytest.mark.parametrize("write_name", list(_WRITES_OF_EACH_CANDIDATE))
 def test_a_write_covers_exactly_the_remaining_candidates(write_name: str):
-    """A write that misses 1 remaining candidate is refused; a write of every remaining candidate is taken."""
+    """Information that misses 1 remaining candidate is refused; information on every remaining candidate is stored."""
     # --- arrange ----------------------
     stage_id, write = _WRITES_OF_EACH_CANDIDATE[write_name]
     accessor = _accessor(stage_id)
@@ -79,19 +83,26 @@ def test_a_write_covers_exactly_the_remaining_candidates(write_name: str):
     write(accessor, _PROBLEM_IDS)
 
 
-@pytest.mark.parametrize("write_name", [*_WRITES_OF_EACH_CANDIDATE, "core_composition", "distilled_suites"])
+@pytest.mark.parametrize(
+    "write_name", [*_WRITES_OF_EACH_CANDIDATE, "candidates", "core_composition", "distilled_suite_summaries"]
+)
 def test_each_piece_of_information_is_written_once(write_name: str):
-    """A second write of the same piece of information is refused."""
+    """An accessor method refuses to write the same piece of information a second time."""
     # --- arrange ----------------------
-    if write_name == "core_composition":
+    if write_name == "candidates":
+        accessor = _accessor(PipelineStageId.CANDIDATE_GENERATION)
+        write = lambda accessor, problem_ids: accessor.add_candidates(  # noqa: E731
+            dict.fromkeys(problem_ids, IntervalBounds(a=-1.0, b=1.0))
+        )
+    elif write_name == "core_composition":
         accessor = _accessor(PipelineStageId.CORE_SELECTION)
         write = lambda accessor, problem_ids: accessor.set_core_composition(  # noqa: E731
             _CORE_COMPOSITION
         )
-    elif write_name == "distilled_suites":
+    elif write_name == "distilled_suite_summaries":
         accessor = _accessor(PipelineStageId.DISTILLATION)
-        write = lambda accessor, problem_ids: accessor.set_distilled_suites(  # noqa: E731
-            [DistilledSuite(suite_family=SuiteFamily.BENCHMARK, size=64, diversity=1.0)]
+        write = lambda accessor, problem_ids: accessor.set_distilled_suite_summaries(  # noqa: E731
+            [DistilledSuiteSummary(suite_family=SuiteFamily.BENCHMARK, size=64, diversity=1.0)]
         )
     else:
         stage_id, write = _WRITES_OF_EACH_CANDIDATE[write_name]
@@ -103,23 +114,12 @@ def test_each_piece_of_information_is_written_once(write_name: str):
         write(accessor, _PROBLEM_IDS)
 
 
-def test_the_candidates_are_added_once():
-    """Candidate generation's accessor refuses a second set of candidates."""
-    # --- arrange ----------------------
-    accessor = _accessor(PipelineStageId.CANDIDATE_GENERATION)
-    accessor.add_candidates(dict.fromkeys(_PROBLEM_IDS, IntervalBounds(a=-1.0, b=1.0)))
-
-    # --- act / assert -----------------
-    with pytest.raises(ValueError, match="writes each piece of its stage's information once"):
-        accessor.add_candidates({})
-
-
 def test_an_accessor_gives_and_takes_only_the_remaining_candidates():
     """After validation rejects 1 candidate, its accessor gives the bounds of the other 2 only, refuses to reject the
     candidate again, and coarse characterization's accessor gives the c-ranges of the other 2 only."""
     # --- arrange ----------------------
     state = build_state_before(PipelineStageId.CANDIDATE_VALIDATION, _PROBLEM_IDS)
-    accessor = state.create_accessor(PipelineStageId.CANDIDATE_VALIDATION)
+    accessor = state.create_state_accessor(PipelineStageId.CANDIDATE_VALIDATION)
 
     # --- act --------------------------
     accessor.reject(_PROBLEM_IDS[0], "bound_to_width_ratio")
@@ -128,9 +128,9 @@ def test_an_accessor_gives_and_takes_only_the_remaining_candidates():
 
     # --- assert -----------------------
     assert list(accessor.interval_bounds()) == _PROBLEM_IDS[1:]
-    with pytest.raises(ValueError, match="not a candidate that no stage has dropped"):
+    with pytest.raises(ValueError, match="dropped already"):
         accessor.reject(_PROBLEM_IDS[0], "bound_to_width_ratio")
-    assert list(state.create_accessor(PipelineStageId.COARSE_CHARACTERIZATION).c_ranges()) == _PROBLEM_IDS[1:]
+    assert list(state.create_state_accessor(PipelineStageId.COARSE_CHARACTERIZATION).c_ranges()) == _PROBLEM_IDS[1:]
 
 
 def test_spacing_takes_the_nearest_kept_candidates_of_its_own_drops_only():
@@ -162,15 +162,15 @@ def test_spacing_has_no_scaled_features_without_scales():
     # --- act / assert -----------------
     assert (
         build_state_before(PipelineStageId.SPACING, _PROBLEM_IDS[:1])
-        .create_accessor(PipelineStageId.SPACING)
+        .create_state_accessor(PipelineStageId.SPACING)
         .coarse_scaled_feature_matrix()
         is None
     )
 
 
 def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_class():
-    """Once core selection stored the classes, its pool holds each candidate's scaled full features, EDI and class, in
-    the order of candidate generation."""
+    """Once core selection stored the classes, its pool holds each candidate's scaled features from full
+    characterization, EDI and class, in the order of candidate generation."""
     # --- arrange ----------------------
     accessor = _accessor(PipelineStageId.CORE_SELECTION)
     classes = dict(zip(_PROBLEM_IDS, [DifficultyClass.A, DifficultyClass.C, DifficultyClass.B], strict=True))
@@ -180,7 +180,7 @@ def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_class
     candidate_pool = accessor.candidate_pool()
 
     # --- assert -----------------------
-    assert candidate_pool.problem_ids == tuple(_PROBLEM_IDS)
+    assert candidate_pool.feature_matrix.problem_ids == tuple(_PROBLEM_IDS)
     assert candidate_pool.difficulty_classes == tuple(classes.values())
     np.testing.assert_array_equal(candidate_pool.edis, [10.0] * 3)
     assert accessor.edis() == dict.fromkeys(_PROBLEM_IDS, 10.0)
@@ -191,9 +191,9 @@ def test_the_candidate_pool_needs_the_classes_and_the_scales():
     candidate only, which leaves it without scales."""
     # --- arrange ----------------------
     accessor = _accessor(PipelineStageId.CORE_SELECTION)
-    accessor_without_scales = build_state_before(PipelineStageId.CORE_SELECTION, _PROBLEM_IDS[:1]).create_accessor(
-        PipelineStageId.CORE_SELECTION
-    )
+    accessor_without_scales = build_state_before(
+        PipelineStageId.CORE_SELECTION, _PROBLEM_IDS[:1]
+    ).create_state_accessor(PipelineStageId.CORE_SELECTION)
     accessor_without_scales.set_difficulty_classes({_PROBLEM_IDS[0]: DifficultyClass.A})
 
     # --- act / assert -----------------
@@ -204,16 +204,16 @@ def test_the_candidate_pool_needs_the_classes_and_the_scales():
 
 
 def test_distillation_needs_the_core_composition():
-    """Distillation's accessor gives the Core's composition that core selection stored, and refuses when it stored
-    none."""
+    """Distillation's accessor gives the Core's composition that core selection stored, and raises when core selection
+    stored none."""
     # --- arrange ----------------------
     state = build_state_before(PipelineStageId.CORE_SELECTION, _PROBLEM_IDS)
-    state.create_accessor(PipelineStageId.CORE_SELECTION).set_difficulty_classes(
+    state.create_state_accessor(PipelineStageId.CORE_SELECTION).set_difficulty_classes(
         dict.fromkeys(_PROBLEM_IDS, DifficultyClass.A)
     )
     state.finish_stage(PipelineStageId.CORE_SELECTION)
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="stored no Core composition"):
-        state.create_accessor(PipelineStageId.DISTILLATION).core_composition()
+        state.create_state_accessor(PipelineStageId.DISTILLATION).core_composition()
     assert _accessor(PipelineStageId.DISTILLATION).core_composition() == _CORE_COMPOSITION

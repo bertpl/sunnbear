@@ -90,10 +90,10 @@ def test_the_summary_gives_each_classs_count_and_largest_core_size():
     """Each class's largest Core size is the largest at which its candidates fill its share on their own, null where
     they fill it at no size."""
     # --- act --------------------------
-    row = CoreComposition.from_class_counts({A: 512, B: 100, C: 64, DA: 48, DB: 16}).summary()
+    summary = CoreComposition.from_class_counts({A: 512, B: 100, C: 64, DA: 48, DB: 16}).summary()
 
     # --- assert -----------------------
-    assert row == {
+    assert summary == {
         "core_size": 256,
         "is_interim": True,
         "quota_a": 64,

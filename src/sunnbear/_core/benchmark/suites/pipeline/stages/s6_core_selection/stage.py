@@ -29,7 +29,7 @@ class CoreSelectionStage(PipelineStage[CoreSelectionStateAccessor]):
       candidates fill no Core of the smallest size;
     - `select_diverse_suite` selects the Core by max-div, and stops the pipeline when the selection misses a quota.
 
-    The stage drops each candidate that the Core does not hold, which is valid but not kept.
+    The stage drops each candidate that the Core does not hold; such a candidate is valid, but not kept.
     """
 
     stage_id = PipelineStageId.CORE_SELECTION
@@ -75,6 +75,6 @@ class CoreSelectionStage(PipelineStage[CoreSelectionStateAccessor]):
         )
         state_accessor.set_core_composition(core_composition)
         core_problem_ids = set(core.problem_ids)
-        for problem_id in state_accessor.problem_ids:
+        for problem_id in state_accessor.remaining_problem_ids:
             if problem_id not in core_problem_ids:
                 state_accessor.drop(problem_id, "not_in_core")

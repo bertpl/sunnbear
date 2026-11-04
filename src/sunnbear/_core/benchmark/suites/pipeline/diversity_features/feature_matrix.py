@@ -38,8 +38,13 @@ class FeatureMatrix:
                 f"A FeatureMatrix needs 1 row per problem id: {len(self.problem_ids)} ids for values of shape "
                 f"{self.values.shape}."
             )
-        elif len(self._row_index_by_problem_id) != len(self.problem_ids):
+        elif len(self.row_index_by_problem_id) != len(self.problem_ids):
             raise ValueError("A FeatureMatrix holds each problem id once.")
+
+    @cached_property
+    def row_index_by_problem_id(self) -> dict[ProblemId, int]:
+        """Return the row of each id in `values`."""
+        return {problem_id: row for row, problem_id in enumerate(self.problem_ids)}
 
     def subset(self, problem_ids: Sequence[ProblemId]) -> "FeatureMatrix":
         """Return the matrix of the candidates `problem_ids`, in their order.
@@ -47,13 +52,5 @@ class FeatureMatrix:
         Raises:
             KeyError: If 1 of `problem_ids` is not in the matrix.
         """
-        rows = [self._row_index_by_problem_id[problem_id] for problem_id in problem_ids]
+        rows = [self.row_index_by_problem_id[problem_id] for problem_id in problem_ids]
         return FeatureMatrix(problem_ids=tuple(problem_ids), values=self.values[rows])
-
-    # --------------------------------------------------------------------------
-    #  Helpers
-    # --------------------------------------------------------------------------
-    @cached_property
-    def _row_index_by_problem_id(self) -> dict[ProblemId, int]:
-        """Return the row of each id in `values`."""
-        return {problem_id: row for row, problem_id in enumerate(self.problem_ids)}

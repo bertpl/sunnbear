@@ -99,9 +99,11 @@ def run_stages(
     """Run `stages` in order on 1 new `PipelineState`, and have `workspace` write each stage's manifest.
 
     Each stage runs on the state accessor that the state creates for it, so `stages` must follow the run order of
-    `PipelineStageId`, from its first stage; they may end before its last. Every stage receives `worker_pool`, in which
-    it may run tasks, and its manifest records the pool's number of workers. A `worker_pool` with more than 1 worker
-    must be inside its ``with`` block, which `run_stages` does not open.
+    `PipelineStageId`, starting at its first member; the list may stop before its last member.
+
+    Every stage receives `worker_pool`, in which it may run tasks, and its manifest records the pool's number of
+    workers. A `worker_pool` with more than 1 worker must be inside its ``with`` block, which `run_stages` does not
+    open.
 
     A stage that raises `PipelineStopError` stops the run: it writes no manifest, and the stages after it do not run.
 
@@ -115,7 +117,7 @@ def run_stages(
     state = PipelineState()
     manifests: list[PipelineStageManifest] = []
     for stage in stages:
-        state_accessor = state.create_accessor(stage.stage_id)
+        state_accessor = state.create_state_accessor(stage.stage_id)
         n_candidates_in = state.n_remaining_candidates
         started_at = datetime.datetime.now(datetime.UTC)
         t_start = time.perf_counter()

@@ -18,9 +18,9 @@ from .function_evaluation_error import FunctionEvaluationError
 # spacings at the root. At that ratio, this fraction of `xtol` stays well above 2 float spacings, so that a root with 1
 # float where f is exactly 0 is not rejected.
 MAX_ZERO_WIDTH_IN_XTOL = 1 / 16
-# Each flag of snuffled's diagnostics maps to the reason that rejects a test problem when the flag is above 0: the
-# flag's name with the prefix `snuffled_`. The rules
-# test the flags in this order, NaN first, because snuffled leaves its other diagnostics unspecified when f returns NaN.
+# Each flag of snuffled's diagnostics maps to the reason that rejects a test problem when the flag is above 0. The
+# rules test the flags in this order, NaN first, because snuffled leaves its other diagnostics unspecified when f
+# returns NaN.
 FLAG_REJECTION_REASONS = {
     Diagnostic.NAN_VALUES_DETECTED: "snuffled_nan_values_detected",
     Diagnostic.INF_VALUES_DETECTED: "snuffled_inf_values_detected",
@@ -59,7 +59,6 @@ def extract_properties_or_rejection_reason(
         property_values = {prop: snuffler.extract(prop) for prop in properties}
         diagnostics = {diagnostic: snuffler.extract(diagnostic) for diagnostic in Diagnostic}
     except FunctionEvaluationError:
-        # f raises during the analysis.
         return "snuffled_f_raises"
     for flag, reason in FLAG_REJECTION_REASONS.items():
         if diagnostics[flag] > 0:

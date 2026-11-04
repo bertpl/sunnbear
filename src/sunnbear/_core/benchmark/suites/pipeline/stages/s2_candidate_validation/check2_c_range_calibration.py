@@ -117,7 +117,7 @@ def calibrate_c_range(xc_fun: XCFun, a: float, b: float, *, mc_tuples: MCTuples)
         else:
             return c_range
     except _CalibrationFailedError as exc:
-        return exc.reason
+        return str(exc)
 
 
 # ==================================================================================================
@@ -246,8 +246,3 @@ class _CRangeSideSearch:
 
 class _CalibrationFailedError(Exception):
     """`_CalibrationFailedError` ends the calibration of a candidate at the step that rejects it."""
-
-    def __init__(self, reason: str) -> None:
-        """Hold the reason of the failing step."""
-        super().__init__(reason)
-        self.reason = reason

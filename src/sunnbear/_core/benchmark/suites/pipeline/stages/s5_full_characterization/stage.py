@@ -14,11 +14,11 @@ class FullCharacterizationStage(CandidateCharacterizationStage[FullCharacterizat
     """`FullCharacterizationStage` computes the full features of each candidate that spacing keeps, and its EDI.
 
     The benchmark suites are selected by the full features, so by default the stage runs at the full fidelity, whose
-    tuple sets and snuffled analysis budget are larger than the coarse fidelity's. Its block scales are fitted only on
-    the candidates that it keeps, because the benchmark suites are selected from those candidates.
+    tuple sets and snuffled analysis budget are larger than the coarse fidelity's. The stage's block scales are fitted
+    only on the candidates that it keeps, because the benchmark suites are selected from those candidates.
 
-    The stage also stores each kept candidate's empirical difficulty index (EDI), from the same solves, which core
-    selection classes the candidates by.
+    The stage also stores each kept candidate's empirical difficulty index (EDI), computed from the same solves; core
+    selection assigns each candidate its difficulty class from its EDI.
 
     The full fidelity can reject a candidate that the coarse one kept, for example a candidate whose f fails only at an
     x that the coarse fidelity's solves never evaluate, but the solves on the full fidelity's larger tuple set do.

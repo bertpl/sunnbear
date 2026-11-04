@@ -76,7 +76,9 @@ class CandidateCharacterizationTask:
         else:
             # The rows are ordered sample by sample, and within a sample, solver by solver in the order of `solver_ids`.
             n_fevals_eff = add_derived_results(solve_results)["n_fevals_eff"].to_numpy().reshape(-1, len(solver_ids))
-            n_incorrect_solves = (~solve_results["is_correct"]).to_numpy().reshape(-1, len(solver_ids)).sum(axis=0)
+            n_incorrect_solves_per_config = (
+                (~solve_results["is_correct"]).to_numpy().reshape(-1, len(solver_ids)).sum(axis=0)
+            )
 
             # --- snuffled's analyses ------------
             problem = FormulaRegistry.candidate_from_id(problem_id).calibrated(c_range.c_min, c_range.c_max)
@@ -100,7 +102,7 @@ class CandidateCharacterizationTask:
                     n_fevals_eff=n_fevals_eff, snuffled_property_values=np.array(property_values)
                 ),
                 edi=compute_edi(n_fevals_eff),
-                n_incorrect_solves_per_config=tuple(int(count) for count in n_incorrect_solves),
+                n_incorrect_solves_per_config=tuple(int(count) for count in n_incorrect_solves_per_config),
             )
 
 

@@ -30,19 +30,19 @@ def select_diverse_suite(
 ) -> "DiverseSuite":
     """Return max-div's selection of the most diverse suite of `composition` from `candidate_pool`.
 
-    max-div searches for the `composition.size` candidates whose scaled full feature vectors are the most diverse,
-    under 1 constraint per quota of `composition`.
+    max-div searches for the `composition.size` candidates whose scaled feature vectors from full characterization
+    are the most diverse, under 1 constraint per quota of `composition`.
 
     Its objective is the geometric mean, with equal weights, of the geometric mean separation under each of 2
     distances, where a selected candidate's separation is its distance to the nearest other selected candidate:
 
     - the L1 distance between the scaled feature vectors, in which every feature block has a mean pairwise L1 distance
       of 1;
-    - the distance between the log2 of the EDIs, so that the suite's EDIs also differ widely within each quota, and 2
-      EDIs compare by their ratio.
+    - the distance between the log2 of the EDIs, so that 2 EDIs compare by their ratio, and the suite's EDIs also
+      differ widely within each quota.
 
-    max-div receives each candidate's feature vector with 1 more column, the log2 of its EDI, which the first distance
-    leaves out, through `l1_distance_over_leading_columns`.
+    max-div receives each candidate's feature vector with 1 more column, the log2 of its EDI; the first distance,
+    `l1_distance_over_leading_columns`, leaves that column out.
 
     The geometric mean weighs every selected candidate's separation equally. A statistic that weighs the smallest
     separations more would let the difficulty classes whose candidates lie closest together decide the selection.
@@ -66,7 +66,7 @@ def select_diverse_suite(
         l1_distance_over_leading_columns, label="l1_over_features", params=(n_features,)
     )
     max_div_problem = MaxDivProblem.new(
-        # max-div takes float32 vectors; the lost precision does not reach the output, which holds the selected
+        # max-div takes float32 vectors; the lost precision does not affect the output, which holds the selected
         # candidates, not their vectors.
         np.hstack([candidate_pool.feature_matrix.values, np.log2(candidate_pool.edis)[:, np.newaxis]]),
         k=composition.size,
@@ -87,13 +87,13 @@ def select_diverse_suite(
     solution = (
         ParallelMaxDivSolverBuilder(max_div_problem)
         .with_seed(seed)
-        .with_workers(seconds(len(candidate_pool.problem_ids) * sec_per_candidate), n_workers=n_workers)
+        .with_workers(seconds(len(candidate_pool.feature_matrix.problem_ids) * sec_per_candidate), n_workers=n_workers)
         .build()
         .solve(verbosity=Verbosity.SILENT)
     )
     composition.check_selection([candidate_pool.difficulty_classes[idx] for idx in solution.i_selected])
     return DiverseSuite(
-        problem_ids=tuple(candidate_pool.problem_ids[idx] for idx in sorted(solution.i_selected)),
+        problem_ids=tuple(candidate_pool.feature_matrix.problem_ids[idx] for idx in sorted(solution.i_selected)),
         diversity=solution.score.diversity,
     )
 

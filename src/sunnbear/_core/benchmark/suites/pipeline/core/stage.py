@@ -19,10 +19,14 @@ type PipelineStageParameterValue = bool | int | float | str
 class PipelineStage[StateAccessorT](ABC):
     """A `PipelineStage` reads what earlier stages found about the candidates, and adds its own information.
 
-    A run keeps 1 state for all its stages. It hands each stage the state accessor of the stage's `stage_id`, which is
-    all that the stage sees of the state: the candidates that no stage has dropped, the information of earlier stages
-    that the stage needs, and the writes of its own information and drops. `StateAccessorT` is the class of that
-    accessor.
+    The run hands each stage the state accessor of the stage's `stage_id`, which is all that the stage sees of the
+    run's `PipelineState`:
+
+    - the candidates that no stage has dropped;
+    - the information of earlier stages that the stage needs;
+    - the methods that write the stage's own information and record its drops.
+
+    `StateAccessorT` is the class of that accessor.
 
     Class attributes:
         stage_id: The stage's `PipelineStageId`, which sets its place in the run order and its state accessor.
@@ -41,7 +45,7 @@ class PipelineStage[StateAccessorT](ABC):
 
     @abstractmethod
     def run(self, state_accessor: StateAccessorT, *, worker_pool: WorkerPool) -> None:
-        """Run the stage on the candidates of `state_accessor`, and write its information and drops through it.
+        """Run the stage on `state_accessor`: read its candidates, and record the stage's information and drops.
 
         Args:
             state_accessor: The stage's state accessor.

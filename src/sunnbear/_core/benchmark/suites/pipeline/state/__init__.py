@@ -1,7 +1,7 @@
 """This package holds the state of a run of the benchmark suite pipeline, and the state accessor of each stage.
 
-The state owns the information of every stage, and each stage reaches it only through its own state accessor, the
-contract that the stage adheres to:
+The state owns the information of every stage. Each stage reaches that information only through its own state accessor,
+which is the contract that the stage adheres to:
 
 - `PipelineState` holds a run's candidates and the information of each stage, and creates each stage's accessor;
 - `PipelineStateStorage` holds that information: the `CandidateRegistry`, with a `CandidateDrop` for each dropped
@@ -29,7 +29,7 @@ from .candidate_registry import CandidateDrop, CandidateRegistry
 from .pipeline_state import PipelineState
 from .stage_information import (
     CharacterizationResults,
-    DistilledSuite,
+    DistilledSuiteSummary,
     IntervalBounds,
     NearestKeptCandidate,
     SuiteMembership,

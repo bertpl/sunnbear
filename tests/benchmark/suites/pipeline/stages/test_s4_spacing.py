@@ -48,7 +48,7 @@ def _run_spacing(
     state = build_state_before(PipelineStageId.SPACING, [ProblemId.from_string(p) for p in problem_ids])
 
     SpacingStage(min_distance=1.0).run(
-        state.create_accessor(PipelineStageId.SPACING), worker_pool=_IN_PROCESS_WORKER_POOL
+        state.create_state_accessor(PipelineStageId.SPACING), worker_pool=_IN_PROCESS_WORKER_POOL
     )
 
     [(nearest_kept_candidates,)] = calls
@@ -65,10 +65,10 @@ def test_the_pass_keeps_the_candidates_far_enough_from_every_kept_one_in_order(m
     drops, nearest_kept_candidates = _run_spacing(
         {
             "f99.1[p=1.0]": (0.0, 0.0),
-            "f99.1[p=2.0]": (0.6, 0.0),  # at 0.6 from p=1
-            "f99.1[p=3.0]": (0.6, 0.6),  # at 1.2 from p=1
-            "f99.1[p=4.0]": (1.2, 0.6),  # at 0.6 from p=3
-            "f99.1[p=5.0]": (1.5, 1.0),  # at 1.3 from p=3
+            "f99.1[p=2.0]": (0.6, 0.0),  # p=2 lies at 0.6 from p=1
+            "f99.1[p=3.0]": (0.6, 0.6),  # p=3 lies at 1.2 from p=1
+            "f99.1[p=4.0]": (1.2, 0.6),  # p=4 lies at 0.6 from p=3
+            "f99.1[p=5.0]": (1.5, 1.0),  # p=5 lies at 1.3 from p=3
             "f99.2": (0.0, 0.0),
         },
         monkeypatch,
@@ -92,8 +92,8 @@ def test_a_formula_with_2_or_more_candidates_keeps_at_least_2(monkeypatch):
     drops, nearest_kept_candidates = _run_spacing(
         {
             "f99.1[p=1.0]": (0.0, 0.0),
-            "f99.1[p=2.0]": (0.2, 0.0),  # at 0.2 from p=1 and 0.1 from p=3
-            "f99.1[p=3.0]": (0.3, 0.0),  # at 0.3 from p=1
+            "f99.1[p=2.0]": (0.2, 0.0),  # p=2 lies at 0.2 from p=1 and 0.1 from p=3
+            "f99.1[p=3.0]": (0.3, 0.0),  # p=3 lies at 0.3 from p=1
             "f99.2[p=1.0]": (0.0, 0.0),
             "f99.2[p=2.0]": (0.0, 0.0),
         },

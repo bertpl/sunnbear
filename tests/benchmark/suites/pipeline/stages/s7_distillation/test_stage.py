@@ -14,7 +14,11 @@ from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
 from sunnbear._core.benchmark.suites.pipeline.selection import CoreCompositionWarning, DifficultyClass, SuiteFamily
 from sunnbear._core.benchmark.suites.pipeline.stages import DistillationStage
-from sunnbear._core.benchmark.suites.pipeline.state import DistillationStateAccessor, DistilledSuite, SuiteMembership
+from sunnbear._core.benchmark.suites.pipeline.state import (
+    DistillationStateAccessor,
+    DistilledSuiteSummary,
+    SuiteMembership,
+)
 from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
 from tests.benchmark.suites.pipeline.example_states import build_state_before, example_problem_ids, record_calls
@@ -35,7 +39,7 @@ _EDI_RATIO_RANGE_BY_CLASS = {A: (0.1, 0.2), B: (0.3, 0.45), C: (0.6, 0.9), DA: (
 
 def _distill(
     class_counts: dict[DifficultyClass, int], stage: DistillationStage, monkeypatch: pytest.MonkeyPatch
-) -> tuple[dict[ProblemId, DifficultyClass], dict[ProblemId, SuiteMembership], tuple[DistilledSuite, ...]]:
+) -> tuple[dict[ProblemId, DifficultyClass], dict[ProblemId, SuiteMembership], tuple[DistilledSuiteSummary, ...]]:
     """Run `stage` on a Core with `class_counts` candidates of each class; return their classes, memberships and
     suites."""
     classes = [c for c, count in class_counts.items() for _ in range(count)]
@@ -47,8 +51,8 @@ def _distill(
     }
     state = build_state_before(PipelineStageId.DISTILLATION, problem_ids, edis=edis)
     memberships_calls = record_calls(monkeypatch, DistillationStateAccessor, "set_suite_memberships")
-    suites_calls = record_calls(monkeypatch, DistillationStateAccessor, "set_distilled_suites")
-    stage.run(state.create_accessor(PipelineStageId.DISTILLATION), worker_pool=_TWO_WORKER_POOL)
+    suites_calls = record_calls(monkeypatch, DistillationStateAccessor, "set_distilled_suite_summaries")
+    stage.run(state.create_state_accessor(PipelineStageId.DISTILLATION), worker_pool=_TWO_WORKER_POOL)
     [(memberships,)], [(suites,)] = memberships_calls, suites_calls
     return dict(zip(problem_ids, classes, strict=True)), dict(memberships), tuple(suites)
 
