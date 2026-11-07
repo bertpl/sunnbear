@@ -93,7 +93,7 @@ class _ExampleStoppingStage(PipelineStage[CoarseCharacterizationStateAccessor]):
 
 def test_the_stages_run_in_order_and_their_manifests_are_written(tmp_path):
     """Each manifest file holds its stage's manifest, which counts the candidates at the stage's start and end and
-    records its parameters; the next stage's accessor finds the stages' information."""
+    records its parameters; the run's build details hold the stages' information."""
     # --- act --------------------------
     result = run_stages(
         PipelineWorkspace(tmp_path),
@@ -102,7 +102,7 @@ def test_the_stages_run_in_order_and_their_manifests_are_written(tmp_path):
     )
 
     # --- assert -----------------------
-    assert result.stop is None
+    assert result.build_details.stop is None
     for manifest in result.manifests:
         manifest_file = tmp_path / "manifests" / f"{manifest.stage_id}.json"
         assert PipelineStageManifest.model_validate_json(manifest_file.read_text()) == manifest
@@ -110,14 +110,15 @@ def test_the_stages_run_in_order_and_their_manifests_are_written(tmp_path):
     assert (generation_manifest.n_candidates_in, generation_manifest.n_candidates_out) == (0, 3)
     assert (validation_manifest.n_candidates_in, validation_manifest.n_candidates_out) == (3, 2)
     assert (generation_manifest.parameters, validation_manifest.parameters) == ({}, {"n_rejected": 1})
-    assert result.state.create_state_accessor(PipelineStageId.COARSE_CHARACTERIZATION).c_ranges() == {
+    assert result.build_details.c_ranges() == {
         _PROBLEM_IDS[1]: CRange(c_min=-1.0, c_max=1.0),
         _PROBLEM_IDS[2]: CRange(c_min=-2.0, c_max=2.0),
     }
 
 
 def test_a_rerun_replaces_the_manifests_and_leaves_no_temporary_files(tmp_path):
-    """A second run into the same workspace replaces every manifest of the first, and leaves only the final files."""
+    """A second run into the same workspace replaces every manifest and the build details of the first run, and leaves
+    only the final files."""
     # --- arrange ----------------------
     workspace = PipelineWorkspace(tmp_path)
     run_stages(workspace, [_ExampleGenerationStage(), _ExampleValidationStage()], worker_pool=_IN_PROCESS_WORKER_POOL)
@@ -133,8 +134,16 @@ def test_a_rerun_replaces_the_manifests_and_leaves_no_temporary_files(tmp_path):
         PipelineStageManifest.model_validate_json((tmp_path / "manifests" / f"{stage_id}.json").read_text())
         for stage_id in stage_ids
     ] == list(second_manifests)
+    build_details_files = [
+        "c_ranges.parquet",
+        "candidate_registry.parquet",
+        "interval_bounds.parquet",
+        "run.json",
+        "storage.json",
+    ]
     assert sorted(path.relative_to(tmp_path).as_posix() for path in tmp_path.rglob("*.*")) == [
-        f"manifests/{stage_id}.json" for stage_id in stage_ids
+        *(f"benchmark_suites_build_details/{name}" for name in build_details_files),
+        *(f"manifests/{stage_id}.json" for stage_id in stage_ids),
     ]
 
 
@@ -160,10 +169,10 @@ def test_a_stage_that_raises_a_pipeline_stop_error_ends_the_run(tmp_path):
         PipelineStageId.CANDIDATE_GENERATION,
         PipelineStageId.CANDIDATE_VALIDATION,
     ]
-    assert result.stop == PipelineStop(
+    assert result.build_details.stop == PipelineStop(
         stage_id=PipelineStageId.COARSE_CHARACTERIZATION, reason="2 candidates are too few."
     )
-    assert result.state.finished_stage_ids == (
+    assert result.build_details.finished_stage_ids == (
         PipelineStageId.CANDIDATE_GENERATION,
         PipelineStageId.CANDIDATE_VALIDATION,
     )
@@ -187,8 +196,6 @@ def test_a_stage_that_runs_tasks_in_the_worker_pool_gives_the_same_information_w
 
     # --- assert -----------------------
     in_process_result, worker_processes_result = results
-    c_ranges = [
-        result.state.create_state_accessor(PipelineStageId.COARSE_CHARACTERIZATION).c_ranges() for result in results
-    ]
+    c_ranges = [result.build_details.c_ranges() for result in results]
     assert c_ranges[0] == c_ranges[1]
     assert (in_process_result.manifests[-1].n_workers, worker_processes_result.manifests[-1].n_workers) == (1, 2)

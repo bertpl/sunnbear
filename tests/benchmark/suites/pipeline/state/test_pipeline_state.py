@@ -1,17 +1,19 @@
-"""`PipelineState` creates each stage's accessor in run order, once every earlier stage has finished, and gives each
-candidate's drop."""
+"""`PipelineState` creates each stage's accessor in run order, once every earlier stage has finished, runs a stage on
+its accessor, and gives each candidate's drop."""
 
 import pytest
 
-from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
+from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageId
 from sunnbear._core.benchmark.suites.pipeline.selection import CoreComposition, DifficultyClass
 from sunnbear._core.benchmark.suites.pipeline.state import (
     CandidateDrop,
     CandidateGenerationStateAccessor,
     DistillationStateAccessor,
+    IntervalBounds,
     PipelineState,
 )
 from sunnbear._core.benchmark.suites.pipeline.state.pipeline_state import _ACCESSOR_CLASSES
+from sunnbear._core.utils.worker_pool import WorkerPool
 from tests.benchmark.suites.pipeline.example_states import build_state_before, example_problem_ids
 
 
@@ -84,3 +86,26 @@ def test_the_state_gives_each_candidates_drop():
     )
     assert state.drop_of(problem_ids[1]) is None
     assert state.n_remaining_candidates == 1
+
+
+class _ExampleGenerationStage(PipelineStage[CandidateGenerationStateAccessor]):
+    """`_ExampleGenerationStage` adds 2 example candidates."""
+
+    stage_id = PipelineStageId.CANDIDATE_GENERATION
+
+    def run(self, state_accessor: CandidateGenerationStateAccessor, *, worker_pool: WorkerPool) -> None:
+        """Add the candidates, each on ``[-1, 1]``."""
+        state_accessor.add_candidates(dict.fromkeys(example_problem_ids(2), IntervalBounds(a=-1.0, b=1.0)))
+
+
+def test_the_state_runs_a_stage_on_its_accessor_and_finishes_it():
+    """`run_stage` runs the stage on the accessor of its `stage_id`, then records that the stage has finished."""
+    # --- arrange ----------------------
+    state = PipelineState()
+
+    # --- act --------------------------
+    state.run_stage(_ExampleGenerationStage(), worker_pool=WorkerPool(n_workers=1))
+
+    # --- assert -----------------------
+    assert state.n_remaining_candidates == 2
+    assert state.finished_stage_ids == (PipelineStageId.CANDIDATE_GENERATION,)

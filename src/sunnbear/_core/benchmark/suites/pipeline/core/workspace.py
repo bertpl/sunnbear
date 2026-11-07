@@ -1,9 +1,11 @@
-"""`PipelineWorkspace` is the only code that writes the files of the benchmark suite pipeline's workspace.
+"""`PipelineWorkspace` is the only code that lays out the top level of the benchmark suite pipeline's workspace.
 
-The workspace directory holds, under ``manifests``, the `PipelineStageManifest` of each stage that ran, as a JSON file
-named after the stage's `PipelineStageId`.
+The workspace directory holds:
 
-Every file is written under a temporary name and then renamed, so a file under its final name is always complete.
+- under ``manifests``, the `PipelineStageManifest` of each stage that ran, as a JSON file named after the stage's
+  `PipelineStageId`; each manifest is written under a temporary name and then renamed, so a file under its final name
+  is always complete;
+- under ``benchmark_suites_build_details``, the files of the run's build details.
 """
 
 import json
@@ -12,6 +14,7 @@ from pathlib import Path
 from .stage_manifest import PipelineStageManifest
 
 _MANIFESTS_DIR_NAME = "manifests"
+_BUILD_DETAILS_DIR_NAME = "benchmark_suites_build_details"
 _MANIFEST_FILE_SUFFIX = ".json"
 _TEMPORARY_FILE_SUFFIX = ".tmp"
 
@@ -20,7 +23,7 @@ _TEMPORARY_FILE_SUFFIX = ".tmp"
 #  PipelineWorkspace
 # ==================================================================================================
 class PipelineWorkspace:
-    """`PipelineWorkspace` writes the files of the benchmark suite pipeline's workspace directory."""
+    """`PipelineWorkspace` writes the workspace's manifests, and gives the path of the build details' directory."""
 
     def __init__(self, path: Path) -> None:
         """Create a workspace for the directory at `path`, which need not exist yet."""
@@ -34,6 +37,11 @@ class PipelineWorkspace:
         manifest_file = self.path / _MANIFESTS_DIR_NAME / f"{manifest.stage_id}{_MANIFEST_FILE_SUFFIX}"
         manifest_json = json.dumps(manifest.model_dump(mode="json"), sort_keys=True, indent=2) + "\n"
         self._write_atomically(manifest_file, manifest_json.encode())
+
+    @property
+    def build_details_dir(self) -> Path:
+        """Return the directory for the run's build details."""
+        return self.path / _BUILD_DETAILS_DIR_NAME
 
     # --------------------------------------------------------------------------
     #  Helpers

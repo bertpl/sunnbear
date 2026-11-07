@@ -15,7 +15,10 @@ The command also takes these optional flags:
   selection rules.
 
 After the run, the command prints 1 line per stage that ran to its end: the number of candidates that it received and
-kept, and its run time.
+kept, and its run time. Then, for each such stage that rejected candidates as invalid, it prints:
+
+- the stage's id, then the number of formulas with rejected candidates;
+- One line per such formula, with its counts of kept candidates and of rejections per reason.
 
 When a stage stops the run, for example because core selection finds too few candidates for the smallest Core of the
 benchmark suites, the command then prints that stage's id and the reason, and exits with status 1.
@@ -31,7 +34,10 @@ from .runner import run_pipeline
 
 
 def main() -> None:
-    """Parse the command line, run the pipeline, and print what each stage kept and any stop."""
+    """Parse the command line, run the pipeline, and print what each stage kept and rejected.
+
+    If a stage stopped the run, print that stage and why, and exit with status 1.
+    """
     parser = argparse.ArgumentParser(
         prog="python -m sunnbear._core.benchmark.suites.pipeline",
         description="Run the benchmark suite pipeline over the shipped formulas.",
@@ -54,8 +60,17 @@ def main() -> None:
             f"{manifest.stage_id}: {manifest.n_candidates_out} of {manifest.n_candidates_in} candidates kept, "
             f"in {manifest.duration_sec:.2f} s"
         )
-    if result.stop is not None:
-        print(f"{result.stop.stage_id}: stopped: {result.stop.reason}")
+    build_details = result.build_details
+    for stage_id in build_details.finished_stage_ids:
+        rejections = build_details.rejections_per_formula(stage_id)
+        if rejections:
+            n_formulas = build_details.candidate_counts(stage_id).height
+            print(f"{stage_id}: formulas with rejected candidates: {len(rejections)} of {n_formulas}")
+            for formula_id, n_candidates, n_kept, n_rejected_per_reason in rejections:
+                reasons = ", ".join(f"{reason}: {n}" for reason, n in n_rejected_per_reason.items())
+                print(f"  {formula_id}: {n_kept} of {n_candidates} candidates kept; {reasons}")
+    if build_details.stop is not None:
+        print(f"{build_details.stop.stage_id}: stopped: {build_details.stop.reason}")
         raise SystemExit(1)
 
 

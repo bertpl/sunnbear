@@ -1,7 +1,7 @@
 """``python -m sunnbear._core.benchmark.suites.pipeline`` runs the pipeline over the shipped formulas:
 
 - it writes into the ``--workspace`` directory with ``--n-workers`` workers, in draft mode with ``--draft``;
-- it prints each stage's counts of candidates and the stage that stops the run;
+- it prints each stage's counts of candidates, the rejections per formula, and the stage that stops the run;
 - it exits normally when no stage stops it;
 - it refuses to run without a workspace.
 """
@@ -41,8 +41,8 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
     until core selection stops the run, because the test's candidates fill no Core. Full characterization runs at the
     coarse fidelity.
 
-    It prints 1 line per stage that ran to its end, in run order, with its counts of candidates, then the stop, and
-    exits with status 1."""
+    It prints 1 line per stage that ran to its end, in run order, with its counts of candidates, then validation's
+    rejections per formula, then the stop, and exits with status 1."""
     # --- arrange ----------------------
     # The command runs over every registered formula. The test keeps only the shipped formulas whose numbers start with
     # (1, 4, 2), because validation runs solves at every tuple of the shipped tuple set's largest size for each
@@ -56,10 +56,20 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
 
     # --- assert -----------------------
     assert exc_info.value.code == 1
-    [*stage_lines, stop_line] = capsys.readouterr().out.splitlines()
+    [*printed_lines, stop_line] = capsys.readouterr().out.splitlines()
+    stage_lines, rejection_lines = printed_lines[: len(_FINISHED_STAGE_IDS)], printed_lines[len(_FINISHED_STAGE_IDS) :]
     assert stop_line.startswith(f"{PipelineStageId.CORE_SELECTION}: stopped: The candidates fill no Core of 128")
     assert [line.split(":")[0] for line in stage_lines] == _FINISHED_STAGE_IDS
     assert all(re.fullmatch(r"\w+: \d+ of \d+ candidates kept, in [0-9.]+ s", line) for line in stage_lines)
+    # Validation rejects candidates of formulas 1.4.2.x, so the rejection lines start with 1 line that counts the
+    # formulas with rejected candidates, followed by 1 line per such formula.
+    [count_line, *formula_lines] = rejection_lines
+    match = re.fullmatch(
+        rf"{PipelineStageId.CANDIDATE_VALIDATION}: formulas with rejected candidates: (\d+) of \d+", count_line
+    )
+    assert match is not None
+    assert len(formula_lines) == int(match.group(1)) > 0
+    assert all(re.fullmatch(r"  f[0-9.]+: \d+ of \d+ candidates kept; .+: \d+", line) for line in formula_lines)
     manifests = [
         PipelineStageManifest.model_validate_json((tmp_path / "manifests" / f"{stage_id}.json").read_text())
         for stage_id in _FINISHED_STAGE_IDS
@@ -73,7 +83,9 @@ def test_the_command_exits_normally_when_no_stage_stops_the_run(tmp_path, monkey
     replaces the run by one that ran no stage, because the shipped formulas take long to fill a Core."""
     # --- arrange ----------------------
     monkeypatch.setattr(
-        runner, "run_pipeline", lambda **_kwargs: PipelineRunResult(manifests=(), stop=None, state=PipelineState())
+        runner,
+        "run_pipeline",
+        lambda **_kwargs: PipelineRunResult(manifests=(), build_details=PipelineState().create_build_details()),
     )
 
     # --- act --------------------------
