@@ -44,7 +44,8 @@ class PipelineWorkspace:
     def write_build_details_files(self, files: Mapping[str, bytes]) -> None:
         """Write the files of a run's build details, each file name mapped to its content, replacing earlier ones.
 
-        The directory of the build details is emptied first, so the files of an earlier, longer run do not remain.
+        The directory of the build details is emptied first, so the files of an earlier run that wrote more files do not
+        remain.
         """
         build_details_dir = self.path / _BUILD_DETAILS_DIR_NAME
         shutil.rmtree(build_details_dir, ignore_errors=True)
@@ -52,7 +53,7 @@ class PipelineWorkspace:
             self._write_atomically(build_details_dir / name, content)
 
     def read_build_details_files(self) -> dict[str, bytes]:
-        """Return the files that `write_build_details_files` wrote, each file name mapped to its content."""
+        """Return the workspace's build details files, each file name mapped to its content."""
         build_details_dir = self.path / _BUILD_DETAILS_DIR_NAME
         return {file.name: file.read_bytes() for file in sorted(build_details_dir.iterdir())}
 

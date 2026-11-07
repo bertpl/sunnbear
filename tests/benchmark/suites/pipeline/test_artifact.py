@@ -36,7 +36,8 @@ def test_the_artifact_loads_the_build_details_that_were_saved():
 
 
 def test_the_artifact_refuses_build_details_of_other_core_solver_configs(monkeypatch):
-    """Build details saved with the shipped core solver configs cannot be loaded once the factory names other ones."""
+    """Build details saved with the shipped core solver configs cannot be loaded once
+    `DiversityFeatureFactory.solver_ids` names other ones."""
     # --- arrange ----------------------
     build_details = build_state_before(PipelineStageId.SPACING, example_problem_ids(3)).create_build_details()
     ArtifactStore.save(BenchmarkSuitesBuildDetailsDeclaration, build_details)

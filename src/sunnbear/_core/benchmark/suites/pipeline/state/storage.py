@@ -139,7 +139,7 @@ class PipelineStateStorage:
                     m.smallest_containing_suite_size for m in self.suite_memberships.values()
                 ],
             }
-        files = {f"{name}{_TABLE_FILE_SUFFIX}": self._table_bytes(columns) for name, columns in tables.items()}
+        files = {f"{name}{_TABLE_FILE_SUFFIX}": self._parquet_file_content(columns) for name, columns in tables.items()}
         files[_JSON_FILE_NAME] = (json.dumps(self._json_contents(), indent=2, sort_keys=True) + "\n").encode()
         return files
 
@@ -158,7 +158,7 @@ class PipelineStateStorage:
         }
 
     @staticmethod
-    def _table_bytes(columns: dict[str, list[Any]]) -> bytes:
+    def _parquet_file_content(columns: dict[str, list[Any]]) -> bytes:
         """Return `columns` as the content of a Parquet file."""
         buffer = io.BytesIO()
         pl.DataFrame(columns).write_parquet(buffer)
@@ -217,7 +217,7 @@ class PipelineStateStorage:
     # --------------------------------------------------------------------------
     @classmethod
     def from_files(cls, files: Mapping[str, bytes]) -> Self:
-        """Return the storage whose contents `to_files` converted to `files`."""
+        """Rebuild the storage from the output of `to_files`."""
         json_contents = json.loads(files[_JSON_FILE_NAME])
         storage = cls(
             candidate_registry=CandidateRegistry.from_table(

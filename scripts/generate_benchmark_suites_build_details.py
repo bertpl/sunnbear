@@ -8,13 +8,13 @@ the shipped test problems, and then commits the artifact's manifest. The script:
   ``--workspace``;
 - stops with status 1, without saving, when a stage stops the run, because the build details of a stopped run hold no
   benchmark suites;
-- saves the build details through `ArtifactStore`, which records in the artifact's manifest the `run_pipeline` call,
-  the versions of max-div and snuffled, and the content hash of the `mc_tuples` artifact that the pipeline uses;
-- publishes the artifact's data release, unless ``--no-publish`` is given, for a trial run.
+- saves the build details through `ArtifactStore`, which records in the artifact's manifest how they were built and
+  from which `mc_tuples` artifact;
+- publishes the artifact's data release, unless ``--no-publish`` is given for a trial run.
 
-Usage:
+Usage, with the workspace directory under ``script_outputs/``:
 
-    uv run python scripts/generate_benchmark_suites_build_details.py --workspace script_outputs/build_details
+    make benchmark-suites-build-details
 """
 
 import argparse
@@ -39,7 +39,10 @@ def main() -> None:
     parser.add_argument("--workspace", type=Path, required=True, help="directory for the outputs of the stages")
     parser.add_argument("--n-workers", type=int, help="number of worker processes (default: 1 per logical CPU)")
     parser.add_argument(
-        "--no-publish", action="store_true", dest="is_trial_run", help="save the artifact, but publish no data release"
+        "--no-publish",
+        action="store_true",
+        dest="is_publish_skipped",
+        help="save the artifact, but publish no data release",
     )
     args = parser.parse_args()
 
@@ -64,7 +67,7 @@ def main() -> None:
         },
     )
     print(f"Saved {manifest.short_identity}.")
-    if args.is_trial_run:
+    if args.is_publish_skipped:
         print("Not published (--no-publish).")
     else:
         manifest = ArtifactStore.publish(BenchmarkSuitesBuildDetailsDeclaration)

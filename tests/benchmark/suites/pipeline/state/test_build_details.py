@@ -3,7 +3,7 @@
 - `PipelineState.create_build_details` refuses a finished stage that did not write its information;
 - the build details give only the information of the finished stages;
 - they count the drops and the incorrect solves, list the rejections per formula, and describe the distilled suites;
-- the build details read back from their own files equal the ones that wrote them;
+- the build details that are read back from their own files equal the ones that wrote them;
 - they report the candidates that differ from those of the registered formulas.
 """
 
@@ -266,20 +266,20 @@ def test_the_build_details_report_the_candidates_that_differ_from_the_registered
     other_formula = define_formula_cls((99, 992), lambda x, c: x - c - 0.25, -1.0, 1.0)()
     problem_ids = [candidate.id for candidate in formula.build_all_candidates()]
     fitting_build_details = build_state_before(PipelineStageId.SPACING, problem_ids).create_build_details()
-    unregistered_build_details = build_state_before(
+    build_details_with_unregistered_candidate = build_state_before(
         PipelineStageId.SPACING, [*problem_ids, *example_problem_ids(1)]
     ).create_build_details()
 
     # --- act --------------------------
     monkeypatch.setattr(FormulaRegistry, "formulas", classmethod(lambda cls: (formula,)))
     fitting_reasons = fitting_build_details.staleness_reasons()
-    unregistered_reasons = unregistered_build_details.staleness_reasons()
+    unregistered_candidate_reasons = build_details_with_unregistered_candidate.staleness_reasons()
     monkeypatch.setattr(FormulaRegistry, "formulas", classmethod(lambda cls: (formula, other_formula)))
-    missing_reasons = fitting_build_details.staleness_reasons()
+    missing_candidate_reasons = fitting_build_details.staleness_reasons()
 
     # --- assert -----------------------
     assert fitting_reasons == []
-    assert unregistered_reasons == [f"1 candidates are not registered, e.g. {example_problem_ids(1)[0]}"]
-    assert missing_reasons == [
+    assert unregistered_candidate_reasons == [f"1 candidates are not registered, e.g. {example_problem_ids(1)[0]}"]
+    assert missing_candidate_reasons == [
         f"1 registered candidates are missing, e.g. {other_formula.build_all_candidates()[0].id}"
     ]

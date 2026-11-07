@@ -1,5 +1,4 @@
-"""This module holds the fixtures that give the tests the modules of `scripts/literature_test_problems/` and
-`scripts/release.py`."""
+"""The fixtures give the tests the modules of `scripts/literature_test_problems/` and `scripts/release.py`."""
 
 import importlib
 import importlib.util

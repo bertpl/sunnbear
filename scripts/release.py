@@ -231,12 +231,14 @@ def step_8_check_stamping_inputs(last_release_version: str) -> None:
         print(f"    artifact manifests to stamp with the release version: {names}")
 
 
-def step_9_check_build_details_fit() -> None:
+def step_9_check_benchmark_suites_build_details_staleness() -> None:
     """Check that the shipped benchmark suites build details fit the release's test problems and core solver configs.
 
-    The website looks the candidates and solver configs of the build details up in the installed sunnbear, so build
-    details that no longer fit would break it; `BenchmarkSuitesBuildDetails.staleness_reasons` and the artifact's
-    `from_files` say when they do not. Loading the artifact downloads its data files, unless the cache holds them.
+    A consumer of the build details looks up each of their candidates and solver configs in the installed sunnbear, so
+    build details that no longer fit the installed sunnbear would break that consumer.
+    `BenchmarkSuitesBuildDetails.staleness_reasons` reports candidates that differ from the registered ones, and the
+    artifact's `from_files` refuses other solver configs. Loading the artifact downloads its data files, unless the
+    cache holds them.
     """
     print_step(9, "benchmark suites build details fit the release's test problems and core solver configs")
     rebuild_hint = "rebuild them with 'make benchmark-suites-build-details' and commit the new manifest"
@@ -593,7 +595,7 @@ def main() -> None:
     step_6_check_classifiers_match()
     step_7_check_changelog_has_entries()
     step_8_check_stamping_inputs(last_release_version)
-    step_9_check_build_details_fit()
+    step_9_check_benchmark_suites_build_details_staleness()
     badge_metrics = step_10_gather_badge_metrics()
 
     if args.is_dry_run:

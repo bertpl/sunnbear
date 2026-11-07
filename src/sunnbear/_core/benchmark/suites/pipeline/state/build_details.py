@@ -302,8 +302,8 @@ class BenchmarkSuitesBuildDetails:
         The files are those of `PipelineStateStorage.to_files`, plus 1 JSON file with the ids of the finished stages and
         the stage that stopped the run and why.
 
-        The storage's files also hold what a stage that stopped the run wrote before it stopped; the read methods of the
-        build details read back from them still return ``None`` for that stage.
+        The storage's files also hold what a stage that stopped the run wrote before it stopped; the read methods of
+        build details rebuilt from these files still return ``None`` for that stage.
         """
         if self.stop is not None:
             stop = dataclasses.asdict(self.stop)
@@ -321,20 +321,20 @@ class BenchmarkSuitesBuildDetails:
         """Return why the build details no longer fit the installed sunnbear's test problems; empty when they fit.
 
         The build details fit when their candidates are exactly the candidates of the registered formulas, so that a
-        consumer finds each candidate, and only those, in `FormulaRegistry`. The other references are checked when the
-        build details are read back: `from_files` refuses characterization results with other core solver configs
-        than `DiversityFeatureFactory.solver_ids`, and stage ids or `DifficultyClass` and `SuiteFamily` values that the
-        installed sunnbear does not define.
+        consumer finds each of these candidates, and no other, in `FormulaRegistry`. The build details' other
+        references to the installed sunnbear are checked when the build details are read back, by `from_files`.
         """
         registered_problem_ids = {
             candidate.id for formula in FormulaRegistry.formulas() for candidate in formula.build_all_candidates()
         }
         problem_ids = set(self._storage.candidate_registry.problem_ids)
-        unknown_problem_ids = sorted(map(str, problem_ids - registered_problem_ids))
+        unregistered_problem_ids = sorted(map(str, problem_ids - registered_problem_ids))
         missing_problem_ids = sorted(map(str, registered_problem_ids - problem_ids))
         reasons = []
-        if unknown_problem_ids:
-            reasons.append(f"{len(unknown_problem_ids)} candidates are not registered, e.g. {unknown_problem_ids[0]}")
+        if unregistered_problem_ids:
+            reasons.append(
+                f"{len(unregistered_problem_ids)} candidates are not registered, e.g. {unregistered_problem_ids[0]}"
+            )
         if missing_problem_ids:
             reasons.append(
                 f"{len(missing_problem_ids)} registered candidates are missing, e.g. {missing_problem_ids[0]}"
@@ -356,12 +356,13 @@ class BenchmarkSuitesBuildDetails:
     # --------------------------------------------------------------------------
     @classmethod
     def from_files(cls, files: Mapping[str, bytes]) -> Self:
-        """Return the build details that `to_files` converted to `files`.
+        """Rebuild the build details from the output of `to_files`.
 
         Raises:
             ValueError: If the characterization results record other core solver configs than
                 `DiversityFeatureFactory.solver_ids`, or the files hold a stage id or a `DifficultyClass` or
                 `SuiteFamily` value that this sunnbear does not define.
+            KeyError: If `files` lacks a file or a field that `to_files` writes.
         """
         run_contents = json.loads(files[_RUN_FILE_NAME])
         if run_contents["stop"] is not None:
