@@ -42,8 +42,8 @@ README = REPO_ROOT / "README.md"
 BUILTIN_ARTIFACTS_DIR = REPO_ROOT / "src" / "sunnbear" / "_core" / "artifacts" / "builtin"
 PYTHON_VERSIONS_FILE = REPO_ROOT / ".python-versions"
 SPLASH_SCRIPT = REPO_ROOT / ".github" / "scripts" / "create_splash.sh"
-SPLASH_WEBP = REPO_ROOT / "images" / "splash_with_version.webp"
-SPLASH_BASE_PNG = REPO_ROOT / "images" / "_splash_without_version.png"
+SPLASH_WITH_VERSION_WEBP = REPO_ROOT / "images" / "splash_with_version.webp"
+SPLASH_WITHOUT_VERSION_WEBP = REPO_ROOT / "images" / "_splash_without_version.webp"
 SPLASH_FONT = REPO_ROOT / "images" / "splash" / "google_fonts_montserrat_bold.ttf"
 
 PACKAGE_NAME = "sunnbear"
@@ -219,7 +219,7 @@ def step_8_check_stamping_inputs(last_release_version: str) -> None:
             fail_with_message(f"README.md must carry exactly 1 {name} badge to stamp (found {n_badges})")
     if shutil.which("magick") is None:
         fail_with_message("ImageMagick ('magick') is required to stamp the release splash but was not found")
-    for path in (SPLASH_SCRIPT, SPLASH_BASE_PNG, SPLASH_FONT):
+    for path in (SPLASH_SCRIPT, SPLASH_WITHOUT_VERSION_WEBP, SPLASH_FONT):
         if not path.is_file():
             fail_with_message(f"the splash cannot be stamped: {path.relative_to(REPO_ROOT)} is missing")
     try:
@@ -492,10 +492,10 @@ def refresh_readme_badges(badge_metrics: BadgeMetrics) -> None:
 
 
 def stamp_splash(version: str) -> None:
-    """Stamp the release version onto the committed splash webp.
+    """Stamp the release version onto the splash and write it to ``splash_with_version.webp``.
 
     Run the second stage of ``create_splash.sh`` (the version overlay) on the
-    committed, version-independent base image. It requires ImageMagick's ``magick`` on PATH,
+    committed ``_splash_without_version.webp``. It requires ImageMagick's ``magick`` on PATH,
     which `step_8_check_stamping_inputs` verifies before the first write.
     """
     # no leading "v": the script prepends it in the annotation
@@ -509,7 +509,7 @@ def step_14_commit_release(version: str, last_release_version: str, badge_metric
     stamp_splash(version)
     manifest_paths = stamp_artifact_manifests(release_version=version, last_release_version=last_release_version)
     run_command(
-        ["git", "add", "pyproject.toml", "uv.lock", "CHANGELOG.md", "README.md", str(SPLASH_WEBP)]
+        ["git", "add", "pyproject.toml", "uv.lock", "CHANGELOG.md", "README.md", str(SPLASH_WITH_VERSION_WEBP)]
         + [str(path) for path in manifest_paths]
     )
     run_command(["git", "commit", "-m", f"release: {version}"])
