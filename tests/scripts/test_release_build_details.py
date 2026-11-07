@@ -34,7 +34,7 @@ def test_the_release_stops_on_unreadable_or_stale_build_details(
 
     # --- act --------------------------
     with pytest.raises(SystemExit):
-        release.step_9_check_benchmark_suites_build_details_staleness()
+        release.step_9_check_artifacts_staleness()
 
     # --- assert -----------------------
     error = capsys.readouterr().err
@@ -49,4 +49,4 @@ def test_the_release_goes_on_with_build_details_that_fit(release, monkeypatch):
     monkeypatch.setattr(ArtifactStore, "load", classmethod(lambda cls, declaration_cls: build_details))
 
     # --- act / assert -----------------
-    release.step_9_check_benchmark_suites_build_details_staleness()
+    release.step_9_check_artifacts_staleness()

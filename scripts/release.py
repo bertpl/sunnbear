@@ -2,7 +2,7 @@
 
 Run via ``make release VERSION=X.Y.Z``.  In order, the release:
 
-- validates state, including that the shipped benchmark suites build details are not stale
+- validates state, including that no built-in artifact is stale
 - bumps the version
 - stamps the versioned splash, the README badges and the built-in artifact manifests
 - finalizes the changelog
@@ -231,17 +231,19 @@ def step_8_check_stamping_inputs(last_release_version: str) -> None:
         print(f"    artifact manifests to stamp with the release version: {names}")
 
 
-def step_9_check_benchmark_suites_build_details_staleness() -> None:
-    """Check that the shipped benchmark suites build details fit the release's test problems and core solver configs.
+def step_9_check_artifacts_staleness() -> None:
+    """Check that no built-in artifact is stale for the release.
 
-    A consumer of the build details looks up each of their candidates and solver configs in the installed sunnbear, so
-    build details that no longer fit the installed sunnbear would break that consumer.
+    The benchmark suites build details are the only built-in artifact that can go stale: they must fit the release's
+    test problems and core solver configs. A consumer of the build details looks up each of their candidates and solver
+    configs in the installed sunnbear, so build details that no longer fit the installed sunnbear would break that
+    consumer.
 
     `BenchmarkSuitesBuildDetails.staleness_reasons` reports candidates that differ from the registered ones, and the
     artifact's `from_files` refuses core solver configs other than `DiversityFeatureFactory.solver_ids`. Loading the
     artifact downloads its data files, unless the cache holds them.
     """
-    print_step(9, "benchmark suites build details are not stale")
+    print_step(9, "built-in artifacts are not stale")
     rebuild_hint = "rebuild them with 'make benchmark-suites-build-details' and commit the new manifest"
     try:
         build_details = ArtifactStore.load(BenchmarkSuitesBuildDetailsDeclaration)
@@ -596,7 +598,7 @@ def main() -> None:
     step_6_check_classifiers_match()
     step_7_check_changelog_has_entries()
     step_8_check_stamping_inputs(last_release_version)
-    step_9_check_benchmark_suites_build_details_staleness()
+    step_9_check_artifacts_staleness()
     badge_metrics = step_10_gather_badge_metrics()
 
     if args.is_dry_run:
