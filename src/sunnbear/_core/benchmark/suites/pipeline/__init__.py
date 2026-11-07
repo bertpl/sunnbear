@@ -1,16 +1,15 @@
 """This package holds the benchmark suite pipeline, the maintainer tooling that builds benchmark suites.
 
-The pipeline is a chain of stages, each of which computes its output table from the output table of the stage before
-it, adding columns and dropping rows:
+The pipeline is a sequence of stages that share 1 state. Every candidate stays in the state, and each stage adds its
+information on the candidates that no stage before it dropped, and drops candidates of its own. The packages are:
 
-- `core` holds the framework: the base class of a stage, the loop that runs the stages, and the workspace that
-  stores their outputs;
-- `stages` holds the stages, 1 module or subpackage per stage, whose names sort in run order;
+- `core` holds the framework: what a stage is, its id, its manifest, and the workspace that stores the manifests;
 - `snuffled_analysis` runs snuffled's analysis of a test problem, for every stage that needs one;
-- `diversity_features` computes the candidates' diversity features, and holds the base classes of the stages that
-  compute them; each such stage is a child class in `stages` that sets its default `FeatureFidelity`;
+- `diversity_features` computes the candidates' diversity features and their empirical difficulty index (EDI);
 - `selection` selects the pipeline's suites, each the most diverse candidates under difficulty quotas, from the
   candidates' feature vectors;
+- `state` holds the state of a run, which each stage reaches only through its own state accessor;
+- `stages` holds the stages, 1 module or subpackage per stage, whose names sort in run order;
 - `run_pipeline` runs the stages in order on a set of formulas, sharing 1 pool of worker processes between them, in a
   `PipelineMode` that sets how much work the stages do.
 
@@ -19,31 +18,19 @@ writes its outputs to the workspace directory given there, outside the package.
 """
 
 from .core import (
-    REJECTED_BY_SCHEMA,
-    REJECTED_CANDIDATES_REPORT_NAME,
-    REJECTIONS_PER_FORMULA_REPORT_NAME,
-    PipelineRunResult,
     PipelineStage,
+    PipelineStageId,
     PipelineStageManifest,
-    PipelineStageOutput,
     PipelineStop,
     PipelineStopError,
     PipelineWorkspace,
-    RejectionReason,
-    run_stages,
 )
-from .diversity_features import (
-    INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME,
-    CandidateCharacterizationStage,
-    FeatureBlock,
-    FeatureFidelity,
-)
+from .diversity_features import DiversityFeatureFactory, FeatureBlock, FeatureFidelity
 from .mode import PipelineMode
-from .runner import run_pipeline
+from .runner import PipelineRunResult, run_pipeline, run_stages
 from .stages import (
-    C_RANGE_SCHEMA,
-    CANDIDATES_SCHEMA,
     MAX_BOUND_TO_WIDTH_RATIO,
+    CandidateCharacterizationStage,
     CandidateGenerationStage,
     CandidateValidationStage,
     CoarseCharacterizationStage,
@@ -52,3 +39,4 @@ from .stages import (
     FullCharacterizationStage,
     SpacingStage,
 )
+from .state import PipelineState

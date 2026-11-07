@@ -1,129 +1,116 @@
 """`SpacingStage` drops near-duplicate candidates of each formula:
 
-- it keeps, in row order, the candidates at least `min_distance` apart in the scaled coarse feature space;
+- it keeps, in the order of candidate generation, the candidates at least `min_distance` apart in the scaled coarse
+  feature space;
 - it keeps at least 2 candidates of every formula that has 2 or more;
-- it reports each dropped candidate with its nearest kept candidate.
+- it stores each dropped candidate's nearest kept candidate.
+
+The tests give the stage its scaled coarse features directly, not those that the state computes.
 """
 
-import polars as pl
+import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureBlock
-from sunnbear._core.benchmark.suites.pipeline.stages import (
-    CANDIDATE_COUNTS_PER_FORMULA_REPORT_NAME,
-    DROPPED_CANDIDATES_REPORT_NAME,
-    NEAREST_KEPT_CANDIDATE_SCHEMA,
-    CoarseCharacterizationStage,
-    SpacingStage,
-)
-from sunnbear._core.solvers.core import SolverConfigRegistry
+from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureMatrix
+from sunnbear._core.benchmark.suites.pipeline.stages import SpacingStage
+from sunnbear._core.benchmark.suites.pipeline.state import CandidateDrop, NearestKeptCandidate, SpacingStateAccessor
+from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
+from tests.benchmark.suites.pipeline.example_states import build_state_before, record_calls
 
 _IN_PROCESS_WORKER_POOL = WorkerPool(n_workers=1)
+_NEAR_DUPLICATE = CandidateDrop(stage_id=PipelineStageId.SPACING, reason="near_duplicate", is_rejection=False)
 
 
-def _coarse_features_table(
-    first_features_by_problem_id: dict[str, tuple[float, float]], *, scales: tuple[float | None, float | None]
-) -> pl.DataFrame:
-    """Return a table of coarse features for 1 core solver config, ``bisection``, with the feature scales `scales`.
+def _run_spacing(
+    vectors_by_problem_id: dict[str, tuple[float, ...]] | None,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    problem_ids: list[str] | None = None,
+) -> tuple[dict[ProblemId, CandidateDrop | None], dict[ProblemId, NearestKeptCandidate]]:
+    """Run spacing at a minimum distance of 1 on the scaled features `vectors_by_problem_id`; return each candidate's
+    drop and the stored nearest kept candidates.
 
-    Each candidate's tuple holds the value of the first feature of the solvers block and of the snuffled block, in that
-    order; its other features are 0. `scales` holds the scale of each `FeatureBlock`, in their order.
+    `vectors_by_problem_id` ``None`` stands for a coarse characterization without scales, of the candidates
+    `problem_ids`.
     """
-    column_names = CoarseCharacterizationStage([SolverConfigRegistry.config_from_id("bisection")]).feature_column_names
-    first_column_names = [
-        next(name for name in column_names if name.startswith(CoarseCharacterizationStage.feature_column_prefix(block)))
-        for block in FeatureBlock
-    ]
-    values_per_block = zip(*first_features_by_problem_id.values(), strict=True)
-    return (
-        pl.DataFrame({"problem_id": list(first_features_by_problem_id)})
-        .with_columns(pl.lit(0.0).alias(column_name) for column_name in column_names)
-        .with_columns(
-            *(
-                pl.Series(column_name, values, dtype=pl.Float64())
-                for column_name, values in zip(first_column_names, values_per_block, strict=True)
-            ),
-            *(
-                pl.lit(scale, dtype=pl.Float64()).alias(column_name)
-                for column_name, scale in zip(
-                    CoarseCharacterizationStage.feature_scale_column_names(), scales, strict=True
-                )
-            ),
+    if vectors_by_problem_id is not None:
+        problem_ids = list(vectors_by_problem_id)
+        scaled_feature_matrix = FeatureMatrix(
+            problem_ids=tuple(map(ProblemId.from_string, problem_ids)),
+            values=np.array(list(vectors_by_problem_id.values())),
         )
-    )
+    else:
+        scaled_feature_matrix = None
+    monkeypatch.setattr(SpacingStateAccessor, "coarse_scaled_feature_matrix", lambda self: scaled_feature_matrix)
+    calls = record_calls(monkeypatch, SpacingStateAccessor, "set_nearest_kept_candidates")
+    state = build_state_before(PipelineStageId.SPACING, [ProblemId.from_string(p) for p in problem_ids])
+
+    state.run_stage(SpacingStage(min_distance=1.0), worker_pool=_IN_PROCESS_WORKER_POOL)
+
+    [(nearest_kept_candidates,)] = calls
+    drops = {ProblemId.from_string(p): state.drop_of(ProblemId.from_string(p)) for p in problem_ids}
+    return drops, dict(nearest_kept_candidates)
 
 
-def test_the_pass_keeps_the_candidates_far_enough_from_every_kept_one_in_row_order():
-    """The stage's pass over the candidates in row order keeps p=1, p=3 and p=5 of formula f99.1, and drops p=2 and
-    p=4, each closer than 1 to the kept candidate before it; p=3 is kept over p=4 because it comes first.
+def test_the_pass_keeps_the_candidates_far_enough_from_every_kept_one_in_order(monkeypatch):
+    """The stage's pass over the candidates keeps p=1, p=3 and p=5 of formula f99.1, and drops p=2 and p=4, each closer
+    than 1 to the kept candidate before it; p=3 is kept over p=4 because it comes first.
 
     Formula f99.2's only candidate is kept, although it coincides with f99.1's first candidate."""
-    # --- arrange ----------------------
-    previous_table = _coarse_features_table(
-        {
-            "f99.1[p=1.0]": (0.0, 0.0),  # scaled: (0.0, 0.0)
-            "f99.1[p=2.0]": (1.2, 0.0),  # scaled: (0.6, 0.0), at 0.6 from p=1
-            "f99.1[p=3.0]": (1.2, 0.3),  # scaled: (0.6, 0.6), at 1.2 from p=1
-            "f99.1[p=4.0]": (2.4, 0.3),  # scaled: (1.2, 0.6), at 0.6 from p=3
-            "f99.1[p=5.0]": (3.0, 0.5),  # scaled: (1.5, 1.0), at 1.3 from p=3
-            "f99.2": (0.0, 0.0),
-        },
-        scales=(2.0, 0.5),
-    )
-
     # --- act --------------------------
-    output = SpacingStage(min_distance=1.0).compute_output(previous_table, worker_pool=_IN_PROCESS_WORKER_POOL)
-
-    # --- assert -----------------------
-    assert output.table.equals(
-        previous_table.filter(pl.col("problem_id").is_in(["f99.1[p=1.0]", "f99.1[p=3.0]", "f99.1[p=5.0]", "f99.2"]))
-    )
-    dropped_candidates = output.reports[DROPPED_CANDIDATES_REPORT_NAME]
-    assert dropped_candidates.schema == pl.Schema({**previous_table.schema, **NEAREST_KEPT_CANDIDATE_SCHEMA})
-    assert dropped_candidates.select("problem_id", *NEAREST_KEPT_CANDIDATE_SCHEMA).rows() == [
-        ("f99.1[p=2.0]", "f99.1[p=1.0]", pytest.approx(0.6)),
-        ("f99.1[p=4.0]", "f99.1[p=3.0]", pytest.approx(0.6)),
-    ]
-    assert output.reports[CANDIDATE_COUNTS_PER_FORMULA_REPORT_NAME].rows() == [("f99.1", 5, 3, 2), ("f99.2", 1, 1, 0)]
-
-
-def test_a_formula_with_2_or_more_candidates_keeps_at_least_2():
-    """Where the pass over the candidates in row order keeps only a formula's first candidate, the stage also keeps the
-    one farthest from it: for f99.1 that is p=3, which then becomes the nearest kept candidate of p=2; for f99.2 it is
-    the second of its 2 identical candidates."""
-    # --- arrange ----------------------
-    previous_table = _coarse_features_table(
+    drops, nearest_kept_candidates = _run_spacing(
         {
             "f99.1[p=1.0]": (0.0, 0.0),
-            "f99.1[p=2.0]": (0.4, 0.0),  # scaled: (0.2, 0.0), at 0.2 from p=1 and 0.1 from p=3
-            "f99.1[p=3.0]": (0.6, 0.0),  # scaled: (0.3, 0.0), at 0.3 from p=1
+            "f99.1[p=2.0]": (0.6, 0.0),  # p=2 lies at 0.6 from p=1
+            "f99.1[p=3.0]": (0.6, 0.6),  # p=3 lies at 1.2 from p=1
+            "f99.1[p=4.0]": (1.2, 0.6),  # p=4 lies at 0.6 from p=3
+            "f99.1[p=5.0]": (1.5, 1.0),  # p=5 lies at 1.3 from p=3
+            "f99.2": (0.0, 0.0),
+        },
+        monkeypatch,
+    )
+
+    # --- assert -----------------------
+    dropped_problem_ids = [problem_id for problem_id, drop in drops.items() if drop is not None]
+    assert [str(problem_id) for problem_id in dropped_problem_ids] == ["f99.1[p=2.0]", "f99.1[p=4.0]"]
+    assert all(drops[problem_id] == _NEAR_DUPLICATE for problem_id in dropped_problem_ids)
+    assert {str(p): (str(n.problem_id), n.distance) for p, n in nearest_kept_candidates.items()} == {
+        "f99.1[p=2.0]": ("f99.1[p=1.0]", pytest.approx(0.6)),
+        "f99.1[p=4.0]": ("f99.1[p=3.0]", pytest.approx(0.6)),
+    }
+
+
+def test_a_formula_with_2_or_more_candidates_keeps_at_least_2(monkeypatch):
+    """Where the pass keeps only a formula's first candidate, the stage also keeps the one farthest from it: for f99.1
+    that is p=3, which then becomes the nearest kept candidate of p=2; for f99.2 it is the second of its 2 identical
+    candidates."""
+    # --- act --------------------------
+    drops, nearest_kept_candidates = _run_spacing(
+        {
+            "f99.1[p=1.0]": (0.0, 0.0),
+            "f99.1[p=2.0]": (0.2, 0.0),  # p=2 lies at 0.2 from p=1 and 0.1 from p=3
+            "f99.1[p=3.0]": (0.3, 0.0),  # p=3 lies at 0.3 from p=1
             "f99.2[p=1.0]": (0.0, 0.0),
             "f99.2[p=2.0]": (0.0, 0.0),
         },
-        scales=(2.0, 0.5),
+        monkeypatch,
     )
 
+    # --- assert -----------------------
+    assert [str(problem_id) for problem_id, drop in drops.items() if drop is not None] == ["f99.1[p=2.0]"]
+    assert {str(p): (str(n.problem_id), n.distance) for p, n in nearest_kept_candidates.items()} == {
+        "f99.1[p=2.0]": ("f99.1[p=3.0]", pytest.approx(0.1))
+    }
+
+
+def test_without_scales_every_candidate_is_kept(monkeypatch):
+    """Coarse characterization has no scales when it keeps fewer than 2 candidates; the stage then keeps every
+    candidate, and stores no nearest kept candidate."""
     # --- act --------------------------
-    output = SpacingStage(min_distance=1.0).compute_output(previous_table, worker_pool=_IN_PROCESS_WORKER_POOL)
+    drops, nearest_kept_candidates = _run_spacing(None, monkeypatch, problem_ids=["f99.1"])
 
     # --- assert -----------------------
-    assert output.table["problem_id"].to_list() == ["f99.1[p=1.0]", "f99.1[p=3.0]", "f99.2[p=1.0]", "f99.2[p=2.0]"]
-    assert output.reports[DROPPED_CANDIDATES_REPORT_NAME].select(
-        "problem_id", *NEAREST_KEPT_CANDIDATE_SCHEMA
-    ).rows() == [("f99.1[p=2.0]", "f99.1[p=3.0]", pytest.approx(0.1))]
-
-
-def test_a_single_candidate_with_null_scales_is_kept():
-    """Coarse characterization leaves the feature scales null when it keeps fewer than 2 candidates; the stage keeps the
-    only candidate, and its reports hold no dropped candidate."""
-    # --- arrange ----------------------
-    previous_table = _coarse_features_table({"f99.1": (0.5, 0.5)}, scales=(None, None))
-
-    # --- act --------------------------
-    output = SpacingStage().compute_output(previous_table, worker_pool=_IN_PROCESS_WORKER_POOL)
-
-    # --- assert -----------------------
-    assert output.table.equals(previous_table)
-    assert output.reports[DROPPED_CANDIDATES_REPORT_NAME].is_empty()
-    assert output.reports[CANDIDATE_COUNTS_PER_FORMULA_REPORT_NAME].rows() == [("f99.1", 1, 1, 0)]
+    assert drops == {ProblemId.from_string("f99.1"): None}
+    assert nearest_kept_candidates == {}

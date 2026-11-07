@@ -1,12 +1,10 @@
-"""`CandidateGenerationStage` lists every candidate of every given formula, with its id and interval bounds."""
+"""`CandidateGenerationStage` adds every candidate of every given formula, with its interval bounds."""
 
-import polars as pl
 import pytest
 
-from sunnbear._core.benchmark.suites.pipeline.stages.s1_candidate_generation import (
-    CANDIDATES_SCHEMA,
-    CandidateGenerationStage,
-)
+from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
+from sunnbear._core.benchmark.suites.pipeline.stages import CandidateGenerationStage
+from sunnbear._core.benchmark.suites.pipeline.state import IntervalBounds, PipelineState
 from sunnbear._core.problems.core import FormulaRegistry
 from sunnbear._core.utils.worker_pool import WorkerPool
 
@@ -18,22 +16,23 @@ from sunnbear._core.utils.worker_pool import WorkerPool
         pytest.param((), id="no_formulas"),
     ],
 )
-def test_the_candidates_are_listed_formula_by_formula_in_the_given_order(formula_numbers):
-    """The rows are each formula's candidates in the order of `Formula.build_all_candidates`, formula by formula in
-    the given order, typed by `CANDIDATES_SCHEMA`."""
+def test_the_candidates_are_added_formula_by_formula_in_the_given_order(formula_numbers):
+    """The candidates are each formula's candidates in the order of `Formula.build_all_candidates`, formula by formula
+    in the given order, with their interval bounds."""
     # --- arrange ----------------------
     formulas_by_number = {formula.number: formula for formula in FormulaRegistry.formulas()}
     formulas = [formulas_by_number[number] for number in formula_numbers]
-    rows_expected = [
-        (str(candidate.id), candidate.a, candidate.b)
-        for formula in formulas
-        for candidate in formula.build_all_candidates()
-    ]
+    state = PipelineState()
 
     # --- act --------------------------
-    output = CandidateGenerationStage(formulas).compute_output(pl.DataFrame(), worker_pool=WorkerPool(n_workers=1))
+    CandidateGenerationStage(formulas).run(
+        state.create_state_accessor(PipelineStageId.CANDIDATE_GENERATION), worker_pool=WorkerPool(n_workers=1)
+    )
 
     # --- assert -----------------------
-    assert output.table.schema == pl.Schema(CANDIDATES_SCHEMA)
-    assert output.table.rows() == rows_expected
-    assert output.reports == {}
+    state.finish_stage(PipelineStageId.CANDIDATE_GENERATION)
+    assert state.create_state_accessor(PipelineStageId.CANDIDATE_VALIDATION).interval_bounds() == {
+        candidate.id: IntervalBounds(a=candidate.a, b=candidate.b)
+        for formula in formulas
+        for candidate in formula.build_all_candidates()
+    }

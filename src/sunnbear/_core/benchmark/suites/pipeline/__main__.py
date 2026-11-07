@@ -14,29 +14,24 @@ The command also takes these optional flags:
 - ``--draft`` runs the stages in `PipelineMode.DRAFT`, which takes a fraction of a full run's time and applies the same
   selection rules.
 
-After the run, the command prints 1 line per stage that wrote its output, then, for each stage that rejects candidates:
-
-- the stage's output name, then the number of formulas with rejected candidates;
-- 1 line per such formula.
+After the run, the command prints 1 line per stage that ran to its end: the number of candidates that it received and
+kept, and its run time.
 
 When a stage stops the run, for example because core selection finds too few candidates for the smallest Core of the
-benchmark suites, the command then prints that stage's output name and the reason, and exits with status 1.
+benchmark suites, the command then prints that stage's id and the reason, and exits with status 1.
 """
 
 import argparse
 from pathlib import Path
 
 from sunnbear._core.problems.core import FormulaRegistry
-from sunnbear._core.solvers import bracketing  # noqa: F401 - importing the shipped solvers registers their configs
-from sunnbear._core.solvers.core import SolverConfigRegistry
 
-from .core import REJECTIONS_PER_FORMULA_REPORT_NAME, PipelineWorkspace, summarize_rejections_per_formula
 from .mode import PipelineMode
 from .runner import run_pipeline
 
 
 def main() -> None:
-    """Parse the command line, run the pipeline, and print what each stage wrote, the rejections and any stop."""
+    """Parse the command line, run the pipeline, and print what each stage kept and any stop."""
     parser = argparse.ArgumentParser(
         prog="python -m sunnbear._core.benchmark.suites.pipeline",
         description="Run the benchmark suite pipeline over the shipped formulas.",
@@ -51,27 +46,16 @@ def main() -> None:
     result = run_pipeline(
         workspace_dir=args.workspace,
         formulas=FormulaRegistry.formulas(),
-        core_solver_configs=[
-            config for config in SolverConfigRegistry.configs() if config.role.is_used_for_problem_characterization
-        ],
         n_workers=args.n_workers,
         mode=PipelineMode.DRAFT if args.is_draft else PipelineMode.FULL,
     )
     for manifest in result.manifests:
-        report_names = ", ".join(manifest.report_sha256s) or "none"
-        rows = f"{manifest.n_rows} rows, {manifest.n_dropped_rows} dropped"
-        print(f"{manifest.output_name}: {rows}, in {manifest.duration_sec:.2f} s; reports: {report_names}")
-    for manifest in result.manifests:
-        if REJECTIONS_PER_FORMULA_REPORT_NAME in manifest.report_sha256s:
-            rejections_per_formula = PipelineWorkspace(args.workspace).read_report(
-                manifest.output_name, REJECTIONS_PER_FORMULA_REPORT_NAME
-            )
-            [count_line, *formula_lines] = summarize_rejections_per_formula(rejections_per_formula)
-            print(f"{manifest.output_name}: {count_line}")
-            for line in formula_lines:
-                print(line)
+        print(
+            f"{manifest.stage_id}: {manifest.n_candidates_out} of {manifest.n_candidates_in} candidates kept, "
+            f"in {manifest.duration_sec:.2f} s"
+        )
     if result.stop is not None:
-        print(f"{result.stop.output_name}: stopped: {result.stop.reason}")
+        print(f"{result.stop.stage_id}: stopped: {result.stop.reason}")
         raise SystemExit(1)
 
 

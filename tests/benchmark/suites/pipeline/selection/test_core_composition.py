@@ -6,9 +6,13 @@ import warnings
 import pytest
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStopError
-from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyClass, DifficultyQuota
-from sunnbear._core.benchmark.suites.pipeline.stages import CoreComposition, CoreCompositionWarning
-from sunnbear._core.benchmark.suites.pipeline.stages.s6_core_selection.core_composition import _CLASSES_PER_QUARTER
+from sunnbear._core.benchmark.suites.pipeline.selection import (
+    CoreComposition,
+    CoreCompositionWarning,
+    DifficultyClass,
+    DifficultyQuota,
+)
+from sunnbear._core.benchmark.suites.pipeline.selection.core_composition import _CLASSES_PER_QUARTER
 
 A, B, C, DA, DB = DifficultyClass
 
@@ -66,8 +70,8 @@ def test_da_and_db_share_1_quota_with_a_warning_when_either_is_short(class_count
     # --- assert -----------------------
     assert composition.size == 256
     assert composition.quotas[-1] == DifficultyQuota(classes=frozenset({DA, DB}), count=64)
-    assert composition.report_row()["quota_d"] == 64
-    assert composition.report_row()["quota_da"] is None
+    assert composition.summary()["quota_d"] == 64
+    assert composition.summary()["quota_da"] is None
 
 
 def test_the_pipeline_stops_below_the_smallest_core_size():
@@ -82,14 +86,14 @@ def test_the_pipeline_stops_below_the_smallest_core_size():
     )
 
 
-def test_the_report_row_gives_each_classs_count_and_largest_core_size():
+def test_the_summary_gives_each_classs_count_and_largest_core_size():
     """Each class's largest Core size is the largest at which its candidates fill its share on their own, null where
     they fill it at no size."""
     # --- act --------------------------
-    row = CoreComposition.from_class_counts({A: 512, B: 100, C: 64, DA: 48, DB: 16}).report_row()
+    summary = CoreComposition.from_class_counts({A: 512, B: 100, C: 64, DA: 48, DB: 16}).summary()
 
     # --- assert -----------------------
-    assert row == {
+    assert summary == {
         "core_size": 256,
         "is_interim": True,
         "quota_a": 64,

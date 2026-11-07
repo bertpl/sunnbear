@@ -1,7 +1,7 @@
 """``python -m sunnbear._core.benchmark.suites.pipeline`` runs the pipeline over the shipped formulas:
 
 - it writes into the ``--workspace`` directory with ``--n-workers`` workers, in draft mode with ``--draft``;
-- it prints the rejections per formula and the stage that stops the run;
+- it prints each stage's counts of candidates and the stage that stops the run;
 - it exits normally when no stage stops it;
 - it refuses to run without a workspace.
 """
@@ -13,26 +13,15 @@ import sys
 import pytest
 
 from sunnbear._core.benchmark.suites.pipeline import runner
-from sunnbear._core.benchmark.suites.pipeline.core import PipelineRunResult, PipelineStageManifest
+from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId, PipelineStageManifest
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureFidelity
-from sunnbear._core.benchmark.suites.pipeline.stages import (
-    CandidateGenerationStage,
-    CandidateValidationStage,
-    CoarseCharacterizationStage,
-    CoreSelectionStage,
-    FullCharacterizationStage,
-    SpacingStage,
-)
+from sunnbear._core.benchmark.suites.pipeline.runner import PipelineRunResult
+from sunnbear._core.benchmark.suites.pipeline.state import PipelineState
 from sunnbear._core.problems.core import FormulaRegistry
 
 _PIPELINE_PACKAGE = "sunnbear._core.benchmark.suites.pipeline"
-_OUTPUT_NAMES = [
-    CandidateGenerationStage.output_name,
-    CandidateValidationStage.output_name,
-    CoarseCharacterizationStage.output_name,
-    SpacingStage.output_name,
-    FullCharacterizationStage.output_name,
-]
+# Core selection stops the run of the first test, so these stages are the ones that run to their end.
+_FINISHED_STAGE_IDS = list(PipelineStageId)[:-2]
 
 
 def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> None:
@@ -48,12 +37,11 @@ def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> N
 
 @pytest.mark.only_with_numba_jit
 def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeypatch, capsys):
-    """In draft mode, the command writes each stage's output into the workspace with the given number of workers, until
-    core selection stops the run, because the test's 3 candidates fill no Core. Full characterization runs at the coarse
-    fidelity.
+    """In draft mode, the command writes each stage's manifest into the workspace with the given number of workers,
+    until core selection stops the run, because the test's candidates fill no Core. Full characterization runs at the
+    coarse fidelity.
 
-    It prints 1 line per stage that wrote its output, in run order, then for each stage that rejects candidates the
-    count of the formulas with rejected candidates, followed by 1 indented line per such formula, then the stop, and
+    It prints 1 line per stage that ran to its end, in run order, with its counts of candidates, then the stop, and
     exits with status 1."""
     # --- arrange ----------------------
     # The command runs over every registered formula. The test keeps only the shipped formulas whose numbers start with
@@ -68,36 +56,25 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
 
     # --- assert -----------------------
     assert exc_info.value.code == 1
-    [*printed_lines, stop_line] = capsys.readouterr().out.splitlines()
-    assert stop_line.startswith(f"{CoreSelectionStage.output_name}: stopped: The candidates fill no Core of 128")
-    assert [line.split(":")[0] for line in printed_lines[: len(_OUTPUT_NAMES)]] == _OUTPUT_NAMES
-    count_line_indices = [idx for idx, line in enumerate(printed_lines) if not line.startswith("  ")]
-    count_line_indices = count_line_indices[len(_OUTPUT_NAMES) :]
-    rejecting_output_names = [
-        CandidateValidationStage.output_name,
-        CoarseCharacterizationStage.output_name,
-        FullCharacterizationStage.output_name,
-    ]
-    assert [printed_lines[idx].split(":")[0] for idx in count_line_indices] == rejecting_output_names
-    for idx, next_idx in zip(count_line_indices, [*count_line_indices[1:], len(printed_lines)], strict=True):
-        n_formulas_with_rejections = next_idx - idx - 1
-        assert re.fullmatch(
-            rf"\w+: formulas with rejected candidates: {n_formulas_with_rejections} of \d+", printed_lines[idx]
-        )
-    assert sorted(path.name for path in tmp_path.glob("*.parquet")) == [f"{name}.parquet" for name in _OUTPUT_NAMES]
+    [*stage_lines, stop_line] = capsys.readouterr().out.splitlines()
+    assert stop_line.startswith(f"{PipelineStageId.CORE_SELECTION}: stopped: The candidates fill no Core of 128")
+    assert [line.split(":")[0] for line in stage_lines] == _FINISHED_STAGE_IDS
+    assert all(re.fullmatch(r"\w+: \d+ of \d+ candidates kept, in [0-9.]+ s", line) for line in stage_lines)
     manifests = [
-        PipelineStageManifest.model_validate_json((tmp_path / "manifests" / f"{name}.json").read_text())
-        for name in _OUTPUT_NAMES
+        PipelineStageManifest.model_validate_json((tmp_path / "manifests" / f"{stage_id}.json").read_text())
+        for stage_id in _FINISHED_STAGE_IDS
     ]
-    assert [manifest.n_workers for manifest in manifests] == [3] * len(_OUTPUT_NAMES)
+    assert [manifest.n_workers for manifest in manifests] == [3] * len(_FINISHED_STAGE_IDS)
     assert manifests[-1].parameters == {"fidelity": FeatureFidelity.COARSE.name}
 
 
 def test_the_command_exits_normally_when_no_stage_stops_the_run(tmp_path, monkeypatch, capsys):
-    """When every stage writes its output, the command prints no stop and returns without an exit status; the test
-    replaces the run by one that wrote no stage, because the shipped formulas take long to fill a Core."""
+    """When every stage runs to its end, the command prints no stop and returns without an exit status; the test
+    replaces the run by one that ran no stage, because the shipped formulas take long to fill a Core."""
     # --- arrange ----------------------
-    monkeypatch.setattr(runner, "run_pipeline", lambda **_kwargs: PipelineRunResult(manifests=(), stop=None))
+    monkeypatch.setattr(
+        runner, "run_pipeline", lambda **_kwargs: PipelineRunResult(manifests=(), stop=None, state=PipelineState())
+    )
 
     # --- act --------------------------
     _run_pipeline_command(monkeypatch, ["--workspace", str(tmp_path)])

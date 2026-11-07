@@ -1,26 +1,20 @@
-"""This package computes the candidates' diversity features, which `SpacingStage` and max-div compare.
+"""This package computes the candidates' diversity features and their empirical difficulty index (EDI).
 
-It also holds the base classes, the fidelities and the feature blocks of the stages that compute them. A fidelity sets
-how much work goes into each feature vector. Each such pipeline stage is a child class of a base class here, lives in
-the package `stages`, and sets its default fidelity. The package holds:
+The characterization stages compute these features, and spacing and max-div compare candidates by them; the EDI is
+max-div's second distance term. The package holds:
 
-- `FeatureFidelity` names a fidelity;
-- `FeatureBlock` names a block of a feature vector;
 - `DiversityFeatureFactory` computes the features: 1 candidate's raw features, and the scaled matrix of a set of
   candidates;
+- `FeatureBlock` names a block of a feature vector;
 - `FeatureBlockScales` holds the scale of each `FeatureBlock` over a set of candidates;
 - `FeatureMatrix` holds 1 feature vector per candidate, paired with the candidate's id;
-- `CandidateCharacterizationStage` is the base class of the characterization stages, which compute the feature vectors
-  in `CandidateCharacterizationTask` tasks, then the scale of each `FeatureBlock`: its mean pairwise L1 distance
-  over the kept candidates. It names the columns that it adds, and later stages read them back through it. Each
-  characterization stage also reports, for each core solver config, the fraction of its solves that end without a
-  correct answer.
+- `compute_edi` computes a candidate's empirical difficulty index (EDI) from its solves;
+- `FeatureFidelity` names a fidelity, which sets how much work goes into each feature vector.
 """
 
-from .characterization_stage import INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME, CandidateCharacterizationStage
-from .characterization_task import CandidateCharacterizationResult, CandidateCharacterizationTask
 from .diversity_feature_factory import DiversityFeatureFactory, FeatureBlockScales
+from .edi import EDI_GPQ_LEVEL, compute_edi
 from .feature_matrix import FeatureMatrix
 from .feature_vector import SNUFFLED_PROPERTIES, SOLVERS_GPQ_LEVELS, FeatureBlock
-from .fevals_mapping import map_feature_to_fevals, map_fevals_to_feature
+from .fevals_mapping import map_fevals_to_feature
 from .fidelity import FeatureFidelity

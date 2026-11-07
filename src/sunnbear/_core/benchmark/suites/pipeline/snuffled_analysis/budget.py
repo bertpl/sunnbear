@@ -6,7 +6,7 @@ from enum import Enum
 from snuffled import Snuffler
 
 from sunnbear._core.benchmark.protocol import MCSolveSettings, SeedPurpose, derive_seed
-from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED, RejectionReason
+from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED
 from sunnbear._core.problems.core import TestProblem
 
 from .diagnostic_rules import extract_properties_or_rejection_reason
@@ -83,7 +83,7 @@ class SnuffledAnalysisBudget(Enum):
         *,
         mc_solve_settings: MCSolveSettings,
         mc_sample_idx: int,
-    ) -> dict[str, float] | RejectionReason:
+    ) -> dict[str, float] | str:
         """Return `properties` from the analysis that `build_snuffler` builds, or the reason to reject `problem`.
 
         The rules are those of `extract_properties_or_rejection_reason`, at the `xtol` of tuple `mc_sample_idx`.

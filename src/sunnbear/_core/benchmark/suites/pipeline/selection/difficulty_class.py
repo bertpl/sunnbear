@@ -1,8 +1,7 @@
 """`DifficultyClass` buckets a candidate by its empirical difficulty index (EDI), relative to bisection's evaluations.
 
-A candidate's EDI is the geometric pseudo-quantile (gpq) at `EDI_GPQ_LEVEL` of the evaluation counts of all its solves
-with the core solver configs, each incorrect solve counting as `max_fevals`, a solve's evaluation budget. Relative to
-`n_bisection_fevals`, the evaluation count that bisection spends, the classes are:
+A candidate's EDI is computed by `compute_edi`, from the evaluation counts of all its solves with the core solver
+configs. Relative to `n_bisection_fevals`, the evaluation count that bisection spends, the classes are:
 
 - A: below 1/4, far better than bisection;
 - B: from 1/4 to 1/2;
@@ -16,9 +15,6 @@ the last quarter split 3 to 1 between Da and Db, because test problems of class 
 
 from enum import StrEnum
 from fractions import Fraction
-
-# A candidate's EDI is the gpq at this level of its evaluation counts, as the module docstring defines it.
-EDI_GPQ_LEVEL = 0.5
 
 
 # ==================================================================================================

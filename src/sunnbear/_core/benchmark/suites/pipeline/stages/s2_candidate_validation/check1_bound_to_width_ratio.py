@@ -17,16 +17,10 @@ larger ratio narrows the benchmark's sampled range of ``xtol`` values; the check
 users' own functions at the default `n_bisection_fevals`.
 """
 
-import polars as pl
-
 # A candidate whose bound-to-width ratio exceeds this limit is rejected by the bound-to-width ratio check.
 MAX_BOUND_TO_WIDTH_RATIO = 100.0
 
 
-def exceeds_max_bound_to_width_ratio() -> pl.Expr:
-    """Return the expression that is true for each candidate whose bound-to-width ratio exceeds the limit.
-
-    The expression reads the columns ``a`` and ``b``.
-    """
-    bound_to_width_ratio = pl.max_horizontal(pl.col("a").abs(), pl.col("b").abs()) / (pl.col("b") - pl.col("a"))
-    return bound_to_width_ratio > MAX_BOUND_TO_WIDTH_RATIO
+def exceeds_max_bound_to_width_ratio(a: float, b: float) -> bool:
+    """Return whether the bound-to-width ratio of the interval ``[a, b]`` exceeds `MAX_BOUND_TO_WIDTH_RATIO`."""
+    return max(abs(a), abs(b)) / (b - a) > MAX_BOUND_TO_WIDTH_RATIO

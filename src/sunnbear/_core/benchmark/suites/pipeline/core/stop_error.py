@@ -1,19 +1,21 @@
-"""A stage raises `PipelineStopError` to stop the pipeline, and `run_stages` reports the stop as a `PipelineStop`.
+"""A stage raises `PipelineStopError` to stop the pipeline, and the run reports the stop as a `PipelineStop`.
 
-A stop is an expected outcome while the corpus of formulas grows: a stage whose input cannot give a valid output stops
-the run with a message that says what the corpus lacks.
+A stop is an expected outcome while the corpus of formulas grows: a stage whose candidates cannot give a valid result
+stops the run with a message that says what the corpus lacks.
 
-The stages before the stopping stage have written their outputs, so a maintainer can still read them.
+The stages before the stopping stage have run, so their information stays available.
 """
 
 from dataclasses import dataclass
+
+from .stage_id import PipelineStageId
 
 
 # ==================================================================================================
 #  PipelineStopError
 # ==================================================================================================
 class PipelineStopError(Exception):
-    """A stage raises `PipelineStopError` when its input cannot give a valid output; the message says why."""
+    """A stage raises `PipelineStopError` when its candidates cannot give a valid result; the message says why."""
 
 
 # ==================================================================================================
@@ -24,9 +26,9 @@ class PipelineStop:
     """A `PipelineStop` records which stage stopped a run, and why.
 
     Attributes:
-        output_name: The `PipelineStage.output_name` of the stage that raised `PipelineStopError`.
+        stage_id: The `PipelineStageId` of the stage that raised `PipelineStopError`.
         reason: The message of the `PipelineStopError`.
     """
 
-    output_name: str
+    stage_id: PipelineStageId
     reason: str

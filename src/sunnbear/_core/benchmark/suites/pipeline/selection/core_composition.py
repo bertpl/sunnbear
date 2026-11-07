@@ -21,10 +21,10 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from fractions import Fraction
 
-import polars as pl
-
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStopError
-from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyClass, DifficultyQuota, SuiteComposition
+
+from .difficulty_class import DifficultyClass
+from .suite_composition import DifficultyQuota, SuiteComposition
 
 # Every Core size is a power of 2, so that every quota, the size times a `DifficultyClass.core_share`, is a whole number
 # of candidates.
@@ -61,10 +61,10 @@ class CoreComposition(SuiteComposition):
         """Return whether the Core is not one that ships: not of `MAX_CORE_SIZE`, or without a quota per class."""
         return (self.size != MAX_CORE_SIZE) or (len(self.quotas) != len(DifficultyClass))
 
-    def report_row(self) -> dict[str, int | bool | None]:
+    def summary(self) -> dict[str, int | bool | None]:
         """Return the Core's size and whether it is interim, and per class its quota, count and largest Core size.
 
-        The keys are the column names of the report that core selection writes:
+        The keys are:
 
         - ``core_size`` and ``is_interim``;
         - per class, with the class's value in lower case:
@@ -76,22 +76,17 @@ class CoreComposition(SuiteComposition):
           of `CORE_SIZES` at which their candidates together fill a quarter of the Core, null where they fill none.
         """
         count_by_quota_classes = {quota.classes: quota.count for quota in self.quotas}
-        row: dict[str, int | bool | None] = {"core_size": self.size, "is_interim": self.is_interim}
+        summary: dict[str, int | bool | None] = {"core_size": self.size, "is_interim": self.is_interim}
         for difficulty_class in DifficultyClass:
             name = difficulty_class.value.lower()
             n_candidates = self.class_counts[difficulty_class]
-            row[f"quota_{name}"] = count_by_quota_classes.get(frozenset({difficulty_class}))
-            row[f"n_candidates_{name}"] = n_candidates
-            row[f"max_core_size_{name}"] = self._max_core_size(n_candidates, difficulty_class.core_share)
+            summary[f"quota_{name}"] = count_by_quota_classes.get(frozenset({difficulty_class}))
+            summary[f"n_candidates_{name}"] = n_candidates
+            summary[f"max_core_size_{name}"] = self._max_core_size(n_candidates, difficulty_class.core_share)
         d_classes = _CLASSES_PER_QUARTER[-1]
-        row["quota_d"] = count_by_quota_classes.get(d_classes)
-        row["max_core_size_d"] = self._max_core_size(sum(self.class_counts[c] for c in d_classes), _QUARTER)
-        return row
-
-    def report_table(self) -> pl.DataFrame:
-        """Return the report that core selection writes: 1 row with the columns of `report_row`."""
-        row = self.report_row()
-        return pl.DataFrame([row], schema={name: pl.Boolean() if name == "is_interim" else pl.Int64() for name in row})
+        summary["quota_d"] = count_by_quota_classes.get(d_classes)
+        summary["max_core_size_d"] = self._max_core_size(sum(self.class_counts[c] for c in d_classes), _QUARTER)
+        return summary
 
     # --------------------------------------------------------------------------
     #  Helpers

@@ -9,8 +9,6 @@ from collections.abc import Sequence
 
 from snuffled import Diagnostic, Snuffler
 
-from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
-
 from .function_evaluation_error import FunctionEvaluationError
 
 # snuffled's `MAX_ZERO_WIDTH` is 1 float spacing at a root without an exact 0, and 2 at a root with 1 float where f is
@@ -20,20 +18,21 @@ from .function_evaluation_error import FunctionEvaluationError
 # spacings at the root. At that ratio, this fraction of `xtol` stays well above 2 float spacings, so that a root with 1
 # float where f is exactly 0 is not rejected.
 MAX_ZERO_WIDTH_IN_XTOL = 1 / 16
-# Each flag of snuffled's diagnostics maps to the reason that rejects a test problem when the flag is above 0. The rules
-# test the flags in this order, NaN first, because snuffled leaves its other diagnostics unspecified when f returns NaN.
+# Each flag of snuffled's diagnostics maps to the reason that rejects a test problem when the flag is above 0. The
+# rules test the flags in this order, NaN first, because snuffled leaves its other diagnostics unspecified when f
+# returns NaN.
 FLAG_REJECTION_REASONS = {
-    Diagnostic.NAN_VALUES_DETECTED: RejectionReason.SNUFFLED_NAN_VALUES_DETECTED,
-    Diagnostic.INF_VALUES_DETECTED: RejectionReason.SNUFFLED_INF_VALUES_DETECTED,
-    Diagnostic.NO_ZEROS_DETECTED: RejectionReason.SNUFFLED_NO_ZEROS_DETECTED,
-    Diagnostic.INTERVAL_NOT_BRACKETING_READY: RejectionReason.SNUFFLED_INTERVAL_NOT_BRACKETING_READY,
-    Diagnostic.ALL_ROOTS_TOO_CLOSE_TO_EDGE: RejectionReason.SNUFFLED_ALL_ROOTS_TOO_CLOSE_TO_EDGE,
+    Diagnostic.NAN_VALUES_DETECTED: "snuffled_nan_values_detected",
+    Diagnostic.INF_VALUES_DETECTED: "snuffled_inf_values_detected",
+    Diagnostic.NO_ZEROS_DETECTED: "snuffled_no_zeros_detected",
+    Diagnostic.INTERVAL_NOT_BRACKETING_READY: "snuffled_interval_not_bracketing_ready",
+    Diagnostic.ALL_ROOTS_TOO_CLOSE_TO_EDGE: "snuffled_all_roots_too_close_to_edge",
 }
 
 
 def extract_properties_or_rejection_reason(
     snuffler: Snuffler, properties: Sequence[str], *, xtol: float
-) -> dict[str, float] | RejectionReason:
+) -> dict[str, float] | str:
     """Return `properties` from `snuffler`'s analysis, or the reason that its diagnostics reject the test problem.
 
     The function extracts `properties` first, in their order, then every diagnostic, in the order of `Diagnostic`,
@@ -54,17 +53,17 @@ def extract_properties_or_rejection_reason(
         xtol: The `xtol` of the analysis's tuple.
 
     Returns:
-        The value of each of `properties`, keyed by its name, or the `RejectionReason` of the first rule that holds.
+        The value of each of `properties`, keyed by its name, or the reason of the first rule that holds.
     """
     try:
         property_values = {prop: snuffler.extract(prop) for prop in properties}
         diagnostics = {diagnostic: snuffler.extract(diagnostic) for diagnostic in Diagnostic}
     except FunctionEvaluationError:
-        return RejectionReason.SNUFFLED_F_RAISES
+        return "snuffled_f_raises"
     for flag, reason in FLAG_REJECTION_REASONS.items():
         if diagnostics[flag] > 0:
             return reason
     if diagnostics[Diagnostic.MAX_ZERO_WIDTH] > MAX_ZERO_WIDTH_IN_XTOL * xtol:
-        return RejectionReason.SNUFFLED_MAX_ZERO_WIDTH_TOO_LARGE
+        return "snuffled_max_zero_width_too_large"
     else:
         return property_values

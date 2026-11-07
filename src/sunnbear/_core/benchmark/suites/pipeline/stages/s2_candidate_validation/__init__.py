@@ -10,12 +10,12 @@ The checks run in sequence, cheapest first, and a candidate is rejected by its f
 4. the snuffled diagnostics check, in `check4_snuffled_diagnostics`, which rejects a candidate when snuffled's analysis
    finds a problem at any of the tuples that it samples, more densely near the ends of the c-range.
 
-`CandidateValidationStage` runs the checks. Its output holds the valid candidates with their c-ranges; its reports
-hold the rejected candidates, each with its `RejectionReason`, and the counts of the rejections per formula.
+`CandidateValidationStage` runs the checks. It rejects each candidate that fails a check, with the check's reason, and
+stores the c-range of each valid candidate.
 """
 
 from .check1_bound_to_width_ratio import MAX_BOUND_TO_WIDTH_RATIO
 from .check2_c_range_calibration import calibrate_c_range
 from .check3_bisection_count import is_bisection_count_exact
 from .check4_snuffled_diagnostics import find_snuffled_rejection_reason
-from .stage import C_RANGE_SCHEMA, CandidateValidationStage
+from .stage import CandidateValidationStage
