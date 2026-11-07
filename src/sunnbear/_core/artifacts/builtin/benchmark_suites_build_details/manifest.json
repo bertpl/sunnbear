@@ -1,8 +1,8 @@
 {
   "archive": {
-    "sha256": "2a163834ba6e1e05f0e995b5392cf0854bdaf52d7671a583e869872f626980d8",
-    "size_bytes": 158177,
-    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-8e3f7822/benchmark_suites_build_details.tar.zst"
+    "sha256": "a4466a95ec2fb5055c90d7456efe32201c150de02dd8db3370990815bd020f02",
+    "size_bytes": 159966,
+    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-7d4d6e20/benchmark_suites_build_details.tar.zst"
   },
   "build_date": "2026-11-07",
   "built_with": {
@@ -10,7 +10,7 @@
     "snuffled": "0.1.11",
     "sunnbear": "0.3.8+dev"
   },
-  "content_hash": "8e3f782292fc9657eeea8eaa34334bd2848ff125f8c9a8246be66cc98b017667",
+  "content_hash": "7d4d6e2042d19eda9735f573f4051dcd7daf0c025de7e0f2ace896257c452d09",
   "files": [
     {
       "path": "c_ranges.parquet",
@@ -19,13 +19,13 @@
     },
     {
       "path": "candidate_registry.parquet",
-      "sha256": "10d67a69c663c13ade7c555d449f801d5489442ac3fd33c2c87a51aa61cd204f",
-      "size_bytes": 9102
+      "sha256": "df0acf0ff4ee9cdcba4ebdea0aa1cbc1a99b968c031f5a96aaf0bdbe173291d6",
+      "size_bytes": 9058
     },
     {
-      "path": "difficulty_classes.parquet",
-      "sha256": "afd52f16efde36be2a5de050eae59a098e1bd89a2bbf7bf70fdf845fe1c5294b",
-      "size_bytes": 6486
+      "path": "difficulty_tiers.parquet",
+      "sha256": "eead62c9a6ddc783c3a24c73c21d05af8ad56ca71eeec5a71afdb8efd36b82b0",
+      "size_bytes": 6479
     },
     {
       "path": "edis.parquet",
@@ -59,13 +59,8 @@
     },
     {
       "path": "storage.json",
-      "sha256": "4a56ae53a803a692237b65cb8c4b896eaf00965cd31d553661966947df4c52a4",
-      "size_bytes": 1635
-    },
-    {
-      "path": "suite_memberships.parquet",
-      "sha256": "219f655c3dcb687d2ee6b5320c46c37435b92469c47e3d54dd992fa77b86a7ad",
-      "size_bytes": 3573
+      "sha256": "f6b19cb6f1cab198c67c400130b7aba5af32cce5b744b564f7c635d1fa07b745",
+      "size_bytes": 55912
     }
   ],
   "generated_by": {

@@ -19,11 +19,11 @@ class PipelineMode(Enum):
     - `DRAFT` takes a fraction of a full run's time, so that a maintainer can rerun the pipeline often.
 
     A setting belongs to the mode only when it sets how much work a stage does. The selection rules, such as the spacing
-    stage's minimum distance and the objective of `select_diverse_suite`, are the same in every mode.
+    stage's minimum distance and the objective of `select_diverse_problem_ids`, are the same in every mode.
 
     Attributes:
         full_characterization_stage_fidelity: The `FeatureFidelity` that `FullCharacterizationStage` runs at.
-        selection_sec_per_candidate: The time per candidate of max-div's search in `select_diverse_suite`.
+        selection_sec_per_candidate: The time per candidate of max-div's search in `select_diverse_problem_ids`.
     """
 
     FULL = (FullCharacterizationStage.default_fidelity, DEFAULT_SELECTION_SEC_PER_CANDIDATE)

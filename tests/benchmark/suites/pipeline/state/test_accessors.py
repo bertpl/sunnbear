@@ -8,15 +8,15 @@ import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.protocol import CRange
+from sunnbear._core.benchmark.suites.benchmark_suite import BenchmarkSuite
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import DiversityFeatureFactory
-from sunnbear._core.benchmark.suites.pipeline.selection import CoreComposition, DifficultyClass, SuiteFamily
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
 from sunnbear._core.benchmark.suites.pipeline.state import (
-    DistilledSuiteSummary,
     IntervalBounds,
     NearestKeptCandidate,
     PipelineStateAccessor,
-    SuiteMembership,
+    SuiteSelectionDetails,
 )
 from tests.benchmark.suites.pipeline.example_states import (
     build_state_before,
@@ -27,14 +27,19 @@ from tests.benchmark.suites.pipeline.example_states import (
 
 _PROBLEM_IDS = example_problem_ids(3)
 _C_RANGE = CRange(c_min=-1.0, c_max=1.0)
-# The 3 example candidates fill no Core, so the example states store this composition.
-_CORE_COMPOSITION = CoreComposition.from_class_counts(dict.fromkeys(DifficultyClass, 64))
 
 
 def _accessor(stage_id: PipelineStageId) -> PipelineStateAccessor:
     """Return the accessor of `stage_id` on a state in which every earlier stage kept the 3 example candidates."""
-    return build_state_before(stage_id, _PROBLEM_IDS, core_composition=_CORE_COMPOSITION).create_state_accessor(
-        stage_id
+    return build_state_before(stage_id, _PROBLEM_IDS).create_state_accessor(stage_id)
+
+
+def _selection_details(name: str, problem_ids: list) -> SuiteSelectionDetails:
+    """Return the selection details of a suite of `problem_ids` that no max-div run selected."""
+    return SuiteSelectionDetails(
+        benchmark_suite=BenchmarkSuite(name=name, aliases=(), problem_ids=tuple(problem_ids)),
+        tier_quotas=None,
+        diversity=None,
     )
 
 
@@ -55,16 +60,21 @@ _WRITES_OF_EACH_CANDIDATE: dict[str, tuple[PipelineStageId, Callable[[PipelineSt
         PipelineStageId.FULL_CHARACTERIZATION,
         lambda accessor, problem_ids: accessor.set_edis(dict.fromkeys(problem_ids, 10.0)),
     ),
-    "difficulty_classes": (
+    "difficulty_tiers": (
         PipelineStageId.CORE_SELECTION,
-        lambda accessor, problem_ids: accessor.set_difficulty_classes(dict.fromkeys(problem_ids, DifficultyClass.A)),
+        lambda accessor, problem_ids: accessor.set_difficulty_tiers(dict.fromkeys(problem_ids, DifficultyTier.A)),
     ),
-    "suite_memberships": (
+    "core_selection_details": (
+        PipelineStageId.CORE_SELECTION,
+        lambda accessor, problem_ids: accessor.set_core_selection_details(_selection_details("sb-3", problem_ids)),
+    ),
+    "distilled_suite_selection_details": (
         PipelineStageId.DISTILLATION,
-        lambda accessor, problem_ids: accessor.set_suite_memberships(
-            dict.fromkeys(
-                problem_ids, SuiteMembership(suite_family=SuiteFamily.BENCHMARK, smallest_containing_suite_size=64)
-            )
+        lambda accessor, problem_ids: accessor.set_distilled_suite_selection_details(
+            {
+                "sb-2a": _selection_details("sb-2a", problem_ids[:2]),
+                "sb-1b": _selection_details("sb-1b", problem_ids[2:]),
+            }
         ),
     ),
 }
@@ -76,16 +86,6 @@ _OTHER_WRITES: dict[str, tuple[PipelineStageId, Callable[[PipelineStateAccessor,
         PipelineStageId.CANDIDATE_GENERATION,
         lambda accessor, problem_ids: accessor.add_candidates(
             dict.fromkeys(problem_ids, IntervalBounds(a=-1.0, b=1.0))
-        ),
-    ),
-    "core_composition": (
-        PipelineStageId.CORE_SELECTION,
-        lambda accessor, problem_ids: accessor.set_core_composition(_CORE_COMPOSITION),
-    ),
-    "distilled_suite_summaries": (
-        PipelineStageId.DISTILLATION,
-        lambda accessor, problem_ids: accessor.set_distilled_suite_summaries(
-            [DistilledSuiteSummary(suite_family=SuiteFamily.BENCHMARK, size=64, diversity=1.0)]
         ),
     ),
 }
@@ -171,52 +171,36 @@ def test_spacing_has_no_scaled_features_without_scales():
     )
 
 
-def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_class():
-    """Once core selection stored the classes, its pool holds each candidate's scaled features from full
-    characterization, EDI and class, in the order of candidate generation."""
+def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_tier():
+    """Once core selection stored the tiers, its pool holds each candidate's scaled features from full
+    characterization, EDI and tier, in the order of candidate generation."""
     # --- arrange ----------------------
     accessor = _accessor(PipelineStageId.CORE_SELECTION)
-    classes = dict(zip(_PROBLEM_IDS, [DifficultyClass.A, DifficultyClass.C, DifficultyClass.B], strict=True))
-    accessor.set_difficulty_classes(classes)
+    tiers = dict(zip(_PROBLEM_IDS, [DifficultyTier.A, DifficultyTier.C, DifficultyTier.B], strict=True))
+    accessor.set_difficulty_tiers(tiers)
 
     # --- act --------------------------
     candidate_pool = accessor.candidate_pool()
 
     # --- assert -----------------------
     assert candidate_pool.feature_matrix.problem_ids == tuple(_PROBLEM_IDS)
-    assert candidate_pool.difficulty_classes == tuple(classes.values())
+    assert candidate_pool.difficulty_tiers == tuple(tiers.values())
     np.testing.assert_array_equal(candidate_pool.edis, [10.0] * 3)
     assert accessor.edis() == dict.fromkeys(_PROBLEM_IDS, 10.0)
 
 
-def test_the_candidate_pool_needs_the_classes_and_the_scales():
-    """Core selection's accessor gives no pool before the classes are stored, nor after full characterization kept 1
+def test_the_candidate_pool_needs_the_tiers_and_the_scales():
+    """Core selection's accessor gives no pool before the tiers are stored, nor after full characterization kept 1
     candidate only, which leaves full characterization without scales."""
     # --- arrange ----------------------
     accessor = _accessor(PipelineStageId.CORE_SELECTION)
     accessor_without_scales = build_state_before(
         PipelineStageId.CORE_SELECTION, _PROBLEM_IDS[:1]
     ).create_state_accessor(PipelineStageId.CORE_SELECTION)
-    accessor_without_scales.set_difficulty_classes({_PROBLEM_IDS[0]: DifficultyClass.A})
+    accessor_without_scales.set_difficulty_tiers({_PROBLEM_IDS[0]: DifficultyTier.A})
 
     # --- act / assert -----------------
-    with pytest.raises(ValueError, match="needs the difficulty classes"):
+    with pytest.raises(ValueError, match="needs the difficulty tiers"):
         accessor.candidate_pool()
     with pytest.raises(ValueError, match="needs the scales of full characterization"):
         accessor_without_scales.candidate_pool()
-
-
-def test_distillation_needs_the_core_composition():
-    """Distillation's accessor gives the Core's composition that core selection stored, and raises when core selection
-    stored none."""
-    # --- arrange ----------------------
-    state = build_state_before(PipelineStageId.CORE_SELECTION, _PROBLEM_IDS)
-    state.create_state_accessor(PipelineStageId.CORE_SELECTION).set_difficulty_classes(
-        dict.fromkeys(_PROBLEM_IDS, DifficultyClass.A)
-    )
-    state.finish_stage(PipelineStageId.CORE_SELECTION)
-
-    # --- act / assert -----------------
-    with pytest.raises(ValueError, match="stored no Core composition"):
-        state.create_state_accessor(PipelineStageId.DISTILLATION).core_composition()
-    assert _accessor(PipelineStageId.DISTILLATION).core_composition() == _CORE_COMPOSITION

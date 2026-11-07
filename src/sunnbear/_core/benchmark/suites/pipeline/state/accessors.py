@@ -14,23 +14,17 @@ The 2 characterization stages share `CharacterizationStateAccessor`, and core se
 `SelectionStateAccessor`, because each pair reads and writes the same kind of information.
 """
 
-from collections.abc import Collection, Mapping, Sequence
+from collections.abc import Collection, Mapping
 from typing import ClassVar
 
 from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureMatrix
-from sunnbear._core.benchmark.suites.pipeline.selection import CandidatePool, CoreComposition, DifficultyClass
+from sunnbear._core.benchmark.suites.pipeline.selection import CandidatePool, DifficultyTier
 from sunnbear._core.problems.core import ProblemId
 
 from .candidate_registry import CandidateDrop
-from .stage_information import (
-    CharacterizationResults,
-    DistilledSuiteSummary,
-    IntervalBounds,
-    NearestKeptCandidate,
-    SuiteMembership,
-)
+from .stage_information import CharacterizationResults, IntervalBounds, NearestKeptCandidate, SuiteSelectionDetails
 from .storage import PipelineStateStorage
 
 
@@ -246,23 +240,23 @@ class SelectionStateAccessor(PipelineStateAccessor):
     def candidate_pool(self) -> CandidatePool:
         """Return the pool of the candidates that no stage has dropped.
 
-        The pool holds their scaled features from full characterization, their EDIs and their difficulty classes.
+        The pool holds their scaled features from full characterization, their EDIs and their difficulty tiers.
 
         Raises:
-            ValueError: If the difficulty classes are not stored yet, or full characterization has no scales, because
-                it kept fewer than 2 candidates.
+            ValueError: If the difficulty tiers are not stored yet, or full characterization has no scales, because it
+                kept fewer than 2 candidates.
         """
         results = self._storage.characterization_results[PipelineStageId.FULL_CHARACTERIZATION]
         scaled_feature_matrix = results.build_scaled_feature_matrix(self.remaining_problem_ids)
-        if self._storage.difficulty_classes is None:
-            raise ValueError("The candidate pool needs the difficulty classes, which core selection stores.")
+        if self._storage.difficulty_tiers is None:
+            raise ValueError("The candidate pool needs the difficulty tiers, which core selection stores.")
         elif scaled_feature_matrix is None:
             raise ValueError("The candidate pool needs the scales of full characterization, which has none.")
         else:
             return CandidatePool.from_feature_matrix(
                 scaled_feature_matrix,
                 edis=self._storage.edis or {},
-                difficulty_classes=self._storage.difficulty_classes,
+                difficulty_tiers=self._storage.difficulty_tiers,
             )
 
 
@@ -270,7 +264,7 @@ class SelectionStateAccessor(PipelineStateAccessor):
 #  CoreSelectionStateAccessor
 # ==================================================================================================
 class CoreSelectionStateAccessor(SelectionStateAccessor):
-    """`CoreSelectionStateAccessor` gives the candidates' EDIs, and takes their classes and the Core's composition."""
+    """`CoreSelectionStateAccessor` gives the candidates' EDIs, and takes their tiers and the Core's details."""
 
     stage_id = PipelineStageId.CORE_SELECTION
 
@@ -278,65 +272,60 @@ class CoreSelectionStateAccessor(SelectionStateAccessor):
         """Return the EDI of each candidate that no stage has dropped."""
         return self._restrict_to_remaining(self._storage.edis or {})
 
-    def set_difficulty_classes(self, difficulty_classes: Mapping[ProblemId, DifficultyClass]) -> None:
-        """Store the class of each candidate that no stage has dropped.
+    def set_difficulty_tiers(self, difficulty_tiers: Mapping[ProblemId, DifficultyTier]) -> None:
+        """Store the tier of each candidate that no stage has dropped.
 
         The stage calls this before it records its drops.
 
         Raises:
-            ValueError: If the classes were stored before, or do not cover exactly those candidates.
+            ValueError: If the tiers were stored before, or do not cover exactly those candidates.
         """
-        self._check_not_written(is_written=self._storage.difficulty_classes is not None)
-        self._check_covers(difficulty_classes.keys(), self.remaining_problem_ids)
-        self._storage.difficulty_classes = self._restrict_to_remaining(difficulty_classes)
+        self._check_not_written(is_written=self._storage.difficulty_tiers is not None)
+        self._check_covers(difficulty_tiers.keys(), self.remaining_problem_ids)
+        self._storage.difficulty_tiers = self._restrict_to_remaining(difficulty_tiers)
 
-    def set_core_composition(self, core_composition: CoreComposition) -> None:
-        """Store the Core's composition.
+    def set_core_selection_details(self, core_selection_details: SuiteSelectionDetails) -> None:
+        """Store the selection details of the Core, whose suite holds the candidates that no stage has dropped.
+
+        The stage calls this after it records its drops.
 
         Raises:
-            ValueError: If the composition was stored before.
+            ValueError: If the details were stored before, or the Core does not hold exactly those candidates.
         """
-        self._check_not_written(is_written=self._storage.core_composition is not None)
-        self._storage.core_composition = core_composition
+        self._check_not_written(is_written=self._storage.core_selection_details is not None)
+        self._check_covers(core_selection_details.benchmark_suite.problem_ids, self.remaining_problem_ids)
+        self._storage.core_selection_details = core_selection_details
 
 
 # ==================================================================================================
 #  DistillationStateAccessor
 # ==================================================================================================
 class DistillationStateAccessor(SelectionStateAccessor):
-    """`DistillationStateAccessor` gives the Core's composition, and takes the suites distilled from the Core."""
+    """`DistillationStateAccessor` takes the selection details of the suites distilled from the Core.
+
+    The candidates that no stage has dropped are the Core's.
+    """
 
     stage_id = PipelineStageId.DISTILLATION
 
-    def core_composition(self) -> CoreComposition:
-        """Return the Core's composition, which core selection stored.
+    def set_distilled_suite_selection_details(
+        self, distilled_suite_selection_details: Mapping[str, SuiteSelectionDetails]
+    ) -> None:
+        """Store the selection details of each distilled suite, keyed by the suite's name.
+
+        The mapping lists the a-series' suites before the b-series', and within each series the suites from largest to
+        smallest. Together they hold the candidates that no stage has dropped: the Core.
 
         Raises:
-            ValueError: If core selection stored no composition.
+            ValueError: If the details were stored before, or the suites together do not hold exactly the Core.
         """
-        if self._storage.core_composition is None:
-            raise ValueError("Core selection stored no Core composition.")
-        else:
-            return self._storage.core_composition
-
-    def set_suite_memberships(self, suite_memberships: Mapping[ProblemId, SuiteMembership]) -> None:
-        """Store the suite membership of each Core member, that is each candidate that no stage has dropped.
-
-        Raises:
-            ValueError: If the memberships were stored before, or do not cover exactly those candidates.
-        """
-        self._check_not_written(is_written=self._storage.suite_memberships is not None)
-        self._check_covers(suite_memberships.keys(), self.remaining_problem_ids)
-        self._storage.suite_memberships = self._restrict_to_remaining(suite_memberships)
-
-    def set_distilled_suite_summaries(self, distilled_suite_summaries: Sequence[DistilledSuiteSummary]) -> None:
-        """Store the summaries of the distilled suites.
-
-        The summaries list the benchmark suites before the calibration suites, and within each family the suites from
-        largest to smallest.
-
-        Raises:
-            ValueError: If the summaries were stored before.
-        """
-        self._check_not_written(is_written=self._storage.distilled_suite_summaries is not None)
-        self._storage.distilled_suite_summaries = tuple(distilled_suite_summaries)
+        self._check_not_written(is_written=self._storage.distilled_suite_selection_details is not None)
+        self._check_covers(
+            {
+                problem_id
+                for details in distilled_suite_selection_details.values()
+                for problem_id in details.benchmark_suite.problem_ids
+            },
+            self.remaining_problem_ids,
+        )
+        self._storage.distilled_suite_selection_details = dict(distilled_suite_selection_details)

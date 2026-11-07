@@ -1,1 +1,1 @@
-"""This package holds the benchmark suite pipeline (`pipeline`), which builds benchmark suites from formulas."""
+"""This package holds `BenchmarkSuite` (`benchmark_suite`) and the benchmark suite pipeline (`pipeline`)."""

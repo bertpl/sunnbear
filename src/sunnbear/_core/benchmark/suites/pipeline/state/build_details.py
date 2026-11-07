@@ -11,8 +11,8 @@ Each consumer builds what it needs from the read methods, which return:
 
 - each finished stage's information, most of it keyed by `ProblemId`;
 - each dropped candidate's `CandidateDrop`: the stage that dropped it, and why;
-- tables that count the drops and the incorrect solves, list the rejections per formula, and describe the
-  distilled suites.
+- tables that count the drops and the incorrect solves, list the rejections per formula, and count each suite's test
+  problems per difficulty tier.
 
 The build details convert themselves to files and back, and say whether they still fit the installed sunnbear's test
 problems.
@@ -29,17 +29,11 @@ import polars as pl
 
 from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId, PipelineStop
-from sunnbear._core.benchmark.suites.pipeline.selection import CoreComposition, DifficultyClass
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
 from sunnbear._core.problems.core import FormulaRegistry, ProblemId
 
 from .candidate_registry import CandidateDrop
-from .stage_information import (
-    CharacterizationResults,
-    DistilledSuiteSummary,
-    IntervalBounds,
-    NearestKeptCandidate,
-    SuiteMembership,
-)
+from .stage_information import CharacterizationResults, IntervalBounds, NearestKeptCandidate, SuiteSelectionDetails
 from .storage import PipelineStateStorage
 
 _RUN_FILE_NAME = "run.json"
@@ -131,33 +125,27 @@ class BenchmarkSuitesBuildDetails:
         """
         return self._copy_if_finished(PipelineStageId.FULL_CHARACTERIZATION, self._storage.edis)
 
-    def difficulty_classes(self) -> dict[ProblemId, DifficultyClass] | None:
-        """Return core selection's difficulty class of each candidate that core selection received.
+    def difficulty_tiers(self) -> dict[ProblemId, DifficultyTier] | None:
+        """Return core selection's difficulty tier of each candidate that core selection received.
 
         Return ``None`` when core selection did not finish.
         """
-        return self._copy_if_finished(PipelineStageId.CORE_SELECTION, self._storage.difficulty_classes)
+        return self._copy_if_finished(PipelineStageId.CORE_SELECTION, self._storage.difficulty_tiers)
 
-    def core_composition(self) -> CoreComposition | None:
-        """Return core selection's composition of the Core.
+    def core_selection_details(self) -> SuiteSelectionDetails | None:
+        """Return core selection's `SuiteSelectionDetails` of the Core.
 
         Return ``None`` when core selection did not finish.
         """
-        return self._copy_if_finished(PipelineStageId.CORE_SELECTION, self._storage.core_composition)
+        return self._copy_if_finished(PipelineStageId.CORE_SELECTION, self._storage.core_selection_details)
 
-    def suite_memberships(self) -> dict[ProblemId, SuiteMembership] | None:
-        """Return distillation's `SuiteMembership` of each Core member.
+    def distilled_suite_selection_details(self) -> dict[str, SuiteSelectionDetails] | None:
+        """Return distillation's `SuiteSelectionDetails` of each suite, keyed by the suite's name.
 
+        The suites follow the order that `DistillationStateAccessor.set_distilled_suite_selection_details` states.
         Return ``None`` when distillation did not finish.
         """
-        return self._copy_if_finished(PipelineStageId.DISTILLATION, self._storage.suite_memberships)
-
-    def distilled_suite_summaries(self) -> tuple[DistilledSuiteSummary, ...] | None:
-        """Return distillation's summary of each suite: benchmark suites first, each family's suites largest first.
-
-        Return ``None`` when distillation did not finish.
-        """
-        return self._copy_if_finished(PipelineStageId.DISTILLATION, self._storage.distilled_suite_summaries)
+        return self._copy_if_finished(PipelineStageId.DISTILLATION, self._storage.distilled_suite_selection_details)
 
     # --------------------------------------------------------------------------
     #  Tables
@@ -258,37 +246,35 @@ class BenchmarkSuitesBuildDetails:
         else:
             return results.incorrect_solves_table()
 
-    def suite_compositions(self) -> pl.DataFrame | None:
-        """Return 1 row per distilled suite, in the order of `distilled_suite_summaries`, with its composition.
+    def suite_tier_counts(self) -> pl.DataFrame | None:
+        """Return 1 row per selected suite, with its number of test problems per difficulty tier.
 
-        The columns are:
+        The rows list the Core, then the distilled suites in the order of `distilled_suite_selection_details`; they list
+        the Core alone when distillation did not finish. The columns are:
 
-        - ``suite_family`` and ``size``;
-        - 1 column ``n_candidates_<class>`` per `DifficultyClass`, with the class's value in lower case;
-        - ``diversity``.
+        - ``suite_name`` and ``size``;
+        - 1 column ``n_candidates_<tier>`` per `DifficultyTier`, with the tier's value in lower case;
+        - ``diversity``, the diversity score of the max-div run that selected the suite, null for a suite that no run
+          selects.
 
-        Return ``None`` when distillation did not finish.
+        Return ``None`` when core selection did not finish.
         """
-        summaries = self.distilled_suite_summaries()
-        memberships = self.suite_memberships()
-        difficulty_classes = self.difficulty_classes()
-        if summaries is None or memberships is None or difficulty_classes is None:
+        core_selection_details = self.core_selection_details()
+        difficulty_tiers = self.difficulty_tiers()
+        if core_selection_details is None or difficulty_tiers is None:
             return None
         else:
+            all_selection_details = [core_selection_details, *(self.distilled_suite_selection_details() or {}).values()]
             rows = []
-            for summary in summaries:
-                class_counts = Counter(
-                    difficulty_classes[problem_id]
-                    for problem_id, membership in memberships.items()
-                    if membership.suite_family is summary.suite_family
-                    and membership.smallest_containing_suite_size <= summary.size
-                )
+            for selection_details in all_selection_details:
+                suite = selection_details.benchmark_suite
+                tier_counts = Counter(difficulty_tiers[problem_id] for problem_id in suite.problem_ids)
                 rows.append(
                     {
-                        "suite_family": summary.suite_family.value,
-                        "size": summary.size,
-                        **{f"n_candidates_{c.value.lower()}": class_counts[c] for c in DifficultyClass},
-                        "diversity": summary.diversity,
+                        "suite_name": suite.name,
+                        "size": len(suite.problem_ids),
+                        **{f"n_candidates_{tier.value.lower()}": tier_counts[tier] for tier in DifficultyTier},
+                        "diversity": selection_details.diversity,
                     }
                 )
             return pl.DataFrame(rows, schema_overrides={"diversity": pl.Float64()})
@@ -304,7 +290,7 @@ class BenchmarkSuitesBuildDetails:
         - ``run.json`` holds the ids of the finished stages, and the stage that stopped the run and why, or ``null``
           when no stage stopped it;
         - ``storage.json`` holds the information that is not per candidate: each characterization stage's fidelity and
-          solver ids, the Core's composition, and each distilled suite's family, size and diversity;
+          solver ids, and the `SuiteSelectionDetails` of the Core and of each distilled suite;
         - each structure of `PipelineStateStorage` that holds information per candidate is 1 Parquet table, named after
           the structure, with 1 row per candidate that the structure covers and the candidate's id in the column
           ``problem_id``. The table ``candidate_registry`` holds every candidate, with the stage and reason of its drop
@@ -373,8 +359,8 @@ class BenchmarkSuitesBuildDetails:
 
         Raises:
             ValueError: If the characterization results record core solver configs other than
-                `DiversityFeatureFactory.solver_ids`, or the files hold a stage id or a `DifficultyClass` or
-                `SuiteFamily` value that this sunnbear does not define.
+                `DiversityFeatureFactory.solver_ids`, or the files hold a stage id or a `DifficultyTier` value that
+                this sunnbear does not define.
             KeyError: If `files` lacks a file or a field of the `to_files` output.
         """
         run_contents = json.loads(files[_RUN_FILE_NAME])

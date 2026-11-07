@@ -5,13 +5,13 @@ them, and returns the state, which then creates the given stage's accessor. `rec
 that a stage writes through 1 method of its accessor.
 """
 
-from collections import Counter
 from collections.abc import Mapping, Sequence
 
 import numpy as np
 import pytest
 
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, CRange, max_fevals_for
+from sunnbear._core.benchmark.suites.benchmark_suite import BenchmarkSuite
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     SNUFFLED_PROPERTIES,
@@ -19,8 +19,13 @@ from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     FeatureFidelity,
     FeatureMatrix,
 )
-from sunnbear._core.benchmark.suites.pipeline.selection import CoreComposition, DifficultyClass
-from sunnbear._core.benchmark.suites.pipeline.state import CharacterizationResults, IntervalBounds, PipelineState
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier, DifficultyTierQuotas
+from sunnbear._core.benchmark.suites.pipeline.state import (
+    CharacterizationResults,
+    IntervalBounds,
+    PipelineState,
+    SuiteSelectionDetails,
+)
 from sunnbear._core.problems.core import ProblemId
 
 _MAX_FEVALS = max_fevals_for(n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
@@ -63,7 +68,6 @@ def build_state_before(
     raw_feature_matrix: FeatureMatrix | None = None,
     edis: Mapping[ProblemId, float] | None = None,
     c_range: CRange = _DEFAULT_C_RANGE,
-    core_composition: CoreComposition | None = None,
 ) -> PipelineState:
     """Return a state in which every stage before `stage_id` has run on `problem_ids` and kept them all.
 
@@ -73,8 +77,7 @@ def build_state_before(
     - each characterization: the raw features `raw_feature_matrix`, by default those of
       `example_raw_feature_matrix`, with their block scales and no incorrect solve;
     - full characterization: the EDIs `edis`, by default 10 for each candidate;
-    - core selection: each candidate's class from its EDI, and `core_composition`, by default the composition of the
-      largest Core that the classes fill.
+    - core selection: each candidate's tier from its EDI, and a Core of every candidate, selected under no quota.
     """
     state = PipelineState()
     if raw_feature_matrix is None:
@@ -95,16 +98,21 @@ def build_state_before(
                 accessor.set_characterization_results(example_characterization_results(raw_feature_matrix))
                 accessor.set_edis(edis)
             case PipelineStageId.CORE_SELECTION:
-                difficulty_classes = {
-                    problem_id: DifficultyClass.from_edi(edi, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
-                    for problem_id, edi in edis.items()
-                }
-                accessor.set_difficulty_classes(difficulty_classes)
-                if core_composition is not None:
-                    stored_core_composition = core_composition
-                else:
-                    stored_core_composition = CoreComposition.from_class_counts(Counter(difficulty_classes.values()))
-                accessor.set_core_composition(stored_core_composition)
+                accessor.set_difficulty_tiers(
+                    {
+                        problem_id: DifficultyTier.from_edi(edi, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
+                        for problem_id, edi in edis.items()
+                    }
+                )
+                accessor.set_core_selection_details(
+                    SuiteSelectionDetails(
+                        benchmark_suite=BenchmarkSuite(
+                            name=f"sb-{len(problem_ids)}", aliases=(), problem_ids=tuple(problem_ids)
+                        ),
+                        tier_quotas=DifficultyTierQuotas(quota_by_group={frozenset(DifficultyTier): len(problem_ids)}),
+                        diversity=1.0,
+                    )
+                )
         state.finish_stage(earlier_stage_id)
     return state
 

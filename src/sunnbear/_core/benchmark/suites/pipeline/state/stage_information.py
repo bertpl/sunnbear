@@ -1,8 +1,8 @@
 """The value objects of this module carry each pipeline stage's information to and from the stage's state accessor.
 
 Each stage's state accessor takes and gives the stage's information in these objects and in plain mappings keyed by
-`ProblemId`; a stage whose information has a type of its own in another package, such as `CRange`, `DifficultyClass`
-or `CoreComposition`, uses that type.
+`ProblemId`; a stage whose information has a type of its own in another package, such as `CRange` or `DifficultyTier`,
+uses that type.
 """
 
 from collections.abc import Mapping, Sequence
@@ -12,13 +12,14 @@ from typing import Any, NamedTuple, Self
 
 import polars as pl
 
+from sunnbear._core.benchmark.suites.benchmark_suite import BenchmarkSuite
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     DiversityFeatureFactory,
     FeatureBlockScales,
     FeatureFidelity,
     FeatureMatrix,
 )
-from sunnbear._core.benchmark.suites.pipeline.selection import SuiteFamily
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTierQuotas
 from sunnbear._core.problems.core import ProblemId
 
 # In a characterization's table of raw features, each config's column of incorrect solves is named with this prefix and
@@ -165,36 +166,53 @@ class NearestKeptCandidate:
 
 
 # ==================================================================================================
-#  SuiteMembership
+#  SuiteSelectionDetails
 # ==================================================================================================
 @dataclass(frozen=True)
-class SuiteMembership:
-    """A `SuiteMembership` places a Core member in the suites that distillation selects.
+class SuiteSelectionDetails:
+    """`SuiteSelectionDetails` records how core selection or distillation selected 1 suite.
+
+    These details are part of the build details of a pipeline run; a user of the suite needs only its `BenchmarkSuite`.
 
     Attributes:
-        suite_family: The member's `SuiteFamily`.
-        smallest_containing_suite_size: The size of the smallest suite of that family that holds the member; every
-            larger suite of the family holds it too.
+        benchmark_suite: The selected suite.
+        tier_quotas: The quotas of the max-div run that selected the suite; ``None`` for a suite that no run
+            selects, such as the largest suite of the b-series, which is the rest of the Core.
+        diversity: The diversity score of that max-div run; ``None`` for a suite that no run selects.
     """
 
-    suite_family: SuiteFamily
-    smallest_containing_suite_size: int
-
-
-# ==================================================================================================
-#  DistilledSuiteSummary
-# ==================================================================================================
-@dataclass(frozen=True)
-class DistilledSuiteSummary:
-    """A `DistilledSuiteSummary` gives the family, size and diversity score of 1 suite that distillation selects.
-
-    Attributes:
-        suite_family: The suite's `SuiteFamily`.
-        size: The suite's number of candidates.
-        diversity: The diversity score of the max-div run that selected the suite; ``None`` for the largest
-            calibration suite, which no run selects.
-    """
-
-    suite_family: SuiteFamily
-    size: int
+    benchmark_suite: BenchmarkSuite
+    tier_quotas: DifficultyTierQuotas | None
     diversity: float | None
+
+    def to_json_values(self) -> dict[str, Any]:
+        """Return the details as JSON values, under the keys ``benchmark_suite``, ``tier_quotas`` and ``diversity``."""
+        if self.tier_quotas is not None:
+            tier_quotas = self.tier_quotas.to_json_values()
+        else:
+            tier_quotas = None
+        return {
+            "benchmark_suite": self.benchmark_suite.to_json_values(),
+            "tier_quotas": tier_quotas,
+            "diversity": self.diversity,
+        }
+
+    # --------------------------------------------------------------------------
+    #  Factory methods
+    # --------------------------------------------------------------------------
+    @classmethod
+    def from_json_values(cls, json_values: dict[str, Any]) -> Self:
+        """Return the details that the output of `to_json_values` holds.
+
+        Raises:
+            ValueError: If a quota names a value that is not a `DifficultyTier`.
+        """
+        if json_values["tier_quotas"] is not None:
+            tier_quotas = DifficultyTierQuotas.from_json_values(json_values["tier_quotas"])
+        else:
+            tier_quotas = None
+        return cls(
+            benchmark_suite=BenchmarkSuite.from_json_values(json_values["benchmark_suite"]),
+            tier_quotas=tier_quotas,
+            diversity=json_values["diversity"],
+        )
