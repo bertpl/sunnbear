@@ -36,7 +36,7 @@ if [ ! -f ./images/_splash_without_version.webp ]; then
 fi
 
 # --- add version info ---
-# The version's right edge lines up with the end of the background's chalk "R", just below it.
+# The background shows "SUNNBEAR" written in chalk; the version sits just below that word, right-aligned with the end of the final "R".
 # The splash is saved at half size, because the README shows it far narrower than that.
 magick "./images/_splash_without_version.webp" -pointsize 128 -font "./images/splash/google_fonts_montserrat_bold.ttf" -gravity East \
        -fill "black" -annotate +1077+163 "v${DISPLAY_VERSION}" \
