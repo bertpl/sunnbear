@@ -1,11 +1,11 @@
 """Run the benchmark suite pipeline over the shipped test problems, and save and publish its build details.
 
 The artifact is `benchmark_suites_build_details`. The maintainer runs this script, through
-``make benchmark-suites-build-details``, when the release script reports that the shipped build details no longer fit
-the shipped test problems, and then commits the artifact's manifest. The script:
+``make benchmark-suites-build-details``, when the release script reports that the shipped build details are stale, and
+then commits the artifact's manifest. The script:
 
 - runs the pipeline in `PipelineMode.DRAFT` over every registered formula, into the workspace directory given by
-  ``--workspace``;
+  ``--workspace``, because the benchmark suites that it builds are not shipped yet, so a run of a few minutes suffices;
 - stops with status 1, without saving, when a stage stops the run, because the build details of a stopped run hold no
   benchmark suites;
 - saves the build details through `ArtifactStore`, which records in the artifact's manifest how they were built and

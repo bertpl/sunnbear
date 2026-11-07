@@ -3,7 +3,6 @@
 The storage converts its contents to files and back, as `PipelineStateStorage.to_files` describes.
 """
 
-import io
 import json
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
@@ -20,6 +19,7 @@ from sunnbear._core.benchmark.suites.pipeline.selection import (
     SuiteFamily,
 )
 from sunnbear._core.problems.core import ProblemId
+from sunnbear._core.utils.parquet import parquet_file_content
 
 from .candidate_registry import CandidateRegistry
 from .stage_information import (
@@ -139,7 +139,7 @@ class PipelineStateStorage:
                     m.smallest_containing_suite_size for m in self.suite_memberships.values()
                 ],
             }
-        files = {f"{name}{_TABLE_FILE_SUFFIX}": self._parquet_file_content(columns) for name, columns in tables.items()}
+        files = {f"{name}{_TABLE_FILE_SUFFIX}": parquet_file_content(columns) for name, columns in tables.items()}
         files[_JSON_FILE_NAME] = (json.dumps(self._json_contents(), indent=2, sort_keys=True) + "\n").encode()
         return files
 
@@ -156,13 +156,6 @@ class PipelineStateStorage:
             "problem_id": list(map(str, information)),
             **{name: [getattr(value, name) for value in information.values()] for name in field_names},
         }
-
-    @staticmethod
-    def _parquet_file_content(columns: dict[str, list[Any]]) -> bytes:
-        """Return `columns` as the content of a Parquet file."""
-        buffer = io.BytesIO()
-        pl.DataFrame(columns).write_parquet(buffer)
-        return buffer.getvalue()
 
     def _json_contents(self) -> dict[str, Any]:
         """Return the structures that are not tables, and each characterization's solver ids and fidelity, as JSON."""

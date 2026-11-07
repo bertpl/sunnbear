@@ -321,8 +321,9 @@ class BenchmarkSuitesBuildDetails:
         """Return why the build details no longer fit the installed sunnbear's test problems; empty when they fit.
 
         The build details fit when their candidates are exactly the candidates of the registered formulas, so that a
-        consumer finds each of these candidates, and no other, in `FormulaRegistry`. The build details' other
-        references to the installed sunnbear are checked when the build details are read back, by `from_files`.
+        consumer finds each of these candidates, and no other, in `FormulaRegistry`. `from_files` checks the build
+        details' other references to the installed sunnbear, such as their core solver configs and stage ids, when it
+        reads them back.
         """
         registered_problem_ids = {
             candidate.id for formula in FormulaRegistry.formulas() for candidate in formula.build_all_candidates()
@@ -359,10 +360,10 @@ class BenchmarkSuitesBuildDetails:
         """Rebuild the build details from the output of `to_files`.
 
         Raises:
-            ValueError: If the characterization results record other core solver configs than
+            ValueError: If the characterization results record core solver configs other than
                 `DiversityFeatureFactory.solver_ids`, or the files hold a stage id or a `DifficultyClass` or
                 `SuiteFamily` value that this sunnbear does not define.
-            KeyError: If `files` lacks a file or a field that `to_files` writes.
+            KeyError: If `files` lacks a file or a field of the `to_files` output.
         """
         run_contents = json.loads(files[_RUN_FILE_NAME])
         if run_contents["stop"] is not None:

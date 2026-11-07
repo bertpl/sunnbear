@@ -2,7 +2,7 @@
 
 Run via ``make release VERSION=X.Y.Z``.  In order, the release:
 
-- validates state, including that the shipped benchmark suites build details fit the release's test problems
+- validates state, including that the shipped benchmark suites build details are not stale
 - bumps the version
 - stamps the versioned splash, the README badges and the built-in artifact manifests
 - finalizes the changelog
@@ -236,11 +236,12 @@ def step_9_check_benchmark_suites_build_details_staleness() -> None:
 
     A consumer of the build details looks up each of their candidates and solver configs in the installed sunnbear, so
     build details that no longer fit the installed sunnbear would break that consumer.
+
     `BenchmarkSuitesBuildDetails.staleness_reasons` reports candidates that differ from the registered ones, and the
-    artifact's `from_files` refuses other solver configs. Loading the artifact downloads its data files, unless the
-    cache holds them.
+    artifact's `from_files` refuses core solver configs other than `DiversityFeatureFactory.solver_ids`. Loading the
+    artifact downloads its data files, unless the cache holds them.
     """
-    print_step(9, "benchmark suites build details fit the release's test problems and core solver configs")
+    print_step(9, "benchmark suites build details are not stale")
     rebuild_hint = "rebuild them with 'make benchmark-suites-build-details' and commit the new manifest"
     try:
         build_details = ArtifactStore.load(BenchmarkSuitesBuildDetailsDeclaration)
@@ -525,7 +526,7 @@ def step_16_add_unreleased_section() -> None:
     """Add a fresh Unreleased section to the changelog."""
     print_step(16, "add fresh '## Unreleased' section to CHANGELOG.md")
     text = CHANGELOG.read_text()
-    # step 13 has just written a '## <version>' heading, so a first '## ' heading always exists
+    # finalizing the changelog has just written a '## <version>' heading, so a first '## ' heading always exists
     first_heading = text.index("\n## ") + 1
     insertion = "## Unreleased\n\n" + "\n".join(f"### {c}\n" for c in CATEGORIES) + "\n"
     text = text[:first_heading] + insertion + text[first_heading:]
@@ -564,7 +565,7 @@ def post_tag_recovery_hint(version: str, also_next_cycle: bool) -> None:
 def main() -> None:
     """Entry point.
 
-    Step 10, which downloads the badge metrics from CI, is the last precondition: it runs after
+    The step that downloads the badge metrics from CI is the last precondition: it runs after
     every quicker check has passed and before the first write.
     """
     parser = argparse.ArgumentParser(description=__doc__)
@@ -582,8 +583,8 @@ def main() -> None:
     parse_semver(version)
 
     print(f"Releasing {PACKAGE_NAME} v{version}\n")
-    # Read the last release's version before step 11 bumps it; steps 8 and 14 use that version to find the
-    # artifact manifests built since that release.
+    # Read the last release's version before the version bump; the stamping-input check and the release commit use
+    # that version to find the artifact manifests built since that release.
     last_release_version = read_pyproject_version()
 
     print("Validation:")

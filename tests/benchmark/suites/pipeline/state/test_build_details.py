@@ -194,7 +194,7 @@ def test_the_build_details_describe_each_distilled_suite():
     ]
 
 
-def test_the_build_details_read_back_the_files_that_they_write():
+def test_the_build_details_rebuilt_from_their_files_equal_the_original():
     """Every read method returns the same value on the build details read back from their files as on the original
     ones."""
     # --- arrange ----------------------

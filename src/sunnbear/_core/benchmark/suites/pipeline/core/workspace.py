@@ -42,10 +42,11 @@ class PipelineWorkspace:
         self._write_atomically(manifest_file, manifest_json.encode())
 
     def write_build_details_files(self, files: Mapping[str, bytes]) -> None:
-        """Write the files of a run's build details, each file name mapped to its content, replacing earlier ones.
+        """Write the files of a run's build details, given as file names mapped to their contents.
 
-        The directory of the build details is emptied first, so the files of an earlier run that wrote more files do not
-        remain.
+        The files replace those of an earlier run: the directory of the build details is emptied first, so the files of
+        an earlier run that wrote more files do not remain. Each file is complete, but an interrupted call leaves only
+        some of the files.
         """
         build_details_dir = self.path / _BUILD_DETAILS_DIR_NAME
         shutil.rmtree(build_details_dir, ignore_errors=True)

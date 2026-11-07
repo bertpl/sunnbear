@@ -10,7 +10,7 @@ from sunnbear._core.artifacts import ArtifactError, ArtifactStore
 
 
 def _raise_artifact_error() -> SimpleNamespace:
-    """Raise the `ArtifactError` of build details that this sunnbear cannot read."""
+    """Raise an `ArtifactError`, as `ArtifactStore.load` does for build details that this sunnbear cannot read."""
     raise ArtifactError("other core solver configs")
 
 
