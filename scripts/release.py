@@ -492,10 +492,10 @@ def refresh_readme_badges(badge_metrics: BadgeMetrics) -> None:
 
 
 def stamp_splash(version: str) -> None:
-    """Stamp the release version onto the committed splash webp.
+    """Stamp the release version onto the splash and write it to ``splash_with_version.webp``.
 
     Run the second stage of ``create_splash.sh`` (the version overlay) on the
-    committed, version-independent base image. It requires ImageMagick's ``magick`` on PATH,
+    committed ``_splash_without_version.webp``. It requires ImageMagick's ``magick`` on PATH,
     which `step_8_check_stamping_inputs` verifies before the first write.
     """
     # no leading "v": the script prepends it in the annotation
