@@ -299,11 +299,23 @@ class BenchmarkSuitesBuildDetails:
     def to_files(self) -> dict[str, bytes]:
         """Return the build details as files, each file name mapped to its content.
 
-        The files are those of `PipelineStateStorage.to_files`, plus 1 JSON file with the ids of the finished stages and
-        the stage that stopped the run and why.
+        The files are the format of the artifact `benchmark_suites_build_details`:
 
-        The storage's files also hold what a stage that stopped the run wrote before it stopped; the read methods of
-        build details rebuilt from these files still return ``None`` for that stage.
+        - ``run.json`` holds the ids of the finished stages, and the stage that stopped the run and why, or ``null``
+          when no stage stopped it;
+        - ``storage.json`` holds the information that is not per candidate: each characterization stage's fidelity and
+          solver ids, the Core's composition, and each distilled suite's family, size and diversity;
+        - each structure of `PipelineStateStorage` that holds information per candidate is 1 Parquet table, named after
+          the structure, with 1 row per candidate that the structure covers and the candidate's id in the column
+          ``problem_id``. The table ``candidate_registry`` holds every candidate, with the stage and reason of its drop
+          and whether the drop is a rejection, which are null for a candidate that no stage dropped;
+        - each characterization stage's results are the Parquet table ``<stage id>_raw_features``, with 1 column per
+          name of `DiversityFeatureFactory.feature_names` and 1 column ``n_incorrect_solves_<solver id>`` per core
+          solver config.
+
+        A structure that its stage has not written has no file. The files also hold what a stage that stopped the run
+        wrote before it stopped; the read methods of build details rebuilt from these files still return ``None`` for
+        that stage.
         """
         if self.stop is not None:
             stop = dataclasses.asdict(self.stop)

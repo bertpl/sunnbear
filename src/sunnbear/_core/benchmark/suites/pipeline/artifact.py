@@ -3,6 +3,9 @@
 The artifact holds the build details of a benchmark suite pipeline run over the shipped test problems, as the files of
 `BenchmarkSuitesBuildDetails.to_files`. The files are downloaded from a data release, and the artifact's manifest ships
 in the package.
+
+A consumer reads the artifact through `ArtifactStore.load`, which returns the `BenchmarkSuitesBuildDetails`, and their
+read methods, not by parsing the files: the layout of the files may change between sunnbear versions.
 """
 
 from collections.abc import Mapping

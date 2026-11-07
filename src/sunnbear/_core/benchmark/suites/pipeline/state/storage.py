@@ -102,14 +102,7 @@ class PipelineStateStorage:
     def to_files(self) -> dict[str, bytes]:
         """Return the storage's contents as files, each file name mapped to its content.
 
-        - Each structure that holds information on candidates is 1 Parquet table, named after the structure, with 1 row
-          per candidate and the candidate's id in the column ``problem_id``.
-        - Each characterization's results are the table ``<stage id>_raw_features``, with 1 column per feature and 1
-          column per config with its count of incorrect solves.
-        - The structures that do not hold information per candidate, and each characterization's solver ids and
-          fidelity, are in 1 JSON file.
-
-        A structure that its stage has not written has no file.
+        `BenchmarkSuitesBuildDetails.to_files` describes the files, which are all its files except ``run.json``.
         """
         tables = {"candidate_registry": self.candidate_registry.to_columns()}
         if self.interval_bounds is not None:
