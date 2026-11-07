@@ -43,7 +43,7 @@ BUILTIN_ARTIFACTS_DIR = REPO_ROOT / "src" / "sunnbear" / "_core" / "artifacts" /
 PYTHON_VERSIONS_FILE = REPO_ROOT / ".python-versions"
 SPLASH_SCRIPT = REPO_ROOT / ".github" / "scripts" / "create_splash.sh"
 SPLASH_WEBP = REPO_ROOT / "images" / "splash_with_version.webp"
-SPLASH_BASE_PNG = REPO_ROOT / "images" / "_splash_without_version.png"
+SPLASH_BASE_WEBP = REPO_ROOT / "images" / "_splash_without_version.webp"
 SPLASH_FONT = REPO_ROOT / "images" / "splash" / "google_fonts_montserrat_bold.ttf"
 
 PACKAGE_NAME = "sunnbear"
@@ -219,7 +219,7 @@ def step_8_check_stamping_inputs(last_release_version: str) -> None:
             fail_with_message(f"README.md must carry exactly 1 {name} badge to stamp (found {n_badges})")
     if shutil.which("magick") is None:
         fail_with_message("ImageMagick ('magick') is required to stamp the release splash but was not found")
-    for path in (SPLASH_SCRIPT, SPLASH_BASE_PNG, SPLASH_FONT):
+    for path in (SPLASH_SCRIPT, SPLASH_BASE_WEBP, SPLASH_FONT):
         if not path.is_file():
             fail_with_message(f"the splash cannot be stamped: {path.relative_to(REPO_ROOT)} is missing")
     try:

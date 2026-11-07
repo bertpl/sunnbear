@@ -13,32 +13,32 @@ echo "--------------------------------------------------------------------------
 DISPLAY_VERSION="$1"  # WITHOUT leading "v" (the annotation adds it), e.g. "0.1.10" or "0.1.11-dev"
 
 # --- create splash without version info ---
-if [ ! -f ./images/_splash_without_version.png ]; then
+if [ ! -f ./images/_splash_without_version.webp ]; then
     magick -pointsize 100 -background transparent \
-           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"S" \
-           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"........ " \
-           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"UN" \
-           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"...... ." \
-           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"N" \
-           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"........ ......... ... " \
-           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"B" \
-           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:".... " \
-           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"E" \
-           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"......... .. " \
-           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"A" \
-           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"......... ... " \
-           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#666666" label:"R" \
-           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#bbbbbb" label:"...-......." \
+           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#efefef" label:"S" \
+           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#9a9a9a" label:"........ " \
+           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#efefef" label:"UN" \
+           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#9a9a9a" label:"...... ." \
+           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#efefef" label:"N" \
+           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#9a9a9a" label:"........ ......... ... " \
+           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#efefef" label:"B" \
+           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#9a9a9a" label:".... " \
+           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#efefef" label:"E" \
+           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#9a9a9a" label:"......... .. " \
+           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#efefef" label:"A" \
+           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#9a9a9a" label:"......... ... " \
+           -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#efefef" label:"R" \
+           -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#9a9a9a" label:"...-......." \
            +append "./images/header.mpc"
-    magick "./images/splash/splash.webp" "./images/header.mpc" -gravity North -geometry +0+5 -composite "./images/temp.mpc"
-    magick -pointsize 36 -font "./images/splash/google_fonts_montserrat_italic.ttf" "./images/temp.mpc" -gravity SouthWest -fill "#ffffff" -annotate +10+5 "DiffusionBee 2.5.3 (FLUX.1-dev + Real-ESRGAN)" "./images/_splash_without_version.png"
+    magick "./images/splash/splash.webp" "./images/header.mpc" -gravity North -geometry +0+28 -composite \
+           -quality 95 -define webp:lossless=false "./images/_splash_without_version.webp"
+    rm ./images/header.mpc ./images/header.cache
 fi
 
 # --- add version info ---
-magick -pointsize 128 -font "./images/splash/google_fonts_montserrat_bold.ttf" "./images/_splash_without_version.png" -gravity East -fill "black" -annotate +1262+273 "v${DISPLAY_VERSION}" "./images/temp.mpc"
-magick -pointsize 128 -font "./images/splash/google_fonts_montserrat_bold.ttf" "./images/temp.mpc" -gravity East -fill "white" -annotate +1265+270 "v${DISPLAY_VERSION}" -quality 90 -define webp:lossless=false "./images/splash_with_version.webp"
-
-# --- clean up ---
-echo "Cleaning up..."
-rm ./images/*.mpc
-rm ./images/*.cache
+# The version's right edge lines up with the end of the background's chalk "R", just below it.
+# The splash is saved at half size, because the README shows it far narrower than that.
+magick "./images/_splash_without_version.webp" -pointsize 128 -font "./images/splash/google_fonts_montserrat_bold.ttf" -gravity East \
+       -fill "black" -annotate +1077+163 "v${DISPLAY_VERSION}" \
+       -fill "white" -annotate +1080+160 "v${DISPLAY_VERSION}" \
+       -resize 50% -quality 90 -define webp:lossless=false "./images/splash_with_version.webp"
