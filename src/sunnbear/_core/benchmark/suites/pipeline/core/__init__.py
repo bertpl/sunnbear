@@ -1,6 +1,11 @@
-"""This package holds the framework of the benchmark suite pipeline: what a stage is, and what a run records.
+"""This package holds the contract between the benchmark suite pipeline's stages and the code that runs them.
 
-The parts of the framework work together as follows:
+A run is a loop over the stages, in the order of `PipelineStageId`: each stage runs on its own state accessor, and the
+run records a manifest for it. This package defines what every stage shares in that loop. The loop itself is
+`run_stages` in `runner`, and the information that the stages share is in `state`; both live outside this package,
+because they depend on the stages, and this package imports nothing from the packages beside it.
+
+The package holds these parts:
 
 - `PipelineStageId` names each stage, in run order.
 - `PipelineStage` is the base class of a stage. A stage runs on its state accessor, through which it reads the
@@ -12,13 +17,11 @@ The parts of the framework work together as follows:
 
 A stage drops a candidate with a plain string as its reason, such as ``bisection_count_not_exact``; the stage that
 drops the candidate chooses the string, so no list of reasons exists.
-
-This package imports nothing from the packages beside it.
 """
 
-from .manifest import PipelineStageExecutionInfo, PipelineStageManifest
 from .root_seed import PIPELINE_ROOT_SEED
 from .stage import PipelineStage
 from .stage_id import PipelineStageId
-from .stop import PipelineStop, PipelineStopError
+from .stage_manifest import PipelineStageExecutionInfo, PipelineStageManifest
+from .stop_error import PipelineStop, PipelineStopError
 from .workspace import PipelineWorkspace

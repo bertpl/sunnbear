@@ -9,7 +9,7 @@ Every file is written under a temporary name and then renamed, so a file under i
 import json
 from pathlib import Path
 
-from .manifest import PipelineStageManifest
+from .stage_manifest import PipelineStageManifest
 
 _MANIFESTS_DIR_NAME = "manifests"
 _MANIFEST_FILE_SUFFIX = ".json"
