@@ -1,15 +1,17 @@
 """`CandidateCharacterizationStage` is the base class of the stages that characterize the candidates."""
 
-from collections.abc import Sequence
 from typing import ClassVar
 
 import numpy as np
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage
-from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureFidelity, FeatureMatrix, DiversityFeatureFactory
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
+    DiversityFeatureFactory,
+    FeatureFidelity,
+    FeatureMatrix,
+)
 from sunnbear._core.benchmark.suites.pipeline.state import CharacterizationResults, CharacterizationStateAccessor
 from sunnbear._core.problems.core import ProblemId
-from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 from .task import CandidateCharacterizationResult, CandidateCharacterizationTask
@@ -42,16 +44,12 @@ class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccess
 
     default_fidelity: ClassVar[FeatureFidelity]
 
-    def __init__(self, core_solver_configs: Sequence[SolverConfig], fidelity: FeatureFidelity | None = None) -> None:
-        """Create the stage, which solves each candidate with `core_solver_configs` at `fidelity`.
+    def __init__(self, fidelity: FeatureFidelity | None = None) -> None:
+        """Create the stage, which solves each candidate with `DiversityFeatureFactory.solver_ids` at `fidelity`.
 
         `fidelity` sets only how much work goes into each candidate's features, never which features the stage computes.
         ``None`` stands for the class's `default_fidelity`.
-
-        Raises:
-            ValueError: If `core_solver_configs` is empty.
         """
-        self.definition = DiversityFeatureFactory(solver_ids=tuple(config.solver_id for config in core_solver_configs))
         self.fidelity = fidelity if fidelity is not None else self.default_fidelity
 
     @property
@@ -78,9 +76,7 @@ class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccess
         results_by_problem_id = self._run_in_formula_batches(
             list(c_ranges.items()),
             problem_id_key=lambda candidate: candidate[0],
-            build_task=lambda batch: CandidateCharacterizationTask(
-                candidates=batch, definition=self.definition, fidelity=self.fidelity
-            ),
+            build_task=lambda batch: CandidateCharacterizationTask(candidates=batch, fidelity=self.fidelity),
             worker_pool=worker_pool,
         )
 
@@ -97,12 +93,11 @@ class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccess
         raw_feature_matrix = FeatureMatrix(
             problem_ids=tuple(kept_results),
             values=np.array([result.raw_features for result in kept_results.values()]).reshape(
-                len(kept_results), len(self.definition.feature_names)
+                len(kept_results), len(DiversityFeatureFactory().feature_names)
             ),
         )
         state_accessor.set_characterization_results(
             CharacterizationResults(
-                definition=self.definition,
                 fidelity=self.fidelity,
                 raw_feature_matrix=raw_feature_matrix,
                 n_incorrect_solves_per_config={

@@ -9,6 +9,7 @@ import pytest
 
 from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import DiversityFeatureFactory
 from sunnbear._core.benchmark.suites.pipeline.selection import CoreComposition, DifficultyClass, SuiteFamily
 from sunnbear._core.benchmark.suites.pipeline.state import (
     DistilledSuiteSummary,
@@ -18,7 +19,6 @@ from sunnbear._core.benchmark.suites.pipeline.state import (
     SuiteMembership,
 )
 from tests.benchmark.suites.pipeline.example_states import (
-    EXAMPLE_DEFINITION,
     build_state_before,
     example_characterization_results,
     example_problem_ids,
@@ -149,9 +149,9 @@ def test_spacing_takes_the_nearest_kept_candidates_of_its_own_drops_only():
     scaled_feature_matrix = accessor.coarse_scaled_feature_matrix()
 
     # --- assert -----------------------
-    expected_matrix = EXAMPLE_DEFINITION.build_scaled_matrix(
-        raw_feature_matrix.subset([_PROBLEM_IDS[0], _PROBLEM_IDS[2]]),
-        EXAMPLE_DEFINITION.fit_block_scales(raw_feature_matrix),
+    factory = DiversityFeatureFactory()
+    expected_matrix = factory.build_scaled_matrix(
+        raw_feature_matrix.subset([_PROBLEM_IDS[0], _PROBLEM_IDS[2]]), factory.fit_block_scales(raw_feature_matrix)
     )
     assert scaled_feature_matrix.problem_ids == expected_matrix.problem_ids
     np.testing.assert_array_equal(scaled_feature_matrix.values, expected_matrix.values)

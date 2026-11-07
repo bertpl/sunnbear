@@ -25,8 +25,6 @@ import argparse
 from pathlib import Path
 
 from sunnbear._core.problems.core import FormulaRegistry
-from sunnbear._core.solvers import bracketing  # noqa: F401 - importing the shipped solvers registers their configs
-from sunnbear._core.solvers.core import SolverConfigRegistry
 
 from .mode import PipelineMode
 from .runner import run_pipeline
@@ -48,9 +46,6 @@ def main() -> None:
     result = run_pipeline(
         workspace_dir=args.workspace,
         formulas=FormulaRegistry.formulas(),
-        core_solver_configs=[
-            config for config in SolverConfigRegistry.configs() if config.role.is_used_for_problem_characterization
-        ],
         n_workers=args.n_workers,
         mode=PipelineMode.DRAFT if args.is_draft else PipelineMode.FULL,
     )

@@ -8,7 +8,6 @@ from sunnbear._core.benchmark.suites.pipeline.mode import PipelineMode
 from sunnbear._core.benchmark.suites.pipeline.runner import run_pipeline
 from sunnbear._core.benchmark.suites.pipeline.stages import DEFAULT_SPACING_MIN_DISTANCE
 from sunnbear._core.problems.core import FormulaRegistry
-from sunnbear._core.solvers.core import SolverConfigRegistry
 
 
 @pytest.mark.only_with_numba_jit
@@ -25,9 +24,6 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     # --- arrange ----------------------
     # The shipped formula 2.1.2 has few candidates, so the pipeline runs fast on it.
     formulas = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 1, 2)]
-    core_solver_configs = [
-        config for config in SolverConfigRegistry.configs() if config.role.is_used_for_problem_characterization
-    ]
 
     # --- act --------------------------
     # By default `run_pipeline` starts 1 worker per CPU, which would only make the workers wait for CPU, because
@@ -36,7 +32,6 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     result = run_pipeline(
         workspace_dir=tmp_path,
         formulas=formulas,
-        core_solver_configs=core_solver_configs,
         n_workers=2,
         mode=PipelineMode.DRAFT,
     )

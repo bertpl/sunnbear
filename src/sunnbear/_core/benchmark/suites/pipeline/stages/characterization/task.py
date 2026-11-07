@@ -1,8 +1,8 @@
 """`CandidateCharacterizationTask` computes the raw features of each candidate of a batch, or the reason to reject it.
 
-For each candidate, the task first runs the solves of the core solver configs, then snuffled's analyses, in the same
-worker, so that each formula is compiled in only 1 worker. Besides the raw features, the task computes the candidate's
-EDI and counts its incorrect solves for each core solver config.
+For each candidate, the task first runs the solves of the core solver configs that `DiversityFeatureFactory` names,
+then snuffled's analyses, in the same worker, so that each formula is compiled in only 1 worker. Besides the raw
+features, the task computes the candidate's EDI and counts its incorrect solves for each core solver config.
 """
 
 from dataclasses import dataclass
@@ -16,8 +16,8 @@ from sunnbear._core.benchmark.runner import BenchmarkRunSettings, BenchmarkTask
 from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     SNUFFLED_PROPERTIES,
-    FeatureFidelity,
     DiversityFeatureFactory,
+    FeatureFidelity,
     compute_edi,
 )
 from sunnbear._core.problems.core import FormulaRegistry, ProblemId
@@ -33,12 +33,10 @@ class CandidateCharacterizationTask:
 
     Attributes:
         candidates: The id and the c-range of each candidate; the task rebuilds each calibrated test problem from them.
-        definition: The `DiversityFeatureFactory` of the raw features, whose core solver configs solve each candidate.
         fidelity: The `FeatureFidelity` of the solves and analyses.
     """
 
     candidates: tuple[tuple[ProblemId, CRange], ...]
-    definition: DiversityFeatureFactory
     fidelity: FeatureFidelity
 
     def run(self) -> list["CandidateCharacterizationResult | str"]:
@@ -58,7 +56,8 @@ class CandidateCharacterizationTask:
         first one whose diagnostics reject the candidate stops them.
         """
         # --- solves -----------------------------
-        solver_ids = self.definition.solver_ids
+        factory = DiversityFeatureFactory()
+        solver_ids = factory.solver_ids
         solve_results = BenchmarkTask(
             problem_id=str(problem_id),
             c_min=c_range.c_min,
@@ -98,7 +97,7 @@ class CandidateCharacterizationTask:
 
             # --- result -------------------------
             return CandidateCharacterizationResult(
-                raw_features=self.definition.compute_raw_feature_row(
+                raw_features=factory.compute_raw_feature_row(
                     n_fevals_eff=n_fevals_eff, snuffled_property_values=np.array(property_values)
                 ),
                 edi=compute_edi(n_fevals_eff),
@@ -114,10 +113,10 @@ class CandidateCharacterizationResult:
     """A `CandidateCharacterizationResult` holds 1 candidate's raw features, EDI and counts of incorrect solves.
 
     Attributes:
-        raw_features: The raw features, in the order of the task's `DiversityFeatureFactory.feature_names`.
+        raw_features: The raw features, in the order of `DiversityFeatureFactory.feature_names`.
         edi: The candidate's empirical difficulty index (EDI).
-        n_incorrect_solves_per_config: For each core solver config, in the order of the definition's `solver_ids`, the
-            number of its solves without a correct answer.
+        n_incorrect_solves_per_config: For each core solver config, in the order of
+            `DiversityFeatureFactory.solver_ids`, the number of its solves without a correct answer.
     """
 
     raw_features: np.ndarray

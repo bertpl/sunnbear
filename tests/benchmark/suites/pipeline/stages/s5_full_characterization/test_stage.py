@@ -5,11 +5,15 @@ import pytest
 
 from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
-from sunnbear._core.benchmark.suites.pipeline.diversity_features import EDI_GPQ_LEVEL, SOLVERS_GPQ_LEVELS, FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
+    EDI_GPQ_LEVEL,
+    SOLVERS_GPQ_LEVELS,
+    DiversityFeatureFactory,
+    FeatureFidelity,
+)
 from sunnbear._core.benchmark.suites.pipeline.stages import FullCharacterizationStage
 from sunnbear._core.benchmark.suites.pipeline.state import FullCharacterizationStateAccessor
 from sunnbear._core.problems.core import ProblemId
-from sunnbear._core.solvers.core import SolverConfigRegistry
 from sunnbear._core.utils.worker_pool import WorkerPool
 from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
 from tests.benchmark.suites.pipeline.example_states import build_state_before, record_calls
@@ -26,10 +30,7 @@ def test_the_stage_stores_the_full_features_their_scales_and_the_edis(isolated_f
     state = build_state_before(
         PipelineStageId.FULL_CHARACTERIZATION, problem_ids, c_range=CRange(c_min=-0.5, c_max=0.5)
     )
-    core_solver_configs = [
-        config for config in SolverConfigRegistry.configs() if config.role.is_used_for_problem_characterization
-    ]
-    stage = FullCharacterizationStage(core_solver_configs)
+    stage = FullCharacterizationStage()
     results_calls = record_calls(monkeypatch, FullCharacterizationStateAccessor, "set_characterization_results")
     edis_calls = record_calls(monkeypatch, FullCharacterizationStateAccessor, "set_edis")
 
@@ -41,7 +42,7 @@ def test_the_stage_stores_the_full_features_their_scales_and_the_edis(isolated_f
     assert results.fidelity is FeatureFidelity.FULL
     assert results.raw_feature_matrix.problem_ids == tuple(problem_ids)
     assert all(scale > 0.0 for scale in results.block_scales.scale_per_block.values())
-    edi_column = len(stage.definition.solver_ids) + SOLVERS_GPQ_LEVELS.index(EDI_GPQ_LEVEL)
+    edi_column = len(DiversityFeatureFactory().solver_ids) + SOLVERS_GPQ_LEVELS.index(EDI_GPQ_LEVEL)
     np.testing.assert_allclose(
         [edis[problem_id] for problem_id in problem_ids], results.raw_feature_matrix.values[:, edi_column]
     )

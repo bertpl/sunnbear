@@ -5,7 +5,7 @@ information on the candidates that no stage before it dropped, and drops candida
 
 - `core` holds the framework: what a stage is, its id, its manifest, and the workspace that stores the manifests;
 - `snuffled_analysis` runs snuffled's analysis of a test problem, for every stage that needs one;
-- `features` defines the candidates' feature vectors and their empirical difficulty index (EDI);
+- `diversity_features` computes the candidates' diversity features and their empirical difficulty index (EDI);
 - `selection` selects the pipeline's suites, each the most diverse candidates under difficulty quotas, from the
   candidates' feature vectors;
 - `state` holds the state of a run, which each stage reaches only through its own state accessor;
@@ -25,7 +25,7 @@ from .core import (
     PipelineStopError,
     PipelineWorkspace,
 )
-from .diversity_features import FeatureBlock, FeatureFidelity, DiversityFeatureFactory
+from .diversity_features import DiversityFeatureFactory, FeatureBlock, FeatureFidelity
 from .mode import PipelineMode
 from .runner import PipelineRunResult, run_pipeline, run_stages
 from .stages import (

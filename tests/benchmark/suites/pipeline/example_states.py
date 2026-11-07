@@ -15,16 +15,14 @@ from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     SNUFFLED_PROPERTIES,
+    DiversityFeatureFactory,
     FeatureFidelity,
     FeatureMatrix,
-    DiversityFeatureFactory,
 )
 from sunnbear._core.benchmark.suites.pipeline.selection import CoreComposition, DifficultyClass
 from sunnbear._core.benchmark.suites.pipeline.state import CharacterizationResults, IntervalBounds, PipelineState
 from sunnbear._core.problems.core import ProblemId
 
-# The example states characterize the candidates with 1 core solver config.
-EXAMPLE_DEFINITION = DiversityFeatureFactory(solver_ids=("bisection",))
 _MAX_FEVALS = max_fevals_for(n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
 _DEFAULT_C_RANGE = CRange(c_min=-1.0, c_max=1.0)
 
@@ -37,7 +35,7 @@ def example_problem_ids(n_candidates: int, *, formula_number: int = 1) -> list[P
 def example_raw_feature_matrix(problem_ids: Sequence[ProblemId], *, seed: int = 3) -> FeatureMatrix:
     """Return random raw features of `problem_ids`, with evaluation counts in [2, max_fevals] in the solvers block."""
     rng = np.random.default_rng(seed=seed)
-    n_solvers_features = len(EXAMPLE_DEFINITION.feature_names) - len(SNUFFLED_PROPERTIES)
+    n_solvers_features = len(DiversityFeatureFactory().feature_names) - len(SNUFFLED_PROPERTIES)
     values = np.hstack(
         [
             rng.uniform(2, _MAX_FEVALS, size=(len(problem_ids), n_solvers_features)),
@@ -50,10 +48,11 @@ def example_raw_feature_matrix(problem_ids: Sequence[ProblemId], *, seed: int = 
 def example_characterization_results(raw_feature_matrix: FeatureMatrix) -> CharacterizationResults:
     """Return the results of a characterization at the coarse fidelity that keeps every candidate of the matrix."""
     return CharacterizationResults(
-        definition=EXAMPLE_DEFINITION,
         fidelity=FeatureFidelity.COARSE,
         raw_feature_matrix=raw_feature_matrix,
-        n_incorrect_solves_per_config=dict.fromkeys(raw_feature_matrix.problem_ids, (0,)),
+        n_incorrect_solves_per_config=dict.fromkeys(
+            raw_feature_matrix.problem_ids, (0,) * len(DiversityFeatureFactory().solver_ids)
+        ),
     )
 
 

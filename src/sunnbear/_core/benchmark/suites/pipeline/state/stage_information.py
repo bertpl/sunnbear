@@ -11,10 +11,10 @@ from functools import cached_property
 from typing import NamedTuple
 
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
+    DiversityFeatureFactory,
     FeatureBlockScales,
     FeatureFidelity,
     FeatureMatrix,
-    DiversityFeatureFactory,
 )
 from sunnbear._core.benchmark.suites.pipeline.selection import SuiteFamily
 from sunnbear._core.problems.core import ProblemId
@@ -38,15 +38,13 @@ class CharacterizationResults:
     """`CharacterizationResults` holds what 1 characterization stage computed for the candidates that it keeps.
 
     Attributes:
-        definition: The `DiversityFeatureFactory` of the feature vectors.
         fidelity: The `FeatureFidelity` of the stage's solves and analyses.
         raw_feature_matrix: The raw features of each kept candidate.
         n_incorrect_solves_per_config: For each kept candidate, 1 count per core solver config, in the order of
-            `definition.solver_ids`: the number of that config's solves that gave no correct answer. Each config
-            solves each candidate `fidelity.solver_mc_size` times.
+            `DiversityFeatureFactory.solver_ids`: the number of that config's solves that gave no correct answer.
+            Each config solves each candidate `fidelity.solver_mc_size` times.
     """
 
-    definition: DiversityFeatureFactory
     fidelity: FeatureFidelity
     raw_feature_matrix: FeatureMatrix
     n_incorrect_solves_per_config: Mapping[ProblemId, tuple[int, ...]]
@@ -54,14 +52,16 @@ class CharacterizationResults:
     @cached_property
     def block_scales(self) -> FeatureBlockScales | None:
         """Return the scale of each block over the kept candidates; ``None`` when the stage keeps fewer than 2."""
-        return self.definition.fit_block_scales(self.raw_feature_matrix)
+        return DiversityFeatureFactory().fit_block_scales(self.raw_feature_matrix)
 
     def build_scaled_feature_matrix(self, problem_ids: Sequence[ProblemId]) -> FeatureMatrix | None:
         """Return the scaled features of the candidates `problem_ids`; ``None`` when the stage has no block scales."""
         if self.block_scales is None:
             return None
         else:
-            return self.definition.build_scaled_matrix(self.raw_feature_matrix.subset(problem_ids), self.block_scales)
+            return DiversityFeatureFactory().build_scaled_matrix(
+                self.raw_feature_matrix.subset(problem_ids), self.block_scales
+            )
 
 
 # ==================================================================================================

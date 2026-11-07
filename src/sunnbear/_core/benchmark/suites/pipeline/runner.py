@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Any
 
 from sunnbear._core.problems.core import Formula
-from sunnbear._core.solvers.core import SolverConfig
 from sunnbear._core.utils.module_imports import worker_pool_for_modules
 from sunnbear._core.utils.worker_pool import WorkerPool
 
@@ -24,6 +23,7 @@ from .core import (
     PipelineStopError,
     PipelineWorkspace,
 )
+from .diversity_features import DiversityFeatureFactory
 from .mode import PipelineMode
 from .stages import (
     CandidateGenerationStage,
@@ -44,7 +44,6 @@ def run_pipeline(
     *,
     workspace_dir: Path,
     formulas: Sequence[Formula],
-    core_solver_configs: Sequence[SolverConfig],
     n_workers: int | None = None,
     mode: PipelineMode = PipelineMode.FULL,
 ) -> "PipelineRunResult":
@@ -56,12 +55,9 @@ def run_pipeline(
     Args:
         workspace_dir: The directory for the manifests of the stages.
         formulas: The formulas whose candidates the pipeline builds.
-        core_solver_configs: The solver configs whose solves characterize the candidates: for the benchmark suites,
-            the configs whose role marks them for characterizing test problems
-            (`SolverRole.is_used_for_problem_characterization`).
         n_workers: The number of worker processes; ``None`` for 1 per logical CPU. Each worker imports the modules that
-            define `formulas` and `core_solver_configs`, so with more than 1 worker, none of them may be defined in an
-            interactive session.
+            define `formulas` and `DiversityFeatureFactory.solver_configs`, so with more than 1 worker, no formula may
+            be defined in an interactive session.
         mode: The `PipelineMode`, whose attributes set how much work the stages do.
 
     Returns:
@@ -71,20 +67,19 @@ def run_pipeline(
         ValueError: If 1 of these holds:
 
             - a formula fails the checks of `Formula.build_all_candidates`;
-            - `core_solver_configs` is empty;
-            - `n_workers` is below 1, or above 1 while a formula or solver config is defined in an interactive session.
+            - `n_workers` is below 1, or above 1 while a formula is defined in an interactive session.
     """
     stages = [
         CandidateGenerationStage(formulas),
         CandidateValidationStage(),
-        CoarseCharacterizationStage(core_solver_configs),
+        CoarseCharacterizationStage(),
         SpacingStage(),
-        FullCharacterizationStage(core_solver_configs, fidelity=mode.full_characterization_stage_fidelity),
+        FullCharacterizationStage(fidelity=mode.full_characterization_stage_fidelity),
         CoreSelectionStage(sec_per_candidate=mode.selection_sec_per_candidate),
         DistillationStage(sec_per_candidate=mode.selection_sec_per_candidate),
     ]
     module_names = {type(formula).__module__ for formula in formulas} | {
-        config.declaring_module_name for config in core_solver_configs
+        config.declaring_module_name for config in DiversityFeatureFactory().solver_configs
     }
     with worker_pool_for_modules(n_workers=n_workers, module_names=module_names) as worker_pool:
         return run_stages(PipelineWorkspace(workspace_dir), stages, worker_pool=worker_pool)
