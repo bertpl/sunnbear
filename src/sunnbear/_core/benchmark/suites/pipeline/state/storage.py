@@ -12,23 +12,12 @@ import polars as pl
 
 from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
-from sunnbear._core.benchmark.suites.pipeline.selection import (
-    CoreComposition,
-    DifficultyClass,
-    DifficultyQuota,
-    SuiteFamily,
-)
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
 from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.parquet import parquet_file_content
 
 from .candidate_registry import CandidateRegistry
-from .stage_information import (
-    CharacterizationResults,
-    DistilledSuiteSummary,
-    IntervalBounds,
-    NearestKeptCandidate,
-    SuiteMembership,
-)
+from .stage_information import CharacterizationResults, IntervalBounds, NearestKeptCandidate, SuiteSelectionDetails
 
 _TABLE_FILE_SUFFIX = ".parquet"
 # This file holds the parts of the storage that are not tables, as `_json_contents` returns them.
@@ -53,11 +42,11 @@ class PipelineStateStorage:
         characterization_results: The results of each characterization stage, keyed by its `PipelineStageId`.
         nearest_kept_candidates: Spacing's nearest kept candidate of each candidate that it drops.
         edis: Full characterization's empirical difficulty index (EDI) of each candidate that it keeps.
-        difficulty_classes: Core selection's difficulty class of each candidate that it receives.
-        core_composition: Core selection's composition of the Core.
-        suite_memberships: Distillation's `SuiteMembership` of each Core member.
-        distilled_suite_summaries: Distillation's `DistilledSuiteSummary` of each suite, in the order that
-            `DistillationStateAccessor.set_distilled_suite_summaries` states.
+        difficulty_tiers: Core selection's difficulty tier of each candidate that it receives.
+        core_selection_details: Core selection's `SuiteSelectionDetails` of the Core.
+        distilled_suite_selection_details: Distillation's `SuiteSelectionDetails` of each suite that it selects, keyed
+            by the suite's name, in the order that `DistillationStateAccessor.set_distilled_suite_selection_details`
+            states.
     """
 
     candidate_registry: CandidateRegistry = field(default_factory=CandidateRegistry)
@@ -66,10 +55,9 @@ class PipelineStateStorage:
     characterization_results: dict[PipelineStageId, CharacterizationResults] = field(default_factory=dict)
     nearest_kept_candidates: dict[ProblemId, NearestKeptCandidate] | None = None
     edis: dict[ProblemId, float] | None = None
-    difficulty_classes: dict[ProblemId, DifficultyClass] | None = None
-    core_composition: CoreComposition | None = None
-    suite_memberships: dict[ProblemId, SuiteMembership] | None = None
-    distilled_suite_summaries: tuple[DistilledSuiteSummary, ...] | None = None
+    difficulty_tiers: dict[ProblemId, DifficultyTier] | None = None
+    core_selection_details: SuiteSelectionDetails | None = None
+    distilled_suite_selection_details: dict[str, SuiteSelectionDetails] | None = None
 
     def unwritten_structure_names(self, stage_id: PipelineStageId) -> list[str]:
         """Return the names of the structures of the stage `stage_id` that the stage has not written yet."""
@@ -85,12 +73,11 @@ class PipelineStateStorage:
                 "edis": self.edis is not None,
             },
             PipelineStageId.CORE_SELECTION: {
-                "difficulty_classes": self.difficulty_classes is not None,
-                "core_composition": self.core_composition is not None,
+                "difficulty_tiers": self.difficulty_tiers is not None,
+                "core_selection_details": self.core_selection_details is not None,
             },
             PipelineStageId.DISTILLATION: {
-                "suite_memberships": self.suite_memberships is not None,
-                "distilled_suite_summaries": self.distilled_suite_summaries is not None,
+                "distilled_suite_selection_details": self.distilled_suite_selection_details is not None,
             },
         }
         is_written_by_name = is_written_by_name_per_stage[stage_id]
@@ -119,18 +106,10 @@ class PipelineStateStorage:
             }
         if self.edis is not None:
             tables["edis"] = {"problem_id": list(map(str, self.edis)), "edi": list(self.edis.values())}
-        if self.difficulty_classes is not None:
-            tables["difficulty_classes"] = {
-                "problem_id": list(map(str, self.difficulty_classes)),
-                "difficulty_class": [c.value for c in self.difficulty_classes.values()],
-            }
-        if self.suite_memberships is not None:
-            tables["suite_memberships"] = {
-                "problem_id": list(map(str, self.suite_memberships)),
-                "suite_family": [m.suite_family.value for m in self.suite_memberships.values()],
-                "smallest_containing_suite_size": [
-                    m.smallest_containing_suite_size for m in self.suite_memberships.values()
-                ],
+        if self.difficulty_tiers is not None:
+            tables["difficulty_tiers"] = {
+                "problem_id": list(map(str, self.difficulty_tiers)),
+                "difficulty_tier": [tier.value for tier in self.difficulty_tiers.values()],
             }
         files = {f"{name}{_TABLE_FILE_SUFFIX}": parquet_file_content(columns) for name, columns in tables.items()}
         files[_JSON_FILE_NAME] = (json.dumps(self._json_contents(), indent=2, sort_keys=True) + "\n").encode()
@@ -152,29 +131,22 @@ class PipelineStateStorage:
 
     def _json_contents(self) -> dict[str, Any]:
         """Return the structures that are not tables, and each characterization's solver ids and fidelity, as JSON."""
-        if self.core_composition is not None:
-            core_composition = {
-                "quotas": [
-                    {"classes": sorted(c.value for c in quota.classes), "count": quota.count}
-                    for quota in self.core_composition.quotas
-                ],
-                "class_counts": {c.value: count for c, count in self.core_composition.class_counts.items()},
-            }
+        if self.core_selection_details is not None:
+            core_selection_details = self.core_selection_details.to_json_values()
         else:
-            core_composition = None
-        if self.distilled_suite_summaries is not None:
-            distilled_suite_summaries = [
-                {"suite_family": s.suite_family.value, "size": s.size, "diversity": s.diversity}
-                for s in self.distilled_suite_summaries
+            core_selection_details = None
+        if self.distilled_suite_selection_details is not None:
+            distilled_suite_selection_details = [
+                details.to_json_values() for details in self.distilled_suite_selection_details.values()
             ]
         else:
-            distilled_suite_summaries = None
+            distilled_suite_selection_details = None
         return {
             "characterizations": {
                 stage_id.value: results.to_json_values() for stage_id, results in self.characterization_results.items()
             },
-            "core_composition": core_composition,
-            "distilled_suite_summaries": distilled_suite_summaries,
+            "core_selection_details": core_selection_details,
+            "distilled_suite_selection_details": distilled_suite_selection_details,
         }
 
     @staticmethod
@@ -191,11 +163,7 @@ class PipelineStateStorage:
                 problem_id=ProblemId.from_string(row["nearest_kept_problem_id"]), distance=row["distance"]
             ),
             "edis": lambda row: row["edi"],
-            "difficulty_classes": lambda row: DifficultyClass(row["difficulty_class"]),
-            "suite_memberships": lambda row: SuiteMembership(
-                suite_family=SuiteFamily(row["suite_family"]),
-                smallest_containing_suite_size=row["smallest_containing_suite_size"],
-            ),
+            "difficulty_tiers": lambda row: DifficultyTier(row["difficulty_tier"]),
         }
 
     # --------------------------------------------------------------------------
@@ -224,23 +192,15 @@ class PipelineStateStorage:
                 setattr(
                     storage, name, dict(zip(problem_ids, map(build_value, table.iter_rows(named=True)), strict=True))
                 )
-        if json_contents["core_composition"] is not None:
-            storage.core_composition = CoreComposition(
-                quotas=tuple(
-                    DifficultyQuota(classes=frozenset(map(DifficultyClass, quota["classes"])), count=quota["count"])
-                    for quota in json_contents["core_composition"]["quotas"]
-                ),
-                class_counts={
-                    DifficultyClass(c): count for c, count in json_contents["core_composition"]["class_counts"].items()
-                },
+        if json_contents["core_selection_details"] is not None:
+            storage.core_selection_details = SuiteSelectionDetails.from_json_values(
+                json_contents["core_selection_details"]
             )
-        if json_contents["distilled_suite_summaries"] is not None:
-            storage.distilled_suite_summaries = tuple(
-                DistilledSuiteSummary(
-                    suite_family=SuiteFamily(summary["suite_family"]),
-                    size=summary["size"],
-                    diversity=summary["diversity"],
-                )
-                for summary in json_contents["distilled_suite_summaries"]
+        if json_contents["distilled_suite_selection_details"] is not None:
+            distilled_suite_selection_details = map(
+                SuiteSelectionDetails.from_json_values, json_contents["distilled_suite_selection_details"]
             )
+            storage.distilled_suite_selection_details = {
+                details.benchmark_suite.name: details for details in distilled_suite_selection_details
+            }
         return storage

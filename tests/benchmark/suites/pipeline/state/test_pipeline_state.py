@@ -4,7 +4,6 @@ its accessor, and gives each candidate's drop."""
 import pytest
 
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, PipelineStageId
-from sunnbear._core.benchmark.suites.pipeline.selection import CoreComposition, DifficultyClass
 from sunnbear._core.benchmark.suites.pipeline.state import (
     CandidateDrop,
     CandidateGenerationStateAccessor,
@@ -21,11 +20,7 @@ def test_the_state_creates_each_stages_accessor_in_run_order():
     """The first accessor is candidate generation's; once every stage before distillation has finished, the state
     creates distillation's accessor, and records the stages that finished."""
     # --- arrange ----------------------
-    state = build_state_before(
-        PipelineStageId.DISTILLATION,
-        example_problem_ids(4),
-        core_composition=CoreComposition.from_class_counts(dict.fromkeys(DifficultyClass, 64)),
-    )
+    state = build_state_before(PipelineStageId.DISTILLATION, example_problem_ids(4))
 
     # --- act --------------------------
     first_accessor = PipelineState().create_state_accessor(PipelineStageId.CANDIDATE_GENERATION)

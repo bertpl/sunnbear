@@ -30,11 +30,5 @@ from .accessors import (
 from .build_details import BenchmarkSuitesBuildDetails
 from .candidate_registry import CandidateDrop, CandidateRegistry
 from .pipeline_state import PipelineState
-from .stage_information import (
-    CharacterizationResults,
-    DistilledSuiteSummary,
-    IntervalBounds,
-    NearestKeptCandidate,
-    SuiteMembership,
-)
+from .stage_information import CharacterizationResults, IntervalBounds, NearestKeptCandidate, SuiteSelectionDetails
 from .storage import PipelineStateStorage
