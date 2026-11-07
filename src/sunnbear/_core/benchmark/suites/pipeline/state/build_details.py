@@ -14,15 +14,15 @@ Each consumer builds what it needs from the read methods, which return:
 - tables that count the drops and the incorrect solves, list the rejections per formula, and describe the
   distilled suites.
 
-The build details write their files into a directory, and read them back.
+The build details convert themselves to files and back, and say whether they still fit the installed sunnbear's test
+problems.
 """
 
 import copy
 import dataclasses
 import json
-import shutil
 from collections import Counter
-from pathlib import Path
+from collections.abc import Mapping
 from typing import Self
 
 import polars as pl
@@ -30,7 +30,7 @@ import polars as pl
 from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId, PipelineStop
 from sunnbear._core.benchmark.suites.pipeline.selection import CoreComposition, DifficultyClass
-from sunnbear._core.problems.core import ProblemId
+from sunnbear._core.problems.core import FormulaRegistry, ProblemId
 
 from .candidate_registry import CandidateDrop
 from .stage_information import (
@@ -296,24 +296,50 @@ class BenchmarkSuitesBuildDetails:
     # --------------------------------------------------------------------------
     #  Files
     # --------------------------------------------------------------------------
-    def write_files(self, directory: Path) -> None:
-        """Write the build details into `directory`, after removing any files that it holds.
+    def to_files(self) -> dict[str, bytes]:
+        """Return the build details as files, each file name mapped to its content.
 
-        The directory holds, in 1 JSON file, the ids of the finished stages and the stage that stopped the run and why,
-        beside the files that `PipelineStateStorage.write_files` writes.
+        The files are those of `PipelineStateStorage.to_files`, plus 1 JSON file with the ids of the finished stages and
+        the stage that stopped the run and why.
 
-        Those files also hold what a stage that stopped the run wrote before it stopped; the read methods of the build
-        details read back from them still return ``None`` for that stage.
+        The storage's files also hold what a stage that stopped the run wrote before it stopped; the read methods of the
+        build details read back from them still return ``None`` for that stage.
         """
-        shutil.rmtree(directory, ignore_errors=True)
-        directory.mkdir(parents=True)
         if self.stop is not None:
             stop = dataclasses.asdict(self.stop)
         else:
             stop = None
         run_contents = {"finished_stage_ids": list(self.finished_stage_ids), "stop": stop}
-        (directory / _RUN_FILE_NAME).write_text(json.dumps(run_contents, indent=2, sort_keys=True) + "\n")
-        self._storage.write_files(directory)
+        return self._storage.to_files() | {
+            _RUN_FILE_NAME: (json.dumps(run_contents, indent=2, sort_keys=True) + "\n").encode()
+        }
+
+    # --------------------------------------------------------------------------
+    #  Staleness
+    # --------------------------------------------------------------------------
+    def staleness_reasons(self) -> list[str]:
+        """Return why the build details no longer fit the installed sunnbear's test problems; empty when they fit.
+
+        The build details fit when their candidates are exactly the candidates of the registered formulas, so that a
+        consumer finds each candidate, and only those, in `FormulaRegistry`. The other references are checked when the
+        build details are read back: `from_files` refuses characterization results with other core solver configs
+        than `DiversityFeatureFactory.solver_ids`, and stage ids or `DifficultyClass` and `SuiteFamily` values that the
+        installed sunnbear does not define.
+        """
+        registered_problem_ids = {
+            candidate.id for formula in FormulaRegistry.formulas() for candidate in formula.build_all_candidates()
+        }
+        problem_ids = set(self._storage.candidate_registry.problem_ids)
+        unknown_problem_ids = sorted(map(str, problem_ids - registered_problem_ids))
+        missing_problem_ids = sorted(map(str, registered_problem_ids - problem_ids))
+        reasons = []
+        if unknown_problem_ids:
+            reasons.append(f"{len(unknown_problem_ids)} candidates are not registered, e.g. {unknown_problem_ids[0]}")
+        if missing_problem_ids:
+            reasons.append(
+                f"{len(missing_problem_ids)} registered candidates are missing, e.g. {missing_problem_ids[0]}"
+            )
+        return reasons
 
     # --------------------------------------------------------------------------
     #  Helpers
@@ -329,9 +355,15 @@ class BenchmarkSuitesBuildDetails:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def read_files(cls, directory: Path) -> Self:
-        """Return the build details that `write_files` wrote into `directory`."""
-        run_contents = json.loads((directory / _RUN_FILE_NAME).read_text())
+    def from_files(cls, files: Mapping[str, bytes]) -> Self:
+        """Return the build details that `to_files` converted to `files`.
+
+        Raises:
+            ValueError: If the characterization results record other core solver configs than
+                `DiversityFeatureFactory.solver_ids`, or the files hold a stage id or a `DifficultyClass` or
+                `SuiteFamily` value that this sunnbear does not define.
+        """
+        run_contents = json.loads(files[_RUN_FILE_NAME])
         if run_contents["stop"] is not None:
             stop = PipelineStop(
                 stage_id=PipelineStageId(run_contents["stop"]["stage_id"]), reason=run_contents["stop"]["reason"]
@@ -339,7 +371,7 @@ class BenchmarkSuitesBuildDetails:
         else:
             stop = None
         return cls(
-            storage=PipelineStateStorage.read_files(directory),
+            storage=PipelineStateStorage.from_files(files),
             finished_stage_ids=tuple(PipelineStageId(stage_id) for stage_id in run_contents["finished_stage_ids"]),
             stop=stop,
         )

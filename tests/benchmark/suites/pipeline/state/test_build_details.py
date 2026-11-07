@@ -3,7 +3,8 @@
 - `PipelineState.create_build_details` refuses a finished stage that did not write its information;
 - the build details give only the information of the finished stages;
 - they count the drops and the incorrect solves, list the rejections per formula, and describe the distilled suites;
-- the build details read back from their own files equal the ones that wrote them.
+- the build details read back from their own files equal the ones that wrote them;
+- they report the candidates that differ from those of the registered formulas.
 """
 
 import dataclasses
@@ -25,6 +26,8 @@ from sunnbear._core.benchmark.suites.pipeline.state import (
     PipelineStateStorage,
     SuiteMembership,
 )
+from sunnbear._core.problems.core import FormulaRegistry
+from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
 from tests.benchmark.suites.pipeline.example_states import (
     build_state_before,
     example_problem_ids,
@@ -191,7 +194,7 @@ def test_the_build_details_describe_each_distilled_suite():
     ]
 
 
-def test_the_build_details_read_back_the_files_that_they_write(tmp_path):
+def test_the_build_details_read_back_the_files_that_they_write():
     """Every read method returns the same value on the build details read back from their files as on the original
     ones."""
     # --- arrange ----------------------
@@ -200,8 +203,7 @@ def test_the_build_details_read_back_the_files_that_they_write(tmp_path):
     )
 
     # --- act --------------------------
-    build_details.write_files(tmp_path / "build_details")
-    read_back = BenchmarkSuitesBuildDetails.read_files(tmp_path / "build_details")
+    read_back = BenchmarkSuitesBuildDetails.from_files(build_details.to_files())
 
     # --- assert -----------------------
     assert (read_back.finished_stage_ids, read_back.stop) == (build_details.finished_stage_ids, build_details.stop)
@@ -224,7 +226,7 @@ def test_the_build_details_read_back_the_files_that_they_write(tmp_path):
 
 
 @pytest.mark.parametrize("n_finished_stages", [0, 3])
-def test_the_build_details_of_a_run_that_stopped_early_read_back_their_files(tmp_path, n_finished_stages: int):
+def test_the_build_details_of_a_run_that_stopped_early_read_back_their_files(n_finished_stages: int):
     """When no stage, or only the first 3 stages, finished, the build details write no files for the later stages, and
     the build details read back from the files hold none of those stages' information."""
     # --- arrange ----------------------
@@ -232,8 +234,7 @@ def test_the_build_details_of_a_run_that_stopped_early_read_back_their_files(tmp
     build_details = build_state_before(stage_id, example_problem_ids(3)).create_build_details()
 
     # --- act --------------------------
-    build_details.write_files(tmp_path)
-    read_back = BenchmarkSuitesBuildDetails.read_files(tmp_path)
+    read_back = BenchmarkSuitesBuildDetails.from_files(build_details.to_files())
 
     # --- assert -----------------------
     assert read_back.finished_stage_ids == tuple(PipelineStageId)[:n_finished_stages]
@@ -243,14 +244,42 @@ def test_the_build_details_of_a_run_that_stopped_early_read_back_their_files(tmp
     assert read_back.incorrect_solves_table(PipelineStageId.FULL_CHARACTERIZATION) is None
 
 
-def test_the_build_details_refuse_files_written_with_other_solver_configs(tmp_path, monkeypatch):
+def test_the_build_details_refuse_files_written_with_other_solver_configs(monkeypatch):
     """Build details written while bisection alone characterized the candidates are refused once the factory names
     other solver configs."""
     # --- arrange ----------------------
-    build_details = build_state_before(PipelineStageId.SPACING, example_problem_ids(3)).create_build_details()
-    build_details.write_files(tmp_path)
+    files = build_state_before(PipelineStageId.SPACING, example_problem_ids(3)).create_build_details().to_files()
     monkeypatch.setattr(DiversityFeatureFactory, "solver_ids", property(lambda self: ("illinois",)))
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=r"computed with the solver configs \['bisection'\], not with \['illinois'\]"):
-        BenchmarkSuitesBuildDetails.read_files(tmp_path)
+        BenchmarkSuitesBuildDetails.from_files(files)
+
+
+def test_the_build_details_report_the_candidates_that_differ_from_the_registered_ones(
+    isolated_formula_registry, monkeypatch
+):
+    """Build details of exactly the candidates of the registered formulas fit; once a formula is added, its candidates
+    are reported missing, and a candidate of no registered formula is reported as not registered."""
+    # --- arrange ----------------------
+    formula = define_formula_cls((99, 991), lambda x, c: x - c, -1.0, 1.0)()
+    other_formula = define_formula_cls((99, 992), lambda x, c: x - c - 0.25, -1.0, 1.0)()
+    problem_ids = [candidate.id for candidate in formula.build_all_candidates()]
+    fitting_build_details = build_state_before(PipelineStageId.SPACING, problem_ids).create_build_details()
+    unregistered_build_details = build_state_before(
+        PipelineStageId.SPACING, [*problem_ids, *example_problem_ids(1)]
+    ).create_build_details()
+
+    # --- act --------------------------
+    monkeypatch.setattr(FormulaRegistry, "formulas", classmethod(lambda cls: (formula,)))
+    fitting_reasons = fitting_build_details.staleness_reasons()
+    unregistered_reasons = unregistered_build_details.staleness_reasons()
+    monkeypatch.setattr(FormulaRegistry, "formulas", classmethod(lambda cls: (formula, other_formula)))
+    missing_reasons = fitting_build_details.staleness_reasons()
+
+    # --- assert -----------------------
+    assert fitting_reasons == []
+    assert unregistered_reasons == [f"1 candidates are not registered, e.g. {example_problem_ids(1)[0]}"]
+    assert missing_reasons == [
+        f"1 registered candidates are missing, e.g. {other_formula.build_all_candidates()[0].id}"
+    ]

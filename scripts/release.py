@@ -2,7 +2,7 @@
 
 Run via ``make release VERSION=X.Y.Z``.  In order, the release:
 
-- validates state
+- validates state, including that the shipped benchmark suites build details fit the release's test problems
 - bumps the version
 - stamps the versioned splash, the README badges and the built-in artifact manifests
 - finalizes the changelog
@@ -31,8 +31,9 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
-from sunnbear._core.artifacts import ArtifactManifest
+from sunnbear._core.artifacts import ArtifactError, ArtifactManifest, ArtifactStore
 from sunnbear._core.artifacts.store import UNRELEASED_SUNNBEAR_VERSION_SUFFIX
+from sunnbear._core.benchmark.suites.pipeline import BenchmarkSuitesBuildDetailsDeclaration
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PYPROJECT = REPO_ROOT / "pyproject.toml"
@@ -230,6 +231,25 @@ def step_8_check_stamping_inputs(last_release_version: str) -> None:
         print(f"    artifact manifests to stamp with the release version: {names}")
 
 
+def step_9_check_build_details_fit() -> None:
+    """Check that the shipped benchmark suites build details fit the release's test problems and core solver configs.
+
+    The website looks the candidates and solver configs of the build details up in the installed sunnbear, so build
+    details that no longer fit would break it; `BenchmarkSuitesBuildDetails.staleness_reasons` and the artifact's
+    `from_files` say when they do not. Loading the artifact downloads its data files, unless the cache holds them.
+    """
+    print_step(9, "benchmark suites build details fit the release's test problems and core solver configs")
+    rebuild_hint = "rebuild them with 'make benchmark-suites-build-details' and commit the new manifest"
+    try:
+        build_details = ArtifactStore.load(BenchmarkSuitesBuildDetailsDeclaration)
+    except ArtifactError as error:
+        fail_with_message(f"the benchmark suites build details cannot be read ({error}); {rebuild_hint}")
+    else:
+        reasons = build_details.staleness_reasons()
+        if reasons:
+            fail_with_message(f"the benchmark suites build details are stale ({'; '.join(reasons)}); {rebuild_hint}")
+
+
 # warn if the number of distinct tests across all CI matrix combos exceeds this multiple of the
 # largest single combo's test count
 TEST_COUNT_UNION_RATIO_WARN = 1.5
@@ -327,13 +347,13 @@ def _fetch_release_metrics() -> dict[str, float]:
         return json.loads((Path(tmp) / "metrics.json").read_text())
 
 
-def step_9_gather_badge_metrics() -> BadgeMetrics:
+def step_10_gather_badge_metrics() -> BadgeMetrics:
     """Resolve every badge number, failing the release if any of them cannot be obtained.
 
     It blocks while the 'Push to Main' run for HEAD is still running, for at most
     `CI_WAIT_TIMEOUT_SEC`.
     """
-    print_step(9, "gather badge metrics (CI metrics for HEAD)")
+    print_step(10, "gather badge metrics (CI metrics for HEAD)")
     metrics = _fetch_release_metrics()
     distinct_test_count = int(metrics["test_union"])
     max_combo = int(metrics["test_max"])
@@ -394,21 +414,21 @@ def stamp_artifact_manifests(*, release_version: str, last_release_version: str)
 # ==================================================================================================
 #  release commit steps
 # ==================================================================================================
-def step_10_bump_version(version: str) -> None:
+def step_11_bump_version(version: str) -> None:
     """Set version in pyproject.toml."""
-    print_step(10, f"bump version to {version}")
+    print_step(11, f"bump version to {version}")
     run_command(["uv", "version", version])
 
 
-def step_11_lock() -> None:
+def step_12_lock() -> None:
     """Refresh uv.lock after version bump."""
-    print_step(11, "refresh uv.lock")
+    print_step(12, "refresh uv.lock")
     run_command(["uv", "lock"])
 
 
-def step_12_finalize_changelog(version: str) -> None:
+def step_13_finalize_changelog(version: str) -> None:
     """Move Unreleased entries to a dated version section."""
-    print_step(12, f"finalize CHANGELOG.md '## Unreleased' -> '## {version} ({date.today().isoformat()})'")
+    print_step(13, f"finalize CHANGELOG.md '## Unreleased' -> '## {version} ({date.today().isoformat()})'")
     text = CHANGELOG.read_text()
     m = _find_unreleased_section(text)
     body = m.group(1)
@@ -477,9 +497,9 @@ def stamp_splash(version: str) -> None:
     run_command(["sh", str(SPLASH_SCRIPT), version], cwd=REPO_ROOT)
 
 
-def step_13_commit_release(version: str, last_release_version: str, badge_metrics: BadgeMetrics) -> None:
+def step_14_commit_release(version: str, last_release_version: str, badge_metrics: BadgeMetrics) -> None:
     """Refresh README badges, stamp the splash and the artifact manifests, then create the release commit."""
-    print_step(13, f"refresh README badges + stamp splash and artifact manifests + commit 'release: {version}'")
+    print_step(14, f"refresh README badges + stamp splash and artifact manifests + commit 'release: {version}'")
     refresh_readme_badges(badge_metrics)
     stamp_splash(version)
     manifest_paths = stamp_artifact_manifests(release_version=version, last_release_version=last_release_version)
@@ -490,36 +510,36 @@ def step_13_commit_release(version: str, last_release_version: str, badge_metric
     run_command(["git", "commit", "-m", f"release: {version}"])
 
 
-def step_14_tag(version: str) -> None:
+def step_15_tag(version: str) -> None:
     """Create the version tag."""
-    print_step(14, f"create tag v{version}")
+    print_step(15, f"create tag v{version}")
     run_command(["git", "tag", f"v{version}"])
 
 
 # ==================================================================================================
 #  post-release steps
 # ==================================================================================================
-def step_15_add_unreleased_section() -> None:
+def step_16_add_unreleased_section() -> None:
     """Add a fresh Unreleased section to the changelog."""
-    print_step(15, "add fresh '## Unreleased' section to CHANGELOG.md")
+    print_step(16, "add fresh '## Unreleased' section to CHANGELOG.md")
     text = CHANGELOG.read_text()
-    # step 12 has just written a '## <version>' heading, so a first '## ' heading always exists
+    # step 13 has just written a '## <version>' heading, so a first '## ' heading always exists
     first_heading = text.index("\n## ") + 1
     insertion = "## Unreleased\n\n" + "\n".join(f"### {c}\n" for c in CATEGORIES) + "\n"
     text = text[:first_heading] + insertion + text[first_heading:]
     CHANGELOG.write_text(text)
 
 
-def step_16_commit_next_cycle() -> None:
+def step_17_commit_next_cycle() -> None:
     """Commit the fresh Unreleased section."""
-    print_step(16, "commit 'chore: begin next development cycle'")
+    print_step(17, "commit 'chore: begin next development cycle'")
     run_command(["git", "add", "CHANGELOG.md"])
     run_command(["git", "commit", "-m", "chore: begin next development cycle"])
 
 
-def step_17_push(version: str) -> None:
+def step_18_push(version: str) -> None:
     """Push main and the tag atomically."""
-    print_step(17, f"push main + v{version} atomically")
+    print_step(18, f"push main + v{version} atomically")
     run_command(["git", "push", "--atomic", "origin", "main", f"refs/tags/v{version}"])
 
 
@@ -542,7 +562,7 @@ def post_tag_recovery_hint(version: str, also_next_cycle: bool) -> None:
 def main() -> None:
     """Entry point.
 
-    Step 9, which downloads the badge metrics from CI, is the last precondition: it runs after
+    Step 10, which downloads the badge metrics from CI, is the last precondition: it runs after
     every quicker check has passed and before the first write.
     """
     parser = argparse.ArgumentParser(description=__doc__)
@@ -560,7 +580,7 @@ def main() -> None:
     parse_semver(version)
 
     print(f"Releasing {PACKAGE_NAME} v{version}\n")
-    # Read the last release's version before step 10 bumps it; steps 8 and 13 use that version to find the
+    # Read the last release's version before step 11 bumps it; steps 8 and 14 use that version to find the
     # artifact manifests built since that release.
     last_release_version = read_pyproject_version()
 
@@ -573,7 +593,8 @@ def main() -> None:
     step_6_check_classifiers_match()
     step_7_check_changelog_has_entries()
     step_8_check_stamping_inputs(last_release_version)
-    badge_metrics = step_9_gather_badge_metrics()
+    step_9_check_build_details_fit()
+    badge_metrics = step_10_gather_badge_metrics()
 
     if args.is_dry_run:
         print(
@@ -583,19 +604,19 @@ def main() -> None:
         return
 
     print("\nRelease commit:")
-    step_10_bump_version(version)
-    step_11_lock()
-    step_12_finalize_changelog(version)
-    step_13_commit_release(version, last_release_version, badge_metrics)
-    step_14_tag(version)
+    step_11_bump_version(version)
+    step_12_lock()
+    step_13_finalize_changelog(version)
+    step_14_commit_release(version, last_release_version, badge_metrics)
+    step_15_tag(version)
 
     print("\nPost-release:")
     also_next_cycle = False
     try:
-        step_15_add_unreleased_section()
-        step_16_commit_next_cycle()
+        step_16_add_unreleased_section()
+        step_17_commit_next_cycle()
         also_next_cycle = True
-        step_17_push(version)
+        step_18_push(version)
     except subprocess.CalledProcessError:
         post_tag_recovery_hint(version, also_next_cycle)
         sys.exit(1)

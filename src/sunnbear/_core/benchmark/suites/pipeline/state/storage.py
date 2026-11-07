@@ -1,12 +1,12 @@
 """`PipelineStateStorage` holds the candidate registry and every stage's information of 1 pipeline run.
 
-The storage writes its contents into a directory, and reads them back, as `PipelineStateStorage.write_files` describes.
+The storage converts its contents to files and back, as `PipelineStateStorage.to_files` describes.
 """
 
+import io
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any, Self
 
 import polars as pl
@@ -99,8 +99,8 @@ class PipelineStateStorage:
     # --------------------------------------------------------------------------
     #  Files
     # --------------------------------------------------------------------------
-    def write_files(self, directory: Path) -> None:
-        """Write the storage's contents into `directory`, which must exist.
+    def to_files(self) -> dict[str, bytes]:
+        """Return the storage's contents as files, each file name mapped to its content.
 
         - Each structure that holds information on candidates is 1 Parquet table, named after the structure, with 1 row
           per candidate and the candidate's id in the column ``problem_id``.
@@ -111,46 +111,37 @@ class PipelineStateStorage:
 
         A structure that its stage has not written has no file.
         """
-        self._write_table(directory / "candidate_registry", self.candidate_registry.to_columns())
+        tables = {"candidate_registry": self.candidate_registry.to_columns()}
         if self.interval_bounds is not None:
-            self._write_table(directory / "interval_bounds", self._columns_of(self.interval_bounds, "a", "b"))
+            tables["interval_bounds"] = self._columns_of(self.interval_bounds, "a", "b")
         if self.c_ranges is not None:
-            self._write_table(directory / "c_ranges", self._columns_of(self.c_ranges, "c_min", "c_max"))
+            tables["c_ranges"] = self._columns_of(self.c_ranges, "c_min", "c_max")
         for stage_id, results in self.characterization_results.items():
-            self._write_table(directory / f"{stage_id}_raw_features", results.to_raw_features_columns())
+            tables[f"{stage_id}_raw_features"] = results.to_raw_features_columns()
         if self.nearest_kept_candidates is not None:
-            self._write_table(
-                directory / "nearest_kept_candidates",
-                {
-                    "problem_id": list(map(str, self.nearest_kept_candidates)),
-                    "nearest_kept_problem_id": [str(n.problem_id) for n in self.nearest_kept_candidates.values()],
-                    "distance": [n.distance for n in self.nearest_kept_candidates.values()],
-                },
-            )
+            tables["nearest_kept_candidates"] = {
+                "problem_id": list(map(str, self.nearest_kept_candidates)),
+                "nearest_kept_problem_id": [str(n.problem_id) for n in self.nearest_kept_candidates.values()],
+                "distance": [n.distance for n in self.nearest_kept_candidates.values()],
+            }
         if self.edis is not None:
-            self._write_table(
-                directory / "edis", {"problem_id": list(map(str, self.edis)), "edi": list(self.edis.values())}
-            )
+            tables["edis"] = {"problem_id": list(map(str, self.edis)), "edi": list(self.edis.values())}
         if self.difficulty_classes is not None:
-            self._write_table(
-                directory / "difficulty_classes",
-                {
-                    "problem_id": list(map(str, self.difficulty_classes)),
-                    "difficulty_class": [c.value for c in self.difficulty_classes.values()],
-                },
-            )
+            tables["difficulty_classes"] = {
+                "problem_id": list(map(str, self.difficulty_classes)),
+                "difficulty_class": [c.value for c in self.difficulty_classes.values()],
+            }
         if self.suite_memberships is not None:
-            self._write_table(
-                directory / "suite_memberships",
-                {
-                    "problem_id": list(map(str, self.suite_memberships)),
-                    "suite_family": [m.suite_family.value for m in self.suite_memberships.values()],
-                    "smallest_containing_suite_size": [
-                        m.smallest_containing_suite_size for m in self.suite_memberships.values()
-                    ],
-                },
-            )
-        (directory / _JSON_FILE_NAME).write_text(json.dumps(self._json_contents(), indent=2, sort_keys=True) + "\n")
+            tables["suite_memberships"] = {
+                "problem_id": list(map(str, self.suite_memberships)),
+                "suite_family": [m.suite_family.value for m in self.suite_memberships.values()],
+                "smallest_containing_suite_size": [
+                    m.smallest_containing_suite_size for m in self.suite_memberships.values()
+                ],
+            }
+        files = {f"{name}{_TABLE_FILE_SUFFIX}": self._table_bytes(columns) for name, columns in tables.items()}
+        files[_JSON_FILE_NAME] = (json.dumps(self._json_contents(), indent=2, sort_keys=True) + "\n").encode()
+        return files
 
     # --------------------------------------------------------------------------
     #  Helpers
@@ -167,9 +158,11 @@ class PipelineStateStorage:
         }
 
     @staticmethod
-    def _write_table(file_stem: Path, columns: dict[str, list[Any]]) -> None:
-        """Write `columns` as a Parquet table to `file_stem` with the suffix `_TABLE_FILE_SUFFIX`."""
-        pl.DataFrame(columns).write_parquet(file_stem.with_suffix(_TABLE_FILE_SUFFIX))
+    def _table_bytes(columns: dict[str, list[Any]]) -> bytes:
+        """Return `columns` as the content of a Parquet file."""
+        buffer = io.BytesIO()
+        pl.DataFrame(columns).write_parquet(buffer)
+        return buffer.getvalue()
 
     def _json_contents(self) -> dict[str, Any]:
         """Return the structures that are not tables, and each characterization's solver ids and fidelity, as JSON."""
@@ -223,24 +216,24 @@ class PipelineStateStorage:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def read_files(cls, directory: Path) -> Self:
-        """Return the storage whose contents `write_files` wrote into `directory`."""
-        json_contents = json.loads((directory / _JSON_FILE_NAME).read_text())
+    def from_files(cls, files: Mapping[str, bytes]) -> Self:
+        """Return the storage whose contents `to_files` converted to `files`."""
+        json_contents = json.loads(files[_JSON_FILE_NAME])
         storage = cls(
             candidate_registry=CandidateRegistry.from_table(
-                pl.read_parquet(directory / f"candidate_registry{_TABLE_FILE_SUFFIX}")
+                pl.read_parquet(files[f"candidate_registry{_TABLE_FILE_SUFFIX}"])
             )
         )
         for stage_id_value, json_values in json_contents["characterizations"].items():
             stage_id = PipelineStageId(stage_id_value)
             storage.characterization_results[stage_id] = CharacterizationResults.from_raw_features_table(
-                pl.read_parquet(directory / f"{stage_id}_raw_features{_TABLE_FILE_SUFFIX}"), json_values
+                pl.read_parquet(files[f"{stage_id}_raw_features{_TABLE_FILE_SUFFIX}"]), json_values
             )
         # Each table of 1 row per candidate becomes the structure of the same name, 1 value per row.
         for name, build_value in cls._value_builders().items():
-            table_file = directory / f"{name}{_TABLE_FILE_SUFFIX}"
-            if table_file.exists():
-                table = pl.read_parquet(table_file)
+            table_file_name = f"{name}{_TABLE_FILE_SUFFIX}"
+            if table_file_name in files:
+                table = pl.read_parquet(files[table_file_name])
                 problem_ids = [ProblemId.from_string(problem_id) for problem_id in table["problem_id"]]
                 setattr(
                     storage, name, dict(zip(problem_ids, map(build_value, table.iter_rows(named=True)), strict=True))

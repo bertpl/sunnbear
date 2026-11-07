@@ -1,14 +1,17 @@
-"""`PipelineWorkspace` is the only code that lays out the top level of the benchmark suite pipeline's workspace.
+"""`PipelineWorkspace` is the only code that writes the files of the benchmark suite pipeline's workspace.
 
 The workspace directory holds:
 
 - under ``manifests``, the `PipelineStageManifest` of each stage that ran, as a JSON file named after the stage's
-  `PipelineStageId`; each manifest is written under a temporary name and then renamed, so a file under its final name
-  is always complete;
+  `PipelineStageId`;
 - under ``benchmark_suites_build_details``, the files of the run's build details.
+
+Every file is written under a temporary name and then renamed, so a file under its final name is always complete.
 """
 
 import json
+import shutil
+from collections.abc import Mapping
 from pathlib import Path
 
 from .stage_manifest import PipelineStageManifest
@@ -23,7 +26,7 @@ _TEMPORARY_FILE_SUFFIX = ".tmp"
 #  PipelineWorkspace
 # ==================================================================================================
 class PipelineWorkspace:
-    """`PipelineWorkspace` writes the workspace's manifests, and gives the path of the build details' directory."""
+    """`PipelineWorkspace` writes the workspace's manifests and build details, and reads the build details back."""
 
     def __init__(self, path: Path) -> None:
         """Create a workspace for the directory at `path`, which need not exist yet."""
@@ -38,10 +41,20 @@ class PipelineWorkspace:
         manifest_json = json.dumps(manifest.model_dump(mode="json"), sort_keys=True, indent=2) + "\n"
         self._write_atomically(manifest_file, manifest_json.encode())
 
-    @property
-    def build_details_dir(self) -> Path:
-        """Return the directory for the run's build details."""
-        return self.path / _BUILD_DETAILS_DIR_NAME
+    def write_build_details_files(self, files: Mapping[str, bytes]) -> None:
+        """Write the files of a run's build details, each file name mapped to its content, replacing earlier ones.
+
+        The directory of the build details is emptied first, so the files of an earlier, longer run do not remain.
+        """
+        build_details_dir = self.path / _BUILD_DETAILS_DIR_NAME
+        shutil.rmtree(build_details_dir, ignore_errors=True)
+        for name, content in files.items():
+            self._write_atomically(build_details_dir / name, content)
+
+    def read_build_details_files(self) -> dict[str, bytes]:
+        """Return the files that `write_build_details_files` wrote, each file name mapped to its content."""
+        build_details_dir = self.path / _BUILD_DETAILS_DIR_NAME
+        return {file.name: file.read_bytes() for file in sorted(build_details_dir.iterdir())}
 
     # --------------------------------------------------------------------------
     #  Helpers
