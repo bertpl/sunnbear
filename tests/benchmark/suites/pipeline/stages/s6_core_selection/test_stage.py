@@ -53,7 +53,7 @@ def test_the_core_size_is_the_largest_that_the_candidates_fill(n_candidates, cor
 
 
 def test_the_stage_stops_the_pipeline_below_the_smallest_core_size():
-    """127 candidates fill no Core of 128, so the stage stops the pipeline, and the message gives their number."""
+    """The stage stops the pipeline for 127 candidates, which fill no Core of 128, and the message gives the 127."""
     # --- act / assert -----------------
     with pytest.raises(PipelineStopError, match=r"^The candidates fill no Core of 128 or more: there are 127\.$"):
         _select_core([5.0] * 127, CoreSelectionStage(_SEC_PER_CANDIDATE))

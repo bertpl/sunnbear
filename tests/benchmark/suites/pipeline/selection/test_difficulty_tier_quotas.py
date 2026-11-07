@@ -60,7 +60,7 @@ def test_short_quotas_merge_with_a_neighbor_until_each_can_be_met(pool_tier_coun
         pytest.param(
             100, {A: 200}, "A selection of 100 candidates gives some tier a quota that is not whole", id="size"
         ),
-        pytest.param(128, {A: 100, B: 20}, "120 candidates cannot fill a selection of 128", id="pool"),
+        pytest.param(128, {A: 100, B: 20}, "A pool of 120 candidates cannot fill a selection of 128", id="pool"),
     ],
 )
 def test_quotas_are_refused_for_a_size_without_whole_quotas_or_too_few_candidates(size, pool_tier_counts, message):

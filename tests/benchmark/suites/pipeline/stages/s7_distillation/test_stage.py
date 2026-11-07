@@ -116,15 +116,15 @@ def test_each_series_nests_its_suites_and_the_stage_records_its_parameters():
     assert stage.parameters == {"sec_per_candidate": _SEC_PER_CANDIDATE, "seed": stage.seed}
 
 
-def test_the_aliases_cover_each_a_series_size_of_the_largest_core():
+def test_the_aliases_cover_each_primary_series_size_of_the_largest_core():
     """The a-series of the largest Core holds 1 suite per power of 2 from `SMALLEST_SUITE_SIZE` up to half the Core, and
     each such size has its aliases."""
     # --- arrange ----------------------
-    a_series_sizes = set()
+    primary_series_sizes = set()
     size = SMALLEST_SUITE_SIZE
     while size <= max(CORE_SIZES) // 2:
-        a_series_sizes.add(size)
+        primary_series_sizes.add(size)
         size *= 2
 
     # --- act / assert -----------------
-    assert set(_PRIMARY_SERIES_ALIASES) == a_series_sizes
+    assert set(_PRIMARY_SERIES_ALIASES) == primary_series_sizes

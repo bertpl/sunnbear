@@ -20,8 +20,10 @@ from sunnbear._core.benchmark.suites.pipeline.state import CoreSelectionStateAcc
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 # Every Core size is a power of 2, so that every suite distilled from the Core, whose size is the Core's divided by a
-# power of 2, has whole quotas. Only a Core of the largest size, with a quota per tier, ships; a Core of another size
-# or with merged quotas is interim: it never ships as benchmark suites.
+# power of 2, has whole quotas.
+#
+# Only a Core of the largest size, with a quota per tier, ships; a Core of another size or with merged quotas is
+# interim: it never ships as benchmark suites.
 CORE_SIZES = (128, 256, 512, 1024, 2048)
 
 
@@ -31,7 +33,7 @@ CORE_SIZES = (128, 256, 512, 1024, 2048)
 class CoreSelectionStage(PipelineStage[CoreSelectionStateAccessor]):
     """`CoreSelectionStage` selects the Core, the suite `sb-<size>`; every other benchmark suite is selected from it.
 
-    A candidate's tier follows from the EDI that full characterization stored, relative to
+    A candidate's tier follows from its EDI, which full characterization stored, relative to
     `DEFAULT_N_BISECTION_FEVALS`, the `n_bisection_fevals` with which the characterization stages run every solve.
 
     The stage selects the Core in 3 steps:

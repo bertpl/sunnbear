@@ -142,7 +142,7 @@ class BenchmarkSuitesBuildDetails:
     def distilled_suite_selection_details(self) -> dict[str, SuiteSelectionDetails] | None:
         """Return distillation's `SuiteSelectionDetails` of each suite, keyed by the suite's name.
 
-        The suites list the a-series before the b-series, and within each series the suites from largest to smallest.
+        The suites follow the order that `DistillationStateAccessor.set_distilled_suite_selection_details` states.
         Return ``None`` when distillation did not finish.
         """
         return self._copy_if_finished(PipelineStageId.DISTILLATION, self._storage.distilled_suite_selection_details)

@@ -313,8 +313,8 @@ class DistillationStateAccessor(SelectionStateAccessor):
     ) -> None:
         """Store the selection details of each distilled suite, keyed by the suite's name.
 
-        The suites list the a-series before the b-series, and within each series the suites from largest to smallest.
-        Together they hold the candidates that no stage has dropped: the Core.
+        The mapping lists the a-series' suites before the b-series', and within each series the suites from largest to
+        smallest. Together they hold the candidates that no stage has dropped: the Core.
 
         Raises:
             ValueError: If the details were stored before, or the suites together do not hold exactly the Core.

@@ -27,7 +27,7 @@ def select_diverse_problem_ids(
     sec_per_candidate: float,
     n_workers: int,
 ) -> tuple[tuple[ProblemId, ...], float]:
-    """Return the ids of max-div's most diverse selection of `tier_quotas.size` candidates, and its diversity score.
+    """Return the ids of max-div's most diverse selection under `tier_quotas`, and the selection's diversity score.
 
     max-div searches for the candidates whose scaled feature vectors from full characterization are the most diverse,
     under 1 constraint per quota of `tier_quotas`; a quota whose group holds every tier is no constraint.
@@ -38,7 +38,7 @@ def select_diverse_problem_ids(
     - the L1 distance between the scaled feature vectors, in which every feature block has a mean pairwise L1 distance
       of 1;
     - the distance between the log2 of the EDIs, so that 2 EDIs compare by their ratio, and the selection's EDIs also
-      differ widely within each quota.
+      differ widely within each quota's group of tiers.
 
     max-div receives each candidate's feature vector with 1 more column, the log2 of its EDI; the first distance,
     `l1_distance_over_leading_columns`, leaves that column out.
@@ -71,7 +71,7 @@ def select_diverse_problem_ids(
         # max-div takes float32 vectors; the lost precision does not affect the output, which holds the selected
         # candidates, not their vectors.
         np.hstack([candidate_pool.feature_matrix.values, np.log2(candidate_pool.edis)[:, np.newaxis]]),
-        k=tier_quotas.size,
+        k=tier_quotas.selection_size,
         distance_metric=feature_distance,
         diversity_metric=HybridDiversityMetric.geomean_of(
             DiversityMetric.geomean_separation().over(feature_distance),
@@ -80,10 +80,10 @@ def select_diverse_problem_ids(
         constraints=[
             Constraint(
                 int_set={idx for idx, tier in enumerate(candidate_pool.difficulty_tiers) if tier in tiers},
-                min_count=count,
-                max_count=count,
+                min_count=quota,
+                max_count=quota,
             )
-            for tiers, count in tier_quotas.quota_by_group.items()
+            for tiers, quota in tier_quotas.quota_by_group.items()
             if len(tiers) < len(DifficultyTier)
         ],
     )

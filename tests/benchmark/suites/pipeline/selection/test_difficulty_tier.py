@@ -1,5 +1,5 @@
-"""`DifficultyTier.from_edi` buckets an EDI by its ratio to `n_bisection_fevals`, and the tiers' Core shares sum to
-1."""
+"""`DifficultyTier.from_edi` buckets an EDI by its ratio to `n_bisection_fevals`, and each tier fills its fixed share
+of the Core."""
 
 import pytest
 

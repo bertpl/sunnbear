@@ -32,16 +32,16 @@ class DifficultyTierQuotas:
     quota_by_group: Mapping[frozenset[DifficultyTier], int]
 
     @property
-    def size(self) -> int:
+    def selection_size(self) -> int:
         """Return the number of candidates of the selection: the sum of the quotas."""
         return sum(self.quota_by_group.values())
 
     def check_selection(self, selected_tiers: Sequence[DifficultyTier]) -> None:
-        """Stop the pipeline unless the selected candidates, given by their tiers, number `size` and meet each quota.
+        """Stop the pipeline unless the selected candidates, given by their tiers, have the selection size and quotas.
 
         Raises:
-            PipelineStopError: If `selected_tiers` does not hold `size` candidates, or does not meet a quota exactly;
-                the message names each such quota with the number of selected candidates in its group.
+            PipelineStopError: If `selected_tiers` does not hold `selection_size` candidates, or does not meet a quota
+                exactly; the message names each such quota with the number of selected candidates in its group.
         """
         tier_counts = Counter(selected_tiers)
         unmet_quota_descriptions = []
@@ -50,10 +50,10 @@ class DifficultyTierQuotas:
             if group_count != quota:
                 group_name = " and ".join(tier.value for tier in DifficultyTier if tier in tiers)
                 unmet_quota_descriptions.append(f"{group_name}: {group_count} of {quota}")
-        if len(selected_tiers) != self.size or unmet_quota_descriptions:
+        if len(selected_tiers) != self.selection_size or unmet_quota_descriptions:
             raise PipelineStopError(
-                f"The selection holds {len(selected_tiers)} candidates for a selection of {self.size}; unmet quotas: "
-                f"{'; '.join(unmet_quota_descriptions) or 'none'}."
+                f"The selection holds {len(selected_tiers)} candidates for a selection of {self.selection_size}; "
+                f"unmet quotas: {'; '.join(unmet_quota_descriptions) or 'none'}."
             )
 
     # --------------------------------------------------------------------------
@@ -84,20 +84,26 @@ class DifficultyTierQuotas:
         Each tier starts with a quota of its own, `size` times the tier's `core_share`.
 
         While a quota asks for more candidates than the pool holds in its group, the quota with the largest shortfall
-        merges with its neighbor in the order of `DifficultyTier` whose quota is smaller; between 2 neighbors with equal
-        quotas, it merges with the later one in that order. At worst, 1 group holds every tier.
+        merges with 1 of its neighbors in the order of `DifficultyTier`:
+
+        - the neighbor whose quota is smaller;
+        - between 2 neighbors with equal quotas, the later one in that order.
+
+        At worst, 1 group holds every tier.
 
         Args:
             size: The number of candidates to select; a multiple of 16, so that every tier's quota is whole.
             pool_tier_counts: The number of candidates of each tier to select from; a missing tier has none.
 
         Raises:
-            ValueError: If `size` is not a multiple of 16, or the candidates to select from number fewer than `size`.
+            ValueError: If `size` is not a multiple of 16, or there are fewer candidates to select from than `size`.
         """
         if size % 16 != 0:
             raise ValueError(f"A selection of {size} candidates gives some tier a quota that is not whole.")
         elif sum(pool_tier_counts.values()) < size:
-            raise ValueError(f"{sum(pool_tier_counts.values())} candidates cannot fill a selection of {size}.")
+            raise ValueError(
+                f"A pool of {sum(pool_tier_counts.values())} candidates cannot fill a selection of {size}."
+            )
         else:
             groups = [frozenset({tier}) for tier in DifficultyTier]
             while True:

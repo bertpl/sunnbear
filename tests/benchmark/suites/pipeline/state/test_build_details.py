@@ -189,30 +189,29 @@ def test_the_build_details_count_each_configs_incorrect_solves():
     assert table.rows() == [("bisection", 96, 3, 3 / 96)]
 
 
-def test_the_build_details_count_each_suites_tiers():
+@pytest.mark.parametrize(
+    "build_state, rows_expected",
+    [
+        pytest.param(
+            _distilled_state,
+            [("sb-2", 2, 1, 1, 0.25), ("sb-1a", 1, 1, 0, 0.5), ("sb-1b", 1, 0, 1, None)],
+            id="distilled",
+        ),
+        pytest.param(
+            lambda: build_state_before(PipelineStageId.DISTILLATION, example_problem_ids(3)),
+            [("sb-3", 3, 0, 3, 1.0)],
+            id="distillation_not_finished",
+        ),
+    ],
+)
+def test_the_build_details_count_each_suites_tiers(build_state, rows_expected):
     """The Core's row comes first, then each distilled suite's, with its name, size, count per tier and diversity
-    score."""
+    score; without distillation's suites, the table holds the Core's row alone."""
     # --- act --------------------------
-    table = _distilled_state().create_build_details().suite_tier_counts()
+    table = build_state().create_build_details().suite_tier_counts()
 
     # --- assert -----------------------
-    assert table.select("suite_name", "size", "n_candidates_a", "n_candidates_b", "diversity").rows() == [
-        ("sb-2", 2, 1, 1, 0.25),
-        ("sb-1a", 1, 1, 0, 0.5),
-        ("sb-1b", 1, 0, 1, None),
-    ]
-
-
-def test_the_build_details_count_the_cores_tiers_when_distillation_did_not_finish():
-    """Without distillation's suites, the table holds the Core's row alone."""
-    # --- arrange ----------------------
-    build_details = build_state_before(PipelineStageId.DISTILLATION, example_problem_ids(3)).create_build_details()
-
-    # --- act --------------------------
-    table = build_details.suite_tier_counts()
-
-    # --- assert -----------------------
-    assert table.select("suite_name", "size", "n_candidates_b").rows() == [("sb-3", 3, 3)]
+    assert table.select("suite_name", "size", "n_candidates_a", "n_candidates_b", "diversity").rows() == rows_expected
 
 
 def test_the_build_details_rebuilt_from_their_files_equal_the_original():
