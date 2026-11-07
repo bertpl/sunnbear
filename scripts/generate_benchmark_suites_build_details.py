@@ -5,7 +5,7 @@ The artifact is `benchmark_suites_build_details`. The maintainer runs this scrip
 then commits the artifact's manifest. The script:
 
 - runs the pipeline in `PipelineMode.DRAFT` over every registered formula, into the workspace directory given by
-  ``--workspace``, because the benchmark suites that it builds are not shipped yet, so a run of a few minutes suffices;
+  ``--workspace``, because the benchmark suites that it builds are not shipped yet;
 - stops with status 1, without saving, when a stage stops the run, because the build details of a stopped run hold no
   benchmark suites;
 - saves the build details through `ArtifactStore`, which records in the artifact's manifest how they were built and
