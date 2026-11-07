@@ -1,6 +1,6 @@
 """`CoarseCharacterizationStage`, the third stage of the benchmark suite pipeline, adds the coarse feature vectors."""
 
-from sunnbear._core.benchmark.suites.pipeline.features import CandidateCharacterizationStage, FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import CandidateCharacterizationStage, FeatureFidelity
 
 
 # ==================================================================================================

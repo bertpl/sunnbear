@@ -8,7 +8,7 @@ import polars.selectors as cs
 import pytest
 from snuffled import FunctionProperty, RootProperty
 
-from sunnbear._core.benchmark.suites.pipeline.features import SNUFFLED_PROPERTIES, FeatureBlock
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import SNUFFLED_PROPERTIES, FeatureBlock
 from sunnbear._core.benchmark.suites.pipeline.stages import CoarseCharacterizationStage
 from sunnbear._core.solvers.core import SolverConfigRegistry
 from sunnbear._core.stats import mean_pairwise_l1

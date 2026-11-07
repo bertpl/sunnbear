@@ -4,7 +4,7 @@ reason to reject the candidate."""
 import math
 
 from sunnbear._core.benchmark.suites.pipeline.core import RejectionReason
-from sunnbear._core.benchmark.suites.pipeline.features import (
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     CandidateCharacterizationResult,
     CandidateCharacterizationTask,
     FeatureFidelity,

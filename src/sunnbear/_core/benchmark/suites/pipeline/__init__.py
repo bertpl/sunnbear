@@ -7,8 +7,8 @@ it, adding columns and dropping rows:
   stores their outputs;
 - `stages` holds the stages, 1 module or subpackage per stage, whose names sort in run order;
 - `snuffled_analysis` runs snuffled's analysis of a test problem, for every stage that needs one;
-- `features` holds the base classes of the stages that compute the candidates' feature vectors; each such stage is a
-  child class in `stages` that sets its default `FeatureFidelity`;
+- `diversity_features` computes the candidates' diversity features, and holds the base classes of the stages that
+  compute them; each such stage is a child class in `stages` that sets its default `FeatureFidelity`;
 - `selection` selects the pipeline's suites, each the most diverse candidates under difficulty quotas, from the
   candidates' feature vectors;
 - `run_pipeline` runs the stages in order on a set of formulas, sharing 1 pool of worker processes between them, in a
@@ -32,7 +32,7 @@ from .core import (
     RejectionReason,
     run_stages,
 )
-from .features import (
+from .diversity_features import (
     INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME,
     CandidateCharacterizationStage,
     FeatureBlock,
