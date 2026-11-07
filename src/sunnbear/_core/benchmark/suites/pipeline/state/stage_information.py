@@ -74,10 +74,11 @@ class CharacterizationResults:
 
         The columns are ``problem_id``, 1 per feature, and 1 per config with its counts of incorrect solves.
         """
+        factory = DiversityFeatureFactory()
         columns: dict[str, list[Any]] = {"problem_id": list(map(str, self.raw_feature_matrix.problem_ids))}
-        for name, values in zip(self.definition.feature_names, self.raw_feature_matrix.values.T, strict=True):
+        for name, values in zip(factory.feature_names, self.raw_feature_matrix.values.T, strict=True):
             columns[name] = values.tolist()
-        for config_idx, solver_id in enumerate(self.definition.solver_ids):
+        for config_idx, solver_id in enumerate(factory.solver_ids):
             columns[f"{_N_INCORRECT_SOLVES_PREFIX}{solver_id}"] = [
                 self.n_incorrect_solves_per_config[problem_id][config_idx]
                 for problem_id in self.raw_feature_matrix.problem_ids
@@ -88,9 +89,9 @@ class CharacterizationResults:
         """Return, per core solver config, the number and fraction of incorrect solves over the kept candidates.
 
         The columns are ``solver_id``, ``n_solves``, ``n_incorrect_solves`` and ``incorrect_fraction``, which is null
-        when the stage kept no candidate; the rows follow the order of `definition.solver_ids`.
+        when the stage kept no candidate; the rows follow the order of `DiversityFeatureFactory.solver_ids`.
         """
-        solver_ids = self.definition.solver_ids
+        solver_ids = DiversityFeatureFactory().solver_ids
         n_incorrect_solves = [
             sum(counts[config_idx] for counts in self.n_incorrect_solves_per_config.values())
             for config_idx in range(len(solver_ids))
@@ -109,7 +110,7 @@ class CharacterizationResults:
 
     def to_json_values(self) -> dict[str, Any]:
         """Return the parts of the results that `to_raw_features_columns` leaves out, as JSON values."""
-        return {"solver_ids": list(self.definition.solver_ids), "fidelity": self.fidelity.name}
+        return {"solver_ids": list(DiversityFeatureFactory().solver_ids), "fidelity": self.fidelity.name}
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -119,21 +120,29 @@ class CharacterizationResults:
         """Return the results that `table` and `json_values` hold.
 
         `table` holds the columns of `to_raw_features_columns`, and `json_values` the values of `to_json_values`.
+
+        Raises:
+            ValueError: If `json_values` records other solver ids than `DiversityFeatureFactory.solver_ids`, as for
+                results that another sunnbear version wrote.
         """
-        definition = FeatureVectorDefinition(solver_ids=tuple(json_values["solver_ids"]))
+        factory = DiversityFeatureFactory()
+        if tuple(json_values["solver_ids"]) != factory.solver_ids:
+            raise ValueError(
+                f"The results were computed with the solver configs {json_values['solver_ids']}, not with "
+                f"{list(factory.solver_ids)}."
+            )
         fidelity = FeatureFidelity[json_values["fidelity"]]
         problem_ids = [ProblemId.from_string(problem_id) for problem_id in table["problem_id"]]
         n_incorrect_solves_per_config = table.select(
-            f"{_N_INCORRECT_SOLVES_PREFIX}{solver_id}" for solver_id in definition.solver_ids
+            f"{_N_INCORRECT_SOLVES_PREFIX}{solver_id}" for solver_id in factory.solver_ids
         ).rows()
         return cls(
-            definition=definition,
             fidelity=fidelity,
             raw_feature_matrix=FeatureMatrix(
                 problem_ids=tuple(problem_ids),
-                values=table.select(definition.feature_names)
+                values=table.select(factory.feature_names)
                 .to_numpy()
-                .reshape(len(problem_ids), len(definition.feature_names)),
+                .reshape(len(problem_ids), len(factory.feature_names)),
             ),
             n_incorrect_solves_per_config=dict(zip(problem_ids, n_incorrect_solves_per_config, strict=True)),
         )

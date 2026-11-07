@@ -13,7 +13,7 @@ import pytest
 
 from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId, PipelineStop
-from sunnbear._core.benchmark.suites.pipeline.features import FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import DiversityFeatureFactory, FeatureFidelity
 from sunnbear._core.benchmark.suites.pipeline.selection import CoreComposition, DifficultyClass, SuiteFamily
 from sunnbear._core.benchmark.suites.pipeline.state import (
     BenchmarkSuitesBuildDetails,
@@ -26,7 +26,6 @@ from sunnbear._core.benchmark.suites.pipeline.state import (
     SuiteMembership,
 )
 from tests.benchmark.suites.pipeline.example_states import (
-    EXAMPLE_DEFINITION,
     build_state_before,
     example_problem_ids,
     example_raw_feature_matrix,
@@ -34,6 +33,13 @@ from tests.benchmark.suites.pipeline.example_states import (
 
 _PROBLEM_IDS = [*example_problem_ids(3, formula_number=1), *example_problem_ids(2, formula_number=2)]
 _CORE_COMPOSITION = CoreComposition.from_class_counts(dict.fromkeys(DifficultyClass, 64))
+
+
+@pytest.fixture(autouse=True)
+def _characterize_with_bisection_only(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Patch `DiversityFeatureFactory.solver_ids` to bisection alone, so that each candidate has 1 count of incorrect
+    solves."""
+    monkeypatch.setattr(DiversityFeatureFactory, "solver_ids", property(lambda self: ("bisection",)))
 
 
 def _distilled_state() -> PipelineState:
@@ -53,7 +59,6 @@ def _distilled_state() -> PipelineState:
         problem_ids = accessor.remaining_problem_ids
         accessor.set_characterization_results(
             CharacterizationResults(
-                definition=EXAMPLE_DEFINITION,
                 fidelity=FeatureFidelity.COARSE,
                 raw_feature_matrix=example_raw_feature_matrix(problem_ids),
                 n_incorrect_solves_per_config={problem_id: (idx,) for idx, problem_id in enumerate(problem_ids)},
@@ -212,7 +217,7 @@ def test_the_build_details_read_back_the_files_that_they_write(tmp_path):
         results, read_back_results = (
             details.characterization_results(stage_id) for details in (build_details, read_back)
         )
-        assert (read_back_results.definition, read_back_results.fidelity) == (results.definition, results.fidelity)
+        assert read_back_results.fidelity == results.fidelity
         assert read_back_results.raw_feature_matrix.problem_ids == results.raw_feature_matrix.problem_ids
         np.testing.assert_array_equal(read_back_results.raw_feature_matrix.values, results.raw_feature_matrix.values)
         assert read_back_results.n_incorrect_solves_per_config == results.n_incorrect_solves_per_config
@@ -236,3 +241,16 @@ def test_the_build_details_of_a_run_that_stopped_early_read_back_their_files(tmp
     assert read_back.nearest_kept_candidates() is None
     assert read_back.core_composition() is None
     assert read_back.incorrect_solves_table(PipelineStageId.FULL_CHARACTERIZATION) is None
+
+
+def test_the_build_details_refuse_files_written_with_other_solver_configs(tmp_path, monkeypatch):
+    """Build details written while bisection alone characterized the candidates are refused once the factory names
+    other solver configs."""
+    # --- arrange ----------------------
+    build_details = build_state_before(PipelineStageId.SPACING, example_problem_ids(3)).create_build_details()
+    build_details.write_files(tmp_path)
+    monkeypatch.setattr(DiversityFeatureFactory, "solver_ids", property(lambda self: ("illinois",)))
+
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match=r"computed with the solver configs \['bisection'\], not with \['illinois'\]"):
+        BenchmarkSuitesBuildDetails.read_files(tmp_path)
