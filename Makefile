@@ -15,6 +15,7 @@ help:
 	@echo '  format-single-file             Format single file using ruff. Useful in e.g. PyCharm to automatically trigger formatting on file save.'
 	@echo ''
 	@echo '  splash       			        Build splash screen using current version of package.'
+	@echo '  benchmark-suites-build-details Run the benchmark suite pipeline; save and publish its build details artifact.'
 	@echo ''
 	@echo '  release       		            Release a version: make release VERSION=X.Y.Z (validates, stamps, tags, pushes).'
 	@echo ''
@@ -52,6 +53,9 @@ format-single-file:
 
 splash:
 	./.github/scripts/create_splash.sh "$$(uv version --short)-dev";
+
+benchmark-suites-build-details:
+	uv run python scripts/generate_benchmark_suites_build_details.py --workspace script_outputs/benchmark_suites_build_details
 
 release:
 	@test -n "$(VERSION)" || (echo "Usage: make release VERSION=X.Y.Z" && exit 1)

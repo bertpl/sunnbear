@@ -1,0 +1,82 @@
+{
+  "archive": {
+    "sha256": "2a163834ba6e1e05f0e995b5392cf0854bdaf52d7671a583e869872f626980d8",
+    "size_bytes": 158177,
+    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-8e3f7822/benchmark_suites_build_details.tar.zst"
+  },
+  "build_date": "2026-11-07",
+  "built_with": {
+    "max-div": "0.21.8",
+    "snuffled": "0.1.11",
+    "sunnbear": "0.3.8+dev"
+  },
+  "content_hash": "8e3f782292fc9657eeea8eaa34334bd2848ff125f8c9a8246be66cc98b017667",
+  "files": [
+    {
+      "path": "c_ranges.parquet",
+      "sha256": "f395a8804b32e68859d829f73dc37a73c4ced01b9a33c0605572dacae1705ce1",
+      "size_bytes": 10168
+    },
+    {
+      "path": "candidate_registry.parquet",
+      "sha256": "10d67a69c663c13ade7c555d449f801d5489442ac3fd33c2c87a51aa61cd204f",
+      "size_bytes": 9102
+    },
+    {
+      "path": "difficulty_classes.parquet",
+      "sha256": "afd52f16efde36be2a5de050eae59a098e1bd89a2bbf7bf70fdf845fe1c5294b",
+      "size_bytes": 6486
+    },
+    {
+      "path": "edis.parquet",
+      "sha256": "10d27a447e2df95f6ed75f8d2f60cba263c1d8fa50824e8b226077e8e7591e55",
+      "size_bytes": 13234
+    },
+    {
+      "path": "interval_bounds.parquet",
+      "sha256": "cfa096eb63883438b6e83fe9b5e4a763667ded5f40035459d8e434c98b80acbd",
+      "size_bytes": 10947
+    },
+    {
+      "path": "nearest_kept_candidates.parquet",
+      "sha256": "f7bf5d21e10cfb9ca20a3b037b166e58d7ed5c555dececdd802e43db866f012f",
+      "size_bytes": 523
+    },
+    {
+      "path": "run.json",
+      "sha256": "8f1064370ba683736d6b31a30ec71e70521fd49fd11418ba2fbd207a6e942483",
+      "size_bytes": 243
+    },
+    {
+      "path": "s3_coarse_characterization_raw_features.parquet",
+      "sha256": "937d4e997ad07b807c0d8631c0a5d8fa73bc3e85efd9f84d91c90554bff2bc22",
+      "size_bytes": 148223
+    },
+    {
+      "path": "s5_full_characterization_raw_features.parquet",
+      "sha256": "937d4e997ad07b807c0d8631c0a5d8fa73bc3e85efd9f84d91c90554bff2bc22",
+      "size_bytes": 148223
+    },
+    {
+      "path": "storage.json",
+      "sha256": "4a56ae53a803a692237b65cb8c4b896eaf00965cd31d553661966947df4c52a4",
+      "size_bytes": 1635
+    },
+    {
+      "path": "suite_memberships.parquet",
+      "sha256": "219f655c3dcb687d2ee6b5320c46c37435b92469c47e3d54dd992fa77b86a7ad",
+      "size_bytes": 3573
+    }
+  ],
+  "generated_by": {
+    "arguments": {
+      "mode": "DRAFT",
+      "n_workers": null
+    },
+    "function": "sunnbear._core.benchmark.suites.pipeline.run_pipeline"
+  },
+  "input_artifact_hashes": {
+    "mc_tuples": "cb162529912f1dae6151c63aaede47a40fa88d2b3c788fb73a3795365ff4f0cb"
+  },
+  "name": "benchmark_suites_build_details"
+}

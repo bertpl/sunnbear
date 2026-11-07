@@ -1,31 +1,16 @@
 """The release script finds the built-in artifact manifests built since the last release, and stamps them."""
 
 import datetime
-import importlib.util
-import sys
 from pathlib import Path
 
 import pytest
 
 from sunnbear._core.artifacts import ArtifactFileEntry, ArtifactManifest
 
-_RELEASE_SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "release.py"
-
 
 # ==================================================================================================
 #  Fixtures and helpers
 # ==================================================================================================
-@pytest.fixture(scope="module")
-def release():
-    """Return `scripts/release.py`, imported by path: the script is not part of the package."""
-    spec = importlib.util.spec_from_file_location("release_script", _RELEASE_SCRIPT)
-    module = importlib.util.module_from_spec(spec)
-    # `dataclasses` looks the module up in `sys.modules` while the script's dataclass is defined.
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
 @pytest.fixture
 def builtin_artifacts_dir(release, monkeypatch, tmp_path):
     """Make the release script look for the built-in artifacts in `tmp_path`, and return that directory."""

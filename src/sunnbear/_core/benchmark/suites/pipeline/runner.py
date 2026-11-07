@@ -130,7 +130,7 @@ def run_stages(
         workspace.write_manifest(manifest)
         manifests.append(manifest)
     build_details = state.create_build_details(stop=stop)
-    build_details.write_files(workspace.build_details_dir)
+    workspace.write_build_details_files(build_details.to_files())
     return PipelineRunResult(manifests=tuple(manifests), build_details=build_details)
 
 

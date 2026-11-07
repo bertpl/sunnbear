@@ -10,6 +10,8 @@ information on the candidates that no stage before it dropped, and drops candida
   candidates' feature vectors;
 - `state` holds the state of a run, which each stage reaches only through its own state accessor;
 - `stages` holds the stages, 1 module or subpackage per stage, whose names sort in run order;
+- `BenchmarkSuitesBuildDetailsDeclaration` declares the build details of a run over the shipped test problems as a
+  data artifact;
 - `run_pipeline` runs the stages in order on a set of formulas, sharing 1 pool of worker processes between them, in a
   `PipelineMode` that sets how much work the stages do.
 
@@ -17,6 +19,7 @@ Every run recomputes every stage. Maintainers run the pipeline from the command 
 writes its outputs to the workspace directory given there, outside the package.
 """
 
+from .artifact import BenchmarkSuitesBuildDetailsDeclaration
 from .core import (
     PipelineStage,
     PipelineStageId,
