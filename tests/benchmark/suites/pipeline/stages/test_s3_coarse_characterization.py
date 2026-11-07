@@ -11,7 +11,7 @@ from sunnbear._core.benchmark.suites.pipeline.core import (
     REJECTED_CANDIDATES_REPORT_NAME,
     RejectionReason,
 )
-from sunnbear._core.benchmark.suites.pipeline.features import INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import INCORRECT_SOLVES_PER_CONFIG_REPORT_NAME
 from sunnbear._core.benchmark.suites.pipeline.stages import (
     CandidateGenerationStage,
     CandidateValidationStage,

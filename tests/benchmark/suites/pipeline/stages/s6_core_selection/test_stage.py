@@ -9,7 +9,7 @@ import numpy as np
 import polars as pl
 import pytest
 
-from sunnbear._core.benchmark.suites.pipeline.features import map_fevals_to_feature
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import map_fevals_to_feature
 from sunnbear._core.benchmark.suites.pipeline.stages import (
     CORE_COMPOSITION_REPORT_NAME,
     DIFFICULTY_CLASS_SCHEMA,

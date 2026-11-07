@@ -1,16 +1,6 @@
-"""`FeatureVectorDefinition` defines the candidates' feature vectors: what they hold, and how they are computed.
+"""`DiversityFeatureFactory` computes the candidates' diversity features, from 1 candidate's row to a set's matrix.
 
-The definition computes the feature vectors in 3 steps:
-
-- per candidate, in the worker that solves and analyzes it: the candidate's raw features, from its solves and snuffled
-  analyses, by `FeatureVectorDefinition.compute_raw_features`;
-- over a set of candidates: the scale of each `FeatureBlock`, held in a `FeatureBlockScales`, by
-  `FeatureVectorDefinition.fit_block_scales`;
-- the scaled matrix for `SpacingStage` and max-div, by `FeatureVectorDefinition.build_scaled_matrix`.
-
-The raw features are in natural units (evaluation counts and snuffled scores), so that they can be shown as they are.
-Only `build_scaled_matrix` returns the solvers block on the log scale of `map_fevals_to_feature`, with each block
-divided by its scale; `fit_block_scales` maps a copy onto that log scale only to compute the scales.
+The class docstring defines the features and their raw form.
 """
 
 from collections.abc import Mapping
@@ -19,6 +9,8 @@ from dataclasses import dataclass
 import numpy as np
 
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, max_fevals_for
+from sunnbear._core.solvers import bracketing  # noqa: F401 - importing the shipped solvers registers their configs
+from sunnbear._core.solvers.core import SolverConfig, SolverConfigRegistry
 from sunnbear._core.stats import gpq, mean_pairwise_l1
 
 from .feature_matrix import FeatureMatrix
@@ -31,40 +23,54 @@ _MAX_FEVALS = max_fevals_for(n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
 
 
 # ==================================================================================================
-#  FeatureVectorDefinition
+#  DiversityFeatureFactory
 # ==================================================================================================
-@dataclass(frozen=True)
-class FeatureVectorDefinition:
-    """A `FeatureVectorDefinition` defines the candidates' feature vector for a set of core solver configs.
+class DiversityFeatureFactory:
+    """A `DiversityFeatureFactory` computes the candidates' diversity features, and defines what they are.
 
-    The vector holds 1 block per `FeatureBlock`, in the order of `FeatureBlock`:
+    A candidate's features form 1 block per `FeatureBlock`, in the order of `FeatureBlock`:
 
-    - the solvers block, from the solves of the core solver configs:
+    - the solvers block, from the candidate's solves with each config of `solver_ids`:
       - per config, in the order of `solver_ids`: the geometric mean of `n_fevals_eff` over the candidate's solves;
       - per level of `SOLVERS_GPQ_LEVELS`: the geometric pseudo-quantile (`gpq`) of `n_fevals_eff` over the
         candidate's solves of all configs together;
     - the snuffled block, from snuffled's analyses: the mean of each property of `SNUFFLED_PROPERTIES`.
 
-    The definition is picklable, so that a worker task can carry it.
+    A raw feature is a feature in natural units, untransformed: the solvers block holds evaluation counts in
+    [2, max_fevals], and the snuffled block mean property scores. The factory computes them in 3 steps:
 
-    Attributes:
-        solver_ids: The ids of the core solver configs.
+    - `compute_raw_feature_row` computes 1 candidate's raw features, in the worker that solves and analyzes it, so that
+      the solves need not be kept;
+    - `fit_block_scales` computes the scale of each block over a set of candidates;
+    - `build_scaled_matrix` builds the matrix that `SpacingStage` and max-div take, in 2 steps: the solvers block, and
+      only that block, is mapped onto [0, 1] by `map_fevals_to_feature`, as ``log(n / 2) / log(max_fevals / 2)``;
+      then each block is divided by its scale.
+
+    The factory holds no state, so a worker task can carry it.
     """
 
-    solver_ids: tuple[str, ...]
+    @property
+    def solver_configs(self) -> tuple[SolverConfig, ...]:
+        """Return the solver configs that characterize a candidate, in the order of the solvers block.
 
-    def __post_init__(self) -> None:
-        """Check that the solvers block has at least 1 config.
-
-        Raises:
-            ValueError: If `solver_ids` is empty.
+        They are the registered configs whose role marks them for characterizing test problems, in the order of
+        `SolverConfigRegistry.configs`.
         """
-        if not self.solver_ids:
-            raise ValueError("A feature vector definition needs at least 1 core solver config.")
+        return tuple(
+            config for config in SolverConfigRegistry.configs() if config.role.is_used_for_problem_characterization
+        )
+
+    @property
+    def solver_ids(self) -> tuple[str, ...]:
+        """Return the ids of `solver_configs`, in their order.
+
+        A test that needs fewer or other configs patches this property.
+        """
+        return tuple(config.solver_id for config in self.solver_configs)
 
     @property
     def feature_names(self) -> tuple[str, ...]:
-        """Return the feature names, in the order of the vector, each starting with its `FeatureBlock` value."""
+        """Return the feature names, in the order of the features, each starting with its `FeatureBlock` value."""
         return (
             *(f"{FeatureBlock.SOLVERS}_geomean_{solver_id}" for solver_id in self.solver_ids),
             *(f"{FeatureBlock.SOLVERS}_gpq_{round(100 * level):02d}" for level in SOLVERS_GPQ_LEVELS),
@@ -74,7 +80,7 @@ class FeatureVectorDefinition:
     # --------------------------------------------------------------------------
     #  Per candidate
     # --------------------------------------------------------------------------
-    def compute_raw_features(self, *, n_fevals_eff: np.ndarray, snuffled_property_values: np.ndarray) -> np.ndarray:
+    def compute_raw_feature_row(self, *, n_fevals_eff: np.ndarray, snuffled_property_values: np.ndarray) -> np.ndarray:
         """Return 1 candidate's raw features, in the order of `feature_names`.
 
         Args:
@@ -113,7 +119,7 @@ class FeatureVectorDefinition:
         that `build_scaled_matrix` uses.
 
         A block with more features, or with values that spread more, contributes more to an L1 distance between 2
-        feature vectors; dividing each block by its scale gives every block a mean pairwise distance of 1 over these
+        candidates; dividing each block by its scale gives every block a mean pairwise distance of 1 over these
         candidates, so that the blocks contribute equally.
 
         A block whose values are the same for all the candidates gets a scale of 0, which `build_scaled_matrix` cannot
@@ -147,7 +153,7 @@ class FeatureVectorDefinition:
     # --------------------------------------------------------------------------
     @property
     def _block_slices(self) -> dict[FeatureBlock, slice]:
-        """Return the columns of each block in the feature vector."""
+        """Return the columns of each block, in the order of `feature_names`."""
         n_solvers_features = len(self.solver_ids) + len(SOLVERS_GPQ_LEVELS)
         return {
             FeatureBlock.SOLVERS: slice(0, n_solvers_features),
@@ -170,7 +176,7 @@ class FeatureBlockScales:
     """A `FeatureBlockScales` holds the scale of each `FeatureBlock` over a set of candidates.
 
     Attributes:
-        scale_per_block: The scale of each block, as `FeatureVectorDefinition.fit_block_scales` computes it.
+        scale_per_block: The scale of each block, as `DiversityFeatureFactory.fit_block_scales` computes it.
     """
 
     scale_per_block: Mapping[FeatureBlock, float]

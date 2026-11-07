@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from .features import FeatureFidelity
+from .diversity_features import FeatureFidelity
 from .selection import DEFAULT_SELECTION_SEC_PER_CANDIDATE
 from .stages import FullCharacterizationStage
 

@@ -8,7 +8,7 @@
 import polars as pl
 import pytest
 
-from sunnbear._core.benchmark.suites.pipeline.features import FeatureBlock
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureBlock
 from sunnbear._core.benchmark.suites.pipeline.stages import (
     CANDIDATE_COUNTS_PER_FORMULA_REPORT_NAME,
     DROPPED_CANDIDATES_REPORT_NAME,

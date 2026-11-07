@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.suites.pipeline.features import FeatureMatrix
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureMatrix
 from sunnbear._core.problems.core import ProblemId
 
 

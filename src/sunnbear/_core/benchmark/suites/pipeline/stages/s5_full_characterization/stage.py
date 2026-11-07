@@ -1,6 +1,6 @@
 """`FullCharacterizationStage` adds the full feature vectors."""
 
-from sunnbear._core.benchmark.suites.pipeline.features import CandidateCharacterizationStage, FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import CandidateCharacterizationStage, FeatureFidelity
 
 
 # ==================================================================================================

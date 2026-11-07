@@ -3,7 +3,7 @@ them back."""
 
 import numpy as np
 
-from sunnbear._core.benchmark.suites.pipeline.features import map_feature_to_fevals, map_fevals_to_feature
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import map_feature_to_fevals, map_fevals_to_feature
 
 
 def test_the_mapping_sends_2_and_max_fevals_to_0_and_1_and_inverts():

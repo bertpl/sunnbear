@@ -14,7 +14,7 @@ import pytest
 
 from sunnbear._core.benchmark.suites.pipeline import runner
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineRunResult, PipelineStageManifest
-from sunnbear._core.benchmark.suites.pipeline.features import FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureFidelity
 from sunnbear._core.benchmark.suites.pipeline.stages import (
     CandidateGenerationStage,
     CandidateValidationStage,

@@ -5,7 +5,7 @@ import pytest
 
 from sunnbear._core.benchmark.suites.pipeline import stages as stages_package
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage
-from sunnbear._core.benchmark.suites.pipeline.features import FeatureFidelity
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureFidelity
 from sunnbear._core.benchmark.suites.pipeline.mode import PipelineMode
 from sunnbear._core.benchmark.suites.pipeline.runner import run_pipeline
 from sunnbear._core.benchmark.suites.pipeline.stages import (

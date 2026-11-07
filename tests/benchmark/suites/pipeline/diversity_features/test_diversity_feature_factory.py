@@ -1,5 +1,6 @@
-"""The tests check that `FeatureVectorDefinition`:
+"""The tests check that `DiversityFeatureFactory`:
 
+- characterizes with the registered configs whose role marks them for characterization;
 - names its features;
 - computes a candidate's raw features in natural units;
 - fits 1 scale per block on the log scale of the solvers block;
@@ -11,21 +12,29 @@ import pytest
 from snuffled import FunctionProperty, RootProperty
 
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, max_fevals_for
-from sunnbear._core.benchmark.suites.pipeline.features import (
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     SNUFFLED_PROPERTIES,
     SOLVERS_GPQ_LEVELS,
+    DiversityFeatureFactory,
     FeatureBlock,
     FeatureBlockScales,
     FeatureMatrix,
-    FeatureVectorDefinition,
     map_fevals_to_feature,
 )
 from sunnbear._core.problems.core import ProblemId
+from sunnbear._core.solvers.core import SolverConfigRegistry
 from sunnbear._core.stats import gpq, mean_pairwise_l1
 
-_DEFINITION = FeatureVectorDefinition(solver_ids=("regula_falsi", "bisection"))
+_SOLVER_IDS = ("regula_falsi", "bisection")
+_FACTORY = DiversityFeatureFactory()
 _N_SOLVERS_FEATURES = 2 + len(SOLVERS_GPQ_LEVELS)
 _MAX_FEVALS = max_fevals_for(n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
+
+
+@pytest.fixture
+def patched_solver_ids(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Patch `DiversityFeatureFactory.solver_ids` to `_SOLVER_IDS`, so that the expected features stay small."""
+    monkeypatch.setattr(DiversityFeatureFactory, "solver_ids", property(lambda self: _SOLVER_IDS))
 
 
 def _raw_feature_matrix(n_candidates: int) -> FeatureMatrix:
@@ -41,11 +50,26 @@ def _raw_feature_matrix(n_candidates: int) -> FeatureMatrix:
     return FeatureMatrix(problem_ids=problem_ids, values=values)
 
 
+def test_the_solver_configs_are_the_registered_configs_that_characterize():
+    """The solver configs are the registered configs whose role marks them for characterization, in the registry's
+    order, and the solver ids are their ids."""
+    # --- act --------------------------
+    solver_configs = _FACTORY.solver_configs
+
+    # --- assert -----------------------
+    assert solver_configs == tuple(
+        config for config in SolverConfigRegistry.configs() if config.role.is_used_for_problem_characterization
+    )
+    assert solver_configs
+    assert _FACTORY.solver_ids == tuple(config.solver_id for config in solver_configs)
+
+
+@pytest.mark.usefixtures("patched_solver_ids")
 def test_the_names_hold_1_geomean_per_config_9_gpq_levels_and_1_name_per_property():
     """For 2 configs, the names are the 2 geomeans in their order, the gpq levels 10 to 90, then 1 per snuffled
     property; `SNUFFLED_PROPERTIES` holds every root and function property of snuffled."""
     # --- act --------------------------
-    feature_names = _DEFINITION.feature_names
+    feature_names = _FACTORY.feature_names
 
     # --- assert -----------------------
     assert feature_names == (
@@ -57,13 +81,7 @@ def test_the_names_hold_1_geomean_per_config_9_gpq_levels_and_1_name_per_propert
     assert set(SNUFFLED_PROPERTIES) == {*RootProperty, *FunctionProperty}
 
 
-def test_a_definition_needs_at_least_1_config():
-    """A definition without configs is refused."""
-    # --- act / assert -----------------
-    with pytest.raises(ValueError, match="at least 1 core solver config"):
-        FeatureVectorDefinition(solver_ids=())
-
-
+@pytest.mark.usefixtures("patched_solver_ids")
 def test_the_raw_features_are_geomeans_gpqs_over_all_solves_and_property_means():
     """The raw features are the geometric mean of each config's column, the gpq at each level over all solves
     together, and the mean of each property, all in natural units."""
@@ -72,7 +90,7 @@ def test_the_raw_features_are_geomeans_gpqs_over_all_solves_and_property_means()
     snuffled_property_values = np.vstack([np.zeros(len(SNUFFLED_PROPERTIES)), np.ones(len(SNUFFLED_PROPERTIES))])
 
     # --- act --------------------------
-    raw_features = _DEFINITION.compute_raw_features(
+    raw_features = _FACTORY.compute_raw_feature_row(
         n_fevals_eff=n_fevals_eff, snuffled_property_values=snuffled_property_values
     )
 
@@ -82,6 +100,7 @@ def test_the_raw_features_are_geomeans_gpqs_over_all_solves_and_property_means()
     assert raw_features[2 + SOLVERS_GPQ_LEVELS.index(0.5)] == pytest.approx(8.0)
 
 
+@pytest.mark.usefixtures("patched_solver_ids")
 @pytest.mark.parametrize(
     "n_configs, n_properties, message",
     [(3, len(SNUFFLED_PROPERTIES), "per config"), (2, len(SNUFFLED_PROPERTIES) - 1, "per property")],
@@ -90,18 +109,19 @@ def test_the_raw_features_refuse_arrays_with_the_wrong_columns(n_configs: int, n
     """An array with a column too many or too few is refused."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=message):
-        _DEFINITION.compute_raw_features(
+        _FACTORY.compute_raw_feature_row(
             n_fevals_eff=np.full((4, n_configs), 2.0), snuffled_property_values=np.zeros((2, n_properties))
         )
 
 
+@pytest.mark.usefixtures("patched_solver_ids")
 def test_each_blocks_scale_is_its_mean_pairwise_l1_distance_on_the_log_scale():
     """The solvers block's scale is computed after `map_fevals_to_feature`, the snuffled block's on its raw values."""
     # --- arrange ----------------------
     raw_feature_matrix = _raw_feature_matrix(5)
 
     # --- act --------------------------
-    block_scales = _DEFINITION.fit_block_scales(raw_feature_matrix)
+    block_scales = _FACTORY.fit_block_scales(raw_feature_matrix)
 
     # --- assert -----------------------
     solvers_values = map_fevals_to_feature(raw_feature_matrix.values[:, :_N_SOLVERS_FEATURES], max_fevals=_MAX_FEVALS)
@@ -116,19 +136,20 @@ def test_each_blocks_scale_is_its_mean_pairwise_l1_distance_on_the_log_scale():
 def test_fewer_than_2_candidates_have_no_scales():
     """One candidate has no pair, so `fit_block_scales` returns `None`."""
     # --- act / assert -----------------
-    assert _DEFINITION.fit_block_scales(_raw_feature_matrix(1)) is None
+    assert _FACTORY.fit_block_scales(_raw_feature_matrix(1)) is None
 
 
+@pytest.mark.usefixtures("patched_solver_ids")
 def test_the_scaled_feature_matrix_divides_each_block_on_the_log_scale_by_its_scale():
     """The scaled feature matrix keeps the ids and leaves the raw features unmodified; each of its blocks has a mean
     pairwise L1 distance of 1, because the scales were fitted on the same candidates."""
     # --- arrange ----------------------
     raw_feature_matrix = _raw_feature_matrix(5)
     raw_values = raw_feature_matrix.values.copy()
-    block_scales = _DEFINITION.fit_block_scales(raw_feature_matrix)
+    block_scales = _FACTORY.fit_block_scales(raw_feature_matrix)
 
     # --- act --------------------------
-    scaled_feature_matrix = _DEFINITION.build_scaled_matrix(raw_feature_matrix, block_scales)
+    scaled_feature_matrix = _FACTORY.build_scaled_matrix(raw_feature_matrix, block_scales)
 
     # --- assert -----------------------
     assert scaled_feature_matrix.problem_ids == raw_feature_matrix.problem_ids
