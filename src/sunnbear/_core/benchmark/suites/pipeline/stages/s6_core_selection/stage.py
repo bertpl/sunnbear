@@ -19,8 +19,9 @@ from sunnbear._core.benchmark.suites.pipeline.selection import (
 from sunnbear._core.benchmark.suites.pipeline.state import CoreSelectionStateAccessor, SuiteSelectionDetails
 from sunnbear._core.utils.worker_pool import WorkerPool
 
-# Every Core size is a power of 2, so that every suite distilled from the Core, of half its size or a further half, has
-# whole quotas. The Core that ships has the largest size, with a quota per tier; any other Core is interim.
+# Every Core size is a power of 2, so that every suite distilled from the Core, whose size is the Core's divided by a
+# power of 2, has whole quotas. Only a Core of the largest size, with a quota per tier, ships; a Core of another size
+# or with merged quotas is interim: it never ships as benchmark suites.
 CORE_SIZES = (128, 256, 512, 1024, 2048)
 
 

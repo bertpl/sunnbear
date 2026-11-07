@@ -18,8 +18,8 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 
 # Each series holds 1 suite per power of 2 from this size up to half the Core.
 SMALLEST_SUITE_SIZE = 64
-# The suites of the primary series carry these aliases, by size; a run whose Core is smaller than 2048 produces no suite
-# of the larger sizes, and so none of their aliases either.
+# The suites of the primary series, the a-series, carry these aliases, by size; a run whose Core is smaller than the
+# largest of `CORE_SIZES` produces no suite of the larger sizes, and so none of their aliases either.
 _PRIMARY_SERIES_ALIASES = {
     1024: ("sb-large",),
     512: ("sb-medium",),
@@ -36,16 +36,17 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
     """`DistillationStage` distills 2 series of suites from the Core: the primary series and the secondary series.
 
     Each series holds 1 suite per power of 2 from `SMALLEST_SUITE_SIZE` up to half the Core, and each of its suites
-    holds every candidate of the series' smaller suites. The 2 series share no candidate. The primary series' suites
-    are named `sb-<size>a` and carry the aliases of `_PRIMARY_SERIES_ALIASES`; the secondary series' are named
-    `sb-<size>b`.
+    holds every candidate of the series' smaller suites. The 2 series share no candidate.
 
-    The stage distills the suites in 2 steps, each suite selected by `select_diverse_problem_ids`, under quotas that
-    `DifficultyTierQuotas.resolve` chooses anew for each selection, at the suite's size and from the candidates that it
-    is selected from:
+    The primary series, the a-series, names its suites `sb-<size>a` and gives them the aliases of
+    `_PRIMARY_SERIES_ALIASES`; the secondary series, the b-series, names its suites `sb-<size>b`.
 
-    - **the split:** the largest suite of the primary series is selected from the Core. The rest of the Core is the
-      largest suite of the secondary series, which no selection makes;
+    The stage distills the suites in 2 steps. Each suite but the largest of the secondary series is selected by
+    `select_diverse_problem_ids`, under quotas that `DifficultyTierQuotas.resolve` chooses anew for each selection, at
+    the suite's size and from the tier counts of the Core or of the series' next larger suite:
+
+    - **the split:** the largest suite of the primary series is selected from the Core. The Core's remaining candidates
+      form the largest suite of the secondary series, without a max-div run of their own;
     - **the halvings:** per series, each smaller suite is selected from the series' next larger suite.
     """
 
@@ -74,11 +75,11 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
 
         # --- split ------------------------------
         largest_suite_size = len(core_pool.feature_matrix.problem_ids) // 2
-        largest_primary_suite = self._select_suite(
+        largest_primary_details = self._select_suite(
             core_pool, size=largest_suite_size, is_primary=True, worker_pool=worker_pool
         )
-        largest_primary_problem_ids = set(largest_primary_suite.benchmark_suite.problem_ids)
-        largest_secondary_suite = SuiteSelectionDetails(
+        largest_primary_problem_ids = set(largest_primary_details.benchmark_suite.problem_ids)
+        largest_secondary_details = SuiteSelectionDetails(
             benchmark_suite=self._build_suite(
                 [p for p in core_pool.feature_matrix.problem_ids if p not in largest_primary_problem_ids],
                 is_primary=False,
@@ -89,13 +90,13 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
 
         # --- halvings ---------------------------
         all_selection_details: list[SuiteSelectionDetails] = []
-        for is_primary, largest_suite in ((True, largest_primary_suite), (False, largest_secondary_suite)):
-            selection_details = largest_suite
+        for is_primary, largest_details in ((True, largest_primary_details), (False, largest_secondary_details)):
+            selection_details = largest_details
             all_selection_details.append(selection_details)
-            while selection_details.benchmark_suite.size > SMALLEST_SUITE_SIZE:
+            while len(selection_details.benchmark_suite.problem_ids) > SMALLEST_SUITE_SIZE:
                 selection_details = self._select_suite(
                     core_pool.subset(selection_details.benchmark_suite.problem_ids),
-                    size=selection_details.benchmark_suite.size // 2,
+                    size=len(selection_details.benchmark_suite.problem_ids) // 2,
                     is_primary=is_primary,
                     worker_pool=worker_pool,
                 )
@@ -108,12 +109,12 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
     #  Helpers
     # --------------------------------------------------------------------------
     def _select_suite(
-        self, pool: CandidatePool, *, size: int, is_primary: bool, worker_pool: WorkerPool
+        self, candidate_pool: CandidatePool, *, size: int, is_primary: bool, worker_pool: WorkerPool
     ) -> SuiteSelectionDetails:
-        """Return the details of a suite of `size` of the primary or secondary series, selected from `pool`."""
-        tier_quotas = DifficultyTierQuotas.resolve(size, Counter(pool.difficulty_tiers))
+        """Return the details of a suite of `size` in the primary or secondary series, chosen from `candidate_pool`."""
+        tier_quotas = DifficultyTierQuotas.resolve(size, Counter(candidate_pool.difficulty_tiers))
         problem_ids, diversity = select_diverse_problem_ids(
-            pool,
+            candidate_pool,
             tier_quotas=tier_quotas,
             seed=self.seed,
             sec_per_candidate=self.sec_per_candidate,

@@ -272,7 +272,7 @@ class BenchmarkSuitesBuildDetails:
                 rows.append(
                     {
                         "suite_name": suite.name,
-                        "size": suite.size,
+                        "size": len(suite.problem_ids),
                         **{f"n_candidates_{tier.value.lower()}": tier_counts[tier] for tier in DifficultyTier},
                         "diversity": selection_details.diversity,
                     }
@@ -290,8 +290,7 @@ class BenchmarkSuitesBuildDetails:
         - ``run.json`` holds the ids of the finished stages, and the stage that stopped the run and why, or ``null``
           when no stage stopped it;
         - ``storage.json`` holds the information that is not per candidate: each characterization stage's fidelity and
-          solver ids, and the `SuiteSelectionDetails` of the Core and of each distilled suite: the suite's name,
-          aliases and test problems, and the quotas and diversity score of the max-div run that selected it;
+          solver ids, and the `SuiteSelectionDetails` of the Core and of each distilled suite;
         - each structure of `PipelineStateStorage` that holds information per candidate is 1 Parquet table, named after
           the structure, with 1 row per candidate that the structure covers and the candidate's id in the column
           ``problem_id``. The table ``candidate_registry`` holds every candidate, with the stage and reason of its drop

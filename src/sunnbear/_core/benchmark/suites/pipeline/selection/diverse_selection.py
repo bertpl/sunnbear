@@ -83,7 +83,7 @@ def select_diverse_problem_ids(
                 min_count=count,
                 max_count=count,
             )
-            for tiers, count in tier_quotas.counts.items()
+            for tiers, count in tier_quotas.quota_by_group.items()
             if len(tiers) < len(DifficultyTier)
         ],
     )

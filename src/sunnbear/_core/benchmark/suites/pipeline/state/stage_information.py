@@ -172,7 +172,7 @@ class NearestKeptCandidate:
 class SuiteSelectionDetails:
     """`SuiteSelectionDetails` records how core selection or distillation selected 1 suite.
 
-    The details belong to the build details: a user of the suite needs only its `BenchmarkSuite`.
+    These details are part of the build details of a pipeline run; a user of the suite needs only its `BenchmarkSuite`.
 
     Attributes:
         benchmark_suite: The selected suite.

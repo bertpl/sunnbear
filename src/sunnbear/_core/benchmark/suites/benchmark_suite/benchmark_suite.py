@@ -16,9 +16,9 @@ class BenchmarkSuite:
     A suite is known by its name and by each of its aliases. The suites that sunnbear builds are:
 
     - `sb-<size>`, such as `sb-2048`: the Core, from which every other one of these suites is selected;
-    - the a-series, `sb-<size>a` from `sb-64a` up to half the Core: the highest-quality selection of benchmark suites;
-    - the b-series, `sb-<size>b` of the same sizes: the b-series shares no test problem with the a-series, so it is an
-      independent series of benchmark suites, which may be of lower quality.
+    - the a-series, `sb-<size>a`: the highest-quality selection of benchmark suites;
+    - the b-series, `sb-<size>b`: the b-series shares no test problem with the a-series, so it is an independent series
+      of benchmark suites, which may be of lower quality.
 
     Within each series, every suite holds every smaller suite of the series.
 
@@ -31,11 +31,6 @@ class BenchmarkSuite:
     name: str
     aliases: tuple[str, ...]
     problem_ids: tuple[ProblemId, ...]
-
-    @property
-    def size(self) -> int:
-        """Return the number of the suite's test problems."""
-        return len(self.problem_ids)
 
     # --------------------------------------------------------------------------
     #  Files

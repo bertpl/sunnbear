@@ -81,7 +81,7 @@ def _distilled_state() -> PipelineState:
     accessor.set_core_selection_details(
         SuiteSelectionDetails(
             benchmark_suite=BenchmarkSuite(name="sb-2", aliases=(), problem_ids=(_PROBLEM_IDS[1], _PROBLEM_IDS[4])),
-            tier_quotas=DifficultyTierQuotas(counts={frozenset({DifficultyTier.A, DifficultyTier.B}): 2}),
+            tier_quotas=DifficultyTierQuotas(quota_by_group={frozenset({DifficultyTier.A, DifficultyTier.B}): 2}),
             diversity=0.25,
         )
     )
@@ -91,7 +91,7 @@ def _distilled_state() -> PipelineState:
         {
             "sb-1a": SuiteSelectionDetails(
                 benchmark_suite=BenchmarkSuite(name="sb-1a", aliases=("sb-single",), problem_ids=(_PROBLEM_IDS[1],)),
-                tier_quotas=DifficultyTierQuotas(counts={frozenset(DifficultyTier): 1}),
+                tier_quotas=DifficultyTierQuotas(quota_by_group={frozenset(DifficultyTier): 1}),
                 diversity=0.5,
             ),
             "sb-1b": SuiteSelectionDetails(

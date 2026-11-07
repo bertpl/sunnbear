@@ -1,4 +1,4 @@
-"""`DifficultyTierQuotas` holds the quotas of 1 selection: how many selected candidates each group of tiers holds.
+"""`DifficultyTierQuotas` holds the quotas of 1 selection: how many selected candidates fall in each group of tiers.
 
 `DifficultyTierQuotas.resolve` chooses the quotas of a selection from its size and the candidates that it selects from,
 so that every quota can be met.
@@ -26,29 +26,30 @@ class DifficultyTierQuotas:
     quota. A group that holds every tier imposes no constraint on the selection.
 
     Attributes:
-        counts: The quota of each group, in the order of `DifficultyTier`.
+        quota_by_group: The quota of each group, in the order of `DifficultyTier`.
     """
 
-    counts: Mapping[frozenset[DifficultyTier], int]
+    quota_by_group: Mapping[frozenset[DifficultyTier], int]
 
     @property
     def size(self) -> int:
         """Return the number of candidates of the selection: the sum of the quotas."""
-        return sum(self.counts.values())
+        return sum(self.quota_by_group.values())
 
     def check_selection(self, selected_tiers: Sequence[DifficultyTier]) -> None:
-        """Stop the pipeline unless a selection of candidates, given by their tiers, has the size and meets each quota.
+        """Stop the pipeline unless the selected candidates, given by their tiers, number `size` and meet each quota.
 
         Raises:
             PipelineStopError: If `selected_tiers` does not hold `size` candidates, or does not meet a quota exactly;
-                the message names each such quota with the selection's count.
+                the message names each such quota with the number of selected candidates in its group.
         """
         tier_counts = Counter(selected_tiers)
-        unmet_quota_descriptions = [
-            f"{self._describe_group(tiers)}: {sum(tier_counts[tier] for tier in tiers)} of {count}"
-            for tiers, count in self.counts.items()
-            if sum(tier_counts[tier] for tier in tiers) != count
-        ]
+        unmet_quota_descriptions = []
+        for tiers, quota in self.quota_by_group.items():
+            group_count = sum(tier_counts[tier] for tier in tiers)
+            if group_count != quota:
+                group_name = " and ".join(tier.value for tier in DifficultyTier if tier in tiers)
+                unmet_quota_descriptions.append(f"{group_name}: {group_count} of {quota}")
         if len(selected_tiers) != self.size or unmet_quota_descriptions:
             raise PipelineStopError(
                 f"The selection holds {len(selected_tiers)} candidates for a selection of {self.size}; unmet quotas: "
@@ -61,18 +62,13 @@ class DifficultyTierQuotas:
     def to_json_values(self) -> list[dict[str, Any]]:
         """Return the quotas as JSON values: 1 item per group, with its ``tiers`` and its ``count``."""
         return [
-            {"tiers": [tier.value for tier in DifficultyTier if tier in tiers], "count": count}
-            for tiers, count in self.counts.items()
+            {"tiers": [tier.value for tier in DifficultyTier if tier in tiers], "count": quota}
+            for tiers, quota in self.quota_by_group.items()
         ]
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
-    @staticmethod
-    def _describe_group(tiers: frozenset[DifficultyTier]) -> str:
-        """Return the names of the tiers of a group, in the order of `DifficultyTier`, joined by "and"."""
-        return " and ".join(tier.value for tier in DifficultyTier if tier in tiers)
-
     @staticmethod
     def _quota_of(group: frozenset[DifficultyTier], size: int) -> int:
         """Return the quota of `group` in a selection of `size`: `size` times the sum of its tiers' `core_share`."""
@@ -85,10 +81,11 @@ class DifficultyTierQuotas:
     def resolve(cls, size: int, pool_tier_counts: Mapping[DifficultyTier, int]) -> Self:
         """Return the quotas of a selection of `size` candidates, merged until the candidates can meet every quota.
 
-        The quotas start at 1 per tier, of `size` times the tier's `core_share`. While a quota asks for more
-        candidates than its group holds, the quota with the largest shortfall merges with its neighbor in the order of
-        `DifficultyTier` whose quota is smaller; between 2 neighbors with equal quotas, it merges with the higher tier.
-        At worst, 1 group holds every tier.
+        Each tier starts with a quota of its own, `size` times the tier's `core_share`.
+
+        While a quota asks for more candidates than the pool holds in its group, the quota with the largest shortfall
+        merges with its neighbor in the order of `DifficultyTier` whose quota is smaller; between 2 neighbors with equal
+        quotas, it merges with the later one in that order. At worst, 1 group holds every tier.
 
         Args:
             size: The number of candidates to select; a multiple of 16, so that every tier's quota is whole.
@@ -110,9 +107,9 @@ class DifficultyTierQuotas:
                 ]
                 group_idx = shortfalls.index(max(shortfalls))
                 if shortfalls[group_idx] <= 0:
-                    return cls(counts={group: cls._quota_of(group, size) for group in groups})
+                    return cls(quota_by_group={group: cls._quota_of(group, size) for group in groups})
                 else:
-                    # Of the 2 neighbors, the one with the smaller quota; on a tie, the higher one, which comes later.
+                    # Of the 2 neighbors, the one with the smaller quota; on a tie, the one that comes later.
                     neighbor_idx = min(
                         (idx for idx in (group_idx - 1, group_idx + 1) if 0 <= idx < len(groups)),
                         key=lambda idx: (cls._quota_of(groups[idx], size), -idx),
@@ -127,4 +124,6 @@ class DifficultyTierQuotas:
         Raises:
             ValueError: If a group names a value that is not a `DifficultyTier`.
         """
-        return cls(counts={frozenset(map(DifficultyTier, group["tiers"])): group["count"] for group in json_values})
+        return cls(
+            quota_by_group={frozenset(map(DifficultyTier, group["tiers"])): group["count"] for group in json_values}
+        )

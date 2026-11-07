@@ -21,9 +21,10 @@ from fractions import Fraction
 #  DifficultyTier
 # ==================================================================================================
 class DifficultyTier(StrEnum):
-    """A `DifficultyTier` names a range of the EDI relative to `n_bisection_fevals`; a candidate's tier holds its EDI.
+    """A `DifficultyTier` names a range of the EDI relative to `n_bisection_fevals`.
 
-    The ranges follow the order of the members, each starting where the one before it ends.
+    A candidate's tier is the range that holds its EDI. The ranges follow the order of the members, each starting where
+    the one before it ends.
     """
 
     A = "A"

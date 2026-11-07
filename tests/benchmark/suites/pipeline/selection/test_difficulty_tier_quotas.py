@@ -1,5 +1,5 @@
 """`DifficultyTierQuotas.resolve` merges quotas until the candidates can meet each of them, and
-`DifficultyTierQuotas.check_selection` checks that a selection has the size and meets each quota."""
+`DifficultyTierQuotas.check_selection` checks that a selection holds the quotas' size and meets each quota."""
 
 import pytest
 
@@ -41,16 +41,17 @@ A, B, C, DA, DB = DifficultyTier
     ],
 )
 def test_short_quotas_merge_with_a_neighbor_until_each_can_be_met(pool_tier_counts, counts_expected):
-    """For a selection of 128, every tier starts with its share: 32 each for A, B and C, 24 for Da, 8 for Db. A quota
-    that asks for more candidates than its group holds merges with its neighbor with the smaller quota, a tie going to
-    the higher tier. With 31 of B and 22 of C, C is 10 short and merges first, with Da, whose quota is smaller than
-    B's; B, then 1 short, merges with A, because its other neighbor's quota, C and Da's 56, is larger."""
+    """For a selection of 128, every tier starts with its share: 32 each for A, B and C, 24 for Da, 8 for Db.
+
+    With 31 of B and 22 of C, C is 10 short and merges first, with Da, because Da's quota of 24 is smaller than B's 32.
+    B is then 1 short; its neighbors are A, with a quota of 32, and the merged C and Da, with 56, so B merges with A.
+    """
     # --- act --------------------------
     tier_quotas = DifficultyTierQuotas.resolve(128, pool_tier_counts)
 
     # --- assert -----------------------
-    assert tier_quotas.counts == counts_expected
-    assert list(tier_quotas.counts) == list(counts_expected)
+    assert tier_quotas.quota_by_group == counts_expected
+    assert list(tier_quotas.quota_by_group) == list(counts_expected)
 
 
 @pytest.mark.parametrize(
@@ -71,7 +72,7 @@ def test_quotas_are_refused_for_a_size_without_whole_quotas_or_too_few_candidate
 
 
 _QUOTAS_WITH_MERGED_D = DifficultyTierQuotas(
-    counts={frozenset({A}): 32, frozenset({B}): 32, frozenset({C}): 32, frozenset({DA, DB}): 32}
+    quota_by_group={frozenset({A}): 32, frozenset({B}): 32, frozenset({C}): 32, frozenset({DA, DB}): 32}
 )
 
 
@@ -85,8 +86,8 @@ _QUOTAS_WITH_MERGED_D = DifficultyTierQuotas(
 )
 def test_a_selection_must_have_the_size_and_meet_every_quota(selected_tiers, message):
     """A selection of the right size that meets every quota passes, however a merged quota splits between its tiers;
-    one that misses a quota or the size stops the pipeline, with a message that names each unmet quota and the
-    selection's count."""
+    one that misses a quota or the size stops the pipeline, with a message that names each unmet quota and the number
+    of selected candidates in its group."""
     # --- act / assert -----------------
     if message is None:
         _QUOTAS_WITH_MERGED_D.check_selection(selected_tiers)
@@ -102,4 +103,4 @@ def test_the_quotas_read_back_from_their_json_values_equal_the_original():
 
     # --- assert -----------------------
     assert read_back == _QUOTAS_WITH_MERGED_D
-    assert list(read_back.counts) == list(_QUOTAS_WITH_MERGED_D.counts)
+    assert list(read_back.quota_by_group) == list(_QUOTAS_WITH_MERGED_D.quota_by_group)

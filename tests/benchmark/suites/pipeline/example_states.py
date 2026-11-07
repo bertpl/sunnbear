@@ -109,7 +109,7 @@ def build_state_before(
                         benchmark_suite=BenchmarkSuite(
                             name=f"sb-{len(problem_ids)}", aliases=(), problem_ids=tuple(problem_ids)
                         ),
-                        tier_quotas=DifficultyTierQuotas(counts={frozenset(DifficultyTier): len(problem_ids)}),
+                        tier_quotas=DifficultyTierQuotas(quota_by_group={frozenset(DifficultyTier): len(problem_ids)}),
                         diversity=1.0,
                     )
                 )

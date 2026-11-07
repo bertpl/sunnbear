@@ -76,7 +76,7 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
     core_selection_details = state.create_build_details().core_selection_details()
     assert core_selection_details.benchmark_suite.name == "sb-128"
     assert core_selection_details.benchmark_suite.aliases == ()
-    assert len(core_selection_details.tier_quotas.counts) == len(DifficultyTier)
+    assert len(core_selection_details.tier_quotas.quota_by_group) == len(DifficultyTier)
     drops = [state.drop_of(problem_id) for problem_id in example_problem_ids(len(edis))]
     assert Counter(drop.reason for drop in drops if drop is not None) == {"not_in_core": 32}
 
@@ -94,5 +94,5 @@ def test_the_stage_fills_merged_quotas_and_records_its_parameters():
     # --- assert -----------------------
     core_tiers = Counter(state.create_state_accessor(PipelineStageId.DISTILLATION).candidate_pool().difficulty_tiers)
     assert core_tiers == dict.fromkeys([A, B, C, DA], 32)
-    assert state.create_build_details().core_selection_details().tier_quotas.counts[frozenset({DA, DB})] == 32
+    assert state.create_build_details().core_selection_details().tier_quotas.quota_by_group[frozenset({DA, DB})] == 32
     assert stage.parameters == {"sec_per_candidate": _SEC_PER_CANDIDATE, "seed": stage.seed}

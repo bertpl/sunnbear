@@ -30,7 +30,7 @@ def test_a_selection_that_misses_a_quota_stops_the_pipeline():
         difficulty_tiers=(DifficultyTier.A,) * 30 + (DifficultyTier.B,) * 10,
     )
     tier_quotas = DifficultyTierQuotas(
-        counts={frozenset({DifficultyTier.A}): 8, frozenset({DifficultyTier.A, DifficultyTier.B}): 4}
+        quota_by_group={frozenset({DifficultyTier.A}): 8, frozenset({DifficultyTier.A, DifficultyTier.B}): 4}
     )
 
     # --- act / assert -----------------

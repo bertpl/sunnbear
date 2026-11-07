@@ -3,7 +3,8 @@
 - the 2 series split the Core in halves; each suite has its name, and the a-series' suites their aliases;
 - each series' smaller suites lie inside its larger ones;
 - every suite that a selection makes meets the quotas that the stage stores for it;
-- the stage records max-div's time per candidate and seed in its parameters.
+- the stage records max-div's time per candidate and seed in its parameters;
+- the a-series' aliases cover each of its sizes in the largest Core.
 """
 
 from collections import Counter
@@ -15,7 +16,9 @@ import pytest
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
 from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
-from sunnbear._core.benchmark.suites.pipeline.stages import DistillationStage
+from sunnbear._core.benchmark.suites.pipeline.stages import SMALLEST_SUITE_SIZE, DistillationStage
+from sunnbear._core.benchmark.suites.pipeline.stages.s6_core_selection import CORE_SIZES
+from sunnbear._core.benchmark.suites.pipeline.stages.s7_distillation.stage import _PRIMARY_SERIES_ALIASES
 from sunnbear._core.benchmark.suites.pipeline.state import BenchmarkSuitesBuildDetails
 from sunnbear._core.utils.worker_pool import WorkerPool
 from tests.benchmark.suites.pipeline.example_states import build_state_before, example_problem_ids
@@ -60,7 +63,7 @@ def _check_quotas_and_nesting(build_details: BenchmarkSuitesBuildDetails) -> Non
     for selection_details in all_selection_details:
         if selection_details.tier_quotas is not None:
             tier_counts = Counter(difficulty_tiers[p] for p in selection_details.benchmark_suite.problem_ids)
-            for tiers, count in selection_details.tier_quotas.counts.items():
+            for tiers, count in selection_details.tier_quotas.quota_by_group.items():
                 assert sum(tier_counts[tier] for tier in tiers) == count
 
 
@@ -111,3 +114,17 @@ def test_each_series_nests_its_suites_and_the_stage_records_its_parameters():
     ]
     _check_quotas_and_nesting(build_details)
     assert stage.parameters == {"sec_per_candidate": _SEC_PER_CANDIDATE, "seed": stage.seed}
+
+
+def test_the_aliases_cover_each_a_series_size_of_the_largest_core():
+    """The a-series of the largest Core holds 1 suite per power of 2 from `SMALLEST_SUITE_SIZE` up to half the Core, and
+    each such size has its aliases."""
+    # --- arrange ----------------------
+    a_series_sizes = set()
+    size = SMALLEST_SUITE_SIZE
+    while size <= max(CORE_SIZES) // 2:
+        a_series_sizes.add(size)
+        size *= 2
+
+    # --- act / assert -----------------
+    assert set(_PRIMARY_SERIES_ALIASES) == a_series_sizes
