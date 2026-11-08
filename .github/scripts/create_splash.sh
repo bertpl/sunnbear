@@ -37,7 +37,7 @@ fi
 
 # --- add version info ---
 # The background image (images/splash/splash.webp) shows "SUNNBEAR" written in chalk; the version sits just below that word, right-aligned with the end of the final "R".
-# The splash is saved 1920 px wide, which is sharp at the README's display width on a 2x screen; every release commits a new copy of this file, so a wider splash would only grow the git history.
+# The splash width set below stays sharp at the README's display width on a 2x screen; every release commits a new copy of the splash, so a wider splash would only grow the git history.
 magick "./images/_splash_without_version.webp" -pointsize 128 -font "./images/splash/google_fonts_montserrat_bold.ttf" -gravity East \
        -fill "black" -annotate +1077+163 "v${DISPLAY_VERSION}" \
        -fill "white" -annotate +1080+160 "v${DISPLAY_VERSION}" \
