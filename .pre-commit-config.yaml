@@ -63,7 +63,7 @@ repos:
       - id: trailing-whitespace
       - id: check-added-large-files
         args: [--maxkb=512]
-        # The splash without version info is larger than the limit on purpose: create_splash.sh stamps the version onto it at full size and only then halves the splash.
+        # The splash without version info is larger than the limit on purpose: create_splash.sh stamps the version onto it at full size and only then shrinks the splash.
         exclude: ^images/_splash_without_version\.webp$
       - id: check-merge-conflict
       - id: check-case-conflict
