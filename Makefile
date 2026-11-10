@@ -31,7 +31,7 @@ dev-setup:
 	uv run pre-commit install
 
 test:
-	# --dist worksteal lets an idle worker take queued tests from a busy one. The default scheduling hands each worker its tests in file order and in advance, so the slowest tests, which sit close together in file order, would all queue on 1 worker.
+	# --dist worksteal lets an idle worker take queued tests from a busy one. The default scheduling hands each worker batches of consecutive tests ahead of time, so the slowest tests, which sit close together in file order, would all land on 1 worker.
 	uv run pytest ./tests -n auto --dist worksteal
 
 coverage:
