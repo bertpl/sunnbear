@@ -74,4 +74,4 @@ jobs:
         env:
           # Setting this variable makes tests/conftest.py fail the run when the tests import sunnbear from anywhere but site-packages
           SUNNBEAR_TESTS_NEEDS_INSTALLED_WHEEL: "1"
-        run: blind-venv/bin/python -m pytest tests/ -n auto
+        run: blind-venv/bin/python -m pytest tests/ -n auto --dist worksteal
