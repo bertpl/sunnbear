@@ -28,7 +28,7 @@ def _run_info_of(solver_ids: list[str], problem_ids: list[str], c_max: float = 1
 @pytest.fixture(scope="module")
 def run_info() -> BenchmarkRunInfo:
     """Return the run info of a run of bisection on the shipped cubic."""
-    return _run_info_of(["bisection"], ["f2.1.1[p1=0.2]"])
+    return _run_info_of(["bisection"], ["f2.1.3[n=3.0,s=0.2]"])
 
 
 # ==================================================================================================
@@ -38,7 +38,7 @@ def test_a_new_run_info_records_the_inputs_the_artifacts_and_the_versions(run_in
     """A new run info records the solvers, problems, tuple set identity and package versions, and is not finished."""
     # --- assert -----------------------
     assert run_info.solver_versions == {"bisection": 1}
-    assert [problem_info.problem_id for problem_info in run_info.problem_infos] == ["f2.1.1[p1=0.2]"]
+    assert [problem_info.problem_id for problem_info in run_info.problem_infos] == ["f2.1.3[n=3.0,s=0.2]"]
     assert run_info.artifact_hashes == {"mc_tuples": ArtifactStore.load_manifest(MCTuplesDeclaration).content_hash}
     assert {"python", "sunnbear", "numpy", "numba", "counted-float", "polars"} <= set(run_info.package_versions)
     assert not run_info.is_finished
@@ -92,9 +92,9 @@ def test_a_run_with_other_package_versions_may_not_resume(run_info):
 @pytest.mark.parametrize(
     "solver_ids, problem_ids",
     [
-        (["regula_falsi"], ["f2.1.1[p1=0.2]"]),
-        (["bisection"], ["f2.1.1[p1=0.4]"]),
-        (["bisection", "regula_falsi"], ["f2.1.1[p1=0.4]", "f2.1.2[p1=3.0]"]),
+        (["regula_falsi"], ["f2.1.3[n=3.0,s=0.2]"]),
+        (["bisection"], ["f2.1.3[n=3.0,s=0.4]"]),
+        (["bisection", "regula_falsi"], ["f2.1.3[n=3.0,s=0.4]", "f2.1.5[n=5.0,s=0.5]"]),
     ],
 )
 def test_runs_of_other_solvers_or_on_other_problems_are_combinable(run_info, solver_ids, problem_ids):
@@ -118,7 +118,7 @@ def test_runs_with_other_settings_versions_or_solver_versions_are_not_combinable
     """Runs on different test problems are combinable only with the same run settings, package versions and solver
     versions; the error names the field that differs."""
     # --- arrange ----------------------
-    other = _run_info_of(["bisection"], ["f2.1.1[p1=0.4]"])
+    other = _run_info_of(["bisection"], ["f2.1.3[n=3.0,s=0.4]"])
     other = other.model_copy(update=other_changes)
 
     # --- act / assert -----------------
@@ -130,7 +130,7 @@ def test_runs_with_another_c_range_of_a_common_problem_are_not_combinable(run_in
     """A test problem in both runs must have the same c-range, even when the solvers differ."""
     # --- act / assert -----------------
     with pytest.raises(BenchmarkRunError, match="problem_infos"):
-        run_info.check_combinable_with(_run_info_of(["regula_falsi"], ["f2.1.1[p1=0.2]"], c_max=0.5))
+        run_info.check_combinable_with(_run_info_of(["regula_falsi"], ["f2.1.3[n=3.0,s=0.2]"], c_max=0.5))
 
 
 def test_runs_of_a_solver_on_the_same_problem_are_not_combinable(run_info):
@@ -138,4 +138,4 @@ def test_runs_of_a_solver_on_the_same_problem_are_not_combinable(run_info):
     would hold those solves twice."""
     # --- act / assert -----------------
     with pytest.raises(BenchmarkRunError, match=r"ran the solvers \['bisection'\] on the test problems"):
-        run_info.check_combinable_with(_run_info_of(["bisection", "regula_falsi"], ["f2.1.1[p1=0.2]"]))
+        run_info.check_combinable_with(_run_info_of(["bisection", "regula_falsi"], ["f2.1.3[n=3.0,s=0.2]"]))

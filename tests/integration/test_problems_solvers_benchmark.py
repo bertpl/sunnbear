@@ -33,8 +33,8 @@ SOLVER_IDS = ("bisection", "regula_falsi")
 
 @pytest.fixture(scope="module")
 def cubic() -> problems.TestProblem:
-    """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to a range of ``c``."""
-    return FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
+    """Return the shipped cubic, ``0.2*x + 0.8*x^3 + c`` on ``[-1, 1]``, calibrated to a range of ``c``."""
+    return FormulaRegistry.candidate_from_id("f2.1.3[n=3.0,s=0.2]").calibrated(c_min=-0.9, c_max=0.9)
 
 
 @pytest.fixture(scope="module")

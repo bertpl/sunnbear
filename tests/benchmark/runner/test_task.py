@@ -54,8 +54,8 @@ class _StallingSolver(Solver):
 
 @pytest.fixture(scope="module")
 def cubic() -> problems.TestProblem:
-    """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to ``c`` in ``[-1, 1]``."""
-    return FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
+    """Return the shipped cubic, ``0.2*x + 0.8*x^3 + c`` on ``[-1, 1]``, calibrated to ``c`` in ``[-0.9, 0.9]``."""
+    return FormulaRegistry.candidate_from_id("f2.1.3[n=3.0,s=0.2]").calibrated(c_min=-0.9, c_max=0.9)
 
 
 @pytest.fixture
@@ -108,7 +108,7 @@ def test_a_task_gives_1_row_per_sample_and_solver_in_the_results_schema(cubic):
     assert results.null_count().sum_horizontal().item() == 0  # run_benchmark_task fills every schema column.
     assert results["solver_id"].to_list() == ["bisection", "regula_falsi"] * SIZE
     assert results["mc_sample_idx"].to_list() == [i for i in range(SIZE) for _ in configs]
-    assert set(results["problem_id"]) == {"f2.1.1[p1=0.2]"}
+    assert set(results["problem_id"]) == {"f2.1.3[n=3.0,s=0.2]"}
     assert set(results["mc_size"]) == {SIZE}
     assert results["u"].to_list()[::2] == mc_tuples.u.tolist()
     assert results["xtol"].is_between(xtol_min, xtol_max, closed="left").all()
@@ -182,7 +182,7 @@ def test_a_task_holds_only_ids_and_survives_pickling(cubic):
     task_copy = pickle.loads(pickle.dumps(task_on_cubic))  # noqa: S301 — the data is this test's own
 
     # --- assert -----------------------
-    assert (task_copy.problem_id, task_copy.solver_ids) == ("f2.1.1[p1=0.2]", ("bisection",))
+    assert (task_copy.problem_id, task_copy.solver_ids) == ("f2.1.3[n=3.0,s=0.2]", ("bisection",))
     assert task_copy == task_on_cubic
     assert task_copy.run().drop("wall_time_ns").equals(task_on_cubic.run().drop("wall_time_ns"))
 

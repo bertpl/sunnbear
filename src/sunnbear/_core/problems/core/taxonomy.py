@@ -57,12 +57,12 @@ class FormulaTaxonomyNode:
     # --------------------------------------------------------------------------
     @property
     def name_slug(self) -> str:
-        """Return `name` as a lowercase identifier, e.g. ``odd_power``; catalog file names carry it."""
+        """Return `name` as a lowercase identifier, e.g. ``linear_plus_odd_power``; catalog file names carry it."""
         return slugify(self.name)
 
     @property
     def label(self) -> str:
-        """Return the class name and dotted number, e.g. ``Cubic (2.1.1)``, for error messages."""
+        """Return the class name and dotted number, e.g. ``Linear (2.1.1)``, for error messages."""
         return f"{type(self).__name__} ({self.format_number(self.number)})"
 
     @classmethod
