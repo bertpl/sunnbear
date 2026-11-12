@@ -24,6 +24,6 @@ class Linear(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.3, c=0.0, expected=0.3),
-        FormulaTestCase.value(params={}, x=0.3, c=-0.5, expected=-0.2),  # exercises c
+        FormulaTestCase.value(params={}, x=0.3, c=-0.5, expected=-0.2),  # c shifts the value
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

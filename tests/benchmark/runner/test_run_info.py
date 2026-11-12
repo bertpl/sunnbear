@@ -27,7 +27,7 @@ def _run_info_of(solver_ids: list[str], problem_ids: list[str], c_max: float = 1
 
 @pytest.fixture(scope="module")
 def run_info() -> BenchmarkRunInfo:
-    """Return the run info of a run of bisection on the shipped cubic."""
+    """Return the run info of a run of bisection on the cubic of formula 2.1.3."""
     return _run_info_of(["bisection"], ["f2.1.3[n=3.0,s=0.2]"])
 
 

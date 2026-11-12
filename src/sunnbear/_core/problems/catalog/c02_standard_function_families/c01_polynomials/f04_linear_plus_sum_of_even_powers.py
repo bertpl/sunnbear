@@ -1,8 +1,8 @@
-"""This formula is a line plus the mean of the even powers up to ``n``, ``x + p*(E_n(x) - 1) + c``."""
+"""This formula is a line plus the mean ``E_n(x)`` of the even powers up to ``n``, ``x + p*(E_n(x) - 1) + c``."""
 
 from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
 
-from .helpers import is_valid_power, power_and_weight_recipes
+from .helpers import is_valid_n, power_and_weight_recipes
 
 # ``LOWEST_N`` is the lowest value of ``n``, which gives a sum of 2 terms; every valid ``n`` is even. With
 # ``n = 2`` the sum has 1 term, and the function equals the function of `LinearPlusEvenPower` at ``n = 2``.
@@ -46,12 +46,12 @@ class LinearPlusSumOfEvenPowers(Formula):
 
     def is_param_tuple_valid(self, n: float, p: float) -> bool:
         """Require ``n`` to be an even integer of at least `LOWEST_N`."""
-        return is_valid_power(n, LOWEST_N)
+        return is_valid_n(n, LOWEST_N)
 
     test_cases = (
         # E_4(0.5) = (0.25 + 0.0625)/2 = 0.15625
         FormulaTestCase.value(params={"n": 4.0, "p": 1.0}, x=0.5, c=0.0, expected=-0.34375),
-        FormulaTestCase.value(params={"n": 4.0, "p": 1.0}, x=0.5, c=0.5, expected=0.15625),  # exercises c
+        FormulaTestCase.value(params={"n": 4.0, "p": 1.0}, x=0.5, c=0.5, expected=0.15625),  # c shifts the value
         FormulaTestCase.value(params={"n": 6.0, "p": 2.0}, x=-1.0, c=0.0, expected=-1.0),  # through (-1, -1)
         FormulaTestCase.invalid(params={"n": 5.0, "p": 1.0}),  # odd highest power
         FormulaTestCase.invalid(params={"n": 4.5, "p": 1.0}),  # highest power that is not an integer

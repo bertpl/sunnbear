@@ -81,8 +81,7 @@ def test_candidates_applies_validity_filter():
 
 @pytest.mark.parametrize("formula_cls", [Linear, LinearPlusEvenPower, LinearPlusOddPower])
 def test_candidates_functions_evaluate(formula_cls):
-    """Linear, LinearPlusEvenPower and LinearPlusOddPower each produce a working f(x, c) callable, which adds c to
-    the function value."""
+    """Each formula produces a working f(x, c) callable, which adds c to the function value."""
     # --- arrange ----------------------
     candidate = formula_cls().build_all_candidates()[0]
 

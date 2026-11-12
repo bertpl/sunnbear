@@ -1,8 +1,8 @@
-"""This formula is a line plus the mean of the odd powers from 3 to ``n``, ``s*x + (1 - s)*O_n(x) + c``."""
+"""This formula is a line plus the mean ``O_n(x)`` of the odd powers from 3 to ``n``, ``s*x + (1 - s)*O_n(x) + c``."""
 
 from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
 
-from .helpers import is_valid_power, power_and_slope_recipes
+from .helpers import is_valid_n, power_and_slope_recipes
 
 # ``LOWEST_N`` is the lowest value of ``n``, which gives a sum of 2 terms; every valid ``n`` is odd. With
 # ``n = 3`` the sum has 1 term, and the function equals the function of `LinearPlusOddPower` at ``n = 3``.
@@ -46,12 +46,12 @@ class LinearPlusSumOfOddPowers(Formula):
 
     def is_param_tuple_valid(self, n: float, s: float) -> bool:
         """Require ``n`` to be an odd integer of at least `LOWEST_N`."""
-        return is_valid_power(n, LOWEST_N)
+        return is_valid_n(n, LOWEST_N)
 
     test_cases = (
         # O_5(0.5) = (0.125 + 0.03125)/2 = 0.078125
         FormulaTestCase.value(params={"n": 5.0, "s": 0.5}, x=0.5, c=0.0, expected=0.2890625),
-        FormulaTestCase.value(params={"n": 5.0, "s": 0.5}, x=0.5, c=0.25, expected=0.5390625),  # exercises c
+        FormulaTestCase.value(params={"n": 5.0, "s": 0.5}, x=0.5, c=0.25, expected=0.5390625),  # c shifts the value
         FormulaTestCase.value(params={"n": 7.0, "s": 0.0}, x=-1.0, c=0.0, expected=-1.0),  # through (-1, -1)
         FormulaTestCase.invalid(params={"n": 6.0, "s": 0.5}),  # even highest power
         FormulaTestCase.invalid(params={"n": 5.5, "s": 0.5}),  # highest power that is not an integer

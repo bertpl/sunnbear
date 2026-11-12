@@ -54,7 +54,7 @@ class _StallingSolver(Solver):
 
 @pytest.fixture(scope="module")
 def cubic() -> problems.TestProblem:
-    """Return the shipped cubic, ``0.2*x + 0.8*x^3 + c`` on ``[-1, 1]``, calibrated to ``c`` in ``[-0.9, 0.9]``."""
+    """Return the cubic ``0.2*x + 0.8*x^3 + c`` of formula 2.1.3 on ``[-1, 1]``, calibrated to a range of ``c``."""
     return FormulaRegistry.candidate_from_id("f2.1.3[n=3.0,s=0.2]").calibrated(c_min=-0.9, c_max=0.9)
 
 

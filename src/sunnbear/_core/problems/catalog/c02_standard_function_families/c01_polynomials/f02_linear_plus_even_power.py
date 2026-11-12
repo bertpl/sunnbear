@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
 
-from .helpers import is_valid_power, power_and_weight_recipes
+from .helpers import is_valid_n, power_and_weight_recipes
 
 # ``LOWEST_N`` is the lowest power ``n`` of the formula; every valid power is even.
 LOWEST_N = 2
@@ -42,11 +42,11 @@ class LinearPlusEvenPower(Formula):
 
     def is_param_tuple_valid(self, n: float, p: float) -> bool:
         """Require ``n`` to be an even integer of at least `LOWEST_N`."""
-        return is_valid_power(n, LOWEST_N)
+        return is_valid_n(n, LOWEST_N)
 
     test_cases = (
         FormulaTestCase.value(params={"n": 2.0, "p": 0.5}, x=0.5, c=0.0, expected=0.125),  # 0.5 + 0.5*(0.25 - 1)
-        FormulaTestCase.value(params={"n": 2.0, "p": 0.5}, x=0.5, c=0.25, expected=0.375),  # exercises c
+        FormulaTestCase.value(params={"n": 2.0, "p": 0.5}, x=0.5, c=0.25, expected=0.375),  # c shifts the value
         FormulaTestCase.value(params={"n": 4.0, "p": 2.0}, x=-1.0, c=0.0, expected=-1.0),  # through (-1, -1)
         FormulaTestCase.invalid(params={"n": 3.0, "p": 0.5}),  # odd power
         FormulaTestCase.invalid(params={"n": 2.5, "p": 0.5}),  # power that is not an integer

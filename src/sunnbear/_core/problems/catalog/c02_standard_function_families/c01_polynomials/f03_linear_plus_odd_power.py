@@ -2,10 +2,10 @@
 
 from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
 
-from .helpers import is_valid_power, power_and_slope_recipes
+from .helpers import is_valid_n, power_and_slope_recipes
 
 # ``LOWEST_N`` is the lowest power ``n`` of the formula; every valid power is odd. With ``n = 1`` the function is the
-# line ``x + c`` for every ``s``.
+# line ``x + c`` of `Linear` for every ``s``, so ``n = 1`` is not a valid power.
 LOWEST_N = 3
 
 
@@ -44,11 +44,11 @@ class LinearPlusOddPower(Formula):
 
     def is_param_tuple_valid(self, n: float, s: float) -> bool:
         """Require ``n`` to be an odd integer of at least `LOWEST_N`."""
-        return is_valid_power(n, LOWEST_N)
+        return is_valid_n(n, LOWEST_N)
 
     test_cases = (
         FormulaTestCase.value(params={"n": 3.0, "s": 0.5}, x=0.5, c=0.0, expected=0.3125),  # 0.25 + 0.5*0.125
-        FormulaTestCase.value(params={"n": 3.0, "s": 0.5}, x=0.5, c=-0.1, expected=0.2125),  # exercises c
+        FormulaTestCase.value(params={"n": 3.0, "s": 0.5}, x=0.5, c=-0.1, expected=0.2125),  # c shifts the value
         FormulaTestCase.value(params={"n": 3.0, "s": 0.0}, x=0.5, c=0.0, expected=0.125),  # the power alone
         FormulaTestCase.value(params={"n": 5.0, "s": -1.0}, x=-1.0, c=0.0, expected=-1.0),  # through (-1, -1)
         FormulaTestCase.invalid(params={"n": 4.0, "s": 0.5}),  # even power

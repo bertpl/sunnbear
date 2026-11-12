@@ -4,8 +4,9 @@ import pytest
 
 from sunnbear._core.problems.core import FormulaRegistry
 
-# The formula number, number of powers and number of values of the other parameter of each polynomial formula.
-FORMULA_PARAMS = [
+# Each entry holds a polynomial formula's number, its number of powers ``n``, and its number of values of ``p`` or
+# ``s``.
+CANDIDATE_GRID_SIZES = [
     pytest.param((2, 1, 1), 1, 1, id="linear"),
     pytest.param((2, 1, 2), 5, 41, id="linear_plus_even_power"),
     pytest.param((2, 1, 3), 4, 42, id="linear_plus_odd_power"),
@@ -15,15 +16,17 @@ FORMULA_PARAMS = [
 
 
 def test_the_parametrization_names_every_polynomial_formula():
-    """`FORMULA_PARAMS` names exactly the formulas of category 2.1."""
+    """`CANDIDATE_GRID_SIZES` names exactly the formulas of category 2.1."""
     # --- act --------------------------
-    category_numbers = {formula.number for formula in FormulaRegistry.formulas() if formula.number[:2] == (2, 1)}
+    formula_numbers_in_category = {
+        formula.number for formula in FormulaRegistry.formulas() if formula.number[:2] == (2, 1)
+    }
 
     # --- assert -----------------------
-    assert {param.values[0] for param in FORMULA_PARAMS} == category_numbers
+    assert {param.values[0] for param in CANDIDATE_GRID_SIZES} == formula_numbers_in_category
 
 
-@pytest.mark.parametrize("formula_number, n_powers, n_values_per_power", FORMULA_PARAMS)
+@pytest.mark.parametrize("formula_number, n_powers, n_values_per_power", CANDIDATE_GRID_SIZES)
 def test_every_candidate_passes_through_the_same_points_at_the_bounds(formula_number, n_powers, n_values_per_power):
     """Each formula combines every power with every value of its other parameter, and at ``c = 0`` every candidate
     passes through ``(-1, -1)`` and ``(1, 1)``, the bounds of its interval."""
