@@ -1,8 +1,12 @@
 """This category holds polynomial formulas.
 
-Every formula of the category uses the interval ``[-1, 1]``, adds ``c`` to the function value, and passes through
-``(-1, -1)`` and ``(1, 1)`` at ``c = 0``. The category holds polynomials only: a power function with a fractional or
-negative exponent is not one.
+Every formula of the category:
+
+- uses the interval ``[-1, 1]``;
+- adds ``c`` to the function value;
+- passes through ``(-1, -1)`` and ``(1, 1)`` at ``c = 0``.
+
+The category holds polynomials only: a power function with a fractional or negative exponent is not one.
 """
 
 from sunnbear._core.problems.core import FormulaCategory

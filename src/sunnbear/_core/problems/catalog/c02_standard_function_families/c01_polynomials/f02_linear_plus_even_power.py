@@ -4,15 +4,15 @@ from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
 
 from .helpers import is_valid_power, power_and_weight_recipes
 
-# The lowest power ``n`` of the formula; every valid power is even.
-LOWEST_POWER = 2
+# ``LOWEST_N`` is the lowest power ``n`` of the formula; every valid power is even.
+LOWEST_N = 2
 
 
 class LinearPlusEvenPower(Formula):
     """`LinearPlusEvenPower` is the polynomial ``x + p*(x^n - 1) + c`` with an even power ``n``.
 
-    At ``c = 0`` the function passes through ``(-1, -1)`` and ``(1, 1)``. For a positive weight ``p`` it is convex,
-    with 1 root in ``[-1, 1]``, to the right of 0.
+    At ``c = 0`` the function passes through ``(-1, -1)`` and ``(1, 1)``. For a positive weight ``p`` the function is
+    convex, and at ``c = 0`` it has 1 root in ``[-1, 1]``, to the right of 0.
 
     - ``p`` is the weight of the power term. As ``p`` grows, the root moves toward the right bound and the curvature
       at the root grows.
@@ -38,11 +38,11 @@ class LinearPlusEvenPower(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipes that combine every even power with every weight."""
-        return power_and_weight_recipes(LOWEST_POWER)
+        return power_and_weight_recipes(LOWEST_N)
 
     def is_param_tuple_valid(self, n: float, p: float) -> bool:
-        """Require ``n`` to be an even integer of at least 2."""
-        return is_valid_power(n, LOWEST_POWER)
+        """Require ``n`` to be an even integer of at least `LOWEST_N`."""
+        return is_valid_power(n, LOWEST_N)
 
     test_cases = (
         FormulaTestCase.value(params={"n": 2.0, "p": 0.5}, x=0.5, c=0.0, expected=0.125),  # 0.5 + 0.5*(0.25 - 1)

@@ -4,9 +4,9 @@ from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
 
 from .helpers import is_valid_power, power_and_slope_recipes
 
-# The lowest power ``n`` of the formula; every valid power is odd. With ``n = 1`` the function is the line ``x + c``
-# for every ``s``.
-LOWEST_POWER = 3
+# ``LOWEST_N`` is the lowest power ``n`` of the formula; every valid power is odd. With ``n = 1`` the function is the
+# line ``x + c`` for every ``s``.
+LOWEST_N = 3
 
 
 class LinearPlusOddPower(Formula):
@@ -21,8 +21,8 @@ class LinearPlusOddPower(Formula):
     - below 0, the function has a local maximum left of 0 and a local minimum right of 0, and 3 roots in ``[-1, 1]``
       while ``abs(c)`` stays below the height of those extrema.
 
-    ``c`` adds to the function value, so it moves the root away from 0: the root of ``x^n + c`` has multiplicity
-    ``n`` only at ``c = 0``.
+    ``c`` adds to the function value, so ``c`` moves the root away from 0. At ``s = 0`` the function is ``x^n + c``,
+    whose root has multiplicity ``n`` only at ``c = 0``.
     """
 
     number = (2, 1, 3)
@@ -40,11 +40,11 @@ class LinearPlusOddPower(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipes that combine every odd power with every slope."""
-        return power_and_slope_recipes(LOWEST_POWER)
+        return power_and_slope_recipes(LOWEST_N)
 
     def is_param_tuple_valid(self, n: float, s: float) -> bool:
-        """Require ``n`` to be an odd integer of at least 3."""
-        return is_valid_power(n, LOWEST_POWER)
+        """Require ``n`` to be an odd integer of at least `LOWEST_N`."""
+        return is_valid_power(n, LOWEST_N)
 
     test_cases = (
         FormulaTestCase.value(params={"n": 3.0, "s": 0.5}, x=0.5, c=0.0, expected=0.3125),  # 0.25 + 0.5*0.125

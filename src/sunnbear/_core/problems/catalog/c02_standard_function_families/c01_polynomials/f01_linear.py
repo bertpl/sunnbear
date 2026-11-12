@@ -4,10 +4,7 @@ from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
 
 
 class Linear(Formula):
-    """`Linear` is the line ``x + c``, whose root is at ``-c``.
-
-    ``c`` adds to the function value, as in the other polynomial formulas.
-    """
+    """`Linear` is the line ``x + c``, whose root is at ``-c``."""
 
     number = (2, 1, 1)
     name = "Linear"

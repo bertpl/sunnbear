@@ -4,9 +4,9 @@ from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
 
 from .helpers import is_valid_power, power_and_weight_recipes
 
-# The lowest highest-power ``n`` of the formula, which gives a sum of 2 terms; every valid ``n`` is even. With
-# ``n = 2`` the function is `LinearPlusEvenPower`'s.
-LOWEST_POWER = 4
+# ``LOWEST_N`` is the lowest value of ``n``, which gives a sum of 2 terms; every valid ``n`` is even. With
+# ``n = 2`` the sum has 1 term, and the function equals the function of `LinearPlusEvenPower` at ``n = 2``.
+LOWEST_N = 4
 
 
 class LinearPlusSumOfEvenPowers(Formula):
@@ -17,9 +17,7 @@ class LinearPlusSumOfEvenPowers(Formula):
 
     - ``p`` is the weight of the sum, as in `LinearPlusEvenPower`.
     - ``n`` adds higher powers, which steepen the function toward the bounds. The term ``x^2`` keeps the function
-      curved around 0 for every ``n``, where a single high power is nearly flat.
-
-    ``c`` adds to the function value.
+      curved around 0 for every ``n``, whereas a single high power is nearly flat there.
     """
 
     number = (2, 1, 4)
@@ -31,11 +29,11 @@ class LinearPlusSumOfEvenPowers(Formula):
         """Evaluate ``x + p*(E_n(x) - 1) + c``."""
         n_terms = int(n) // 2
         x_squared = x * x
-        power = 1.0
+        term = 1.0
         sum_of_powers = 0.0
         for _ in range(n_terms):
-            power *= x_squared
-            sum_of_powers += power
+            term *= x_squared
+            sum_of_powers += term
         return x + p * (sum_of_powers / n_terms - 1.0) + c
 
     def interval_bounds(self, n: float, p: float) -> tuple[float, float]:
@@ -44,11 +42,11 @@ class LinearPlusSumOfEvenPowers(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipes that combine every even highest power with every weight."""
-        return power_and_weight_recipes(LOWEST_POWER)
+        return power_and_weight_recipes(LOWEST_N)
 
     def is_param_tuple_valid(self, n: float, p: float) -> bool:
-        """Require ``n`` to be an even integer of at least 4."""
-        return is_valid_power(n, LOWEST_POWER)
+        """Require ``n`` to be an even integer of at least `LOWEST_N`."""
+        return is_valid_power(n, LOWEST_N)
 
     test_cases = (
         # E_4(0.5) = (0.25 + 0.0625)/2 = 0.15625

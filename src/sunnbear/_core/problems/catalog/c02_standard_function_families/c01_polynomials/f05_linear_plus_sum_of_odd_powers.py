@@ -4,9 +4,9 @@ from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
 
 from .helpers import is_valid_power, power_and_slope_recipes
 
-# The lowest highest-power ``n`` of the formula, which gives a sum of 2 terms; every valid ``n`` is odd. With
-# ``n = 3`` the function is `LinearPlusOddPower`'s.
-LOWEST_POWER = 5
+# ``LOWEST_N`` is the lowest value of ``n``, which gives a sum of 2 terms; every valid ``n`` is odd. With
+# ``n = 3`` the sum has 1 term, and the function equals the function of `LinearPlusOddPower` at ``n = 3``.
+LOWEST_N = 5
 
 
 class LinearPlusSumOfOddPowers(Formula):
@@ -17,9 +17,7 @@ class LinearPlusSumOfOddPowers(Formula):
 
     - ``s`` is the slope at ``x = 0``, as in `LinearPlusOddPower`.
     - ``n`` adds higher powers, which steepen the function toward the bounds. The term ``x^3`` dominates around 0
-      for every ``n``, where a single high power is much flatter.
-
-    ``c`` adds to the function value.
+      for every ``n``, whereas a single high power is much flatter there.
     """
 
     number = (2, 1, 5)
@@ -31,11 +29,11 @@ class LinearPlusSumOfOddPowers(Formula):
         """Evaluate ``s*x + (1 - s)*O_n(x) + c``."""
         n_terms = (int(n) - 1) // 2
         x_squared = x * x
-        power = x
+        term = x
         sum_of_powers = 0.0
         for _ in range(n_terms):
-            power *= x_squared
-            sum_of_powers += power
+            term *= x_squared
+            sum_of_powers += term
         return s * x + (1.0 - s) * sum_of_powers / n_terms + c
 
     def interval_bounds(self, n: float, s: float) -> tuple[float, float]:
@@ -44,11 +42,11 @@ class LinearPlusSumOfOddPowers(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipes that combine every odd highest power with every slope."""
-        return power_and_slope_recipes(LOWEST_POWER)
+        return power_and_slope_recipes(LOWEST_N)
 
     def is_param_tuple_valid(self, n: float, s: float) -> bool:
-        """Require ``n`` to be an odd integer of at least 5."""
-        return is_valid_power(n, LOWEST_POWER)
+        """Require ``n`` to be an odd integer of at least `LOWEST_N`."""
+        return is_valid_power(n, LOWEST_N)
 
     test_cases = (
         # O_5(0.5) = (0.125 + 0.03125)/2 = 0.078125

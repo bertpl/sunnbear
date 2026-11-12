@@ -4,17 +4,26 @@ import pytest
 
 from sunnbear._core.problems.core import FormulaRegistry
 
+# The formula number, number of powers and number of values of the other parameter of each polynomial formula.
+FORMULA_PARAMS = [
+    pytest.param((2, 1, 1), 1, 1, id="linear"),
+    pytest.param((2, 1, 2), 5, 41, id="linear_plus_even_power"),
+    pytest.param((2, 1, 3), 4, 42, id="linear_plus_odd_power"),
+    pytest.param((2, 1, 4), 4, 41, id="linear_plus_sum_of_even_powers"),
+    pytest.param((2, 1, 5), 3, 42, id="linear_plus_sum_of_odd_powers"),
+]
 
-@pytest.mark.parametrize(
-    "formula_number, n_powers, n_values_per_power",
-    [
-        pytest.param((2, 1, 1), 1, 1, id="linear"),
-        pytest.param((2, 1, 2), 5, 41, id="linear_plus_even_power"),
-        pytest.param((2, 1, 3), 4, 42, id="linear_plus_odd_power"),
-        pytest.param((2, 1, 4), 4, 41, id="linear_plus_sum_of_even_powers"),
-        pytest.param((2, 1, 5), 3, 42, id="linear_plus_sum_of_odd_powers"),
-    ],
-)
+
+def test_the_parametrization_names_every_polynomial_formula():
+    """`FORMULA_PARAMS` names exactly the formulas of category 2.1."""
+    # --- act --------------------------
+    category_numbers = {formula.number for formula in FormulaRegistry.formulas() if formula.number[:2] == (2, 1)}
+
+    # --- assert -----------------------
+    assert {param.values[0] for param in FORMULA_PARAMS} == category_numbers
+
+
+@pytest.mark.parametrize("formula_number, n_powers, n_values_per_power", FORMULA_PARAMS)
 def test_every_candidate_passes_through_the_same_points_at_the_bounds(formula_number, n_powers, n_values_per_power):
     """Each formula combines every power with every value of its other parameter, and at ``c = 0`` every candidate
     passes through ``(-1, -1)`` and ``(1, 1)``, the bounds of its interval."""

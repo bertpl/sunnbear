@@ -50,7 +50,7 @@ def test_candidates_materializes_recipe_grid():
 
 @pytest.mark.usefixtures("isolated_formula_registry")
 def test_candidates_applies_validity_filter():
-    """The candidates hold only the recipe's tuples that `is_param_tuple_valid` accepts."""
+    """The candidates hold only the recipe's tuples that pass `is_param_tuple_valid`."""
 
     # --- arrange ----------------------
     class OddOnly(Formula):
@@ -81,7 +81,8 @@ def test_candidates_applies_validity_filter():
 
 @pytest.mark.parametrize("formula_cls", [Linear, LinearPlusEvenPower, LinearPlusOddPower])
 def test_candidates_functions_evaluate(formula_cls):
-    """Each polynomial formula produces a working f(x, c) callable, which adds c to the function value."""
+    """Linear, LinearPlusEvenPower and LinearPlusOddPower each produce a working f(x, c) callable, which adds c to
+    the function value."""
     # --- arrange ----------------------
     candidate = formula_cls().build_all_candidates()[0]
 
