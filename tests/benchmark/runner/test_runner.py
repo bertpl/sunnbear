@@ -25,8 +25,8 @@ _EXTERNAL_SOLVER_CONFIG_MODULE_NAME = f"{__name__.rpartition('.')[0]}.external_s
 #  Fixtures
 # ==================================================================================================
 # The test problems of the 2 formulas alternate in the list, so the tests check that the run groups them by
-# formula: both test problems of f2.1.3 run first.
-_PROBLEM_IDS = ("f2.1.3[n=3.0,s=0.2]", "f2.1.5[n=5.0,s=0.5]", "f2.1.3[n=3.0,s=0.4]")
+# formula: both test problems of f99.801 run first.
+_PROBLEM_IDS = ("f99.801[p1=0.2]", "f99.802[p1=3.0]", "f99.801[p1=0.4]")
 _SOLVER_IDS = ("bisection", "regula_falsi")
 
 
@@ -38,7 +38,7 @@ def _run_inputs(run_dir: Path, **changes: object) -> dict[str, object]:
     return {
         "solver_configs": [SolverConfigRegistry.config_from_id(solver_id) for solver_id in _SOLVER_IDS],
         "problems": [
-            FormulaRegistry.candidate_from_id(problem_id).calibrated(-0.9, 0.9) for problem_id in _PROBLEM_IDS
+            FormulaRegistry.candidate_from_id(problem_id).calibrated(-1.0, 1.0) for problem_id in _PROBLEM_IDS
         ],
         "run_dir": run_dir,
         "root_seed": 1,
@@ -70,16 +70,16 @@ def test_a_run_writes_1_results_file_per_formula_and_loads_every_solve(finished_
 
     # --- assert -----------------------
     assert sorted(path.name for path in finished_run_dir.iterdir()) == [
-        "f2.1.3.parquet",
-        "f2.1.5.parquet",
+        "f99.801.parquet",
+        "f99.802.parquet",
         "run_info.json",
     ]
     assert dict(results.schema) == RESULTS_SCHEMA
     assert results.height == len(_PROBLEM_IDS) * len(_SOLVER_IDS) * MC_SIZE
     assert results["problem_id"].unique(maintain_order=True).to_list() == [
-        "f2.1.3[n=3.0,s=0.2]",
-        "f2.1.3[n=3.0,s=0.4]",
-        "f2.1.5[n=5.0,s=0.5]",
+        "f99.801[p1=0.2]",
+        "f99.801[p1=0.4]",
+        "f99.802[p1=3.0]",
     ]
 
 
@@ -154,7 +154,7 @@ def test_a_crashed_run_resumes_with_only_its_unfinished_tasks(finished_run_dir, 
 
     # --- assert -----------------------
     # The 1st task's results were staged before the crash, so only the crashed task and the next one run.
-    assert problem_ids_run == ["f2.1.3[n=3.0,s=0.4]", "f2.1.5[n=5.0,s=0.5]"]
+    assert problem_ids_run == ["f99.801[p1=0.4]", "f99.802[p1=3.0]"]
     assert _results_without_wall_time(tmp_path).equals(_results_without_wall_time(finished_run_dir))
 
 
@@ -187,8 +187,8 @@ def test_a_run_that_stopped_before_writing_a_results_file_writes_it_from_the_sta
     run_benchmark(**_run_inputs(tmp_path))
 
     # --- assert -----------------------
-    # The results of both test problems of f2.1.3 were staged before the crash, so only f2.1.5's task runs.
-    assert problem_ids_run == ["f2.1.5[n=5.0,s=0.5]"]
+    # The results of both test problems of f99.801 were staged before the crash, so only f99.802's task runs.
+    assert problem_ids_run == ["f99.802[p1=3.0]"]
     assert _results_without_wall_time(tmp_path).equals(_results_without_wall_time(finished_run_dir))
 
 
@@ -199,7 +199,7 @@ def test_a_run_that_stopped_before_writing_a_results_file_writes_it_from_the_sta
         ({"mc_size": 64}, "run_settings"),
         ({"solver_configs": [SolverConfigRegistry.config_from_id("bisection")]}, "solver_versions"),
         (
-            {"problems": [FormulaRegistry.candidate_from_id("f2.1.3[n=3.0,s=0.2]").calibrated(-0.5, 0.5)]},
+            {"problems": [FormulaRegistry.candidate_from_id("f99.801[p1=0.2]").calibrated(-0.5, 0.5)]},
             "problem_infos",
         ),
     ],
@@ -217,8 +217,8 @@ def test_resuming_with_other_inputs_is_refused(finished_run_dir, changes, differ
         ({"solver_configs": []}, "solver_configs must hold at least 1 item"),
         ({"problems": []}, "problems must hold at least 1 item"),
         (
-            {"problems": [FormulaRegistry.candidate_from_id("f2.1.3[n=3.0,s=0.2]").calibrated(-0.9, 0.9)] * 2},
-            r"problems holds these ids more than once: \['f2.1.3\[n=3.0,s=0.2\]'\]",
+            {"problems": [FormulaRegistry.candidate_from_id("f99.801[p1=0.2]").calibrated(-1.0, 1.0)] * 2},
+            r"problems holds these ids more than once: \['f99.801\[p1=0.2\]'\]",
         ),
         ({"mc_size": 33}, "size must be one of"),
         ({"n_bisection_fevals": 1}, "n_bisection_fevals must be at least 2"),

@@ -3,24 +3,17 @@ import math
 import pytest
 from counted_float import FlopCountingContext
 
-from sunnbear._core.problems.catalog.c02_standard_function_families.c01_polynomials.f01_linear import Linear
-from sunnbear._core.problems.catalog.c02_standard_function_families.c01_polynomials.f02_linear_plus_even_power import (
-    LinearPlusEvenPower,
-)
-from sunnbear._core.problems.catalog.c02_standard_function_families.c01_polynomials.f03_linear_plus_odd_power import (
-    LinearPlusOddPower,
-)
 from sunnbear._core.problems.core import (
     Formula,
     FormulaRegistry,
     ParamAxis,
     ParamGrid,
-    ParamNotation,
     ParamRecipe,
     ProblemId,
 )
 from sunnbear._core.problems.core.exceptions import InvalidParamsError, UnknownFormulaError
 
+from .example_formulas import ExampleCubic, ExampleOddPower
 from .example_taxonomy_nodes import define_formula_cls
 
 
@@ -33,60 +26,35 @@ def test_formulas_contains_catalog_sorted():
 
     # --- assert -----------------------
     assert [f.number for f in registered] == sorted(f.number for f in registered)
-    assert {type(f) for f in registered} >= {Linear, LinearPlusEvenPower, LinearPlusOddPower}
+    assert {type(f) for f in registered} >= {ExampleCubic, ExampleOddPower}
 
 
 def test_candidates_materializes_recipe_grid():
     # --- act --------------------------
-    candidates = list(LinearPlusEvenPower().build_all_candidates())
+    cubic_candidates = list(ExampleCubic().build_all_candidates())
 
     # --- assert -----------------------
-    # The grid is the product of 5 powers and 41 weights, with the power as the outer axis.
-    weights = [ParamNotation.POW10.build_value_from_argument(-1.0 + 0.1 * i) for i in range(41)]
-    assert [c.id.param_values for c in candidates] == [(n, p) for n in (2.0, 4.0, 6.0, 8.0, 10.0) for p in weights]
-    assert all(c.id.formula_number == LinearPlusEvenPower.number for c in candidates)
-    assert all((c.a, c.b) == (-1.0, 1.0) for c in candidates)
+    assert [c.id.param_values for c in cubic_candidates] == [(0.0,), (0.2,), (0.4,), (0.6,), (0.8,), (1.0,)]
+    assert all(c.id.formula_number == ExampleCubic.number for c in cubic_candidates)
+    assert all((c.a, c.b) == (-2.0, 2.0) for c in cubic_candidates)
 
 
-@pytest.mark.usefixtures("isolated_formula_registry")
 def test_candidates_applies_validity_filter():
-    """The candidates hold only the recipe's tuples that pass `is_param_tuple_valid`."""
-
-    # --- arrange ----------------------
-    class OddOnly(Formula):
-        number = (99, 997)
-        name = "Odd only"
-        param_names = ("p1",)
-        jit = False
-
-        @staticmethod
-        def parametrized_fun(x: float, c: float, p1: float) -> float:
-            return x - c
-
-        def interval_bounds(self, p1: float) -> tuple[float, float]:
-            return (-1.0, 1.0)
-
-        def recipes(self) -> tuple[ParamRecipe, ...]:
-            return (ParamGrid.decimal("p1", 1.0, 4.0, 1.0),)
-
-        def is_param_tuple_valid(self, p1: float) -> bool:
-            return int(p1) % 2 == 1
-
     # --- act --------------------------
-    candidates = OddOnly().build_all_candidates()
+    odd_candidates = list(ExampleOddPower().build_all_candidates())
 
     # --- assert -----------------------
-    assert [c.id.param_values for c in candidates] == [(1.0,), (3.0,)]
+    assert [c.id.param_values for c in odd_candidates] == [(1.0,), (3.0,), (5.0,), (7.0,)]
 
 
-@pytest.mark.parametrize("formula_cls", [Linear, LinearPlusEvenPower, LinearPlusOddPower])
+@pytest.mark.parametrize("formula_cls", [ExampleCubic, ExampleOddPower])
 def test_candidates_functions_evaluate(formula_cls):
-    """Each formula produces a working f(x, c) callable, which adds c to the function value."""
+    """The cubic and the odd power each produce a working f(x, c) callable."""
     # --- arrange ----------------------
-    candidate = formula_cls().build_all_candidates()[0]
+    candidate = formula_cls().build_all_candidates()[0]  # p1 = 0.0 resp. 1.0
 
     # --- act / assert -----------------
-    assert candidate.xc_fun(0.5, 1.0) == pytest.approx(candidate.xc_fun(0.5, 0.0) + 1.0)
+    assert candidate.xc_fun(2.0, 1.0) == pytest.approx(candidate.xc_fun(2.0, 0.0) - 1.0)
 
 
 @pytest.mark.usefixtures("isolated_formula_registry")
@@ -149,9 +117,9 @@ def test_zero_param_formula_yields_exactly_one_candidate():
 def test_registry_holds_one_instance_per_formula():
     """Enumeration and reconstruction hand out the same registered instance."""
     # --- act --------------------------
-    [enumerated] = [f for f in FormulaRegistry.formulas() if type(f) is LinearPlusOddPower]
-    candidate_a = FormulaRegistry.candidate_from_id("f2.1.3[n=3.0,s=0.2]")
-    candidate_b = FormulaRegistry.candidate_from_id("f2.1.3[n=3.0,s=0.4]")
+    [enumerated] = [f for f in FormulaRegistry.formulas() if type(f) is ExampleCubic]
+    candidate_a = FormulaRegistry.candidate_from_id("f99.801[p1=0.2]")
+    candidate_b = FormulaRegistry.candidate_from_id("f99.801[p1=0.4]")
 
     # --- assert -----------------------
     assert candidate_a.formula is candidate_b.formula is enumerated
@@ -368,11 +336,11 @@ def test_every_catalog_formula_validates():
 # ==================================================================================================
 def test_compiled_formula_is_cached_per_class():
     # --- arrange ----------------------
-    first_instance, second_instance = LinearPlusEvenPower(), LinearPlusEvenPower()
+    first_instance, second_instance = ExampleCubic(), ExampleCubic()
 
     # --- act / assert -----------------
     assert first_instance._compiled_formula() is second_instance._compiled_formula()
-    assert LinearPlusEvenPower()._compiled_formula() is not LinearPlusOddPower()._compiled_formula()
+    assert ExampleCubic()._compiled_formula() is not ExampleOddPower()._compiled_formula()
 
 
 @pytest.mark.usefixtures("isolated_formula_registry")
@@ -433,7 +401,7 @@ def test_bound_formula_calls_math_functions_inside_flop_counting():
 
     # compile another formula first, as the earlier solves of a run do, so that numba has loaded its registries
     # before `Sine` is bound
-    Linear().build_all_candidates()[0].xc_fun(0.0, 0.0)
+    ExampleCubic().build_all_candidates()[0].xc_fun(0.0, 0.0)
     x_fun = Sine().bind_x_fun((), 0.25)
 
     # --- act --------------------------
@@ -450,27 +418,26 @@ def test_bound_formula_calls_math_functions_inside_flop_counting():
 def test_candidate_from_id_and_string():
     """A `ProblemId` and its rendered string rebuild the same calibrated test problem."""
     # --- act --------------------------
-    problem_id = ProblemId((2, 1, 3), ("n", "s"), (3.0, 0.2))
-    problem_from_id = FormulaRegistry.candidate_from_id(problem_id).calibrated(-0.5, 0.5)
-    problem_from_str = FormulaRegistry.candidate_from_id("f2.1.3[n=3.0,s=0.2]").calibrated(-0.5, 0.5)
+    problem_from_id = FormulaRegistry.candidate_from_id(ProblemId((99, 801), ("p1",), (0.2,))).calibrated(-5.0, 5.0)
+    problem_from_str = FormulaRegistry.candidate_from_id("f99.801[p1=0.2]").calibrated(-5.0, 5.0)
 
     # --- assert -----------------------
     for problem in (problem_from_id, problem_from_str):
-        assert problem.id == problem_id
-        assert (problem.a, problem.b, problem.c_min, problem.c_max) == (-1.0, 1.0, -0.5, 0.5)
-        assert problem.xc_fun(0.5, 0.0) == pytest.approx(0.1 + 0.8 * 0.125)
+        assert problem.id == ProblemId((99, 801), ("p1",), (0.2,))
+        assert (problem.a, problem.b, problem.c_min, problem.c_max) == (-2.0, 2.0, -5.0, 5.0)
+        assert problem.xc_fun(2.0, 0.0) == pytest.approx(8.0 - 0.4)
 
 
 def test_build_x_fun():
     """`build_x_fun` fixes `c` and returns the test problem's function as a function of `x` alone."""
     # --- arrange ----------------------
-    problem = FormulaRegistry.candidate_from_id("f2.1.3[n=3.0,s=0.0]").calibrated(-0.5, 0.5)
+    problem = FormulaRegistry.candidate_from_id("f99.801[p1=0.0]").calibrated(-5.0, 5.0)
 
     # --- act --------------------------
-    f = problem.build_x_fun(c=0.25)
+    f = problem.build_x_fun(c=1.0)
 
     # --- assert -----------------------
-    assert f(0.5) == pytest.approx(0.125 + 0.25)
+    assert f(2.0) == pytest.approx(7.0)
 
 
 def test_candidate_from_id_unknown_formula():
@@ -483,16 +450,16 @@ def test_candidate_from_id_invalid_params():
     """An id whose parameter values fail the formula's validity criteria raises `InvalidParamsError`."""
     with pytest.raises(InvalidParamsError):
         FormulaRegistry.candidate_from_id(
-            ProblemId((2, 1, 3), ("n", "s"), (4.0, 0.2))  # even power: invalid
+            ProblemId((99, 802), ("p1",), (2.0,))  # even power: invalid
         )
 
 
 @pytest.mark.parametrize(
     "text",
     [
-        "f2.1.3[n=3.0,slope=0.2]",  # wrong name
-        "f2.1.3[n=3.0]",  # parameter missing
-        "f2.1.3[n=3.0,s=0.2,p2=0.4]",  # extra parameter
+        "f99.801[slope=0.2]",  # wrong name
+        "f99.801",  # parameter missing
+        "f99.801[p1=0.2,p2=0.4]",  # extra parameter
     ],
 )
 def test_candidate_from_id_rejects_param_names_that_differ_from_the_formula(text):
@@ -503,8 +470,8 @@ def test_candidate_from_id_rejects_param_names_that_differ_from_the_formula(text
 
 def test_catalog_brackets_change_sign_within_c_range():
     # --- arrange ----------------------
-    problem = FormulaRegistry.candidate_from_id("f2.1.3[n=5.0,s=0.0]").calibrated(-0.9, 0.9)
+    problem = FormulaRegistry.candidate_from_id("f99.802[p1=5.0]").calibrated(-1.0, 1.0)
 
     # --- act / assert -----------------
-    for c in (-0.9, 0.0, 0.9):
+    for c in (-1.0, 0.0, 1.0):
         assert problem.xc_fun(problem.a, c) * problem.xc_fun(problem.b, c) < 0

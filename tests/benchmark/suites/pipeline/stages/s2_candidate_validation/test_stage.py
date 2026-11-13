@@ -62,7 +62,7 @@ def test_the_stage_gives_the_same_results_with_1_or_2_workers():
     formulas = [
         formula
         for formula in FormulaRegistry.formulas()
-        if formula.number[:3] in {(1, 4, 2), (2, 1, 1)} or formula.number == (1, 4, 1, 6)
+        if formula.number[:3] == (1, 4, 2) or formula.number in {(1, 4, 1, 6), (99, 801)}
     ]
     module_names = {type(formula).__module__ for formula in formulas}
 

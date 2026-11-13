@@ -25,14 +25,28 @@ import pytest
 
 import sunnbear
 from sunnbear._core.problems.core import FormulaRegistry
+from sunnbear._core.utils.class_origin import is_sunnbear_module
 from sunnbear.solvers import SolverConfigRegistry
+
+# Importing the module registers the example formulas that the tests of the framework use, in every test process.
+from tests.problems import example_formulas  # noqa: F401
 
 
 @pytest.fixture
 def isolated_formula_registry(monkeypatch):
     """Give the test its own copy of the formula registry, so the formulas and categories that a test defines don't stay
-    registered after the test."""
-    monkeypatch.setattr(FormulaRegistry, "_formulas_by_number", dict(FormulaRegistry._formulas_by_number))
+    registered after the test.
+
+    The copy holds only sunnbear's own formulas. It leaves out the example formulas of
+    `tests.problems.example_formulas`, so that a test is free to define formulas or subcategories under the
+    user-defined category.
+    """
+    sunnbear_formulas = {
+        number: formula
+        for number, formula in FormulaRegistry._formulas_by_number.items()
+        if is_sunnbear_module(type(formula).__module__)
+    }
+    monkeypatch.setattr(FormulaRegistry, "_formulas_by_number", sunnbear_formulas)
     monkeypatch.setattr(FormulaRegistry, "_categories_by_number", dict(FormulaRegistry._categories_by_number))
     monkeypatch.setattr(FormulaRegistry, "_is_taxonomy_validated", False)
 

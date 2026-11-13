@@ -122,11 +122,12 @@ def test_node_outside_sunnbear_under_builtin_only_top_level_fails_on_read(define
 def test_candidate_from_id_checks_the_taxonomy_first():
     """`candidate_from_id` raises `FormulaTaxonomyError` for an invalid tree, even for a registered formula's id."""
     # --- arrange ----------------------
-    define_formula_cls((99, 7, 1))
+    define_formula_cls((99, 5))  # registered, and valid by itself
+    define_formula_cls((99, 7, 1))  # category (99, 7) is not defined
 
     # --- act / assert -----------------
     with pytest.raises(FormulaTaxonomyError):
-        FormulaRegistry.candidate_from_id("f2.1.3[n=3.0,s=0.2]")
+        FormulaRegistry.candidate_from_id("f99.5")
 
 
 @pytest.mark.usefixtures("isolated_formula_registry")

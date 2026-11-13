@@ -17,13 +17,13 @@ from sunnbear._core.stats import gpq
 from sunnbear.solvers import Bisection, RegulaFalsi, Solver, SolveResult, SolveStatus
 
 # A batch of shift values for the cubic fixture below, inside the range it is calibrated for.
-C_VALUES = np.linspace(-0.9, 0.9, 5)
+C_VALUES = np.linspace(-1.0, 1.0, 5)
 
 
 @pytest.fixture(scope="module")
 def cubic() -> problems.TestProblem:
-    """Return the cubic ``0.2*x + 0.8*x^3 + c`` of formula 2.1.3 on ``[-1, 1]``, calibrated to a range of ``c``."""
-    return FormulaRegistry.candidate_from_id("f2.1.3[n=3.0,s=0.2]").calibrated(c_min=-0.9, c_max=0.9)
+    """Return the example cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to ``c`` in ``[-1, 1]``."""
+    return FormulaRegistry.candidate_from_id("f99.801[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
 
 
 def _solve_batch(solver: Solver, cubic: problems.TestProblem, xtol: float) -> list[SolveResult]:
@@ -31,7 +31,7 @@ def _solve_batch(solver: Solver, cubic: problems.TestProblem, xtol: float) -> li
     return [solver.solve(cubic.build_x_fun(c), cubic.a, cubic.b, xtol=xtol, max_fevals=200) for c in C_VALUES]
 
 
-def test_a_shipped_function_is_solved_by_both_solvers_with_counted_flops(cubic):
+def test_an_example_function_is_solved_by_both_solvers_with_counted_flops(cubic):
     """Both solvers end inside the cubic's interval with counted flops; Bisection converges with a small residual."""
     # --- act --------------------------
     results = {solver.name: _solve_batch(solver, cubic, 1e-9) for solver in (Bisection(), RegulaFalsi())}
@@ -44,7 +44,7 @@ def test_a_shipped_function_is_solved_by_both_solvers_with_counted_flops(cubic):
             assert cubic.a <= result.x <= cubic.b, (name, c)
     for c, result in zip(C_VALUES, results["bisection"], strict=True):
         assert result.status is SolveStatus.CONVERGED
-        # The slope on the cubic's interval is at most 2.6, so the residual at a converged estimate is small.
+        # The slope on the cubic's interval is at most 12, so the residual at a converged estimate is small.
         assert abs(cubic.build_x_fun(c)(result.x)) < 1e-6
 
 
