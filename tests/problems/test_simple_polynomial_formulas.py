@@ -1,4 +1,4 @@
-"""The simple polynomial formulas (category 2.1) give the expected candidates, with shared values at the bounds."""
+"""The simple polynomial formulas (category 2.1) give the expected candidates, which share values at the bounds."""
 
 import pytest
 
