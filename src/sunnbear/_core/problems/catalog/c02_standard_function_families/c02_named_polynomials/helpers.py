@@ -1,20 +1,20 @@
-"""This module holds what the named polynomial formulas share: their degrees and the rule for their intervals.
+"""This module holds the rule for a valid degree, and what the formulas of the Jacobi polynomials share.
 
-`is_valid_degree` serves every formula. `SWEPT_DEGREES` and `jacobi_interval_bounds` serve the 5 formulas whose
-polynomials are orthogonal on ``[-1, 1]``.
+`is_valid_degree` serves every formula of the category. `JACOBI_SWEPT_DEGREES` and `jacobi_interval_bounds` serve
+the formulas whose polynomials are orthogonal on ``[-1, 1]``.
 
-Each of those 5 is a Jacobi polynomial ``P_n^(alpha, beta)`` up to a constant factor, so 1 rule gives the interval of
-all of them, from the degree and the 2 parameters of that Jacobi polynomial.
+Each of those polynomials is a Jacobi polynomial ``P_n^(alpha, beta)`` up to a constant factor, so 1 rule gives the
+interval of all of them, from the degree and the 2 parameters of that Jacobi polynomial.
 """
 
 import math
 
-# Each formula on ``[-1, 1]`` sweeps these degrees: each degree up to 32, then an even and an odd degree at each power
-# of 2 up to 1024. An even and an odd degree differ in their intervals (`jacobi_interval_bounds`), so the high degrees
-# come in pairs too. Neighboring high degrees give nearly the same kind of function, so above 32 the sweep keeps only
-# 2 degrees per power of 2. It ends at 1025, where a recurrence over the degrees already takes about 1000 steps per
-# evaluation.
-SWEPT_DEGREES = (
+# Each of the formulas whose polynomials are orthogonal on ``[-1, 1]`` sweeps these degrees: each degree up to 32,
+# then an even and an odd degree at each power of 2 up to 1024. An even and an odd degree differ in their intervals
+# (`jacobi_interval_bounds`), so the high degrees come in pairs too. Neighboring high degrees give nearly the same
+# kind of function, so above 32 the sweep keeps only 2 degrees per power of 2. It ends at 1025, where a recurrence
+# over the degrees already takes about 1000 steps per evaluation.
+JACOBI_SWEPT_DEGREES = (
     *(float(degree) for degree in range(1, 33)),
     *(2.0**exponent + parity for exponent in range(6, 11) for parity in (0.0, 1.0)),
 )

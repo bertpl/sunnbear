@@ -4,7 +4,7 @@ import itertools
 
 from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamRecipe, ParamTable
 
-from .helpers import SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
+from .helpers import JACOBI_SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
 
 # ``alpha`` and ``beta`` have to be above this value: the Jacobi polynomials are orthogonal on ``[-1, 1]`` only above
 # it.
@@ -82,7 +82,7 @@ class JacobiPolynomial(Formula):
         return jacobi_interval_bounds(n, alpha, beta)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipe that combines the degrees of `SWEPT_DEGREES` with 6 values of ``alpha`` and of ``beta``.
+        """Return the recipe that combines `JACOBI_SWEPT_DEGREES` with 6 values of ``alpha`` and of ``beta``.
 
         Both parameters take -0.75 and the values from -0.5 to 1.5 in steps of 0.5:
 
@@ -92,7 +92,7 @@ class JacobiPolynomial(Formula):
           formula's ``alpha`` is 0.5 higher than the ``alpha`` and ``beta`` here.
         """
         alpha_beta_values = (-0.75, *ParamAxis("alpha", -0.5, 1.5, 0.5).values())
-        rows = tuple(itertools.product(SWEPT_DEGREES, alpha_beta_values, alpha_beta_values))
+        rows = tuple(itertools.product(JACOBI_SWEPT_DEGREES, alpha_beta_values, alpha_beta_values))
         return (ParamTable(names=self.param_names, rows=rows),)
 
     def is_param_tuple_valid(self, n: float, alpha: float, beta: float) -> bool:

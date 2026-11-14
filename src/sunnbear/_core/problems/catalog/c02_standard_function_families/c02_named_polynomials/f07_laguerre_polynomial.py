@@ -8,7 +8,6 @@ from .helpers import is_valid_degree
 
 # Above this degree the value at the upper bound of the interval overflows.
 HIGHEST_VALID_DEGREE = 256
-# The recipe sweeps the degrees up to this one.
 HIGHEST_SWEPT_DEGREE = 20
 
 
@@ -23,19 +22,21 @@ class LaguerrePolynomial(Formula):
     - next to 0, the zeros lie about ``1/n`` apart and the amplitude stays below 1;
     - toward ``4*n + 2``, the zeros spread out and the amplitude grows about as ``exp(x/2)``.
 
-    ``c`` shifts ``x`` without a divisor. The range of ``c`` then differs between an odd and an even ``n``:
+    ``c`` shifts ``x`` by ``c`` itself, not by ``c/n^2`` as in the formulas whose polynomials are orthogonal on
+    ``[-1, 1]``. The range of ``c`` then differs between an odd and an even ``n``:
 
-    - for an odd ``n``, the function can slide far to the right, where the zeros lie far apart, and only a little to
-      the left, where the lowest zero lies close to the lower bound 0;
-    - for an even ``n``, the lower bound lies between 2 of the close zeros next to 0, which limits the slide on both
-      sides.
+    - for an odd ``n``, ``c`` can shift the function far to the right, where the zeros lie far apart, and only a
+      little to the left, where the lowest zero lies close to the lower bound 0;
+    - for an even ``n``, the lower bound lies between 2 of the close zeros next to 0, which limits the shift in both
+      directions.
 
-    The polynomial needs no division: ``L_n(0) = 1`` for every ``n``.
+    The polynomial is not divided by a constant, because its amplitude next to 0 already stays below 1:
+    ``L_n(0) = 1`` for every ``n``.
 
     References:
-        - NIST Digital Library of Mathematical Functions, §18.3, for the definition; §18.9(i), for the recurrence;
-          and §18.16(iv), for the zeros. https://dlmf.nist.gov/18.3, https://dlmf.nist.gov/18.9 and
-          https://dlmf.nist.gov/18.16
+        - NIST Digital Library of Mathematical Functions, §18.3, for the definition. https://dlmf.nist.gov/18.3
+        - NIST Digital Library of Mathematical Functions, §18.9(i), for the recurrence. https://dlmf.nist.gov/18.9
+        - NIST Digital Library of Mathematical Functions, §18.16(iv), for the zeros. https://dlmf.nist.gov/18.16
     """
 
     number = (2, 2, 7)

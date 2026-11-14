@@ -8,7 +8,6 @@ from .helpers import is_valid_degree
 
 # Above this degree the values at the bounds of the interval overflow.
 HIGHEST_VALID_DEGREE = 512
-# The recipe sweeps the degrees up to this one.
 HIGHEST_SWEPT_DEGREE = 40
 # This factor is ``2^(-1/3)`` times the mean of 2.338 and 4.088, the absolute values of the first 2 zeros of the Airy
 # function Ai.
@@ -32,13 +31,14 @@ class HermitePolynomial(Formula):
     in the middle of the interval is then below 1 for every ``n``, while that of ``H_n`` itself grows with the norm.
     The division moves no zero, because it only scales the function.
 
-    ``c`` shifts ``x`` without a divisor: the zeros next to the bounds lie about ``n^(-1/6)`` apart, so the range of
-    ``c`` narrows only slowly as ``n`` grows.
+    ``c`` shifts ``x`` by ``c`` itself, not by ``c/n^2`` as in the formulas whose polynomials are orthogonal on
+    ``[-1, 1]``: the zeros next to the bounds lie about ``n^(-1/6)`` apart, so the range of ``c`` narrows only slowly
+    as ``n`` grows.
 
     References:
-        - NIST Digital Library of Mathematical Functions, §18.3, for the definition and the norm; §18.9(i), for the
-          recurrence; and §18.16(v), for the zeros. https://dlmf.nist.gov/18.3, https://dlmf.nist.gov/18.9 and
-          https://dlmf.nist.gov/18.16
+        - NIST Digital Library of Mathematical Functions, §18.3, for the definition and the norm. https://dlmf.nist.gov/18.3
+        - NIST Digital Library of Mathematical Functions, §18.9(i), for the recurrence. https://dlmf.nist.gov/18.9
+        - NIST Digital Library of Mathematical Functions, §18.16(v), for the zeros. https://dlmf.nist.gov/18.16
     """
 
     number = (2, 2, 6)
@@ -65,8 +65,8 @@ class HermitePolynomial(Formula):
         Every zero lies inside ``[-sqrt(2*n + 1), sqrt(2*n + 1)]``, which is the interval for an odd ``n``.
 
         The lower bound for an even ``n`` lies between the 2 lowest zeros, which lie near
-        ``-(sqrt(2*n + 1) - 2^(-1/3)*abs(a_k)*(2*n + 1)^(-1/6))``, with ``a_1`` and ``a_2`` the first 2 zeros of the
-        Airy function Ai. The lower bound takes the mean of ``abs(a_1)`` and ``abs(a_2)`` for ``abs(a_k)``.
+        ``-(sqrt(2*n + 1) - 2^(-1/3)*abs(a_k)*(2*n + 1)^(-1/6))``, with ``a_k``, for ``k`` = 1 and 2, the first 2 zeros
+        of the Airy function Ai. The lower bound takes the mean of ``abs(a_1)`` and ``abs(a_2)`` for ``abs(a_k)``.
 
         That rule is an approximation; the tests check that it holds up to `HIGHEST_VALID_DEGREE`.
         """

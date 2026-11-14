@@ -1,7 +1,8 @@
 """This category holds polynomials that a reference work lists by name, such as the Legendre polynomials.
 
 A test problem needs a sign change over its interval, so the interval has to hold an odd number of the polynomial's
-real zeros. Most polynomials of the category have as many real zeros as their degree ``n``:
+real zeros. Most polynomials of the category have as many real zeros as their degree ``n``, and their interval
+depends on whether ``n`` is odd or even:
 
 - an odd ``n`` takes an interval that holds every zero;
 - an even ``n`` takes an interval that leaves out 1 zero, the lowest.
@@ -16,9 +17,9 @@ of ``c``, the number of zeros in its interval.
 The function's values at the bounds of the interval do change with ``c``, and those values decide a solver's first
 steps.
 
-The first 5 formulas hold the polynomials that are orthogonal on ``[-1, 1]``. They shift ``x`` by ``c/n^2``, because
-their zeros next to the bounds lie about ``1/n^2`` apart. `helpers` holds what else they share: `SWEPT_DEGREES` and
-the rule for their intervals.
+The formulas of the polynomials that are orthogonal on ``[-1, 1]`` come first in the category. `helpers` holds what
+they share: `JACOBI_SWEPT_DEGREES` and the rule for their intervals. Each of them but `ChebyshevFirstKindPolynomial`
+shifts ``x`` by ``c/n^2``, because its zeros next to the bounds lie about ``1/n^2`` apart.
 """
 
 from sunnbear._core.problems.core import FormulaCategory

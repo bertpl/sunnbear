@@ -22,7 +22,7 @@ from sunnbear._core.problems.catalog.c02_standard_function_families.c02_named_po
 )
 from sunnbear._core.problems.core import FormulaRegistry
 
-# The references through mpmath compute with this many decimal digits.
+# The reference functions that use mpmath compute with this many decimal digits.
 MPMATH_DIGITS = 50
 
 
@@ -94,10 +94,14 @@ def _bernoulli_amplitude(n: float, a: float, b: float) -> float:
     return 2.0 * math.factorial(int(n)) / (2.0 * math.pi) ** n
 
 
-# Each entry holds a named polynomial formula's number, its number of candidates, the function that gives the formula's
-# value from scipy or mpmath, and the function that gives the scale of a candidate's values near its zeros, from its
-# parameters. The comparison with the reference allows an absolute error of 1e-9 times that scale. The scale is 0 for
-# a formula that is a product of factors: its values span many orders of magnitude, and each is accurate relative to
+# Each entry holds, for a named polynomial formula:
+# - its number;
+# - its number of candidates;
+# - the function that gives the formula's value from scipy or mpmath;
+# - the function that gives the scale of a candidate's values near its zeros, from its parameters.
+#
+# `test_every_formula_agrees_with_its_reference` scales its absolute tolerance by that scale. The scale is 0 for a
+# formula that is a product of factors: its values span many orders of magnitude, and each is accurate relative to
 # its own size.
 NAMED_POLYNOMIAL_FORMULAS = [
     pytest.param((2, 2, 1), 42, _chebyshev_first_kind, lambda *params: 1.0, id="chebyshev_first_kind"),
@@ -110,20 +114,6 @@ NAMED_POLYNOMIAL_FORMULAS = [
     pytest.param((2, 2, 8), 11 + 9 + 5, _bernoulli, _bernoulli_amplitude, id="bernoulli"),
     pytest.param((2, 2, 9), 40, _wilkinson, lambda *params: 0.0, id="wilkinson"),
     pytest.param((2, 2, 10), 20, _second_wilkinson, lambda *params: 0.0, id="second_wilkinson"),
-]
-
-# Each entry holds the number of a formula that takes even degrees, and the function that gives, for a degree, an x
-# below every zero of that degree's polynomial at ``c = 0``.
-X_BELOW_EVERY_ZERO_PER_FORMULA = [
-    pytest.param((2, 2, 1), lambda n: -1.0, id="chebyshev_first_kind"),
-    pytest.param((2, 2, 2), lambda n: -1.0, id="chebyshev_second_kind"),
-    pytest.param((2, 2, 3), lambda n: -1.0, id="legendre"),
-    pytest.param((2, 2, 4), lambda n: -1.0, id="gegenbauer"),
-    pytest.param((2, 2, 5), lambda n: -1.0, id="jacobi"),
-    pytest.param((2, 2, 6), lambda n: -math.sqrt(2.0 * n + 1.0), id="hermite"),
-    pytest.param((2, 2, 7), lambda n: 0.0, id="laguerre"),
-    pytest.param((2, 2, 9), lambda n: 0.0, id="wilkinson"),
-    pytest.param((2, 2, 10), lambda n: 2.0 ** -(n + 1.0), id="second_wilkinson"),
 ]
 
 # `test_every_formula_agrees_with_its_reference` compares a formula with its reference at these degrees, where the
@@ -149,23 +139,11 @@ def test_the_parametrization_names_every_named_polynomial_formula():
     assert {param.values[0] for param in NAMED_POLYNOMIAL_FORMULAS} == formula_numbers_in_category
 
 
-def test_every_formula_with_an_even_degree_is_checked_for_the_zero_that_it_leaves_out():
-    """`X_BELOW_EVERY_ZERO_PER_FORMULA` names exactly the formulas of category 2.2 with a candidate of even degree."""
-    # --- act --------------------------
-    formula_numbers_with_an_even_degree = {
-        formula.number
-        for formula in FormulaRegistry.formulas()
-        if formula.number[:2] == (2, 2)
-        and any(candidate.id.param_values[0] % 2 == 0 for candidate in formula.build_all_candidates())
-    }
-
-    # --- assert -----------------------
-    assert {param.values[0] for param in X_BELOW_EVERY_ZERO_PER_FORMULA} == formula_numbers_with_an_even_degree
-
-
-@pytest.mark.parametrize("formula_number, n_candidates, reference_fun, value_scale_fun", NAMED_POLYNOMIAL_FORMULAS)
+@pytest.mark.parametrize(
+    "formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun", NAMED_POLYNOMIAL_FORMULAS
+)
 def test_every_candidate_has_opposite_signs_at_the_bounds_of_its_interval(
-    formula_number, n_candidates, reference_fun, value_scale_fun
+    formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun
 ):
     """A formula gives its expected number of candidates, each with opposite signs at its 2 bounds at ``c = 0``."""
     # --- arrange ----------------------
@@ -181,9 +159,13 @@ def test_every_candidate_has_opposite_signs_at_the_bounds_of_its_interval(
         assert min(value_at_a, value_at_b) < 0.0 < max(value_at_a, value_at_b), candidate.id
 
 
-@pytest.mark.parametrize("formula_number, x_below_every_zero", X_BELOW_EVERY_ZERO_PER_FORMULA)
-def test_the_interval_of_an_even_degree_leaves_out_1_zero(formula_number, x_below_every_zero):
-    """Between an x below every zero and the lower bound of an even degree's interval, the sign changes exactly once."""
+@pytest.mark.parametrize(
+    "formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun", NAMED_POLYNOMIAL_FORMULAS
+)
+def test_the_interval_of_an_even_degree_leaves_out_1_zero(
+    formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun
+):
+    """From the lower bound of the next odd degree's interval to an even degree's lower bound, the sign changes once."""
     # --- arrange ----------------------
     [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
     even_degree_candidates = [
@@ -193,16 +175,21 @@ def test_the_interval_of_an_even_degree_leaves_out_1_zero(formula_number, x_belo
 
     # --- act / assert -----------------
     for candidate in even_degree_candidates:
-        x_lowest = x_below_every_zero(candidate.id.param_values[0])
+        # The interval of the next odd degree holds every zero of that degree, and its lower bound lies below every
+        # zero of this even degree too.
+        n, *other_params = candidate.id.param_values
+        x_lowest = formula.interval_bounds(n + 1.0, *other_params)[0]
         x_values = [x_lowest + (candidate.a - x_lowest) * step / n_steps for step in range(n_steps + 1)]
         is_positive_per_x = [value > 0.0 for x in x_values if (value := candidate.xc_fun(x, 0.0)) != 0.0]
         n_sign_changes = sum(1 for before, after in itertools.pairwise(is_positive_per_x) if before != after)
         assert n_sign_changes == 1, candidate.id
 
 
-@pytest.mark.parametrize("formula_number, n_candidates, reference_fun, value_scale_fun", NAMED_POLYNOMIAL_FORMULAS)
-def test_every_formula_agrees_with_its_reference(formula_number, n_candidates, reference_fun, value_scale_fun):
-    """At the degrees of `COMPARED_DEGREES`, a formula's value equals its reference's across the interval, for 3 c."""
+@pytest.mark.parametrize(
+    "formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun", NAMED_POLYNOMIAL_FORMULAS
+)
+def test_every_formula_agrees_with_its_reference(formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun):
+    """At each degree of `COMPARED_DEGREES`, a formula equals its reference across the interval, for 3 values of c."""
     # --- arrange ----------------------
     [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
     compared_candidates = [
@@ -210,9 +197,11 @@ def test_every_formula_agrees_with_its_reference(formula_number, n_candidates, r
     ]
 
     # --- act / assert -----------------
+    # Each formula sweeps only some of `COMPARED_DEGREES`; requiring 4 of them keeps a recipe change from leaving the
+    # comparison with almost no degrees.
     assert len({candidate.id.param_values[0] for candidate in compared_candidates}) >= 4
     for candidate in compared_candidates:
-        abs_tolerance = 1e-9 * value_scale_fun(*candidate.id.param_values)
+        abs_tolerance = 1e-9 * abs_tolerance_scale_fun(*candidate.id.param_values)
         for x in np.linspace(candidate.a, candidate.b, 7):
             for c in (0.0, 0.4, -0.3):
                 expected = reference_fun(float(x), c, *candidate.id.param_values)
@@ -258,14 +247,11 @@ def test_the_interval_rule_holds_up_to_the_highest_valid_degree(formula_number, 
     [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
     degrees = [2, 3, 4, 8, 16, 33, 64, 128, highest_valid_degree - 1, highest_valid_degree]
 
+    # --- act / assert -----------------
     for n in degrees:
         zeros = np.sort(scipy_roots_fun(n)[0])
-
-        # --- act --------------------------
         a, b = formula.interval_bounds(float(n))
         values_at_bounds = [formula.bind_xc_fun((float(n),))(bound, 0.0) for bound in (a, b)]
-
-        # --- assert -----------------------
         if n % 2 == 0:
             assert zeros[0] < a < zeros[1], n
         else:

@@ -5,7 +5,7 @@ import math
 
 from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamRecipe, ParamTable
 
-from .helpers import SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
+from .helpers import JACOBI_SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
 
 # ``alpha`` has to be above this value: the Gegenbauer polynomials are orthogonal on ``[-1, 1]`` only above it, and at
 # this value their outermost zeros lie on the bounds -1 and 1.
@@ -80,7 +80,7 @@ class GegenbauerPolynomial(Formula):
         return jacobi_interval_bounds(n, alpha - 0.5, alpha - 0.5)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipe that combines the degrees of `SWEPT_DEGREES` with ``alpha`` from -0.4 to 2 in steps of 0.2.
+        """Return the recipe that combines `JACOBI_SWEPT_DEGREES` with ``alpha`` from -0.4 to 2 in steps of 0.2.
 
         - The sweep starts at -0.4, the lowest multiple of 0.2 above `ALPHA_EXCLUSIVE_LOWER_LIMIT`.
         - The sweep ends at 2: at that ``alpha`` and a degree above 100, the amplitude in the middle of ``[-1, 1]`` is
@@ -88,7 +88,7 @@ class GegenbauerPolynomial(Formula):
           further and gives no other kind of function.
         """
         alpha_values = ParamAxis("alpha", -0.4, 2.0, 0.2).values()
-        return (ParamTable(names=self.param_names, rows=tuple(itertools.product(SWEPT_DEGREES, alpha_values))),)
+        return (ParamTable(names=self.param_names, rows=tuple(itertools.product(JACOBI_SWEPT_DEGREES, alpha_values))),)
 
     def is_param_tuple_valid(self, n: float, alpha: float) -> bool:
         """Require ``n`` to be an integer of at least 1, and ``alpha`` to be in its valid range."""

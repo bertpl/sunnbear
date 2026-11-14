@@ -4,7 +4,6 @@ from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamGrid, Pa
 
 from .helpers import is_valid_degree
 
-# The recipe sweeps the degrees up to this one.
 HIGHEST_SWEPT_DEGREE = 40
 
 
@@ -26,7 +25,8 @@ class WilkinsonPolynomial(Formula):
     Each factor is divided by ``k``, which divides the polynomial by ``n!``: the function is then 1 at the upper
     bound for every ``n``. The division moves no zero, because it only scales the function.
 
-    ``c`` shifts ``x`` without a divisor, because the zeros lie 1 apart for every ``n``.
+    ``c`` shifts ``x`` by ``c`` itself, not by ``c/n^2`` as in the formulas whose polynomials are orthogonal on
+    ``[-1, 1]``, because the zeros lie 1 apart for every ``n``.
 
     References:
         - Wilkinson, J. H. (1959). The evaluation of the zeros of ill-conditioned polynomials. Part I. Numerische

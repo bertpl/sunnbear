@@ -7,7 +7,8 @@ from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, Pa
 
 from .helpers import is_valid_degree
 
-# The table of the Bernoulli numbers ends at this degree, which is also the highest degree that the recipes sweep.
+# `BERNOULLI_NUMBERS` holds the Bernoulli numbers up to this index, and the recipes sweep the degrees up to it. A
+# higher degree adds real zeros only slowly, about 1 per 4 degrees.
 HIGHEST_VALID_DEGREE = 49
 # Each entry holds the lowest and the highest degree of a recipe, and the bounds ``a`` and ``b`` of the interval that
 # the recipe gives to every odd degree between them.
@@ -16,24 +17,6 @@ DEGREE_RANGES_WITH_INTERVALS = (
     (23.0, 39.0, -2.5, 3.5),
     (41.0, 49.0, -3.5, 4.5),
 )
-
-
-def _compute_bernoulli_numbers(highest_index: int) -> tuple[float, ...]:
-    """Return the Bernoulli numbers ``B_0`` to ``B_highest_index``, with ``B_1 = -1/2``.
-
-    The numbers follow in exact arithmetic from ``sum over k = 0..m of binomial(m + 1, k)*B_k = 0`` for every ``m`` of
-    at least 1, and are rounded to floats at the end.
-    """
-    numbers = [Fraction(1)]
-    for m in range(1, highest_index + 1):
-        sum_of_lower_terms = sum((math.comb(m + 1, k) * numbers[k] for k in range(m)), start=Fraction(0))
-        numbers.append(-sum_of_lower_terms / (m + 1))
-    return tuple(float(number) for number in numbers)
-
-
-# `BernoulliPolynomial.parametrized_fun` reads this table as a global, because numba compiles that function without
-# its class.
-BERNOULLI_NUMBERS = _compute_bernoulli_numbers(HIGHEST_VALID_DEGREE)
 
 
 class BernoulliPolynomial(Formula):
@@ -45,19 +28,23 @@ class BernoulliPolynomial(Formula):
     - ``n`` is the degree, an odd integer from 1 to `HIGHEST_VALID_DEGREE`.
     - ``a`` and ``b`` are the bounds of the interval, which lie equally far from 0.5, so that ``a + b = 1``.
 
-    The interval is a parameter because no formula gives it: most zeros of ``B_n`` are complex, and the number of
-    real zeros does not grow steadily with ``n``, so the largest real zero does not either. Each recipe therefore
-    gives 1 interval to a range of degrees, wide enough to hold every real zero of each of them.
+    The interval is a parameter because no closed-form expression gives it: most zeros of ``B_n`` are complex, and
+    the number of real zeros does not grow steadily with ``n``, so the largest real zero does not either.
+
+    Each recipe therefore gives 1 interval to a range of degrees, and the interval is wide enough to hold every real
+    zero of each degree in that range.
 
     Only an odd ``n`` is valid. ``B_n(1 - x) = (-1)^n * B_n(x)``, so on an interval around 0.5 an odd degree has
     opposite signs at the 2 bounds, while an even degree has the same sign at both.
 
-    ``c`` shifts ``x`` without a divisor, because the zeros lie 0.5 apart for every ``n``.
+    ``c`` shifts ``x`` by ``c`` itself, not by ``c/n^2`` as in the formulas whose polynomials are orthogonal on
+    ``[-1, 1]``, because the zeros lie 0.5 apart for every ``n``.
 
     References:
-        - NIST Digital Library of Mathematical Functions, §24.2(i), for the definition; §24.4(i) and §24.4(ii), for
-          the 2 identities that `parametrized_fun` uses; and §24.12(i), for the real zeros. https://dlmf.nist.gov/24.2,
-          https://dlmf.nist.gov/24.4 and https://dlmf.nist.gov/24.12
+        - NIST Digital Library of Mathematical Functions, §24.2(i), for the definition. https://dlmf.nist.gov/24.2
+        - NIST Digital Library of Mathematical Functions, §24.4(i) and §24.4(ii), for the difference equation and the
+          symmetry. https://dlmf.nist.gov/24.4
+        - NIST Digital Library of Mathematical Functions, §24.12(i), for the real zeros. https://dlmf.nist.gov/24.12
     """
 
     number = (2, 2, 8)
@@ -70,7 +57,8 @@ class BernoulliPolynomial(Formula):
 
         Evaluating ``B_n(y) = sum over k = 0..n of binomial(n, k)*B_k*y^(n-k)`` at ``y`` itself loses accuracy near
         the zeros as ``n`` and ``abs(y)`` grow, because its terms cancel. The terms cancel far less on ``[0, 1)``, so
-        the function evaluates the sum only there and reaches every other ``y`` in 2 steps.
+        the function evaluates the sum only there, and reaches every other ``y`` through 2 identities: a reflection
+        about 0.5, and steps of 1 along x.
         """
         degree = int(n)
         y = x - c
@@ -101,8 +89,8 @@ class BernoulliPolynomial(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return 1 recipe per entry of `DEGREE_RANGES_WITH_INTERVALS`: its odd degrees, on its interval.
 
-        Each interval has round bounds and ends at the degree up to which it is safe: in every candidate the largest
-        real zero lies at least 0.25 inside the upper bound, and at the next odd degree it would reach that bound.
+        Each interval has round bounds, and in every candidate the largest real zero lies at least 0.25 inside the
+        upper bound. `[-1.5, 2.5]` would lose that margin at degree 25, and `[-2.5, 3.5]` at degree 41.
         """
         return tuple(
             ParamGrid(
@@ -139,3 +127,24 @@ class BernoulliPolynomial(Formula):
         FormulaTestCase.invalid(params={"n": 3.0, "a": -1.5, "b": 3.0}),  # interval that is not centered on 0.5
         FormulaTestCase.interval_bounds(params={"n": 3.0, "a": -1.5, "b": 2.5}, expected=(-1.5, 2.5)),
     )
+
+
+# ==================================================================================================
+#  Helpers
+# ==================================================================================================
+def _compute_bernoulli_numbers(highest_index: int) -> tuple[float, ...]:
+    """Return the Bernoulli numbers ``B_0`` to ``B_highest_index``, with ``B_1 = -1/2``.
+
+    The numbers follow in exact arithmetic from ``sum over k = 0..m of binomial(m + 1, k)*B_k = 0`` for every ``m`` of
+    at least 1, and are rounded to floats at the end.
+    """
+    numbers = [Fraction(1)]
+    for m in range(1, highest_index + 1):
+        sum_of_lower_terms = sum((math.comb(m + 1, k) * numbers[k] for k in range(m)), start=Fraction(0))
+        numbers.append(-sum_of_lower_terms / (m + 1))
+    return tuple(float(number) for number in numbers)
+
+
+# `BernoulliPolynomial.parametrized_fun` reads this table as a global, because numba compiles that function without
+# its class.
+BERNOULLI_NUMBERS = _compute_bernoulli_numbers(HIGHEST_VALID_DEGREE)
