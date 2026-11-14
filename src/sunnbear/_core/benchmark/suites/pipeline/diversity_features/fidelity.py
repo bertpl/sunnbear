@@ -17,8 +17,9 @@ class FeatureFidelity(Enum):
     - `COARSE` and `FULL` are the fidelities of coarse and of full characterization in full mode;
     - `COARSE_DRAFT` and `FULL_DRAFT` are their fidelities in draft mode.
 
-    `COARSE_DRAFT` differs from `COARSE` only in its snuffled analyses: it runs fewer of them, each at a lower budget,
-    because snuffled's analyses take most of the time to compute a feature vector.
+    The draft fidelities differ from `COARSE` only in their snuffled analyses, because snuffled's analyses take most of
+    the time to compute a feature vector: both run each analysis at a lower budget, and `COARSE_DRAFT` also runs fewer
+    analyses.
 
     A member's value starts with the member's name. An enum merges members with equal values into 1 member, and the
     name keeps 2 fidelities with the same settings apart.
@@ -33,7 +34,7 @@ class FeatureFidelity(Enum):
     COARSE = ("COARSE", MCTuplesSize.SIZE_32, 32, SnuffledAnalysisBudget.LOW)
     FULL = ("FULL", MCTuplesSize.SIZE_1024, 64, SnuffledAnalysisBudget.HIGH)
     COARSE_DRAFT = ("COARSE_DRAFT", MCTuplesSize.SIZE_32, 8, SnuffledAnalysisBudget.VERY_LOW)
-    FULL_DRAFT = ("FULL_DRAFT", MCTuplesSize.SIZE_32, 32, SnuffledAnalysisBudget.LOW)
+    FULL_DRAFT = ("FULL_DRAFT", MCTuplesSize.SIZE_32, 32, SnuffledAnalysisBudget.VERY_LOW)
 
     def __init__(
         self,
