@@ -1,5 +1,5 @@
-"""`WorkerPool` runs tasks in this process for 1 worker, and splits items into batches without splitting the items
-that share a key.
+"""`WorkerPool` runs tasks in this process for 1 worker, and splits items into batches that keep the items of 1 key
+together where they fit.
 
 With 2 or more workers, the tasks run in worker processes that:
 
@@ -132,31 +132,75 @@ def test_a_pool_with_workers_runs_no_task_outside_its_with_block():
 # ==================================================================================================
 #  Splitting into batches
 # ==================================================================================================
+_ITEMS_IN_GROUPS_OF_7_2_3 = ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "b1", "b2", "c1", "c2", "c3"]
+
+
 @pytest.mark.parametrize(
-    "items, n_workers, batches_expected",
+    "items, n_workers, max_batch_size, batches_expected",
     [
         # With 1 worker, the 8 groups of 1 item fill 4 batches of 2 items.
-        (["a", "b", "c", "d", "e", "f", "g", "h"], 1, [["a", "b"], ["c", "d"], ["e", "f"], ["g", "h"]]),
+        (["a", "b", "c", "d", "e", "f", "g", "h"], 1, None, [["a", "b"], ["c", "d"], ["e", "f"], ["g", "h"]]),
         # With 2 workers, the 8 items fill 8 batches of 1 item.
-        (["a", "b", "c", "d", "e", "f", "g", "h"], 2, [["a"], ["b"], ["c"], ["d"], ["e"], ["f"], ["g"], ["h"]]),
-        # A group larger than a batch's maximum of 2 items forms a batch of its own, and no batch splits a group.
-        (["a1", "a2", "a3", "b1", "c1", "c2"], 1, [["a1", "a2", "a3"], ["b1"], ["c1", "c2"]]),
+        (["a", "b", "c", "d", "e", "f", "g", "h"], 2, None, [["a"], ["b"], ["c"], ["d"], ["e"], ["f"], ["g"], ["h"]]),
+        # A group that fits in a batch's maximum of 2 items stays together.
+        (["a1", "b1", "b2", "c1", "c2", "d1"], 1, None, [["a1"], ["b1", "b2"], ["c1", "c2"], ["d1"]]),
+        # A group larger than a batch's maximum of 2 items is split into batches that hold no other group.
+        (["a1", "a2", "a3", "b1", "c1", "c2"], 1, None, [["a1", "a2"], ["a3"], ["b1"], ["c1", "c2"]]),
+        # A split group's batches have nearly equal sizes: 5 items with a maximum of 4 give 3 and 2, not 4 and 1.
+        (
+            ["a1", "a2", "a3", "a4", "a5", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1", "j1", "k1", "l1"],
+            1,
+            None,
+            [["a1", "a2", "a3"], ["a4", "a5"], ["b1", "c1", "d1", "e1"], ["f1", "g1", "h1", "i1"], ["j1", "k1", "l1"]],
+        ),
         # The groups keep their order of first appearance, and the items keep their order within a group.
-        (["b1", "a1", "b2"], 1, [["b1", "b2"], ["a1"]]),
-        ([], 1, []),
+        (
+            ["b1", "a1", "b2", "c1", "d1", "e1", "f1", "g1"],
+            1,
+            None,
+            [["b1", "b2"], ["a1", "c1"], ["d1", "e1"], ["f1", "g1"]],
+        ),
+        # A `max_batch_size` above the default maximum of 3 items changes nothing.
+        (
+            _ITEMS_IN_GROUPS_OF_7_2_3,
+            1,
+            5,
+            [["a1", "a2", "a3"], ["a4", "a5", "a6"], ["a7"], ["b1", "b2"], ["c1", "c2", "c3"]],
+        ),
+        # A `max_batch_size` below the default maximum splits the groups larger than `max_batch_size`.
+        (
+            _ITEMS_IN_GROUPS_OF_7_2_3,
+            1,
+            2,
+            [["a1", "a2"], ["a3", "a4"], ["a5", "a6"], ["a7"], ["b1", "b2"], ["c1", "c2"], ["c3"]],
+        ),
+        ([], 1, None, []),
     ],
 )
-def test_items_are_split_into_batches_of_whole_groups(items, n_workers, batches_expected):
-    """`split_into_batches` keeps the items that share a first letter in 1 batch, in about `TARGET_BATCHES_PER_WORKER`
-    batches per worker."""
+def test_items_are_split_into_batches_that_keep_a_fitting_group_together(
+    items, n_workers, max_batch_size, batches_expected
+):
+    """`split_into_batches` splits the items into about `TARGET_BATCHES_PER_WORKER` batches per worker, as follows:
+
+    - the items that share a first letter stay in 1 batch where they fit, and are split over batches of their own
+      where they do not;
+    - a `max_batch_size` below the default maximum lowers the maximum.
+    """
     # --- arrange ----------------------
     worker_pool = WorkerPool(n_workers=n_workers)
 
     # --- act --------------------------
-    batches = worker_pool.split_into_batches(items, group_key=lambda item: item[0])
+    batches = worker_pool.split_into_batches(items, group_key=lambda item: item[0], max_batch_size=max_batch_size)
 
     # --- assert -----------------------
     assert batches == batches_expected
+
+
+def test_a_max_batch_size_below_1_is_refused():
+    """A `max_batch_size` below 1 raises `ValueError`."""
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match="max_batch_size must be at least 1"):
+        WorkerPool(n_workers=1).split_into_batches(["a"], group_key=lambda item: item, max_batch_size=0)
 
 
 # ==================================================================================================

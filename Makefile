@@ -1,5 +1,6 @@
 file_path=
 MODE=draft
+N_WORKERS=
 
 help:
 	@echo 'Commands:'
@@ -24,6 +25,7 @@ help:
 	@echo ''
 	@echo '  format-single-file             - accepts `file_path=<path>` to pass the relative path of the file to be formatted.'
 	@echo '  benchmark-suites-build-details - accepts `MODE=draft` (the default) or `MODE=full` to set how much work the pipeline does.'
+	@echo '                                 - accepts `N_WORKERS=<n>` to set the number of worker processes (default: 1 per logical CPU).'
 
 build:
 	uv build;
@@ -58,7 +60,7 @@ splash:
 	./.github/scripts/create_splash.sh "$$(uv version --short)-dev";
 
 benchmark-suites-build-details:
-	uv run python scripts/generate_benchmark_suites_build_details.py --workspace script_outputs/benchmark_suites_build_details --mode $(MODE)
+	uv run python scripts/generate_benchmark_suites_build_details.py --workspace script_outputs/benchmark_suites_build_details --mode $(MODE) $(if $(N_WORKERS),--n-workers $(N_WORKERS))
 
 release:
 	@test -n "$(VERSION)" || (echo "Usage: make release VERSION=X.Y.Z" && exit 1)
