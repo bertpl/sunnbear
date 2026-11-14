@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import c01_polynomials
+from . import c01_simple_polynomials
 
 
 class StandardFunctionFamilies(FormulaCategory):

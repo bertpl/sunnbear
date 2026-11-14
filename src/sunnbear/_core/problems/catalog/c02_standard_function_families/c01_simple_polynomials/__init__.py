@@ -1,4 +1,4 @@
-"""This category holds polynomial formulas.
+"""This category holds simple polynomial formulas: a line, alone or combined with a power or a sum of powers.
 
 Every formula of the category adds ``c`` to the function value, and at ``c = 0`` its values at the bounds of its
 interval are the same for every parameter tuple. The calibrated range of ``c`` is therefore the same for all of a
@@ -19,8 +19,8 @@ from . import (
 )
 
 
-class Polynomials(FormulaCategory):
-    """`Polynomials` is the category of polynomial formulas."""
+class SimplePolynomials(FormulaCategory):
+    """`SimplePolynomials` is the category of simple polynomial formulas."""
 
     number = (2, 1)
-    name = "Polynomials"
+    name = "Simple polynomials"
