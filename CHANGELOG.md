@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Write a negative parameter value in a `ProblemId` as `-2^x` or `-10^x` where that is shorter than its decimal form; this changes the ids of 11 test problems
+- Write a negative parameter value in a `ProblemId` as `-2^x` or `-10^x` where that spelling is shorter than the decimal spelling; this changes the ids of 11 shipped test problems
 
 ### Deprecated
 
