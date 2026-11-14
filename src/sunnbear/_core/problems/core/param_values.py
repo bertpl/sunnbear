@@ -197,8 +197,9 @@ class ParamNotation(StrEnum):
     #  Helpers
     # --------------------------------------------------------------------------
     def _build_value_from_rounded_argument(self, argument: float) -> float:
-        """Return the value of an already rounded `argument`: the argument itself, or a power of the base with the
-        notation's sign.
+        """Return the value of an already rounded `argument`: the argument itself, or a power of the base.
+
+        A negative power notation gives the negative of that power.
 
         Raises:
             ValueError: If the power overflows to a non-finite value.
@@ -209,9 +210,7 @@ class ParamNotation(StrEnum):
             try:
                 return self._power_sign * float(self._power_base) ** argument
             except OverflowError as exc:
-                raise ValueError(
-                    f"{self._spell_rounded_argument(argument)} overflows to a non-finite value."
-                ) from exc
+                raise ValueError(f"{self._spell_rounded_argument(argument)} overflows to a non-finite value.") from exc
 
     def _spell_rounded_argument(self, argument: float) -> str:
         """Write an already rounded `argument` in this notation, e.g. ``0.4``, ``2^1.2`` or ``-10^0.3``."""
