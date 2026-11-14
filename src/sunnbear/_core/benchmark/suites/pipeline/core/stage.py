@@ -12,11 +12,11 @@ from .stage_id import PipelineStageId
 # A stage's parameter value is a JSON scalar, so that its manifest can record it.
 type PipelineStageParameterValue = bool | int | float | str
 
-# The largest number of candidates in 1 task of `PipelineStage._run_in_formula_batches`. Splitting a large formula
-# over several tasks shortens a stage, because:
+# `MAX_CANDIDATES_PER_TASK` is the largest number of candidates in 1 task of `PipelineStage._run_in_formula_batches`.
+# Splitting a large formula over several tasks shortens a stage, because:
 # - a stage cannot end before its longest task does;
-# - the time per candidate differs widely between candidates, and the neighbors of a slow candidate in a formula's
-#   order are usually slow too;
+# - the time per candidate differs widely between candidates, and the candidates next to a slow candidate in a
+#   formula's list are usually slow too, so a task of consecutive candidates can hold many slow ones;
 # - compiling a formula takes far less time than running 1 slow candidate, so splitting a formula over several workers
 #   costs little.
 MAX_CANDIDATES_PER_TASK = 50
@@ -76,9 +76,10 @@ class PipelineStage[StateAccessorT](ABC):
     ) -> dict[ProblemId, R]:
         """Return each candidate's result from `build_task`, keyed by problem id, from batches grouped by formula.
 
-        The candidates of a formula go to the same task when they fit within a batch's maximum size, which
-        `WorkerPool.split_into_batches` sets and `MAX_CANDIDATES_PER_TASK` caps, so most formulas are compiled in only
-        1 worker. A larger formula is split over several tasks, so that its candidates run in several workers.
+        Each batch becomes 1 task. A batch holds at most `MAX_CANDIDATES_PER_TASK` candidates, or fewer when
+        `WorkerPool.split_into_batches` sets a lower maximum. The candidates of a formula that fit in 1 batch go to 1
+        task, so most formulas are compiled in only 1 worker. A larger formula is split over several tasks, so that its
+        candidates run in several workers.
 
         Args:
             candidates: The candidates to run, each with a distinct problem id.

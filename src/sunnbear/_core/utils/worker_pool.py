@@ -122,15 +122,15 @@ class WorkerPool:
           items, or at most `max_batch_size` items when that is given and smaller;
         - the groups fill the batches in order of first appearance, and the items keep their order within a group;
         - a batch takes the next group as long as the batch then holds at most its maximum size;
-        - a group larger than a batch's maximum size is split into consecutive batches of nearly equal sizes, none
-          above that size, which hold no other group. A large group then runs in several workers.
+        - a group larger than a batch's maximum size is split into consecutive batches that hold no other group, of
+          nearly equal sizes and none above that maximum. A large group then runs in several workers.
 
         Args:
             items: The items to split.
             group_key: Returns the key of an item's group.
-            max_batch_size: The largest number of items in a batch, for items that take long enough that a batch of
-                the default maximum would keep 1 worker busy long after the others finish; ``None`` for the default
-                maximum alone.
+            max_batch_size: The largest number of items in a batch, or ``None`` to use the default maximum alone. Set
+                it for items that take so long that a batch of the default maximum size would keep 1 worker busy long
+                after the others finish.
 
         Raises:
             ValueError: If `max_batch_size` is below 1.

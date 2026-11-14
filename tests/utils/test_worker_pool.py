@@ -1,5 +1,5 @@
-"""`WorkerPool` runs tasks in this process for 1 worker, and splits items into batches without splitting the items
-that share a key.
+"""`WorkerPool` runs tasks in this process for 1 worker, and splits items into batches that keep the items of 1 key
+together where they fit.
 
 With 2 or more workers, the tasks run in worker processes that:
 
@@ -132,7 +132,7 @@ def test_a_pool_with_workers_runs_no_task_outside_its_with_block():
 # ==================================================================================================
 #  Splitting into batches
 # ==================================================================================================
-_TWELVE_ITEMS = ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "b1", "b2", "c1", "c2", "c3"]
+_ITEMS_IN_GROUPS_OF_7_2_3 = ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "b1", "b2", "c1", "c2", "c3"]
 
 
 @pytest.mark.parametrize(
@@ -161,10 +161,15 @@ _TWELVE_ITEMS = ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "b1", "b2", "c1", "c2
             [["b1", "b2"], ["a1", "c1"], ["d1", "e1"], ["f1", "g1"]],
         ),
         # A `max_batch_size` above the default maximum of 3 items changes nothing.
-        (_TWELVE_ITEMS, 1, 5, [["a1", "a2", "a3"], ["a4", "a5", "a6"], ["a7"], ["b1", "b2"], ["c1", "c2", "c3"]]),
+        (
+            _ITEMS_IN_GROUPS_OF_7_2_3,
+            1,
+            5,
+            [["a1", "a2", "a3"], ["a4", "a5", "a6"], ["a7"], ["b1", "b2"], ["c1", "c2", "c3"]],
+        ),
         # A `max_batch_size` below the default maximum splits the groups larger than `max_batch_size`.
         (
-            _TWELVE_ITEMS,
+            _ITEMS_IN_GROUPS_OF_7_2_3,
             1,
             2,
             [["a1", "a2"], ["a3", "a4"], ["a5", "a6"], ["a7"], ["b1", "b2"], ["c1", "c2"], ["c3"]],
@@ -175,9 +180,12 @@ _TWELVE_ITEMS = ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "b1", "b2", "c1", "c2
 def test_items_are_split_into_batches_that_keep_a_fitting_group_together(
     items, n_workers, max_batch_size, batches_expected
 ):
-    """`split_into_batches` gives about `TARGET_BATCHES_PER_WORKER` batches per worker; the items that share a first
-    letter stay in 1 batch where they fit, and are split over batches of their own where they do not; a
-    `max_batch_size` below the default maximum lowers the maximum."""
+    """`split_into_batches` splits the items into about `TARGET_BATCHES_PER_WORKER` batches per worker, as follows:
+
+    - the items that share a first letter stay in 1 batch where they fit, and are split over batches of their own
+      where they do not;
+    - a `max_batch_size` below the default maximum lowers the maximum.
+    """
     # --- arrange ----------------------
     worker_pool = WorkerPool(n_workers=n_workers)
 

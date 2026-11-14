@@ -13,8 +13,8 @@ then commits the artifact's manifest. The script:
   from which `mc_tuples` artifact;
 - publishes the artifact's data release, unless ``--no-publish`` is given for a trial run.
 
-Usage, with the workspace directory under ``script_outputs/``: in draft mode, in full mode, and with a number of
-worker processes other than 1 per logical CPU:
+Usage, with the workspace directory under ``script_outputs/``, in draft mode, in full mode, and with 12 worker
+processes, where the default is 1 per logical CPU:
 
     make benchmark-suites-build-details
     make benchmark-suites-build-details MODE=full
