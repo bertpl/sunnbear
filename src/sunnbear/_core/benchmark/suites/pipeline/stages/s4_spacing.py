@@ -1,8 +1,8 @@
 """`SpacingStage`, the fourth stage of the benchmark suite pipeline, drops near-duplicate candidates of each formula.
 
 Dense parameter grids give candidates of 1 formula whose feature vectors lie close together. Such candidates add to
-the cost of characterizing each candidate in full, and little to the diversity of the benchmark suites, so the stage
-keeps, per formula, only candidates that lie at least a minimum distance apart.
+the cost of full characterization, and little to the diversity of the benchmark suites, so the stage keeps, per formula,
+only candidates that lie at least a minimum distance apart.
 """
 
 from typing import TYPE_CHECKING

@@ -6,7 +6,6 @@ import math
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import load_first_mc_tuples
 from sunnbear._core.benchmark.protocol import CRange, MCSolveSettings
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     SNUFFLED_PROPERTIES,
@@ -83,10 +82,10 @@ def test_the_task_runs_the_snuffled_analyses_of_its_fidelity(isolated_formula_re
     [characterization] = task.run()
 
     # --- assert -----------------------
-    first_vs = load_first_mc_tuples(fidelity.n_snuffled_analyses).v
+    first_v_values = fidelity.snuffled_mc_tuples.v
     assert [(budget, mc_sample_idx) for budget, mc_sample_idx, _ in analyses] == [
         (fidelity.snuffled_budget, mc_sample_idx) for mc_sample_idx in range(fidelity.n_snuffled_analyses)
     ]
-    assert [c for _, _, c in analyses] == list(MCSolveSettings.map_v_onto_c_range(first_vs, c_range))
+    assert [c for _, _, c in analyses] == list(MCSolveSettings.map_v_onto_c_range(first_v_values, c_range))
     assert isinstance(characterization, CandidateCharacterizationResult)
     np.testing.assert_array_equal(characterization.raw_features[-len(SNUFFLED_PROPERTIES) :], 0.0)

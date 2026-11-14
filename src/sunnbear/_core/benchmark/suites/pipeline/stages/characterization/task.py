@@ -10,7 +10,6 @@ from dataclasses import dataclass
 import numpy as np
 
 from sunnbear._core.benchmark.aggregation import add_derived_results
-from sunnbear._core.benchmark.mc_tuples import load_first_mc_tuples
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, CRange, MCSolveSettings
 from sunnbear._core.benchmark.runner import BenchmarkRunSettings, BenchmarkTask
 from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED
@@ -80,15 +79,14 @@ class CandidateCharacterizationTask:
             )
 
             # --- snuffled's analyses ------------
-            n_snuffled_analyses = self.fidelity.n_snuffled_analyses
             problem = FormulaRegistry.candidate_from_id(problem_id).calibrated(c_range.c_min, c_range.c_max)
             mc_solve_settings = MCSolveSettings.from_test_problem(
                 problem,
                 n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS,
-                mc_tuples=load_first_mc_tuples(n_snuffled_analyses),
+                mc_tuples=self.fidelity.snuffled_mc_tuples,
             )
             property_values = []
-            for mc_sample_idx in range(n_snuffled_analyses):
+            for mc_sample_idx in range(self.fidelity.n_snuffled_analyses):
                 result = self.fidelity.snuffled_budget.extract_properties_or_rejection_reason(
                     problem, SNUFFLED_PROPERTIES, mc_solve_settings=mc_solve_settings, mc_sample_idx=mc_sample_idx
                 )

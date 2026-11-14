@@ -57,17 +57,6 @@ def load_mc_tuples(size: int) -> MCTuples:
     return _load_full_set().first(MCTuplesSize(size))
 
 
-def load_first_mc_tuples(n_tuples: int) -> MCTuples:
-    """Return the first `n_tuples` tuples of the shipped Monte Carlo tuple set.
-
-    `n_tuples` need not be 1 of `MCTuplesSize`.
-
-    Raises:
-        ValueError: If `n_tuples` is below 2 or above the largest of `MCTuplesSize`.
-    """
-    return _load_full_set().first(n_tuples)
-
-
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================

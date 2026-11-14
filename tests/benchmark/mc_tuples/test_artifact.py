@@ -1,5 +1,4 @@
-"""The `mc_tuples` artifact round-trips through its CSV file, `load_mc_tuples(size)` returns the shipped sets, and
-`load_first_mc_tuples(n_tuples)` their first tuples."""
+"""The `mc_tuples` artifact round-trips through its CSV file, and `load_mc_tuples(size)` returns the shipped sets."""
 
 import math
 
@@ -14,7 +13,6 @@ from sunnbear._core.benchmark.mc_tuples import (
     MCTuplesDeclaration,
     MCTuplesSize,
     fine_lanes_of,
-    load_first_mc_tuples,
     load_mc_tuples,
 )
 
@@ -102,25 +100,6 @@ def test_every_shipped_value_holds_at_least_min_n_bits():
 
     # --- assert -----------------------
     assert min(bit_stats.min_n_bits_u, bit_stats.min_n_bits_v) >= MIN_N_BITS
-
-
-@pytest.mark.parametrize("n_tuples", [2, 8, 100, 1024])
-def test_load_first_mc_tuples_returns_the_first_tuples_of_the_shipped_set(n_tuples):
-    """Any count from 2 to the largest size gives that many tuples from the start of the full shipped set."""
-    # --- act --------------------------
-    tuples = load_first_mc_tuples(n_tuples)
-
-    # --- assert -----------------------
-    full = load_mc_tuples(max(MCTuplesSize))
-    assert tuples.u.tolist() == full.u[:n_tuples].tolist()
-    assert tuples.v.tolist() == full.v[:n_tuples].tolist()
-
-
-@pytest.mark.parametrize("n_tuples", [1, 1025])
-def test_load_first_mc_tuples_rejects_a_count_outside_the_shipped_set(n_tuples):
-    """A count below 2 or above the largest size raises a `ValueError` that gives the range."""
-    with pytest.raises(ValueError, match=r"size must lie in \[2, 1024\]"):
-        load_first_mc_tuples(n_tuples)
 
 
 def test_load_mc_tuples_rejects_an_unsupported_size():

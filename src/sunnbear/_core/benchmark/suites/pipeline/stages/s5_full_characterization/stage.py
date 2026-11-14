@@ -13,8 +13,8 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 class FullCharacterizationStage(CandidateCharacterizationStage[FullCharacterizationStateAccessor]):
     """`FullCharacterizationStage` computes the full features of each candidate that spacing keeps, and its EDI.
 
-    The benchmark suites are selected by the full features, so by default the stage runs at the full fidelity, which
-    runs more solves and more snuffled analyses than the coarse fidelity, each analysis at a higher budget.
+    The benchmark suites are selected by the full features, so by default the stage runs at `FeatureFidelity.FULL`,
+    the most expensive fidelity.
 
     The stage's block scales are fitted only on the candidates that it keeps, because the benchmark suites are selected
     from those candidates.
