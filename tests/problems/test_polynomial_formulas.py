@@ -5,13 +5,15 @@ import pytest
 from sunnbear._core.problems.core import FormulaRegistry
 
 # Each entry holds a polynomial formula's number, the number of values of its first parameter (a power ``p`` or a
-# term count ``n``), and the number of values of its second parameter (a weight ``w`` or a slope ``m``).
+# term count ``n``), the number of values of its second parameter (a weight ``w`` or a slope ``m``), and the bounds of
+# its interval, at which its value at ``c = 0`` is half the interval's width, negative at the lower bound.
 CANDIDATE_GRID_SIZES = [
-    pytest.param((2, 1, 1), 1, 1, id="linear"),
-    pytest.param((2, 1, 2), 5, 31, id="linear_plus_even_power"),
-    pytest.param((2, 1, 3), 4, 43, id="linear_plus_odd_power"),
-    pytest.param((2, 1, 4), 4, 31, id="linear_plus_sum_of_even_powers"),
-    pytest.param((2, 1, 5), 3, 43, id="linear_plus_sum_of_odd_powers"),
+    pytest.param((2, 1, 1), 1, 1, (-1.0, 1.0), id="linear"),
+    pytest.param((2, 1, 2), 5, 31, (-1.0, 1.0), id="linear_plus_even_power"),
+    pytest.param((2, 1, 3), 4, 43, (-1.0, 1.0), id="linear_plus_odd_power"),
+    pytest.param((2, 1, 4), 4, 31, (-1.0, 1.0), id="linear_plus_sum_of_even_powers"),
+    pytest.param((2, 1, 5), 3, 43, (-1.0, 1.0), id="linear_plus_sum_of_odd_powers"),
+    pytest.param((2, 1, 6), 9, 25, (0.0, 1.0), id="one_sided_linear_plus_power"),
 ]
 
 
@@ -26,12 +28,12 @@ def test_the_parametrization_names_every_polynomial_formula():
     assert {param.values[0] for param in CANDIDATE_GRID_SIZES} == formula_numbers_in_category
 
 
-@pytest.mark.parametrize("formula_number, n_first_param_values, n_second_param_values", CANDIDATE_GRID_SIZES)
+@pytest.mark.parametrize("formula_number, n_first_param_values, n_second_param_values, interval", CANDIDATE_GRID_SIZES)
 def test_every_candidate_passes_through_the_same_points_at_the_bounds(
-    formula_number, n_first_param_values, n_second_param_values
+    formula_number, n_first_param_values, n_second_param_values, interval
 ):
     """Each formula combines every power or term count with every value of its other parameter, and at ``c = 0`` every
-    candidate passes through ``(-1, -1)`` and ``(1, 1)``, the bounds of its interval."""
+    candidate of a formula has the same values at the bounds of its interval."""
     # --- arrange ----------------------
     [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
 
@@ -40,10 +42,12 @@ def test_every_candidate_passes_through_the_same_points_at_the_bounds(
 
     # --- assert -----------------------
     assert len(candidates) == n_first_param_values * n_second_param_values
+    a, b = interval
+    half_width = (b - a) / 2
     for candidate in candidates:
-        assert (candidate.a, candidate.b) == (-1.0, 1.0)
-        assert candidate.xc_fun(-1.0, 0.0) == pytest.approx(-1.0, abs=1e-12)
-        assert candidate.xc_fun(1.0, 0.0) == pytest.approx(1.0, abs=1e-12)
+        assert (candidate.a, candidate.b) == (a, b)
+        assert candidate.xc_fun(a, 0.0) == pytest.approx(-half_width, abs=1e-12)
+        assert candidate.xc_fun(b, 0.0) == pytest.approx(half_width, abs=1e-12)
 
 
 @pytest.mark.parametrize("formula_number", [(2, 1, 3), (2, 1, 5)])

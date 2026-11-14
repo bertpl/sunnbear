@@ -1,7 +1,7 @@
 """This module holds what the polynomial formulas share: the validity rules of their parameters and their recipes.
 
-All formulas with a weight ``w`` build their recipes with `weight_recipes`, so they sweep the same weights; all
-formulas with a slope ``m`` build them with `slope_recipes`, so they sweep the same slopes.
+The formulas on ``[-1, 1]`` with a weight ``w`` build their recipes with `weight_recipes`, so they sweep the same
+weights; the formulas with a slope ``m`` build them with `slope_recipes`, so they sweep the same slopes.
 """
 
 from sunnbear._core.problems.core import ParamAxis, ParamGrid, ParamNotation, ParamRecipe
