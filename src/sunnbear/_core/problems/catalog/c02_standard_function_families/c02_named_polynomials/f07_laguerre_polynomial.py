@@ -23,7 +23,7 @@ class LaguerrePolynomial(Formula):
     - toward ``4*n + 2``, the zeros spread out and the amplitude grows about as ``exp(x/2)``.
 
     ``c`` shifts ``x`` by ``c`` itself, not by ``c/n^2`` as in the formulas whose polynomials are orthogonal on
-    ``[-1, 1]``. The range of ``c`` then differs between an odd and an even ``n``:
+    ``[-1, 1]``. The calibrated range of ``c`` then differs between an odd and an even ``n``:
 
     - for an odd ``n``, ``c`` can shift the function far to the right, where the zeros lie far apart, and only a
       little to the left, where the lowest zero lies close to the lower bound 0;
@@ -63,6 +63,7 @@ class LaguerrePolynomial(Formula):
 
         The lower bound for an even ``n`` lies between the 2 lowest zeros, which lie near ``j_1^2/(4*n + 2)`` and
         ``j_2^2/(4*n + 2)``, with ``j_1`` and ``j_2`` the first 2 positive zeros of the Bessel function of order 0.
+
         McMahon's approximation puts the midpoint of ``j_1`` and ``j_2`` at ``1.25*pi``, so the lower bound is
         ``(1.25*pi)^2/(4*n + 2)``.
 
@@ -77,9 +78,11 @@ class LaguerrePolynomial(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps every degree from 1 to `HIGHEST_SWEPT_DEGREE`.
 
-        A higher degree mainly adds a wider range of values between the 2 ends of the interval, and such ranges are
-        left to formulas that are built for them. The sweep ends where the range of values is about as wide as at the
-        highest degree that the recipe of `HermitePolynomial` sweeps.
+        A higher degree mainly widens the range of values between the 2 ends of the interval, and a wide range of
+        values is not the purpose of this formula.
+
+        The sweep ends where the range of values is about as wide as at the highest degree that the recipe of
+        `HermitePolynomial` sweeps.
         """
         return (ParamGrid.decimal("n", 1.0, float(HIGHEST_SWEPT_DEGREE), 1.0),)
 

@@ -61,8 +61,8 @@ class WilkinsonPolynomial(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps every degree from 1 to `HIGHEST_SWEPT_DEGREE`.
 
-        A higher degree mainly adds a wider range of values between the middle of the interval and its bounds, and
-        such ranges are left to formulas that are built for them.
+        A higher degree mainly widens the range of values between the middle of the interval and its bounds, and a
+        wide range of values is not the purpose of this formula.
         """
         return (ParamGrid.decimal("n", 1.0, float(HIGHEST_SWEPT_DEGREE), 1.0),)
 

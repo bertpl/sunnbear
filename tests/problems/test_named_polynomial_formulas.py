@@ -100,9 +100,9 @@ def _bernoulli_amplitude(n: float, a: float, b: float) -> float:
 # - the function that gives the formula's value from scipy or mpmath;
 # - the function that gives the scale of a candidate's values near its zeros, from its parameters.
 #
-# `test_every_formula_agrees_with_its_reference` scales its absolute tolerance by that scale. The scale is 0 for a
-# formula that is a product of factors: its values span many orders of magnitude, and each is accurate relative to
-# its own size.
+# `test_every_formula_agrees_with_its_reference` scales its absolute tolerance by that scale. For a formula that is a
+# product of factors, the scale is 0, so only the relative tolerance applies: its values span many orders of magnitude,
+# and each is accurate relative to its own size.
 NAMED_POLYNOMIAL_FORMULAS = [
     pytest.param((2, 2, 1), 42, _chebyshev_first_kind, lambda *params: 1.0, id="chebyshev_first_kind"),
     pytest.param((2, 2, 2), 42, _chebyshev_second_kind, lambda *params: 1.0, id="chebyshev_second_kind"),
@@ -116,8 +116,8 @@ NAMED_POLYNOMIAL_FORMULAS = [
     pytest.param((2, 2, 10), 20, _second_wilkinson, lambda *params: 0.0, id="second_wilkinson"),
 ]
 
-# `test_every_formula_agrees_with_its_reference` compares a formula with its reference at these degrees, where the
-# formula sweeps them.
+# `test_every_formula_agrees_with_its_reference` compares a formula with its reference at those of these degrees
+# that the formula sweeps.
 COMPARED_DEGREES = (1.0, 2.0, 3.0, 8.0, 20.0, 21.0, 31.0, 40.0, 49.0, 64.0, 129.0, 1024.0)
 
 # `test_the_lower_bound_of_an_even_degree_lies_between_the_2_lowest_zeros` checks the interval rule at these Jacobi
@@ -241,8 +241,8 @@ def test_the_lower_bound_of_an_even_degree_lies_between_the_2_lowest_zeros(alpha
     ],
 )
 def test_the_interval_rule_holds_up_to_the_highest_valid_degree(formula_number, scipy_roots_fun, highest_valid_degree):
-    """Up to its highest valid degree, a formula's interval holds every zero that scipy gives but the lowest of an even
-    degree, and its values at the bounds are finite."""
+    """Up to its highest valid degree, a formula's interval holds every zero that scipy gives, except the lowest zero of
+    an even degree, and its values at the bounds are finite."""
     # --- arrange ----------------------
     [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
     degrees = [2, 3, 4, 8, 16, 33, 64, 128, highest_valid_degree - 1, highest_valid_degree]
@@ -261,11 +261,12 @@ def test_the_interval_rule_holds_up_to_the_highest_valid_degree(formula_number, 
 
 
 def test_every_real_zero_of_a_bernoulli_candidate_lies_well_inside_its_interval():
-    """A Bernoulli candidate is positive from 0.25 below its upper bound on, so no real zero lies there or beyond."""
+    """A Bernoulli candidate is positive from 0.25 below its upper bound to 3 above it, so no real zero lies there."""
     # --- arrange ----------------------
     [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 2, 8)]
 
     # --- act / assert -----------------
     for candidate in formula.build_all_candidates():
         x_values = np.linspace(candidate.b - 0.25, candidate.b + 3.0, 60)
-        assert all(candidate.xc_fun(float(x), 0.0) > 0.0 for x in x_values), candidate.id
+        for x in x_values:
+            assert candidate.xc_fun(float(x), 0.0) > 0.0, (candidate.id, x)

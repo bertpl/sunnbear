@@ -7,8 +7,8 @@ from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, Pa
 
 from .helpers import is_valid_degree
 
-# `BERNOULLI_NUMBERS` holds the Bernoulli numbers up to this index, and the recipes sweep the degrees up to it. A
-# higher degree adds real zeros only slowly, about 1 per 4 degrees.
+# The degrees in `DEGREE_RANGES_WITH_INTERVALS` must not exceed this one, because `BERNOULLI_NUMBERS` holds the
+# Bernoulli numbers up to this index only. A higher degree adds real zeros only slowly, about 1 per 4 degrees.
 HIGHEST_VALID_DEGREE = 49
 # Each entry holds the lowest and the highest degree of a recipe, and the bounds ``a`` and ``b`` of the interval that
 # the recipe gives to every odd degree between them.
@@ -56,9 +56,10 @@ class BernoulliPolynomial(Formula):
         """Evaluate ``B_n(x - c)`` from the polynomial's values on ``[0, 1)``.
 
         Evaluating ``B_n(y) = sum over k = 0..n of binomial(n, k)*B_k*y^(n-k)`` at ``y`` itself loses accuracy near
-        the zeros as ``n`` and ``abs(y)`` grow, because its terms cancel. The terms cancel far less on ``[0, 1)``, so
-        the function evaluates the sum only there, and reaches every other ``y`` through 2 identities: a reflection
-        about 0.5, and steps of 1 along x.
+        the zeros as ``n`` and ``abs(y)`` grow, because its terms cancel.
+
+        The terms cancel far less on ``[0, 1)``, so the function evaluates the sum only there, and reaches every other
+        ``y`` through 2 identities: a reflection about 0.5, and steps of 1 along x.
         """
         degree = int(n)
         y = x - c
@@ -89,8 +90,9 @@ class BernoulliPolynomial(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return 1 recipe per entry of `DEGREE_RANGES_WITH_INTERVALS`: its odd degrees, on its interval.
 
-        Each interval has round bounds, and in every candidate the largest real zero lies at least 0.25 inside the
-        upper bound. `[-1.5, 2.5]` would lose that margin at degree 25, and `[-2.5, 3.5]` at degree 41.
+        Each interval has half-integer bounds, and in every candidate the largest real zero lies at least 0.25 inside
+        the upper bound. `[-1.5, 2.5]` would lose that margin at degree 25, and `[-2.5, 3.5]` at degree 41. Degree 23
+        fits both intervals, and takes the wider one.
         """
         return tuple(
             ParamGrid(

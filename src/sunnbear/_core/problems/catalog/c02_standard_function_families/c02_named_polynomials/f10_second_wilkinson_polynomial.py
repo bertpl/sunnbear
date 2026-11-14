@@ -20,8 +20,8 @@ class SecondWilkinsonPolynomial(Formula):
     an odd ``n``, and ``n - 1`` for an even ``n``, whose interval leaves out the lowest zero.
 
     The zeros lie closer together toward the lower bound of the interval, each half as far from 0 as the one above
-    it, and the values of the function between the zeros get smaller toward that bound: the range of values grows much
-    faster with ``n`` than that of `WilkinsonPolynomial`.
+    it. The values of the function between the zeros get smaller toward that bound, so the range of values grows much
+    faster with ``n`` than in `WilkinsonPolynomial`.
 
     ``c`` moves every zero by the same factor, ``2^-c``. In `WilkinsonPolynomial` the zeros are ``k + c``; here they
     are ``2^-(k + c)``.
@@ -42,18 +42,18 @@ class SecondWilkinsonPolynomial(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
         """Evaluate the product over ``k = 1..n`` of ``(x - 2^-(k + c))``, 1 factor at a time."""
-        zero = 2.0 ** (-c)
+        zero_k = 2.0 ** (-c)
         value = 1.0
         for _ in range(int(n)):
-            zero *= 0.5
-            value *= x - zero
+            zero_k *= 0.5
+            value *= x - zero_k
         return value
 
     def interval_bounds(self, n: float) -> tuple[float, float]:
         """Return ``[2^-(n + 1), 1]`` for an odd ``n``, and ``[2^-(n - 0.5), 1]`` for an even ``n``.
 
-        The bounds ``2^-(n + 1)`` and 1 lie a factor 2 beyond the outermost zeros. The bound ``2^-(n - 0.5)`` lies
-        midway between the 2 lowest zeros, by their exponents.
+        The bounds ``2^-(n + 1)`` and 1 lie a factor 2 beyond the outermost zeros. The bound ``2^-(n - 0.5)`` is the
+        geometric mean of the 2 lowest zeros, ``2^-n`` and ``2^-(n - 1)``.
         """
         if int(n) % 2 == 1:
             return (2.0 ** -(n + 1.0), 1.0)

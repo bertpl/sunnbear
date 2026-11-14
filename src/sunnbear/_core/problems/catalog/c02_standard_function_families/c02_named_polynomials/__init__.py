@@ -7,8 +7,8 @@ depends on whether ``n`` is odd or even:
 - an odd ``n`` takes an interval that holds every zero;
 - an even ``n`` takes an interval that leaves out 1 zero, the lowest.
 
-`BernoulliPolynomial` is the exception: most of its zeros are complex, so it takes odd degrees only, on intervals
-that its parameters give.
+`BernoulliPolynomial` is the exception: most of its zeros are complex, so its parameters give its interval, and it
+takes odd degrees only.
 
 In every formula but `ChebyshevFirstKindPolynomial`, ``c`` moves the zeros along the x-axis: by a shift of ``x`` or,
 in `SecondWilkinsonPolynomial`, by a common factor. The function then keeps its form and, across the calibrated range

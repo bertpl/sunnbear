@@ -9,8 +9,8 @@ from .helpers import is_valid_degree
 # Above this degree the values at the bounds of the interval overflow.
 HIGHEST_VALID_DEGREE = 512
 HIGHEST_SWEPT_DEGREE = 40
-# This factor is ``2^(-1/3)`` times the mean of 2.338 and 4.088, the absolute values of the first 2 zeros of the Airy
-# function Ai.
+# The lower bound of an even degree's interval uses this factor: ``2^(-1/3)`` times the mean of 2.338 and 4.088, the
+# absolute values of the first 2 zeros of the Airy function Ai.
 LOWEST_ZEROS_AIRY_FACTOR = 2.55
 
 
@@ -24,16 +24,16 @@ class HermitePolynomial(Formula):
     an odd ``n``, and ``n - 1`` for an even ``n``.
 
     The zeros lie inside ``[-sqrt(2*n + 1), sqrt(2*n + 1)]``, about ``pi/sqrt(2*n)`` apart in the middle. The
-    amplitude grows about as ``exp(x^2/2)`` from the middle to the bounds, which is far faster than in the other
-    formulas of the category.
+    amplitude grows about as ``exp(x^2/2)`` from the middle to the bounds, which is far faster than in the formulas
+    whose polynomials are orthogonal on ``[-1, 1]``.
 
     The polynomial is divided by ``sqrt(2^n * n! * sqrt(pi))``, its norm under the weight ``exp(-x^2)``. The amplitude
     in the middle of the interval is then below 1 for every ``n``, while that of ``H_n`` itself grows with the norm.
     The division moves no zero, because it only scales the function.
 
     ``c`` shifts ``x`` by ``c`` itself, not by ``c/n^2`` as in the formulas whose polynomials are orthogonal on
-    ``[-1, 1]``: the zeros next to the bounds lie about ``n^(-1/6)`` apart, so the range of ``c`` narrows only slowly
-    as ``n`` grows.
+    ``[-1, 1]``: the zeros next to the bounds lie about ``n^(-1/6)`` apart, so the calibrated range of ``c`` narrows
+    only slowly as ``n`` grows.
 
     References:
         - NIST Digital Library of Mathematical Functions, §18.3, for the definition and the norm. https://dlmf.nist.gov/18.3
@@ -50,7 +50,7 @@ class HermitePolynomial(Formula):
         """Evaluate ``h_n(x - c)``, with ``h_k(y) = H_k(y)/sqrt(2^k * k! * sqrt(pi))``.
 
         The recurrence is ``h_(k+1)(y) = sqrt(2/(k + 1))*y*h_k(y) - sqrt(k/(k + 1))*h_(k-1)(y)``, which follows from
-        the recurrence of ``H_k`` and its norm. It takes ``n`` steps and holds for every ``x``.
+        the recurrence of ``H_k`` and its norm. The recurrence takes ``n`` steps and holds for every ``x``.
         """
         y = x - c
         h_previous = 0.0
@@ -66,7 +66,8 @@ class HermitePolynomial(Formula):
 
         The lower bound for an even ``n`` lies between the 2 lowest zeros, which lie near
         ``-(sqrt(2*n + 1) - 2^(-1/3)*abs(a_k)*(2*n + 1)^(-1/6))``, with ``a_k``, for ``k`` = 1 and 2, the first 2 zeros
-        of the Airy function Ai. The lower bound takes the mean of ``abs(a_1)`` and ``abs(a_2)`` for ``abs(a_k)``.
+        of the Airy function Ai. The lower bound is that expression with the mean of ``abs(a_1)`` and
+        ``abs(a_2)`` in place of ``abs(a_k)``.
 
         That rule is an approximation; the tests check that it holds up to `HIGHEST_VALID_DEGREE`.
         """
@@ -79,8 +80,8 @@ class HermitePolynomial(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps every degree from 1 to `HIGHEST_SWEPT_DEGREE`.
 
-        A higher degree mainly adds a wider range of values between the middle of the interval and its bounds, and
-        such ranges are left to formulas that are built for them.
+        A higher degree mainly widens the range of values between the middle of the interval and its bounds, and a
+        wide range of values is not the purpose of this formula.
         """
         return (ParamGrid.decimal("n", 1.0, float(HIGHEST_SWEPT_DEGREE), 1.0),)
 
