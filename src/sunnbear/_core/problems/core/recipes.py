@@ -5,7 +5,8 @@ A `ParamRecipe` materializes parameter tuples, and comes in 2 kinds:
 - **`ParamGrid`** sweeps a grid. A grid composes 3 small pieces, innermost first::
 
       ParamNotation  how one axis maps grid arguments to values
-          │          (DECIMAL, or POW2/POW10 where the grid lives in exponent space)
+          │          (DECIMAL, or a power notation where the grid lives in exponent space:
+          │          POW2/POW10 for positive values, NEG_POW2/NEG_POW10 for negative ones)
           │
       ParamAxis      one swept parameter: a named argument grid from `start` to
           │          `stop` in steps of `step`, materialized by values() through
@@ -67,7 +68,7 @@ class ParamAxis:
     """One swept parameter: a named argument grid from `start` to `stop` in steps of `step`.
 
     The grid lives in the notation's *argument* space — the value itself for
-    DECIMAL, the exponent for POW2/POW10 — and is **inclusive of both
+    DECIMAL, the exponent for a power notation — and is **inclusive of both
     endpoints**: unlike Python's half-open ``range``, ``stop`` is materialized,
     so ``start=0, stop=2, step=1`` yields three points (a POW2 axis with that
     grid yields values ``1.0, 2.0, 4.0``).
@@ -248,6 +249,16 @@ class ParamGrid(ParamRecipe):
     def pow10(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
         """Build a single-axis grid in base-10 exponent space (POW10 notation)."""
         return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW10),))
+
+    @classmethod
+    def neg_pow2(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
+        """Build a single-axis grid of negative values in base-2 exponent space (NEG_POW2 notation)."""
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.NEG_POW2),))
+
+    @classmethod
+    def neg_pow10(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
+        """Build a single-axis grid of negative values in base-10 exponent space (NEG_POW10 notation)."""
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.NEG_POW10),))
 
 
 # ==================================================================================================

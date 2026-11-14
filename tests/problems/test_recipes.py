@@ -21,10 +21,13 @@ def test_axis_decimal_values_are_grid_rounded():
     [
         (ParamNotation.POW2, 0.0, 2.0, (1.0, 2.0, 4.0), ["1.0", "2.0", "4.0"]),
         (ParamNotation.POW10, -1.0, 1.0, (0.1, 1.0, 10.0), ["0.1", "1.0", "10.0"]),
+        (ParamNotation.NEG_POW2, 0.0, 2.0, (-1.0, -2.0, -4.0), ["-1.0", "-2.0", "-4.0"]),
+        (ParamNotation.NEG_POW10, -1.0, 1.0, (-0.1, -1.0, -10.0), ["-0.1", "-1.0", "-10.0"]),
     ],
 )
 def test_axis_power_values(notation, start, stop, values, spellings):
-    """A power axis sweeps the exponent; its values are powers of the base, spelled canonically."""
+    """A power axis sweeps the exponent; its values are powers of the base, or their negatives, spelled
+    canonically."""
     # --- arrange ----------------------
     axis = ParamAxis("p1", start, stop, step=1.0, notation=notation)
 
@@ -256,12 +259,21 @@ def test_axis_grid_with_large_magnitude_values():
     assert ParamAxis("p1", 1e16, 3e16, step=1e16).values() == (1e16, 2e16, 3e16)
 
 
-def test_grid_pow10_convenience():
+@pytest.mark.parametrize(
+    "build_grid, expected",
+    [
+        (ParamGrid.pow10, [(0.1,), (1.0,), (10.0,)]),
+        (ParamGrid.neg_pow10, [(-0.1,), (-1.0,), (-10.0,)]),
+        (ParamGrid.neg_pow2, [(-0.5,), (-1.0,), (-2.0,)]),
+    ],
+)
+def test_grid_power_conveniences(build_grid, expected):
+    """A power convenience builds a single-axis grid of powers of its base, or of their negatives."""
     # --- arrange / act ----------------
-    grid = ParamGrid.pow10("p1", -1.0, 1.0, step=1.0)
+    grid = build_grid("p1", -1.0, 1.0, step=1.0)
 
     # --- assert -----------------------
-    assert list(grid.tuples()) == [(0.1,), (1.0,), (10.0,)]
+    assert list(grid.tuples()) == expected
 
 
 def test_grid_single_axis_convenience():
