@@ -10,21 +10,26 @@ from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import SnuffledA
 #  FeatureFidelity
 # ==================================================================================================
 class FeatureFidelity(Enum):
-    """A `FeatureFidelity` sets how much work goes into a feature vector: its tuple sets and its snuffled budget.
+    """A `FeatureFidelity` sets how much work goes into a feature vector: its solves and its snuffled analyses.
+
+    snuffled's analyses take most of the time of a feature vector, so `VERY_COARSE` differs from `COARSE` only in
+    them: it runs fewer analyses, each at a lower budget.
 
     Attributes:
         solver_mc_size: The size of the Monte Carlo tuple set for the solves of the core solver configs.
-        snuffled_mc_size: The size of the Monte Carlo tuple set for snuffled's analyses.
+        n_snuffled_analyses: The number of snuffled analyses, 1 at each of the first tuples of the shipped Monte Carlo
+            tuple set. The number need not be 1 of the set's sizes.
         snuffled_budget: The budget of each snuffled analysis.
     """
 
-    COARSE = (MCTuplesSize.SIZE_32, MCTuplesSize.SIZE_32, SnuffledAnalysisBudget.LOW)
-    FULL = (MCTuplesSize.SIZE_1024, MCTuplesSize.SIZE_64, SnuffledAnalysisBudget.HIGH)
+    VERY_COARSE = (MCTuplesSize.SIZE_32, 8, SnuffledAnalysisBudget.VERY_LOW)
+    COARSE = (MCTuplesSize.SIZE_32, 32, SnuffledAnalysisBudget.LOW)
+    FULL = (MCTuplesSize.SIZE_1024, 64, SnuffledAnalysisBudget.HIGH)
 
     def __init__(
-        self, solver_mc_size: MCTuplesSize, snuffled_mc_size: MCTuplesSize, snuffled_budget: SnuffledAnalysisBudget
+        self, solver_mc_size: MCTuplesSize, n_snuffled_analyses: int, snuffled_budget: SnuffledAnalysisBudget
     ) -> None:
         """Store the parts of the member's value as the fidelity's attributes."""
         self.solver_mc_size = solver_mc_size
-        self.snuffled_mc_size = snuffled_mc_size
+        self.n_snuffled_analyses = n_snuffled_analyses
         self.snuffled_budget = snuffled_budget

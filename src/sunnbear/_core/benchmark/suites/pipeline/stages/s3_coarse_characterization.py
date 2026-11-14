@@ -13,8 +13,9 @@ from .characterization import CandidateCharacterizationStage
 class CoarseCharacterizationStage(CandidateCharacterizationStage[CoarseCharacterizationStateAccessor]):
     """`CoarseCharacterizationStage` computes each valid candidate's coarse features.
 
-    The coarse features only need to tell the near-duplicate candidates of a formula apart, so the stage runs on every
-    valid candidate at the coarse fidelity's small tuple sets and budget.
+    The coarse features only need to tell the near-duplicate candidates of a formula apart, so by default the stage
+    runs on every valid candidate at the coarse fidelity, whose solves and snuffled analyses are fewer than the full
+    fidelity's, at a lower budget per analysis.
     """
 
     stage_id = PipelineStageId.COARSE_CHARACTERIZATION

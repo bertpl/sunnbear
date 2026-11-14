@@ -1,12 +1,19 @@
 """`CandidateCharacterizationTask` returns, for each of its candidates in their order, a characterization result or the
-reason to reject the candidate."""
+reason to reject the candidate, and runs snuffled's analyses as its fidelity sets them."""
 
 import math
 
 import numpy as np
+import pytest
 
-from sunnbear._core.benchmark.protocol import CRange
-from sunnbear._core.benchmark.suites.pipeline.diversity_features import DiversityFeatureFactory, FeatureFidelity
+from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
+from sunnbear._core.benchmark.protocol import CRange, MCSolveSettings
+from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
+    SNUFFLED_PROPERTIES,
+    DiversityFeatureFactory,
+    FeatureFidelity,
+)
+from sunnbear._core.benchmark.suites.pipeline.snuffled_analysis import SnuffledAnalysisBudget
 from sunnbear._core.benchmark.suites.pipeline.stages.characterization import (
     CandidateCharacterizationResult,
     CandidateCharacterizationTask,
@@ -54,3 +61,32 @@ def test_the_task_returns_a_characterization_or_a_reason_per_candidate(isolated_
     assert characterization.n_incorrect_solves_per_config == (0, 0)
     assert reason_of_nan == "function_error"
     assert reason_of_zeros == "snuffled_max_zero_width_too_large"
+
+
+@pytest.mark.parametrize("fidelity", [FeatureFidelity.VERY_COARSE, FeatureFidelity.COARSE])
+def test_the_task_runs_the_snuffled_analyses_of_its_fidelity(isolated_formula_registry, monkeypatch, fidelity):
+    """The task runs `n_snuffled_analyses` analyses at the fidelity's budget, 1 at each of the first tuples of the
+    shipped tuple set, in their order; the test replaces the analysis by a recorder that returns each property as 0."""
+    # --- arrange ----------------------
+    define_formula_cls((99, 964), lambda x, c: x - c - 1 / 3, -1.0, 1.0)
+    analyses = []
+
+    def record_analysis(budget, problem, properties, *, mc_solve_settings, mc_sample_idx):
+        analyses.append((budget, mc_sample_idx, float(mc_solve_settings.cs[mc_sample_idx])))
+        return dict.fromkeys(properties, 0.0)
+
+    monkeypatch.setattr(SnuffledAnalysisBudget, "extract_properties_or_rejection_reason", record_analysis)
+    c_range = CRange(c_min=-0.5, c_max=0.5)
+    task = CandidateCharacterizationTask(candidates=((ProblemId.from_string("f99.964"), c_range),), fidelity=fidelity)
+
+    # --- act --------------------------
+    [characterization] = task.run()
+
+    # --- assert -----------------------
+    first_vs = load_mc_tuples(max(MCTuplesSize)).v[: fidelity.n_snuffled_analyses]
+    assert [(budget, mc_sample_idx) for budget, mc_sample_idx, _ in analyses] == [
+        (fidelity.snuffled_budget, mc_sample_idx) for mc_sample_idx in range(fidelity.n_snuffled_analyses)
+    ]
+    assert [c for _, _, c in analyses] == list(MCSolveSettings.map_v_onto_c_range(first_vs, c_range))
+    assert isinstance(characterization, CandidateCharacterizationResult)
+    np.testing.assert_array_equal(characterization.raw_features[-len(SNUFFLED_PROPERTIES) :], 0.0)

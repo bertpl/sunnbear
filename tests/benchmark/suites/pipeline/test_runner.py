@@ -16,7 +16,8 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
 
     - every candidate that no stage drops reaches full characterization;
     - spacing runs at its default minimum distance;
-    - full characterization runs at the coarse fidelity, as its manifest records.
+    - coarse characterization runs at the very coarse fidelity and full characterization at the coarse fidelity, as
+      their manifests record.
 
     Core selection then stops the run, because 4 candidates fill no Core, so neither core selection nor distillation
     writes a manifest.
@@ -45,6 +46,7 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     assert stop.reason.startswith("The candidates fill no Core of 128 or more")
     n_candidates = sum(len(formula.build_all_candidates()) for formula in formulas)
     assert manifests[0].n_candidates_out == n_candidates
+    assert manifests[2].parameters == {"fidelity": FeatureFidelity.VERY_COARSE.name}
     assert manifests[3].parameters == {"min_distance": DEFAULT_SPACING_MIN_DISTANCE}
     assert manifests[4].parameters == {"fidelity": FeatureFidelity.COARSE.name}
     drops = [

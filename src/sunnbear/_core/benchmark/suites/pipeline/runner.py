@@ -72,7 +72,7 @@ def run_pipeline(
     stages = [
         CandidateGenerationStage(formulas),
         CandidateValidationStage(),
-        CoarseCharacterizationStage(),
+        CoarseCharacterizationStage(fidelity=mode.coarse_characterization_stage_fidelity),
         SpacingStage(),
         FullCharacterizationStage(fidelity=mode.full_characterization_stage_fidelity),
         CoreSelectionStage(sec_per_candidate=mode.selection_sec_per_candidate),
