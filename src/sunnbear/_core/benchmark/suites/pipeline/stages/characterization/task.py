@@ -1,8 +1,9 @@
 """`CandidateCharacterizationTask` computes the raw features of each candidate of a batch, or the reason to reject it.
 
 For each candidate, the task first runs the solves of the core solver configs that `DiversityFeatureFactory` names,
-then snuffled's analyses, in the same worker, so that each formula is compiled in only 1 worker. Besides the raw
-features, the task computes the candidate's EDI and counts its incorrect solves for each core solver config.
+then snuffled's analyses, in the same worker, so that the worker compiles the candidate's formula once for both.
+Besides the raw features, the task computes the candidate's EDI and counts its incorrect solves for each core solver
+config.
 """
 
 from dataclasses import dataclass

@@ -12,6 +12,12 @@ from .stage_id import PipelineStageId
 # A stage's parameter value is a JSON scalar, so that its manifest can record it.
 type PipelineStageParameterValue = bool | int | float | str
 
+# The largest number of candidates in 1 task of `PipelineStage._run_in_formula_batches`. A stage cannot end before its
+# longest task does, and the time per candidate differs by more than a factor 10 between candidates, while the
+# neighbors of a slow candidate in a formula's order are usually slow too. Compiling a formula takes far less time
+# than 1 slow candidate, so splitting a formula over several workers costs little.
+MAX_CANDIDATES_PER_TASK = 50
+
 
 # ==================================================================================================
 #  PipelineStage
@@ -65,9 +71,11 @@ class PipelineStage[StateAccessorT](ABC):
         build_task: Callable[[tuple[C, ...]], WorkerTask[list[R]]],
         worker_pool: WorkerPool,
     ) -> dict[ProblemId, R]:
-        """Return each candidate's result from `build_task`, keyed by problem id, with every formula in 1 batch.
+        """Return each candidate's result from `build_task`, keyed by problem id, from batches grouped by formula.
 
-        Every candidate of a formula goes to the same task, so each formula is compiled in only 1 worker.
+        The candidates of a formula go to the same task where they fit in 1 batch, so most formulas are compiled in
+        only 1 worker. A formula with more than `MAX_CANDIDATES_PER_TASK` candidates is split over several tasks, so
+        that its candidates run in several workers.
 
         Args:
             candidates: The candidates to run, each with a distinct problem id.
@@ -77,7 +85,9 @@ class PipelineStage[StateAccessorT](ABC):
             worker_pool: The worker pool of the run, which splits the candidates into batches and runs their tasks.
         """
         batches = worker_pool.split_into_batches(
-            candidates, group_key=lambda candidate: problem_id_key(candidate).formula_id
+            candidates,
+            group_key=lambda candidate: problem_id_key(candidate).formula_id,
+            max_batch_size=MAX_CANDIDATES_PER_TASK,
         )
         tasks = {batch_idx: build_task(tuple(batch)) for batch_idx, batch in enumerate(batches)}
         results_by_problem_id: dict[ProblemId, R] = {}

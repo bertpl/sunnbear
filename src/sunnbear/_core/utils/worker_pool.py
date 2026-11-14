@@ -109,28 +109,54 @@ class WorkerPool:
                     future.cancel()
                 wait(keys_by_future)
 
-    def split_into_batches[T](self, items: Sequence[T], *, group_key: Callable[[T], Hashable]) -> list[list[T]]:
-        """Split `items` into about `TARGET_BATCHES_PER_WORKER` batches per worker, keeping the items of 1 key together.
+    def split_into_batches[T](
+        self, items: Sequence[T], *, group_key: Callable[[T], Hashable], max_batch_size: int | None = None
+    ) -> list[list[T]]:
+        """Split `items` into at least about `TARGET_BATCHES_PER_WORKER` batches per worker.
 
-        The items with the same key form a group, which no batch splits, so work that a group's items share, such as
-        compiling a function, happens once per group. The batches are filled as follows:
+        The items with the same key form a group. A batch keeps a group together where the group fits in 1 batch, so
+        work that a group's items share, such as compiling a function, mostly happens once per group. The batches are
+        filled as follows:
 
+        - a batch holds at most `ceil(len(items) / (TARGET_BATCHES_PER_WORKER * n_workers))` items, and at most
+          `max_batch_size` items when that is given;
         - the groups fill the batches in order of first appearance, and the items keep their order within a group;
-        - a batch takes the next group as long as the batch then holds at most
-          `ceil(len(items) / (TARGET_BATCHES_PER_WORKER * n_workers))` items; a group larger than that maximum forms a
-          batch of its own.
+        - a batch takes the next group as long as the batch then holds at most the maximum;
+        - a group larger than the maximum is split into consecutive batches of nearly equal sizes, none above the
+          maximum, which hold no other group. A large group then runs in several workers, not in 1.
+
+        Args:
+            items: The items to split.
+            group_key: Returns the key of an item's group.
+            max_batch_size: The largest number of items in a batch, for items that take long enough that a batch of
+                the default maximum would keep 1 worker busy long after the others finish; ``None`` for the default
+                maximum alone.
+
+        Raises:
+            ValueError: If `max_batch_size` is below 1.
         """
+        if max_batch_size is not None and max_batch_size < 1:
+            raise ValueError(f"max_batch_size must be at least 1 (got {max_batch_size}).")
         groups: dict[Hashable, list[T]] = {}
         for item in items:
             groups.setdefault(group_key(item), []).append(item)
-        max_batch_size = math.ceil(len(items) / (TARGET_BATCHES_PER_WORKER * self.n_workers))
+        max_size = math.ceil(len(items) / (TARGET_BATCHES_PER_WORKER * self.n_workers))
+        if max_batch_size is not None:
+            max_size = min(max_size, max_batch_size)
         batches: list[list[T]] = []
         batch: list[T] = []
         for group in groups.values():
-            if batch and len(batch) + len(group) > max_batch_size:
+            if batch and len(batch) + len(group) > max_size:
                 batches.append(batch)
                 batch = []
-            batch.extend(group)
+            if len(group) > max_size:
+                n_group_batches = math.ceil(len(group) / max_size)
+                group_batch_size = math.ceil(len(group) / n_group_batches)
+                batches.extend(
+                    group[start : start + group_batch_size] for start in range(0, len(group), group_batch_size)
+                )
+            else:
+                batch.extend(group)
         if batch:
             batches.append(batch)
         return batches
