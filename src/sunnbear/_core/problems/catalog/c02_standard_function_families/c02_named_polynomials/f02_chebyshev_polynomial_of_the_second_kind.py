@@ -1,0 +1,85 @@
+"""This formula is the Chebyshev polynomial of the second kind with ``x`` shifted by ``c``, ``U_n(x - c/n^2)``."""
+
+import math
+
+from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe, ParamTable
+
+from .helpers import SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
+
+
+class ChebyshevSecondKindPolynomial(Formula):
+    """`ChebyshevSecondKindPolynomial` is ``U_n(x - c/n^2)``, with ``U_n`` the Chebyshev polynomial of the second kind.
+
+    ``n`` is the degree, an integer of at least 1. The function has ``n`` zeros in its interval for an odd ``n``, and
+    ``n - 1`` for an even ``n``.
+
+    The amplitude of ``U_n`` grows from about 1 in the middle of ``[-1, 1]`` to ``n + 1`` at the bounds -1 and 1.
+
+    ``c`` shifts ``x``, so the function keeps its form and, across the range of ``c``, the number of zeros in its
+    interval.
+
+    Adding ``c`` to the function value would not keep the number of zeros in the interval: the values at the bounds
+    grow with ``n``, so the range of ``c`` would have to grow with them. For a high degree, nearly every ``c`` in that
+    range would then exceed the amplitude of about 1 in the middle of ``[-1, 1]`` and leave only the zero next to one
+    of the bounds.
+
+    References:
+        - NIST Digital Library of Mathematical Functions, §18.3, for the definition. https://dlmf.nist.gov/18.3
+        - NIST Digital Library of Mathematical Functions, §18.5(i), for the trigonometric form. https://dlmf.nist.gov/18.5
+    """
+
+    number = (2, 2, 2)
+    name = "Chebyshev polynomial of the second kind"
+    param_names = ("n",)
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, n: float) -> float:
+        """Evaluate ``U_n(y)`` at ``y = x - c/n^2``, from ``abs(y)``, since ``U_n(-y) = (-1)^n * U_n(y)``."""
+        y = x - c / (n * n)
+        abs_y = abs(y)
+        if abs_y < 1.0:
+            # Below 1, sin((n + 1)*t)/sin(t) gives U_n(abs(y)) at the same cost for every n.
+            t = math.acos(abs_y)
+            value_at_abs_y = math.sin((n + 1.0) * t) / math.sin(t)
+        elif abs_y == 1.0:
+            # At 1, sin((n + 1)*t)/sin(t) is 0/0, and U_n(1) = n + 1.
+            value_at_abs_y = n + 1.0
+        else:
+            # Because of the shift, abs(y) can exceed 1 by at most a few times 1/n^2. Above 1, sinh and acosh replace
+            # sin and acos.
+            t = math.acosh(abs_y)
+            value_at_abs_y = math.sinh((n + 1.0) * t) / math.sinh(t)
+        if y < 0.0 and int(n) % 2 == 1:
+            return -value_at_abs_y
+        else:
+            return value_at_abs_y
+
+    def interval_bounds(self, n: float) -> tuple[float, float]:
+        """Return ``[-1, 1]`` for an odd ``n``, and ``[-cos(1.5*pi/(n + 1)), 1]`` for an even ``n``.
+
+        ``U_n`` is the Jacobi polynomial with both parameters 0.5, up to a constant factor.
+        """
+        return jacobi_interval_bounds(n, 0.5, 0.5)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the recipe that sweeps the degrees of `SWEPT_DEGREES`."""
+        return (ParamTable(names=self.param_names, rows=tuple((degree,) for degree in SWEPT_DEGREES)),)
+
+    def is_param_tuple_valid(self, n: float) -> bool:
+        """Require ``n`` to be an integer of at least 1."""
+        return is_valid_degree(n)
+
+    test_cases = (
+        FormulaTestCase.value(params={"n": 2.0}, x=0.75, c=0.0, expected=1.25),  # U_2(y) = 4*y^2 - 1
+        FormulaTestCase.value(params={"n": 2.0}, x=1.0, c=1.0, expected=1.25),  # c shifts x by c/4, to y = 0.75
+        FormulaTestCase.value(params={"n": 3.0}, x=-0.5, c=0.0, expected=1.0),  # U_3(y) = 8*y^3 - 4*y, an odd function
+        FormulaTestCase.value(params={"n": 3.0}, x=1.0, c=0.0, expected=4.0),  # U_n(1) = n + 1
+        FormulaTestCase.value(params={"n": 3.0}, x=-1.0, c=0.0, expected=-4.0),  # U_n(-1) = (-1)^n * (n + 1)
+        FormulaTestCase.value(params={"n": 2.0}, x=1.0, c=-4.0, expected=15.0),  # beyond 1, at y = 2
+        FormulaTestCase.value(params={"n": 3.0}, x=-1.0, c=9.0, expected=-56.0),  # beyond -1, at y = -2
+        FormulaTestCase.invalid(params={"n": 2.5}),  # degree that is not an integer
+        FormulaTestCase.invalid(params={"n": 0.0}),  # degree below 1
+        FormulaTestCase.interval_bounds(params={"n": 3.0}, expected=(-1.0, 1.0)),
+        FormulaTestCase.interval_bounds(params={"n": 4.0}, expected=(-math.cos(0.3 * math.pi), 1.0)),
+        FormulaTestCase.interval_bounds(params={"n": 2.0}, expected=(0.0, 1.0)),
+    )
