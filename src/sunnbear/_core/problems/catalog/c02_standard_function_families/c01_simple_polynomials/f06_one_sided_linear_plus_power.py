@@ -20,7 +20,7 @@ class OneSidedLinearPlusPower(Formula):
     - ``w`` is the weight of the power relative to the line: the power's share is ``w/(1 + w)``. As ``w`` grows, the
       function gets flat near 0 and steep near 1.
 
-    The recipe sweeps ``w`` over a wide range on purpose, wider than the other polynomial formulas sweep their
+    The recipe sweeps ``w`` over a wide range on purpose, wider than the other simple polynomial formulas sweep their
     weights and slopes. At the low end the function is close to a line without being one, and at the high end it is
     close to the power alone, which is very flat for low x.
 

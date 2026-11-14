@@ -1,4 +1,4 @@
-"""This module holds what the polynomial formulas share: the validity rules of their parameters and their recipes.
+"""This module holds what the simple polynomial formulas share: their parameters' validity rules and their recipes.
 
 The formulas on ``[-1, 1]`` with a weight ``w`` build their recipes with `weight_recipes`, so they sweep the same
 weights; the formulas with a slope ``m`` build them with `slope_recipes`, so they sweep the same slopes.

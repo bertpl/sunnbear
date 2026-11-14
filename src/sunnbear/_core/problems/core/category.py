@@ -25,9 +25,9 @@ class FormulaCategory(FormulaTaxonomyNode):
 
     Example::
 
-        class Polynomials(FormulaCategory):
+        class SimplePolynomials(FormulaCategory):
             number = (2, 1)
-            name = "Polynomials"
+            name = "Simple polynomials"
 
     Class attributes:
         number: The category's place in the taxonomy; its parent category is ``number[:-1]``.

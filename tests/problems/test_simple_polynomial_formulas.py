@@ -1,10 +1,10 @@
-"""The polynomial formulas (category 2.1) give the expected candidates, which share their values at the bounds."""
+"""The simple polynomial formulas (category 2.1) give the expected candidates, with shared values at the bounds."""
 
 import pytest
 
 from sunnbear._core.problems.core import FormulaRegistry
 
-# Each entry holds a polynomial formula's number, the number of values of its first parameter (a power ``p`` or a
+# Each entry holds a simple polynomial formula's number, the number of values of its first parameter (a power ``p`` or a
 # term count ``n``), the number of values of its second parameter (a weight ``w`` or a slope ``m``), and the bounds of
 # its interval, at which its value at ``c = 0`` is half the interval's width, negative at the lower bound.
 CANDIDATE_GRID_SIZES = [
@@ -17,7 +17,7 @@ CANDIDATE_GRID_SIZES = [
 ]
 
 
-def test_the_parametrization_names_every_polynomial_formula():
+def test_the_parametrization_names_every_simple_polynomial_formula():
     """`CANDIDATE_GRID_SIZES` names exactly the formulas of category 2.1."""
     # --- act --------------------------
     formula_numbers_in_category = {
