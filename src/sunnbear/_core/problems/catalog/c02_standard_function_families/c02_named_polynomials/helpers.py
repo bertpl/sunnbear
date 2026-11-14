@@ -9,7 +9,7 @@ import math
 
 from sunnbear._core.problems.core import ParamTable
 
-# The degrees that every formula sweeps: each degree up to 32, then an even and an odd degree at each power of 2 up to
+# Every formula sweeps these degrees: each degree up to 32, then an even and an odd degree at each power of 2 up to
 # 1024. An even and an odd degree differ in their intervals (`jacobi_interval_bounds`), so the high degrees come in
 # pairs too.
 SWEPT_DEGREES = (
@@ -24,11 +24,12 @@ def is_valid_degree(n: float) -> bool:
 
 
 def degree_sweep_recipe(param_names: tuple[str, ...], *values_per_other_param: tuple[float, ...]) -> ParamTable:
-    """Return the recipe that combines every degree of `SWEPT_DEGREES` with every combination of the other values.
+    """Return the recipe that combines each degree of `SWEPT_DEGREES` with each combination of the other values.
 
     Args:
         param_names: The formula's parameter names, of which the first names the degree.
-        values_per_other_param: The values of each parameter after the degree, in the order of `param_names`.
+        values_per_other_param: The other values: those of each parameter after the degree, in the order of
+            `param_names`.
     """
     return ParamTable(names=param_names, rows=tuple(itertools.product(SWEPT_DEGREES, *values_per_other_param)))
 
@@ -44,12 +45,13 @@ def jacobi_interval_bounds(n: float, alpha: float, beta: float) -> tuple[float, 
 
     With ``x = -cos(theta)``, the 2 lowest zeros lie near ``theta = j_1/N`` and ``theta = j_2/N``, where
     ``N = n + (alpha + beta + 1)/2`` and ``j_1`` and ``j_2`` are the first 2 positive zeros of the Bessel function of
-    order `beta`. McMahon's approximation of those 2 zeros puts the middle between them at ``(1.25 + beta/2)*pi``,
-    and the lower bound takes that value for ``theta*N``.
+    order `beta`.
 
-    The rule is an approximation, with no proof that it holds for every `n`, `alpha` and `beta`. Each formula
-    therefore accepts only the parameter values for which the tests check that the bound lies between the 2 lowest
-    zeros.
+    McMahon's approximation puts the midpoint of ``j_1`` and ``j_2`` at ``(1.25 + beta/2)*pi``, so the lower bound is
+    ``-cos(theta)`` at ``theta = (1.25 + beta/2)*pi/N``.
+
+    The rule is an approximation, with no proof that it holds for every `n`, `alpha` and `beta`, so a caller passes
+    only parameter values for which the tests check that the bound lies between the 2 lowest zeros.
 
     References:
         - NIST Digital Library of Mathematical Functions, §18.16(ii), for the zeros of the Jacobi polynomials, and
@@ -59,5 +61,5 @@ def jacobi_interval_bounds(n: float, alpha: float, beta: float) -> tuple[float, 
         return (-1.0, 1.0)
     else:
         theta_over_pi = (1.25 + beta / 2.0) / (n + (alpha + beta + 1.0) / 2.0)
-        # -cos(theta), written as a sine so that theta = pi/2 gives exactly 0
+        # The lower bound is -cos(theta), written as a sine so that theta = pi/2 gives exactly 0.
         return (math.sin(math.pi * (theta_over_pi - 0.5)), 1.0)

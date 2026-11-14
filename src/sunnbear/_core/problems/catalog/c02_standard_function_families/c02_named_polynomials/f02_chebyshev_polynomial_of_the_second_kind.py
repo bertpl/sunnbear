@@ -10,22 +10,17 @@ from .helpers import degree_sweep_recipe, is_valid_degree, jacobi_interval_bound
 class ChebyshevSecondKindPolynomial(Formula):
     """`ChebyshevSecondKindPolynomial` is ``U_n(x - c/n^2)``, with ``U_n`` the Chebyshev polynomial of the second kind.
 
-    The swings of ``U_n`` grow from about 1 in the middle of ``[-1, 1]`` to ``n + 1`` at the bounds -1 and 1.
+    ``n`` is the degree, an integer of at least 1. The function has ``n`` zeros in its interval for an odd ``n``, and
+    ``n - 1`` for an even ``n``.
 
-    - ``n`` is the degree, an integer of at least 1. The function has ``n`` zeros in its interval for an odd ``n``,
-      and ``n - 1`` for an even ``n``.
+    The amplitude of ``U_n`` grows from about 1 in the middle of ``[-1, 1]`` to ``n + 1`` at the bounds -1 and 1.
 
-    ``c`` shifts ``x``, so the function keeps its form and every zero of its interval for every ``c``. Adding ``c`` to
-    the function value would not keep them: the range of ``c`` would follow the values at the bounds, which grow with
-    ``n``, and nearly every ``c`` of a high degree would leave only the zero in the outermost swing. The shift is
-    ``c/n^2`` because the zeros next to the bounds lie about ``1/n^2`` apart.
+    ``c`` shifts ``x``, so the function keeps its form and, across the range of ``c``, the number of zeros in its
+    interval.
 
-    `parametrized_fun` evaluates ``U_n(y)`` from ``abs(y)``, since ``U_n(-y) = (-1)^n * U_n(y)``:
-
-    - inside ``(-1, 1)``, as ``sin((n + 1)*t)/sin(t)`` with ``t = acos(abs(y))``, which costs the same for every ``n``;
-    - at -1 and 1, as ``n + 1``, because the form above is 0/0 there;
-    - beyond -1 and 1, where the shift takes ``y`` by a few times ``1/n^2``, as ``sinh((n + 1)*t)/sinh(t)`` with
-      ``t = acosh(abs(y))``.
+    Adding ``c`` to the function value would not keep that number: the values at the bounds grow with ``n``, so the
+    range of ``c`` would have to grow with them, and for a high degree nearly every ``c`` in that range would leave
+    only the zero next to one of the bounds.
 
     References:
         - NIST Digital Library of Mathematical Functions, §18.3, for the definition, and §18.5(i), for the
@@ -38,15 +33,19 @@ class ChebyshevSecondKindPolynomial(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate ``U_n(x - c/n^2)``."""
+        """Evaluate ``U_n(y)`` at ``y = x - c/n^2``, from ``abs(y)``, since ``U_n(-y) = (-1)^n * U_n(y)``."""
         y = x - c / (n * n)
         abs_y = abs(y)
         if abs_y < 1.0:
+            # Below 1, sin((n + 1)*t)/sin(t) gives U_n(abs(y)) at the same cost for every n.
             t = math.acos(abs_y)
             value_at_abs_y = math.sin((n + 1.0) * t) / math.sin(t)
         elif abs_y == 1.0:
+            # At 1, that form is 0/0, and U_n(1) = n + 1.
             value_at_abs_y = n + 1.0
         else:
+            # Above 1, which abs(y) passes by at most a few times 1/n^2 because of the shift, sinh and acosh replace
+            # sin and acos.
             t = math.acosh(abs_y)
             value_at_abs_y = math.sinh((n + 1.0) * t) / math.sinh(t)
         if y < 0.0 and int(n) % 2 == 1:

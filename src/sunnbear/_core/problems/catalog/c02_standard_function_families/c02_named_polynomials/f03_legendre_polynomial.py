@@ -10,16 +10,17 @@ from .helpers import degree_sweep_recipe, is_valid_degree, jacobi_interval_bound
 class LegendrePolynomial(Formula):
     """`LegendrePolynomial` is ``P_n(x - c/n^2)``, with ``P_n`` the Legendre polynomial.
 
-    The swings of ``P_n`` grow from about ``sqrt(2/(pi*n))`` in the middle of ``[-1, 1]`` to 1 at the bounds -1 and 1.
+    ``n`` is the degree, an integer of at least 1. The function has ``n`` zeros in its interval for an odd ``n``, and
+    ``n - 1`` for an even ``n``.
 
-    - ``n`` is the degree, an integer of at least 1. The function has ``n`` zeros in its interval for an odd ``n``,
-      and ``n - 1`` for an even ``n``.
+    The amplitude of ``P_n`` grows from about ``sqrt(2/(pi*n))`` in the middle of ``[-1, 1]`` to 1 at the bounds -1
+    and 1.
 
-    ``c`` shifts ``x``, for the reason that `ChebyshevSecondKindPolynomial` gives: the function keeps its form and
-    every zero of its interval for every ``c``, which a ``c`` added to the function value would not do.
+    ``c`` shifts ``x``, so the function keeps its form and, across the range of ``c``, the number of zeros in its
+    interval.
 
-    `parametrized_fun` evaluates ``P_n`` by its recurrence over the degrees, which takes ``n`` steps and holds for
-    every ``x``.
+    Adding ``c`` to the function value would not keep that number: the amplitude in the middle of ``[-1, 1]`` shrinks
+    as ``n`` grows, so for a high degree nearly every ``c`` would leave only the zeros near the bounds.
 
     References:
         - NIST Digital Library of Mathematical Functions, §18.3, for the definition, and §18.9(i), for the
@@ -32,7 +33,10 @@ class LegendrePolynomial(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate ``P_n(x - c/n^2)`` by ``(k + 1)*P_(k+1)(y) = (2*k + 1)*y*P_k(y) - k*P_(k-1)(y)``."""
+        """Evaluate ``P_n(x - c/n^2)`` by ``(k + 1)*P_(k+1)(y) = (2*k + 1)*y*P_k(y) - k*P_(k-1)(y)``.
+
+        The recurrence takes ``n`` steps and holds for every ``x``.
+        """
         y = x - c / (n * n)
         p_previous = 1.0
         p = y

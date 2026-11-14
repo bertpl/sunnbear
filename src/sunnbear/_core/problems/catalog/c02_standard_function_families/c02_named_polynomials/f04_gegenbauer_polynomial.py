@@ -8,7 +8,7 @@ from .helpers import degree_sweep_recipe, is_valid_degree, jacobi_interval_bound
 
 # ``alpha`` has to be above this value: the Gegenbauer polynomials are orthogonal on ``[-1, 1]`` only above it, and at
 # this value their outermost zeros lie on the bounds -1 and 1.
-ALPHA_LOWER_LIMIT = -0.5
+ALPHA_EXCLUSIVE_LOWER_LIMIT = -0.5
 # The tests check the rule of `jacobi_interval_bounds` up to this ``alpha``; the rule fails a little above it.
 HIGHEST_ALPHA = 7.0
 
@@ -20,28 +20,32 @@ class GegenbauerPolynomial(Formula):
 
     - ``n`` is the degree, an integer of at least 1. The function has ``n`` zeros in its interval for an odd ``n``,
       and ``n - 1`` for an even ``n``.
-    - ``alpha`` sets how the swings change from the middle of ``[-1, 1]`` to its bounds. Below 0 the swings shrink
-      toward the bounds, at 0 they are equally high everywhere, and above 0 they grow toward the bounds, faster for
-      a higher ``alpha``. It lies above `ALPHA_LOWER_LIMIT` and is at most `HIGHEST_ALPHA`. It is not the ``alpha`` of
+    - ``alpha`` sets how the amplitude changes from the middle of ``[-1, 1]`` to its bounds:
+
+      - below 0, the amplitude shrinks toward the bounds;
+      - at 0, it is the same everywhere;
+      - above 0, it grows toward the bounds, faster for a higher ``alpha``.
+
+      ``alpha`` lies above `ALPHA_EXCLUSIVE_LOWER_LIMIT` and is at most `HIGHEST_ALPHA`. It is not the ``alpha`` of
       `JacobiPolynomial`, which is 0.5 lower for the same polynomial.
 
-    3 values of ``alpha`` give the polynomial of another formula: 0 gives ``T_n``, 0.5 gives the Legendre polynomial
-    and 1 gives ``U_n/(n + 1)``.
+    The polynomial of another formula follows at 3 values of ``alpha``:
+
+    - 0 gives ``T_n``;
+    - 0.5 gives the Legendre polynomial;
+    - 1 gives ``U_n/(n + 1)``.
 
     The polynomial is divided by its value at 1 for 2 reasons:
 
     - The function is then 1 at ``y = 1`` for every ``n`` and ``alpha``. ``C_n^(alpha)(1)`` itself is negative for an
-      ``alpha`` below 0, so without the division the function would rise toward 1 for one ``alpha`` and fall for
-      another.
+      ``alpha`` below 0, so without the division the function would end at a positive value at ``y = 1`` for an
+      ``alpha`` above 0, and at a negative value for an ``alpha`` below 0.
     - The divided polynomial has a limit at ``alpha = 0``, which is ``T_n``, while ``C_n^(0)`` itself is 0 everywhere.
 
     The division moves no zero, because it only scales the function.
 
-    ``c`` shifts ``x``, for the reason that `ChebyshevSecondKindPolynomial` gives: the function keeps its form and
-    every zero of its interval for every ``c``.
-
-    `parametrized_fun` evaluates the divided polynomial by a recurrence over the degrees, which takes ``n`` steps,
-    holds for every ``x`` and needs no separate case at ``alpha = 0``.
+    ``c`` shifts ``x``, so the function keeps its form and, across the range of ``c``, the number of zeros in its
+    interval.
 
     References:
         - NIST Digital Library of Mathematical Functions, §18.3, for the definition, where the parameter is called
@@ -58,7 +62,8 @@ class GegenbauerPolynomial(Formula):
         """Evaluate ``R_n(x - c/n^2)``, with ``R_k(y) = C_k^(alpha)(y)/C_k^(alpha)(1)``.
 
         The recurrence is ``(k + 2*alpha - 1)*R_k(y) = 2*(k + alpha - 1)*y*R_(k-1)(y) - (k - 1)*R_(k-2)(y)``, which
-        follows from the recurrence of ``C_k^(alpha)`` and its value at 1.
+        follows from the recurrence of ``C_k^(alpha)`` and its value at 1. The recurrence takes ``n`` steps, holds for
+        every ``x`` and needs no separate case at ``alpha = 0``.
         """
         y = x - c / (n * n)
         r_previous = 1.0
@@ -77,17 +82,20 @@ class GegenbauerPolynomial(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that combines the degrees of `SWEPT_DEGREES` with ``alpha`` from -0.4 to 2 in steps of 0.2.
 
-        - The sweep starts at -0.4, its lowest step above `ALPHA_LOWER_LIMIT`.
-        - The sweep ends at 2, where the swings in the middle of ``[-1, 1]`` are already thousands of times lower
-          than the value at the bounds for a degree above 100. A higher ``alpha`` continues that trend and gives no
-          other kind of function.
+        - The sweep starts at -0.4, the lowest multiple of 0.2 above `ALPHA_EXCLUSIVE_LOWER_LIMIT`.
+        - The sweep ends at 2, where the amplitude in the middle of ``[-1, 1]`` is already thousands of times lower
+          than the value at the bounds for a degree above 100. A higher ``alpha`` lowers that amplitude further and
+          gives no other kind of function.
         """
         alpha_values = ParamAxis("alpha", -0.4, 2.0, 0.2).values()
         return (degree_sweep_recipe(self.param_names, alpha_values),)
 
     def is_param_tuple_valid(self, n: float, alpha: float) -> bool:
         """Require ``n`` to be an integer of at least 1, and ``alpha`` to be in its valid range."""
-        return is_valid_degree(n) and ALPHA_LOWER_LIMIT < alpha <= HIGHEST_ALPHA
+        if not is_valid_degree(n):
+            return False
+        else:
+            return ALPHA_EXCLUSIVE_LOWER_LIMIT < alpha <= HIGHEST_ALPHA
 
     test_cases = (
         FormulaTestCase.value(params={"n": 1.0, "alpha": 0.6}, x=0.3, c=0.0, expected=0.3),  # R_1(y) = y

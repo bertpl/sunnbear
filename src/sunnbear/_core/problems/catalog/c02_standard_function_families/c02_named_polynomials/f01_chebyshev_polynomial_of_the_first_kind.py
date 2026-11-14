@@ -10,18 +10,17 @@ from .helpers import degree_sweep_recipe, is_valid_degree, jacobi_interval_bound
 class ChebyshevFirstKindPolynomial(Formula):
     """`ChebyshevFirstKindPolynomial` is ``T_n(x) + c``, with ``T_n`` the Chebyshev polynomial of the first kind.
 
-    ``T_n`` swings between -1 and 1 across the whole of ``[-1, 1]``. For every ``c`` between -1 and 1 the function
-    therefore keeps every zero of its interval, and ``c`` only moves the zeros. That is why ``c`` adds to the function
-    value here, while it shifts ``x`` in the other formulas of the category.
+    ``n`` is the degree, an integer of at least 1. The function has ``n`` zeros in its interval for an odd ``n``, and
+    ``n - 1`` for an even ``n``. ``n = 1`` gives the line ``x + c``.
 
-    - ``n`` is the degree, an integer of at least 1. The function has ``n`` zeros in its interval for an odd ``n``,
-      and ``n - 1`` for an even ``n``. ``n = 1`` gives the line ``x + c``.
+    ``T_n`` oscillates between -1 and 1 across the whole of ``[-1, 1]``.
+
+    For every ``c`` between -1 and 1 the function therefore keeps the same number of zeros in its interval, and ``c``
+    only moves them. That is why ``c`` adds to the function value here, while it shifts ``x`` in the other formulas of
+    the category.
 
     At ``c = 0`` the function goes from -1 at the lower bound to 1 at the upper bound, for every ``n``: the lower
-    bound of an even ``n`` is the lowest point inside ``[-1, 1]`` at which ``T_n`` reaches -1.
-
-    `parametrized_fun` evaluates ``T_n(x)`` as ``cos(n*acos(x))``, which is defined only on ``[-1, 1]``. On that
-    interval it equals the polynomial, and it costs the same for every ``n``.
+    bound of the interval for an even ``n`` is the lowest point inside ``[-1, 1]`` at which ``T_n`` reaches -1.
 
     References:
         - NIST Digital Library of Mathematical Functions, §18.3, for the definition, and §18.5(i), for the
@@ -34,7 +33,11 @@ class ChebyshevFirstKindPolynomial(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
-        """Evaluate ``T_n(x) + c``."""
+        """Evaluate ``T_n(x) + c``, with ``T_n(x)`` as ``cos(n*acos(x))``.
+
+        ``cos(n*acos(x))`` is defined only on ``[-1, 1]``, where it equals the polynomial and costs the same for every
+        ``n``.
+        """
         return math.cos(n * math.acos(x)) + c
 
     def interval_bounds(self, n: float) -> tuple[float, float]:

@@ -6,9 +6,9 @@ from .helpers import degree_sweep_recipe, is_valid_degree, jacobi_interval_bound
 
 # ``alpha`` and ``beta`` have to be above this value: the Jacobi polynomials are orthogonal on ``[-1, 1]`` only above
 # it.
-PARAMETER_LOWER_LIMIT = -1.0
+ALPHA_BETA_EXCLUSIVE_LOWER_LIMIT = -1.0
 # The tests check the rule of `jacobi_interval_bounds` up to this value of ``alpha`` and ``beta``.
-HIGHEST_PARAMETER = 3.0
+HIGHEST_ALPHA_BETA = 3.0
 
 
 class JacobiPolynomial(Formula):
@@ -18,23 +18,27 @@ class JacobiPolynomial(Formula):
 
     - ``n`` is the degree, an integer of at least 1. The function has ``n`` zeros in its interval for an odd ``n``,
       and ``n - 1`` for an even ``n``.
-    - ``alpha`` sets how the swings change toward the bound 1, and ``beta`` how they change toward the bound -1.
-      Above -0.5 the swings grow toward that bound, at -0.5 they stay equally high, and below -0.5 they shrink. Each
-      lies above `PARAMETER_LOWER_LIMIT` and is at most `HIGHEST_PARAMETER`.
+    - ``alpha`` sets how the amplitude changes toward the bound 1, and ``beta`` how it changes toward the bound -1.
+      Toward that bound, the amplitude:
+
+      - grows, for a value above -0.5;
+      - stays the same, at -0.5;
+      - shrinks, for a value below -0.5.
+
+      ``alpha`` and ``beta`` each lie above `ALPHA_BETA_EXCLUSIVE_LOWER_LIMIT` and are at most `HIGHEST_ALPHA_BETA`.
 
     With ``alpha`` unequal to ``beta``, the function behaves differently at its 2 ends, which no other formula of the
     category does. With ``alpha`` equal to ``beta`` it is the function of `GegenbauerPolynomial`, whose ``alpha`` is
-    0.5 higher. The pairs ``(-0.5, 0.5)`` and ``(0.5, -0.5)`` give the Chebyshev polynomials of the third and the
-    fourth kind, up to a constant factor.
+    0.5 higher.
+
+    The pairs ``(-0.5, 0.5)`` and ``(0.5, -0.5)`` give the Chebyshev polynomials of the third and the fourth kind, up
+    to a constant factor.
 
     The polynomial is divided by its value at 1, so that the function is 1 at ``y = 1`` for every parameter tuple, as
     the function of `GegenbauerPolynomial` is. The division moves no zero, because it only scales the function.
 
-    ``c`` shifts ``x``, for the reason that `ChebyshevSecondKindPolynomial` gives: the function keeps its form and
-    every zero of its interval for every ``c``.
-
-    `parametrized_fun` evaluates the divided polynomial by a recurrence over the degrees, which takes ``n`` steps and
-    holds for every ``x``.
+    ``c`` shifts ``x``, so the function keeps its form and, across the range of ``c``, the number of zeros in its
+    interval.
 
     References:
         - NIST Digital Library of Mathematical Functions, §18.3, for the definition and for the Chebyshev polynomials
@@ -53,7 +57,7 @@ class JacobiPolynomial(Formula):
         With ``s = alpha + beta`` and ``t = 2*k + s``, the recurrence is
         ``2*(k + s)*(t - 2)*(k + alpha)*R_k(y) = (t - 1)*(t*(t - 2)*y + alpha^2 - beta^2)*R_(k-1)(y)
         - 2*(k - 1)*(k + beta - 1)*t*R_(k-2)(y)``, which follows from the recurrence of ``P_k^(alpha, beta)`` and its
-        value at 1.
+        value at 1. The recurrence takes ``n`` steps and holds for every ``x``.
         """
         y = x - c / (n * n)
         s = alpha + beta
@@ -80,13 +84,13 @@ class JacobiPolynomial(Formula):
 
         Both parameters take -0.75 and the values from -0.5 to 1.5 in steps of 0.5:
 
-        - -0.75 is the only value at which the swings shrink toward a bound. It lies midway between
-          `PARAMETER_LOWER_LIMIT` and -0.5, the value at which the swings stay equally high.
-        - The values end at 1.5, which is the highest ``alpha`` of `GegenbauerPolynomial`'s recipe, 2, in the terms
-          of this formula.
+        - The value -0.75 is the only one at which the amplitude shrinks toward a bound. It lies midway between
+          `ALPHA_BETA_EXCLUSIVE_LOWER_LIMIT` and -0.5, the value at which the amplitude stays the same.
+        - The values end at 1.5, which corresponds to 2, the highest ``alpha`` of `GegenbauerPolynomial`'s recipe,
+          because that formula's ``alpha`` is 0.5 higher.
         """
-        parameter_values = (-0.75, *ParamAxis("alpha", -0.5, 1.5, 0.5).values())
-        return (degree_sweep_recipe(self.param_names, parameter_values, parameter_values),)
+        alpha_beta_values = (-0.75, *ParamAxis("alpha", -0.5, 1.5, 0.5).values())
+        return (degree_sweep_recipe(self.param_names, alpha_beta_values, alpha_beta_values),)
 
     def is_param_tuple_valid(self, n: float, alpha: float, beta: float) -> bool:
         """Require ``n`` to be an integer of at least 1, and ``alpha`` and ``beta`` to be in their valid range."""
@@ -94,7 +98,8 @@ class JacobiPolynomial(Formula):
             return False
         else:
             return (
-                PARAMETER_LOWER_LIMIT < alpha <= HIGHEST_PARAMETER and PARAMETER_LOWER_LIMIT < beta <= HIGHEST_PARAMETER
+                ALPHA_BETA_EXCLUSIVE_LOWER_LIMIT < alpha <= HIGHEST_ALPHA_BETA
+                and ALPHA_BETA_EXCLUSIVE_LOWER_LIMIT < beta <= HIGHEST_ALPHA_BETA
             )
 
     test_cases = (

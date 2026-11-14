@@ -8,8 +8,11 @@ needs a sign change over its interval, so the interval has to hold an odd number
 
 `helpers` holds that rule, and the degrees that every formula of the category sweeps.
 
-In most formulas ``c`` shifts ``x``. The function then keeps its form and every zero of its interval for every ``c``,
-while its values at the bounds of the interval change with ``c``, and those values decide a solver's first steps.
+In every formula but `ChebyshevFirstKindPolynomial`, ``c`` shifts ``x`` by ``c/n^2``, because the zeros next to the
+bounds lie about ``1/n^2`` apart. The shifted function keeps its form and, across the calibrated range of ``c``, the
+number of zeros in its interval.
+
+Its values at the bounds of the interval do change with ``c``, and those values decide a solver's first steps.
 """
 
 from sunnbear._core.problems.core import FormulaCategory

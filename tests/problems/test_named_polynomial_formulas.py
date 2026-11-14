@@ -10,7 +10,7 @@ from scipy import special
 from sunnbear._core.problems.catalog.c02_standard_function_families.c02_named_polynomials.helpers import (
     jacobi_interval_bounds,
 )
-from sunnbear._core.problems.core import Formula, FormulaRegistry
+from sunnbear._core.problems.core import FormulaRegistry
 
 
 def _chebyshev_first_kind(x: float, c: float, n: float) -> float:
@@ -51,14 +51,8 @@ NAMED_POLYNOMIAL_FORMULAS = [
     pytest.param((2, 2, 5), 42 * 6 * 6, _jacobi, id="jacobi"),
 ]
 
-# The degrees at which `test_every_formula_agrees_with_scipy` compares a formula with scipy.
+# `test_every_formula_agrees_with_scipy` compares a formula with scipy at these degrees.
 COMPARED_DEGREES = (1.0, 2.0, 3.0, 8.0, 31.0, 64.0, 129.0, 1024.0)
-
-
-def _formula_with_number(formula_number: tuple[int, ...]) -> Formula:
-    """Return the registered formula with `formula_number`."""
-    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
-    return formula
 
 
 def test_the_parametrization_names_every_named_polynomial_formula():
@@ -78,7 +72,7 @@ def test_every_candidate_is_negative_at_its_lower_bound_and_positive_at_its_uppe
 ):
     """A formula gives its expected number of candidates, each with ``f(a) < 0 < f(b)`` at ``c = 0``."""
     # --- arrange ----------------------
-    formula = _formula_with_number(formula_number)
+    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
 
     # --- act --------------------------
     candidates = formula.build_all_candidates()
@@ -93,7 +87,7 @@ def test_every_candidate_is_negative_at_its_lower_bound_and_positive_at_its_uppe
 def test_the_interval_of_an_even_degree_leaves_out_1_zero(formula_number, n_candidates, scipy_fun):
     """Between -1 and the lower bound of an even degree's interval, the function changes sign exactly once."""
     # --- arrange ----------------------
-    formula = _formula_with_number(formula_number)
+    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
     even_degree_candidates = [
         candidate for candidate in formula.build_all_candidates() if candidate.id.param_values[0] % 2 == 0
     ]
@@ -102,11 +96,12 @@ def test_the_interval_of_an_even_degree_leaves_out_1_zero(formula_number, n_cand
     # --- act / assert -----------------
     assert even_degree_candidates
     for candidate in even_degree_candidates:
-        # x-values from -1 to the lower bound, at equal steps of the angle acos(-x), in which the zeros lie evenly
+        # The x-values go from -1 to the lower bound, at equal steps of the angle acos(-x), in which the zeros lie
+        # evenly.
         angle_of_lower_bound = math.acos(-candidate.a)
         x_values = [-math.cos(angle_of_lower_bound * step / n_steps) for step in range(n_steps + 1)]
-        is_positive = [value > 0.0 for x in x_values if (value := candidate.xc_fun(x, 0.0)) != 0.0]
-        n_sign_changes = sum(1 for before, after in itertools.pairwise(is_positive) if before != after)
+        is_positive_per_x = [value > 0.0 for x in x_values if (value := candidate.xc_fun(x, 0.0)) != 0.0]
+        n_sign_changes = sum(1 for before, after in itertools.pairwise(is_positive_per_x) if before != after)
         assert n_sign_changes == 1, candidate.id
 
 
@@ -114,7 +109,7 @@ def test_the_interval_of_an_even_degree_leaves_out_1_zero(formula_number, n_cand
 def test_every_formula_agrees_with_scipy(formula_number, n_candidates, scipy_fun):
     """At the degrees of `COMPARED_DEGREES`, a formula's value equals scipy's across the interval, for 3 values of c."""
     # --- arrange ----------------------
-    formula = _formula_with_number(formula_number)
+    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
     compared_candidates = [
         candidate for candidate in formula.build_all_candidates() if candidate.id.param_values[0] in COMPARED_DEGREES
     ]
@@ -129,6 +124,7 @@ def test_every_formula_agrees_with_scipy(formula_number, n_candidates, scipy_fun
                 assert value == pytest.approx(expected, rel=1e-9, abs=1e-9), (candidate.id, x, c)
 
 
+@pytest.mark.parametrize("n", [2, 4, 6, 8, 16, 32, 64, 128, 1024])
 @pytest.mark.parametrize(
     "alpha, beta",
     [
@@ -139,15 +135,14 @@ def test_every_formula_agrees_with_scipy(formula_number, n_candidates, scipy_fun
         pytest.param(6.5, 6.5, id="highest_alpha_of_the_gegenbauer_polynomial"),
     ],
 )
-def test_the_lower_bound_of_an_even_degree_lies_between_the_2_lowest_zeros(alpha, beta):
-    """At the limits of the parameters that the formulas accept, the interval rule holds for every even degree tried."""
-    for n in (2, 4, 6, 8, 16, 32, 64, 128, 1024):
-        # --- arrange ----------------------
-        zeros = np.sort(special.roots_jacobi(n, alpha, beta)[0])
+def test_the_lower_bound_of_an_even_degree_lies_between_the_2_lowest_zeros(alpha, beta, n):
+    """At the limits of the parameters that the formulas accept, the interval rule holds for an even degree."""
+    # --- arrange ----------------------
+    zeros = np.sort(special.roots_jacobi(n, alpha, beta)[0])
 
-        # --- act --------------------------
-        a, b = jacobi_interval_bounds(float(n), alpha, beta)
+    # --- act --------------------------
+    a, b = jacobi_interval_bounds(float(n), alpha, beta)
 
-        # --- assert -----------------------
-        assert zeros[0] < a < zeros[1], n
-        assert b == 1.0
+    # --- assert -----------------------
+    assert zeros[0] < a < zeros[1]
+    assert b == 1.0
