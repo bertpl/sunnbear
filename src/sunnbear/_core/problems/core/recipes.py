@@ -5,7 +5,7 @@ A `ParamRecipe` materializes parameter tuples, and comes in 2 kinds:
 - **`ParamGrid`** sweeps a grid. A grid composes 3 small pieces, innermost first::
 
       ParamNotation  how one axis maps grid arguments to values
-          │          (DECIMAL, or a power notation where the grid lives in exponent space)
+          │          (DECIMAL, or a power notation, whose grid arguments are exponents)
           │
       ParamAxis      one swept parameter: a named argument grid from `start` to
           │          `stop` in steps of `step`, materialized by values() through

@@ -6,7 +6,7 @@ A parameter value is a plain float.
 
 - the value itself for `DECIMAL`;
 - the exponent for `POW2` and `POW10`, whose value is a positive power of 2 or 10;
-- the exponent for `NEG_POW2` and `NEG_POW10`, whose value is the negative of such a power.
+- the exponent for `NEG_POW2` and `NEG_POW10`, whose value is the negative of a power of 2 or 10.
 
 A grid sweeps the argument, and building a value rounds the argument to `CANONICAL_DIGITS`
 significant digits.
@@ -200,9 +200,7 @@ class ParamNotation(StrEnum):
     #  Helpers
     # --------------------------------------------------------------------------
     def _build_value_from_rounded_argument(self, argument: float) -> float:
-        """Return the value of an already rounded `argument`: the argument itself, or a power of the base.
-
-        `NEG_POW2` and `NEG_POW10` give the negative of that power.
+        """Return the value of a rounded `argument`: the argument, a power of the base, or the negative of that power.
 
         Raises:
             ValueError: If the power overflows to a non-finite value.

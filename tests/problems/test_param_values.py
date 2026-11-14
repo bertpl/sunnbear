@@ -34,11 +34,11 @@ def test_build_value_rejects_non_finite_argument(notation, non_finite_argument):
 
 
 @pytest.mark.parametrize(
-    "notation, spelling", [(ParamNotation.POW10, r"10\^400\.0"), (ParamNotation.NEG_POW10, r"-10\^400\.0")]
+    "notation, spelling_pattern", [(ParamNotation.POW10, r"10\^400\.0"), (ParamNotation.NEG_POW10, r"-10\^400\.0")]
 )
-def test_build_value_rejects_overflowing_power(notation, spelling):
+def test_build_value_rejects_overflowing_power(notation, spelling_pattern):
     """A finite exponent can still overflow ``base ** exponent``, and the message spells the power."""
-    with pytest.raises(ValueError, match=f"^{spelling} overflows to a non-finite value"):
+    with pytest.raises(ValueError, match=f"^{spelling_pattern} overflows to a non-finite value"):
         notation.build_value_from_argument(400.0)
 
 
