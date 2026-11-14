@@ -51,17 +51,20 @@ def weight_recipes(first_axis: ParamAxis) -> tuple[ParamRecipe, ...]:
 def slope_recipes(first_axis: ParamAxis) -> tuple[ParamRecipe, ...]:
     """Return the recipes of a formula whose parameters are that of `first_axis` and a slope ``m``.
 
-    The recipes combine every value of `first_axis` with 3 sets of slopes ``m``:
+    The recipes combine every value of `first_axis` with 3 sets of slopes ``m``, of which the positive and the
+    negative slopes have the same sizes:
 
-    - from 10^-2 to 10^-0.1, with the exponent in steps of 0.1, stopping below 1 because at ``m = 1`` the function is
-      the line ``x + c`` of `Linear`. Below 10^-2, the function differs from the one at ``m = 0`` only close to
-      ``x = 0``, and few values of ``c`` place the root there;
+    - from 10^-2 to 10^1, with the exponent in steps of 0.1;
     - 0;
-    - from -10^-1 to -10^1, with the exponent in steps of 0.1.
+    - from -10^-2 to -10^1, with the exponent in steps of 0.1.
+
+    The recipes leave out no slope for giving a function that another candidate gives too, such as ``m = 1``, at
+    which the function is the line ``x + c`` of `Linear`: the selection of a benchmark suite's test problems drops
+    candidates that resemble each other.
     """
-    positive_slope_axis = ParamAxis("m", -2.0, -0.1, 0.1, ParamNotation.POW10)
+    positive_slope_axis = ParamAxis("m", -2.0, 1.0, 0.1, ParamNotation.POW10)
     zero_slope_axis = ParamAxis("m", 0.0, 0.0, 1.0)
-    negative_slope_axis = ParamAxis("m", -1.0, 1.0, 0.1, ParamNotation.NEG_POW10)
+    negative_slope_axis = ParamAxis("m", -2.0, 1.0, 0.1, ParamNotation.NEG_POW10)
     return (
         ParamGrid(axes=(first_axis, positive_slope_axis)),
         ParamGrid(axes=(first_axis, zero_slope_axis)),

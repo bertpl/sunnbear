@@ -9,9 +9,9 @@ from sunnbear._core.problems.core import FormulaRegistry
 CANDIDATE_GRID_SIZES = [
     pytest.param((2, 1, 1), 1, 1, id="linear"),
     pytest.param((2, 1, 2), 5, 41, id="linear_plus_even_power"),
-    pytest.param((2, 1, 3), 4, 42, id="linear_plus_odd_power"),
+    pytest.param((2, 1, 3), 4, 63, id="linear_plus_odd_power"),
     pytest.param((2, 1, 4), 4, 41, id="linear_plus_sum_of_even_first_param_values"),
-    pytest.param((2, 1, 5), 3, 42, id="linear_plus_sum_of_odd_powers"),
+    pytest.param((2, 1, 5), 3, 63, id="linear_plus_sum_of_odd_powers"),
 ]
 
 
@@ -47,9 +47,9 @@ def test_every_candidate_passes_through_the_same_points_at_the_bounds(
 
 
 @pytest.mark.parametrize("formula_number", [(2, 1, 3), (2, 1, 5)])
-def test_the_slopes_run_from_the_negative_ones_through_0_to_just_below_1(formula_number):
-    """The slopes ``m`` of a formula hold 21 negative values from -10 to -0.1, then 0, then 20 values from 0.01 to
-    ``10^-0.1``, and every power or term count gets all of them."""
+def test_the_positive_and_the_negative_slopes_have_the_same_sizes(formula_number):
+    """The slopes ``m`` of a formula hold 31 positive values from 0.01 to 10, their negatives, and 0, and every power
+    or term count gets all of them."""
     # --- arrange ----------------------
     [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
 
@@ -61,7 +61,9 @@ def test_the_slopes_run_from_the_negative_ones_through_0_to_just_below_1(formula
 
     # --- assert -----------------------
     for slopes in slopes_per_first_param.values():
-        sorted_slopes = sorted(slopes)
-        assert (sorted_slopes[0], sorted_slopes[20], sorted_slopes[21]) == (-10.0, -0.1, 0.0)
-        assert (sorted_slopes[22], sorted_slopes[-1]) == (0.01, pytest.approx(10**-0.1))
-        assert len(slopes) == 42
+        positive_slopes = sorted(m for m in slopes if m > 0.0)
+        negative_slopes = sorted(m for m in slopes if m < 0.0)
+        assert (positive_slopes[0], positive_slopes[-1], len(positive_slopes)) == (0.01, 10.0, 31)
+        assert sorted(-m for m in negative_slopes) == positive_slopes
+        assert slopes.count(0.0) == 1
+        assert len(slopes) == 63

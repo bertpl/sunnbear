@@ -16,6 +16,9 @@ class LinearPlusOddPower(Formula):
 
     ``m`` is the slope at ``x = 0``:
 
+    - above ``p/(p - 1)``, the function has a local minimum left of 0 and a local maximum right of 0, beyond which
+      it returns to -1 and 1 at the bounds; it keeps 1 root in ``[-1, 1]``;
+    - at 1, the function is the line ``x + c``;
     - between 0 and 1, the function is increasing, and it flattens around 0 as ``m`` falls;
     - at 0, the function is the power ``x^p``;
     - below 0, the function has a local maximum left of 0 and a local minimum right of 0, and 3 roots in ``[-1, 1]``
