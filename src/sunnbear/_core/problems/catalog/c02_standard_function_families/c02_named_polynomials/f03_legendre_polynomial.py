@@ -4,7 +4,7 @@ import math
 
 from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe, ParamTable
 
-from .helpers import SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
+from .helpers import JACOBI_SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
 
 
 class LegendrePolynomial(Formula):
@@ -53,8 +53,8 @@ class LegendrePolynomial(Formula):
         return jacobi_interval_bounds(n, 0.0, 0.0)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipe that sweeps the degrees of `SWEPT_DEGREES`."""
-        return (ParamTable(names=self.param_names, rows=tuple((degree,) for degree in SWEPT_DEGREES)),)
+        """Return the recipe that sweeps the degrees of `JACOBI_SWEPT_DEGREES`."""
+        return (ParamTable(names=self.param_names, rows=tuple((degree,) for degree in JACOBI_SWEPT_DEGREES)),)
 
     def is_param_tuple_valid(self, n: float) -> bool:
         """Require ``n`` to be an integer of at least 1."""
