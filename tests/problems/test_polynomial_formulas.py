@@ -8,9 +8,9 @@ from sunnbear._core.problems.core import FormulaRegistry
 # term count ``n``), and the number of values of its second parameter (a weight ``w`` or a slope ``m``).
 CANDIDATE_GRID_SIZES = [
     pytest.param((2, 1, 1), 1, 1, id="linear"),
-    pytest.param((2, 1, 2), 5, 41, id="linear_plus_even_power"),
+    pytest.param((2, 1, 2), 5, 31, id="linear_plus_even_power"),
     pytest.param((2, 1, 3), 4, 43, id="linear_plus_odd_power"),
-    pytest.param((2, 1, 4), 4, 41, id="linear_plus_sum_of_even_first_param_values"),
+    pytest.param((2, 1, 4), 4, 31, id="linear_plus_sum_of_even_powers"),
     pytest.param((2, 1, 5), 3, 43, id="linear_plus_sum_of_odd_powers"),
 ]
 

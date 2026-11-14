@@ -41,10 +41,10 @@ def term_count_axis(lowest_power: int) -> ParamAxis:
 def weight_recipes(first_axis: ParamAxis) -> tuple[ParamRecipe, ...]:
     """Return the recipes of a formula whose parameters are that of `first_axis` and a weight ``w``.
 
-    The recipes combine every value of `first_axis` with every weight ``w`` from 10^-1 to 10^3, with the exponent in
-    steps of 0.1. Below 10^-1, the function is nearly the line ``x``.
+    The recipes combine every value of `first_axis` with every weight ``w`` from 10^-3 to 10^3, with the exponent in
+    steps of 0.2.
     """
-    weight_axis = ParamAxis("w", -1.0, 3.0, 0.1, ParamNotation.POW10)
+    weight_axis = ParamAxis("w", -3.0, 3.0, 0.2, ParamNotation.POW10)
     return (ParamGrid(axes=(first_axis, weight_axis)),)
 
 
