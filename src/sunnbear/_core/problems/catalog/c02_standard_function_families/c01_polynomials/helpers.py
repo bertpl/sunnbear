@@ -4,14 +4,10 @@ All formulas with a weight ``p`` build their recipes with `power_and_weight_reci
 all formulas with a slope ``s`` build them with `power_and_slope_recipes`, so they sweep the same slopes.
 """
 
-from sunnbear._core.problems.core import ParamAxis, ParamGrid, ParamNotation, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import ParamAxis, ParamGrid, ParamNotation, ParamRecipe
 
 # The recipes sweep the power ``n`` up to this value.
 HIGHEST_N = 10
-
-# No parameter notation spells a value of the form ``-10^k``. The negative slopes are therefore the negatives of 10^-1
-# to 10^1, with the exponent in steps of 0.1, each rounded to 3 significant digits, which the decimal notation spells.
-_NEGATIVE_SLOPES = tuple(-float(f"{10.0 ** (tenths / 10):.3g}") for tenths in range(-10, 11))
 
 
 def is_valid_n(n: float, lowest_n: int) -> bool:
@@ -43,16 +39,16 @@ def power_and_slope_recipes(lowest_n: int) -> tuple[ParamRecipe, ...]:
       the line ``x + c`` of `Linear` for every ``n``. Below 10^-2, the function differs from the one at ``s = 0`` only
       close to ``x = 0``, and few values of ``c`` place the root there;
     - 0;
-    - the negative slopes from -0.1 to -10 (`_NEGATIVE_SLOPES`).
+    - from -10^-1 to -10^1, with the exponent in steps of 0.1.
     """
     power_axis = _power_axis(lowest_n)
     positive_slope_axis = ParamAxis("s", -2.0, -0.1, 0.1, ParamNotation.POW10)
     zero_slope_axis = ParamAxis("s", 0.0, 0.0, 1.0)
-    negative_slope_rows = tuple((n, s) for n in power_axis.values() for s in _NEGATIVE_SLOPES)
+    negative_slope_axis = ParamAxis("s", -1.0, 1.0, 0.1, ParamNotation.NEG_POW10)
     return (
         ParamGrid(axes=(power_axis, positive_slope_axis)),
         ParamGrid(axes=(power_axis, zero_slope_axis)),
-        ParamTable(names=("n", "s"), rows=negative_slope_rows),
+        ParamGrid(axes=(power_axis, negative_slope_axis)),
     )
 
 
