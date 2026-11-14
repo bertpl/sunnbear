@@ -67,7 +67,7 @@ class LaguerrePolynomial(Formula):
         McMahon's approximation puts the midpoint of ``j_1`` and ``j_2`` at ``1.25*pi``, so the lower bound is
         ``(1.25*pi)^2/(4*n + 2)``.
 
-        That rule is an approximation; the tests check that it holds up to `HIGHEST_VALID_DEGREE`.
+        That rule is an approximation; the tests check it at sampled degrees up to `HIGHEST_VALID_DEGREE`.
         """
         upper_bound = 4.0 * n + 2.0
         if int(n) % 2 == 1:

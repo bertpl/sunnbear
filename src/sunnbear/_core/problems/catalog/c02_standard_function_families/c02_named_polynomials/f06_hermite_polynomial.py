@@ -69,7 +69,7 @@ class HermitePolynomial(Formula):
         of the Airy function Ai. The lower bound is that expression with the mean of ``abs(a_1)`` and
         ``abs(a_2)`` in place of ``abs(a_k)``.
 
-        That rule is an approximation; the tests check that it holds up to `HIGHEST_VALID_DEGREE`.
+        That rule is an approximation; the tests check it at sampled degrees up to `HIGHEST_VALID_DEGREE`.
         """
         upper_bound = math.sqrt(2.0 * n + 1.0)
         if int(n) % 2 == 1:
