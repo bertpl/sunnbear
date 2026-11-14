@@ -16,8 +16,7 @@ class PipelineMode(Enum):
     Each member sets the work of 1 kind of run:
 
     - `FULL` builds the benchmark suites;
-    - `DRAFT` takes a fraction of a full run's time, so that a maintainer can rerun the pipeline often. Each of its
-      characterization stages runs at the `FeatureFidelity` 1 step coarser than the stage's default.
+    - `DRAFT` takes a fraction of a full run's time, so that a maintainer can rerun the pipeline often.
 
     A setting belongs to the mode only when it sets how much work a stage does. The selection rules, such as the spacing
     stage's minimum distance and the objective of `select_diverse_problem_ids`, are the same in every mode.
@@ -33,7 +32,7 @@ class PipelineMode(Enum):
         FullCharacterizationStage.default_fidelity,
         DEFAULT_SELECTION_SEC_PER_CANDIDATE,
     )
-    DRAFT = (FeatureFidelity.VERY_COARSE, FeatureFidelity.COARSE, DEFAULT_SELECTION_SEC_PER_CANDIDATE / 10)
+    DRAFT = (FeatureFidelity.COARSE_DRAFT, FeatureFidelity.FULL_DRAFT, DEFAULT_SELECTION_SEC_PER_CANDIDATE / 10)
 
     def __init__(
         self,

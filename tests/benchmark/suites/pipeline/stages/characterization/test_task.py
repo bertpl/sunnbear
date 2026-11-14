@@ -62,7 +62,7 @@ def test_the_task_returns_a_characterization_or_a_reason_per_candidate(isolated_
     assert reason_of_zeros == "snuffled_max_zero_width_too_large"
 
 
-@pytest.mark.parametrize("fidelity", [FeatureFidelity.VERY_COARSE, FeatureFidelity.COARSE])
+@pytest.mark.parametrize("fidelity", [FeatureFidelity.COARSE_DRAFT, FeatureFidelity.COARSE])
 def test_the_task_runs_the_snuffled_analyses_of_its_fidelity(isolated_formula_registry, monkeypatch, fidelity):
     """The task runs `n_snuffled_analyses` analyses at the fidelity's budget, 1 at each of the first tuples of the
     shipped tuple set, in their order, and puts their properties in the snuffled features."""
