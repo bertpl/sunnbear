@@ -98,7 +98,7 @@ def test_parse_value_rejects_bad_tokens(token, match):
         (2.0**-20.0, "2^-20.0"),
         (10.0**0.5, "10^0.5"),
         (0.3, "0.3"),
-        (-4.0, "-4.0"),  # authored as -2^2.0: the decimal is shorter
+        (-4.0, "-4.0"),  # -2^2.0 also spells it: the decimal is shorter
         (-(2.0**1.23), "-2^1.23"),
         (-(10.0**0.5), "-10^0.5"),
         (-(10.0**4.0), "-10^4.0"),  # shorter than the decimal -10000.0
@@ -116,7 +116,7 @@ def test_spell_value_canonically_picks_the_shortest_valid_spelling(value, expect
     [
         0.1 + 0.2,  # 0.30000000000000004 needs 17 decimal digits, and no short exponent reproduces it
         2.0**1.2345678901234,  # its exponent needs 14 digits
-        -(2.0**1.2345678901234),  # the same holds for the negative of that power
+        -(2.0**1.2345678901234),  # its exponent also needs 14 digits
         float("inf"),
         float("nan"),
     ],
@@ -129,16 +129,22 @@ def test_invalid_param_value_is_rejected(value):
         ParamNotation.spell_value_canonically(value)
 
 
-@pytest.mark.parametrize(
-    "notation, start, stop, step",
-    [
-        (ParamNotation.DECIMAL, -5.0, 5.0, 0.1),
-        (ParamNotation.POW2, -20.0, 20.0, 0.1),
-        (ParamNotation.POW10, -5.0, 5.0, 0.01),
-        (ParamNotation.NEG_POW2, -20.0, 20.0, 0.1),
-        (ParamNotation.NEG_POW10, -5.0, 5.0, 0.01),
-    ],
-)
+# Each case is a notation with the start, stop and step of an axis's argument grid.
+_ROUND_TRIP_CASES = [
+    (ParamNotation.DECIMAL, -5.0, 5.0, 0.1),
+    (ParamNotation.POW2, -20.0, 20.0, 0.1),
+    (ParamNotation.POW10, -5.0, 5.0, 0.01),
+    (ParamNotation.NEG_POW2, -20.0, 20.0, 0.1),
+    (ParamNotation.NEG_POW10, -5.0, 5.0, 0.01),
+]
+
+
+def test_round_trip_cases_cover_every_notation():
+    """The round-trip test covers every `ParamNotation` member."""
+    assert {notation for notation, *_ in _ROUND_TRIP_CASES} == set(ParamNotation)
+
+
+@pytest.mark.parametrize("notation, start, stop, step", _ROUND_TRIP_CASES)
 def test_every_built_value_parses_back_from_its_canonical_spelling(notation, start, stop, step):
     """Every value that a `ParamAxis` builds is valid, and parsing its canonical spelling gives the same float."""
     # --- arrange ----------------------

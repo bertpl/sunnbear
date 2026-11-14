@@ -259,21 +259,12 @@ def test_axis_grid_with_large_magnitude_values():
     assert ParamAxis("p1", 1e16, 3e16, step=1e16).values() == (1e16, 2e16, 3e16)
 
 
-@pytest.mark.parametrize(
-    "build_grid, expected",
-    [
-        (ParamGrid.pow10, [(0.1,), (1.0,), (10.0,)]),
-        (ParamGrid.neg_pow10, [(-0.1,), (-1.0,), (-10.0,)]),
-        (ParamGrid.neg_pow2, [(-0.5,), (-1.0,), (-2.0,)]),
-    ],
-)
-def test_grid_power_conveniences(build_grid, expected):
-    """A power convenience builds a single-axis grid of powers of its base, or of their negatives."""
+def test_grid_pow10_convenience():
     # --- arrange / act ----------------
-    grid = build_grid("p1", -1.0, 1.0, step=1.0)
+    grid = ParamGrid.pow10("p1", -1.0, 1.0, step=1.0)
 
     # --- assert -----------------------
-    assert list(grid.tuples()) == expected
+    assert list(grid.tuples()) == [(0.1,), (1.0,), (10.0,)]
 
 
 def test_grid_single_axis_convenience():

@@ -5,8 +5,7 @@ A `ParamRecipe` materializes parameter tuples, and comes in 2 kinds:
 - **`ParamGrid`** sweeps a grid. A grid composes 3 small pieces, innermost first::
 
       ParamNotation  how one axis maps grid arguments to values
-          │          (DECIMAL, or a power notation where the grid lives in exponent space:
-          │          POW2/POW10 for positive values, NEG_POW2/NEG_POW10 for negative ones)
+          │          (DECIMAL, or a power notation where the grid lives in exponent space)
           │
       ParamAxis      one swept parameter: a named argument grid from `start` to
           │          `stop` in steps of `step`, materialized by values() through
@@ -249,16 +248,6 @@ class ParamGrid(ParamRecipe):
     def pow10(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
         """Build a single-axis grid in base-10 exponent space (POW10 notation)."""
         return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW10),))
-
-    @classmethod
-    def neg_pow2(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
-        """Build a single-axis grid of negative values in base-2 exponent space (NEG_POW2 notation)."""
-        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.NEG_POW2),))
-
-    @classmethod
-    def neg_pow10(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
-        """Build a single-axis grid of negative values in base-10 exponent space (NEG_POW10 notation)."""
-        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.NEG_POW10),))
 
 
 # ==================================================================================================

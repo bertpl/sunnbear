@@ -2,18 +2,21 @@
 
 A parameter value is a plain float.
 
-**A notation maps a continuous argument to a value.** The argument is the value itself for
-`DECIMAL` and the exponent for the 4 power notations: `POW2` and `POW10` for a positive power of 2 or
-10, and `NEG_POW2` and `NEG_POW10` for the negative of one. A grid sweeps the argument, and building a
-value rounds the argument to `CANONICAL_DIGITS` significant digits.
+**A notation maps a continuous argument to a value.** The argument is:
+
+- the value itself for `DECIMAL`;
+- the exponent for `POW2` and `POW10`, whose value is a positive power of 2 or 10;
+- the exponent for `NEG_POW2` and `NEG_POW10`, whose value is the negative of such a power.
+
+A grid sweeps the argument, and building a value rounds the argument to `CANONICAL_DIGITS`
+significant digits.
 
 A power notation's value then follows from its rounded exponent by plain exponentiation and is not
 rounded itself, so a value authored as ``2^1.23`` is exactly ``2 ** 1.23``, and a reader who
-computes ``2 ** 1.23`` from a paper or a suite file gets the same float. A value authored as
-``-10^0.3`` is exactly ``-(10 ** 0.3)``.
+computes ``2 ** 1.23`` from a paper or a suite file gets the same float.
 
-The negative power notations let a grid sweep negative values on a logarithmic scale, as `POW2` and
-`POW10` do for positive values.
+`NEG_POW2` and `NEG_POW10` let a grid sweep negative values on a logarithmic scale, as `POW2` and
+`POW10` do for positive values. A value authored as ``-10^0.3`` is exactly ``-(10 ** 0.3)``.
 
 **The notation matters only while a value is built.** Afterwards a value is written in its
 canonical spelling (see `ParamNotation`), which depends on the float alone: ``2^2.0`` and
@@ -115,9 +118,9 @@ class ParamNotation(StrEnum):
         A minus sign before the base negates the power, so ``-10^0.3`` is ``-(10 ** 0.3)``.
 
         Raises:
-            ValueError: If the token uses an exponent base other than 2, 10, -2 or -10, is malformed, or
-                gives a non-finite value; for an unsupported base or a malformed token, the message
-                names the token.
+            ValueError: If the text before ``^`` is not 2, 10, -2 or -10, if the token is malformed, or if
+                it gives a non-finite value; for unsupported text before ``^`` or a malformed token, the
+                message names the token.
         """
         if "^" in token:
             base_text, _, argument_text = token.partition("^")
@@ -173,7 +176,7 @@ class ParamNotation(StrEnum):
         if not isfinite(value):
             return None
         if self is not ParamNotation.DECIMAL and self._power_sign * value <= 0.0:
-            return None  # a power of 2 or 10 is positive, and the negative of one is negative
+            return None  # a power of 2 or 10 is positive, and the negative of such a power is negative
 
         # --- spell value --------------------------
         # for a power, recover the exponent of a valid value; the comparison below rejects the value
@@ -199,7 +202,7 @@ class ParamNotation(StrEnum):
     def _build_value_from_rounded_argument(self, argument: float) -> float:
         """Return the value of an already rounded `argument`: the argument itself, or a power of the base.
 
-        A negative power notation gives the negative of that power.
+        `NEG_POW2` and `NEG_POW10` give the negative of that power.
 
         Raises:
             ValueError: If the power overflows to a non-finite value.
@@ -231,7 +234,7 @@ class ParamNotation(StrEnum):
 
     @property
     def _power_sign(self) -> float:
-        """Return the sign of a power notation's values: -1 for `NEG_POW2` and `NEG_POW10`, 1 otherwise."""
+        """Return the sign of a power notation's values: -1.0 where the notation negates the power, 1.0 otherwise."""
         if self in (ParamNotation.NEG_POW2, ParamNotation.NEG_POW10):
             return -1.0
         else:
