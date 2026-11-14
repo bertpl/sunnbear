@@ -2,9 +2,9 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe, ParamTable
 
-from .helpers import degree_sweep_recipe, is_valid_degree, jacobi_interval_bounds
+from .helpers import SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
 
 
 class ChebyshevSecondKindPolynomial(Formula):
@@ -18,13 +18,14 @@ class ChebyshevSecondKindPolynomial(Formula):
     ``c`` shifts ``x``, so the function keeps its form and, across the range of ``c``, the number of zeros in its
     interval.
 
-    Adding ``c`` to the function value would not keep that number: the values at the bounds grow with ``n``, so the
-    range of ``c`` would have to grow with them, and for a high degree nearly every ``c`` in that range would leave
-    only the zero next to one of the bounds.
+    Adding ``c`` to the function value would not keep the number of zeros in the interval: the values at the bounds
+    grow with ``n``, so the range of ``c`` would have to grow with them. For a high degree, nearly every ``c`` in that
+    range would then exceed the amplitude of about 1 in the middle of ``[-1, 1]`` and leave only the zero next to one
+    of the bounds.
 
     References:
-        - NIST Digital Library of Mathematical Functions, §18.3, for the definition, and §18.5(i), for the
-          trigonometric form. https://dlmf.nist.gov/18.3 and https://dlmf.nist.gov/18.5
+        - NIST Digital Library of Mathematical Functions, §18.3, for the definition. https://dlmf.nist.gov/18.3
+        - NIST Digital Library of Mathematical Functions, §18.5(i), for the trigonometric form. https://dlmf.nist.gov/18.5
     """
 
     number = (2, 2, 2)
@@ -41,10 +42,10 @@ class ChebyshevSecondKindPolynomial(Formula):
             t = math.acos(abs_y)
             value_at_abs_y = math.sin((n + 1.0) * t) / math.sin(t)
         elif abs_y == 1.0:
-            # At 1, that form is 0/0, and U_n(1) = n + 1.
+            # At 1, sin((n + 1)*t)/sin(t) is 0/0, and U_n(1) = n + 1.
             value_at_abs_y = n + 1.0
         else:
-            # Above 1, which abs(y) passes by at most a few times 1/n^2 because of the shift, sinh and acosh replace
+            # Because of the shift, abs(y) can exceed 1 by at most a few times 1/n^2. Above 1, sinh and acosh replace
             # sin and acos.
             t = math.acosh(abs_y)
             value_at_abs_y = math.sinh((n + 1.0) * t) / math.sinh(t)
@@ -62,7 +63,7 @@ class ChebyshevSecondKindPolynomial(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps the degrees of `SWEPT_DEGREES`."""
-        return (degree_sweep_recipe(self.param_names),)
+        return (ParamTable(names=self.param_names, rows=tuple((degree,) for degree in SWEPT_DEGREES)),)
 
     def is_param_tuple_valid(self, n: float) -> bool:
         """Require ``n`` to be an integer of at least 1."""

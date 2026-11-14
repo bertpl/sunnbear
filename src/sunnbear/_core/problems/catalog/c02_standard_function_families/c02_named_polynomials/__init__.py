@@ -6,13 +6,14 @@ needs a sign change over its interval, so the interval has to hold an odd number
 - an odd ``n`` takes ``[-1, 1]``, which holds every zero;
 - an even ``n`` takes an interval that leaves out 1 zero, the lowest.
 
-`helpers` holds that rule, and the degrees that every formula of the category sweeps.
+`helpers` holds that rule, and `SWEPT_DEGREES`, which every formula of the category sweeps.
 
 In every formula but `ChebyshevFirstKindPolynomial`, ``c`` shifts ``x`` by ``c/n^2``, because the zeros next to the
 bounds lie about ``1/n^2`` apart. The shifted function keeps its form and, across the calibrated range of ``c``, the
 number of zeros in its interval.
 
-Its values at the bounds of the interval do change with ``c``, and those values decide a solver's first steps.
+The shifted function's values at the bounds of the interval do change with ``c``, and those values decide a solver's
+first steps.
 """
 
 from sunnbear._core.problems.core import FormulaCategory

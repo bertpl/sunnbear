@@ -1,16 +1,18 @@
 """This formula is the Gegenbauer polynomial, divided by its value at 1, with ``x`` shifted by ``c``."""
 
+import itertools
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamRecipe, ParamTable
 
-from .helpers import degree_sweep_recipe, is_valid_degree, jacobi_interval_bounds
+from .helpers import SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
 
 # ``alpha`` has to be above this value: the Gegenbauer polynomials are orthogonal on ``[-1, 1]`` only above it, and at
 # this value their outermost zeros lie on the bounds -1 and 1.
 ALPHA_EXCLUSIVE_LOWER_LIMIT = -0.5
-# The tests check the rule of `jacobi_interval_bounds` up to this ``alpha``; the rule fails a little above it.
-HIGHEST_ALPHA = 7.0
+# Up to this ``alpha``, the tests check that the lower bound from `jacobi_interval_bounds` lies between the 2 lowest
+# zeros. A little above this ``alpha``, the lower bound no longer lies between them.
+ALPHA_INCLUSIVE_UPPER_LIMIT = 7.0
 
 
 class GegenbauerPolynomial(Formula):
@@ -26,14 +28,14 @@ class GegenbauerPolynomial(Formula):
       - at 0, it is the same everywhere;
       - above 0, it grows toward the bounds, faster for a higher ``alpha``.
 
-      ``alpha`` lies above `ALPHA_EXCLUSIVE_LOWER_LIMIT` and is at most `HIGHEST_ALPHA`. It is not the ``alpha`` of
-      `JacobiPolynomial`, which is 0.5 lower for the same polynomial.
+      ``alpha`` lies above `ALPHA_EXCLUSIVE_LOWER_LIMIT` and is at most `ALPHA_INCLUSIVE_UPPER_LIMIT`. It is not the
+      ``alpha`` of `JacobiPolynomial`, which is 0.5 lower for the same polynomial.
 
     The polynomial of another formula follows at 3 values of ``alpha``:
 
-    - 0 gives ``T_n``;
+    - 0 gives ``T_n``, the Chebyshev polynomial of the first kind;
     - 0.5 gives the Legendre polynomial;
-    - 1 gives ``U_n/(n + 1)``.
+    - 1 gives ``U_n/(n + 1)``, with ``U_n`` the Chebyshev polynomial of the second kind.
 
     The polynomial is divided by its value at 1 for 2 reasons:
 
@@ -44,13 +46,11 @@ class GegenbauerPolynomial(Formula):
 
     The division moves no zero, because it only scales the function.
 
-    ``c`` shifts ``x``, so the function keeps its form and, across the range of ``c``, the number of zeros in its
-    interval.
-
     References:
         - NIST Digital Library of Mathematical Functions, §18.3, for the definition, where the parameter is called
-          lambda; §18.6(i), for the value at 1; and §18.9(i), for the recurrence. https://dlmf.nist.gov/18.3,
-          https://dlmf.nist.gov/18.6 and https://dlmf.nist.gov/18.9
+          lambda. https://dlmf.nist.gov/18.3
+        - NIST Digital Library of Mathematical Functions, §18.6(i), for the value at 1. https://dlmf.nist.gov/18.6
+        - NIST Digital Library of Mathematical Functions, §18.9(i), for the recurrence. https://dlmf.nist.gov/18.9
     """
 
     number = (2, 2, 4)
@@ -83,19 +83,19 @@ class GegenbauerPolynomial(Formula):
         """Return the recipe that combines the degrees of `SWEPT_DEGREES` with ``alpha`` from -0.4 to 2 in steps of 0.2.
 
         - The sweep starts at -0.4, the lowest multiple of 0.2 above `ALPHA_EXCLUSIVE_LOWER_LIMIT`.
-        - The sweep ends at 2, where the amplitude in the middle of ``[-1, 1]`` is already thousands of times lower
-          than the value at the bounds for a degree above 100. A higher ``alpha`` lowers that amplitude further and
-          gives no other kind of function.
+        - The sweep ends at 2: at that ``alpha`` and a degree above 100, the amplitude in the middle of ``[-1, 1]`` is
+          already thousands of times lower than the value at the bounds. A higher ``alpha`` lowers that amplitude
+          further and gives no other kind of function.
         """
         alpha_values = ParamAxis("alpha", -0.4, 2.0, 0.2).values()
-        return (degree_sweep_recipe(self.param_names, alpha_values),)
+        return (ParamTable(names=self.param_names, rows=tuple(itertools.product(SWEPT_DEGREES, alpha_values))),)
 
     def is_param_tuple_valid(self, n: float, alpha: float) -> bool:
         """Require ``n`` to be an integer of at least 1, and ``alpha`` to be in its valid range."""
         if not is_valid_degree(n):
             return False
         else:
-            return ALPHA_EXCLUSIVE_LOWER_LIMIT < alpha <= HIGHEST_ALPHA
+            return ALPHA_EXCLUSIVE_LOWER_LIMIT < alpha <= ALPHA_INCLUSIVE_UPPER_LIMIT
 
     test_cases = (
         FormulaTestCase.value(params={"n": 1.0, "alpha": 0.6}, x=0.3, c=0.0, expected=0.3),  # R_1(y) = y

@@ -2,9 +2,9 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe, ParamTable
 
-from .helpers import degree_sweep_recipe, is_valid_degree, jacobi_interval_bounds
+from .helpers import SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
 
 
 class LegendrePolynomial(Formula):
@@ -19,12 +19,13 @@ class LegendrePolynomial(Formula):
     ``c`` shifts ``x``, so the function keeps its form and, across the range of ``c``, the number of zeros in its
     interval.
 
-    Adding ``c`` to the function value would not keep that number: the amplitude in the middle of ``[-1, 1]`` shrinks
-    as ``n`` grows, so for a high degree nearly every ``c`` would leave only the zeros near the bounds.
+    Adding ``c`` to the function value would not keep the number of zeros in the interval: the amplitude in the middle
+    of ``[-1, 1]`` shrinks as ``n`` grows, so for a high degree nearly every ``c`` would leave only the zeros near the
+    bounds.
 
     References:
-        - NIST Digital Library of Mathematical Functions, §18.3, for the definition, and §18.9(i), for the
-          recurrence. https://dlmf.nist.gov/18.3 and https://dlmf.nist.gov/18.9
+        - NIST Digital Library of Mathematical Functions, §18.3, for the definition. https://dlmf.nist.gov/18.3
+        - NIST Digital Library of Mathematical Functions, §18.9(i), for the recurrence. https://dlmf.nist.gov/18.9
     """
 
     number = (2, 2, 3)
@@ -53,7 +54,7 @@ class LegendrePolynomial(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps the degrees of `SWEPT_DEGREES`."""
-        return (degree_sweep_recipe(self.param_names),)
+        return (ParamTable(names=self.param_names, rows=tuple((degree,) for degree in SWEPT_DEGREES)),)
 
     def is_param_tuple_valid(self, n: float) -> bool:
         """Require ``n`` to be an integer of at least 1."""

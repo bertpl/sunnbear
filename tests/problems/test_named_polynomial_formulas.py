@@ -1,4 +1,7 @@
-"""Each named polynomial formula (category 2.2) gives the expected candidates, on intervals with a sign change."""
+"""The named polynomial formulas (category 2.2) give the expected candidates, with values that agree with scipy.
+
+Each candidate's interval has a sign change, and the interval of an even degree leaves out exactly the lowest zero.
+"""
 
 import itertools
 import math
@@ -7,6 +10,10 @@ import numpy as np
 import pytest
 from scipy import special
 
+from sunnbear._core.problems.catalog.c02_standard_function_families.c02_named_polynomials import (
+    f04_gegenbauer_polynomial,
+    f05_jacobi_polynomial,
+)
 from sunnbear._core.problems.catalog.c02_standard_function_families.c02_named_polynomials.helpers import (
     jacobi_interval_bounds,
 )
@@ -54,6 +61,13 @@ NAMED_POLYNOMIAL_FORMULAS = [
 # `test_every_formula_agrees_with_scipy` compares a formula with scipy at these degrees.
 COMPARED_DEGREES = (1.0, 2.0, 3.0, 8.0, 31.0, 64.0, 129.0, 1024.0)
 
+# `test_the_lower_bound_of_an_even_degree_lies_between_the_2_lowest_zeros` checks the interval rule at these Jacobi
+# parameters: just above the excluded lower limit of ``alpha`` and ``beta``, at their upper limit, and at the upper
+# limit of `GegenbauerPolynomial`, whose ``alpha`` is 0.5 higher than the Jacobi parameters.
+NEAR_LOWER_LIMIT = f05_jacobi_polynomial.ALPHA_BETA_EXCLUSIVE_LOWER_LIMIT + 0.01
+JACOBI_UPPER_LIMIT = f05_jacobi_polynomial.ALPHA_BETA_INCLUSIVE_UPPER_LIMIT
+GEGENBAUER_UPPER_LIMIT = f04_gegenbauer_polynomial.ALPHA_INCLUSIVE_UPPER_LIMIT - 0.5
+
 
 def test_the_parametrization_names_every_named_polynomial_formula():
     """`NAMED_POLYNOMIAL_FORMULAS` names exactly the formulas of category 2.2."""
@@ -96,8 +110,8 @@ def test_the_interval_of_an_even_degree_leaves_out_1_zero(formula_number, n_cand
     # --- act / assert -----------------
     assert even_degree_candidates
     for candidate in even_degree_candidates:
-        # The x-values go from -1 to the lower bound, at equal steps of the angle acos(-x), in which the zeros lie
-        # evenly.
+        # The x-values go from -1 to the lower bound in equal steps of the angle acos(-x), because the zeros lie about
+        # evenly spaced in that angle.
         angle_of_lower_bound = math.acos(-candidate.a)
         x_values = [-math.cos(angle_of_lower_bound * step / n_steps) for step in range(n_steps + 1)]
         is_positive_per_x = [value > 0.0 for x in x_values if (value := candidate.xc_fun(x, 0.0)) != 0.0]
@@ -128,15 +142,15 @@ def test_every_formula_agrees_with_scipy(formula_number, n_candidates, scipy_fun
 @pytest.mark.parametrize(
     "alpha, beta",
     [
-        pytest.param(-0.99, -0.99, id="both_near_the_lower_limit"),
-        pytest.param(-0.99, 3.0, id="alpha_near_the_lower_limit_beta_highest"),
-        pytest.param(3.0, -0.99, id="alpha_highest_beta_near_the_lower_limit"),
-        pytest.param(3.0, 3.0, id="both_highest"),
-        pytest.param(6.5, 6.5, id="highest_alpha_of_the_gegenbauer_polynomial"),
+        pytest.param(NEAR_LOWER_LIMIT, NEAR_LOWER_LIMIT, id="both_near_the_lower_limit"),
+        pytest.param(NEAR_LOWER_LIMIT, JACOBI_UPPER_LIMIT, id="alpha_near_the_lower_limit_beta_highest"),
+        pytest.param(JACOBI_UPPER_LIMIT, NEAR_LOWER_LIMIT, id="alpha_highest_beta_near_the_lower_limit"),
+        pytest.param(JACOBI_UPPER_LIMIT, JACOBI_UPPER_LIMIT, id="both_highest"),
+        pytest.param(GEGENBAUER_UPPER_LIMIT, GEGENBAUER_UPPER_LIMIT, id="highest_alpha_of_the_gegenbauer_polynomial"),
     ],
 )
 def test_the_lower_bound_of_an_even_degree_lies_between_the_2_lowest_zeros(alpha, beta, n):
-    """At the limits of the parameters that the formulas accept, the interval rule holds for an even degree."""
+    """At the limits of the formulas' valid parameters, the interval rule holds for an even degree."""
     # --- arrange ----------------------
     zeros = np.sort(special.roots_jacobi(n, alpha, beta)[0])
 

@@ -2,9 +2,9 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe, ParamTable
 
-from .helpers import degree_sweep_recipe, is_valid_degree, jacobi_interval_bounds
+from .helpers import SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
 
 
 class ChebyshevFirstKindPolynomial(Formula):
@@ -19,12 +19,13 @@ class ChebyshevFirstKindPolynomial(Formula):
     only moves them. That is why ``c`` adds to the function value here, while it shifts ``x`` in the other formulas of
     the category.
 
-    At ``c = 0`` the function goes from -1 at the lower bound to 1 at the upper bound, for every ``n``: the lower
-    bound of the interval for an even ``n`` is the lowest point inside ``[-1, 1]`` at which ``T_n`` reaches -1.
+    At ``c = 0`` the function goes from -1 at the lower bound to 1 at the upper bound, for every ``n``. For an odd
+    ``n``, ``T_n(-1)`` is -1. For an even ``n``, the lower bound of the interval is the smallest ``x`` inside
+    ``[-1, 1]`` at which ``T_n`` is -1.
 
     References:
-        - NIST Digital Library of Mathematical Functions, §18.3, for the definition, and §18.5(i), for the
-          trigonometric form. https://dlmf.nist.gov/18.3 and https://dlmf.nist.gov/18.5
+        - NIST Digital Library of Mathematical Functions, §18.3, for the definition. https://dlmf.nist.gov/18.3
+        - NIST Digital Library of Mathematical Functions, §18.5(i), for the trigonometric form. https://dlmf.nist.gov/18.5
     """
 
     number = (2, 2, 1)
@@ -49,7 +50,7 @@ class ChebyshevFirstKindPolynomial(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps the degrees of `SWEPT_DEGREES`."""
-        return (degree_sweep_recipe(self.param_names),)
+        return (ParamTable(names=self.param_names, rows=tuple((degree,) for degree in SWEPT_DEGREES)),)
 
     def is_param_tuple_valid(self, n: float) -> bool:
         """Require ``n`` to be an integer of at least 1."""
