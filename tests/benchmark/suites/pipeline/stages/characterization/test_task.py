@@ -6,7 +6,7 @@ import math
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
+from sunnbear._core.benchmark.mc_tuples import load_first_mc_tuples
 from sunnbear._core.benchmark.protocol import CRange, MCSolveSettings
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     SNUFFLED_PROPERTIES,
@@ -66,7 +66,7 @@ def test_the_task_returns_a_characterization_or_a_reason_per_candidate(isolated_
 @pytest.mark.parametrize("fidelity", [FeatureFidelity.VERY_COARSE, FeatureFidelity.COARSE])
 def test_the_task_runs_the_snuffled_analyses_of_its_fidelity(isolated_formula_registry, monkeypatch, fidelity):
     """The task runs `n_snuffled_analyses` analyses at the fidelity's budget, 1 at each of the first tuples of the
-    shipped tuple set, in their order; the test replaces the analysis by a recorder that returns each property as 0."""
+    shipped tuple set, in their order, and puts their properties in the snuffled features."""
     # --- arrange ----------------------
     define_formula_cls((99, 964), lambda x, c: x - c - 1 / 3, -1.0, 1.0)
     analyses = []
@@ -83,7 +83,7 @@ def test_the_task_runs_the_snuffled_analyses_of_its_fidelity(isolated_formula_re
     [characterization] = task.run()
 
     # --- assert -----------------------
-    first_vs = load_mc_tuples(max(MCTuplesSize)).v[: fidelity.n_snuffled_analyses]
+    first_vs = load_first_mc_tuples(fidelity.n_snuffled_analyses).v
     assert [(budget, mc_sample_idx) for budget, mc_sample_idx, _ in analyses] == [
         (fidelity.snuffled_budget, mc_sample_idx) for mc_sample_idx in range(fidelity.n_snuffled_analyses)
     ]

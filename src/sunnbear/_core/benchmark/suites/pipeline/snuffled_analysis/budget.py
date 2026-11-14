@@ -19,14 +19,14 @@ from .function_evaluation_error import FunctionEvaluationError
 class SnuffledAnalysisBudget(Enum):
     """A `SnuffledAnalysisBudget` names a budget of snuffled's analysis of 1 test problem at 1 Monte Carlo tuple.
 
+    `VERY_LOW` differs from `LOW` only in `n_roots`. An analysis's run time grows with the number of roots that it
+    analyzes, so `VERY_LOW` shortens the analysis of a function with more roots than `VERY_LOW.n_roots`, and analyzes
+    a function with at most `VERY_LOW.n_roots` roots as `LOW` does.
+
     Attributes:
         n_fun_samples: The number of x-values at which snuffled samples f across the interval.
         n_roots: The largest number of roots that snuffled analyzes.
         n_root_samples: The number of x-values at which snuffled samples f around each root that it analyzes.
-
-    `VERY_LOW` differs from `LOW` only in `n_roots`. An analysis's run time grows with the number of roots that it
-    analyzes, so `VERY_LOW` shortens the analysis of a function with many roots, and leaves the analysis of a function
-    with up to its `n_roots` roots as `LOW` runs it.
     """
 
     VERY_LOW = (1_000, 10, 30)

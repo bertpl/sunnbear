@@ -11,11 +11,12 @@ The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples
   runs 2 max-div solves per size (`construction`) and reports each size's `MCTuplesSizeResult`;
 - `generate_mc_tuples` raises `MCTuplesConstructionError` when a size cannot meet its constraints;
 - the `DEFAULT_*` constants hold the defaults of the arguments of `generate_mc_tuples`;
-- `load_mc_tuples(size)` returns one size of the shipped set, 1 of `MCTuplesSize`; `MCTuplesDeclaration`
-  declares the set as the data artifact `mc_tuples`.
+- `load_mc_tuples(size)` returns one size of the shipped set, 1 of `MCTuplesSize`, and
+  `load_first_mc_tuples(n_tuples)` returns its first `n_tuples` tuples for any count up to the largest size;
+  `MCTuplesDeclaration` declares the set as the data artifact `mc_tuples`.
 """
 
-from .artifact import MCTuplesDeclaration, load_mc_tuples
+from .artifact import MCTuplesDeclaration, load_first_mc_tuples, load_mc_tuples
 from .construction import (
     DEFAULT_N_POPULATION,
     DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL,

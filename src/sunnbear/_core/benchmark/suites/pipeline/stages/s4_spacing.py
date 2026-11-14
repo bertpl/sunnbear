@@ -17,9 +17,9 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 if TYPE_CHECKING:
     from sunnbear._core.problems.core import ProblemId
 
-# `SpacingStage`'s default `min_distance` is a tenth of a feature block's mean pairwise distance. Full characterization
-# runs on every candidate that spacing keeps, and takes far longer per candidate than the coarse features that spacing
-# compares, so the default is set to keep the full characterization of the shipped formulas affordable.
+# `SpacingStage`'s default `min_distance` is 1/10 of a feature block's mean pairwise distance. Full characterization
+# runs on every candidate that spacing keeps, and takes far longer per candidate than coarse characterization, so the
+# default is set to keep the full characterization of the shipped formulas affordable.
 DEFAULT_SPACING_MIN_DISTANCE = 0.1
 
 

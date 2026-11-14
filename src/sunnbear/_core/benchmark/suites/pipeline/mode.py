@@ -17,7 +17,7 @@ class PipelineMode(Enum):
 
     - `FULL` builds the benchmark suites;
     - `DRAFT` takes a fraction of a full run's time, so that a maintainer can rerun the pipeline often. Each of its
-      characterization stages runs 1 fidelity below the stage's default.
+      characterization stages runs at the next coarser `FeatureFidelity` than the stage's default.
 
     A setting belongs to the mode only when it sets how much work a stage does. The selection rules, such as the spacing
     stage's minimum distance and the objective of `select_diverse_problem_ids`, are the same in every mode.

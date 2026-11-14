@@ -10,7 +10,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from sunnbear._core.benchmark.aggregation import add_derived_results
-from sunnbear._core.benchmark.mc_tuples import MCTuplesSize, load_mc_tuples
+from sunnbear._core.benchmark.mc_tuples import load_first_mc_tuples
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, CRange, MCSolveSettings
 from sunnbear._core.benchmark.runner import BenchmarkRunSettings, BenchmarkTask
 from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED
@@ -80,14 +80,12 @@ class CandidateCharacterizationTask:
             )
 
             # --- snuffled's analyses ------------
-            # Each size of the shipped tuple set starts with the smaller sizes, so the first tuples of the largest size
-            # are the first tuples of every size.
             n_snuffled_analyses = self.fidelity.n_snuffled_analyses
             problem = FormulaRegistry.candidate_from_id(problem_id).calibrated(c_range.c_min, c_range.c_max)
             mc_solve_settings = MCSolveSettings.from_test_problem(
                 problem,
                 n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS,
-                mc_tuples=load_mc_tuples(max(MCTuplesSize)).first(n_snuffled_analyses),
+                mc_tuples=load_first_mc_tuples(n_snuffled_analyses),
             )
             property_values = []
             for mc_sample_idx in range(n_snuffled_analyses):
