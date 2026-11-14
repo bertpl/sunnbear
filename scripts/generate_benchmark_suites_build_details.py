@@ -4,17 +4,19 @@ The artifact is `benchmark_suites_build_details`. The maintainer runs this scrip
 ``make benchmark-suites-build-details``, when the release script reports that the shipped build details are stale, and
 then commits the artifact's manifest. The script:
 
-- runs the pipeline in `PipelineMode.DRAFT` over every registered formula, into the workspace directory given by
-  ``--workspace``, because the benchmark suites that it builds are not shipped yet;
+- runs the pipeline over every registered formula, into the workspace directory given by ``--workspace``, in the
+  `PipelineMode` given by ``--mode``. The default is draft mode, because the benchmark suites that the pipeline builds
+  are not shipped yet; a run in full mode takes several times longer;
 - stops with status 1, without saving, when a stage stops the run, because the build details of a stopped run hold no
   benchmark suites;
 - saves the build details through `ArtifactStore`, which records in the artifact's manifest how they were built and
   from which `mc_tuples` artifact;
 - publishes the artifact's data release, unless ``--no-publish`` is given for a trial run.
 
-Usage, with the workspace directory under ``script_outputs/``:
+Usage, with the workspace directory under ``script_outputs/``, in draft mode and in full mode:
 
     make benchmark-suites-build-details
+    make benchmark-suites-build-details MODE=full
 """
 
 import argparse
@@ -30,14 +32,19 @@ from sunnbear._core.benchmark.suites.pipeline import (
 )
 from sunnbear._core.problems.core import FormulaRegistry
 
-_MODE = PipelineMode.DRAFT
-
 
 def main() -> None:
     """Run the pipeline, then save and publish its build details as the `benchmark_suites_build_details` artifact."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--workspace", type=Path, required=True, help="directory for the outputs of the stages")
     parser.add_argument("--n-workers", type=int, help="number of worker processes (default: 1 per logical CPU)")
+    parser.add_argument(
+        "--mode",
+        type=str.lower,
+        choices=[mode.name.lower() for mode in PipelineMode],
+        default=PipelineMode.DRAFT.name.lower(),
+        help="how much work the stages do (default: %(default)s)",
+    )
     parser.add_argument(
         "--no-publish",
         action="store_true",
@@ -46,8 +53,9 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    mode = PipelineMode[args.mode.upper()]
     result = run_pipeline(
-        workspace_dir=args.workspace, formulas=FormulaRegistry.formulas(), n_workers=args.n_workers, mode=_MODE
+        workspace_dir=args.workspace, formulas=FormulaRegistry.formulas(), n_workers=args.n_workers, mode=mode
     )
     for manifest in result.manifests:
         print(f"{manifest.stage_id}: {manifest.n_candidates_out} of {manifest.n_candidates_in} candidates kept")
@@ -63,7 +71,7 @@ def main() -> None:
         input_artifact_hashes={MCTuplesDeclaration.name: ArtifactStore.load_manifest(MCTuplesDeclaration).content_hash},
         generated_by={
             "function": "sunnbear._core.benchmark.suites.pipeline.run_pipeline",
-            "arguments": {"mode": _MODE.name, "n_workers": args.n_workers},
+            "arguments": {"mode": mode.name, "n_workers": args.n_workers},
         },
     )
     print(f"Saved {manifest.short_identity}.")

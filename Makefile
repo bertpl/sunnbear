@@ -1,4 +1,5 @@
 file_path=
+MODE=draft
 
 help:
 	@echo 'Commands:'
@@ -22,6 +23,7 @@ help:
 	@echo 'Options:'
 	@echo ''
 	@echo '  format-single-file             - accepts `file_path=<path>` to pass the relative path of the file to be formatted.'
+	@echo '  benchmark-suites-build-details - accepts `MODE=draft` (the default) or `MODE=full` to set how much work the pipeline does.'
 
 build:
 	uv build;
@@ -56,7 +58,7 @@ splash:
 	./.github/scripts/create_splash.sh "$$(uv version --short)-dev";
 
 benchmark-suites-build-details:
-	uv run python scripts/generate_benchmark_suites_build_details.py --workspace script_outputs/benchmark_suites_build_details
+	uv run python scripts/generate_benchmark_suites_build_details.py --workspace script_outputs/benchmark_suites_build_details --mode $(MODE)
 
 release:
 	@test -n "$(VERSION)" || (echo "Usage: make release VERSION=X.Y.Z" && exit 1)

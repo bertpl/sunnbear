@@ -1,8 +1,8 @@
 """`SpacingStage`, the fourth stage of the benchmark suite pipeline, drops near-duplicate candidates of each formula.
 
-Dense parameter grids give candidates of 1 formula whose feature vectors nearly coincide. Such candidates add to the
-cost of characterizing each candidate in full, and nothing to the diversity of the benchmark suites, so the stage
-keeps, per formula, only candidates that lie at least a minimum distance apart.
+Dense parameter grids give candidates of 1 formula whose feature vectors lie close together. Such candidates raise the
+cost of full characterization and add little to the diversity of the benchmark suites, so the stage keeps, per formula,
+only candidates that lie at least a minimum distance apart.
 """
 
 from typing import TYPE_CHECKING
@@ -17,10 +17,11 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 if TYPE_CHECKING:
     from sunnbear._core.problems.core import ProblemId
 
-# `SpacingStage`'s default `min_distance` is small, so the stage drops only candidates whose feature vectors, with each
-# block divided by its scale, nearly coincide; raise it as the corpus grows, so that characterizing the kept candidates
-# in full stays affordable.
-DEFAULT_SPACING_MIN_DISTANCE = 1e-3
+# `SpacingStage`'s default `min_distance` is 1/10 of the mean pairwise L1 distance within each block of the coarse
+# feature vectors, after each block is divided by its scale. Full characterization runs on every candidate that spacing
+# keeps, and takes far longer per candidate than coarse characterization, so the default is set to keep the full
+# characterization of the shipped formulas affordable.
+DEFAULT_SPACING_MIN_DISTANCE = 0.1
 
 
 # ==================================================================================================
