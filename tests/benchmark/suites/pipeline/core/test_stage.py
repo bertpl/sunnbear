@@ -10,8 +10,8 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 
 
 @dataclass(frozen=True)
-class _ExampleParamTask:
-    """`_ExampleParamTask` returns the text of each of its problem ids."""
+class _ExampleProblemIdTextTask:
+    """`_ExampleProblemIdTextTask` returns the text of each of its problem ids."""
 
     problem_ids: tuple[ProblemId, ...]
 
@@ -26,10 +26,11 @@ def test_a_formula_with_many_candidates_is_split_over_tasks_of_limited_size():
     # --- arrange ----------------------
     large_formula_ids = [ProblemId.from_string(f"f99.901[n={n}.0]") for n in range(5 * MAX_CANDIDATES_PER_TASK)]
     small_formula_ids = [ProblemId.from_string(f"f99.902[n={n}.0]") for n in range(3)]
-    tasks: list[_ExampleParamTask] = []
+    tasks: list[_ExampleProblemIdTextTask] = []
 
-    def build_task(batch: tuple[ProblemId, ...]) -> _ExampleParamTask:
-        tasks.append(_ExampleParamTask(problem_ids=batch))
+    def build_task(batch: tuple[ProblemId, ...]) -> _ExampleProblemIdTextTask:
+        """Build the task for `batch` and record it in `tasks`."""
+        tasks.append(_ExampleProblemIdTextTask(problem_ids=batch))
         return tasks[-1]
 
     # --- act --------------------------

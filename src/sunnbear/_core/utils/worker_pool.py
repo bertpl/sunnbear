@@ -112,18 +112,18 @@ class WorkerPool:
     def split_into_batches[T](
         self, items: Sequence[T], *, group_key: Callable[[T], Hashable], max_batch_size: int | None = None
     ) -> list[list[T]]:
-        """Split `items` into at least about `TARGET_BATCHES_PER_WORKER` batches per worker.
+        """Split `items` into batches of a limited size, keeping the items of 1 key together where they fit.
 
-        The items with the same key form a group. A batch keeps a group together where the group fits in 1 batch, so
-        work that a group's items share, such as compiling a function, mostly happens once per group. The batches are
-        filled as follows:
+        The items with the same key form a group. A batch keeps a group together when the group fits in 1 batch, so a
+        group's shared work, such as compiling a function, mostly happens once per group. The batches are filled as
+        follows:
 
-        - a batch holds at most `ceil(len(items) / (TARGET_BATCHES_PER_WORKER * n_workers))` items, and at most
-          `max_batch_size` items when that is given;
+        - a batch holds at most the default maximum of `ceil(len(items) / (TARGET_BATCHES_PER_WORKER * n_workers))`
+          items, or at most `max_batch_size` items when that is given and smaller;
         - the groups fill the batches in order of first appearance, and the items keep their order within a group;
-        - a batch takes the next group as long as the batch then holds at most the maximum;
-        - a group larger than the maximum is split into consecutive batches of nearly equal sizes, none above the
-          maximum, which hold no other group. A large group then runs in several workers, not in 1.
+        - a batch takes the next group as long as the batch then holds at most its maximum size;
+        - a group larger than a batch's maximum size is split into consecutive batches of nearly equal sizes, none
+          above that size, which hold no other group. A large group then runs in several workers.
 
         Args:
             items: The items to split.
@@ -140,17 +140,17 @@ class WorkerPool:
         groups: dict[Hashable, list[T]] = {}
         for item in items:
             groups.setdefault(group_key(item), []).append(item)
-        max_size = math.ceil(len(items) / (TARGET_BATCHES_PER_WORKER * self.n_workers))
+        effective_max_batch_size = math.ceil(len(items) / (TARGET_BATCHES_PER_WORKER * self.n_workers))
         if max_batch_size is not None:
-            max_size = min(max_size, max_batch_size)
+            effective_max_batch_size = min(effective_max_batch_size, max_batch_size)
         batches: list[list[T]] = []
         batch: list[T] = []
         for group in groups.values():
-            if batch and len(batch) + len(group) > max_size:
+            if batch and len(batch) + len(group) > effective_max_batch_size:
                 batches.append(batch)
                 batch = []
-            if len(group) > max_size:
-                n_group_batches = math.ceil(len(group) / max_size)
+            if len(group) > effective_max_batch_size:
+                n_group_batches = math.ceil(len(group) / effective_max_batch_size)
                 group_batch_size = math.ceil(len(group) / n_group_batches)
                 batches.extend(
                     group[start : start + group_batch_size] for start in range(0, len(group), group_batch_size)
