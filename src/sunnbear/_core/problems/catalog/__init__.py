@@ -9,6 +9,8 @@ The catalog tests check this layout convention:
   ``name_slug``; the directory path therefore reads as the full number, e.g.
   ``c02_standard_function_families/c01_polynomials/f01_linear.py`` is formula ``2.1.1``
 
+`PARAMETER_NAMES.md` in this folder is the guide to the names of the formulas' parameters.
+
 Importing this package registers every shipped formula and category.
 """
 
