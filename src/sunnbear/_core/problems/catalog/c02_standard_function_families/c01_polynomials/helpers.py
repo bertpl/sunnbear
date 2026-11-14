@@ -54,17 +54,17 @@ def slope_recipes(first_axis: ParamAxis) -> tuple[ParamRecipe, ...]:
     The recipes combine every value of `first_axis` with 3 sets of slopes ``m``, of which the positive and the
     negative slopes have the same sizes:
 
-    - from 10^-2 to 10^1, with the exponent in steps of 0.1;
+    - from 10^-3 to 10^1, with the exponent in steps of 0.2;
     - 0;
-    - from -10^-2 to -10^1, with the exponent in steps of 0.1.
+    - from -10^-3 to -10^1, with the exponent in steps of 0.2.
 
     The recipes leave out no slope for giving a function that another candidate gives too, such as ``m = 1``, at
     which the function is the line ``x + c`` of `Linear`: the selection of a benchmark suite's test problems drops
     candidates that resemble each other.
     """
-    positive_slope_axis = ParamAxis("m", -2.0, 1.0, 0.1, ParamNotation.POW10)
+    positive_slope_axis = ParamAxis("m", -3.0, 1.0, 0.2, ParamNotation.POW10)
     zero_slope_axis = ParamAxis("m", 0.0, 0.0, 1.0)
-    negative_slope_axis = ParamAxis("m", -2.0, 1.0, 0.1, ParamNotation.NEG_POW10)
+    negative_slope_axis = ParamAxis("m", -3.0, 1.0, 0.2, ParamNotation.NEG_POW10)
     return (
         ParamGrid(axes=(first_axis, positive_slope_axis)),
         ParamGrid(axes=(first_axis, zero_slope_axis)),

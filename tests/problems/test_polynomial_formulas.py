@@ -9,9 +9,9 @@ from sunnbear._core.problems.core import FormulaRegistry
 CANDIDATE_GRID_SIZES = [
     pytest.param((2, 1, 1), 1, 1, id="linear"),
     pytest.param((2, 1, 2), 5, 41, id="linear_plus_even_power"),
-    pytest.param((2, 1, 3), 4, 63, id="linear_plus_odd_power"),
+    pytest.param((2, 1, 3), 4, 43, id="linear_plus_odd_power"),
     pytest.param((2, 1, 4), 4, 41, id="linear_plus_sum_of_even_first_param_values"),
-    pytest.param((2, 1, 5), 3, 63, id="linear_plus_sum_of_odd_powers"),
+    pytest.param((2, 1, 5), 3, 43, id="linear_plus_sum_of_odd_powers"),
 ]
 
 
@@ -48,7 +48,7 @@ def test_every_candidate_passes_through_the_same_points_at_the_bounds(
 
 @pytest.mark.parametrize("formula_number", [(2, 1, 3), (2, 1, 5)])
 def test_the_positive_and_the_negative_slopes_have_the_same_sizes(formula_number):
-    """The slopes ``m`` of a formula hold 31 positive values from 0.01 to 10, their negatives, and 0, and every power
+    """The slopes ``m`` of a formula hold 21 positive values from 0.001 to 10, their negatives, and 0, and every power
     or term count gets all of them."""
     # --- arrange ----------------------
     [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
@@ -63,7 +63,7 @@ def test_the_positive_and_the_negative_slopes_have_the_same_sizes(formula_number
     for slopes in slopes_per_first_param.values():
         positive_slopes = sorted(m for m in slopes if m > 0.0)
         negative_slopes = sorted(m for m in slopes if m < 0.0)
-        assert (positive_slopes[0], positive_slopes[-1], len(positive_slopes)) == (0.01, 10.0, 31)
+        assert (positive_slopes[0], positive_slopes[-1], len(positive_slopes)) == (0.001, 10.0, 21)
         assert sorted(-m for m in negative_slopes) == positive_slopes
         assert slopes.count(0.0) == 1
-        assert len(slopes) == 63
+        assert len(slopes) == 43
