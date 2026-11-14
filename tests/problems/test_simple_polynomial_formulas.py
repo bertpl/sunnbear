@@ -1,12 +1,12 @@
-"""The simple polynomial formulas (category 2.1) give the expected candidates, which share values at the bounds."""
+"""Each simple polynomial formula gives the expected candidates, whose values at the bounds are equal at ``c = 0``."""
 
 import pytest
 
 from sunnbear._core.problems.core import FormulaRegistry
 
-# Each entry holds a simple polynomial formula's number, the number of values of its first parameter (a power ``p`` or a
-# term count ``n``), the number of values of its second parameter (a weight ``w`` or a slope ``m``), and the bounds of
-# its interval, at which its value at ``c = 0`` is half the interval's width, negative at the lower bound.
+# Each entry holds a simple polynomial formula's number, the number of values of its first parameter (a power ``p``
+# or a term count ``n``), the number of values of its second parameter (a weight ``w`` or a slope ``m``), and the
+# bounds of its interval, at which its value at ``c = 0`` is half the interval's width, negative at the lower bound.
 CANDIDATE_GRID_SIZES = [
     pytest.param((2, 1, 1), 1, 1, (-1.0, 1.0), id="linear"),
     pytest.param((2, 1, 2), 5, 31, (-1.0, 1.0), id="linear_plus_even_power"),
