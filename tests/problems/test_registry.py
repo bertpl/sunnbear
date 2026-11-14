@@ -3,8 +3,6 @@ import math
 import pytest
 from counted_float import FlopCountingContext
 
-from sunnbear._core.problems.catalog.c02_standard_function_families.c01_polynomials.f01_cubic import Cubic
-from sunnbear._core.problems.catalog.c02_standard_function_families.c01_polynomials.f02_odd_power import OddPower
 from sunnbear._core.problems.core import (
     Formula,
     FormulaRegistry,
@@ -15,6 +13,7 @@ from sunnbear._core.problems.core import (
 )
 from sunnbear._core.problems.core.exceptions import InvalidParamsError, UnknownFormulaError
 
+from .example_formulas import ExampleCubic, ExampleOddPower
 from .example_taxonomy_nodes import define_formula_cls
 
 
@@ -27,28 +26,28 @@ def test_formulas_contains_catalog_sorted():
 
     # --- assert -----------------------
     assert [f.number for f in registered] == sorted(f.number for f in registered)
-    assert {type(f) for f in registered} >= {Cubic, OddPower}
+    assert {type(f) for f in registered} >= {ExampleCubic, ExampleOddPower}
 
 
 def test_candidates_materializes_recipe_grid():
     # --- act --------------------------
-    cubic_candidates = list(Cubic().build_all_candidates())
+    cubic_candidates = list(ExampleCubic().build_all_candidates())
 
     # --- assert -----------------------
     assert [c.id.param_values for c in cubic_candidates] == [(0.0,), (0.2,), (0.4,), (0.6,), (0.8,), (1.0,)]
-    assert all(c.id.formula_number == Cubic.number for c in cubic_candidates)
+    assert all(c.id.formula_number == ExampleCubic.number for c in cubic_candidates)
     assert all((c.a, c.b) == (-2.0, 2.0) for c in cubic_candidates)
 
 
 def test_candidates_applies_validity_filter():
     # --- act --------------------------
-    odd_candidates = list(OddPower().build_all_candidates())
+    odd_candidates = list(ExampleOddPower().build_all_candidates())
 
     # --- assert -----------------------
     assert [c.id.param_values for c in odd_candidates] == [(1.0,), (3.0,), (5.0,), (7.0,)]
 
 
-@pytest.mark.parametrize("formula_cls", [Cubic, OddPower])
+@pytest.mark.parametrize("formula_cls", [ExampleCubic, ExampleOddPower])
 def test_candidates_functions_evaluate(formula_cls):
     """The cubic and the odd power each produce a working f(x, c) callable."""
     # --- arrange ----------------------
@@ -118,9 +117,9 @@ def test_zero_param_formula_yields_exactly_one_candidate():
 def test_registry_holds_one_instance_per_formula():
     """Enumeration and reconstruction hand out the same registered instance."""
     # --- act --------------------------
-    [enumerated] = [f for f in FormulaRegistry.formulas() if type(f) is Cubic]
-    candidate_a = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]")
-    candidate_b = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.4]")
+    [enumerated] = [f for f in FormulaRegistry.formulas() if type(f) is ExampleCubic]
+    candidate_a = FormulaRegistry.candidate_from_id("f99.801[p1=0.2]")
+    candidate_b = FormulaRegistry.candidate_from_id("f99.801[p1=0.4]")
 
     # --- assert -----------------------
     assert candidate_a.formula is candidate_b.formula is enumerated
@@ -337,11 +336,11 @@ def test_every_catalog_formula_validates():
 # ==================================================================================================
 def test_compiled_formula_is_cached_per_class():
     # --- arrange ----------------------
-    first_instance, second_instance = Cubic(), Cubic()
+    first_instance, second_instance = ExampleCubic(), ExampleCubic()
 
     # --- act / assert -----------------
     assert first_instance._compiled_formula() is second_instance._compiled_formula()
-    assert Cubic()._compiled_formula() is not OddPower()._compiled_formula()
+    assert ExampleCubic()._compiled_formula() is not ExampleOddPower()._compiled_formula()
 
 
 @pytest.mark.usefixtures("isolated_formula_registry")
@@ -402,7 +401,7 @@ def test_bound_formula_calls_math_functions_inside_flop_counting():
 
     # compile another formula first, as the earlier solves of a run do, so that numba has loaded its registries
     # before `Sine` is bound
-    Cubic().build_all_candidates()[0].xc_fun(0.0, 0.0)
+    ExampleCubic().build_all_candidates()[0].xc_fun(0.0, 0.0)
     x_fun = Sine().bind_x_fun((), 0.25)
 
     # --- act --------------------------
@@ -419,12 +418,12 @@ def test_bound_formula_calls_math_functions_inside_flop_counting():
 def test_candidate_from_id_and_string():
     """A `ProblemId` and its rendered string rebuild the same calibrated test problem."""
     # --- act --------------------------
-    problem_from_id = FormulaRegistry.candidate_from_id(ProblemId((2, 1, 1), ("p1",), (0.2,))).calibrated(-5.0, 5.0)
-    problem_from_str = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(-5.0, 5.0)
+    problem_from_id = FormulaRegistry.candidate_from_id(ProblemId((99, 801), ("p1",), (0.2,))).calibrated(-5.0, 5.0)
+    problem_from_str = FormulaRegistry.candidate_from_id("f99.801[p1=0.2]").calibrated(-5.0, 5.0)
 
     # --- assert -----------------------
     for problem in (problem_from_id, problem_from_str):
-        assert problem.id == ProblemId((2, 1, 1), ("p1",), (0.2,))
+        assert problem.id == ProblemId((99, 801), ("p1",), (0.2,))
         assert (problem.a, problem.b, problem.c_min, problem.c_max) == (-2.0, 2.0, -5.0, 5.0)
         assert problem.xc_fun(2.0, 0.0) == pytest.approx(8.0 - 0.4)
 
@@ -432,7 +431,7 @@ def test_candidate_from_id_and_string():
 def test_build_x_fun():
     """`build_x_fun` fixes `c` and returns the test problem's function as a function of `x` alone."""
     # --- arrange ----------------------
-    problem = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.0]").calibrated(-5.0, 5.0)
+    problem = FormulaRegistry.candidate_from_id("f99.801[p1=0.0]").calibrated(-5.0, 5.0)
 
     # --- act --------------------------
     f = problem.build_x_fun(c=1.0)
@@ -451,16 +450,16 @@ def test_candidate_from_id_invalid_params():
     """An id whose parameter values fail the formula's validity criteria raises `InvalidParamsError`."""
     with pytest.raises(InvalidParamsError):
         FormulaRegistry.candidate_from_id(
-            ProblemId((2, 1, 2), ("p1",), (2.0,))  # even power: invalid
+            ProblemId((99, 802), ("p1",), (2.0,))  # even power: invalid
         )
 
 
 @pytest.mark.parametrize(
     "text",
     [
-        "f2.1.1[slope=0.2]",  # wrong name
-        "f2.1.1",  # parameter missing
-        "f2.1.1[p1=0.2,p2=0.4]",  # extra parameter
+        "f99.801[slope=0.2]",  # wrong name
+        "f99.801",  # parameter missing
+        "f99.801[p1=0.2,p2=0.4]",  # extra parameter
     ],
 )
 def test_candidate_from_id_rejects_param_names_that_differ_from_the_formula(text):
@@ -471,7 +470,7 @@ def test_candidate_from_id_rejects_param_names_that_differ_from_the_formula(text
 
 def test_catalog_brackets_change_sign_within_c_range():
     # --- arrange ----------------------
-    problem = FormulaRegistry.candidate_from_id("f2.1.2[p1=5.0]").calibrated(-1.0, 1.0)
+    problem = FormulaRegistry.candidate_from_id("f99.802[p1=5.0]").calibrated(-1.0, 1.0)
 
     # --- act / assert -----------------
     for c in (-1.0, 0.0, 1.0):

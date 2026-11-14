@@ -12,7 +12,7 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 @pytest.mark.parametrize(
     "formula_numbers",
     [
-        pytest.param(((2, 1, 2), (2, 1, 1)), id="2_formulas_against_number_order"),
+        pytest.param(((99, 802), (99, 801)), id="2_formulas_against_number_order"),
         pytest.param((), id="no_formulas"),
     ],
 )

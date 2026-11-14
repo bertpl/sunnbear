@@ -12,7 +12,7 @@ from sunnbear._core.problems.core import FormulaRegistry
 
 @pytest.mark.only_with_numba_jit
 def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(tmp_path):
-    """On formula 2.1.2, the pipeline in draft mode runs the stages in run order on the formula's candidates:
+    """On example formula 99.802, the pipeline in draft mode runs the stages in run order on the formula's candidates:
 
     - every candidate that no stage drops reaches full characterization;
     - spacing runs at its default minimum distance;
@@ -22,8 +22,8 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     writes a manifest.
     """
     # --- arrange ----------------------
-    # The shipped formula 2.1.2 has few candidates, so the pipeline runs fast on it.
-    formulas = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 1, 2)]
+    # The example formula 99.802 has few candidates, so the pipeline runs fast on it.
+    formulas = [formula for formula in FormulaRegistry.formulas() if formula.number == (99, 802)]
 
     # --- act --------------------------
     # By default `run_pipeline` starts 1 worker per CPU, which would only make the workers wait for CPU, because

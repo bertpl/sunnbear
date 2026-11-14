@@ -32,7 +32,7 @@ def test_the_settings_map_u_log_uniformly_onto_the_xtol_range_and_v_linearly_ont
 def test_the_settings_of_a_test_problem_take_its_interval_and_its_c_range():
     """`from_test_problem` takes the interval bounds and the c-range from the calibrated test problem."""
     # --- arrange ----------------------
-    problem = FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=0.5)
+    problem = FormulaRegistry.candidate_from_id("f99.801[p1=0.2]").calibrated(c_min=-1.0, c_max=0.5)
     mc_tuples = MCTuples([0.5, 0.25], [0.5, 0.25])
 
     # --- act --------------------------

@@ -7,7 +7,9 @@ The catalog tests check this layout convention:
 - a formula is a module ``f<NN>_<slug>.py`` defining one `Formula` subclass
 - ``<NN>`` is the last element of the category's or formula's number, zero-padded to 2 digits, and ``<slug>`` is its
   ``name_slug``; the directory path therefore reads as the full number, e.g.
-  ``c02_standard_function_families/c01_polynomials/f01_cubic.py`` is formula ``2.1.1``
+  ``c02_standard_function_families/c01_polynomials/f01_linear.py`` is formula ``2.1.1``
+
+`PARAMETER_NAMES.md` in this folder is the guide to the names of the formulas' parameters.
 
 Importing this package registers every shipped formula and category.
 """

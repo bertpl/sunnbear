@@ -22,8 +22,8 @@ C_VALUES = np.linspace(-1.0, 1.0, 5)
 
 @pytest.fixture(scope="module")
 def cubic() -> problems.TestProblem:
-    """Return the shipped cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to ``c`` in ``[-1, 1]``."""
-    return FormulaRegistry.candidate_from_id("f2.1.1[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
+    """Return the example cubic, ``x^3 - 0.2 x - c`` on ``[-2, 2]``, calibrated to ``c`` in ``[-1, 1]``."""
+    return FormulaRegistry.candidate_from_id("f99.801[p1=0.2]").calibrated(c_min=-1.0, c_max=1.0)
 
 
 def _solve_batch(solver: Solver, cubic: problems.TestProblem, xtol: float) -> list[SolveResult]:
@@ -31,7 +31,7 @@ def _solve_batch(solver: Solver, cubic: problems.TestProblem, xtol: float) -> li
     return [solver.solve(cubic.build_x_fun(c), cubic.a, cubic.b, xtol=xtol, max_fevals=200) for c in C_VALUES]
 
 
-def test_a_shipped_function_is_solved_by_both_solvers_with_counted_flops(cubic):
+def test_an_example_function_is_solved_by_both_solvers_with_counted_flops(cubic):
     """Both solvers end inside the cubic's interval with counted flops; Bisection converges with a small residual."""
     # --- act --------------------------
     results = {solver.name: _solve_batch(solver, cubic, 1e-9) for solver in (Bisection(), RegulaFalsi())}
