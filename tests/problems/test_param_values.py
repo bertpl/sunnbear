@@ -15,10 +15,13 @@ from sunnbear._core.problems.core import ParamAxis, ParamNotation, deduplicate_p
         (ParamNotation.POW2, 1.2, 2.0**1.2),  # the same float as computing 2 ** 1.2 yourself
         (ParamNotation.POW10, -3.4, 10.0**-3.4),
         (ParamNotation.POW10, -3.4000000000000004, 10.0**-3.4),  # the exponent is rounded, not the value
+        (ParamNotation.NEG_POW2, 1.2, -(2.0**1.2)),  # the negative of the power, not a power of -2
+        (ParamNotation.NEG_POW10, -3.4, -(10.0**-3.4)),
     ],
 )
 def test_build_value_from_argument(notation, argument, expected):
-    """A notation rounds the argument to `CANONICAL_DIGITS` digits, then maps it to the argument or a power."""
+    """A notation rounds the argument to `CANONICAL_DIGITS` digits, then maps it to the argument, a power or the
+    negative of a power."""
     assert notation.build_value_from_argument(argument) == expected
 
 
@@ -30,10 +33,13 @@ def test_build_value_rejects_non_finite_argument(notation, non_finite_argument):
         notation.build_value_from_argument(non_finite_argument)
 
 
-def test_build_value_rejects_overflowing_power():
-    """A finite exponent can still overflow ``base ** exponent``."""
-    with pytest.raises(ValueError, match="non-finite"):
-        ParamNotation.POW10.build_value_from_argument(400.0)
+@pytest.mark.parametrize(
+    "notation, spelling_pattern", [(ParamNotation.POW10, r"10\^400\.0"), (ParamNotation.NEG_POW10, r"-10\^400\.0")]
+)
+def test_build_value_rejects_overflowing_power(notation, spelling_pattern):
+    """A finite exponent can still overflow ``base ** exponent``, and the message spells the power."""
+    with pytest.raises(ValueError, match=f"^{spelling_pattern} overflows to a non-finite value"):
+        notation.build_value_from_argument(400.0)
 
 
 # ==================================================================================================
@@ -49,6 +55,8 @@ def test_build_value_rejects_overflowing_power():
         ("1e+16", 1e16),
         ("2^1.2", 2.0**1.2),
         ("10^-3.4", 10.0**-3.4),
+        ("-2^1.2", -(2.0**1.2)),  # a minus sign before the base negates the power
+        ("-10^-3.4", -(10.0**-3.4)),
         ("0.30000000000000004", 0.3),  # the argument is rounded, as build_value_from_argument rounds it
         ("2^2.0", 4.0),  # the same float as "4.0", so the same value
     ],
@@ -62,6 +70,7 @@ def test_parse_value(token, expected):
     "token, match",
     [
         ("3^1.4", "Unsupported exponent base"),
+        ("-3^1.4", "Unsupported exponent base"),
         ("2^abc", "Malformed parameter token"),
         ("zz", "Malformed parameter token"),
         ("inf", "finite"),
@@ -89,7 +98,11 @@ def test_parse_value_rejects_bad_tokens(token, match):
         (2.0**-20.0, "2^-20.0"),
         (10.0**0.5, "10^0.5"),
         (0.3, "0.3"),
-        (-4.0, "-4.0"),  # negative: only the decimal can spell it
+        (-4.0, "-4.0"),  # -2^2.0 also spells it: the decimal is shorter
+        (-(2.0**1.23), "-2^1.23"),
+        (-(10.0**0.5), "-10^0.5"),
+        (-(10.0**4.0), "-10^4.0"),  # shorter than the decimal -10000.0
+        (-(10.0**3.0), "-1000.0"),  # tie in length: the decimal wins
         (-0.0, "0.0"),
     ],
 )
@@ -103,6 +116,7 @@ def test_spell_value_canonically_picks_the_shortest_valid_spelling(value, expect
     [
         0.1 + 0.2,  # 0.30000000000000004 needs 17 decimal digits, and no short exponent reproduces it
         2.0**1.2345678901234,  # its exponent needs 14 digits
+        -(2.0**1.2345678901234),  # its exponent also needs 14 digits
         float("inf"),
         float("nan"),
     ],
@@ -115,14 +129,22 @@ def test_invalid_param_value_is_rejected(value):
         ParamNotation.spell_value_canonically(value)
 
 
-@pytest.mark.parametrize(
-    "notation, start, stop, step",
-    [
-        (ParamNotation.DECIMAL, -5.0, 5.0, 0.1),
-        (ParamNotation.POW2, -20.0, 20.0, 0.1),
-        (ParamNotation.POW10, -5.0, 5.0, 0.01),
-    ],
-)
+# Each case is a notation with the start, stop and step of an axis's argument grid.
+_ROUND_TRIP_CASES = [
+    (ParamNotation.DECIMAL, -5.0, 5.0, 0.1),
+    (ParamNotation.POW2, -20.0, 20.0, 0.1),
+    (ParamNotation.POW10, -5.0, 5.0, 0.01),
+    (ParamNotation.NEG_POW2, -20.0, 20.0, 0.1),
+    (ParamNotation.NEG_POW10, -5.0, 5.0, 0.01),
+]
+
+
+def test_round_trip_cases_cover_every_notation():
+    """The round-trip test covers every `ParamNotation` member."""
+    assert {notation for notation, *_ in _ROUND_TRIP_CASES} == set(ParamNotation)
+
+
+@pytest.mark.parametrize("notation, start, stop, step", _ROUND_TRIP_CASES)
 def test_every_built_value_parses_back_from_its_canonical_spelling(notation, start, stop, step):
     """Every value that a `ParamAxis` builds is valid, and parsing its canonical spelling gives the same float."""
     # --- arrange ----------------------

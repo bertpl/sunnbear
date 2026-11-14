@@ -2,13 +2,21 @@
 
 A parameter value is a plain float.
 
-**A notation maps a continuous argument to a value.** The argument is the value itself for
-`DECIMAL` and the exponent for `POW2`/`POW10`. A grid sweeps the argument, and building a value
-rounds the argument to `CANONICAL_DIGITS` significant digits.
+**A notation maps a continuous argument to a value.** The argument is:
+
+- the value itself for `DECIMAL`;
+- the exponent for `POW2` and `POW10`, whose value is a positive power of 2 or 10;
+- the exponent for `NEG_POW2` and `NEG_POW10`, whose value is the negative of a power of 2 or 10.
+
+A grid sweeps the argument, and building a value rounds the argument to `CANONICAL_DIGITS`
+significant digits.
 
 A power notation's value then follows from its rounded exponent by plain exponentiation and is not
 rounded itself, so a value authored as ``2^1.23`` is exactly ``2 ** 1.23``, and a reader who
 computes ``2 ** 1.23`` from a paper or a suite file gets the same float.
+
+`NEG_POW2` and `NEG_POW10` let a grid sweep negative values on a logarithmic scale, as `POW2` and
+`POW10` do for positive values. A value authored as ``-10^0.3`` is exactly ``-(10 ** 0.3)``.
 
 **The notation matters only while a value is built.** Afterwards a value is written in its
 canonical spelling (see `ParamNotation`), which depends on the float alone: ``2^2.0`` and
@@ -67,7 +75,7 @@ class ParamNotation(StrEnum):
     can spell it under the validity rule and returns the shortest spelling, so the spelling depends
     on the float alone, not on how it was authored: ``2^2.0`` and ``4.0`` both spell as ``4.0``.
 
-    A tie in length goes to the notation declared first below.
+    A tie in length goes to the notation declared first below, so the decimal wins every tie.
 
     Power spellings depend on the platform's ``pow``, which is not guaranteed to be correctly
     rounded: ``2^1.23`` can parse to a float that differs in the last bit on another platform, so one
@@ -80,6 +88,8 @@ class ParamNotation(StrEnum):
     DECIMAL = "decimal"  # value = argument
     POW2 = "pow2"  # value = 2 ** argument
     POW10 = "pow10"  # value = 10 ** argument
+    NEG_POW2 = "neg_pow2"  # value = -(2 ** argument)
+    NEG_POW10 = "neg_pow10"  # value = -(10 ** argument)
 
     # --------------------------------------------------------------------------
     #  Building and parsing a value
@@ -99,22 +109,26 @@ class ParamNotation(StrEnum):
 
     @classmethod
     def parse_value(cls, token: str) -> float:
-        """Parse one spelling (``0.4``, ``1e-05``, ``2^1.2``, ``10^-3.4``) back into its value.
+        """Parse one spelling (``0.4``, ``1e-05``, ``2^1.2``, ``10^-3.4``, ``-10^0.3``) back into its value.
 
         The number after ``^``, or the whole token for a decimal, is rounded as
         `build_value_from_argument` rounds its argument, so a spelling of a valid value parses back to
         exactly that value.
 
+        A minus sign before the base negates the power, so ``-10^0.3`` is ``-(10 ** 0.3)``.
+
         Raises:
-            ValueError: If the token uses an exponent base other than 2 or 10, is malformed, or gives a
-                non-finite value; for an unsupported base or a malformed token, the message names the
-                token.
+            ValueError: If the text before ``^`` is not 2, 10, -2 or -10, if the token is malformed, or if
+                it gives a non-finite value; for unsupported text before ``^`` or a malformed token, the
+                message names the token.
         """
         if "^" in token:
             base_text, _, argument_text = token.partition("^")
-            notation = {"2": cls.POW2, "10": cls.POW10}.get(base_text)
+            notation = {"2": cls.POW2, "10": cls.POW10, "-2": cls.NEG_POW2, "-10": cls.NEG_POW10}.get(base_text)
             if notation is None:
-                raise ValueError(f"Unsupported exponent base {base_text!r} in token {token!r} (supported: 2, 10).")
+                raise ValueError(
+                    f"Unsupported exponent base {base_text!r} in token {token!r} (supported: 2, 10, -2, -10)."
+                )
         else:
             notation, argument_text = cls.DECIMAL, token
         try:
@@ -159,8 +173,10 @@ class ParamNotation(StrEnum):
         """Return this notation's spelling of `value`, or None if it cannot spell `value` under the validity rule."""
         # --- validation ---------------------------
         value = value + 0.0  # adding 0.0 turns -0.0 into 0.0, so the two equal floats spell alike
-        if not isfinite(value) or (self is not ParamNotation.DECIMAL and value <= 0.0):
-            return None  # a power of 2 or 10 is finite and positive
+        if not isfinite(value):
+            return None
+        if self is not ParamNotation.DECIMAL and self._power_sign * value <= 0.0:
+            return None  # a power of 2 or 10 is positive, and the negative of such a power is negative
 
         # --- spell value --------------------------
         # for a power, recover the exponent of a valid value; the comparison below rejects the value
@@ -168,10 +184,10 @@ class ParamNotation(StrEnum):
         match self:
             case ParamNotation.DECIMAL:
                 argument = value
-            case ParamNotation.POW2:
-                argument = log2(value)
-            case ParamNotation.POW10:
-                argument = log10(value)
+            case ParamNotation.POW2 | ParamNotation.NEG_POW2:
+                argument = log2(abs(value))
+            case ParamNotation.POW10 | ParamNotation.NEG_POW10:
+                argument = log10(abs(value))
             case _:
                 assert_never(self)
         argument = _round_argument(argument)
@@ -184,36 +200,43 @@ class ParamNotation(StrEnum):
     #  Helpers
     # --------------------------------------------------------------------------
     def _build_value_from_rounded_argument(self, argument: float) -> float:
-        """Return the value of an already rounded `argument`: the argument itself, or a power of the base.
+        """Return the value of a rounded `argument`: the argument, a power of the base, or the negative of that power.
 
         Raises:
             ValueError: If the power overflows to a non-finite value.
         """
-        match self:
-            case ParamNotation.DECIMAL:
-                return argument
-            case ParamNotation.POW2 | ParamNotation.POW10:
-                try:
-                    return float(self._power_base) ** argument
-                except OverflowError as exc:
-                    raise ValueError(f"{self._power_base}^{argument!r} overflows to a non-finite value.") from exc
-            case _:
-                assert_never(self)
+        if self is ParamNotation.DECIMAL:
+            return argument
+        else:
+            try:
+                return self._power_sign * float(self._power_base) ** argument
+            except OverflowError as exc:
+                raise ValueError(f"{self._spell_rounded_argument(argument)} overflows to a non-finite value.") from exc
 
     def _spell_rounded_argument(self, argument: float) -> str:
-        """Write an already rounded `argument` in this notation, e.g. ``0.4`` or ``2^1.2``."""
-        match self:
-            case ParamNotation.DECIMAL:
-                return repr(argument)
-            case ParamNotation.POW2 | ParamNotation.POW10:
-                return f"{self._power_base}^{argument!r}"
-            case _:
-                assert_never(self)
+        """Write an already rounded `argument` in this notation, e.g. ``0.4``, ``2^1.2`` or ``-10^0.3``."""
+        if self is ParamNotation.DECIMAL:
+            return repr(argument)
+        elif self._power_sign > 0.0:
+            return f"{self._power_base}^{argument!r}"
+        else:
+            return f"-{self._power_base}^{argument!r}"
 
     @property
     def _power_base(self) -> int:
         """Return the base of a power notation: 2 or 10."""
-        return 2 if self is ParamNotation.POW2 else 10
+        if self in (ParamNotation.POW2, ParamNotation.NEG_POW2):
+            return 2
+        else:
+            return 10
+
+    @property
+    def _power_sign(self) -> float:
+        """Return the sign of a power notation's values: -1.0 where the notation negates the power, 1.0 otherwise."""
+        if self in (ParamNotation.NEG_POW2, ParamNotation.NEG_POW10):
+            return -1.0
+        else:
+            return 1.0
 
 
 # ==================================================================================================

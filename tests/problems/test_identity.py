@@ -10,6 +10,7 @@ _RENDERED_IDS = [
     "f2.1.2[p1=5.0]",
     "f2.1.1[p1=-0.4]",  # leading minus in a value
     "f2.1.5[p1=-0.4,p2=-1e-12]",  # negative values and scientific notation on both sides of the comma
+    "f2.1.5[p1=-10^0.3,p2=-2^-1.5]",  # negatives of powers, with a negative exponent
     "f2.1.1[p1=1e+16]",  # plus sign inside a value
     "f2.1.1[slope_2=0.5]",  # a name with an underscore and a digit
 ]

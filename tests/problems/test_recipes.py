@@ -21,10 +21,13 @@ def test_axis_decimal_values_are_grid_rounded():
     [
         (ParamNotation.POW2, 0.0, 2.0, (1.0, 2.0, 4.0), ["1.0", "2.0", "4.0"]),
         (ParamNotation.POW10, -1.0, 1.0, (0.1, 1.0, 10.0), ["0.1", "1.0", "10.0"]),
+        (ParamNotation.NEG_POW2, 0.0, 2.0, (-1.0, -2.0, -4.0), ["-1.0", "-2.0", "-4.0"]),
+        (ParamNotation.NEG_POW10, -1.0, 1.0, (-0.1, -1.0, -10.0), ["-0.1", "-1.0", "-10.0"]),
     ],
 )
 def test_axis_power_values(notation, start, stop, values, spellings):
-    """A power axis sweeps the exponent; its values are powers of the base, spelled canonically."""
+    """A power axis sweeps the exponent; its values are powers of the base, or their negatives, spelled
+    canonically."""
     # --- arrange ----------------------
     axis = ParamAxis("p1", start, stop, step=1.0, notation=notation)
 
