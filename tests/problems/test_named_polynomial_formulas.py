@@ -111,7 +111,7 @@ NAMED_POLYNOMIAL_FORMULAS = [
     pytest.param((2, 2, 5), 42 * 6 * 6, _jacobi, lambda *params: 1.0, id="jacobi"),
     pytest.param((2, 2, 6), 40, _hermite, lambda *params: 1.0, id="hermite"),
     pytest.param((2, 2, 7), 20, _laguerre, lambda *params: 1.0, id="laguerre"),
-    pytest.param((2, 2, 8), 11 + 9 + 5, _bernoulli, _bernoulli_amplitude, id="bernoulli"),
+    pytest.param((2, 2, 8), 12 + 8 + 5, _bernoulli, _bernoulli_amplitude, id="bernoulli"),
     pytest.param((2, 2, 9), 40, _wilkinson, lambda *params: 0.0, id="wilkinson"),
     pytest.param((2, 2, 10), 20, _second_wilkinson, lambda *params: 0.0, id="second_wilkinson"),
 ]

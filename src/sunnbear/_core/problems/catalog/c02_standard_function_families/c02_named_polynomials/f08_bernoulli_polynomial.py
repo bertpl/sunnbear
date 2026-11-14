@@ -13,8 +13,8 @@ HIGHEST_VALID_DEGREE = 49
 # Each entry holds the lowest and the highest degree of a recipe, and the bounds ``a`` and ``b`` of the interval that
 # the recipe gives to every odd degree between them.
 DEGREE_RANGES_WITH_INTERVALS = (
-    (1.0, 21.0, -1.5, 2.5),
-    (23.0, 39.0, -2.5, 3.5),
+    (1.0, 23.0, -1.5, 2.5),
+    (25.0, 39.0, -2.5, 3.5),
     (41.0, 49.0, -3.5, 4.5),
 )
 
@@ -91,8 +91,8 @@ class BernoulliPolynomial(Formula):
         """Return 1 recipe per entry of `DEGREE_RANGES_WITH_INTERVALS`: its odd degrees, on its interval.
 
         Each interval has half-integer bounds, and in every candidate the largest real zero lies at least 0.25 inside
-        the upper bound. `[-1.5, 2.5]` would lose that margin at degree 25, and `[-2.5, 3.5]` at degree 41. Degree 23
-        fits both intervals, and takes the wider one.
+        the upper bound. `[-1.5, 2.5]` would lose that margin at degree 25, and `[-2.5, 3.5]` at degree 41, which is
+        where the next interval takes over.
         """
         return tuple(
             ParamGrid(
