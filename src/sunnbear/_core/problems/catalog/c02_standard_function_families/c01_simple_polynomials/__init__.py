@@ -4,7 +4,8 @@ Every formula of the category adds ``c`` to the function value, and at ``c = 0``
 interval are the same for every parameter tuple. The calibrated range of ``c`` is therefore the same for all of a
 formula's test problems.
 
-The category holds polynomials only: a power function with a fractional or negative exponent is not one.
+The category holds polynomials only: a power function with a fractional or negative exponent is not one, and the
+category `PowerFunctions` holds those.
 """
 
 from sunnbear._core.problems.core import FormulaCategory
