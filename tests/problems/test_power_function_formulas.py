@@ -14,7 +14,7 @@ import pytest
 from sunnbear._core.problems.catalog.c02_standard_function_families.c03_power_functions import (
     f05_signed_reciprocal_power,
 )
-from sunnbear._core.problems.core import Formula, FormulaRegistry
+from sunnbear._core.problems.core import FormulaRegistry
 
 # Each entry holds a power function formula's number and its number of candidates.
 #
@@ -27,12 +27,6 @@ POWER_FUNCTION_FORMULAS = [
     pytest.param((2, 3, 4), 81 * 6 - 63, id="near_pole_power"),
     pytest.param((2, 3, 5), 61, id="signed_reciprocal_power"),
 ]
-
-
-def _formula(number: tuple[int, ...]) -> Formula:
-    """Return the registered formula with `number`."""
-    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == number]
-    return formula
 
 
 def test_the_parametrization_names_every_power_function_formula():
@@ -48,10 +42,10 @@ def test_the_parametrization_names_every_power_function_formula():
 
 @pytest.mark.parametrize("formula_number, n_candidates", POWER_FUNCTION_FORMULAS)
 def test_every_candidate_has_opposite_signs_at_the_bounds_of_its_interval(formula_number, n_candidates):
-    """A formula gives its expected number of candidates, each negative at its lower or upper bound and positive at
-    the other, at ``c = 0``."""
+    """A formula gives its expected number of candidates, and at ``c = 0`` each candidate is negative at one bound of
+    its interval and positive at the other."""
     # --- arrange ----------------------
-    formula = _formula(formula_number)
+    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
 
     # --- act --------------------------
     candidates = formula.build_all_candidates()
@@ -72,7 +66,8 @@ def test_signed_power_1_is_0_at_its_root_and_nonzero_next_to_it(c):
     linear term underflows too.
     """
     # --- arrange ----------------------
-    candidates = _formula((2, 3, 1)).build_all_candidates()
+    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 3, 1)]
+    candidates = formula.build_all_candidates()
 
     # --- act / assert -----------------
     for candidate in candidates:
@@ -84,10 +79,12 @@ def test_signed_power_1_is_0_at_its_root_and_nonzero_next_to_it(c):
 
 
 def test_near_edge_power_and_near_pole_power_accept_the_same_pairs_of_power_and_distance():
-    """Among the powers that both formulas sweep at a distance above 0, both accept the same pairs ``(p, d)``."""
+    """Among the powers in the sweeps of both formulas at a distance above 0, both accept the same pairs ``(p, d)``."""
     # --- arrange ----------------------
-    near_edge_candidates = _formula((2, 3, 3)).build_all_candidates()
-    near_pole_candidates = _formula((2, 3, 4)).build_all_candidates()
+    [near_edge_formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 3, 3)]
+    [near_pole_formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 3, 4)]
+    near_edge_candidates = near_edge_formula.build_all_candidates()
+    near_pole_candidates = near_pole_formula.build_all_candidates()
 
     # --- act --------------------------
     near_edge_pairs = {candidate.id.param_values for candidate in near_edge_candidates if candidate.a > 0.0}
@@ -108,7 +105,8 @@ def test_signed_reciprocal_power_is_finite_at_and_next_to_its_pole(c):
     """At every power, `SignedReciprocalPower` is 0 at its pole, and at the floats next to the pole it has the sign of
     ``z`` and an absolute value of at most `MAX_ABS_VALUE`."""
     # --- arrange ----------------------
-    candidates = _formula((2, 3, 5)).build_all_candidates()
+    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 3, 5)]
+    candidates = formula.build_all_candidates()
     max_abs_value = f05_signed_reciprocal_power.MAX_ABS_VALUE
 
     # --- act / assert -----------------

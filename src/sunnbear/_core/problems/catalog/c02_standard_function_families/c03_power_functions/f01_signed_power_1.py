@@ -24,10 +24,8 @@ class SignedPower1(Formula):
     every ``c``.
 
     The shift is ``c/(1 + p)``, not ``c``, so that the values at the bounds, ``(1 - c/(1 + p))^p`` and
-    ``-(1 + c/(1 + p))^p``, stay about ``exp(-c)`` and ``-exp(c)`` for a large ``p``, whatever ``p`` is. The calibrated
-    range of ``c`` then does not shrink as ``p`` grows.
-
-    For a small ``p`` the divisor is close to 1, and ``c`` is close to the position of the root.
+    ``-(1 + c/(1 + p))^p``, stay about ``exp(-c)`` and ``-exp(c)`` for every large ``p``. The calibrated range of ``c``
+    then does not shrink as ``p`` grows.
 
     The linear term keeps the function from being exactly 0 around its root. For a large ``p``, ``abs(z)^p`` underflows
     to 0 in float64 on an interval around the root.

@@ -14,7 +14,7 @@ The category has 2 kinds of formulas:
   ``x^(-p)`` the same way, so that it changes sign at its pole.
 - **On ``[d, 1]``, a power of a positive x,** where ``d`` is the distance from 0 to the lower bound of the interval:
   `NearEdgePower` is ``x^p``, whose domain ends at 0, and `NearPolePower` is the reciprocal power, whose pole lies at
-  0. Both accept a pair of ``p`` and ``d`` only when ``d^p < 0.5``, which puts a root inside the interval.
+  0. Both accept only the pairs of ``p`` and ``d`` that put a root inside the interval.
 
 Every formula sweeps its power ``p`` over several orders of magnitude, on a logarithmic scale. `helpers` holds what the
 formulas share.

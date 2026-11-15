@@ -42,8 +42,8 @@ class NearPolePower(Formula):
         """Return the recipe that combines ``p`` from 10^-2 to 10^6 with every distance of `distance_axis`.
 
         The recipe does not leave out the candidates that fail the benchmark suite inclusion conditions. For a large
-        ``p`` at a small ``d``, the root lies too close to the lower bound to satisfy them, so no benchmark suite holds
-        such a candidate.
+        ``p`` at a small ``d``, the root lies too close to the lower bound to satisfy the conditions, so no benchmark
+        suite holds such a candidate.
         """
         return (ParamGrid(axes=(power_axis(-2.0, 6.0), distance_axis())),)
 

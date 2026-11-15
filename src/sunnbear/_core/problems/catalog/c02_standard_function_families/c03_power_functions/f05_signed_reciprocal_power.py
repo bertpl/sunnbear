@@ -6,8 +6,8 @@ from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamGrid, Pa
 
 from .helpers import power_axis
 
-# The function's absolute value never exceeds this limit: nearer to the pole, the function is constant at this limit
-# or its negative.
+# The function's absolute value never exceeds this limit: next to the pole, where ``abs(z)^(-p)`` would exceed this
+# limit, the function returns this limit with the sign of ``z``.
 #
 # The value is far below float64's largest value on purpose: a solver multiplies function values and their
 # differences, and a product of 3 differences of values of this size is still finite.
@@ -41,7 +41,7 @@ class SignedReciprocalPower(Formula):
         """Evaluate ``sign(z)*abs(z)^(-p)`` at ``z = x - c/(1 + p)``, limited to `MAX_ABS_VALUE`, and 0 at ``z = 0``.
 
         The function computes ``abs(z)^p``, which underflows to 0 next to the pole, and divides by it only where the
-        quotient stays within `MAX_ABS_VALUE`. Computing ``abs(z)^(-p)`` directly would overflow there.
+        quotient stays within `MAX_ABS_VALUE`. Computing ``abs(z)^(-p)`` directly would overflow next to the pole.
         """
         z = x - c / (1.0 + p)
         if z == 0.0:

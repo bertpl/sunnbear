@@ -1,10 +1,9 @@
-"""This formula is a power on an interval that starts at or near the edge of its domain, ``x^p - 0.5 + c``."""
+"""This formula is a power on an interval that starts at or near the edge of the power's domain, ``x^p - 0.5 + c``."""
 
 from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamGrid, ParamRecipe
 
 from .helpers import distance_axis, power_axis
 
-# Both recipes start their sweep of ``p`` at ``10^LOWEST_LOG10_POWER``.
 LOWEST_LOG10_POWER = -2.0
 
 
@@ -16,8 +15,7 @@ class NearEdgePower(Formula):
 
     - ``p`` is the power, any value above 0. Below ``p = 1`` the function is a root function such as the square root,
       whose slope grows without limit toward the edge. Above ``p = 1`` the function is flat at the edge.
-    - ``d`` is the distance from the edge to the lower bound of the interval, 0 or more. At ``d = 0`` the interval
-      starts at the edge.
+    - ``d`` is the distance from the edge to the lower bound of the interval, 0 or more.
 
     At ``c = 0`` the function is 0.5 at the upper bound and ``d^p - 0.5`` at the lower bound. A pair of ``p`` and
     ``d`` is valid only when ``d^p < 0.5``, so that the function has a root inside the interval.
@@ -48,7 +46,7 @@ class NearEdgePower(Formula):
 
         Both recipes start ``p`` at the same round value, ``10^LOWEST_LOG10_POWER``, and neither leaves out the
         candidates that fail the benchmark suite inclusion conditions. For a small ``p`` at ``d = 0``, the root lies
-        too close to the lower bound to satisfy them, so no benchmark suite holds such a candidate.
+        too close to the lower bound to satisfy the conditions, so no benchmark suite holds such a candidate.
         """
         zero_distance_axis = ParamAxis("d", 0.0, 0.0, 1.0)
         return (

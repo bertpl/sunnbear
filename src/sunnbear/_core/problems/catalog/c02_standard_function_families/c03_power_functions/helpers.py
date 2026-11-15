@@ -2,8 +2,7 @@
 
 Every formula of the category sweeps its power ``p`` on a logarithmic scale with the same step (`power_axis`).
 
-`NearEdgePower` and `NearPolePower` share the interval ``[d, 1]`` and the distances ``d`` that they sweep
-(`distance_axis`).
+`NearEdgePower` and `NearPolePower` share the sweep of the distances ``d`` (`distance_axis`).
 """
 
 from sunnbear._core.problems.core import ParamAxis, ParamNotation
