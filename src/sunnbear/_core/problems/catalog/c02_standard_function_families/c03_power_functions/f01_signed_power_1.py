@@ -1,4 +1,4 @@
-"""This formula is a signed power whose root moves with ``c``, ``sign(z)*abs(z)^p + TINY_LINEAR_TERM_SLOPE*z``."""
+"""This formula is a signed power of ``z = x - c/(1 + p)`` plus a tiny linear term, so its root moves with ``c``."""
 
 import math
 
@@ -21,22 +21,26 @@ class SignedPower1(Formula):
     ``p`` is the power, any value above 0.
 
     ``c`` shifts x, so the root lies at ``x = c/(1 + p)``, and the function has the same form around its root for
-    every ``c``. `SignedPower2` is the same power with ``c`` added to its value.
+    every ``c``.
 
-    The shift is ``c/(1 + p)``, not ``c``, because of the values at the bounds, ``(1 - c/(1 + p))^p`` and
-    ``-(1 + c/(1 + p))^p``. For a large ``p`` these are about ``exp(-c)`` and ``-exp(c)``, whatever ``p`` is, so the
-    calibrated range of ``c`` does not shrink as ``p`` grows. For a small ``p`` the divisor is close to 1, and ``c`` is
-    close to the position of the root.
+    The shift is ``c/(1 + p)``, not ``c``, so that the values at the bounds, ``(1 - c/(1 + p))^p`` and
+    ``-(1 + c/(1 + p))^p``, stay about ``exp(-c)`` and ``-exp(c)`` for a large ``p``, whatever ``p`` is. The calibrated
+    range of ``c`` then does not shrink as ``p`` grows.
+
+    For a small ``p`` the divisor is close to 1, and ``c`` is close to the position of the root.
 
     The linear term keeps the function from being exactly 0 around its root. For a large ``p``, ``abs(z)^p`` underflows
-    to 0 in float64 on an interval around the root. Without the term, the test problem would not satisfy the benchmark
-    suite inclusion conditions, because the conditions require bisection to spend a fixed number of evaluations, and
-    bisection stops early where a midpoint lands on an exact 0 of f. With the term, f is exactly 0 only within about
-    5e-48 of the root, where the term underflows too.
+    to 0 in float64 on an interval around the root.
 
-    The term exceeds the power only where the power is below ``TINY_LINEAR_TERM_SLOPE*abs(z)``. For a large ``p`` that
-    is a growing part of the interval around the root, where the function is then the line of the term, with the
-    power left only next to the bounds.
+    Without the term, the test problem would not satisfy the benchmark suite inclusion conditions, because the
+    conditions require bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint
+    lands on an exact 0 of f.
+
+    With the term, f is exactly 0 only within about 5e-48 of the root, where the term underflows too.
+
+    The larger ``p`` is, the larger the part of the interval around the root where the power is below
+    ``TINY_LINEAR_TERM_SLOPE*abs(z)``. On that part the function is about the line ``TINY_LINEAR_TERM_SLOPE*z``, and
+    the power dominates only next to the bounds.
     """
 
     number = (2, 3, 1)

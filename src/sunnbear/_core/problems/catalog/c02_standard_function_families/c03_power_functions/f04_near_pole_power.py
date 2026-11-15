@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamGrid, ParamRecipe
 
-from .helpers import distance_axis, has_root_inside_interval, power_axis
+from .helpers import distance_axis, power_axis
 
 
 class NearPolePower(Formula):
@@ -15,13 +15,13 @@ class NearPolePower(Formula):
     - ``d`` is the distance from the pole to the lower bound of the interval, above 0.
 
     The formula divides ``x^(-p)`` by its value at the lower bound, ``d^(-p)``, which gives ``(d/x)^p``. The power is
-    then 1 at the lower bound for every ``p`` and ``d``; ``d^(-p)`` itself is beyond float64's range for a large ``p``.
+    then 1 at the lower bound for every ``p`` and ``d``, and the formula never computes ``d^(-p)``, which overflows
+    float64 for a large ``p``.
 
     At ``c = 0`` the function is 0.5 at the lower bound and ``d^p - 0.5`` at the upper bound. A pair of ``p`` and
-    ``d`` is valid only when ``d^p < 0.5``, so that the function has a root inside the interval
-    (`has_root_inside_interval`). `NearEdgePower` has the same values at the opposite bounds, and the same rule.
+    ``d`` is valid only when ``d^p < 0.5``, so that the function has a root inside the interval.
 
-    ``c`` adds to the function value, so the root lies at ``d*(0.5 - c)^(-1/p)``: a factor above the lower bound that
+    ``c`` adds to the function value, so the root lies at ``d*(0.5 - c)^(-1/p)``, the lower bound times a factor that
     nears 1 as ``p`` grows.
     """
 
@@ -41,15 +41,16 @@ class NearPolePower(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that combines ``p`` from 10^-2 to 10^6 with every distance of `distance_axis`.
 
-        The recipe is not cut to the candidates that satisfy the benchmark suite inclusion conditions. For a large
-        ``p`` at a small ``d``, the root lies too close to the lower bound to satisfy them.
+        The recipe does not leave out the candidates that fail the benchmark suite inclusion conditions. For a large
+        ``p`` at a small ``d``, the root lies too close to the lower bound to satisfy them, so no benchmark suite holds
+        such a candidate.
         """
         return (ParamGrid(axes=(power_axis(-2.0, 6.0), distance_axis())),)
 
     def is_param_tuple_valid(self, p: float, d: float) -> bool:
         """Require ``p`` and ``d`` above 0, and a root inside the interval."""
         if p > 0.0 and d > 0.0:
-            return has_root_inside_interval(p, d)
+            return d**p < 0.5
         else:
             return False
 

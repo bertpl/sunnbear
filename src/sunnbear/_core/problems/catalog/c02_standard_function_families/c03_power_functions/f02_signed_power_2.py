@@ -15,9 +15,10 @@ class SignedPower2(Formula):
 
     ``p`` is the power, any value above 0.
 
-    ``c`` adds to the function value, where `SignedPower1` shifts x by it. The root then lies at
+    ``c`` adds to the function value, while in `SignedPower1` ``c`` shifts x. The root then lies at
     ``-sign(c)*abs(c)^(1/p)``, away from 0, and it is a simple root for every ``c`` but 0. The point ``x = 0`` stays
-    where it is, so a solver meets the infinite or zero slope there on its way to a root that lies elsewhere.
+    where it is, so a solver may evaluate f near the infinite or zero slope at 0 before it reaches a root that lies
+    elsewhere.
 
     At ``c = 0`` the function passes through ``(-1, -1)`` and ``(1, 1)`` for every ``p``, so the calibrated range of
     ``c`` is the same for all of the formula's test problems.

@@ -6,7 +6,8 @@ from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamGrid, Pa
 
 from .helpers import power_axis
 
-# The function's size never exceeds this value: nearer to the pole, the function is flat at it.
+# The function's absolute value never exceeds this limit: nearer to the pole, the function is constant at this limit
+# or its negative.
 #
 # The value is far below float64's largest value on purpose: a solver multiplies function values and their
 # differences, and a product of 3 differences of values of this size is still finite.
@@ -17,7 +18,7 @@ class SignedReciprocalPower(Formula):
     """`SignedReciprocalPower` is ``sign(z)*abs(z)^(-p)`` with ``z = x - c/(1 + p)``, on ``[-1, 1]``.
 
     The function has a pole at ``z = 0``, where it jumps from negative to positive values. It has no root: the sign
-    change that its interval holds is the pole, which a solver then converges to.
+    change in its interval is the pole, which a solver then converges to.
 
     ``p`` is the power, any value above 0.
 
@@ -59,8 +60,8 @@ class SignedReciprocalPower(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps ``p`` from 10^-3 to 10^3.
 
-        At the low end the function is close to the step ``sign(z)``. At the high end it is flat at `MAX_ABS_VALUE` in
-        size on most of the interval.
+        At the low end the function is close to the step ``sign(z)``. At the high end its absolute value is
+        `MAX_ABS_VALUE` on most of the interval.
         """
         return (ParamGrid(axes=(power_axis(-3.0, 3.0),)),)
 

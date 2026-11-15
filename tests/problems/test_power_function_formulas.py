@@ -1,7 +1,10 @@
 """The power function formulas (category 2.3) give the expected candidates, each with a sign change over its interval.
 
-The other tests cover what each formula adds to a plain power: the linear term of `SignedPower1`, the rule for the
-interval ``[d, 1]``, and the finite values of `SignedReciprocalPower` at and next to its pole.
+Further tests cover what each formula adds to a plain power:
+
+- the linear term of `SignedPower1`;
+- the pairs of ``p`` and ``d`` that give a root inside ``[d, 1]``;
+- the finite values of `SignedReciprocalPower` at and next to its pole.
 """
 
 import math
@@ -24,8 +27,6 @@ POWER_FUNCTION_FORMULAS = [
     pytest.param((2, 3, 4), 81 * 6 - 63, id="near_pole_power"),
     pytest.param((2, 3, 5), 61, id="signed_reciprocal_power"),
 ]
-
-MAX_ABS_VALUE = f05_signed_reciprocal_power.MAX_ABS_VALUE
 
 
 def _formula(number: tuple[int, ...]) -> Formula:
@@ -63,7 +64,7 @@ def test_every_candidate_has_opposite_signs_at_the_bounds_of_its_interval(formul
 
 
 @pytest.mark.parametrize("c", [0.3, -0.7])
-def test_signed_power_1_is_exactly_0_only_at_its_root(c):
+def test_signed_power_1_is_0_at_its_root_and_nonzero_next_to_it(c):
     """At every power, `SignedPower1` is 0 at its root and has the sign of ``z`` at the floats next to it, also where
     the power itself underflows to 0.
 
@@ -82,8 +83,8 @@ def test_signed_power_1_is_exactly_0_only_at_its_root(c):
         assert candidate.xc_fun(math.nextafter(root, math.inf), c) > 0.0, candidate.id
 
 
-def test_near_edge_power_and_near_pole_power_keep_the_same_pairs_of_power_and_distance():
-    """Among the powers that both formulas sweep at a distance above 0, both keep the same pairs ``(p, d)``."""
+def test_near_edge_power_and_near_pole_power_accept_the_same_pairs_of_power_and_distance():
+    """Among the powers that both formulas sweep at a distance above 0, both accept the same pairs ``(p, d)``."""
     # --- arrange ----------------------
     near_edge_candidates = _formula((2, 3, 3)).build_all_candidates()
     near_pole_candidates = _formula((2, 3, 4)).build_all_candidates()
@@ -105,9 +106,10 @@ def test_near_edge_power_and_near_pole_power_keep_the_same_pairs_of_power_and_di
 @pytest.mark.parametrize("c", [0.0, 0.3, -0.7])
 def test_signed_reciprocal_power_is_finite_at_and_next_to_its_pole(c):
     """At every power, `SignedReciprocalPower` is 0 at its pole, and at the floats next to the pole it has the sign of
-    ``z`` and a size of at most `MAX_ABS_VALUE`."""
+    ``z`` and an absolute value of at most `MAX_ABS_VALUE`."""
     # --- arrange ----------------------
     candidates = _formula((2, 3, 5)).build_all_candidates()
+    max_abs_value = f05_signed_reciprocal_power.MAX_ABS_VALUE
 
     # --- act / assert -----------------
     for candidate in candidates:
@@ -116,5 +118,5 @@ def test_signed_reciprocal_power_is_finite_at_and_next_to_its_pole(c):
         value_below = candidate.xc_fun(math.nextafter(pole, -math.inf), c)
         value_above = candidate.xc_fun(math.nextafter(pole, math.inf), c)
         assert candidate.xc_fun(pole, c) == 0.0, candidate.id
-        assert -MAX_ABS_VALUE <= value_below < 0.0, candidate.id
-        assert 0.0 < value_above <= MAX_ABS_VALUE, candidate.id
+        assert -max_abs_value <= value_below < 0.0, candidate.id
+        assert 0.0 < value_above <= max_abs_value, candidate.id
