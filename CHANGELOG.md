@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add standard function families to the test problems that the internal benchmark suite pipeline builds benchmark suites from
+
 ### Changed
 
 - Write a negative parameter value in a `ProblemId` as `-2^x` or `-10^x` where that spelling is shorter than the decimal spelling; this changes the ids of 11 shipped test problems
