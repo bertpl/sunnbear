@@ -7,7 +7,6 @@
 - the a-series' aliases cover each of its sizes in the largest Core.
 """
 
-from collections import Counter
 from itertools import pairwise
 
 import numpy as np
@@ -15,7 +14,7 @@ import pytest
 
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
-from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier, DifficultyTierQuotas
 from sunnbear._core.benchmark.suites.pipeline.stages import SMALLEST_SUITE_SIZE, DistillationStage
 from sunnbear._core.benchmark.suites.pipeline.stages.s6_core_selection import CORE_SIZES
 from sunnbear._core.benchmark.suites.pipeline.stages.s7_distillation.stage import _PRIMARY_SERIES_ALIASES
@@ -53,18 +52,25 @@ def _distill(tier_counts: dict[DifficultyTier, int], stage: DistillationStage) -
 
 def _check_quotas_and_nesting(build_details: BenchmarkSuitesBuildDetails) -> None:
     """Check that each suite that a selection makes meets its quotas, and that each suite holds the next smaller one of
-    its series."""
-    difficulty_tiers = build_details.difficulty_tiers()
+    its series.
+
+    A candidate counts toward the tier whose recorded EDI range holds its EDI; the EDIs of `_distill` are all
+    different, so the ranges do not overlap.
+    """
+    edis = build_details.edis(PipelineStageId.FINE_CHARACTERIZATION)
     all_selection_details = list(build_details.distilled_suite_selection_details().values())
     for selection_details, next_selection_details in pairwise(all_selection_details):
         suite, next_suite = selection_details.benchmark_suite, next_selection_details.benchmark_suite
         if suite.name[-1] == next_suite.name[-1]:
             assert set(next_suite.problem_ids) < set(suite.problem_ids)
     for selection_details in all_selection_details:
-        if selection_details.tier_quotas is not None:
-            tier_counts = Counter(difficulty_tiers[p] for p in selection_details.benchmark_suite.problem_ids)
-            for tiers, count in selection_details.tier_quotas.quota_by_group.items():
-                assert sum(tier_counts[tier] for tier in tiers) == count
+        if selection_details.edi_range_by_tier is not None:
+            suite = selection_details.benchmark_suite
+            tier_counts = {
+                tier: sum(lower <= edis[p] <= upper for p in suite.problem_ids)
+                for tier, (lower, upper) in selection_details.edi_range_by_tier.items()
+            }
+            assert tier_counts == DifficultyTierQuotas(len(suite.problem_ids)).quota_by_tier
 
 
 @pytest.mark.only_with_numba_jit
@@ -89,7 +95,10 @@ def test_the_series_split_a_core_of_128_into_2_suites_of_64():
         (16, 4),
     ]
     assert all_selection_details["sb-64a"].diversity > 0.0
-    assert (all_selection_details["sb-64b"].tier_quotas, all_selection_details["sb-64b"].diversity) == (None, None)
+    assert (all_selection_details["sb-64b"].edi_range_by_tier, all_selection_details["sb-64b"].diversity) == (
+        None,
+        None,
+    )
     _check_quotas_and_nesting(build_details)
 
 

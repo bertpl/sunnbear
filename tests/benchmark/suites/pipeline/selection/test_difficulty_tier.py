@@ -1,5 +1,5 @@
-"""`DifficultyTier.from_edi` buckets an EDI by its ratio to `n_bisection_fevals`, and each tier fills its fixed share
-of the Core."""
+"""`DifficultyTier.from_edi` buckets an EDI by its ratio to `n_bisection_fevals`, the tiers' EDI ranges join, and each
+tier fills its fixed share of the Core."""
 
 import pytest
 
@@ -24,6 +24,12 @@ def test_the_tier_follows_the_edi_relative_to_bisections_count(edi, difficulty_t
     falls in Db."""
     # --- act / assert -----------------
     assert DifficultyTier.from_edi(edi, n_bisection_fevals=40) is difficulty_tier_expected
+
+
+def test_each_tiers_edi_range_starts_where_the_one_before_ends():
+    """With 40 bisection evaluations, the tiers' EDI ranges run from 0 to 10, 20, 40, 80 and 160."""
+    # --- act / assert -----------------
+    assert [tier.edi_range(40) for tier in DifficultyTier] == [(0, 10), (10, 20), (20, 40), (40, 80), (80, 160)]
 
 
 def test_the_core_shares_sum_to_1():

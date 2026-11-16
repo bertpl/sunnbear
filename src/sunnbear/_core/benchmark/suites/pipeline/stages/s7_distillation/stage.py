@@ -1,6 +1,5 @@
 """`DistillationStage` distills 2 disjoint series of nested suites from the Core: the a-series and the b-series."""
 
-from collections import Counter
 from collections.abc import Sequence
 
 from sunnbear._core.benchmark.protocol import SeedPurpose, derive_seed
@@ -9,6 +8,7 @@ from sunnbear._core.benchmark.suites.pipeline.core import PIPELINE_ROOT_SEED, Pi
 from sunnbear._core.benchmark.suites.pipeline.selection import (
     DEFAULT_SELECTION_SEC_PER_CANDIDATE,
     CandidatePool,
+    DifficultyTierAssignment,
     DifficultyTierQuotas,
     select_diverse_problem_ids,
 )
@@ -47,9 +47,9 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
       form the largest suite of the secondary series, without a max-div run of their own;
     - **the halvings:** per series, each smaller suite is selected from the series' next larger suite.
 
-    Every suite but the largest of the secondary series is selected by `select_diverse_problem_ids`, under quotas that
-    `DifficultyTierQuotas.resolve` chooses anew for that suite's size, from the tier counts of the suite or Core it is
-    selected from.
+    Every suite but the largest of the secondary series is selected by `select_diverse_problem_ids`, under the quotas of
+    that suite's size, with the tiers that `DifficultyTierAssignment.from_pool` assigns anew to the candidates of the
+    suite or Core that it is selected from.
     """
 
     stage_id = PipelineStageId.DISTILLATION
@@ -86,7 +86,7 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
                 [p for p in core_pool.feature_matrix.problem_ids if p not in largest_primary_problem_ids],
                 is_primary=False,
             ),
-            tier_quotas=None,
+            edi_range_by_tier=None,
             diversity=None,
         )
 
@@ -114,17 +114,17 @@ class DistillationStage(PipelineStage[DistillationStateAccessor]):
         self, candidate_pool: CandidatePool, *, size: int, is_primary: bool, worker_pool: WorkerPool
     ) -> SuiteSelectionDetails:
         """Return the details of a suite of `size` in the primary or secondary series, chosen from `candidate_pool`."""
-        tier_quotas = DifficultyTierQuotas.resolve(size, Counter(candidate_pool.difficulty_tiers))
+        tier_assignment = DifficultyTierAssignment.from_pool(candidate_pool, DifficultyTierQuotas(size))
         problem_ids, diversity = select_diverse_problem_ids(
             candidate_pool,
-            tier_quotas=tier_quotas,
+            tier_assignment=tier_assignment,
             seed=self.seed,
             sec_per_candidate=self.sec_per_candidate,
             n_workers=worker_pool.n_workers,
         )
         return SuiteSelectionDetails(
             benchmark_suite=self._build_suite(problem_ids, is_primary=is_primary),
-            tier_quotas=tier_quotas,
+            edi_range_by_tier=tier_assignment.edi_range_by_tier,
             diversity=diversity,
         )
 

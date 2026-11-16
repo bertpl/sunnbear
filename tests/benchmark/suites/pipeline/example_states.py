@@ -19,7 +19,7 @@ from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     FeatureFidelity,
     FeatureMatrix,
 )
-from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier, DifficultyTierQuotas
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
 from sunnbear._core.benchmark.suites.pipeline.state import (
     CharacterizationResults,
     IntervalBounds,
@@ -86,7 +86,8 @@ def build_state_before(
       `example_raw_feature_matrix`) with their block scales, the EDIs `edis` (by default 10 for each candidate), and
       no incorrect solve;
     - spacing: a minimum distance of 1, and no drop;
-    - core selection: each candidate's tier from its EDI, and a Core of every candidate, selected under no quota.
+    - core selection: each candidate's tier from its EDI, and a Core of every candidate, which no max-div run
+      selected.
     """
     state = PipelineState()
     if raw_feature_matrix is None:
@@ -116,8 +117,8 @@ def build_state_before(
                         benchmark_suite=BenchmarkSuite(
                             name=f"sb-{len(problem_ids)}", aliases=(), problem_ids=tuple(problem_ids)
                         ),
-                        tier_quotas=DifficultyTierQuotas(quota_by_group={frozenset(DifficultyTier): len(problem_ids)}),
-                        diversity=1.0,
+                        edi_range_by_tier=None,
+                        diversity=None,
                     )
                 )
         state.finish_stage(earlier_stage_id)
