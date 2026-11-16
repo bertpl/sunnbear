@@ -25,6 +25,8 @@ from sunnbear._core.problems.core import ProblemId
 # In a characterization's table of raw features, each config's column of incorrect solves is named with this prefix and
 # the config's solver id.
 _N_INCORRECT_SOLVES_PREFIX = "n_incorrect_solves_"
+# In the same table, this column holds each candidate's empirical difficulty index (EDI).
+_EDI_COLUMN_NAME = "edi"
 
 
 # ==================================================================================================
@@ -47,6 +49,7 @@ class CharacterizationResults:
     Attributes:
         fidelity: The `FeatureFidelity` of the stage's solves and analyses.
         raw_feature_matrix: The raw features of each kept candidate.
+        edis: The empirical difficulty index (EDI) of each kept candidate, computed from the stage's solves.
         n_incorrect_solves_per_config: For each kept candidate, 1 count per core solver config, in the order of
             `DiversityFeatureFactory.solver_ids`: the number of that config's solves that gave no correct answer.
             Each config solves each candidate `fidelity.solver_mc_size` times.
@@ -54,6 +57,7 @@ class CharacterizationResults:
 
     fidelity: FeatureFidelity
     raw_feature_matrix: FeatureMatrix
+    edis: Mapping[ProblemId, float]
     n_incorrect_solves_per_config: Mapping[ProblemId, tuple[int, ...]]
 
     @cached_property
@@ -73,12 +77,13 @@ class CharacterizationResults:
     def to_raw_features_columns(self) -> dict[str, list[Any]]:
         """Return the results as table columns.
 
-        The columns are ``problem_id``, 1 per feature, and 1 per config with its counts of incorrect solves.
+        The columns are ``problem_id``, 1 per feature, ``edi``, and 1 per config with its counts of incorrect solves.
         """
         factory = DiversityFeatureFactory()
         columns: dict[str, list[Any]] = {"problem_id": list(map(str, self.raw_feature_matrix.problem_ids))}
         for name, values in zip(factory.feature_names, self.raw_feature_matrix.values.T, strict=True):
             columns[name] = values.tolist()
+        columns[_EDI_COLUMN_NAME] = [self.edis[problem_id] for problem_id in self.raw_feature_matrix.problem_ids]
         for config_idx, solver_id in enumerate(factory.solver_ids):
             columns[f"{_N_INCORRECT_SOLVES_PREFIX}{solver_id}"] = [
                 self.n_incorrect_solves_per_config[problem_id][config_idx]
@@ -145,6 +150,7 @@ class CharacterizationResults:
                 .to_numpy()
                 .reshape(len(problem_ids), len(factory.feature_names)),
             ),
+            edis=dict(zip(problem_ids, table[_EDI_COLUMN_NAME].to_list(), strict=True)),
             n_incorrect_solves_per_config=dict(zip(problem_ids, n_incorrect_solves_per_config, strict=True)),
         )
 
@@ -158,7 +164,8 @@ class NearestKeptCandidate:
 
     Attributes:
         problem_id: The id of the nearest kept candidate.
-        distance: The distance between the 2 candidates, as a multiple of spacing's minimum distance.
+        distance: The distance between the 2 candidates' scaled coarse feature vectors, which is smaller than the
+            minimum distance that spacing chose, unless the kept candidate is 1 of the 2 that spacing always keeps.
     """
 
     problem_id: ProblemId

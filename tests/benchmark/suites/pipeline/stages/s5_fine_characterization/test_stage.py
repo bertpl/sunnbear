@@ -32,17 +32,16 @@ def test_the_stage_stores_the_fine_features_their_scales_and_the_edis(isolated_f
     )
     stage = FineCharacterizationStage()
     results_calls = record_calls(monkeypatch, FineCharacterizationStateAccessor, "set_characterization_results")
-    edis_calls = record_calls(monkeypatch, FineCharacterizationStateAccessor, "set_edis")
 
     # --- act --------------------------
     state.run_stage(stage, worker_pool=WorkerPool(n_workers=1))
 
     # --- assert -----------------------
-    [(results,)], [(edis,)] = results_calls, edis_calls
+    [(results,)] = results_calls
     assert results.fidelity is FeatureFidelity.FINE_PRODUCTION
     assert results.raw_feature_matrix.problem_ids == tuple(problem_ids)
     assert all(scale > 0.0 for scale in results.block_scales.scale_per_block.values())
     edi_column = len(DiversityFeatureFactory().solver_ids) + SOLVERS_GPQ_LEVELS.index(EDI_GPQ_LEVEL)
     np.testing.assert_allclose(
-        [edis[problem_id] for problem_id in problem_ids], results.raw_feature_matrix.values[:, edi_column]
+        [results.edis[problem_id] for problem_id in problem_ids], results.raw_feature_matrix.values[:, edi_column]
     )

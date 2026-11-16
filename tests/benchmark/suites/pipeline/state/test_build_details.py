@@ -63,14 +63,14 @@ def _distilled_state() -> PipelineState:
             CharacterizationResults(
                 fidelity=FeatureFidelity.COARSE_PRODUCTION,
                 raw_feature_matrix=example_raw_feature_matrix(problem_ids),
+                edis=dict.fromkeys(problem_ids, 10.0),
                 n_incorrect_solves_per_config={problem_id: (idx,) for idx, problem_id in enumerate(problem_ids)},
             )
         )
-        if stage_id is PipelineStageId.FINE_CHARACTERIZATION:
-            accessor.set_edis(dict.fromkeys(problem_ids, 10.0))
         state.finish_stage(stage_id)
         if stage_id is PipelineStageId.COARSE_CHARACTERIZATION:
             accessor = state.create_state_accessor(PipelineStageId.SPACING)
+            accessor.set_min_distance(0.1)
             accessor.drop(_PROBLEM_IDS[2], "near_duplicate")
             accessor.set_nearest_kept_candidates(
                 {_PROBLEM_IDS[2]: NearestKeptCandidate(problem_id=_PROBLEM_IDS[1], distance=0.5)}
@@ -235,6 +235,7 @@ def test_the_build_details_rebuilt_from_their_files_equal_the_original():
         if field.name not in ("candidate_registry", "characterization_results")
     ]:
         assert getattr(read_back, read_method)() == getattr(build_details, read_method)()
+    assert read_back.edis() == build_details.edis()
     for stage_id in (PipelineStageId.COARSE_CHARACTERIZATION, PipelineStageId.FINE_CHARACTERIZATION):
         results, read_back_results = (
             details.characterization_results(stage_id) for details in (build_details, read_back)
@@ -242,6 +243,7 @@ def test_the_build_details_rebuilt_from_their_files_equal_the_original():
         assert read_back_results.fidelity == results.fidelity
         assert read_back_results.raw_feature_matrix.problem_ids == results.raw_feature_matrix.problem_ids
         np.testing.assert_array_equal(read_back_results.raw_feature_matrix.values, results.raw_feature_matrix.values)
+        assert read_back_results.edis == results.edis
         assert read_back_results.n_incorrect_solves_per_config == results.n_incorrect_solves_per_config
 
 
@@ -260,6 +262,7 @@ def test_the_build_details_of_a_run_that_stopped_early_read_back_their_files(n_f
     assert read_back.finished_stage_ids == tuple(PipelineStageId)[:n_finished_stages]
     assert read_back.c_ranges() == build_details.c_ranges()
     assert read_back.nearest_kept_candidates() is None
+    assert read_back.edis() is None
     assert read_back.core_selection_details() is None
     assert read_back.incorrect_solves_table(PipelineStageId.FINE_CHARACTERIZATION) is None
 

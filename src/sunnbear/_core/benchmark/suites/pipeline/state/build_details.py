@@ -111,6 +111,13 @@ class BenchmarkSuitesBuildDetails:
         """
         return self._copy_if_finished(stage_id, self._storage.characterization_results.get(stage_id))
 
+    def spacing_min_distance(self) -> float | None:
+        """Return the minimum distance between kept candidates of 1 formula that the spacing stage chose.
+
+        Return ``None`` when spacing did not finish.
+        """
+        return self._copy_if_finished(PipelineStageId.SPACING, self._storage.spacing_min_distance)
+
     def nearest_kept_candidates(self) -> dict[ProblemId, NearestKeptCandidate] | None:
         """Return, for each candidate that the spacing stage dropped, its nearest kept candidate.
 
@@ -123,7 +130,11 @@ class BenchmarkSuitesBuildDetails:
 
         Return ``None`` when fine characterization did not finish.
         """
-        return self._copy_if_finished(PipelineStageId.FINE_CHARACTERIZATION, self._storage.edis)
+        results = self.characterization_results(PipelineStageId.FINE_CHARACTERIZATION)
+        if results is None:
+            return None
+        else:
+            return dict(results.edis)
 
     def difficulty_tiers(self) -> dict[ProblemId, DifficultyTier] | None:
         """Return core selection's difficulty tier of each candidate that core selection received.
@@ -290,14 +301,15 @@ class BenchmarkSuitesBuildDetails:
         - ``run.json`` holds the ids of the finished stages, and the stage that stopped the run and why, or ``null``
           when no stage stopped it;
         - ``storage.json`` holds the information that is not per candidate: each characterization stage's fidelity and
-          solver ids, and the `SuiteSelectionDetails` of the Core and of each distilled suite;
+          solver ids, spacing's minimum distance, and the `SuiteSelectionDetails` of the Core and of each distilled
+          suite;
         - each structure of `PipelineStateStorage` that holds information per candidate is 1 Parquet table, named after
           the structure, with 1 row per candidate that the structure covers and the candidate's id in the column
           ``problem_id``. The table ``candidate_registry`` holds every candidate, with the stage and reason of its drop
           and whether the drop is a rejection, which are null for a candidate that no stage dropped;
         - each characterization stage's results are the Parquet table ``<stage id>_raw_features``, with 1 column per
-          name of `DiversityFeatureFactory.feature_names` and 1 column ``n_incorrect_solves_<solver id>`` per core
-          solver config.
+          name of `DiversityFeatureFactory.feature_names`, the column ``edi`` with the stage's EDIs, and 1 column
+          ``n_incorrect_solves_<solver id>`` per core solver config.
 
         A structure that its stage has not written has no file. The files also hold what a stage that stopped the run
         wrote before it stopped; the read methods of build details rebuilt from these files still return ``None`` for

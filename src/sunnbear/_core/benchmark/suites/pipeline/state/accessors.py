@@ -160,11 +160,12 @@ class CharacterizationStateAccessor(PipelineStateAccessor):
         The stage calls this after it has recorded its rejections.
 
         Raises:
-            ValueError: If the results were stored before, or their raw features or incorrect solves do not cover
+            ValueError: If the results were stored before, or their raw features, EDIs or incorrect solves do not cover
                 exactly those candidates.
         """
         self._check_not_written(is_written=self.stage_id in self._storage.characterization_results)
         self._check_covers(results.raw_feature_matrix.problem_ids, self.remaining_problem_ids)
+        self._check_covers(results.edis.keys(), self.remaining_problem_ids)
         self._check_covers(results.n_incorrect_solves_per_config.keys(), self.remaining_problem_ids)
         self._storage.characterization_results[self.stage_id] = results
 
@@ -182,7 +183,10 @@ class CoarseCharacterizationStateAccessor(CharacterizationStateAccessor):
 #  SpacingStateAccessor
 # ==================================================================================================
 class SpacingStateAccessor(PipelineStateAccessor):
-    """`SpacingStateAccessor` gives the coarse features, and takes the nearest kept candidate of each dropped one."""
+    """`SpacingStateAccessor` gives the coarse features and EDIs, and takes the stage's minimum distance and drops.
+
+    For each candidate that the stage drops, the accessor takes its nearest kept candidate.
+    """
 
     stage_id = PipelineStageId.SPACING
 
@@ -193,6 +197,20 @@ class SpacingStateAccessor(PipelineStateAccessor):
         """
         results = self._storage.characterization_results[PipelineStageId.COARSE_CHARACTERIZATION]
         return results.build_scaled_feature_matrix(self.remaining_problem_ids)
+
+    def coarse_edis(self) -> dict[ProblemId, float]:
+        """Return coarse characterization's EDI of each candidate that no stage has dropped."""
+        results = self._storage.characterization_results[PipelineStageId.COARSE_CHARACTERIZATION]
+        return self._restrict_to_remaining(results.edis)
+
+    def set_min_distance(self, min_distance: float) -> None:
+        """Store the minimum distance between kept candidates of 1 formula that the stage chose.
+
+        Raises:
+            ValueError: If the minimum distance was stored before.
+        """
+        self._check_not_written(is_written=self._storage.spacing_min_distance is not None)
+        self._storage.spacing_min_distance = min_distance
 
     def set_nearest_kept_candidates(self, nearest_kept_candidates: Mapping[ProblemId, NearestKeptCandidate]) -> None:
         """Store the nearest kept candidate of each candidate that the stage dropped.
@@ -214,21 +232,9 @@ class SpacingStateAccessor(PipelineStateAccessor):
 #  FineCharacterizationStateAccessor
 # ==================================================================================================
 class FineCharacterizationStateAccessor(CharacterizationStateAccessor):
-    """`FineCharacterizationStateAccessor` takes the stage's results and empirical difficulty indices (EDIs)."""
+    """`FineCharacterizationStateAccessor` gives the candidates' c-ranges, and takes the stage's results."""
 
     stage_id = PipelineStageId.FINE_CHARACTERIZATION
-
-    def set_edis(self, edis: Mapping[ProblemId, float]) -> None:
-        """Store the EDI of each candidate that no stage has dropped.
-
-        The stage calls this after it has recorded its rejections.
-
-        Raises:
-            ValueError: If the EDIs were stored before, or do not cover exactly those candidates.
-        """
-        self._check_not_written(is_written=self._storage.edis is not None)
-        self._check_covers(edis.keys(), self.remaining_problem_ids)
-        self._storage.edis = self._restrict_to_remaining(edis)
 
 
 # ==================================================================================================
@@ -240,7 +246,7 @@ class SelectionStateAccessor(PipelineStateAccessor):
     def candidate_pool(self) -> CandidatePool:
         """Return the pool of the candidates that no stage has dropped.
 
-        The pool holds their scaled features from fine characterization, their EDIs and their difficulty tiers.
+        The pool holds their scaled features and their EDIs from fine characterization, and their difficulty tiers.
 
         Raises:
             ValueError: If the difficulty tiers are not stored yet, or fine characterization has no scales, because it
@@ -255,7 +261,7 @@ class SelectionStateAccessor(PipelineStateAccessor):
         else:
             return CandidatePool.from_feature_matrix(
                 scaled_feature_matrix,
-                edis=self._storage.edis or {},
+                edis=results.edis,
                 difficulty_tiers=self._storage.difficulty_tiers,
             )
 
@@ -269,8 +275,9 @@ class CoreSelectionStateAccessor(SelectionStateAccessor):
     stage_id = PipelineStageId.CORE_SELECTION
 
     def edis(self) -> dict[ProblemId, float]:
-        """Return the EDI of each candidate that no stage has dropped."""
-        return self._restrict_to_remaining(self._storage.edis or {})
+        """Return fine characterization's EDI of each candidate that no stage has dropped."""
+        results = self._storage.characterization_results[PipelineStageId.FINE_CHARACTERIZATION]
+        return self._restrict_to_remaining(results.edis)
 
     def set_difficulty_tiers(self, difficulty_tiers: Mapping[ProblemId, DifficultyTier]) -> None:
         """Store the tier of each candidate that no stage has dropped.
