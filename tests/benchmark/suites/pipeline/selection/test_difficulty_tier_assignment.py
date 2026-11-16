@@ -2,9 +2,10 @@
 until the pool meets every quota:
 
 - a short tier takes candidates from the nearest tier with a surplus, through the tiers in between;
-- with surpluses equally near on both sides, it takes the adjacent candidate whose EDI is closer to its range;
+- with surpluses equally near on both sides, the short tier takes, of the 2 candidates just outside its own in EDI
+  order, the one whose EDI is closer to the short tier's range;
 - among equal EDIs, the pool's order decides;
-- it refuses a pool smaller than the selection.
+- `from_pool` refuses a pool smaller than the selection.
 """
 
 from collections import Counter
@@ -70,11 +71,12 @@ def _edis_of_tiers(pool_tier_counts: dict[DifficultyTier, int]) -> list[float]:
     ],
 )
 def test_a_short_tier_takes_candidates_from_the_nearest_surplus(selection_size, pool_tier_counts, counts_expected):
-    """Each short tier takes the candidates it lacks from the nearest tier with a surplus.
+    """Each short tier takes its missing candidates from the nearest tier with a surplus:
 
-    With 10 of Db and 50 of Da for quotas of 16 and 48, Db takes Da's 2 surplus candidates, and the other 4 come from C
-    through Da, which keeps 48. With 31 of B and 22 of C, C has the larger shortfall and takes 10 from Da first; B then
-    takes 1 from A, because C has no surplus left.
+    - with 10 of Db and 50 of Da for quotas of 16 and 48, Db takes Da's 2 surplus candidates, and the other 4 come from
+      C through Da, which keeps 48;
+    - with 31 of B and 22 of C, C has the larger shortfall and takes 10 from Da first; B then takes 1 from A, because C
+      has no surplus left.
     """
     # --- arrange ----------------------
     pool = _pool(_edis_of_tiers(pool_tier_counts))

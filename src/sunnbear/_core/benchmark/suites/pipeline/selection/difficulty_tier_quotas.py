@@ -43,16 +43,16 @@ class DifficultyTierQuotas:
         """Return each tier's quota, in the order of `DifficultyTier`."""
         return {tier: int(self.selection_size * tier.core_share) for tier in DifficultyTier}
 
-    def check_selection(self, selected_tiers: Sequence[DifficultyTier]) -> None:
+    def check_selection(self, selected_assigned_tiers: Sequence[DifficultyTier]) -> None:
         """Stop the pipeline unless the selected candidates, given by their assigned tiers, meet every quota exactly.
 
         The quotas sum to `selection_size`, so a selection that meets every quota also has that size.
 
         Raises:
-            PipelineStopError: If `selected_tiers` does not meet a quota exactly; the message names each such tier with
-                the number of selected candidates that count toward it.
+            PipelineStopError: If `selected_assigned_tiers` does not meet a quota exactly; the message names each such
+                tier with the number of selected candidates that count toward it.
         """
-        tier_counts = Counter(selected_tiers)
+        tier_counts = Counter(selected_assigned_tiers)
         unmet_quota_descriptions = [
             f"{tier.value}: {tier_counts[tier]} of {quota}"
             for tier, quota in self.quota_by_tier.items()
@@ -60,6 +60,6 @@ class DifficultyTierQuotas:
         ]
         if unmet_quota_descriptions:
             raise PipelineStopError(
-                f"The selection holds {len(selected_tiers)} candidates for a selection of {self.selection_size}; "
-                f"unmet quotas: {'; '.join(unmet_quota_descriptions)}."
+                f"The selection holds {len(selected_assigned_tiers)} candidates for a selection of "
+                f"{self.selection_size}; unmet quotas: {'; '.join(unmet_quota_descriptions)}."
             )

@@ -1,5 +1,6 @@
-"""`DifficultyTier.from_edi` buckets an EDI by its ratio to `n_bisection_fevals`, the tiers' EDI ranges join, and each
-tier fills its fixed share of the Core."""
+"""`DifficultyTier.from_edi` buckets an EDI by its ratio to `n_bisection_fevals`, each tier's EDI range starts where
+the range of the tier before it ends, an EDI's ratio distance to a range is the factor by which it lies outside, and
+each tier fills its fixed share of the Core."""
 
 import pytest
 
@@ -30,6 +31,21 @@ def test_each_tiers_edi_range_starts_where_the_one_before_ends():
     """With 40 bisection evaluations, the tiers' EDI ranges run from 0 to 10, 20, 40, 80 and 160."""
     # --- act / assert -----------------
     assert [tier.edi_range(40) for tier in DifficultyTier] == [(0, 10), (10, 20), (20, 40), (40, 80), (80, 160)]
+
+
+@pytest.mark.parametrize(
+    "edi, distance_expected",
+    [
+        pytest.param(16.0, 1.25, id="below"),
+        pytest.param(30.0, 1.0, id="inside"),
+        pytest.param(60.0, 1.5, id="above"),
+    ],
+)
+def test_the_ratio_distance_is_the_factor_outside_the_range(edi, distance_expected):
+    """With 40 bisection evaluations, C's range runs from 20 to 40: 16 lies a factor 1.25 below it, and 60 a factor 1.5
+    above it."""
+    # --- act / assert -----------------
+    assert DifficultyTier.C.edi_ratio_distance(edi, 40) == distance_expected
 
 
 def test_the_core_shares_sum_to_1():

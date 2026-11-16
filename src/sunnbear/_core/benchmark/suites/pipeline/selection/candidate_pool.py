@@ -31,9 +31,12 @@ class CandidatePool:
     n_bisection_fevals: int
 
     @cached_property
-    def difficulty_tiers(self) -> tuple[DifficultyTier, ...]:
-        """Return each candidate's difficulty tier, from its EDI, in the order of `feature_matrix`'s rows."""
-        return tuple(DifficultyTier.from_edi(edi, n_bisection_fevals=self.n_bisection_fevals) for edi in self.edis)
+    def difficulty_tiers(self) -> dict[ProblemId, DifficultyTier]:
+        """Return each candidate's difficulty tier, from its EDI, keyed by id in the order of the pool."""
+        return {
+            problem_id: DifficultyTier.from_edi(edi, n_bisection_fevals=self.n_bisection_fevals)
+            for problem_id, edi in zip(self.feature_matrix.problem_ids, self.edis, strict=True)
+        }
 
     def subset(self, problem_ids: Sequence[ProblemId]) -> Self:
         """Return the pool of the candidates `problem_ids`, in their order.

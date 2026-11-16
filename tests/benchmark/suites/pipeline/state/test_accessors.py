@@ -202,7 +202,7 @@ def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_tier(
     assert candidate_pool.feature_matrix.problem_ids == tuple(_PROBLEM_IDS)
     np.testing.assert_array_equal(candidate_pool.edis, list(edis.values()))
     assert candidate_pool.n_bisection_fevals == DEFAULT_N_BISECTION_FEVALS
-    assert candidate_pool.difficulty_tiers == (DifficultyTier.A, DifficultyTier.C, DifficultyTier.B)
+    assert list(candidate_pool.difficulty_tiers.values()) == [DifficultyTier.A, DifficultyTier.C, DifficultyTier.B]
 
 
 def test_the_candidate_pool_needs_the_scales():

@@ -21,8 +21,8 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 # power of 2, has whole quotas.
 #
 # Only a Core of the largest size, whose candidates all count toward their difficulty tier's quota, ships; a Core of
-# another size, or one whose selection assigned some candidate another tier, is interim: it never ships as benchmark
-# suites.
+# another size, or one for which `DifficultyTierAssignment.from_pool` assigned some candidate a tier other than its
+# difficulty tier, is interim: it never ships as benchmark suites.
 CORE_SIZES = (128, 256, 512, 1024, 2048)
 
 
@@ -32,7 +32,8 @@ CORE_SIZES = (128, 256, 512, 1024, 2048)
 class CoreSelectionStage(PipelineStage[CoreSelectionStateAccessor]):
     """`CoreSelectionStage` selects the Core, the suite `sb-<size>`; every other benchmark suite is selected from it.
 
-    A candidate's difficulty tier follows from its EDI, which fine characterization stored, as `CandidatePool` gives it.
+    `CandidatePool.difficulty_tiers` derives each candidate's difficulty tier from its EDI, which fine characterization
+    stored.
 
     The stage selects the Core in 3 steps:
 
@@ -70,9 +71,7 @@ class CoreSelectionStage(PipelineStage[CoreSelectionStateAccessor]):
         # --- size and tiers ---------------------
         core_size = self._choose_core_size(len(state_accessor.remaining_problem_ids))
         candidate_pool = state_accessor.candidate_pool()
-        state_accessor.set_difficulty_tiers(
-            dict(zip(candidate_pool.feature_matrix.problem_ids, candidate_pool.difficulty_tiers, strict=True))
-        )
+        state_accessor.set_difficulty_tiers(candidate_pool.difficulty_tiers)
         tier_assignment = DifficultyTierAssignment.from_pool(candidate_pool, DifficultyTierQuotas(core_size))
 
         # --- selection --------------------------

@@ -71,8 +71,8 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
     state = _select_core(edis, CoreSelectionStage(_SEC_PER_CANDIDATE))
 
     # --- assert -----------------------
-    distillation_accessor = state.create_state_accessor(PipelineStageId.DISTILLATION)
-    assert Counter(distillation_accessor.candidate_pool().difficulty_tiers) == {A: 32, B: 32, C: 32, DA: 24, DB: 8}
+    core_pool = state.create_state_accessor(PipelineStageId.DISTILLATION).candidate_pool()
+    assert Counter(core_pool.difficulty_tiers.values()) == {A: 32, B: 32, C: 32, DA: 24, DB: 8}
     core_selection_details = state.create_build_details().core_selection_details()
     assert core_selection_details.benchmark_suite.name == "sb-128"
     assert core_selection_details.benchmark_suite.aliases == ()
@@ -88,8 +88,8 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
 
 
 @pytest.mark.only_with_numba_jit
-def test_the_stage_fills_a_short_tier_with_the_hardest_of_its_neighbor_and_records_its_parameters():
-    """The candidates hold no Db, so the 8 hardest candidates of Da, the last 8 in the pool among equal EDIs, count
+def test_the_stage_fills_a_short_tier_from_its_neighbor_and_records_its_parameters():
+    """The candidates hold no Db, and all candidates of Da share the EDI 60, so the last 8 of Da in the pool count
     toward Db's quota, and the Core holds all 8; the stage's parameters record max-div's time per candidate and seed."""
     # --- arrange ----------------------
     stage = CoreSelectionStage(_SEC_PER_CANDIDATE)
@@ -99,8 +99,8 @@ def test_the_stage_fills_a_short_tier_with_the_hardest_of_its_neighbor_and_recor
     state = _select_core(edis, stage)
 
     # --- assert -----------------------
-    core_tiers = Counter(state.create_state_accessor(PipelineStageId.DISTILLATION).candidate_pool().difficulty_tiers)
-    assert core_tiers == dict.fromkeys([A, B, C, DA], 32)
+    core_pool = state.create_state_accessor(PipelineStageId.DISTILLATION).candidate_pool()
+    assert Counter(core_pool.difficulty_tiers.values()) == dict.fromkeys([A, B, C, DA], 32)
     core_selection_details = state.create_build_details().core_selection_details()
     assert set(example_problem_ids(len(edis))[-8:]) <= set(core_selection_details.benchmark_suite.problem_ids)
     assert core_selection_details.edi_range_by_tier[DB] == (60.0, 60.0)
