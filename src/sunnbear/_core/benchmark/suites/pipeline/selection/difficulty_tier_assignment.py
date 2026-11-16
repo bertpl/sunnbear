@@ -44,47 +44,47 @@ class DifficultyTierAssignment:
     #  Helpers
     # --------------------------------------------------------------------------
     @staticmethod
-    def _choose_supplier(
-        short_idx: int,
-        assigned_tier_counts: list[int],
-        quota_counts: list[int],
+    def _nearest_tier_with_surplus(
+        tier_below_quota: DifficultyTier,
+        assigned_tier_counts: Mapping[DifficultyTier, int],
+        quotas: DifficultyTierQuotas,
         sorted_edis: np.ndarray,
         n_bisection_fevals: int,
-    ) -> int:
-        """Return the index, in the order of `DifficultyTier`, of the tier that gives 1 candidate to the short tier.
+    ) -> DifficultyTier:
+        """Return the tier from which `tier_below_quota` takes its next candidate: the nearest tier with a surplus.
 
-        The rule is the one that `from_pool` describes.
+        A tier has a surplus when it holds more candidates than its quota, and "nearest" counts tiers, not EDIs. When 2
+        tiers with a surplus lie equally near on both sides, the tier on the side whose adjacent candidate has the EDI
+        closer, as a ratio, to the EDI range of `tier_below_quota` wins, and the lower tier on a tie.
 
         Args:
-            short_idx: The index of the short tier, which holds fewer candidates than its quota.
+            tier_below_quota: A tier that holds fewer candidates than its quota.
             assigned_tier_counts: The number of candidates of each assigned tier, in the order of `DifficultyTier`.
-            quota_counts: The quota of each tier, in the same order.
+            quotas: The quotas of the selection.
             sorted_edis: The pool's EDIs in ascending order, with the pool's order kept among equal EDIs.
             n_bisection_fevals: The `n_bisection_fevals` that sets the tiers' EDI ranges.
         """
-        surplus_idxs = [
-            idx
-            for idx, (count, quota) in enumerate(zip(assigned_tier_counts, quota_counts, strict=True))
-            if count > quota
-        ]
-        # Of 2 tiers equally near, `min` takes the lower one; `opposite_idx` is then the tier at the same distance on
-        # the other side of the short tier.
-        nearest_idx = min(surplus_idxs, key=lambda idx: (abs(idx - short_idx), idx))
-        opposite_idx = 2 * short_idx - nearest_idx
-        if opposite_idx not in surplus_idxs:
-            return nearest_idx
+        tiers = list(DifficultyTier)
+        position = tiers.index(tier_below_quota)
+        quota_by_tier = quotas.quota_by_tier
+        surplus_positions = [idx for idx, tier in enumerate(tiers) if assigned_tier_counts[tier] > quota_by_tier[tier]]
+        # Of 2 tiers equally near, `min` takes the lower one; `opposite_position` is then the position at the same
+        # distance on the other side of `tier_below_quota`.
+        nearest_position = min(surplus_positions, key=lambda idx: (abs(idx - position), idx))
+        opposite_position = 2 * position - nearest_position
+        if opposite_position not in surplus_positions:
+            return tiers[nearest_position]
         else:
-            # The 2 candidates just outside the short tier's candidates are the last one before them and the first one
+            # The adjacent candidates of `tier_below_quota` are the last one before its candidates and the first one
             # after them.
-            start = sum(assigned_tier_counts[:short_idx])
-            end = start + assigned_tier_counts[short_idx]
-            short_tier = list(DifficultyTier)[short_idx]
-            lower_ratio_distance = short_tier.edi_ratio_distance(sorted_edis[start - 1], n_bisection_fevals)
-            upper_ratio_distance = short_tier.edi_ratio_distance(sorted_edis[end], n_bisection_fevals)
+            start = sum(assigned_tier_counts[tier] for tier in tiers[:position])
+            end = start + assigned_tier_counts[tier_below_quota]
+            lower_ratio_distance = tier_below_quota.edi_ratio_distance(sorted_edis[start - 1], n_bisection_fevals)
+            upper_ratio_distance = tier_below_quota.edi_ratio_distance(sorted_edis[end], n_bisection_fevals)
             if upper_ratio_distance < lower_ratio_distance:
-                return opposite_idx
+                return tiers[opposite_position]
             else:
-                return nearest_idx
+                return tiers[nearest_position]
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -98,18 +98,17 @@ class DifficultyTierAssignment:
         every candidate its assigned tier.
 
         The number of candidates of each assigned tier starts at the pool's count of that difficulty tier. A tier has a
-        surplus when it holds more candidates than its quota. While a tier holds fewer candidates than its quota, 1
-        candidate moves:
+        surplus when it holds more candidates than its quota. While a tier is below its quota, 1 candidate moves:
 
-        - the tier with the largest shortfall, the first in the order of `DifficultyTier` on a tie, takes 1 candidate
-          from the nearest tier with a surplus, counted in tiers;
+        - the tier below its quota with the largest shortfall, the first in the order of `DifficultyTier` on a tie,
+          takes 1 candidate from the nearest tier with a surplus, counted in tiers;
         - each tier in between passes 1 candidate on and keeps its number of candidates, so each limit between
-          consecutive tiers, from the supplying tier to the short tier, moves by 1 candidate;
-        - when 2 tiers with a surplus lie equally near on both sides, the short tier takes, of the 2 candidates just
-          outside its own candidates, the one whose EDI lies closer, as a ratio, to the short tier's EDI range, and
-          the one with the lower EDI on a tie.
+          consecutive tiers, from the tier with a surplus to the tier below its quota, moves by 1 candidate;
+        - when 2 tiers with a surplus lie equally near on both sides, the tier below its quota takes, of the 2
+          candidates just outside its own candidates, the one whose EDI lies closer, as a ratio, to the EDI range of
+          the tier below its quota, and the one with the lower EDI on a tie.
 
-        Each move lowers the total shortfall by 1 and leaves no other tier short, so the loop ends.
+        Each move lowers the total shortfall by 1 and puts no other tier below its quota, so the loop ends.
 
         Raises:
             ValueError: If the pool holds fewer candidates than the selection.
@@ -120,34 +119,36 @@ class DifficultyTierAssignment:
                 f"A pool of {len(problem_ids)} candidates cannot fill a selection of {quotas.selection_size}."
             )
         else:
-            tiers = list(DifficultyTier)
-            quota_counts = list(quotas.quota_by_tier.values())
+            quota_by_tier = quotas.quota_by_tier
             difficulty_tier_counts = Counter(candidate_pool.difficulty_tiers.values())
-            assigned_tier_counts = [difficulty_tier_counts[tier] for tier in tiers]
+            assigned_tier_counts = {tier: difficulty_tier_counts[tier] for tier in DifficultyTier}
             # A stable sort keeps the pool's order among equal EDIs.
             edi_order = np.argsort(candidate_pool.edis, kind="stable")
             sorted_edis = candidate_pool.edis[edi_order]
 
             # --- moves of 1 candidate -----------
-            while any(count < quota for count, quota in zip(assigned_tier_counts, quota_counts, strict=True)):
-                shortfalls = [quota - count for count, quota in zip(assigned_tier_counts, quota_counts, strict=True)]
-                short_idx = shortfalls.index(max(shortfalls))
-                supplier_idx = cls._choose_supplier(
-                    short_idx, assigned_tier_counts, quota_counts, sorted_edis, candidate_pool.n_bisection_fevals
+            while any(assigned_tier_counts[tier] < quota for tier, quota in quota_by_tier.items()):
+                # `max` takes the first of the tiers with the largest shortfall.
+                tier_below_quota = max(
+                    DifficultyTier, key=lambda tier: quota_by_tier[tier] - assigned_tier_counts[tier]
                 )
-                assigned_tier_counts[supplier_idx] -= 1
-                assigned_tier_counts[short_idx] += 1
+                tier_with_surplus = cls._nearest_tier_with_surplus(
+                    tier_below_quota, assigned_tier_counts, quotas, sorted_edis, candidate_pool.n_bisection_fevals
+                )
+                assigned_tier_counts[tier_with_surplus] -= 1
+                assigned_tier_counts[tier_below_quota] += 1
 
             # --- assigned tiers -----------------
-            ends = np.cumsum(assigned_tier_counts)
-            starts = ends - assigned_tier_counts
+            counts = list(assigned_tier_counts.values())
+            ends = np.cumsum(counts)
+            starts = ends - counts
             assigned_tier_by_row = np.empty(len(problem_ids), dtype=object)
-            assigned_tier_by_row[edi_order] = np.repeat(np.array(tiers, dtype=object), assigned_tier_counts)
+            assigned_tier_by_row[edi_order] = np.repeat(np.array(list(DifficultyTier), dtype=object), counts)
             return cls(
                 quotas=quotas,
                 assigned_tiers=dict(zip(problem_ids, assigned_tier_by_row.tolist(), strict=True)),
                 edi_range_by_tier={
                     tier: (float(sorted_edis[start]), float(sorted_edis[end - 1]))
-                    for tier, start, end in zip(tiers, starts, ends, strict=True)
+                    for tier, start, end in zip(DifficultyTier, starts, ends, strict=True)
                 },
             )

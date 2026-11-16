@@ -1,9 +1,9 @@
 """`DifficultyTierAssignment.from_pool` moves the limits between the tiers' candidates, in the order of their EDIs,
 until the pool meets every quota:
 
-- a short tier takes candidates from the nearest tier with a surplus, through the tiers in between;
-- with surpluses equally near on both sides, the short tier takes, of the 2 candidates just outside its own in EDI
-  order, the one whose EDI is closer to the short tier's range;
+- a tier below its quota takes candidates from the nearest tier with a surplus, through the tiers in between;
+- with surpluses equally near on both sides, the tier below its quota takes, of the 2 candidates just outside its
+  own in EDI order, the one whose EDI is closer to its own range;
 - among equal EDIs, the pool's order decides;
 - `from_pool` refuses a pool smaller than the selection.
 """
@@ -54,24 +54,29 @@ def _edis_of_tiers(pool_tier_counts: dict[DifficultyTier, int]) -> list[float]:
     "selection_size, pool_tier_counts, counts_expected",
     [
         pytest.param(
-            128, {A: 40, B: 40, C: 40, DA: 30, DB: 10}, {A: 40, B: 40, C: 40, DA: 30, DB: 10}, id="no_short_tier"
+            128, {A: 40, B: 40, C: 40, DA: 30, DB: 10}, {A: 40, B: 40, C: 40, DA: 30, DB: 10}, id="no_tier_below_quota"
         ),
         pytest.param(
             256, {A: 64, B: 64, C: 70, DA: 50, DB: 10}, {A: 64, B: 64, C: 66, DA: 48, DB: 16}, id="through_a_tier"
         ),
         pytest.param(
-            128, {A: 10, B: 60, C: 40, DA: 30, DB: 10}, {A: 32, B: 38, C: 40, DA: 30, DB: 10}, id="short_lowest_tier"
+            128,
+            {A: 10, B: 60, C: 40, DA: 30, DB: 10},
+            {A: 32, B: 38, C: 40, DA: 30, DB: 10},
+            id="lowest_tier_below_quota",
         ),
         pytest.param(
-            128, {A: 40, B: 31, C: 22, DA: 40, DB: 10}, {A: 39, B: 32, C: 32, DA: 30, DB: 10}, id="2_short_tiers"
+            128, {A: 40, B: 31, C: 22, DA: 40, DB: 10}, {A: 39, B: 32, C: 32, DA: 30, DB: 10}, id="2_tiers_below_quota"
         ),
         pytest.param(
             128, {A: 20, B: 40, C: 40, DA: 20, DB: 8}, {A: 32, B: 32, C: 32, DA: 24, DB: 8}, id="pool_of_the_size"
         ),
     ],
 )
-def test_a_short_tier_takes_candidates_from_the_nearest_surplus(selection_size, pool_tier_counts, counts_expected):
-    """Each short tier takes its missing candidates from the nearest tier with a surplus:
+def test_a_tier_below_its_quota_takes_candidates_from_the_nearest_surplus(
+    selection_size, pool_tier_counts, counts_expected
+):
+    """Each tier below its quota takes its missing candidates from the nearest tier with a surplus:
 
     - with 10 of Db and 50 of Da for quotas of 16 and 48, Db takes Da's 2 surplus candidates, and the other 4 come from
       C through Da, which keeps 48;

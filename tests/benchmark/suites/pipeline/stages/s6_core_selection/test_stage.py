@@ -2,8 +2,8 @@
 
 - the Core's size is the largest of `CORE_SIZES` that the candidates fill, and the stage stops the pipeline below it;
 - it stores each candidate's tier, from its EDI;
-- it selects the Core by max-div under the tier quotas, also when a tier is short, drops the other candidates, and
-  stores the Core's selection details;
+- it selects the Core by max-div under the tier quotas, also when a tier is below its quota, drops the other
+  candidates, and stores the Core's selection details;
 - it records max-div's time per candidate and seed in its parameters.
 """
 
@@ -88,7 +88,7 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
 
 
 @pytest.mark.only_with_numba_jit
-def test_the_stage_fills_a_short_tier_from_its_neighbor_and_records_its_parameters():
+def test_the_stage_fills_a_tier_below_its_quota_from_its_neighbor_and_records_its_parameters():
     """No candidate is of tier Db, and all candidates of Da share the EDI 60, so the last 8 of Da in the pool count
     toward Db's quota, and the Core holds all 8; the stage's parameters record max-div's time per candidate and seed."""
     # --- arrange ----------------------
