@@ -40,7 +40,7 @@ class PipelineStateStorage:
         interval_bounds: Candidate generation's interval bounds of each candidate.
         c_ranges: Validation's c-range of each valid candidate.
         characterization_results: The results of each characterization stage, keyed by its `PipelineStageId`.
-        spacing_min_distance: The minimum distance between kept candidates of 1 formula that spacing chose.
+        spacing_min_distance: The minimum distance that spacing chose between the kept candidates of 1 formula.
         nearest_kept_candidates: Spacing's nearest kept candidate of each candidate that it drops.
         difficulty_tiers: Core selection's difficulty tier of each candidate that it receives.
         core_selection_details: Core selection's `SuiteSelectionDetails` of the Core.
@@ -130,10 +130,7 @@ class PipelineStateStorage:
         }
 
     def _json_contents(self) -> dict[str, Any]:
-        """Return the structures that are not tables, and each characterization's solver ids and fidelity, as JSON.
-
-        The structures that are not tables are spacing's minimum distance and the selection details.
-        """
+        """Return the structures that are not tables, and each characterization's solver ids and fidelity, as JSON."""
         if self.core_selection_details is not None:
             core_selection_details = self.core_selection_details.to_json_values()
         else:

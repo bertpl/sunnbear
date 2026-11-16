@@ -2,8 +2,9 @@
 
 Dense parameter grids give candidates of 1 formula whose feature vectors lie close together. Such candidates raise the
 cost of fine characterization and add little to the diversity of the benchmark suites, so the stage keeps, per formula,
-only candidates that lie at least a minimum distance apart. The stage chooses the minimum distance at which it keeps a
-target number of candidates.
+only candidates that lie at least a minimum distance apart.
+
+The stage chooses the minimum distance at which it keeps a target number of candidates.
 """
 
 from typing import TYPE_CHECKING
@@ -18,13 +19,15 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 if TYPE_CHECKING:
     from sunnbear._core.problems.core import ProblemId
 
-# The minimum distances that `SpacingStage` chooses from: 10^-3.0, 10^-2.9, ... up to 10^1.0. A distance is measured in
-# multiples of the mean pairwise L1 distance within a block of the coarse feature vectors, so the options run from
-# candidates that are nearly identical to candidates that lie 10 times the mean distance apart.
+# `SpacingStage` chooses its minimum distance from these options: 10^-3.0, 10^-2.9, ... up to 10^1.0. A distance is
+# measured in multiples of the mean pairwise L1 distance within a block of the coarse feature vectors, so the options
+# run from 1/1000 of the mean distance, at which only nearly identical candidates are dropped, to 10 times the mean
+# distance.
 SPACING_MIN_DISTANCE_OPTIONS = tuple(10.0 ** (exponent_in_tenths / 10) for exponent_in_tenths in range(-30, 11))
 
 # Fine characterization and the selection stages run on every candidate that spacing keeps, and fine characterization
-# takes far longer per candidate than coarse characterization, so the target sets the cost of the stages after spacing.
+# takes far longer per candidate than coarse characterization, so the target number of kept candidates sets the cost of
+# the stages after spacing.
 DEFAULT_SPACING_TARGET_N_KEPT_CANDIDATES = 16_384
 
 
@@ -42,17 +45,19 @@ class SpacingStage(PipelineStage[SpacingStateAccessor]):
     by its scale, as `SpacingStateAccessor.coarse_scaled_feature_matrix` gives them. Each block then has a mean pairwise
     distance of 1, so a minimum distance is measured in multiples of a block's mean pairwise distance.
 
-    Per formula, a pass runs over the candidates in ascending order of their EDI from coarse characterization;
-    candidates with equal EDIs keep the order of candidate generation, so the result is deterministic. The pass:
+    Per formula, a pass runs over the candidates in ascending order of their empirical difficulty index (EDI) from
+    coarse characterization; candidates with equal EDIs keep the order of candidate generation, so the result is
+    deterministic. The pass:
 
     - keeps the first and the last candidate in that order, whatever the minimum distance, so that a formula keeps its
       easiest and its hardest candidate, and a formula with 2 or more candidates keeps at least 2;
-    - then keeps each candidate in between whose distance to every candidate kept before it, the last one included, is
-      at least the minimum distance.
+    - then keeps each candidate in between whose distance to every kept candidate, the last candidate in that order
+      included, is at least the minimum distance.
 
     The stage drops each other candidate as a near duplicate, which is valid but not kept, and stores, for each dropped
     candidate, the nearest kept candidate of the same formula. When coarse characterization kept fewer than 2
-    candidates, it has no block scales, and the stage keeps every candidate.
+    candidates, it has no block scales; the stage then keeps every candidate, and stores the smallest option as its
+    minimum distance.
 
     The stage runs in the main process, not in the run's worker pool: per formula it compares a few feature vectors, and
     each worker would have to import the formulas' modules only to receive the candidates.
@@ -61,7 +66,7 @@ class SpacingStage(PipelineStage[SpacingStateAccessor]):
     stage_id = PipelineStageId.SPACING
 
     def __init__(self, target_n_kept_candidates: int = DEFAULT_SPACING_TARGET_N_KEPT_CANDIDATES) -> None:
-        """Create the stage, which chooses its minimum distance to keep at least `target_n_kept_candidates`."""
+        """Create the stage, which aims to keep at least `target_n_kept_candidates` candidates over all formulas."""
         self.target_n_kept_candidates = target_n_kept_candidates
 
     @property

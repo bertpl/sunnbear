@@ -28,8 +28,8 @@ class PipelineMode(Enum):
 
     Attributes:
         coarse_characterization_stage_fidelity: The `FeatureFidelity` of `CoarseCharacterizationStage`.
-        spacing_stage_target_n_kept_candidates: The number of candidates that `SpacingStage` aims to keep, on which the
-            stages after it then work.
+        spacing_stage_target_n_kept_candidates: The number of candidates that `SpacingStage` aims to keep for the
+            stages after spacing.
         fine_characterization_stage_fidelity: The `FeatureFidelity` of `FineCharacterizationStage`.
         selection_sec_per_candidate: The time per candidate of max-div's search in `select_diverse_problem_ids`.
     """

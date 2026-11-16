@@ -82,9 +82,9 @@ def build_state_before(
     The stages write this example information:
 
     - generation and validation: the interval ``[-1, 1]`` and the c-range `c_range` of each candidate;
-    - each characterization: the raw features `raw_feature_matrix`, by default those of
-      `example_raw_feature_matrix`, with their block scales, the EDIs `edis`, by default 10 for each candidate, and no
-      incorrect solve;
+    - each characterization: the raw features `raw_feature_matrix` (by default those of
+      `example_raw_feature_matrix`) with their block scales, the EDIs `edis` (by default 10 for each candidate), and
+      no incorrect solve;
     - spacing: a minimum distance of 1, and no drop;
     - core selection: each candidate's tier from its EDI, and a Core of every candidate, selected under no quota.
     """

@@ -183,9 +183,9 @@ class CoarseCharacterizationStateAccessor(CharacterizationStateAccessor):
 #  SpacingStateAccessor
 # ==================================================================================================
 class SpacingStateAccessor(PipelineStateAccessor):
-    """`SpacingStateAccessor` gives the coarse features and EDIs, and takes the stage's minimum distance and drops.
+    """`SpacingStateAccessor` gives the coarse features and EDIs, and takes the stage's minimum distance.
 
-    For each candidate that the stage drops, the accessor takes its nearest kept candidate.
+    The accessor also takes the nearest kept candidate of each candidate that the stage drops.
     """
 
     stage_id = PipelineStageId.SPACING
@@ -204,7 +204,7 @@ class SpacingStateAccessor(PipelineStateAccessor):
         return self._restrict_to_remaining(results.edis)
 
     def set_min_distance(self, min_distance: float) -> None:
-        """Store the minimum distance between kept candidates of 1 formula that the stage chose.
+        """Store the minimum distance that the stage chose between the kept candidates of 1 formula.
 
         Raises:
             ValueError: If the minimum distance was stored before.

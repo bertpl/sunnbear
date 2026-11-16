@@ -93,9 +93,9 @@ def test_the_pass_goes_in_edi_order_and_keeps_the_candidates_far_enough_from_eve
 
 
 def test_the_first_and_the_last_candidate_are_kept_whatever_their_distance(monkeypatch):
-    """Candidates with equal EDIs keep the order of candidate generation, so f99.1 keeps p=1 and p=3, although they lie
-    closer together than the minimum distance of 1, and drops p=2. Formula f99.2 keeps both of its 2 identical
-    candidates."""
+    """Candidates with equal EDIs keep the order of candidate generation, so p=1 and p=3 are f99.1's first and last
+    candidate: the stage keeps both, although they lie closer together than the minimum distance of 1, and drops p=2.
+    Formula f99.2 keeps both of its 2 identical candidates."""
     # --- arrange ----------------------
     monkeypatch.setattr(s4_spacing, "SPACING_MIN_DISTANCE_OPTIONS", (1.0,))
 

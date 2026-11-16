@@ -165,7 +165,7 @@ class NearestKeptCandidate:
     Attributes:
         problem_id: The id of the nearest kept candidate.
         distance: The distance between the 2 candidates' scaled coarse feature vectors, which is smaller than the
-            minimum distance that spacing chose, unless the kept candidate is 1 of the 2 that spacing always keeps.
+            minimum distance that spacing chose.
     """
 
     problem_id: ProblemId

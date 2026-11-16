@@ -112,7 +112,7 @@ class BenchmarkSuitesBuildDetails:
         return self._copy_if_finished(stage_id, self._storage.characterization_results.get(stage_id))
 
     def spacing_min_distance(self) -> float | None:
-        """Return the minimum distance between kept candidates of 1 formula that the spacing stage chose.
+        """Return the minimum distance that the spacing stage chose between the kept candidates of 1 formula.
 
         Return ``None`` when spacing did not finish.
         """
