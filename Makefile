@@ -24,7 +24,7 @@ help:
 	@echo 'Options:'
 	@echo ''
 	@echo '  format-single-file             - accepts `file_path=<path>` to pass the relative path of the file to be formatted.'
-	@echo '  benchmark-suites-build-details - accepts `MODE=draft` (the default) or `MODE=full` to set how much work the pipeline does.'
+	@echo '  benchmark-suites-build-details - accepts `MODE=draft` (the default) or `MODE=production` to set how much work the pipeline does.'
 	@echo '                                 - accepts `N_WORKERS=<n>` to set the number of worker processes (default: 1 per logical CPU).'
 
 build:

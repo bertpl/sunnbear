@@ -39,7 +39,7 @@ from .stages import (
     CoarseCharacterizationStage,
     CoreSelectionStage,
     DistillationStage,
-    FullCharacterizationStage,
+    FineCharacterizationStage,
     SpacingStage,
 )
 from .state import PipelineState

@@ -6,18 +6,18 @@ then commits the artifact's manifest. The script:
 
 - runs the pipeline over every registered formula, into the workspace directory given by ``--workspace``, in the
   `PipelineMode` given by ``--mode``. The default is draft mode, because the benchmark suites that the pipeline builds
-  are not shipped yet; a run in full mode takes several times longer;
+  are not shipped yet; a run in production mode takes several times longer;
 - stops with status 1, without saving, when a stage stops the run, because the build details of a stopped run hold no
   benchmark suites;
 - saves the build details through `ArtifactStore`, which records in the artifact's manifest how they were built and
   from which `mc_tuples` artifact;
 - publishes the artifact's data release, unless ``--no-publish`` is given for a trial run.
 
-Usage, with the workspace directory under ``script_outputs/``, in draft mode, in full mode, and with 12 worker
+Usage, with the workspace directory under ``script_outputs/``, in draft mode, in production mode, and with 12 worker
 processes, where the default is 1 per logical CPU:
 
     make benchmark-suites-build-details
-    make benchmark-suites-build-details MODE=full
+    make benchmark-suites-build-details MODE=production
     make benchmark-suites-build-details N_WORKERS=12
 """
 

@@ -54,7 +54,7 @@ def test_the_stage_stores_the_kept_candidates_features_and_rejects_the_others(is
 
     # --- assert -----------------------
     assert len(DiversityFeatureFactory().feature_names) == 25
-    assert results.fidelity is FeatureFidelity.COARSE
+    assert results.fidelity is FeatureFidelity.COARSE_PRODUCTION
     assert results.raw_feature_matrix.problem_ids == (ProblemId.from_string("f99.971"),)
     assert results.raw_feature_matrix.values.shape == (1, 25)
     assert results.block_scales is None
@@ -74,7 +74,7 @@ def test_the_stage_stores_each_configs_incorrect_solves_per_candidate(isolated_f
     _, results = _characterize(stage, ["f99.973", "f99.974"], monkeypatch)
 
     # --- assert -----------------------
-    n_solves = FeatureFidelity.COARSE.solver_mc_size
+    n_solves = FeatureFidelity.COARSE_PRODUCTION.solver_mc_size
     assert results.n_incorrect_solves_per_config == {
         ProblemId.from_string("f99.973"): (0,) * len(DiversityFeatureFactory().solver_ids),
         ProblemId.from_string("f99.974"): tuple(

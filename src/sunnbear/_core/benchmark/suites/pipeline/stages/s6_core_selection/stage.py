@@ -33,7 +33,7 @@ CORE_SIZES = (128, 256, 512, 1024, 2048)
 class CoreSelectionStage(PipelineStage[CoreSelectionStateAccessor]):
     """`CoreSelectionStage` selects the Core, the suite `sb-<size>`; every other benchmark suite is selected from it.
 
-    A candidate's tier follows from its EDI, which full characterization stored, relative to
+    A candidate's tier follows from its EDI, which fine characterization stored, relative to
     `DEFAULT_N_BISECTION_FEVALS`, the `n_bisection_fevals` with which the characterization stages run every solve.
 
     The stage selects the Core in 3 steps:

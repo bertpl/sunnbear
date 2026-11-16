@@ -14,9 +14,9 @@ class CoarseCharacterizationStage(CandidateCharacterizationStage[CoarseCharacter
     """`CoarseCharacterizationStage` computes each valid candidate's coarse features.
 
     The coarse features only need to tell the near-duplicate candidates of a formula apart, so the stage runs on every
-    valid candidate, by default at `FeatureFidelity.COARSE`, which costs far less per candidate than
-    `FeatureFidelity.FULL`.
+    valid candidate, by default at `FeatureFidelity.COARSE_PRODUCTION`, which costs far less per candidate than
+    `FeatureFidelity.FINE_PRODUCTION`.
     """
 
     stage_id = PipelineStageId.COARSE_CHARACTERIZATION
-    default_fidelity = FeatureFidelity.COARSE
+    default_fidelity = FeatureFidelity.COARSE_PRODUCTION

@@ -29,7 +29,7 @@ def select_diverse_problem_ids(
 ) -> tuple[tuple[ProblemId, ...], float]:
     """Return the ids of max-div's most diverse selection under `tier_quotas`, and the selection's diversity score.
 
-    max-div searches for the candidates whose scaled feature vectors from full characterization are the most diverse,
+    max-div searches for the candidates whose scaled feature vectors from fine characterization are the most diverse,
     under 1 constraint per quota of `tier_quotas`; a quota whose group holds every tier is no constraint.
 
     Its objective is the geometric mean, with equal weights, of the geometric mean separation under each of 2

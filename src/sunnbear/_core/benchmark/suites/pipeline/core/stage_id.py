@@ -17,6 +17,6 @@ class PipelineStageId(StrEnum):
     CANDIDATE_VALIDATION = "s2_candidate_validation"
     COARSE_CHARACTERIZATION = "s3_coarse_characterization"
     SPACING = "s4_spacing"
-    FULL_CHARACTERIZATION = "s5_full_characterization"
+    FINE_CHARACTERIZATION = "s5_fine_characterization"
     CORE_SELECTION = "s6_core_selection"
     DISTILLATION = "s7_distillation"

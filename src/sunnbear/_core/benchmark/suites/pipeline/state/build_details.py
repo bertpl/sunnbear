@@ -119,11 +119,11 @@ class BenchmarkSuitesBuildDetails:
         return self._copy_if_finished(PipelineStageId.SPACING, self._storage.nearest_kept_candidates)
 
     def edis(self) -> dict[ProblemId, float] | None:
-        """Return full characterization's empirical difficulty index (EDI) of each candidate that it kept.
+        """Return fine characterization's empirical difficulty index (EDI) of each candidate that it kept.
 
-        Return ``None`` when full characterization did not finish.
+        Return ``None`` when fine characterization did not finish.
         """
-        return self._copy_if_finished(PipelineStageId.FULL_CHARACTERIZATION, self._storage.edis)
+        return self._copy_if_finished(PipelineStageId.FINE_CHARACTERIZATION, self._storage.edis)
 
     def difficulty_tiers(self) -> dict[ProblemId, DifficultyTier] | None:
         """Return core selection's difficulty tier of each candidate that core selection received.

@@ -11,8 +11,8 @@ test problems.
 The command also takes these optional flags:
 
 - ``--n-workers`` sets the number of worker processes that the stages share;
-- ``--draft`` runs the stages in `PipelineMode.DRAFT`, which takes a fraction of a full run's time and applies the same
-  selection rules.
+- ``--draft`` runs the stages in `PipelineMode.DRAFT`, which takes a fraction of a production run's time and applies the
+  same selection rules.
 
 After the run, the command prints 1 line per stage that ran to its end: the number of candidates that it received and
 kept, and its run time. Then, for each such stage that rejected candidates as invalid, it prints:
@@ -53,7 +53,7 @@ def main() -> None:
         workspace_dir=args.workspace,
         formulas=FormulaRegistry.formulas(),
         n_workers=args.n_workers,
-        mode=PipelineMode.DRAFT if args.is_draft else PipelineMode.FULL,
+        mode=PipelineMode.DRAFT if args.is_draft else PipelineMode.PRODUCTION,
     )
     for manifest in result.manifests:
         print(

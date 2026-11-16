@@ -56,17 +56,17 @@ def _distilled_state() -> PipelineState:
     accessor.reject(_PROBLEM_IDS[3], "bisection_count_not_exact")
     accessor.set_c_ranges(dict.fromkeys(accessor.remaining_problem_ids, CRange(c_min=-0.5, c_max=0.5)))
     state.finish_stage(PipelineStageId.CANDIDATE_VALIDATION)
-    for stage_id in (PipelineStageId.COARSE_CHARACTERIZATION, PipelineStageId.FULL_CHARACTERIZATION):
+    for stage_id in (PipelineStageId.COARSE_CHARACTERIZATION, PipelineStageId.FINE_CHARACTERIZATION):
         accessor = state.create_state_accessor(stage_id)
         problem_ids = accessor.remaining_problem_ids
         accessor.set_characterization_results(
             CharacterizationResults(
-                fidelity=FeatureFidelity.COARSE,
+                fidelity=FeatureFidelity.COARSE_PRODUCTION,
                 raw_feature_matrix=example_raw_feature_matrix(problem_ids),
                 n_incorrect_solves_per_config={problem_id: (idx,) for idx, problem_id in enumerate(problem_ids)},
             )
         )
-        if stage_id is PipelineStageId.FULL_CHARACTERIZATION:
+        if stage_id is PipelineStageId.FINE_CHARACTERIZATION:
             accessor.set_edis(dict.fromkeys(problem_ids, 10.0))
         state.finish_stage(stage_id)
         if stage_id is PipelineStageId.COARSE_CHARACTERIZATION:
@@ -235,7 +235,7 @@ def test_the_build_details_rebuilt_from_their_files_equal_the_original():
         if field.name not in ("candidate_registry", "characterization_results")
     ]:
         assert getattr(read_back, read_method)() == getattr(build_details, read_method)()
-    for stage_id in (PipelineStageId.COARSE_CHARACTERIZATION, PipelineStageId.FULL_CHARACTERIZATION):
+    for stage_id in (PipelineStageId.COARSE_CHARACTERIZATION, PipelineStageId.FINE_CHARACTERIZATION):
         results, read_back_results = (
             details.characterization_results(stage_id) for details in (build_details, read_back)
         )
@@ -261,7 +261,7 @@ def test_the_build_details_of_a_run_that_stopped_early_read_back_their_files(n_f
     assert read_back.c_ranges() == build_details.c_ranges()
     assert read_back.nearest_kept_candidates() is None
     assert read_back.core_selection_details() is None
-    assert read_back.incorrect_solves_table(PipelineStageId.FULL_CHARACTERIZATION) is None
+    assert read_back.incorrect_solves_table(PipelineStageId.FINE_CHARACTERIZATION) is None
 
 
 def test_the_build_details_refuse_files_written_with_other_solver_configs(monkeypatch):

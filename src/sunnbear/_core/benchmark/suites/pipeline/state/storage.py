@@ -41,7 +41,7 @@ class PipelineStateStorage:
         c_ranges: Validation's c-range of each valid candidate.
         characterization_results: The results of each characterization stage, keyed by its `PipelineStageId`.
         nearest_kept_candidates: Spacing's nearest kept candidate of each candidate that it drops.
-        edis: Full characterization's empirical difficulty index (EDI) of each candidate that it keeps.
+        edis: Fine characterization's empirical difficulty index (EDI) of each candidate that it keeps.
         difficulty_tiers: Core selection's difficulty tier of each candidate that it receives.
         core_selection_details: Core selection's `SuiteSelectionDetails` of the Core.
         distilled_suite_selection_details: Distillation's `SuiteSelectionDetails` of each suite that it selects, keyed
@@ -68,8 +68,8 @@ class PipelineStateStorage:
                 "characterization_results": PipelineStageId.COARSE_CHARACTERIZATION in self.characterization_results
             },
             PipelineStageId.SPACING: {"nearest_kept_candidates": self.nearest_kept_candidates is not None},
-            PipelineStageId.FULL_CHARACTERIZATION: {
-                "characterization_results": PipelineStageId.FULL_CHARACTERIZATION in self.characterization_results,
+            PipelineStageId.FINE_CHARACTERIZATION: {
+                "characterization_results": PipelineStageId.FINE_CHARACTERIZATION in self.characterization_results,
                 "edis": self.edis is not None,
             },
             PipelineStageId.CORE_SELECTION: {

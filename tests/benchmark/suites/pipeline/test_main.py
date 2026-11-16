@@ -38,7 +38,7 @@ def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> N
 @pytest.mark.only_with_numba_jit
 def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeypatch, capsys):
     """In draft mode, the command writes each stage's manifest into the workspace with the given number of workers,
-    until core selection stops the run, because the test's candidates fill no Core. Full characterization runs at its
+    until core selection stops the run, because the test's candidates fill no Core. Fine characterization runs at its
     draft fidelity.
 
     It prints 1 line per stage that ran to its end, in run order, with its counts of candidates, then validation's
@@ -75,7 +75,7 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
         for stage_id in _FINISHED_STAGE_IDS
     ]
     assert [manifest.n_workers for manifest in manifests] == [3] * len(_FINISHED_STAGE_IDS)
-    assert manifests[-1].parameters == {"fidelity": FeatureFidelity.FULL_DRAFT.name}
+    assert manifests[-1].parameters == {"fidelity": FeatureFidelity.FINE_DRAFT.name}
 
 
 def test_the_command_exits_normally_when_no_stage_stops_the_run(tmp_path, monkeypatch, capsys):

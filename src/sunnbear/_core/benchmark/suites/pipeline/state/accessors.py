@@ -211,12 +211,12 @@ class SpacingStateAccessor(PipelineStateAccessor):
 
 
 # ==================================================================================================
-#  FullCharacterizationStateAccessor
+#  FineCharacterizationStateAccessor
 # ==================================================================================================
-class FullCharacterizationStateAccessor(CharacterizationStateAccessor):
-    """`FullCharacterizationStateAccessor` takes the stage's results and empirical difficulty indices (EDIs)."""
+class FineCharacterizationStateAccessor(CharacterizationStateAccessor):
+    """`FineCharacterizationStateAccessor` takes the stage's results and empirical difficulty indices (EDIs)."""
 
-    stage_id = PipelineStageId.FULL_CHARACTERIZATION
+    stage_id = PipelineStageId.FINE_CHARACTERIZATION
 
     def set_edis(self, edis: Mapping[ProblemId, float]) -> None:
         """Store the EDI of each candidate that no stage has dropped.
@@ -240,18 +240,18 @@ class SelectionStateAccessor(PipelineStateAccessor):
     def candidate_pool(self) -> CandidatePool:
         """Return the pool of the candidates that no stage has dropped.
 
-        The pool holds their scaled features from full characterization, their EDIs and their difficulty tiers.
+        The pool holds their scaled features from fine characterization, their EDIs and their difficulty tiers.
 
         Raises:
-            ValueError: If the difficulty tiers are not stored yet, or full characterization has no scales, because it
+            ValueError: If the difficulty tiers are not stored yet, or fine characterization has no scales, because it
                 kept fewer than 2 candidates.
         """
-        results = self._storage.characterization_results[PipelineStageId.FULL_CHARACTERIZATION]
+        results = self._storage.characterization_results[PipelineStageId.FINE_CHARACTERIZATION]
         scaled_feature_matrix = results.build_scaled_feature_matrix(self.remaining_problem_ids)
         if self._storage.difficulty_tiers is None:
             raise ValueError("The candidate pool needs the difficulty tiers, which core selection stores.")
         elif scaled_feature_matrix is None:
-            raise ValueError("The candidate pool needs the scales of full characterization, which has none.")
+            raise ValueError("The candidate pool needs the scales of fine characterization, which has none.")
         else:
             return CandidatePool.from_feature_matrix(
                 scaled_feature_matrix,

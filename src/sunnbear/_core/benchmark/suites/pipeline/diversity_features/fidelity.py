@@ -14,12 +14,13 @@ class FeatureFidelity(Enum):
 
     Each member is the fidelity of 1 characterization stage in 1 `PipelineMode`:
 
-    - `COARSE` and `FULL` are the fidelities of coarse and of full characterization in full mode;
-    - `COARSE_DRAFT` and `FULL_DRAFT` are their fidelities in draft mode.
+    - `COARSE_PRODUCTION` and `FINE_PRODUCTION` are the fidelities of coarse and of fine characterization in
+      production mode;
+    - `COARSE_DRAFT` and `FINE_DRAFT` are their fidelities in draft mode.
 
-    The draft fidelities differ from `COARSE` only in their snuffled analyses, because snuffled's analyses take most of
-    the time to compute a feature vector: both run each analysis at a lower budget, and `COARSE_DRAFT` also runs fewer
-    analyses.
+    The draft fidelities differ from `COARSE_PRODUCTION` only in their snuffled analyses, because snuffled's analyses
+    take most of the time to compute a feature vector: both run each analysis at a lower budget, and `COARSE_DRAFT`
+    also runs fewer analyses.
 
     A member's value starts with the member's name. An enum merges members with equal values into 1 member, and the
     name keeps 2 fidelities with the same settings apart.
@@ -31,10 +32,10 @@ class FeatureFidelity(Enum):
         snuffled_budget: The budget of each snuffled analysis.
     """
 
-    COARSE = ("COARSE", MCTuplesSize.SIZE_32, 32, SnuffledAnalysisBudget.LOW)
-    FULL = ("FULL", MCTuplesSize.SIZE_1024, 64, SnuffledAnalysisBudget.HIGH)
+    COARSE_PRODUCTION = ("COARSE_PRODUCTION", MCTuplesSize.SIZE_32, 32, SnuffledAnalysisBudget.LOW)
+    FINE_PRODUCTION = ("FINE_PRODUCTION", MCTuplesSize.SIZE_1024, 64, SnuffledAnalysisBudget.HIGH)
     COARSE_DRAFT = ("COARSE_DRAFT", MCTuplesSize.SIZE_32, 8, SnuffledAnalysisBudget.VERY_LOW)
-    FULL_DRAFT = ("FULL_DRAFT", MCTuplesSize.SIZE_32, 32, SnuffledAnalysisBudget.VERY_LOW)
+    FINE_DRAFT = ("FINE_DRAFT", MCTuplesSize.SIZE_32, 32, SnuffledAnalysisBudget.VERY_LOW)
 
     def __init__(
         self,

@@ -1,7 +1,7 @@
 """`SpacingStage`, the fourth stage of the benchmark suite pipeline, drops near-duplicate candidates of each formula.
 
 Dense parameter grids give candidates of 1 formula whose feature vectors lie close together. Such candidates raise the
-cost of full characterization and add little to the diversity of the benchmark suites, so the stage keeps, per formula,
+cost of fine characterization and add little to the diversity of the benchmark suites, so the stage keeps, per formula,
 only candidates that lie at least a minimum distance apart.
 """
 
@@ -18,8 +18,8 @@ if TYPE_CHECKING:
     from sunnbear._core.problems.core import ProblemId
 
 # `SpacingStage`'s default `min_distance` is 1/10 of the mean pairwise L1 distance within each block of the coarse
-# feature vectors, after each block is divided by its scale. Full characterization runs on every candidate that spacing
-# keeps, and takes far longer per candidate than coarse characterization, so the default is set to keep the full
+# feature vectors, after each block is divided by its scale. Fine characterization runs on every candidate that spacing
+# keeps, and takes far longer per candidate than coarse characterization, so the default is set to keep the fine
 # characterization of the shipped formulas affordable.
 DEFAULT_SPACING_MIN_DISTANCE = 0.1
 
