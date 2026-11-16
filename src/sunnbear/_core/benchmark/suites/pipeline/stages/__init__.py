@@ -8,7 +8,7 @@ from .characterization import CandidateCharacterizationStage
 from .s1_candidate_generation import CandidateGenerationStage
 from .s2_candidate_validation import MAX_BOUND_TO_WIDTH_RATIO, CandidateValidationStage
 from .s3_coarse_characterization import CoarseCharacterizationStage
-from .s4_spacing import DEFAULT_SPACING_MIN_DISTANCE, SpacingStage
+from .s4_spacing import DEFAULT_SPACING_TARGET_N_KEPT_CANDIDATES, SPACING_MIN_DISTANCE_OPTIONS, SpacingStage
 from .s5_fine_characterization import FineCharacterizationStage
 from .s6_core_selection import CoreSelectionStage
 from .s7_distillation import SMALLEST_SUITE_SIZE, DistillationStage

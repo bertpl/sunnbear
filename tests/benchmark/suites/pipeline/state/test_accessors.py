@@ -56,10 +56,6 @@ _WRITES_OF_EACH_CANDIDATE: dict[str, tuple[PipelineStageId, Callable[[PipelineSt
             example_characterization_results(example_raw_feature_matrix(problem_ids))
         ),
     ),
-    "edis": (
-        PipelineStageId.FINE_CHARACTERIZATION,
-        lambda accessor, problem_ids: accessor.set_edis(dict.fromkeys(problem_ids, 10.0)),
-    ),
     "difficulty_tiers": (
         PipelineStageId.CORE_SELECTION,
         lambda accessor, problem_ids: accessor.set_difficulty_tiers(dict.fromkeys(problem_ids, DifficultyTier.A)),
@@ -87,6 +83,10 @@ _OTHER_WRITES: dict[str, tuple[PipelineStageId, Callable[[PipelineStateAccessor,
         lambda accessor, problem_ids: accessor.add_candidates(
             dict.fromkeys(problem_ids, IntervalBounds(a=-1.0, b=1.0))
         ),
+    ),
+    "spacing_min_distance": (
+        PipelineStageId.SPACING,
+        lambda accessor, problem_ids: accessor.set_spacing_min_distance(0.1),
     ),
 }
 
@@ -160,6 +160,21 @@ def test_spacing_takes_the_nearest_kept_candidates_of_its_own_drops_only():
     accessor.set_nearest_kept_candidates({_PROBLEM_IDS[1]: nearest_kept_candidate})
 
 
+def test_spacing_gets_the_coarse_edis_of_the_remaining_candidates():
+    """After spacing dropped 1 of 3 candidates, its accessor gives coarse characterization's EDIs of the other 2."""
+    # --- arrange ----------------------
+    edis = dict(zip(_PROBLEM_IDS, [30.0, 10.0, 20.0], strict=True))
+    accessor = build_state_before(PipelineStageId.SPACING, _PROBLEM_IDS, edis=edis).create_state_accessor(
+        PipelineStageId.SPACING
+    )
+
+    # --- act --------------------------
+    accessor.drop(_PROBLEM_IDS[1], "near_duplicate")
+
+    # --- assert -----------------------
+    assert accessor.coarse_edis() == {_PROBLEM_IDS[0]: 30.0, _PROBLEM_IDS[2]: 20.0}
+
+
 def test_spacing_has_no_scaled_features_without_scales():
     """After coarse characterization kept 1 candidate only, it has no scales, so spacing's accessor gives no matrix."""
     # --- act / assert -----------------
@@ -186,7 +201,7 @@ def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_tier(
     assert candidate_pool.feature_matrix.problem_ids == tuple(_PROBLEM_IDS)
     assert candidate_pool.difficulty_tiers == tuple(tiers.values())
     np.testing.assert_array_equal(candidate_pool.edis, [10.0] * 3)
-    assert accessor.edis() == dict.fromkeys(_PROBLEM_IDS, 10.0)
+    assert accessor.fine_edis() == dict.fromkeys(_PROBLEM_IDS, 10.0)
 
 
 def test_the_candidate_pool_needs_the_tiers_and_the_scales():

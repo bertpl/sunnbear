@@ -50,11 +50,19 @@ def example_raw_feature_matrix(problem_ids: Sequence[ProblemId], *, seed: int = 
     return FeatureMatrix(problem_ids=tuple(problem_ids), values=values)
 
 
-def example_characterization_results(raw_feature_matrix: FeatureMatrix) -> CharacterizationResults:
-    """Return the results of a characterization at the coarse fidelity that keeps every candidate of the matrix."""
+def example_characterization_results(
+    raw_feature_matrix: FeatureMatrix, edis: Mapping[ProblemId, float] | None = None
+) -> CharacterizationResults:
+    """Return the results of a characterization at the coarse fidelity that keeps every candidate of the matrix.
+
+    The candidates have the EDIs `edis`, by default 10 each.
+    """
+    if edis is None:
+        edis = dict.fromkeys(raw_feature_matrix.problem_ids, 10.0)
     return CharacterizationResults(
         fidelity=FeatureFidelity.COARSE_PRODUCTION,
         raw_feature_matrix=raw_feature_matrix,
+        edis=edis,
         n_incorrect_solves_per_config=dict.fromkeys(
             raw_feature_matrix.problem_ids, (0,) * len(DiversityFeatureFactory().solver_ids)
         ),
@@ -74,9 +82,10 @@ def build_state_before(
     The stages write this example information:
 
     - generation and validation: the interval ``[-1, 1]`` and the c-range `c_range` of each candidate;
-    - each characterization: the raw features `raw_feature_matrix`, by default those of
-      `example_raw_feature_matrix`, with their block scales and no incorrect solve;
-    - fine characterization: the EDIs `edis`, by default 10 for each candidate;
+    - each characterization: the raw features `raw_feature_matrix` (by default those of
+      `example_raw_feature_matrix`) with their block scales, the EDIs `edis` (by default 10 for each candidate), and
+      no incorrect solve;
+    - spacing: a minimum distance of 1, and no drop;
     - core selection: each candidate's tier from its EDI, and a Core of every candidate, selected under no quota.
     """
     state = PipelineState()
@@ -90,13 +99,11 @@ def build_state_before(
                 accessor.add_candidates(dict.fromkeys(problem_ids, IntervalBounds(a=-1.0, b=1.0)))
             case PipelineStageId.CANDIDATE_VALIDATION:
                 accessor.set_c_ranges(dict.fromkeys(problem_ids, c_range))
-            case PipelineStageId.COARSE_CHARACTERIZATION:
-                accessor.set_characterization_results(example_characterization_results(raw_feature_matrix))
+            case PipelineStageId.COARSE_CHARACTERIZATION | PipelineStageId.FINE_CHARACTERIZATION:
+                accessor.set_characterization_results(example_characterization_results(raw_feature_matrix, edis))
             case PipelineStageId.SPACING:
+                accessor.set_spacing_min_distance(1.0)
                 accessor.set_nearest_kept_candidates({})
-            case PipelineStageId.FINE_CHARACTERIZATION:
-                accessor.set_characterization_results(example_characterization_results(raw_feature_matrix))
-                accessor.set_edis(edis)
             case PipelineStageId.CORE_SELECTION:
                 accessor.set_difficulty_tiers(
                     {

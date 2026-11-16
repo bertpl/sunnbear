@@ -3,6 +3,8 @@
 Dense parameter grids give candidates of 1 formula whose feature vectors lie close together. Such candidates raise the
 cost of fine characterization and add little to the diversity of the benchmark suites, so the stage keeps, per formula,
 only candidates that lie at least a minimum distance apart.
+
+The stage chooses the minimum distance at which it keeps a target number of candidates.
 """
 
 from typing import TYPE_CHECKING
@@ -17,33 +19,44 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 if TYPE_CHECKING:
     from sunnbear._core.problems.core import ProblemId
 
-# `SpacingStage`'s default `min_distance` is 1/10 of the mean pairwise L1 distance within each block of the coarse
-# feature vectors, after each block is divided by its scale. Fine characterization runs on every candidate that spacing
-# keeps, and takes far longer per candidate than coarse characterization, so the default is set to keep the fine
-# characterization of the shipped formulas affordable.
-DEFAULT_SPACING_MIN_DISTANCE = 0.1
+# `SpacingStage` chooses its minimum distance from these options, a tenth of a decade apart. A distance is measured in
+# multiples of the mean pairwise L1 distance within a block of the coarse feature vectors, so the options run from
+# 1/1000 of the mean distance, at which only nearly identical candidates are dropped, to 10 times the mean distance.
+SPACING_MIN_DISTANCE_OPTIONS = tuple(10.0 ** (exponent_in_tenths / 10) for exponent_in_tenths in range(-30, 11))
+
+# Fine characterization and the selection stages run on every candidate that spacing keeps, and fine characterization
+# takes far longer per candidate than coarse characterization, so the target number of kept candidates sets the cost of
+# the stages after spacing.
+DEFAULT_SPACING_TARGET_N_KEPT_CANDIDATES = 16_384
 
 
 # ==================================================================================================
 #  SpacingStage
 # ==================================================================================================
 class SpacingStage(PipelineStage[SpacingStateAccessor]):
-    """`SpacingStage` keeps, per formula, candidates that lie at least `min_distance` apart, and drops the others.
+    """`SpacingStage` keeps, per formula, candidates that lie at least a minimum distance apart, and drops the others.
+
+    The stage chooses the minimum distance from `SPACING_MIN_DISTANCE_OPTIONS`: the largest option at which it keeps at
+    least `target_n_kept_candidates` candidates, over all formulas together. When it keeps fewer at every option, it
+    takes the smallest option. The stage stores the minimum distance that it chose.
 
     The distance between 2 candidates is the L1 distance between their coarse feature vectors, with each block divided
     by its scale, as `SpacingStateAccessor.coarse_scaled_feature_matrix` gives them. Each block then has a mean pairwise
-    distance of 1, so `min_distance` is measured in multiples of a block's mean pairwise distance.
+    distance of 1, so a minimum distance is measured in multiples of a block's mean pairwise distance.
 
-    Per formula, a pass runs over the candidates in the order of candidate generation, so the result is deterministic.
-    The pass keeps the formula's first candidate, and each later candidate whose distance to every candidate kept
-    before it is at least `min_distance`.
+    Per formula, a pass runs over the candidates in ascending order of their empirical difficulty index (EDI) from
+    coarse characterization; candidates with equal EDIs keep the order of candidate generation, so the result is
+    deterministic. The pass:
 
-    Where a formula has 2 or more candidates and the pass keeps only its first, the stage also keeps the candidate
-    farthest from it, so that a formula with 2 or more candidates keeps at least 2.
+    - keeps the first and the last candidate in that order, whatever the minimum distance, so that a formula keeps its
+      easiest and its hardest candidate, and a formula with 2 or more candidates keeps at least 2;
+    - then keeps each candidate in between whose distance to every kept candidate, including the last candidate in
+      that order, is at least the minimum distance.
 
     The stage drops each other candidate as a near duplicate, which is valid but not kept, and stores, for each dropped
     candidate, the nearest kept candidate of the same formula. When coarse characterization kept fewer than 2
-    candidates, it has no block scales, and the stage keeps every candidate.
+    candidates, it has no block scales; the stage then keeps every candidate, and stores the smallest option as its
+    minimum distance.
 
     The stage runs in the main process, not in the run's worker pool: per formula it compares a few feature vectors, and
     each worker would have to import the formulas' modules only to receive the candidates.
@@ -51,61 +64,88 @@ class SpacingStage(PipelineStage[SpacingStateAccessor]):
 
     stage_id = PipelineStageId.SPACING
 
-    def __init__(self, min_distance: float = DEFAULT_SPACING_MIN_DISTANCE) -> None:
-        """Create the stage, which keeps, per formula, candidates at least `min_distance` apart.
-
-        `min_distance` is measured in multiples of a feature block's mean pairwise L1 distance.
-        """
-        self.min_distance = min_distance
+    def __init__(self, target_n_kept_candidates: int = DEFAULT_SPACING_TARGET_N_KEPT_CANDIDATES) -> None:
+        """Create the stage, which aims to keep at least `target_n_kept_candidates` candidates over all formulas."""
+        self.target_n_kept_candidates = target_n_kept_candidates
 
     @property
-    def parameters(self) -> dict[str, float]:
-        """Return `min_distance`, the stage's only parameter."""
-        return {"min_distance": self.min_distance}
+    def parameters(self) -> dict[str, int]:
+        """Return `target_n_kept_candidates`, the stage's only parameter."""
+        return {"target_n_kept_candidates": self.target_n_kept_candidates}
 
     def run(self, state_accessor: SpacingStateAccessor, *, worker_pool: WorkerPool) -> None:
-        """Drop the near duplicates of each formula, and store the nearest kept candidate of each dropped one.
+        """Choose the minimum distance, drop the near duplicates of each formula, and store the stage's information.
 
-        The stage does not use `worker_pool`.
+        The information is the minimum distance and the nearest kept candidate of each dropped candidate. The stage
+        does not use `worker_pool`.
         """
+        # --- candidates per formula, by EDI -----
         scaled_feature_matrix = state_accessor.coarse_scaled_feature_matrix()
-        nearest_kept_candidates: dict[ProblemId, NearestKeptCandidate] = {}
+        problem_ids_by_formula: dict[str, list[ProblemId]] = {}
+        vectors_by_formula: dict[str, np.ndarray] = {}
         if scaled_feature_matrix is not None:
-            # --- candidates per formula ---------
-            problem_ids_by_formula: dict[str, list[ProblemId]] = {}
+            edis = state_accessor.coarse_edis()
             for problem_id in scaled_feature_matrix.problem_ids:
                 problem_ids_by_formula.setdefault(problem_id.formula_id, []).append(problem_id)
+            for formula_id, problem_ids in problem_ids_by_formula.items():
+                # The sort is stable, so candidates with equal EDIs keep the order of candidate generation.
+                problem_ids.sort(key=edis.__getitem__)
+                vectors_by_formula[formula_id] = scaled_feature_matrix.subset(problem_ids).values
 
-            # --- spacing, formula by formula ----
-            for problem_ids in problem_ids_by_formula.values():
-                vectors = scaled_feature_matrix.subset(problem_ids).values
-                kept_positions = self._select_kept_positions(vectors)
-                for position, problem_id in enumerate(problem_ids):
-                    if position not in kept_positions:
-                        distances_to_kept = l1_distances_to(vectors[kept_positions], vectors[position])
-                        nearest_idx = int(np.argmin(distances_to_kept))
-                        nearest_kept_candidates[problem_id] = NearestKeptCandidate(
-                            problem_id=problem_ids[kept_positions[nearest_idx]],
-                            distance=float(distances_to_kept[nearest_idx]),
-                        )
-                        state_accessor.drop(problem_id, "near_duplicate")
+        # --- minimum distance -------------------
+        min_distance = self._choose_min_distance(list(vectors_by_formula.values()))
+        state_accessor.set_spacing_min_distance(min_distance)
+
+        # --- spacing, formula by formula --------
+        nearest_kept_candidates: dict[ProblemId, NearestKeptCandidate] = {}
+        for formula_id, problem_ids in problem_ids_by_formula.items():
+            vectors = vectors_by_formula[formula_id]
+            kept_positions = self._select_kept_positions(vectors, min_distance)
+            for position, problem_id in enumerate(problem_ids):
+                if position not in kept_positions:
+                    distances_to_kept = l1_distances_to(vectors[kept_positions], vectors[position])
+                    nearest_idx = int(np.argmin(distances_to_kept))
+                    nearest_kept_candidates[problem_id] = NearestKeptCandidate(
+                        problem_id=problem_ids[kept_positions[nearest_idx]],
+                        distance=float(distances_to_kept[nearest_idx]),
+                    )
+                    state_accessor.drop(problem_id, "near_duplicate")
         state_accessor.set_nearest_kept_candidates(nearest_kept_candidates)
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
-    def _select_kept_positions(self, vectors: np.ndarray) -> list[int]:
-        """Return the positions in `vectors` of the candidates that 1 formula keeps, in ascending order.
+    def _choose_min_distance(self, vectors_per_formula: list[np.ndarray]) -> float:
+        """Return the largest option at which the formulas together keep at least the target number of candidates.
 
-        `vectors` holds the formula's scaled feature vectors, 1 per row, in the order of candidate generation.
+        Return the smallest option when the formulas keep fewer candidates than the target at every option.
+        `vectors_per_formula` holds 1 array per formula: the formula's scaled feature vectors, 1 per row, in ascending
+        order of their EDI.
+
+        Every option is tried, because the number of kept candidates need not fall with each larger option: the pass
+        keeps a candidate by its distance to the candidates kept before it, and those change with the minimum distance.
         """
-        kept_positions = [0]
-        for position in range(1, len(vectors)):
+        options_reaching_target = []
+        for min_distance in SPACING_MIN_DISTANCE_OPTIONS:
+            n_kept = sum(len(self._select_kept_positions(vectors, min_distance)) for vectors in vectors_per_formula)
+            if n_kept >= self.target_n_kept_candidates:
+                options_reaching_target.append(min_distance)
+        if options_reaching_target:
+            return max(options_reaching_target)
+        else:
+            return min(SPACING_MIN_DISTANCE_OPTIONS)
+
+    @staticmethod
+    def _select_kept_positions(vectors: np.ndarray, min_distance: float) -> list[int]:
+        """Return, in ascending order, the positions in `vectors` of 1 formula's kept candidates at `min_distance`.
+
+        `vectors` holds the formula's scaled feature vectors, 1 per row, in the order of the pass: ascending EDI.
+        """
+        last_position = len(vectors) - 1
+        # A formula with 1 candidate has the same first and last position.
+        kept_positions = sorted({0, last_position})
+        for position in range(1, last_position):
             distances_to_kept = l1_distances_to(vectors[kept_positions], vectors[position])
-            if distances_to_kept.min() >= self.min_distance:
+            if distances_to_kept.min() >= min_distance:
                 kept_positions.append(position)
-        if len(kept_positions) == 1 and len(vectors) > 1:
-            # Keep at least 2 candidates: the first is already kept, so add the one farthest from it among the others.
-            distances_to_first = l1_distances_to(vectors[1:], vectors[0])
-            kept_positions.append(1 + int(np.argmax(distances_to_first)))
-        return kept_positions
+        return sorted(kept_positions)

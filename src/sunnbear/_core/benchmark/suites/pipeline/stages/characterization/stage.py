@@ -1,6 +1,6 @@
 """`CandidateCharacterizationStage` is the base class of the stages that characterize the candidates."""
 
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 import numpy as np
 
@@ -11,10 +11,12 @@ from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     FeatureMatrix,
 )
 from sunnbear._core.benchmark.suites.pipeline.state import CharacterizationResults, CharacterizationStateAccessor
-from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
 
 from .task import CandidateCharacterizationResult, CandidateCharacterizationTask
+
+if TYPE_CHECKING:
+    from sunnbear._core.problems.core import ProblemId
 
 
 # ==================================================================================================
@@ -27,6 +29,7 @@ class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccess
 
     - their raw features;
     - the scale of each feature block, fitted on the kept candidates;
+    - their empirical difficulty index (EDI), computed from the same solves as the raw features;
     - their incorrect solves per core solver config.
 
     An incorrect solve counts as `max_fevals` in `n_fevals_eff`, from which the solvers block is computed. The counts of
@@ -62,15 +65,6 @@ class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccess
 
         The candidates are characterized in `CandidateCharacterizationTask` tasks on `worker_pool`.
         """
-        self._characterize(state_accessor, worker_pool=worker_pool)
-
-    # --------------------------------------------------------------------------
-    #  Helpers
-    # --------------------------------------------------------------------------
-    def _characterize(
-        self, state_accessor: StateAccessorT, *, worker_pool: WorkerPool
-    ) -> dict[ProblemId, CandidateCharacterizationResult]:
-        """Characterize the candidates as `run` describes it, and return the result of each kept candidate."""
         # --- characterize, in the worker pool ---
         c_ranges = state_accessor.c_ranges()
         results_by_problem_id = self._run_in_formula_batches(
@@ -100,9 +94,9 @@ class CandidateCharacterizationStage[StateAccessorT: CharacterizationStateAccess
             CharacterizationResults(
                 fidelity=self.fidelity,
                 raw_feature_matrix=raw_feature_matrix,
+                edis={problem_id: result.edi for problem_id, result in kept_results.items()},
                 n_incorrect_solves_per_config={
                     problem_id: result.n_incorrect_solves_per_config for problem_id, result in kept_results.items()
                 },
             )
         )
-        return kept_results

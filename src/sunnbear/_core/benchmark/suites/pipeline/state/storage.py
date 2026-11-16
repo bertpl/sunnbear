@@ -40,8 +40,8 @@ class PipelineStateStorage:
         interval_bounds: Candidate generation's interval bounds of each candidate.
         c_ranges: Validation's c-range of each valid candidate.
         characterization_results: The results of each characterization stage, keyed by its `PipelineStageId`.
+        spacing_min_distance: The minimum distance that spacing chose for its pass over each formula's candidates.
         nearest_kept_candidates: Spacing's nearest kept candidate of each candidate that it drops.
-        edis: Fine characterization's empirical difficulty index (EDI) of each candidate that it keeps.
         difficulty_tiers: Core selection's difficulty tier of each candidate that it receives.
         core_selection_details: Core selection's `SuiteSelectionDetails` of the Core.
         distilled_suite_selection_details: Distillation's `SuiteSelectionDetails` of each suite that it selects, keyed
@@ -53,8 +53,8 @@ class PipelineStateStorage:
     interval_bounds: dict[ProblemId, IntervalBounds] | None = None
     c_ranges: dict[ProblemId, CRange] | None = None
     characterization_results: dict[PipelineStageId, CharacterizationResults] = field(default_factory=dict)
+    spacing_min_distance: float | None = None
     nearest_kept_candidates: dict[ProblemId, NearestKeptCandidate] | None = None
-    edis: dict[ProblemId, float] | None = None
     difficulty_tiers: dict[ProblemId, DifficultyTier] | None = None
     core_selection_details: SuiteSelectionDetails | None = None
     distilled_suite_selection_details: dict[str, SuiteSelectionDetails] | None = None
@@ -67,10 +67,12 @@ class PipelineStateStorage:
             PipelineStageId.COARSE_CHARACTERIZATION: {
                 "characterization_results": PipelineStageId.COARSE_CHARACTERIZATION in self.characterization_results
             },
-            PipelineStageId.SPACING: {"nearest_kept_candidates": self.nearest_kept_candidates is not None},
+            PipelineStageId.SPACING: {
+                "spacing_min_distance": self.spacing_min_distance is not None,
+                "nearest_kept_candidates": self.nearest_kept_candidates is not None,
+            },
             PipelineStageId.FINE_CHARACTERIZATION: {
-                "characterization_results": PipelineStageId.FINE_CHARACTERIZATION in self.characterization_results,
-                "edis": self.edis is not None,
+                "characterization_results": PipelineStageId.FINE_CHARACTERIZATION in self.characterization_results
             },
             PipelineStageId.CORE_SELECTION: {
                 "difficulty_tiers": self.difficulty_tiers is not None,
@@ -104,8 +106,6 @@ class PipelineStateStorage:
                 "nearest_kept_problem_id": [str(n.problem_id) for n in self.nearest_kept_candidates.values()],
                 "distance": [n.distance for n in self.nearest_kept_candidates.values()],
             }
-        if self.edis is not None:
-            tables["edis"] = {"problem_id": list(map(str, self.edis)), "edi": list(self.edis.values())}
         if self.difficulty_tiers is not None:
             tables["difficulty_tiers"] = {
                 "problem_id": list(map(str, self.difficulty_tiers)),
@@ -145,6 +145,7 @@ class PipelineStateStorage:
             "characterizations": {
                 stage_id.value: results.to_json_values() for stage_id, results in self.characterization_results.items()
             },
+            "spacing_min_distance": self.spacing_min_distance,
             "core_selection_details": core_selection_details,
             "distilled_suite_selection_details": distilled_suite_selection_details,
         }
@@ -162,7 +163,6 @@ class PipelineStateStorage:
             "nearest_kept_candidates": lambda row: NearestKeptCandidate(
                 problem_id=ProblemId.from_string(row["nearest_kept_problem_id"]), distance=row["distance"]
             ),
-            "edis": lambda row: row["edi"],
             "difficulty_tiers": lambda row: DifficultyTier(row["difficulty_tier"]),
         }
 
@@ -192,6 +192,7 @@ class PipelineStateStorage:
                 setattr(
                     storage, name, dict(zip(problem_ids, map(build_value, table.iter_rows(named=True)), strict=True))
                 )
+        storage.spacing_min_distance = json_contents["spacing_min_distance"]
         if json_contents["core_selection_details"] is not None:
             storage.core_selection_details = SuiteSelectionDetails.from_json_values(
                 json_contents["core_selection_details"]

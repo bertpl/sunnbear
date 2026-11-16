@@ -1,8 +1,8 @@
 {
   "archive": {
-    "sha256": "72a659f130b8e9ffe1e12f31432413d802277c5aee6cf55774747e9262800d6b",
-    "size_bytes": 1131757,
-    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-bdc9f7f4/benchmark_suites_build_details.tar.zst"
+    "sha256": "54d18390e47deae83392109382b898ee3c5e0a6364568748ea369743fd196b01",
+    "size_bytes": 1350778,
+    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-bbc06f2b/benchmark_suites_build_details.tar.zst"
   },
   "build_date": "2026-11-16",
   "built_with": {
@@ -10,7 +10,7 @@
     "snuffled": "0.1.11",
     "sunnbear": "0.4.1+dev"
   },
-  "content_hash": "bdc9f7f4a7a509995f91454af47b1b2b49a9d21b6de48047d7bde379dae986e8",
+  "content_hash": "bbc06f2b1075001475478c117ee2fb3b498e98fe6c7bf15b0726c27c347eedb7",
   "files": [
     {
       "path": "c_ranges.parquet",
@@ -19,18 +19,13 @@
     },
     {
       "path": "candidate_registry.parquet",
-      "sha256": "330bff09bb027d37a3fa6acefa98aa2b557d42aa3075059d105c06560190d73d",
-      "size_bytes": 18860
+      "sha256": "7e78cf4a9256ba60e0a1c45ddb8883d5a9d75560a04e014357d55ea62ef93953",
+      "size_bytes": 18446
     },
     {
       "path": "difficulty_tiers.parquet",
-      "sha256": "0186cc7d66bb8a574d7a30bdb3744a35a2feebb515ebbdc4a663c8a7d018bdae",
-      "size_bytes": 11551
-    },
-    {
-      "path": "edis.parquet",
-      "sha256": "4e5fe1b7d6870d737e44144835bae2ed61e46d4f075e43e3252df896b446cc1f",
-      "size_bytes": 29605
+      "sha256": "fd1594184a8b346459ad7924c3cb5276cfd82f88475fc0b30913059f2caf5d26",
+      "size_bytes": 14180
     },
     {
       "path": "interval_bounds.parquet",
@@ -39,8 +34,8 @@
     },
     {
       "path": "nearest_kept_candidates.parquet",
-      "sha256": "e4d43b6272849272e52d68c4d45009cc3dbbf9a18d0b0dddecd1efc8e872371b",
-      "size_bytes": 34686
+      "sha256": "d188290a64342c7e88900e3be8cf47d2a29e8ebcd234592a519a22b4531b3677",
+      "size_bytes": 2122
     },
     {
       "path": "run.json",
@@ -49,18 +44,18 @@
     },
     {
       "path": "s3_coarse_characterization_raw_features.parquet",
-      "sha256": "242bde956ec423bc504bdfcc9a6e334d11fee9f46ac6970035e1b801b6d5932f",
-      "size_bytes": 691629
+      "sha256": "2cbb1be5fac7b703a5ef179a576f9664df743db3c21dcc9052d30773b6361dcb",
+      "size_bytes": 728326
     },
     {
       "path": "s5_fine_characterization_raw_features.parquet",
-      "sha256": "02db84bb67163a58353baf92c9b06143390fa2b5a8b1f511560080f5fce1345e",
-      "size_bytes": 371623
+      "sha256": "869c347fa5819ae37b687090ab2cfdeb3ba441817e57ecff275d64d201e00ac1",
+      "size_bytes": 732857
     },
     {
       "path": "storage.json",
-      "sha256": "9f7a09b7c1b7e62b38fae5236c34b43eaa1424d95d07babaa91e309468a94e40",
-      "size_bytes": 232900
+      "sha256": "e2e3158b24fade8a9add0199af701bb908def8f96f4eb9eb7bc27a89aeaf16b1",
+      "size_bytes": 233268
     }
   ],
   "generated_by": {
