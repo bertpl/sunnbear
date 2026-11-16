@@ -20,7 +20,7 @@ class CandidatePool:
     """A `CandidatePool` holds the candidates to select from, each with its features, EDI and tier.
 
     Attributes:
-        feature_matrix: The candidates' scaled feature vectors from full characterization, with their ids.
+        feature_matrix: The candidates' scaled feature vectors from fine characterization, with their ids.
         edis: Each candidate's empirical difficulty index (EDI), in the order of `feature_matrix`'s rows.
         difficulty_tiers: Each candidate's tier, in the order of `feature_matrix`'s rows.
     """

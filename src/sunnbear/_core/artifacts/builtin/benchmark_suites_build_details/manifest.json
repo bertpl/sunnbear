@@ -1,16 +1,16 @@
 {
   "archive": {
-    "sha256": "112f0f4853c3aa76675bc58da021977fb37afbc7ca1ebb06a8a98f3cf8cb7bc4",
-    "size_bytes": 1131733,
-    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-9cf70428/benchmark_suites_build_details.tar.zst"
+    "sha256": "72a659f130b8e9ffe1e12f31432413d802277c5aee6cf55774747e9262800d6b",
+    "size_bytes": 1131757,
+    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-bdc9f7f4/benchmark_suites_build_details.tar.zst"
   },
-  "build_date": "2026-11-15",
+  "build_date": "2026-11-16",
   "built_with": {
     "max-div": "0.21.8",
     "snuffled": "0.1.11",
-    "sunnbear": "0.4.1"
+    "sunnbear": "0.4.1+dev"
   },
-  "content_hash": "9cf70428b98f5f4ef8b980b35438d6b079d0ffe49251c6623a9fdece9ca5efa0",
+  "content_hash": "bdc9f7f4a7a509995f91454af47b1b2b49a9d21b6de48047d7bde379dae986e8",
   "files": [
     {
       "path": "c_ranges.parquet",
@@ -19,8 +19,8 @@
     },
     {
       "path": "candidate_registry.parquet",
-      "sha256": "bd78f79391036c7fb171c80a8fa1f8ff77d177d35037ba3f170e0b0c3cdf3b02",
-      "size_bytes": 18862
+      "sha256": "330bff09bb027d37a3fa6acefa98aa2b557d42aa3075059d105c06560190d73d",
+      "size_bytes": 18860
     },
     {
       "path": "difficulty_tiers.parquet",
@@ -44,7 +44,7 @@
     },
     {
       "path": "run.json",
-      "sha256": "8f1064370ba683736d6b31a30ec71e70521fd49fd11418ba2fbd207a6e942483",
+      "sha256": "6abe7d3e74231dc154c011b14df92a39d6ba04ca60a5b6983f132ce2053910d4",
       "size_bytes": 243
     },
     {
@@ -53,14 +53,14 @@
       "size_bytes": 691629
     },
     {
-      "path": "s5_full_characterization_raw_features.parquet",
+      "path": "s5_fine_characterization_raw_features.parquet",
       "sha256": "02db84bb67163a58353baf92c9b06143390fa2b5a8b1f511560080f5fce1345e",
       "size_bytes": 371623
     },
     {
       "path": "storage.json",
-      "sha256": "1e42cfb51a6e1cb2cceeabed7c8b73f7d3f7f91b2a025853a5017d6719582f9d",
-      "size_bytes": 233092
+      "sha256": "9f7a09b7c1b7e62b38fae5236c34b43eaa1424d95d07babaa91e309468a94e40",
+      "size_bytes": 232900
     }
   ],
   "generated_by": {

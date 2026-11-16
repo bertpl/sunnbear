@@ -1,4 +1,4 @@
-"""`CoreSelectionStage` selects the Core from the candidates' full features:
+"""`CoreSelectionStage` selects the Core from the candidates' fine features:
 
 - the Core's size is the largest of `CORE_SIZES` that the candidates fill, and the stage stops the pipeline below it;
 - it stores each candidate's tier, from its EDI;

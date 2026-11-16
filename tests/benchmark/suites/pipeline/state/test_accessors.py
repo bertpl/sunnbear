@@ -57,7 +57,7 @@ _WRITES_OF_EACH_CANDIDATE: dict[str, tuple[PipelineStageId, Callable[[PipelineSt
         ),
     ),
     "edis": (
-        PipelineStageId.FULL_CHARACTERIZATION,
+        PipelineStageId.FINE_CHARACTERIZATION,
         lambda accessor, problem_ids: accessor.set_edis(dict.fromkeys(problem_ids, 10.0)),
     ),
     "difficulty_tiers": (
@@ -172,7 +172,7 @@ def test_spacing_has_no_scaled_features_without_scales():
 
 
 def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_tier():
-    """Once core selection stored the tiers, its pool holds each candidate's scaled features from full
+    """Once core selection stored the tiers, its pool holds each candidate's scaled features from fine
     characterization, EDI and tier, in the order of candidate generation."""
     # --- arrange ----------------------
     accessor = _accessor(PipelineStageId.CORE_SELECTION)
@@ -190,8 +190,8 @@ def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_tier(
 
 
 def test_the_candidate_pool_needs_the_tiers_and_the_scales():
-    """Core selection's accessor gives no pool before the tiers are stored, nor after full characterization kept 1
-    candidate only, which leaves full characterization without scales."""
+    """Core selection's accessor gives no pool before the tiers are stored, nor after fine characterization kept 1
+    candidate only, which leaves fine characterization without scales."""
     # --- arrange ----------------------
     accessor = _accessor(PipelineStageId.CORE_SELECTION)
     accessor_without_scales = build_state_before(
@@ -202,5 +202,5 @@ def test_the_candidate_pool_needs_the_tiers_and_the_scales():
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="needs the difficulty tiers"):
         accessor.candidate_pool()
-    with pytest.raises(ValueError, match="needs the scales of full characterization"):
+    with pytest.raises(ValueError, match="needs the scales of fine characterization"):
         accessor_without_scales.candidate_pool()

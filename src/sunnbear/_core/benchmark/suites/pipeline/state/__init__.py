@@ -22,7 +22,7 @@ from .accessors import (
     CoarseCharacterizationStateAccessor,
     CoreSelectionStateAccessor,
     DistillationStateAccessor,
-    FullCharacterizationStateAccessor,
+    FineCharacterizationStateAccessor,
     PipelineStateAccessor,
     SelectionStateAccessor,
     SpacingStateAccessor,

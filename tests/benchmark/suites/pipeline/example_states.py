@@ -53,7 +53,7 @@ def example_raw_feature_matrix(problem_ids: Sequence[ProblemId], *, seed: int = 
 def example_characterization_results(raw_feature_matrix: FeatureMatrix) -> CharacterizationResults:
     """Return the results of a characterization at the coarse fidelity that keeps every candidate of the matrix."""
     return CharacterizationResults(
-        fidelity=FeatureFidelity.COARSE,
+        fidelity=FeatureFidelity.COARSE_PRODUCTION,
         raw_feature_matrix=raw_feature_matrix,
         n_incorrect_solves_per_config=dict.fromkeys(
             raw_feature_matrix.problem_ids, (0,) * len(DiversityFeatureFactory().solver_ids)
@@ -76,7 +76,7 @@ def build_state_before(
     - generation and validation: the interval ``[-1, 1]`` and the c-range `c_range` of each candidate;
     - each characterization: the raw features `raw_feature_matrix`, by default those of
       `example_raw_feature_matrix`, with their block scales and no incorrect solve;
-    - full characterization: the EDIs `edis`, by default 10 for each candidate;
+    - fine characterization: the EDIs `edis`, by default 10 for each candidate;
     - core selection: each candidate's tier from its EDI, and a Core of every candidate, selected under no quota.
     """
     state = PipelineState()
@@ -94,7 +94,7 @@ def build_state_before(
                 accessor.set_characterization_results(example_characterization_results(raw_feature_matrix))
             case PipelineStageId.SPACING:
                 accessor.set_nearest_kept_candidates({})
-            case PipelineStageId.FULL_CHARACTERIZATION:
+            case PipelineStageId.FINE_CHARACTERIZATION:
                 accessor.set_characterization_results(example_characterization_results(raw_feature_matrix))
                 accessor.set_edis(edis)
             case PipelineStageId.CORE_SELECTION:

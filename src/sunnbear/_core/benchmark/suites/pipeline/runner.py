@@ -31,7 +31,7 @@ from .stages import (
     CoarseCharacterizationStage,
     CoreSelectionStage,
     DistillationStage,
-    FullCharacterizationStage,
+    FineCharacterizationStage,
     SpacingStage,
 )
 from .state import BenchmarkSuitesBuildDetails, PipelineState
@@ -45,7 +45,7 @@ def run_pipeline(
     workspace_dir: Path,
     formulas: Sequence[Formula],
     n_workers: int | None = None,
-    mode: PipelineMode = PipelineMode.FULL,
+    mode: PipelineMode = PipelineMode.PRODUCTION,
 ) -> "PipelineRunResult":
     """Run every stage of the benchmark suite pipeline on `formulas`, into the workspace directory `workspace_dir`.
 
@@ -74,7 +74,7 @@ def run_pipeline(
         CandidateValidationStage(),
         CoarseCharacterizationStage(fidelity=mode.coarse_characterization_stage_fidelity),
         SpacingStage(),
-        FullCharacterizationStage(fidelity=mode.full_characterization_stage_fidelity),
+        FineCharacterizationStage(fidelity=mode.fine_characterization_stage_fidelity),
         CoreSelectionStage(sec_per_candidate=mode.selection_sec_per_candidate),
         DistillationStage(sec_per_candidate=mode.selection_sec_per_candidate),
     ]

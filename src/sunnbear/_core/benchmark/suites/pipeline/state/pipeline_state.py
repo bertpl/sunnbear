@@ -12,7 +12,7 @@ from .accessors import (
     CoarseCharacterizationStateAccessor,
     CoreSelectionStateAccessor,
     DistillationStateAccessor,
-    FullCharacterizationStateAccessor,
+    FineCharacterizationStateAccessor,
     PipelineStateAccessor,
     SpacingStateAccessor,
 )
@@ -27,7 +27,7 @@ _ACCESSOR_CLASSES: dict[PipelineStageId, type[PipelineStateAccessor]] = {
         CandidateValidationStateAccessor,
         CoarseCharacterizationStateAccessor,
         SpacingStateAccessor,
-        FullCharacterizationStateAccessor,
+        FineCharacterizationStateAccessor,
         CoreSelectionStateAccessor,
         DistillationStateAccessor,
     )

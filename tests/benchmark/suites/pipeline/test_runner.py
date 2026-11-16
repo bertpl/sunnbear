@@ -14,9 +14,9 @@ from sunnbear._core.problems.core import FormulaRegistry
 def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(tmp_path):
     """On example formula 99.802, the pipeline in draft mode runs the stages in run order on the formula's candidates:
 
-    - every candidate that no stage drops reaches full characterization;
+    - every candidate that no stage drops reaches fine characterization;
     - spacing runs at its default minimum distance;
-    - coarse and full characterization run at their draft fidelities, as their manifests record.
+    - coarse and fine characterization run at their draft fidelities, as their manifests record.
 
     Core selection then stops the run, because 4 candidates fill no Core, so neither core selection nor distillation
     writes a manifest.
@@ -47,7 +47,7 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     assert manifests[0].n_candidates_out == n_candidates
     assert manifests[2].parameters == {"fidelity": FeatureFidelity.COARSE_DRAFT.name}
     assert manifests[3].parameters == {"min_distance": DEFAULT_SPACING_MIN_DISTANCE}
-    assert manifests[4].parameters == {"fidelity": FeatureFidelity.FULL_DRAFT.name}
+    assert manifests[4].parameters == {"fidelity": FeatureFidelity.FINE_DRAFT.name}
     drops = [
         result.build_details.drop_of(candidate.id)
         for formula in formulas
