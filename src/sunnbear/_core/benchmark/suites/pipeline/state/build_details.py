@@ -111,6 +111,17 @@ class BenchmarkSuitesBuildDetails:
         """
         return self._copy_if_finished(stage_id, self._storage.characterization_results.get(stage_id))
 
+    def edis(self, stage_id: PipelineStageId) -> dict[ProblemId, float] | None:
+        """Return the empirical difficulty index (EDI) of each candidate that the stage `stage_id` kept.
+
+        `stage_id` names a characterization stage. Return ``None`` for a stage that did not finish.
+        """
+        results = self.characterization_results(stage_id)
+        if results is None:
+            return None
+        else:
+            return dict(results.edis)
+
     def spacing_min_distance(self) -> float | None:
         """Return the minimum distance that the spacing stage chose for its pass over each formula's candidates.
 
@@ -124,17 +135,6 @@ class BenchmarkSuitesBuildDetails:
         Return ``None`` when spacing did not finish.
         """
         return self._copy_if_finished(PipelineStageId.SPACING, self._storage.nearest_kept_candidates)
-
-    def fine_edis(self) -> dict[ProblemId, float] | None:
-        """Return fine characterization's empirical difficulty index (EDI) of each candidate that it kept.
-
-        Return ``None`` when fine characterization did not finish.
-        """
-        results = self.characterization_results(PipelineStageId.FINE_CHARACTERIZATION)
-        if results is None:
-            return None
-        else:
-            return dict(results.edis)
 
     def difficulty_tiers(self) -> dict[ProblemId, DifficultyTier] | None:
         """Return core selection's difficulty tier of each candidate that core selection received.
