@@ -1,6 +1,10 @@
-"""`DifficultyTier.from_edi` buckets an EDI by its ratio to `n_bisection_fevals`, each tier's EDI range starts where
-the range of the tier before it ends, an EDI's ratio distance to a range is the factor by which it lies outside, and
-each tier fills its fixed share of the Core."""
+"""`DifficultyTier` meets these rules:
+
+- `DifficultyTier.from_edi` buckets an EDI by its ratio to `n_bisection_fevals`;
+- each tier's EDI range starts where the range of the tier before it ends;
+- an EDI's ratio distance to a range is the factor by which the EDI lies outside the range;
+- each tier fills its fixed share of the Core.
+"""
 
 import pytest
 

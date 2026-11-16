@@ -10,7 +10,9 @@ configs. Relative to `n_bisection_fevals`, the evaluation count that bisection s
 - Db: from 2 up to 4; 4 is the ratio of `max_fevals` to `n_bisection_fevals`, so every EDI falls in a tier.
 
 Every max-div selection, of the Core and of the distilled suites, has 1 quota per tier, a fixed share of the
-selection's size, `DifficultyTier.core_share`: a quarter each for A, B and C, and the last quarter split 3 to 1 between
+selection's size.
+
+`DifficultyTier.core_share` gives the shares: a quarter each for A, B and C, and the last quarter split 3 to 1 between
 Da and Db, because test problems of tier Db are rare and extreme.
 """
 

@@ -25,9 +25,9 @@ from .difficulty_tier_quotas import DifficultyTierQuotas
 class DifficultyTierAssignment:
     """A `DifficultyTierAssignment` gives each candidate of 1 pool its assigned tier in 1 selection.
 
-    A candidate's assigned tier is the tier whose quota it counts toward. It is the candidate's difficulty tier, unless
-    the pool holds too few candidates of some tier for its quota: then `from_pool` assigns some candidates a
-    neighboring tier, by the order of their EDIs.
+    A candidate's assigned tier is the tier whose quota it counts toward. The assigned tier is the candidate's
+    difficulty tier, unless the pool holds too few candidates of some tier for its quota: then `from_pool` assigns some
+    candidates another tier, by the order of their EDIs.
 
     Attributes:
         quotas: The quotas of the selection.
@@ -59,7 +59,7 @@ class DifficultyTierAssignment:
             short_idx: The index of the short tier, which holds fewer candidates than its quota.
             assigned_tier_counts: The number of candidates of each assigned tier, in the order of `DifficultyTier`.
             quota_counts: The quota of each tier, in the same order.
-            sorted_edis: The pool's EDIs, in the order of `from_pool`.
+            sorted_edis: The pool's EDIs in ascending order, with the pool's order kept among equal EDIs.
             n_bisection_fevals: The `n_bisection_fevals` that sets the tiers' EDI ranges.
         """
         surplus_idxs = [
@@ -94,19 +94,20 @@ class DifficultyTierAssignment:
         """Return the assignment of the candidates of `candidate_pool` for a selection under `quotas`.
 
         The candidates are ordered by EDI, and by their order in the pool where 2 EDIs are equal. In that order, each
-        tier's candidates follow those of the tier before it, so the number of candidates of each assigned tier sets
-        every candidate's assigned tier.
+        tier's candidates follow those of the tier before it, so the count of candidates per tier is enough to give
+        every candidate its assigned tier.
 
-        The numbers start at the pool's count of each difficulty tier. While a tier holds fewer candidates than its
-        quota, 1 candidate moves:
+        The number of candidates of each assigned tier starts at the pool's count of that difficulty tier. A tier has a
+        surplus when it holds more candidates than its quota. While a tier holds fewer candidates than its quota, 1
+        candidate moves:
 
         - the tier with the largest shortfall, the first in the order of `DifficultyTier` on a tie, takes 1 candidate
-          from the nearest tier, counted in tiers, whose number of candidates exceeds that tier's own quota;
-        - each tier in between passes 1 candidate on and keeps its number, so each limit between consecutive tiers,
-          from the supplying tier to the short tier, moves by 1 candidate;
+          from the nearest tier with a surplus, counted in tiers;
+        - each tier in between passes 1 candidate on and keeps its number of candidates, so each limit between
+          consecutive tiers, from the supplying tier to the short tier, moves by 1 candidate;
         - when 2 tiers with a surplus lie equally near on both sides, the short tier takes, of the 2 candidates just
-          outside its own candidates, the one whose EDI lies closer, as a ratio, to the tier's EDI range, and the
-          lower one on a tie.
+          outside its own candidates, the one whose EDI lies closer, as a ratio, to the short tier's EDI range, and
+          the one with the lower EDI on a tie.
 
         Each move lowers the total shortfall by 1 and leaves no other tier short, so the loop ends.
 
@@ -127,7 +128,7 @@ class DifficultyTierAssignment:
             edi_order = np.argsort(candidate_pool.edis, kind="stable")
             sorted_edis = candidate_pool.edis[edi_order]
 
-            # --- moves of 1 candidate -------------
+            # --- moves of 1 candidate -----------
             while any(count < quota for count, quota in zip(assigned_tier_counts, quota_counts, strict=True)):
                 shortfalls = [quota - count for count, quota in zip(assigned_tier_counts, quota_counts, strict=True)]
                 short_idx = shortfalls.index(max(shortfalls))
@@ -137,7 +138,7 @@ class DifficultyTierAssignment:
                 assigned_tier_counts[supplier_idx] -= 1
                 assigned_tier_counts[short_idx] += 1
 
-            # --- assigned tiers -------------------
+            # --- assigned tiers -----------------
             ends = np.cumsum(assigned_tier_counts)
             starts = ends - assigned_tier_counts
             assigned_tier_by_row = np.empty(len(problem_ids), dtype=object)

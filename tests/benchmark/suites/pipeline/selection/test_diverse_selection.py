@@ -44,8 +44,12 @@ class _FirstCandidatesSolverBuilder:
 
 
 def test_a_selection_that_misses_a_quota_stops_the_pipeline(monkeypatch):
-    """max-div treats its constraints as soft; a stand-in for its solver selects the first 16 of 32 candidates, all of
-    tier A, so the check after the selection stops the pipeline."""
+    """A stand-in for max-div's solver selects the first 16 of 32 candidates, all of tier A, so the check after the
+    selection stops the pipeline.
+
+    With 1 constraint per tier on disjoint sets, max-div itself refuses a constraint that it cannot meet, so only a
+    stand-in reaches the check.
+    """
     # --- arrange ----------------------
     monkeypatch.setattr(
         "sunnbear._core.benchmark.suites.pipeline.selection.diverse_selection.ParallelMaxDivSolverBuilder",

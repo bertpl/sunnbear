@@ -23,7 +23,8 @@ class CandidatePool:
     Attributes:
         feature_matrix: The candidates' scaled feature vectors from fine characterization, with their ids.
         edis: Each candidate's empirical difficulty index (EDI), in the order of `feature_matrix`'s rows.
-        n_bisection_fevals: The `n_bisection_fevals` of the solves that gave the EDIs, which sets the tiers' EDI ranges.
+        n_bisection_fevals: The `n_bisection_fevals` of the solves that gave the EDIs; the tiers' EDI ranges are set
+            relative to this `n_bisection_fevals`.
     """
 
     feature_matrix: FeatureMatrix

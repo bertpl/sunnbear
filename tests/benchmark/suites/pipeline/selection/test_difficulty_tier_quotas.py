@@ -24,7 +24,7 @@ def test_quotas_are_refused_for_a_size_without_positive_whole_quotas(selection_s
 
 
 @pytest.mark.parametrize(
-    "selected_tiers, message",
+    "selected_assigned_tiers, message",
     [
         pytest.param([A] * 32 + [B] * 32 + [C] * 32 + [DA] * 24 + [DB] * 8, None, id="met"),
         pytest.param(
@@ -35,7 +35,7 @@ def test_quotas_are_refused_for_a_size_without_positive_whole_quotas(selection_s
         pytest.param([A] * 32 + [B] * 32 + [C] * 32 + [DA] * 24, r"120 candidates .* Db: 0 of 8\.$", id="few"),
     ],
 )
-def test_a_selection_must_meet_every_quota(selected_tiers, message):
+def test_a_selection_must_meet_every_quota(selected_assigned_tiers, message):
     """A selection that meets every quota passes; one that misses a quota stops the pipeline, with a message that names
     each unmet quota and the number of selected candidates of its tier."""
     # --- arrange ----------------------
@@ -43,7 +43,7 @@ def test_a_selection_must_meet_every_quota(selected_tiers, message):
 
     # --- act / assert -----------------
     if message is None:
-        quotas.check_selection(selected_tiers)
+        quotas.check_selection(selected_assigned_tiers)
     else:
         with pytest.raises(PipelineStopError, match=message):
-            quotas.check_selection(selected_tiers)
+            quotas.check_selection(selected_assigned_tiers)

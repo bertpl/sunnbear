@@ -190,8 +190,10 @@ class SuiteSelectionDetails:
         benchmark_suite: The selected suite.
         edi_range_by_tier: Per tier, the smallest and the largest EDI of the candidates assigned that tier, among all
             the input candidates of the max-div run that selected the suite, not only the selected ones; the ranges
-            show where `DifficultyTierAssignment.from_pool` moved the limits between tiers. ``None`` for a suite that
-            no run selects, such as the largest suite of the b-series, which is the rest of the Core.
+            show where `DifficultyTierAssignment.from_pool` moved the limits between tiers.
+
+            ``None`` for a suite that no run selects, such as the largest suite of the b-series, which is the rest of
+            the Core.
         diversity: The diversity score of that max-div run; ``None`` for a suite that no run selects.
     """
 

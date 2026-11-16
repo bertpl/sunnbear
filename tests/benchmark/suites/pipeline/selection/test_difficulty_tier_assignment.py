@@ -134,8 +134,8 @@ def test_among_equal_edis_the_later_candidate_in_the_pool_moves_up():
 
 @pytest.mark.parametrize("seed", range(5))
 def test_the_assigned_tiers_follow_the_edis_and_meet_every_quota(seed):
-    """On random pools with equal EDIs, the assigned tiers never decrease as the EDI rises, and every tier holds at
-    least its quota."""
+    """On random pools in which some EDIs repeat, the assigned tiers never decrease as the EDI rises, and every tier
+    holds at least its quota."""
     # --- arrange ----------------------
     rng = np.random.default_rng(seed=seed)
     pool = _pool(np.round(2.0 * 80.0 ** rng.random(300), 0).tolist())
