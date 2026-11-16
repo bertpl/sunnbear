@@ -102,7 +102,7 @@ def build_state_before(
             case PipelineStageId.COARSE_CHARACTERIZATION | PipelineStageId.FINE_CHARACTERIZATION:
                 accessor.set_characterization_results(example_characterization_results(raw_feature_matrix, edis))
             case PipelineStageId.SPACING:
-                accessor.set_min_distance(1.0)
+                accessor.set_spacing_min_distance(1.0)
                 accessor.set_nearest_kept_candidates({})
             case PipelineStageId.CORE_SELECTION:
                 accessor.set_difficulty_tiers(

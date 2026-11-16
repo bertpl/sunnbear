@@ -33,8 +33,8 @@ def _run_spacing(
     """Run spacing on `candidates`; return each candidate's drop, the stored nearest kept candidates and the stored
     minimum distance.
 
-    `candidates` maps each problem id to the candidate's coarse EDI and scaled feature vector. ``None`` stands for a
-    coarse characterization without scales, of the candidates `problem_ids`.
+    `candidates` maps each problem id to the candidate's coarse EDI and scaled feature vector. When `candidates` is
+    ``None``, coarse characterization has no scales, and the candidates are `problem_ids`.
     """
     if candidates is not None:
         problem_ids = list(candidates)
@@ -48,7 +48,7 @@ def _run_spacing(
         edis = None
     monkeypatch.setattr(SpacingStateAccessor, "coarse_scaled_feature_matrix", lambda self: scaled_feature_matrix)
     nearest_kept_candidates_calls = record_calls(monkeypatch, SpacingStateAccessor, "set_nearest_kept_candidates")
-    min_distance_calls = record_calls(monkeypatch, SpacingStateAccessor, "set_min_distance")
+    min_distance_calls = record_calls(monkeypatch, SpacingStateAccessor, "set_spacing_min_distance")
     state = build_state_before(PipelineStageId.SPACING, [ProblemId.from_string(p) for p in problem_ids], edis=edis)
 
     state.run_stage(

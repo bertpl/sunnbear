@@ -112,7 +112,7 @@ class BenchmarkSuitesBuildDetails:
         return self._copy_if_finished(stage_id, self._storage.characterization_results.get(stage_id))
 
     def spacing_min_distance(self) -> float | None:
-        """Return the minimum distance that the spacing stage chose between the kept candidates of 1 formula.
+        """Return the minimum distance that the spacing stage chose for its pass over each formula's candidates.
 
         Return ``None`` when spacing did not finish.
         """
@@ -125,7 +125,7 @@ class BenchmarkSuitesBuildDetails:
         """
         return self._copy_if_finished(PipelineStageId.SPACING, self._storage.nearest_kept_candidates)
 
-    def edis(self) -> dict[ProblemId, float] | None:
+    def fine_edis(self) -> dict[ProblemId, float] | None:
         """Return fine characterization's empirical difficulty index (EDI) of each candidate that it kept.
 
         Return ``None`` when fine characterization did not finish.

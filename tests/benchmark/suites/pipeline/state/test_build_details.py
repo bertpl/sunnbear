@@ -70,7 +70,7 @@ def _distilled_state() -> PipelineState:
         state.finish_stage(stage_id)
         if stage_id is PipelineStageId.COARSE_CHARACTERIZATION:
             accessor = state.create_state_accessor(PipelineStageId.SPACING)
-            accessor.set_min_distance(0.1)
+            accessor.set_spacing_min_distance(0.1)
             accessor.drop(_PROBLEM_IDS[2], "near_duplicate")
             accessor.set_nearest_kept_candidates(
                 {_PROBLEM_IDS[2]: NearestKeptCandidate(problem_id=_PROBLEM_IDS[1], distance=0.5)}
@@ -135,7 +135,7 @@ def test_the_build_details_hold_only_the_information_of_finished_stages():
     # --- assert -----------------------
     assert build_details.stop == stop
     assert build_details.finished_stage_ids == tuple(PipelineStageId)[:5]
-    assert build_details.edis() == dict.fromkeys(problem_ids, 10.0)
+    assert build_details.fine_edis() == dict.fromkeys(problem_ids, 10.0)
     assert build_details.difficulty_tiers() is None
     assert build_details.suite_tier_counts() is None
     assert build_details.incorrect_solves_table(PipelineStageId.COARSE_CHARACTERIZATION) is not None
@@ -235,7 +235,7 @@ def test_the_build_details_rebuilt_from_their_files_equal_the_original():
         if field.name not in ("candidate_registry", "characterization_results")
     ]:
         assert getattr(read_back, read_method)() == getattr(build_details, read_method)()
-    assert read_back.edis() == build_details.edis()
+    assert read_back.fine_edis() == build_details.fine_edis()
     for stage_id in (PipelineStageId.COARSE_CHARACTERIZATION, PipelineStageId.FINE_CHARACTERIZATION):
         results, read_back_results = (
             details.characterization_results(stage_id) for details in (build_details, read_back)
@@ -262,7 +262,7 @@ def test_the_build_details_of_a_run_that_stopped_early_read_back_their_files(n_f
     assert read_back.finished_stage_ids == tuple(PipelineStageId)[:n_finished_stages]
     assert read_back.c_ranges() == build_details.c_ranges()
     assert read_back.nearest_kept_candidates() is None
-    assert read_back.edis() is None
+    assert read_back.fine_edis() is None
     assert read_back.core_selection_details() is None
     assert read_back.incorrect_solves_table(PipelineStageId.FINE_CHARACTERIZATION) is None
 

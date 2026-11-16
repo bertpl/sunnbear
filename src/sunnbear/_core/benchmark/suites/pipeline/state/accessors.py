@@ -160,8 +160,8 @@ class CharacterizationStateAccessor(PipelineStateAccessor):
         The stage calls this after it has recorded its rejections.
 
         Raises:
-            ValueError: If the results were stored before, or their raw features, EDIs or incorrect solves do not cover
-                exactly those candidates.
+            ValueError: If the results were stored before, or their raw features, empirical difficulty indices (EDIs)
+                or incorrect solves do not cover exactly those candidates.
         """
         self._check_not_written(is_written=self.stage_id in self._storage.characterization_results)
         self._check_covers(results.raw_feature_matrix.problem_ids, self.remaining_problem_ids)
@@ -203,8 +203,8 @@ class SpacingStateAccessor(PipelineStateAccessor):
         results = self._storage.characterization_results[PipelineStageId.COARSE_CHARACTERIZATION]
         return self._restrict_to_remaining(results.edis)
 
-    def set_min_distance(self, min_distance: float) -> None:
-        """Store the minimum distance that the stage chose between the kept candidates of 1 formula.
+    def set_spacing_min_distance(self, min_distance: float) -> None:
+        """Store the minimum distance that the stage chose for its pass over each formula's candidates.
 
         Raises:
             ValueError: If the minimum distance was stored before.
@@ -274,7 +274,7 @@ class CoreSelectionStateAccessor(SelectionStateAccessor):
 
     stage_id = PipelineStageId.CORE_SELECTION
 
-    def edis(self) -> dict[ProblemId, float]:
+    def fine_edis(self) -> dict[ProblemId, float]:
         """Return fine characterization's EDI of each candidate that no stage has dropped."""
         results = self._storage.characterization_results[PipelineStageId.FINE_CHARACTERIZATION]
         return self._restrict_to_remaining(results.edis)

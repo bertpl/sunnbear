@@ -71,7 +71,7 @@ class CoreSelectionStage(PipelineStage[CoreSelectionStateAccessor]):
         # --- difficulty tiers -------------------
         difficulty_tiers = {
             problem_id: DifficultyTier.from_edi(edi, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
-            for problem_id, edi in state_accessor.edis().items()
+            for problem_id, edi in state_accessor.fine_edis().items()
         }
         state_accessor.set_difficulty_tiers(difficulty_tiers)
 

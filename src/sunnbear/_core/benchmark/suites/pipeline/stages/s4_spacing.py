@@ -19,10 +19,9 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 if TYPE_CHECKING:
     from sunnbear._core.problems.core import ProblemId
 
-# `SpacingStage` chooses its minimum distance from these options: 10^-3.0, 10^-2.9, ... up to 10^1.0. A distance is
-# measured in multiples of the mean pairwise L1 distance within a block of the coarse feature vectors, so the options
-# run from 1/1000 of the mean distance, at which only nearly identical candidates are dropped, to 10 times the mean
-# distance.
+# `SpacingStage` chooses its minimum distance from these options, a tenth of a decade apart. A distance is measured in
+# multiples of the mean pairwise L1 distance within a block of the coarse feature vectors, so the options run from
+# 1/1000 of the mean distance, at which only nearly identical candidates are dropped, to 10 times the mean distance.
 SPACING_MIN_DISTANCE_OPTIONS = tuple(10.0 ** (exponent_in_tenths / 10) for exponent_in_tenths in range(-30, 11))
 
 # Fine characterization and the selection stages run on every candidate that spacing keeps, and fine characterization
@@ -51,8 +50,8 @@ class SpacingStage(PipelineStage[SpacingStateAccessor]):
 
     - keeps the first and the last candidate in that order, whatever the minimum distance, so that a formula keeps its
       easiest and its hardest candidate, and a formula with 2 or more candidates keeps at least 2;
-    - then keeps each candidate in between whose distance to every kept candidate, the last candidate in that order
-      included, is at least the minimum distance.
+    - then keeps each candidate in between whose distance to every kept candidate, including the last candidate in
+      that order, is at least the minimum distance.
 
     The stage drops each other candidate as a near duplicate, which is valid but not kept, and stores, for each dropped
     candidate, the nearest kept candidate of the same formula. When coarse characterization kept fewer than 2
@@ -95,7 +94,7 @@ class SpacingStage(PipelineStage[SpacingStateAccessor]):
 
         # --- minimum distance -------------------
         min_distance = self._choose_min_distance(list(vectors_by_formula.values()))
-        state_accessor.set_min_distance(min_distance)
+        state_accessor.set_spacing_min_distance(min_distance)
 
         # --- spacing, formula by formula --------
         nearest_kept_candidates: dict[ProblemId, NearestKeptCandidate] = {}
@@ -117,10 +116,11 @@ class SpacingStage(PipelineStage[SpacingStateAccessor]):
     #  Helpers
     # --------------------------------------------------------------------------
     def _choose_min_distance(self, vectors_per_formula: list[np.ndarray]) -> float:
-        """Return the largest of `SPACING_MIN_DISTANCE_OPTIONS` at which the formulas together keep at least the target.
+        """Return the largest option at which the formulas together keep at least the target number of candidates.
 
         Return the smallest option when the formulas keep fewer candidates than the target at every option.
-        `vectors_per_formula` holds 1 array per formula, as `_select_kept_positions` takes it.
+        `vectors_per_formula` holds 1 array per formula: the formula's scaled feature vectors, 1 per row, in ascending
+        order of their EDI.
 
         Every option is tried, because the number of kept candidates need not fall with each larger option: the pass
         keeps a candidate by its distance to the candidates kept before it, and those change with the minimum distance.
@@ -137,7 +137,7 @@ class SpacingStage(PipelineStage[SpacingStateAccessor]):
 
     @staticmethod
     def _select_kept_positions(vectors: np.ndarray, min_distance: float) -> list[int]:
-        """Return the positions in `vectors` of the candidates that 1 formula keeps at `min_distance`, ascending.
+        """Return, in ascending order, the positions in `vectors` of 1 formula's kept candidates at `min_distance`.
 
         `vectors` holds the formula's scaled feature vectors, 1 per row, in the order of the pass: ascending EDI.
         """

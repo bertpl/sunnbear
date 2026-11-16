@@ -86,7 +86,7 @@ _OTHER_WRITES: dict[str, tuple[PipelineStageId, Callable[[PipelineStateAccessor,
     ),
     "spacing_min_distance": (
         PipelineStageId.SPACING,
-        lambda accessor, problem_ids: accessor.set_min_distance(0.1),
+        lambda accessor, problem_ids: accessor.set_spacing_min_distance(0.1),
     ),
 }
 
@@ -201,7 +201,7 @@ def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_tier(
     assert candidate_pool.feature_matrix.problem_ids == tuple(_PROBLEM_IDS)
     assert candidate_pool.difficulty_tiers == tuple(tiers.values())
     np.testing.assert_array_equal(candidate_pool.edis, [10.0] * 3)
-    assert accessor.edis() == dict.fromkeys(_PROBLEM_IDS, 10.0)
+    assert accessor.fine_edis() == dict.fromkeys(_PROBLEM_IDS, 10.0)
 
 
 def test_the_candidate_pool_needs_the_tiers_and_the_scales():

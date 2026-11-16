@@ -77,7 +77,12 @@ class CharacterizationResults:
     def to_raw_features_columns(self) -> dict[str, list[Any]]:
         """Return the results as table columns.
 
-        The columns are ``problem_id``, 1 per feature, ``edi``, and 1 per config with its counts of incorrect solves.
+        The columns are:
+
+        - ``problem_id``;
+        - 1 per feature;
+        - ``edi``;
+        - 1 per config, with its counts of incorrect solves.
         """
         factory = DiversityFeatureFactory()
         columns: dict[str, list[Any]] = {"problem_id": list(map(str, self.raw_feature_matrix.problem_ids))}
