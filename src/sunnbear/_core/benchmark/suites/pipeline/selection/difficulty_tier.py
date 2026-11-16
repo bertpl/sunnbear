@@ -9,8 +9,11 @@ configs. Relative to `n_bisection_fevals`, the evaluation count that bisection s
 - Da: from 1 to 2, worse than bisection;
 - Db: from 2 up to 4; 4 is the ratio of `max_fevals` to `n_bisection_fevals`, so every EDI falls in a tier.
 
-The Core that ships holds each tier in a fixed share of its size, `DifficultyTier.core_share`: a quarter each for A, B
-and C, and the last quarter split 3 to 1 between Da and Db, because test problems of tier Db are rare and extreme.
+Every max-div selection, of the Core and of the distilled suites, has 1 quota per tier, a fixed share of the
+selection's size.
+
+`DifficultyTier.core_share` gives the shares: a quarter each for A, B and C, and the last quarter split 3 to 1 between
+Da and Db, because test problems of tier Db are rare and extreme.
 """
 
 from enum import StrEnum
@@ -35,8 +38,21 @@ class DifficultyTier(StrEnum):
 
     @property
     def core_share(self) -> Fraction:
-        """Return the fraction of a suite that the tier fills when every tier has a quota of its own."""
+        """Return the fraction of the candidates of every selection that count toward the tier's quota."""
         return _CORE_SHARES[self]
+
+    def edi_range(self, n_bisection_fevals: int) -> tuple[float, float]:
+        """Return the tier's range of the EDI, `(lower, upper)`, for solves with `n_bisection_fevals`.
+
+        The range holds its lower bound and excludes its upper bound; A's range starts at 0.
+        """
+        lower_ratio, upper_ratio = _EDI_RATIO_RANGES[self]
+        return lower_ratio * n_bisection_fevals, upper_ratio * n_bisection_fevals
+
+    def edi_ratio_distance(self, edi: float, n_bisection_fevals: int) -> float:
+        """Return the factor by which `edi` lies below or above the tier's EDI range, or 1 when the range holds it."""
+        lower, upper = self.edi_range(n_bisection_fevals)
+        return max(lower / edi, edi / upper, 1.0)
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -44,20 +60,19 @@ class DifficultyTier(StrEnum):
     @classmethod
     def from_edi(cls, edi: float, *, n_bisection_fevals: int) -> "DifficultyTier":
         """Return the tier whose EDI range holds `edi`; an EDI at or above the range of Da falls in Db."""
-        edi_ratio = edi / n_bisection_fevals
         for difficulty_tier in cls:
-            if edi_ratio < _EDI_RATIO_UPPER_BOUNDS[difficulty_tier]:
+            if edi < difficulty_tier.edi_range(n_bisection_fevals)[1]:
                 return difficulty_tier
         return cls.DB
 
 
-# Each tier's EDI range, relative to `n_bisection_fevals`, excludes its upper bound.
-_EDI_RATIO_UPPER_BOUNDS = {
-    DifficultyTier.A: 1 / 4,
-    DifficultyTier.B: 1 / 2,
-    DifficultyTier.C: 1,
-    DifficultyTier.DA: 2,
-    DifficultyTier.DB: 4,
+# Each tier's EDI range, relative to `n_bisection_fevals`, starts where the range of the tier before it ends.
+_EDI_RATIO_RANGES = {
+    DifficultyTier.A: (0, 1 / 4),
+    DifficultyTier.B: (1 / 4, 1 / 2),
+    DifficultyTier.C: (1 / 2, 1),
+    DifficultyTier.DA: (1, 2),
+    DifficultyTier.DB: (2, 4),
 }
 _CORE_SHARES = {
     DifficultyTier.A: Fraction(1, 4),

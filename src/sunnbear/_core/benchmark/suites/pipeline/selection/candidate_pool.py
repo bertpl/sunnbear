@@ -2,6 +2,7 @@
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Self
 
 import numpy as np
@@ -17,17 +18,26 @@ from .difficulty_tier import DifficultyTier
 # ==================================================================================================
 @dataclass(frozen=True)
 class CandidatePool:
-    """A `CandidatePool` holds the candidates to select from, each with its features, EDI and tier.
+    """A `CandidatePool` holds the candidates to select from, each with its features and EDI.
 
     Attributes:
         feature_matrix: The candidates' scaled feature vectors from fine characterization, with their ids.
         edis: Each candidate's empirical difficulty index (EDI), in the order of `feature_matrix`'s rows.
-        difficulty_tiers: Each candidate's tier, in the order of `feature_matrix`'s rows.
+        n_bisection_fevals: The `n_bisection_fevals` of the solves that gave the EDIs; the tiers' EDI ranges are set
+            relative to this `n_bisection_fevals`.
     """
 
     feature_matrix: FeatureMatrix
     edis: np.ndarray
-    difficulty_tiers: tuple[DifficultyTier, ...]
+    n_bisection_fevals: int
+
+    @cached_property
+    def difficulty_tiers(self) -> dict[ProblemId, DifficultyTier]:
+        """Return each candidate's difficulty tier, from its EDI, keyed by id in the order of the pool."""
+        return {
+            problem_id: DifficultyTier.from_edi(edi, n_bisection_fevals=self.n_bisection_fevals)
+            for problem_id, edi in zip(self.feature_matrix.problem_ids, self.edis, strict=True)
+        }
 
     def subset(self, problem_ids: Sequence[ProblemId]) -> Self:
         """Return the pool of the candidates `problem_ids`, in their order.
@@ -39,7 +49,7 @@ class CandidatePool:
         return type(self)(
             feature_matrix=self.feature_matrix.subset(problem_ids),
             edis=self.edis[rows],
-            difficulty_tiers=tuple(self.difficulty_tiers[row] for row in rows),
+            n_bisection_fevals=self.n_bisection_fevals,
         )
 
     # --------------------------------------------------------------------------
@@ -47,15 +57,11 @@ class CandidatePool:
     # --------------------------------------------------------------------------
     @classmethod
     def from_feature_matrix(
-        cls,
-        feature_matrix: FeatureMatrix,
-        *,
-        edis: Mapping[ProblemId, float],
-        difficulty_tiers: Mapping[ProblemId, DifficultyTier],
+        cls, feature_matrix: FeatureMatrix, *, edis: Mapping[ProblemId, float], n_bisection_fevals: int
     ) -> Self:
-        """Return the pool of the candidates of `feature_matrix`, with the EDI and the tier of each, keyed by id."""
+        """Return the pool of the candidates of `feature_matrix`, with the EDI of each, keyed by id."""
         return cls(
             feature_matrix=feature_matrix,
             edis=np.array([edis[problem_id] for problem_id in feature_matrix.problem_ids]),
-            difficulty_tiers=tuple(difficulty_tiers[problem_id] for problem_id in feature_matrix.problem_ids),
+            n_bisection_fevals=n_bisection_fevals,
         )

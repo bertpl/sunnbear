@@ -19,7 +19,7 @@ from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     FeatureFidelity,
     FeatureMatrix,
 )
-from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTierQuotas
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
 from sunnbear._core.problems.core import ProblemId
 
 # In a characterization's table of raw features, each config's column of incorrect solves is named with this prefix and
@@ -188,24 +188,31 @@ class SuiteSelectionDetails:
 
     Attributes:
         benchmark_suite: The selected suite.
-        tier_quotas: The quotas of the max-div run that selected the suite; ``None`` for a suite that no run
-            selects, such as the largest suite of the b-series, which is the rest of the Core.
+        edi_range_by_tier: Per tier, the smallest and the largest EDI of the candidates assigned that tier, among all
+            the input candidates of the max-div run that selected the suite, not only the selected ones; the ranges
+            show where `DifficultyTierAssignment.from_pool` moved the limits between tiers.
+
+            ``None`` for a suite that no run selects, such as the largest suite of the b-series, which is the rest of
+            the Core.
         diversity: The diversity score of that max-div run; ``None`` for a suite that no run selects.
     """
 
     benchmark_suite: BenchmarkSuite
-    tier_quotas: DifficultyTierQuotas | None
+    edi_range_by_tier: Mapping[DifficultyTier, tuple[float, float]] | None
     diversity: float | None
 
     def to_json_values(self) -> dict[str, Any]:
-        """Return the details as JSON values, under the keys ``benchmark_suite``, ``tier_quotas`` and ``diversity``."""
-        if self.tier_quotas is not None:
-            tier_quotas = self.tier_quotas.to_json_values()
+        """Return the details as JSON values, under the keys ``benchmark_suite``, ``edi_range_by_tier``, ``diversity``.
+
+        Each tier's EDI range is a list of 2 numbers, keyed by the tier's value.
+        """
+        if self.edi_range_by_tier is not None:
+            edi_range_by_tier = {tier.value: list(edi_range) for tier, edi_range in self.edi_range_by_tier.items()}
         else:
-            tier_quotas = None
+            edi_range_by_tier = None
         return {
             "benchmark_suite": self.benchmark_suite.to_json_values(),
-            "tier_quotas": tier_quotas,
+            "edi_range_by_tier": edi_range_by_tier,
             "diversity": self.diversity,
         }
 
@@ -217,14 +224,17 @@ class SuiteSelectionDetails:
         """Return the details that the output of `to_json_values` holds.
 
         Raises:
-            ValueError: If a quota names a value that is not a `DifficultyTier`.
+            ValueError: If an EDI range is keyed by a value that is not a `DifficultyTier`.
         """
-        if json_values["tier_quotas"] is not None:
-            tier_quotas = DifficultyTierQuotas.from_json_values(json_values["tier_quotas"])
+        if json_values["edi_range_by_tier"] is not None:
+            edi_range_by_tier = {
+                DifficultyTier(tier_value): (lower, upper)
+                for tier_value, (lower, upper) in json_values["edi_range_by_tier"].items()
+            }
         else:
-            tier_quotas = None
+            edi_range_by_tier = None
         return cls(
             benchmark_suite=BenchmarkSuite.from_json_values(json_values["benchmark_suite"]),
-            tier_quotas=tier_quotas,
+            edi_range_by_tier=edi_range_by_tier,
             diversity=json_values["diversity"],
         )

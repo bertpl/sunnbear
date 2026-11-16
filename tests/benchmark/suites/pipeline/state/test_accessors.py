@@ -7,7 +7,7 @@ from collections.abc import Callable
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.protocol import CRange
+from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, CRange
 from sunnbear._core.benchmark.suites.benchmark_suite import BenchmarkSuite
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import DiversityFeatureFactory
@@ -38,7 +38,7 @@ def _selection_details(name: str, problem_ids: list) -> SuiteSelectionDetails:
     """Return the selection details of a suite of `problem_ids` that no max-div run selected."""
     return SuiteSelectionDetails(
         benchmark_suite=BenchmarkSuite(name=name, aliases=(), problem_ids=tuple(problem_ids)),
-        tier_quotas=None,
+        edi_range_by_tier=None,
         diversity=None,
     )
 
@@ -187,35 +187,32 @@ def test_spacing_has_no_scaled_features_without_scales():
 
 
 def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_tier():
-    """Once core selection stored the tiers, its pool holds each candidate's scaled features from fine
-    characterization, EDI and tier, in the order of candidate generation."""
+    """Core selection's pool holds each candidate's scaled features and EDI from fine characterization, and the tier of
+    that EDI for `DEFAULT_N_BISECTION_FEVALS`, in the order of candidate generation."""
     # --- arrange ----------------------
-    accessor = _accessor(PipelineStageId.CORE_SELECTION)
-    tiers = dict(zip(_PROBLEM_IDS, [DifficultyTier.A, DifficultyTier.C, DifficultyTier.B], strict=True))
-    accessor.set_difficulty_tiers(tiers)
+    edis = dict(zip(_PROBLEM_IDS, [5.0, 30.0, 15.0], strict=True))
+    accessor = build_state_before(PipelineStageId.CORE_SELECTION, _PROBLEM_IDS, edis=edis).create_state_accessor(
+        PipelineStageId.CORE_SELECTION
+    )
 
     # --- act --------------------------
     candidate_pool = accessor.candidate_pool()
 
     # --- assert -----------------------
     assert candidate_pool.feature_matrix.problem_ids == tuple(_PROBLEM_IDS)
-    assert candidate_pool.difficulty_tiers == tuple(tiers.values())
-    np.testing.assert_array_equal(candidate_pool.edis, [10.0] * 3)
-    assert accessor.fine_edis() == dict.fromkeys(_PROBLEM_IDS, 10.0)
+    np.testing.assert_array_equal(candidate_pool.edis, list(edis.values()))
+    assert candidate_pool.n_bisection_fevals == DEFAULT_N_BISECTION_FEVALS
+    assert list(candidate_pool.difficulty_tiers.values()) == [DifficultyTier.A, DifficultyTier.C, DifficultyTier.B]
 
 
-def test_the_candidate_pool_needs_the_tiers_and_the_scales():
-    """Core selection's accessor gives no pool before the tiers are stored, nor after fine characterization kept 1
-    candidate only, which leaves fine characterization without scales."""
+def test_the_candidate_pool_needs_the_scales():
+    """Core selection's accessor gives no pool after fine characterization kept 1 candidate only, which leaves fine
+    characterization without scales."""
     # --- arrange ----------------------
-    accessor = _accessor(PipelineStageId.CORE_SELECTION)
     accessor_without_scales = build_state_before(
         PipelineStageId.CORE_SELECTION, _PROBLEM_IDS[:1]
     ).create_state_accessor(PipelineStageId.CORE_SELECTION)
-    accessor_without_scales.set_difficulty_tiers({_PROBLEM_IDS[0]: DifficultyTier.A})
 
     # --- act / assert -----------------
-    with pytest.raises(ValueError, match="needs the difficulty tiers"):
-        accessor.candidate_pool()
     with pytest.raises(ValueError, match="needs the scales of fine characterization"):
         accessor_without_scales.candidate_pool()

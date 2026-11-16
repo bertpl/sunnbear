@@ -1,8 +1,6 @@
 """`CoreSelectionStage` selects the Core: the most diverse candidates, at the largest size that the candidates fill."""
 
-from collections import Counter
-
-from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, SeedPurpose, derive_seed
+from sunnbear._core.benchmark.protocol import SeedPurpose, derive_seed
 from sunnbear._core.benchmark.suites.benchmark_suite import BenchmarkSuite
 from sunnbear._core.benchmark.suites.pipeline.core import (
     PIPELINE_ROOT_SEED,
@@ -12,7 +10,7 @@ from sunnbear._core.benchmark.suites.pipeline.core import (
 )
 from sunnbear._core.benchmark.suites.pipeline.selection import (
     DEFAULT_SELECTION_SEC_PER_CANDIDATE,
-    DifficultyTier,
+    DifficultyTierAssignment,
     DifficultyTierQuotas,
     select_diverse_problem_ids,
 )
@@ -22,8 +20,9 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 # Every Core size is a power of 2, so that every suite distilled from the Core, whose size is the Core's divided by a
 # power of 2, has whole quotas.
 #
-# Only a Core of the largest size, with a quota per tier, ships; a Core of another size or with merged quotas is
-# interim: it never ships as benchmark suites.
+# Only a Core of the largest size, whose candidates all count toward their difficulty tier's quota, ships; a Core of
+# another size, or one for which `DifficultyTierAssignment.from_pool` assigned some candidate a tier other than its
+# difficulty tier, is interim: it never ships as benchmark suites.
 CORE_SIZES = (128, 256, 512, 1024, 2048)
 
 
@@ -33,14 +32,15 @@ CORE_SIZES = (128, 256, 512, 1024, 2048)
 class CoreSelectionStage(PipelineStage[CoreSelectionStateAccessor]):
     """`CoreSelectionStage` selects the Core, the suite `sb-<size>`; every other benchmark suite is selected from it.
 
-    A candidate's tier follows from its EDI, which fine characterization stored, relative to
-    `DEFAULT_N_BISECTION_FEVALS`, the `n_bisection_fevals` with which the characterization stages run every solve.
+    The stage stores each candidate's difficulty tier, which `CandidatePool.difficulty_tiers` derives from the EDI that
+    fine characterization stored.
 
     The stage selects the Core in 3 steps:
 
     - the Core's size is the largest of `CORE_SIZES` that the candidates fill, whatever their tiers; below the smallest
       size, the stage stops the pipeline;
-    - `DifficultyTierQuotas.resolve` chooses the Core's quotas, merged until the candidates can meet each of them;
+    - `DifficultyTierAssignment.from_pool` assigns each candidate a tier, so that the candidates can meet every quota of
+      the Core;
     - `select_diverse_problem_ids` selects the Core by max-div.
 
     The stage drops each candidate that the Core does not hold; such a candidate is valid, but not kept.
@@ -68,21 +68,16 @@ class CoreSelectionStage(PipelineStage[CoreSelectionStateAccessor]):
             PipelineStopError: If the candidates fill no Core of the smallest of `CORE_SIZES`, or if max-div's
                 selection misses a quota, as `select_diverse_problem_ids` describes.
         """
-        # --- difficulty tiers -------------------
-        difficulty_tiers = {
-            problem_id: DifficultyTier.from_edi(edi, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
-            for problem_id, edi in state_accessor.fine_edis().items()
-        }
-        state_accessor.set_difficulty_tiers(difficulty_tiers)
-
-        # --- size and quotas --------------------
-        core_size = self._choose_core_size(len(difficulty_tiers))
-        tier_quotas = DifficultyTierQuotas.resolve(core_size, Counter(difficulty_tiers.values()))
+        # --- size and tiers ---------------------
+        core_size = self._choose_core_size(len(state_accessor.remaining_problem_ids))
+        candidate_pool = state_accessor.candidate_pool()
+        state_accessor.set_difficulty_tiers(candidate_pool.difficulty_tiers)
+        tier_assignment = DifficultyTierAssignment.from_pool(candidate_pool, DifficultyTierQuotas(core_size))
 
         # --- selection --------------------------
         core_problem_ids, diversity = select_diverse_problem_ids(
-            state_accessor.candidate_pool(),
-            tier_quotas=tier_quotas,
+            candidate_pool,
+            tier_assignment=tier_assignment,
             seed=self.seed,
             sec_per_candidate=self.sec_per_candidate,
             n_workers=worker_pool.n_workers,
@@ -94,7 +89,7 @@ class CoreSelectionStage(PipelineStage[CoreSelectionStateAccessor]):
         state_accessor.set_core_selection_details(
             SuiteSelectionDetails(
                 benchmark_suite=BenchmarkSuite(name=f"sb-{core_size}", aliases=(), problem_ids=core_problem_ids),
-                tier_quotas=tier_quotas,
+                edi_range_by_tier=tier_assignment.edi_range_by_tier,
                 diversity=diversity,
             )
         )

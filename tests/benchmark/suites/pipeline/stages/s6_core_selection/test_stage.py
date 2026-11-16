@@ -2,8 +2,8 @@
 
 - the Core's size is the largest of `CORE_SIZES` that the candidates fill, and the stage stops the pipeline below it;
 - it stores each candidate's tier, from its EDI;
-- it selects the Core by max-div under the tier quotas, also when quotas merge, drops the other candidates, and stores
-  the Core's selection details;
+- it selects the Core by max-div under the tier quotas, also when a tier is below its quota, drops the other
+  candidates, and stores the Core's selection details;
 - it records max-div's time per candidate and seed in its parameters.
 """
 
@@ -71,28 +71,37 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
     state = _select_core(edis, CoreSelectionStage(_SEC_PER_CANDIDATE))
 
     # --- assert -----------------------
-    distillation_accessor = state.create_state_accessor(PipelineStageId.DISTILLATION)
-    assert Counter(distillation_accessor.candidate_pool().difficulty_tiers) == {A: 32, B: 32, C: 32, DA: 24, DB: 8}
+    core_pool = state.create_state_accessor(PipelineStageId.DISTILLATION).candidate_pool()
+    assert Counter(core_pool.difficulty_tiers.values()) == {A: 32, B: 32, C: 32, DA: 24, DB: 8}
     core_selection_details = state.create_build_details().core_selection_details()
     assert core_selection_details.benchmark_suite.name == "sb-128"
     assert core_selection_details.benchmark_suite.aliases == ()
-    assert len(core_selection_details.tier_quotas.quota_by_group) == len(DifficultyTier)
+    assert core_selection_details.edi_range_by_tier == {
+        A: (5.0, 5.0),
+        B: (15.0, 15.0),
+        C: (30.0, 30.0),
+        DA: (60.0, 60.0),
+        DB: (120.0, 120.0),
+    }
     drops = [state.drop_of(problem_id) for problem_id in example_problem_ids(len(edis))]
     assert Counter(drop.reason for drop in drops if drop is not None) == {"not_in_core": 32}
 
 
 @pytest.mark.only_with_numba_jit
-def test_the_stage_fills_merged_quotas_and_records_its_parameters():
-    """The candidates hold no Db, so Db's quota merges with Da's, and the selection fills the merged quota with Da;
-    the stage's parameters record max-div's time per candidate and seed."""
+def test_the_stage_fills_a_tier_below_its_quota_from_its_neighbor_and_records_its_parameters():
+    """No candidate is of tier Db, and all candidates of Da share the EDI 60, so the last 8 of Da in the pool count
+    toward Db's quota, and the Core holds all 8; the stage's parameters record max-div's time per candidate and seed."""
     # --- arrange ----------------------
     stage = CoreSelectionStage(_SEC_PER_CANDIDATE)
+    edis = [5.0] * 40 + [15.0] * 40 + [30.0] * 40 + [60.0] * 40
 
     # --- act --------------------------
-    state = _select_core([5.0] * 40 + [15.0] * 40 + [30.0] * 40 + [60.0] * 40, stage)
+    state = _select_core(edis, stage)
 
     # --- assert -----------------------
-    core_tiers = Counter(state.create_state_accessor(PipelineStageId.DISTILLATION).candidate_pool().difficulty_tiers)
-    assert core_tiers == dict.fromkeys([A, B, C, DA], 32)
-    assert state.create_build_details().core_selection_details().tier_quotas.quota_by_group[frozenset({DA, DB})] == 32
+    core_pool = state.create_state_accessor(PipelineStageId.DISTILLATION).candidate_pool()
+    assert Counter(core_pool.difficulty_tiers.values()) == dict.fromkeys([A, B, C, DA], 32)
+    core_selection_details = state.create_build_details().core_selection_details()
+    assert set(example_problem_ids(len(edis))[-8:]) <= set(core_selection_details.benchmark_suite.problem_ids)
+    assert core_selection_details.edi_range_by_tier[DB] == (60.0, 60.0)
     assert stage.parameters == {"sec_per_candidate": _SEC_PER_CANDIDATE, "seed": stage.seed}

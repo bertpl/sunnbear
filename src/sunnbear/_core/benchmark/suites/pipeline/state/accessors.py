@@ -17,7 +17,7 @@ The 2 characterization stages share `CharacterizationStateAccessor`, and core se
 from collections.abc import Collection, Mapping
 from typing import ClassVar
 
-from sunnbear._core.benchmark.protocol import CRange
+from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureMatrix
 from sunnbear._core.benchmark.suites.pipeline.selection import CandidatePool, DifficultyTier
@@ -246,23 +246,19 @@ class SelectionStateAccessor(PipelineStateAccessor):
     def candidate_pool(self) -> CandidatePool:
         """Return the pool of the candidates that no stage has dropped.
 
-        The pool holds their scaled features and their EDIs from fine characterization, and their difficulty tiers.
+        The pool holds their scaled features and their EDIs from fine characterization, whose solves all use
+        `DEFAULT_N_BISECTION_FEVALS`.
 
         Raises:
-            ValueError: If the difficulty tiers are not stored yet, or fine characterization has no scales, because it
-                kept fewer than 2 candidates.
+            ValueError: If fine characterization has no scales, because it kept fewer than 2 candidates.
         """
         results = self._storage.characterization_results[PipelineStageId.FINE_CHARACTERIZATION]
         scaled_feature_matrix = results.build_scaled_feature_matrix(self.remaining_problem_ids)
-        if self._storage.difficulty_tiers is None:
-            raise ValueError("The candidate pool needs the difficulty tiers, which core selection stores.")
-        elif scaled_feature_matrix is None:
+        if scaled_feature_matrix is None:
             raise ValueError("The candidate pool needs the scales of fine characterization, which has none.")
         else:
             return CandidatePool.from_feature_matrix(
-                scaled_feature_matrix,
-                edis=results.edis,
-                difficulty_tiers=self._storage.difficulty_tiers,
+                scaled_feature_matrix, edis=results.edis, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS
             )
 
 
@@ -270,14 +266,9 @@ class SelectionStateAccessor(PipelineStateAccessor):
 #  CoreSelectionStateAccessor
 # ==================================================================================================
 class CoreSelectionStateAccessor(SelectionStateAccessor):
-    """`CoreSelectionStateAccessor` gives the candidates' EDIs, and takes their tiers and the Core's details."""
+    """`CoreSelectionStateAccessor` takes the candidates' difficulty tiers and the Core's details."""
 
     stage_id = PipelineStageId.CORE_SELECTION
-
-    def fine_edis(self) -> dict[ProblemId, float]:
-        """Return fine characterization's EDI of each candidate that no stage has dropped."""
-        results = self._storage.characterization_results[PipelineStageId.FINE_CHARACTERIZATION]
-        return self._restrict_to_remaining(results.edis)
 
     def set_difficulty_tiers(self, difficulty_tiers: Mapping[ProblemId, DifficultyTier]) -> None:
         """Store the tier of each candidate that no stage has dropped.

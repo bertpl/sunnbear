@@ -1,8 +1,8 @@
 {
   "archive": {
-    "sha256": "54d18390e47deae83392109382b898ee3c5e0a6364568748ea369743fd196b01",
-    "size_bytes": 1350778,
-    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-bbc06f2b/benchmark_suites_build_details.tar.zst"
+    "sha256": "7196fb9b662d581d3ccd1bf6e81ff9f9fcdd4dc1e5b547db6e10e4c548050fab",
+    "size_bytes": 1350409,
+    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-9acbbce5/benchmark_suites_build_details.tar.zst"
   },
   "build_date": "2026-11-16",
   "built_with": {
@@ -10,7 +10,7 @@
     "snuffled": "0.1.11",
     "sunnbear": "0.4.1+dev"
   },
-  "content_hash": "bbc06f2b1075001475478c117ee2fb3b498e98fe6c7bf15b0726c27c347eedb7",
+  "content_hash": "9acbbce55a5155304ff0966743d5a25017a53156bbdc58dafcc1efb8438c3d52",
   "files": [
     {
       "path": "c_ranges.parquet",
@@ -19,8 +19,8 @@
     },
     {
       "path": "candidate_registry.parquet",
-      "sha256": "7e78cf4a9256ba60e0a1c45ddb8883d5a9d75560a04e014357d55ea62ef93953",
-      "size_bytes": 18446
+      "sha256": "c1da2f56c116024dec34b3e654ecc7ff5c0773a109a734c83c358ef7c44b8dcc",
+      "size_bytes": 18116
     },
     {
       "path": "difficulty_tiers.parquet",
@@ -54,8 +54,8 @@
     },
     {
       "path": "storage.json",
-      "sha256": "e2e3158b24fade8a9add0199af701bb908def8f96f4eb9eb7bc27a89aeaf16b1",
-      "size_bytes": 233268
+      "sha256": "9fa191823f57197743f495b2aedf65c38e6bb21ee7d743e50dfeae6b340fa1a1",
+      "size_bytes": 225526
     }
   ],
   "generated_by": {

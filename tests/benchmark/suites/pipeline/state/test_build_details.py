@@ -16,7 +16,7 @@ from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.benchmark_suite import BenchmarkSuite
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId, PipelineStop
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import DiversityFeatureFactory, FeatureFidelity
-from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier, DifficultyTierQuotas
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
 from sunnbear._core.benchmark.suites.pipeline.state import (
     BenchmarkSuitesBuildDetails,
     CharacterizationResults,
@@ -81,7 +81,7 @@ def _distilled_state() -> PipelineState:
     accessor.set_core_selection_details(
         SuiteSelectionDetails(
             benchmark_suite=BenchmarkSuite(name="sb-2", aliases=(), problem_ids=(_PROBLEM_IDS[1], _PROBLEM_IDS[4])),
-            tier_quotas=DifficultyTierQuotas(quota_by_group={frozenset({DifficultyTier.A, DifficultyTier.B}): 2}),
+            edi_range_by_tier={DifficultyTier.A: (5.0, 9.5), DifficultyTier.B: (10.0, 10.0)},
             diversity=0.25,
         )
     )
@@ -91,12 +91,12 @@ def _distilled_state() -> PipelineState:
         {
             "sb-1a": SuiteSelectionDetails(
                 benchmark_suite=BenchmarkSuite(name="sb-1a", aliases=("sb-single",), problem_ids=(_PROBLEM_IDS[1],)),
-                tier_quotas=DifficultyTierQuotas(quota_by_group={frozenset(DifficultyTier): 1}),
+                edi_range_by_tier={DifficultyTier.A: (5.0, 5.0), DifficultyTier.B: (10.0, 10.0)},
                 diversity=0.5,
             ),
             "sb-1b": SuiteSelectionDetails(
                 benchmark_suite=BenchmarkSuite(name="sb-1b", aliases=(), problem_ids=(_PROBLEM_IDS[4],)),
-                tier_quotas=None,
+                edi_range_by_tier=None,
                 diversity=None,
             ),
         }
@@ -199,7 +199,7 @@ def test_the_build_details_count_each_configs_incorrect_solves():
         ),
         pytest.param(
             lambda: build_state_before(PipelineStageId.DISTILLATION, example_problem_ids(3)),
-            [("sb-3", 3, 0, 3, 1.0)],
+            [("sb-3", 3, 0, 3, None)],
             id="distillation_not_finished",
         ),
     ],
