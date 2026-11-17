@@ -8,7 +8,7 @@ test problem's failures, such as NaN values or a root at an interval bound, occu
 snuffled analyzes f at each sampled tuple:
 
 - at the HIGH budget, `SnuffledAnalysisBudget.HIGH`, for the sampled tuples at the positions in `HIGH_BUDGET_POSITIONS`;
-- at the LOW budget, `SnuffledAnalysisBudget.LOW`, for the others.
+- at the MEDIUM budget, `SnuffledAnalysisBudget.MEDIUM`, for the others.
 
 The check reads only snuffled's diagnostics, not its function or root properties. It rejects the candidate at the first
 sampled tuple at which the diagnostics reject it, by the rules of `extract_properties_or_rejection_reason`.
@@ -53,7 +53,7 @@ def plan_snuffled_analyses(mc_solve_settings: MCSolveSettings) -> list[tuple[int
 
     `select_edge_biased_indices` picks `N_SNUFFLED_TUPLES` positions among all tuples sorted by ``c``. The sampled
     tuples at the positions `HIGH_BUDGET_POSITIONS` get `SnuffledAnalysisBudget.HIGH`, the others
-    `SnuffledAnalysisBudget.LOW`.
+    `SnuffledAnalysisBudget.MEDIUM`.
     """
     tuple_indices_by_c = np.argsort(mc_solve_settings.cs, kind="stable")
     sampled_tuple_indices = tuple_indices_by_c[
@@ -62,7 +62,7 @@ def plan_snuffled_analyses(mc_solve_settings: MCSolveSettings) -> list[tuple[int
     return [
         (
             int(mc_sample_idx),
-            SnuffledAnalysisBudget.HIGH if position in HIGH_BUDGET_POSITIONS else SnuffledAnalysisBudget.LOW,
+            SnuffledAnalysisBudget.HIGH if position in HIGH_BUDGET_POSITIONS else SnuffledAnalysisBudget.MEDIUM,
         )
         for position, mc_sample_idx in enumerate(sampled_tuple_indices)
     ]

@@ -45,7 +45,7 @@ def run_dir(cubic: problems.TestProblem, tmp_path_factory: pytest.TempPathFactor
         solver_configs=[SolverConfigRegistry.config_from_id(solver_id) for solver_id in SOLVER_IDS],
         problems=[cubic],
         run_dir=run_dir,
-        mc_size=MCTuplesSize.SIZE_32,
+        mc_size=MCTuplesSize.SIZE_16,
         n_workers=1,
     )
     return run_dir
@@ -58,7 +58,7 @@ def test_the_results_table_has_the_schema_and_1_row_per_solver_and_sample(run_di
 
     # --- assert -----------------------
     assert dict(results.schema) == RESULTS_SCHEMA
-    assert results.height == len(SOLVER_IDS) * MCTuplesSize.SIZE_32
+    assert results.height == len(SOLVER_IDS) * MCTuplesSize.SIZE_16
     assert results["solver_id"].unique(maintain_order=True).to_list() == list(SOLVER_IDS)
     assert results["problem_id"].unique().to_list() == [str(cubic.id)]
 

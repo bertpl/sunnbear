@@ -9,8 +9,8 @@ from sunnbear._core.benchmark.mc_tuples import MCTuplesSize
 @pytest.mark.parametrize(
     "max_size, sizes",
     [
-        (MCTuplesSize.SIZE_32, (32,)),
-        (64, (32, 64)),  # a plain int is accepted
+        (MCTuplesSize.SIZE_4, (4,)),
+        (16, (4, 16)),  # a plain int is accepted
         (MCTuplesSize.SIZE_1024, tuple(MCTuplesSize)),
     ],
 )
@@ -30,9 +30,9 @@ def test_up_to_rejects_a_size_outside_the_set():
 @pytest.mark.parametrize(
     "size, n_required, n_new",
     [
-        (MCTuplesSize.SIZE_32, 0, 32),  # the smallest size has no size below
-        (MCTuplesSize.SIZE_64, 32, 32),
-        (MCTuplesSize.SIZE_1024, 512, 512),
+        (MCTuplesSize.SIZE_4, 0, 4),  # the smallest size has no size below
+        (MCTuplesSize.SIZE_64, 16, 48),
+        (MCTuplesSize.SIZE_1024, 256, 768),
     ],
 )
 def test_n_required_and_n_new_split_a_size_into_the_size_below_and_its_new_tuples(size, n_required, n_new):

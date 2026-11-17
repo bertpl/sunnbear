@@ -25,11 +25,10 @@ class MCTuplesSize(IntEnum):
     returns it as a member.
     """
 
-    SIZE_32 = 32
+    SIZE_4 = 4
+    SIZE_16 = 16
     SIZE_64 = 64
-    SIZE_128 = 128
     SIZE_256 = 256
-    SIZE_512 = 512
     SIZE_1024 = 1024
 
     @classmethod
@@ -39,8 +38,8 @@ class MCTuplesSize(IntEnum):
 
     @property
     def size_below(self) -> "MCTuplesSize | None":
-        """Return the next smaller size, half as large, which this size includes; None for the smallest size."""
-        return None if self == min(MCTuplesSize) else MCTuplesSize(self // 2)
+        """Return the next smaller size, a quarter as large, which this size includes; None for the smallest size."""
+        return None if self == min(MCTuplesSize) else MCTuplesSize(self // 4)
 
     @property
     def n_required(self) -> int:

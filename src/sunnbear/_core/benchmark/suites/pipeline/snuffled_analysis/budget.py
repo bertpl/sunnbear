@@ -19,19 +19,18 @@ from .function_evaluation_error import FunctionEvaluationError
 class SnuffledAnalysisBudget(Enum):
     """A `SnuffledAnalysisBudget` names a budget of snuffled's analysis of 1 test problem at 1 Monte Carlo tuple.
 
-    `VERY_LOW` differs from `LOW` only in `n_roots`. An analysis's run time grows with the number of roots that it
-    analyzes, so `VERY_LOW` shortens the analysis of a function with more roots than `VERY_LOW.n_roots`, and analyzes
-    a function with at most `VERY_LOW.n_roots` roots as `LOW` does.
+    The members are ordered by the work of an analysis, from `LOW` to `HIGH`.
 
     Attributes:
         n_fun_samples: The number of x-values at which snuffled samples f across the interval.
         n_roots: The largest number of roots that snuffled analyzes.
-        n_root_samples: The number of x-values at which snuffled samples f around each root that it analyzes.
+        n_root_samples: The number of x-values at which snuffled samples f around each root that it analyzes, on both
+            sides together; snuffled may round it to a count that it supports.
     """
 
-    VERY_LOW = (1_000, 10, 30)
-    LOW = (1_000, 30, 30)
-    HIGH = (10_000, 100, 100)
+    LOW = (500, 16, 16)
+    MEDIUM = (2_000, 16, 32)
+    HIGH = (8_000, 64, 64)
 
     def __init__(self, n_fun_samples: int, n_roots: int, n_root_samples: int) -> None:
         """Store the sample counts of the member's value as the budget's attributes."""

@@ -19,7 +19,7 @@ from sunnbear.solvers import SolverConfigRegistry
 def _run_info_of(solver_ids: list[str], problem_ids: list[str], c_max: float = 1.0) -> BenchmarkRunInfo:
     """Return the run info of a run of `solver_ids` on `problem_ids`, each calibrated to c in [-1, `c_max`]."""
     return BenchmarkRunInfo.for_current_inputs(
-        run_settings=BenchmarkRunSettings(mc_size=32, n_bisection_fevals=40, root_seed=1),
+        run_settings=BenchmarkRunSettings(mc_size=16, n_bisection_fevals=40, root_seed=1),
         solver_configs=[SolverConfigRegistry.config_from_id(solver_id) for solver_id in solver_ids],
         problems=[FormulaRegistry.candidate_from_id(problem_id).calibrated(-1.0, c_max) for problem_id in problem_ids],
     )
