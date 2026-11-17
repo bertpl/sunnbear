@@ -23,7 +23,7 @@ def test_an_analysis_that_passes_returns_the_requested_properties(isolated_formu
     define_formula_cls((99, 941), lambda x, c: x - c - 1 / 3, -1.0, 1.0)
     problem = FormulaRegistry.candidate_from_id("f99.941").calibrated(c_min=-0.5, c_max=0.5)
     mc_solve_settings = MCSolveSettings.from_test_problem(
-        problem, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS, mc_tuples=load_mc_tuples(MCTuplesSize.SIZE_32)
+        problem, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS, mc_tuples=load_mc_tuples(MCTuplesSize.SIZE_16)
     )
     snuffler = SnuffledAnalysisBudget.LOW.build_snuffler(problem, mc_solve_settings=mc_solve_settings, mc_sample_idx=0)
     properties = [*RootProperty, *FunctionProperty]

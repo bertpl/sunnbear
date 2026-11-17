@@ -61,8 +61,8 @@ def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]
 # ==================================================================================================
 @pytest.mark.only_with_numba_jit
 def test_generator_builds_nested_symmetric_sizes_and_reports_each_size():
-    """A construction up to size 64 builds sizes 32 and 64 as a valid nested set (`_assert_valid_nested_set`), and
-    reports both sizes in order.
+    """A construction up to size 64 builds sizes 4, 16 and 64 as a valid nested set (`_assert_valid_nested_set`),
+    and reports each size in order.
 
     Only the structure is asserted: max-div's spread depends on the wall-clock time.
     """
@@ -78,7 +78,7 @@ def test_generator_builds_nested_symmetric_sizes_and_reports_each_size():
 
     # --- assert -----------------------
     assert tuples.size == 64
-    assert [int(result.size) for result in results] == [32, 64]
+    assert [int(result.size) for result in results] == [4, 16, 64]
     _assert_valid_nested_set(tuples, results)
     assert all(result.refined_base_tuple_array.shape == (int(result.size) // 4, 2) for result in results)
     assert all(result.selection_solution.score_checkpoints for result in results)
@@ -95,11 +95,11 @@ def test_generator_selects_and_refines_each_size_and_builds_the_next_on_it(monke
 
     # --- act --------------------------
     generator = MCTuplesGenerator(n_population=2**12, on_size_finished=results.append)
-    tuples = generator.generate(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_128)
+    tuples = generator.generate(t_total_sec=1.0, max_size=MCTuplesSize.SIZE_64)
 
     # --- assert -----------------------
-    assert tuples.size == 128
-    assert [int(result.size) for result in results] == [32, 64, 128]
+    assert tuples.size == 64
+    assert [int(result.size) for result in results] == [4, 16, 64]
     _assert_valid_nested_set(tuples, results)
     for result in results:
         n_required_base_tuples = result.size.n_required // 4
@@ -148,7 +148,7 @@ def test_generator_splits_each_size_s_budget_8_to_1_between_selection_and_refine
     generator.generate(t_total_sec=9.0, max_size=MCTuplesSize.SIZE_64)
 
     # --- assert -----------------------
-    assert [solve for solve, _ in budgets] == ["selection", "refinement"] * 2
+    assert [solve for solve, _ in budgets] == ["selection", "refinement"] * 3
     for i, result in enumerate(results):
         assert budgets[2 * i][1] == pytest.approx(8 / 9 * result.t_budget_sec)
         assert budgets[2 * i + 1][1] == pytest.approx(1 / 9 * result.t_budget_sec)

@@ -180,13 +180,13 @@ def test_the_build_details_give_each_stages_rejections_per_formula():
 
 
 def test_the_build_details_count_each_configs_incorrect_solves():
-    """Over the 3 candidates that coarse characterization kept, with 0, 1 and 2 incorrect solves of 32 each, the
-    config has 3 incorrect solves of 96."""
+    """Over the 3 candidates that coarse characterization kept, with 0, 1 and 2 incorrect solves of 64 each, the
+    config has 3 incorrect solves of 192."""
     # --- act --------------------------
     table = _distilled_state().create_build_details().incorrect_solves_table(PipelineStageId.COARSE_CHARACTERIZATION)
 
     # --- assert -----------------------
-    assert table.rows() == [("bisection", 96, 3, 3 / 96)]
+    assert table.rows() == [("bisection", 192, 3, 3 / 192)]
 
 
 @pytest.mark.parametrize(

@@ -16,7 +16,7 @@ from sunnbear._core.benchmark.runner.task import BenchmarkTask
 from sunnbear._core.problems.core import FormulaRegistry
 from sunnbear.solvers import SolverConfigRegistry
 
-MC_SIZE = 32
+MC_SIZE = 16
 
 _EXTERNAL_SOLVER_CONFIG_MODULE_NAME = f"{__name__.rpartition('.')[0]}.external_solver_config"
 

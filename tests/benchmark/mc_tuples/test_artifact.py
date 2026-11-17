@@ -104,5 +104,5 @@ def test_every_shipped_value_holds_at_least_min_n_bits():
 
 def test_load_mc_tuples_rejects_an_unsupported_size():
     """A size that is not one of the shipped sizes raises a `ValueError` listing them."""
-    with pytest.raises(ValueError, match=r"one of \[32, 64, 128, 256, 512, 1024\]"):
+    with pytest.raises(ValueError, match=r"one of \[4, 16, 64, 256, 1024\]"):
         load_mc_tuples(100)
