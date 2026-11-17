@@ -22,8 +22,8 @@ class SnuffledAnalysisBudget(Enum):
     Attributes:
         n_fun_samples: The number of x-values at which snuffled samples f across the interval.
         n_roots: The largest number of roots that snuffled analyzes.
-        n_root_samples: The number of x-values at which snuffled samples f around each root that it analyzes, on both
-            sides together; snuffled may round the number to a count that snuffled supports.
+        n_root_samples: The number of x-values at which snuffled samples f around each root that it analyzes,
+            counted over both sides of the root; snuffled may round the number to a count that it supports.
     """
 
     LOW = (500, 16, 16)

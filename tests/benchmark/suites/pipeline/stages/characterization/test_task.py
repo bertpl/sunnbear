@@ -65,8 +65,8 @@ def test_the_task_returns_a_characterization_or_a_reason_per_candidate(isolated_
 
 @pytest.mark.parametrize("fidelity", [FeatureFidelity.COARSE_DRAFT, FeatureFidelity.COARSE_PRODUCTION])
 def test_the_task_runs_the_snuffled_analyses_of_its_fidelity(isolated_formula_registry, monkeypatch, fidelity):
-    """The task runs 1 analysis at the fidelity's budget at each tuple of the shipped Monte Carlo tuple set of size
-    `snuffled_mc_size`, in the order of the tuples, and puts the analyses' properties in the snuffled features."""
+    """The task runs 1 analysis at each tuple of the shipped Monte Carlo tuple set of size `snuffled_mc_size`, in the
+    order of the tuples, each at the fidelity's budget, and puts the analyses' properties in the snuffled features."""
     # --- arrange ----------------------
     define_formula_cls((99, 964), lambda x, c: x - c - 1 / 3, -1.0, 1.0)
     analyses = []

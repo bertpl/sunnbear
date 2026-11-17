@@ -127,7 +127,7 @@ def test_the_random_starting_selection_needs_enough_candidates():
 # ==================================================================================================
 def test_validation_returns_a_valid_selection_s_new_candidates():
     """A selection of the dummy rotational sibling tuple, the size below's base tuple and 3 candidates in distinct
-    lanes meets the constraints of size 16, and its new candidates come back as they are."""
+    lanes meets the constraints of size 16, and `_validated_new_selection` returns its new candidates unchanged."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_16, _BASE_4, n_population=8192)
     new = np.sort(_distinct_lane_selection(solve, 3))
