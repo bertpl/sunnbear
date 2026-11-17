@@ -18,7 +18,7 @@ class FeatureFidelity(Enum):
       production mode;
     - `COARSE_DRAFT` and `FINE_DRAFT` are their fidelities in draft mode.
 
-    Each member writes out its own settings, also where 2 members' settings are equal today, so that a change to 1
+    Each member's value lists all of its own settings, even where 2 members' settings are equal, so that a change to 1
     member's settings leaves the others as they are.
 
     A member's value starts with the member's name. An enum merges members with equal values into 1 member, and the

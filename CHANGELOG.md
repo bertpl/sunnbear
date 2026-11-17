@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Change the sizes of the shipped Monte Carlo tuple set to 4, 16, 64, 256 and 1024; this changes benchmark results
+- Change the sizes of the shipped Monte Carlo tuple set, which `MCTuplesSize` lists, to 4, 16, 64, 256 and 1024; this changes benchmark results
 
 ### Deprecated
 

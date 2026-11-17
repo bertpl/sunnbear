@@ -19,13 +19,11 @@ from .function_evaluation_error import FunctionEvaluationError
 class SnuffledAnalysisBudget(Enum):
     """A `SnuffledAnalysisBudget` names a budget of snuffled's analysis of 1 test problem at 1 Monte Carlo tuple.
 
-    The members are ordered by the work of an analysis, from `LOW` to `HIGH`.
-
     Attributes:
         n_fun_samples: The number of x-values at which snuffled samples f across the interval.
         n_roots: The largest number of roots that snuffled analyzes.
         n_root_samples: The number of x-values at which snuffled samples f around each root that it analyzes, on both
-            sides together; snuffled may round it to a count that it supports.
+            sides together; snuffled may round the number to a count that snuffled supports.
     """
 
     LOW = (500, 16, 16)

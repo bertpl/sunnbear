@@ -65,8 +65,8 @@ def test_the_task_returns_a_characterization_or_a_reason_per_candidate(isolated_
 
 @pytest.mark.parametrize("fidelity", [FeatureFidelity.COARSE_DRAFT, FeatureFidelity.COARSE_PRODUCTION])
 def test_the_task_runs_the_snuffled_analyses_of_its_fidelity(isolated_formula_registry, monkeypatch, fidelity):
-    """The task runs 1 analysis at the fidelity's budget at each tuple of the set of size `snuffled_mc_size`, in
-    their order, and puts their properties in the snuffled features."""
+    """The task runs 1 analysis at the fidelity's budget at each tuple of the shipped Monte Carlo tuple set of size
+    `snuffled_mc_size`, in the order of the tuples, and puts the analyses' properties in the snuffled features."""
     # --- arrange ----------------------
     define_formula_cls((99, 964), lambda x, c: x - c - 1 / 3, -1.0, 1.0)
     analyses = []
@@ -83,10 +83,10 @@ def test_the_task_runs_the_snuffled_analyses_of_its_fidelity(isolated_formula_re
     [characterization] = task.run()
 
     # --- assert -----------------------
-    first_v_values = load_mc_tuples(fidelity.snuffled_mc_size).v
+    snuffled_v_values = load_mc_tuples(fidelity.snuffled_mc_size).v
     assert [(budget, mc_sample_idx) for budget, mc_sample_idx, _ in analyses] == [
         (fidelity.snuffled_budget, mc_sample_idx) for mc_sample_idx in range(fidelity.snuffled_mc_size)
     ]
-    assert [c for _, _, c in analyses] == list(MCSolveSettings.map_v_onto_c_range(first_v_values, c_range))
+    assert [c for _, _, c in analyses] == list(MCSolveSettings.map_v_onto_c_range(snuffled_v_values, c_range))
     assert isinstance(characterization, CandidateCharacterizationResult)
     np.testing.assert_array_equal(characterization.raw_features[-len(SNUFFLED_PROPERTIES) :], 0.0)

@@ -9,7 +9,7 @@ from sunnbear._core.benchmark.mc_tuples.construction.rotations import N_LOWER_FI
 from sunnbear._core.benchmark.mc_tuples.construction.selection import MCTuplesSelectionSolve
 from sunnbear._core.benchmark.mc_tuples.construction.solve import INCLUSION_CONSTRAINT_WEIGHT, MCTuplesSolveSettings
 
-# The 1 base tuple of the smallest size lies in 2 lower fine lanes, 32 apart: u in the first, v in the second.
+# The smallest size's only base tuple lies in 2 lower fine lanes, 32 apart: u in the first, v in the second.
 _LANES_4 = 5 + 32 * np.arange(2)
 _BASE_4 = np.column_stack([_LANES_4[0::2] + 0.5, _LANES_4[1::2] + 0.25]) / N_FINE_LANES
 
@@ -50,7 +50,7 @@ def test_the_population_lies_only_in_the_lower_fine_lanes_that_the_size_below_le
 
 def test_constraints_allow_1_new_value_per_free_lane_and_keep_the_dummy_rotational_sibling_tuple_and_the_size_below():
     """Size 16 gets 1 constraint per free lane that allows at most 1 candidate with its u or its v in that lane, and
-    the weighted constraint that keeps the dummy rotational sibling tuple and the 1 base tuple of the size below."""
+    the weighted constraint that keeps the dummy rotational sibling tuple and the only base tuple of the size below."""
     # --- arrange ----------------------
     solve = _solve(MCTuplesSize.SIZE_16, _BASE_4, n_population=8192)
     population = solve.population
@@ -80,8 +80,8 @@ def test_constraints_allow_1_new_value_per_free_lane_and_keep_the_dummy_rotation
 def test_the_random_starting_selection_holds_the_new_base_tuples_in_distinct_lanes(
     size, required_base_tuple_array, n_new_base_tuples
 ):
-    """The starting selection holds as many candidates as the size has new base tuples, ascending, with their
-    values in distinct lower fine lanes, 2 per base tuple."""
+    """The starting selection holds as many candidates as the size has new base tuples, ascending, and the u
+    and v values of these candidates lie in distinct lower fine lanes, 1 lane per value."""
     # --- arrange ----------------------
     solve = _solve(size, required_base_tuple_array, n_population=8192)
 
