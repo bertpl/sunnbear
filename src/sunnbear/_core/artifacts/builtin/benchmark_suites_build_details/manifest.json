@@ -1,31 +1,31 @@
 {
   "archive": {
-    "sha256": "7196fb9b662d581d3ccd1bf6e81ff9f9fcdd4dc1e5b547db6e10e4c548050fab",
-    "size_bytes": 1350409,
-    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-9acbbce5/benchmark_suites_build_details.tar.zst"
+    "sha256": "f80faafcc014b1ca26c7c11b3f5b5c13d95e48d14b30331eea0edf496252e011",
+    "size_bytes": 1448299,
+    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-f88d501e/benchmark_suites_build_details.tar.zst"
   },
-  "build_date": "2026-11-16",
+  "build_date": "2026-11-17",
   "built_with": {
     "max-div": "0.21.8",
     "snuffled": "0.1.11",
     "sunnbear": "0.4.1+dev"
   },
-  "content_hash": "9acbbce55a5155304ff0966743d5a25017a53156bbdc58dafcc1efb8438c3d52",
+  "content_hash": "f88d501e04c9e0563a222873ddeaab3d612c505bd2ef2afbf91f1d548d56064f",
   "files": [
     {
       "path": "c_ranges.parquet",
-      "sha256": "446862e726439ad86033f27977b13dd3f48d2e65141c3d5aeb1fbee993c3cc66",
-      "size_bytes": 24522
+      "sha256": "893f9f8c9fd0e80de637ec9a68661ae29ec770026632a9620f415ed8bf008854",
+      "size_bytes": 24565
     },
     {
       "path": "candidate_registry.parquet",
-      "sha256": "c1da2f56c116024dec34b3e654ecc7ff5c0773a109a734c83c358ef7c44b8dcc",
-      "size_bytes": 18116
+      "sha256": "0a166e58164cc864d47807d78eec3a661a34e682c11f83b0ac83b704c69498d5",
+      "size_bytes": 18119
     },
     {
       "path": "difficulty_tiers.parquet",
-      "sha256": "fd1594184a8b346459ad7924c3cb5276cfd82f88475fc0b30913059f2caf5d26",
-      "size_bytes": 14180
+      "sha256": "67a3df0c6791712f7f0e980081ed12d300a7c88c87c86c41c47384db3737c4bd",
+      "size_bytes": 14276
     },
     {
       "path": "interval_bounds.parquet",
@@ -34,7 +34,7 @@
     },
     {
       "path": "nearest_kept_candidates.parquet",
-      "sha256": "d188290a64342c7e88900e3be8cf47d2a29e8ebcd234592a519a22b4531b3677",
+      "sha256": "65b5535fa86a6f6f92a6d5fc8c781fea92289aed81c83d978c70467bc496682f",
       "size_bytes": 2122
     },
     {
@@ -44,29 +44,29 @@
     },
     {
       "path": "s3_coarse_characterization_raw_features.parquet",
-      "sha256": "2cbb1be5fac7b703a5ef179a576f9664df743db3c21dcc9052d30773b6361dcb",
-      "size_bytes": 728326
+      "sha256": "ef2a2c4678491d453d44e7d77feffa0316b9b39263af88523962035c7fccecb0",
+      "size_bytes": 738922
     },
     {
       "path": "s5_fine_characterization_raw_features.parquet",
-      "sha256": "869c347fa5819ae37b687090ab2cfdeb3ba441817e57ecff275d64d201e00ac1",
-      "size_bytes": 732857
+      "sha256": "1b584916610e8f4521f7a145573d13c0acf1e818a4c41dda4728afe6c2b50bbb",
+      "size_bytes": 747835
     },
     {
       "path": "storage.json",
-      "sha256": "9fa191823f57197743f495b2aedf65c38e6bb21ee7d743e50dfeae6b340fa1a1",
-      "size_bytes": 225526
+      "sha256": "1c0eddd6fe4e15fce65c98d2052443ff281c6127109e6a1bcf61750fa6f4fe31",
+      "size_bytes": 226090
     }
   ],
   "generated_by": {
     "arguments": {
-      "mode": "DRAFT",
+      "mode": "PRODUCTION",
       "n_workers": 12
     },
     "function": "sunnbear._core.benchmark.suites.pipeline.run_pipeline"
   },
   "input_artifact_hashes": {
-    "mc_tuples": "cb162529912f1dae6151c63aaede47a40fa88d2b3c788fb73a3795365ff4f0cb"
+    "mc_tuples": "bf13ed4a497da78f6582d8fb8284c23e19ba5b817e98d0e5b23e46b31b161a68"
   },
   "name": "benchmark_suites_build_details"
 }
