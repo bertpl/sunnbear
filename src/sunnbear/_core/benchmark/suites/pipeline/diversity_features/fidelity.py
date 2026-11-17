@@ -21,8 +21,15 @@ class FeatureFidelity(Enum):
     Each member's value lists all of its own settings, even where 2 members' settings are equal, so that a change to 1
     member's settings leaves the others as they are.
 
-    A member's value starts with the member's name. An enum merges members with equal values into 1 member, and the
-    name keeps 2 fidelities with the same settings apart.
+    A member's value is a tuple of 4 elements, in this order:
+
+    - the member's name, which keeps equal settings apart;
+    - `solver_mc_size`, the tuple set size of the solves;
+    - `snuffled_mc_size`, the tuple set size of snuffled's analyses;
+    - `snuffled_budget`, the budget of each snuffled analysis.
+
+    An enum merges members with equal values into 1 member, so the name keeps 2 fidelities with the same settings
+    apart.
 
     Attributes:
         solver_mc_size: The size of the Monte Carlo tuple set for the solves of the core solver configs.
