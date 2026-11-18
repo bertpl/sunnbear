@@ -178,10 +178,10 @@ def test_validation_refuses_a_selection_that_leaves_an_lhs_lane_without_exactly_
     solve = _solve(MCTuplesSize.SIZE_16, _BASE_4, n_population=8192)
     new = solve._initial_new_selection().copy()
     u, v = solve.population.u, solve.population.v
-    lanes_of = MCTuplesSize.SIZE_16.lhs_lane_indices
+    lhs_lane_indices = MCTuplesSize.SIZE_16.lhs_lane_indices
     tiles = MCTuplesSize.SIZE_16.tile_indices(u, v)
-    is_in_same_tile_and_v_lane = (tiles == tiles[new[0]]) & (lanes_of(v) == lanes_of(v)[new[0]])
-    new[0] = np.flatnonzero(is_in_same_tile_and_v_lane & (lanes_of(u) != lanes_of(u)[new[0]]))[0]
+    is_in_same_tile_and_v_lane = (tiles == tiles[new[0]]) & (lhs_lane_indices(v) == lhs_lane_indices(v)[new[0]])
+    new[0] = np.flatnonzero(is_in_same_tile_and_v_lane & (lhs_lane_indices(u) != lhs_lane_indices(u)[new[0]]))[0]
 
     # --- act / assert -----------------
     with pytest.raises(MCTuplesConstructionError, match="Size 16: LHS lanes along u that do not hold exactly 1 tuple"):

@@ -1,4 +1,4 @@
-"""`MCTuplesSize` lists the sizes in which the shipped Monte Carlo tuple set comes, and divides each size's square.
+"""`MCTuplesSize` lists the sizes of the shipped Monte Carlo tuple set, and divides the unit square for each size.
 
 A size of `n` tuples divides the unit square in 2 ways:
 
@@ -40,8 +40,8 @@ class MCTuplesSize(IntEnum):
     - `sqrt(n)` by `sqrt(n)` tiles, each where 1 of `sqrt(n)` equal tile columns along u crosses 1 of as many equal
       tile rows along v; a tile holds `sqrt(n)` by `sqrt(n)` LHS cells.
 
-    Every size is a power of 4, so `sqrt(n)` is a whole number, and each LHS lane and each tile of a size holds 4 LHS
-    lanes and 2 by 2 tiles of the next size.
+    Every size is a power of 4, so `sqrt(n)` is a whole number, each LHS lane of a size holds 4 LHS lanes of the next
+    size, and each tile holds 2 by 2 tiles of the next size.
     """
 
     SIZE_4 = 4
@@ -123,6 +123,20 @@ class MCTuplesSize(IntEnum):
         rows = np.floor(v * self.n_tiles_per_axis).astype(np.int64)
         return columns * self.n_tiles_per_axis + rows
 
+    @property
+    def lower_half_tile_indices(self) -> np.ndarray:
+        """Return the indices of the size's tiles in [0, 0.5]^2, ascending."""
+        lower_half = np.arange(self.n_tiles_per_axis // 2)
+        return (lower_half[:, None] * self.n_tiles_per_axis + lower_half[None, :]).ravel()
+
+    def tile_columns_and_rows(self, tile_indices: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        """Return the tile column and the tile row of each tile in `tile_indices`, the inverse of `tile_indices`."""
+        return np.divmod(tile_indices, self.n_tiles_per_axis)
+
+    def tile_columns_of_lhs_lanes(self, lane_indices: np.ndarray) -> np.ndarray:
+        """Return the tile column that holds each LHS lane in `lane_indices`, or the tile row for a lane along v."""
+        return lane_indices // (int(self) // self.n_tiles_per_axis)
+
     # --------------------------------------------------------------------------
     #  Check of a size's tuples
     # --------------------------------------------------------------------------
@@ -131,9 +145,6 @@ class MCTuplesSize(IntEnum):
 
         `tuple_array` is an `(n, 2)` array of (u, v) values in the open unit square, so it passes only when it holds
         exactly `size` tuples.
-
-        Raises:
-            ValueError: If an LHS lane or a tile holds no tuple, or 2 or more.
         """
         u, v = tuple_array[:, 0], tuple_array[:, 1]
         indices_per_part = {

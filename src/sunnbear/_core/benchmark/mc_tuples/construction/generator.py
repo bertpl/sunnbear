@@ -44,8 +44,9 @@ from .solve import MCTuplesSolveSettings
 # constants, so that the 3 cannot drift apart; `generate_mc_tuples` documents each argument.
 DEFAULT_N_WORKERS = 32
 DEFAULT_SEED = 42
-# 2^18 gives the largest size's selection solve about 2 candidates per LHS cell of its free lanes; its starting
-# selection draws a candidate in each LHS cell that it needs and that holds none.
+# A population of 2^18 candidates gives the largest size's selection solve about 2 candidates per LHS cell of its free
+# lanes; its starting selection draws a new candidate in each LHS cell that the starting selection needs and that holds
+# no candidate.
 DEFAULT_N_POPULATION = 2**18
 DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL = 256
 
@@ -284,10 +285,10 @@ def generate_mc_tuples(
             `t_total_sec` is, so a short run that wants fewer sizes passes a smaller `max_size`.
         n_population: The number of candidate base tuples drawn for each size's selection solve, at least 1; the
             candidates in a diagonal LHS cell, whose u and v share an LHS lane, and those in a tile of the size below
-            are dropped, and the starting selection adds a candidate in each LHS cell that it needs and that holds
-            none.
+            are dropped. max-div starts from 1 candidate in each tile that the size below leaves empty; where the LHS
+            cell chosen for that candidate holds none, a new candidate is drawn in it.
         n_refinement_random_candidates_per_cell: The number of random candidate base tuples that the refinement solve
-            draws in each LHS cell of the largest size of a new base tuple, at least 1.
+            draws in each LHS cell of the largest size that holds a new base tuple, at least 1.
 
     Raises:
         ValueError: If `t_total_sec` is below 1 s, `n_workers`, `n_population` or

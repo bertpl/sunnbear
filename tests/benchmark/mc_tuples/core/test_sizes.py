@@ -92,6 +92,37 @@ def test_tile_indices_numbers_each_tile_by_its_column_and_row():
     ]
 
 
+@pytest.mark.parametrize(
+    "size, lower_half_tile_indices",
+    [(MCTuplesSize.SIZE_4, [0]), (MCTuplesSize.SIZE_16, [0, 1, 4, 5])],
+)
+def test_lower_half_tile_indices_lists_the_tiles_in_the_lower_left_quarter(size, lower_half_tile_indices):
+    """The tiles in [0, 0.5]^2 are those whose tile column and tile row both lie in the lower half."""
+    # --- act / assert -----------------
+    assert size.lower_half_tile_indices.tolist() == lower_half_tile_indices
+
+
+def test_tile_columns_and_rows_inverts_tile_indices():
+    """At size 64, the tile column and the tile row of each of the 64 tiles number it back to the same index."""
+    # --- arrange ----------------------
+    size = MCTuplesSize.SIZE_64
+    centers = (np.arange(8) + 0.5) / 8
+    u, v = np.meshgrid(centers, centers, indexing="ij")
+
+    # --- act --------------------------
+    columns, rows = size.tile_columns_and_rows(size.tile_indices(u.ravel(), v.ravel()))
+
+    # --- assert -----------------------
+    assert columns.tolist() == np.repeat(np.arange(8), 8).tolist()
+    assert rows.tolist() == np.tile(np.arange(8), 8).tolist()
+
+
+def test_tile_columns_of_lhs_lanes_gives_the_tile_column_under_which_each_lhs_lane_lies():
+    """At size 16, each tile spans 4 LHS lanes per axis, so LHS lanes 0 to 3 lie under tile column 0, 4 to 7 under 1."""
+    # --- act / assert -----------------
+    assert MCTuplesSize.SIZE_16.tile_columns_of_lhs_lanes(np.array([0, 3, 4, 7, 15])).tolist() == [0, 0, 1, 1, 3]
+
+
 def _grid_tuple_array(size: MCTuplesSize) -> np.ndarray:
     """Return `size` tuples that hold exactly 1 tuple in each LHS lane and each tile of `size`.
 
@@ -137,7 +168,7 @@ def _move_tuple_0_into_the_lhs_lanes_of_tuple_1(axis: int):
         (
             lambda tuple_array: tuple_array[1:],
             "LHS lanes along u that do not hold exactly 1 tuple: 1 of 16",
-        ),  # tuple 0 dropped
+        ),  # tuple 0 is dropped
     ],
 )
 def test_check_lhs_lanes_and_tiles_refuses_an_lhs_lane_or_a_tile_without_exactly_1_tuple(change, message):

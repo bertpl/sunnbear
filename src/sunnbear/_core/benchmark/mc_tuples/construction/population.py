@@ -15,6 +15,9 @@ The selection's population is drawn in 3 steps:
 2. each candidate lies at its own uniform random position inside its LHS cell;
 3. the candidates outside the given tiles are dropped.
 
+The selection's starting selection then takes 1 candidate in each of a list of LHS cells, and draws a new candidate in
+a cell where the population holds none (`pick_or_draw_in_lhs_cells`).
+
 The refinement's population lies only in the LHS cells of given base tuples: each base tuple comes first, followed by
 `n_random_candidates_per_cell` candidates at uniform random positions inside its LHS cell.
 
@@ -54,16 +57,38 @@ class MCTuplesPopulation:
         """Return the candidate base tuples as an `(n, 2)` array of (u, v) values."""
         return np.column_stack([self.u, self.v])
 
-    def extended_by(self, other: "MCTuplesPopulation") -> "MCTuplesPopulation":
-        """Return this population followed by the candidates of `other`."""
-        return MCTuplesPopulation(u=np.concatenate([self.u, other.u]), v=np.concatenate([self.v, other.v]))
+    def pick_or_draw_in_lhs_cells(
+        self, u_lanes: np.ndarray, v_lanes: np.ndarray, size: MCTuplesSize, rng: np.random.Generator
+    ) -> tuple["MCTuplesPopulation", np.ndarray]:
+        """Return this population, extended where needed, and 1 candidate in each LHS cell that the lane pairs name.
+
+        Each LHS cell of `size` `(u_lanes[i], v_lanes[i])` takes a random candidate of this population inside it, or,
+        when this population holds none there, a new candidate drawn inside it and appended to the population.
+
+        Returns:
+            The extended population, and the picked candidates as indices into it, ascending.
+        """
+        # A cell's id is unique among the cells of `size`, so that sorting the ids groups the candidates by cell.
+        cell_ids = size.lhs_lane_indices(self.u) * int(size) + size.lhs_lane_indices(self.v)
+        order = np.argsort(cell_ids, kind="stable")
+        sorted_cell_ids = cell_ids[order]
+        wanted_cell_ids = u_lanes * int(size) + v_lanes
+        starts = np.searchsorted(sorted_cell_ids, wanted_cell_ids, side="left")
+        ends = np.searchsorted(sorted_cell_ids, wanted_cell_ids, side="right")
+        has_candidate = ends > starts
+        picked = np.empty(wanted_cell_ids.size, dtype=np.int64)
+        picked[has_candidate] = order[starts[has_candidate] + rng.integers(ends[has_candidate] - starts[has_candidate])]
+        drawn = self.draw_1_in_each_lhs_cell(u_lanes[~has_candidate], v_lanes[~has_candidate], size, rng)
+        picked[~has_candidate] = self.u.size + np.arange(drawn.u.size)
+        extended = MCTuplesPopulation(u=np.concatenate([self.u, drawn.u]), v=np.concatenate([self.v, drawn.v]))
+        return extended, np.sort(picked)
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
     @staticmethod
     def _draw_values_in_lhs_lanes(lane_indices: np.ndarray, size: MCTuplesSize, rng: np.random.Generator) -> np.ndarray:
-        """Return 1 random value inside each LHS lane of `size` in `lane_indices`, its mirror included.
+        """Return 1 random value inside each LHS lane of `size` in `lane_indices`.
 
         Each value and its mirror, 1 - value, hold at least `MIN_N_BITS` bits.
         """
@@ -82,7 +107,7 @@ class MCTuplesPopulation:
     #  Factory methods
     # --------------------------------------------------------------------------
     @classmethod
-    def draw_in_lhs_cells(
+    def draw_1_in_each_lhs_cell(
         cls, u_lane_indices: np.ndarray, v_lane_indices: np.ndarray, size: MCTuplesSize, rng: np.random.Generator
     ) -> "MCTuplesPopulation":
         """Return 1 candidate at a uniform random position inside each LHS cell of `size` that the 2 lane arrays name.
@@ -116,7 +141,7 @@ class MCTuplesPopulation:
             count=n_population,
         )
         cells = cells[cells[:, 0] != cells[:, 1]]
-        population = cls.draw_in_lhs_cells(free_lanes[cells[:, 0]], free_lanes[cells[:, 1]], size, rng)
+        population = cls.draw_1_in_each_lhs_cell(free_lanes[cells[:, 0]], free_lanes[cells[:, 1]], size, rng)
         is_in_free_tile = np.isin(size.tile_indices(population.u, population.v), free_tiles)
         return cls(u=population.u[is_in_free_tile], v=population.v[is_in_free_tile])
 

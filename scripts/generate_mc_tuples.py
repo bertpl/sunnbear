@@ -66,7 +66,10 @@ def main() -> None:
         "--n-refinement-random-candidates-per-cell",
         type=int,
         default=DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL,
-        help="candidate base tuples per LHS cell of the largest size of a new base tuple in the refinement solve",
+        help=(
+            "candidate base tuples per new base tuple in the refinement solve, "
+            "in the LHS cell of the largest size that holds it"
+        ),
     )
     parser.add_argument("--inspection-dir", type=Path, help="directory for the tuples and solutions of each size")
     parser.add_argument(

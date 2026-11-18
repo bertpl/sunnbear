@@ -4,8 +4,8 @@ The MC tuples are the (u, v) tuples that every Monte Carlo benchmark run samples
 
 - `MCTuples` holds a set of tuples, maps them onto a test problem, reports their spread as `MCTuplesStats`, and
   reports how many bits of information their values hold as `MCTuplesBitStats`;
-- `MCTuplesSize` lists the set's sizes and divides each size's square into LHS lanes and tiles; `MIN_N_BITS` is the
-  fewest bits of information that `generate_mc_tuples` leaves in any value;
+- `MCTuplesSize` lists the set's sizes and divides the unit square into LHS lanes and tiles for each size; `MIN_N_BITS`
+  is the fewest bits of information that `generate_mc_tuples` leaves in any value;
 - `generate_mc_tuples` constructs a nested set that is symmetric under rotations by 90 degrees around (0.5, 0.5), so
   every size's means are 0.5 on both axes, and every size holds exactly 1 tuple in each of its LHS lanes and tiles. It
   delegates to `MCTuplesGenerator`, which runs 2 max-div solves per size (`construction`) and reports each size's
