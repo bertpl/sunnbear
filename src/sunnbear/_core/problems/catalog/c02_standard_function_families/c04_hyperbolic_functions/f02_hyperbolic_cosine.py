@@ -31,9 +31,10 @@ class HyperbolicCosine(Formula):
     def parametrized_fun(x: float, c: float, b: float) -> float:
         """Evaluate ``cosh(u) - cosh(v)`` as ``2*sinh((u + v)/2)*sinh((u - v)/2)``, with ``u = x - c`` and ``v = b/2``.
 
-        The 2 forms are equal. Subtracting the 2 values of ``cosh`` would cancel their leading digits next to the root:
-        for a small ``b`` both values are close to 1, so the function would be exactly 0 on a band of x around the
-        root, and bisection would stop early where a midpoint lands on that band.
+        The 2 forms are equal. Subtracting the 2 values of ``cosh`` would cancel their leading digits next to the root.
+
+        For a small ``b`` both values are close to 1, so the function would be exactly 0 on a band of x around the root,
+        and bisection would stop early where a midpoint lands on that band.
         """
         u = x - c
         v = 0.5 * b

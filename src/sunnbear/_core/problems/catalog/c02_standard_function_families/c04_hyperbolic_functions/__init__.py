@@ -14,8 +14,9 @@ The category has 2 kinds of formulas, which differ in how ``c`` enters:
   and ``c`` changes the values at the bounds or, for ``tanh``, where the step lies.
 - **`InverseHyperbolicSine`, `InverseHyperbolicCosine` and `InverseHyperbolicTangent` add ``c`` to the function
   value.** A shift of ``x`` would move the edge of ``acosh``'s domain and the poles of ``atanh`` into the interval.
-  Each of these 3 formulas divides the function by its value at a bound, so that every candidate of a formula has
-  the same c-range.
+
+Each of the 3 inverse hyperbolic formulas divides the function by its value at a bound, so that every candidate of a
+formula has the same c-range.
 """
 
 from sunnbear._core.problems.core import FormulaCategory

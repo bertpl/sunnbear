@@ -70,7 +70,7 @@ def test_hyperbolic_cosine_has_the_sign_of_x_minus_its_root_next_to_its_root():
 
 
 @pytest.mark.parametrize("c", [0.0, 0.3, -0.7])
-def test_hyperbolic_tangent_at_level_1_has_the_sign_of_x_minus_c_next_to_its_root(c):
+def test_hyperbolic_tangent_at_d_equal_to_1_has_the_sign_of_x_minus_c_next_to_its_root(c):
     """At ``d = 1``, `HyperbolicTangent` is 0 at its root ``x = c`` and has the sign of ``x - c`` at the floats next
     to it, where ``1 + tanh(x - c)`` rounds to 1."""
     # --- arrange ----------------------
@@ -85,12 +85,12 @@ def test_hyperbolic_tangent_at_level_1_has_the_sign_of_x_minus_c_next_to_its_roo
         assert candidate.xc_fun(math.nextafter(c, math.inf), c) > 0.0, candidate.id
 
 
-def test_hyperbolic_tangent_keeps_full_precision_at_every_level_of_its_root():
-    """At every level ``d`` of the root, `HyperbolicTangent` agrees with ``1 + tanh(x) - d`` from mpmath at x-values
+def test_hyperbolic_tangent_keeps_full_precision_across_the_sweep_of_d():
+    """At every ``d`` in the sweep of ``d``, `HyperbolicTangent` agrees with ``1 + tanh(x) - d`` from mpmath at x-values
     around the root, to within a few ulps of the larger of ``1 + tanh(x)`` and ``d``.
 
-    Computed as written, ``1 + tanh(x)`` has an error of about 1e-16 whatever its size, which next to a root at
-    ``d = 10^-15`` is about 10 % of ``d``.
+    Computed by adding 1 to ``tanh(x)``, ``1 + tanh(x)`` has an error of about 1e-16 whatever its size, which next to
+    a root at ``d = 10^-15`` is about 10 % of ``d``.
     """
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number((2, 4, 3))

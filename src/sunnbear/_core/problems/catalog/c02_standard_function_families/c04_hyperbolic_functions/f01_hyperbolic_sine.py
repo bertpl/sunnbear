@@ -12,7 +12,7 @@ class HyperbolicSine(Formula):
     small ``b``, and grows as an exponential toward both bounds for a large ``b``.
 
     ``c`` shifts x, so the root lies at ``x = c``. For a large ``b``, a shift by ``c`` multiplies the value at 1 bound
-    by about ``exp(abs(c))`` and divides the value at the other bound by it.
+    by about ``exp(abs(c))`` and divides the value at the other bound by the same factor.
 
     References:
         - NIST Digital Library of Mathematical Functions, §4.28, for the definition. https://dlmf.nist.gov/4.28
