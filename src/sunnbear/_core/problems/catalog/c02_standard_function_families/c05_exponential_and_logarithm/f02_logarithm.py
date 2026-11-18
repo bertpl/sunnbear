@@ -11,11 +11,11 @@ class Logarithm(Formula):
     ``log`` has a singularity at 0. ``d`` is the distance from the singularity to the lower bound of the interval, and
     lies between 0 and 1.
 
-    For a ``d`` close to 1 the function is close to a line, and for a small ``d`` it is steep next to the lower bound
-    and flat over most of the interval.
+    For a ``d`` close to 1 the function is close to a line, and for a small ``d`` the function is steep next to the
+    lower bound and flat over most of the interval.
 
     At ``c = 0``, the division by ``log(1/d)`` makes the function -1 at the lower bound and 1 at the upper bound, for
-    every ``d``.
+    every ``d``, so that every candidate has the same c-range.
 
     ``c`` adds to the function value, so the root lies at ``x = d^((1 + c)/2)``: at ``sqrt(d)`` for ``c = 0``, and
     closer to the singularity for a larger ``c``.
@@ -41,8 +41,8 @@ class Logarithm(Formula):
         """Return the recipe that sweeps ``d`` from 10^-15 to 10^-0.1.
 
         The recipe does not leave out the candidates that fail the benchmark suite inclusion conditions. For the
-        smallest ``d``, the range of ``c`` lets the root come too close to the lower bound to satisfy the conditions,
-        so no benchmark suite holds such a candidate.
+        smallest values of ``d``, the range of ``c`` lets the root come too close to the lower bound to satisfy the
+        conditions, so no benchmark suite holds a candidate with such a ``d``.
         """
         return (ParamGrid(axes=(ParamAxis("d", -15.0, -0.1, 0.1, ParamNotation.POW10),)),)
 

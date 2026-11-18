@@ -47,7 +47,7 @@ def test_every_candidate_has_opposite_signs_at_the_bounds_of_its_interval(formul
 
 @pytest.mark.parametrize("c", [0.0, 0.05, -0.07])
 def test_exponential_has_the_sign_of_x_minus_c_next_to_its_root(c):
-    """`Exponential` is 0 at its root ``x = c`` and has the sign of ``x - c`` at the floats next to it, where
+    """`Exponential` is 0 at its root ``x = c`` and has the sign of ``x - c`` at the floats next to the root, where
     ``exp(x - c)`` rounds to 1."""
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number((2, 5, 1))

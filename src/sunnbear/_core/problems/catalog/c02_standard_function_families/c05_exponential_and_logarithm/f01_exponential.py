@@ -10,11 +10,11 @@ class Exponential(Formula):
 
     ``b`` is the upper bound of the interval, any value above 0.
 
-    The function is close to the line ``x - c`` for a small ``b``. For a large ``b``, it is close to -1 over most of
-    the lower half of the interval, and grows as an exponential toward the upper bound.
+    The function is close to the line ``x - c`` for a small ``b``. For a large ``b``, the function is close to -1 over
+    most of the lower half of the interval, and grows as an exponential toward the upper bound.
 
     ``c`` shifts x, so the root lies at ``x = c``. Next to the root, ``exp(x - c)`` is close to 1, so the function is
-    computed as ``expm1(x - c)``, which keeps its full precision there.
+    computed as ``expm1(x - c)``, which keeps full precision there.
 
     References:
         - NIST Digital Library of Mathematical Functions, §4.2, for the definition. https://dlmf.nist.gov/4.2
@@ -36,7 +36,8 @@ class Exponential(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps ``b`` from 10^-1 to 10^2.
 
-        At the low end the function is close to a line. At the high end its value at the upper bound is about 2.7e43.
+        At the low end the function is close to a line. At the high end the function's value at the upper bound is about
+        2.7e43.
         """
         return (ParamGrid(axes=(ParamAxis("b", -1.0, 2.0, 0.02, ParamNotation.POW10),)),)
 
