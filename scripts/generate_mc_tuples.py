@@ -16,7 +16,7 @@ time. The script:
   - `k<size>_selected.csv`, after the selection solve;
   - `k<size>.csv`, after the refinement solve;
   - `k<size>_selection_solution.pkl` and `k<size>_refinement_solution.pkl`;
-- prints the spread of every size, its means and its largest number of tuples in 1 fine lane, and the overall score;
+- prints the spread of every size, its means, and the overall score;
 - saves the set through `ArtifactStore`, which records in the artifact's manifest the `generate_mc_tuples` call with
   the arguments that the script passes to `MCTuplesGenerator`, and max-div's version; `--no-save` skips saving the
   set, for a trial run.
@@ -40,13 +40,11 @@ from sunnbear._core.benchmark.mc_tuples import (
     DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL,
     DEFAULT_N_WORKERS,
     DEFAULT_SEED,
-    N_FINE_LANES,
     MCTuplesDeclaration,
     MCTuplesGenerator,
     MCTuplesSize,
     MCTuplesSizeResult,
     MCTuplesStats,
-    fine_lanes_of,
 )
 
 
@@ -68,7 +66,7 @@ def main() -> None:
         "--n-refinement-random-candidates-per-cell",
         type=int,
         default=DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL,
-        help="candidate base tuples per fine cell of a new base tuple in the refinement solve",
+        help="candidate base tuples per LHS cell of the largest size of a new base tuple in the refinement solve",
     )
     parser.add_argument("--inspection-dir", type=Path, help="directory for the tuples and solutions of each size")
     parser.add_argument(
@@ -96,22 +94,18 @@ def main() -> None:
     )
     tuples = generator.generate(arguments["t_total_sec"], arguments["max_size"])
 
-    print(
-        "| size | min separation L2 / u / v | gpq(0.1) u / v / L2 | score | mean offset u / v | tuples per fine lane |"
-    )
-    print("|---|---|---|---|---|---|")
+    print("| size | min separation L2 / u / v | gpq(0.1) u / v / L2 | score | mean offset u / v |")
+    print("|---|---|---|---|---|")
     scores = []
     for size in (size for size in MCTuplesSize if size <= tuples.size):
         size_tuples = tuples.first(size)
         stats = size_tuples.stats()
         scores.append(stats.score)
-        offsets = [(math.fsum(values) / size - 0.5) * N_FINE_LANES for values in (size_tuples.u, size_tuples.v)]
-        max_per_lane = max(int(np.bincount(fine_lanes_of(values)).max()) for values in (size_tuples.u, size_tuples.v))
+        offsets = [math.fsum(values) / size - 0.5 for values in (size_tuples.u, size_tuples.v)]
         print(
             f"| {size} | {stats.min_separation_l2_fraction:.1%} / {stats.min_separation_u_fraction:.1%} / "
             f"{stats.min_separation_v_fraction:.1%} | {stats.gpq_u_fraction:.1%} / {stats.gpq_v_fraction:.1%} / "
-            f"{stats.gpq_l2_fraction:.1%} | {stats.score:.1%} | {offsets[0]:+.1e} / {offsets[1]:+.1e} | "
-            f"at most {max_per_lane} |"
+            f"{stats.gpq_l2_fraction:.1%} | {stats.score:.1%} | {offsets[0]:+.1e} / {offsets[1]:+.1e} |"
         )
     print(f"Overall score, the geomean of the sizes' scores: {math.exp(np.mean(np.log(scores))):.1%}")
 

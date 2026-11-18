@@ -8,11 +8,9 @@ import pytest
 from sunnbear._core.artifacts import ArtifactError
 from sunnbear._core.benchmark.mc_tuples import (
     MIN_N_BITS,
-    N_FINE_LANES,
     MCTuples,
     MCTuplesDeclaration,
     MCTuplesSize,
-    fine_lanes_of,
     load_mc_tuples,
 )
 
@@ -52,9 +50,8 @@ def test_load_mc_tuples_returns_a_prefix_of_the_shipped_set(size):
 
 
 @pytest.mark.parametrize("size", MCTuplesSize)
-def test_each_shipped_size_has_means_of_exactly_0_5_and_at_most_1_tuple_per_fine_lane(size):
-    """Each shipped size's mean u and mean v round to exactly 0.5, and no 2 of its tuples share a fine lane along u or
-    along v.
+def test_each_shipped_size_has_means_of_exactly_0_5(size):
+    """Each shipped size's mean u and mean v round to exactly 0.5.
 
     Each value pairs with its mirror 1 - value, so the exact sum of a size's values differs from size / 2 by far less
     than half a float step; `math.fsum` rounds only that exact sum, so the mean rounds to 0.5.
@@ -64,8 +61,14 @@ def test_each_shipped_size_has_means_of_exactly_0_5_and_at_most_1_tuple_per_fine
 
     # --- assert -----------------------
     assert [math.fsum(values) / size for values in (tuples.u, tuples.v)] == [0.5, 0.5]
-    for values in (tuples.u, tuples.v):
-        assert np.bincount(fine_lanes_of(values)).max() == 1
+
+
+@pytest.mark.parametrize("size", MCTuplesSize)
+def test_each_shipped_size_holds_exactly_1_tuple_per_lhs_lane_and_per_tile(size):
+    """Each shipped size holds exactly 1 tuple in each of its LHS lanes, along u and along v, and in each of its tiles
+    (`MCTuplesSize.check_lhs_lanes_and_tiles`)."""
+    # --- act / assert -----------------
+    size.check_lhs_lanes_and_tiles(load_mc_tuples(size).tuple_array)
 
 
 @pytest.mark.parametrize("size", MCTuplesSize)
@@ -81,16 +84,6 @@ def test_each_shipped_size_has_the_same_set_of_u_values_as_of_v_values(size):
 
     # --- assert -----------------------
     assert np.sort(tuples.u).tolist() == np.sort(tuples.v).tolist()
-
-
-def test_the_largest_shipped_size_holds_exactly_1_tuple_per_fine_lane():
-    """The largest size fills every fine lane along u and along v with exactly 1 tuple."""
-    # --- act --------------------------
-    tuples = load_mc_tuples(max(MCTuplesSize))
-
-    # --- assert -----------------------
-    for values in (tuples.u, tuples.v):
-        assert np.bincount(fine_lanes_of(values), minlength=N_FINE_LANES).tolist() == [1] * N_FINE_LANES
 
 
 def test_every_shipped_value_holds_at_least_min_n_bits():

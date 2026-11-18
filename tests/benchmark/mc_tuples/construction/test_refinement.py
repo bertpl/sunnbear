@@ -1,18 +1,18 @@
-"""`MCTuplesRefinementSolve` requires 1 new base tuple per fine cell of the selected new base tuples, starts from those
-base tuples, and refuses a selection that breaks a fine cell's constraint."""
+"""`MCTuplesRefinementSolve` requires 1 new base tuple per LHS cell of the largest size of the selected new base tuples,
+starts from those base tuples, and refuses a selection that breaks an LHS cell's constraint."""
 
 import numpy as np
 import pytest
 
-from sunnbear._core.benchmark.mc_tuples import N_FINE_LANES, MCTuplesConstructionError, MCTuplesSize
+from sunnbear._core.benchmark.mc_tuples import MCTuplesConstructionError, MCTuplesSize
 from sunnbear._core.benchmark.mc_tuples.construction.refinement import MCTuplesRefinementSolve
 from sunnbear._core.benchmark.mc_tuples.construction.solve import INCLUSION_CONSTRAINT_WEIGHT, MCTuplesSolveSettings
 
-# The base tuples use 32 lower fine lanes, 16 apart: the 4 base tuples of size 16 take the first 8, the 12 new base
-# tuples of size 64 the other 24; u lies in the even ones, v in the odd ones.
+# The base tuples use 32 lower-half LHS lanes of size 1024, 16 apart: the 4 base tuples of size 16 take the first 8, the
+# 12 new base tuples of size 64 the other 24; u lies in the even ones, v in the odd ones.
 _LANES = 5 + 16 * np.arange(32)
-_BASE_16 = np.column_stack([_LANES[0:8:2] + 0.5, _LANES[1:8:2] + 0.25]) / N_FINE_LANES
-_NEW_OF_SIZE_64 = np.column_stack([_LANES[8::2] + 0.5, _LANES[9::2] + 0.25]) / N_FINE_LANES
+_BASE_16 = np.column_stack([_LANES[0:8:2] + 0.5, _LANES[1:8:2] + 0.25]) / 1024
+_NEW_OF_SIZE_64 = np.column_stack([_LANES[8::2] + 0.5, _LANES[9::2] + 0.25]) / 1024
 
 _N_RANDOM_CANDIDATES_PER_CELL = 8
 
@@ -29,8 +29,8 @@ def _solve() -> MCTuplesRefinementSolve:
 # ==================================================================================================
 #  Constraints and starting selection
 # ==================================================================================================
-def test_constraints_hold_1_new_base_tuple_per_fine_cell_and_the_dummy_rotational_sibling_tuple_and_the_size_below():
-    """Size 64 gets 1 constraint per fine cell of its 12 new base tuples, each over that cell's 9 candidates, and the
+def test_constraints_hold_1_new_base_tuple_per_lhs_cell_and_the_dummy_rotational_sibling_tuple_and_the_size_below():
+    """Size 64 gets 1 constraint per LHS cell of its 12 new base tuples, each over that cell's 9 candidates, and the
     weighted constraint that keeps the dummy rotational sibling tuple and the 4 base tuples of the size below."""
     # --- act --------------------------
     constraints = _solve()._constraints()
@@ -46,7 +46,7 @@ def test_constraints_hold_1_new_base_tuple_per_fine_cell_and_the_dummy_rotationa
 
 
 def test_the_starting_selection_is_the_selected_new_base_tuples():
-    """The starting selection holds the first candidate of each fine cell, which is the selected new base tuple in that
+    """The starting selection holds the first candidate of each LHS cell, which is the selected new base tuple in that
     cell."""
     # --- arrange ----------------------
     solve = _solve()
@@ -62,8 +62,8 @@ def test_the_starting_selection_is_the_selected_new_base_tuples():
 # ==================================================================================================
 #  Validation
 # ==================================================================================================
-def test_validation_returns_a_selection_with_1_new_base_tuple_per_fine_cell():
-    """Validating a selection of the 5 kept candidates and the last candidate of each fine cell returns those last
+def test_validation_returns_a_selection_with_1_new_base_tuple_per_lhs_cell():
+    """Validating a selection of the 5 kept candidates and the last candidate of each LHS cell returns those last
     candidates."""
     # --- arrange ----------------------
     new = 9 * np.arange(12) + 8
@@ -72,12 +72,14 @@ def test_validation_returns_a_selection_with_1_new_base_tuple_per_fine_cell():
     assert _solve()._validated_new_selection(np.concatenate([np.arange(5), 5 + new])).tolist() == new.tolist()
 
 
-def test_validation_refuses_2_new_base_tuples_in_1_fine_cell():
-    """A selection that takes 2 candidates of the first fine cell, and none of the second, raises an error."""
+def test_validation_refuses_2_new_base_tuples_in_1_lhs_cell():
+    """A selection that takes 2 candidates of the first LHS cell, and none of the second, raises an error."""
     # --- arrange ----------------------
     new = 9 * np.arange(12)
     new[1] = 1
 
     # --- act / assert -----------------
-    with pytest.raises(MCTuplesConstructionError, match="2 fine cells do not hold exactly 1 new base tuple"):
+    with pytest.raises(
+        MCTuplesConstructionError, match="2 LHS cells of the largest size do not hold exactly 1 new base tuple"
+    ):
         _solve()._validated_new_selection(np.concatenate([np.arange(5), 5 + np.sort(new)]))

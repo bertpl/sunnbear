@@ -4,20 +4,21 @@ sibling tuple included."""
 import numpy as np
 import pytest
 
+from sunnbear._core.benchmark.mc_tuples import MCTuplesSize
 from sunnbear._core.benchmark.mc_tuples.construction.distances import (
     DUMMY_ROTATIONAL_SIBLING_TUPLE,
     base_tuple_squared_l2_distance,
     base_tuple_value_distance,
 )
-from sunnbear._core.benchmark.mc_tuples.construction.rotations import N_LOWER_FINE_LANES
-from sunnbear._core.benchmark.mc_tuples.construction.size_result import MCTuplesSizeResult
+from sunnbear._core.benchmark.mc_tuples.construction.rotations import tuple_array_of
 
 
 def _random_base_tuple_array(n: int, seed: int) -> np.ndarray:
-    """Return `n` random base tuples whose u values and v values lie in 2n distinct lower fine lanes."""
+    """Return `n` random base tuples whose u values and v values lie in 2n distinct lower-half LHS lanes of the largest
+    size."""
     rng = np.random.default_rng(seed)
-    lanes = rng.permutation(N_LOWER_FINE_LANES)[: 2 * n].reshape(2, n)
-    return ((lanes + rng.random((2, n))) / (2 * N_LOWER_FINE_LANES)).T
+    lanes = rng.permutation(max(MCTuplesSize).n_lower_half_lhs_lanes)[: 2 * n].reshape(2, n)
+    return ((lanes + rng.random((2, n))) / int(max(MCTuplesSize))).T
 
 
 def _cyclic_separations(tuple_array: np.ndarray, axes: list[int]) -> np.ndarray:
@@ -50,7 +51,7 @@ def test_the_l2_separation_of_each_base_tuple_is_that_of_its_4_tuples(seed):
     separations = _separations_through_candidates(base_tuple_array, base_tuple_squared_l2_distance)
 
     # --- assert -----------------------
-    expected = _cyclic_separations(MCTuplesSizeResult._tuple_array_of(base_tuple_array), [0, 1]).reshape(-1, 4) ** 2
+    expected = _cyclic_separations(tuple_array_of(base_tuple_array), [0, 1]).reshape(-1, 4) ** 2
     assert np.allclose(expected, expected[:, :1])
     assert separations == pytest.approx(expected[:, 0], abs=1e-7)
 
@@ -66,7 +67,7 @@ def test_the_axis_separation_of_each_base_tuple_is_the_smaller_of_its_2_values(s
     separations = _separations_through_candidates(base_tuple_array, base_tuple_value_distance)
 
     # --- assert -----------------------
-    tuple_array = MCTuplesSizeResult._tuple_array_of(base_tuple_array)
+    tuple_array = tuple_array_of(base_tuple_array)
     separations_u, separations_v = _cyclic_separations(tuple_array, [0]), _cyclic_separations(tuple_array, [1])
     assert np.sort(separations_u) == pytest.approx(np.sort(separations_v))
     assert separations == pytest.approx(separations_u.reshape(-1, 4).min(axis=1), abs=1e-7)
