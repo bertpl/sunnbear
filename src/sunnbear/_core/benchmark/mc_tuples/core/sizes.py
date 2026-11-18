@@ -42,6 +42,16 @@ class MCTuplesSize(IntEnum):
 
     Every size is a power of 4, so `sqrt(n)` is a whole number, each LHS lane of a size holds 4 LHS lanes of the next
     size, and each tile holds 2 by 2 tiles of the next size.
+
+    Exactly 1 tuple in each LHS lane along each axis makes a size's tuples a Latin hypercube sample; exactly 1 tuple in
+    each tile on top of that makes them an orthogonal sample, also called an orthogonal-array-based Latin hypercube.
+
+    References:
+        - Tang, B. (1993). Orthogonal array-based Latin hypercubes. Journal of the American Statistical Association
+          88(424), 1392-1397. Its Latin hypercubes, built from an orthogonal array of strength 2 with `n = s^2` runs,
+          hold exactly 1 point in each of `s` by `s` equal squares, the condition that the tiles impose; the
+          construction of the shipped set does not use the paper's method.
+          https://doi.org/10.1080/01621459.1993.10476423
     """
 
     SIZE_4 = 4
