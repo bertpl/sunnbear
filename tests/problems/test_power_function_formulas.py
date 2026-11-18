@@ -45,7 +45,7 @@ def test_every_candidate_has_opposite_signs_at_the_bounds_of_its_interval(formul
     """A formula gives its expected number of candidates, and at ``c = 0`` each candidate is negative at one bound of
     its interval and positive at the other."""
     # --- arrange ----------------------
-    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
+    formula = FormulaRegistry.formula_from_number(formula_number)
 
     # --- act --------------------------
     candidates = formula.build_all_candidates()
@@ -66,7 +66,7 @@ def test_signed_power_1_is_0_at_its_root_and_nonzero_next_to_it(c):
     linear term underflows too.
     """
     # --- arrange ----------------------
-    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 3, 1)]
+    formula = FormulaRegistry.formula_from_number((2, 3, 1))
     candidates = formula.build_all_candidates()
 
     # --- act / assert -----------------
@@ -81,8 +81,8 @@ def test_signed_power_1_is_0_at_its_root_and_nonzero_next_to_it(c):
 def test_near_edge_power_and_near_pole_power_accept_the_same_pairs_of_power_and_distance():
     """Among the powers in the sweeps of both formulas at a distance above 0, both accept the same pairs ``(p, d)``."""
     # --- arrange ----------------------
-    [near_edge_formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 3, 3)]
-    [near_pole_formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 3, 4)]
+    near_edge_formula = FormulaRegistry.formula_from_number((2, 3, 3))
+    near_pole_formula = FormulaRegistry.formula_from_number((2, 3, 4))
     near_edge_candidates = near_edge_formula.build_all_candidates()
     near_pole_candidates = near_pole_formula.build_all_candidates()
 
@@ -105,7 +105,7 @@ def test_signed_reciprocal_power_is_finite_at_and_next_to_its_pole(c):
     """At every power, `SignedReciprocalPower` is 0 at its pole, and at the floats next to the pole it has the sign of
     ``z`` and an absolute value of at most `MAX_ABS_VALUE`."""
     # --- arrange ----------------------
-    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 3, 5)]
+    formula = FormulaRegistry.formula_from_number((2, 3, 5))
     candidates = formula.build_all_candidates()
     max_abs_value = f05_signed_reciprocal_power.MAX_ABS_VALUE
 
