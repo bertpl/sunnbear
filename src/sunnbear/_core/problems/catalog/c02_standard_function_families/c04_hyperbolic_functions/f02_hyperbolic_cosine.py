@@ -11,7 +11,7 @@ class HyperbolicCosine(Formula):
     ``b`` is the upper bound of the interval, any value above 0.
 
     ``cosh`` is even, with its minimum at 0, so ``cosh(x) - cosh(b/2)`` has 2 roots, ``-b/2`` and ``b/2``. The interval
-    holds the minimum at its lower bound and the root ``b/2`` at its midpoint, so it holds an odd number of roots.
+    holds the minimum at its lower bound and the root ``b/2`` at its midpoint, and leaves out the root ``-b/2``.
 
     The function is close to the parabola ``(x^2 - b^2/4)/2`` for a small ``b``, and grows as an exponential toward the
     upper bound for a large ``b``.
@@ -29,17 +29,24 @@ class HyperbolicCosine(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, b: float) -> float:
-        """Evaluate ``cosh(x - c) - cosh(b/2)``."""
-        return math.cosh(x - c) - math.cosh(0.5 * b)
+        """Evaluate ``cosh(u) - cosh(v)`` as ``2*sinh((u + v)/2)*sinh((u - v)/2)``, with ``u = x - c`` and ``v = b/2``.
+
+        The 2 forms are equal. Subtracting the 2 values of ``cosh`` would cancel their leading digits next to the root:
+        for a small ``b`` both values are close to 1, so the function would be exactly 0 on a band of x around the
+        root, and bisection would stop early where a midpoint lands on that band.
+        """
+        u = x - c
+        v = 0.5 * b
+        return 2.0 * math.sinh(0.5 * (u + v)) * math.sinh(0.5 * (u - v))
 
     def interval_bounds(self, b: float) -> tuple[float, float]:
         """Return the interval ``[0, b]``."""
         return (0.0, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipe that sweeps ``b`` from 10^-1 to 10^2, with ``log10(b)`` in steps of 0.02.
+        """Return the recipe that sweeps ``b`` from 10^-1 to 10^2.
 
-        At the high end the value at the upper bound is about 1.3e43, as for `HyperbolicSine` at the same ``b``.
+        At the high end the value at the upper bound is about 1.3e43.
         """
         return (ParamGrid(axes=(ParamAxis("b", -1.0, 2.0, 0.02, ParamNotation.POW10),)),)
 

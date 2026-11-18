@@ -1,7 +1,7 @@
 """The hyperbolic function formulas (category 2.4) give the expected candidates, each changing sign in its interval.
 
-Further tests cover how `HyperbolicTangent` keeps full precision next to its root, both at ``d = 1`` and in the
-lower tail of ``tanh``.
+Further tests cover how `HyperbolicCosine` and `HyperbolicTangent` keep full precision next to the root, where
+subtracting 2 nearly equal values would cancel their leading digits.
 """
 
 import math
@@ -11,12 +11,12 @@ import pytest
 
 from sunnbear._core.problems.core import FormulaRegistry
 
-# The reference values that mpmath computes use this many decimal digits.
+# mpmath computes the reference values with this many decimal digits.
 MPMATH_DIGITS = 50
 
 # Each entry holds a hyperbolic function formula's number and its number of candidates.
 #
-# `HyperbolicTangent` has 161 candidates that sweep the interval's bound, and 151 that sweep the level of the root.
+# `HyperbolicTangent` has 161 candidates from the sweep of ``b``, and 151 from the sweep of ``d``.
 HYPERBOLIC_FUNCTION_FORMULAS = [
     pytest.param((2, 4, 1), 151, id="hyperbolic_sine"),
     pytest.param((2, 4, 2), 151, id="hyperbolic_cosine"),
@@ -55,6 +55,20 @@ def test_every_candidate_has_opposite_signs_at_the_bounds_of_its_interval(formul
         assert min(value_at_a, value_at_b) < 0.0 < max(value_at_a, value_at_b), candidate.id
 
 
+def test_hyperbolic_cosine_has_the_sign_of_x_minus_its_root_next_to_its_root():
+    """At ``c = 0``, `HyperbolicCosine` is 0 at its root ``x = b/2`` and nonzero at the floats next to it, also where
+    ``cosh(x)`` and ``cosh(b/2)`` round to the same float."""
+    # --- arrange ----------------------
+    formula = FormulaRegistry.formula_from_number((2, 4, 2))
+
+    # --- act / assert -----------------
+    for candidate in formula.build_all_candidates():
+        root = 0.5 * candidate.b
+        assert candidate.xc_fun(root, 0.0) == 0.0, candidate.id
+        assert candidate.xc_fun(math.nextafter(root, -math.inf), 0.0) < 0.0, candidate.id
+        assert candidate.xc_fun(math.nextafter(root, math.inf), 0.0) > 0.0, candidate.id
+
+
 @pytest.mark.parametrize("c", [0.0, 0.3, -0.7])
 def test_hyperbolic_tangent_at_level_1_has_the_sign_of_x_minus_c_next_to_its_root(c):
     """At ``d = 1``, `HyperbolicTangent` is 0 at its root ``x = c`` and has the sign of ``x - c`` at the floats next
@@ -64,7 +78,7 @@ def test_hyperbolic_tangent_at_level_1_has_the_sign_of_x_minus_c_next_to_its_roo
     candidates = [candidate for candidate in formula.build_all_candidates() if candidate.id.param_values[1] == 1.0]
 
     # --- act / assert -----------------
-    assert len(candidates) == 161 + 1  # the 1 of the sweep of levels at d = 1 too
+    assert len(candidates) == 161 + 1  # 161 from the sweep of b, and 1 from the sweep of d, which ends at d = 1
     for candidate in candidates:
         assert candidate.xc_fun(c, c) == 0.0, candidate.id
         assert candidate.xc_fun(math.nextafter(c, -math.inf), c) < 0.0, candidate.id

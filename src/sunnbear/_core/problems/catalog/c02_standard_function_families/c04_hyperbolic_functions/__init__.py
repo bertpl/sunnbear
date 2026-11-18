@@ -1,11 +1,12 @@
 """This category holds the hyperbolic functions ``sinh``, ``cosh`` and ``tanh``, and their inverses.
 
-The hyperbolic functions give 2 behaviors that no polynomial or power function gives: growth as an exponential, and,
-for ``tanh``, a function that is close to a step.
+The hyperbolic functions give 2 behaviors absent from the polynomials and the power functions: growth as an
+exponential, and, for ``tanh``, a function that is close to a step.
 
-Each formula is the plain function on an interval that a parameter sets. A scale of ``x`` would add nothing: the
-benchmark's ``xtol`` is a fixed fraction of the interval's width, so ``sinh(s*x)`` on ``[-1, 1]`` and ``sinh(x)`` on
-``[-s, s]`` are the same problem for every solver, up to rounding.
+Each formula is the plain function, and a parameter sets its interval.
+
+A scale of ``x`` would add nothing: the benchmark's ``xtol`` is a fixed fraction of the interval's width, so
+``sinh(s*x)`` on ``[-1, 1]`` and ``sinh(x)`` on ``[-s, s]`` are the same problem for every solver, up to rounding.
 
 The category has 2 kinds of formulas, which differ in how ``c`` enters:
 
@@ -13,7 +14,8 @@ The category has 2 kinds of formulas, which differ in how ``c`` enters:
   and ``c`` changes the values at the bounds or, for ``tanh``, where the step lies.
 - **`InverseHyperbolicSine`, `InverseHyperbolicCosine` and `InverseHyperbolicTangent` add ``c`` to the function
   value.** A shift of ``x`` would move the edge of ``acosh``'s domain and the poles of ``atanh`` into the interval.
-  Each divides the function by its value at a bound, so that every candidate of a formula has the same c-range.
+  Each of these 3 formulas divides the function by its value at a bound, so that every candidate of a formula has
+  the same c-range.
 """
 
 from sunnbear._core.problems.core import FormulaCategory

@@ -1,4 +1,4 @@
-"""The formula registry holds formulas and categories, looks up a formula by its number, and rebuilds candidates.
+"""The formula registry holds formulas and categories, finds a formula by number, and rebuilds a candidate from its id.
 
 Defining a concrete `Formula` or a `FormulaCategory` subclass registers one instance of it here,
 as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
@@ -46,7 +46,7 @@ if TYPE_CHECKING:
 #  FormulaRegistry
 # ==================================================================================================
 class FormulaRegistry:
-    """`FormulaRegistry` enumerates formulas and categories, looks up a formula by its number, or rebuilds a candidate.
+    """`FormulaRegistry` lists formulas and categories, finds a formula by number, or rebuilds a candidate from its id.
 
     `Formula.__init_subclass__` and `FormulaCategory.__init_subclass__` call `register_formula` and
     `register_category`, so the registry is complete as soon as the modules that define the formula and

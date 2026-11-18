@@ -32,7 +32,7 @@ class HyperbolicSine(Formula):
         return (-b, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipe that sweeps ``b`` from 10^-1 to 10^2, with ``log10(b)`` in steps of 0.02.
+        """Return the recipe that sweeps ``b`` from 10^-1 to 10^2.
 
         At the low end the function is a line to within 0.2 %. At the high end its values at the bounds are about
         1.3e43.

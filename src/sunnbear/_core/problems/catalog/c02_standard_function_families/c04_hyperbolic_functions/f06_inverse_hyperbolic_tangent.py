@@ -37,7 +37,7 @@ class InverseHyperbolicTangent(Formula):
         return (-(1.0 - d), 1.0 - d)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipe that sweeps ``d`` from 10^-15 to 10^-1, with ``log10(d)`` in steps of 0.1.
+        """Return the recipe that sweeps ``d`` from 10^-15 to 10^-1.
 
         The recipe does not leave out the candidates that fail the benchmark suite inclusion conditions. For the
         smallest ``d``, the range of ``c`` lets the root come too close to a bound to satisfy the conditions, so no

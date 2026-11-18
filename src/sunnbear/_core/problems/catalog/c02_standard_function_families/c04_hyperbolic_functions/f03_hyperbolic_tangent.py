@@ -1,11 +1,13 @@
-"""This formula is the hyperbolic tangent with its root at a level ``d`` above -1, ``1 + tanh(x - c) - d``."""
+"""This formula is ``1 + tanh(x - c) - d``, which is 0 where ``tanh`` lies ``d`` above its lower asymptote -1."""
 
 import math
 
 from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamGrid, ParamNotation, ParamRecipe
 
-# Up to this ``d``, the root lies in the lower tail of ``tanh``, where ``1 + tanh(u)`` is computed from ``exp(2*u)``.
-MAX_D_OF_TAIL_FORM = 0.5
+# Up to this ``d``, the root lies in the lower tail of ``tanh``, where ``1 + tanh(x - c)`` is computed from
+# ``exp(2*(x - c))``. Above it, ``tanh(x - c) + (1 - d)`` is accurate to a few ulps of ``d`` next to the root, because
+# ``abs(1 - d)`` is then below ``d``.
+MAX_D_FOR_EXP_EVALUATION = 0.5
 
 
 class HyperbolicTangent(Formula):
@@ -13,7 +15,7 @@ class HyperbolicTangent(Formula):
 
     - ``b`` is the upper bound of the interval, any value above 0. For a small ``b``, the function is close to a
       line. For a large ``b``, it is close to a step from ``-d`` to ``2 - d``: in float64, ``tanh`` equals -1 or 1
-      outside a transition about 38 wide.
+      outside a range of x about 38 wide, centered on ``x = c``.
     - ``d`` is the level of the root above ``tanh``'s lower asymptote -1, between 0 and 2. At ``d = 1`` the function
       is ``tanh(x - c)``. For a small ``d``, the root lies in ``tanh``'s lower tail, where the function is only ``d``
       above its value at the lower bound.
@@ -35,16 +37,16 @@ class HyperbolicTangent(Formula):
     def parametrized_fun(x: float, c: float, b: float, d: float) -> float:
         """Evaluate ``1 + tanh(u) - d`` at ``u = x - c``, in the form that keeps full precision next to the root.
 
-        - Where ``u < 0`` and ``d`` is at most `MAX_D_OF_TAIL_FORM`, ``1 + tanh(u)`` is computed as ``2*e/(1 + e)``
-          with ``e = exp(2*u)``. Adding 1 to ``tanh(u)`` would cancel its leading digits, so next to a root at a small
-          ``d`` the function would take only a few values, 1.1e-16 apart.
+        - Where ``u < 0`` and ``d`` is at most `MAX_D_FOR_EXP_EVALUATION`, ``1 + tanh(u)`` is computed as
+          ``2*exp(2*u)/(1 + exp(2*u))``. Adding 1 to ``tanh(u)`` would cancel its leading digits, so next to a root
+          at a small ``d`` the function would take only a few values, 1.1e-16 apart.
         - Elsewhere the function is computed as ``tanh(u) + (1 - d)``. At ``d = 1`` that is ``tanh(u)`` itself, which
           is exactly 0 only at ``u = 0``; the form from ``exp(2*u)`` would be 0 on a band about 1e-16 wide.
         """
         u = x - c
-        if u < 0.0 and d <= MAX_D_OF_TAIL_FORM:
-            e = math.exp(2.0 * u)
-            return 2.0 * e / (1.0 + e) - d
+        if u < 0.0 and d <= MAX_D_FOR_EXP_EVALUATION:
+            exp_2u = math.exp(2.0 * u)
+            return 2.0 * exp_2u / (1.0 + exp_2u) - d
         else:
             return math.tanh(u) + (1.0 - d)
 
@@ -53,14 +55,12 @@ class HyperbolicTangent(Formula):
         return (-b, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return 2 recipes: one that sweeps the steepness, and one that sweeps the level of the root.
+        """Return 2 recipes: one that sweeps ``b`` at ``d = 1``, and one that sweeps the level ``d`` at ``b = 32``.
 
-        - The steepness: ``d = 1``, with ``b`` from 10^-1 to 10^15. From ``b`` of about 10^13 on, the transition of
-          ``tanh`` is narrower than the benchmark's ``xtol``, so every solver sees a step.
-        - The level: ``b = 32``, with ``d`` from 10^-15 to 1. At ``d = 10^-15`` the root lies at about
-          ``x = -17.6``.
-
-        Both recipes step ``log10`` of the swept parameter by 0.1.
+        - The sweep of ``b``: from 10^-1 to 10^15. From ``b`` of about 10^13 on, the transition of ``tanh`` is narrower
+          than the benchmark's ``xtol``, so every solver sees a step.
+        - The sweep of ``d``: from 10^-15 to 1. At ``d = 10^-15`` the root lies at about ``x = -17.6``, so the interval
+          holds the root at every ``d`` of the sweep.
         """
         return (
             ParamGrid(axes=(ParamAxis("b", -1.0, 15.0, 0.1, ParamNotation.POW10), ParamAxis("d", 1.0, 1.0, 1.0))),

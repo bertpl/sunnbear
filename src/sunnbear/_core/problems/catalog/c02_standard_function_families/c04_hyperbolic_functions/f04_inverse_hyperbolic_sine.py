@@ -35,7 +35,7 @@ class InverseHyperbolicSine(Formula):
         return (-b, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipe that sweeps ``b`` from 10^-1 to 10^15, with ``log10(b)`` in steps of 0.1."""
+        """Return the recipe that sweeps ``b`` from 10^-1 to 10^15."""
         return (ParamGrid(axes=(ParamAxis("b", -1.0, 15.0, 0.1, ParamNotation.POW10),)),)
 
     def is_param_tuple_valid(self, b: float) -> bool:

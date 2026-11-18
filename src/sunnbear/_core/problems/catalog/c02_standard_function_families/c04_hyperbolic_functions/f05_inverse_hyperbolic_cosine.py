@@ -37,7 +37,7 @@ class InverseHyperbolicCosine(Formula):
         return (1.0, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipe that sweeps ``b`` from 10^0.1 to 10^15, with ``log10(b)`` in steps of 0.1.
+        """Return the recipe that sweeps ``b`` from 10^0.1 to 10^15.
 
         The recipe does not leave out the candidates that fail the benchmark suite inclusion conditions. For the
         largest ``b``, the range of ``c`` lets the root come too close to the lower bound to satisfy the conditions,
