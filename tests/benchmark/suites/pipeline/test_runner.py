@@ -22,7 +22,7 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     """
     # --- arrange ----------------------
     # The example formula 99.802 has few candidates, so the pipeline runs fast on it.
-    formulas = [formula for formula in FormulaRegistry.formulas() if formula.number == (99, 802)]
+    formulas = [FormulaRegistry.formula_from_number((99, 802))]
 
     # --- act --------------------------
     # By default `run_pipeline` starts 1 worker per CPU, which would only make the workers wait for CPU, because

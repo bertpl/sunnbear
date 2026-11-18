@@ -147,7 +147,7 @@ def test_every_candidate_has_opposite_signs_at_the_bounds_of_its_interval(
 ):
     """A formula gives its expected number of candidates, each with opposite signs at its 2 bounds at ``c = 0``."""
     # --- arrange ----------------------
-    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
+    formula = FormulaRegistry.formula_from_number(formula_number)
 
     # --- act --------------------------
     candidates = formula.build_all_candidates()
@@ -167,7 +167,7 @@ def test_the_interval_of_an_even_degree_leaves_out_1_zero(
 ):
     """From the lower bound of the next odd degree's interval to an even degree's lower bound, the sign changes once."""
     # --- arrange ----------------------
-    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
+    formula = FormulaRegistry.formula_from_number(formula_number)
     even_degree_candidates = [
         candidate for candidate in formula.build_all_candidates() if candidate.id.param_values[0] % 2 == 0
     ]
@@ -191,7 +191,7 @@ def test_the_interval_of_an_even_degree_leaves_out_1_zero(
 def test_every_formula_agrees_with_its_reference(formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun):
     """At each degree of `COMPARED_DEGREES`, a formula equals its reference across the interval, for 3 values of c."""
     # --- arrange ----------------------
-    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
+    formula = FormulaRegistry.formula_from_number(formula_number)
     compared_candidates = [
         candidate for candidate in formula.build_all_candidates() if candidate.id.param_values[0] in COMPARED_DEGREES
     ]
@@ -244,7 +244,7 @@ def test_the_interval_rule_holds_up_to_the_highest_valid_degree(formula_number, 
     """Up to its highest valid degree, a formula's interval holds every zero that scipy gives, except the lowest zero of
     an even degree, and its values at the bounds are finite."""
     # --- arrange ----------------------
-    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
+    formula = FormulaRegistry.formula_from_number(formula_number)
     degrees = [2, 3, 4, 8, 16, 33, 64, 128, highest_valid_degree - 1, highest_valid_degree]
 
     # --- act / assert -----------------
@@ -263,7 +263,7 @@ def test_the_interval_rule_holds_up_to_the_highest_valid_degree(formula_number, 
 def test_every_real_zero_of_a_bernoulli_candidate_lies_well_inside_its_interval():
     """A Bernoulli candidate is positive from 0.25 below its upper bound to 3 above it, so no real zero lies there."""
     # --- arrange ----------------------
-    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == (2, 2, 8)]
+    formula = FormulaRegistry.formula_from_number((2, 2, 8))
 
     # --- act / assert -----------------
     for candidate in formula.build_all_candidates():

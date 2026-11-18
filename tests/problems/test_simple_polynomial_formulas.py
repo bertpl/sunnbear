@@ -35,7 +35,7 @@ def test_every_candidate_passes_through_the_same_points_at_the_bounds(
     """Each formula combines every power or term count with every value of its other parameter, and at ``c = 0`` every
     candidate of a formula has the same values at the bounds of its interval."""
     # --- arrange ----------------------
-    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
+    formula = FormulaRegistry.formula_from_number(formula_number)
 
     # --- act --------------------------
     candidates = formula.build_all_candidates()
@@ -55,7 +55,7 @@ def test_the_positive_and_the_negative_slopes_have_the_same_sizes(formula_number
     """The slopes ``m`` of a formula hold 21 positive values from 0.001 to 10, their negatives, and 0, and every power
     or term count gets all of them."""
     # --- arrange ----------------------
-    [formula] = [formula for formula in FormulaRegistry.formulas() if formula.number == formula_number]
+    formula = FormulaRegistry.formula_from_number(formula_number)
 
     # --- act --------------------------
     slopes_per_first_param: dict[float, list[float]] = {}

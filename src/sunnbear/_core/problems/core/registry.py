@@ -1,4 +1,4 @@
-"""The formula registry holds formulas and categories, and rebuilds a candidate test problem from an identity.
+"""The formula registry holds formulas and categories, finds a formula by number, and rebuilds a candidate from its id.
 
 Defining a concrete `Formula` or a `FormulaCategory` subclass registers one instance of it here,
 as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
@@ -46,7 +46,7 @@ if TYPE_CHECKING:
 #  FormulaRegistry
 # ==================================================================================================
 class FormulaRegistry:
-    """`FormulaRegistry` enumerates formulas and categories, or rebuilds a candidate test problem from an identity.
+    """`FormulaRegistry` lists formulas and categories, finds a formula by number, or rebuilds a candidate from its id.
 
     `Formula.__init_subclass__` and `FormulaCategory.__init_subclass__` call `register_formula` and
     `register_category`, so the registry is complete as soon as the modules that define the formula and
@@ -108,6 +108,21 @@ class FormulaRegistry:
         return tuple(category for _, category in sorted(cls._categories_by_number.items()))
 
     @classmethod
+    def formula_from_number(cls, number: tuple[int, ...]) -> "Formula":
+        """Return the registered formula with the number `number`, such as ``(2, 3, 1)``.
+
+        Raises:
+            FormulaTaxonomyError: If the registered nodes do not form a valid taxonomy tree.
+            UnknownFormulaError: If no registered formula has the number `number`.
+        """
+        cls._ensure_taxonomy_validated()
+        formula = cls._formulas_by_number.get(number)
+        if formula is None:
+            raise UnknownFormulaError(f"No registered formula with number {FormulaTaxonomyNode.format_number(number)}.")
+        else:
+            return formula
+
+    @classmethod
     def candidate_from_id(cls, problem_id: ProblemId | str) -> CandidateTestProblem:
         """Reconstruct a candidate test problem from its identity.
 
@@ -123,17 +138,11 @@ class FormulaRegistry:
             InvalidParamsError: If the parameter names differ from the formula's `param_names`, or the
                 parameter tuple fails the formula's validity criteria.
         """
-        cls._ensure_taxonomy_validated()
         if isinstance(problem_id, str):
             parsed_problem_id = ProblemId.from_string(problem_id)
         else:
             parsed_problem_id = problem_id
-        formula = cls._formulas_by_number.get(parsed_problem_id.formula_number)
-        if formula is None:
-            raise UnknownFormulaError(
-                f"No registered formula with number "
-                f"{FormulaTaxonomyNode.format_number(parsed_problem_id.formula_number)} (id: {parsed_problem_id})."
-            )
+        formula = cls.formula_from_number(parsed_problem_id.formula_number)
         if parsed_problem_id.param_names != formula.param_names:
             raise InvalidParamsError(
                 f"Parameter names {list(parsed_problem_id.param_names)} do not match the parameters "

@@ -440,6 +440,21 @@ def test_build_x_fun():
     assert f(2.0) == pytest.approx(7.0)
 
 
+def test_formula_from_number():
+    """`formula_from_number` returns the registered formula with the given number."""
+    # --- act --------------------------
+    formula = FormulaRegistry.formula_from_number(ExampleCubic.number)
+
+    # --- assert -----------------------
+    assert type(formula) is ExampleCubic
+
+
+def test_formula_from_number_unknown_formula():
+    """A formula number that is not registered raises `UnknownFormulaError`."""
+    with pytest.raises(UnknownFormulaError):
+        FormulaRegistry.formula_from_number((9, 9))
+
+
 def test_candidate_from_id_unknown_formula():
     """An id whose formula number is not registered raises `UnknownFormulaError`."""
     with pytest.raises(UnknownFormulaError):
