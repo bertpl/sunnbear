@@ -8,9 +8,10 @@ from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, Pa
 class Exponential(Formula):
     """`Exponential` is ``exp(x - c) - 1`` on ``[-b, b]``.
 
-    ``b`` is the upper bound of the interval, any value above 0. The function is close to the line ``x - c`` for a
-    small ``b``. For a large ``b``, it is close to -1 over most of the lower half of the interval, and grows as an
-    exponential toward the upper bound.
+    ``b`` is the upper bound of the interval, any value above 0.
+
+    The function is close to the line ``x - c`` for a small ``b``. For a large ``b``, it is close to -1 over most of
+    the lower half of the interval, and grows as an exponential toward the upper bound.
 
     ``c`` shifts x, so the root lies at ``x = c``. Next to the root, ``exp(x - c)`` is close to 1, so the function is
     computed as ``expm1(x - c)``, which keeps its full precision there.

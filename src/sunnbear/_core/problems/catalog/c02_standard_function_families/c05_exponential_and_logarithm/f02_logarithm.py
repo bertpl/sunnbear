@@ -8,11 +8,13 @@ from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, Pa
 class Logarithm(Formula):
     """`Logarithm` is ``2*log(x)/log(1/d) + 1 + c`` on ``[d, 1]``.
 
-    ``log`` has a singularity at 0. ``d`` is its distance from the lower bound of the interval, between 0 and 1. For a
-    ``d`` close to 1 the function is close to a line, and for a small ``d`` it is steep next to the lower bound and
-    flat over most of the interval.
+    ``log`` has a singularity at 0. ``d`` is the distance from the singularity to the lower bound of the interval, and
+    lies between 0 and 1.
 
-    The division by ``log(1/d)`` makes the function -1 at the lower bound and 1 at the upper bound at ``c = 0``, for
+    For a ``d`` close to 1 the function is close to a line, and for a small ``d`` it is steep next to the lower bound
+    and flat over most of the interval.
+
+    At ``c = 0``, the division by ``log(1/d)`` makes the function -1 at the lower bound and 1 at the upper bound, for
     every ``d``.
 
     ``c`` adds to the function value, so the root lies at ``x = d^((1 + c)/2)``: at ``sqrt(d)`` for ``c = 0``, and

@@ -60,9 +60,13 @@ def test_exponential_has_the_sign_of_x_minus_c_next_to_its_root(c):
 
 
 @pytest.mark.parametrize("c", [0.0, 0.5, -0.5])
-def test_logarithm_is_minus_1_plus_c_and_1_plus_c_at_its_bounds_and_0_at_d_to_the_half_of_1_plus_c(c):
-    """For every ``d``, `Logarithm` is ``-1 + c`` at ``x = d``, ``1 + c`` at ``x = 1``, and 0 at its root
-    ``x = d^((1 + c)/2)``, to within a few ulps of 1."""
+def test_logarithm_is_minus_1_plus_c_and_1_plus_c_at_its_bounds_and_0_at_its_root(c):
+    """For every ``d``, `Logarithm` takes these values, each to within 1e-15:
+
+    - ``-1 + c`` at ``x = d``;
+    - ``1 + c`` at ``x = 1``;
+    - 0 at its root ``x = d^((1 + c)/2)``.
+    """
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number((2, 5, 2))
 

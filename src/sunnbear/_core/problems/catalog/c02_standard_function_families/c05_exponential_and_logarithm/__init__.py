@@ -1,7 +1,7 @@
 """This category holds the exponential function and the logarithm.
 
-The exponential function grows from a flat asymptote into exponential growth, and the logarithm is steep next to its
-singularity at 0 and flat away from it.
+The exponential function is nearly flat for large negative ``x`` and grows fast for large positive ``x``, and the
+logarithm is steep next to its singularity at 0 and flat away from it.
 
 Each formula is the plain function, and a parameter sets its interval. A scale of ``x`` would add nothing: the
 benchmark's ``xtol`` is a fixed fraction of the interval's width, so ``exp(s*x)`` on ``[-1, 1]`` and ``exp(x)`` on
