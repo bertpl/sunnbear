@@ -9,8 +9,8 @@ from sunnbear._core.benchmark.mc_tuples.construction.rotations import tuple_arra
 from sunnbear._core.benchmark.mc_tuples.construction.selection import MCTuplesSelectionSolve
 from sunnbear._core.benchmark.mc_tuples.construction.solve import INCLUSION_CONSTRAINT_WEIGHT, MCTuplesSolveSettings
 
-# The smallest size's only base tuple: u in LHS lane 1 of size 16 and v in LHS lane 4, so in tile 1 of size 16 (tile
-# column 0, tile row 1). It leaves free the lanes 0, 2, 3, 5, 6 and 7 and the tiles 0, 4 and 5 of [0, 0.5]^2.
+# The smallest size's only base tuple has u in LHS lane 1 of size 16 and v in LHS lane 4, so it lies in tile 1 of size
+# 16 (tile column 0, tile row 1). It leaves free the lanes 0, 2, 3, 5, 6 and 7 and the tiles 0, 4 and 5 of [0, 0.5]^2.
 _BASE_4 = np.array([[0.1, 0.3]])
 
 

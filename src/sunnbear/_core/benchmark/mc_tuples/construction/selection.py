@@ -62,7 +62,7 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
         size: MCTuplesSize,
         settings: MCTuplesSolveSettings,
     ) -> None:
-        """Draw the population from `n_population` candidates in the free lanes and tiles, and a starting selection.
+        """Draw the population from `n_population` candidates in the free lanes and tiles, then a starting selection.
 
         The starting selection adds a candidate to the population in each LHS cell that the starting selection needs and
         that holds no candidate, so the starting selection never runs out of candidates. Both draws advance
@@ -86,7 +86,7 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
         """Return the solve's number of candidates times its number of selected candidates, both in base tuples.
 
         The candidates are the dummy rotational sibling tuple, the size below's base tuples and the population before
-        its candidates in diagonal cells and in tiles of the size below are dropped.
+        its candidates in diagonal cells and in tiles that the size below's base tuples fill are dropped.
         """
         return (1 + size.n_required // 4 + n_population) * (1 + size // 4)
 
@@ -134,16 +134,13 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
         """Return a free lane along u and one along v for each free tile, assigned at random, each free lane to 1 tile.
 
         The tuple of a tile has its u value in the tile's column and its v value in the tile's row, so the tile's u lane
-        comes from the LHS lanes under its tile column, and its v lane from those under its tile row. LHS lanes are
-        numbered the same way along u and v, so the lanes under tile column `b` and under tile row `b` are 1 block of
-        `size / n_tiles_per_axis` LHS lanes.
+        comes from the LHS lanes under its tile column, and its v lane from those under its tile row.
 
-        Per block `b`, the block's free lanes go in random order first to the free tiles in tile column `b`, as their u
-        lanes, then to the free tiles in tile row `b`, as their v lanes; the tile on the diagonal, in both, takes 2
-        distinct lanes of the block.
+        LHS lanes are numbered the same way along u and v, so the lanes under tile column `b` and under tile row `b` are
+        1 block of `size / n_tiles_per_axis` LHS lanes.
 
-        Each block holds exactly as many free lanes as these tiles need: every base tuple of the size below that fills
-        a tile of that tile column or tile row fills 1 lane of the block too.
+        Each block holds exactly as many free lanes as the free tiles in its tile column and its tile row need: every
+        base tuple of the size below that fills a tile of that tile column or tile row fills 1 lane of the block too.
 
         Returns:
             The lanes along u and the lanes along v, both in the order of `free_tiles`.
@@ -153,9 +150,12 @@ class MCTuplesSelectionSolve(MCTuplesSolve):
         u_lanes = np.empty(free_tiles.size, dtype=np.int64)
         v_lanes = np.empty(free_tiles.size, dtype=np.int64)
         for block in range(size.n_tiles_per_axis // 2):
+            # The block's free lanes go in random order first to the free tiles in tile column `block`, as their u
+            # lanes, then to the free tiles in tile row `block`, as their v lanes; the tile on the diagonal, in both,
+            # takes 2 distinct lanes of the block.
             lanes = rng.permutation(free_lanes[block_indices == block])
-            tiles_in_block_column = np.flatnonzero(tile_columns == block)
-            tiles_in_block_row = np.flatnonzero(tile_rows == block)
-            u_lanes[tiles_in_block_column] = lanes[: tiles_in_block_column.size]
-            v_lanes[tiles_in_block_row] = lanes[tiles_in_block_column.size :]
+            free_tile_positions_in_block_column = np.flatnonzero(tile_columns == block)
+            free_tile_positions_in_block_row = np.flatnonzero(tile_rows == block)
+            u_lanes[free_tile_positions_in_block_column] = lanes[: free_tile_positions_in_block_column.size]
+            v_lanes[free_tile_positions_in_block_row] = lanes[free_tile_positions_in_block_column.size :]
         return u_lanes, v_lanes

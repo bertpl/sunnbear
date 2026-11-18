@@ -143,8 +143,8 @@ class MCTuplesSize(IntEnum):
     def check_lhs_lanes_and_tiles(self, tuple_array: np.ndarray) -> None:
         """Raise `ValueError` unless each LHS lane along u, each LHS lane along v and each tile holds exactly 1 tuple.
 
-        `tuple_array` is an `(n, 2)` array of (u, v) values in the open unit square, so it passes only when it holds
-        exactly `size` tuples.
+        `tuple_array` is an `(n, 2)` array of (u, v) values in the open unit square. It passes only when `n` equals the
+        size, since each of the size's LHS lanes along u needs exactly 1 tuple.
         """
         u, v = tuple_array[:, 0], tuple_array[:, 1]
         indices_per_part = {

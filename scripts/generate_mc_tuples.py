@@ -68,7 +68,7 @@ def main() -> None:
         default=DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL,
         help=(
             "candidate base tuples per new base tuple in the refinement solve, "
-            "in the LHS cell of the largest size that holds it"
+            "in that base tuple's LHS cell of the largest size"
         ),
     )
     parser.add_argument("--inspection-dir", type=Path, help="directory for the tuples and solutions of each size")

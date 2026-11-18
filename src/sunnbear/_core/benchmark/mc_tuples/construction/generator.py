@@ -284,11 +284,11 @@ def generate_mc_tuples(
         max_size: The largest size to build, 1 of `MCTuplesSize`; every size up to it is built, however short
             `t_total_sec` is, so a short run that wants fewer sizes passes a smaller `max_size`.
         n_population: The number of candidate base tuples drawn for each size's selection solve, at least 1; the
-            candidates in a diagonal LHS cell, whose u and v share an LHS lane, and those in a tile of the size below
-            are dropped. max-div starts from 1 candidate in each tile that the size below leaves empty; where the LHS
-            cell chosen for that candidate holds none, a new candidate is drawn in it.
+            candidates in a diagonal LHS cell, whose u and v share an LHS lane, and those in a tile that the size
+            below's base tuples fill are dropped. max-div starts from 1 candidate in each tile that the size below
+            leaves empty; where the LHS cell chosen for that candidate holds none, a new candidate is drawn in it.
         n_refinement_random_candidates_per_cell: The number of random candidate base tuples that the refinement solve
-            draws in each LHS cell of the largest size that holds a new base tuple, at least 1.
+            draws in each new base tuple's LHS cell of the largest size, at least 1.
 
     Raises:
         ValueError: If `t_total_sec` is below 1 s, `n_workers`, `n_population` or

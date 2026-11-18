@@ -1,5 +1,5 @@
-"""`MCTuplesRefinementSolve` requires 1 new base tuple per LHS cell of the largest size that holds a selected new base
-tuple, starts from those base tuples, and refuses a selection that breaks an LHS cell's constraint."""
+"""`MCTuplesRefinementSolve` requires 1 new base tuple in each selected new base tuple's LHS cell of the largest size,
+starts from those base tuples, and refuses a selection that breaks an LHS cell's constraint."""
 
 import numpy as np
 import pytest

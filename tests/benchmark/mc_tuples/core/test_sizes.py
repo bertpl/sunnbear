@@ -173,7 +173,8 @@ def _move_tuple_0_into_the_lhs_lanes_of_tuple_1(axis: int):
 )
 def test_check_lhs_lanes_and_tiles_refuses_an_lhs_lane_or_a_tile_without_exactly_1_tuple(change, message):
     """At size 16, a grid of tuples with 1 tuple moved or dropped, or 2 swapped between tiles, raises a `ValueError`
-    that counts the parts of the first kind that break, checked in the order LHS lanes along u, along v, tiles."""
+    that counts the LHS lanes or tiles without exactly 1 tuple in the first check that fails, the checks running in the
+    order LHS lanes along u, LHS lanes along v, tiles."""
     # --- arrange ----------------------
     tuple_array = change(_grid_tuple_array(MCTuplesSize.SIZE_16))
 

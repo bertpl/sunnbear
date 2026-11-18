@@ -8,6 +8,6 @@ class MCTuplesConstructionError(SunnbearError):
 
     - the selection misses the dummy rotational sibling tuple or a base tuple of the size below;
     - after the selection solve, an LHS lane or a tile of the size does not hold exactly 1 tuple;
-    - after the refinement solve, an LHS cell of the largest size that held a new base tuple does not hold exactly 1
-      new base tuple.
+    - after the refinement solve, a selected new base tuple's LHS cell of the largest size does not hold exactly 1 new
+      base tuple.
     """

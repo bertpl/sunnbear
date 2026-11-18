@@ -3,11 +3,11 @@
 The selection solve (`selection`) draws only a few candidates per LHS cell of the largest size, so each new base tuple
 that it picks can still move to a better position within that cell.
 
-The refinement solve draws a population only in the LHS cells of the largest size that hold the selected new base
-tuples: each base tuple, followed by many candidates inside its cell (`MCTuplesPopulation.draw_in_lhs_cells_of`).
+The refinement solve draws a population only in the selected new base tuples' LHS cells of the largest size: each base
+tuple, followed by many candidates inside its cell (`MCTuplesPopulation.draw_in_lhs_cells_of`).
 
 Besides the weighted constraint that keeps the dummy rotational sibling tuple and the size below (`solve`), 1 constraint
-per LHS cell of the largest size that holds a new base tuple requires exactly 1 new base tuple in that cell.
+per new base tuple's LHS cell of the largest size requires exactly 1 new base tuple in that cell.
 
 Every size's LHS lanes are made of whole LHS lanes of the largest size, and its tiles of whole LHS cells of the largest
 size, so a base tuple that moves within its LHS cell of the largest size keeps its LHS lanes and its tile at every size.
@@ -35,7 +35,7 @@ class MCTuplesRefinementSolve(MCTuplesSolve):
 
     Attributes:
         n_random_candidates_per_cell: The number of candidates that the population draws in each LHS cell of the largest
-            size that holds a new base tuple, besides the selected base tuple.
+            size of a new base tuple, besides the selected base tuple.
     """
 
     def __init__(
@@ -45,7 +45,7 @@ class MCTuplesRefinementSolve(MCTuplesSolve):
         size: MCTuplesSize,
         settings: MCTuplesSolveSettings,
     ) -> None:
-        """Draw the population in the LHS cells of the largest size that hold the new base tuples.
+        """Draw the population in the new base tuples' LHS cells of the largest size.
 
         `selected_base_tuple_array` holds the size's base tuples after the selection solve: the size below's base
         tuples first, then the new base tuples. Drawing the population advances `settings.rng`.
@@ -64,7 +64,7 @@ class MCTuplesRefinementSolve(MCTuplesSolve):
     #  Subclass hooks
     # --------------------------------------------------------------------------
     def _new_base_tuple_constraints(self) -> list[Constraint]:
-        """Return 1 constraint per LHS cell of the largest size that holds a new base tuple.
+        """Return 1 constraint per new base tuple's LHS cell of the largest size.
 
         Each constraint requires exactly 1 new base tuple in its cell.
         """

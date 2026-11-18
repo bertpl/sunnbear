@@ -58,12 +58,13 @@ class MCTuplesPopulation:
         return np.column_stack([self.u, self.v])
 
     def pick_or_draw_in_lhs_cells(
-        self, u_lanes: np.ndarray, v_lanes: np.ndarray, size: MCTuplesSize, rng: np.random.Generator
+        self, u_lane_indices: np.ndarray, v_lane_indices: np.ndarray, size: MCTuplesSize, rng: np.random.Generator
     ) -> tuple["MCTuplesPopulation", np.ndarray]:
-        """Return this population, extended where needed, and 1 candidate in each LHS cell that the lane pairs name.
+        """Return this population, extended where needed, and 1 candidate in each LHS cell that the 2 lane arrays name.
 
-        Each LHS cell of `size` `(u_lanes[i], v_lanes[i])` takes a random candidate of this population inside it, or,
-        when this population holds none there, a new candidate drawn inside it and appended to the population.
+        The LHS cell of `size` where LHS lane `u_lane_indices[i]` along u crosses LHS lane `v_lane_indices[i]` along v
+        takes a random candidate of this population inside it, or, when this population holds none there, a new
+        candidate drawn inside it and appended to the population.
 
         Returns:
             The extended population, and the picked candidates as indices into it, ascending.
@@ -72,13 +73,13 @@ class MCTuplesPopulation:
         cell_ids = size.lhs_lane_indices(self.u) * int(size) + size.lhs_lane_indices(self.v)
         order = np.argsort(cell_ids, kind="stable")
         sorted_cell_ids = cell_ids[order]
-        wanted_cell_ids = u_lanes * int(size) + v_lanes
+        wanted_cell_ids = u_lane_indices * int(size) + v_lane_indices
         starts = np.searchsorted(sorted_cell_ids, wanted_cell_ids, side="left")
         ends = np.searchsorted(sorted_cell_ids, wanted_cell_ids, side="right")
         has_candidate = ends > starts
         picked = np.empty(wanted_cell_ids.size, dtype=np.int64)
         picked[has_candidate] = order[starts[has_candidate] + rng.integers(ends[has_candidate] - starts[has_candidate])]
-        drawn = self.draw_1_in_each_lhs_cell(u_lanes[~has_candidate], v_lanes[~has_candidate], size, rng)
+        drawn = self.draw_1_in_each_lhs_cell(u_lane_indices[~has_candidate], v_lane_indices[~has_candidate], size, rng)
         picked[~has_candidate] = self.u.size + np.arange(drawn.u.size)
         extended = MCTuplesPopulation(u=np.concatenate([self.u, drawn.u]), v=np.concatenate([self.v, drawn.v]))
         return extended, np.sort(picked)
