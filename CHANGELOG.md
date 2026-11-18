@@ -5,21 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.4.3 (2026-11-18)
 
 ### Added
 
 - Add hyperbolic functions to the standard function families of the test problems that the internal benchmark suite pipeline builds benchmark suites from
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 0.4.2 (2026-11-17)
 
