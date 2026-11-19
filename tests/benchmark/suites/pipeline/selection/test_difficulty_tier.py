@@ -27,8 +27,8 @@ from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
     ],
 )
 def test_the_tier_follows_the_edi_relative_to_bisections_count(edi, difficulty_tier_expected):
-    """With 40 bisection evaluations, the tiers start at the EDIs 10, 20 and 40, and an EDI of `max_fevals`, 160, falls
-    in D."""
+    """With 40 bisection evaluations, tiers B, C and D start at the EDIs 10, 20 and 40, and an EDI of `max_fevals`, 160,
+    falls in D."""
     # --- act / assert -----------------
     assert DifficultyTier.from_edi(edi, n_bisection_fevals=40) is difficulty_tier_expected
 
