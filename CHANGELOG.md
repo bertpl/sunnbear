@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add methods to `MCTuplesSize` for a size's LHS lanes and tiles, and `check_lhs_lanes_and_tiles`, which checks that each holds exactly 1 tuple
+- Add methods to `MCTuplesSize` for a size's LHS lanes and tiles, among them `check_lhs_lanes_and_tiles`, which checks that each LHS lane and each tile holds exactly 1 tuple
 
 ### Changed
 
