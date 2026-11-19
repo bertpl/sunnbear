@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.4.4 (2026-11-19)
 
 ### Added
 
@@ -15,14 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Replace the shipped Monte Carlo tuple set with one that holds, at every size n, exactly 1 tuple in each of n equal intervals along u and along v, and in each square of a `sqrt(n)` by `sqrt(n)` grid; this changes benchmark results
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 0.4.3 (2026-11-18)
 
