@@ -18,7 +18,7 @@ from sunnbear._core.benchmark.suites.pipeline.state import PipelineState
 from sunnbear._core.utils.worker_pool import WorkerPool
 from tests.benchmark.suites.pipeline.example_states import build_state_before, example_problem_ids
 
-A, B, C, DA, DB = DifficultyTier
+A, B, C, D = DifficultyTier
 
 # The stage runs no tasks in the pool, so its processes never start; max-div runs 1 worker per worker of the pool, and
 # warns that 1 worker gains nothing over a single solve.
@@ -61,9 +61,8 @@ def test_the_stage_stops_the_pipeline_below_the_smallest_core_size():
 
 @pytest.mark.only_with_numba_jit
 def test_the_stage_selects_a_core_that_meets_every_quota():
-    """From 160 candidates whose EDIs fall 40 each in A, B and C, 30 in Da and 10 in Db, the stage selects the Core
-    `sb-128` with 32 each of A, B and C, 24 of Da and 8 of Db under 1 quota per tier, and drops the other 32 candidates
-    as not in the Core."""
+    """From 160 candidates whose EDIs fall 40 in each tier, those of D at 60 and 120, the stage selects the Core
+    `sb-128` with 32 of each tier under 1 quota per tier, and drops the other 32 candidates as not in the Core."""
     # --- arrange ----------------------
     edis = [5.0] * 40 + [15.0] * 40 + [30.0] * 40 + [60.0] * 30 + [120.0] * 10
 
@@ -72,7 +71,7 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
 
     # --- assert -----------------------
     core_pool = state.create_state_accessor(PipelineStageId.DISTILLATION).candidate_pool()
-    assert Counter(core_pool.difficulty_tiers.values()) == {A: 32, B: 32, C: 32, DA: 24, DB: 8}
+    assert Counter(core_pool.difficulty_tiers.values()) == dict.fromkeys([A, B, C, D], 32)
     core_selection_details = state.create_build_details().core_selection_details()
     assert core_selection_details.benchmark_suite.name == "sb-128"
     assert core_selection_details.benchmark_suite.aliases == ()
@@ -80,8 +79,7 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
         A: (5.0, 5.0),
         B: (15.0, 15.0),
         C: (30.0, 30.0),
-        DA: (60.0, 60.0),
-        DB: (120.0, 120.0),
+        D: (60.0, 120.0),
     }
     drops = [state.drop_of(problem_id) for problem_id in example_problem_ids(len(edis))]
     assert Counter(drop.reason for drop in drops if drop is not None) == {"not_in_core": 32}
@@ -89,19 +87,19 @@ def test_the_stage_selects_a_core_that_meets_every_quota():
 
 @pytest.mark.only_with_numba_jit
 def test_the_stage_fills_a_tier_below_its_quota_from_its_neighbor_and_records_its_parameters():
-    """No candidate is of tier Db, and all candidates of Da share the EDI 60, so the last 8 of Da in the pool count
-    toward Db's quota, and the Core holds all 8; the stage's parameters record max-div's time per candidate and seed."""
+    """Only 24 candidates are of tier D, and all candidates of C share the EDI 30, so the last 8 of C in the pool count
+    toward D's quota, and the Core holds all 8; the stage's parameters record max-div's time per candidate and seed."""
     # --- arrange ----------------------
     stage = CoreSelectionStage(_SEC_PER_CANDIDATE)
-    edis = [5.0] * 40 + [15.0] * 40 + [30.0] * 40 + [60.0] * 40
+    edis = [5.0] * 40 + [15.0] * 40 + [30.0] * 56 + [60.0] * 24
 
     # --- act --------------------------
     state = _select_core(edis, stage)
 
     # --- assert -----------------------
     core_pool = state.create_state_accessor(PipelineStageId.DISTILLATION).candidate_pool()
-    assert Counter(core_pool.difficulty_tiers.values()) == dict.fromkeys([A, B, C, DA], 32)
+    assert Counter(core_pool.difficulty_tiers.values()) == {A: 32, B: 32, C: 40, D: 24}
     core_selection_details = state.create_build_details().core_selection_details()
-    assert set(example_problem_ids(len(edis))[-8:]) <= set(core_selection_details.benchmark_suite.problem_ids)
-    assert core_selection_details.edi_range_by_tier[DB] == (60.0, 60.0)
+    assert set(example_problem_ids(len(edis))[128:136]) <= set(core_selection_details.benchmark_suite.problem_ids)
+    assert core_selection_details.edi_range_by_tier[D] == (30.0, 60.0)
     assert stage.parameters == {"sec_per_candidate": _SEC_PER_CANDIDATE, "seed": stage.seed}
