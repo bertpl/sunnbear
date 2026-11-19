@@ -6,14 +6,15 @@ configs. Relative to `n_bisection_fevals`, the evaluation count that bisection s
 - A: below 1/4, far better than bisection;
 - B: from 1/4 to 1/2;
 - C: from 1/2 to 1, comparable to bisection but still better;
-- Da: from 1 to 2, worse than bisection;
-- Db: from 2 up to 4; 4 is the ratio of `max_fevals` to `n_bisection_fevals`, so every EDI falls in a tier.
+- D: from 1 up to 4, worse than bisection; 4 is the ratio of `max_fevals` to `n_bisection_fevals`, so every EDI falls
+  in a tier.
+
+D spans a factor 4, where B and C each span a factor 2, because an EDI above twice `n_bisection_fevals` is rare, so a
+separate tier from 2 to 4 would hold few candidates: of the core solver configs, ITP spends at most about
+`n_bisection_fevals` evaluations, and Ridders at most about twice that.
 
 Every max-div selection, of the Core and of the distilled suites, has 1 quota per tier, a fixed share of the
-selection's size.
-
-`DifficultyTier.core_share` gives the shares: a quarter each for A, B and C, and the last quarter split 3 to 1 between
-Da and Db, because test problems of tier Db are rare and extreme.
+selection's size. `DifficultyTier.core_share` gives the shares, equal for every tier.
 """
 
 from enum import StrEnum
@@ -33,8 +34,7 @@ class DifficultyTier(StrEnum):
     A = "A"
     B = "B"
     C = "C"
-    DA = "Da"
-    DB = "Db"
+    D = "D"
 
     @property
     def core_share(self) -> Fraction:
@@ -59,11 +59,11 @@ class DifficultyTier(StrEnum):
     # --------------------------------------------------------------------------
     @classmethod
     def from_edi(cls, edi: float, *, n_bisection_fevals: int) -> "DifficultyTier":
-        """Return the tier whose EDI range holds `edi`; an EDI at or above the range of Da falls in Db."""
+        """Return the tier whose EDI range holds `edi`; an EDI at or above the upper end of D's range falls in D."""
         for difficulty_tier in cls:
             if edi < difficulty_tier.edi_range(n_bisection_fevals)[1]:
                 return difficulty_tier
-        return cls.DB
+        return cls.D
 
 
 # Each tier's EDI range, relative to `n_bisection_fevals`, starts where the range of the tier before it ends.
@@ -71,13 +71,11 @@ _EDI_RATIO_RANGES = {
     DifficultyTier.A: (0, 1 / 4),
     DifficultyTier.B: (1 / 4, 1 / 2),
     DifficultyTier.C: (1 / 2, 1),
-    DifficultyTier.DA: (1, 2),
-    DifficultyTier.DB: (2, 4),
+    DifficultyTier.D: (1, 4),
 }
 _CORE_SHARES = {
     DifficultyTier.A: Fraction(1, 4),
     DifficultyTier.B: Fraction(1, 4),
     DifficultyTier.C: Fraction(1, 4),
-    DifficultyTier.DA: Fraction(3, 16),
-    DifficultyTier.DB: Fraction(1, 16),
+    DifficultyTier.D: Fraction(1, 4),
 }

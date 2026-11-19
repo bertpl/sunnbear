@@ -64,7 +64,7 @@ def test_a_selection_that_misses_a_quota_stops_the_pipeline(monkeypatch):
     tier_assignment = DifficultyTierAssignment.from_pool(pool, DifficultyTierQuotas(16))
 
     # --- act / assert -----------------
-    with pytest.raises(PipelineStopError, match=r"unmet quotas: A: 16 of 4; B: 0 of 4; C: 0 of 4; Da: 0 of 3; Db: 0"):
+    with pytest.raises(PipelineStopError, match=r"unmet quotas: A: 16 of 4; B: 0 of 4; C: 0 of 4; D: 0 of 4\."):
         select_diverse_problem_ids(pool, tier_assignment=tier_assignment, seed=1, sec_per_candidate=0.05, n_workers=2)
 
 

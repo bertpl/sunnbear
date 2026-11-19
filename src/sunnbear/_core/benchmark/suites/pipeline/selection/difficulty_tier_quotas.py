@@ -1,5 +1,6 @@
 """`DifficultyTierQuotas` holds the quotas of 1 selection: how many selected candidates count toward each tier."""
 
+import math
 from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -20,8 +21,8 @@ class DifficultyTierQuotas:
     those with that assigned tier, which `DifficultyTierAssignment` gives.
 
     Attributes:
-        selection_size: The number of candidates of the selection; a positive multiple of 16, so that every tier's
-            quota is whole and at least 1.
+        selection_size: The number of candidates of the selection; a positive multiple of the denominator of every
+            tier's `core_share`, so that every tier's quota is whole and at least 1.
     """
 
     selection_size: int
@@ -30,12 +31,14 @@ class DifficultyTierQuotas:
         """Refuse a selection size that gives some tier a quota that is not a positive whole number.
 
         Raises:
-            ValueError: If `selection_size` is not a positive multiple of 16.
+            ValueError: If `selection_size` is not a positive multiple of the denominator of every tier's
+                `core_share`.
         """
-        if self.selection_size <= 0 or self.selection_size % 16 != 0:
+        size_divisor = math.lcm(*(tier.core_share.denominator for tier in DifficultyTier))
+        if self.selection_size <= 0 or self.selection_size % size_divisor != 0:
             raise ValueError(
                 f"A selection of {self.selection_size} candidates gives some tier a quota that is not a positive "
-                f"whole number."
+                f"whole number; a selection's size must be a positive multiple of {size_divisor}."
             )
 
     @property

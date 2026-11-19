@@ -22,7 +22,7 @@ from sunnbear._core.benchmark.suites.pipeline.state import BenchmarkSuitesBuildD
 from sunnbear._core.utils.worker_pool import WorkerPool
 from tests.benchmark.suites.pipeline.example_states import build_state_before, example_problem_ids
 
-A, B, C, DA, DB = DifficultyTier
+A, B, C, D = DifficultyTier
 
 # The stage runs no tasks in the pool, so the pool's processes never start. max-div runs 1 worker per worker of the
 # pool, and with 1 worker it warns that it gains nothing over a single solve, so the pool has 2 workers.
@@ -33,7 +33,7 @@ _TWO_WORKER_POOL = WorkerPool(n_workers=2)
 _SEC_PER_CANDIDATE = 0.03
 # These are the ranges of each tier's EDIs, relative to `DEFAULT_N_BISECTION_FEVALS`; the EDIs differ within a tier,
 # so that the distance between 2 EDIs of 1 tier is not 0.
-_EDI_RATIO_RANGE_BY_TIER = {A: (0.1, 0.2), B: (0.3, 0.45), C: (0.6, 0.9), DA: (1.2, 1.8), DB: (2.5, 3.5)}
+_EDI_RATIO_RANGE_BY_TIER = {A: (0.1, 0.2), B: (0.3, 0.45), C: (0.6, 0.9), D: (1.2, 3.5)}
 
 
 def _distill(tier_counts: dict[DifficultyTier, int], stage: DistillationStage) -> BenchmarkSuitesBuildDetails:
@@ -76,9 +76,9 @@ def _check_quotas_and_nesting(build_details: BenchmarkSuitesBuildDetails) -> Non
 @pytest.mark.only_with_numba_jit
 def test_the_series_split_a_core_of_128_into_2_suites_of_64():
     """A Core of 128 with every tier at its share splits into `sb-64a`, alias `sb-tiny`, and `sb-64b`, each with 16
-    of A, B and C, 12 of Da and 4 of Db; only `sb-64a` has quotas and a diversity score."""
+    of each tier; only `sb-64a` has quotas and a diversity score."""
     # --- act --------------------------
-    build_details = _distill({A: 32, B: 32, C: 32, DA: 24, DB: 8}, DistillationStage(_SEC_PER_CANDIDATE))
+    build_details = _distill({A: 32, B: 32, C: 32, D: 32}, DistillationStage(_SEC_PER_CANDIDATE))
 
     # --- assert -----------------------
     all_selection_details = build_details.distilled_suite_selection_details()
@@ -89,10 +89,10 @@ def test_the_series_split_a_core_of_128_into_2_suites_of_64():
     a_suite, b_suite = (details.benchmark_suite for details in all_selection_details.values())
     assert set(a_suite.problem_ids) | set(b_suite.problem_ids) == set(build_details.remaining_problem_ids)
     assert not set(a_suite.problem_ids) & set(b_suite.problem_ids)
-    assert build_details.suite_tier_counts().select("n_candidates_a", "n_candidates_db").rows() == [
-        (32, 8),
-        (16, 4),
-        (16, 4),
+    assert build_details.suite_tier_counts().select("n_candidates_a", "n_candidates_d").rows() == [
+        (32, 32),
+        (16, 16),
+        (16, 16),
     ]
     assert all_selection_details["sb-64a"].diversity > 0.0
     assert (all_selection_details["sb-64b"].edi_range_by_tier, all_selection_details["sb-64b"].diversity) == (
@@ -111,7 +111,7 @@ def test_each_series_nests_its_suites_and_the_stage_records_its_parameters():
     stage = DistillationStage(_SEC_PER_CANDIDATE)
 
     # --- act --------------------------
-    build_details = _distill({A: 64, B: 64, C: 64, DA: 40, DB: 24}, stage)
+    build_details = _distill({A: 64, B: 64, C: 56, D: 72}, stage)
 
     # --- assert -----------------------
     all_selection_details = build_details.distilled_suite_selection_details()
