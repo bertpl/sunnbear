@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Merge the difficulty tiers Da and Db of the internal benchmark suite pipeline into 1 tier D, which gets a quarter of every benchmark suite, as A, B and C do
+
 ### Deprecated
 
 ### Removed
