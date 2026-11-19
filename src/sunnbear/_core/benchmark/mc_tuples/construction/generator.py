@@ -5,16 +5,15 @@ around (0.5, 0.5) (`rotations`), so every size's u values and v values are the s
 0.5.
 
 The construction builds the sizes bottom-up, the smallest first, and each larger size includes the size below it,
-so every size is a prefix of the next. Each axis is divided into `N_FINE_LANES` equal parts, the fine lanes, and no 2
-tuples of the set share a fine lane.
+so every size is a prefix of the next. Every size holds exactly 1 tuple in each of its LHS lanes, along u and along v,
+and exactly 1 in each of its tiles (`MCTuplesSize`).
 
 `MCTuplesGenerator` builds each size in 2 max-div solves over base tuples, each implemented in the module of this
 package named in parentheses:
 
-1. the selection solve picks the new base tuples from a population over the fine lanes of [0, 0.5] that the size
-   below leaves free (`selection`);
-2. the refinement solve moves each new base tuple within its fine cell, the crossing of its fine u-lane and fine v-lane
-   (`refinement`).
+1. the selection solve picks the new base tuples from a population over the LHS lanes and tiles of [0, 0.5]^2 that
+   the size below leaves free (`selection`);
+2. the refinement solve moves each new base tuple within its LHS cell of the largest size (`refinement`).
 
 Both solves share:
 
@@ -45,7 +44,9 @@ from .solve import MCTuplesSolveSettings
 # constants, so that the 3 cannot drift apart; `generate_mc_tuples` documents each argument.
 DEFAULT_N_WORKERS = 32
 DEFAULT_SEED = 42
-# 2^18 = 512^2 gives the smallest size's selection solve about 1 candidate per fine cell of the lower fine lanes.
+# A population of 2^18 candidates gives the largest size's selection solve about 2 candidates per LHS cell of its free
+# lanes; its starting selection draws a new candidate in each LHS cell that the starting selection needs and that holds
+# no candidate.
 DEFAULT_N_POPULATION = 2**18
 DEFAULT_N_REFINEMENT_RANDOM_CANDIDATES_PER_CELL = 256
 
@@ -118,8 +119,7 @@ class MCTuplesGenerator:
         Raises:
             ValueError: If `t_total_sec` is below `MIN_T_TOTAL_SEC`, or `max_size` is not 1 of `MCTuplesSize`.
             MCTuplesConstructionError: If a size cannot be built within its constraints, which can happen when
-                `t_total_sec` is too short for max-div to meet them, or when `n_population` is too small to place
-                the size's new base tuples in distinct fine lanes.
+                `t_total_sec` is too short for max-div to meet them.
         """
         t_budget_per_size_sec = self.t_budget_per_size_sec(t_total_sec, max_size)
         settings = MCTuplesSolveSettings(
@@ -234,15 +234,16 @@ def generate_mc_tuples(
     So every size's u values and v values are the same set, symmetric around 0.5, and every size's mean u
     and mean v are exactly 0.5.
 
-    Each axis is cut into as many equal fine lanes as the largest `MCTuplesSize` holds tuples, and no 2 tuples share a
-    fine lane, so the largest size holds exactly 1 tuple per fine lane on each axis.
+    Every size of `n` tuples holds exactly 1 tuple in each of its `n` LHS lanes, the equal parts of width `1/n` along
+    u and along v, and exactly 1 tuple in each of its tiles, the squares of a `sqrt(n)` by `sqrt(n)` grid
+    (`MCTuplesSize`).
 
     Each size's new base tuples come from 2 max-div solves:
 
     - the selection solve picks them from a random population of about `n_population` candidate base tuples;
-    - the refinement solve moves each new base tuple within its fine cell, the crossing of its fine u-lane and fine
-      v-lane: it picks 1 base tuple per fine cell among the base tuple itself and
-      `n_refinement_random_candidates_per_cell` random candidates inside that fine cell.
+    - the refinement solve moves each new base tuple within its LHS cell of the largest size, the crossing of 2 LHS
+      lanes of that size: it picks 1 base tuple per such cell among the base tuple itself and
+      `n_refinement_random_candidates_per_cell` random candidates inside that cell.
 
     Both solves maximize the geomean of 3 values of gpq(0.1), the geometric pseudo-quantile at level 0.1, a soft
     minimum that `MCTuplesStats` reports: one over each tuple's distance to its nearest other tuple along u, one along v
@@ -283,16 +284,17 @@ def generate_mc_tuples(
         max_size: The largest size to build, 1 of `MCTuplesSize`; every size up to it is built, however short
             `t_total_sec` is, so a short run that wants fewer sizes passes a smaller `max_size`.
         n_population: The number of candidate base tuples drawn for each size's selection solve, at least 1; the
-            candidates in a diagonal fine cell, whose u and v share a fine lane, are dropped.
+            candidates in a diagonal LHS cell, whose u and v share an LHS lane, and those in a tile that the size
+            below's base tuples fill are dropped. max-div starts from 1 candidate in each tile that the size below
+            leaves empty; where the LHS cell chosen for that candidate holds none, a new candidate is drawn in it.
         n_refinement_random_candidates_per_cell: The number of random candidate base tuples that the refinement solve
-            draws in each fine cell of a new base tuple, at least 1.
+            draws in each new base tuple's LHS cell of the largest size, at least 1.
 
     Raises:
         ValueError: If `t_total_sec` is below 1 s, `n_workers`, `n_population` or
             `n_refinement_random_candidates_per_cell` is below 1, or `max_size` is not 1 of `MCTuplesSize`.
         MCTuplesConstructionError: If a size cannot be built within its constraints, which can happen when
-            `t_total_sec` is too short for max-div to meet them, or when `n_population` is too small to place the
-            size's new base tuples in distinct fine lanes.
+            `t_total_sec` is too short for max-div to meet them.
     """
     generator = MCTuplesGenerator(
         n_workers=n_workers,

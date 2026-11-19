@@ -1,16 +1,16 @@
-"""`MCTuplesRefinementSolve` moves each new base tuple of a size within its fine cell, in the size's second solve.
+"""`MCTuplesRefinementSolve`, a size's second solve, moves each new base tuple within its LHS cell of the largest size.
 
-The selection solve (`selection`) draws only a few candidates per fine cell, so each new base tuple that it picks can
-still move to a better position within its fine cell.
+The selection solve (`selection`) draws only a few candidates per LHS cell of the largest size, so each new base tuple
+that it picks can still move to a better position within that cell.
 
-The refinement solve draws a population only in the fine cells of the selected new base tuples: each base tuple,
-followed by many candidates inside its fine cell (`MCTuplesPopulation.draw_in_fine_cells_of`).
+The refinement solve draws a population only in the selected new base tuples' LHS cells of the largest size: each base
+tuple, followed by many candidates inside its cell (`MCTuplesPopulation.draw_in_lhs_cells_of`).
 
 Besides the weighted constraint that keeps the dummy rotational sibling tuple and the size below (`solve`), 1 constraint
-per fine cell of a new base tuple requires exactly 1 new base tuple in that cell.
+per new base tuple's LHS cell of the largest size requires exactly 1 new base tuple in that cell.
 
-A fine cell fixes a base tuple's 2 lower fine lanes, so every set of new base tuples that meets these constraints keeps
-the limit of 1 tuple per fine lane.
+Every size's LHS lanes are made of whole LHS lanes of the largest size, and its tiles of whole LHS cells of the largest
+size, so a base tuple that moves within its LHS cell of the largest size keeps its LHS lanes and its tile at every size.
 
 max-div starts from the selected base tuples, so the refinement ends with a score at least as high as theirs.
 """
@@ -29,11 +29,13 @@ from .solve import MCTuplesSolve, MCTuplesSolveSettings
 #  MCTuplesRefinementSolve
 # ==================================================================================================
 class MCTuplesRefinementSolve(MCTuplesSolve):
-    """`MCTuplesRefinementSolve` is the max-div solve that moves the new base tuples of 1 size within their fine cells.
+    """`MCTuplesRefinementSolve` is the max-div solve that moves a size's new base tuples within their LHS cells.
+
+    Their LHS cells are those of the largest size.
 
     Attributes:
-        n_random_candidates_per_cell: The number of candidates that the population draws in each fine cell, besides the
-            selected base tuple.
+        n_random_candidates_per_cell: The number of candidates that the population draws in each LHS cell of the largest
+            size of a new base tuple, besides the selected base tuple.
     """
 
     def __init__(
@@ -43,15 +45,18 @@ class MCTuplesRefinementSolve(MCTuplesSolve):
         size: MCTuplesSize,
         settings: MCTuplesSolveSettings,
     ) -> None:
-        """Draw the population in the fine cells of the new base tuples in `selected_base_tuple_array`.
+        """Draw the population in the new base tuples' LHS cells of the largest size.
 
         `selected_base_tuple_array` holds the size's base tuples after the selection solve: the size below's base
         tuples first, then the new base tuples. Drawing the population advances `settings.rng`.
         """
         self.n_random_candidates_per_cell = n_random_candidates_per_cell
         n_required_base_tuples = size.n_required // 4
-        population = MCTuplesPopulation.draw_in_fine_cells_of(
-            selected_base_tuple_array[n_required_base_tuples:], n_random_candidates_per_cell, settings.rng
+        population = MCTuplesPopulation.draw_in_lhs_cells_of(
+            selected_base_tuple_array[n_required_base_tuples:],
+            n_random_candidates_per_cell,
+            max(MCTuplesSize),
+            settings.rng,
         )
         super().__init__(population, selected_base_tuple_array[:n_required_base_tuples], size, settings)
 
@@ -59,7 +64,10 @@ class MCTuplesRefinementSolve(MCTuplesSolve):
     #  Subclass hooks
     # --------------------------------------------------------------------------
     def _new_base_tuple_constraints(self) -> list[Constraint]:
-        """Return 1 constraint per fine cell of a new base tuple, each requiring exactly 1 new base tuple in it."""
+        """Return 1 constraint per new base tuple's LHS cell of the largest size.
+
+        Each constraint requires exactly 1 new base tuple in its cell.
+        """
         n_per_cell = self.n_random_candidates_per_cell + 1
         return [
             Constraint(int_set=set(range(start, start + n_per_cell)), min_count=1, max_count=1)
@@ -67,14 +75,17 @@ class MCTuplesRefinementSolve(MCTuplesSolve):
         ]
 
     def _initial_new_selection(self) -> np.ndarray:
-        """Return the selected new base tuples, each fine cell's first candidate, as indices into the population."""
+        """Return the selected new base tuples as indices into the population.
+
+        They are the first candidate of each LHS cell of the largest size.
+        """
         return (self.n_random_candidates_per_cell + 1) * np.arange(self.n_new_base_tuples)
 
     def _check_new_selection(self, new_selection: np.ndarray) -> None:
-        """Raise `MCTuplesConstructionError` if a fine cell holds no new base tuple, or 2 or more."""
+        """Raise `MCTuplesConstructionError` unless each LHS cell of the largest size holds exactly 1 new base tuple."""
         counts = np.bincount(new_selection // (self.n_random_candidates_per_cell + 1), minlength=self.n_new_base_tuples)
         n_off = int((counts != 1).sum())
         if n_off > 0:
             raise MCTuplesConstructionError(
-                f"Size {self.size}: {n_off} fine cells do not hold exactly 1 new base tuple."
+                f"Size {self.size}: {n_off} LHS cells of the largest size do not hold exactly 1 new base tuple."
             )

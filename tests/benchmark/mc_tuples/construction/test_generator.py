@@ -1,7 +1,7 @@
 """`MCTuplesGenerator`, which `generate_mc_tuples` runs:
 
-- builds nested sizes that are symmetric under rotations by 90 degrees, with means of exactly 0.5, at most 1 tuple per
-  fine lane, and at least `MIN_N_BITS` bits in every value;
+- builds nested sizes that are symmetric under rotations by 90 degrees, with means of exactly 0.5, exactly 1 tuple per
+  LHS lane and per tile, and at least `MIN_N_BITS` bits in every value;
 - reports each size;
 - splits the total time over the sizes, and each size's time over its 2 solves;
 - scales down the worker count of a short run.
@@ -18,7 +18,6 @@ from sunnbear._core.benchmark.mc_tuples import (
     MCTuplesGenerator,
     MCTuplesSize,
     MCTuplesSizeResult,
-    fine_lanes_of,
     generate_mc_tuples,
 )
 from sunnbear._core.benchmark.mc_tuples.construction.refinement import MCTuplesRefinementSolve
@@ -32,7 +31,7 @@ def _take_the_starting_selection(self: MCTuplesSelectionSolve, t_budget_sec: flo
 
 
 def _pick_each_cell_s_last_candidate(self: MCTuplesRefinementSolve, t_budget_sec: float) -> tuple[np.ndarray, None]:
-    """Replace `MCTuplesRefinementSolve.run`: pick the last candidate of each fine cell, without running max-div."""
+    """Replace `MCTuplesRefinementSolve.run`: pick the last candidate of each LHS cell, without running max-div."""
     n_per_cell = self.n_random_candidates_per_cell + 1
     new = self.population.base_tuple_array[n_per_cell - 1 :: n_per_cell]
     return np.vstack([self.required_base_tuple_array, new]), None
@@ -43,7 +42,7 @@ def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]
 
     - the u values and the v values are the same set;
     - the u and v means are exactly 0.5;
-    - each fine lane holds at most 1 tuple;
+    - each LHS lane and each tile holds exactly 1 tuple;
     - every value holds at least `MIN_N_BITS` bits of information.
     """
     for result in results:
@@ -51,7 +50,7 @@ def _assert_valid_nested_set(tuples: MCTuples, results: list[MCTuplesSizeResult]
         assert result.tuples.tuple_array.tolist() == size_tuples.tuple_array.tolist()
         assert np.array_equal(np.sort(size_tuples.u), np.sort(size_tuples.v))
         assert math.fsum(size_tuples.u) / result.size == 0.5
-        assert np.bincount(fine_lanes_of(size_tuples.u)).max() == 1
+        result.size.check_lhs_lanes_and_tiles(size_tuples.tuple_array)
         bit_stats = size_tuples.bit_stats()
         assert min(bit_stats.min_n_bits_u, bit_stats.min_n_bits_v) >= MIN_N_BITS
 
@@ -87,7 +86,8 @@ def test_generator_builds_nested_symmetric_sizes_and_reports_each_size():
 
 def test_generator_selects_and_refines_each_size_and_builds_the_next_on_it(monkeypatch):
     """With both solves replaced by stubs that run no max-div, the generator builds a valid nested set, and for each
-    size it moves every selected new base tuple within its fine cell and keeps the size below's base tuples."""
+    size it moves every selected new base tuple within its LHS cell of the largest size and keeps the size below's base
+    tuples."""
     # --- arrange ----------------------
     monkeypatch.setattr(MCTuplesSelectionSolve, "run", _take_the_starting_selection)
     monkeypatch.setattr(MCTuplesRefinementSolve, "run", _pick_each_cell_s_last_candidate)
@@ -106,7 +106,7 @@ def test_generator_selects_and_refines_each_size_and_builds_the_next_on_it(monke
         selected, refined = result.selected_base_tuple_array, result.refined_base_tuple_array
         assert np.array_equal(selected[:n_required_base_tuples], refined[:n_required_base_tuples])
         assert not np.any(selected[n_required_base_tuples:] == refined[n_required_base_tuples:])
-        assert np.array_equal(fine_lanes_of(selected), fine_lanes_of(refined))
+        assert np.array_equal(max(MCTuplesSize).lhs_lane_indices(selected), max(MCTuplesSize).lhs_lane_indices(refined))
         assert result.selected_tuple_array.shape == (int(result.size), 2)
 
 

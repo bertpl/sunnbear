@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add methods to `MCTuplesSize` for a size's LHS lanes and tiles, among them `check_lhs_lanes_and_tiles`, which checks that each LHS lane and each tile holds exactly 1 tuple
+
 ### Changed
+
+- Replace the shipped Monte Carlo tuple set with one that holds, at every size n, exactly 1 tuple in each of n equal intervals along u and along v, and in each square of a `sqrt(n)` by `sqrt(n)` grid; this changes benchmark results
 
 ### Deprecated
 
