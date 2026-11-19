@@ -61,8 +61,8 @@ def test_the_stage_stops_the_pipeline_below_the_smallest_core_size():
 
 @pytest.mark.only_with_numba_jit
 def test_the_stage_selects_a_core_that_meets_every_quota():
-    """From 160 candidates whose EDIs fall 40 in each tier, those of D at 60 and 120, the stage selects the Core
-    `sb-128` with 32 of each tier under 1 quota per tier, and drops the other 32 candidates as not in the Core."""
+    """From 160 candidates whose EDIs fall 40 in each tier, with D's EDIs at 60 and 120, the stage selects the
+    Core `sb-128` with 32 of each tier under 1 quota per tier, and drops the other 32 candidates as not in the Core."""
     # --- arrange ----------------------
     edis = [5.0] * 40 + [15.0] * 40 + [30.0] * 40 + [60.0] * 30 + [120.0] * 10
 

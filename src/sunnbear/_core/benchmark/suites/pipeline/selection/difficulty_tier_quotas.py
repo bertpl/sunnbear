@@ -34,11 +34,11 @@ class DifficultyTierQuotas:
             ValueError: If `selection_size` is not a positive multiple of the denominator of every tier's
                 `core_share`.
         """
-        size_multiple = math.lcm(*(tier.core_share.denominator for tier in DifficultyTier))
-        if self.selection_size <= 0 or self.selection_size % size_multiple != 0:
+        size_divisor = math.lcm(*(tier.core_share.denominator for tier in DifficultyTier))
+        if self.selection_size <= 0 or self.selection_size % size_divisor != 0:
             raise ValueError(
                 f"A selection of {self.selection_size} candidates gives some tier a quota that is not a positive "
-                f"whole number; a selection's size must be a positive multiple of {size_multiple}."
+                f"whole number; a selection's size must be a positive multiple of {size_divisor}."
             )
 
     @property

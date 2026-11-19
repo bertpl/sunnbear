@@ -65,8 +65,8 @@ def test_a_tier_below_its_quota_takes_candidates_from_the_nearest_surplus(
 ):
     """Each tier below its quota takes its missing candidates from the nearest tier with a surplus:
 
-    - with 56 of D and 66 of C for quotas of 64, D takes C's 2 surplus candidates, and the other 6 come from B through
-      C, which keeps 64;
+    - with 56 of D and 66 of C for quotas of 64, D takes C's 2 surplus candidates; B's 6 surplus candidates move to C,
+      and C passes 6 more to D, so C keeps 64;
     - with 31 of B and 22 of C, C has the larger shortfall and takes 10 from D first; B then takes 1 from A, because C
       has no surplus left.
     """

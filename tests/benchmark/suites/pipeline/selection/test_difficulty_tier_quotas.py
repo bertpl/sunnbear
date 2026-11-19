@@ -17,7 +17,7 @@ def test_each_tier_has_its_share_of_the_selection():
 
 @pytest.mark.parametrize("selection_size", [0, 102])
 def test_quotas_are_refused_for_a_size_without_positive_whole_quotas(selection_size):
-    """A size that is not a positive multiple of 4 gives the tiers, with their shares of 1/4, quotas that are not
+    """Each tier's share is 1/4, so a size that is not a positive multiple of 4 gives the tiers quotas that are not
     positive whole numbers; the message names the multiple."""
     # --- act / assert -----------------
     with pytest.raises(

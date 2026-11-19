@@ -55,6 +55,6 @@ def test_the_ratio_distance_is_the_factor_outside_the_range(edi, distance_expect
 
 
 def test_each_tier_fills_a_quarter_of_the_core():
-    """Each tier fills a quarter of the Core."""
+    """Each tier fills 1/4 of the Core."""
     # --- act / assert -----------------
     assert [difficulty_tier.core_share for difficulty_tier in DifficultyTier] == [Fraction(1, 4)] * 4

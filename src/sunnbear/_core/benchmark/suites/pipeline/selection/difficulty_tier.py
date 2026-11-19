@@ -9,11 +9,11 @@ configs. Relative to `n_bisection_fevals`, the evaluation count that bisection s
 - D: from 1 up to 4, worse than bisection; 4 is the ratio of `max_fevals` to `n_bisection_fevals`, so every EDI falls
   in a tier.
 
-D spans a factor 4, where B and C span a factor 2, because an EDI above 2 is rare: of the core solver configs, ITP
-spends at most about bisection's count, and Ridders at most about twice it.
+D spans a factor 4, where B and C span a factor 2, because an EDI above twice `n_bisection_fevals` is rare: of the core
+solver configs, ITP spends at most about bisection's count, and Ridders at most about twice it.
 
 Every max-div selection, of the Core and of the distilled suites, has 1 quota per tier, a fixed share of the
-selection's size. `DifficultyTier.core_share` gives the shares: a quarter for each tier.
+selection's size. `DifficultyTier.core_share` gives the shares, equal for every tier.
 """
 
 from enum import StrEnum
