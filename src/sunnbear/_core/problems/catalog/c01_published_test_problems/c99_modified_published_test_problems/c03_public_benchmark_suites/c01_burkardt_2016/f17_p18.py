@@ -92,7 +92,8 @@ class ModifiedBurkardt2016P18(Formula):
             ),
             (
                 "This changes what the test problem tests: the source writes the polynomial term by term "
-                "because it is hard to evaluate accurately in that form."
+                "to make it hard to evaluate accurately, and the expression evaluates it without that "
+                "cancellation."
             ),
         ),
     )

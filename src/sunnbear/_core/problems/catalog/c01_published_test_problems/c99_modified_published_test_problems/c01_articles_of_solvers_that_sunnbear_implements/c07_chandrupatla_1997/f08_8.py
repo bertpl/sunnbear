@@ -64,7 +64,7 @@ class ModifiedChandrupatla19978(Formula):
             (
                 r"$\c$ scales x, so that the root moves by the factor $(\param{b}/\param{a})^{\c}$ and "
                 "never reaches 0: the interval spans orders of magnitude next to the pole of "
-                r"$1628/\tmp{u}$ at 0, across which a shift along x would take the lower bound."
+                r"$1628/\tmp{u}$ at 0, and a shift along x would move the lower bound across it."
             ),
         ),
     )

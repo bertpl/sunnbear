@@ -75,9 +75,14 @@ class ModifiedSuliMayers200312(Formula):
         notes=(
             (
                 r"The expression is the published function evaluated at $\tmp{u} + 1.05$, which moves the "
-                "function's minimum from 1.05 to 0. Its intervals hold only the left root, "
-                r"$-1/\param{M}$, because each published interval holds both roots, $1.05 \pm "
-                r"1/\param{M}$, so that the function has the same sign at both published bounds."
+                "function's minimum from 1.05 to 0, because the largest bound of the narrow published "
+                "interval, $[1.04999, 1.05001]$, is about 52,500 times its width, more than the benchmark "
+                "suite inclusion conditions allow."
+            ),
+            (
+                r"The modified intervals hold only the left root, $-1/\param{M}$, because each published "
+                r"interval holds both roots, $1.05 \pm 1/\param{M}$, so that the function has the same "
+                "sign at both published bounds."
             ),
             (
                 "This changes what the test problem tests: the source uses the function to show that an "

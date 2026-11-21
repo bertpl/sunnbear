@@ -49,7 +49,7 @@ class ModifiedGorgeyEtAl2025Equation1(Formula):
         notes=(
             (
                 "The interval ends at 3.06, not at the published 3, which is the triple root, so that the "
-                "function is not 0 there; the interval still holds all 3 roots."
+                "function is not 0 there; the interval still holds all 3 roots, $-2$, $-1$ and 3."
             ),
         ),
     )

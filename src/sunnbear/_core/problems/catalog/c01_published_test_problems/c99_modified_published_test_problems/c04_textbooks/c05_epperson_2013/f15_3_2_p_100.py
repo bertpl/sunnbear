@@ -49,8 +49,8 @@ class ModifiedEpperson201332P100(Formula):
         notes=(
             (
                 "The interval starts at 0.01, the lower bound of the source's other interval, not at the "
-                "published $-0.2$, so that it holds the root and not the pole at 0: the pole is a second "
-                "sign change, so that the function has the same sign at both published bounds."
+                "published $-0.2$, so that it holds the root and not the pole at 0. The pole is a second "
+                "sign change, so the function has the same sign at both published bounds."
             ),
         ),
     )

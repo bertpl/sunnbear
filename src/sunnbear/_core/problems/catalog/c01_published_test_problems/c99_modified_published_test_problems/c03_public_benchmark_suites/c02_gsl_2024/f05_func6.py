@@ -52,10 +52,10 @@ class ModifiedGsl2024Func6(Formula):
         interval="[-0.0005, 0.0002]",
         notes=(
             (
-                r"The expression is the published function, $(\x - 1)^7$, at $\x + 1$, on the published "
-                "interval $[0.9995, 1.0002]$ shifted by $-1$, because the published interval's largest "
-                "bound is about 1429 times its width, more than the benchmark suite inclusion conditions "
-                "allow."
+                r"The expression is the published function, $(\x - 1)^7$, evaluated at $\x + 1$, on the "
+                "published interval $[0.9995, 1.0002]$ shifted by $-1$, because the published interval's "
+                "largest bound is about 1429 times its width, more than the benchmark suite inclusion "
+                "conditions allow."
             ),
         ),
     )

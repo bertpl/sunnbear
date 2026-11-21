@@ -59,8 +59,9 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
         interval="[-1.02, 1]",
         notes=(
             (
-                "The interval starts at $-1.02$, not at the published $-1$, where the function jumps to a "
-                r"branch that is never negative: for any $\c < 0$, the published interval holds no sign "
+                "The interval starts at $-1.02$, not at the published $-1$, where the function jumps from "
+                r"$-1$ to a branch that is never negative: for any $\c < 0$, the shift along x puts the "
+                "published lower bound on that branch, so that the published interval holds no sign "
                 "change."
             ),
         ),

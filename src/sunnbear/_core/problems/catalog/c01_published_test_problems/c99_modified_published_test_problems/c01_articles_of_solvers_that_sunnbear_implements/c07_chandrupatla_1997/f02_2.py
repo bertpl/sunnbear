@@ -69,14 +69,16 @@ class ModifiedChandrupatla19972(Formula):
         notes=(
             (
                 r"$\c$ scales x, so that the root moves by the factor $(\param{b}/\param{a})^{\c}$ and "
-                "never reaches 0: the interval spans orders of magnitude next to the pole at 0, across "
-                "which a shift along x would take the lower bound."
+                "never reaches 0: the interval spans orders of magnitude next to the pole at 0, and a "
+                "shift along x would move the lower bound across it."
             ),
             (
                 "The widest published interval, $[10^{-12}, 10^{12}]$, becomes $[10^{-12}, 10^{10}]$, "
-                "because the benchmark's tolerance on x is a fixed fraction of the interval's width: on "
-                r"the published interval that tolerance is about 2, so that at the smallest values of $\c$ "
-                "the root, at about 1, lies within that tolerance of the lower bound, closer than the "
+                "because the benchmark's tolerance on x is a fixed fraction of the interval's width."
+            ),
+            (
+                "On the published interval that tolerance is about 2, so that at the smallest values of "
+                r"$\c$ the root, near 1, lies within that tolerance of the lower bound, closer than the "
                 "benchmark suite inclusion conditions allow."
             ),
         ),

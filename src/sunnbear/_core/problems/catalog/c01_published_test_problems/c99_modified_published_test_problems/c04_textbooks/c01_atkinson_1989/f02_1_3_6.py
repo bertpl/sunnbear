@@ -69,15 +69,17 @@ class ModifiedAtkinson1989136(Formula):
         notes=(
             (
                 r"The expression is the published function, $\x^3 - 3 \x^2 + 3 \x - 1$, evaluated at $\x + "
-                "1$ without the cancellation of its terms, on the published intervals shifted by $-1$. "
+                "1$ without the cancellation of its terms, on the published intervals shifted by $-1$."
+            ),
+            (
                 "The intervals are shifted because the largest bound of the published interval $[0.998, "
                 "1.002]$ is about 250 times its width, more than the benchmark suite inclusion conditions "
                 "allow."
             ),
             (
                 "This changes what the test problem tests on $[-0.002, 0.002]$: the source uses $[0.998, "
-                "1.002]$ to show the band of noise that rounding gives the published function around its "
-                "root, and the expression has no such band."
+                "1.002]$ to show the published function's band of rounding noise around its root, and the "
+                "expression has no such band."
             ),
         ),
     )

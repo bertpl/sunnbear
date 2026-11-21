@@ -52,12 +52,12 @@ class ModifiedDowellJarratt1972Problem3(Formula):
         notes=(
             (
                 r"$\c$ shifts the function along the y-axis, not along x as for the published test "
-                "problem, because the published bounds lie $10^{-4}$ from $-1$, where the series "
-                "diverges, and from a second root at 0."
+                "problem, because the published lower bound lies $10^{-4}$ from $-1$, where the series "
+                "diverges, and the upper bound lies $10^{-4}$ from a second root at 0."
             ),
             (
                 "A shift along x by more than $10^{-4}$ would evaluate the series where it diverges, or "
-                "move that root into the interval."
+                "move the root at 0 into the interval."
             ),
         ),
     )

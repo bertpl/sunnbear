@@ -51,10 +51,10 @@ class ModifiedEpperson201331125(Formula):
         interval="[-0.002, 0.002]",
         notes=(
             (
-                r"The expression is the published function, $(\x - 1)^5$, at $\x + 1$, on the published "
-                "interval $[0.998, 1.002]$ shifted by $-1$, because the published interval's largest "
-                "bound is about 250 times its width, more than the benchmark suite inclusion conditions "
-                "allow."
+                r"The expression is the published function, $(\x - 1)^5$, evaluated at $\x + 1$, on the "
+                "published interval $[0.998, 1.002]$ shifted by $-1$, because the published interval's "
+                "largest bound is about 250 times its width, more than the benchmark suite inclusion "
+                "conditions allow."
             ),
         ),
     )

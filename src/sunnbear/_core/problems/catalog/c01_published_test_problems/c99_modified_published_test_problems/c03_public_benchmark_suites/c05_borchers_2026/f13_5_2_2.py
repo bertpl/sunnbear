@@ -54,9 +54,8 @@ class ModifiedBorchers2026522(Formula):
         notes=(
             (
                 "The interval is the published $[-2, 2]$ moved left by 0.04, so that neither bound is a "
-                r"root: at the published bounds, which are the roots $-2$ and 2, float64's value of $\pi$ "
-                "makes the function slightly negative, so that the function has the same sign at both "
-                "published bounds."
+                r"root. At the published bounds, the roots $-2$ and 2, float64's value of $\pi$ makes the "
+                "function slightly negative, so that the function has the same sign at both."
             ),
             (
                 "This changes what the test problem tests: the source finds every root in $[-2, 2]$, and "

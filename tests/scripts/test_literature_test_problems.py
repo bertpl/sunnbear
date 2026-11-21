@@ -315,7 +315,7 @@ def test_modified_category_has_the_name_of_its_published_category(category):
 @pytest.mark.parametrize("formula", _PUBLISHED_FORMULAS, ids=lambda formula: formula.label)
 @pytest.mark.parametrize("c", [0.25, -0.25])
 def test_published_formula_shifts_x_by_c(formula, c):
-    """A published formula shifts x by ``c_scale*c``, by category 1's rule, and declares that way."""
+    """A published formula shifts x by ``c_scale*c``, by category 1's rule, and declares `EffectOfC.SHIFTS_X`."""
     for candidate in formula.build_all_candidates():
         # --- act ----------------------
         ways = _c_ways_followed(candidate, c)

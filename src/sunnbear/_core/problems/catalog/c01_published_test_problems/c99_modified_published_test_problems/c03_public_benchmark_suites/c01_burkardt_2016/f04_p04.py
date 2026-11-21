@@ -75,8 +75,8 @@ class ModifiedBurkardt2016P04(Formula):
         notes=(
             (
                 r"$\c$ scales x, so that the root moves by the factor $(20/10^{-5})^{\c}$ and never "
-                "reaches 0: the interval spans orders of magnitude next to the pole at 0, across which a "
-                "shift along x would take the lower bound."
+                "reaches 0: the interval spans orders of magnitude next to the pole at 0, and a shift "
+                "along x would move the lower bound across it."
             ),
         ),
     )
