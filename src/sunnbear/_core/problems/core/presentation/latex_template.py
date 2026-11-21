@@ -46,9 +46,8 @@ class LatexTemplate:
     _COMMAND_WITH_ARGUMENT: ClassVar[re.Pattern[str]] = re.compile(
         r"\\(" + "|".join(_ARGUMENT_PATTERN_BY_COMMAND) + r")(?![A-Za-z])"
     )
-    # _NUMBER_OR_EXPONENT_AT_END matches a text that ends, before any trailing spaces, in a digit that is not a
-    # subscript, in a placeholder, or in an exponent in braces. A value placed right after such a text would read as
-    # part of the number.
+    # _NUMBER_OR_EXPONENT_AT_END matches a text that ends, before any trailing spaces, in 1 of 3 things: a digit that is
+    # not a subscript, a placeholder, or an exponent in braces.
     _NUMBER_OR_EXPONENT_AT_END: ClassVar[re.Pattern[str]] = re.compile(
         r"(?:(?<!_)\d|" + _PLACEHOLDER.pattern + r"|\^\{[^{}]*\})\s*$"
     )
@@ -110,9 +109,15 @@ class LatexTemplate:
     def substitute_values(self, latex_by_name: Mapping[str, str]) -> str:
         r"""Return the text as `substitute` returns it, with ``\cdot`` before each value that follows a number.
 
-        ``\cdot`` goes before each value that follows a digit outside a subscript, another value or an exponent in
-        braces, because the value would otherwise read as part of that number: ``1.54226 \param{w}`` at ``w = 0.2``
-        would render as 1.542260.2, and ``2 \param{n}`` at ``n = 4`` as 24.
+        ``\cdot`` goes before each value that follows 1 of these, because the value would otherwise read as part of the
+        number before it:
+
+        - a digit outside a subscript;
+        - another value;
+        - an exponent in braces.
+
+        For example, ``1.54226 \param{w}`` at ``w = 0.2`` would render as 1.542260.2, and ``2 \param{n}`` at ``n = 4``
+        as 24.
 
         A symbol needs no dot, because ``2 \param{n}`` with the symbol ``n`` reads as ``2n``.
 

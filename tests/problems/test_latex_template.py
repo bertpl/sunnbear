@@ -85,7 +85,7 @@ def test_substitute_rejects_a_missing_name():
     ],
 )
 def test_substitute_values_separates_a_value_from_a_number_before_it(text, expected):
-    r"""A value after a number gets ``\cdot`` before it, so that the value and the number do not read as 1 number."""
+    r"""A value after a number gets ``\cdot`` before it, and a value after anything else gets none."""
     # --- act --------------------------
     latex = LatexTemplate(text).substitute_values({"a": "2", "b": "(-3)"})
 

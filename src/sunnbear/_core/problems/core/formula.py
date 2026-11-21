@@ -309,9 +309,9 @@ class Formula(FormulaTaxonomyNode, ABC):
         (`ParamNotation.spell_value_in_latex`), and wrapped in ``\prm{…}``. The values are substituted, not simplified:
         ``1 - \param{m}`` at ``m = 0.5`` gives ``1 - \prm{0.5}``.
 
-        A value that follows a digit, another value or an exponent gets ``\cdot`` before it, so that the value and the
-        number do not read as 1 number (`LatexTemplate.substitute_values`): ``2 \param{n}`` at ``n = 4`` gives
-        ``2 \cdot \prm{4}``.
+        A value that follows a number gets ``\cdot`` before it, so that the value does not read as part of the number
+        before it; `LatexTemplate.substitute_values` states which texts count as a number. ``2 \param{n}`` at ``n = 4``
+        gives ``2 \cdot \prm{4}``.
 
         Args:
             text: A definition's side, the expression or the interval of the formula's presentation.
