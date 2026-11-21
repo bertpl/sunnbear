@@ -109,7 +109,7 @@ class RootsFortran20252627(Formula):
         ),
         interval=r"[\param{a}, \param{b}]",
         notes=(
-            r"The first case holds where $e^{1/\tmp{u}^2}$ overflows in float64, whose largest value is about "
+            r"The expression is 0 where $e^{1/\tmp{u}^2}$ exceeds the largest float64 value, which is about "
             r"$e^{709.78}$.",
         ),
     )

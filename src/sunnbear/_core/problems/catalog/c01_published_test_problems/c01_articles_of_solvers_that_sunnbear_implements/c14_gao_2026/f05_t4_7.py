@@ -47,6 +47,10 @@ class Gao2026T47(Formula):
             r"\end{cases}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        notes=(
+            r"The expression is 0 for $|\tmp{u}| < 10^{-100}$, where float64 rounds $\tmp{u} e^{-1/\tmp{u}^2}$ to 0 "
+            r"anyway; the published function is 0 only at $\tmp{u} = 0$.",
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

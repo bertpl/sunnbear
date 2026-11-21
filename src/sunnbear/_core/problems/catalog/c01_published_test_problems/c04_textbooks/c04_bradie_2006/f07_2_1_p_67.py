@@ -36,7 +36,7 @@ class Bradie200621P67(Formula):
     name = "§2.1 (p. 67)"
     params = (
         FormulaParam("initial_investment", latex_symbol=r"\mathit{investment}"),
-        FormulaParam("monthly_deposit", latex_symbol=r"\mathit{deposit}"),
+        FormulaParam("monthly_deposit", latex_symbol=r"\mathit{monthly\ deposit}"),
         FormulaParam("goal", latex_symbol=r"\mathit{goal}"),
     )
     source = FormulaSource(
