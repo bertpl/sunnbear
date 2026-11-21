@@ -1,9 +1,6 @@
 """This module holds a formula of Chapra, Canale (2015).
 
-The formula comes from the row with the key ``§8.2, (8.14)`` in the survey of published test problems. The survey gives
-this function as 1 expression with a change of its variable to the pH, as `f(10^-pH)`, which the module generator,
-`scripts/literature_test_problems/formula_modules.py`, cannot apply, so a person writes this module: a change of the
-formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``§8.2, (8.14)`` in the survey of published test problems.
 """
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable

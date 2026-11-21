@@ -1,10 +1,6 @@
 """This module holds a formula of Bradie (2006).
 
 The formula comes from the row with the key ``§2.1 (p. 67); 2.1-19; 2.5-20`` in the survey of published test problems.
-The survey gives this function as 1 expression that the module generator,
-`scripts/literature_test_problems/formula_modules.py`, cannot translate: constants named in words (the initial
-investment, the monthly deposit and the goal), with several sets of values. A person therefore writes this module, and a
-change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable

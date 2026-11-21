@@ -1,8 +1,6 @@
 """This module holds a formula of Süli, Mayers (2003).
 
-The formula comes from the row with the key ``Exercise 1.2`` in the survey of published test problems. The survey gives
-this function as a description, not as 1 expression, so a person writes this module: a change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``Exercise 1.2`` in the survey of published test problems.
 """
 
 import math

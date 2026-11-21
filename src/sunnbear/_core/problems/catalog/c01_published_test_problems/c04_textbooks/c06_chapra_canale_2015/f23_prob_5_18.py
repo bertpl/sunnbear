@@ -1,9 +1,6 @@
 """This module holds a formula of Chapra, Canale (2015).
 
-The formula comes from the row with the key ``Prob. 5.18`` in the survey of published test problems. The survey gives
-this function as 1 expression with a change of its variable to the temperature `T` in °C, as `f(T + 273.15)`, which the
-module generator, `scripts/literature_test_problems/formula_modules.py`, cannot apply, so a person writes this module: a
-change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``Prob. 5.18`` in the survey of published test problems.
 """
 
 import math

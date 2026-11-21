@@ -1,10 +1,6 @@
 """This module holds a formula of Chapra, Canale (2015).
 
 The formula comes from the row with the key ``§8.3, (8.19), (8.20), Fig. 8.4`` in the survey of published test problems.
-The survey gives this function as 1 expression that the module generator,
-`scripts/literature_test_problems/formula_modules.py`, cannot translate: a parameter given as a ratio, `q/q0 = 0.01`. A
-person therefore writes this module, and a change of the formula's row in `data/literature_test_problems/sources/` needs
-a change of this module.
 """
 
 import math

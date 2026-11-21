@@ -1,18 +1,11 @@
 """This module holds a formula of Romadani (2025).
 
-The formula comes from the row with the key ``5.4`` in the survey of published test problems. A script generates this
-module from that survey: to change the formula, change its source file in `data/literature_test_problems/sources/` and
-run `uv run python -m scripts.literature_test_problems.formula_modules 2025_romadani_python_implementations`; do not
-edit this file.
+The formula comes from the row with the key ``5.4`` in the survey of published test problems.
 """
 
 import math
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
-
-# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
-# survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "f438a03094b8f6f6"
 
 
 class Romadani202554(Formula):

@@ -1,7 +1,6 @@
 """This module holds formula f1.99.2.18.6, the modified version of the published formula f1.2.18.6.
 
-A person writes this module: the module generator, `scripts/literature_test_problems/formula_modules.py`, writes only
-the published formulas of category 1. A change of formula f1.2.18.6 may need a matching change of this module.
+A change of formula f1.2.18.6 may need a matching change of this module.
 """
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
