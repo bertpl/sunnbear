@@ -4,6 +4,7 @@ The formula comes from the rows with the keys ``§2.2 Ex. 3; Fig. 2.5; 2.5-1(c)`
 the survey of published test problems.
 """
 
+from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -43,11 +44,7 @@ class BurdenFairesBurden201622Ex3(Formula):
         FormulaParam("k", latex_symbol="k"),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
-        FormulaParam(
-            "c_scale",
-            latex_symbol="s",
-            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
-        ),
+        C_SCALE_PARAM,
     )
     source = FormulaSource(
         reference=(

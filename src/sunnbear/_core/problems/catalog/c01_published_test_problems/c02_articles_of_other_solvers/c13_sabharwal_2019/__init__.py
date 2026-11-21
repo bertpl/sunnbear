@@ -26,4 +26,4 @@ class Sabharwal2019(FormulaCategory):
 
     number = (1, 2, 13)
     name = "Sabharwal (2019)"
-    description = "The test problems come from the article that introduces a blend of bisection and regula falsi."
+    description = "The test problems come from the article that introduces a hybrid of bisection and regula falsi."

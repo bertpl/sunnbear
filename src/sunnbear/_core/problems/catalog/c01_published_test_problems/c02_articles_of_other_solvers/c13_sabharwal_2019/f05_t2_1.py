@@ -3,6 +3,7 @@
 The formula comes from the rows with the keys ``T2.1``, ``T2.2`` and ``T2.3`` in the survey of published test problems.
 """
 
+from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -32,11 +33,7 @@ class Sabharwal2019T21(Formula):
         FormulaParam("k", latex_symbol="k"),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
-        FormulaParam(
-            "c_scale",
-            latex_symbol="s",
-            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
-        ),
+        C_SCALE_PARAM,
     )
     source = FormulaSource(
         reference=(

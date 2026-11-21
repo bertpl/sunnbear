@@ -42,5 +42,5 @@ class OliveiraTakahashi2021(FormulaCategory):
     name = "Oliveira, Takahashi (2021)"
     description = (
         "The test problems come from the article that introduces the ITP method, which improves the"
-        " average performance of bisection and keeps its worst case."
+        " average performance of bisection and keeps bisection's worst-case number of iterations."
     )

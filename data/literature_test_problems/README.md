@@ -248,13 +248,20 @@ Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, belo
 - evaluates that function at `x - c_scale*c`, so that the formula's `c` shifts the function along x. `c_scale` is the rounded width of the formula's interval; the class docstring of `PublishedTestProblems`, the class of category 1, states the rule and its reasons;
 - lists the formula's published test problems in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds and `c_scale` as 3 more parameters, `a`, `b` and `c_scale`;
 - renames a source's own parameters `a`, `b` and `c_scale` to `a_`, `b_` and `c_scale_` in every formula, so that these 3 names always mean the bounds of the interval and the scale of the shift;
-- names its source in a `FormulaSource`: the source's `reference`, and a `location` that the module's author writes from the rows' keys and the source's `where_in_source`, naming the table, section or exercise set of each key, such as `Table I, problem 12` for the row keyed `12`;
-- declares each parameter as a `FormulaParam` with the source's own LaTeX symbol for it. The LaTeX symbols of the bounds of a formula with several intervals are `a` and `b`, or `x_{\min}` and `x_{\max}` where the source has its own parameter named `a` or `b`; the LaTeX symbol of `c_scale` is `s`, and its `meaning` states the rule for `c_scale`;
+- names its source in a `FormulaSource`: the source's `reference`, and a `location` that names the table, section or exercise set of each of the rows' keys, which the module's author writes from those keys and the source's `where_in_source`, such as `Table I, problem 12` for the row keyed `12`;
+- declares each parameter with a LaTeX symbol:
+  - a source's own parameter is a `FormulaParam` with the source's symbol for it;
+  - the bounds of a formula with several intervals take `a` and `b`, or `x_{\min}` and `x_{\max}` where the source has its own parameter named `a` or `b`;
+  - `c_scale` is `C_SCALE_PARAM`, from the package `shift_along_x` of category 1, whose symbol is `s` and whose `meaning` states the rule for `c_scale`;
 - declares a `presentation` with 3 parts:
-  - the shifted variable `\tmp{u} = \x - c_scale \c`, with `c_scale` as its value for a formula with 1 interval and as `\param{c_scale}` for a formula with several intervals; a function whose variable is not `x` or `c` keeps that variable's name for the shifted variable;
-  - as the expression, the function in the shifted variable, in the source's form;
+  - the shifted variable `\tmp{u} = \x - c_scale \c`, where `c_scale` is written as its number for a formula with 1 interval, and as `\param{c_scale}` for a formula with several intervals. The shifted variable is `\tmp{u}`, unless the source names the function's variable other than `x` or `c`, which `\x` and `\c` stand for; it then takes that name, such as `\tmp{h}` for a function of `h`;
+  - the expression: the function of the shifted variable, with the source's own numbers and order of terms;
   - the interval;
-- declares `effect_of_c = EffectOfC.SHIFTS_X`, and gives its `ParamTable` the summary "The published parameter values.", or "The published parameter values and intervals." where the table lists intervals too, or "The published intervals." where it lists only intervals;
+- declares `effect_of_c = EffectOfC.SHIFTS_X`;
+- gives its `ParamTable` a summary that names what the table lists:
+  - "The published parameter values." where it lists only parameter values;
+  - "The published parameter values and intervals." where it lists intervals too;
+  - "The published intervals." where it lists only intervals;
 - takes its name, and its module and class names, from the key of the formula's first row. Where the key lists several locations, separated by `;` or `,`, the name ends after the first location; while the names of several formulas of the source would give module names that differ only in their `fNN` prefix, each of those names takes its key's next location too;
 - holds test cases whose expected values are computed from the function in high precision, such as with mpmath:
   - a case whose expected value is below `1000*DEFAULT_ATOL` in magnitude sets `atol=0.0`, because the default `atol` would let a wrong value of that size pass;

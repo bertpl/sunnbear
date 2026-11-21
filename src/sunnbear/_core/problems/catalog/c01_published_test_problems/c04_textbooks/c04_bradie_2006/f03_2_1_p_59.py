@@ -5,6 +5,7 @@ Fig. 2.1; §2.2 (p. 74); §2.4 (p. 98); 2.1-10; 2.2-10; 2.4-13; 2.5-12 to 2.5-14
 problems.
 """
 
+from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -36,11 +37,7 @@ class Bradie200621P59(Formula):
     params = (
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
-        FormulaParam(
-            "c_scale",
-            latex_symbol="s",
-            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
-        ),
+        C_SCALE_PARAM,
     )
     source = FormulaSource(
         reference=(

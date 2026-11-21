@@ -5,6 +5,7 @@ The formula comes from the row with the key ``2.1-6(c); 2.3-12(a)`` in the surve
 
 import math
 
+from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -31,11 +32,7 @@ class BurdenFairesBurden2016216C(Formula):
     params = (
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
-        FormulaParam(
-            "c_scale",
-            latex_symbol="s",
-            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
-        ),
+        C_SCALE_PARAM,
     )
     source = FormulaSource(
         reference=(

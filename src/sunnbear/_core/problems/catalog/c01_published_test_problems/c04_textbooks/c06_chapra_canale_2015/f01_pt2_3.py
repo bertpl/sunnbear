@@ -6,6 +6,7 @@ The formula comes from the row with the key ``(PT2.3), (PT2.4); Ex. 5.1, 5.3–5
 
 import math
 
+from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -42,11 +43,7 @@ class ChapraCanale2015Pt23(Formula):
         FormulaParam("t", latex_symbol="t"),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
-        FormulaParam(
-            "c_scale",
-            latex_symbol="s",
-            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
-        ),
+        C_SCALE_PARAM,
     )
     source = FormulaSource(
         reference=(
