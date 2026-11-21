@@ -69,6 +69,30 @@ def test_substitute_rejects_a_missing_name():
         LatexTemplate(r"\param{m} \x^{\param{p}}").substitute({"m": "m"})
 
 
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        # a value after a digit, another value or an exponent gets a dot
+        (r"1.5 \param{a} \x", r"1.5 \cdot \prm{2} \x"),
+        (r"\frac{1}{2 \param{a} + 1}", r"\frac{1}{2 \cdot \prm{2} + 1}"),
+        (r"\param{a} \param{b}", r"\prm{2} \cdot \prm{(-3)}"),
+        (r"\param{a}^2 \param{b}", r"\prm{2}^2 \cdot \prm{(-3)}"),
+        (r"\tmp{u}^{2} \param{b}", r"\tmp{u}^{2} \cdot \prm{(-3)}"),
+        # a value after anything else gets none
+        (r"\x^{\param{a}} - \param{b} (\param{a} + \c)", r"\x^{\prm{2}} - \prm{(-3)} (\prm{2} + \c)"),
+        (r"\text{if } \param{a} \text{ is odd}", r"\text{if } \prm{2} \text{ is odd}"),
+        (r"\log_2 \param{a}", r"\log_2 \prm{2}"),
+    ],
+)
+def test_substitute_values_separates_a_value_from_a_number_before_it(text, expected):
+    r"""A value that follows a number gets ``\cdot`` before it, so that the 2 do not read as 1 number."""
+    # --- act --------------------------
+    latex = LatexTemplate(text).substitute_values({"a": "2", "b": "(-3)"})
+
+    # --- assert -----------------------
+    assert latex == expected
+
+
 def test_plain_marker_macros_define_every_marker():
     """The plain definitions cover the 5 markers, each as plain LaTeX."""
     assert dict(PLAIN_MARKER_MACROS) == {r"\x": "x", r"\c": "c", r"\tmp": "#1", r"\fn": "#1", r"\prm": "#1"}
