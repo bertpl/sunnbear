@@ -1,10 +1,10 @@
 r"""`LatexTemplate` holds 1 text in sunnbear's LaTeX notation, and owns that notation.
 
-A formula's presentation writes its LaTeX, and the math in its texts, in this notation:
+A formula's presentation writes its LaTeX, and the math in its texts for a reader, in this notation:
 
 - **a placeholder per parameter,** ``\param{name}``, which `LatexTemplate.substitute` replaces before sunnbear hands
   the LaTeX out;
-- **5 markers,** which stay in the LaTeX that sunnbear hands out, so that a consumer can style each role:
+- **5 markers,** which stay in the LaTeX that sunnbear hands out, so that a consumer can style each kind of symbol:
   - ``\x``, the variable;
   - ``\c``, the parameter ``c``;
   - ``\tmp{…}``, a temporary variable, such as ``\tmp{u}`` or ``\tmp{t_1}``;
@@ -12,11 +12,13 @@ A formula's presentation writes its LaTeX, and the math in its texts, in this no
   - ``\prm{…}``, which wraps the symbol or the value that replaced a placeholder.
 
 A consumer that renders the LaTeX defines each marker as a macro. `DEFAULT_MARKER_MACROS` holds plain definitions,
-in the form of the ``macros`` option of KaTeX, so that any consumer renders the LaTeX without styling it. ``\c`` is
-LaTeX's cedilla accent, which the consumer's definition replaces; a consumer that defines no markers fails on ``\x``,
-which every formula's expression uses.
+in the form of the ``macros`` option of KaTeX, so that any consumer renders the LaTeX without styling it.
 
-A text for a reader marks its math as ``$…$`` inline and ``$$…$$`` for display, as mkdocs does.
+``\c`` already exists in LaTeX as the cedilla accent, so the consumer's definition replaces it. A consumer that defines
+no markers fails on ``\x``, which every formula's expression uses.
+
+A text for a reader (a presentation's summary and notes, a parameter's meaning, a recipe's summary or a category's
+description) marks its math as ``$…$`` inline and ``$$…$$`` for display, as mkdocs does.
 """
 
 import re
@@ -25,8 +27,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import ClassVar
 
-# DEFAULT_MARKER_MACROS maps each marker to a plain definition, as KaTeX's `macros` option takes it: ``#1`` stands for
-# the marker's argument.
+# ``#1`` stands for the marker's argument, as in KaTeX's `macros` option.
 DEFAULT_MARKER_MACROS = MappingProxyType(
     {
         r"\x": "x",
@@ -43,7 +44,7 @@ DEFAULT_MARKER_MACROS = MappingProxyType(
 # ==================================================================================================
 @dataclass(frozen=True)
 class LatexTemplate:
-    r"""`LatexTemplate` holds 1 text in sunnbear's LaTeX notation: LaTeX, or prose with LaTeX math.
+    r"""`LatexTemplate` holds 1 text in sunnbear's LaTeX notation: LaTeX, or a text for a reader with LaTeX math.
 
     The argument of ``\tmp{…}`` and ``\fn{…}`` may hold 1 level of braces, as in ``\tmp{t_{1}}``.
     """
@@ -52,9 +53,12 @@ class LatexTemplate:
 
     # a placeholder's name is the parameter's name, a Python identifier
     _PLACEHOLDER: ClassVar[re.Pattern[str]] = re.compile(r"\\param\{([A-Za-z_][A-Za-z0-9_]*)\}")
-    _TEMPORARY_VARIABLE: ClassVar[re.Pattern[str]] = re.compile(r"\\tmp\{((?:[^{}]|\{[^{}]*\})+)\}")
-    _INTERMEDIATE_FUNCTION: ClassVar[re.Pattern[str]] = re.compile(r"\\fn\{((?:[^{}]|\{[^{}]*\})+)\}")
-    # a command of the notation, written in any way, so that a malformed one can be found
+    # _MARKER_ARGUMENT is a marker's argument in braces, which may hold 1 level of braces.
+    _MARKER_ARGUMENT: ClassVar[str] = r"\{((?:[^{}]|\{[^{}]*\})+)\}"
+    _TEMPORARY_VARIABLE: ClassVar[re.Pattern[str]] = re.compile(r"\\tmp" + _MARKER_ARGUMENT)
+    _INTERMEDIATE_FUNCTION: ClassVar[re.Pattern[str]] = re.compile(r"\\fn" + _MARKER_ARGUMENT)
+    # _COMMAND matches ``\param``, ``\tmp`` and ``\fn`` whatever follows them, so that __post_init__ finds a
+    # malformed one.
     _COMMAND: ClassVar[re.Pattern[str]] = re.compile(r"\\(param|tmp|fn)(?![A-Za-z])")
 
     def __post_init__(self) -> None:
@@ -63,13 +67,13 @@ class LatexTemplate:
         Raises:
             ValueError: If a ``\param`` names no Python identifier, or a ``\tmp`` or ``\fn`` has no argument in braces.
         """
-        well_formed = {
+        argument_pattern_by_command = {
             "param": self._PLACEHOLDER,
             "tmp": self._TEMPORARY_VARIABLE,
             "fn": self._INTERMEDIATE_FUNCTION,
         }
         for command in self._COMMAND.finditer(self.text):
-            if not well_formed[command[1]].match(self.text, command.start()):
+            if not argument_pattern_by_command[command[1]].match(self.text, command.start()):
                 raise ValueError(
                     f"LatexTemplate: \\{command[1]} at position {command.start()} has no well-formed argument in "
                     f"{self.text!r}."
@@ -81,17 +85,28 @@ class LatexTemplate:
     @property
     def placeholder_names(self) -> tuple[str, ...]:
         """Return the parameter names of the text's placeholders, in the order of their first use."""
-        return self._names_in_order(self._PLACEHOLDER)
+        return tuple(dict.fromkeys(match[1] for match in self._PLACEHOLDER.finditer(self.text)))
 
     @property
     def temporary_variable_names(self) -> tuple[str, ...]:
         r"""Return the arguments of the text's ``\tmp{…}`` markers, in the order of their first use."""
-        return self._names_in_order(self._TEMPORARY_VARIABLE)
+        return tuple(dict.fromkeys(match[1] for match in self._TEMPORARY_VARIABLE.finditer(self.text)))
 
     @property
     def intermediate_function_names(self) -> tuple[str, ...]:
         r"""Return the arguments of the text's ``\fn{…}`` markers, in the order of their first use."""
-        return self._names_in_order(self._INTERMEDIATE_FUNCTION)
+        return tuple(dict.fromkeys(match[1] for match in self._INTERMEDIATE_FUNCTION.finditer(self.text)))
+
+    @property
+    def markers_and_names(self) -> tuple[tuple[str, str], ...]:
+        r"""Return the text's temporary variables and intermediate functions, as pairs of marker and name.
+
+        The marker keeps a temporary variable ``\tmp{g}`` apart from an intermediate function ``\fn{g}``.
+        """
+        return (
+            *(("tmp", name) for name in self.temporary_variable_names),
+            *(("fn", name) for name in self.intermediate_function_names),
+        )
 
     # --------------------------------------------------------------------------
     #  Substitution
@@ -111,10 +126,3 @@ class LatexTemplate:
             raise ValueError(f"LatexTemplate: no LaTeX for the placeholders {missing} of {self.text!r}.")
         else:
             return self._PLACEHOLDER.sub(lambda match: rf"\prm{{{latex_by_name[match[1]]}}}", self.text)
-
-    # --------------------------------------------------------------------------
-    #  Helpers
-    # --------------------------------------------------------------------------
-    def _names_in_order(self, pattern: re.Pattern[str]) -> tuple[str, ...]:
-        """Return the distinct arguments that `pattern` matches in the text, in the order of their first match."""
-        return tuple(dict.fromkeys(match[1] for match in pattern.finditer(self.text)))

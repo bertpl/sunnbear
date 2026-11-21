@@ -33,7 +33,7 @@ package imports those modules.
 
 Ownership summary:
 
-- a concrete `Formula` contributes only mathematics plus its declared parameter
+- a concrete `Formula` contributes its mathematics and its declared parameter
   interface: `params`, `parametrized_fun`, `interval_bounds`, `recipes`, optionally
   `is_param_tuple_valid` — one class, one module, in `catalog`; defining the
   class registers it. It also declares what a reader sees of it: its `presentation`
@@ -50,9 +50,9 @@ Ownership summary:
 from .category import USER_DEFINED_FORMULA_CATEGORY_NUMBER, FormulaCategory
 from .effect_of_c import EffectOfC
 from .formula import Formula
-from .formula_param import FormulaParam
 from .identity import ProblemId
 from .latex_template import DEFAULT_MARKER_MACROS, LatexTemplate
+from .param import FormulaParam
 from .param_values import (
     CANONICAL_DIGITS,
     DEDUP_DIGITS,

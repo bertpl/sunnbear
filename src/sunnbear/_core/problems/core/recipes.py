@@ -23,7 +23,7 @@ A `ParamRecipe` materializes parameter tuples, and comes in 2 kinds:
 A formula holds a *tuple* of recipes and its candidates are their concatenation,
 so recipes are additive: anything the small grammar above cannot express is
 written as one more recipe, not as a richer axis. Every recipe's parameter
-names must match the formula's declared `param_names`, which is what fixes the
+names must match the names of the formula's declared `params`, which is what fixes the
 meaning of tuple position (`Formula._validate_recipes`).
 
 When an axis's notation builds each grid value (`ParamNotation.build_value_from_argument`),
@@ -136,9 +136,9 @@ class ParamRecipe(ABC):
     r"""`ParamRecipe` is the base class of a recipe that materializes parameter tuples: a grid or a table.
 
     Attributes:
-        summary: Optional here: 1 sentence for a reader on what the recipe covers, such as "the sweep of $\param{b}$ at
-            $\param{d} = 1$", in sunnbear's LaTeX notation (`LatexTemplate`). The catalog's tests require it of every
-            recipe of a shipped formula.
+        summary: 1 sentence for a reader on what the recipe covers, such as "The sweep of $\param{b}$ at
+            $\param{d} = 1$.", in sunnbear's LaTeX notation (`LatexTemplate`). None by default; the catalog's tests
+            require it of every recipe of a shipped formula.
     """
 
     summary: str | None = None

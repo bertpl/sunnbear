@@ -46,13 +46,14 @@ def test_invalid_definitions_are_rejected(definitions, expression, message):
         FormulaPresentation(definitions=definitions, expression=expression, interval="[0, 1]")
 
 
-def test_text_uses_only_defined_names():
-    """A note that names a temporary variable that no definition defines is rejected."""
-    with pytest.raises(ValueError, match="no earlier definition"):
-        FormulaPresentation(expression=r"\x - \c", interval="[0, 1]", notes=(r"Here $\tmp{u}$ is undefined.",))
-
-
-def test_malformed_notation_in_a_text_is_rejected():
-    """Each field is checked as a `LatexTemplate`, the summary included."""
-    with pytest.raises(ValueError, match="no well-formed argument"):
-        FormulaPresentation(expression=r"\x - \c", interval="[0, 1]", summary=r"A function of $\param{}$.")
+@pytest.mark.parametrize(
+    "texts, message",
+    [
+        ({"notes": (r"Here $\tmp{u}$ is undefined.",)}, "no earlier definition"),  # a note names an undefined name
+        ({"summary": r"A function of $\param{}$."}, "no well-formed argument"),  # malformed notation in the summary
+    ],
+)
+def test_invalid_text_is_rejected(texts, message):
+    """A text for a reader that names an undefined name, or breaks sunnbear's LaTeX notation, is rejected."""
+    with pytest.raises(ValueError, match=message):
+        FormulaPresentation(expression=r"\x - \c", interval="[0, 1]", **texts)

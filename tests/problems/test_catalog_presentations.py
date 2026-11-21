@@ -1,9 +1,10 @@
 """Each shipped formula and category declares what a reader sees of it, and each formula applies ``c`` as it declares.
 
 The checks of a formula's own notation, placeholders and definitions run when its class is defined (`Formula`,
-`FormulaPresentation`); these tests add the policy for the shipped catalog. The tests of how category 1's formulas
-apply ``c`` live with the survey of published test problems, in `tests/scripts/`, because they use the rule of
-category 1 for the size of the shift.
+`FormulaPresentation`); these tests add the requirements that apply only to the shipped formulas and categories.
+
+The tests of how category 1's formulas apply ``c`` live with the survey of published test problems, in
+`tests/scripts/`, because they use the rule of category 1 for the size of the shift.
 """
 
 import pytest
@@ -19,7 +20,6 @@ _SHIPPED_FORMULAS = [
 _SHIPPED_CATEGORIES = [
     category for category in FormulaRegistry.categories() if type(category).__module__.startswith(_CATALOG_PREFIX)
 ]
-# the formulas outside category 1 that declare how they apply c
 _FORMULAS_TO_CHECK_FOR_C = [
     formula for formula in _SHIPPED_FORMULAS if formula.effect_of_c is not None and formula.number[0] != 1
 ]
@@ -31,9 +31,7 @@ def _texts_for_a_reader(formula: Formula) -> list[str]:
     texts = [param.meaning for param in formula.params if param.meaning is not None]
     texts += [recipe.summary for recipe in formula.recipes() if recipe.summary is not None]
     if formula.presentation is not None:
-        texts += formula.presentation.notes
-        if formula.presentation.summary is not None:
-            texts.append(formula.presentation.summary)
+        texts += formula.presentation.texts_for_a_reader
     return texts
 
 
@@ -98,7 +96,7 @@ def test_category_declares_its_description(category: FormulaCategory):
 def test_formula_applies_c_as_declared(formula):
     """Evaluated at its first, middle and last candidate, a formula applies ``c`` as its `effect_of_c` says.
 
-    The evaluation check cannot judge every candidate, such as one whose function is flat almost everywhere, so it
+    `follows_effect_of_c` cannot judge every candidate, such as one whose function is flat almost everywhere, so it
     must judge at least 1, and each candidate that it judges must follow the declared way.
     """
     # --- arrange ----------------------

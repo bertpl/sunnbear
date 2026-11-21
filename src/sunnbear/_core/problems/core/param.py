@@ -13,10 +13,11 @@ class FormulaParam:
     Attributes:
         name: The parameter's name in ids, recipes and the signatures of the formula's hooks, such as ``"alpha"``.
         latex_symbol: The parameter's symbol in LaTeX, such as ``r"\alpha"``, which replaces the parameter's
-            placeholder when a formula renders its LaTeX with symbols. Optional here; the catalog's tests require it of
-            every parameter of a shipped formula.
-        meaning: Optional: what the parameter does, in a sentence for a reader, written only where the formula's
-            expression does not make it obvious. The sentence writes its math in LaTeX, as `LatexTemplate` describes.
+            placeholder when a formula renders its LaTeX with symbols. None by default; the catalog's tests require it
+            of every parameter of a shipped formula.
+        meaning: What the parameter does, in a sentence for a reader, written only where the formula's expression
+            does not make it obvious. The sentence writes its math in LaTeX, as `LatexTemplate` describes. None by
+            default.
     """
 
     name: str

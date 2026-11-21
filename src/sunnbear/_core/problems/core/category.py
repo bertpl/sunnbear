@@ -32,8 +32,8 @@ class FormulaCategory(FormulaTaxonomyNode):
     Class attributes:
         number: The category's place in the taxonomy; its parent category is ``number[:-1]``.
         name: Display name.
-        description: Optional here: a text for a reader on what the category holds, in sunnbear's LaTeX notation
-            (`LatexTemplate`). The catalog's tests require it of every shipped category.
+        description: A text for a reader on what the category holds, in sunnbear's LaTeX notation (`LatexTemplate`).
+            None by default; the catalog's tests require it of every shipped category.
         is_builtin_only: Whether this category and every node below it are reserved for classes
             defined inside the sunnbear package. Declared on top-level categories only; the
             registry applies a top-level category's flag to every node below it, and a

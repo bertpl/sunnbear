@@ -10,9 +10,8 @@ from typing import assert_never
 class EffectOfC(StrEnum):
     """`EffectOfC` is a way in which a formula applies ``c``, as each formula declares in `Formula.effect_of_c`.
 
-    The declaration states what the formula's code does, and the catalog's tests check it by evaluating the formula.
-    Each member gives its sentence for a reader, which names the way and gives no amount, such as how far ``c`` shifts
-    the function.
+    The declaration states what the formula's code does. A way that moves x also admits a positive factor ``g(c)`` on
+    the function's values, which moves no root, as in ``f(x, c) = g(c)*f(x - s*c, 0)``.
     """
 
     SHIFTS_X = "shifts_x"  # f(x, c) = f(x - s*c, 0), for a constant s
@@ -21,7 +20,10 @@ class EffectOfC(StrEnum):
 
     @property
     def sentence(self) -> str:
-        """Return the way of applying ``c`` as a sentence for a reader."""
+        """Return the way of applying ``c`` as a sentence for a reader.
+
+        The sentence names the way and gives no amount, such as how far ``c`` shifts the function.
+        """
         match self:
             case EffectOfC.SHIFTS_X:
                 return "Shifts the function along the x-axis."

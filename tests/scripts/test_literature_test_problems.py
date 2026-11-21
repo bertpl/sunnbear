@@ -345,6 +345,11 @@ def test_modified_formula_applies_c_in_a_way_of_its_subcategory(formula, c):
             assert _C_WAY_OF_EFFECT[formula.effect_of_c] in ways, candidate.id
 
 
+def test_c_way_of_effect_covers_every_effect():
+    """`_C_WAY_OF_EFFECT` names a way of `_c_ways_followed` for each member of `EffectOfC`."""
+    assert set(_C_WAY_OF_EFFECT) == set(EffectOfC)
+
+
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
 def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula):
     """A formula of category 1 that shifts x multiplies ``c`` by ``PublishedTestProblems.c_scale`` of its interval.
