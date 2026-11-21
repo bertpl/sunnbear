@@ -4,7 +4,6 @@ The formula comes from the row with the key ``Ex. 5.6, §5.3.2, Fig. 5.14; Ex. 6
 the survey of published test problems.
 """
 
-from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -35,7 +34,7 @@ class ChapraCanale2015Ex56(Formula):
     params = (
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
-        C_SCALE_PARAM,
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(

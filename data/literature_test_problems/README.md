@@ -252,7 +252,7 @@ Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, belo
 - declares each parameter with a LaTeX symbol:
   - a source's own parameter is a `FormulaParam` with the source's symbol for it;
   - the bounds of a formula with several intervals take `a` and `b`, or `x_{\min}` and `x_{\max}` where the source has its own parameter named `a` or `b`;
-  - `c_scale` is `C_SCALE_PARAM`, from the package `shift_along_x` of category 1, whose symbol is `s` and whose `meaning` states the rule for `c_scale`;
+  - `c_scale` takes `s`, with no `meaning`: category 1 states the rule for `c_scale` once, in `PublishedTestProblems`;
 - declares a `presentation` with 3 parts:
   - the shifted variable `\tmp{u} = \x - c_scale \c`, where `c_scale` is written as its number for a formula with 1 interval, and as `\param{c_scale}` for a formula with several intervals. The shifted variable is `\tmp{u}`, unless the source names the function's variable other than `x` or `c`, which `\x` and `\c` stand for; it then takes that name, such as `\tmp{h}` for a function of `h`;
   - the expression: the function of the shifted variable, with the source's own numbers and order of terms;

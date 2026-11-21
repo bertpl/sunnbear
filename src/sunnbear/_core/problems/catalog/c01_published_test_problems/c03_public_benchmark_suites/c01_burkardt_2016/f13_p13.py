@@ -3,7 +3,6 @@
 The formula comes from the row with the key ``p13`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -33,7 +32,7 @@ class Burkardt2016P13(Formula):
         FormulaParam("slope", latex_symbol=r"\mathit{slope}"),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
-        C_SCALE_PARAM,
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(

@@ -3,7 +3,6 @@
 The formula comes from the row with the key ``4`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -35,7 +34,7 @@ class AlefeldPotraShi19954(Formula):
         FormulaParam("n", latex_symbol="n"),
         FormulaParam("a", latex_symbol=r"x_{\min}"),
         FormulaParam("b", latex_symbol=r"x_{\max}"),
-        C_SCALE_PARAM,
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(

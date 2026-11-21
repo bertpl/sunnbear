@@ -5,7 +5,6 @@ The formula comes from the row with the key ``2.3-6(f)`` in the survey of publis
 
 import math
 
-from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -32,7 +31,7 @@ class BurdenFairesBurden2016236F(Formula):
     params = (
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
-        C_SCALE_PARAM,
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(

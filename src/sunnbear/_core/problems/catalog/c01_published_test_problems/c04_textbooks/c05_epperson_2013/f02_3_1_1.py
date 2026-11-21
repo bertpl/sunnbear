@@ -4,7 +4,6 @@ The formula comes from the rows with the keys ``3.1-1, 3.1-3(a), 3.1-10; 3.2-2, 
 ``3.1-2(c)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -40,7 +39,7 @@ class Epperson2013311(Formula):
         FormulaParam("k", latex_symbol="k"),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
-        C_SCALE_PARAM,
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(

@@ -5,7 +5,6 @@ The formula comes from the rows with the keys ``16`` and ``37`` in the survey of
 
 import math
 
-from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -35,7 +34,7 @@ class Ellithy202616(Formula):
         FormulaParam("m", latex_symbol="m"),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
-        C_SCALE_PARAM,
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(

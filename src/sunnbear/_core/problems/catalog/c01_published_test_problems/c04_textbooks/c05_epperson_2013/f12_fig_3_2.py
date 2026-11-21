@@ -3,7 +3,6 @@
 The formula comes from the row with the key ``Fig. 3.2, 3.6, 3.7`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -31,7 +30,7 @@ class Epperson2013Fig32(Formula):
     params = (
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
-        C_SCALE_PARAM,
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(

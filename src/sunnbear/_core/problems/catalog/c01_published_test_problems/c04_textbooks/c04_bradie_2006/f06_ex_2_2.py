@@ -6,7 +6,6 @@ The formula comes from the row with the key ``Ex. 2.2; Fig. 2.3; Tables 2.2, 2.3
 
 import math
 
-from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -38,7 +37,7 @@ class Bradie2006Ex22(Formula):
     params = (
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
-        C_SCALE_PARAM,
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(

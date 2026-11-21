@@ -5,7 +5,6 @@ The formula comes from the row with the key ``§4.3, §4.4; Ex. 4.1, 4.8`` in th
 
 import math
 
-from sunnbear._core.problems.catalog.c01_published_test_problems.shift_along_x import C_SCALE_PARAM
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -38,7 +37,7 @@ class Moler200443(Formula):
         FormulaParam("a_", latex_symbol="a"),
         FormulaParam("a", latex_symbol=r"x_{\min}"),
         FormulaParam("b", latex_symbol=r"x_{\max}"),
-        C_SCALE_PARAM,
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
