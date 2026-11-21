@@ -36,8 +36,9 @@ class PublishedTestProblems(FormulaCategory):
       each parameter tuple holds the ``c_scale`` of its own interval, so that ``parametrized_fun`` does not round the
       width on every call.
 
-    A person writes each formula module outside subcategory 1.99 from its rows in the survey of published test problems,
-    `data/literature_test_problems/sources/`, so a change of a formula's rows needs a change of its module.
+    A person writes each formula module outside subcategory 1.99 from the formula's rows in the survey of published
+    test problems, `data/literature_test_problems/sources/`, so a change of a formula's rows needs a change of its
+    module.
 
     Subcategory 1.99 holds modified versions of the published test problems that do not satisfy the benchmark suite
     inclusion conditions; the docstring of `ModifiedPublishedTestProblems` states how the formulas of subcategory 1.99

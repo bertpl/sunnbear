@@ -81,6 +81,8 @@ Every text field is markdown, with code in backticks; a field that holds only co
 - `sign`, `cbrt`, and the Bessel functions `J0`, `J1`, `Y0` and `Y1`;
 - a power `base^(1/q)` with an odd integer `q`: the real root, negative for a negative base.
 
+The script that compares the rows parses only part of this syntax: it compares a row whose `f` it cannot parse by its text (§ Statuses).
+
 ## Statuses
 
 Each row has 1 of 3 final statuses, decided in this order; the paragraphs *The same function* and *Test problems and intervals* below the list define the list's terms:
@@ -239,16 +241,18 @@ A formula's `status` is `active` or `retired`; `variable_change`, `f` and `param
 
 ## Formula modules
 
-Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, below `src/sunnbear/_core/problems/catalog/c01_published_test_problems/`: 1 package per subcategory, 1 package per source and 1 module per formula. A person writes each module, and a change of a formula's rows needs a change of its module. A formula module:
+Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, below `src/sunnbear/_core/problems/catalog/c01_published_test_problems/`: 1 package per subcategory, 1 package per source and 1 module per formula. A person writes each module; the class docstring of `PublishedTestProblems` states how a module depends on its rows. A formula module:
 
 - takes its function from the `f` of the formula's first row, as the source prints it, unless the formula's line in `formulas.csv` gives an `f`; where a row of the formula gives only an `f_description`, the module's author writes the function from that description and the source;
-- takes x as the variable that the formula's `variable_change` names, where `formulas.csv` gives one, as in `f(10^-pH)` on `[2, 12]`;
+- takes as x the variable of the formula's `variable_change`, where `formulas.csv` gives one: for `` the pH, as `f(10^-pH)` on `[2, 12]` ``, x is the pH, and the module evaluates `f(10^-x)` on `[2, 12]`;
 - evaluates that function at `x - c_scale*c`, so that the formula's `c` shifts the function along x. `c_scale` is the rounded width of the formula's interval; the class docstring of `PublishedTestProblems`, the class of category 1, states the rule and its reasons;
 - lists the formula's published test problems in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds and `c_scale` as 3 more parameters, `a`, `b` and `c_scale`;
 - renames a source's own parameters `a`, `b` and `c_scale` to `a_`, `b_` and `c_scale_` in every formula, so that these 3 names always mean the bounds of the interval and the scale of the shift;
 - names its source in a `FormulaSource`: the source's `reference`, and the keys of the formula's rows as the location;
 - takes its name, and its module and class names, from the key of the formula's first row. Where the key lists several locations, separated by `;` or `,`, the name ends after the first location; while the names of several formulas of the source would give module names that differ only in their `fNN` prefix, each of those names takes its key's next location too;
-- holds test cases whose expected values are computed from the function in high precision, such as with mpmath. A case whose expected value is near 0 sets `atol=0.0`, because the default `atol` would accept any value near 0; a case whose function cannot be evaluated in float64 to within the default tolerance, such as an ill-conditioned function or a polynomial in expanded form near its multiple root, sets a wider `atol`.
+- holds test cases whose expected values are computed from the function in high precision, such as with mpmath:
+  - a case whose expected value is below `1000*DEFAULT_ATOL` in magnitude sets `atol=0.0`, because the default `atol` would let a wrong value of that size pass;
+  - a case whose function cannot be evaluated in float64 to within the default tolerance, such as an ill-conditioned function or a polynomial in expanded form near its multiple root, sets an `atol` of a few times the difference between its float64 value and its high-precision value.
 
 **The published test problems:** a row's parameters give 1 or several sets of values:
 
@@ -263,7 +267,7 @@ The module's docstring names each rounded value, and its test cases evaluate the
 
 The class docstring of `ModifiedPublishedTestProblems` describes subcategory 1.99, the modified versions of published test problems. A change of a published formula 1.x.y.z may need a matching change of formula 1.99.x.y.z.
 
-**When a formula retires, delete its module and its import in the source's `__init__.py`.**
+**When a formula retires, delete its module and the import of that module in the source's `__init__.py`.**
 
 ## Adding a source
 
