@@ -46,7 +46,7 @@ class HyperbolicTangent(Formula):
     params = (
         FormulaParam("b", latex_symbol="b"),
         FormulaParam(
-            "d", latex_symbol="d", meaning=r"How far $\tanh$ lies above its lower asymptote, $-1$, at the root."
+            "d", latex_symbol="d", meaning=r"The height of $\tanh$ above its lower asymptote, $-1$, at the root."
         ),
     )
     presentation = FormulaPresentation(

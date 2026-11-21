@@ -48,8 +48,8 @@ class HyperbolicCosine(Formula):
             "interval."
         ),
         notes=(
-            r"The expression equals $$\cosh(\x - \c) - \cosh\frac{\param{b}}{2},$$ in a form whose terms do not "
-            "cancel next to the root.",
+            r"The expression equals $$\cosh(\x - \c) - \cosh\frac{\param{b}}{2},$$ in a form that loses no "
+            "precision to cancellation next to the root.",
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

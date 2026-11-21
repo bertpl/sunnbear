@@ -37,7 +37,7 @@ class HyperbolicFunctions(FormulaCategory):
     number = (2, 4)
     name = "Hyperbolic functions"
     description = (
-        r"The hyperbolic functions $\sinh$, $\cosh$ and $\tanh$, and their inverses: functions that grow exponentially "
-        r"or logarithmically, $\tanh$ close to a step, $\operatorname{arcosh}$ from the edge of its domain, and "
-        r"$\operatorname{artanh}$ between its poles."
+        r"The hyperbolic functions $\sinh$, $\cosh$ and $\tanh$, and their inverses. Most of them grow exponentially "
+        r"or logarithmically; $\tanh$ is close to a step, $\operatorname{arcosh}$ starts at the edge of its domain, "
+        r"and $\operatorname{artanh}$ is steep next to its poles."
     )

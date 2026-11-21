@@ -1,11 +1,7 @@
-"""This module holds the rule for a valid degree, and what the formulas of polynomials orthogonal on ``[-1, 1]`` share.
+"""This module holds the rule for a valid degree, LaTeX for intervals, and what the orthogonal polynomials share.
 
-`is_valid_degree` serves every formula of the category, and `interval_by_parity_latex` every formula whose interval
-differs between an odd and an even degree. `JACOBI_SWEPT_DEGREES`, `JACOBI_SWEPT_DEGREES_TEXT` and
-`jacobi_interval_bounds` serve the formulas whose polynomials are orthogonal on ``[-1, 1]``.
-
-Each of those polynomials is a Jacobi polynomial ``P_n^(alpha, beta)`` up to a constant factor, so 1 rule gives the
-interval of all of them, from the degree and the 2 parameters of that Jacobi polynomial.
+Each polynomial orthogonal on ``[-1, 1]`` is a Jacobi polynomial ``P_n^(alpha, beta)`` up to a constant factor, so 1
+rule gives the interval of all of them, from the degree and the 2 parameters of that Jacobi polynomial.
 """
 
 import math
@@ -36,7 +32,10 @@ def is_valid_degree(n: float) -> bool:
 
 
 def interval_by_parity_latex(odd_degree_interval: str, even_degree_interval: str) -> str:
-    r"""Return the LaTeX of an interval that differs between an odd and an even degree ``n``, as ``cases``.
+    r"""Return a ``cases`` environment with the LaTeX of the interval for an odd and for an even degree ``n``.
+
+    The conditions name the degree by the placeholder ``\param{n}``, so the formula's degree parameter must be named
+    ``n``.
 
     Args:
         odd_degree_interval: The interval's LaTeX for an odd ``n``, such as ``"[-1, 1]"``.

@@ -39,7 +39,10 @@ class SignedPower2(Formula):
     presentation = FormulaPresentation(
         expression=r"\operatorname{sgn}(\x) \, |\x|^{\param{p}} + \c",
         interval="[-1, 1]",
-        summary=r"A signed power, whose infinite or zero slope at $\x = 0$ lies away from its root.",
+        summary=(
+            r"A signed power, with an infinite slope at $\x = 0$ for $\param{p} < 1$ and a zero slope for "
+            r"$\param{p} > 1$, away from its root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 

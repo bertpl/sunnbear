@@ -45,7 +45,8 @@ class OneSidedLinearPlusPower(Formula):
         expression=r"\frac{\x + \param{w} \x^{\param{p}}}{1 + \param{w}} - 0.5 + \c",
         interval="[0, 1]",
         summary=(
-            r"A weighted mean of a line and a power with 1 root, flat next to the lower bound for a large $\param{w}$."
+            r"A weighted mean of a line and a power, with 1 root and, for a large $\param{w}$, flat next to the lower "
+            "bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_Y

@@ -81,8 +81,8 @@ class GegenbauerPolynomial(Formula):
             "[-1, 1]", r"\left[-\cos\frac{(1 + \param{alpha}/2) \pi}{\param{n} + \param{alpha}}, 1\right]"
         ),
         summary=(
-            r"The Gegenbauer polynomial, whose amplitude toward the bounds shrinks for $\param{alpha} < 0$, stays the "
-            r"same for $\param{alpha} = 0$ and grows for $\param{alpha} > 0$."
+            r"The Gegenbauer polynomial, whose amplitude, from the middle of its interval toward the bounds, shrinks "
+            r"for $\param{alpha} < 0$, stays the same for $\param{alpha} = 0$ and grows for $\param{alpha} > 0$."
         ),
         notes=(
             r"At $\param{alpha} = 0$, where $C^{(0)}_{\param{n}}$ is 0 everywhere, the function is the limit of the "
