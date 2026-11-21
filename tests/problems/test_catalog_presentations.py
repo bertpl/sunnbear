@@ -116,7 +116,9 @@ def test_categories_declare_their_descriptions():
 # ==================================================================================================
 #  How c applies
 # ==================================================================================================
-@pytest.mark.parametrize("formula", _FORMULAS_TO_CHECK_FOR_C, ids=lambda formula: formula.label)
+@pytest.mark.parametrize(
+    "formula", _FORMULAS_TO_CHECK_FOR_C, ids=[formula.label for formula in _FORMULAS_TO_CHECK_FOR_C]
+)
 def test_formula_applies_c_as_declared(formula):
     """Evaluated at its first, middle and last candidate, a formula applies ``c`` as its `effect_of_c` says.
 
