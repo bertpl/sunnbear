@@ -49,9 +49,9 @@ class ModifiedBurdenFairesBurden2016218(Formula):
         interval="[4, 4.6]",
         notes=(
             (
-                r"The interval ends at 4.6, not at the published 5, left of the pole of $\tan \tmp{u}$ at "
-                r"$3\pi/2$, so that it holds the root and no pole: the pole is a second sign change, so "
-                "that the function has the same sign at both published bounds."
+                "The interval ends at 4.6, not at the published 5, so that it holds the root and no pole: "
+                r"4.6 lies left of the pole of $\tan \tmp{u}$ at $3\pi/2$, and the pole is a second sign "
+                "change, so that the function has the same sign at both published bounds."
             ),
         ),
     )

@@ -55,8 +55,8 @@ class ModifiedPublishedTestProblems(FormulaCategory):
     name = "Modified published test problems"
     description = (
         "The test problems are modified versions of published test problems that do not satisfy the benchmark "
-        "suite inclusion conditions, each as close to the published one as the conditions allow. A modified "
-        "test problem that shifts its function along the x-axis takes $s$ from its own interval; where a "
-        r"shift along x does not work, such as next to a pole or the end of the function's domain, $\c$ is "
-        "added to the function's value or scales x instead."
+        "suite inclusion conditions, each as close to the published one as the conditions allow. A modified test "
+        r"problem that shifts its function along the x-axis shifts it by $s \c$, with $s$ the rounded width of its "
+        "own interval. Where such a shift does not work, such as next to a pole or the end of the function's "
+        r"domain, $\c$ is added to the function's value or scales x instead."
     )

@@ -87,8 +87,9 @@ class ModifiedBorchers2026F12(Formula):
             ),
             (
                 r"$\operatorname{log1p}(z)$ is $\ln(1 + z)$, computed without rounding $1 + z$. Next to "
-                "the root, the terms of the second case cancel too, so that the first case sums their "
-                "Taylor series."
+                r"the root, the terms of $\operatorname{log1p}(\tmp{t}) - \tmp{t} + \frac{\tmp{t}^2}{2}$ "
+                r"cancel too, so that for $|\tmp{t}| < \frac{1}{16}$ the expression sums their Taylor "
+                "series."
             ),
             (
                 "This changes what the test problem tests: the source uses the function to show that root "

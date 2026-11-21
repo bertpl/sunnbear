@@ -74,10 +74,10 @@ class ModifiedSuliMayers200312(Formula):
         interval=r"[\param{a}, \param{b}]",
         notes=(
             (
-                r"The expression is the published function at $\tmp{u} + 1.05$, which moves its minimum "
-                r"from 1.05 to 0, on intervals that hold only its left root, $-1/\param{M}$: each "
-                r"published interval holds both roots, $1.05 \pm 1/\param{M}$, so that the function has "
-                "the same sign at both published bounds."
+                r"The expression is the published function evaluated at $\tmp{u} + 1.05$, which moves the "
+                "function's minimum from 1.05 to 0. Its intervals hold only the left root, "
+                r"$-1/\param{M}$, because each published interval holds both roots, $1.05 \pm "
+                r"1/\param{M}$, so that the function has the same sign at both published bounds."
             ),
             (
                 "This changes what the test problem tests: the source uses the function to show that an "

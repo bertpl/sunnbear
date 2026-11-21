@@ -84,7 +84,7 @@ class ModifiedChandrupatla19979(Formula):
                     (0.0002, 27.0),
                     (0.0002, 81.0),
                 ),
-                summary="The published intervals from $[2 \\cdot 10^{-4}, 9]$ on.",
+                summary="The published intervals $[2 \\cdot 10^{-4}, 9]$ and wider.",
             ),
         )
 

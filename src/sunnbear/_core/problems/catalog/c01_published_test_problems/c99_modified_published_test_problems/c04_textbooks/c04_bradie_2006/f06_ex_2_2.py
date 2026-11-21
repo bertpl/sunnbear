@@ -58,9 +58,9 @@ class ModifiedBradie2006Ex22(Formula):
         interval="[0, 0.495]",
         notes=(
             (
-                r"The interval ends at 0.495, not at the published 0.5, the pole of $\tan \pi \tmp{u}$, "
-                r"where the function is about $1.6 \cdot 10^{16}$ in float64 and which a shift along x by "
-                r"any $\c < 0$ crosses."
+                r"The interval ends at 0.495, not at the published 0.5, which is the pole of $\tan \pi "
+                r"\tmp{u}$: the function is about $1.6 \cdot 10^{16}$ there in float64, and a shift along "
+                r"x by any $\c < 0$ would cross the pole."
             ),
         ),
     )

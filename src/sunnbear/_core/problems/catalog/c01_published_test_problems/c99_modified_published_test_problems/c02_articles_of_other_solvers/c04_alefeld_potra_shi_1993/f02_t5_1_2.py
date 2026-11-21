@@ -58,11 +58,13 @@ class ModifiedAlefeldPotraShi1993T512(Formula):
         notes=(
             (
                 "Each bound lies 1% of the published interval's width from its pole, rounded to 1 "
-                "significant digit, not $10^{-9}$ from it as published, where a shift along x by more "
-                "than $10^{-9}$ would cross the pole. This changes what the test problem tests: the "
-                "modified intervals leave out the steepest part of the function next to each pole, as "
-                r"$|f|$ is at least about $2 \cdot 10^{27}$ at the published bounds and at most about $7 "
-                r"\cdot 10^{5}$ at the modified ones."
+                "significant digit, not $10^{-9}$ from it as published: a shift along x by more than "
+                "$10^{-9}$ would move a published bound across its pole."
+            ),
+            (
+                "This changes what the test problem tests: the modified intervals leave out the steepest "
+                r"part of the function next to each pole, as $|f|$ is at least about $2 \cdot 10^{27}$ at "
+                r"the published bounds and at most about $7 \cdot 10^{5}$ at the modified ones."
             ),
         ),
     )

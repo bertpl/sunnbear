@@ -73,10 +73,11 @@ class ModifiedChandrupatla19972(Formula):
                 "which a shift along x would take the lower bound."
             ),
             (
-                "The widest published interval, $[10^{-12}, 10^{12}]$, becomes $[10^{-12}, 10^{10}]$: the "
-                "benchmark's tolerance on x is a fixed fraction of the interval's width, about 2 on the "
-                r"published interval, so that the root, at 1 for the smallest values of $\c$, lies within "
-                "it of the lower bound."
+                "The widest published interval, $[10^{-12}, 10^{12}]$, becomes $[10^{-12}, 10^{10}]$, "
+                "because the benchmark's tolerance on x is a fixed fraction of the interval's width: on "
+                r"the published interval that tolerance is about 2, so that at the smallest values of $\c$ "
+                "the root, at about 1, lies within that tolerance of the lower bound, closer than the "
+                "benchmark suite inclusion conditions allow."
             ),
         ),
     )
@@ -104,7 +105,8 @@ class ModifiedChandrupatla19972(Formula):
                     (1e-12, 10000000000.0),
                 ),
                 summary=(
-                    "The published intervals from $[10^{-4}, 10^{4}]$ on, the widest narrowed to $[10^{-12}, 10^{10}]$."
+                    "The published intervals $[10^{-4}, 10^{4}]$ and wider, "
+                    "with the widest narrowed to $[10^{-12}, 10^{10}]$."
                 ),
             ),
         )

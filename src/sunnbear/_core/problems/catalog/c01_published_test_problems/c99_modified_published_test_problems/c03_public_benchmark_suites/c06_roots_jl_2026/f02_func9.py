@@ -70,9 +70,10 @@ class ModifiedRootsJl2026Func9(Formula):
         interval="[5, 7.7]",
         notes=(
             (
-                r"The interval ends at 7.7, not at the published 12, left of the pole of $\tan \tmp{u}$ at "
-                r"$5\pi/2$, so that it holds 1 root and no pole: the published interval holds 2 roots and "
-                "2 poles, so that the function has the same sign at both published bounds."
+                "The interval ends at 7.7, not at the published 12, so that it holds 1 root and no pole: "
+                r"7.7 lies left of the pole of $\tan \tmp{u}$ at $5\pi/2$, and the published interval "
+                "holds 2 roots and 2 poles, so that the function has the same sign at both published "
+                "bounds."
             ),
             (
                 "This changes what the test problem tests: the source finds every root in $[5, 12]$, and "
