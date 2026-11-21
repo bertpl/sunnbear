@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``§2.1 (p. 67); 2.1-19; 2.5-20`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Bradie200621P67(Formula):
@@ -26,17 +35,33 @@ class Bradie200621P67(Formula):
     number = (1, 4, 4, 7)
     name = "§2.1 (p. 67)"
     params = (
-        FormulaParam("initial_investment"),
-        FormulaParam("monthly_deposit"),
-        FormulaParam("goal"),
+        FormulaParam("initial_investment", latex_symbol=r"\mathit{investment}"),
+        FormulaParam("monthly_deposit", latex_symbol=r"\mathit{deposit}"),
+        FormulaParam("goal", latex_symbol=r"\mathit{goal}"),
     )
     source = FormulaSource(
         reference=(
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
             "Upper Saddle River, NJ. ISBN 0-13-013054-0."
         ),
-        location="§2.1 (p. 67); 2.1-19; 2.5-20",
+        location="§2.1 (p. 67); Exercises 2.1-19, 2.5-20",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{r}", r"\x - 0.09 \c"),
+            (r"\tmp{g}", r"\left(1 + \frac{\tmp{r}}{12}\right)^{36}"),
+        ),
+        expression=(
+            r"\begin{cases} "
+            r"\param{initial_investment} + 36 \param{monthly_deposit} - \param{goal} & \text{if } \tmp{r} = 0 \\ "
+            r"\param{initial_investment} \tmp{g} + \param{monthly_deposit} \frac{\tmp{g} - 1}{\tmp{r}/12} "
+            r"- \param{goal} "
+            r"& \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval="[0.01, 0.1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, initial_investment: float, monthly_deposit: float, goal: float) -> float:
@@ -75,6 +100,7 @@ class Bradie200621P67(Formula):
                         25000.0,
                     ),
                 ),
+                summary="The published parameter values.",
             ),
         )
 

@@ -5,7 +5,16 @@ The formula comes from the row with the key ``aps14_f`` in the survey of publish
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Scipy2026Aps14F(Formula):
@@ -21,7 +30,7 @@ class Scipy2026Aps14F(Formula):
 
     number = (1, 3, 8, 7)
     name = "aps14_f"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "SciPy 1.18.1, module `scipy/optimize/_tstutils.py`, "
@@ -35,8 +44,19 @@ class Scipy2026Aps14F(Formula):
             'zero of a nonlinear function without using derivatives", Advances in Engineering Software '
             "28.3 (1997): 145-149 (no DOI in the module)"
         ),
-        location="aps14_f",
+        location="Collection “aps”, aps14_f",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1000 \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"\frac{\param{n}}{20} \left(\frac{\tmp{u}}{1.5} + \sin \tmp{u} - 1\right) & \text{if } \tmp{u} > 0 \\ "
+            r"-\frac{\param{n}}{20} & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval=r"\left[-1000, \frac{\pi}{2}\right]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -98,6 +118,7 @@ class Scipy2026Aps14F(Formula):
                     (39.0,),
                     (40.0,),
                 ),
+                summary="The published parameter values.",
             ),
         )
 

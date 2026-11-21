@@ -5,7 +5,14 @@ The formula comes from the row with the key ``(4.2)`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Brent197342(Formula):
@@ -30,8 +37,19 @@ class Brent197342(Formula):
             "Table Errata 520. Mathematics of Computation 29(132), 1166. "
             "https://doi.org/10.1090/s0025-5718-1975-0371062-9."
         ),
-        location="(4.2)",
+        location="Section 4, Eq. (4.2)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 10^{6} \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"e^{\tmp{u}} & \text{if } \tmp{u} > -10^{6} \\ "
+            r"e^{-10^{6}} - (\tmp{u} + 10^{6})^2 & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval="[-1001200, 0]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

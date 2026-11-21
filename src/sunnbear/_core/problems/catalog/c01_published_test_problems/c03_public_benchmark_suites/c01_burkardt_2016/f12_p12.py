@@ -5,7 +5,16 @@ The formula comes from the row with the key ``p12`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Burkardt2016P12(Formula):
@@ -21,10 +30,10 @@ class Burkardt2016P12(Formula):
     number = (1, 3, 1, 12)
     name = "p12"
     params = (
-        FormulaParam("factor"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("factor", latex_symbol=r"\mathit{factor}"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -52,8 +61,21 @@ class Burkardt2016P12(Formula):
             "\n"
             "The file's `brent` solver cites Brent's 1973 book for the algorithm, not for any function."
         ),
-        location="p12",
+        location="Problem p12",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"-\exp\left(\ln \param{factor} + \ln|\tmp{u} - 1| - \frac{1}{(\tmp{u} - 1)^2}\right) "
+            r"& \text{if } \tmp{u} < 1 \\ "
+            r"0 & \text{if } \tmp{u} = 1 \\ "
+            r"\exp\left(\ln \param{factor} + \ln|\tmp{u} - 1| - \frac{1}{(\tmp{u} - 1)^2}\right) & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, factor: float, a: float, b: float, c_scale: float) -> float:
@@ -73,7 +95,11 @@ class Burkardt2016P12(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
         return (
-            ParamTable(names=("factor", "a", "b", "c_scale"), rows=((1000.0, -4.0, 4.1, 8.1), (1000.0, 0.5, 2.0, 1.5))),
+            ParamTable(
+                names=("factor", "a", "b", "c_scale"),
+                rows=((1000.0, -4.0, 4.1, 8.1), (1000.0, 0.5, 2.0, 1.5)),
+                summary="The published parameter values and intervals.",
+            ),
         )
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`

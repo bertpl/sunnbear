@@ -5,7 +5,16 @@ The formula comes from the row with the key ``aps15_f`` in the survey of publish
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Scipy2026Aps15F(Formula):
@@ -22,7 +31,7 @@ class Scipy2026Aps15F(Formula):
 
     number = (1, 3, 8, 8)
     name = "aps15_f"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "SciPy 1.18.1, module `scipy/optimize/_tstutils.py`, "
@@ -36,8 +45,21 @@ class Scipy2026Aps15F(Formula):
             'zero of a nonlinear function without using derivatives", Advances in Engineering Software '
             "28.3 (1997): 145-149 (no DOI in the module)"
         ),
-        location="aps15_f",
+        location="Collection “aps”, aps15_f",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1000 \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"-0.859 & \text{if } \tmp{u} < 0 \\ "
+            r"\exp\left(\frac{(\param{n} + 1) \tmp{u}}{2} \cdot 1000\right) - 1.859 "
+            r"& \text{if } \tmp{u} \le \frac{2 \cdot 10^{-3}}{1 + \param{n}} \\ "
+            r"e - 1.859 & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval=r"[-1000, 10^{-4}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -92,6 +114,7 @@ class Scipy2026Aps15F(Formula):
                     (900.0,),
                     (1000.0,),
                 ),
+                summary="The published parameter values.",
             ),
         )
 

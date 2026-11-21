@@ -106,7 +106,7 @@ class ModifiedRootsFortran20252627(Formula):
             "  - The brackets of 4 cases differ: case 146 starts at 0.51, as roots-fortran's own "
             "comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`."
         ),
-        location="26–27",
+        location="root_tests.f90, cases 26 and 27",
     )
 
     @staticmethod

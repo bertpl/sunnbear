@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``7.1`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class LiZhouLangeTian202671(Formula):
@@ -21,11 +30,11 @@ class LiZhouLangeTian202671(Formula):
     number = (1, 2, 20, 3)
     name = "7.1"
     params = (
-        FormulaParam("a0"),
-        FormulaParam("a1"),
-        FormulaParam("a2"),
-        FormulaParam("a3"),
-        FormulaParam("m"),
+        FormulaParam("a0", latex_symbol="a_0"),
+        FormulaParam("a1", latex_symbol="a_1"),
+        FormulaParam("a2", latex_symbol="a_2"),
+        FormulaParam("a3", latex_symbol="a_3"),
+        FormulaParam("m", latex_symbol="m"),
     )
     source = FormulaSource(
         reference=(
@@ -35,8 +44,16 @@ class LiZhouLangeTian202671(Formula):
             " Preprint: arXiv 2212.00797v2 (8 November 2025), https://arxiv.org/abs/2212.00797v2. The "
             "authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
         ),
-        location="7.1",
+        location="Section 7.1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{\theta}", r"\x - 2 \c"),),
+        expression=(
+            r"\param{a3} \tmp{\theta}^{\param{m}} + \param{a2} \tmp{\theta}^2 + \param{a1} \tmp{\theta} + \param{a0}"
+        ),
+        interval="[0, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a0: float, a1: float, a2: float, a3: float, m: float) -> float:
@@ -69,6 +86,7 @@ class LiZhouLangeTian202671(Formula):
                         3.0,
                     ),
                 ),
+                summary="The published parameter values.",
             ),
         )
 

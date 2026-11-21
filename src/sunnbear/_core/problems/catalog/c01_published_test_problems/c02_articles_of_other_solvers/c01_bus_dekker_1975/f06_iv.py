@@ -5,7 +5,14 @@ The formula comes from the row with the key ``IV`` in the survey of published te
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class BusDekker1975Iv(Formula):
@@ -26,8 +33,19 @@ class BusDekker1975Iv(Formula):
             "for finding a zero of a function. ACM Transactions on Mathematical Software 1(4), 330–345."
             " https://doi.org/10.1145/355656.355659."
         ),
-        location="IV",
+        location="Group IV",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"0 & \text{if } |\tmp{u}| < 10^{-100} \\ "
+            r"\tmp{u} e^{-\tmp{u}^{-2}} & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval="[-1, 4]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

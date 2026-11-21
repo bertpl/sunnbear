@@ -5,7 +5,14 @@ The formula comes from the row with the key ``§2.8 case (4); P34(iv)`` in the s
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Atkinson198928Case4(Formula):
@@ -27,8 +34,19 @@ class Atkinson198928Case4(Formula):
             "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & "
             "Sons, New York. ISBN 0-471-62489-6."
         ),
-        location="§2.8 case (4); P34(iv)",
+        location="§2.8 case (4); Problem 34(iv)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"0 & \text{if } \tmp{u} = 1 \\ "
+            r"(\tmp{u} - 1) e^{-1/(\tmp{u} - 1)^2} & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval="[0, 3]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``f27`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 from sunnbear._core.utils.math_functions import sign
 
 
@@ -28,8 +35,17 @@ class GanchovskiSmithRackauckasTomovTraykov2026F27(Formula):
             "`MDPI-Algorithms-Data` of the authors' repository "
             "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
-        location="f27",
+        location="Table 2, f27",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{u}", r"\x - 2 \c"),
+            (r"\tmp{p}", r"\tmp{u} + 1.11111"),
+        ),
+        expression=r"(81 - \tmp{p}(108 - \tmp{p}(54 - \tmp{p}(12 - \tmp{p})))) \operatorname{sgn}(\tmp{p} - 3)",
+        interval="[1, 3]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

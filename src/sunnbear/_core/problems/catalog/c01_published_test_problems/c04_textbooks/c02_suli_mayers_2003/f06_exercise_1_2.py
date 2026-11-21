@@ -5,7 +5,14 @@ The formula comes from the row with the key ``Exercise 1.2`` in the survey of pu
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class SuliMayers2003Exercise12(Formula):
@@ -30,6 +37,20 @@ class SuliMayers2003Exercise12(Formula):
         ),
         location="Exercise 1.2",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{u}", r"\x - \c"),
+            (r"\fn{g}(\x)", r"-\x \sin^2 \frac{1}{\x}"),
+        ),
+        expression=(
+            r"\begin{cases} "
+            r"0 & \text{if } \tmp{u} = 0 \\ "
+            r"\tmp{u} - \fn{g}(\tmp{u}) & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

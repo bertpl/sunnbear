@@ -3,7 +3,16 @@
 The formula comes from the rows with the keys ``3.11`` and ``3.12`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Stage2013311(Formula):
@@ -22,15 +31,26 @@ class Stage2013311(Formula):
 
     number = (1, 2, 12, 8)
     name = "3.11"
-    params = (FormulaParam("d"),)
+    params = (FormulaParam("d", latex_symbol="d"),)
     source = FormulaSource(
         reference=(
             "Stage, S. A. (2013). Comments on An Improvement to the Brent's Method. International "
             "Journal of Experimental Algorithms 4(1), 1–16. No DOI; the publisher's PDF: "
             "https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf."
         ),
-        location="3.11, 3.12",
+        location="§3.11; §3.12",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"-\param{d} & \text{if } \tmp{u} \le 1/3 \\ "
+            r"1 - \param{d} & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval="[-10, 10]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, d: float) -> float:
@@ -47,7 +67,7 @@ class Stage2013311(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("d",), rows=((0.5,), (0.001,))),)
+        return (ParamTable(names=("d",), rows=((0.5,), (0.001,)), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"d": 0.5}, x=-4.0, c=0.0, expected=-0.5),

@@ -37,7 +37,7 @@ class ModifiedGaldino2011F4(Formula):
             "978-1-61284-365-0. No DOI; the author's copy: "
             "http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543."
         ),
-        location="f4",
+        location="Table IV, f4",
     )
 
     @staticmethod

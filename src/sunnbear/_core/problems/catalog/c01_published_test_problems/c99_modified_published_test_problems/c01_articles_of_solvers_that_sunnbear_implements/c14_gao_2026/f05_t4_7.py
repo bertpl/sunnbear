@@ -44,7 +44,7 @@ class ModifiedGao2026T47(Formula):
             "Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied "
             "Mathematics Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928."
         ),
-        location="T4.7",
+        location="Table 4, function 7",
     )
 
     @staticmethod

@@ -44,7 +44,7 @@ class ModifiedAtkinson198928Case4(Formula):
             "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & "
             "Sons, New York. ISBN 0-471-62489-6."
         ),
-        location="§2.8 case (4); P34(iv)",
+        location="§2.8 case (4); Problem 34(iv)",
     )
 
     @staticmethod

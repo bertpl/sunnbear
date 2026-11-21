@@ -6,7 +6,16 @@ The formula comes from the row with the key ``26–27`` in the survey of publish
 import math
 import sys
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 # MAX_EXP_ARGUMENT is the largest argument for which float64 exp does not overflow.
 MAX_EXP_ARGUMENT = math.log(sys.float_info.max)
@@ -24,9 +33,9 @@ class RootsFortran20252627(Formula):
     number = (1, 3, 3, 4)
     name = "26–27"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -88,8 +97,23 @@ class RootsFortran20252627(Formula):
             "  - The brackets of 4 cases differ: case 146 starts at 0.51, as roots-fortran's own "
             "comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`."
         ),
-        location="26–27",
+        location="root_tests.f90, cases 26 and 27",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"0 & \text{if } 709.78 \, \tmp{u}^2 < 1 \\ "
+            r"\frac{\tmp{u}}{e^{1/\tmp{u}^2}} & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            r"The first case holds where $e^{1/\tmp{u}^2}$ overflows in float64, whose largest value is about "
+            r"$e^{709.78}$.",
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -108,7 +132,13 @@ class RootsFortran20252627(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((-1.0, 4.0, 5.0), (-1.1234, 4.4567, 5.58))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((-1.0, 4.0, 5.0), (-1.1234, 4.4567, 5.58)),
+                summary="The published intervals.",
+            ),
+        )
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`
     # would accept any value near 0, 0 among them

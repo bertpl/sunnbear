@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``2.6`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class OliveiraTakahashi202126(Formula):
@@ -27,8 +34,19 @@ class OliveiraTakahashi202126(Formula):
             "Software 47(1), Article 5. https://doi.org/10.1145/3423597. The article itself is dated "
             "December 2020."
         ),
-        location="2.6",
+        location="Table 1, ill-behaved function 6",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"0 & \text{if } 21 \tmp{u} - 1 = 0 \\ "
+            r"\frac{1}{21 \tmp{u} - 1} & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval="[-1, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
