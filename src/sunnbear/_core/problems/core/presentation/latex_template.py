@@ -46,10 +46,11 @@ class LatexTemplate:
     _COMMAND_WITH_ARGUMENT: ClassVar[re.Pattern[str]] = re.compile(
         r"\\(" + "|".join(_ARGUMENT_PATTERN_BY_COMMAND) + r")(?![A-Za-z])"
     )
-    # _ENDS_IN_A_NUMBER matches the end of a text that a value placed right after it would read as part of: a digit
-    # that is not a subscript, a placeholder, or an exponent in braces, followed by nothing but spaces.
-    _ENDS_IN_A_NUMBER: ClassVar[re.Pattern[str]] = re.compile(
-        r"(?:(?<!_)\d|\\param\{[A-Za-z_][A-Za-z0-9_]*\}|\^\{[^{}]*\})\s*$"
+    # _NUMBER_OR_EXPONENT_AT_END matches a text that ends, before any trailing spaces, in a digit that is not a
+    # subscript, in a placeholder, or in an exponent in braces. A value placed right after such a text would read as
+    # part of the number.
+    _NUMBER_OR_EXPONENT_AT_END: ClassVar[re.Pattern[str]] = re.compile(
+        r"(?:(?<!_)\d|" + _PLACEHOLDER.pattern + r"|\^\{[^{}]*\})\s*$"
     )
 
     def __post_init__(self) -> None:
@@ -107,12 +108,13 @@ class LatexTemplate:
             return self._PLACEHOLDER.sub(lambda match: rf"\prm{{{latex_by_name[match[1]]}}}", self.text)
 
     def substitute_values(self, latex_by_name: Mapping[str, str]) -> str:
-        r"""Return the text with each placeholder replaced by a value's LaTeX, as `substitute` does, adding ``\cdot``.
+        r"""Return the text as `substitute` returns it, with ``\cdot`` before each value that follows a number.
 
-        ``\cdot`` goes before each value that follows a digit, another value or an exponent, because the value would
-        otherwise read as part of that number: ``1.54226 \param{w}`` at ``w = 0.2`` would render as 1.542260.2, and
-        ``2 \param{n}`` at ``n = 4`` as 24. A symbol needs no dot, because ``2 \param{n}`` with the symbol ``n`` reads
-        as ``2n``.
+        ``\cdot`` goes before each value that follows a digit outside a subscript, another value or an exponent in
+        braces, because the value would otherwise read as part of that number: ``1.54226 \param{w}`` at ``w = 0.2``
+        would render as 1.542260.2, and ``2 \param{n}`` at ``n = 4`` as 24.
+
+        A symbol needs no dot, because ``2 \param{n}`` with the symbol ``n`` reads as ``2n``.
 
         Args:
             latex_by_name: The LaTeX of each parameter's value, such as ``"0.2"``; it may hold names that the text does
@@ -124,10 +126,10 @@ class LatexTemplate:
 
         def placeholder_with_dot_where_needed(match: re.Match[str]) -> str:
             r"""Return the placeholder of `match`, with ``\cdot`` before it where a number precedes it."""
-            if self._ENDS_IN_A_NUMBER.search(self.text, 0, match.start()):
+            if self._NUMBER_OR_EXPONENT_AT_END.search(self.text, 0, match.start()):
                 return rf"\cdot {match[0]}"
             else:
                 return match[0]
 
-        dotted = self._PLACEHOLDER.sub(placeholder_with_dot_where_needed, self.text)
-        return LatexTemplate(dotted).substitute(latex_by_name)
+        text_with_dots = self._PLACEHOLDER.sub(placeholder_with_dot_where_needed, self.text)
+        return LatexTemplate(text_with_dots).substitute(latex_by_name)

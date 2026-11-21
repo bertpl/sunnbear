@@ -307,9 +307,11 @@ class Formula(FormulaTaxonomyNode, ABC):
 
         Each value is spelled as the test problem's id spells it, written in LaTeX
         (`ParamNotation.spell_value_in_latex`), and wrapped in ``\prm{…}``. The values are substituted, not simplified:
-        ``1 - \param{m}`` at ``m = 0.5`` gives ``1 - \prm{0.5}``. A value that follows a number gets ``\cdot`` before
-        it, so that the 2 do not read as 1 number (`LatexTemplate.substitute_values`): ``2 \param{n}`` at ``n = 4``
-        gives ``2 \cdot \prm{4}``.
+        ``1 - \param{m}`` at ``m = 0.5`` gives ``1 - \prm{0.5}``.
+
+        A value that follows a digit, another value or an exponent gets ``\cdot`` before it, so that the value and the
+        number do not read as 1 number (`LatexTemplate.substitute_values`): ``2 \param{n}`` at ``n = 4`` gives
+        ``2 \cdot \prm{4}``.
 
         Args:
             text: A definition's side, the expression or the interval of the formula's presentation.
