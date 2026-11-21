@@ -1,8 +1,8 @@
 """This module holds the rule for a valid degree, and what the formulas of polynomials orthogonal on ``[-1, 1]`` share.
 
-`is_valid_degree` serves every formula of the category, and `interval_by_parity_latex` every formula but
-`BernoulliPolynomial`. `JACOBI_SWEPT_DEGREES`, `JACOBI_SWEPT_DEGREES_TEXT` and `jacobi_interval_bounds` serve the
-formulas whose polynomials are orthogonal on ``[-1, 1]``.
+`is_valid_degree` serves every formula of the category, and `interval_by_parity_latex` every formula whose interval
+differs between an odd and an even degree. `JACOBI_SWEPT_DEGREES`, `JACOBI_SWEPT_DEGREES_TEXT` and
+`jacobi_interval_bounds` serve the formulas whose polynomials are orthogonal on ``[-1, 1]``.
 
 Each of those polynomials is a Jacobi polynomial ``P_n^(alpha, beta)`` up to a constant factor, so 1 rule gives the
 interval of all of them, from the degree and the 2 parameters of that Jacobi polynomial.
@@ -22,9 +22,11 @@ JACOBI_SWEPT_DEGREES = (
     *(float(degree) for degree in range(1, 33)),
     *(2.0**exponent + parity for exponent in range(6, 11) for parity in (0.0, 1.0)),
 )
-# The summary of a recipe that sweeps `JACOBI_SWEPT_DEGREES` names them with this text.
+# A recipe that sweeps `JACOBI_SWEPT_DEGREES` starts its summary with this text, which has no final period, so that
+# the recipe can name its other parameters after it. The text names the degrees of `JACOBI_SWEPT_DEGREES`, so the 2
+# change together.
 JACOBI_SWEPT_DEGREES_TEXT = (
-    r"The degrees $\param{n}$ from 1 to 32, then each power of 2 from 64 to 1024 and the degree after it"
+    r"The degrees $\param{n}$ from 1 to 32, then each power of 2 from 64 to 1024 and that power plus 1"
 )
 
 

@@ -81,7 +81,10 @@ class JacobiPolynomial(Formula):
             r"\left[-\cos\frac{(1.25 + \param{beta}/2) \pi}{\param{n} + (\param{alpha} + \param{beta} + 1)/2}, "
             r"1\right]",
         ),
-        summary="The Jacobi polynomial, whose amplitude can change differently toward each bound.",
+        summary=(
+            r"The Jacobi polynomial, whose amplitude toward the upper bound depends on $\param{alpha}$, and toward the "
+            r"lower bound on $\param{beta}$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

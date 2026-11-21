@@ -50,8 +50,8 @@ class SecondWilkinsonPolynomial(Formula):
         expression=r"\prod_{k=1}^{\param{n}} \left(\x - 2^{-(k + \c)}\right)",
         interval=interval_by_parity_latex(r"[2^{-(\param{n} + 1)}, 1]", r"[2^{-(\param{n} - 0.5)}, 1]"),
         summary=(
-            "Wilkinson's second polynomial, with roots that crowd together toward the lower bound, each half as far "
-            "from 0 as the one above it."
+            "Wilkinson's second polynomial, with roots that lie closer together toward the lower bound, each half as "
+            "far from 0 as the one above it."
         ),
     )
     effect_of_c = EffectOfC.SCALES_X

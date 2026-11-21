@@ -42,6 +42,9 @@ def decimal_axis_text(axis: ParamAxis) -> str:
     r"""Return a decimal `axis`'s values as a recipe's summary names them, such as "$\param{p}$ from 2 to 10".
 
     The text names the step only where it is not 1, as in "$\param{p}$ from 3 to 9 in steps of 2".
+
+    The axis must use the ``ParamNotation.DECIMAL`` notation: for a power notation, the text would name the exponents
+    as the values.
     """
     text = r"$\param{" + axis.param_name + "}$" + f" from {axis.start:g} to {axis.stop:g}"
     if axis.step != 1.0:

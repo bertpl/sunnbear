@@ -37,6 +37,6 @@ class PowerFunctions(FormulaCategory):
     number = (2, 3)
     name = "Power functions"
     description = (
-        r"The power $\x^p$ with a power $p$ that need not be a positive integer, which brings an infinite slope at a "
-        "root, a root of fractional multiplicity, the edge of the function's domain, or a pole."
+        r"The power $\x^p$ with an exponent $p$ that need not be a positive integer, so that the function can have an "
+        "infinite slope at a root, a root of fractional multiplicity, the edge of its domain, or a pole."
     )

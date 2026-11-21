@@ -46,8 +46,8 @@ class InverseHyperbolicTangent(Formula):
         expression=r"\frac{\operatorname{artanh} \x}{\operatorname{artanh}(1 - \param{d})} + \c",
         interval=r"[-(1 - \param{d}), 1 - \param{d}]",
         summary=(
-            r"The inverse hyperbolic tangent, steep next to both bounds for a small $\param{d}$, where they lie close "
-            "to its poles."
+            r"The inverse hyperbolic tangent, steep next to both bounds for a small $\param{d}$, because both bounds "
+            r"then lie close to the poles of $\operatorname{artanh}$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
