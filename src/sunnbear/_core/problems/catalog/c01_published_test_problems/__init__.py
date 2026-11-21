@@ -49,9 +49,9 @@ class PublishedTestProblems(FormulaCategory):
     name = "Published test problems"
     description = (
         "The test problems come from published sources: articles on root-finding methods, public benchmark suites and "
-        r"textbooks. A formula that shifts its function along the x-axis evaluates it at $\x - s \c$, where $s$ is the "
-        r"width of the formula's interval, rounded to 3 significant digits; at $\c = 0$, the formula is the published "
-        "function."
+        r"textbooks. A formula that shifts its function along the x-axis evaluates the function at $\x - s \c$, where "
+        r"$s$ is the width of the interval, rounded to 3 significant digits; a formula with several intervals has 1 "
+        r"value of $s$ for each. At $\c = 0$, the formula is the published function."
     )
     is_builtin_only = True
 

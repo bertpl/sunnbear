@@ -8,5 +8,7 @@ class PurposeBuiltFunctions(FormulaCategory):
 
     number = (3,)
     name = "Purpose-built functions"
-    description = "Functions written for sunnbear, each to provoke a specific behavior of a solver."
+    description = (
+        "The test problems are functions written for sunnbear, each to provoke a specific behavior of a solver."
+    )
     is_builtin_only = True
