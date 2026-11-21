@@ -39,7 +39,7 @@ class ModifiedChandrupatla19979(Formula):
             "zero of a nonlinear function without using derivatives. Advances in Engineering Software "
             "28(3), 145–149. https://doi.org/10.1016/S0965-9978(96)00051-8."
         ),
-        location="9",
+        location="Table 1, function 9",
     )
 
     @staticmethod

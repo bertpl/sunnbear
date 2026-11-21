@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``I`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Ridders1979I(Formula):
@@ -23,8 +30,14 @@ class Ridders1979I(Formula):
             " function. IEEE Transactions on Circuits and Systems 26(11), 979–980. "
             "https://doi.org/10.1109/TCS.1979.1084580."
         ),
-        location="I",
+        location="Section I",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        expression=r"\tmp{u}^{3} - \tmp{u} - 5",
+        interval="[-1, 3]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

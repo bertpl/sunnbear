@@ -41,7 +41,7 @@ class ModifiedFord19971(Formula):
             "10.24200/sci.2020.21758, which doi.org does not resolve. An earlier version is the "
             "University of Essex technical report CSM-257 (1995)."
         ),
-        location="1",
+        location="Section “Numerical Tests”, function 1",
     )
 
     @staticmethod

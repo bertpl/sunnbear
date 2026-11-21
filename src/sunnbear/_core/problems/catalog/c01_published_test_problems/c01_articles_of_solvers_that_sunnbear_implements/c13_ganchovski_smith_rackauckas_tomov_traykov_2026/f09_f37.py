@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``f37`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F37(Formula):
@@ -25,8 +32,14 @@ class GanchovskiSmithRackauckasTomovTraykov2026F37(Formula):
             "`MDPI-Algorithms-Data` of the authors' repository "
             "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
-        location="f37",
+        location="Table 2, f37",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        expression=r"\left(\tmp{u} - \frac{7}{9}\right)^{3} + \frac{\tmp{u} - \frac{7}{9}}{10^{3}}",
+        interval="[-11, 9]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -15,3 +15,7 @@ class Stage2013(FormulaCategory):
 
     number = (1, 2, 12)
     name = "Stage (2013)"
+    description = (
+        "The test problems come from an article that comments on an improvement to Brent's method "
+        "and compares 7 methods."
+    )

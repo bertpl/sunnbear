@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``3.11-25`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Epperson201331125(Formula):
@@ -23,8 +30,14 @@ class Epperson201331125(Formula):
             "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "
             "John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
         ),
-        location="3.11-25",
+        location="Exercise 3.11-25",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.004 \c"),),
+        expression=r"\left(\tmp{u} - 1\right)^{5}",
+        interval="[0.998, 1.002]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``Fig. 2.2`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Bradie2006Fig22(Formula):
@@ -25,6 +32,12 @@ class Bradie2006Fig22(Formula):
         ),
         location="Fig. 2.2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=r"\left(\tmp{u} - 1\right)^{7}",
+        interval="[0, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

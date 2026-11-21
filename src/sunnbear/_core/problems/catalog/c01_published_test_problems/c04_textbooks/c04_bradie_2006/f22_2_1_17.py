@@ -5,7 +5,14 @@ The formula comes from the row with the key ``2.1-17`` in the survey of publishe
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Bradie20062117(Formula):
@@ -26,8 +33,17 @@ class Bradie20062117(Formula):
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
             "Upper Saddle River, NJ. ISBN 0-13-013054-0."
         ),
-        location="2.1-17",
+        location="Exercise 2.1-17",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{\zeta}", r"\x - 0.5 \c"),),
+        expression=(
+            r"\cos{\left(4 \tmp{\zeta} \sqrt{1 - \tmp{\zeta}^{2}} \right)} - \left(-1 + 8 "
+            r"\tmp{\zeta}^{2} - 8 \tmp{\zeta}^{4}\right)"
+        ),
+        interval="[0, 0.5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

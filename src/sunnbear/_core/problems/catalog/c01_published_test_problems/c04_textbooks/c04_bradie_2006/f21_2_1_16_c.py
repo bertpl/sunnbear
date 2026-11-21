@@ -6,7 +6,14 @@ published test problems.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Bradie20062116C(Formula):
@@ -27,8 +34,14 @@ class Bradie20062116C(Formula):
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
             "Upper Saddle River, NJ. ISBN 0-13-013054-0."
         ),
-        location="2.1-16(c); 2.2-11(c); 2.3-16; 2.4-14(c); 2.5-18(c)",
+        location="Exercises 2.1-16(c), 2.2-11(c), 2.3-16, 2.4-14(c), 2.5-18(c)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"1.05 - 1.04 \tmp{u} + \ln{\left(\tmp{u} \right)}",
+        interval="[1, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -42,7 +42,7 @@ class ModifiedAlefeldPotraShi199512(Formula):
             "https://doi.org/10.1145/210089.210111. The authors' code is CALGO 748: "
             "https://www.netlib.org/toms/748."
         ),
-        location="12",
+        location="Table I, problem 12",
     )
 
     @staticmethod

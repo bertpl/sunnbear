@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``§4.1, §4.2, §4.4, §4.5`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Moler200441(Formula):
@@ -20,7 +29,7 @@ class Moler200441(Formula):
 
     number = (1, 4, 3, 3)
     name = "§4.1"
-    params = (FormulaParam("M"),)
+    params = (FormulaParam("M", latex_symbol="M"),)
     source = FormulaSource(
         reference=(
             "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); "
@@ -30,6 +39,12 @@ class Moler200441(Formula):
         ),
         location="§4.1, §4.2, §4.4, §4.5",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\tmp{u}^{2} - \param{M}",
+        interval="[1, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, M: float) -> float:
@@ -43,7 +58,7 @@ class Moler200441(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("M",), rows=((2.0,),)),)
+        return (ParamTable(names=("M",), rows=((2.0,),), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"M": 2.0}, x=1.3, c=0.0, expected=-0.3099999999999999),

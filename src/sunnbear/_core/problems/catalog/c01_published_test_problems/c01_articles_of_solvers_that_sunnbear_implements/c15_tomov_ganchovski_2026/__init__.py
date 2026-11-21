@@ -17,3 +17,7 @@ class TomovGanchovski2026(FormulaCategory):
 
     number = (1, 1, 15)
     name = "Tomov, Ganchovski (2026)"
+    description = (
+        "The test problems come from a preprint on the global convergence and the stopping rule of "
+        "a safeguarded modified Anderson–Björck method."
+    )

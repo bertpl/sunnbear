@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``driver`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Norton1985Driver(Formula):
@@ -24,8 +31,14 @@ class Norton1985Driver(Formula):
             "https://doi.org/10.1145/214392.214396. The author's Fortran code is Algorithm 631 of the "
             "Collected Algorithms of the ACM (CALGO), https://www.netlib.org/toms/631."
         ),
-        location="driver",
+        location="the driver of the author's code",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\tmp{u}^{7} + 28 \tmp{u}^{4} - 480",
+        interval="[1, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

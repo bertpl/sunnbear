@@ -5,7 +5,14 @@ The formula comes from the row with the key ``P14`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class BadrAlmotairiElGhamry2021P14(Formula):
@@ -23,8 +30,14 @@ class BadrAlmotairiElGhamry2021P14(Formula):
             "finding algorithms and traditional methods. Mathematics 9(11), 1306. "
             "https://doi.org/10.3390/math9111306."
         ),
-        location="P14",
+        location="Table 1, P14",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"e^{\tmp{u}} - 3 \tmp{u} - 2",
+        interval="[2, 3]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

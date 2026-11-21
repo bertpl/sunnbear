@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``T4.1 r1-2`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Brent1973T41R12(Formula):
@@ -19,9 +28,9 @@ class Brent1973T41R12(Formula):
     number = (1, 1, 4, 1)
     name = "T4.1 r1-2"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -31,8 +40,14 @@ class Brent1973T41R12(Formula):
             "Table Errata 520. Mathematics of Computation 29(132), 1166. "
             "https://doi.org/10.1090/s0025-5718-1975-0371062-9."
         ),
-        location="T4.1 r1-2",
+        location="Table 4.1, rows 1 and 2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u}^{9}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -46,7 +61,13 @@ class Brent1973T41R12(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((-1.0, 1.1, 2.1), (-1.0, 4.0, 5.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((-1.0, 1.1, 2.1), (-1.0, 4.0, 5.0)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

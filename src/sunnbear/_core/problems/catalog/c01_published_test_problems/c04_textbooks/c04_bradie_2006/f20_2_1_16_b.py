@@ -4,7 +4,14 @@ The formula comes from the row with the key ``2.1-16(b); 2.2-11(b); 2.3-15; 2.4-
 published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Bradie20062116B(Formula):
@@ -24,8 +31,14 @@ class Bradie20062116B(Formula):
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
             "Upper Saddle River, NJ. ISBN 0-13-013054-0."
         ),
-        location="2.1-16(b); 2.2-11(b); 2.3-15; 2.4-14(b); 2.5-18(b)",
+        location="Exercises 2.1-16(b), 2.2-11(b), 2.3-15, 2.4-14(b), 2.5-18(b)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\tmp{u}^{3} - \tmp{u}^{2} - 10 \tmp{u} + 7",
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

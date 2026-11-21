@@ -5,7 +5,16 @@ The formula comes from the row with the key ``2.3-6(e)`` in the survey of publis
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class BurdenFairesBurden2016236E(Formula):
@@ -19,9 +28,9 @@ class BurdenFairesBurden2016236E(Formula):
     number = (1, 4, 7, 37)
     name = "2.3-6(e)"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -29,8 +38,14 @@ class BurdenFairesBurden2016236E(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="2.3-6(e)",
+        location="Exercise 2.3-6(e)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"e^{\tmp{u}} - 3 \tmp{u}^{2}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -44,7 +59,11 @@ class BurdenFairesBurden2016236E(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((0.0, 1.0, 1.0), (3.0, 5.0, 2.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"), rows=((0.0, 1.0, 1.0), (3.0, 5.0, 2.0)), summary="The published intervals."
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.0, expected=1.0798588075760032),

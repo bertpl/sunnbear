@@ -5,7 +5,14 @@ The formula comes from the row with the key ``13`` in the survey of published te
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Suhadolnik201213(Formula):
@@ -22,8 +29,14 @@ class Suhadolnik201213(Formula):
             "Suhadolnik, A. (2012). Combined bracketing methods for solving nonlinear equations. "
             "Applied Mathematics Letters 25(11), 1755–1760. https://doi.org/10.1016/j.aml.2012.02.006."
         ),
-        location="13",
+        location="Table 1, function 13",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
+        expression=r"e^{- \tmp{u}} - \tmp{u} - \sin{\left(\tmp{u} \right)}",
+        interval="[0, 0.5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

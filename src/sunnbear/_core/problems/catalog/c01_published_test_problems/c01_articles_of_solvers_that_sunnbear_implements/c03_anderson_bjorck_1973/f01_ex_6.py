@@ -5,7 +5,16 @@ The formula comes from the row with the key ``Ex. 6`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class AndersonBjorck1973Ex6(Formula):
@@ -17,7 +26,7 @@ class AndersonBjorck1973Ex6(Formula):
 
     number = (1, 1, 3, 1)
     name = "Ex. 6"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Anderson, N., Björck, Å. (1973). A new high order method of regula falsi type for "
@@ -25,6 +34,12 @@ class AndersonBjorck1973Ex6(Formula):
         ),
         location="Ex. 6",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"e^{- \param{n} \tmp{u}} \left(\tmp{u} - 1\right) + \tmp{u}^{\param{n}}",
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -38,7 +53,13 @@ class AndersonBjorck1973Ex6(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("n",), rows=((1.0,), (5.0,), (10.0,), (15.0,), (20.0,))),)
+        return (
+            ParamTable(
+                names=("n",),
+                rows=((1.0,), (5.0,), (10.0,), (15.0,), (20.0,)),
+                summary="The published parameter values.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"n": 1.0}, x=0.3, c=0.0, expected=-0.21857275447720254),

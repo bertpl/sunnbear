@@ -5,7 +5,14 @@ The formula comes from the row with the key ``2`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class AlefeldPotra19922(Formula):
@@ -23,8 +30,17 @@ class AlefeldPotra19922(Formula):
             "Alefeld, G. E., Potra, F. A. (1992). Some efficient methods for enclosing simple zeros of "
             "nonlinear equations. BIT 32(2), 334–344. https://doi.org/10.1007/bf01994885."
         ),
-        location="2",
+        location="Table 1, problem 2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.9 \c"),),
+        expression=(
+            r"\tmp{u}^{2} \left(\frac{\tmp{u}^{2}}{3} + \sqrt{2} \sin{\left(\tmp{u} \right)}\right) - "
+            r"\frac{\sqrt{3}}{18}"
+        ),
+        interval="[0.1, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

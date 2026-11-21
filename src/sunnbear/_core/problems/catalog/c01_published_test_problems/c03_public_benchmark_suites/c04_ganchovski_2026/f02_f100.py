@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``f100`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 from sunnbear._core.utils.math_functions import real_root
 
 
@@ -34,6 +41,12 @@ class Ganchovski2026F100(Formula):
         ),
         location="f100",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2.72 \c"),),
+        expression=r"\sqrt[3]{\frac{4 \tmp{u} - 3}{\tmp{u}}}",
+        interval="[0, e]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

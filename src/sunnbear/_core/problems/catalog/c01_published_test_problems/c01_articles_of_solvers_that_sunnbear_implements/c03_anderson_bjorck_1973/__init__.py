@@ -14,3 +14,7 @@ class AndersonBjorck1973(FormulaCategory):
 
     number = (1, 1, 3)
     name = "Anderson, Björck (1973)"
+    description = (
+        "The test problems come from the article that introduces the Anderson–Björck method, a "
+        "regula falsi method of high order."
+    )

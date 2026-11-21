@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``p18`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Burkardt2016P18(Formula):
@@ -19,9 +28,9 @@ class Burkardt2016P18(Formula):
     number = (1, 3, 1, 17)
     name = "p18"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -49,8 +58,17 @@ class Burkardt2016P18(Formula):
             "\n"
             "The file's `brent` solver cites Brent's 1973 book for the algorithm, not for any function."
         ),
-        location="p18",
+        location="Problem p18",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"{10.0}^{14} \left(1.0 \tmp{u}^{7} - 7.0 \tmp{u}^{6} + 21.0 \tmp{u}^{5} - 35.0 \tmp{u}^{4} "
+            r"+ 35.0 \tmp{u}^{3} - 21.0 \tmp{u}^{2} + 7.0 \tmp{u} - 1.0\right)"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -66,7 +84,13 @@ class Burkardt2016P18(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((0.988, 1.012, 0.024), (0.99, 1.013, 0.023))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((0.988, 1.012, 0.024), (0.99, 1.013, 0.023)),
+                summary="The published intervals.",
+            ),
+        )
 
     # a case with a positive `atol` lies where float64 cannot evaluate the function to the
     # default tolerance, because the function is ill-conditioned there or its terms cancel

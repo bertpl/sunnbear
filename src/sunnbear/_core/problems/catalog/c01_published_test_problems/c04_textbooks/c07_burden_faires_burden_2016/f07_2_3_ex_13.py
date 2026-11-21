@@ -6,7 +6,16 @@ published test problems.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class BurdenFairesBurden201623Ex13(Formula):
@@ -25,9 +34,9 @@ class BurdenFairesBurden201623Ex13(Formula):
     number = (1, 4, 7, 7)
     name = "§2.3 Ex. 1–3"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -35,8 +44,14 @@ class BurdenFairesBurden201623Ex13(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="§2.3 Ex. 1–3; Fig. 2.8; Tables 2.3–2.6; 2.5-1(d)",
+        location="§2.3 Examples 1–3; Fig. 2.8; Tables 2.3–2.6; Exercise 2.5-1(d)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -51,7 +66,11 @@ class BurdenFairesBurden201623Ex13(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
         return (
-            ParamTable(names=("a", "b", "c_scale"), rows=((0.0, 1.57079632679, 1.57), (0.5, 0.785398163397, 0.285))),
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((0.0, 1.57079632679, 1.57), (0.5, 0.785398163397, 0.285)),
+                summary="The published intervals.",
+            ),
         )
 
     test_cases = (

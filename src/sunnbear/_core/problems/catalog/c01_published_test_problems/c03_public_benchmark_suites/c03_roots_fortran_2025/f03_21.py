@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``21`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class RootsFortran202521(Formula):
@@ -15,7 +24,7 @@ class RootsFortran202521(Formula):
 
     number = (1, 3, 3, 3)
     name = "21"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25, "
@@ -76,8 +85,14 @@ class RootsFortran202521(Formula):
             "  - The brackets of 4 cases differ: case 146 starts at 0.51, as roots-fortran's own "
             "comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`."
         ),
-        location="21",
+        location="root_tests.f90, case 21",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.01 \c"),),
+        expression=r"\tmp{u}^{2} - \left(1.0 - \tmp{u}\right)^{\param{n}}",
+        interval="[0, 1.01]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -91,7 +106,13 @@ class RootsFortran202521(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("n",), rows=((2.0,), (5.0,), (10.0,), (15.0,), (20.0,))),)
+        return (
+            ParamTable(
+                names=("n",),
+                rows=((2.0,), (5.0,), (10.0,), (15.0,), (20.0,)),
+                summary="The published parameter values.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"n": 2.0}, x=0.303, c=0.0, expected=-0.394),

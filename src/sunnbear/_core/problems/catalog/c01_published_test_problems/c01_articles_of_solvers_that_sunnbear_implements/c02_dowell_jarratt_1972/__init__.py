@@ -14,3 +14,6 @@ class DowellJarratt1972(FormulaCategory):
 
     number = (1, 1, 2)
     name = "Dowell, Jarratt (1972)"
+    description = (
+        "The test problems come from the article that introduces the Pegasus method, a modified regula falsi method."
+    )

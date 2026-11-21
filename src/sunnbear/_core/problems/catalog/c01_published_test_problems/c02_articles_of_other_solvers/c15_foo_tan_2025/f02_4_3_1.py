@@ -5,7 +5,16 @@ The formula comes from the row with the key ``4.3.1`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class FooTan2025431(Formula):
@@ -26,8 +35,8 @@ class FooTan2025431(Formula):
     number = (1, 2, 15, 2)
     name = "4.3.1"
     params = (
-        FormulaParam("q"),
-        FormulaParam("y"),
+        FormulaParam("q", latex_symbol="q"),
+        FormulaParam("y", latex_symbol="y"),
     )
     source = FormulaSource(
         reference=(
@@ -35,8 +44,23 @@ class FooTan2025431(Formula):
             "arXiv preprint 2509.20897v1. https://doi.org/10.48550/arxiv.2509.20897 "
             "(https://arxiv.org/abs/2509.20897v1)."
         ),
-        location="4.3.1",
+        location="Section 4.3.1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=(
+            r"\frac{\tmp{u} \ln{\left(\param{q} - 1 \right)}}{\ln{\left(\param{q} \right)}} - "
+            r"\frac{\begin{cases} 0 & \text{for}\: \tmp{u} = 0 \\\tmp{u} \ln{\left(\tmp{u} \right)} & "
+            r"\text{otherwise} \end{cases}}{\ln{\left(\param{q} \right)}} - \frac{\begin{cases} 0 & "
+            r"\text{for}\: \tmp{u} = 1 \\\left(1 - \tmp{u}\right) \ln{\left(1 - \tmp{u} \right)} & "
+            r"\text{otherwise} \end{cases}}{\ln{\left(\param{q} \right)}} - \param{y}"
+        ),
+        interval=(
+            r"\left[0, "
+            r"\frac{170141183460469231731687303715884105726}{170141183460469231731687303715884105727}\right]"
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, q: float, y: float) -> float:
@@ -69,6 +93,7 @@ class FooTan2025431(Formula):
                     (1.7014118346046923e38, 0.8),
                     (1.7014118346046923e38, 0.9),
                 ),
+                summary="The published parameter values.",
             ),
         )
 

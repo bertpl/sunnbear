@@ -5,7 +5,14 @@ The formula comes from the row with the key ``func4`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Gsl2024Func4(Formula):
@@ -26,8 +33,14 @@ class Gsl2024Func4(Formula):
             "https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/roots/?h=release-2-8. The files cite "
             "no source for their functions."
         ),
-        location="func4",
+        location="test_funcs.c, func4",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2.33 \c"),),
+        expression=r"\tmp{u} e^{- \tmp{u}}",
+        interval=r"\left[- \frac{1}{3}, 2\right]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

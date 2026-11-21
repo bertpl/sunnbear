@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``1`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Chandrupatla19971(Formula):
@@ -19,9 +28,9 @@ class Chandrupatla19971(Formula):
     number = (1, 1, 7, 1)
     name = "1"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -29,8 +38,14 @@ class Chandrupatla19971(Formula):
             "zero of a nonlinear function without using derivatives. Advances in Engineering Software "
             "28(3), 145–149. https://doi.org/10.1016/S0965-9978(96)00051-8."
         ),
-        location="1",
+        location="Table 1, function 1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u}^{3} - 2 \tmp{u} - 5",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -54,6 +69,7 @@ class Chandrupatla19971(Formula):
                     (-10000.0, 10000.0, 20000.0),
                     (-10000000000.0, 10000000000.0, 20000000000.0),
                 ),
+                summary="The published intervals.",
             ),
         )
 

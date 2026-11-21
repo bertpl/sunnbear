@@ -6,7 +6,16 @@ The formula comes from the row with the key ``(PT2.3), (PT2.4); Ex. 5.1, 5.3–5
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ChapraCanale2015Pt23(Formula):
@@ -27,13 +36,13 @@ class ChapraCanale2015Pt23(Formula):
     number = (1, 4, 6, 1)
     name = "(PT2.3)"
     params = (
-        FormulaParam("g"),
-        FormulaParam("m"),
-        FormulaParam("v"),
-        FormulaParam("t"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("g", latex_symbol="g"),
+        FormulaParam("m", latex_symbol="m"),
+        FormulaParam("v", latex_symbol="v"),
+        FormulaParam("t", latex_symbol="t"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -42,9 +51,19 @@ class ChapraCanale2015Pt23(Formula):
             "2021."
         ),
         location=(
-            "(PT2.3), (PT2.4); Ex. 5.1, 5.3–5.5; Fig. 5.1, 5.6, 5.7, 5.13; Prob. 5.14, 5.21, 5.23, 5.26, 7.20, 7.21"
+            "Eqs. (PT2.3), (PT2.4); Examples 5.1, 5.3–5.5; Fig. 5.1, 5.6, 5.7, 5.13; Prob. 5.14, 5.21, "
+            "5.23, 5.26, 7.20, 7.21"
         ),
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"\frac{\param{g} \param{m}}{\tmp{u}} \left(1 - e^{- \frac{\tmp{u}}{\param{m}} "
+            r"\param{t}}\right) - \param{v}"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(
@@ -70,6 +89,7 @@ class ChapraCanale2015Pt23(Formula):
                     (9.81, 68.1, 40.0, 10.0, 4.0, 20.0, 16.0),
                     (9.81, 82.0, 36.0, 4.0, 3.0, 5.0, 2.0),
                 ),
+                summary="The published parameter values and intervals.",
             ),
         )
 

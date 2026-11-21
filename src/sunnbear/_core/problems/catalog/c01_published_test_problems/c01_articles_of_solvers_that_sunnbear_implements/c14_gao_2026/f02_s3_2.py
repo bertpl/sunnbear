@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``S3.2`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 from sunnbear._core.utils.math_functions import real_root
 
 
@@ -23,8 +30,14 @@ class Gao2026S32(Formula):
             "Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied "
             "Mathematics Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928."
         ),
-        location="S3.2",
+        location="Section 3, function 2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 15 \c"),),
+        expression=r"\frac{\sqrt[5]{\tmp{u}}}{1 + \sqrt[5]{\left|{\tmp{u}}\right|}}",
+        interval="[-5, 10]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

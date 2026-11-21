@@ -3,7 +3,16 @@
 The formula comes from the rows with the keys ``1`` and ``4`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class AlefeldPotra19921(Formula):
@@ -19,18 +28,24 @@ class AlefeldPotra19921(Formula):
     number = (1, 2, 3, 1)
     name = "1"
     params = (
-        FormulaParam("k"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("k", latex_symbol="k"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
             "Alefeld, G. E., Potra, F. A. (1992). Some efficient methods for enclosing simple zeros of "
             "nonlinear equations. BIT 32(2), 334–344. https://doi.org/10.1007/bf01994885."
         ),
-        location="1, 4",
+        location="Table 1, problems 1 and 4",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u}^{3} - \param{k}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, k: float, a: float, b: float, c_scale: float) -> float:
@@ -44,7 +59,13 @@ class AlefeldPotra19921(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("k", "a", "b", "c_scale"), rows=((1.0, 0.5, 1.5, 1.0), (-1.0, -1.8, 0.0, 1.8))),)
+        return (
+            ParamTable(
+                names=("k", "a", "b", "c_scale"),
+                rows=((1.0, 0.5, 1.5, 1.0), (-1.0, -1.8, 0.0, 1.8)),
+                summary="The published parameter values and intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

@@ -5,7 +5,16 @@ The formula comes from the row with the key ``6`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class AlefeldPotraShi19956(Formula):
@@ -19,7 +28,7 @@ class AlefeldPotraShi19956(Formula):
 
     number = (1, 1, 6, 2)
     name = "6"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Alefeld, G. E., Potra, F. A., Shi, Y. (1995). Algorithm 748: enclosing zeros of continuous"
@@ -27,8 +36,14 @@ class AlefeldPotraShi19956(Formula):
             "https://doi.org/10.1145/210089.210111. The authors' code is CALGO 748: "
             "https://www.netlib.org/toms/748."
         ),
-        location="6",
+        location="Table I, problem 6",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"2 \tmp{u} e^{- \param{n}} - 2 e^{- \param{n} \tmp{u}} + 1",
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -46,6 +61,7 @@ class AlefeldPotraShi19956(Formula):
             ParamTable(
                 names=("n",),
                 rows=((1.0,), (2.0,), (3.0,), (4.0,), (5.0,), (20.0,), (40.0,), (60.0,), (80.0,), (100.0,)),
+                summary="The published parameter values.",
             ),
         )
 

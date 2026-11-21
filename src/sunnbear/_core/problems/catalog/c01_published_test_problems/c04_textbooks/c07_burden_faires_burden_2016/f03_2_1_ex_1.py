@@ -4,7 +4,14 @@ The formula comes from the row with the key ``§2.1 Ex. 1, 2; Table 2.1; §2.2 I
 (p. 84); §2.5 Ill. (p. 89), Table 2.11`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class BurdenFairesBurden201621Ex1(Formula):
@@ -32,10 +39,16 @@ class BurdenFairesBurden201621Ex1(Formula):
             "the print year 2014."
         ),
         location=(
-            "§2.1 Ex. 1, 2; Table 2.1; §2.2 Ill. (pp. 60, 62–63), Table 2.2; §2.4 Ill. (p. 84); §2.5 "
-            "Ill. (p. 89), Table 2.11"
+            "§2.1 Examples 1, 2; Table 2.1; §2.2 Ill. (pp. 60, 62–63), Table 2.2; §2.4 Ill. (p. 84); "
+            "§2.5 Ill. (p. 89), Table 2.11"
         ),
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\tmp{u}^{3} + 4 \tmp{u}^{2} - 10",
+        interval="[1, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

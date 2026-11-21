@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``T2.2`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Gao2026T22(Formula):
@@ -22,8 +29,14 @@ class Gao2026T22(Formula):
             "Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied "
             "Mathematics Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928."
         ),
-        location="T2.2",
+        location="Table 2, function 2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 8 \c"),),
+        expression=r"\tmp{u}^{7}",
+        interval="[-3, 5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

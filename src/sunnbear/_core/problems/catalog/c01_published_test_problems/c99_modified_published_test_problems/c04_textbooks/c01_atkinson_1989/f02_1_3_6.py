@@ -51,7 +51,7 @@ class ModifiedAtkinson1989136(Formula):
             "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & "
             "Sons, New York. ISBN 0-471-62489-6."
         ),
-        location="(1.3.6)",
+        location="Eq. (1.3.6)",
     )
 
     @staticmethod

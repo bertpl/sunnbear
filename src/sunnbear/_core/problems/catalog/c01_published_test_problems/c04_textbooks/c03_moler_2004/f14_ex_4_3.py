@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``Ex. 4.3`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Moler2004Ex43(Formula):
@@ -27,8 +34,14 @@ class Moler2004Ex43(Formula):
             "edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: "
             "https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
         ),
-        location="Ex. 4.3",
+        location="Exercise 4.3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"816 \tmp{u}^{3} - 3835 \tmp{u}^{2} + 6000 \tmp{u} - 3125",
+        interval="[1, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

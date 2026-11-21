@@ -5,7 +5,14 @@ The formula comes from the row with the key ``f1`` in the survey of published te
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Borchers2026F1(Formula):
@@ -27,8 +34,17 @@ class Borchers2026F1(Formula):
             "page is unversioned and gives no author or date; it is on the website of Hans W. Borchers,"
             " the author of the R package pracma. The chapter cites no source for its test problems."
         ),
-        location="f1",
+        location="§5.6, f1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.2 \c"),),
+        expression=(
+            r"\tmp{u}^{2} \left(\frac{\tmp{u}^{2}}{3} + \sqrt{2} \sin{\left(\tmp{u} \right)}\right) - "
+            r"\frac{\sqrt{3}}{18}"
+        ),
+        interval="[0, 1.2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

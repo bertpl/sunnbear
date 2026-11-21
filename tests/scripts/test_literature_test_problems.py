@@ -12,7 +12,7 @@ import textwrap
 import pytest
 
 from sunnbear._core.problems.catalog.c01_published_test_problems import PublishedTestProblems
-from sunnbear._core.problems.core import EffectOfC, FormulaRegistry, FormulaSource
+from sunnbear._core.problems.core import EffectOfC, FormulaRegistry
 
 _CATEGORY_1_FORMULAS = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 1]
 # _PUBLISHED_FORMULAS are the formulas of category 1 outside subcategory 1.99, and _MODIFIED_FORMULAS those inside it.
@@ -244,21 +244,18 @@ def test_timeline_template_counts_every_status(script_modules):
 def test_published_formula_matches_the_survey(formula, sources, committed_formulas_table):
     """A published formula has an active line in `formulas.csv`, and its category and `source` match its source.
 
-    The category's name must be the source's short title, and `source` must hold the source's reference and its rows'
-    keys as the location.
+    The test does not check the location, because the module's author writes it as prose from the formula's rows' keys
+    and the source's `where_in_source`.
     """
-    # --- arrange ----------------------
+    # --- arrange / act ----------------
     line = {line.number: line for line in committed_formulas_table.formulas}[formula.number]
     source = {source.source_id: source for source in sources}[line.source_id]
     category = {category.number: category for category in FormulaRegistry.categories()}[formula.number[:3]]
 
-    # --- act --------------------------
-    location = ", ".join(source.find_row(row_id).key for row_id in line.row_ids)
-
     # --- assert -----------------------
     assert not line.is_retired
     assert category.name == source.short_title
-    assert formula.source == FormulaSource(reference=source.reference, location=location)
+    assert formula.source.reference == source.reference
 
 
 def test_published_sources_in_the_catalog_are_complete(committed_formulas_table):

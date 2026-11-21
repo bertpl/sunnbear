@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``(1.2)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class SuliMayers200312(Formula):
@@ -22,18 +31,24 @@ class SuliMayers200312(Formula):
     number = (1, 4, 2, 1)
     name = "(1.2)"
     params = (
-        FormulaParam("M"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("M", latex_symbol="M"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
             "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "
             "University Press, Cambridge. https://doi.org/10.1017/CBO9780511801181."
         ),
-        location="(1.2)",
+        location="Eq. (1.2)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\frac{1}{2} - \frac{1}{1 + \param{M} \left|{\tmp{u} - 1.05}\right|}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, M: float, a: float, b: float, c_scale: float) -> float:
@@ -60,6 +75,7 @@ class SuliMayers200312(Formula):
                     (2000000.0, 1.04999, 1.05001, 2e-05),
                     (20000000.0, 1.04999, 1.05001, 2e-05),
                 ),
+                summary="The published parameter values and intervals.",
             ),
         )
 

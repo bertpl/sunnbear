@@ -5,7 +5,16 @@ The formula comes from the row with the key ``Prob. 5.15`` in the survey of publ
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ChapraCanale2015Prob515(Formula):
@@ -21,10 +30,10 @@ class ChapraCanale2015Prob515(Formula):
     number = (1, 4, 6, 20)
     name = "Prob. 5.15"
     params = (
-        FormulaParam("g"),
-        FormulaParam("L"),
-        FormulaParam("t"),
-        FormulaParam("v"),
+        FormulaParam("g", latex_symbol="g"),
+        FormulaParam("L", latex_symbol="L"),
+        FormulaParam("t", latex_symbol="t"),
+        FormulaParam("v", latex_symbol="v"),
     )
     source = FormulaSource(
         reference=(
@@ -34,6 +43,15 @@ class ChapraCanale2015Prob515(Formula):
         ),
         location="Prob. 5.15",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{H}", r"\x - 2 \c"),),
+        expression=(
+            r"\param{v} - \sqrt{2 \param{g} \tmp{H}} \tanh{\left(\frac{\sqrt{2 \param{g} \tmp{H}}}{2 "
+            r"\param{L}} \param{t} \right)}"
+        ),
+        interval="[0, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, g: float, L: float, t: float, v: float) -> float:
@@ -47,7 +65,11 @@ class ChapraCanale2015Prob515(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("g", "L", "t", "v"), rows=((9.81, 4.0, 2.5, 5.0),)),)
+        return (
+            ParamTable(
+                names=("g", "L", "t", "v"), rows=((9.81, 4.0, 2.5, 5.0),), summary="The published parameter values."
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

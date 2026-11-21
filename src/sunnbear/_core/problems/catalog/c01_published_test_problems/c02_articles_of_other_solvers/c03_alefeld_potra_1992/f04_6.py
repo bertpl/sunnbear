@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``6`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class AlefeldPotra19926(Formula):
@@ -17,14 +26,22 @@ class AlefeldPotra19926(Formula):
 
     number = (1, 2, 3, 4)
     name = "6"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Alefeld, G. E., Potra, F. A. (1992). Some efficient methods for enclosing simple zeros of "
             "nonlinear equations. BIT 32(2), 334–344. https://doi.org/10.1007/bf01994885."
         ),
-        location="6",
+        location="Table 1, problem 6",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=(
+            r"\left(1 + \left(1 - \param{n}\right)^{2}\right) \tmp{u}^{2} - \left(1 - \param{n} " r"\tmp{u}\right)^{2}"
+        ),
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -38,7 +55,7 @@ class AlefeldPotra19926(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("n",), rows=((5.0,), (10.0,), (20.0,))),)
+        return (ParamTable(names=("n",), rows=((5.0,), (10.0,), (20.0,)), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"n": 5.0}, x=0.3, c=0.0, expected=1.28),

@@ -5,7 +5,16 @@ The formula comes from the row with the key ``2.1-5(d)`` in the survey of publis
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class BurdenFairesBurden2016215D(Formula):
@@ -20,9 +29,9 @@ class BurdenFairesBurden2016215D(Formula):
     number = (1, 4, 7, 14)
     name = "2.1-5(d)"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -30,8 +39,14 @@ class BurdenFairesBurden2016215D(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="2.1-5(d)",
+        location="Exercise 2.1-5(d)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u} \cos{\left(\tmp{u} \right)} - 2 \tmp{u}^{2} + 3 \tmp{u} - 1",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -45,7 +60,11 @@ class BurdenFairesBurden2016215D(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((0.2, 0.3, 0.1), (1.2, 1.3, 0.1))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"), rows=((0.2, 0.3, 0.1), (1.2, 1.3, 0.1)), summary="The published intervals."
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

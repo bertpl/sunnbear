@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``3`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class GottliebThompson20103(Formula):
@@ -18,9 +27,9 @@ class GottliebThompson20103(Formula):
     number = (1, 2, 8, 2)
     name = "3"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -28,8 +37,14 @@ class GottliebThompson20103(Formula):
             "Mathematical Sciences 4(15), 709–718. No DOI; the publisher's copy: "
             "http://www.m-hikari.com/ams/ams-2010/ams-13-16-2010/gottliebAMS13-16-2010.pdf."
         ),
-        location="3",
+        location="Table 1, test 3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"11 \tmp{u}^{11} - 1",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -43,7 +58,11 @@ class GottliebThompson20103(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((0.1, 0.9, 0.8), (0.4, 1.0, 0.6))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"), rows=((0.1, 0.9, 0.8), (0.4, 1.0, 0.6)), summary="The published intervals."
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"a": 0.1, "b": 0.9, "c_scale": 0.8}, x=0.34, c=0.0, expected=-0.9999227922719982),

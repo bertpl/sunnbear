@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``39`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class RootsFortran202539(Formula):
@@ -76,8 +83,17 @@ class RootsFortran202539(Formula):
             "  - The brackets of 4 cases differ: case 146 starts at 0.51, as roots-fortran's own "
             "comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`."
         ),
-        location="39",
+        location="root_tests.f90, case 39",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
+        expression=(
+            r"\tmp{u}^{5} - 61.0 \tmp{u}^{4} + \frac{6801.0}{5.0} \tmp{u}^{3} - \frac{66531.0}{5.0} "
+            r"\tmp{u}^{2} + \frac{5205601.0}{100.0} \tmp{u} - \frac{4005001.0}{100.0}"
+        ),
+        interval="[0, 10]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -41,8 +41,8 @@ class ModifiedBradie2006Ex22(Formula):
             "Upper Saddle River, NJ. ISBN 0-13-013054-0."
         ),
         location=(
-            "Ex. 2.2; Fig. 2.3; Tables 2.2, 2.3, 2.5; §2.2 (p. 74); §2.4 (pp. 98, 100); §2.5 (p. 109); "
-            "2.1-13; 2.5-15; 2.6-3"
+            "Example 2.2; Fig. 2.3; Tables 2.2, 2.3, 2.5; §2.2 (p. 74); §2.4 (pp. 98, 100); §2.5 (p. "
+            "109); Exercises 2.1-13, 2.5-15, 2.6-3"
         ),
     )
 

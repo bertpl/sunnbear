@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``2.3-13`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class BurdenFairesBurden20162313(Formula):
@@ -19,9 +28,9 @@ class BurdenFairesBurden20162313(Formula):
     number = (1, 4, 7, 39)
     name = "2.3-13"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -29,8 +38,14 @@ class BurdenFairesBurden20162313(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="2.3-13",
+        location="Exercise 2.3-13",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"230 \tmp{u}^{4} + 18 \tmp{u}^{3} + 9 \tmp{u}^{2} - 221 \tmp{u} - 9",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -44,7 +59,13 @@ class BurdenFairesBurden20162313(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((-1.0, 0.0, 1.0), (0.0, 1.0, 1.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((-1.0, 0.0, 1.0), (0.0, 1.0, 1.0)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"a": -1.0, "b": 0.0, "c_scale": 1.0}, x=-0.7, c=0.0, expected=199.15899999999996),

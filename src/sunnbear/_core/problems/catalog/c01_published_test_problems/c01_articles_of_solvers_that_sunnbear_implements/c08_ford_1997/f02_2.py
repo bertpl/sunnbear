@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``2`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Ford19972(Formula):
@@ -18,9 +27,9 @@ class Ford19972(Formula):
     number = (1, 1, 8, 2)
     name = "2"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -30,8 +39,16 @@ class Ford19972(Formula):
             "10.24200/sci.2020.21758, which doi.org does not resolve. An earlier version is the "
             "University of Essex technical report CSM-257 (1995)."
         ),
-        location="2",
+        location="Section “Numerical Tests”, function 2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"\frac{\left(\tmp{u} - 1\right) \prod_{i=1}^{10} \left(\tmp{u}^{2} + \tmp{u} + " r"i\right)}{10^{8}}"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -60,7 +77,13 @@ class Ford19972(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((0.9, 1.1, 0.2), (0.5, 1.5, 1.0), (-5.0, 10.0, 15.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((0.9, 1.1, 0.2), (0.5, 1.5, 1.0), (-5.0, 10.0, 15.0)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

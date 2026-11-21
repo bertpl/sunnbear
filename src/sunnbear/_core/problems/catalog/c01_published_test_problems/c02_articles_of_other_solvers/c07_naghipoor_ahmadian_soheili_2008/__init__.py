@@ -15,3 +15,6 @@ class NaghipoorAhmadianSoheili2008(FormulaCategory):
 
     number = (1, 2, 7)
     name = "Naghipoor, Ahmadian, Soheili (2008)"
+    description = (
+        "The test problems come from the article that introduces an improved regula falsi method for simple zeros."
+    )

@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``§3`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class IsmuniyartoPinheiroSokhna20253(Formula):
@@ -35,6 +42,16 @@ class IsmuniyartoPinheiroSokhna20253(Formula):
         ),
         location="§3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{n}", r"\x - 8 \c"),),
+        expression=(
+            r"- \frac{2000 {1.2}^{\tmp{n}}}{{1.2}^{\tmp{n}} - 1} + \frac{50 \tmp{n}}{{1.2}^{\tmp{n}} - "
+            r"1} + 3750 - \left(- \frac{600 \left(1 + 0.2\right)^{\tmp{n}}}{{1.2}^{\tmp{n}} - 1} + "
+            r"\frac{200 \tmp{n}}{{1.2}^{\tmp{n}} - 1}\right)"
+        ),
+        interval="[2, 10]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

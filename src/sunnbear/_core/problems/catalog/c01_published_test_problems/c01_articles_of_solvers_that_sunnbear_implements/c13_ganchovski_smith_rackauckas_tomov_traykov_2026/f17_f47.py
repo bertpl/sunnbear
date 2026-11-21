@@ -5,7 +5,16 @@ The formula comes from the rows with the keys ``f47`` and ``f48`` in the survey 
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F47(Formula):
@@ -20,7 +29,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F47(Formula):
 
     number = (1, 1, 13, 17)
     name = "f47"
-    params = (FormulaParam("k"),)
+    params = (FormulaParam("k", latex_symbol="k"),)
     source = FormulaSource(
         reference=(
             "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to "
@@ -30,8 +39,14 @@ class GanchovskiSmithRackauckasTomovTraykov2026F47(Formula):
             "`MDPI-Algorithms-Data` of the authors' repository "
             "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
-        location="f47, f48",
+        location="Table 2, f47 and f48",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.499 \c"),),
+        expression=(r"\frac{1}{\sqrt{\tmp{u}}} - 2 \ln{\left(5 \cdot 10^{\param{k}} \sqrt{\tmp{u}} \right)} + " r"0.8"),
+        interval="[0.0005, 0.5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, k: float) -> float:
@@ -45,7 +60,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F47(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("k",), rows=((3.0,), (7.0,))),)
+        return (ParamTable(names=("k",), rows=((3.0,), (7.0,)), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"k": 3.0}, x=0.15035, c=0.0, expected=-11.760615174862355),

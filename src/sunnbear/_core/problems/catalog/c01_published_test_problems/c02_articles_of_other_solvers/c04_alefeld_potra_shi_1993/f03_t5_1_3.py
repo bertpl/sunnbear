@@ -5,7 +5,16 @@ The formula comes from the row with the key ``T5.1-3`` in the survey of publishe
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class AlefeldPotraShi1993T513(Formula):
@@ -23,8 +32,8 @@ class AlefeldPotraShi1993T513(Formula):
     number = (1, 2, 4, 3)
     name = "T5.1-3"
     params = (
-        FormulaParam("a_"),
-        FormulaParam("b_"),
+        FormulaParam("a_", latex_symbol="a"),
+        FormulaParam("b_", latex_symbol="b"),
     )
     source = FormulaSource(
         reference=(
@@ -32,8 +41,14 @@ class AlefeldPotraShi1993T513(Formula):
             "equations. Mathematics of Computation 61(204), 733–744. "
             "https://doi.org/10.1090/s0025-5718-1993-1192965-2."
         ),
-        location="T5.1-3",
+        location="Table 5.1, problem 3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 40 \c"),),
+        expression=r"\param{a_} \tmp{u} e^{\param{b_} \tmp{u}}",
+        interval="[-9, 31]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a_: float, b_: float) -> float:
@@ -47,7 +62,13 @@ class AlefeldPotraShi1993T513(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a_", "b_"), rows=((-40.0, -1.0), (-100.0, -2.0), (-200.0, -3.0))),)
+        return (
+            ParamTable(
+                names=("a_", "b_"),
+                rows=((-40.0, -1.0), (-100.0, -2.0), (-200.0, -3.0)),
+                summary="The published parameter values.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"a_": -40.0, "b_": -1.0}, x=3.0, c=0.0, expected=-5.974448204143673),

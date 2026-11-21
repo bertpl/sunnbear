@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``2.5`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class OliveiraTakahashi202125(Formula):
@@ -23,8 +30,17 @@ class OliveiraTakahashi202125(Formula):
             "Software 47(1), Article 5. https://doi.org/10.1145/3423597. The article itself is dated "
             "December 2020."
         ),
-        location="2.5",
+        location="Table 1, ill-behaved function 5",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=(
+            r"\begin{cases} \frac{1 + 10^{6}}{10^{6}} & \text{for}\: \tmp{u} > \frac{1 - 10^{6}}{10^{6}}"
+            r" \\0 & \text{otherwise} \end{cases} - 1"
+        ),
+        interval="[-1, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

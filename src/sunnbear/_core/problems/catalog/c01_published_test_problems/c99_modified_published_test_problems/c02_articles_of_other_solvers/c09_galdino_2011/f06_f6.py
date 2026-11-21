@@ -36,7 +36,7 @@ class ModifiedGaldino2011F6(Formula):
             "978-1-61284-365-0. No DOI; the author's copy: "
             "http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543."
         ),
-        location="f6",
+        location="Table IV, f6",
     )
 
     @staticmethod

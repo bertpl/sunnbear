@@ -4,7 +4,16 @@ The formula comes from the rows with the keys ``3.1-1, 3.1-3(a), 3.1-10; 3.2-2, 
 ``3.1-2(c)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Epperson2013311(Formula):
@@ -27,18 +36,24 @@ class Epperson2013311(Formula):
     number = (1, 4, 5, 2)
     name = "3.1-1"
     params = (
-        FormulaParam("k"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("k", latex_symbol="k"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
             "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "
             "John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
         ),
-        location="3.1-1, 3.1-3(a), 3.1-10; 3.2-2, 3.2-5(h); 3.3-3(h); 3.8-1, 3.8-2, 3.1-2(c)",
+        location="Exercises 3.1-1, 3.1-3(a), 3.1-10, 3.2-2, 3.2-5(h), 3.3-3(h), 3.8-1, 3.8-2, 3.1-2(c)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u}^{3} - \param{k}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, k: float, a: float, b: float, c_scale: float) -> float:
@@ -52,7 +67,13 @@ class Epperson2013311(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("k", "a", "b", "c_scale"), rows=((2.0, 0.0, 2.0, 2.0), (3.0, 0.0, 3.0, 3.0))),)
+        return (
+            ParamTable(
+                names=("k", "a", "b", "c_scale"),
+                rows=((2.0, 0.0, 2.0, 2.0), (3.0, 0.0, 3.0, 3.0)),
+                summary="The published parameter values and intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"k": 2.0, "a": 0.0, "b": 2.0, "c_scale": 2.0}, x=0.6, c=0.0, expected=-1.784),

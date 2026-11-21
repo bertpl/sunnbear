@@ -5,7 +5,16 @@ The formula comes from the row with the key ``11`` in the survey of published te
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Suhadolnik201211(Formula):
@@ -20,17 +29,23 @@ class Suhadolnik201211(Formula):
     number = (1, 2, 11, 8)
     name = "11"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
             "Suhadolnik, A. (2012). Combined bracketing methods for solving nonlinear equations. "
             "Applied Mathematics Letters 25(11), 1755–1760. https://doi.org/10.1016/j.aml.2012.02.006."
         ),
-        location="11",
+        location="Table 1, function 11",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\arctan{\left(\tmp{u} \right)} - 1",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -44,7 +59,11 @@ class Suhadolnik201211(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((1.0, 8.0, 7.0), (0.0, 9.0, 9.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"), rows=((1.0, 8.0, 7.0), (0.0, 9.0, 9.0)), summary="The published intervals."
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"a": 1.0, "b": 8.0, "c_scale": 7.0}, x=3.1, c=0.0, expected=0.2587542052323633),

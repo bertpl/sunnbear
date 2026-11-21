@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``84–85`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class RootsFortran20258485(Formula):
@@ -18,9 +27,9 @@ class RootsFortran20258485(Formula):
     number = (1, 3, 3, 29)
     name = "84–85"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -82,8 +91,17 @@ class RootsFortran20258485(Formula):
             "  - The brackets of 4 cases differ: case 146 starts at 0.51, as roots-fortran's own "
             "comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`."
         ),
-        location="84–85",
+        location="root_tests.f90, case 84–85",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"\left(\left(\left(\tmp{u} \tmp{u} - 6.0\right) \tmp{u} - 8.0\right) \tmp{u} - 3.0\right) "
+            r"\tmp{u}^{4} - 1.0"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -97,7 +115,13 @@ class RootsFortran20258485(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((-5.0, 0.0, 5.0), (0.0, 5.0, 5.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((-5.0, 0.0, 5.0), (0.0, 5.0, 5.0)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"a": -5.0, "b": 0.0, "c_scale": 5.0}, x=-3.5, c=0.0, expected=15239.72265625),

@@ -34,7 +34,7 @@ class ModifiedRidders1979Iii2(Formula):
             " function. IEEE Transactions on Circuits and Systems 26(11), 979–980. "
             "https://doi.org/10.1109/TCS.1979.1084580."
         ),
-        location="III.2",
+        location="Section III, function 2",
     )
 
     @staticmethod

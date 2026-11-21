@@ -5,7 +5,16 @@ The formula comes from the rows with the keys ``17``, ``28`` and ``44`` in the s
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Ellithy202617(Formula):
@@ -24,11 +33,11 @@ class Ellithy202617(Formula):
     number = (1, 2, 18, 3)
     name = "17"
     params = (
-        FormulaParam("e"),
-        FormulaParam("M"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("e", latex_symbol="e"),
+        FormulaParam("M", latex_symbol="M"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -38,8 +47,14 @@ class Ellithy202617(Formula):
             "https://github.com/Abdelrhman-Ellithy/hybridroots, at commit "
             "`7f22131ef4e1def3e3928dc6558f46f756d0a5ea`."
         ),
-        location="17, 28, 44",
+        location="dataset.json, problems 17, 28 and 44",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u} - \param{e} \sin{\left(\tmp{u} \right)} - \param{M}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, e: float, M: float, a: float, b: float, c_scale: float) -> float:
@@ -57,6 +72,7 @@ class Ellithy202617(Formula):
             ParamTable(
                 names=("e", "M", "a", "b", "c_scale"),
                 rows=((0.8, 1.2, 1.0, 3.0, 2.0), (0.5, 1.0, 0.0, 3.0, 3.0), (0.99, 2.0, 2.0, 3.0, 1.0)),
+                summary="The published parameter values and intervals.",
             ),
         )
 

@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``1.8`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 from sunnbear._core.utils.math_functions import real_root, sign
 
 
@@ -24,8 +31,17 @@ class OliveiraTakahashi202118(Formula):
             "Software 47(1), Article 5. https://doi.org/10.1145/3423597. The article itself is dated "
             "December 2020."
         ),
-        location="1.8",
+        location="Table 1, well-behaved function 8",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=(
+            r"\frac{1}{3} + \operatorname{sign}{\left(\tmp{u} \right)} \sqrt[3]{\left|{\tmp{u}}\right|} "
+            r"+ \tmp{u}^{3}"
+        ),
+        interval="[-1, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -56,7 +56,7 @@ class ModifiedBorchers2026F12(Formula):
             "page is unversioned and gives no author or date; it is on the website of Hans W. Borchers,"
             " the author of the R package pracma. The chapter cites no source for its test problems."
         ),
-        location="f12",
+        location="§5.6, f12",
     )
 
     @staticmethod

@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``func6`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Gsl2024Func6(Formula):
@@ -24,8 +31,14 @@ class Gsl2024Func6(Formula):
             "https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/roots/?h=release-2-8. The files cite "
             "no source for their functions."
         ),
-        location="func6",
+        location="test_funcs.c, func6",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.0007 \c"),),
+        expression=r"\left(\tmp{u} - 1\right)^{7}",
+        interval="[0.9995, 1.0002]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

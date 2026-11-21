@@ -5,7 +5,16 @@ The formula comes from the row with the key ``§2 (p. 58)`` in the survey of pub
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Bradie20062P58(Formula):
@@ -24,9 +33,9 @@ class Bradie20062P58(Formula):
     number = (1, 4, 4, 2)
     name = "§2 (p. 58)"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -35,6 +44,12 @@ class Bradie20062P58(Formula):
         ),
         location="§2 (p. 58)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"3 \tmp{u}^{2} + \frac{\ln{\left(\left(\pi - \tmp{u}\right)^{2} \right)}}{\pi^{4}} + 1",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -52,6 +67,7 @@ class Bradie20062P58(Formula):
             ParamTable(
                 names=("a", "b", "c_scale"),
                 rows=((2.14159265359, 3.14159265359, 1.0), (3.14159265359, 4.14159265359, 1.0)),
+                summary="The published intervals.",
             ),
         )
 

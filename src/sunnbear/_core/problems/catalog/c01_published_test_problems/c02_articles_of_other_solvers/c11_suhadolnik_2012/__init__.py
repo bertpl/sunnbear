@@ -14,3 +14,4 @@ class Suhadolnik2012(FormulaCategory):
 
     number = (1, 2, 11)
     name = "Suhadolnik (2012)"
+    description = "The test problems come from the article that introduces combined bracketing methods."

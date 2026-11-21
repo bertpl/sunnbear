@@ -5,7 +5,14 @@ The formula comes from the row with the key ``T2.10`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Sabharwal2019T210(Formula):
@@ -22,8 +29,14 @@ class Sabharwal2019T210(Formula):
             "Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms Bisection and Regula "
             "Falsi Algorithms. Mathematics 7(11), 1118. https://doi.org/10.3390/math7111118."
         ),
-        location="T2.10",
+        location="Table 2, function 10",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=r"\tmp{u} \sin{\left(\tmp{u} \right)} - 1",
+        interval="[0, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

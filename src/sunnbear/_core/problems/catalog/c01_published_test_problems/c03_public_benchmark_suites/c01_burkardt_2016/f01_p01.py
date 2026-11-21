@@ -5,7 +5,16 @@ The formula comes from the row with the key ``p01`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Burkardt2016P01(Formula):
@@ -22,9 +31,9 @@ class Burkardt2016P01(Formula):
     number = (1, 3, 1, 1)
     name = "p01"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -52,8 +61,14 @@ class Burkardt2016P01(Formula):
             "\n"
             "The file's `brent` solver cites Brent's 1973 book for the algorithm, not for any function."
         ),
-        location="p01",
+        location="Problem p01",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\sin{\left(\tmp{u} \right)} - 0.5 \tmp{u}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -69,7 +84,9 @@ class Burkardt2016P01(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("a", "b", "c_scale"), rows=((-1000.0, 1001.0, 2000.0), (1.57079632679, 3.14159265359, 1.57))
+                names=("a", "b", "c_scale"),
+                rows=((-1000.0, 1001.0, 2000.0), (1.57079632679, 3.14159265359, 1.57)),
+                summary="The published intervals.",
             ),
         )
 

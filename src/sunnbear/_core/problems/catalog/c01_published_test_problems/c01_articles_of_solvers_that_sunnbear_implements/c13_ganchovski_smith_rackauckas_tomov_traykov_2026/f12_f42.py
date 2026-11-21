@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``f42`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F42(Formula):
@@ -20,9 +29,9 @@ class GanchovskiSmithRackauckasTomovTraykov2026F42(Formula):
     number = (1, 1, 13, 12)
     name = "f42"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -33,8 +42,14 @@ class GanchovskiSmithRackauckasTomovTraykov2026F42(Formula):
             "`MDPI-Algorithms-Data` of the authors' repository "
             "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
-        location="f42",
+        location="Table 2, f42",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\left(\tmp{u}^{2} - \tmp{u} - 6\right) \left(\tmp{u}^{2} - 3 \tmp{u} + 2\right)",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -48,7 +63,13 @@ class GanchovskiSmithRackauckasTomovTraykov2026F42(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((0.0, 3.14159265359, 3.14), (0.0, 4.0, 4.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((0.0, 3.14159265359, 3.14), (0.0, 4.0, 4.0)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

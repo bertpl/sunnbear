@@ -5,7 +5,14 @@ The formula comes from the row with the key ``2.4-2(d)`` in the survey of publis
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class BurdenFairesBurden2016242D(Formula):
@@ -26,8 +33,14 @@ class BurdenFairesBurden2016242D(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="2.4-2(d)",
+        location="Exercise 2.4-2(d)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=r"e^{3 \tmp{u}} - 27 \tmp{u}^{6} + 27 \tmp{u}^{4} e^{\tmp{u}} - 9 \tmp{u}^{2} e^{2 \tmp{u}}",
+        interval="[3, 5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

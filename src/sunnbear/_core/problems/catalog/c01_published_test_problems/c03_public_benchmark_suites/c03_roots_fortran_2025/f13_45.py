@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``45`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class RootsFortran202545(Formula):
@@ -18,7 +27,7 @@ class RootsFortran202545(Formula):
 
     number = (1, 3, 3, 13)
     name = "45"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25, "
@@ -79,8 +88,14 @@ class RootsFortran202545(Formula):
             "  - The brackets of 4 cases differ: case 146 starts at 0.51, as roots-fortran's own "
             "comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`."
         ),
-        location="45",
+        location="root_tests.f90, case 45",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.99 \c"),),
+        expression=r"\frac{\param{n} \tmp{u} - 1.0}{\left(\param{n} - 1.0\right) \tmp{u}}",
+        interval="[0.01, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -94,7 +109,7 @@ class RootsFortran202545(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("n",), rows=((20.0,), (30.0,))),)
+        return (ParamTable(names=("n",), rows=((20.0,), (30.0,)), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"n": 20.0}, x=0.307, c=0.0, expected=0.8811932110406309),

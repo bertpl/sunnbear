@@ -5,7 +5,16 @@ The formula comes from the row with the key ``sin_f`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Gsl2024SinF(Formula):
@@ -22,9 +31,9 @@ class Gsl2024SinF(Formula):
     number = (1, 3, 2, 6)
     name = "sin_f"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -33,8 +42,14 @@ class Gsl2024SinF(Formula):
             "https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/roots/?h=release-2-8. The files cite "
             "no source for their functions."
         ),
-        location="sin_f",
+        location="test_funcs.c, sin_f",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\sin{\left(\tmp{u} \right)}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -50,7 +65,9 @@ class Gsl2024SinF(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("a", "b", "c_scale"), rows=((3.0, 4.0, 1.0), (-4.0, -3.0, 1.0), (-0.333333333333, 1.0, 1.33))
+                names=("a", "b", "c_scale"),
+                rows=((3.0, 4.0, 1.0), (-4.0, -3.0, 1.0), (-0.333333333333, 1.0, 1.33)),
+                summary="The published intervals.",
             ),
         )
 

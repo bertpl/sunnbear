@@ -5,7 +5,14 @@ The formula comes from the row with the key ``(23)`` in the survey of published 
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class OliveiraTakahashi202123(Formula):
@@ -28,8 +35,14 @@ class OliveiraTakahashi202123(Formula):
             "Software 47(1), Article 5. https://doi.org/10.1145/3423597. The article itself is dated "
             "December 2020."
         ),
-        location="(23)",
+        location="Appendix C, Eq. (23)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 200 \c"),),
+        expression=r"\left(\tmp{u} - \left(100 + 10 \pi\right)\right) \left(\tmp{u} - 10 \pi\right)",
+        interval="[-100, 100]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

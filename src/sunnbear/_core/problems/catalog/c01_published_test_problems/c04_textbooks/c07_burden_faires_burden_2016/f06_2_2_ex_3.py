@@ -4,7 +4,16 @@ The formula comes from the rows with the keys ``§2.2 Ex. 3; Fig. 2.5; 2.5-1(c)`
 the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class BurdenFairesBurden201622Ex3(Formula):
@@ -31,10 +40,10 @@ class BurdenFairesBurden201622Ex3(Formula):
     number = (1, 4, 7, 6)
     name = "§2.2 Ex. 3"
     params = (
-        FormulaParam("k"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("k", latex_symbol="k"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -42,8 +51,14 @@ class BurdenFairesBurden201622Ex3(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="§2.2 Ex. 3; Fig. 2.5; 2.5-1(c), 2.1-5(a); 2.5-8, 2.2-10",
+        location="§2.2 Example 3; Fig. 2.5; Exercises 2.5-1(c), 2.1-5(a), 2.5-8, 2.2-10",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u} - \param{k}^{- \tmp{u}}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, k: float, a: float, b: float, c_scale: float) -> float:
@@ -61,6 +76,7 @@ class BurdenFairesBurden201622Ex3(Formula):
             ParamTable(
                 names=("k", "a", "b", "c_scale"),
                 rows=((3.0, 0.0, 1.0, 1.0), (2.0, 0.0, 1.0, 1.0), (2.0, 0.333333333333, 1.0, 0.667)),
+                summary="The published parameter values and intervals.",
             ),
         )
 

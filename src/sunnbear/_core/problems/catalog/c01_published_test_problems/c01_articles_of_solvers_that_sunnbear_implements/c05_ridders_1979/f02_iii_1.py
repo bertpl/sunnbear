@@ -5,7 +5,16 @@ The formula comes from the row with the key ``III.1`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Ridders1979Iii1(Formula):
@@ -20,9 +29,9 @@ class Ridders1979Iii1(Formula):
     number = (1, 1, 5, 2)
     name = "III.1"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -30,8 +39,14 @@ class Ridders1979Iii1(Formula):
             " function. IEEE Transactions on Circuits and Systems 26(11), 979–980. "
             "https://doi.org/10.1109/TCS.1979.1084580."
         ),
-        location="III.1",
+        location="Section III, function 1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u} e^{\tmp{u}} - 10",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -45,7 +60,13 @@ class Ridders1979Iii1(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((-10.0, 10.0, 20.0), (-100.0, 100.0, 200.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((-10.0, 10.0, 20.0), (-100.0, 100.0, 200.0)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

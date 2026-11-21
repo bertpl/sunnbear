@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``Ex. 4.10(c)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 from sunnbear._core.utils.math_functions import bessel_j0, bessel_y0
 
 
@@ -25,8 +32,14 @@ class Moler2004Ex410C(Formula):
             "edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: "
             "https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
         ),
-        location="Ex. 4.10(c)",
+        location="Exercise 4.10(c)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 31.4 \c"),),
+        expression=r"J_{0}\left(\tmp{u}\right) - Y_{0}\left(\tmp{u}\right)",
+        interval=r"[0, 10 \pi]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

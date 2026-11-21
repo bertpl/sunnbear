@@ -31,7 +31,7 @@ class ModifiedSabharwal2019T28(Formula):
             "Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms Bisection and Regula "
             "Falsi Algorithms. Mathematics 7(11), 1118. https://doi.org/10.3390/math7111118."
         ),
-        location="T2.8",
+        location="Table 2, function 8",
     )
 
     @staticmethod

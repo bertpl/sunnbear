@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``2.3-5(a); 2.6-1(a)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class BurdenFairesBurden2016235A(Formula):
@@ -23,8 +30,14 @@ class BurdenFairesBurden2016235A(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="2.3-5(a); 2.6-1(a)",
+        location="Exercises 2.3-5(a), 2.6-1(a)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        expression=r"\tmp{u}^{3} - 2 \tmp{u}^{2} - 5",
+        interval="[1, 4]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``T1.2`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class NaghipoorAhmadianSoheili2008T12(Formula):
@@ -24,8 +31,14 @@ class NaghipoorAhmadianSoheili2008T12(Formula):
             " No DOI; the publisher's copy: "
             "https://www.m-hikari.com/ams/ams-password-2008/ams-password5-8-2008/soheiliAMS5-8-2008.pdf."
         ),
-        location="T1.2",
+        location="Table 1, equation 2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.8 \c"),),
+        expression=r"11 \tmp{u}^{11} - 1",
+        interval="[0.1, 0.9]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -14,3 +14,7 @@ class Gao2026(FormulaCategory):
 
     number = (1, 1, 14)
     name = "Gao (2026)"
+    description = (
+        "The test problems come from the article that introduces CARF, a root-finding method that "
+        "interpolates with clipped powers."
+    )

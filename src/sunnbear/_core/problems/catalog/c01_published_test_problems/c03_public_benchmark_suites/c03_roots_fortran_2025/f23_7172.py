@@ -3,7 +3,16 @@
 The formula comes from the rows with the keys ``71–72`` and ``132`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class RootsFortran20257172(Formula):
@@ -20,9 +29,9 @@ class RootsFortran20257172(Formula):
     number = (1, 3, 3, 23)
     name = "71–72"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -84,8 +93,14 @@ class RootsFortran20257172(Formula):
             "  - The brackets of 4 cases differ: case 146 starts at 0.51, as roots-fortran's own "
             "comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`."
         ),
-        location="71–72, 132",
+        location="root_tests.f90, cases 71–72 and 132",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -102,6 +117,7 @@ class RootsFortran20257172(Formula):
             ParamTable(
                 names=("a", "b", "c_scale"),
                 rows=((-2.0001, 1.0001, 3.0), (-0.0001, 1.0001, 1.0), (-1000.0, 1.0, 1000.0)),
+                summary="The published intervals.",
             ),
         )
 

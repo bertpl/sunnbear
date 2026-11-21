@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``T2.4`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Sabharwal2019T24(Formula):
@@ -23,8 +30,14 @@ class Sabharwal2019T24(Formula):
             "Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms Bisection and Regula "
             "Falsi Algorithms. Mathematics 7(11), 1118. https://doi.org/10.3390/math7111118."
         ),
-        location="T2.4",
+        location="Table 2, function 4",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        expression=r"\tmp{u}^{2} - \tmp{u} - 2",
+        interval="[1, 4]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

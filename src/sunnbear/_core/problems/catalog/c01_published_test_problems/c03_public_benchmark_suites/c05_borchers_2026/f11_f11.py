@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``f11`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Borchers2026F11(Formula):
@@ -24,8 +31,14 @@ class Borchers2026F11(Formula):
             "page is unversioned and gives no author or date; it is on the website of Hans W. Borchers,"
             " the author of the R package pracma. The chapter cites no source for its test problems."
         ),
-        location="f11",
+        location="§5.6, f11",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.2 \c"),),
+        expression=r"\tmp{u}^{9} + 0.0001",
+        interval="[-1.2, 0]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

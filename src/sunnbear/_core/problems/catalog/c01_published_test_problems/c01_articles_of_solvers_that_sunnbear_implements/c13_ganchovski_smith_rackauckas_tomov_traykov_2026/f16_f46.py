@@ -5,7 +5,14 @@ The formula comes from the row with the key ``f46`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F46(Formula):
@@ -26,8 +33,14 @@ class GanchovskiSmithRackauckasTomovTraykov2026F46(Formula):
             "`MDPI-Algorithms-Data` of the authors' repository "
             "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
-        location="f46",
+        location="Table 2, f46",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.61 \c"),),
+        expression=r"\frac{e^{- 5 \tmp{u}} - \tmp{u} - 0.5}{\tmp{u}^{5}}",
+        interval="[0.09, 0.7]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

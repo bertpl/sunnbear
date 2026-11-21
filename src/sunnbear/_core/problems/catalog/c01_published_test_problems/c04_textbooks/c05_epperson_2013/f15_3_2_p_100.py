@@ -4,7 +4,16 @@ The formula comes from the row with the key ``§3.2 (p. 100), Fig. 3.4, Table 3.
 of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Epperson201332P100(Formula):
@@ -20,17 +29,23 @@ class Epperson201332P100(Formula):
     number = (1, 4, 5, 15)
     name = "§3.2 (p. 100)"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
             "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "
             "John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
         ),
-        location="§3.2 (p. 100), Fig. 3.4, Table 3.3; Ex. 3.19, Table 3.16",
+        location="§3.2 (p. 100), Fig. 3.4, Table 3.3; Example 3.19, Table 3.16",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\frac{20 \tmp{u} - 1}{19 \tmp{u}}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -44,7 +59,13 @@ class Epperson201332P100(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((0.01, 1.0, 0.99), (-0.2, 0.2, 0.4))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((0.01, 1.0, 0.99), (-0.2, 0.2, 0.4)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

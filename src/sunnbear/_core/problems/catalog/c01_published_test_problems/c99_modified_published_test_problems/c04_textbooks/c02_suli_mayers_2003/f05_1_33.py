@@ -39,7 +39,7 @@ class ModifiedSuliMayers2003133(Formula):
             "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "
             "University Press, Cambridge. https://doi.org/10.1017/CBO9780511801181."
         ),
-        location="(1.33)",
+        location="Eq. (1.33)",
     )
 
     @staticmethod

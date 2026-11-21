@@ -14,3 +14,4 @@ class AlefeldPotra1992(FormulaCategory):
 
     number = (1, 2, 3)
     name = "Alefeld, Potra (1992)"
+    description = "The test problems come from an article that presents efficient methods for enclosing simple zeros."

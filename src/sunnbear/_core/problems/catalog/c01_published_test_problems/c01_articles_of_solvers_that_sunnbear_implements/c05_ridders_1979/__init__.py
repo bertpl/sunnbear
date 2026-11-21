@@ -14,3 +14,4 @@ class Ridders1979(FormulaCategory):
 
     number = (1, 1, 5)
     name = "Ridders (1979)"
+    description = "The test problems come from the article that introduces Ridders' method."

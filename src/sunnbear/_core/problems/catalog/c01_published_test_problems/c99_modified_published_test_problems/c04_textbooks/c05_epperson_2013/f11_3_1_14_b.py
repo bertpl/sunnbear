@@ -28,7 +28,7 @@ class ModifiedEpperson20133114B(Formula):
             "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "
             "John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
         ),
-        location="3.1-14(b)",
+        location="Exercise 3.1-14(b)",
     )
 
     @staticmethod

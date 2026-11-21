@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``p11`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Burkardt2016P11(Formula):
@@ -18,10 +27,10 @@ class Burkardt2016P11(Formula):
     number = (1, 3, 1, 11)
     name = "p11"
     params = (
-        FormulaParam("epsilon"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("epsilon", latex_symbol=r"\epsilon"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -49,8 +58,14 @@ class Burkardt2016P11(Formula):
             "\n"
             "The file's `brent` solver cites Brent's 1973 book for the algorithm, not for any function."
         ),
-        location="p11",
+        location="Problem p11",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\frac{16.0 - \tmp{u}^{4}}{16.0 \tmp{u}^{4} + \param{epsilon}}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, epsilon: float, a: float, b: float, c_scale: float) -> float:
@@ -66,7 +81,9 @@ class Burkardt2016P11(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("epsilon", "a", "b", "c_scale"), rows=((1e-05, 0.0, 10.0, 10.0), (1e-05, 0.25, 5.0, 4.75))
+                names=("epsilon", "a", "b", "c_scale"),
+                rows=((1e-05, 0.0, 10.0, 10.0), (1e-05, 0.25, 5.0, 4.75)),
+                summary="The published parameter values and intervals.",
             ),
         )
 

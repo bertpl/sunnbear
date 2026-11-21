@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``App. D`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class LiZhouLangeTian2026AppD(Formula):
@@ -27,8 +34,14 @@ class LiZhouLangeTian2026AppD(Formula):
             " Preprint: arXiv 2212.00797v2 (8 November 2025), https://arxiv.org/abs/2212.00797v2. The "
             "authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
         ),
-        location="App. D",
+        location="Appendix D",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=r"\tmp{u}^{3} - 3 \tmp{u}^{2} + \tmp{u} + 1",
+        interval="[0, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

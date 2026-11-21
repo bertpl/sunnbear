@@ -5,7 +5,14 @@ The formula comes from the row with the key ``1.12`` in the survey of published 
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class OliveiraTakahashi2021112(Formula):
@@ -24,8 +31,14 @@ class OliveiraTakahashi2021112(Formula):
             "Software 47(1), Article 5. https://doi.org/10.1145/3423597. The article itself is dated "
             "December 2020."
         ),
-        location="1.12",
+        location="Table 1, well-behaved function 12",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=r"\phi{\left(\tmp{u} - 1 \right)} - \frac{\sqrt{2}}{4}",
+        interval="[-1, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

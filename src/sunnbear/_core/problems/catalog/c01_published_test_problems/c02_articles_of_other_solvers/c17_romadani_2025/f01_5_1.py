@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``5.1`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Romadani202551(Formula):
@@ -23,8 +30,14 @@ class Romadani202551(Formula):
             "Methods into Efficient Python Implementations. ICCK Journal of Applied Mathematics 1(3), "
             "154–189. https://doi.org/10.62762/jam.2025.840767."
         ),
-        location="5.1",
+        location="Section 5.1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\tmp{u}^{7} - 2 \tmp{u}^{6} + 4 \tmp{u}^{5} - 1",
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

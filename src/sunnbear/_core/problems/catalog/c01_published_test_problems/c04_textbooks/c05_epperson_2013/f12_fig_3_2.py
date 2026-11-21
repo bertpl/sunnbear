@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``Fig. 3.2, 3.6, 3.7`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Epperson2013Fig32(Formula):
@@ -19,9 +28,9 @@ class Epperson2013Fig32(Formula):
     number = (1, 4, 5, 12)
     name = "Fig. 3.2"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -30,6 +39,12 @@ class Epperson2013Fig32(Formula):
         ),
         location="Fig. 3.2, 3.6, 3.7",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u}^{2} - \frac{1}{2}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -43,7 +58,11 @@ class Epperson2013Fig32(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((0.0, 4.0, 4.0), (0.0, 2.0, 2.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"), rows=((0.0, 4.0, 4.0), (0.0, 2.0, 2.0)), summary="The published intervals."
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, x=1.2, c=0.0, expected=0.94),

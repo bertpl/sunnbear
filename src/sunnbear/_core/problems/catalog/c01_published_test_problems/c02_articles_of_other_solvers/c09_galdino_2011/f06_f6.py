@@ -5,7 +5,14 @@ The formula comes from the row with the key ``f6`` in the survey of published te
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Galdino2011F6(Formula):
@@ -26,8 +33,14 @@ class Galdino2011F6(Formula):
             "978-1-61284-365-0. No DOI; the author's copy: "
             "http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543."
         ),
-        location="f6",
+        location="Table IV, f6",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"e^{\left(\tmp{u} - 3\right)^{5}} - 1",
+        interval="[2.5, 3.5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

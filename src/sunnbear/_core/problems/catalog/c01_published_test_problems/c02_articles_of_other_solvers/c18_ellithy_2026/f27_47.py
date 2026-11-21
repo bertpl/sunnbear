@@ -5,7 +5,14 @@ The formula comes from the row with the key ``47`` in the survey of published te
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Ellithy202647(Formula):
@@ -28,8 +35,16 @@ class Ellithy202647(Formula):
             "https://github.com/Abdelrhman-Ellithy/hybridroots, at commit "
             "`7f22131ef4e1def3e3928dc6558f46f756d0a5ea`."
         ),
-        location="47",
+        location="dataset.json, problem 47",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        expression=(
+            r"\cos{\left(\tmp{u} \right)} + 1.0 \left(1 - \cos{\left(\tmp{u} \right)}\right)^{2} - 0.05 " r"\tmp{u}^{2}"
+        ),
+        interval="[3, 6]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

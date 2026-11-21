@@ -5,7 +5,14 @@ The formula comes from the row with the key ``p19`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Burkardt2016P19(Formula):
@@ -46,8 +53,16 @@ class Burkardt2016P19(Formula):
             "\n"
             "The file's `brent` solver cites Brent's 1973 book for the algorithm, not for any function."
         ),
-        location="p19",
+        location="Problem p19",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=(
+            r"\cos{\left(100.0 \tmp{u} \right)} - 4.0 \operatorname{erf}{\left(30.0 \tmp{u} - 10.0 " r"\right)}"
+        ),
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

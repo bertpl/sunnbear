@@ -5,7 +5,14 @@ The formula comes from the row with the key ``Prob. 6.13`` in the survey of publ
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ChapraCanale2015Prob613(Formula):
@@ -29,6 +36,12 @@ class ChapraCanale2015Prob613(Formula):
         ),
         location="Prob. 6.13",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=r"e^{0.5 \tmp{u}} - \left(5 - 5 \tmp{u}\right)",
+        interval="[0, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

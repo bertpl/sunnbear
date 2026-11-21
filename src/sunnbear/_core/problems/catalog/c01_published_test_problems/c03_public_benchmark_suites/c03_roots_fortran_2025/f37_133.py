@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``133`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class RootsFortran2025133(Formula):
@@ -19,10 +28,10 @@ class RootsFortran2025133(Formula):
     number = (1, 3, 3, 37)
     name = "133"
     params = (
-        FormulaParam("x1"),
-        FormulaParam("x2"),
-        FormulaParam("y1"),
-        FormulaParam("y2"),
+        FormulaParam("x1", latex_symbol="x_{1}"),
+        FormulaParam("x2", latex_symbol="x_{2}"),
+        FormulaParam("y1", latex_symbol="y_{1}"),
+        FormulaParam("y2", latex_symbol="y_{2}"),
     )
     source = FormulaSource(
         reference=(
@@ -84,8 +93,17 @@ class RootsFortran2025133(Formula):
             "  - The brackets of 4 cases differ: case 146 starts at 0.51, as roots-fortran's own "
             "comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`."
         ),
-        location="133",
+        location="root_tests.f90, case 133",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 157 \c"),),
+        expression=(
+            r"\param{y1} + \frac{\tmp{u} - \param{x1}}{\param{x2} - \param{x1}} \left(\param{y2} - "
+            r"\param{y1}\right)"
+        ),
+        interval="[0, 157.08]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, x1: float, x2: float, y1: float, y2: float) -> float:
@@ -99,7 +117,13 @@ class RootsFortran2025133(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("x1", "x2", "y1", "y2"), rows=((0.0, 157.08, 1012.0, -1114.0),)),)
+        return (
+            ParamTable(
+                names=("x1", "x2", "y1", "y2"),
+                rows=((0.0, 157.08, 1012.0, -1114.0),),
+                summary="The published parameter values.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

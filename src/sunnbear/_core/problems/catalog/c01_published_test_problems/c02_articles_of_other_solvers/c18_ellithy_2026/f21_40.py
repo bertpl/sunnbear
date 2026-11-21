@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``40`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Ellithy202640(Formula):
@@ -23,8 +30,14 @@ class Ellithy202640(Formula):
             "https://github.com/Abdelrhman-Ellithy/hybridroots, at commit "
             "`7f22131ef4e1def3e3928dc6558f46f756d0a5ea`."
         ),
-        location="40",
+        location="dataset.json, problem 40",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        expression=r"\tmp{u}^{5} - 3 \tmp{u}^{4} + 2 \tmp{u}^{3} - \tmp{u} + 0.1",
+        interval="[-1, 3]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

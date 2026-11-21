@@ -31,7 +31,7 @@ class ModifiedBurdenFairesBurden2016211(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="2.1-1",
+        location="Exercise 2.1-1",
     )
 
     @staticmethod

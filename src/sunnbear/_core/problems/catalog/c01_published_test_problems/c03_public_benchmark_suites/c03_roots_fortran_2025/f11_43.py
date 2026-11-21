@@ -5,7 +5,14 @@ The formula comes from the row with the key ``43`` in the survey of published te
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class RootsFortran202543(Formula):
@@ -78,8 +85,16 @@ class RootsFortran202543(Formula):
             "  - The brackets of 4 cases differ: case 146 starts at 0.51, as roots-fortran's own "
             "comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`."
         ),
-        location="43",
+        location="root_tests.f90, case 43",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.7 \c"),),
+        expression=(
+            r"3.0 \tmp{u} \sin{\left(\tmp{u} \cdot 20.0 \right)} \cos{\left(\tmp{u} \right)} + \tmp{u} -" r" 2.0"
+        ),
+        interval="[0, 0.7]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -31,7 +31,7 @@ class ModifiedAtkinson1989P38A(Formula):
             "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & "
             "Sons, New York. ISBN 0-471-62489-6."
         ),
-        location="P38(a)",
+        location="Problem 38(a)",
     )
 
     @staticmethod

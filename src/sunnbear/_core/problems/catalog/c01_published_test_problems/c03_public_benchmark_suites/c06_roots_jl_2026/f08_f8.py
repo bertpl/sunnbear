@@ -5,7 +5,14 @@ The formula comes from the row with the key ``f8`` in the survey of published te
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class RootsJl2026F8(Formula):
@@ -39,8 +46,14 @@ class RootsJl2026F8(Formula):
             "Algorithms 57(3), 389–398, published online in 2010. "
             "https://doi.org/10.1007/s11075-010-9434-5. Its rows are in `2010_li_multiple_roots`."
         ),
-        location="f8",
+        location="runbenchmarks.jl, f8",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        expression=r"e^{- \tmp{u}^{2} + \tmp{u} + 2} - \cos{\left(\tmp{u} \right)} + \tmp{u}^{3} + 1",
+        interval="[-2, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

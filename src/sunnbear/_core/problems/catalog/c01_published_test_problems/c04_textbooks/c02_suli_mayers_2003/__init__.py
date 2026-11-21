@@ -14,3 +14,7 @@ class SuliMayers2003(FormulaCategory):
 
     number = (1, 4, 2)
     name = "Süli, Mayers (2003)"
+    description = (
+        "The test problems come from chapter 1, on solving equations by iteration, of the textbook "
+        "An Introduction to Numerical Analysis."
+    )

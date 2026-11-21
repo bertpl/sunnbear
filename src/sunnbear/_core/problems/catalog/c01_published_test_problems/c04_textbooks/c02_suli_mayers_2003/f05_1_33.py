@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``(1.33)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class SuliMayers2003133(Formula):
@@ -20,14 +29,20 @@ class SuliMayers2003133(Formula):
 
     number = (1, 4, 2, 5)
     name = "(1.33)"
-    params = (FormulaParam("a_"),)
+    params = (FormulaParam("a_", latex_symbol="a"),)
     source = FormulaSource(
         reference=(
             "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "
             "University Press, Cambridge. https://doi.org/10.1017/CBO9780511801181."
         ),
-        location="(1.33)",
+        location="Eq. (1.33)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\tmp{u} - \param{a_} \tmp{u} \left(1 - \tmp{u}\right)",
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a_: float) -> float:
@@ -41,7 +56,7 @@ class SuliMayers2003133(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a_",), rows=((3.4,), (3.5,), (3.99,))),)
+        return (ParamTable(names=("a_",), rows=((3.4,), (3.5,), (3.99,)), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"a_": 3.4}, x=0.3, c=0.0, expected=-0.414),

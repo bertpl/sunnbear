@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``7`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class GottliebThompson20107(Formula):
@@ -23,8 +30,14 @@ class GottliebThompson20107(Formula):
             "Mathematical Sciences 4(15), 709–718. No DOI; the publisher's copy: "
             "http://www.m-hikari.com/ams/ams-2010/ams-13-16-2010/gottliebAMS13-16-2010.pdf."
         ),
-        location="7",
+        location="Table 1, test 7",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
+        expression=r"\frac{1}{\tmp{u}} - 1",
+        interval="[0.5, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

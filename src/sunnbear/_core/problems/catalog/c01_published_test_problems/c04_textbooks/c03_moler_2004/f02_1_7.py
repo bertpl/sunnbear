@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``§1.7`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Moler200417(Formula):
@@ -30,6 +37,15 @@ class Moler200417(Formula):
         ),
         location="§1.7",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.024 \c"),),
+        expression=(
+            r"\tmp{u}^{7} - 7 \tmp{u}^{6} + 21 \tmp{u}^{5} - 35 \tmp{u}^{4} + 35 \tmp{u}^{3} - 21 "
+            r"\tmp{u}^{2} + 7 \tmp{u} - 1"
+        ),
+        interval="[0.988, 1.012]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

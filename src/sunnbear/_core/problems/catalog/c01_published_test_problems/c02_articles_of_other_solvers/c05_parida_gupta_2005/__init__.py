@@ -17,3 +17,4 @@ class ParidaGupta2005(FormulaCategory):
 
     number = (1, 2, 5)
     name = "Parida, Gupta (2005)"
+    description = "The test problems come from the article that introduces an improved regula falsi method."

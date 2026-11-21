@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``Ex. 3.10, 3.11, 3.14`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Epperson2013Ex310(Formula):
@@ -24,8 +31,14 @@ class Epperson2013Ex310(Formula):
             "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "
             "John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
         ),
-        location="Ex. 3.10, 3.11, 3.14",
+        location="Examples 3.10, 3.11, 3.14",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        expression=r"\tmp{u}^{4} - \tmp{u} - 1",
+        interval="[-2, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

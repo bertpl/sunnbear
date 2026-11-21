@@ -5,7 +5,16 @@ The formula comes from the row with the key ``p16`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Burkardt2016P16(Formula):
@@ -26,11 +35,11 @@ class Burkardt2016P16(Formula):
     number = (1, 3, 1, 16)
     name = "p16"
     params = (
-        FormulaParam("e"),
-        FormulaParam("m"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("e", latex_symbol="e"),
+        FormulaParam("m", latex_symbol="m"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -58,8 +67,17 @@ class Burkardt2016P16(Formula):
             "\n"
             "The file's `brent` solver cites Brent's 1973 book for the algorithm, not for any function."
         ),
-        location="p16",
+        location="Problem p16",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"\frac{\pi \left(\tmp{u} - \param{m}\right)}{180.0} - \param{e} \sin{\left(\frac{\pi "
+            r"\tmp{u}}{180.0} \right)}"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, e: float, m: float, a: float, b: float, c_scale: float) -> float:
@@ -77,6 +95,7 @@ class Burkardt2016P16(Formula):
             ParamTable(
                 names=("e", "m", "a", "b", "c_scale"),
                 rows=((0.8, 5.0, -175.0, 185.0, 360.0), (0.8, 5.0, 0.0, 185.0, 185.0)),
+                summary="The published parameter values and intervals.",
             ),
         )
 

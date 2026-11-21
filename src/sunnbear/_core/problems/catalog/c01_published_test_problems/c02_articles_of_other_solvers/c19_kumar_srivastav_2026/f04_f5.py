@@ -5,7 +5,14 @@ The formula comes from the row with the key ``f5`` in the survey of published te
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class KumarSrivastav2026F5(Formula):
@@ -26,8 +33,14 @@ class KumarSrivastav2026F5(Formula):
             "https://doi.org/10.21203/rs.3.rs-10070193/v1. The article's Data Availability statement "
             "offers the authors' scripts from the corresponding author on request."
         ),
-        location="f5",
+        location="Table 3, f5",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\ln{\left(1 + \tmp{u} \right)} - 0.4",
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

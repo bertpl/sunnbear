@@ -5,7 +5,14 @@ The formula comes from the row with the key ``2.4-1(d); 2.5-2`` in the survey of
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class BurdenFairesBurden2016241D(Formula):
@@ -27,8 +34,17 @@ class BurdenFairesBurden2016241D(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="2.4-1(d); 2.5-2",
+        location="Exercises 2.4-1(d), 2.5-2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=(
+            r"e^{6 \tmp{u}} + 3 \ln{\left(2 \right)}^{2} e^{2 \tmp{u}} - \ln{\left(8 \right)} e^{4 "
+            r"\tmp{u}} - \ln{\left(2 \right)}^{3}"
+        ),
+        interval="[-1, 0]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``4`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class AlefeldPotraShi19954(Formula):
@@ -21,11 +30,11 @@ class AlefeldPotraShi19954(Formula):
     number = (1, 1, 6, 1)
     name = "4"
     params = (
-        FormulaParam("a_"),
-        FormulaParam("n"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a_", latex_symbol="a"),
+        FormulaParam("n", latex_symbol="n"),
+        FormulaParam("a", latex_symbol=r"x_{\min}"),
+        FormulaParam("b", latex_symbol=r"x_{\max}"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -34,8 +43,14 @@ class AlefeldPotraShi19954(Formula):
             "https://doi.org/10.1145/210089.210111. The authors' code is CALGO 748: "
             "https://www.netlib.org/toms/748."
         ),
-        location="4",
+        location="Table I, problem 4",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u}^{\param{n}} - \param{a_}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a_: float, n: float, a: float, b: float, c_scale: float) -> float:
@@ -68,6 +83,7 @@ class AlefeldPotraShi19954(Formula):
                     (1.0, 12.0, -0.95, 4.05, 5.0),
                     (1.0, 14.0, -0.95, 4.05, 5.0),
                 ),
+                summary="The published parameter values and intervals.",
             ),
         )
 

@@ -5,7 +5,14 @@ The formula comes from the row with the key ``5.2.2`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Borchers2026522(Formula):
@@ -26,8 +33,14 @@ class Borchers2026522(Formula):
             "page is unversioned and gives no author or date; it is on the website of Hans W. Borchers,"
             " the author of the R package pracma. The chapter cites no source for its test problems."
         ),
-        location="5.2.2",
+        location="§5.2.2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        expression=r"\tmp{u} \sin{\left(\pi \tmp{u} \right)}",
+        interval="[-2, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -5,7 +5,16 @@ Fig. 2.1; §2.2 (p. 74); §2.4 (p. 98); 2.1-10; 2.2-10; 2.4-13; 2.5-12 to 2.5-14
 problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Bradie200621P59(Formula):
@@ -25,9 +34,9 @@ class Bradie200621P59(Formula):
     number = (1, 4, 4, 3)
     name = "§2.1 (p. 59)"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -35,10 +44,16 @@ class Bradie200621P59(Formula):
             "Upper Saddle River, NJ. ISBN 0-13-013054-0."
         ),
         location=(
-            "§2.1 (p. 59); Ex. 2.1–2.3, 2.8, 2.9, 2.11–2.13; Tables 2.1–2.3, 2.5, 2.6; Fig. 2.1; §2.2 "
-            "(p. 74); §2.4 (p. 98); 2.1-10; 2.2-10; 2.4-13; 2.5-12 to 2.5-14, 2.5-17"
+            "§2.1 (p. 59); Examples 2.1–2.3, 2.8, 2.9, 2.11–2.13; Tables 2.1–2.3, 2.5, 2.6; Fig. 2.1; "
+            "§2.2 (p. 74); §2.4 (p. 98); Exercises 2.1-10, 2.2-10, 2.4-13, 2.5-12 to 2.5-14, 2.5-17"
         ),
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u}^{3} + 2 \tmp{u}^{2} - 3 \tmp{u} - 1",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -52,7 +67,13 @@ class Bradie200621P59(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((1.0, 2.0, 1.0), (-3.0, -2.0, 1.0), (-1.0, 0.0, 1.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((1.0, 2.0, 1.0), (-3.0, -2.0, 1.0), (-1.0, 0.0, 1.0)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"a": 1.0, "b": 2.0, "c_scale": 1.0}, x=1.3, c=0.0, expected=0.6770000000000003),

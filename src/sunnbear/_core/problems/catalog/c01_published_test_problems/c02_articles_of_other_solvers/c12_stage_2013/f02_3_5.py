@@ -5,7 +5,14 @@ The formula comes from the row with the key ``3.5`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Stage201335(Formula):
@@ -23,8 +30,14 @@ class Stage201335(Formula):
             "Journal of Experimental Algorithms 4(1), 1–16. No DOI; the publisher's PDF: "
             "https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf."
         ),
-        location="3.5",
+        location="§3.5",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",
+        interval="[-10, 10]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

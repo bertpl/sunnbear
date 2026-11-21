@@ -5,7 +5,16 @@ The formula comes from the row with the key ``f12`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Borchers2026F12(Formula):
@@ -22,9 +31,9 @@ class Borchers2026F12(Formula):
     number = (1, 3, 5, 12)
     name = "f12"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -33,8 +42,16 @@ class Borchers2026F12(Formula):
             "page is unversioned and gives no author or date; it is on the website of Hans W. Borchers,"
             " the author of the R package pracma. The chapter cites no source for its test problems."
         ),
-        location="f12",
+        location="§5.6, f12",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"\ln{\left(\tmp{u} \right)} + \frac{\tmp{u}^{2}}{2 e^{1}} - \frac{2 \tmp{u}}{\sqrt{e^{1}}} " r"+ 1"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -48,7 +65,11 @@ class Borchers2026F12(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((1.0, 3.4, 2.4), (1.0, 2.5, 1.5))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"), rows=((1.0, 3.4, 2.4), (1.0, 2.5, 1.5)), summary="The published intervals."
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

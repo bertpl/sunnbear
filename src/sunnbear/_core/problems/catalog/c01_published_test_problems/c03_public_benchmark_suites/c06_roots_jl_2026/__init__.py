@@ -24,3 +24,4 @@ class RootsJl2026(FormulaCategory):
 
     number = (1, 3, 6)
     name = "Roots.jl (2026)"
+    description = "The test problems come from the tests of Roots.jl, a Julia package of root finders, version 3.0.11."

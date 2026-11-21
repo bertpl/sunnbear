@@ -5,7 +5,16 @@ The formula comes from the row with the key ``8`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Chandrupatla19978(Formula):
@@ -21,10 +30,10 @@ class Chandrupatla19978(Formula):
     number = (1, 1, 7, 8)
     name = "8"
     params = (
-        FormulaParam("xi"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("xi", latex_symbol=r"\xi"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -32,8 +41,17 @@ class Chandrupatla19978(Formula):
             "zero of a nonlinear function without using derivatives. Advances in Engineering Software "
             "28(3), 145–149. https://doi.org/10.1016/S0965-9978(96)00051-8."
         ),
-        location="8",
+        location="Table 1, function 8",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"- \frac{3062 \left(1 - \param{xi}\right) e^{- \tmp{u}}}{\param{xi} + \left(1 - "
+            r"\param{xi}\right) e^{- \tmp{u}}} - 1013 + \frac{1628}{\tmp{u}}"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, xi: float, a: float, b: float, c_scale: float) -> float:
@@ -57,6 +75,7 @@ class Chandrupatla19978(Formula):
                     (0.61489, 0.0002, 27.0, 27.0),
                     (0.61489, 0.0002, 81.0, 81.0),
                 ),
+                summary="The published parameter values and intervals.",
             ),
         )
 

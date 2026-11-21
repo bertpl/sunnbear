@@ -14,3 +14,4 @@ class Romadani2025(FormulaCategory):
 
     number = (1, 2, 17)
     name = "Romadani (2025)"
+    description = "The test problems come from an article on Python implementations of classical root-finding methods."
