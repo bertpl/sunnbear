@@ -183,8 +183,8 @@ The appending rules above exist so that adding a source never shifts the ids of 
    - `formulas.csv`;
    - its module's file name and the `number` of the module's class;
    - the import in the source's `__init__.py`;
-   - tracked code that names its id, such as `UNTRANSLATABLE_FORMULAS` in `scripts/literature_test_problems/formula_modules.py`.
-3. Regenerate the source's modules and the survey; regenerating keeps the renumbering.
+   - tracked text that names its id, such as the docstring of its modified version in subcategory 1.99.
+3. Regenerate the survey; regenerating keeps the renumbering.
 
 A formula retired by a newly added source keeps its line and its id: deleting that line would let the addition of a source shift the ids of a source that was already in the survey, which is exactly what the appending rules prevent.
 
@@ -230,65 +230,30 @@ A formula's `status` is `active` or `retired`; `variable_change`, `f` and `param
 
 ## Formula modules
 
-Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, below `src/sunnbear/_core/problems/catalog/c01_published_test_problems/`: 1 package per subcategory, 1 package per source and 1 module per formula. A script generates the modules from the source files:
+Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, below `src/sunnbear/_core/problems/catalog/c01_published_test_problems/`: 1 package per subcategory, 1 package per source and 1 module per formula. A person writes each module, and a change of a formula's rows needs a change of its module. A formula module:
 
-```
-uv run python -m scripts.literature_test_problems.formula_modules <source id> ...
-```
-
-For each source named, the script writes the source's package and its formula modules, and rewrites the `__init__.py` of each subcategory. A generated formula module:
-
-- takes its function from the `f` of the formula's first row, as the source prints it, unless the formula's line in `formulas.csv` gives an `f`;
+- takes its function from the `f` of the formula's first row, as the source prints it, unless the formula's line in `formulas.csv` gives an `f`, or the row gives only an `f_description`;
 - evaluates that function at `x - c_scale*c`, so that the formula's `c` shifts the function along x. `c_scale` is the rounded width of the formula's interval; the class docstring of `PublishedTestProblems`, the class of category 1, states the rule and its reasons;
 - lists the formula's published test problems in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds and `c_scale` as 3 more parameters, `a`, `b` and `c_scale`;
 - renames a source's own parameters `a`, `b` and `c_scale` to `a_`, `b_` and `c_scale_` in every formula, so that these 3 names always mean the bounds of the interval and the scale of the shift;
 - names its source in a `FormulaSource`: the source's `reference`, and the keys of the formula's rows as the location;
 - takes its name, and its module and class names, from the key of the formula's first row. Where the key lists several locations, separated by `;` or `,`, the name ends after the first location; while the names of several formulas of the source would give module names that differ only in their `fNN` prefix, each of those names takes its key's next location too;
-- holds test cases whose expected values mpmath computes from the function;
-- holds `SURVEY_FIELDS_HASH`, a hash of the fields that the module depends on: the source's `title` and `reference`, the formula's `variable_change`, `f` and `parameters` in `formulas.csv`, and the fields of its rows, so that the hash changes with each change of those fields.
-
-**The function** may use, besides the operators and the functions of Python's `math`, the constructs that the docstring of `formula_expressions.py` lists, such as `if(condition; a; b)`, `sum(term, i = m..n)` and the Bessel functions.
+- holds test cases whose expected values are computed from the function in high precision, such as with mpmath.
 
 **The published test problems:** a row's parameters give 1 or several sets of values:
 
 - **1 set:** each combination of its values pairs with each of the row's intervals.
 - **Several sets,** separated by `;`, where the same parameter gets values in more than 1 set: each set names its intervals after `on`, as in `` on `[0, 5]`: `a = 0.2, 1`, `n = 4(2)12`; on `[-0.95, 4.05]`: `a = 1`, `n = 8(2)14` ``, unless the row gives only 1 interval.
 
-For a formula of several rows, the script checks that each row's own `f`, at that row's values, gives the formula's function.
+For a formula of several rows, each row's own `f`, at that row's values, must give the formula's function.
 
 **A value that needs more significant digits than a parameter value holds,** such as `pi`, is rounded to `CANONICAL_DIGITS` significant digits, the most that a parameter value holds; this applies to a parameter value and to a bound of a formula with several intervals.
 
 The module's docstring names each rounded value, and its test cases evaluate the function at the rounded value.
 
-**Among the x-values whose cases meet the strictest tolerance, a test case takes one where the case tests the function,** if any does. A case tests the function where both of these hold:
+The class docstring of `ModifiedPublishedTestProblems` describes subcategory 1.99, the modified versions of published test problems. A change of a published formula 1.x.y.z may need a matching change of formula 1.99.x.y.z.
 
-- its expected value is at least `CASE_SMALL_VALUE`;
-- the function's value changes by more than `CASE_MIN_RELATIVE_CHANGE` of itself when x moves by `CASE_X_STEP_FRACTION` of the interval's width.
-
-A case whose expected value stays below `CASE_SMALL_VALUE`, and whose Python value agrees with mpmath's within `CASE_RTOL` alone, gets `atol=0.0`, because the default `atol` would accept any value near 0. Where its Python value does not agree that closely, the case gets a wider `atol` for 1 of the 2 reasons below, or else no `atol` of its own; the script keeps such a case only where no x-value that it tries gives a case that meets a stricter tolerance.
-
-**A test case whose function cannot be evaluated in float64 to within `CASE_ATOL`** gets a wider `atol`, which `FormulaModuleSpec._case_tolerance` in `scripts/literature_test_problems/formula_modules.py` sets, for 1 of 2 reasons:
-
-- **An ill-conditioned function,** such as `sin(x*10^6)`: the test case's Python value differs from mpmath's by no more than the spread of the function's exact values within `CASE_X_ULPS` float64 steps of x on either side; the `atol` is a multiple of that spread.
-- **A function that cancels,** such as a polynomial in expanded form near its multiple root: the Python value differs from mpmath's by no more than `CASE_ROUNDING_UNITS` units of float64 rounding of the sum of the magnitudes of the function's terms; the `atol` is a multiple of that bound.
-
-The modules of 2 kinds of published formulas are written by hand, and the script only imports them:
-
-- a formula with a row that gives only an `f_description`;
-- a formula in the script's `UNTRANSLATABLE_FORMULAS`, whose row's `f`, `parameters` or `variable_change` the script cannot translate, such as an infinite sum.
-
-The script never writes the formulas of subcategory 1.99, the modified versions of published test problems; a person writes them, and the class docstring of `ModifiedPublishedTestProblems` describes them. A change of a published formula 1.x.y.z may need a matching change of formula 1.99.x.y.z, which the script does not make.
-
-The script stops and names each formula that it cannot generate. It cannot generate:
-
-- a formula with a `variable_change`;
-- a function, parameter values or intervals that it cannot read, such as a parameter without a published value, or several sets of values with several intervals and no `on`;
-- a formula of several rows in which a row's own `f` differs from the formula's function;
-- a function that is complex at an x-value of a test case, or whose Python value agrees with mpmath at none of the x-values tried.
-
-After a change of a source file, regenerate the modules of its formulas: the tests recompute each module's `SURVEY_FIELDS_HASH` from the source files, so that a module that was not regenerated fails the tests.
-
-**When a formula retires, delete its module and its import in the source's `__init__.py` by hand,** then regenerate the source's modules. The script imports sunnbear's catalog, so it fails with an import error while an `__init__.py` still imports a deleted module.
+**When a formula retires, delete its module and its import in the source's `__init__.py`.**
 
 ## Adding a source
 
@@ -296,7 +261,7 @@ After a change of a source file, regenerate the modules of its formulas: the tes
 2. Regenerate. The script prints each row that needs a decision; `rows.csv` gives, in `match_kind` and `matches`, why it needs one and the earlier rows that the script found for it.
 3. Add a line to `decisions.csv` for each of those rows, and for any automatic status that is wrong, then regenerate until the script prints no problems.
 4. Add a line to `formula_decisions.csv` for each set of the source's `new` rows that are obviously 1 function, with `f` and `parameters` where each row gives its own values of a parameter, and for each row whose formula takes another variable (§ Formulas). Restore `formulas.csv` from git, because the regenerations above already appended the source's formulas without these decisions, then regenerate.
-5. Generate the source's formula modules (§ Formula modules), and write by hand the modules of its formulas whose rows give only an `f_description`, or whose `f` the script cannot translate (add those to its `UNTRANSLATABLE_FORMULAS`).
+5. Write the source's package and its formula modules (§ Formula modules), and import the package in its subcategory's `__init__.py`.
 6. Commit the source file, `decisions.csv`, `formula_decisions.csv`, the generated files and the formula modules together.
 
 ## Regenerating
@@ -322,7 +287,7 @@ CI does not regenerate `rows.csv`, because another sympy version could change a 
 - every source file has its fields;
 - `summary.md` and `timeline.html` equal what the script builds from `rows.csv` and the source files;
 - the active formulas of `formulas.csv` hold every `new` row exactly once and no other row, the rows of each formula come from its own source, and the file equals what the script builds from `rows.csv`, `formula_decisions.csv` and the file's own ids;
-- each formula of category 1 in sunnbear's catalog has an active line in `formulas.csv`; its category is named after its source, its `source` holds the source's reference and its rows' keys as the location, and a generated module holds the current `SURVEY_FIELDS_HASH`;
+- each formula of category 1 in sunnbear's catalog has an active line in `formulas.csv`; its category is named after its source, its `source` holds the source's reference and its rows' keys as the location;
 - every active formula of a source that has a formula in the catalog is in the catalog too.
 
 A change to the parsing or matching in `scripts/literature_test_problems/`, or to the sympy version, is what the test does not check: whoever makes it regenerates `rows.csv`.

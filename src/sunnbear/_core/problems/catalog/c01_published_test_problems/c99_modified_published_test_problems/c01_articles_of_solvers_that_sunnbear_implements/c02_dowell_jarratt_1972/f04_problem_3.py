@@ -1,7 +1,6 @@
 """This module holds formula f1.99.1.2.4, the modified version of the published formula f1.1.2.4.
 
-A person writes this module: the module generator, `scripts/literature_test_problems/formula_modules.py`, writes only
-the published formulas of category 1. A change of formula f1.1.2.4 may need a matching change of this module.
+A change of formula f1.1.2.4 may need a matching change of this module.
 """
 
 import math

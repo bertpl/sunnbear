@@ -1,9 +1,7 @@
 """This module holds a formula of Steffen et al. (2025).
 
-The formula comes from the row with the key ``(8)`` in the survey of published test problems. The survey gives this
-function as 1 expression that the module generator, `scripts/literature_test_problems/formula_modules.py`, cannot
-translate: an expression with a function ``alpha`` that the row's parameters define. A person therefore writes this
-module, and a change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``(8)`` in the survey of published test problems. A change of the formula's
+row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math

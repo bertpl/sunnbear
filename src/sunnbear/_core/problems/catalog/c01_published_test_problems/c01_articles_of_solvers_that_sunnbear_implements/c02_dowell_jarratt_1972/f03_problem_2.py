@@ -1,17 +1,11 @@
 """This module holds a formula of Dowell, Jarratt (1972).
 
-The formula comes from the row with the key ``Problem 2`` in the survey of published test problems. A script generates
-this module from that survey: to change the formula, change its source file in `data/literature_test_problems/sources/`
-and run `uv run python -m scripts.literature_test_problems.formula_modules 1972_dowell_jarratt_pegasus`; do not edit
-this file.
+The formula comes from the row with the key ``Problem 2`` in the survey of published test problems. A change of the
+formula's row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 from sunnbear._core.utils.math_functions import bessel_j0, bessel_j1, bessel_y0, bessel_y1
-
-# SURVEY_FIELDS_HASH is a hash of this formula's survey fields; the tests recompute it from the
-# survey, so that a test fails when the survey changes and this module is not regenerated.
-SURVEY_FIELDS_HASH = "ec66590e86154058"
 
 
 class DowellJarratt1972Problem2(Formula):

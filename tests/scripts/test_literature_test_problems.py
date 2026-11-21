@@ -1,15 +1,12 @@
 """The generated files of `data/literature_test_problems/` agree with the folder's source files and decisions.
 
-The tests do not run the row comparison in `matching`, because another sympy version could change a match, and they
-do not regenerate the formula modules of category 1 in sunnbear's catalog; they recompute each module's hash from the
-survey.
+The tests do not run the row comparison in `matching`, because another sympy version could change a match.
 """
 
 import ast
 import inspect
 import math
 import re
-import sys
 import textwrap
 
 import pytest
@@ -244,22 +241,16 @@ def test_timeline_template_counts_every_status(script_modules):
 #  The formulas of category 1 in sunnbear's catalog
 # ==================================================================================================
 @pytest.mark.parametrize("formula", _PUBLISHED_FORMULAS, ids=lambda formula: formula.label)
-def test_published_formula_matches_the_survey(formula, script_modules, sources, committed_formulas_table):
+def test_published_formula_matches_the_survey(formula, sources, committed_formulas_table):
     """A published formula has an active line in `formulas.csv`, and its category and `source` match its source.
 
     The category's name must be the source's short title, and `source` must hold the source's reference and its rows'
     keys as the location.
-
-    A generated module's hash must equal the hash of its survey fields, so that a module left stale after a change
-    of the survey fails; a module has no hash exactly when it is hand-written: when a row of its formula only
-    describes its function, or the formula is 1 of the generator's `UNTRANSLATABLE_FORMULAS`.
     """
     # --- arrange ----------------------
     line = {line.number: line for line in committed_formulas_table.formulas}[formula.number]
     source = {source.source_id: source for source in sources}[line.source_id]
-    survey_formula = script_modules["formulas"].SurveyFormula(line, source)
     category = {category.number: category for category in FormulaRegistry.categories()}[formula.number[:3]]
-    survey_fields_hash = getattr(sys.modules[type(formula).__module__], "SURVEY_FIELDS_HASH", None)
 
     # --- act --------------------------
     location = ", ".join(source.find_row(row_id).key for row_id in line.row_ids)
@@ -268,12 +259,6 @@ def test_published_formula_matches_the_survey(formula, script_modules, sources, 
     assert not line.is_retired
     assert category.name == source.short_title
     assert formula.source == FormulaSource(reference=source.reference, location=location)
-    if script_modules["formula_modules"].is_hand_written(survey_formula):
-        assert survey_fields_hash is None
-    else:
-        assert survey_fields_hash == script_modules["formula_modules"].FormulaModuleSpec.survey_fields_hash(
-            survey_formula
-        )
 
 
 def test_published_sources_in_the_catalog_are_complete(committed_formulas_table):

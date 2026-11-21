@@ -1,8 +1,7 @@
 """This module holds a formula of Burkardt (2016).
 
-The formula comes from the row with the key ``p12`` in the survey of published test problems. The survey gives this
-function as a description, not as 1 expression, so a person writes this module: a change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``p12`` in the survey of published test problems. A change of the formula's
+row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math

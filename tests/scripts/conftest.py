@@ -31,9 +31,6 @@ def script_modules() -> dict[str, ModuleType]:
             "statuses",
             "overview",
             "formulas",
-            "formula_expressions",
-            "published_test_problems",
-            "formula_modules",
         )
     }
 
