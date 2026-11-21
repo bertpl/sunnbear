@@ -1,8 +1,4 @@
-r"""`FormulaPresentation` holds what a reader sees of a formula: its math in LaTeX, its summary and its notes.
-
-Every field is written in sunnbear's LaTeX notation, which `latex_template` describes. `Formula` renders the fields with
-its parameters' symbols, or with a test problem's values.
-"""
+"""`FormulaPresentation` holds what a reader sees of a formula; the package's docstring says how it is rendered."""
 
 from dataclasses import dataclass
 
@@ -20,6 +16,16 @@ class FormulaPresentation:
     the definitions and the expression into 1 aligned display, so no field contains the ``\\`` or ``&`` that separate
     and align those lines; an environment inside a field, such as ``cases``, keeps its own.
 
+    Each field holds 1 of the 2 kinds of text that the package's docstring defines:
+
+    | Field | Kind of text |
+    |---|---|
+    | `definitions` | LaTeX math on each side, with no ``$`` |
+    | `expression` | LaTeX math, with no ``$`` |
+    | `interval` | LaTeX math, with no ``$`` |
+    | `summary` | a text for a reader, with its math as ``$…$`` inline and ``$$…$$`` for display |
+    | `notes` | texts for a reader, with their math as ``$…$`` inline and ``$$…$$`` for display |
+
     Attributes:
         expression: The right side of ``f(x, c) = …``, as the formula's code computes it, including the conditions
             under which the code returns a fixed value. It may span several lines, such as a ``cases`` environment.
@@ -31,8 +37,8 @@ class FormulaPresentation:
             marker. Empty by default.
         summary: Briefly, what the formula is, or what makes it an interesting test problem, such as "Oscillatory
             function with many roots". None by default; the catalog's tests require it of every shipped formula.
-        notes: Paragraphs for a reader, such as a note that gives the original expression when the formula's code
-            computes an equivalent form of it. Empty by default.
+        notes: Paragraphs for a reader, such as a note that gives the original expression as display math when the
+            formula's code computes an equivalent form of it. Empty by default.
     """
 
     expression: str
@@ -89,12 +95,15 @@ class FormulaPresentation:
 
     @property
     def math_placeholder_names(self) -> frozenset[str]:
-        """Return the parameter names of the placeholders in the definitions, the expression and the interval."""
+        r"""Return the names of the parameters whose placeholder appears in the fields of LaTeX math.
+
+        A placeholder is ``\param{name}``; the fields of LaTeX math are `definitions`, `expression` and `interval`.
+        """
         return frozenset(name for text in self._math_texts for name in LatexTemplate(text).placeholder_names)
 
     @property
     def placeholder_names(self) -> frozenset[str]:
-        """Return the parameter names of the placeholders in every field."""
+        r"""Return the names of the parameters whose ``\param{…}`` placeholder appears in any field."""
         texts = (*self._math_texts, *self.texts_for_a_reader)
         return frozenset(name for text in texts for name in LatexTemplate(text).placeholder_names)
 
@@ -103,7 +112,7 @@ class FormulaPresentation:
     # --------------------------------------------------------------------------
     @property
     def _math_texts(self) -> tuple[str, ...]:
-        """Return the fields that are LaTeX: each side of each definition, the expression and the interval."""
+        """Return the fields that are LaTeX math: each side of each definition, `expression` and `interval`."""
         sides = [side for definition in self.definitions for side in definition]
         return (*sides, self.expression, self.interval)
 

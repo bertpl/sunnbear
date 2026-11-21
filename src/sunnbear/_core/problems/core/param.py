@@ -16,8 +16,8 @@ class FormulaParam:
             placeholder when a formula renders its LaTeX with symbols. None by default; the catalog's tests require it
             of every parameter of a shipped formula.
         meaning: What the parameter does, in a sentence for a reader, written only where the formula's expression
-            does not make it obvious. The sentence writes its math in LaTeX, as `LatexTemplate` describes. None by
-            default.
+            does not make it obvious. The sentence is a text for a reader in sunnbear's LaTeX notation
+            (`presentation`), with its math as ``$…$`` inline and ``$$…$$`` for display. None by default.
     """
 
     name: str

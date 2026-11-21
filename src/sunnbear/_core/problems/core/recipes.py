@@ -137,8 +137,9 @@ class ParamRecipe(ABC):
 
     Attributes:
         summary: One sentence for a reader on what the recipe covers, such as "The sweep of $\param{b}$ at
-            $\param{d} = 1$.", in sunnbear's LaTeX notation (`LatexTemplate`). None by default; the catalog's tests
-            require it of every recipe of a shipped formula.
+            $\param{d} = 1$.". The sentence is a text for a reader in sunnbear's LaTeX notation (`presentation`),
+            with its math as ``$…$`` inline and ``$$…$$`` for display. None by default; the catalog's tests require it
+            of every recipe of a shipped formula.
     """
 
     summary: str | None = None

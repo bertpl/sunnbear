@@ -1,31 +1,4 @@
-r"""`LatexTemplate` holds 1 text in sunnbear's LaTeX notation, and defines that notation.
-
-The LaTeX of a formula's presentation, and the math in the texts for a reader that the last paragraph lists, use this
-notation:
-
-- **a placeholder per parameter,** ``\param{name}``, which `LatexTemplate.substitute` replaces before sunnbear hands
-  the LaTeX out;
-- **5 markers,** which stay in the LaTeX that sunnbear hands out, so that a consumer can style each kind of symbol:
-  - ``\x``, the variable;
-  - ``\c``, the parameter ``c``;
-  - ``\tmp{…}``, a temporary variable, such as ``\tmp{u}`` or ``\tmp{t_1}``;
-  - ``\fn{…}``, an intermediate function, such as ``\fn{g}(\x)``;
-  - ``\prm{…}``, which wraps the symbol or the value that replaced a placeholder.
-
-A consumer that renders the LaTeX defines each marker as a macro. `PLAIN_MARKER_MACROS` holds plain definitions, in the
-form of the ``macros`` option of KaTeX, so that a consumer that does not style the markers can still render the LaTeX.
-
-``\c`` already exists in LaTeX as the cedilla accent, so the consumer's definition replaces it. A consumer that defines
-no markers fails on ``\x``, which every formula's expression uses.
-
-A text for a reader marks its math as ``$…$`` inline and ``$$…$$`` for display, as mkdocs does. The texts for a reader
-are:
-
-- a presentation's summary and notes;
-- a parameter's meaning;
-- a recipe's summary;
-- a category's description.
-"""
+"""`LatexTemplate` holds 1 text in sunnbear's LaTeX notation, which the package's docstring describes."""
 
 import re
 from collections.abc import Mapping
